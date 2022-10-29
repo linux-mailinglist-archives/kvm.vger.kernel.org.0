@@ -2,63 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4833F611E8A
-	for <lists+kvm@lfdr.de>; Sat, 29 Oct 2022 02:00:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 567DB611EBB
+	for <lists+kvm@lfdr.de>; Sat, 29 Oct 2022 02:35:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230003AbiJ2AAP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 20:00:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51782 "EHLO
+        id S229691AbiJ2AfK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 20:35:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229916AbiJ2AAK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 20:00:10 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0CDD43E50
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 17:00:05 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id y72so7795555yby.13
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 17:00:05 -0700 (PDT)
+        with ESMTP id S229674AbiJ2AfI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 20:35:08 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D11BF58171
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 17:35:07 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id k8so8580677wrh.1
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 17:35:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=84R2eYddxpxfwALxiEQNqgRaCZuxTUj2E3HhM+z6HRs=;
-        b=RDmg4RwsphaSGKwI/1dWEe2nPwCRjzYIeRwrj4PGQPJFcLOpIkndFv6C6mQd5RWH7Z
-         UMuDyKg60Q+pHmYQwM+oKbOVejgLPNmF6SkLSx35s1AIFuhrJilQLZ7fJPxMoi6KlzEf
-         8ZDw/9jYaVNEttuGFxGPE7eU1RPahLzpnoeC7i7Rv6WDdBIR+X+o9HyDd4RhSb0VuCLm
-         eEPQTh2z+kr8pM79iMWR6gstYSqCDJANNb5aHxZ1xSduXjqkRa1haPu60FC3uGKsFogX
-         eK338Aipzues97NkoRALGXqU5//+pa8zYT21M3XEr5JzFU+EYLNqLKWwCPDrFwq+KszQ
-         kaNg==
+        bh=H/ZnB5F+DVfXKr1M4rAR7gUNY4tm1xTurWMjuzZRaCQ=;
+        b=H4nRHTRLfB74dloa6Q0Xz7xeHgFWi39fFyKMH8tG5ZxGqRWBgSpPiDEe6sPUyP7Lug
+         aQMz5X1Pab4i4yrwoBwUMKzGLc/uhLFJIIPSpsIqDQZHB3wK23L/tKi7bE22OKLTosem
+         QnImR9uHZ9zmOjljOpDJfXELoykgAnOG0mrK+WbHkEC4Sf0XRoPCpOgF8u9wv1iTyKtJ
+         zaod5mbil+4WZ5LS/qlcf4+EdGzbwAxWKE6rPJEOo5BUE4VZCVGCimokBQr3Ect4ORf8
+         LLryy4CgaddvxB8htq1xldyVxpfODuaTM+yuIuY7mHYUWSzy6CAqaVxTYhDZOPUvs3BC
+         IrUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=84R2eYddxpxfwALxiEQNqgRaCZuxTUj2E3HhM+z6HRs=;
-        b=iqyqB8BK1GGM2EGBlzO6srevCpVUoSGVk8Mnk1pJqdYxkq7csX3+xJYqVpxNnILYdw
-         BviVUvq7E1VLU6emOA4L7P68FQOZwN2rF2GcZmd5ZJQGjaBzo2JIKMkMI+/GprcTgPne
-         pf47E8L61DrTHBxvDxRSIfuPEWPuONAFTenLGPC2seP+Oz6rIwon1CrMTKpUZBchfOox
-         9CmItXHJJnxrxTUvmNRKO+KYnX9CXE7UYmbt4FmmCpApLsTluA1XaWV2AQ3QfX4l5DJX
-         skF7MTIQf/BLGeQxUxlXIvt2L0u8BXbAtwqpMGuWJx/pIThh+nKmHlrbgM0uzy/xn6PL
-         +Qww==
-X-Gm-Message-State: ACrzQf00f67OufA4iAWMCrZxIeKIv2ABtZ5ySPo5dUouUJnni5fy4pCE
-        FvwWbhRXlVgbTBWJIzTnp/ak8h1RKIZjJKgm062cpw==
-X-Google-Smtp-Source: AMsMyM5WBCCvC3KQ9sNCRgCPXsoCb4/y7NXotPnjwcW9m2e73Yltsurmhg2a5p+4Ti18nnAj6QHltNsTPzgev59Do5Y=
-X-Received: by 2002:a05:6902:68b:b0:6a6:bffd:b691 with SMTP id
- i11-20020a056902068b00b006a6bffdb691mr1466633ybt.607.1667001604528; Fri, 28
- Oct 2022 17:00:04 -0700 (PDT)
+        bh=H/ZnB5F+DVfXKr1M4rAR7gUNY4tm1xTurWMjuzZRaCQ=;
+        b=aTyKoQ2H4gIY0zVjeQxgTUSQARnT1Fx/HPoiVsKtM8L6PHwrgVCsEtqC5TmUauwVhQ
+         fZbSeBFBgufLQIn57tCAmjSe7ge22sSj74byp4wfxKtqgLWMS0vuhW6U3KevxDfaO8lM
+         jlqw1ofRvblhOl+W9A1xJUVhaiiNW2Sndb+cZZoXVwcX0o5OOAAneYnjDWFwfGCJTECz
+         yDRimeH1unIpxnFPPJTcXeqsg1LcDLaS2eKXNPq/8qS1fdVWDKUsXzx2PniuQJJDLZJ+
+         B22HInMEqHRCb0VYSG/NSKM+GtcZy5fIgB6GRJU3Gf/K9CMDOZmrvm46pzKOSn+az2u4
+         q21g==
+X-Gm-Message-State: ACrzQf1KEC2rQTiYx0TUqdIM2LocYeOlvwNgU2R7WnFpxMuW9XPYOLn0
+        hIWKq3kumeLqjfCmKbY0x9p3uCxreiyI2dqIcx0Y7i9Xx8M=
+X-Google-Smtp-Source: AMsMyM4rrgrlBwrwHRN831CK+5d4jBrOUFXKJ4+EqQhpAvdvr3kdbAT8HEmkC9QNLOgXI0FjLlo4wD2dbtfK0xwvbrc=
+X-Received: by 2002:a5d:604c:0:b0:236:6deb:6d31 with SMTP id
+ j12-20020a5d604c000000b002366deb6d31mr984873wrt.282.1667003706292; Fri, 28
+ Oct 2022 17:35:06 -0700 (PDT)
 MIME-Version: 1.0
-References: <20221018214612.3445074-1-dmatlack@google.com> <20221018214612.3445074-4-dmatlack@google.com>
- <Y1sX1FP4YIWRl5YU@google.com>
-In-Reply-To: <Y1sX1FP4YIWRl5YU@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Fri, 28 Oct 2022 16:59:38 -0700
-Message-ID: <CALzav=dVUJwSrzeeoPpL2oKdzimjyGuZtc3=i+eMJouxpDW9-A@mail.gmail.com>
-Subject: Re: [PATCH v2 3/8] KVM: selftests: Delete dead ucall code
+References: <20221028130035.1550068-1-aaronlewis@google.com>
+ <Y1wCqAzJwvz4s8OR@google.com> <CAAAPnDEda-FBz+3suqtA868Szwp-YCoLEmK1c=UynibTWCU1hw@mail.gmail.com>
+ <Y1xOvenzUxFIS0iz@google.com>
+In-Reply-To: <Y1xOvenzUxFIS0iz@google.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Fri, 28 Oct 2022 17:34:54 -0700
+Message-ID: <CAAAPnDFRoStx7CeLSLAWvd65hZzeLwwKX678mUjO11ytnkZZ4w@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Fix a stall when KVM_SET_MSRS is called on the
+ pmu counters
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -71,51 +69,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 27, 2022 at 4:44 PM Sean Christopherson <seanjc@google.com> wrote:
+On Fri, Oct 28, 2022 at 2:51 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On Tue, Oct 18, 2022, David Matlack wrote:
-> > Delete a bunch of code related to ucall handling from
-> > smaller_maxphyaddr_emulation_test. The only thing
-> > smaller_maxphyaddr_emulation_test needs to check is that the vCPU exits
-> > with UCALL_DONE after the second vcpu_run().
+> On Fri, Oct 28, 2022, Aaron Lewis wrote:
+> > On Fri, Oct 28, 2022 at 4:26 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Fri, Oct 28, 2022, Aaron Lewis wrote:
+> > > @@ -3778,16 +3775,13 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> > >
+> > >     case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
+> > >     case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
+> > > -        pr = true;
+> > > -        fallthrough;
+> > >     case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
+> > >     case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
+> > >         if (kvm_pmu_is_valid_msr(vcpu, msr))
+> > >             return kvm_pmu_set_msr(vcpu, msr_info);
+> > >
+> > > -        if (pr || data != 0)
+> > > -            vcpu_unimpl(vcpu, "disabled perfctr wrmsr: "
+> > > -                  "0x%x data 0x%llx\n", msr, data);
+> > > +        if (data)
+> > > +            kvm_pr_unimpl_wrmsr(vcpu, msr, data);
 > >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > ---
-> >  .../smaller_maxphyaddr_emulation_test.c       | 54 +------------------
-> >  1 file changed, 2 insertions(+), 52 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-> > index c5353ad0e06d..d6e71549ca08 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-> > @@ -90,64 +90,15 @@ static void process_exit_on_emulation_error(struct kvm_vcpu *vcpu)
-> >       vcpu_regs_set(vcpu, &regs);
-> >  }
-> >
-> > -static void do_guest_assert(struct ucall *uc)
-> > -{
-> > -     REPORT_GUEST_ASSERT(*uc);
-> > -}
-> > -
-> > -static void check_for_guest_assert(struct kvm_vcpu *vcpu)
-> > +static void assert_ucall_done(struct kvm_vcpu *vcpu)
+> > Any reason to keep the check for 'data' around?  Now that it's
+> > checking for 'report_ignored_msrs' maybe we don't need that check as
+> > well.  I'm not sure what the harm is in removing it, and with this
+> > change we are additionally restricting pmu counter == 0 from printing.
 >
-> I vote to delete this helper too, it's used exactly once and doesn't exactly make
-> the code more readable.
+> Checking 'dat' doesn't restrict counter 0, it skips printing if the guest (or host)
+> is writing '0', e.g. it would also skip the case you encountered where the host is
+> blindly "restoring" unused MSRs.
 >
-> >       TEST_ASSERT(get_ucall(vcpu, &uc) == UCALL_DONE,
-> >                   "Unexpected ucall command: %lu, expected UCALL_DONE (%d)",
-> >                   uc.cmd, UCALL_DONE);
->
-> I believe the warning is due to gcc resolving the VA args inputs to test_assert()
-> before the call to get_ucall().  One thought:
->
->   uint64_t cmd = get_ucall(vcpu, NULL);
->
->   TEST_ASSERT(cmd == UCALL_DONE, ...)
->
+> Or did I misunderstand your comment?
 
-I think you're right. And only gcc complains, which is how I missed
-it. We can kill 2 birds (gcc warning + delete helper) with:
+That makes sense.
 
-  ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
+Reviewed-by: Aaron Lewis <aaronlewis@google.com>
