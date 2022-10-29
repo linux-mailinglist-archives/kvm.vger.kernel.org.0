@@ -2,107 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 567DB611EBB
-	for <lists+kvm@lfdr.de>; Sat, 29 Oct 2022 02:35:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21BF9611FD8
+	for <lists+kvm@lfdr.de>; Sat, 29 Oct 2022 05:43:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229691AbiJ2AfK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 20:35:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57570 "EHLO
+        id S229752AbiJ2Dnh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 23:43:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229674AbiJ2AfI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 20:35:08 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D11BF58171
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 17:35:07 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id k8so8580677wrh.1
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 17:35:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=H/ZnB5F+DVfXKr1M4rAR7gUNY4tm1xTurWMjuzZRaCQ=;
-        b=H4nRHTRLfB74dloa6Q0Xz7xeHgFWi39fFyKMH8tG5ZxGqRWBgSpPiDEe6sPUyP7Lug
-         aQMz5X1Pab4i4yrwoBwUMKzGLc/uhLFJIIPSpsIqDQZHB3wK23L/tKi7bE22OKLTosem
-         QnImR9uHZ9zmOjljOpDJfXELoykgAnOG0mrK+WbHkEC4Sf0XRoPCpOgF8u9wv1iTyKtJ
-         zaod5mbil+4WZ5LS/qlcf4+EdGzbwAxWKE6rPJEOo5BUE4VZCVGCimokBQr3Ect4ORf8
-         LLryy4CgaddvxB8htq1xldyVxpfODuaTM+yuIuY7mHYUWSzy6CAqaVxTYhDZOPUvs3BC
-         IrUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=H/ZnB5F+DVfXKr1M4rAR7gUNY4tm1xTurWMjuzZRaCQ=;
-        b=aTyKoQ2H4gIY0zVjeQxgTUSQARnT1Fx/HPoiVsKtM8L6PHwrgVCsEtqC5TmUauwVhQ
-         fZbSeBFBgufLQIn57tCAmjSe7ge22sSj74byp4wfxKtqgLWMS0vuhW6U3KevxDfaO8lM
-         jlqw1ofRvblhOl+W9A1xJUVhaiiNW2Sndb+cZZoXVwcX0o5OOAAneYnjDWFwfGCJTECz
-         yDRimeH1unIpxnFPPJTcXeqsg1LcDLaS2eKXNPq/8qS1fdVWDKUsXzx2PniuQJJDLZJ+
-         B22HInMEqHRCb0VYSG/NSKM+GtcZy5fIgB6GRJU3Gf/K9CMDOZmrvm46pzKOSn+az2u4
-         q21g==
-X-Gm-Message-State: ACrzQf1KEC2rQTiYx0TUqdIM2LocYeOlvwNgU2R7WnFpxMuW9XPYOLn0
-        hIWKq3kumeLqjfCmKbY0x9p3uCxreiyI2dqIcx0Y7i9Xx8M=
-X-Google-Smtp-Source: AMsMyM4rrgrlBwrwHRN831CK+5d4jBrOUFXKJ4+EqQhpAvdvr3kdbAT8HEmkC9QNLOgXI0FjLlo4wD2dbtfK0xwvbrc=
-X-Received: by 2002:a5d:604c:0:b0:236:6deb:6d31 with SMTP id
- j12-20020a5d604c000000b002366deb6d31mr984873wrt.282.1667003706292; Fri, 28
- Oct 2022 17:35:06 -0700 (PDT)
+        with ESMTP id S229681AbiJ2Dnf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 23:43:35 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA0A61C8D7C;
+        Fri, 28 Oct 2022 20:43:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667015014; x=1698551014;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=lwhcsqVAPcB+BRLzzkySku/43hUGK299jANuukpJQiU=;
+  b=DU5uUi+sMPvwvQvrMrsKVZ7QYkhHdRbqX3edVEUBiX13HbqjrMb5Zjeo
+   PHEstuGA4JyAm3XM8ER+4XJKw8Q2ON8Q3DT9eWSAfZDIKjjA3W9x5gT9z
+   yZCeUG/39seUm49yg0mno4PoeehngrAK3ynElWQ/cNvFtXTAKHLrh3Eu4
+   44prwvaoYNMnf8Yo2jk5BU14jvVq4Is03d5ax0FVyyZMo38hlze/oI2o1
+   7hf6fyHD/vBT6+6AkrixetzF6jYZGazQ4MSxq8mh5H1+/aT+7y9DsWlyR
+   7FDqZv9FtaYggSrj1xpsRo/RArb6CAU77zibHcxobyCJQ4LV1UpGOJEVk
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10514"; a="309723947"
+X-IronPort-AV: E=Sophos;i="5.95,222,1661842800"; 
+   d="scan'208";a="309723947"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2022 20:43:34 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10514"; a="635522260"
+X-IronPort-AV: E=Sophos;i="5.95,222,1661842800"; 
+   d="scan'208";a="635522260"
+Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.215.211]) ([10.254.215.211])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2022 20:43:25 -0700
+Message-ID: <8b165b88-eea1-c891-2754-33209a2711bf@linux.intel.com>
+Date:   Sat, 29 Oct 2022 11:43:23 +0800
 MIME-Version: 1.0
-References: <20221028130035.1550068-1-aaronlewis@google.com>
- <Y1wCqAzJwvz4s8OR@google.com> <CAAAPnDEda-FBz+3suqtA868Szwp-YCoLEmK1c=UynibTWCU1hw@mail.gmail.com>
- <Y1xOvenzUxFIS0iz@google.com>
-In-Reply-To: <Y1xOvenzUxFIS0iz@google.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Fri, 28 Oct 2022 17:34:54 -0700
-Message-ID: <CAAAPnDFRoStx7CeLSLAWvd65hZzeLwwKX678mUjO11ytnkZZ4w@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Fix a stall when KVM_SET_MSRS is called on the
- pmu counters
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Cc:     baolu.lu@linux.intel.com, bpf@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v3 05/15] iommufd: File descriptor, context, kconfig and
+ makefiles
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>
+References: <5-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <9a837538-6333-0973-c6f4-229064026330@linux.intel.com>
+ <Y1lq2JJt1yLrzNjs@nvidia.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <Y1lq2JJt1yLrzNjs@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 28, 2022 at 2:51 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Oct 28, 2022, Aaron Lewis wrote:
-> > On Fri, Oct 28, 2022 at 4:26 PM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Fri, Oct 28, 2022, Aaron Lewis wrote:
-> > > @@ -3778,16 +3775,13 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> > >
-> > >     case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
-> > >     case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
-> > > -        pr = true;
-> > > -        fallthrough;
-> > >     case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
-> > >     case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
-> > >         if (kvm_pmu_is_valid_msr(vcpu, msr))
-> > >             return kvm_pmu_set_msr(vcpu, msr_info);
-> > >
-> > > -        if (pr || data != 0)
-> > > -            vcpu_unimpl(vcpu, "disabled perfctr wrmsr: "
-> > > -                  "0x%x data 0x%llx\n", msr, data);
-> > > +        if (data)
-> > > +            kvm_pr_unimpl_wrmsr(vcpu, msr, data);
-> >
-> > Any reason to keep the check for 'data' around?  Now that it's
-> > checking for 'report_ignored_msrs' maybe we don't need that check as
-> > well.  I'm not sure what the harm is in removing it, and with this
-> > change we are additionally restricting pmu counter == 0 from printing.
->
-> Checking 'dat' doesn't restrict counter 0, it skips printing if the guest (or host)
-> is writing '0', e.g. it would also skip the case you encountered where the host is
-> blindly "restoring" unused MSRs.
->
-> Or did I misunderstand your comment?
+On 2022/10/27 1:14, Jason Gunthorpe wrote:
+> On Wed, Oct 26, 2022 at 08:58:23PM +0800, Baolu Lu wrote:
+>>> +	[_IOC_NR(_ioctl) - IOMMUFD_CMD_BASE] = {                               \
+>>> +		.size = sizeof(_struct) +                                      \
+>>> +			BUILD_BUG_ON_ZERO(sizeof(union ucmd_buffer) <          \
+>>> +					  sizeof(_struct)),                    \
+>>> +		.min_size = offsetofend(_struct, _last),                       \
+>>> +		.ioctl_num = _ioctl,                                           \
+>>> +		.execute = _fn,                                                \
+>>> +	}
+>>> +static struct iommufd_ioctl_op iommufd_ioctl_ops[] = {
+>>
+>> How about making the ops "static const"?
+> 
+> Yes both const's were missed
+> 
+>>> +static void __exit iommufd_exit(void)
+>>> +{
+>>> +	misc_deregister(&iommu_misc_dev);
+>>> +}
+>>> +
+>>> +module_init(iommufd_init);
+>>> +module_exit(iommufd_exit);
+>>> +
+>>> +MODULE_DESCRIPTION("I/O Address Space Management for passthrough devices");
+>>> +MODULE_LICENSE("GPL");
+>>
+>> Could above be "GPL v2"?
+> 
+> It should be just "GPL", see Documentation/process/license-rules.rst:
+> 
+>      "GPL v2"                      Same as "GPL". It exists for historic
 
-That makes sense.
+Ah! Thanks for letting me know this.
 
-Reviewed-by: Aaron Lewis <aaronlewis@google.com>
+> 
+>>> --- /dev/null
+>>> +++ b/include/uapi/linux/iommufd.h
+>>> @@ -0,0 +1,55 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>>> +/* Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES.
+>>> + */
+>>> +#ifndef _UAPI_IOMMUFD_H
+>>> +#define _UAPI_IOMMUFD_H
+>>> +
+>>> +#include <linux/types.h>
+>>> +#include <linux/ioctl.h>
+>>> +
+>>> +#define IOMMUFD_TYPE (';')
+>>> +
+>>> +/**
+>>> + * DOC: General ioctl format
+>>> + *
+>>> + * The ioctl mechanims follows a general format to allow for extensibility. Each
+>>                  ^^^^^^^^^ mechanism?
+> 
+> How about "interface" ?
+
+Yes. It works.
+
+With above addressed,
+
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+
+Best regards,
+baolu
