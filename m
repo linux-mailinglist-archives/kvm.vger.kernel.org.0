@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EF44612840
-	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:29:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C5F07612845
+	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:29:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231245AbiJ3G3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Oct 2022 02:29:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54058 "EHLO
+        id S231264AbiJ3G3w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Oct 2022 02:29:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230489AbiJ3G2J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230493AbiJ3G2J (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 30 Oct 2022 02:28:09 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0542E2E4;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FFA72EE;
         Sat, 29 Oct 2022 23:24:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667111076; x=1698647076;
+  t=1667111077; x=1698647077;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=JDJD5HxBG16VKKz5Tw7vIJeGTJe3WzrVqBHL0IAN/Ng=;
-  b=Nhwi0SRhqXTVldQdOwYrr1iUoyZVdg4UsIwKF2Jv7z9MvlB8CdMYKsmR
-   ZIRITjEUI6REpG8KHY30LXTWvaHe2q4f/ukam8123gHZmafcKyKIWckxG
-   VIkYuGfVPWzU+kdkON+kR3PaEqsGB8VnnX2vdbsgyJwVuta7NsiO0KMgj
-   liLf9rV2sd5zSAAoNJMpwQv/2JfD7p1AsSRBADk9cnnfLL7Idot5VlgWQ
-   srXUttc4LF2zvCrMcfeU66q4oBf7DgpERJDk1t3FAEsryJ7hpT3FBVtWI
-   /XFStPSp+/DK0KILuU3lqzHGCl4FRaWnQ+S0imvAd4K2kISK0dZK1tdaw
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037186"
+  bh=bxQogyGeF26Y2rtQ1vDn3KVS8MkMlSfBtAXMo5C8hPA=;
+  b=MvxW5cuR8ecq7ysLL87E8Rjg0DHhKDzXpgFAV25UldEYGDi1q+VUkZ/a
+   fpTBd+kIrBF79nMiHcb9LP6nZq8uc5LgFYASoM1skdhwCrDVivBxHqQ84
+   cVCGTjwwWclMPKc+Uk/2MuclSipmUzg7wGlwmBIDVRPV0qiZSrDu+z5t2
+   e+rYCVuRwOs/9KviERptFuRw3YPm7Nsgo6CqG7NJAlc9AG2wdPKvKk6DO
+   EqIC0lAOWSqWeDgaRpQAwtEFlMTpdboavr/K17wawsgwb4on2dhid7eoi
+   IwIGV6htovy9kZ9Qc/Y/HflTbhNJy1ueiyLrXFUH+escQT0QIY+pN2oK5
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037187"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="395037186"
+   d="scan'208";a="395037187"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:09 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878393080"
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878393083"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="878393080"
+   d="scan'208";a="878393083"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:09 -0700
 From:   isaku.yamahata@intel.com
@@ -44,9 +44,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>,
         David Matlack <dmatlack@google.com>
-Subject: [PATCH v10 073/108] [MARKER] The start of TDX KVM patch series: TD vcpu exits/interrupts/hypercalls
-Date:   Sat, 29 Oct 2022 23:23:14 -0700
-Message-Id: <ce0a37458edddb27c01e78a5d8b4dc64da7c486e.1667110240.git.isaku.yamahata@intel.com>
+Subject: [PATCH v10 074/108] KVM: TDX: complete interrupts after tdexit
+Date:   Sat, 29 Oct 2022 23:23:15 -0700
+Message-Id: <62b2229edec27f04f0f0a7dbc1ff1fd1b1e13378.1667110240.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1667110240.git.isaku.yamahata@intel.com>
 References: <cover.1667110240.git.isaku.yamahata@intel.com>
@@ -63,35 +63,43 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-This empty commit is to mark the start of patch series of TD vcpu
-exits, interrupts, and hypercalls.
+This corresponds to VMX __vmx_complete_interrupts().  Because TDX
+virtualize vAPIC, KVM only needs to care NMI injection.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Documentation/virt/kvm/intel-tdx-layer-status.rst | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/tdx.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-index b51e8e6b1541..1cec14213f69 100644
---- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
-+++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-@@ -13,6 +13,7 @@ What qemu can do
- - Qemu can create/destroy vcpu of TDX vm type.
- - Qemu can populate initial guest memory image.
- - Qemu can finalize guest TD.
-+- Qemu can start to run vcpu. But vcpu can not make progress yet.
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index f35ccf2b502d..af13c19af339 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -456,6 +456,14 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	vcpu->kvm->vm_bugged = true;
+ }
  
- Patch Layer status
- ------------------
-@@ -23,7 +24,7 @@ Patch Layer status
- * TD vcpu creation/destruction:         Applied
- * TDX EPT violation:                    Applied
- * TD finalization:                      Applied
--* TD vcpu enter/exit:                   Applying
-+* TD vcpu enter/exit:                   Applied
- * TD vcpu interrupts/exit/hypercall:    Not yet
++static void tdx_complete_interrupts(struct kvm_vcpu *vcpu)
++{
++	/* Avoid costly SEAMCALL if no nmi was injected */
++	if (vcpu->arch.nmi_injected)
++		vcpu->arch.nmi_injected = td_management_read8(to_tdx(vcpu),
++							      TD_VCPU_PEND_NMI);
++}
++
+ struct tdx_uret_msr {
+ 	u32 msr;
+ 	unsigned int slot;
+@@ -524,6 +532,8 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
+ 	trace_kvm_exit(vcpu, KVM_ISA_VMX);
  
- * KVM MMU GPA shared bits:              Applied
++	tdx_complete_interrupts(vcpu);
++
+ 	return EXIT_FASTPATH_NONE;
+ }
+ 
 -- 
 2.25.1
 
