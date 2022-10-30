@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF66C6127CB
-	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:24:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DD636127C4
+	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:24:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230002AbiJ3GYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Oct 2022 02:24:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46900 "EHLO
+        id S229974AbiJ3GY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Oct 2022 02:24:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229822AbiJ3GYE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Oct 2022 02:24:04 -0400
+        with ESMTP id S229828AbiJ3GYF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Oct 2022 02:24:05 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FC35DB;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43BCBBC;
         Sat, 29 Oct 2022 23:24:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1667111044; x=1698647044;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=0nvz3WaeOypeXRr2ZlbIpcoCC53yXD/BSQQN4hsBa1E=;
-  b=NbwUDwkaJbRpWat4C6Gi8xmv5iMdqaMcA9hcGIhAjgvdwh+2EvMCvu+X
-   K6Qcs1dhCSxY/nJdfYuQ9RI+XSYG42f5lqkF9q/KYgfk6PFDxVimU+0LD
-   OohSrXbNAO4/Qp2fbW+KFuwPcMh6BjRvyCYuI9J+xLWGXjHsrs0wJGez5
-   g5P3UrOHiLp+qdYFCXW+H1QqkwzzHIQI5SO2RVI6augcG0nlUZ7eR8R0Z
-   Q3Sgcr3qHA69F8StPGJjkeMEYfn0+0/oM1uPW2n/cKj6GMzaZx/QVamIe
-   ZmWha5DYrCXSdzjpYFTc7SOFnWOB2cE36mfryr4VQ6fvm5IZE6PxtC3pU
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037129"
+  bh=jpCQcZecMNiOkK/TgcMHhl62N+vT7vM+ua/D84nFGlU=;
+  b=RNhVN0buGE9GVKrc1k39uQOe1edPbgFchdEb9h2Kry/yMRcVYq0nh4CA
+   bTfRCmo1brW9fWFFODased4gnLRJhp6n8jar+05x2uJbxU31HrTs50paR
+   5V2oovGimwY9d+NmrONrBxlzD40s1iHtKnPg+D3k8Qc3vZ/+l9A7Pp6I1
+   csmtJjMk5Ca4u3wAb/n11BYI/ZiVIyhUT2nN7AE+bJJY075O45hsglobw
+   RHZJVOZMk4zBxIxF6lRVET4VJgwsCkfOLMs/yBWuqT4tO428BcaWVOLi/
+   GBaEEadoYaDLhFvxEWskhfH3hwujV90TpxWAZuZUISLoS/20c1+e7dyLy
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037130"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="395037129"
+   d="scan'208";a="395037130"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:23:59 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878392882"
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878392885"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="878392882"
+   d="scan'208";a="878392885"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:23:59 -0700
 From:   isaku.yamahata@intel.com
@@ -43,10 +43,11 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: [PATCH v10 017/108] KVM: TDX: Refuse to unplug the last cpu on the package
-Date:   Sat, 29 Oct 2022 23:22:18 -0700
-Message-Id: <de6b69781a6ba1fe65535f48db2677eef3ec6a83.1667110240.git.isaku.yamahata@intel.com>
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v10 018/108] KVM: TDX: x86: Add ioctl to get TDX systemwide parameters
+Date:   Sat, 29 Oct 2022 23:22:19 -0700
+Message-Id: <178c7ceb19eace04d2745be0feb7623a5cf56738.1667110240.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1667110240.git.isaku.yamahata@intel.com>
 References: <cover.1667110240.git.isaku.yamahata@intel.com>
@@ -61,185 +62,268 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-In order to reclaim TDX host key id, (i.e. when deleting guest TD), needs
-to call TDH.PHYMEM.PAGE.WBINVD on all packages.  If we have used TDX host
-key id, refuse to offline the last online cpu.
+Implement a system-scoped ioctl to get system-wide parameters for TDX.
 
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h |  1 +
- arch/x86/include/asm/kvm_host.h    |  1 +
- arch/x86/kvm/vmx/main.c            |  1 +
- arch/x86/kvm/vmx/tdx.c             | 40 +++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/x86_ops.h         |  2 ++
- arch/x86/kvm/x86.c                 | 27 ++++++++++++--------
- 6 files changed, 61 insertions(+), 11 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h    |  1 +
+ arch/x86/include/asm/kvm_host.h       |  1 +
+ arch/x86/include/uapi/asm/kvm.h       | 48 +++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/main.c               |  2 ++
+ arch/x86/kvm/vmx/tdx.c                | 46 +++++++++++++++++++++++++
+ arch/x86/kvm/vmx/x86_ops.h            |  2 ++
+ arch/x86/kvm/x86.c                    |  6 ++++
+ tools/arch/x86/include/uapi/asm/kvm.h | 48 +++++++++++++++++++++++++++
+ 8 files changed, 154 insertions(+)
 
 diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 3a29a6b31ee8..0ceb8e58a6c0 100644
+index 0ceb8e58a6c0..4425564647cb 100644
 --- a/arch/x86/include/asm/kvm-x86-ops.h
 +++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -17,6 +17,7 @@ BUILD_BUG_ON(1)
- KVM_X86_OP(hardware_enable)
- KVM_X86_OP(hardware_disable)
- KVM_X86_OP(hardware_unsetup)
-+KVM_X86_OP_OPTIONAL_RET0(offline_cpu)
- KVM_X86_OP(has_emulated_msr)
- KVM_X86_OP(vcpu_after_set_cpuid)
- KVM_X86_OP(is_vm_type_supported)
+@@ -118,6 +118,7 @@ KVM_X86_OP(smi_allowed)
+ KVM_X86_OP(enter_smm)
+ KVM_X86_OP(leave_smm)
+ KVM_X86_OP(enable_smi_window)
++KVM_X86_OP_OPTIONAL(dev_mem_enc_ioctl)
+ KVM_X86_OP_OPTIONAL(mem_enc_ioctl)
+ KVM_X86_OP_OPTIONAL(mem_enc_register_region)
+ KVM_X86_OP_OPTIONAL(mem_enc_unregister_region)
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 2870155ce6fb..50b39d0071ff 100644
+index 50b39d0071ff..1fced310ec63 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1466,6 +1466,7 @@ struct kvm_x86_ops {
- 	int (*hardware_enable)(void);
- 	void (*hardware_disable)(void);
- 	void (*hardware_unsetup)(void);
-+	int (*offline_cpu)(void);
- 	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
- 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
+@@ -1626,6 +1626,7 @@ struct kvm_x86_ops {
+ 	int (*leave_smm)(struct kvm_vcpu *vcpu, const char *smstate);
+ 	void (*enable_smi_window)(struct kvm_vcpu *vcpu);
  
++	int (*dev_mem_enc_ioctl)(void __user *argp);
+ 	int (*mem_enc_ioctl)(struct kvm *kvm, void __user *argp);
+ 	int (*mem_enc_register_region)(struct kvm *kvm, struct kvm_enc_region *argp);
+ 	int (*mem_enc_unregister_region)(struct kvm *kvm, struct kvm_enc_region *argp);
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 54b08789c402..2ad9666e02a5 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -535,4 +535,52 @@ struct kvm_pmu_event_filter {
+ #define KVM_X86_DEFAULT_VM	0
+ #define KVM_X86_TDX_VM		1
+ 
++/* Trust Domain eXtension sub-ioctl() commands. */
++enum kvm_tdx_cmd_id {
++	KVM_TDX_CAPABILITIES = 0,
++
++	KVM_TDX_CMD_NR_MAX,
++};
++
++struct kvm_tdx_cmd {
++	/* enum kvm_tdx_cmd_id */
++	__u32 id;
++	/* flags for sub-commend. If sub-command doesn't use this, set zero. */
++	__u32 flags;
++	/*
++	 * data for each sub-command. An immediate or a pointer to the actual
++	 * data in process virtual address.  If sub-command doesn't use it,
++	 * set zero.
++	 */
++	__u64 data;
++	/*
++	 * Auxiliary error code.  The sub-command may return TDX SEAMCALL
++	 * status code in addition to -Exxx.
++	 * Defined for consistency with struct kvm_sev_cmd.
++	 */
++	__u64 error;
++	/* Reserved: Defined for consistency with struct kvm_sev_cmd. */
++	__u64 unused;
++};
++
++struct kvm_tdx_cpuid_config {
++	__u32 leaf;
++	__u32 sub_leaf;
++	__u32 eax;
++	__u32 ebx;
++	__u32 ecx;
++	__u32 edx;
++};
++
++struct kvm_tdx_capabilities {
++	__u64 attrs_fixed0;
++	__u64 attrs_fixed1;
++	__u64 xfam_fixed0;
++	__u64 xfam_fixed1;
++
++	__u32 nr_cpuid_configs;
++	__u32 padding;
++	struct kvm_tdx_cpuid_config cpuid_configs[0];
++};
++
+ #endif /* _ASM_X86_KVM_H */
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index d01a946a18cf..0918d1e6d2f3 100644
+index 0918d1e6d2f3..aedba5acb8eb 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -67,6 +67,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.name = "kvm_intel",
+@@ -203,6 +203,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.complete_emulated_msr = kvm_complete_insn_gp,
  
- 	.hardware_unsetup = vt_hardware_unsetup,
-+	.offline_cpu = tdx_offline_cpu,
- 	.check_processor_compatibility = vmx_check_processor_compatibility,
+ 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
++
++	.dev_mem_enc_ioctl = tdx_dev_ioctl,
+ };
  
- 	.hardware_enable = vmx_hardware_enable,
+ struct kvm_x86_init_ops vt_init_ops __initdata = {
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index ec88dde0d300..64229c3b3c5a 100644
+index 64229c3b3c5a..5a3ed8217a54 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -42,6 +42,7 @@ static struct tdx_capabilities tdx_caps;
-  */
- static DEFINE_MUTEX(tdx_lock);
- static struct mutex *tdx_mng_key_config_lock;
-+static atomic_t nr_configured_hkid;
- 
- static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
- {
-@@ -222,7 +223,8 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
- 		pr_err("tdh_mng_key_freeid failed. HKID %d is leaked.\n",
- 			kvm_tdx->hkid);
- 		return;
--	}
-+	} else
-+		atomic_dec(&nr_configured_hkid);
- 
- free_hkid:
- 	tdx_hkid_free(kvm_tdx);
-@@ -371,6 +373,8 @@ int tdx_vm_init(struct kvm *kvm)
- 		if (ret)
- 			break;
- 	}
-+	if (!ret)
-+		atomic_inc(&nr_configured_hkid);
- 	cpus_read_unlock();
- 	free_cpumask_var(packages);
- 	if (ret)
-@@ -514,3 +518,37 @@ void tdx_hardware_unsetup(void)
- 	/* kfree accepts NULL. */
- 	kfree(tdx_mng_key_config_lock);
+@@ -431,6 +431,52 @@ int tdx_vm_init(struct kvm *kvm)
+ 	return ret;
  }
-+
-+int tdx_offline_cpu(void)
+ 
++int tdx_dev_ioctl(void __user *argp)
 +{
-+	int curr_cpu = smp_processor_id();
-+	cpumask_var_t packages;
-+	int ret = 0;
-+	int i;
++	struct kvm_tdx_capabilities __user *user_caps;
++	struct kvm_tdx_capabilities caps;
++	struct kvm_tdx_cmd cmd;
 +
-+	if (!atomic_read(&nr_configured_hkid))
-+		return 0;
++	BUILD_BUG_ON(sizeof(struct kvm_tdx_cpuid_config) !=
++		     sizeof(struct tdx_cpuid_config));
 +
++	if (copy_from_user(&cmd, argp, sizeof(cmd)))
++		return -EFAULT;
++	if (cmd.flags || cmd.error || cmd.unused)
++		return -EINVAL;
 +	/*
-+	 * To reclaim hkid, need to call TDH.PHYMEM.PAGE.WBINVD on all packages.
-+	 * If this is the last online cpu on the package, refuse offline.
++	 * Currently only KVM_TDX_CAPABILITIES is defined for system-scoped
++	 * mem_enc_ioctl().
 +	 */
-+	if (!zalloc_cpumask_var(&packages, GFP_KERNEL))
-+		return -ENOMEM;
++	if (cmd.id != KVM_TDX_CAPABILITIES)
++		return -EINVAL;
 +
-+	for_each_online_cpu(i) {
-+		if (i != curr_cpu)
-+			cpumask_set_cpu(topology_physical_package_id(i), packages);
-+	}
-+	if (!cpumask_test_cpu(topology_physical_package_id(curr_cpu), packages))
-+		ret = -EBUSY;
-+	free_cpumask_var(packages);
-+	if (ret)
-+		/*
-+		 * Because it's hard for human operator to understand the
-+		 * reason, warn it.
-+		 */
-+		pr_warn("TDX requires all packages to have an online CPU.  "
-+			"Delete all TDs in order to offline all CPUs of a package.\n");
-+	return ret;
++	user_caps = (void __user *)cmd.data;
++	if (copy_from_user(&caps, user_caps, sizeof(caps)))
++		return -EFAULT;
++
++	if (caps.nr_cpuid_configs < tdx_caps.nr_cpuid_configs)
++		return -E2BIG;
++
++	caps = (struct kvm_tdx_capabilities) {
++		.attrs_fixed0 = tdx_caps.attrs_fixed0,
++		.attrs_fixed1 = tdx_caps.attrs_fixed1,
++		.xfam_fixed0 = tdx_caps.xfam_fixed0,
++		.xfam_fixed1 = tdx_caps.xfam_fixed1,
++		.nr_cpuid_configs = tdx_caps.nr_cpuid_configs,
++		.padding = 0,
++	};
++
++	if (copy_to_user(user_caps, &caps, sizeof(caps)))
++		return -EFAULT;
++	if (copy_to_user(user_caps->cpuid_configs, &tdx_caps.cpuid_configs,
++			 tdx_caps.nr_cpuid_configs *
++			 sizeof(struct tdx_cpuid_config)))
++		return -EFAULT;
++
++	return 0;
 +}
++
+ static int __init tdx_module_setup(void)
+ {
+ 	const struct tdsysinfo_struct *tdsysinfo;
 diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 95da978c9aa9..b2cb5786830a 100644
+index b2cb5786830a..057f2be3d818 100644
 --- a/arch/x86/kvm/vmx/x86_ops.h
 +++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -134,6 +134,7 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
- int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+@@ -135,6 +135,7 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
  bool tdx_is_vm_type_supported(unsigned long type);
  void tdx_hardware_unsetup(void);
-+int tdx_offline_cpu(void);
+ int tdx_offline_cpu(void);
++int tdx_dev_ioctl(void __user *argp);
  
  int tdx_vm_init(struct kvm *kvm);
  void tdx_mmu_release_hkid(struct kvm *kvm);
-@@ -142,6 +143,7 @@ void tdx_vm_free(struct kvm *kvm);
- static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
+@@ -144,6 +145,7 @@ static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
  static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
  static inline void tdx_hardware_unsetup(void) {}
-+static inline int tdx_offline_cpu(void) { return 0; }
+ static inline int tdx_offline_cpu(void) { return 0; }
++static inline int tdx_dev_ioctl(void __user *argp) { return -EOPNOTSUPP; };
  
  static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
  static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4b22196cb12c..25c30c8c2d9b 100644
+index 25c30c8c2d9b..ddcbbcf13a55 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -12337,16 +12337,23 @@ int kvm_arch_online_cpu(unsigned int cpu, int usage_count)
+@@ -4678,6 +4678,12 @@ long kvm_arch_dev_ioctl(struct file *filp,
+ 		r = kvm_x86_dev_has_attr(&attr);
+ 		break;
+ 	}
++	case KVM_MEMORY_ENCRYPT_OP:
++		r = -EINVAL;
++		if (!kvm_x86_ops.dev_mem_enc_ioctl)
++			goto out;
++		r = static_call(kvm_x86_dev_mem_enc_ioctl)(argp);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
+index 54b08789c402..2ad9666e02a5 100644
+--- a/tools/arch/x86/include/uapi/asm/kvm.h
++++ b/tools/arch/x86/include/uapi/asm/kvm.h
+@@ -535,4 +535,52 @@ struct kvm_pmu_event_filter {
+ #define KVM_X86_DEFAULT_VM	0
+ #define KVM_X86_TDX_VM		1
  
- int kvm_arch_offline_cpu(unsigned int cpu, int usage_count)
- {
--	if (usage_count) {
--		/*
--		 * arch callback kvm_arch_hardware_disable() assumes that
--		 * preemption is disabled for historical reason.  Disable
--		 * preemption until all arch callbacks are fixed.
--		 */
--		preempt_disable();
--		hardware_disable(NULL);
--		preempt_enable();
--	}
-+	int ret;
++/* Trust Domain eXtension sub-ioctl() commands. */
++enum kvm_tdx_cmd_id {
++	KVM_TDX_CAPABILITIES = 0,
 +
-+	if (!usage_count)
-+		return 0;
++	KVM_TDX_CMD_NR_MAX,
++};
 +
-+	ret = static_call(kvm_x86_offline_cpu)();
-+	if (ret)
-+		return ret;
-+
++struct kvm_tdx_cmd {
++	/* enum kvm_tdx_cmd_id */
++	__u32 id;
++	/* flags for sub-commend. If sub-command doesn't use this, set zero. */
++	__u32 flags;
 +	/*
-+	 * arch callback kvm_arch_hardware_disable() assumes that preemption is
-+	 * disabled for historical reason.  Disable preemption until all arch
-+	 * callbacks are fixed.
++	 * data for each sub-command. An immediate or a pointer to the actual
++	 * data in process virtual address.  If sub-command doesn't use it,
++	 * set zero.
 +	 */
-+	preempt_disable();
-+	hardware_disable(NULL);
-+	preempt_enable();
- 	return 0;
- }
- 
++	__u64 data;
++	/*
++	 * Auxiliary error code.  The sub-command may return TDX SEAMCALL
++	 * status code in addition to -Exxx.
++	 * Defined for consistency with struct kvm_sev_cmd.
++	 */
++	__u64 error;
++	/* Reserved: Defined for consistency with struct kvm_sev_cmd. */
++	__u64 unused;
++};
++
++struct kvm_tdx_cpuid_config {
++	__u32 leaf;
++	__u32 sub_leaf;
++	__u32 eax;
++	__u32 ebx;
++	__u32 ecx;
++	__u32 edx;
++};
++
++struct kvm_tdx_capabilities {
++	__u64 attrs_fixed0;
++	__u64 attrs_fixed1;
++	__u64 xfam_fixed0;
++	__u64 xfam_fixed1;
++
++	__u32 nr_cpuid_configs;
++	__u32 padding;
++	struct kvm_tdx_cpuid_config cpuid_configs[0];
++};
++
+ #endif /* _ASM_X86_KVM_H */
 -- 
 2.25.1
 
