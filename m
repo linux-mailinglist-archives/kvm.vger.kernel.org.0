@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C38186127DD
-	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:25:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A0476127C6
+	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:24:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229943AbiJ3GZO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Oct 2022 02:25:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46914 "EHLO
+        id S229980AbiJ3GYa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Oct 2022 02:24:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229808AbiJ3GYE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Oct 2022 02:24:04 -0400
+        with ESMTP id S229787AbiJ3GYF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Oct 2022 02:24:05 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E44D6D8;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20BCAB4;
         Sat, 29 Oct 2022 23:24:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667111043; x=1698647043;
+  t=1667111044; x=1698647044;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=c3by2T16lzjQJuySZXCKjj7l+xnufSG16l0hxS0c+aE=;
-  b=Fuzv+ajVo81/Z4+iMCpSWCflVcPzwIBayhJYgEhvGmtn+P7UD0zkGt2+
-   a72tW1qrysTojRd7z87WDEfhvIheMjFOB2QgC9ZrrmpdIva9efv3jey0N
-   s+j0MMWd4Z2EnLPdAgjt+KMmzOebU86wws8G4mseXoQ+u748i1+xPs408
-   W+dHOFVqddoUUEBLyoCSflHQ7MVXaA7JfzjETs+1Shk2SwYRMb26wI7DD
-   zNB4mRsfA/2liqoqWJBye+OptCx/fmadFvKIHs1Y5Ds8bz+Sc1P+U3ANa
-   8MerpF0zAsuFjrUvK+7ggNT/cZmB+1SLDV99+OZxv7zXVuSP/2Rp4wPkp
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037127"
+  bh=mNq7USUq4s3azC4fpdp0DqaTiaOSN0rdu5xF/5mqy90=;
+  b=GNfIxmOLs3TcUmyDL/gIk4yCRRbrlFKpF0rbphA+TrvCSkQWvTyCyFXK
+   UJVjshyHmHQesQhg39Q0/rhO5+gsexRRwsgifSEBh54Ct8/H7lpIGUb7r
+   J8ULbS3AeUVtr9T0ThH2zSlih1bgTvgM3b7G89Dks+tQKxGnEryYny2hQ
+   pUBm79S0lq3SDuAE25F24w8Z/7bYRpAr3ZT77DvMm058Ep0rcZ6ewn710
+   FFcbOAqtVIZtAxoonA1FAuqstjaT8EbIL/VGB3XF0pTeOLwakIFy/Q/IS
+   5wgyArpfgCE7U391todjX2zy3m6fd3H+hbEtBC82WBvvaqdlygzQYud0/
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037128"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="395037127"
+   d="scan'208";a="395037128"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:23:59 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878392876"
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878392879"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="878392876"
+   d="scan'208";a="878392879"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:23:59 -0700
 From:   isaku.yamahata@intel.com
@@ -43,10 +43,12 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: [PATCH v10 015/108] x86/cpu: Add helper functions to allocate/free TDX private host key id
-Date:   Sat, 29 Oct 2022 23:22:16 -0700
-Message-Id: <5ee7c6dc4ba03b5d5166e015c148ef534ee53f8e.1667110240.git.isaku.yamahata@intel.com>
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Kai Huang <kai.huang@intel.com>
+Subject: [PATCH v10 016/108] KVM: TDX: create/destroy VM structure
+Date:   Sat, 29 Oct 2022 23:22:17 -0700
+Message-Id: <fb337a67e17715977e46523d1344cb2a7f46a37a.1667110240.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1667110240.git.isaku.yamahata@intel.com>
 References: <cover.1667110240.git.isaku.yamahata@intel.com>
@@ -61,102 +63,630 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-TDX private host key id is assigned to guest TD.  The memory controller
-encrypts guest TD memory with the assigned TDX private host key id (HIKD).
-Add helper functions to allocate/free TDX private host key id so that TDX
-KVM manage it.
+As the first step to create TDX guest, create/destroy VM struct.  Assign
+TDX private Host Key ID (HKID) to the TDX guest for memory encryption and
+allocate extra pages for the TDX guest. On destruction, free allocated
+pages, and HKID.
 
-Also export the global TDX private host key id that is used to encrypt TDX
-module, its memory and some dynamic data (TDR).  When VMM releasing
-encrypted page to reuse it, the page needs to be flushed with the used host
-key id.  VMM needs the global TDX private host key id to flush such pages
-TDX module accesses with the global TDX private host key id.
+Before tearing down private page tables, TDX requires some resources of the
+guest TD to be destroyed (i.e. keyID must have been reclaimed, etc).  Add
+flush_shadow_all_private callback before tearing down private page tables
+for it.
 
+Add a second kvm_x86_ops hook in kvm_arch_destroy_vm() to support TDX's
+destruction path, which needs to first put the VM into a teardown state,
+then free per-vCPU resources, and finally free per-VM resources.
+
+Co-developed-by: Kai Huang <kai.huang@intel.com>
+Signed-off-by: Kai Huang <kai.huang@intel.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/tdx.h  | 13 +++++++++++++
- arch/x86/virt/vmx/tdx/tdx.c | 28 +++++++++++++++++++++++++++-
- 2 files changed, 40 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm-x86-ops.h |   2 +
+ arch/x86/include/asm/kvm_host.h    |   2 +
+ arch/x86/kvm/vmx/main.c            |  34 ++-
+ arch/x86/kvm/vmx/tdx.c             | 411 +++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/tdx.h             |   2 +
+ arch/x86/kvm/vmx/x86_ops.h         |  11 +
+ arch/x86/kvm/x86.c                 |   8 +
+ 7 files changed, 467 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index ba2e4c69fb9f..cd304d323d33 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -186,6 +186,17 @@ struct tdsysinfo_struct {
- const struct tdsysinfo_struct *tdx_get_sysinfo(void);
- bool platform_tdx_enabled(void);
- int tdx_enable(void);
-+
-+/*
-+ * Key id globally used by TDX module: TDX module maps TDR with this TDX global
-+ * key id.  TDR includes key id assigned to the TD.  Then TDX module maps other
-+ * TD-related pages with the assigned key id.  TDR requires this TDX global key
-+ * id for cache flush unlike other TD-related pages.
-+ */
-+extern u32 tdx_global_keyid __read_mostly;
-+int tdx_keyid_alloc(void);
-+void tdx_keyid_free(int keyid);
-+
- u64 __seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9,
- 	       struct tdx_module_output *out);
- #else	/* !CONFIG_INTEL_TDX_HOST */
-@@ -193,6 +204,8 @@ struct tdsysinfo_struct;
- static inline const struct tdsysinfo_struct *tdx_get_sysinfo(void) { return NULL; }
- static inline bool platform_tdx_enabled(void) { return false; }
- static inline int tdx_enable(void)  { return -ENODEV; }
-+static inline int tdx_keyid_alloc(void) { return -EOPNOTSUPP; }
-+static inline void tdx_keyid_free(int keyid) { }
- #endif	/* CONFIG_INTEL_TDX_HOST */
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 8a5c5ae70bc5..3a29a6b31ee8 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -21,7 +21,9 @@ KVM_X86_OP(has_emulated_msr)
+ KVM_X86_OP(vcpu_after_set_cpuid)
+ KVM_X86_OP(is_vm_type_supported)
+ KVM_X86_OP(vm_init)
++KVM_X86_OP_OPTIONAL(flush_shadow_all_private)
+ KVM_X86_OP_OPTIONAL(vm_destroy)
++KVM_X86_OP_OPTIONAL(vm_free)
+ KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
+ KVM_X86_OP(vcpu_create)
+ KVM_X86_OP(vcpu_free)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 2a41a93a80f3..2870155ce6fb 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1472,7 +1472,9 @@ struct kvm_x86_ops {
+ 	bool (*is_vm_type_supported)(unsigned long vm_type);
+ 	unsigned int vm_size;
+ 	int (*vm_init)(struct kvm *kvm);
++	void (*flush_shadow_all_private)(struct kvm *kvm);
+ 	void (*vm_destroy)(struct kvm *kvm);
++	void (*vm_free)(struct kvm *kvm);
  
- #endif /* !__ASSEMBLY__ */
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 6fb630fa7d09..0625ced219d7 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -64,7 +64,8 @@ static struct cmr_info tdx_cmr_array[MAX_CMRS] __aligned(CMR_INFO_ARRAY_ALIGNMEN
- static int tdx_cmr_num;
- 
- /* TDX module global KeyID.  Used in TDH.SYS.CONFIG ABI. */
--static u32 tdx_global_keyid;
-+u32 tdx_global_keyid __read_mostly;
-+EXPORT_SYMBOL_GPL(tdx_global_keyid);
- 
- /*
-  * Detect TDX private KeyIDs to see whether TDX has been enabled by the
-@@ -113,6 +114,31 @@ static void __init clear_tdx(void)
- 	tdx_keyid_start = tdx_keyid_num = 0;
+ 	/* Create, but do not attach this VCPU */
+ 	int (*vcpu_precreate)(struct kvm *kvm);
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 0900ff2f2390..d01a946a18cf 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -29,18 +29,44 @@ static __init int vt_hardware_setup(void)
+ 	return 0;
  }
  
-+/* TDX KeyID pool */
-+static DEFINE_IDA(tdx_keyid_pool);
-+
-+int tdx_keyid_alloc(void)
++static void vt_hardware_unsetup(void)
 +{
-+	if (WARN_ON_ONCE(!tdx_keyid_start || !tdx_keyid_num))
-+		return -EINVAL;
-+
-+	/* The first keyID is reserved for the global key. */
-+	return ida_alloc_range(&tdx_keyid_pool, tdx_keyid_start + 1,
-+			       tdx_keyid_start + tdx_keyid_num - 1,
-+			       GFP_KERNEL);
++	tdx_hardware_unsetup();
++	vmx_hardware_unsetup();
 +}
-+EXPORT_SYMBOL_GPL(tdx_keyid_alloc);
 +
-+void tdx_keyid_free(int keyid)
+ static int vt_vm_init(struct kvm *kvm)
+ {
+ 	if (is_td(kvm))
+-		return -EOPNOTSUPP;	/* Not ready to create guest TD yet. */
++		return tdx_vm_init(kvm);
+ 
+ 	return vmx_vm_init(kvm);
+ }
+ 
++static void vt_flush_shadow_all_private(struct kvm *kvm)
 +{
-+	/* keyid = 0 is reserved. */
-+	if (!keyid || keyid <= 0)
++	if (is_td(kvm))
++		return tdx_mmu_release_hkid(kvm);
++}
++
++static void vt_vm_destroy(struct kvm *kvm)
++{
++	if (is_td(kvm))
 +		return;
 +
-+	ida_free(&tdx_keyid_pool, keyid);
++	vmx_vm_destroy(kvm);
 +}
-+EXPORT_SYMBOL_GPL(tdx_keyid_free);
 +
- static void __init tdx_memory_destroy(void)
++static void vt_vm_free(struct kvm *kvm)
++{
++	if (is_td(kvm))
++		return tdx_vm_free(kvm);
++}
++
+ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.name = "kvm_intel",
+ 
+-	.hardware_unsetup = vmx_hardware_unsetup,
++	.hardware_unsetup = vt_hardware_unsetup,
+ 	.check_processor_compatibility = vmx_check_processor_compatibility,
+ 
+ 	.hardware_enable = vmx_hardware_enable,
+@@ -50,7 +76,9 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.is_vm_type_supported = vt_is_vm_type_supported,
+ 	.vm_size = sizeof(struct kvm_vmx),
+ 	.vm_init = vt_vm_init,
+-	.vm_destroy = vmx_vm_destroy,
++	.flush_shadow_all_private = vt_flush_shadow_all_private,
++	.vm_destroy = vt_vm_destroy,
++	.vm_free = vt_vm_free,
+ 
+ 	.vcpu_precreate = vmx_vcpu_precreate,
+ 	.vcpu_create = vmx_vcpu_create,
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 530e72f85762..ec88dde0d300 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -32,6 +32,401 @@ struct tdx_capabilities {
+ /* Capabilities of KVM + the TDX module. */
+ static struct tdx_capabilities tdx_caps;
+ 
++/*
++ * Some TDX SEAMCALLs (TDH.MNG.CREATE, TDH.PHYMEM.CACHE.WB,
++ * TDH.MNG.KEY.RECLAIMID, TDH.MNG.KEY.FREEID etc) tries to acquire a global lock
++ * internally in TDX module.  If failed, TDX_OPERAND_BUSY is returned without
++ * spinning or waiting due to a constraint on execution time.  It's caller's
++ * responsibility to avoid race (or retry on TDX_OPERAND_BUSY).  Use this mutex
++ * to avoid race in TDX module because the kernel knows better about scheduling.
++ */
++static DEFINE_MUTEX(tdx_lock);
++static struct mutex *tdx_mng_key_config_lock;
++
++static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
++{
++	return pa | ((hpa_t)hkid << boot_cpu_data.x86_phys_bits);
++}
++
++static inline bool is_td_created(struct kvm_tdx *kvm_tdx)
++{
++	return kvm_tdx->tdr.added;
++}
++
++static inline void tdx_hkid_free(struct kvm_tdx *kvm_tdx)
++{
++	tdx_keyid_free(kvm_tdx->hkid);
++	kvm_tdx->hkid = -1;
++}
++
++static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
++{
++	return kvm_tdx->hkid > 0;
++}
++
++static void tdx_clear_page(unsigned long page)
++{
++	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
++	unsigned long i;
++
++	/*
++	 * Zeroing the page is only necessary for systems with MKTME-i:
++	 * when re-assign one page from old keyid to a new keyid, MOVDIR64B is
++	 * required to clear/write the page with new keyid to prevent integrity
++	 * error when read on the page with new keyid.
++	 *
++	 * The cache line could be poisoned (even without MKTME-i), clear the
++	 * poison bit.
++	 */
++	for (i = 0; i < PAGE_SIZE; i += 64)
++		movdir64b((void *)(page + i), zero_page);
++	/*
++	 * MOVDIR64B store uses WC buffer.  Prevent following memory reads
++	 * from seeing potentially poisoned cache.
++	 */
++	__mb();
++}
++
++static int tdx_reclaim_page(unsigned long va, hpa_t pa, bool do_wb, u16 hkid)
++{
++	struct tdx_module_output out;
++	u64 err;
++
++	do {
++		err = tdh_phymem_page_reclaim(pa, &out);
++		/*
++		 * TDH.PHYMEM.PAGE.RECLAIM is allowed only when TD is shutdown.
++		 * state.  i.e. destructing TD.
++		 * TDH.PHYMEM.PAGE.RECLAIM  requires TDR and target page.
++		 * Because we're destructing TD, it's rare to contend with TDR.
++		 */
++	} while (err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX));
++	if (WARN_ON_ONCE(err)) {
++		pr_tdx_error(TDH_PHYMEM_PAGE_RECLAIM, err, &out);
++		return -EIO;
++	}
++
++	if (do_wb) {
++		/*
++		 * Only TDR page gets into this path.  No contention is expected
++		 * because the last page of TD.
++		 */
++		err = tdh_phymem_page_wbinvd(set_hkid_to_hpa(pa, hkid));
++		if (WARN_ON_ONCE(err)) {
++			pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
++			return -EIO;
++		}
++	}
++
++	tdx_clear_page(va);
++	return 0;
++}
++
++static int tdx_alloc_td_page(struct tdx_td_page *page)
++{
++	page->va = __get_free_page(GFP_KERNEL_ACCOUNT);
++	if (!page->va)
++		return -ENOMEM;
++
++	page->pa = __pa(page->va);
++	return 0;
++}
++
++static inline void tdx_mark_td_page_added(struct tdx_td_page *page)
++{
++	WARN_ON_ONCE(page->added);
++	page->added = true;
++}
++
++static void tdx_reclaim_td_page(struct tdx_td_page *page)
++{
++	if (page->added) {
++		/*
++		 * TDCX are being reclaimed.  TDX module maps TDCX with HKID
++		 * assigned to the TD.  Here the cache associated to the TD
++		 * was already flushed by TDH.PHYMEM.CACHE.WB before here, So
++		 * cache doesn't need to be flushed again.
++		 */
++		if (tdx_reclaim_page(page->va, page->pa, false, 0))
++			return;
++
++		page->added = false;
++	}
++	if (page->va) {
++		free_page(page->va);
++		page->va = 0;
++	}
++}
++
++static int tdx_do_tdh_phymem_cache_wb(void *param)
++{
++	u64 err = 0;
++
++	do {
++		err = tdh_phymem_cache_wb(!!err);
++	} while (err == TDX_INTERRUPTED_RESUMABLE);
++
++	/* Other thread may have done for us. */
++	if (err == TDX_NO_HKID_READY_TO_WBCACHE)
++		err = TDX_SUCCESS;
++	if (WARN_ON_ONCE(err)) {
++		pr_tdx_error(TDH_PHYMEM_CACHE_WB, err, NULL);
++		return -EIO;
++	}
++
++	return 0;
++}
++
++void tdx_mmu_release_hkid(struct kvm *kvm)
++{
++	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
++	cpumask_var_t packages;
++	bool cpumask_allocated;
++	u64 err;
++	int ret;
++	int i;
++
++	if (!is_hkid_assigned(kvm_tdx))
++		return;
++
++	if (!is_td_created(kvm_tdx))
++		goto free_hkid;
++
++	cpumask_allocated = zalloc_cpumask_var(&packages, GFP_KERNEL);
++	cpus_read_lock();
++	for_each_online_cpu(i) {
++		if (cpumask_allocated &&
++			cpumask_test_and_set_cpu(topology_physical_package_id(i),
++						packages))
++			continue;
++
++		/*
++		 * We can destroy multiple the guest TDs simultaneously.
++		 * Prevent tdh_phymem_cache_wb from returning TDX_BUSY by
++		 * serialization.
++		 */
++		mutex_lock(&tdx_lock);
++		ret = smp_call_on_cpu(i, tdx_do_tdh_phymem_cache_wb, NULL, 1);
++		mutex_unlock(&tdx_lock);
++		if (ret)
++			break;
++	}
++	cpus_read_unlock();
++	free_cpumask_var(packages);
++
++	mutex_lock(&tdx_lock);
++	err = tdh_mng_key_freeid(kvm_tdx->tdr.pa);
++	mutex_unlock(&tdx_lock);
++	if (WARN_ON_ONCE(err)) {
++		pr_tdx_error(TDH_MNG_KEY_FREEID, err, NULL);
++		pr_err("tdh_mng_key_freeid failed. HKID %d is leaked.\n",
++			kvm_tdx->hkid);
++		return;
++	}
++
++free_hkid:
++	tdx_hkid_free(kvm_tdx);
++}
++
++void tdx_vm_free(struct kvm *kvm)
++{
++	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
++	int i;
++
++	/* Can't reclaim or free TD pages if teardown failed. */
++	if (is_hkid_assigned(kvm_tdx))
++		return;
++
++	if (kvm_tdx->tdcs) {
++		for (i = 0; i < tdx_caps.tdcs_nr_pages; i++)
++			tdx_reclaim_td_page(&kvm_tdx->tdcs[i]);
++		kfree(kvm_tdx->tdcs);
++	}
++
++	/*
++	 * TDX module maps TDR with TDX global HKID.  TDX module may access TDR
++	 * while operating on TD (Especially reclaiming TDCS).  Cache flush with
++	 * TDX global HKID is needed.
++	 */
++	if (kvm_tdx->tdr.added &&
++		tdx_reclaim_page(kvm_tdx->tdr.va, kvm_tdx->tdr.pa, true,
++				tdx_global_keyid))
++		return;
++
++	free_page(kvm_tdx->tdr.va);
++}
++
++static int tdx_do_tdh_mng_key_config(void *param)
++{
++	hpa_t *tdr_p = param;
++	u64 err;
++
++	do {
++		err = tdh_mng_key_config(*tdr_p);
++
++		/*
++		 * If it failed to generate a random key, retry it because this
++		 * is typically caused by an entropy error of the CPU's random
++		 * number generator.
++		 */
++	} while (err == TDX_KEY_GENERATION_FAILED);
++
++	if (WARN_ON_ONCE(err)) {
++		pr_tdx_error(TDH_MNG_KEY_CONFIG, err, NULL);
++		return -EIO;
++	}
++
++	return 0;
++}
++
++int tdx_vm_init(struct kvm *kvm)
++{
++	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
++	cpumask_var_t packages;
++	int ret, i;
++	u64 err;
++
++	ret = tdx_keyid_alloc();
++	if (ret < 0)
++		return ret;
++	kvm_tdx->hkid = ret;
++
++	ret = tdx_alloc_td_page(&kvm_tdx->tdr);
++	if (ret)
++		goto free_hkid;
++
++	kvm_tdx->tdcs = kcalloc(tdx_caps.tdcs_nr_pages, sizeof(*kvm_tdx->tdcs),
++				GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++	if (!kvm_tdx->tdcs)
++		goto free_tdr;
++	for (i = 0; i < tdx_caps.tdcs_nr_pages; i++) {
++		ret = tdx_alloc_td_page(&kvm_tdx->tdcs[i]);
++		if (ret)
++			goto free_tdcs;
++	}
++
++	if (!zalloc_cpumask_var(&packages, GFP_KERNEL)) {
++		ret = -ENOMEM;
++		goto free_tdcs;
++	}
++	cpus_read_lock();
++	/*
++	 * Need at least one CPU of the package to be online in order to
++	 * program all packages for host key id.  Check it.
++	 */
++	for_each_present_cpu(i)
++		cpumask_set_cpu(topology_physical_package_id(i), packages);
++	for_each_online_cpu(i)
++		cpumask_clear_cpu(topology_physical_package_id(i), packages);
++	if (!cpumask_empty(packages)) {
++		ret = -EIO;
++		/*
++		 * Because it's hard for human operator to figure out the
++		 * reason, warn it.
++		 */
++		pr_warn("All packages need to have online CPU to create TD. Online CPU and retry.\n");
++		goto free_packages;
++	}
++
++	/*
++	 * Acquire global lock to avoid TDX_OPERAND_BUSY:
++	 * TDH.MNG.CREATE and other APIs try to lock the global Key Owner
++	 * Table (KOT) to track the assigned TDX private HKID.  It doesn't spin
++	 * to acquire the lock, returns TDX_OPERAND_BUSY instead, and let the
++	 * caller to handle the contention.  This is because of time limitation
++	 * usable inside the TDX module and OS/VMM knows better about process
++	 * scheduling.
++	 *
++	 * APIs to acquire the lock of KOT:
++	 * TDH.MNG.CREATE, TDH.MNG.KEY.FREEID, TDH.MNG.VPFLUSHDONE, and
++	 * TDH.PHYMEM.CACHE.WB.
++	 */
++	mutex_lock(&tdx_lock);
++	err = tdh_mng_create(kvm_tdx->tdr.pa, kvm_tdx->hkid);
++	mutex_unlock(&tdx_lock);
++	if (WARN_ON_ONCE(err)) {
++		pr_tdx_error(TDH_MNG_CREATE, err, NULL);
++		ret = -EIO;
++		goto free_packages;
++	}
++	tdx_mark_td_page_added(&kvm_tdx->tdr);
++
++	for_each_online_cpu(i) {
++		int pkg = topology_physical_package_id(i);
++
++		if (cpumask_test_and_set_cpu(pkg, packages))
++			continue;
++
++		/*
++		 * Program the memory controller in the package with an
++		 * encryption key associated to a TDX private host key id
++		 * assigned to this TDR.  Concurrent operations on same memory
++		 * controller results in TDX_OPERAND_BUSY.  Avoid this race by
++		 * mutex.
++		 */
++		mutex_lock(&tdx_mng_key_config_lock[pkg]);
++		ret = smp_call_on_cpu(i, tdx_do_tdh_mng_key_config,
++				      &kvm_tdx->tdr.pa, true);
++		mutex_unlock(&tdx_mng_key_config_lock[pkg]);
++		if (ret)
++			break;
++	}
++	cpus_read_unlock();
++	free_cpumask_var(packages);
++	if (ret)
++		goto teardown;
++
++	for (i = 0; i < tdx_caps.tdcs_nr_pages; i++) {
++		err = tdh_mng_addcx(kvm_tdx->tdr.pa, kvm_tdx->tdcs[i].pa);
++		if (WARN_ON_ONCE(err)) {
++			pr_tdx_error(TDH_MNG_ADDCX, err, NULL);
++			ret = -EIO;
++			goto teardown;
++		}
++		tdx_mark_td_page_added(&kvm_tdx->tdcs[i]);
++	}
++
++	/*
++	 * Note, TDH_MNG_INIT cannot be invoked here.  TDH_MNG_INIT requires a dedicated
++	 * ioctl() to define the configure CPUID values for the TD.
++	 */
++	return 0;
++
++	/*
++	 * The sequence for freeing resources from a partially initialized TD
++	 * varies based on where in the initialization flow failure occurred.
++	 * Simply use the full teardown and destroy, which naturally play nice
++	 * with partial initialization.
++	 */
++teardown:
++	tdx_mmu_release_hkid(kvm);
++	tdx_vm_free(kvm);
++	return ret;
++
++free_packages:
++	cpus_read_unlock();
++	free_cpumask_var(packages);
++free_tdcs:
++	for (i = 0; i < tdx_caps.tdcs_nr_pages; i++) {
++		if (!kvm_tdx->tdcs[i].va)
++			continue;
++		free_page(kvm_tdx->tdcs[i].va);
++	}
++	kfree(kvm_tdx->tdcs);
++	kvm_tdx->tdcs = NULL;
++free_tdr:
++	if (kvm_tdx->tdr.va) {
++		free_page(kvm_tdx->tdr.va);
++		kvm_tdx->tdr.added = false;
++		kvm_tdx->tdr.va = 0;
++		kvm_tdx->tdr.pa = 0;
++	}
++free_hkid:
++	if (kvm_tdx->hkid != -1)
++		tdx_hkid_free(kvm_tdx);
++	return ret;
++}
++
+ static int __init tdx_module_setup(void)
  {
- 	while (!list_empty(&tdx_memlist)) {
+ 	const struct tdsysinfo_struct *tdsysinfo;
+@@ -82,6 +477,8 @@ bool tdx_is_vm_type_supported(unsigned long type)
+ 
+ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+ {
++	int max_pkgs;
++	int i;
+ 	int r;
+ 
+ 	if (!enable_ept) {
+@@ -95,6 +492,14 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+ 		return -ENODEV;
+ 	}
+ 
++	max_pkgs = topology_max_packages();
++	tdx_mng_key_config_lock = kcalloc(max_pkgs, sizeof(*tdx_mng_key_config_lock),
++				   GFP_KERNEL);
++	if (!tdx_mng_key_config_lock)
++		return -ENOMEM;
++	for (i = 0; i < max_pkgs; i++)
++		mutex_init(&tdx_mng_key_config_lock[i]);
++
+ 	/* TDX requires VMX. */
+ 	r = vmxon_all();
+ 	if (!r)
+@@ -103,3 +508,9 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+ 
+ 	return r;
+ }
++
++void tdx_hardware_unsetup(void)
++{
++	/* kfree accepts NULL. */
++	kfree(tdx_mng_key_config_lock);
++}
+diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+index 98999bf3f188..938314635b47 100644
+--- a/arch/x86/kvm/vmx/tdx.h
++++ b/arch/x86/kvm/vmx/tdx.h
+@@ -17,6 +17,8 @@ struct kvm_tdx {
+ 
+ 	struct tdx_td_page tdr;
+ 	struct tdx_td_page *tdcs;
++
++	int hkid;
+ };
+ 
+ struct vcpu_tdx {
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index ac1688b0b0e3..95da978c9aa9 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -133,9 +133,20 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
+ #ifdef CONFIG_INTEL_TDX_HOST
+ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+ bool tdx_is_vm_type_supported(unsigned long type);
++void tdx_hardware_unsetup(void);
++
++int tdx_vm_init(struct kvm *kvm);
++void tdx_mmu_release_hkid(struct kvm *kvm);
++void tdx_vm_free(struct kvm *kvm);
+ #else
+ static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
+ static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
++static inline void tdx_hardware_unsetup(void) {}
++
++static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
++static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
++static inline void tdx_flush_shadow_all_private(struct kvm *kvm) {}
++static inline void tdx_vm_free(struct kvm *kvm) {}
+ #endif
+ 
+ #endif /* __KVM_X86_VMX_X86_OPS_H */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 91053fdc4512..4b22196cb12c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12702,6 +12702,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 	kvm_page_track_cleanup(kvm);
+ 	kvm_xen_destroy_vm(kvm);
+ 	kvm_hv_destroy_vm(kvm);
++	static_call_cond(kvm_x86_vm_free)(kvm);
+ }
+ 
+ static void memslot_rmap_free(struct kvm_memory_slot *slot)
+@@ -13012,6 +13013,13 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 
+ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+ {
++	/*
++	 * kvm_mmu_zap_all() zaps both private and shared page tables.  Before
++	 * tearing down private page tables, TDX requires some TD resources to
++	 * be destroyed (i.e. keyID must have been reclaimed, etc).  Invoke
++	 * kvm_x86_flush_shadow_all_private() for this.
++	 */
++	static_call_cond(kvm_x86_flush_shadow_all_private)(kvm);
+ 	kvm_mmu_zap_all(kvm);
+ }
+ 
 -- 
 2.25.1
 
