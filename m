@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFAC86127ED
-	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:25:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 945876127EA
+	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:25:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230208AbiJ3GZi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Oct 2022 02:25:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47210 "EHLO
+        id S230194AbiJ3GZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Oct 2022 02:25:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229926AbiJ3GYL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229925AbiJ3GYL (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 30 Oct 2022 02:24:11 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6E61115;
-        Sat, 29 Oct 2022 23:24:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03C81126;
+        Sat, 29 Oct 2022 23:24:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1667111049; x=1698647049;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9+zynqxUnbt7L2tmrykvNHmz+Wt/xr8Fj4lA+9l+hKk=;
-  b=g4TObN/ZmXLocUM6TmKGs0dTcTrxY/LBI4+S4Hy0x337usVOHhK8N7S2
-   +YYyCdEFt3DU5q4lz3YnWYj2oFJzqeM+E//Dca+scRXGYrUF55P+5DNRp
-   /+eH6oq8umn5kPdA8CaqAdiOoYpW+Pn/Y+U6U3QFX52a1XcDG7Yu6Bl9b
-   OvKdXUV6D8t2RHIi91XaNvlcWdRewwXtRj3dRKPa3BlYLKTeE5bKwXXHe
-   K0Uv42B3AypOsF3GpiOnM1YLp2B8TSUqWsGUxF7YND7E0/qOjyHy6EjFt
-   c4kNsCYfWhVG3DKEibU7wn8C0OvOZpS2GlTAM6iwZ5k330G6kx9hODIwK
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037152"
+  bh=NKuth91WRs/SZEoHEI1aWkm/ClHWtQ+fWSUlO4AXg5k=;
+  b=E6dgYF4EjrMxHT4FncLk7ukclniLDARsZlKM/48gxe4zMcnLbPr65ovR
+   DnDM/bzzfe1T839BbYEBXMmmQeftG0R41wZoYSi6ikSc9APWSm8FXJZv+
+   3sekp4mOXlNSMCmik8pc2i7vp1uCionK0d0/u/Y8Ol/6ZiOonq2emZE1L
+   sZCDzRO1xUUagEVs11DCl76b2jJfgSlEM7pZOpwz89UKMxf4H8IV2KDX+
+   2yxgmdTCksrFCySFa6+TlwNGgz/RCh3xr0BPGFfxh3hdmwQf6qCJhQ4C3
+   9iZ4bqdhI/meKMXhe/9q/KMA3GkBPmyKEy6YfJiMCG/s1WEoE4s8hqs/S
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037153"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="395037152"
+   d="scan'208";a="395037153"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:03 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878392975"
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878392978"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="878392975"
+   d="scan'208";a="878392978"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:03 -0700
 From:   isaku.yamahata@intel.com
@@ -44,9 +44,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>,
         David Matlack <dmatlack@google.com>
-Subject: [PATCH v10 040/108] [MARKER] The start of TDX KVM patch series: KVM TDP MMU hooks
-Date:   Sat, 29 Oct 2022 23:22:41 -0700
-Message-Id: <72a30156f43914290e283d5228bd099cd552b062.1667110240.git.isaku.yamahata@intel.com>
+Subject: [PATCH v10 041/108] KVM: x86/tdp_mmu: refactor kvm_tdp_mmu_map()
+Date:   Sat, 29 Oct 2022 23:22:42 -0700
+Message-Id: <ae532ffde75be94062f03dab8b538fa64d1dfc74.1667110240.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1667110240.git.isaku.yamahata@intel.com>
 References: <cover.1667110240.git.isaku.yamahata@intel.com>
@@ -63,27 +63,67 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-This empty commit is to mark the start of patch series of KVM TDP MMU
-hooks.
+Factor out non-leaf SPTE population logic from kvm_tdp_mmu_map().  MapGPA
+hypercall needs to populate non-leaf SPTE to record which GPA, private or
+shared, is allowed in the leaf EPT entry.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- Documentation/virt/kvm/intel-tdx-layer-status.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 26 +++++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
 
-diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-index df003d2ed89e..d5cace00c433 100644
---- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
-+++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-@@ -25,6 +25,6 @@ Patch Layer status
- * TD vcpu interrupts/exit/hypercall:    Not yet
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 3325633b1cb5..11b0ec8aebe2 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1157,6 +1157,24 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
+ 	return 0;
+ }
  
- * KVM MMU GPA shared bits:              Applied
--* KVM TDP refactoring for TDX:          Applying
--* KVM TDP MMU hooks:                    Not yet
-+* KVM TDP refactoring for TDX:          Applied
-+* KVM TDP MMU hooks:                    Applying
- * KVM TDP MMU MapGPA:                   Not yet
++static int tdp_mmu_populate_nonleaf(struct kvm_vcpu *vcpu, struct tdp_iter *iter,
++				    bool account_nx)
++{
++	struct kvm_mmu_page *sp;
++	int ret;
++
++	KVM_BUG_ON(is_shadow_present_pte(iter->old_spte), vcpu->kvm);
++	KVM_BUG_ON(is_removed_spte(iter->old_spte), vcpu->kvm);
++
++	sp = tdp_mmu_alloc_sp(vcpu);
++	tdp_mmu_init_child_sp(sp, iter);
++
++	ret = tdp_mmu_link_sp(vcpu->kvm, iter, sp, account_nx, true);
++	if (ret)
++		tdp_mmu_free_sp(sp);
++	return ret;
++}
++
+ /*
+  * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
+  * page tables and SPTEs to translate the faulting guest physical address.
+@@ -1165,7 +1183,6 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
+ 	struct kvm_mmu *mmu = vcpu->arch.mmu;
+ 	struct tdp_iter iter;
+-	struct kvm_mmu_page *sp;
+ 	int ret;
+ 
+ 	kvm_mmu_hugepage_adjust(vcpu, fault);
+@@ -1211,13 +1228,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 			if (is_removed_spte(iter.old_spte))
+ 				break;
+ 
+-			sp = tdp_mmu_alloc_sp(vcpu);
+-			tdp_mmu_init_child_sp(sp, &iter);
+-
+-			if (tdp_mmu_link_sp(vcpu->kvm, &iter, sp, account_nx, true)) {
+-				tdp_mmu_free_sp(sp);
++			if (tdp_mmu_populate_nonleaf(vcpu, &iter, account_nx))
+ 				break;
+-			}
+ 		}
+ 	}
+ 
 -- 
 2.25.1
 
