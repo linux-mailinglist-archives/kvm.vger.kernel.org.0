@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4478612835
-	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:29:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 16667612849
+	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:30:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230445AbiJ3G3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Oct 2022 02:29:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49732 "EHLO
+        id S231282AbiJ3GaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Oct 2022 02:30:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230448AbiJ3G12 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Oct 2022 02:27:28 -0400
+        with ESMTP id S230496AbiJ3G2M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Oct 2022 02:28:12 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6B63126;
-        Sat, 29 Oct 2022 23:24:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC8012DA;
+        Sat, 29 Oct 2022 23:24:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667111068; x=1698647068;
+  t=1667111077; x=1698647077;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=JYNUDx8GHocZLxIorehBxnsfBypc958rUI5pLMpWkV4=;
-  b=QG0coiFrJsFeuyOYWrKfmE2uh0Nno/1Yw/VvHs2kHFO5P2qjLcBQmZFg
-   zfgqEGP/g3cFgRVOE01ByI3lLMpK5tMP8VaQocf4V3s9afNnqYgrl+Gbh
-   VuS5k8ZS/h+8LkNEHgET6Q/csfaXkOGps1g+Uh6fEm3XW9lqBlZ7/Rojl
-   Cnr1bgjH0FGWGYU0dCJdH4ED4Htvw7QenKBp7giuZ432ArRFLLgHxYP98
-   +g7c3Qzz8MLdy1NZ6Zb4TZZREbIyG1BKNYycFfdM3Xls45SHUyYmvrMYi
-   Ey/RqJTKe7IBxdeaH0Opmdhzd266CDOXgiqJOXnQ9Q6GqjQaGBvWcBPgv
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="288435999"
+  bh=eZh7/sZOFjViDLI+mxWW/ArYyS76JriGARHJrAfbUgw=;
+  b=BCShBrjbXPI9/sVUkrFStX48PkNfPRtdsp46rJW85yBM9g89XtZwbs8H
+   NkXFN7jgrm+VeatUMSCx/uINcbS9m4T39/ate8OjYAbRBoAKlI9IWBGlR
+   fKfTaFMYq6lNPIr6voMJmkarEjXdm62/eh+RizSElGMdCdpmiN4qHYvj7
+   +86i4YKLgdWJQhPC30H70Z8I4FrC9Y5nOGSlGckyH68eJ0aVbx3Yklr9T
+   iKmaX+oKawka6ERByZj0rW+XM71/O54ZQSnD2U3QoQ2EbHbAOKM8dKqJc
+   E2yye4/rxMGXVVZY+aA3P7+Bq0P0k5BKYakmXUr2dFfl7KFJkkVJbLgyw
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="288436001"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="288435999"
+   d="scan'208";a="288436001"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:14 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878393171"
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:15 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878393174"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="878393171"
+   d="scan'208";a="878393174"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:14 -0700
 From:   isaku.yamahata@intel.com
@@ -44,9 +44,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>,
         David Matlack <dmatlack@google.com>
-Subject: [PATCH v10 103/108] KVM: TDX: Silently discard SMI request
-Date:   Sat, 29 Oct 2022 23:23:44 -0700
-Message-Id: <e8b5a458f0944d2945d53c4a42d927e1979129f7.1667110240.git.isaku.yamahata@intel.com>
+Subject: [PATCH v10 104/108] KVM: TDX: Silently ignore INIT/SIPI
+Date:   Sat, 29 Oct 2022 23:23:45 -0700
+Message-Id: <a888bb4d30de2e57b0eb5e61189349c86cab1a70.1667110240.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1667110240.git.isaku.yamahata@intel.com>
 References: <cover.1667110240.git.isaku.yamahata@intel.com>
@@ -63,185 +63,144 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX doesn't support system-management mode (SMM) and system-management
-interrupt (SMI) in guest TDs.  Because guest state (vcpu state, memory
-state) is protected, it must go through the TDX module APIs to change guest
-state, injecting SMI and changing vcpu mode into SMM.  The TDX module
-doesn't provide a way for VMM to inject SMI into guest TD and a way for VMM
-to switch guest vcpu mode into SMM.
+The TDX module API doesn't provide API for VMM to inject INIT IPI and SIPI.
+Instead it defines the different protocols to boot application processors.
+Ignore INIT and SIPI events for the TDX guest.
 
-We have two options in KVM when handling SMM or SMI in the guest TD or the
-device model (e.g. QEMU): 1) silently ignore the request or 2) return a
-meaningful error.
-
-For simplicity, we implemented the option 1).
+There are two options. 1) (silently) ignore INIT/SIPI request or 2) return
+error to guest TDs somehow.  Given that TDX guest is paravirtualized to
+boot AP, the option 1 is chosen for simplicity.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/lapic.c       |  7 +++++--
- arch/x86/kvm/vmx/main.c    | 43 ++++++++++++++++++++++++++++++++++----
- arch/x86/kvm/vmx/tdx.c     | 27 ++++++++++++++++++++++++
- arch/x86/kvm/vmx/x86_ops.h |  8 +++++++
- arch/x86/kvm/x86.c         |  3 ++-
- 5 files changed, 81 insertions(+), 7 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  2 ++
+ arch/x86/kvm/lapic.c               | 19 ++++++++++++-------
+ arch/x86/kvm/svm/svm.c             |  1 +
+ arch/x86/kvm/vmx/main.c            | 22 +++++++++++++++++++++-
+ 5 files changed, 37 insertions(+), 8 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 17c3828d42a3..4e9b96480716 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -140,6 +140,7 @@ KVM_X86_OP_OPTIONAL(migrate_timers)
+ KVM_X86_OP(msr_filter_changed)
+ KVM_X86_OP(complete_emulated_msr)
+ KVM_X86_OP(vcpu_deliver_sipi_vector)
++KVM_X86_OP(vcpu_deliver_init)
+ KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+ KVM_X86_OP(check_processor_compatibility)
+ 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 094fff5414e1..df67ca7b23d3 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1706,6 +1706,7 @@ struct kvm_x86_ops {
+ 	int (*complete_emulated_msr)(struct kvm_vcpu *vcpu, int err);
+ 
+ 	void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
++	void (*vcpu_deliver_init)(struct kvm_vcpu *vcpu);
+ 
+ 	/*
+ 	 * Returns vCPU specific APICv inhibit reasons
+@@ -1914,6 +1915,7 @@ int kvm_emulate_wbinvd(struct kvm_vcpu *vcpu);
+ void kvm_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
+ int kvm_load_segment_descriptor(struct kvm_vcpu *vcpu, u16 selector, int seg);
+ void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
++void kvm_vcpu_deliver_init(struct kvm_vcpu *vcpu);
+ 
+ int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
+ 		    int reason, bool has_error_code, u32 error_code);
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 8d894c3959c8..7a1d612bd138 100644
+index 7a1d612bd138..7393d858ed72 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -1171,8 +1171,11 @@ static int __apic_accept_irq(struct kvm_lapic *apic, int delivery_mode,
- 
- 	case APIC_DM_SMI:
- 		result = 1;
--		kvm_make_request(KVM_REQ_SMI, vcpu);
--		kvm_vcpu_kick(vcpu);
-+		if (static_call(kvm_x86_has_emulated_msr)(vcpu->kvm,
-+							  MSR_IA32_SMBASE)) {
-+			kvm_make_request(KVM_REQ_SMI, vcpu);
-+			kvm_vcpu_kick(vcpu);
-+		}
- 		break;
- 
- 	case APIC_DM_NMI:
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 3a8a4fdf1ce7..4acba8d8cb27 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -223,6 +223,41 @@ static int vt_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	return vmx_get_msr(vcpu, msr_info);
+@@ -3035,6 +3035,16 @@ int kvm_lapic_set_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
+ 	return 0;
  }
  
-+static int vt_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
++void kvm_vcpu_deliver_init(struct kvm_vcpu *vcpu)
++{
++	kvm_vcpu_reset(vcpu, true);
++	if (kvm_vcpu_is_bsp(vcpu))
++		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
++	else
++		vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
++}
++EXPORT_SYMBOL_GPL(kvm_vcpu_deliver_init);
++
+ int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
+@@ -3066,13 +3076,8 @@ int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+ 		return 0;
+ 	}
+ 
+-	if (test_and_clear_bit(KVM_APIC_INIT, &apic->pending_events)) {
+-		kvm_vcpu_reset(vcpu, true);
+-		if (kvm_vcpu_is_bsp(apic->vcpu))
+-			vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+-		else
+-			vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
+-	}
++	if (test_and_clear_bit(KVM_APIC_INIT, &apic->pending_events))
++		static_call(kvm_x86_vcpu_deliver_init)(vcpu);
+ 	if (test_and_clear_bit(KVM_APIC_SIPI, &apic->pending_events)) {
+ 		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED) {
+ 			/* evaluate pending_events before reading the vector */
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 2bcf2e1a5271..5d56b0f1f595 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4857,6 +4857,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.complete_emulated_msr = svm_complete_emulated_msr,
+ 
+ 	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
++	.vcpu_deliver_init = kvm_vcpu_deliver_init,
+ 	.vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
+ };
+ 
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 4acba8d8cb27..d776d5d169d0 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -286,6 +286,25 @@ static void vt_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
+ 	vmx_deliver_interrupt(apic, delivery_mode, trig_mode, vector);
+ }
+ 
++static void vt_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
 +{
 +	if (is_td_vcpu(vcpu))
-+		return tdx_smi_allowed(vcpu, for_injection);
++		return;
 +
-+	return vmx_smi_allowed(vcpu, for_injection);
++	kvm_vcpu_deliver_sipi_vector(vcpu, vector);
 +}
 +
-+static int vt_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
-+{
-+	if (unlikely(is_td_vcpu(vcpu)))
-+		return tdx_enter_smm(vcpu, smstate);
-+
-+	return vmx_enter_smm(vcpu, smstate);
-+}
-+
-+static int vt_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
-+{
-+	if (unlikely(is_td_vcpu(vcpu)))
-+		return tdx_leave_smm(vcpu, smstate);
-+
-+	return vmx_leave_smm(vcpu, smstate);
-+}
-+
-+static void vt_enable_smi_window(struct kvm_vcpu *vcpu)
++static void vt_vcpu_deliver_init(struct kvm_vcpu *vcpu)
 +{
 +	if (is_td_vcpu(vcpu)) {
-+		tdx_enable_smi_window(vcpu);
++		/* TDX doesn't support INIT.  Ignore INIT event */
++		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
 +		return;
 +	}
 +
-+	/* RSM will cause a vmexit anyway.  */
-+	vmx_enable_smi_window(vcpu);
++	kvm_vcpu_deliver_init(vcpu);
 +}
 +
- static void vt_apicv_post_state_restore(struct kvm_vcpu *vcpu)
+ static void vt_flush_tlb_all(struct kvm_vcpu *vcpu)
  {
- 	struct pi_desc *pi = vcpu_to_pi_desc(vcpu);
-@@ -580,10 +615,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	if (is_td_vcpu(vcpu))
+@@ -627,7 +646,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.msr_filter_changed = vmx_msr_filter_changed,
+ 	.complete_emulated_msr = kvm_complete_insn_gp,
  
- 	.setup_mce = vmx_setup_mce,
+-	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
++	.vcpu_deliver_sipi_vector = vt_vcpu_deliver_sipi_vector,
++	.vcpu_deliver_init = vt_vcpu_deliver_init,
  
--	.smi_allowed = vmx_smi_allowed,
--	.enter_smm = vmx_enter_smm,
--	.leave_smm = vmx_leave_smm,
--	.enable_smi_window = vmx_enable_smi_window,
-+	.smi_allowed = vt_smi_allowed,
-+	.enter_smm = vt_enter_smm,
-+	.leave_smm = vt_leave_smm,
-+	.enable_smi_window = vt_enable_smi_window,
- 
- 	.can_emulate_instruction = vmx_can_emulate_instruction,
- 	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 8e8ac1081ce4..111027724e06 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1660,6 +1660,33 @@ int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 	return 1;
- }
- 
-+int tdx_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
-+{
-+	/* SMI isn't supported for TDX. */
-+	WARN_ON_ONCE(1);
-+	return false;
-+}
-+
-+int tdx_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
-+{
-+	/* smi_allowed() is always false for TDX as above. */
-+	WARN_ON_ONCE(1);
-+	return 0;
-+}
-+
-+int tdx_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
-+{
-+	WARN_ON_ONCE(1);
-+	return 0;
-+}
-+
-+void tdx_enable_smi_window(struct kvm_vcpu *vcpu)
-+{
-+	/* SMI isn't supported for TDX.  Silently discard SMI request. */
-+	WARN_ON_ONCE(1);
-+	vcpu->arch.smi_pending = false;
-+}
-+
- int tdx_dev_ioctl(void __user *argp)
- {
- 	struct kvm_tdx_capabilities __user *user_caps;
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 8b9399b154f3..d4ffbf580bc5 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -165,6 +165,10 @@ void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
- bool tdx_is_emulated_msr(u32 index, bool write);
- int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr);
- int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr);
-+int tdx_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection);
-+int tdx_enter_smm(struct kvm_vcpu *vcpu, char *smstate);
-+int tdx_leave_smm(struct kvm_vcpu *vcpu, const char *smstate);
-+void tdx_enable_smi_window(struct kvm_vcpu *vcpu);
- 
- int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
- int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
-@@ -206,6 +210,10 @@ static inline void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason, u64 *in
- static inline bool tdx_is_emulated_msr(u32 index, bool write) { return false; }
- static inline int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr) { return 1; }
- static inline int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr) { return 1; }
-+static inline int tdx_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection) { return false; }
-+static inline int tdx_enter_smm(struct kvm_vcpu *vcpu, char *smstate) { return 0; }
-+static inline int tdx_leave_smm(struct kvm_vcpu *vcpu, const char *smstate) { return 0; }
-+static inline void tdx_enable_smi_window(struct kvm_vcpu *vcpu) {}
- 
- static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
- static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5304b27f2566..d07563d0e204 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4936,7 +4936,8 @@ static int kvm_vcpu_ioctl_nmi(struct kvm_vcpu *vcpu)
- 
- static int kvm_vcpu_ioctl_smi(struct kvm_vcpu *vcpu)
- {
--	kvm_make_request(KVM_REQ_SMI, vcpu);
-+	if (static_call(kvm_x86_has_emulated_msr)(vcpu->kvm, MSR_IA32_SMBASE))
-+		kvm_make_request(KVM_REQ_SMI, vcpu);
- 
- 	return 0;
- }
+ 	.dev_mem_enc_ioctl = tdx_dev_ioctl,
+ 	.mem_enc_ioctl = vt_mem_enc_ioctl,
 -- 
 2.25.1
 
