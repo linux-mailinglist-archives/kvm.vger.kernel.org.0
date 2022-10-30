@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CB856127D1
-	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:24:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A65A6127D3
+	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:24:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230035AbiJ3GYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Oct 2022 02:24:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46972 "EHLO
+        id S230042AbiJ3GYz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Oct 2022 02:24:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229874AbiJ3GYI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Oct 2022 02:24:08 -0400
+        with ESMTP id S229886AbiJ3GYJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Oct 2022 02:24:09 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78C92CD;
-        Sat, 29 Oct 2022 23:24:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13CB1107;
+        Sat, 29 Oct 2022 23:24:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667111047; x=1698647047;
+  t=1667111048; x=1698647048;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WrHckUqFHfiof4poG5sF1RlRME0x5PTeFyG15y9QQLI=;
-  b=JuwHeMaClDFiQPeO/nYmkLcD9YjHSiGqJkjMrMZD3rv8oFmtjQG2l0SC
-   SBW1gik5ze1EMVndryYU2JgOevlTZ1yyJE50uxrRBOUozTyb3x+aLlWhe
-   3RCoXOtjj3RiOZ5Vd3QJ166sDpBxrkuZr58PVfT/jbgrE8vsfgxVsZwAq
-   fPH4mt5fS/meqWjlMq7zrPwPMQ/+J2rzW7Ozcsgcr56pe9ArL/hw2pCdU
-   eE7RmV3G8f6sWDKf9qiDgg503OaTIJP79Kc5xn2fSc+OMR211tUpPp8Hq
-   TW+rYWnkyvgtiTHy5+q97fzSlPLIyuTJUEu5XKpYDldCOjrfeeXC9YZzR
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037140"
+  bh=E8AWVag83/nQIVNiwPvy8uiPIhu/N4cABF2sF0KoCec=;
+  b=J1AoI+HcJ32+6gBJO/c7Ych4KmmUv/Hnmt8ahFOJ5k5EdFgZ02mYPFBK
+   irpxRqG9wYi1SKcF8kdH+Mhf8RRi+kTwi0DfbAN8NnGhjaNe6zHBeykUv
+   T6ACcbXtjFhuZzagSjIXNIJCbGLbNfjwDrkTphxkH3vK7j1pJxq8ilEQj
+   lo9fUa/yMhPU2M2Iy6Wv/FKY/Zs+5cSY8U9E4sNHIQx+7opDPfyUiau2q
+   660Sp2FZp6oL0fd08kxjQXPBDAp1Z3d20YUlXBYTzez0WFN84NY5W63cm
+   fi4r5aQ8ewjZcXLOoBwErfujAO11Y+Zvhxpl0KDuRzoEctBbrVUB5SfoS
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037141"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="395037140"
+   d="scan'208";a="395037141"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:01 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878392928"
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878392933"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="878392928"
+   d="scan'208";a="878392933"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:01 -0700
 From:   isaku.yamahata@intel.com
@@ -43,10 +43,11 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: [PATCH v10 028/108] KVM: x86/mmu: introduce config for PRIVATE KVM MMU
-Date:   Sat, 29 Oct 2022 23:22:29 -0700
-Message-Id: <f45e5a6159ee013411dacb54bd6c1663e5829c7a.1667110240.git.isaku.yamahata@intel.com>
+        David Matlack <dmatlack@google.com>,
+        Rick Edgecombe <rick.p.edgecombe@intel.com>
+Subject: [PATCH v10 029/108] KVM: x86/mmu: Add address conversion functions for TDX shared bit of GPA
+Date:   Sat, 29 Oct 2022 23:22:30 -0700
+Message-Id: <6e6eafc711f7a174f760b8933c6b8658971c864b.1667110240.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1667110240.git.isaku.yamahata@intel.com>
 References: <cover.1667110240.git.isaku.yamahata@intel.com>
@@ -63,29 +64,102 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-To keep the case of non TDX intact, introduce a new config option for
-private KVM MMU support.  At the moment, this is synonym for
-CONFIG_INTEL_TDX_HOST && CONFIG_KVM_INTEL.  The config makes it clear
-that the config is only for x86 KVM MMU.
+TDX repurposes one GPA bit (51 bit or 47 bit based on configuration) to
+indicate the GPA is private(if cleared) or shared (if set) with VMM.  If
+GPA.shared is set, GPA is covered by the existing conventional EPT pointed
+by EPTP.  If GPA.shared bit is cleared, GPA is covered by TDX module.
+VMM has to issue SEAMCALLs to operate.
 
+Add a member to remember GPA shared bit for each guest TDs, add address
+conversion functions between private GPA and shared GPA and test if GPA
+is private.
+
+Because struct kvm_arch (or struct kvm which includes struct kvm_arch. See
+kvm_arch_alloc_vm() that passes __GPF_ZERO) is zero-cleared when allocated,
+the new member to remember GPA shared bit is guaranteed to be zero with
+this patch unless it's initialized explicitly.
+
+Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/Kconfig | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  4 ++++
+ arch/x86/kvm/mmu.h              | 32 ++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/tdx.c          |  5 +++++
+ 3 files changed, 41 insertions(+)
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 73fdfa429b20..6bafdb2ce284 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -133,4 +133,8 @@ config KVM_XEN
- config KVM_EXTERNAL_WRITE_TRACKING
- 	bool
- 
-+config KVM_MMU_PRIVATE
-+	def_bool y
-+	depends on INTEL_TDX_HOST && KVM_INTEL
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 829a07d23909..3374ec0d6d90 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1372,6 +1372,10 @@ struct kvm_arch {
+ 	 */
+ #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
+ 	struct kvm_mmu_memory_cache split_desc_cache;
 +
- endif # VIRTUALIZATION
++#ifdef CONFIG_KVM_MMU_PRIVATE
++	gfn_t gfn_shared_mask;
++#endif
+ };
+ 
+ struct kvm_vm_stat {
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 6bdaacb6faa0..a45f7a96b821 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -278,4 +278,36 @@ static inline gpa_t kvm_translate_gpa(struct kvm_vcpu *vcpu,
+ 		return gpa;
+ 	return translate_nested_gpa(vcpu, gpa, access, exception);
+ }
++
++static inline gfn_t kvm_gfn_shared_mask(const struct kvm *kvm)
++{
++#ifdef CONFIG_KVM_MMU_PRIVATE
++	return kvm->arch.gfn_shared_mask;
++#else
++	return 0;
++#endif
++}
++
++static inline gfn_t kvm_gfn_shared(const struct kvm *kvm, gfn_t gfn)
++{
++	return gfn | kvm_gfn_shared_mask(kvm);
++}
++
++static inline gfn_t kvm_gfn_private(const struct kvm *kvm, gfn_t gfn)
++{
++	return gfn & ~kvm_gfn_shared_mask(kvm);
++}
++
++static inline gpa_t kvm_gpa_private(const struct kvm *kvm, gpa_t gpa)
++{
++	return gpa & ~gfn_to_gpa(kvm_gfn_shared_mask(kvm));
++}
++
++static inline bool kvm_is_private_gpa(const struct kvm *kvm, gpa_t gpa)
++{
++	gfn_t mask = kvm_gfn_shared_mask(kvm);
++
++	return mask && !(gpa_to_gfn(gpa) & mask);
++}
++
+ #endif
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index fd9210cb4f36..e80f9cf79b2e 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -785,6 +785,11 @@ static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+ 	kvm_tdx->attributes = td_params->attributes;
+ 	kvm_tdx->xfam = td_params->xfam;
+ 
++	if (td_params->exec_controls & TDX_EXEC_CONTROL_MAX_GPAW)
++		kvm->arch.gfn_shared_mask = gpa_to_gfn(BIT_ULL(51));
++	else
++		kvm->arch.gfn_shared_mask = gpa_to_gfn(BIT_ULL(47));
++
+ out:
+ 	/* kfree() accepts NULL. */
+ 	kfree(init_vm);
 -- 
 2.25.1
 
