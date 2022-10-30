@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 407BC6127B5
+	by mail.lfdr.de (Postfix) with ESMTP id 960EB6127B6
 	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:24:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbiJ3GYH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Oct 2022 02:24:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46844 "EHLO
+        id S229885AbiJ3GYJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Oct 2022 02:24:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229763AbiJ3GYC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229647AbiJ3GYC (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 30 Oct 2022 02:24:02 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68589AA;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02043A8;
         Sat, 29 Oct 2022 23:24:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1667111040; x=1698647040;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=IF5t22+jjqwYZmXfcnPQEHlPDHTbwXg0OYhOtId3FpQ=;
-  b=Hp30dhW+sUWfGQgU/TmS786iIrHCnuHcZ0wF2QPa2KUgsRsnKOtPn3qW
-   3awWkQqQsqMkNmCvJo/Uf330IiEHF1Yjs8GmK+ThU6uR+8CLiWbYG3uw8
-   SOQj/eZjp7YDMzqBVj8C7cIwdNO9+0nVNC3jhS7KdSizNqBOhzm0bBM4C
-   4b9p3ydPGehdg6eam+OexAUmcU3FhjFLsNZiBGDstMvkSv/Hd5N742TZ6
-   OPy7AOmMdUdkv0uYzXCnRUf2Scd0FrrjsxYGBBgxMV4PwqQTmQ/MyC03U
-   MSyIjOjrG74Ggwr60mvZJTE/a8TSyCtMD1RtfU8Yv7CydFQud3cn3JFQF
+  bh=Wz0IOBwmt08sjnia6i0n3OJTM/lMAvZ79Lb70SgXMts=;
+  b=PcRz3WlvN2kzIZzgkGZNjbmHgKfH4IfslmkHfAIsJw4rFyq0IEQnj+N9
+   PPYaxj0J4uERFOvNGUxubutU5FYbuMg5CSAEu9HJnB2/UkDUS1yBxH7+G
+   Kwws201DeQMdKlMkNP5MG3uKVD14UYnI0XaPTK5NoIjuNjakuWUBhLYgU
+   wSaRKAvw7QdIRAO0rNHHla8aIXh+bBLCBmrIVS5KuE6sBvxu1IlZoXMtg
+   UkdTH2CV3k1qcGU3zPqe3aXsO2DSZLwj8hlVamqh9UhI5m0jAXStEOfjY
+   RyCakXK7MXiKZid85dQJqrW7N6iYuPPdh3X+jDR5bp1Q5Y7V1j4h0WSrV
    Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037115"
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037116"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="395037115"
+   d="scan'208";a="395037116"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:23:57 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878392844"
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878392847"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="878392844"
+   d="scan'208";a="878392847"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:23:57 -0700
 From:   isaku.yamahata@intel.com
@@ -43,10 +43,12 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: [PATCH v10 005/108] KVM: TDX: Initialize the TDX module when loading the KVM intel kernel module
-Date:   Sat, 29 Oct 2022 23:22:06 -0700
-Message-Id: <99e5fcf2a7127347816982355fd4141ee1038a54.1667110240.git.isaku.yamahata@intel.com>
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [PATCH v10 006/108] KVM: x86: Introduce vm_type to differentiate default VMs from confidential VMs
+Date:   Sat, 29 Oct 2022 23:22:07 -0700
+Message-Id: <adf56a24d3a5d01aba3616445cefe45f1d6a2543.1667110240.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1667110240.git.isaku.yamahata@intel.com>
 References: <cover.1667110240.git.isaku.yamahata@intel.com>
@@ -61,344 +63,271 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-TDX requires several initialization steps for KVM to create guest TDs.
-Detect CPU feature, enable VMX (TDX is based on VMX), detect the TDX module
-availability, and initialize it.  This patch implements those steps.
+Unlike default VMs, confidential VMs (Intel TDX and AMD SEV-ES) don't allow
+some operations (e.g., memory read/write, register state access, etc).
 
-There are several options on when to initialize the TDX module.  A.) kernel
-module loading time, B.) the first guest TD creation time.  A.) was chosen.
-With B.), a user may hit an error of the TDX initialization when trying to
-create the first guest TD.  The machine that fails to initialize the TDX
-module can't boot any guest TD further.  Such failure is undesirable and a
-surprise because the user expects that the machine can accommodate guest
-TD, but actually not.  So A.) is better than B.).
+Introduce vm_type to track the type of the VM to x86 KVM.  Other arch KVMs
+already use vm_type, KVM_INIT_VM accepts vm_type, and x86 KVM callback
+vm_init accepts vm_type.  So follow them.  Further, a different policy can
+be made based on vm_type.  Define KVM_X86_DEFAULT_VM for default VM as
+default and define KVM_X86_TDX_VM for Intel TDX VM.  The wrapper function
+will be defined as "bool is_td(kvm) { return vm_type == VM_TYPE_TDX; }"
 
-Introduce a module parameter, enable_tdx, to explicitly enable TDX KVM
-support.  It's off by default to keep same behavior for those who don't use
-TDX.  Implement hardware_setup method to detect TDX feature of CPU.
-Because TDX requires all present CPUs to enable VMX (VMXON).  The x86
-specific kvm_arch_post_hardware_enable_setup overrides the existing weak
-symbol of kvm_arch_post_hardware_enable_setup which is called at the KVM
-module initialization.
+Add a capability KVM_CAP_VM_TYPES to effectively allow device model,
+e.g. qemu, to query what VM types are supported by KVM.  This (introduce a
+new capability and add vm_type) is chosen to align with other arch KVMs
+that have VM types already.  Other arch KVMs uses different name to query
+supported vm types and there is no common name for it, so new name was
+chosen.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/Makefile      |  1 +
- arch/x86/kvm/vmx/main.c    | 18 ++++++-
- arch/x86/kvm/vmx/tdx.c     | 99 ++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c     | 39 +++++++++++++++
- arch/x86/kvm/vmx/x86_ops.h |  9 ++++
- arch/x86/kvm/x86.c         | 32 +++++++-----
- 6 files changed, 186 insertions(+), 12 deletions(-)
- create mode 100644 arch/x86/kvm/vmx/tdx.c
+ Documentation/virt/kvm/api.rst        | 21 +++++++++++++++++++++
+ arch/x86/include/asm/kvm-x86-ops.h    |  1 +
+ arch/x86/include/asm/kvm_host.h       |  2 ++
+ arch/x86/include/uapi/asm/kvm.h       |  3 +++
+ arch/x86/kvm/svm/svm.c                |  6 ++++++
+ arch/x86/kvm/vmx/main.c               |  1 +
+ arch/x86/kvm/vmx/tdx.h                |  6 +-----
+ arch/x86/kvm/vmx/vmx.c                |  5 +++++
+ arch/x86/kvm/vmx/x86_ops.h            |  1 +
+ arch/x86/kvm/x86.c                    |  9 ++++++++-
+ include/uapi/linux/kvm.h              |  1 +
+ tools/arch/x86/include/uapi/asm/kvm.h |  3 +++
+ tools/include/uapi/linux/kvm.h        |  1 +
+ 13 files changed, 54 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index ee4d0999f20f..e2c05195cb95 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -24,6 +24,7 @@ kvm-$(CONFIG_KVM_XEN)	+= xen.o
- kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
- 			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o vmx/main.o
- kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
-+kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 08253cf498d1..b6f08e8a8320 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -147,10 +147,31 @@ described as 'basic' will be available.
+ The new VM has no virtual cpus and no memory.
+ You probably want to use 0 as machine type.
  
- kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
++X86:
++^^^^
++
++Supported vm type can be queried from KVM_CAP_VM_TYPES, which returns the
++bitmap of supported vm types. The 1-setting of bit @n means vm type with
++value @n is supported.
++
++S390:
++^^^^^
++
+ In order to create user controlled virtual machines on S390, check
+ KVM_CAP_S390_UCONTROL and use the flag KVM_VM_S390_UCONTROL as
+ privileged user (CAP_SYS_ADMIN).
  
++MIPS:
++^^^^^
++
++To use hardware assisted virtualization on MIPS (VZ ASE) rather than
++the default trap & emulate implementation (which changes the virtual
++memory layout to fit in user mode), check KVM_CAP_MIPS_VZ and use the
++flag KVM_VM_MIPS_VZ.
++
++ARM64:
++^^^^^^
++
+ On arm64, the physical address size for a VM (IPA Size limit) is limited
+ to 40bits by default. The limit can be configured if the host supports the
+ extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 15c1515a0760..8a5c5ae70bc5 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -19,6 +19,7 @@ KVM_X86_OP(hardware_disable)
+ KVM_X86_OP(hardware_unsetup)
+ KVM_X86_OP(has_emulated_msr)
+ KVM_X86_OP(vcpu_after_set_cpuid)
++KVM_X86_OP(is_vm_type_supported)
+ KVM_X86_OP(vm_init)
+ KVM_X86_OP_OPTIONAL(vm_destroy)
+ KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 66b1ff1cec61..2a41a93a80f3 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1151,6 +1151,7 @@ enum kvm_apicv_inhibit {
+ };
+ 
+ struct kvm_arch {
++	unsigned long vm_type;
+ 	unsigned long n_used_mmu_pages;
+ 	unsigned long n_requested_mmu_pages;
+ 	unsigned long n_max_mmu_pages;
+@@ -1468,6 +1469,7 @@ struct kvm_x86_ops {
+ 	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
+ 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
+ 
++	bool (*is_vm_type_supported)(unsigned long vm_type);
+ 	unsigned int vm_size;
+ 	int (*vm_init)(struct kvm *kvm);
+ 	void (*vm_destroy)(struct kvm *kvm);
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 46de10a809ec..54b08789c402 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -532,4 +532,7 @@ struct kvm_pmu_event_filter {
+ #define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TSC) */
+ #define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
+ 
++#define KVM_X86_DEFAULT_VM	0
++#define KVM_X86_TDX_VM		1
++
+ #endif /* _ASM_X86_KVM_H */
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index aaf5f0623011..2bcf2e1a5271 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4713,6 +4713,11 @@ static void svm_vm_destroy(struct kvm *kvm)
+ 	sev_vm_destroy(kvm);
+ }
+ 
++static bool svm_is_vm_type_supported(unsigned long type)
++{
++	return type == KVM_X86_DEFAULT_VM;
++}
++
+ static int svm_vm_init(struct kvm *kvm)
+ {
+ 	if (!pause_filter_count || !pause_filter_thresh)
+@@ -4740,6 +4745,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.vcpu_free = svm_vcpu_free,
+ 	.vcpu_reset = svm_vcpu_reset,
+ 
++	.is_vm_type_supported = svm_is_vm_type_supported,
+ 	.vm_size = sizeof(struct kvm_svm),
+ 	.vm_init = svm_vm_init,
+ 	.vm_destroy = svm_vm_destroy,
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index a7d4af73228e..a5cbf3ca2055 100644
+index a5cbf3ca2055..22bf49afc761 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -7,6 +7,22 @@
- #include "pmu.h"
- #include "tdx.h"
+@@ -33,6 +33,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.hardware_disable = vmx_hardware_disable,
+ 	.has_emulated_msr = vmx_has_emulated_msr,
  
-+static bool __read_mostly enable_tdx = IS_ENABLED(CONFIG_INTEL_TDX_HOST);
-+module_param_named(tdx, enable_tdx, bool, 0444);
-+
-+static __init int vt_hardware_setup(void)
-+{
-+	int ret;
-+
-+	ret = vmx_hardware_setup();
-+	if (ret)
-+		return ret;
-+
-+	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
-+
-+	return 0;
-+}
-+
- struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.name = "kvm_intel",
++	.is_vm_type_supported = vmx_is_vm_type_supported,
+ 	.vm_size = sizeof(struct kvm_vmx),
+ 	.vm_init = vmx_vm_init,
+ 	.vm_destroy = vmx_vm_destroy,
+diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+index 060bf48ec3d6..473013265bd8 100644
+--- a/arch/x86/kvm/vmx/tdx.h
++++ b/arch/x86/kvm/vmx/tdx.h
+@@ -15,11 +15,7 @@ struct vcpu_tdx {
  
-@@ -148,7 +164,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- struct kvm_x86_init_ops vt_init_ops __initdata = {
- 	.cpu_has_kvm_support = vmx_cpu_has_kvm_support,
- 	.disabled_by_bios = vmx_disabled_by_bios,
--	.hardware_setup = vmx_hardware_setup,
-+	.hardware_setup = vt_hardware_setup,
- 	.handle_intel_pt_intr = NULL,
+ static inline bool is_td(struct kvm *kvm)
+ {
+-	/*
+-	 * TDX VM type isn't defined yet.
+-	 * return kvm->arch.vm_type == KVM_X86_TDX_VM;
+-	 */
+-	return false;
++	return kvm->arch.vm_type == KVM_X86_TDX_VM;
+ }
  
- 	.runtime_ops = &vt_x86_ops,
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-new file mode 100644
-index 000000000000..6213a5c6b637
---- /dev/null
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -0,0 +1,99 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <linux/cpu.h>
-+
-+#include <asm/tdx.h>
-+
-+#include "capabilities.h"
-+#include "x86_ops.h"
-+#include "tdx.h"
-+#include "x86.h"
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) "tdx: " fmt
-+
-+#define TDX_MAX_NR_CPUID_CONFIGS					\
-+	((sizeof(struct tdsysinfo_struct) -				\
-+		offsetof(struct tdsysinfo_struct, cpuid_configs))	\
-+		/ sizeof(struct tdx_cpuid_config))
-+
-+struct tdx_capabilities {
-+	u8 tdcs_nr_pages;
-+	u8 tdvpx_nr_pages;
-+
-+	u64 attrs_fixed0;
-+	u64 attrs_fixed1;
-+	u64 xfam_fixed0;
-+	u64 xfam_fixed1;
-+
-+	u32 nr_cpuid_configs;
-+	struct tdx_cpuid_config cpuid_configs[TDX_MAX_NR_CPUID_CONFIGS];
-+};
-+
-+/* Capabilities of KVM + the TDX module. */
-+static struct tdx_capabilities tdx_caps;
-+
-+static int __init tdx_module_setup(void)
-+{
-+	const struct tdsysinfo_struct *tdsysinfo;
-+	int ret = 0;
-+
-+	BUILD_BUG_ON(sizeof(*tdsysinfo) != 1024);
-+	BUILD_BUG_ON(TDX_MAX_NR_CPUID_CONFIGS != 37);
-+
-+	ret = tdx_enable();
-+	if (ret) {
-+		pr_info("Failed to initialize TDX module.\n");
-+		return ret;
-+	}
-+
-+	tdsysinfo = tdx_get_sysinfo();
-+	if (tdsysinfo->num_cpuid_config > TDX_MAX_NR_CPUID_CONFIGS)
-+		return -EIO;
-+
-+	tdx_caps = (struct tdx_capabilities) {
-+		.tdcs_nr_pages = tdsysinfo->tdcs_base_size / PAGE_SIZE,
-+		/*
-+		 * TDVPS = TDVPR(4K page) + TDVPX(multiple 4K pages).
-+		 * -1 for TDVPR.
-+		 */
-+		.tdvpx_nr_pages = tdsysinfo->tdvps_base_size / PAGE_SIZE - 1,
-+		.attrs_fixed0 = tdsysinfo->attributes_fixed0,
-+		.attrs_fixed1 = tdsysinfo->attributes_fixed1,
-+		.xfam_fixed0 =	tdsysinfo->xfam_fixed0,
-+		.xfam_fixed1 = tdsysinfo->xfam_fixed1,
-+		.nr_cpuid_configs = tdsysinfo->num_cpuid_config,
-+	};
-+	if (!memcpy(tdx_caps.cpuid_configs, tdsysinfo->cpuid_configs,
-+			tdsysinfo->num_cpuid_config *
-+			sizeof(struct tdx_cpuid_config)))
-+		return -EIO;
-+
-+	pr_info("kvm: TDX is supported. x86 phys bits %d\n",
-+		boot_cpu_data.x86_phys_bits);
-+
-+	return 0;
-+}
-+
-+int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
-+{
-+	int r;
-+
-+	if (!enable_ept) {
-+		pr_warn("Cannot enable TDX with EPT disabled\n");
-+		return -EINVAL;
-+	}
-+
-+	/* MOVDIR64B instruction is needed. */
-+	if (!static_cpu_has(X86_FEATURE_MOVDIR64B)) {
-+		pr_warn("Cannot enable TDX with MOVDIR64B supported ");
-+		return -ENODEV;
-+	}
-+
-+	/* TDX requires VMX. */
-+	r = vmxon_all();
-+	if (!r)
-+		r = tdx_module_setup();
-+	vmxoff_all();
-+
-+	return r;
-+}
+ static inline bool is_td_vcpu(struct kvm_vcpu *vcpu)
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 1963b28a2ea5..68aef67c5eb7 100644
+index 68aef67c5eb7..dc05b78e0a1e 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2479,6 +2479,35 @@ int vmx_hardware_enable(void)
- 	return 0;
+@@ -7410,6 +7410,11 @@ int vmx_vcpu_create(struct kvm_vcpu *vcpu)
+ 	return err;
  }
  
-+static void __init vmxon(void *arg)
++bool vmx_is_vm_type_supported(unsigned long type)
 +{
-+	int cpu = raw_smp_processor_id();
-+	u64 phys_addr = __pa(per_cpu(vmxarea, cpu));
-+	atomic_t *failed = arg;
-+	int r;
-+
-+	if (cr4_read_shadow() & X86_CR4_VMXE) {
-+		r = -EBUSY;
-+		goto out;
-+	}
-+
-+	r = kvm_cpu_vmxon(phys_addr);
-+out:
-+	if (r)
-+		atomic_inc(failed);
++	return type == KVM_X86_DEFAULT_VM;
 +}
 +
-+int __init vmxon_all(void)
-+{
-+	atomic_t failed = ATOMIC_INIT(0);
-+
-+	on_each_cpu(vmxon, &failed, 1);
-+
-+	if (atomic_read(&failed))
-+		return -EBUSY;
-+	return 0;
-+}
-+
- static void vmclear_local_loaded_vmcss(void)
- {
- 	int cpu = raw_smp_processor_id();
-@@ -2499,6 +2528,16 @@ void vmx_hardware_disable(void)
- 	intel_pt_handle_vmx(0);
- }
+ #define L1TF_MSG_SMT "L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
+ #define L1TF_MSG_L1D "L1TF CPU bug present and virtualization mitigation disabled, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
  
-+static void __init vmxoff(void *junk)
-+{
-+	cpu_vmxoff();
-+}
-+
-+void __init vmxoff_all(void)
-+{
-+	on_each_cpu(vmxoff, NULL, 1);
-+}
-+
- /*
-  * There is no X86_FEATURE for SGX yet, but anyway we need to query CPUID
-  * directly instead of going through cpu_has(), to ensure KVM is trapping
 diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 83efb7f92a58..6196d651a00a 100644
+index 6196d651a00a..d4877f4f93de 100644
 --- a/arch/x86/kvm/vmx/x86_ops.h
 +++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -17,6 +17,9 @@ __init int vmx_cpu_has_kvm_support(void);
- __init int vmx_disabled_by_bios(void);
- __init int vmx_hardware_setup(void);
- 
-+int __init vmxon_all(void);
-+void __init vmxoff_all(void);
-+
- extern struct kvm_x86_ops vt_x86_ops __initdata;
- extern struct kvm_x86_init_ops vt_init_ops __initdata;
- 
-@@ -127,4 +130,10 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
- #endif
- void vmx_setup_mce(struct kvm_vcpu *vcpu);
- 
-+#ifdef CONFIG_INTEL_TDX_HOST
-+int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
-+#else
-+static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
-+#endif
-+
- #endif /* __KVM_X86_VMX_X86_OPS_H */
+@@ -27,6 +27,7 @@ void vmx_hardware_unsetup(void);
+ int vmx_check_processor_compatibility(void);
+ int vmx_hardware_enable(void);
+ void vmx_hardware_disable(void);
++bool vmx_is_vm_type_supported(unsigned long type);
+ int vmx_vm_init(struct kvm *kvm);
+ void vmx_vm_destroy(struct kvm *kvm);
+ int vmx_vcpu_precreate(struct kvm *kvm);
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 769b3a9a3151..715a53d4fc3d 100644
+index 715a53d4fc3d..91053fdc4512 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -12244,6 +12244,16 @@ static void hardware_enable(void *arg)
- 		atomic_inc(failed);
- }
+@@ -4520,6 +4520,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_X86_NOTIFY_VMEXIT:
+ 		r = kvm_caps.has_notify_vmexit;
+ 		break;
++	case KVM_CAP_VM_TYPES:
++		r = BIT(KVM_X86_DEFAULT_VM);
++		if (static_call(kvm_x86_is_vm_type_supported)(KVM_X86_TDX_VM))
++			r |= BIT(KVM_X86_TDX_VM);
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -12507,9 +12512,11 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	int ret;
+ 	unsigned long flags;
  
-+static int kvm_hardware_enable_all(void)
-+{
-+	atomic_t failed = ATOMIC_INIT(0);
+-	if (type)
++	if (!static_call(kvm_x86_is_vm_type_supported)(type))
+ 		return -EINVAL;
+ 
++	kvm->arch.vm_type = type;
 +
-+	on_each_cpu(hardware_enable, &failed, 1);
-+	if (atomic_read(&failed))
-+		return -EBUSY;
-+	return 0;
-+}
+ 	ret = kvm_page_track_init(kvm);
+ 	if (ret)
+ 		goto out;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index fa60b032a405..49386e4de8b8 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1216,6 +1216,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_CPU_TOPOLOGY 222
+ #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
+ #define KVM_CAP_PRIVATE_MEM 224
++#define KVM_CAP_VM_TYPES 225
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
+index 46de10a809ec..54b08789c402 100644
+--- a/tools/arch/x86/include/uapi/asm/kvm.h
++++ b/tools/arch/x86/include/uapi/asm/kvm.h
+@@ -532,4 +532,7 @@ struct kvm_pmu_event_filter {
+ #define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TSC) */
+ #define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
+ 
++#define KVM_X86_DEFAULT_VM	0
++#define KVM_X86_TDX_VM		1
 +
- static void hardware_disable(void *junk)
- {
- 	WARN_ON_ONCE(preemptible());
-@@ -12251,29 +12261,29 @@ static void hardware_disable(void *junk)
- 	drop_user_return_notifiers();
- }
+ #endif /* _ASM_X86_KVM_H */
+diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+index 0d5d4419139a..812b771d8702 100644
+--- a/tools/include/uapi/linux/kvm.h
++++ b/tools/include/uapi/linux/kvm.h
+@@ -1178,6 +1178,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_ZPCI_OP 221
+ #define KVM_CAP_S390_CPU_TOPOLOGY 222
+ #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
++#define KVM_CAP_VM_TYPES 225
  
-+static void kvm_hardware_disable_all(void)
-+{
-+	on_each_cpu(hardware_disable, NULL, 1);
-+}
-+
- /*
-  * Called after the VM is otherwise initialized, but just before adding it to
-  * the vm_list.
-  */
- int kvm_arch_add_vm(struct kvm *kvm, int usage_count)
- {
--	atomic_t failed = ATOMIC_INIT(0);
--	int r = 0;
-+	int r;
- 
- 	if (usage_count != 1)
- 		return kvm_mmu_post_init_vm(kvm);
- 
--	on_each_cpu(hardware_enable, &failed, 1);
--
--	if (atomic_read(&failed)) {
--		r = -EBUSY;
--		goto err;
--	}
-+	r = kvm_hardware_enable_all();
-+	if (r)
-+		return r;
- 
- 	r = kvm_mmu_post_init_vm(kvm);
--err:
- 	if (r)
--		on_each_cpu(hardware_disable, NULL, 1);
-+		kvm_hardware_disable_all();
- 	return r;
- }
- 
-@@ -12288,7 +12298,7 @@ int kvm_arch_drop_vm(int usage_count)
- 	if (usage_count)
- 		return 0;
- 
--	on_each_cpu(hardware_disable, NULL, 1);
-+	kvm_hardware_disable_all();
- 	return 0;
- }
+ #ifdef KVM_CAP_IRQ_ROUTING
  
 -- 
 2.25.1
