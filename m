@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BBE04612818
-	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:27:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D26EA61281B
+	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:27:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230430AbiJ3G1V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Oct 2022 02:27:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49684 "EHLO
+        id S230176AbiJ3G1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Oct 2022 02:27:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230161AbiJ3GZZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Oct 2022 02:25:25 -0400
+        with ESMTP id S230177AbiJ3GZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Oct 2022 02:25:28 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27596222;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F1D7231;
         Sat, 29 Oct 2022 23:24:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1667111055; x=1698647055;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=RM3+eWq8eAgKigI5ubM3QJ4p1TJTvjO5HFLkxD5vwu4=;
-  b=KfMvq5nYj8PjsTedF3CtxHrYNoTr/THR66KqkINxZcv9zKov3Mj+0wkA
-   4U3ApEwwEmgb74Mrod7A/LcER0PKAs6doCShzHj5VUldNrdpQ8FT284q8
-   +8DF9QZYpnR1g3iPRmEiRmDlnGhtrIGdOUWQCs+gfpLEgXCh02xuGcwuH
-   mLGR2zrtV6yucHychY7B8TEoMAlq2eH7tWAA9oymxB+k41pzy+tXvrmRl
-   1YP4o5NhVMwE5giOo6n9/o9a35u4z9XqCQ9Y4siu3fCIqRKXU7ZiEQr3r
-   8PaksTDTq/CyJ6PzzB759ka2tMUuEuUUg9ftUjR9diHsDLkQX5sakjbMo
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037173"
+  bh=7faA3B0OqUMnFM6ysYVSaG6I4oEbGhUujDKJN05XdS0=;
+  b=VwjAt6OS+nj3GmPqO3I1QBbdqImh8IkNm3Hd/RvRGlCOkeoyJnOYgg29
+   Hznjel3383qCaANoJuu6XPu9syCdgk5estyuYYVYt+LRAwc/lKBg6WH6z
+   wqG9b4/RhRspRks0/KPtImUYOkwk60yu0hG8bjAwcWUOuWjIt6xAh8xK6
+   BcCIu0oOPTnj/Tju81r4OJMFkVIuXfHyUaV/RdHY0EwGOzJQCge4Qphk+
+   PZ/Ee9Uua8l3waFRpeY90/yphCgQqTgnibZLCf03PdoqcxsMVL4Jefnj8
+   G0SPSlY/rqt12SF2c03JNlD9NBwjSdhY8vaLqnL0EYiB9G0QrrCgDniWK
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037174"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="395037173"
+   d="scan'208";a="395037174"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:07 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878393039"
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878393042"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="878393039"
+   d="scan'208";a="878393042"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:07 -0700
 From:   isaku.yamahata@intel.com
@@ -43,10 +43,11 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: [PATCH v10 060/108] KVM: Add functions to set GFN to private or shared
-Date:   Sat, 29 Oct 2022 23:23:01 -0700
-Message-Id: <c834432220f04c39a8dfa6ac3838446e6c06c9e9.1667110240.git.isaku.yamahata@intel.com>
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v10 061/108] KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX
+Date:   Sat, 29 Oct 2022 23:23:02 -0700
+Message-Id: <861847305216ba97ab65ad2e0ebe5bf08e2fd71a.1667110240.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1667110240.git.isaku.yamahata@intel.com>
 References: <cover.1667110240.git.isaku.yamahata@intel.com>
@@ -61,129 +62,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-TDX KVM support needs to track whether GFN is private or shared.  Introduce
-functions to set whether GFN is private or shared and pre-allocate memory
-for xarray.
+Introduce a helper to directly (pun intended) fault-in a TDP page
+without having to go through the full page fault path.  This allows
+TDX to get the resulting pfn and also allows the RET_PF_* enums to
+stay in mmu.c where they belong.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- include/linux/kvm_host.h | 11 ++++++
- virt/kvm/kvm_main.c      | 74 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 85 insertions(+)
+ arch/x86/kvm/mmu.h     |  3 +++
+ arch/x86/kvm/mmu/mmu.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index a0b64308d240..fac07886ab39 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2307,9 +2307,20 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
- #define KVM_MEM_ATTR_PRIVATE	0x0002
- 
- #ifdef __KVM_HAVE_ARCH_UPDATE_MEM_ATTR
-+/* memory attr on [start, end) */
-+int kvm_vm_reserve_mem_attr(struct kvm *kvm, gfn_t start, gfn_t end);
-+int kvm_vm_set_mem_attr(struct kvm *kvm, int attr, gfn_t start, gfn_t end);
- void kvm_arch_update_mem_attr(struct kvm *kvm, struct kvm_memory_slot *slot,
- 			      unsigned int attr, gfn_t start, gfn_t end);
- #else
-+static inline int kvm_vm_reserve_mem_attr(struct kvm *kvm, gfn_t start, gfn_t end)
-+{
-+	return -EOPNOTSUPP;
-+}
-+static inline int kvm_vm_set_mem_attr(struct kvm *kvm, int attr, gfn_t start, gfn_t end)
-+{
-+	return -EOPNOTSUPP;
-+}
- static inline void kvm_arch_update_mem_attr(struct kvm *kvm,
- 					    struct kvm_memory_slot *slot,
- 					    unsigned int attr,
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9f82b03a8118..f0e77b65939b 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1121,6 +1121,80 @@ static inline void kvm_restrictedmem_unregister(struct kvm_memory_slot *slot)
- 					  &slot->notifier);
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 50d240d52697..e2a0dfbee56d 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -154,6 +154,9 @@ static inline void kvm_mmu_load_pgd(struct kvm_vcpu *vcpu)
+ 					  vcpu->arch.mmu->root_role.level);
  }
  
-+/*
-+ * Reserve memory for [start, end) so that the next set oepration won't fail
-+ * with -ENOMEM.
-+ */
-+int kvm_vm_reserve_mem_attr(struct kvm *kvm, gfn_t start, gfn_t end)
-+{
-+	int r = 0;
-+	gfn_t gfn;
++kvm_pfn_t kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa,
++			       u32 error_code, int max_level);
 +
-+	xa_lock(&kvm->mem_attr_array);
-+	for (gfn = start; gfn < end; gfn++) {
-+		r = __xa_insert(&kvm->mem_attr_array, gfn, NULL, GFP_KERNEL_ACCOUNT);
-+		if (r == -EBUSY)
-+			r = 0;
-+		if (r)
-+			break;
-+	}
-+	xa_unlock(&kvm->mem_attr_array);
-+
-+	return r;
-+}
-+EXPORT_SYMBOL_GPL(kvm_vm_reserve_mem_attr);
-+
-+/* Set memory attr for [start, end) */
-+int kvm_vm_set_mem_attr(struct kvm *kvm, int attr, gfn_t start, gfn_t end)
-+{
-+	void *entry;
-+	gfn_t gfn;
-+	int r;
-+	int i;
-+
-+	/* By default, the entry is private. */
-+	switch (attr) {
-+	case KVM_MEM_ATTR_PRIVATE:
-+		entry = NULL;
-+		break;
-+	case KVM_MEM_ATTR_SHARED:
-+		entry = xa_mk_value(KVM_MEM_ATTR_SHARED);
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return -EINVAL;
-+	}
-+
-+	WARN_ON_ONCE(start >= end);
-+	for (gfn = start; gfn < end; gfn++) {
-+		r = xa_err(xa_store(&kvm->mem_attr_array, gfn, entry,
-+				    GFP_KERNEL_ACCOUNT));
-+		if (r)
-+			break;
-+	}
-+	if (start >= gfn)
-+		return r;
-+
-+	end = gfn;
-+	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-+		struct kvm_memslot_iter iter;
-+		struct kvm_memory_slot *slot;
-+		struct kvm_memslots *slots;
-+
-+		slots = __kvm_memslots(kvm, i);
-+		kvm_for_each_memslot_in_gfn_range(&iter, slots, start, end) {
-+			gfn_t s = max(start, slot->base_gfn);
-+			gfn_t e = min(end, slot->base_gfn + slot->npages);
-+
-+			WARN_ON_ONCE(s >= e);
-+			kvm_arch_update_mem_attr(kvm, slot, attr, s, e);
-+		}
-+	}
-+
-+	return r;
-+}
-+EXPORT_SYMBOL_GPL(kvm_vm_set_mem_attr);
-+
- #else /* !CONFIG_HAVE_KVM_RESTRICTED_MEM */
+ /*
+  * Check if a given access (described through the I/D, W/R and U/S bits of a
+  * page fault error code pfec) causes a permission fault with the given PTE
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 08923b64dcc8..168c84c99de3 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4485,6 +4485,45 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	return direct_page_fault(vcpu, fault);
+ }
  
- static inline void kvm_restrictedmem_register(struct kvm_memory_slot *slot)
++kvm_pfn_t kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa,
++			       u32 error_code, int max_level)
++{
++	int r;
++	struct kvm_page_fault fault = (struct kvm_page_fault) {
++		.addr = gpa,
++		.error_code = error_code,
++		.exec = error_code & PFERR_FETCH_MASK,
++		.write = error_code & PFERR_WRITE_MASK,
++		.present = error_code & PFERR_PRESENT_MASK,
++		.rsvd = error_code & PFERR_RSVD_MASK,
++		.user = error_code & PFERR_USER_MASK,
++		.prefetch = false,
++		.is_tdp = true,
++		.nx_huge_page_workaround_enabled = is_nx_huge_page_enabled(vcpu->kvm),
++		.is_private = kvm_is_private_gpa(vcpu->kvm, gpa),
++	};
++
++	if (mmu_topup_memory_caches(vcpu, false))
++		return KVM_PFN_ERR_FAULT;
++
++	/*
++	 * Loop on the page fault path to handle the case where an mmu_notifier
++	 * invalidation triggers RET_PF_RETRY.  In the normal page fault path,
++	 * KVM needs to resume the guest in case the invalidation changed any
++	 * of the page fault properties, i.e. the gpa or error code.  For this
++	 * path, the gpa and error code are fixed by the caller, and the caller
++	 * expects failure if and only if the page fault can't be fixed.
++	 */
++	do {
++		fault.max_level = max_level;
++		fault.req_level = PG_LEVEL_4K;
++		fault.goal_level = PG_LEVEL_4K;
++		r = direct_page_fault(vcpu, &fault);
++	} while (r == RET_PF_RETRY && !is_error_noslot_pfn(fault.pfn));
++	return fault.pfn;
++}
++EXPORT_SYMBOL_GPL(kvm_mmu_map_tdp_page);
++
+ static void nonpaging_init_context(struct kvm_mmu *context)
+ {
+ 	context->page_fault = nonpaging_page_fault;
 -- 
 2.25.1
 
