@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64E8F6127F5
-	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:25:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7ECF6127F2
+	for <lists+kvm@lfdr.de>; Sun, 30 Oct 2022 07:25:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230259AbiJ3GZs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Oct 2022 02:25:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47724 "EHLO
+        id S230233AbiJ3GZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Oct 2022 02:25:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229952AbiJ3GYY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Oct 2022 02:24:24 -0400
+        with ESMTP id S229635AbiJ3GY0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Oct 2022 02:24:26 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E06E187;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3739188;
         Sat, 29 Oct 2022 23:24:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1667111051; x=1698647051;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Fb3dBDV4drTH1Irv7AqwIGDFRaog5goehiwWHDo/z9Q=;
-  b=TXj+aMyAYc+3v2ZH/LqcvYmus5axvGcxS9LlsmNl9JvymQvownvdU71F
-   JujWgpoLrQX5JQHBAgvOO5y9vIObN69ayrSZJwN1ykgSkvjmEX7XAxjZu
-   W6uIBcE/Lj4nCAfUoAknR69SInJ8KGQ1I88ysUes+Gg7evypuiAVgujY4
-   puZin3g6EuggdSM8C5TG1xNTywT9cPJNE0ov7u1ChpBhIJwR7+4rvZ6NM
-   eT0W9hvAbOrCqpuZ7FPifX5AMVGcQ+e1UhrhcrEi7vkfCSUAs2wl4nAYc
-   UQxWgNjOklp8rQ6uBgRfrgc456EaNKZwtkqw9JKwmDQdIHv3Oq+skXqn8
+  bh=8q0Zi89k4Pljz6j6YFmcZyhYRvEh99WoaA0AWQJmknA=;
+  b=XtcnInG+kF2woEhjxgCvQ4kqmAk0Z9Ro3cUatmdo9CMSzTABTrXkzD4X
+   m7Zpmdp9EmDitb+D8MDhHh6DumjYv767b3oS+uHw/s51cgPSd2p9wzEaB
+   cvkfLBYIQ++8IJqKOp40iHvPgntqotbVAqiFOQYmYmBIgkgWn8/Afmg7F
+   gH7K0dgpPkvn5VmqJ9OGLtjwR1a0mhx7fP0eoELzbjGBJixzgZJ0cMXuN
+   Ld4p25gvYLKBES/OxQEnRRXQx4rGJbeXE9LD3B+iz9ZKg+2+8IAQ+Uwmx
+   sC6agb6rsaEKquQTDTufPMgbJMFgUrnr6zJCgdfpuELVVhkP4ZQTUT70j
    g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037162"
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="395037163"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="395037162"
+   d="scan'208";a="395037163"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:05 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878393007"
+X-IronPort-AV: E=McAfee;i="6500,9779,10515"; a="878393010"
 X-IronPort-AV: E=Sophos;i="5.95,225,1661842800"; 
-   d="scan'208";a="878393007"
+   d="scan'208";a="878393010"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 23:24:05 -0700
 From:   isaku.yamahata@intel.com
@@ -43,10 +43,11 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: [PATCH v10 050/108] [MARKER] The start of TDX KVM patch series: TDX EPT violation
-Date:   Sat, 29 Oct 2022 23:22:51 -0700
-Message-Id: <13cd5623491890659b1eded413678f6a6c2fa50e.1667110240.git.isaku.yamahata@intel.com>
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v10 051/108] KVM: x86/mmu: Disallow dirty logging for x86 TDX
+Date:   Sat, 29 Oct 2022 23:22:52 -0700
+Message-Id: <4873c5af293116df92eb8da5e1ba4e76df081682.1667110240.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1667110240.git.isaku.yamahata@intel.com>
 References: <cover.1667110240.git.isaku.yamahata@intel.com>
@@ -63,33 +64,70 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-This empty commit is to mark the start of patch series of TDX EPT
-violation.
+TDX doesn't support dirty logging.  Report dirty logging isn't supported so
+that device model, for example qemu, can properly handle it.
 
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Documentation/virt/kvm/intel-tdx-layer-status.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/x86.c       |  5 +++++
+ include/linux/kvm_host.h |  1 +
+ virt/kvm/kvm_main.c      | 10 +++++++++-
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-index d5cace00c433..c3e675bea802 100644
---- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
-+++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-@@ -19,12 +19,12 @@ Patch Layer status
- * TDX architectural definitions:        Applied
- * TD VM creation/destruction:           Applied
- * TD vcpu creation/destruction:         Applied
--* TDX EPT violation:                    Not yet
-+* TDX EPT violation:                    Applying
- * TD finalization:                      Not yet
- * TD vcpu enter/exit:                   Not yet
- * TD vcpu interrupts/exit/hypercall:    Not yet
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ba4a9ce0ee80..24d9bfd4c582 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -13862,6 +13862,11 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
+ }
+ EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
  
- * KVM MMU GPA shared bits:              Applied
- * KVM TDP refactoring for TDX:          Applied
--* KVM TDP MMU hooks:                    Applying
-+* KVM TDP MMU hooks:                    Applied
- * KVM TDP MMU MapGPA:                   Not yet
++bool kvm_arch_dirty_log_supported(struct kvm *kvm)
++{
++	return kvm->arch.vm_type != KVM_X86_TDX_VM;
++}
++
+ bool kvm_arch_has_private_mem(struct kvm *kvm)
+ {
+ 	return kvm->arch.vm_type == KVM_X86_TDX_VM;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index b658803ea2c7..a0b64308d240 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1477,6 +1477,7 @@ int kvm_arch_drop_vm(int usage_count);
+ void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+ int kvm_arch_create_vm_debugfs(struct kvm *kvm);
+ bool kvm_arch_has_private_mem(struct kvm *kvm);
++bool kvm_arch_dirty_log_supported(struct kvm *kvm);
+ 
+ #ifndef __KVM_HAVE_ARCH_VM_ALLOC
+ /*
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 8c996f40b544..9f82b03a8118 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1869,10 +1869,18 @@ bool __weak kvm_arch_has_private_mem(struct kvm *kvm)
+ 	return false;
+ }
+ 
++bool __weak kvm_arch_dirty_log_supported(struct kvm *kvm)
++{
++	return true;
++}
++
+ static int check_memory_region_flags(struct kvm *kvm,
+ 				     const struct kvm_user_mem_region *mem)
+ {
+-	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
++	u32 valid_flags = 0;
++
++	if (kvm_arch_dirty_log_supported(kvm))
++		valid_flags |= KVM_MEM_LOG_DIRTY_PAGES;
+ 
+ #ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM
+ 	if (kvm_arch_has_private_mem(kvm))
 -- 
 2.25.1
 
