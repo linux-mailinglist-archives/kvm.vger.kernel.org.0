@@ -2,136 +2,270 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B5F1D6132A6
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 10:24:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 420FE6133C2
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 11:38:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230182AbiJaJYF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 05:24:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50718 "EHLO
+        id S230042AbiJaKid (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 06:38:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230395AbiJaJXt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 05:23:49 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A12FDF63;
-        Mon, 31 Oct 2022 02:22:46 -0700 (PDT)
+        with ESMTP id S230012AbiJaKi0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 06:38:26 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55465C77F;
+        Mon, 31 Oct 2022 03:38:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667208166; x=1698744166;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Dk392vKLE9i7N1vmzYLQyKcqIsTeZR+TmuP19K/V+0o=;
-  b=JvliAE6/SFscSyOFremvahmR3HgXWgyAYI5PLzBte67nZgl3E4s+7PIW
-   PIJU9igcks8qSekAWtYajAL2RqdyOqFbVauIr6GB+8eiB19Gvhum8GX4R
-   9PIkk7NQt5YA1HcAKHAFx3Io6k2yvvOMPFAr+OIMplzfxzvEyEjN3rsZx
-   w1lNmlChxlvS7AMqZQw7trO4X+/2ctn89OcJQEs5JlVqoJcCJM5fa86q6
-   /T76uEGGnGj/p9twMqEPjfNQ1tHnFQQ5uLXgTaXPLekNCn3E2kYqluzjk
-   k561uB7k2YGUYN8NMEw2Oefo4imyjV4vbwts0e8afubTJD8q7ih6HtRyS
+  t=1667212705; x=1698748705;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=5NnA48ZX3VY5BT5H7bLTVoZrVVPezpOVIWaegytPDyI=;
+  b=V+LGWky1JDMsHdlicBad+6pE/6LraLQE8mxq1WhR2/8NIiugmXHGTaC5
+   gZA6mJI0vbtFvnLc+wvYyIVn8A9ump9cctEUHvo5Lmq+DdR8rZNnrJT4h
+   vE0njm3xjnCTQ2SVn6QimbotbWapczx6x8AHXT5RDhA+FMFwE5wQ1McwU
+   xR0x2EtNRTiJbX1VIOwf6c6+zJJ5TR5S5hXlOsUH6UeV+qV5OZ3eh1tVw
+   T67QTRkBf0Rto+GK8l3653BcHz2rvdd3shX4FT4qEYJxIBCsNi6E/XsJ2
+   UakRmdn0cMdwjZAUQTEtTbk/R09wPJbf8l/z3u/3BHG6+subQbT0y5sor
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10516"; a="288570195"
+X-IronPort-AV: E=McAfee;i="6500,9779,10516"; a="335521501"
 X-IronPort-AV: E=Sophos;i="5.95,227,1661842800"; 
-   d="scan'208";a="288570195"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2022 02:22:17 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10516"; a="696941190"
+   d="scan'208";a="335521501"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2022 03:38:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10516"; a="722768354"
 X-IronPort-AV: E=Sophos;i="5.95,227,1661842800"; 
-   d="scan'208";a="696941190"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.255.28.35]) ([10.255.28.35])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2022 02:22:15 -0700
-Message-ID: <f1fdc428-f407-9582-c392-579f873f7562@linux.intel.com>
-Date:   Mon, 31 Oct 2022 17:22:13 +0800
+   d="scan'208";a="722768354"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by FMSMGA003.fm.intel.com with ESMTP; 31 Oct 2022 03:38:24 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 31 Oct 2022 03:38:23 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Mon, 31 Oct 2022 03:38:23 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.45) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Mon, 31 Oct 2022 03:38:23 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XbCRV/iigLqpRUEs9NCLFlcX1vhAiWQTUM39JbRge1n6RfK6YwdcOteMkgxXmV7igToCTlj3ntAcuALZk6waZRQwhuNZjUCioo/EaOpEoJFba7VLcYBA3sS4Glb7K6bQ+NW/b+jPUbeZkywU+kTFnVUD+Nacz3JrXBnGYAUaZbNMG3itBAtjWAbZTRPGcaOs+qcpRhb/G1uW5FuB0abZCLqsXH2I7TiikrsWwLyUyPcSfWVeMAHCj3a4NHzhKG8MYyDC5BCUx9OCg87m+Mc+kHbyHPtWTL8XmMNb/H6D+FjjihnyammK+j0fcqIATcEAe2WuH8ch1u0wT/FHRTd3mQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J7FrEOUwW+MrNtRwDKi8uUEP5XtLs++S4CtVqjHaHo4=;
+ b=I92ZGNV5gkROo4q42/m6rejOEDD2TBUsqVnQt3J/Wmo2zYDWENFAmhHaNYjZTBI1z1KnFinUkIvO3DK8i4mUriNEZ5XxOGAuitzESmHrDPCMAAwUnMuJPGuQFAd6V6zYhoGFriWzWfd7OCXnlPm1nJgKHFZmZmRPyPjs02+mOpTa0Odh7/EqsiMQV3JDTG/9WMOifL+IoT7ZtYuR61dHlaiiEG13H8m9+NaXLfSq6z+VQp8MfjnZKwioZAs+pYZup+6i/H+Q5QBZWPXpdFPtWEHd+larVcwqcsUi9bD7TJ/kxiE9QIX+F5RgT3vD96LNbL3ysxiKRkN0NliQMxGJzw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by SA1PR11MB6919.namprd11.prod.outlook.com (2603:10b6:806:2bc::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.19; Mon, 31 Oct
+ 2022 10:38:21 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::37e3:9536:43ed:2ecf]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::37e3:9536:43ed:2ecf%5]) with mapi id 15.20.5769.016; Mon, 31 Oct 2022
+ 10:38:21 +0000
+Message-ID: <39eb11ed-dbf2-822a-dc79-5b70a49c430b@intel.com>
+Date:   Mon, 31 Oct 2022 18:38:45 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.11.0
+Subject: Re: [PATCH 00/10] Connect VFIO to IOMMUFD
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        <dri-devel@lists.freedesktop.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        "Harald Freudenberger" <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        <intel-gfx@lists.freedesktop.org>,
+        <intel-gvt-dev@lists.freedesktop.org>, <iommu@lists.linux.dev>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        "Joonas Lahtinen" <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>,
+        Longfang Liu <liulongfang@huawei.com>,
+        "Matthew Rosato" <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+CC:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+References: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
+From:   Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SI1PR02CA0049.apcprd02.prod.outlook.com
+ (2603:1096:4:1f5::18) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH v10 010/108] KVM: TDX: Add TDX "architectural" error codes
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <679bb45187dc54b82ebc9df5381a7d5de0b782d5.1667110240.git.isaku.yamahata@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <679bb45187dc54b82ebc9df5381a7d5de0b782d5.1667110240.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|SA1PR11MB6919:EE_
+X-MS-Office365-Filtering-Correlation-Id: 82937d22-c805-49c7-cc09-08dabb2c07c8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jV/7JHLc8NPmtX5kQg8mLfgPx1C/7qkmFcuvgfzo1DlZb+J0LAxDJTS52qWEcoLZX29idvPf2E0Uo5xn4shOhPbm4hY8FHWZNw+UyORA2+M7At5yvxCerA4yOMECAthKRe0ooCJyfVJ0kmv6ef8dpN0fFYxNR5kq9X12srMWft0km+WD6rmo5Wq0Ri4vZEo/o20HnDMcjSDWUlJ38khALZeMsif4Fz8vhP8qy6JplMM1VGnud4iIIapC8wHgPLkayh6vDoIxshecoOH3l6ls0/kjMEycmYWCmDnJF8YTV7TIjO87N+uxIP8p250nrEfToN4RTedOwG0etNdr7vKSLMUbFLGYetXilai2bLP45nm7bF0yG3tFRS0LaUAje6quxHN1TrqHG9Z0xyHurEVozv7jbDZ4SD8wV/DY9WCGPVeQFW70oDXXyqm75yAHO19MMlOzsdncJ/JGKuWuNQUQ7J2A5yQb9kHn9FT+y9GHiGh7m/VA2VikmiQzEr+wKN+0FFbFFDunzlNyHSLQupoJ+ufgH9Ln0LmOnavQrhSU1GHUo0w2/FVVwAh/GlIgze7d0TVPURBVuMwieimZy0DY34ELNXxOqRNIF0KSAjKdf2+vYEA0YFKYzggXsg4sadZpSIvmyiQVi+XUzimkHknbLjv0HrN/fDA1pQkb37ZZ3zvWQa/ackoCSFQnWGMNg6W/UWKBUx5BmY2f9lmz9YjPY00oD0cuhM+MS951GFM725SSFOE6B0NZjX95u+K/o0omohXfer5FCJoyrgMaC4Yy/QaZBcd3sXP7CUiLK2gn3Y79WSOIhrBWfrMPeignMjECjA1s9HtrdRZOsTPFW7B/QG2je7iwtWr9UUX4r2WQTNPF5FMaDWGbYXQKMnUVj6jAWhjdXJeaIQaBHgDL7h+W/g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(366004)(136003)(346002)(396003)(39860400002)(451199015)(82960400001)(38100700002)(921005)(36756003)(86362001)(31696002)(2906002)(6486002)(966005)(6666004)(478600001)(7406005)(8676002)(316002)(6506007)(8936002)(4326008)(66946007)(66556008)(66476007)(7416002)(6636002)(54906003)(41300700001)(5660300002)(110136005)(2616005)(186003)(53546011)(26005)(6512007)(83380400001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?V21LTjhNaFlOOTVPQ1BmRDdwZTZac05LVDRGWFlsK1VuUmhtWURJRFNmak5i?=
+ =?utf-8?B?dis3a1Nkakl1UWZ1R1Mvcnljckx3bFlsZXlVZWwrbnVlNFhmUGRKWkRlcFQ1?=
+ =?utf-8?B?QWpidktHNjljcG0xaXFxdXJUdC8wOGR2TVJjdnI0OU9ia3VSeXNQMXlUcnNJ?=
+ =?utf-8?B?akIzNHlmcHZyalcyb0x5KzJubmdlaWVRTGliMG5zR1lDSDJGVndGbDJNYlZ1?=
+ =?utf-8?B?VXlSS09VNlVwZnVsZk85M3dSMDl3VkYwcTdUajQzanpEVWM3WmhONi9JaDVY?=
+ =?utf-8?B?YXFHcHFWRUoyT3AwWW8wWDlVWStNeC9ZTTRXdHJsUnNyMkNMUk01Vnpsbmh6?=
+ =?utf-8?B?WXZmdWFXU3RzVk5Ta2RJcWRzakE3OC9QUzUwMWlVb0Rsb1ppcVhTNkdqdTdV?=
+ =?utf-8?B?cEorZlB6V1V1RjdaKys3ODk4bzB2T2I0SmZVb25JSUs0R3FyZmVUM0R6ekli?=
+ =?utf-8?B?aEk2OGRqdFg5Ymp1QkhkTzZTOUJOVkwwcTlHclRqelZWZGl5SHdHN3JYMmc5?=
+ =?utf-8?B?MEdmMUs1YzRrc1c5ZGw0cGFESU9IdjlIR2lSUXhNODIybXdxWE9aT09pUlNj?=
+ =?utf-8?B?RUhQMm5SNlBNcG00OGpzRE91aExSRW1NQm8yNDBiaHlRNnhCRXFoR3pZc25r?=
+ =?utf-8?B?M2ZSRDdWN3dQenM2UzhpUEtVUWk4WWQ2ZmNFN0o0QXhITHJWbGIrcHBsN1lI?=
+ =?utf-8?B?Q0xScUQrNGFhUUxTdGw1OXN6d2RQNmt3Y2xLVC9WN0NHSnFmRDEzcTRtZ2tQ?=
+ =?utf-8?B?c0Zac3NBZnhxdm9JTkN2OS9qcG5GdzlLbVkwSi9QYVdMM2F4UEMvTUR3RnlV?=
+ =?utf-8?B?T0UybGU3dVRTVmtTR1U1Y1BJWmVWd3dvcUpuanhBTmJGL1B1d0hJWURWMFJP?=
+ =?utf-8?B?TTMyVnhOd3JFSjhLYVJrSzNRa1NxVVd2anRmOVVYSEkxOUhtZG4xS3N6Zkpw?=
+ =?utf-8?B?UlhMU0kwYm51elMvOUFmcG1wc3VINXhVaExmdE1FSDcxVUhtbTYrd1lmaVlJ?=
+ =?utf-8?B?MzByb3kxLzFISkJTNU1jSC90L0VaUS9ucEFDMlp1Z2NTTUNXR0dIYjUra21h?=
+ =?utf-8?B?Y01FeVNJSUFMWjFGSUwvak1EVzVNMUFWQ1NPdU4zM1VtZ2xyYWt6blJRU01M?=
+ =?utf-8?B?L0hZNEVocmhQWmVlZzY1QjFMOGdzM05USlZBTCtQZThOUnllNGppNlZCTWJC?=
+ =?utf-8?B?YXlkMlhSSDcwZUpRU3RxWG9HclhFcFYyTWFnTjZUVVVCVDRSU2dwMk0wcm9V?=
+ =?utf-8?B?YjBxMUNvVXJJckoyYkx3cVhzV0JIUkg3ME9seG83SnhOZXRONzc0RnhhbCtO?=
+ =?utf-8?B?ZlBWZ3AzNEwrQjRVZUp3ZTVHWU5zaEk4Yy96RGhueXI4UTVMSi8zYWdQTnFW?=
+ =?utf-8?B?ZlhOZjFialFvQzJZUk1DajdyV2FZamhqRzFaS3FzQXVhRExrTmZXa2RRU0VK?=
+ =?utf-8?B?b2JYT2d3V0dPOFhrRDZZMlpNZnlFMmRYcmFWb1U0ZmtNNUpJWWNvUUxkeDRN?=
+ =?utf-8?B?NGhsVzdtMTFGZngrU1pWbVptV2xjc3FQT3Z0cDRhUW9Wdzd4TE5LUHdGRTFB?=
+ =?utf-8?B?eFQwV3g3YVBORmxmQlpZeFAvUjBvSURGVi84eUZXZ3AzRDBUUnJWVHZKOHVG?=
+ =?utf-8?B?NzVyMHRUOGY5SnpRRlFxRW1UcHgvcDkxWmNadzRtK0ZiNkdPMEl0cTcyMmlI?=
+ =?utf-8?B?TWJRQ3dXb29Ca3RvQmd2M29EWWJtMStjL0Y2SzY3ak96NHp4NUZqYmRlcmpp?=
+ =?utf-8?B?bStYV1MrbWp3UlJkNXYzeFhCU3FacjNyL3E5RlQ0dUNnUFJDenJjbHAzZkdl?=
+ =?utf-8?B?SHlrd1JLRVlYOHFZMlA0T2FqL2dBQ2xXNjdWanNhUDFKSk9SUVVOeUVHQ2ND?=
+ =?utf-8?B?NUtWOXl0OTRmWFZENnBjc1RlZnZWcFdOVmlUYm1mY0Q0cjVzU0hSTVhYcHVj?=
+ =?utf-8?B?SkpNeiswVXU1bmFNUkgvbjZmeWw5ZW5Nc3BWUjZlSlVDblRJS1VIS21TTUk2?=
+ =?utf-8?B?dGZ2dWhNMFlIUldlVHRPZm42TVFBUGV6c0U1OGhPV0JkWDRTeW45azZ5TzJv?=
+ =?utf-8?B?Q2hPV3RhbEdmdC9sWlh5L2lxYmN5SmFNMVJSS2RsN3p2WHh5TFVtZUJpY2li?=
+ =?utf-8?Q?mH7OSqWQcwcHheDBhCwjSffKI?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82937d22-c805-49c7-cc09-08dabb2c07c8
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2022 10:38:21.3494
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 62AfrJE5Bx/Q9u52s5yBGdYIZkAJWY2xZB5WkgfkmFyX/+z2aC7po7xvUrCSVO3LOQQTQ0rsTm2D6kedBKBumQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6919
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Jason,
 
-On 2022/10/30 14:22, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
->
-> Add error codes for the TDX SEAMCALLs both for TDX VMM side for TDH
-> SEAMCALL and TDX guest side for TDG.VP.VMCALL.  KVM issues the TDX
-> SEAMCALLs and checks its error code.  KVM handles hypercall from the TDX
-> guest and may return an error.  So error code for the TDX guest is also
-> needed.
->
-> TDX SEAMCALL uses bits 31:0 to return more information, so these error
-> codes will only exactly match RAX[63:32].  Error codes for TDG.VP.VMCALL is
-> defined by TDX Guest-Host-Communication interface spec.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   arch/x86/kvm/vmx/tdx_errno.h | 38 ++++++++++++++++++++++++++++++++++++
->   1 file changed, 38 insertions(+)
->   create mode 100644 arch/x86/kvm/vmx/tdx_errno.h
->
-> diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
-> new file mode 100644
-> index 000000000000..ce246ba62454
-> --- /dev/null
-> +++ b/arch/x86/kvm/vmx/tdx_errno.h
-> @@ -0,0 +1,38 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* architectural status code for SEAMCALL */
-> +
-> +#ifndef __KVM_X86_TDX_ERRNO_H
-> +#define __KVM_X86_TDX_ERRNO_H
-> +
-> +#define TDX_SEAMCALL_STATUS_MASK		0xFFFFFFFF00000000ULL
-> +
-> +/*
-> + * TDX SEAMCALL Status Codes (returned in RAX)
-> + */
-> +#define TDX_SUCCESS				0x0000000000000000ULL
-> +#define TDX_NON_RECOVERABLE_VCPU		0x4000000100000000ULL
-> +#define TDX_INTERRUPTED_RESUMABLE		0x8000000300000000ULL
-> +#define TDX_OPERAND_BUSY                        0x8000020000000000ULL
+On 2022/10/26 02:17, Jason Gunthorpe wrote:
+> This series provides an alternative container layer for VFIO implemented
+> using iommufd. This is optional, if CONFIG_IOMMUFD is not set then it will
+> not be compiled in.
+> 
+> At this point iommufd can be injected by passing in a iommfd FD to
+> VFIO_GROUP_SET_CONTAINER which will use the VFIO compat layer in iommufd
+> to obtain the compat IOAS and then connect up all the VFIO drivers as
+> appropriate.
+> 
+> This is temporary stopping point, a following series will provide a way to
+> directly open a VFIO device FD and directly connect it to IOMMUFD using
+> native ioctls that can expose the IOMMUFD features like hwpt, future
+> vPASID and dynamic attachment.
+> 
+> This series, in compat mode, has passed all the qemu tests we have
+> available, including the test suites for the Intel GVT mdev. Aside from
+> the temporary limitation with P2P memory this is belived to be fully
+> compatible with VFIO.
+> 
+> This is on github: https://github.com/jgunthorpe/linux/commits/vfio_iommufd
 
-one minor format issue, spaces are used  instread of tabs this line.
+In our side, we found the gvt-g test failed. Guest i915 driver stuck at
+init phase. While with your former version  (commit ID 
+a249441ba6fd9d658f4a1b568453e3a742d12686), gvt-g test is passing. I
+noticed there a quite a few change in iommufd/pages.c from last version.
+We are internally tracing in the gvt-g side, may also good to have your
+attention.
 
+> It requires the iommufd series:
+> 
+> https://lore.kernel.org/r/0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com
+> 
+> Jason Gunthorpe (10):
+>    vfio: Move vfio_device driver open/close code to a function
+>    vfio: Move vfio_device_assign_container() into
+>      vfio_device_first_open()
+>    vfio: Rename vfio_device_assign/unassign_container()
+>    vfio: Move storage of allow_unsafe_interrupts to vfio_main.c
+>    vfio: Use IOMMU_CAP_ENFORCE_CACHE_COHERENCY for
+>      vfio_file_enforced_coherent()
+>    vfio-iommufd: Allow iommufd to be used in place of a container fd
+>    vfio-iommufd: Support iommufd for physical VFIO devices
+>    vfio-iommufd: Support iommufd for emulated VFIO devices
+>    vfio: Make vfio_container optionally compiled
+>    iommufd: Allow iommufd to supply /dev/vfio/vfio
+> 
+>   drivers/gpu/drm/i915/gvt/kvmgt.c              |   3 +
+>   drivers/iommu/iommufd/Kconfig                 |  12 +
+>   drivers/iommu/iommufd/main.c                  |  35 +-
+>   drivers/s390/cio/vfio_ccw_ops.c               |   3 +
+>   drivers/s390/crypto/vfio_ap_ops.c             |   3 +
+>   drivers/vfio/Kconfig                          |  38 ++-
+>   drivers/vfio/Makefile                         |   5 +-
+>   drivers/vfio/container.c                      | 136 ++------
+>   drivers/vfio/fsl-mc/vfio_fsl_mc.c             |   3 +
+>   drivers/vfio/iommufd.c                        | 161 +++++++++
+>   .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |   6 +
+>   drivers/vfio/pci/mlx5/main.c                  |   3 +
+>   drivers/vfio/pci/vfio_pci.c                   |   3 +
+>   drivers/vfio/platform/vfio_amba.c             |   3 +
+>   drivers/vfio/platform/vfio_platform.c         |   3 +
+>   drivers/vfio/vfio.h                           | 100 +++++-
+>   drivers/vfio/vfio_iommu_type1.c               |   5 +-
+>   drivers/vfio/vfio_main.c                      | 318 ++++++++++++++----
+>   include/linux/vfio.h                          |  39 +++
+>   19 files changed, 681 insertions(+), 198 deletions(-)
+>   create mode 100644 drivers/vfio/iommufd.c
+> 
+> 
+> base-commit: 3bec937e94942a6aee8854be1c1f5cc2b92d15e2
 
-> +#define TDX_VCPU_NOT_ASSOCIATED			0x8000070200000000ULL
-> +#define TDX_KEY_GENERATION_FAILED		0x8000080000000000ULL
-> +#define TDX_KEY_STATE_INCORRECT			0xC000081100000000ULL
-> +#define TDX_KEY_CONFIGURED			0x0000081500000000ULL
-> +#define TDX_NO_HKID_READY_TO_WBCACHE		0x0000082100000000ULL
-> +#define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
-> +
-> +/*
-> + * TDG.VP.VMCALL Status Codes (returned in R10)
-> + */
-> +#define TDG_VP_VMCALL_SUCCESS			0x0000000000000000ULL
-> +#define TDG_VP_VMCALL_RETRY			0x0000000000000001ULL
-> +#define TDG_VP_VMCALL_INVALID_OPERAND		0x8000000000000000ULL
-> +#define TDG_VP_VMCALL_TDREPORT_FAILED		0x8000000000000001ULL
-> +
-> +/*
-> + * TDX module operand ID, appears in 31:0 part of error code as
-> + * detail information
-> + */
-> +#define TDX_OPERAND_ID_RCX			0x01
-> +#define TDX_OPERAND_ID_SEPT			0x92
-> +
-> +#endif /* __KVM_X86_TDX_ERRNO_H */
+-- 
+Regards,
+Yi Liu
+
