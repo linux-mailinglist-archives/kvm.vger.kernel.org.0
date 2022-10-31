@@ -2,141 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CFD52613D71
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 19:37:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64614613D72
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 19:37:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbiJaShg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 14:37:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35612 "EHLO
+        id S230112AbiJaSho (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 14:37:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230041AbiJaShf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 14:37:35 -0400
-Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [IPv6:2620:100:9001:583::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83CEE13DCE
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:37:34 -0700 (PDT)
-Received: from pps.filterd (m0122332.ppops.net [127.0.0.1])
-        by mx0a-00190b01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 29VIPMjX017695;
-        Mon, 31 Oct 2022 18:35:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=from : to : cc :
- subject : date : message-id : content-type : content-transfer-encoding :
- mime-version; s=jan2016.eng;
- bh=+4kfrzPP193PjoFjOWGnNtmxl6Ecgsk0i6Dad+FhCNw=;
- b=LSLMB5XynVdbwern9M38t38FaUNOVo7UYT1UewZz942H43XgAhwG7J6HhzxXMVMVZBlX
- CK6cgSnsTft+AZJ2WXhSWqa1qFYELbZR8cQ3GC69NYhX2k5d4ROSgx9xyuXckWo5fbgF
- 1eWy9yP136sY4J8+wVKL08wVpPMnLPza2vGFvz3Y1lwHFEbkePPaPVZXUCYABncrWse8
- kX/7iFsFrkJEjaOBrje24r/6+K1tGjViNCNkX7MKXvovFpEzrVgj5FEK/ibyYr27pEy9
- bLEfqmnJ6hu/F1i51z2K11wuxiF2uLg0bdvOn/HywmWSfg8pj0yaphWEE30luoRO+ycw uw== 
-Received: from prod-mail-ppoint6 (prod-mail-ppoint6.akamai.com [184.51.33.61] (may be forged))
-        by mx0a-00190b01.pphosted.com (PPS) with ESMTPS id 3kjfds8mvf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 31 Oct 2022 18:35:30 +0000
-Received: from pps.filterd (prod-mail-ppoint6.akamai.com [127.0.0.1])
-        by prod-mail-ppoint6.akamai.com (8.17.1.5/8.17.1.5) with ESMTP id 29VGJIwS011192;
-        Mon, 31 Oct 2022 14:35:29 -0400
-Received: from email.msg.corp.akamai.com ([172.27.91.22])
-        by prod-mail-ppoint6.akamai.com (PPS) with ESMTPS id 3kgygxy1w1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 31 Oct 2022 14:35:29 -0400
-Received: from usma1ex-dag4mb8.msg.corp.akamai.com (172.27.91.27) by
- usma1ex-dag4mb6.msg.corp.akamai.com (172.27.91.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.12; Mon, 31 Oct 2022 14:35:28 -0400
-Received: from usma1ex-dag4mb8.msg.corp.akamai.com ([172.27.91.27]) by
- usma1ex-dag4mb8.msg.corp.akamai.com ([172.27.91.27]) with mapi id
- 15.02.1118.012; Mon, 31 Oct 2022 14:35:28 -0400
-From:   "Jayaramappa, Srilakshmi" <sjayaram@akamai.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "seanjc@google.com" <seanjc@google.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "suleiman@google.com" <suleiman@google.com>,
-        "Hunt, Joshua" <johunt@akamai.com>
-Subject: KVM: x86: snapshotted TSC frequency causing time drifts in vms
-Thread-Topic: x86: snapshotted TSC frequency causing time drifts in vms
-Thread-Index: AQHY7VUBvAGfvnsQJ0OJYynFST/RMA==
-Date:   Mon, 31 Oct 2022 18:35:28 +0000
-Message-ID: <a49dfacc8a99424a94993171ba2955a0@akamai.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.27.164.27]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229452AbiJaShn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 14:37:43 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE40C12626
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:37:42 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id 17so7169641pfv.4
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:37:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=f6MbXeIWosdo9vjybEQsKSPNjMNkH/5gETThTzJuRxM=;
+        b=ifJ30Qw9zH1n5BLrQVMy7hdWESTFOw8wJ2HSn6qNh3U+liDp/R/z+GplGkoxnPV/UY
+         qXhhEHS+beDVFqBDNUXNkhLzLr2DwkNDcrV+mcqs6LaEyHDyqKOOQURhryUKd8/gnX1e
+         QQ1MwnyfFwibqEzjjFPeybANull9eEad6ZPAgzHUdKtIW/mHO6d6j5JBXT+/asnFOwZe
+         RVY0fJlFs4PIqtIofsqBXOzdXsf+3lCYs29JqTSnn/Z6UtkcErPZnGopBK/SQm7yTtiF
+         6KiXoEdstRYKnLKJWF+caRGK+ARqJQdn51FigSRyspkHFhTaVLpEh//+fxVfCCsjPqGR
+         8OXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f6MbXeIWosdo9vjybEQsKSPNjMNkH/5gETThTzJuRxM=;
+        b=ie5BwilpG4Icujbyb25oVv8XG+FAml9YmhOIGx3MGivhZ0B25dF0bce18ZvWKRHRnA
+         zlt2EzzXfZo0FVr46+Y/z4cIIB5Xm5kZkD7FHygeLpEemyGVRz7TjTJFY4EhB6awz6xx
+         aSIzHmN4i3sofXxH7jWo8I8/aCdRqhGSvi3wVJ7d3EQAX02SplP29c8HijNvzzNfdCXl
+         MNhQe3xaCrzxAS6lWipkAUGu6v0zP00ZA+N/Nai6/kIuF89uqUcbMMl6h4+CctRd/6re
+         0Lx/sTnnhD7u+Yvspk5LDxuoUH8dzLFCU2TCwl1qM/F1tEDJxDmXv/BDIc/uDti9PRLm
+         owog==
+X-Gm-Message-State: ACrzQf341p7sOrC08KHbdGdnNu7n93u72MgeI5RhsSF5E9uD7LBinzfQ
+        mXtVIPawBfvaMQ8jba10BGtx7g==
+X-Google-Smtp-Source: AMsMyM6VJGBxz/aTzJrHwRoh84jG9YIrU9HH1O77gAN8mIN+XdEFhDksuBODyWDoXkQ7EtFPIsYBCQ==
+X-Received: by 2002:a63:1861:0:b0:462:4961:9a8f with SMTP id 33-20020a631861000000b0046249619a8fmr14010645pgy.372.1667241462128;
+        Mon, 31 Oct 2022 11:37:42 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id bb8-20020a170902bc8800b00179f370dbe7sm4732278plb.287.2022.10.31.11.37.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Oct 2022 11:37:41 -0700 (PDT)
+Date:   Mon, 31 Oct 2022 18:37:38 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 10/10] KVM: selftests: Add a test for
+ KVM_CAP_EXIT_ON_EMULATION_FAILURE
+Message-ID: <Y2AV8hF0NLNc7vAm@google.com>
+References: <20221031180045.3581757-1-dmatlack@google.com>
+ <20221031180045.3581757-11-dmatlack@google.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-31_19,2022-10-31_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0 spamscore=0
- adultscore=0 phishscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2210310115
-X-Proofpoint-ORIG-GUID: i0vgYpKmlG0Vwzpyrb4-Gz7wunVJeROS
-X-Proofpoint-GUID: i0vgYpKmlG0Vwzpyrb4-Gz7wunVJeROS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-31_19,2022-10-31_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 mlxlogscore=999
- bulkscore=0 malwarescore=0 lowpriorityscore=0 priorityscore=1501
- impostorscore=0 clxscore=1011 spamscore=0 phishscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2210310115
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221031180045.3581757-11-dmatlack@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Mon, Oct 31, 2022, David Matlack wrote:
+> Add a selftest to exercise the KVM_CAP_EXIT_ON_EMULATION_FAILURE
+> capability.
+> 
+> This capability is also exercised through
+> smaller_maxphyaddr_emulation_test, but that test requires
+> allow_smaller_maxphyaddr=Y, which is off by default on Intel when ept=Y
+> and unconditionally disabled on AMD when npt=Y. This new test ensures we
 
-We were recently notified of significant time drift on some of our virtual =
-machines. Upon investigation it was found that the jumps in time were large=
-r than ntp was able to gracefully correct. After further probing we discove=
-red that the affected vms booted with tsc frequency equal to the early tsc =
-frequency of the host and not the calibrated frequency.
+Uber nit, avoid pronouns, purely so that "no pronouns" can be an unconditional
+guideline, not because "we" is at all ambiguous in this case.
 
-There were two variables that cached tsc_khz - cpu_tsc_khz and max_tsc_khz.
-Caching max_tsc_khz would cause further scaling of the user_tsc_khz when th=
-e vcpu is created after the host tsc calibrabration and kvm is loaded befor=
-e calibration. But it appears that Sean's commit "KVM: x86: Don't snapshot =
-"max" TSC if host TSC is constant" would fix that issue. [1]
+  This new test ensures KVM_CAP_EXIT_ON_EMULATION_FAILURE is exercised
+  independent of allow_smaller_maxphyaddr.
 
-The cached cpu_tsc_khz is used in
-1. get_kvmclock_ns() which incorrectly sets the factors hv_clock.tsc_to_sys=
-tem_mul and hv_clock.shift that estimate passage of time.
-2. kvm_guest_time_update()
+> exercise KVM_CAP_EXIT_ON_EMULATION_FAILURE independent of
+> allow_smaller_maxphyaddr.
+> 
+> +static void guest_code(void)
+> +{
+> +	/* Execute flds with an MMIO address to force KVM to emulate it. */
+> +	flds(MMIO_GVA);
 
-We came across Anton Romanov's patch "KVM: x86: Use current rather than sna=
-pshotted TSC frequency if it is constant" [2] that seems to address the cac=
-hed cpu_tsc_khz  case. The patch description says "the race can be hit if a=
-nd only if userspace is able to create a VM before TSC refinement completes=
-". We think as long as the kvm module is loaded before the host tsc calibra=
-tion happens the vms can be created anytime and they will have the problem =
-(confirmed this by shutting down an affected vm and relaunching it - it con=
-tinued to experience time issues). VMs need not be created before tsc refin=
-ement.
-
-Even if kvm module loads and vcpu is created before the host tsc refinement=
- and have incorrect time estimation on the vm until the tsc refinement, the=
- patches referenced here would subsequently provide the correct factors to =
-determine time. And any error in time in that small interval can be correct=
-ed by ntp if it is running on the guest. If there was no ntp, the error wou=
-ld probably be negligible and would not accumulate.
-
-There doesn't seem to be any response on the v6 of Anton's patch. I wanted =
-to ask if there is further changes in progress or if it is all set to be me=
-rged ?
-
-I'd appreciate you taking the time with this query.
-
-Thanks
--Sri
-
-
-[1] commit id: 741e511b42086a100c05dbe8fd1baeec42e7c584
-[2] https://lore.kernel.org/all/20220608183525.1143682-1-romanton@google.co=
-m/=
+Add tests to verify KVM handles cases where the memory operand splits pages on
+both sides?  Mostly because I'm curious if KVM actually does the right thing :-)
+It'll require creating an extra memslot, but I don't think that should be too
+difficult?
