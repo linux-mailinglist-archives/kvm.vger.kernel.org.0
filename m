@@ -2,88 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 76AFF613D50
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 19:28:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFD52613D71
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 19:37:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229992AbiJaS2g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 14:28:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59014 "EHLO
+        id S230104AbiJaShg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 14:37:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230062AbiJaS20 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 14:28:26 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D54C7120B6
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:28:23 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id r61-20020a17090a43c300b00212f4e9cccdso16662051pjg.5
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:28:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vz6yiApS1co9RvG/8mi0KCN4CFmc6c0fRULo+xpV8Mo=;
-        b=NKAd0H011FWuuNptQfpVe6E/Am0wjkRwwuo/j58WN5RcBiwNu1p1oXOEkLfy9QCYHY
-         LKRqFGYDNfn0CGnXlpOCp6BEpotaj9SBp1HEWZAzPjiv0bCgX7tgIbnO5aumEjXX48eF
-         r5OJMwrFsNus826EVmVHTf0IcU2KYJa7NbjPSGBBxL+1ZS1H0qNmP9wcKX+i+4UgoGKg
-         qQ6IwUDIOt32f9JQuLZpCAWqnBk30h8PjSP2i7jurh36JAIMVdrTNXQrhpL8eKTUIEWW
-         E7dQJvRQ3mkZ5Wrse4YyvfEz4Q9ULFgA4fsHrdyPAPp9Yc4N67xR8VhK+QwHSnnlhfw6
-         RQVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vz6yiApS1co9RvG/8mi0KCN4CFmc6c0fRULo+xpV8Mo=;
-        b=3nCpYMbZcejI77DBsEtQ5ud5Qx26hk3p8RKB7pdS6Na/HUQPHp//bwwQmmUkUh1543
-         bmLVTU4Kx2FZwRczivX78pYYfM+zroxhEm8SF3ajzMtZ/+nWcQL+tKN0A4YJwu6Mu6LG
-         PhAQk5GBzgdcwvqSut6uiOdzMJBpYGaJRukFL6el12h9RcJK98geEB+UPrvzZ1XGtDns
-         ZDGqUcehj7IXmhp8LB8arKOk1BmdzARnE0TofOQF7cq7WqhBC/ytKPI50UmVpcu9Vbz+
-         4Kl/Jv/wmh/auyzh1K1c+1gGgrj4G5gXdiL194RCmYLDkM8yeLPEkS2JzZcO/PTcbcA6
-         sbeg==
-X-Gm-Message-State: ACrzQf1Ut5B6CpWeeLKA6auYQM35yxbDesBHEaIoMr5JM01eumYQg1By
-        T724zlQtimUiOC7fMQlJZNugHg==
-X-Google-Smtp-Source: AMsMyM7BKAhuXKWt31cWYKYMgAF/H9OewsNJD9XdT5HS9VdT2w0Qggs3h/SX9n5u2UjaQojAVoIoXQ==
-X-Received: by 2002:a17:902:ccc4:b0:17c:7cc1:a401 with SMTP id z4-20020a170902ccc400b0017c7cc1a401mr15712856ple.58.1667240903446;
-        Mon, 31 Oct 2022 11:28:23 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id m14-20020a63fd4e000000b00460c67afbd5sm4519268pgj.7.2022.10.31.11.28.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Oct 2022 11:28:22 -0700 (PDT)
-Date:   Mon, 31 Oct 2022 18:28:19 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yang Zhong <yang.zhong@intel.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 06/10] KVM: selftests: Copy KVM PFERR masks into
- selftests
-Message-ID: <Y2ATw8BHvi0muiSX@google.com>
-References: <20221031180045.3581757-1-dmatlack@google.com>
- <20221031180045.3581757-7-dmatlack@google.com>
+        with ESMTP id S230041AbiJaShf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 14:37:35 -0400
+Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [IPv6:2620:100:9001:583::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83CEE13DCE
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:37:34 -0700 (PDT)
+Received: from pps.filterd (m0122332.ppops.net [127.0.0.1])
+        by mx0a-00190b01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 29VIPMjX017695;
+        Mon, 31 Oct 2022 18:35:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=from : to : cc :
+ subject : date : message-id : content-type : content-transfer-encoding :
+ mime-version; s=jan2016.eng;
+ bh=+4kfrzPP193PjoFjOWGnNtmxl6Ecgsk0i6Dad+FhCNw=;
+ b=LSLMB5XynVdbwern9M38t38FaUNOVo7UYT1UewZz942H43XgAhwG7J6HhzxXMVMVZBlX
+ CK6cgSnsTft+AZJ2WXhSWqa1qFYELbZR8cQ3GC69NYhX2k5d4ROSgx9xyuXckWo5fbgF
+ 1eWy9yP136sY4J8+wVKL08wVpPMnLPza2vGFvz3Y1lwHFEbkePPaPVZXUCYABncrWse8
+ kX/7iFsFrkJEjaOBrje24r/6+K1tGjViNCNkX7MKXvovFpEzrVgj5FEK/ibyYr27pEy9
+ bLEfqmnJ6hu/F1i51z2K11wuxiF2uLg0bdvOn/HywmWSfg8pj0yaphWEE30luoRO+ycw uw== 
+Received: from prod-mail-ppoint6 (prod-mail-ppoint6.akamai.com [184.51.33.61] (may be forged))
+        by mx0a-00190b01.pphosted.com (PPS) with ESMTPS id 3kjfds8mvf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 31 Oct 2022 18:35:30 +0000
+Received: from pps.filterd (prod-mail-ppoint6.akamai.com [127.0.0.1])
+        by prod-mail-ppoint6.akamai.com (8.17.1.5/8.17.1.5) with ESMTP id 29VGJIwS011192;
+        Mon, 31 Oct 2022 14:35:29 -0400
+Received: from email.msg.corp.akamai.com ([172.27.91.22])
+        by prod-mail-ppoint6.akamai.com (PPS) with ESMTPS id 3kgygxy1w1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 31 Oct 2022 14:35:29 -0400
+Received: from usma1ex-dag4mb8.msg.corp.akamai.com (172.27.91.27) by
+ usma1ex-dag4mb6.msg.corp.akamai.com (172.27.91.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.12; Mon, 31 Oct 2022 14:35:28 -0400
+Received: from usma1ex-dag4mb8.msg.corp.akamai.com ([172.27.91.27]) by
+ usma1ex-dag4mb8.msg.corp.akamai.com ([172.27.91.27]) with mapi id
+ 15.02.1118.012; Mon, 31 Oct 2022 14:35:28 -0400
+From:   "Jayaramappa, Srilakshmi" <sjayaram@akamai.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "seanjc@google.com" <seanjc@google.com>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "suleiman@google.com" <suleiman@google.com>,
+        "Hunt, Joshua" <johunt@akamai.com>
+Subject: KVM: x86: snapshotted TSC frequency causing time drifts in vms
+Thread-Topic: x86: snapshotted TSC frequency causing time drifts in vms
+Thread-Index: AQHY7VUBvAGfvnsQJ0OJYynFST/RMA==
+Date:   Mon, 31 Oct 2022 18:35:28 +0000
+Message-ID: <a49dfacc8a99424a94993171ba2955a0@akamai.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.27.164.27]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221031180045.3581757-7-dmatlack@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-31_19,2022-10-31_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0 spamscore=0
+ adultscore=0 phishscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2210310115
+X-Proofpoint-ORIG-GUID: i0vgYpKmlG0Vwzpyrb4-Gz7wunVJeROS
+X-Proofpoint-GUID: i0vgYpKmlG0Vwzpyrb4-Gz7wunVJeROS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-31_19,2022-10-31_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 mlxlogscore=999
+ bulkscore=0 malwarescore=0 lowpriorityscore=0 priorityscore=1501
+ impostorscore=0 clxscore=1011 spamscore=0 phishscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2210310115
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 31, 2022, David Matlack wrote:
-> Copy KVM's macros for page fault error masks into processor.h so they
-> can be used in selftests.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
+Hi,
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+We were recently notified of significant time drift on some of our virtual =
+machines. Upon investigation it was found that the jumps in time were large=
+r than ntp was able to gracefully correct. After further probing we discove=
+red that the affected vms booted with tsc frequency equal to the early tsc =
+frequency of the host and not the calibrated frequency.
+
+There were two variables that cached tsc_khz - cpu_tsc_khz and max_tsc_khz.
+Caching max_tsc_khz would cause further scaling of the user_tsc_khz when th=
+e vcpu is created after the host tsc calibrabration and kvm is loaded befor=
+e calibration. But it appears that Sean's commit "KVM: x86: Don't snapshot =
+"max" TSC if host TSC is constant" would fix that issue. [1]
+
+The cached cpu_tsc_khz is used in
+1. get_kvmclock_ns() which incorrectly sets the factors hv_clock.tsc_to_sys=
+tem_mul and hv_clock.shift that estimate passage of time.
+2. kvm_guest_time_update()
+
+We came across Anton Romanov's patch "KVM: x86: Use current rather than sna=
+pshotted TSC frequency if it is constant" [2] that seems to address the cac=
+hed cpu_tsc_khz  case. The patch description says "the race can be hit if a=
+nd only if userspace is able to create a VM before TSC refinement completes=
+". We think as long as the kvm module is loaded before the host tsc calibra=
+tion happens the vms can be created anytime and they will have the problem =
+(confirmed this by shutting down an affected vm and relaunching it - it con=
+tinued to experience time issues). VMs need not be created before tsc refin=
+ement.
+
+Even if kvm module loads and vcpu is created before the host tsc refinement=
+ and have incorrect time estimation on the vm until the tsc refinement, the=
+ patches referenced here would subsequently provide the correct factors to =
+determine time. And any error in time in that small interval can be correct=
+ed by ntp if it is running on the guest. If there was no ntp, the error wou=
+ld probably be negligible and would not accumulate.
+
+There doesn't seem to be any response on the v6 of Anton's patch. I wanted =
+to ask if there is further changes in progress or if it is all set to be me=
+rged ?
+
+I'd appreciate you taking the time with this query.
+
+Thanks
+-Sri
+
+
+[1] commit id: 741e511b42086a100c05dbe8fd1baeec42e7c584
+[2] https://lore.kernel.org/all/20220608183525.1143682-1-romanton@google.co=
+m/=
