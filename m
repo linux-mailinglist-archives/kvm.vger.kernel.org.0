@@ -2,90 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 936CE6138D5
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 15:19:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C53A613AEC
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 17:01:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231515AbiJaOTM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 10:19:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35686 "EHLO
+        id S231405AbiJaQBO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 12:01:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231556AbiJaOTI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 10:19:08 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 411D721BC;
-        Mon, 31 Oct 2022 07:19:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667225946; x=1698761946;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=tqW2d6h1UDzp5U1oT1GYec0J1/UWlA3NgSO3LKyeYTY=;
-  b=S6j38KIXDiovBjFja+NadtAW4huBAVBNTiPfNrLwzYrybWZYjuOc95fT
-   jEBGnCb4ThdZyHLKo/aUSOZpK2iMniMO6rumPVXCe8Fd3ZpqDE0m2Xz9z
-   ty3yf45hWldVlM3L5zEt1KdjHNhBp3x+MGnVQkVxF5Bu3M1UTPOSbExS0
-   ePtriuS6CW1tD1e3mgFt3G34iVx+7P+U57SuWgX2Wp3/5Al/k/ScH8afS
-   CL0WL4uqi5I0qC1nAZWZxusE7q0LnulXZ8mXThp3v0JY+ByFLZslmz1eH
-   XlvuMQJK5Pq7mSGLA8MdthU32njkdX2X6UwqEXFeZA4/YacjqgstKheSs
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10517"; a="296322288"
-X-IronPort-AV: E=Sophos;i="5.95,228,1661842800"; 
-   d="scan'208";a="296322288"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2022 07:19:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10517"; a="628252321"
-X-IronPort-AV: E=Sophos;i="5.95,228,1661842800"; 
-   d="scan'208";a="628252321"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga007.jf.intel.com with ESMTP; 31 Oct 2022 07:18:54 -0700
-Date:   Mon, 31 Oct 2022 22:14:26 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S231134AbiJaQBL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 12:01:11 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2065.outbound.protection.outlook.com [40.107.220.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAC64EAA;
+        Mon, 31 Oct 2022 09:01:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=f1zsaFd0Xwm+qWYzp6pygdbYbzUjMnCUNx3mpufOV+lXqSpkFDkgsinO6HVcWrx+IaAoafWtteaiyJSfgW+mJdtItK64xe2BK4i+YnEHD+91o+3+KLKDrJB0pOIKYMGjdGxq/DDNI3vyyraZXbZT60tb4OLuVBlIX7nAV75pdcwWxm2RD0rydMFcoTc19Le6reN+PZ/eFG4F0ZsLIjHHGO5F74u3zSfSqzLqO7QV1Ce4/ql1VK4QpJObCLhDYXLaFWXerh00VrE3Cx9AXYifXL0u6SyxgfJeWWs54K056c3cTZX1vmW4OSqre8krelzsnweS/uKMH1UyTiEyu0TYNQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BjynL/rs7PIfjrgcK5Uv5Q/Y6hx3EpZXD944t8rTKRQ=;
+ b=DXr/+GlSRAqulWjEFzaauKa8GYNP4+wX0TgyiU5m4UdC4vUdnKm0rTXLf88CPOQMNg8c4RhY0XUT+AqbG/6qrOWNEY5D82KVc9sTb3MKpjBqA5LW8Qlwyed1qpqSBTEKiEvttaWVrV4uOSMETDfeKig37qeHPT1p6RIrVS8Qx0IG+iyOuYJ2k90F0GolXAu2pqrAVPHhwrCWKKfqPE1bOekUVoQiGjjx0ukiUJFttp/t09stu7Fhg8KJEaLmvlYzy3vCSZmhzgdhDyVxnz+bnorMU6dwIaQM5lP4yyhFtmOmn+jbPxoLM1LMJr4S68Z09U6Ni7HNvenzn2YjZo4FyA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BjynL/rs7PIfjrgcK5Uv5Q/Y6hx3EpZXD944t8rTKRQ=;
+ b=psk16E6A5p4aOW1bwljNQvZhiio7i85jy0srORWWwzXU3QdsYlM2mSPOBzEwvRxZlpDkSLi5BGoKQjO4/Q2Kcarw536hWhD+gbfGU5Q2cysFGwvgrrLp2cFMqOWRfvtptjHxcsz4rXL3dmu3qQJpbAFVBKZGsPc4y2an+NnltZ2RIwyoyTT/8/ZZztTDS+anpqNtKvorLLbppnyM80kSmem6AUqqpMahadxzZl5Roh3JhWkCQkXD2sWmf4DsHZ2f/ZvLHPN7qBeVy6imXHt4csD0dC99GWYEw6psw9zV/SW9pRddZKJLQI4YMMdHH7+S201wnutV2+dFByhNGDwTPg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH0PR12MB5647.namprd12.prod.outlook.com (2603:10b6:510:144::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.19; Mon, 31 Oct
+ 2022 16:01:05 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5769.015; Mon, 31 Oct 2022
+ 16:01:05 +0000
+Date:   Mon, 31 Oct 2022 13:01:04 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>, bpf@vger.kernel.org,
         Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v9 2/8] KVM: Extend the memslot to support fd-based
- private memory
-Message-ID: <20221031141426.GA3994099@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <20221025151344.3784230-3-chao.p.peng@linux.intel.com>
- <f324f02c-cf76-08a9-07a3-4af60778056f@intel.com>
-MIME-Version: 1.0
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v3 8/15] iommufd: Algorithms for PFN storage
+Message-ID: <Y1/xQCEgZ3XJh57D@nvidia.com>
+References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <8-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f324f02c-cf76-08a9-07a3-4af60778056f@intel.com>
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+In-Reply-To: <8-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+X-ClientProxiedBy: MN2PR17CA0030.namprd17.prod.outlook.com
+ (2603:10b6:208:15e::43) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH0PR12MB5647:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9a497430-134a-45e6-67b7-08dabb591dc0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: KDO0PBStEdjFf6cf78WyYUTS6xa4105BE1iU+p7aNY5+gbOOaZ/CaPi3HKqo/lKMRfmvfCCPp8Oru0UwXXqfPNaG6j2TR1LhtQNMeoUY5WXSFczSKdq4MbK4n2WsVRMRedU2G7PqQ+N8oIbI2QOJ11pb2ApMNaIV1tHsA7Pzytb9masOVeSig7HDNIsKmhFJFNJ4tTPO21veC5S3Q9htHiZfpdwDMXrn+0YLkP7WrSqgv3xzOf6QiDCzaTosPwpL4c9YoIzV47X9KmV/5mB0N9656Ba6AUWn5HPFF2HVDb58oY83zix5IS8NDDlX8ppW4TtYdq9amp4BixBgtdu4LJe7htvytBzE/UxEFfeumY7czDw1ZyKh3RLkoqusWoGGZxdQZZ6Rw0ASSGYzum4JAFTxesSU8neXGFmBfsKdzIfw0yesMQn+A0o0f+TAjt/o38DF736dyhnuCaFucHuMxSdF8kqr1oeQB2dQ748FW8bUI25m2CbGrFysUi9piBNjV9bownA8wHergMz8VeTfLK3gya1bE+qNpvSVrKupZT3LYSJ/5lenquQaxrIB8zehQINV1o8jVCgIn7r6FFM3M5nuUED7COkQtUWuYGxHMmbRV0ewKbGl/ZwBSEL0nSbdG9M8QJlinJL199V2haqY21cFImouwIlFvBPEtfI6sSj48CATvVSPU1Yquq95tW5p8Z52jHn3L7Edv0FYTj/lSwel6rAPtkL+Ms/o0QIMxGx1wlNLWweDknrrLOU6frBX7smtHfKtTLSdetMFe3rZag==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(136003)(346002)(366004)(39860400002)(396003)(451199015)(36756003)(86362001)(38100700002)(921005)(83380400001)(30864003)(2906002)(6506007)(2616005)(26005)(6512007)(186003)(478600001)(41300700001)(6486002)(316002)(54906003)(110136005)(8676002)(66946007)(66556008)(66476007)(5660300002)(7416002)(4326008)(8936002)(7406005)(334744004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?phDWfaF2UGrQPbw3PjcRrupeLrGI9gDmVh23SdhzVZd8JoaLWrixpCV+5Pf2?=
+ =?us-ascii?Q?DVt9cp+IbYvWPZWZ3l2v1CqUHltcgRfWWo3goyFFcNhz7n8WmBK4s09xoYZC?=
+ =?us-ascii?Q?d5pIuPP6065q1f/JQ+ucE9M4sZVtqCb2CibSvntyEGaBJuXgkqPf278bOUdN?=
+ =?us-ascii?Q?LQAp7dk30g2pXTqqzm8DgSp0R8dMxOTpanxdb9qzT439u0e33ZCF1iB0i5e+?=
+ =?us-ascii?Q?pzGtKLyd19NpJ33WsZ/mAyiisf2XY+2af4uz/z5tPMeTfas2Y9YXq6+dnvAp?=
+ =?us-ascii?Q?raPWqlKKKcTomC2SE/TPq3z4yggwpfYk34OcRp5z+ZekE0CkMKkUdx/QvU/4?=
+ =?us-ascii?Q?8ov7ofeZvYCkodDLw9yh0z5fMnveQ+6AC6zkFZxwXLuQXdB8URjT/2Z4xF2y?=
+ =?us-ascii?Q?5C9S+iJaKDm83OIWohsfpPolw/FF596OZatIWUcux5DtpyWaKzlXKl5t03AZ?=
+ =?us-ascii?Q?lnych0/85m0XhFLzWc8Nh4eL31GOhNXJ7y13cH1wq8DIJ/K/mnOd3K0y81wU?=
+ =?us-ascii?Q?dN9BZBlvFl0aor7ues3UpvAJWOVb+uok4s/NotsdLSucjTeU5COnmlCuXhNd?=
+ =?us-ascii?Q?kJlBO/rt9mEx58uo2kAqz/Uc+Taspgl5NuvCw23tAG1FE5Xd3nWSppMpOTug?=
+ =?us-ascii?Q?2XvXsK23IBcEopxgD+ls5RYBnY/VNk9HCDiS/b6TtOCN5XY98py8eIupVoqC?=
+ =?us-ascii?Q?I0d8GTCllXLiaX/WlqqRWREEE8X5nDHh4Lw9D1q3m6PIj4LoHa6dC9HZyw0n?=
+ =?us-ascii?Q?Gjjz32gb8eKS14KB27eEfrl7ZccMAdYZLmNXjCjPUqMPqsPTSJb1BGsaY6Jf?=
+ =?us-ascii?Q?3OlncOnlFJl1kdTvED9qp/XoWoaeaHeiR+Rp4wxwzAD0jcvNXzeLe6kSBuWm?=
+ =?us-ascii?Q?MBybZ7SneJdWFBFh2/SEqC9sPghjVD8gCKhGm0VusXTz1vbeHP/2/Bj4leuT?=
+ =?us-ascii?Q?Kmw92/4QoN0pOrl2s9Cqf754ITPqIwubvd3sjUQ1j301iJloyotPIo1uX/0B?=
+ =?us-ascii?Q?EhjPoItjGd+zZzQ7x/9nJq8f703KyKZsn8ziZuH/BEYcqV3zl0P9Et6GlbU1?=
+ =?us-ascii?Q?x3JMIziDYGilvUYV0HP4wpdVh/zrOERZDAdxIkUVHGBmB56qFLZM7zVE29Z4?=
+ =?us-ascii?Q?3ogTAZnsvM1173iYyZtyq7kgJ2cR6g5oGPTxCBL6H+WNUtXAxrsNNHkqkQ60?=
+ =?us-ascii?Q?RAhLOw/uRkKU92rKgo6e/a+PoHHT1cca4OXkLs00QDlo5ID5Qg6a7XT0OhqQ?=
+ =?us-ascii?Q?QuSzmC0yH6ef8IQiVqFeM7i+b2krtuhCQXaMRSDnvMiMVEcU+45joPkECreX?=
+ =?us-ascii?Q?GdEa9fRwcj7MhdBMA55GZGvMuQ2GiYxrVsSlsS67bJhN1v++mYhKaHy23d5h?=
+ =?us-ascii?Q?lX4UegOxtabZol05jZ8DdMwuk+nX7E1HTY1AUbu0DxVsViK6cC91wmrWdoq3?=
+ =?us-ascii?Q?ny8/ElTv63gcjRvP7KC65z/k/cA+Y6fjsrO34v9Qi6jke46N/QhWBLUyv3Q+?=
+ =?us-ascii?Q?+8CyY4UBa/Puq6ShJIzJ4wLKwhNlx/GNOualEgK9UzUTO8JR+MLBIiBna3gM?=
+ =?us-ascii?Q?J+wm0qtK64EqwEgwMS8=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a497430-134a-45e6-67b7-08dabb591dc0
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2022 16:01:05.4321
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vNEdbgKDlddFgUa8Q+ZC7M5Xz2pB9oWOOXmjK9z3OwevGVFG9ijk7KTaI+06fFLZ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5647
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -93,187 +140,357 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 28, 2022 at 03:04:27PM +0800, Xiaoyao Li wrote:
-> On 10/25/2022 11:13 PM, Chao Peng wrote:
-> > In memory encryption usage, guest memory may be encrypted with special
-> > key and can be accessed only by the guest itself. We call such memory
-> > private memory. It's valueless and sometimes can cause problem to allow
-> > userspace to access guest private memory. This new KVM memslot extension
-> > allows guest private memory being provided though a restrictedmem
->                                                  ^
-> 
-> typo
+On Tue, Oct 25, 2022 at 03:12:17PM -0300, Jason Gunthorpe wrote:
 
-Thanks!
+> +int iopt_pages_fill_xarray(struct iopt_pages *pages, unsigned long start_index,
+> +			   unsigned long last_index, struct page **out_pages)
+> +{
+> +	struct interval_tree_double_span_iter span;
+> +	unsigned long xa_end = start_index;
+> +	struct pfn_reader_user user;
+> +	int rc;
+> +
+> +	pfn_reader_user_init(&user, pages);
+> +	user.upages_len = last_index - start_index + 1;
 
-> 
-> > backed file descriptor(fd) and userspace is restricted to access the
-> > bookmarked memory in the fd.
-> > 
-> > This new extension, indicated by the new flag KVM_MEM_PRIVATE, adds two
-> > additional KVM memslot fields restricted_fd/restricted_offset to allow
-> > userspace to instruct KVM to provide guest memory through restricted_fd.
-> > 'guest_phys_addr' is mapped at the restricted_offset of restricted_fd
-> > and the size is 'memory_size'.
-> > 
-> > The extended memslot can still have the userspace_addr(hva). When use, a
-> > single memslot can maintain both private memory through restricted_fd
-> > and shared memory through userspace_addr. Whether the private or shared
-> > part is visible to guest is maintained by other KVM code.
-> > 
-> > A restrictedmem_notifier field is also added to the memslot structure to
-> > allow the restricted_fd's backing store to notify KVM the memory change,
-> > KVM then can invalidate its page table entries.
-> > 
-> > Together with the change, a new config HAVE_KVM_RESTRICTED_MEM is added
-> > and right now it is selected on X86_64 only. A KVM_CAP_PRIVATE_MEM is
-> > also introduced to indicate KVM support for KVM_MEM_PRIVATE.
-> > 
-> > To make code maintenance easy, internally we use a binary compatible
-> > alias struct kvm_user_mem_region to handle both the normal and the
-> > '_ext' variants.
-> > 
-> > Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > ---
-> >   Documentation/virt/kvm/api.rst | 48 ++++++++++++++++++++++++++++-----
-> >   arch/x86/kvm/Kconfig           |  2 ++
-> >   arch/x86/kvm/x86.c             |  2 +-
-> >   include/linux/kvm_host.h       | 13 +++++++--
-> >   include/uapi/linux/kvm.h       | 29 ++++++++++++++++++++
-> >   virt/kvm/Kconfig               |  3 +++
-> >   virt/kvm/kvm_main.c            | 49 ++++++++++++++++++++++++++++------
-> >   7 files changed, 128 insertions(+), 18 deletions(-)
-> > 
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index eee9f857a986..f3fa75649a78 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -1319,7 +1319,7 @@ yet and must be cleared on entry.
-> >   :Capability: KVM_CAP_USER_MEMORY
-> >   :Architectures: all
-> >   :Type: vm ioctl
-> > -:Parameters: struct kvm_userspace_memory_region (in)
-> > +:Parameters: struct kvm_userspace_memory_region(_ext) (in)
-> >   :Returns: 0 on success, -1 on error
-> >   ::
-> > @@ -1332,9 +1332,18 @@ yet and must be cleared on entry.
-> >   	__u64 userspace_addr; /* start of the userspace allocated memory */
-> >     };
-> > +  struct kvm_userspace_memory_region_ext {
-> > +	struct kvm_userspace_memory_region region;
-> > +	__u64 restricted_offset;
-> > +	__u32 restricted_fd;
-> > +	__u32 pad1;
-> > +	__u64 pad2[14];
-> > +  };
-> > +
-> >     /* for kvm_memory_region::flags */
-> >     #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
-> >     #define KVM_MEM_READONLY	(1UL << 1)
-> > +  #define KVM_MEM_PRIVATE		(1UL << 2)
-> >   This ioctl allows the user to create, modify or delete a guest physical
-> >   memory slot.  Bits 0-15 of "slot" specify the slot id and this value
-> > @@ -1365,12 +1374,27 @@ It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
-> >   be identical.  This allows large pages in the guest to be backed by large
-> >   pages in the host.
-> > -The flags field supports two flags: KVM_MEM_LOG_DIRTY_PAGES and
-> > -KVM_MEM_READONLY.  The former can be set to instruct KVM to keep track of
-> > -writes to memory within the slot.  See KVM_GET_DIRTY_LOG ioctl to know how to
-> > -use it.  The latter can be set, if KVM_CAP_READONLY_MEM capability allows it,
-> > -to make a new slot read-only.  In this case, writes to this memory will be
-> > -posted to userspace as KVM_EXIT_MMIO exits.
-> > +kvm_userspace_memory_region_ext struct includes all fields of
-> > +kvm_userspace_memory_region struct, while also adds additional fields for some
-> > +other features. See below description of flags field for more information.
-> > +It's recommended to use kvm_userspace_memory_region_ext in new userspace code.
-> > +
-> > +The flags field supports following flags:
-> > +
-> > +- KVM_MEM_LOG_DIRTY_PAGES to instruct KVM to keep track of writes to memory
-> > +  within the slot.  For more details, see KVM_GET_DIRTY_LOG ioctl.
-> > +
-> > +- KVM_MEM_READONLY, if KVM_CAP_READONLY_MEM allows, to make a new slot
-> > +  read-only.  In this case, writes to this memory will be posted to userspace as
-> > +  KVM_EXIT_MMIO exits.
-> > +
-> > +- KVM_MEM_PRIVATE, if KVM_CAP_PRIVATE_MEM allows, to indicate a new slot has
-> > +  private memory backed by a file descriptor(fd) and userspace access to the
-> > +  fd may be restricted. Userspace should use restricted_fd/restricted_offset in
-> > +  kvm_userspace_memory_region_ext to instruct KVM to provide private memory
-> > +  to guest. Userspace should guarantee not to map the same pfn indicated by
-> > +  restricted_fd/restricted_offset to different gfns with multiple memslots.
-> > +  Failed to do this may result undefined behavior.
-> >   When the KVM_CAP_SYNC_MMU capability is available, changes in the backing of
-> >   the memory region are automatically reflected into the guest.  For example, an
-> > @@ -8215,6 +8239,16 @@ structure.
-> >   When getting the Modified Change Topology Report value, the attr->addr
-> >   must point to a byte where the value will be stored or retrieved from.
-> > +8.36 KVM_CAP_PRIVATE_MEM
-> > +------------------------
-> > +
-> > +:Architectures: x86
-> > +
-> > +This capability indicates that private memory is supported and userspace can
-> > +set KVM_MEM_PRIVATE flag for KVM_SET_USER_MEMORY_REGION ioctl.  See
-> > +KVM_SET_USER_MEMORY_REGION for details on the usage of KVM_MEM_PRIVATE and
-> > +kvm_userspace_memory_region_ext fields.
-> > +
-> >   9. Known KVM API problems
-> >   =========================
-> > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> > index 67be7f217e37..8d2bd455c0cd 100644
-> > --- a/arch/x86/kvm/Kconfig
-> > +++ b/arch/x86/kvm/Kconfig
-> > @@ -49,6 +49,8 @@ config KVM
-> >   	select SRCU
-> >   	select INTERVAL_TREE
-> >   	select HAVE_KVM_PM_NOTIFIER if PM
-> > +	select HAVE_KVM_RESTRICTED_MEM if X86_64
-> > +	select RESTRICTEDMEM if HAVE_KVM_RESTRICTED_MEM
-> >   	help
-> >   	  Support hosting fully virtualized guest machines using hardware
-> >   	  virtualization extensions.  You will need a fairly recent
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 4bd5f8a751de..02ad31f46dd7 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -12425,7 +12425,7 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
-> >   	}
-> >   	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> > -		struct kvm_userspace_memory_region m;
-> > +		struct kvm_user_mem_region m;
-> >   		m.slot = id | (i << 16);
-> >   		m.flags = 0;
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 32f259fa5801..739a7562a1f3 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -44,6 +44,7 @@
-> >   #include <asm/kvm_host.h>
-> >   #include <linux/kvm_dirty_ring.h>
-> > +#include <linux/restrictedmem.h>
-> >   #ifndef KVM_MAX_VCPU_IDS
-> >   #define KVM_MAX_VCPU_IDS KVM_MAX_VCPUS
-> > @@ -575,8 +576,16 @@ struct kvm_memory_slot {
-> >   	u32 flags;
-> >   	short id;
-> >   	u16 as_id;
-> > +	struct file *restricted_file;
-> > +	loff_t restricted_offset;
-> > +	struct restrictedmem_notifier notifier;
-> >   };
-> > +static inline bool kvm_slot_can_be_private(const struct kvm_memory_slot *slot)
-> > +{
-> > +	return slot && (slot->flags & KVM_MEM_PRIVATE);
-> > +}
-> > +
-> 
-> We can introduce this function in patch 6 when it's first used.
+Syzkaller found that upages_len is supposed to be in bytes, not number
+of pages. Which is surprising the test suite didn't find it.
 
-Good to me.
+-       user.upages_len = last_index - start_index + 1;
++       user.upages_len = (last_index - start_index + 1) * sizeof(*out_pages);
 
-Chao
-> 
-> 
+While fixing the test suite to cover this I also discovered this:
+
+@@ -129,7 +129,7 @@ void interval_tree_span_iter_advance(struct interval_tree_span_iter *iter,
+                return;
+ 
+        iter->first_index = new_index;
+-       if (new_index == iter->last_index) {
++       if (new_index > iter->last_index) {
+                iter->is_hole = -1;
+                return;
+        }
+
+Where the span iterator would not behave properly at its limit,
+causing some chaos.
+
+While thinking about iommufd_access_pin_pages(), which is the API that
+trigggered all these problems, I realized we need to upgrade the
+iova_alignment when an access is created to at least PAGE_SIZE if the
+external driver is going to call iommufd_access_pin_pages(). Otherwise
+the API can't work right because there is no way to communicate
+offsets in the struct pages returned when pinning. Use of RW doesn't
+require this so I made it a flag, which is convient for the test suite
+that assumes odd alignments for RW testing. See below
+
+Finally, the test suite didn't cover the unmap while access exists
+flow, and the code forgot to set the ops pointer:
+
+@@ -435,6 +425,10 @@ iommufd_access_create(struct iommufd_ctx *ictx,
+u32 ioas_id,
+        if (IS_ERR(access))
+                return access;
+ 
++       access->data = data;
++       access->ops = ops;
++       access->ictx = ictx;
+
+Jason
+
+diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
+index d1af0389dfab83..737897a2dcfc3c 100644
+--- a/drivers/iommu/iommufd/device.c
++++ b/drivers/iommu/iommufd/device.c
+@@ -26,15 +26,6 @@ struct iommufd_device {
+ 	bool enforce_cache_coherency;
+ };
+ 
+-struct iommufd_access {
+-	struct iommufd_object obj;
+-	struct iommufd_ctx *ictx;
+-	struct iommufd_ioas *ioas;
+-	const struct iommufd_access_ops *ops;
+-	void *data;
+-	u32 ioas_access_list_id;
+-};
+-
+ void iommufd_device_destroy(struct iommufd_object *obj)
+ {
+ 	struct iommufd_device *idev =
+@@ -413,8 +404,7 @@ void iommufd_access_destroy_object(struct iommufd_object *obj)
+ 	struct iommufd_access *access =
+ 		container_of(obj, struct iommufd_access, obj);
+ 
+-	WARN_ON(xa_erase(&access->ioas->access_list,
+-			 access->ioas_access_list_id) != access);
++	iopt_remove_access(&access->ioas->iopt, access);
+ 	iommufd_ctx_put(access->ictx);
+ 	refcount_dec(&access->ioas->obj.users);
+ }
+@@ -435,6 +425,10 @@ iommufd_access_create(struct iommufd_ctx *ictx, u32 ioas_id,
+ 	if (IS_ERR(access))
+ 		return access;
+ 
++	access->data = data;
++	access->ops = ops;
++	access->ictx = ictx;
++
+ 	obj = iommufd_get_object(ictx, ioas_id, IOMMUFD_OBJ_IOAS);
+ 	if (IS_ERR(obj)) {
+ 		rc = PTR_ERR(obj);
+@@ -443,15 +437,16 @@ iommufd_access_create(struct iommufd_ctx *ictx, u32 ioas_id,
+ 	access->ioas = container_of(obj, struct iommufd_ioas, obj);
+ 	iommufd_put_object_keep_user(obj);
+ 
+-	rc = xa_alloc(&access->ioas->access_list, &access->ioas_access_list_id,
+-		      access, xa_limit_16b, GFP_KERNEL_ACCOUNT);
++	if (ops->needs_pin_pages)
++		access->iova_alignment = PAGE_SIZE;
++	else
++		access->iova_alignment = 1;
++	rc = iopt_add_access(&access->ioas->iopt, access);
+ 	if (rc)
+ 		goto out_put_ioas;
+ 
+ 	/* The calling driver is a user until iommufd_access_destroy() */
+ 	refcount_inc(&access->obj.users);
+-	access->ictx = ictx;
+-	access->data = data;
+ 	iommufd_ctx_get(ictx);
+ 	iommufd_object_finalize(ictx, &access->obj);
+ 	return access;
+@@ -495,18 +490,18 @@ void iommufd_access_notify_unmap(struct io_pagetable *iopt, unsigned long iova,
+ 	struct iommufd_access *access;
+ 	unsigned long index;
+ 
+-	xa_lock(&ioas->access_list);
+-	xa_for_each(&ioas->access_list, index, access) {
++	xa_lock(&ioas->iopt.access_list);
++	xa_for_each(&ioas->iopt.access_list, index, access) {
+ 		if (!iommufd_lock_obj(&access->obj))
+ 			continue;
+-		xa_unlock(&ioas->access_list);
++		xa_unlock(&ioas->iopt.access_list);
+ 
+ 		access->ops->unmap(access->data, iova, length);
+ 
+ 		iommufd_put_object(&access->obj);
+-		xa_lock(&ioas->access_list);
++		xa_lock(&ioas->iopt.access_list);
+ 	}
+-	xa_unlock(&ioas->access_list);
++	xa_unlock(&ioas->iopt.access_list);
+ }
+ 
+ /**
+@@ -591,6 +586,11 @@ int iommufd_access_pin_pages(struct iommufd_access *access, unsigned long iova,
+ 	bool first = true;
+ 	int rc;
+ 
++	/* Driver didn't specify needs_pin_pages in its ops */
++	if (IS_ENABLED(CONFIG_IOMMUFD_TEST) &&
++	    WARN_ON(access->iova_alignment != PAGE_SIZE))
++		return -EINVAL;
++
+ 	if (!length)
+ 		return -EINVAL;
+ 	if (check_add_overflow(iova, length - 1, &last_iova))
+diff --git a/drivers/iommu/iommufd/io_pagetable.c b/drivers/iommu/iommufd/io_pagetable.c
+index bb5cb19417d696..5d4d48c80d3ad8 100644
+--- a/drivers/iommu/iommufd/io_pagetable.c
++++ b/drivers/iommu/iommufd/io_pagetable.c
+@@ -505,7 +505,8 @@ static int iopt_unmap_iova_range(struct io_pagetable *iopt, unsigned long start,
+ 			up_read(&iopt->domains_rwsem);
+ 			iommufd_access_notify_unmap(iopt, area_first,
+ 						    iopt_area_length(area));
+-			WARN_ON(READ_ONCE(area->num_accesses));
++			if (WARN_ON(READ_ONCE(area->num_accesses)))
++				return -EDEADLOCK;
+ 			goto again;
+ 		}
+ 
+@@ -643,6 +644,7 @@ int iopt_init_table(struct io_pagetable *iopt)
+ 	iopt->allowed_itree = RB_ROOT_CACHED;
+ 	iopt->reserved_itree = RB_ROOT_CACHED;
+ 	xa_init_flags(&iopt->domains, XA_FLAGS_ACCOUNT);
++	xa_init_flags(&iopt->access_list, XA_FLAGS_ALLOC);
+ 
+ 	/*
+ 	 * iopt's start as SW tables that can use the entire size_t IOVA space
+@@ -669,6 +671,7 @@ void iopt_destroy_table(struct io_pagetable *iopt)
+ 
+ 	WARN_ON(!RB_EMPTY_ROOT(&iopt->reserved_itree.rb_root));
+ 	WARN_ON(!xa_empty(&iopt->domains));
++	WARN_ON(!xa_empty(&iopt->access_list));
+ 	WARN_ON(!RB_EMPTY_ROOT(&iopt->area_itree.rb_root));
+ }
+ 
+@@ -802,9 +805,12 @@ static int iopt_check_iova_alignment(struct io_pagetable *iopt,
+ 				     unsigned long new_iova_alignment)
+ {
+ 	unsigned long align_mask = new_iova_alignment - 1;
++	struct iommufd_access *access;
+ 	struct iopt_area *area;
++	unsigned long index;
+ 
+ 	lockdep_assert_held(&iopt->iova_rwsem);
++	lockdep_assert_held(&iopt->domains_rwsem);
+ 
+ 	for (area = iopt_area_iter_first(iopt, 0, ULONG_MAX); area;
+ 	     area = iopt_area_iter_next(area, 0, ULONG_MAX))
+@@ -812,6 +818,12 @@ static int iopt_check_iova_alignment(struct io_pagetable *iopt,
+ 		    (iopt_area_length(area) & align_mask) ||
+ 		    (area->page_offset & align_mask))
+ 			return -EADDRINUSE;
++
++	if (IS_ENABLED(CONFIG_IOMMUFD_TEST))
++		xa_for_each(&iopt->access_list, index, access)
++			if (WARN_ON(access->iova_alignment >
++				    new_iova_alignment))
++				return -EADDRINUSE;
+ 	return 0;
+ }
+ 
+@@ -896,10 +908,12 @@ int iopt_table_add_domain(struct io_pagetable *iopt,
+ static int iopt_calculate_iova_alignment(struct io_pagetable *iopt)
+ {
+ 	unsigned long new_iova_alignment;
++	struct iommufd_access *access;
+ 	struct iommu_domain *domain;
+ 	unsigned long index;
+ 
+ 	lockdep_assert_held_write(&iopt->iova_rwsem);
++	lockdep_assert_held(&iopt->domains_rwsem);
+ 
+ 	if (iopt->disable_large_pages)
+ 		new_iova_alignment = PAGE_SIZE;
+@@ -910,6 +924,11 @@ static int iopt_calculate_iova_alignment(struct io_pagetable *iopt)
+ 		new_iova_alignment = max_t(unsigned long,
+ 					   1UL << __ffs(domain->pgsize_bitmap),
+ 					   new_iova_alignment);
++	xa_for_each(&iopt->access_list, index, access)
++		new_iova_alignment = max_t(unsigned long,
++					   access->iova_alignment,
++					   new_iova_alignment);
++
+ 	if (new_iova_alignment > iopt->iova_alignment) {
+ 		int rc;
+ 
+@@ -1106,6 +1125,41 @@ int iopt_disable_large_pages(struct io_pagetable *iopt)
+ 	return rc;
+ }
+ 
++int iopt_add_access(struct io_pagetable *iopt, struct iommufd_access *access)
++{
++	int rc;
++
++	down_write(&iopt->domains_rwsem);
++	down_write(&iopt->iova_rwsem);
++	rc = xa_alloc(&iopt->access_list, &access->iopt_access_list_id, access,
++		      xa_limit_16b, GFP_KERNEL_ACCOUNT);
++	if (rc)
++		goto out_unlock;
++
++	rc = iopt_calculate_iova_alignment(iopt);
++	if (rc) {
++		xa_erase(&iopt->access_list, access->iopt_access_list_id);
++		goto out_unlock;
++	}
++
++out_unlock:
++	up_write(&iopt->iova_rwsem);
++	up_write(&iopt->domains_rwsem);
++	return rc;
++}
++
++void iopt_remove_access(struct io_pagetable *iopt,
++			struct iommufd_access *access)
++{
++	down_write(&iopt->domains_rwsem);
++	down_write(&iopt->iova_rwsem);
++	WARN_ON(xa_erase(&iopt->access_list, access->iopt_access_list_id) !=
++		access);
++	WARN_ON(iopt_calculate_iova_alignment(iopt));
++	up_write(&iopt->iova_rwsem);
++	up_write(&iopt->domains_rwsem);
++}
++
+ /* Narrow the valid_iova_itree to include reserved ranges from a group. */
+ int iopt_table_enforce_group_resv_regions(struct io_pagetable *iopt,
+ 					  struct device *device,
+diff --git a/drivers/iommu/iommufd/ioas.c b/drivers/iommu/iommufd/ioas.c
+index c32a87f11c55be..068055272fc5b5 100644
+--- a/drivers/iommu/iommufd/ioas.c
++++ b/drivers/iommu/iommufd/ioas.c
+@@ -17,7 +17,6 @@ void iommufd_ioas_destroy(struct iommufd_object *obj)
+ 	rc = iopt_unmap_all(&ioas->iopt, NULL);
+ 	WARN_ON(rc && rc != -ENOENT);
+ 	iopt_destroy_table(&ioas->iopt);
+-	WARN_ON(!xa_empty(&ioas->access_list));
+ 	mutex_destroy(&ioas->mutex);
+ }
+ 
+@@ -36,7 +35,6 @@ struct iommufd_ioas *iommufd_ioas_alloc(struct iommufd_ctx *ictx)
+ 
+ 	INIT_LIST_HEAD(&ioas->hwpt_list);
+ 	mutex_init(&ioas->mutex);
+-	xa_init_flags(&ioas->access_list, XA_FLAGS_ALLOC);
+ 	return ioas;
+ 
+ out_abort:
+diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
+index 47d18388dc24fa..783fbbf0b732d4 100644
+--- a/drivers/iommu/iommufd/iommufd_private.h
++++ b/drivers/iommu/iommufd/iommufd_private.h
+@@ -34,6 +34,7 @@ struct iommufd_ctx {
+ struct io_pagetable {
+ 	struct rw_semaphore domains_rwsem;
+ 	struct xarray domains;
++	struct xarray access_list;
+ 	unsigned int next_domain_id;
+ 
+ 	struct rw_semaphore iova_rwsem;
+@@ -205,7 +206,6 @@ struct iommufd_ioas {
+ 	struct io_pagetable iopt;
+ 	struct mutex mutex;
+ 	struct list_head hwpt_list;
+-	struct xarray access_list;
+ };
+ 
+ static inline struct iommufd_ioas *iommufd_get_ioas(struct iommufd_ucmd *ucmd,
+@@ -256,10 +256,22 @@ void iommufd_hw_pagetable_destroy(struct iommufd_object *obj);
+ 
+ void iommufd_device_destroy(struct iommufd_object *obj);
+ 
++struct iommufd_access {
++	struct iommufd_object obj;
++	struct iommufd_ctx *ictx;
++	struct iommufd_ioas *ioas;
++	const struct iommufd_access_ops *ops;
++	void *data;
++	unsigned long iova_alignment;
++	u32 iopt_access_list_id;
++};
++
++int iopt_add_access(struct io_pagetable *iopt, struct iommufd_access *access);
++void iopt_remove_access(struct io_pagetable *iopt,
++			struct iommufd_access *access);
+ void iommufd_access_destroy_object(struct iommufd_object *obj);
+ 
+ #ifdef CONFIG_IOMMUFD_TEST
+-struct iommufd_access;
+ struct iommufd_hw_pagetable *
+ iommufd_device_selftest_attach(struct iommufd_ctx *ictx,
+ 			       struct iommufd_ioas *ioas,
+diff --git a/include/linux/iommufd.h b/include/linux/iommufd.h
+index fc253a4d2f8e77..7a5d64a1dae482 100644
+--- a/include/linux/iommufd.h
++++ b/include/linux/iommufd.h
+@@ -29,6 +29,7 @@ int iommufd_device_attach(struct iommufd_device *idev, u32 *pt_id,
+ void iommufd_device_detach(struct iommufd_device *idev);
+ 
+ struct iommufd_access_ops {
++	u8 needs_pin_pages : 1;
+ 	void (*unmap)(void *data, unsigned long iova, unsigned long length);
+ };
+ 
