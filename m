@@ -2,62 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4490B612E64
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 01:40:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61DD1612F29
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 03:59:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229718AbiJaAkK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Oct 2022 20:40:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60212 "EHLO
+        id S229695AbiJaC7m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Oct 2022 22:59:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229711AbiJaAkI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Oct 2022 20:40:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 775589FD8
-        for <kvm@vger.kernel.org>; Sun, 30 Oct 2022 17:39:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667176748;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UeYV9gtrEMC/f2NfGupIKl3UhHTgEqpO1AGhP6jS8dg=;
-        b=JYfu8clHAA+YOyFJWMUdB4Qm2SQz+ZTeJ3t4O46sPPRjTJvEHHgJp93BGdo4VCCMMUKudH
-        0xiVsd4ZCpon4P9CCaYth0TqejZn/3z1V/dWgezEbNQHETKUx3JYyv7YeyWHFTsNBYEWVH
-        A3CGHhIFc7nRXCYvTV9URHWoXVl8zE0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-249-Ul4LwwRhM0aMhypjoAEcLQ-1; Sun, 30 Oct 2022 20:39:04 -0400
-X-MC-Unique: Ul4LwwRhM0aMhypjoAEcLQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 52797185A794;
-        Mon, 31 Oct 2022 00:39:03 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-151.bne.redhat.com [10.64.54.151])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 46E6D40C6F75;
-        Mon, 31 Oct 2022 00:38:55 +0000 (UTC)
-From:   Gavin Shan <gshan@redhat.com>
-To:     kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev, ajones@ventanamicro.com, maz@kernel.org,
-        bgardon@google.com, catalin.marinas@arm.com, dmatlack@google.com,
-        will@kernel.org, pbonzini@redhat.com, peterx@redhat.com,
-        oliver.upton@linux.dev, seanjc@google.com, james.morse@arm.com,
-        shuah@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
-        zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: [PATCH v7 9/9] KVM: selftests: Automate choosing dirty ring size in dirty_log_test
-Date:   Mon, 31 Oct 2022 08:36:21 +0800
-Message-Id: <20221031003621.164306-10-gshan@redhat.com>
-In-Reply-To: <20221031003621.164306-1-gshan@redhat.com>
-References: <20221031003621.164306-1-gshan@redhat.com>
+        with ESMTP id S229500AbiJaC7k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Oct 2022 22:59:40 -0400
+Received: from wout1-smtp.messagingengine.com (wout1-smtp.messagingengine.com [64.147.123.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8A58764A
+        for <kvm@vger.kernel.org>; Sun, 30 Oct 2022 19:59:38 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailout.west.internal (Postfix) with ESMTP id A3FC532000D7;
+        Sun, 30 Oct 2022 22:59:34 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Sun, 30 Oct 2022 22:59:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1667185174; x=1667271574; bh=iX
+        HP+s9VF9+fFLjw1JK+GN8LdbcFfgOK0uK9DoiuD/A=; b=rrbClnH2pUAeFv4jiU
+        LL96QXjZsqd2AGLtyggpmEjKv4eGcGjffDqMYdYuNKqCMEupOIvQK+yjNj1LfNP2
+        4fmyBw+POPP/FFIRZgaSDPRFXs37rsq3VnEJC4fWXepRfLZpYtAwp1K8rFTn4XQk
+        yxA91M87qOLZKhxBZ7uK34/+YsdZfdxUFM7yJnZj26C1+yipGNOrU1mvkrkTINjz
+        NrpnyNkr+r9fEOX94xbFU5Htzs1gATDBhfoU67RDEEkmEoMVg2UlW2Gnfkd9HlXN
+        //AVEhZuvDurJZEd8UCJJG1AjmMn/jsbaEMHSSVCGy4wDaqHelnk4vZdTlqdfnHp
+        yBmw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm3; t=1667185174; x=1667271574; bh=iXHP+s9VF9+fFLjw1JK+GN8LdbcF
+        fgOK0uK9DoiuD/A=; b=U/K96ighvltiICXTwhDUw3T0inoqAvf8md+Fhk1t8vL2
+        5lqaowzssfQo+bUb3OQORVq2zX/GkeB2r8TzuA+lqUM1Z8sL1EIe7B8d1JaYZNW6
+        712OIYBbwI23CAT7fGEIvCOuPGPYvRBRM6Ltu0y0HUDTndYjfh+MDsncAp59MLo9
+        ABh6nWgS+BExd0VTrB7qpJ97jOTssoRKTpxbZ3LY1qrJEHzeoU4/2W7y3ipaQD/U
+        pWrOPgPQX6INwnrsFEKq3MoBjwBwsPhUwck/qcrJ6LMXTkcgCWCqb09ItWAVK4tj
+        kPj/mW8FgxQ2tfBiOjnmxNT5Ut04xGzI1JsV8QsFMA==
+X-ME-Sender: <xms:FTpfY_XmS-fwjNo11M1N0NNN322u_PzxPgqqc0AlF1u9qyMgSVtLgw>
+    <xme:FTpfY3mQo1RTKk2CUZl-TeSOFcKRNR_J3gXPgkiQUNAGAG3thwDDtzonfjHrYNBAz
+    8tnYPCzzWxLTgfULvA>
+X-ME-Received: <xmr:FTpfY7aRXRIV9VsVILyd5ewwEelg84oWiMylM8tGRaxj_uTKHzbLU9QmbnmcVQVHaIk7vA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedruddugdehudcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecunecujfgurhepfffhvfevuffkfhggtggujgesthdttd
+    dttddtvdenucfhrhhomhepfdfmihhrihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhi
+    rhhilhhlsehshhhuthgvmhhovhdrnhgrmhgvqeenucggtffrrghtthgvrhhnpefhieeghf
+    dtfeehtdeftdehgfehuddtvdeuheettddtheejueekjeegueeivdektdenucevlhhushht
+    vghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkihhrihhllhesshhhuh
+    htvghmohhvrdhnrghmvg
+X-ME-Proxy: <xmx:FTpfY6X6a0-nNncUTENIATXiPpbN5ND7WE5F8NqymrswjHR2K5LetQ>
+    <xmx:FTpfY5m6iTa_ajRFX9W8qURJIth8Q1mt3onGkcWflfa05_IiRQv2XA>
+    <xmx:FTpfY3eFPCplgTpV8dcJhCefVG_rlxfAkhPZtW4kPz7zSFBTdY155g>
+    <xmx:FjpfY-whjk59Cxskc9UBP3Kjn6tD2e6QjMgxpd_j_EjVTrdoprlhnw>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 30 Oct 2022 22:59:33 -0400 (EDT)
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id 6E064109579; Mon, 31 Oct 2022 05:59:30 +0300 (+03)
+Date:   Mon, 31 Oct 2022 05:59:30 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Robert Hoo <robert.hu@linux.intel.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [PATCH 8/9] KVM: x86: When guest set CR3, handle LAM bits
+ semantics
+Message-ID: <20221031025930.maz3g5npks7boixl@box.shutemov.name>
+References: <20221017070450.23031-1-robert.hu@linux.intel.com>
+ <20221017070450.23031-9-robert.hu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221017070450.23031-9-robert.hu@linux.intel.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,92 +86,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In the dirty ring case, we rely on vcpu exit due to full dirty ring
-state. On ARM64 system, there are 4096 host pages when the host
-page size is 64KB. In this case, the vcpu never exits due to the
-full dirty ring state. The similar case is 4KB page size on host
-and 64KB page size on guest. The vcpu corrupts same set of host
-pages, but the dirty page information isn't collected in the main
-thread. This leads to infinite loop as the following log shows.
+On Mon, Oct 17, 2022 at 03:04:49PM +0800, Robert Hoo wrote:
+> When only changes LAM bits, ask next vcpu run to load mmu pgd, so that it
+> will build new CR3 with LAM bits updates. No TLB flush needed on this case.
+> When changes on effective addresses, no matter LAM bits changes or not, go
+> through normal pgd update process.
+> 
+> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> ---
+>  arch/x86/kvm/x86.c | 26 ++++++++++++++++++++++----
+>  1 file changed, 22 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e9b465bff8d3..fb779f88ae88 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1228,9 +1228,9 @@ static bool kvm_is_valid_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+>  int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+>  {
+>  	bool skip_tlb_flush = false;
+> -	unsigned long pcid = 0;
+> +	unsigned long pcid = 0, old_cr3;
+>  #ifdef CONFIG_X86_64
+> -	bool pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+> +	bool pcid_enabled = !!kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+>  
+>  	if (pcid_enabled) {
+>  		skip_tlb_flush = cr3 & X86_CR3_PCID_NOFLUSH;
+> @@ -1243,6 +1243,10 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+>  	if (cr3 == kvm_read_cr3(vcpu) && !is_pae_paging(vcpu))
+>  		goto handle_tlb_flush;
+>  
+> +	if (!guest_cpuid_has(vcpu, X86_FEATURE_LAM) &&
+> +	    (cr3 & (X86_CR3_LAM_U48 | X86_CR3_LAM_U57)))
+> +		return	1;
+> +
+>  	/*
+>  	 * Do not condition the GPA check on long mode, this helper is used to
+>  	 * stuff CR3, e.g. for RSM emulation, and there is no guarantee that
+> @@ -1254,8 +1258,22 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+>  	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
+>  		return 1;
+>  
+> -	if (cr3 != kvm_read_cr3(vcpu))
+> -		kvm_mmu_new_pgd(vcpu, cr3);
+> +	old_cr3 = kvm_read_cr3(vcpu);
+> +	if (cr3 != old_cr3) {
+> +		if ((cr3 ^ old_cr3) & CR3_ADDR_MASK) {
+> +			kvm_mmu_new_pgd(vcpu, cr3 & ~(X86_CR3_LAM_U48 |
+> +					X86_CR3_LAM_U57));
+> +		} else {
+> +			/* Only LAM conf changes, no tlb flush needed */
+> +			skip_tlb_flush = true;
 
-  # ./dirty_log_test -M dirty-ring -c 65536 -m 5
-  Setting log mode to: 'dirty-ring'
-  Test iterations: 32, interval: 10 (ms)
-  Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-  guest physical test memory offset: 0xffbffe0000
-  vcpu stops because vcpu is kicked out...
-  Notifying vcpu to continue
-  vcpu continues now.
-  Iteration 1 collected 576 pages
-  <No more output afterwards>
+I'm not sure about this.
 
-Fix the issue by automatically choosing the best dirty ring size,
-to ensure vcpu exit due to full dirty ring state. The option '-c'
-becomes a hint to the dirty ring count, instead of the value of it.
+Consider case when LAM_U48 gets enabled on 5-level paging machines. We may
+have valid TLB entries for addresses above 47-bit. It's kinda broken case,
+but seems valid from architectural PoV, no?
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 26 +++++++++++++++++---
- 1 file changed, 22 insertions(+), 4 deletions(-)
+I guess after enabling LAM, these entries will never match. But if LAM
+gets disabled again they will become active. Hm?
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 8758c10ec850..a87e5f78ebf1 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -24,6 +24,9 @@
- #include "guest_modes.h"
- #include "processor.h"
- 
-+#define DIRTY_MEM_BITS 30 /* 1G */
-+#define PAGE_SHIFT_4K  12
-+
- /* The memory slot index to track dirty pages */
- #define TEST_MEM_SLOT_INDEX		1
- 
-@@ -273,6 +276,24 @@ static bool dirty_ring_supported(void)
- 
- static void dirty_ring_create_vm_done(struct kvm_vm *vm)
- {
-+	uint64_t pages;
-+	uint32_t limit;
-+
-+	/*
-+	 * We rely on vcpu exit due to full dirty ring state. Adjust
-+	 * the ring buffer size to ensure we're able to reach the
-+	 * full dirty ring state.
-+	 */
-+	pages = (1ul << (DIRTY_MEM_BITS - vm->page_shift)) + 3;
-+	pages = vm_adjust_num_guest_pages(vm->mode, pages);
-+	if (vm->page_size < getpagesize())
-+		pages = vm_num_host_pages(vm->mode, pages);
-+
-+	limit = 1 << (31 - __builtin_clz(pages));
-+	test_dirty_ring_count = 1 << (31 - __builtin_clz(test_dirty_ring_count));
-+	test_dirty_ring_count = min(limit, test_dirty_ring_count);
-+	pr_info("dirty ring count: 0x%x\n", test_dirty_ring_count);
-+
- 	/*
- 	 * Switch to dirty ring mode after VM creation but before any
- 	 * of the vcpu creation.
-@@ -685,9 +706,6 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, struct kvm_vcpu **vcpu,
- 	return vm;
- }
- 
--#define DIRTY_MEM_BITS 30 /* 1G */
--#define PAGE_SHIFT_4K  12
--
- struct test_params {
- 	unsigned long iterations;
- 	unsigned long interval;
-@@ -830,7 +848,7 @@ static void help(char *name)
- 	printf("usage: %s [-h] [-i iterations] [-I interval] "
- 	       "[-p offset] [-m mode]\n", name);
- 	puts("");
--	printf(" -c: specify dirty ring size, in number of entries\n");
-+	printf(" -c: hint to dirty ring size, in number of entries\n");
- 	printf("     (only useful for dirty-ring test; default: %"PRIu32")\n",
- 	       TEST_DIRTY_RING_COUNT);
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
+Maybe just flush?
+
+> +			/*
+> +			 * Though effective addr no change, mark the
+> +			 * request so that LAM bits will take effect
+> +			 * when enter guest.
+> +			 */
+> +			kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
+> +		}
+> +	}
+>  
+>  	vcpu->arch.cr3 = cr3;
+>  	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
+> -- 
+> 2.31.1
+> 
+
 -- 
-2.23.0
-
+  Kiryl Shutsemau / Kirill A. Shutemov
