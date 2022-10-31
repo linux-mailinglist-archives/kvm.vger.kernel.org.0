@@ -2,91 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DB53613638
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 13:26:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D24E861362F
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 13:25:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230300AbiJaM0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 08:26:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51480 "EHLO
+        id S230486AbiJaMZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 08:25:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbiJaM0A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 08:26:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07793106
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 05:25:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667219103;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zfkK1KtSCue63LLMxZ4FtECuWKGnXXVP4gbD3G4cjL0=;
-        b=OFx4cqAw1WszYJHlmmLCJFPOXdJRo/xVbu9y99AH8+Poi0r9/e1eiyLb5DXSZKaqJ6gor6
-        QsO1Q15Ch+Xmg1aSef1upI7yOeWymOUWGRjDF2e0i44POTd7WUMzjRx0cYapxkajV52iBq
-        YBOorJY2g/Jl16w0nPVudGzb/bcDnHE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-471-f_6eIIAdMRKeJS1Nta6omQ-1; Mon, 31 Oct 2022 08:25:01 -0400
-X-MC-Unique: f_6eIIAdMRKeJS1Nta6omQ-1
-Received: by mail-wm1-f71.google.com with SMTP id e8-20020a05600c218800b003cf634f5280so925215wme.8
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 05:25:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zfkK1KtSCue63LLMxZ4FtECuWKGnXXVP4gbD3G4cjL0=;
-        b=b9zlDTQ+LjMUDrqZvPbEA//7wykU/JUzPknMtZrYL3fW8RZSyNTW7SFpvYOuIFCS8V
-         BYu/BleISe1gFeRnMkGM7bx7430M7Wvf+82h1dBt3H4KuJgjRezJtcWlAXt5eQcqjkVM
-         bYiaQ9JbcZuPJHxpI2SZSho42ljzXQO+D0XHypuNZz0YJfo1ZtlZWi9CtOWuQ3pOvLDy
-         bWuHkbPPDCn+8eHpHDgDFnJDU0es5iI2kZgw8EpLg6OlMU4DDNSpjiyf0kxwZTpkzv11
-         qP7e8ok7ldXvL6eEgtuS3oUTdjRSZyPsHRrdJfX593USiUv2LE+MetuCHwiKdHqz43a5
-         NrMw==
-X-Gm-Message-State: ACrzQf204Ydpp3+2dG8b7Wa7fDvlkT7Ubp3ngdjPK4tpIQq44OFG7scu
-        B1tJbiZkDC5IqZ3GAEwH89UQO6Cgl2TjCCA2yLsI9yT57BThlGbPLo1lophgYyRe0FD0VtUbI+p
-        4sbQnHZB37k3E
-X-Received: by 2002:a7b:c4cf:0:b0:3cf:497c:ae3a with SMTP id g15-20020a7bc4cf000000b003cf497cae3amr17788957wmk.177.1667219100536;
-        Mon, 31 Oct 2022 05:25:00 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM69D8xIsVZcaWiRZms64488Fpw3/JfDO/S2qIuys1bMppxYZyg7F7QbMgvcGKp4qqtV88spaA==
-X-Received: by 2002:a7b:c4cf:0:b0:3cf:497c:ae3a with SMTP id g15-20020a7bc4cf000000b003cf497cae3amr17788937wmk.177.1667219100283;
-        Mon, 31 Oct 2022 05:25:00 -0700 (PDT)
-Received: from redhat.com ([2.52.15.189])
-        by smtp.gmail.com with ESMTPSA id l13-20020a05600c2ccd00b003a2f2bb72d5sm8067013wmc.45.2022.10.31.05.24.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Oct 2022 05:24:59 -0700 (PDT)
-Date:   Mon, 31 Oct 2022 08:24:55 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     qemu-devel@nongnu.org, Gautam Dawar <gdawar@xilinx.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eli Cohen <eli@mellanox.com>,
-        Parav Pandit <parav@mellanox.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Cindy Lu <lulu@redhat.com>,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Harpreet Singh Anand <hanand@xilinx.com>
-Subject: Re: [PATCH v5 2/6] vdpa: Allocate SVQ unconditionally
-Message-ID: <20221031082106-mutt-send-email-mst@kernel.org>
-References: <20221011104154.1209338-1-eperezma@redhat.com>
- <20221011104154.1209338-3-eperezma@redhat.com>
- <20221031041821-mutt-send-email-mst@kernel.org>
- <CAJaqyWcaZ32agF0CKPUU89NHj0Di9Q5kFJDsWcUwCG2q0u_kEQ@mail.gmail.com>
+        with ESMTP id S231376AbiJaMZ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 08:25:26 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC3BCF037;
+        Mon, 31 Oct 2022 05:25:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667219124; x=1698755124;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=7MhpDoZ8tvchs+YekHGdKMKN9RgWllEKnxm/Esoz3Ug=;
+  b=G899/dSN8mxrmwf9T2fZwooU+HqFiPSrii9VQZU1NGJEI/zZMh5gQXPy
+   uihhIv89TmnLxTcf2ivbqwUDmWLakRITXxR8yia84dMXsqRaR1ksAjrA2
+   47Y7rd5olhJ/ERS0zg7rBBCGtfF0f0hJoISrHBq/6HV2pOTMHgAhQQa1J
+   Im4mkHnGykfIRbCOtfpijKO+bs5dUSuhy+7BugqLQCvdRoZqTiJ5nMmzV
+   b/9dQPWDfe7P5lhFtCVvuhQ7IPr881+dMmyekSFljed5rK9juapN6O+Fb
+   QF3MJo21C0ExD0kw7W1xmu+GCVO2UEjYnmav2/Qd4oCA4sAQcu71WbKLZ
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10516"; a="395198521"
+X-IronPort-AV: E=Sophos;i="5.95,227,1661842800"; 
+   d="scan'208";a="395198521"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2022 05:25:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10516"; a="722794402"
+X-IronPort-AV: E=Sophos;i="5.95,227,1661842800"; 
+   d="scan'208";a="722794402"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by FMSMGA003.fm.intel.com with ESMTP; 31 Oct 2022 05:25:23 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 31 Oct 2022 05:25:23 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 31 Oct 2022 05:25:22 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Mon, 31 Oct 2022 05:25:22 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.172)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Mon, 31 Oct 2022 05:25:22 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PUDnNtwlbJrKkYVGw4g9GZWE+Gh+ngPfhPXOywb937vftVDiNNl2UpeA7wfCl715iYl7fbtknxOt0HfSWZKoSqGZ35Oq69c5w3mKifm3TArKJMXW9/fILsmOkdDrGWOXvfZljq1Oqlvmb/njQMJg5tGEMV56TvhkgYUMTVU5gKXsnUYSP1Mh4BAex7oGiYPmWzErLfrdv6XkCtlqCURxSs8WrBZGCeHgITmmc/jQYmaPyuJN5W81zUyMG0EnEiR5qQb8jFG4K7UZ5R1CSy19fxUNIzsWlww8HGeHAdlWIDyvySXovIRlvKhuPNc55TMH0qu7l8MpSSI8J5e6OfkO2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1mgZdoYkAREqGyZo62RnK5oPWtoqzOu317wWZiTYHPo=;
+ b=LPFjLRtvejzAV14rraYUK1C9a0mpVf+ddV03iSsOHzrykdehJ7I0FJF+jBezpEaCPirm1xo/yvgeAwT0BYc44d34i5E/d/7ZeWXrEaTQB6S5Nss6k8klKfyywrlkH3q2c9pB8fjR+edaVYe6SjTTjGPAD6GM14FmYGl5bUsYUSxoQCWqWiqjhz3R/S4E4Q03foOUjtgd9OFGkmHs1MkU3YVfJAAAU7ZZ0OfeLQPI4DkYi+sDmnejF9NsP87zsZqKI+y+6GdRH/2szLbDxzMIo/oAyv0IdQJDwwCZg1jEKJoqoaLs3Y7FHFtazSuJbyAlppBUE7e7cHHTUIfsXCuAGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by CY5PR11MB6344.namprd11.prod.outlook.com (2603:10b6:930:3b::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.19; Mon, 31 Oct
+ 2022 12:25:15 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::37e3:9536:43ed:2ecf]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::37e3:9536:43ed:2ecf%5]) with mapi id 15.20.5769.016; Mon, 31 Oct 2022
+ 12:25:15 +0000
+Message-ID: <d8a0352e-9e1d-5b01-7616-dccc73a172a6@intel.com>
+Date:   Mon, 31 Oct 2022 20:25:39 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.11.0
+Subject: Re: [PATCH 00/10] Connect VFIO to IOMMUFD
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        <dri-devel@lists.freedesktop.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Eric Farman" <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        <intel-gfx@lists.freedesktop.org>,
+        <intel-gvt-dev@lists.freedesktop.org>, <iommu@lists.linux.dev>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        "Jason Herne" <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>,
+        Longfang Liu <liulongfang@huawei.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        "Halil Pasic" <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "Rodrigo Vivi" <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+References: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
+ <39eb11ed-dbf2-822a-dc79-5b70a49c430b@intel.com>
+ <Y1+9IB+DI9v+nD0P@nvidia.com>
+From:   Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <Y1+9IB+DI9v+nD0P@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SGXP274CA0001.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b8::13)
+ To DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJaqyWcaZ32agF0CKPUU89NHj0Di9Q5kFJDsWcUwCG2q0u_kEQ@mail.gmail.com>
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|CY5PR11MB6344:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1311be73-370b-4168-b91e-08dabb3af6e6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: MXEwYhK37kaFR4vEwxMUm8Hiu+5LqjFtr20meP0VlqmGm7n/HccafCBHb14d2ZiU8d/IXDAiUnjFJBwRs7SWCoMoac2DtYp2JIMeBjMWEMIFyNnVBR6csPiGCgPK3p9sNiZrnjBboh9G4y0lUWGJHtc13lqqcmz/GtVI2tyiyGU1kIq94R19XO9uyZrl/Lamf1EroICPMlwzBQNvVL66sxMAbYPPwwK+3U/2MZQmcZxXXXPr/I7aQnYcyL2tfH6rP3nKE6hRd84GngUcwXxY82WNK9N2rojMlAZf9IU1BvOgsoXFTxdDAdslUT0w0zTXrRdHmNb/Vv9GcZ90olu9x7c/F0iVP0dsa0QnUvSapO4WycHvrSEqwi7XUDCZmSn9aSadZQYEs+M7SiOel5tHVAY3T42EjUKGOGd0npu97N67MiK192zovyQ85FGVGN3smcxmpeHLI3EoKtw7sFfyGMs4YuUfqmYeTm1MDx7Q1Z27n/eByrALatWkYRcwg9+7fEfa4wceShzLJF94/y3jvI+91SgsNzR33dJjeekMpCKXKodzCUbUR7wOdDcSUlxtM6KO9T3fqhdj95alQ0YsKAgXQGABvLpugV9sklRqlZhmhawyJR1lCaSUVtOgq20D5DrDwjkphSlb3bzi8JtyGf6W4+n4rc24TNHIF5Ax7vBUcrx8Un05NcFsQmjlL9xe8WYeeB+CgzyS+eYGjAQOY8gM4gSYPRTibzWC7VWcN92l3M4u109WFqwimP9i26kAtLA9ETVZQYL0FYOWB70lbondNm6UQFD2doyG39edz/XbptprUk+/BBuGTEUMUJkEyTRlK6YZBDelkQXEdgcUOg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(39860400002)(136003)(366004)(346002)(376002)(451199015)(6512007)(31696002)(186003)(36756003)(41300700001)(2616005)(6666004)(7416002)(5660300002)(2906002)(7406005)(53546011)(83380400001)(6506007)(26005)(8936002)(6486002)(966005)(38100700002)(31686004)(86362001)(6916009)(66556008)(316002)(4326008)(66476007)(66946007)(8676002)(478600001)(82960400001)(54906003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UUJXd1NnaWkvM1JIS0dYN2N5OG4rTWdyMHBKWkhYdjd3TGZxaGVSYXg5aS9n?=
+ =?utf-8?B?VnJqN1Z3cU4zMit0VXN5akZiTzBEVkZHSkFaanQ4RGxCdG8weEt5ekJnL1Av?=
+ =?utf-8?B?cVpXQnRWZmQyZ0IwbXBkRDBLTkR0aVBFKzB1Umh3a0JFbUcwaFArSDJSZ0tT?=
+ =?utf-8?B?dkFDL0Zsb2g2RXR0QzV3WkE3akN1OFVYZ2RqcVI2b2dmdmYrV1pSaTY3aENL?=
+ =?utf-8?B?L0RpYjlQV0FFU2xBWUlvWVJLRm1QYjZzcm5kV01ueVpENmI3bU5QSkc1MGMy?=
+ =?utf-8?B?OG10Q2NZK2R3RTlLalg2N3plMU5ac3dxWGJGU2xyWVZCVEdzTzA5YmNzSm9p?=
+ =?utf-8?B?ejE3QWlBSGhmMDM2cW03bGFNb1Ywc25kcE0rb3BaQU5HTmpYeU1XdW9UZ2Jw?=
+ =?utf-8?B?WkttVktNbVh2NDUrYTdUUEROSGJIbnNicmtKMVF3NU1WY3RHTFVjOURUdzFr?=
+ =?utf-8?B?QnBMb2VGL0JHNEt6SEZXd1VEcGNwTWVoL0M2dnlrcU1vVlBicnpBVkZkbnhY?=
+ =?utf-8?B?cE52Q3VpT3FVOHpkOHJEbStHRDBWSlh0MEtoNE45VjZKdk1vYm05SStUKzRQ?=
+ =?utf-8?B?a2pBc0I0Mzd3cnZFL3JOa0FVdFJDQmdMcXU1N285Zm02WHg4S2ZtT0xiTUFS?=
+ =?utf-8?B?Vjd3RUhxU2o2bHJWeHVmUHZ0cWZVZE95Ti9RSkxBMmtQWEE4dXZCSm1UeU01?=
+ =?utf-8?B?WE5XMlVWaXpzYVJDUmU2a0dyL0M2dlFTWGdRblI5WTdSeHFRWXZwMndxeFZx?=
+ =?utf-8?B?L3ZMMDFWR0JSRHRmazVZSElMRG13U3p5OVN5Ujcza1lKeXpteHFXemFtM2pr?=
+ =?utf-8?B?UitzQlY2R29jNFFQZCtBQVBTZ0NWV0lNazArZjFkem90RG5ZQVlidlkvMno2?=
+ =?utf-8?B?cEJMNEpEUURMTmtmd3MzMzhSU1lkQSs2dmJ2TmhtY0ZzVmNwRDZRb2h1TTBr?=
+ =?utf-8?B?Uk1ZUVM2WkhYUjdpRmMxTHhWUEYrcFZWQ0cwZTk3aytZSFE2aUpXejRLaWNS?=
+ =?utf-8?B?NzU4Sk9BcUJuS2JRZUN0TjVuOG5SQ2RSalVsTklBR0xHMFczK09RNTV2OSt2?=
+ =?utf-8?B?ckgyWmd3Q01iVzU3RHdlbXdid1lsRkU0eVVrZXBEdDNYMVZQZXZsOTJrUE9i?=
+ =?utf-8?B?SDRqOGVWWlhPQkRxNDBVTTI2eG8vSlh3SUpOOGpvYzRBaFZjYUhjZmZWRW8w?=
+ =?utf-8?B?RDVySHF3QUtCaDJNc2d5dXdyVnMvbjk5NmdXcUpqQmN5cndpV1pFdFB1ZWlr?=
+ =?utf-8?B?QmdPSy9SMWNHYVFHTXBNaXlQemdqYUU1U2lZK1RUclM0ZUNIMWRTSURscGR5?=
+ =?utf-8?B?QVZzWVdvSUpnRmVGNXNBNVBrN2hYcjJHV2VJbEJBT0ZrV2EvVk9iSmZocWNq?=
+ =?utf-8?B?VVFScDhVYW1takxpQkY5UVl6eWoyYS9JRlR3Wi92RUtTanRBMzZHTlQ5bWZI?=
+ =?utf-8?B?a0ZrMEIvdXI1VGFHNkVuVEVlME5tN1N2QVg3U3dGcXkvckc5bmxWbDRsRC8z?=
+ =?utf-8?B?VWNlNCtJYmMvUXNKdk1oU2tzRmJreGZLcFVqaG1RckExZkk5bE0rWExibS81?=
+ =?utf-8?B?RWdsUGVGVks2QjVLc0hsV2lTN2NXajBrV1VJTCtGcHNNakZFMmlETUI0YkpY?=
+ =?utf-8?B?RXV1WU5pVWFnRm1BOUxZNExIbzVpem9pTnV0U1VXRFFXRHF6QVkrZEs5Zm93?=
+ =?utf-8?B?eFlLVXpBRWlUSGRhWUp6Nmt6MStlbWxxcU9YR1NDamw5bG1McWE3aDFJenhJ?=
+ =?utf-8?B?TWlKdkhPL1h0Qy95UVRPa2dRU0VhWVIwVGtla2tJWk8xR3pTNWg2ZDExRVRK?=
+ =?utf-8?B?VlBLdmJyZGVTUk1KL2svYU8wK2ROa1dscjNnQmMzMTMrQmZIdkFUamNVOElt?=
+ =?utf-8?B?QWdHZVFjRGNQNWkzM2RoUW9lTU84Nm5hRnR2ajNPVDRZQ0FTeDRGZDRINkpK?=
+ =?utf-8?B?Z1NmNzdOQ2xWM3dVc3BXaGQ4RWEwM1QzS0RsMityL2VQbWZzQ3d2aDhCTEpP?=
+ =?utf-8?B?Vk1FdWJMY0hUWlBGRmxaRGZtSVpvS09ZTTFUUW8rYm5nUE4ycndtN2ZxOU5W?=
+ =?utf-8?B?NEZTTUE0WVpmdmRlUUt2VVNZZWZZUmdYaGh3Tk1kdUdqWXlFUmpGbGdGOVhn?=
+ =?utf-8?Q?kstabdzHigKUvL8/er1HBCjDo?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1311be73-370b-4168-b91e-08dabb3af6e6
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2022 12:25:15.5065
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bR18y8gUshE6TU8zYQ1VNntXZRQcky6GbDCRK6A0Yy7fpiRP/8ke6Rvp0jCBZKrt7kTpbnnADbGXR8sQim1A3w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6344
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,114 +196,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 31, 2022 at 12:56:06PM +0100, Eugenio Perez Martin wrote:
-> On Mon, Oct 31, 2022 at 9:21 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Tue, Oct 11, 2022 at 12:41:50PM +0200, Eugenio Pérez wrote:
-> > > SVQ may run or not in a device depending on runtime conditions (for
-> > > example, if the device can move CVQ to its own group or not).
-> > >
-> > > Allocate the resources unconditionally, and decide later if to use them
-> > > or not.
-> > >
-> > > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
-> >
-> > I applied this for now but I really dislike it that we are wasting
-> > resources like this.
-> >
-> > Can I just drop this patch from the series? It looks like things
-> > will just work anyway ...
-> >
+On 2022/10/31 20:18, Jason Gunthorpe wrote:
+> On Mon, Oct 31, 2022 at 06:38:45PM +0800, Yi Liu wrote:
+>> Hi Jason,
+>>
+>> On 2022/10/26 02:17, Jason Gunthorpe wrote:
+>>> This series provides an alternative container layer for VFIO implemented
+>>> using iommufd. This is optional, if CONFIG_IOMMUFD is not set then it will
+>>> not be compiled in.
+>>>
+>>> At this point iommufd can be injected by passing in a iommfd FD to
+>>> VFIO_GROUP_SET_CONTAINER which will use the VFIO compat layer in iommufd
+>>> to obtain the compat IOAS and then connect up all the VFIO drivers as
+>>> appropriate.
+>>>
+>>> This is temporary stopping point, a following series will provide a way to
+>>> directly open a VFIO device FD and directly connect it to IOMMUFD using
+>>> native ioctls that can expose the IOMMUFD features like hwpt, future
+>>> vPASID and dynamic attachment.
+>>>
+>>> This series, in compat mode, has passed all the qemu tests we have
+>>> available, including the test suites for the Intel GVT mdev. Aside from
+>>> the temporary limitation with P2P memory this is belived to be fully
+>>> compatible with VFIO.
+>>>
+>>> This is on github: https://github.com/jgunthorpe/linux/commits/vfio_iommufd
+>>
+>> In our side, we found the gvt-g test failed. Guest i915 driver stuck at
+>> init phase. While with your former version  (commit ID
+>> a249441ba6fd9d658f4a1b568453e3a742d12686), gvt-g test is passing.
 > 
-> It will not work simply dropping this patch, because new code expects
-> SVQ vrings to be already allocated. But that is doable with more work.
+> Oh, I didn't realize you grabbed such an older version for this testing..
+
+yeah, this was grabbed before your posting. :-)
+
+>> noticed there a quite a few change in iommufd/pages.c from last version.
+>> We are internally tracing in the gvt-g side, may also good to have your
+>> attention.
 > 
-> > I know, when one works on a feature it seems like everyone should
-> > enable it - but the reality is qemu already works quite well for
-> > most users and it is our resposibility to first do no harm.
-> >
+> syzkaller just ran into this that I was starting to investigate:
 > 
-> I agree, but then it is better to drop this series entirely for this
-> merge window. I think it is justified to add it at the beginning of
-> the next merge window, and to give more time for testing and adding
-> more features actually.
-
-Not sure what "then" means. You tell me - should I drop it?
-
-> However, I think shadow CVQ should start by default as long as the
-> device has the right set of both virtio and vdpa features. Otherwise,
-> we need another cmdline parameter, something like x-cvq-svq, and the
-> update of other layers like libvirt.
+> @@ -1505,7 +1505,7 @@ int iopt_pages_fill_xarray(struct iopt_pages *pages, unsigned long start_index,
+>          int rc;
+>   
+>          pfn_reader_user_init(&user, pages);
+> -       user.upages_len = last_index - start_index + 1;
+> +       user.upages_len = (last_index - start_index + 1) * sizeof(*out_pages);
+>          interval_tree_for_each_double_span(&span, &pages->access_itree,
 > 
-> Thanks!
+> It would certainly hit gvt - but you should get WARN_ON's not hangs
+> 
+> There is something wrong with the test suite that it isn't covering
+> the above, I'm going to look into that today.
 
-OK maybe that is not too bad.
+sounds to be the cause. I didn't see any significant change in vfio_main.c
+that may fail gvt. So should the iommufd changes. Then we will re-run the
+test after your update.:-)
 
-
-> >
-> > > ---
-> > >  hw/virtio/vhost-vdpa.c | 33 +++++++++++++++------------------
-> > >  1 file changed, 15 insertions(+), 18 deletions(-)
-> > >
-> > > diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-> > > index 7f0ff4df5b..d966966131 100644
-> > > --- a/hw/virtio/vhost-vdpa.c
-> > > +++ b/hw/virtio/vhost-vdpa.c
-> > > @@ -410,6 +410,21 @@ static int vhost_vdpa_init_svq(struct vhost_dev *hdev, struct vhost_vdpa *v,
-> > >      int r;
-> > >      bool ok;
-> > >
-> > > +    shadow_vqs = g_ptr_array_new_full(hdev->nvqs, vhost_svq_free);
-> > > +    for (unsigned n = 0; n < hdev->nvqs; ++n) {
-> > > +        g_autoptr(VhostShadowVirtqueue) svq;
-> > > +
-> > > +        svq = vhost_svq_new(v->iova_tree, v->shadow_vq_ops,
-> > > +                            v->shadow_vq_ops_opaque);
-> > > +        if (unlikely(!svq)) {
-> > > +            error_setg(errp, "Cannot create svq %u", n);
-> > > +            return -1;
-> > > +        }
-> > > +        g_ptr_array_add(shadow_vqs, g_steal_pointer(&svq));
-> > > +    }
-> > > +
-> > > +    v->shadow_vqs = g_steal_pointer(&shadow_vqs);
-> > > +
-> > >      if (!v->shadow_vqs_enabled) {
-> > >          return 0;
-> > >      }
-> > > @@ -426,20 +441,6 @@ static int vhost_vdpa_init_svq(struct vhost_dev *hdev, struct vhost_vdpa *v,
-> > >          return -1;
-> > >      }
-> > >
-> > > -    shadow_vqs = g_ptr_array_new_full(hdev->nvqs, vhost_svq_free);
-> > > -    for (unsigned n = 0; n < hdev->nvqs; ++n) {
-> > > -        g_autoptr(VhostShadowVirtqueue) svq;
-> > > -
-> > > -        svq = vhost_svq_new(v->iova_tree, v->shadow_vq_ops,
-> > > -                            v->shadow_vq_ops_opaque);
-> > > -        if (unlikely(!svq)) {
-> > > -            error_setg(errp, "Cannot create svq %u", n);
-> > > -            return -1;
-> > > -        }
-> > > -        g_ptr_array_add(shadow_vqs, g_steal_pointer(&svq));
-> > > -    }
-> > > -
-> > > -    v->shadow_vqs = g_steal_pointer(&shadow_vqs);
-> > >      return 0;
-> > >  }
-> > >
-> > > @@ -580,10 +581,6 @@ static void vhost_vdpa_svq_cleanup(struct vhost_dev *dev)
-> > >      struct vhost_vdpa *v = dev->opaque;
-> > >      size_t idx;
-> > >
-> > > -    if (!v->shadow_vqs) {
-> > > -        return;
-> > > -    }
-> > > -
-> > >      for (idx = 0; idx < v->shadow_vqs->len; ++idx) {
-> > >          vhost_svq_stop(g_ptr_array_index(v->shadow_vqs, idx));
-> > >      }
-> > > --
-> > > 2.31.1
-> >
-
+-- 
+Regards,
+Yi Liu
