@@ -2,125 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA5F46133DB
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 11:44:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E8AF7613493
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 12:36:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229906AbiJaKoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 06:44:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60462 "EHLO
+        id S230327AbiJaLgo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 07:36:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230056AbiJaKoI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 06:44:08 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23A6ADA0
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 03:44:07 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id 21so16820968edv.3
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 03:44:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:to:subject:message-id:date:from:sender
-         :reply-to:mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HimZc8yramtrHBkHsNskSIVkCsBkqEjbz+TPQpvnPJY=;
-        b=XSYcZMAmi81t/KQVNOBMsshKOjtXu9FkdWATKhorl2do45oU556qWFDH24TiTx+08r
-         gm5o5V7djBJJ7wLgctJwgfiEZDSwC2zrcgI9o7jnJcJDOMBWOU1wWIMEcs/stg9iYwRV
-         p50OoqZUPUkCyVxp4duxoQRU4cFe2tdEekvDqS2MNEEaZYsgn3Q1nSqmCjAYD+SA0dC9
-         CbRKFuMVOtXT5CfOvSb+IFD8KXVvv12ZkPyZH8ZZ7Y8l3rJU6d3pQkDaFQenzxs3C431
-         TJqQVXFi68B0cujmYq3+Q1HOUGF11Em6aDRLleTHRU6AdgPiGitz8mLKNVSqPzjPspio
-         2hTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:to:subject:message-id:date:from:sender
-         :reply-to:mime-version:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HimZc8yramtrHBkHsNskSIVkCsBkqEjbz+TPQpvnPJY=;
-        b=aCEyVwca8+m+l8Mxa9VGRmcwAXTVhPJD3AKRbWnUNqdLvfkbd0mL8rcvAHfRh/yhH/
-         r9fkVgb2FnU+SRlR52MkvD/e4sgCif8SDqRycqZTdyd8DTR4zpEsC0S7eiKixf4a3K+v
-         xxPfSokZphDCMT2D2Z+YE+PayQ0St9BsSCLfcaMlV3E8n/c+CkdY5xC1IoKS8b8iEIIi
-         yuIgW8Wz1bKN7AOH+MwOfSSkCy+/cDQkQOMZwA1LStEsptEuFrINdKZfdZ5pCT65LcQt
-         BhXsxNKgPUSsSpQ8nfu3vd1HoY+0YwTczQo3zW8yUrAFanF90lRCWf+9Kksshy/r1isT
-         kR6g==
-X-Gm-Message-State: ACrzQf27Z5OJ4Qx57PKeU78n6ZPOlRrYxAxQQDhCpgzO4YV7RUovNY2O
-        DLw9oX9D9Q/ecdyh9GA7u0W1DYvnJbA4t9OnQl0=
-X-Google-Smtp-Source: AMsMyM6ZYFjDfYpQIYBqJVYy8J/TnaFS2P+m93kqVOQMTyYfy7xBkxvEA+OchR6Zu3xj3CcWCzLHBfJa0+7Y5zLRDug=
-X-Received: by 2002:aa7:c452:0:b0:463:14dd:2093 with SMTP id
- n18-20020aa7c452000000b0046314dd2093mr9741197edr.48.1667213045311; Mon, 31
- Oct 2022 03:44:05 -0700 (PDT)
+        with ESMTP id S229629AbiJaLgm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 07:36:42 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 010FDE0A1
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 04:36:40 -0700 (PDT)
+Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4N19xv71JRzpW4m;
+        Mon, 31 Oct 2022 19:33:07 +0800 (CST)
+Received: from cgs.huawei.com (10.244.148.83) by
+ kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 31 Oct 2022 19:36:38 +0800
+From:   Gaosheng Cui <cuigaosheng1@huawei.com>
+To:     <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+        <x86@kernel.org>, <hpa@zytor.com>, <cuigaosheng1@huawei.com>
+CC:     <kvm@vger.kernel.org>
+Subject: [PATCH] KVM: x86: fix undefined behavior in bit shift for __feature_bit
+Date:   Mon, 31 Oct 2022 19:36:38 +0800
+Message-ID: <20221031113638.4182263-1-cuigaosheng1@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Reply-To: alyonadegrik@yandex.com
-Sender: aminaterfas1975@gmail.com
-Received: by 2002:a05:6402:496:b0:459:39ae:3d23 with HTTP; Mon, 31 Oct 2022
- 03:44:04 -0700 (PDT)
-From:   Alyona Degrik <rameshkangco@gmail.com>
-Date:   Mon, 31 Oct 2022 03:44:04 -0700
-X-Google-Sender-Auth: wCE6RDy9s1lbII75FBFi1ORBTM0
-Message-ID: <CAGibXBgpzwqmKMaEn08kko9XHe0BoJpkrZFYczzR5sZtMKtmLg@mail.gmail.com>
-Subject: Hilf mir, bitte
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: Yes, score=6.0 required=5.0 tests=BAYES_80,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2a00:1450:4864:20:0:0:0:532 listed in]
-        [list.dnswl.org]
-        *  2.0 BAYES_80 BODY: Bayes spam probability is 80 to 95%
-        *      [score: 0.8375]
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [rameshkangco[at]gmail.com]
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [aminaterfas1975[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        *  2.9 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-X-Spam-Level: *****
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.244.148.83]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemi500012.china.huawei.com (7.221.188.12)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Lieber Freund,
+Shifting signed 32-bit value by 31 bits is undefined, so changing
+significant bit to unsigned. The UBSAN warning calltrace like below:
 
-Bitte sch=C3=A4men Sie sich nicht, Sie =C3=BCber dieses Medium zu kontaktie=
-ren;
-Mein Ziel ist es, eine tragf=C3=A4hige Gesch=C3=A4ftsbeziehung mit Ihnen in
-Ihrem Land aufzubauen.
+UBSAN: shift-out-of-bounds in arch/x86/kvm/reverse_cpuid.h:101:11
+left shift of 1 by 31 places cannot be represented in type 'int'
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x7d/0xa5
+ dump_stack+0x15/0x1b
+ ubsan_epilogue+0xe/0x4e
+ __ubsan_handle_shift_out_of_bounds+0x1e7/0x20c
+ kvm_set_cpu_caps+0x15a/0x770 [kvm]
+ hardware_setup+0xa6f/0xdfe [kvm_intel]
+ kvm_arch_hardware_setup+0x100/0x1e80 [kvm]
+ kvm_init+0xdb/0x560 [kvm]
+ vmx_init+0x161/0x2b4 [kvm_intel]
+ do_one_initcall+0x76/0x430
+ do_init_module+0x61/0x28a
+ load_module+0x1f82/0x2e50
+ __do_sys_finit_module+0xf8/0x190
+ __x64_sys_finit_module+0x23/0x30
+ do_syscall_64+0x58/0x80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+ </TASK>
 
-Ich bin Frau Alyona Degrik aus Kiew (Ukraine); Ich war Eigent=C3=BCmerin
-und Gesch=C3=A4ftsf=C3=BChrerin von LEOGAMING, bevor Russland in mein Land
-einmarschierte. Ich habe Ihr Profil durchgesehen und es klingt
-interessant, also habe ich beschlossen, Ihnen zu schreiben und Ihre
-Hilfe und Unterst=C3=BCtzung f=C3=BCr Investitionszwecke zu suchen, aufgrun=
-d der
-Invasion Russlands in mein Land Ukraine.
+Fixes: a7c48c3f56db ("KVM: x86: Expand build-time assertion on reverse CPUID usage")
+Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
+---
+ arch/x86/kvm/reverse_cpuid.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Ich halte es f=C3=BCr notwendig, mein Gesch=C3=A4ftsprojekt in Ihrem Land z=
-u
-diversifizieren, um die Zukunft meines einzigen Sohnes zu sichern,
-nachdem mein Gesch=C3=A4ft von den russischen Milit=C3=A4rtruppen zerst=C3=
-=B6rt wurde
-und in meinem Land keine sinnvollen wirtschaftlichen Aktivit=C3=A4ten mehr
-stattfinden.
+diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+index a19d473d0184..ebd6b621d3b8 100644
+--- a/arch/x86/kvm/reverse_cpuid.h
++++ b/arch/x86/kvm/reverse_cpuid.h
+@@ -98,7 +98,7 @@ static __always_inline u32 __feature_bit(int x86_feature)
+ 	x86_feature = __feature_translate(x86_feature);
+ 
+ 	reverse_cpuid_check(x86_feature / 32);
+-	return 1 << (x86_feature & 31);
++	return 1U << (x86_feature & 31);
+ }
+ 
+ #define feature_bit(name)  __feature_bit(X86_FEATURE_##name)
+-- 
+2.25.1
 
-Ich w=C3=BCrde wirklich gerne mehr =C3=BCber dich erfahren! Und ich hoffe, =
-dass
-du mich auch kennenlernen willst. Wenn ja, dann freue ich mich auf
-Ihre Antwort.
-
-"Mit all meiner Aufrichtigkeit
-Frau Alyona Degrik
-alyonadegrik@legislator.com
