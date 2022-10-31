@@ -2,270 +2,369 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 420FE6133C2
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 11:38:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D09FC6133D7
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 11:42:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230042AbiJaKid (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 06:38:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54600 "EHLO
+        id S229707AbiJaKma (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 06:42:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230012AbiJaKi0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 06:38:26 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55465C77F;
-        Mon, 31 Oct 2022 03:38:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667212705; x=1698748705;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=5NnA48ZX3VY5BT5H7bLTVoZrVVPezpOVIWaegytPDyI=;
-  b=V+LGWky1JDMsHdlicBad+6pE/6LraLQE8mxq1WhR2/8NIiugmXHGTaC5
-   gZA6mJI0vbtFvnLc+wvYyIVn8A9ump9cctEUHvo5Lmq+DdR8rZNnrJT4h
-   vE0njm3xjnCTQ2SVn6QimbotbWapczx6x8AHXT5RDhA+FMFwE5wQ1McwU
-   xR0x2EtNRTiJbX1VIOwf6c6+zJJ5TR5S5hXlOsUH6UeV+qV5OZ3eh1tVw
-   T67QTRkBf0Rto+GK8l3653BcHz2rvdd3shX4FT4qEYJxIBCsNi6E/XsJ2
-   UakRmdn0cMdwjZAUQTEtTbk/R09wPJbf8l/z3u/3BHG6+subQbT0y5sor
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10516"; a="335521501"
-X-IronPort-AV: E=Sophos;i="5.95,227,1661842800"; 
-   d="scan'208";a="335521501"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2022 03:38:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10516"; a="722768354"
-X-IronPort-AV: E=Sophos;i="5.95,227,1661842800"; 
-   d="scan'208";a="722768354"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by FMSMGA003.fm.intel.com with ESMTP; 31 Oct 2022 03:38:24 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 31 Oct 2022 03:38:23 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Mon, 31 Oct 2022 03:38:23 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.45) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Mon, 31 Oct 2022 03:38:23 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XbCRV/iigLqpRUEs9NCLFlcX1vhAiWQTUM39JbRge1n6RfK6YwdcOteMkgxXmV7igToCTlj3ntAcuALZk6waZRQwhuNZjUCioo/EaOpEoJFba7VLcYBA3sS4Glb7K6bQ+NW/b+jPUbeZkywU+kTFnVUD+Nacz3JrXBnGYAUaZbNMG3itBAtjWAbZTRPGcaOs+qcpRhb/G1uW5FuB0abZCLqsXH2I7TiikrsWwLyUyPcSfWVeMAHCj3a4NHzhKG8MYyDC5BCUx9OCg87m+Mc+kHbyHPtWTL8XmMNb/H6D+FjjihnyammK+j0fcqIATcEAe2WuH8ch1u0wT/FHRTd3mQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J7FrEOUwW+MrNtRwDKi8uUEP5XtLs++S4CtVqjHaHo4=;
- b=I92ZGNV5gkROo4q42/m6rejOEDD2TBUsqVnQt3J/Wmo2zYDWENFAmhHaNYjZTBI1z1KnFinUkIvO3DK8i4mUriNEZ5XxOGAuitzESmHrDPCMAAwUnMuJPGuQFAd6V6zYhoGFriWzWfd7OCXnlPm1nJgKHFZmZmRPyPjs02+mOpTa0Odh7/EqsiMQV3JDTG/9WMOifL+IoT7ZtYuR61dHlaiiEG13H8m9+NaXLfSq6z+VQp8MfjnZKwioZAs+pYZup+6i/H+Q5QBZWPXpdFPtWEHd+larVcwqcsUi9bD7TJ/kxiE9QIX+F5RgT3vD96LNbL3ysxiKRkN0NliQMxGJzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by SA1PR11MB6919.namprd11.prod.outlook.com (2603:10b6:806:2bc::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.19; Mon, 31 Oct
- 2022 10:38:21 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::37e3:9536:43ed:2ecf]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::37e3:9536:43ed:2ecf%5]) with mapi id 15.20.5769.016; Mon, 31 Oct 2022
- 10:38:21 +0000
-Message-ID: <39eb11ed-dbf2-822a-dc79-5b70a49c430b@intel.com>
-Date:   Mon, 31 Oct 2022 18:38:45 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.11.0
-Subject: Re: [PATCH 00/10] Connect VFIO to IOMMUFD
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@gmail.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        <dri-devel@lists.freedesktop.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        "Harald Freudenberger" <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        <intel-gfx@lists.freedesktop.org>,
-        <intel-gvt-dev@lists.freedesktop.org>, <iommu@lists.linux.dev>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        "Joonas Lahtinen" <joonas.lahtinen@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>,
-        Longfang Liu <liulongfang@huawei.com>,
-        "Matthew Rosato" <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Will Deacon <will@kernel.org>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-CC:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>
-References: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
-From:   Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI1PR02CA0049.apcprd02.prod.outlook.com
- (2603:1096:4:1f5::18) To DS0PR11MB7529.namprd11.prod.outlook.com
- (2603:10b6:8:141::20)
+        with ESMTP id S229587AbiJaKm2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 06:42:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85CB0DFE2
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 03:41:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667212894;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jg34LqUFq9kapneHl8gAo0S9bhs12rrReRlScpgS/yc=;
+        b=a6JaYa3KC/1v8tPo6dEetOoRYkKYN1+KeKzFvEDX785Bv+955aByWbm+zkwjgRKXZMUDoY
+        LV9MYsZJ4Bxp/bs+Lb1x1YZsbhlYbyWeirLkpfDdjvQZn3+ykP/yYweJDC/9vEv/S1v9j1
+        JMYI8PZNK3g5nr0Lajp2Ic5N/Knk3Vo=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-246-3kn76Q_yP-2tiK1JTU1RpA-1; Mon, 31 Oct 2022 06:41:26 -0400
+X-MC-Unique: 3kn76Q_yP-2tiK1JTU1RpA-1
+Received: by mail-pj1-f69.google.com with SMTP id my9-20020a17090b4c8900b002130d29fd7cso10263150pjb.7
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 03:41:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jg34LqUFq9kapneHl8gAo0S9bhs12rrReRlScpgS/yc=;
+        b=GxVqnT7EiZSaaKOi7M4OGVmx43FV5H15mA9adUX29kVuNEY+54zdb6logDtrr0wOWB
+         +w1eLeMyxK4HJGZWGNx8+QkzfN2s3oFdIUSTpjbBjp+bFdVIbphBHmYUVlAtREkAvkVQ
+         xpfMS6tM8Xh9NtYHFx+swXFV7HQzwPkIz1v0A9lLdu+1THfUtTwE/dfPKSj7lYLupH/6
+         hcSbndPITtdFu+v68Aih/AZogpWKpTT/vSvZWIkVQb49ICCw+cM44FlXOBxqJU1AOuO1
+         SE3izAdYDpaCoEmNThEaRGYrpPtvzyxTSdkTQSC/5jAWFJIdsikK4ZjGgD6zF9fe7frF
+         TWpg==
+X-Gm-Message-State: ACrzQf0tzd4IoML5ky7+jVoGZdPqb5Qr+EAw+XElm0x8BgMGZp8ujRtH
+        al5LQG9QvUbO+/kKYec+ZhM44gH1Ti5mwbcqGR9+b+ZRBemI0JW8qEkXMu6ygUXMdPQbC/1q6C+
+        LnK7lkM5dt7OmX4R1sqQWYJsNt5Xy
+X-Received: by 2002:a05:6a00:170b:b0:56d:4b31:c4cf with SMTP id h11-20020a056a00170b00b0056d4b31c4cfmr7367844pfc.68.1667212884966;
+        Mon, 31 Oct 2022 03:41:24 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5gXKVkhk9oEKr0v8jRDpRWowu8I9+BcHP9jg2RaNQ//MdQeP6EIwqtOTZ9+Nypmb1XNOQJT+mS3kYaqMaLQ4A=
+X-Received: by 2002:a05:6a00:170b:b0:56d:4b31:c4cf with SMTP id
+ h11-20020a056a00170b00b0056d4b31c4cfmr7367822pfc.68.1667212884618; Mon, 31
+ Oct 2022 03:41:24 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|SA1PR11MB6919:EE_
-X-MS-Office365-Filtering-Correlation-Id: 82937d22-c805-49c7-cc09-08dabb2c07c8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jV/7JHLc8NPmtX5kQg8mLfgPx1C/7qkmFcuvgfzo1DlZb+J0LAxDJTS52qWEcoLZX29idvPf2E0Uo5xn4shOhPbm4hY8FHWZNw+UyORA2+M7At5yvxCerA4yOMECAthKRe0ooCJyfVJ0kmv6ef8dpN0fFYxNR5kq9X12srMWft0km+WD6rmo5Wq0Ri4vZEo/o20HnDMcjSDWUlJ38khALZeMsif4Fz8vhP8qy6JplMM1VGnud4iIIapC8wHgPLkayh6vDoIxshecoOH3l6ls0/kjMEycmYWCmDnJF8YTV7TIjO87N+uxIP8p250nrEfToN4RTedOwG0etNdr7vKSLMUbFLGYetXilai2bLP45nm7bF0yG3tFRS0LaUAje6quxHN1TrqHG9Z0xyHurEVozv7jbDZ4SD8wV/DY9WCGPVeQFW70oDXXyqm75yAHO19MMlOzsdncJ/JGKuWuNQUQ7J2A5yQb9kHn9FT+y9GHiGh7m/VA2VikmiQzEr+wKN+0FFbFFDunzlNyHSLQupoJ+ufgH9Ln0LmOnavQrhSU1GHUo0w2/FVVwAh/GlIgze7d0TVPURBVuMwieimZy0DY34ELNXxOqRNIF0KSAjKdf2+vYEA0YFKYzggXsg4sadZpSIvmyiQVi+XUzimkHknbLjv0HrN/fDA1pQkb37ZZ3zvWQa/ackoCSFQnWGMNg6W/UWKBUx5BmY2f9lmz9YjPY00oD0cuhM+MS951GFM725SSFOE6B0NZjX95u+K/o0omohXfer5FCJoyrgMaC4Yy/QaZBcd3sXP7CUiLK2gn3Y79WSOIhrBWfrMPeignMjECjA1s9HtrdRZOsTPFW7B/QG2je7iwtWr9UUX4r2WQTNPF5FMaDWGbYXQKMnUVj6jAWhjdXJeaIQaBHgDL7h+W/g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(366004)(136003)(346002)(396003)(39860400002)(451199015)(82960400001)(38100700002)(921005)(36756003)(86362001)(31696002)(2906002)(6486002)(966005)(6666004)(478600001)(7406005)(8676002)(316002)(6506007)(8936002)(4326008)(66946007)(66556008)(66476007)(7416002)(6636002)(54906003)(41300700001)(5660300002)(110136005)(2616005)(186003)(53546011)(26005)(6512007)(83380400001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?V21LTjhNaFlOOTVPQ1BmRDdwZTZac05LVDRGWFlsK1VuUmhtWURJRFNmak5i?=
- =?utf-8?B?dis3a1Nkakl1UWZ1R1Mvcnljckx3bFlsZXlVZWwrbnVlNFhmUGRKWkRlcFQ1?=
- =?utf-8?B?QWpidktHNjljcG0xaXFxdXJUdC8wOGR2TVJjdnI0OU9ia3VSeXNQMXlUcnNJ?=
- =?utf-8?B?akIzNHlmcHZyalcyb0x5KzJubmdlaWVRTGliMG5zR1lDSDJGVndGbDJNYlZ1?=
- =?utf-8?B?VXlSS09VNlVwZnVsZk85M3dSMDl3VkYwcTdUajQzanpEVWM3WmhONi9JaDVY?=
- =?utf-8?B?YXFHcHFWRUoyT3AwWW8wWDlVWStNeC9ZTTRXdHJsUnNyMkNMUk01Vnpsbmh6?=
- =?utf-8?B?WXZmdWFXU3RzVk5Ta2RJcWRzakE3OC9QUzUwMWlVb0Rsb1ppcVhTNkdqdTdV?=
- =?utf-8?B?cEorZlB6V1V1RjdaKys3ODk4bzB2T2I0SmZVb25JSUs0R3FyZmVUM0R6ekli?=
- =?utf-8?B?aEk2OGRqdFg5Ymp1QkhkTzZTOUJOVkwwcTlHclRqelZWZGl5SHdHN3JYMmc5?=
- =?utf-8?B?MEdmMUs1YzRrc1c5ZGw0cGFESU9IdjlIR2lSUXhNODIybXdxWE9aT09pUlNj?=
- =?utf-8?B?RUhQMm5SNlBNcG00OGpzRE91aExSRW1NQm8yNDBiaHlRNnhCRXFoR3pZc25r?=
- =?utf-8?B?M2ZSRDdWN3dQenM2UzhpUEtVUWk4WWQ2ZmNFN0o0QXhITHJWbGIrcHBsN1lI?=
- =?utf-8?B?Q0xScUQrNGFhUUxTdGw1OXN6d2RQNmt3Y2xLVC9WN0NHSnFmRDEzcTRtZ2tQ?=
- =?utf-8?B?c0Zac3NBZnhxdm9JTkN2OS9qcG5GdzlLbVkwSi9QYVdMM2F4UEMvTUR3RnlV?=
- =?utf-8?B?T0UybGU3dVRTVmtTR1U1Y1BJWmVWd3dvcUpuanhBTmJGL1B1d0hJWURWMFJP?=
- =?utf-8?B?TTMyVnhOd3JFSjhLYVJrSzNRa1NxVVd2anRmOVVYSEkxOUhtZG4xS3N6Zkpw?=
- =?utf-8?B?UlhMU0kwYm51elMvOUFmcG1wc3VINXhVaExmdE1FSDcxVUhtbTYrd1lmaVlJ?=
- =?utf-8?B?MzByb3kxLzFISkJTNU1jSC90L0VaUS9ucEFDMlp1Z2NTTUNXR0dIYjUra21h?=
- =?utf-8?B?Y01FeVNJSUFMWjFGSUwvak1EVzVNMUFWQ1NPdU4zM1VtZ2xyYWt6blJRU01M?=
- =?utf-8?B?L0hZNEVocmhQWmVlZzY1QjFMOGdzM05USlZBTCtQZThOUnllNGppNlZCTWJC?=
- =?utf-8?B?YXlkMlhSSDcwZUpRU3RxWG9HclhFcFYyTWFnTjZUVVVCVDRSU2dwMk0wcm9V?=
- =?utf-8?B?YjBxMUNvVXJJckoyYkx3cVhzV0JIUkg3ME9seG83SnhOZXRONzc0RnhhbCtO?=
- =?utf-8?B?ZlBWZ3AzNEwrQjRVZUp3ZTVHWU5zaEk4Yy96RGhueXI4UTVMSi8zYWdQTnFW?=
- =?utf-8?B?ZlhOZjFialFvQzJZUk1DajdyV2FZamhqRzFaS3FzQXVhRExrTmZXa2RRU0VK?=
- =?utf-8?B?b2JYT2d3V0dPOFhrRDZZMlpNZnlFMmRYcmFWb1U0ZmtNNUpJWWNvUUxkeDRN?=
- =?utf-8?B?NGhsVzdtMTFGZngrU1pWbVptV2xjc3FQT3Z0cDRhUW9Wdzd4TE5LUHdGRTFB?=
- =?utf-8?B?eFQwV3g3YVBORmxmQlpZeFAvUjBvSURGVi84eUZXZ3AzRDBUUnJWVHZKOHVG?=
- =?utf-8?B?NzVyMHRUOGY5SnpRRlFxRW1UcHgvcDkxWmNadzRtK0ZiNkdPMEl0cTcyMmlI?=
- =?utf-8?B?TWJRQ3dXb29Ca3RvQmd2M29EWWJtMStjL0Y2SzY3ak96NHp4NUZqYmRlcmpp?=
- =?utf-8?B?bStYV1MrbWp3UlJkNXYzeFhCU3FacjNyL3E5RlQ0dUNnUFJDenJjbHAzZkdl?=
- =?utf-8?B?SHlrd1JLRVlYOHFZMlA0T2FqL2dBQ2xXNjdWanNhUDFKSk9SUVVOeUVHQ2ND?=
- =?utf-8?B?NUtWOXl0OTRmWFZENnBjc1RlZnZWcFdOVmlUYm1mY0Q0cjVzU0hSTVhYcHVj?=
- =?utf-8?B?SkpNeiswVXU1bmFNUkgvbjZmeWw5ZW5Nc3BWUjZlSlVDblRJS1VIS21TTUk2?=
- =?utf-8?B?dGZ2dWhNMFlIUldlVHRPZm42TVFBUGV6c0U1OGhPV0JkWDRTeW45azZ5TzJv?=
- =?utf-8?B?Q2hPV3RhbEdmdC9sWlh5L2lxYmN5SmFNMVJSS2RsN3p2WHh5TFVtZUJpY2li?=
- =?utf-8?Q?mH7OSqWQcwcHheDBhCwjSffKI?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82937d22-c805-49c7-cc09-08dabb2c07c8
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2022 10:38:21.3494
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 62AfrJE5Bx/Q9u52s5yBGdYIZkAJWY2xZB5WkgfkmFyX/+z2aC7po7xvUrCSVO3LOQQTQ0rsTm2D6kedBKBumQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6919
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20221011104154.1209338-1-eperezma@redhat.com> <20221011104154.1209338-7-eperezma@redhat.com>
+ <20221031042356-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20221031042356-mutt-send-email-mst@kernel.org>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Mon, 31 Oct 2022 11:40:48 +0100
+Message-ID: <CAJaqyWdmvASZfj5rZLZjUxEnZB2AJWQFKEj30g_w2_0z9vqjow@mail.gmail.com>
+Subject: Re: [PATCH v5 6/6] vdpa: Always start CVQ in SVQ mode
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     qemu-devel@nongnu.org, Gautam Dawar <gdawar@xilinx.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eli Cohen <eli@mellanox.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        Cindy Lu <lulu@redhat.com>,
+        Liuxiangdong <liuxiangdong5@huawei.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Harpreet Singh Anand <hanand@xilinx.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
+On Mon, Oct 31, 2022 at 9:25 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Tue, Oct 11, 2022 at 12:41:54PM +0200, Eugenio P=C3=A9rez wrote:
+> > Isolate control virtqueue in its own group, allowing to intercept contr=
+ol
+> > commands but letting dataplane run totally passthrough to the guest.
+> >
+> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+>
+> I guess we need svq for this. Not a reason to allocate it for
+> all queues.
 
-On 2022/10/26 02:17, Jason Gunthorpe wrote:
-> This series provides an alternative container layer for VFIO implemented
-> using iommufd. This is optional, if CONFIG_IOMMUFD is not set then it will
-> not be compiled in.
-> 
-> At this point iommufd can be injected by passing in a iommfd FD to
-> VFIO_GROUP_SET_CONTAINER which will use the VFIO compat layer in iommufd
-> to obtain the compat IOAS and then connect up all the VFIO drivers as
-> appropriate.
-> 
-> This is temporary stopping point, a following series will provide a way to
-> directly open a VFIO device FD and directly connect it to IOMMUFD using
-> native ioctls that can expose the IOMMUFD features like hwpt, future
-> vPASID and dynamic attachment.
-> 
-> This series, in compat mode, has passed all the qemu tests we have
-> available, including the test suites for the Intel GVT mdev. Aside from
-> the temporary limitation with P2P memory this is belived to be fully
-> compatible with VFIO.
-> 
-> This is on github: https://github.com/jgunthorpe/linux/commits/vfio_iommufd
+I'll document this part better.
 
-In our side, we found the gvt-g test failed. Guest i915 driver stuck at
-init phase. While with your former version  (commit ID 
-a249441ba6fd9d658f4a1b568453e3a742d12686), gvt-g test is passing. I
-noticed there a quite a few change in iommufd/pages.c from last version.
-We are internally tracing in the gvt-g side, may also good to have your
-attention.
+> Also if vdpa does not support pasid then I guess
+> we should not bother with svq.
+>
 
-> It requires the iommufd series:
-> 
-> https://lore.kernel.org/r/0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com
-> 
-> Jason Gunthorpe (10):
->    vfio: Move vfio_device driver open/close code to a function
->    vfio: Move vfio_device_assign_container() into
->      vfio_device_first_open()
->    vfio: Rename vfio_device_assign/unassign_container()
->    vfio: Move storage of allow_unsafe_interrupts to vfio_main.c
->    vfio: Use IOMMU_CAP_ENFORCE_CACHE_COHERENCY for
->      vfio_file_enforced_coherent()
->    vfio-iommufd: Allow iommufd to be used in place of a container fd
->    vfio-iommufd: Support iommufd for physical VFIO devices
->    vfio-iommufd: Support iommufd for emulated VFIO devices
->    vfio: Make vfio_container optionally compiled
->    iommufd: Allow iommufd to supply /dev/vfio/vfio
-> 
->   drivers/gpu/drm/i915/gvt/kvmgt.c              |   3 +
->   drivers/iommu/iommufd/Kconfig                 |  12 +
->   drivers/iommu/iommufd/main.c                  |  35 +-
->   drivers/s390/cio/vfio_ccw_ops.c               |   3 +
->   drivers/s390/crypto/vfio_ap_ops.c             |   3 +
->   drivers/vfio/Kconfig                          |  38 ++-
->   drivers/vfio/Makefile                         |   5 +-
->   drivers/vfio/container.c                      | 136 ++------
->   drivers/vfio/fsl-mc/vfio_fsl_mc.c             |   3 +
->   drivers/vfio/iommufd.c                        | 161 +++++++++
->   .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |   6 +
->   drivers/vfio/pci/mlx5/main.c                  |   3 +
->   drivers/vfio/pci/vfio_pci.c                   |   3 +
->   drivers/vfio/platform/vfio_amba.c             |   3 +
->   drivers/vfio/platform/vfio_platform.c         |   3 +
->   drivers/vfio/vfio.h                           | 100 +++++-
->   drivers/vfio/vfio_iommu_type1.c               |   5 +-
->   drivers/vfio/vfio_main.c                      | 318 ++++++++++++++----
->   include/linux/vfio.h                          |  39 +++
->   19 files changed, 681 insertions(+), 198 deletions(-)
->   create mode 100644 drivers/vfio/iommufd.c
-> 
-> 
-> base-commit: 3bec937e94942a6aee8854be1c1f5cc2b92d15e2
+Yes, if the device does not support ASID or it does not support all
+conditions (like to be able to isolate precisely CVQ in its own AS),
+svq is not enabled.
 
--- 
-Regards,
-Yi Liu
+This is not documented properly in the patch description.
+
+
+> > ---
+> > v5:
+> > * Fixing the not adding cvq buffers when x-svq=3Don is specified.
+> > * Move vring state in vhost_vdpa_get_vring_group instead of using a
+> >   parameter.
+> > * Rename VHOST_VDPA_NET_CVQ_PASSTHROUGH to VHOST_VDPA_NET_DATA_ASID
+> >
+> > v4:
+> > * Squash vhost_vdpa_cvq_group_is_independent.
+> > * Rebased on last CVQ start series, that allocated CVQ cmd bufs at load
+> > * Do not check for cvq index on vhost_vdpa_net_prepare, we only have on=
+e
+> >   that callback registered in that NetClientInfo.
+> >
+> > v3:
+> > * Make asid related queries print a warning instead of returning an
+> >   error and stop the start of qemu.
+> > ---
+> >  hw/virtio/vhost-vdpa.c |   3 +-
+> >  net/vhost-vdpa.c       | 118 +++++++++++++++++++++++++++++++++++++++--
+> >  2 files changed, 115 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+> > index 29d009c02b..fd4de06eab 100644
+> > --- a/hw/virtio/vhost-vdpa.c
+> > +++ b/hw/virtio/vhost-vdpa.c
+> > @@ -682,7 +682,8 @@ static int vhost_vdpa_set_backend_cap(struct vhost_=
+dev *dev)
+> >  {
+> >      uint64_t features;
+> >      uint64_t f =3D 0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2 |
+> > -        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH;
+> > +        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH |
+> > +        0x1ULL << VHOST_BACKEND_F_IOTLB_ASID;
+> >      int r;
+> >
+> >      if (vhost_vdpa_call(dev, VHOST_GET_BACKEND_FEATURES, &features)) {
+> > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> > index f7831aeb8d..6f6ef59ea3 100644
+> > --- a/net/vhost-vdpa.c
+> > +++ b/net/vhost-vdpa.c
+> > @@ -38,6 +38,9 @@ typedef struct VhostVDPAState {
+> >      void *cvq_cmd_out_buffer;
+> >      virtio_net_ctrl_ack *status;
+> >
+> > +    /* Number of address spaces supported by the device */
+> > +    unsigned address_space_num;
+> > +
+> >      /* The device always have SVQ enabled */
+> >      bool always_svq;
+> >      bool started;
+> > @@ -102,6 +105,9 @@ static const uint64_t vdpa_svq_device_features =3D
+> >      BIT_ULL(VIRTIO_NET_F_RSC_EXT) |
+> >      BIT_ULL(VIRTIO_NET_F_STANDBY);
+> >
+> > +#define VHOST_VDPA_NET_DATA_ASID 0
+> > +#define VHOST_VDPA_NET_CVQ_ASID 1
+> > +
+> >  VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
+> >  {
+> >      VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> > @@ -226,6 +232,34 @@ static NetClientInfo net_vhost_vdpa_info =3D {
+> >          .check_peer_type =3D vhost_vdpa_check_peer_type,
+> >  };
+> >
+> > +static uint32_t vhost_vdpa_get_vring_group(int device_fd, unsigned vq_=
+index)
+> > +{
+> > +    struct vhost_vring_state state =3D {
+> > +        .index =3D vq_index,
+> > +    };
+> > +    int r =3D ioctl(device_fd, VHOST_VDPA_GET_VRING_GROUP, &state);
+> > +
+> > +    return r < 0 ? 0 : state.num;
+> > +}
+> > +
+> > +static int vhost_vdpa_set_address_space_id(struct vhost_vdpa *v,
+> > +                                           unsigned vq_group,
+> > +                                           unsigned asid_num)
+> > +{
+> > +    struct vhost_vring_state asid =3D {
+> > +        .index =3D vq_group,
+> > +        .num =3D asid_num,
+> > +    };
+> > +    int ret;
+> > +
+> > +    ret =3D ioctl(v->device_fd, VHOST_VDPA_SET_GROUP_ASID, &asid);
+> > +    if (unlikely(ret < 0)) {
+> > +        warn_report("Can't set vq group %u asid %u, errno=3D%d (%s)",
+> > +            asid.index, asid.num, errno, g_strerror(errno));
+> > +    }
+> > +    return ret;
+> > +}
+> > +
+> >  static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *addr)
+> >  {
+> >      VhostIOVATree *tree =3D v->iova_tree;
+> > @@ -300,11 +334,50 @@ dma_map_err:
+> >  static int vhost_vdpa_net_cvq_start(NetClientState *nc)
+> >  {
+> >      VhostVDPAState *s;
+> > -    int r;
+> > +    struct vhost_vdpa *v;
+> > +    uint32_t cvq_group;
+> > +    int cvq_index, r;
+> >
+> >      assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+> >
+> >      s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> > +    v =3D &s->vhost_vdpa;
+> > +
+> > +    v->listener_shadow_vq =3D s->always_svq;
+> > +    v->shadow_vqs_enabled =3D s->always_svq;
+> > +    s->vhost_vdpa.address_space_id =3D VHOST_VDPA_NET_DATA_ASID;
+> > +
+> > +    if (s->always_svq) {
+> > +        goto out;
+> > +    }
+> > +
+> > +    if (s->address_space_num < 2) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    /**
+> > +     * Check if all the virtqueues of the virtio device are in a diffe=
+rent vq
+> > +     * than the last vq. VQ group of last group passed in cvq_group.
+> > +     */
+> > +    cvq_index =3D v->dev->vq_index_end - 1;
+> > +    cvq_group =3D vhost_vdpa_get_vring_group(v->device_fd, cvq_index);
+> > +    for (int i =3D 0; i < cvq_index; ++i) {
+> > +        uint32_t group =3D vhost_vdpa_get_vring_group(v->device_fd, i)=
+;
+> > +
+> > +        if (unlikely(group =3D=3D cvq_group)) {
+> > +            warn_report("CVQ %u group is the same as VQ %u one (%u)", =
+cvq_group,
+> > +                        i, group);
+> > +            return 0;
+> > +        }
+> > +    }
+> > +
+> > +    r =3D vhost_vdpa_set_address_space_id(v, cvq_group, VHOST_VDPA_NET=
+_CVQ_ASID);
+> > +    if (r =3D=3D 0) {
+> > +        v->shadow_vqs_enabled =3D true;
+> > +        s->vhost_vdpa.address_space_id =3D VHOST_VDPA_NET_CVQ_ASID;
+> > +    }
+> > +
+> > +out:
+> >      if (!s->vhost_vdpa.shadow_vqs_enabled) {
+> >          return 0;
+> >      }
+> > @@ -576,12 +649,38 @@ static const VhostShadowVirtqueueOps vhost_vdpa_n=
+et_svq_ops =3D {
+> >      .avail_handler =3D vhost_vdpa_net_handle_ctrl_avail,
+> >  };
+> >
+> > +static uint32_t vhost_vdpa_get_as_num(int vdpa_device_fd)
+> > +{
+> > +    uint64_t features;
+> > +    unsigned num_as;
+> > +    int r;
+> > +
+> > +    r =3D ioctl(vdpa_device_fd, VHOST_GET_BACKEND_FEATURES, &features)=
+;
+> > +    if (unlikely(r < 0)) {
+> > +        warn_report("Cannot get backend features");
+> > +        return 1;
+> > +    }
+> > +
+> > +    if (!(features & BIT_ULL(VHOST_BACKEND_F_IOTLB_ASID))) {
+> > +        return 1;
+> > +    }
+> > +
+> > +    r =3D ioctl(vdpa_device_fd, VHOST_VDPA_GET_AS_NUM, &num_as);
+> > +    if (unlikely(r < 0)) {
+> > +        warn_report("Cannot retrieve number of supported ASs");
+> > +        return 1;
+> > +    }
+> > +
+> > +    return num_as;
+> > +}
+> > +
+> >  static NetClientState *net_vhost_vdpa_init(NetClientState *peer,
+> >                                             const char *device,
+> >                                             const char *name,
+> >                                             int vdpa_device_fd,
+> >                                             int queue_pair_index,
+> >                                             int nvqs,
+> > +                                           unsigned nas,
+> >                                             bool is_datapath,
+> >                                             bool svq,
+> >                                             VhostIOVATree *iova_tree)
+> > @@ -600,6 +699,7 @@ static NetClientState *net_vhost_vdpa_init(NetClien=
+tState *peer,
+> >      snprintf(nc->info_str, sizeof(nc->info_str), TYPE_VHOST_VDPA);
+> >      s =3D DO_UPCAST(VhostVDPAState, nc, nc);
+> >
+> > +    s->address_space_num =3D nas;
+> >      s->vhost_vdpa.device_fd =3D vdpa_device_fd;
+> >      s->vhost_vdpa.index =3D queue_pair_index;
+> >      s->always_svq =3D svq;
+> > @@ -686,6 +786,8 @@ int net_init_vhost_vdpa(const Netdev *netdev, const=
+ char *name,
+> >      g_autoptr(VhostIOVATree) iova_tree =3D NULL;
+> >      NetClientState *nc;
+> >      int queue_pairs, r, i =3D 0, has_cvq =3D 0;
+> > +    unsigned num_as =3D 1;
+> > +    bool svq_cvq;
+> >
+> >      assert(netdev->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
+> >      opts =3D &netdev->u.vhost_vdpa;
+> > @@ -711,7 +813,13 @@ int net_init_vhost_vdpa(const Netdev *netdev, cons=
+t char *name,
+> >          return queue_pairs;
+> >      }
+> >
+> > -    if (opts->x_svq) {
+> > +    svq_cvq =3D opts->x_svq;
+> > +    if (has_cvq && !opts->x_svq) {
+> > +        num_as =3D vhost_vdpa_get_as_num(vdpa_device_fd);
+> > +        svq_cvq =3D num_as > 1;
+> > +    }
+> > +
+> > +    if (opts->x_svq || svq_cvq) {
+> >          struct vhost_vdpa_iova_range iova_range;
+> >
+> >          uint64_t invalid_dev_features =3D
+> > @@ -734,15 +842,15 @@ int net_init_vhost_vdpa(const Netdev *netdev, con=
+st char *name,
+> >
+> >      for (i =3D 0; i < queue_pairs; i++) {
+> >          ncs[i] =3D net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
+> > -                                     vdpa_device_fd, i, 2, true, opts-=
+>x_svq,
+> > -                                     iova_tree);
+> > +                                     vdpa_device_fd, i, 2, num_as, tru=
+e,
+> > +                                     opts->x_svq, iova_tree);
+> >          if (!ncs[i])
+> >              goto err;
+> >      }
+> >
+> >      if (has_cvq) {
+> >          nc =3D net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
+> > -                                 vdpa_device_fd, i, 1, false,
+> > +                                 vdpa_device_fd, i, 1, num_as, false,
+> >                                   opts->x_svq, iova_tree);
+> >          if (!nc)
+> >              goto err;
+> > --
+> > 2.31.1
+>
 
