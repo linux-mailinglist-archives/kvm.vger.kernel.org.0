@@ -2,183 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDCEA614215
-	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 01:05:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6742E61415B
+	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 00:09:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229642AbiKAAFz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 20:05:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46890 "EHLO
+        id S229574AbiJaXJx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 19:09:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbiKAAFv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 20:05:51 -0400
-X-Greylist: delayed 3928 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 31 Oct 2022 17:05:50 PDT
-Received: from mx0b-00190b01.pphosted.com (mx0b-00190b01.pphosted.com [IPv6:2620:100:9005:57f::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8553A11A1A
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 17:05:50 -0700 (PDT)
-Received: from pps.filterd (m0050096.ppops.net [127.0.0.1])
-        by m0050096.ppops.net-00190b01. (8.17.1.19/8.17.1.19) with ESMTP id 29VKxi4a018339;
-        Mon, 31 Oct 2022 23:00:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=jan2016.eng;
- bh=E0duj+AzpkH4laHokeHVWzVk4gjxS08+GRiACXqmFPg=;
- b=ZXYRFdpCei4Koi7qvfkOGCgUsIejnX67DuGHIGao2kOMxTkbL4h5pCNcH4Rs+tiUL5wm
- lJz7I582dhGy9ChXzsQQSYk2lQyNXrrRtr85/Jy47AlivymfpZ39ZfEYLWQsNIWACJDa
- n4pprS96E+6QuaK9JMo5zcuq5LfT9LWnTW0lJEi4GfaQyrOB86kZUYt2hhMInEYcTdYU
- gbKcPbBiAR0Yi3tXA6JBsl8g4Zxv+YpRb7tZgDL1K6rkq4XKhpxid4jH3aRMbjrUihu0
- 6f2I43DaZ2rHOr/jcSwSYWq+IklbwmdaECzaeONEQSl0WAFMs2UFJFPVWyKOkGAV6GgG Yg== 
-Received: from prod-mail-ppoint2 (prod-mail-ppoint2.akamai.com [184.51.33.19] (may be forged))
-        by m0050096.ppops.net-00190b01. (PPS) with ESMTPS id 3kjjwpf0s9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 31 Oct 2022 23:00:18 +0000
-Received: from pps.filterd (prod-mail-ppoint2.akamai.com [127.0.0.1])
-        by prod-mail-ppoint2.akamai.com (8.17.1.5/8.17.1.5) with ESMTP id 29VMh5ZG032182;
-        Mon, 31 Oct 2022 19:00:18 -0400
-Received: from email.msg.corp.akamai.com ([172.27.91.26])
-        by prod-mail-ppoint2.akamai.com (PPS) with ESMTPS id 3kgygxqmep-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 31 Oct 2022 19:00:18 -0400
-Received: from usma1ex-dag4mb8.msg.corp.akamai.com (172.27.91.27) by
- usma1ex-dag4mb7.msg.corp.akamai.com (172.27.91.26) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.12; Mon, 31 Oct 2022 19:00:17 -0400
-Received: from usma1ex-dag4mb8.msg.corp.akamai.com ([172.27.91.27]) by
- usma1ex-dag4mb8.msg.corp.akamai.com ([172.27.91.27]) with mapi id
- 15.02.1118.012; Mon, 31 Oct 2022 19:00:17 -0400
-From:   "Jayaramappa, Srilakshmi" <sjayaram@akamai.com>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "suleiman@google.com" <suleiman@google.com>,
-        "Hunt, Joshua" <johunt@akamai.com>
-Subject: Re: KVM: x86: snapshotted TSC frequency causing time drifts in vms
-Thread-Topic: KVM: x86: snapshotted TSC frequency causing time drifts in vms
-Thread-Index: AQHY7VUBvAGfvnsQJ0OJYynFST/RMK4pUIaA///MAaE=
-Date:   Mon, 31 Oct 2022 23:00:17 +0000
-Message-ID: <5394d31b6be148b49b80b33aaa39ff45@akamai.com>
-References: <a49dfacc8a99424a94993171ba2955a0@akamai.com>,<Y2BFSZ1ExLiOIIi9@google.com>
-In-Reply-To: <Y2BFSZ1ExLiOIIi9@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.27.164.27]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229505AbiJaXJw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 19:09:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72DE12BE7
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 16:08:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667257729;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VQFFGriLEOJQiVzKnvQsJXHkfhk9DM13xloxVckNyEY=;
+        b=bUoZZaERRZKDsx4vIU+VkxULEG0XZH6GHAVi08SnZRBzKFY2q1NF82A8NEBBVJsm2T6Zwx
+        t7VDqr5orKvw+4KcjIQZ1xvdufanElwoJNPhDj5gY7FrEyb7N9mcpRNMtl/T2Aer6Mf/f/
+        xzYPZKa4c0uY9WAbGXzMlJBUsPPuAYQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-570-qvL3ykXUNg-TfIivNzV1IQ-1; Mon, 31 Oct 2022 19:08:44 -0400
+X-MC-Unique: qvL3ykXUNg-TfIivNzV1IQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3A06C3804506;
+        Mon, 31 Oct 2022 23:08:43 +0000 (UTC)
+Received: from [10.64.54.151] (vpn2-54-151.bne.redhat.com [10.64.54.151])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 79B7C17584;
+        Mon, 31 Oct 2022 23:08:34 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v7 5/9] KVM: arm64: Improve no-running-vcpu report for
+ dirty ring
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+        ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
+        catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
+        pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
+        james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+References: <20221031003621.164306-1-gshan@redhat.com>
+ <20221031003621.164306-6-gshan@redhat.com> <Y1+QiS0S3e6b358Q@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <d3a4278a-94e2-7af4-da2d-946c903d8825@redhat.com>
+Date:   Tue, 1 Nov 2022 07:08:32 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-31_21,2022-10-31_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0
- mlxlogscore=999 suspectscore=0 phishscore=0 spamscore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2210310142
-X-Proofpoint-GUID: Hx8VAXfcyKdVMdrhsl3NDRnnsLA-_KxW
-X-Proofpoint-ORIG-GUID: Hx8VAXfcyKdVMdrhsl3NDRnnsLA-_KxW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-31_21,2022-10-31_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 mlxlogscore=999
- malwarescore=0 priorityscore=1501 impostorscore=0 mlxscore=0 bulkscore=0
- adultscore=0 phishscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2210310143
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Y1+QiS0S3e6b358Q@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 10/31/22 5:08 PM, Oliver Upton wrote:
+> On Mon, Oct 31, 2022 at 08:36:17AM +0800, Gavin Shan wrote:
+>> KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP should be enabled only when KVM
+>> device "kvm-arm-vgic-its" is used by userspace. Currently, it's the
+>> only case where a running VCPU is missed for dirty ring. However,
+>> there are potentially other devices introducing similar error in
+>> future.
+>>
+>> In order to report those broken devices only, the no-running-vcpu
+>> warning message is escaped from KVM device "kvm-arm-vgic-its". For
+>> this, the function vgic_has_its() needs to be exposed with a more
+>> generic function name (kvm_vgic_has_its()).
+>>
+>> Link: https://lore.kernel.org/kvmarm/Y1ghIKrAsRFwSFsO@google.com
+>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> 
+> I don't think this should be added as a separate patch.
+> 
+> The weak kvm_arch_allow_write_without_running_vcpu() (and adding its
+> caller) should be rolled into patch 4/9. The arm64 implementation of
+> that should be introduced in patch 6/9.
+> 
 
-From: Sean Christopherson <seanjc@google.com>
-Sent: Monday, October 31, 2022 5:59 PM
-To: Jayaramappa, Srilakshmi
-Cc: kvm@vger.kernel.org; pbonzini@redhat.com; vkuznets@redhat.com; mlevitsk=
-@redhat.com; suleiman@google.com; Hunt, Joshua
-Subject: Re: KVM: x86: snapshotted TSC frequency causing time drifts in vms
-=A0  =20
-On Mon, Oct 31, 2022, Jayaramappa, Srilakshmi wrote:
-> Hi,
->=20
-> We were recently notified of significant time drift on some of our virtua=
-l
-> machines. Upon investigation it was found that the jumps in time were lar=
-ger
-> than ntp was able to gracefully correct. After further probing we discove=
-red
-> that the affected vms booted with tsc frequency equal to the early tsc
-> frequency of the host and not the calibrated frequency.
->=20
-> There were two variables that cached tsc_khz - cpu_tsc_khz and max_tsc_kh=
-z.
-> Caching max_tsc_khz would cause further scaling of the user_tsc_khz when =
-the
-> vcpu is created after the host tsc calibrabration and kvm is loaded befor=
-e
-> calibration. But it appears that Sean's commit "KVM: x86: Don't snapshot
-> "max" TSC if host TSC is constant" would fix that issue. [1]
->=20
-> The cached cpu_tsc_khz is used in 1. get_kvmclock_ns() which incorrectly =
-sets
-> the factors hv_clock.tsc_to_system_mul and hv_clock.shift that estimate
-> passage of time.=A0 2. kvm_guest_time_update()
->=20
-> We came across Anton Romanov's patch "KVM: x86: Use current rather than
-> snapshotted TSC frequency if it is constant" [2] that seems to address th=
-e
-> cached cpu_tsc_khz=A0 case. The patch description says "the race can be h=
-it if
-> and only if userspace is able to create a VM before TSC refinement
-> completes". We think as long as the kvm module is loaded before the host =
-tsc
-> calibration happens the vms can be created anytime and they will have the
-> problem (confirmed this by shutting down an affected vm and relaunching i=
-t -
-> it continued to experience time issues). VMs need not be created before t=
-sc
-> refinement.
->=20
-> Even if kvm module loads and vcpu is created before the host tsc refineme=
-nt
-> and have incorrect time estimation on the vm until the tsc refinement, th=
-e
-> patches referenced here would subsequently provide the correct factors to
-> determine time. And any error in time in that small interval can be corre=
-cted
-> by ntp if it is running on the guest. If there was no ntp, the error woul=
-d
-> probably be negligible and would not accumulate.
->=20
-> There doesn't seem to be any response on the v6 of Anton's patch. I wante=
-d to
-> ask if there is further changes in progress or if it is all set to be mer=
-ged?
+Ok, the changes will be distributed in PATCH[4/9] and PATCH[6/9].
 
-Drat, it slipped through the cracks.
+>> ---
+>>   arch/arm64/kvm/mmu.c               | 14 ++++++++++++++
+>>   arch/arm64/kvm/vgic/vgic-init.c    |  4 ++--
+>>   arch/arm64/kvm/vgic/vgic-irqfd.c   |  4 ++--
+>>   arch/arm64/kvm/vgic/vgic-its.c     |  2 +-
+>>   arch/arm64/kvm/vgic/vgic-mmio-v3.c | 18 ++++--------------
+>>   arch/arm64/kvm/vgic/vgic.c         | 10 ++++++++++
+>>   arch/arm64/kvm/vgic/vgic.h         |  1 -
+>>   include/kvm/arm_vgic.h             |  1 +
+>>   include/linux/kvm_dirty_ring.h     |  1 +
+>>   virt/kvm/dirty_ring.c              |  5 +++++
+>>   virt/kvm/kvm_main.c                |  2 +-
+>>   11 files changed, 41 insertions(+), 21 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 60ee3d9f01f8..e0855b2b3d66 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -932,6 +932,20 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+>>   	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
+>>   }
+>>   
+>> +/*
+>> + * kvm_arch_allow_write_without_running_vcpu - allow writing guest memory
+>> + * without the running VCPU when dirty ring is enabled.
+>> + *
+>> + * The running VCPU is required to track dirty guest pages when dirty ring
+>> + * is enabled. Otherwise, the backup bitmap should be used to track the
+>> + * dirty guest pages. When vgic/its is enabled, we need to use the backup
+>> + * bitmap to track the dirty guest pages for it.
+>> + */
+>> +bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
+>> +{
+>> +	return kvm->dirty_ring_with_bitmap && kvm_vgic_has_its(kvm);
+>> +}
+> 
+> It is trivial for userspace to cause a WARN to fire like this. Just set
+> up the VM with !RING_WITH_BITMAP && ITS.
+> 
+> The goal is to catch KVM bugs, not userspace bugs, so I'd suggest only
+> checking whether or not an ITS is present.
+> 
+> [...]
+> 
 
-Paolo, can you pick up the below patch?=A0 Oobviously assuming you don't sp=
-y any
-problems.
+Ok. 'kvm->dirty_ring_with_bitmap' needn't to be checked here if we don't
+plan to catch userspace bug. Marc had suggestions to escape from the
+no-running-vcpu check only when vgic/its tables are being restored [1].
 
-It has a superficial conflict with commit 938c8745bcf2 ("KVM: x86: Introduc=
-e
-"struct kvm_caps" to track misc caps/settings"), but otherwise applies clea=
-nly.
+In order to cover Marc's concern, I would introduce a different helper
+kvm_vgic_save_its_tables_in_progress(), which simply returns
+'bool struct vgic_dist::save_its_tables_in_progress'. The newly added
+field is set and cleared in vgic_its_ctrl(). All these changes will be
+folded to PATCH[v7 6/9]. Oliver and Marc, could you please let me know
+if the changes sounds good?
 
-> [2]  https://urldefense.com/v3/__https://lore.kernel.org/all/202206081835=
-25.1143682-1-romanton@google.com/__;!!GjvTz_vk!QH6DrxJkEWcYdjwasd9zcBVokREj=
-7lO9qb6tynY5SpQoRRXRxi959dCvoy_sbU9oRcrSbNCxXwA_dw$
+    static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
+    {
+        const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+        struct vgic_dist *dist = &kvm->arch.vgic;
+        int ret = 0;
+          :
+        switch (attr) {
+        case KVM_DEV_ARM_ITS_CTRL_RESET:
+             vgic_its_reset(kvm, its);
+             break;
+        case KVM_DEV_ARM_ITS_SAVE_TABLES:
+             dist->save_its_tables_in_progress = true;
+             ret = abi->save_tables(its);
+             dist->save_its_tables_in_progress = false;
+             break;
+        case KVM_DEV_ARM_ITS_RESTORE_TABLES:
+             ret = abi->restore_tables(its);
+             break;
+        }
+        :
+     }
+  
+[1] https://lore.kernel.org/kvmarm/2ce535e9-f57a-0ab6-5c30-2b8afd4472e6@redhat.com/T/#mcf10e2d3ca0235ab1cac8793d894c1634666d280
 
+>> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+>> index 91201f743033..10218057c176 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+>> @@ -38,20 +38,10 @@ u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
+>>   	return reg | ((u64)val << lower);
+>>   }
+>>   
+>> -bool vgic_has_its(struct kvm *kvm)
+>> -{
+>> -	struct vgic_dist *dist = &kvm->arch.vgic;
+>> -
+>> -	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
+>> -		return false;
+>> -
+>> -	return dist->has_its;
+>> -}
+>> -
+> 
+> nit: renaming/exposing this helper should be done in a separate patch.
+> Also, I don't think you need to move it anywhere either.
+> 
+> [...]
+> 
 
+As Marc suggested, we tend to escape the site of saving vgic/its tables from
+the no-running-vcpu check. So we need a new helper kvm_vgic_save_its_tables_in_progress()
+instead, meaning kvm_vgic_has_its() isn't needed.
 
-Thanks, Sean! Appreciate it.
+>> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+>> index 7ce6a5f81c98..f27e038043f3 100644
+>> --- a/virt/kvm/dirty_ring.c
+>> +++ b/virt/kvm/dirty_ring.c
+>> @@ -26,6 +26,11 @@ bool kvm_use_dirty_bitmap(struct kvm *kvm)
+>>   	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
+>>   }
+>>   
+>> +bool __weak kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
+>> +{
+>> +	return kvm->dirty_ring_with_bitmap;
+>> +}
+>> +
+> 
+> Same comment on the arm64 implementation applies here. This should just
+> return false by default.
+> 
 
--Sri
+Ok. It return 'false' and the addition of kvm_arch_allow_write_without_running_vcpu()
+will be folded to PATCH[4/9], as you suggested.
 
+Thanks,
+Gavin
 
-    =
