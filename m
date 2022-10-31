@@ -2,69 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6742E61415B
-	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 00:09:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8B1B6141A3
+	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 00:24:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbiJaXJx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 19:09:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35436 "EHLO
+        id S229668AbiJaXYh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 19:24:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbiJaXJw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 19:09:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72DE12BE7
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 16:08:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667257729;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VQFFGriLEOJQiVzKnvQsJXHkfhk9DM13xloxVckNyEY=;
-        b=bUoZZaERRZKDsx4vIU+VkxULEG0XZH6GHAVi08SnZRBzKFY2q1NF82A8NEBBVJsm2T6Zwx
-        t7VDqr5orKvw+4KcjIQZ1xvdufanElwoJNPhDj5gY7FrEyb7N9mcpRNMtl/T2Aer6Mf/f/
-        xzYPZKa4c0uY9WAbGXzMlJBUsPPuAYQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-570-qvL3ykXUNg-TfIivNzV1IQ-1; Mon, 31 Oct 2022 19:08:44 -0400
-X-MC-Unique: qvL3ykXUNg-TfIivNzV1IQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3A06C3804506;
-        Mon, 31 Oct 2022 23:08:43 +0000 (UTC)
-Received: from [10.64.54.151] (vpn2-54-151.bne.redhat.com [10.64.54.151])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 79B7C17584;
-        Mon, 31 Oct 2022 23:08:34 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v7 5/9] KVM: arm64: Improve no-running-vcpu report for
- dirty ring
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-        ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
-        catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
-        pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
-        james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-References: <20221031003621.164306-1-gshan@redhat.com>
- <20221031003621.164306-6-gshan@redhat.com> <Y1+QiS0S3e6b358Q@google.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <d3a4278a-94e2-7af4-da2d-946c903d8825@redhat.com>
-Date:   Tue, 1 Nov 2022 07:08:32 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S229946AbiJaXYX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 19:24:23 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2056.outbound.protection.outlook.com [40.107.223.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F38471116F;
+        Mon, 31 Oct 2022 16:24:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XhbzylFyeYx9CdhoSx30Bq4qJDeXxJtCu/MTAcSafBYmI9H+65Fvny5oC4POXgLlBkNFkLQxhuV5/eRB4WkdWBmDg5UhcCsky/g9wJzGeojPY+g4d2XNWQNiSQp7r52UbsIJNdhPSAwUnkhrMfZpxcy2ZRSUjEKhciShSNx768DB3ON+A4c8UyST9YfcesnbXTX1Vi/qHwk1lIAb+X12OYpbfib9icwh+U7bBMUyCe70k04AGcVmwlylg0eW8/32hhhMzLFJIIcjr2BqjfFj1qwE5QP2wdASIP9Tulzd3EGJhXG9o/HD/iMgfhsgOyTBDTv1Idqkm3AAAvRAX4UEEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rfT+UhN1hCVxNARMVWehY2yYimz/SzErbhDNhnBYRNI=;
+ b=NOcXXQB+tOkrR+Y5NBX7G0C9zsjdgl4K1dGeMSspmAUf0/tz8Lb/juXeU8ZhCmMo7WAB5xHCn+PQwaznKRNo9qyKnuLKLT4yezyFo8qc66Ap6l/rjVo7NywxdpGc2X0V72il1Ov/himagXuUd4lFzPLCxKj9wtfCkGx9TL/Kca1fy1NNFb/tEwAQ8eP0X1lgIgyLxLoNPNmL1rCkwxC968EtgoMooNhooZpOT1fegj11edOJ4j7uVXKn2XcRrDT7O0g1lDJ95pZz9RlWGF+g/XjVUKRP2S7WgLu5Pe4+hTfXf660VX3IftXUtcof8WvRDo7J2NGBO59cma+3g9/Zug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rfT+UhN1hCVxNARMVWehY2yYimz/SzErbhDNhnBYRNI=;
+ b=D9vcslJrw388IPWUmjlt4b/67U9SKX5kw9DNy1tgjwyD88F6/UfUw6sM38r6ykUH/GEeFeJ2u7REwRE9HzrRrh13fj3BzfTfNURkNKtAc/E0zRapEuDkgEQ0/XehAu+uGpY/HQN8Ejj+CY5h6/TS2HJppu2HbayiztTG/GyGPRpUpWRoLBdH2u7o6eFUHA8M0Zrwxjxgo/hDPiC3nKHboWeORp+iWvHKxwakuMwvwRAkkn8U96haRPKUk9sSuoEm0RY0S6N0TtRuJ37iCroRdlegisdtteKxf7LtqlfdP/8Jjj3arTdcP2YN+QG3PE9k0elJdnGIgCRPmkPvevttVA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DS7PR12MB6263.namprd12.prod.outlook.com (2603:10b6:8:95::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.19; Mon, 31 Oct
+ 2022 23:24:15 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5769.015; Mon, 31 Oct 2022
+ 23:24:15 +0000
+Date:   Mon, 31 Oct 2022 20:24:13 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+Subject: Re: [PATCH 00/10] Connect VFIO to IOMMUFD
+Message-ID: <Y2BZHZXJwxF5C4a8@nvidia.com>
+References: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
+ <39eb11ed-dbf2-822a-dc79-5b70a49c430b@intel.com>
+ <Y1+9IB+DI9v+nD0P@nvidia.com>
+ <d8a0352e-9e1d-5b01-7616-dccc73a172a6@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d8a0352e-9e1d-5b01-7616-dccc73a172a6@intel.com>
+X-ClientProxiedBy: CH2PR20CA0019.namprd20.prod.outlook.com
+ (2603:10b6:610:58::29) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-In-Reply-To: <Y1+QiS0S3e6b358Q@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB6263:EE_
+X-MS-Office365-Filtering-Correlation-Id: 370d6fd0-dc20-4fb8-e6d4-08dabb97069b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YsKVJ6EAyQEFJUvZL8Vm8ERFzpnUzVfRYY1+0TYXhDOLip1I4C2S0Mp8pYywGorJn6l4eArTs1s7l7vi1vUdcVguh9LpB6awEBLciH9woNHzbDIKqr07UKihdVpn2JyBVKoZ/9SLx14np3n5ciS17X19Vf+NDm8QUql1bwr2yVcK74cJuxOnss8DZ3zrH+lQdVrf1Lhh9N8hh/DDWmiIoQJjT0GbFRgJZx7w9clZ3EfrLmoBSVmsmnhijqXFpw2GESiTTwxQPGML6lYMcExIyhiKPPkJEVSQk8xbikCduTxpww6yxlyAPgSFj2n0xHiJj/DdquUzKyeziS5YwLEDUhhAybL/+HZDowtq3RumcjFOQTM/jZQ+54WTtosU8oz4ifp4k2yaowuyDKpJvWBD0L5aGvXsDnhZL9lLCj/q5/xlZInERJEhqb+yC0E1ZaEZJxceK0v1ndyLXcbMTj2xAq2PcMwDSeqvLR2wxRKvLknz6+Whs34N5+l28lISPkoKMdX0iOEeMnBGqHgiuiRbu1FXp5pDc/2PD9fQW+bbsu1PR+WOYUg4Sp9wokJz55q2WPzErcGW9kLvzVrZf+ZtMpQH66iXqSGSf6E2y3yUS6z2xKlDCwe6e75IweCGKfS+sj5PEcp+0DftyHve+Jp7zAcyWf8gA0Dfk31UUIdo+7F8gXin6dfN4HAY9XrVXuSFg4/VkkLNC7vZKgyBXgIlbQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(39860400002)(346002)(136003)(366004)(396003)(451199015)(83380400001)(2906002)(38100700002)(478600001)(6916009)(66476007)(66556008)(66946007)(4326008)(8676002)(2616005)(186003)(41300700001)(7406005)(7416002)(86362001)(6486002)(5660300002)(36756003)(316002)(54906003)(6506007)(107886003)(6512007)(26005)(4744005)(8936002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?EJHEKWVKqiWAi5oxg3sgj0Z94NxHiaxXW5xKJ0MzpHKanJMnssRnRSsnfD10?=
+ =?us-ascii?Q?PGJfmh0vOpw/Tz+Zf1CvlbjggkJDMmNRRBUaIgXCUiWMmOwpcDQofq4x5bfB?=
+ =?us-ascii?Q?rJoVjhcDrGrhPH8+2j89Gts8x764cx83Z00BY5WZJMrS/YSvs0Ix8XkRxoLT?=
+ =?us-ascii?Q?XnYOWqOxfq5+SS7ohtQjGfa1vAVUcU+Zv2B8qrZ8IAdkYwA0+LHloABChJWO?=
+ =?us-ascii?Q?oAytzkW70WaEFQeXHBtzgj8xXz174+Sy22VyNfaN4KtgKwcR6cTgEXU3tutf?=
+ =?us-ascii?Q?jmo1SrrFKDnIu8Jbvcpqh0N6xrBYHADDDGuiL2tSCGQOuW0JyilPAy147/FB?=
+ =?us-ascii?Q?5mfChpLps77oRfV6IPfhLmRWAJfsBTsIkpVdDuVnd4fFObg5PaUCDHTgyrYr?=
+ =?us-ascii?Q?9VG5aqRNN0G9nhZlSFxq6c/3vPiGILyv65F7xia0FQ3BolvG2o9czF6LbOIS?=
+ =?us-ascii?Q?h03KwM0/Al7Vxs07BupqXTVU1oyZdwgVLOtgQ0K0T9PTHgAAVY7BTWYpaEE/?=
+ =?us-ascii?Q?tjQUYDMXVNs/hTsuv5Jtx7aGLGEV4wKWoCfCn8oZJEG9yfkDI0kXGd+aGn10?=
+ =?us-ascii?Q?CiGBTSo/pS5gVVdWNAaYivp+OFu8tah+uUetCxfWLcyKWvnAIpcNkZVm9nMe?=
+ =?us-ascii?Q?VbyqSWhGtraZEHCic8aArB7UTa0R9A5TqeI28tW6hBXu/WXKR5Ezyuu6Mxlv?=
+ =?us-ascii?Q?0L9vWclLGW52RR3NP0JZDHKRAspm94AixgJQT1zidIdfLnZh1zbohx+p7bGm?=
+ =?us-ascii?Q?RuQ0BVrHOLcHaJCsVoVxn4AGgpP2tDjn1UF+ZsFFs6++3BUhBRqVlm5AkWFK?=
+ =?us-ascii?Q?DQlOQHN8ZgzL3tK2zpcVnXlRxcIjw1mfPlYInzl0Mf9n2rFg7As0MEQ5cuKv?=
+ =?us-ascii?Q?dbPNGD++QiBlekmpPNw90eUN0u5LZdbvaIrcfpNUmcxp7byEL3qzpWJET2QN?=
+ =?us-ascii?Q?PnP4/Glc8fsrJXoW9cqMooZLJFVubBprumQVHH+GEj5wXUwc2UNOEfEdyBFN?=
+ =?us-ascii?Q?kNZGmwFexcK+edCrRvY3B8yBJr6ulxLSArMW+jWfPM2n3S/Rdalg1OTN3OlN?=
+ =?us-ascii?Q?lBlFa3U4Ls5zkGzVNMgi4C0ezEmxQGnAEUSLc707PoxJK94LURgWN6aizxkQ?=
+ =?us-ascii?Q?Xxyrbca971pxDn3qdkhpwKD6N8/1AujKyJCfSkPGILwTj+vK+WwkXd0a/Khy?=
+ =?us-ascii?Q?S4o6+SpS3/oUksUoR4DFlJdUI4xCKvL+j4mshi+MVDo59Tu64iBFOchvgaYd?=
+ =?us-ascii?Q?fxEGyF1g8sifJ58E67MHXfZI3IljTvFNndsyEkaYKTliNiG+5dAMJoxtubDD?=
+ =?us-ascii?Q?nQh90i6TcmhEvU8qo5/+2gSF4b1xSzEGxpEg/t540M9dXs2Vv83VvbYG/equ?=
+ =?us-ascii?Q?M9MUWJz+CZKt4Oef1oiZNdHzPdkr6F7VlHKZ3F/L7uCLZrZpB3SaMb2wGA8K?=
+ =?us-ascii?Q?ECsgRvf8aQ01EUg0A9n5LZwQWVgDm3R5sYaKtKCryMdJrpUXnbf2RRfQJhHo?=
+ =?us-ascii?Q?n8dB8tbgygteUNjBqOdYohe/SvbhloKj8ccLk2xU0eL7ux14/BhxO0UvHnG+?=
+ =?us-ascii?Q?rs3YwUu+M2fcIWvL14+SzZcM0KBcCMEgFThUrheS?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 370d6fd0-dc20-4fb8-e6d4-08dabb97069b
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2022 23:24:15.4025
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vAxSics9McVZYP6+79aV0m3nd+2pVjVi83vK2DJIjEHyb+icTpeGBv3jE8q7tdjZ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6263
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,162 +150,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/31/22 5:08 PM, Oliver Upton wrote:
-> On Mon, Oct 31, 2022 at 08:36:17AM +0800, Gavin Shan wrote:
->> KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP should be enabled only when KVM
->> device "kvm-arm-vgic-its" is used by userspace. Currently, it's the
->> only case where a running VCPU is missed for dirty ring. However,
->> there are potentially other devices introducing similar error in
->> future.
->>
->> In order to report those broken devices only, the no-running-vcpu
->> warning message is escaped from KVM device "kvm-arm-vgic-its". For
->> this, the function vgic_has_its() needs to be exposed with a more
->> generic function name (kvm_vgic_has_its()).
->>
->> Link: https://lore.kernel.org/kvmarm/Y1ghIKrAsRFwSFsO@google.com
->> Suggested-by: Sean Christopherson <seanjc@google.com>
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
+On Mon, Oct 31, 2022 at 08:25:39PM +0800, Yi Liu wrote:
+> > There is something wrong with the test suite that it isn't covering
+> > the above, I'm going to look into that today.
 > 
-> I don't think this should be added as a separate patch.
-> 
-> The weak kvm_arch_allow_write_without_running_vcpu() (and adding its
-> caller) should be rolled into patch 4/9. The arm64 implementation of
-> that should be introduced in patch 6/9.
-> 
+> sounds to be the cause. I didn't see any significant change in vfio_main.c
+> that may fail gvt. So should the iommufd changes. Then we will re-run the
+> test after your update.:-)
 
-Ok, the changes will be distributed in PATCH[4/9] and PATCH[6/9].
-
->> ---
->>   arch/arm64/kvm/mmu.c               | 14 ++++++++++++++
->>   arch/arm64/kvm/vgic/vgic-init.c    |  4 ++--
->>   arch/arm64/kvm/vgic/vgic-irqfd.c   |  4 ++--
->>   arch/arm64/kvm/vgic/vgic-its.c     |  2 +-
->>   arch/arm64/kvm/vgic/vgic-mmio-v3.c | 18 ++++--------------
->>   arch/arm64/kvm/vgic/vgic.c         | 10 ++++++++++
->>   arch/arm64/kvm/vgic/vgic.h         |  1 -
->>   include/kvm/arm_vgic.h             |  1 +
->>   include/linux/kvm_dirty_ring.h     |  1 +
->>   virt/kvm/dirty_ring.c              |  5 +++++
->>   virt/kvm/kvm_main.c                |  2 +-
->>   11 files changed, 41 insertions(+), 21 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index 60ee3d9f01f8..e0855b2b3d66 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -932,6 +932,20 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
->>   	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
->>   }
->>   
->> +/*
->> + * kvm_arch_allow_write_without_running_vcpu - allow writing guest memory
->> + * without the running VCPU when dirty ring is enabled.
->> + *
->> + * The running VCPU is required to track dirty guest pages when dirty ring
->> + * is enabled. Otherwise, the backup bitmap should be used to track the
->> + * dirty guest pages. When vgic/its is enabled, we need to use the backup
->> + * bitmap to track the dirty guest pages for it.
->> + */
->> +bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
->> +{
->> +	return kvm->dirty_ring_with_bitmap && kvm_vgic_has_its(kvm);
->> +}
-> 
-> It is trivial for userspace to cause a WARN to fire like this. Just set
-> up the VM with !RING_WITH_BITMAP && ITS.
-> 
-> The goal is to catch KVM bugs, not userspace bugs, so I'd suggest only
-> checking whether or not an ITS is present.
-> 
-> [...]
-> 
-
-Ok. 'kvm->dirty_ring_with_bitmap' needn't to be checked here if we don't
-plan to catch userspace bug. Marc had suggestions to escape from the
-no-running-vcpu check only when vgic/its tables are being restored [1].
-
-In order to cover Marc's concern, I would introduce a different helper
-kvm_vgic_save_its_tables_in_progress(), which simply returns
-'bool struct vgic_dist::save_its_tables_in_progress'. The newly added
-field is set and cleared in vgic_its_ctrl(). All these changes will be
-folded to PATCH[v7 6/9]. Oliver and Marc, could you please let me know
-if the changes sounds good?
-
-    static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
-    {
-        const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-        struct vgic_dist *dist = &kvm->arch.vgic;
-        int ret = 0;
-          :
-        switch (attr) {
-        case KVM_DEV_ARM_ITS_CTRL_RESET:
-             vgic_its_reset(kvm, its);
-             break;
-        case KVM_DEV_ARM_ITS_SAVE_TABLES:
-             dist->save_its_tables_in_progress = true;
-             ret = abi->save_tables(its);
-             dist->save_its_tables_in_progress = false;
-             break;
-        case KVM_DEV_ARM_ITS_RESTORE_TABLES:
-             ret = abi->restore_tables(its);
-             break;
-        }
-        :
-     }
-  
-[1] https://lore.kernel.org/kvmarm/2ce535e9-f57a-0ab6-5c30-2b8afd4472e6@redhat.com/T/#mcf10e2d3ca0235ab1cac8793d894c1634666d280
-
->> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> index 91201f743033..10218057c176 100644
->> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> @@ -38,20 +38,10 @@ u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
->>   	return reg | ((u64)val << lower);
->>   }
->>   
->> -bool vgic_has_its(struct kvm *kvm)
->> -{
->> -	struct vgic_dist *dist = &kvm->arch.vgic;
->> -
->> -	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
->> -		return false;
->> -
->> -	return dist->has_its;
->> -}
->> -
-> 
-> nit: renaming/exposing this helper should be done in a separate patch.
-> Also, I don't think you need to move it anywhere either.
-> 
-> [...]
-> 
-
-As Marc suggested, we tend to escape the site of saving vgic/its tables from
-the no-running-vcpu check. So we need a new helper kvm_vgic_save_its_tables_in_progress()
-instead, meaning kvm_vgic_has_its() isn't needed.
-
->> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
->> index 7ce6a5f81c98..f27e038043f3 100644
->> --- a/virt/kvm/dirty_ring.c
->> +++ b/virt/kvm/dirty_ring.c
->> @@ -26,6 +26,11 @@ bool kvm_use_dirty_bitmap(struct kvm *kvm)
->>   	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
->>   }
->>   
->> +bool __weak kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
->> +{
->> +	return kvm->dirty_ring_with_bitmap;
->> +}
->> +
-> 
-> Same comment on the arm64 implementation applies here. This should just
-> return false by default.
-> 
-
-Ok. It return 'false' and the addition of kvm_arch_allow_write_without_running_vcpu()
-will be folded to PATCH[4/9], as you suggested.
+I updated the github with all the changes made so far, it is worth
+trying again!
 
 Thanks,
-Gavin
-
+Jason
