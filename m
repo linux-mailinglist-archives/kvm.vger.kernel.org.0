@@ -2,76 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64614613D72
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 19:37:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C8FD613DA4
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 19:47:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230112AbiJaSho (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 14:37:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35654 "EHLO
+        id S229441AbiJaSrD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 14:47:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiJaShn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 14:37:43 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE40C12626
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:37:42 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id 17so7169641pfv.4
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:37:42 -0700 (PDT)
+        with ESMTP id S229841AbiJaSrC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 14:47:02 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F83213E14
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:47:01 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id k15so3383285pfg.2
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:47:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f6MbXeIWosdo9vjybEQsKSPNjMNkH/5gETThTzJuRxM=;
-        b=ifJ30Qw9zH1n5BLrQVMy7hdWESTFOw8wJ2HSn6qNh3U+liDp/R/z+GplGkoxnPV/UY
-         qXhhEHS+beDVFqBDNUXNkhLzLr2DwkNDcrV+mcqs6LaEyHDyqKOOQURhryUKd8/gnX1e
-         QQ1MwnyfFwibqEzjjFPeybANull9eEad6ZPAgzHUdKtIW/mHO6d6j5JBXT+/asnFOwZe
-         RVY0fJlFs4PIqtIofsqBXOzdXsf+3lCYs29JqTSnn/Z6UtkcErPZnGopBK/SQm7yTtiF
-         6KiXoEdstRYKnLKJWF+caRGK+ARqJQdn51FigSRyspkHFhTaVLpEh//+fxVfCCsjPqGR
-         8OXQ==
+        bh=OD+Dj6QiqQPcqUwOclLcNaDdFbYYrYUChNSiJbOcpjk=;
+        b=MmCFekFLbUuohkmlHUThG37fqm1rxlUpqslpZv9CWTa/v26nXUdjpHv6eNdc8/PJtn
+         I2prhfaNkukF8aWSGoDe3ZPxGua9A8jA+3U+unJxUeUzL6QV43+Ck5Iv9zi8dnTe+NYu
+         0w1H0ZqxlQbgZmhQv7eTrsz0CuqPMA7pRLWezCFJhK3nLQGNn2eWspfKpG0Ux361GVHz
+         9UTmRjOh1YqraEz2+Y1NMAZgAP04PHibnLksQrvJh1rJFcd13Rt2+1mVeC9glFCNkAJ2
+         XMnoLzr+l1fEsGsd8vbfUxJO8jMWdRz2AW397dtiVTelWFgGiCPMA61RJaMQi4qch2I/
+         IOjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=f6MbXeIWosdo9vjybEQsKSPNjMNkH/5gETThTzJuRxM=;
-        b=ie5BwilpG4Icujbyb25oVv8XG+FAml9YmhOIGx3MGivhZ0B25dF0bce18ZvWKRHRnA
-         zlt2EzzXfZo0FVr46+Y/z4cIIB5Xm5kZkD7FHygeLpEemyGVRz7TjTJFY4EhB6awz6xx
-         aSIzHmN4i3sofXxH7jWo8I8/aCdRqhGSvi3wVJ7d3EQAX02SplP29c8HijNvzzNfdCXl
-         MNhQe3xaCrzxAS6lWipkAUGu6v0zP00ZA+N/Nai6/kIuF89uqUcbMMl6h4+CctRd/6re
-         0Lx/sTnnhD7u+Yvspk5LDxuoUH8dzLFCU2TCwl1qM/F1tEDJxDmXv/BDIc/uDti9PRLm
-         owog==
-X-Gm-Message-State: ACrzQf341p7sOrC08KHbdGdnNu7n93u72MgeI5RhsSF5E9uD7LBinzfQ
-        mXtVIPawBfvaMQ8jba10BGtx7g==
-X-Google-Smtp-Source: AMsMyM6VJGBxz/aTzJrHwRoh84jG9YIrU9HH1O77gAN8mIN+XdEFhDksuBODyWDoXkQ7EtFPIsYBCQ==
-X-Received: by 2002:a63:1861:0:b0:462:4961:9a8f with SMTP id 33-20020a631861000000b0046249619a8fmr14010645pgy.372.1667241462128;
-        Mon, 31 Oct 2022 11:37:42 -0700 (PDT)
+        bh=OD+Dj6QiqQPcqUwOclLcNaDdFbYYrYUChNSiJbOcpjk=;
+        b=hccaC1CDOBv9y7hcarHw4E0xj26lEqdsXNM+67qIK5z8uV9KvmKHnIV/DommKwvrHl
+         fMO3j1sk7uKIEdSTJcsSr230UhhATDV7hZKg5R+Uy1GhiFgLHqSwdbxmem5htaOVu6Ut
+         SchS5J0dIB4QwhJEGloQLHVQIDRgKjvyu/5byz8EvyecUYze55AdmMf9sX2UyvR7/ANQ
+         rJ+azurB02dfjnUo4+P8IuLKoUhjjmETBBELEwZ+i5vB3SK0oxXSj26yatTtgD+qlWL6
+         XE32A20nUN5NJ9Y1ezsRyVmvm7UsbEhgtpAyF00rXlh0TVS/MWXyVZy/4iWBs9M65qUX
+         oUZA==
+X-Gm-Message-State: ACrzQf1bbJYN+t32/mHSf5spFgDipf0krcLU891NcliHubLuzEkIl7sH
+        PFPGzOlE6Qp/bmsS6/jWm0ThX0gWJfx92A==
+X-Google-Smtp-Source: AMsMyM4htz0IkD7YSKcI/7Xm9dLC93O2StWjcFH36bHWeLHkCtn/nHx1byMNzCL16k2BSRcfoK8fGg==
+X-Received: by 2002:a05:6a00:14cf:b0:56d:88a8:32cf with SMTP id w15-20020a056a0014cf00b0056d88a832cfmr4973710pfu.27.1667242020859;
+        Mon, 31 Oct 2022 11:47:00 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id bb8-20020a170902bc8800b00179f370dbe7sm4732278plb.287.2022.10.31.11.37.41
+        by smtp.gmail.com with ESMTPSA id z190-20020a6233c7000000b0056ba7ce4d5asm4959985pfz.52.2022.10.31.11.47.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Oct 2022 11:37:41 -0700 (PDT)
-Date:   Mon, 31 Oct 2022 18:37:38 +0000
+        Mon, 31 Oct 2022 11:47:00 -0700 (PDT)
+Date:   Mon, 31 Oct 2022 18:46:57 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yang Zhong <yang.zhong@intel.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 10/10] KVM: selftests: Add a test for
- KVM_CAP_EXIT_ON_EMULATION_FAILURE
-Message-ID: <Y2AV8hF0NLNc7vAm@google.com>
-References: <20221031180045.3581757-1-dmatlack@google.com>
- <20221031180045.3581757-11-dmatlack@google.com>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     pbonzini@redhat.com, dmatlack@google.com, andrew.jones@linux.dev,
+        wei.w.wang@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 1/5] KVM: selftests: Add missing break between -e and
+ -g option in dirty_log_perf_test
+Message-ID: <Y2AYIbZrpd4heE1H@google.com>
+References: <20221031173819.1035684-1-vipinsh@google.com>
+ <20221031173819.1035684-2-vipinsh@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221031180045.3581757-11-dmatlack@google.com>
+In-Reply-To: <20221031173819.1035684-2-vipinsh@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,30 +74,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 31, 2022, David Matlack wrote:
-> Add a selftest to exercise the KVM_CAP_EXIT_ON_EMULATION_FAILURE
-> capability.
+On Mon, Oct 31, 2022, Vipin Sharma wrote:
+> Passing -e option (Run VCPUs while dirty logging is being disabled) in
+> dirty_log_perf_test also unintentionally enables -g (Do not enable
+> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2). Add break between two switch case
+> logic.
 > 
-> This capability is also exercised through
-> smaller_maxphyaddr_emulation_test, but that test requires
-> allow_smaller_maxphyaddr=Y, which is off by default on Intel when ept=Y
-> and unconditionally disabled on AMD when npt=Y. This new test ensures we
+> Fixes: cfe12e64b065 ("KVM: selftests: Add an option to run vCPUs while disabling dirty logging")
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> ---
 
-Uber nit, avoid pronouns, purely so that "no pronouns" can be an unconditional
-guideline, not because "we" is at all ambiguous in this case.
-
-  This new test ensures KVM_CAP_EXIT_ON_EMULATION_FAILURE is exercised
-  independent of allow_smaller_maxphyaddr.
-
-> exercise KVM_CAP_EXIT_ON_EMULATION_FAILURE independent of
-> allow_smaller_maxphyaddr.
-> 
-> +static void guest_code(void)
-> +{
-> +	/* Execute flds with an MMIO address to force KVM to emulate it. */
-> +	flds(MMIO_GVA);
-
-Add tests to verify KVM handles cases where the memory operand splits pages on
-both sides?  Mostly because I'm curious if KVM actually does the right thing :-)
-It'll require creating an extra memslot, but I don't think that should be too
-difficult?
+Reviewed-by: Sean Christopherson <seanjc@google.com>
