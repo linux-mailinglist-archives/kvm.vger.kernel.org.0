@@ -2,199 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA8F66135B8
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 13:18:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DB53613638
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 13:26:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231276AbiJaMSr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 08:18:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46178 "EHLO
+        id S230300AbiJaM0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 08:26:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbiJaMSq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 08:18:46 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on20609.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e89::609])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC9DAF6A;
-        Mon, 31 Oct 2022 05:18:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b4XBtghjymsmgZp5QxiBuJ2C4tl2qVDz9ymIX2bdG4x9O2ZSIzIYjf+6w+qu19+Fbo5tiwP2ZGaFYNXUf+inPVaVZ0G0el7ShEwGxMDYwjCRtjEmBtkqeV+zlmh3fT6Fa1XGfgv/g52dnbcbcoCby+eySV5H8ohhqbV8CbFHLCbS9v5RxYBFRdB3UJr/ZDzd2LliLKls/+tYBAEUXCbnHjbRqRqhe0pn5D8r8AiDAWn+X5NIK6bbvoo9vmnRppIk/vqwQUVgy2x+KufSvSw50PqETf+UHizZpV20Ut4Fv5RQHPDh8xHQryZDsyhwM2xjfeUjwGixTojSXLT4PXF1aA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FjmT/YYYPHAhdO4+HxP8VEHTGSctun0rbwsC4hkNH8Q=;
- b=dzM+GJDZ4t70dQQs+ARbpwBU8qKTC0eL+a4DcfhNYzFxnnFb2cYS137juUGD1/0pR+z5XHb5QqZjfOAyBBaqPSG1zP3f6WpXM8uKO6Y9JYKT6DbvMFob686uTGNxV7d8mBiy8pPcnkCqtMBOWUmPQJENpIqqviIc609uIDZVuEvudvcTh+bwDEZ1tO1JOL4MPBbV96LbXbnDEK32HQGq4YMXLCvuBA1aBvRRjXdqdidxHqsYVR5T1NjJyvo1lpqUrEjrnorSigjywIoyduhERRmziDVLOgJWk6By4wonWdcmXN/otcSb3IYj5//3sVZfSS8g4cnHHGhH5CHEO/rLFQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FjmT/YYYPHAhdO4+HxP8VEHTGSctun0rbwsC4hkNH8Q=;
- b=As43O28+svtejjYJTsb9tX00RtMiyoNYEL33759WN6lVBNltqcZIu3UVOlkvsEjnCSaIBW6k+XuDWSCvgDoB9nXJ9ej3SIT0UrxWzT0d48NxmVRa9sYarKGQDWU5M2BTdOcx3bL05fQx3nHTMb3OpQYhR2usiDlUGMpEmcbn2PDfpw60a9rK0GEpxIBh83T3DkAT8RYwxnskZpv1OE9QhasNjs5rshGs2KkUEklP6ka10WyhHQOSFlLDrxxDOvVlz5adta59bKemomTxqn6J+D7Xf8YzBf+jJ1GQGuphVpfEx7xVJ95qQGC5ZX2hdGLBjyKnxUkPQv79EuZnzKENaQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH2PR12MB4875.namprd12.prod.outlook.com (2603:10b6:610:35::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.19; Mon, 31 Oct
- 2022 12:18:41 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5769.015; Mon, 31 Oct 2022
- 12:18:41 +0000
-Date:   Mon, 31 Oct 2022 09:18:40 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@gmail.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Will Deacon <will@kernel.org>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>
-Subject: Re: [PATCH 00/10] Connect VFIO to IOMMUFD
-Message-ID: <Y1+9IB+DI9v+nD0P@nvidia.com>
-References: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
- <39eb11ed-dbf2-822a-dc79-5b70a49c430b@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <39eb11ed-dbf2-822a-dc79-5b70a49c430b@intel.com>
-X-ClientProxiedBy: BL1PR13CA0025.namprd13.prod.outlook.com
- (2603:10b6:208:256::30) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229482AbiJaM0A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 08:26:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07793106
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 05:25:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667219103;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zfkK1KtSCue63LLMxZ4FtECuWKGnXXVP4gbD3G4cjL0=;
+        b=OFx4cqAw1WszYJHlmmLCJFPOXdJRo/xVbu9y99AH8+Poi0r9/e1eiyLb5DXSZKaqJ6gor6
+        QsO1Q15Ch+Xmg1aSef1upI7yOeWymOUWGRjDF2e0i44POTd7WUMzjRx0cYapxkajV52iBq
+        YBOorJY2g/Jl16w0nPVudGzb/bcDnHE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-471-f_6eIIAdMRKeJS1Nta6omQ-1; Mon, 31 Oct 2022 08:25:01 -0400
+X-MC-Unique: f_6eIIAdMRKeJS1Nta6omQ-1
+Received: by mail-wm1-f71.google.com with SMTP id e8-20020a05600c218800b003cf634f5280so925215wme.8
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 05:25:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zfkK1KtSCue63LLMxZ4FtECuWKGnXXVP4gbD3G4cjL0=;
+        b=b9zlDTQ+LjMUDrqZvPbEA//7wykU/JUzPknMtZrYL3fW8RZSyNTW7SFpvYOuIFCS8V
+         BYu/BleISe1gFeRnMkGM7bx7430M7Wvf+82h1dBt3H4KuJgjRezJtcWlAXt5eQcqjkVM
+         bYiaQ9JbcZuPJHxpI2SZSho42ljzXQO+D0XHypuNZz0YJfo1ZtlZWi9CtOWuQ3pOvLDy
+         bWuHkbPPDCn+8eHpHDgDFnJDU0es5iI2kZgw8EpLg6OlMU4DDNSpjiyf0kxwZTpkzv11
+         qP7e8ok7ldXvL6eEgtuS3oUTdjRSZyPsHRrdJfX593USiUv2LE+MetuCHwiKdHqz43a5
+         NrMw==
+X-Gm-Message-State: ACrzQf204Ydpp3+2dG8b7Wa7fDvlkT7Ubp3ngdjPK4tpIQq44OFG7scu
+        B1tJbiZkDC5IqZ3GAEwH89UQO6Cgl2TjCCA2yLsI9yT57BThlGbPLo1lophgYyRe0FD0VtUbI+p
+        4sbQnHZB37k3E
+X-Received: by 2002:a7b:c4cf:0:b0:3cf:497c:ae3a with SMTP id g15-20020a7bc4cf000000b003cf497cae3amr17788957wmk.177.1667219100536;
+        Mon, 31 Oct 2022 05:25:00 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM69D8xIsVZcaWiRZms64488Fpw3/JfDO/S2qIuys1bMppxYZyg7F7QbMgvcGKp4qqtV88spaA==
+X-Received: by 2002:a7b:c4cf:0:b0:3cf:497c:ae3a with SMTP id g15-20020a7bc4cf000000b003cf497cae3amr17788937wmk.177.1667219100283;
+        Mon, 31 Oct 2022 05:25:00 -0700 (PDT)
+Received: from redhat.com ([2.52.15.189])
+        by smtp.gmail.com with ESMTPSA id l13-20020a05600c2ccd00b003a2f2bb72d5sm8067013wmc.45.2022.10.31.05.24.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Oct 2022 05:24:59 -0700 (PDT)
+Date:   Mon, 31 Oct 2022 08:24:55 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Eugenio Perez Martin <eperezma@redhat.com>
+Cc:     qemu-devel@nongnu.org, Gautam Dawar <gdawar@xilinx.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eli Cohen <eli@mellanox.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        Cindy Lu <lulu@redhat.com>,
+        Liuxiangdong <liuxiangdong5@huawei.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Harpreet Singh Anand <hanand@xilinx.com>
+Subject: Re: [PATCH v5 2/6] vdpa: Allocate SVQ unconditionally
+Message-ID: <20221031082106-mutt-send-email-mst@kernel.org>
+References: <20221011104154.1209338-1-eperezma@redhat.com>
+ <20221011104154.1209338-3-eperezma@redhat.com>
+ <20221031041821-mutt-send-email-mst@kernel.org>
+ <CAJaqyWcaZ32agF0CKPUU89NHj0Di9Q5kFJDsWcUwCG2q0u_kEQ@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH2PR12MB4875:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6e5db1f4-eeb7-43ab-7e1d-08dabb3a0c23
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qkTbtVBOOgS/W3+mZ3xw/3IT7DUgXkGQdQ1iqKTQxuGQbk/nz4RUuBvdaiw9KM2xhxfVQRZ6pi2R2WQBvezYDNi/mwbXWPet5MD1V6u+5+ri1uTTu2EzqErx2bwOEHzU4qCoA7Y89H4gnSPph84PBFve0+/076SLTQeX8JZJdjOHAYh5K7QtPAOUzvDPpfzFx7F5CYxHCE1Ii4oH6/NV33kilhYNjUUwOzBH1WzGreh722BTceRqG/ki53mVxG7jeB3Z9UA6jcEop2tzBt2NN4YZ8/RSEReTKl8i25IAf/1b0MR6KIUnCBItjzo5R2BwYm8jnXaF1qHkR5rG8iZh0HMUwyLeWsWkzy4yKaKMGI26tZxWNZdgvud7UceoXlEPtsm114xtNopGW6sVx3TkuHqzJPOFoIrIbVGF/7x5Sa/cEiUl1UBlcHNxyATSjrM/rpffvaihmIochg3pTfQ03AMT2spE/nTazYzYnkqwA8IIZeRt2FqGJ7bS4SBke0/lNa7AwE8ZIDafFq0LJaO0TjrDXWoKUgbW5TNxsWkY45gdOI2s8opPy7AuN9JipU6+MOkqGxYqIcD4igVTnueExdYZEveNkqWpkAzeY+7AtqiDePopiy/zk7b77ccSQEPLBmOMkkMmvN8jIwerVoPE2bU3OiaCnw4M8LoeTi0LNpsL9Qwnl3WAGPtdmFVC8BtZk5UFxpsVN+9IQqXW4hz6PilotGwtnMWD8XQVKGy+0YYWMP6kq/jjXUSFzz/Ksm4Fnj0DZHsZzU+quLUoTccL/2R6FvO+8HnglBLsIzRpHRo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(366004)(396003)(376002)(39860400002)(136003)(451199015)(83380400001)(107886003)(966005)(6486002)(2906002)(36756003)(86362001)(38100700002)(6512007)(53546011)(26005)(2616005)(186003)(5660300002)(66556008)(66946007)(8676002)(66476007)(316002)(478600001)(7406005)(41300700001)(6506007)(4326008)(8936002)(7416002)(54906003)(6916009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?J4WqxdEMQrsb+NvZZ9YiAKXFV4F2W6r3o7ltGAPrtWozRtuN3OurjRVK6FLC?=
- =?us-ascii?Q?8Uj4fT11fG84SludrgeB+xRQuo1ArFBmSoedVYTHR0+cPfWShEQgVB2TgcJP?=
- =?us-ascii?Q?22MP0sudFrtnBa8jCMHb72AvHduxe+tnrdP2BxZXQzNLVc1VOfr5unw6p7Ev?=
- =?us-ascii?Q?V3JaYSXQ+ggy5dpFu3ZfUss8taL0COErWFmPDisfBGRyL1E4qHdd+qCqPXOZ?=
- =?us-ascii?Q?NLXyiQU+0MUtWMvUzugvUeky2Afe9udQOpec9dbifAeWtF9Jxjfjphcbtdc6?=
- =?us-ascii?Q?DQbeBakiAfg8OxkLZjHw86+3fu9/a04In/78iL7AakLx73dRf5rkhXbTetHD?=
- =?us-ascii?Q?+0ur5tLzHINgy9vcV5z56K8l6Leg9ZKzgS495VouoLs9BSox1DB09GZ98VqV?=
- =?us-ascii?Q?7pLn0ws4ade1fR8wKgXvrU9wN9JCZBS/4BAzTF2ASLjhmYrfznGARUspW2xv?=
- =?us-ascii?Q?LtsLOTBBVU3tF+xAwsByx2kI9Vzodpn1f8cLgCT8e/03sNGul61ct1XieS3x?=
- =?us-ascii?Q?xmsPvxlZrZ8+zdPcJWybDZ8x/EEsSkPyRZ2NmOdziax1Ixo8U9kowGjAOA1w?=
- =?us-ascii?Q?VaN6iHPI3FONE9tkxIHRzAMYM9LgjE/K6Zu1AQoHbUqqoNqIJLtbW1Me8Imt?=
- =?us-ascii?Q?gxI3Tz7ALlfhDEo14D5HH34zI0BNes7DtK8kY/zJM4HpjW8LObvf1tuN7yK1?=
- =?us-ascii?Q?28mCjM1AMb1teZrJsbWRaLMIeNZ5vn3I+0pshmQtj//ZMXmkBgOAkW1JYdhz?=
- =?us-ascii?Q?nZ9YmZSmoX14lm+dTBCOcCX3x5lwcyf7O9YB743QZz7LFWCf5aqAdbO/F312?=
- =?us-ascii?Q?amOh0ZTurIv8Hn/T/MibPK+8cIomoMG5bCA3zutr2Kj+kGxvBJ2fd/L6YD1x?=
- =?us-ascii?Q?M/OExNyqcHG2EOvRNt/32ntfzlWnO5VoS+kl1UiMPd/cCQW9N7uVmxZ6uBBC?=
- =?us-ascii?Q?fQGATX7Jkc7UucMu3f6/tjJ3Sk4FiaSati+//TVi1k4CoyVY0Qjgl4lkCsTg?=
- =?us-ascii?Q?6h6dcHexbUiXGqNzTrWLfESb0zgDpgHN4bnIV2cXahLCDea1u+mk1pjBEKUA?=
- =?us-ascii?Q?/F+zOPYCV5a1QD7gxYfVRM+JIrHqnZu+qcB0yJL3oCa0EZLIRk+8l6UYC8m/?=
- =?us-ascii?Q?TVBW3mkdvxsxKFWJATAhftNK/KNVH7RoK9XQ+rVm4TddOPM+uc6F9taUSD7U?=
- =?us-ascii?Q?eBA+WLhfoZVJfqn5yVf1eJBwoIea6XlVbJCkCdkKji+tuxTKW3jpPVQwj9qq?=
- =?us-ascii?Q?nbNy7w6Das1VilDu2itUcV0WLwTqOkmx2sT2DE0sLZswyWVLaR/t2ttNCaTB?=
- =?us-ascii?Q?VRmhbj4hJJnwB1n25B57naT+2XZuIizEZncBaiumBtTVCflX34ZDB8UkKM3d?=
- =?us-ascii?Q?DzUrCzNfyseMnyX77JUePA3Fwze4t9pun27G+XWe7zw75eGXePFqX0s04z7R?=
- =?us-ascii?Q?Qt8+Vhw1G0nbVSyi1RPbn4PnsFgTHV1LCRm4hYgnGrdgToMQx841jqWOEFDX?=
- =?us-ascii?Q?1Y/AvjFZ9r7rVFj099uNK+0a+8oax3cGQK96ysaxD739ZdvOzaaJrF3U/DXv?=
- =?us-ascii?Q?RzeTuVEh2EQncV6YFtU=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e5db1f4-eeb7-43ab-7e1d-08dabb3a0c23
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2022 12:18:41.5455
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VncR3exM/jMdIsfOLagq1gDXnanI3TK0fxHSKZNnkvZ013sMqyLrfw1MeyzqAQXu
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4875
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJaqyWcaZ32agF0CKPUU89NHj0Di9Q5kFJDsWcUwCG2q0u_kEQ@mail.gmail.com>
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 31, 2022 at 06:38:45PM +0800, Yi Liu wrote:
-> Hi Jason,
+On Mon, Oct 31, 2022 at 12:56:06PM +0100, Eugenio Perez Martin wrote:
+> On Mon, Oct 31, 2022 at 9:21 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, Oct 11, 2022 at 12:41:50PM +0200, Eugenio Pérez wrote:
+> > > SVQ may run or not in a device depending on runtime conditions (for
+> > > example, if the device can move CVQ to its own group or not).
+> > >
+> > > Allocate the resources unconditionally, and decide later if to use them
+> > > or not.
+> > >
+> > > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> >
+> > I applied this for now but I really dislike it that we are wasting
+> > resources like this.
+> >
+> > Can I just drop this patch from the series? It looks like things
+> > will just work anyway ...
+> >
 > 
-> On 2022/10/26 02:17, Jason Gunthorpe wrote:
-> > This series provides an alternative container layer for VFIO implemented
-> > using iommufd. This is optional, if CONFIG_IOMMUFD is not set then it will
-> > not be compiled in.
-> > 
-> > At this point iommufd can be injected by passing in a iommfd FD to
-> > VFIO_GROUP_SET_CONTAINER which will use the VFIO compat layer in iommufd
-> > to obtain the compat IOAS and then connect up all the VFIO drivers as
-> > appropriate.
-> > 
-> > This is temporary stopping point, a following series will provide a way to
-> > directly open a VFIO device FD and directly connect it to IOMMUFD using
-> > native ioctls that can expose the IOMMUFD features like hwpt, future
-> > vPASID and dynamic attachment.
-> > 
-> > This series, in compat mode, has passed all the qemu tests we have
-> > available, including the test suites for the Intel GVT mdev. Aside from
-> > the temporary limitation with P2P memory this is belived to be fully
-> > compatible with VFIO.
-> > 
-> > This is on github: https://github.com/jgunthorpe/linux/commits/vfio_iommufd
+> It will not work simply dropping this patch, because new code expects
+> SVQ vrings to be already allocated. But that is doable with more work.
 > 
-> In our side, we found the gvt-g test failed. Guest i915 driver stuck at
-> init phase. While with your former version  (commit ID
-> a249441ba6fd9d658f4a1b568453e3a742d12686), gvt-g test is passing. 
+> > I know, when one works on a feature it seems like everyone should
+> > enable it - but the reality is qemu already works quite well for
+> > most users and it is our resposibility to first do no harm.
+> >
+> 
+> I agree, but then it is better to drop this series entirely for this
+> merge window. I think it is justified to add it at the beginning of
+> the next merge window, and to give more time for testing and adding
+> more features actually.
 
-Oh, I didn't realize you grabbed such an older version for this testing..
+Not sure what "then" means. You tell me - should I drop it?
 
-> noticed there a quite a few change in iommufd/pages.c from last version.
-> We are internally tracing in the gvt-g side, may also good to have your
-> attention.
+> However, I think shadow CVQ should start by default as long as the
+> device has the right set of both virtio and vdpa features. Otherwise,
+> we need another cmdline parameter, something like x-cvq-svq, and the
+> update of other layers like libvirt.
+> 
+> Thanks!
 
-syzkaller just ran into this that I was starting to investigate:
+OK maybe that is not too bad.
 
-@@ -1505,7 +1505,7 @@ int iopt_pages_fill_xarray(struct iopt_pages *pages, unsigned long start_index,
-        int rc;
- 
-        pfn_reader_user_init(&user, pages);
--       user.upages_len = last_index - start_index + 1;
-+       user.upages_len = (last_index - start_index + 1) * sizeof(*out_pages);
-        interval_tree_for_each_double_span(&span, &pages->access_itree,
 
-It would certainly hit gvt - but you should get WARN_ON's not hangs
+> >
+> > > ---
+> > >  hw/virtio/vhost-vdpa.c | 33 +++++++++++++++------------------
+> > >  1 file changed, 15 insertions(+), 18 deletions(-)
+> > >
+> > > diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+> > > index 7f0ff4df5b..d966966131 100644
+> > > --- a/hw/virtio/vhost-vdpa.c
+> > > +++ b/hw/virtio/vhost-vdpa.c
+> > > @@ -410,6 +410,21 @@ static int vhost_vdpa_init_svq(struct vhost_dev *hdev, struct vhost_vdpa *v,
+> > >      int r;
+> > >      bool ok;
+> > >
+> > > +    shadow_vqs = g_ptr_array_new_full(hdev->nvqs, vhost_svq_free);
+> > > +    for (unsigned n = 0; n < hdev->nvqs; ++n) {
+> > > +        g_autoptr(VhostShadowVirtqueue) svq;
+> > > +
+> > > +        svq = vhost_svq_new(v->iova_tree, v->shadow_vq_ops,
+> > > +                            v->shadow_vq_ops_opaque);
+> > > +        if (unlikely(!svq)) {
+> > > +            error_setg(errp, "Cannot create svq %u", n);
+> > > +            return -1;
+> > > +        }
+> > > +        g_ptr_array_add(shadow_vqs, g_steal_pointer(&svq));
+> > > +    }
+> > > +
+> > > +    v->shadow_vqs = g_steal_pointer(&shadow_vqs);
+> > > +
+> > >      if (!v->shadow_vqs_enabled) {
+> > >          return 0;
+> > >      }
+> > > @@ -426,20 +441,6 @@ static int vhost_vdpa_init_svq(struct vhost_dev *hdev, struct vhost_vdpa *v,
+> > >          return -1;
+> > >      }
+> > >
+> > > -    shadow_vqs = g_ptr_array_new_full(hdev->nvqs, vhost_svq_free);
+> > > -    for (unsigned n = 0; n < hdev->nvqs; ++n) {
+> > > -        g_autoptr(VhostShadowVirtqueue) svq;
+> > > -
+> > > -        svq = vhost_svq_new(v->iova_tree, v->shadow_vq_ops,
+> > > -                            v->shadow_vq_ops_opaque);
+> > > -        if (unlikely(!svq)) {
+> > > -            error_setg(errp, "Cannot create svq %u", n);
+> > > -            return -1;
+> > > -        }
+> > > -        g_ptr_array_add(shadow_vqs, g_steal_pointer(&svq));
+> > > -    }
+> > > -
+> > > -    v->shadow_vqs = g_steal_pointer(&shadow_vqs);
+> > >      return 0;
+> > >  }
+> > >
+> > > @@ -580,10 +581,6 @@ static void vhost_vdpa_svq_cleanup(struct vhost_dev *dev)
+> > >      struct vhost_vdpa *v = dev->opaque;
+> > >      size_t idx;
+> > >
+> > > -    if (!v->shadow_vqs) {
+> > > -        return;
+> > > -    }
+> > > -
+> > >      for (idx = 0; idx < v->shadow_vqs->len; ++idx) {
+> > >          vhost_svq_stop(g_ptr_array_index(v->shadow_vqs, idx));
+> > >      }
+> > > --
+> > > 2.31.1
+> >
 
-There is something wrong with the test suite that it isn't covering
-the above, I'm going to look into that today.
-
-Jason
