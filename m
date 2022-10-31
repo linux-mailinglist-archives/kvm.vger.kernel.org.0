@@ -2,342 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB4256131AB
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 09:26:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 918DF613238
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 10:08:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229529AbiJaI00 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 04:26:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48386 "EHLO
+        id S230106AbiJaJI2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 05:08:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbiJaI0Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 04:26:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EA55644A
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 01:25:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667204726;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AWGWZn2gpcSmU0xFQ8d8r+vWR3I3N77l3W6W3fr8iDU=;
-        b=WvYjfzvUDSCTB+w4nxzGGLLP6bw58iwP/x8lxEvFTpi8rcBRiCGMmBMno87ZIWN9Yv8lxK
-        mWdliUm39E9HMQv0EOZrvTjd39fc3piK8vnoWhCmWUUklhvF0EZRQ7HDKtdlT9yazsh+Lk
-        ruBcQrdksDWHQqs7pkchUIGYGr/rUO8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-644-vpQh6cs8Pe2w0bnDhX3Fmw-1; Mon, 31 Oct 2022 04:25:25 -0400
-X-MC-Unique: vpQh6cs8Pe2w0bnDhX3Fmw-1
-Received: by mail-wr1-f70.google.com with SMTP id i14-20020adfa50e000000b0023652707418so2813924wrb.20
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 01:25:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AWGWZn2gpcSmU0xFQ8d8r+vWR3I3N77l3W6W3fr8iDU=;
-        b=bWl3cQvsnHI5rWr9qzYAf7/rjV6wWkPadcqLlGDasMBjNVZIXAAPjMzjUSqGnu8j3P
-         WUdyxZrZaQH/Y9auMY6HWUnca4yAlJW1qD5UDf4SPk7L9gecTrK1CWyAiVOAKKgEGviw
-         ZoPRaKomhaGfWiole/CRzXU2usAGevK/qd1XxXfNb0XfD134kqu9QIcHX53XusQsvpCp
-         Smx2+on2HIc0DWFuKWFpDsLvRXnpMAag/y9XR+XulGjRXZ/VH6ToZupeKxZLGjtGgNTD
-         ugM/cVWExn35x5AJzcR5Zeb4Cdn7YP3o04uxUfbSOEd73Txu38AitOJtLUHgbfBg1lsX
-         2iVg==
-X-Gm-Message-State: ACrzQf3+YfXmkRIDEUFWnBfNYJFd+mZ76N0cFizeB1tOkJeauoK2qC6Q
-        CbSAWEmUDvDcwjQgyrSYT/d7nTMx+E8WtQN1tg7igCtZcKsmd9ugaGFDb1Uima1K/ECUIH8Hj1/
-        CukbJXchmS5TX
-X-Received: by 2002:a05:600c:35cb:b0:3c6:e382:62fb with SMTP id r11-20020a05600c35cb00b003c6e38262fbmr7027828wmq.22.1667204724341;
-        Mon, 31 Oct 2022 01:25:24 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7CLwK7d8Rah9LKz/kgVU17xRU0I15SQA+E0TQgkEf4yGCwYw1t3vTH/zhu1mAtPMGiXstcJw==
-X-Received: by 2002:a05:600c:35cb:b0:3c6:e382:62fb with SMTP id r11-20020a05600c35cb00b003c6e38262fbmr7027806wmq.22.1667204724090;
-        Mon, 31 Oct 2022 01:25:24 -0700 (PDT)
-Received: from redhat.com ([2.52.15.189])
-        by smtp.gmail.com with ESMTPSA id i11-20020a05600c354b00b003cf57329221sm7420509wmq.14.2022.10.31.01.25.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Oct 2022 01:25:23 -0700 (PDT)
-Date:   Mon, 31 Oct 2022 04:25:19 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-Cc:     qemu-devel@nongnu.org, Gautam Dawar <gdawar@xilinx.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eli Cohen <eli@mellanox.com>,
-        Parav Pandit <parav@mellanox.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Cindy Lu <lulu@redhat.com>,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Harpreet Singh Anand <hanand@xilinx.com>
-Subject: Re: [PATCH v5 6/6] vdpa: Always start CVQ in SVQ mode
-Message-ID: <20221031042356-mutt-send-email-mst@kernel.org>
-References: <20221011104154.1209338-1-eperezma@redhat.com>
- <20221011104154.1209338-7-eperezma@redhat.com>
+        with ESMTP id S229505AbiJaJI1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 05:08:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC0AB764C
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 02:08:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6813E60FA7
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 09:08:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7249C433D6;
+        Mon, 31 Oct 2022 09:08:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667207304;
+        bh=XyEyZaCaDS1iH/TW1RAmNRD0RiLTKVHIgX5Q3DeWWuU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=j1Caxz5EOxkO32/byri0Ilor35vjDhbVjYAna7ij9xr2+J10VAJ+yqMHBO1aJx58O
+         oBZQaNcICWP7tg6yk1sb2OKpN7OTq+NWQaa7HsEvJv+n5A6QOBhZ2bBMg2UErCaONI
+         fYGnbMEnzq/MUX8bKr7o+lVc6bwm+pKfhECy+n4VvJjVWeRNkgDC3RpEtNmyHQX2rz
+         AlsDwol0OLCC5nEkCz2UJU4biXxN/dE4bfyenbNGyjudTfT4g/2o1kBKrG/KTnQP8Q
+         gudzXIskeXlVZ21LldUCjJVH7RBTik4AU20Z/tYOXw/NGO6vwXngswY9OiheYHSH/S
+         F15Pdqq7PpzeA==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1opQmM-002h7u-A3;
+        Mon, 31 Oct 2022 09:08:22 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221011104154.1209338-7-eperezma@redhat.com>
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Date:   Mon, 31 Oct 2022 09:08:21 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Gavin Shan <gshan@redhat.com>,
+        Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com,
+        bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev,
+        dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
+        james.morse@arm.com, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
+ conjunction with bitmap
+In-Reply-To: <Y1wIj/sdJw7VMiY5@google.com>
+References: <Y1LDRkrzPeQXUHTR@google.com> <87edv0gnb3.wl-maz@kernel.org>
+ <Y1ckxYst3tc0LCqb@google.com> <Y1css8k0gtFkVwFQ@google.com>
+ <878rl4gxzx.wl-maz@kernel.org> <Y1ghIKrAsRFwSFsO@google.com>
+ <877d0lhdo9.wl-maz@kernel.org> <Y1rDkz6q8+ZgYFWW@google.com>
+ <875yg5glvk.wl-maz@kernel.org>
+ <36c97b96-1427-ce05-8fce-fd21c4711af9@redhat.com>
+ <Y1wIj/sdJw7VMiY5@google.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <9e57cd7616974c783cce5026d61d310b@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: seanjc@google.com, gshan@redhat.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 11, 2022 at 12:41:54PM +0200, Eugenio Pérez wrote:
-> Isolate control virtqueue in its own group, allowing to intercept control
-> commands but letting dataplane run totally passthrough to the guest.
+On 2022-10-28 17:51, Sean Christopherson wrote:
+> On Fri, Oct 28, 2022, Gavin Shan wrote:
+>> Hi Sean and Marc,
+>> 
+>> On 10/28/22 2:30 AM, Marc Zyngier wrote:
+>> > On Thu, 27 Oct 2022 18:44:51 +0100,
+>> > Sean Christopherson <seanjc@google.com> wrote:
+>> > >
+>> > > On Thu, Oct 27, 2022, Marc Zyngier wrote:
+>> > > > On Tue, 25 Oct 2022 18:47:12 +0100, Sean Christopherson <seanjc@google.com> wrote:
+>> 
+>> [...]
+>> > >
+>> > > > > And ideally such bugs would detected without relying on userspace to
+>> > > > > enabling dirty logging, e.g. the Hyper-V bug lurked for quite some
+>> > > > > time and was only found when mark_page_dirty_in_slot() started
+>> > > > > WARNing.
+>> > > > >
+>> > > > > I'm ok if arm64 wants to let userspace shoot itself in the foot with
+>> > > > > the ITS, but I'm not ok dropping the protections in the common
+>> > > > > mark_page_dirty_in_slot().
+>> > > > >
+>> > > > > One somewhat gross idea would be to let architectures override the
+>> > > > > "there must be a running vCPU" rule, e.g. arm64 could toggle a flag
+>> > > > > in kvm->arch in its kvm_write_guest_lock() to note that an expected
+>> > > > > write without a vCPU is in-progress:
+>> > > > >
+>> > > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> > > > > index 8c5c69ba47a7..d1da8914f749 100644
+>> > > > > --- a/virt/kvm/kvm_main.c
+>> > > > > +++ b/virt/kvm/kvm_main.c
+>> > > > > @@ -3297,7 +3297,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>> > > > >          struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+>> > > > >   #ifdef CONFIG_HAVE_KVM_DIRTY_RING
+>> > > > > -       if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
+>> > > > > +       if (!kvm_arch_allow_write_without_running_vcpu(kvm) && WARN_ON_ONCE(!vcpu))
+>> > > > > +               return;
+>> > > > > +
+>> > > > > +       if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
+>> > > > >                  return;
+>> > > > >   #endif
+>> > > > > @@ -3305,10 +3308,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>> > > > >                  unsigned long rel_gfn = gfn - memslot->base_gfn;
+>> > > > >                  u32 slot = (memslot->as_id << 16) | memslot->id;
+>> > > > > -               if (kvm->dirty_ring_size)
+>> > > > > +               if (kvm->dirty_ring_size && vcpu)
+>> > > > >                          kvm_dirty_ring_push(&vcpu->dirty_ring,
+>> > > > >                                              slot, rel_gfn);
+>> > > > > -               else
+>> > > > > +               else if (memslot->dirty_bitmap)
+>> > > > >                          set_bit_le(rel_gfn, memslot->dirty_bitmap);
+>> > > > >          }
+>> > > > >   }
 > 
-> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> ...
+> 
+>> > > A slightly different alternative would be have a completely separate
+>> > > API for writing guest memory without an associated vCPU.  I.e. start
+>> > > building up proper device emulation support.  Then the vCPU-based
+>> > > APIs could yell if a vCPU isn't provided (or there is no running
+>> > > vCPU in the current mess).  And the deviced-based API could be
+>> > > provided if and only if the architecture actually supports emulating
+>> > > writes from devices, i.e. x86 would not opt-in and so would even
+>> > > have access to the API.
+>> >
+>> > Which is what I was putting under the "major surgery" label in my
+>> > previous email.
+>> >
+>> > Anyhow, for the purpose of unblocking Gavin's series, I suggest to
+>> > adopt your per-arch opt-out suggestion as a stop gap measure, and we
+>> > will then be able to bike-shed for weeks on what the shape of the
+>> > device-originated memory dirtying API should be.
+>> >
+>> 
+>> It's really a 'major surgery' and I would like to make sure I fully 
+>> understand
+>> 'a completely separate API for writing guest memory without an 
+>> associated vCPU",
+>> before I'm going to working on v7 for this.
+>> 
+>> There are 7 functions and 2 macros involved as below. I assume Sean is 
+>> suggesting
+>> to add another argument, whose name can be 'has_vcpu', for these 
+>> functions and macros?
+> 
+> No.
+> 
+> As March suggested, for your series just implement the hacky arch 
+> opt-out, don't
 
-I guess we need svq for this. Not a reason to allocate it for
-all queues. Also if vdpa does not support pasid then I guess
-we should not bother with svq.
+Please call me April.
 
-> ---
-> v5:
-> * Fixing the not adding cvq buffers when x-svq=on is specified.
-> * Move vring state in vhost_vdpa_get_vring_group instead of using a
->   parameter.
-> * Rename VHOST_VDPA_NET_CVQ_PASSTHROUGH to VHOST_VDPA_NET_DATA_ASID
+> try and do surgery at this time as that's likely going to be a
+> months-long effort
+> that touches a lot of cross-arch code.
 > 
-> v4:
-> * Squash vhost_vdpa_cvq_group_is_independent.
-> * Rebased on last CVQ start series, that allocated CVQ cmd bufs at load
-> * Do not check for cvq index on vhost_vdpa_net_prepare, we only have one
->   that callback registered in that NetClientInfo.
+> E.g. I believe the ARM opt-out (opt-in?) for the above hack would be
 > 
-> v3:
-> * Make asid related queries print a warning instead of returning an
->   error and stop the start of qemu.
-> ---
->  hw/virtio/vhost-vdpa.c |   3 +-
->  net/vhost-vdpa.c       | 118 +++++++++++++++++++++++++++++++++++++++--
->  2 files changed, 115 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-> index 29d009c02b..fd4de06eab 100644
-> --- a/hw/virtio/vhost-vdpa.c
-> +++ b/hw/virtio/vhost-vdpa.c
-> @@ -682,7 +682,8 @@ static int vhost_vdpa_set_backend_cap(struct vhost_dev *dev)
->  {
->      uint64_t features;
->      uint64_t f = 0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2 |
-> -        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH;
-> +        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH |
-> +        0x1ULL << VHOST_BACKEND_F_IOTLB_ASID;
->      int r;
->  
->      if (vhost_vdpa_call(dev, VHOST_GET_BACKEND_FEATURES, &features)) {
-> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> index f7831aeb8d..6f6ef59ea3 100644
-> --- a/net/vhost-vdpa.c
-> +++ b/net/vhost-vdpa.c
-> @@ -38,6 +38,9 @@ typedef struct VhostVDPAState {
->      void *cvq_cmd_out_buffer;
->      virtio_net_ctrl_ack *status;
->  
-> +    /* Number of address spaces supported by the device */
-> +    unsigned address_space_num;
-> +
->      /* The device always have SVQ enabled */
->      bool always_svq;
->      bool started;
-> @@ -102,6 +105,9 @@ static const uint64_t vdpa_svq_device_features =
->      BIT_ULL(VIRTIO_NET_F_RSC_EXT) |
->      BIT_ULL(VIRTIO_NET_F_STANDBY);
->  
-> +#define VHOST_VDPA_NET_DATA_ASID 0
-> +#define VHOST_VDPA_NET_CVQ_ASID 1
-> +
->  VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
->  {
->      VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
-> @@ -226,6 +232,34 @@ static NetClientInfo net_vhost_vdpa_info = {
->          .check_peer_type = vhost_vdpa_check_peer_type,
->  };
->  
-> +static uint32_t vhost_vdpa_get_vring_group(int device_fd, unsigned vq_index)
-> +{
-> +    struct vhost_vring_state state = {
-> +        .index = vq_index,
-> +    };
-> +    int r = ioctl(device_fd, VHOST_VDPA_GET_VRING_GROUP, &state);
-> +
-> +    return r < 0 ? 0 : state.num;
-> +}
-> +
-> +static int vhost_vdpa_set_address_space_id(struct vhost_vdpa *v,
-> +                                           unsigned vq_group,
-> +                                           unsigned asid_num)
-> +{
-> +    struct vhost_vring_state asid = {
-> +        .index = vq_group,
-> +        .num = asid_num,
-> +    };
-> +    int ret;
-> +
-> +    ret = ioctl(v->device_fd, VHOST_VDPA_SET_GROUP_ASID, &asid);
-> +    if (unlikely(ret < 0)) {
-> +        warn_report("Can't set vq group %u asid %u, errno=%d (%s)",
-> +            asid.index, asid.num, errno, g_strerror(errno));
-> +    }
-> +    return ret;
-> +}
-> +
->  static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *addr)
->  {
->      VhostIOVATree *tree = v->iova_tree;
-> @@ -300,11 +334,50 @@ dma_map_err:
->  static int vhost_vdpa_net_cvq_start(NetClientState *nc)
->  {
->      VhostVDPAState *s;
-> -    int r;
-> +    struct vhost_vdpa *v;
-> +    uint32_t cvq_group;
-> +    int cvq_index, r;
->  
->      assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
->  
->      s = DO_UPCAST(VhostVDPAState, nc, nc);
-> +    v = &s->vhost_vdpa;
-> +
-> +    v->listener_shadow_vq = s->always_svq;
-> +    v->shadow_vqs_enabled = s->always_svq;
-> +    s->vhost_vdpa.address_space_id = VHOST_VDPA_NET_DATA_ASID;
-> +
-> +    if (s->always_svq) {
-> +        goto out;
-> +    }
-> +
-> +    if (s->address_space_num < 2) {
-> +        return 0;
-> +    }
-> +
-> +    /**
-> +     * Check if all the virtqueues of the virtio device are in a different vq
-> +     * than the last vq. VQ group of last group passed in cvq_group.
-> +     */
-> +    cvq_index = v->dev->vq_index_end - 1;
-> +    cvq_group = vhost_vdpa_get_vring_group(v->device_fd, cvq_index);
-> +    for (int i = 0; i < cvq_index; ++i) {
-> +        uint32_t group = vhost_vdpa_get_vring_group(v->device_fd, i);
-> +
-> +        if (unlikely(group == cvq_group)) {
-> +            warn_report("CVQ %u group is the same as VQ %u one (%u)", cvq_group,
-> +                        i, group);
-> +            return 0;
-> +        }
-> +    }
-> +
-> +    r = vhost_vdpa_set_address_space_id(v, cvq_group, VHOST_VDPA_NET_CVQ_ASID);
-> +    if (r == 0) {
-> +        v->shadow_vqs_enabled = true;
-> +        s->vhost_vdpa.address_space_id = VHOST_VDPA_NET_CVQ_ASID;
-> +    }
-> +
-> +out:
->      if (!s->vhost_vdpa.shadow_vqs_enabled) {
->          return 0;
->      }
-> @@ -576,12 +649,38 @@ static const VhostShadowVirtqueueOps vhost_vdpa_net_svq_ops = {
->      .avail_handler = vhost_vdpa_net_handle_ctrl_avail,
->  };
->  
-> +static uint32_t vhost_vdpa_get_as_num(int vdpa_device_fd)
-> +{
-> +    uint64_t features;
-> +    unsigned num_as;
-> +    int r;
-> +
-> +    r = ioctl(vdpa_device_fd, VHOST_GET_BACKEND_FEATURES, &features);
-> +    if (unlikely(r < 0)) {
-> +        warn_report("Cannot get backend features");
-> +        return 1;
-> +    }
-> +
-> +    if (!(features & BIT_ULL(VHOST_BACKEND_F_IOTLB_ASID))) {
-> +        return 1;
-> +    }
-> +
-> +    r = ioctl(vdpa_device_fd, VHOST_VDPA_GET_AS_NUM, &num_as);
-> +    if (unlikely(r < 0)) {
-> +        warn_report("Cannot retrieve number of supported ASs");
-> +        return 1;
-> +    }
-> +
-> +    return num_as;
-> +}
-> +
->  static NetClientState *net_vhost_vdpa_init(NetClientState *peer,
->                                             const char *device,
->                                             const char *name,
->                                             int vdpa_device_fd,
->                                             int queue_pair_index,
->                                             int nvqs,
-> +                                           unsigned nas,
->                                             bool is_datapath,
->                                             bool svq,
->                                             VhostIOVATree *iova_tree)
-> @@ -600,6 +699,7 @@ static NetClientState *net_vhost_vdpa_init(NetClientState *peer,
->      snprintf(nc->info_str, sizeof(nc->info_str), TYPE_VHOST_VDPA);
->      s = DO_UPCAST(VhostVDPAState, nc, nc);
->  
-> +    s->address_space_num = nas;
->      s->vhost_vdpa.device_fd = vdpa_device_fd;
->      s->vhost_vdpa.index = queue_pair_index;
->      s->always_svq = svq;
-> @@ -686,6 +786,8 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
->      g_autoptr(VhostIOVATree) iova_tree = NULL;
->      NetClientState *nc;
->      int queue_pairs, r, i = 0, has_cvq = 0;
-> +    unsigned num_as = 1;
-> +    bool svq_cvq;
->  
->      assert(netdev->type == NET_CLIENT_DRIVER_VHOST_VDPA);
->      opts = &netdev->u.vhost_vdpa;
-> @@ -711,7 +813,13 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
->          return queue_pairs;
->      }
->  
-> -    if (opts->x_svq) {
-> +    svq_cvq = opts->x_svq;
-> +    if (has_cvq && !opts->x_svq) {
-> +        num_as = vhost_vdpa_get_as_num(vdpa_device_fd);
-> +        svq_cvq = num_as > 1;
-> +    }
-> +
-> +    if (opts->x_svq || svq_cvq) {
->          struct vhost_vdpa_iova_range iova_range;
->  
->          uint64_t invalid_dev_features =
-> @@ -734,15 +842,15 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
->  
->      for (i = 0; i < queue_pairs; i++) {
->          ncs[i] = net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
-> -                                     vdpa_device_fd, i, 2, true, opts->x_svq,
-> -                                     iova_tree);
-> +                                     vdpa_device_fd, i, 2, num_as, true,
-> +                                     opts->x_svq, iova_tree);
->          if (!ncs[i])
->              goto err;
->      }
->  
->      if (has_cvq) {
->          nc = net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
-> -                                 vdpa_device_fd, i, 1, false,
-> +                                 vdpa_device_fd, i, 1, num_as, false,
->                                   opts->x_svq, iova_tree);
->          if (!nc)
->              goto err;
-> -- 
-> 2.31.1
+> bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
+> {
+> 	return vgic_has_its(kvm);
+> }
 
+Although that will probably lead to the expected effect,
+this helper should only return true when the ITS is actively
+dumped.
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
