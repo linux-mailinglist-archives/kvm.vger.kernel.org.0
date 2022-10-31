@@ -2,164 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6055161323A
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 10:08:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E21861326F
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 10:19:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230115AbiJaJIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 05:08:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44352 "EHLO
+        id S230226AbiJaJTl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 05:19:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbiJaJIe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 05:08:34 -0400
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B78DE99
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 02:08:32 -0700 (PDT)
-Date:   Mon, 31 Oct 2022 09:08:25 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1667207310;
+        with ESMTP id S230186AbiJaJTa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 05:19:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EE40AE58
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 02:18:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667207912;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=U5/JbhY9LhPSVJdzEwNQNkVnYtJH0GE5orskeb4KkyM=;
-        b=jv8WmDlSDnakkn2G4sRDBN9wI1fZ25KXJiRIu7pmtAqaYYLTMBBhML386CR6NVjUCjSw5k
-        /oehu9sLm6mNwPLju/fWRXVaDrdIFKeJG83KuyaWFObAy/glCdCYnFeASrNhTnxGOb7jyK
-        9abjDA6RtHarmimbY5SP6e0zPRXdbsk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-        ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
-        catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
-        pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
-        james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v7 5/9] KVM: arm64: Improve no-running-vcpu report for
- dirty ring
-Message-ID: <Y1+QiS0S3e6b358Q@google.com>
-References: <20221031003621.164306-1-gshan@redhat.com>
- <20221031003621.164306-6-gshan@redhat.com>
+        bh=wEf8cRb4TLYPYASggaPulamyqh6fRxomZhqUsJe70lA=;
+        b=VPVVfq+W1vljk2rJ0G4btBT9+XWT1U3DxP7CTJRBVBugp3LxzanpHYcY+fyj+k4qEGpsr0
+        C/kmbdnuvT3YfH5mX6xY7vdgf2+1EIZPmiTqm9kA7WOzaQNlZj2PHwH/AphxOZZbtwiHLC
+        5RPaHT8Htl8IQ7rafuGJqWqnXHiAi6w=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-536-qd4vPACCOp2nSCkrxM_25Q-1; Mon, 31 Oct 2022 05:18:24 -0400
+X-MC-Unique: qd4vPACCOp2nSCkrxM_25Q-1
+Received: by mail-qv1-f70.google.com with SMTP id h1-20020a0ceda1000000b004b899df67a4so5425396qvr.1
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 02:18:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wEf8cRb4TLYPYASggaPulamyqh6fRxomZhqUsJe70lA=;
+        b=70NgypN+3kC01JWJ4i413Urbv8WkJ0r47OOjS1xzJh9kEXq2XL0tqkVpw9sENSRQxU
+         4BWF6wr4zeYtKZNE3kjRF+oViqcFBbQ6cetVbNOiW/wHWEYFmReQTZl4xBfNvZ9XKALy
+         ALofEX6yy1coTGiPDCCwY27LuKKtS0veWCw6r6+7W1lEizLcnf2fNdbMvPp9uCclbRSY
+         hO93fgmx6Pb7KSlf9S0mzjzwi1+hBriwVLVesJcixFxIGWJHqL5jgHhUH2LzmRtWo0eM
+         UFltvhBjLIcTrSBDazeKr+N5AcTB2EtdkCJ+759VFjBrCtxpVDoJUrgjfXPX5MqYUVbu
+         lgIw==
+X-Gm-Message-State: ACrzQf0p6NqI+vWoFsSzsCNH5x/HTMp3t69wKEPLamsHOgvPjag9w9mZ
+        9zeseEeuBXehDPxPytyDkAeYAbVH0hxlGX+GtBBcz1jEgs0o9bKbNop9aS525Cvzddlfie9obsH
+        VIJy1H7GnaJ3d
+X-Received: by 2002:a05:620a:199f:b0:6ee:bbd2:4c50 with SMTP id bm31-20020a05620a199f00b006eebbd24c50mr8364035qkb.500.1667207903664;
+        Mon, 31 Oct 2022 02:18:23 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4olZT6py2Dkvc62FgswOCrOLSA+9D1FbQFn4jFwUP7lTvfqZXuIVpxdtJRuQF/qYD1vFf9DA==
+X-Received: by 2002:a05:620a:199f:b0:6ee:bbd2:4c50 with SMTP id bm31-20020a05620a199f00b006eebbd24c50mr8364026qkb.500.1667207903435;
+        Mon, 31 Oct 2022 02:18:23 -0700 (PDT)
+Received: from ovpn-194-149.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id g1-20020a05620a40c100b006cebda00630sm603594qko.60.2022.10.31.02.18.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Oct 2022 02:18:22 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v12 00/46] KVM: x86: hyper-v: Fine-grained TLB flush +
+ L2 TLB flush features
+In-Reply-To: <Y1m1Jnpw5betG8CG@google.com>
+References: <20221021153521.1216911-1-vkuznets@redhat.com>
+ <Y1m0ef+LdcAW0Bzh@google.com> <Y1m1Jnpw5betG8CG@google.com>
+Date:   Mon, 31 Oct 2022 10:18:19 +0100
+Message-ID: <87zgdcs65g.fsf@ovpn-194-149.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221031003621.164306-6-gshan@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 31, 2022 at 08:36:17AM +0800, Gavin Shan wrote:
-> KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP should be enabled only when KVM
-> device "kvm-arm-vgic-its" is used by userspace. Currently, it's the
-> only case where a running VCPU is missed for dirty ring. However,
-> there are potentially other devices introducing similar error in
-> future.
-> 
-> In order to report those broken devices only, the no-running-vcpu
-> warning message is escaped from KVM device "kvm-arm-vgic-its". For
-> this, the function vgic_has_its() needs to be exposed with a more
-> generic function name (kvm_vgic_has_its()).
-> 
-> Link: https://lore.kernel.org/kvmarm/Y1ghIKrAsRFwSFsO@google.com
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
+Sean Christopherson <seanjc@google.com> writes:
 
-I don't think this should be added as a separate patch.
+> On Wed, Oct 26, 2022, Sean Christopherson wrote:
+>> On Fri, Oct 21, 2022, Vitaly Kuznetsov wrote:
+>> >   KVM: selftests: evmcs_test: Introduce L2 TLB flush test
+>> >   KVM: selftests: hyperv_svm_test: Introduce L2 TLB flush test
+>> 
+>> Except for these two (patches 44 and 45),
+>> 
+>> Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-The weak kvm_arch_allow_write_without_running_vcpu() (and adding its
-caller) should be rolled into patch 4/9. The arm64 implementation of
-that should be introduced in patch 6/9.
+Thanks! I'll take a look at 44/45 shortly.
 
-> ---
->  arch/arm64/kvm/mmu.c               | 14 ++++++++++++++
->  arch/arm64/kvm/vgic/vgic-init.c    |  4 ++--
->  arch/arm64/kvm/vgic/vgic-irqfd.c   |  4 ++--
->  arch/arm64/kvm/vgic/vgic-its.c     |  2 +-
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 18 ++++--------------
->  arch/arm64/kvm/vgic/vgic.c         | 10 ++++++++++
->  arch/arm64/kvm/vgic/vgic.h         |  1 -
->  include/kvm/arm_vgic.h             |  1 +
->  include/linux/kvm_dirty_ring.h     |  1 +
->  virt/kvm/dirty_ring.c              |  5 +++++
->  virt/kvm/kvm_main.c                |  2 +-
->  11 files changed, 41 insertions(+), 21 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 60ee3d9f01f8..e0855b2b3d66 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -932,6 +932,20 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
->  	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
->  }
->  
-> +/*
-> + * kvm_arch_allow_write_without_running_vcpu - allow writing guest memory
-> + * without the running VCPU when dirty ring is enabled.
-> + *
-> + * The running VCPU is required to track dirty guest pages when dirty ring
-> + * is enabled. Otherwise, the backup bitmap should be used to track the
-> + * dirty guest pages. When vgic/its is enabled, we need to use the backup
-> + * bitmap to track the dirty guest pages for it.
-> + */
-> +bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
-> +{
-> +	return kvm->dirty_ring_with_bitmap && kvm_vgic_has_its(kvm);
-> +}
+>
+> Actually, easiest thing is probably for Paolo to queue everything through 43
+> (with a comment in patch 13 about the GPA translation), and then you can send a
+> new version containing only the stragglers.
 
-It is trivial for userspace to cause a WARN to fire like this. Just set
-up the VM with !RING_WITH_BITMAP && ITS.
+Paolo,
 
-The goal is to catch KVM bugs, not userspace bugs, so I'd suggest only
-checking whether or not an ITS is present.
+do you want to follow this path or do you expect the full 'v13' from me? 
 
-[...]
+-- 
+Vitaly
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> index 91201f743033..10218057c176 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -38,20 +38,10 @@ u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
->  	return reg | ((u64)val << lower);
->  }
->  
-> -bool vgic_has_its(struct kvm *kvm)
-> -{
-> -	struct vgic_dist *dist = &kvm->arch.vgic;
-> -
-> -	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
-> -		return false;
-> -
-> -	return dist->has_its;
-> -}
-> -
-
-nit: renaming/exposing this helper should be done in a separate patch.
-Also, I don't think you need to move it anywhere either.
-
-[...]
-
-> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-> index 7ce6a5f81c98..f27e038043f3 100644
-> --- a/virt/kvm/dirty_ring.c
-> +++ b/virt/kvm/dirty_ring.c
-> @@ -26,6 +26,11 @@ bool kvm_use_dirty_bitmap(struct kvm *kvm)
->  	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
->  }
->  
-> +bool __weak kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
-> +{
-> +	return kvm->dirty_ring_with_bitmap;
-> +}
-> +
-
-Same comment on the arm64 implementation applies here. This should just
-return false by default.
-
---
-Thanks,
-Oliver
