@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 31DE4613CC9
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 19:01:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0F44613CCA
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 19:01:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229955AbiJaSBK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 14:01:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39802 "EHLO
+        id S230007AbiJaSBN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 14:01:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229898AbiJaSBE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 14:01:04 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 062E413D3C
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:01:03 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id j22-20020aa79296000000b0056d3180c800so2366567pfa.3
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:01:03 -0700 (PDT)
+        with ESMTP id S229935AbiJaSBH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 14:01:07 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4E6E13D6F
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:01:05 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 204-20020a250fd5000000b006ccc0e91098so1677984ybp.13
+        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 11:01:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EumOl5mGgVnCEzDA+UueSGzDQoNJ9RAkypwsXwSdasQ=;
-        b=nmA84ddMcpRP2hFYDqoMp2XhVwDw0uGolYYYJo8yoKEeGUTwIcNkDhfeLAmWW/F6oW
-         oLUUPUeRENd3+vUw22CvKmI9o0MEP8zAPsZ9QmuQI/4YEt80KgXrdz3YIf7Ddf6W2jEY
-         N1DeK1POtHRaWUTOr1DDvz/yuL3vV0eDKCq8H2EDK0YUrxqU4ixGybWBzA7Fxjxrk8Pf
-         6i/07Qj30aMH2VcbHYR7Jur2RoVXb+h3iRUVtmpoZ7cOYv8KJ1nOnqga9ljYe/K4YiFl
-         I4AbXKP7rcb3GkQOG9/rZzatx9bkzvgIQmzRSzIO2kg+HfwQmAkbf2tMBLeWNHPuwuj5
-         FoNA==
+        bh=KMoIap0sR+1CcUsNo9fMIcDCtwhfe98yh5fTCarrD0c=;
+        b=VLj3zRJLo2Nc3pt/6PLTuz73FGjUXZHI+ss8K4kGwcdY9WYhL/h3+bd7wVTujqbsxK
+         Njc0xZihrFpNQECfQyYwVmTV74B8Hgpb/tbbqO2iR1d7GakKXdBa9T+fMSjpRWNItcBh
+         YcIILblPGHdbp8SEL6gItvb+2mfhZGvRbm8VU7DHSAet99kBSSZ3WBYggp6btxpHIawf
+         mBaXaiwBJNBhjDNmCO9GSKBLLhbjU7vJKmpm6NZ4yKMEB0s52TsbHEi+VIdY8JTB0rcS
+         zJBKaOywg57weYiiRYoo9al80OZSmMbT6G+NJ4NhmktEwyQP3a1M3wMQ4dq4DFRQOO9B
+         F7mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EumOl5mGgVnCEzDA+UueSGzDQoNJ9RAkypwsXwSdasQ=;
-        b=GFRGTej6J4/wk7quB47Q+0eVykAZ+WIxUbhl6lCmKV2BhUgVu5yjf7yBFxTPhoteyj
-         CDdP1jvph9UY5ySQ+luC0n1hHYwaIBRaUDFtg8/2x38bQs1lGNtAhx4jUmTazmEI6zSb
-         eNXAfUq9VSgkraDTMDGuoYd2KMqkSJWOJf3G30xDCaVu//KTMdaZfbl8QFEFWt1zifeZ
-         nNI8mSEO9ujEPA8hKdGAKmBng64D52Vv+nZXZBuRRST/9BIhXRHqm+jUvleNULgmLauQ
-         oc7ARsypHrualIhVk3ut9EACk6/QmIhYP4uX7goPmTWyzZzeqnGoEZ/s4c3I180T1IHr
-         /4ww==
-X-Gm-Message-State: ACrzQf2DkjCN2tK3L0PGv93ye9/1pu4DyJ2ZjSlSPkeIr3mOSQT1o1a/
-        lWx1zT7XXPKXEYzEWQUzarJNnW543wi0MA==
-X-Google-Smtp-Source: AMsMyM5efca/PyxNmqTIb6Ud/6wk5zBYuG9TABpZz5Sadm8w5mD6vosLbMuigQHzECNtMr3fA/F1iLGoEYPiYA==
+        bh=KMoIap0sR+1CcUsNo9fMIcDCtwhfe98yh5fTCarrD0c=;
+        b=4gKOWWlvkaL1g2eM/4xBnlX+9P2P3BFe1sn29uKV1WaZ+eh3c2rVkDxWokXpI1k0Ei
+         WS9xszipimrTKX2FyRXIaRW/+3nADPg9dZU0LicIvIOLDVRE+atSvDFVSspFhjKryCeH
+         c0PDTYplDWJkFuGyz7JSi0iqpURFCRhTEzcnrcPPDvcSz15xsoeqvBOZEtPvsSnqym1k
+         SuqImSSNyXzqSNzLGTBN9ZNRk5UiZttGTR75J3LZe5J8F2IJfj5zK5R2FqpBiccCPBVd
+         2f/mYidhN/e3kD+zloYA+33O5rfboy2+mtbLkT4xUJeMDNWxcICaAG3X5Z8JEtCz1o3/
+         XcDA==
+X-Gm-Message-State: ACrzQf1CgCLe+Y3sQiA5bkiPBIL0wtgd7E8JplBGvAUmEUCJsc4kgk2I
+        K++DuwKBk3EpmmI5GQJi+PzTGI2i8KtfhQ==
+X-Google-Smtp-Source: AMsMyM4U9Rbs0fvhBZ53r4dAC1ISz0ocqdMAMluyOod/5k8dcgP8aQKc2vlbCtT9g8F7baxM7AkAlokX+RUnEA==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a17:90a:c691:b0:212:fd5f:1ab8 with SMTP
- id n17-20020a17090ac69100b00212fd5f1ab8mr32667755pjt.11.1667239262566; Mon,
- 31 Oct 2022 11:01:02 -0700 (PDT)
-Date:   Mon, 31 Oct 2022 11:00:42 -0700
+ (user=dmatlack job=sendgmr) by 2002:a05:6902:13c7:b0:695:84d9:c5da with SMTP
+ id y7-20020a05690213c700b0069584d9c5damr13953475ybu.650.1667239264359; Mon,
+ 31 Oct 2022 11:01:04 -0700 (PDT)
+Date:   Mon, 31 Oct 2022 11:00:43 -0700
 In-Reply-To: <20221031180045.3581757-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221031180045.3581757-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221031180045.3581757-8-dmatlack@google.com>
-Subject: [PATCH v3 07/10] KVM: selftests: Avoid JMP in non-faulting path of KVM_ASM_SAFE()
+Message-ID: <20221031180045.3581757-9-dmatlack@google.com>
+Subject: [PATCH v3 08/10] KVM: selftests: Provide error code as a
+ KVM_ASM_SAFE() output
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -77,72 +78,130 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <seanjc@google.com>
 
-Clear R9 in the non-faulting path of KVM_ASM_SAFE() and fall through to
-to a common load of "vector" to effectively load "vector" with '0' to
-reduce the code footprint of the asm blob, to reduce the runtime overhead
-of the non-faulting path (when "vector" is stored in a register), and so
-that additional output constraints that are valid if and only if a fault
-occur are loaded even in the non-faulting case.
+Provide the error code on a fault in KVM_ASM_SAFE(), e.g. to allow tests
+to assert that #PF generates the correct error code without needing to
+manually install a #PF handler.  Use r10 as the scratch register for the
+error code, as it's already clobbered by the asm blob (loaded with the
+RIP of the to-be-executed instruction).  Deliberately load the output
+"error_code" even in the non-faulting path so that error_code is always
+initialized with deterministic data (the aforementioned RIP), i.e to
+ensure a selftest won't end up with uninitialized consumption regardless
+of how KVM_ASM_SAFE() is used.
 
-A future patch will add a 64-bit output for the error code, and if its
-output is not explicitly loaded with _something_, the user of the asm
-blob can end up technically consuming uninitialized data.  Using a
-common path to load the output constraints will allow using an existing
-scratch register, e.g. r10, to hold the error code in the faulting path,
-while also guaranteeing the error code is initialized with deterministic
-data in the non-faulting patch (r10 is loaded with the RIP of
-to-be-executed instruction).
-
-Consuming the error code when a fault doesn't occur would obviously be a
-test bug, but there's no guarantee the compiler will detect uninitialized
-consumption.  And conversely, it's theoretically possible that the
-compiler might throw a false positive on uninitialized data, e.g. if the
-compiler can't determine that the non-faulting path won't touch the error
-code.
-
-Alternatively, the error code could be explicitly loaded in the
-non-faulting path, but loading a 64-bit memory|register output operand
-with an explicitl value requires a sign-extended "MOV imm32, r/m64",
-which isn't exactly straightforward and has a largish code footprint.
-And loading the error code with what is effectively garbage (from a
-scratch register) avoids having to choose an arbitrary value for the
-non-faulting case.
-
-Opportunistically remove a rogue asterisk in the block comment.
+Don't clear r10 in the non-faulting case and instead load error code with
+the RIP (see above).  The error code is valid if and only if an exception
+occurs, and '0' isn't necessarily a better "invalid" value, e.g. '0'
+could result in false passes for a buggy test.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- tools/testing/selftests/kvm/include/x86_64/processor.h | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ .../selftests/kvm/include/x86_64/processor.h  | 39 +++++++++++++------
+ .../selftests/kvm/lib/x86_64/processor.c      |  1 +
+ .../selftests/kvm/x86_64/hyperv_features.c    |  3 +-
+ 3 files changed, 30 insertions(+), 13 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index f7249cb27e0d..9efe80d52389 100644
+index 9efe80d52389..33b0f19e502c 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -764,7 +764,7 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
-  * for recursive faults when accessing memory in the handler.  The downside to
-  * using registers is that it restricts what registers can be used by the actual
-  * instruction.  But, selftests are 64-bit only, making register* pressure a
-- * minor concern.  Use r9-r11 as they are volatile, i.e. don't need* to be saved
-+ * minor concern.  Use r9-r11 as they are volatile, i.e. don't need to be saved
-  * by the callee, and except for r11 are not implicit parameters to any
-  * instructions.  Ideally, fixup would use r8-r10 and thus avoid implicit
-  * parameters entirely, but Hyper-V's hypercall ABI uses r8 and testing Hyper-V
-@@ -786,11 +786,9 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
- 	"lea 1f(%%rip), %%r10\n\t"				\
- 	"lea 2f(%%rip), %%r11\n\t"				\
+@@ -780,6 +780,7 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+  *
+  * REGISTER OUTPUTS:
+  * r9  = exception vector (non-zero)
++ * r10 = error code
+  */
+ #define KVM_ASM_SAFE(insn)					\
+ 	"mov $" __stringify(KVM_EXCEPTION_MAGIC) ", %%r9\n\t"	\
+@@ -788,29 +789,43 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
  	"1: " insn "\n\t"					\
--	"movb $0, %[vector]\n\t"				\
--	"jmp 3f\n\t"						\
-+	"xor %%r9, %%r9\n\t"					\
+ 	"xor %%r9, %%r9\n\t"					\
  	"2:\n\t"						\
--	"mov  %%r9b, %[vector]\n\t"				\
--	"3:\n\t"
-+	"mov  %%r9b, %[vector]\n\t"
+-	"mov  %%r9b, %[vector]\n\t"
++	"mov  %%r9b, %[vector]\n\t"				\
++	"mov  %%r10, %[error_code]\n\t"
  
- #define KVM_ASM_SAFE_OUTPUTS(v)	[vector] "=qm"(v)
+-#define KVM_ASM_SAFE_OUTPUTS(v)	[vector] "=qm"(v)
++#define KVM_ASM_SAFE_OUTPUTS(v, ec)	[vector] "=qm"(v), [error_code] "=rm"(ec)
  #define KVM_ASM_SAFE_CLOBBERS	"r9", "r10", "r11"
+ 
+-#define kvm_asm_safe(insn, inputs...)			\
+-({							\
+-	uint8_t vector;					\
+-							\
+-	asm volatile(KVM_ASM_SAFE(insn)			\
+-		     : KVM_ASM_SAFE_OUTPUTS(vector)	\
+-		     : inputs				\
+-		     : KVM_ASM_SAFE_CLOBBERS);		\
+-	vector;						\
++#define kvm_asm_safe(insn, inputs...)					\
++({									\
++	uint64_t ign_error_code;					\
++	uint8_t vector;							\
++									\
++	asm volatile(KVM_ASM_SAFE(insn)					\
++		     : KVM_ASM_SAFE_OUTPUTS(vector, ign_error_code)	\
++		     : inputs						\
++		     : KVM_ASM_SAFE_CLOBBERS);				\
++	vector;								\
++})
++
++#define kvm_asm_safe_ec(insn, error_code, inputs...)			\
++({									\
++	uint8_t vector;							\
++									\
++	asm volatile(KVM_ASM_SAFE(insn)					\
++		     : KVM_ASM_SAFE_OUTPUTS(vector, error_code)		\
++		     : inputs						\
++		     : KVM_ASM_SAFE_CLOBBERS);				\
++	vector;								\
+ })
+ 
+ static inline uint8_t rdmsr_safe(uint32_t msr, uint64_t *val)
+ {
++	uint64_t error_code;
+ 	uint8_t vector;
+ 	uint32_t a, d;
+ 
+ 	asm volatile(KVM_ASM_SAFE("rdmsr")
+-		     : "=a"(a), "=d"(d), KVM_ASM_SAFE_OUTPUTS(vector)
++		     : "=a"(a), "=d"(d), KVM_ASM_SAFE_OUTPUTS(vector, error_code)
+ 		     : "c"(msr)
+ 		     : KVM_ASM_SAFE_CLOBBERS);
+ 
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index 39c4409ef56a..fc6c724e0d24 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -1116,6 +1116,7 @@ static bool kvm_fixup_exception(struct ex_regs *regs)
+ 
+ 	regs->rip = regs->r11;
+ 	regs->r9 = regs->vector;
++	regs->r10 = regs->error_code;
+ 	return true;
+ }
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+index 05b32e550a80..2b6d455acf8a 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+@@ -18,6 +18,7 @@
+ static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
+ 				vm_vaddr_t output_address, uint64_t *hv_status)
+ {
++	uint64_t error_code;
+ 	uint8_t vector;
+ 
+ 	/* Note both the hypercall and the "asm safe" clobber r9-r11. */
+@@ -25,7 +26,7 @@ static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
+ 		     KVM_ASM_SAFE("vmcall")
+ 		     : "=a" (*hv_status),
+ 		       "+c" (control), "+d" (input_address),
+-		       KVM_ASM_SAFE_OUTPUTS(vector)
++		       KVM_ASM_SAFE_OUTPUTS(vector, error_code)
+ 		     : [output_address] "r"(output_address),
+ 		       "a" (-EFAULT)
+ 		     : "cc", "memory", "r8", KVM_ASM_SAFE_CLOBBERS);
 -- 
 2.38.1.273.g43a17bfeac-goog
 
