@@ -2,182 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA543612F58
-	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 04:39:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E0DA612F77
+	for <lists+kvm@lfdr.de>; Mon, 31 Oct 2022 05:23:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbiJaDjE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Oct 2022 23:39:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36890 "EHLO
+        id S229556AbiJaEXv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 00:23:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiJaDjC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Oct 2022 23:39:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2159B95A0
-        for <kvm@vger.kernel.org>; Sun, 30 Oct 2022 20:38:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667187490;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5heqDPTvyg/WwWWnO5zE1eTi0JOXR9TBRklxSqDrFRk=;
-        b=JS/EZA67N4oVlfQLudFfF8wsLOvmK3466a77t8XWPCiHt5ECDXH2Z2pOTMSAEYKhV43Lad
-        iVwYVM0vJBTLh/X0X/aW13Y5bL00InALm2AnIkTYALrxD05DRCFotWmpU4bFougMcPtPlZ
-        UTFHFMzrXHvRkoo7TJGp0aSHH/ykEtk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-453-n2y_sGmJMmC9_R0eH2-6_w-1; Sun, 30 Oct 2022 23:38:06 -0400
-X-MC-Unique: n2y_sGmJMmC9_R0eH2-6_w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EC95D185A792;
-        Mon, 31 Oct 2022 03:38:05 +0000 (UTC)
-Received: from [10.64.54.151] (vpn2-54-151.bne.redhat.com [10.64.54.151])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 788FE4EA5B;
-        Mon, 31 Oct 2022 03:37:59 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
- conjunction with bitmap
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com,
-        bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev,
-        dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
-        james.morse@arm.com, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, shan.gavin@gmail.com
-References: <Y1LDRkrzPeQXUHTR@google.com> <87edv0gnb3.wl-maz@kernel.org>
- <Y1ckxYst3tc0LCqb@google.com> <Y1css8k0gtFkVwFQ@google.com>
- <878rl4gxzx.wl-maz@kernel.org> <Y1ghIKrAsRFwSFsO@google.com>
- <877d0lhdo9.wl-maz@kernel.org> <Y1rDkz6q8+ZgYFWW@google.com>
- <875yg5glvk.wl-maz@kernel.org>
- <36c97b96-1427-ce05-8fce-fd21c4711af9@redhat.com>
- <Y1wIj/sdJw7VMiY5@google.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <a162a328-fc28-ce23-6f1c-e84abc4fab0c@redhat.com>
-Date:   Mon, 31 Oct 2022 11:37:56 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S229492AbiJaEXt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 00:23:49 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E0347672;
+        Sun, 30 Oct 2022 21:23:48 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id o7so6184648pjj.1;
+        Sun, 30 Oct 2022 21:23:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vH+u5Bvhhpd8c/WXOrPFjzMFEIOOOR91w47tMe67fvw=;
+        b=ZoF5wNrDtCndMrY5l1x5eCa5Xf6dlwImcvus3j/fwWhwYcSyeTw2p7+vl0mPJFVHRe
+         T/GUttK1LxvwUA36ZnzZRiWUikvAAouXVxoTHzHMHNVNz7M4CWKj7yBCV4kPmaLhDGX+
+         69g8BWNd99uZFqNXprg/s9UlKStqMT9L4/9dp9A7CZro6WecWVzQ3tjxKUHSAhGRVvfD
+         p2hah64j20nuGgkUFxaFnJlyDCERKaTbxF63gH98ngLiZYVVRxtG09zrYBBM8WFSOZdc
+         gUc0R/h5GhaV2QxKKGEh1gpc+O5r/cio8EWw/m8ARt7EMJi9AhEfuTDZnRrOZigbdJCK
+         COuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vH+u5Bvhhpd8c/WXOrPFjzMFEIOOOR91w47tMe67fvw=;
+        b=ii2xctD3goGdu4pRega59iAjyS9//PU//sOuIC4+Odnkp1Ytsj1UkGtDXl+v+xxDNy
+         ZIWTMuV2bu1ifzVL+8x3fwl5xhv86VOSy3opJq3d4JqNsINZ5qowUAqdZ0uHuZ4em2Of
+         vMwli1yKRknf82wwy3kWtNc/Y8J/+IFGPzk4iL3ujmvWcq2B4/m1gSacm4/WScKsE8x1
+         hoNYXIcxuBiI/LCtyJV46eYYptEhZxNjBaBM9g6qilA8HKHvVxghrSv/kyf/9v3xPvZX
+         xW7dqzBMhGNqJAOcx05KzA736W4/W/PL6s8i4WfGAtO+INAC7Z40XwJVl0h9h9Ok1JlJ
+         2h2A==
+X-Gm-Message-State: ACrzQf0799WNNDeBBz7VNEHrIpH9BHE+BOeq4fpboLUT2KpuMSpF4HPj
+        JmzjpiyetR6TkHsSdq6EyhQ=
+X-Google-Smtp-Source: AMsMyM7a+6pY9T+TrDG5O6IqlyTrShqEWuaBbhnkaJwUAEgEAUgldq0Ai1cKfy2rTHswY3+NdoG19Q==
+X-Received: by 2002:a17:90b:17c9:b0:213:32a9:465b with SMTP id me9-20020a17090b17c900b0021332a9465bmr12627095pjb.54.1667190227666;
+        Sun, 30 Oct 2022 21:23:47 -0700 (PDT)
+Received: from debian.me (subs09a-223-255-225-72.three.co.id. [223.255.225.72])
+        by smtp.gmail.com with ESMTPSA id u29-20020a63455d000000b0046faefad8a1sm1671086pgk.79.2022.10.30.21.23.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 30 Oct 2022 21:23:47 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+        id C9A6F100398; Mon, 31 Oct 2022 11:23:42 +0700 (WIB)
+Date:   Mon, 31 Oct 2022 11:23:42 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v10 107/108] KVM: x86: design documentation on TDX
+ support of x86 KVM TDP MMU
+Message-ID: <Y19NzlQcwhV/2wl3@debian.me>
+References: <cover.1667110240.git.isaku.yamahata@intel.com>
+ <91062ba1b723d5b866b17447e3f8f8addaa334ee.1667110240.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <Y1wIj/sdJw7VMiY5@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="Aew40JBmWCIbpsgg"
+Content-Disposition: inline
+In-Reply-To: <91062ba1b723d5b866b17447e3f8f8addaa334ee.1667110240.git.isaku.yamahata@intel.com>
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
 
-On 10/29/22 12:51 AM, Sean Christopherson wrote:
-> On Fri, Oct 28, 2022, Gavin Shan wrote:
->> On 10/28/22 2:30 AM, Marc Zyngier wrote:
->>> On Thu, 27 Oct 2022 18:44:51 +0100,
->>> Sean Christopherson <seanjc@google.com> wrote:
->>>>
->>>> On Thu, Oct 27, 2022, Marc Zyngier wrote:
->>>>> On Tue, 25 Oct 2022 18:47:12 +0100, Sean Christopherson <seanjc@google.com> wrote:
->>
->> [...]
->>>>
->>>>>> And ideally such bugs would detected without relying on userspace to
->>>>>> enabling dirty logging, e.g. the Hyper-V bug lurked for quite some
->>>>>> time and was only found when mark_page_dirty_in_slot() started
->>>>>> WARNing.
->>>>>>
->>>>>> I'm ok if arm64 wants to let userspace shoot itself in the foot with
->>>>>> the ITS, but I'm not ok dropping the protections in the common
->>>>>> mark_page_dirty_in_slot().
->>>>>>
->>>>>> One somewhat gross idea would be to let architectures override the
->>>>>> "there must be a running vCPU" rule, e.g. arm64 could toggle a flag
->>>>>> in kvm->arch in its kvm_write_guest_lock() to note that an expected
->>>>>> write without a vCPU is in-progress:
->>>>>>
->>>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>>>>> index 8c5c69ba47a7..d1da8914f749 100644
->>>>>> --- a/virt/kvm/kvm_main.c
->>>>>> +++ b/virt/kvm/kvm_main.c
->>>>>> @@ -3297,7 +3297,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->>>>>>           struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
->>>>>>    #ifdef CONFIG_HAVE_KVM_DIRTY_RING
->>>>>> -       if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
->>>>>> +       if (!kvm_arch_allow_write_without_running_vcpu(kvm) && WARN_ON_ONCE(!vcpu))
->>>>>> +               return;
->>>>>> +
->>>>>> +       if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
->>>>>>                   return;
->>>>>>    #endif
->>>>>> @@ -3305,10 +3308,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->>>>>>                   unsigned long rel_gfn = gfn - memslot->base_gfn;
->>>>>>                   u32 slot = (memslot->as_id << 16) | memslot->id;
->>>>>> -               if (kvm->dirty_ring_size)
->>>>>> +               if (kvm->dirty_ring_size && vcpu)
->>>>>>                           kvm_dirty_ring_push(&vcpu->dirty_ring,
->>>>>>                                               slot, rel_gfn);
->>>>>> -               else
->>>>>> +               else if (memslot->dirty_bitmap)
->>>>>>                           set_bit_le(rel_gfn, memslot->dirty_bitmap);
->>>>>>           }
->>>>>>    }
-> 
-> ...
-> 
->>>> A slightly different alternative would be have a completely separate
->>>> API for writing guest memory without an associated vCPU.  I.e. start
->>>> building up proper device emulation support.  Then the vCPU-based
->>>> APIs could yell if a vCPU isn't provided (or there is no running
->>>> vCPU in the current mess).  And the deviced-based API could be
->>>> provided if and only if the architecture actually supports emulating
->>>> writes from devices, i.e. x86 would not opt-in and so would even
->>>> have access to the API.
->>>
->>> Which is what I was putting under the "major surgery" label in my
->>> previous email.
->>>
->>> Anyhow, for the purpose of unblocking Gavin's series, I suggest to
->>> adopt your per-arch opt-out suggestion as a stop gap measure, and we
->>> will then be able to bike-shed for weeks on what the shape of the
->>> device-originated memory dirtying API should be.
->>>
->>
->> It's really a 'major surgery' and I would like to make sure I fully understand
->> 'a completely separate API for writing guest memory without an associated vCPU",
->> before I'm going to working on v7 for this.
->>
->> There are 7 functions and 2 macros involved as below. I assume Sean is suggesting
->> to add another argument, whose name can be 'has_vcpu', for these functions and macros?
-> 
-> No.
-> 
-> As March suggested, for your series just implement the hacky arch opt-out, don't
-> try and do surgery at this time as that's likely going to be a months-long effort
-> that touches a lot of cross-arch code.
-> 
-> E.g. I believe the ARM opt-out (opt-in?) for the above hack would be
-> 
-> bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
-> {
-> 	return vgic_has_its(kvm);
-> }
-> 
+--Aew40JBmWCIbpsgg
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Ok, Thanks for your confirm. v7 was just posted to address comments from Marc,
-Peter, Oliver and you. Please help to review when you get a chance.
+On Sat, Oct 29, 2022 at 11:23:48PM -0700, isaku.yamahata@intel.com wrote:
+> +During TDX non-root operation (i.e. guest TD), memory accesses can be qu=
+alified
+> +as either shared or private, based on the value of a new SHARED bit in t=
+he Guest
+> +Physical Address (GPA).  The CPU translates shared GPAs using the usual =
+VMX EPT
+> +(Extended Page Table) or "Shared EPT" (in this document), which resides =
+in the
+> +host VMM memory.  The Shared EPT is directly managed by the host VMM - t=
+he same
+> +as with the current VMX.  Since guest TDs usually require I/O, and the d=
+ata
+> +exchange needs to be done via shared memory, thus KVM needs to use the c=
+urrent
+> +EPT functionality even for TDs.
 
-https://lore.kernel.org/kvmarm/20221031003621.164306-1-gshan@redhat.com/T/#t
+Strip the last "thus", so it becomes "... via shared memory, KVM needs to u=
+se ..."
 
-Thanks,
-Gavin
+> +The following depicts the relationship.
+> +::
+> +
+> +                    KVM                             |       TDX module
+> +                     |                              |           |
+> +        -------------+----------                    |           |
+> +        |                      |                    |           |
+> +        V                      V                    |           |
+> +     shared GPA           private GPA               |           |
+> +  CPU shared EPT pointer  KVM private EPT pointer   |  CPU secure EPT po=
+inter
+> +        |                      |                    |           |
+> +        |                      |                    |           |
+> +        V                      V                    |           V
+> +  shared EPT                private EPT<-------mirror----->Secure EPT
+> +        |                      |                    |           |
+> +        |                      \--------------------+------\    |
+> +        |                                           |      |    |
+> +        V                                           |      V    V
+> +  shared guest page                                 |    private guest p=
+age
+> +                                                    |
+> +                                                    |
+> +                              non-encrypted memory  |    encrypted memory
+> +                                                    |
+> +
+> +shared EPT: CPU and KVM walk with shared GPA
+> +            Maintained by the existing code
+> +private EPT: KVM walks with private GPA
+> +             Maintained by the twisted existing code
+> +secure EPT: CPU walks with private GPA.
+> +            Maintained by TDX module with TDX SEAMCALLs via hooks
+> +
 
+What about this legend below?
+
+---- >8 ----
+
+diff --git a/Documentation/virt/kvm/tdx-tdp-mmu.rst b/Documentation/virt/kv=
+m/tdx-tdp-mmu.rst
+index 2d91c94e6d8fd7..9ddbf44725f212 100644
+--- a/Documentation/virt/kvm/tdx-tdp-mmu.rst
++++ b/Documentation/virt/kvm/tdx-tdp-mmu.rst
+@@ -236,12 +236,14 @@ The following depicts the relationship.
+                               non-encrypted memory  |    encrypted memory
+                                                     |
+=20
+-shared EPT: CPU and KVM walk with shared GPA
+-            Maintained by the existing code
+-private EPT: KVM walks with private GPA
+-             Maintained by the twisted existing code
+-secure EPT: CPU walks with private GPA.
+-            Maintained by TDX module with TDX SEAMCALLs via hooks
++Where:
++
++  * shared EPT: CPU and KVM walk with shared GPA (maintained by the existi=
+ng
++    code)
++  * private EPT: KVM walks with private GPA (maintained by the twisted exi=
+sting
++    code)
++  * secure EPT: CPU walks with private GPA (maintained by TDX module with =
+TDX
++    SEAMCALLs via hooks).
+=20
+=20
+ Tracking private EPT page
+
+> +Concurrent zapping
+> +------------------
+> +1. read lock
+> +2. freeze the EPT entry (atomically set the value to REMOVED_SPTE)
+> +   If other vcpu froze the entry, restart page fault.
+> +3. TLB shootdown
+> +
+> +   * send IPI to remote vcpus
+> +   * TLB flush (local and remote)
+> +
+> +   For each entry update, TLB shootdown is needed because of the
+> +   concurrency.
+
+Concurrency issues?
+
+Also, as I have iterated several times before, you need to add the
+documentation to KVM table of contents (index):
+
+---- >8 ----
+
+diff --git a/Documentation/virt/kvm/index.rst b/Documentation/virt/kvm/inde=
+x.rst
+index cdb8b43ce7970a..ff2db9ab428d3c 100644
+--- a/Documentation/virt/kvm/index.rst
++++ b/Documentation/virt/kvm/index.rst
+@@ -20,3 +20,4 @@ KVM
+    review-checklist
+=20
+    intel-tdx
++   tdx-tdp-mmu
+
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--Aew40JBmWCIbpsgg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY19NxwAKCRD2uYlJVVFO
+o9qaAQCVOIc3CkEyOCXd9prfp+jxgWKmQqj/u5tVMqLG3nnYKQEA0yqxAC5RW3KQ
+wh/SgCiIatrEzhbHk4ME/YxNwzFxIAc=
+=Dg1Z
+-----END PGP SIGNATURE-----
+
+--Aew40JBmWCIbpsgg--
