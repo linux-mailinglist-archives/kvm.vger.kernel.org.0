@@ -2,282 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23BFB614B16
-	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 13:49:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D16A614B22
+	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 13:51:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230267AbiKAMt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Nov 2022 08:49:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34636 "EHLO
+        id S230423AbiKAMvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Nov 2022 08:51:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbiKAMt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Nov 2022 08:49:27 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2081.outbound.protection.outlook.com [40.107.100.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 091551ADBB;
-        Tue,  1 Nov 2022 05:49:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZqSGYzF/ZaGG2nx30vZlKMOCIexVQ/iHWNbGP/+f+aEi5+FURJ5tYX9RMmxwIhIy8s4VU18MCuJ00DEmBU+jdzrsxOSEBsaICEMuwAM+tHY0yFhBNec83ZeRG9eUZuTNNnIpAKyPbf38GgS51Z+3Nm0xVu9yKoWGZGWFJpqoHW+WML1cZ4XIB+thMQLUJDkb4kxNk0tELQX4HsrTL0CmIms8tmHehwKHHj7R/J9+lvh7txGgQirUUzEYkfYUXOJqngntCIZyn3O/B+H0SLjaZXQ9Mq5K8qOisgE8sQhtuLb6tJeV6MLrahODwGbo5WoZFUTuuquSF2TvpPqOW9IXqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2f2dri1+x2XJZ4FI56mGO2gjXBj7bT4eDOQlY877CYQ=;
- b=dStLXQ4a9LNSboLgxaITWGEy9ZpjfoTiM3mlL9oS/bVPJ4PttQbMRH8mFtdRL4i36xU0rzNH/rrBuXTjH2RoHwljCdiy1G/LVyZGzIpz7ZQjXGp0hd1E+JDvo1EnbV9ZewClWlAolP2ivrGKNb7NSjHvychf4hhgLQjZ7NgDL9SOmpu96JgqaLS5xnmQUuoaAmF3GlZk09FuJvwKclJNX2TolpGZxx+enQ+7auoKdyGn0Rc9smB33LmAQyho4iga7iXEiXTHtA+1RjbPImsc/zgxtfiFTJ/KhoNl4hE6as2cEiT6pMAADp7gXfPsxrhGSDPDSquNPqvgprLfg6WRaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2f2dri1+x2XJZ4FI56mGO2gjXBj7bT4eDOQlY877CYQ=;
- b=tPENcrPaxejR8xiEEoAti/2YVHYxoqnQRA5Tu/anWONtwZ9571dWBFhFZdjmQEbeXM+gINPLInK7BnAhR2EBD43upRy3fNQFB3uqILAaRVpnC1vm/zkrCZVnbRixWRQEwFLWVo+8ZslthvMiuocakK/c107mLPxRE6FZPQXcVoZnRUvCM4PREznIfKWPktJYNSjnX9gykPRhMwt/48g1ROG19rHnGQ3hNhzSWeN717SDA3oGI96PWZxKtTlGe/bochPxUuceG/6CKWgPvvJ5d7FwqOgsFu5VWGEmUYWfLsVPOhwndOuaxU7Uptod6qMlsyEtb9lOykAhqhQIlWKP5w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH2PR12MB4247.namprd12.prod.outlook.com (2603:10b6:610:7c::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.21; Tue, 1 Nov
- 2022 12:49:23 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5769.015; Tue, 1 Nov 2022
- 12:49:23 +0000
-Date:   Tue, 1 Nov 2022 09:49:21 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@gmail.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        Longfang Liu <liulongfang@huawei.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Will Deacon <will@kernel.org>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH 08/10] vfio-iommufd: Support iommufd for emulated VFIO
- devices
-Message-ID: <Y2EV0e1KcJMuEgH9@nvidia.com>
-References: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
- <8-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
- <BN9PR11MB5276B6ACAE7E511770887BF38C369@BN9PR11MB5276.namprd11.prod.outlook.com>
+        with ESMTP id S230209AbiKAMvY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Nov 2022 08:51:24 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DCBD1B1FD
+        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 05:51:23 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id l11so20413096edb.4
+        for <kvm@vger.kernel.org>; Tue, 01 Nov 2022 05:51:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=I3ZWUelOBGuajwMCGSZuHahRmnca9IMPS5lnk5/9ETI=;
+        b=SH22qPUXsEn3p/Floa1ZUMCLaXYV8bLk5ULHiQsQqH465E1SVAmIu6Gj850XUtWV9A
+         D3vcOJJpkBKDfQObFbUbvPzsspuQeDi8iVxdxbPuOD5L9lqdeXzBxpoBhQrusiuhFHEW
+         X5gb+sDNXCfylI/G4HA9XvQ5zBoOQLjxCMPiCtygwfXo80GSGpNvwLPh/Z+T/8bh3Zuk
+         SwXqo9RR/EoPDC2jCc+HLc5z3HKMEmC/z195V79dBXKBEvrvXGJaudJx8wGWvzn2YMCf
+         SHKwY8wXPJECzov7T2eLVkWbEI2/y+28jeSZJQxu8o71oB3W65T8TXYTCq5r5pvnAkJ1
+         KxsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I3ZWUelOBGuajwMCGSZuHahRmnca9IMPS5lnk5/9ETI=;
+        b=WBO+vR9tKlLIYfTKBYMX2jGDPYPqDOIttPLUI1RQtoq3U5jnm6lehe/RxKpF2HFqKF
+         46XY7Pw0cyNuxQ/rkZ5bOgmHJBfP1jqnXl9io++5w9iRrB938MprWsaOqgJmMptgubz9
+         DndHGqDaYRgzq/vLnmMvlEkTDZFVFh6dFkTGnG4sqzF7FMOzl7hzXoyE6X82NlsnPf7E
+         5U1FcfoRMyPXMPKHzhP4qHx9DBwNqBm0F7/up1YSKhcxfEezPVymxueXRkB/R0Stc6hK
+         aS974alq2GJIKDXPCXj2WDIbMqzFf15grhDq1aSfotZMsjlOEoA9BUHB+28Fo0barvmm
+         QcLg==
+X-Gm-Message-State: ACrzQf371353DngG6I+a9LutDfdAiLMoLUvPA06OWu430uBWdOYcXxrU
+        5d95NnB+DEIntCEf39KGGc0kZg==
+X-Google-Smtp-Source: AMsMyM49yeZoSu5tYqBhel3Vi41lPu+IDsM9aRBTodsPAIXmVMIiAGsNUkmhNpKrHHoSwAH+rwrGSg==
+X-Received: by 2002:a05:6402:158d:b0:463:2343:b980 with SMTP id c13-20020a056402158d00b004632343b980mr14233232edv.150.1667307081713;
+        Tue, 01 Nov 2022 05:51:21 -0700 (PDT)
+Received: from localhost (cst2-173-61.cust.vodafone.cz. [31.30.173.61])
+        by smtp.gmail.com with ESMTPSA id e22-20020a17090658d600b007ad0b97e6e9sm4112927ejs.162.2022.11.01.05.51.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Nov 2022 05:51:21 -0700 (PDT)
+Date:   Tue, 1 Nov 2022 13:51:20 +0100
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Atish Patra <atishp@rivosinc.com>
+Cc:     linux-kernel@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Guo Ren <guoren@kernel.org>, kvm-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [RFC  4/9] RISC-V: KVM: Improve privilege mode filtering for perf
+Message-ID: <20221101125120.lkd3n3yybihjhzyk@kamzik>
+References: <20220718170205.2972215-1-atishp@rivosinc.com>
+ <20220718170205.2972215-5-atishp@rivosinc.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276B6ACAE7E511770887BF38C369@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: YT1PR01CA0103.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:2c::12) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH2PR12MB4247:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8c93eee0-ded1-45d2-e35d-08dabc07806a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KkUwkTuGnps27G+UAA735lgB5IsW6FK2smnNlo9kIvV3bF8U4BPTDHrqNCOMw+J4YBIR76JbdQS/lMN7q7yZf9EcPB8Q0jClCgeLVeNJFrcDGYjL39SGqgIrmWPp0Ff4Ld8IPYpbiGqqXUt3N3T4Z21crupO/piiGyMm9yABraUeiZFI6nwGlK06s5gLyP+kpDKY8C4snxn9IcfZMALXa8Baqnlzg9sOGWkeqQ2UIQehhY/U9YSfBJZ7htv9VKYe5AvWa/nUdtMNSUNGRb7/vVg/8gpqM2yHMI3An8HeCHfGUHW/dbLTZZNPpWdWcB4JS+0Fu8c33+yzyapA8fbCGPWa0Qzf494k+5hkWjTWxHZnC7eQKIeDpeCcvKA94T639ehDmDYlfTTkr6b4GdNDs591PeNrTeFhZRIJjURnjtQp5awfAbJs4uoCD+5d6bu25vWi1Rw4oT6BvZvTFXbUyTJASHdd3qYlqtWUwV0iyaQj5med+KKBvMvd7YFG+XtDFdgLcJ6nD+Oddf7OZWzy0RQKCY8ZKOFnGOi/vSbiHMyIsc08c6J1AsjFyftAyuyVnOje4pyKSjU316Tu7yIO7SgkHCpPJhEAzJaZPRkIW9bD2qZX4ZDAb16pgr07bn8s3FY16f+KLDhsOOqP9+jb3iyHEs5zryVw+fUhg6bmGT+YsGCGoJuJKdqCAF77Qpsow1kSJKzVjSHczTRCtvsvsA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(136003)(376002)(346002)(366004)(451199015)(36756003)(38100700002)(5660300002)(2906002)(7406005)(7416002)(83380400001)(86362001)(6512007)(26005)(316002)(6916009)(54906003)(186003)(2616005)(478600001)(6486002)(41300700001)(66556008)(4326008)(66476007)(8936002)(8676002)(66946007)(6506007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?RTMrAemkoV1g1yjzvlOSdPv/uR+3El+9TtqvZtxYx4gkVoGG4BiALWzgMdqS?=
- =?us-ascii?Q?9XKGdf5Pt56Bi+hW6HIfRZgWdsRND5lBn8ZGWXuxaxAt8f/l28mpc4yU1gA7?=
- =?us-ascii?Q?mlreLtCCNgWhcOvZ2Oe28VLMFrhc+n+NI4mTX6dF3+wMiCqUkvp2Enw2t5H+?=
- =?us-ascii?Q?sdOEu0EObpOwD9eRaKdvLPrVfOFhpdHUuMFJi75gVyWTyKPj5IVrlAth5W+D?=
- =?us-ascii?Q?pPrrDy9t518t57I1ZQGAtm0SA/64GkiBvYqfdMibAEY8aUGR5i/zMZlTZg/k?=
- =?us-ascii?Q?KuF6wP1K0YN4f2DT1M1ZkoMsh4Lp8f2bcO+FFBaLaWfFmTDJ/DRvIvoP4YWX?=
- =?us-ascii?Q?0HVSIbSAdSgimzx6mlZxa898ZkTGaBZpzlbsOMOq6Sz/ozAjqgcAJBHPwrJ5?=
- =?us-ascii?Q?DC/mAqrZztrab83NhPw5N6+Uyy8W/12GnrIncwFJU/W6OcHs9zzwRsoXQqaM?=
- =?us-ascii?Q?ROJcXJDyZ3umnSKdf4y6nYDJUNoT9xi8mSbDmnY1uAFndFCj/kyFCwGYthNJ?=
- =?us-ascii?Q?gI9X3a4FdDyXWzyEWDi+PI6hpEDpDmGqXx/zO+AxZn5ltaWEthoPl++lJq13?=
- =?us-ascii?Q?FrmNGjAaxsPR+qTLsyaq8zxPyRn0MnWF8ivV05laMC90Rp/B2zWhff3YbsIe?=
- =?us-ascii?Q?P5P8aBZKo46TcXDKar7bywA3VGIAyP4+o7L2pQ5ce3HqVleFy8XEwQL1v0lJ?=
- =?us-ascii?Q?YAHIpPOeQCbT1re7xhaUTB5XKeQOuaWHri1S1CGT7wVJZGuRAtR6E6twpU6B?=
- =?us-ascii?Q?y7XqHYYteVl5apVecwKEp1TMU2v8S6IxPo+R9yvalMCJhVY6OBgkue/XDdto?=
- =?us-ascii?Q?qhiyzO0NAJCD7DojZKdgRsundw0HdEm/kfaviJY8uGfnNdkh45EWILIiVSOD?=
- =?us-ascii?Q?5KemTcSIdHMSJyd6lLCCoCbmlchDYCSDytQxlLUG+D2++VRplvAwsZ9l1LdI?=
- =?us-ascii?Q?b8qtk5l4NJzfKHX6KZj5DEhQoC41Mo4Is8IhiP/56GsqlajtEfeUBIddHYCT?=
- =?us-ascii?Q?JqIg2Am6jp+e2VFziyvCK5QcrPiXXf8GaBTgnVUCxJKzKRelSRxbdSYToD0n?=
- =?us-ascii?Q?B2ZeX/7y2kdZpA+f4GZNUpuc0/wqUKDBe6JAmlUnvJb5iu0uHWvn+hpLM/jE?=
- =?us-ascii?Q?N7BtQBerGIrYcxZ1KzFODTRiQfE+7vcQ1bv7wHrJy6uoE88tTG88mrwlP5N5?=
- =?us-ascii?Q?4IehyIXQBXBLzM7bYYA5QeB7vInemOT4tUovxkhrJARYwEQzISyoJoSAP8mP?=
- =?us-ascii?Q?ZRz98MgSgl77vK5TzS181Ih5YwnzclrIozOX5Y3tvdEIoS5BHQqgGmplOv1T?=
- =?us-ascii?Q?XJ/SPBd5A0y3RJRGbujdu6fkLbiQODFPTA+hxjn0/oLQyJiSkuzSDCp98BQK?=
- =?us-ascii?Q?mlsjlNB6QLU5/NJiywkoDrCp2BVOpCEzQXhk1RbDiNtXZuwnabaptOZOnR/h?=
- =?us-ascii?Q?iA0MnnbYEAacfCjYQ9sTqJLA8iun5qzyJkWbRfrfaA35uxgU8WnORAmK9wwH?=
- =?us-ascii?Q?ITfbdFhadeCOv3U46snY9VYPpfJLmCJGxQisZ9d1jlIAe8LXvxuwvtxb5+zP?=
- =?us-ascii?Q?ievVKahhUafvF8LpFKJenstqn9rPa6Lza8qeucrZ?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8c93eee0-ded1-45d2-e35d-08dabc07806a
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Nov 2022 12:49:23.3815
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /8c1o1D1DQVcyp124/3rH7Z1JUCMMDoyfwAtY5CynFB9slCQxp1YzZ6bbqUdnl6b
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4247
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220718170205.2972215-5-atishp@rivosinc.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 01, 2022 at 08:37:39AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Wednesday, October 26, 2022 2:51 AM
-> > 
-> > Emulated VFIO devices are calling vfio_register_emulated_iommu_dev() and
-> > consist of all the mdev drivers.
-> > 
-> > Like the physical drivers, support for iommufd is provided by the driver
-> > supplying the correct correct standard ops. Provide ops from the core that
-> > duplicate what vfio_register_emulated_iommu_dev() does.
-> > 
-> > Emulated drivers are where it is more likely to see variation in the
-> > iommfd support ops. For instance IDXD will probably need to setup both a
-> > iommfd_device context linked to a PASID and an iommufd_access context to
-> > support all their mdev operations.
-> > 
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > ---
-> >  drivers/gpu/drm/i915/gvt/kvmgt.c  |   3 +
-> >  drivers/s390/cio/vfio_ccw_ops.c   |   3 +
-> >  drivers/s390/crypto/vfio_ap_ops.c |   3 +
-> >  drivers/vfio/container.c          | 108 ++++++-----------------------
-> >  drivers/vfio/iommufd.c            |  57 ++++++++++++++++
-> >  drivers/vfio/vfio.h               |  10 ++-
-> >  drivers/vfio/vfio_main.c          | 110 +++++++++++++++++++++++++++++-
-> >  include/linux/vfio.h              |  14 ++++
-> >  8 files changed, 217 insertions(+), 91 deletions(-)
+On Mon, Jul 18, 2022 at 10:02:00AM -0700, Atish Patra wrote:
+> Currently, the host driver doesn't have any method to identify if the
+> requested perf event is from kvm or bare metal. As KVM runs in HS
+> mode, there are no separate hypervisor privilege mode to distinguish
+> between the attributes for guest/host.
 > 
-> mtty, mdpy and mbochs?
-
-They don't call rw or pin_pages, so they don't need to do
-anything:
-
-
-	/*
-	 * If the driver doesn't provide this op then it means the device does
-	 * not do DMA at all. So nothing to do.
-	 */
-	if (!vdev->ops->bind_iommufd)
-		return 0;
-
-> > +int vfio_container_pin_pages(struct vfio_container *container,
-> > +			     struct iommu_group *iommu_group, dma_addr_t
-> > iova,
-> > +			     int npage, int prot, struct page **pages)
-> >  {
-> > -	struct vfio_container *container;
-> > -	struct vfio_group *group = device->group;
-> > -	struct vfio_iommu_driver *driver;
-> > -	int ret;
-> > -
-> > -	if (!pages || !npage || !vfio_assert_device_open(device))
-> > -		return -EINVAL;
-> > +	/* group->container cannot change while a vfio device is open */
-> > +	struct vfio_iommu_driver *driver = container->iommu_driver;
-> > 
-> >  	if (npage > VFIO_PIN_PAGES_MAX_ENTRIES)
-> >  		return -E2BIG;
-> > 
-> >  	/* group->container cannot change while a vfio device is open */
-> > -	container = group->container;
-> >  	driver = container->iommu_driver;
+> Improve the privilege mode filtering by using the event specific
+> config1 field.
 > 
-> duplicated comment and assignment.
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  drivers/perf/riscv_pmu_sbi.c   | 27 ++++++++++++++++++++++-----
+>  include/linux/perf/riscv_pmu.h |  2 ++
+>  2 files changed, 24 insertions(+), 5 deletions(-)
 > 
-> Actually, I'm not sure whether the comment should be put within this
-> container helper and other two. There is no group reference in these
-> helpers then it sounds like the comment makes more sense to be in the
-> caller side?
+> diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
+> index 5d0eef3ef136..34f9fcc221a8 100644
+> --- a/drivers/perf/riscv_pmu_sbi.c
+> +++ b/drivers/perf/riscv_pmu_sbi.c
+> @@ -275,6 +275,27 @@ int riscv_pmu_sbi_hpmc_width(void)
+>  }
+>  EXPORT_SYMBOL(riscv_pmu_sbi_hpmc_width);
+>  
+> +static unsigned long pmu_sbi_get_filter_flags(struct perf_event *event)
+> +{
+> +	unsigned long cflags = 0;
+> +	bool guest_events = false;
+> +
+> +	if (event->attr.config1 & RISCV_KVM_PMU_CONFIG1_GUEST_EVENTS)
+> +		guest_events = true;
+> +	if (event->attr.exclude_kernel)
+> +		cflags |= guest_events ? SBI_PMU_CFG_FLAG_SET_VSINH : SBI_PMU_CFG_FLAG_SET_SINH;
+> +	if (event->attr.exclude_user)
+> +		cflags |= guest_events ? SBI_PMU_CFG_FLAG_SET_VUINH : SBI_PMU_CFG_FLAG_SET_UINH;
+> +	if (guest_events && event->attr.exclude_hv)
+> +		cflags |= SBI_PMU_CFG_FLAG_SET_SINH;
+> +	if (event->attr.exclude_host)
+> +		cflags |= SBI_PMU_CFG_FLAG_SET_UINH | SBI_PMU_CFG_FLAG_SET_SINH;
+> +	if (event->attr.exclude_guest)
+> +		cflags |= SBI_PMU_CFG_FLAG_SET_VSINH | SBI_PMU_CFG_FLAG_SET_VUINH;
+> +
+> +	return cflags;
+> +}
+> +
+>  static int pmu_sbi_ctr_get_idx(struct perf_event *event)
+>  {
+>  	struct hw_perf_event *hwc = &event->hw;
+> @@ -286,11 +307,7 @@ static int pmu_sbi_ctr_get_idx(struct perf_event *event)
+>  	uint64_t cmask = GENMASK_ULL(rvpmu->num_counters - 1, 0);
+>  	unsigned long cflags = 0;
+>  
+> -	if (event->attr.exclude_kernel)
+> -		cflags |= SBI_PMU_CFG_FLAG_SET_SINH;
+> -	if (event->attr.exclude_user)
+> -		cflags |= SBI_PMU_CFG_FLAG_SET_UINH;
+> -
+> +	cflags = pmu_sbi_get_filter_flags(event);
+>  	/* retrieve the available counter index */
+>  #if defined(CONFIG_32BIT)
+>  	ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_CFG_MATCH, cbase, cmask,
+> diff --git a/include/linux/perf/riscv_pmu.h b/include/linux/perf/riscv_pmu.h
+> index 6fee211c27b5..825b95253bc5 100644
+> --- a/include/linux/perf/riscv_pmu.h
+> +++ b/include/linux/perf/riscv_pmu.h
+> @@ -26,6 +26,8 @@
+>  
+>  #define RISCV_PMU_STOP_FLAG_RESET 1
+>  
+> +#define RISCV_KVM_PMU_CONFIG1_GUEST_EVENTS 0x1
+> +
+>  struct cpu_hw_events {
+>  	/* currently enabled events */
+>  	int			n_events;
+> -- 
+> 2.25.1
+>
 
-Yeah, that is better
-
-> > +void vfio_unpin_pages(struct vfio_device *device, dma_addr_t iova, int
-> > npage)
-> > +{
-> > +	if (WARN_ON(!vfio_assert_device_open(device)))
-> > +		return;
-> > +
-> > +	if (device->group->container) {
-> > +		vfio_container_unpin_pages(device->group->container, iova,
-> > +					   npage);
-> > +	} else if (device->iommufd_access) {
-> 
-> be consistent with other two helpers i.e. if-if instead of if-else
-
-Done
-
-> > +		if (WARN_ON(iova > ULONG_MAX))
-> > +			return;
-> 
-> Is there a reason why this is a WARN_ON only in unpin but not in pin?
-
-This is how it has always been. I suppose someone once thought it
-would be OK for the driver to do racy stuff during pin - but clearly
-that is not the case. Lets fix it while we are here.
-
-> > +int vfio_dma_rw(struct vfio_device *device, dma_addr_t iova, void *data,
-> > +		size_t len, bool write)
-> > +{
-> > +	if (!data || len <= 0 || !vfio_assert_device_open(device))
-> > +		return -EINVAL;
-> > +
-> > +	if (device->group->container)
-> > +		return vfio_container_dma_rw(device->group->container,
-> > iova,
-> > +					     data, len, write);
-> > +
-> > +	if (device->iommufd_access) {
-> > +		unsigned int flags = 0;
-> > +
-> > +		if (iova > ULONG_MAX)
-> > +			return -EINVAL;
-> > +
-> > +		/* VFIO historically tries to auto-detect a kthread */
-> > +		if (!current->mm)
-> > +			flags |= IOMMUFD_ACCESS_RW_KTHREAD;
-> 
-> Can you elaborate why this cannot be put in iommufd as the default
-> policy similar to what vfio container does?
-
-Snooping in kernel structs to try to guess the calling execution
-context is bad design. The caller should know its own context and it
-should declare positively what it is. Someday this should be lifted
-out of VFIO as well and into the drivers.
-
-Jason
-
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
