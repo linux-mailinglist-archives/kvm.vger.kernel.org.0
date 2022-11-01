@@ -2,368 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 03E206149D2
-	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 12:49:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 57F8D6149C3
+	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 12:48:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229944AbiKALtk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Nov 2022 07:49:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40180 "EHLO
+        id S230173AbiKALsa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Nov 2022 07:48:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231331AbiKALtD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Nov 2022 07:49:03 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B044FD2D;
-        Tue,  1 Nov 2022 04:43:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667303014; x=1698839014;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=4KiQzvQ3ZQDSZnSelbcIg3zXaQ/2lSH85X61Qpll+XE=;
-  b=Aih8tX7JdiYjwEiUaetb2HQR+Rm0mcBo3wOyx/99JDLWYVgUquazwvw9
-   DVuMUHdaoBbyH2T4En++HybvjtIvNwxLeAdM+foEvXFs4oDR4t2vDpCTm
-   zY8qhalpFcMxTr6KKrp8y+5kcVP19sFkPaUJwdok+khYoSc1bhd9UouvK
-   MV5pW8cABsglCdfbYFKe7UJF8XdonMmZrzm9MXzcURUS9M4jWSQ6Zj9SA
-   Zz1DRz+bv9ROLyt2WyfpoioKzTXdWbWxQYiQuXk6Io2wIQxaomqy0SNYF
-   xsqCwglG8YH1cDbDJvtkZM6VsVit2JTnxQu49MEGaDuuhVq6Ww+SEnLiV
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10517"; a="288829033"
-X-IronPort-AV: E=Sophos;i="5.95,230,1661842800"; 
-   d="scan'208";a="288829033"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2022 04:43:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10517"; a="628549716"
-X-IronPort-AV: E=Sophos;i="5.95,230,1661842800"; 
-   d="scan'208";a="628549716"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga007.jf.intel.com with ESMTP; 01 Nov 2022 04:43:22 -0700
-Date:   Tue, 1 Nov 2022 19:38:54 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        with ESMTP id S230428AbiKALsE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Nov 2022 07:48:04 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2079.outbound.protection.outlook.com [40.107.237.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96D261BE82;
+        Tue,  1 Nov 2022 04:41:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LTdZPP8/7hy2AqmG/YGq8wRrEtKlqrrHBMmgUx7oPxIlwdYuLEJWojBtW2QrzMYY4uBXrizY3BcvJjQ8qf6lhSszkebDA0142ZjiilYamfSZH2ChLC7grEInefeo7jqxIEW3CE0AOj4X5vMICkj3gS0FjaukJMGvt858mujoNCRxgbp8hW2IK52782kdHPeZQUHbwe6HNp8Tx++/HCQbTd+Gb3xa4GxCBh4UWg5z2lwSlZ6JNOfj1onoU+fP2j+hVmPG+vtQvAOxDB/ze/JOE5uNsWEgN/4C86hTMYFky7J9JtbpjrzbfG4GkfmzDub89XQ5Sm1E7vXz9i5IVMnXbQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1fmz2hcFcb4og7U0APjgn49HxDs99fBuT9yALUelGSo=;
+ b=nFEP++q5xBSb7ClSsM4q7e/YW+iWrbOPexOv0nF2agmJib3yflUrzhZhOJv5xHGqzWS83BHhboF672d8xr/8TG+gg3XyeB0qJTq5kCr4dJ5B0Xv9zKU/DjEI+13PmkHPlCdwhYTPkH7MFiXsOESH/JvrW0JHMAE4QXMTUQ11EH8zesVaQv2CCN/z5XynWnRYHmu3OxcEeqg/w2F83aM/zCDka7RrWWe3KzxKg1Hbj4S9pneTyXFVOntpOg2QQl+lGpBhRu55kKSNbcHrhTtM2Y9EopulSyLi2iflWCuCXO3sN/AycAlh6Y+GYa1KTiAb3zlAUIH+PjJ0Wk0mGFzgSQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1fmz2hcFcb4og7U0APjgn49HxDs99fBuT9yALUelGSo=;
+ b=rLC13e8eyQCMUZ7DgS6JPuLAhFe/FGLZpnYzOh4eElRq2UzUKU7BKNyffa/0xVbBi8iJtwmsEzAgd4eBHhyS5LRzavk0yFKYjmI3IzGopofIYXn9AIS5/2wmhCGq7wEfXC/CAJ8LFFV/cxaykCl3ntC7OddnL19KsfhpFVzqmtohJqVae4IZ1iY1H7dAuyOTC8qWTrluQ4njy9TBjvIfmB8BsPBZbfzz7kotW9DkiyDohAk/I5jcAiOXLWaSNiBvzaQYIlKdXMj0ffPkMQ0vaeak7mgn6692Y3OPqKQ4VG/1tMZ9enoUQ3kNVavDKvai1qiKkRKYm75JT/jEbYZpaQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by MN2PR12MB4455.namprd12.prod.outlook.com (2603:10b6:208:265::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.21; Tue, 1 Nov
+ 2022 11:41:04 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5769.015; Tue, 1 Nov 2022
+ 11:41:04 +0000
+Date:   Tue, 1 Nov 2022 08:41:02 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v9 7/8] KVM: Handle page fault for private memory
-Message-ID: <20221101113854.GB4015495@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <20221025151344.3784230-8-chao.p.peng@linux.intel.com>
- <20221026215425.GC3819453@ls.amr.corp.intel.com>
- <20221028065545.GD3885130@chaop.bj.intel.com>
- <20221101000250.GA674570@ls.amr.corp.intel.com>
-MIME-Version: 1.0
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+Subject: Re: [PATCH 00/10] Connect VFIO to IOMMUFD
+Message-ID: <Y2EFzjYn9IqbRmQs@nvidia.com>
+References: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
+ <39eb11ed-dbf2-822a-dc79-5b70a49c430b@intel.com>
+ <Y1+9IB+DI9v+nD0P@nvidia.com>
+ <d8a0352e-9e1d-5b01-7616-dccc73a172a6@intel.com>
+ <Y2BZHZXJwxF5C4a8@nvidia.com>
+ <1ba21eb6-5050-d9ba-d988-a939bf6c821b@intel.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221101000250.GA674570@ls.amr.corp.intel.com>
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <1ba21eb6-5050-d9ba-d988-a939bf6c821b@intel.com>
+X-ClientProxiedBy: YT1PR01CA0109.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:2c::18) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN2PR12MB4455:EE_
+X-MS-Office365-Filtering-Correlation-Id: d804325e-0d3e-4f07-073f-08dabbfdf544
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: qGQgBJOSdTb2qPsDgTEpaI6hg38yzSj3A67/VFFMzMhrCx7sRY/0txf8WU3H1jMQX3srl8Co7bJwgZxyY1FL+uFw75QtjeDGYTbslUdZthbuELAn3eZxUMkWADFIY38RNa+tbQchfdsWDXPtXwWribDrt6yTx74ZpONAweV7mXflCL1y6E/+VsbAOGW900ilNA/35kYygy3tur/A8jsRTrpiCREJoRxTrKrzE0cgKdmCC3WaZQvfLVnWikUFdaXX5UuNcSSWC2VxsZ0pNgT7RadcA24Xp9gWvbH/LQwcnWMwko0YJ6Hf89HUAA24XY/n4v6LlXvj9dTF19T+zcfhPbPULksiSkbnyKpGmbAvdFopnklj9VxsYe6iQi97xJCHERt4a7OuzrxbzYQ4furd9SvGO313MAZPAiUaYzV3D2vfkNxyWNujZo0dxtHzDHhzGDyxKNfDxBV4EUSn2BXaRzvYW6R8Wkx1oGRP2JmwCpJvSet3dkFbcNX3ohFECJ0u93w4zoskUbGES6VfqPnp2wV7hcp+SIc3HykBFvvil9ygnQrjLy5DdMgQ3LslQxIDon3lhjltAcFf1l61IhwmougWADnDecAOinGJsmb4ab+Ic2QgU1HUCc1e3ep9dZXy2Tub5UocXp2wdeDXW9fuvsXK/81sJ+O5SOBx9rAzNNT0ayYXq4nix8FeUAxeEvB8LJix2mN3ZHfMT0eOuhzY+g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(376002)(39860400002)(366004)(396003)(136003)(451199015)(2906002)(38100700002)(107886003)(53546011)(86362001)(26005)(316002)(8676002)(66556008)(41300700001)(6512007)(66476007)(6506007)(2616005)(186003)(54906003)(8936002)(6916009)(66946007)(4326008)(36756003)(5660300002)(7416002)(7406005)(83380400001)(6486002)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?dmxh8p5V8aie9pSHhRvz6cldgWMgzh6VJ8Watrd7l5q0xSwDa7B4JYpOOKeE?=
+ =?us-ascii?Q?OwOAtUA2CcDDA9bEeFZC91wwzjsCvS+3SZrSzaXMs3nNHld0Lse0FJc3R+ZZ?=
+ =?us-ascii?Q?kk8T3931+0w5AkFn4QYuI4yHZCSQKSuCukm+5xmJYHF5e/XMrlQp7sE7ZUQT?=
+ =?us-ascii?Q?OewMN9YeGC09KeBU/c0h2ZgY/4EJx3yd8XO8eS8aWHv49cWATDI1IkZr3H6Z?=
+ =?us-ascii?Q?Ev8CVHC3T/KxpzJkIREH9k3z7uQvJqfiC2E0MmYpZCyiD5vxHkmnl6VO9+Hg?=
+ =?us-ascii?Q?XLlWVLcri9FMo0N8Sakp+fc90AxwextUeHNbo/kaE/sw36DNyYZfA0kLtjdy?=
+ =?us-ascii?Q?ZgNmz3ihBTLTjTjQKdPTKgXzDGsjKO3+f/vkjjfMwJEWfQHWHTtybyxZiOLj?=
+ =?us-ascii?Q?pkSngogX1CbWz9RZ2kpegcL0RSrH/Bh1+hDLitTrm32laNU6zknr6pbhcTU2?=
+ =?us-ascii?Q?xkPgglyrBNkZTf6JtU9wxW3nU7df6EngHnWKBpkvwDjGvd006OJh0fH92r7N?=
+ =?us-ascii?Q?pXjNbVUTYjxRbcy/fhBgLMTDdPZ3k+F/zmIMDl+YkWqQbbVrEMUw9T3uSuxx?=
+ =?us-ascii?Q?8TIeBVOAp7Ou+4BeBmv7NUPeV6PFzpnn6AzxezX1tqyqKIsOgBDNBOB45Fyd?=
+ =?us-ascii?Q?vy+AhT7BdFjhx/583/+DYH3CYmoQtTEAlW0bm0hMYGcQyWW4gUYDELiHdXw5?=
+ =?us-ascii?Q?ckhWUm8wVcllJineFqQesajwj04bKGBRTBpMRsU4uubfbXiyaeUKZtxxoEA2?=
+ =?us-ascii?Q?eC7njFCGEQGaBJ+3SxKSptE6FV6Es5FHqWWfwsI8KJ5hCuk4IeG3Hr7CFNt2?=
+ =?us-ascii?Q?vYYHjPgHWJzcVpJ5iEern6n4+XNqPI3WNpLzKGNp1u/QFcs5r6URR9hCNrP0?=
+ =?us-ascii?Q?wQOcWBKrFn/gqsbCR84hFL8DYfxbzgLynJN0/xnBs3IJw3eqAbd3kd+zyd9l?=
+ =?us-ascii?Q?0esG66oKXYD8sXDkSfE2VLebIvvTbBVuanvwBRASfSaFE+FMaCaAef3EKe/b?=
+ =?us-ascii?Q?e/2s/q66Fp8DCZVZn9QobUGbRL6Y3WVIkD+8o1iXpgLJIz6gIrXFUlKwo2EZ?=
+ =?us-ascii?Q?ZUuGvMXeMC5pL5NGmS8PkFf1cuuyvwgfKSOCSlkX8PhnfHgi4IRO5gT9Plnw?=
+ =?us-ascii?Q?pejPEQmGH8bZhVpob3v5o16RxD8fUaPq3ZTG8A65kpCBp56SCvoD1X1jm+Ax?=
+ =?us-ascii?Q?ssDhWaFcz7z4xl5nwozQ52sKoLqLBDvZon9NBSoMD/DfV/bfSD0lRi36JiZH?=
+ =?us-ascii?Q?bapj1i/u5Q3465SaiuCp5sAXxv8bXXZyNcJ8j6jTjKFJ8fCdWb/V5dMIjyfQ?=
+ =?us-ascii?Q?m5qUbRO5LgN+WBrew8HSNy5NNLQD0Vs+XsHrfyrpqOfWLUP9TqQ7aFEY/dwg?=
+ =?us-ascii?Q?miZvW7EASfT9Pj3c9SCWChwvXDDGFSxGmOxXgLB2D1irrwCyqIlK6FoffdK6?=
+ =?us-ascii?Q?BPI6zLTx7ZxWdeyy9a+Y8UqM3VH3ZTkOb+hK5UGMHSLuJ3ckYL5QkSKidx6W?=
+ =?us-ascii?Q?FJshi8KWGD0SYzN+zkyqnpWH/vXAmsGsk3ESrRi4WSCTkiZlt6T3is3b2ClS?=
+ =?us-ascii?Q?gdQCEPEFo0YxgtMQvAwpEN4yDFk2F1cPhFx9iVcY?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d804325e-0d3e-4f07-073f-08dabbfdf544
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Nov 2022 11:41:04.5623
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HHJs+3rK6RRjcL6huc4yHGNZiYtMxKPNDWAgHensj0USe7zsUgFbs7PGD+71+172
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4455
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 31, 2022 at 05:02:50PM -0700, Isaku Yamahata wrote:
-> On Fri, Oct 28, 2022 at 02:55:45PM +0800,
-> Chao Peng <chao.p.peng@linux.intel.com> wrote:
-> 
-> > On Wed, Oct 26, 2022 at 02:54:25PM -0700, Isaku Yamahata wrote:
-> > > On Tue, Oct 25, 2022 at 11:13:43PM +0800,
-> > > Chao Peng <chao.p.peng@linux.intel.com> wrote:
+On Tue, Nov 01, 2022 at 11:04:38AM +0800, Yi Liu wrote:
+> On 2022/11/1 07:24, Jason Gunthorpe wrote:
+> > On Mon, Oct 31, 2022 at 08:25:39PM +0800, Yi Liu wrote:
+> > > > There is something wrong with the test suite that it isn't covering
+> > > > the above, I'm going to look into that today.
 > > > 
-> > > > A memslot with KVM_MEM_PRIVATE being set can include both fd-based
-> > > > private memory and hva-based shared memory. Architecture code (like TDX
-> > > > code) can tell whether the on-going fault is private or not. This patch
-> > > > adds a 'is_private' field to kvm_page_fault to indicate this and
-> > > > architecture code is expected to set it.
-> > > > 
-> > > > To handle page fault for such memslot, the handling logic is different
-> > > > depending on whether the fault is private or shared. KVM checks if
-> > > > 'is_private' matches the host's view of the page (maintained in
-> > > > mem_attr_array).
-> > > >   - For a successful match, private pfn is obtained with
-> > > >     restrictedmem_get_page () from private fd and shared pfn is obtained
-> > > >     with existing get_user_pages().
-> > > >   - For a failed match, KVM causes a KVM_EXIT_MEMORY_FAULT exit to
-> > > >     userspace. Userspace then can convert memory between private/shared
-> > > >     in host's view and retry the fault.
-> > > > 
-> > > > Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > > > ---
-> > > >  arch/x86/kvm/mmu/mmu.c          | 56 +++++++++++++++++++++++++++++++--
-> > > >  arch/x86/kvm/mmu/mmu_internal.h | 14 ++++++++-
-> > > >  arch/x86/kvm/mmu/mmutrace.h     |  1 +
-> > > >  arch/x86/kvm/mmu/spte.h         |  6 ++++
-> > > >  arch/x86/kvm/mmu/tdp_mmu.c      |  3 +-
-> > > >  include/linux/kvm_host.h        | 28 +++++++++++++++++
-> > > >  6 files changed, 103 insertions(+), 5 deletions(-)
-> > > > 
-> > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > > index 67a9823a8c35..10017a9f26ee 100644
-> > > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > > @@ -3030,7 +3030,7 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn,
-> > > >  
-> > > >  int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> > > >  			      const struct kvm_memory_slot *slot, gfn_t gfn,
-> > > > -			      int max_level)
-> > > > +			      int max_level, bool is_private)
-> > > >  {
-> > > >  	struct kvm_lpage_info *linfo;
-> > > >  	int host_level;
-> > > > @@ -3042,6 +3042,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> > > >  			break;
-> > > >  	}
-> > > >  
-> > > > +	if (is_private)
-> > > > +		return max_level;
-> > > 
-> > > Below PG_LEVEL_NUM is passed by zap_collapsible_spte_range().  It doesn't make
-> > > sense.
-> > > 
-> > > > +
-> > > >  	if (max_level == PG_LEVEL_4K)
-> > > >  		return PG_LEVEL_4K;
-> > > >  
-> > > > @@ -3070,7 +3073,8 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> > > >  	 * level, which will be used to do precise, accurate accounting.
-> > > >  	 */
-> > > >  	fault->req_level = kvm_mmu_max_mapping_level(vcpu->kvm, slot,
-> > > > -						     fault->gfn, fault->max_level);
-> > > > +						     fault->gfn, fault->max_level,
-> > > > +						     fault->is_private);
-> > > >  	if (fault->req_level == PG_LEVEL_4K || fault->huge_page_disallowed)
-> > > >  		return;
-> > > >  
-> > > > @@ -4141,6 +4145,32 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
-> > > >  	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
-> > > >  }
-> > > >  
-> > > > +static inline u8 order_to_level(int order)
-> > > > +{
-> > > > +	BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
-> > > > +
-> > > > +	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
-> > > > +		return PG_LEVEL_1G;
-> > > > +
-> > > > +	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
-> > > > +		return PG_LEVEL_2M;
-> > > > +
-> > > > +	return PG_LEVEL_4K;
-> > > > +}
-> > > > +
-> > > > +static int kvm_faultin_pfn_private(struct kvm_page_fault *fault)
-> > > > +{
-> > > > +	int order;
-> > > > +	struct kvm_memory_slot *slot = fault->slot;
-> > > > +
-> > > > +	if (kvm_restricted_mem_get_pfn(slot, fault->gfn, &fault->pfn, &order))
-> > > > +		return RET_PF_RETRY;
-> > > > +
-> > > > +	fault->max_level = min(order_to_level(order), fault->max_level);
-> > > > +	fault->map_writable = !(slot->flags & KVM_MEM_READONLY);
-> > > > +	return RET_PF_CONTINUE;
-> > > > +}
-> > > > +
-> > > >  static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> > > >  {
-> > > >  	struct kvm_memory_slot *slot = fault->slot;
-> > > > @@ -4173,6 +4203,22 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> > > >  			return RET_PF_EMULATE;
-> > > >  	}
-> > > >  
-> > > > +	if (kvm_slot_can_be_private(slot) &&
-> > > > +	    fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-> > > > +		vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
-> > > > +		if (fault->is_private)
-> > > > +			vcpu->run->memory.flags = KVM_MEMORY_EXIT_FLAG_PRIVATE;
-> > > > +		else
-> > > > +			vcpu->run->memory.flags = 0;
-> > > > +		vcpu->run->memory.padding = 0;
-> > > > +		vcpu->run->memory.gpa = fault->gfn << PAGE_SHIFT;
-> > > > +		vcpu->run->memory.size = PAGE_SIZE;
-> > > > +		return RET_PF_USER;
-> > > > +	}
-> > > > +
-> > > > +	if (fault->is_private)
-> > > > +		return kvm_faultin_pfn_private(fault);
-> > > > +
-> > > >  	async = false;
-> > > >  	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, &async,
-> > > >  					  fault->write, &fault->map_writable,
-> > > > @@ -5557,6 +5603,9 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
-> > > >  			return -EIO;
-> > > >  	}
-> > > >  
-> > > > +	if (r == RET_PF_USER)
-> > > > +		return 0;
-> > > > +
-> > > >  	if (r < 0)
-> > > >  		return r;
-> > > >  	if (r != RET_PF_EMULATE)
-> > > > @@ -6408,7 +6457,8 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
-> > > >  		 */
-> > > >  		if (sp->role.direct &&
-> > > >  		    sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn,
-> > > > -							       PG_LEVEL_NUM)) {
-> > > > +							       PG_LEVEL_NUM,
-> > > > +							       false)) {
-> > > >  			kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
-> > > >  
-> > > >  			if (kvm_available_flush_tlb_with_range())
-> > > > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> > > > index 582def531d4d..5cdff5ca546c 100644
-> > > > --- a/arch/x86/kvm/mmu/mmu_internal.h
-> > > > +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> > > > @@ -188,6 +188,7 @@ struct kvm_page_fault {
-> > > >  
-> > > >  	/* Derived from mmu and global state.  */
-> > > >  	const bool is_tdp;
-> > > > +	const bool is_private;
-> > > >  	const bool nx_huge_page_workaround_enabled;
-> > > >  
-> > > >  	/*
-> > > > @@ -236,6 +237,7 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
-> > > >   * RET_PF_RETRY: let CPU fault again on the address.
-> > > >   * RET_PF_EMULATE: mmio page fault, emulate the instruction directly.
-> > > >   * RET_PF_INVALID: the spte is invalid, let the real page fault path update it.
-> > > > + * RET_PF_USER: need to exit to userspace to handle this fault.
-> > > >   * RET_PF_FIXED: The faulting entry has been fixed.
-> > > >   * RET_PF_SPURIOUS: The faulting entry was already fixed, e.g. by another vCPU.
-> > > >   *
-> > > > @@ -252,6 +254,7 @@ enum {
-> > > >  	RET_PF_RETRY,
-> > > >  	RET_PF_EMULATE,
-> > > >  	RET_PF_INVALID,
-> > > > +	RET_PF_USER,
-> > > >  	RET_PF_FIXED,
-> > > >  	RET_PF_SPURIOUS,
-> > > >  };
-> > > > @@ -309,7 +312,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> > > >  
-> > > >  int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> > > >  			      const struct kvm_memory_slot *slot, gfn_t gfn,
-> > > > -			      int max_level);
-> > > > +			      int max_level, bool is_private);
-> > > >  void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
-> > > >  void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_level);
-> > > >  
-> > > > @@ -318,4 +321,13 @@ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
-> > > >  void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
-> > > >  void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
-> > > >  
-> > > > +#ifndef CONFIG_HAVE_KVM_RESTRICTED_MEM
-> > > > +static inline int kvm_restricted_mem_get_pfn(struct kvm_memory_slot *slot,
-> > > > +					gfn_t gfn, kvm_pfn_t *pfn, int *order)
-> > > > +{
-> > > > +	WARN_ON_ONCE(1);
-> > > > +	return -EOPNOTSUPP;
-> > > > +}
-> > > > +#endif /* CONFIG_HAVE_KVM_RESTRICTED_MEM */
-> > > > +
-> > > >  #endif /* __KVM_X86_MMU_INTERNAL_H */
-> > > > diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
-> > > > index ae86820cef69..2d7555381955 100644
-> > > > --- a/arch/x86/kvm/mmu/mmutrace.h
-> > > > +++ b/arch/x86/kvm/mmu/mmutrace.h
-> > > > @@ -58,6 +58,7 @@ TRACE_DEFINE_ENUM(RET_PF_CONTINUE);
-> > > >  TRACE_DEFINE_ENUM(RET_PF_RETRY);
-> > > >  TRACE_DEFINE_ENUM(RET_PF_EMULATE);
-> > > >  TRACE_DEFINE_ENUM(RET_PF_INVALID);
-> > > > +TRACE_DEFINE_ENUM(RET_PF_USER);
-> > > >  TRACE_DEFINE_ENUM(RET_PF_FIXED);
-> > > >  TRACE_DEFINE_ENUM(RET_PF_SPURIOUS);
-> > > >  
-> > > > diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-> > > > index 7670c13ce251..9acdf72537ce 100644
-> > > > --- a/arch/x86/kvm/mmu/spte.h
-> > > > +++ b/arch/x86/kvm/mmu/spte.h
-> > > > @@ -315,6 +315,12 @@ static inline bool is_dirty_spte(u64 spte)
-> > > >  	return dirty_mask ? spte & dirty_mask : spte & PT_WRITABLE_MASK;
-> > > >  }
-> > > >  
-> > > > +static inline bool is_private_spte(u64 spte)
-> > > > +{
-> > > > +	/* FIXME: Query C-bit/S-bit for SEV/TDX. */
-> > > > +	return false;
-> > > > +}
-> > > > +
-> > > 
-> > > PFN encoded in spte doesn't make sense.  In VMM for TDX, private-vs-shared is
-> > > determined by S-bit of GFN.
+> > > sounds to be the cause. I didn't see any significant change in vfio_main.c
+> > > that may fail gvt. So should the iommufd changes. Then we will re-run the
+> > > test after your update.:-)
 > > 
-> > My understanding is we will have software bit in the spte, will we? In
-> > current TDX code I see we have SPTE_SHARED_MASK bit defined.
+> > I updated the github with all the changes made so far, it is worth
+> > trying again!
 > 
-> I'm afraid that you're referring old version.  It's not.  For TDX, gfn needs
-> to be checked.  Which isn't encoded in spte.
+> gvt is still failing with below call trace in host side. vfio_unpin_pages()
+> is still in problem. Any idea on it?
 
-Okay.
+Oh, this is my mistake, I rushed a bit getting updated branches:
 
-> 
-> 
-> > > >  static inline u64 get_rsvd_bits(struct rsvd_bits_validate *rsvd_check, u64 pte,
-> > > >  				int level)
-> > > >  {
-> > > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > > index 672f0432d777..9f97aac90606 100644
-> > > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > > @@ -1768,7 +1768,8 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
-> > > >  			continue;
-> > > >  
-> > > >  		max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot,
-> > > > -							      iter.gfn, PG_LEVEL_NUM);
-> > > > +						iter.gfn, PG_LEVEL_NUM,
-> > > > +						is_private_spte(iter.old_spte));
-> > > >  		if (max_mapping_level < iter.level)
-> > > >  			continue;
-> > > 
-> > > This is to merge pages into a large page on the next kvm page fault.  large page
-> > > support is not yet supported.  Let's skip the private slot until large page
-> > > support is done.
-> > 
-> > So what your suggestion is passing in a 'false' at this time for
-> > 'is_private'? Unless we will decide not use the above is_private_spte,
-> > this code does not hurt, right? is_private_spte() return false before
-> > we finally get chance to add the large page support.
-> 
-> Let's pass false always for now.
+diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
+index 40eb6931ab2321..29e7b1fdd0cd4a 100644
+--- a/drivers/vfio/iommufd.c
++++ b/drivers/vfio/iommufd.c
+@@ -118,6 +118,7 @@ static void vfio_emulated_unmap(void *data, unsigned long iova,
+ }
+ 
+ static const struct iommufd_access_ops vfio_user_ops = {
++	.needs_pin_pages = 1,
+ 	.unmap = vfio_emulated_unmap,
+ };
 
-Good to me. Thanks.
-
-Chao
-> -- 
-> Isaku Yamahata <isaku.yamahata@gmail.com>
+Thanks, 
+Jason
