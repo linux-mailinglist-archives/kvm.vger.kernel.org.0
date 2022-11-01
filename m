@@ -2,97 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AF71615431
-	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 22:23:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DC04615473
+	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 22:51:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230165AbiKAVXI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Nov 2022 17:23:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43402 "EHLO
+        id S230354AbiKAVvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Nov 2022 17:51:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230174AbiKAVXG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Nov 2022 17:23:06 -0400
-X-Greylist: delayed 452 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 01 Nov 2022 14:23:05 PDT
-Received: from smtp.smtpout.orange.fr (smtp-15.smtpout.orange.fr [80.12.242.15])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 22916EBC
-        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 14:23:05 -0700 (PDT)
-Received: from pop-os.home ([86.243.100.34])
-        by smtp.orange.fr with ESMTPA
-        id pyanoKD2rsfCIpybaoWfM8; Tue, 01 Nov 2022 22:15:31 +0100
-X-ME-Helo: pop-os.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Tue, 01 Nov 2022 22:15:31 +0100
-X-ME-IP: 86.243.100.34
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        kvm@vger.kernel.org
-Subject: [PATCH 27/30] KVM: x86/mmu: Use kstrtobool() instead of strtobool()
-Date:   Tue,  1 Nov 2022 22:14:15 +0100
-Message-Id: <ae7bd1f18c6f2e2e5fe21b72b62a6ae192ef9501.1667336095.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1667336095.git.christophe.jaillet@wanadoo.fr>
-References: <cover.1667336095.git.christophe.jaillet@wanadoo.fr>
+        with ESMTP id S230086AbiKAVvI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Nov 2022 17:51:08 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6D6E617F
+        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 14:51:04 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4N23cQ6yTMz4xG6;
+        Wed,  2 Nov 2022 08:51:02 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1667339463;
+        bh=XsmISU6iyvIQtW7XEorFckANs8h/uXjylMsjSpUamTU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=CbHvflimntBICJbgdR8EzYFhcEhEHTXaax/pkv47pI+bUMoyuzjKKlzLt3zhHf/Qk
+         LJl87BzyPHzqsNSwG8DqT8gry5HMzMulOisjnqsJ2BNoUNODkHayn668txI9i2ChY/
+         NtUe/X6zw5kq5eHUX7ie8f4pUjFaqE7/Ku1lEiGNY+9iyYqCR18lY+uv0GojcT/Inn
+         M6Xvt6KxKctAj+H1aTFiesjNLxK3GLZ2NI3ntRGVv+WLKhO7ahMA9lTs5PJeHjJctd
+         Cez7/WSET4LPl0XLpKSDsYfX1TZB46o5Pzgo86jUbv68X0fuObQpZ+n9hoKCZ65wgr
+         sIQ3/LY/wSlwQ==
+Date:   Wed, 2 Nov 2022 08:51:01 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     kvm@vger.kernel.org, iommu@lists.linux.dev
+Subject: Re: iommufd branch into linux-next
+Message-ID: <20221102085101.21efbd6b@canb.auug.org.au>
+In-Reply-To: <Y2BpD9OuPOmUu6GJ@nvidia.com>
+References: <Y2BpD9OuPOmUu6GJ@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/lZzlkd=Ghn_Dzb5Bf3RUyHN";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-strtobool() is the same as kstrtobool().
-However, the latter is more used within the kernel.
+--Sig_/lZzlkd=Ghn_Dzb5Bf3RUyHN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-In order to remove strtobool() and slightly simplify kstrtox.h, switch to
-the other function name.
+Hi Jason,
 
-While at it, include the corresponding header file (<linux/kstrtox.h>)
+On Mon, 31 Oct 2022 21:32:15 -0300 Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+> Can you include the new iommufd tree into linux-next please?
+>=20
+> git://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git
+>=20
+> Branches 'for-next' and 'for-rc'
+>=20
+> You can read about what it is here:
+>=20
+> https://lore.kernel.org/all/0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com/
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-This patch is part of a serie that axes all usages of strtobool().
-Each patch can be applied independently from the other ones.
+Added from today.
 
-The last patch of the serie removes the definition of strtobool().
+Thanks for adding your subsystem tree as a participant of linux-next.  As
+you may know, this is not a judgement of your code.  The purpose of
+linux-next is for integration testing and to lower the impact of
+conflicts between subsystems in the next merge window.=20
 
-You may not be in copy of the cover letter. So, if needed, it is available
-at [1].
+You will need to ensure that the patches/commits in your tree/series have
+been:
+     * submitted under GPL v2 (or later) and include the Contributor's
+        Signed-off-by,
+     * posted to the relevant mailing list,
+     * reviewed by you (or another maintainer of your subsystem tree),
+     * successfully unit tested, and=20
+     * destined for the current or next Linux merge window.
 
-[1]:  https://lore.kernel.org/all/cover.1667336095.git.christophe.jaillet@wanadoo.fr/
----
- arch/x86/kvm/mmu/mmu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Basically, this should be just what you would send to Linus (or ask him
+to fetch).  It is allowed to be rebased if you deem it necessary.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6f81539061d6..aa45abce7586 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -42,6 +42,7 @@
- #include <linux/uaccess.h>
- #include <linux/hash.h>
- #include <linux/kern_levels.h>
-+#include <linux/kstrtox.h>
- #include <linux/kthread.h>
- 
- #include <asm/page.h>
-@@ -6641,7 +6642,7 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
- 		new_val = 1;
- 	else if (sysfs_streq(val, "auto"))
- 		new_val = get_nx_auto_mode();
--	else if (strtobool(val, &new_val) < 0)
-+	else if (kstrtobool(val, &new_val) < 0)
- 		return -EINVAL;
- 
- 	__set_nx_huge_pages(new_val);
--- 
-2.34.1
+--=20
+Cheers,
+Stephen Rothwell=20
+sfr@canb.auug.org.au
 
+--Sig_/lZzlkd=Ghn_Dzb5Bf3RUyHN
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmNhlMUACgkQAVBC80lX
+0Gy8+Af+PAvG352aKlG9/FMuGS9U4PVytWO2qZ1ACEUO/QnMwo54uxib0b79em54
+OevS8nT+jKhWSNn9qtVkdvUC5FS5jJGsvOGgz/8mGiGGmO26THKcHp9XJslbQr+s
+Hi4+/pYttlFhLo3Y3aRy3cb136jFWrgTDbKvSw7jqpFKINbWhKaiD7y1M+e4YLEH
+eXx40gIBRGH64Wvv/XYKTfRVkk7+5YVehr/SAtUIQfOX9AJke3ldmzMHulgobFzO
+mbuBT8q6N6jEKt5MDrftWrKRbhTs9Vv+97eVE6zmqEleLxn0A/nTyLNrFtQdzWak
+8ap7Ma7mwWgMKNsoYrmc2f5ZqB4NiQ==
+=Ei9o
+-----END PGP SIGNATURE-----
+
+--Sig_/lZzlkd=Ghn_Dzb5Bf3RUyHN--
