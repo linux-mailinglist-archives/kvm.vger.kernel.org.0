@@ -2,198 +2,319 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E71B6145BD
-	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 09:32:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A44C6145C8
+	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 09:37:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229996AbiKAIcl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Nov 2022 04:32:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57236 "EHLO
+        id S230030AbiKAIhq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Nov 2022 04:37:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229912AbiKAIck (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Nov 2022 04:32:40 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 968F73B5;
-        Tue,  1 Nov 2022 01:32:39 -0700 (PDT)
+        with ESMTP id S229835AbiKAIho (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Nov 2022 04:37:44 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C810613D36;
+        Tue,  1 Nov 2022 01:37:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667291559; x=1698827559;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=knn1oLAwfIIL7icxHS5nRNahPFf2tYSjAdO5agJ5DQI=;
-  b=eYkGisWxpq8rcOc7PO5rVTZQotzF8wBclcuxUYGbRR6yhi/yw7SgoUby
-   L0pJCZD3q1mlRJi5rcKswNCst1v2hLecWX2UaKUJbk/wyvJzPxaZbQ3+N
-   Z6ZDLZemuNmnU7ZfT6HVln0+Rn8KIHSmoJSBcX9AF+Gu2GR5ZICxugaNB
-   Z1r5BwpEqfj2rNLR9H4QZu6/fT37Y3wxD4ROFCM2wF4hvhONELpYWlRBM
-   YVge9TByTb2To3DLFlbG+PlJeVS7BTI5ZoTVi3jNHzP66VPrb2RbriVvQ
-   TIFBpXX066uOH8qb8qj7GW9CtDe7cuoEKhDIKuwmIfLMsqQZ0ou0ZiiA/
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10517"; a="310800251"
+  t=1667291863; x=1698827863;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=KdsMqnFvJUQhe1naAvRQnxtRiT6d/xM4SRaqKf3kaAs=;
+  b=l1WFlreewF/i6yGIjEumcbB5ufS15DmJcdp0pq2AsrhyQtNJgHFJ/aNE
+   3c0NIAO/WVwz8B6Zdn518LsaaK+1QDUl4DlsbNrsAgYVnz5agxM2kpRKE
+   i6cnll+BkisRH7DysijRB1J+pjBMAhYPl9JcaYCfyJUqwH+cnvke2WHpx
+   mED2CthoBmEpMd2Ig99RWS7eW0Spk13VLjMNoJkJUNX83JhXH7AFK3dTv
+   pGTvEqalbGRVMdQWGSuM4CC7KenObIfQKslFf/wYxeb3HRQnqyB8M6JIe
+   buM290XFUAbAlfKgRjsZsd8wSOnBCtlCxKBkFE+0NS4WlJYgbUMusDriF
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10517"; a="310189553"
 X-IronPort-AV: E=Sophos;i="5.95,230,1661842800"; 
-   d="scan'208";a="310800251"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2022 01:32:38 -0700
+   d="scan'208";a="310189553"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2022 01:37:43 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10517"; a="723095713"
+X-IronPort-AV: E=McAfee;i="6500,9779,10517"; a="633811243"
 X-IronPort-AV: E=Sophos;i="5.95,230,1661842800"; 
-   d="scan'208";a="723095713"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by FMSMGA003.fm.intel.com with ESMTP; 01 Nov 2022 01:32:35 -0700
-Message-ID: <955799c72b6b825fcce104771ee7570d826faac5.camel@linux.intel.com>
-Subject: Re: [KVM] e923b0537d: kernel-selftests.kvm.rseq_test.fail
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     Gavin Shan <gshan@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        kernel test robot <oliver.sang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        lkp@lists.01.org, lkp@intel.com, xudong.hao@intel.com,
-        regressions@lists.linux.dev
-Date:   Tue, 01 Nov 2022 16:32:35 +0800
-In-Reply-To: <9bfeae26-b4b1-eedb-6cbd-b4f9f1e1cc55@redhat.com>
-References: <Yvn60W/JpPO8URLY@xsang-OptiPlex-9020>
-         <Yvq9wzXNF4ZnlCdk@google.com>
-         <5034abb9-e176-d480-c577-1ec5dd47182b@redhat.com>
-         <9bfeae26-b4b1-eedb-6cbd-b4f9f1e1cc55@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+   d="scan'208";a="633811243"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga002.jf.intel.com with ESMTP; 01 Nov 2022 01:37:42 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 1 Nov 2022 01:37:41 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Tue, 1 Nov 2022 01:37:41 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Tue, 1 Nov 2022 01:37:41 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rk7LbfB5ulrLIRgvfNf9rqbZxqGddpedm9RVv69EL7UptfgGLie1cVdcNVbjHz44SC6gQ5uJHF3tfoe00qzeE/cKlA2I8kNmt+P71kc36Sm329mCuSYgdHi7Hbl+Y1KQlD9A2eREpYTUsXv9fZU9CzPq4KUhRY3hVsuQUFd9vjYmDhxcviqyfcM3TKZAOwWFbhgUp1znyfBTGi+EVepnfMswywFotAryb+R0LcM/IN9QIGNQfTAKQbw9CjAtDups4U5ry/dWEeraNc4H6tsPnAg10Q6sY9edujLqF8iSjuvayJlPIOwGoVWEtO3m6wceT+XlCLf9KAkRP+DEPO0BIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=C2xxECMfZdiqmuMd1gUNQk+8xfQC23/aZuN+4NDryhk=;
+ b=fZZ8MCb2AJGmgu5kT2HPYumErg7q9ksftVibNdhvKflc5l9jM6r4bUFYYlnNhYVTPyZjve/IY+yXzu+77bYAo2j2Aum2lawfoAoienxv7LDyrblhPcHL23lCQKKhVOMeD0VAvaDqQAU5FIcO49c29ldPj1p+5pdmB+1RNmWO/AUDdKPbQaMGP8xfHWqKwVDC8LL+ExW2xOWKWgyaavdieHruNwGrFtvYG0QyTvh8Me6cNmFbYgGnuBsSaBNw7aJ0I3Htos1/abhoKWU+9OtKdioYwWBe/K4QmQ6UDuaOPDlUDCrogdRDTarU+qyX4Ungisdd4DefFNZi3mF4WP5LHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by PH7PR11MB6053.namprd11.prod.outlook.com (2603:10b6:510:1d1::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.19; Tue, 1 Nov
+ 2022 08:37:40 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::737e:211a:bb53:4cd7]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::737e:211a:bb53:4cd7%5]) with mapi id 15.20.5769.021; Tue, 1 Nov 2022
+ 08:37:39 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Eric Farman" <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        "Joonas Lahtinen" <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Longfang Liu <liulongfang@huawei.com>,
+        "Matthew Rosato" <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        "Shameer Kolothum" <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>
+CC:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: RE: [PATCH 08/10] vfio-iommufd: Support iommufd for emulated VFIO
+ devices
+Thread-Topic: [PATCH 08/10] vfio-iommufd: Support iommufd for emulated VFIO
+ devices
+Thread-Index: AQHY6KK36tKtoJuH5EW7rSfXhdk+0q4pxKMQ
+Date:   Tue, 1 Nov 2022 08:37:39 +0000
+Message-ID: <BN9PR11MB5276B6ACAE7E511770887BF38C369@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
+ <8-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
+In-Reply-To: <8-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.6.500.17
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH7PR11MB6053:EE_
+x-ms-office365-filtering-correlation-id: 19787ad1-27f9-4ae6-4be4-08dabbe45614
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: KtxKOf5iJKrCc5hu8mW0sNeM5TnFfoPDtFPzsYFbWZ4KYVLZdRwr60LzekvAOvcweCMxKuRpaSHBNLoDEM/Fu9F+8uAogirVwIwOrnf7b7XA3AVmLLAOtDw0YHQ40CvneL0aANT6ehwihcIbCN3PlrdVZ0YUx2vEuJmtg1oE6XDmxq055OUSnpYagT/ZGJaKKnXBZAfOEHKn3OIWvgLYXWtnEeNq5AVVXno4zc0ooIdDgc0CXPdeG9ycDoCdOpKt6ySjv4YGI9C5xgePKy1aPsUREBu1l/fn67ZVBsvz5GMCiyGXVCbDrQyZtVZ53zStI+EnS+7XrvK/+8PtZT26fk1XGZNEzzJKQT0xfowT0Rx9KEHUPcwbc5fYfXYaa1IDnB+PO6EyxDAn2wJ6auno58xIkc6CF2+MvSTKxjpa3hZlJK0SvSSLzrlYCtz8QCWQvblQ3eDFzP+xU8ACPAgZsL19/b+DUyGFxcd/qKatyZb2AYsPO9udP7E8pnN3e5LkNE2v+kpvQ7stZ3Jw4tPFNKnwe4G1tMeOt2O+YWLjDUXh6sOTkydrWyWMgeJNYE3/s6UirlUFULoI5up5SPycFaHzCw4oJr+7U5rof5MPNgyBMzUiCzLbxXGqk90T0xT/yaZ1uZ7MrTffYaZvPHxnIi5tuyx/A8Al4f6mlNXHsv2P6NKvWPnMFTOr860N08/Qvc4ku03sOhKxoTKFR7N1lRnraRD7rJFbXC04hxF82SL6pJzuaLYaxMaUyx0CtPJfYqk//H6ULDSdvXafJfK3WXrjlT727oWWFTzIdld5WEo=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(366004)(39860400002)(376002)(346002)(136003)(451199015)(6506007)(7696005)(9686003)(478600001)(26005)(54906003)(83380400001)(186003)(2906002)(55016003)(66556008)(316002)(66476007)(66946007)(110136005)(6636002)(7406005)(52536014)(7416002)(71200400001)(76116006)(8676002)(4326008)(64756008)(8936002)(5660300002)(41300700001)(86362001)(66446008)(33656002)(38100700002)(921005)(122000001)(38070700005)(82960400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?kO5YflTdw+BDlTzJ19Y81oki5ZHycYL+vSpHRqftj7pcKJLsR87fBNdAGO2+?=
+ =?us-ascii?Q?gVLmx02rEW93+LnTIukvIWmDghkj2ekfVyHFdktqqJY1pjMx9CgxdHCuM5Hr?=
+ =?us-ascii?Q?Kkdsd49/o3D/jMNr82w6+7XSNfYGd27u7G0eZkYG6ORWJXS2FDYrbReD+zyk?=
+ =?us-ascii?Q?C6Vc+K2ZU7hvC9aYNyYr56TvEnwX1Wp7CBXPtBpHPP292z0fVc5bMuA+6U5d?=
+ =?us-ascii?Q?QvFlPb7iknLs8Ve7GhyHyu/FmZPYxnjiT98p3HfD5mYy3tdXjM8N0Y/ESnxR?=
+ =?us-ascii?Q?2dbV8SDR/116h6W95ge/5SEu5+lwTA/olIyhVSkxNXaY/j0c2YO5UwjUR4tM?=
+ =?us-ascii?Q?JGhhopGdFVoquq14FxGlZY/7P8QOBOrCM3cIYhzLjP/bvIykUDlXQbDK6CG6?=
+ =?us-ascii?Q?W6MNy5X8rIVaZkNs6w5qoszXBEFA0yEGCXwk2wrWt6iHDmD3beDe1ZnCswPD?=
+ =?us-ascii?Q?QDMGmxqMfWVR0ScMuna03te1Wz8w38FVu/ljjkiikSd4iedujx+izUHwdhC4?=
+ =?us-ascii?Q?FGFkKQ5KhwgoBfR/hKTNd2ro9nu+c4XTvLpxSP3uwHEjALR5QNZhWsx5s2Vj?=
+ =?us-ascii?Q?K13HAuv2OvPFYq36wQnM4escEvD5AStC+gf6CngBYbU3pKkXePuG6fKuguK2?=
+ =?us-ascii?Q?w3ABRjYYZaTky+JLBA3OzpYffDoIWDIQPeYwI/i8AV1prjPlAxgGSejfF5f+?=
+ =?us-ascii?Q?C5qY/PN1POdZATVPx08bfXGl/bqPCO9OM7u2lMQ214Z6Ycml0RhHT0ThJkRY?=
+ =?us-ascii?Q?ERe9aUVy9oS/6sBslagbFeXQx+HjuLUszw4NR38MetxSG3BcvoaFNEWLojQT?=
+ =?us-ascii?Q?aArz7rzAhUrC626vkKioE/WgItA/4DXHA511NhqJOUCj1YaU1d3bQINBB9/J?=
+ =?us-ascii?Q?dexNsqZsteh6vAxZBhOHqUZtoASRI5V5ugMCjY0PisGEuNZsjT4QTC9ha81X?=
+ =?us-ascii?Q?FSvbzGnV59IQoiYlECkps1doDmEXNjVwPC+f6VUr5V7Hf+cPwozaUpkef079?=
+ =?us-ascii?Q?cWabSz9iXyBJKLr8T/JnafIbSoAAVdzYCgEnowkIN4EIi61ON8upfsJq/4E8?=
+ =?us-ascii?Q?X6r72JupX4/5d2Q57+sAhrg666wDtHm/xc2wms2cMTzCzXt3zSZe7hjgfuek?=
+ =?us-ascii?Q?l/ceCu3Zpbf1MrcJr8kN9A+SMpVHW0CHb0zxo3wzxF9o8uBpXdZIztzAuJt/?=
+ =?us-ascii?Q?hHivfanr438UKuAENMpzJaLvJSt+xJe4xrIp06xMnF7NacNItw/EooynCRme?=
+ =?us-ascii?Q?N4CaM0+lkSAly6rmO14IBkGh+IiclW5XCB9RkzrBzqOeeiaPUdGIeGF7HFE3?=
+ =?us-ascii?Q?/sqv0iRYJRsIrBvPG35JIOsLiS5UYkAj9/StMxq2pLYglNh/we7jfpPa33b5?=
+ =?us-ascii?Q?Axu9uImKZ8BlAIFu44RXSCjk/gWSSxOJ5LTGqcLLzRQ7GjUD86CW9kWvOaA2?=
+ =?us-ascii?Q?3QlQA5g0NyxNJMsvG78KPbaO6rfyVCMGdfhu4yON/9liaw9LqcdY4aWUOA1S?=
+ =?us-ascii?Q?XwyWwWiNOKjPAzufnk+sUbP8n+Fb+4Oh8LmxE9Gc8HomkDqM9x1qkssJfD7f?=
+ =?us-ascii?Q?iJXwqzdTK9qQ3kFNy++xCL4Pc/G7WSYwv6Ij2FdL?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19787ad1-27f9-4ae6-4be4-08dabbe45614
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Nov 2022 08:37:39.7299
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xU2gTA4yISEKrtiLJr/rO2PqT34GW2oH6/DfdRxSEcWa/lNjcjWXjNNrL5gGvQ6FxFGcRM5b6V07FAiSZ9Evbg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6053
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-08-16 at 20:02 +1000, Gavin Shan wrote:
-> Hi Sean,
-> 
-> On 8/16/22 3:02 PM, Gavin Shan wrote:
-> > On 8/16/22 7:42 AM, Sean Christopherson wrote:
-> > > On Mon, Aug 15, 2022, kernel test robot wrote:
-> > > > commit: e923b0537d28e15c9d31ce8b38f810b325816903 ("KVM:
-> > > > selftests: Fix target thread to be migrated in rseq_test")
-> > > > https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git
-> > > >  master
-> > > 
-> > > ...
-> > > 
-> > > > # selftests: kvm: rseq_test
-> > > > # ==== Test Assertion Failure ====
-> > > > #   rseq_test.c:278: i > (NR_TASK_MIGRATIONS / 2)
-> > > > #   pid=49599 tid=49599 errno=4 - Interrupted system call
-> > > > #      1    0x000000000040265d: main at rseq_test.c:278
-> > > > #      2    0x00007fe44eed07fc: ?? ??:0
-> > > > #      3    0x00000000004026d9: _start at ??:?
-> > > > #   Only performed 23174 KVM_RUNs, task stalled too much?
-> > > > #
-> > > > not ok 56 selftests: kvm: rseq_test # exit=254
-> > > 
-> > > ...
-> > > 
-> > > > # Automatically generated file; DO NOT EDIT.
-> > > > # Linux/x86_64 5.19.0-rc6 Kernel Configuration
-> > > > #
-> > > > CONFIG_CC_VERSION_TEXT="gcc-11 (Debian 11.3.0-3) 11.3.0"
-> > > > CONFIG_CC_IS_GCC=y
-> > > > CONFIG_GCC_VERSION=110300
-> > > > CONFIG_CLANG_VERSION=0
-> > > > CONFIG_AS_IS_GNU=y
-> > > > CONFIG_AS_VERSION=23800
-> > > > CONFIG_LD_IS_BFD=y
-> > > > CONFIG_LD_VERSION=23800
-> > > > CONFIG_LLD_VERSION=0
-> > > 
-> > > Assuming 23800 == 2.38, this is a known issue.
-> > > 
-> > > https://lore.kernel.org/all/20220810104114.6838-1-gshan@redhat.com
-> > > 
-> > 
-> > It's probably different story this time. The assert is triggered
-> > because
-> > of the following instructions. I would guess the reason is vcpu
-> > thread
-> > has been running on CPU where we has high CPU load. In this case,
-> > the
-> > vcpu thread can't be run in time. More specific, the vcpu thread
-> > can't
-> > be run in the 1 - 10us time window, which is specified by the
-> > migration
-> > worker (thread).
-> > 
-> >      TEST_ASSERT(i > (NR_TASK_MIGRATIONS / 2),
-> >                  "Only performed %d KVM_RUNs, task stalled too
-> > much?\n", i);
-> > 
-> > I think we need to improve the handshake mechanism between the vcpu
-> > thread
-> > and migration worker. In current implementation, the handshake is
-> > done through
-> > the atomic counter. The mechanism is simple enough, but vcpu thread
-> > can miss
-> > the aforementioned time window. Another issue is the test case much
-> > more time
-> > than expected to finish.
-> > 
-> > Sean, if you think it's reasonable, I can figure out something to
-> > do:
-> > 
-> > - Reuse the atomic counter for a full synchronization between these
-> > two
-> >    threads. Something like below:
-> > 
-> >    #define RSEQ_TEST_STATE_RUN_VCPU       0     // vcpu_run()
-> >    #define RSEQ_TEST_STATE_MIGRATE        1     //
-> > sched_setaffinity()
-> >    #define RSEQ_TEST_STATE_CHECK          2     // Check
-> > rseq.cpu_id and get_cpu()
-> > 
-> >    The atomic counter is reset to RSEQ_TEST_STATE_RUN_VCPU after
-> > RSEQ_TEST_STATE_RUN_VCPU
-> > 
-> > - Reduce NR_TASK_MIGRATIONS from 100000 to num_of_online_cpus().
-> > With this,
-> >    less time is needed to finish the test case.
-> > 
-> 
-> I'm able to recreate the issue on my local arm64 system.
-> 
-> - From the source code, the iteration count is changed from 100000 to
-> 1000
-> - Only CPU#0 and CPU#1 are exposed in calc_min_max_cpu, meaning other
-> CPUs
->    are cleared from @possible_mask
-> - Run some CPU bound task on CPU#0 and CPU#1
->    # while true; do taskset -c 0 ./a; done
->    # while true; do taskset -c 1 ./a; done
-> - Run 'rseq_test' and hit the issue
->    # ./rseq_test
->    calc_min_max_cpu: nproc=224
->    calc_min_max_cpu: min_cpu=0, max_cpu=1
->    main: Required tests: 1000   Succeeds: 1
->    ==== Test Assertion Failure ====
->      rseq_test.c:280: i > (NR_TASK_MIGRATIONS / 2)
->      pid=9624 tid=9624 errno=4 - Interrupted system call
->         1	0x0000000000401cf3: main at rseq_test.c:280
->         2	0x0000ffffbc64679b: ?? ??:0
->         3	0x0000ffffbc64686b: ?? ??:0
->         4	0x0000000000401def: _start at ??:?
->      Only performed 1 KVM_RUNs, task stalled too much?
-> 
-I met this as well, and can reproduce this easily on my Cascade-Lake
-machine, without heavy workload; before I find this mail.
-I'm wondering if it's because vcpu_run() has become much more time
-consuming than this test case was defined?
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Wednesday, October 26, 2022 2:51 AM
+>=20
+> Emulated VFIO devices are calling vfio_register_emulated_iommu_dev() and
+> consist of all the mdev drivers.
+>=20
+> Like the physical drivers, support for iommufd is provided by the driver
+> supplying the correct correct standard ops. Provide ops from the core tha=
+t
+> duplicate what vfio_register_emulated_iommu_dev() does.
+>=20
+> Emulated drivers are where it is more likely to see variation in the
+> iommfd support ops. For instance IDXD will probably need to setup both a
+> iommfd_device context linked to a PASID and an iommufd_access context to
+> support all their mdev operations.
+>=20
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/gpu/drm/i915/gvt/kvmgt.c  |   3 +
+>  drivers/s390/cio/vfio_ccw_ops.c   |   3 +
+>  drivers/s390/crypto/vfio_ap_ops.c |   3 +
+>  drivers/vfio/container.c          | 108 ++++++-----------------------
+>  drivers/vfio/iommufd.c            |  57 ++++++++++++++++
+>  drivers/vfio/vfio.h               |  10 ++-
+>  drivers/vfio/vfio_main.c          | 110 +++++++++++++++++++++++++++++-
+>  include/linux/vfio.h              |  14 ++++
+>  8 files changed, 217 insertions(+), 91 deletions(-)
 
-BTW, if we substitute sys_getcpu(&cpu) with vdso_getcpu(), can reduce
-the reproduction odds.
+mtty, mdpy and mbochs?
 
-> Thanks,
-> Gavin
-> 
-> 
+> diff --git a/drivers/vfio/container.c b/drivers/vfio/container.c
+> index 8772dad6808539..0388f2e33447eb 100644
+> --- a/drivers/vfio/container.c
+> +++ b/drivers/vfio/container.c
+> @@ -540,113 +540,45 @@ void vfio_group_unuse_container(struct
+> vfio_group *group)
+>  	fput(group->opened_file);
+>  }
+>=20
+> -/*
+> - * Pin contiguous user pages and return their associated host pages for =
+local
+> - * domain only.
+> - * @device [in]  : device
+> - * @iova [in]    : starting IOVA of user pages to be pinned.
+> - * @npage [in]   : count of pages to be pinned.  This count should not
+> - *		   be greater than VFIO_PIN_PAGES_MAX_ENTRIES.
+> - * @prot [in]    : protection flags
+> - * @pages[out]   : array of host pages
+> - * Return error or number of pages pinned.
+> - *
+> - * A driver may only call this function if the vfio_device was created
+> - * by vfio_register_emulated_iommu_dev().
+> - */
+> -int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
+> -		   int npage, int prot, struct page **pages)
+> +int vfio_container_pin_pages(struct vfio_container *container,
+> +			     struct iommu_group *iommu_group, dma_addr_t
+> iova,
+> +			     int npage, int prot, struct page **pages)
+>  {
+> -	struct vfio_container *container;
+> -	struct vfio_group *group =3D device->group;
+> -	struct vfio_iommu_driver *driver;
+> -	int ret;
+> -
+> -	if (!pages || !npage || !vfio_assert_device_open(device))
+> -		return -EINVAL;
+> +	/* group->container cannot change while a vfio device is open */
+> +	struct vfio_iommu_driver *driver =3D container->iommu_driver;
+>=20
+>  	if (npage > VFIO_PIN_PAGES_MAX_ENTRIES)
+>  		return -E2BIG;
+>=20
+>  	/* group->container cannot change while a vfio device is open */
+> -	container =3D group->container;
+>  	driver =3D container->iommu_driver;
+
+duplicated comment and assignment.
+
+Actually, I'm not sure whether the comment should be put within this
+container helper and other two. There is no group reference in these
+helpers then it sounds like the comment makes more sense to be in the
+caller side?
+
+> +void vfio_unpin_pages(struct vfio_device *device, dma_addr_t iova, int
+> npage)
+> +{
+> +	if (WARN_ON(!vfio_assert_device_open(device)))
+> +		return;
+> +
+> +	if (device->group->container) {
+> +		vfio_container_unpin_pages(device->group->container, iova,
+> +					   npage);
+> +	} else if (device->iommufd_access) {
+
+be consistent with other two helpers i.e. if-if instead of if-else
+
+> +		if (WARN_ON(iova > ULONG_MAX))
+> +			return;
+
+Is there a reason why this is a WARN_ON only in unpin but not in pin?
+
+> +int vfio_dma_rw(struct vfio_device *device, dma_addr_t iova, void *data,
+> +		size_t len, bool write)
+> +{
+> +	if (!data || len <=3D 0 || !vfio_assert_device_open(device))
+> +		return -EINVAL;
+> +
+> +	if (device->group->container)
+> +		return vfio_container_dma_rw(device->group->container,
+> iova,
+> +					     data, len, write);
+> +
+> +	if (device->iommufd_access) {
+> +		unsigned int flags =3D 0;
+> +
+> +		if (iova > ULONG_MAX)
+> +			return -EINVAL;
+> +
+> +		/* VFIO historically tries to auto-detect a kthread */
+> +		if (!current->mm)
+> +			flags |=3D IOMMUFD_ACCESS_RW_KTHREAD;
+
+Can you elaborate why this cannot be put in iommufd as the default
+policy similar to what vfio container does?
 
