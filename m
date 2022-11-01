@@ -2,128 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35D06615099
-	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 18:26:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B94916150BE
+	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 18:34:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230208AbiKAR0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Nov 2022 13:26:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56434 "EHLO
+        id S230184AbiKAReG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Nov 2022 13:34:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230133AbiKAR0d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Nov 2022 13:26:33 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E7B1178B6
-        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 10:26:31 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id gw22so923904pjb.3
-        for <kvm@vger.kernel.org>; Tue, 01 Nov 2022 10:26:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=A4QtUNj00AFef6/SLaxc9/EwfiEMk/XY7VysTIRCNPk=;
-        b=GsJToAMuJ29wa7MEmx4mYyei/7wv80A0LVzK56seJd3rF4Iza7U3ZPb2voZV21TLTN
-         RxpDgA2RSMWks/aF2G1p1yac9G/1umJFalIjnM0nXDpvs8UOdNk7V54bFdBfr34nX38e
-         IQXZHEYQL81ulw6Uymt/PPeYXF0F3z62tB5HDbR5bjJHaCzZOtdxavohIZJCCqGp8dq3
-         lWca2/vOzct4CEreWPEW2kTLPa1KAz6yPdkGtc+Nyc71IcwQcGBbEb8l8yakRNIBUKEn
-         9YvwySYx/6EYUSNoFfcEHRtZd7HxydbrpvsFNsDcM6LomZIXAmeUXQpZo3bOdnz84whe
-         TtaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A4QtUNj00AFef6/SLaxc9/EwfiEMk/XY7VysTIRCNPk=;
-        b=YqkRcVGpM7O5x8Fgl7XnpkLPS8muNyULPQx5Dx+g00MAev450KGuqDjZWyGgTkrKxP
-         UAFAFplsqChSXsqUYE59mdgq3wncLxob94uPfh3l7hpkqOTOMyNBGIA9orB7iTn8lgYl
-         fzQPUJhyyZKusdmvdOFPZ2uvKaeEUoprbjKOdY5CB34y3RQKFdcAhwzCKCVbobWSZqKn
-         zvWDOWkwwnAIoTCCm0cYmi2L0A1P9Ho2SpNLReqEgm5uu7idFHQQtCd2W2o6D5s1HKsY
-         2PMRE1qLg8QmRGTVpcvAW19giOkoXKAtU4gEkKbyOSAS7HJ/Cy0ZIlIbFORNkipMHXbm
-         FboA==
-X-Gm-Message-State: ACrzQf1tIGAyJUUP+Y/b6htZiLNPp1OH9jrNxRKICWCrOhwMBa3oZXd6
-        aBfyNfNA4a2r0hQNFkFa0G3g3Q==
-X-Google-Smtp-Source: AMsMyM5Vb6UFf34QgXTQptO3wBNpsNlppGWrjixPl4a14JL9LAnJyPI67XMAeJtoT1oJDK1obuG8+g==
-X-Received: by 2002:a17:902:d54a:b0:186:a43b:8e with SMTP id z10-20020a170902d54a00b00186a43b008emr21216723plf.36.1667323590558;
-        Tue, 01 Nov 2022 10:26:30 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id r7-20020aa79ec7000000b0056da63c8515sm2984440pfq.91.2022.11.01.10.26.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Nov 2022 10:26:30 -0700 (PDT)
-Date:   Tue, 1 Nov 2022 17:26:26 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v13 45/48] KVM: selftests: Introduce rdmsr_from_l2() and
- use it for MSR-Bitmap tests
-Message-ID: <Y2FWwkq1kv9uXLwt@google.com>
-References: <20221101145426.251680-1-vkuznets@redhat.com>
- <20221101145426.251680-46-vkuznets@redhat.com>
- <Y2FFNO3Bu9Z3LtCW@google.com>
- <87bkpqskr2.fsf@ovpn-194-149.brq.redhat.com>
+        with ESMTP id S229875AbiKARcK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Nov 2022 13:32:10 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F11D1CB04;
+        Tue,  1 Nov 2022 10:32:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 38187B81E9A;
+        Tue,  1 Nov 2022 17:32:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43E12C433D6;
+        Tue,  1 Nov 2022 17:32:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667323926;
+        bh=JbOeM0AqPBBllU0o+kD6rGUUaYrAlKa7olm2RWjRX8A=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FUfEpkIf4c2oRPE6z3YmW84PIJsB9HNzoMJhSMGNSdLUmy1s3QY70HYASvWiz+aPY
+         KtXu/HZUpi2LmnOJh1wm+mLGuPUwM+T6LF5aTgjoVZCmUPEQmVt1TFaF+3Ek08stt+
+         4Uf5Z+qLZrbpFnIjaz+OWvc56vcnkfx2/g3bIfTIPFLgjUW5icvEfmZvN6hlwKprB1
+         o6VHHDFN7Nh0uNJ+8PNADUryctE0FnW0zoOWuoTP4tSphJuQiEuwWW3/2iJLRB0NJo
+         fOwWI5tkWg8KB7XoJzXzmIpMYTY0KvLm2AI2hNDvA7QSzRSBSjBWHiNJXBYHLn3RPf
+         MiYKuTqqHhBTA==
+Date:   Tue, 1 Nov 2022 10:32:04 -0700
+From:   Josh Poimboeuf <jpoimboe@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jmattson@google.com
+Subject: Re: [PATCH 1/7] KVM: VMX: remove regs argument of __vmx_vcpu_run
+Message-ID: <20221101173204.w7yuoerkafxonyzx@treble>
+References: <20221028230723.3254250-1-pbonzini@redhat.com>
+ <20221028230723.3254250-2-pbonzini@redhat.com>
+ <Y2AH6sevOvD/GnKV@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87bkpqskr2.fsf@ovpn-194-149.brq.redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <Y2AH6sevOvD/GnKV@google.com>
+X-Spam-Status: No, score=-8.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 01, 2022, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
+On Mon, Oct 31, 2022 at 05:37:46PM +0000, Sean Christopherson wrote:
+> On Fri, Oct 28, 2022, Paolo Bonzini wrote:
+> > Registers are reachable through vcpu_vmx, no need to pass
+> > a separate pointer to the regs[] array.
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >  arch/x86/kernel/asm-offsets.c |  1 +
+> >  arch/x86/kvm/vmx/nested.c     |  3 +-
+> >  arch/x86/kvm/vmx/vmenter.S    | 58 +++++++++++++++--------------------
+> >  arch/x86/kvm/vmx/vmx.c        |  3 +-
+> >  arch/x86/kvm/vmx/vmx.h        |  3 +-
+> >  5 files changed, 29 insertions(+), 39 deletions(-)
+> > 
+> > diff --git a/arch/x86/kernel/asm-offsets.c b/arch/x86/kernel/asm-offsets.c
+> > index cb50589a7102..90da275ad223 100644
+> > --- a/arch/x86/kernel/asm-offsets.c
+> > +++ b/arch/x86/kernel/asm-offsets.c
+> > @@ -111,6 +111,7 @@ static void __used common(void)
+> >  
+> >  	if (IS_ENABLED(CONFIG_KVM_INTEL)) {
+> >  		BLANK();
+> > +		OFFSET(VMX_vcpu_arch_regs, vcpu_vmx, vcpu.arch.regs);
 > 
-> > On Tue, Nov 01, 2022, Vitaly Kuznetsov wrote:
-> >> Hyper-V MSR-Bitmap tests do RDMSR from L2 to exit to L1. While 'evmcs_test'
-> >> correctly clobbers all GPRs (which are not preserved), 'hyperv_svm_test'
-> >> does not. Introduce and use common rdmsr_from_l2() to avoid code
-> >> duplication and remove hardcoding of MSRs.
-> >> 
-> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >> ---
-> >>  .../selftests/kvm/include/x86_64/processor.h  |  9 +++++++
-> >>  .../testing/selftests/kvm/x86_64/evmcs_test.c | 24 ++++---------------
-> >>  .../selftests/kvm/x86_64/hyperv_svm_test.c    |  8 +++----
-> >>  3 files changed, 17 insertions(+), 24 deletions(-)
-> >> 
-> >> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> >> index fbaf0b6cec4b..a14b7e4ea7c4 100644
-> >> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> >> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> >> @@ -520,6 +520,15 @@ static inline void cpu_relax(void)
-> >>  		"hlt\n"	\
-> >>  		)
-> >>  
-> >> +/* Exit to L1 from L2 with RDMSR instruction */
-> >> +static inline void rdmsr_from_l2(uint32_t msr)
-> >
-> > I would prefer keeping this helper out of common x86-64 code, even if it means
-> > duplicating code across multiple Hyper-V tests until the L1 VM-Enter/VM-Exit
-> > sequences get cleaned up.  The name is misleading, e.g. it doesn't really read
-> > the MSR since there are no outputs
-> 
-> It's somewhat similar to vmcall()/vmmcall() which are only used to exit
-> from L2 to L1 (and thus nobody complained that all the register values
-> are random) and not issue a hypercall and return some value.
+> Is there an asm-offsets-like solution that doesn't require exposing vcpu_vmx
+> outside of KVM?  We (Google) want to explore loading multiple instances of KVM,
+> i.e. loading multiple versions of kvm.ko at the same time, to allow intra-host
+> migration between versions of KVM to upgrade/rollback KVM without changing the
+> kernel (RFC coming soon-ish).  IIRC, asm-offsets is the only place where I haven't
+> been able to figure out a simple way to avoid exposing KVM's internal structures
+> outside of KVM (so that the structures can change across KVM instances without
+> breaking kernel code).
 
-Sort of.  VMCALL/VMMCALL are unique in that they have no meaning (ignoring VMX's
-STM) other than what is given to them by the hypervisor/software on VM-Exit.  RDMSR
-on the other hand (and literally every other instruction), has architecturally
-defined behavior and thus expectations beyond generating a VM-Exit.
+Is that really a problem?  Would it even make sense for non-KVM kernel
+code to use 'vcpu_vmx' anyway?  It already seems to be private.
+asm-offsets.c has to "cheat" to get access to it by including
+"../kvm/vmx/vmx.h".
 
-I do think we should clean up the VMCALL/VMMCALL code to remove the clobbers
-if/when the VM-Enter/VM-Exit sequences are fixed, and maybe make them more generic,
-e.g. to allow reusing helpers for L1 and L2.  But, because the meaning of VMCALL/VMMCALL
-is software-defined, we'll always need a selftests specific L2=>L1 hypercall,
-e.g. to ensure L0 forwards the hypercall to L1.
+So the only concern is exposing the asm offsets, right?  But it seems
+highly unlikely any non-KVM code would be using those either.
+
+And, that would be a bug anyway: module code is subject to change and
+could always get recompiled.  The kernel proper shouldn't be making any
+assumptions about the layouts of module-owned structs.
+
+-- 
+Josh
