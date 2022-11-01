@@ -2,173 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0A4361526C
-	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 20:39:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D09FF61526F
+	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 20:39:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229935AbiKATjF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Nov 2022 15:39:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36702 "EHLO
+        id S229823AbiKATjc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Nov 2022 15:39:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230037AbiKATjA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Nov 2022 15:39:00 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CF0463A7;
-        Tue,  1 Nov 2022 12:38:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b4ntZlNgLyTjCvcvgYKmfoItaJPLxifB/FY3uQP4OmUMjfxg4xMtp262VpdBSrKIBMlxFCmuKCsok9m7D+AdQsHozOK92yEoYWlHGsjsgQtStBY49QDvFBTkTBwY5kfRz397xe6RYda7sfOqymTA4JdoXuhmEnRnp8YG3V3V4FGkY4cdQl0hIeAyHhMx1rcGfjCZmcppIc+nzt9f7bJ6ft5mvl5HbTKPYPxaIRA/myXnyyMuBWSmeIIsThpAHsh41tM3VTJoHjpQfZfh5/X3nZpjIfzLOH1UuqWEgY024TNfFZ8vNZZfz5PvQZBcOW0gDNjqcpHa12RLClLGwwF5Ag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=P/Mdhej9zJbt6GBu5KeLfadq1Q7S2KUvgzn8Po53DWA=;
- b=N80fNE6Bj3FjG0LfBUL26jkUK0O83B9eMnb7grfGNRr7kAf1fwGwMDhJXfi7NTimCega8gbxDYzdxsWFADg93pj/Xhw7lRoqyHeErfu3DvpR5RLPM5aQ/9zSStGSABmInK3kYAv4yA3ZR3CuAhyKUjAJ+/pe2bKTfFz0xic4CQNwQ/bVxbLbNZQSvsNfayOrlFxU04blSJHEZduwrEIiMml/YaiFP/YpgDBpiHutzNMB/Ssf1/1HZzyTwc3ipIGhTX2T1pIAM89+eqkuMeAZmtBgro0TqEDOMqlGtKjMhcGGWjHOxQLqaAuE1xMcCWSVpyjPXGGfXnSndKzwAWGNCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=P/Mdhej9zJbt6GBu5KeLfadq1Q7S2KUvgzn8Po53DWA=;
- b=bwBhHuw+8ZlYIVbed8naZY0P2OUE6IkveH+6NdXNSMUBP9cGm8mS2yqFNNPCBEhG2PVLRvGYq5Qff/1EnODWCTRT4nmjF9Kx0C8cUs5mwlk9q+3Lwpb+9K5fElA7zUzeDKIfLZsh+GkLoWfR9OixxnRlgFmdbICUvBLLdgEg39+Bczq//2BFwYdgVSvL2g7Gfk/Ymk1AWJF+ekf5WVlE1zm4sC5sSxg6KTLcWrRJNwJ8uaE42mKTVwCKjWB5Am2IMUHL2ptFClvdQU302tT9suE21IYkfWZQLFK56Y75EPKCh9weiex+EwkLV8J2Rt49kGbzb4BhEKmFDgUb65B/Pg==
-Received: from MW4PR03CA0288.namprd03.prod.outlook.com (2603:10b6:303:b5::23)
- by DS7PR12MB5910.namprd12.prod.outlook.com (2603:10b6:8:7b::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5769.16; Tue, 1 Nov 2022 19:38:57 +0000
-Received: from CO1NAM11FT043.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:b5:cafe::a5) by MW4PR03CA0288.outlook.office365.com
- (2603:10b6:303:b5::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.21 via Frontend
- Transport; Tue, 1 Nov 2022 19:38:57 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- CO1NAM11FT043.mail.protection.outlook.com (10.13.174.193) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5769.14 via Frontend Transport; Tue, 1 Nov 2022 19:38:57 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Tue, 1 Nov 2022
- 12:38:51 -0700
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.29; Tue, 1 Nov 2022 12:38:51 -0700
-Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29 via Frontend
- Transport; Tue, 1 Nov 2022 12:38:49 -0700
-Date:   Tue, 1 Nov 2022 12:38:48 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Lu Baolu <baolu.lu@linux.intel.com>, <bpf@vger.kernel.org>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>, <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, <linux-doc@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <llvm@lists.linux.dev>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        "Jason Wang" <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        <kvm@vger.kernel.org>, "Matthew Rosato" <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>,
-        "Keqian Zhu" <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v3 07/15] iommufd: PFN handling for iopt_pages
-Message-ID: <Y2F1yBnFpv8jhosS@Asurada-Nvidia>
-References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
- <7-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+        with ESMTP id S229739AbiKATjb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Nov 2022 15:39:31 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DC311A386
+        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 12:39:30 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id f9so14312943pgj.2
+        for <kvm@vger.kernel.org>; Tue, 01 Nov 2022 12:39:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tnEODX2baOxy8d43W9uFCYaWlAQWT5w4AwPUA+Xic0c=;
+        b=NWg9Qf4jep8QtwAzp6LlGIBZ9WQD30RO5yMyObW05gSJG0RMgAVotBdXfDg/PFd7xS
+         wCgCLMtq5WSobjNO9MYRFanOAIe42cCUImyWBJwXI8lQ1IxIx07DZtoRY54cUC4l3g5S
+         UG9dDF1oqM0F4NJQBNPBytpWImiAMW/09OKcI+od9oiV/Khh+0eTOsRQ/FXclq4kKpE4
+         IdLvAE1X9Umsd54HDWZuQPvjoOdvKQ+0x3WcG/43TeY0YpKQrcpZVVnrmUlXN6EoA1/J
+         VNt0Oux+EbMueltF5UC/wafegmCKmhF/wOFdvOcmi+hzEKeFg9bK6RlnOmaRXyMP/fN+
+         T/0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tnEODX2baOxy8d43W9uFCYaWlAQWT5w4AwPUA+Xic0c=;
+        b=QqC6fsAKpIG9TxqRFU3oAvvlWLgfDwWENvwHWbusSrU6hud6o46UVnh9gwlsKvYvIu
+         IJyV/pIkO9YKLsPOQFbmmXRFq1w5RJIw7QEkK4VIrlbirXIaYfRSsDBnywWk8MGl+rvs
+         9CPiF4MVyOnoEn6ZWLYd4SnAYuibZo7AoIojN0A5dKM5iBHcmXhpfw83NaFuw67YbG1h
+         L/Em3rnvc9RNW035DBVJ6mfEJA9Cl6/881TVdMaN8IjQ82CJ2lOf9HnkBhPWpHOcBbhS
+         ztip463HSBKE6a252tUgxfprmq9bf/IsKFMdwpwi57Zox0fOaLNMXFXfFsCCDPfSSaka
+         QHzw==
+X-Gm-Message-State: ACrzQf1XX/PCXlCi6jxRzVO6wEOHwP+mU8ouFc93EUuVXeZAObTAZwzo
+        pNImyPWBUBkGhjxMEXlahhAIGr5rAm5IPQ==
+X-Google-Smtp-Source: AMsMyM7y1Oh83Y/hQ+zELq6lqCQy6nyQlUDKZUw2/ZCPUhQWvl3BJiU2S+q1OeuYAM5aix2PbSxXSQ==
+X-Received: by 2002:a63:89c3:0:b0:46e:d2d9:a960 with SMTP id v186-20020a6389c3000000b0046ed2d9a960mr18383448pgd.329.1667331569800;
+        Tue, 01 Nov 2022 12:39:29 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id b7-20020aa78ec7000000b0056262811c5fsm6862296pfr.59.2022.11.01.12.39.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Nov 2022 12:39:29 -0700 (PDT)
+Date:   Tue, 1 Nov 2022 19:39:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+        ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
+        catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
+        pbonzini@redhat.com, peterx@redhat.com, oliver.upton@linux.dev,
+        james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v7 1/9] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
+Message-ID: <Y2F17Y7YG5Z9XnOJ@google.com>
+References: <20221031003621.164306-1-gshan@redhat.com>
+ <20221031003621.164306-2-gshan@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT043:EE_|DS7PR12MB5910:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2bbdbb85-790c-48e0-2151-08dabc40b7bc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vf+oLm3YM3z7XMiULJkGTB/HWnasLmpDgC62pt5fqTbMV5urbiR+UDY2J2mYUMp7QFMh2Srl+iE2MwVEnyl1R4DL7C2o5+zCnYHjmSK4Phszig26Liy9F708B2mKpbIAZ6Qk+QP7bYRL1WxaiXPuvHEXAUoG7Yj9IdGSCQGj3meQrk/xg0PJkVkaTh+bkyDN5orWwkUp5jfvwLjZrvYyGWd4CY738iThiU0iNaMcIAXNBKdrxfzvKBqq97CNDFkz7mJ8pb2HlgAcZA+P7bFH5bM5P+ksx02YSR0H6IA02Nzcg9oMIKFumj8pcFojediiYAgvXDuhq9qsR2kqr8CxgWE7OBeOMGfRHCy6jNfupxL54Ne+xVQaBr36WdyGw18ZVdjRJLyjwetQvWlZsZdZLzL1RXWr1fXsbQZXQvrVA1B0HXzMt6hq8EELJv+ltKTmhpjyZbjuj/2kVbL/OqP37KbKgvn+NocxuZhQL9wJYkrMnAFmY3D2kN+lupJVcBoBMa0F34YGrCOkIC1x0ReJ7YN5Ak6zWBmgAuU3ry+SuN+537F2+Z+F98powV75UHB38IZU99bNKma3acfEJSsrb/B4IvxYLxmWSbUh9Th5xOS6SfU8WJgGexdeIkiaYIWhs2e3b5o/+pbD6Qp3xFwqZ8+ByjsW1nd1Suu3YWe1k4xoCtCteW9IZQ1hrGSsx5FbQRmCNRZpWlWfGucx3tqeJ1oI4OyCQKGBaTzT5Lm/qKJE1Y4k26oeyBj6amh15sLA0MC5e0/5ow2Edr2vWIU8Qg==
-X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(376002)(39860400002)(136003)(396003)(346002)(451199015)(36840700001)(40470700004)(46966006)(41300700001)(8936002)(7416002)(478600001)(40480700001)(5660300002)(316002)(54906003)(6862004)(7406005)(70206006)(8676002)(70586007)(83380400001)(6636002)(356005)(7636003)(82740400003)(336012)(36860700001)(55016003)(426003)(9686003)(186003)(26005)(40460700003)(4326008)(47076005)(86362001)(33716001)(82310400005)(2906002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Nov 2022 19:38:57.1897
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2bbdbb85-790c-48e0-2151-08dabc40b7bc
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT043.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5910
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221031003621.164306-2-gshan@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 25, 2022 at 03:12:16PM -0300, Jason Gunthorpe wrote:
+On Mon, Oct 31, 2022, Gavin Shan wrote:
+> The VCPU isn't expected to be runnable when the dirty ring becomes soft
+> full, until the dirty pages are harvested and the dirty ring is reset
+> from userspace. So there is a check in each guest's entrace to see if
+> the dirty ring is soft full or not. The VCPU is stopped from running if
+> its dirty ring has been soft full. The similar check will be needed when
+> the feature is going to be supported on ARM64. As Marc Zyngier suggested,
+> a new event will avoid pointless overhead to check the size of the dirty
+> ring ('vcpu->kvm->dirty_ring_size') in each guest's entrance.
+> 
+> Add KVM_REQ_DIRTY_RING_SOFT_FULL. The event is raised when the dirty ring
+> becomes soft full in kvm_dirty_ring_push(). The event is cleared in the
+> check, done in the newly added helper kvm_dirty_ring_check_request(), or
+> when the dirty ring is reset by userspace. Since the VCPU is not runnable
+> when the dirty ring becomes soft full, the KVM_REQ_DIRTY_RING_SOFT_FULL
+> event is always set to prevent the VCPU from running until the dirty pages
+> are harvested and the dirty ring is reset by userspace.
+> 
+> kvm_dirty_ring_soft_full() becomes a private function with the newly added
+> helper kvm_dirty_ring_check_request(). The alignment for the various event
+> definitions in kvm_host.h is changed to tab character by the way. In order
+> to avoid using 'container_of()', the argument @ring is replaced by @vcpu
+> in kvm_dirty_ring_push() and kvm_dirty_ring_reset(). The argument @kvm to
+> kvm_dirty_ring_reset() is dropped since it can be retrieved from the VCPU.
+> 
+> Link: https://lore.kernel.org/kvmarm/87lerkwtm5.wl-maz@kernel.org
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> ---
 
-> diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-> +static int pfn_reader_user_pin(struct pfn_reader_user *user,
-> +			       struct iopt_pages *pages,
-> +			       unsigned long start_index,
-> +			       unsigned long last_index)
-> +{
-> +	bool remote_mm = pages->source_mm != current->mm;
-> +	unsigned long npages;
-> +	uintptr_t uptr;
-> +	long rc;
+> @@ -142,13 +144,17 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+>  
+>  	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+>  
+> +	if (!kvm_dirty_ring_soft_full(ring))
+> +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
 > +
-> +	if (!user->upages) {
-> +		/* All undone in pfn_reader_destroy() */
-> +		user->upages_len =
-> +			(last_index - start_index + 1) * sizeof(*user->upages);
-> +		user->upages = temp_kmalloc(&user->upages_len, NULL, 0);
-> +		if (!user->upages)
-> +			return -ENOMEM;
-> +	}
-> +
-> +	if (user->locked == -1) {
-> +		/*
-> +		 * The majority of usages will run the map task within the mm
-> +		 * providing the pages, so we can optimize into
-> +		 * get_user_pages_fast()
-> +		 */
-> +		user->locked = 0;
-> +		if (remote_mm) {
-> +			if (!mmget_not_zero(pages->source_mm)) {
-> +				kfree(user->upages);
-> +				user->upages = NULL;
 
-Coverity reports BAD_FREE at user->upages here.
+Marc, Peter, and/or Paolo, can you confirm that clearing the request here won't
+cause ordering problems?  Logically, this makes perfect sense (to me, since I
+suggested it), but I'm mildly concerned I'm overlooking an edge case where KVM
+could end up with a soft-full ring but no pending request.
 
-In iopt_pages_fill_xarray and iopt_pages_fill_from_mm, user->upages
-is assigned by shifting the out_pages input of iopt_pages_add_access
-that could be originated from vfio_pin_pages, I am not sure if the
-remote_mm and mmget_not_zero value checks can prevent this though.
+>  	trace_kvm_dirty_ring_reset(ring);
+>  
+>  	return count;
+>  }
+>  
