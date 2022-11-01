@@ -2,169 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 603496147E8
-	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 11:48:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3207A614839
+	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 12:09:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229866AbiKAKsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Nov 2022 06:48:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36096 "EHLO
+        id S230180AbiKALJO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Nov 2022 07:09:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbiKAKsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Nov 2022 06:48:09 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51519193C7
-        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 03:48:08 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id g24so13198191plq.3
-        for <kvm@vger.kernel.org>; Tue, 01 Nov 2022 03:48:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=TMxfFnQEzQ8AbsMFHJGkF0WYebtIumwrSeVhJx0ftUI=;
-        b=UqNCRBe9TgKtGt2+WEXUrx+W0tS0e/IfA/QOOT+HS2ZcyjUxt7tItX0VNLUJeuwS82
-         F0U7/pL0aUC2rZLIHu9Faf+fE9VVZWxFy8YZYspyY3TserZI2PzhqkSzcxIqLdyGmsFV
-         cFjj+yxAwFl87zQ56vsUahVXHUZUkaPABqLDZOjr4HuJknaso3FzFqiWZQ4uHvT9XPg7
-         g5dSbdxneGubPCenpXtPXmGr7JChDQHBYSKt1IpXCaQf+HsYP/Otn9NP961qMPTzwuoH
-         LebOSHfm8irgvL6j3Vp+iuSWriYqFtolOTTt2lXTXa7xk2Os+nLrXHecam+mxsrI7CB+
-         KUXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TMxfFnQEzQ8AbsMFHJGkF0WYebtIumwrSeVhJx0ftUI=;
-        b=4R5PLIycF6gkBXkCruI1Mk0CVlyFGTKjcKgo3tolCZb5XIxZUwGv/5u8sPzEO/H2Ht
-         W/JpZ2WjxDlurFMqsBi35ekRekZLsDzf3zInERD1YMxN0HSS+zEeLOynGmaiJ9+KnCV2
-         ZYOcJNlrCKHhl5UlzWuWIbxUeiDLw50Wztd4azwrzpnW1zi7R2KwPOjmrEONR7fckvGd
-         LVjiJoBR9KD37ZtU9MXEq/Lyn8+ymzfM3EVOXzTp9FXxs2/q/RddFO0jVotKgdFmc8Tj
-         kUWIqrE2NnstcdStXx/x6nyECUTa8kH1G7avmbohq1Lpop91ljrgpEX9Yny43VCPEnQ+
-         04Tw==
-X-Gm-Message-State: ACrzQf2fL6vGrT4Qa6ky57vj4yeIrTsmwtXbT3h4Y1Hov2zlqxcW6ty7
-        4B81XFTFAf+ABPKCQNgP3XQ/vg0cFqx6UyA+URLCoA==
-X-Google-Smtp-Source: AMsMyM4QXwuQisJZcrtUtmStzzQ1dKTn2YwaMqyArI5euBjHzZ2nKC1dCA5XdgPaN/E2MUHBVQCg8vVsOA0krMCqZME=
-X-Received: by 2002:a17:903:264b:b0:186:af7a:391d with SMTP id
- je11-20020a170903264b00b00186af7a391dmr18965064plb.19.1667299687554; Tue, 01
- Nov 2022 03:48:07 -0700 (PDT)
+        with ESMTP id S230013AbiKALJN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Nov 2022 07:09:13 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72C1718E23;
+        Tue,  1 Nov 2022 04:09:12 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id CFFAB6732D; Tue,  1 Nov 2022 12:09:08 +0100 (CET)
+Date:   Tue, 1 Nov 2022 12:09:08 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Alexey Kardashevskiy <aik@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux.dev, Robin Murphy <robin.murphy@arm.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Pankaj Gupta <pankaj.gupta@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH kernel v2] swiotlb: Half the size if allocation failed
+Message-ID: <20221101110908.GA14146@lst.de>
+References: <20221031081327.47089-1-aik@amd.com>
 MIME-Version: 1.0
-References: <20221013121319.994170-1-vannapurve@google.com>
- <20221013121319.994170-5-vannapurve@google.com> <Y1Hhw40H58EmZ6lK@google.com>
-In-Reply-To: <Y1Hhw40H58EmZ6lK@google.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Tue, 1 Nov 2022 16:17:55 +0530
-Message-ID: <CAGtprH90U_gNGOxnOey3k=F8+HdC0zW+xk0ZxD4VNzaDey0sLw@mail.gmail.com>
-Subject: Re: [V3 PATCH 4/4] KVM: selftests: x86: Precompute the cpu type
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        shuah@kernel.org, bgardon@google.com, oupton@google.com,
-        peterx@redhat.com, vkuznets@redhat.com, dmatlack@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221031081327.47089-1-aik@amd.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 21, 2022 at 5:33 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Oct 13, 2022, Vishal Annapurve wrote:
-> > Cache the vendor CPU type in a global variable so that multiple calls
-> > to is_amd/intel_cpu() do not need to re-execute CPUID.
-> >
-> > Sync the global variable is_cpu_amd into the guest so the guest can also
-> > avoid executing CPUID instruction.
-> >
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Vishal Annapurve <vannapurve@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/lib/x86_64/processor.c | 10 ++++++++--
-> >  1 file changed, 8 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > index fa65e8142c16..f508e58346e9 100644
-> > --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > @@ -19,6 +19,7 @@
-> >  #define MAX_NR_CPUID_ENTRIES 100
-> >
-> >  vm_vaddr_t exception_handlers;
-> > +static bool is_cpu_amd;
->
-> This should probably have a "host" qualifier, e.g. is_host_cpu_amd.  More below.
->
+Thanks.  I've applied this with minor edits (see below).
 
-Ack.
+---
+From 8d58aa484920c4f9be4834a7aeb446cdced21a37 Mon Sep 17 00:00:00 2001
+From: Alexey Kardashevskiy <aik@amd.com>
+Date: Mon, 31 Oct 2022 19:13:27 +1100
+Subject: swiotlb: reduce the swiotlb buffer size on allocation failure
 
-> >
-> >  static void regs_dump(FILE *stream, struct kvm_regs *regs, uint8_t indent)
-> >  {
-> > @@ -1046,7 +1047,7 @@ static bool cpu_vendor_string_is(const char *vendor)
-> >
-> >  bool is_intel_cpu(void)
->
-> It'll be more churn, but I think we should drop the wrappers in this patch so
-> that we can visually audit all users.  There is technically a subtle functional
-> change here, as previously executing is_intel_cpu() and is_amd_cpu() in the guest
-> will consume the _guest_ CPUID, whereas with this change, the guest will now
-> consume the _host_ CPUID.
->
-> It just so happens that the existing user and the new user both want to query
-> Intel vs. AMD for VMCALL vs. VMMCALL, i.e. care about the host even when checking
-> from the guest.  It's extreme paranoia since I don't think there are any parallel
-> series that are adding is_intel_cpu()/is_amd_cpu() users, not to mention that I
-> don't think any selftests does cross-vendor virtualization, but on the other hand
-> the paranoia doesn't cost much.
->
+At the moment the AMD encrypted platform reserves 6% of RAM for SWIOTLB
+or 1GB, whichever is less. However it is possible that there is no block
+big enough in the low memory which make SWIOTLB allocation fail and
+the kernel continues without DMA. In such case a VM hangs on DMA.
 
-Ack. I think this patch should also be the part of a different series
-which deals with executing hypercall according to the cpu type, there
-is no immediate need for this change in this series.
+This moves alloc+remap to a helper and calls it from a loop where
+the size is halved on each iteration.
 
-Will incorporate your feedback in the next version of this patch.
+This updates default_nslabs on successful allocation which looks like
+an oversight as not doing so should have broken callers of
+swiotlb_size_or_default().
 
-> >  {
-> > -     return cpu_vendor_string_is("GenuineIntel");
-> > +     return !is_cpu_amd;
->
-> Please keep the explicit "GenuineIntel" check, i.e. add is_host_cpu_intel.  KVM
-> technically supports other vendors, e.g. Centaur and Zhaoxin for VMX, and Hygon
-> for AMD, so it's not impossible that someone could run on Centuar or Zhaoxin and
-> get a false positive.  Again, extreme paranoia, but doesn't cost much.
->
+Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ kernel/dma/swiotlb.c | 63 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 39 insertions(+), 24 deletions(-)
 
-Ack, makes sense.
+diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
+index 339a990554e7f..a34c38bbe28f1 100644
+--- a/kernel/dma/swiotlb.c
++++ b/kernel/dma/swiotlb.c
+@@ -300,6 +300,37 @@ static void swiotlb_init_io_tlb_mem(struct io_tlb_mem *mem, phys_addr_t start,
+ 	return;
+ }
+ 
++static void *swiotlb_memblock_alloc(unsigned long nslabs, unsigned int flags,
++		int (*remap)(void *tlb, unsigned long nslabs))
++{
++	size_t bytes = PAGE_ALIGN(nslabs << IO_TLB_SHIFT);
++	void *tlb;
++
++	/*
++	 * By default allocate the bounce buffer memory from low memory, but
++	 * allow to pick a location everywhere for hypervisors with guest
++	 * memory encryption.
++	 */
++	if (flags & SWIOTLB_ANY)
++		tlb = memblock_alloc(bytes, PAGE_SIZE);
++	else
++		tlb = memblock_alloc_low(bytes, PAGE_SIZE);
++
++	if (!tlb) {
++		pr_warn("%s: Failed to allocate %zu bytes tlb structure\n",
++			__func__, bytes);
++		return NULL;
++	}
++
++	if (remap && remap(tlb, nslabs) < 0) {
++		memblock_free(tlb, PAGE_ALIGN(bytes));
++		pr_warn("%s: Failed to remap %zu bytes\n", __func__, bytes);
++		return NULL;
++	}
++
++	return tlb;
++}
++
+ /*
+  * Statically reserve bounce buffer space and initialize bounce buffer data
+  * structures for the software IO TLB used to implement the DMA API.
+@@ -310,7 +341,6 @@ void __init swiotlb_init_remap(bool addressing_limit, unsigned int flags,
+ 	struct io_tlb_mem *mem = &io_tlb_default_mem;
+ 	unsigned long nslabs;
+ 	size_t alloc_size;
+-	size_t bytes;
+ 	void *tlb;
+ 
+ 	if (!addressing_limit && !swiotlb_force_bounce)
+@@ -326,31 +356,16 @@ void __init swiotlb_init_remap(bool addressing_limit, unsigned int flags,
+ 		swiotlb_adjust_nareas(num_possible_cpus());
+ 
+ 	nslabs = default_nslabs;
+-	/*
+-	 * By default allocate the bounce buffer memory from low memory, but
+-	 * allow to pick a location everywhere for hypervisors with guest
+-	 * memory encryption.
+-	 */
+-retry:
+-	bytes = PAGE_ALIGN(nslabs << IO_TLB_SHIFT);
+-	if (flags & SWIOTLB_ANY)
+-		tlb = memblock_alloc(bytes, PAGE_SIZE);
+-	else
+-		tlb = memblock_alloc_low(bytes, PAGE_SIZE);
+-	if (!tlb) {
+-		pr_warn("%s: failed to allocate tlb structure\n", __func__);
+-		return;
+-	}
+-
+-	if (remap && remap(tlb, nslabs) < 0) {
+-		memblock_free(tlb, PAGE_ALIGN(bytes));
+-
++	while ((tlb = swiotlb_memblock_alloc(nslabs, flags, remap)) == NULL) {
++		if (nslabs <= IO_TLB_MIN_SLABS)
++			return;
+ 		nslabs = ALIGN(nslabs >> 1, IO_TLB_SEGSIZE);
+-		if (nslabs >= IO_TLB_MIN_SLABS)
+-			goto retry;
++	}
+ 
+-		pr_warn("%s: Failed to remap %zu bytes\n", __func__, bytes);
+-		return;
++	if (default_nslabs != nslabs) {
++		pr_info("SWIOTLB bounce buffer size adjusted %lu -> %lu slabs",
++			default_nslabs, nslabs);
++		default_nslabs = nslabs;
+ 	}
+ 
+ 	alloc_size = PAGE_ALIGN(array_size(sizeof(*mem->slots), nslabs));
+-- 
+2.30.2
 
-> >  }
-> >
-> >  /*
-> > @@ -1054,7 +1055,7 @@ bool is_intel_cpu(void)
-> >   */
-> >  bool is_amd_cpu(void)
-> >  {
-> > -     return cpu_vendor_string_is("AuthenticAMD");
-> > +     return is_cpu_amd;
-> >  }
-> >
-> >  void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits)
-> > @@ -1328,8 +1329,13 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm)
-> >       return get_kvm_intel_param_bool("unrestricted_guest");
-> >  }
-> >
-> > +void kvm_selftest_arch_init(void)
-> > +{
-> > +     is_cpu_amd = cpu_vendor_string_is("AuthenticAMD");
-> > +}
-> >
-> >  void kvm_arch_vm_post_create(struct kvm_vm *vm)
-> >  {
-> >       vm_create_irqchip(vm);
-> > +     sync_global_to_guest(vm, is_cpu_amd);
-> >  }
-> > --
-> > 2.38.0.rc1.362.ged0d419d3c-goog
-> >
