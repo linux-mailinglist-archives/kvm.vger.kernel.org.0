@@ -2,96 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DED926151CF
-	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 19:53:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C96DC6151DF
+	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 20:02:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230301AbiKASxd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Nov 2022 14:53:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60436 "EHLO
+        id S229949AbiKATCI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Nov 2022 15:02:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230307AbiKASxb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Nov 2022 14:53:31 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA4A1113A
-        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 11:53:24 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id q1-20020a17090a750100b002139ec1e999so9285793pjk.1
-        for <kvm@vger.kernel.org>; Tue, 01 Nov 2022 11:53:24 -0700 (PDT)
+        with ESMTP id S229511AbiKATCH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Nov 2022 15:02:07 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1B1B1D0CE
+        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 12:02:04 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id v124-20020a1cac82000000b003cf7a4ea2caso2748439wme.5
+        for <kvm@vger.kernel.org>; Tue, 01 Nov 2022 12:02:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kIogl8aSx5o02RPy7Uupn5soh8eQt5K+DU/0+En+fDM=;
-        b=Dr2bthuuo98UU48CPcQFPhVOnj8Ygc0+Und07u9E4UryEXwxuXQEJiITQ5TOKO8WCg
-         gpmOJ/L0kfMeRGw9VieeNZ+6UWzzAC2LNT2Ew/C9ELTTJIVWL3m+aukw2TX40jwytAJN
-         pFsKRTq4Qoyp0mB/V7ycz55tQ8ppz93c2wVvgxzzrNILNT7OSRqQlnFyD4sOWwXEUNLL
-         3Tf/Dv+hhvz/J/K0UNnQbniNF3klKbmIzRukoo2yteKs7NIrdlVcTcPRp+660DKNPTbi
-         qQI+i+YqKs3bxkrMZpDTyh5ayxBIXEolr33WfUFQjPDk0SsThbtXUEsK0S+148VAUbvO
-         fzBQ==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mn4YfEQWKIJQD//Kju02cktaiRIU2F9W8PwX5XQiQMA=;
+        b=Ev57ZBkdyzQC3QaXmi4kVM9gOVMhmYqzkuihkS1E4rktQybXKfIBIuTVv3PENOdYrm
+         khvSeOtpsPLYeg3NlQzfJeuBNGzWAHUl69wjAwrmFS6RZ5wbbt+g/Ktufd31etI6zJq7
+         ihUBF14WJnJpTBTj8zd/0hXHjhvbKcFfmRAtOT73SAHpxt1Kz4mbPXZJ24of481ndoIn
+         2Ef6ZId1rWhq85jMlIVCMXYCPTEurt/fgGtUBfQgEOW1TF+Yb8zamJvT59TYYIoIY0U3
+         CCx94Q6ow4WgSl5gY8n6PG4xZlR4Mm9J2mS6qDCV1aSbJVn04BeHX7AstCpa8fRcsXDP
+         gYnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kIogl8aSx5o02RPy7Uupn5soh8eQt5K+DU/0+En+fDM=;
-        b=Ov+1DHl3jAWN+vHKth6iGYfn+gdc70ZTEh4T8EqmOq58Uj/vIXZKyiA73FIC0nZCZU
-         QWpjp5Gdm3Yn1JWTjVcV4WvbmMkFdvIKaOOlowFmOZgPx0egbGojSc/Zi1NZpRLnfocx
-         /+ZgM8vr8EOUEJX193XPPJvDlFLCFy19c/COcXRmQZ+Wf4qYLvyVF7HW8nvGjjlhnrtY
-         fnXjmvcP8ab0FS16LLDGF9dSl3MFgXxACp9TrES+CHKDxS7IYNdJgDNJDu0DWplzk6v8
-         JgjIOWfQK3e7ifFcn1TLpmMX1uMSyas2t3RjWfYykceQAYjQYzNIZulznIlTisdZJGEB
-         hilQ==
-X-Gm-Message-State: ACrzQf3bvir9/lyVUvvXCjWE2xHbWFPtmPfDVoYsOQDnYZT7g+yCmgt3
-        8Ry0GiqHEDoQYMnU/Ta1xWtsdtizv4lQZQ==
-X-Google-Smtp-Source: AMsMyM79GI9TTB4j5E1EBrwtQYTBAe/CH0MoPX1cXYznOMHHRmBiWC7JKiWyHPFEo/F0odercOMr9A==
-X-Received: by 2002:a17:90b:3013:b0:213:ab5f:d388 with SMTP id hg19-20020a17090b301300b00213ab5fd388mr19798694pjb.66.1667328804191;
-        Tue, 01 Nov 2022 11:53:24 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id g2-20020a17090a708200b001f8c532b93dsm6424350pjk.15.2022.11.01.11.53.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Nov 2022 11:53:23 -0700 (PDT)
-Date:   Tue, 1 Nov 2022 18:53:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Bill Wendling <isanbard@gmail.com>
-Cc:     Bill Wendling <morbo@google.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] x86/pmu: Disable inlining of measure()
-Message-ID: <Y2FrIAPxaEfYISg3@google.com>
-References: <20220601163012.3404212-1-morbo@google.com>
- <CALMp9eRgbc624bWe6wcTqpSsdEdnj+Q_xE8L21EdCZmQXBQPsw@mail.gmail.com>
- <CAGG=3QX218AyDM6LS8oe2-PH=eq=hBf5JrGedzb48DavE-5PPA@mail.gmail.com>
- <Y1htZKmRt/+WXhIo@google.com>
- <CAEzuVAetwLSaP2gt00Y0i0xdrj59TVT9ngB1iHXOa-mZ1fOqAA@mail.gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Mn4YfEQWKIJQD//Kju02cktaiRIU2F9W8PwX5XQiQMA=;
+        b=TshKn+QGmsBORuUJ5RRpaG9G7p9U67VZlRLixLPXhW9iUiQjvezDFf89m6L9vmLv+a
+         TOClngmFp4/vuyF9DR1uWYbMkdNhHP3HctrvcEBIIxzNvkBftIBhhkj2Kx4jtnMg/obV
+         2DuFmtDKgCRVl/UMOk637FrfDPl199gWRuN7R3YGDBNDNw7dlHQ19hJjvoB0PwH4xeDZ
+         VoUqZo62PEw/8BI+KL+nnz84qlHJBsWcCmXRlY2OISVh7e0CLKxCCJTct+E5IWX2fI9x
+         CIqY3j47ACvKYGj+YYDz4a8npNgiVfExhLi9LCuk3Cn8uhCND+a/2OE5ro9QcxV10SIb
+         bdUQ==
+X-Gm-Message-State: ACrzQf1FiXKkY8pYPBscZ7gs8eNgg3X1wPQwyfiQr8FUvjhprOMejkq5
+        PvKGpq0fq5rheUZrV3ykAnszz8KmqdN7HcG9uqJszFFgf9Q=
+X-Google-Smtp-Source: AMsMyM7+GVnmCAKMhr+dkuNYvoI/t1UfX+4nYpV1XlZp0R47EfT29ksTiyis4vC+n+46TcYTFLStz1bZh1jEAkCzE9s=
+X-Received: by 2002:a7b:cb17:0:b0:3cf:7801:c76f with SMTP id
+ u23-20020a7bcb17000000b003cf7801c76fmr6011483wmj.1.1667329323165; Tue, 01 Nov
+ 2022 12:02:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAEzuVAetwLSaP2gt00Y0i0xdrj59TVT9ngB1iHXOa-mZ1fOqAA@mail.gmail.com>
+References: <20221031173819.1035684-1-vipinsh@google.com> <20221031173819.1035684-5-vipinsh@google.com>
+ <Y2AmgObslx57+uYt@google.com>
+In-Reply-To: <Y2AmgObslx57+uYt@google.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Tue, 1 Nov 2022 12:01:26 -0700
+Message-ID: <CAHVum0fhangxMp5ysYdyoKVY+CKWeBAadMFX1V8MgqryRGHQrw@mail.gmail.com>
+Subject: Re: [PATCH v7 4/5] KVM: selftests: Add atoi_positive() and
+ atoi_non_negative() for input validation
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, dmatlack@google.com, andrew.jones@linux.dev,
+        wei.w.wang@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        TVD_PH_BODY_ACCOUNTS_PRE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 26, 2022, Bill Wendling wrote:
-> On Tue, Oct 25, 2022 at 4:12 PM Sean Christopherson <seanjc@google.com> wrote:
+On Mon, Oct 31, 2022 at 12:48 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Oct 31, 2022, Vipin Sharma wrote:
+> > diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+> > index ec0f070a6f21..210e98a49a83 100644
+> > --- a/tools/testing/selftests/kvm/lib/test_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/test_util.c
+> > @@ -353,3 +353,19 @@ int atoi_paranoid(const char *num_str)
 > >
-> > On Tue, Oct 25, 2022, Bill Wendling wrote:
-> > > On Wed, Jun 1, 2022 at 10:22 AM Jim Mattson <jmattson@google.com> wrote:
-> > > >
-> > > > On Wed, Jun 1, 2022 at 9:30 AM Bill Wendling <morbo@google.com> wrote:
-> > > > >
-> > > > > From: Bill Wendling <isanbard@gmail.com>
+> >       return num;
+> >  }
+> > +
+> > +uint32_t atoi_positive(const char *num_str)
+>
+> I think it makes sense to inline atoi_positive() and atoi_non_negative() in
+> test_util.h.  Depending on developer's setups, it might be one less layer to jump
+> through to look at the implementation.
+>
 
-This "From:" should not exist.  It causes your @gmail.com account be to credited
-as the author, whereas your SOB suggests you intended this to be credited to your
-@google.com address.
+I am not sure if this makes life much easier for developers, as
+"inline" can totally be ignored by the compiler. Also, not sure how
+much qualitative improvement it will add in the developer's code
+browsing journey. Anyways, I will add "inline" in the next version.
 
-Let me know if this should indeed list morbo@google.com as the author, I can fix
-it up when applying.
+> > +{
+> > +     int num = atoi_paranoid(num_str);
+> > +
+> > +     TEST_ASSERT(num > 0, "%s is not a positive integer.\n", num_str);
+>
+> Newlines aren't needed in asserts.  This applies to atoi_paranoid() in the previous
+> patch as well (I initially missed them).
+>
 
-> > > > > Signed-off-by: Bill Wendling <morbo@google.com>
-> > > > Reviewed-by: Jim Mattson <jmattson@google.com>
+Okay, I will remove it from the previous patch also.
+
+> > +     return num;
+> > +}
+> > +
+> > +uint32_t atoi_non_negative(const char *num_str)
+> > +{
+> > +     int num = atoi_paranoid(num_str);
+> > +
+> > +     TEST_ASSERT(num >= 0, "%s is not a non-negative integer.\n", num_str);
+> > +     return num;
+> > +}
+> > diff --git a/tools/testing/selftests/kvm/max_guest_memory_test.c b/tools/testing/selftests/kvm/max_guest_memory_test.c
+> > index 1595b73dc09a..20015de3b91c 100644
+> > --- a/tools/testing/selftests/kvm/max_guest_memory_test.c
+> > +++ b/tools/testing/selftests/kvm/max_guest_memory_test.c
+> > @@ -193,15 +193,14 @@ int main(int argc, char *argv[])
+> >       while ((opt = getopt(argc, argv, "c:h:m:s:H")) != -1) {
+> >               switch (opt) {
+> >               case 'c':
+> > -                     nr_vcpus = atoi_paranoid(optarg);
+> > -                     TEST_ASSERT(nr_vcpus > 0, "number of vcpus must be >0");
+> > +                     nr_vcpus = atoi_positive(optarg);
+>
+> I know I originally made the claim that the assert would provide enough context
+> to offest lack of a specific message, but after actually playing around with this,
+> past me was wrong.  E.g. this
+>
+>   Memory size must be greater than 0, got '-1'
+>
+> is much more helpful than
+>
+>   -1 is not a positive integer.
+>
+> E.g. something like this?
+>
+>   static inline uint32_t atoi_positive(const char *name, const char *num_str)
+>   {
+>         int num = atoi_paranoid(num_str);
+>
+>         TEST_ASSERT(num > 0, "%s must be greater than 0, got '%s'", name, num_str);
+>         return num;
+>   }
+>
+>   static inline uint32_t atoi_non_negative(const char *name, const char *num_str)
+>   {
+>         int num = atoi_paranoid(num_str);
+>
+>         TEST_ASSERT(num >= 0, "%s must be non-negative, got '%s'", name, num_str);
+>         return num;
+>   }
+>
+> IMO, that also makes the code slightly easier to follow as it's super obvious
+> what is being parsed.
+>
+>   p.wr_fract = atoi_positive("Write fraction", optarg);
+>
+>   p.iterations = atoi_positive("Number of iterations", optarg);
+>
+>   nr_vcpus = atoi_positive("Number of vCPUs", optarg);
+>
+
+I will make this change. It is indeed better.
+
+> Last thought: my vote would be to ignore the 80 char soft limit when adding the
+> "name" to these calls, in every case except nr_memslot_modifications the overrun
+> is relatively minor and not worth wrapping.  See below for my thougts on that one.
+>
+> >                       break;
+> >               case 'm':
+> > -                     max_mem = atoi_paranoid(optarg) * size_1gb;
+> > +                     max_mem = atoi_positive(optarg) * size_1gb;
+> >                       TEST_ASSERT(max_mem > 0, "memory size must be >0");
+>
+> This assert can be dropped, max_mem is a uint64_t so wrapping to '0' is impossible.
+>
+
+I intentionally kept it, as it is also protecting against having
+accidently making size_1gb to 0.
+
+> >                       break;
+> >               case 's':
+> > -                     slot_size = atoi_paranoid(optarg) * size_1gb;
+> > +                     slot_size = atoi_positive(optarg) * size_1gb;
+>
+> Same thing here.
+>
+> >                       TEST_ASSERT(slot_size > 0, "slot size must be >0");
+> >                       break;
+> >               case 'H':
+> > diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+> > index 865276993ffb..7539ee7b6e95 100644
+> > --- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+> > +++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+> > @@ -175,7 +175,7 @@ int main(int argc, char *argv[])
+> >                       p.partition_vcpu_memory_access = false;
+> >                       break;
+>
+> memslot_modification_delay can be converted to atoi_non_negative(), it open codes
+> strtoul(), but the "long" part is unnecessary because memslot_modification_delay
+> is an "unsigned int", not an "unsigned long".
+>
+> >               case 'i':
+> > -                     p.nr_memslot_modifications = atoi_paranoid(optarg);
+> > +                     p.nr_memslot_modifications = atoi_positive(optarg);
+>
+> To avoid a ridiculously long line, my vote is to rename the test args.  The names
+> are rather odd irrespective of line length.  E.g. in a prep patch do
+>
+>   s/memslot_modification_delay/delay
+>   s/nr_memslot_modifications/nr_iterations
+>
+
+Okay, I will change this and any other places I find which can be shortened.
+
+> which yields parsing of:
+>
+>         while ((opt = getopt(argc, argv, "hm:d:b:v:oi:")) != -1) {
+>                 switch (opt) {
+>                 case 'm':
+>                         guest_modes_cmdline(optarg);
+>                         break;
+>                 case 'd':
+>                         p.delay = atoi_non_negative("Delay", optarg);
+>                         break;
+>                 case 'b':
+>                         guest_percpu_mem_size = parse_size(optarg);
+>                         break;
+>                 case 'v':
+>                         nr_vcpus = atoi_positive("Number of vCPUs", optarg);
+>                         TEST_ASSERT(nr_vcpus <= max_vcpus,
+>                                     "Invalid number of vcpus, must be between 1 and %d",
+>                                     max_vcpus);
+>                         break;
+>                 case 'o':
+>                         p.partition_vcpu_memory_access = false;
+>                         break;
+>                 case 'i':
+>                         p.nr_iterations = atoi_positive("Number of iterations", optarg);
+>                         break;
+>                 case 'h':
+>                 default:
+>                         help(argv[0]);
+>                         break;
+>                 }
+>         }
+>
