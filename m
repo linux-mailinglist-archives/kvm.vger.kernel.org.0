@@ -2,193 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A880614301
-	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 03:04:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2C99614331
+	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 03:25:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229495AbiKACEZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Oct 2022 22:04:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52094 "EHLO
+        id S229832AbiKACZV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Oct 2022 22:25:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiKACEY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Oct 2022 22:04:24 -0400
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D16B4FCA
-        for <kvm@vger.kernel.org>; Mon, 31 Oct 2022 19:04:22 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailout.nyi.internal (Postfix) with ESMTP id 7C9235C00E3;
-        Mon, 31 Oct 2022 22:04:20 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Mon, 31 Oct 2022 22:04:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1667268260; x=1667354660; bh=Xv
-        eVymeTkMcN6gTvb11AbTE1RmZPSo8mgEN6N+xjrvo=; b=FPmiyMV+7W/0G2+OCf
-        nZJqDZX6cEbP6rDKup9mO7TVmLROzx6nsuuc9SEo09CreUf6VPtMmCBrt9SpjhYc
-        KTyvjqS/lYaGgdE8IIYXp+U5AKM+Ke59i8DCyjLGnyNUcTeD8t1/dkw/+3yZnQYe
-        VoBIGL685A12FbW+G6eEVmr0I4l1rQRBH0O1iduC9w3S6hajFrQenx2afWuOx/eZ
-        ++5PuJaNPH5EqLEdXriMXjdvUhtvpru+QFT8utLPYWJr/BxHxh2WenLB22+FiKoy
-        xZ2e1/DNzSogCCwA6gU0ug+J1tvDOux6FMfPo68cDppTD5av6l2AWHG3rTgijRkB
-        Y+tQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm3; t=1667268260; x=1667354660; bh=XveVymeTkMcN6gTvb11AbTE1RmZP
-        So8mgEN6N+xjrvo=; b=KzeLpEDUy77S6aRrUztmKKeH4KsveiEz7neZZGSkp/mX
-        P3zT+PZp4eDNBxLZcrB6cmPiuw0KqvVH1iV5ipBrH/4rYucc1GQJL07J8p5gIoOP
-        28jV5mFpqwppJy6EgRr5dGH3AhbwKEuO3BHgzz4IW9OYHSawHvnqCURuL4xNPvIG
-        9ihaVg+8fTF3yS2VmDgCBdqPajO8RxMRfAbXv337g5DZjEQz2LTuBlSrN3OYwx1E
-        yxRkBPsv94GYqeAiC/+qlSeGRtGl6bj8haLu/U44nXOxFfC8VAjC0lt62NIx6mm0
-        5dEe+jX9tUSL8pc5NVp/plvJrpZwZBM3BCmdt4h5dw==
-X-ME-Sender: <xms:o35gY5Pm70LyKSGzPYAp5XUQusOh6p11NY27zXGExPRG9qgw9eq8Lg>
-    <xme:o35gY79ax1p6Y3F8iV_eG6AzPOwk-icnHZhJ62qJLB90-XHN3alwd5c_lQz3BQLgD
-    TPYtDqJm2UwI_aF6oI>
-X-ME-Received: <xmr:o35gY4SV3QMv1ODrvkGXI-_dWjByxL9LrDsLC2DVMmxcX5dstaz9h1Nbd7QitftCiR79GA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrudeggdegfecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecunecujfgurhepfffhvfevuffkfhggtggujgesthdttd
-    dttddtvdenucfhrhhomhepfdfmihhrihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhi
-    rhhilhhlsehshhhuthgvmhhovhdrnhgrmhgvqeenucggtffrrghtthgvrhhnpefhieeghf
-    dtfeehtdeftdehgfehuddtvdeuheettddtheejueekjeegueeivdektdenucevlhhushht
-    vghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkihhrihhllhesshhhuh
-    htvghmohhvrdhnrghmvg
-X-ME-Proxy: <xmx:o35gY1utQExjj2OtLL5Qq6qvoqfvITJOqBpwmtiD8Zuz7_MlhddatA>
-    <xmx:o35gYxdWcYnk7ukH08OogRMWTlqv8CWsHGVfteA-fpfDSxQXbtFiLw>
-    <xmx:o35gYx3utCjmkquhlIJ8FxmFvr7rY7jzCFShTxVP3x2McaCb1NdOFQ>
-    <xmx:pH5gYypvMpOeYh8jkzrYSvzm6Px1dS8wyFKghhmhTxco3wuKT5NBgg>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 31 Oct 2022 22:04:19 -0400 (EDT)
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id 1E9B910444A; Tue,  1 Nov 2022 05:04:16 +0300 (+03)
-Date:   Tue, 1 Nov 2022 05:04:16 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Robert Hoo <robert.hu@linux.intel.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
-Subject: Re: [PATCH 8/9] KVM: x86: When guest set CR3, handle LAM bits
- semantics
-Message-ID: <20221101020416.yh53bvpt3v5gwvcj@box.shutemov.name>
-References: <20221017070450.23031-1-robert.hu@linux.intel.com>
- <20221017070450.23031-9-robert.hu@linux.intel.com>
- <20221031025930.maz3g5npks7boixl@box.shutemov.name>
- <d03bcd8fe216e5934473759fa6fdaac4e1105847.camel@linux.intel.com>
+        with ESMTP id S229549AbiKACZT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Oct 2022 22:25:19 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 311E4101E0;
+        Mon, 31 Oct 2022 19:25:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667269518; x=1698805518;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=93hyB3s3jYTeEmmwLhdxxyKJFPpYXYsilpRvm7mmI20=;
+  b=PJKRY7sSdZQ7TQUo7Z0bJ55zYi0xGTFntRRy80gl84WQwVXurjTVqd8H
+   LyC5ByCsMiPAW1hoMRADBFqJprpmuOWPPleAIuSsClR4BeuWydJXXiSrn
+   u++hZGy7ElP/cnk+szlZZUN8uUzwM3J5oniO4EV6shALJLRy7l0APHKEG
+   7cqG9/ASEcSgQLDBHW/Ddhc6Hdl/Vv5i2zCuapH8doVgyRFlRAM2LVg+T
+   n5k1jE26WXQCVMGXObzh1kEDiIOBJD7oteRV+KMiwLbGCNoamr0kZvoGX
+   Wq6eFemH0Y1dyhj8Unpzb4b5PgPmxhLiVc0LjZPZTyYQKMRM0DPJA20Lv
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10517"; a="371129080"
+X-IronPort-AV: E=Sophos;i="5.95,229,1661842800"; 
+   d="scan'208";a="371129080"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2022 19:25:17 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10517"; a="739179521"
+X-IronPort-AV: E=Sophos;i="5.95,229,1661842800"; 
+   d="scan'208";a="739179521"
+Received: from aellsw1-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.105.29])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2022 19:25:15 -0700
+From:   Kai Huang <kai.huang@intel.com>
+To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org
+Cc:     dave.hansen@linux.intel.com, seanjc@google.com,
+        pbonzini@redhat.com, jarkko@kernel.org, tony.luck@intel.com,
+        linux-kernel@vger.kernel.org, Kai Huang <kai.huang@intel.com>,
+        Haitao Huang <haitao.huang@linux.intel.com>
+Subject: [RESEND PATCH v3] KVM: VMX: Allow exposing EDECCSSA user leaf function to KVM guest
+Date:   Tue,  1 Nov 2022 15:24:22 +1300
+Message-Id: <20221101022422.858944-1-kai.huang@intel.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d03bcd8fe216e5934473759fa6fdaac4e1105847.camel@linux.intel.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 01, 2022 at 09:46:39AM +0800, Robert Hoo wrote:
-> On Mon, 2022-10-31 at 05:59 +0300, Kirill A. Shutemov wrote:
-> > On Mon, Oct 17, 2022 at 03:04:49PM +0800, Robert Hoo wrote:
-> > > When only changes LAM bits, ask next vcpu run to load mmu pgd, so
-> > > that it
-> > > will build new CR3 with LAM bits updates. No TLB flush needed on
-> > > this case.
-> > > When changes on effective addresses, no matter LAM bits changes or
-> > > not, go
-> > > through normal pgd update process.
-> > > 
-> > > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> > > ---
-> > >  arch/x86/kvm/x86.c | 26 ++++++++++++++++++++++----
-> > >  1 file changed, 22 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index e9b465bff8d3..fb779f88ae88 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -1228,9 +1228,9 @@ static bool kvm_is_valid_cr3(struct kvm_vcpu
-> > > *vcpu, unsigned long cr3)
-> > >  int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
-> > >  {
-> > >  	bool skip_tlb_flush = false;
-> > > -	unsigned long pcid = 0;
-> > > +	unsigned long pcid = 0, old_cr3;
-> > >  #ifdef CONFIG_X86_64
-> > > -	bool pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
-> > > +	bool pcid_enabled = !!kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
-> > >  
-> > >  	if (pcid_enabled) {
-> > >  		skip_tlb_flush = cr3 & X86_CR3_PCID_NOFLUSH;
-> > > @@ -1243,6 +1243,10 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu,
-> > > unsigned long cr3)
-> > >  	if (cr3 == kvm_read_cr3(vcpu) && !is_pae_paging(vcpu))
-> > >  		goto handle_tlb_flush;
-> > >  
-> > > +	if (!guest_cpuid_has(vcpu, X86_FEATURE_LAM) &&
-> > > +	    (cr3 & (X86_CR3_LAM_U48 | X86_CR3_LAM_U57)))
-> > > +		return	1;
-> > > +
-> > >  	/*
-> > >  	 * Do not condition the GPA check on long mode, this helper is
-> > > used to
-> > >  	 * stuff CR3, e.g. for RSM emulation, and there is no guarantee
-> > > that
-> > > @@ -1254,8 +1258,22 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu,
-> > > unsigned long cr3)
-> > >  	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
-> > >  		return 1;
-> > >  
-> > > -	if (cr3 != kvm_read_cr3(vcpu))
-> > > -		kvm_mmu_new_pgd(vcpu, cr3);
-> > > +	old_cr3 = kvm_read_cr3(vcpu);
-> > > +	if (cr3 != old_cr3) {
-> > > +		if ((cr3 ^ old_cr3) & CR3_ADDR_MASK) {
-> > > +			kvm_mmu_new_pgd(vcpu, cr3 & ~(X86_CR3_LAM_U48 |
-> > > +					X86_CR3_LAM_U57));
-> > > +		} else {
-> > > +			/* Only LAM conf changes, no tlb flush needed
-> > > */
-> > > +			skip_tlb_flush = true;
-> > 
-> > I'm not sure about this.
-> > 
-> > Consider case when LAM_U48 gets enabled on 5-level paging machines.
-> > We may
-> > have valid TLB entries for addresses above 47-bit. It's kinda broken
-> > case,
-> > but seems valid from architectural PoV, no?
-> 
-> You're right, thanks Kirill.
-> 
-> I noticed in your Kernel enabling, because of this LAM_U48 and LA_57
-> overlapping, you enabled LAM_U57 only for simplicity at this moment. I
-> thought at that time, that this trickiness will be contained in Kernel
-> layer, but now it turns out at least non-EPT KVM MMU is not spared.
-> > 
-> > I guess after enabling LAM, these entries will never match. But if
-> > LAM
-> > gets disabled again they will become active. Hm?
-> > 
-> > Maybe just flush?
-> 
-> Now we have 2 options
-> 1. as you suggested, just flush
-> 2. more precisely identify the case Guest.LA57 && (CR3.bit[62:61] 00
-> -->10 switching), flush. (LAM_U57 bit take precedence over LAM_U48,
-> from spec.)
-> 
-> Considering CR3 change is relatively hot path, and tlb flush is heavy,
-> I lean towards option 2. Your opinion? 
+The new Asynchronous Exit (AEX) notification mechanism (AEX-notify)
+allows one enclave to receive a notification in the ERESUME after the
+enclave exit due to an AEX.  EDECCSSA is a new SGX user leaf function
+(ENCLU[EDECCSSA]) to facilitate the AEX notification handling.  The new
+EDECCSSA is enumerated via CPUID(EAX=0x12,ECX=0x0):EAX[11].
 
-11 in bits [62:61] is also considered LAM_U57. So your option 2 is broken.
+Besides Allowing reporting the new AEX-notify attribute to KVM guests,
+also allow reporting the new EDECCSSA user leaf function to KVM guests
+so the guest can fully utilize the AEX-notify mechanism.
 
-And I don't buy argument about hot path: the case we talking about is
-about enabling/disabling LAM with constant PGD. It's not hot path by any
-mean.
+Similar to existing X86_FEATURE_SGX1 and X86_FEATURE_SGX2, introduce a
+new scattered X86_FEATURE_SGX_EDECCSSA bit for the new EDECCSSA, and
+report it in KVM's supported CPUIDs.
 
-Let's not be fancy. Just flush TLB.
+Note, no additional KVM enabling is required to allow the guest to use
+EDECCSSA.  It's impossible to trap ENCLU (without completely preventing
+the guest from using SGX).  Advertise EDECCSSA as supported purely so
+that userspace doesn't need to special case EDECCSSA, i.e. doesn't need
+to manually check host CPUID.
 
+The inability to trap ENCLU also means that KVM can't prevent the guest
+from using EDECCSSA, but that virtualization hole is benign as far as
+KVM is concerned.  EDECCSSA is simply a fancy way to modify internal
+enclave state.
+
+More background about how do AEX-notify and EDECCSSA work:
+
+SGX maintains a Current State Save Area Frame (CSSA) for each enclave
+thread.  When AEX happens, the enclave thread context is saved to the
+CSSA and the CSSA is increased by 1.  For a normal ERESUME which doesn't
+deliver AEX notification, it restores the saved thread context from the
+previously saved SSA and decreases the CSSA.  If AEX-notify is enabled
+for one enclave, the ERESUME acts differently.  Instead of restoring the
+saved thread context and decreasing the CSSA, it acts like EENTER which
+doesn't decrease the CSSA but establishes a clean slate thread context
+using the CSSA for the enclave to handle the notification.  After some
+handling, the enclave must discard the "new-established" SSA and switch
+back to the previously saved SSA (upon AEX).  Otherwise, the enclave
+will run out of SSA space upon further AEXs and eventually fail to run.
+
+To solve this problem, the new EDECCSSA essentially decreases the CSSA.
+It can be used by the enclave notification handler to switch back to the
+previous saved SSA when needed, i.e. after it handles the notification.
+
+Cc: Haitao Huang <haitao.huang@linux.intel.com>
+Acked-by: Sean Christopherson <seanjc@google.com>
+Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+Signed-off-by: Kai Huang <kai.huang@intel.com>
+---
+
+This is just a RESEND (with adding "Cc: Haitao" explicitly).
+
+Btw, Haitao said there's use case using EDECCSSA w/o AEX-notify:
+
+https://lore.kernel.org/lkml/00b07459-5512-b00b-636b-f35845ec369f@intel.com/T/#me559bfb5be8970b993fc7119ca95b257dc7a8901
+
+So this one can actually be merged independently.
+
+v2 -> v3:
+
+ - Updated subsystem tag to "KVM: VMX:" (Sean).
+ - Updated changelog (Sean).
+ - Added Sean and Jarkko's Acks.
+
+---
+ arch/x86/include/asm/cpufeatures.h | 1 +
+ arch/x86/kernel/cpu/cpuid-deps.c   | 1 +
+ arch/x86/kernel/cpu/scattered.c    | 1 +
+ arch/x86/kvm/cpuid.c               | 2 +-
+ arch/x86/kvm/reverse_cpuid.h       | 3 +++
+ 5 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index b71f4f2ecdd5..d0d7edd0d641 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -304,6 +304,7 @@
+ #define X86_FEATURE_UNRET		(11*32+15) /* "" AMD BTB untrain return */
+ #define X86_FEATURE_USE_IBPB_FW		(11*32+16) /* "" Use IBPB during runtime firmware calls */
+ #define X86_FEATURE_RSB_VMEXIT_LITE	(11*32+17) /* "" Fill RSB on VM exit when EIBRS is enabled */
++#define X86_FEATURE_SGX_EDECCSSA	(11*32+18) /* "" SGX EDECCSSA user leaf function */
+ 
+ /* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
+ #define X86_FEATURE_AVX_VNNI		(12*32+ 4) /* AVX VNNI instructions */
+diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
+index c881bcafba7d..d95221117129 100644
+--- a/arch/x86/kernel/cpu/cpuid-deps.c
++++ b/arch/x86/kernel/cpu/cpuid-deps.c
+@@ -75,6 +75,7 @@ static const struct cpuid_dep cpuid_deps[] = {
+ 	{ X86_FEATURE_SGX_LC,			X86_FEATURE_SGX	      },
+ 	{ X86_FEATURE_SGX1,			X86_FEATURE_SGX       },
+ 	{ X86_FEATURE_SGX2,			X86_FEATURE_SGX1      },
++	{ X86_FEATURE_SGX_EDECCSSA,		X86_FEATURE_SGX1      },
+ 	{ X86_FEATURE_XFD,			X86_FEATURE_XSAVES    },
+ 	{ X86_FEATURE_XFD,			X86_FEATURE_XGETBV1   },
+ 	{ X86_FEATURE_AMX_TILE,			X86_FEATURE_XFD       },
+diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
+index fc01f81f6e2a..f53944fb8f7f 100644
+--- a/arch/x86/kernel/cpu/scattered.c
++++ b/arch/x86/kernel/cpu/scattered.c
+@@ -40,6 +40,7 @@ static const struct cpuid_bit cpuid_bits[] = {
+ 	{ X86_FEATURE_PER_THREAD_MBA,	CPUID_ECX,  0, 0x00000010, 3 },
+ 	{ X86_FEATURE_SGX1,		CPUID_EAX,  0, 0x00000012, 0 },
+ 	{ X86_FEATURE_SGX2,		CPUID_EAX,  1, 0x00000012, 0 },
++	{ X86_FEATURE_SGX_EDECCSSA,	CPUID_EAX, 11, 0x00000012, 0 },
+ 	{ X86_FEATURE_HW_PSTATE,	CPUID_EDX,  7, 0x80000007, 0 },
+ 	{ X86_FEATURE_CPB,		CPUID_EDX,  9, 0x80000007, 0 },
+ 	{ X86_FEATURE_PROC_FEEDBACK,    CPUID_EDX, 11, 0x80000007, 0 },
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 7065462378e2..15c1c5bbb10d 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -665,7 +665,7 @@ void kvm_set_cpu_caps(void)
+ 	);
+ 
+ 	kvm_cpu_cap_init_scattered(CPUID_12_EAX,
+-		SF(SGX1) | SF(SGX2)
++		SF(SGX1) | SF(SGX2) | SF(SGX_EDECCSSA)
+ 	);
+ 
+ 	kvm_cpu_cap_mask(CPUID_8000_0001_ECX,
+diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+index a19d473d0184..4e5b8444f161 100644
+--- a/arch/x86/kvm/reverse_cpuid.h
++++ b/arch/x86/kvm/reverse_cpuid.h
+@@ -23,6 +23,7 @@ enum kvm_only_cpuid_leafs {
+ /* Intel-defined SGX sub-features, CPUID level 0x12 (EAX). */
+ #define KVM_X86_FEATURE_SGX1		KVM_X86_FEATURE(CPUID_12_EAX, 0)
+ #define KVM_X86_FEATURE_SGX2		KVM_X86_FEATURE(CPUID_12_EAX, 1)
++#define KVM_X86_FEATURE_SGX_EDECCSSA	KVM_X86_FEATURE(CPUID_12_EAX, 11)
+ 
+ struct cpuid_reg {
+ 	u32 function;
+@@ -78,6 +79,8 @@ static __always_inline u32 __feature_translate(int x86_feature)
+ 		return KVM_X86_FEATURE_SGX1;
+ 	else if (x86_feature == X86_FEATURE_SGX2)
+ 		return KVM_X86_FEATURE_SGX2;
++	else if (x86_feature == X86_FEATURE_SGX_EDECCSSA)
++		return KVM_X86_FEATURE_SGX_EDECCSSA;
+ 
+ 	return x86_feature;
+ }
+
+base-commit: 7b72c823ddf8aaaec4e9fb28e6fbe4d511e7dad1
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+2.37.3
+
