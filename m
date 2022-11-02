@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D173616CFF
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2495C616D00
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231502AbiKBSrD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 14:47:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41996 "EHLO
+        id S231639AbiKBSrF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 14:47:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231441AbiKBSrA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 14:47:00 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4335C2CE27
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:47:00 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id p66-20020a257445000000b006ca0ba7608fso16940285ybc.7
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:47:00 -0700 (PDT)
+        with ESMTP id S231336AbiKBSrC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 14:47:02 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90B0A2CE27
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:47:01 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id k11-20020aa792cb000000b00558674e8e7fso9475840pfa.6
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:47:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b7uq7+6FJUtCM5yZaRMCgjXsjZDgsouXY7vk22+ZXIs=;
-        b=XDgeZyKDTKKipX+i2aGyHNi3s+8pnkpnMI12cgPv4ojpprE+Fg9YnzSmNNsXX8HfJj
-         iQbxfEndlSN9abt6doem7fwJJXekYak3qgfa1e23bo7K9164k5zp7hw1o60qcSIVJ2w5
-         drYOm4FQw/MYk0vW8prIJdruby48uiOoct5SUhO7BjVnv3fPIL/h5KidH0sDSufi9qzW
-         DpKq7TkYLamfrhWnqBMaBIHpEeY/o280to+UOlNzldbdEpoWBRgZHLGKJS+Sk0rLiOz7
-         ZRGobOy+GEWhz0thGXVb31D7vBrs3byLm/297DioRssWpXwKLAWCIyi89HRJVJim6mxZ
-         BR6w==
+        bh=ql4D3kiOZzzmaaxOdFm8FO+vhwnQsfC/UdEU/ar8O0w=;
+        b=aNUkXBxNmbQdSOVWv/Iru8y2NflwpO3ygzFS+IJT5/Cf8/2z63W9e3jYx+G37tLmuR
+         uPOhSWPTbC2R7qdSaC14LMM7IvbB7ygmTGx6qBlJi7RUGTqucbqwElkWrgUFczYdLxRL
+         rSeeO+qJRkWJ9KMDIl/9lQky6rdAJVXS6BO6TCldqcHYGfZgQq6QdS8mvOrUsWBpUIkd
+         Bf4X/NRvFKb3/JNPPWRfXs631Uh1uhJ6hHASPauf3Ufvq7ggVIXra2yCgt9GLT9JCZGR
+         xIVL4tiQukJwdNXGN4YL4E00JVdzV6HNi0oZjwvaALhAndPrKKIVN+3mdEeo7n4YKlFj
+         xneQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b7uq7+6FJUtCM5yZaRMCgjXsjZDgsouXY7vk22+ZXIs=;
-        b=TTnSdC7GlkyGu24Yr0+rYgyUiM9c3em5/x/A3Hq7RfghtfYD5DGM3d7orP9JRVmCoR
-         W3LAkWh8CoLr541Q7R3x4uMHzoRQXZ5L8mQF4hVt0CfrX1evhRpKNUjxfBL+2qaCLt77
-         rtPQSGYeR7vWncS7ROxtNCOrlNZ3HvpQQGpW6mZ+GOCxFk3YacjrjEPOrT7phpPTw2Pb
-         RyexEYkZiieF92JCSp9n98zv4Vq+u26hYp4fChxDXva8SfJ7ij7B1hINylHw+Zkv6k3D
-         Qwk1lC6a6D7rq4lUFKcn45G1Fh2Cj9p8jOL3ZluzXKGOqfHKi5Hzh1SRJjSPgBjEAvuN
-         TrXA==
-X-Gm-Message-State: ACrzQf0d/Vpi8Nl26Yz3OyNf7BCJ7dJUaw+ORjefPDDvXWtJeClXgSra
-        Zj1Nmlojxd4gMCOFJ1impwROgXFIyyg+iw==
-X-Google-Smtp-Source: AMsMyM6ztd9xyXefhdqKbXs4TQ/5pf47M9ZV5C6tp0cuCubpRbzjdpMp5DlM5P9ogxJwG548M2iggV6hX5AAZA==
+        bh=ql4D3kiOZzzmaaxOdFm8FO+vhwnQsfC/UdEU/ar8O0w=;
+        b=tBr3UL7CQDts91NcsF+tt8W7RIu5OOvXEMZCy06zZTfWnORCfektGQhnDsjdsOZs8J
+         LnD3lVzXyl9EQlm6M7RSq3JooVdmNGekgxEloJKErzmZ/QWHZK8HsduStpxk4acXFgqm
+         Q4zIU1ko6SdEVv24V7DiH+San11WK6QEMvN54zFLGrWonX+/a0codLT+9yI1/nRgc1rp
+         0N8L7MdWNU4AmGiHfqdW2oi/GbyUEwuz3hHpMIjm70NiJJISmzXs0fU/FxwB1yu7hkF0
+         0TpuDcbtXRyEN5YvJmKpplcrkhsHnhvFrI9NOmiMAs3DUsLfwvb+gaVVdyqJoMd9Hs/J
+         5jgg==
+X-Gm-Message-State: ACrzQf2NXp+EQROJ6sArFpd6+LMU9lzIqnuokcloWO/3UlcqltPCSqQh
+        +jhA/yZOlLseoeI1vv0y96IyxoRek+7hWA==
+X-Google-Smtp-Source: AMsMyM5q5qyLQVIN/MGOhr7mcX1yfMtLR66i3kecMb/7rU9e44+PG++MAUT2C4Z1Um9dIO4ffifVTmdnv8tL7g==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a5b:f4e:0:b0:6bc:9f5a:96f0 with SMTP id
- y14-20020a5b0f4e000000b006bc9f5a96f0mr177191ybr.10.1667414819125; Wed, 02 Nov
- 2022 11:46:59 -0700 (PDT)
-Date:   Wed,  2 Nov 2022 11:46:45 -0700
+ (user=dmatlack job=sendgmr) by 2002:a05:6a00:230d:b0:53d:c198:6ad7 with SMTP
+ id h13-20020a056a00230d00b0053dc1986ad7mr26953339pfh.67.1667414820988; Wed,
+ 02 Nov 2022 11:47:00 -0700 (PDT)
+Date:   Wed,  2 Nov 2022 11:46:46 -0700
 In-Reply-To: <20221102184654.282799-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221102184654.282799-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221102184654.282799-2-dmatlack@google.com>
-Subject: [PATCH v4 01/10] KVM: selftests: Rename emulator_error_test to smaller_maxphyaddr_emulation_test
+Message-ID: <20221102184654.282799-3-dmatlack@google.com>
+Subject: [PATCH v4 02/10] KVM: selftests: Explicitly require instructions bytes
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -75,77 +75,119 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename emulator_error_test to smaller_maxphyaddr_emulation_test and
-update the comment at the top of the file to document that this is
-explicitly a test to validate that KVM emulates instructions in response
-to an EPT violation when emulating a smaller MAXPHYADDR.
+Hard-code the flds instruction and assert the exact instruction bytes
+are present in run->emulation_failure. The test already requires the
+instruction bytes to be present because that's the only way the test
+will advance the RIP past the flds and get to GUEST_DONE().
+
+Note that KVM does not necessarily return exactly 2 bytes in
+run->emulation_failure since it may not know the exact instruction
+length in all cases. So just assert that
+run->emulation_failure.insn_size is at least 2.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 Reviewed-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/.gitignore                         | 2 +-
- tools/testing/selftests/kvm/Makefile                           | 2 +-
- ...ulator_error_test.c => smaller_maxphyaddr_emulation_test.c} | 3 ++-
- 3 files changed, 4 insertions(+), 3 deletions(-)
- rename tools/testing/selftests/kvm/x86_64/{emulator_error_test.c => smaller_maxphyaddr_emulation_test.c} (97%)
+ .../smaller_maxphyaddr_emulation_test.c       | 68 ++++++-------------
+ 1 file changed, 20 insertions(+), 48 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 2f0d705db9db..053e5d34cd03 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -17,7 +17,6 @@
- /x86_64/cr4_cpuid_sync_test
- /x86_64/debug_regs
- /x86_64/evmcs_test
--/x86_64/emulator_error_test
- /x86_64/fix_hypercall_test
- /x86_64/get_msr_index_features
- /x86_64/kvm_clock_test
-@@ -36,6 +35,7 @@
- /x86_64/set_boot_cpu_id
- /x86_64/set_sregs_test
- /x86_64/sev_migrate_tests
-+/x86_64/smaller_maxphyaddr_emulation_test
- /x86_64/smm_test
- /x86_64/state_test
- /x86_64/svm_vmcall_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 0172eb6cb6ee..ab133b731a2d 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -81,7 +81,6 @@ TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
- TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
- TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
- TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
--TEST_GEN_PROGS_x86_64 += x86_64/emulator_error_test
- TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
-@@ -96,6 +95,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
- TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
- TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
-+TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
- TEST_GEN_PROGS_x86_64 += x86_64/smm_test
- TEST_GEN_PROGS_x86_64 += x86_64/state_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
-diff --git a/tools/testing/selftests/kvm/x86_64/emulator_error_test.c b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-similarity index 97%
-rename from tools/testing/selftests/kvm/x86_64/emulator_error_test.c
-rename to tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-index 236e11755ba6..6ed996988a5a 100644
---- a/tools/testing/selftests/kvm/x86_64/emulator_error_test.c
+diff --git a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
+index 6ed996988a5a..d92cd4139f6d 100644
+--- a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-@@ -2,7 +2,8 @@
- /*
-  * Copyright (C) 2020, Google LLC.
-  *
-- * Tests for KVM_CAP_EXIT_ON_EMULATION_FAILURE capability.
-+ * Test that KVM emulates instructions in response to EPT violations when
-+ * allow_smaller_maxphyaddr is enabled and guest.MAXPHYADDR < host.MAXPHYADDR.
-  */
+@@ -19,41 +19,20 @@
+ #define MEM_REGION_SLOT	10
+ #define MEM_REGION_SIZE PAGE_SIZE
  
- #define _GNU_SOURCE /* for program_invocation_short_name */
++#define FLDS_MEM_EAX ".byte 0xd9, 0x00"
++
+ static void guest_code(void)
+ {
+-	__asm__ __volatile__("flds (%[addr])"
+-			     :: [addr]"r"(MEM_REGION_GVA));
++	__asm__ __volatile__(FLDS_MEM_EAX :: "a"(MEM_REGION_GVA));
+ 
+ 	GUEST_DONE();
+ }
+ 
+-/*
+- * Accessors to get R/M, REG, and Mod bits described in the SDM vol 2,
+- * figure 2-2 "Table Interpretation of ModR/M Byte (C8H)".
+- */
+-#define GET_RM(insn_byte) (insn_byte & 0x7)
+-#define GET_REG(insn_byte) ((insn_byte & 0x38) >> 3)
+-#define GET_MOD(insn_byte) ((insn_byte & 0xc) >> 6)
+-
+-/* Ensure we are dealing with a simple 2-byte flds instruction. */
+-static bool is_flds(uint8_t *insn_bytes, uint8_t insn_size)
+-{
+-	return insn_size >= 2 &&
+-	       insn_bytes[0] == 0xd9 &&
+-	       GET_REG(insn_bytes[1]) == 0x0 &&
+-	       GET_MOD(insn_bytes[1]) == 0x0 &&
+-	       /* Ensure there is no SIB byte. */
+-	       GET_RM(insn_bytes[1]) != 0x4 &&
+-	       /* Ensure there is no displacement byte. */
+-	       GET_RM(insn_bytes[1]) != 0x5;
+-}
+-
+ static void process_exit_on_emulation_error(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_run *run = vcpu->run;
+ 	struct kvm_regs regs;
+ 	uint8_t *insn_bytes;
+-	uint8_t insn_size;
+ 	uint64_t flags;
+ 
+ 	TEST_ASSERT(run->exit_reason == KVM_EXIT_INTERNAL_ERROR,
+@@ -65,30 +44,23 @@ static void process_exit_on_emulation_error(struct kvm_vcpu *vcpu)
+ 		    "Unexpected suberror: %u",
+ 		    run->emulation_failure.suberror);
+ 
+-	if (run->emulation_failure.ndata >= 1) {
+-		flags = run->emulation_failure.flags;
+-		if ((flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES) &&
+-		    run->emulation_failure.ndata >= 3) {
+-			insn_size = run->emulation_failure.insn_size;
+-			insn_bytes = run->emulation_failure.insn_bytes;
+-
+-			TEST_ASSERT(insn_size <= 15 && insn_size > 0,
+-				    "Unexpected instruction size: %u",
+-				    insn_size);
+-
+-			TEST_ASSERT(is_flds(insn_bytes, insn_size),
+-				    "Unexpected instruction.  Expected 'flds' (0xd9 /0)");
+-
+-			/*
+-			 * If is_flds() succeeded then the instruction bytes
+-			 * contained an flds instruction that is 2-bytes in
+-			 * length (ie: no prefix, no SIB, no displacement).
+-			 */
+-			vcpu_regs_get(vcpu, &regs);
+-			regs.rip += 2;
+-			vcpu_regs_set(vcpu, &regs);
+-		}
+-	}
++	flags = run->emulation_failure.flags;
++	TEST_ASSERT(run->emulation_failure.ndata >= 3 &&
++		    flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES,
++		    "run->emulation_failure is missing instruction bytes");
++
++	TEST_ASSERT(run->emulation_failure.insn_size >= 2,
++		    "Expected a 2-byte opcode for 'flds', got %d bytes",
++		    run->emulation_failure.insn_size);
++
++	insn_bytes = run->emulation_failure.insn_bytes;
++	TEST_ASSERT(insn_bytes[0] == 0xd9 && insn_bytes[1] == 0,
++		    "Expected 'flds [eax]', opcode '0xd9 0x00', got opcode 0x%02x 0x%02x\n",
++		    insn_bytes[0], insn_bytes[1]);
++
++	vcpu_regs_get(vcpu, &regs);
++	regs.rip += 2;
++	vcpu_regs_set(vcpu, &regs);
+ }
+ 
+ static void do_guest_assert(struct ucall *uc)
 -- 
 2.38.1.273.g43a17bfeac-goog
 
