@@ -2,172 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6466616D1A
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2F30616D2A
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:50:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231519AbiKBSre (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 14:47:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42130 "EHLO
+        id S231663AbiKBSuR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 14:50:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231709AbiKBSrT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 14:47:19 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F122FFF0
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:47:14 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-3697bd55974so166607767b3.15
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:47:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nQsYYcvMuiXeimF3iWphBO1Sb/hb6+CelzMx1eKIPSU=;
-        b=pw9ymKA5S+Jx9QOYGRBTqhoQ3BHm/jqVqpUFdB6f3MXDLBe+NWv48150aokyYA/QY5
-         d9woU8yJZ2UvMNiVZdK8bSGccAhD9cpn/NKf6H9aBHC6ICTybIW8pLbMZ2j5Wz9AsqMg
-         m6xZGYnwV5zX2AkwYawsNt+RTJ7ujLPNaFDCM2Amt0PVsjznpFYlc1c+s8QKUm1FWJEo
-         r1QkLIR17F0t1ZnVuHMh4LW1oU4+yrXnZIgKlBs3NDw9Mw6mbQlWaiDTygj6FGZzAsXi
-         zmV41q7J3DlwhzU8Quc5yNBxYBvV0MP5wYNHJFM98RGoYzY20ZJqdqn3EmdQ8c+LoT17
-         XrTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nQsYYcvMuiXeimF3iWphBO1Sb/hb6+CelzMx1eKIPSU=;
-        b=wYBiSQfrCkP8d/7HwuBA6jiQdAGs3J0NwgHq0RNEFamFRmU6rwEFNCpB/FZnnmTxrp
-         EO6AQz33qbDjILjUiMrJ2jETVi5cPJdOK/NBXXy4nf5E6L/EddfajyT4bXRCjfGBosv4
-         UhSQjRxEuSIaEwIzsFroKST/Q4MOwcIX69ECntG3UVZRQHLGPQGwRTdh9YdvkbKZkkkC
-         uczHHa1JaRp6TqdbYAYnz4FpCGYXNb0orYFO3b9d6PF+1VJjc76cJYSKVvNtm7NwPBGS
-         e0OEBWBTOYOU6UGNJqJBcXTlDRc4NJPrPFPAtnVrxaBE8NuXMK1ICOQ2XxCpKa3j5vE+
-         Dqjg==
-X-Gm-Message-State: ACrzQf3YHKEA0vCvQLNjXS1QbGL9/e2rU47lbVsRjKGgcysrdDdgxvde
-        GcVTQBN577LPGyCfwyOInQfwqqmnNWJ5GA==
-X-Google-Smtp-Source: AMsMyM43IUGOPge1t3uHBUGFvgiuKeHmYSedOK6angXrFPIk+JUSfWbqcPJ+DZGNAH4FoO9M8EeZkCunUFxbrA==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a0d:c5c4:0:b0:34a:7ab0:7b29 with SMTP id
- h187-20020a0dc5c4000000b0034a7ab07b29mr25379869ywd.294.1667414833843; Wed, 02
- Nov 2022 11:47:13 -0700 (PDT)
-Date:   Wed,  2 Nov 2022 11:46:54 -0700
-In-Reply-To: <20221102184654.282799-1-dmatlack@google.com>
-Mime-Version: 1.0
-References: <20221102184654.282799-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221102184654.282799-11-dmatlack@google.com>
-Subject: [PATCH v4 10/10] KVM: selftests: Add a test for KVM_CAP_EXIT_ON_EMULATION_FAILURE
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yang Zhong <yang.zhong@intel.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231718AbiKBSt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 14:49:56 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69CE6C01;
+        Wed,  2 Nov 2022 11:49:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1374BB82426;
+        Wed,  2 Nov 2022 18:49:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBFD8C433C1;
+        Wed,  2 Nov 2022 18:49:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667414991;
+        bh=A9V26abd3ofhCXzboqJszcQ8NMZJoEJqgoBj4Pi/PF8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=n/eYUT5c1MXDySctcF4yD+cGNE9uiEyE8Yln6G6O7ESxBGrWOkD0qXBrIxP5D09tx
+         rPet5rrxRJHAfe8hioWKZQ1iJusfCXAckHA7RwECS67arZyVDWKd/Y/QhKsTgKxco9
+         fJcyq7ZBTJR3e2zg94+sL6bxDLT6dxqk7tFIHafdkuomMQJqTXrd+OVXW5rvQKWImI
+         oxU70L8e/VzYhVf1rQFGdJuJdbFi82J56nqiMSJYPtdM3hZaUOdzHcN2Pl/6O88y+J
+         /4ZlWQygHNWO8kJXUc+bgLLUB14i597HfGfy0iLluCcZoSYl5LjAUwo2LEgEWCJGVl
+         WZQUaqh5TxuQw==
+Date:   Wed, 2 Nov 2022 11:49:48 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Nicolin Chen <nicolinc@nvidia.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>, bpf@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v3 15/15] iommufd: Add a selftest
+Message-ID: <Y2K7zMvzrHmQJ1hk@dev-arch.thelio-3990X>
+References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <15-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <Y2GCV97lxEGwAuo6@Asurada-Nvidia>
+ <Y2Jt+WxNUwROJ8fN@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y2Jt+WxNUwROJ8fN@nvidia.com>
+X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a selftest to exercise the KVM_CAP_EXIT_ON_EMULATION_FAILURE
-capability.
+On Wed, Nov 02, 2022 at 10:17:45AM -0300, Jason Gunthorpe wrote:
+> On Tue, Nov 01, 2022 at 01:32:23PM -0700, Nicolin Chen wrote:
+> > On Tue, Oct 25, 2022 at 03:12:24PM -0300, Jason Gunthorpe wrote:
+> >  
+> > > diff --git a/drivers/iommu/iommufd/selftest.c b/drivers/iommu/iommufd/selftest.c
+> > 
+> > > +static inline struct iommufd_hw_pagetable *
+> > > +get_md_pagetable(struct iommufd_ucmd *ucmd, u32 mockpt_id,
+> > > +		 struct mock_iommu_domain **mock)
+> > > +{
+> > > +	struct iommufd_hw_pagetable *hwpt;
+> > > +	struct iommufd_object *obj;
+> > > +
+> > > +	obj = iommufd_get_object(ucmd->ictx, mockpt_id,
+> > > +				 IOMMUFD_OBJ_HW_PAGETABLE);
+> > > +	if (IS_ERR(obj))
+> > > +		return ERR_CAST(obj);
+> > > +	hwpt = container_of(obj, struct iommufd_hw_pagetable, obj);
+> > > +	if (hwpt->domain->ops != mock_ops.default_domain_ops) {
+> > > +		return ERR_PTR(-EINVAL);
+> > > +		iommufd_put_object(&hwpt->obj);
+> > 
+> > Coverity reports that return is placed before iommufd_put_object.
+> 
+> I'm surprised no compiler warned about this!
 
-This capability is also exercised through
-smaller_maxphyaddr_emulation_test, but that test requires
-allow_smaller_maxphyaddr=Y, which is off by default on Intel when ept=Y
-and unconditionally disabled on AMD when npt=Y. This new test ensures
-that KVM_CAP_EXIT_ON_EMULATION_FAILURE is exercised independent of
-allow_smaller_maxphyaddr.
+clang does have -Wunreachable-code-return to try and flag issues like
+this but it is not on by default nor included in -Wall:
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |  1 +
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../x86_64/exit_on_emulation_failure_test.c   | 45 +++++++++++++++++++
- 3 files changed, 47 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
+https://clang.llvm.org/docs/DiagnosticsReference.html#wunreachable-code-return
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 053e5d34cd03..bef984e4c39d 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -17,6 +17,7 @@
- /x86_64/cr4_cpuid_sync_test
- /x86_64/debug_regs
- /x86_64/evmcs_test
-+/x86_64/exit_on_emulation_failure_test
- /x86_64/fix_hypercall_test
- /x86_64/get_msr_index_features
- /x86_64/kvm_clock_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index ab133b731a2d..11a6104e6547 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -81,6 +81,7 @@ TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
- TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
- TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
- TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
-+TEST_GEN_PROGS_x86_64 += x86_64/exit_on_emulation_failure_test
- TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
-diff --git a/tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c b/tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
-new file mode 100644
-index 000000000000..37c61f712fd5
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
-@@ -0,0 +1,45 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2022, Google LLC.
-+ *
-+ * Test for KVM_CAP_EXIT_ON_EMULATION_FAILURE.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+
-+#include "flds_emulation.h"
-+
-+#include "test_util.h"
-+
-+#define MMIO_GPA	0x700000000
-+#define MMIO_GVA	MMIO_GPA
-+
-+static void guest_code(void)
-+{
-+	/* Execute flds with an MMIO address to force KVM to emulate it. */
-+	flds(MMIO_GVA);
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	/* Tell stdout not to buffer its content */
-+	setbuf(stdout, NULL);
-+
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_EXIT_ON_EMULATION_FAILURE));
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+	vm_enable_cap(vm, KVM_CAP_EXIT_ON_EMULATION_FAILURE, 1);
-+	virt_map(vm, MMIO_GVA, MMIO_GPA, 1);
-+
-+	vcpu_run(vcpu);
-+	handle_flds_emulation_failure_exit(vcpu);
-+	vcpu_run(vcpu);
-+	ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.38.1.273.g43a17bfeac-goog
+The fact it is included in -Wunreachable-code-aggressive makes me think
+that this might generate a lot of false positives around constructs such
+as
 
+    if (IS_ENABLED(CONFIG_...))
+        return ...;
+
+    return ...;
+
+but I have not actually tested it.
+
+> > > +static int iommufd_test_access_pages(struct iommufd_ucmd *ucmd,
+> > > +				     unsigned int access_id, unsigned long iova,
+> > > +				     size_t length, void __user *uptr,
+> > > +				     u32 flags)
+> > > +{
+> > > +	struct iommu_test_cmd *cmd = ucmd->cmd;
+> > > +	struct selftest_access_item *item;
+> > > +	struct selftest_access *staccess;
+> > > +	struct page **pages;
+> > > +	size_t npages;
+> > > +	int rc;
+> > > +
+> > > +	if (flags & ~MOCK_FLAGS_ACCESS_WRITE)
+> > > +		return -EOPNOTSUPP;
+> > > +
+> > > +	staccess = iommufd_access_get(access_id);
+> > > +	if (IS_ERR(staccess))
+> > > +		return PTR_ERR(staccess);
+> > > +
+> > > +	npages = (ALIGN(iova + length, PAGE_SIZE) -
+> > > +		  ALIGN_DOWN(iova, PAGE_SIZE)) /
+> > > +		 PAGE_SIZE;
+> > > +	pages = kvcalloc(npages, sizeof(*pages), GFP_KERNEL_ACCOUNT);
+> > > +	if (!pages) {
+> > > +		rc = -ENOMEM;
+> > > +		goto out_put;
+> > > +	}
+> > > +
+> > > +	rc = iommufd_access_pin_pages(staccess->access, iova, length, pages,
+> > > +				      flags & MOCK_FLAGS_ACCESS_WRITE);
+> > > +	if (rc)
+> > > +		goto out_free_pages;
+> > > +
+> > > +	rc = iommufd_test_check_pages(
+> > > +		uptr - (iova - ALIGN_DOWN(iova, PAGE_SIZE)), pages, npages);
+> > > +	if (rc)
+> > > +		goto out_unaccess;
+> > > +
+> > > +	item = kzalloc(sizeof(*item), GFP_KERNEL_ACCOUNT);
+> > > +	if (!item) {
+> > > +		rc = -ENOMEM;
+> > > +		goto out_unaccess;
+> > > +	}
+> > > +
+> > > +	item->iova = iova;
+> > > +	item->length = length;
+> > > +	spin_lock(&staccess->lock);
+> > > +	item->id = staccess->next_id++;
+> > > +	list_add_tail(&item->items_elm, &staccess->items);
+> > > +	spin_unlock(&staccess->lock);
+> > > +
+> > > +	cmd->access_pages.out_access_item_id = item->id;
+> > > +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
+> > > +	if (rc)
+> > > +		goto out_free_item;
+> > > +	goto out_free_pages;
+> > > +
+> > > +out_free_item:
+> > > +	spin_lock(&staccess->lock);
+> > > +	list_del(&item->items_elm);
+> > > +	spin_unlock(&staccess->lock);
+> > > +	kfree(item);
+> > > +out_unaccess:
+> > > +	iommufd_access_unpin_pages(staccess->access, iova, length);
+> > > +out_free_pages:
+> > > +	kvfree(pages);
+> > 
+> > Coverity reports a double free here, call trace:
+> > 
+> > [jumped from] rc = iommufd_access_pin_pages(..., pages, ...);
+> > 	[in which] iopt_pages_add_access(..., out_pages, ...);
+> > 		[then] iopt_pages_fill_xarray(..., out_pages);
+> > 			[then] iopt_pages_fill_from_mm(..., out_pages);
+> > 				[then] user->upages = out_pages + ...;
+> > 				       pfn_reader_user_pin(user, ...);
+> > 					[then] kfree(user->upages);
+> > 					       return -EFAULT;
+> > 
+> > Should be the same potential issue in the other email.
+> 
+> Yes, looks like
+> 
+> Thanks,
+> Jason
