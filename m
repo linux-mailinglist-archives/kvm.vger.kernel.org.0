@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C8C86166C7
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 17:00:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EEBB6166C8
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 17:00:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230505AbiKBQAW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 12:00:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39368 "EHLO
+        id S231140AbiKBQAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 12:00:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230132AbiKBQAR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230306AbiKBQAR (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 2 Nov 2022 12:00:17 -0400
-Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD0142A70A
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 09:00:15 -0700 (PDT)
-Received: by mail-il1-x149.google.com with SMTP id 15-20020a056e0220cf00b0030099e75602so11391819ilq.21
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 09:00:15 -0700 (PDT)
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A24062197
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 09:00:16 -0700 (PDT)
+Received: by mail-io1-xd4a.google.com with SMTP id w16-20020a6b4a10000000b006a5454c789eso14663280iob.20
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 09:00:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=w+ebisBkWPJ5RfFeeP4pPr1G3UX4W/TiA76RvuNqNLA=;
-        b=XoYuKuLxkAD2axLD7g3mm5M0/BmoY8FOTvqzKmUp0b/Vvt4kD/ctbK7UHxs875OEP9
-         h4aoaZDmPBd8F5BZZp4p8UljOXoHzb79rSy+mGFqwXsiuTZWSA4kKPi24zmuyQMxXx5e
-         2hXDKm4K49Ap4mlzzp18Kb+6Hl7KH5QSdN161NtkbIwWKEtHV4Tr6yY/4VuscKO0LEAd
-         +9rjF8gw5zjjB5+YPsPVhSXjuyQFxeVivE0YkDeZ4VXeapkCm3+5+BDTnK4h2ksqAerM
-         lDJvMLNjzoH9CdQcyqZulou6EOpXV8IOctSbyH9lKs3rCuvRsuV99k/FLda3cNnra5HO
-         EXAA==
+        bh=JBK3THjfM00hK0Ybjyd8D/mGedv8JDwjrzgy5dwB9z4=;
+        b=dbyGbrfAsVPTI9iGgH/v3lJgbF6lyQwv4R3CSgTCRB+aVUaCEPcg1nD3Xie/rvlR7d
+         HTPTCdAAr/y8MugQRXbBLNrJATNub17S/vMyO9ma6rYzCHsoPcWF5Wa8BJiLdrN4msYr
+         4JzCXH/wlt27vs0sceY2lKc5052Q2IiPCmUHrhOxaX3AO7LkL/LpnrPmM+3SqoA6HDNe
+         QS4kk89UswRVhODhg7ZiROMMSCiRkFx71w82IHmfVe/1A+yYR/kKAe/Lgj+tM2vAfATR
+         1R0z9YVqhmFQ8B4A8z28r3fisXiFU6awVpKqTrjzdTXDiiU/m4XXY3p1HzRFcYKaebai
+         N7Ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w+ebisBkWPJ5RfFeeP4pPr1G3UX4W/TiA76RvuNqNLA=;
-        b=qgYnMhluoY6n3tTU6mSTJqeR7A8xJ7y1d7AEpCSqpgW+EZng5MTGbXZElySSM/gStH
-         kNSBmhwrUERCajDCcp3HHLRmWwq2B6O4wp+8USPSaoSlWNAlR9ART2W1Tfkk6XATLIu3
-         iQb1JOpcajewOCAOcFdomI5q5oYvEikAXUIWBokXHR938IJdAn3Ta3HHSEOEN8s2YdXD
-         /u8pHTymC18SVxTVW6A/AnJmxaQ4NSUD8dHEbrit75RymZwjt8pVfyER6RVd4RedDCjP
-         a5i0hICSB8cD/A8roOFOLazeXD4Yd/69wKsNH5EH1kw2uuunhKs/JAIfw3yI+8ybMvGR
-         eXuw==
-X-Gm-Message-State: ACrzQf2bPB+TXu7QDqpCOlyBazEYzO6bDW+P1hMyeAeoi2j9aYNRQN11
-        npl7AA8r/urtdKUCJ/cEo+6uVuwSTwQtCUfGcWQXd925OmpXNyx0iawXayy2wY/56eBigTaSNL0
-        LGXNlj9riAieuuh+X3fx9uR5oGd9oWvRMs6KIGAZ8Sj/u70ZlDXUM0NDVbtO52NT2o6EIRHU=
-X-Google-Smtp-Source: AMsMyM6zqOL1K//7aXhNXs8rhdxlChQl4VFyUXBU6xR8n3oPjWwm4mVAaWtqrFGQLlraR0U7LQqf9cObPcmop4hg6Q==
+        bh=JBK3THjfM00hK0Ybjyd8D/mGedv8JDwjrzgy5dwB9z4=;
+        b=CEvJ0i1MGlQD5Sdu+xI+qGODfimTcaB3WIJjIw+8m12dDIRpsoYEs+G6I/fVVmoXjB
+         f0c/2ad9TEYuORfIvWYUxC8g06++/sJIFTF8ObdHGexYmmmFt/Y2Z5KJMQzmphClB7qf
+         XPPnFv5Oq6TFVA3jtkFvRVwYWG9e37YnSLYuhr+8+gP7e0bJaFfh3t0Ccl9BcZY5F6FF
+         I+5iboJEIgSuBJ1CI6bzDPfwOEkWAjP83VjMpZMKBkUTavt9s03eQ5GSx9ogUr/2VWOz
+         w7k2ZKa/ehBfcoUO/uzYwovWfitOIj1s2QANrf6ihb4VxktsCOcEOQ+foczA5rgcDN1d
+         XwQg==
+X-Gm-Message-State: ACrzQf0++hhweyzn7zV09AhsR0aGOIa8HE4C1IDWuJCwkojFri0TSuAC
+        qgItYzfTFWYnsCEvMzVrcAWNRgIfZ3FTQgSgN7HUjGobzEdWVRqpUzLcPl0n4/w14R148W/mVv2
+        dPq31dE3ZP+r1edBW3zQmdasA7w6udaXd1s+24c17p/SlTWJBTpRzdTLlphZ9giHq+el7K14=
+X-Google-Smtp-Source: AMsMyM4zfXEA1KKsNsALv/tZdGC6baN3Yw4J0cpPH6OSvdBdq2Zks9Erp+jcvZ4twbrjdx9FjGOh3cMTbEn/0Ny3MA==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a6b:c3cd:0:b0:6a8:3ca0:dafa with SMTP
- id t196-20020a6bc3cd000000b006a83ca0dafamr16203473iof.193.1667404815211; Wed,
- 02 Nov 2022 09:00:15 -0700 (PDT)
-Date:   Wed,  2 Nov 2022 16:00:04 +0000
+ (user=coltonlewis job=sendgmr) by 2002:a02:cf8f:0:b0:373:9526:ff08 with SMTP
+ id w15-20020a02cf8f000000b003739526ff08mr17431866jar.298.1667404816007; Wed,
+ 02 Nov 2022 09:00:16 -0700 (PDT)
+Date:   Wed,  2 Nov 2022 16:00:05 +0000
 In-Reply-To: <20221102160007.1279193-1-coltonlewis@google.com>
 Mime-Version: 1.0
 References: <20221102160007.1279193-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221102160007.1279193-2-coltonlewis@google.com>
-Subject: [PATCH v9 1/4] KVM: selftests: implement random number generator for
- guest code
+Message-ID: <20221102160007.1279193-3-coltonlewis@google.com>
+Subject: [PATCH v9 2/4] KVM: selftests: create -r argument to specify random seed
 From:   Colton Lewis <coltonlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
@@ -70,65 +69,113 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement random number generator for guest code to randomize parts
-of the test, making it less predictable and a more accurate reflection
-of reality.
-
-The random number generator chosen is the Park-Miller Linear
-Congruential Generator, a fancy name for a basic and well-understood
-random number generator entirely sufficient for this purpose. Each
-vCPU calculates its own seed by adding its index to the seed provided.
+Create a -r argument to specify a random seed. If no argument is
+provided, the seed defaults to 1. The random seed is set with
+perf_test_set_random_seed() and must be set before guest_code runs to
+apply.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- tools/testing/selftests/kvm/include/test_util.h |  7 +++++++
- tools/testing/selftests/kvm/lib/test_util.c     | 17 +++++++++++++++++
- 2 files changed, 24 insertions(+)
+ tools/testing/selftests/kvm/dirty_log_perf_test.c    | 12 ++++++++++--
+ tools/testing/selftests/kvm/include/perf_test_util.h |  2 ++
+ tools/testing/selftests/kvm/lib/perf_test_util.c     |  6 ++++++
+ 3 files changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index befc754ce9b3..9e4f36a1a8b0 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -152,4 +152,11 @@ static inline void *align_ptr_up(void *x, size_t size)
- 	return (void *)align_up((unsigned long)x, size);
+diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+index f99e39a672d3..c97a5e455699 100644
+--- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+@@ -132,6 +132,7 @@ struct test_params {
+ 	bool partition_vcpu_memory_access;
+ 	enum vm_mem_backing_src_type backing_src;
+ 	int slots;
++	uint32_t random_seed;
+ };
+ 
+ static void toggle_dirty_logging(struct kvm_vm *vm, int slots, bool enable)
+@@ -225,6 +226,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 				 p->slots, p->backing_src,
+ 				 p->partition_vcpu_memory_access);
+ 
++	/* If no argument provided, random seed will be 1. */
++	pr_info("Random seed: %u\n", p->random_seed);
++	perf_test_set_random_seed(vm, p->random_seed ? p->random_seed : 1);
+ 	perf_test_set_wr_fract(vm, p->wr_fract);
+ 
+ 	guest_num_pages = (nr_vcpus * guest_percpu_mem_size) >> vm->page_shift;
+@@ -352,7 +356,7 @@ static void help(char *name)
+ {
+ 	puts("");
+ 	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
+-	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]"
++	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-r random seed ] [-s mem type]"
+ 	       "[-x memslots]\n", name);
+ 	puts("");
+ 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
+@@ -380,6 +384,7 @@ static void help(char *name)
+ 	printf(" -v: specify the number of vCPUs to run.\n");
+ 	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
+ 	       "     them into a separate region of memory for each vCPU.\n");
++	printf(" -r: specify the starting random seed.\n");
+ 	backing_src_help("-s");
+ 	printf(" -x: Split the memory region into this number of memslots.\n"
+ 	       "     (default: 1)\n");
+@@ -406,7 +411,7 @@ int main(int argc, char *argv[])
+ 
+ 	guest_modes_append_default();
+ 
+-	while ((opt = getopt(argc, argv, "eghi:p:m:nb:f:v:os:x:")) != -1) {
++	while ((opt = getopt(argc, argv, "eghi:p:m:nb:f:v:or:s:x:")) != -1) {
+ 		switch (opt) {
+ 		case 'e':
+ 			/* 'e' is for evil. */
+@@ -442,6 +447,9 @@ int main(int argc, char *argv[])
+ 		case 'o':
+ 			p.partition_vcpu_memory_access = false;
+ 			break;
++		case 'r':
++			p.random_seed = atoi(optarg);
++			break;
+ 		case 's':
+ 			p.backing_src = parse_backing_src_type(optarg);
+ 			break;
+diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
+index eaa88df0555a..f1050fd42d10 100644
+--- a/tools/testing/selftests/kvm/include/perf_test_util.h
++++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+@@ -35,6 +35,7 @@ struct perf_test_args {
+ 	uint64_t gpa;
+ 	uint64_t size;
+ 	uint64_t guest_page_size;
++	uint32_t random_seed;
+ 	int wr_fract;
+ 
+ 	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
+@@ -52,6 +53,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
+ void perf_test_destroy_vm(struct kvm_vm *vm);
+ 
+ void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract);
++void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed);
+ 
+ void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
+ void perf_test_join_vcpu_threads(int vcpus);
+diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+index 9618b37c66f7..0bb0659b9a0d 100644
+--- a/tools/testing/selftests/kvm/lib/perf_test_util.c
++++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+@@ -229,6 +229,12 @@ void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract)
+ 	sync_global_to_guest(vm, perf_test_args);
  }
  
-+struct guest_random_state {
-+	uint32_t seed;
-+};
-+
-+struct guest_random_state new_guest_random_state(uint32_t seed);
-+uint32_t guest_random_u32(struct guest_random_state *state);
-+
- #endif /* SELFTEST_KVM_TEST_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-index 6d23878bbfe1..c4d2749fb2c3 100644
---- a/tools/testing/selftests/kvm/lib/test_util.c
-+++ b/tools/testing/selftests/kvm/lib/test_util.c
-@@ -17,6 +17,23 @@
- 
- #include "test_util.h"
- 
-+/*
-+ * Random number generator that is usable from guest code. This is the
-+ * Park-Miller LCG using standard constants.
-+ */
-+
-+struct guest_random_state new_guest_random_state(uint32_t seed)
++void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed)
 +{
-+	struct guest_random_state s = {.seed = seed};
-+	return s;
++	perf_test_args.random_seed = random_seed;
++	sync_global_to_guest(vm, perf_test_args.random_seed);
 +}
 +
-+uint32_t guest_random_u32(struct guest_random_state *state)
-+{
-+	state->seed = (uint64_t)state->seed * 48271 % ((uint32_t)(1 << 31) - 1);
-+	return state->seed;
-+}
-+
- /*
-  * Parses "[0-9]+[kmgt]?".
-  */
+ uint64_t __weak perf_test_nested_pages(int nr_vcpus)
+ {
+ 	return 0;
 -- 
 2.38.1.273.g43a17bfeac-goog
 
