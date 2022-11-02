@@ -2,54 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09C0E616CFE
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D173616CFF
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231464AbiKBSrA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 14:47:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41988 "EHLO
+        id S231502AbiKBSrD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 14:47:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231319AbiKBSq6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 14:46:58 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A5FC2CE27
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:46:58 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-37010fefe48so148711967b3.19
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:46:58 -0700 (PDT)
+        with ESMTP id S231441AbiKBSrA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 14:47:00 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4335C2CE27
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:47:00 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id p66-20020a257445000000b006ca0ba7608fso16940285ybc.7
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:47:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KlOYR8Qeaq/wAWJ2lzry+Znm/MJL+cQ3Uz2M02gh7/0=;
-        b=cNl1WsT0PC8mf7yCOxltFM5Da04upOParWzGDQqAN5CssyV44fzMqoGTtt39ZjkOVq
-         5U2WL3iGfkkHsT3yCJFLm5oOcbdEQGDq0/bOlq4n7jYj3QXExzVlp9dCJocKWO9DzLjQ
-         vA4Ir7IlEoFh/3wR+0tB4zsxydS/pQ6f94ezEsIsVbn+/XPazpS3DZtOLuBMNtudRJTG
-         YahTY6u8bftMgfB1H1IUA2WmmjeZZrtKYSbVP52zG5fn19VZNsQDx91PmDGKZiL4BpzA
-         qYi4X0W5NFNvSIduFswLyHFbV906OuPJorbHF3MnXtP1XFZulqXpJYPGaCyHRARd1F79
-         K9nA==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b7uq7+6FJUtCM5yZaRMCgjXsjZDgsouXY7vk22+ZXIs=;
+        b=XDgeZyKDTKKipX+i2aGyHNi3s+8pnkpnMI12cgPv4ojpprE+Fg9YnzSmNNsXX8HfJj
+         iQbxfEndlSN9abt6doem7fwJJXekYak3qgfa1e23bo7K9164k5zp7hw1o60qcSIVJ2w5
+         drYOm4FQw/MYk0vW8prIJdruby48uiOoct5SUhO7BjVnv3fPIL/h5KidH0sDSufi9qzW
+         DpKq7TkYLamfrhWnqBMaBIHpEeY/o280to+UOlNzldbdEpoWBRgZHLGKJS+Sk0rLiOz7
+         ZRGobOy+GEWhz0thGXVb31D7vBrs3byLm/297DioRssWpXwKLAWCIyi89HRJVJim6mxZ
+         BR6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KlOYR8Qeaq/wAWJ2lzry+Znm/MJL+cQ3Uz2M02gh7/0=;
-        b=imStWcqMUqt7p89Qjj0lU5pzSk2x/z4ibFy2FbRc1FgmxtQqcNeo3dohj5FsyxUzMO
-         3GtK7cM+us3d9ziPkvZlMbhxOUWgVkE7PCF63PklgdYVH3QpjFpgRXxXioMeoHXpVVV+
-         ZJdgJ1F14nrEH1XFeOhfrbzu73u76V/hs5WsQjjCTTAJFg8BKDJMtMDEprkZ2KSa+qhk
-         hTWEevgrW4VdkiMhZRNrSwGc92akFzbqh9I24zvGJj2Bs7xTY2UVvAo0VPT0P9/pqZyi
-         EIirbBhANrpqB/zDhJ2Jt8bdsUzZPe3869nRSasdGfWF2WmG4VHKCox+RIyOUDY3HV4J
-         E6uw==
-X-Gm-Message-State: ACrzQf19bRW/UEeB8c5NHWaqNwof8ZCs2xVc0pjD0ebh7j7Pi7Uejokw
-        DNrta7JD2ixziqCxGxno4Guzz9szN8CjAg==
-X-Google-Smtp-Source: AMsMyM5etykfcW5k30jMkENKo1eiw1lShVx8g9YmBw++NvnwE1Hadmw44LHYGhAEJipO4RIzpj4B6vBrDxYQmA==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b7uq7+6FJUtCM5yZaRMCgjXsjZDgsouXY7vk22+ZXIs=;
+        b=TTnSdC7GlkyGu24Yr0+rYgyUiM9c3em5/x/A3Hq7RfghtfYD5DGM3d7orP9JRVmCoR
+         W3LAkWh8CoLr541Q7R3x4uMHzoRQXZ5L8mQF4hVt0CfrX1evhRpKNUjxfBL+2qaCLt77
+         rtPQSGYeR7vWncS7ROxtNCOrlNZ3HvpQQGpW6mZ+GOCxFk3YacjrjEPOrT7phpPTw2Pb
+         RyexEYkZiieF92JCSp9n98zv4Vq+u26hYp4fChxDXva8SfJ7ij7B1hINylHw+Zkv6k3D
+         Qwk1lC6a6D7rq4lUFKcn45G1Fh2Cj9p8jOL3ZluzXKGOqfHKi5Hzh1SRJjSPgBjEAvuN
+         TrXA==
+X-Gm-Message-State: ACrzQf0d/Vpi8Nl26Yz3OyNf7BCJ7dJUaw+ORjefPDDvXWtJeClXgSra
+        Zj1Nmlojxd4gMCOFJ1impwROgXFIyyg+iw==
+X-Google-Smtp-Source: AMsMyM6ztd9xyXefhdqKbXs4TQ/5pf47M9ZV5C6tp0cuCubpRbzjdpMp5DlM5P9ogxJwG548M2iggV6hX5AAZA==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a81:5455:0:b0:350:6625:437d with SMTP id
- i82-20020a815455000000b003506625437dmr23598077ywb.326.1667414817531; Wed, 02
- Nov 2022 11:46:57 -0700 (PDT)
-Date:   Wed,  2 Nov 2022 11:46:44 -0700
+ (user=dmatlack job=sendgmr) by 2002:a5b:f4e:0:b0:6bc:9f5a:96f0 with SMTP id
+ y14-20020a5b0f4e000000b006bc9f5a96f0mr177191ybr.10.1667414819125; Wed, 02 Nov
+ 2022 11:46:59 -0700 (PDT)
+Date:   Wed,  2 Nov 2022 11:46:45 -0700
+In-Reply-To: <20221102184654.282799-1-dmatlack@google.com>
 Mime-Version: 1.0
+References: <20221102184654.282799-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221102184654.282799-1-dmatlack@google.com>
-Subject: [PATCH v4 00/10] KVM: selftests: Fix and clean up emulator_error_test
+Message-ID: <20221102184654.282799-2-dmatlack@google.com>
+Subject: [PATCH v4 01/10] KVM: selftests: Rename emulator_error_test to smaller_maxphyaddr_emulation_test
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -73,68 +75,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Miscellaneous fixes and cleanups to emulator_error_test. The reason I
-started looking at this test is because it fails when TDP is disabled,
-which pollutes my test results wheneveer I am testing a new series for
-upstream.
+Rename emulator_error_test to smaller_maxphyaddr_emulation_test and
+update the comment at the top of the file to document that this is
+explicitly a test to validate that KVM emulates instructions in response
+to an EPT violation when emulating a smaller MAXPHYADDR.
 
-v4:
- - Collect more R-b tags from Sean.
- - Assert no #PF when TDP is enabled [Sean]
- - Avoid 'we' pronoun in commit message [Sean]
- - Bundle assert+skip in one function [Sean]
+Signed-off-by: David Matlack <dmatlack@google.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/.gitignore                         | 2 +-
+ tools/testing/selftests/kvm/Makefile                           | 2 +-
+ ...ulator_error_test.c => smaller_maxphyaddr_emulation_test.c} | 3 ++-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+ rename tools/testing/selftests/kvm/x86_64/{emulator_error_test.c => smaller_maxphyaddr_emulation_test.c} (97%)
 
-v3: https://lore.kernel.org/kvm/20221031180045.3581757-1-dmatlack@google.com/
- - Collect R-b tags from Sean.
- - Drop ModR/M decoding in favor of hard-coded instruction [Sean]
- - Fix gspurious gcc warning about using uninitialized variable [Sean]
- - Drop assert_ucall_done() helper [Sean]
- - Spelling fixes [Sean]
- - Use kvm_asm_safe*() to check #PF(RSVD) instead of an exception
-   handler [Sean]
-
-v2: https://lore.kernel.org/kvm/20221018214612.3445074-1-dmatlack@google.com/
- - Split emulator_error_test into 2 separate tests to ensure continued
-   test coverage of KVM emulation in response to EPT violations when
-   "allow_smaller_maxphyaddr && guest.MAXPHYADDR < host.MAXPHADDR".  [Sean]
- - Test that flds generates #PF(RSVD) when TDP is disabled [Sean]
-
-v1: https://lore.kernel.org/kvm/20220929204708.2548375-1-dmatlack@google.com/
-
-David Matlack (8):
-  KVM: selftests: Rename emulator_error_test to
-    smaller_maxphyaddr_emulation_test
-  KVM: selftests: Explicitly require instructions bytes
-  KVM: selftests: Delete dead ucall code
-  KVM: selftests: Move flds instruction emulation failure handling to
-    header
-  KVM: x86/mmu: Use BIT{,_ULL}() for PFERR masks
-  KVM: selftests: Copy KVM PFERR masks into selftests
-  KVM: selftests: Expect #PF(RSVD) when TDP is disabled
-  KVM: selftests: Add a test for KVM_CAP_EXIT_ON_EMULATION_FAILURE
-
-Sean Christopherson (2):
-  KVM: selftests: Avoid JMP in non-faulting path of KVM_ASM_SAFE()
-  KVM: selftests: Provide error code as a KVM_ASM_SAFE() output
-
- arch/x86/include/asm/kvm_host.h               |  20 +-
- tools/testing/selftests/kvm/.gitignore        |   3 +-
- tools/testing/selftests/kvm/Makefile          |   3 +-
- .../selftests/kvm/include/x86_64/processor.h  |  66 ++++--
- .../selftests/kvm/lib/x86_64/processor.c      |   1 +
- .../kvm/x86_64/emulator_error_test.c          | 193 ------------------
- .../x86_64/exit_on_emulation_failure_test.c   |  45 ++++
- .../selftests/kvm/x86_64/flds_emulation.h     |  55 +++++
- .../selftests/kvm/x86_64/hyperv_features.c    |   3 +-
- .../smaller_maxphyaddr_emulation_test.c       | 112 ++++++++++
- 10 files changed, 280 insertions(+), 221 deletions(-)
- delete mode 100644 tools/testing/selftests/kvm/x86_64/emulator_error_test.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/flds_emulation.h
- create mode 100644 tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-
-
-base-commit: d5af637323dd156bad071a3f8fc0d7166cca1276
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 2f0d705db9db..053e5d34cd03 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -17,7 +17,6 @@
+ /x86_64/cr4_cpuid_sync_test
+ /x86_64/debug_regs
+ /x86_64/evmcs_test
+-/x86_64/emulator_error_test
+ /x86_64/fix_hypercall_test
+ /x86_64/get_msr_index_features
+ /x86_64/kvm_clock_test
+@@ -36,6 +35,7 @@
+ /x86_64/set_boot_cpu_id
+ /x86_64/set_sregs_test
+ /x86_64/sev_migrate_tests
++/x86_64/smaller_maxphyaddr_emulation_test
+ /x86_64/smm_test
+ /x86_64/state_test
+ /x86_64/svm_vmcall_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 0172eb6cb6ee..ab133b731a2d 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -81,7 +81,6 @@ TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
+ TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
+ TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
+ TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
+-TEST_GEN_PROGS_x86_64 += x86_64/emulator_error_test
+ TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+@@ -96,6 +95,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
+ TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
+ TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
+ TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
++TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
+ TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+ TEST_GEN_PROGS_x86_64 += x86_64/state_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
+diff --git a/tools/testing/selftests/kvm/x86_64/emulator_error_test.c b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
+similarity index 97%
+rename from tools/testing/selftests/kvm/x86_64/emulator_error_test.c
+rename to tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
+index 236e11755ba6..6ed996988a5a 100644
+--- a/tools/testing/selftests/kvm/x86_64/emulator_error_test.c
++++ b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
+@@ -2,7 +2,8 @@
+ /*
+  * Copyright (C) 2020, Google LLC.
+  *
+- * Tests for KVM_CAP_EXIT_ON_EMULATION_FAILURE capability.
++ * Test that KVM emulates instructions in response to EPT violations when
++ * allow_smaller_maxphyaddr is enabled and guest.MAXPHYADDR < host.MAXPHYADDR.
+  */
+ 
+ #define _GNU_SOURCE /* for program_invocation_short_name */
 -- 
 2.38.1.273.g43a17bfeac-goog
 
