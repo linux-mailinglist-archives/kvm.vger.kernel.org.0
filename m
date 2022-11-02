@@ -2,70 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67BB6616DE8
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 20:39:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7AC7616DF5
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 20:47:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230045AbiKBTjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 15:39:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53210 "EHLO
+        id S230102AbiKBTr1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 15:47:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229534AbiKBTjq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 15:39:46 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FDF610D9
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 12:39:45 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id p15-20020a17090a348f00b002141615576dso3067059pjb.4
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 12:39:45 -0700 (PDT)
+        with ESMTP id S229709AbiKBTr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 15:47:26 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAC84F5B7
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 12:47:24 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id g24so17583514plq.3
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 12:47:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Oy/+InM7thBp0kwixsoFXfh5sgFzh+UFZjFGkPyLYAQ=;
-        b=AlcBvu+Y8a9n0rxdCd7zQ9e17/IgiXWiW1brOwB5ZbqKr0SLoquafVF2YULPC3vlet
-         uSvOds2cnLBsHxmhHE7ndhPTYL5pauSfC7xzaQss2UczgTV3VYIG6/OP33iqNuAJKL+d
-         LvWvNA2iJGJPbsOQpB/Dji8i51YZCf6Q/ISjFxFbxFbku9lnCGmjRd0Dgdx9WZGItFV/
-         2AiTf+3QkbGxpIrmP/8lnU62kw9iNvAiIoGPBkKzwLwHrqSFwtZxTIHgIhpOED9s7cKB
-         3c4cmTHomEsxZCom4U2kcddeyipmi4giT/3jA5bvxdMV/McfpAXZhOh+lEB408GUCwPX
-         AW1w==
+        bh=XZUg37uJOYfpvjSeVnjDTPG9wFYr/ltSGt4/E37UDaE=;
+        b=T6n+ZNy6EJsuUFK142/EHb28MY0RHQS0F3csirBX1F4szkFH3Oa1GmcjrbMzMqlehR
+         PvjsJwJm7zQIiFKAQ+k5bRqj3r5MNjpdC5QRkWxNtnvQEVAEPB0xpqh4V/qBgfoZFH/0
+         X3Dr4HnK3V1IBtSh/4vfOTaOu0DmXUFWj6fWoc4wVthF+lGODGd5TBZPkeQhh2JpHeyp
+         ZJoFYF8I+pq6CfhphcrQl+pAJSgexA1ATjhi8/HGr0ViJe2DXVkDmdTX0/O3PAlo5tHC
+         1qsWaUE1rHB77yvUEvxqLKB8XZrzBsq5tHtS1s84o8MbSlwJZiAU4a0qutIvlFqV3sub
+         sUAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Oy/+InM7thBp0kwixsoFXfh5sgFzh+UFZjFGkPyLYAQ=;
-        b=2/9xzOabIKeNuqkVUlCUEdCakfn19TYZBwxMWC00Cy7qpx+4osKNs4MI8lJ89kkIHm
-         Y5SDz8qmOTtf7+/cPKf3muNqEpc/OPR93zPQduc7ZCevlc9KrE4m3nUXrA5vap56eo4W
-         VTkHcPXG3lfhjEfkUj88w1IDRVeOhBZsCYu2SkyhEGWZN0lQvxWI8GWMHwzkzljRtTsb
-         A8ZLiP6hzIefRpkLrd7+XYAswZyOYumsdLpQwUZ+kgUR4xu+Nev5n+v6I40eYrtu5dHX
-         XZwSsOuItH20h6dPD6IHB94f8JkJL1jDeYE/EFyr4W4eGQ9MJes4SFkjBpYTSYXEqSS/
-         OT3Q==
-X-Gm-Message-State: ACrzQf21YYleNjsjFjvyCSWt4f5HTgra3UtLAAFLhp/GSNWoP9Y0qDs5
-        1VYQvZ8Np2l1Ii9NM0axBLRFxQ==
-X-Google-Smtp-Source: AMsMyM4nTTPc3fRpd+P93lNOuXEOQVEyD2E+BsPyWFnexxUNkM1wQSGyy2pTEo93wVPY4+XonbOyww==
-X-Received: by 2002:a17:90b:3144:b0:215:db2e:bc6e with SMTP id ip4-20020a17090b314400b00215db2ebc6emr1492273pjb.12.1667417984739;
-        Wed, 02 Nov 2022 12:39:44 -0700 (PDT)
+        bh=XZUg37uJOYfpvjSeVnjDTPG9wFYr/ltSGt4/E37UDaE=;
+        b=7wZqM/mkTsbirj3+9M6BSrOf7xXMwcxUhfU8BvDaTImLLuVQjP+F7tyUDC21aoU/5w
+         GCk2gGicd2FLNsmQdI4YlfsTi5BkusgY5y7+gLozwn+K//DS5OTVhnhIWMOtN+T+9ESy
+         zSWCgdfKyGw2nipFk/aE84gefbHt2WzswLVjhrq67RoLQbKwOZomifwZW9vZ3KydLYIX
+         8dKQA25r9TlKoRbn4YjuGdnrp0cGCDR78XdSuAhikSBRBSZJZ1bcmPprXjtgv6Rh2JwJ
+         Ha6QaskrhaemFzWtWvFPyYPOJAEXiPo3hmYRzN954YKxm4Z0rYoh2z1NCCHJ0TstpHqW
+         3jLg==
+X-Gm-Message-State: ACrzQf3PL604kTyi3490Y1lKMgbUyn2AlePkRCDscNgdNxqYEwc8rVX1
+        E2kgCWtOYlU24EhU4XotactqiUksKiR9SQ==
+X-Google-Smtp-Source: AMsMyM7oyCdBbkPZUPhhDvi7k1UptHvFb1HUn9nf2o5jtHc+LvzTsYv4dx5WGGQHkKa1hX1esfULbw==
+X-Received: by 2002:a17:902:f686:b0:187:16a0:fd2b with SMTP id l6-20020a170902f68600b0018716a0fd2bmr20793406plg.91.1667418444372;
+        Wed, 02 Nov 2022 12:47:24 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id w2-20020aa79542000000b0054ee4b632dasm8813384pfq.169.2022.11.02.12.39.44
+        by smtp.gmail.com with ESMTPSA id h18-20020a63df52000000b00434272fe870sm7937729pgj.88.2022.11.02.12.47.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 12:39:44 -0700 (PDT)
-Date:   Wed, 2 Nov 2022 19:39:40 +0000
+        Wed, 02 Nov 2022 12:47:24 -0700 (PDT)
+Date:   Wed, 2 Nov 2022 19:47:20 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Bo Liu <liubo03@inspur.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: replace DEFINE_SIMPLE_ATTRIBUTE with
- DEFINE_DEBUGFS_ATTRIBUTE
-Message-ID: <Y2LHfJYjd1PxPVQq@google.com>
-References: <20221101072506.7307-1-liubo03@inspur.com>
- <c0b98151-16b6-6d8f-1765-0f7d46682d60@redhat.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Anish Ghulati <aghulati@google.com>
+Subject: Re: [PATCH] KVM: x86: Use SRCU to protect zap in
+ __kvm_set_or_clear_apicv_inhibit
+Message-ID: <Y2LJSE5nuHZJV7fF@google.com>
+References: <20221102193020.1091939-1-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c0b98151-16b6-6d8f-1765-0f7d46682d60@redhat.com>
+In-Reply-To: <20221102193020.1091939-1-bgardon@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,54 +74,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 02, 2022, Paolo Bonzini wrote:
-> On 11/1/22 08:25, Bo Liu wrote:
-> > Fix the following coccicheck warning:
-> >    virt/kvm/kvm_main.c:3847:0-23: WARNING
-> >      vcpu_get_pid_fops should be defined with DEFINE_DEBUGFS_ATTRIBUTE
-> > 
-> > Signed-off-by: Bo Liu <liubo03@inspur.com>
-> > ---
-> >   virt/kvm/kvm_main.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index f1df24c2bc84..3f383f27d3d7 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -3844,7 +3844,7 @@ static int vcpu_get_pid(void *data, u64 *val)
-> >   	return 0;
-> >   }
-> > -DEFINE_SIMPLE_ATTRIBUTE(vcpu_get_pid_fops, vcpu_get_pid, NULL, "%llu\n");
-> > +DEFINE_DEBUGFS_ATTRIBUTE(vcpu_get_pid_fops, vcpu_get_pid, NULL, "%llu\n");
-> >   static void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
-> >   {
-> 
-> If you really wanted to do this, you would also have to replace
-> debugfs_create_file with debugfs_create_file_unsafe.
-> 
-> However, this is not a good idea.  The rationale in the .cocci file is that
-> "DEFINE_SIMPLE_ATTRIBUTE + debugfs_create_file() imposes some significant
-> overhead", but this should not really be relevant for a debugfs file.
-> 
-> Such a patch would only make sense if there was a version of
-> debugfs_create_file_unsafe() with a less-terrible name (e.g.
-> debugfs_create_simple_attr?), which could _only_ be used with fops created
-> by DEFINE_DEBUGFS_ATTRIBUTE.  Without such a type-safe trick, the .cocci
-> file is only adding confusion to perfectly fine code.
+On Wed, Nov 02, 2022, Ben Gardon wrote:
+> kvm_zap_gfn_range must be called in an SRCU read-critical section, but
 
-Heh, some serious deja vu here[1].  This is the second case of identical, flawed
-patches being sent in response to misguided coccinelle warnings in a rather short
-amount of time, the "return min(r, 0)" horror being the other case[2][3].
+Please add parantheses when referencing functions, i.e. kvm_zap_gfn_range().
 
-The min() thing is supposed to be fixed by commit aeb300c1dbfc ("coccinelle: misc:
-minmax: suppress patch generation for err returns").  Is that patch broken, or are
-folks just running old scripts?
+> there is no SRCU annotation in __kvm_set_or_clear_apicv_inhibit.
 
-As for the DEFINE_DEBUGFS_ATTRIBUTE check, can that warning be downgraded (is that
-even a thing?) or even deleted?  As much as I enjoyed the opportunity to learn more
-about debugfs, the unnecessary confusion and wasted time was/is annoying.
+__kvm_set_or_clear_apicv_inhibit()
 
-[1] https://lore.kernel.org/all/Yxoo1A2fmlAWruyV@google.com
-[2] https://lore.kernel.org/all/8881d7b4-0c31-cafd-1158-0d42c1c7f43a@redhat.com
-[3] https://lore.kernel.org/all/d8a518c4a4014307b30020b38022d633@AcuMS.aculab.com
+> Add the needed SRCU annotation.
+
+It's not an annotation, acquiring SRCU is very much functional code.
+
+> Tested: ran tools/testing/selftests/kvm/x86_64/debug_regs on a DBG
+> 	build. This patch causes the suspicious RCU warning to disappear.
+> 	Note that the warning is hit in __kvm_zap_rmaps, so
+> 	kvm_memslots_have_rmaps must return true in order for this to
+> 	repro (i.e. the TDP MMU must be off or nesting in use.)
+
+Please provide the stack trace or at least a verbal description of what paths
+can reach __kvm_set_or_clear_apicv_inhibit() without holding SRCU, i.e. explain
+why this bug isn't being hit left and right.
+
+E.g.
+
+  Unconditionally take KVM's SRCU lock in __kvm_set_or_clear_apicv_inhibit()
+  when zapping virtual APIC SPTEs.  SRCU must be held when zapping SPTEs in
+  shadow MMUs to protect the gfn=>memslot translation (the TDP MMU walks all
+  roots and so doesn't dereference memslots).
+
+  In most cases, the inhibits are updated during KVM_RUN and so SRCU is
+  already held, but other ioctls() can also modify inhibits and don't
+  acquire SRCU, e.g. KVM_SET_GUEST_DEBUG and KVM_SET_LAPIC.  Acquire SRCU
+  unconditionally to avoid playing whack-a-mole, as nesting SRCU locks is
+  safe and this is not a hot path.
+
+> Fixes: 36222b117e36 ("KVM: x86: don't disable APICv memslot when inhibited")
+
+Reported-by?  IIRC this originated in a syzkaller report?
