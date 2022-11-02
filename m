@@ -2,123 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B43F616A1D
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 18:10:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 96678616A72
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 18:18:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230242AbiKBRKm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 13:10:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35988 "EHLO
+        id S231223AbiKBRSv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 13:18:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230489AbiKBRKi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 13:10:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15F7615707
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 10:09:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667408984;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=akfUnKDkyHdw6CJdXMPMOatfFRUJHL9zU65unIR/pRQ=;
-        b=Cb8Fom359NMRfeE7lkonvw3OiO3D1Yk9OvRsEVLCM5gaHWG+/9icCP9aWRF08vOZ/9V+ZC
-        md9b5NiNrwQF4nfrrwCnTxxUaMo5r2IBUdFjRdnzaoVQ1PMmQxRNEN5NDA/VapHCMUCn2P
-        stt6E6VRnM/tgZfigRE91XYIuC2jAVM=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-616-MnQaqlNmPxywmn9jy9RFyg-1; Wed, 02 Nov 2022 13:09:38 -0400
-X-MC-Unique: MnQaqlNmPxywmn9jy9RFyg-1
-Received: by mail-ej1-f72.google.com with SMTP id qk31-20020a1709077f9f00b00791a3e02c80so10506974ejc.21
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 10:09:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=akfUnKDkyHdw6CJdXMPMOatfFRUJHL9zU65unIR/pRQ=;
-        b=mNQ8IoRN5VhOC7TZDBnNc2NugfRclmH5EK0BOVajiqvVjRijfyAW0XeydjKdihnSWs
-         POpmuji9SNAnlYnt6Y1KN8OzkGqJsNpsXCX0X0U7Hubl2Ocqxq/QHzlLVZbeGJe1hoO3
-         7zBstHcAUT3Y5iYoRgMFR+E4efb6Ilyf9AlPWZeFlS90m7JvmaMH2wykT5KN6nj392JD
-         b/+0EyeaHFAawg/4bfqIPwN0X63WNTGiyl5knEsH3+x3Hfhq/RnhYOmjZo92GB0GPXYX
-         GI4SjDOyii0DU1MCN2Mnoh4Z1asaYvDw4Envr4hfp1eDH7QldPBWfwbSNsYbkOBwVjxh
-         YB1g==
-X-Gm-Message-State: ACrzQf1Ozt7T62vU7Prc7gl98DFmJLfnK9HtcEQCepdQxUwSUI2ROmRM
-        reHP8qjRU7i9QTumt0qe56Qb7pQJdOkcqA6AynzQJH6ixtpeZjHVPZ0W/Hc6pMIvayvRIwoFtyj
-        GIqG/Ml7vQcTR
-X-Received: by 2002:a17:907:7637:b0:7ad:b869:2cc7 with SMTP id jy23-20020a170907763700b007adb8692cc7mr21604644ejc.159.1667408975458;
-        Wed, 02 Nov 2022 10:09:35 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4CJLxtMqHbz1dMFAFk5cy6mkFthnGD4URcLfuOlCKz7waWk6cxJDJ+bDTplU/SPtJT3rD+og==
-X-Received: by 2002:a17:907:7637:b0:7ad:b869:2cc7 with SMTP id jy23-20020a170907763700b007adb8692cc7mr21604628ejc.159.1667408975209;
-        Wed, 02 Nov 2022 10:09:35 -0700 (PDT)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id ku11-20020a170907788b00b0078ba492db81sm5631647ejc.9.2022.11.02.10.09.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Nov 2022 10:09:34 -0700 (PDT)
-Message-ID: <19d25f07-a9b8-cc88-cc0a-290e95c71bd7@redhat.com>
-Date:   Wed, 2 Nov 2022 18:09:33 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH v4 0/5] MSR filtering and MSR exiting flag clean up
-Content-Language: en-US
-To:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
-Cc:     jmattson@google.com, seanjc@google.com
-References: <20220921151525.904162-1-aaronlewis@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220921151525.904162-1-aaronlewis@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231140AbiKBRSs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 13:18:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C20124084
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 10:18:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EF9AD617D1
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 17:18:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D25BC43470;
+        Wed,  2 Nov 2022 17:18:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667409526;
+        bh=t+XSBxtVm4q9uEvwXkO3w2nATlENacHRnZp9Kw64sVY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=SJPUcexlv421RPT+uRVF0crG2rJQiWSpTV1vdBlet0+AtWLXczUGTXKN8LX7Js6cn
+         DPb4xPebyXZ1YeRkNgP9UaxZc3xhJiSATVIlqb1EhuIwjH3H146Ozr5rBlaF849DjU
+         QFJdZL7bcQgl1KelgspQQXuIOTmie2sWx9VysiZCS+KQaRBagHiMafBRpAUB9M2Ncc
+         hUOOmNExwM5PGT68Vsvhs3jKw5fqharoRp/kqMGIDt8X623JPzoewufqUesK185lzx
+         2TWkDpAQ+IRcWsrcOm8Tji6cur065LjgqbHkDw6VCkRsaSe71BXKKl6NVlH03W4m01
+         kZSMzNHvRyEUw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oqHO0-003H7v-4L;
+        Wed, 02 Nov 2022 17:18:44 +0000
+Date:   Wed, 02 Nov 2022 17:18:13 +0000
+Message-ID: <87y1stff6y.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        andrew.jones@linux.dev, ajones@ventanamicro.com,
+        bgardon@google.com, catalin.marinas@arm.com, dmatlack@google.com,
+        will@kernel.org, pbonzini@redhat.com, peterx@redhat.com,
+        seanjc@google.com, james.morse@arm.com, shuah@kernel.org,
+        suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+        zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v7 5/9] KVM: arm64: Improve no-running-vcpu report for dirty ring
+In-Reply-To: <d3a4278a-94e2-7af4-da2d-946c903d8825@redhat.com>
+References: <20221031003621.164306-1-gshan@redhat.com>
+        <20221031003621.164306-6-gshan@redhat.com>
+        <Y1+QiS0S3e6b358Q@google.com>
+        <d3a4278a-94e2-7af4-da2d-946c903d8825@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com, catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org, pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com, james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/21/22 17:15, Aaron Lewis wrote:
-> The changes in this series were intended to be accepted at the same time as
-> commit cf5029d5dd7c ("KVM: x86: Protect the unused bits in MSR exiting
-> flags").  With that already accepted this series is the rest of the changes
-> that evolved from the code review.  The RFC tag has been removed because
-> that part of the change has already been accepted.  All that's left is the
-> clean up and the selftest.
+On Mon, 31 Oct 2022 23:08:32 +0000,
+Gavin Shan <gshan@redhat.com> wrote:
 > 
-> v3 -> v4
->   - Patches 2 and 3 are new.  They were intended to be a part of commit
->     cf5029d5dd7c ("KVM: x86: Protect the unused bits in MSR exiting flags"),
->     but with that accepted it made sense to split what remained into two.
+>
+> In order to cover Marc's concern, I would introduce a different helper
+> kvm_vgic_save_its_tables_in_progress(), which simply returns
+> 'bool struct vgic_dist::save_its_tables_in_progress'. The newly added
+> field is set and cleared in vgic_its_ctrl(). All these changes will be
+> folded to PATCH[v7 6/9]. Oliver and Marc, could you please let me know
+> if the changes sounds good?
 > 
-> v2 -> v3
->   - Added patch 1/4 to prevent the kernel from using the flag
->     KVM_MSR_FILTER_DEFAULT_ALLOW.
->   - Cleaned up the selftest code based on feedback.
-> 
-> v1 -> v2
->   - Added valid masks KVM_MSR_FILTER_VALID_MASK and
->     KVM_MSR_EXIT_REASON_VALID_MASK.
->   - Added patch 2/3 to add valid mask KVM_MSR_FILTER_RANGE_VALID_MASK, and
->     use it.
->   - Added testing to demonstrate flag protection when calling the ioctl for
->     KVM_X86_SET_MSR_FILTER or KVM_CAP_X86_USER_SPACE_MSR.
-> 
-> Aaron Lewis (5):
->    KVM: x86: Disallow the use of KVM_MSR_FILTER_DEFAULT_ALLOW in the kernel
->    KVM: x86: Add a VALID_MASK for the MSR exit reason flags
->    KVM: x86: Add a VALID_MASK for the flag in kvm_msr_filter
->    KVM: x86: Add a VALID_MASK for the flags in kvm_msr_filter_range
->    selftests: kvm/x86: Test the flags in MSR filtering and MSR exiting
-> 
->   arch/x86/include/uapi/asm/kvm.h               |  5 ++
->   arch/x86/kvm/x86.c                            |  8 +-
->   include/uapi/linux/kvm.h                      |  3 +
->   .../kvm/x86_64/userspace_msr_exit_test.c      | 85 +++++++++++++++++++
->   4 files changed, 96 insertions(+), 5 deletions(-)
+>    static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
+>    {
+>        const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+>        struct vgic_dist *dist = &kvm->arch.vgic;
+>        int ret = 0;
+>          :
+>        switch (attr) {
+>        case KVM_DEV_ARM_ITS_CTRL_RESET:
+>             vgic_its_reset(kvm, its);
+>             break;
+>        case KVM_DEV_ARM_ITS_SAVE_TABLES:
+>             dist->save_its_tables_in_progress = true;
+>             ret = abi->save_tables(its);
+>             dist->save_its_tables_in_progress = false;
+>             break;
+>        case KVM_DEV_ARM_ITS_RESTORE_TABLES:
+>             ret = abi->restore_tables(its);
+>             break;
+>        }
+>        :
+>     }
 
-Queued, thanks.
+Yes, this is the sort of thing I had in mind. This should make the
+whole patch rather trivial, and you could implement
+kvm_arch_allow_write_without_running_vcpu() as returning this flag.
 
-Paolo
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
