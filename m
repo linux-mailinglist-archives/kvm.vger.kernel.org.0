@@ -2,202 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 476826166C9
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 17:00:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A9C1616701
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 17:04:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231153AbiKBQA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 12:00:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39414 "EHLO
+        id S230348AbiKBQEZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 12:04:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230427AbiKBQAT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 12:00:19 -0400
-Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5228E2C134
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 09:00:18 -0700 (PDT)
-Received: by mail-il1-x14a.google.com with SMTP id s15-20020a056e02216f00b00300d14ba82bso1537931ilv.5
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 09:00:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NUyMNnyD6Vd9kmq5WeePMbPGyZVCujZMExzub8EbTbU=;
-        b=YqOPubMkKPWJJ/e3faDypXJGO3b4lCjBI/3C8q8uJ+RJbtshzDb7Bnrgg/y+eDV5vN
-         NqKJJCm8NmnrHcOig/T9gf9tOFVQdmp2h02puzQpuaKeU4PeNczi24ysB5yXsXRMWnoQ
-         9S0Tcf1WN4qcccxZhO7pzVuw+ozSNrucziBhlG0Z1a1ax4+2YL3yFE3uZs7/auYcy598
-         UvDAfNsuK3rUHWfhsi7tqTaDuWS5sVGwKKk9mYaxDNRL+xAxmMuam5LHbSR9UJAGXrmF
-         DT0Zg2WoRFYsA7l5u6niwa/ETl0BoiG82yC+r6sIpT5URozLof2XKIJjxGb8p8SJUFTY
-         i6Gw==
+        with ESMTP id S231214AbiKBQD7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 12:03:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0429A2CC8E
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 09:02:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667404961;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=z1zCVGxNa8Dahm8ZhjlrLhv37ZXOWng8ggXjb+LCFNY=;
+        b=BoZLerTGKIiziHBgSBP16stywkK7tJBv00TyxDgVxRJBRANSN/tZGC6kuzSsY7JC2qyILd
+        XtRccQrQBWtM4gYu4n4RbvzhbGp7UVnTB3NVt8y6lBNQRxdbaPkE2E0URpHbT7scArpDfR
+        pvQ4i/tP2Lf3zM6QrK5wdmnvW99QDg8=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-22-ScSEMazONFKdyD6GKw1-VA-1; Wed, 02 Nov 2022 12:02:40 -0400
+X-MC-Unique: ScSEMazONFKdyD6GKw1-VA-1
+Received: by mail-ed1-f70.google.com with SMTP id i17-20020a05640242d100b0044f18a5379aso12633848edc.21
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 09:02:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NUyMNnyD6Vd9kmq5WeePMbPGyZVCujZMExzub8EbTbU=;
-        b=6tjzAJCwb/r84UHIZwr6/0BWGh/V31QrxppkWrAJ8wUebfMtsQpvGkigWfXmR4dtJT
-         BeBVKhihB8J6QwcrzyGD6398fpqnQ1w3OymdzY/lkzqZthaSrCE2U0Eb6RJAZEi1MVlc
-         PLf/e6ENokGA+Khn7E6LzL9q9IIyVwl2JekoepZeJYolKTg1zDLpRWcDIxsoM7YrLGPa
-         Xi8eavZ0X09OT5magIu7M6zurS/x8ppBNTwg6i8gZfnNjTEaqxDr4iksKO2MjRliRdP7
-         lgBp2knQtZuPbMA1b6WMjdURLhPsZbhZHYSNkKzRS5Vo6jVGj1xxOpDiFGYg0lPy5/2V
-         +Miw==
-X-Gm-Message-State: ACrzQf26INsaSYBgheqSLS5FM+Ll2XY/1mEwCmyjGIhEueQ0QcsTn3ON
-        f0eBVbW5eui/t8ruYeX2TpwVIFNLY2KQerH2HtRJhsmgZnBwbqfUO5qKpgik16jPgRuiyA1+m3R
-        55Tn6cTeis2Fnyx4WFnbgVwYcP28duey8YB9CC57kQmGCf5WJSH2NbbkSRgJ8CVcExx+3F58=
-X-Google-Smtp-Source: AMsMyM4n/1opFc5Ke/R+WJu3Mj6/h0tA49JogeuQjy+R16Aj5BAHfRiNDyEFEfLQhkTssnpb94A8cVWYsCEVRVX5zA==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a02:9982:0:b0:364:6be:dbd6 with SMTP
- id a2-20020a029982000000b0036406bedbd6mr16631019jal.311.1667404818010; Wed,
- 02 Nov 2022 09:00:18 -0700 (PDT)
-Date:   Wed,  2 Nov 2022 16:00:07 +0000
-In-Reply-To: <20221102160007.1279193-1-coltonlewis@google.com>
-Mime-Version: 1.0
-References: <20221102160007.1279193-1-coltonlewis@google.com>
-X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221102160007.1279193-5-coltonlewis@google.com>
-Subject: [PATCH v9 4/4] KVM: selftests: randomize page access order
-From:   Colton Lewis <coltonlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
-        seanjc@google.com, oupton@google.com, ricarkol@google.com,
-        Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z1zCVGxNa8Dahm8ZhjlrLhv37ZXOWng8ggXjb+LCFNY=;
+        b=VyhZLHs4QX1OdLwuTnCB1KymFJN0OydSdJlS+PtgR3y/wmu5ypGiAkIOik2MuNirzg
+         ZCArGzw4pGU38SHABmHnAv3bMJZNK94u4vapq0WeXLtW+vspdx1ggUNo0LGg1wix55lA
+         sA4p0QgB1hTr3ldR5gkDto2r+96YZrZOW08yb5h5j4oHqC+wyVLCUWyTwdOjqjTzjkTF
+         Ot8alfLL8t+xT7UQ05ShgeACz1tajSGXkzwdxQ+kvb+bOpMW20Heo2OxSEby4fwai0rP
+         zMsJan19MONHTbrokVhecgH36bXCZ+k8Tai1YcDAf5VqKR8AowrIEDqXKjTq2sk+NhJb
+         ADaA==
+X-Gm-Message-State: ACrzQf0na3cXFk4D5J3Itv4x3/Z67NjMY45Imo3P00UofXxuauLYKGSc
+        IGEVCL0xEPnUKMgDYCdqFjqxb6nwIRzMBk1symlf/WEHvfg2ji4t/JLoSCIrvx7+adI28cKKlkp
+        UeiZTowg7nWA2
+X-Received: by 2002:a05:6402:1842:b0:461:59b6:3f1b with SMTP id v2-20020a056402184200b0046159b63f1bmr25549690edy.308.1667404959269;
+        Wed, 02 Nov 2022 09:02:39 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5YtvJPapFSkugwcKMzw/qQFwaodPj4fnR6aRTvMeSgOW9u/Jhki1J4UlEhl9h9Ittg6jov7Q==
+X-Received: by 2002:a05:6402:1842:b0:461:59b6:3f1b with SMTP id v2-20020a056402184200b0046159b63f1bmr25549663edy.308.1667404959083;
+        Wed, 02 Nov 2022 09:02:39 -0700 (PDT)
+Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
+        by smtp.googlemail.com with ESMTPSA id f16-20020a056402069000b00459cd13fd34sm1401714edy.85.2022.11.02.09.02.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Nov 2022 09:02:37 -0700 (PDT)
+Message-ID: <cd7fcdec-bf2c-ca27-4355-ce56ab9538d9@redhat.com>
+Date:   Wed, 2 Nov 2022 17:02:36 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 6/7] KVM: SVM: move MSR_IA32_SPEC_CTRL save/restore to
+ assembly
+Content-Language: en-US
+To:     Josh Poimboeuf <jpoimboe@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        jmattson@google.com, seanjc@google.com
+References: <20221028230723.3254250-1-pbonzini@redhat.com>
+ <20221028230723.3254250-7-pbonzini@redhat.com>
+ <20221102152814.lmuzib5472zsaroy@treble>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20221102152814.lmuzib5472zsaroy@treble>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Create the ability to randomize page access order with the -a
-argument. This includes the possibility that the same pages may be hit
-multiple times during an iteration or not at all.
+On 11/2/22 16:28, Josh Poimboeuf wrote:
+> On Fri, Oct 28, 2022 at 07:07:22PM -0400, Paolo Bonzini wrote:
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -3918,10 +3918,21 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
+>>   	struct vcpu_svm *svm = to_svm(vcpu);
+>>   	unsigned long vmcb_pa = svm->current_vmcb->pa;
+>>   
+>> +	/*
+>> +	 * For non-nested case:
+>> +	 * If the L01 MSR bitmap does not intercept the MSR, then we need to
+>> +	 * save it.
+>> +	 *
+>> +	 * For nested case:
+>> +	 * If the L02 MSR bitmap does not intercept the MSR, then we need to
+>> +	 * save it.
+>> +	 */
+>> +	bool spec_ctrl_intercepted = msr_write_intercepted(vcpu, MSR_IA32_SPEC_CTRL);
+> 
+> This triggers a warning:
+> 
+>    vmlinux.o: warning: objtool: svm_vcpu_enter_exit+0x3d: call to svm_msrpm_offset() leaves .noinstr.text section
+> 
+> svm_vcpu_enter_exit() is noinstr, but it's calling
+> msr_write_intercepted() which is not.
 
-Population has random access as false to ensure all pages will be
-touched by population and avoid page faults in late dirty memory that
-would pollute the test results.
+I suspect I didn't see it because it's inlined here, but it has to be 
+fixed indeed.
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- tools/testing/selftests/kvm/dirty_log_perf_test.c | 11 +++++++++--
- .../selftests/kvm/include/perf_test_util.h        |  2 ++
- tools/testing/selftests/kvm/lib/perf_test_util.c  | 15 ++++++++++++++-
- 3 files changed, 25 insertions(+), 3 deletions(-)
+> That's why in the VMX code I did the call to msr_write_intercepted() (in
+> __vmx_vcpu_run_flags) before calling vmx_vcpu_enter_exit().
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index 0d0240041acf..065961943b3d 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -133,6 +133,7 @@ struct test_params {
- 	int slots;
- 	uint32_t write_percent;
- 	uint32_t random_seed;
-+	bool random_access;
- };
- 
- static void toggle_dirty_logging(struct kvm_vm *vm, int slots, bool enable)
-@@ -260,6 +261,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	 * would pollute the performance results.
- 	 */
- 	perf_test_set_write_percent(vm, 100);
-+	perf_test_set_random_access(vm, false);
- 	perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
- 
- 	/* Allow the vCPUs to populate memory */
-@@ -282,6 +284,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		ts_diff.tv_sec, ts_diff.tv_nsec);
- 
- 	perf_test_set_write_percent(vm, p->write_percent);
-+	perf_test_set_random_access(vm, p->random_access);
- 
- 	while (iteration < p->iterations) {
- 		/*
-@@ -365,10 +368,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- static void help(char *name)
- {
- 	puts("");
--	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
-+	printf("usage: %s [-h] [-a] [-i iterations] [-p offset] [-g] "
- 	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-r random seed ] [-s mem type]"
- 	       "[-x memslots] [-w percentage]\n", name);
- 	puts("");
-+	printf(" -a: access memory randomly rather than in order.\n");
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
- 	       TEST_HOST_LOOP_N);
- 	printf(" -g: Do not enable KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2. This\n"
-@@ -422,8 +426,11 @@ int main(int argc, char *argv[])
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "eghi:p:m:nb:v:or:s:x:w:")) != -1) {
-+	while ((opt = getopt(argc, argv, "aeghi:p:m:nb:v:or:s:x:w:")) != -1) {
- 		switch (opt) {
-+		case 'a':
-+			p.random_access = true;
-+			break;
- 		case 'e':
- 			/* 'e' is for evil. */
- 			run_vcpus_while_disabling_dirty_logging = true;
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index 845165001ec8..3d0b75ea866a 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -40,6 +40,7 @@ struct perf_test_args {
- 
- 	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
- 	bool nested;
-+	bool random_access;
- 
- 	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
- };
-@@ -54,6 +55,7 @@ void perf_test_destroy_vm(struct kvm_vm *vm);
- 
- void perf_test_set_write_percent(struct kvm_vm *vm, uint32_t write_percent);
- void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed);
-+void perf_test_set_random_access(struct kvm_vm *vm, bool random_access);
- 
- void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
- void perf_test_join_vcpu_threads(int vcpus);
-diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index 92b47f71a0a5..137be359b09e 100644
---- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-+++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -48,6 +48,8 @@ void perf_test_guest_code(uint32_t vcpu_idx)
- 	struct perf_test_vcpu_args *vcpu_args = &pta->vcpu_args[vcpu_idx];
- 	uint64_t gva;
- 	uint64_t pages;
-+	uint64_t addr;
-+	uint64_t page;
- 	int i;
- 	struct guest_random_state rand_state =
- 		new_guest_random_state(pta->random_seed + vcpu_idx);
-@@ -60,7 +62,12 @@ void perf_test_guest_code(uint32_t vcpu_idx)
- 
- 	while (true) {
- 		for (i = 0; i < pages; i++) {
--			uint64_t addr = gva + (i * pta->guest_page_size);
-+			if (pta->random_access)
-+				page = guest_random_u32(&rand_state) % pages;
-+			else
-+				page = i;
-+
-+			addr = gva + (page * pta->guest_page_size);
- 
- 			if (guest_random_u32(&rand_state) % 100 < pta->write_percent)
- 				*(uint64_t *)addr = 0x0123456789ABCDEF;
-@@ -237,6 +244,12 @@ void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed)
- 	sync_global_to_guest(vm, perf_test_args.random_seed);
- }
- 
-+void perf_test_set_random_access(struct kvm_vm *vm, bool random_access)
-+{
-+	perf_test_args.random_access = random_access;
-+	sync_global_to_guest(vm, perf_test_args.random_access);
-+}
-+
- uint64_t __weak perf_test_nested_pages(int nr_vcpus)
- {
- 	return 0;
--- 
-2.38.1.273.g43a17bfeac-goog
+Yes, it's easy to do the same and do it in svm_vcpu_run().
+
+Paolo
 
