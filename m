@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCA8A6172BE
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 00:37:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCA0C6172C3
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 00:37:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230364AbiKBXhC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 19:37:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52542 "EHLO
+        id S231417AbiKBXhJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 19:37:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231474AbiKBXgc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 19:36:32 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ECBE167D8
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 16:28:28 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id o15-20020a17090aac0f00b00212e93524c0so2507857pjq.2
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 16:28:28 -0700 (PDT)
+        with ESMTP id S231251AbiKBXgi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 19:36:38 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ECCA25283
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 16:28:35 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id o2-20020a5b0502000000b006cade5e7c07so388181ybp.10
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 16:28:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iC0/T0AhLSWTGEIBQBOFB08rB97eCOcnEVK/qTBONrw=;
-        b=tZw/FyIVcLFV6FA43bzdEfF9B7To8LmWA2trx2hUjXhZIwCqyiHS5JPWpTe77VM+Zu
-         A0vvMWIX0mmMQWsuW5gcXP3zUecRsw2cEjV1dUamNxNTGcfF4iz6i7W1YHi7fo209V7r
-         71ruyH5ckKO+X8r5hZ/fgQw9WCkg6P0aeK1P9N3IfL9vGCZY4+40d3hRKxGy6cPRSIcX
-         p9l2yO/RmzfjCYN3NyPDHhIPEt/IJqmX6893+qbHH/TBu0mbukYWgjozBLmpd7BUYWQ7
-         aIkUPatwDmQMh/4L6DZOR53SFEGISgBmptXfdW0zNg5biLNXlqn8WbVsG6doRANl/F7u
-         nS7w==
+        bh=47NN14tzjqb2Jkjp+DZD0PLnkTAdeUGBp2aNHGDmHKU=;
+        b=iExh/fYctDhDT2GR5L2oUQlwBYQkU8U79TQCr7U34lzJZ9FOj4LdJXlk6H96PeM/sy
+         FDYviQAM8Aj4+GPwFBIfX4BIaZQrJxaEgoBet3kygw3fyE3sRYJah6Q+H1flApkDrtSj
+         fmUQwcke74FTSEU5peoNjbJRdIF4gNe27CScm1SR50pWdAAJunYSaPN7lUxk+tkwruyi
+         ZRMo4JarTk/lYV/tukRK3lXXnuEYcUW9AbkLvZLjxbfwMTBeLfacEh44NacfgfTG1HAf
+         S3R4SEL1Cvmr9DjijMEj3K6K4Oa07mMxAIcj28VlWrkl1d8iW/YBgygbgZNAcnUn6ZZH
+         2XIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iC0/T0AhLSWTGEIBQBOFB08rB97eCOcnEVK/qTBONrw=;
-        b=YRrhan3oSd5DPv0GgPyHHexpYOqhVgWal3O3Iv0wWAWh6Xtwi1NvD5e+pKNtGOgxBE
-         KOEFIBPTcsLiVJdiorVklvCE9e5WitirkNEzCBtbepJuvXLRAOjH8OJ6anjDYRFQ9HAv
-         xmfAZVSGTx+YymIeLo8r7XrOjIgMEEuWredUy+eblTSKJ/8hyMKJ+wzaN2it+Iywby1r
-         Kc6hLSBUSl6izJ351kSOimPXxPuLtPyNvF8urNTt2Cr187subs9gD0KKLFLQKa94Jj/k
-         QDn9eRk30d+g45MbLh6PJwKQflGxYbhomUtEV0/2v8ik9DgrJHQt1Rj5PKJmbNUIoB43
-         Whhw==
-X-Gm-Message-State: ACrzQf2HeZVtKjOaKEY3P4ZofaIM3j//CnxJqEX3h2/+DT70AnfGaHXw
-        zoMqICleNm9C4CGalh0QssZO9iwbQmCI
-X-Google-Smtp-Source: AMsMyM61FNEiVQWuNH7mOrtoQRc8w0APwU7lOPDXjoN9Hj57SRUwOg2Sw6SxLFHZFguL9+guFX0Pqt4t0MYp
+        bh=47NN14tzjqb2Jkjp+DZD0PLnkTAdeUGBp2aNHGDmHKU=;
+        b=54TVs3dO8RZm5jAZZwneQVUTKSo5S/A+Dho0pAnrtaniu4jyAVfBJmf5UGVQ9LD8Il
+         oglSFRncqi0TLGWv5nuOWAwWQyCKiRdSMzK8f+4wsW9sFMHe/87pMPYdv+kZiJOC7142
+         391zWiiDCzOJq8oGXijkel3jSGucBSyI+mpcxRInILM5qszFiFyE35wagwsHqW4jkSdD
+         AWlZ30MMXxi6ikP4mrtbSnxchDHHLF+IA+dD8RFUNPhozkY2qYTMAHH1WSxWCvk+qSYN
+         tMxH45QtZao7eY9wJNjZfWVvHOgWiMw2Vf8Oq1QdKFtdmg7Ts3IdgAgmnCuQoZTJdEQK
+         LKFQ==
+X-Gm-Message-State: ACrzQf30eDxbZ/ESJJD2Ud37jq3WDFhy+Y8wzSe9w1BFB+RfDGPij46M
+        y2G3X9Z6PkAYwJldlZINhzdBzDmx1RMD
+X-Google-Smtp-Source: AMsMyM7c6AK421/51FaS7EjnL1reK65nBGtuf6Ki4MccFg6eZrNtGMgZwjzzyLFVz2yNbJyHZE86NwBJ/k1D
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a17:90b:1d90:b0:213:d0a2:72ab with SMTP id
- pf16-20020a17090b1d9000b00213d0a272abmr21443758pjb.221.1667431667652; Wed, 02
- Nov 2022 16:27:47 -0700 (PDT)
-Date:   Wed,  2 Nov 2022 16:27:34 -0700
+ (user=vipinsh job=sendgmr) by 2002:a81:6083:0:b0:355:6608:2730 with SMTP id
+ u125-20020a816083000000b0035566082730mr188700ywb.183.1667431669185; Wed, 02
+ Nov 2022 16:27:49 -0700 (PDT)
+Date:   Wed,  2 Nov 2022 16:27:35 -0700
 In-Reply-To: <20221102232737.1351745-1-vipinsh@google.com>
 Mime-Version: 1.0
 References: <20221102232737.1351745-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221102232737.1351745-5-vipinsh@google.com>
-Subject: [PATCH v8 4/7] KVM: selftests: Use SZ_1G from sizes.h in max_guest_memory_test.c
+Message-ID: <20221102232737.1351745-6-vipinsh@google.com>
+Subject: [PATCH v8 5/7] KVM: selftests: Shorten the test args in memslot_modification_stress_test.c
 From:   Vipin Sharma <vipinsh@google.com>
 To:     seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com
 Cc:     andrew.jones@linux.dev, wei.w.wang@intel.com, kvm@vger.kernel.org,
@@ -59,7 +59,7 @@ Cc:     andrew.jones@linux.dev, wei.w.wang@intel.com, kvm@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,84 +67,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Replace size_1gb defined in max_guest_memory_test.c with the SZ_1G from
-linux/sizes.h header file.
+Change test args memslot_modification_delay and nr_memslot_modifications
+to delay and nr_iterations for simplicity.
 
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
 ---
- .../selftests/kvm/max_guest_memory_test.c        | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ .../kvm/memslot_modification_stress_test.c     | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/max_guest_memory_test.c b/tools/testing/selftests/kvm/max_guest_memory_test.c
-index 1595b73dc09a..8056dc5831b5 100644
---- a/tools/testing/selftests/kvm/max_guest_memory_test.c
-+++ b/tools/testing/selftests/kvm/max_guest_memory_test.c
-@@ -11,6 +11,7 @@
- #include <linux/bitmap.h>
- #include <linux/bitops.h>
- #include <linux/atomic.h>
-+#include <linux/sizes.h>
+diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+index d7ddc8a105a2..d6089ccaa484 100644
+--- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
++++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+@@ -87,8 +87,8 @@ static void add_remove_memslot(struct kvm_vm *vm, useconds_t delay,
+ }
  
- #include "kvm_util.h"
- #include "test_util.h"
-@@ -162,8 +163,7 @@ int main(int argc, char *argv[])
- 	 * just below the 4gb boundary.  This test could create memory at
- 	 * 1gb-3gb,but it's simpler to skip straight to 4gb.
- 	 */
--	const uint64_t size_1gb = (1 << 30);
--	const uint64_t start_gpa = (4ull * size_1gb);
-+	const uint64_t start_gpa = SZ_4G;
- 	const int first_slot = 1;
+ struct test_params {
+-	useconds_t memslot_modification_delay;
+-	uint64_t nr_memslot_modifications;
++	useconds_t delay;
++	uint64_t nr_iterations;
+ 	bool partition_vcpu_memory_access;
+ };
  
- 	struct timespec time_start, time_run1, time_reset, time_run2;
-@@ -180,13 +180,13 @@ int main(int argc, char *argv[])
- 	 * are quite common for x86, requires changing only max_mem (KVM allows
- 	 * 32k memslots, 32k * 2gb == ~64tb of guest memory).
- 	 */
--	slot_size = 2 * size_1gb;
-+	slot_size = SZ_2G;
+@@ -107,8 +107,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
  
- 	max_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
- 	TEST_ASSERT(max_slots > first_slot, "KVM is broken");
+ 	pr_info("Started all vCPUs\n");
  
- 	/* All KVM MMUs should be able to survive a 128gb guest. */
--	max_mem = 128 * size_1gb;
-+	max_mem = 128ull * SZ_1G;
+-	add_remove_memslot(vm, p->memslot_modification_delay,
+-			   p->nr_memslot_modifications);
++	add_remove_memslot(vm, p->delay,
++			   p->nr_iterations);
  
- 	calc_default_nr_vcpus();
+ 	run_vcpus = false;
  
-@@ -197,11 +197,11 @@ int main(int argc, char *argv[])
- 			TEST_ASSERT(nr_vcpus > 0, "number of vcpus must be >0");
+@@ -144,8 +144,8 @@ int main(int argc, char *argv[])
+ 	int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
+ 	int opt;
+ 	struct test_params p = {
+-		.memslot_modification_delay = 0,
+-		.nr_memslot_modifications =
++		.delay = 0,
++		.nr_iterations =
+ 			DEFAULT_MEMSLOT_MODIFICATION_ITERATIONS,
+ 		.partition_vcpu_memory_access = true
+ 	};
+@@ -158,8 +158,8 @@ int main(int argc, char *argv[])
+ 			guest_modes_cmdline(optarg);
  			break;
- 		case 'm':
--			max_mem = atoi_paranoid(optarg) * size_1gb;
-+			max_mem = 1ull * atoi_paranoid(optarg) * SZ_1G;
- 			TEST_ASSERT(max_mem > 0, "memory size must be >0");
+ 		case 'd':
+-			p.memslot_modification_delay = atoi_paranoid(optarg);
+-			TEST_ASSERT(p.memslot_modification_delay >= 0,
++			p.delay = atoi_paranoid(optarg);
++			TEST_ASSERT(p.delay >= 0,
+ 				    "A negative delay is not supported.");
  			break;
- 		case 's':
--			slot_size = atoi_paranoid(optarg) * size_1gb;
-+			slot_size = 1ull * atoi_paranoid(optarg) * SZ_1G;
- 			TEST_ASSERT(slot_size > 0, "slot size must be >0");
+ 		case 'b':
+@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
+ 			p.partition_vcpu_memory_access = false;
  			break;
- 		case 'H':
-@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
- 
- #ifdef __x86_64__
- 		/* Identity map memory in the guest using 1gb pages. */
--		for (i = 0; i < slot_size; i += size_1gb)
-+		for (i = 0; i < slot_size; i += SZ_1G)
- 			__virt_pg_map(vm, gpa + i, gpa + i, PG_LEVEL_1G);
- #else
- 		for (i = 0; i < slot_size; i += vm->page_size)
-@@ -260,7 +260,7 @@ int main(int argc, char *argv[])
- 	vcpus = NULL;
- 
- 	pr_info("Running with %lugb of guest memory and %u vCPUs\n",
--		(gpa - start_gpa) / size_1gb, nr_vcpus);
-+		(gpa - start_gpa) / SZ_1G, nr_vcpus);
- 
- 	rendezvous_with_vcpus(&time_start, "spawning");
- 	rendezvous_with_vcpus(&time_run1, "run 1");
+ 		case 'i':
+-			p.nr_memslot_modifications = atoi_paranoid(optarg);
++			p.nr_iterations = atoi_paranoid(optarg);
+ 			break;
+ 		case 'h':
+ 		default:
 -- 
 2.38.1.273.g43a17bfeac-goog
 
