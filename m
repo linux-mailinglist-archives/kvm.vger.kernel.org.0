@@ -2,86 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 607BD616652
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 16:39:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3114B6166B9
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 16:59:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230320AbiKBPj1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 11:39:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53952 "EHLO
+        id S231146AbiKBP7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 11:59:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229850AbiKBPjZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 11:39:25 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6337A13D14
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 08:39:23 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id l6so16638105pjj.0
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 08:39:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wLzDceGAhJYUUv7ij93AITlgZbz7ZuZnjbQtBh4OPQE=;
-        b=fNN5w2u5U/zO6eQZDwh32Y5mmO6nbENrhIkRcPOJrw6w0xyp8TCKdKoinElaRiyZSL
-         ucFvIQMq16BWXYB9qJM6xFhIv/0fJuMedWJ1scen9e40F96GOXcysrgASjK/tgrrf7+p
-         WvcKEkt1JZ6ifAkwqmxzJ3VpLVhVfcH0gHURzexRer5yFYcntJzm4xzriVj5LfeEvFAZ
-         7h3bDl10oDbYYwpUFd/OTf7rqE8FL7PIfAGIwyuh/wCf8lFECJO/VTBSD+JHnFWU2vAJ
-         5ntIk9av20oCsJRQELXUBhuOBZF01WZ1C58X4Nc0w8d0YwODdnYxBwQObEsrBvbNRX/7
-         QfWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wLzDceGAhJYUUv7ij93AITlgZbz7ZuZnjbQtBh4OPQE=;
-        b=tHoZpB7A9YrYvRDtuubzFmZBvNOcMuzr9k5DVEyLig1+OTYweq9+b6CYgmzETQEge+
-         kYeytRK0CI7X1WN0gvaokgyRyCkZJ7ch7CJ9tf+AKNMZlBtI4SkGvPnzY4NW8+LoGKKi
-         HE+XiCzTjWt9cjNmhZQJFeIHYbR6P++IdHsv4qArrR07nUMqIYoJ00jrAfmwYdCwtMr+
-         ZmEr2AxYCUDAMt4prfo9pAm2fjjsJBK53zWiSBkPtyjIZRo0EsIUAhK0EnyKFFsAaeQH
-         Hqk+2nNe0F7QbWRDnU7v+gM8UefjmQaFtGtuwl/uBywhysGPOsdiFdmK5W6EQl0Tpud9
-         EDjQ==
-X-Gm-Message-State: ACrzQf1fkZiNZrkIROf6IlDmRlr/WVr1u68M3uR6uP31rvp0Tj4JU2DU
-        fjWoG2doe/n5g2a8YDHkwJEgGw==
-X-Google-Smtp-Source: AMsMyM4mzfo37eCZ+2e6+LSRqO0T06TIxk83Xam6g7znq2DeOXVYw97H7I8hR9rPHms89/k34v4Irg==
-X-Received: by 2002:a17:90b:4c48:b0:214:25cd:96e3 with SMTP id np8-20020a17090b4c4800b0021425cd96e3mr5826259pjb.188.1667403562726;
-        Wed, 02 Nov 2022 08:39:22 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id g28-20020aa796bc000000b0056cc99862f8sm8877673pfk.92.2022.11.02.08.39.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 08:39:22 -0700 (PDT)
-Date:   Wed, 2 Nov 2022 15:39:18 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     isaku.yamahata@intel.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, isaku.yamahata@gmail.com
-Subject: Re: [PATCH 0/4] KVM: simplify hardware initialization
-Message-ID: <Y2KPJjCZn0YKzSJl@google.com>
-References: <cover.1667369456.git.isaku.yamahata@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1667369456.git.isaku.yamahata@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231150AbiKBP6u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 11:58:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A98EE2197
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 08:58:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 48FC66162F
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 15:58:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1416C433D6;
+        Wed,  2 Nov 2022 15:58:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667404726;
+        bh=HX9zj9GM9OWe4YXhMsVjlp4lVDfOB/zbQjFOQfuR2To=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Qh07gmOgCeigjcvSBI719bVcZ7HH0lWvCkCGQatFgY/ual/4f6cDOOhVzsLPxzQvy
+         XvsFO0xWQD+E81EXUtgp+9Jehx8H+b7VIreoffjM+hQ4YNvGfMvzWGoABfro9nCQ67
+         A3wOvvcpj9am58IZVvd8ByhttmSTO5t38zowdEZ2Y+bGYKAnsTiGKSNjw40Zll0hnV
+         NVg5OQooEBpYS+JexDlD8pwo6NDfvfbxuye3TmaVWlR6JW5x3kpsgkGRbC39jd0ZUL
+         bqHiRhkI8CHNH3PUyCP9CAhqwgoNDzztJTci00YVy+MqO/CEqb3mYu9/N8PEvxden7
+         8ywr4QILxnE5g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oqG8Z-003FIG-DC;
+        Wed, 02 Nov 2022 15:58:44 +0000
+Date:   Wed, 02 Nov 2022 15:58:43 +0000
+Message-ID: <867d0de4b0.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        andrew.jones@linux.dev, ajones@ventanamicro.com,
+        bgardon@google.com, catalin.marinas@arm.com, dmatlack@google.com,
+        will@kernel.org, pbonzini@redhat.com, oliver.upton@linux.dev,
+        james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v7 1/9] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
+In-Reply-To: <Y2J+xhBYhqBI81f7@x1n>
+References: <20221031003621.164306-1-gshan@redhat.com>
+        <20221031003621.164306-2-gshan@redhat.com>
+        <Y2F17Y7YG5Z9XnOJ@google.com>
+        <Y2J+xhBYhqBI81f7@x1n>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: peterx@redhat.com, seanjc@google.com, gshan@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com, catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org, pbonzini@redhat.com, oliver.upton@linux.dev, james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 01, 2022, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Wed, 02 Nov 2022 14:29:26 +0000,
+Peter Xu <peterx@redhat.com> wrote:
 > 
-> This patch series include random simplifications of KVM hardware enable/disable.
-> Although the past attempt [1] was turned out to be a bad idea, it has still
-> useful patches.
+> On Tue, Nov 01, 2022 at 07:39:25PM +0000, Sean Christopherson wrote:
+> > > @@ -142,13 +144,17 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+> > >  
+> > >  	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+> > >  
+> > > +	if (!kvm_dirty_ring_soft_full(ring))
+> > > +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
+> > > +
+> > 
+> > Marc, Peter, and/or Paolo, can you confirm that clearing the
+> > request here won't cause ordering problems?  Logically, this makes
+> > perfect sense (to me, since I suggested it), but I'm mildly
+> > concerned I'm overlooking an edge case where KVM could end up with
+> > a soft-full ring but no pending request.
+> 
+> I don't see an ordering issue here, as long as kvm_clear_request() is using
+> atomic version of bit clear, afaict that's genuine RMW and should always
+> imply a full memory barrier (on any arch?) between the soft full check and
+> the bit clear.  At least for x86 the lock prefix was applied.
 
-I have a larger cleanup that includes all of these patches except "Remove a global
-variable, hardware_enable_failed".  I was planning on posting the series last weeks,
-but I've dealing with a comedy of errors.  With luck, I'll get it posted today.
+No, clear_bit() is not a full barrier. It only atomic, and thus
+completely unordered (see Documentation/atomic_bitops.txt). If you
+want a full barrier, you need to use test_and_clear_bit().
 
-I'll fold in the aforementioned patch as well, there are quite a few conflicts as
-my series has a variety of bug fixes before it gets to these cleanups.
+> 
+> However I don't see anything stops a simple "race" to trigger like below:
+> 
+>           recycle thread                   vcpu thread
+>           --------------                   -----------
+>       if (!dirty_ring_soft_full)                                   <--- not full
+>                                         dirty_ring_push();
+>                                         if (dirty_ring_soft_full)  <--- full due to the push
+>                                             set_request(SOFT_FULL);
+>           clear_request(SOFT_FULL);                                <--- can wrongly clear the request?
+>
+
+Hmmm, well spotted. That's another ugly effect of the recycle thread
+playing with someone else's toys.
+
+> But I don't think that's a huge matter, as it'll just let the vcpu to have
+> one more chance to do another round of KVM_RUN.  Normally I think it means
+> there can be one more dirty GFN (perhaps there're cases that it can push >1
+> gfns for one KVM_RUN cycle?  I never figured out the details here, but
+> still..) pushed to the ring so closer to the hard limit, but we have had a
+> buffer zone of KVM_DIRTY_RING_RSVD_ENTRIES (64) entries.  So I assume
+> that's still fine, but maybe worth a short comment here?
+> 
+> I never know what's the maximum possible GFNs being dirtied for a KVM_RUN
+> cycle.  It would be good if there's an answer to that from anyone.
+
+This is dangerous, and I'd rather not go there.
+
+It is starting to look like we need the recycle thread to get out of
+the way. And to be honest:
+
++	if (!kvm_dirty_ring_soft_full(ring))
++		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
+
+seems rather superfluous. Only clearing the flag in the vcpu entry
+path feels much saner, and I can't see anything that would break.
+
+Thoughts?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
