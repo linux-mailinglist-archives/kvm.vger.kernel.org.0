@@ -2,110 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DC04615473
-	for <lists+kvm@lfdr.de>; Tue,  1 Nov 2022 22:51:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7ADAF615732
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 03:01:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230354AbiKAVvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Nov 2022 17:51:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33290 "EHLO
+        id S230015AbiKBCBr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Nov 2022 22:01:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230086AbiKAVvI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Nov 2022 17:51:08 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6D6E617F
-        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 14:51:04 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4N23cQ6yTMz4xG6;
-        Wed,  2 Nov 2022 08:51:02 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1667339463;
-        bh=XsmISU6iyvIQtW7XEorFckANs8h/uXjylMsjSpUamTU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=CbHvflimntBICJbgdR8EzYFhcEhEHTXaax/pkv47pI+bUMoyuzjKKlzLt3zhHf/Qk
-         LJl87BzyPHzqsNSwG8DqT8gry5HMzMulOisjnqsJ2BNoUNODkHayn668txI9i2ChY/
-         NtUe/X6zw5kq5eHUX7ie8f4pUjFaqE7/Ku1lEiGNY+9iyYqCR18lY+uv0GojcT/Inn
-         M6Xvt6KxKctAj+H1aTFiesjNLxK3GLZ2NI3ntRGVv+WLKhO7ahMA9lTs5PJeHjJctd
-         Cez7/WSET4LPl0XLpKSDsYfX1TZB46o5Pzgo86jUbv68X0fuObQpZ+n9hoKCZ65wgr
-         sIQ3/LY/wSlwQ==
-Date:   Wed, 2 Nov 2022 08:51:01 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     kvm@vger.kernel.org, iommu@lists.linux.dev
-Subject: Re: iommufd branch into linux-next
-Message-ID: <20221102085101.21efbd6b@canb.auug.org.au>
-In-Reply-To: <Y2BpD9OuPOmUu6GJ@nvidia.com>
-References: <Y2BpD9OuPOmUu6GJ@nvidia.com>
+        with ESMTP id S229770AbiKBCBp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Nov 2022 22:01:45 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90DD217E3C
+        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 19:01:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667354504; x=1698890504;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=vkyYbqaGgT5Xnt4eTCsxAg6Tkm1iI8W4kMybmjDfcAk=;
+  b=cVt+21AhAslRSjYflRv1Dh4Uu7duASDxnvCDYkdJOum5WR4SWZTIGsB6
+   +jBKUynvPyta7tXmCjDK9+y97zJO8zjy27jOJ5t9SdORYIG/NutuTJpkr
+   xTK1xOVNBusABzGnb/lK8bzFjZxFSrAXPru0VccTkTCIpw9yTCNfemJKT
+   Tx9PvMUpFT5B381ZkMKLP0zRJaPFVKFRjI6S02TevoTPKsiwL0C/keyVp
+   oCPf91ktkzYKVrzy5mzPmuMJ51RoiF+b2Osch89TdCwyyMieReGoWhYrJ
+   T5D4jR+mTiD/vMb9rcfYaqeoBl2pNHat2XNoLbAPPcN2VhXCBuXwVlsVZ
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10518"; a="289676974"
+X-IronPort-AV: E=Sophos;i="5.95,232,1661842800"; 
+   d="scan'208";a="289676974"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2022 19:01:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10518"; a="667405985"
+X-IronPort-AV: E=Sophos;i="5.95,232,1661842800"; 
+   d="scan'208";a="667405985"
+Received: from sqa-gate.sh.intel.com (HELO robert-clx2.tsp.org) ([10.239.48.212])
+  by orsmga001.jf.intel.com with ESMTP; 01 Nov 2022 19:01:42 -0700
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     pbonzini@redhat.com, seanjc@google.com, gshan@redhat.com
+Cc:     kvm@vger.kernel.org, Robert Hoo <robert.hu@linux.intel.com>
+Subject: [RFC 0/1] KVM: selftests: rseq_test: use vdso_getcpu() instead of syscall()
+Date:   Wed,  2 Nov 2022 10:01:27 +0800
+Message-Id: <20221102020128.3030511-1-robert.hu@linux.intel.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/lZzlkd=Ghn_Dzb5Bf3RUyHN";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/lZzlkd=Ghn_Dzb5Bf3RUyHN
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Recently, our QA often meet the test assert failure in KVM selftest rseq_test.
+e.g.
+==== Test Assertion Failure ====
+  rseq_test.c:273: i > (NR_TASK_MIGRATIONS / 2)
+  pid=391366 tid=391366 errno=4 - Interrupted system call
+     1	0x00000000004027dd: main at rseq_test.c:272
+     2	0x00007f7fc383ad84: ?? ??:0
+     3	0x000000000040286d: _start at ??:?
+  Only performed 32083 KVM_RUNs, task stalled too much?
 
-Hi Jason,
+Though this is not a bug [1], passing this assert means the race condition
+can be more hit, which is the original purpose of this test case design.
 
-On Mon, 31 Oct 2022 21:32:15 -0300 Jason Gunthorpe <jgg@nvidia.com> wrote:
->
-> Can you include the new iommufd tree into linux-next please?
->=20
-> git://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git
->=20
-> Branches 'for-next' and 'for-rc'
->=20
-> You can read about what it is here:
->=20
-> https://lore.kernel.org/all/0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com/
+[1] https://lore.kernel.org/kvm/YvwYxeE4vc%2FSrbil@google.com/
 
-Added from today.
+Robert Hoo (1):
+  KVM: selftests: rseq_test: use vdso_getcpu() instead of syscall()
 
-Thanks for adding your subsystem tree as a participant of linux-next.  As
-you may know, this is not a judgement of your code.  The purpose of
-linux-next is for integration testing and to lower the impact of
-conflicts between subsystems in the next merge window.=20
+ tools/testing/selftests/kvm/rseq_test.c | 32 ++++++++++++++++++-------
+ 1 file changed, 24 insertions(+), 8 deletions(-)
 
-You will need to ensure that the patches/commits in your tree/series have
-been:
-     * submitted under GPL v2 (or later) and include the Contributor's
-        Signed-off-by,
-     * posted to the relevant mailing list,
-     * reviewed by you (or another maintainer of your subsystem tree),
-     * successfully unit tested, and=20
-     * destined for the current or next Linux merge window.
+-- 
+2.31.1
 
-Basically, this should be just what you would send to Linus (or ask him
-to fetch).  It is allowed to be rebased if you deem it necessary.
-
---=20
-Cheers,
-Stephen Rothwell=20
-sfr@canb.auug.org.au
-
---Sig_/lZzlkd=Ghn_Dzb5Bf3RUyHN
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmNhlMUACgkQAVBC80lX
-0Gy8+Af+PAvG352aKlG9/FMuGS9U4PVytWO2qZ1ACEUO/QnMwo54uxib0b79em54
-OevS8nT+jKhWSNn9qtVkdvUC5FS5jJGsvOGgz/8mGiGGmO26THKcHp9XJslbQr+s
-Hi4+/pYttlFhLo3Y3aRy3cb136jFWrgTDbKvSw7jqpFKINbWhKaiD7y1M+e4YLEH
-eXx40gIBRGH64Wvv/XYKTfRVkk7+5YVehr/SAtUIQfOX9AJke3ldmzMHulgobFzO
-mbuBT8q6N6jEKt5MDrftWrKRbhTs9Vv+97eVE6zmqEleLxn0A/nTyLNrFtQdzWak
-8ap7Ma7mwWgMKNsoYrmc2f5ZqB4NiQ==
-=Ei9o
------END PGP SIGNATURE-----
-
---Sig_/lZzlkd=Ghn_Dzb5Bf3RUyHN--
