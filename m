@@ -2,138 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 816BC615F1A
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 10:12:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C33676161A9
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 12:22:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231137AbiKBJMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 05:12:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40944 "EHLO
+        id S230475AbiKBLWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 07:22:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231361AbiKBJLs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 05:11:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 597EF286FE
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 02:10:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S230499AbiKBLWe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 07:22:34 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F4ED13FA6;
+        Wed,  2 Nov 2022 04:22:28 -0700 (PDT)
+Received: from zn.tnic (p200300ea9733e741329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e741:329c:23ff:fea6:a903])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8E29C61890
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 09:10:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E59FCC433C1;
-        Wed,  2 Nov 2022 09:10:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1667380251;
-        bh=3NBoQ3ldUa+yOxeyENfnkBM2LyM5YloHDrknbDGq34c=;
-        h=From:To:Cc:Subject:Date:From;
-        b=sRjh0cGisFS4038BuCp8168oQUNIM6TzP9MDeK+A0wKFoWjwjVx2qpg6D7I8+JyP1
-         Nungr/01NBkg9bQ2/wrYS9KsVKk/U/K4phdPtTVG0QfUBI9S6hkvxIYc0qISXh4Uis
-         2Hk5bYADdWLGMR1Y3b9i9lDzbWHbSbzPNVRPDm7VpDX+g0QHelLg0YN/TCTAVvmVUF
-         PLHc/0axacHTHKo0BLh9V9YdGUVCNYoWS2eyIm3aUtOqC+4Ir+bfQ5htnxgs9vZuun
-         V+hLoiGyqYPG1BbzEfTnZgKIPTf3SPxrHVsBwLvVi8brtpVFTA/O1rAMtPBl/dIIFV
-         bDkug7413Jmfg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oq9lo-003AWO-FX;
-        Wed, 02 Nov 2022 09:10:48 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Gavin Shan <gshan@redhat.com>, Mark Brown <broonie@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Quentin Perret <qperret@google.com>,
-        Ryan Roberts <ryan.roberts@arm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Steven Price <steven.price@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.1, take #3
-Date:   Wed,  2 Nov 2022 09:10:36 +0000
-Message-Id: <20221102091036.2106882-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D08081EC0567;
+        Wed,  2 Nov 2022 12:22:26 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1667388146;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=stsEyPM3yshEwkVJFTjMEf1n3jksEvxwTfKS4NKFQ3M=;
+        b=bicSDEWqpmnYKra+kbGFh+j8MDU2fk8a81eXZBfoDvBd+piFoqJo7Zv/4XE6hgDQX1Kmi9
+        v7PXwWK8cAJrg2sSoRzHUsSxDumVASpNo323yy/TwAmtZGL7Zojtyj57cLIicAfpzlK84g
+        53QASmyBfQKtIAUiHL83CfI0vJvHUfk=
+Date:   Wed, 2 Nov 2022 12:22:22 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc:     vbabka@suse.cz, x86@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+        thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, michael.roth@amd.com,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        "Kaplan, David" <David.Kaplan@amd.com>
+Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
+Message-ID: <Y2JS7kn8Q9P4rXso@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
+ <Y0grhk1sq2tf/tUl@zn.tnic>
+ <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
+ <Y1e5oC9QyDlKpxZ9@zn.tnic>
+ <6511c122-d5cc-3f8d-9651-7c2cd67dc5af@amd.com>
+ <Y2A6/ZwvKhpNBTMP@zn.tnic>
+ <dc89b2f4-1053-91ac-aeac-bb3b25f9ebc7@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, catalin.marinas@arm.com, gshan@redhat.com, broonie@kernel.org, oliver.upton@linux.dev, qperret@google.com, ryan.roberts@arm.com, seanjc@google.com, steven.price@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <dc89b2f4-1053-91ac-aeac-bb3b25f9ebc7@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+On Mon, Oct 31, 2022 at 04:58:38PM -0500, Kalra, Ashish wrote:
+>      if (snp_lookup_rmpentry(pfn, &rmp_level)) {
+>             do_sigbus(regs, error_code, address, VM_FAULT_SIGBUS);
+>             return RMP_PF_RETRY;
 
-Here's another set of fixes for 6.1. Two of them are critical fixes
-(MTE support triggering an invalid pointer dereference in nVHE
-configurations, SME trapping not enabled in VHE configurations).
-Thankfully, these configuration are pretty rare, because hardly anyone
-is making us of MTE yet, and that SME HW simply doesn't exist in the
-wild.
+Does this issue some halfway understandable error message why the
+process got killed?
 
-The rest is a limited set of fixes for relatively harmless bugs and
-documentation update.
+> Will look at adding our own recovery function for the same, but that will
+> again mark the pages as poisoned, right ?
 
-Please pull,
+Well, not poisoned but PG_offlimits or whatever the mm folks agree upon.
+Semantically, it'll be handled the same way, ofc.
 
-	M.
+> Still waiting for some/more feedback from mm folks on the same.
 
-The following changes since commit 247f34f7b80357943234f93f247a1ae6b6c3a740:
+Just send the patch and they'll give it.
 
-  Linux 6.1-rc2 (2022-10-23 15:27:33 -0700)
+Thx.
 
-are available in the Git repository at:
+-- 
+Regards/Gruss,
+    Boris.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.1-3
-
-for you to fetch changes up to be0ddf5293a7895a8c9096e1a8560930c6a0ab3f:
-
-  arm64: booting: Document our requirements for fine grained traps with SME (2022-11-01 19:30:34 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.1, take #3
-
-- Fix the pKVM stage-1 walker erronously using the stage-2 accessor
-
-- Correctly convert vcpu->kvm to a hyp pointer when generating
-  an exception in a nVHE+MTE configuration
-
-- Check that KVM_CAP_DIRTY_LOG_* are valid before enabling them
-
-- Fix SMPRI_EL1/TPIDR2_EL0 trapping on VHE
-
-- Document the boot requirements for FGT when entering the kernel
-  at EL1
-
-----------------------------------------------------------------
-Gavin Shan (1):
-      KVM: Check KVM_CAP_DIRTY_LOG_{RING, RING_ACQ_REL} prior to enabling them
-
-Marc Zyngier (1):
-      KVM: arm64: Fix SMPRI_EL1/TPIDR2_EL0 trapping on VHE
-
-Mark Brown (1):
-      arm64: booting: Document our requirements for fine grained traps with SME
-
-Quentin Perret (1):
-      KVM: arm64: Use correct accessor to parse stage-1 PTEs
-
-Ryan Roberts (1):
-      KVM: arm64: Fix bad dereference on MTE-enabled systems
-
- Documentation/arm64/booting.rst         |  8 ++++++++
- arch/arm64/kvm/hyp/exception.c          |  3 ++-
- arch/arm64/kvm/hyp/include/hyp/switch.h | 20 ++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c   |  2 +-
- arch/arm64/kvm/hyp/nvhe/switch.c        | 26 --------------------------
- arch/arm64/kvm/hyp/vhe/switch.c         |  8 --------
- virt/kvm/kvm_main.c                     |  3 +++
- 7 files changed, 34 insertions(+), 36 deletions(-)
+https://people.kernel.org/tglx/notes-about-netiquette
