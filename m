@@ -2,82 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB0FF617025
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 23:00:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 411CC61702F
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 23:03:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229996AbiKBWAA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 18:00:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49056 "EHLO
+        id S230368AbiKBWDX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 18:03:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbiKBV76 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 17:59:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7827E003
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 14:58:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667426335;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=19jAwIpz25mwhFPQXkoppeGvWvIpF/x47prNgyjimyE=;
-        b=BI+GGbTYeNsi1ZH2K/6+3tgGbMWHCAAFFR+qffe8Nr0N34iMIRbNO5EK49s4Unzj7/WYuT
-        yGlaczHgdP6z9ZW5KUO6whijHe7FqD3CdBMSMxj+ixeMWQll0bQJAcTtz6Uh4EVGNLjQdf
-        sL5wd4FCXfr1MKPtCVaAJtXoMNfc0I0=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-106-5RCDTmjtM7KhJGjL3ZgxjA-1; Wed, 02 Nov 2022 17:58:54 -0400
-X-MC-Unique: 5RCDTmjtM7KhJGjL3ZgxjA-1
-Received: by mail-il1-f200.google.com with SMTP id j7-20020a056e02154700b003007885e7beso204478ilu.20
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 14:58:54 -0700 (PDT)
+        with ESMTP id S230124AbiKBWDW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 18:03:22 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35B93FE6
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 15:03:21 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id o70so194483yba.7
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 15:03:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=53rtM2tOKUZC17mzsEdWurdRWDAbb+IFlx/I3QaJfho=;
+        b=N1VphNwdxb/NhSkHMiJfGFqNvaKDulnWXGieR7FCQEci8+vuCMZly07jXuBfaWgIbt
+         bWDKRNhBF2T61PoR6ygPtOpiR69ieu22Hbw02NDaW+UeACLWEpm4GVe+orHtMk1qaIwN
+         ybVl7XhfTCW9vKNX4MMEpS+GQA3e0WubsPqcocViZJyZRTo79RpkbBTB1jQu7wiRB58/
+         5m2pG5Oad7FHN6oEtQ/xSlqL5e1Awl9scBTWpTefTerEhiTW2zmlF5DviyxF/zRdRzt8
+         1cAE2SegvCV2DRcgZX2s08V0A+rVPJ6xxRbuWnp2UQmUFOOKg3f+SDWotCcdR9x8eLjr
+         SOHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=19jAwIpz25mwhFPQXkoppeGvWvIpF/x47prNgyjimyE=;
-        b=Vgs+ZE73GQ9NaJMN4AW8VBT03QFfQ8lQwTvNicMsrfq8hZvOrY+YQFXJJDYNkEHwpn
-         Tzg17OzS5BpGqhfSSQZO7u4vJiDzcC7jCP9tKEHjgrK5IsnHRnxdkHPE7Rwcz3h39KwQ
-         pLWV/iNaXqiouP7OwXKB6kYs+YNJQWtOFeuQtvf4PYzsRpcbvzczDB8wAtVjHXpIPFC7
-         bLi6hHTxAjHKVxJc2rqLsVFB0szRG3QofHhDrUAim6Pke6JFLleUihCucffUz1GUgAdo
-         DBIMpGg2PxEHFSyx3EklXX4Ok0IPWjekWwXtdgvrnqa7+Md+ReHxFTPuUAhZqYCAyIFG
-         AtVA==
-X-Gm-Message-State: ACrzQf08IHxE4T8lPQVfEcQtQaC7uV8ZXQeuTCiCbSH+qjYWGrE5YEAO
-        jgit95iBc4SdlkNBj4FE7Oy1EeWtNNijbgzDz5KDfUru5xT73d6pDp05QHaMXEfMurxlA/wSmbw
-        4TOo1MO3CsvZY
-X-Received: by 2002:a92:ca07:0:b0:2fa:ad2a:cd4c with SMTP id j7-20020a92ca07000000b002faad2acd4cmr16089253ils.292.1667426333620;
-        Wed, 02 Nov 2022 14:58:53 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5dmswFcGZVPd7FynLZuU25I7XELgnvq1kGCPuVlRNq3vtiq4su1jgHneL5/uAlkRlVy4x+2w==
-X-Received: by 2002:a92:ca07:0:b0:2fa:ad2a:cd4c with SMTP id j7-20020a92ca07000000b002faad2acd4cmr16089244ils.292.1667426333375;
-        Wed, 02 Nov 2022 14:58:53 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id r17-20020a056638045100b003743cc92b27sm5207589jap.157.2022.11.02.14.58.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 14:58:52 -0700 (PDT)
-Date:   Wed, 2 Nov 2022 15:58:51 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Anthony DeRossi <ajderossi@gmail.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "abhsahu@nvidia.com" <abhsahu@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>
-Subject: Re: [PATCH v2] vfio-pci: Accept a non-zero open_count on reset
-Message-ID: <20221102155851.2d19978e.alex.williamson@redhat.com>
-In-Reply-To: <CAKkLME3bR++sWFusGdxohD3ZCgBDj7rjsjMZs=RvaYYfaJskng@mail.gmail.com>
-References: <20221026194245.1769-1-ajderossi@gmail.com>
-        <BN9PR11MB52763B921748415B14FFB57D8C369@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <Y2EFLVYwWumB9JbL@ziepe.ca>
-        <CAKkLME3bR++sWFusGdxohD3ZCgBDj7rjsjMZs=RvaYYfaJskng@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=53rtM2tOKUZC17mzsEdWurdRWDAbb+IFlx/I3QaJfho=;
+        b=guntXpPaouLk1uVCC1o85jSjyUEKAUvDebZHJgGIR/WXcN54q9UySBPC2yTAfczTWl
+         +NyQdEVvml6KoMjJGuhF0B4HvltWW6upnCj8jDedu+Ejtv5U9t9jVY2m7smf51tBMrPZ
+         ShfqgJiF9gVKESfZwVo3Y0CK2cck5h7NPZ2CYuo4Es2FCmTW71gc0SDXTuZGCDBIvq55
+         WzovGjUFXLzYpAhOPbxPviyvWBZ7jzti0fEF2X1ioSmZbo1Sx8jEj8B2pYQYb23DdnkD
+         vDYwuOmwzLk9eRDuRP6TRuM6tjlraU4+rC/4YVqcnthttcJLELTi13R483ditdL1VagL
+         dNwQ==
+X-Gm-Message-State: ACrzQf3ez4wQHhlr4CI4oDc+0I9DPxmqgT2E14mqj0TvV60aUcFWpKOp
+        kdIsBUTNp7/rmgX1eDxMRCNb04l7zD+jKwrToC2/Jg==
+X-Google-Smtp-Source: AMsMyM70buN6c220kX5KZZX2DLGDXHZ7CJ8iKWrl0ApYH+YpzwI2LQG2UTaHQPRkDlBY2acJUs+UljbKUW4io1WAHL8=
+X-Received: by 2002:a05:6902:1244:b0:6ca:cbd8:9310 with SMTP id
+ t4-20020a056902124400b006cacbd89310mr25934182ybu.0.1667426600406; Wed, 02 Nov
+ 2022 15:03:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20221031180045.3581757-1-dmatlack@google.com> <20221031180045.3581757-5-dmatlack@google.com>
+ <Y2ATsTO8tqs4gtz/@google.com> <CALzav=eqiCbYaNUgSEsZrRGEA2pv3x5j=oUvbm=_Gho4t50H1g@mail.gmail.com>
+ <Y2K/BvYwX06lsOH+@google.com>
+In-Reply-To: <Y2K/BvYwX06lsOH+@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Wed, 2 Nov 2022 15:02:54 -0700
+Message-ID: <CALzav=dy7QU6ZTEzkm8_0Lox3E7VS6vUjpb93AFXUBkwChRXdQ@mail.gmail.com>
+Subject: Re: [PATCH v3 04/10] KVM: selftests: Move flds instruction emulation
+ failure handling to header
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,24 +76,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2 Nov 2022 06:14:24 +0000
-Anthony DeRossi <ajderossi@gmail.com> wrote:
+On Wed, Nov 2, 2022 at 12:03 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Nov 02, 2022, David Matlack wrote:
+> > On Mon, Oct 31, 2022 at 11:28 AM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Mon, Oct 31, 2022, David Matlack wrote:
+> > > > +
+> > > > +static inline void assert_exit_for_flds_emulation_failure(struct kvm_vcpu *vcpu)
+> > >
+> > > I think it makes sense to keeping the bundling of the assert+skip.  As written,
+> > > the last test doesn't need to skip, but that may not always hold true, e.g. if
+> > > the test adds more stages to verify KVM handles page splits correctly, and even
+> > > when a skip is required, it does no harm.  I can't think of a scenario where a
+> > > test would want an FLDS emulation error but wouldn't want to skip the instruction,
+> > > e.g. injecting a fault from userspace is largely an orthogonal test.
+> > >
+> > > Maybe this as a helper name?  I don't think it's necessary to include "assert"
+> > > anywhere in the name, the idea being that "emulated" provides a hint that it's a
+> > > non-trivial helper.
+> > >
+> > >   static inline void skip_emulated_flds(struct kvm_vcpu *vcpu)
+> > >
+> > > or skip_emulated_flds_instruction() if we're concerned that it might not be obvious
+> > > "flds" is an instruction mnemonic.
+> >
+> > I kept them separate for readability,
+>
+> Ha, and of course I found assert_exit_for_flds_emulation_failure() hard to read :-)
+>
+> > but otherwise I have no argument against bundling. I find skip_emulated*()
+> > somewhat misleading since flds is not actually emulated (successfully). I'm
+> > trending toward something like handle_flds_emulation_failure_exit() for v4.
+>
+> How about "skip_flds_on_emulation_failure_exit()"?  "handle" is quite generic and
+> doesn't provide any hints as to what the function actually does under the hood.
 
-> On Tue, Nov 1, 2022 at 11:38 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > I've been meaning to take a deeper look, but I'm thinking vfio_pci
-> > doesn't need open_count at all any more.  
-> 
-> I spent some time looking at it, but I'm not very familiar with this
-> area.
-> 
-> None of the fields in vfio_pci_core_device look usable as a substitute
-> for open_count, but calling pci_is_enabled() on the PCI device might be
-> sufficient. pci_enable_device()/pci_disable_device() appear to be called
-> in the right locations in vfio_pci_core.
-
-I think that could work too, but of course it's PCI specific.  If we
-had a vfio core helper to get the open count for the device set, that
-would make it more universally available.  Thanks,
-
-Alex
-
+LGTM. Paolo can you apply the name change when queueing v4 (assuming
+there are no other comments)? If not I'd be happy to send a v5.
