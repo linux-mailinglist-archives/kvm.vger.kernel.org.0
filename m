@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB825616D08
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC675616D04
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231683AbiKBSrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 14:47:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42024 "EHLO
+        id S231689AbiKBSrJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 14:47:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231520AbiKBSrD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 14:47:03 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B89D2CE27
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:47:03 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-36fc0644f51so165660277b3.17
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:47:03 -0700 (PDT)
+        with ESMTP id S231666AbiKBSrF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 14:47:05 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31A582F66B
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:47:05 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id y6-20020a25b9c6000000b006c1c6161716so17028118ybj.8
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:47:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cMB6TX5uDf1QAJ7HvbUaBRObClM1MNgowri3IAfpFFY=;
-        b=VauRlSFVm86d5oJHtfg4zSldCKdbxKThcr5I1twnfjAgsrppOQ0DbeQRgCa/HXam/Q
-         F94c+F7Ek6v10tbSmme1HDxuMaM0ZK78uhE/DR/xGFMUaCw/Z3UxYop+jaliu3xydblO
-         oSFTWwMXjoDH9V2WzB5BH/xcZ2FpjaN0B0MI9A6+Jb0++jVvTgfi/Hz1hAZYasr1rfjs
-         VvZQpGkagO18C2IaWWMUja/grz3WSJrwkbV3CvvY6GtUiL+G2CoSsReyqq/1IH/mgWHA
-         PF0lWD28fv6JcdmQLusZJ6ZHpzINCaPDT5KYGWg0EKdyeS9DJN1xh4gHKkboNl+QVPnL
-         UkYA==
+        bh=rZlY20pisID3UMdvyEPOsDdyNuMTsJMxwMVwMHhsyEA=;
+        b=KNbO5OFWGRx1Sf9wqORfzfux0wAUYpDYYqoWVzcDfEHuZCvzhZJhCo4vmrbBjVxkvY
+         VNGAf8BNUlbiZjjclnqE4NI1QkXMeEyNylOdjhzfk1Uv0RDRVG+qHyTXD/oz8WWxwAz1
+         6O3PWRsf3jF7iBm5p2IacbAm33P5mTBDMrWLnzrHA0ur2JxjfFj/bEV2mEUvVnk48lbX
+         Sa+z/ag63DF2d3I1cPm+QHuNMZwTPvnnO0/mgRN66FEywFzB7q2xT1A0mdCVBKzw0Yv6
+         8qh2XilcDj2Fs1/rgRZtnm2kb4iG74TuVY6rv50E7xTp2vZrhg2GYw9eRrxSG07aqNGY
+         03LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cMB6TX5uDf1QAJ7HvbUaBRObClM1MNgowri3IAfpFFY=;
-        b=68vDa4xgTw01vfHkMQWNEFG6GuQ00kl66NdCO2UH/gkw2oZDZDgisV2NQxSvZT54vU
-         xPiEawBu9vDZ5F4ZRx1DDPtF3QrfRa4loUObfbzrt7/yoFtlkSaLUxFGfeWle3lTOXKm
-         0V1ZQFz2gHjYcHypl9srOT2yTb9v1+MjWEPE51qtb25bc+xwNZsgzIbGGZ1JEIX7OebY
-         Je2vUjawpcmT1mHRW0IGl3mPISggs3UeXUQ5uEWN5w4Saf0N/bXoxJq4a0FjZmNdLDcn
-         O0Hf/SoN7wU/z8TpSndNcj1/XrktlVHtl/MSF41sE3+kLdSQwgaWFlRRImwCTYYvUT2i
-         jAuw==
-X-Gm-Message-State: ACrzQf0zl16TE0e2Y2QF+7BVTjdhDr91ByGh31y07tEyU0DEhR+PAlmF
-        v6PckK9Z25A0dyuA8LnodN8CKB2HBseTKw==
-X-Google-Smtp-Source: AMsMyM4+47uBszbYBydrPC4GTCo0jqqlsf8OemUUFXinQvbfOQDsvqzYf9lbWqCVoc2BTk+jDzfNgYPmPZ20bQ==
+        bh=rZlY20pisID3UMdvyEPOsDdyNuMTsJMxwMVwMHhsyEA=;
+        b=1ZUSqHxhi7meVpo5095B4Ng4Dp5XvpHSzOO4DRyAqRASm2h3cgkxhS5MusZbZC/xcS
+         vzQEdcg3XYw4hSJA6Ldwm0VwV+73fXTXRywJrGjDSvjY7hIhbxXUObIDBcx4YPz2fxJw
+         WBLVU/vU0E2OKfn2ExmchQzc71UnEse0t04fK5RMq+i3GgCM15XqxhJrRS0ygOs2Kxb3
+         pb1ELMIlWqp8JgNnKxM2yoWChmh6Eq6MzzHeHyrngxF3csy7G2xoTbAq9qvv/FPurCtS
+         pa43khIcCTsBdLLe0vhWTgLROhXsllkrp72zT+Q5Q4DdjFJl33e4LlynURdzvCAFBUXz
+         ykyw==
+X-Gm-Message-State: ACrzQf09aS5TTwrW1KNCl7zFdeiMdpHEzTOHghu3mh4jyJwvA1DSskLW
+        RxWvut9moKeaw5KgO+z1a3LnZmWw7xXpFg==
+X-Google-Smtp-Source: AMsMyM6QT10t0FAYm56F0kG0IqnbQ/spL61Nwk7MXdKMTo7EfSDMgIZDdtM1jM4PphXGFDEkYqwgxikHQ3hM/w==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a81:6f88:0:b0:35f:df0e:3a7a with SMTP id
- k130-20020a816f88000000b0035fdf0e3a7amr25239243ywc.416.1667414822529; Wed, 02
- Nov 2022 11:47:02 -0700 (PDT)
-Date:   Wed,  2 Nov 2022 11:46:47 -0700
+ (user=dmatlack job=sendgmr) by 2002:a25:25d7:0:b0:6cb:77ee:61a0 with SMTP id
+ l206-20020a2525d7000000b006cb77ee61a0mr193123ybl.498.1667414823936; Wed, 02
+ Nov 2022 11:47:03 -0700 (PDT)
+Date:   Wed,  2 Nov 2022 11:46:48 -0700
 In-Reply-To: <20221102184654.282799-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221102184654.282799-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221102184654.282799-4-dmatlack@google.com>
-Subject: [PATCH v4 03/10] KVM: selftests: Delete dead ucall code
+Message-ID: <20221102184654.282799-5-dmatlack@google.com>
+Subject: [PATCH v4 04/10] KVM: selftests: Move flds instruction emulation
+ failure handling to header
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -75,95 +76,152 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Delete a bunch of code related to ucall handling from
-smaller_maxphyaddr_emulation_test. The only thing
-smaller_maxphyaddr_emulation_test needs to check is that the vCPU exits
-with UCALL_DONE after the second vcpu_run().
+Move the flds instruction emulation failure handling code to a header
+so it can be re-used in an upcoming test.
+
+No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
 ---
- .../smaller_maxphyaddr_emulation_test.c       | 61 +------------------
- 1 file changed, 1 insertion(+), 60 deletions(-)
+ .../selftests/kvm/x86_64/flds_emulation.h     | 55 +++++++++++++++++++
+ .../smaller_maxphyaddr_emulation_test.c       | 44 ++-------------
+ 2 files changed, 59 insertions(+), 40 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/flds_emulation.h
 
+diff --git a/tools/testing/selftests/kvm/x86_64/flds_emulation.h b/tools/testing/selftests/kvm/x86_64/flds_emulation.h
+new file mode 100644
+index 000000000000..e43a7df25f2c
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/flds_emulation.h
+@@ -0,0 +1,55 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef SELFTEST_KVM_FLDS_EMULATION_H
++#define SELFTEST_KVM_FLDS_EMULATION_H
++
++#include "kvm_util.h"
++
++#define FLDS_MEM_EAX ".byte 0xd9, 0x00"
++
++/*
++ * flds is an instruction that the KVM instruction emulator is known not to
++ * support. This can be used in guest code along with a mechanism to force
++ * KVM to emulate the instruction (e.g. by providing an MMIO address) to
++ * exercise emulation failures.
++ */
++static inline void flds(uint64_t address)
++{
++	__asm__ __volatile__(FLDS_MEM_EAX :: "a"(address));
++}
++
++static inline void handle_flds_emulation_failure_exit(struct kvm_vcpu *vcpu)
++{
++	struct kvm_run *run = vcpu->run;
++	struct kvm_regs regs;
++	uint8_t *insn_bytes;
++	uint64_t flags;
++
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_INTERNAL_ERROR,
++		    "Unexpected exit reason: %u (%s)",
++		    run->exit_reason,
++		    exit_reason_str(run->exit_reason));
++
++	TEST_ASSERT(run->emulation_failure.suberror == KVM_INTERNAL_ERROR_EMULATION,
++		    "Unexpected suberror: %u",
++		    run->emulation_failure.suberror);
++
++	flags = run->emulation_failure.flags;
++	TEST_ASSERT(run->emulation_failure.ndata >= 3 &&
++		    flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES,
++		    "run->emulation_failure is missing instruction bytes");
++
++	TEST_ASSERT(run->emulation_failure.insn_size >= 2,
++		    "Expected a 2-byte opcode for 'flds', got %d bytes",
++		    run->emulation_failure.insn_size);
++
++	insn_bytes = run->emulation_failure.insn_bytes;
++	TEST_ASSERT(insn_bytes[0] == 0xd9 && insn_bytes[1] == 0,
++		    "Expected 'flds [eax]', opcode '0xd9 0x00', got opcode 0x%02x 0x%02x\n",
++		    insn_bytes[0], insn_bytes[1]);
++
++	vcpu_regs_get(vcpu, &regs);
++	regs.rip += 2;
++	vcpu_regs_set(vcpu, &regs);
++}
++
++#endif /* !SELFTEST_KVM_FLDS_EMULATION_H */
 diff --git a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-index d92cd4139f6d..f9fdf365dff7 100644
+index f9fdf365dff7..9d0e555ea630 100644
 --- a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-@@ -63,64 +63,6 @@ static void process_exit_on_emulation_error(struct kvm_vcpu *vcpu)
- 	vcpu_regs_set(vcpu, &regs);
+@@ -8,6 +8,8 @@
+ 
+ #define _GNU_SOURCE /* for program_invocation_short_name */
+ 
++#include "flds_emulation.h"
++
+ #include "test_util.h"
+ #include "kvm_util.h"
+ #include "vmx.h"
+@@ -19,50 +21,12 @@
+ #define MEM_REGION_SLOT	10
+ #define MEM_REGION_SIZE PAGE_SIZE
+ 
+-#define FLDS_MEM_EAX ".byte 0xd9, 0x00"
+-
+ static void guest_code(void)
+ {
+-	__asm__ __volatile__(FLDS_MEM_EAX :: "a"(MEM_REGION_GVA));
+-
++	flds(MEM_REGION_GVA);
+ 	GUEST_DONE();
  }
  
--static void do_guest_assert(struct ucall *uc)
--{
--	REPORT_GUEST_ASSERT(*uc);
--}
--
--static void check_for_guest_assert(struct kvm_vcpu *vcpu)
--{
--	struct ucall uc;
--
--	if (vcpu->run->exit_reason == KVM_EXIT_IO &&
--	    get_ucall(vcpu, &uc) == UCALL_ABORT) {
--		do_guest_assert(&uc);
--	}
--}
--
--static void process_ucall_done(struct kvm_vcpu *vcpu)
+-static void process_exit_on_emulation_error(struct kvm_vcpu *vcpu)
 -{
 -	struct kvm_run *run = vcpu->run;
--	struct ucall uc;
+-	struct kvm_regs regs;
+-	uint8_t *insn_bytes;
+-	uint64_t flags;
 -
--	check_for_guest_assert(vcpu);
--
--	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
+-	TEST_ASSERT(run->exit_reason == KVM_EXIT_INTERNAL_ERROR,
 -		    "Unexpected exit reason: %u (%s)",
 -		    run->exit_reason,
 -		    exit_reason_str(run->exit_reason));
 -
--	TEST_ASSERT(get_ucall(vcpu, &uc) == UCALL_DONE,
--		    "Unexpected ucall command: %lu, expected UCALL_DONE (%d)",
--		    uc.cmd, UCALL_DONE);
--}
+-	TEST_ASSERT(run->emulation_failure.suberror == KVM_INTERNAL_ERROR_EMULATION,
+-		    "Unexpected suberror: %u",
+-		    run->emulation_failure.suberror);
 -
--static uint64_t process_ucall(struct kvm_vcpu *vcpu)
--{
--	struct kvm_run *run = vcpu->run;
--	struct ucall uc;
+-	flags = run->emulation_failure.flags;
+-	TEST_ASSERT(run->emulation_failure.ndata >= 3 &&
+-		    flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES,
+-		    "run->emulation_failure is missing instruction bytes");
 -
--	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
--		    "Unexpected exit reason: %u (%s)",
--		    run->exit_reason,
--		    exit_reason_str(run->exit_reason));
+-	TEST_ASSERT(run->emulation_failure.insn_size >= 2,
+-		    "Expected a 2-byte opcode for 'flds', got %d bytes",
+-		    run->emulation_failure.insn_size);
 -
--	switch (get_ucall(vcpu, &uc)) {
--	case UCALL_SYNC:
--		break;
--	case UCALL_ABORT:
--		do_guest_assert(&uc);
--		break;
--	case UCALL_DONE:
--		process_ucall_done(vcpu);
--		break;
--	default:
--		TEST_ASSERT(false, "Unexpected ucall");
--	}
+-	insn_bytes = run->emulation_failure.insn_bytes;
+-	TEST_ASSERT(insn_bytes[0] == 0xd9 && insn_bytes[1] == 0,
+-		    "Expected 'flds [eax]', opcode '0xd9 0x00', got opcode 0x%02x 0x%02x\n",
+-		    insn_bytes[0], insn_bytes[1]);
 -
--	return uc.cmd;
+-	vcpu_regs_get(vcpu, &regs);
+-	regs.rip += 2;
+-	vcpu_regs_set(vcpu, &regs);
 -}
 -
  int main(int argc, char *argv[])
  {
  	struct kvm_vcpu *vcpu;
-@@ -157,8 +99,7 @@ int main(int argc, char *argv[])
- 	vcpu_run(vcpu);
- 	process_exit_on_emulation_error(vcpu);
- 	vcpu_run(vcpu);
--
--	TEST_ASSERT(process_ucall(vcpu) == UCALL_DONE, "Expected UCALL_DONE");
-+	ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
+@@ -97,7 +61,7 @@ int main(int argc, char *argv[])
+ 	vm_set_page_table_entry(vm, vcpu, MEM_REGION_GVA, pte | (1ull << 36));
  
- 	kvm_vm_free(vm);
+ 	vcpu_run(vcpu);
+-	process_exit_on_emulation_error(vcpu);
++	handle_flds_emulation_failure_exit(vcpu);
+ 	vcpu_run(vcpu);
+ 	ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
  
 -- 
 2.38.1.273.g43a17bfeac-goog
