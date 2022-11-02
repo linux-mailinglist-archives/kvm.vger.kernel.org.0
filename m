@@ -2,147 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33AC2616B57
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 18:59:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C42C616B60
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:02:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229971AbiKBR67 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 13:58:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58368 "EHLO
+        id S230006AbiKBSCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 14:02:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230150AbiKBR6n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 13:58:43 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1021B1DF02
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 10:58:43 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id y13so17086544pfp.7
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 10:58:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=870ePeKf/g5/gv7jvhhc9uXlyy+wXSAuC1dLJzDbfU4=;
-        b=bKBi4f3Mj/csNXtmaCXh9uZTo5NRblA00Y9vUFqQFWzv1bfG/4NyylKmwl3YH9UqFS
-         hR7kU7RZvCi22SBIKaeVMMuDh76PhfDdg+z/WwV+tXEbqPaQM5JWuk1FvJXs8aR67QEk
-         Re2EXlz/4B0RAvG4fzClH1lLz1M2grsUUmJWx6MeqoHoIIPBSz86OVIOwJ0foFxx1Si5
-         P2PBCHeNKeX8KWwCpDPiVuaX0bJuLs5hwbRToEMSGc/U5nqOc/G1Ok5B4C4lR8Vs06XH
-         vSdHmoigBqXuCPZvjVG3SjOZMD8ArE+HQtnxv/dcPeYXBtchyS3docJm0LYiFD7ZM4cz
-         s77w==
+        with ESMTP id S229598AbiKBSCC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 14:02:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2ADA20BE8
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:01:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667412063;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rCufs503dpXhujdx2ITwJq82yoPCeWyuDZvhe6M3z5g=;
+        b=WITmVO/apQx4y9E+LjtSXnHYfj1eBIAWSf/GKj8bqpjvwTk6m30SgIC1x9SjzCNc+aHyGF
+        ZYWkJ0oPdkehAJb/JeDcvhjDz3hcTUsKMucl/QyJYck1hcHl9+99U/gFD72QJPl08Qk0FY
+        4sdBLLqKt5tA2bFahxwU1WHTyiQVYhs=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-50-KZ9y2C0cP4iSILb4kbh3oQ-1; Wed, 02 Nov 2022 14:01:01 -0400
+X-MC-Unique: KZ9y2C0cP4iSILb4kbh3oQ-1
+Received: by mail-ej1-f70.google.com with SMTP id xj11-20020a170906db0b00b0077b6ecb23fcso10290826ejb.5
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:01:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=870ePeKf/g5/gv7jvhhc9uXlyy+wXSAuC1dLJzDbfU4=;
-        b=16Z7PRB7pMr4wHAdRduFsa8vJpyQqZJ87vjh9YtU45Z8RxwoOlF+ug+ncI17T+8aEA
-         eMl1oNXXr8AKsMd4oB6am+zOHkgb/qtmQjYLF47SJn0Xk4S40ItUiAM8ldvba6NjJEim
-         0KbFzvQMbHGs9KB+7o9dPkSerVc5/+oxtpgJ9wbfxEbKTUR7ZPfoDh8UOfjV4n5V9Tk4
-         vFDtWpG6hpUWVyKPvfgTf9bqAcSW22FJ1j6iw43ZD5Ws2W8Vrk5qaigNcVTp7ur4UUci
-         6KQzUFLXoY8ziYkBkHZsYDL8rSuJOCB0tj5jtUeUC+F8C8JU6Ehoqsn980pH7IjvIX9N
-         n1SA==
-X-Gm-Message-State: ACrzQf2GMOJeOy3OpWAcyx7UXDRJCVcIQq/gSd2j/IBNe2g776OXEezQ
-        +Q4zxYLCXbI3BlFJ7xA9YaeMvQ==
-X-Google-Smtp-Source: AMsMyM5dWNkcf2+fykK6GVeKAEqK2UQrPkyh4w5OxsoelvaCcQsmow7nQRO6GWHLdnekHTyAPxI/mA==
-X-Received: by 2002:a65:53c6:0:b0:46f:cbcb:7402 with SMTP id z6-20020a6553c6000000b0046fcbcb7402mr13577265pgr.366.1667411922325;
-        Wed, 02 Nov 2022 10:58:42 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id h13-20020a63384d000000b0045751ef6423sm7852427pgn.87.2022.11.02.10.58.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 10:58:41 -0700 (PDT)
-Date:   Wed, 2 Nov 2022 17:58:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Sandipan Das <sandipan.das@amd.com>
-Subject: Re: [kvm-unit-tests PATCH v4 23/24] x86/pmu: Update testcases to
- cover AMD PMU
-Message-ID: <Y2KvzqPsU5VIGU+x@google.com>
-References: <20221024091223.42631-1-likexu@tencent.com>
- <20221024091223.42631-24-likexu@tencent.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rCufs503dpXhujdx2ITwJq82yoPCeWyuDZvhe6M3z5g=;
+        b=AiJk5bVUCBn4GMsmjszoEOSn4Z3uT+ZUrqd5Ln1gNlN8UpEoY06XnwDf+fDDPMd1vW
+         gjBEvtbPnbbzD+YxRBS3lRMfwjyF98SK2T7DRj5jc4aoxl5crrCPzw0N+E6rbB2lXySp
+         c45zDvEKz57kHnHzMPlcdKcBvj3mERAXYB9D9G08gRtlyRVGSuvDDzVcHRN9QsQoPpFY
+         ZonWuWV3rEZlhggxgH+smuKWJUMRqN9SflyE1WLSkPe62qrNYCWUdOYIsoWk1pmcH5Jh
+         Nu5jute6Yd1QpPrcQP+U+riPJIR/WPgT2Rc+giy3Jb5LmtLVmZPrb/lo26VJLCjO4jc4
+         cfmA==
+X-Gm-Message-State: ACrzQf3FeFixadM6VXLT8fmjfEMJkGkc2aTi1UMUnG2Uaktj9ZWgQKIl
+        bsKjWXJeqXhS0WmGRnQotOEmb4cnUsQKfHUbrLVUyG46lyWPDMPtaKflYOMq1SJOweL9UYgT+Xz
+        od8RKurXvN69e
+X-Received: by 2002:a17:907:162a:b0:7a9:9875:3147 with SMTP id hb42-20020a170907162a00b007a998753147mr24811955ejc.546.1667412059713;
+        Wed, 02 Nov 2022 11:00:59 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6+k26jt8P0meTC5cvtxOQG2A16cOuUyN4Zb9NbzYoBjeJ+Gwhk+kLVvmXBfhREPPfCCMEb7A==
+X-Received: by 2002:a17:907:162a:b0:7a9:9875:3147 with SMTP id hb42-20020a170907162a00b007a998753147mr24811931ejc.546.1667412059484;
+        Wed, 02 Nov 2022 11:00:59 -0700 (PDT)
+Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
+        by smtp.googlemail.com with ESMTPSA id q16-20020a17090676d000b007ae035374a0sm1016781ejn.214.2022.11.02.11.00.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Nov 2022 11:00:57 -0700 (PDT)
+Message-ID: <28116f0b-4acd-d72c-aaee-c2fc63ad8190@redhat.com>
+Date:   Wed, 2 Nov 2022 19:00:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221024091223.42631-24-likexu@tencent.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH AUTOSEL 6.0 03/11] kvm: x86: Do proper cleanup if
+ kvm_x86_ops->vm_init() fails
+Content-Language: en-US
+To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Cc:     Junaid Shahid <junaids@google.com>,
+        Sean Christopherson <seanjc@google.com>, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, kvm@vger.kernel.org
+References: <20221014135139.2109024-1-sashal@kernel.org>
+ <20221014135139.2109024-3-sashal@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20221014135139.2109024-3-sashal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 24, 2022, Like Xu wrote:
-> @@ -104,11 +115,17 @@ static inline void write_gp_event_select(unsigned int i, u64 value)
->  
->  static inline u8 pmu_version(void)
->  {
-> +	if (!is_intel())
-> +		return 0;
-
-This can be handled by adding pmu_caps.version.
-
+On 10/14/22 15:51, Sasha Levin wrote:
+> From: Junaid Shahid <junaids@google.com>
+> 
+> [ Upstream commit b24ede22538b4d984cbe20532bbcb303692e7f52 ]
+> 
+> If vm_init() fails [which can happen, for instance, if a memory
+> allocation fails during avic_vm_init()], we need to cleanup some
+> state in order to avoid resource leaks.
+> 
+> Signed-off-by: Junaid Shahid <junaids@google.com>
+> Link: https://lore.kernel.org/r/20220729224329.323378-1-junaids@google.com
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> ---
+>   arch/x86/kvm/x86.c | 8 +++++++-
+>   1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b0c47b41c264..11fbd42100be 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12080,6 +12080,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   	if (ret)
+>   		goto out_page_track;
+>   
+> +	ret = static_call(kvm_x86_vm_init)(kvm);
+> +	if (ret)
+> +		goto out_uninit_mmu;
 > +
->  	return cpuid_10.a & 0xff;
->  }
->  
->  static inline bool this_cpu_has_pmu(void)
->  {
-> +	if (!is_intel())
-> +		return true;
+>   	INIT_HLIST_HEAD(&kvm->arch.mask_notifier_list);
+>   	INIT_LIST_HEAD(&kvm->arch.assigned_dev_head);
+>   	atomic_set(&kvm->arch.noncoherent_dma_count, 0);
+> @@ -12115,8 +12119,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   	kvm_hv_init_vm(kvm);
+>   	kvm_xen_init_vm(kvm);
+>   
+> -	return static_call(kvm_x86_vm_init)(kvm);
+> +	return 0;
+>   
+> +out_uninit_mmu:
+> +	kvm_mmu_uninit_vm(kvm);
+>   out_page_track:
+>   	kvm_page_track_cleanup(kvm);
+>   out:
 
-I think it makes sense to kill off this_cpu_has_pmu(), the only usage is after
-an explicit is_intel() check, and practically speaking that will likely hold true
-since differentiating between Intel and AMD PMUs seems inevitable.
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> +
->  	return !!pmu_version();
->  }
->  
-> @@ -135,12 +152,18 @@ static inline void set_nr_gp_counters(u8 new_num)
->  
->  static inline u8 pmu_gp_counter_width(void)
->  {
-> -	return (cpuid_10.a >> 16) & 0xff;
-> +	if (is_intel())
-
-Again, can be handled by utilizing pmu_caps.
-
-> +		return (cpuid_10.a >> 16) & 0xff;
-> +	else
-> +		return PMC_DEFAULT_WIDTH;
->  }
->  
->  static inline u8 pmu_gp_counter_mask_length(void)
->  {
-> -	return (cpuid_10.a >> 24) & 0xff;
-> +	if (is_intel())
-> +		return (cpuid_10.a >> 24) & 0xff;
-> +	else
-> +		return pmu_nr_gp_counters();
->  }
->  
->  static inline u8 pmu_nr_fixed_counters(void)
-> @@ -161,6 +184,9 @@ static inline u8 pmu_fixed_counter_width(void)
->  
->  static inline bool pmu_gp_counter_is_available(int i)
->  {
-> +	if (!is_intel())
-> +		return i < pmu_nr_gp_counters();
-> +
->  	/* CPUID.0xA.EBX bit is '1 if they counter is NOT available. */
->  	return !(cpuid_10.b & BIT(i));
->  }
-> @@ -268,4 +294,9 @@ static inline bool pebs_has_baseline(void)
->  	return pmu.perf_cap & PMU_CAP_PEBS_BASELINE;
->  }
->  
-> +static inline bool has_amd_perfctr_core(void)
-
-Unnecessary wrappers, just use this_cpu_has() directly.
-
-> +{
-> +	return this_cpu_has(X86_FEATURE_PERFCTR_CORE);
-> +}
