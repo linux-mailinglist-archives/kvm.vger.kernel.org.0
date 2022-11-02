@@ -2,149 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB57C6163F7
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 14:41:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 71BCE6164A6
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 15:13:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229741AbiKBNlY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 09:41:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40608 "EHLO
+        id S230210AbiKBONB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 10:13:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229752AbiKBNlV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 09:41:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26B68E5B
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 06:40:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667396425;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ijbFF0H/xCdH726+uTnvXQpvPZW6ByxgMWw5uU67hZo=;
-        b=KdVf4YNKPbDK5dNacv0XfJLFrVLQZ/fgT2bGwPNPjZvhW1gT7Ttm2t2AYvUWGLyznn1DkE
-        5mbv8Nghjjg72Rk+RvJ+CX/4hbVoWGNst2cchovRY3l6ziPxil1cLC+g6xUYXrknbuXpP9
-        L7wLunGQmYuku2bLx6m26CvWUbwlcxw=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-401-77oQ8PesO7SMm_M6JG_l0w-1; Wed, 02 Nov 2022 09:40:23 -0400
-X-MC-Unique: 77oQ8PesO7SMm_M6JG_l0w-1
-Received: by mail-ej1-f71.google.com with SMTP id gt15-20020a1709072d8f00b007aaac7973fbso10063215ejc.23
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 06:40:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ijbFF0H/xCdH726+uTnvXQpvPZW6ByxgMWw5uU67hZo=;
-        b=6Kv2j3FtsxjS8S5t2zoRJOniHUt/R8kqNCQDqCtRnguaR55ZnGc6KVDeSQbo/5ZKle
-         eYTLKV8SMvCZuIQcsNmqU16Zv2LusXBP+Sn8aw4QMjQp79k5NM5zVthbahLLiuzwBSBa
-         tMAe3UBH6VSc0gPGzXdnQl7eZfOy4jWC9/2K5FWPPa3irf9yJlNH+WAwTdaQefcqTAJj
-         Serlqik02EdiL7wEUFZuMudvsej1bHf7aGeyfAISDvO3soFJVFI8taOi7Wg1oHDpo9UP
-         z9vGjeJYQi2M6XelVrZmlMxoUu+EcG8e9/lXwF6+1NQDjpDmkiXXGBfQfTW7Vuwm8kFS
-         aR2w==
-X-Gm-Message-State: ACrzQf0f9pUZHr4kaApl8eI1EHR3IfU5nqSNiiZsJhyDkCLKvOUKVGI4
-        NETWhtBI97Tx0rK+ULRe7Xpe7U3hX21QG9wmTgNJc9PWCfih36T3qjVCavsAdQFoPhUC/+mvU/q
-        L33QjIsOWyYgr
-X-Received: by 2002:a17:906:8a6c:b0:7a8:2f09:d88d with SMTP id hy12-20020a1709068a6c00b007a82f09d88dmr23410439ejc.49.1667396422549;
-        Wed, 02 Nov 2022 06:40:22 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7THT0zUdd+gaQKQVjw1hUNTdgrVAacvK5K9pvBd4DnFuaiL9Pt4e5ApNNFqqflSgh+2NrUjA==
-X-Received: by 2002:a17:906:8a6c:b0:7a8:2f09:d88d with SMTP id hy12-20020a1709068a6c00b007a82f09d88dmr23410402ejc.49.1667396422319;
-        Wed, 02 Nov 2022 06:40:22 -0700 (PDT)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id eg35-20020a05640228a300b004638ba0ea96sm2998079edb.97.2022.11.02.06.40.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Nov 2022 06:40:20 -0700 (PDT)
-Message-ID: <fd2cf028-bd83-57ff-7e6d-ef3ee11852a1@redhat.com>
-Date:   Wed, 2 Nov 2022 14:40:18 +0100
+        with ESMTP id S229531AbiKBOM7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 10:12:59 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7824B22B16;
+        Wed,  2 Nov 2022 07:12:57 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A2Dqc0j008745;
+        Wed, 2 Nov 2022 14:12:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=35nE7o15c9riT5mLxghtC7oxViP9L6ZfHhdvEYODxLM=;
+ b=SlEayUNUlqFz784oCyvTtczjBdNqH67uOoBWijkPAxYmaA2oi0QZrwojcdbz1m59dOuJ
+ P4Mi47hD4dE0VGLg4Z/eMOaO7Jp7E61GhdpanVdvQfA722BxcSIeteSLaKByHdfo0Kkg
+ Vpyg8a6Y7DDQPsTKajfiImHP2M3JsVwnG/3ZMZRpDcRvNRS0wMi0K9uFs0/02lBkR5EK
+ e3IwCPykKJ2aHf8Zomm9U5cxvEYJ9jRSDXdB/R8Dhf9derW/w9n+Klxjt1YK8rVWh2On
+ ReR3Bo0hc+q/kHuFQlVDfoHbSyQenFCms2bTP93WgxvJBPOTGL9EGuviBDYW12VWDp7I ig== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kks22jjtq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Nov 2022 14:12:43 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A2DEIWY010237;
+        Wed, 2 Nov 2022 14:12:43 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kks22jjsq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Nov 2022 14:12:43 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A2E6bq1008788;
+        Wed, 2 Nov 2022 14:12:41 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06fra.de.ibm.com with ESMTP id 3kguejd6fv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Nov 2022 14:12:41 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A2ECcLZ27787858
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 2 Nov 2022 14:12:38 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 58260A405B;
+        Wed,  2 Nov 2022 14:12:38 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B4528A4060;
+        Wed,  2 Nov 2022 14:12:37 +0000 (GMT)
+Received: from osiris (unknown [9.145.56.93])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed,  2 Nov 2022 14:12:37 +0000 (GMT)
+Date:   Wed, 2 Nov 2022 15:12:36 +0100
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>
+Subject: Re: [PATCH v2 1/9] s390/uaccess: Add storage key checked cmpxchg
+ access to user space
+Message-ID: <Y2J61LWSV+HolIeT@osiris>
+References: <20221012205609.2811294-1-scgl@linux.ibm.com>
+ <20221012205609.2811294-2-scgl@linux.ibm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH v2 1/5] perf/x86/intel/lbr: use setup_clear_cpu_cap
- instead of clear_cpu_cap
-Content-Language: en-US
-To:     Borislav Petkov <bp@alien8.de>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Jane Malalane <jane.malalane@citrix.com>,
-        Kees Cook <keescook@chromium.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-perf-users@vger.kernel.org,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
-References: <20220718141123.136106-1-mlevitsk@redhat.com>
- <20220718141123.136106-2-mlevitsk@redhat.com> <Yyh9RDbaRqUR1XSW@zn.tnic>
- <c105971a72dfe6d46ad75fb7e71f79ba716e081c.camel@redhat.com>
- <YzGlQBkCSJxY+8Jf@zn.tnic>
- <c1168e8bd9077a2cc9ef61ee06db7a4e8c0f1600.camel@redhat.com>
- <Y1EOBAaLbv2CXBDL@zn.tnic>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Y1EOBAaLbv2CXBDL@zn.tnic>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221012205609.2811294-2-scgl@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: vEqvPEkNOiMjLF4A4AXRnLajCt2hxpmZ
+X-Proofpoint-ORIG-GUID: eMFw4JuDxVV5yzho1KrLvvsVObKo68QS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-02_09,2022-11-02_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 mlxscore=0 phishscore=0 clxscore=1015 malwarescore=0
+ lowpriorityscore=0 impostorscore=0 bulkscore=0 suspectscore=0
+ mlxlogscore=999 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2210170000 definitions=main-2211020090
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/20/22 10:59, Borislav Petkov wrote:
-> On Wed, Sep 28, 2022 at 01:49:34PM +0300, Maxim Levitsky wrote:
->> Patch 5 is the main fix - it makes the kernel to be tolerant to a
->> broken CPUID config (coming hopefully from hypervisor), where you have
->> a feature (AVX2 in my case) but not a feature on which this feature
->> depends (AVX).
+Hi Janis,
+
+On Wed, Oct 12, 2022 at 10:56:01PM +0200, Janis Schoetterl-Glausch wrote:
+> Add cmpxchg functionality similar to that in cmpxchg.h except that the
+> target is a user space address and that the address' storage key is
+> matched with the access_key argument in order to honor key-controlled
+> protection.
+> The access is performed by changing to the secondary-spaces mode and
+> setting the PSW key for the duration of the compare and swap.
 > 
-> I really really don't like it when people are fixing the wrong thing.
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> ---
 > 
-> Why does the kernel need to get fixed when something else can't get its
-> CPUID dependencies straight? I don't even want to know why something
-> would set AVX2 without AVX?!?!
+> 
+> Possible variations:
+>   * check the assumptions made in cmpxchg_user_key_size and error out
+>   * call functions called by copy_to_user
+>      * access_ok? is a nop
+>      * should_fail_usercopy?
+>      * instrument_copy_to_user? doesn't make sense IMO
+>   * don't be overly strict in cmpxchg_user_key
+> 
+> 
+>  arch/s390/include/asm/uaccess.h | 189 ++++++++++++++++++++++++++++++++
+>  1 file changed, 189 insertions(+)
 
-Users do so because they just "disable AVX" (e.g. in QEMU -cpu 
-host,-avx) and that removes the AVX bit.  Userspace didn't bother to 
-implement the whole set of CPUID bit dependencies for AVX because:
+So finally I send the uaccess/cmpxchg patches in reply to this mail.
+Sorry for the long delay!
 
-1) Intel is adding AVX features every other week and probably half the 
-time people would forget to add the dependency
+The first three patches are not required for the functionality you need,
+but given that I always stress that the code should be consistent I include
+them anyway.
 
-2) anyway you absolutely need to check XCR0 before using AVX, which in 
-the kernel is done using cpu_has_xfeatures(XFEATURE_MASK_YMM), and 
-userspace *does* remove the XSAVE state from 0Dh leaf if you remove AVX.
+The changes are probably quite obvious:
 
-(2) in particular holds even on bare metal.  The kernel bug here is that 
-X86_FEATURE_AVX only tells you if the instructions are _present_, not if 
-they are _usable_.   Indeed, the XCR0 check is present for all other 
-files in arch/x86/crypto, either instead or in addition to 
-boot_cpu_has(X86_FEATURE_AVX).
+- Keep uaccess cmpxchg code more or less identical to regular cmpxchg
+  code. I wasn't able to come up with a readable code base which could be
+  used for both variants.
 
-Maxim had sent a patch about a year ago to do it in aesni-intel-glue.c 
-but Dave told him to fix the dependencies instead 
-(https://lore.kernel.org/all/20211103124614.499580-1-mlevitsk@redhat.com/). 
-  What do you think of applying that patch instead?
+- Users may only use the cmpxchg_user_key() macro - _not_ the inline
+  function, which is an internal API. This will require that you need to
+  add a switch statement and couple of casts within the KVM code, but
+  shouldn't have much of an impact on the generated code.
+
+- Cause link error for non-integral sizes, similar to other uaccess
+  functions.
+
+- cmpxchg_user_key() has now a simple return value: 0 or -EFAULT, and
+  writes the old value to a location provided by a pointer. This is quite
+  similar to the futex code. Users must compare the old and expected value
+  to figure out if something was exchanged. Note that this is in most cases
+  more efficient than extracting the condition code from the PSW with ipm,
+  since nowadays we have instructions like compare and branch relative on
+  condition, etc.
+
+- Couple of other minor changes which I forgot.
+
+Code is untested (of course :) ). Please give it a try and let me know if
+this is good enough for your purposes.
+
+I also did not limit the number of retries for the one and two byte
+scenarion. Before doing that we need to have proof that there really is a
+problem. Maybe Nico or you will give this a try.
 
 Thanks,
-
-Paolo
-
+Heiko
