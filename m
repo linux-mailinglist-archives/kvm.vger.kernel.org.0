@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A59B6170F7
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 23:52:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 43A8A6170F6
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 23:52:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbiKBWwa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 18:52:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46788 "EHLO
+        id S230337AbiKBWw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 18:52:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231663AbiKBWwG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231661AbiKBWwG (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 2 Nov 2022 18:52:06 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04B7B1181A
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 15:51:58 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-348608c1cd3so281307b3.10
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1FF9DF34
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 15:51:57 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id l63-20020a639142000000b0046f5bbb7372so41296pge.23
         for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 15:51:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=W++GGh+DB64T8mGjyKpK8ZHBTBkGXFLmW4/vAnmYs9I=;
-        b=CTxWiyZ6Ie4BTbInLB/pBTtahI9E3dhK52VK+Rd380t5lB+p6M2sY13DgQ+j6PANOZ
-         /cIPkJIXLS5Sx8tyDC7LlnTLxvhNKmmfDF0+2e/dbxmQelbs3Y6rMs4VoRoq1aXCItMd
-         iDISIhagL8Cy1DaZZNVguomr9Qn5S5/zQde4dMXMMkXzfdDi273caTXjior9l8kFTsWt
-         mBr0CsD1DXykMDxZlMTcRO3tQ2+i6X0ngQ9HoiYF7c8r++8zSaAAvjN+hxZ0eEku5YAX
-         mn4mFTYOW1AAwakccm8plwjL1qe8DpiGIcHj8i3v/nS2vYQaxZFoLyeX2tfqoIJbUgRL
-         1DRA==
+        bh=xDvNqDKYm25iAo/FVzxm8LbMNeFXW/5fxLAmd4sS7IQ=;
+        b=gnhf2kfc3cb2WRrJmjgeLzIJhzQPJGUxtqm/5QF5FVsmC+mXj0iigWKguQwPhb54xF
+         g1xw6yCJB0jBMynZLOk+fSBQr/8OTLuQkZMll1QwLxMzN1Zzy+RWk+OIlwWJJUh0FM+2
+         cKwlqk6bKS6ZovFbXdlp4e0LH6aasAByYEN0pdY4vI+AfIhQ6bF823xVTI5NjA2Er/Ug
+         rDHhi0Qjm036ylSdHZoexGvLeSXE5mNJuWNXGXyhr6Et77XxDMathyKq/ZvAdhg/qlQk
+         KZyWe1rdGyqlJjUWNmLT+6oYXhJHTDrLET+/usNoHBoL28q5bnPRDYMjAbroLVCzMD9z
+         sILg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=W++GGh+DB64T8mGjyKpK8ZHBTBkGXFLmW4/vAnmYs9I=;
-        b=037l6VF1bdpwVUQDxHpmAJYcdQ22laR3lloH5jJMcJJ7cCE7GJF4f3jo6urGkPxaml
-         GmNLCmSLHXc36/bOJLFiMOtIPZb3op5p/BMcgMXDL24iZCUGbs2IxTj2IaB26Pza6cN8
-         UpqdGvJ30LEih5p2qGUlyaelJbtgL2cIvoSRaciQ6HbBFc1nUffEcoFuqWTuoOnnoZIN
-         9KZLjKOSn7vyWxa92UfYDxIYbjEPEZm8J/IgIMuNfoCVCyd8CQgXD8cmAYVUcFrfisE3
-         Zn7Wgg4HKxKnpiq8WZwEfVGRVZMm8uXBXO2kcHyq8on/CwpwZqObYbNhBaL97zzM3K8i
-         blpA==
-X-Gm-Message-State: ACrzQf0/pSry4BTU733tH3y2chbK7CcMf2a+KpmUhAe4y8z1cl5Da0eo
-        H2yvsDLdxb4ClzwiYi7TPBMxiHVRrS4=
-X-Google-Smtp-Source: AMsMyM6vruFKhUPxiovzfrTu2xVXUDScg/Zk02h9kbQiwcDpCHMzTdrHc0VQCLWb9fgAGgIaEAl+ygG3a+U=
+        bh=xDvNqDKYm25iAo/FVzxm8LbMNeFXW/5fxLAmd4sS7IQ=;
+        b=CcTlzUjrGFTYfuGL/ygPLxxsYeC1TuVL7ru6n6WrUBgewa2sVTMQtEYNvFQewRPbcV
+         wt3HhuPT8/MR2TayBcFVzGjBqG9HejweSf3C9/v6Oe9u29p/w0GIhKhyk/cvk/zGKg3V
+         1UHtBj5JR+TGxLzNf36B7u84bMFldWfTMBD3xbrFUxNoI3Dy3rcC6BWGhLtQ3DdSmZOO
+         Slu5QyviETm1boMMAgDTiCZul6K4b51MEzFkG35Ie5CPEBCUc6BgW4M54XRlWl6BCoYK
+         z2aEbBGJVfJESAs8UJOe0cry2H020afwN6zVYcoIaT5xy4OdPpf1SRzmrM+z8/2KoyaK
+         l/rg==
+X-Gm-Message-State: ACrzQf0qf+gePbSXtB5jbn4/yeoNJfyY9tyz6pN4Dytilw9q9iaAweUE
+        V2eyJC5Ve5qIPqsiADxXiIpiIYU0I/w=
+X-Google-Smtp-Source: AMsMyM6rnsPaepV9JCYvC97L/PHj8LHVdqry7XXTJo20kpcBej/MGou3rR5bRhkJUfY00sQO94Ea63AFdfs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:124f:b0:66e:e3da:487e with SMTP id
- t15-20020a056902124f00b0066ee3da487emr27618583ybu.310.1667429513193; Wed, 02
- Nov 2022 15:51:53 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:f414:b0:212:cacf:42c3 with SMTP id
+ ch20-20020a17090af41400b00212cacf42c3mr45271349pjb.198.1667429514522; Wed, 02
+ Nov 2022 15:51:54 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  2 Nov 2022 22:51:06 +0000
+Date:   Wed,  2 Nov 2022 22:51:07 +0000
 In-Reply-To: <20221102225110.3023543-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221102225110.3023543-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102225110.3023543-24-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v5 23/27] x86/pmu: Add global helpers to cover
- Intel Arch PMU Version 1
+Message-ID: <20221102225110.3023543-25-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v5 24/27] x86/pmu: Add gp_events pointer to
+ route different event tables
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -73,181 +73,93 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-To test Intel arch pmu version 1, most of the basic framework and
-use cases which test any PMU counter do not require any changes,
-except no access to registers introduced only in PMU version 2.
-
-Adding some guardian's checks can seamlessly support version 1,
-while opening the door for normal AMD PMUs tests.
+AMD and Intel do not share the same set of coding rules for performance
+events, and code to test the same performance event can be reused by
+pointing to a different coding table, noting that the table size also
+needs to be updated.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/pmu.c |  9 ++++++---
- lib/x86/pmu.h |  5 +++++
- x86/pmu.c     | 47 +++++++++++++++++++++++++++++++----------------
- 3 files changed, 42 insertions(+), 19 deletions(-)
+ x86/pmu.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/lib/x86/pmu.c b/lib/x86/pmu.c
-index 0a69a3c6..ea4859df 100644
---- a/lib/x86/pmu.c
-+++ b/lib/x86/pmu.c
-@@ -24,9 +24,12 @@ void pmu_init(void)
- 		pmu.perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
- 	pmu.msr_gp_counter_base = MSR_IA32_PERFCTR0;
- 	pmu.msr_gp_event_select_base = MSR_P6_EVNTSEL0;
--	pmu.msr_global_status = MSR_CORE_PERF_GLOBAL_STATUS;
--	pmu.msr_global_ctl = MSR_CORE_PERF_GLOBAL_CTRL;
--	pmu.msr_global_status_clr = MSR_CORE_PERF_GLOBAL_OVF_CTRL;
-+
-+	if (this_cpu_has_perf_global_status()) {
-+		pmu.msr_global_status = MSR_CORE_PERF_GLOBAL_STATUS;
-+		pmu.msr_global_ctl = MSR_CORE_PERF_GLOBAL_CTRL;
-+		pmu.msr_global_status_clr = MSR_CORE_PERF_GLOBAL_OVF_CTRL;
-+	}
- 
- 	pmu_reset_all_counters();
- }
-diff --git a/lib/x86/pmu.h b/lib/x86/pmu.h
-index 885b53f1..e2c0bdf4 100644
---- a/lib/x86/pmu.h
-+++ b/lib/x86/pmu.h
-@@ -89,6 +89,11 @@ static inline bool this_cpu_has_perf_global_ctrl(void)
- 	return pmu.version > 1;
- }
- 
-+static inline bool this_cpu_has_perf_global_status(void)
-+{
-+	return pmu.version > 1;
-+}
-+
- static inline bool pmu_gp_counter_is_available(int i)
- {
- 	return pmu.gp_counter_available & BIT(i);
 diff --git a/x86/pmu.c b/x86/pmu.c
-index 3cca5b9c..7f200658 100644
+index 7f200658..c40e2a96 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -102,12 +102,18 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
+@@ -30,7 +30,7 @@ struct pmu_event {
+ 	uint32_t unit_sel;
+ 	int min;
+ 	int max;
+-} gp_events[] = {
++} intel_gp_events[] = {
+ 	{"core cycles", 0x003c, 1*N, 50*N},
+ 	{"instructions", 0x00c0, 10*N, 10.2*N},
+ 	{"ref cycles", 0x013c, 1*N, 30*N},
+@@ -46,6 +46,9 @@ struct pmu_event {
  
- static void global_enable(pmu_counter_t *cnt)
+ char *buf;
+ 
++static struct pmu_event *gp_events;
++static unsigned int gp_events_size;
++
+ static inline void loop(void)
  {
-+	if (!this_cpu_has_perf_global_ctrl())
-+		return;
-+
- 	cnt->idx = event_to_global_idx(cnt);
- 	wrmsr(pmu.msr_global_ctl, rdmsr(pmu.msr_global_ctl) | BIT_ULL(cnt->idx));
- }
+ 	unsigned long tmp, tmp2, tmp3;
+@@ -91,7 +94,7 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
+ 	if (is_gp(cnt)) {
+ 		int i;
  
- static void global_disable(pmu_counter_t *cnt)
+-		for (i = 0; i < sizeof(gp_events)/sizeof(gp_events[0]); i++)
++		for (i = 0; i < gp_events_size; i++)
+ 			if (gp_events[i].unit_sel == (cnt->config & 0xffff))
+ 				return &gp_events[i];
+ 	} else
+@@ -213,7 +216,7 @@ static void check_gp_counters(void)
  {
-+	if (!this_cpu_has_perf_global_ctrl())
-+		return;
-+
- 	wrmsr(pmu.msr_global_ctl, rdmsr(pmu.msr_global_ctl) & ~BIT_ULL(cnt->idx));
- }
+ 	int i;
  
-@@ -283,7 +289,8 @@ static void check_counter_overflow(void)
- 	overflow_preset = measure_for_overflow(&cnt);
+-	for (i = 0; i < sizeof(gp_events)/sizeof(gp_events[0]); i++)
++	for (i = 0; i < gp_events_size; i++)
+ 		if (pmu_gp_counter_is_available(i))
+ 			check_gp_counter(&gp_events[i]);
+ 		else
+@@ -246,7 +249,7 @@ static void check_counters_many(void)
  
- 	/* clear status before test */
--	pmu_clear_global_status();
-+	if (this_cpu_has_perf_global_status())
-+		pmu_clear_global_status();
- 
- 	report_prefix_push("overflow");
- 
-@@ -310,6 +317,10 @@ static void check_counter_overflow(void)
- 		idx = event_to_global_idx(&cnt);
- 		__measure(&cnt, cnt.count);
- 		report(cnt.count == 1, "cntr-%d", i);
-+
-+		if (!this_cpu_has_perf_global_status())
-+			continue;
-+
- 		status = rdmsr(pmu.msr_global_status);
- 		report(status & (1ull << idx), "status-%d", i);
- 		wrmsr(pmu.msr_global_status_clr, status);
-@@ -418,7 +429,8 @@ static void check_running_counter_wrmsr(void)
- 	report(evt.count < gp_events[1].min, "cntr");
- 
- 	/* clear status before overflow test */
--	pmu_clear_global_status();
-+	if (this_cpu_has_perf_global_status())
-+		pmu_clear_global_status();
- 
- 	start_event(&evt);
- 
-@@ -430,8 +442,11 @@ static void check_running_counter_wrmsr(void)
- 
- 	loop();
- 	stop_event(&evt);
--	status = rdmsr(pmu.msr_global_status);
--	report(status & 1, "status msr bit");
-+
-+	if (this_cpu_has_perf_global_status()) {
-+		status = rdmsr(pmu.msr_global_status);
-+		report(status & 1, "status msr bit");
-+	}
- 
- 	report_prefix_pop();
- }
-@@ -451,7 +466,8 @@ static void check_emulated_instr(void)
+ 		cnt[n].ctr = MSR_GP_COUNTERx(n);
+ 		cnt[n].config = EVNTSEL_OS | EVNTSEL_USR |
+-			gp_events[i % ARRAY_SIZE(gp_events)].unit_sel;
++			gp_events[i % gp_events_size].unit_sel;
+ 		n++;
+ 	}
+ 	for (i = 0; i < pmu.nr_fixed_counters; i++) {
+@@ -595,7 +598,7 @@ static void set_ref_cycle_expectations(void)
+ {
+ 	pmu_counter_t cnt = {
+ 		.ctr = MSR_IA32_PERFCTR0,
+-		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[2].unit_sel,
++		.config = EVNTSEL_OS | EVNTSEL_USR | intel_gp_events[2].unit_sel,
  	};
- 	report_prefix_push("emulated instruction");
- 
--	pmu_clear_global_status();
-+	if (this_cpu_has_perf_global_status())
-+		pmu_clear_global_status();
- 
- 	start_event(&brnch_cnt);
- 	start_event(&instr_cnt);
-@@ -485,7 +501,8 @@ static void check_emulated_instr(void)
- 		:
- 		: "eax", "ebx", "ecx", "edx");
- 
--	wrmsr(pmu.msr_global_ctl, 0);
-+	if (this_cpu_has_perf_global_ctrl())
-+		wrmsr(pmu.msr_global_ctl, 0);
- 
- 	stop_event(&brnch_cnt);
- 	stop_event(&instr_cnt);
-@@ -496,10 +513,12 @@ static void check_emulated_instr(void)
- 	       "instruction count");
- 	report(brnch_cnt.count - brnch_start >= EXPECTED_BRNCH,
- 	       "branch count");
--	// Additionally check that those counters overflowed properly.
--	status = rdmsr(pmu.msr_global_status);
--	report(status & 1, "branch counter overflow");
--	report(status & 2, "instruction counter overflow");
-+	if (this_cpu_has_perf_global_status()) {
-+		// Additionally check that those counters overflowed properly.
-+		status = rdmsr(pmu.msr_global_status);
-+		report(status & 1, "branch counter overflow");
-+		report(status & 2, "instruction counter overflow");
-+	}
- 
- 	report_prefix_pop();
- }
-@@ -585,7 +604,8 @@ static void set_ref_cycle_expectations(void)
- 	if (!pmu.nr_gp_counters || !pmu_gp_counter_is_available(2))
+ 	uint64_t tsc_delta;
+ 	uint64_t t0, t1, t2, t3;
+@@ -631,8 +634,8 @@ static void set_ref_cycle_expectations(void)
+ 	if (!tsc_delta)
  		return;
  
--	wrmsr(pmu.msr_global_ctl, 0);
-+	if (this_cpu_has_perf_global_ctrl())
-+		wrmsr(pmu.msr_global_ctl, 0);
+-	gp_events[2].min = (gp_events[2].min * cnt.count) / tsc_delta;
+-	gp_events[2].max = (gp_events[2].max * cnt.count) / tsc_delta;
++	intel_gp_events[2].min = (intel_gp_events[2].min * cnt.count) / tsc_delta;
++	intel_gp_events[2].max = (intel_gp_events[2].max * cnt.count) / tsc_delta;
+ }
  
- 	t0 = fenced_rdtsc();
- 	start_event(&cnt);
-@@ -636,11 +656,6 @@ int main(int ac, char **av)
+ static void check_invalid_rdpmc_gp(void)
+@@ -656,6 +659,8 @@ int main(int ac, char **av)
  		return report_summary();
  	}
  
--	if (pmu.version == 1) {
--		report_skip("PMU version 1 is not supported.");
--		return report_summary();
--	}
--
++	gp_events = (struct pmu_event *)intel_gp_events;
++	gp_events_size = sizeof(intel_gp_events)/sizeof(intel_gp_events[0]);
  	set_ref_cycle_expectations();
  
  	printf("PMU version:         %d\n", pmu.version);
