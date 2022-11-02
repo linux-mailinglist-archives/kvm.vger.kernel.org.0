@@ -2,77 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8DD3616B4B
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 18:55:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 432C1616B4F
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 18:56:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231288AbiKBRzX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 13:55:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55688 "EHLO
+        id S230434AbiKBR4K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 13:56:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229949AbiKBRzU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 13:55:20 -0400
+        with ESMTP id S229637AbiKBR4I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 13:56:08 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D2B0A44D
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 10:54:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 461A12EF10
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 10:55:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667411667;
+        s=mimecast20190719; t=1667411711;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qsy9PInY+W27+gffMySXvFWm04u28ouULp0IKJ8CX94=;
-        b=VraqMsxYX4A5ybuJMTyt4i7wssZh+7RS4FKwnzwlj7cSlvsdAc68ZT7765vREU3GD90R1n
-        Oys4kwHuL3rYsE+7P2r427XFRUwHZddxb/R3h7YpJIM2xPjx7BsbKwHPTaZQUdG3rWgsqJ
-        wB3tAhm7lS+tud6XLKk381XnPrgDjkY=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=tePRKZ0uLjBLYtJwfg0xYFUmQTdg6aXwOf9GayM0nFY=;
+        b=P+qkNoAHXkUEQ7NWg1R983QWCWziOUCvw0zyjPAgDPN67OhvQg1W+7Noad6Lzh6GGrIriD
+        DOdwF20VtKqmfmhJiJnvsRQBYLHsgTremgCA3dP+eKS+SM5kuK7GatTiN7PJuNKOQEZY99
+        CRNGEzIpLVcxhKILpfDvI0DV4MVoAqw=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-230-jIUn3MzkPVOuJsxOZZrVng-1; Wed, 02 Nov 2022 13:54:26 -0400
-X-MC-Unique: jIUn3MzkPVOuJsxOZZrVng-1
-Received: by mail-ej1-f69.google.com with SMTP id qb12-20020a1709077e8c00b007a6c5a23a30so10347800ejc.12
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 10:54:26 -0700 (PDT)
+ us-mta-212-yhHIpxHGNDuv12lYZ5hyGA-1; Wed, 02 Nov 2022 13:55:09 -0400
+X-MC-Unique: yhHIpxHGNDuv12lYZ5hyGA-1
+Received: by mail-ej1-f71.google.com with SMTP id ga26-20020a1709070c1a00b007ad4a55d6e1so10203686ejc.6
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 10:55:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qsy9PInY+W27+gffMySXvFWm04u28ouULp0IKJ8CX94=;
-        b=53ow7N3LjjMwMQK1RyL3sYaW3ksRYo/+QtTqVxVed2XDX5eNdxQKk93nwKaNCYMEJX
-         RkQuBASo1NKDhGWkvZK53E+VH51qPUIVcw+Tgbn8w3FIw9rq3C2xDMIFNwQ6YNx3/qHz
-         RlCRA5Qbogna0qZ/wE5mzRSFlVmAmfPtNex3Q9GGuYO82gK1irKIVTQEUaEqWg6tnYJz
-         6TSAg48ghYu/9pGv7MaXcXmDuDKg6384HNnUQSBHECkKTeZ0Cmto8s500hHRltzyftjZ
-         wYhefPyJi3aRCTIxhgRwXqUCt2VRcLmzKhqLDqWYPTg6d704/O16LKbOtFWpoSlqwoeK
-         MLXQ==
-X-Gm-Message-State: ACrzQf2RONJvjMBrEKARDsk1WndW+o/dNyhOOAaAjoJF7nOc+Nzt/KE3
-        T3ZkKFm4Y5K+uSXCmtf3XKCJbMjVvV9VgrmO/s5vu5csbMtm6wqOxOUas4ox2bpMun3DRdOjNN/
-        xROPFtpKqnL9Z
-X-Received: by 2002:a17:907:31c7:b0:740:e3e5:c025 with SMTP id xf7-20020a17090731c700b00740e3e5c025mr25445521ejb.341.1667411665339;
-        Wed, 02 Nov 2022 10:54:25 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7i9P8a3KaukAAmvuzA0kYKoaG+hzHr8RgD2JCBtxz5ORS+iIp13DTtPPB6cRp+bA7bWvgRQg==
-X-Received: by 2002:a17:907:31c7:b0:740:e3e5:c025 with SMTP id xf7-20020a17090731c700b00740e3e5c025mr25445499ejb.341.1667411665122;
-        Wed, 02 Nov 2022 10:54:25 -0700 (PDT)
+        bh=tePRKZ0uLjBLYtJwfg0xYFUmQTdg6aXwOf9GayM0nFY=;
+        b=CmrY5/sLFB4L1g2kpgFVUSg7M13h1jXw7f/j/Xj746aBc0EGbVZfaHa6NXz1umBn3B
+         8zm8mWKbatQNtSpG3jGsk/LCOn9qudV8g7KkrOjCunAtU6ugGC8yOqVKOuIvS5TzyqEr
+         fyCqUsadfEHkYvtq+cClYOW/ugAG8FnwQNrngk4uum7/1HaENPi2lD2zNbhJzusdpp5h
+         MGd/iwZG4YqIRHtHbWmVOubgnJ+xRsuyK/ZN4vHJe68Q58QNvQHxAkDpE5zXMldzVNrL
+         y+rQl5Pgp2PdSYUZ1bgvBl3S+rWKBpx0dSLGuMzU799qqRBFeH9887x1pN/wFF5l8RP5
+         3UqA==
+X-Gm-Message-State: ACrzQf3dYV3kdVK9S3LUHgtsB5GlogcTVl36wILepgx4oO3DRPq6vCb3
+        Rxqr8m+JQjbrcvPffJZ6a/Dhf92Wm26XxVut9I4N6V3tyjZNK9SqwkW3kG90PY2wPqE9mLHPWvd
+        v9dexAgEe/KRk
+X-Received: by 2002:a17:906:dc93:b0:7ad:ca82:4cb9 with SMTP id cs19-20020a170906dc9300b007adca824cb9mr18291450ejc.521.1667411708077;
+        Wed, 02 Nov 2022 10:55:08 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4CGDDQLFxluIk93PXHliWQxFzNbc8VATbMSOEZi9GEjCnyS6RcTxp7eGuio3D7ZCvsmWJmNw==
+X-Received: by 2002:a17:906:dc93:b0:7ad:ca82:4cb9 with SMTP id cs19-20020a170906dc9300b007adca824cb9mr18291428ejc.521.1667411707801;
+        Wed, 02 Nov 2022 10:55:07 -0700 (PDT)
 Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id dy14-20020a05640231ee00b00461621cae1fsm6046687edb.16.2022.11.02.10.54.23
+        by smtp.googlemail.com with ESMTPSA id v27-20020aa7cd5b000000b00458898fe90asm6117421edw.5.2022.11.02.10.55.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Nov 2022 10:54:24 -0700 (PDT)
-Message-ID: <47ae788b-c19d-3a1f-8ac2-b6674770e79f@redhat.com>
-Date:   Wed, 2 Nov 2022 18:54:22 +0100
+        Wed, 02 Nov 2022 10:55:07 -0700 (PDT)
+Message-ID: <67c59554-1d90-0c7c-a436-e2dd0782f4cb@redhat.com>
+Date:   Wed, 2 Nov 2022 18:55:06 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.4.0
+Subject: Re: [PATCH] KVM: x86: Fix a stall when KVM_SET_MSRS is called on the
+ pmu counters
 Content-Language: en-US
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Gaosheng Cui <cuigaosheng1@huawei.com>, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org
-References: <20221031113638.4182263-1-cuigaosheng1@huawei.com>
- <Y2AJIFQlF5C0ozoU@google.com>
- <Y2A2HmJxTdoWm1vf@hirez.programming.kicks-ass.net>
+To:     Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
+References: <20221028130035.1550068-1-aaronlewis@google.com>
+ <Y1wCqAzJwvz4s8OR@google.com>
+ <CAAAPnDEda-FBz+3suqtA868Szwp-YCoLEmK1c=UynibTWCU1hw@mail.gmail.com>
+ <Y1xOvenzUxFIS0iz@google.com>
+ <CALMp9eT9S4_k9cFR26idssjV+Yz4VH23hXA10PVTGJwNALKeWw@mail.gmail.com>
+ <Y1xbINshcICWxxfa@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: x86: fix undefined behavior in bit shift for
- __feature_bit
-In-Reply-To: <Y2A2HmJxTdoWm1vf@hirez.programming.kicks-ass.net>
+In-Reply-To: <Y1xbINshcICWxxfa@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -85,32 +86,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/31/22 21:54, Peter Zijlstra wrote:
->> PeterZ is contending that this isn't actually undefined behavior given how the
->> kernel is compiled[*].  That said, I would be in favor of replacing the open-coded
->> shift with BIT() to make the code a bit more self-documenting, and that would
->> naturally fix this maybe-undefined-behavior issue.
->>
->> [*]https://lore.kernel.org/all/Y1%2FAaJOcgIc%2FINtv@hirez.programming.kicks-ass.net
-> I'm definitely in favour of updating this code; both your suggestion and
-> hpa's suggestion look like sane changes. But I do feel that whatever
-> UBSAN thing generated this warning needs to be fixed too.
-> 
-> I'm fine with the compiler warning about this code -- but it must not
-> claim undefined behaviour given the compiler flags we use.
+On 10/29/22 00:43, Sean Christopherson wrote:
+>>> Checking 'dat' doesn't restrict counter 0, it skips printing if the guest (or host)
+>>> is writing '0', e.g. it would also skip the case you encountered where the host is
+>>> blindly "restoring" unused MSRs.
+>> The VMM is only blind because KVM_GET_MSR_INDEX_LIST poked it in the
+>> eye. It would be nice to have an API that the VMM could query for the
+>> list of supported MSRs.
+> That should be a fairly easy bug fix, kvm_init_msr_list() can and should omit PMU
+> MSRs if enable_pmu==false.
 
-Yes, the compiler is buggy here (see old bug report for GCC, now fixed, 
-at https://gcc.gnu.org/bugzilla/show_bug.cgi?id=68418).
+Aaron, are you going to send a patch for this?
 
-I cannot even reproduce the problem with the simple userspace testcase
-
-#include <stdlib.h>
-int main(int argc) {
-	int i = argc << 31;
-	exit(i < 0);
-}
-
-on either GCC 12 or clang 15.
+Thanks,
 
 Paolo
 
