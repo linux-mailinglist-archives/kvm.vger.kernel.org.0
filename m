@@ -2,62 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33CDD61699F
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 17:48:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D33A6169A0
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 17:48:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231932AbiKBQr7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 12:47:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48342 "EHLO
+        id S232070AbiKBQsY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 12:48:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231947AbiKBQrk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 12:47:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32F56BF52
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 09:43:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667407400;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fTFZdSVqI0N+O3i56sH80q79jqwRkWzhFiqZV68haTk=;
-        b=RvBWXnVQjs/BeBa3GnnpAK1GoR48nB1uLqZtxe1eRf0+Uo8c3I3K5A1As5oU5cGRKIMSFn
-        ZlYWObRs/aQIbg/mivfHw36NYA//lJIYNdg5yon5GDaGazBn7usvtESH5fnn5JHZY1zErF
-        Y+rUO0fbFMs5v8MqFdijL65TsWXz+Yc=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-399-Hmj9QwozP_qVxPABoP3elA-1; Wed, 02 Nov 2022 12:43:19 -0400
-X-MC-Unique: Hmj9QwozP_qVxPABoP3elA-1
-Received: by mail-qt1-f199.google.com with SMTP id a19-20020a05622a02d300b0039a3711179dso12527270qtx.12
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 09:43:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fTFZdSVqI0N+O3i56sH80q79jqwRkWzhFiqZV68haTk=;
-        b=Wt6AVlBj//a14hiTMOobVxbQovXv7KGeudtyYkiehQLTnHlPJCEY12KMZJL6/8kged
-         molZRp6dicboL0IgBjeZU/LDoT2Om1AWKKL3anatZen1XpFpi6IqnkxZvZwBHIUgDAQj
-         yisaw/94ULfP3IK9mcq4yZB/sVAlE6gzCeSjCfE8Hh7B0bKQkDRRRk18Fc3F9H3P4jBS
-         VgwbDPPxodC/AiUwHbUfQZXRMMtngorwfjHP8Ic7gebyrTvHXb/nxrJrG8yBVvacv9WV
-         irdJ9oiqy5lm0c/ifKdkk5OkGt9mDDdkorcYYJRoHNpFw5yR19cGlReU2B0OvmV20MMo
-         ckmg==
-X-Gm-Message-State: ACrzQf1Xwnpz5DoLJDOPgMc9VCiPh6gCX4m5kmcnc1ho6uiYQpzpPR37
-        /eoSoYf03UIMkq46sqVu9fyZvABDsRbepBYYlXQ5FSFuVH18QNyDrG3m5TbwIZND5E5Zk6qzos7
-        0TM9Mlc0pcddk
-X-Received: by 2002:a37:5586:0:b0:6fa:39c4:2ca9 with SMTP id j128-20020a375586000000b006fa39c42ca9mr10011512qkb.247.1667407399318;
-        Wed, 02 Nov 2022 09:43:19 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4/rvQXdCAyIe0HFz95uUEGgTNvP6HVoipjnQ1WNKjj3y50tjMcIRaYfVVUhCu1DT+83sBt5A==
-X-Received: by 2002:a37:5586:0:b0:6fa:39c4:2ca9 with SMTP id j128-20020a375586000000b006fa39c42ca9mr10011503qkb.247.1667407399083;
-        Wed, 02 Nov 2022 09:43:19 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
-        by smtp.gmail.com with ESMTPSA id f16-20020ac80690000000b0035ce8965045sm6757917qth.42.2022.11.02.09.43.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 09:43:18 -0700 (PDT)
-Date:   Wed, 2 Nov 2022 12:43:16 -0400
-From:   Peter Xu <peterx@redhat.com>
+        with ESMTP id S231651AbiKBQsH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 12:48:07 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7CF42FFDB
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 09:45:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 05AE461AAC
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 16:45:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BDDDC433C1;
+        Wed,  2 Nov 2022 16:45:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667407515;
+        bh=1cbBbaq56thwhXbZnxz27t/mzMrdxsnPaOSRpDBHL48=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=QA3DCisgqCnyAS9IR04TKYg68K8rhIKIUaXo1UOaGgpiT9VTK6wfz3ti+OgZ4btmp
+         NqPu/Yrws4aHVQ7uw+P7ul6gnt5NQbdh+fafrKHMucv80OUsoldX6Vk7vaJlWMgFvU
+         fJa0yTSxLYGQmhSzqW38bLKr2CNT5EUv5HEgQJ/aCIIrLTbtZgogNikm3jU+SlCrpJ
+         zNIHtxvWl0DU/OfAf/bJRPiKTfriwJNGcEYyXwtQ2uDUZULHK6hHcoDEGJLasCqU51
+         8Azy/iYoaIlRaqfvxksR1M9j1OPIeeZNMegVDvNowdfEEzdfi+zYDkTCJgImyecYTs
+         016MZCkazT3qg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oqGrY-003Ge5-M7;
+        Wed, 02 Nov 2022 16:45:13 +0000
+Date:   Wed, 02 Nov 2022 16:44:41 +0000
+Message-ID: <871qqlgvba.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Gavin Shan <gshan@redhat.com>,
+Cc:     Peter Xu <peterx@redhat.com>, Gavin Shan <gshan@redhat.com>,
         kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
         ajones@ventanamicro.com, bgardon@google.com,
@@ -66,57 +50,91 @@ Cc:     Marc Zyngier <maz@kernel.org>, Gavin Shan <gshan@redhat.com>,
         shuah@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
         zhenyzha@redhat.com, shan.gavin@gmail.com
 Subject: Re: [PATCH v7 1/9] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
-Message-ID: <Y2KeJGYUxnOOcXMj@x1n>
+In-Reply-To: <Y2KWm8wiL3jBryMI@google.com>
 References: <20221031003621.164306-1-gshan@redhat.com>
- <20221031003621.164306-2-gshan@redhat.com>
- <Y2F17Y7YG5Z9XnOJ@google.com>
- <Y2J+xhBYhqBI81f7@x1n>
- <867d0de4b0.wl-maz@kernel.org>
- <Y2KZdDAQN4889W9V@x1n>
- <Y2Kby0yXu0/Zi2P1@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y2Kby0yXu0/Zi2P1@google.com>
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        <20221031003621.164306-2-gshan@redhat.com>
+        <Y2F17Y7YG5Z9XnOJ@google.com>
+        <Y2J+xhBYhqBI81f7@x1n>
+        <867d0de4b0.wl-maz@kernel.org>
+        <Y2KWm8wiL3jBryMI@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, peterx@redhat.com, gshan@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com, catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org, pbonzini@redhat.com, oliver.upton@linux.dev, james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 02, 2022 at 04:33:15PM +0000, Sean Christopherson wrote:
-> On Wed, Nov 02, 2022, Peter Xu wrote:
-> > Might be slightly off-topic: I didn't quickly spot how do we guarantee two
-> > threads doing KVM_RUN ioctl on the same vcpu fd concurrently.  I know
-> > that's insane and could have corrupted things, but I just want to make sure
-> > e.g. even a malicious guest app won't be able to trigger host warnings.
+On Wed, 02 Nov 2022 16:11:07 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
 > 
-> kvm_vcpu_ioctl() takes the vCPU's mutex:
+> On Wed, Nov 02, 2022, Marc Zyngier wrote:
+> > On Wed, 02 Nov 2022 14:29:26 +0000, Peter Xu <peterx@redhat.com> wrote:
+> > > However I don't see anything stops a simple "race" to trigger like below:
+> > > 
+> > >           recycle thread                   vcpu thread
+> > >           --------------                   -----------
+> > >       if (!dirty_ring_soft_full)                                   <--- not full
+> > >                                         dirty_ring_push();
+> > >                                         if (dirty_ring_soft_full)  <--- full due to the push
+> > >                                             set_request(SOFT_FULL);
+> > >           clear_request(SOFT_FULL);                                <--- can wrongly clear the request?
+> > >
+> > 
+> > Hmmm, well spotted. That's another ugly effect of the recycle thread
+> > playing with someone else's toys.
+> > 
+> > > But I don't think that's a huge matter, as it'll just let the vcpu to have
+> > > one more chance to do another round of KVM_RUN.  Normally I think it means
+> > > there can be one more dirty GFN (perhaps there're cases that it can push >1
+> > > gfns for one KVM_RUN cycle?  I never figured out the details here, but
+> > > still..) pushed to the ring so closer to the hard limit, but we have had a
+> > > buffer zone of KVM_DIRTY_RING_RSVD_ENTRIES (64) entries.  So I assume
+> > > that's still fine, but maybe worth a short comment here?
+> > > 
+> > > I never know what's the maximum possible GFNs being dirtied for a KVM_RUN
+> > > cycle.  It would be good if there's an answer to that from anyone.
+> > 
+> > This is dangerous, and I'd rather not go there.
+> > 
+> > It is starting to look like we need the recycle thread to get out of
+> > the way. And to be honest:
+> > 
+> > +	if (!kvm_dirty_ring_soft_full(ring))
+> > +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
+> > 
+> > seems rather superfluous. Only clearing the flag in the vcpu entry
+> > path feels much saner, and I can't see anything that would break.
+> > 
+> > Thoughts?
 > 
-> static long kvm_vcpu_ioctl(struct file *filp,
-> 			   unsigned int ioctl, unsigned long arg)
-> {
-> 	...
-> 
-> 	/*
-> 	 * Some architectures have vcpu ioctls that are asynchronous to vcpu
-> 	 * execution; mutex_lock() would break them.
-> 	 */
-> 	r = kvm_arch_vcpu_async_ioctl(filp, ioctl, arg);
-> 	if (r != -ENOIOCTLCMD)
-> 		return r;
-> 
-> 	if (mutex_lock_killable(&vcpu->mutex))
-> 		return -EINTR;
-> 	switch (ioctl) {
-> 	case KVM_RUN: {
+> I've no objections to dropping the clear on reset, I suggested it
+> primarily so that it would be easier to understand what action
+> causes the dirty ring to become not-full.  I agree that the explicit
+> clear is unnecessary from a functional perspective.
 
-Ah, makes sense, thanks!
+The core of the issue is that the whole request mechanism is a
+producer/consumer model, where consuming a request is a CLEAR
+action. The standard model is that the vcpu thread is the consumer,
+and that any thread (including the vcpu itself) can be a producer.
+
+With this flag clearing being on a non-vcpu thread, you end-up with
+two consumers, and things can go subtly wrong.
+
+I'd suggest replacing this hunk with a comment saying that the request
+will be cleared by the vcpu thread next time it enters the guest.
+
+	M.
 
 -- 
-Peter Xu
-
+Without deviation from the norm, progress is not possible.
