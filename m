@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 874F0616D0A
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B52C0616D12
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231680AbiKBSrP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 14:47:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42124 "EHLO
+        id S231707AbiKBSrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 14:47:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231694AbiKBSrI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 14:47:08 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE3462CE27
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:47:07 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-36fc0644f51so165662597b3.17
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:47:07 -0700 (PDT)
+        with ESMTP id S231666AbiKBSrK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 14:47:10 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4D5F2F67C
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:47:09 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id e8-20020a5b0cc8000000b006bca0fa3ab6so16982454ybr.0
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:47:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3kR62HSIiTQCzwGmQgs5HY6YJRVWbPr3ykoc+jji2yw=;
-        b=q5DQoPzrYWPMyKqVo1p7fe42p1gFesUoA0SbdaAzEHPMfWMQYOsQtlQUppP9XvLEQ/
-         tZ0H8d2Azp17sw6x/LWkhKmx770K+fHmREw+0gPtt+zV2jUV/icvoL5tVVND7cgQ1TsM
-         uG/oldWXppmgBts7lzQaFL+QnHf5V6Yh3llW+NhQhNWBpw3W7SnXjTQy4XYODmtHD/K3
-         nCfYHNy2o8FT6rSG1l/To4WShg7NPGtwDGSrRJjb9QX403y9Z5sJHSlcY2OPf3rx2meE
-         eD7+HqgcqC6NfT117EUE+ujUcqZKv+4YX8UOaAkWPfOAUuod+Hh3skEOHXvFmEMdKpY/
-         YXAQ==
+        bh=EumOl5mGgVnCEzDA+UueSGzDQoNJ9RAkypwsXwSdasQ=;
+        b=UZJ4hHhdrFkLZ870xr/rjRoaNrd6lIUolSt2myKZViZ/GGgQJ/pbadILfT8PMgjEmu
+         ZYJWMBFgnYN1VAS1sLdD1zns2vEJ7+9ZGXFVeb557F/DY1ywKHMoyiUM5NbF4Qf0vWV0
+         HWQGgu6owiFBTWoUE5C8Xs10LQnj5RtBCy/8pYbOiom4+jomeGFSih3281H71Xj7S1CY
+         D03bNpNLbV1lB7R/ldNZ8/3BuLzXQIaL2U2XmlK0oMiMBUyuxlinHckz1iU6srG3GjKh
+         w2zFicVm0sILsMZZH9FSCLtgKgywo4OjhLDhwc4g+PEgq1k0SfpdqxDIGTaNTZ81gLoW
+         VJgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3kR62HSIiTQCzwGmQgs5HY6YJRVWbPr3ykoc+jji2yw=;
-        b=flx9Kz6/rug8TAZgFXu4lTybdiUpSMneRTnNujaqxr0UtSHj/MVilHTrAbJVUpN4xW
-         4+tb4thjLF4Dn6vix/bi2k3YaZXiBut51+UhJsexAew7GKOIaeT4ktwnJ9KwcGT0ugmp
-         bB0P/houeN+gTscMxK32rSZAcF7L8HrCyxcwszmWxbCOes37dxplbmFnaZeiqJT9afJr
-         U/u4un/jpIlfc9ev5GKf+lhXu81Oylke44zVduTn71rgr5Icm1MwPYCd83jkANjLIX4c
-         PxktsaGf5NHJCvVeYrxbytuGk/0+igCs917Xbrdg+cZnzMPoO70UY3oIkxG3NKPUVm7a
-         drlg==
-X-Gm-Message-State: ACrzQf0MyP23blP0qX8VD1tGjD2pztQtXgLZVKxOo9q98J102RFWI40d
-        4FOzXI+OZSz3gyw5MBrIAw7y6mDvfEC2lg==
-X-Google-Smtp-Source: AMsMyM4CTD6h0hiYzEZTXKWUZW2tL3Y5DhoZKaapI828Ce/Kz9P/BgOTzVbndv8TZmPXKfphxjQ6Q6P9Aqz9EA==
+        bh=EumOl5mGgVnCEzDA+UueSGzDQoNJ9RAkypwsXwSdasQ=;
+        b=7SZtV8zFE2msxO4kQBt42Jdl7/AtDYJdECtttvvO9nm/rbCxu4Qc1pzMnIWoUkRZmK
+         6cfy1/XXLvyEPpDVT2Y68LV7xhaOfboGlVpWkLk/BQehxtPg6KUyL6cTwCXs6PogskYm
+         rhg1rNR59rO8sWY5Zae+xUarfmHk57n72679Pi5hdT1iKuruWPFlUNtKwv2KNGIKX88T
+         Kwk05dAjKJzdWytmUe7nIupYc6QOXRlDZw59ufCvUB42ttrH8x6kPMPZGIKnBDCKr1za
+         qz59lhI9kHXvkpKJDTxzFzA9AJlhHRXFSgbe7fOjf227PPDpTMOnxy6tUYq/js7FoxWE
+         GAKQ==
+X-Gm-Message-State: ACrzQf2lBxHElFP4SnYRw33rOx+FTof36bXn7eXDNIJdlnr5jea+KI2G
+        093CRHOkWB6haxnNMU7bwvLleiNrUqiFXQ==
+X-Google-Smtp-Source: AMsMyM5ppov+wqEqcSKl5tRhi1ODfgtFQA4ohSDwa8CL7qUIHi6UlCTVjKAHH7wax6oVG0rPEXTX5URrinBHZA==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a05:6902:348:b0:6be:b67e:8c24 with SMTP
- id e8-20020a056902034800b006beb67e8c24mr26065847ybs.112.1667414827708; Wed,
- 02 Nov 2022 11:47:07 -0700 (PDT)
-Date:   Wed,  2 Nov 2022 11:46:50 -0700
+ (user=dmatlack job=sendgmr) by 2002:a25:d491:0:b0:6ca:ef3c:d5f6 with SMTP id
+ m139-20020a25d491000000b006caef3cd5f6mr23347532ybf.343.1667414829036; Wed, 02
+ Nov 2022 11:47:09 -0700 (PDT)
+Date:   Wed,  2 Nov 2022 11:46:51 -0700
 In-Reply-To: <20221102184654.282799-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221102184654.282799-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221102184654.282799-7-dmatlack@google.com>
-Subject: [PATCH v4 06/10] KVM: selftests: Copy KVM PFERR masks into selftests
+Message-ID: <20221102184654.282799-8-dmatlack@google.com>
+Subject: [PATCH v4 07/10] KVM: selftests: Avoid JMP in non-faulting path of KVM_ASM_SAFE()
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -75,47 +75,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Copy KVM's macros for page fault error masks into processor.h so they
-can be used in selftests.
+From: Sean Christopherson <seanjc@google.com>
 
+Clear R9 in the non-faulting path of KVM_ASM_SAFE() and fall through to
+to a common load of "vector" to effectively load "vector" with '0' to
+reduce the code footprint of the asm blob, to reduce the runtime overhead
+of the non-faulting path (when "vector" is stored in a register), and so
+that additional output constraints that are valid if and only if a fault
+occur are loaded even in the non-faulting case.
+
+A future patch will add a 64-bit output for the error code, and if its
+output is not explicitly loaded with _something_, the user of the asm
+blob can end up technically consuming uninitialized data.  Using a
+common path to load the output constraints will allow using an existing
+scratch register, e.g. r10, to hold the error code in the faulting path,
+while also guaranteeing the error code is initialized with deterministic
+data in the non-faulting patch (r10 is loaded with the RIP of
+to-be-executed instruction).
+
+Consuming the error code when a fault doesn't occur would obviously be a
+test bug, but there's no guarantee the compiler will detect uninitialized
+consumption.  And conversely, it's theoretically possible that the
+compiler might throw a false positive on uninitialized data, e.g. if the
+compiler can't determine that the non-faulting path won't touch the error
+code.
+
+Alternatively, the error code could be explicitly loaded in the
+non-faulting path, but loading a 64-bit memory|register output operand
+with an explicitl value requires a sign-extended "MOV imm32, r/m64",
+which isn't exactly straightforward and has a largish code footprint.
+And loading the error code with what is effectively garbage (from a
+scratch register) avoids having to choose an arbitrary value for the
+non-faulting case.
+
+Opportunistically remove a rogue asterisk in the block comment.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/x86_64/processor.h  | 23 +++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ tools/testing/selftests/kvm/include/x86_64/processor.h | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index e8ca0d8a6a7e..f7249cb27e0d 100644
+index f7249cb27e0d..9efe80d52389 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -882,4 +882,27 @@ void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
- #define XSTATE_XTILE_DATA_MASK		(1ULL << XSTATE_XTILE_DATA_BIT)
- #define XFEATURE_XTILE_MASK		(XSTATE_XTILE_CFG_MASK | \
- 					XSTATE_XTILE_DATA_MASK)
-+
-+#define PFERR_PRESENT_BIT 0
-+#define PFERR_WRITE_BIT 1
-+#define PFERR_USER_BIT 2
-+#define PFERR_RSVD_BIT 3
-+#define PFERR_FETCH_BIT 4
-+#define PFERR_PK_BIT 5
-+#define PFERR_SGX_BIT 15
-+#define PFERR_GUEST_FINAL_BIT 32
-+#define PFERR_GUEST_PAGE_BIT 33
-+#define PFERR_IMPLICIT_ACCESS_BIT 48
-+
-+#define PFERR_PRESENT_MASK	BIT(PFERR_PRESENT_BIT)
-+#define PFERR_WRITE_MASK	BIT(PFERR_WRITE_BIT)
-+#define PFERR_USER_MASK		BIT(PFERR_USER_BIT)
-+#define PFERR_RSVD_MASK		BIT(PFERR_RSVD_BIT)
-+#define PFERR_FETCH_MASK	BIT(PFERR_FETCH_BIT)
-+#define PFERR_PK_MASK		BIT(PFERR_PK_BIT)
-+#define PFERR_SGX_MASK		BIT(PFERR_SGX_BIT)
-+#define PFERR_GUEST_FINAL_MASK	BIT_ULL(PFERR_GUEST_FINAL_BIT)
-+#define PFERR_GUEST_PAGE_MASK	BIT_ULL(PFERR_GUEST_PAGE_BIT)
-+#define PFERR_IMPLICIT_ACCESS	BIT_ULL(PFERR_IMPLICIT_ACCESS_BIT)
-+
- #endif /* SELFTEST_KVM_PROCESSOR_H */
+@@ -764,7 +764,7 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+  * for recursive faults when accessing memory in the handler.  The downside to
+  * using registers is that it restricts what registers can be used by the actual
+  * instruction.  But, selftests are 64-bit only, making register* pressure a
+- * minor concern.  Use r9-r11 as they are volatile, i.e. don't need* to be saved
++ * minor concern.  Use r9-r11 as they are volatile, i.e. don't need to be saved
+  * by the callee, and except for r11 are not implicit parameters to any
+  * instructions.  Ideally, fixup would use r8-r10 and thus avoid implicit
+  * parameters entirely, but Hyper-V's hypercall ABI uses r8 and testing Hyper-V
+@@ -786,11 +786,9 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+ 	"lea 1f(%%rip), %%r10\n\t"				\
+ 	"lea 2f(%%rip), %%r11\n\t"				\
+ 	"1: " insn "\n\t"					\
+-	"movb $0, %[vector]\n\t"				\
+-	"jmp 3f\n\t"						\
++	"xor %%r9, %%r9\n\t"					\
+ 	"2:\n\t"						\
+-	"mov  %%r9b, %[vector]\n\t"				\
+-	"3:\n\t"
++	"mov  %%r9b, %[vector]\n\t"
+ 
+ #define KVM_ASM_SAFE_OUTPUTS(v)	[vector] "=qm"(v)
+ #define KVM_ASM_SAFE_CLOBBERS	"r9", "r10", "r11"
 -- 
 2.38.1.273.g43a17bfeac-goog
 
