@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F5816171EA
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 00:20:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81A5F6171FB
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 00:20:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231204AbiKBXUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 19:20:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32818 "EHLO
+        id S230502AbiKBXUV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 19:20:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230371AbiKBXT4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 19:19:56 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6FD3260C
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 16:19:25 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 192-20020a6303c9000000b004701a0aa835so85432pgd.15
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 16:19:25 -0700 (PDT)
+        with ESMTP id S230381AbiKBXT5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 19:19:57 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC5C821B1
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 16:19:26 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d18-20020a170902ced200b001871dab2d59so199583plg.22
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 16:19:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pp3PbLfGlbPMUpUfY94YYIKSvd3QEyEjimXY5GHh7Do=;
-        b=UkZGnXGmq2elzgV9DLUz74QXF30iTWbFGDiWfdaXhQTrFX8aiqCFVBpq5xcu6/5CJ0
-         6CAeS4zBndyLbi6uL4aOTOJPom/GUXPjp+wnaiLNi/IOKHaUUiAdDM0lQqJcKi8lJ3vx
-         vnARJXxit3idHJ3CVkd3Epv6mh/Uh5po1QC+vmSMzcdxDA+trq8VPV/HTVpleuhXsuBJ
-         gB5evBsfkJOotXoUamKJrE8Yp7t9k0CZooSYyZMUGEw+wssTud1LYZ35nFOFQX6SsKf7
-         8kThfTBVhIqoMM2+KcJViQg4ABdkLDTwvbAbS0YvwKJ8JO2nHVa2hjZQKtmcKqW09CRW
-         6M/w==
+        bh=2jZZfFf52GmkjzF4UkJBFUQx8TRwCaNEoxRzKdccz/c=;
+        b=eS+ADSAUDBr+3HDHnDb3Fr9sF+Jb8/UT2oH309j3Rm/86ObG6TRCn9IyhpjUkKBdpE
+         kcCNHyv3vwGiHYQRvOqDpsz+Ka9M2XEJCdBD1BDMQE+yHelvK5eIZBtBOFMFVOay6VLL
+         HRD1UaccDMN8QRmrJzaFGA2kakGK5P4xJGBM94BuLtDJAAqDK7hBLTZ7oOdfic4lXqK4
+         Fr39ZfZInLrcHKiM8fxmsZrdE64FtenP1A0FKcDrTDJZkpQ1QUJo1/Y5EttLt8eZYz9U
+         +9QTVq6+Q+Y4pZ8EkuhDPhDFtAlj3OJomhnuiK5WjSAlU9kpBh9BdzMjPScyheuXuiwK
+         D0tA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Pp3PbLfGlbPMUpUfY94YYIKSvd3QEyEjimXY5GHh7Do=;
-        b=2d4GWE3K2haSisHE4QHJGrrUayrI70VMt6UPhvNK/xP+qCo2pjbqRiMAr13VHkVyIT
-         DNqrIUcRpbymrqOEhso6HPqBMZnOemMYqD4KZCB0aQqs1cYhCm2mYG/xHxu0hGPqyuIx
-         dTJTImrOuTUggxWqgOFx+3nRR3wVX7ve8kPk9ZPoF6000q2zwRl6Wm9PQGsoriOrQLUv
-         ZC6xXOR6qD6HFdmqMliyoHtUKQaJBjINgq57d/hymu9yJkOaQRuZFhh9qbip/Ze+NgsU
-         yLPNR34t6JyxGJYwweXy3QZPPQCeqXjBNihS3Jep6iF6FOw1xvyGF0XEi/Z0ma2E7fGL
-         8Vkw==
-X-Gm-Message-State: ACrzQf1AYzCHHT8c8oIxZguFNSed4MVsJAKOJIWQw6nlBDBPrs9oVur/
-        JTZG+Jb3hIJG0YWmaOlv/bLCa65Vvec=
-X-Google-Smtp-Source: AMsMyM5BN48AgcZOI4nVxc2uFg8TXUQwjAkA5TEHVSI5KiQDtZoUe78o5/c87/pf9J/oxQANcuw7e+pFPCs=
+        bh=2jZZfFf52GmkjzF4UkJBFUQx8TRwCaNEoxRzKdccz/c=;
+        b=E6eXMTP0ZtfwBy5jF3K21pAKmNozp3lQ1XW1aJ74vUtrdlkGtOtGvKF3afBbzl7T8y
+         NOFR0ooijFdxgiUD1iYPrImBhNE9SCBgMvX80xrJ/yD79+9fYvtzxUfAfnXbKUunFzU4
+         vRrOR929ogE2KYGls9KpqwsN6jNTGHgDXVkox2TXzPXon/K/M3erteIKNERjxUeckSLa
+         jSlDGTf1oijCCM09M/tk92av2s/4EiRICYheNJDTMbVn5/WNwGEK1AG890ohispmnR7S
+         c8PHDmvXhTgpEuBwX5Dx9gBTBxYJLKuHt48PEGqbYs+w80xxGBnoInpHimSdtytuFNCh
+         HnGg==
+X-Gm-Message-State: ACrzQf1O2fP/4F9B6hkAUeR+z4aVUOrsl3q8WPii8rOrE9cvr4uqNtYt
+        HQc1NasvcYC0wYqGVq27lO+ZLjNkg7Q=
+X-Google-Smtp-Source: AMsMyM6vYYJQBYlQiDcX1wj97hZ9g1pk+rDBzdLxVoyiEkvTNhgYg+UmvFixquw/EG51V/dsQ+i+Sr9IedQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:1206:0:b0:470:18c:1489 with SMTP id
- h6-20020a631206000000b00470018c1489mr6904894pgl.357.1667431164538; Wed, 02
- Nov 2022 16:19:24 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:e7c5:b0:213:b7d8:1c4c with SMTP id
+ kb5-20020a17090ae7c500b00213b7d81c4cmr25473196pjb.114.1667431166266; Wed, 02
+ Nov 2022 16:19:26 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  2 Nov 2022 23:18:33 +0000
+Date:   Wed,  2 Nov 2022 23:18:34 +0000
 In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221102231911.3107438-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-7-seanjc@google.com>
-Subject: [PATCH 06/44] KVM: s390: Move hardware setup/unsetup to init/exit
+Message-ID: <20221102231911.3107438-8-seanjc@google.com>
+Subject: [PATCH 07/44] KVM: x86: Do timer initialization after XCR0 configuration
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Huacai Chen <chenhuacai@kernel.org>,
@@ -89,7 +89,7 @@ Cc:     James Morse <james.morse@arm.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -97,70 +97,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that kvm_arch_hardware_setup() is called immediately after
-kvm_arch_init(), fold the guts of kvm_arch_hardware_(un)setup() into
-kvm_arch_{init,exit}() as a step towards dropping one of the hooks.
-
-No functional change intended.
+Move kvm_arch_init()'s call to kvm_timer_init() down a few lines below
+the XCR0 configuration code.  A future patch will move hardware setup
+into kvm_arch_init() and slot in vendor hardware setup before the call
+to kvm_timer_init() so that timer initialization (among other stuff)
+doesn't need to be unwound if vendor setup fails.  XCR0 setup on the
+other hand needs to happen before vendor hardware setup.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/s390/kvm/kvm-s390.c | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
+ arch/x86/kvm/x86.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 8395433a79b2..1aaee15211f2 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -323,21 +323,12 @@ static struct notifier_block kvm_clock_notifier = {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index cd9eb13e2ed7..9a7702b1c563 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9320,13 +9320,13 @@ int kvm_arch_init(void *opaque)
+ 	if (r)
+ 		goto out_free_percpu;
  
- int kvm_arch_hardware_setup(void *opaque)
- {
--	gmap_notifier.notifier_call = kvm_gmap_notifier;
--	gmap_register_pte_notifier(&gmap_notifier);
--	vsie_gmap_notifier.notifier_call = kvm_s390_vsie_gmap_notifier;
--	gmap_register_pte_notifier(&vsie_gmap_notifier);
--	atomic_notifier_chain_register(&s390_epoch_delta_notifier,
--				       &kvm_clock_notifier);
- 	return 0;
- }
+-	kvm_timer_init();
+-
+ 	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
+ 		host_xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
+ 		kvm_caps.supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
+ 	}
  
- void kvm_arch_hardware_unsetup(void)
- {
--	gmap_unregister_pte_notifier(&gmap_notifier);
--	gmap_unregister_pte_notifier(&vsie_gmap_notifier);
--	atomic_notifier_chain_unregister(&s390_epoch_delta_notifier,
--					 &kvm_clock_notifier);
++	kvm_timer_init();
 +
- }
- 
- static void allow_cpu_feat(unsigned long nr)
-@@ -517,6 +508,13 @@ int kvm_arch_init(void *opaque)
- 	if (rc)
- 		goto err_gib;
- 
-+	gmap_notifier.notifier_call = kvm_gmap_notifier;
-+	gmap_register_pte_notifier(&gmap_notifier);
-+	vsie_gmap_notifier.notifier_call = kvm_s390_vsie_gmap_notifier;
-+	gmap_register_pte_notifier(&vsie_gmap_notifier);
-+	atomic_notifier_chain_register(&s390_epoch_delta_notifier,
-+				       &kvm_clock_notifier);
-+
- 	return 0;
- 
- err_gib:
-@@ -533,6 +531,11 @@ int kvm_arch_init(void *opaque)
- 
- void kvm_arch_exit(void)
- {
-+	gmap_unregister_pte_notifier(&gmap_notifier);
-+	gmap_unregister_pte_notifier(&vsie_gmap_notifier);
-+	atomic_notifier_chain_unregister(&s390_epoch_delta_notifier,
-+					 &kvm_clock_notifier);
-+
- 	kvm_s390_gib_destroy();
- 	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM))
- 		kvm_s390_pci_exit();
+ 	if (pi_inject_timer == -1)
+ 		pi_inject_timer = housekeeping_enabled(HK_TYPE_TIMER);
+ #ifdef CONFIG_X86_64
 -- 
 2.38.1.431.g37b22c650d-goog
 
