@@ -2,61 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B226C615C13
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 07:08:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 822A2615C15
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 07:14:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230024AbiKBGIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 02:08:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59424 "EHLO
+        id S229561AbiKBGOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 02:14:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbiKBGIw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 02:08:52 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 076E02DCE
-        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 23:08:52 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id 66so3183590ybl.11
-        for <kvm@vger.kernel.org>; Tue, 01 Nov 2022 23:08:51 -0700 (PDT)
+        with ESMTP id S229534AbiKBGOh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 02:14:37 -0400
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 821F625C5A
+        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 23:14:36 -0700 (PDT)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-36ad4cf9132so157222987b3.6
+        for <kvm@vger.kernel.org>; Tue, 01 Nov 2022 23:14:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=il3ZtgB9NYdWIwujqVE/vtr81bmPbSm84N+bXazElYg=;
-        b=fftlL88Wv8/qPfZnbBzDzMgp5h6lVzMdFbRl5BRihlBKdZ1vKITnIaRtBExcXtWmHw
-         WigSdxy9U+mfehPYCQrugJBBZzTOxZ7iyO5tqpKfD10QOfqRiSco1bWgFwr/Wn4mWkA9
-         AEUGlScfBPBKPu9gSLoYP9RTwDisuBJV+s5a1qEGsN7HyAXbOu4PiCnHeiXUqb+J/UNo
-         pFYsAw2Lxny1OXK/nUiJiD0Urq+hXpglogvP2+hpv/MnA0V8S1X4VJIB9Ul6wU3H6nW0
-         AGxN/cIPbOtM7NiF/efsaBmyNWgmGnY8aQcFIHyXeUVLXkO6nEYNlR4uS1F7evLLJLQY
-         2RrQ==
+        bh=ceGZcCBh/C5qXmlTn7aYTLoHRJz3v4pUMXJmQIvbk6c=;
+        b=PpsKCaac4R+pcSrWNuGtq19Ptw4FBJabeSPIs3AUQFemtPxbVb/hpaa1Hwf3lPHsH4
+         +Bq6UXgWcS7KyHmfFI+Yr4xh/h80tKaZERzI5o00vs1TJS6UPDCPYVytv8rzYo56FxZK
+         MA47kWPaskSHgfBibfyM2o3JXXjBEKaNoKQl7HSbeOQBHjudUEo9MugoQAHF+U3ScH4/
+         VqR9VSkt4Jk087Bc6hJlqmpTebc8yDRg1Aw3AskeHS3RCun5dFI3dYZWaLcVBq1oofMd
+         E+j+FqwmTwKKAkWZ3h2jnd3KAqsKvyOEENMNYGB0b7Tbtp7Y5lX83qWKasKHDj55szx4
+         1A+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=il3ZtgB9NYdWIwujqVE/vtr81bmPbSm84N+bXazElYg=;
-        b=Me7dtNgtPX93RrfadBtEaKhjomYbsa9hNJVDb+yDIVDD3ENV/gt2FY86gnKIlRQTE5
-         K1ytmxX23/z1WC31S0Cnxhou3Jxnphsn1I+Eocnqz7y4fa6y/9V9ZNmhrJuzhV8VOnoq
-         i+VGQ2edGwMjQ+NZMD1XHUlOGKYkj0KGiAfV1xdbT7/HAe6s7KBdTSwSuaeRluels2FL
-         gKI+9PaVvZVkR88h4J/S9dXLxFstR8VeFK8bRzlOkLZTW1zhFm9/1CZBMNeFM/TuHw1k
-         HvrvCR09aaTcdeRsOTNa6q7iHJRJLaJ+W8GHCZRWD8EIhLUSmXb0bNnAeyr6c5GO/296
-         RWBw==
-X-Gm-Message-State: ACrzQf2ysZl+XCrgu0tv630g10EIak8O5zKBM7nSJu60E6mMGk7hWkwN
-        tgj8ngvJHODxO5X6/XNPkYMa3UjnjqBonKNUx/8=
-X-Google-Smtp-Source: AMsMyM6rJK3is5x2YFhhuabozPugUh/IWXlyX1Z9cH2QR6+paR3btvK8YHaMYzbkI84TSlhS6cm8GT7RnOo+i2ryL0U=
-X-Received: by 2002:a25:23c9:0:b0:6ca:15ee:3b92 with SMTP id
- j192-20020a2523c9000000b006ca15ee3b92mr20865257ybj.107.1667369331302; Tue, 01
- Nov 2022 23:08:51 -0700 (PDT)
+        bh=ceGZcCBh/C5qXmlTn7aYTLoHRJz3v4pUMXJmQIvbk6c=;
+        b=X2yu/TrjNQv4nBPfjBpe8pJXkR7ieQsJsFQCHyhYiNbWeDjSr+SGupRwXSXNJeJfJ2
+         fnpSy0QbX025xyaMl4Ypj18rbTSfDC89uZKvtN4vski70sJQs9jiNThUJ9ftfPg3Vy3V
+         hcNGbedjhKUQcrSFKi9n8WFZGWSNJeGj7+TlFN7uJ5rBGEAYsUGFGyQ1N80LOCIW1NGm
+         9h+PaR3mzu/uR35PsTCDHAJL6/ZC8vpnBWD9MEUHftPhslmro00J2QT6IkoHrvieEJD9
+         lG58tcTVnRQVIP8PnCs7l8i0eMZv5j1oqZGLj7/sNJcDB2RLscmTD1v2yya7eHOpJElq
+         UMjg==
+X-Gm-Message-State: ACrzQf3IbBo/lsqr8K7ZKBAwa9hGrDkuTxGQtrR3vkBzsb70JlGMHB1V
+        CO8yzlUZOIib1Xn2XlMSh56ZboHg8bo6+8TNuRGZbrncxcnypg==
+X-Google-Smtp-Source: AMsMyM6glFWxQ1binyiGrgnZrbEYB6/Gi2XKdHEcxsL+cQS+hj06nQtE6EaDg+KpGr9p9tDmCwAI1uR6EyHJkVZyauk=
+X-Received: by 2002:a81:67c5:0:b0:370:c85:7fa4 with SMTP id
+ b188-20020a8167c5000000b003700c857fa4mr21688054ywc.216.1667369675738; Tue, 01
+ Nov 2022 23:14:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <20221026194245.1769-1-ajderossi@gmail.com> <BN9PR11MB52763B921748415B14FFB57D8C369@BN9PR11MB5276.namprd11.prod.outlook.com>
-In-Reply-To: <BN9PR11MB52763B921748415B14FFB57D8C369@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y2EFLVYwWumB9JbL@ziepe.ca>
+In-Reply-To: <Y2EFLVYwWumB9JbL@ziepe.ca>
 From:   Anthony DeRossi <ajderossi@gmail.com>
-Date:   Wed, 2 Nov 2022 06:08:40 +0000
-Message-ID: <CAKkLME1vg4kJNzs4y7Z18EHPspGaoJmhPV7hKjHLy=VsFpxhhg@mail.gmail.com>
+Date:   Wed, 2 Nov 2022 06:14:24 +0000
+Message-ID: <CAKkLME3bR++sWFusGdxohD3ZCgBDj7rjsjMZs=RvaYYfaJskng@mail.gmail.com>
 Subject: Re: [PATCH v2] vfio-pci: Accept a non-zero open_count on reset
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "cohuck@redhat.com" <cohuck@redhat.com>,
-        "jgg@ziepe.ca" <jgg@ziepe.ca>,
         "abhsahu@nvidia.com" <abhsahu@nvidia.com>,
         "yishaih@nvidia.com" <yishaih@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
@@ -70,11 +71,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 1, 2022 at 8:49 AM Tian, Kevin <kevin.tian@intel.com> wrote:
-> WARN_ON()
+On Tue, Nov 1, 2022 at 11:38 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> I've been meaning to take a deeper look, but I'm thinking vfio_pci
+> doesn't need open_count at all any more.
 
-I sent an updated patch with this change. Thanks.
+I spent some time looking at it, but I'm not very familiar with this
+area.
 
-v3: https://lore.kernel.org/kvm/20221102055732.2110-1-ajderossi@gmail.com/
+None of the fields in vfio_pci_core_device look usable as a substitute
+for open_count, but calling pci_is_enabled() on the PCI device might be
+sufficient. pci_enable_device()/pci_disable_device() appear to be called
+in the right locations in vfio_pci_core.
+
+I'm happy to submit a separate patch to check pci_is_enabled() if the
+PCI device life cycle makes sense.
 
 Anthony
