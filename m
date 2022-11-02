@@ -2,78 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13B3161675B
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 17:11:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3067E616857
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 17:20:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231358AbiKBQLS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 12:11:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50174 "EHLO
+        id S231553AbiKBQUk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 12:20:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231305AbiKBQLM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 12:11:12 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B5192B19C
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 09:11:11 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id i3so16798325pfc.11
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 09:11:11 -0700 (PDT)
+        with ESMTP id S231540AbiKBQUW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 12:20:22 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B1AB31350
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 09:14:47 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id v124-20020a1cac82000000b003cf7a4ea2caso1596764wme.5
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 09:14:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xjbiGog+CMLFws9ba0e8gTV0L7Jl5w0vMwDQ7UNnmBw=;
-        b=fg5ss+yu7hOd7zMQAayXu1r5V5FRoeiX0Ib8rbO1Hbpnplg28DwPoTzY3KXbp2IM5l
-         c8LhKRuFMH0LpjHZqJ/2MO63rmotIEtPBD0D+rrJYFHPwGvPjKFUWsaM0f6Or6MD+PMa
-         xWZBW7C28NlVRSBqddoR8LLJS5WgYHillPL2TPvWLB/q/bsrRkhbFv47BZ6Sjtk0FQVM
-         enNFn/n81hHrMVGNCRCSpNhDfglnUMmtyta2ATX+wgX831Gh9RjaU/U3AQkd3cynJHeo
-         U+5ETSrGJcaCiKGZdkgrI0jt9/jJ9kNO/LscVkh2clSBXP1iXeLU5+XbUTtSax048fuO
-         WbJQ==
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BpDb3eA5T10BTKaEzNInMNBCCpx0zoiS14ubIM6NfnE=;
+        b=gxlExpzzLGUfRn7vXJgTOm6x12MJszdK4eaWr1U0uyx/Ia3OEtiHhBV0CRsqZQuOf7
+         8FyVMf41cOXuV4VEH6Hi7xAeFixEBeDAKVxMCLX48Dfa8Y78007LDZb3jotS41UMNcjg
+         uZtFKHfHwrFm2IJWpnRwHmR82bSrSxiULmNT3HcjrCBIslON7u5tHL3xqB2u1cfO1m6p
+         mL2ncoRZkdUOZ8f8T7pAdr7IzySCixciPSys5wcnTx6uAZO7f+IivY6HKrWpYFM29n9I
+         wVX5GumCVuGQhmkbuC765tg/KvzRrp5PMZ2io7iWDs0E1uKUbb2DQb1HV59vUMZGAf+c
+         j/gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xjbiGog+CMLFws9ba0e8gTV0L7Jl5w0vMwDQ7UNnmBw=;
-        b=PRcf+16h9vIW4u4/b4SwXX5uorj6bzGatccRubVx9+ALaY1sWsuEo4i3PxmcsaHnwU
-         aZO6zt+hIDntDKAcANvGxadrmxta0oZ416Pa4sD8JPBROtT1YqE+aXZkatSodZGa0Kfo
-         aKw3LF9gxq7+Cjd5dUou4GEA+mb9J+4m3nqJ5YWqtkLkZ7HX0wYUDRb97PIzGPUt82ga
-         VARpwv9K7Pn/P66qv46AatcRjvNSSHl9gh0uWkLo10IIbETyyjZpiPgZTuNpGDK5PtKF
-         h4G9aZ1oFBoiG7mF+o2/GPEoVMk9WwFrDP6nlZxsSrGaopn0h1yUVahTHPlIiWz6ax/l
-         No8Q==
-X-Gm-Message-State: ACrzQf0kbs/+DyCmbgA9+sRD48/A74jnfxMQJUVypVurhDhfUENEEaxZ
-        m39J807Ly3HwucuRJnNk3r0MOw==
-X-Google-Smtp-Source: AMsMyM40y/EP1XZjLr8u5d95J50ow6Qq/UpZGFYNazWh9EsURT6JqjOG9NRHwf0ExoNxySlBc1J0Zw==
-X-Received: by 2002:a63:8b42:0:b0:46f:5bd0:1ae2 with SMTP id j63-20020a638b42000000b0046f5bd01ae2mr21786579pge.422.1667405471018;
-        Wed, 02 Nov 2022 09:11:11 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a15-20020a170902710f00b001885041d7b8sm77000pll.293.2022.11.02.09.11.10
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BpDb3eA5T10BTKaEzNInMNBCCpx0zoiS14ubIM6NfnE=;
+        b=wo21TtUotmNbEPAp0dkTJPaVuDyZ/DNqiylhSkeFgKTqi/QqL17yIYrkT+IKVvnAby
+         8T/y5nYwHMqq6yAk/4OOjsCFQuUzNEKoM+k77ySdMFz12KN4T74WdJEKrKqYcNUPXgHV
+         MdDCt6KGEBvr7wQyZF0n4/iGl/Esa8GYPFzut4mUvDwoF/vdrm4cqk7TYPeyzu/nHcm1
+         r1sRlA26rMgm/XDifLjLYZYaMZ7bugIslDSeYhHjviop/v5jlSSijAHG8QeZKEtXlJJ8
+         YIsEM2dLhJHOq1o887gnlGFj5q821bfEEJfw72CKbgLlqfjeCIedRlGMX21i/59koX9X
+         N61Q==
+X-Gm-Message-State: ACrzQf1MQy/sEbW2oS+KD/ezmB7GBw1PzpmDD90Y9I5OjcXMTAMgA6CG
+        IAJqk2NSimL7fS4eO8ilw0QA9w==
+X-Google-Smtp-Source: AMsMyM7HGMltrxCTrV7aqNFSsqNsIgzADe5S3oOs1MHc1WYnXT/2QUlJHefFW892SSjNmfT1q7IMoA==
+X-Received: by 2002:a05:600c:a48:b0:3b9:af1f:1b38 with SMTP id c8-20020a05600c0a4800b003b9af1f1b38mr16514126wmq.185.1667405658449;
+        Wed, 02 Nov 2022 09:14:18 -0700 (PDT)
+Received: from usaari01.cust.communityfibre.co.uk ([2a02:6b6a:b4d7:0:6a08:9b26:ab04:7065])
+        by smtp.gmail.com with ESMTPSA id m17-20020a5d56d1000000b0022cc6b8df5esm13230923wrw.7.2022.11.02.09.14.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 09:11:10 -0700 (PDT)
-Date:   Wed, 2 Nov 2022 16:11:07 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Peter Xu <peterx@redhat.com>, Gavin Shan <gshan@redhat.com>,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-        ajones@ventanamicro.com, bgardon@google.com,
-        catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
-        pbonzini@redhat.com, oliver.upton@linux.dev, james.morse@arm.com,
-        shuah@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
-        zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v7 1/9] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
-Message-ID: <Y2KWm8wiL3jBryMI@google.com>
-References: <20221031003621.164306-1-gshan@redhat.com>
- <20221031003621.164306-2-gshan@redhat.com>
- <Y2F17Y7YG5Z9XnOJ@google.com>
- <Y2J+xhBYhqBI81f7@x1n>
- <867d0de4b0.wl-maz@kernel.org>
+        Wed, 02 Nov 2022 09:14:17 -0700 (PDT)
+From:   Usama Arif <usama.arif@bytedance.com>
+To:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
+        yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+        maz@kernel.org, steven.price@arm.com, mark.rutland@arm.com
+Cc:     fam.zheng@bytedance.com, liangma@liangbit.com,
+        punit.agrawal@bytedance.com, Usama Arif <usama.arif@bytedance.com>
+Subject: [RFC 0/6] KVM: arm64: implement vcpu_is_preempted check
+Date:   Wed,  2 Nov 2022 16:13:34 +0000
+Message-Id: <20221102161340.2982090-1-usama.arif@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <867d0de4b0.wl-maz@kernel.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,47 +72,173 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 02, 2022, Marc Zyngier wrote:
-> On Wed, 02 Nov 2022 14:29:26 +0000, Peter Xu <peterx@redhat.com> wrote:
-> > However I don't see anything stops a simple "race" to trigger like below:
-> > 
-> >           recycle thread                   vcpu thread
-> >           --------------                   -----------
-> >       if (!dirty_ring_soft_full)                                   <--- not full
-> >                                         dirty_ring_push();
-> >                                         if (dirty_ring_soft_full)  <--- full due to the push
-> >                                             set_request(SOFT_FULL);
-> >           clear_request(SOFT_FULL);                                <--- can wrongly clear the request?
-> >
-> 
-> Hmmm, well spotted. That's another ugly effect of the recycle thread
-> playing with someone else's toys.
-> 
-> > But I don't think that's a huge matter, as it'll just let the vcpu to have
-> > one more chance to do another round of KVM_RUN.  Normally I think it means
-> > there can be one more dirty GFN (perhaps there're cases that it can push >1
-> > gfns for one KVM_RUN cycle?  I never figured out the details here, but
-> > still..) pushed to the ring so closer to the hard limit, but we have had a
-> > buffer zone of KVM_DIRTY_RING_RSVD_ENTRIES (64) entries.  So I assume
-> > that's still fine, but maybe worth a short comment here?
-> > 
-> > I never know what's the maximum possible GFNs being dirtied for a KVM_RUN
-> > cycle.  It would be good if there's an answer to that from anyone.
-> 
-> This is dangerous, and I'd rather not go there.
-> 
-> It is starting to look like we need the recycle thread to get out of
-> the way. And to be honest:
-> 
-> +	if (!kvm_dirty_ring_soft_full(ring))
-> +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
-> 
-> seems rather superfluous. Only clearing the flag in the vcpu entry
-> path feels much saner, and I can't see anything that would break.
-> 
-> Thoughts?
+This patchset adds support for vcpu_is_preempted in arm64, which allows the guest
+to check if a vcpu was scheduled out, which is useful to know incase it was
+holding a lock. vcpu_is_preempted can be used to improve
+performance in locking (see owner_on_cpu usage in mutex_spin_on_owner,
+mutex_can_spin_on_owner, rtmutex_spin_on_owner and osq_lock) and scheduling
+(see available_idle_cpu which is used in several places in kernel/sched/fair.c
+for e.g. in wake_affine to determine which CPU can run soonest):
 
-I've no objections to dropping the clear on reset, I suggested it primarily so
-that it would be easier to understand what action causes the dirty ring to become
-not-full.  I agree that the explicit clear is unnecessary from a functional
-perspective.
+This patchset shows improvement on overcommitted hosts (vCPUs > pCPUS), as waiting
+for preempted vCPUs reduces performance.
+
+This patchset is inspired from the para_steal_clock implementation and from the
+work originally done by Zengruan Ye:
+https://lore.kernel.org/linux-arm-kernel/20191226135833.1052-1-yezengruan@huawei.com/.
+(I have kept the original file author and patch sign-offs, hope thats ok).
+
+All the results in the below experiments are done on an aws r6g.metal instance
+which has 64 pCPUs.
+
+The following table shows the index results of UnixBench running on a 128 vCPU VM
+with (6.0.0+vcpu_is_preempted) and without (6.0.0 base) the patchset.
+TestName                                6.0.0 base  6.0.0+vcpu_is_preempted    % improvement for vcpu_is_preempted
+Dhrystone 2 using register variables    187761      191274.7                   1.871368389
+Double-Precision Whetstone              96743.6     98414.4                    1.727039308
+Execl Throughput                        689.3       10426                      1412.548963
+File Copy 1024 bufsize 2000 maxblocks   549.5       3165                       475.978162
+File Copy 256 bufsize 500 maxblocks     400.7       2084.7                     420.2645371
+File Copy 4096 bufsize 8000 maxblocks   894.3       5003.2                     459.4543218
+Pipe Throughput                         76819.5     78601.5                    2.319723508
+Pipe-based Context Switching            3444.8      13414.5                    289.4130283
+Process Creation                        301.1       293.4                      -2.557289937
+Shell Scripts (1 concurrent)            1248.1      28300.6                    2167.494592
+Shell Scripts (8 concurrent)            781.2       26222.3                    3256.669227
+System Call Overhead                    3426        3729.4                     8.855808523
+
+System Benchmarks Index Score           3053        11534                      277.7923354
+
+This shows a 277% overall improvement using these patches.
+
+The biggest improvement is in the shell scripts benchmark, which forks a lot of processes.
+This acquires rwsem lock where a large chunk of time is spent in base 6.0.0 kernel.
+This can be seen from one of the callstack of the perf output of the shell
+scripts benchmark on 6.0.0 base (pseudo NMI enabled for perf numbers below):
+- 33.79% el0_svc
+   - 33.43% do_el0_svc
+      - 33.43% el0_svc_common.constprop.3
+         - 33.30% invoke_syscall
+            - 17.27% __arm64_sys_clone
+               - 17.27% __do_sys_clone
+                  - 17.26% kernel_clone
+                     - 16.73% copy_process
+                        - 11.91% dup_mm
+                           - 11.82% dup_mmap
+                              - 9.15% down_write
+                                 - 8.87% rwsem_down_write_slowpath
+                                    - 8.48% osq_lock
+
+Just under 50% of the total time in the shell script benchmarks ends up being
+spent in osq_lock in the base 6.0.0 kernel:
+  Children      Self  Command   Shared Object        Symbol
+   17.19%    10.71%  sh      [kernel.kallsyms]  [k] osq_lock
+    6.17%     4.04%  sort    [kernel.kallsyms]  [k] osq_lock
+    4.20%     2.60%  multi.  [kernel.kallsyms]  [k] osq_lock
+    3.77%     2.47%  grep    [kernel.kallsyms]  [k] osq_lock
+    3.50%     2.24%  expr    [kernel.kallsyms]  [k] osq_lock
+    3.41%     2.23%  od      [kernel.kallsyms]  [k] osq_lock
+    3.36%     2.15%  rm      [kernel.kallsyms]  [k] osq_lock
+    3.28%     2.12%  tee     [kernel.kallsyms]  [k] osq_lock
+    3.16%     2.02%  wc      [kernel.kallsyms]  [k] osq_lock
+    0.21%     0.13%  looper  [kernel.kallsyms]  [k] osq_lock
+    0.01%     0.00%  Run     [kernel.kallsyms]  [k] osq_lock
+
+and this comes down to less than 1% total with 6.0.0+vcpu_is_preempted kernel:
+  Children      Self  Command   Shared Object        Symbol
+     0.26%     0.21%  sh      [kernel.kallsyms]  [k] osq_lock
+     0.10%     0.08%  multi.  [kernel.kallsyms]  [k] osq_lock
+     0.04%     0.04%  sort    [kernel.kallsyms]  [k] osq_lock
+     0.02%     0.01%  grep    [kernel.kallsyms]  [k] osq_lock
+     0.02%     0.02%  od      [kernel.kallsyms]  [k] osq_lock
+     0.01%     0.01%  tee     [kernel.kallsyms]  [k] osq_lock
+     0.01%     0.00%  expr    [kernel.kallsyms]  [k] osq_lock
+     0.01%     0.01%  looper  [kernel.kallsyms]  [k] osq_lock
+     0.00%     0.00%  wc      [kernel.kallsyms]  [k] osq_lock
+     0.00%     0.00%  rm      [kernel.kallsyms]  [k] osq_lock
+
+To make sure, there is no change in performance when vCPUs < pCPUs, UnixBench
+was run on a 32 CPU VM. The kernel with vcpu_is_preempted implemented
+performed 0.9% better overall than base kernel, and the individual benchmarks
+were within +/-2% improvement over 6.0.0 base.
+Hence the patches have no negative affect when vCPUs < pCPUs.
+
+
+The other method discussed in https://lore.kernel.org/linux-arm-kernel/20191226135833.1052-1-yezengruan@huawei.com/
+was pv conditional yield by Marc Zyngier and Will Deacon to reduce vCPU reschedule
+if the vCPU will exit immediately.
+(https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pvcy).
+The patches were ported to 6.0.0 kernel and tested with UnixBench with a 128 vCPU VM:
+
+TestName                                6.0.0 base  6.0.0+pvcy      % improvement for pvcy
+Dhrystone 2 using register variables    187761      183128          -2.467498575
+Double-Precision Whetstone              96743.6     96645           -0.101918887
+Execl Throughput                        689.3       1019.8          47.9471928
+File Copy 1024 bufsize 2000 maxblocks   549.5       2029.7          269.3721565
+File Copy 256 bufsize 500 maxblocks     400.7       1439.4          259.2213626
+File Copy 4096 bufsize 8000 maxblocks   894.3       3434.1          283.9986582
+Pipe Throughput                         76819.5     74268.8         -3.320380893
+Pipe-based Context Switching            3444.8      5963.3          73.11019508
+Process Creation                        301.1       163.2           -45.79873796
+Shell Scripts (1 concurrent)            1248.1      1859.7          49.00248378
+Shell Scripts (8 concurrent)            781.2       1171            49.89759345
+System Call Overhead                    3426        3194.4          -6.760070053
+
+System Benchmarks Index Score           3053        4605            50.83524402
+
+pvcy shows a smaller overall improvement (50%) compared to vcpu_is_preempted (277%).
+Host side flamegraph analysis shows that ~60% of the host time when using pvcy
+is spent in kvm_handle_wfx, compared with ~1.5% when using vcpu_is_preempted,
+hence vcpu_is_preempted shows a larger improvement.
+
+It might be that pvcy can be used in combination with vcpu_is_preempted, but this
+series is to start a discussion on vcpu_is_preempted as it shows a much bigger
+improvement in performance and its much easier to review vcpu_is_preempted standalone.
+
+The respective QEMU change to test this is at
+https://github.com/uarif1/qemu/commit/2da2c2927ae8de8f03f439804a0dad9cf68501b6,
+if this patchset looks good to start review, I can send the QEMU change to the
+qemu mailing list to start its review as well.
+
+Looking forward to your response!
+Thanks,
+Usama
+ 
+Usama Arif (6):
+  KVM: arm64: Document PV-lock interface
+  KVM: arm64: Add SMCCC paravirtualised lock calls
+  KVM: arm64: Support pvlock preempted via shared structure
+  KVM: arm64: Provide VCPU attributes for PV lock
+  KVM: arm64: Support the VCPU preemption check
+  KVM: selftests: add tests for PV time specific hypercalls
+
+ Documentation/virt/kvm/arm/hypercalls.rst     |   3 +
+ Documentation/virt/kvm/arm/pvlock.rst         |  64 +++++++++
+ Documentation/virt/kvm/devices/vcpu.rst       |  23 ++++
+ arch/arm64/include/asm/kvm_host.h             |  25 ++++
+ arch/arm64/include/asm/paravirt.h             |   2 +
+ arch/arm64/include/asm/pvlock-abi.h           |  17 +++
+ arch/arm64/include/asm/spinlock.h             |  16 ++-
+ arch/arm64/include/uapi/asm/kvm.h             |   3 +
+ arch/arm64/kernel/paravirt.c                  | 126 ++++++++++++++++++
+ arch/arm64/kernel/setup.c                     |   3 +
+ arch/arm64/kvm/Makefile                       |   2 +-
+ arch/arm64/kvm/arm.c                          |   8 ++
+ arch/arm64/kvm/guest.c                        |   9 ++
+ arch/arm64/kvm/hypercalls.c                   |  36 +++++
+ arch/arm64/kvm/pvlock.c                       | 100 ++++++++++++++
+ arch/arm64/kvm/pvtime.c                       |  16 ---
+ include/linux/arm-smccc.h                     |  13 ++
+ include/linux/cpuhotplug.h                    |   1 +
+ include/uapi/linux/kvm.h                      |   2 +
+ tools/arch/arm64/include/uapi/asm/kvm.h       |   1 +
+ tools/include/linux/arm-smccc.h               |  13 ++
+ .../selftests/kvm/aarch64/hypercalls.c        |   2 +
+ 22 files changed, 467 insertions(+), 18 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/pvlock.rst
+ create mode 100644 arch/arm64/include/asm/pvlock-abi.h
+ create mode 100644 arch/arm64/kvm/pvlock.c
+
+-- 
+2.25.1
+
