@@ -2,114 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7AC7616DF5
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 20:47:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B54CB616E33
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 21:02:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230102AbiKBTr1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 15:47:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55252 "EHLO
+        id S230465AbiKBUCL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 16:02:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229709AbiKBTr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 15:47:26 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAC84F5B7
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 12:47:24 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id g24so17583514plq.3
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 12:47:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XZUg37uJOYfpvjSeVnjDTPG9wFYr/ltSGt4/E37UDaE=;
-        b=T6n+ZNy6EJsuUFK142/EHb28MY0RHQS0F3csirBX1F4szkFH3Oa1GmcjrbMzMqlehR
-         PvjsJwJm7zQIiFKAQ+k5bRqj3r5MNjpdC5QRkWxNtnvQEVAEPB0xpqh4V/qBgfoZFH/0
-         X3Dr4HnK3V1IBtSh/4vfOTaOu0DmXUFWj6fWoc4wVthF+lGODGd5TBZPkeQhh2JpHeyp
-         ZJoFYF8I+pq6CfhphcrQl+pAJSgexA1ATjhi8/HGr0ViJe2DXVkDmdTX0/O3PAlo5tHC
-         1qsWaUE1rHB77yvUEvxqLKB8XZrzBsq5tHtS1s84o8MbSlwJZiAU4a0qutIvlFqV3sub
-         sUAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XZUg37uJOYfpvjSeVnjDTPG9wFYr/ltSGt4/E37UDaE=;
-        b=7wZqM/mkTsbirj3+9M6BSrOf7xXMwcxUhfU8BvDaTImLLuVQjP+F7tyUDC21aoU/5w
-         GCk2gGicd2FLNsmQdI4YlfsTi5BkusgY5y7+gLozwn+K//DS5OTVhnhIWMOtN+T+9ESy
-         zSWCgdfKyGw2nipFk/aE84gefbHt2WzswLVjhrq67RoLQbKwOZomifwZW9vZ3KydLYIX
-         8dKQA25r9TlKoRbn4YjuGdnrp0cGCDR78XdSuAhikSBRBSZJZ1bcmPprXjtgv6Rh2JwJ
-         Ha6QaskrhaemFzWtWvFPyYPOJAEXiPo3hmYRzN954YKxm4Z0rYoh2z1NCCHJ0TstpHqW
-         3jLg==
-X-Gm-Message-State: ACrzQf3PL604kTyi3490Y1lKMgbUyn2AlePkRCDscNgdNxqYEwc8rVX1
-        E2kgCWtOYlU24EhU4XotactqiUksKiR9SQ==
-X-Google-Smtp-Source: AMsMyM7oyCdBbkPZUPhhDvi7k1UptHvFb1HUn9nf2o5jtHc+LvzTsYv4dx5WGGQHkKa1hX1esfULbw==
-X-Received: by 2002:a17:902:f686:b0:187:16a0:fd2b with SMTP id l6-20020a170902f68600b0018716a0fd2bmr20793406plg.91.1667418444372;
-        Wed, 02 Nov 2022 12:47:24 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id h18-20020a63df52000000b00434272fe870sm7937729pgj.88.2022.11.02.12.47.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 12:47:24 -0700 (PDT)
-Date:   Wed, 2 Nov 2022 19:47:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Anish Ghulati <aghulati@google.com>
-Subject: Re: [PATCH] KVM: x86: Use SRCU to protect zap in
- __kvm_set_or_clear_apicv_inhibit
-Message-ID: <Y2LJSE5nuHZJV7fF@google.com>
-References: <20221102193020.1091939-1-bgardon@google.com>
+        with ESMTP id S230454AbiKBUBr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 16:01:47 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B3F51036;
+        Wed,  2 Nov 2022 13:01:44 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A2IGRv4010825;
+        Wed, 2 Nov 2022 20:00:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ZEYHGwsVZ9i/ZMrlW5q0nkckbHNYGw87m2YtJ0AKGxQ=;
+ b=SXQ6VNpBNqZccLcMEzpdnny3NQLI105hgcR4DrBs/B//53X3no+zl9A0Jm012IoyLGY1
+ DS8OdPIG20oiGDEfEVCCzw0JgLjbWQVRdzOo4WynVDVw4LSgpZwCb7j5GAHd7rmybdIB
+ gJ2eWJ6nEKpZyw6fZlzCL1OfckGzioarDT/G+QHBAmEpzISRk45wptQbib2lDBXvXtML
+ pgOtAtrRdR2MdaSe5xBdrQHLlEGnElo9HmxpjJs+5FjYjn4UtP3vqbhtC5cj3Ww1ouGO
+ GAtAgve4864DPAmw/vj9KowwwHBPmiE5Od3nB2zr6rO9699u2mbtE1MvzUI4VxYbbYoX vg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kkvbydnfq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Nov 2022 20:00:51 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A2Jeqvv013125;
+        Wed, 2 Nov 2022 20:00:50 GMT
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kkvbydneg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Nov 2022 20:00:50 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A2JolxS021521;
+        Wed, 2 Nov 2022 20:00:49 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma04dal.us.ibm.com with ESMTP id 3kgutabwbh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Nov 2022 20:00:49 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com ([9.208.128.112])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A2K0lv166650482
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 2 Nov 2022 20:00:47 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CCF7258054;
+        Wed,  2 Nov 2022 20:00:46 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0E5B458070;
+        Wed,  2 Nov 2022 20:00:43 +0000 (GMT)
+Received: from [9.160.116.108] (unknown [9.160.116.108])
+        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Wed,  2 Nov 2022 20:00:42 +0000 (GMT)
+Message-ID: <431304f4-cbe9-6453-cd3a-0843972ca368@linux.ibm.com>
+Date:   Wed, 2 Nov 2022 16:00:42 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221102193020.1091939-1-bgardon@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH v2 1/7] vfio/ccw: create a parent struct
+Content-Language: en-US
+To:     Eric Farman <farman@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>, Yi Liu <yi.l.liu@intel.com>
+Cc:     Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        David Airlie <airlied@gmail.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20221102150152.2521475-1-farman@linux.ibm.com>
+ <20221102150152.2521475-2-farman@linux.ibm.com>
+ <df037cd2e564acaa14c5a3358fd3386df29ad61e.camel@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <df037cd2e564acaa14c5a3358fd3386df29ad61e.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 3fpTBz1LZ22r3buesVDvJ_LOREDV8ITb
+X-Proofpoint-ORIG-GUID: 5kUYJ_dzxBTVeb9OuF-AJbfKjVSjRI8Q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-02_14,2022-11-02_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ priorityscore=1501 spamscore=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 suspectscore=0 clxscore=1015 mlxscore=0 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211020128
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 02, 2022, Ben Gardon wrote:
-> kvm_zap_gfn_range must be called in an SRCU read-critical section, but
+On 11/2/22 3:29 PM, Eric Farman wrote:
+> On Wed, 2022-11-02 at 16:01 +0100, Eric Farman wrote:
+>> Move the stuff associated with the mdev parent (and thus the
+>> subchannel struct) into its own struct, and leave the rest in
+>> the existing private structure.
+>>
+>> The subchannel will point to the parent, and the parent will point
+>> to the private, for the areas where one or both are needed. Further
+>> separation of these structs will follow.
+>>
+>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+>> ---
+>>  drivers/s390/cio/vfio_ccw_drv.c     | 96 ++++++++++++++++++++++++---
+>> --
+>>  drivers/s390/cio/vfio_ccw_ops.c     |  8 ++-
+>>  drivers/s390/cio/vfio_ccw_private.h | 20 ++++--
+>>  3 files changed, 100 insertions(+), 24 deletions(-)
+>>
+>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c
+>> b/drivers/s390/cio/vfio_ccw_drv.c
+>> index 7f5402fe857a..06022fb37b9d 100644
+>> --- a/drivers/s390/cio/vfio_ccw_drv.c
+>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
 
-Please add parantheses when referencing functions, i.e. kvm_zap_gfn_range().
+...
 
-> there is no SRCU annotation in __kvm_set_or_clear_apicv_inhibit.
+>>  static int vfio_ccw_sch_probe(struct subchannel *sch)
+>>  {
+>>         struct pmcw *pmcw = &sch->schib.pmcw;
+>>         struct vfio_ccw_private *private;
+>> +       struct vfio_ccw_parent *parent;
+>>         int ret = -ENOMEM;
+>>  
+>>         if (pmcw->qf) {
+>> @@ -213,41 +246,62 @@ static int vfio_ccw_sch_probe(struct subchannel
+>> *sch)
+>>                 return -ENODEV;
+>>         }
+>>  
+>> +       parent = kzalloc(sizeof(*parent), GFP_KERNEL);
+>> +       if (IS_ERR(parent))
+>> +               return PTR_ERR(parent);
+>> +
+>> +       dev_set_name(&parent->dev, "parent");
+>> +       parent->dev.parent = &sch->dev;
+>> +       parent->dev.release = &vfio_ccw_free_parent;
+>> +       ret = device_register(&parent->dev);
+>> +       if (ret)
+>> +               goto out_free;
+>> +
+>>         private = vfio_ccw_alloc_private(sch);
+>> -       if (IS_ERR(private))
+>> +       if (IS_ERR(private)) {
+>> +               put_device(&parent->dev);
+> 
+> This should've been device_unregister. (I could rearrange the code a
+> bit to avoid the mix of returns/gotos around here, but since the whole
+> series is trying to separate these two structs that seems unnecessary.)
+> 
+>>                 return PTR_ERR(private);
+>> +       }
+>>  
+>> -       dev_set_drvdata(&sch->dev, private);
+>> +       dev_set_drvdata(&sch->dev, parent);
+>> +       dev_set_drvdata(&parent->dev, private);
+>>  
+>> -       private->mdev_type.sysfs_name = "io";
+>> -       private->mdev_type.pretty_name = "I/O subchannel (Non-QDIO)";
+>> -       private->mdev_types[0] = &private->mdev_type;
+>> -       ret = mdev_register_parent(&private->parent, &sch->dev,
+>> +       parent->mdev_type.sysfs_name = "io";
+>> +       parent->mdev_type.pretty_name = "I/O subchannel (Non-QDIO)";
+>> +       parent->mdev_types[0] = &parent->mdev_type;
+>> +       ret = mdev_register_parent(&parent->parent, &sch->dev,
+>>                                    &vfio_ccw_mdev_driver,
+>> -                                  private->mdev_types, 1);
+>> +                                  parent->mdev_types, 1);
+>>         if (ret)
+>> -               goto out_free;
+>> +               goto out_unreg;
+>>  
+>>         VFIO_CCW_MSG_EVENT(4, "bound to subchannel %x.%x.%04x\n",
+>>                            sch->schid.cssid, sch->schid.ssid,
+>>                            sch->schid.sch_no);
+>>         return 0;
+>>  
+>> +out_unreg:
+>> +       device_unregister(&parent->dev);
+>>  out_free:
+>> +       dev_set_drvdata(&parent->dev, NULL);
+>>         dev_set_drvdata(&sch->dev, NULL);
+>>         vfio_ccw_free_private(private);
+>> +       put_device(&parent->dev);
+> 
+> While this...
+> 
+>>         return ret;
+>>  }
+>>  
+>>  static void vfio_ccw_sch_remove(struct subchannel *sch)
+>>  {
+>> -       struct vfio_ccw_private *private = dev_get_drvdata(&sch-
+>>> dev);
+>> +       struct vfio_ccw_parent *parent = dev_get_drvdata(&sch->dev);
+>> +       struct vfio_ccw_private *private = dev_get_drvdata(&parent-
+>>> dev);
+>>  
+>> -       mdev_unregister_parent(&private->parent);
+>> +       mdev_unregister_parent(&parent->parent);
+>>  
+>> +       device_unregister(&parent->dev);
+>>         dev_set_drvdata(&sch->dev, NULL);
+>>  
+>>         vfio_ccw_free_private(private);
+>> +       put_device(&parent->dev);
+> 
+> ...and this shouldn't even be there. Sorry for the brain fog.
+> 
 
-__kvm_set_or_clear_apicv_inhibit()
+Thanks, with these changes I no longer see refcount underflows.  I'll continue reviewing with those changes presumed for v3.
 
-> Add the needed SRCU annotation.
-
-It's not an annotation, acquiring SRCU is very much functional code.
-
-> Tested: ran tools/testing/selftests/kvm/x86_64/debug_regs on a DBG
-> 	build. This patch causes the suspicious RCU warning to disappear.
-> 	Note that the warning is hit in __kvm_zap_rmaps, so
-> 	kvm_memslots_have_rmaps must return true in order for this to
-> 	repro (i.e. the TDP MMU must be off or nesting in use.)
-
-Please provide the stack trace or at least a verbal description of what paths
-can reach __kvm_set_or_clear_apicv_inhibit() without holding SRCU, i.e. explain
-why this bug isn't being hit left and right.
-
-E.g.
-
-  Unconditionally take KVM's SRCU lock in __kvm_set_or_clear_apicv_inhibit()
-  when zapping virtual APIC SPTEs.  SRCU must be held when zapping SPTEs in
-  shadow MMUs to protect the gfn=>memslot translation (the TDP MMU walks all
-  roots and so doesn't dereference memslots).
-
-  In most cases, the inhibits are updated during KVM_RUN and so SRCU is
-  already held, but other ioctls() can also modify inhibits and don't
-  acquire SRCU, e.g. KVM_SET_GUEST_DEBUG and KVM_SET_LAPIC.  Acquire SRCU
-  unconditionally to avoid playing whack-a-mole, as nesting SRCU locks is
-  safe and this is not a hot path.
-
-> Fixes: 36222b117e36 ("KVM: x86: don't disable APICv memslot when inhibited")
-
-Reported-by?  IIRC this originated in a syzkaller report?
