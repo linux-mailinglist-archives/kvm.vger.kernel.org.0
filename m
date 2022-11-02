@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA7A86170E0
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 23:51:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8362B6170E1
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 23:51:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231559AbiKBWvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 18:51:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45770 "EHLO
+        id S231373AbiKBWvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 18:51:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231520AbiKBWvS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 18:51:18 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39513BC3E
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 15:51:18 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id n12-20020a170902e54c00b00188515e81a6so150209plf.23
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 15:51:18 -0700 (PDT)
+        with ESMTP id S231272AbiKBWvU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 18:51:20 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35423BC3E
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 15:51:20 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-3735edd4083so772797b3.0
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 15:51:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=4UuFeK7ZuzlAbWszFPHCqZNN8a1tHo5FOVtIZXoUWgU=;
-        b=pNaYqtDhha9ETxoBUkPpBPVgkCLjH+IFu8ZwiF0RP6FhExmzs0S2acrzDQPTGuY3MD
-         OwjqHS+cA1HRMhexLP8h8XqXAiUrnU7oDN+y41cbckhSUwhBD/O5aInwrmPHEWenDo8F
-         lO52+155jiGW4oM0ujMP6TaKl2CHB6D8hOAAB6f7k05QpWn0rL4vFrkbhw5GYgeIWrwC
-         IsQbT9hL41YM2Jk4MUassiSGXeuUbIXlXyHI3c7EFsTQcdH8sxGFIWgvknR0bm20lASl
-         kS7CJcR/I9DEa77LwaXONSANtFcCCF4gQD8UlNBE953SK9riO8yyKI4VCcc8szDXCWx3
-         Dzhg==
+        bh=0KFr9Y8Bkobvim11bxjxGXR4w41czOzgx7YyAgL15Zc=;
+        b=C4n4QKVSf6yxBj4NoU2dCOFtrQndCF9Y7ZvlK0qdmE4wzuQbYIKWp88ip2ULv7whQt
+         CApHSEC1HFKUQwQtMYS9dpzFJrh87LLn6eHaiGxVHa1MG2EqAQ87Qq2GVONKJOrHiVSu
+         IybjsZSohGQ7RevH+zwcqtDHjkd4YAIEPPDkPmcnIjE3MJsNbF3DtMLV53pI8PaH9mfJ
+         2WXhMWFRzifM3BUA4p9BEjn3jRcQ66ZqUUfdC+yXdBQl8NeSC70f24rC1Hg+0bMCXiD/
+         LX7QszL8s0sWM4GB6AQtKYhp+BnS8FDnFzXafH6u0c0Al5VfDprGrlgP9NAOtyea+9Ti
+         QMMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=4UuFeK7ZuzlAbWszFPHCqZNN8a1tHo5FOVtIZXoUWgU=;
-        b=YOjo5rgphsnNk8uEhr2W569TYJGH1stZ4w5qqK+NTP8GWE6DtfUcVjbtxznRkRmHRS
-         1cUEcDT2DkGMt7q7AmNxDFtb8DiNUU2jHeLL7qYZKOp4Weqw1HNBNQ2xg6quvwNzrFKP
-         MwY/FR+gr+YVrC8J1fF7cfw8O+76Lf24WoGcAhKVqOOTKZW3g+ebElDL0lm69Bx6rB+l
-         GG0nCqnS8NtnSyC++AsyaKEWH7+bSLExNCykgxCK+tkqQEfXF+TXrgHHMzs5XuOo9l7C
-         s9Q3Qpr+MDSeV3ulv1S7qVekcS+xXQtdFa5YtWyrfgZAvRDRWHdKp5k94Li1Q75/5Spk
-         tF8A==
-X-Gm-Message-State: ACrzQf3jfpG5y9SrT8o7L+9vXJNfggQWdn2WEt4WTrfjFsgyXr3xMROp
-        Kt06eUZNcpUyyRJF6Cfh3V0nwKcFR7c=
-X-Google-Smtp-Source: AMsMyM5vpQhgImqdJmnApP1JY1GM0X8zbe6G/bKr46ljwyhZtiRQzUG4SJaFEbHmDFN6yqbFAEwUVBA/2oc=
+        bh=0KFr9Y8Bkobvim11bxjxGXR4w41czOzgx7YyAgL15Zc=;
+        b=j31Av/8oRYr7YbqUvmTZm4POuooMXAyCUUT0lrNB0uf/ze2zqHEFwqsyYuiKcKABNR
+         eceg4+cxLED5bjPHrf5rmReeJcaZ3lVQX6RxG0LhzKQaJGRH4b0kNunpNtR0sJ6EcAoy
+         8WLN/Ypb2HvIZWMrnyXaldRvhDWQvMVn1FkWL0iMKZyn8d4hIIkEj27X9xygWrFYE/Ti
+         716xD0CzEokTu/VvDO4+02NprPpkET+GtiBP23gxgNH7qGS32zXLsGm9nY5oHInDHH3J
+         75AedwyxmoY4R1C3g4XwVNPqslhx0UXJo1hlz5ciAZ+7FB5kz4gBEEOkLiavrn9rr6/7
+         rtvg==
+X-Gm-Message-State: ACrzQf3Tnav6W8319dP3HCvo+ffhD1XrauwQgl6/sHcWOALjIloOPvY8
+        aa+iU+EUnLZ0G2+Nl6jT77k70iOd9XI=
+X-Google-Smtp-Source: AMsMyM6d04X/cYw1+U1EQGe3R1Lcgfi9r4yrBFX0YqXmzRew+DniyFW8s+xWjIjsbEwF/ZuBtMgJvZ9nzGs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e902:b0:186:9c03:5f27 with SMTP id
- k2-20020a170902e90200b001869c035f27mr26953277pld.16.1667429477790; Wed, 02
- Nov 2022 15:51:17 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:e207:0:b0:6ca:268b:10c3 with SMTP id
+ h7-20020a25e207000000b006ca268b10c3mr24724191ybe.407.1667429479531; Wed, 02
+ Nov 2022 15:51:19 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  2 Nov 2022 22:50:45 +0000
+Date:   Wed,  2 Nov 2022 22:50:46 +0000
 In-Reply-To: <20221102225110.3023543-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221102225110.3023543-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102225110.3023543-3-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v5 02/27] x86/pmu: Test emulation instructions
- on full-width counters
+Message-ID: <20221102225110.3023543-4-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v5 03/27] x86/pmu: Pop up FW prefix to avoid
+ out-of-context propagation
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -73,39 +73,28 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-Move check_emulated_instr() into check_counters() so that full-width
-counters could be tested with ease by the same test case.
+The inappropriate prefix "full-width writes" may be propagated to
+later test cases if it is not popped out.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/pmu.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ x86/pmu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/x86/pmu.c b/x86/pmu.c
-index 1a3e5a54..308a0ce0 100644
+index 308a0ce0..da8c004a 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -520,6 +520,9 @@ static void check_emulated_instr(void)
+@@ -665,6 +665,7 @@ int main(int ac, char **av)
+ 		report_prefix_push("full-width writes");
+ 		check_counters();
+ 		check_gp_counters_write_width();
++		report_prefix_pop();
+ 	}
  
- static void check_counters(void)
- {
-+	if (is_fep_available())
-+		check_emulated_instr();
-+
- 	check_gp_counters();
- 	check_fixed_counters();
- 	check_rdpmc();
-@@ -655,9 +658,6 @@ int main(int ac, char **av)
- 
- 	apic_write(APIC_LVTPC, PC_VECTOR);
- 
--	if (is_fep_available())
--		check_emulated_instr();
--
- 	check_counters();
- 
- 	if (this_cpu_perf_capabilities() & PMU_CAP_FW_WRITES) {
+ 	return report_summary();
 -- 
 2.38.1.431.g37b22c650d-goog
 
