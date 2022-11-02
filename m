@@ -2,155 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A77B615B65
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 05:25:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 94C35615C09
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 07:05:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229770AbiKBEZT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 00:25:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58676 "EHLO
+        id S229756AbiKBGFZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 02:05:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229537AbiKBEZS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 00:25:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4CEE248ED
-        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 21:24:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667363062;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ka7Osup5DV6yuD8HHLmPPzojpLGP5jXKxXOIT/4q/DU=;
-        b=VGpJ9RIr7xbTQNwUY6chXOnv6TFDw/DiM7B4MQeAz938KqWZ7uwPqHfEThxEoUaq7QHpGU
-        ZmJKEoO+1xyrfwnS2z6lApjS4qvXdbPy/MENU2HzWkSze4hg74OpnTLV742+z899Stf1Ls
-        0F3UcXt1C6pv3gxI0Gy5w+apU5LU+NM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-116-tJw0Rl95PqGJK_D3KWWuTg-1; Wed, 02 Nov 2022 00:24:18 -0400
-X-MC-Unique: tJw0Rl95PqGJK_D3KWWuTg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6C8118828C1;
-        Wed,  2 Nov 2022 04:24:18 +0000 (UTC)
-Received: from [10.64.54.151] (vpn2-54-151.bne.redhat.com [10.64.54.151])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 65BFA2166B2D;
-        Wed,  2 Nov 2022 04:24:12 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [RFC 1/1] KVM: selftests: rseq_test: use vdso_getcpu() instead of
- syscall()
-To:     Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com,
-        seanjc@google.com
-Cc:     kvm@vger.kernel.org
-References: <20221102020128.3030511-1-robert.hu@linux.intel.com>
- <20221102020128.3030511-2-robert.hu@linux.intel.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <7371fbbd-25b0-6cb1-0a46-1f1bd194af2e@redhat.com>
-Date:   Wed, 2 Nov 2022 12:24:04 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S229504AbiKBGFX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 02:05:23 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8720233B2
+        for <kvm@vger.kernel.org>; Tue,  1 Nov 2022 23:05:22 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id d13-20020a17090a3b0d00b00213519dfe4aso996140pjc.2
+        for <kvm@vger.kernel.org>; Tue, 01 Nov 2022 23:05:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y9uyhw9PL/OkoyPXAE/pdjREfoBueHEZ0NBGMdBg/Sc=;
+        b=fUGFMkHGoMF/QkYZaDgscqM5S0tCYHRI4ZuYi7eJi8E3VJ5u5w9Ebr8dFPDPjAvSat
+         sq1HSsm1EHK1lcyTdpn9rKmjEgquHRRZt2Miw7iTqqxqF0Ryv/uwp2bFlncrZ5dlKccU
+         SIERlAfK56K7kQSkQbFNziOdjlYviE/I7kBt5poNHQegkiREeP1lZUmCPTClYh0YCvfY
+         FKU9HhQDhUwl5dYRVvoSU/4YhOJz4uC6eC1oZls1CQIvy1jQCHVheYW88TtVJLjpK4aN
+         j9tFgoGObNWAp5yagd02YPRw0//rwqH02RdgBKcjcst7kVPfF4ezQoUyHdJlPBrLZwD6
+         vW4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y9uyhw9PL/OkoyPXAE/pdjREfoBueHEZ0NBGMdBg/Sc=;
+        b=d0ahRVTOnXE4WvscnxsdT/MqekdHEacNDRoUN3jXPcalSnCKjiNhebbA+FROhESiWS
+         KrS2sYFRXZMX5aFWUb/wCB4ywlGDj6gDTgRAY3uanV+ESw0uYBXTMihXskVmMAYli0tW
+         buJUsnAwPAKO7hF3cPmij+csHZXbZyi4wpQSF4SdLjlFKq8x4eVABPIKKJYfme6i5weZ
+         O24qPVhyzidLWlRjyoJUtVKCiobecqD7H+LAntEoEPeMOhJ5p4B3/sQvPDuXidxiir8G
+         FJaWDFRkvUvf47JMm3I3OQB0foweD3GWVh9qiN+kiPJlGkRI52GB7InnMU+x7Hz7RXNx
+         +YVw==
+X-Gm-Message-State: ACrzQf3Lz4whQWcT/kTGlDRhIgrHURU2FtGbfojdiwmI1auSPmBPRlWu
+        dTi3Bh5NIr6gAVHy5ziqh1jlP95RK71h2A==
+X-Google-Smtp-Source: AMsMyM7xupyLnGZY8PTdkxP8oEiGZqQXpjBzvNmd2jG8KVjfPqNAKKjAQhJDNwlXY53rLVukXV4fyQ==
+X-Received: by 2002:a17:902:e154:b0:186:f0d5:1ac0 with SMTP id d20-20020a170902e15400b00186f0d51ac0mr22771054pla.15.1667369122061;
+        Tue, 01 Nov 2022 23:05:22 -0700 (PDT)
+Received: from crazyhorse.local ([174.127.229.57])
+        by smtp.googlemail.com with ESMTPSA id h29-20020a63121d000000b004388ba7e5a9sm6810611pgl.49.2022.11.01.23.05.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Nov 2022 23:05:21 -0700 (PDT)
+From:   Anthony DeRossi <ajderossi@gmail.com>
+To:     kvm@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com, jgg@ziepe.ca,
+        kevin.tian@intel.com, abhsahu@nvidia.com, yishaih@nvidia.com
+Subject: [PATCH v3] vfio/pci: Accept a non-zero open_count on reset
+Date:   Tue,  1 Nov 2022 22:57:32 -0700
+Message-Id: <20221102055732.2110-1-ajderossi@gmail.com>
+X-Mailer: git-send-email 2.37.4
 MIME-Version: 1.0
-In-Reply-To: <20221102020128.3030511-2-robert.hu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Robert,
+The implementation of vfio_pci_core_disable() inspects the open_count of
+every device in the device set to determine whether a reset is needed.
+This count is always non-zero for the device being disabled, effectively
+disabling the reset logic.
 
-On 11/2/22 10:01 AM, Robert Hoo wrote:
-> vDSO getcpu() has been in Kernel since 2.6.19, which we can assume
-> generally available.
-> Use vDSO getcpu() to reduce the overhead, so that vcpu thread stalls less
-> therefore can have more odds to hit the race condition.
-> 
+After commit 2cd8b14aaa66 ("vfio/pci: Move to the device set
+infrastructure"), failure to create a new file for a device would cause
+the reset to be skipped due to open_count being decremented after
+calling close_device() in the error path.
 
-It would be nice to provide more context to explain how the race
-condition is caused.
+After commit eadd86f835c6 ("vfio: Remove calls to
+vfio_group_add_container_user()"), releasing a device would always skip
+the reset due to an ordering change in vfio_device_fops_release().
 
-> Fixes: 0fcc102923de ("KVM: selftests: Use getcpu() instead of sched_getcpu() in rseq_test")
-> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> ---
->   tools/testing/selftests/kvm/rseq_test.c | 32 ++++++++++++++++++-------
->   1 file changed, 24 insertions(+), 8 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-> index 6f88da7e60be..0b68a6b19b31 100644
-> --- a/tools/testing/selftests/kvm/rseq_test.c
-> +++ b/tools/testing/selftests/kvm/rseq_test.c
-> @@ -42,15 +42,29 @@ static void guest_code(void)
->   }
->   
->   /*
-> - * We have to perform direct system call for getcpu() because it's
-> - * not available until glic 2.29.
-> + * getcpu() was added in kernel 2.6.19. glibc support wasn't there
-> + * until glibc 2.29.
-> + * We can direct call it from vdso to ease gblic dependency.
-> + *
-> + * vdso manipulation code refers from selftests/x86/test_vsyscall.c
->    */
-> -static void sys_getcpu(unsigned *cpu)
-> -{
-> -	int r;
-> +typedef long (*getcpu_t)(unsigned *, unsigned *, void *);
-> +static getcpu_t vdso_getcpu;
->   
-> -	r = syscall(__NR_getcpu, cpu, NULL, NULL);
-> -	TEST_ASSERT(!r, "getcpu failed, errno = %d (%s)", errno, strerror(errno));
-> +static void init_vdso(void)
-> +{
-> +	void *vdso = dlopen("linux-vdso.so.1", RTLD_LAZY | RTLD_LOCAL |
-> +			    RTLD_NOLOAD);
-> +	if (!vdso)
-> +		vdso = dlopen("linux-gate.so.1", RTLD_LAZY | RTLD_LOCAL |
-> +			      RTLD_NOLOAD);
-> +	if (!vdso)
-> +		TEST_ASSERT(!vdso, "failed to find vDSO\n");
-> +
-> +	vdso_getcpu = (getcpu_t)dlsym(vdso, "__vdso_getcpu");
-> +	if (!vdso_getcpu)
-> +		TEST_ASSERT(!vdso_getcpu,
-> +			    "failed to find __vdso_getcpu in vDSO\n");
->   }
->   
+Failing to reset the device leaves it in an unknown state, potentially
+causing errors when it is bound to a different driver.
 
-As the comments say, vdso manipulation code comes from selftests/x86/test_vsyscall.c.
-I would guess 'linux-vdso.so.1' and 'linux-gate.so.1' are x86 specific. If I'm correct,
-the test case will fail on other architectures, including ARM64.
+This issue was observed with a Radeon RX Vega 56 [1002:687f] (rev c3)
+assigned to a Windows guest. After shutting down the guest, unbinding
+the device from vfio-pci, and binding the device to amdgpu:
 
->   static int next_cpu(int cpu)
-> @@ -205,6 +219,8 @@ int main(int argc, char *argv[])
->   	struct kvm_vcpu *vcpu;
->   	u32 cpu, rseq_cpu;
->   
-> +	init_vdso();
-> +
->   	/* Tell stdout not to buffer its content */
->   	setbuf(stdout, NULL);
->   
-> @@ -253,7 +269,7 @@ int main(int argc, char *argv[])
->   			 * across the seq_cnt reads.
->   			 */
->   			smp_rmb();
-> -			sys_getcpu(&cpu);
-> +			vdso_getcpu(&cpu, NULL, NULL);
->   			rseq_cpu = rseq_current_cpu_raw();
->   			smp_rmb();
->   		} while (snapshot != atomic_read(&seq_cnt));
-> 
+[  548.007102] [drm:psp_hw_start [amdgpu]] *ERROR* PSP create ring failed!
+[  548.027174] [drm:psp_hw_init [amdgpu]] *ERROR* PSP firmware loading failed
+[  548.027242] [drm:amdgpu_device_fw_loading [amdgpu]] *ERROR* hw_init of IP block <psp> failed -22
+[  548.027306] amdgpu 0000:0a:00.0: amdgpu: amdgpu_device_ip_init failed
+[  548.027308] amdgpu 0000:0a:00.0: amdgpu: Fatal error during GPU init
 
-Thanks,
-Gavin
+Fixes: 2cd8b14aaa66 ("vfio/pci: Move to the device set infrastructure")
+Fixes: eadd86f835c6 ("vfio: Remove calls to vfio_group_add_container_user()")
+Signed-off-by: Anthony DeRossi <ajderossi@gmail.com>
+---
+v2 -> v3:
+- Added WARN_ON()
+- Revised commit message
+v2: https://lore.kernel.org/kvm/20221026194245.1769-1-ajderossi@gmail.com/
+
+v1 -> v2:
+- Changed reset behavior instead of open_count ordering
+- Retitled from "vfio: Decrement open_count before close_device()"
+v1: https://lore.kernel.org/kvm/20221025193820.4412-1-ajderossi@gmail.com/
+
+ drivers/vfio/pci/vfio_pci_core.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index badc9d828cac..f09aa84f46e5 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -174,7 +174,7 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
+ }
+ 
+ struct vfio_pci_group_info;
+-static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
++static void vfio_pci_core_try_reset(struct vfio_pci_core_device *vdev);
+ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+ 				      struct vfio_pci_group_info *groups);
+ 
+@@ -667,7 +667,7 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
+ out:
+ 	pci_disable_device(pdev);
+ 
+-	vfio_pci_dev_set_try_reset(vdev->vdev.dev_set);
++	vfio_pci_core_try_reset(vdev);
+ 
+ 	/* Put the pm-runtime usage counter acquired during enable */
+ 	if (!disable_idle_d3)
+@@ -2483,14 +2483,18 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+ 	return ret;
+ }
+ 
+-static bool vfio_pci_dev_set_needs_reset(struct vfio_device_set *dev_set)
++static bool vfio_pci_core_needs_reset(struct vfio_pci_core_device *vdev)
+ {
++	struct vfio_device_set *dev_set = vdev->vdev.dev_set;
+ 	struct vfio_pci_core_device *cur;
+ 	bool needs_reset = false;
+ 
++	if (WARN_ON(vdev->vdev.open_count > 1))
++		return false;
++
+ 	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
+-		/* No VFIO device in the set can have an open device FD */
+-		if (cur->vdev.open_count)
++		/* Only the VFIO device being reset can have an open FD */
++		if (cur != vdev && cur->vdev.open_count)
+ 			return false;
+ 		needs_reset |= cur->needs_reset;
+ 	}
+@@ -2498,19 +2502,20 @@ static bool vfio_pci_dev_set_needs_reset(struct vfio_device_set *dev_set)
+ }
+ 
+ /*
+- * If a bus or slot reset is available for the provided dev_set and:
++ * If a bus or slot reset is available for the provided device and:
+  *  - All of the devices affected by that bus or slot reset are unused
+  *  - At least one of the affected devices is marked dirty via
+  *    needs_reset (such as by lack of FLR support)
+  * Then attempt to perform that bus or slot reset.
+  */
+-static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set)
++static void vfio_pci_core_try_reset(struct vfio_pci_core_device *vdev)
+ {
++	struct vfio_device_set *dev_set = vdev->vdev.dev_set;
+ 	struct vfio_pci_core_device *cur;
+ 	struct pci_dev *pdev;
+ 	bool reset_done = false;
+ 
+-	if (!vfio_pci_dev_set_needs_reset(dev_set))
++	if (!vfio_pci_core_needs_reset(vdev))
+ 		return;
+ 
+ 	pdev = vfio_pci_dev_set_resettable(dev_set);
+-- 
+2.37.4
 
