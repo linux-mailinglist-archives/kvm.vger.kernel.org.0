@@ -2,126 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56DB2616B3C
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 18:54:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E8DD3616B4B
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 18:55:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231315AbiKBRyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 13:54:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55390 "EHLO
+        id S231288AbiKBRzX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 13:55:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231224AbiKBRyI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 13:54:08 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5D1A2EF08
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 10:54:06 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id m6so17112977pfb.0
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 10:54:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fpYDgRbuVtbAhi3UvVtxCWU8xfrY9oiPW0Q34ekpElc=;
-        b=hxfe4fBYz4313JRDaRhX/2VOVL6R5WuSg81AhHXoXgcKkgKCZIcsqi6OEsH/S5/0b/
-         gxJPieyRiBsbohb3PU4LfisAyQq5GvSUhcrrMvuIXubDveQEQORoNCrXCAQ8A5rIQ5O4
-         FOjLPpklhT+9SJmIppKund9yD8PmTLTClCtSshMXXd1HwbExEvRizP0utogDMQgKAWE8
-         XODhChNefXkWpJJZ4DJJZsIGoNb7zTSS4yxxmgW4oU59Um3u/cH6kzu4ghUtHTsq+KgX
-         JRPLHvqGuJY4zhLV410kl/oZQSUZjjtHdf+fvjrp60gaoOUjn9YKkBkn5MUoc3YMR5k4
-         KuSA==
+        with ESMTP id S229949AbiKBRzU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 13:55:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D2B0A44D
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 10:54:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667411667;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qsy9PInY+W27+gffMySXvFWm04u28ouULp0IKJ8CX94=;
+        b=VraqMsxYX4A5ybuJMTyt4i7wssZh+7RS4FKwnzwlj7cSlvsdAc68ZT7765vREU3GD90R1n
+        Oys4kwHuL3rYsE+7P2r427XFRUwHZddxb/R3h7YpJIM2xPjx7BsbKwHPTaZQUdG3rWgsqJ
+        wB3tAhm7lS+tud6XLKk381XnPrgDjkY=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-230-jIUn3MzkPVOuJsxOZZrVng-1; Wed, 02 Nov 2022 13:54:26 -0400
+X-MC-Unique: jIUn3MzkPVOuJsxOZZrVng-1
+Received: by mail-ej1-f69.google.com with SMTP id qb12-20020a1709077e8c00b007a6c5a23a30so10347800ejc.12
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 10:54:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fpYDgRbuVtbAhi3UvVtxCWU8xfrY9oiPW0Q34ekpElc=;
-        b=AZCeYAsg7Ka89EBayQcmtRhCKYOupL1T95OwUdG8JmlkAjx6e6vOTQDlFG/yi56oGQ
-         KXbn2Vv6QfyIzqpaINKiu6YeDWwGt45ekhQwx1Thl+ctmtko7oigMbF5Q/ExuOn67MdF
-         41CUsBoY3vMJW9zC/yrwuG0RaHYiFQwRhFRaTNFsxlsgBp+VzjuDVy8hO32Yfk/+LJEU
-         b9ANL0I2IptiMR9ETqGZoT/7oSOK/iL9/LhfLtRJO6kAFD6pgvAiZLiujyLmLs8/xt40
-         Xt3wjltoaXyknGoKydFSZPxqyoItZxyCwyxf5MCg/8mZ9LQsWrxyWmkejhR+UlrrAtPW
-         XoFA==
-X-Gm-Message-State: ACrzQf33I+Ke5s4S0/VdqoJBZt6cMCHHalfVlEDDRS/gnA6WN4UGWAJG
-        /oSkzwvdjqfwc8CxymDFA3iKHg==
-X-Google-Smtp-Source: AMsMyM5E7+t+kS5JVd2cmZMa9gFkaxoNxKHfenISUdm+vEOb5xM6B4Nui+S0COKjfSAqKIjIzhgJqw==
-X-Received: by 2002:a65:6d1b:0:b0:46a:f245:8825 with SMTP id bf27-20020a656d1b000000b0046af2458825mr22759441pgb.224.1667411646061;
-        Wed, 02 Nov 2022 10:54:06 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x189-20020a6263c6000000b0056b8af5d46esm8731631pfb.168.2022.11.02.10.54.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 10:54:05 -0700 (PDT)
-Date:   Wed, 2 Nov 2022 17:54:02 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v4 16/24] x86/pmu: Add GP counter related
- helpers
-Message-ID: <Y2Kuui/2op6aXbkJ@google.com>
-References: <20221024091223.42631-1-likexu@tencent.com>
- <20221024091223.42631-17-likexu@tencent.com>
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qsy9PInY+W27+gffMySXvFWm04u28ouULp0IKJ8CX94=;
+        b=53ow7N3LjjMwMQK1RyL3sYaW3ksRYo/+QtTqVxVed2XDX5eNdxQKk93nwKaNCYMEJX
+         RkQuBASo1NKDhGWkvZK53E+VH51qPUIVcw+Tgbn8w3FIw9rq3C2xDMIFNwQ6YNx3/qHz
+         RlCRA5Qbogna0qZ/wE5mzRSFlVmAmfPtNex3Q9GGuYO82gK1irKIVTQEUaEqWg6tnYJz
+         6TSAg48ghYu/9pGv7MaXcXmDuDKg6384HNnUQSBHECkKTeZ0Cmto8s500hHRltzyftjZ
+         wYhefPyJi3aRCTIxhgRwXqUCt2VRcLmzKhqLDqWYPTg6d704/O16LKbOtFWpoSlqwoeK
+         MLXQ==
+X-Gm-Message-State: ACrzQf2RONJvjMBrEKARDsk1WndW+o/dNyhOOAaAjoJF7nOc+Nzt/KE3
+        T3ZkKFm4Y5K+uSXCmtf3XKCJbMjVvV9VgrmO/s5vu5csbMtm6wqOxOUas4ox2bpMun3DRdOjNN/
+        xROPFtpKqnL9Z
+X-Received: by 2002:a17:907:31c7:b0:740:e3e5:c025 with SMTP id xf7-20020a17090731c700b00740e3e5c025mr25445521ejb.341.1667411665339;
+        Wed, 02 Nov 2022 10:54:25 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7i9P8a3KaukAAmvuzA0kYKoaG+hzHr8RgD2JCBtxz5ORS+iIp13DTtPPB6cRp+bA7bWvgRQg==
+X-Received: by 2002:a17:907:31c7:b0:740:e3e5:c025 with SMTP id xf7-20020a17090731c700b00740e3e5c025mr25445499ejb.341.1667411665122;
+        Wed, 02 Nov 2022 10:54:25 -0700 (PDT)
+Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
+        by smtp.googlemail.com with ESMTPSA id dy14-20020a05640231ee00b00461621cae1fsm6046687edb.16.2022.11.02.10.54.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Nov 2022 10:54:24 -0700 (PDT)
+Message-ID: <47ae788b-c19d-3a1f-8ac2-b6674770e79f@redhat.com>
+Date:   Wed, 2 Nov 2022 18:54:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221024091223.42631-17-likexu@tencent.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Content-Language: en-US
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Gaosheng Cui <cuigaosheng1@huawei.com>, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org
+References: <20221031113638.4182263-1-cuigaosheng1@huawei.com>
+ <Y2AJIFQlF5C0ozoU@google.com>
+ <Y2A2HmJxTdoWm1vf@hirez.programming.kicks-ass.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: x86: fix undefined behavior in bit shift for
+ __feature_bit
+In-Reply-To: <Y2A2HmJxTdoWm1vf@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 24, 2022, Like Xu wrote:
- +static inline u32 gp_counter_base(void)
-> +{
-> +	return pmu.msr_gp_counter_base;
-> +}
-> +
-> +static inline void set_gp_counter_base(u32 new_base)
-> +{
-> +	pmu.msr_gp_counter_base = new_base;
-> +}
-> +
-> +static inline u32 gp_event_select_base(void)
-> +{
-> +	return pmu.msr_gp_event_select_base;
-> +}
-> +
-> +static inline void set_gp_event_select_base(u32 new_base)
-> +{
-> +	pmu.msr_gp_event_select_base = new_base;
-> +}
-> +
-> +static inline u32 gp_counter_msr(unsigned int i)
-> +{
-> +	return gp_counter_base() + i;
-> +}
-> +
-> +static inline u32 gp_event_select_msr(unsigned int i)
+On 10/31/22 21:54, Peter Zijlstra wrote:
+>> PeterZ is contending that this isn't actually undefined behavior given how the
+>> kernel is compiled[*].  That said, I would be in favor of replacing the open-coded
+>> shift with BIT() to make the code a bit more self-documenting, and that would
+>> naturally fix this maybe-undefined-behavior issue.
+>>
+>> [*]https://lore.kernel.org/all/Y1%2FAaJOcgIc%2FINtv@hirez.programming.kicks-ass.net
+> I'm definitely in favour of updating this code; both your suggestion and
+> hpa's suggestion look like sane changes. But I do feel that whatever
+> UBSAN thing generated this warning needs to be fixed too.
+> 
+> I'm fine with the compiler warning about this code -- but it must not
+> claim undefined behaviour given the compiler flags we use.
 
-As propsed in the previous version, I think it makes sense to make these look
-like macros so that it's more obvious that the callers are computing an MSR index
-and not getting the MSR, e.g.
+Yes, the compiler is buggy here (see old bug report for GCC, now fixed, 
+at https://gcc.gnu.org/bugzilla/show_bug.cgi?id=68418).
 
-	MSR_GP_EVENT_SELECTx(i)
+I cannot even reproduce the problem with the simple userspace testcase
 
-> +{
-> +	return gp_event_select_base() + i;
-> +}
-> +
-> +static inline void write_gp_counter_value(unsigned int i, u64 value)
-> +{
-> +	wrmsr(gp_counter_msr(i), value);
-> +}
-> +
-> +static inline void write_gp_event_select(unsigned int i, u64 value)
-> +{
-> +	wrmsr(gp_event_select_msr(i), value);
-> +}
+#include <stdlib.h>
+int main(int argc) {
+	int i = argc << 31;
+	exit(i < 0);
+}
 
-Almost all of these one-line wrappers are unnecessary.  "struct pmu_caps pmu" is
-already exposed, just reference "pmu" directly.  And for the rdmsr/wrmsr wrappers,
-the code I wanted to dedup was the calculation of the MSR index, hiding the actual
-WRMSR and RDMSR operations are a net-negative IMO.
+on either GCC 12 or clang 15.
+
+Paolo
+
