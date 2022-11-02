@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B0B46616D0B
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2495616D15
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231697AbiKBSrV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 14:47:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42324 "EHLO
+        id S231750AbiKBSrd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 14:47:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231678AbiKBSrN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 14:47:13 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5B6D2FFD8
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:47:11 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id e13-20020a17090301cd00b001871e6f8714so6713782plh.14
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:47:11 -0700 (PDT)
+        with ESMTP id S231696AbiKBSrS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 14:47:18 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43C5B2FFE6
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:47:13 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-36810cfa61fso164448247b3.6
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:47:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KMoIap0sR+1CcUsNo9fMIcDCtwhfe98yh5fTCarrD0c=;
-        b=k1yXSjshfABPqBWzkk2re+5NTx0r1/omNxYPIhvfkrWPWOXQ3FDs8tlXd0BS10PfBn
-         sIs/Hi3l8f6BNYAm0REVTPHyrmG9K7BzizWj7vjmVWwyUdSpJ3jse/1wzbTuYuz346fA
-         odG+5EaTWzlr8ZbCQA34/E/aQoFtQ5fsxGYXp+OUKV4vuVHfIg+MSfLquVktJihbS6m8
-         /IXUNoe8XbV7njQf5AOmZzjox2KDVvFzIsaxo/RD728X41FYQpqh3nDVRURNPDLUR34b
-         L2qlQhINf0RH3gnunJd8nBJznViQZZh5hXHrNszL5J2v2bsPCQ2iuOkTKKS8+aHndIcP
-         BAbQ==
+        bh=tgC3vVAXJf1HfFnPnIA3qYa9J9PvuIsGWvmyOnENyL8=;
+        b=JdPVYbvGmrT6AIY9WsQkOGcffjK6ZQKiB6a7Ftdk9nfu2exh7TOl1eF1c61rq1a1Wv
+         2ZPcL3ecWhrhStfF1UCD08OJUh1mMaZGGrdY5UE1CF2Ainbb8xid0bOzU5EWqLV/Vkny
+         F9lkfunRcJYMLYvdfmS17oKvKlfu6AAgV2pdi3p3fC1VWMVjw4E9hM+iqC2bcNtaEntE
+         AZzlerQBqK3smN9LHqysu1Ma/VAYzLNCpFzbFAI8EAsB++6B9vNU4J+dhiijzJ6xK9u4
+         xZ/eWpnrQD/pd5q3df0hDHLJf1JyPBtnBnXI0FavLPHb4XoMinPV9xD8SDGM2fBLNzH+
+         lvzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KMoIap0sR+1CcUsNo9fMIcDCtwhfe98yh5fTCarrD0c=;
-        b=yx45q6V6PGLh1v1wLGp9XGNwjAeTEq6O0fadpfUgfpRdQd7zzi59nyn2siO0IL7U5H
-         VdfN7mRqJWvCW09Ak+0eyHT5vpqLkc7bpmStDdXscpjpGYr4LtW7K4fl+8IZR4W1DZNe
-         RVrjJhgbV9xQ8UKvyX5w2P3yqO+lFrIVCpAz943cViIBWhGAqPC6L5xIUt6UhI9PIQzr
-         Pmjh+7s+mWcLiKxJlDbekK7PaWfAum7YEYWAdXQJw0fFS0m3QEHFEsNWzpceDoLwj658
-         MEw9Yv/eYnyh5WV8t854oUH3xownU5YKhCqNhThnQ7sdowiDJ4JIZ1AxSZ0TgWDdsvN6
-         h1sg==
-X-Gm-Message-State: ACrzQf1E7fJD5WTsfA4JBvWn9PaugngWM5+eV4elKC5VyvHRBLKqQlac
-        Gcd3CbVafoyFLVCaB3HluuRVlwtDZ4/6vA==
-X-Google-Smtp-Source: AMsMyM48FymbReh5snaAz2jmylT9nC4FzX0GZg+//beH/EXpya9DpGzRz3RTzXCaxExeLJ4ck1uJogvMSA7pJA==
+        bh=tgC3vVAXJf1HfFnPnIA3qYa9J9PvuIsGWvmyOnENyL8=;
+        b=ggQmunwnSC26MNF85VZzau40b0doCsFRA9CbtUzZv+lCFovMeMVfEq5XCIcuPwZn5p
+         BQmVCQLvXnCI6HlCdHauNGXveKawzpHC/qWcnax4Ht71KB3YofMyUUGmuNRJaUv3XMMV
+         lAzfNPSDcVHa+VBqOlWsuvy6VpnVfl5ONG+LgR0WNnqfYN4aSJv+XXlg3dLrhndWQe8e
+         oXHpKvJjKW8jR+wqg2fUh+d3LoKpUrQDSzvyOdPFfBnaZT0b6Kz6U+JIObnr1ISbRwea
+         +kIqYFSbE0hdgdUQeDXbxeiCKxKtE76Y1OuhCsAClu4PuoiLgLZZtnlVzFcB9oO5p2Jt
+         rJdg==
+X-Gm-Message-State: ACrzQf19OZuoS6f+P5ny3JYrT9eX9sAWlsUgHC1d5A6DrQQluK/Q1RD7
+        7UjmJYlRoTfJdMP0niUrLRgBOH1VNXhhgg==
+X-Google-Smtp-Source: AMsMyM6Cadio/K70nPcxiUijaio/rnmWE5a7GQmQudQfr2KyPu4sSVnym27O7cmyzagmc3xS6gGC1sOlzECJyA==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a17:90a:f291:b0:20a:eab5:cf39 with SMTP
- id fs17-20020a17090af29100b0020aeab5cf39mr79473pjb.1.1667414830700; Wed, 02
- Nov 2022 11:47:10 -0700 (PDT)
-Date:   Wed,  2 Nov 2022 11:46:52 -0700
+ (user=dmatlack job=sendgmr) by 2002:a25:8089:0:b0:6c9:b209:d922 with SMTP id
+ n9-20020a258089000000b006c9b209d922mr25375362ybk.396.1667414832588; Wed, 02
+ Nov 2022 11:47:12 -0700 (PDT)
+Date:   Wed,  2 Nov 2022 11:46:53 -0700
 In-Reply-To: <20221102184654.282799-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221102184654.282799-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221102184654.282799-9-dmatlack@google.com>
-Subject: [PATCH v4 08/10] KVM: selftests: Provide error code as a
- KVM_ASM_SAFE() output
+Message-ID: <20221102184654.282799-10-dmatlack@google.com>
+Subject: [PATCH v4 09/10] KVM: selftests: Expect #PF(RSVD) when TDP is disabled
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -76,132 +75,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+Change smaller_maxphyaddr_emulation_test to expect a #PF(RSVD), rather
+than an emulation failure, when TDP is disabled. KVM only needs to
+emulate instructions to emulate a smaller guest.MAXPHYADDR when TDP is
+enabled.
 
-Provide the error code on a fault in KVM_ASM_SAFE(), e.g. to allow tests
-to assert that #PF generates the correct error code without needing to
-manually install a #PF handler.  Use r10 as the scratch register for the
-error code, as it's already clobbered by the asm blob (loaded with the
-RIP of the to-be-executed instruction).  Deliberately load the output
-"error_code" even in the non-faulting path so that error_code is always
-initialized with deterministic data (the aforementioned RIP), i.e to
-ensure a selftest won't end up with uninitialized consumption regardless
-of how KVM_ASM_SAFE() is used.
-
-Don't clear r10 in the non-faulting case and instead load error code with
-the RIP (see above).  The error code is valid if and only if an exception
-occurs, and '0' isn't necessarily a better "invalid" value, e.g. '0'
-could result in false passes for a buggy test.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Fixes: 39bbcc3a4e39 ("selftests: kvm: Allows userspace to handle emulation errors.")
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- .../selftests/kvm/include/x86_64/processor.h  | 39 +++++++++++++------
- .../selftests/kvm/lib/x86_64/processor.c      |  1 +
- .../selftests/kvm/x86_64/hyperv_features.c    |  3 +-
- 3 files changed, 30 insertions(+), 13 deletions(-)
+ .../smaller_maxphyaddr_emulation_test.c       | 51 +++++++++++++++++--
+ 1 file changed, 46 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 9efe80d52389..33b0f19e502c 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -780,6 +780,7 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
-  *
-  * REGISTER OUTPUTS:
-  * r9  = exception vector (non-zero)
-+ * r10 = error code
-  */
- #define KVM_ASM_SAFE(insn)					\
- 	"mov $" __stringify(KVM_EXCEPTION_MAGIC) ", %%r9\n\t"	\
-@@ -788,29 +789,43 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
- 	"1: " insn "\n\t"					\
- 	"xor %%r9, %%r9\n\t"					\
- 	"2:\n\t"						\
--	"mov  %%r9b, %[vector]\n\t"
-+	"mov  %%r9b, %[vector]\n\t"				\
-+	"mov  %%r10, %[error_code]\n\t"
+diff --git a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
+index 9d0e555ea630..ea1e7ae37e85 100644
+--- a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
++++ b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
+@@ -21,9 +21,28 @@
+ #define MEM_REGION_SLOT	10
+ #define MEM_REGION_SIZE PAGE_SIZE
  
--#define KVM_ASM_SAFE_OUTPUTS(v)	[vector] "=qm"(v)
-+#define KVM_ASM_SAFE_OUTPUTS(v, ec)	[vector] "=qm"(v), [error_code] "=rm"(ec)
- #define KVM_ASM_SAFE_CLOBBERS	"r9", "r10", "r11"
- 
--#define kvm_asm_safe(insn, inputs...)			\
--({							\
--	uint8_t vector;					\
--							\
--	asm volatile(KVM_ASM_SAFE(insn)			\
--		     : KVM_ASM_SAFE_OUTPUTS(vector)	\
--		     : inputs				\
--		     : KVM_ASM_SAFE_CLOBBERS);		\
--	vector;						\
-+#define kvm_asm_safe(insn, inputs...)					\
-+({									\
-+	uint64_t ign_error_code;					\
-+	uint8_t vector;							\
-+									\
-+	asm volatile(KVM_ASM_SAFE(insn)					\
-+		     : KVM_ASM_SAFE_OUTPUTS(vector, ign_error_code)	\
-+		     : inputs						\
-+		     : KVM_ASM_SAFE_CLOBBERS);				\
-+	vector;								\
-+})
-+
-+#define kvm_asm_safe_ec(insn, error_code, inputs...)			\
-+({									\
-+	uint8_t vector;							\
-+									\
-+	asm volatile(KVM_ASM_SAFE(insn)					\
-+		     : KVM_ASM_SAFE_OUTPUTS(vector, error_code)		\
-+		     : inputs						\
-+		     : KVM_ASM_SAFE_CLOBBERS);				\
-+	vector;								\
- })
- 
- static inline uint8_t rdmsr_safe(uint32_t msr, uint64_t *val)
+-static void guest_code(void)
++static void guest_code(bool tdp_enabled)
  {
+-	flds(MEM_REGION_GVA);
 +	uint64_t error_code;
- 	uint8_t vector;
- 	uint32_t a, d;
- 
- 	asm volatile(KVM_ASM_SAFE("rdmsr")
--		     : "=a"(a), "=d"(d), KVM_ASM_SAFE_OUTPUTS(vector)
-+		     : "=a"(a), "=d"(d), KVM_ASM_SAFE_OUTPUTS(vector, error_code)
- 		     : "c"(msr)
- 		     : KVM_ASM_SAFE_CLOBBERS);
- 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 39c4409ef56a..fc6c724e0d24 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -1116,6 +1116,7 @@ static bool kvm_fixup_exception(struct ex_regs *regs)
- 
- 	regs->rip = regs->r11;
- 	regs->r9 = regs->vector;
-+	regs->r10 = regs->error_code;
- 	return true;
++	uint64_t vector;
++
++	vector = kvm_asm_safe_ec(FLDS_MEM_EAX, error_code, "a"(MEM_REGION_GVA));
++
++	/*
++	 * When TDP is enabled, the flds instruction will trigger an emulation
++	 * failure, exit to userspace, and then the selftest skips the
++	 * instruction.
++	 *
++	 * When TDP is disabled, no instruction emulation is required so flds
++	 * should generate #PF(RSVD).
++	 */
++	if (tdp_enabled) {
++		GUEST_ASSERT(!vector);
++	} else {
++		GUEST_ASSERT_EQ(vector, PF_VECTOR);
++		GUEST_ASSERT(error_code & PFERR_RSVD_MASK);
++	}
++
+ 	GUEST_DONE();
  }
  
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-index 05b32e550a80..2b6d455acf8a 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-@@ -18,6 +18,7 @@
- static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
- 				vm_vaddr_t output_address, uint64_t *hv_status)
- {
-+	uint64_t error_code;
- 	uint8_t vector;
+@@ -32,6 +51,7 @@ int main(int argc, char *argv[])
+ 	struct kvm_vcpu *vcpu;
+ 	struct kvm_vm *vm;
+ 	uint64_t gpa, pte;
++	struct ucall uc;
+ 	uint64_t *hva;
+ 	int rc;
  
- 	/* Note both the hypercall and the "asm safe" clobber r9-r11. */
-@@ -25,7 +26,7 @@ static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
- 		     KVM_ASM_SAFE("vmcall")
- 		     : "=a" (*hv_status),
- 		       "+c" (control), "+d" (input_address),
--		       KVM_ASM_SAFE_OUTPUTS(vector)
-+		       KVM_ASM_SAFE_OUTPUTS(vector, error_code)
- 		     : [output_address] "r"(output_address),
- 		       "a" (-EFAULT)
- 		     : "cc", "memory", "r8", KVM_ASM_SAFE_CLOBBERS);
+@@ -41,6 +61,10 @@ int main(int argc, char *argv[])
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_SMALLER_MAXPHYADDR));
+ 
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++	vcpu_args_set(vcpu, 1, kvm_is_tdp_enabled());
++
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(vcpu);
+ 
+ 	vcpu_set_cpuid_maxphyaddr(vcpu, MAXPHYADDR);
+ 
+@@ -61,9 +85,26 @@ int main(int argc, char *argv[])
+ 	vm_set_page_table_entry(vm, vcpu, MEM_REGION_GVA, pte | (1ull << 36));
+ 
+ 	vcpu_run(vcpu);
+-	handle_flds_emulation_failure_exit(vcpu);
+-	vcpu_run(vcpu);
+-	ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
++
++	/*
++	 * When TDP is enabled, KVM must emulate the flds instruction, which
++	 * results in an emulation failure out to userspace since KVM does not
++	 * know how to emulate flds.
++	 */
++	if (kvm_is_tdp_enabled()) {
++		handle_flds_emulation_failure_exit(vcpu);
++		vcpu_run(vcpu);
++	}
++
++	switch (get_ucall(vcpu, &uc)) {
++	case UCALL_ABORT:
++		REPORT_GUEST_ASSERT(uc);
++		break;
++	case UCALL_DONE:
++		break;
++	default:
++		TEST_FAIL("Unrecognized ucall: %lu\n", uc.cmd);
++	}
+ 
+ 	kvm_vm_free(vm);
+ 
 -- 
 2.38.1.273.g43a17bfeac-goog
 
