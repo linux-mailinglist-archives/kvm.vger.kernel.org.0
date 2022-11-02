@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2495616D15
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6466616D1A
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231750AbiKBSrd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 14:47:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42504 "EHLO
+        id S231519AbiKBSre (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 14:47:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231696AbiKBSrS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 14:47:18 -0400
+        with ESMTP id S231709AbiKBSrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 14:47:19 -0400
 Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43C5B2FFE6
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:47:13 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-36810cfa61fso164448247b3.6
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:47:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F122FFF0
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:47:14 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-3697bd55974so166607767b3.15
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:47:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tgC3vVAXJf1HfFnPnIA3qYa9J9PvuIsGWvmyOnENyL8=;
-        b=JdPVYbvGmrT6AIY9WsQkOGcffjK6ZQKiB6a7Ftdk9nfu2exh7TOl1eF1c61rq1a1Wv
-         2ZPcL3ecWhrhStfF1UCD08OJUh1mMaZGGrdY5UE1CF2Ainbb8xid0bOzU5EWqLV/Vkny
-         F9lkfunRcJYMLYvdfmS17oKvKlfu6AAgV2pdi3p3fC1VWMVjw4E9hM+iqC2bcNtaEntE
-         AZzlerQBqK3smN9LHqysu1Ma/VAYzLNCpFzbFAI8EAsB++6B9vNU4J+dhiijzJ6xK9u4
-         xZ/eWpnrQD/pd5q3df0hDHLJf1JyPBtnBnXI0FavLPHb4XoMinPV9xD8SDGM2fBLNzH+
-         lvzg==
+        bh=nQsYYcvMuiXeimF3iWphBO1Sb/hb6+CelzMx1eKIPSU=;
+        b=pw9ymKA5S+Jx9QOYGRBTqhoQ3BHm/jqVqpUFdB6f3MXDLBe+NWv48150aokyYA/QY5
+         d9woU8yJZ2UvMNiVZdK8bSGccAhD9cpn/NKf6H9aBHC6ICTybIW8pLbMZ2j5Wz9AsqMg
+         m6xZGYnwV5zX2AkwYawsNt+RTJ7ujLPNaFDCM2Amt0PVsjznpFYlc1c+s8QKUm1FWJEo
+         r1QkLIR17F0t1ZnVuHMh4LW1oU4+yrXnZIgKlBs3NDw9Mw6mbQlWaiDTygj6FGZzAsXi
+         zmV41q7J3DlwhzU8Quc5yNBxYBvV0MP5wYNHJFM98RGoYzY20ZJqdqn3EmdQ8c+LoT17
+         XrTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tgC3vVAXJf1HfFnPnIA3qYa9J9PvuIsGWvmyOnENyL8=;
-        b=ggQmunwnSC26MNF85VZzau40b0doCsFRA9CbtUzZv+lCFovMeMVfEq5XCIcuPwZn5p
-         BQmVCQLvXnCI6HlCdHauNGXveKawzpHC/qWcnax4Ht71KB3YofMyUUGmuNRJaUv3XMMV
-         lAzfNPSDcVHa+VBqOlWsuvy6VpnVfl5ONG+LgR0WNnqfYN4aSJv+XXlg3dLrhndWQe8e
-         oXHpKvJjKW8jR+wqg2fUh+d3LoKpUrQDSzvyOdPFfBnaZT0b6Kz6U+JIObnr1ISbRwea
-         +kIqYFSbE0hdgdUQeDXbxeiCKxKtE76Y1OuhCsAClu4PuoiLgLZZtnlVzFcB9oO5p2Jt
-         rJdg==
-X-Gm-Message-State: ACrzQf19OZuoS6f+P5ny3JYrT9eX9sAWlsUgHC1d5A6DrQQluK/Q1RD7
-        7UjmJYlRoTfJdMP0niUrLRgBOH1VNXhhgg==
-X-Google-Smtp-Source: AMsMyM6Cadio/K70nPcxiUijaio/rnmWE5a7GQmQudQfr2KyPu4sSVnym27O7cmyzagmc3xS6gGC1sOlzECJyA==
+        bh=nQsYYcvMuiXeimF3iWphBO1Sb/hb6+CelzMx1eKIPSU=;
+        b=wYBiSQfrCkP8d/7HwuBA6jiQdAGs3J0NwgHq0RNEFamFRmU6rwEFNCpB/FZnnmTxrp
+         EO6AQz33qbDjILjUiMrJ2jETVi5cPJdOK/NBXXy4nf5E6L/EddfajyT4bXRCjfGBosv4
+         UhSQjRxEuSIaEwIzsFroKST/Q4MOwcIX69ECntG3UVZRQHLGPQGwRTdh9YdvkbKZkkkC
+         uczHHa1JaRp6TqdbYAYnz4FpCGYXNb0orYFO3b9d6PF+1VJjc76cJYSKVvNtm7NwPBGS
+         e0OEBWBTOYOU6UGNJqJBcXTlDRc4NJPrPFPAtnVrxaBE8NuXMK1ICOQ2XxCpKa3j5vE+
+         Dqjg==
+X-Gm-Message-State: ACrzQf3YHKEA0vCvQLNjXS1QbGL9/e2rU47lbVsRjKGgcysrdDdgxvde
+        GcVTQBN577LPGyCfwyOInQfwqqmnNWJ5GA==
+X-Google-Smtp-Source: AMsMyM43IUGOPge1t3uHBUGFvgiuKeHmYSedOK6angXrFPIk+JUSfWbqcPJ+DZGNAH4FoO9M8EeZkCunUFxbrA==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:8089:0:b0:6c9:b209:d922 with SMTP id
- n9-20020a258089000000b006c9b209d922mr25375362ybk.396.1667414832588; Wed, 02
- Nov 2022 11:47:12 -0700 (PDT)
-Date:   Wed,  2 Nov 2022 11:46:53 -0700
+ (user=dmatlack job=sendgmr) by 2002:a0d:c5c4:0:b0:34a:7ab0:7b29 with SMTP id
+ h187-20020a0dc5c4000000b0034a7ab07b29mr25379869ywd.294.1667414833843; Wed, 02
+ Nov 2022 11:47:13 -0700 (PDT)
+Date:   Wed,  2 Nov 2022 11:46:54 -0700
 In-Reply-To: <20221102184654.282799-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221102184654.282799-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221102184654.282799-10-dmatlack@google.com>
-Subject: [PATCH v4 09/10] KVM: selftests: Expect #PF(RSVD) when TDP is disabled
+Message-ID: <20221102184654.282799-11-dmatlack@google.com>
+Subject: [PATCH v4 10/10] KVM: selftests: Add a test for KVM_CAP_EXIT_ON_EMULATION_FAILURE
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -75,101 +75,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Change smaller_maxphyaddr_emulation_test to expect a #PF(RSVD), rather
-than an emulation failure, when TDP is disabled. KVM only needs to
-emulate instructions to emulate a smaller guest.MAXPHYADDR when TDP is
-enabled.
+Add a selftest to exercise the KVM_CAP_EXIT_ON_EMULATION_FAILURE
+capability.
 
-Fixes: 39bbcc3a4e39 ("selftests: kvm: Allows userspace to handle emulation errors.")
+This capability is also exercised through
+smaller_maxphyaddr_emulation_test, but that test requires
+allow_smaller_maxphyaddr=Y, which is off by default on Intel when ept=Y
+and unconditionally disabled on AMD when npt=Y. This new test ensures
+that KVM_CAP_EXIT_ON_EMULATION_FAILURE is exercised independent of
+allow_smaller_maxphyaddr.
+
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- .../smaller_maxphyaddr_emulation_test.c       | 51 +++++++++++++++++--
- 1 file changed, 46 insertions(+), 5 deletions(-)
+ tools/testing/selftests/kvm/.gitignore        |  1 +
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../x86_64/exit_on_emulation_failure_test.c   | 45 +++++++++++++++++++
+ 3 files changed, 47 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
 
-diff --git a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-index 9d0e555ea630..ea1e7ae37e85 100644
---- a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-@@ -21,9 +21,28 @@
- #define MEM_REGION_SLOT	10
- #define MEM_REGION_SIZE PAGE_SIZE
- 
--static void guest_code(void)
-+static void guest_code(bool tdp_enabled)
- {
--	flds(MEM_REGION_GVA);
-+	uint64_t error_code;
-+	uint64_t vector;
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 053e5d34cd03..bef984e4c39d 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -17,6 +17,7 @@
+ /x86_64/cr4_cpuid_sync_test
+ /x86_64/debug_regs
+ /x86_64/evmcs_test
++/x86_64/exit_on_emulation_failure_test
+ /x86_64/fix_hypercall_test
+ /x86_64/get_msr_index_features
+ /x86_64/kvm_clock_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index ab133b731a2d..11a6104e6547 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -81,6 +81,7 @@ TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
+ TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
+ TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
+ TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
++TEST_GEN_PROGS_x86_64 += x86_64/exit_on_emulation_failure_test
+ TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+diff --git a/tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c b/tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
+new file mode 100644
+index 000000000000..37c61f712fd5
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
+@@ -0,0 +1,45 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2022, Google LLC.
++ *
++ * Test for KVM_CAP_EXIT_ON_EMULATION_FAILURE.
++ */
 +
-+	vector = kvm_asm_safe_ec(FLDS_MEM_EAX, error_code, "a"(MEM_REGION_GVA));
++#define _GNU_SOURCE /* for program_invocation_short_name */
 +
-+	/*
-+	 * When TDP is enabled, the flds instruction will trigger an emulation
-+	 * failure, exit to userspace, and then the selftest skips the
-+	 * instruction.
-+	 *
-+	 * When TDP is disabled, no instruction emulation is required so flds
-+	 * should generate #PF(RSVD).
-+	 */
-+	if (tdp_enabled) {
-+		GUEST_ASSERT(!vector);
-+	} else {
-+		GUEST_ASSERT_EQ(vector, PF_VECTOR);
-+		GUEST_ASSERT(error_code & PFERR_RSVD_MASK);
-+	}
++#include "flds_emulation.h"
 +
- 	GUEST_DONE();
- }
- 
-@@ -32,6 +51,7 @@ int main(int argc, char *argv[])
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
- 	uint64_t gpa, pte;
-+	struct ucall uc;
- 	uint64_t *hva;
- 	int rc;
- 
-@@ -41,6 +61,10 @@ int main(int argc, char *argv[])
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_SMALLER_MAXPHYADDR));
- 
- 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+	vcpu_args_set(vcpu, 1, kvm_is_tdp_enabled());
++#include "test_util.h"
 +
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
- 
- 	vcpu_set_cpuid_maxphyaddr(vcpu, MAXPHYADDR);
- 
-@@ -61,9 +85,26 @@ int main(int argc, char *argv[])
- 	vm_set_page_table_entry(vm, vcpu, MEM_REGION_GVA, pte | (1ull << 36));
- 
- 	vcpu_run(vcpu);
--	handle_flds_emulation_failure_exit(vcpu);
--	vcpu_run(vcpu);
--	ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
++#define MMIO_GPA	0x700000000
++#define MMIO_GVA	MMIO_GPA
 +
-+	/*
-+	 * When TDP is enabled, KVM must emulate the flds instruction, which
-+	 * results in an emulation failure out to userspace since KVM does not
-+	 * know how to emulate flds.
-+	 */
-+	if (kvm_is_tdp_enabled()) {
-+		handle_flds_emulation_failure_exit(vcpu);
-+		vcpu_run(vcpu);
-+	}
++static void guest_code(void)
++{
++	/* Execute flds with an MMIO address to force KVM to emulate it. */
++	flds(MMIO_GVA);
++	GUEST_DONE();
++}
 +
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	case UCALL_DONE:
-+		break;
-+	default:
-+		TEST_FAIL("Unrecognized ucall: %lu\n", uc.cmd);
-+	}
- 
- 	kvm_vm_free(vm);
- 
++int main(int argc, char *argv[])
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	/* Tell stdout not to buffer its content */
++	setbuf(stdout, NULL);
++
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_EXIT_ON_EMULATION_FAILURE));
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++	vm_enable_cap(vm, KVM_CAP_EXIT_ON_EMULATION_FAILURE, 1);
++	virt_map(vm, MMIO_GVA, MMIO_GPA, 1);
++
++	vcpu_run(vcpu);
++	handle_flds_emulation_failure_exit(vcpu);
++	vcpu_run(vcpu);
++	ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
++
++	kvm_vm_free(vm);
++	return 0;
++}
 -- 
 2.38.1.273.g43a17bfeac-goog
 
