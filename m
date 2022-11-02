@@ -2,67 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C207617302
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 00:46:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90C5A617314
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 00:56:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230060AbiKBXqY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 19:46:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33562 "EHLO
+        id S230077AbiKBX4Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 19:56:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230450AbiKBXqF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 19:46:05 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52812193
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 16:46:00 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id e129so198113pgc.9
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 16:46:00 -0700 (PDT)
+        with ESMTP id S229971AbiKBX4W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 19:56:22 -0400
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21F362713
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 16:56:22 -0700 (PDT)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-37063f855e5so1469327b3.3
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 16:56:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PxnrF5yXGCzBk6DuHEJc9aTEx7Jr1C20HXqasxjld9I=;
-        b=foT9bmxt+RZUSdC8GunvebUXVC5zFCL3KCnne9B6lNVSkp4oEUxJz8Qu2eKO38p5rf
-         QFDgFhnaoJOt24v44q/UcrVM0y3JD7KOsJSsz5syx/qZxINhm8AeEyHXr3AGA0YPrWUL
-         Cdyb7ziJC9/WoJiwD3soz46KqRF58jmJgsREd+udlkVDvHR0Ds8ZaZVGag2BiamqVTk8
-         f5TuwXJ8sScV+DACm6zL2EGK6+TfBrp+cM0QjFOGOYxwsrjf9gUaNxqpAUd1dPBryHla
-         NKlzL5YZAhfHPsBdWGypf7M/5wJ0YnP6ImZKr44zlveTFsieuFiZO0LshYqvc2UJgbHS
-         5SHA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=hbEcN1ifRG0CLzWvNQBxXgvfGWN0lKUpPYRl5gmu4FU=;
+        b=JztyOTKcpKoSooxqm6kzxpGVcQaUNpEPtBGjMGlx+txcfMnZIHPW4Vr/YTVo4vNCJv
+         TqwggrFPie8wgyV9N/oVdcAour3FqyikMEHcphFyTjEg5EE8LaGqf55kDpFe9658rOUp
+         kSpaEkxPonYF7/4/fUbPnoBu7coRsiiCVv4nASChho/qS+KKYlxi/aloQCJ0mm7kC4kW
+         uBhEvFlY9NSm1ILJy3nW8JruaBS2JoDujoqROcWTeBz6lZk4IUVAJ44F2jCoQ1eZTesI
+         V/19jIpiecZ2xKxMVSnMKA/DVETclR7075qc7X5dMjajebkoR8nAgsFypDzwW96h9id7
+         LAkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PxnrF5yXGCzBk6DuHEJc9aTEx7Jr1C20HXqasxjld9I=;
-        b=UTbI5kBRjM/hOhsiSK6X6/O1Hgpoc2LKSGKQ37YEvVurHZQ47ZpnZ+fhCBkgVZZZb/
-         OEVp1Qj6EHxzAD81G1RxK3Vi/5NoPV6qo+I+KcfM7NPQ8/dYlBWRKCn0Yc0v8UQY5mSM
-         QD6PHdobRUOotAAaXlKFsh1CL1rqlK0cGa/yaoY8RlKELVd9gd+GBBfojaC3W0hmkMUU
-         whDxNzryJR+6R+NKft6huOB4qTDfQlHbXPW7/OjKBuV+uIgSjj1+Bw/4A3+93drodXK+
-         kr8i7rKsC1ubvtr8TLIKC7HvEHxjCd4yGKj49aQJkcupDyTau8cnKtLr6GVP9cUNfgno
-         itBA==
-X-Gm-Message-State: ACrzQf1JwUE3vSi4WISVmaSncgEtM60ZK3pr7HDS8NkeIEoUtEt6Tfjb
-        Lrs79JZLgWlJbCUT3GA8a9rFYQ==
-X-Google-Smtp-Source: AMsMyM4MThYbzDwazYy/pifB316ku5meLYAnINTWxrULu+jof2vSlpkfGVVeXHEd7w2usP1MOmbjXg==
-X-Received: by 2002:a62:174a:0:b0:56b:9fc2:4ebd with SMTP id 71-20020a62174a000000b0056b9fc24ebdmr11036716pfx.21.1667432759752;
-        Wed, 02 Nov 2022 16:45:59 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id im23-20020a170902bb1700b00186ae20e8dcsm8810730plb.271.2022.11.02.16.45.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 16:45:59 -0700 (PDT)
-Date:   Wed, 2 Nov 2022 23:45:56 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     pbonzini@redhat.com, dmatlack@google.com, andrew.jones@linux.dev,
-        wei.w.wang@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 5/7] KVM: selftests: Shorten the test args in
- memslot_modification_stress_test.c
-Message-ID: <Y2MBNA7pLIb6ugU2@google.com>
-References: <20221102232737.1351745-1-vipinsh@google.com>
- <20221102232737.1351745-6-vipinsh@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hbEcN1ifRG0CLzWvNQBxXgvfGWN0lKUpPYRl5gmu4FU=;
+        b=ojRPqsYymfBK707LVJbQcl6l+uHDH92eR2oSgJw0EURAUEcCOGW6kHv34DgqV5DrMI
+         Nc2Ix0Mufca0xr9uzAR+i0Isvy4NI+qaLXpjpr+tcvxK8iP3Eo7wsOzHOaZF8jknteoI
+         dycuWP3F59CA9ZVs3s1rn7RyEKVJKETKUtuDvkub2GgUJk2NAFSTexzJkiInojTzX+gg
+         SesfeBI5sf0an3OVGzq6gh71BhTrGMTMIoFJ0FT88j23DlLvV+T2Pag2vuVVXwymDIYI
+         YA+cad9d4PoBffaB8CtugkFUCjrX5gQZmGsRSMh3d9Rxl2hvZKD0f+VsnSuq8OU+fr8t
+         baNQ==
+X-Gm-Message-State: ACrzQf2js4IsqgVh3Z/66p3dIBBwfdkmkwZhY6bpYJTmOfogbFD+Doc0
+        54xTAWLAs+2Jdfsh8HDIUNx4IfvRS/MdUU132py47A==
+X-Google-Smtp-Source: AMsMyM4arCSKEYjf7qDPMDZ68LREMOfC2nyuDJ4TOc39/x6JfKweB4Lw4nYUBWmDRnz4WQPd7gdO3QFFkbEUKiFMlto=
+X-Received: by 2002:a81:16c2:0:b0:36f:f574:4a49 with SMTP id
+ 185-20020a8116c2000000b0036ff5744a49mr25907159yww.111.1667433381299; Wed, 02
+ Nov 2022 16:56:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221102232737.1351745-6-vipinsh@google.com>
+References: <20221102160007.1279193-1-coltonlewis@google.com> <Y2L/cWBjAtGheXNw@google.com>
+In-Reply-To: <Y2L/cWBjAtGheXNw@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Wed, 2 Nov 2022 16:55:55 -0700
+Message-ID: <CALzav=cJZn1y8xoQ7bAgraewWOn9oDZnQdmxp-cZfeNh-VgtKw@mail.gmail.com>
+Subject: Re: [PATCH v9 0/4] randomize memory access of dirty_log_perf_test
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+        ricarkol@google.com
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -74,80 +68,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 02, 2022, Vipin Sharma wrote:
-> Change test args memslot_modification_delay and nr_memslot_modifications
-> to delay and nr_iterations for simplicity.
+On Wed, Nov 2, 2022 at 4:38 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Nov 02, 2022, Colton Lewis wrote:
+> > Add the ability to randomize parts of dirty_log_perf_test,
+> > specifically the order pages are accessed and whether pages are read
+> > or written.
+>
+> David, or anyone else that's intimately familiar with dirty_log_perf_test, can
+> you look over the changes in patches 3 and 4?  They look good to me, but that
+> doesn't mean a whole lot :-)
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-
-I don't care about the credit so much as I don't want you getting yelled at for
-one of my random ideas :-)
-
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  .../kvm/memslot_modification_stress_test.c     | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> index d7ddc8a105a2..d6089ccaa484 100644
-> --- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> +++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> @@ -87,8 +87,8 @@ static void add_remove_memslot(struct kvm_vm *vm, useconds_t delay,
->  }
->  
->  struct test_params {
-> -	useconds_t memslot_modification_delay;
-> -	uint64_t nr_memslot_modifications;
-> +	useconds_t delay;
-> +	uint64_t nr_iterations;
->  	bool partition_vcpu_memory_access;
->  };
->  
-> @@ -107,8 +107,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  
->  	pr_info("Started all vCPUs\n");
->  
-> -	add_remove_memslot(vm, p->memslot_modification_delay,
-> -			   p->nr_memslot_modifications);
-> +	add_remove_memslot(vm, p->delay,
-> +			   p->nr_iterations);
-
-This wrap is no longer necessary (which was part of the motivation for the
-rename).
-
->  	run_vcpus = false;
->  
-> @@ -144,8 +144,8 @@ int main(int argc, char *argv[])
->  	int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
->  	int opt;
->  	struct test_params p = {
-> -		.memslot_modification_delay = 0,
-> -		.nr_memslot_modifications =
-> +		.delay = 0,
-> +		.nr_iterations =
->  			DEFAULT_MEMSLOT_MODIFICATION_ITERATIONS,
->  		.partition_vcpu_memory_access = true
->  	};
-> @@ -158,8 +158,8 @@ int main(int argc, char *argv[])
->  			guest_modes_cmdline(optarg);
->  			break;
->  		case 'd':
-> -			p.memslot_modification_delay = atoi_paranoid(optarg);
-> -			TEST_ASSERT(p.memslot_modification_delay >= 0,
-> +			p.delay = atoi_paranoid(optarg);
-> +			TEST_ASSERT(p.delay >= 0,
->  				    "A negative delay is not supported.");
->  			break;
->  		case 'b':
-> @@ -175,7 +175,7 @@ int main(int argc, char *argv[])
->  			p.partition_vcpu_memory_access = false;
->  			break;
->  		case 'i':
-> -			p.nr_memslot_modifications = atoi_paranoid(optarg);
-> +			p.nr_iterations = atoi_paranoid(optarg);
->  			break;
->  		case 'h':
->  		default:
-> -- 
-> 2.38.1.273.g43a17bfeac-goog
-> 
+Sure, will do.
