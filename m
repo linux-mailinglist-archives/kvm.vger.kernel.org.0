@@ -2,69 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A090616C6C
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:36:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09C0E616CFE
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 19:47:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231366AbiKBSgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 14:36:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57136 "EHLO
+        id S231464AbiKBSrA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 14:47:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231360AbiKBSgl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 14:36:41 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AFBE303FA
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:35:52 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id b5so16987842pgb.6
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:35:52 -0700 (PDT)
+        with ESMTP id S231319AbiKBSq6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 14:46:58 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A5FC2CE27
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 11:46:58 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-37010fefe48so148711967b3.19
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 11:46:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LufEymnjB/6dUVWIe7LauF7rJYuUgeUD8pb8Z6TK8x4=;
-        b=ERkLmSYyPtkzzmluwaoeMJQi8ioAPCGIJPZ48Npgzdzslsow/Fa1Ud/aAB0r7f6m13
-         tpsp10QvI5IQkOfxVKBZF6WBJyL/vzFHZUwRRd0htDDiAzPxH/n8wpeW8sfOnOhWlNgd
-         GyA2N7BwjLZl36PCX/qW8jtOTBpidOpSTEoTN6wg9YsTFuIWSjRYaajf+QV5/7EF2j/k
-         3oIumzwfGJA8C8K4YRJP73+MTR+uso7MnCLUohzVumpa0SkS/JVzYhXXHNf5dx2IzwRe
-         Yf06dHh5cN14lvaf3iUlq/E7bs3PyUc6G2GsSd5wEdHj3mf7mhHgijiYgNLbHYoKYpUF
-         CeKA==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=KlOYR8Qeaq/wAWJ2lzry+Znm/MJL+cQ3Uz2M02gh7/0=;
+        b=cNl1WsT0PC8mf7yCOxltFM5Da04upOParWzGDQqAN5CssyV44fzMqoGTtt39ZjkOVq
+         5U2WL3iGfkkHsT3yCJFLm5oOcbdEQGDq0/bOlq4n7jYj3QXExzVlp9dCJocKWO9DzLjQ
+         vA4Ir7IlEoFh/3wR+0tB4zsxydS/pQ6f94ezEsIsVbn+/XPazpS3DZtOLuBMNtudRJTG
+         YahTY6u8bftMgfB1H1IUA2WmmjeZZrtKYSbVP52zG5fn19VZNsQDx91PmDGKZiL4BpzA
+         qYi4X0W5NFNvSIduFswLyHFbV906OuPJorbHF3MnXtP1XFZulqXpJYPGaCyHRARd1F79
+         K9nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LufEymnjB/6dUVWIe7LauF7rJYuUgeUD8pb8Z6TK8x4=;
-        b=xlFHyMooJ4T8vNjsyjMUxZVXJNtdFNWADoZJA9cCGvtqNFNNtIeM4s4YUsUBROPyiS
-         Gct6+YsOtTRqsh+ZGMsUnHhAjPXf0evEvf68kgm45kLXYwX4H4LwdlHJ4pzZzuGQp6ER
-         iDigJQfcm5kDn/X/k1LXue1s/nJLzsdJm8b6yS/K13ZYkX9DBGpeoIFM8sMqW7c2x1Dy
-         APW9osjx6AH6mH54RDLlTwseSfZ9cExYWPvDaFOesNtXNsdSK4qN3MquXi7DmF4qVN0/
-         Acefye9XfUUi/8SnXPIUX1oatMVk9AdFC0sKPVlD7yZQwOM91oPAzFPQi3ixln8zunHs
-         PAwA==
-X-Gm-Message-State: ACrzQf3sj9I6QvBFx7zhdXKgQxI9N/TxW6VQw8calGAzzvwDFaBkKyj7
-        b4RapgsS6+7+fN58351JiCkZFg==
-X-Google-Smtp-Source: AMsMyM4gXYNQEXNjjqDrghpgg9zTOF1npqfGx7vs/T3f0M9YMdkl/2SwJWrf4BF8a4zd74APThNvdg==
-X-Received: by 2002:a63:d24b:0:b0:454:defd:db65 with SMTP id t11-20020a63d24b000000b00454defddb65mr22396636pgi.203.1667414152018;
-        Wed, 02 Nov 2022 11:35:52 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x5-20020aa79ac5000000b0056bdb5197f4sm8794554pfp.35.2022.11.02.11.35.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 11:35:51 -0700 (PDT)
-Date:   Wed, 2 Nov 2022 18:35:48 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v4 00/24] x86/pmu: Test case optimization,
- fixes and additions
-Message-ID: <Y2K4hHmK010F3vfO@google.com>
-References: <20221024091223.42631-1-likexu@tencent.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221024091223.42631-1-likexu@tencent.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KlOYR8Qeaq/wAWJ2lzry+Znm/MJL+cQ3Uz2M02gh7/0=;
+        b=imStWcqMUqt7p89Qjj0lU5pzSk2x/z4ibFy2FbRc1FgmxtQqcNeo3dohj5FsyxUzMO
+         3GtK7cM+us3d9ziPkvZlMbhxOUWgVkE7PCF63PklgdYVH3QpjFpgRXxXioMeoHXpVVV+
+         ZJdgJ1F14nrEH1XFeOhfrbzu73u76V/hs5WsQjjCTTAJFg8BKDJMtMDEprkZ2KSa+qhk
+         hTWEevgrW4VdkiMhZRNrSwGc92akFzbqh9I24zvGJj2Bs7xTY2UVvAo0VPT0P9/pqZyi
+         EIirbBhANrpqB/zDhJ2Jt8bdsUzZPe3869nRSasdGfWF2WmG4VHKCox+RIyOUDY3HV4J
+         E6uw==
+X-Gm-Message-State: ACrzQf19bRW/UEeB8c5NHWaqNwof8ZCs2xVc0pjD0ebh7j7Pi7Uejokw
+        DNrta7JD2ixziqCxGxno4Guzz9szN8CjAg==
+X-Google-Smtp-Source: AMsMyM5etykfcW5k30jMkENKo1eiw1lShVx8g9YmBw++NvnwE1Hadmw44LHYGhAEJipO4RIzpj4B6vBrDxYQmA==
+X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
+ (user=dmatlack job=sendgmr) by 2002:a81:5455:0:b0:350:6625:437d with SMTP id
+ i82-20020a815455000000b003506625437dmr23598077ywb.326.1667414817531; Wed, 02
+ Nov 2022 11:46:57 -0700 (PDT)
+Date:   Wed,  2 Nov 2022 11:46:44 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
+Message-ID: <20221102184654.282799-1-dmatlack@google.com>
+Subject: [PATCH v4 00/10] KVM: selftests: Fix and clean up emulator_error_test
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,21 +73,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 24, 2022, Like Xu wrote:
-> The patch set includes all the changes on my side (SPR PEBS and AMD
-> PerfMonV2 are included, except for Arch lbr), which helps to keep the
-> review time focused. 
-> 
-> There are no major changes in the test logic. A considerable number of
-> helpers have been added to lib/x86/pmu.[c,h], which really helps the
-> readability of the code, while hiding some hardware differentiation details.
-> 
-> These are divided into three parts, the first part (01 - 08) is bug fixing,
-> the second part (09 - 18) is code refactoring, and the third part is the
-> addition of new test cases. It may also be good to split up and merge
-> in sequence. They get passed on AMD Zen3/4, Intel ICX/SPR machines.
+Miscellaneous fixes and cleanups to emulator_error_test. The reason I
+started looking at this test is because it fails when TDP is disabled,
+which pollutes my test results wheneveer I am testing a new series for
+upstream.
 
-Quite a few comments, some which result in a fair bit of fallout, e.g. avoiding
-the global cpuid_10, tabs. vs. spaces, etc...  I've made all the changes locally
-and have a few additional cleanup patches.  I'll post a v5 once testing looks ok,
-hopefully this week.
+v4:
+ - Collect more R-b tags from Sean.
+ - Assert no #PF when TDP is enabled [Sean]
+ - Avoid 'we' pronoun in commit message [Sean]
+ - Bundle assert+skip in one function [Sean]
+
+v3: https://lore.kernel.org/kvm/20221031180045.3581757-1-dmatlack@google.com/
+ - Collect R-b tags from Sean.
+ - Drop ModR/M decoding in favor of hard-coded instruction [Sean]
+ - Fix gspurious gcc warning about using uninitialized variable [Sean]
+ - Drop assert_ucall_done() helper [Sean]
+ - Spelling fixes [Sean]
+ - Use kvm_asm_safe*() to check #PF(RSVD) instead of an exception
+   handler [Sean]
+
+v2: https://lore.kernel.org/kvm/20221018214612.3445074-1-dmatlack@google.com/
+ - Split emulator_error_test into 2 separate tests to ensure continued
+   test coverage of KVM emulation in response to EPT violations when
+   "allow_smaller_maxphyaddr && guest.MAXPHYADDR < host.MAXPHADDR".  [Sean]
+ - Test that flds generates #PF(RSVD) when TDP is disabled [Sean]
+
+v1: https://lore.kernel.org/kvm/20220929204708.2548375-1-dmatlack@google.com/
+
+David Matlack (8):
+  KVM: selftests: Rename emulator_error_test to
+    smaller_maxphyaddr_emulation_test
+  KVM: selftests: Explicitly require instructions bytes
+  KVM: selftests: Delete dead ucall code
+  KVM: selftests: Move flds instruction emulation failure handling to
+    header
+  KVM: x86/mmu: Use BIT{,_ULL}() for PFERR masks
+  KVM: selftests: Copy KVM PFERR masks into selftests
+  KVM: selftests: Expect #PF(RSVD) when TDP is disabled
+  KVM: selftests: Add a test for KVM_CAP_EXIT_ON_EMULATION_FAILURE
+
+Sean Christopherson (2):
+  KVM: selftests: Avoid JMP in non-faulting path of KVM_ASM_SAFE()
+  KVM: selftests: Provide error code as a KVM_ASM_SAFE() output
+
+ arch/x86/include/asm/kvm_host.h               |  20 +-
+ tools/testing/selftests/kvm/.gitignore        |   3 +-
+ tools/testing/selftests/kvm/Makefile          |   3 +-
+ .../selftests/kvm/include/x86_64/processor.h  |  66 ++++--
+ .../selftests/kvm/lib/x86_64/processor.c      |   1 +
+ .../kvm/x86_64/emulator_error_test.c          | 193 ------------------
+ .../x86_64/exit_on_emulation_failure_test.c   |  45 ++++
+ .../selftests/kvm/x86_64/flds_emulation.h     |  55 +++++
+ .../selftests/kvm/x86_64/hyperv_features.c    |   3 +-
+ .../smaller_maxphyaddr_emulation_test.c       | 112 ++++++++++
+ 10 files changed, 280 insertions(+), 221 deletions(-)
+ delete mode 100644 tools/testing/selftests/kvm/x86_64/emulator_error_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/flds_emulation.h
+ create mode 100644 tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
+
+
+base-commit: d5af637323dd156bad071a3f8fc0d7166cca1276
+-- 
+2.38.1.273.g43a17bfeac-goog
+
