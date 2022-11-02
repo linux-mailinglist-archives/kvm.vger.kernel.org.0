@@ -2,149 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3461C615CF7
-	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 08:29:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 57BC1615D34
+	for <lists+kvm@lfdr.de>; Wed,  2 Nov 2022 08:58:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230153AbiKBH3P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 03:29:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53248 "EHLO
+        id S229688AbiKBH6M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 03:58:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230365AbiKBH3N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 03:29:13 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A87E313E3D
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 00:29:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667374152; x=1698910152;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=HGPGTm9GBQ0YnOiaID9aEq0IEH9SOekiZpcO5JTSd6g=;
-  b=L1Se2LankZMqrJjHhnK5d+n95biMEPYmfO0yF1KslvCPpNGBAOA2/XPF
-   WnAW2DKiDEqDnL7WPpCZCGc5kKIMzF4RbrU++epTalpmlDcMTpxHH+1bs
-   4SN+1DL9tNlOSILjoiNEoLrhVAp6Ux6R591RbPNFADWkyDTUHOhDCLlfU
-   cxSISDWmucj+xa1tIBROrAJspXsiAvYwoKutvhKImh66CjXNqesJpkg7v
-   u5vmEByvSebY5JvoNDgva+ZZWjncX+udmGenwBpoFyfiBS3EFRnlQu3+d
-   UEE3GjfcVBPKaJ2KKryF0AAuaYN1cdcI2Bc1zbP+IMVZAuvJlxQJ5RJQG
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10518"; a="310441293"
-X-IronPort-AV: E=Sophos;i="5.95,232,1661842800"; 
-   d="scan'208";a="310441293"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2022 00:29:12 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10518"; a="697703516"
-X-IronPort-AV: E=Sophos;i="5.95,232,1661842800"; 
-   d="scan'208";a="697703516"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga008.fm.intel.com with ESMTP; 02 Nov 2022 00:29:10 -0700
-Message-ID: <1d6a68dd95e13ce36b9f3ccee0b4e203a3aecf02.camel@linux.intel.com>
-Subject: Re: [PATCH 8/9] KVM: x86: When guest set CR3, handle LAM bits
- semantics
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
-Date:   Wed, 02 Nov 2022 15:29:10 +0800
-In-Reply-To: <20221101020416.yh53bvpt3v5gwvcj@box.shutemov.name>
-References: <20221017070450.23031-1-robert.hu@linux.intel.com>
-         <20221017070450.23031-9-robert.hu@linux.intel.com>
-         <20221031025930.maz3g5npks7boixl@box.shutemov.name>
-         <d03bcd8fe216e5934473759fa6fdaac4e1105847.camel@linux.intel.com>
-         <20221101020416.yh53bvpt3v5gwvcj@box.shutemov.name>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229462AbiKBH6H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 03:58:07 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A79DD25282
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 00:58:06 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id z26so2562700pff.1
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 00:58:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sl5X5/0riDRJIk3jT87SVDndCc8tqsVtJw8Nt/QvqsE=;
+        b=pBcGKLKtTTBuKW9WCmuwB02SFHL4lAyC5Dr0O2+UAy0wW36NVBCsqO9/yhpV6T0MuN
+         MwXHGSgQDIEI2tvdkE1cDVB1WrB5L4wSCibqCF2FxM5Pmsws6ms3FHCEvXx0mBHm5vmQ
+         n95V6xwJi4cUF99P4okm3N7CvvauoKVTpsadCr5rIbWU6Nt44pdJfTDUmjExOIMBOIz1
+         uVbXUtALUSY90g92orqLLsE9h2+tcPNlqYqPLMYDM20X7nCsADNk+kG02KzpE/7zYgy+
+         xDrdjwlpWUvepwEBack3v5rxG8L0TmxhbBvVwbWWJ6qmP+EOEBJy9FlnWBCbOXeKbDO1
+         Tl+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Sl5X5/0riDRJIk3jT87SVDndCc8tqsVtJw8Nt/QvqsE=;
+        b=a2AvTWOVEYsqVn+p/bsoYAhYECOKR9nAqWUhpzRTXMRmUJZ8FPS/HPeKF5Py60driO
+         NUc9GSPYhNGfKs4wYHmHjRpoOCWwR1tU3aaPKJbmRgZxnj+K4O5nbiGwKny+hQ6CqEDh
+         gKWUbmT4CZsqCbjZeT0M6sa3uh2K3jjAJunfG6e/lfcRhg2G/fd4exadq1jcjlKHca3J
+         BrZXgaTULKQ4t4QgmTbvO0UzsJ8RRWMu+zR/eyrfut16EB2Ct/0gN3jbImOMPODmthhq
+         l3drb7debCook9AJC0BX8qENtzgE5eiyZICfa3SLSsJu8IO2j+0vBPlhUEhWOoYDi9CK
+         QZrw==
+X-Gm-Message-State: ACrzQf2jzt84HYIDZLMYgbQcPWYr5EcmkgOHwKadq1tfNBY0VDGQScLt
+        /Gp2OjNlBnsgJGFOJV1D4qgoLo3b7eU8XODC
+X-Google-Smtp-Source: AMsMyM5K9NuIbSAAwfcr8e0S8nQZGCrazpzmdZwEV0F0//2AxZAkNsFXuCwZyNoy0Njvdw+tppWjcA==
+X-Received: by 2002:a05:6a00:4c16:b0:56d:2634:c28e with SMTP id ea22-20020a056a004c1600b0056d2634c28emr20930029pfb.8.1667375886155;
+        Wed, 02 Nov 2022 00:58:06 -0700 (PDT)
+Received: from centos83-dev.mshome.net ([39.156.73.13])
+        by smtp.gmail.com with ESMTPSA id z20-20020aa79f94000000b0056246403534sm7838717pfr.88.2022.11.02.00.58.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Nov 2022 00:58:05 -0700 (PDT)
+From:   hbuxiaofei <hbuxiaofei@gmail.com>
+To:     will@kernel.org
+Cc:     kvm@vger.kernel.org, hbuxiaofei <hbuxiaofei@gmail.com>
+Subject: [PATCH] hw/i8042: Fix value uninitialized in kbd_io()
+Date:   Wed,  2 Nov 2022 15:57:55 +0800
+Message-Id: <20221102075755.68804-1-hbuxiaofei@gmail.com>
+X-Mailer: git-send-email 2.27.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-11-01 at 05:04 +0300, Kirill A. Shutemov wrote:
-...
-> > > > -	if (cr3 != kvm_read_cr3(vcpu))
-> > > > -		kvm_mmu_new_pgd(vcpu, cr3);
-> > > > +	old_cr3 = kvm_read_cr3(vcpu);
-> > > > +	if (cr3 != old_cr3) {
-> > > > +		if ((cr3 ^ old_cr3) & CR3_ADDR_MASK) {
-> > > > +			kvm_mmu_new_pgd(vcpu, cr3 &
-> > > > ~(X86_CR3_LAM_U48 |
-> > > > +					X86_CR3_LAM_U57));
-> > > > +		} else {
-> > > > +			/* Only LAM conf changes, no tlb flush
-> > > > needed
-> > > > */
-> > > > +			skip_tlb_flush = true;
-> > > 
-> > > I'm not sure about this.
-> > > 
-> > > Consider case when LAM_U48 gets enabled on 5-level paging
-> > > machines.
-> > > We may
-> > > have valid TLB entries for addresses above 47-bit. It's kinda
-> > > broken
-> > > case,
-> > > but seems valid from architectural PoV, no?
-> > 
-> > You're right, thanks Kirill.
-> > 
-> > I noticed in your Kernel enabling, because of this LAM_U48 and
-> > LA_57
-> > overlapping, you enabled LAM_U57 only for simplicity at this
-> > moment. I
-> > thought at that time, that this trickiness will be contained in
-> > Kernel
-> > layer, but now it turns out at least non-EPT KVM MMU is not spared.
-> > > 
-> > > I guess after enabling LAM, these entries will never match. But
-> > > if
-> > > LAM
-> > > gets disabled again they will become active. Hm?
-> > > 
-> > > Maybe just flush?
-> > 
-> > Now we have 2 options
-> > 1. as you suggested, just flush
-> > 2. more precisely identify the case Guest.LA57 && (CR3.bit[62:61]
-> > 00
-> > -->10 switching), flush. (LAM_U57 bit take precedence over LAM_U48,
-> > from spec.)
-> > 
-> > Considering CR3 change is relatively hot path, and tlb flush is
-> > heavy,
-> > I lean towards option 2. Your opinion? 
-> 
-> 11 in bits [62:61] is also considered LAM_U57. So your option 2 is
-> broken.
+  GCC Version:
+    gcc (GCC) 8.4.1 20200928 (Red Hat 8.4.1-1)
 
-Hi Kirill,
+  hw/i8042.c: In function ‘kbd_io’:
+  hw/i8042.c:153:19: error: ‘value’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+     state.write_cmd = val;
+     ~~~~~~~~~~~~~~~~^~~~~
+  hw/i8042.c:298:5: note: ‘value’ was declared here
+    u8 value;
+       ^~~~~
+  cc1: all warnings being treated as errors
+  make: *** [Makefile:508: hw/i8042.o] Error 1
 
-When I came to cook v2 per your suggestion, i.e. leave it just flush, I
-pondered on the necessity on all the cases of the 2 bits (LAM_U48,
-LAM_U57) flips.
-Hold this: LAM_U57 (bit61) takes precedence over LAM_U48 (bit62).
+Signed-off-by: hbuxiaofei <hbuxiaofei@gmail.com>
+---
+ hw/i8042.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-(0,0) --> {(0,1), (1,0), (1,1)}
-(0,1) --> {(0,0), (1,0), (1,1)}
-(1,0) --> {(0,0), (0,1), (1,1)}
-(1,1) --> {(0,0), (1,0), (1,0)}
-
-Among all the 12 cases, only (0,0) --> (1,0) && 5-level paging on, has
-to flush tlb. Am I right? if so, would you still prefer unconditionally
-flush, just for 1/12 necessity? (if include 5-level/4-level variations,
-1/24)
-
-> 
-> And I don't buy argument about hot path: the case we talking about is
-> about enabling/disabling LAM with constant PGD. It's not hot path by
-> any
-> mean.
-> 
-> Let's not be fancy. Just flush TLB.
-> 
+diff --git a/hw/i8042.c b/hw/i8042.c
+index 20be36c..6e4b559 100644
+--- a/hw/i8042.c
++++ b/hw/i8042.c
+@@ -295,7 +295,7 @@ static void kbd_reset(void)
+ static void kbd_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+ 		   u8 is_write, void *ptr)
+ {
+-	u8 value;
++	u8 value = 0;
+ 
+ 	if (is_write)
+ 		value = ioport__read8(data);
+-- 
+2.27.0
 
