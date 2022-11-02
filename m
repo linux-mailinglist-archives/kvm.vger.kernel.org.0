@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44EAC617259
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 00:24:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9ED8A617268
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 00:25:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231512AbiKBXYq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 19:24:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40728 "EHLO
+        id S230384AbiKBXY4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 19:24:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231397AbiKBXYG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 19:24:06 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35DD3E0CF
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 16:20:22 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id t6-20020a25b706000000b006b38040b6f7so381374ybj.6
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 16:20:22 -0700 (PDT)
+        with ESMTP id S231411AbiKBXYH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 19:24:07 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD08511166
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 16:20:25 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id x23-20020a634857000000b0043c700f6441so77712pgk.21
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 16:20:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=AmBoSXR8cwd5lTD1kT3C6jOdPtKlXVWaxLfPcD3i/BA=;
-        b=A4LFXQvMEiMuZgDhVOBfxgGfRyIfGS+S8KSMnj+Vr9W1tshUJrzjoBHEk2zyBmtuUx
-         ogerrpFu4rsjjI/sI3GyvZmyme0dQur1nNIpa5Z0zCZXG96ndtvapZWIKQm2GJMUm5m2
-         LsigaHbBSZ9pylAyo4vTxcd3+XJl38XJAsQGQ/ROMpywUqfkt92p6bWAwX/dJ91NOq+7
-         S+bmlgrgh9Sl1Z66FSmcHyz+HIbX+iPl1tQMoNqGSmehOlx34qAWN0o2IMklgRvvQzfX
-         JiKbV/ERt9lE/slKzawIAY7mBuqZdOCM7HIZwVK+4KXst1IruQyj9ydx+aZdlEy3UNeT
-         yvIA==
+        bh=FB9/txOY21wW/TPsgqc6j4ZQ11jhPkkdawz9sPCSXNA=;
+        b=Gh0pNKJAjUP7sOLxgeINR/cbIHMm/TCvJmesgDmGY7tgu6P6YXBVfYIXTfojpYFhsq
+         HkT9AYvu2cJGezPMeBp64lBMsTUd9ONRFB5hypdMyN7za0hetccYQckOK26B+CDbxF6r
+         +OhS46uwFsSqDvUawxhpwU4TdzcYBw50A+ZMoD8n+DmjlNK3aB9aXy9DkBx+JSHJ6ISO
+         pjQ1VfDtpdTwM/Mhh3TXxzf4TORrG3FqJQ2hX6AUGnQSwf155R85whsuIiWoEQQ1/uAN
+         5ZiQXw1v8DLP7PBHC5uyXihM2rPnRlLj9wclnfoxTX04fyoZeThV5J1v6/TU+dV2434R
+         khBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=AmBoSXR8cwd5lTD1kT3C6jOdPtKlXVWaxLfPcD3i/BA=;
-        b=d82sUklNn6smwUOAYZDQ2zDB4oLgM7iKYez2SyokbZt2R3bhJWDUK03wLz9V+WtDgd
-         103auvdJWDD6Jd8kTROmb/e9A/SOlq8PY0R9kDMtazSfw7dZ0MBz9Rpfo5mvj8KFHlMh
-         6yB1KOX74/cn6XL8+d66rMB1OohBhhtAuQedfJXB1nS5wl5UW69LycyriZMiIXd2zUqg
-         bTnxX6fW5nD0Xtue5xedITTjMhiu5WQfNF/HDYWepPNLXmMjqCL2ple3vdn8uYyvOF9A
-         EqFnf2BZncTxaCXYJcSJ1W2+6tAYLExEvrWdQqbjwl+ersjHmvZ6//Q39nX6PO7nw36Y
-         /UbA==
-X-Gm-Message-State: ACrzQf371qy8WzAbXlzJuF68NEtS6B6+cld7mEFQQU3lLdKW0PfXraUx
-        ShuPwvaxCK1L3NbFROB/n1DBJHpGiNM=
-X-Google-Smtp-Source: AMsMyM5Ng0545HhMYFHs4ZoSEDRiZLF3jo6aiC5mZSOnG1pbbaOXTdJfeIfrQvlziKqnVpV++3ycQpnD44s=
+        bh=FB9/txOY21wW/TPsgqc6j4ZQ11jhPkkdawz9sPCSXNA=;
+        b=MEQgVrET+00VzPOmBBZGjxCX6nPnjjmqBfcF2+wKaLWxLxQ6TqJAyXbQ1fy1KHIrrT
+         75FxOd23jIaOmHdEb5sxuMShQMsqkjzf2r8i2mawZ4dyKTbVn7avWRsPXGqjWAsZ0oaY
+         5nSmj3HU6oKgXgXpC5Q2IIPit4w15e8RqYv/BAtLZP9q4oji29c7/8v4NISMV9RsmNZj
+         CTYe0BgVnEYGbiBURgcqBLHH4VyGLJysh1eh6kSWmuqQVxJvu2AOln1/gPrskLrAiXVa
+         vKhxnXmtW6aBAW3o/KqeamSS/BQYDNQMP56fPVN+7yr6cNgyENh2SF05JgDf8oUTMrEN
+         pRcA==
+X-Gm-Message-State: ACrzQf1Smostl3smqtVWl30/l4ng3kftaVWufa+KKg5VySzzDeGR+8LJ
+        5pDWAXy/+93TmcvZyA4Oie2O0S1X+9s=
+X-Google-Smtp-Source: AMsMyM7nfKY/wHJ8tA5FRpJD6/RIsVOrpmudYjvQ2DhJNYVckSrzlEN04CTpOiyaCyk531P1edibX7B9dbc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:842:b0:370:641a:5c01 with SMTP id
- bz2-20020a05690c084200b00370641a5c01mr178409ywb.250.1667431210754; Wed, 02
- Nov 2022 16:20:10 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:3698:b0:56d:3180:e88f with SMTP id
+ dw24-20020a056a00369800b0056d3180e88fmr24063664pfb.66.1667431212769; Wed, 02
+ Nov 2022 16:20:12 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  2 Nov 2022 23:19:00 +0000
+Date:   Wed,  2 Nov 2022 23:19:01 +0000
 In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221102231911.3107438-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-34-seanjc@google.com>
-Subject: [PATCH 33/44] KVM: x86: Do VMX/SVM support checks directly in vendor code
+Message-ID: <20221102231911.3107438-35-seanjc@google.com>
+Subject: [PATCH 34/44] KVM: VMX: Shuffle support checks and hardware enabling
+ code around
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Huacai Chen <chenhuacai@kernel.org>,
@@ -97,147 +98,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Do basic VMX/SVM support checks directly in vendor code instead of
-implementing them via kvm_x86_ops hooks.  Beyond the superficial benefit
-of providing common messages, which isn't even clearly a net positive
-since vendor code can provide more precise/detailed messages, there's
-zero advantage to bouncing through common x86 code.
+Reorder code in vmx.c so that the VMX support check helpers reside above
+the hardware enabling helpers, which will allow KVM to perform support
+checks during hardware enabling (in a future patch).
 
-Consolidating the checks will also simplify performing the checks
-across all CPUs (in a future patch).
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 --
- arch/x86/kvm/svm/svm.c          | 38 +++++++++++++++------------------
- arch/x86/kvm/vmx/vmx.c          | 37 +++++++++++++++++---------------
- arch/x86/kvm/x86.c              | 11 ----------
- 4 files changed, 37 insertions(+), 51 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 212 ++++++++++++++++++++---------------------
+ 1 file changed, 106 insertions(+), 106 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 58a7cb8d8e96..f223c845ed6e 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1666,8 +1666,6 @@ struct kvm_x86_nested_ops {
- };
- 
- struct kvm_x86_init_ops {
--	int (*cpu_has_kvm_support)(void);
--	int (*disabled_by_bios)(void);
- 	int (*check_processor_compatibility)(void);
- 	int (*hardware_setup)(void);
- 	unsigned int (*handle_intel_pt_intr)(void);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3c48fb837302..3523d24d004b 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -525,21 +525,28 @@ static void svm_init_osvw(struct kvm_vcpu *vcpu)
- 		vcpu->arch.osvw.status |= 1;
- }
- 
--static int has_svm(void)
-+static bool kvm_is_svm_supported(void)
- {
- 	const char *msg;
-+	u64 vm_cr;
- 
- 	if (!cpu_has_svm(&msg)) {
--		printk(KERN_INFO "has_svm: %s\n", msg);
--		return 0;
-+		pr_err("SVM not supported, %s\n", msg);
-+		return false;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 2a7e62d0707d..07d86535c032 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2485,77 +2485,6 @@ static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
  	}
- 
- 	if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT)) {
- 		pr_info("KVM is unsupported when running as an SEV guest\n");
--		return 0;
-+		return false;
- 	}
- 
--	return 1;
-+	rdmsrl(MSR_VM_CR, vm_cr);
-+	if (vm_cr & (1 << SVM_VM_CR_SVM_DISABLE)) {
-+		pr_err("SVM disabled in MSR_VM_CR\n");
-+		return false;
-+	}
-+
-+	return true;
  }
  
- void __svm_write_tsc_multiplier(u64 multiplier)
-@@ -578,10 +585,9 @@ static int svm_hardware_enable(void)
- 	if (efer & EFER_SVME)
- 		return -EBUSY;
- 
--	if (!has_svm()) {
--		pr_err("%s: err EOPNOTSUPP on %d\n", __func__, me);
-+	if (!kvm_is_svm_supported())
- 		return -EINVAL;
--	}
-+
- 	sd = per_cpu(svm_data, me);
- 	if (!sd) {
- 		pr_err("%s: svm_data is NULL on %d\n", __func__, me);
-@@ -4112,17 +4118,6 @@ static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
- 	vmcb_mark_dirty(svm->vmcb, VMCB_CR);
- }
- 
--static int is_disabled(void)
+-static int kvm_cpu_vmxon(u64 vmxon_pointer)
 -{
--	u64 vm_cr;
+-	u64 msr;
 -
--	rdmsrl(MSR_VM_CR, vm_cr);
--	if (vm_cr & (1 << SVM_VM_CR_SVM_DISABLE))
--		return 1;
+-	cr4_set_bits(X86_CR4_VMXE);
+-
+-	asm_volatile_goto("1: vmxon %[vmxon_pointer]\n\t"
+-			  _ASM_EXTABLE(1b, %l[fault])
+-			  : : [vmxon_pointer] "m"(vmxon_pointer)
+-			  : : fault);
+-	return 0;
+-
+-fault:
+-	WARN_ONCE(1, "VMXON faulted, MSR_IA32_FEAT_CTL (0x3a) = 0x%llx\n",
+-		  rdmsrl_safe(MSR_IA32_FEAT_CTL, &msr) ? 0xdeadbeef : msr);
+-	cr4_clear_bits(X86_CR4_VMXE);
+-
+-	return -EFAULT;
+-}
+-
+-static int vmx_hardware_enable(void)
+-{
+-	int cpu = raw_smp_processor_id();
+-	u64 phys_addr = __pa(per_cpu(vmxarea, cpu));
+-	int r;
+-
+-	if (cr4_read_shadow() & X86_CR4_VMXE)
+-		return -EBUSY;
+-
+-	/*
+-	 * This can happen if we hot-added a CPU but failed to allocate
+-	 * VP assist page for it.
+-	 */
+-	if (static_branch_unlikely(&enable_evmcs) &&
+-	    !hv_get_vp_assist_page(cpu))
+-		return -EFAULT;
+-
+-	intel_pt_handle_vmx(1);
+-
+-	r = kvm_cpu_vmxon(phys_addr);
+-	if (r) {
+-		intel_pt_handle_vmx(0);
+-		return r;
+-	}
+-
+-	if (enable_ept)
+-		ept_sync_global();
 -
 -	return 0;
 -}
 -
- static void
- svm_patch_hypercall(struct kvm_vcpu *vcpu, unsigned char *hypercall)
- {
-@@ -5121,8 +5116,6 @@ static __init int svm_hardware_setup(void)
- 
- 
- static struct kvm_x86_init_ops svm_init_ops __initdata = {
--	.cpu_has_kvm_support = has_svm,
--	.disabled_by_bios = is_disabled,
- 	.hardware_setup = svm_hardware_setup,
- 	.check_processor_compatibility = svm_check_processor_compat,
- 
-@@ -5136,6 +5129,9 @@ static int __init svm_init(void)
- 
- 	__unused_size_checks();
- 
-+	if (!kvm_is_svm_supported())
-+		return -EOPNOTSUPP;
-+
- 	r = kvm_x86_vendor_init(&svm_init_ops);
- 	if (r)
- 		return r;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 1b645f52cd8d..2a7e62d0707d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2485,17 +2485,6 @@ static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
- 	}
- }
- 
--static __init int cpu_has_kvm_support(void)
+-static void vmclear_local_loaded_vmcss(void)
 -{
--	return cpu_has_vmx();
+-	int cpu = raw_smp_processor_id();
+-	struct loaded_vmcs *v, *n;
+-
+-	list_for_each_entry_safe(v, n, &per_cpu(loaded_vmcss_on_cpu, cpu),
+-				 loaded_vmcss_on_cpu_link)
+-		__loaded_vmcs_clear(v);
 -}
 -
--static __init int vmx_disabled_by_bios(void)
+-static void vmx_hardware_disable(void)
 -{
--	return !boot_cpu_has(X86_FEATURE_MSR_IA32_FEAT_CTL) ||
--	       !boot_cpu_has(X86_FEATURE_VMX);
+-	vmclear_local_loaded_vmcss();
+-
+-	if (cpu_vmxoff())
+-		kvm_spurious_fault();
+-
+-	intel_pt_handle_vmx(0);
 -}
 -
- static int kvm_cpu_vmxon(u64 vmxon_pointer)
- {
- 	u64 msr;
-@@ -7477,16 +7466,29 @@ static int vmx_vm_init(struct kvm *kvm)
+ /*
+  * There is no X86_FEATURE for SGX yet, but anyway we need to query CPUID
+  * directly instead of going through cpu_has(), to ensure KVM is trapping
+@@ -2781,6 +2710,112 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
  	return 0;
  }
  
@@ -257,61 +211,141 @@ index 1b645f52cd8d..2a7e62d0707d 100644
 +	return true;
 +}
 +
- static int __init vmx_check_processor_compat(void)
- {
- 	struct vmcs_config vmcs_conf;
- 	struct vmx_capability vmx_cap;
- 
--	if (!this_cpu_has(X86_FEATURE_MSR_IA32_FEAT_CTL) ||
--	    !this_cpu_has(X86_FEATURE_VMX)) {
--		pr_err("VMX is disabled on CPU %d\n", smp_processor_id());
++static int __init vmx_check_processor_compat(void)
++{
++	struct vmcs_config vmcs_conf;
++	struct vmx_capability vmx_cap;
++
 +	if (!kvm_is_vmx_supported())
- 		return -EIO;
--	}
- 
- 	if (setup_vmcs_config(&vmcs_conf, &vmx_cap) < 0)
- 		return -EIO;
-@@ -8471,8 +8473,6 @@ static __init int hardware_setup(void)
++		return -EIO;
++
++	if (setup_vmcs_config(&vmcs_conf, &vmx_cap) < 0)
++		return -EIO;
++	if (nested)
++		nested_vmx_setup_ctls_msrs(&vmcs_conf, vmx_cap.ept);
++	if (memcmp(&vmcs_config, &vmcs_conf, sizeof(struct vmcs_config)) != 0) {
++		pr_err("CPU %d feature inconsistency!\n", smp_processor_id());
++		return -EIO;
++	}
++	return 0;
++}
++
++static int kvm_cpu_vmxon(u64 vmxon_pointer)
++{
++	u64 msr;
++
++	cr4_set_bits(X86_CR4_VMXE);
++
++	asm_volatile_goto("1: vmxon %[vmxon_pointer]\n\t"
++			  _ASM_EXTABLE(1b, %l[fault])
++			  : : [vmxon_pointer] "m"(vmxon_pointer)
++			  : : fault);
++	return 0;
++
++fault:
++	WARN_ONCE(1, "VMXON faulted, MSR_IA32_FEAT_CTL (0x3a) = 0x%llx\n",
++		  rdmsrl_safe(MSR_IA32_FEAT_CTL, &msr) ? 0xdeadbeef : msr);
++	cr4_clear_bits(X86_CR4_VMXE);
++
++	return -EFAULT;
++}
++
++static int vmx_hardware_enable(void)
++{
++	int cpu = raw_smp_processor_id();
++	u64 phys_addr = __pa(per_cpu(vmxarea, cpu));
++	int r;
++
++	if (cr4_read_shadow() & X86_CR4_VMXE)
++		return -EBUSY;
++
++	/*
++	 * This can happen if we hot-added a CPU but failed to allocate
++	 * VP assist page for it.
++	 */
++	if (static_branch_unlikely(&enable_evmcs) &&
++	    !hv_get_vp_assist_page(cpu))
++		return -EFAULT;
++
++	intel_pt_handle_vmx(1);
++
++	r = kvm_cpu_vmxon(phys_addr);
++	if (r) {
++		intel_pt_handle_vmx(0);
++		return r;
++	}
++
++	if (enable_ept)
++		ept_sync_global();
++
++	return 0;
++}
++
++static void vmclear_local_loaded_vmcss(void)
++{
++	int cpu = raw_smp_processor_id();
++	struct loaded_vmcs *v, *n;
++
++	list_for_each_entry_safe(v, n, &per_cpu(loaded_vmcss_on_cpu, cpu),
++				 loaded_vmcss_on_cpu_link)
++		__loaded_vmcs_clear(v);
++}
++
++static void vmx_hardware_disable(void)
++{
++	vmclear_local_loaded_vmcss();
++
++	if (cpu_vmxoff())
++		kvm_spurious_fault();
++
++	intel_pt_handle_vmx(0);
++}
++
+ struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags)
+ {
+ 	int node = cpu_to_node(cpu);
+@@ -7466,41 +7501,6 @@ static int vmx_vm_init(struct kvm *kvm)
+ 	return 0;
  }
  
- static struct kvm_x86_init_ops vmx_init_ops __initdata = {
--	.cpu_has_kvm_support = cpu_has_kvm_support,
--	.disabled_by_bios = vmx_disabled_by_bios,
- 	.check_processor_compatibility = vmx_check_processor_compat,
- 	.hardware_setup = hardware_setup,
- 	.handle_intel_pt_intr = NULL,
-@@ -8517,6 +8517,9 @@ static int __init vmx_init(void)
- {
- 	int r, cpu;
- 
-+	if (!kvm_is_vmx_supported())
-+		return -EOPNOTSUPP;
-+
- 	hv_setup_evmcs();
- 
- 	r = kvm_x86_vendor_init(&vmx_init_ops);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 39675b9662d7..0c1778f3308a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9309,17 +9309,6 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
- 		return -EEXIST;
- 	}
- 
--	if (!ops->cpu_has_kvm_support()) {
--		pr_err_ratelimited("no hardware support for '%s'\n",
--				   ops->runtime_ops->name);
--		return -EOPNOTSUPP;
--	}
--	if (ops->disabled_by_bios()) {
--		pr_err_ratelimited("support for '%s' disabled by bios\n",
--				   ops->runtime_ops->name);
--		return -EOPNOTSUPP;
+-static bool __init kvm_is_vmx_supported(void)
+-{
+-	if (!cpu_has_vmx()) {
+-		pr_err("CPU doesn't support VMX\n");
+-		return false;
 -	}
 -
- 	/*
- 	 * KVM explicitly assumes that the guest has an FPU and
- 	 * FXSAVE/FXRSTOR. For example, the KVM_GET_FPU explicitly casts the
+-	if (!boot_cpu_has(X86_FEATURE_MSR_IA32_FEAT_CTL) ||
+-	    !boot_cpu_has(X86_FEATURE_VMX)) {
+-		pr_err("VMX not enabled in MSR_IA32_FEAT_CTL\n");
+-		return false;
+-	}
+-
+-	return true;
+-}
+-
+-static int __init vmx_check_processor_compat(void)
+-{
+-	struct vmcs_config vmcs_conf;
+-	struct vmx_capability vmx_cap;
+-
+-	if (!kvm_is_vmx_supported())
+-		return -EIO;
+-
+-	if (setup_vmcs_config(&vmcs_conf, &vmx_cap) < 0)
+-		return -EIO;
+-	if (nested)
+-		nested_vmx_setup_ctls_msrs(&vmcs_conf, vmx_cap.ept);
+-	if (memcmp(&vmcs_config, &vmcs_conf, sizeof(struct vmcs_config)) != 0) {
+-		pr_err("CPU %d feature inconsistency!\n", smp_processor_id());
+-		return -EIO;
+-	}
+-	return 0;
+-}
+-
+ static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+ {
+ 	u8 cache;
 -- 
 2.38.1.431.g37b22c650d-goog
 
