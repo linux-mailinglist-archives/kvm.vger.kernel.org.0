@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6660B61723E
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 00:24:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E08AC617241
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 00:24:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231415AbiKBXYH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 19:24:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32786 "EHLO
+        id S231431AbiKBXYJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 19:24:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230394AbiKBXWl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 19:22:41 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 846ED2643
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 16:20:10 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id g6-20020a17090a300600b00212f609f6aeso64505pjb.9
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 16:20:10 -0700 (PDT)
+        with ESMTP id S231347AbiKBXW4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 19:22:56 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4CC9B7F4
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 16:20:12 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-349423f04dbso765417b3.13
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 16:20:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=s9AuxTlRjBrfjYkcaQi28he/RkCYbCa6yMT59uzOKa0=;
-        b=ddAfxHTlEUHw0qawyyn7Bns3LOyks9re4MtMC6FAIFAvlDf6eK/nu/+/9Fi10x1R6n
-         WWJsCNbWaFv5FoXY2JkfL2gPHfmH7n5Ig/c/8vgYFwan9v+I5VkTcY5cAcyMIsF0YYgl
-         ayeymXyuzlb1ZK6RywTZFK6M2TrYNtbmp52NtBkrAW3CizVOcP2GK1YSKNk0hRzbGX/H
-         t6V+7QqjJlqd98Pv08NBqx2q5El2vxmRcwGZXuIwYC0OoPXag/D+TlMulKYngdYVLuGi
-         IcUk8i0bIt121WR3Ua8dNN2eN53mKcAGIC6t4monNq6evoAdLql3aLFHNiEvl7F6ATwg
-         1KbQ==
+        bh=/lqn4M/Too7/hLjEdNjj07wzHVUwU9le6KZacsTk8SY=;
+        b=jpZ4+tq6rgM4hZWXweQJqfxuirRlrRpN+o4JwlpzpCNTf2A1sJCTA6DFTlQxCFhgbt
+         sLPS4JguQacCAQKGId9cUa8Po003/wEsvkFZ2dOMw9iNk7lA7jWRoh5OFZzRfWNs6e3X
+         DneEijHQrn4rLICnTKWJFk513kvZJ3K123XsKZ8FoBZdWOMtOvWDKENXD0/AJPQsCKjG
+         rrWvKtMA58cnJHMchHTeytkk5Oc3RF3YtWKf69zqcXqxFh7WlsD0FI+Jf5mEVKngU/vv
+         wyh2CqSaqQR9rkwiquK7nfr1sE2Ot7UFYqlBaM19WPnwV+Bbr0Tz+aWWsDk+unGGDNDW
+         oUvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=s9AuxTlRjBrfjYkcaQi28he/RkCYbCa6yMT59uzOKa0=;
-        b=vnoGUWNAA40nlJs7SFF2yBH4WGcqckPMj+eRVocfH11wnJTdHoz/zi5npg4P4avQwQ
-         QXwHzJk5hF63WlPnm5CG9MOr55eU14y6d34vsImkTqy0VqiUg4fgbkB3s0thJML4RwUd
-         RREcaqC7NRghTisd0YPX8X8DrQPEmITRPTtgbPUHCA0M3ma57spyfvYjykfTDCZCGIC7
-         iFiy+MbE46NcHckLwbgSZuCAEA63oEnFDe4PMclqLMS1n7T4Q/MzN9Gcj5vIiyjF9WdX
-         34xYS1GYeMygtC5ECEK5Rp2Hun6Js8KDV7TxgKza3xVVcGMPYwtt4a3htHZ3PnAbijv2
-         oWbA==
-X-Gm-Message-State: ACrzQf0SaWsX8ovxo4tckGveZvJ1jafPE79vAEkRz8Hw6WM5d/SErtVs
-        ojtOIjzyszcDJYjOYYHcaTCZBa1CeRw=
-X-Google-Smtp-Source: AMsMyM4Aj3fLciSdgeuMbOdggWgonn7AFJaBAotEN5fF2aTBDAVACdmSaSGC1ByL/Xgyuk/Z8cG2B3zdT14=
+        bh=/lqn4M/Too7/hLjEdNjj07wzHVUwU9le6KZacsTk8SY=;
+        b=ygJxloadYnJdFuZ7T4vFjfEv53Z7MXShCrJBCuDcjwGuWVVVdaHOBIj5wIlKYiAxRV
+         3TZ+DxOGig1ItKNO8JUW7SB6aZX2i+LzTLy8hqpxs/1ZEy+GaDeFm9Qt97hpvAJO6Zrr
+         n1Ry7TgNFyKrYMXLs72iybOHWLuOMG2wV8wAlZjfGi3LGGmGhvLJQAQQFpSakIkaFAZF
+         FDeklfchfEqF60SQAtrEVCbQrR+8QnGp4hqKJ7Xt7UiKLliXclVlbvXQQYgjsAQchlMq
+         /s3+4JiMHELUhl3m9SghnPWlAUDOxKQWxTJTgGWXoPWQXXUXzXduTi++NKlraCtcnU2J
+         ky3A==
+X-Gm-Message-State: ACrzQf0ayxRzUm+aYAAz16wi3VWKry5MCYfAtwkjFUggLRV9Uj9L8jrZ
+        55Kdwa9/YNR0PvK2t+84AoQDoLR2bxg=
+X-Google-Smtp-Source: AMsMyM7jpwGuIU1urFbOZ+g44WVeQ15lWGU4IrnR1FfXK34lSVgumwGfDAw7vRfyWzKVx0s/7WxU/xcerg8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:240a:b0:183:6555:7a89 with SMTP id
- e10-20020a170903240a00b0018365557a89mr27116619plo.68.1667431189462; Wed, 02
- Nov 2022 16:19:49 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:e694:0:b0:6ca:2610:76fd with SMTP id
+ d142-20020a25e694000000b006ca261076fdmr171916ybh.607.1667431191239; Wed, 02
+ Nov 2022 16:19:51 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  2 Nov 2022 23:18:48 +0000
+Date:   Wed,  2 Nov 2022 23:18:49 +0000
 In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221102231911.3107438-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-22-seanjc@google.com>
-Subject: [PATCH 21/44] KVM: MIPS: Register die notifier prior to kvm_init()
+Message-ID: <20221102231911.3107438-23-seanjc@google.com>
+Subject: [PATCH 22/44] KVM: RISC-V: Do arch init directly in riscv_kvm_init()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Huacai Chen <chenhuacai@kernel.org>,
@@ -97,41 +97,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Call kvm_init() only after _all_ setup is complete, as kvm_init() exposes
-/dev/kvm to userspace and thus allows userspace to create VMs (and call
-other ioctls).
+Fold the guts of kvm_arch_init() into riscv_kvm_init() instead of
+bouncing through kvm_init()=>kvm_arch_init().  Functionally, this is a
+glorified nop as invoking kvm_arch_init() is the very first action
+performed by kvm_init().
+
+Moving setup to riscv_kvm_init(), which is tagged __init, will allow
+tagging more functions and data with __init and __ro_after_init.  And
+emptying kvm_arch_init() will allow dropping the hook entirely once all
+architecture implementations are nops.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/mips/kvm/mips.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ arch/riscv/kvm/main.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 75681281e2df..ae7a24342fdf 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -1640,16 +1640,17 @@ static int __init kvm_mips_init(void)
- 	if (ret)
- 		return ret;
- 
--	ret = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
--
--	if (ret)
--		return ret;
- 
- 	if (boot_cpu_type() == CPU_LOONGSON64)
- 		kvm_priority_to_irq = kvm_loongson3_priority_to_irq;
- 
- 	register_die_notifier(&kvm_mips_csr_die_notifier);
- 
-+	ret = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
-+	if (ret) {
-+		unregister_die_notifier(&kvm_mips_csr_die_notifier);
-+		return ret;
-+	}
- 	return 0;
+diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
+index a146fa0ce4d2..cb063b8a9a0f 100644
+--- a/arch/riscv/kvm/main.c
++++ b/arch/riscv/kvm/main.c
+@@ -66,6 +66,15 @@ void kvm_arch_hardware_disable(void)
  }
  
+ int kvm_arch_init(void *opaque)
++{
++	return 0;
++}
++
++void kvm_arch_exit(void)
++{
++}
++
++static int __init riscv_kvm_init(void)
+ {
+ 	const char *str;
+ 
+@@ -110,15 +119,6 @@ int kvm_arch_init(void *opaque)
+ 
+ 	kvm_info("VMID %ld bits available\n", kvm_riscv_gstage_vmid_bits());
+ 
+-	return 0;
+-}
+-
+-void kvm_arch_exit(void)
+-{
+-}
+-
+-static int __init riscv_kvm_init(void)
+-{
+ 	return kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
+ }
+ module_init(riscv_kvm_init);
 -- 
 2.38.1.431.g37b22c650d-goog
 
