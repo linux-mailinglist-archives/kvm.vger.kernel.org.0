@@ -2,77 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77F55618835
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 20:08:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFBE961889D
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 20:19:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229496AbiKCTIw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 15:08:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49450 "EHLO
+        id S231733AbiKCTTk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 15:19:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbiKCTIv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 15:08:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F4EA1C919
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 12:07:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667502467;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zhbRKqOz7AwtNr+GvYAbUWRDPYB/jC5g0HhlYMT07Es=;
-        b=QYPtAB/CUu6FPrjMGtwHp3yK698dSBygUauhFmiW0Pz26GjQPIRhrTtKWjoxL5VeIQm+nn
-        bUf6V9m17KK+PHuGQO1THGWD2D7NJzVrB42fGy2+7qeoG2tmtp00FpJrafgFQ5xcnx1RnF
-        cYaKtdvSNMP7URYnoe62DlF0aAB+ZwQ=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-312-QaItLcmUPLSwBs4UDARjKQ-1; Thu, 03 Nov 2022 15:07:45 -0400
-X-MC-Unique: QaItLcmUPLSwBs4UDARjKQ-1
-Received: by mail-io1-f70.google.com with SMTP id r197-20020a6b8fce000000b006c3fc33424dso1624785iod.5
-        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 12:07:45 -0700 (PDT)
+        with ESMTP id S231655AbiKCTTY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 15:19:24 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 593CB21E1D
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 12:17:40 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id j21-20020a17090a7e9500b00212b3905d87so1196183pjl.9
+        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 12:17:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=V5ShnTa1jHvkmSSuOGq0oPwfWcLkpSb0qmkA9knQiXw=;
+        b=IRzHdInd99dJ5ML8O2zTA4ZFKkv3y+Vb5wCpQoLer2QrtN/hsVttQnpX1NfUwz4Vw1
+         QNlOliKRei9dLkR5VIgUmyAmLxmJbf3oNlH94ASVN7gtEe9YqNzKV5NmfKF6mxJiBuFZ
+         VEbzL9/GbjU5I43jQmECYMtNaVSV7CUAZBBF5T66ftBv7QMPe7CCzB35yvnAFA2Ka/ej
+         5ERkY19pNCgvDd9WS03HSeZjnt30iYLtRDJcooR2DkasrqxsY8J2ohFVZ8gvg1VfoJgN
+         Les++RyICut+ftVun0JgrjV8om4gu3ArE20yABLC694g+JhWbvJzflzRhfkARKZLBtTx
+         7q9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zhbRKqOz7AwtNr+GvYAbUWRDPYB/jC5g0HhlYMT07Es=;
-        b=ceTsEyhhfx8KdXliLYXflg7e8HZ6Y+0AgM+jsXf6kLSgnmasMhs2ITCyPeuKv4UlYK
-         hICjeeTqErfqucYZVVMcFI+JYV4slsO5sAGBnrKloAuGJBbULqnFyM3plmzK1WDM0qH5
-         S/GzNllky6qzbJYai3IcOb1pOi8+34yf49xfKq/w+DpX7ca5TxkK5AX7lN5GNddMj1Pm
-         xzgVYCPcnhURhjAKqv6DhsfT/i4ltIqOH7Jnfy9JkOqTAZZFVp7svshi5Ru/K3y8KACG
-         MK8w7ZvV43CdR3PqxTBK1zxKKwWkQM/Jeeaa3EPApQ8bArzp/IRdtOsrt9N3t5ucyexC
-         1TsA==
-X-Gm-Message-State: ACrzQf3WulFeocSNxtY34kqsS3MiIMYAGpEs/T7NUee//oA4SLvB5Oig
-        3DPCJY8PD8Nj4E38RLxKmGw2ETRSiI/ijfUrjlj6xVOiKYzMu8mVygH+r/x/cJVjhpnCICwcF/U
-        NvUboiK3yJgsW
-X-Received: by 2002:a92:6b0e:0:b0:2ff:df3e:995b with SMTP id g14-20020a926b0e000000b002ffdf3e995bmr18395888ilc.193.1667502464730;
-        Thu, 03 Nov 2022 12:07:44 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6fhGJKoBZkZf/dm9GJzjm9FHbno8qR0vL3K83tJEgMIfrczp5aL7DisKmHa0IGGRd58m9GWw==
-X-Received: by 2002:a92:6b0e:0:b0:2ff:df3e:995b with SMTP id g14-20020a926b0e000000b002ffdf3e995bmr18395878ilc.193.1667502464554;
-        Thu, 03 Nov 2022 12:07:44 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id i9-20020a056638050900b0035678e2e175sm453025jar.50.2022.11.03.12.07.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 12:07:44 -0700 (PDT)
-Date:   Thu, 3 Nov 2022 13:07:42 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Shang XiaoJing <shangxiaojing@huawei.com>
-Cc:     <yishaih@nvidia.com>, <jgg@ziepe.ca>,
-        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
-        <cohuck@redhat.com>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH -next] vfio/mlx5: Switch to use module_pci_driver()
- macro
-Message-ID: <20221103130742.1f95c45c.alex.williamson@redhat.com>
-In-Reply-To: <20220922123507.11222-1-shangxiaojing@huawei.com>
-References: <20220922123507.11222-1-shangxiaojing@huawei.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=V5ShnTa1jHvkmSSuOGq0oPwfWcLkpSb0qmkA9knQiXw=;
+        b=Jj6PfiXot0u9E3yvTVNC+229aHsy5jUj/k8UWB02XQZKlEMMG1IILOhtTw1PrjoOmx
+         QKf67VVGTJfv7vkMNihiOzQiu1wkyLXsZEtv5pvS84o4Nd02pbu4+CiBQdHSCxCxiZpu
+         Eqhw5Ijvq3KXe/QpN2iuyiFj5VlhK0iGtCqlcfbE/gvq6cZRLUM3+S/PCjBfIzitPlVl
+         mAlJ6GDnUUP67q2nSfC7b1hI7NMxQJO0E7NaENXJKxTsJw/V5Irf5TDlIWCDpP+Wt9Ah
+         UvHxBObbRT52NFZbhyAeY0oJnB4yrXlmxzNCjk5nDl3/CZPgddKlJTWH5HIxxIJx1YpR
+         Waig==
+X-Gm-Message-State: ACrzQf2ktO7URNFqKjHNMTRszdtaLA0NSnyDH7EUxDUuWY/D6fcPUrx8
+        7qPA9pt74QoSnglDMv/ylVxKTzhFT1ZB
+X-Google-Smtp-Source: AMsMyM6DvleSxoBRVnkg7LQ5uxy5YJV0YI2dDUNW/jEBAecP3MMKh/wKI/1VbVQVkd4Q0jwOPZjOdAoQTTgg
+X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
+ (user=vipinsh job=sendgmr) by 2002:a17:90a:f291:b0:20a:eab5:cf39 with SMTP id
+ fs17-20020a17090af29100b0020aeab5cf39mr144116pjb.1.1667503045409; Thu, 03 Nov
+ 2022 12:17:25 -0700 (PDT)
+Date:   Thu,  3 Nov 2022 12:17:12 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
+Message-ID: <20221103191719.1559407-1-vipinsh@google.com>
+Subject: [PATCH v9 0/7] dirty_log_perf_test vCPU pinning
+From:   Vipin Sharma <vipinsh@google.com>
+To:     seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com
+Cc:     andrew.jones@linux.dev, wei.w.wang@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,44 +65,107 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 22 Sep 2022 20:35:07 +0800
-Shang XiaoJing <shangxiaojing@huawei.com> wrote:
+Pin vCPUs to a host physical CPUs (pCPUs) in dirty_log_perf_test and
+optionally pin the main application thread to a physical cpu if
+provided.
 
-> Since pci provides the helper macro module_pci_driver(), we may replace
-> the module_init/exit with it.
-> 
-> Signed-off-by: Shang XiaoJing <shangxiaojing@huawei.com>
-> ---
->  drivers/vfio/pci/mlx5/main.c | 13 +------------
->  1 file changed, 1 insertion(+), 12 deletions(-)
+While at it, I changed following:
 
-Nice cleanup.  Yishai?  Thanks,
+1. atoi() replaced with atoi_paranoid(), atoi_positive and
+   atoi_non_negative()
+2. Sorted the command line options alphabetically in
+   dirty_log_perf_test.
+3. Added the missing break between -e and -g in dirty_log_perf_test.c
+4. Replaced size_1gb in max_guest_memory_test.c with SZ_* macros from
+   sizes.h.
+5. Shortened the test args name in memslot_modification_stress_test.c
 
-Alex
+v9:
+- Changed commit message of patch 4.
+- Changed some line wrapping in memslot_modification_stress_test.c
+- Added Reviewed-by and Suggested-by.
 
-> 
-> diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-> index 759a5f5f7b3f..42bfa2678b81 100644
-> --- a/drivers/vfio/pci/mlx5/main.c
-> +++ b/drivers/vfio/pci/mlx5/main.c
-> @@ -654,18 +654,7 @@ static struct pci_driver mlx5vf_pci_driver = {
->  	.driver_managed_dma = true,
->  };
->  
-> -static void __exit mlx5vf_pci_cleanup(void)
-> -{
-> -	pci_unregister_driver(&mlx5vf_pci_driver);
-> -}
-> -
-> -static int __init mlx5vf_pci_init(void)
-> -{
-> -	return pci_register_driver(&mlx5vf_pci_driver);
-> -}
-> -
-> -module_init(mlx5vf_pci_init);
-> -module_exit(mlx5vf_pci_cleanup);
-> +module_pci_driver(mlx5vf_pci_driver);
->  
->  MODULE_LICENSE("GPL");
->  MODULE_AUTHOR("Max Gurtovoy <mgurtovoy@nvidia.com>");
+v8: https://lore.kernel.org/lkml/20221102232737.1351745-1-vipinsh@google.com/
+- Changed atoi_positive() and atoi_non_negative() to accept variable name also.
+- Moved atoi_positive() and atoi_non_negative() definition to test_util.h
+- Removed new line character from TEST_ASSERT() statements.
+- Using official SZ_1G from sizes.h header file in max_guest_memory_test.c
+- Shortened test args name in memslot_modification_stress_test.c
+
+v7: https://lore.kernel.org/lkml/20221031173819.1035684-1-vipinsh@google.com/
+- Moved pinning APIs from perf_test_util.c to kvm_util.c.
+- Missed one atoi() call in aarch64/debug-exceptions.c, changed it to
+  atoi_positive().
+
+v6: https://lore.kernel.org/lkml/20221021211816.1525201-1-vipinsh@google.com/
+- Updated the shortlog of Patch 5.
+- Changed formatting of help text of -c in dirty_log_perf_test
+
+v5: https://lore.kernel.org/lkml/20221010220538.1154054-1-vipinsh@google.com/
+- Added atoi_postive() and atoi_non_negative() APIs for string parsing.
+- Using sched_getaffinity() to verify if a pCPU is allowed or not.
+- Changed Suggested-by to add only person came up with original idea of
+  pinning.
+- Updated strings and commit messages.
+
+v4: https://lore.kernel.org/lkml/20221006171133.372359-1-vipinsh@google.com/
+- Moved boolean to check vCPUs pinning from perf_test_vcpu_args to
+  perf_test_args.
+- Changed assert statements to make error more descriptive.
+- Modified break statement between 'e' and 'g' option in v3 by not copying
+  dirty_log_manual_caps = 0 to 'e'.
+
+v3: https://lore.kernel.org/lkml/20220826184500.1940077-1-vipinsh@google.com
+- Moved atoi_paranoid() to test_util.c and replaced all atoi() usage
+  with atoi_paranoid()
+- Sorted command line options alphabetically.
+- Instead of creating a vcpu thread on a specific pcpu the thread will
+  migrate to the provided pcpu after its creation.
+- Decoupled -e and -g option.
+
+v2: https://lore.kernel.org/lkml/20220819210737.763135-1-vipinsh@google.com/
+- Removed -d option.
+- One cpu list passed as option, cpus for vcpus, followed by
+  application thread cpu.
+- Added paranoid cousin of atoi().
+
+v1: https://lore.kernel.org/lkml/20220817152956.4056410-1-vipinsh@google.com
+
+
+Vipin Sharma (7):
+  KVM: selftests: Add missing break between -e and -g option in
+    dirty_log_perf_test
+  KVM: selftests: Put command line options in alphabetical order in
+    dirty_log_perf_test
+  KVM: selftests: Add atoi_paranoid() to catch errors missed by atoi()
+  KVM: selftests: Use SZ_* macros from sizes.h in
+    max_guest_memory_test.c
+  KVM: selftests: Shorten the test args in
+    memslot_modification_stress_test.c
+  KVM: selftests: Add atoi_positive() and atoi_non_negative() for input
+    validation
+  KVM: selftests: Allowing running dirty_log_perf_test on specific CPUs
+
+ .../selftests/kvm/aarch64/arch_timer.c        | 25 ++------
+ .../selftests/kvm/aarch64/debug-exceptions.c  |  2 +-
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |  6 +-
+ .../selftests/kvm/access_tracking_perf_test.c |  2 +-
+ .../selftests/kvm/demand_paging_test.c        |  4 +-
+ .../selftests/kvm/dirty_log_perf_test.c       | 64 +++++++++++++------
+ .../selftests/kvm/include/kvm_util_base.h     |  4 ++
+ .../selftests/kvm/include/perf_test_util.h    |  4 ++
+ .../testing/selftests/kvm/include/test_util.h | 18 ++++++
+ .../selftests/kvm/kvm_page_table_test.c       |  4 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 54 ++++++++++++++++
+ .../selftests/kvm/lib/perf_test_util.c        |  8 ++-
+ tools/testing/selftests/kvm/lib/test_util.c   | 19 ++++++
+ .../selftests/kvm/max_guest_memory_test.c     | 21 +++---
+ .../kvm/memslot_modification_stress_test.c    | 22 +++----
+ .../testing/selftests/kvm/memslot_perf_test.c | 24 ++-----
+ .../selftests/kvm/set_memory_region_test.c    |  2 +-
+ .../selftests/kvm/x86_64/nx_huge_pages_test.c |  5 +-
+ 18 files changed, 190 insertions(+), 98 deletions(-)
+
+-- 
+2.38.1.273.g43a17bfeac-goog
 
