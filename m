@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2940F617478
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 03:51:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B70C461747A
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 03:51:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231343AbiKCCvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 22:51:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42722 "EHLO
+        id S231347AbiKCCvh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 22:51:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231260AbiKCCu6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 22:50:58 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E3B313E9B;
-        Wed,  2 Nov 2022 19:50:55 -0700 (PDT)
+        with ESMTP id S231339AbiKCCvU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 22:51:20 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A271814036;
+        Wed,  2 Nov 2022 19:51:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667443855; x=1698979855;
+  t=1667443860; x=1698979860;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=lg09VbI/60vYnXZzpwRBHqC+c64eQ+EJZudgsq58kIU=;
-  b=WrcQQ9l7ltZb7HpcXDVAO+QcAL+f83wQBO2shMQDiR/mz68mJSf/ZIyb
-   HxpliXC3OhCwEvE9cT8epwkCDAbFO4DwR8mZ86PRzWnDO2fj4o45XON7n
-   7xRo7bvSsr2PzRDvMl+pSURgq6liAbmzqtyZzRJRtJXQkReo8992iY/xr
-   TyQIhH8+rnnMjk7VKhGYleFn+HxRY/+UbSGXryaS6VrsK0Jgg7GG/RBqO
-   3/4tWk7iaJ7LWuDPshDP4C3t7rIDP2pTr02aVX04TiWxY6uaexG65VIuz
-   rrb7imCSJbnIrcdommYv+XZA3BArRVHHhjwSMXZb4LR+i4cDSd7+8d6iO
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="308289844"
+  bh=qDIvJKQbDJZne66SN3OTzm4SJ9/jbIpx8cLqn7z/wuU=;
+  b=iz/GVGE5QBtI4TYG4NahYz0/f/T7FIlc9l7j4ami0KHFb8gj9AYA/l06
+   Ex2pG/CNpPSc7KlrjUWAStNs6t3L4z9CZoPxdu5qTmP530fAGeZhvPLdE
+   P6b9hcqYuJT5+T83uJXVGZAzwIzorhlZ38ebCCXCdWQzingg7upTAxq0G
+   Kxc5MFSsMcd5nboKVQ16yUAP0N1wG7Oen3qEnbDqLGErTeoGlm4SkiKOl
+   p9E2RxN85ttR2l0pCrGzVOQ2B1SHbxgyZhYSB8wAG66bjHxwkyQ1KbA7l
+   IThtwJ/IGmV6/F8i8Hy+Ume8fqwlvgfEQe9CZln+BGMS9M1Jf0FW8xqby
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="307186647"
 X-IronPort-AV: E=Sophos;i="5.95,235,1661842800"; 
-   d="scan'208";a="308289844"
+   d="scan'208";a="307186647"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2022 19:50:55 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2022 19:51:00 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="698047897"
+X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="698047904"
 X-IronPort-AV: E=Sophos;i="5.95,235,1661842800"; 
-   d="scan'208";a="698047897"
+   d="scan'208";a="698047904"
 Received: from jiaxichen-precision-3650-tower.sh.intel.com ([10.239.159.75])
-  by fmsmga008.fm.intel.com with ESMTP; 02 Nov 2022 19:50:50 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 02 Nov 2022 19:50:55 -0700
 From:   Jiaxi Chen <jiaxi.chen@linux.intel.com>
 To:     kvm@vger.kernel.org
 Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
@@ -50,16 +50,16 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
         keescook@chromium.org, nathan@kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/8] x86: KVM: Advertise AMX-FP16 CPUID to user space
-Date:   Thu,  3 Nov 2022 10:50:26 +0800
-Message-Id: <20221103025030.78371-5-jiaxi.chen@linux.intel.com>
+Subject: [PATCH v2 5/8] x86: KVM: Advertise AVX-IFMA CPUID to user space
+Date:   Thu,  3 Nov 2022 10:50:27 +0800
+Message-Id: <20221103025030.78371-6-jiaxi.chen@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221103025030.78371-1-jiaxi.chen@linux.intel.com>
 References: <20221103025030.78371-1-jiaxi.chen@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+X-Spam-Status: No, score=-8.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
         SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,48 +67,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Latest Intel platform Granite Rapids has introduced a new instruction -
-AMX-FP16, which performs dot-products of two FP16 tiles and accumulates
-the results into a packed single precision tile. This instrucion needs
-no additional enabling on top of the existing kernel AMX enabling.
-
-AMX-FP16 adds FP16 capability and also allows a FP16 GPU trained model
-to run faster without loss of accuracy or added SW overhead.
+AVX-IFMA is a new instruction in the latest Intel platform Sierra
+Forest. This instruction packed multiplies unsigned 52-bit integers and
+adds the low/high 52-bit products to Qword Accumulators.
 
 The bit definition:
-CPUID.(EAX=7,ECX=1):EAX[bit 21]
+CPUID.(EAX=7,ECX=1):EAX[bit 23]
 
 This CPUID is exposed to user space. Besides, there is no other VMX
 control for this instruction.
 
 Signed-off-by: Jiaxi Chen <jiaxi.chen@linux.intel.com>
 ---
- arch/x86/kvm/cpuid.c         | 2 +-
+ arch/x86/kvm/cpuid.c         | 3 ++-
  arch/x86/kvm/reverse_cpuid.h | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index b388ef52f8c8..19ef02d5b11b 100644
+index 19ef02d5b11b..e84c6216a72c 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -657,7 +657,7 @@ void kvm_set_cpu_caps(void)
+@@ -657,7 +657,8 @@ void kvm_set_cpu_caps(void)
  		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL_SSBD);
  
  	kvm_cpu_cap_init_scattered(CPUID_7_1_EAX,
--		F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD)
-+		F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) | F(AMX_FP16)
+-		F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) | F(AMX_FP16)
++		F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) | F(AMX_FP16) |
++		F(AVX_IFMA)
  	);
  
  	kvm_cpu_cap_mask(CPUID_D_1_EAX,
 diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
-index 24f570ddb225..05fd43ebd226 100644
+index 05fd43ebd226..954c0ceb1e90 100644
 --- a/arch/x86/kvm/reverse_cpuid.h
 +++ b/arch/x86/kvm/reverse_cpuid.h
-@@ -29,6 +29,7 @@ enum kvm_only_cpuid_leafs {
- #define X86_FEATURE_AVX_VNNI            KVM_X86_FEATURE(CPUID_7_1_EAX, 4)
+@@ -30,6 +30,7 @@ enum kvm_only_cpuid_leafs {
  #define X86_FEATURE_AVX512_BF16         KVM_X86_FEATURE(CPUID_7_1_EAX, 5)
  #define X86_FEATURE_CMPCCXADD           KVM_X86_FEATURE(CPUID_7_1_EAX, 7)
-+#define X86_FEATURE_AMX_FP16            KVM_X86_FEATURE(CPUID_7_1_EAX, 21)
+ #define X86_FEATURE_AMX_FP16            KVM_X86_FEATURE(CPUID_7_1_EAX, 21)
++#define X86_FEATURE_AVX_IFMA            KVM_X86_FEATURE(CPUID_7_1_EAX, 23)
  
  struct cpuid_reg {
  	u32 function;
