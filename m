@@ -2,216 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39E06618557
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 17:53:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 870D961859E
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 18:03:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231587AbiKCQxS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 12:53:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52592 "EHLO
+        id S231386AbiKCRC6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 13:02:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229694AbiKCQxR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 12:53:17 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DBD1DD
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 09:53:16 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id g24so2495260plq.3
-        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 09:53:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3VNihJl4rIG/CKtSJtV/S/XMKVJKarlATfZrl5tjRkk=;
-        b=EdjQL3F+O6Ash0ZDhtzJFFWfytiaBg8s2Z1H74Jw+Hmcu2R/ZI2YT9VVCNktrZ8JdG
-         OHNU8Fr4lSF33Ti8g1y+Es5PHVm7I5oh5aXpyQytARdBFN+KIq3MyQ0D05kkA29AYd0A
-         EnsC5OVct9KbweLipQ0s4PEpxXCfSkK05HRi1alTXSCwzoW6inI9lxdbsQOJj5jkCrzs
-         G3YHMH4/QF5GV3ZWcBwFSOUtBMvrLYv7dGRurciQjP9FSxCTm1A76i4U4PersCWR2Jga
-         FbKdAQ6Map7905WqnhWxt6oQXFyBw1uT73LIyRmVB0zbBFO/v4oYtPBWWAUz9YKCsa9y
-         xOQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3VNihJl4rIG/CKtSJtV/S/XMKVJKarlATfZrl5tjRkk=;
-        b=Xs0jwN3H3BlkJEc3B29raNUKdKAlWHY9kdaYltxMwPRPuK8qY24VVEO/PUT270epBo
-         +YhXAoc83xdLLMywkIYsAG5lhELWj7Ehll9TBMPtxxezNgPgASGID5rKJo8eMlWoQtfp
-         kd+fntLDvkzfP2TrrSnbH7SV135Dv+Pptz74DkyO8TQEZkaXkx6zKuo5u4vZGhtYaN3r
-         2A47fOKVLwPO9JMHi5v900ANNk/DHwDV0uNlpH579C5/JfZvREI53E2y1nfC8JSIuCfp
-         APhAQvJT1gfTyQGn9Zd79MlMqCViI3lgkgjrhV10LTMr3e4P58t5k1aCDMqZo/eHi2Jp
-         SmOg==
-X-Gm-Message-State: ACrzQf0oKmgbxOhyhDXigkon2n/t6uBSIAR0rmIcoUAXkYkXMzNQRb1o
-        TVKf9B5v7h4FFYyIRhjm1AY6tA==
-X-Google-Smtp-Source: AMsMyM5/jQhNsoX1nsJm8nky0aqb4gdGs9fH9qwIasnEGR0Yr3GTZqtWC2cB8kC/GOzGBGXD8inc0A==
-X-Received: by 2002:a17:90b:2317:b0:213:26a3:246f with SMTP id mt23-20020a17090b231700b0021326a3246fmr33177624pjb.148.1667494395616;
-        Thu, 03 Nov 2022 09:53:15 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id c24-20020aa79538000000b0056bbcf88b93sm1000460pfp.42.2022.11.03.09.53.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 09:53:15 -0700 (PDT)
-Date:   Thu, 3 Nov 2022 16:53:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Eric Li <ercli@ucdavis.edu>,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v5 05/15] KVM: nVMX: Let userspace set nVMX MSR to any
- _host_ supported value
-Message-ID: <Y2Px90RQydMUoiRH@google.com>
-References: <20220607213604.3346000-1-seanjc@google.com>
- <20220607213604.3346000-6-seanjc@google.com>
- <20221031163907.w64vyg5twzvv2nho@linux.intel.com>
- <Y2ABrnRzg729ZZNI@google.com>
- <20221101101801.zxcjswoesg2gltri@linux.intel.com>
- <Y2FePYteNrEfZ7D5@google.com>
- <20221102085414.fk2xss74jvtzs6mr@linux.intel.com>
+        with ESMTP id S232059AbiKCRCh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 13:02:37 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 424BA140E0
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 10:02:36 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A3FdM21028576;
+        Thu, 3 Nov 2022 17:01:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=zfygsbACEzEVl/O0/PDU0SNvcKoNHrKyDtKfcler3s4=;
+ b=d9DiRZ+agIOTqigbvoYzkDH7QpB7Dl3X1ha0QSOno0uG/T/JkTMd/ToMi+7rTnIyQkmN
+ h4g2pI/ySjWa9rfobS53mW7+9H8Z7Mm2uD7ewUyBD9RrScAzGimQWsQDd/LiUdBTqQNz
+ joB2IGQFxfH7nc4sPpYb7ZVmtQ4zrIzvTl6Uf46KlHzWm04qWe5rHb8JHL+ZCP0qfUoA
+ x/+LWCCF9Mo6JPdeDreGuob5D4J7qBeyfCgFpn9Svi4x/Sz0BIc/Tt0A/bgWRtAq4LPj
+ rY94iE00/MlH6zfSffm1MUGEdz7dT0sMfXBAB45kuh3svC4WGqVikj2An15WB0q9nbA6 QQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kmemwqpy2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Nov 2022 17:01:57 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A3GmluT002364;
+        Thu, 3 Nov 2022 17:01:56 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kmemwqpx2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Nov 2022 17:01:56 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A3H1s1R020712;
+        Thu, 3 Nov 2022 17:01:54 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06fra.de.ibm.com with ESMTP id 3kguejeuhh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Nov 2022 17:01:54 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A3GuICP49873324
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 3 Nov 2022 16:56:18 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3DBD45204E;
+        Thu,  3 Nov 2022 17:01:51 +0000 (GMT)
+Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com (unknown [9.152.222.245])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A70F952050;
+        Thu,  3 Nov 2022 17:01:50 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+Subject: [PATCH v11 00/11] s390x: CPU Topology
+Date:   Thu,  3 Nov 2022 18:01:39 +0100
+Message-Id: <20221103170150.20789-1-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221102085414.fk2xss74jvtzs6mr@linux.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: -6IJvBYCphr0yUXo_hd0oM4SxLEXYWBx
+X-Proofpoint-GUID: 2T6Ot3VZh0xvXWGOG519wYNiO974-Uf3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-03_04,2022-11-03_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ impostorscore=0 adultscore=0 bulkscore=0 priorityscore=1501 clxscore=1015
+ spamscore=0 lowpriorityscore=0 mlxlogscore=999 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211030110
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 02, 2022, Yu Zhang wrote:
-> On Tue, Nov 01, 2022 at 05:58:21PM +0000, Sean Christopherson wrote:
-> > On Tue, Nov 01, 2022, Yu Zhang wrote:
-> > > What I observed is that vmx->nested.msrs.secondary_ctls_high will be changed
-> > > in vmx_adjust_secondary_exec_control(), which can be triggered after cpuid is
-> > > set. 
-> > 
-> > Ugh, that path got overlooked when we yanked out KVM's manipulaton of VMX MSRs
-> > in response to guest CPUID changes.  I wonder if we can get away with changing
-> > KVM's behavior to only ensure a feature isn't exposed to L2 when it's not exposed
-> > to L1.
-> > 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 6b4266e949a3..cfc35d559d91 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -4523,8 +4523,8 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
-> >          * Update the nested MSR settings so that a nested VMM can/can't set
-> >          * controls for features that are/aren't exposed to the guest.
-> >          */
-> > -       if (nested) {
-> > -               if (enabled)
-> > +       if (nested && !enabled)
-> > +               if (exiting)
-> >                         vmx->nested.msrs.secondary_ctls_high |= control;
-> >                 else
-> >                         vmx->nested.msrs.secondary_ctls_high &= ~control;
-> > 
-> 
-> Indeed, this change can make sure a feature won't be exposed to L2, if L1
-> does not have it.
+Hi,
 
-No, that's not the goal of the change.  KVM already hides features in the VMX MSRs
-if the base feature is not supported in L1 according to guest CPUID.  The problem
-is that, currently, KVM also _forces_ features to be enabled in the VMX MSRs when
-the base feature IS supported in L1 (CPUID).
+The implementation of the CPU Topology in QEMU has been drastically
+modified since the last patch series and the number of LOCs has been
+greatly reduced.
 
-Ideally, KVM should NEVER manipulate VMX MSRs in response to guest CPUID changes.
-That's what I was referring to earlier by commits:
+0) Two new patches in front of the series:
+   - A preliminary patch to move the machine properties to the 
+     class_init routine
+   - The max thread machine class attribute patch.
 
-  8805875aa473 ("Revert "KVM: nVMX: Do not expose MPX VMX controls when guest MPX disabled"")
-  9389d5774aca ("Revert "KVM: nVMX: Expose load IA32_PERF_GLOBAL_CTRL"")
+  Both patches could be taken upstream separatly from each other and
+  from the rest of the series.
 
-E.g. if userspace sets VMX MSRs and then sets guest CPUID, KVM will override the
-nVMX CPU model defined by userspace.  The scenario where userspace hides a "base"
-feature but exposes the feature in the VMX MSRs is nonsensical, which is why I
-think KVM can likely get away with force-disabling features.
+1) Unnecessary objects have been removed, only a single S390Topology
+   object is created to support migration and reset.
 
-The reverse is completely legitimate though: hiding a feature in VMX MSRs even if
-the base feature is supported for L1, i.e. disallowing L1 from enabling the feature
-in L2, is something that real VMMs will actually do, e.g. if the user doesn't trust
-that KVM correctly handles all aspects of nested virtualization for the feature.
+2) The introduction of drawers and books is deferred to a later version.
 
-In other words, the behavior you're observing, where vmx->nested.msrs.secondary_ctls_high
-is changed by vmx_adjust_secondary_exec_control(), is a completely separate bug
-than the one below.
+3) A new machine property, topology, is added for new machines for test
+   purpose and migration to/from a host without facility 11 from/to a
+   host with the facility 11.
 
-> But for the feature bits that L1 has, yet cleared from the
-> vmcs_conf->nested.msrs.secondary_ctls_high in nested_vmx_setup_ctls_msrs(),
-> there's no chance for userspace vmm to reset it again.
-> 
-> Well, I am not suggesting to give userspace vmm such permission(which I believe
-> is incorrect). And IIUC, vmcs_conf->nested.msrs.secondary_ctls_high shall serve
-> as a template to initialize vmx->nested.msrs.secondary_ctls_high. So maybe we
-> shall not mask off some features in nested_vmx_setup_ctls_msrs() at the beginning.
->  
-> > > Since KVM's config(vmcs_config->nested.secondary_ctls_high) is done during init
-> > > by nested_vmx_setup_ctls_msrs(), which only kept a subset of the flags from the
-> > > vmcs_confg->cpu_based_2nd_exec_ctrl, the vmx_restore_control_msr() could fail
-> > > later, when userspace VMM tries to enable a feature(the only one I witnessed is
-> > > SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE) by setting MSR_IA32_VMX_PROCBASED_CTLS2.
-> > > Because the vmx->nested.msrs.secondary_ctls_high is updated by cpuid, but this
-> > > bit is not taken from vmcs_conf->cpu_based_2nd_exec_ctrl by nested_vmx_setup_ctls_msrs()
-> > > for vmcs_config->nested.secondary_ctls_high.
-> > > 
-> > > The failure can be fixed, simply by adding SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE in
-> > > nested_vmx_setup_ctls_msrs(), e.g.
-> > 
-> > Assuming KVM actually supports user wait/pause in L2, this is an orthogonal bug
-> > to the CPUID-based manipulation above.  KVM simply neglects to advertise to userspace
-> > that ENABLE_USR_WAIT_PAUSE is supported for nested virtualization.
-> > 
-> > If KVM doesn't correctly support virtualizing user wait/pause for L2, then the
-> > correct location to fix this is in vmx_secondary_exec_control().
-> > 
-> 
-> Sorry, why vmx_secondary_exec_control()?
+Also a documentation has been added to the series.
 
-You missed the qualifier:
 
-  If KVM doesn't correctly support virtualizing user wait/pause for L2
+To use the QEMU patches, you will need Linux V6-rc1 or newer,
+or use the following Linux mainline patches:
 
-If KVM should NOT be exposing ENABLE_USR_WAIT_PAUSE to the L1 VMM, then NOT
-propagating the feature to msrs->secondary_ctls_low is correct.  And if that's
-the case, then vmx_secondary_exec_control() needs to be modified so that it does
-NOT set ENABLE_USR_WAIT_PAUSE in vmx->nested.msrs.secondary_ctls_high.
+f5ecfee94493 2022-07-20 KVM: s390: resetting the Topology-Change-Report    
+24fe0195bc19 2022-07-20 KVM: s390: guest support for topology function     
+0130337ec45b 2022-07-20 KVM: s390: Cleanup ipte lock access and SIIF fac.. 
 
-> Could we just change nested_vmx_setup_ctls_msrs() like below:
+Currently this code is for KVM only, I have no idea if it is interesting
+to provide a TCG patch. If ever it will be done in another series.
 
-If KVM correctly virtualizes the feature in a nested scenario, yes.  I haven't
-looked into ENABLE_USR_WAIT_PAUSE enough to know whether or not KVM gets the
-nested virtualization pieces correct, hence the above qualifier.
+To have a better understanding of the S390x CPU Topology and its
+implementation in QEMU you can have a look at the documentation in the
+last patch of this series.
 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 0c62352dda6a..fa255391718c 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -6791,13 +6791,7 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
->         msrs->procbased_ctls_low &=
->                 ~(CPU_BASED_CR3_LOAD_EXITING | CPU_BASED_CR3_STORE_EXITING);
-> 
-> -       /*
-> -        * secondary cpu-based controls.  Do not include those that
-> -        * depend on CPUID bits, they are added later by
-> -        * vmx_vcpu_after_set_cpuid.
-> -        */
->         msrs->secondary_ctls_low = 0;
-> -
->         msrs->secondary_ctls_high = vmcs_conf->cpu_based_2nd_exec_ctrl;
->         msrs->secondary_ctls_high &=
->                 SECONDARY_EXEC_DESC |
-> @@ -6810,7 +6804,8 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
->                 SECONDARY_EXEC_ENABLE_INVPCID |
->                 SECONDARY_EXEC_RDSEED_EXITING |
->                 SECONDARY_EXEC_XSAVES |
-> -               SECONDARY_EXEC_TSC_SCALING;
-> +               SECONDARY_EXEC_TSC_SCALING |
-> +               SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE;
-> 
->         /*
->          * We can emulate "VMCS shadowing," even if the hardware
+The admin will want to match the host and the guest topology, taking
+into account that the guest does not recognize multithreading.
+Consequently, two vCPU assigned to threads of the same real CPU should
+preferably be assigned to the same socket of the guest machine.
+
+Regards,
+Pierre
+
+Pierre Morel (11):
+  s390x: Register TYPE_S390_CCW_MACHINE properties as class properties
+  s390x/cpu topology: add max_threads machine class attribute
+  s390x/cpu topology: core_id sets s390x CPU topology
+  s390x/cpu topology: reporting the CPU topology to the guest
+  s390x/cpu_topology: resetting the Topology-Change-Report
+  s390x/cpu_topology: CPU topology migration
+  target/s390x: interception of PTF instruction
+  s390x/cpu topology: add topology_capable QEMU capability
+  s390x/cpu topology: add topology machine property
+  s390x/cpu_topology: activating CPU topology
+  docs/s390x: document s390x cpu topology
+
+ docs/system/s390x/cpu-topology.rst |  80 ++++++++
+ include/hw/boards.h                |   3 +
+ include/hw/s390x/cpu-topology.h    |  45 +++++
+ include/hw/s390x/s390-virtio-ccw.h |  10 +
+ target/s390x/cpu.h                 |  81 ++++++++
+ target/s390x/kvm/kvm_s390x.h       |   1 +
+ hw/core/machine.c                  |   3 +
+ hw/s390x/cpu-topology.c            | 286 +++++++++++++++++++++++++++++
+ hw/s390x/s390-virtio-ccw.c         | 192 +++++++++++++------
+ target/s390x/cpu-sysemu.c          |  21 +++
+ target/s390x/cpu_topology.c        | 100 ++++++++++
+ target/s390x/kvm/kvm.c             |  50 ++++-
+ util/qemu-config.c                 |   4 +
+ hw/s390x/meson.build               |   1 +
+ qemu-options.hx                    |   6 +-
+ target/s390x/meson.build           |   1 +
+ 16 files changed, 827 insertions(+), 57 deletions(-)
+ create mode 100644 docs/system/s390x/cpu-topology.rst
+ create mode 100644 include/hw/s390x/cpu-topology.h
+ create mode 100644 hw/s390x/cpu-topology.c
+ create mode 100644 target/s390x/cpu_topology.c
+
+-- 
+2.31.1
+
+Changelog:
+
+- since v10
+
+- change machine attribute "topology-disable" to "topology"
+  (Cedric)
+- Add preliminary patch for machine properties
+  (Cedric)
+- Use next machine as 7.2
+  (Cedric / Connie)
+- Remove unecessary mutex
+  (Thomas)
+- use ENOTSUP return value for kvm_s390_topology_set_mtcr()
+  (Cedric)
+- Add explanation on container and cpu TLEs
+  (Thomas)
+- use again cpu and socket count in topology structure
+  (Cedric)
+- Suppress the S390TopoTLE structure and integrate
+  the TLE masks to the socket structure.
+  (-)
+- the STSI instruction now finds the topology from the machine
+  (Cedric)
+
+- since v9
+
+- remove books and drawers
+
+- remove thread denying and replace with a merge
+  of cores * threads to specify the CPUs available
+  to the guest
+
+- add a class option to avoid topology on older
+  machines
+  (Cedric)
+
+- Allocate a SYSIB buffer of the maximal length to
+  avoid overflow.
+  (Nico, Janis)
+
+- suppress redundancy of smp parameters in topology
+  and use directly the machine smp structure
+
+- Early check for topology support
+  (Cedric)
+
+- since v8
+
+- Linux patches are now mainline
+
+- simplification of the implementation
+  (Janis)
+
+- Migration, new machine definition
+  (Thomas)
+
+- Documentation
+
+- since v7
+
+- Coherence with the Linux patch series changes for MTCR get
+  (Pierre)
+
+- check return values during new CPU creation
+  (Thomas)
+
+- Improving codding style and argument usages
+  (Thomas)
+
+- since v6
+
+- Changes on smp args in qemu-options
+  (Daniel)
+  
+- changed comments in machine.jason
+  (Daniel)
+ 
+- Added reset
+  (Janosch)
+
+- since v5
+
+- rebasing on newer QEMU version
+
+- reworked most lines above 80 characters.
+
+- since v4
+
+- Added drawer and books to topology
+
+- Added numa topology
+
+- Added documentation
+
+- since v3
+
+- Added migration
+  (Thomas)
+
+- Separated STSI instruction from KVM to prepare TCG
+  (Thomas)
+
+- Take care of endianess to prepare TCG
+  (Thomas)
+
+- Added comments on STSI CPU container and PFT instruction
+  (Thomas)
+
+- Moved enabling the instructions as the last patch
+  (Thomas)
