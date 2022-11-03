@@ -2,277 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 96C33617838
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 09:00:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00D2F61785D
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 09:07:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230267AbiKCIAw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 04:00:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51578 "EHLO
+        id S229548AbiKCIHt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 04:07:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229871AbiKCIAv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 04:00:51 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0866F58;
-        Thu,  3 Nov 2022 01:00:49 -0700 (PDT)
+        with ESMTP id S231392AbiKCIHo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 04:07:44 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE9F95FC4
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 01:07:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667462450; x=1698998450;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=WvQTIrLM7V5iwFCSJu6Kr1F/RNMG0FqI+moVI7uRmRA=;
-  b=i80GHJ/KdZfCM7x7S+otvKsbW2OraM5977przdAtP7jTxkNKMVp6bkWk
-   Bm3KWpwuiZ5/Xfezhp3JB8h8MvYF7eorqZ3QgmjERpx6DJoSzwalXtvVG
-   HSsP6QvgcrdYAS0y8UoumHN9W/inFZQkDxkFsdPXQPgRLDDuHZZmtCCdn
-   15T/nHcBaw4GKBWHWjouS29mqfgZIAwa7CWA+lH/P0t/wylb1Hj4488W0
-   odZ1slotdq9Vd441NJ/KTGGBneLgC/8uHnmekKTpfOhdz/OCd0/pOmSpf
-   sesSd9aWtDL6eNuxjP+uqQa56EEOvldMYTy+CtQFBNbt3mrioFjojcvSB
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="290004173"
+  t=1667462863; x=1698998863;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=I8lsCxdSj2qBG63xWcOuQeSmzJ0+fPV9tYuKCeWIyrQ=;
+  b=BAKcSQXG9wo6JzcPgTXtWSArDGAzltiuE5L/ISzZOX1/iY8cE3aUiSW/
+   rx8owOPFaB+XZFQsCA4I29m+29JgGuiRcRrYGSzYGsNCXHf3dz2NKmYil
+   iiP5ViNmW8eTbIih96iwEm41OUP+gafPf27/AinDLG5ETp5rOZ0ADoQtb
+   a7XX9Sf0Sqj9s2fvZM/G1Asw6eZyhVfeKdIvwTf6qkbWD8cX/0HHldAXT
+   Oqkw9K9OGkTPalDysjuCAtxP1gVZv9zCc9P/Kgyk7/tnJnxMWGk3JWZmO
+   XKcMgTdVfKTgjvEwsHHFlRuAfYyUPA+RAgpWs9al3L2kwP0w0uPEZtBmO
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="309611900"
 X-IronPort-AV: E=Sophos;i="5.95,235,1661842800"; 
-   d="scan'208";a="290004173"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2022 01:00:49 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="759852039"
+   d="scan'208";a="309611900"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2022 01:07:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="809580991"
 X-IronPort-AV: E=Sophos;i="5.95,235,1661842800"; 
-   d="scan'208";a="759852039"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.255.28.201]) ([10.255.28.201])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2022 01:00:46 -0700
-Message-ID: <4e037f13-fe58-dbb4-af77-7c63f5252e78@linux.intel.com>
-Date:   Thu, 3 Nov 2022 16:00:44 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH v10 031/108] KVM: x86/mmu: Replace hardcoded value 0 for
- the initial value for SPTE
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <0de1d5dfbce49b5e9d4f93289296b726180b8dd0.1667110240.git.isaku.yamahata@intel.com>
- <4865ef9b-8b51-107b-d6c4-40db55bcbe06@linux.intel.com>
-In-Reply-To: <4865ef9b-8b51-107b-d6c4-40db55bcbe06@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+   d="scan'208";a="809580991"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by orsmga005.jf.intel.com with ESMTP; 03 Nov 2022 01:07:42 -0700
+Message-ID: <f2866792a3e7ecfbe4b17b7a1a4b8cb7a1c576f1.camel@linux.intel.com>
+Subject: Re: [PATCH 8/9] KVM: x86: When guest set CR3, handle LAM bits
+ semantics
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
+Date:   Thu, 03 Nov 2022 16:07:41 +0800
+In-Reply-To: <20221103024001.wtrj77ekycleq4vc@box.shutemov.name>
+References: <20221017070450.23031-1-robert.hu@linux.intel.com>
+         <20221017070450.23031-9-robert.hu@linux.intel.com>
+         <20221031025930.maz3g5npks7boixl@box.shutemov.name>
+         <d03bcd8fe216e5934473759fa6fdaac4e1105847.camel@linux.intel.com>
+         <20221101020416.yh53bvpt3v5gwvcj@box.shutemov.name>
+         <1d6a68dd95e13ce36b9f3ccee0b4e203a3aecf02.camel@linux.intel.com>
+         <20221102210512.aadxeb3qiloff7yl@box.shutemov.name>
+         <9578f16e8be3dddae2c5571a4a8f033ab4259840.camel@linux.intel.com>
+         <20221103024001.wtrj77ekycleq4vc@box.shutemov.name>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-8.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 2022-11-03 at 05:40 +0300, Kirill A. Shutemov wrote:
+> On Thu, Nov 03, 2022 at 09:04:23AM +0800, Robert Hoo wrote:
+> > I also notice that skip_tlb_flush is set when pcid_enabled && (CR3
+> > & X86_CR3_PCID_NOFLUSH). Under this condition, do you think (0,0)
+> > -->
+> > (1,0) need to flip it back to false?
+> 
+> Yes, I think we should. We know it is a safe choice.
 
-On 2022/11/3 15:17, Binbin Wu wrote:
->
-> On 2022/10/30 14:22, isaku.yamahata@intel.com wrote:
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>
->> The TDX support will need the "suppress #VE" bit (bit 63) set as the
->> initial value for SPTE.  To reduce code change size, introduce a new 
->> macro
->> SHADOW_NONPRESENT_VALUE for the initial value for the shadow page table
->> entry (SPTE) and replace hard-coded value 0 for it.  Initialize 
->> shadow page
->> tables with their value.
->>
->> The plan is to unconditionally set the "suppress #VE" bit for both 
->> AMD and
->> Intel as: 1) AMD hardware doesn't use this bit; 2) for conventional VMX
->> guests, KVM never enables the "EPT-violation #VE" in VMCS control and
->> "suppress #VE" bit is ignored by hardware.
->>
->> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> ---
->>   arch/x86/kvm/mmu/mmu.c     | 50 +++++++++++++++++++++++++++++++++-----
->>   arch/x86/kvm/mmu/spte.h    |  2 ++
->>   arch/x86/kvm/mmu/tdp_mmu.c | 15 ++++++------
->>   3 files changed, 54 insertions(+), 13 deletions(-)
->>
->> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
->> index 10017a9f26ee..e7e11f51f8b4 100644
->> --- a/arch/x86/kvm/mmu/mmu.c
->> +++ b/arch/x86/kvm/mmu/mmu.c
->> @@ -538,9 +538,9 @@ static u64 mmu_spte_clear_track_bits(struct kvm 
->> *kvm, u64 *sptep)
->>         if (!is_shadow_present_pte(old_spte) ||
->>           !spte_has_volatile_bits(old_spte))
->> -        __update_clear_spte_fast(sptep, 0ull);
->> +        __update_clear_spte_fast(sptep, SHADOW_NONPRESENT_VALUE);
->>       else
->> -        old_spte = __update_clear_spte_slow(sptep, 0ull);
->> +        old_spte = __update_clear_spte_slow(sptep, 
->> SHADOW_NONPRESENT_VALUE);
->>         if (!is_shadow_present_pte(old_spte))
->>           return old_spte;
->> @@ -574,7 +574,7 @@ static u64 mmu_spte_clear_track_bits(struct kvm 
->> *kvm, u64 *sptep)
->>    */
->>   static void mmu_spte_clear_no_track(u64 *sptep)
->>   {
->> -    __update_clear_spte_fast(sptep, 0ull);
->> +    __update_clear_spte_fast(sptep, SHADOW_NONPRESENT_VALUE);
->>   }
->>     static u64 mmu_spte_get_lockless(u64 *sptep)
->> @@ -642,6 +642,39 @@ static void walk_shadow_page_lockless_end(struct 
->> kvm_vcpu *vcpu)
->>       }
->>   }
->
-> Why the changes in mmu_spte_clear_track_bits and 
-> mmu_spte_clear_no_track are not handled differently for X86_64 and non 
-> X86_64 as the shadow page init below?
-> It seems the two functions are the common code.
+If so, then judging the (0,0) --> (1,0) case in the else{} branch is
+inevitable, isn't it?
 
-I see there are different definitions of SHADOW_NONPRESENT_VALUE for 
-X86_64 and  non X86_64 in the following patch.
-So got the answer now. : )
+Or totally remove the skip_tlb_flush logic in this function, but this
+would break existing logic. You won't like it. 
+> 
+> It also would be nice to get LAM documentation updated on the
+> expected
+> behaviour. It is not clear from current documentation if enabling LAM
+> causes flush. We can only guess that it should at least for some
+> scenarios.
+> 
+> Phantom TLB entires that resurface after LAM gets disable would be
+> fun to
+> debug.
+> 
+Agree, and echo your conservativeness.
 
-
->
->
->> +#ifdef CONFIG_X86_64
->> +static inline void kvm_init_shadow_page(void *page)
->> +{
->> +    memset64(page, SHADOW_NONPRESENT_VALUE, 4096 / 8);
->> +}
->> +
->> +static int mmu_topup_shadow_page_cache(struct kvm_vcpu *vcpu)
->> +{
->> +    struct kvm_mmu_memory_cache *mc = 
->> &vcpu->arch.mmu_shadow_page_cache;
->> +    int start, end, i, r;
->> +
->> +    start = kvm_mmu_memory_cache_nr_free_objects(mc);
->> +    r = kvm_mmu_topup_memory_cache(mc, PT64_ROOT_MAX_LEVEL);
->> +
->> +    /*
->> +     * Note, topup may have allocated objects even if it failed to 
->> allocate
->> +     * the minimum number of objects required to make forward 
->> progress _at
->> +     * this time_.  Initialize newly allocated objects even on 
->> failure, as
->> +     * userspace can free memory and rerun the vCPU in response to 
->> -ENOMEM.
->> +     */
->> +    end = kvm_mmu_memory_cache_nr_free_objects(mc);
->> +    for (i = start; i < end; i++)
->> +        kvm_init_shadow_page(mc->objects[i]);
->> +    return r;
->> +}
->> +#else
->> +static int mmu_topup_shadow_page_cache(struct kvm_vcpu *vcpu)
->> +{
->> +    return 
->> kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
->> +                      PT64_ROOT_MAX_LEVEL);
->> +}
->> +#endif /* CONFIG_X86_64 */
->> +
->>   static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool 
->> maybe_indirect)
->>   {
->>       int r;
->> @@ -651,8 +684,7 @@ static int mmu_topup_memory_caches(struct 
->> kvm_vcpu *vcpu, bool maybe_indirect)
->>                          1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
->>       if (r)
->>           return r;
->> -    r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
->> -                       PT64_ROOT_MAX_LEVEL);
->> +    r = mmu_topup_shadow_page_cache(vcpu);
->>       if (r)
->>           return r;
->>       if (maybe_indirect) {
->> @@ -5870,7 +5902,13 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
->>       vcpu->arch.mmu_page_header_cache.kmem_cache = 
->> mmu_page_header_cache;
->>       vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
->>   -    vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
->> +    /*
->> +     * When X86_64, initial SEPT entries are initialized with
->> +     * SHADOW_NONPRESENT_VALUE.  Otherwise zeroed.  See
->> +     * mmu_topup_shadow_page_cache().
->> +     */
->> +    if (!IS_ENABLED(CONFIG_X86_64))
->> +        vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
->>         vcpu->arch.mmu = &vcpu->arch.root_mmu;
->>       vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
->> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
->> index 7670c13ce251..42ecaa75da15 100644
->> --- a/arch/x86/kvm/mmu/spte.h
->> +++ b/arch/x86/kvm/mmu/spte.h
->> @@ -148,6 +148,8 @@ static_assert(MMIO_SPTE_GEN_LOW_BITS == 8 && 
->> MMIO_SPTE_GEN_HIGH_BITS == 11);
->>     #define MMIO_SPTE_GEN_MASK GENMASK_ULL(MMIO_SPTE_GEN_LOW_BITS + 
->> MMIO_SPTE_GEN_HIGH_BITS - 1, 0)
->>   +#define SHADOW_NONPRESENT_VALUE    0ULL
->> +
->>   extern u64 __read_mostly shadow_host_writable_mask;
->>   extern u64 __read_mostly shadow_mmu_writable_mask;
->>   extern u64 __read_mostly shadow_nx_mask;
->> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
->> index eab765442d0b..38bc4c2f0f1f 100644
->> --- a/arch/x86/kvm/mmu/tdp_mmu.c
->> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
->> @@ -694,7 +694,7 @@ static inline int tdp_mmu_zap_spte_atomic(struct 
->> kvm *kvm,
->>        * here since the SPTE is going from non-present to 
->> non-present.  Use
->>        * the raw write helper to avoid an unnecessary check on 
->> volatile bits.
->>        */
->> -    __kvm_tdp_mmu_write_spte(iter->sptep, 0);
->> +    __kvm_tdp_mmu_write_spte(iter->sptep, SHADOW_NONPRESENT_VALUE);
->>         return 0;
->>   }
->> @@ -871,8 +871,8 @@ static void __tdp_mmu_zap_root(struct kvm *kvm, 
->> struct kvm_mmu_page *root,
->>               continue;
->>             if (!shared)
->> -            tdp_mmu_set_spte(kvm, &iter, 0);
->> -        else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0))
->> +            tdp_mmu_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
->> +        else if (tdp_mmu_set_spte_atomic(kvm, &iter, 
->> SHADOW_NONPRESENT_VALUE))
->>               goto retry;
->>       }
->>   }
->> @@ -928,8 +928,9 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct 
->> kvm_mmu_page *sp)
->>       if (WARN_ON_ONCE(!is_shadow_present_pte(old_spte)))
->>           return false;
->>   -    __tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, 
->> old_spte, 0,
->> -               sp->gfn, sp->role.level + 1, true, true);
->> +    __tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte,
->> +               SHADOW_NONPRESENT_VALUE, sp->gfn, sp->role.level + 1,
->> +               true, true);
->>         return true;
->>   }
->> @@ -963,7 +964,7 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, 
->> struct kvm_mmu_page *root,
->>               !is_last_spte(iter.old_spte, iter.level))
->>               continue;
->>   -        tdp_mmu_set_spte(kvm, &iter, 0);
->> +        tdp_mmu_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
->>           flush = true;
->>       }
->>   @@ -1328,7 +1329,7 @@ static bool set_spte_gfn(struct kvm *kvm, 
->> struct tdp_iter *iter,
->>        * invariant that the PFN of a present * leaf SPTE can never 
->> change.
->>        * See __handle_changed_spte().
->>        */
->> -    tdp_mmu_set_spte(kvm, iter, 0);
->> +    tdp_mmu_set_spte(kvm, iter, SHADOW_NONPRESENT_VALUE);
->>         if (!pte_write(range->pte)) {
->>           new_spte = 
->> kvm_mmu_changed_pte_notifier_make_spte(iter->old_spte,
