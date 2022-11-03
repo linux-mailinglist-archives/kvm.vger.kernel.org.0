@@ -2,74 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EDCA861744D
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 03:35:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BE15617452
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 03:38:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230296AbiKCCfV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 22:35:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34932 "EHLO
+        id S230336AbiKCCiE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 22:38:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229992AbiKCCfT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 22:35:19 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99C2312A95;
-        Wed,  2 Nov 2022 19:35:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667442918; x=1698978918;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=qijP8nV44V8zutbFDZIO/Mf+o2BCycasqhn7uJt8cGs=;
-  b=oIpOm9CtQ9VRxWBdAM/byt3DohYPSjgr0K5JykGP43d5IV6hCnKO0Hd3
-   bvdlaFoj2sih4bZTbr0BGUsVY0DKAyhyLKAJnZLlTbMyabj3mUha9vvzT
-   Y4R6FEoL4O3ZnOonjwuEGyglK2g2OQ1PLJ4KeTcpYcrYwYYTAD1Ubo9w0
-   /c+evCIq5RP/s2d3mXxk3wfeM3jbWDgIaW+sfK1yVz7UtBblIAZoJjV5c
-   nbbAGvvKHyaJ/e0s7cq8q69SqZ6cnwrlQRWeWJhBrUHgfAlKkbz65ZyE/
-   JFaHJDRCua5nKf0ZH6wHrb/Vxvtqs15h9r7bIiZWP2Lrrm44KDkx03onG
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="309566806"
-X-IronPort-AV: E=Sophos;i="5.95,235,1661842800"; 
-   d="scan'208";a="309566806"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2022 19:35:18 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="759775361"
-X-IronPort-AV: E=Sophos;i="5.95,235,1661842800"; 
-   d="scan'208";a="759775361"
-Received: from jiaxiche-mobl.ccr.corp.intel.com (HELO [10.238.2.23]) ([10.238.2.23])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2022 19:35:12 -0700
-Message-ID: <e4a17902-e11b-fe1e-30b8-16eefd443883@linux.intel.com>
-Date:   Thu, 3 Nov 2022 10:35:04 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH 1/6] x86: KVM: Enable CMPccXADD CPUID and expose it to
- guest
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
-        ndesaulniers@google.com, alexandre.belloni@bootlin.com,
-        peterz@infradead.org, jpoimboe@kernel.org,
-        chang.seok.bae@intel.com, pawan.kumar.gupta@linux.intel.com,
-        babu.moger@amd.com, jmattson@google.com, sandipan.das@amd.com,
-        tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        fenghua.yu@intel.com, keescook@chromium.org,
-        jane.malalane@citrix.com, nathan@kernel.org,
+        with ESMTP id S229866AbiKCCiC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 22:38:02 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63FD712A95;
+        Wed,  2 Nov 2022 19:38:00 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id d13-20020a17090a3b0d00b00213519dfe4aso561312pjc.2;
+        Wed, 02 Nov 2022 19:38:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jRNCs2fd3UsRFb9r1y0twS4Yp6GOe3jwOJN7LNY2xm4=;
+        b=h4S9i5ttXBaxuB9R/I6Hk7fTETigk03EgjJb8pQyiGlx22czeeRnSjMQbzk9BMUIJo
+         n24kmW5ifClcwoxUV41Nk8SeMKJeG4Yu4jxFyRPmC24nCXnS7QD0EesXge6XJIMFzHuP
+         bVvtAQJCpKK858pC576CRj/V7bixhi9CECIjmPfR04OEP7gkmr1AVHS3pulQHlqQZOdk
+         FfqNqNQ6/nAktm7S5eRhEUa9/F09i/+HAeYMy522A6eqBkZXktV2X68rbfLg/XIvqoya
+         eLg9bDhesAWInAdwsvbR9m0cktH9TVYistrt6k56pLC/4d2R8NHX223zv80xsj9kGH8r
+         DT1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jRNCs2fd3UsRFb9r1y0twS4Yp6GOe3jwOJN7LNY2xm4=;
+        b=6+Kvne1UTl9tPqKj2O0KCTYdJQG2q1+Bt1k7c1IbL0zcBaQKPx6g9iz5EzmUgdHPZT
+         +pxAqSqWDq7eiDYG9qTUy2BJ44lBFbWr7FJ/868N5moRTbn1MqmNLmz+gbt2GRV8pCG+
+         c6s0hmJ5OuO0aqGxmDdVGxKTJciQXGtDKh5lmWnraKndWa7kT32ds6F+WfpGCQphSZK1
+         uIDu+Bw43IPwXzXY0NsPAkz8yNqcs0MzEJj8HNOmguaXmNISDu07wXxtXOVtOTVD2npe
+         LOvJBHWrqKQRPES1CrPSaYY8K6PIuYdJQYtuJ+xOeo8fvrP/sPogmC1LWKG9daES7PQu
+         ZkVg==
+X-Gm-Message-State: ACrzQf3MLijDtFb0ceB28I9/m3w4RKpavCejragSZtNlt8FlzoUV0gcb
+        zlNObWhNDiBEhPAGDnYH7P4=
+X-Google-Smtp-Source: AMsMyM6imzg64dN+TbDK2pPP7Xz5Bg39zIg7DMjJDG00aehbhzFFTO6tqh9Uw4bikHlU0vFxBFQUwg==
+X-Received: by 2002:a17:90a:ca13:b0:213:b85a:3bdb with SMTP id x19-20020a17090aca1300b00213b85a3bdbmr24782163pjt.97.1667443079402;
+        Wed, 02 Nov 2022 19:37:59 -0700 (PDT)
+Received: from debian.me (subs02-180-214-232-93.three.co.id. [180.214.232.93])
+        by smtp.gmail.com with ESMTPSA id mt16-20020a17090b231000b0020d48bc6661sm2137880pjb.31.2022.11.02.19.37.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Nov 2022 19:37:58 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+        id 28C5310402C; Thu,  3 Nov 2022 09:37:54 +0700 (WIB)
+Date:   Thu, 3 Nov 2022 09:37:54 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     Liao Chang <liaochang1@huawei.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20221019084734.3590760-1-jiaxi.chen@linux.intel.com>
- <20221019084734.3590760-2-jiaxi.chen@linux.intel.com>
- <Y1AUhlwWjIkKfZHA@google.com>
- <cce514da-32b4-3b84-cfad-67a05705bc9f@linux.intel.com>
- <Y1lrGgyIcgweVGup@zn.tnic>
- <ad24c33d-8f07-4d73-136f-ad16bb2b1981@linux.intel.com>
- <Y2E2G9Q2wKJnc8dx@google.com>
-From:   Jiaxi Chen <jiaxi.chen@linux.intel.com>
-In-Reply-To: <Y2E2G9Q2wKJnc8dx@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-8.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Subject: Re: [PATCH 2/2] KVM: x86: Fix a typo about the usage of kvcalloc()
+Message-ID: <Y2Mpgm+zEetfZlWM@debian.me>
+References: <20221103011749.139262-1-liaochang1@huawei.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="g7Bj2J/Ny5mTe2nT"
+Content-Disposition: inline
+In-Reply-To: <20221103011749.139262-1-liaochang1@huawei.com>
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -77,51 +76,30 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 11/1/2022 11:07 PM, Sean Christopherson wrote:
-> On Tue, Nov 01, 2022, Jiaxi Chen wrote:
->>
->>
->> On 10/27/2022 1:15 AM, Borislav Petkov wrote:
->>> On Wed, Oct 26, 2022 at 11:40:31AM +0800, Jiaxi Chen wrote:
->>>>> What do you think about moving CPUID_7_1_EAX to be a KVM-only leaf too?  AFAICT,
->>>>> KVM passthrough is the only reason the existing features are defined.
->>>
->>> Yap, looking at the patches which added those 2 feature flags upstream,
->>> they don't look like some particular use was the goal but rather to
->>> expose it to guests. Besides, AVX512 apps do their own CPUID detection.
->>>
->>>> Since CPUID_7_1_EAX has only 5 features now, it is a big waste,       
->>>> should we move it to KVM-only leaf as Sean suggested. What's your     
->>>> opinion about this?                                                   
->>>
->>> Yes, pls do.
->>>
->>> And when you do, make sure to undo what
->>>
->>>   b302e4b176d0 ("x86/cpufeatures: Enumerate the new AVX512 BFLOAT16 instructions")
->>>
->>> added.
->>>
->>> Thx.
->>>
->> Hi Sean and Boris,
->>
->> Just realized moving CPUID_7_1_EAX to kvm-only leaf will not save space
->> in enum cpuid_leafs[]. CPUID_7_1_EAX is indeed removed, but someone
->> else, ie. CPUID_DUMMY needs to take the place, otherwise the cpuid_leafs
->> array would be deranged. Therefore, the length of x86 cpuid leaves is
->> not decreased.
-> 
-> The order of "enum cpuid_leafs" is completely arbitrary.
-> 
-> After replacing CPUID_7_1_EAX with CPUID_DUMMY, replace CPUID_DUMMY with the last
-> leaf, which is currently CPUID_8000_001F_EAX, and update the #defines accordingly.
-> Alternatively, Boris may prefer skipping the intermediate CPUID_DUMMY step and
-> just replace CPUID_7_1_EAX with CPUID_8000_001F_EAX straightaway.
+--g7Bj2J/Ny5mTe2nT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Yes, thanks for Sean's kind suggestion. I think use CPUID_DUMMY as the
-transition leaf will make the code logic and commit message clearer.
-Will change it in v2.
--- 
-Regards,
-Jiaxi
+On Thu, Nov 03, 2022 at 09:17:49AM +0800, Liao Chang wrote:
+> Swap the 1st and 2nd arguments to be consistent with the usage of
+> kvcalloc().
+>=20
+
+This isn't typofix as suggested from the patch subject, right?
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--g7Bj2J/Ny5mTe2nT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY2MpfgAKCRD2uYlJVVFO
+o7viAPkBnv2MutmdeR8i1olYydOxlacezVPJ3lXxLELtoChVDQEAkadliI+V3GQb
+jLNxotI2n263ofu9eEIO7nxvdr2SeAo=
+=0KCs
+-----END PGP SIGNATURE-----
+
+--g7Bj2J/Ny5mTe2nT--
