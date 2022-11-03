@@ -2,95 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CAC72617E82
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 14:56:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C335617E92
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 14:58:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231589AbiKCN4e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 09:56:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50722 "EHLO
+        id S231459AbiKCN6t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 09:58:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbiKCN4d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 09:56:33 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7266B13D7A;
-        Thu,  3 Nov 2022 06:56:32 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id io19so1990154plb.8;
-        Thu, 03 Nov 2022 06:56:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ign6P2397IfFIK8m+Wt90gPlj7W1vvnJv9kawkVb51E=;
-        b=HI60mlPg8m4ViBKO0Ko7cuIw5CWkpo8OHY1k84Ajd5UAw+zDBFvmBRD4QqqhAkWjrN
-         lNmUO5a0U0c9OsgC2lnIcjG0iXaXQwj1Rjdhdq3CWXM3n20R6+lqm1pCRuvrf7JrLUxY
-         ty8hjsDXeWQExDcegMa7fgsxIufgE5FGrldncF2oy/UlSjaix/bMMutFDFEgSiuDnZQO
-         0DgEIpgx/XfW3tmQMZa/NUd6jvrjEc1L14YPWBE1ZcnUtLREdMF8hBrirywpkLkCcwtx
-         B38Pd5TkQTOi5rbP8ECHzsFmcft2lugGBX2bI3whqkTYnqsAwTPuWQomeqr5pzoOSuec
-         9FCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ign6P2397IfFIK8m+Wt90gPlj7W1vvnJv9kawkVb51E=;
-        b=OMTMIziAe3R9XIwA4OSkxc4H44Z0tTRt7WZJ4eM6zcnFln10CpSnoVq1Xo73eYEfUN
-         dxkDCPrNZgaKQt84tqT+rqczvIHQHOULMpGtOdYLQZ7xY9K0d+ZbGcMZk87v6CJicfqi
-         /C9vOnLnv1n1fW4YSkJlhQiRPU5LeSJ6udbkxEH1oMcAMd5JsHNJ9w/HdfGzkiRkJIHK
-         HFZkp3CUHdXavM+DhuiGWJLYIA9617omZ9fzg4CHJvhJigfD4iXPgbwLFa0+74nRkwAN
-         4jWzuOHJw0BLNF4OeCG5S8Af02TXxmjGdoTsEYKrPxz+GQdKVnMOuI26dt8/iwxUN3LW
-         /L7g==
-X-Gm-Message-State: ACrzQf2DIuv5/JmZdxq/JqDh0FfFv2L0LR5LIly7iJgc1LWbS1VuYpqm
-        JCJgZKP9LSotyR/bibg6upE=
-X-Google-Smtp-Source: AMsMyM4vIEMLHQ7RSu1HWrdVM/SWZEWnhtUUleBmGwGYurtfIHzBYGeVcxvcjRtNSl0mHNh1iLLDqg==
-X-Received: by 2002:a17:90b:1c8d:b0:203:cc25:4eb5 with SMTP id oo13-20020a17090b1c8d00b00203cc254eb5mr31460357pjb.132.1667483791949;
-        Thu, 03 Nov 2022 06:56:31 -0700 (PDT)
-Received: from [192.168.43.80] (subs02-180-214-232-12.three.co.id. [180.214.232.12])
-        by smtp.gmail.com with ESMTPSA id b6-20020a170903228600b00187033cac81sm689757plh.145.2022.11.03.06.56.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Nov 2022 06:56:31 -0700 (PDT)
-Message-ID: <5636b9a1-dbb8-5ab3-8b56-05f6faaccded@gmail.com>
-Date:   Thu, 3 Nov 2022 20:56:25 +0700
+        with ESMTP id S231144AbiKCN6p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 09:58:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E46E1402E
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 06:57:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667483864;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=fUsqybhXp/D82YuS/O33LZfOTzfFB038d5lKiyOEhC8=;
+        b=JJHt7TaPaevjU3CwkgkvxwpGgCqwycXTzmshRJLSF17+VPVZ4NimTlE4z3B7U7n38VL2A+
+        aJ7KDlWqPmJc4ehH+vRohouldgf/v56QOLvdjq7NiCJDzDOVVCUfIPxGdwTx1NhSXFvWxv
+        rcASehiB1iNWclMETplvf98npVxcrxw=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-528-wG8_w1AzN_-3brZ9aiF0Rw-1; Thu, 03 Nov 2022 09:57:41 -0400
+X-MC-Unique: wG8_w1AzN_-3brZ9aiF0Rw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BD30A3815D2F;
+        Thu,  3 Nov 2022 13:57:40 +0000 (UTC)
+Received: from amdlaptop.tlv.redhat.com (dhcp-4-238.tlv.redhat.com [10.35.4.238])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 52F8B40C2140;
+        Thu,  3 Nov 2022 13:57:37 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kselftest@vger.kernel.org
+Subject: [PATCH 0/9] nSVM: Security and correctness fixes
+Date:   Thu,  3 Nov 2022 15:57:27 +0200
+Message-Id: <20221103135736.42295-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [External] Re: [RFC 1/6] KVM: arm64: Document PV-lock interface
-Content-Language: en-US
-To:     Usama Arif <usama.arif@bytedance.com>
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
-        yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-        maz@kernel.org, steven.price@arm.com, mark.rutland@arm.com,
-        fam.zheng@bytedance.com, liangma@liangbit.com,
-        punit.agrawal@bytedance.com
-References: <20221102161340.2982090-1-usama.arif@bytedance.com>
- <20221102161340.2982090-2-usama.arif@bytedance.com>
- <Y2M6eU6xW7jjVQNx@debian.me>
- <61800b69-5f6a-d173-fc42-628ee3db15d8@bytedance.com>
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <61800b69-5f6a-d173-fc42-628ee3db15d8@bytedance.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/3/22 20:15, Usama Arif wrote:
-> Hi,
-> 
-> Thanks for the review. I will include the changes in the next version I send for pvlock. I have sent a patch to fix pvtime here https://lore.kernel.org/all/20221103131210.3603385-1-usama.arif@bytedance.com/.
-> 
-
-Please please please *DON'T* top-post; reply inline instead.
-
--- 
-An old man doll... just what I always wanted! - Clara
+Recently while trying to fix some unit tests I found a CVE in SVM nested co=
+de.=0D
+=0D
+In 'shutdown_interception' vmexit handler we call kvm_vcpu_reset.=0D
+=0D
+However if running nested and L1 doesn't intercept shutdown, we will still =
+end=0D
+up running this function and trigger a bug in it.=0D
+=0D
+The bug is that this function resets the 'vcpu->arch.hflags' without proper=
+ly=0D
+leaving the nested state, which leaves the vCPU in inconsistent state, whic=
+h=0D
+later triggers a kernel panic in SVM code.=0D
+=0D
+The same bug can likely be triggered by sending INIT via local apic to a vC=
+PU=0D
+which runs a nested guest.=0D
+=0D
+On VMX we are lucky that the issue can't happen because VMX always intercep=
+ts=0D
+triple faults, thus triple fault in L2 will always be redirected to L1.=0D
+Plus the 'handle_triple_fault' of VMX doesn't reset the vCPU.=0D
+=0D
+INIT IPI can't happen on VMX either because INIT events are masked while in=
+=0D
+VMX mode.=0D
+=0D
+First 4 patches in this series address the above issue, and are=0D
+already posted on the list with title,=0D
+('nSVM: fix L0 crash if L2 has shutdown condtion which L1 doesn't intercept=
+')=0D
+I addressed the review feedback and also added a unit test to hit this issu=
+e.=0D
+=0D
+In addition to these patches I noticed that KVM doesn't honour SHUTDOWN int=
+ercept bit=0D
+of L1 on SVM, and I included a fix to do so - its only for correctness=0D
+as a normal hypervisor should always intercept SHUTDOWN.=0D
+A unit test on the other hand might want to not do so.=0D
+I also extendted the triple_fault_test selftest to hit this issue.=0D
+=0D
+Finaly I found another security issue, I found a way to=0D
+trigger a kernel non rate limited printk on SVM from the guest, and=0D
+last patch in the series fixes that.=0D
+=0D
+A unit test I posted to kvm-unit-tests project hits this issue, so=0D
+no selftest was added.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (9):=0D
+  KVM: x86: nSVM: leave nested mode on vCPU free=0D
+  KVM: x86: nSVM: harden svm_free_nested against freeing vmcb02 while=0D
+    still in use=0D
+  KVM: x86: add kvm_leave_nested=0D
+  KVM: x86: forcibly leave nested mode on vCPU reset=0D
+  KVM: selftests: move idt_entry to header=0D
+  kvm: selftests: add svm nested shutdown test=0D
+  KVM: x86: allow L1 to not intercept triple fault=0D
+  KVM: selftests: add svm part to triple_fault_test=0D
+  KVM: x86: remove exit_int_info warning in svm_handle_exit=0D
+=0D
+ arch/x86/kvm/svm/nested.c                     | 12 +++-=0D
+ arch/x86/kvm/svm/svm.c                        | 10 +--=0D
+ arch/x86/kvm/vmx/nested.c                     |  4 +-=0D
+ arch/x86/kvm/x86.c                            | 29 ++++++--=0D
+ tools/testing/selftests/kvm/.gitignore        |  1 +=0D
+ tools/testing/selftests/kvm/Makefile          |  1 +=0D
+ .../selftests/kvm/include/x86_64/processor.h  | 13 ++++=0D
+ .../selftests/kvm/lib/x86_64/processor.c      | 13 ----=0D
+ .../kvm/x86_64/svm_nested_shutdown_test.c     | 71 +++++++++++++++++++=0D
+ .../kvm/x86_64/triple_fault_event_test.c      | 71 ++++++++++++++-----=0D
+ 10 files changed, 174 insertions(+), 51 deletions(-)=0D
+ create mode 100644 tools/testing/selftests/kvm/x86_64/svm_nested_shutdown_=
+test.c=0D
+=0D
+-- =0D
+2.34.3=0D
+=0D
 
