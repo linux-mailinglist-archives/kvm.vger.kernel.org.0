@@ -2,65 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90C5A617314
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 00:56:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4C48617333
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 01:05:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230077AbiKBX4Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 19:56:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37060 "EHLO
+        id S231181AbiKCAFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 20:05:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229971AbiKBX4W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 19:56:22 -0400
-Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21F362713
-        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 16:56:22 -0700 (PDT)
-Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-37063f855e5so1469327b3.3
-        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 16:56:22 -0700 (PDT)
+        with ESMTP id S230077AbiKCAFd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 20:05:33 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 502DA2678;
+        Wed,  2 Nov 2022 17:05:32 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id v28so135083pfi.12;
+        Wed, 02 Nov 2022 17:05:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hbEcN1ifRG0CLzWvNQBxXgvfGWN0lKUpPYRl5gmu4FU=;
-        b=JztyOTKcpKoSooxqm6kzxpGVcQaUNpEPtBGjMGlx+txcfMnZIHPW4Vr/YTVo4vNCJv
-         TqwggrFPie8wgyV9N/oVdcAour3FqyikMEHcphFyTjEg5EE8LaGqf55kDpFe9658rOUp
-         kSpaEkxPonYF7/4/fUbPnoBu7coRsiiCVv4nASChho/qS+KKYlxi/aloQCJ0mm7kC4kW
-         uBhEvFlY9NSm1ILJy3nW8JruaBS2JoDujoqROcWTeBz6lZk4IUVAJ44F2jCoQ1eZTesI
-         V/19jIpiecZ2xKxMVSnMKA/DVETclR7075qc7X5dMjajebkoR8nAgsFypDzwW96h9id7
-         LAkA==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=gN1mKfLTOfiBIachHef1NvCz2+Mp1pI1D3scxDhbX2Q=;
+        b=VoMoH5s1BaOgvMgxmxoaPSwIJ8csJ12qeDMhgkAZfx8dggO8aBmKyGFJonnw5N6UAG
+         uOyMsPS8VtwD9n0cMlotq0o8rXdSvdDihbRJv8fdd44k6IvqOu3iiqi2vkH/59wOnESa
+         YmgBDkdpDxqVv06Pcx3IaPrLjCgM6zzJKIA+LyqViCr64R3kbryML579QXUXMVq9j6N8
+         nJEO8kUqLntVvB9FMuX3dW0JCOmIuHZRzQRQj791lZdM99vhP/1f5vDsiImKbwM9oLRJ
+         KNtkrhOBSsXZ2bjFUnZhPWWCRDpIVGUZlPaSV3VmIZ3QDGCN5qzRxtstIYDwcew2bZJ0
+         dMyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hbEcN1ifRG0CLzWvNQBxXgvfGWN0lKUpPYRl5gmu4FU=;
-        b=ojRPqsYymfBK707LVJbQcl6l+uHDH92eR2oSgJw0EURAUEcCOGW6kHv34DgqV5DrMI
-         Nc2Ix0Mufca0xr9uzAR+i0Isvy4NI+qaLXpjpr+tcvxK8iP3Eo7wsOzHOaZF8jknteoI
-         dycuWP3F59CA9ZVs3s1rn7RyEKVJKETKUtuDvkub2GgUJk2NAFSTexzJkiInojTzX+gg
-         SesfeBI5sf0an3OVGzq6gh71BhTrGMTMIoFJ0FT88j23DlLvV+T2Pag2vuVVXwymDIYI
-         YA+cad9d4PoBffaB8CtugkFUCjrX5gQZmGsRSMh3d9Rxl2hvZKD0f+VsnSuq8OU+fr8t
-         baNQ==
-X-Gm-Message-State: ACrzQf2js4IsqgVh3Z/66p3dIBBwfdkmkwZhY6bpYJTmOfogbFD+Doc0
-        54xTAWLAs+2Jdfsh8HDIUNx4IfvRS/MdUU132py47A==
-X-Google-Smtp-Source: AMsMyM4arCSKEYjf7qDPMDZ68LREMOfC2nyuDJ4TOc39/x6JfKweB4Lw4nYUBWmDRnz4WQPd7gdO3QFFkbEUKiFMlto=
-X-Received: by 2002:a81:16c2:0:b0:36f:f574:4a49 with SMTP id
- 185-20020a8116c2000000b0036ff5744a49mr25907159yww.111.1667433381299; Wed, 02
- Nov 2022 16:56:21 -0700 (PDT)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gN1mKfLTOfiBIachHef1NvCz2+Mp1pI1D3scxDhbX2Q=;
+        b=O67LWDHl9Xv/bEWja18lw8QC6ySVxdwQkpFUsxNFbeb47qUz2uCpT/uS+6MtNPyaId
+         /keFOZh16/queb7IcGW2bNidBIf/mE5xJ1PMrJCpAJZ8Q1jVf0Jxpv/XVTHEYPPI3Rxs
+         hN4bt/EWy3z3SSsgHzbFu8eryGT+fH8/f8t9ji6n9EvlHyyYA3FUnqeoZirUPDkacs+r
+         5CzSzwQZneWmua8HpcZR/o0vxgoVtGIsBRVYWKU1UbHoMCpJphIKcmzi0KGohJWhzTRW
+         7UiKiPiygPibXksZdPDGQaCzfwyCfW5WH5s+/eXs9wmUMMu00+sDwsa47rS4Pz7vUI7x
+         jovQ==
+X-Gm-Message-State: ACrzQf2v78JFz7tLEuv09XvSJHZ94/zALD7wgt5T9ubYuKZ7I7KCxeH8
+        SbdSa/sFSYpDRLDM1hzG1TFwwxj0pp4=
+X-Google-Smtp-Source: AMsMyM6g7lsgrfrPjXE/AcpfOSIAQAVmLQDsXcOWJ3BZT8e2elxDiXSDqV8yNe2gtN5nJ1oRn4LM3w==
+X-Received: by 2002:a63:1f5c:0:b0:469:d0e6:dac0 with SMTP id q28-20020a631f5c000000b00469d0e6dac0mr23190352pgm.427.1667433931649;
+        Wed, 02 Nov 2022 17:05:31 -0700 (PDT)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id s16-20020a170902ea1000b001837b19ebb8sm8955062plg.244.2022.11.02.17.05.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Nov 2022 17:05:30 -0700 (PDT)
+Date:   Wed, 2 Nov 2022 17:05:30 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v10 010/108] KVM: TDX: Add TDX "architectural" error codes
+Message-ID: <20221103000530.GA954260@ls.amr.corp.intel.com>
+References: <cover.1667110240.git.isaku.yamahata@intel.com>
+ <679bb45187dc54b82ebc9df5381a7d5de0b782d5.1667110240.git.isaku.yamahata@intel.com>
+ <f1fdc428-f407-9582-c392-579f873f7562@linux.intel.com>
 MIME-Version: 1.0
-References: <20221102160007.1279193-1-coltonlewis@google.com> <Y2L/cWBjAtGheXNw@google.com>
-In-Reply-To: <Y2L/cWBjAtGheXNw@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Wed, 2 Nov 2022 16:55:55 -0700
-Message-ID: <CALzav=cJZn1y8xoQ7bAgraewWOn9oDZnQdmxp-cZfeNh-VgtKw@mail.gmail.com>
-Subject: Re: [PATCH v9 0/4] randomize memory access of dirty_log_perf_test
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-        ricarkol@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f1fdc428-f407-9582-c392-579f873f7562@linux.intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,15 +79,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 2, 2022 at 4:38 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Nov 02, 2022, Colton Lewis wrote:
-> > Add the ability to randomize parts of dirty_log_perf_test,
-> > specifically the order pages are accessed and whether pages are read
-> > or written.
->
-> David, or anyone else that's intimately familiar with dirty_log_perf_test, can
-> you look over the changes in patches 3 and 4?  They look good to me, but that
-> doesn't mean a whole lot :-)
+On Mon, Oct 31, 2022 at 05:22:13PM +0800,
+Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
-Sure, will do.
+> 
+> On 2022/10/30 14:22, isaku.yamahata@intel.com wrote:
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > 
+> > Add error codes for the TDX SEAMCALLs both for TDX VMM side for TDH
+> > SEAMCALL and TDX guest side for TDG.VP.VMCALL.  KVM issues the TDX
+> > SEAMCALLs and checks its error code.  KVM handles hypercall from the TDX
+> > guest and may return an error.  So error code for the TDX guest is also
+> > needed.
+> > 
+> > TDX SEAMCALL uses bits 31:0 to return more information, so these error
+> > codes will only exactly match RAX[63:32].  Error codes for TDG.VP.VMCALL is
+> > defined by TDX Guest-Host-Communication interface spec.
+> > 
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >   arch/x86/kvm/vmx/tdx_errno.h | 38 ++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 38 insertions(+)
+> >   create mode 100644 arch/x86/kvm/vmx/tdx_errno.h
+> > 
+> > diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
+> > new file mode 100644
+> > index 000000000000..ce246ba62454
+> > --- /dev/null
+> > +++ b/arch/x86/kvm/vmx/tdx_errno.h
+> > @@ -0,0 +1,38 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/* architectural status code for SEAMCALL */
+> > +
+> > +#ifndef __KVM_X86_TDX_ERRNO_H
+> > +#define __KVM_X86_TDX_ERRNO_H
+> > +
+> > +#define TDX_SEAMCALL_STATUS_MASK		0xFFFFFFFF00000000ULL
+> > +
+> > +/*
+> > + * TDX SEAMCALL Status Codes (returned in RAX)
+> > + */
+> > +#define TDX_SUCCESS				0x0000000000000000ULL
+> > +#define TDX_NON_RECOVERABLE_VCPU		0x4000000100000000ULL
+> > +#define TDX_INTERRUPTED_RESUMABLE		0x8000000300000000ULL
+> > +#define TDX_OPERAND_BUSY                        0x8000020000000000ULL
+> 
+> one minor format issue, spaces are used  instread of tabs this line.
+
+Thanks, fixed it locally. It will be include in the next respin.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
