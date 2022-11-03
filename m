@@ -2,226 +2,329 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D08ED617DC9
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 14:22:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BA8D617DDE
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 14:25:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230171AbiKCNWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 09:22:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58686 "EHLO
+        id S229587AbiKCNZg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 09:25:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231725AbiKCNWP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 09:22:15 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DABC13EA3;
-        Thu,  3 Nov 2022 06:22:14 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A3CJrRq005056;
-        Thu, 3 Nov 2022 13:21:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=aFkGVTo1XJsI6iGGvAkxQhjQYKM9aG4FMgppl4Mi3V4=;
- b=oJ1AASijW3z94yCNGRZiFICP24fGSesVBCEC8Xqh2VdcOSvNxBynHuTHaQTYP/QuJhIZ
- NxmeS6rFalfFqEImPhHnqx7l9m0DRnvCkPUBJEJD82t6dDaoo74fFkT92fc23c1D2lHW
- z3uDhJrunZQbC1UjLKk4TC5rJ1OSHSJJw8YRacyK/Fc/6hpMYwSVOCBV4liDhrkRX+s3
- 4vcis021UkJZus/SW5ZDm+zV40sIbdWd/kkCVxmMhKqN9jOyylEeC6toF69LcrW9uRf0
- uYVKNSAlaqCYvq0CZRK55lKcF6VETT9NWK/9cu1NIH0e/BdZ3BvQqVhZ5qiRT66SJqWa IQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kmcabmsme-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Nov 2022 13:21:27 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A3AtXV6006838;
-        Thu, 3 Nov 2022 13:21:26 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kmcabmsjq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Nov 2022 13:21:25 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A3D5ZwC024560;
-        Thu, 3 Nov 2022 13:21:23 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03fra.de.ibm.com with ESMTP id 3kgut8pkgt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Nov 2022 13:21:23 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A3DLJlt63635926
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 3 Nov 2022 13:21:19 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BB3664C04A;
-        Thu,  3 Nov 2022 13:21:19 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C63864C044;
-        Thu,  3 Nov 2022 13:21:18 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  3 Nov 2022 13:21:18 +0000 (GMT)
-Date:   Thu, 3 Nov 2022 14:21:17 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Chao Gao <chao.gao@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 25/44] KVM: s390: Do s390 specific init without bouncing
- through kvm_init()
-Message-ID: <20221103142117.4e27c80c@p-imbrenda>
-In-Reply-To: <20221103134415.5b277ce9@p-imbrenda>
-References: <20221102231911.3107438-1-seanjc@google.com>
-        <20221102231911.3107438-26-seanjc@google.com>
-        <20221103134415.5b277ce9@p-imbrenda>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S230165AbiKCNZe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 09:25:34 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8E000C53;
+        Thu,  3 Nov 2022 06:25:33 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 32C751FB;
+        Thu,  3 Nov 2022 06:25:39 -0700 (PDT)
+Received: from [10.1.39.27] (e122027.cambridge.arm.com [10.1.39.27])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 654313F534;
+        Thu,  3 Nov 2022 06:25:29 -0700 (PDT)
+Message-ID: <76f59579-b701-a243-2a50-72a1401d3a65@arm.com>
+Date:   Thu, 3 Nov 2022 13:25:27 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [RFC 5/6] KVM: arm64: Support the VCPU preemption check
+Content-Language: en-GB
+To:     Usama Arif <usama.arif@bytedance.com>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
+        yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+        maz@kernel.org, mark.rutland@arm.com
+Cc:     fam.zheng@bytedance.com, liangma@liangbit.com,
+        punit.agrawal@bytedance.com
+References: <20221102161340.2982090-1-usama.arif@bytedance.com>
+ <20221102161340.2982090-6-usama.arif@bytedance.com>
+From:   Steven Price <steven.price@arm.com>
+In-Reply-To: <20221102161340.2982090-6-usama.arif@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: qBPHBsV6cFHEd8MUfp3luW546x7XEBtX
-X-Proofpoint-GUID: PZHd2NjudsBQn9w2kOd6Znv6byrMRJIu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-03_04,2022-11-03_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 malwarescore=0 lowpriorityscore=0 suspectscore=0
- phishscore=0 impostorscore=0 adultscore=0 mlxscore=0 mlxlogscore=826
- spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211030090
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 3 Nov 2022 13:44:15 +0100
-Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
+On 02/11/2022 16:13, Usama Arif wrote:
+> Support the vcpu_is_preempted() functionality under KVM/arm64. This will
+> enhance lock performance on overcommitted hosts (more runnable VCPUs
+> than physical CPUs in the system) as doing busy waits for preempted
+> VCPUs will hurt system performance far worse than early yielding.
+> 
+> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
+> Signed-off-by: Usama Arif <usama.arif@bytedance.com>
+> ---
+>  arch/arm64/include/asm/paravirt.h |   2 +
+>  arch/arm64/include/asm/spinlock.h |  16 +++-
+>  arch/arm64/kernel/paravirt.c      | 126 ++++++++++++++++++++++++++++++
+>  arch/arm64/kernel/setup.c         |   3 +
+>  include/linux/cpuhotplug.h        |   1 +
+>  5 files changed, 147 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
+> index 9aa193e0e8f2..4ccb4356c56b 100644
+> --- a/arch/arm64/include/asm/paravirt.h
+> +++ b/arch/arm64/include/asm/paravirt.h
+> @@ -19,10 +19,12 @@ static inline u64 paravirt_steal_clock(int cpu)
+>  }
+>  
+>  int __init pv_time_init(void);
+> +int __init pv_lock_init(void);
+>  
+>  #else
+>  
+>  #define pv_time_init() do {} while (0)
+> +#define pv_lock_init() do {} while (0)
+>  
+>  #endif // CONFIG_PARAVIRT
+>  
+> diff --git a/arch/arm64/include/asm/spinlock.h b/arch/arm64/include/asm/spinlock.h
+> index 0525c0b089ed..7023efa4de96 100644
+> --- a/arch/arm64/include/asm/spinlock.h
+> +++ b/arch/arm64/include/asm/spinlock.h
+> @@ -10,7 +10,20 @@
+>  
+>  /* See include/linux/spinlock.h */
+>  #define smp_mb__after_spinlock()	smp_mb()
+> +#define vcpu_is_preempted vcpu_is_preempted
+> +
+> +#ifdef CONFIG_PARAVIRT
+> +#include <linux/static_call_types.h>
+> +
+> +bool dummy_vcpu_is_preempted(int cpu);
+>  
+> +DECLARE_STATIC_CALL(pv_vcpu_is_preempted, dummy_vcpu_is_preempted);
+> +static inline bool vcpu_is_preempted(int cpu)
+> +{
+> +	return static_call(pv_vcpu_is_preempted)(cpu);
+> +}
+> +
+> +#else
+>  /*
+>   * Changing this will break osq_lock() thanks to the call inside
+>   * smp_cond_load_relaxed().
+> @@ -18,10 +31,11 @@
+>   * See:
+>   * https://lore.kernel.org/lkml/20200110100612.GC2827@hirez.programming.kicks-ass.net
+>   */
+> -#define vcpu_is_preempted vcpu_is_preempted
+>  static inline bool vcpu_is_preempted(int cpu)
+>  {
+>  	return false;
+>  }
+>  
+> +#endif /* CONFIG_PARAVIRT */
+> +
+>  #endif /* __ASM_SPINLOCK_H */
+> diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
+> index 57c7c211f8c7..45bcca87bed7 100644
+> --- a/arch/arm64/kernel/paravirt.c
+> +++ b/arch/arm64/kernel/paravirt.c
+> @@ -22,6 +22,7 @@
+>  
+>  #include <asm/paravirt.h>
+>  #include <asm/pvclock-abi.h>
+> +#include <asm/pvlock-abi.h>
+>  #include <asm/smp_plat.h>
+>  
+>  struct static_key paravirt_steal_enabled;
+> @@ -38,7 +39,12 @@ struct pv_time_stolen_time_region {
+>  	struct pvclock_vcpu_stolen_time __rcu *kaddr;
+>  };
+>  
+> +struct pv_lock_state_region {
+> +	struct pvlock_vcpu_state __rcu *kaddr;
+> +};
+> +
+>  static DEFINE_PER_CPU(struct pv_time_stolen_time_region, stolen_time_region);
+> +static DEFINE_PER_CPU(struct pv_lock_state_region, lock_state_region);
+>  
+>  static bool steal_acc = true;
+>  static int __init parse_no_stealacc(char *arg)
+> @@ -178,3 +184,123 @@ int __init pv_time_init(void)
+>  
+>  	return 0;
+>  }
+> +
+> +static bool native_vcpu_is_preempted(int cpu)
+> +{
+> +	return false;
+> +}
+> +
+> +DEFINE_STATIC_CALL(pv_vcpu_is_preempted, native_vcpu_is_preempted);
+> +
+> +static bool para_vcpu_is_preempted(int cpu)
+> +{
+> +	struct pv_lock_state_region *reg;
+> +	__le64 preempted_le;
+> +
+> +	reg = per_cpu_ptr(&lock_state_region, cpu);
+> +	if (!reg->kaddr) {
+> +		pr_warn_once("PV lock enabled but not configured for cpu %d\n",
+> +			     cpu);
+> +		return false;
+> +	}
+> +
+> +	preempted_le = le64_to_cpu(READ_ONCE(reg->kaddr->preempted));
+> +
+> +	return !!(preempted_le);
+> +}
+> +
+> +static int pvlock_vcpu_state_dying_cpu(unsigned int cpu)
+> +{
+> +	struct pv_lock_state_region *reg;
+> +
+> +	reg = this_cpu_ptr(&lock_state_region);
+> +	if (!reg->kaddr)
+> +		return 0;
+> +
+> +	memunmap(reg->kaddr);
+> +	memset(reg, 0, sizeof(*reg));
+> +
+> +	return 0;
+> +}
+> +
+> +static int init_pvlock_vcpu_state(unsigned int cpu)
+> +{
+> +	struct pv_lock_state_region *reg;
+> +	struct arm_smccc_res res;
+> +
+> +	reg = this_cpu_ptr(&lock_state_region);
+> +
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_LOCK_PREEMPTED, &res);
+> +
+> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED) {
+> +		pr_warn("Failed to init PV lock data structure\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	reg->kaddr = memremap(res.a0,
+> +			      sizeof(struct pvlock_vcpu_state),
+> +			      MEMREMAP_WB);
+> +
+> +	if (!reg->kaddr) {
+> +		pr_warn("Failed to map PV lock data structure\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int kvm_arm_init_pvlock(void)
+> +{
+> +	int ret;
+> +
+> +	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
+> +				"hypervisor/arm/pvlock:starting",
+> +				init_pvlock_vcpu_state,
+> +				pvlock_vcpu_state_dying_cpu);
+> +	if (ret < 0) {
+> +		pr_warn("PV-lock init failed\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static bool has_kvm_pvlock(void)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	/* To detect the presence of PV lock support we require SMCCC 1.1+ */
+> +	if (arm_smccc_1_1_get_conduit() == SMCCC_CONDUIT_NONE)
+> +		return false;
 
-> On Wed,  2 Nov 2022 23:18:52 +0000
-> Sean Christopherson <seanjc@google.com> wrote:
-> 
-> > Move the guts of kvm_arch_init() into a new helper, __kvm_s390_init(),
-> > and invoke the new helper directly from kvm_s390_init() instead of
-> > bouncing through kvm_init().  Invoking kvm_arch_init() is the very
-> > first action performed by kvm_init(), i.e. this is a glorified nop.
-> > 
-> > Moving setup to __kvm_s390_init() will allow tagging more functions as
-> > __init, and emptying kvm_arch_init() will allow dropping the hook
-> > entirely once all architecture implementations are nops.
-> > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/s390/kvm/kvm-s390.c | 29 +++++++++++++++++++++++++----
-> >  1 file changed, 25 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > index 7fcd2d3b3558..e1c9980aae78 100644
-> > --- a/arch/s390/kvm/kvm-s390.c
-> > +++ b/arch/s390/kvm/kvm-s390.c
-> > @@ -461,7 +461,7 @@ static void kvm_s390_cpu_feat_init(void)
-> >  	 */
-> >  }
-> >  
-> > -int kvm_arch_init(void *opaque)
-> > +static int __kvm_s390_init(void)
-> >  {
-> >  	int rc = -ENOMEM;
-> >  
-> > @@ -519,7 +519,7 @@ int kvm_arch_init(void *opaque)
-> >  	return rc;
-> >  }
-> >  
-> > -void kvm_arch_exit(void)
-> > +static void __kvm_s390_exit(void)
-> >  {
-> >  	gmap_unregister_pte_notifier(&gmap_notifier);
-> >  	gmap_unregister_pte_notifier(&vsie_gmap_notifier);
-> > @@ -533,6 +533,16 @@ void kvm_arch_exit(void)
-> >  	debug_unregister(kvm_s390_dbf_uv);
-> >  }
-> >  
-> > +int kvm_arch_init(void *opaque)
-> > +{
-> > +	return 0;
-> > +}
-> > +
-> > +void kvm_arch_exit(void)
-> > +{
-> > +
-> > +}
-> > +  
-> 
-> I wonder at this point if it's possible to define kvm_arch_init and
-> kvm_arch_exit directly in kvm_main.c with __weak
+This is unnecessary as arm_smccc_1_1_invoke() will return failure if
+there's no conduit (or pre-SMCCC 1.1). I suspect this was a copy/paste
+from has_pv_steal_clock() which also has the unnecessary check (patch
+welcome ;) ).
 
-ah, nevermind, you get rid of them completely in the next patch
+> +
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+> +			     ARM_SMCCC_HV_PV_LOCK_FEATURES, &res);
 
-> 
-> >  /* Section: device related */
-> >  long kvm_arch_dev_ioctl(struct file *filp,
-> >  			unsigned int ioctl, unsigned long arg)
-> > @@ -5634,7 +5644,7 @@ static inline unsigned long nonhyp_mask(int i)
-> >  
-> >  static int __init kvm_s390_init(void)
-> >  {
-> > -	int i;
-> > +	int i, r;
-> >  
-> >  	if (!sclp.has_sief2) {
-> >  		pr_info("SIE is not available\n");
-> > @@ -5650,12 +5660,23 @@ static int __init kvm_s390_init(void)
-> >  		kvm_s390_fac_base[i] |=
-> >  			stfle_fac_list[i] & nonhyp_mask(i);
-> >  
-> > -	return kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
-> > +	r = __kvm_s390_init();
-> > +	if (r)
-> > +		return r;
-> > +
-> > +	r = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
-> > +	if (r) {
-> > +		__kvm_s390_exit();
-> > +		return r;
-> > +	}
-> > +	return 0;
-> >  }
-> >  
-> >  static void __exit kvm_s390_exit(void)
-> >  {
-> >  	kvm_exit();
-> > +
-> > +	__kvm_s390_exit();
-> >  }
-> >  
-> >  module_init(kvm_s390_init);  
-> 
+Since this is a 'OWNER_VENDOR_HYP' call this should really be preceded
+by a check that we're running under the expected hypervisor. See e.g.
+kvm_init_hyp_services().
+
+Of course for KVM we already have a (different) discovery mechanism and
+this could be included as a ARM_SMCCC_KVM_FUNC_xxx feature. This
+has_kvm_pvlock() function would then simply be:
+
+static bool has_kvm_pvlock(void)
+{
+	return kvm_arm_hyp_service_available(ARM_SMCC_KVM_FUNC_PVLOCK);
+}
+
+Steve
+
+> +
+> +	if (res.a0 != SMCCC_RET_SUCCESS)
+> +		return false;
+> +
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_LOCK_FEATURES,
+> +			     ARM_SMCCC_HV_PV_LOCK_PREEMPTED, &res);
+> +
+> +	return (res.a0 == SMCCC_RET_SUCCESS);
+> +}
+> +
+> +int __init pv_lock_init(void)
+> +{
+> +	int ret;
+> +
+> +	if (is_hyp_mode_available())
+> +		return 0;
+> +
+> +	if (!has_kvm_pvlock())
+> +		return 0;
+> +
+> +	ret = kvm_arm_init_pvlock();
+> +	if (ret)
+> +		return ret;
+> +
+> +	static_call_update(pv_vcpu_is_preempted, para_vcpu_is_preempted);
+> +	pr_info("using PV-lock preempted\n");
+> +
+> +	return 0;
+> +}
+> \ No newline at end of file
+> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+> index fea3223704b6..05ca07ac5800 100644
+> --- a/arch/arm64/kernel/setup.c
+> +++ b/arch/arm64/kernel/setup.c
+> @@ -42,6 +42,7 @@
+>  #include <asm/cpu_ops.h>
+>  #include <asm/kasan.h>
+>  #include <asm/numa.h>
+> +#include <asm/paravirt.h>
+>  #include <asm/sections.h>
+>  #include <asm/setup.h>
+>  #include <asm/smp_plat.h>
+> @@ -360,6 +361,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
+>  	smp_init_cpus();
+>  	smp_build_mpidr_hash();
+>  
+> +	pv_lock_init();
+> +
+>  	/* Init percpu seeds for random tags after cpus are set up. */
+>  	kasan_init_sw_tags();
+>  
+> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+> index f61447913db9..c0ee11855c73 100644
+> --- a/include/linux/cpuhotplug.h
+> +++ b/include/linux/cpuhotplug.h
+> @@ -192,6 +192,7 @@ enum cpuhp_state {
+>  	/* Must be the last timer callback */
+>  	CPUHP_AP_DUMMY_TIMER_STARTING,
+>  	CPUHP_AP_ARM_XEN_STARTING,
+> +	CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
+>  	CPUHP_AP_ARM_CORESIGHT_STARTING,
+>  	CPUHP_AP_ARM_CORESIGHT_CTI_STARTING,
+>  	CPUHP_AP_ARM64_ISNDEP_STARTING,
 
