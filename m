@@ -2,96 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00D2F61785D
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 09:07:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 72F126178FE
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 09:44:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbiKCIHt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 04:07:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55938 "EHLO
+        id S230415AbiKCIov (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 04:44:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231392AbiKCIHo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 04:07:44 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE9F95FC4
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 01:07:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667462863; x=1698998863;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=I8lsCxdSj2qBG63xWcOuQeSmzJ0+fPV9tYuKCeWIyrQ=;
-  b=BAKcSQXG9wo6JzcPgTXtWSArDGAzltiuE5L/ISzZOX1/iY8cE3aUiSW/
-   rx8owOPFaB+XZFQsCA4I29m+29JgGuiRcRrYGSzYGsNCXHf3dz2NKmYil
-   iiP5ViNmW8eTbIih96iwEm41OUP+gafPf27/AinDLG5ETp5rOZ0ADoQtb
-   a7XX9Sf0Sqj9s2fvZM/G1Asw6eZyhVfeKdIvwTf6qkbWD8cX/0HHldAXT
-   Oqkw9K9OGkTPalDysjuCAtxP1gVZv9zCc9P/Kgyk7/tnJnxMWGk3JWZmO
-   XKcMgTdVfKTgjvEwsHHFlRuAfYyUPA+RAgpWs9al3L2kwP0w0uPEZtBmO
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="309611900"
-X-IronPort-AV: E=Sophos;i="5.95,235,1661842800"; 
-   d="scan'208";a="309611900"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2022 01:07:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="809580991"
-X-IronPort-AV: E=Sophos;i="5.95,235,1661842800"; 
-   d="scan'208";a="809580991"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by orsmga005.jf.intel.com with ESMTP; 03 Nov 2022 01:07:42 -0700
-Message-ID: <f2866792a3e7ecfbe4b17b7a1a4b8cb7a1c576f1.camel@linux.intel.com>
-Subject: Re: [PATCH 8/9] KVM: x86: When guest set CR3, handle LAM bits
- semantics
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
-Date:   Thu, 03 Nov 2022 16:07:41 +0800
-In-Reply-To: <20221103024001.wtrj77ekycleq4vc@box.shutemov.name>
-References: <20221017070450.23031-1-robert.hu@linux.intel.com>
-         <20221017070450.23031-9-robert.hu@linux.intel.com>
-         <20221031025930.maz3g5npks7boixl@box.shutemov.name>
-         <d03bcd8fe216e5934473759fa6fdaac4e1105847.camel@linux.intel.com>
-         <20221101020416.yh53bvpt3v5gwvcj@box.shutemov.name>
-         <1d6a68dd95e13ce36b9f3ccee0b4e203a3aecf02.camel@linux.intel.com>
-         <20221102210512.aadxeb3qiloff7yl@box.shutemov.name>
-         <9578f16e8be3dddae2c5571a4a8f033ab4259840.camel@linux.intel.com>
-         <20221103024001.wtrj77ekycleq4vc@box.shutemov.name>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-8.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229570AbiKCIot (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 04:44:49 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EA6D65E9
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 01:44:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id DC128B82680
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 08:44:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58B01C433C1;
+        Thu,  3 Nov 2022 08:44:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667465084;
+        bh=6HC9cTjR3pmiIrioiO/OBwZqM/LEtqKSCEjcsbP+fGI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=G2/kSK4Y8xOTxpDstBuax/vzYlsm6ACyl6drdUdvPiCcyPostYlvl2G6kg/6jbHwJ
+         Z+RjHZOpW6HrHWOpzc4vgS81QiYKFtobUuq7FUHtDq+Qp8CCRTew21RstOr5e+Sukl
+         pLkzt3fUn++0dcQAUwmGDrtBU/+hJMnkInHSV6qI10kuSWR+Qth3QjB6Kcr+JUX9kR
+         aM+qJ6d5s/+f5JvE4LMK0PrA0MwybSqa+YTM1z8UWfOsrk/YoWnT8uuAGPXOEFSXev
+         U2rYpnlRwGh/z/7M0ztjfFFpJzzEVND0GC2f1jBMk2n/XILEgKT4XfEihaDm9FkHtd
+         PRRTq8pSauVNQ==
+Received: from 82-132-225-179.dab.02.net ([82.132.225.179] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oqVq4-003S3p-Ue;
+        Thu, 03 Nov 2022 08:44:41 +0000
+Date:   Thu, 03 Nov 2022 08:44:04 +0000
+Message-ID: <87v8nwfmwb.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v2 10/14] KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver limit to VM creation
+In-Reply-To: <CAAeT=FycObU5eHaR23OZ_PeR6-cQeNrmGs=Mi-VnrVuWR6ovSg@mail.gmail.com>
+References: <20221028105402.2030192-1-maz@kernel.org>
+        <20221028105402.2030192-11-maz@kernel.org>
+        <CAAeT=FycObU5eHaR23OZ_PeR6-cQeNrmGs=Mi-VnrVuWR6ovSg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.225.179
+X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-11-03 at 05:40 +0300, Kirill A. Shutemov wrote:
-> On Thu, Nov 03, 2022 at 09:04:23AM +0800, Robert Hoo wrote:
-> > I also notice that skip_tlb_flush is set when pcid_enabled && (CR3
-> > & X86_CR3_PCID_NOFLUSH). Under this condition, do you think (0,0)
-> > -->
-> > (1,0) need to flip it back to false?
-> 
-> Yes, I think we should. We know it is a safe choice.
+Hi Reiji,
 
-If so, then judging the (0,0) --> (1,0) case in the else{} branch is
-inevitable, isn't it?
+On Thu, 03 Nov 2022 04:55:52 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Fri, Oct 28, 2022 at 4:16 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> >         case SYS_ID_DFR0_EL1:
+> > -               /* Limit guests to PMUv3 for ARMv8.4 */
+> > -               val = cpuid_feature_cap_perfmon_field(val,
+> > -                                                     ID_DFR0_PERFMON_SHIFT,
+> > -                                                     kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+> > +               val &= ~ARM64_FEATURE_MASK(ID_DFR0_PERFMON);
+> > +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_PERFMON),
+> > +                                 pmuver_to_perfmon(vcpu_pmuver(vcpu)));
+> 
+> Shouldn't KVM expose the sanitized value as it is when AArch32 is
+> not supported at EL0 ? Since the register value is UNKNOWN when AArch32
+> is not supported at EL0, I would think this code might change the PERFMON
+> field value on such systems (could cause live migration to fail).
 
-Or totally remove the skip_tlb_flush logic in this function, but this
-would break existing logic. You won't like it. 
-> 
-> It also would be nice to get LAM documentation updated on the
-> expected
-> behaviour. It is not clear from current documentation if enabling LAM
-> causes flush. We can only guess that it should at least for some
-> scenarios.
-> 
-> Phantom TLB entires that resurface after LAM gets disable would be
-> fun to
-> debug.
-> 
-Agree, and echo your conservativeness.
+I'm not sure this would cause anything to fail as we now treat all
+AArch32 idregs as RAZ/WI when AArch32 isn't supported (and the
+visibility callback still applies here).
 
+But it doesn't hurt to make pmuver_to_perfmon() return 0 when AArch32
+isn't supported, and it will at least make the ID register consistent
+from a guest perspective.
+
+I plan to squash the following (untested) hack in:
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 8f4412cd4bf6..3b28ef48a525 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1094,6 +1094,10 @@ static u8 perfmon_to_pmuver(u8 perfmon)
+ 
+ static u8 pmuver_to_perfmon(u8 pmuver)
+ {
++       /* If no AArch32, make the field RAZ */
++       if (!kvm_supports_32bit_el0())
++               return 0;
++
+        switch (pmuver) {
+        case ID_AA64DFR0_EL1_PMUVer_IMP:
+                return ID_DFR0_PERFMON_8_0;
+@@ -1302,10 +1306,9 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+                           const struct sys_reg_desc *rd,
+                           u64 val)
+ {
+-       u8 perfmon, host_perfmon = 0;
++       u8 perfmon, host_perfmon;
+ 
+-       if (system_supports_32bit_el0())
+-               host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
++       host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
+ 
+        /*
+         * Allow DFR0_EL1.PerfMon to be set from userspace as long as
+
+> I should have noticed this with the previous version...
+
+No worries, thanks a lot for having had a look!
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
