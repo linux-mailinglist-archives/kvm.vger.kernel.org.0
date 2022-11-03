@@ -2,112 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B2B8617480
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 03:52:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C39686174AA
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 03:58:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231309AbiKCCwX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 22:52:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42814 "EHLO
+        id S230494AbiKCC6m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 22:58:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231364AbiKCCvy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 22:51:54 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F81F13F2F;
-        Wed,  2 Nov 2022 19:51:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667443880; x=1698979880;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=JwR3352mQmtvv3jNZ1XhkuwmOLMITQeiSm1roomzunE=;
-  b=cEZsyvxplYHWJiTf93ddNqPEoTWsWua48H/ANx5El3I5/fCvHAAj86rE
-   65+rvWoWzRpjtTqvdJz7j4sUnp/E8HrIFc9A2tM7ks3AXxDFmnsEd+5zA
-   TK4SgMzjjRLOUUopHP7fc4hHX6VadkD7KoOfJ4FbEtq/i4xHCRi//TRxV
-   izx5scHctphqvbaUPD+/sNUm0pnFavrmDFjRA2hIO/Xsrdn4LidozhsBp
-   JgNKXsWDRh5BK+OjPlrJfPTK0fMN+0+fAM7Uv1V5TX+5fTD9S/WMBh4Eb
-   jbJO/j0TL/2oqq0smhTv4wxuaejktfu2kpl43F4A28QQnuOJQKUN8r3yX
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="289282961"
-X-IronPort-AV: E=Sophos;i="5.95,235,1661842800"; 
-   d="scan'208";a="289282961"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2022 19:51:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="698047945"
-X-IronPort-AV: E=Sophos;i="5.95,235,1661842800"; 
-   d="scan'208";a="698047945"
-Received: from jiaxichen-precision-3650-tower.sh.intel.com ([10.239.159.75])
-  by fmsmga008.fm.intel.com with ESMTP; 02 Nov 2022 19:51:10 -0700
-From:   Jiaxi Chen <jiaxi.chen@linux.intel.com>
-To:     kvm@vger.kernel.org
-Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, ndesaulniers@google.com,
-        alexandre.belloni@bootlin.com, peterz@infradead.org,
-        jpoimboe@kernel.org, chang.seok.bae@intel.com,
-        pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
-        jmattson@google.com, sandipan.das@amd.com, tony.luck@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
-        keescook@chromium.org, nathan@kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 8/8] x86: KVM: Advertise PREFETCHIT0/1 CPUID to user space
-Date:   Thu,  3 Nov 2022 10:50:30 +0800
-Message-Id: <20221103025030.78371-9-jiaxi.chen@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221103025030.78371-1-jiaxi.chen@linux.intel.com>
-References: <20221103025030.78371-1-jiaxi.chen@linux.intel.com>
+        with ESMTP id S230303AbiKCC6k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 22:58:40 -0400
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64E9313FB2
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 19:58:39 -0700 (PDT)
+Received: by mail-io1-f72.google.com with SMTP id w16-20020a6b4a10000000b006a5454c789eso284626iob.20
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 19:58:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sL5eEqpqsj3L6/i5wWPNiCL2KlnJXhfZkRVBWGmMBmE=;
+        b=gOU7vngkDaUPCR+qFgWNDP/lVe02ymwSgEAasvnVaLyTFdQ7eUEkRs+0aG2ZyYqGRS
+         9ClaiXeLni9zOeG6pt90MYymO+IIgc7p5h67sXl7LqXpSg60lC5CfjzKZLS+Lf+nchNJ
+         7J52YjlbotFLVy9BoX9+vXaV2BUkHQj81rEH4uHKylwP2OQSC7FVYtG1Dw54DR/cJCNB
+         2DVfcJofje/35xF6yPghXIKTqAFP58nMXu2/txeA98utMqhP8NEqW9SXQ3U6lu6ZF0aF
+         nnFZqfJ4oYrZbudZIy2ifz5jE7Ub0fMlz0IacfH6Jr2vIvuuGU7MHt12KYY8TohSCQ0t
+         ACjw==
+X-Gm-Message-State: ACrzQf3oT7g49QPw3ZHL5Fo/88AfASic8sLkHuU+krjfSxgurHjE5onJ
+        LoOoo+4xd6uqEItDvDGwidAeKH/4NtX88F2oRq+svhsHtviN
+X-Google-Smtp-Source: AMsMyM7akPKhYuki0KeArMITl5oRpEd1aQDUG/CAcjqNDqnZyvXKHUxz+uJK9W5973oVMfw7PiEWjiRZurwwmbLKUy3Vx4p+c5Cv
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a05:6e02:1d94:b0:300:229:d9e8 with SMTP id
+ h20-20020a056e021d9400b003000229d9e8mr16662349ila.66.1667444318739; Wed, 02
+ Nov 2022 19:58:38 -0700 (PDT)
+Date:   Wed, 02 Nov 2022 19:58:38 -0700
+In-Reply-To: <000000000000a4496905ec7f35b7@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004d244705ec88228c@google.com>
+Subject: Re: [syzbot] BUG: unable to handle kernel paging request in vmx_handle_exit_irqoff
+From:   syzbot <syzbot+8cdd16fd5a6c0565e227@syzkaller.appspotmail.com>
+To:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Latest Intel platform Granite Rapids has introduced a new instruction -
-PREFETCHIT0/1, which moves code to memory (cache) closer to the
-processor depending on specific hints.
+syzbot has found a reproducer for the following issue on:
 
-The bit definition:
-CPUID.(EAX=7,ECX=1):EDX[bit 14]
+HEAD commit:    61c3426aca2c Add linux-next specific files for 20221102
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=13596541880000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=acb529cc910d907c
+dashboard link: https://syzkaller.appspot.com/bug?extid=8cdd16fd5a6c0565e227
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17d036de880000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11d5e00a880000
 
-This CPUID is exposed to user space. Besides, there is no other VMX
-control for this instruction.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/cc56d88dd6a3/disk-61c3426a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/5921b65b080f/vmlinux-61c3426a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/39cbd355fedd/bzImage-61c3426a.xz
 
-Signed-off-by: Jiaxi Chen <jiaxi.chen@linux.intel.com>
----
- arch/x86/kvm/cpuid.c         | 2 +-
- arch/x86/kvm/reverse_cpuid.h | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8cdd16fd5a6c0565e227@syzkaller.appspotmail.com
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 47ac2a502d91..9021a80b3553 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -662,7 +662,7 @@ void kvm_set_cpu_caps(void)
- 	);
- 
- 	kvm_cpu_cap_init_scattered(CPUID_7_1_EDX,
--		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT)
-+		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT) | F(PREFETCHITI)
- 	);
- 
- 	kvm_cpu_cap_mask(CPUID_D_1_EAX,
-diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
-index b8addd85b062..884aebe7b3c2 100644
---- a/arch/x86/kvm/reverse_cpuid.h
-+++ b/arch/x86/kvm/reverse_cpuid.h
-@@ -36,6 +36,7 @@ enum kvm_only_cpuid_leafs {
- /* Intel-defined sub-features, CPUID level 0x00000007:1 (EDX) */
- #define X86_FEATURE_AVX_VNNI_INT8       KVM_X86_FEATURE(CPUID_7_1_EDX, 4)
- #define X86_FEATURE_AVX_NE_CONVERT      KVM_X86_FEATURE(CPUID_7_1_EDX, 5)
-+#define X86_FEATURE_PREFETCHITI         KVM_X86_FEATURE(CPUID_7_1_EDX, 14)
- 
- struct cpuid_reg {
- 	u32 function;
--- 
-2.27.0
+BUG: unable to handle page fault for address: fffffbc0000001d8
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 23ffe4067 P4D 23ffe4067 PUD 0 
+Oops: 0000 [#1] PREEMPT SMP KASAN
+CPU: 0 PID: 5404 Comm: syz-executor526 Not tainted 6.1.0-rc3-next-20221102-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/11/2022
+RIP: 0010:gate_offset arch/x86/include/asm/desc_defs.h:100 [inline]
+RIP: 0010:handle_external_interrupt_irqoff arch/x86/kvm/vmx/vmx.c:6818 [inline]
+RIP: 0010:vmx_handle_exit_irqoff arch/x86/kvm/vmx/vmx.c:6830 [inline]
+RIP: 0010:vmx_handle_exit_irqoff+0x334/0x750 arch/x86/kvm/vmx/vmx.c:6822
+Code: 00 01 be 01 03 00 00 48 89 ef e8 27 a4 e8 ff e9 96 fd ff ff e8 9d 3d 5c 00 48 89 e8 48 ba 00 00 00 00 00 fc ff df 48 c1 e8 03 <0f> b6 0c 10 48 8d 45 01 48 89 c6 48 c1 ee 03 0f b6 14 16 48 89 ee
+RSP: 0018:ffffc90004217b38 EFLAGS: 00010806
+RAX: 1fffffc0000001d8 RBX: ffff88801f964000 RCX: 0000000000000000
+RDX: dffffc0000000000 RSI: ffffffff8120a3b3 RDI: 0000000000000005
+RBP: fffffe0000000ec0 R08: 0000000000000005 R09: 0000000080000000
+R10: 0000000080000000 R11: 0000000000000000 R12: 00000000800000ec
+R13: 0000000080000000 R14: 000000000121e226 R15: ffff88801f964038
+FS:  0000555555e9c3c0(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: fffffbc0000001d8 CR3: 00000000213a8000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ vcpu_enter_guest+0x33d1/0x59e0 arch/x86/kvm/x86.c:10815
+ vcpu_run arch/x86/kvm/x86.c:10964 [inline]
+ kvm_arch_vcpu_ioctl_run+0xa80/0x2b90 arch/x86/kvm/x86.c:11185
+ kvm_vcpu_ioctl+0x570/0xfc0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4065
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7fb696cd1f89
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 b1 14 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffd0f7a3e18 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007ffd0f7a3e50 RCX: 00007fb696cd1f89
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000000000 R09: 000000000000d3e4
+R10: 00007ffd0f7a3e20 R11: 0000000000000246 R12: 00000000000f4240
+R13: 000000000000d3e4 R14: 00007ffd0f7a3e3c R15: 00007ffd0f7a3e40
+ </TASK>
+Modules linked in:
+CR2: fffffbc0000001d8
+---[ end trace 0000000000000000 ]---
+RIP: 0010:gate_offset arch/x86/include/asm/desc_defs.h:100 [inline]
+RIP: 0010:handle_external_interrupt_irqoff arch/x86/kvm/vmx/vmx.c:6818 [inline]
+RIP: 0010:vmx_handle_exit_irqoff arch/x86/kvm/vmx/vmx.c:6830 [inline]
+RIP: 0010:vmx_handle_exit_irqoff+0x334/0x750 arch/x86/kvm/vmx/vmx.c:6822
+Code: 00 01 be 01 03 00 00 48 89 ef e8 27 a4 e8 ff e9 96 fd ff ff e8 9d 3d 5c 00 48 89 e8 48 ba 00 00 00 00 00 fc ff df 48 c1 e8 03 <0f> b6 0c 10 48 8d 45 01 48 89 c6 48 c1 ee 03 0f b6 14 16 48 89 ee
+RSP: 0018:ffffc90004217b38 EFLAGS: 00010806
+RAX: 1fffffc0000001d8 RBX: ffff88801f964000 RCX: 0000000000000000
+RDX: dffffc0000000000 RSI: ffffffff8120a3b3 RDI: 0000000000000005
+RBP: fffffe0000000ec0 R08: 0000000000000005 R09: 0000000080000000
+R10: 0000000080000000 R11: 0000000000000000 R12: 00000000800000ec
+R13: 0000000080000000 R14: 000000000121e226 R15: ffff88801f964038
+FS:  0000555555e9c3c0(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: fffffbc0000001d8 CR3: 00000000213a8000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	00 01                	add    %al,(%rcx)
+   2:	be 01 03 00 00       	mov    $0x301,%esi
+   7:	48 89 ef             	mov    %rbp,%rdi
+   a:	e8 27 a4 e8 ff       	callq  0xffe8a436
+   f:	e9 96 fd ff ff       	jmpq   0xfffffdaa
+  14:	e8 9d 3d 5c 00       	callq  0x5c3db6
+  19:	48 89 e8             	mov    %rbp,%rax
+  1c:	48 ba 00 00 00 00 00 	movabs $0xdffffc0000000000,%rdx
+  23:	fc ff df
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	0f b6 0c 10          	movzbl (%rax,%rdx,1),%ecx <-- trapping instruction
+  2e:	48 8d 45 01          	lea    0x1(%rbp),%rax
+  32:	48 89 c6             	mov    %rax,%rsi
+  35:	48 c1 ee 03          	shr    $0x3,%rsi
+  39:	0f b6 14 16          	movzbl (%rsi,%rdx,1),%edx
+  3d:	48 89 ee             	mov    %rbp,%rsi
 
