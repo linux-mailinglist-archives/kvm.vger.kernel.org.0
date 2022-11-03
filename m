@@ -2,238 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE72C617382
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 01:57:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E127561738C
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 02:04:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230222AbiKCA5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Nov 2022 20:57:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56466 "EHLO
+        id S229880AbiKCBE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Nov 2022 21:04:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbiKCA5p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Nov 2022 20:57:45 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B27160ED;
-        Wed,  2 Nov 2022 17:57:44 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id b1-20020a17090a7ac100b00213fde52d49so369144pjl.3;
-        Wed, 02 Nov 2022 17:57:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PT5TJtiFLVcBhEGCiUt+Q/ygadniH1MGveMuwPrnffg=;
-        b=J3OYl1d4sC6FIMH2MusbIHhGhA92hoVKy4RWPDebrUJ8R+/KpO3RCafo7oJVZKD3WJ
-         dfTFNKp4BO4rRgLvU4I4Sh4YdomKx5J6exiLf9AkKnYLEaQqvmfZcDX4B8TcyrRqQRbA
-         2TBmon+Wv0CRqjDz81TrGslPdyqP6S5/L132a+1g3ZtQQJuBiBAaWZer63+1t7NPuT4l
-         +wS3IkJU1Dxls24vCXuHMtrtCA9fxr+NThRP/dXNQIZVQXSvfhXHnyFD0MkFtY2t/ZEs
-         v2EWaRv0W4VpNeIwuvJqWf6mCdTwteuKFmvytnvV8BANSi/NDu8VsNJHb38BDuxr9+hf
-         6DcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PT5TJtiFLVcBhEGCiUt+Q/ygadniH1MGveMuwPrnffg=;
-        b=YnNEtPAAdBNDuis6xNcJsAylVPaiDxm5ZZA9qfCqgfJroSUpMRGf9/7+ilahNSedZh
-         wO2fn0MLrJk/aPItON/tNvEKcaH1hbIpDN4IS2NQXv9wovIemKOsNXSRemeXkgv7A3Zn
-         TLt0vi4Oyq6I14qqzND8u/O00nIrlvrjoEk1OrVLFUIlRXTA1mpzqdbl3EP8QwqcDi90
-         ZeizZFfX+jmbhS32IP1r46edm1o3FowXScwHtx0VsEarzp8eX2CRxQ93aR/lAknyo/WP
-         MuSjCSZFvcFDGhabPw/iwUPFeZWcdoE5EivCnAfKCfTg/llk3D/M6hLxs3QsaDrrWbGG
-         q1Nw==
-X-Gm-Message-State: ACrzQf1x/s7jDA4PRsogr5CW1AndwLl8CfF4gROMgc3GGFPVSU9C96fk
-        DS7VvazS6Al63ff9pxdUv3E=
-X-Google-Smtp-Source: AMsMyM6h2qWOjTifvTpDULGNAYbAYiHoJBiaBuSE3bePjVu3sWkMEH0VZKlkWzqvbt5KcLkl6Q0dfQ==
-X-Received: by 2002:a17:902:da8e:b0:186:9869:adfa with SMTP id j14-20020a170902da8e00b001869869adfamr28175360plx.57.1667437063851;
-        Wed, 02 Nov 2022 17:57:43 -0700 (PDT)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id a7-20020a62d407000000b0056bad6ff1b8sm8992574pfh.101.2022.11.02.17.57.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 17:57:43 -0700 (PDT)
-Date:   Wed, 2 Nov 2022 17:57:42 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v10 014/108] KVM: TDX: Stub in tdx.h with structs,
- accessors, and VMCS helpers
-Message-ID: <20221103005742.GB954260@ls.amr.corp.intel.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <75ac959fddbfd057d3ae8ad73e91708a2da60965.1667110240.git.isaku.yamahata@intel.com>
- <e1cb3dd0-796b-73d5-ddb8-38e807c061df@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e1cb3dd0-796b-73d5-ddb8-38e807c061df@linux.intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229459AbiKCBE0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Nov 2022 21:04:26 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C959B60FB
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 18:04:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667437465; x=1698973465;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=7//xQ2Idgbk6w1DbjkSTtP1Eth+guHMk5ew8szqsNSE=;
+  b=jPwXrDV1Lz5+iQ5o7e8hRmF4iel1+fhgaP5/K1wGbQ7z9wYJi5rTHcjf
+   J+5DulRnqfsHvXLh8y7l5IoGrk9qU9wN5Xm9sk0vlT7zvUgLXP0jqbwAE
+   zPRwcnRc/xtfzby1jqtvl0EvllWH17ZU3BrDr58iEmT/ywzuIZSjy/vhi
+   ymp5rq7cWsitkfxVXa6jtn81jksy29fyrFmW7GtEU8lY/IO3s1quOYdDJ
+   1Pn2EqJQnbT6fmDOIGQOqmGYRhCgthTpxx2lMU/wMnJ1ay1BSWkwqoQ8X
+   9KrTfn162Mc7NsSgWgQX1SVf+jtfedTKw1c0iCZgEknOKyT8OMRwA1F90
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="289944979"
+X-IronPort-AV: E=Sophos;i="5.95,235,1661842800"; 
+   d="scan'208";a="289944979"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2022 18:04:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="759752257"
+X-IronPort-AV: E=Sophos;i="5.95,235,1661842800"; 
+   d="scan'208";a="759752257"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by orsmga004.jf.intel.com with ESMTP; 02 Nov 2022 18:04:24 -0700
+Message-ID: <9578f16e8be3dddae2c5571a4a8f033ab4259840.camel@linux.intel.com>
+Subject: Re: [PATCH 8/9] KVM: x86: When guest set CR3, handle LAM bits
+ semantics
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
+Date:   Thu, 03 Nov 2022 09:04:23 +0800
+In-Reply-To: <20221102210512.aadxeb3qiloff7yl@box.shutemov.name>
+References: <20221017070450.23031-1-robert.hu@linux.intel.com>
+         <20221017070450.23031-9-robert.hu@linux.intel.com>
+         <20221031025930.maz3g5npks7boixl@box.shutemov.name>
+         <d03bcd8fe216e5934473759fa6fdaac4e1105847.camel@linux.intel.com>
+         <20221101020416.yh53bvpt3v5gwvcj@box.shutemov.name>
+         <1d6a68dd95e13ce36b9f3ccee0b4e203a3aecf02.camel@linux.intel.com>
+         <20221102210512.aadxeb3qiloff7yl@box.shutemov.name>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 31, 2022 at 07:39:46PM +0800,
-Binbin Wu <binbin.wu@linux.intel.com> wrote:
-
+On Thu, 2022-11-03 at 00:05 +0300, Kirill A. Shutemov wrote:
+> On Wed, Nov 02, 2022 at 03:29:10PM +0800, Robert Hoo wrote:
+> > On Tue, 2022-11-01 at 05:04 +0300, Kirill A. Shutemov wrote:
+> > ...
+> > > > > > -	if (cr3 != kvm_read_cr3(vcpu))
+> > > > > > -		kvm_mmu_new_pgd(vcpu, cr3);
+> > > > > > +	old_cr3 = kvm_read_cr3(vcpu);
+> > > > > > +	if (cr3 != old_cr3) {
+> > > > > > +		if ((cr3 ^ old_cr3) & CR3_ADDR_MASK) {
+> > > > > > +			kvm_mmu_new_pgd(vcpu, cr3 &
+> > > > > > ~(X86_CR3_LAM_U48 |
+> > > > > > +					X86_CR3_LAM_U57));
+> > > > > > +		} else {
+> > > > > > +			/* Only LAM conf changes, no tlb flush
+> > > > > > needed
+> > > > > > */
+> > > > > > +			skip_tlb_flush = true;
+> > > > > 
+> > > > > I'm not sure about this.
+> > > > > 
+> > > > > Consider case when LAM_U48 gets enabled on 5-level paging
+> > > > > machines.
+> > > > > We may
+> > > > > have valid TLB entries for addresses above 47-bit. It's kinda
+> > > > > broken
+> > > > > case,
+> > > > > but seems valid from architectural PoV, no?
+> > > > 
+> > > > You're right, thanks Kirill.
+> > > > 
+> > > > I noticed in your Kernel enabling, because of this LAM_U48 and
+> > > > LA_57
+> > > > overlapping, you enabled LAM_U57 only for simplicity at this
+> > > > moment. I
+> > > > thought at that time, that this trickiness will be contained in
+> > > > Kernel
+> > > > layer, but now it turns out at least non-EPT KVM MMU is not
+> > > > spared.
+> > > > > 
+> > > > > I guess after enabling LAM, these entries will never match.
+> > > > > But
+> > > > > if
+> > > > > LAM
+> > > > > gets disabled again they will become active. Hm?
+> > > > > 
+> > > > > Maybe just flush?
+> > > > 
+> > > > Now we have 2 options
+> > > > 1. as you suggested, just flush
+> > > > 2. more precisely identify the case Guest.LA57 &&
+> > > > (CR3.bit[62:61]
+> > > > 00
+> > > > -->10 switching), flush. (LAM_U57 bit take precedence over
+> > > > LAM_U48,
+> > > > from spec.)
+> > > > 
+> > > > Considering CR3 change is relatively hot path, and tlb flush is
+> > > > heavy,
+> > > > I lean towards option 2. Your opinion? 
+> > > 
+> > > 11 in bits [62:61] is also considered LAM_U57. So your option 2
+> > > is
+> > > broken.
+> > 
+> > Hi Kirill,
+> > 
+> > When I came to cook v2 per your suggestion, i.e. leave it just
+> > flush, I
+> > pondered on the necessity on all the cases of the 2 bits (LAM_U48,
+> > LAM_U57) flips.
+> > Hold this: LAM_U57 (bit61) takes precedence over LAM_U48 (bit62).
+> > 
+> > (0,0) --> {(0,1), (1,0), (1,1)}
+> > (0,1) --> {(0,0), (1,0), (1,1)}
+> > (1,0) --> {(0,0), (0,1), (1,1)}
+> > (1,1) --> {(0,0), (1,0), (1,0)}
+> > 
+> > Among all the 12 cases, only (0,0) --> (1,0) && 5-level paging on,
+> > has
+> > to flush tlb. Am I right? if so, would you still prefer
+> > unconditionally
+> > flush, just for 1/12 necessity? (if include 5-level/4-level
+> > variations,
+> > 1/24)
 > 
-> On 2022/10/30 14:22, isaku.yamahata@intel.com wrote:
-> > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > 
-> > Stub in kvm_tdx, vcpu_tdx, and their various accessors.  TDX defines
-> > SEAMCALL APIs to access TDX control structures corresponding to the VMX
-> > VMCS.  Introduce helper accessors to hide its SEAMCALL ABI details.
-> > 
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >   arch/x86/kvm/vmx/tdx.h | 118 ++++++++++++++++++++++++++++++++++++++++-
-> >   1 file changed, 116 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> > index 473013265bd8..98999bf3f188 100644
-> > --- a/arch/x86/kvm/vmx/tdx.h
-> > +++ b/arch/x86/kvm/vmx/tdx.h
-> > @@ -3,14 +3,27 @@
-> >   #define __KVM_X86_TDX_H
-> >   #ifdef CONFIG_INTEL_TDX_HOST
-> > +
-> > +#include "tdx_ops.h"
-> > +
-> > +struct tdx_td_page {
-> > +	unsigned long va;
-> > +	hpa_t pa;
-> > +	bool added;
-> > +};
-> > +
-> >   struct kvm_tdx {
-> >   	struct kvm kvm;
-> > -	/* TDX specific members follow. */
-> > +
-> > +	struct tdx_td_page tdr;
-> > +	struct tdx_td_page *tdcs;
-> >   };
-> >   struct vcpu_tdx {
-> >   	struct kvm_vcpu	vcpu;
-> > -	/* TDX specific members follow. */
-> > +
-> > +	struct tdx_td_page tdvpr;
-> > +	struct tdx_td_page *tdvpx;
-> >   };
-> >   static inline bool is_td(struct kvm *kvm)
-> > @@ -32,6 +45,107 @@ static inline struct vcpu_tdx *to_tdx(struct kvm_vcpu *vcpu)
-> >   {
-> >   	return container_of(vcpu, struct vcpu_tdx, vcpu);
-> >   }
-> > +
-> > +static __always_inline void tdvps_vmcs_check(u32 field, u8 bits)
-> > +{
-> > +#define VMCS_ENC_ACCESS_TYPE_MASK	0x1UL
-> > +#define VMCS_ENC_ACCESS_TYPE_FULL	0x0UL
-> > +#define VMCS_ENC_ACCESS_TYPE_HIGH	0x1UL
-> > +#define VMCS_ENC_ACCESS_TYPE(field)	((field) & VMCS_ENC_ACCESS_TYPE_MASK)
-> > +
-> > +	/* TDX is 64bit only.  HIGH field isn't supported. */
-> > +	BUILD_BUG_ON_MSG(__builtin_constant_p(field) &&
-> > +			 VMCS_ENC_ACCESS_TYPE(field) == VMCS_ENC_ACCESS_TYPE_HIGH,
-> > +			 "Read/Write to TD VMCS *_HIGH fields not supported");
-> > +
-> > +	BUILD_BUG_ON(bits != 16 && bits != 32 && bits != 64);
-> > +
-> > +#define VMCS_ENC_WIDTH_MASK	GENMASK(14, 13)
-> > +#define VMCS_ENC_WIDTH_16BIT	(0UL << 13)
-> > +#define VMCS_ENC_WIDTH_64BIT	(1UL << 13)
-> > +#define VMCS_ENC_WIDTH_32BIT	(2UL << 13)
-> > +#define VMCS_ENC_WIDTH_NATURAL	(3UL << 13)
-> > +#define VMCS_ENC_WIDTH(field)	((field) & VMCS_ENC_WIDTH_MASK)
-> > +
-> > +	/* TDX is 64bit only.  i.e. natural width = 64bit. */
-> > +	BUILD_BUG_ON_MSG(bits != 64 && __builtin_constant_p(field) &&
-> > +			 (VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_64BIT ||
-> > +			  VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_NATURAL),
-> > +			 "Invalid TD VMCS access for 64-bit field");
-> > +	BUILD_BUG_ON_MSG(bits != 32 && __builtin_constant_p(field) &&
-> > +			 VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_32BIT,
-> > +			 "Invalid TD VMCS access for 32-bit field");
-> > +	BUILD_BUG_ON_MSG(bits != 16 && __builtin_constant_p(field) &&
-> > +			 VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_16BIT,
-> > +			 "Invalid TD VMCS access for 16-bit field");
-> > +}
-> > +
-> > +static __always_inline void tdvps_state_non_arch_check(u64 field, u8 bits) {}
-> > +static __always_inline void tdvps_management_check(u64 field, u8 bits) {}
-> > +
-> > +#define TDX_BUILD_TDVPS_ACCESSORS(bits, uclass, lclass)				\
-> > +static __always_inline u##bits td_##lclass##_read##bits(struct vcpu_tdx *tdx,	\
-> > +							u32 field)		\
-> > +{										\
-> > +	struct tdx_module_output out;						\
-> > +	u64 err;								\
-> > +										\
-> > +	tdvps_##lclass##_check(field, bits);					\
-> > +	err = tdh_vp_rd(tdx->tdvpr.pa, TDVPS_##uclass(field), &out);		\
-> > +	if (unlikely(err)) {							\
-> > +		pr_err("TDH_VP_RD["#uclass".0x%x] failed: 0x%llx\n",		\
-> > +		       field, err);						\
-> > +		return 0;							\
-> > +	}									\
-> > +	return (u##bits)out.r8;							\
-> > +}										\
-> > +static __always_inline void td_##lclass##_write##bits(struct vcpu_tdx *tdx,	\
-> > +						      u32 field, u##bits val)	\
-> > +{										\
-> > +	struct tdx_module_output out;						\
-> > +	u64 err;								\
-> > +										\
-> > +	tdvps_##lclass##_check(field, bits);					\
-> > +	err = tdh_vp_wr(tdx->tdvpr.pa, TDVPS_##uclass(field), val,		\
-> > +		      GENMASK_ULL(bits - 1, 0), &out);				\
-> > +	if (unlikely(err))							\
-> > +		pr_err("TDH_VP_WR["#uclass".0x%x] = 0x%llx failed: 0x%llx\n",	\
-> > +		       field, (u64)val, err);					\
-> > +}										\
-> > +static __always_inline void td_##lclass##_setbit##bits(struct vcpu_tdx *tdx,	\
-> > +						       u32 field, u64 bit)	\
-> > +{										\
-> > +	struct tdx_module_output out;						\
-> > +	u64 err;								\
-> > +										\
-> > +	tdvps_##lclass##_check(field, bits);					\
-> > +	err = tdh_vp_wr(tdx->tdvpr.pa, TDVPS_##uclass(field), bit, bit,		\
-> > +			&out);							\
-> > +	if (unlikely(err))							\
-> > +		pr_err("TDH_VP_WR["#uclass".0x%x] |= 0x%llx failed: 0x%llx\n",	\
-> > +		       field, bit, err);					\
-> > +}										\
-> > +static __always_inline void td_##lclass##_clearbit##bits(struct vcpu_tdx *tdx,	\
-> > +							 u32 field, u64 bit)	\
-> > +{										\
-> > +	struct tdx_module_output out;						\
-> > +	u64 err;								\
-> > +										\
-> > +	tdvps_##lclass##_check(field, bits);					\
-> > +	err = tdh_vp_wr(tdx->tdvpr.pa, TDVPS_##uclass(field), 0, bit,		\
-> > +			&out);							\
-> > +	if (unlikely(err))							\
-> > +		pr_err("TDH_VP_WR["#uclass".0x%x] &= ~0x%llx failed: 0x%llx\n",	\
-> > +		       field, bit,  err);					\
-> > +}
+> I would keep it simple. We can always add optimization later if
+> there's
+> a workload that actually benefit from it. But I cannot imagine
+> situation
+> where enabling LAM is a hot path.
 > 
-> For the set of accessors, although there will be kernel errer message when
-> tdh_vp_{rd,wr} fails,
-> the caller doesn't know these function calls succeed or not. Won't this
-> cause any unexpected
-> behavior?
+OK, I'm open to this.
 
-Oh right.  Basically tdh_vp_{rd, wr} should fail as long as parameters are correct.
-So I'll add KVM_BUG_ON().  TDX module takes shared lock on TDVPR, TDR and TDCS.
-It should fails with TDX_OPERAND_BUSY on run time. (At least with TDX module 1.0)
+I also notice that skip_tlb_flush is set when pcid_enabled && (CR3
+& X86_CR3_PCID_NOFLUSH). Under this condition, do you think (0,0) -->
+(1,0) need to flip it back to false?
 
-Thanks,
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+{
+	bool skip_tlb_flush = false;
+	unsigned long pcid = 0, old_cr3;
+#ifdef CONFIG_X86_64
+	bool pcid_enabled = !!kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+
+	if (pcid_enabled) {
+		skip_tlb_flush = cr3 & X86_CR3_PCID_NOFLUSH;
+
+
