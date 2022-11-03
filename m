@@ -2,112 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E9BB617F34
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 15:16:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 257D1617F56
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 15:22:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231545AbiKCOQL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 10:16:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36586 "EHLO
+        id S230294AbiKCOWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 10:22:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231652AbiKCOPj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 10:15:39 -0400
+        with ESMTP id S230387AbiKCOWQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 10:22:16 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D43415832
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 07:14:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55B63B23
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 07:21:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667484879;
+        s=mimecast20190719; t=1667485276;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FT9aNXqnuKXbR3StefJr7RNDWsInEBudWILSzsOk6wI=;
-        b=gVHCOHjZ0/3884PCuIpeplykA/eX4NgUnPBGapVOHupe0faAK26G3fusBGGQHZztTj5f07
-        uAeJKqIICLAa9Kd4P6Fjm+8bi8zUrxXj8IAsOX/VwUZZYwSlIyRi57IXaHuUUOYbwNCW4G
-        knO+UlU76kPS8vyaLj1QdXm769Pk58s=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-108-8Qpk1q88NTOADxqZAGJhHA-1; Thu, 03 Nov 2022 10:14:35 -0400
-X-MC-Unique: 8Qpk1q88NTOADxqZAGJhHA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D2C662A2AD7D;
-        Thu,  3 Nov 2022 14:14:33 +0000 (UTC)
-Received: from amdlaptop.tlv.redhat.com (dhcp-4-238.tlv.redhat.com [10.35.4.238])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E9E4640C6EC3;
-        Thu,  3 Nov 2022 14:14:29 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-kernel@vger.kernel.org,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
-        Shuah Khan <shuah@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Borislav Petkov <bp@alien8.de>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kselftest@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        David Matlack <dmatlack@google.com>, stable@vger.kernel.org
-Subject: [PATCH v2 9/9] KVM: x86: remove exit_int_info warning in svm_handle_exit
-Date:   Thu,  3 Nov 2022 16:13:51 +0200
-Message-Id: <20221103141351.50662-10-mlevitsk@redhat.com>
-In-Reply-To: <20221103141351.50662-1-mlevitsk@redhat.com>
-References: <20221103141351.50662-1-mlevitsk@redhat.com>
+        bh=Ce30PlUaAvWtlyscTUqBTgqw9q6bbQE1OIBsSDReTF0=;
+        b=K4rcMasdTu0aa8s1R7hkDUEqp17xtkY+iJPjRmpk3/eNzRf7nZrMI3G/JWEf3cM3VbEns9
+        nkMW88iwbnp87/aD2NFFiVVwd/mU+McI7pWpSPqVxWciJQHeJwxHHks9HTLWcURwpma4Ww
+        4z/WgWv9BKBRD56+iLM5YGehxZqqrkQ=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-516-KOBODGo9NpG7jQHRC0Qoow-1; Thu, 03 Nov 2022 10:21:15 -0400
+X-MC-Unique: KOBODGo9NpG7jQHRC0Qoow-1
+Received: by mail-ej1-f72.google.com with SMTP id he6-20020a1709073d8600b0078e20190301so1352094ejc.22
+        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 07:21:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ce30PlUaAvWtlyscTUqBTgqw9q6bbQE1OIBsSDReTF0=;
+        b=O8FwfYLL5wwcM1fchY8KRG7JZfccYb2abtJz4nZDXsHcRW2Cm9lB8x2RDRuQxNCcDq
+         fwmGRv/3rTodOxJnTVepj54s+t7KGuV9tMssGamEcA/lWWvAv7aAEMkTx6jiVn2USPz9
+         fVdlzPeujVF6EuEZMvu/2UONHcieevOFl2edMebmwIbUXMw+ZlFUuBLFf6cw6Y/XtHDo
+         U0V7X+Lt3EmbwvJnFk/Pr4PQBFHLtjU8uIf2Rb9FZMjkER2DKE5xbdc0wbOA2OV1Gp6o
+         BJWstP9L0xSrnWFhIW8V99dIAWi1XelIFbVfgdCCi54AF1s+07R7ucM/te7jiYkW/oxA
+         hYtQ==
+X-Gm-Message-State: ACrzQf06JbaIIsuplncn7hbWRb76uZTXlu57Jfu6P2hv7JRWE197Erh5
+        EvuHHbk0WVwBEj2vpZbR236aleAaZ79e/yNuSEAp6GW8j6mbARN6Dw6zwMKCO44UfFd6iNGWV+J
+        a3ojXeNjeV02j
+X-Received: by 2002:a17:907:6d22:b0:7ad:5cd3:d33a with SMTP id sa34-20020a1709076d2200b007ad5cd3d33amr28375100ejc.622.1667485273934;
+        Thu, 03 Nov 2022 07:21:13 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6yjWLlJjdX00UUzGGT/4RdepXpECARyC2atUebpbZwkDSNOfLx7vcGW0i8mbz3yiKU7J8iBg==
+X-Received: by 2002:a17:907:6d22:b0:7ad:5cd3:d33a with SMTP id sa34-20020a1709076d2200b007ad5cd3d33amr28375086ejc.622.1667485273704;
+        Thu, 03 Nov 2022 07:21:13 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id 2-20020a170906200200b007acbac07f07sm564018ejo.51.2022.11.03.07.21.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Nov 2022 07:21:13 -0700 (PDT)
+Message-ID: <f5315936-fbdf-c7b1-e7a9-f494001eebfd@redhat.com>
+Date:   Thu, 3 Nov 2022 15:21:12 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Content-Language: en-US
+To:     Matthias Gerstner <matthias.gerstner@suse.de>, kvm@vger.kernel.org
+References: <20221103135927.13656-1-matthias.gerstner@suse.de>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] tools/kvm_stat: fix attack vector with user controlled
+ FUSE mounts
+In-Reply-To: <20221103135927.13656-1-matthias.gerstner@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It is valid to receive external interrupt and have broken IDT entry,
-which will lead to #GP with exit_int_into that will contain the index of
-the IDT entry (e.g any value).
+On 11/3/22 14:59, Matthias Gerstner wrote:
+> The fix is simply to use the file system type field instead. Whitespace
+> in the mount path is escaped in /proc/mounts thus no further safety
+> measures in the parsing should be necessary to make this correct.
 
-Other exceptions can happen as well, like #NP or #SS
-(if stack switch fails).
+Can you please send a patch to replace seq_printf with seq_escape in 
+afs_show_devname though?  I couldn't find anything that prevents 
+cell->name and volume->name from containing a space, so better safe than 
+sorry.
 
-Thus this warning can be user triggred and has very little value.
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/svm/svm.c | 9 ---------
- 1 file changed, 9 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index e9cec1b692051c..36f651ce842174 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3428,15 +3428,6 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 		return 0;
- 	}
- 
--	if (is_external_interrupt(svm->vmcb->control.exit_int_info) &&
--	    exit_code != SVM_EXIT_EXCP_BASE + PF_VECTOR &&
--	    exit_code != SVM_EXIT_NPF && exit_code != SVM_EXIT_TASK_SWITCH &&
--	    exit_code != SVM_EXIT_INTR && exit_code != SVM_EXIT_NMI)
--		printk(KERN_ERR "%s: unexpected exit_int_info 0x%x "
--		       "exit_code 0x%x\n",
--		       __func__, svm->vmcb->control.exit_int_info,
--		       exit_code);
--
- 	if (exit_fastpath != EXIT_FASTPATH_NONE)
- 		return 1;
- 
--- 
-2.34.3
+Paolo
 
