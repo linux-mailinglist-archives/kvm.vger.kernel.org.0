@@ -2,62 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A3D26189C3
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 21:44:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 944D16189C8
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 21:44:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230509AbiKCUo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 16:44:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47088 "EHLO
+        id S230415AbiKCUos (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 16:44:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbiKCUoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 16:44:25 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C171CFD2
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 13:44:24 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-3691846091fso28374877b3.9
-        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 13:44:24 -0700 (PDT)
+        with ESMTP id S231150AbiKCUor (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 16:44:47 -0400
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CE801CFD2
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 13:44:46 -0700 (PDT)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-13b6c1c89bdso3528631fac.13
+        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 13:44:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=gZjxMa2o2lIB5f0O5ApzvKQHK+nnAzaO63nl4HV7qcs=;
-        b=A2dNWW/lB3vYSRcyXKgrHJacIauqYZ+0M3sRvwzySRRmQFDF6DOv2TCEaLd/CqiBTv
-         i21uh3/5YqZRVYVjgGcNGrr/7XoDGxdOQKM+5K7Q+imbT78CTUG4Jz8eg+eYTt8sJf/r
-         oBYIOANOWoQ4nDjldGOIEm6N4+n4VBJFOBC/GiebE4xZCqFGrGXFSKKajFx7oIJnH37d
-         ZdEKo/IdW2ky/MFm7kQzLiEWBWHnE0VMvCHfIscMEPe1lHYqDmRQ71r4sOlMkic8rvAZ
-         xZwcLmkj2g5dJe9LvkrkSAJvp20NzD7gzCCcH8wOo4GgPx8xoB4uoOLo0KYlTV5PLehk
-         5zig==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=f+1UXnbHGdIK3De5/zrEFzfAPZ6gH5pChAdbN9r+W4A=;
+        b=qbTQ75Rp01epfSUPdhZSPNe0WQ/fIPdQOlufBzI9AZkCQJkgzihFi/mJ+f2SEA8kod
+         79KVegLflkPN+QnRNkOkfKBSufSDhndTfvDT5n9sn0Yctc4oFE9kkc15q4116kmjJmx9
+         MWbzT98/4SS9oxsr4b4BTmhstuq+NLfqmWX+I5Q8SBSVzR/C/gbPV1bb6wvKZ0Zuob3+
+         Dqd5QYK7RnF3TVaPF5jbGvXW/g/5UQzE/L9CN1iWreLtjq9mUxuHT4WiKqzNbLjitXnV
+         uLWsqUHu+3ybQrmlfN1oG1igPmYaPID5u4R0zq8AfG6GP07Oymab6TxruT1M0H4zQ/Cl
+         0UOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gZjxMa2o2lIB5f0O5ApzvKQHK+nnAzaO63nl4HV7qcs=;
-        b=UoQ+JxaA705/+49Ik7Cv07SbPY4/C/Wv/Lc/0ybdtQzKy4K7FTLHkaXAdSBh1Z75sB
-         WPyaetoCs85Frw8Hq5H+zb2pPvTdjP05OnjzERge8hO9cZhzlGKUlBJpobWIWrY13epT
-         L79daJdgfQaWzN02UE9zeZ/4lZEkZniqTp6nwFb3BSfYNbsfOU9wV+R59Ibilx9EsYEh
-         f8691WSZoM//DTyB8vWxf3CA1INgtuHi608pe/O0jerooRq7bCkYedTLkY6u1lDAZzWP
-         kTIfhcuH8uGRlCxT1iQ2etkln/6HwZHiP/McEhLH+gmUrSdaoBw4MAUJcOgXQtm7YVd/
-         AcjA==
-X-Gm-Message-State: ACrzQf0tea1qFeihdXvq5Bt7tbDX4V5EqaMMqb1aMxFDxwEqsjkpLVxq
-        Y/REYIIhdDN+vdA1ccPrW2VWmhTJ0KbwBg==
-X-Google-Smtp-Source: AMsMyM62Ze2/sy8ru2ONW0J6MhUJeLkrFvpyiMx+TZkoPd+xklnnDCEjmL8mKxR91ipAQ0vWX/UvWcz/Aa2stw==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a81:5807:0:b0:36a:b20c:a88a with SMTP id
- m7-20020a815807000000b0036ab20ca88amr29731998ywb.324.1667508263503; Thu, 03
- Nov 2022 13:44:23 -0700 (PDT)
-Date:   Thu,  3 Nov 2022 13:44:21 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221103204421.1146958-1-dmatlack@google.com>
-Subject: [PATCH v2] KVM: x86/mmu: Do not recover dirty-tracked NX Huge Pages
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        David Matlack <dmatlack@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=f+1UXnbHGdIK3De5/zrEFzfAPZ6gH5pChAdbN9r+W4A=;
+        b=XCmVWituOpnjMGeuCY7wJzdRBKZKQutFoTHuPiBhmoLTYycTCTp7/68W2+MWK87G8g
+         XZaSM390RYcxMZ1olzSVwMDO4JfUQLI2ft5ckrdV2P/Va9kKEwdH4rwnQ/cwnL9WTkC7
+         IocbHPslqgIgopwyxNvTsJb5M9LsFKSfFIjJe5EbSwm+R3mQjyKVNH8yaSWZRNq7Yg0O
+         7XatitQ1bsWJtkIzXfw1gheMA+E8I/DKTTbzdOQgYnN1UhlWRQIZxbY1ePAiDGc2ZLej
+         DJTfG2hxlHHLSZZ/W/cnYQWh4KBN6SwK51bndIVFLjJ0pLYlSsegVa3Us2uEpnoZkXb/
+         Vzgw==
+X-Gm-Message-State: ACrzQf3vc42sLPdtOfusdk5PEksSVhzuXeClKwO74kQfmWbL8WA27RG/
+        jcFZI65LPeL1k/0+fHrdxGpF2kAEUWDN+GMlh4SEVA==
+X-Google-Smtp-Source: AMsMyM64AAFKgqcaFOvUMlg264rZEPo9ZOtG5F9Q4+2r9YG/KU69ZMIwa7pHG+2lrcw0TupK401Z7Q+Yqx1HBrqPkL0=
+X-Received: by 2002:a05:6871:8a3:b0:13b:18ef:e8df with SMTP id
+ r35-20020a05687108a300b0013b18efe8dfmr18879685oaq.181.1667508285595; Thu, 03
+ Nov 2022 13:44:45 -0700 (PDT)
+MIME-Version: 1.0
+References: <20221103191733.3153803-1-aaronlewis@google.com>
+In-Reply-To: <20221103191733.3153803-1-aaronlewis@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 3 Nov 2022 13:44:34 -0700
+Message-ID: <CALMp9eTjJHMhQGDmbn2WYdcaFLWMvtQjWN4pTUMRXTAnBwj6jQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Omit PMU MSRs from KVM_GET_MSR_INDEX_LIST if !enable_pmu
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        Like Xu <like.xu.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,91 +67,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Do not recover (i.e. zap) an NX Huge Page that is being dirty tracked,
-as it will just be faulted back in at the same 4KiB granularity when
-accessed by a vCPU. This may need to be changed if KVM ever supports
-2MiB (or larger) dirty tracking granularity, or faulting huge pages
-during dirty tracking for reads/executes. However for now, these zaps
-are entirely wasteful.
+On Thu, Nov 3, 2022 at 12:18 PM Aaron Lewis <aaronlewis@google.com> wrote:
+>
+> When the PMU is disabled, don't bother sharing the PMU MSRs with
+> userspace through KVM_GET_MSR_INDEX_LIST.  Instead, filter them out so
+> userspace doesn't have to keep track of them.
+>
+> Note that 'enable_pmu' is read-only, so userspace has no control over
+> whether the PMU MSRs are included in the list or not.
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 521b433f978c..19bc42a6946d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7042,13 +7042,20 @@ static void kvm_init_msr_list(void)
+>                                 continue;
+>                         break;
+>                 case MSR_ARCH_PERFMON_PERFCTR0 ... MSR_ARCH_PERFMON_PERFCTR0 + 17:
+> -                       if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_PERFCTR0 >=
+> -                           min(INTEL_PMC_MAX_GENERIC, kvm_pmu_cap.num_counters_gp))
+> +                       if ((msrs_to_save_all[i] - MSR_ARCH_PERFMON_PERFCTR0 >=
+> +                           min(INTEL_PMC_MAX_GENERIC, kvm_pmu_cap.num_counters_gp)) ||
+> +                           !enable_pmu)
+>                                 continue;
+>                         break;
+>                 case MSR_ARCH_PERFMON_EVENTSEL0 ... MSR_ARCH_PERFMON_EVENTSEL0 + 17:
+> -                       if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=
+> -                           min(INTEL_PMC_MAX_GENERIC, kvm_pmu_cap.num_counters_gp))
+> +                       if ((msrs_to_save_all[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=
+> +                           min(INTEL_PMC_MAX_GENERIC, kvm_pmu_cap.num_counters_gp)) ||
+> +                           !enable_pmu)
+> +                               continue;
+> +                       break;
+> +               case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
+> +               case MSR_K7_EVNTSEL0 ... MSR_K7_PERFCTR3:
+> +                       if (!enable_pmu)
+>                                 continue;
+>                         break;
+>                 case MSR_IA32_XFD:
 
-This commit does nominally increase the CPU usage of the NX recover
-worker by about 1% when testing with a VM with 16 slots.
+I think you've missed a bunch:
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
-In order to check if this commit increases the CPU usage of the NX
-recovery worker thread I used a modified version of execute_perf_test
-[1] that supports splitting guest memory into multiple slots and reports
-/proc/pid/schedstat:se.sum_exec_runtime for the NX recovery worker just
-before tearing down the VM. The goal was to force a large number of NX
-Huge Page recoveries and see if the recovery worker used any more CPU.
-
-Test Setup:
-
-  echo 1000 > /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms
-  echo 10 > /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio
-
-Test Command:
-
-  ./execute_perf_test -v64 -s anonymous_hugetlb_1gb -x 16 -o
-
-        | kvm-nx-lpage-re:se.sum_exec_runtime      |
-        | ---------------------------------------- |
-Run     | Before             | After               |
-------- | ------------------ | ------------------- |
-1       | 730.084105         | 724.375314          |
-2       | 728.751339         | 740.581988          |
-3       | 736.264720         | 757.078163          |
-
-Comparing the median results, this commit results in about a 1% increase
-CPU usage of the NX recovery worker.
-
-[1] https://lore.kernel.org/kvm/20221019234050.3919566-2-dmatlack@google.com/
-
-v2:
- - Only skip NX Huge Pages that are actively being dirty tracked [Paolo]
-
-v1: https://lore.kernel.org/kvm/20221027200316.2221027-1-dmatlack@google.com/
-
- arch/x86/kvm/mmu/mmu.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 82bc6321e58e..1c443f9aeb4b 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6831,6 +6831,7 @@ static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel
- static void kvm_recover_nx_huge_pages(struct kvm *kvm)
- {
- 	unsigned long nx_lpage_splits = kvm->stat.nx_lpage_splits;
-+	struct kvm_memory_slot *slot;
- 	int rcu_idx;
- 	struct kvm_mmu_page *sp;
- 	unsigned int ratio;
-@@ -6865,7 +6866,21 @@ static void kvm_recover_nx_huge_pages(struct kvm *kvm)
- 				      struct kvm_mmu_page,
- 				      possible_nx_huge_page_link);
- 		WARN_ON_ONCE(!sp->nx_huge_page_disallowed);
--		if (is_tdp_mmu_page(sp))
-+		WARN_ON_ONCE(!sp->role.direct);
-+
-+		slot = gfn_to_memslot(kvm, sp->gfn);
-+		WARN_ON_ONCE(!slot);
-+
-+		/*
-+		 * Unaccount and do not attempt to recover any NX Huge Pages
-+		 * that are being dirty tracked, as they would just be faulted
-+		 * back in as 4KiB pages. The NX Huge Pages in this slot will be
-+		 * recovered, along with all the other huge pages in the slot,
-+		 * when dirty logging is disabled.
-+		 */
-+		if (slot && kvm_slot_dirty_track_enabled(slot))
-+			unaccount_nx_huge_page(kvm, sp);
-+		else if (is_tdp_mmu_page(sp))
- 			flush |= kvm_tdp_mmu_zap_sp(kvm, sp);
- 		else
- 			kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
-
--- 
-2.38.1.431.g37b22c650d-goog
-
+MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
+MSR_ARCH_PERFMON_FIXED_CTR0 + 2,
+MSR_CORE_PERF_FIXED_CTR_CTRL, MSR_CORE_PERF_GLOBAL_STATUS,
+MSR_CORE_PERF_GLOBAL_CTRL, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
+MSR_IA32_PEBS_ENABLE, MSR_PEBS_DATA_CFG
