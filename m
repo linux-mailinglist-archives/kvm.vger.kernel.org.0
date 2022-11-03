@@ -2,133 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE48F6177A0
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 08:25:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 481EB6177AB
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 08:27:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231230AbiKCHZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 03:25:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58184 "EHLO
+        id S231318AbiKCH11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 03:27:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229823AbiKCHZo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 03:25:44 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 627412619
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 00:25:43 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id j15so1337364wrq.3
-        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 00:25:43 -0700 (PDT)
+        with ESMTP id S231310AbiKCH1Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 03:27:25 -0400
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32F8B2DDE
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 00:27:24 -0700 (PDT)
+Received: by mail-yb1-xb30.google.com with SMTP id 187so1273066ybe.1
+        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 00:27:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EDXCjZngZdqFd0T8UNtaJgIVNUXtxy5kh+IvZcYgc3o=;
-        b=KBb4CRffvbqT8vCYmIjrzMCnn1vGDH3hTE8kztkuirWCWDx5vmnnhlY12+76G8HB+D
-         zNMscqf1aWjU1jn9Q/+2qznV1nyjnfJgJejU0eBLDst+wEJ5JP32F9KCikAYwccYRz/4
-         CEoS+rbiQf+EK76mQ+O07yD4/kZHVOkQQ4sHVGI67dP7iLfCkYZsRk0ZykZuinHxGqnw
-         VBepbg5NHi4yk+ONf1CC+WSt8MwwyKu83Az0OvU8HlQtsrRUhgNXczuxh+p9v62b1ye5
-         0/LNF3gKJJGGBQ4GVZwf3fHBWg9tW8pDxWcOYgxGkG6PYQEim2NR9gsO5CmPy3fAtv6n
-         sc3w==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=6ly+G7+lyR2tgEVR1WMOK4EJ7N76yR8l41oUG1sHf9c=;
+        b=HrG2x4rNnb4SGZ4hQdH5OcFnrmKg4dnJ93AURRjRRNhh/t7Y5qGudWyzIHd8YDrtRa
+         DObcY/k3auLnQaAuraUBk82c/Wwpwgm+xk3l17J96W+F+acGu6yV4gei0zhQOC6O1R66
+         jWQaf1lExl1/9VVnmXSbJd4WpqqqIQie3+Sb9B1i/CyD6+momFmz2mYCMI3q094loyli
+         fDWk0RkkWEFNieHjdo73T4VNq71CAzD832G+/goGZxI/efxl9R7TGepZrtRN27fMHIo+
+         ZzcRFBpXAgam+vl+RSjHaefBGv00Mty/1OPE66QJwQdW65lYDVJhg3AsZ3zAOZMB9XAh
+         t/Jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EDXCjZngZdqFd0T8UNtaJgIVNUXtxy5kh+IvZcYgc3o=;
-        b=a3bM4rC8d0vAjRdSRadOTCRAD9VPx1euyLjRizwfBk7Kl87KoVMs9UhkYUwEQNUTG7
-         r9gguqZBYakHEa6+ecwI5pog4bkGnr8eO5p7dZMGpaCdVGTmyZLQ39ZVusAg79zTuWf2
-         FLMbomAXFfgXHL1F9b20QkmzXOPAKWmMuiAPEv9lDESVp2/aQhGwVsh4nJxCc95kr/Sx
-         qikPzEop6xTHpiCKWf85pgrr2RCqTozrkh4k+n2sh+YH8dAbXDAA33vxT3PnPeXudSfa
-         8Lrv/bzPAKKJf/Q8inIeHzhPTbfVufKN5DyErSjEStwXlo5yDZAmqOeRNv+xwZIzoAhd
-         jTOQ==
-X-Gm-Message-State: ACrzQf0G3YtGk1mvAk0y0bN9T1wvMbN4jFmajf2tcA3Ajns2OB/jgQid
-        2toxIZ5KMASi6Oh1GQXg5SbW4A==
-X-Google-Smtp-Source: AMsMyM74HX/NoI0zgj7ni+fuzXHxAnM/kiJpMAz2sP8bktGhOQR4suw74I3bBM5aFs9fFpQjlVL3zA==
-X-Received: by 2002:a5d:50ca:0:b0:236:776c:3075 with SMTP id f10-20020a5d50ca000000b00236776c3075mr17956880wrt.656.1667460341889;
-        Thu, 03 Nov 2022 00:25:41 -0700 (PDT)
-Received: from [192.168.11.175] (216.red-88-29-181.dynamicip.rima-tde.net. [88.29.181.216])
-        by smtp.gmail.com with ESMTPSA id i10-20020a1c540a000000b003a3442f1229sm4408723wmb.29.2022.11.03.00.25.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Nov 2022 00:25:40 -0700 (PDT)
-Message-ID: <dd59d579-4a4e-6db2-eac4-6c5c3ab71fd3@linaro.org>
-Date:   Thu, 3 Nov 2022 08:25:37 +0100
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6ly+G7+lyR2tgEVR1WMOK4EJ7N76yR8l41oUG1sHf9c=;
+        b=sVzL9Z3ywTag0OHIONW/YfMJRVnDvFITw120pZYzlzPA0lmr0XANdPiTdhla8L7jXe
+         9cPKgHYwkoKcDY+NQ+vFshdXLlH9RCDoBHtzOmw+M2E34QXUTcrJub7HZLpziPUMIWsq
+         CQrZnqB5ZWvLxgHzABOGIt/A5/trC2XLBak23wiiWRpFKmw5YII7eSCJBd6U6zl4bVXZ
+         dOAh6jwUmLKHxiGErLYmnY1iscLlZAuyQS/txFLhVxHdotmyL+rV0k8CetfWHyJmuoNy
+         S+lhYUm6mH80PwGEexDOaHxq3O+O5xZlydZiEIfOHZzOhhPrpZrOVHJ/lZ94+/id/q4V
+         evRA==
+X-Gm-Message-State: ACrzQf2u9M6nqWcNLYo05ql+wIucF7bPTZMhxATmG/yk7mnAHLeffKZ8
+        kuxd8c2R01hvwAwd57IKIiitMrXZnLtPzgPRwp7Rtw==
+X-Google-Smtp-Source: AMsMyM707h3+vIMmk1iKOcN3+xAYZCYrZqaa6FBSFeXjdm/4+xJAoqfaOX6vvY2T22hmyCyRhvlXxzQ+GytACfWctBk=
+X-Received: by 2002:a25:7b42:0:b0:6ca:1d03:2254 with SMTP id
+ w63-20020a257b42000000b006ca1d032254mr26098678ybc.584.1667460443279; Thu, 03
+ Nov 2022 00:27:23 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.4.1
-Subject: Re: [PATCH 17/44] KVM: arm64: Do arm/arch initialiation without
- bouncing through kvm_init()
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Chao Gao <chao.gao@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Yuan Yao <yuan.yao@intel.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-18-seanjc@google.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20221102231911.3107438-18-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <000000000000e9df4305ec7a3fc7@google.com> <0000000000005912d405ec8a329c@google.com>
+In-Reply-To: <0000000000005912d405ec8a329c@google.com>
+From:   Marco Elver <elver@google.com>
+Date:   Thu, 3 Nov 2022 08:26:47 +0100
+Message-ID: <CANpmjNNwjCWa0TX4CYShB5KrErWEd-z0BgpZTrpofnJNx-MkvA@mail.gmail.com>
+Subject: Re: [syzbot] WARNING in __perf_event_overflow
+To:     syzbot <syzbot+589d998651a580e6135d@syzkaller.appspotmail.com>
+Cc:     acme@kernel.org, alex.williamson@redhat.com,
+        alexander.shishkin@linux.intel.com, bpf@vger.kernel.org,
+        cohuck@redhat.com, dvyukov@google.com, jgg@ziepe.ca,
+        jolsa@kernel.org, kevin.tian@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        mark.rutland@arm.com, mingo@redhat.com, namhyung@kernel.org,
+        netdev@vger.kernel.org, peterz@infradead.org,
+        shameerali.kolothum.thodi@huawei.com,
+        syzkaller-bugs@googlegroups.com, yishaih@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-15.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SORTED_RECIPS,SPF_HELO_NONE,
+        SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+On Thu, 3 Nov 2022 at 06:26, syzbot
+<syzbot+589d998651a580e6135d@syzkaller.appspotmail.com> wrote:
+>
+> syzbot has bisected this issue to:
+>
+> commit c1d050b0d169fd60c8acef157db53bd4e3141799
+> Author: Yishai Hadas <yishaih@nvidia.com>
+> Date:   Thu Sep 8 18:34:45 2022 +0000
+>
+>     vfio/mlx5: Create and destroy page tracker object
+>
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=136eb2da880000
+> start commit:   88619e77b33d net: stmmac: rk3588: Allow multiple gmac cont..
+> git tree:       bpf
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=10eeb2da880000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=176eb2da880000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=a66c6c673fb555e8
+> dashboard link: https://syzkaller.appspot.com/bug?extid=589d998651a580e6135d
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11eabcea880000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10f7e632880000
+>
+> Reported-by: syzbot+589d998651a580e6135d@syzkaller.appspotmail.com
+> Fixes: c1d050b0d169 ("vfio/mlx5: Create and destroy page tracker object")
+>
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-On 3/11/22 00:18, Sean Christopherson wrote:
-> Move arm/arch specific initialization directly in arm's module_init(),
-> now called kvm_arm_init(), instead of bouncing through kvm_init() to
-> reach kvm_arch_init().  Invoking kvm_arch_init() is the very first action
-> performed by kvm_init(), i.e. this is a glorified nop.
-> 
-> Making kvm_arch_init() a nop will allow dropping it entirely once all
-> other architectures follow suit.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/arm64/kvm/arm.c | 25 ++++++++++++++++---------
->   1 file changed, 16 insertions(+), 9 deletions(-)
-
->   /* NOP: Compiling as a module not supported */
->   void kvm_arch_exit(void)
->   {
-> -	kvm_unregister_perf_callbacks();
-
-Doesn't this belong to the previous patch?
-
-> +
->   }
-
+The bisection is wrong - see
+https://lore.kernel.org/all/20221031093513.3032814-1-elver@google.com/
