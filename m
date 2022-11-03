@@ -2,70 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B5B2F618B82
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 23:29:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D1059618B8E
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 23:31:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231361AbiKCW3q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 18:29:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48688 "EHLO
+        id S229481AbiKCWbu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 18:31:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231806AbiKCW3R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 18:29:17 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C80ED22BF8
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 15:29:16 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id 4so3314665pli.0
-        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 15:29:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=a5roKd3dzGljHrTZvorPWCF+JnKyRC7p9CZ4elbqwas=;
-        b=pHPBzIRvTuEp0FZBJVItXCZLfqGBJQwIcLzR2QNu8yL7ebm+whm2cDwsH/YtJpliw9
-         B6DTqI/0aBUanj1d6O5dwRiBetSIt5eGLqn7IM34rZP+VAAfiCcx5y2d9kk/yVeAWjhc
-         3nruwBTl9RtMWF9Vv/mh0Go+d2gUsKAzvSn6rkSMX02VTMviqdaX+5rj6XRONthFJ8JR
-         PTK9aLM+J/3dILPlwT0BkONm5lJVAKcCvx/KQD7B3weXUBINGyKCS9szfCPvfessx4PY
-         OxMbF3z3iHtTJpnScF/levjuR/Y+aGT6UX9drY4++/YYQpxCSBEOL1OUTEWgAuIjOT3T
-         xG0w==
+        with ESMTP id S229461AbiKCWbq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 18:31:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F4212C7B
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 15:30:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667514644;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dFQqcskEaMsJv/nzLHsZye7Gc5BPG2pBqpBhEOGGuOc=;
+        b=aQCSRS/8tMu8EW3fvts+j+Ag5AKyyftVJUvUPbx9ZsM1V5DYNVjmqPN9uTEzc7+HpSmEXU
+        xWmUjDbTE4aKmS+5RiMODFiTxwVGoekS+Gjg73342J2cFL1zXCgPFj+RsVSl2EkDgcx2Px
+        ZN6c8ze1jHWMWm10ed96nEay4wS6Ibs=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-442-fzAd24wMO9GE779lM1syvg-1; Thu, 03 Nov 2022 18:30:43 -0400
+X-MC-Unique: fzAd24wMO9GE779lM1syvg-1
+Received: by mail-io1-f69.google.com with SMTP id c14-20020a5ea80e000000b006d6e9b05e58so909553ioa.23
+        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 15:30:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a5roKd3dzGljHrTZvorPWCF+JnKyRC7p9CZ4elbqwas=;
-        b=01E9o48XIey71YTrJTf5U30URvraZcDmx0iX+WbU4vAOF+W1/8+kwl+Uqynm02hAkf
-         WNay4vQVyd40wuMemj28y+8BylHzmtHg55oJZF63yJFaRc9mVGRLcSgfAUWpT4Yla9tO
-         Ije6ZxkIH5jc7TYm21nWgvZPQPsYbUdOVWqS7vMauqP8mo8v2GSXziif3c4JylhD/p6l
-         EMOQa8nMtsPdq1YsfeOSLeqkKht1QYVZtOmZ1U2YstIKHPdUMhgzSsJ6r113KDdJkBOJ
-         xmB+EnCU5hGdtCWp26FkpKdQecEf1nD3iebGREZ5YiE2fy/uuGGLaeLYq0gtZZAbplGD
-         ndvg==
-X-Gm-Message-State: ACrzQf2ZZyZzTL39TGetmtV9/ml6j8xxR9Ew3Nh8Qoi0WKFk592WeeoH
-        +8+UqxX5Uq2JP8ylRA6KzM9Urw==
-X-Google-Smtp-Source: AMsMyM5XBQErr9M7P4rDwdOZA08fzkCaolPvHx8BfJ4JTLlPYAx98QUGHOSRtac8whnFwDM1FZK1wA==
-X-Received: by 2002:a17:902:eccc:b0:186:5f09:f9 with SMTP id a12-20020a170902eccc00b001865f0900f9mr32251529plh.6.1667514556220;
-        Thu, 03 Nov 2022 15:29:16 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x3-20020a170902ea8300b00176ab6a0d5fsm1192465plb.54.2022.11.03.15.29.15
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dFQqcskEaMsJv/nzLHsZye7Gc5BPG2pBqpBhEOGGuOc=;
+        b=5VJEM7VEn2gAPw78FqZngQV/2h2r7EsC4O4b8OCEnBbwbklWOUj9ZTP0F8ZWbD/wFH
+         ufroOMq/VhKYf0Fsp3nk8Voxrra1H40nrMu6cnOKZoGh0phw5D/rlT1/M20Ikkjq0+di
+         kedDMGjZaKxK9DIfAPswprx5bZkOunLewG2dSlagf/HxFcqCd17Lo73j1CTGI9sEz8tb
+         KshMN0YPTLg2hEEz8GVbHBRhXQ6UTLzqRqfhKbmvCqzBr8nn9MltcxS33mxctyZ11qJn
+         u8YIbycQ8uVu1h6t7EZqIK0oQlJ50Mw1jF2S4UIoxvqmRxUvpkePUgmlkPZOJg5fjHYM
+         jIJg==
+X-Gm-Message-State: ACrzQf0DB569ynLlKQVSnElV3OyVwNbD4SfkuMhvRzXxSwSzlsyYXdp8
+        HQl/rw/5ipWt6Lt/l1m1SZqu/semN6ZoKjZQT/p6QWfPTJmsD3i5cUW2GwQz+DRirwK7bTO7M2q
+        WKszZ66W2ckOD
+X-Received: by 2002:a05:6e02:1605:b0:2fc:3e76:b264 with SMTP id t5-20020a056e02160500b002fc3e76b264mr18047210ilu.162.1667514642400;
+        Thu, 03 Nov 2022 15:30:42 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7RLREM/wkJZOQevZ2zKDWblrtnQOLDy76/QTDrtYbqDrY3R3/3rU68xOGdsxr6aeWKyYQwiQ==
+X-Received: by 2002:a05:6e02:1605:b0:2fc:3e76:b264 with SMTP id t5-20020a056e02160500b002fc3e76b264mr18047197ilu.162.1667514642215;
+        Thu, 03 Nov 2022 15:30:42 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id z10-20020a056602080a00b006a175fe334dsm812991iow.1.2022.11.03.15.30.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 15:29:15 -0700 (PDT)
-Date:   Thu, 3 Nov 2022 22:29:12 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [PATCH] KVM: x86: Omit PMU MSRs from KVM_GET_MSR_INDEX_LIST if
- !enable_pmu
-Message-ID: <Y2RAuO9Si74/sW1y@google.com>
-References: <20221103191733.3153803-1-aaronlewis@google.com>
- <CALMp9eTjJHMhQGDmbn2WYdcaFLWMvtQjWN4pTUMRXTAnBwj6jQ@mail.gmail.com>
+        Thu, 03 Nov 2022 15:30:41 -0700 (PDT)
+Date:   Thu, 3 Nov 2022 16:30:40 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Anthony DeRossi <ajderossi@gmail.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "abhsahu@nvidia.com" <abhsahu@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>
+Subject: Re: [PATCH v2] vfio-pci: Accept a non-zero open_count on reset
+Message-ID: <20221103163040.31421b10.alex.williamson@redhat.com>
+In-Reply-To: <Y2Q/wusmucaZF9bt@ziepe.ca>
+References: <20221026194245.1769-1-ajderossi@gmail.com>
+        <BN9PR11MB52763B921748415B14FFB57D8C369@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <Y2EFLVYwWumB9JbL@ziepe.ca>
+        <20221102154527.3ad11fe2.alex.williamson@redhat.com>
+        <Y2Q/wusmucaZF9bt@ziepe.ca>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eTjJHMhQGDmbn2WYdcaFLWMvtQjWN4pTUMRXTAnBwj6jQ@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,63 +86,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 03, 2022, Jim Mattson wrote:
-> On Thu, Nov 3, 2022 at 12:18 PM Aaron Lewis <aaronlewis@google.com> wrote:
-> >
-> > When the PMU is disabled, don't bother sharing the PMU MSRs with
-> > userspace through KVM_GET_MSR_INDEX_LIST.  Instead, filter them out so
-> > userspace doesn't have to keep track of them.
-> >
-> > Note that 'enable_pmu' is read-only, so userspace has no control over
-> > whether the PMU MSRs are included in the list or not.
-> >
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> > ---
-> >  arch/x86/kvm/x86.c | 15 +++++++++++----
-> >  1 file changed, 11 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 521b433f978c..19bc42a6946d 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -7042,13 +7042,20 @@ static void kvm_init_msr_list(void)
-> >                                 continue;
-> >                         break;
-> >                 case MSR_ARCH_PERFMON_PERFCTR0 ... MSR_ARCH_PERFMON_PERFCTR0 + 17:
-> > -                       if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_PERFCTR0 >=
-> > -                           min(INTEL_PMC_MAX_GENERIC, kvm_pmu_cap.num_counters_gp))
-> > +                       if ((msrs_to_save_all[i] - MSR_ARCH_PERFMON_PERFCTR0 >=
-> > +                           min(INTEL_PMC_MAX_GENERIC, kvm_pmu_cap.num_counters_gp)) ||
-> > +                           !enable_pmu)
-> >                                 continue;
-> >                         break;
-> >                 case MSR_ARCH_PERFMON_EVENTSEL0 ... MSR_ARCH_PERFMON_EVENTSEL0 + 17:
-> > -                       if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=
-> > -                           min(INTEL_PMC_MAX_GENERIC, kvm_pmu_cap.num_counters_gp))
-> > +                       if ((msrs_to_save_all[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=
-> > +                           min(INTEL_PMC_MAX_GENERIC, kvm_pmu_cap.num_counters_gp)) ||
-> > +                           !enable_pmu)
-> > +                               continue;
-> > +                       break;
-> > +               case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
-> > +               case MSR_K7_EVNTSEL0 ... MSR_K7_PERFCTR3:
-> > +                       if (!enable_pmu)
-> >                                 continue;
-> >                         break;
-> >                 case MSR_IA32_XFD:
-> 
-> I think you've missed a bunch:
-> 
-> MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
-> MSR_ARCH_PERFMON_FIXED_CTR0 + 2,
-> MSR_CORE_PERF_FIXED_CTR_CTRL, MSR_CORE_PERF_GLOBAL_STATUS,
-> MSR_CORE_PERF_GLOBAL_CTRL, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-> MSR_IA32_PEBS_ENABLE, MSR_PEBS_DATA_CFG
+On Thu, 3 Nov 2022 19:25:06 -0300
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
 
-Ooh, better idea!  Assuming this isn't a pressing concern, what about organizing
-the MSR lists into sublists, kinda like what I proposed for VMX MSRs[*], but do
-it in a generic way.  E.g. have all the PMU MSRs in a sub-list so that they can
-be skipped as a group instead of needing to add a bunch of enable_pmu checks.
+> On Wed, Nov 02, 2022 at 03:45:27PM -0600, Alex Williamson wrote:
+> > > open_count was from before we changed the core code to call
+> > > open_device only once. If we are only a call chain from
+> > > open_device/close_device then we know that the open_count must be 1.  
+> > 
+> > That accounts for the first test, we don't need to test open_count on
+> > the calling device in this path, but the idea here is that we want to
+> > test whether we're the last close_device among the set.  Not sure how
+> > we'd do that w/o some visibility to open_count.  Maybe we need a
+> > vfio_device_set_open_count() that when 1 we know we're the first open
+> > or last close?  Thanks,  
+> 
+> Right, we are checking the open count on all the devices in the set,
+> so I think that just this hunk is fine:
+> 
+> > > > > -		if (cur->vdev.open_count)
+> > > > > +		if (cur != vdev && cur->vdev.open_count)
+> > > > >  			return false;    
+> 
+> Because vfio_pci_dev_set_needs_reset() is always called from
+> open/close (which is how it picks up the devset lock), so we never
+> need to consider the current device by definition, it is always "just
+> being closed"
+> 
+> A little comment to explain this and that should be it?
 
-[*] https://lore.kernel.org/all/20220805172945.35412-3-seanjc@google.com
+Yes, but the open question Kevin raised was that open_count is listed
+as private in the header, so we ought not to be looking at it at all
+from vfio-pci-core unless we want to change that or provide an alternate
+interface to it.  Thanks,
+
+Alex
+
