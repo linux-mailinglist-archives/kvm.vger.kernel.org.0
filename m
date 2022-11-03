@@ -2,216 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A9F361799D
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 10:16:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 849DA617AC9
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 11:25:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231274AbiKCJQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 05:16:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35452 "EHLO
+        id S231215AbiKCKZP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 06:25:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231239AbiKCJQG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 05:16:06 -0400
-Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD1F5101D4
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 02:15:14 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1667466913;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DncmAK3NL9/4oZSAvB5v1EwbaOtUA9prdXDP6eXZj4U=;
-        b=gm9b1pbR4ETHnTMEDi4+iSijmTeRfExnUIh7z0Bfk+9ePF/k2MB9FXwDICjLkIwPq0tOO4
-        fNmJnkePNQtib4sgW+c2GzesO5f1aFdj6h0UAt2weSBtO0EE87Jbv00bc2xllwwYGFG+WK
-        LbkMbGYR/7YJEmcL+2Y/hPJ3DJkr+0I=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
+        with ESMTP id S231192AbiKCKZM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 06:25:12 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2A9DD11C
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 03:25:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 608AFB826A0
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 10:25:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0722BC433D7;
+        Thu,  3 Nov 2022 10:25:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667471106;
+        bh=1WjLvryUdEjCQvaGHVT4ulj0LOaBupI7N5OU9BiVl5w=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=MF+ZKTQo493m4vReC6RjdsC4JAi2ZaqHn73bOyvEx+WIcIGg+3Xd3iyEQYzVtzHKy
+         oVi6wgoi1cjocgXOlvZe9Nbuk88wrlqofN3qL5qWkmi9ilCzWDiMeRXEbkCRWITxBD
+         Wb24a7y/dgLeK34nevpfsa4JfAHkUI0OihIHk1wmu5PZWN3KXGwP2RR46cNka58BDD
+         FF2IuFj1rXpsn0Y7ZK576xDKTK86az/4DotWOp5vSeJ4r37RxIk0zjMvCXistMRjnA
+         WvGx+bpSvjFpYfO4b5PxV98bnHYGd/vqYpbjo7KT3e3kGkhkZ3xpvGc8pseTv+zER9
+         WDCoakY1H7PBg==
+Received: from [104.132.45.97] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oqXPD-003TRe-JS;
+        Thu, 03 Nov 2022 10:25:03 +0000
+Date:   Thu, 03 Nov 2022 10:24:33 +0000
+Message-ID: <87tu3gfi8u.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Quentin Perret <qperret@google.com>,
-        Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v4 14/14] KVM: arm64: Handle stage-2 faults in parallel
-Date:   Thu,  3 Nov 2022 09:15:04 +0000
-Message-Id: <20221103091504.1040934-1-oliver.upton@linux.dev>
-In-Reply-To: <20221103091140.1040433-1-oliver.upton@linux.dev>
-References: <20221103091140.1040433-1-oliver.upton@linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v2 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to be set from userspace
+In-Reply-To: <CAAeT=FyiNeRun7oRL83AUkVabUSb9pxL2SS9yZwi1rjFnbhH6g@mail.gmail.com>
+References: <20221028105402.2030192-1-maz@kernel.org>
+        <20221028105402.2030192-12-maz@kernel.org>
+        <CAAeT=FyiNeRun7oRL83AUkVabUSb9pxL2SS9yZwi1rjFnbhH6g@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 104.132.45.97
+X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The stage-2 map walker has been made parallel-aware, and as such can be
-called while only holding the read side of the MMU lock. Rip out the
-conditional locking in user_mem_abort() and instead grab the read lock.
-Continue to take the write lock from other callsites to
-kvm_pgtable_stage2_map().
+On Thu, 03 Nov 2022 05:31:56 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Fri, Oct 28, 2022 at 4:16 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Allow userspace to write ID_AA64DFR0_EL1, on the condition that only
+> > the PMUver field can be altered and be at most the one that was
+> > initially computed for the guest.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 37 ++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 36 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 7a4cd644b9c0..4fa14b4ae2a6 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1247,6 +1247,40 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> >         return 0;
+> >  }
+> >
+> > +static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> > +                              const struct sys_reg_desc *rd,
+> > +                              u64 val)
+> > +{
+> > +       u8 pmuver, host_pmuver;
+> > +
+> > +       host_pmuver = kvm_arm_pmu_get_pmuver_limit();
+> > +
+> > +       /*
+> > +        * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
+> > +        * as it doesn't promise more than what the HW gives us. We
+> > +        * allow an IMPDEF PMU though, only if no PMU is supported
+> > +        * (KVM backward compatibility handling).
+> > +        */
+> 
+> It appears the patch allows userspace to set IMPDEF even
+> when host_pmuver == 0.  Shouldn't it be allowed only when
+> host_pmuver == IMPDEF (as before)?
+> Probably, it may not cause any real problems though.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_pgtable.h  |  3 ++-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c |  2 +-
- arch/arm64/kvm/hyp/pgtable.c          |  5 +++--
- arch/arm64/kvm/mmu.c                  | 31 ++++++---------------------
- 4 files changed, 13 insertions(+), 28 deletions(-)
+Given that we don't treat the two cases any differently, I thought it
+would be reasonable to relax this particular case, and I can't see any
+reason why we shouldn't tolerate this sort of migration.
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 7634b6964779..a874ce0ce7b5 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -412,6 +412,7 @@ void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pg
-  * @prot:	Permissions and attributes for the mapping.
-  * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-  *		page-table pages.
-+ * @flags:	Flags to control the page-table walk (ex. a shared walk)
-  *
-  * The offset of @addr within a page is ignored, @size is rounded-up to
-  * the next page boundary and @phys is rounded-down to the previous page
-@@ -433,7 +434,7 @@ void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pg
-  */
- int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   u64 phys, enum kvm_pgtable_prot prot,
--			   void *mc);
-+			   void *mc, enum kvm_pgtable_walk_flags flags);
- 
- /**
-  * kvm_pgtable_stage2_set_owner() - Unmap and annotate pages in the IPA space to
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 735769886b55..f6d82bf33ce1 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -257,7 +257,7 @@ static inline int __host_stage2_idmap(u64 start, u64 end,
- 				      enum kvm_pgtable_prot prot)
- {
- 	return kvm_pgtable_stage2_map(&host_kvm.pgt, start, end - start, start,
--				      prot, &host_s2_pool);
-+				      prot, &host_s2_pool, 0);
- }
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index e088d01e6e82..b9545e2e9d6a 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -912,7 +912,7 @@ static int stage2_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 
- int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   u64 phys, enum kvm_pgtable_prot prot,
--			   void *mc)
-+			   void *mc, enum kvm_pgtable_walk_flags flags)
- {
- 	int ret;
- 	struct stage2_map_data map_data = {
-@@ -923,7 +923,8 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	};
- 	struct kvm_pgtable_walker walker = {
- 		.cb		= stage2_map_walker,
--		.flags		= KVM_PGTABLE_WALK_TABLE_PRE |
-+		.flags		= flags |
-+				  KVM_PGTABLE_WALK_TABLE_PRE |
- 				  KVM_PGTABLE_WALK_LEAF,
- 		.arg		= &map_data,
- 	};
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 52e042399ba5..410c2a37fe32 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -861,7 +861,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 
- 		write_lock(&kvm->mmu_lock);
- 		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
--					     &cache);
-+					     &cache, 0);
- 		write_unlock(&kvm->mmu_lock);
- 		if (ret)
- 			break;
-@@ -1156,7 +1156,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	gfn_t gfn;
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
--	bool use_read_lock = false;
- 	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
- 	unsigned long vma_pagesize, fault_granule;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-@@ -1191,8 +1190,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (logging_active) {
- 		force_pte = true;
- 		vma_shift = PAGE_SHIFT;
--		use_read_lock = (fault_status == FSC_PERM && write_fault &&
--				 fault_granule == PAGE_SIZE);
- 	} else {
- 		vma_shift = get_vma_page_shift(vma, hva);
- 	}
-@@ -1291,15 +1288,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (exec_fault && device)
- 		return -ENOEXEC;
- 
--	/*
--	 * To reduce MMU contentions and enhance concurrency during dirty
--	 * logging dirty logging, only acquire read lock for permission
--	 * relaxation.
--	 */
--	if (use_read_lock)
--		read_lock(&kvm->mmu_lock);
--	else
--		write_lock(&kvm->mmu_lock);
-+	read_lock(&kvm->mmu_lock);
- 	pgt = vcpu->arch.hw_mmu->pgt;
- 	if (mmu_invalidate_retry(kvm, mmu_seq))
- 		goto out_unlock;
-@@ -1343,15 +1332,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
- 	 * kvm_pgtable_stage2_map() should be called to change block size.
- 	 */
--	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
-+	if (fault_status == FSC_PERM && vma_pagesize == fault_granule)
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
--	} else {
--		WARN_ONCE(use_read_lock, "Attempted stage-2 map outside of write lock\n");
--
-+	else
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
--					     memcache);
--	}
-+					     memcache, KVM_PGTABLE_WALK_SHARED);
- 
- 	/* Mark the page dirty only if the fault is handled successfully */
- 	if (writable && !ret) {
-@@ -1360,10 +1346,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
- 
- out_unlock:
--	if (use_read_lock)
--		read_unlock(&kvm->mmu_lock);
--	else
--		write_unlock(&kvm->mmu_lock);
-+	read_unlock(&kvm->mmu_lock);
- 	kvm_set_pfn_accessed(pfn);
- 	kvm_release_pfn_clean(pfn);
- 	return ret != -EAGAIN ? ret : 0;
-@@ -1569,7 +1552,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 	 */
- 	kvm_pgtable_stage2_map(kvm->arch.mmu.pgt, range->start << PAGE_SHIFT,
- 			       PAGE_SIZE, __pfn_to_phys(pfn),
--			       KVM_PGTABLE_PROT_R, NULL);
-+			       KVM_PGTABLE_PROT_R, NULL, 0);
- 
- 	return false;
- }
+> 
+> 
+> > +       pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
+> > +       if (pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver)
+> > +               return -EINVAL;
+> > +
+> > +       /* We already have a PMU, don't try to disable it... */
+> > +       if (kvm_vcpu_has_pmu(vcpu) &&
+> > +           (pmuver == 0 || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF))
+> > +               return -EINVAL;
+> 
+> Nit: Perhaps it might be useful to return a different error code for the
+> above two (new) error cases (I plan to use -E2BIG and -EPERM
+> respectively for those cases with my ID register series).
+
+My worry in doing so is that we don't have an established practice for
+these cases. I'm fine with introducing new error codes, but I'm not
+sure there is an existing practice in userspace to actually interpret
+them.
+
+Even -EPERM has a slightly different meaning, and although there is
+some language there saying that it is all nonsense, we should be very
+careful.
+
+Thanks,
+
+	M.
+
 -- 
-2.38.1.431.g37b22c650d-goog
-
+Without deviation from the norm, progress is not possible.
