@@ -2,108 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C7F8618B5C
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 23:25:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F6CC618B5E
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 23:25:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231238AbiKCWZL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 18:25:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45250 "EHLO
+        id S231693AbiKCWZi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 18:25:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229985AbiKCWZK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 18:25:10 -0400
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52074140E6
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 15:25:09 -0700 (PDT)
-Received: by mail-qv1-xf2f.google.com with SMTP id x13so2118789qvn.6
-        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 15:25:09 -0700 (PDT)
+        with ESMTP id S231378AbiKCWZh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 18:25:37 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A796617D
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 15:25:37 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id v17so3278854plo.1
+        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 15:25:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
+        d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=q6ulxAKzgwhOEAz+Vk416yC+zAh5tU2bKFMPZ+SDAAI=;
-        b=OEi2IJ5t5LhiItl3w2w445nY5kMKTZdfnRucawu1E9eH1Hrk35dMNk6pGtepQIQrK7
-         rAJy9hsBhQ+CcTvjbwyfMdRm7Ekz14sSKm+2Mb1LN7rOlmPns8CaSDg0lJqQBNVUW7Ik
-         ZpIAi7mnujo/5cuY69dj9+lJJ9hb46N58JrRCcKdaaWZ6bENv8hc7b1K2zvMtp3eBcc4
-         OARqKj4yGzBlM2VOvGLMaGEK51TX+jtRBb3PzMvH6I8Q2PHpIjZlyM8TG/vHZYdpnAAg
-         4UZUK3c2lbupvCmLibBZckpA8FMocBwb99xEuKIiDT4fc5YwiWWzE+t6yNbrICFOCtsU
-         ln4A==
+        bh=PO6xlmxvka0CVGc5nO1Kud7KkxoU59ZTMUWaXaIsCuU=;
+        b=b9tUlcxIEtOZfXUQNLUzylQxZJ6cIokU+gy0w+a+x5jfcDQZxyD/+L7ft0n4KmSSOP
+         UgoR/NIvpT31Zrc1i9HIoGAx02lJTRZosFC3UfwuxRwDeh6k32j14kjfL7MkfEM6vSyu
+         +JRQ9SRZXxwYLr2Bb42boUmTG7Ol9QvH3/sxOjSO+LMLQxnNVwxZAQyG9NAgUPnkuJtL
+         PrHtehXJfAkInlWF8gfMdsmk7yjtqX2LX0gX4SZJxqBp16STqiRyTzf9XsLspr3GlPLk
+         ZuZWwuFkTYc0j+1Fve0J+HhbfA7/tXKVgicAOqUZB3s6teQWv7u0Gz6Aa+rNRoHtv8Ot
+         j6EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=q6ulxAKzgwhOEAz+Vk416yC+zAh5tU2bKFMPZ+SDAAI=;
-        b=fFhgfFVIHhubR9MAYxJ9HndIWZ4rkaGLQGyRHPHzEhMXpmi6DwH0QO9v57Oul2FPTi
-         1cvQl7kV16SvRaOYSY0F4GABGnZbActx4t9RAPECWk9fFQoUZgTS4O+dg1a7OP/ietPP
-         Hgxjl/BzH5a41hVL6OhBigIJ6OM7iZ3HcZKf/6GGaLDjfIzUWFD5QNUCLNwPMTMa8haW
-         sLFwvWKhOpFeR9N1/PbdBa/d2XR/NCvxnR9qpiU4m1U28zyFrzyJA2/WdHdLWaXmbHXB
-         BA3krhzRq2VyPDc8IOarVm3F/GXKFeRs+l6qWA8LO+7xcSa3JCOHMa5N+71TGNb8tRz8
-         rChg==
-X-Gm-Message-State: ACrzQf3uU2xhYZSShOiE1M/ldE7XJZSCNmCGhHzgc5djsad/4+U21SEm
-        XXvG5qXX+ou5lNM+NyXWcLR7aQ==
-X-Google-Smtp-Source: AMsMyM5xKijdaz8+OvrGPP5D7JyWzVjnGwrcw8IsAPnceqepAaFSFeSNaigEAZzNPaui93Kd5Cwd/A==
-X-Received: by 2002:a05:6214:1bc7:b0:4bb:7aa8:b5cd with SMTP id m7-20020a0562141bc700b004bb7aa8b5cdmr29253548qvc.78.1667514308515;
-        Thu, 03 Nov 2022 15:25:08 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
-        by smtp.gmail.com with ESMTPSA id o5-20020ac87c45000000b003a50d92f9b4sm1324734qtv.1.2022.11.03.15.25.07
+        bh=PO6xlmxvka0CVGc5nO1Kud7KkxoU59ZTMUWaXaIsCuU=;
+        b=nkj0HNXNv6Sb1kBlw4mYY+diws1cDmx8LbIzdK1MKT26HDt4HONqmciIgVc8Xl/G7g
+         vvAUEr32g1O+j0fVKGJ8wKCGe9nPgcBXIZrlAUSoFVyDbbTa9m1koFdzkU/oLm7tXO+p
+         +FPQ51dUm9IpO6d3slsB0RfkGdEeXtPnR4yKzvQKl0okKxslDc3qNtn1lQQHQqKrkagx
+         i3qA8XmEZAi+MHDcdsIy3ZrhD1WVu6SeftX9ONDAeOF/EG3P18dpE01bMPNSNw9wwTGa
+         TYGjMnRsFKSoMLrL8xNdzl9hYrh1Mx5KuZldTMIrFrp7trwtZdBvmD+QBx8QtjwAqNqN
+         YBHA==
+X-Gm-Message-State: ACrzQf3nXypIS+YI2liq/S0Z7eOER5LlmGVgOlDkmJDqjJqp+2dopcc8
+        csyDv0UwUstJtYSeU2hYOolC2J6O0qb5Jw==
+X-Google-Smtp-Source: AMsMyM68njOrKyWTO4YrkdUs2xYcRNgqXrvH8bSZ6MYrY73blOQTr3+/xBM64zpqs7VbDcKa//4mpQ==
+X-Received: by 2002:a17:902:ef43:b0:186:99be:2ee9 with SMTP id e3-20020a170902ef4300b0018699be2ee9mr32322793plx.148.1667514336592;
+        Thu, 03 Nov 2022 15:25:36 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 3-20020a621703000000b0056ba02feda1sm1288792pfx.94.2022.11.03.15.25.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 15:25:07 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1oqie2-008RIP-Ux;
-        Thu, 03 Nov 2022 19:25:06 -0300
-Date:   Thu, 3 Nov 2022 19:25:06 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Anthony DeRossi <ajderossi@gmail.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "abhsahu@nvidia.com" <abhsahu@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>
-Subject: Re: [PATCH v2] vfio-pci: Accept a non-zero open_count on reset
-Message-ID: <Y2Q/wusmucaZF9bt@ziepe.ca>
-References: <20221026194245.1769-1-ajderossi@gmail.com>
- <BN9PR11MB52763B921748415B14FFB57D8C369@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Y2EFLVYwWumB9JbL@ziepe.ca>
- <20221102154527.3ad11fe2.alex.williamson@redhat.com>
+        Thu, 03 Nov 2022 15:25:36 -0700 (PDT)
+Date:   Thu, 3 Nov 2022 22:25:32 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     jarkko@kernel.org, Harald Hoyer <harald@profian.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: SVM: Only dump VSMA to klog for debugging
+Message-ID: <Y2Q/3A1DSzSJkRAy@google.com>
+References: <20221103210421.359837-1-pgonda@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221102154527.3ad11fe2.alex.williamson@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221103210421.359837-1-pgonda@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 02, 2022 at 03:45:27PM -0600, Alex Williamson wrote:
-> > open_count was from before we changed the core code to call
-> > open_device only once. If we are only a call chain from
-> > open_device/close_device then we know that the open_count must be 1.
+On Thu, Nov 03, 2022, Peter Gonda wrote:
+> The KERN_CONT documentation says it defaults back to KERNL_DEFAULT if the
+
+State what actually happens.  Documentation is sometimes wrong, and just saying
+"the docs say XYZ" makes it sound like this is a fix based on code inspection,
+whereas you encountered a real problem.  E.g.
+
+  Explicitly print the VMSA dump at KERN_DEBUG log level, KERN_CONT uses
+  KERNEL_DEFAULT if the previous log line has a newline, i.e. if there's
+  nothing to continuing, and as a result the VMSA gets dumped when it
+  shouldn't.
+
+> previous log line has a newline. So switch from KERN_CONT to
+> print_hex_dump_debug().
+
+Jarkko pointed this out in the original submission, but the buggy patch got queued
+without the fixup.  This is a good opportunity to throw in a link so that it's
+clear that the change is aligned with the original intent.
+
+  Link: https://lore.kernel.org/all/YuPMeWX4uuR1Tz3M@kernel.org
+
+> Cc: Jarkko Sakkinen <jarkko@kernel.org>
+> Cc: Harald Hoyer <harald@profian.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: x86@kernel.org
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Peter Gonda <pgonda@google.com>
 > 
-> That accounts for the first test, we don't need to test open_count on
-> the calling device in this path, but the idea here is that we want to
-> test whether we're the last close_device among the set.  Not sure how
-> we'd do that w/o some visibility to open_count.  Maybe we need a
-> vfio_device_set_open_count() that when 1 we know we're the first open
-> or last close?  Thanks,
+> Fixes: 6fac42f127b8 ("KVM: SVM: Dump Virtual Machine Save Area (VMSA) to klog")
 
-Right, we are checking the open count on all the devices in the set,
-so I think that just this hunk is fine:
+Fixes: usually goes before everything else, and this should probably Cc stable@
+as well.
 
-> > > > -		if (cur->vdev.open_count)
-> > > > +		if (cur != vdev && cur->vdev.open_count)
-> > > >  			return false;  
+With the above tweaks,
 
-Because vfio_pci_dev_set_needs_reset() is always called from
-open/close (which is how it picks up the devset lock), so we never
-need to consider the current device by definition, it is always "just
-being closed"
-
-A little comment to explain this and that should be it?
-
-Jason
+Reviewed-by: Sean Christopherson <seanjc@google.com>
