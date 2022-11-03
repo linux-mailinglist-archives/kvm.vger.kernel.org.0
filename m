@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C536A6188A8
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 20:20:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DB936188AA
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 20:20:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231848AbiKCTUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 15:20:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59158 "EHLO
+        id S231790AbiKCTUX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 15:20:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231401AbiKCTTi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 15:19:38 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27837222BD
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 12:17:54 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id q3-20020a17090311c300b0017898180dddso1924578plh.0
-        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 12:17:54 -0700 (PDT)
+        with ESMTP id S231673AbiKCTTl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 15:19:41 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E68C4220FE
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 12:17:55 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id f189-20020a6238c6000000b0056e3400fdc0so1172626pfa.10
+        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 12:17:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=e3JYiAUQQRWKLGF50CeTvf+Wuh3InMfajk/MWXVrEkI=;
-        b=sfZh29qx0kLnNdp34OArwg6gIrmM7CTmPWLBNm+sovfEYu59QOJQAq3M32tbcljgyB
-         +HpflTek3WA33NIfmLjd1yIJJAC7RQ2p0Qu4syYEivEGv2aA7/zJcF6zOjM2IVfkxDlb
-         WYMUSza+OFrfAqu+KhDWv1I30uaAlNWJ6nK5F97/Tw2Uykvt+cSAe9kxo1SlSWT6jQmp
-         aGk9GrX/vT2lfJc9wg0TFYkwFSxxwcp8TYqwiXDPpf7I2VsEzI+WB7CD2Q87weVkgwLG
-         vuQJmvwSjoOn/vnCubTlYcTeqPSCGvOJEwVQ45ojujTY83cqJvpqnpE7vkISZd2cmhiY
-         HMKA==
+        bh=VE7RW56VayO0keHNnwyMULSgmJMIPboymyf3dnMpIn8=;
+        b=dP06Br4JqYIplmuDlAtw8NBC+7JUvZT/C7ro4K3jXNYWrwSPrgJpl0+uHN7VL6sqQA
+         N5IDDScJ9pn8OFNVw5BiW9bPmtVrxqPhIx98k/ZYGVIJqmijFynyPv8l5O5OHZqwX59D
+         5c2VHbPch+kLoZSHgsf3qRYJoaO5jO3bm7zzL157WfPUALtR9KPBrKoduYJ2o2ambwtj
+         d1dmvwelsNsILAAx1/4TQ/sdHjKQpgUd6vkHfhUd5w0V4iDmpAFTlHn+WwyfDai9uW+l
+         7F4auKXvQmQslZ5G9HMyHp3gOR7NITa9rRHwjmexITZIFDs825hDqcphrS6DgrGW9oJZ
+         WfpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e3JYiAUQQRWKLGF50CeTvf+Wuh3InMfajk/MWXVrEkI=;
-        b=hxqzIZGphiK+EwApa7Fl3PIga/YCC0yA5W7a7OBfwInBHq6Y4XQkykNafqRSUr0Ipp
-         0g/fi4V2ANqqhVHC+QPWZh0eNq8BkeCnqonMWlWLmc8XDs3SPJaoSXfYKlVRztMaz+6Z
-         Gy6y8MICJgG0YyOBVHnYbbsELGIUmZQx5eh2RFy4fWXtCWZiBQ7HV6fvomyLOfgpJ8je
-         7FZoztjzQpprIul+VIM9tf7+8JtKwzkWfGqUCQ3wYiWu26nHrMt8hODcoPmxLwyAzfgk
-         Whs/IZvGrsAd/D2XFC+ggPdX6dFpBE4CZAAEbhSuBb4myGvOmbre8WoRG7upir9FZEBa
-         bIsw==
-X-Gm-Message-State: ACrzQf3D7IB5OB0caLe4J2Jb3ziaIp0mqEB/yixROQxVNIUu/mwm03Qr
-        Zh4aiKYqVNKPX+lv+6nwLyuPVkEUVlKz
-X-Google-Smtp-Source: AMsMyM7lWBa42ivfsP1sfDSsFCOumi6d48dIk0I2oBW7EfC12C+nUhCGnUkOc/QKtXn7UZsghL1zazCYHH8c
+        bh=VE7RW56VayO0keHNnwyMULSgmJMIPboymyf3dnMpIn8=;
+        b=WOYNkWGudvIYxlw09ysIxZM49FYLlphOp95PAOJXc4gmiMfJ130BVwDsKVck/cU2fQ
+         2zuvqmCG7DVr4PWV4kR63TeqBB2lrFtnMXuN9WVn6UyCngQdtyOxZXaDOiin9xTYtNV1
+         Qj3FITaFUBAspHZRvpCQAHzMNggnF0/jj4+NjD8I5jkuFZinlWYIiPlRqo2KCxzOw02n
+         DpWveQ0/vedK667r3Y8i54sqegDgN4nKtxR247C+Xi8KYZMTiAJjcb6+OC0PD6CTkNtk
+         SMsfxo0Eg1lbxHilHIYkG0YIHagC1b+Ok1qnGhO5N0Uc52vMhSqwBVngfW9KjHEjISM+
+         t11g==
+X-Gm-Message-State: ACrzQf1fPn5VpjDynOpknUXxs8F3/skfvWSDYTI9KSBBh3l5dddjqyZd
+        VKZ+TqxdV8vRZxKrB8PJmVEgdwaTobdP
+X-Google-Smtp-Source: AMsMyM4hBl4M9fbpMdGpzYElHUBrf9nCvqojz3WQNHWrEUlKpMlDYb9B4dvU37yIpnHK9KVboTV5Bql8iMiL
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a05:6a00:1a04:b0:52a:d4dc:5653 with SMTP
- id g4-20020a056a001a0400b0052ad4dc5653mr31954891pfv.69.1667503056685; Thu, 03
- Nov 2022 12:17:36 -0700 (PDT)
-Date:   Thu,  3 Nov 2022 12:17:18 -0700
+ (user=vipinsh job=sendgmr) by 2002:a17:90a:f291:b0:20a:eab5:cf39 with SMTP id
+ fs17-20020a17090af29100b0020aeab5cf39mr144204pjb.1.1667503058552; Thu, 03 Nov
+ 2022 12:17:38 -0700 (PDT)
+Date:   Thu,  3 Nov 2022 12:17:19 -0700
 In-Reply-To: <20221103191719.1559407-1-vipinsh@google.com>
 Mime-Version: 1.0
 References: <20221103191719.1559407-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221103191719.1559407-7-vipinsh@google.com>
-Subject: [PATCH v9 6/7] KVM: selftests: Add atoi_positive() and
- atoi_non_negative() for input validation
+Message-ID: <20221103191719.1559407-8-vipinsh@google.com>
+Subject: [PATCH v9 7/7] KVM: selftests: Allowing running dirty_log_perf_test
+ on specific CPUs
 From:   Vipin Sharma <vipinsh@google.com>
 To:     seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com
 Cc:     andrew.jones@linux.dev, wei.w.wang@intel.com, kvm@vger.kernel.org,
@@ -60,7 +60,7 @@ Cc:     andrew.jones@linux.dev, wei.w.wang@intel.com, kvm@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,345 +68,235 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Many KVM selftests take command line arguments which are supposed to be
-positive (>0) or non-negative (>=0). Some tests do these validation and
-some missed adding the check.
+Add a command line option, -c, to pin vCPUs to physical CPUs (pCPUs),
+i.e.  to force vCPUs to run on specific pCPUs.
 
-Add atoi_positive() and atoi_non_negative() to validate inputs in
-selftests before proceeding to use those values.
+Requirement to implement this feature came in discussion on the patch
+"Make page tables for eager page splitting NUMA aware"
+https://lore.kernel.org/lkml/YuhPT2drgqL+osLl@google.com/
+
+This feature is useful as it provides a way to analyze performance based
+on the vCPUs and dirty log worker locations, like on the different NUMA
+nodes or on the same NUMA nodes.
+
+To keep things simple, implementation is intentionally very limited,
+either all of the vCPUs will be pinned followed by an optional main
+thread or nothing will be pinned.
 
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
+Suggested-by: David Matlack <dmatlack@google.com>
 Reviewed-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/aarch64/arch_timer.c        | 25 ++++---------------
- .../selftests/kvm/aarch64/debug-exceptions.c  |  2 +-
- .../testing/selftests/kvm/aarch64/vgic_irq.c  |  2 +-
- .../selftests/kvm/access_tracking_perf_test.c |  2 +-
- .../selftests/kvm/demand_paging_test.c        |  4 +--
- .../selftests/kvm/dirty_log_perf_test.c       | 12 ++++-----
- .../testing/selftests/kvm/include/test_util.h | 16 ++++++++++++
- .../selftests/kvm/kvm_page_table_test.c       |  4 +--
- .../selftests/kvm/max_guest_memory_test.c     |  9 +++----
- .../kvm/memslot_modification_stress_test.c    | 10 +++-----
- .../testing/selftests/kvm/memslot_perf_test.c | 22 ++++------------
- .../selftests/kvm/set_memory_region_test.c    |  2 +-
- .../selftests/kvm/x86_64/nx_huge_pages_test.c |  3 +--
- 13 files changed, 47 insertions(+), 66 deletions(-)
+ .../selftests/kvm/dirty_log_perf_test.c       | 25 ++++++++-
+ .../selftests/kvm/include/kvm_util_base.h     |  4 ++
+ .../selftests/kvm/include/perf_test_util.h    |  4 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 54 +++++++++++++++++++
+ .../selftests/kvm/lib/perf_test_util.c        |  8 ++-
+ 5 files changed, 92 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 251e7ff04883..9409617fce9c 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -414,36 +414,21 @@ static bool parse_args(int argc, char *argv[])
- 	while ((opt = getopt(argc, argv, "hn:i:p:m:")) != -1) {
- 		switch (opt) {
- 		case 'n':
--			test_args.nr_vcpus = atoi_paranoid(optarg);
--			if (test_args.nr_vcpus <= 0) {
--				pr_info("Positive value needed for -n\n");
--				goto err;
--			} else if (test_args.nr_vcpus > KVM_MAX_VCPUS) {
-+			test_args.nr_vcpus = atoi_positive("Number of vCPUs", optarg);
-+			if (test_args.nr_vcpus > KVM_MAX_VCPUS) {
- 				pr_info("Max allowed vCPUs: %u\n",
- 					KVM_MAX_VCPUS);
- 				goto err;
- 			}
- 			break;
- 		case 'i':
--			test_args.nr_iter = atoi_paranoid(optarg);
--			if (test_args.nr_iter <= 0) {
--				pr_info("Positive value needed for -i\n");
--				goto err;
--			}
-+			test_args.nr_iter = atoi_positive("Number of iterations", optarg);
- 			break;
- 		case 'p':
--			test_args.timer_period_ms = atoi_paranoid(optarg);
--			if (test_args.timer_period_ms <= 0) {
--				pr_info("Positive value needed for -p\n");
--				goto err;
--			}
-+			test_args.timer_period_ms = atoi_positive("Periodicity", optarg);
- 			break;
- 		case 'm':
--			test_args.migration_freq_ms = atoi_paranoid(optarg);
--			if (test_args.migration_freq_ms < 0) {
--				pr_info("0 or positive value needed for -m\n");
--				goto err;
--			}
-+			test_args.migration_freq_ms = atoi_non_negative("Frequency", optarg);
- 			break;
- 		case 'h':
- 		default:
-diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-index 19fffdf19c9f..878c334607e1 100644
---- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-+++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -423,7 +423,7 @@ int main(int argc, char *argv[])
- 	while ((opt = getopt(argc, argv, "i:")) != -1) {
- 		switch (opt) {
- 		case 'i':
--			ss_iteration = atoi_paranoid(optarg);
-+			ss_iteration = atoi_positive("Number of iterations", optarg);
- 			break;
- 		case 'h':
- 		default:
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-index ae90b718070a..4ead42a072b7 100644
---- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-@@ -824,7 +824,7 @@ int main(int argc, char **argv)
- 	while ((opt = getopt(argc, argv, "hn:e:l:")) != -1) {
- 		switch (opt) {
- 		case 'n':
--			nr_irqs = atoi_paranoid(optarg);
-+			nr_irqs = atoi_non_negative("Number of IRQs", optarg);
- 			if (nr_irqs > 1024 || nr_irqs % 32)
- 				help(argv[0]);
- 			break;
-diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-index c6bcc5301e2c..a81e7a7ae18f 100644
---- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-+++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -368,7 +368,7 @@ int main(int argc, char *argv[])
- 			params.vcpu_memory_bytes = parse_size(optarg);
- 			break;
- 		case 'v':
--			params.nr_vcpus = atoi_paranoid(optarg);
-+			params.nr_vcpus = atoi_positive("Number of vCPUs", optarg);
- 			break;
- 		case 'o':
- 			overlap_memory_access = true;
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index 82597fb04146..0c98181fa248 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -427,8 +427,8 @@ int main(int argc, char *argv[])
- 			p.src_type = parse_backing_src_type(optarg);
- 			break;
- 		case 'v':
--			nr_vcpus = atoi_paranoid(optarg);
--			TEST_ASSERT(nr_vcpus > 0 && nr_vcpus <= max_vcpus,
-+			nr_vcpus = atoi_positive("Number of vCPUs", optarg);
-+			TEST_ASSERT(nr_vcpus <= max_vcpus,
- 				    "Invalid number of vcpus, must be between 1 and %d", max_vcpus);
- 			break;
- 		case 'o':
 diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index ecda802b78ff..4d639683b8ef 100644
+index 4d639683b8ef..0612158329aa 100644
 --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
 +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -416,9 +416,7 @@ int main(int argc, char *argv[])
- 			run_vcpus_while_disabling_dirty_logging = true;
- 			break;
- 		case 'f':
--			p.wr_fract = atoi_paranoid(optarg);
--			TEST_ASSERT(p.wr_fract >= 1,
--				    "Write fraction cannot be less than one");
-+			p.wr_fract = atoi_positive("Write fraction", optarg);
- 			break;
- 		case 'g':
- 			dirty_log_manual_caps = 0;
-@@ -427,7 +425,7 @@ int main(int argc, char *argv[])
- 			help(argv[0]);
- 			break;
- 		case 'i':
--			p.iterations = atoi_paranoid(optarg);
-+			p.iterations = atoi_positive("Number of iterations", optarg);
- 			break;
- 		case 'm':
- 			guest_modes_cmdline(optarg);
-@@ -445,12 +443,12 @@ int main(int argc, char *argv[])
- 			p.backing_src = parse_backing_src_type(optarg);
- 			break;
- 		case 'v':
--			nr_vcpus = atoi_paranoid(optarg);
--			TEST_ASSERT(nr_vcpus > 0 && nr_vcpus <= max_vcpus,
-+			nr_vcpus = atoi_positive("Number of vCPUs", optarg);
-+			TEST_ASSERT(nr_vcpus <= max_vcpus,
- 				    "Invalid number of vcpus, must be between 1 and %d", max_vcpus);
- 			break;
- 		case 'x':
--			p.slots = atoi_paranoid(optarg);
-+			p.slots = atoi_positive("Number of slots", optarg);
- 			break;
- 		default:
- 			help(argv[0]);
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index feae42863759..3be98e81189a 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -154,4 +154,20 @@ static inline void *align_ptr_up(void *x, size_t size)
+@@ -353,7 +353,7 @@ static void help(char *name)
+ 	puts("");
+ 	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
+ 	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]"
+-	       "[-x memslots]\n", name);
++	       "[-x memslots] [-c physical cpus to run test on]\n", name);
+ 	puts("");
+ 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
+ 	       TEST_HOST_LOOP_N);
+@@ -383,6 +383,17 @@ static void help(char *name)
+ 	backing_src_help("-s");
+ 	printf(" -x: Split the memory region into this number of memslots.\n"
+ 	       "     (default: 1)\n");
++	printf(" -c: Pin tasks to physical CPUs.  Takes a list of comma separated\n"
++	       "     values (target pCPU), one for each vCPU, plus an optional\n"
++	       "     entry for the main application task (specified via entry\n"
++	       "     <nr_vcpus + 1>).  If used, entries must be provided for all\n"
++	       "     vCPUs, i.e. pinning vCPUs is all or nothing.\n\n"
++	       "     E.g. to create 3 vCPUs, pin vCPU0=>pCPU22, vCPU1=>pCPU23,\n"
++	       "     vCPU2=>pCPU24, and pin the application task to pCPU50:\n\n"
++	       "         ./dirty_log_perf_test -v 3 -c 22,23,24,50\n\n"
++	       "     To leave the application task unpinned, drop the final entry:\n\n"
++	       "         ./dirty_log_perf_test -v 3 -c 22,23,24\n\n"
++	       "     (default: no pinning)\n");
+ 	puts("");
+ 	exit(0);
+ }
+@@ -390,6 +401,7 @@ static void help(char *name)
+ int main(int argc, char *argv[])
+ {
+ 	int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
++	const char *pcpu_list = NULL;
+ 	struct test_params p = {
+ 		.iterations = TEST_HOST_LOOP_N,
+ 		.wr_fract = 1,
+@@ -406,11 +418,14 @@ int main(int argc, char *argv[])
  
- int atoi_paranoid(const char *num_str);
+ 	guest_modes_append_default();
  
-+static inline uint32_t atoi_positive(const char *name, const char *num_str)
-+{
-+	int num = atoi_paranoid(num_str);
-+
-+	TEST_ASSERT(num > 0, "%s must be greater than 0, got '%s'", name, num_str);
-+	return num;
-+}
-+
-+static inline uint32_t atoi_non_negative(const char *name, const char *num_str)
-+{
-+	int num = atoi_paranoid(num_str);
-+
-+	TEST_ASSERT(num >= 0, "%s must be non-negative, got '%s'", name, num_str);
-+	return num;
-+}
-+
- #endif /* SELFTEST_KVM_TEST_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/testing/selftests/kvm/kvm_page_table_test.c
-index ea7feb69bb88..696b366be06b 100644
---- a/tools/testing/selftests/kvm/kvm_page_table_test.c
-+++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
-@@ -461,8 +461,8 @@ int main(int argc, char *argv[])
- 			p.test_mem_size = parse_size(optarg);
- 			break;
- 		case 'v':
--			nr_vcpus = atoi_paranoid(optarg);
--			TEST_ASSERT(nr_vcpus > 0 && nr_vcpus <= max_vcpus,
-+			nr_vcpus = atoi_positive("Number of vCPUs", optarg);
-+			TEST_ASSERT(nr_vcpus <= max_vcpus,
- 				    "Invalid number of vcpus, must be between 1 and %d", max_vcpus);
- 			break;
- 		case 's':
-diff --git a/tools/testing/selftests/kvm/max_guest_memory_test.c b/tools/testing/selftests/kvm/max_guest_memory_test.c
-index 8056dc5831b5..feaf2be20ff2 100644
---- a/tools/testing/selftests/kvm/max_guest_memory_test.c
-+++ b/tools/testing/selftests/kvm/max_guest_memory_test.c
-@@ -193,16 +193,13 @@ int main(int argc, char *argv[])
- 	while ((opt = getopt(argc, argv, "c:h:m:s:H")) != -1) {
+-	while ((opt = getopt(argc, argv, "b:ef:ghi:m:nop:s:v:x:")) != -1) {
++	while ((opt = getopt(argc, argv, "b:c:ef:ghi:m:nop:s:v:x:")) != -1) {
  		switch (opt) {
- 		case 'c':
--			nr_vcpus = atoi_paranoid(optarg);
--			TEST_ASSERT(nr_vcpus > 0, "number of vcpus must be >0");
-+			nr_vcpus = atoi_positive("Number of vCPUs", optarg);
- 			break;
- 		case 'm':
--			max_mem = 1ull * atoi_paranoid(optarg) * SZ_1G;
--			TEST_ASSERT(max_mem > 0, "memory size must be >0");
-+			max_mem = 1ull * atoi_positive("Memory size", optarg) * SZ_1G;
- 			break;
- 		case 's':
--			slot_size = 1ull * atoi_paranoid(optarg) * SZ_1G;
--			TEST_ASSERT(slot_size > 0, "slot size must be >0");
-+			slot_size = 1ull * atoi_positive("Slot size", optarg) * SZ_1G;
- 			break;
- 		case 'H':
- 			hugepages = true;
-diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-index f27f07e4a5cc..3ddf2fb9fa86 100644
---- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-+++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-@@ -156,16 +156,14 @@ int main(int argc, char *argv[])
- 			guest_modes_cmdline(optarg);
- 			break;
- 		case 'd':
--			p.delay = atoi_paranoid(optarg);
--			TEST_ASSERT(p.delay >= 0,
--				    "A negative delay is not supported.");
-+			p.delay = atoi_non_negative("Delay", optarg);
- 			break;
  		case 'b':
  			guest_percpu_mem_size = parse_size(optarg);
  			break;
- 		case 'v':
--			nr_vcpus = atoi_paranoid(optarg);
--			TEST_ASSERT(nr_vcpus > 0 && nr_vcpus <= max_vcpus,
-+			nr_vcpus = atoi_positive("Number of vCPUs", optarg);
-+			TEST_ASSERT(nr_vcpus <= max_vcpus,
- 				    "Invalid number of vcpus, must be between 1 and %d",
- 				    max_vcpus);
- 			break;
-@@ -173,7 +171,7 @@ int main(int argc, char *argv[])
- 			p.partition_vcpu_memory_access = false;
- 			break;
- 		case 'i':
--			p.nr_iterations = atoi_paranoid(optarg);
-+			p.nr_iterations = atoi_positive("Number of iterations", optarg);
- 			break;
- 		case 'h':
- 		default:
-diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
-index 4bae9e3f5ca1..330aaef1c02f 100644
---- a/tools/testing/selftests/kvm/memslot_perf_test.c
-+++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-@@ -892,33 +892,21 @@ static bool parse_args(int argc, char *argv[],
- 			}
- 			break;
- 		case 'f':
--			targs->tfirst = atoi_paranoid(optarg);
--			if (targs->tfirst < 0) {
--				pr_info("First test to run has to be non-negative\n");
--				return false;
--			}
-+			targs->tfirst = atoi_non_negative("First test", optarg);
- 			break;
++		case 'c':
++			pcpu_list = optarg;
++			break;
  		case 'e':
--			targs->tlast = atoi_paranoid(optarg);
--			if (targs->tlast < 0 || targs->tlast >= NTESTS) {
-+			targs->tlast = atoi_non_negative("Last test", optarg);
-+			if (targs->tlast >= NTESTS) {
- 				pr_info("Last test to run has to be non-negative and less than %zu\n",
- 					NTESTS);
- 				return false;
- 			}
- 			break;
- 		case 'l':
--			targs->seconds = atoi_paranoid(optarg);
--			if (targs->seconds < 0) {
--				pr_info("Test length in seconds has to be non-negative\n");
--				return false;
--			}
-+			targs->seconds = atoi_non_negative("Test length", optarg);
- 			break;
- 		case 'r':
--			targs->runs = atoi_paranoid(optarg);
--			if (targs->runs <= 0) {
--				pr_info("Runs per test has to be positive\n");
--				return false;
--			}
-+			targs->runs = atoi_positive("Runs per test", optarg);
- 			break;
+ 			/* 'e' is for evil. */
+ 			run_vcpus_while_disabling_dirty_logging = true;
+@@ -456,6 +471,12 @@ int main(int argc, char *argv[])
  		}
  	}
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index c366949c8362..85c16f09a50e 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -407,7 +407,7 @@ int main(int argc, char *argv[])
  
- #ifdef __x86_64__
- 	if (argc > 1)
--		loops = atoi_paranoid(argv[1]);
-+		loops = atoi_positive("Number of iterations", argv[1]);
- 	else
- 		loops = 10;
++	if (pcpu_list) {
++		kvm_parse_vcpu_pinning(pcpu_list, perf_test_args.vcpu_to_pcpu,
++				       nr_vcpus);
++		perf_test_args.pin_vcpus = true;
++	}
++
+ 	TEST_ASSERT(p.iterations >= 2, "The test should have at least two iterations");
  
-diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-index 354b6902849c..ea0978f22db8 100644
---- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-@@ -241,7 +241,7 @@ int main(int argc, char **argv)
- 	while ((opt = getopt(argc, argv, "hp:t:r")) != -1) {
- 		switch (opt) {
- 		case 'p':
--			reclaim_period_ms = atoi_paranoid(optarg);
-+			reclaim_period_ms = atoi_non_negative("Reclaim period", optarg);
- 			break;
- 		case 't':
- 			token = atoi_paranoid(optarg);
-@@ -257,7 +257,6 @@ int main(int argc, char **argv)
- 	}
+ 	pr_info("Test iterations: %"PRIu64"\n",	p.iterations);
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index e42a09cd24a0..3bf2333ef95d 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -688,6 +688,10 @@ static inline struct kvm_vm *vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
  
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_VM_DISABLE_NX_HUGE_PAGES));
--	TEST_REQUIRE(reclaim_period_ms > 0);
+ struct kvm_vcpu *vm_recreate_with_one_vcpu(struct kvm_vm *vm);
  
- 	__TEST_REQUIRE(token == MAGIC_TOKEN,
- 		       "This test must be run with the magic token %d.\n"
++void kvm_pin_this_task_to_pcpu(uint32_t pcpu);
++void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
++			    int nr_vcpus);
++
+ unsigned long vm_compute_max_gfn(struct kvm_vm *vm);
+ unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size);
+ unsigned int vm_num_host_pages(enum vm_guest_mode mode, unsigned int num_guest_pages);
+diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
+index eaa88df0555a..849c875dd0ff 100644
+--- a/tools/testing/selftests/kvm/include/perf_test_util.h
++++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+@@ -39,6 +39,10 @@ struct perf_test_args {
+ 
+ 	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
+ 	bool nested;
++	/* True if all vCPUs are pinned to pCPUs */
++	bool pin_vcpus;
++	/* The vCPU=>pCPU pinning map. Only valid if pin_vcpus is true. */
++	uint32_t vcpu_to_pcpu[KVM_MAX_VCPUS];
+ 
+ 	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
+ };
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index f1cb1627161f..3b7710fb3784 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -11,6 +11,7 @@
+ #include "processor.h"
+ 
+ #include <assert.h>
++#include <sched.h>
+ #include <sys/mman.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -443,6 +444,59 @@ struct kvm_vcpu *vm_recreate_with_one_vcpu(struct kvm_vm *vm)
+ 	return vm_vcpu_recreate(vm, 0);
+ }
+ 
++void kvm_pin_this_task_to_pcpu(uint32_t pcpu)
++{
++	cpu_set_t mask;
++	int r;
++
++	CPU_ZERO(&mask);
++	CPU_SET(pcpu, &mask);
++	r = sched_setaffinity(0, sizeof(mask), &mask);
++	TEST_ASSERT(!r, "sched_setaffinity() failed for pCPU '%u'.\n", pcpu);
++}
++
++static uint32_t parse_pcpu(const char *cpu_str, const cpu_set_t *allowed_mask)
++{
++	uint32_t pcpu = atoi_non_negative("CPU number", cpu_str);
++
++	TEST_ASSERT(CPU_ISSET(pcpu, allowed_mask),
++		    "Not allowed to run on pCPU '%d', check cgroups?\n", pcpu);
++	return pcpu;
++}
++
++void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
++			    int nr_vcpus)
++{
++	cpu_set_t allowed_mask;
++	char *cpu, *cpu_list;
++	char delim[2] = ",";
++	int i, r;
++
++	cpu_list = strdup(pcpus_string);
++	TEST_ASSERT(cpu_list, "strdup() allocation failed.\n");
++
++	r = sched_getaffinity(0, sizeof(allowed_mask), &allowed_mask);
++	TEST_ASSERT(!r, "sched_getaffinity() failed");
++
++	cpu = strtok(cpu_list, delim);
++
++	/* 1. Get all pcpus for vcpus. */
++	for (i = 0; i < nr_vcpus; i++) {
++		TEST_ASSERT(cpu, "pCPU not provided for vCPU '%d'\n", i);
++		vcpu_to_pcpu[i] = parse_pcpu(cpu, &allowed_mask);
++		cpu = strtok(NULL, delim);
++	}
++
++	/* 2. Check if the main worker needs to be pinned. */
++	if (cpu) {
++		kvm_pin_this_task_to_pcpu(parse_pcpu(cpu, &allowed_mask));
++		cpu = strtok(NULL, delim);
++	}
++
++	TEST_ASSERT(!cpu, "pCPU list contains trailing garbage characters '%s'", cpu);
++	free(cpu_list);
++}
++
+ /*
+  * Userspace Memory Region Find
+  *
+diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+index 9618b37c66f7..3a1d0a44419b 100644
+--- a/tools/testing/selftests/kvm/lib/perf_test_util.c
++++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+@@ -2,6 +2,8 @@
+ /*
+  * Copyright (C) 2020, Google LLC.
+  */
++#define _GNU_SOURCE
++
+ #include <inttypes.h>
+ 
+ #include "kvm_util.h"
+@@ -243,6 +245,10 @@ void __weak perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_v
+ static void *vcpu_thread_main(void *data)
+ {
+ 	struct vcpu_thread *vcpu = data;
++	int vcpu_idx = vcpu->vcpu_idx;
++
++	if (perf_test_args.pin_vcpus)
++		kvm_pin_this_task_to_pcpu(perf_test_args.vcpu_to_pcpu[vcpu_idx]);
+ 
+ 	WRITE_ONCE(vcpu->running, true);
+ 
+@@ -255,7 +261,7 @@ static void *vcpu_thread_main(void *data)
+ 	while (!READ_ONCE(all_vcpu_threads_running))
+ 		;
+ 
+-	vcpu_thread_fn(&perf_test_args.vcpu_args[vcpu->vcpu_idx]);
++	vcpu_thread_fn(&perf_test_args.vcpu_args[vcpu_idx]);
+ 
+ 	return NULL;
+ }
 -- 
 2.38.1.273.g43a17bfeac-goog
 
