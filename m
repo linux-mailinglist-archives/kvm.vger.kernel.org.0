@@ -2,94 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56C57617617
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 06:22:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA390617620
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 06:26:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230150AbiKCFWF convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 3 Nov 2022 01:22:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53094 "EHLO
+        id S230451AbiKCF00 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 01:26:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiKCFWD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 01:22:03 -0400
-Received: from relay.hostedemail.com (smtprelay0017.hostedemail.com [216.40.44.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8687613E9A;
-        Wed,  2 Nov 2022 22:22:02 -0700 (PDT)
-Received: from omf16.hostedemail.com (a10.router.float.18 [10.200.18.1])
-        by unirelay08.hostedemail.com (Postfix) with ESMTP id DAB8414048F;
-        Thu,  3 Nov 2022 05:22:00 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf16.hostedemail.com (Postfix) with ESMTPA id B066B2000E;
-        Thu,  3 Nov 2022 05:21:31 +0000 (UTC)
-Message-ID: <d92ada3062bc1c3a7557bfa0499fc4a8cee3aa10.camel@perches.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Fix a typo about the usage of kvcalloc()
-From:   Joe Perches <joe@perches.com>
-To:     "liaochang (A)" <liaochang1@huawei.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 02 Nov 2022 22:21:55 -0700
-In-Reply-To: <26cda02a-af8d-5976-9d3a-a595c0ed2fb6@huawei.com>
-References: <20221103011749.139262-1-liaochang1@huawei.com>
-         <Y2Mpgm+zEetfZlWM@debian.me>
-         <26cda02a-af8d-5976-9d3a-a595c0ed2fb6@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+        with ESMTP id S230267AbiKCF0W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 01:26:22 -0400
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8951C18B15
+        for <kvm@vger.kernel.org>; Wed,  2 Nov 2022 22:26:18 -0700 (PDT)
+Received: by mail-io1-f69.google.com with SMTP id l9-20020a5d8f89000000b006bd33712128so447806iol.17
+        for <kvm@vger.kernel.org>; Wed, 02 Nov 2022 22:26:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hubE5cXRc9JuQCcqWhxOGTFZ206SuvXNuCleiqfj7l0=;
+        b=i8ExnvAyUrECrKkEdICtCWhVXCMWPtvWH/Jp6ARvXw2dmPCRNqFrl6HFnzhNOT+uOM
+         szRe5GdsX5HgWnUN+ppkdbH74Ko2azMilvRuKzIkDTX7FrN70o/w/PuJbpDmpGM8FJ25
+         HtFrwaY6tpnbERdNLawNHQoRpiKjyuHxqJlkglBq1us0sEfdH7tplK/lv7pVHQtNJMzS
+         mImUX0xsj4ejbIMEh9nDK3MYrK7XtMMPxTbLgjP4Jzk+KWYKLn108KTPFBpCjlz2432T
+         7qv9vYm67ZiujZANmxslUVsDSyZSj1rU7kPGfrgI794n+TClp06B8rFE3ClEi36qRgEq
+         fjFg==
+X-Gm-Message-State: ACrzQf30LRgEiLVTS4Gbb7wdD7u9OMGrXLNoecCCOMBuu7OB1As+8jWR
+        HsM1C7/xpa+MKIkk5I+XE26R0vAivvexOipYrfMkZol8pVuu
+X-Google-Smtp-Source: AMsMyM7M+gbJ9p2WjkZ9tsLPHEN9g++/Bo3XU4yPT5uBfhfhLwrxINRWSCpGkuwwLFqDERYuy5PPDkBauLfSwc6aEbOSjHRRHa64
 MIME-Version: 1.0
-X-Rspamd-Queue-Id: B066B2000E
-X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
-        SPF_NONE,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+X-Received: by 2002:a92:cc49:0:b0:300:d9d7:fe36 with SMTP id
+ t9-20020a92cc49000000b00300d9d7fe36mr860359ilq.225.1667453177891; Wed, 02 Nov
+ 2022 22:26:17 -0700 (PDT)
+Date:   Wed, 02 Nov 2022 22:26:17 -0700
+In-Reply-To: <000000000000e9df4305ec7a3fc7@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000005912d405ec8a329c@google.com>
+Subject: Re: [syzbot] WARNING in __perf_event_overflow
+From:   syzbot <syzbot+589d998651a580e6135d@syzkaller.appspotmail.com>
+To:     acme@kernel.org, alex.williamson@redhat.com,
+        alexander.shishkin@linux.intel.com, bpf@vger.kernel.org,
+        cohuck@redhat.com, dvyukov@google.com, elver@google.com,
+        jgg@ziepe.ca, jolsa@kernel.org, kevin.tian@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, mark.rutland@arm.com,
+        mingo@redhat.com, namhyung@kernel.org, netdev@vger.kernel.org,
+        peterz@infradead.org, shameerali.kolothum.thodi@huawei.com,
+        syzkaller-bugs@googlegroups.com, yishaih@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
         version=3.4.6
-X-Stat-Signature: gmdzq5sn7iw343nbpmuc7fabxehjokgd
-X-Rspamd-Server: rspamout02
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX1+w7uVnmjLZRKLHD7OJm2ieqtVexUKMVaw=
-X-HE-Tag: 1667452891-482577
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-11-03 at 12:18 +0800, liaochang (A) wrote:
-> 
-> 在 2022/11/3 10:37, Bagas Sanjaya 写道:
-> > This isn't typofix as suggested from the patch subject, right?
-> 
-> Well, since kvcalloc uses the product of 1st and 2nd argument to do allocation,
-> hence current code supposes to work well, but the usage is obviously no sense,
-> that is why i name it a 'typo' and make it correct ;)
-> 
+syzbot has bisected this issue to:
 
-Seems there are several of these typo/defects.
+commit c1d050b0d169fd60c8acef157db53bd4e3141799
+Author: Yishai Hadas <yishaih@nvidia.com>
+Date:   Thu Sep 8 18:34:45 2022 +0000
 
-$ git grep -P 'calloc\s*\(\s*sizeof'
-arch/x86/kvm/cpuid.c:   array.entries = kvcalloc(sizeof(struct kvm_cpuid_entry2), cpuid->nent, GFP_KERNEL);
-drivers/gpu/drm/nouveau/nouveau_svm.c:  buffer->fault = kvcalloc(sizeof(*buffer->fault), buffer->entries, GFP_KERNEL);
-drivers/scsi/bfa/bfad_bsg.c:    buf_base = kcalloc(sizeof(struct bfad_buf_info) +
-drivers/soc/fsl/dpio/dpio-service.c:    ed = kcalloc(sizeof(struct qbman_eq_desc), 32, GFP_KERNEL);
-fs/btrfs/send.c:        sctx->clone_roots = kvcalloc(sizeof(*sctx->clone_roots),
-kernel/bpf/bpf_local_storage.c: smap->buckets = kvcalloc(sizeof(*smap->buckets), nbuckets,
-kernel/watch_queue.c:   pages = kcalloc(sizeof(struct page *), nr_pages, GFP_KERNEL);
-tools/lib/bpf/libbpf.c: gen = calloc(sizeof(*gen), 1);
-tools/objtool/check.c:  struct cfi_state *cfi = calloc(sizeof(struct cfi_state), 1);
-tools/objtool/check.c:  file->pv_ops = calloc(sizeof(struct pv_state), nr);
-tools/perf/builtin-record.c:            rec->switch_output.filenames = calloc(sizeof(char *),
-tools/perf/util/bpf-loader.c:   priv = calloc(sizeof(*priv), 1);
-tools/perf/util/hist.c:         he->res_samples = calloc(sizeof(struct res_sample),
-tools/perf/util/metricgroup.c:  metric_events = calloc(sizeof(void *), ids_size + 1);
-tools/perf/util/stat-shadow.c:                  metric_events = calloc(sizeof(struct evsel *),
-tools/perf/util/synthetic-events.c:     synthesize_threads = calloc(sizeof(pthread_t), thread_nr);
-tools/perf/util/synthetic-events.c:     args = calloc(sizeof(*args), thread_nr);
-tools/testing/selftests/arm64/fp/fp-stress.c:   children = calloc(sizeof(*children), tests);
-tools/testing/selftests/bpf/prog_tests/fexit_bpf2bpf.c: link = calloc(sizeof(struct bpf_link *), prog_cnt);
-tools/testing/selftests/bpf/prog_tests/fexit_bpf2bpf.c: prog = calloc(sizeof(struct bpf_program *), prog_cnt);
-tools/testing/selftests/bpf/test_progs.c:       dispatcher_threads = calloc(sizeof(pthread_t), env.workers);
-tools/testing/selftests/bpf/test_progs.c:       data = calloc(sizeof(struct dispatch_data), env.workers);
-tools/testing/selftests/bpf/test_progs.c:       env.worker_current_test = calloc(sizeof(int), env.workers);
-tools/testing/selftests/bpf/test_progs.c:               env.worker_pids = calloc(sizeof(__pid_t), env.workers);
-tools/testing/selftests/bpf/test_progs.c:               env.worker_socks = calloc(sizeof(int), env.workers);
-tools/testing/selftests/memfd/fuse_test.c:      zero = calloc(sizeof(*zero), mfd_def_size);
+    vfio/mlx5: Create and destroy page tracker object
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=136eb2da880000
+start commit:   88619e77b33d net: stmmac: rk3588: Allow multiple gmac cont..
+git tree:       bpf
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=10eeb2da880000
+console output: https://syzkaller.appspot.com/x/log.txt?x=176eb2da880000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a66c6c673fb555e8
+dashboard link: https://syzkaller.appspot.com/bug?extid=589d998651a580e6135d
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11eabcea880000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10f7e632880000
+
+Reported-by: syzbot+589d998651a580e6135d@syzkaller.appspotmail.com
+Fixes: c1d050b0d169 ("vfio/mlx5: Create and destroy page tracker object")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
