@@ -2,71 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4086618026
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 15:53:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E0BCD618077
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 16:04:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231881AbiKCOxr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 10:53:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36154 "EHLO
+        id S232022AbiKCPEp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 11:04:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231925AbiKCOx1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 10:53:27 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A25741A3A9
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 07:53:14 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id c2so2138879plz.11
-        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 07:53:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+EOoy7YAYLFDl3hhNdNz/Dei5v7yTMufGMRoDAJQwns=;
-        b=DtlCiaFP2I1bckyWh5G0FM0i+CkRoJ8mvsBb/FLYQ5vsiNn+K5Kfn7De9s3JQXuFWh
-         H7mPuPNypG5Va/KzQj7+sGaovbWc+tl9ROBGVKX1lFNt3evPO2v0Ei2ctaqdE05U/zux
-         ZiXZpPEwzB4r3+qncQCDYv4T/92auL3oUUc02wrbgRMQherqPxfkT4821kjSGSum4WAF
-         cGlsnWBV0J+2ixoR0C1djo6X1hgD0NHBSynA4HTves7BwMiQrC8xwko7rm9oM4O2V6Uy
-         qFUKvrrxD2R6qqNFAeG1x4eHJdcQUJhvaSkqajPP+WL+NtH6rCIZ4qohw7R1BfLL7kTB
-         g1iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+EOoy7YAYLFDl3hhNdNz/Dei5v7yTMufGMRoDAJQwns=;
-        b=KJRYFkaX30hryWi3SpuJJFUtTfNLnTIU1rgP4vevu3H0WgN9lQ1irboNZrbOLl5prz
-         jvkjpCfmJcdlTqYXsCNuSQxY5DSw/zCEV4IsxVmFIVqEtrR1lSpotne2BJurZ4kvZIiT
-         B+bIg/MZSnwZ4iuJ6N2ZhFUn8jWvwzihIt/K/rJlO1zfZSLEg6nR14HpQr7480NJPURj
-         wyFrScCc2GYPGOU+H+zRDEJhF0h96Hl3u97usVU25ISqEun4V1jesBvMUNoxkuRi0FMn
-         cRm7qUFgngOs3R3W7oMf6ul483KYonp88+syXTMIId62F5WHuRZ9Pcj5NftM6roO3/CZ
-         nCLw==
-X-Gm-Message-State: ACrzQf1nHYgJRMNoaI/poKnmPUL17QjJ1uQet9c0YHohZlLb32+gkn6Y
-        ND1u/Pmj/3HTU8zmzRQPqdQfVc+Py9jG74m+NfzgIw==
-X-Google-Smtp-Source: AMsMyM4WzkVgP+HlYu/hXxndYVEW+ikrBgoVSC2s61IT60dLmVa4lu36WrgsBoYQ7rj4vYLHvfKQny4wvHwqFcAzXQE=
-X-Received: by 2002:a17:903:22c1:b0:187:2ced:455f with SMTP id
- y1-20020a17090322c100b001872ced455fmr17805199plg.18.1667487193938; Thu, 03
- Nov 2022 07:53:13 -0700 (PDT)
+        with ESMTP id S231886AbiKCPDI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 11:03:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF2EE1929C
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 08:02:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667487728;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=NQfBuXDOrH1Yycxs8u+vcZb8jI8Lwx8edK3ZcCfcDBg=;
+        b=bKORCeOBUZhtvoELvR0yLT+mynVuCa9DiQgGQG6KE/OdEgPZrU6fZKf3ukMSPvbEyMoeMM
+        fCevuEC2CVD1sf2nNkcriDVG2AuXsT6pQtygYA55+ui0oco7NghPldKNw89eQz7awcsSKn
+        xjamNQz+x38XuZw6NBv59x6LGoPxSMg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-29-5urxHFDhNc25cYgOjomTUw-1; Thu, 03 Nov 2022 11:02:04 -0400
+X-MC-Unique: 5urxHFDhNc25cYgOjomTUw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 676D61064B5E;
+        Thu,  3 Nov 2022 15:01:52 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5019A200BA7A;
+        Thu,  3 Nov 2022 15:01:52 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH] KVM: replace direct irq.h inclusion
+Date:   Thu,  3 Nov 2022 11:01:51 -0400
+Message-Id: <20221103150151.4057338-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20221028105402.2030192-1-maz@kernel.org> <20221028105402.2030192-11-maz@kernel.org>
- <CAAeT=FycObU5eHaR23OZ_PeR6-cQeNrmGs=Mi-VnrVuWR6ovSg@mail.gmail.com> <87v8nwfmwb.wl-maz@kernel.org>
-In-Reply-To: <87v8nwfmwb.wl-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Thu, 3 Nov 2022 07:52:57 -0700
-Message-ID: <CAAeT=Fz9pKey3=bc=Nzn=c8HZ=PhGmv4tTGkwmi2yiEHG9eM3Q@mail.gmail.com>
-Subject: Re: [PATCH v2 10/14] KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver
- limit to VM creation
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,94 +55,228 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+virt/kvm/irqchip.c is including "irq.h" from the arch-specific KVM source
+directory (i.e. not from arch/*/include) for the sole purpose of retrieving
+irqchip_in_kernel.
 
-On Thu, Nov 3, 2022 at 1:44 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Reiji,
->
-> On Thu, 03 Nov 2022 04:55:52 +0000,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Fri, Oct 28, 2022 at 4:16 AM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > >         case SYS_ID_DFR0_EL1:
-> > > -               /* Limit guests to PMUv3 for ARMv8.4 */
-> > > -               val = cpuid_feature_cap_perfmon_field(val,
-> > > -                                                     ID_DFR0_PERFMON_SHIFT,
-> > > -                                                     kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
-> > > +               val &= ~ARM64_FEATURE_MASK(ID_DFR0_PERFMON);
-> > > +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_PERFMON),
-> > > +                                 pmuver_to_perfmon(vcpu_pmuver(vcpu)));
-> >
-> > Shouldn't KVM expose the sanitized value as it is when AArch32 is
-> > not supported at EL0 ? Since the register value is UNKNOWN when AArch32
-> > is not supported at EL0, I would think this code might change the PERFMON
-> > field value on such systems (could cause live migration to fail).
->
-> I'm not sure this would cause anything to fail as we now treat all
-> AArch32 idregs as RAZ/WI when AArch32 isn't supported (and the
-> visibility callback still applies here).
+Making the function inline in a header that is already included,
+such as asm/kvm_host.h, is not possible because it needs to look at
+struct kvm which is defined after asm/kvm_host.h is included.  So add a
+kvm_arch_irqchip_in_kernel non-inline function; irqchip_in_kernel() is
+only performance critical on arm64 and x86, and the non-inline function
+is enough on all other architectures.
 
-Oops, sorry I totally forgot about that change...
+irq.h can then be deleted from all architectures except x86.
 
-> But it doesn't hurt to make pmuver_to_perfmon() return 0 when AArch32
-> isn't supported, and it will at least make the ID register consistent
-> from a guest perspective.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/arm64/kvm/arm.c       |  5 +++++
+ arch/arm64/kvm/irq.h       | 16 ----------------
+ arch/powerpc/kvm/irq.h     | 22 ----------------------
+ arch/powerpc/kvm/powerpc.c | 18 ++++++++++++++++--
+ arch/s390/kvm/irq.h        | 19 -------------------
+ arch/s390/kvm/kvm-s390.c   |  5 +++++
+ arch/x86/kvm/irq.c         |  5 +++++
+ include/linux/kvm_host.h   |  2 ++
+ virt/kvm/irqchip.c         |  3 +--
+ 9 files changed, 34 insertions(+), 61 deletions(-)
+ delete mode 100644 arch/arm64/kvm/irq.h
+ delete mode 100644 arch/powerpc/kvm/irq.h
+ delete mode 100644 arch/s390/kvm/irq.h
 
-I believe the register will be consistent (0) even from a guest
-perspective with the current patch when AArch32 isn't supported
-because read_id_reg() checks that with sysreg_visible_as_raz()
-in the beginning.
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 94d33e296e10..7b107fa540fa 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2130,6 +2130,11 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
+ 	return NULL;
+ }
+ 
++bool kvm_arch_irqchip_in_kernel(struct kvm *kvm)
++{
++	return irqchip_in_kernel(kvm);
++}
++
+ bool kvm_arch_has_irq_bypass(void)
+ {
+ 	return true;
+diff --git a/arch/arm64/kvm/irq.h b/arch/arm64/kvm/irq.h
+deleted file mode 100644
+index 0d257de42c10..000000000000
+--- a/arch/arm64/kvm/irq.h
++++ /dev/null
+@@ -1,16 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
+-/*
+- * irq.h: in kernel interrupt controller related definitions
+- * Copyright (c) 2016 Red Hat, Inc.
+- *
+- * This header is included by irqchip.c. However, on ARM, interrupt
+- * controller declarations are located in include/kvm/arm_vgic.h since
+- * they are mostly shared between arm and arm64.
+- */
+-
+-#ifndef __IRQ_H
+-#define __IRQ_H
+-
+-#include <kvm/arm_vgic.h>
+-
+-#endif
+diff --git a/arch/powerpc/kvm/irq.h b/arch/powerpc/kvm/irq.h
+deleted file mode 100644
+index e6463f866abc..000000000000
+--- a/arch/powerpc/kvm/irq.h
++++ /dev/null
+@@ -1,22 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef __IRQ_H
+-#define __IRQ_H
+-
+-#include <linux/kvm_host.h>
+-
+-static inline int irqchip_in_kernel(struct kvm *kvm)
+-{
+-	int ret = 0;
+-
+-#ifdef CONFIG_KVM_MPIC
+-	ret = ret || (kvm->arch.mpic != NULL);
+-#endif
+-#ifdef CONFIG_KVM_XICS
+-	ret = ret || (kvm->arch.xics != NULL);
+-	ret = ret || (kvm->arch.xive != NULL);
+-#endif
+-	smp_rmb();
+-	return ret;
+-}
+-
+-#endif
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index b850b0efa201..04494a4fb37a 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -36,7 +36,6 @@
+ #include <asm/setup.h>
+ 
+ #include "timing.h"
+-#include "irq.h"
+ #include "../mm/mmu_decl.h"
+ 
+ #define CREATE_TRACE_POINTS
+@@ -2165,10 +2164,25 @@ static int kvm_vm_ioctl_get_pvinfo(struct kvm_ppc_pvinfo *pvinfo)
+ 	return 0;
+ }
+ 
++bool kvm_arch_irqchip_in_kernel(struct kvm *kvm)
++{
++	int ret = 0;
++
++#ifdef CONFIG_KVM_MPIC
++	ret = ret || (kvm->arch.mpic != NULL);
++#endif
++#ifdef CONFIG_KVM_XICS
++	ret = ret || (kvm->arch.xics != NULL);
++	ret = ret || (kvm->arch.xive != NULL);
++#endif
++	smp_rmb();
++	return ret;
++}
++
+ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_event,
+ 			  bool line_status)
+ {
+-	if (!irqchip_in_kernel(kvm))
++	if (!kvm_arch_irqchip_in_kernel(kvm))
+ 		return -ENXIO;
+ 
+ 	irq_event->status = kvm_set_irq(kvm, KVM_USERSPACE_IRQ_SOURCE_ID,
+diff --git a/arch/s390/kvm/irq.h b/arch/s390/kvm/irq.h
+deleted file mode 100644
+index 484608c71dd0..000000000000
+--- a/arch/s390/kvm/irq.h
++++ /dev/null
+@@ -1,19 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/*
+- * s390 irqchip routines
+- *
+- * Copyright IBM Corp. 2014
+- *
+- *    Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
+- */
+-#ifndef __KVM_IRQ_H
+-#define __KVM_IRQ_H
+-
+-#include <linux/kvm_host.h>
+-
+-static inline int irqchip_in_kernel(struct kvm *kvm)
+-{
+-	return 1;
+-}
+-
+-#endif
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 45d4b8182b07..b08586bebf78 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -5559,6 +5559,11 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ 	return VM_FAULT_SIGBUS;
+ }
+ 
++bool kvm_arch_irqchip_in_kernel(struct kvm *kvm)
++{
++	return true;
++}
++
+ /* Section: memory related */
+ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 				   const struct kvm_memory_slot *old,
+diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
+index f371f1292ca3..d8d50558f165 100644
+--- a/arch/x86/kvm/irq.c
++++ b/arch/x86/kvm/irq.c
+@@ -165,3 +165,8 @@ bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
+ 
+ 	return resample ? irqchip_kernel(kvm) : irqchip_in_kernel(kvm);
+ }
++
++bool kvm_arch_irqchip_in_kernel(struct kvm *kvm)
++{
++	return irqchip_in_kernel(kvm);
++}
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 18592bdf4c1b..12cfc935a9f1 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -653,6 +653,8 @@ struct kvm_irq_routing_table {
+ 	 */
+ 	struct hlist_head map[];
+ };
++
++bool kvm_arch_irqchip_in_kernel(struct kvm *kvm);
+ #endif
+ 
+ #ifndef KVM_INTERNAL_MEM_SLOTS
+diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+index 58e4f88b2b9f..1e567d1f6d3d 100644
+--- a/virt/kvm/irqchip.c
++++ b/virt/kvm/irqchip.c
+@@ -17,7 +17,6 @@
+ #include <linux/srcu.h>
+ #include <linux/export.h>
+ #include <trace/events/kvm.h>
+-#include "irq.h"
+ 
+ int kvm_irq_map_gsi(struct kvm *kvm,
+ 		    struct kvm_kernel_irq_routing_entry *entries, int gsi)
+@@ -50,7 +49,7 @@ int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi)
+ {
+ 	struct kvm_kernel_irq_routing_entry route;
+ 
+-	if (!irqchip_in_kernel(kvm) || (msi->flags & ~KVM_MSI_VALID_DEVID))
++	if (!kvm_arch_irqchip_in_kernel(kvm) || (msi->flags & ~KVM_MSI_VALID_DEVID))
+ 		return -EINVAL;
+ 
+ 	route.msi.address_lo = msi->address_lo;
+-- 
+2.31.1
 
-I withdraw my comment, and the patch looks good to me.
-
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
-
-Thank you,
-Reiji
-
->
-> I plan to squash the following (untested) hack in:
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 8f4412cd4bf6..3b28ef48a525 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1094,6 +1094,10 @@ static u8 perfmon_to_pmuver(u8 perfmon)
->
->  static u8 pmuver_to_perfmon(u8 pmuver)
->  {
-> +       /* If no AArch32, make the field RAZ */
-> +       if (!kvm_supports_32bit_el0())
-> +               return 0;
-> +
->         switch (pmuver) {
->         case ID_AA64DFR0_EL1_PMUVer_IMP:
->                 return ID_DFR0_PERFMON_8_0;
-> @@ -1302,10 +1306,9 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
->                            const struct sys_reg_desc *rd,
->                            u64 val)
->  {
-> -       u8 perfmon, host_perfmon = 0;
-> +       u8 perfmon, host_perfmon;
->
-> -       if (system_supports_32bit_el0())
-> -               host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
-> +       host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
->
->         /*
->          * Allow DFR0_EL1.PerfMon to be set from userspace as long as
->
-> > I should have noticed this with the previous version...
->
-> No worries, thanks a lot for having had a look!
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
