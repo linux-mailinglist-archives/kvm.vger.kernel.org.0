@@ -2,172 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 009C3617EEC
-	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 15:07:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 933C9617EF2
+	for <lists+kvm@lfdr.de>; Thu,  3 Nov 2022 15:09:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231334AbiKCOHz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 10:07:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59766 "EHLO
+        id S231169AbiKCOJV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 10:09:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230513AbiKCOHs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 10:07:48 -0400
+        with ESMTP id S231246AbiKCOJS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 10:09:18 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9E0F101D0
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 07:06:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 366ADFAFE
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 07:08:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667484408;
+        s=mimecast20190719; t=1667484505;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4x9kvayeo4WDR+ntPzcjIFI+riYUY38wegNmKe10nu4=;
-        b=GadKX8RyLlBGSvoUdi5aYkLTELe1P6aEC3GLC1kK4YtW61RazcTHc3qibZBiT9wN+vP6hf
-        jG9O6b8B5mARq3dZTq0xpQ7LN3/r1IsBZvPmqsL/pDeSl39vXg6svuBLhzBaD/8rLsb3S9
-        hDOUdKaCndbzeoVWZr6JeBojKe3XSQo=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=tMZz/r0Y/xMO+n/fhUi//lk8Yf2Cm8C30yAiPyY4Bw4=;
+        b=BvLHurLMwVDgrC5uhK44L/byVG+P6ZGto4yEoY+EUaGq99Wtcv85Zsei/h/1XNI/kMnA0G
+        XUZZkE7fBZ6fc0zr/jB43JlmqvJxl1TT9Qc891GgF2z7pXM4reGLJz29OYlixI950akVBl
+        +wyDHma+7+3qDJfAtHN5ymQXbUFrB88=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-606-58e759YeOs-4mQnSnwBbqg-1; Thu, 03 Nov 2022 10:06:48 -0400
-X-MC-Unique: 58e759YeOs-4mQnSnwBbqg-1
-Received: by mail-qk1-f200.google.com with SMTP id n13-20020a05620a294d00b006cf933c40feso2016587qkp.20
-        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 07:06:47 -0700 (PDT)
+ us-mta-210-G9s8QAWzOmegFljOMhZgQQ-1; Thu, 03 Nov 2022 10:08:23 -0400
+X-MC-Unique: G9s8QAWzOmegFljOMhZgQQ-1
+Received: by mail-ej1-f69.google.com with SMTP id hd11-20020a170907968b00b0078df60485fdso1321033ejc.17
+        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 07:08:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4x9kvayeo4WDR+ntPzcjIFI+riYUY38wegNmKe10nu4=;
-        b=OuhXzmE+/bbSOkZGBszdsku7sU0LyiKPQno+xqLLQtq4DMxqnH+0wlbJrVoYxaxSBs
-         Ag/Jhg/8c5rYNZ6MRLbHhpJedpBgN3LKHmcH+ntJp0isCRdIYSB7fQRZLPAmp3OtnGlk
-         569zfzDnjHLNnB9uu8PY81bbKUc5b9pXf5NTMBjAfZNwr8FcMpcoQpLRUdiUO9D3/FfW
-         YbceePRjYqEIVYgCf55+ZOFAWRhZlLEJFEkbhIAKtdfvYx2r9Wwbe1qwqKoXFUogjqgH
-         G5OXUmiLVTHTOZ0gLI5RhaxKY5F1kjjjzyp/DZcGq+Eh/EHOcj9H3Xc2CRpx3hDgoO3Y
-         wdVw==
-X-Gm-Message-State: ACrzQf0IsDnKDyxrCVbSYgHUGOuYoLMy/WvYqjp/TVEQZf4VjbA2akgC
-        NaER78MR7y4W0AhPmFTBu1Qr7Qnb8Kbplldwogn+Ek9Mu3rOzZe93yjKAMS232AZA3oTgS4mw0h
-        3GGhnw9uDZ9hK/bfzQuR6BN+0IDjOHFQz49mpN8U/JydvdVaycCViDL7JrMhojbkn
-X-Received: by 2002:ae9:f714:0:b0:6fa:43e5:4be0 with SMTP id s20-20020ae9f714000000b006fa43e54be0mr12025962qkg.243.1667484407005;
-        Thu, 03 Nov 2022 07:06:47 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7TyUBX3uqeAaNVtbhyJqnoCjQSSozPE1tCnGDxPKMpDcmHdEXVL5+awPM0oKn14YKSLETz9w==
-X-Received: by 2002:ae9:f714:0:b0:6fa:43e5:4be0 with SMTP id s20-20020ae9f714000000b006fa43e54be0mr12025898qkg.243.1667484406584;
-        Thu, 03 Nov 2022 07:06:46 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id o5-20020ac87c45000000b003a50d92f9b4sm608578qtv.1.2022.11.03.07.06.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 07:06:45 -0700 (PDT)
-Message-ID: <33dfde6d609bc800edc5e813705523f6afdcedf0.camel@redhat.com>
-Subject: Re: [PATCH 0/9] nSVM: Security and correctness fixes
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
-        Yang Zhong <yang.zhong@intel.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Peter Xu <peterx@redhat.com>, linux-kselftest@vger.kernel.org
-Date:   Thu, 03 Nov 2022 16:06:40 +0200
-In-Reply-To: <20221103135736.42295-1-mlevitsk@redhat.com>
-References: <20221103135736.42295-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tMZz/r0Y/xMO+n/fhUi//lk8Yf2Cm8C30yAiPyY4Bw4=;
+        b=qrWWvrw/ctACflrajM4c80dLHY4V2sRlyTlitVNjvwg8bc8W2ArgWfbMkxzDKyRoWs
+         vqMw+hZ8BHnMegrzS3Yv8UAGJQC4ILfZKMcU0PdxAo2maZY2HasYMtjlb+/Yb1K5mzmL
+         M1SBwPrm/4e58eEuj1oAF9GW5krKQ0iinVjdxC09mlPA35rGgjtVctQmwtJwCci03qXR
+         NUZQLq0H8vfPRVWhOc06+rRArJkRPt59n/LaxFxLYI6TW8B/ueJBSG5xN6DYT5nOYU9d
+         rsWXQqml1lw2fC6fk6sTVlfhLx1oWMF/sfh+yUixTvR4qlAxaB0+O+skRi2pdQq1MAtj
+         IaXw==
+X-Gm-Message-State: ACrzQf1hAMCtXCpxo9htGsoyiv3CEaLmK15qQD/FDriXKNHD6h7Ksm7W
+        iUeWnEvqA7CDE+ZCbr6PcV/dxpv9ygWZ+MQ5LSsBo1pM7tp/roxt1Js864+1MZKEPmRFEuF3q97
+        JqMLUXB14itvC
+X-Received: by 2002:a05:6402:528a:b0:454:8613:6560 with SMTP id en10-20020a056402528a00b0045486136560mr31172978edb.252.1667484502424;
+        Thu, 03 Nov 2022 07:08:22 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4Dre/hkgRdSdcGbydsy/bQuSRL4FR7uIznudXowctaxKseqrZdRoK/gAiQci2+2pTFqeljBQ==
+X-Received: by 2002:a05:6402:528a:b0:454:8613:6560 with SMTP id en10-20020a056402528a00b0045486136560mr31172953edb.252.1667484502137;
+        Thu, 03 Nov 2022 07:08:22 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id hw20-20020a170907a0d400b007ade5cc6e7asm558763ejc.39.2022.11.03.07.08.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Nov 2022 07:08:21 -0700 (PDT)
+Message-ID: <48530886-ed28-d50a-205b-81f6bf359ca7@redhat.com>
+Date:   Thu, 3 Nov 2022 15:08:19 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH] tools/kvm_stat: fix attack vector with user controlled
+ FUSE mounts
+Content-Language: en-US
+To:     Matthias Gerstner <matthias.gerstner@suse.de>, kvm@vger.kernel.org
+References: <20221103135927.13656-1-matthias.gerstner@suse.de>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20221103135927.13656-1-matthias.gerstner@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-11-03 at 15:57 +0200, Maxim Levitsky wrote:
-> Recently while trying to fix some unit tests I found a CVE in SVM nested code.
+On 11/3/22 14:59, Matthias Gerstner wrote:
+> The first field in /proc/mounts can be influenced by unprivileged users
+> through the widespread `fusermount` setuid-root program. Example:
 > 
-> In 'shutdown_interception' vmexit handler we call kvm_vcpu_reset.
+> ```
+> user$ mkdir ~/mydebugfs
+> user$ export _FUSE_COMMFD=0
+> user$ fusermount ~/mydebugfs -ononempty,fsname=debugfs
+> user$ grep debugfs /proc/mounts
+> debugfs /home/user/mydebugfs fuse rw,nosuid,nodev,relatime,user_id=1000,group_id=100 0 0
+> ```
 > 
-> However if running nested and L1 doesn't intercept shutdown, we will still end
-> up running this function and trigger a bug in it.
+> If there is no debugfs already mounted in the system then this can be
+> used by unprivileged users to trick kvm_stat into using a user
+> controlled file system location for obtaining KVM statistics.
 > 
-> The bug is that this function resets the 'vcpu->arch.hflags' without properly
-> leaving the nested state, which leaves the vCPU in inconsistent state, which
-> later triggers a kernel panic in SVM code.
+> To exploit this also a race condition has to be won, since the code
+> checks for the existence of the 'kvm' subdirectory of the resulting
+> path. This doesn't work on a FUSE mount, because the root user is not
+> allowed to access non-root FUSE mounts for security reasons. If an
+> attacker manages to unmount the FUSE mount in time again then kvm_stat
+> would be using the resulting path, though.
 > 
-> The same bug can likely be triggered by sending INIT via local apic to a vCPU
-> which runs a nested guest.
-> 
-> On VMX we are lucky that the issue can't happen because VMX always intercepts
-> triple faults, thus triple fault in L2 will always be redirected to L1.
-> Plus the 'handle_triple_fault' of VMX doesn't reset the vCPU.
-> 
-> INIT IPI can't happen on VMX either because INIT events are masked while in
-> VMX mode.
-> 
-> First 4 patches in this series address the above issue, and are
-> already posted on the list with title,
-> ('nSVM: fix L0 crash if L2 has shutdown condtion which L1 doesn't intercept')
-> I addressed the review feedback and also added a unit test to hit this issue.
-> 
-> In addition to these patches I noticed that KVM doesn't honour SHUTDOWN intercept bit
-> of L1 on SVM, and I included a fix to do so - its only for correctness
-> as a normal hypervisor should always intercept SHUTDOWN.
-> A unit test on the other hand might want to not do so.
-> I also extendted the triple_fault_test selftest to hit this issue.
-> 
-> Finaly I found another security issue, I found a way to
-> trigger a kernel non rate limited printk on SVM from the guest, and
-> last patch in the series fixes that.
-> 
-> A unit test I posted to kvm-unit-tests project hits this issue, so
-> no selftest was added.
-> 
-> Best regards,
->         Maxim Levitsky
-> 
-> Maxim Levitsky (9):
->   KVM: x86: nSVM: leave nested mode on vCPU free
->   KVM: x86: nSVM: harden svm_free_nested against freeing vmcb02 while
->     still in use
->   KVM: x86: add kvm_leave_nested
->   KVM: x86: forcibly leave nested mode on vCPU reset
->   KVM: selftests: move idt_entry to header
->   kvm: selftests: add svm nested shutdown test
->   KVM: x86: allow L1 to not intercept triple fault
->   KVM: selftests: add svm part to triple_fault_test
->   KVM: x86: remove exit_int_info warning in svm_handle_exit
-> 
->  arch/x86/kvm/svm/nested.c                     | 12 +++-
->  arch/x86/kvm/svm/svm.c                        | 10 +--
->  arch/x86/kvm/vmx/nested.c                     |  4 +-
->  arch/x86/kvm/x86.c                            | 29 ++++++--
->  tools/testing/selftests/kvm/.gitignore        |  1 +
->  tools/testing/selftests/kvm/Makefile          |  1 +
->  .../selftests/kvm/include/x86_64/processor.h  | 13 ++++
->  .../selftests/kvm/lib/x86_64/processor.c      | 13 ----
->  .../kvm/x86_64/svm_nested_shutdown_test.c     | 71 +++++++++++++++++++
->  .../kvm/x86_64/triple_fault_event_test.c      | 71 ++++++++++++++-----
->  10 files changed, 174 insertions(+), 51 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/svm_nested_shutdown_test.c
-> 
-> -- 
-> 2.34.3
-> 
-> 
+> The impact if winning the race condition is mostly a denial-of-service
+> or damaged information integrity. The files in debugfs are only opened
+> for reading. So the attacker can cause very large data to be read in by
+> kvm_stat or fake data to be processed by kvm_stat. I don't see any
+> viable way to turn this into a privilege escalation.
 
+Ok, thanks for confirming.  I will tweak the commit message.
 
-I jumped the gun a bit with this patch series, there are few checkpatch.pl issues and some
-leftovers I didn't remove. I'll resend this shortly.
+Paolo
 
-Best regards,
-	Maxim Levitsky
-
+> The fix is simply to use the file system type field instead. Whitespace
+> in the mount path is escaped in /proc/mounts thus no further safety
+> measures in the parsing should be necessary to make this correct.
+> ---
+>   tools/kvm/kvm_stat/kvm_stat | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
+> index 9c366b3a676d..88a73999aa58 100755
+> --- a/tools/kvm/kvm_stat/kvm_stat
+> +++ b/tools/kvm/kvm_stat/kvm_stat
+> @@ -1756,7 +1756,7 @@ def assign_globals():
+>   
+>       debugfs = ''
+>       for line in open('/proc/mounts'):
+> -        if line.split(' ')[0] == 'debugfs':
+> +        if line.split(' ')[2] == 'debugfs':
+>               debugfs = line.split(' ')[1]
+>               break
+>       if debugfs == '':
 
