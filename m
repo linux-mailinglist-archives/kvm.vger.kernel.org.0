@@ -2,49 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A9D3618CCF
-	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 00:32:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97F86618CDD
+	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 00:34:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230494AbiKCXcg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 19:32:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53986 "EHLO
+        id S230497AbiKCXe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 19:34:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230361AbiKCXcc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 19:32:32 -0400
-Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 883F01F601
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 16:32:30 -0700 (PDT)
-Date:   Thu, 3 Nov 2022 23:32:23 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1667518348;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AkuOT4cCm8lWPlDD69OJU/NZeThANLz0iL3yJQqkzEM=;
-        b=eakihLoa2JvOPxYFnYcGM0hY1jxnCOWluKCc1dZ0RkPrPRsMNBjJQzuhHHYe1QxPaAk064
-        34n10Zy7oa+KLbGIc+AGP1eXp4xdGGlsFO9mmFVIDrkbj/c9/Rwh894OV92TW3AklfSEko
-        xHEBvMLeSuNFrx8AghKRUwx3bqpS86M=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-        ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
-        catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
-        pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
-        james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v7 4/9] KVM: Support dirty ring in conjunction with bitmap
-Message-ID: <Y2RPhwIUsGLQ2cz/@google.com>
-References: <20221031003621.164306-1-gshan@redhat.com>
- <20221031003621.164306-5-gshan@redhat.com>
+        with ESMTP id S230261AbiKCXeZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 19:34:25 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C5A42182D;
+        Thu,  3 Nov 2022 16:34:25 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A3Mfv1A016506;
+        Thu, 3 Nov 2022 23:34:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=e2YtRtcv00QA3VMD6/NiGd3rTfVXWoJoDthWJy2wGMw=;
+ b=KHPXALBtDhTkPETF8EFIA6wO4L/wOF0EqFc8K4y9jQoq/8X3d+AyNjq4qT4Qu3qHf5Zj
+ T1Rws7+3VcGiON8u6GGxQPwdG9WWPDjF/6qZAURNim/1MJaL6ILfB508en5sSkkIPTLe
+ AzusSyb2NanVTdAZplhUjyMP6iIw6OPYMzlFA6mM2zt3OrHy9tYcjHMGVz5Ruehb2T+d
+ 07Jx6eB+PT4j7J1XYe4l8WWvfi/4enr4dKRSY1vkbbA1EtBvKcrq4XcPgIqK0hQqb2GC
+ 1ACgzQmyu6g+qGyULxOve4EaaF+X0DHsIv2AotV3z6PYsbm1PC8oU5ZQRFTWvRqk5z8W +A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kmphjsb0e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Nov 2022 23:34:18 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A3NYHbE025695;
+        Thu, 3 Nov 2022 23:34:17 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kmphjsayx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Nov 2022 23:34:17 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A3NJpnN032583;
+        Thu, 3 Nov 2022 23:34:16 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma02wdc.us.ibm.com with ESMTP id 3kgutammh9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 03 Nov 2022 23:34:16 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com ([9.208.128.112])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A3NYE6N7865054
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 3 Nov 2022 23:34:15 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7A87358054;
+        Thu,  3 Nov 2022 23:34:14 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 04B4058058;
+        Thu,  3 Nov 2022 23:34:07 +0000 (GMT)
+Received: from [9.65.206.126] (unknown [9.65.206.126])
+        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  3 Nov 2022 23:34:06 +0000 (GMT)
+Message-ID: <c4285d52-4886-a243-d641-1006e0b23994@linux.ibm.com>
+Date:   Thu, 3 Nov 2022 19:34:06 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221031003621.164306-5-gshan@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH v2 7/7] vfio: Remove vfio_free_device
+Content-Language: en-US
+To:     Eric Farman <farman@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>, Yi Liu <yi.l.liu@intel.com>
+Cc:     Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        David Airlie <airlied@gmail.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20221102150152.2521475-1-farman@linux.ibm.com>
+ <20221102150152.2521475-8-farman@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <20221102150152.2521475-8-farman@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: MEv8iFkDuzR_598RYz20f1sckapX54K5
+X-Proofpoint-GUID: mwX7xaEAcnKaJAimpUOkrctyTnDjPKAH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-03_04,2022-11-03_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 mlxlogscore=999 phishscore=0 spamscore=0 clxscore=1015
+ bulkscore=0 priorityscore=1501 impostorscore=0 mlxscore=0 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211030161
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
         SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -52,62 +123,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 31, 2022 at 08:36:16AM +0800, Gavin Shan wrote:
-> ARM64 needs to dirty memory outside of a VCPU context when VGIC/ITS is
-> enabled. It's conflicting with that ring-based dirty page tracking always
-> requires a running VCPU context.
+On 11/2/22 11:01 AM, Eric Farman wrote:
+> With the "mess" sorted out, we should be able to inline the
+> vfio_free_device call introduced by commit cb9ff3f3b84c
+> ("vfio: Add helpers for unifying vfio_device life cycle")
+> and remove them from driver release callbacks.
 > 
-> Introduce a new flavor of dirty ring that requires the use of both VCPU
-> dirty rings and a dirty bitmap. The expectation is that for non-VCPU
-> sources of dirty memory (such as the VGIC/ITS on arm64), KVM writes to
-> the dirty bitmap. Userspace should scan the dirty bitmap before migrating
-> the VM to the target.
-> 
-> Use an additional capability to advertise this behavior. The newly added
-> capability (KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP) can't be enabled before
-> KVM_CAP_DIRTY_LOG_RING_ACQ_REL on ARM64. In this way, the newly added
-> capability is treated as an extension of KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 
-Whatever ordering requirements we settle on between these capabilities
-needs to be documented as well.
+Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-[...]
 
-> @@ -4588,6 +4594,13 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
->  			return -EINVAL;
->  
->  		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
-> +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP:
-> +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
-> +		    !kvm->dirty_ring_size)
-
-I believe this ordering requirement is problematic, as it piles on top
-of an existing problem w.r.t. KVM_CAP_DIRTY_LOG_RING v. memslot
-creation.
-
-Example:
- - Enable KVM_CAP_DIRTY_LOG_RING
- - Create some memslots w/ dirty logging enabled (note that the bitmap
-   is _not_ allocated)
- - Enable KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
- - Save ITS tables and get a NULL dereference in
-   mark_page_dirty_in_slot():
-
-                if (vcpu && kvm->dirty_ring_size)
-                        kvm_dirty_ring_push(&vcpu->dirty_ring,
-                                            slot, rel_gfn);
-                else
-------->		set_bit_le(rel_gfn, memslot->dirty_bitmap);
-
-Similarly, KVM may unnecessarily allocate bitmaps if dirty logging is
-enabled on memslots before KVM_CAP_DIRTY_LOG_RING is enabled.
-
-You could paper over this issue by disallowing DIRTY_RING_WITH_BITMAP if
-DIRTY_LOG_RING has already been enabled, but the better approach would
-be to explicitly check kvm_memslots_empty() such that the real
-dependency is obvious. Peter, hadn't you mentioned something about
-checking against memslots in an earlier revision?
-
---
-Thanks,
-Oliver
