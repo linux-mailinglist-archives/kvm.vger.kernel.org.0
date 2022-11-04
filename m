@@ -2,70 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E1A3619F10
-	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 18:44:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2456161A0F3
+	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 20:26:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232007AbiKDRoB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Nov 2022 13:44:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51296 "EHLO
+        id S229523AbiKDT0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Nov 2022 15:26:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231939AbiKDRno (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Nov 2022 13:43:44 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75FA2748E8
-        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 10:42:40 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id v1so8016559wrt.11
-        for <kvm@vger.kernel.org>; Fri, 04 Nov 2022 10:42:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=gZRaWO/V1xiqx1eDC7r3VOOHIFPvaFpSyP31c7Jcw6s=;
-        b=moVmMmYBwK6xOn+awu4Z2/Q+mLOImqr4cXxGAy1//sAXvXmk+uwiPJ1KnAFv/5MJdx
-         WKxFXzVqwdlx5SH8sQFjR9m9CemQd5+udzUFNvRd3Duvl4mjdkzhwN4SfCmPCd5bBNZL
-         M+XbukpM6pFEup0kX94kJUjYR8wzIVuzxtYCSWzOmxRcpykfgbMZ69effEZvbi0o7Qce
-         qfMq9cLcShSfWjlyjW2f4Es9+mlJ48cQsRneRwUj7IvcgsoyV+nC0RY/Y2XIX64ZsN/7
-         Yo4WRHqM2sfKt7yzKGgr5+DrH0R0IrBCRpz3dahyUL1Enwik8EfkA2IwMLrcAXvE0q4l
-         FKyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gZRaWO/V1xiqx1eDC7r3VOOHIFPvaFpSyP31c7Jcw6s=;
-        b=to3zOmyLfvQWqY7O8CHIgvXcpfYzD814VyYG7ewMaW5EAeUn2kM02EEjqXGAiO8nDF
-         +2Xz9QMHrha3HM2+dPtqZt1Kg4/oBznUgG20sUpo+0KZovCHxzdIrZNRCnfDhJ6AGDZW
-         w7e9FpGESzgZKMkkyrz3hPzKSkfJY6enyMzPhJVYusD1Ys9qs5XQihaXHj37h2dganNN
-         1dzmwMoigYD9WbSWXwyvi/QZuLyR1I/L1uZwrxdbrbYMSQ7n8IfLuBApaewbUMIXg6pQ
-         8IITxDJgJLgqFaGhNkLLB4MRqfxTnXrWC5tODtUd534+RpDrG1pace5eEnw0SG9gQr/y
-         vHOg==
-X-Gm-Message-State: ACrzQf2v5+/Bz5okj6TLULhFjcF6LsxxqNMtdrrgJkiDpnHInXXaBdIf
-        h7Jq5X4c7Sy5kf+kz2A9K8aVyyOfizO0PxBiA/nDUw==
-X-Google-Smtp-Source: AMsMyM6oeAl9VU7IukG+ufk/d0220k0kvPLgAWMaVWWu9lfDLGiKZIeuyB2sA3qpRQ42h5Db8GK0C/zT7dQz5Xt2uI8=
-X-Received: by 2002:a5d:53cf:0:b0:236:bbc0:236 with SMTP id
- a15-20020a5d53cf000000b00236bbc00236mr21494089wrw.572.1667583758732; Fri, 04
- Nov 2022 10:42:38 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221104011041.290951-1-pcc@google.com> <86a656r8nh.wl-maz@kernel.org>
-In-Reply-To: <86a656r8nh.wl-maz@kernel.org>
-From:   Peter Collingbourne <pcc@google.com>
-Date:   Fri, 4 Nov 2022 10:42:27 -0700
-Message-ID: <CAMn1gO62ugtyL9-0hE=DCn=EJ6JY+=Li3QTKPeNULdUhZdnM7w@mail.gmail.com>
-Subject: Re: [PATCH v5 0/8] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        with ESMTP id S229532AbiKDT0L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Nov 2022 15:26:11 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on20615.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5b::615])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE9E021E2C;
+        Fri,  4 Nov 2022 12:26:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fG/sa/f5G+Cx88ylfezt9R7IjJ+Vlh46C1RTYX6LR1Ob3XmnWO74zjiffbgEqj0DCIbPfd0E1fYUG5j7zEbuRJ8/PsS+aEDeI8jsLpXXvuwbmvX4RVkURWqihP5WDtnIeN94AKfJnQxZDq/FIfqToXQCPyotmK3HFji1v/JGBl32E1VEPBxZ6h6W2dmLMggcIb2Tcfnof7oHzSGHqFIYQ8seg8Od3qH6j7XhlPda0OqB2wgHaxiz/PuCG+XTSRd3qyKjhATCferMsN0kXIil0vNYGpJotTKYwfch8JvQm6gqCHA7gNpP2uPZksGKxvXWfwRCjYJQvn3YOUJMt1oujw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5tu930OvuFu3jUn0EKruj8z7OPgPu9liMfZeXGy8qZo=;
+ b=NU0S6ba+3W29Axpe6TuMsMPlxY5hqznzKrnsa7gRkB1d9E+PdTtWMQ0zCUM9hJY2ovmq/c3DCcMrpo1uBt/IVlP2JuNNaQ6BlYra8LussY6cWSOkVmKS1g/BLKaSMXXJne0t1Lsmj13SOFWvwygbU406efcu6hs37oabSqBs9avTDVvEiamrbd95ybPcdaB8ggIu2YwqnxxhGkkzsDhhI17AKSzBEf3EGhNd3gnNlfc9mXpVBUd5qhoCkpKx0ABbNoSS4NXxOnqkG9qyprw8Yw0/vIxdCr/fxGfM6fKhBPwXCzBCFq1URnlusZruNl2+DQfI2+3Nn6A5jtGFzE6wwg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5tu930OvuFu3jUn0EKruj8z7OPgPu9liMfZeXGy8qZo=;
+ b=hhEBYTJnwInl1s3HayOV4a5LvCPn7gfecC9hDQwHhKm235znCA69/DysEXmHtIUb9/Y5RoaQhouE5nrM25yZ0eQ8kYq/XtsKw/rITTGNmYBfhoDpHEi0zJVClwtWalGQvYUA3DIB7rYD/RGQi9NowPwaqRosDeEHBSY94dbl5eBoEf+vRc2KFmIpXwzeWzUqmoQPHS7lrkwdezsjzmQUYijkuSDbmiWo+9IDNvxzy+u8oXJUFLzjq31txDRUCtqQZ2bgrKUz2mfDXzzN//GaXXbMtnJcnMyfxV1+BLTUdA7UfZiyuM8yx+l5GsquKSmUG2V/YptGb91mJC7Rxk/2IQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CH2PR12MB4311.namprd12.prod.outlook.com (2603:10b6:610:a8::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.22; Fri, 4 Nov
+ 2022 19:25:41 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5769.015; Fri, 4 Nov 2022
+ 19:25:41 +0000
+Date:   Fri, 4 Nov 2022 16:25:40 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Joerg Roedel <joro@8bytes.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
-        Steven Price <steven.price@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        linux-mm <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v3 01/15] iommu: Add IOMMU_CAP_ENFORCE_CACHE_COHERENCY
+Message-ID: <Y2VnNJYQfQwfKiwl@nvidia.com>
+References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <1-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <BN9PR11MB5276F41D50FFAFFCC8186B238C389@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB5276F41D50FFAFFCC8186B238C389@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR02CA0004.namprd02.prod.outlook.com
+ (2603:10b6:208:fc::17) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH2PR12MB4311:EE_
+X-MS-Office365-Filtering-Correlation-Id: a7ab9e5c-9a8f-4249-85c4-08dabe9a5c8c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RYof3kHT/5xG1v5dpE9hfFOlu7hv//WpwOdSMdPx/xJFG7EHEGRFl2mAwulqTHw2MgJJ7VlboY5xOSfdDSZcRbHfAkBhBJ4gsTk/oSxfuPQ2qyv/6X4GLh5p4Z4fcxDVkjVH/vjnfZKO6brgmULLYMieQwxJwZATcNDvowLE9Pv+w4PA3mJi4is5QTJ507n09rp2X/pMwV8aleR3Ud70c4PohZ6k/iSA/eOMsqJrnX8KPk2rRdeGVw0z8Oa4NdbmAZJ5sFGU3oNv0dcOtqRaJH0oq/AEvViHbC7UC9Hyz/0q0+Rp57jL/vZqIRm59dDVYxk5Q6PVuAvGATF26V1vctRYz2J7DH/y9EAUnn+7TIkXg+hzta+qERxpMCPzOImd8J+meQNY/MrUAWeIEfM5QIGZmh1KSvo3DEngnqpimSvKhSjJpvg7M6aUy+x8Ge2K1/Ik32pShbb9rBDsAIWzXULdV78R0rI5dW51pxNr6KFhnBSp7LXK+P/uKplrJM/y14W+eNJMmVqWinPShVuMdRcpcGEaNDEWbeMwpO0XIDykAS+GOpsacQbTQkfsPm8dCNZx02N6d5Xv8GemqZozFsbQ+qryeBHzFCOhIxECAry0fSIX+wnk6eYhog//AttWNxDki/L7Er8ncS4etOWhsq3sCnlYrla7JZrsKu+UEKXomgBxFaeLVeQA5qBiRzn55h9Ta2C9GZ/KfBSZ1TZ2GQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(39860400002)(366004)(376002)(346002)(396003)(451199015)(38100700002)(36756003)(8936002)(66556008)(8676002)(86362001)(41300700001)(4326008)(26005)(66946007)(7416002)(7406005)(5660300002)(316002)(66476007)(54906003)(6916009)(4744005)(2906002)(2616005)(186003)(478600001)(6486002)(6512007)(6506007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yyFyQvaMpZGct7Hne/EZj9HxjaAFYkbmqox4swBGXMNhDXE59WyZwvAYX3rq?=
+ =?us-ascii?Q?zr6AIONCYyDh+cx4nU3jKlpWkf+8ccEfiOyq/R3gWdwTaNPkkP3yW/Es3IVe?=
+ =?us-ascii?Q?8rvZKh4jlOyuawe3ifyV5VJoFh/IL/Ddo9X2hTqQmeFoUXnZ9a3uLSzRs9Ta?=
+ =?us-ascii?Q?x9xHBBgXyFsnGvSqoJ3xoEfQxhAc5tmlJn0iWs2AJMNThMJdrmVTFihlKyhS?=
+ =?us-ascii?Q?56AAeykQidtQtuP9ZfPYYvvMzSCI0x6s4fecpAKj26zHiO318OLI+j1DoFEA?=
+ =?us-ascii?Q?9wkmYS8OfhYqvBpKIm/C29BrH8R+CAO1jrFDaD8PwHCRaDq4onKqANQfUXOH?=
+ =?us-ascii?Q?UGLKkq/dgz1GmwjQCC9aKGKXUP3TIJmTGn/COPJixjFkxPkUvIjXx7x8+FEL?=
+ =?us-ascii?Q?fE+ylNmoIjMkUPGRl3usObVLfVIXchsvP58NL44KsLVwCBXd+qDEbbITYCWD?=
+ =?us-ascii?Q?rZlBarcXvdPI2KBS7MlvMylhqvcp8gA26Lst4LLdGthMJpfRbwkao1x4T/y+?=
+ =?us-ascii?Q?7kmC0dvaxxoedfzQumwR4MPt5K3/2ccsHRUaFe3dVa9cbY426vHNCsypFlA7?=
+ =?us-ascii?Q?YCLssfSItOMkZkI2zAWBrAnw0Fir5oZh1xgXBT5hNOEfPYf2nUwxTCse87yR?=
+ =?us-ascii?Q?0uSvrrdxbzauE3lddlyqByb+klg8ZAJrAXD26D7ua3rNzFAJq5XPIQTloE40?=
+ =?us-ascii?Q?mQeNhIy8Pur6zFdYQDZ4/mXbEzTV8nJSzALwZRnzzRR2AZ8jcvoDVVrUi1hZ?=
+ =?us-ascii?Q?O9ARNSKDXl4EkLNWwKCNQJ+2k9KOevxHKT0N0wfuwUTtGb90qxn80rysMqDI?=
+ =?us-ascii?Q?JAyUGCe6vEAU8qt5Alio7fbVNfL/lpxDhJjKZI5KNn08oPB/tWNvfx40mnmZ?=
+ =?us-ascii?Q?Lbhx9dEFUHAIwdAjTOOslb3ROT/ejR5sFP3lYMHd11BCMii7YwZJCdJtqmwq?=
+ =?us-ascii?Q?UeuF47n8ovK3PhEJtHxNGaERUAiy5hfbwcNUH6fQVKhTkyEtbD0RMxd9Ps6+?=
+ =?us-ascii?Q?vtf06lCoeXqg6vYRQJBZejwprcR7PA9gaUiVaokZA923HI26yqeNtf+01VZu?=
+ =?us-ascii?Q?BqCKBylnl0NnIyXJfFNSkBhbqSpfp0evfJ8U9Py6SZASoXjzki5gJFz/3+jJ?=
+ =?us-ascii?Q?moVFT8lOTzPLOsvIxGK36hAyCSaA0Jn6lDfkQ5rpAQVLO6mMoU3n0D1sN6er?=
+ =?us-ascii?Q?9LWSr59oxf/U/BKwrtJFf7UtPpcIeE57s3AHVzAw88Odg1nmSE+xc1UXeLPW?=
+ =?us-ascii?Q?yITkhSpuNFx6CuQ1+VUjt0rqD9Jr5myV5EQZqLzoXaOWe74aMpOD378ZQjqc?=
+ =?us-ascii?Q?PwzsH52w3i3YCXYNsaWxc1jNmAQpV82vRQpsgu+vB9l0x00ngmy/u6dzlAk2?=
+ =?us-ascii?Q?eDTgbej1azJw0W5s31lMhnCJtpFpbcEIp8AWJO2PT2brCcmx2QRKu4JA5ntZ?=
+ =?us-ascii?Q?gFLMBl6leKQlobxQq0mUqBJ1qtKAJm3XAwmypu8yNRvUXLky4ElVSF/98/mu?=
+ =?us-ascii?Q?Xfd8sGKndnXXHJQ39KpbAggIC8fejV98aTJrH+36laE3Ys5e2lRO1GiksUX7?=
+ =?us-ascii?Q?L3Er2ESuzuUzf6u5Wk0=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a7ab9e5c-9a8f-4249-85c4-08dabe9a5c8c
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2022 19:25:41.5956
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ffrl3EKxzoH1cRMlzzCtTQKxmSOCRc0kXL8VuFk1f/OF31YHYuS2S4UOIup/iGEb
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4311
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,68 +147,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 4, 2022 at 9:23 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 04 Nov 2022 01:10:33 +0000,
-> Peter Collingbourne <pcc@google.com> wrote:
-> >
-> > Hi,
-> >
-> > This patch series allows VMMs to use shared mappings in MTE enabled
-> > guests. The first five patches were taken from Catalin's tree [1] which
-> > addressed some review feedback from when they were previously sent out
-> > as v3 of this series. The first patch from Catalin's tree makes room
-> > for an additional PG_arch_3 flag by making the newer PG_arch_* flags
-> > arch-dependent. The next four patches are based on a series that
-> > Catalin sent out prior to v3, whose cover letter [2] I quote from below:
-> >
-> > > This series aims to fix the races between initialising the tags on a
-> > > page and setting the PG_mte_tagged flag. Currently the flag is set
-> > > either before or after that tag initialisation and this can lead to CoW
-> > > copying stale tags. The first patch moves the flag setting after the
-> > > tags have been initialised, solving the CoW issue. However, concurrent
-> > > mprotect() on a shared mapping may (very rarely) lead to valid tags
-> > > being zeroed.
-> > >
-> > > The second skips the sanitise_mte_tags() call in kvm_set_spte_gfn(),
-> > > deferring it to user_mem_abort(). The outcome is that no
-> > > sanitise_mte_tags() can be simplified to skip the pfn_to_online_page()
-> > > check and only rely on VM_MTE_ALLOWED vma flag that can be checked in
-> > > user_mem_abort().
-> > >
-> > > The third and fourth patches use PG_arch_3 as a lock for page tagging,
-> > > based on Peter Collingbourne's idea of a two-bit lock.
-> > >
-> > > I think the first patch can be queued but the rest needs some in depth
-> > > review and test. With this series (if correct) we could allos MAP_SHARED
-> > > on KVM guest memory but this is to be discussed separately as there are
-> > > some KVM ABI implications.
-> >
-> > In this v5 I rebased Catalin's tree onto -next again. Please double check
->
-> Please don't do use -next as a base. In-flight series should be based
-> on a *stable* tag, either 6.0 or one of the early -RCs. If there is a
-> known conflict with -next, do mention it in the cover letter and
-> provide a resolution.
+On Thu, Nov 03, 2022 at 05:03:01AM +0000, Tian, Kevin wrote:
+> > @@ -4458,7 +4458,11 @@ static bool intel_iommu_capable(struct device
+> > *dev, enum iommu_cap cap)
+> >  		return irq_remapping_enabled == 1;
+> >  	if (cap == IOMMU_CAP_PRE_BOOT_PROTECTION)
+> >  		return dmar_platform_optin();
+> > +	if (cap == IOMMU_CAP_ENFORCE_CACHE_COHERENCY) {
+> > +		struct device_domain_info *info = dev_iommu_priv_get(dev);
+> > 
+> > +		return ecap_sc_support(info->iommu->ecap);
+> > +	}
+> >  	return false;
+> >  }
+> 
+> use switch/case while making this change.
 
-Okay, I will keep that in mind.
+Done:
 
-> > my rebase, which resolved the conflict with commit a8e5e5146ad0 ("arm64:
-> > mte: Avoid setting PG_mte_tagged if no tags cleared or restored").
->
-> This commit seems part of -rc1, so I guess the patches directly apply
-> on top of that tag?
+static bool intel_iommu_capable(struct device *dev, enum iommu_cap cap)
+{
+	struct device_domain_info *info = dev_iommu_priv_get(dev);
 
-Yes, sorry, this also applies cleanly to -rc1.
+	switch (cap) {
+	case IOMMU_CAP_CACHE_COHERENCY:
+		return true;
+	case IOMMU_CAP_INTR_REMAP:
+		return irq_remapping_enabled == 1;
+	case IOMMU_CAP_PRE_BOOT_PROTECTION:
+		return dmar_platform_optin();
+	case IOMMU_CAP_ENFORCE_CACHE_COHERENCY:
+		return ecap_sc_support(info->iommu->ecap);
+	default:
+		return false;
+	}
+}
 
-> > I now have Reviewed-by for all patches except for the last one, which adds
-> > the documentation. Thanks for the reviews so far, and please take a look!
->
-> I'd really like the MM folks (list now cc'd) to look at the relevant
-> patches (1 and 5) and ack them before I take this.
-
-Okay, here are the lore links for the convenience of the MM folks:
-https://lore.kernel.org/all/20221104011041.290951-2-pcc@google.com/
-https://lore.kernel.org/all/20221104011041.290951-6-pcc@google.com/
-
-Peter
+Thanks,
+Jason
