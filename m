@@ -2,89 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4C4161A3DF
-	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 23:06:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E73561A404
+	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 23:23:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230118AbiKDWGc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Nov 2022 18:06:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34522 "EHLO
+        id S229494AbiKDWXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Nov 2022 18:23:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbiKDWGa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Nov 2022 18:06:30 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26401D10A;
-        Fri,  4 Nov 2022 15:06:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667599590; x=1699135590;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=fW0Bxr9OnS17BvgprAuZazMwrhTy9Qfa+MwnyV0jt60=;
-  b=n4hAvMbyxzAX+HZ9f5EgeAzpeNQ2G2C5NYqieQrd6sSgBKpDZBaCEqUj
-   GDEbWiJztuLp2Gj5qimeRplzG4qTv1WfxgiC8xPoKja34A9/L7PKnYVxp
-   sgi1TiCf+ktmF2L9BPtCDV3MP7CrbKz4mLwzW2lZeKWJZEDjObAkzxT2p
-   xFNLDg0nCgDCoHqRoirutydS3cqhjuDKc4Dw4o7Px4jAEPRZzA1XqZdDf
-   jPDZNw6EHvvr+tRwJWwv3yZosrjSN+JVkaZpFUXfg8ET+HlP/7yiXgi2v
-   RWIHk4SOM0rtA/tgiFwCIRnv7VHCvxLgIRoSlYTo7lpgpK01hjxIELvMV
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10521"; a="289811519"
-X-IronPort-AV: E=Sophos;i="5.96,138,1665471600"; 
-   d="scan'208";a="289811519"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2022 15:06:29 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10521"; a="635243963"
-X-IronPort-AV: E=Sophos;i="5.96,138,1665471600"; 
-   d="scan'208";a="635243963"
-Received: from anantsin-mobl2.amr.corp.intel.com (HELO [10.209.97.57]) ([10.209.97.57])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2022 15:06:28 -0700
-Message-ID: <b2274949-8fba-24ff-89bf-627f288ace06@intel.com>
-Date:   Fri, 4 Nov 2022 15:06:28 -0700
+        with ESMTP id S229450AbiKDWXN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Nov 2022 18:23:13 -0400
+Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F0612D775
+        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 15:23:09 -0700 (PDT)
+Date:   Fri, 4 Nov 2022 22:23:02 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1667600588;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=43rE8449ZA7RnQbWm7rB14AGuyEAs2Cqf2MmYOuEeis=;
+        b=KtO70yIWLIG65aNkmLBqbApAYzf4PgA71drYUOQAG8xzy0NEoAqLDq4/w2l90ngnhFpWc/
+        yz4Ebn90BVG8oNXY86Y2/ZaEQ/hixZVScNXKqeCwZDFD0IURuVETOP+Gi91qdk5xk0fV+z
+        HOA3H4/lWXP8+b4Y+SW+fxTcDgXqRug=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+        ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
+        catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
+        pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
+        james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v7 4/9] KVM: Support dirty ring in conjunction with bitmap
+Message-ID: <Y2WQxsgOBZwzWzPq@google.com>
+References: <20221031003621.164306-1-gshan@redhat.com>
+ <20221031003621.164306-5-gshan@redhat.com>
+ <Y2RPhwIUsGLQ2cz/@google.com>
+ <d5b86a73-e030-7ce3-e5f3-301f4f505323@redhat.com>
+ <Y2RlfkyQMCtD6Rbh@google.com>
+ <d7e45de0-bff6-7d8c-4bf4-1a09e8acb726@redhat.com>
+ <Y2VyMwAlg7U9pXzV@google.com>
+ <f2d95d47-6411-8d01-14eb-5e17e1a16dbf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH 0/3] x86/speculation: Support Automatic IBRS
-Content-Language: en-US
-To:     Kim Phillips <kim.phillips@amd.com>, x86@kernel.org
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Babu Moger <Babu.Moger@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20221104213651.141057-1-kim.phillips@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20221104213651.141057-1-kim.phillips@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f2d95d47-6411-8d01-14eb-5e17e1a16dbf@redhat.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/4/22 14:36, Kim Phillips wrote:
-> The AMD Zen4 core supports a new feature called Automatic IBRS.
-> (Indirect Branch Restricted Speculation).
+On Sat, Nov 05, 2022 at 05:57:33AM +0800, Gavin Shan wrote:
+> On 11/5/22 4:12 AM, Oliver Upton wrote:
+> > I agree that we should address (1) like this, but in (2) requiring that
+> > no memslots were created before enabling the existing capabilities would
+> > be a change in ABI. If we can get away with that, great, but otherwise
+> > we may need to delete the bitmaps associated with all memslots when the
+> > cap is enabled.
+> > 
 > 
-> Enable Automatic IBRS by default if the CPU feature is present.
-> It typically provides greater performance over the incumbent
-> generic retpolines mitigation.
+> I had the assumption QEMU and kvm/selftests are the only consumers to
+> use DIRTY_RING. In this case, requiring that no memslots were created
+> to enable DIRTY_RING won't break userspace.
+> Following your thoughts, the tracked dirty pages in the bitmap also
+> need to be synchronized to the per-vcpu-ring before the bitmap can be
+> destroyed.
 
-Could you also share some information on how this differs from EIBRS and
-why it needs to exist in parallel to EBIRS?
+Eh, I don't think we'd need to go that far. No matter what, any dirty
+bits that were present in the bitmap could never be read again anyway,
+as we reject KVM_GET_DIRTY_LOG if kvm->dirty_ring_size != 0.
+
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 91cf51a25394..420cc101a16e 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -4588,6 +4588,32 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+> >   			return -EINVAL;
+> >   		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+> > +
+> > +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP: {
+> > +		struct kvm_memslots *slots;
+> > +		int r = -EINVAL;
+> > +
+> > +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+> > +		    !kvm->dirty_ring_size)
+> > +			return r;
+> > +
+> > +		mutex_lock(&kvm->slots_lock);
+> > +
+> > +		slots = kvm_memslots(kvm);
+> > +
+> > +		/*
+> > +		 * Avoid a race between memslot creation and enabling the ring +
+> > +		 * bitmap capability to guarantee that no memslots have been
+> > +		 * created without a bitmap.
+> > +		 */
+> > +		if (kvm_memslots_empty(slots)) {
+> > +			kvm->dirty_ring_with_bitmap = cap->args[0];
+> > +			r = 0;
+> > +		}
+> > +
+> > +		mutex_unlock(&kvm->slots_lock);
+> > +		return r;
+> > +	}
+> >   	default:
+> >   		return kvm_vm_ioctl_enable_cap(kvm, cap);
+> >   	}
+> > 
+> 
+> The proposed changes look good to me. It will be integrated to PATCH[v8 4/9].
+> By the way, v8 will be posted shortly.
+
+Excellent, thanks!
+
+--
+Best,
+Oliver
