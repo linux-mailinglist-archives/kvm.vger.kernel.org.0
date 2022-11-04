@@ -2,125 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E73561A404
-	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 23:23:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A373A61A412
+	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 23:30:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229494AbiKDWXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Nov 2022 18:23:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41168 "EHLO
+        id S229745AbiKDW35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Nov 2022 18:29:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbiKDWXN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Nov 2022 18:23:13 -0400
-Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F0612D775
-        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 15:23:09 -0700 (PDT)
-Date:   Fri, 4 Nov 2022 22:23:02 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1667600588;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=43rE8449ZA7RnQbWm7rB14AGuyEAs2Cqf2MmYOuEeis=;
-        b=KtO70yIWLIG65aNkmLBqbApAYzf4PgA71drYUOQAG8xzy0NEoAqLDq4/w2l90ngnhFpWc/
-        yz4Ebn90BVG8oNXY86Y2/ZaEQ/hixZVScNXKqeCwZDFD0IURuVETOP+Gi91qdk5xk0fV+z
-        HOA3H4/lWXP8+b4Y+SW+fxTcDgXqRug=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-        ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
-        catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
-        pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
-        james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v7 4/9] KVM: Support dirty ring in conjunction with bitmap
-Message-ID: <Y2WQxsgOBZwzWzPq@google.com>
-References: <20221031003621.164306-1-gshan@redhat.com>
- <20221031003621.164306-5-gshan@redhat.com>
- <Y2RPhwIUsGLQ2cz/@google.com>
- <d5b86a73-e030-7ce3-e5f3-301f4f505323@redhat.com>
- <Y2RlfkyQMCtD6Rbh@google.com>
- <d7e45de0-bff6-7d8c-4bf4-1a09e8acb726@redhat.com>
- <Y2VyMwAlg7U9pXzV@google.com>
- <f2d95d47-6411-8d01-14eb-5e17e1a16dbf@redhat.com>
+        with ESMTP id S229672AbiKDW3z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Nov 2022 18:29:55 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B88F81274A
+        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 15:29:53 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id l2so6105424pld.13
+        for <kvm@vger.kernel.org>; Fri, 04 Nov 2022 15:29:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5Aq/mVWfLwMWGNt8fSCRAZ8qaQX+Rp9/roFUUSHdFcg=;
+        b=dKOKOca6Gt2YyKKroo64YoypifXCi0Cnu7uvNh/c1CQKTYDigZb1a5Lc6nfrrUEMI/
+         4AE2r5sOnFMf/n4N6rkqJkEinjHy10LPkOYq61AodJoYbUhGCTtIzVhqSoARiYYRtFo/
+         EclovTivzigbK81kGBQRDG0qF26K9JY+bLhX0J0qVedsSALXRnsV1mIYQbLUA7RdI4Bl
+         F8BWIJWldzMyvETppjo+2Y4ZQDwmlrfV9ZT/zySDdpk9yZyTmfAxbwSHbaM4LwBFWmC7
+         KyZY28moUsv5znWRMH9QPRY8B1+WPpJCb1AVkbrC9wmyWUSfTKUMmauuTdOpubCs51OC
+         6Y/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5Aq/mVWfLwMWGNt8fSCRAZ8qaQX+Rp9/roFUUSHdFcg=;
+        b=cK1VK6wo5O3lOD0e2XP/7bGuKAeqMwWKR9OyHNPO4+47ZxUKjZ60C43SBdybiSYiEC
+         gELr0aNBBrUC5L59MCa71OnaCzJcj+aYOskpHABuwIfQBn26HM8nhqBwZ/FNOcX0Uhpf
+         UJ9QNiB8TgEe+TlO/eyPvs95ItETo1JO9QzS0NWzRFhLLMUoR82ko3K+5CKgE5vTOsHj
+         Y2tHJBP0zue4LX9TdJO1nP5eWlJN4mBj2h/vXcrRLyhhIKBvhrWnk1fkovCjv9aLcMfL
+         6sWUswcKUSrF4FxmphqLTVhFBRhJuHP7QiJVHV1p4W6Zya6iFDXG1zt+cEQdH2/fZjiI
+         XXeA==
+X-Gm-Message-State: ACrzQf21HuYjCogI3H8pBfSy9yYWWU7qxmyTNmJkLR02VcC3bBKpQrl3
+        FI1yrTjFxnxkZ8berBwvWZQAmQ==
+X-Google-Smtp-Source: AMsMyM6o08bPyM7u13HIMLyxzK/w69wLSfIdjhMYyTpFlvV74UC9l3d3wEgtuR0o04KYkQ2hwL/GmQ==
+X-Received: by 2002:a17:903:2645:b0:185:480a:85d2 with SMTP id je5-20020a170903264500b00185480a85d2mr37750861plb.144.1667600993126;
+        Fri, 04 Nov 2022 15:29:53 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id s11-20020a170902ea0b00b0018700ba9090sm237049plg.185.2022.11.04.15.29.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Nov 2022 15:29:52 -0700 (PDT)
+Date:   Fri, 4 Nov 2022 22:29:48 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v9 4/8] KVM: Use gfn instead of hva for mmu_notifier_retry
+Message-ID: <Y2WSXLtcJOpWPtuv@google.com>
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <20221025151344.3784230-5-chao.p.peng@linux.intel.com>
+ <CA+EHjTySnJTuLB+XoRya6kS_zw2iMahW9-Ze70oKTf+6k0GrGQ@mail.gmail.com>
+ <20221104022813.GA4129873@chaop.bj.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f2d95d47-6411-8d01-14eb-5e17e1a16dbf@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221104022813.GA4129873@chaop.bj.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 05, 2022 at 05:57:33AM +0800, Gavin Shan wrote:
-> On 11/5/22 4:12 AM, Oliver Upton wrote:
-> > I agree that we should address (1) like this, but in (2) requiring that
-> > no memslots were created before enabling the existing capabilities would
-> > be a change in ABI. If we can get away with that, great, but otherwise
-> > we may need to delete the bitmaps associated with all memslots when the
-> > cap is enabled.
+On Fri, Nov 04, 2022, Chao Peng wrote:
+> On Thu, Oct 27, 2022 at 11:29:14AM +0100, Fuad Tabba wrote:
+> > Hi,
 > > 
-> 
-> I had the assumption QEMU and kvm/selftests are the only consumers to
-> use DIRTY_RING. In this case, requiring that no memslots were created
-> to enable DIRTY_RING won't break userspace.
-> Following your thoughts, the tracked dirty pages in the bitmap also
-> need to be synchronized to the per-vcpu-ring before the bitmap can be
-> destroyed.
-
-Eh, I don't think we'd need to go that far. No matter what, any dirty
-bits that were present in the bitmap could never be read again anyway,
-as we reject KVM_GET_DIRTY_LOG if kvm->dirty_ring_size != 0.
-
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 91cf51a25394..420cc101a16e 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -4588,6 +4588,32 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
-> >   			return -EINVAL;
-> >   		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
-> > +
-> > +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP: {
-> > +		struct kvm_memslots *slots;
-> > +		int r = -EINVAL;
-> > +
-> > +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
-> > +		    !kvm->dirty_ring_size)
-> > +			return r;
-> > +
-> > +		mutex_lock(&kvm->slots_lock);
-> > +
-> > +		slots = kvm_memslots(kvm);
-> > +
-> > +		/*
-> > +		 * Avoid a race between memslot creation and enabling the ring +
-> > +		 * bitmap capability to guarantee that no memslots have been
-> > +		 * created without a bitmap.
-> > +		 */
-> > +		if (kvm_memslots_empty(slots)) {
-> > +			kvm->dirty_ring_with_bitmap = cap->args[0];
-> > +			r = 0;
-> > +		}
-> > +
-> > +		mutex_unlock(&kvm->slots_lock);
-> > +		return r;
-> > +	}
-> >   	default:
-> >   		return kvm_vm_ioctl_enable_cap(kvm, cap);
-> >   	}
+> > On Tue, Oct 25, 2022 at 4:19 PM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> > >
+> > > Currently in mmu_notifier validate path, hva range is recorded and then
+> > > checked against in the mmu_notifier_retry_hva() of the page fault path.
+> > > However, for the to be introduced private memory, a page fault may not
+> > > have a hva associated, checking gfn(gpa) makes more sense.
+> > >
+> > > For existing non private memory case, gfn is expected to continue to
+> > > work. The only downside is when aliasing multiple gfns to a single hva,
+> > > the current algorithm of checking multiple ranges could result in a much
+> > > larger range being rejected. Such aliasing should be uncommon, so the
+> > > impact is expected small.
+> > >
+> > > It also fixes a bug in kvm_zap_gfn_range() which has already been using
 > > 
+> > nit: Now it's kvm_unmap_gfn_range().
 > 
-> The proposed changes look good to me. It will be integrated to PATCH[v8 4/9].
-> By the way, v8 will be posted shortly.
+> Forgot to mention: the bug is still with kvm_zap_gfn_range(). It calls
+> kvm_mmu_invalidate_begin/end with a gfn range but before this series
+> kvm_mmu_invalidate_begin/end actually accept a hva range. Note it's
+> unrelated to whether we use kvm_zap_gfn_range() or kvm_unmap_gfn_range()
+> in the following patch (patch 05).
 
-Excellent, thanks!
+Grr, in the future, if you find an existing bug, please send a patch.  At the
+very least, report the bug.  The APICv case that this was added for could very
+well be broken because of this, and the resulting failures would be an absolute
+nightmare to debug.
+
+Compile tested only...
 
 --
-Best,
-Oliver
+From: Sean Christopherson <seanjc@google.com>
+Date: Fri, 4 Nov 2022 22:20:33 +0000
+Subject: [PATCH] KVM: x86/mmu: Block all page faults during
+ kvm_zap_gfn_range()
+
+When zapping a GFN range, pass 0 => ALL_ONES for the to-be-invalidated
+range to effectively block all page faults while the zap is in-progress.
+The invalidation helpers take a host virtual address, whereas zapping a
+GFN obviously provides a guest physical address and with the wrong unit
+of measurement (frame vs. byte).
+
+Alternatively, KVM could walk all memslots to get the associated HVAs,
+but thanks to SMM, that would require multiple lookups.  And practically
+speaking, kvm_zap_gfn_range() usage is quite rare and not a hot path,
+e.g. MTRR and CR0.CD are almost guaranteed to be done only on vCPU0
+during boot, and APICv inhibits are similarly infrequent operations.
+
+Fixes: edb298c663fc ("KVM: x86/mmu: bump mmu notifier count in kvm_zap_gfn_range")
+Cc: stable@vger.kernel.org
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6f81539061d6..1ccb769f62af 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -6056,7 +6056,7 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+ 
+ 	write_lock(&kvm->mmu_lock);
+ 
+-	kvm_mmu_invalidate_begin(kvm, gfn_start, gfn_end);
++	kvm_mmu_invalidate_begin(kvm, 0, -1ul);
+ 
+ 	flush = kvm_rmap_zap_gfn_range(kvm, gfn_start, gfn_end);
+ 
+@@ -6070,7 +6070,7 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+ 		kvm_flush_remote_tlbs_with_address(kvm, gfn_start,
+ 						   gfn_end - gfn_start);
+ 
+-	kvm_mmu_invalidate_end(kvm, gfn_start, gfn_end);
++	kvm_mmu_invalidate_end(kvm, 0, -1ul);
+ 
+ 	write_unlock(&kvm->mmu_lock);
+ }
+
+base-commit: c12879206e47730ff5ab255bbf625b28ade4028f
+-- 
+
