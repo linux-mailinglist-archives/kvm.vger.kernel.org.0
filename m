@@ -2,118 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED6F261960F
-	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 13:19:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A20A661961C
+	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 13:21:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231789AbiKDMTo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Nov 2022 08:19:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46056 "EHLO
+        id S231872AbiKDMVN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Nov 2022 08:21:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230402AbiKDMTn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Nov 2022 08:19:43 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45613120A0;
-        Fri,  4 Nov 2022 05:19:40 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id q1so4202710pgl.11;
-        Fri, 04 Nov 2022 05:19:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lpOhz7OxgcyX16jnYCGIcgxXstL27/jHBLX3BQlZkeM=;
-        b=cgzEgr24LoI9IjU+XM4EMk8dKD1ZuwOUoG2l29SwIwhDpdCk1rND+HSkQzPaFXXUun
-         5cwqt4utz8zuQy+631yxcp8JeTFWa3eEkR6rLzF+IQQONAm77Re4+TeMpD3W2MH1BG0k
-         xpw4hpqq2JLk9/rFoZ9a9PIltTd+TgIFu3ne1ijW4zZiDKY4Q2Lfnp1QKP/5fTQ/RXCF
-         sGZicS+qqji92R8nClF8Qce3AOCsMhu2lWkuuNsR5EHcX1aF3PHTZeyjQrPGzGFRsP4k
-         RN+MepWdTPb4gy5WMrWU7TZn6sYgVJl/ZAxP+ckrNg/JqvnI2g7HxwDXe6/hlJfR45wa
-         16lQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lpOhz7OxgcyX16jnYCGIcgxXstL27/jHBLX3BQlZkeM=;
-        b=YJgs5Hp3vkNswd+UPF0Q6kBgBL1lvfKiWSPvD0xhud3kAWds9Mv4AXCT0c1fDytjeH
-         N0OAPRelTTA6xXCp+yH1V2oub8X8Msb8EuEBu6zTh3Qd2eUtopmPhlx49ZHIFI0EXdFm
-         CpN/zlKymJh+CW1FPI0oD7I9gtivPLpDcadUz1J0SGVcQPqMG63VRQH3QEZ+HgwtSX/i
-         0iiOa166hQYyATABvcMxoGvPUh+w4sTrb5W4x3kBovDUB3fWJ+Ry8rH0NJMmxYF6ywtq
-         jJA1KMZGXQrWsSadrttmbUK/7FxUCSkE2uHyp9PMgK/Lk3D2Cc2+SEy0Hge7DzYIJErz
-         IplA==
-X-Gm-Message-State: ACrzQf2tsmQ1UvZIv/xJso/hzgJjnuLjKuN+TW3ObSkrzjXiU5REx4ye
-        5ucE/lY3d0ay/vFvOvMeqBmYAhg+ZcL0xQ==
-X-Google-Smtp-Source: AMsMyM7+wkqLB0hFLrfY0ZTPMLFgrcCEO0q4UBENhChoWBosKogPXniCnR6xUQqM7H+JaXD1DhGp0g==
-X-Received: by 2002:a05:6a00:140a:b0:56c:b679:f812 with SMTP id l10-20020a056a00140a00b0056cb679f812mr35864191pfu.46.1667564379656;
-        Fri, 04 Nov 2022 05:19:39 -0700 (PDT)
-Received: from [192.168.43.80] (subs02-180-214-232-17.three.co.id. [180.214.232.17])
-        by smtp.gmail.com with ESMTPSA id b6-20020a170903228600b001782a6fbcacsm2543892plh.101.2022.11.04.05.19.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Nov 2022 05:19:39 -0700 (PDT)
-Message-ID: <995a64b0-a9bb-05ce-85d1-6b5ee25ec0ef@gmail.com>
-Date:   Fri, 4 Nov 2022 19:19:32 +0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH] kvm/arm: Fix pvtime documentation
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Usama Arif <usama.arif@bytedance.com>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
-        yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-        steven.price@arm.com, mark.rutland@arm.com,
-        fam.zheng@bytedance.com, liangma@liangbit.com,
-        punit.agrawal@bytedance.com
-References: <20221103131210.3603385-1-usama.arif@bytedance.com>
- <24d81fe9-7cd1-71eb-8c35-0739f638b3df@gmail.com>
- <86fsf0qc1w.wl-maz@kernel.org>
- <4b2b78c6-9903-1247-9d16-fc6270aa34fc@gmail.com>
- <86cza3q8q5.wl-maz@kernel.org>
-Content-Language: en-US
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <86cza3q8q5.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S231855AbiKDMVH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Nov 2022 08:21:07 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 948AA2D1DC
+        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 05:21:05 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 23A97B82D42
+        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 12:21:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0E7EC433C1;
+        Fri,  4 Nov 2022 12:21:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667564462;
+        bh=13hGB5OrTrlv34yHV4xBUhzbdI6gDem825pl88PDw0A=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=q5YsjFOaszIVpzfcMBQl1F6a3KIbY/HXvm3hUhZTnFjKgigFRUOcHGXDlTrPbvJQz
+         +s7iKUjMXnXbgXBkOgEVTuAXkmYRjYNUfrTy4Vuz1hKvwwUCfYRez0JekQo64TwUXc
+         nZeCNoNFViT5Roid6QitT7DmPGSycHcB9TBK7X/qKtPKGrrGFEPdYJgF1M6fIklogx
+         uCz8taVQ5KVc71ian5FUiPQc6UiAokrn1vMGiDEpXUEjJ9tYwr/wOlbulgG87osXNH
+         nOyOjyo5YgaYGhsUcTudq5JrOUEn3d4RjNPWAP70zsG935YTiLdoWrB3J0vkxRlpi1
+         M3oEC3IFP7+Kw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oqvgy-003l7d-C9;
+        Fri, 04 Nov 2022 12:21:00 +0000
+Date:   Fri, 04 Nov 2022 12:20:59 +0000
+Message-ID: <86bkpmrjv8.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v2 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to be set from userspace
+In-Reply-To: <CAAeT=FwViQRmyJjf3jxcWnLFQAYob8uvvx7QNhWyj6OmaYDKyg@mail.gmail.com>
+References: <20221028105402.2030192-1-maz@kernel.org>
+        <20221028105402.2030192-12-maz@kernel.org>
+        <CAAeT=FyiNeRun7oRL83AUkVabUSb9pxL2SS9yZwi1rjFnbhH6g@mail.gmail.com>
+        <87tu3gfi8u.wl-maz@kernel.org>
+        <CAAeT=FwViQRmyJjf3jxcWnLFQAYob8uvvx7QNhWyj6OmaYDKyg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/4/22 18:06, Marc Zyngier wrote:
-> On Fri, 04 Nov 2022 01:48:21 +0000,
-> Bagas Sanjaya <bagasdotme@gmail.com> wrote:
->>
->> On 11/3/22 22:42, Marc Zyngier wrote:
->>> No, this is the correct course of action. There isn't any point in
->>> having an *unrelated* change in a separate series. This is a
->>> standalone change, posted as a standalone patch.
->>>
->>>> Please reroll your series [2] with suggestion applied.
->>>
->>> Or not.
->>>
->>
->> You mean the series before this patch have already been applied,
->> right?
-> 
-> This change is 100% independent from the series you quoted. Why should
-> there be a dependency between the two?
-> 
-> As for respinning the series at this stage for a documentation
-> formatting issue, this is pretty pointless, and only clutters people's
-> Inbox with redundant versions...
-> 
-> 	M.
-> 
+Hi Reiji,
 
-OK, thanks!
+On Fri, 04 Nov 2022 07:00:22 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
+>
+> On Thu, Nov 3, 2022 at 3:25 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Thu, 03 Nov 2022 05:31:56 +0000,
+> > Reiji Watanabe <reijiw@google.com> wrote:
+> > >
+> > > It appears the patch allows userspace to set IMPDEF even
+> > > when host_pmuver == 0.  Shouldn't it be allowed only when
+> > > host_pmuver == IMPDEF (as before)?
+> > > Probably, it may not cause any real problems though.
+> >
+> > Given that we don't treat the two cases any differently, I thought it
+> > would be reasonable to relax this particular case, and I can't see any
+> > reason why we shouldn't tolerate this sort of migration.
+>
+> That's true. I assume it won't cause any functional issues.
+> 
+> I have another comment related to this.
+> KVM allows userspace to create a guest with a mix of vCPUs with and
+> without PMU.  For such a guest, if the register for the vCPU without
+> PMU is set last, I think the PMUVER value for vCPUs with PMU could
+> become no PMU (0) or IMPDEF (0xf).
+> Also, with the current patch, userspace can set PMUv3 support value
+> (non-zero or non-IMPDEF) for vCPUs without the PMU.
+> IMHO, KVM shouldn't allow userspace to set PMUVER to the value that
+> is inconsistent with PMU configuration for the vCPU.
+> What do you think ?
+
+Yes, this seems sensible, and we only do it one way at the moment.
+
+> I'm thinking of the following code (not tested).
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 4fa14b4ae2a6..ddd849027cc3 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1265,10 +1265,17 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>         if (pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver)
+>                 return -EINVAL;
+> 
+> -       /* We already have a PMU, don't try to disable it... */
+> -       if (kvm_vcpu_has_pmu(vcpu) &&
+> -           (pmuver == 0 || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF))
+> -               return -EINVAL;
+> +       if (kvm_vcpu_has_pmu(vcpu)) {
+> +               /* We already have a PMU, don't try to disable it... */
+> +               if (pmuver == 0 || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF) {
+> +                       return -EINVAL;
+> +               }
+> +       } else {
+> +               /* We don't have a PMU, don't try to enable it... */
+> +               if (pmuver > 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF) {
+> +                       return -EINVAL;
+> +               }
+> +       }
+
+This is a bit ugly. I came up with this instead:
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 3b28ef48a525..e104fde1a0ee 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1273,6 +1273,7 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 			       u64 val)
+ {
+ 	u8 pmuver, host_pmuver;
++	bool valid_pmu;
+ 
+ 	host_pmuver = kvm_arm_pmu_get_pmuver_limit();
+ 
+@@ -1286,9 +1287,10 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 	if (pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver)
+ 		return -EINVAL;
+ 
+-	/* We already have a PMU, don't try to disable it... */
+-	if (kvm_vcpu_has_pmu(vcpu) &&
+-	    (pmuver == 0 || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF))
++	valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
++
++	/* Make sure view register and PMU support do match */
++	if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+ 		return -EINVAL;
+ 
+ 	/* We can only differ with PMUver, and anything else is an error */
+
+and the similar check for the 32bit counterpart.
+
+> 
+>         /* We can only differ with PMUver, and anything else is an error */
+>         val ^= read_id_reg(vcpu, rd);
+> @@ -1276,7 +1283,8 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>         if (val)
+>                 return -EINVAL;
+> 
+> -       vcpu->kvm->arch.dfr0_pmuver = pmuver;
+> +       if (kvm_vcpu_has_pmu(vcpu))
+> +               vcpu->kvm->arch.dfr0_pmuver = pmuver;
+
+We need to update this unconditionally if we want to be able to
+restore an IMPDEF PMU view to the guest.
+
+Thanks,
+
+	M.
 
 -- 
-An old man doll... just what I always wanted! - Clara
-
+Without deviation from the norm, progress is not possible.
