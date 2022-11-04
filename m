@@ -2,164 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7960619005
-	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 06:37:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98AEA61901B
+	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 06:43:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230526AbiKDFh6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Nov 2022 01:37:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48972 "EHLO
+        id S229812AbiKDFnf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Nov 2022 01:43:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230003AbiKDFh4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Nov 2022 01:37:56 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C5827FD5;
-        Thu,  3 Nov 2022 22:37:54 -0700 (PDT)
+        with ESMTP id S229646AbiKDFne (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Nov 2022 01:43:34 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55054DF97;
+        Thu,  3 Nov 2022 22:43:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667540274; x=1699076274;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=EgmtsBqJVK3JbLONjG56zRgFCzcOwywt2/xTnCkOP1Y=;
-  b=RRsqVmeFV1jdWym2d/I+Kc9LjXpsQQlKhLAOZVCDQxfjGNhGTwTvv5Dq
-   oENIPmIdC9RWNBMANhk8/4BkB7cx/usEvNcjvXEHJiN49nMgBKdvTnq/M
-   8x1ht8HlyB+DYQ0xJg36bhoKX8fkXHvlmPpt7zqpYJw/InLqK+3BffjM/
-   vlV1bvNUgnH5n6eE2Z2byVu7fWSmbq2hw776McV4ezWkYYr3v3jrYqsL8
-   qSsUTpFiD0KpRUGMHF4By711gZcuO/mS+XYbduSeo43EtIsuNSER2sxiW
-   Dt9aEsSQ4YhqwToPklubLr8rGdZacR3iz38o+yHQJMjAmSmwg1fU8MloG
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10520"; a="336584917"
+  t=1667540613; x=1699076613;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=trqSu4uttDtLId6wzhhHnXrPyjPOvJ92u2kouTvFFsc=;
+  b=jjBKBIfg57wr7ATgsrtgUhjQFP2WNnLbYrB79cVQbipXvgA313crgfJi
+   9TBNrb/mNast9AjuRGC8PcXolZN4lxwBxnpFC/ko6hOuCV+87dAcvq0Dj
+   RXGaDyih/cN73veQzGOrqN4ahUuCu/MLib+fGaUJXhyK34BzJSl+D7qhV
+   tZyLanchvTVC9OpPJoFkmedszYsZOKdfk1IsYEO+hEZ1E6oLu+J5AJpaz
+   afja/wI7fLJ4Qj7CkpxmRV0sJP9q70Iot3h/gwbHNaJG2k5QcAnUomqz5
+   KhJAzkMlG/EnuqiBfS9Cv74+jnTykTyxZCocTzd0gP8u861zPYD0Blagt
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10520"; a="293212370"
 X-IronPort-AV: E=Sophos;i="5.96,136,1665471600"; 
-   d="scan'208";a="336584917"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2022 22:37:54 -0700
+   d="scan'208";a="293212370"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2022 22:43:32 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10520"; a="666249074"
+X-IronPort-AV: E=McAfee;i="6500,9779,10520"; a="880175886"
 X-IronPort-AV: E=Sophos;i="5.96,136,1665471600"; 
-   d="scan'208";a="666249074"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orsmga008.jf.intel.com with ESMTP; 03 Nov 2022 22:37:46 -0700
-Date:   Fri, 4 Nov 2022 13:37:45 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
+   d="scan'208";a="880175886"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga006.fm.intel.com with ESMTP; 03 Nov 2022 22:43:32 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 3 Nov 2022 22:43:31 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Thu, 3 Nov 2022 22:43:31 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.40) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Thu, 3 Nov 2022 22:43:31 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JWpdZKhR26ZTUt2g3B5yc+WvztZRrGaTMm7wxTh5v9A2xcRtsJ/skyS/m/aFg0oTfBPZwjfys4TN9dmwwcTP3kAQQqR/FoKKTGl+aKa1im6lYyRWnusUhSOpVd+DUAJf+uFx/Htc00AIL0hsgv/yh0xrcmaP7qpS6ARthbSc2dwCeEf1E+aZJpFmB0WmKl71sRFC0fnqLw0vH7mOGPziSc1TtzC/WJoQ1oCRUsOt46ZoDD40uGIGg6wDQhV7oxfSGs85+m/QOZLbTVRut+yUjLVGk6kj+ZK0ltq9SHEChTx4a3svhs63L8y5P3cyZfwH+F/yHU8X6htCyaRdhRdarg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=trqSu4uttDtLId6wzhhHnXrPyjPOvJ92u2kouTvFFsc=;
+ b=LvZO1AoGjgCgKH7RQEhOQflt5J99yPC6fR71Lyx5y39+Ogyj+uZZy5iW75yexzqj8fcAFq4QzbPncMaFmeigYQQA6gv+EqHP/jxnkZ+X6/v8ZmcIW+WetvPDDRIERR67vkrfRGIuCe71aO6bZCmibtrkXbpbP+jhcLsp4zCA9vLDgMY3Fxck13VN6IAN1MfeGj+/lBLpvamgc3WGYsAvDajB+Zjcurw3siUAifAnT5zN1EZ91KJ8k1arNaKMUhSBGcgDVX4GX47yg06/9jkJzAYXBqsBcbM5Txrz5pEM46JwMpUH3axG7FPh7dzAsXSbw4M4q5QfaZFLu7MQRKd1eA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by IA0PR11MB7283.namprd11.prod.outlook.com (2603:10b6:208:439::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.20; Fri, 4 Nov
+ 2022 05:43:30 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::737e:211a:bb53:4cd7]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::737e:211a:bb53:4cd7%5]) with mapi id 15.20.5791.022; Fri, 4 Nov 2022
+ 05:43:30 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Joerg Roedel <joro@8bytes.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
         Eric Farman <farman@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Chao Gao <chao.gao@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 03/44] KVM: Allocate cpus_hardware_enabled after arch
- hardware setup
-Message-ID: <20221104053745.qvi35kflf2i2ifgs@yy-desk-7060>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-4-seanjc@google.com>
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        "Shameerali Kolothum Thodi" <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+Subject: RE: [PATCH v3 15/15] iommufd: Add a selftest
+Thread-Topic: [PATCH v3 15/15] iommufd: Add a selftest
+Thread-Index: AQHY6J1pXc4epOTBu0+Bzhxi63Udt64uAKiAgABLnFA=
+Date:   Fri, 4 Nov 2022 05:43:29 +0000
+Message-ID: <BN9PR11MB52769FA78CA8B7FD3DB7595E8C3B9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <15-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com> <Y2RkXV+q0Q6bdTde@nvidia.com>
+In-Reply-To: <Y2RkXV+q0Q6bdTde@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|IA0PR11MB7283:EE_
+x-ms-office365-filtering-correlation-id: f515e5a7-099c-435e-b3de-08dabe2780b9
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: c0xilIuTZ/p5bHNvK89Hx5D0lSX4l0jmD7C5J+me8itrX/V5UnFYhxFR2TtlyJb6kTNVhOI1r1tspo4/1LppwV/Btw+Maxr4CaXbolV2xkiUJfqIFabi6Q34OxWEZU4w+xeW2Yy490NkNGwdj2JxELEiabH8zjscnhjvfSbuUum3aidAAV9rloxvkQ2rrLWi4Fdgq6AJATH5QxqeUCVr6ICGBv01qiyXAPy7uMow0FQnr0beYbUMbZbuvnY226JHv5bzor6PgBhmKlQHqt34xUVwIjJGFtzM1UbzrQRuOhrox0gEih/2Q3zh/n1sPqRqm0aD/FnMd6HCGem22x+LFqhDY97VCkTwGGX9c9wQcFDpOz3CPpsxi3n360vCR0Y4Mmt9mENm2aPRZV0iyTJZ9USRB6UzDWfAUgj7CL+f2+2LgjX22zLbEwyj2kURyQ9vIxjC/d1i6nM341sACzp5mwtaICtUC1qniedxUv+lgMioKUgnQGSxZLOSKEL20RqBvjQq8Zo85xjHj6atQ2nPGAEqPwr6wSvi1Qg/z4aKTTsDnagGtJ+R3KIqDOvRuBv5xb3CnWbkIwbxgC3/4SDP/k3wo7MGjorN32y5Q6D14kywjHLPhCA+I2j058n6cXt6268pAdRz+XATYNs8bLrZp/RI2Xu5jxvo3ptnCEw0Jj3EtHkWF3ESI6YS5sn5Wb61dKgvbQx8OU2ThF2kyyjhphr7QdlCEqjL9xemB7WgEvNGK0GuI9rKbfczht6XieAbJmLaMMPa0nK0EcJiALjvqaiMK7l0nVhWxS/ZoZG/MyE=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(39860400002)(396003)(346002)(366004)(376002)(451199015)(921005)(66556008)(66446008)(71200400001)(55016003)(64756008)(66946007)(6506007)(7416002)(66476007)(38070700005)(8936002)(5660300002)(52536014)(2906002)(41300700001)(110136005)(4744005)(54906003)(316002)(4326008)(76116006)(7406005)(8676002)(26005)(186003)(9686003)(83380400001)(38100700002)(33656002)(82960400001)(478600001)(7696005)(122000001)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?LHZZcyupQoW+WnhOROgBP9dSECgZHutrR+Pg/wTjaTjsdf1DsC2ASm+WyEqR?=
+ =?us-ascii?Q?qHAzA+iNEk1b1SEerE7MENUsRoIzAQJrcTfatMa5H/WI9X34LIdVw31eX3hr?=
+ =?us-ascii?Q?f/RWThtnLSbdzMth9TRNI+yvPpSCgv3sIpdm6dVLRb/DhI8F6384ZJVmFIGI?=
+ =?us-ascii?Q?wq+nhD6sVv40UqN1dupgpvKFw4Iwtid8lus2eXZUSPjEacxdRaDxyQonRJek?=
+ =?us-ascii?Q?plLkMUaM/i9UZOeGzSEid0RLsdLzIoAxe1tVz2EsL9D0s4iw1sRm3MtW+faF?=
+ =?us-ascii?Q?50ENWP6KgMhQacYEppNthUo38WlHViXSRXSxkR949sfQUMbqFUAVUdeogly+?=
+ =?us-ascii?Q?H24bAMbPq85MItgmyfMQ83VSSWo+tJLF98e/Knv3Hh/M9JzA7lczi7V/JSJh?=
+ =?us-ascii?Q?ClVhCZEr6LygiGPTYfPZYXDxwKRezpdHIzajZYgD8L0aPupNexOjV+dho2Kh?=
+ =?us-ascii?Q?rzVj9cne41aAJ4w6xLsN4x9L4oBjt+4Tlyl6SEY0LM1fBN0AV6YIqqXZ/M+T?=
+ =?us-ascii?Q?CT9XOLaR9rKcyyx4rYap/ONBsLxlmM0xw4M+U25cor61f6dZENP3T5UaJbdv?=
+ =?us-ascii?Q?iZOfGiq901ItYvBos9I5RiUbiXm2JFJXj3I5j37lJZJzChse6XSNMjZOV7O0?=
+ =?us-ascii?Q?hE7YDm7zBl7DaPRF5sLnqLkgpaS6DYpbbjkBRrMYC+BEf/fqKRxeuJN6iNRH?=
+ =?us-ascii?Q?3CsDi1DpsxXbLA85YGcYBX3uipsMf66mqH2KxOGNPJ6Ho77wKKV7TM06UnOO?=
+ =?us-ascii?Q?4dRW3dJOYt6NrX/scrukze7iPRA98LfMqxeD0k+OqHPmmXp2r7Z53/+6pMAA?=
+ =?us-ascii?Q?XE1d3L2IMWoX4Ma1THKuIVng0fSzDO27mEv93CGuffJilKi33tokoYEMjR3P?=
+ =?us-ascii?Q?F3dn4CKLrHHNtYkqbG0zYDSCJPbA8ZBz09MatWcDQ+82Tz+iCnFDrdJsP50S?=
+ =?us-ascii?Q?SETrCSrrJFEQ65HC1Cj3b3LSOuyQnm3U2G2CyKbsIQ83yJqdqdQvPvSvERaK?=
+ =?us-ascii?Q?8j9264gJM7Q8wnYEiONDLdUpBiB1HIFYvlWO+weQtqh1gq17ajaY2D5refVX?=
+ =?us-ascii?Q?8ldEW7Ud7Du9I2XX8dsPLv9MQG9q+/1PRMBMKQQt1Ee3kMcGo/Tu6w0ZZdwB?=
+ =?us-ascii?Q?qMx9V2QltCzaZii/Qk8JMVgPhYJza0Zkip8hDvUqiYkc4MrW+kV0wXFd0gtC?=
+ =?us-ascii?Q?f0k7PfrVt8r55V0KZ6wrp7oEONiyJhCfRfuEAeYxWGX+BezXYVJcXlh7tryu?=
+ =?us-ascii?Q?1V4liicT7cczChBJ0B1ZmVHmKOqVCj9kzjlvS8HzpK9DzSvET8YZXVk0yLGf?=
+ =?us-ascii?Q?/RB+CaR+FwsoX0W6e3cD06vnN/ux2T7ytTwOREAtpHXUsoiR/TnnK7/kWDkE?=
+ =?us-ascii?Q?3olMw7gOi5PdtII3rip4a5h5YS1V3kIYW7YDa7IhyAdzSap9qjccbMBKbn7L?=
+ =?us-ascii?Q?H8ydu4Wyl+LcIUun0oTZVJSAlAGWpOkHGmqbHTdVY6pf68m/5OwHDa5sptdw?=
+ =?us-ascii?Q?cZ8+ntvTPClxaNMXi73yhV0KV40JS17RltLoUus1yqBHgiYKB6uh1HTiNi7v?=
+ =?us-ascii?Q?ydKvNjBbINzKRfBgpGHDUVb/iAyuhtgf6QypiWq8?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221102231911.3107438-4-seanjc@google.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-8.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f515e5a7-099c-435e-b3de-08dabe2780b9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Nov 2022 05:43:29.8533
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 4pLgnATjJF9MN2ZJYeOEL7BE8YdyE/cXTlGU6AgKYJEn7MLPf/EZuFw2YeYXKZGrryislrKm7vfijbOMYYo/6A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7283
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 02, 2022 at 11:18:30PM +0000, Sean Christopherson wrote:
-> Allocate cpus_hardware_enabled after arch hardware setup so that arch
-> "init" and "hardware setup" are called back-to-back and thus can be
-> combined in a future patch.  cpus_hardware_enabled is never used before
-> kvm_create_vm(), i.e. doesn't have a dependency with hardware setup and
-> only needs to be allocated before /dev/kvm is exposed to userspace.
->
-> Free the object before the arch hooks are invoked to maintain symmetry,
-> and so that arch code can move away from the hooks without having to
-> worry about ordering changes.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  virt/kvm/kvm_main.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index e0424af52acc..8b7534cc953b 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -5843,15 +5843,15 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
->  	if (r)
->  		return r;
->
-> +	r = kvm_arch_hardware_setup(opaque);
-> +	if (r < 0)
-> +		goto err_hw_setup;
-> +
->  	if (!zalloc_cpumask_var(&cpus_hardware_enabled, GFP_KERNEL)) {
->  		r = -ENOMEM;
->  		goto err_hw_enabled;
->  	}
->
-> -	r = kvm_arch_hardware_setup(opaque);
-> -	if (r < 0)
-> -		goto out_free_1;
-> -
->  	c.ret = &r;
->  	c.opaque = opaque;
->  	for_each_online_cpu(cpu) {
-> @@ -5937,10 +5937,10 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
->  	unregister_reboot_notifier(&kvm_reboot_notifier);
->  	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
->  out_free_2:
-> -	kvm_arch_hardware_unsetup();
-> -out_free_1:
->  	free_cpumask_var(cpus_hardware_enabled);
->  err_hw_enabled:
-> +	kvm_arch_hardware_unsetup();
-> +err_hw_setup:
->  	kvm_arch_exit();
->  	return r;
->  }
-> @@ -5967,9 +5967,9 @@ void kvm_exit(void)
->  	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
->  	on_each_cpu(hardware_disable_nolock, NULL, 1);
->  	kvm_irqfd_exit();
-> +	free_cpumask_var(cpus_hardware_enabled);
->  	kvm_arch_hardware_unsetup();
->  	kvm_arch_exit();
-> -	free_cpumask_var(cpus_hardware_enabled);
->  	kvm_vfio_ops_exit();
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Friday, November 4, 2022 9:01 AM
+>=20
+> The only way I can see to solve this is to hold a serializing lock
+> across iommufd_access_pin_pages() so that neither
+> iommufd_test_access_unmap() can progress until both the pin is
+> completed and the record of the pin is stored.
 
-Looks good to me.
+same as gvt does which maintains an internal mapping cache and
+conducts pin/unmap with cache update under the mutex protection.
 
-Reviewed-by: Yuan Yao <yuan.yao@intel.com>
+>=20
+> Fortunately in the iommufd design we can hold a lock like this across
+> these calls, and in the op callback, without deadlocking. I can't
+> recall if vfio can do the same, I suspect not since I had in my mind I
+> needed to avoid that kind of locking for deadlock reasons..
 
->  }
->  EXPORT_SYMBOL_GPL(kvm_exit);
-> --
-> 2.38.1.431.g37b22c650d-goog
->
+I think so. iiuc vfio relies on driver to ensure serialization in this scen=
+ario.
