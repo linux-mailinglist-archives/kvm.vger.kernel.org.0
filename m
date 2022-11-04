@@ -2,136 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62087618DDB
-	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 03:02:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82C0B618DE0
+	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 03:05:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230291AbiKDCCI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Nov 2022 22:02:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47598 "EHLO
+        id S230261AbiKDCFs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Nov 2022 22:05:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbiKDCCG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Nov 2022 22:02:06 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF29F14D37;
-        Thu,  3 Nov 2022 19:02:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667527325; x=1699063325;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=PbDcGd2txZZjxfqbiNRIeanByco2lscQZW9KH00uNFo=;
-  b=jSs6cPavenLFemU1mIScN/aVfzriqn6NY3fBy3A6DMsK4EhLwj1QHlqz
-   +CpYmAAPRdTNlmoyCzy5k8W8ELbihrwJLlfhAiHiWcqVImwL1d1QWWyoN
-   LnmmKJqERlfkctWgSBTpq/e0URHO2VWWlrBmjopF7iTiqB9KWyln1M88R
-   4tLR5bhct642LzETdJo4u4kaADvBoX6lTUOOBC573+XCAbeMuMGfYuObF
-   Nyla1FO0Vh5ZpvmDF8oFK0nuVAqWSrZfWf1CmA8RgzRMZZDzrT0marYnG
-   SHNSv2yQLo2/4QVVEDQmjl57AnMkTfdA5zd1Mf38+PmK4lCsQNB8whn2S
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10520"; a="293178852"
-X-IronPort-AV: E=Sophos;i="5.96,135,1665471600"; 
-   d="scan'208";a="293178852"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2022 19:02:04 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10520"; a="698466214"
-X-IronPort-AV: E=Sophos;i="5.96,135,1665471600"; 
-   d="scan'208";a="698466214"
-Received: from jiaxiche-mobl.ccr.corp.intel.com (HELO [10.238.2.23]) ([10.238.2.23])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2022 19:01:57 -0700
-Message-ID: <9197a0a4-4c15-1e6e-a44b-a8036c2104c4@linux.intel.com>
-Date:   Fri, 4 Nov 2022 10:01:55 +0800
+        with ESMTP id S229496AbiKDCFr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Nov 2022 22:05:47 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63B921E700
+        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 19:05:46 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id h14so3315790pjv.4
+        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 19:05:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VFUujnDa9hgM2VoxjeJ+chMz7zCherdpYz2zmraA5Kc=;
+        b=OnQm2h3p9mixU2SQ5uaKg4GFFrx1jIknBKTscFV+IaDS0Q7k9ivjP1jktAtGDiunt/
+         V7BMHJsOjYp5nAlmTmzdc40kZ7E8rIvgaZk9enT2uwTx5CdYM7YMbAA9wJ4KNwuJe0zC
+         KTaIYjyN2ec4BfvrZmdehAv2hzDeekM28+eyGF/TSduGnjiyOBrzaYyguCdyf7au3l/U
+         KuVZ4ZyYS32tZA96O5jwLJ/RPLGscVMi1eAhGUXhcZdXMG2UF5w2NZ8GV3kQWgUsiT6o
+         EHAKRbwesbwsgGlOXgs6a+uJwGJwEgwzbmZln+cKcMETcTlQlASBEmSstvSAzqAwlddL
+         qwFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VFUujnDa9hgM2VoxjeJ+chMz7zCherdpYz2zmraA5Kc=;
+        b=G6YkmWZ6yGilxTEMihIISDjC0N21EBlNXlfBtP+scy3x1hjRdqV//kS2JJNkYAkkfl
+         jdo4D4LjAflqLCgumCIiF+N2sRnCUhNzIzJvBLJ06ZRU5iwRosqCLLlnjp/aXDkc6i7Z
+         CsBc61dJxv8KPdbWFo/5NHpP98LbKOV8/v6OsgY7x2zpTFqjmyy/hX4kojCLUpBkJKsO
+         ZBHdgySeu2j2ookZg1c1b5HGacRMWZniURX7CQ2ZR7XjWwtgkL2OOE5/zEDJzuHiC5rf
+         0R2LjIHS/wD5nVwJQGsZdS2Rq6ok0uGxHwkMlCBjrou8R7CjYaRiCpNyE1OXq558Jm9D
+         h+Jw==
+X-Gm-Message-State: ACrzQf1U8GHCydbB2Nisu96yfkfIZaqtbsvG6A1xe4S1Sl/W+cX20A0v
+        0PKRMLDcjchWFaAUykiKTJ6y2w==
+X-Google-Smtp-Source: AMsMyM4VFIUXp8AYn9jwQvjWGhVJWVRu4bKaUuSrhs9SKVgvvcs3QBB/XL7oIBCvzjYXmnoxfKm+rg==
+X-Received: by 2002:a17:90b:1c82:b0:1ee:eb41:b141 with SMTP id oo2-20020a17090b1c8200b001eeeb41b141mr35262118pjb.143.1667527545809;
+        Thu, 03 Nov 2022 19:05:45 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id m6-20020a1709026bc600b0018853dd8832sm1381654plt.4.2022.11.03.19.05.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Nov 2022 19:05:45 -0700 (PDT)
+Date:   Fri, 4 Nov 2022 02:05:41 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com,
+        kvm@vger.kernel.org
+Subject: Re: [RFC 1/1] KVM: selftests: rseq_test: use vdso_getcpu() instead
+ of syscall()
+Message-ID: <Y2RzdQVvZnS7wcMr@google.com>
+References: <20221102020128.3030511-1-robert.hu@linux.intel.com>
+ <20221102020128.3030511-2-robert.hu@linux.intel.com>
+ <Y2MPe3qhgQG0euE0@google.com>
+ <b7ae920f-dae0-b3f3-aba3-944cb73c19c2@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH v2 1/8] x86: KVM: Move existing x86 CPUID leaf
- [CPUID_7_1_EAX] to kvm-only leaf
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, ndesaulniers@google.com,
-        alexandre.belloni@bootlin.com, peterz@infradead.org,
-        jpoimboe@kernel.org, chang.seok.bae@intel.com,
-        pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
-        jmattson@google.com, sandipan.das@amd.com, tony.luck@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
-        keescook@chromium.org, nathan@kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20221103025030.78371-1-jiaxi.chen@linux.intel.com>
- <20221103025030.78371-2-jiaxi.chen@linux.intel.com>
- <Y2N/peaVRIjTMyrw@zn.tnic>
-From:   Jiaxi Chen <jiaxi.chen@linux.intel.com>
-In-Reply-To: <Y2N/peaVRIjTMyrw@zn.tnic>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b7ae920f-dae0-b3f3-aba3-944cb73c19c2@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Nov 03, 2022, Gavin Shan wrote:
+> On 11/3/22 8:46 AM, Sean Christopherson wrote:
+> > On Wed, Nov 02, 2022, Robert Hoo wrote:
+> > > @@ -253,7 +269,7 @@ int main(int argc, char *argv[])
+> > >   			 * across the seq_cnt reads.
+> > >   			 */
+> > >   			smp_rmb();
+> > > -			sys_getcpu(&cpu);
+> > > +			vdso_getcpu(&cpu, NULL, NULL);
+> > >   			rseq_cpu = rseq_current_cpu_raw();
+> > >   			smp_rmb();
+> > >   		} while (snapshot != atomic_read(&seq_cnt));
+> > 
+> > Something seems off here.  Half of the iterations in the migration thread have a
+> > delay of 5+us, which should be more than enough time to complete a few getcpu()
+> > syscalls to stabilize the CPU.
+> > 
+> > Has anyone tried to figure out why the vCPU thread is apparently running slow?
+> > E.g. is KVM_RUN itself taking a long time, is the task not getting scheduled in,
+> > etc...  I can see how using vDSO would make the vCPU more efficient, but I'm
+> > curious as to why that's a problem in the first place.
+> > 
+> > Anyways, assuming there's no underlying problem that can be solved, the easier
+> > solution is to just bump the delay in the migration thread.  As per its gigantic
+> > comment, the original bug reproduced with up to 500us delays, so bumping the min
+> > delay to e.g. 5us is acceptable.  If that doesn't guarantee the vCPU meets its
+> > quota, then something else is definitely going on.
+> > 
+> 
+> I doubt if it's still caused by busy system as mentioned previously [1]. At least,
+> I failed to reproduce the issue on my ARM64 system until some workloads are enforced
+> to hog CPUs.
 
+Yeah, I suspect something else as well.  My best guest at this point is mitigations,
+I'll test that tomorrow to see if it makes any difference.
 
-On 11/3/2022 4:45 PM, Borislav Petkov wrote:
-> On Thu, Nov 03, 2022 at 10:50:23AM +0800, Jiaxi Chen wrote:
->> diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
->> index 1a85e1fb0922..fbb4e7bd2288 100644
->> --- a/arch/x86/include/asm/cpufeature.h
->> +++ b/arch/x86/include/asm/cpufeature.h
->> @@ -24,7 +24,7 @@ enum cpuid_leafs
->>  	CPUID_7_0_EBX,
->>  	CPUID_D_1_EAX,
->>  	CPUID_LNX_4,
->> -	CPUID_7_1_EAX,
->> +	CPUID_DUMMY,
->>  	CPUID_8000_0008_EBX,
->>  	CPUID_6_EAX,
->>  	CPUID_8000_000A_EDX,
-> 
-> No, do this (diff ontop):
-> 
-> diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
-> index fbb4e7bd2288..b2905ddd7ab4 100644
-> --- a/arch/x86/include/asm/cpufeature.h
-> +++ b/arch/x86/include/asm/cpufeature.h
-> @@ -24,7 +24,7 @@ enum cpuid_leafs
->  	CPUID_7_0_EBX,
->  	CPUID_D_1_EAX,
->  	CPUID_LNX_4,
-> -	CPUID_DUMMY,
-> +	CPUID_LNX_5,
->  	CPUID_8000_0008_EBX,
->  	CPUID_6_EAX,
->  	CPUID_8000_000A_EDX,
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 91acf8b8e493..5c9023438e57 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -306,6 +306,8 @@
->  #define X86_FEATURE_RSB_VMEXIT_LITE	(11*32+17) /* "" Fill RSB on VM exit when EIBRS is enabled */
->  #define X86_FEATURE_CALL_DEPTH		(11*32+18) /* "" Call depth tracking for RSB stuffing */
->  
-> +/* Linux-defined mapping, word 12 */
-> +
->  /* AMD-defined CPU features, CPUID level 0x80000008 (EBX), word 13 */
->  #define X86_FEATURE_CLZERO		(13*32+ 0) /* CLZERO instruction */
->  #define X86_FEATURE_IRPERF		(13*32+ 1) /* Instructions Retired Count */
-> 
-> ---
-> 
-> I'm pretty sure we'll need new bits soon so let's reuse that one for
-> Linux-defined flags.
-> 
-> Then you can drop patch 2.
-> 
+> Looking at the implementation syscall(NR_getcpu), it's simply to copy
+> the per-cpu data from kernel to userspace. So I don't see it should consume lots
+> of time. As system call is handled by interrupt/exception, the time consumed by
+> the interrupt/exception handler should be architecture dependent. Besides, the time
+> needed by ioctl(KVM_RUN) also differs on architectures.
 
-Hi Boris,
+Yes, but Robert is seeing problems on x86-64 that I have been unable to reproduce,
+i.e. this isn't an architectural difference problem.
 
-Yes, that's reasonable. I understand the goodnees of putting CPUID_LNX_5
-here is to avoid changing the array length [NCAPINTS] and other parts twice.
-But before new bits come, word 12 is empty in this gap. Is that ok?
+> [1] https://lore.kernel.org/kvm/d8290cbe-5d87-137a-0633-0ff5c69d57b0@redhat.com/
+> 
+> I think Sean's suggestion to bump the delay to 5us would be the quick fix if it helps.
+> However, more time will be needed to complete the test. Sean, do you mind to reduce
+> NR_TASK_MIGRATIONS from 100000 to 20000 either?
 
--- 
-Regards,
-Jiaxi
+I don't think the number of migrations needs to be cut by 5x, the +5us bump only
+changes the average from ~5us (to ~7.5us).
+
+But before we start mucking with the delay, I want to at least understand _why_
+a lower bound of 1us is insufficient.
