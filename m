@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 530C7619B35
-	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 16:16:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E955619B34
+	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 16:16:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232450AbiKDPQL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Nov 2022 11:16:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57602 "EHLO
+        id S232467AbiKDPQI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Nov 2022 11:16:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232470AbiKDPQD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Nov 2022 11:16:03 -0400
+        with ESMTP id S232465AbiKDPP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Nov 2022 11:15:56 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 486F438B0
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 999BA5582
         for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 08:15:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1667574900;
@@ -20,22 +20,22 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tE42PNnFF/m0fEHtmSiadsyNXCXcPI2ur/gt+05bV+k=;
-        b=dkf7btOF8dsGwpO5VRRBPeLQynq/DXHlr4WDeNQhkjLmyB+Jq1VZTg7IC/toIeSuZyukoK
-        Hio88/LuCasVKufLSJ6mrfGgP1Hu22zpNuFc4XSL08O1O2VzeZFs+VOOMJUOhvaBDtG1jX
-        25/EN+ifUMU2vpx9Jk3NTRHn2rVqVyE=
+        bh=nMGhB+cIUztS62Zo93dN1SSLUlu0sn9Iy9UJXvUpLpc=;
+        b=GesGpj2zUMszvu4tnIaCmIoCeJuu7NRGDUfRT5tfHZFchsRjnZL26osWv5Br6iO5tfKvrB
+        z3YAObvFoq6F7u8USBlHucD52iHAZJ9sVaMzZsLRXhJ99LfnaHBzk/Ae3Tg9DaeBrHKGTO
+        za+mty/zTaDhyLVOvpaj1T/tcuOmBco=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-596-bP32ffFeP-WFP6Kkw4XF0g-1; Fri, 04 Nov 2022 11:14:57 -0400
-X-MC-Unique: bP32ffFeP-WFP6Kkw4XF0g-1
+ us-mta-158-swPDqkY4O0me1kburFFHTw-1; Fri, 04 Nov 2022 11:14:57 -0400
+X-MC-Unique: swPDqkY4O0me1kburFFHTw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DDC132999B25;
-        Fri,  4 Nov 2022 15:14:56 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 362202999B2C;
+        Fri,  4 Nov 2022 15:14:57 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6ABD2C2C8D9;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E7A92C2C8C5;
         Fri,  4 Nov 2022 15:14:56 +0000 (UTC)
 From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
 To:     qemu-devel@nongnu.org
@@ -44,11 +44,11 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
         Yanan Wang <wangyanan55@huawei.com>, kvm@vger.kernel.org,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: [RFC PATCH 2/3] KVM: keep track of running vcpu ioctls
-Date:   Fri,  4 Nov 2022 11:14:53 -0400
-Message-Id: <20221104151454.136551-3-eesposit@redhat.com>
+        David Hildenbrand <david@redhat.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Subject: [RFC PATCH 3/3]  kvm: Atomic memslot updates
+Date:   Fri,  4 Nov 2022 11:14:54 -0400
+Message-Id: <20221104151454.136551-4-eesposit@redhat.com>
 In-Reply-To: <20221104151454.136551-1-eesposit@redhat.com>
 References: <20221104151454.136551-1-eesposit@redhat.com>
 MIME-Version: 1.0
@@ -64,87 +64,300 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Just as in kvm-all.c, introduce per-vcpu QemuLockCnt to keep
-track when vcpus are executing an ioctl.
-Keep a per-vcpu lock to minimize cache line bouncing.
-The kvm listener will then use the lock to prevent new ioctls
-from running when modifying memslots.
+From: David Hildenbrand <david@redhat.com>
+
+If we update an existing memslot (e.g., resize, split), we temporarily
+remove the memslot to re-add it immediately afterwards. These updates
+are not atomic, especially not for KVM VCPU threads, such that we can
+get spurious faults.
+
+Let's inhibit most KVM ioctls while performing relevant updates, such
+that we can perform the update just as if it would happen atomically
+without additional kernel support.
+
+We capture the add/del changes and apply them in the notifier commit
+stage instead. There, we can check for overlaps and perform the ioctl
+inhibiting only if really required (-> overlap).
+
+To keep things simple we don't perform additional checks that wouldn't
+actually result in an overlap -- such as !RAM memory regions in some
+cases (see kvm_set_phys_mem()).
+
+To minimize cache-line bouncing, use a separate indicator
+(in_ioctl_lock) per CPU.  Also, make sure to hold the kvm_slots_lock
+while performing both actions (removing+re-adding).
+
+We have to wait until all IOCTLs were exited and block new ones from
+getting executed. Kick all CPUs, so they will exit the KVM_RUN ioctl.
+
+This approach cannot result in a deadlock as long as the inhibitor does
+not hold any locks that might hinder an IOCTL from getting finished and
+exited - something fairly unusual. The inhibitor will always hold the BQL.
+
+AFAIKs, one possible candidate would be userfaultfd. If a page cannot be
+placed (e.g., during postcopy), because we're waiting for a lock, or if the
+userfaultfd thread cannot process a fault, because it is waiting for a
+lock, there could be a deadlock. However, the BQL is not applicable here,
+because any other guest memory access while holding the BQL would already
+result in a deadlock.
+
+Nothing else in the kernel should block forever and wait for userspace
+intervention.
+
+Note: pause_all_vcpus()/resume_all_vcpus() or
+start_exclusive()/end_exclusive() cannot be used, as they either drop
+the BQL or require to be called without the BQL - something inhibitors
+cannot handle. We need a low-level locking mechanism that is
+deadlock-free even when not releasing the BQL.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Tested-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
 ---
- accel/kvm/kvm-all.c   | 14 ++++++++++++++
- hw/core/cpu-common.c  |  2 ++
- include/hw/core/cpu.h |  3 +++
- 3 files changed, 19 insertions(+)
+ accel/kvm/kvm-all.c      | 142 ++++++++++++++++++++++++++++++++++++---
+ include/sysemu/kvm_int.h |   8 +++
+ 2 files changed, 139 insertions(+), 11 deletions(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 099d7bda56..48cdf1fecd 100644
+index 48cdf1fecd..05b7aa5403 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -2811,6 +2811,18 @@ static void kvm_eat_signals(CPUState *cpu)
-     } while (sigismember(&chkset, SIG_IPI));
+@@ -46,6 +46,7 @@
+ #include "sysemu/hw_accel.h"
+ #include "kvm-cpus.h"
+ #include "sysemu/dirtylimit.h"
++#include "qemu/range.h"
+ 
+ #include "hw/boards.h"
+ #include "monitor/stats.h"
+@@ -1294,6 +1295,7 @@ void kvm_set_max_memslot_size(hwaddr max_slot_size)
+     kvm_max_slot_size = max_slot_size;
  }
  
-+static void kvm_cpu_set_in_ioctl(CPUState *cpu, bool in_ioctl)
-+{
-+    if (unlikely(qemu_mutex_iothread_locked())) {
++/* Called with KVMMemoryListener.slots_lock held */
+ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+                              MemoryRegionSection *section, bool add)
+ {
+@@ -1328,14 +1330,12 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+     ram = memory_region_get_ram_ptr(mr) + mr_offset;
+     ram_start_offset = memory_region_get_ram_addr(mr) + mr_offset;
+ 
+-    kvm_slots_lock();
+-
+     if (!add) {
+         do {
+             slot_size = MIN(kvm_max_slot_size, size);
+             mem = kvm_lookup_matching_slot(kml, start_addr, slot_size);
+             if (!mem) {
+-                goto out;
++                return;
+             }
+             if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+                 /*
+@@ -1373,7 +1373,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+             start_addr += slot_size;
+             size -= slot_size;
+         } while (size);
+-        goto out;
 +        return;
+     }
+ 
+     /* register the new slot */
+@@ -1398,9 +1398,6 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+         ram += slot_size;
+         size -= slot_size;
+     } while (size);
+-
+-out:
+-    kvm_slots_unlock();
+ }
+ 
+ static void *kvm_dirty_ring_reaper_thread(void *data)
+@@ -1457,18 +1454,137 @@ static void kvm_region_add(MemoryListener *listener,
+                            MemoryRegionSection *section)
+ {
+     KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
++    KVMMemoryUpdate *update;
++
++    update = g_new0(KVMMemoryUpdate, 1);
++    update->section = memory_region_section_new_copy(section);
+ 
+-    memory_region_ref(section->mr);
+-    kvm_set_phys_mem(kml, section, true);
++    QSIMPLEQ_INSERT_TAIL(&kml->transaction_add, update, next);
+ }
+ 
+ static void kvm_region_del(MemoryListener *listener,
+                            MemoryRegionSection *section)
+ {
+     KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
++    KVMMemoryUpdate *update;
++
++    update = g_new0(KVMMemoryUpdate, 1);
++    update->section = memory_region_section_new_copy(section);
++
++    QSIMPLEQ_INSERT_TAIL(&kml->transaction_del, update, next);
++}
++
++static void kvm_ioctl_inhibit_begin(void)
++{
++    CPUState *cpu;
++
++    /*
++     * We allow to inhibit only when holding the BQL, so we can identify
++     * when an inhibitor wants to issue an ioctl easily.
++     */
++    g_assert(qemu_mutex_iothread_locked());
++
++    CPU_FOREACH(cpu) {
++        qemu_lockcnt_lock(&cpu->in_ioctl_lock);
 +    }
-+    if (in_ioctl) {
-+        qemu_lockcnt_inc(&cpu->in_ioctl_lock);
-+    } else {
-+        qemu_lockcnt_dec(&cpu->in_ioctl_lock);
++    qemu_lockcnt_lock(&kvm_in_ioctl_lock);
+ 
+-    kvm_set_phys_mem(kml, section, false);
+-    memory_region_unref(section->mr);
++    /* Inhibiting happens rarely, we can keep things simple and spin here. */
++    while (true) {
++        bool any_cpu_in_ioctl = false;
++
++        CPU_FOREACH(cpu) {
++            if (qemu_lockcnt_count(&cpu->in_ioctl_lock)) {
++                any_cpu_in_ioctl = true;
++                qemu_cpu_kick(cpu);
++            }
++        }
++        if (!any_cpu_in_ioctl &&
++            !qemu_lockcnt_count(&kvm_in_ioctl_lock)) {
++            break;
++        }
++        g_usleep(100);
 +    }
 +}
 +
- static void kvm_set_in_ioctl(bool in_ioctl)
- {
-     if (likely(qemu_mutex_iothread_locked())) {
-@@ -3049,7 +3061,9 @@ int kvm_vcpu_ioctl(CPUState *cpu, int type, ...)
-     va_end(ap);
- 
-     trace_kvm_vcpu_ioctl(cpu->cpu_index, type, arg);
-+    kvm_cpu_set_in_ioctl(cpu, true);
-     ret = ioctl(cpu->kvm_fd, type, arg);
-+    kvm_cpu_set_in_ioctl(cpu, false);
-     if (ret == -1) {
-         ret = -errno;
-     }
-diff --git a/hw/core/cpu-common.c b/hw/core/cpu-common.c
-index f9fdd46b9d..8d6a4b1b65 100644
---- a/hw/core/cpu-common.c
-+++ b/hw/core/cpu-common.c
-@@ -237,6 +237,7 @@ static void cpu_common_initfn(Object *obj)
-     cpu->nr_threads = 1;
- 
-     qemu_mutex_init(&cpu->work_mutex);
-+    qemu_lockcnt_init(&cpu->in_ioctl_lock);
-     QSIMPLEQ_INIT(&cpu->work_list);
-     QTAILQ_INIT(&cpu->breakpoints);
-     QTAILQ_INIT(&cpu->watchpoints);
-@@ -248,6 +249,7 @@ static void cpu_common_finalize(Object *obj)
- {
-     CPUState *cpu = CPU(obj);
- 
-+    qemu_lockcnt_destroy(&cpu->in_ioctl_lock);
-     qemu_mutex_destroy(&cpu->work_mutex);
++static void kvm_ioctl_inhibit_end(void)
++{
++    CPUState *cpu;
++
++    qemu_lockcnt_unlock(&kvm_in_ioctl_lock);
++    CPU_FOREACH(cpu) {
++        qemu_lockcnt_unlock(&cpu->in_ioctl_lock);
++    }
++}
++
++static void kvm_region_commit(MemoryListener *listener)
++{
++    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener,
++                                          listener);
++    KVMMemoryUpdate *u1, *u2;
++    bool need_inhibit = false;
++
++    if (QSIMPLEQ_EMPTY(&kml->transaction_add) &&
++        QSIMPLEQ_EMPTY(&kml->transaction_del)) {
++        return;
++    }
++
++    /*
++     * We have to be careful when regions to add overlap with ranges to remove.
++     * We have to simulate atomic KVM memslot updates by making sure no ioctl()
++     * is currently active.
++     *
++     * The lists are order by addresses, so it's easy to find overlaps.
++     */
++    u1 = QSIMPLEQ_FIRST(&kml->transaction_del);
++    u2 = QSIMPLEQ_FIRST(&kml->transaction_add);
++    while (u1 && u2) {
++        Range r1, r2;
++
++        range_init_nofail(&r1, u1->section->offset_within_address_space,
++                          int128_get64(u1->section->size));
++        range_init_nofail(&r2, u2->section->offset_within_address_space,
++                          int128_get64(u2->section->size));
++
++        if (range_overlaps_range(&r1, &r2)) {
++            need_inhibit = true;
++            break;
++        }
++        if (range_lob(&r1) < range_lob(&r2)) {
++            u1 = QSIMPLEQ_NEXT(u1, next);
++        } else {
++            u2 = QSIMPLEQ_NEXT(u2, next);
++        }
++    }
++
++
++    kvm_slots_lock();
++    if (need_inhibit) {
++        kvm_ioctl_inhibit_begin();
++    }
++
++    /* Remove all memslots before adding the new ones. */
++    QSIMPLEQ_FOREACH_SAFE(u1, &kml->transaction_del, next, u2) {
++        kvm_set_phys_mem(kml, u1->section, false);
++        memory_region_unref(u1->section->mr);
++
++        QSIMPLEQ_REMOVE(&kml->transaction_del, u1, KVMMemoryUpdate, next);
++        memory_region_section_free_copy(u1->section);
++        g_free(u1);
++    }
++    QSIMPLEQ_FOREACH_SAFE(u1, &kml->transaction_add, next, u2) {
++        memory_region_ref(u1->section->mr);
++        kvm_set_phys_mem(kml, u1->section, true);
++
++        QSIMPLEQ_REMOVE(&kml->transaction_add, u1, KVMMemoryUpdate, next);
++        memory_region_section_free_copy(u1->section);
++        g_free(u1);
++    }
++
++    if (need_inhibit) {
++        kvm_ioctl_inhibit_end();
++    }
++    kvm_slots_unlock();
  }
  
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index f9b58773f7..07852b2a3c 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -397,6 +397,9 @@ struct CPUState {
-     uint32_t kvm_fetch_index;
-     uint64_t dirty_pages;
+ static void kvm_log_sync(MemoryListener *listener,
+@@ -1612,8 +1728,12 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+         kml->slots[i].slot = i;
+     }
  
-+    /* kvm only for now: CPU is in kvm_vcpu_ioctl() (esp. KVM_RUN) */
-+    QemuLockCnt in_ioctl_lock;
++    QSIMPLEQ_INIT(&kml->transaction_add);
++    QSIMPLEQ_INIT(&kml->transaction_del);
 +
-     /* Used for events with 'vcpu' and *without* the 'disabled' properties */
-     DECLARE_BITMAP(trace_dstate_delayed, CPU_TRACE_DSTATE_MAX_EVENTS);
-     DECLARE_BITMAP(trace_dstate, CPU_TRACE_DSTATE_MAX_EVENTS);
+     kml->listener.region_add = kvm_region_add;
+     kml->listener.region_del = kvm_region_del;
++    kml->listener.commit = kvm_region_commit;
+     kml->listener.log_start = kvm_log_start;
+     kml->listener.log_stop = kvm_log_stop;
+     kml->listener.priority = 10;
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index 3b4adcdc10..5ea2d7924b 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -12,6 +12,7 @@
+ #include "exec/memory.h"
+ #include "qapi/qapi-types-common.h"
+ #include "qemu/accel.h"
++#include "qemu/queue.h"
+ #include "sysemu/kvm.h"
+ 
+ typedef struct KVMSlot
+@@ -31,10 +32,17 @@ typedef struct KVMSlot
+     ram_addr_t ram_start_offset;
+ } KVMSlot;
+ 
++typedef struct KVMMemoryUpdate {
++    QSIMPLEQ_ENTRY(KVMMemoryUpdate) next;
++    MemoryRegionSection *section;
++} KVMMemoryUpdate;
++
+ typedef struct KVMMemoryListener {
+     MemoryListener listener;
+     KVMSlot *slots;
+     int as_id;
++    QSIMPLEQ_HEAD(, KVMMemoryUpdate) transaction_add;
++    QSIMPLEQ_HEAD(, KVMMemoryUpdate) transaction_del;
+ } KVMMemoryListener;
+ 
+ #define KVM_MSI_HASHTAB_SIZE    256
 -- 
 2.31.1
 
