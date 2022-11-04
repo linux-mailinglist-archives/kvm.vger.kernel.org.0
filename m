@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F55361A1D3
-	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 21:03:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F11661A1D4
+	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 21:03:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229693AbiKDUC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Nov 2022 16:02:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48026 "EHLO
+        id S229772AbiKDUDB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Nov 2022 16:03:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229900AbiKDUC2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Nov 2022 16:02:28 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 936714E432
-        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 13:01:41 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id 130so5402861pfu.8
-        for <kvm@vger.kernel.org>; Fri, 04 Nov 2022 13:01:41 -0700 (PDT)
+        with ESMTP id S229888AbiKDUCg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Nov 2022 16:02:36 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A48F650F06
+        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 13:01:48 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id b185so5402854pfb.9
+        for <kvm@vger.kernel.org>; Fri, 04 Nov 2022 13:01:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e5SjKpl5wQpBKJaujaO+g62YnASncJMmHCTnqeXvOsQ=;
-        b=G/2wdby9XEOdzpBgg5EDh+iPs5wZ5HXoJv2WWfzydjtLTKSHnZM762oIKwPbtwN//E
-         /C3tND2qrcxcMOn4I22EXHmx1VCdwmR3W3vy0l0rYcxseP6VvKE0ZVEsQ46A81VRLlVK
-         qZBtAghw5K57jdIAtKuhdZYzbnD686BHRopAs4ou70vFfRW9shoIRyhs8Obt2uAwbQJP
-         6I/AkzEVziRxi12JvOmhnpP4akRJczRyJ7oTAwlxC3ewewoQBhkfVvt10tXUNnEDvPmg
-         qE65p8s5QveEz4LQX1to5Ba6b1k1ktvBMVez0G/v2cjUHsqVyTSWHYBjcnDps7tQ/idC
-         9t9g==
+        bh=lL1U+nSAOKGAWh3pKMUaEtjhsNJnzcDwQbCqQSSfvwA=;
+        b=PiBpvMYwmV8P8Zgt9o13BTOVxy5NGSgCssKtEu0l9EItx60jcrjboAxqz0nzvKly1O
+         Vk2osvdOYIIH3D1zkQ267NUKfsN3WpwEtVhO7LsoOMdWAYe8c6NvelJhzGITEZjuMxEA
+         8xaD2n3ybfIOwUV5T3Veknoam5EBaLLm7C4cQ8CkRLyzwUqAxm+UkZwuWrrjyPvNmszy
+         N3+mm0h7js21kBsD9kKZ7fZnqRo7b2Wo1mTcfcqFvVnCCPEc49RWwDZyznbsOwMA3UAG
+         qk3Q4ODa8lPk7poBC17LU16Z1Fs+gerCUAQuF1UFs57P1p9om2lmMgNM3Pb9pyZ3MeXN
+         dr7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=e5SjKpl5wQpBKJaujaO+g62YnASncJMmHCTnqeXvOsQ=;
-        b=VdrJ8G3rW+h8BZCPcS/U7CFiQlaIXqqd9qSaJ4Sh8PNSOUnw6T4u9esyH9jMLCnb7V
-         r4P/yWDsWBGmbfKMQCvcAx6zPrXSwpCsh+LK2+AHBLdTtPI4IrQDZSGqU73Gf47NBrpr
-         GmayjYXs3scZoXpea1YWIQBW4lEQ24rpJvet1ddzRE4jx16lXgqXHh37zrg2gGS+FbXj
-         n4DIi4inKH8J47pK1aR6grUNG0Jq4WJhtz40xA8R7Mz+C5KX2Udg/Zx3zATvDf5v6ZNB
-         yEEAkmuFRkD8/OpCCejCrIepzbufdn59MWWqevuZTVwCwEuRyJ4Vd9/gtjq/ETu6PjzZ
-         IOoA==
-X-Gm-Message-State: ACrzQf1yU5Udrhszwrk4U54m/2rvAjPIMWdopQJOrbLRjlpB+upL+XWE
-        g92qAdR+e+bOCaoRw+dwYQqg8m0g16EIwg==
-X-Google-Smtp-Source: AMsMyM7pb9CmSFsMnnMrwDUvg5VMpuKhP6ltHNmb7Zm8m+q139VycgLcuCmeNeFsWv0c8xKKoSoihQ==
-X-Received: by 2002:a63:5a63:0:b0:42f:e143:80d4 with SMTP id k35-20020a635a63000000b0042fe14380d4mr32485104pgm.456.1667592100697;
-        Fri, 04 Nov 2022 13:01:40 -0700 (PDT)
+        bh=lL1U+nSAOKGAWh3pKMUaEtjhsNJnzcDwQbCqQSSfvwA=;
+        b=xnDua78e7bYNVCgulXj7LeapuCwYDy1U/LkhnaVypFdPGnOJfaq8AibhV1SIfFnmg0
+         faQtk23E1U6oCwb3PucZzJolo8XO7tGQBIo+MWrRajixwZFPfStn9xHoijqeDqga+1r6
+         tWfqqr3sfQhvMAEyows9NNu2dKysPIYmekuVpTesH2oQZoUjdfDg4HCw+YZYJayA2W9M
+         pYivArmsyyEiHTblplfBxTk9nwFRRpxk5ni5aBEw2tSqoEmq77TKIHc0IOZSbrpcHvTM
+         CJFgw6hiod4FVujjK/FJDVm3gguPK/MawsN1ZrFGPPVVvo8ia/aQTOvauYeLsUC5TNJy
+         59/g==
+X-Gm-Message-State: ACrzQf2mYh+dkWBMMJIZFyeIX6aXt2OlwVlq/EcWybJkg8i5pMX071xx
+        RPJHiGUIUK3ouP2ybo1EGmijBMe8766+eQ==
+X-Google-Smtp-Source: AMsMyM5S7nUujFSB1BxUltmovyDz1SV4zC1L6VvtHOcjvj54fCuLoprNGQHWMKEr0nWskL9ivV7jDg==
+X-Received: by 2002:a05:6a00:8ce:b0:56e:6961:c6b6 with SMTP id s14-20020a056a0008ce00b0056e6961c6b6mr7976225pfu.3.1667592107992;
+        Fri, 04 Nov 2022 13:01:47 -0700 (PDT)
 Received: from crazyhorse.local ([174.127.229.57])
-        by smtp.googlemail.com with ESMTPSA id q23-20020a63cc57000000b0046f6d7dcd1dsm122545pgi.25.2022.11.04.13.01.40
+        by smtp.googlemail.com with ESMTPSA id q23-20020a63cc57000000b0046f6d7dcd1dsm122545pgi.25.2022.11.04.13.01.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Nov 2022 13:01:40 -0700 (PDT)
+        Fri, 04 Nov 2022 13:01:47 -0700 (PDT)
 From:   Anthony DeRossi <ajderossi@gmail.com>
 To:     kvm@vger.kernel.org
 Cc:     alex.williamson@redhat.com, cohuck@redhat.com, jgg@ziepe.ca,
         kevin.tian@intel.com, abhsahu@nvidia.com, yishaih@nvidia.com
-Subject: [PATCH v4 1/3] vfio: Fix container device registration life cycle
-Date:   Fri,  4 Nov 2022 12:57:25 -0700
-Message-Id: <20221104195727.4629-2-ajderossi@gmail.com>
+Subject: [PATCH v4 2/3] vfio: Add an open counter to vfio_device_set
+Date:   Fri,  4 Nov 2022 12:57:26 -0700
+Message-Id: <20221104195727.4629-3-ajderossi@gmail.com>
 X-Mailer: git-send-email 2.37.4
 In-Reply-To: <20221104195727.4629-1-ajderossi@gmail.com>
 References: <20221104195727.4629-1-ajderossi@gmail.com>
@@ -71,56 +71,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In vfio_device_open(), vfio_container_device_register() is always called
-when open_count == 1. On error, vfio_device_container_unregister() is
-only called when open_count == 1 and close_device is set. This leaks a
-registration for devices without a close_device implementation.
+open_count is incremented before open_device() and decremented after
+close_device() for each device in the set. This allows devices to
+determine whether shared resources are in use without tracking them
+manually or accessing the private open_count in vfio_device.
 
-In vfio_device_fops_release(), vfio_device_container_unregister() is
-called unconditionally. This can cause a device to be unregistered
-multiple times.
-
-Treating container device registration/unregistration uniformly (always
-when open_count == 1) fixes both issues.
-
-Fixes: ce4b4657ff18 ("vfio: Replace the DMA unmapping notifier with a callback")
 Signed-off-by: Anthony DeRossi <ajderossi@gmail.com>
 ---
- drivers/vfio/vfio_main.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ drivers/vfio/vfio_main.c | 3 +++
+ include/linux/vfio.h     | 1 +
+ 2 files changed, 4 insertions(+)
 
 diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 2d168793d4e1..9a4af880e941 100644
+index 9a4af880e941..6c65418fc7e3 100644
 --- a/drivers/vfio/vfio_main.c
 +++ b/drivers/vfio/vfio_main.c
-@@ -801,8 +801,9 @@ static struct file *vfio_device_open(struct vfio_device *device)
- err_close_device:
- 	mutex_lock(&device->dev_set->lock);
- 	mutex_lock(&device->group->group_lock);
--	if (device->open_count == 1 && device->ops->close_device) {
--		device->ops->close_device(device);
-+	if (device->open_count == 1) {
-+		if (device->ops->close_device)
-+			device->ops->close_device(device);
+@@ -761,6 +761,7 @@ static struct file *vfio_device_open(struct vfio_device *device)
+ 		mutex_lock(&device->group->group_lock);
+ 		device->kvm = device->group->kvm;
+ 
++		device->dev_set->open_count++;
+ 		if (device->ops->open_device) {
+ 			ret = device->ops->open_device(device);
+ 			if (ret)
+@@ -809,6 +810,7 @@ static struct file *vfio_device_open(struct vfio_device *device)
+ 	}
+ err_undo_count:
+ 	mutex_unlock(&device->group->group_lock);
++	device->dev_set->open_count--;
+ 	device->open_count--;
+ 	if (device->open_count == 0 && device->kvm)
+ 		device->kvm = NULL;
+@@ -1023,6 +1025,7 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+ 			device->ops->close_device(device);
  
  		vfio_device_container_unregister(device);
++		device->dev_set->open_count--;
  	}
-@@ -1017,10 +1018,12 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
- 	mutex_lock(&device->dev_set->lock);
- 	vfio_assert_device_open(device);
- 	mutex_lock(&device->group->group_lock);
--	if (device->open_count == 1 && device->ops->close_device)
--		device->ops->close_device(device);
-+	if (device->open_count == 1) {
-+		if (device->ops->close_device)
-+			device->ops->close_device(device);
- 
--	vfio_device_container_unregister(device);
-+		vfio_device_container_unregister(device);
-+	}
  	mutex_unlock(&device->group->group_lock);
  	device->open_count--;
- 	if (device->open_count == 0)
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index e7cebeb875dd..5becdcdf4ba2 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -28,6 +28,7 @@ struct vfio_device_set {
+ 	struct mutex lock;
+ 	struct list_head device_list;
+ 	unsigned int device_count;
++	unsigned int open_count;
+ };
+ 
+ struct vfio_device {
 -- 
 2.37.4
 
