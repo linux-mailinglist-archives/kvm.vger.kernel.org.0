@@ -2,100 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0F1C6190F9
-	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 07:21:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55D396190FF
+	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 07:23:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231230AbiKDGVt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Nov 2022 02:21:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50396 "EHLO
+        id S230465AbiKDGXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Nov 2022 02:23:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231384AbiKDGVX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Nov 2022 02:21:23 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 500DE2A72B
-        for <kvm@vger.kernel.org>; Thu,  3 Nov 2022 23:21:21 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id w14so5665235wru.8
-        for <kvm@vger.kernel.org>; Thu, 03 Nov 2022 23:21:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lCXwZ5vfNe4SOPsgVDOzi3k6ifSwUdOjW1NH0sg+5rM=;
-        b=zcl272foHL4KaayQq1kq5oJeQSUrmBhZUd7b4kRoVJiQ5379j2ZkkOfI1EwRxRzFbE
-         8rvWRUY2sP15++X3oRb2vdl6yJGi0+bKBKI6aS3gNmHmrJjKoyDsAQoHcPv8kv5lLrhr
-         +CVusvt/P6/aSZM3mL5e9GYEj9TX3cZIG10RgXGN4aOK1aQZbxs/VQrNJ6Yh01d4SJmw
-         2j6WPlHvWC98Hi8oBUVjYV06h3Z9xVvnI+/Wk8kTNMg904MfJ9BgQg5j8lew/yNY7m77
-         M59jT/uKm3xEaphlt/qItM9WVOx7TqB7BRo8gJGkU7ZHLJnEvNi8hmUfQIdffryUu+y6
-         F4Rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lCXwZ5vfNe4SOPsgVDOzi3k6ifSwUdOjW1NH0sg+5rM=;
-        b=OBF1g5aIEBuV6C2iW3YyQSCfP5dta8xVtIB96A4WwMf+z2GlgUY3SQbY85JJlVDi9r
-         yOyicGXIY93wVQth1JAbMSz49cRwsAqY4Yl++QS50p7TqEWf/oISQ3nXeZ5cW9snpiLb
-         RWlFszoH9UfLkgOGVngCgUBG7GkDkxcjgEZ2D2dSQe12g/2lUoR4FbTwPQ6znLgr+F+e
-         HTW8edMYRxxca6ikgWtilPi/jKiBsUkJsCeFQHutHm79bYs88fl9e4NwB/2vZvm2z2C2
-         Su0i4KgwC9cNJKnxdgp8d+GV74Q+bUAZ1nO/jR0nO7RA5hO9oT1Z3bPyOjIlu+aeGvKU
-         5PGA==
-X-Gm-Message-State: ACrzQf0w6IJwLanlS9OcY82fH3V7WjB0F4DiGEuT+b8AdzL7H72O37yk
-        DKaoeXs8nk5g215sguPsSwANdA==
-X-Google-Smtp-Source: AMsMyM68wJEa3smABHPK3YXkguRUiNr4QZx08ls9uFNkEujnEZnJ0igA3c8PEyj/dIjxjaBk9yTbDw==
-X-Received: by 2002:adf:fe8e:0:b0:236:6860:e55a with SMTP id l14-20020adffe8e000000b002366860e55amr20229508wrr.105.1667542879959;
-        Thu, 03 Nov 2022 23:21:19 -0700 (PDT)
-Received: from usaari01.cust.communityfibre.co.uk ([2a02:6b6a:b4d7:0:c7c:f931:dd4c:1ea6])
-        by smtp.gmail.com with ESMTPSA id w11-20020a5d608b000000b002366f9bd717sm3099924wrt.45.2022.11.03.23.21.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 23:21:19 -0700 (PDT)
-From:   Usama Arif <usama.arif@bytedance.com>
-To:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
-        yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-        maz@kernel.org, steven.price@arm.com, mark.rutland@arm.com,
-        bagasdotme@gmail.com
-Cc:     fam.zheng@bytedance.com, liangma@liangbit.com,
-        punit.agrawal@bytedance.com, Usama Arif <usama.arif@bytedance.com>
-Subject: [v2 6/6] KVM: selftests: add tests for PV time specific hypercall
-Date:   Fri,  4 Nov 2022 06:21:05 +0000
-Message-Id: <20221104062105.4119003-7-usama.arif@bytedance.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221104062105.4119003-1-usama.arif@bytedance.com>
-References: <20221104062105.4119003-1-usama.arif@bytedance.com>
+        with ESMTP id S231649AbiKDGXM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Nov 2022 02:23:12 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 723022B27D;
+        Thu,  3 Nov 2022 23:22:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667542954; x=1699078954;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dpPYB6O0Iym/jBFRwx8/3NauFKj5Z5IV2Uq06/9dUi0=;
+  b=HJHNOlLDKYROR5BFNk9a+3WW+ijpbZ3KmOtJ2aJMjsiosPXAalu56m4q
+   6LR7o2JrZkWwA1riwxun8wHI8vOH8oGn/BS2kmDfUFqDe+rdDJCMqP86y
+   i1J00fSb39auoR6enGJcwZVk9EgHWpnVlt8YovuvWMFcSr9zE8Vmp/uR8
+   eOo849xNtIjGyIt18IME4btaR4p3qy/VJMSRQjPIpz6jAN+HeMiBBoJbs
+   i7lYEDUxk7ecsij4xLoAQLJI7NdXPtE9TuuoB16eW/9mHYth3hEzmWAMW
+   zVJT2TVrsR56jSR4oFCjfZ+XwryBJ7BDTIJh7SjOKcDhkzbKH7nEu6lOt
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10520"; a="311630024"
+X-IronPort-AV: E=Sophos;i="5.96,136,1665471600"; 
+   d="scan'208";a="311630024"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2022 23:22:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10520"; a="698531026"
+X-IronPort-AV: E=Sophos;i="5.96,136,1665471600"; 
+   d="scan'208";a="698531026"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by fmsmga008.fm.intel.com with ESMTP; 03 Nov 2022 23:22:23 -0700
+Date:   Fri, 4 Nov 2022 14:22:23 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Atish Patra <atishp@atishpatra.org>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Chao Gao <chao.gao@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Yuan Yao <yuan.yao@intel.com>
+Subject: Re: [PATCH 08/44] KVM: x86: Move hardware setup/unsetup to init/exit
+Message-ID: <20221104062223.7kcrbt66mlmqxk7f@yy-desk-7060>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-9-seanjc@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221102231911.3107438-9-seanjc@google.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a vendor specific hypercall.
+On Wed, Nov 02, 2022 at 11:18:35PM +0000, Sean Christopherson wrote:
+> Now that kvm_arch_hardware_setup() is called immediately after
+> kvm_arch_init(), fold the guts of kvm_arch_hardware_(un)setup() into
+> kvm_arch_{init,exit}() as a step towards dropping one of the hooks.
+>
+> To avoid having to unwind various setup, e.g registration of several
+> notifiers, slot in the vendor hardware setup before the registration of
+> said notifiers and callbacks.  Introducing a functional change while
+> moving code is less than ideal, but the alternative is adding a pile of
+> unwinding code, which is much more error prone, e.g. several attempts to
+> move the setup code verbatim all introduced bugs.
+>
+> Add a comment to document that kvm_ops_update() is effectively the point
+> of no return, e.g. it sets the kvm_x86_ops.hardware_enable canary and so
+> needs to be unwound.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 121 +++++++++++++++++++++++----------------------
+>  1 file changed, 63 insertions(+), 58 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9a7702b1c563..80ee580a9cd4 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9252,6 +9252,24 @@ static struct notifier_block pvclock_gtod_notifier = {
+>  };
+>  #endif
+>
+> +static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
+> +{
+> +	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
+> +
+> +#define __KVM_X86_OP(func) \
+> +	static_call_update(kvm_x86_##func, kvm_x86_ops.func);
+> +#define KVM_X86_OP(func) \
+> +	WARN_ON(!kvm_x86_ops.func); __KVM_X86_OP(func)
+> +#define KVM_X86_OP_OPTIONAL __KVM_X86_OP
+> +#define KVM_X86_OP_OPTIONAL_RET0(func) \
+> +	static_call_update(kvm_x86_##func, (void *)kvm_x86_ops.func ? : \
+> +					   (void *)__static_call_return0);
+> +#include <asm/kvm-x86-ops.h>
+> +#undef __KVM_X86_OP
+> +
+> +	kvm_pmu_ops_update(ops->pmu_ops);
+> +}
+> +
+>  int kvm_arch_init(void *opaque)
+>  {
+>  	struct kvm_x86_init_ops *ops = opaque;
+> @@ -9325,6 +9343,24 @@ int kvm_arch_init(void *opaque)
+>  		kvm_caps.supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
+>  	}
+>
+> +	rdmsrl_safe(MSR_EFER, &host_efer);
+> +
+> +	if (boot_cpu_has(X86_FEATURE_XSAVES))
+> +		rdmsrl(MSR_IA32_XSS, host_xss);
+> +
+> +	kvm_init_pmu_capability();
+> +
+> +	r = ops->hardware_setup();
+> +	if (r != 0)
+> +		goto out_mmu_exit;
 
-Signed-off-by: Usama Arif <usama.arif@bytedance.com>
----
- tools/testing/selftests/kvm/aarch64/hypercalls.c | 2 ++
- 1 file changed, 2 insertions(+)
+The failure case of ops->hardware_setup() is unwound
+by kvm_arch_exit() before this patch, do we need to
+keep that old behavior ?
 
-diff --git a/tools/testing/selftests/kvm/aarch64/hypercalls.c b/tools/testing/selftests/kvm/aarch64/hypercalls.c
-index a39da3fe4952..c5c304e886a5 100644
---- a/tools/testing/selftests/kvm/aarch64/hypercalls.c
-+++ b/tools/testing/selftests/kvm/aarch64/hypercalls.c
-@@ -78,6 +78,8 @@ static const struct test_hvc_info hvc_info[] = {
- 	TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID,
- 			ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID),
- 	TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0),
-+	TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID,
-+			ARM_SMCCC_VENDOR_HYP_KVM_PV_LOCK_FUNC_ID),
- 	TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID, KVM_PTP_VIRT_COUNTER),
- };
- 
--- 
-2.25.1
-
+> +
+> +	/*
+> +	 * Point of no return!  DO NOT add error paths below this point unless
+> +	 * absolutely necessary, as most operations from this point forward
+> +	 * require unwinding.
+> +	 */
+> +	kvm_ops_update(ops);
+> +
+>  	kvm_timer_init();
+>
+>  	if (pi_inject_timer == -1)
+> @@ -9336,8 +9372,32 @@ int kvm_arch_init(void *opaque)
+>  		set_hv_tscchange_cb(kvm_hyperv_tsc_notifier);
+>  #endif
+>
+> +	kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
+> +
+> +	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+> +		kvm_caps.supported_xss = 0;
+> +
+> +#define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
+> +	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
+> +#undef __kvm_cpu_cap_has
+> +
+> +	if (kvm_caps.has_tsc_control) {
+> +		/*
+> +		 * Make sure the user can only configure tsc_khz values that
+> +		 * fit into a signed integer.
+> +		 * A min value is not calculated because it will always
+> +		 * be 1 on all machines.
+> +		 */
+> +		u64 max = min(0x7fffffffULL,
+> +			      __scale_tsc(kvm_caps.max_tsc_scaling_ratio, tsc_khz));
+> +		kvm_caps.max_guest_tsc_khz = max;
+> +	}
+> +	kvm_caps.default_tsc_scaling_ratio = 1ULL << kvm_caps.tsc_scaling_ratio_frac_bits;
+> +	kvm_init_msr_list();
+>  	return 0;
+>
+> +out_mmu_exit:
+> +	kvm_mmu_vendor_module_exit();
+>  out_free_percpu:
+>  	free_percpu(user_return_msrs);
+>  out_free_x86_emulator_cache:
+> @@ -9347,6 +9407,8 @@ int kvm_arch_init(void *opaque)
+>
+>  void kvm_arch_exit(void)
+>  {
+> +	kvm_unregister_perf_callbacks();
+> +
+>  #ifdef CONFIG_X86_64
+>  	if (hypervisor_is_type(X86_HYPER_MS_HYPERV))
+>  		clear_hv_tscchange_cb();
+> @@ -9362,6 +9424,7 @@ void kvm_arch_exit(void)
+>  	irq_work_sync(&pvclock_irq_work);
+>  	cancel_work_sync(&pvclock_gtod_work);
+>  #endif
+> +	static_call(kvm_x86_hardware_unsetup)();
+>  	kvm_x86_ops.hardware_enable = NULL;
+>  	kvm_mmu_vendor_module_exit();
+>  	free_percpu(user_return_msrs);
+> @@ -11922,72 +11985,14 @@ void kvm_arch_hardware_disable(void)
+>  	drop_user_return_notifiers();
+>  }
+>
+> -static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
+> -{
+> -	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
+> -
+> -#define __KVM_X86_OP(func) \
+> -	static_call_update(kvm_x86_##func, kvm_x86_ops.func);
+> -#define KVM_X86_OP(func) \
+> -	WARN_ON(!kvm_x86_ops.func); __KVM_X86_OP(func)
+> -#define KVM_X86_OP_OPTIONAL __KVM_X86_OP
+> -#define KVM_X86_OP_OPTIONAL_RET0(func) \
+> -	static_call_update(kvm_x86_##func, (void *)kvm_x86_ops.func ? : \
+> -					   (void *)__static_call_return0);
+> -#include <asm/kvm-x86-ops.h>
+> -#undef __KVM_X86_OP
+> -
+> -	kvm_pmu_ops_update(ops->pmu_ops);
+> -}
+> -
+>  int kvm_arch_hardware_setup(void *opaque)
+>  {
+> -	struct kvm_x86_init_ops *ops = opaque;
+> -	int r;
+> -
+> -	rdmsrl_safe(MSR_EFER, &host_efer);
+> -
+> -	if (boot_cpu_has(X86_FEATURE_XSAVES))
+> -		rdmsrl(MSR_IA32_XSS, host_xss);
+> -
+> -	kvm_init_pmu_capability();
+> -
+> -	r = ops->hardware_setup();
+> -	if (r != 0)
+> -		return r;
+> -
+> -	kvm_ops_update(ops);
+> -
+> -	kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
+> -
+> -	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+> -		kvm_caps.supported_xss = 0;
+> -
+> -#define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
+> -	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
+> -#undef __kvm_cpu_cap_has
+> -
+> -	if (kvm_caps.has_tsc_control) {
+> -		/*
+> -		 * Make sure the user can only configure tsc_khz values that
+> -		 * fit into a signed integer.
+> -		 * A min value is not calculated because it will always
+> -		 * be 1 on all machines.
+> -		 */
+> -		u64 max = min(0x7fffffffULL,
+> -			      __scale_tsc(kvm_caps.max_tsc_scaling_ratio, tsc_khz));
+> -		kvm_caps.max_guest_tsc_khz = max;
+> -	}
+> -	kvm_caps.default_tsc_scaling_ratio = 1ULL << kvm_caps.tsc_scaling_ratio_frac_bits;
+> -	kvm_init_msr_list();
+>  	return 0;
+>  }
+>
+>  void kvm_arch_hardware_unsetup(void)
+>  {
+> -	kvm_unregister_perf_callbacks();
+>
+> -	static_call(kvm_x86_hardware_unsetup)();
+>  }
+>
+>  int kvm_arch_check_processor_compat(void *opaque)
+> --
+> 2.38.1.431.g37b22c650d-goog
+>
