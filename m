@@ -2,161 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B35461A1FD
-	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 21:15:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F1EA061A202
+	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 21:15:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229629AbiKDUPM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Nov 2022 16:15:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57210 "EHLO
+        id S229798AbiKDUPn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Nov 2022 16:15:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbiKDUPK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Nov 2022 16:15:10 -0400
-Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 359D930F77
-        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 13:15:08 -0700 (PDT)
-Date:   Fri, 4 Nov 2022 20:12:35 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1667592767;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=e1MPhNwvfG4enmJTG4TrEJFHNNzuRv9rFUtE3O6Q7fQ=;
-        b=UdfYU32+A3e2WuPMtlWhM79eOtsaVNdMBblK1AnJ7zGMgHIWpWD0/BOJkU4Th/r6giXD0d
-        6W72w9Dze+eqzJHt5FAtlqYfeISDy1r5dzSyrFKVWDDxWxst1wH0Vhs98qaQmZ2zes2cAw
-        GaDjgSMTUdryq6i49X0zgHyo7fZjTU4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-        ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
-        catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
-        pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
-        james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v7 4/9] KVM: Support dirty ring in conjunction with bitmap
-Message-ID: <Y2VyMwAlg7U9pXzV@google.com>
-References: <20221031003621.164306-1-gshan@redhat.com>
- <20221031003621.164306-5-gshan@redhat.com>
- <Y2RPhwIUsGLQ2cz/@google.com>
- <d5b86a73-e030-7ce3-e5f3-301f4f505323@redhat.com>
- <Y2RlfkyQMCtD6Rbh@google.com>
- <d7e45de0-bff6-7d8c-4bf4-1a09e8acb726@redhat.com>
+        with ESMTP id S229589AbiKDUPm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Nov 2022 16:15:42 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01A5045ED0
+        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 13:15:41 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id d13-20020a17090a3b0d00b00213519dfe4aso5465278pjc.2
+        for <kvm@vger.kernel.org>; Fri, 04 Nov 2022 13:15:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WwcH+iZxGlELoSFmbiG2F+LcSAfxo7d4BXkkQPL3oEI=;
+        b=Feo7aLccvIiUFCz0IQvThwilRRuNsyrpZUnftVsZfjj8XYXQSFrIYH3rBJ9pl9AVd1
+         0QBS4p0eS2Auk5grltqCZHhMy52m2eoOZ3Dyjvl6u7ksM+uKmfXQViJ2DXA8oC3D4Z34
+         IZgMWO3NptjbIzmMH+7K07NkCucKQA3oBW+yQ9OuKRe0+DMXUgLl0Rs58L/pchkt3qwG
+         SRvLV8FDseMonl0kTvvz0KTjPcnWljQWZJ8bRjD448LzwgH9ljB4ZZnYaguVVVZ5Rh/H
+         Z656e04FZq7s/SPiTN5UXm2Xfu4LYQY2nb1iUEZCzGlvNIqMCMtTR0K0fg2+3idK7iEY
+         /AAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WwcH+iZxGlELoSFmbiG2F+LcSAfxo7d4BXkkQPL3oEI=;
+        b=Sv+FRLuo3xQ+WGhgKrTjEzr1OzS056D1A4JENp95hG08grF26YLQr/aJ5zWbjwtykV
+         Qj+ruoGlO9Yo5QxADmWDZHoYEjvzRWO1wAaVC8hfMFZv0fiPS83b5zeqZ+hF1PhdyYFv
+         QHenDocEZWnZhO2z0Ri5AQPPJdXFAzYkmTtsMFP3dhKvCAMXPwONtP3gMs4bzlD88jIp
+         6+/a0sOW7zPS8HWoBsuXkBcO9niXIkq7W6MzorbGvJxqwG8/MaWXGRT1vkCM64LhZrAO
+         +GWSQBgP5l2tLKMHPv8oLJYh2xQ40nwhwF3vxMGQ2xcDlHbvJhDIq7UBXKwQV8jRGMZR
+         Nedg==
+X-Gm-Message-State: ACrzQf2tyjWQr5g7wAAMoajrT6k2KSXECi7VZGCIfghqgozWAw2ZPSoj
+        lo7uubwQyaZXeYf4axZkVdpCjA==
+X-Google-Smtp-Source: AMsMyM7LA9CKVJucdf56FhPBIDbY23ArzmJdn5v66cKOhKDCPGvtmHqu7FhmyFiehmOw+k0waEgaCQ==
+X-Received: by 2002:a17:90a:2bc9:b0:212:8210:c92d with SMTP id n9-20020a17090a2bc900b002128210c92dmr38288471pje.38.1667592940349;
+        Fri, 04 Nov 2022 13:15:40 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id i7-20020a17090332c700b00183c67844aesm166908plr.22.2022.11.04.13.15.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Nov 2022 13:15:39 -0700 (PDT)
+Date:   Fri, 4 Nov 2022 20:15:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Atish Patra <atishp@atishpatra.org>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Yuan Yao <yuan.yao@intel.com>
+Subject: Re: [PATCH 02/44] KVM: Initialize IRQ FD after arch hardware setup
+Message-ID: <Y2Vy6Eq89tQa+3bq@google.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-3-seanjc@google.com>
+ <Y2Rfz+TIcdfcawxh@gao-cwp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d7e45de0-bff6-7d8c-4bf4-1a09e8acb726@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Y2Rfz+TIcdfcawxh@gao-cwp>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 04, 2022 at 02:57:15PM +0800, Gavin Shan wrote:
-> On 11/4/22 9:06 AM, Oliver Upton wrote:
-
-[...]
-
-> > Just to make sure we're on the same page, there's two issues:
+On Fri, Nov 04, 2022, Chao Gao wrote:
+> On Wed, Nov 02, 2022 at 11:18:29PM +0000, Sean Christopherson wrote:
 > > 
-> >   (1) If DIRTY_LOG_RING is enabled before memslot creation and
-> >       RING_WITH_BITMAP is enabled after memslots have been created w/
-> >       dirty logging enabled, memslot->dirty_bitmap == NULL and the
-> >       kernel will fault when attempting to save the ITS tables.
+> >+	r = kvm_irqfd_init();
+> >+	if (r)
+> >+		goto err_irqfd;
+> >+
+> > 	r = kvm_async_pf_init();
+> > 	if (r)
+> >-		goto out_free_4;
+> >+		goto err_async_pf;
 > > 
-> >   (2) Not your code, but a similar issue. If DIRTY_LOG_RING[_ACQ_REL] is
-> >       enabled after memslots have been created w/ dirty logging enabled,
-> >       memslot->dirty_bitmap != NULL and that memory is wasted until the
-> >       memslot is freed.
+> > 	kvm_chardev_ops.owner = module;
 > > 
-> > I don't expect you to fix #2, though I've mentioned it because using the
-> > same approach to #1 and #2 would be nice.
-> > 
+> >@@ -5927,6 +5926,9 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+> > 	kvm_vfio_ops_exit();
+> > err_vfio:
+> > 	kvm_async_pf_deinit();
+> >+err_async_pf:
+> >+	kvm_irqfd_exit();
 > 
-> Yes, I got your points. Case (2) is still possible to happen with QEMU
-> excluded. However, QEMU is always enabling DIRTY_LOG_RING[_ACQ_REL] before
-> any memory slot is created. I agree that we need to ensure there are no
-> memory slots when DIRTY_LOG_RING[_ACQ_REL] is enabled.
+> >+err_irqfd:
+> > out_free_4:
 > 
-> For case (1), we can ensure RING_WTIH_BITMAP is enabled before any memory
-> slot is added, as below. QEMU needs a new helper (as above) to enable it
-> on board's level.
-> 
-> Lets fix both with a new helper in PATCH[v8 4/9] like below?
+> Do you mind removing one of the two labels?
 
-I agree that we should address (1) like this, but in (2) requiring that
-no memslots were created before enabling the existing capabilities would
-be a change in ABI. If we can get away with that, great, but otherwise
-we may need to delete the bitmaps associated with all memslots when the
-cap is enabled.
-
->   static inline bool kvm_vm_has_memslot_pages(struct kvm *kvm)
->   {
->       bool has_memslot_pages;
-> 
->       mutex_lock(&kvm->slots_lock);
-> 
->       has_memslot_pages = !!kvm->nr_memslot_pages;
-> 
->       mutex_unlock(&kvm->slots_lock);
-> 
->       return has_memslot_pages;
->   }
-
-Do we need to build another helper for this? kvm_memslots_empty() will
-tell you whether or not a memslot has been created by checking the gfn
-tree.
-
-On top of that, the memslot check and setting
-kvm->dirty_ring_with_bitmap must happen behind the slots_lock. Otherwise
-you could still wind up creating memslots w/o bitmaps.
-
-
-Something like:
-
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 91cf51a25394..420cc101a16e 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4588,6 +4588,32 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
- 			return -EINVAL;
- 
- 		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
-+
-+	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP: {
-+		struct kvm_memslots *slots;
-+		int r = -EINVAL;
-+
-+		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
-+		    !kvm->dirty_ring_size)
-+			return r;
-+
-+		mutex_lock(&kvm->slots_lock);
-+
-+		slots = kvm_memslots(kvm);
-+
-+		/*
-+		 * Avoid a race between memslot creation and enabling the ring +
-+		 * bitmap capability to guarantee that no memslots have been
-+		 * created without a bitmap.
-+		 */
-+		if (kvm_memslots_empty(slots)) {
-+			kvm->dirty_ring_with_bitmap = cap->args[0];
-+			r = 0;
-+		}
-+
-+		mutex_unlock(&kvm->slots_lock);
-+		return r;
-+	}
- 	default:
- 		return kvm_vm_ioctl_enable_cap(kvm, cap);
- 	}
-
---
-Thanks,
-Oliver
+Ah, I meant to tack on a patch at the very end to clean up these labels once the
+dust had settled, e.g. to also resolve the "err" vs. "out" mess I created (on
+purpose, because trying to describe the "out" path was frustrating and generated
+too much churn).
