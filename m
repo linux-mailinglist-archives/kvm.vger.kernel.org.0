@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A33D61A1D5
-	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 21:03:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FD9361A1DD
+	for <lists+kvm@lfdr.de>; Fri,  4 Nov 2022 21:06:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229846AbiKDUDE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Nov 2022 16:03:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47930 "EHLO
+        id S229589AbiKDUGm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Nov 2022 16:06:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230006AbiKDUCj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Nov 2022 16:02:39 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40ADC45A35
-        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 13:01:52 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id y4so5865249plb.2
-        for <kvm@vger.kernel.org>; Fri, 04 Nov 2022 13:01:52 -0700 (PDT)
+        with ESMTP id S229487AbiKDUGl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Nov 2022 16:06:41 -0400
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3E401BC
+        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 13:06:39 -0700 (PDT)
+Received: by mail-yb1-xb30.google.com with SMTP id n85so1418857yba.1
+        for <kvm@vger.kernel.org>; Fri, 04 Nov 2022 13:06:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Jh/lYB5WiOxX1oSK4LWl/FL3NO8tB4pgbus8C9dwTWk=;
-        b=em4fQgqI+TXrScQ/k5gwiFtYFyzXQ4CEYuZEzjarizzrodACfNrwwQtI/5wOb9j83+
-         mShZ3TU8wUBb5oVOLw/AVrGL0oYsrZfYpmlpKb+Pb+3oXB+CxDBr0IIbL7VHJeeYmIqo
-         iJZmiaay2FRoPdpSnispwU/kV1s71LCpDEog1yzZ0TVkQhBXnyUzA5wyO1OiuGxVseR0
-         OOC1GvYf5lZajGr5T2pLodVEh5KE3ZJ0xgf7vHCl0RB9a//TWjarUg2nKGOTfVmAFaYU
-         IVMS9WDBaKxZEDjJbLIxDiKG0fYHKmwf+7hukPQGI0L0btFhv9sfQYxaSKPEc6AsnYZ/
-         qHdw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DyHspqoSZy8qwpQeQx8PLncv/UhzgF04MTXSZVNsezE=;
+        b=Kqo4Km5wAQbET6ncTjggF58yC1zjmXaWjgZm+ufPfiyjvJBmAOLevwuq2AcVKO0jdF
+         i2zd9goS/L8YdNtlriUL1H3s+vhba+kd8gyHlVPzC5UqqNYncsrAxyGBCCaaCCCYbiIY
+         dRRZas2Y/ie3R2RvbyUnXMRMRkebrkLhQfuEcE9jcUUo09sOKoTiLh1a6I+HHOUkI/9x
+         fn34g+3KZs6UaZlLfzg9f2WGrRxB61MK1kEX0SCNgmyB9x8eQd9rtEFWnpnIjPfvY6Yb
+         Aro11Ej6OzU1E+yfMT9wDyWiAyv6duRPFsjgps+ro0M4yAm0Qaehpw9qEtVt1VTOR0EX
+         S87A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Jh/lYB5WiOxX1oSK4LWl/FL3NO8tB4pgbus8C9dwTWk=;
-        b=4YvPZFu5ASQjnnMqFE00UeA47jYhc8BKbsWOP8JMmavE35JqK/5U9dVunh91qP+N1e
-         3az3XQd8PHM+AfaAd+iZrISrhMlhTRqHo1zKKMXDEe4YdMhD0qVrvIe+tiS7CGmtoVSS
-         W+qoa04Yf0EwNxGpg0s+B/SiiIvYhF8mVvW6Yf2+lJx0Jrwnyis5ZYwT2SroTJrhC6T+
-         n63FnAFM2PvvkjunlSsLW+dBZrpgu2+rikHOaNCpAMO1WfqnY0qdmGuVdYA32Pjkfq8+
-         1wdYQSkhyz+Q+3pi+GwJC2gTR+uiwrb8Ah5X1bjhXWiTo7zqC9Sjl7mpJIYcgEMXO9qw
-         eqNg==
-X-Gm-Message-State: ACrzQf2DdgsmODd/7/YAHJMu97TIiHevw7DWylGOJnorl23Mee3twqfW
-        MQJHVaC04PkLd4/Z+TnomOuUWhFUZ03AEw==
-X-Google-Smtp-Source: AMsMyM7n6xzlxWpINSc7gC6ArswBZ/yS+gHl00K2gSlsK1nX4Cr7zGkC4G79z00UcVUHwPV0gfxNdg==
-X-Received: by 2002:a17:902:7283:b0:188:612b:1d31 with SMTP id d3-20020a170902728300b00188612b1d31mr6333194pll.81.1667592111657;
-        Fri, 04 Nov 2022 13:01:51 -0700 (PDT)
-Received: from crazyhorse.local ([174.127.229.57])
-        by smtp.googlemail.com with ESMTPSA id q23-20020a63cc57000000b0046f6d7dcd1dsm122545pgi.25.2022.11.04.13.01.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Nov 2022 13:01:51 -0700 (PDT)
-From:   Anthony DeRossi <ajderossi@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com, jgg@ziepe.ca,
-        kevin.tian@intel.com, abhsahu@nvidia.com, yishaih@nvidia.com
-Subject: [PATCH v4 3/3] vfio/pci: Check the device set open_count on reset
-Date:   Fri,  4 Nov 2022 12:57:27 -0700
-Message-Id: <20221104195727.4629-4-ajderossi@gmail.com>
-X-Mailer: git-send-email 2.37.4
-In-Reply-To: <20221104195727.4629-1-ajderossi@gmail.com>
-References: <20221104195727.4629-1-ajderossi@gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DyHspqoSZy8qwpQeQx8PLncv/UhzgF04MTXSZVNsezE=;
+        b=T8KmyMbIgmXe/+QRE22uXGwmHE7A62qJztk4SMIgci4i9Aoby4vRf4qiIWwpAkhiJf
+         NY4nOU0iPI8/XuWkg9+mMYl5uZYpXYrxn0+JLgx9HMeNm39lAR9hx6eUuZVzOfxwKNWb
+         SqPrbbuCGKt77+8pfVYXvG36bCU/UtndWgakSJe3j/WbfSULuRmZxMLzxs0BINIPNOEM
+         Pze9gvqxgjS756CJntpIBWDIjfc0XsxzNciYnSAzdNP3xCgFbfCp3VvKZj0eBNVvQGhh
+         60W0NZwLj9e0A7GVTatoq/10fgcquwYHozxayMuNSjSjH1FMYNRRNDyqSNlkn6jNxC1Y
+         kyow==
+X-Gm-Message-State: ACrzQf1+olUZNdJOU3hZEALf5aC+mtoCWLGL8v2M58NGQJb+8LBXG39b
+        SwA+q3JCs1nENInLI3L1/DLxw5fTagRZia/tsi4=
+X-Google-Smtp-Source: AMsMyM7YXEk6MY6UlSPKf6SATf8ywjkC56533VwV1HOc3sip3QnHL8+YJ4FonRVoFW6sGpY9CbwULv3Uuo2Dr+FlPhg=
+X-Received: by 2002:a05:6902:134c:b0:6bb:f88a:8744 with SMTP id
+ g12-20020a056902134c00b006bbf88a8744mr35842691ybu.488.1667592398615; Fri, 04
+ Nov 2022 13:06:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20221026194245.1769-1-ajderossi@gmail.com> <BN9PR11MB52763B921748415B14FFB57D8C369@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y2EFLVYwWumB9JbL@ziepe.ca> <CAKkLME3bR++sWFusGdxohD3ZCgBDj7rjsjMZs=RvaYYfaJskng@mail.gmail.com>
+ <20221102155851.2d19978e.alex.williamson@redhat.com>
+In-Reply-To: <20221102155851.2d19978e.alex.williamson@redhat.com>
+From:   Anthony DeRossi <ajderossi@gmail.com>
+Date:   Fri, 4 Nov 2022 20:06:27 +0000
+Message-ID: <CAKkLME28+v0ZvfkP9SPwZTmqGFMmm2_Gt45zs6ja4XZAxt2biw@mail.gmail.com>
+Subject: Re: [PATCH v2] vfio-pci: Accept a non-zero open_count on reset
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "abhsahu@nvidia.com" <abhsahu@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -71,66 +72,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vfio_pci_dev_set_needs_reset() inspects the open_count of every device
-in the set to determine whether a reset is needed. The current device
-always has open_count == 1 within vfio_pci_core_disable(), effectively
-disabling the reset logic. This field is also documented as private in
-vfio_device, so it should not be used to determine whether other devices
-in the set are open.
+On Wed, Nov 2, 2022 at 9:59 PM Alex Williamson
+<alex.williamson@redhat.com> wrote:
+> I think that could work too, but of course it's PCI specific.  If we
+> had a vfio core helper to get the open count for the device set, that
+> would make it more universally available.
 
-Checking for open_count > 1 on the device set fixes both issues.
+Thanks for the suggestion. I sent a new series with this change.
 
-After commit 2cd8b14aaa66 ("vfio/pci: Move to the device set
-infrastructure"), failure to create a new file for a device would cause
-the reset to be skipped due to open_count being decremented after
-calling close_device() in the error path.
+v4: https://lore.kernel.org/kvm/20221104195727.4629-1-ajderossi@gmail.com/
 
-After commit eadd86f835c6 ("vfio: Remove calls to
-vfio_group_add_container_user()"), releasing a device would always skip
-the reset due to an ordering change in vfio_device_fops_release().
-
-Failing to reset the device leaves it in an unknown state, potentially
-causing errors when it is bound to a different driver.
-
-This issue was observed with a Radeon RX Vega 56 [1002:687f] (rev c3)
-assigned to a Windows guest. After shutting down the guest, unbinding
-the device from vfio-pci, and binding the device to amdgpu:
-
-[  548.007102] [drm:psp_hw_start [amdgpu]] *ERROR* PSP create ring failed!
-[  548.027174] [drm:psp_hw_init [amdgpu]] *ERROR* PSP firmware loading failed
-[  548.027242] [drm:amdgpu_device_fw_loading [amdgpu]] *ERROR* hw_init of IP block <psp> failed -22
-[  548.027306] amdgpu 0000:0a:00.0: amdgpu: amdgpu_device_ip_init failed
-[  548.027308] amdgpu 0000:0a:00.0: amdgpu: Fatal error during GPU init
-
-Fixes: 2cd8b14aaa66 ("vfio/pci: Move to the device set infrastructure")
-Fixes: eadd86f835c6 ("vfio: Remove calls to vfio_group_add_container_user()")
-Signed-off-by: Anthony DeRossi <ajderossi@gmail.com>
----
- drivers/vfio/pci/vfio_pci_core.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index badc9d828cac..e65c70781fe2 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -2488,12 +2488,12 @@ static bool vfio_pci_dev_set_needs_reset(struct vfio_device_set *dev_set)
- 	struct vfio_pci_core_device *cur;
- 	bool needs_reset = false;
- 
--	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
--		/* No VFIO device in the set can have an open device FD */
--		if (cur->vdev.open_count)
--			return false;
-+	/* No other VFIO device in the set can be open. */
-+	if (dev_set->open_count > 1)
-+		return false;
-+
-+	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list)
- 		needs_reset |= cur->needs_reset;
--	}
- 	return needs_reset;
- }
- 
--- 
-2.37.4
-
+Anthony
