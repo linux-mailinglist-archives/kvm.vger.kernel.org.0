@@ -2,136 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 17FE761A628
-	for <lists+kvm@lfdr.de>; Sat,  5 Nov 2022 00:58:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0EAC61A64B
+	for <lists+kvm@lfdr.de>; Sat,  5 Nov 2022 01:07:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229545AbiKDX6y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Nov 2022 19:58:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37988 "EHLO
+        id S229523AbiKEAHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Nov 2022 20:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiKDX6x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Nov 2022 19:58:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 207CD419B6
-        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 16:57:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667606278;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZnzJmimE900iiRy7VTWPGN9EpNmm/Y1LD4I/QC6tB0Q=;
-        b=JPAcdJx6TKr3yek8G/LwnDJQQZDMOgViSG17nENe6z1o9mRj3pfVYEBzDZu1NTwe21dz2N
-        MB0WUnv5V5mZZyjqUTK80vsWABDrhQHZ1eyO//SPsPodnifv4rumDi/nwsd6UwNILcWpNs
-        y7vgwtUwVBYIU3EN9z+jAMOwf+HR5Ts=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-196-T678CyveNP-D_kNb-7hxrA-1; Fri, 04 Nov 2022 19:57:57 -0400
-X-MC-Unique: T678CyveNP-D_kNb-7hxrA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 20CF785A583;
-        Fri,  4 Nov 2022 23:57:46 +0000 (UTC)
-Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 343EFC16932;
-        Fri,  4 Nov 2022 23:57:26 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v3 0/6] KVM: selftests: memslot_perf_test: aarch64
- cleanup/fixes
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
-        ajones@ventanamicro.com, kvmarm@lists.linux.dev, shuah@kernel.org,
-        peterx@redhat.com, oliver.upton@linux.dev, seanjc@google.com,
-        ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-References: <20221020071209.559062-1-gshan@redhat.com>
- <91d563b6-5f1c-5ecc-0a40-7d8838770b22@maciej.szmigiero.name>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <ee1167f3-5b43-55a9-c815-b759d243dc4e@redhat.com>
-Date:   Sat, 5 Nov 2022 07:57:24 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S229450AbiKEAHg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Nov 2022 20:07:36 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09EDA317F8;
+        Fri,  4 Nov 2022 17:07:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667606855; x=1699142855;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=SK2sI5aDoV9/etevfTVRBjvDW9ZuCS66qUATN3sgJBw=;
+  b=ayEmehNwuQ/zjz1ydkXJ7oAEdaPl42r03VNwDT7lLUrh21bhAA46/DbQ
+   0YLA0aRb1FjWYgpb7tJmwiz8i3Xud/6tgHQFfN0XgRX970+dsMXfvCQlX
+   poPUIRZXR+yEPpvr1xFh3R9c/UqHkD3WyPa17HmkUzNCAMX2hC6+YpKQy
+   ayNN+yKvjMwBdnddCX0K6jH7VoRaFHsa1O/RK/sK6ZpEEm7AbNk05ZhcY
+   1xtW3Vdg3u3X4N6/74dkes1/vQLezkGF4YVkFbDdxtee3DSii9GwKeUfQ
+   a7E6ncv8pgiDv3TKNhSCPHXXJ6IfstaUVLV6V5xQHBF6GTV6TAUywMu/z
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10521"; a="293432643"
+X-IronPort-AV: E=Sophos;i="5.96,139,1665471600"; 
+   d="scan'208";a="293432643"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2022 17:07:34 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10521"; a="760501944"
+X-IronPort-AV: E=Sophos;i="5.96,139,1665471600"; 
+   d="scan'208";a="760501944"
+Received: from ztao-mobl.ccr.corp.intel.com (HELO [10.254.213.180]) ([10.254.213.180])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2022 17:07:26 -0700
+Message-ID: <2d2b467b-da07-2b96-27c9-569b727dd8c9@linux.intel.com>
+Date:   Sat, 5 Nov 2022 08:07:24 +0800
 MIME-Version: 1.0
-In-Reply-To: <91d563b6-5f1c-5ecc-0a40-7d8838770b22@maciej.szmigiero.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Cc:     baolu.lu@linux.intel.com,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v3 14/15] iommufd: vfio container FD ioctl compatibility
+To:     Jason Gunthorpe <jgg@nvidia.com>, bpf@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>
+References: <14-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <14-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/25/22 7:18 AM, Maciej S. Szmigiero wrote:
-> On 20.10.2022 09:12, Gavin Shan wrote:
->> kvm/selftests/memslots_perf_test doesn't work with 64KB-page-size-host
->> and 4KB-page-size-guest on aarch64. In the implementation, the host and
->> guest page size have been hardcoded to 4KB. It's ovbiously not working
->> on aarch64 which supports 4KB, 16KB, 64KB individually on host and guest.
->>
->> This series tries to fix it. After the series is applied, the test runs
->> successfully with 64KB-page-size-host and 4KB-page-size-guest.
->>
->>     # ./memslots_perf_tests -v -s 512
->>
->> Since we're here, the code is cleaned up a bit as PATCH[1-3] do. The
->> other patches are fixes to handle the mismatched host/guest page
->> sized.
->>
->> v1: https://lore.kernel.org/kvmarm/20221014071914.227134-1-gshan@redhat.com/T/#t
->> v2: https://lore.kernel.org/kvmarm/20221018040454.405719-1-gshan@redhat.com/T/#t
->>
->> Changelog
->> =========
->> v3:
->>    * Improved comments about MEM_TEST_MOVE_SIZE, which is set
->>      to 64KB in PATCH[v3 4/6] and finally fixed to 192KB in
->>      PATCH[v3 5/6].                                              (Maciej)
->>    * Use size instead of pages to do the comparison in
->>      test_memslot_move_prepare()                                 (Maciej)
->>    * Use tools/include/linux/sizes.h instead of inventing
->>      our own macros.                                             (Oliver)
->> v2:
->>    * Pick the smaller value between the ones specified by
->>      user or probed from KVM_CAP_NR_MEMSLOTS in PATCH[v2 3/6]    (Maciej)
->>    * Improved comments about MEM_TEST_MOVE_SIZE in
->>      PATCH[v2 4/6]                                               (Maciej)
->>    * Avoid mismatched guest page size after VM is started in
->>      prepare_vm() in PATCH[v2 4/6]                               (Maciej)
->>    * Fix condition to check MEM_TEST_{UNMAP, UNMAP_CHUNK}_SIZE
->>      in check_memory_size() in PATCH[v2 4/6]                     (Maciej)
->>    * Define base and huge page size in kvm_util_base.h in
->>      PATCH[v2 5/6]                                               (Sean)
->>    * Add checks on host/guest page size in check_memory_size()
->>      and fail early if any of them exceeds 64KB in PATCH[v2 5/6] (Maciej)
->>
->>
->> Gavin Shan (6):
->>    KVM: selftests: memslot_perf_test: Use data->nslots in prepare_vm()
->>    KVM: selftests: memslot_perf_test: Consolidate loop conditions in
->>      prepare_vm()
->>    KVM: selftests: memslot_perf_test: Probe memory slots for once
->>    KVM: selftests: memslot_perf_test: Support variable guest page size
->>    KVM: selftests: memslot_perf_test: Consolidate memory
->>    KVM: selftests: memslot_perf_test: Report optimal memory slots
->>
-> 
-> This patch set now looks good to me, so for the whole series:
-> Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> 
+On 2022/10/26 2:12, Jason Gunthorpe wrote:
+> +static int iommufd_fill_cap_iova(struct iommufd_ioas *ioas,
+> +				 struct vfio_info_cap_header __user *cur,
+> +				 size_t avail)
+> +{
+> +	struct vfio_iommu_type1_info_cap_iova_range __user *ucap_iovas =
+> +		container_of(cur,
+> +			     struct vfio_iommu_type1_info_cap_iova_range __user,
+> +			     header);
+> +	struct vfio_iommu_type1_info_cap_iova_range cap_iovas = {
+> +		.header = {
+> +			.id = VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE,
+> +			.version = 1,
+> +		},
+> +	};
+> +	struct interval_tree_span_iter span;
 
-Thanks for your time on reviews, Maciej. The broken test case was reported
-in our downstream Linux, which means our downstream linux needs the improvements
-and fixes to make the test case working.
+Intel 0day robot reported:
 
-Thanks,
-Gavin
+commit: 954c5e0297d664c7f46c628b3151567b53afe153 [14/15] iommufd: vfio 
+container FD ioctl compatibility
+config: m68k-randconfig-s053-20221104 (attached as .config)
+compiler: m68k-linux-gcc (GCC) 12.1.0
+reproduce:
+         wget 
+https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross 
+-O ~/bin/make.cross
+         chmod +x ~/bin/make.cross
+         # apt-get install sparse
+         # sparse version: v0.6.4-39-gce1a6720-dirty
+         git remote add internal-blu2-usb 
+git://bee.sh.intel.com/git/blu2/usb.git
+         git fetch --no-tags internal-blu2-usb iommu/iommufd/v3
+         git checkout 954c5e0297d664c7f46c628b3151567b53afe153
+         # save the config file
+         mkdir build_dir && cp config build_dir/.config
+         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross 
+C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=m68k 
+SHELL=/bin/bash drivers/iommu/iommufd/
 
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+
+sparse warnings: (new ones prefixed by >>)
+ >> drivers/iommu/iommufd/vfio_compat.c:294:17: sparse: sparse: cast 
+removes address space '__user' of expression
+
+vim +/__user +294 drivers/iommu/iommufd/vfio_compat.c
+
+    288	
+    289	static int iommufd_fill_cap_iova(struct iommufd_ioas *ioas,
+    290					 struct vfio_info_cap_header __user *cur,
+    291					 size_t avail)
+    292	{
+    293		struct vfio_iommu_type1_info_cap_iova_range __user *ucap_iovas =
+  > 294			container_of(cur,
+    295				     struct vfio_iommu_type1_info_cap_iova_range __user,
+    296				     header);
+    297		struct vfio_iommu_type1_info_cap_iova_range cap_iovas = {
+    298			.header = {
+    299				.id = VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE,
+    300				.version = 1,
+    301			},
+    302		};
+    303		struct interval_tree_span_iter span;
+    304	
+    305		interval_tree_for_each_span(&span, &ioas->iopt.reserved_itree, 0,
+    306					    ULONG_MAX) {
+    307			struct vfio_iova_range range;
+    308	
+    309			if (!span.is_hole)
+    310				continue;
+    311			range.start = span.start_hole;
+    312			range.end = span.last_hole;
+    313			if (avail >= struct_size(&cap_iovas, iova_ranges,
+    314						 cap_iovas.nr_iovas + 1) &&
+    315			    copy_to_user(&ucap_iovas->iova_ranges[cap_iovas.nr_iovas],
+    316					 &range, sizeof(range)))
+    317				return -EFAULT;
+    318			cap_iovas.nr_iovas++;
+    319		}
+    320		if (avail >= struct_size(&cap_iovas, iova_ranges, 
+cap_iovas.nr_iovas) &&
+    321		    copy_to_user(ucap_iovas, &cap_iovas, sizeof(cap_iovas)))
+    322			return -EFAULT;
+    323		return struct_size(&cap_iovas, iova_ranges, cap_iovas.nr_iovas);
+    324	}
+    325	
+
+Best regards,
+baolu
