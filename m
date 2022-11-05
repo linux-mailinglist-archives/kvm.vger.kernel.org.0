@@ -2,160 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14D5F61A6C6
-	for <lists+kvm@lfdr.de>; Sat,  5 Nov 2022 02:49:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8FC461A797
+	for <lists+kvm@lfdr.de>; Sat,  5 Nov 2022 05:57:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229609AbiKEBs6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Nov 2022 21:48:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37840 "EHLO
+        id S229589AbiKEE5N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Nov 2022 00:57:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbiKEBs5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Nov 2022 21:48:57 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E0972252A;
-        Fri,  4 Nov 2022 18:48:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=9U5xi3PcgZdoJ36o8T9jPl/wvWDSsiwJ5sUl4RJdjZk=; b=ePD8DfII+AqMG+pbpQoEpH39TY
-        s+hVP+5iEsxjJ8oU86NNuGgxNscBI7RVuaMQbhuxsUyc/NKsegOoKTu/d3lCJQEInm5686UJ6Wa2e
-        p0O0X1IJWg4TguqnCcpF2gp22n3prg5INmSuVElNXeIumuzFhWMKz93GgmUd124H5vWdo9DX2GC/Q
-        L6RAQPhrX291UPkprEzJu1CtIYExY65loSeybACFw2S2XzgqwWva6KN++Siq3RaGhJlXWgJofVPCm
-        v29GnWL13GD+OZXJbOGFp2kJC0vlR+ZkeoBgCdlerynfZczDbJysumW3Tp8rsw/r4ky5ORlT1kUl/
-        ze9pMWlA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1or8IR-007rC4-5c; Sat, 05 Nov 2022 01:48:31 +0000
-Date:   Sat, 5 Nov 2022 01:48:31 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v3 03/15] interval-tree: Add a utility to iterate over
- spans in an interval tree
-Message-ID: <Y2XA702nWRGfP7mo@casper.infradead.org>
-References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
- <3-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
- <BN9PR11MB527666424E77F8417DF1BF4C8C389@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Y2VqK3m9i6FlQd9+@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y2VqK3m9i6FlQd9+@nvidia.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229542AbiKEE5L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Nov 2022 00:57:11 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33AE131DEE
+        for <kvm@vger.kernel.org>; Fri,  4 Nov 2022 21:57:10 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id x8-20020aa79568000000b0056dd717e051so3308706pfq.11
+        for <kvm@vger.kernel.org>; Fri, 04 Nov 2022 21:57:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XzQ/JwtPWhSrAT5jdOi7rv7mHMX+sB3nOWPz6ecV840=;
+        b=Mujmrs7ffOhJTdpBZz7thLFAW5rIFh8MtxNsLNnm4mofYyhJlK6EPvWWrPS22HQPWU
+         SM204oFfX/dt8Oy3Ac/XGkQ+CPqooalXTlCdIWktoNaxCKC4hR4xA/tcDx9eywbgjTeX
+         T7wKtVlmFDfLtinFb/MXKllVWRMMZZDTV6OjBynXPboYtEhoq7wRzp8sFoP1jNfm0/2j
+         lfReFTq0wHLbUmwrGtUVFbD/mCqwtP0gM4jryw67RV5gJOOlRAGIkVU1lCrfh6F9Y+bi
+         +QRaXBngV+YkmZB3n0QSUpLG67icQTtFQihZJaC6/4mTUwRKvuTrukGbiME4+WMRfMio
+         zwoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XzQ/JwtPWhSrAT5jdOi7rv7mHMX+sB3nOWPz6ecV840=;
+        b=RWhDjqpgMLnV+A4AJT/87oq89zQJtpAWBxLCEnj02Zl9UV9VUEEVlL9qDwEw8iFKhi
+         lUvkgzaVArWrUUpcQlG6PxfG+tM/lQMWlAhfe/OwqZqWA+MaUs8/23li+HBcGi8XUi1q
+         bjRw7E6y2tnJ63f7kA8+WE29yk2pZnAA02pWRP1yr0ZlFVYn8uBqYVJ/Gou7bTUm9uO5
+         KLlKJVExxnGUjBdGWhYfW3rjloUdPmA4Z9TmhQ5a2/gWtG9bRbmhLNR0QvTYMozu19QH
+         sg+6DOVZHXcWweKjqq37cssp13dPrNGEFZGtiWzH/SdD6sdK7SZ33xkHELJmAFsLGTkY
+         YtGA==
+X-Gm-Message-State: ACrzQf0N9sGejukrid6Zh2uvWHaeLU11GTsvPbcCYVP6wjPU9W4xqnF7
+        jvJHTdhix+Rf0wh2DTntWvknogsTOdyC
+X-Google-Smtp-Source: AMsMyM6JziBXYGDsP00lbMCuca3QR+oGSfuT6bcd7s6s4XJhNqTeqfuaOhWcgh+QMDTzlmYpMvEokz7tLFsF
+X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
+ (user=vipinsh job=sendgmr) by 2002:a17:90a:7348:b0:213:2708:8dc3 with SMTP id
+ j8-20020a17090a734800b0021327088dc3mr1066872pjs.2.1667624229329; Fri, 04 Nov
+ 2022 21:57:09 -0700 (PDT)
+Date:   Fri,  4 Nov 2022 21:56:58 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
+Message-ID: <20221105045704.2315186-1-vipinsh@google.com>
+Subject: [PATCH 0/6] Add Hyper-v extended hypercall support in KVM
+From:   Vipin Sharma <vipinsh@google.com>
+To:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com
+Cc:     dmatlack@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 04, 2022 at 04:38:19PM -0300, Jason Gunthorpe wrote:
-> On Thu, Nov 03, 2022 at 05:31:17AM +0000, Tian, Kevin wrote:
-> > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Wednesday, October 26, 2022 2:12 AM
-> > > +/*
-> > > + * This iterator travels over spans in an interval tree. It does not return
-> > > + * nodes but classifies each span as either a hole, where no nodes intersect,
-> > > or
-> > > + * a used, which is fully covered by nodes. Each iteration step toggles
-> > > between
-> > > + * hole and used until the entire range is covered. The returned spans
-> > > always
-> > > + * fully cover the requested range.
-> > > + *
-> > > + * The iterator is greedy, it always returns the largest hole or used possible,
-> > > + * consolidating all consecutive nodes.
-> > > + *
-> > > + * Only is_hole, start_hole/used and last_hole/used are part of the external
-> > > + * interface.
-> > 
-> > slightly better readability if moving this sentence into the structure as
-> > the break line
-> 
-> Do you mean like this?
-> 
-> @@ -37,13 +37,16 @@ interval_tree_iter_next(struct interval_tree_node *node,
->   * The iterator is greedy, it always returns the largest hole or used possible,
->   * consolidating all consecutive nodes.
-> - *
-> - * Only is_hole, start_hole/used and last_hole/used are part of the external
-> - * interface.
->   */
->  struct interval_tree_span_iter {
->  	struct interval_tree_node *nodes[2];
->  	unsigned long first_index;
->  	unsigned long last_index;
-> +
-> +	/*
-> +	 * Only is_hole, start_hole/used and last_hole/used are part of the
-> +	 * external interface.
-> +	 */
->  	union {
->  		unsigned long start_hole;
->  		unsigned long start_used;
+This patch series adds Hyper-V extended hypercall support. All
+hypercalls will exit to userspace if CPUID.0x40000003.EBX BIT(20) is
+set.
 
-Or you could kernel-doc it ...
+Patch 4 and 5 are prep patches, they move some code to hyperv.h later
+used by newly introduced test hyperv_extended_hcalls in Patch 6.
 
-/**
- * struct interval_tree_span_iter - Find used and unused spans.
- * @start_hole: ...
- * @start_used: ...
- ...
- *
- * This iterator travels over spans in an interval tree. It does not return
- * nodes but classifies each span as either a hole, where no nodes intersect,
- * or as used, which is fully covered by nodes. Each iteration step
- * alternates between hole and used until the entire range is covered. The
- * returned spans always fully cover the requested range.
- *
- * The iterator is greedy, it always returns the largest span possible,
- * consolidating all consecutive nodes.
- */
-struct interval_tree_span_iter {
-	/* private: not for use by the caller */
- 	struct interval_tree_node *nodes[2];
- 	unsigned long first_index;
- 	unsigned long last_index;
-	/* public: */
-	union {
-		unsigned long start_hole;
-		unsigned long start_used;
-...
-};
+RFC: https://lore.kernel.org/lkml/20221021185916.1494314-1-vipinsh@google.com/
+
+Vipin Sharma (6):
+  KVM: x86: hyper-v: Use common code for hypercall userspace exit
+  KVM: x86: hyper-v: Add extended hypercall support in Hyper-v
+  KVM: selftests: Test Hyper-V extended hypercall enablement
+  KVM: selftests: Make Hyper-V guest OS ID common
+  KVM: selftests: Move hypercall() to hyper.h
+  KVM: selftests: Test Hyper-V extended hypercall exit to userspace
+
+ arch/x86/kvm/hyperv.c                         | 43 +++++----
+ tools/testing/selftests/kvm/.gitignore        |  1 +
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../selftests/kvm/include/x86_64/hyperv.h     | 31 +++++++
+ .../selftests/kvm/x86_64/hyperv_clock.c       |  2 +-
+ .../kvm/x86_64/hyperv_extended_hcalls.c       | 90 +++++++++++++++++++
+ .../selftests/kvm/x86_64/hyperv_features.c    | 32 +++----
+ .../selftests/kvm/x86_64/hyperv_svm_test.c    |  2 +-
+ 8 files changed, 163 insertions(+), 39 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_extended_hcalls.c
+
+-- 
+2.38.1.273.g43a17bfeac-goog
 
