@@ -2,73 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D630861DA47
-	for <lists+kvm@lfdr.de>; Sat,  5 Nov 2022 13:40:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E305261DBB8
+	for <lists+kvm@lfdr.de>; Sat,  5 Nov 2022 16:42:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229935AbiKEMkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 5 Nov 2022 08:40:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40092 "EHLO
+        id S229992AbiKEPmB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 5 Nov 2022 11:42:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229951AbiKEMjt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 5 Nov 2022 08:39:49 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B7F3178A4
-        for <kvm@vger.kernel.org>; Sat,  5 Nov 2022 05:39:48 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id b1-20020a17090a7ac100b00213fde52d49so6673667pjl.3
-        for <kvm@vger.kernel.org>; Sat, 05 Nov 2022 05:39:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:to:subject:message-id:date:from:reply-to
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=c8XA1N0uaxkLO/wKHErNWHaSuu64k5Pjb5u9dmcZrOc=;
-        b=mu8m7znM9duu/MEuox3wxE9uI+enJzfHDrHCiCJ0dxXEnbtqlugP30RV4pUA4LaD8D
-         DTqzL6R3iJdygnN0tebcl2jKMC1xnk2qmH9yHj5ZpYJsig0zgAkFbQEJMtQOsyMS9E9+
-         9mZsd+BXbCYizoNZILloIeJgVKBYQDDlfcxWmhtehgP0gShVz6QbysTuA73O0zNW89oN
-         M95vp9qd39mlLDduLYXTQkqHXtcuCB6sr4c0ysKpoCTw5s/vT8zmw06SHC/DLusZ9o66
-         sNkDbmLIhAcJBtA+VmbRSjB+l+4rXBDt3pKOG75zF9L+vjSBjo5n2zZjo+rRsufLH5jZ
-         6xmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:to:subject:message-id:date:from:reply-to
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c8XA1N0uaxkLO/wKHErNWHaSuu64k5Pjb5u9dmcZrOc=;
-        b=ZbTxTqvyhnOUbvAIcVSYHKR1oRuQLBg53Phj/WvfVBfe0jLBd8YBHWMzw82Br0iDzO
-         tthH8nLp2fuVJCkgxfgoOrqcC8BJh9DiJElNP8nXX7+FBkhh8W9zV1WAaaYodarwTfjo
-         ww7g62hOp+ePT1qt2pwc+18WFveU9ig27I0g394N7DpNwQ5AjfDJGHY9YKD+IKa4mebh
-         ilhTKEI+9qYgwsiGXfxilyZJmehOnWFx2ZYQxDcWLSh61ZF05DVJLhFkN3ATm/eqh/O4
-         yPzw+BRRBYkWMVJgTi0wNcXYdR+J4opCtveh4/3Sj5t8cZRCvyLkHLm16EEKOrvViBGk
-         Asnw==
-X-Gm-Message-State: ACrzQf10qWLLJL3IDRsIIgHnJyzRWddQoFt+FQzHJntE/YeryU/VAccy
-        bAEp/OgoRcLYZV2IwdrGDy1MDO6Z/MnCOKT1HX4=
-X-Google-Smtp-Source: AMsMyM5GFe2gsiMaHXHXvp99K7JeNN2UuK6dELDyLpsoJjIUkQcn4q3aD74FbKEapmwctM2YF8x1D4LMLHeg4fM3LVk=
-X-Received: by 2002:a17:90b:4ac3:b0:213:3918:f276 with SMTP id
- mh3-20020a17090b4ac300b002133918f276mr57022678pjb.19.1667651987563; Sat, 05
- Nov 2022 05:39:47 -0700 (PDT)
+        with ESMTP id S229885AbiKEPl7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 5 Nov 2022 11:41:59 -0400
+Received: from bg4.exmail.qq.com (bg4.exmail.qq.com [43.155.67.158])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6825D116;
+        Sat,  5 Nov 2022 08:41:56 -0700 (PDT)
+X-QQ-mid: bizesmtp73t1667662912ts7owgay
+Received: from localhost.localdomain ( [182.148.13.29])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Sat, 05 Nov 2022 23:41:44 +0800 (CST)
+X-QQ-SSF: 01000000002000D0E000B00A0000000
+X-QQ-FEAT: D6RqbDSxuq55pyzvV3rN3fwltv+7QPqxZ+JJZ7eLlMGfSyvB+T2foKajoIi96
+        vgWSQ2veEx+nmZqrqZL1X4EBAv3kp+C86c7tEC1VNnIy1/cdLk7Mw1Q8c7J6j6gCMZwiMJ8
+        NMV7wBDEAafW82NV91X2TkFBe7++4Xb/4aSRLjiDybqFVHzOUZ4UfvPdSonC10+iHjs1jp5
+        vLDI/w/W8hTrkcPSmfONHeaDI9a9/rudGO2hJxb/8e+ZrSbRVhenDruD75TypDJfpRGOM2K
+        L5Hx5LJ6AI7BcXFTCTUs9twIUC1NSDeX2fS0uJa+stS9/J0K195sI3po2h3afjOZhOyxTfp
+        tSeBm1EEe19mmaSb48Khdb5rSzEwQnJxF8aLlgaEgRuho2d/Oxj6KPYaQkXSg==
+X-QQ-GoodBg: 0
+From:   Shaomin Deng <dengshaomin@cdjrlc.com>
+To:     pbonzini@redhat.com, shuah@kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Shaomin Deng <dengshaomin@cdjrlc.com>
+Subject: [PATCH] KVM: selftests: Delete the semicolon after curly braces
+Date:   Sat,  5 Nov 2022 11:41:42 -0400
+Message-Id: <20221105154142.9003-1-dengshaomin@cdjrlc.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Received: by 2002:a05:7301:2e91:b0:83:922d:c616 with HTTP; Sat, 5 Nov 2022
- 05:39:47 -0700 (PDT)
-Reply-To: stefanopessia755@hotmail.com
-From:   Stefano Pessina <wamathaibenard@gmail.com>
-Date:   Sat, 5 Nov 2022 15:39:47 +0300
-Message-ID: <CAN7bvZKO8GxFn7CG_EtS_Of+AZ+KsuqTkq40Mq-yJDNrEHyakg@mail.gmail.com>
-Subject: Geldspende
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=4.7 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLYTO,
-        FREEMAIL_REPLYTO_END_DIGIT,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: ****
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:cdjrlc.com:qybglogicsvr:qybglogicsvr4
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_MSPIKE_H2,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---=20
-Die Summe von 500.000,00 =E2=82=AC wurde Ihnen von STEFANO PESSINA gespende=
-t.
-Bitte kontaktieren Sie uns f=C3=BCr weitere Informationen =C3=BCber
-stefanopessia755@hotmail.com
+The semicolon after curly braces is not needed.
+
+Signed-off-by: Shaomin Deng <dengshaomin@cdjrlc.com>
+---
+ tools/testing/selftests/kvm/access_tracking_perf_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+index 1c2749b1481a..35f81e844e38 100644
+--- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
++++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+@@ -229,7 +229,7 @@ static void vcpu_thread_main(struct perf_test_vcpu_args *vcpu_args)
+ 		case ITERATION_MARK_IDLE:
+ 			mark_vcpu_memory_idle(vm, vcpu_args);
+ 			break;
+-		};
++		}
+ 
+ 		vcpu_last_completed_iteration[vcpu_idx] = current_iteration;
+ 	}
+-- 
+2.35.1
+
