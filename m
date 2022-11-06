@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D734E61E508
-	for <lists+kvm@lfdr.de>; Sun,  6 Nov 2022 18:48:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7704261E509
+	for <lists+kvm@lfdr.de>; Sun,  6 Nov 2022 18:48:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231297AbiKFRsA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Nov 2022 12:48:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45204 "EHLO
+        id S231314AbiKFRsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Nov 2022 12:48:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231147AbiKFRrp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230468AbiKFRrp (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 6 Nov 2022 12:47:45 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2050.outbound.protection.outlook.com [40.107.220.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02F4A6571
-        for <kvm@vger.kernel.org>; Sun,  6 Nov 2022 09:47:37 -0800 (PST)
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2070.outbound.protection.outlook.com [40.107.102.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01523657D
+        for <kvm@vger.kernel.org>; Sun,  6 Nov 2022 09:47:38 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bkyU1EpMTJ4+d5E9rn951Gvj05kqCn10a932Q9N1CKcQGy9RHxhbB78GhFILuTX0ZPPVjnkbh75nMAvelCjwuICcavbl1/u0FkrskDNrnmU80QnawW3D5yt1V4RKNgrwVsiT1qF/chzm5lbYI/HENOMQ7EWXk1ON4oSEmlkLHC6nhrvUqEIqvScVdiAINp8sa7LmC1LfzZYm4FpMXh+nszZTGaMHi7bBMJlbmYk+SvN6sz42Ag9uXGTVpMWWLsyIcuhIRN+eOj4R+VYIUynhL09oYJPvsRSlahL0iprKDQYo+ImZqvzFdYhCve741VDlcnFPFBF4FHlx5DQ2iIsvhQ==
+ b=NUMhRKj0aYe+XkUoKbJ2NB8ZdQWs2fLS62kCIvxms8z2FokCMbOrrpHChauVPRscfAeemVbbrcHpS0HuDd4DSljVFXRKJjcibUN117aBj4oFuzV6lh8mb4ytW61rf3P/o3vs7zmH3+FNBo78Vv0A7J4pM8RLjD743Iz+QRhogFz3ei34REjpE0YwBy5GGsLQ+yuj8P8KBMfdsPAOndYE+R/M0GgiN+8m6KFHtqOrb33gnCsMdkngGRcIFZhY4QqpQytTjDbBUwaUolV13eRgIbZWvokFGM7J1PatW3X+Q+3lYP1Z1fVwNjQEP90nRFupK3zNhZVZF/JNax5ndXWTKA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JcmuycdpkEmt2Q1yqZWh0X9ViiwkmDSrVhQQomAWY6E=;
- b=FHnb6rWJkRz2hmfH1yoGBhT0br624sHMlkb3eBwna/ejvnrTmxNjs4WSHQXbJBlxN8Zf5BO0+V7mNhZhW6yJy3Z4hXfz+yOgKcbptduT8opjl+IGFKTmlm/VBEz48MwzJXGurVeItSSBBDVlp7mTXZVwWmuVqkgLNJv8EyIfU78wEV3qKUbmya2Aw6WyleuMerX6W1ncXyCF23VbMGnfjuqwOSFGg64Dx8qeH/ciL8A3VLuCHT8H2WgFC4THBUOjt/XE09pp8YAMubCKo9zysXPCjcFXTAajSoMOs66nC78wysdMwBdED8ViwcQVDeQBW4rE5yYnmoG3wvf6nwAqcw==
+ bh=sCZMaXfF/czc2VaRVZLUMNEQLdeNsGTaq65WXvaUMW4=;
+ b=M9wfT8Eq/0AjhAsAD8ITwugUWMQWDnWQ9FMRqH/ZaPfV2Pl3yiVAu7ej65tJKaAokkf93RFnZJcY+WO8+tfZdYpeT31ao8Lv8NDH8U0mc62eYZ1Pt0TexuiGSN1mHbimWbC8+wcNdklmtSfOKcz4OEIPg0co4GFpMmSJznS4IRwRT92C5lULjcjolcJIVFUD3HukL1LD5paVtcDXwihxjfhT+EvJeH3ti/i2YXBfUEFN4jIeSpodZrQSQTlZPPzPdjyTRkME5zpHWTZoY9Op/9Jdwb4rc7+Vwfzy1sz7wvPYARvPZ5rIYrCwznE1pZaLojQwTHV4MMDUMrRyxh1VQQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.118.233) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -28,18 +28,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JcmuycdpkEmt2Q1yqZWh0X9ViiwkmDSrVhQQomAWY6E=;
- b=kxoJPYb5noh6p+IkR2B2twQ26Bh4hvhCTDW0NXJlEulCiTRmF5DiLI72fG3W04IqFm/QWP2hucyHHYZIJjnrQP6nA0cgGUPsM/BG4bkbRKgEFMIeYZgJcH8jS8k5UrEsMvTLxu+1lBl3nniT1tjxrHRHn3py8ogU+9uTTqqEM9uJLw7ZYDQM66hqHArW4lj9WHDmp1uNZbswNxN3GTfAzL61/JezBxl3RCgdoJ7rwhs3ZaJqg01vVZyy48t9JpNDsNEjO/G+2ctHqggOvyzr+O6nB9hb9L2z+0byGw2s3ZZ9TeexEcKAwbpt6+mRh0h6Y3ZBd+/FDSCXzqDPTok6cw==
-Received: from DM6PR08CA0048.namprd08.prod.outlook.com (2603:10b6:5:1e0::22)
- by DM4PR12MB5216.namprd12.prod.outlook.com (2603:10b6:5:398::18) with
+ bh=sCZMaXfF/czc2VaRVZLUMNEQLdeNsGTaq65WXvaUMW4=;
+ b=X+WhRrVzov+qhkKYpkB8A7kXBW0EKUMgz6LKbL8i5JClZpQFXyw7Ul3nzlb/9dY1thtFeTpa9SedlxOM9QOIuLEtqk5ub55DNkYFoH8rDHAvKE0DJwAU0T0sgGp+UNvHa1n/ZXx4yNpAaCAgK+aeYq5MlnzYzadd+cWohJdUzl8cO8uDeB49oyQ02SBfAqRxenmhTYasRGvoR+lt6/yZJR1RZA8l7KngNeSXcf5txDOZ9jFBjqUz7yHRopD2olpMJ6d/D0iRAv5NppyvlV9taNJ2wlq2+gSFBqmXLTAA5OuJqNH8OgnoaK24QAySJelLid3IZU6N+rTLFT51UhX/ZQ==
+Received: from DM6PR08CA0059.namprd08.prod.outlook.com (2603:10b6:5:1e0::33)
+ by CH0PR12MB5330.namprd12.prod.outlook.com (2603:10b6:610:d5::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.19; Sun, 6 Nov
- 2022 17:47:34 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.25; Sun, 6 Nov
+ 2022 17:47:36 +0000
 Received: from DM6NAM11FT058.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:1e0:cafe::cf) by DM6PR08CA0048.outlook.office365.com
- (2603:10b6:5:1e0::22) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:5:1e0:cafe::d) by DM6PR08CA0059.outlook.office365.com
+ (2603:10b6:5:1e0::33) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.25 via Frontend
- Transport; Sun, 6 Nov 2022 17:47:34 +0000
+ Transport; Sun, 6 Nov 2022 17:47:36 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -49,27 +49,27 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
 Received: from mail.nvidia.com (216.228.118.233) by
  DM6NAM11FT058.mail.protection.outlook.com (10.13.172.216) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5791.20 via Frontend Transport; Sun, 6 Nov 2022 17:47:34 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ 15.20.5791.20 via Frontend Transport; Sun, 6 Nov 2022 17:47:36 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
  (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Sun, 6 Nov 2022
- 09:47:32 -0800
+ 09:47:35 -0800
 Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.29; Sun, 6 Nov 2022 09:47:31 -0800
+ 15.2.986.29; Sun, 6 Nov 2022 09:47:35 -0800
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
  (10.126.190.181) with Microsoft SMTP Server id 15.2.986.29 via Frontend
- Transport; Sun, 6 Nov 2022 09:47:29 -0800
+ Transport; Sun, 6 Nov 2022 09:47:32 -0800
 From:   Yishai Hadas <yishaih@nvidia.com>
 To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>
 CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
         <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
         <shayd@nvidia.com>, <yishaih@nvidia.com>, <maorg@nvidia.com>,
         <avihaih@nvidia.com>, <cohuck@redhat.com>
-Subject: [PATCH vfio 08/13] vfio/mlx5: Introduce vfio precopy ioctl implementation
-Date:   Sun, 6 Nov 2022 19:46:25 +0200
-Message-ID: <20221106174630.25909-9-yishaih@nvidia.com>
+Subject: [PATCH vfio 09/13] vfio/mlx5: Manage read() of multiple state saves
+Date:   Sun, 6 Nov 2022 19:46:26 +0200
+Message-ID: <20221106174630.25909-10-yishaih@nvidia.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20221106174630.25909-1-yishaih@nvidia.com>
 References: <20221106174630.25909-1-yishaih@nvidia.com>
@@ -78,23 +78,23 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT058:EE_|DM4PR12MB5216:EE_
-X-MS-Office365-Filtering-Correlation-Id: 00f5d856-63df-43fc-71e4-08dac01efc8c
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT058:EE_|CH0PR12MB5330:EE_
+X-MS-Office365-Filtering-Correlation-Id: e1fe64c0-438b-443e-e889-08dac01efdac
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LTpSQLhX7+Ttt+Zk8g3Q1JupD3OwRHPPxj9XBfJ+A2+bjkRvsCCDAFAoiEy5FJklJV1NXDSsErtSh/kJNzF9xUT+7diTsuZ2gjWLiII7f24UAijzu7SBoiLWoKJuyTOdtaeV4le7hbrElz+yOh/jhnRXxHwhYi4aG+6pbXwigUOhm4RrxwR6mjAdbwLKxS8DQoLbMRC5gTzdBfI+A+Eq8zaPuQnInE5ardutp0LCuX4dGi+4CZ0Y0A1eyHbHBZk/9UrL7p+aELvfnj64e4qVXATPkJ8Jo1HuD8OqlC3exu9vnjcvgXPLiwm04l1FAvis/JJUL7OS5R9V4+aO2/ECQmFVK+87oIjo9od+mNjDRpdOgyCOjL/4kIpIM1x3p8e5kcokH8/yZ1xN4H67bFoyD+78Zm9+1Bq/vA9AeAX5Awa95uTfWoKVOfkIIrhBZW+XHmL44rqN/dWjxGRgof9iQ/9wc0l015+U/J9ldXinMFj1lWLpk3/wFI3HP1wLg3kDzk0qVIkH3J8g18lSmGAekMlO4oq+KCaXPocAPJWp3GbU+cQeRKiFjDn8vbmgHzEjXi/VujhKz9pp38hF3jgJ36ewRCQOI98LkPMhcTH0UWcsClVzKiaY+Xw+KZur97s0L01bfF2tJ9t8kOmr1+EObSBc+JqEZ/2gWnAjtdB224KzhT1ZGuocWS8SEu9SHm4NDey/yazkBVgvcCrFqmHy54pCvmsiGSDgrdBajNkREUZfPqyNHwCx0FAQNBoJBnW7i4i6YZNb3XkGGw7Tu2avVw==
-X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(136003)(39860400002)(396003)(376002)(346002)(451199015)(46966006)(40470700004)(36840700001)(186003)(1076003)(426003)(83380400001)(2616005)(336012)(2906002)(6666004)(36756003)(8936002)(41300700001)(316002)(7696005)(36860700001)(82310400005)(47076005)(26005)(478600001)(5660300002)(40480700001)(86362001)(70206006)(4326008)(110136005)(356005)(8676002)(6636002)(40460700003)(7636003)(82740400003)(70586007)(54906003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: vDmoFIRSQDlJseQs0mwtg7v6soPVfVUDVCPgxYZ+HR0HSqSzOJ3ddEYetiLjKh09QGEvjmmQjRHBE+bvFoJ2S2/X+gQ4pmr1uxNpBDqAXvT4W53zjLWPJlr3iwUTwQpzgHQVzcpHR6NRIF9cU//uCIURG7A5Z1CEVXcuISN1BmYNjYqZe2EzDqQTN9wYgANMOMNCiS66GxjcvDcLoAUjeFQSzQ+yIL92+nAmQZQgqUoSmJPPG/zpAW/6E+R+0VcLAZheAPmq5j8Lm8/5cp84o6SLabccFcERfvDCiquzjehILnEb3dL91E7MzZgS53bFySGav5JChOamnX2ZgdsAtDzvtvoKbBstUjs2CVTveGrg3C77EbDNmVEyWElo9WelQqqQg9Ut1jGqSD6YMPr6dtoIRlZfx3HAR5FI45k03LwcdMg1Yt3D1I3pvG/AOZ5hHB8Ek9ZRPWX+criqMnNPlXRk3LObvNA1cR/n7xn36G1Z8nbVowDZBoarzdGoErr77Q1EYVmtGRCFE5I7TH3TuF5dta5nslqrzhVVVDY3i1CTELpCwonrfwkNkdVCCzW82rUZvfCvDs9gVPXNrEbt404Tzkh45N+mc5YHHIqu9MrKQif2iVVcpNUH7wU6/5hDHhPCTnhuJ8/ug7/5skbKMWwOUXGKBUliCShx1zdoZIeKIK4tV6RjgdRVEw/kHYks5Oiqej2amSWg+7htl+rufhsNNzCM1dZaT/xrDMmAfqnD9E347ya/BuAfSq5kxx8i9dSgxorf8ult7pR4cWzAcA==
+X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(396003)(39860400002)(136003)(346002)(376002)(451199015)(40470700004)(36840700001)(46966006)(478600001)(2616005)(110136005)(6636002)(5660300002)(8936002)(36756003)(6666004)(47076005)(26005)(36860700001)(186003)(316002)(1076003)(336012)(86362001)(7696005)(426003)(40480700001)(4326008)(8676002)(70586007)(54906003)(70206006)(82740400003)(41300700001)(40460700003)(2906002)(82310400005)(356005)(83380400001)(7636003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2022 17:47:34.3398
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2022 17:47:36.2459
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00f5d856-63df-43fc-71e4-08dac01efc8c
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1fe64c0-438b-443e-e889-08dac01efdac
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT058.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5216
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5330
 X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -107,232 +107,244 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Shay Drory <shayd@nvidia.com>
 
-vfio precopy ioctl returns an estimation of data available for
-transferring from the device.
+Since all the states that were mentioned in previous patches are
+transferred over the same FD, on one hand, and mlx5 keeps one data
+structure per state, on the other hand, mlx5 needs to manage the delta
+between FD position and the current state (data structure) transferred.
 
-Whenever a user is using VFIO_MIG_GET_PRECOPY_INFO, track the current
-state of the device, and if needed, append the dirty data to the
-transfer FD data. This is done by saving a middle state.
-
-As mlx5 runs the SAVE command asynchronously, make sure to query for
-incremental data only once there is no active save command.
-Running both in parallel, might end-up with a failure in the incremental
-query command on un-tracked vhca.
-
-Also, a middle state will be saved only after the previous state has
-finished its SAVE command and has been fully transferred, this enables
-to re-use the resources.
-
-In order to map between FD position and the new saved state data, store
-the current FD position.
+Also, as mentioned in previous patch, user can switch VFIO device to
+STOP_COPY without transferring any data in PRE_COPY state. Hence, the
+delta management of the final state has a dedicated data structure.
 
 Signed-off-by: Shay Drory <shayd@nvidia.com>
 Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 ---
- drivers/vfio/pci/mlx5/cmd.c  |   9 +++
- drivers/vfio/pci/mlx5/cmd.h  |   1 +
- drivers/vfio/pci/mlx5/main.c | 131 +++++++++++++++++++++++++++++++++++
- 3 files changed, 141 insertions(+)
+ drivers/vfio/pci/mlx5/main.c | 115 ++++++++++++++++++++++++++++++-----
+ 1 file changed, 100 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
-index eb684455c2b2..2d2171191218 100644
---- a/drivers/vfio/pci/mlx5/cmd.c
-+++ b/drivers/vfio/pci/mlx5/cmd.c
-@@ -64,6 +64,15 @@ int mlx5vf_cmd_query_vhca_migration_state(struct mlx5vf_pci_core_device *mvdev,
- 	if (mvdev->mdev_detach)
- 		return -ENOTCONN;
- 
-+	/*
-+	 * In case PRE_COPY is used, saving_migf is exposed while device is
-+	 * running. Make sure to run only once there is no active save command.
-+	 * Running both in parallel, might end-up with a failure in the
-+	 * incremental query command on un-tracked vhca.
-+	 */
-+	if (query_flags & MLX5VF_QUERY_INC)
-+		wait_event(mvdev->saving_migf->save_wait,
-+			   !mvdev->saving_migf->save_cb_active);
- 	MLX5_SET(query_vhca_migration_state_in, in, opcode,
- 		 MLX5_CMD_OP_QUERY_VHCA_MIGRATION_STATE);
- 	MLX5_SET(query_vhca_migration_state_in, in, vhca_id, mvdev->vhca_id);
-diff --git a/drivers/vfio/pci/mlx5/cmd.h b/drivers/vfio/pci/mlx5/cmd.h
-index c12fa81ba53f..07a2fc54c9d8 100644
---- a/drivers/vfio/pci/mlx5/cmd.h
-+++ b/drivers/vfio/pci/mlx5/cmd.h
-@@ -30,6 +30,7 @@ struct mlx5_vf_migration_file {
- 	u8 save_cb_active:1;
- 
- 	struct sg_append_table table;
-+	size_t table_start_pos;
- 	size_t image_length;
- 	size_t allocated_length;
- 	/*
 diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-index 10e073c32ab1..266626066fed 100644
+index 266626066fed..8a5714158e43 100644
 --- a/drivers/vfio/pci/mlx5/main.c
 +++ b/drivers/vfio/pci/mlx5/main.c
-@@ -107,6 +107,22 @@ static int mlx5vf_add_migration_pages(struct mlx5_vf_migration_file *migf,
- 	return ret;
- }
+@@ -34,7 +34,7 @@ static struct mlx5vf_pci_core_device *mlx5vf_drvdata(struct pci_dev *pdev)
  
-+static void mlx5vf_prep_next_table(struct mlx5_vf_migration_file *migf)
-+{
-+	struct sg_page_iter sg_iter;
+ static struct page *
+ mlx5vf_get_migration_page(struct mlx5_vf_migration_file *migf,
+-			  unsigned long offset)
++			  unsigned long offset, struct sg_append_table *table)
+ {
+ 	unsigned long cur_offset = 0;
+ 	struct scatterlist *sg;
+@@ -43,14 +43,14 @@ mlx5vf_get_migration_page(struct mlx5_vf_migration_file *migf,
+ 	/* All accesses are sequential */
+ 	if (offset < migf->last_offset || !migf->last_offset_sg) {
+ 		migf->last_offset = 0;
+-		migf->last_offset_sg = migf->table.sgt.sgl;
++		migf->last_offset_sg = table->sgt.sgl;
+ 		migf->sg_last_entry = 0;
+ 	}
+ 
+ 	cur_offset = migf->last_offset;
+ 
+ 	for_each_sg(migf->last_offset_sg, sg,
+-			migf->table.sgt.orig_nents - migf->sg_last_entry, i) {
++			table->sgt.orig_nents - migf->sg_last_entry, i) {
+ 		if (offset < sg->length + cur_offset) {
+ 			migf->last_offset_sg = sg;
+ 			migf->sg_last_entry += i;
+@@ -161,10 +161,45 @@ static int mlx5vf_release_file(struct inode *inode, struct file *filp)
+ 	(mvdev->mig_state == VFIO_DEVICE_STATE_PRE_COPY || \
+ 	 mvdev->mig_state == VFIO_DEVICE_STATE_PRE_COPY_P2P)
+ 
++#define VFIO_PRE_COPY_SUPP(mvdev) \
++	(mvdev->core_device.vdev.migration_flags & VFIO_MIGRATION_PRE_COPY)
 +
-+	lockdep_assert_held(&migf->lock);
-+	migf->table_start_pos += migf->image_length;
-+	/* clear sgtable, all data has been transferred */
-+	for_each_sgtable_page(&migf->table.sgt, &sg_iter, 0)
-+		__free_page(sg_page_iter_page(&sg_iter));
-+	sg_free_append_table(&migf->table);
-+	memset(&migf->table, 0, sizeof(migf->table));
-+	migf->image_length = 0;
-+	migf->allocated_length = 0;
-+	migf->last_offset_sg = NULL;
++#define MIGF_HAS_DATA(migf) \
++	(READ_ONCE(migf->image_length) || READ_ONCE(migf->final_length))
++
++static size_t
++mlx5vf_final_table_start_pos(struct mlx5_vf_migration_file *migf)
++{
++	return MIGF_TOTAL_DATA(migf) - migf->final_length;
 +}
 +
- static void mlx5vf_disable_fd(struct mlx5_vf_migration_file *migf)
- {
- 	struct sg_page_iter sg_iter;
-@@ -120,6 +136,7 @@ static void mlx5vf_disable_fd(struct mlx5_vf_migration_file *migf)
- 	migf->image_length = 0;
- 	migf->allocated_length = 0;
- 	migf->final_length = 0;
-+	migf->table_start_pos = 0;
- 	migf->filp->f_pos = 0;
- 	for_each_sgtable_page(&migf->final_table.sgt, &sg_iter, 0)
- 		__free_page(sg_page_iter_page(&sg_iter));
-@@ -137,6 +154,13 @@ static int mlx5vf_release_file(struct inode *inode, struct file *filp)
- 	return 0;
- }
- 
-+#define MIGF_TOTAL_DATA(migf) \
-+	(migf->table_start_pos + migf->image_length + migf->final_length)
++static size_t mlx5vf_get_table_start_pos(struct mlx5_vf_migration_file *migf)
++{
++	return migf->table_start_pos;
++}
 +
-+#define VFIO_MIG_STATE_PRE_COPY(mvdev) \
-+	(mvdev->mig_state == VFIO_DEVICE_STATE_PRE_COPY || \
-+	 mvdev->mig_state == VFIO_DEVICE_STATE_PRE_COPY_P2P)
++static size_t mlx5vf_get_table_end_pos(struct mlx5_vf_migration_file *migf,
++				       struct sg_append_table *table)
++{
++	if (table == &migf->final_table)
++		return MIGF_TOTAL_DATA(migf);
++	return migf->table_start_pos + migf->image_length;
++}
++
++static struct sg_append_table *
++mlx5vf_get_table(struct mlx5_vf_migration_file *migf, loff_t *pos)
++{
++	if (migf->final_length &&
++	    *pos >= mlx5vf_final_table_start_pos(migf))
++		return &migf->final_table;
++	return &migf->table;
++}
 +
  static ssize_t mlx5vf_save_read(struct file *filp, char __user *buf, size_t len,
  			       loff_t *pos)
  {
-@@ -230,10 +254,117 @@ static void mlx5vf_mark_err(struct mlx5_vf_migration_file *migf)
- 	wake_up_interruptible(&migf->poll_wait);
+ 	struct mlx5_vf_migration_file *migf = filp->private_data;
++	struct sg_append_table *table;
+ 	ssize_t done = 0;
+ 
+ 	if (pos)
+@@ -173,16 +208,16 @@ static ssize_t mlx5vf_save_read(struct file *filp, char __user *buf, size_t len,
+ 
+ 	if (!(filp->f_flags & O_NONBLOCK)) {
+ 		if (wait_event_interruptible(migf->poll_wait,
+-			     READ_ONCE(migf->image_length) || migf->is_err))
++			     (MIGF_HAS_DATA(migf) || migf->is_err)))
+ 			return -ERESTARTSYS;
+ 	}
+ 
+ 	mutex_lock(&migf->lock);
+-	if ((filp->f_flags & O_NONBLOCK) && !READ_ONCE(migf->image_length)) {
++	if ((filp->f_flags & O_NONBLOCK) && !MIGF_HAS_DATA(migf)) {
+ 		done = -EAGAIN;
+ 		goto out_unlock;
+ 	}
+-	if (*pos > migf->image_length) {
++	if (*pos > MIGF_TOTAL_DATA(migf)) {
+ 		done = -EINVAL;
+ 		goto out_unlock;
+ 	}
+@@ -191,16 +226,28 @@ static ssize_t mlx5vf_save_read(struct file *filp, char __user *buf, size_t len,
+ 		goto out_unlock;
+ 	}
+ 
+-	len = min_t(size_t, migf->image_length - *pos, len);
++	/* If we reach the end of the PRE_COPY size */
++	if (MIGF_TOTAL_DATA(migf) == *pos &&
++	    VFIO_MIG_STATE_PRE_COPY(migf->mvdev)) {
++		done = -ENOMSG;
++		goto out_unlock;
++	}
++
++	len = min_t(size_t, MIGF_TOTAL_DATA(migf) - *pos, len);
++	table = mlx5vf_get_table(migf, pos);
+ 	while (len) {
++		struct sg_append_table *tmp = table;
++		unsigned long offset;
+ 		size_t page_offset;
+ 		struct page *page;
+ 		size_t page_len;
+ 		u8 *from_buff;
+ 		int ret;
+ 
+-		page_offset = (*pos) % PAGE_SIZE;
+-		page = mlx5vf_get_migration_page(migf, *pos - page_offset);
++		offset = *pos - mlx5vf_get_table_start_pos(migf);
++		page_offset = offset % PAGE_SIZE;
++		offset -= page_offset;
++		page = mlx5vf_get_migration_page(migf, offset, table);
+ 		if (!page) {
+ 			if (done == 0)
+ 				done = -EINVAL;
+@@ -208,6 +255,12 @@ static ssize_t mlx5vf_save_read(struct file *filp, char __user *buf, size_t len,
+ 		}
+ 
+ 		page_len = min_t(size_t, len, PAGE_SIZE - page_offset);
++		/*
++		 * In case an image is ended in the middle of the page, read
++		 * until the end of the image and manage it.
++		 */
++		page_len = min_t(size_t, page_len,
++				 mlx5vf_get_table_end_pos(migf, table) - *pos);
+ 		from_buff = kmap_local_page(page);
+ 		ret = copy_to_user(buf, from_buff + page_offset, page_len);
+ 		kunmap_local(from_buff);
+@@ -219,6 +272,23 @@ static ssize_t mlx5vf_save_read(struct file *filp, char __user *buf, size_t len,
+ 		len -= page_len;
+ 		done += page_len;
+ 		buf += page_len;
++		/*
++		 * In case we moved from PRE_COPY to STOP_COPY we need to prepare
++		 * migf for final state when current state was fully transferred.
++		 * Otherwise we might miss the final table and caller may get EOF
++		 * by next read().
++		 */
++		if (migf->final_table.sgt.sgl &&
++		    *pos == mlx5vf_final_table_start_pos(migf)) {
++			mlx5vf_prep_next_table(migf);
++			table = mlx5vf_get_table(migf, pos);
++			/*
++			 * Check whether the SAVE command has finished and we
++			 * have some extra data.
++			 */
++			if (tmp == table)
++				break;
++		}
+ 	}
+ 
+ out_unlock:
+@@ -237,7 +307,7 @@ static __poll_t mlx5vf_save_poll(struct file *filp,
+ 	mutex_lock(&migf->lock);
+ 	if (migf->disabled || migf->is_err)
+ 		pollflags = EPOLLIN | EPOLLRDNORM | EPOLLRDHUP;
+-	else if (READ_ONCE(migf->image_length))
++	else if (MIGF_HAS_DATA(migf))
+ 		pollflags = EPOLLIN | EPOLLRDNORM;
+ 	mutex_unlock(&migf->lock);
+ 
+@@ -380,20 +450,34 @@ static int mlx5vf_pci_save_device_inc_data(struct mlx5vf_pci_core_device *mvdev)
+ 	if (ret)
+ 		return ret;
+ 
+-	if (migf->is_err)
+-		return -ENODEV;
+-
++	mutex_lock(&migf->lock);
++	if (migf->is_err) {
++		ret = -ENODEV;
++		goto err;
++	}
++	/*
++	 * We finished transferring the current state, prepare migf for final
++	 * table. Otherwise we might miss the final table and caller may get
++	 * EOF by next read().
++	 */
++	if (migf->filp->f_pos == MIGF_TOTAL_DATA(migf))
++		mlx5vf_prep_next_table(migf);
+ 	ret = mlx5vf_add_migration_pages(
+ 		migf, DIV_ROUND_UP_ULL(length, PAGE_SIZE), &migf->final_table);
+ 	if (ret) {
+ 		mlx5vf_mark_err(migf);
+-		return ret;
++		goto err;
+ 	}
+ 
++	mutex_unlock(&migf->lock);
+ 	ret = mlx5vf_cmd_save_vhca_state(mvdev, migf, true, false);
+ 	if (ret)
+ 		mlx5vf_mark_err(migf);
+ 	return ret;
++
++err:
++	mutex_unlock(&migf->lock);
++	return ret;
  }
  
-+static ssize_t mlx5vf_precopy_ioctl(struct file *filp, unsigned int cmd,
-+				    unsigned long arg)
-+{
-+	struct mlx5_vf_migration_file *migf = filp->private_data;
-+	struct mlx5vf_pci_core_device *mvdev = migf->mvdev;
-+	bool first_state, state_finish_transfer;
-+	struct vfio_precopy_info info;
-+	loff_t *pos = &filp->f_pos;
-+	unsigned long minsz;
-+	size_t inc_length;
-+	int ret;
-+
-+	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
-+		return -ENOTTY;
-+
-+	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
-+
-+	if (copy_from_user(&info, (void __user *)arg, minsz))
-+		return -EFAULT;
-+
-+	if (info.argsz < minsz)
-+		return -EINVAL;
-+
-+	mutex_lock(&mvdev->state_mutex);
-+	if (!VFIO_MIG_STATE_PRE_COPY(migf->mvdev)) {
-+		ret = -EINVAL;
-+		goto err_state_unlock;
-+	}
-+
-+	/*
-+	 * We can't issue a SAVE command when the device is suspended, so as
-+	 * part of VFIO_DEVICE_STATE_PRE_COPY_P2P no reason to query for extra
-+	 * bytes that can't be read.
-+	 */
-+	if (mvdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY_P2P) {
-+		/*
-+		 * Once the query returns it's guaranteed that there is no
-+		 * active SAVE command.
-+		 * As so, the other code below is safe with the proper locks.
-+		 */
-+		ret = mlx5vf_cmd_query_vhca_migration_state(mvdev, &inc_length,
-+							    MLX5VF_QUERY_INC);
-+		if (ret)
-+			goto err_state_unlock;
-+	}
-+
-+	mutex_lock(&migf->lock);
-+	if (*pos > MIGF_TOTAL_DATA(migf)) {
-+		ret = -EINVAL;
-+		goto err_migf_unlock;
-+	}
-+
-+	if (migf->disabled || migf->is_err) {
-+		ret = -ENODEV;
-+		goto err_migf_unlock;
-+	}
-+
-+	first_state = migf->table_start_pos == 0;
-+	if (first_state) {
-+		info.initial_bytes = MIGF_TOTAL_DATA(migf) - *pos;
-+		info.dirty_bytes = 0;
-+	} else {
-+		info.initial_bytes = 0;
-+		info.dirty_bytes = MIGF_TOTAL_DATA(migf) - *pos;
-+	}
-+	state_finish_transfer = *pos == MIGF_TOTAL_DATA(migf);
-+	if (!(state_finish_transfer && inc_length &&
-+	      mvdev->mig_state == VFIO_DEVICE_STATE_PRE_COPY)) {
-+		mutex_unlock(&migf->lock);
-+		goto done;
-+	}
-+
-+	/*
-+	 * We finished transferring the current state and the device has a
-+	 * dirty state, save a new state to be ready for.
-+	 */
-+	mlx5vf_prep_next_table(migf);
-+	ret = mlx5vf_add_migration_pages(migf,
-+					 DIV_ROUND_UP_ULL(inc_length, PAGE_SIZE),
-+					 &migf->table);
-+	mutex_unlock(&migf->lock);
-+	if (ret) {
-+		mlx5vf_mark_err(migf);
-+		goto err_state_unlock;
-+	}
-+
-+	ret = mlx5vf_cmd_save_vhca_state(mvdev, migf, true, true);
-+	if (ret) {
-+		mlx5vf_mark_err(migf);
-+		goto err_state_unlock;
-+	}
-+
-+	info.dirty_bytes += inc_length;
-+
-+done:
-+	mlx5vf_state_mutex_unlock(mvdev);
-+	return copy_to_user((void __user *)arg, &info, minsz);
-+
-+err_migf_unlock:
-+	mutex_unlock(&migf->lock);
-+err_state_unlock:
-+	mlx5vf_state_mutex_unlock(mvdev);
-+	return ret;
-+}
-+
- static const struct file_operations mlx5vf_save_fops = {
- 	.owner = THIS_MODULE,
- 	.read = mlx5vf_save_read,
- 	.poll = mlx5vf_save_poll,
-+	.unlocked_ioctl = mlx5vf_precopy_ioctl,
-+	.compat_ioctl = compat_ptr_ioctl,
- 	.release = mlx5vf_release_file,
- 	.llseek = no_llseek,
- };
+ static struct mlx5_vf_migration_file *
+@@ -482,7 +566,8 @@ static ssize_t mlx5vf_resume_write(struct file *filp, const char __user *buf,
+ 		int ret;
+ 
+ 		page_offset = (*pos) % PAGE_SIZE;
+-		page = mlx5vf_get_migration_page(migf, *pos - page_offset);
++		page = mlx5vf_get_migration_page(migf, *pos - page_offset,
++						 &migf->table);
+ 		if (!page) {
+ 			if (done == 0)
+ 				done = -EINVAL;
 -- 
 2.18.1
 
