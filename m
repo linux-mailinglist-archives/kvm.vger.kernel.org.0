@@ -2,225 +2,359 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 838D361FDD3
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:46:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ACEC561FDEB
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:52:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232180AbiKGSqI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 13:46:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57450 "EHLO
+        id S232909AbiKGSwr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 13:52:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232161AbiKGSqH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 13:46:07 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2047.outbound.protection.outlook.com [40.107.237.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CC132497A;
-        Mon,  7 Nov 2022 10:46:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K6FMRCLqsk9BGwRDicCIe4d6rgz9HTdbSK3uGp1+qAmBNzjFNNr5gSN8UM/ZGXphpWCk6jF8RaHlwT6wavh1Cg/B+LH2TQzJCgFxUfwS41WgAYoK228OsY+FuL8nnBmy9N+y/l9XDq+CEKOws2zM8iBQsSlwU/jtOwvqS4hS+z6TrJ0m+XF44rRIeHGQHMqHW4Qxw0IoA9w2iBWGv/Za0XfVvT+mjtYJ+cUrQJ790eiRRDOJC4Xc4IhE5KlDA9GN8BkF8kzoBud3xGjDNrUn2bo/Ktf7JFDow+IKTPk7TtCcUjM6RoldUxbZeVnR4uyth9zo/e+5kzAW0Ay/Ng6cgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yfDSnX4a8rAzHrRVgGZ73tSTfv/MuQE9rCLao9Qhh7c=;
- b=NJDPWL0LbBKs7v5vFpqnGIjsj2WrwL8raMOs4vQoW9DUAiapaipBhAkM+qwGCwjb0hXuLMp5BXS3BlHszNwxwi3t0FPCpbRvc+bDm3lunJNAB49XMcI4TWEOgO4yIy4J7dFjsroGBw5Hj141jRoW7pCz2G99kA73MiPUSLMtgldqVqNKm8Kp9wWJyEnJhQJyerrgwrdStAI8rtVCCmbeqKB7od0Yan7AfdkmO0jR8KYF7eko/iR9ABowxXonRRqIeh2TmYJVimSaCMEPWoak/sY0i3E9kJN3g0waZA/5feuhtKsI+O2d3t9b0MxlIgliWv9SZmnvcDvxsTBC1O8iww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yfDSnX4a8rAzHrRVgGZ73tSTfv/MuQE9rCLao9Qhh7c=;
- b=WjZSc9s3T/bOxCd6bZFnkhxFLEA3VAg+pJVEQZwPWEWrQKM9dAhJgNuU38SvxLFxXpJMNwTu2CuLB+tv/UTM35UI7ISh9yqVfbUvCf+WQor95X9fKHreJtbq81mJeesZ8lLmM5FN9h4SB1UtUMxjCAPDG7dcRT/5kBc8DUYcr7DDC23z8hzOs4D3wopYtrTkP8FanhI4gUA1hYeAah+md6xqgfyM/wDDnErRGtVdoutfo2W/t6dDLPUojgJFZJFG09Zy91l0/Yn12at9WL0OYgbLp/bMh07vBpouG1CsFqCwtkZYBBlxF0tlbKfild1PNa9hk/1G7MJtRvMX9ir7zg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB7354.namprd12.prod.outlook.com (2603:10b6:510:20d::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.24; Mon, 7 Nov
- 2022 18:46:00 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Mon, 7 Nov 2022
- 18:46:00 +0000
-Date:   Mon, 7 Nov 2022 14:45:59 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
-        dri-devel@lists.freedesktop.org,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Longfang Liu <liulongfang@huawei.com>,
-        linux-s390@vger.kernel.org, Yi Liu <yi.l.liu@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Will Deacon <will@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Halil Pasic <pasic@linux.ibm.com>, iommu@lists.linux.dev,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org, Zhi Wang <zhi.a.wang@intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: [PATCH 04/10] vfio: Move storage of allow_unsafe_interrupts to
- vfio_main.c
-Message-ID: <Y2lSZwNT8f/RMoZf@nvidia.com>
-References: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
- <4-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
- <20221026152442.4855c5de.alex.williamson@redhat.com>
- <Y1wiCc33Jh5QY+1f@nvidia.com>
- <20221031164526.0712e456.alex.williamson@redhat.com>
- <Y2kF75zVD581UeR2@nvidia.com>
- <20221107081853.18727337.alex.williamson@redhat.com>
- <Y2klGAUEUwpjWHw6@nvidia.com>
- <20221107110508.7f02abf4.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221107110508.7f02abf4.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL0PR05CA0003.namprd05.prod.outlook.com
- (2603:10b6:208:91::13) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S232778AbiKGSwd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 13:52:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C05620F45
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 10:51:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667847091;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TwNJ5l0LenrpgzAGzR5lW9fGTrxZv+vJR+aIBTTnE5k=;
+        b=Y2sbBLBsBfnVhhOjTRoWNiI9qOfrbbA75WGzUzZW3ZSry71iO639pairEbACFdFkdQvxeJ
+        sLznqYJ7AJoH0ddUunf65DBIZuE5tCpRC/goIytGDxBRV0HQta6ySeCbaJC/q3i0yQq4PQ
+        BmrGTJOs1/qHoK56I7m9M7iPVWzu/tk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-299-IQ1FgjxyOdKpvFMYNWvLJQ-1; Mon, 07 Nov 2022 13:51:30 -0500
+X-MC-Unique: IQ1FgjxyOdKpvFMYNWvLJQ-1
+Received: by mail-wm1-f72.google.com with SMTP id z18-20020a05600c221200b003cf7fcc286aso3392277wml.1
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 10:51:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TwNJ5l0LenrpgzAGzR5lW9fGTrxZv+vJR+aIBTTnE5k=;
+        b=c88Ex7F73brFx40KHBzZw5mF34odKSlQpozdePuDsitJ9GwIxaSxaCO3JYTEbCZ46m
+         pjF9qMT5KRKumKuyNDXEIW6xin0kwzgBd0BVy7EjKtb7YfNUodGoKmSsBqO+nDRIl7Iw
+         7iugarV7VzOtY7LC9G8BQ7VQzvkGN7XMBJmv0hoTwrLIppXJ9XQklcYIHAI2fEHpVWW+
+         ydKPH2mmxcchQ+wgX8CSG5NQizXMWshKkEikSncptwT0IpGONynpDtN+Sro00FNbjsW4
+         XkRhZ6OxgFaA2PA+bPM9hDaJklfy89n6DCMdR+hgl6bzLcfqhtHk62XNcPFQJcJmyDfk
+         zPmw==
+X-Gm-Message-State: ACrzQf1fz93HRUmwTKYVN6+f6ZqeY4IWWULju2mLsFwlCp+NAJwALbC1
+        09Qlc4zYfpQkbIAUHVGYznWM88p1izpHPUNWMe3ZlUjEZmmxEi+7urFK5c33pBzmRysaCWpv34B
+        3+2TyU7/4tMbW
+X-Received: by 2002:a05:600c:1989:b0:3c6:fabb:ea73 with SMTP id t9-20020a05600c198900b003c6fabbea73mr33484449wmq.19.1667847088688;
+        Mon, 07 Nov 2022 10:51:28 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM5FqkHG4PLA7haQOcF3RqLp6ElVkM7k4uuYAslxPFp/HquyvkF9ui+ofK7m6K+27wyBlsgorw==
+X-Received: by 2002:a05:600c:1989:b0:3c6:fabb:ea73 with SMTP id t9-20020a05600c198900b003c6fabbea73mr33484433wmq.19.1667847088380;
+        Mon, 07 Nov 2022 10:51:28 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id n10-20020a5d420a000000b0023682011c1dsm7958580wrq.104.2022.11.07.10.51.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Nov 2022 10:51:27 -0800 (PST)
+Message-ID: <b4195ffb-f9ce-869b-e3d6-a6ded38d4efb@redhat.com>
+Date:   Mon, 7 Nov 2022 19:51:26 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB7354:EE_
-X-MS-Office365-Filtering-Correlation-Id: eb408cd4-7afc-40f6-28eb-08dac0f0509a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: VvXaHvZA01YOedg4vgpMZLh18/qSIAgMnBmQ6JRfZkS65JTJGa0vWAHnUQlSm0hzHOX/cvMs58CINBrwMfCm9Ee2WfS52gChNd4ifX5auzcU1nroFEHDBSppBx6tNR/DQu4QVvpwho5GYS59XOW53QOckSpowx4t8SenB9qdeFlg59txDXFpQXtSC5Z+PKUvNhncsEsMon/m7j/baAk6pI2P30JzkZYXPzmxrpx1p3+z6bsILKDb80fiCUUdBzYb02JHWztyUTB28MGzUgz1oa+2AEw3FNkqxhtk4KER+U31KMJMebwQF/mSFLrDHeC7Ese1cfxuxMRUca1AXpz6dlSXikuxKc9gh17Hmg8XRVIDjWxxLB6aAx+ngFrhiUwXKgVF0TdQTGX2U0W8wuvjf6DMdedPQjAIcfksIINNhOBKQ1bPB6Zi+oENV6MerAeh5h0Oes6I03FkaMT3eJnvqAWItgfFWG1h4WaKvV3cxdUHVDJetQgi4S6BR2ToGGqkEXxXyPZHo1FGY3CmNtlGTJGHNphthtdaXcgxv7bDEi2XrJ0rVqhm0JP0+GN9xlre5FJ202+2b8whUBLU3BijXr6oYItCLI86DHLobtQ3TzdhEy/PAj9eExa3TClzQQeX8RKFaexSWim6HBJos5T9cRhNoF7wAFesGRFWGiDdL5J4jLyMnYL3TifI7QusfZzt0tkrllD6MT6Tf1RHS7Eb6Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(366004)(136003)(39860400002)(376002)(396003)(451199015)(5660300002)(8936002)(478600001)(7416002)(6486002)(7406005)(41300700001)(6916009)(66946007)(66556008)(66476007)(4326008)(54906003)(8676002)(83380400001)(2906002)(38100700002)(316002)(6506007)(86362001)(186003)(6512007)(2616005)(26005)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DMwNe4kK/SCaQrJQw1cdeScqlzhHvMi2end8aF6n89gX5U9fNm0vF4VYpNnG?=
- =?us-ascii?Q?brCNDQuQpOIkCgXD/V3Y9r2DS4kjfIhXaoScOoFTmw/jtpGJBcNHKB6oLyBR?=
- =?us-ascii?Q?c7/kKW+juCuw19FbjOLphZmiOUNqnRM+YpelC/IZHjXQQeicghtMu4wb3ftI?=
- =?us-ascii?Q?P62250TcKs0n4JexZutPYw06eu2pHbEUMX4Xm1Jsb9TBaJ5uKOh97LqwdD3A?=
- =?us-ascii?Q?AQwJs76QloGW80lj+oFu6gif3iYxDegaEPUMPzyHS2srD0e514V81inKRrkW?=
- =?us-ascii?Q?rdFggs1ljJRd1WkPt6LgFb7VTL4efp/RTIIxlLWYU598vwn7ZgEz/o9lMGva?=
- =?us-ascii?Q?YW1HSPKvjuNHvBo8oVuLttMGP3fyQ029XxO5r2/K7Ie1nz6QYm8eULsGo2E+?=
- =?us-ascii?Q?NKTwZVLxPjuB/9YR9+CCb56X3LekiLXvZPsk7syjpBYVFtk6wTri2MaWbwQ+?=
- =?us-ascii?Q?DjpvZvgd40x35ewR61ohLtC1tpTOWzevHGahBJ85jG02ln6ucPSIZZqYPPwN?=
- =?us-ascii?Q?CR8bzzBIocS3HHQoSOCFIWUPFxwVBthRw5FJvTKIbtW0pPHy0mSGHMm96sqw?=
- =?us-ascii?Q?zRcIfsk8D+GR8oMcgU5HSSj+0SFtAuEyVk6rozra1v/0J57pKsv1TiqiOgCQ?=
- =?us-ascii?Q?zvzgFUYJj9Reo3otqGcUINsyn/frKSeh6p6wW5bgj9OmEoaBZlaZbRMg45Fy?=
- =?us-ascii?Q?FtUiqudjk/tmJvfXs248ukI1ol/FMAvRdhXKBr/MwC3zmTXxHIlB2MTEelJl?=
- =?us-ascii?Q?3Uv6LYsMBPPEIpfruR82+7pFAsYsanqSd3xcMsFqUB4czSHKHSw9Cn6YGwGq?=
- =?us-ascii?Q?/xJVlDByUQcFSy3iGcqd5zzc0FUMPV49OefS2wXthIo86J6HXEG/GshVFqrX?=
- =?us-ascii?Q?Mhhn9GkkKpThxmwvvMmbVe3+jRWwWt43vpCW0NdiuRqPG9dbOfXiwphJSDz0?=
- =?us-ascii?Q?nfGZr2zu7Fy243o91cVio9hbXNRAum1I56ZsW3MV5EcZZ+5Xxy1drmCK1ghU?=
- =?us-ascii?Q?Cvn0H2EM5ot7iI8ygLXtnMqyTdKJsN27QD/AGjhbqzaH36W1nr4i9wPjnXfm?=
- =?us-ascii?Q?hDEwSWgV1Kr6x01f/+EJYuxSzMmEOEERh0uts1Jh0OViAiHM3kpvSX8RxOOa?=
- =?us-ascii?Q?cnvN/efaM4jftIxrRzeqM5i73y4gT3IWyjD3yaXMky+vIb+mRpfTdvvX/As5?=
- =?us-ascii?Q?eUO/6bd94fFLCPIZh8yPGX2QNtEuxC8GHLVPzgtz5d8gb3s1RN9qIzSqkrEI?=
- =?us-ascii?Q?fYDl4ZKTjjhKs/YfdfLk2deB+KLw/K9BrJJAWeY/bXSJhjiNbYtagxKwF/tP?=
- =?us-ascii?Q?7v8JhOJyx1JOvyZYMp8h0tywtEYG0MhWdxQWa547kIXlJlcMGPzaqgdvREj3?=
- =?us-ascii?Q?AgmGF042GsrqMSdpnif2dG63XlwM7xcns/5vkAVoYi/WfpUVPthDxu39Q24y?=
- =?us-ascii?Q?JbXu3EP/FjzAixcpVk5MbYL2L64vzGOHlwS9wyDGVL7lC8gy2D7NjlSUZInb?=
- =?us-ascii?Q?Zqy5omlbwPxkst42QtoqXHXlj2krecBTSJlyQlkAWKRju9x6jD1rVMfu0DA0?=
- =?us-ascii?Q?ZmNStEJ675jZ3AWsheU=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb408cd4-7afc-40f6-28eb-08dac0f0509a
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2022 18:46:00.4716
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sZjqB6MDwrTmDB2WQEFtRBbGzMq4viKVyY7/Oa7flvd1MLqt1pgmRN4ck4tAIEFl
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7354
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 1/8] KVM: SVM: extract VMCB accessors to a new file
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        nathan@kernel.org, thomas.lendacky@amd.com,
+        andrew.cooper3@citrix.com, peterz@infradead.org,
+        jmattson@google.com, stable@vger.kernel.org
+References: <20221107145436.276079-1-pbonzini@redhat.com>
+ <20221107145436.276079-2-pbonzini@redhat.com> <Y2k7o8i/qhBm9bpC@google.com>
+ <3ca5e8b6-c786-2f15-8f81-fd6353c43692@redhat.com>
+ <Y2lLFEt3tQBoZTDe@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Y2lLFEt3tQBoZTDe@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 11:05:08AM -0700, Alex Williamson wrote:
-
-> After further consideration... I don't think the option on vfio-main
-> makes sense, basically for the same reason that the original option
-> existed on the IOMMU backend rather than vfio-core.  The option
-> describes a means to relax a specific aspect of IOMMU isolation, which
-> makes more sense to expose via the IOMMU provider, imo.  For example,
-> vfio-main cannot generate an equivalent error message as provided in
-> type1 today, it's too far removed from the IOMMU feature support.
-
-vfio-main can do it, we just have to be strict that the EPERM code is
-always going to be this case.
- 
-> > > If vdpa doesn't allow full device access such that it can guarantee
-> > > that a device cannot generate a DMA that can spoof MSI, then it
-> > > sounds like the flag we pass when attaching a device to iommfd
-> > > should to reflect this difference in usage.  
-> > 
-> > VDPA allows arbitary DMA just like VFIO. At most VDPA limits the MMIO
-> > touches.
->
-> So why exactly isn't this an issue for VDPA?  Are we just burying our
-> head in the sand that such platforms exists and can still be useful
-> given the appropriate risk vs reward trade-off?
-
-Simply that nobody has asked for it, and might never ask for it. This
-is all support for old platforms, and there just doesn't seem to be a
-"real" use case for very new (and actually rare) NIC hardware stuck
-into ancient platforms with this security problem.
-
-So I'd rather leave this in the past than carry forward a security
-exception as some ongoing 1st class thing.
-
-> > and IMHO we don't actually want to enable this more
-> > widely. So I don't want to see a global kernel wide flag at this point
-> > until we get reason to make more than just VFIO insecure.
+On 11/7/22 19:14, Sean Christopherson wrote:
+> On Mon, Nov 07, 2022, Paolo Bonzini wrote:
+>> On 11/7/22 18:08, Sean Christopherson wrote:
+>>> What about making KVM self-sufficient?
+>>
+>> You mean having a different asm-offsets.h file just for arch/x86/kvm/?
 > 
-> But this brings into question the entire existence of the opt-in.  Do
-> we agree that there are valid use cases for such an option?
+> Yeah.
 
-I think it is something VFIO has historically allowed and I think we
-can continue to allow it, but I don't think we should encourage its
-use or encourage it to propogate to wider areas given that the
-legitimate use cases are focused on fairly old hardware at this point.
+I'll try tomorrow, wish me luck. :)
 
-So, I'd rather wait for someone to ask for it, and explain why they
-need to use a combination of stuff where we need to have a true global
-option.
+>> The problem is that the _existing_ include of kvm_cache_regs.h in svm.h
+>> fails, with
+>>
+>> arch/x86/kernel/../kvm/svm/svm.h:25:10: fatal error: kvm_cache_regs.h: No
+>> such file or directory
+>>     25 | #include "kvm_cache_regs.h"
+>>        |          ^~~~~~~~~~~~~~~~~~
+>> compilation terminated.
+> 
+> Duh.  Now the changelog makes more sense...
 
-> Unlike things like ACS overrides, lack of interrupt isolation really
-> requires a malicious actor.  We're not going to inadvertently overlap
-> DMA to interrupt addresses like we might to a non-isolated MMIO ranges.
-> Therefore an admin can make a reasonable determination relative to the
-> extent to which the userspace is trusted.  This is not unlike opt-outs
-> to CPU vulnerability mitigation imo, there are use cases where the
-> performance or functionality is more important than the isolation.
-> Hand waving this away as a vfio-unique insecurity is a bad precedent
-> for iommufd.
+I'll add the commit message, though I also would not mind getting rid of 
+this patch.
 
-I agree with this, which is why I think it should come from the actual
-user facing subsystem not be a system wide flag. The "is userspace
-trusted" for VFIO may be quite different than from VDPA or whatever
-else comes next.
+>> The other two solutions here are:
+>>
+>> 1) move kvm_cache_regs.h to arch/x86/include/asm/ so it can be included
+>> normally
+>>
+>> 2) extract the structs to arch/x86/kvm/svm/svm_types.h and include that from
+>> asm-offsets.h, basically the opposite of this patch.
+>>
+>> (2) is my preference if having a different asm-offsets.h file turns out to
+>> be too complex.  We can do the same for VMX as well.
+> 
+> What about adding dedicated structs to hold the non-regs params for VM-Enter and
+> VMRUN?  Grabbing stuff willy-nilly in the assembly code makes the flows difficult
+> to read as there's nothing in the C code that describes what fields are actually
+> used.
 
-I'd be much more comfortable with this as a system wide iommufd flag
-if we also tied it to do some demonstration of privilege - eg a
-requirement to open iommufd with CAP_SYS_RAWIO for instance.
+What fields are actually used is (like with any other function) 
+"potentially all, you'll have to read the source code and in fact you 
+can just read asm-offsets.c instead".  What I mean is, I cannot offhand 
+see or remember what fields are touched by svm_prepare_switch_to_guest, 
+why would __svm_vcpu_run be any different?  And the new SVM assembly 
+code is quite readable overall.
 
-That is the usual protocol for these kinds of insecurities..
+> And due to 32-bit's restriction on the number of params, maintaining the
+> ad hoc approach will be annoying as passing in new info will require shuffling,
+> and any KVM refactorings will need updates to asm-offsets.c, e.g. "spec_ctrl"
+> should really live in "struct kvm_vcpu" since it's common to both AMD and Intel.
 
-I think right now we can leave this as-is and we can wait for some
-more information to decide how best to proceed.
+So what? :)  We're talking of 2 fields (regs, spec_ctrl) for VMX and 4 
+(regs, spec_ctrl, svm->current_vmcb and svm->vmcb01---for simplicity all 
+of them) for SVM, and they don't change very often at all.  If 
+hypothetically KVM had used similar assembly code from the get go, there 
+would have been 3 changes in 15 years: spec_ctrl was added for SSBD, and 
+the other two fields correspond to two changes to the nesed VMCB 
+handling (svm->current_vmcb was first introduced together with vmcb02, 
+and later VMSAVE/VMLOAD started always using vmcb01).  That's not too bad.
 
-Thanks,
-Jason
+> That would also allow fixing the bugs introduced by commit bb06650634d3 ("KVM:
+> VMX: Convert launched argument to flags").  nested_vmx_check_vmentry_hw() never
+> fully enters the guest; at worst, it triggers a "VM-Exit on VM-Enter" consistency
+> check.  Thus there's no need to load the guest's spec control and zero chance that
+> the guest can write to spec control.
+
+Hmm, I'm not sure how it's related to this series.  Is the problem also 
+with the three-argument limit?
+
+Paolo
+
+> E.g. as a very rough starting point
+> 
+> ---
+>   arch/x86/include/asm/kvm_host.h |  8 ++++++++
+>   arch/x86/kvm/svm/svm.c          | 13 ++++++++++---
+>   arch/x86/kvm/svm/svm.h          |  4 ++--
+>   arch/x86/kvm/vmx/nested.c       |  8 ++++++--
+>   arch/x86/kvm/vmx/run_flags.h    |  8 --------
+>   arch/x86/kvm/vmx/vmx.c          | 32 +++++++++-----------------------
+>   arch/x86/kvm/vmx/vmx.h          |  4 +---
+>   7 files changed, 36 insertions(+), 41 deletions(-)
+>   delete mode 100644 arch/x86/kvm/vmx/run_flags.h
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 415113dea951..d56fe6151656 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -204,6 +204,14 @@ enum exit_fastpath_completion {
+>   };
+>   typedef enum exit_fastpath_completion fastpath_t;
+>   
+> +struct kvm_vmrun_params {
+> +	...
+> +};
+> +
+> +struct kvm_vmenter_params {
+> +	...
+> +};
+> +
+>   struct x86_emulate_ctxt;
+>   struct x86_exception;
+>   union kvm_smram;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 627c126cd9bb..7df9ea3ad3f1 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3925,16 +3925,23 @@ static fastpath_t svm_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
+>   static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu, bool spec_ctrl_intercepted)
+>   {
+>   	struct vcpu_svm *svm = to_svm(vcpu);
+> +	struct kvm_vmrun_params vmrun = {
+> +		.regs = vcpu->arch.regs,
+> +		.vmcb01 = svm->vmcb01.ptr,
+> +		.vmcb = svm->current_vmcb->ptr,
+> +		.spec_ctrl = svm->current_vmcb->ptr,
+> +		.spec_ctrl_intercepted = spec_ctrl_intercepted,
+> +	};
+>   
+>   	guest_state_enter_irqoff();
+>   
+>   	if (sev_es_guest(vcpu->kvm)) {
+> -		__svm_sev_es_vcpu_run(svm, spec_ctrl_intercepted);
+> +		__svm_sev_es_vcpu_run(&params);
+>   	} else {
+>   		struct svm_cpu_data *sd = per_cpu(svm_data, vcpu->cpu);
+>   
+> -		__svm_vcpu_run(svm, __sme_page_pa(sd->save_area),
+> -			       spec_ctrl_intercepted);
+> +		params.save_save_pa = __sme_page_pa(sd->save_area);
+> +		__svm_vcpu_run(vcpu->arch.regs, &params);
+>   	}
+>   
+>   	guest_state_exit_irqoff();
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 9d940d8736f0..bf321b755a15 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -483,7 +483,7 @@ void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+>   
+>   /* vmenter.S */
+>   
+> -void __svm_sev_es_vcpu_run(struct vcpu_svm *svm, bool spec_ctrl_intercepted);
+> -void __svm_vcpu_run(struct vcpu_svm *svm, unsigned long hsave_pa, bool spec_ctrl_intercepted);
+> +void __svm_sev_es_vcpu_run(struct kvm_vmrun_params *params);
+> +void __svm_vcpu_run(unsigned long *regs, struct kvm_vmrun_params *params);
+>   
+>   #endif
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 61a2e551640a..da6c9b8c3a4f 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3058,6 +3058,11 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+>   
+>   static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+>   {
+> +	struct kvm_vmenter_params params = {
+> +		.launched = vmx->loaded_vmcs->launched,
+> +		.spec_ctrl = this_cpu_read(x86_spec_ctrl_current),
+> +		.spec_ctrl_intercepted = true,
+> +	};
+>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>   	unsigned long cr3, cr4;
+>   	bool vm_fail;
+> @@ -3094,8 +3099,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+>   		vmx->loaded_vmcs->host_state.cr4 = cr4;
+>   	}
+>   
+> -	vm_fail = __vmx_vcpu_run(vmx, (unsigned long *)&vcpu->arch.regs,
+> -				 __vmx_vcpu_run_flags(vmx));
+> +	vm_fail = __vmx_vcpu_run(vcpu->arch.regs, &params);
+>   
+>   	if (vmx->msr_autoload.host.nr)
+>   		vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
+> diff --git a/arch/x86/kvm/vmx/run_flags.h b/arch/x86/kvm/vmx/run_flags.h
+> deleted file mode 100644
+> index edc3f16cc189..000000000000
+> --- a/arch/x86/kvm/vmx/run_flags.h
+> +++ /dev/null
+> @@ -1,8 +0,0 @@
+> -/* SPDX-License-Identifier: GPL-2.0 */
+> -#ifndef __KVM_X86_VMX_RUN_FLAGS_H
+> -#define __KVM_X86_VMX_RUN_FLAGS_H
+> -
+> -#define VMX_RUN_VMRESUME	(1 << 0)
+> -#define VMX_RUN_SAVE_SPEC_CTRL	(1 << 1)
+> -
+> -#endif /* __KVM_X86_VMX_RUN_FLAGS_H */
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 05a747c9a9ff..307380cd2000 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -847,24 +847,6 @@ static bool msr_write_intercepted(struct vcpu_vmx *vmx, u32 msr)
+>   	return vmx_test_msr_bitmap_write(vmx->loaded_vmcs->msr_bitmap, msr);
+>   }
+>   
+> -unsigned int __vmx_vcpu_run_flags(struct vcpu_vmx *vmx)
+> -{
+> -	unsigned int flags = 0;
+> -
+> -	if (vmx->loaded_vmcs->launched)
+> -		flags |= VMX_RUN_VMRESUME;
+> -
+> -	/*
+> -	 * If writes to the SPEC_CTRL MSR aren't intercepted, the guest is free
+> -	 * to change it directly without causing a vmexit.  In that case read
+> -	 * it after vmexit and store it in vmx->spec_ctrl.
+> -	 */
+> -	if (unlikely(!msr_write_intercepted(vmx, MSR_IA32_SPEC_CTRL)))
+> -		flags |= VMX_RUN_SAVE_SPEC_CTRL;
+> -
+> -	return flags;
+> -}
+> -
+>   static __always_inline void clear_atomic_switch_msr_special(struct vcpu_vmx *vmx,
+>   		unsigned long entry, unsigned long exit)
+>   {
+> @@ -7065,9 +7047,14 @@ static fastpath_t vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
+>   }
+>   
+>   static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+> -					struct vcpu_vmx *vmx,
+> -					unsigned long flags)
+> +					struct vcpu_vmx *vmx)
+>   {
+> +	struct kvm_vmenter_params params = {
+> +		.launched = vmx->loaded_vmcs->launched,
+> +		.spec_ctrl = vmx->spec_ctrl,
+> +		.spec_ctrl_intercepted = msr_write_intercepted(vmx, MSR_IA32_SPEC_CTRL),
+> +	};
+> +
+>   	guest_state_enter_irqoff();
+>   
+>   	/* L1D Flush includes CPU buffer clear to mitigate MDS */
+> @@ -7084,8 +7071,7 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+>   	if (vcpu->arch.cr2 != native_read_cr2())
+>   		native_write_cr2(vcpu->arch.cr2);
+>   
+> -	vmx->fail = __vmx_vcpu_run(vmx, (unsigned long *)&vcpu->arch.regs,
+> -				   flags);
+> +	vmx->fail = __vmx_vcpu_run(vcpu->arch.regs, &params);
+>   
+>   	vcpu->arch.cr2 = native_read_cr2();
+>   
+> @@ -7185,7 +7171,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>   	kvm_wait_lapic_expire(vcpu);
+>   
+>   	/* The actual VMENTER/EXIT is in the .noinstr.text section. */
+> -	vmx_vcpu_enter_exit(vcpu, vmx, __vmx_vcpu_run_flags(vmx));
+> +	vmx_vcpu_enter_exit(vcpu, vmx);
+>   
+>   	/* All fields are clean at this point */
+>   	if (static_branch_unlikely(&enable_evmcs)) {
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index a3da84f4ea45..4eb196f88b47 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -421,9 +421,7 @@ struct vmx_uret_msr *vmx_find_uret_msr(struct vcpu_vmx *vmx, u32 msr);
+>   void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu);
+>   void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
+>   void vmx_spec_ctrl_restore_host(struct vcpu_vmx *vmx, unsigned int flags);
+> -unsigned int __vmx_vcpu_run_flags(struct vcpu_vmx *vmx);
+> -bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs,
+> -		    unsigned int flags);
+> +bool __vmx_vcpu_run(unsigned long *regs, struct kvm_vmenter_params *params);
+>   int vmx_find_loadstore_msr_slot(struct vmx_msrs *m, u32 msr);
+>   void vmx_ept_load_pdptrs(struct kvm_vcpu *vcpu);
+>   
+> 
+> base-commit: 0443d79faa4575a5871b54801ed4a36eecce32e3
+
