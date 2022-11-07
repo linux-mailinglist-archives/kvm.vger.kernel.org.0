@@ -2,71 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A2AD61F124
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 11:48:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 730D361F15C
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 11:59:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231867AbiKGKsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 05:48:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51102 "EHLO
+        id S231851AbiKGK7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 05:59:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231588AbiKGKsv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 05:48:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E78819025
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 02:47:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667818068;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dHMORFRgxchzu7qGPOxw/7Z7UKa5NJNSGH76rj88AMM=;
-        b=IvkAzrAFU5RUbJ52EVRGfSxx3ksuLZeaMPjm4hyo/XT2nXxwe6vVZsAteA8CQ8BgQef7Fe
-        Grqsite+nFj4NmbzyHcAAS7CJy40THWoDoIFTPJv2Iz0qqjzXWtJpoAKZXEQGyvg0lv4ya
-        7S/bCH0GqWTm/p6lz+a1OSyciN7aagQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-637-aA5YE0oSNGio5tOK5RX-Ig-1; Mon, 07 Nov 2022 05:47:47 -0500
-X-MC-Unique: aA5YE0oSNGio5tOK5RX-Ig-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 650A31C06ECB;
-        Mon,  7 Nov 2022 10:47:46 +0000 (UTC)
-Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D2E01121314;
-        Mon,  7 Nov 2022 10:47:39 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v8 4/7] KVM: arm64: Enable ring-based dirty memory
- tracking
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com,
-        andrew.jones@linux.dev, ajones@ventanamicro.com,
-        bgardon@google.com, dmatlack@google.com, will@kernel.org,
-        suzuki.poulose@arm.com, alexandru.elisei@arm.com,
-        pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
-        oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
-References: <20221104234049.25103-1-gshan@redhat.com>
- <20221104234049.25103-5-gshan@redhat.com> <87mt94f5ev.wl-maz@kernel.org>
- <b46128d5-3a58-a33e-ad9e-7c4726c5feaa@redhat.com>
- <8635avqeop.wl-maz@kernel.org>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <b1382847-f3aa-043e-6078-ce652470ec07@redhat.com>
-Date:   Mon, 7 Nov 2022 18:47:37 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S231737AbiKGK6u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 05:58:50 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89D14FACD;
+        Mon,  7 Nov 2022 02:58:49 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A79RJoT031559;
+        Mon, 7 Nov 2022 10:58:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=mLQgHqgxLW4IBDzDlUE3URrpBRkD+w3wy+BnMK5/nJM=;
+ b=RDgQcAR7ZuqPKpiaQ9s/ExcHCE39ZcgNepo4pS0PWvpepBdH8pT7IGPfdh0a3xTR3BYc
+ Pp5qj/DRvAK0U8+2rJVAgzhGQBdRH8P9vU94nGEDqd/usklhC/C+IAb9MM7EQl0/Ewoz
+ Fy1HZ5JpMyObbn3fLcPaao+hVkIKH0QSUH30jaArXuD9r6o55XZzpXk21Uk6vP/k7V3Q
+ Ojr9Oop3Hn/mYkBC9LHpGiAd7Jy8TE95S+UgEeWa7ZlbCnugMJoDPwxc1gROTG/GROus
+ 2NvLk7yKOM7IzF5azo4nsJ7zyzMRZc734zh6wePALOWVb2XBsZOOHyb0p3nGqxDTe+I1 rg== 
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1gky4f5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Nov 2022 10:58:48 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A7AoKKU017002;
+        Mon, 7 Nov 2022 10:58:46 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03fra.de.ibm.com with ESMTP id 3kngp5hs2r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Nov 2022 10:58:46 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A7AwhBo65405414
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 7 Nov 2022 10:58:43 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A75315204E;
+        Mon,  7 Nov 2022 10:58:43 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 627315204F;
+        Mon,  7 Nov 2022 10:58:43 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH v1] s390/mm: fix virtual-physical address confusion for swiotlb
+Date:   Mon,  7 Nov 2022 11:58:43 +0100
+Message-Id: <20221107105843.6641-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-In-Reply-To: <8635avqeop.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 43Ez8trfHkwAbl8Eu9zN5X4uMdrI0iS5
+X-Proofpoint-GUID: 43Ez8trfHkwAbl8Eu9zN5X4uMdrI0iS5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-07_02,2022-11-03_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 mlxscore=0 mlxlogscore=874 suspectscore=0 clxscore=1015
+ priorityscore=1501 malwarescore=0 impostorscore=0 phishscore=0 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211070084
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,121 +76,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+swiotlb passes virtual addresses to set_memory_encrypted() and
+set_memory_decrypted(), but uv_remove_shared() and uv_set_shared()
+expect physical addresses. This currently works, because virtual
+and physical addresses are the same.
 
-On 11/7/22 5:47 PM, Marc Zyngier wrote:
-> On Sun, 06 Nov 2022 21:46:19 +0000,
-> Gavin Shan <gshan@redhat.com> wrote:
->> On 11/6/22 11:50 PM, Marc Zyngier wrote:
->>> On Fri, 04 Nov 2022 23:40:46 +0000,
->>> Gavin Shan <gshan@redhat.com> wrote:
->>>>
->>>> Enable ring-based dirty memory tracking on arm64 by selecting
->>>> CONFIG_HAVE_KVM_DIRTY_{RING_ACQ_REL, RING_WITH_BITMAP} and providing
->>>> the ring buffer's physical page offset (KVM_DIRTY_LOG_PAGE_OFFSET).
->>>>
->>>> Besides, helper kvm_vgic_save_its_tables_in_progress() is added to
->>>> indicate if vgic/its tables are being saved or not. The helper is used
->>>> in ARM64's kvm_arch_allow_write_without_running_vcpu() to keep the
->>>> site of saving vgic/its tables out of no-running-vcpu radar.
->>>>
->>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
->>>> ---
->>>>    Documentation/virt/kvm/api.rst     |  2 +-
->>>>    arch/arm64/include/uapi/asm/kvm.h  |  1 +
->>>>    arch/arm64/kvm/Kconfig             |  2 ++
->>>>    arch/arm64/kvm/arm.c               |  3 +++
->>>>    arch/arm64/kvm/mmu.c               | 15 +++++++++++++++
->>>>    arch/arm64/kvm/vgic/vgic-its.c     |  3 +++
->>>>    arch/arm64/kvm/vgic/vgic-mmio-v3.c |  7 +++++++
->>>>    include/kvm/arm_vgic.h             |  2 ++
->>>>    8 files changed, 34 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->>>> index 2ec32bd41792..2fc68f684ad8 100644
->>>> --- a/Documentation/virt/kvm/api.rst
->>>> +++ b/Documentation/virt/kvm/api.rst
->>>> @@ -7921,7 +7921,7 @@ regardless of what has actually been exposed through the CPUID leaf.
->>>>    8.29 KVM_CAP_DIRTY_LOG_RING/KVM_CAP_DIRTY_LOG_RING_ACQ_REL
->>>>    ----------------------------------------------------------
->>>>    -:Architectures: x86
->>>> +:Architectures: x86, arm64
->>>>    :Parameters: args[0] - size of the dirty log ring
->>>>      KVM is capable of tracking dirty memory using ring buffers that
->>>> are
->>>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->>>> index 316917b98707..a7a857f1784d 100644
->>>> --- a/arch/arm64/include/uapi/asm/kvm.h
->>>> +++ b/arch/arm64/include/uapi/asm/kvm.h
->>>> @@ -43,6 +43,7 @@
->>>>    #define __KVM_HAVE_VCPU_EVENTS
->>>>      #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
->>>> +#define KVM_DIRTY_LOG_PAGE_OFFSET 64
->>>>      #define KVM_REG_SIZE(id)
->>>> \
->>>>    	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
->>>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->>>> index 815cc118c675..066b053e9eb9 100644
->>>> --- a/arch/arm64/kvm/Kconfig
->>>> +++ b/arch/arm64/kvm/Kconfig
->>>> @@ -32,6 +32,8 @@ menuconfig KVM
->>>>    	select KVM_VFIO
->>>>    	select HAVE_KVM_EVENTFD
->>>>    	select HAVE_KVM_IRQFD
->>>> +	select HAVE_KVM_DIRTY_RING_ACQ_REL
->>>> +	select HAVE_KVM_DIRTY_RING_WITH_BITMAP
->>>>    	select HAVE_KVM_MSI
->>>>    	select HAVE_KVM_IRQCHIP
->>>>    	select HAVE_KVM_IRQ_ROUTING
->>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->>>> index 94d33e296e10..6b097605e38c 100644
->>>> --- a/arch/arm64/kvm/arm.c
->>>> +++ b/arch/arm64/kvm/arm.c
->>>> @@ -746,6 +746,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
->>>>      		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
->>>>    			return kvm_vcpu_suspend(vcpu);
->>>> +
->>>> +		if (kvm_dirty_ring_check_request(vcpu))
->>>> +			return 0;
->>>>    	}
->>>>      	return 1;
->>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>>> index 60ee3d9f01f8..fbeb55e45f53 100644
->>>> --- a/arch/arm64/kvm/mmu.c
->>>> +++ b/arch/arm64/kvm/mmu.c
->>>> @@ -932,6 +932,21 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
->>>>    	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
->>>>    }
->>>>    +/*
->>>> + * kvm_arch_allow_write_without_running_vcpu - allow writing guest memory
->>>> + * without the running VCPU when dirty ring is enabled.
->>>> + *
->>>> + * The running VCPU is required to track dirty guest pages when dirty ring
->>>> + * is enabled. Otherwise, the backup bitmap should be used to track the
->>>> + * dirty guest pages. When vgic/its tables are being saved, the backup
->>>> + * bitmap is used to track the dirty guest pages due to the missed running
->>>> + * VCPU in the period.
->>>> + */
->>>> +bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
->>>> +{
->>>> +	return kvm_vgic_save_its_tables_in_progress(kvm);
->>>
->>> I don't think we need the extra level of abstraction here. Just return
->>> kvm->arch.vgic.save_its_tables_in_progress and be done with it.
->>>
->>> You can also move the helper to the vgic-its code since they are
->>> closely related for now.
->>>
->>
->> Ok. After kvm_arch_allow_write_without_running_vcpu() is moved to vgic-its.c,
->> do we need to replace 'struct vgic_dist::save_its_tables_in_progress' with
->> a file-scoped variant ('bool vgic_its_saving_tables') ?
-> 
-> No, this still needs to be per-VM.
-> 
+Add virt_to_phys() to resolve the virtual-physical confusion.
 
-Yeah, it's still per-VM state. Sorry for my dumb question :)
+Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+---
+ arch/s390/mm/init.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks,
-Gavin
+diff --git a/arch/s390/mm/init.c b/arch/s390/mm/init.c
+index 97d66a3e60fb..8b652654064e 100644
+--- a/arch/s390/mm/init.c
++++ b/arch/s390/mm/init.c
+@@ -146,7 +146,7 @@ int set_memory_encrypted(unsigned long addr, int numpages)
+ 
+ 	/* make specified pages unshared, (swiotlb, dma_free) */
+ 	for (i = 0; i < numpages; ++i) {
+-		uv_remove_shared(addr);
++		uv_remove_shared(virt_to_phys((void *)addr));
+ 		addr += PAGE_SIZE;
+ 	}
+ 	return 0;
+@@ -157,7 +157,7 @@ int set_memory_decrypted(unsigned long addr, int numpages)
+ 	int i;
+ 	/* make specified pages shared (swiotlb, dma_alloca) */
+ 	for (i = 0; i < numpages; ++i) {
+-		uv_set_shared(addr);
++		uv_set_shared(virt_to_phys((void *)addr));
+ 		addr += PAGE_SIZE;
+ 	}
+ 	return 0;
+-- 
+2.37.3
 
