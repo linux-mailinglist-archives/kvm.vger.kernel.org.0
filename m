@@ -2,113 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D4B261FCE2
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:09:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26B0961FCDB
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:09:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231734AbiKGSJx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 13:09:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51290 "EHLO
+        id S233042AbiKGSJJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 13:09:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232667AbiKGSJh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 13:09:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F78524BE2
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 10:04:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667844287;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BERLrqzoMhvkSHmGJ/W4Pvsqg1w8fBN4W9l/TXLwuX4=;
-        b=Bp/zpKnfQeriBuh33nMj9ZCBWYSBK7BeUwzFcngqQdcJ9Rgmal15qC5JTDSUty3BwHsBIW
-        ZRn4GAIGO9zeyl6W2Af9m13vRw/dno3gXlqGYdS+7qIYoxyyJC3tfByrn0BVLD/Gj90UG2
-        vfWRlcI48XnlGw1VgW2OfSKg27D7Aeg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-28-iHa4tFWrMnS69rN-UoDAvA-1; Mon, 07 Nov 2022 13:04:46 -0500
-X-MC-Unique: iHa4tFWrMnS69rN-UoDAvA-1
-Received: by mail-wm1-f69.google.com with SMTP id m34-20020a05600c3b2200b003cf549cb32bso8792458wms.1
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 10:04:45 -0800 (PST)
+        with ESMTP id S232674AbiKGSIw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 13:08:52 -0500
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0B8F2528A
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 10:05:03 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id j5-20020a05600c410500b003cfa9c0ea76so2250583wmi.3
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 10:05:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Gix4kQCW8Z4JM85AwAtCPZnOkOivM313FvF7kbWiWq0=;
+        b=DXy71LDtU0EoyrfIGmmciQOnFX8VVxM5fj06HrkbDiknlRP/l2NtTfkYJHCIv6FCLa
+         d3UymtM4nMKQv3auDg15bEEiYl7q64OVgabttD5pgT2j569P5TttC+wAM8bh4GBckaIp
+         DelKnF7Wg8rzPmSNE23I5ZHx4y5ojdLLO0NMnseiAnRudEfvtzEn8Fx3lJNOTQ6+v2rX
+         AJn4x7vbTUa2d4qPZrPZsjGLDXGKm18Q6fOr+LJT3HGu2OUzUKDXqRhaEDKhqDb9qHMd
+         1IQVeg4k+lzrdwk3GOV5oHkvgUKYJ/KbL14Wj5AxhsSheExkj65neVGsp1ZUYshJPuZ+
+         yC+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BERLrqzoMhvkSHmGJ/W4Pvsqg1w8fBN4W9l/TXLwuX4=;
-        b=rq0DgR7GaWSccB0HAWZWSLM/xnA+zoP8ybdVi6qAxzVeu4e8Ax4ldCzaJI25Iqe/KV
-         TSs9bxatQFo+Dj28lGeHeqVxnDR7/XinF3UVn/BWW0nyneO5X1zR6MIUFh/vK3GcMx0b
-         2SnjSwltBqi+cwcQoWSzkfMSOgtvFWfTPdoQiQS27YPLOwDW5yNkpSFgqD2lXGs6AewS
-         1T3ldLfjVwogRWBRuenQyC7LpuycxxIMubI8LWMZj5/7EnnIt9B+hA1FUzYw0QLPffev
-         Fydi0PU5rBZ1akg4XQ/HU9O7Kt1AwzGycaupmfoXx/YefuJGlhgO1SFkwYzmBzT4JnAr
-         73EA==
-X-Gm-Message-State: ANoB5pnkb1HMlxbm1lxUmVmvg5vGcxRpcxxQHLMuyX10Lk1s1c+rjo2x
-        JFSE9RTBL8hYquOu0WRACSlhvdPqCS1ZAfc+LWDetRJpv3IbgqDHPrZLaX/ffh81WOpq0ilfShv
-        EO7aJmonbiW1b
-X-Received: by 2002:a05:6000:3cf:b0:23a:cdf5:3655 with SMTP id b15-20020a05600003cf00b0023acdf53655mr11528454wrg.444.1667844284932;
-        Mon, 07 Nov 2022 10:04:44 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6tAOxKmuugPRRrOAVpUuk0PVNxtGKOK7Kmu/xTdJPnrrvhUD8J+oWcEtkViCt486Xa+7kM5A==
-X-Received: by 2002:a05:6000:3cf:b0:23a:cdf5:3655 with SMTP id b15-20020a05600003cf00b0023acdf53655mr11528438wrg.444.1667844284698;
-        Mon, 07 Nov 2022 10:04:44 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id i2-20020a05600c354200b003c71358a42dsm16312447wmq.18.2022.11.07.10.04.43
+        bh=Gix4kQCW8Z4JM85AwAtCPZnOkOivM313FvF7kbWiWq0=;
+        b=a5TX5+lD9gYDiNhqfICLUAgfyCrG0rqxI4pSHSLaLq2ES4UbpKjfCFeIXr6Eb3RbQx
+         J/xc09T3hXRWa8p0q803joInM76ooeoqNi09U8x6l7/OKqC6fSshxnGpvHvGnUBVcTEk
+         KZNpx06wv7u/AnsCn9lLf1eehLx1bY+s4dmAJiJe/Do8AKg9etfAkqe8uuIAC6G6iDlP
+         WvrgPwT85bgEo2NJsekt160U0LB/BveyLVJEKKEOSRmisM3jhDa3n0MB5W2A2HFSsh9b
+         gIu3u+ioSSCpvzbjlJ2vm7nyp6SWFIc3beQo/eQd8cuXRdz1mud4BXNB6NovyG1h2ndb
+         kFaQ==
+X-Gm-Message-State: ACrzQf0a/ee7OZroOBhJeFtqdwrDWqPYTYc4N5Khw1hnIJySiC5XtUYR
+        vidZHg1bsdoRulpYIac77qbhhQ==
+X-Google-Smtp-Source: AMsMyM6PIMZL/CchhWwggUhd4+4tCOaRIODBuhqs5nYrUTHI4qAjb0xTYz6rrjqPbzDo/aw6NO5FFQ==
+X-Received: by 2002:a05:600c:1d96:b0:3cf:7cdb:fbc2 with SMTP id p22-20020a05600c1d9600b003cf7cdbfbc2mr25000939wms.37.1667844302576;
+        Mon, 07 Nov 2022 10:05:02 -0800 (PST)
+Received: from ?IPV6:2a02:6b6a:b4d7:0:ebf7:de38:f6bc:8fe8? ([2a02:6b6a:b4d7:0:ebf7:de38:f6bc:8fe8])
+        by smtp.gmail.com with ESMTPSA id z3-20020adfe543000000b0023538fb27c1sm7766791wrm.85.2022.11.07.10.05.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Nov 2022 10:04:44 -0800 (PST)
-Message-ID: <bb7ae6ed-0666-023c-c956-e5f5956c34ed@redhat.com>
-Date:   Mon, 7 Nov 2022 19:04:43 +0100
+        Mon, 07 Nov 2022 10:05:01 -0800 (PST)
+Message-ID: <5ad52760-4320-028c-aa8a-aeeba6097847@bytedance.com>
+Date:   Mon, 7 Nov 2022 18:05:00 +0000
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH v3 1/3] KVM: x86/pmu: Stop adding speculative Intel GP
- PMCs that don't exist yet
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [v2 1/6] KVM: arm64: Document PV-lock interface
 Content-Language: en-US
-To:     Like Xu <like.xu.linux@gmail.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220919091008.60695-1-likexu@tencent.com>
- <Y0CAHch5UR2Lp0tU@google.com>
- <a90c28df-eb54-f20a-13a5-9ee4172f870e@gmail.com>
- <Y0mL3g2Eamp4bMHD@google.com>
- <524f23fa-b069-1468-dfc6-fa342c11cb7f@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <524f23fa-b069-1468-dfc6-fa342c11cb7f@gmail.com>
+To:     Punit Agrawal <punit.agrawal@bytedance.com>
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
+        yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+        maz@kernel.org, steven.price@arm.com, mark.rutland@arm.com,
+        bagasdotme@gmail.com, fam.zheng@bytedance.com, liangma@liangbit.com
+References: <20221104062105.4119003-1-usama.arif@bytedance.com>
+ <20221104062105.4119003-2-usama.arif@bytedance.com> <87k0463axq.fsf@stealth>
+From:   Usama Arif <usama.arif@bytedance.com>
+In-Reply-To: <87k0463axq.fsf@stealth>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/7/22 08:26, Like Xu wrote:
-> On 15/10/2022 12:18 am, Sean Christopherson wrote:
->> On Fri, Oct 14, 2022, Like Xu wrote:
->>> On 8/10/2022 3:38 am, Sean Christopherson wrote:
->>>> Does this need Cc:stable@vger.kernel.org?  Or is this benign enough 
->>>> that we don't
->>>> care?
->>>
->>> Considering stable kernel may access IA32_OVERCLOCKING_STATUS as well,
->>> cc stable list helps to remove the illusion of pmu msr scope for 
->>> stable tree
->>> maintainers.
+
+
+On 07/11/2022 17:56, Punit Agrawal wrote:
+> Hi Usama,
+> 
+> Usama Arif <usama.arif@bytedance.com> writes:
+> 
+>> Introduce a paravirtualization interface for KVM/arm64 to obtain whether
+>> the VCPU is currently running or not.
 >>
->> Is that a "yes, this should be Cc'd stable" or "no, don't bother"?
+>> The PV lock structure of the guest is allocated by user space.
+>>
+>> A hypercall interface is provided for the guest to interrogate the
+>> location of the shared memory structures.
+>>
+>> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
+>> Signed-off-by: Usama Arif <usama.arif@bytedance.com>
+>> ---
+>>   Documentation/virt/kvm/arm/index.rst    |  1 +
+>>   Documentation/virt/kvm/arm/pvlock.rst   | 52 +++++++++++++++++++++++++
+>>   Documentation/virt/kvm/devices/vcpu.rst | 25 ++++++++++++
+>>   3 files changed, 78 insertions(+)
+>>   create mode 100644 Documentation/virt/kvm/arm/pvlock.rst
+>>
+>> diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
+>> index e84848432158..b8499dc00a6a 100644
+>> --- a/Documentation/virt/kvm/arm/index.rst
+>> +++ b/Documentation/virt/kvm/arm/index.rst
+>> @@ -10,4 +10,5 @@ ARM
+>>      hyp-abi
+>>      hypercalls
+>>      pvtime
+>> +   pvlock
+>>      ptp_kvm
+>> diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm/arm/pvlock.rst
+>> new file mode 100644
+>> index 000000000000..d3c391b16d36
+>> --- /dev/null
+>> +++ b/Documentation/virt/kvm/arm/pvlock.rst
+>> @@ -0,0 +1,52 @@
+>> +.. SPDX-License-Identifier: GPL-2.0
+>> +
+>> +Paravirtualized lock support for arm64
+>> +======================================
+>> +
+>> +KVM/arm64 provides a hypervisor service call for paravirtualized guests to
+>> +determine whether a VCPU is currently running or not.
+>> +
+>> +A new SMCCC compatible hypercall is defined:
+>> +
+>> +* ARM_SMCCC_VENDOR_HYP_KVM_PV_LOCK_FUNC_ID:   0xC6000002
+>> +
+>> +ARM_SMCCC_VENDOR_HYP_KVM_PV_LOCK_FUNC_ID
+>> +
+>> +    ============= ========    ==========================================
+>> +    Function ID:  (uint32)    0xC6000002
+>> +    Return value: (int64)     IPA of the pv lock data structure for this
+>> +                              VCPU. On failure:
+>> +                              NOT_SUPPORTED (-1)
+>> +    ============= ========    ==========================================
+>> +
+>> +The IPA returned by PV_LOCK_PREEMPTED should be mapped by the guest as normal
+>> +memory with inner and outer write back caching attributes, in the inner
+>> +shareable domain.
+>> +
+>> +PV_LOCK_PREEMPTED returns the structure for the calling VCPU.
+>> +
+>> +PV lock state
+>> +-------------
+>> +
+>> +The structure pointed to by the PV_LOCK_PREEMPTED hypercall is as follows:
+>> +
+>> ++-----------+-------------+-------------+---------------------------------+
+>> +| Field     | Byte Length | Byte Offset | Description                     |
+>> ++===========+=============+=============+=================================+
+>> +| preempted |      8      |      0      | Indicate if the VCPU that owns  |
+>> +|           |             |             | this struct is running or not.  |
+>> +|           |             |             | Non-zero values mean the VCPU   |
+>> +|           |             |             | has been preempted. Zero means  |
+>> +|           |             |             | the VCPU is not preempted.      |
+>> ++-----------+-------------+-------------+---------------------------------+
+>> +
+>> +The preempted field will be updated to 1 by the hypervisor prior to scheduling
+>> +a VCPU. When the VCPU is scheduled out, the preempted field will be updated
+>> +to 0 by the hypervisor.
 > 
-> Oops, I missed this one. "Yes, this should be Cc'd" as I have received a 
-> few complaints on this.
+> The text above doesn't match the description in the table. Please update
+> the texts to align them with the code.
 > 
-> Please let me know if I need to post a new version of this minor patch 
-> set, considering the previous
-> comment "No need for a v4, the above nits can be handled when applying. "
+Will make it clearer in the next revision. Thanks.
 
-Queued, thanks.
-
-Paolo
-
+> [...]
+> 
