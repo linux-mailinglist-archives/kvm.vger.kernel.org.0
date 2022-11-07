@@ -2,64 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39C1B61FD3A
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:19:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E8CA61FD4B
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:20:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233042AbiKGSTY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 13:19:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35522 "EHLO
+        id S232000AbiKGSUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 13:20:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229695AbiKGSTG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 13:19:06 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722B9248D9
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 10:18:03 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id c188-20020a25c0c5000000b006d8eba07513so862897ybf.17
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 10:18:03 -0800 (PST)
+        with ESMTP id S232483AbiKGST6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 13:19:58 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FB6724966
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 10:19:29 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id v3so11173891pgh.4
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 10:19:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=SVpJ7aIaCnc27Nai+tOQ95kOWQRaCZF+MoF86rbtvzo=;
-        b=gZWeOac7wLd9R+5qZZfAryw6P7TtiwppmzSb2swP+iB/1ToMUgSClD7sfhJuf3ALAk
-         HlT/7jgxACseqkXHRNzdW9vZHUGzDc1MephGBc4VHgaX5qcxY0EKXKJ55oHKbXnlbK/U
-         ZuTe5m8Lvsh967hU9cAVQuY9uuHIXyiQIppzpLdGA3itno6e2J1g3E4hn92zv0T/qVP9
-         vEalTBDokVWZ5mAKD0KysLYvWvK1JpzylZOc1rHrJc/dyxG3n5qVe78VZc8YD5Vr5kkA
-         tD8w8WRrG2amRPCr2dKMWqMHOR4TjfknHHdgnYK8S/+aNw5D0z8cDguZEdnBqFbMqk2Y
-         hr2Q==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w7oQlQSGWErcIWmEijXaEvWPIfe56DxtjW2YodF6ZaE=;
+        b=dral5VrDzWpIXTVIhpxyg4cWdu7i694XTx/CtLfAwwl9xnXJw/FNSm8HnbZ+uu1YsQ
+         yzUabaLL/Wcw35lXOJyRUAf4lIYf51cyXMFoNHeJy7AVQ+376aM8en6Il5jJuLibCMas
+         zLH5pw0Yl8eZ7dH3ihR//thkLoLSylcvErhF6x10I6yvnF3yfwEZ7aWOawqm0x6MDe6T
+         NFAe+2RAo1zQrcwTAdDBnY/o5n31RmMMScKrAwj+xgbLXSkgDjbv+G+nhQ54v/df8TA1
+         dVR7wgrXZtuz0UAJT2klX38uJSfKodmXM/uWCkf+m92aaZxca0pwYQwdF5SajPz+pdUV
+         /9nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SVpJ7aIaCnc27Nai+tOQ95kOWQRaCZF+MoF86rbtvzo=;
-        b=fH7UyG3aV77Iz+g1iBoGBd/BFCScKiw7pw+7kItMOqJpwMOMSA13z/6hreZqIdVcIR
-         OKJ+Il+vgsu6Kzg/cYu6YmW2WAB8sbRPy5gO6nKf23gLx7mUvLIAf1YHMbKLO0oxISMB
-         USRoq3YkZfNJQiRxOdL23/akTPu93s00mgzCJIaqx+rqmT6BqMqUhZ6HWx8HkheMCb6w
-         w+toVeQVNG2vxc+uqO7q9IFtfdULXTGlvrv/bF+3AsFSh1RfC48Vd2LDKx6wdAFEVo8O
-         Ub/kMBMZKmnqi1LsXOPgObwrL5XZXyFppZsRe4uYCZACut+N6DS/T5oe70U+jZztRgBI
-         pbSA==
-X-Gm-Message-State: ANoB5pk8JvKfdA7nKqzDtE2PFs0MiDuzuAWez9UeFCCMgLXXp4HzFP5w
-        qOtmtRZRiW/ffLkBmLzc/nW9SGVGznzIgRMYZA==
-X-Google-Smtp-Source: AA0mqf6BhOmNbpecyx5hygRjdl3Vj/zQDs60nUh89NoOI0HdckPtnaXbFX0YpmuZ4KdyPyVHsSbe9fs6ExwXmAoQhg==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a25:7386:0:b0:6d3:1b77:58ea with SMTP
- id o128-20020a257386000000b006d31b7758eamr18164590ybc.445.1667845082783; Mon,
- 07 Nov 2022 10:18:02 -0800 (PST)
-Date:   Mon, 07 Nov 2022 18:18:02 +0000
-In-Reply-To: <Y2PsAAmRX78Dky2l@google.com> (message from David Matlack on Thu,
- 3 Nov 2022 09:27:44 -0700)
-Mime-Version: 1.0
-Message-ID: <gsnt5yfqtyqt.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v9 2/4] KVM: selftests: create -r argument to specify
- random seed
-From:   Colton Lewis <coltonlewis@google.com>
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w7oQlQSGWErcIWmEijXaEvWPIfe56DxtjW2YodF6ZaE=;
+        b=K4IVkAWd+EC8m6EYPXPrD43vdcGEGxIgadSBM1AokRmucX6+bwm7hgZ64kWkG5yUkr
+         LE218xVHO1+ZAgWGxqgBy82LHfIuzXEA4tfKWZw0/PJ/UwR/8JQcVDmDCgzAEp7uqHv9
+         Da6TcWC4wL3nbsnXfr+X5gnRtUITfH0WW9HMJ6aTY2r+jkyxy9ePZRITGOPdSrG7y4dB
+         s9+uUuo5azTnpkq0pFKwDpKOfUBEyF6CIpBU21wg33imnlPvOVjvKcChFMZZrhyIsSwi
+         YlQPe7cMy5klOuVU1O4WYlF28QitWCwn0miEU1e1LHrMuZnfNNY+jXtwV3SC6VTjqUp+
+         KeFA==
+X-Gm-Message-State: ACrzQf1SivhNKjbMX8+qfOrtdcaxtAqeJeTxvWgFlQoTKr7gQWUF2U9P
+        T/XdPjukMLUX90cke1m5yiUfrg==
+X-Google-Smtp-Source: AMsMyM4rnkRsDtAGEb3zfh89py2cnTFpfYi1YlUckPJ0bJYEmer59wywHW7N5IxQ+TKIT8759KckpQ==
+X-Received: by 2002:a63:8a42:0:b0:46f:5804:8d9e with SMTP id y63-20020a638a42000000b0046f58048d9emr44691332pgd.214.1667845168931;
+        Mon, 07 Nov 2022 10:19:28 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id e9-20020a170902784900b00183e2a96414sm5288040pln.121.2022.11.07.10.19.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Nov 2022 10:19:28 -0800 (PST)
+Date:   Mon, 7 Nov 2022 18:19:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
 To:     David Matlack <dmatlack@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        seanjc@google.com, oupton@google.com, ricarkol@google.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+Cc:     Andrew Jones <andrew.jones@linux.dev>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vipinsh@google.com" <vipinsh@google.com>,
+        "ajones@ventanamicro.com" <ajones@ventanamicro.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v1 00/18] KVM selftests code consolidation and cleanup
+Message-ID: <Y2lMLfjiRAF8ZrNT@google.com>
+References: <20221024113445.1022147-1-wei.w.wang@intel.com>
+ <Y1mlJqKdFtlgG3jR@google.com>
+ <DS0PR11MB63731F2B467D4084F5C8D9B5DC339@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <Y1qnWFzekT27rYka@google.com>
+ <CALzav=c4-FWVrWQebuYs--vbgnyPjEwZxfjSS1aMSRL3JMbWYw@mail.gmail.com>
+ <Y1rNm0E6/I5y6K2a@google.com>
+ <20221028124106.oze32j2lkq5ykifj@kamzik>
+ <Y1v6AEInngzRxSJ+@google.com>
+ <CALzav=chUT9v4wYVVy9dSLcevhADxONaf9iCMOWQ_vUOwpkV9g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALzav=chUT9v4wYVVy9dSLcevhADxONaf9iCMOWQ_vUOwpkV9g@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,60 +85,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-David Matlack <dmatlack@google.com> writes:
+On Mon, Nov 07, 2022, David Matlack wrote:
+> On Fri, Oct 28, 2022 at 8:49 AM Sean Christopherson <seanjc@google.com> wrote:
+> > Anyways, if someone wants to pursue this, these ideas and the "requirement" should
+> > be run by the checkpatch maintainers.  They have far more experience and authority
+> > in this area, and I suspect we aren't the first people to want checkpatch to get
+> > involved in enforcing shortlog scope.
+> 
+> Documenting would at least be an improvement over what we have today
+> since it would eliminate the need to re-explain the preferred rules
+> every time. We can just point to the documentation when reviewing
+> patches.
 
-> On Wed, Nov 02, 2022 at 04:00:05PM +0000, Colton Lewis wrote:
->> Create a -r argument to specify a random seed. If no argument is
->> provided, the seed defaults to 1. The random seed is set with
->> perf_test_set_random_seed() and must be set before guest_code runs to
->> apply.
+Agreed.  And there are many other things I want to formalize for KVM x86, e.g.
+testing expectations, health requirements for the various branches, what each
+branch is used for etc...
 
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->> ---
->>   tools/testing/selftests/kvm/dirty_log_perf_test.c    | 12 ++++++++++--
->>   tools/testing/selftests/kvm/include/perf_test_util.h |  2 ++
->>   tools/testing/selftests/kvm/lib/perf_test_util.c     |  6 ++++++
->>   3 files changed, 18 insertions(+), 2 deletions(-)
+If you want to send a patch for the shortlogs thing, maybe create
 
->> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c  
->> b/tools/testing/selftests/kvm/dirty_log_perf_test.c
->> index f99e39a672d3..c97a5e455699 100644
->> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
->> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
->> @@ -132,6 +132,7 @@ struct test_params {
->>   	bool partition_vcpu_memory_access;
->>   	enum vm_mem_backing_src_type backing_src;
->>   	int slots;
->> +	uint32_t random_seed;
->>   };
+  Documentation/process/maintainer-kvm-x86.rst
 
->>   static void toggle_dirty_logging(struct kvm_vm *vm, int slots, bool  
->> enable)
->> @@ -225,6 +226,9 @@ static void run_test(enum vm_guest_mode mode, void  
->> *arg)
->>   				 p->slots, p->backing_src,
->>   				 p->partition_vcpu_memory_access);
+and link it into Documentation/process/maintainer-handbooks.rst?
 
->> +	/* If no argument provided, random seed will be 1. */
->> +	pr_info("Random seed: %u\n", p->random_seed);
->> +	perf_test_set_random_seed(vm, p->random_seed ? p->random_seed : 1);
-
-> If the user passes `-r 0` or does not pass `-r` at all, this will print
-> "Random seed: 0" and then proceed to use 1 as the random seed, which
-> seems unnecessarily misleading.
-
-
-Fair point, forgot to change the print statement when I made that
-change.
-
-> If you want the default random seed to be 1, you can initialize
-> p.random_seed to 1 before argument parsing (where all the other
-> test_params are default initialized), then the value you print here will
-> be accurate and you don't need the comment or ternary operator.
-
-
-Will do. This also need a argument parsing check to specifically prevent
-0 since my reason for changing in the first place is realizing 0 is not
-a valid input to the pRNG I chose. Anything multiplied by 0 is 0 so a 0
-seed produces a string of 0s. libc random also chooses 1 if seed is not
-specified.
+> `git log --pretty=oneline` is not a great way to document shortlog
+> scopes because it does not explain the rules (e.g. when to use "KVM:
+> x86: " vs "KVM: x86/mmu: "), does not explain why things the way they
+> are, and is inconsistent since we don't always catch every patch that
+> goes by with a non-preferred shortlog scope.
