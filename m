@@ -2,114 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 542F661F780
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 16:23:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65D9961F7AB
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 16:31:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232866AbiKGPX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 10:23:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60452 "EHLO
+        id S232248AbiKGPbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 10:31:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232861AbiKGPXY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 10:23:24 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 582D0CD9;
-        Mon,  7 Nov 2022 07:23:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=4vgRGnuVtkTGEKsFjUHCzmRGxBEch8B2PbVdx00wfIY=; b=r4KpmD8YQg8XB7hbcAadnPrE6n
-        jwfLNXaVezrfXQi1O1mdc+6ow3TXholNpOy0J4rqHFRyl2Ty5kq35FtNMUIfir/x8qCdnt4q7vf1H
-        uq/Iu1Z5luOhf/DKVmfEA9RFMvRIY4jE6WJ4otVcaUj0TCHzpCe8RIf0PHf73ju3bzwJ2k2MBBV+L
-        m5vqNMv/b+hVsIVuKHOA3bgtEaudnRJBjdm4baPQN3WYwG7B6JBfpuaaPiBhsgCcrzhcBIMQTyx/0
-        OGNTa4lCru3Jc5RLzKQvXgyLtCXLnD6GAmB+GKO27jX3LAuu3lMDDITO/dPfhyVfAcSAjm4MCwo7Q
-        +xhekxJA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1os3y2-009SXw-B1; Mon, 07 Nov 2022 15:23:18 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id A69EE30007E;
-        Mon,  7 Nov 2022 16:23:12 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 8F2942B8046C9; Mon,  7 Nov 2022 16:23:12 +0100 (CET)
-Date:   Mon, 7 Nov 2022 16:23:12 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        nathan@kernel.org, thomas.lendacky@amd.com,
-        andrew.cooper3@citrix.com, jmattson@google.com, seanjc@google.com,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 4/8] KVM: SVM: move guest vmsave/vmload to assembly
-Message-ID: <Y2ki4Iz8AZzTODKS@hirez.programming.kicks-ass.net>
-References: <20221107145436.276079-1-pbonzini@redhat.com>
- <20221107145436.276079-5-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221107145436.276079-5-pbonzini@redhat.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231698AbiKGPbE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 10:31:04 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB03212D0A
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 07:31:03 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 46A0560E17
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 15:31:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A11DCC433D6;
+        Mon,  7 Nov 2022 15:31:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667835062;
+        bh=bkVktwW5TQjNJ7vT92h9Ndj7XiwAcQLTowe267DgFCM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=n6poy86h9Rm4cDZcXm40fl1O2bbwobQTLE1dNyZvG7LyEe4N6BXXkjxlhywPpw+sW
+         cXAM33t1k16JO/VLniR7wxF3VPJNxL2/XhIcq5c/vX/xxkDnyUBcco1opwqdd8sUA7
+         Ll5SjjbNQHHFgXCSX3Y/Kau8KyhSEhuKlCTlUTZtA9buC06CBQyomUoxp1ByWAtRry
+         wTPhEApW2RUD+v3HYx2zGnXe24Yw+65Y1VvGD0jOv67zq94Kdjt8I13O3ITOsEGnd0
+         lY6An1wsYTUm03vJGthMwUcLa3iE0PmMzH6BZ/AMXwY8zWWwSpe3RubmzrgrbtFA6U
+         m7nVDvTlb/y7w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1os45U-004QlV-B6;
+        Mon, 07 Nov 2022 15:31:00 +0000
+Date:   Mon, 07 Nov 2022 15:30:59 +0000
+Message-ID: <86zgd2pyrw.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
+        ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com,
+        will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+        pbonzini@redhat.com, seanjc@google.com, oliver.upton@linux.dev,
+        zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
+In-Reply-To: <Y2kdXTn6X3O08sFv@x1n>
+References: <20221104234049.25103-1-gshan@redhat.com>
+        <20221104234049.25103-4-gshan@redhat.com>
+        <87o7tkf5re.wl-maz@kernel.org>
+        <Y2ffRYoqlQOxgVtk@x1n>
+        <87iljrg7vd.wl-maz@kernel.org>
+        <Y2gh4x4MD8BJvogH@x1n>
+        <867d07qfvk.wl-maz@kernel.org>
+        <Y2kdXTn6X3O08sFv@x1n>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: peterx@redhat.com, gshan@redhat.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com, will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com, seanjc@google.com, oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 09:54:32AM -0500, Paolo Bonzini wrote:
-> @@ -56,6 +59,16 @@ SYM_FUNC_START(__svm_vcpu_run)
->  	/* Move @svm to RDI. */
->  	mov %_ASM_ARG2, %_ASM_DI
->  
-> +	/*
-> +	 * Use a single vmcb (vmcb01 because it's always valid) for
-> +	 * context switching guest state via VMLOAD/VMSAVE, that way
-> +	 * the state doesn't need to be copied between vmcb01 and
-> +	 * vmcb02 when switching vmcbs for nested virtualization.
-> +	 */
-> +	mov SVM_vmcb01_pa(%_ASM_DI), %_ASM_AX
-> +1:	vmload %_ASM_AX
-> +2:
-> +
->  	/* "POP" @vmcb to RAX. */
->  	pop %_ASM_AX
->  
-> @@ -80,16 +93,11 @@ SYM_FUNC_START(__svm_vcpu_run)
->  	/* Enter guest mode */
->  	sti
->  
-> +3:	vmrun %_ASM_AX
-> +4:
-> +	cli
->  
-> +	/* Pop @svm to RAX while it's the only available register. */
->  	pop %_ASM_AX
->  
->  	/* Save all guest registers.  */
+On Mon, 07 Nov 2022 14:59:41 +0000,
+Peter Xu <peterx@redhat.com> wrote:
+> 
+> On Mon, Nov 07, 2022 at 09:21:35AM +0000, Marc Zyngier wrote:
+> > On Sun, 06 Nov 2022 21:06:43 +0000,
+> > Peter Xu <peterx@redhat.com> wrote:
+> > > 
+> > > It's definitely not the case for x86, but if it's true for
+> > > arm64, then could the DMA be spread across all the guest pages?
+> > > If it's also true, I really don't know how this will work..
+> > 
+> > Of course, all pages can be the target of DMA. It works the same way
+> > it works for the ITS: you sync the state, you obtain the dirty bits,
+> > you move on.
+> > 
+> > And mimicking what x86 does is really not my concern (if you still
+> > think that arm64 is just another flavour of x86, stay tuned!  ;-).
+> 
+> I didn't mean so, I should probably stop mentioning x86. :)
 
-So Andrew noted that once the vmload has executed any exception taken
-(say at 3) will crash and burn because %gs is scribbled.
+Please! I turned off my last x86 development machine over the weekend,
+and my x86 laptop is now a glorified window manager... ;-)
 
-Might be good to make a record of this in the code so it can be cleaned
-up some day.
+> I had some sense already from the topics in past few years of kvm forum.
+> Yeah I'll be looking forward to anything more coming.
 
-> @@ -159,11 +179,19 @@ SYM_FUNC_START(__svm_vcpu_run)
->  	pop %_ASM_BP
->  	RET
->  
-> +10:	cmpb $0, kvm_rebooting
->  	jne 2b
->  	ud2
-> +30:	cmpb $0, kvm_rebooting
-> +	jne 4b
-> +	ud2
-> +50:	cmpb $0, kvm_rebooting
-> +	jne 6b
-> +	ud2
->  
-> +	_ASM_EXTABLE(1b, 10b)
-> +	_ASM_EXTABLE(3b, 30b)
-> +	_ASM_EXTABLE(5b, 50b)
+Yup. Hopefully we won't have to wait for too long to see this stuff (I
+had good discussions on the subject at both KF and Plumbers in Dublin
+earlier this year).
+
+> > > We're only syncing the dirty bitmap once right now with the
+> > > protocol.  If that can cover most of the guest mem, it's same as
+> > > non-live.  If we sync it periodically, then it's the same as
+> > > enabling dirty-log alone and the rings are useless.
+> > 
+> > I'm glad that you finally accept it: the ring *ARE* useless in the
+> > general sense. Only limited, CPU-only workloads can make any use of
+> > the current design. This probably covers a large proportion of what
+> > the cloud vendors do, but this doesn't work for general situations
+> > where you have a stream of dirty pages originating outside of the
+> > CPUs.
+> 
+> The ring itself is really not the thing to blame, IMHO it's a good attempt
+> to try out de-coupling guest size in regard of dirty tracking from kvm.  It
+> may not be perfect, but it may still service some of the goals, e.g., at
+> least it allows the user app to detect per-vcpu information and also since
+> there's the ring full events we can do something more than before like the
+> vcpu throttling that China Telecom does with the ring structures.
+
+I don't disagree with that: for vcpu-based workloads, the rings are
+great and doing their job. It's just that there is another side to
+this problem, and you'll have to deal with both eventually. We're just
+ahead of the curve here...
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
