@@ -2,132 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FCC0620194
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 22:58:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CA8B620199
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 22:58:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233040AbiKGV6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 16:58:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40968 "EHLO
+        id S232624AbiKGV6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 16:58:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232466AbiKGV6F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 16:58:05 -0500
-Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03D7D2A40E
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 13:58:02 -0800 (PST)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1667858280;
+        with ESMTP id S233181AbiKGV6J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 16:58:09 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C127128E16;
+        Mon,  7 Nov 2022 13:58:03 -0800 (PST)
+Received: from zn.tnic (p200300ea9733e764329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e764:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4D3D41EC071E;
+        Mon,  7 Nov 2022 22:58:02 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1667858282;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UZiyD2k3y+EgHFhd63YTq4eWFfM6/StSmrCFVfziB3E=;
-        b=xLi/4ocdf+ppLrJmfOO+OYHS7mtB+7dzqmhZiOcFcQZHi8X8TOQ/crSA6zZYUCcP6Y/RHg
-        +xbh68fMgMm8gPPpUe60TmWNqPpB27Ji699w5Z1P247b+uHye6ghSkJKJA0oK/wiCaKmgN
-        ndLg94qd5fQh+6KgVLM7dveIGEDA0uw=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Quentin Perret <qperret@google.com>,
-        Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v5 10/14] KVM: arm64: Split init and set for table PTE
-Date:   Mon,  7 Nov 2022 21:56:40 +0000
-Message-Id: <20221107215644.1895162-11-oliver.upton@linux.dev>
-In-Reply-To: <20221107215644.1895162-1-oliver.upton@linux.dev>
-References: <20221107215644.1895162-1-oliver.upton@linux.dev>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=uQcKspdlDKpk49zfyausr9OngCMvETATkpBKm+sBLhk=;
+        b=Qwtyu/SGJvknZmcPnQ2RVX7AM+OQGNt7XRtmeoNiddst/4dyq3Twq5mY7V+q5GRPPX8JBv
+        oL90uqH946ccxeIPpTbSO4VMjvvJ1iOX4FrOWLBvAhr71mqYWcJDb7cztQmoChrcj7ydpF
+        EHzowFWLanlPhgD4che2ALb0pw2wqYw=
+Date:   Mon, 7 Nov 2022 22:57:58 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-perf-users@vger.kernel.org,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH v2 2/5] x86/cpuid: refactor
+ setup_clear_cpu_cap()/clear_cpu_cap()
+Message-ID: <Y2l/ZibeaD3P8lBp@zn.tnic>
+References: <20220718141123.136106-1-mlevitsk@redhat.com>
+ <20220718141123.136106-3-mlevitsk@redhat.com>
+ <Y1LGkTXCksqAYLHD@zn.tnic>
+ <Y2lYMqLVP+00Rpu5@zn.tnic>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Y2lYMqLVP+00Rpu5@zn.tnic>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Create a helper to initialize a table and directly call
-smp_store_release() to install it (for now). Prepare for a subsequent
-change that generalizes PTE writes with a helper.
+On Mon, Nov 07, 2022 at 08:10:42PM +0100, Borislav Petkov wrote:
+> Lemme document it so that it is at least clear. Who knows, we might end
+> up improving it in the process.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/hyp/pgtable.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+IOW, something like this. It's a start at least...
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index a34e2050f931..f4dd77c6c97d 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -136,16 +136,13 @@ static void kvm_clear_pte(kvm_pte_t *ptep)
- 	WRITE_ONCE(*ptep, 0);
- }
- 
--static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp,
--			      struct kvm_pgtable_mm_ops *mm_ops)
-+static kvm_pte_t kvm_init_table_pte(kvm_pte_t *childp, struct kvm_pgtable_mm_ops *mm_ops)
- {
--	kvm_pte_t old = *ptep, pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
-+	kvm_pte_t pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
- 
- 	pte |= FIELD_PREP(KVM_PTE_TYPE, KVM_PTE_TYPE_TABLE);
- 	pte |= KVM_PTE_VALID;
--
--	WARN_ON(kvm_pte_valid(old));
--	smp_store_release(ptep, pte);
-+	return pte;
- }
- 
- static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
-@@ -413,7 +410,7 @@ static bool hyp_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 			  enum kvm_pgtable_walk_flags visit)
- {
--	kvm_pte_t *childp;
-+	kvm_pte_t *childp, new;
- 	struct hyp_map_data *data = ctx->arg;
- 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
- 
-@@ -427,8 +424,10 @@ static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	if (!childp)
- 		return -ENOMEM;
- 
--	kvm_set_table_pte(ctx->ptep, childp, mm_ops);
-+	new = kvm_init_table_pte(childp, mm_ops);
- 	mm_ops->get_page(ctx->ptep);
-+	smp_store_release(ctx->ptep, new);
-+
- 	return 0;
- }
- 
-@@ -796,7 +795,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 				struct stage2_map_data *data)
- {
- 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
--	kvm_pte_t *childp;
-+	kvm_pte_t *childp, new;
- 	int ret;
- 
- 	ret = stage2_map_walker_try_leaf(ctx, data);
-@@ -821,8 +820,9 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	if (stage2_pte_is_counted(ctx->old))
- 		stage2_put_pte(ctx, data->mmu, mm_ops);
- 
--	kvm_set_table_pte(ctx->ptep, childp, mm_ops);
-+	new = kvm_init_table_pte(childp, mm_ops);
- 	mm_ops->get_page(ctx->ptep);
-+	smp_store_release(ctx->ptep, new);
- 
- 	return 0;
- }
+https://lore.kernel.org/r/20221107211505.8572-1-bp@alien8.de
+
 -- 
-2.38.1.431.g37b22c650d-goog
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
