@@ -2,177 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB0996203EB
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 00:45:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6862B62040A
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 00:54:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232396AbiKGXp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 18:45:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60208 "EHLO
+        id S232588AbiKGXyh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 18:54:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231890AbiKGXpy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 18:45:54 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2061.outbound.protection.outlook.com [40.107.220.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D80DF1BE8A;
-        Mon,  7 Nov 2022 15:45:49 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lY1YgtW0ATiDj1lldme6ZNlHC5njAhQ8OdNr/zbWFjmoEkRIpcKpWCUnmrKzu0STlMoAUPUdFaWMDctrRLhcdB/XhrS/9gbys4Q880WeKTZB0fEbFJtlMlRfwCWMuF61U1y0OWPvNm4PBsVOkrAUaxO08cWPn4fvNFqvyO4qYhHtJeDAkeoplx3YssvDWyhafQd+d8aUXhhOmeshk9uremCjxcygQRA9Ou1Zn1X+CT3BkjJ7ufWLV8LIWpljbtRAINy6jzuqGrlF5RLyMu1EkddRjwLrehURB+4Kr6FnYVW2dHzWGhZco12r7TsYIcjuqxDzPfLWh/hg9kSRpsU1ag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kiaZYX3gHWEf7MSSHuq/Kc2LWU0eiwCCSed5eOu9Pj4=;
- b=HtYrvpIGzmoeZL+A1s3xfPQCRRhC6jmmzzbELSdHW6NXhBB+HR6FL0AUvoai1t92v/xPfu8yMwXTnvpW+X9Ea/UPKainJqGtZrH0CQigE/01ASDPf3sY5ZL4qOmzK2sGuGPFeFtGxlPIkIqnxnFbSakSUpe6HaZ/mc6wa8I7sS0rgByN8BzQr/OyebN77suWFYLW0ebpmgehxpnG5h8ExwhXTt44EV9Htwzgu9cqaa4ys5jaEbi5udBTbkEezSs4oEin0YBx31ny0EiSYrL6BN6FpeXqd9sGgw2si+Tar9i0+ZnjFigCQmmGmHi4cpw+D54OM1Yca89n90IfC2UG3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kiaZYX3gHWEf7MSSHuq/Kc2LWU0eiwCCSed5eOu9Pj4=;
- b=GeMExQ/ftThQo6SZIn7ZtWm33N1ci6wCtRFRyLXiUib/fWtuf+ObW0L8SDic1WuWNogDgnmSY8Zx0slIpKVmsUs0luagtNidLOShOSStkpDITyGjp/+1LKocpp6RzP0HzbJ47HV36yJzIxZLwNBxGLCybHh80nevK3lzZvFSjY99iT7FpgPZ5oV86SmpqxEFLiXDJ/t0BX2F+LiyKc7mqfrQadCsWdJ7zQmsbW6R9+oXSB2aq2y2tYN0FcDrnXwMri12rzw7ZrS34mr8NJ6FRCbUaIuu0cd+0xaFxP7DqWA+xIdc1dajQHRCadhqdw6isNTDi+T1znC8bZcvbfgWCw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BL3PR12MB6546.namprd12.prod.outlook.com (2603:10b6:208:38d::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Mon, 7 Nov
- 2022 23:45:48 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Mon, 7 Nov 2022
- 23:45:48 +0000
-Date:   Mon, 7 Nov 2022 19:45:46 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@gmail.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Will Deacon <will@kernel.org>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>
-Subject: Re: [PATCH 06/10] vfio-iommufd: Allow iommufd to be used in place of
- a container fd
-Message-ID: <Y2mYql90K/Oi6BIO@nvidia.com>
-References: <6-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
- <58917b42-bfdd-c352-4b20-68ff135f968e@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <58917b42-bfdd-c352-4b20-68ff135f968e@intel.com>
-X-ClientProxiedBy: BL0PR05CA0010.namprd05.prod.outlook.com
- (2603:10b6:208:91::20) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S232305AbiKGXyf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 18:54:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4DFA20BEA
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 15:53:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667865210;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pT3sJPmwBj29BZlhUVGZFUrh95hujl1L/E+LlGzj8c8=;
+        b=fp7MS5g3Nhc4PzlhUKtibsgJ7/u7sMdObm4Yt7dGa/3rqi+4nm7PzWG0hMy75PJjPB6YaZ
+        qSbT7YDOyCuyypsrLA785+JAKFL4xyNMQYISQzRTbDn0MySYuSplDemlEyw9OyYY3tTijP
+        v94lmElQRZM5rGtT2hSMW6aXqKnHvco=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-595-d7dFaKVHN2WExWFIgfGwJw-1; Mon, 07 Nov 2022 18:53:27 -0500
+X-MC-Unique: d7dFaKVHN2WExWFIgfGwJw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7EB9985A59D;
+        Mon,  7 Nov 2022 23:53:26 +0000 (UTC)
+Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F236EC15BB5;
+        Mon,  7 Nov 2022 23:53:20 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, will@kernel.org,
+        shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com,
+        pbonzini@redhat.com, zhenyzha@redhat.com, shuah@kernel.org,
+        kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
+References: <20221104234049.25103-1-gshan@redhat.com>
+ <20221104234049.25103-4-gshan@redhat.com>
+ <ec281dc5-baa2-3e18-8e83-089322db551a@redhat.com>
+ <861qqfq9s2.wl-maz@kernel.org>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <3b1ed84e-c911-f41a-a57d-eada16e093c3@redhat.com>
+Date:   Tue, 8 Nov 2022 07:53:17 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL3PR12MB6546:EE_
-X-MS-Office365-Filtering-Correlation-Id: 04398a0a-3466-45d3-04f7-08dac11a31d7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: a96fq5yuUwXrAo+E0kpDxlHDm54AWEnVTpyP7ExI5JFlIOsIjE3osvwjrBbAg0CQKkqNGoJ8Ps9Y+H8ykcH4ionDmZFBlG3uaFJth4xxoNyCN8COnWrKdyT8vq28PQ/y7ZYEbQ3fBDQGEr3NgzNKZAKuKv3jXRC4I/C/OVjhXbmEqoCrD2XesGWznJXU1xVDXNHxCQym/ue5pdHZWF/HzDH0XQrnmptRCpeMjYhzA6gs6rLMwdxTywnL6WcVx8wBBS1RxmO/eEnF8LvC83koh3Dbh3Tnqnz4W10ttzl1/zkDfCiG35qCG/SPQlGliZKYfII6QmQG5ZnbI/meGX8WrVnTR1J+EhEeUk+C1cbRut/cDcdmO4CiyzO0oO+XA2kM14St2Re/B7DTcmzW7nG/H7LSFHB/gbiRbWgtzCz1vMibmTXvSzXDiKbpnomRQ0fC8gnT2Me77TUOKQFxRhILIwGQ+vi+vtzG36iSScqLnCxR9f6TFbtsB6uYYyXrNa7BV6YX90GxRadN1/it290ZpYXSSXiCAIxe3WjUcgWsWlRgEHPtoKqJFTYwF2tl+VX52qyvuNymtgzmKv4ZkZ4Uhe5dTdYBx+bdUyaLx2XmRxt8+ooS1B+qlqJpYSvaEBgtZesLgdroEp+xxvzW9fTvuSbak1hrRIUAkqmHUF9WMJDZoGcmxQzLRewF+g/6uGbNyJm7hiboHrqPOjSTaXr2aw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(136003)(366004)(346002)(39860400002)(396003)(451199015)(53546011)(6506007)(186003)(2616005)(6512007)(26005)(107886003)(5660300002)(38100700002)(36756003)(2906002)(41300700001)(8936002)(7416002)(8676002)(86362001)(6486002)(6916009)(316002)(66476007)(54906003)(66556008)(66946007)(7406005)(4744005)(4326008)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rBLnO6XxDwmeKmg7+mcw12qC8Bk6/GI0M6U6zSGfyIZM4o8M7kXepUCoNDjT?=
- =?us-ascii?Q?kqODNMzkupSQ2liO3loRQ2vsqk8XH5L4vPofvdafCGb5q8lT+5bRmj/uISfY?=
- =?us-ascii?Q?3CNecZ108Xk+8uToJCKOzFSs1LvnyYN8AawLcybtzDRs2nfn043cgiID14/c?=
- =?us-ascii?Q?byubRTsqVSuXjxEW/o10WQlPNepvR/7bx6HiPhaCPDp6rZjydFG5U2l+txQ/?=
- =?us-ascii?Q?+fagR7qQkwMpFQ6SOUmiCJdAK9xIUjnyJ88cM0fxasQm0fbE19snlAMTUI/y?=
- =?us-ascii?Q?j8kRRmoZH7G3JG9veX2PqwiWcm8ydGawpaZk/VJxKCNFA4Eaye0csNkFAa9L?=
- =?us-ascii?Q?a7ws/5/K04qNFafn+hoZRVOa/gUrkqMdcmBdaeNJKw8UjPJ05+R0ionxm4Kg?=
- =?us-ascii?Q?COvZh0TzSPzN1+Xeq7eN0LwEJDojMjc3oEBCsA7SwVBgaRhepQl01Q5xMeE1?=
- =?us-ascii?Q?AP/0EJqTm724vcvvf80fhkXFk+F6q1BAD6/kcUEMzc4sn3SFieY01soUf2J0?=
- =?us-ascii?Q?sdMsvqqFHo/ghAIrbZwp5DKjt30zKAYHiTjWqOGbHcWTW1qIozkBnsLogr08?=
- =?us-ascii?Q?GQxhUt5V9PMo9qPhqbFbOzQ3yMrUNtXGYZlH4xDM6gNxZC5WHVH7y6cnUmvx?=
- =?us-ascii?Q?ENxBR3blXXk73tHcCTT6QFgzYreZCqo4RJ45k8CsBLCI2LOtMBI6CiItyZHQ?=
- =?us-ascii?Q?I7aFWcX01qJchNuiEoThF9RWB7/Qd/QxsrleSoSy/tTaclG39EUHkyUrFHSd?=
- =?us-ascii?Q?1J7P+YCmlD7FDLMsNSGQJINKKP+wXPqW/leEzpNBcx6Jy0p9ozq6mf8IunGg?=
- =?us-ascii?Q?ta4Kd/zMrWNEPF0t1lIMnPWm8CCQUCaYiO2JVs0n2Knil0PdGy9ZOkjRL+c7?=
- =?us-ascii?Q?RD8lpvKyMqnD+NjqeV3QzKCnOsDCZ+06zKXbQpZt3dz4jza+5rvqvFsFdCM8?=
- =?us-ascii?Q?ykgZusJuFkb0fgW0Am47GC4SgEfPmywysn+rSP+uJihqU5AMPsnpMP3J8G0G?=
- =?us-ascii?Q?jSwt1ajx0almgU3SI3V/j8Oj3Ei+FyESc2lxIfz+MRXP5GKRXo84ayzXzaSt?=
- =?us-ascii?Q?kyIljCacLYDAIefZfclNLIwQMNJ9/LTNdFzILZQ+FKtU9tJVZ+FmuBpyR5RE?=
- =?us-ascii?Q?XwGjPRDyfhWhfi3Po+q1s+twaCUBNP726GqkVcoJZEifhQpJxE24YAN+WFUp?=
- =?us-ascii?Q?ovc1386JINOO3e83rrwrdU78/tYtJaM7OUMkk/oRNw5patKj8oTEw8sq064r?=
- =?us-ascii?Q?g8oU6P+lb07cBQqRC/ukeLu1VEUD1kiPvuAzHaZyho/vljOpTA9+c55I4j5J?=
- =?us-ascii?Q?itmm/OqeFChpMM6kfY16D/H6xtcDCNENvtjUBCAhbV2p9p+cZ+vSyaZZNTam?=
- =?us-ascii?Q?bd4RFIjJyCZTjl8hq+ewTtTxWJUAwsZvnvVBMHVWpsvbofT8GxGjmt+HWlco?=
- =?us-ascii?Q?yoKCtuW+8w6MR2mvifkrxhvaatD9QCApoF0Pmn4u9b8kk/qCyRp8Mb2cExSp?=
- =?us-ascii?Q?l7/Jfn1WbqahtHKQoHQGtGfW/5zeQPdARJ6Dss4qEsn8N4Atq1KRjYNEil4e?=
- =?us-ascii?Q?CVvAfx0AWreWm1RGDGo=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 04398a0a-3466-45d3-04f7-08dac11a31d7
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2022 23:45:47.8331
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LTRPO2ldXTp0iP9x7vE5HspCEikCBAiToECGgIcLu6xM3OSSS9kfqRRKRlzPr+eI
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6546
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <861qqfq9s2.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 02, 2022 at 03:28:20PM +0800, Yi Liu wrote:
-> On 2022/10/26 02:50, Jason Gunthorpe wrote:
-> > This makes VFIO_GROUP_SET_CONTAINER accept both a vfio container FD and an
-> > iommufd.
-> > 
-> > In iommufd mode an IOAS will exist after the SET_CONTAINER, but it will
-> > not be attached to any groups.
+Hi Marc,
+
+On 11/7/22 7:33 PM, Marc Zyngier wrote:
+> On Mon, 07 Nov 2022 10:45:34 +0000,
+> Gavin Shan <gshan@redhat.com> wrote:
+>> On 11/5/22 7:40 AM, Gavin Shan wrote:
+>>> ARM64 needs to dirty memory outside of a VCPU context when VGIC/ITS is
+>>> enabled. It's conflicting with that ring-based dirty page tracking always
+>>> requires a running VCPU context.
+>>>
+>>> Introduce a new flavor of dirty ring that requires the use of both VCPU
+>>> dirty rings and a dirty bitmap. The expectation is that for non-VCPU
+>>> sources of dirty memory (such as the VGIC/ITS on arm64), KVM writes to
+>>> the dirty bitmap. Userspace should scan the dirty bitmap before migrating
+>>> the VM to the target.
+>>>
+>>> Use an additional capability to advertise this behavior. The newly added
+>>> capability (KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP) can't be enabled before
+>>> KVM_CAP_DIRTY_LOG_RING_ACQ_REL on ARM64. In this way, the newly added
+>>> capability is treated as an extension of KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
+>>>
+>>> Suggested-by: Marc Zyngier <maz@kernel.org>
+>>> Suggested-by: Peter Xu <peterx@redhat.com>
+>>> Co-developed-by: Oliver Upton <oliver.upton@linux.dev>
+>>> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>> Acked-by: Peter Xu <peterx@redhat.com>
+>>> ---
+>>>    Documentation/virt/kvm/api.rst | 33 ++++++++++++++++++-----
+>>>    include/linux/kvm_dirty_ring.h |  7 +++++
+>>>    include/linux/kvm_host.h       |  1 +
+>>>    include/uapi/linux/kvm.h       |  1 +
+>>>    virt/kvm/Kconfig               |  8 ++++++
+>>>    virt/kvm/dirty_ring.c          | 10 +++++++
+>>>    virt/kvm/kvm_main.c            | 49 +++++++++++++++++++++++++++-------
+>>>    7 files changed, 93 insertions(+), 16 deletions(-)
+>>>
+>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+
+[...]
+
+>>
+>> In order to speed up the review and reduce unnecessary respins. After
+>> collecting comments on PATCH[v8 3/7] from Marc and Peter, I would change
+>> above description as below. Could you please confirm it looks good to you?
+>>
+>> In the 4th paragraph, the words starting from "Collecting the dirty bitmap..."
+>> to the end, was previously suggested by Oliver, even Marc suggested to avoid
+>> mentioning "migration".
+>>
+>>    After enabling the dirty rings, the userspace needs to detect the
+>>    capability of KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP to see whether the ring
+>>    structures need to be backed by per-slot bitmaps. With this capability
 > 
-> is there any special reason that we cannot attach the IOAS in the SET
-> container phase or SET_IOMMU phase?
-
-It is because iommufd has been deliberately made to work only on
-struct device * not iommu_groups, and when we go to do the
-SET_CONTAINER we have no idea what the device will be.
-
-So defering the operation is the cleanest approach.
-
-> >  From a VFIO perspective this means that the VFIO_GROUP_GET_STATUS and
-> > VFIO_GROUP_FLAGS_VIABLE works subtly differently. With the container FD
-> > the iommu_group_claim_dma_owner() is done during SET_CONTAINER but for
-> > IOMMFD this is done during VFIO_GROUP_GET_DEVICE_FD. Meaning that
+> s/need/can/. If there was a *need*, it should happen automatically
+> without user intervention.
 > 
-> s/IOMMFD/IOMMUFD
 
-Done
+Ok. s/need to/can in next revision :)
 
-Jason
+>>    advertised, it means the architecture can dirty guest pages without
+>>    vcpu/ring context, so that some of the dirty information will still be
+>>    maintained in the bitmap structure. KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
+>>    can't be enabled if the capability of KVM_CAP_DIRTY_LOG_RING_ACQ_REL
+>>    hasn't been enabled, or any memslot has been existing.
+>>
+>>    Note that the bitmap here is only a backup of the ring structure. The
+>>    use of the ring and bitmap combination is only beneficial if there is
+>>    only a very small amount of memory that is dirtied out of vcpu/ring
+>>    context. Otherwise, the stand-alone per-slot bitmap mechanism needs to
+>>    be considered.
+>>
+>>    To collect dirty bits in the backup bitmap, userspace can use the same
+>>    KVM_GET_DIRTY_LOG ioctl. KVM_CLEAR_DIRTY_LOG isn't needed as long as all
+>>    the generation of the dirty bits is done in a single pass. Collecting
+>>    the dirty bitmap should be the very last thing that the VMM does before
+>>    transmitting state to the target VM. VMM needs to ensure that the dirty
+>>    state is final and avoid missing dirty pages from another ioctl ordered
+>>    after the bitmap collection.
+> 
+> I would replace "transmitting state to the target VM" with
+> "considering the state as complete", as I still object to casting this
+> API into the migration mold. People use this stuff more far more than
+> migration (checkpointing, for example).
+> 
+
+Fair enough. I will change accordingly in next revision.
+
+>>
+>>    NOTE: One example of using the backup bitmap is saving arm64 vgic/its
+>>    tables through KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on
+>>    KVM device "kvm-arm-vgic-its" during VM's migration.
+> 
+> Same remark about migration.
+> 
+
+Ok. I will change this paragraph as below in next revision, to avoid mentioning
+"migration".
+
+   NOTE: One example of using the backup bitmap is saving arm64 vgic/its
+   tables through KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on
+   KVM device "kvm-arm-vgic-its" when dirty ring is enabled.
+
+Thanks,
+Gavin
+
