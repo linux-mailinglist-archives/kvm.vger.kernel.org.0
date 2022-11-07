@@ -2,141 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 563CE61FD62
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:22:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAAD261FD5E
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:22:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231540AbiKGSWs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 13:22:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38734 "EHLO
+        id S232575AbiKGSWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 13:22:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231946AbiKGSWk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 13:22:40 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2A8FB56;
-        Mon,  7 Nov 2022 10:22:38 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A7IBq2u003348;
-        Mon, 7 Nov 2022 18:22:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=DdfWgA9vouqG75fSo60uN652MOW4sllCxUOKeP3RfcQ=;
- b=eebFqKmEkCdsVhVRi/XbOsQdRoLwq4ZqlPHzBEH8C4MPmOdN3J6x8ZbxV5zTXLIgDm15
- qQMOH8r09V5AhYha+kX4r724Ee4Rs17OS5mdepLKgsCtM6E+cKKeEzVbWBSKtzUU4YY/
- aol74r7eqOMb3RVogdjXRRpLoaEf7XKjZLctN4O010ACm93+mKOIeOp847ulP5z3lJdS
- a6r/G22054YYfe1JEjnORfLH3epvLYpdmC1s98grcGDpk1fzOzBAhj8oDY55/damEQhE
- H/H/yzX12ifeRs3++3u3YxAL0OCP8U9NqLLbLLjBZeOyB0VpgKfGjSVo9Axrk8+wTTm8 9Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1uuwfut-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 18:22:12 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A7Gap89020063;
-        Mon, 7 Nov 2022 18:22:11 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1uuwfu3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 18:22:11 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A7IL2m0022680;
-        Mon, 7 Nov 2022 18:22:10 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma02dal.us.ibm.com with ESMTP id 3kngnd5nhx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 18:22:10 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com ([9.208.128.116])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A7IM8k714090930
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 7 Nov 2022 18:22:09 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D47C358062;
-        Mon,  7 Nov 2022 18:22:07 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1A18E5805F;
-        Mon,  7 Nov 2022 18:22:04 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.65.225.56])
-        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  7 Nov 2022 18:22:03 +0000 (GMT)
-Message-ID: <1166ac40ae848d81e7fa7aeec056c91079d768d4.camel@linux.ibm.com>
-Subject: Re: [PATCH 09/44] KVM: Drop arch hardware (un)setup hooks
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Chao Gao <chao.gao@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Yuan Yao <yuan.yao@intel.com>
-Date:   Mon, 07 Nov 2022 13:22:03 -0500
-In-Reply-To: <20221102231911.3107438-10-seanjc@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
-         <20221102231911.3107438-10-seanjc@google.com>
+        with ESMTP id S232183AbiKGSWg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 13:22:36 -0500
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B251AF0D
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 10:22:32 -0800 (PST)
+Received: by mail-il1-x149.google.com with SMTP id 15-20020a056e0220cf00b0030099e75602so9377499ilq.21
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 10:22:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CPH7Fyc6lBr9UZD8MCVONU1MftilQDvFU6aPtcRL9X0=;
+        b=tXUOF0ORSw+B0jy6sE9c74s8+AfI2/J+WyFNFLZQAFcO2ZW8rGyFFoYh0i+0A4dMrk
+         h/9jUGm7U+0iWQL2LLHN9EkLRZuWq+iopURmG3qlj5yy6iSseLEBt9kcfG5gSI7a+eyj
+         kpSF+HiFY8Uck3+O0JiUq2loVTHPJcncTfc8w0z4fcq6zawvMjBiv8MwR3/gXj+zxyIx
+         mM3qMfIVYmlKXJHppMxunxIpv10RwymL/jjf7tQRJ01cqbCQesmmZiL0fyFfuuW4iYEY
+         6ae3hHkNMIgepD/j0Cg8o6tPBBouyKkt3FbTUPAWpC9fEpLQIBkIF0OdwSRNN7p1Iimg
+         nNZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CPH7Fyc6lBr9UZD8MCVONU1MftilQDvFU6aPtcRL9X0=;
+        b=3bf7ao5dziKoW7y2CSEaLxgGqASguEM810KeQ16Sk640Mw5VnS5rj/wlJp0al3RyZm
+         ZcMq8VGV1y+Ay6hR1MpjP5r1KUYtYbXprbC4qXaYUUFk7+5Mb+2DdjgBiR2GKvg8RlXM
+         PdL9ixw+E3f2W1dVufdgRHxWsS/16F06St86VairIXsx/W5K9CAgu1w275Gh5aDhfwVT
+         BH+fjOpi/dGxtRWJ+/Fxz8ADXpV0SJ2QY6Pf5zBrSCo2vXRLhIYin0OYzQiOphFVkHBB
+         MVOhJ4LiU3Tehs13+Rb88mLRrJBB11cRiKD49KMt9PtuYTa4mEWW/OXtitinQlblmlrw
+         5zNA==
+X-Gm-Message-State: ACrzQf0iJOIsgBwK4T/24nxzrB2hFJJUQr9qpc9iMfoVQ9syY2XQapYG
+        QGfznkN6vifghPcEw/uLbbIq1wfU2Mu0htXzHkKfJM+9AfRmOZ8hsy0mZ1mJ2B2Nx6o7F0WXISu
+        pYDRSVZVrg5whMfzgn9SnMCx9UmkIOCtvMQiN49rwdVpLZzJfWyUi9hzMeaXyCVKqstbmx60=
+X-Google-Smtp-Source: AMsMyM5TADBv2QkNPeb5vpbWhw96xD82U2zYx9EYJzI4h8JvFt+zznTmMDfKYaRqkhlp2WslAjTgSKeHlJs/qvZDnQ==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6638:3e89:b0:372:8e2d:18c3 with
+ SMTP id ch9-20020a0566383e8900b003728e2d18c3mr29724542jab.158.1667845352111;
+ Mon, 07 Nov 2022 10:22:32 -0800 (PST)
+Date:   Mon,  7 Nov 2022 18:22:04 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
+Message-ID: <20221107182208.479157-1-coltonlewis@google.com>
+Subject: [PATCH v10 0/4] randomize memory access of dirty_log_perf_test
+From:   Colton Lewis <coltonlewis@google.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
+        seanjc@google.com, oupton@google.com, ricarkol@google.com,
+        Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
-MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: otjvlxlCigjzwqXdeFPxNBxJt_I7IxRm
-X-Proofpoint-ORIG-GUID: dd3fkNzioIT2BrJda-qHcffczlDpzuYb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-07_08,2022-11-07_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- mlxlogscore=888 clxscore=1015 impostorscore=0 malwarescore=0
- lowpriorityscore=0 mlxscore=0 adultscore=0 spamscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211070144
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gV2VkLCAyMDIyLTExLTAyIGF0IDIzOjE4ICswMDAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOgo+IERyb3Aga3ZtX2FyY2hfaGFyZHdhcmVfc2V0dXAoKSBhbmQga3ZtX2FyY2hfaGFyZHdh
-cmVfdW5zZXR1cCgpIG5vdwo+IHRoYXQKPiBhbGwgaW1wbGVtZW50YXRpb25zIGFyZSBub3BzLgo+
-IAo+IE5vIGZ1bmN0aW9uYWwgY2hhbmdlIGludGVuZGVkLgo+IAo+IFNpZ25lZC1vZmYtYnk6IFNl
-YW4gQ2hyaXN0b3BoZXJzb24gPHNlYW5qY0Bnb29nbGUuY29tPgo+IC0tLQo+IMKgYXJjaC9hcm02
-NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5owqDCoCB8wqAgMSAtCj4gwqBhcmNoL2FybTY0L2t2bS9h
-cm0uY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNSAtLS0tLQo+IMKgYXJjaC9t
-aXBzL2luY2x1ZGUvYXNtL2t2bV9ob3N0LmjCoMKgwqAgfMKgIDEgLQo+IMKgYXJjaC9taXBzL2t2
-bS9taXBzLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDUgLS0tLS0KPiDCoGFy
-Y2gvcG93ZXJwYy9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIHzCoCAxIC0KPiDCoGFyY2gvcG93ZXJw
-Yy9rdm0vcG93ZXJwYy5jwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA1IC0tLS0tCj4gwqBhcmNoL3Jp
-c2N2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmjCoMKgIHzCoCAxIC0KPiDCoGFyY2gvcmlzY3Yva3Zt
-L21haW4uY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDUgLS0tLS0KPiDCoGFyY2gv
-czM5MC9rdm0va3ZtLXMzOTAuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAxMCAtLS0tLS0tLS0t
-Cj4gwqBhcmNoL3g4Ni9rdm0veDg2LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IHwgMTAgLS0tLS0tLS0tLQo+IMKgaW5jbHVkZS9saW51eC9rdm1faG9zdC5owqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCB8wqAgMiAtLQo+IMKgdmlydC9rdm0va3ZtX21haW4uY8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA3IC0tLS0tLS0KPiDCoDEyIGZpbGVzIGNoYW5nZWQsIDUz
-IGRlbGV0aW9ucygtKQoKUmV2aWV3ZWQtYnk6IEVyaWMgRmFybWFuIDxmYXJtYW5AbGludXguaWJt
-LmNvbT4JIyBzMzkwCg==
+Add the ability to randomize parts of dirty_log_perf_test,
+specifically the order pages are accessed and whether pages are read
+or written.
 
+v10:
+
+Move setting default random seed to argument parsing code.
+
+Colton Lewis (4):
+  KVM: selftests: implement random number generator for guest code
+  KVM: selftests: create -r argument to specify random seed
+  KVM: selftests: randomize which pages are written vs read
+  KVM: selftests: randomize page access order
+
+ .../selftests/kvm/access_tracking_perf_test.c |  2 +-
+ .../selftests/kvm/dirty_log_perf_test.c       | 59 ++++++++++++++-----
+ .../selftests/kvm/include/perf_test_util.h    |  8 ++-
+ .../testing/selftests/kvm/include/test_util.h |  7 +++
+ .../selftests/kvm/lib/perf_test_util.c        | 33 +++++++++--
+ tools/testing/selftests/kvm/lib/test_util.c   | 17 ++++++
+ 6 files changed, 102 insertions(+), 24 deletions(-)
+
+--
+2.38.1.431.g37b22c650d-goog
