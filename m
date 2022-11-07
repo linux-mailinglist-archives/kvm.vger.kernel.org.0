@@ -2,127 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CEBB6200CA
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 22:15:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E53F26200CF
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 22:16:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233482AbiKGVPJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 16:15:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60918 "EHLO
+        id S233406AbiKGVQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 16:16:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233487AbiKGVOT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 16:14:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D423317CA
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 13:10:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667855411;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S5uHAm/YMaHSV2rOFAm9u7M75Iy7HbODE/InmExnaAE=;
-        b=PRoAuTx6ivBM4dcWT6Elj0ieI/8F8YyTwMWEJ3LnJZXLzoHLilPpFpSqQW7iCqCcI6zJDs
-        DvNmuybthNlfj/odrOmdZ8rF8T7JkqRplyI6n8EmxMiWFQH6sEn7eG9b2URvM6p11D6FM1
-        XCXbdswLzKgROtHhyp4LFA0O1Yq0VjE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-228-JIpXlTFyO2Sw5Q_W9MpagQ-1; Mon, 07 Nov 2022 16:10:09 -0500
-X-MC-Unique: JIpXlTFyO2Sw5Q_W9MpagQ-1
-Received: by mail-wr1-f71.google.com with SMTP id e21-20020adfa455000000b002365c221b59so3268952wra.22
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 13:10:09 -0800 (PST)
+        with ESMTP id S233469AbiKGVP0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 16:15:26 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E8842EF51
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 13:11:52 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id 64so11563764pgc.5
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 13:11:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uQxDTNLotBeU5vzOFGDa7HGUR31Gv4MxI4cPw2VN0VA=;
+        b=jOnf79RjMrKxTkpIMgF9QlhQDCkrvQc+/rIjVJX9j8t27DdQGo1oQ069HQC9CLFnCJ
+         1gHiFboOJa6U9snTTXJK+kOMszDW3ai8vrUZ6HI5iP07Kz7HYhjbyZZWoV6Hn05JsOKj
+         bU1ZxkgVV73cvRl7TC9aZtQ+UKvAFL10iOBIyLSJv6jhZIUwXv4plcymz6UPk6vqQfVQ
+         PQCu5s8d8mkbHfKJrejJRbmOpDDZgDG22AoetQqnFluT0Yd4JvrObXzUE38FPa5ZMQlm
+         FTYx7npnEv6iP40IjrXvfariJ1ueJvPF8G81ROOCZC+/BI2dGuwxglkCdnKihECgB+78
+         Uw3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=S5uHAm/YMaHSV2rOFAm9u7M75Iy7HbODE/InmExnaAE=;
-        b=LB9ps1t4IDBOQoZ//hS0B4j74kIx6XvL4m8ezjKWcyq0r/UzTeKNs/cjvXtgQOwLFv
-         ARLi8pB/MWvsVqWCiK7jLe1nxTBAWKO4jus554Ayy/kybTvmO/gg12ejwV6FtBhfD+VY
-         +iKeL0gT6NktTTd+Dm/ZM4RWhGT8umleM2rOhN/ZFSd5XCoDmm5JZVtQZjY2GmQBUBmL
-         yqn7Pz3ceoCf9/+fC88BxZM+qRKajzb+MHtB1mDLoG4s5G9OExeZzqSohWTxXGx4dTSI
-         ugH+z56dkKaorvNxrPSewaDQOain4OZ1hEjBbT+eSIQFwSGLihy0LypwPCLZeaeexMzR
-         916Q==
-X-Gm-Message-State: ACrzQf09wi25sprw0gQDBYXACXZZ7F//omR/eViwK7irM9qKABQvfMNv
-        cKcJiFcUe5EUg1qP/C1/OUscFYJmrxVHjAPBgP1IyuJu7beaIIBnAiE3h29q57Pds7qabyN4L30
-        k1gG2TFRN2nl5
-X-Received: by 2002:a5d:4b45:0:b0:236:501f:7a41 with SMTP id w5-20020a5d4b45000000b00236501f7a41mr33248884wrs.516.1667855408486;
-        Mon, 07 Nov 2022 13:10:08 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM7OiDI4F9MI4Y77S9G7vRAA8ji/J8GVqtN7aNFdugsfuItxHBGzX5veSqv7kZTArZsQcUceGA==
-X-Received: by 2002:a5d:4b45:0:b0:236:501f:7a41 with SMTP id w5-20020a5d4b45000000b00236501f7a41mr33248873wrs.516.1667855408285;
-        Mon, 07 Nov 2022 13:10:08 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id i5-20020adffc05000000b0023660f6cecfsm8312230wrr.80.2022.11.07.13.10.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Nov 2022 13:10:07 -0800 (PST)
-Message-ID: <b8487793-d7b8-0557-a4c2-b62754e14830@redhat.com>
-Date:   Mon, 7 Nov 2022 22:10:06 +0100
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uQxDTNLotBeU5vzOFGDa7HGUR31Gv4MxI4cPw2VN0VA=;
+        b=7R0eiKz+BdrFNtkPajsQ4+ihol9rgxARjkWhf1t/ARGC6TtK2OjlV4WMe8KIc4i9IT
+         aE0d7uBxR+tAGpxRdLPTKqitL74rd8MkFFGZ289XCqKRTTIyYs0GeiZzvOMzoMNcuDnw
+         w+CRGBbMvBNnsIfB8LBG+rFh5wYXoYFMCl350UGjNz6Ioyj5pkv86PgOXC7J3pJild1J
+         IEbFSbcLfxZbHufOt9r9T8231c/hzSFU0CbYl6CSMqOb9+tAOjsXM3iECl/EaOQHWJpp
+         x1zRb2KSvXjjLg8iKCT8G6nfVNGrYcjY68E9XoxKI69ENDVRxyrcCZHbhjuYidP+Mty4
+         CQvQ==
+X-Gm-Message-State: ACrzQf2qJ+yduFRAWu5bF2DZc3tZ+ADwdi1Qp8NDVj1T6c3EpgsLBMB2
+        r6lMh3U5XFIZcrWE3T6iz1ipUQ==
+X-Google-Smtp-Source: AMsMyM5liJeJIPS4yBMVVLnIHlSsUkGUzNnvanHyNz2oWf/qJRJEz81J8s4pOxfh86gB5dt5ZqgR/g==
+X-Received: by 2002:a63:a5f:0:b0:46e:c9cf:e702 with SMTP id z31-20020a630a5f000000b0046ec9cfe702mr45835080pgk.198.1667855512007;
+        Mon, 07 Nov 2022 13:11:52 -0800 (PST)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id mm11-20020a17090b358b00b0020d24ea4400sm6586623pjb.38.2022.11.07.13.11.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Nov 2022 13:11:51 -0800 (PST)
+Date:   Mon, 7 Nov 2022 13:11:47 -0800
+From:   David Matlack <dmatlack@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        seanjc@google.com, oupton@google.com, ricarkol@google.com
+Subject: Re: [PATCH v10 2/4] KVM: selftests: create -r argument to specify
+ random seed
+Message-ID: <Y2l0kyyy1POrNS6u@google.com>
+References: <20221107182208.479157-1-coltonlewis@google.com>
+ <20221107182208.479157-3-coltonlewis@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC] vhost: Clear the pending messages on
- vhost_init_device_iotlb()
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     eric.auger.pro@gmail.com, jasowang@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, peterx@redhat.com
-References: <20221107203431.368306-1-eric.auger@redhat.com>
- <20221107153924-mutt-send-email-mst@kernel.org>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20221107153924-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221107182208.479157-3-coltonlewis@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Michael,
-On 11/7/22 21:42, Michael S. Tsirkin wrote:
-> On Mon, Nov 07, 2022 at 09:34:31PM +0100, Eric Auger wrote:
->> When the vhost iotlb is used along with a guest virtual iommu
->> and the guest gets rebooted, some MISS messages may have been
->> recorded just before the reboot and spuriously executed by
->> the virtual iommu after the reboot. Despite the device iotlb gets
->> re-initialized, the messages are not cleared. Fix that by calling
->> vhost_clear_msg() at the end of vhost_init_device_iotlb().
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  drivers/vhost/vhost.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->> index 40097826cff0..422a1fdee0ca 100644
->> --- a/drivers/vhost/vhost.c
->> +++ b/drivers/vhost/vhost.c
->> @@ -1751,6 +1751,7 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled)
->>  	}
->>  
->>  	vhost_iotlb_free(oiotlb);
->> +	vhost_clear_msg(d);
->>  
->>  	return 0;
->>  }
-> Hmm.  Can't messages meanwhile get processes and affect the
-> new iotlb?
-Isn't the msg processing stopped at the moment this function is called
-(VHOST_SET_FEATURES)?
+On Mon, Nov 07, 2022 at 06:22:06PM +0000, Colton Lewis wrote:
+> Create a -r argument to specify a random seed. If no argument is
+> provided, the seed defaults to 1. The random seed is set with
+> perf_test_set_random_seed() and must be set before guest_code runs to
+> apply.
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 
-Thanks
+Reviewed-by: David Matlack <dmatlack@google.com>
 
-Eric
->
->
->> -- 
->> 2.37.3
-
+> ---
+>  tools/testing/selftests/kvm/dirty_log_perf_test.c  | 14 ++++++++++++--
+>  .../testing/selftests/kvm/include/perf_test_util.h |  2 ++
+>  tools/testing/selftests/kvm/lib/perf_test_util.c   |  6 ++++++
+>  3 files changed, 20 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> index f99e39a672d3..f74a78138df3 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> @@ -132,6 +132,7 @@ struct test_params {
+>  	bool partition_vcpu_memory_access;
+>  	enum vm_mem_backing_src_type backing_src;
+>  	int slots;
+> +	uint32_t random_seed;
+>  };
+>  
+>  static void toggle_dirty_logging(struct kvm_vm *vm, int slots, bool enable)
+> @@ -225,6 +226,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  				 p->slots, p->backing_src,
+>  				 p->partition_vcpu_memory_access);
+>  
+> +	pr_info("Random seed: %u\n", p->random_seed);
+> +	perf_test_set_random_seed(vm, p->random_seed);
+>  	perf_test_set_wr_fract(vm, p->wr_fract);
+>  
+>  	guest_num_pages = (nr_vcpus * guest_percpu_mem_size) >> vm->page_shift;
+> @@ -352,7 +355,7 @@ static void help(char *name)
+>  {
+>  	puts("");
+>  	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
+> -	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]"
+> +	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-r random seed ] [-s mem type]"
+>  	       "[-x memslots]\n", name);
+>  	puts("");
+>  	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
+> @@ -380,6 +383,7 @@ static void help(char *name)
+>  	printf(" -v: specify the number of vCPUs to run.\n");
+>  	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
+>  	       "     them into a separate region of memory for each vCPU.\n");
+> +	printf(" -r: specify the starting random seed.\n");
+>  	backing_src_help("-s");
+>  	printf(" -x: Split the memory region into this number of memslots.\n"
+>  	       "     (default: 1)\n");
+> @@ -396,6 +400,7 @@ int main(int argc, char *argv[])
+>  		.partition_vcpu_memory_access = true,
+>  		.backing_src = DEFAULT_VM_MEM_SRC,
+>  		.slots = 1,
+> +		.random_seed = 1,
+>  	};
+>  	int opt;
+>  
+> @@ -406,7 +411,7 @@ int main(int argc, char *argv[])
+>  
+>  	guest_modes_append_default();
+>  
+> -	while ((opt = getopt(argc, argv, "eghi:p:m:nb:f:v:os:x:")) != -1) {
+> +	while ((opt = getopt(argc, argv, "eghi:p:m:nb:f:v:or:s:x:")) != -1) {
+>  		switch (opt) {
+>  		case 'e':
+>  			/* 'e' is for evil. */
+> @@ -442,6 +447,11 @@ int main(int argc, char *argv[])
+>  		case 'o':
+>  			p.partition_vcpu_memory_access = false;
+>  			break;
+> +		case 'r':
+> +			p.random_seed = atoi(optarg);
+> +			TEST_ASSERT(p.random_seed > 0,
+> +				    "Invalid random seed, must be greater than 0");
+> +			break;
+>  		case 's':
+>  			p.backing_src = parse_backing_src_type(optarg);
+>  			break;
+> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
+> index eaa88df0555a..f1050fd42d10 100644
+> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
+> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+> @@ -35,6 +35,7 @@ struct perf_test_args {
+>  	uint64_t gpa;
+>  	uint64_t size;
+>  	uint64_t guest_page_size;
+> +	uint32_t random_seed;
+>  	int wr_fract;
+>  
+>  	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
+> @@ -52,6 +53,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
+>  void perf_test_destroy_vm(struct kvm_vm *vm);
+>  
+>  void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract);
+> +void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed);
+>  
+>  void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
+>  void perf_test_join_vcpu_threads(int vcpus);
+> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> index 9618b37c66f7..0bb0659b9a0d 100644
+> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> @@ -229,6 +229,12 @@ void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract)
+>  	sync_global_to_guest(vm, perf_test_args);
+>  }
+>  
+> +void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed)
+> +{
+> +	perf_test_args.random_seed = random_seed;
+> +	sync_global_to_guest(vm, perf_test_args.random_seed);
+> +}
+> +
+>  uint64_t __weak perf_test_nested_pages(int nr_vcpus)
+>  {
+>  	return 0;
+> -- 
+> 2.38.1.431.g37b22c650d-goog
+> 
