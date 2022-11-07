@@ -2,194 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A80F61F642
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 15:38:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CEA861F6A2
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 15:53:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231853AbiKGOiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 09:38:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51736 "EHLO
+        id S232324AbiKGOxF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 09:53:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231857AbiKGOiJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 09:38:09 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2053.outbound.protection.outlook.com [40.107.92.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46F192C6;
-        Mon,  7 Nov 2022 06:38:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T//LAGfIFIZy35iHOiFEAmU5fkKwUT5d8Xrf+Vcsl5kAJV4gzRbsxH7geOQKPmb510x2wYh36C0d1gqX9T+FhCyOLOakpJQlW2WqKCLIIfD6IZKYmPxNjlm+8tVICR5zChQn2wx8f/2dN4c53dnEyX0EvhKJ8NtHW8F8533FxGjk6+GNHWgM85vAoAwsMcvPBPaWWHfAPiY5pvtUMJGLOvCGV/XzBRmW9O5y0oLw/JpCCISy0Idf+DiF6dv876Psk1nEq96XFXUmst5al7WUoL4mUZ+55Hb3uuH711bzipPvSeHwtRvCU3prby7LlgoQpy1RKpGRuhdesy75Q2mm3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=86tVBISN5fI+IGSsoARQi3YKAxAT0osQx5loXarKwkM=;
- b=WT+hI0vpGDxO/xOsOMvIfAH4gPE7qebHI3XYiH7VlzWwzQ7x6XSkNHMAH86GWa+f8umt3HCbZ+2WDueJwS8R1jsmKwSg7WxWduCKgFjBdmfFBuo4UszaGf6KDzTpNyV51dBAbWH/cvu0WR1lfHuadyyOYx6QORj/Vkrgyz9aBZ6zWCP4CYeP9LhoZw922r7HV1qQvjsdwRgBBveYYDHbB9nLvDlVxbQDjFDnI9GBVCDfoO4tNQ00pTDWIBcfCXHE7F5+Cilo27eF9JuY2172gZZ1bPGx0P/0ZM67OFq/K/5UuuqGjxw++bUM12TuLFGBVmeCfk7zTo394oHnbOrwRA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=86tVBISN5fI+IGSsoARQi3YKAxAT0osQx5loXarKwkM=;
- b=t2Ca3+PXKECdscqsMnz+tHyYN2ubF8omTdkf5aKqR/rDU15kPBATAlw8lHC53RhPKj9xj2A3Tl6XJ8Wph59/SxeXN+FexJE9szTRxg3djBgiI2ate8xUKz2VUltqg2Rb3/bj4+XgWCcnb3XXM7iUnleXK1sA0YyjhaQ1KVi0jbvb+WhD0nFFPHeVZa+mjl/eIR2WTcWCpNmxSht2Cubd30FUlNM5XSLCH5Y/ib3/vPYePBXp9/YJlKd5YIZx0oQJpoqV2p22knAhDJQ0bu5Y745QiJ7+ZsOVUJSwwmPTfT32KLyebr+5zDKZy/SaEggRkbCGo+mVuQt1dd3jwWZQDw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CO6PR12MB5460.namprd12.prod.outlook.com (2603:10b6:5:357::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27; Mon, 7 Nov
- 2022 14:38:06 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Mon, 7 Nov 2022
- 14:38:05 +0000
-Date:   Mon, 7 Nov 2022 10:38:04 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v3 03/15] interval-tree: Add a utility to iterate over
- spans in an interval tree
-Message-ID: <Y2kYTLsMbQjIUMXh@nvidia.com>
-References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
- <3-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
- <BN9PR11MB527666424E77F8417DF1BF4C8C389@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Y2VqK3m9i6FlQd9+@nvidia.com>
- <Y2XA702nWRGfP7mo@casper.infradead.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y2XA702nWRGfP7mo@casper.infradead.org>
-X-ClientProxiedBy: MN2PR01CA0059.prod.exchangelabs.com (2603:10b6:208:23f::28)
- To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+        with ESMTP id S231527AbiKGOxE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 09:53:04 -0500
+Received: from out203-205-221-210.mail.qq.com (out203-205-221-210.mail.qq.com [203.205.221.210])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 157141C42C;
+        Mon,  7 Nov 2022 06:53:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+        s=s201512; t=1667832778;
+        bh=ydwp8OFfyNC3czSkVZxP+swyc/Ys7TW8cMf+ICjld9k=;
+        h=From:To:Cc:Subject:Date;
+        b=W6P3FhiqTwfi328eGZnLO2Ur77Nv8f9zhcyUBz6y6Vd701AEqano1e8S/YehKpiKr
+         6CTVf9z8krhqLhKGAUhCDjR/TY4s+aD9ixPozrQx+mfnGlFTpdzcyDypJwglWczSFf
+         E9tuw5aRJBCViM+WEg1Zt4jkXhxLtQSuS/JYW0MU=
+Received: from localhost.localdomain ([111.199.191.46])
+        by newxmesmtplogicsvrszc2-1.qq.com (NewEsmtp) with SMTP
+        id D390D68D; Mon, 07 Nov 2022 22:52:57 +0800
+X-QQ-mid: xmsmtpt1667832777tphmmd7vn
+Message-ID: <tencent_00082C8BFA925A65E11570F417F1CD404505@qq.com>
+X-QQ-XMAILINFO: N3l5ASPewLWq4Uhl1CArSyWT4MJYqsh11W6vWdIGDNfLbUYEvf45isialscPab
+         OLxIzzPDyTAMDfml6D+gAq12nohz/4KXm4d1/IAL3HR4vKJd3+OxcRt1t8igkIJ4Zx7sibC7EHKN
+         Bjeb/86YJyrIA8WXHttuEDnnw0v1czODpHScabmXKKO2GDtl2yxVypwVyUjkyhrz1NNM5sBQCT+c
+         wcv9RYr0TopiUf/O2Fgpu+kAbfVVgH3p1dqW3EaCBsGIQx0+XSed/wSL9hzUrLMgNmn8Eyosa5la
+         z4ZJLdEoz38MjBDDL3ioWXmM7Kgp+0UEy7R0HAOpxNXldsJyFZiOArXJhCsBhZUbxobDxWAxdjt7
+         eO1R90fxkFjDyspl4vOXPGPX94z/W9iKwfKvDckejT5qRNx0bwVrqVF/Lkjip7Xk8fjknwdNZYf4
+         4IgBIoLMgJ2wjHj4QVrxv9NMR2dF1JqvqSrCZkl92OlPubZhzgu1VKPTs11LHKZbY3Q6LlgzcdVp
+         JKRi5PCqqq4MoRxU2w3cZrPP+uAKXT0uulCMV9FNDy1uOicCKrdHmAW+goD5pY/uZ2ED3Y5jAn/z
+         lHTW4E2t9/BHeoycGzFvEqdARAnKNaVg9es0EoyeinRRcQjSRnVwwnb1ySROgejrf4Ank7K2tiso
+         6VwNIDC8VA4qhTk1dXuhebJGYucX9heQqSPPs4JyAowLSBQcmVtDPSjXleuJrf5H7OU2v0F5BrNp
+         XQTPeq9yZks96RvHKdo6cdB8fqkiA/OpFEklP8/mDe4VXxexvs40grZK6EkooIZTmdlvQmiJjH0v
+         6Bph9gwMSilsGBCJlKyPOqos+lmZqTgakRCb7LeHNojTyLKTG+XxnPXBAg0/SHwmigOp4U+dWx4n
+         TuijpOGxCrhElX3WTO8Tt4i2fF2Dp9PQmm41oPxGl7FrjbFX8/Jiz6oF4JfD7mDALc+zZ8wTirdx
+         AsRKy2Gz2BkTrs24K1JVJgYExT1Fyc
+From:   Rong Tao <rtoax@foxmail.com>
+To:     pbonzini@redhat.com
+Cc:     Rong Tao <rongtao@cestc.cn>,
+        Dmitry Klochkov <kdmitry556@gmail.com>,
+        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE (KVM)),
+        linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] tools/kvm_stat: update exit reasons for vmx/svm/aarch64/userspace
+Date:   Mon,  7 Nov 2022 22:52:49 +0800
+X-OQ-MSGID: <20221107145250.23018-1-rtoax@foxmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CO6PR12MB5460:EE_
-X-MS-Office365-Filtering-Correlation-Id: 90d09937-66aa-44b9-2887-08dac0cdae95
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EFl6whwbXAqBRXuGCZlTM3gDSwq6ScWo7nxfjmfhk0gSWyZCp9LEacznc+FJMSAk6K42W3k0Ofr0PCrOb5QGxJNeK5QDbrevchgKckn1JvlaCjZvBbuA+Y4I+XWbQDI5ks0GFxJZlMtfo7cK1yQhpZHx0+EGctfr8tmoktw2+jXHNeI+FTAJiY5/m9o5np6CvG+GytxRCMBklyM8Cf9ux3tLrtieU7SGaLWwrkoAbATZTINF1p5wP3Ff8hvwLm9oOvuVapDBS0mBpCVn67UemEWYyBItknBFmWzpKswrT0J9lsNi2wpd0kLA/v+JQauk8Rzxq23ekXG0EN3zAq8IeGaPK3/9iZduQGtMF4eQMk1P+6dhrO9cucEP6NEqjKHbBKHTiI3F8MRCH4gxTwVGgsJFt7dNVBvDsQNLCgWMxeVtHb+VBYjxBd2ktOh+P3/TjQNtantjG+pDqBjfeby2/VLicRB0/RXvu63SqxuQ8sJD8VaSS376Bdyoqp3OOA59uulVgvWbX80I7yQ8pZt2hMgwhMtDBawYRu4cqQXBKDXy6XZOUk+5ckTTrAfuzMVaoGtMhkduJMKy/b4GEptZfNj4h0ZWNf0SKu+T4VK5dbktQ94jlQM/KvbMj+upYlIFy5wD9moag+0ahMW3CYgu56S8yPog97MSG/Md3UoRVYVRVdqscmv3Xaj6VYK1WNDpOmUWoJNpVs6Epet7konigQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(376002)(366004)(39860400002)(136003)(396003)(451199015)(26005)(186003)(2616005)(83380400001)(6512007)(38100700002)(2906002)(5660300002)(7406005)(7416002)(8936002)(6506007)(6486002)(478600001)(4326008)(66556008)(8676002)(66946007)(66476007)(41300700001)(316002)(6916009)(54906003)(86362001)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rtefODzIIjHDt4FdSRuqYc1UL3X0eqEkyi4KljjYzY3BESQZ2lDPecEH91MT?=
- =?us-ascii?Q?4NyrPrUiRqkF61AdVfS6C+HWaJ6AEAQkg0B+0wZLdEbLLSZ0Yn/dUJCzRgtQ?=
- =?us-ascii?Q?+kpcex91rzzI0urGjnjjr6YW5X9xcmIGftAMN0s58xr0/8prU66BkD+pMDQP?=
- =?us-ascii?Q?H0c+Z6UW7D6zgGzSVNLk/KVS5ZUj8D/OPvgZ3xRl035EXEEoHFXN9uokpxHx?=
- =?us-ascii?Q?B60L1VLamGHLerHi/gYn3rKq9GZDLlVYeSmgr3hyBzKEo45HRvdYMYe5J/FF?=
- =?us-ascii?Q?ZmsA4mrDqwh7tPpIc/zS+TUx9ESGdMK/ppQsTzQ14wQjYDHCGoWZalnWI7UR?=
- =?us-ascii?Q?elntX7lAuwmMqe47bQd0O3dt08U2iP5i5VO5UmvL1XezMmJFCuT+hhII8Ese?=
- =?us-ascii?Q?qzkgoaavyT9oO00IOU6+e5NKbHIOUu1cbpt1zrC1TxkV/1Y1lLcmmEyiCj5X?=
- =?us-ascii?Q?VZqwBc64qE+bpnmwbrPD/LVsWBaN+1zan+7MJPkGACeHcNgTpntn4BETMHVv?=
- =?us-ascii?Q?YmLHgOCxaPK92hzN0FZZkzdOB7mtYX7p9b7Pg+z1Xw4pKcHyVk5dZ10rwrmH?=
- =?us-ascii?Q?I6CwVjCMvTzNT7YYmrIE3sQ91GBDLlAiMxlD1OZ4qMWOQJbK6Es7ZxQ5tSP5?=
- =?us-ascii?Q?HhLZVHwavA8o/4UkQWH+eQo6SVjN4zr0aDVurv/pL49H0Gyv3Mcmgrce69iD?=
- =?us-ascii?Q?GvLNRXxI80BAyBoaRxzpLH3d12n2NX1xrQb36TZALtzBBuILQAI10OCgOZhs?=
- =?us-ascii?Q?e5+eUDmScUVu+9e6QbR5t3b6XIQ/CRMKGn2gvNtzbC233O4ztcUusNAAgju3?=
- =?us-ascii?Q?MZho6kjyTWPbCg6MQoE3QsgCtXNatTpzzRRVGztS+oZKSt22ubTyxv50vyLe?=
- =?us-ascii?Q?IbxXNx6RCxPivCmjKtYwzC3rdr0mRqyCRIi28jY+29AM+mrt4VVY1hj/qnj5?=
- =?us-ascii?Q?luvqaYGZhcmatt9/drx/2uhjCsVYUtBT0HuZ26RKEVx6T0ttSCG8QvCHVVtt?=
- =?us-ascii?Q?+DPjXFM1pChv/NO5xqU/TQAiNWnToA5PyWRs1oxXfAWlrAaxP1UT0UltZ2bf?=
- =?us-ascii?Q?K7k7teCsjkZVS6Nn3yBD01bV21l2dGTGynYY1dX6mo60mFE7j8lInT0HrZid?=
- =?us-ascii?Q?z9f9GdV/PUKU1fEjAsFO/f3CZx0t6ti+vEVXXWbjfaRA4ILbUlKziFOSDvtr?=
- =?us-ascii?Q?DqENNwToTsTzln0N8PnIE20RYTwwYBjvuGvxp+NRdajSo6lkmZccIcKSQk3G?=
- =?us-ascii?Q?o3ahveqXWSpggdB0/lFwB8o8G63nDQIeskNDyXFVrLL93CfbW3vTvwKtCpi2?=
- =?us-ascii?Q?m0m3e2mBk2JWY2G7uktL8f8do9mg7J5fMuG7+PDfQzlBugcTLKLvh3dY53IF?=
- =?us-ascii?Q?kzN8HoApQlOZPsTTPQFxBPqcu9mRWUP1/8sl0F3vXR/mzIotWEmj/auX9GHL?=
- =?us-ascii?Q?0Fu2Vqt0XL9JCkYytIX/TtJPl9ojm5yiUuB3sV9owexPqMhXnAZaEVlOr2wQ?=
- =?us-ascii?Q?Z79UEj/bmUOgxmBenqlENZ3RX4qR9A2ODy+MdSP6gpR/3skxd6dZeUal/KkW?=
- =?us-ascii?Q?DldJO/wfdaiqY8eEqMI=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 90d09937-66aa-44b9-2887-08dac0cdae95
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2022 14:38:05.8685
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5MJE4+PCOlIlfii6zr3bv5EdVbc+ghp91YyyuA8c35huDZdlAi9yghm6djksJmsY
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5460
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        HELO_DYNAMIC_IPADDR,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,RDNS_DYNAMIC,
+        SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75 autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 05, 2022 at 01:48:31AM +0000, Matthew Wilcox wrote:
-> Or you could kernel-doc it ...
+From: Rong Tao <rongtao@cestc.cn>
 
-That is a good idea:
+Update EXIT_REASONS from source, including VMX_EXIT_REASONS,
+SVM_EXIT_REASONS, AARCH64_EXIT_REASONS, USERSPACE_EXIT_REASONS.
 
-/**
- * struct interval_tree_span_iter - Find used and unused spans.
- * @start_hole: Start of an interval for a hole when is_hole == 1
- * @last_hole: Inclusive end of an interval for a hole when is_hole == 1
- * @start_used: Start of a used interval when is_hole == 0
- * @last_used: Inclusive end of a used interval when is_hole == 0
- * @is_hole: 0 == used, 1 == is_hole, -1 == done iteration
- *
- * This iterator travels over spans in an interval tree. It does not return
- * nodes but classifies each span as either a hole, where no nodes intersect, or
- * a used, which is fully covered by nodes. Each iteration step toggles between
- * hole and used until the entire range is covered. The returned spans always
- * fully cover the requested range.
- *
- * The iterator is greedy, it always returns the largest hole or used possible,
- * consolidating all consecutive nodes.
- *
- * Use interval_tree_span_iter_done() to detect end of iteration.
- */
-struct interval_tree_span_iter {
-	/* private: not for use by the caller */
-	struct interval_tree_node *nodes[2];
-	unsigned long first_index;
-	unsigned long last_index;
+Signed-off-by: Rong Tao <rongtao@cestc.cn>
+---
+ tools/kvm/kvm_stat/kvm_stat | 96 +++++++++++++++++++++++++++++++------
+ 1 file changed, 82 insertions(+), 14 deletions(-)
 
-	/* public: */
-	union {
-		unsigned long start_hole;
-		unsigned long start_used;
-	};
-	union {
-		unsigned long last_hole;
-		unsigned long last_used;
-	};
-	int is_hole;
-};
+diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
+index 9c366b3a676d..a34b781a3ce8 100755
+--- a/tools/kvm/kvm_stat/kvm_stat
++++ b/tools/kvm/kvm_stat/kvm_stat
+@@ -41,11 +41,14 @@ VMX_EXIT_REASONS = {
+     'EXCEPTION_NMI':        0,
+     'EXTERNAL_INTERRUPT':   1,
+     'TRIPLE_FAULT':         2,
+-    'PENDING_INTERRUPT':    7,
++    'INIT_SIGNAL':          3,
++    'SIPI_SIGNAL':          4,
++    'INTERRUPT_WINDOW':     7,
+     'NMI_WINDOW':           8,
+     'TASK_SWITCH':          9,
+     'CPUID':                10,
+     'HLT':                  12,
++    'INVD':                 13,
+     'INVLPG':               14,
+     'RDPMC':                15,
+     'RDTSC':                16,
+@@ -65,26 +68,48 @@ VMX_EXIT_REASONS = {
+     'MSR_READ':             31,
+     'MSR_WRITE':            32,
+     'INVALID_STATE':        33,
++    'MSR_LOAD_FAIL':        34,
+     'MWAIT_INSTRUCTION':    36,
++    'MONITOR_TRAP_FLAG':    37,
+     'MONITOR_INSTRUCTION':  39,
+     'PAUSE_INSTRUCTION':    40,
+     'MCE_DURING_VMENTRY':   41,
+     'TPR_BELOW_THRESHOLD':  43,
+     'APIC_ACCESS':          44,
++    'EOI_INDUCED':          45,
++    'GDTR_IDTR':            46,
++    'LDTR_TR':              47,
+     'EPT_VIOLATION':        48,
+     'EPT_MISCONFIG':        49,
++    'INVEPT':               50,
++    'RDTSCP':               51,
++    'PREEMPTION_TIMER':     52,
++    'INVVPID':              53,
+     'WBINVD':               54,
+     'XSETBV':               55,
+     'APIC_WRITE':           56,
++    'RDRAND':               57,
+     'INVPCID':              58,
++    'VMFUNC':               59,
++    'ENCLS':                60,
++    'RDSEED':               61,
++    'PML_FULL':             62,
++    'XSAVES':               63,
++    'XRSTORS':              64,
++    'UMWAIT':               67,
++    'TPAUSE':               68,
++    'BUS_LOCK':             74,
++    'NOTIFY':               75,
+ }
+ 
+ SVM_EXIT_REASONS = {
+     'READ_CR0':       0x000,
++    'READ_CR2':       0x002,
+     'READ_CR3':       0x003,
+     'READ_CR4':       0x004,
+     'READ_CR8':       0x008,
+     'WRITE_CR0':      0x010,
++    'WRITE_CR2':      0x012,
+     'WRITE_CR3':      0x013,
+     'WRITE_CR4':      0x014,
+     'WRITE_CR8':      0x018,
+@@ -105,6 +130,7 @@ SVM_EXIT_REASONS = {
+     'WRITE_DR6':      0x036,
+     'WRITE_DR7':      0x037,
+     'EXCP_BASE':      0x040,
++    'LAST_EXCP':      0x05f,
+     'INTR':           0x060,
+     'NMI':            0x061,
+     'SMI':            0x062,
+@@ -151,21 +177,45 @@ SVM_EXIT_REASONS = {
+     'MWAIT':          0x08b,
+     'MWAIT_COND':     0x08c,
+     'XSETBV':         0x08d,
++    'RDPRU':          0x08e,
++    'EFER_WRITE_TRAP':           0x08f,
++    'CR0_WRITE_TRAP':            0x090,
++    'CR1_WRITE_TRAP':            0x091,
++    'CR2_WRITE_TRAP':            0x092,
++    'CR3_WRITE_TRAP':            0x093,
++    'CR4_WRITE_TRAP':            0x094,
++    'CR5_WRITE_TRAP':            0x095,
++    'CR6_WRITE_TRAP':            0x096,
++    'CR7_WRITE_TRAP':            0x097,
++    'CR8_WRITE_TRAP':            0x098,
++    'CR9_WRITE_TRAP':            0x099,
++    'CR10_WRITE_TRAP':           0x09a,
++    'CR11_WRITE_TRAP':           0x09b,
++    'CR12_WRITE_TRAP':           0x09c,
++    'CR13_WRITE_TRAP':           0x09d,
++    'CR14_WRITE_TRAP':           0x09e,
++    'CR15_WRITE_TRAP':           0x09f,
++    'INVPCID':        0x0a2,
+     'NPF':            0x400,
++    'AVIC_INCOMPLETE_IPI':       0x401,
++    'AVIC_UNACCELERATED_ACCESS': 0x402,
++    'VMGEXIT':        0x403,
+ }
+ 
+-# EC definition of HSR (from arch/arm64/include/asm/kvm_arm.h)
++# EC definition of HSR (from arch/arm64/include/asm/esr.h)
+ AARCH64_EXIT_REASONS = {
+     'UNKNOWN':      0x00,
+-    'WFI':          0x01,
++    'WFx':          0x01,
+     'CP15_32':      0x03,
+     'CP15_64':      0x04,
+     'CP14_MR':      0x05,
+     'CP14_LS':      0x06,
+     'FP_ASIMD':     0x07,
+     'CP10_ID':      0x08,
++    'PAC':          0x09,
+     'CP14_64':      0x0C,
+-    'ILL_ISS':      0x0E,
++    'BTI':          0x0D,
++    'ILL':          0x0E,
+     'SVC32':        0x11,
+     'HVC32':        0x12,
+     'SMC32':        0x13,
+@@ -173,21 +223,26 @@ AARCH64_EXIT_REASONS = {
+     'HVC64':        0x16,
+     'SMC64':        0x17,
+     'SYS64':        0x18,
+-    'IABT':         0x20,
+-    'IABT_HYP':     0x21,
++    'SVE':          0x19,
++    'ERET':         0x1A,
++    'FPAC':         0x1C,
++    'SME':          0x1D,
++    'IMP_DEF':      0x1F,
++    'IABT_LOW':     0x20,
++    'IABT_CUR':     0x21,
+     'PC_ALIGN':     0x22,
+-    'DABT':         0x24,
+-    'DABT_HYP':     0x25,
++    'DABT_LOW':     0x24,
++    'DABT_CUR':     0x25,
+     'SP_ALIGN':     0x26,
+     'FP_EXC32':     0x28,
+     'FP_EXC64':     0x2C,
+     'SERROR':       0x2F,
+-    'BREAKPT':      0x30,
+-    'BREAKPT_HYP':  0x31,
+-    'SOFTSTP':      0x32,
+-    'SOFTSTP_HYP':  0x33,
+-    'WATCHPT':      0x34,
+-    'WATCHPT_HYP':  0x35,
++    'BREAKPT_LOW':  0x30,
++    'BREAKPT_CUR':  0x31,
++    'SOFTSTP_LOW':  0x32,
++    'SOFTSTP_CUR':  0x33,
++    'WATCHPT_LOW':  0x34,
++    'WATCHPT_CUR':  0x35,
+     'BKPT32':       0x38,
+     'VECTOR32':     0x3A,
+     'BRK64':        0x3C,
+@@ -220,6 +275,19 @@ USERSPACE_EXIT_REASONS = {
+     'S390_TSCH':        22,
+     'EPR':              23,
+     'SYSTEM_EVENT':     24,
++    'S390_STSI':        25,
++    'IOAPIC_EOI':       26,
++    'HYPERV':           27,
++    'ARM_NISV':         28,
++    'X86_RDMSR':        29,
++    'X86_WRMSR':        30,
++    'DIRTY_RING_FULL':  31,
++    'AP_RESET_HOLD':    32,
++    'X86_BUS_LOCK':     33,
++    'XEN':              34,
++    'RISCV_SBI':        35,
++    'RISCV_CSR':        36,
++    'NOTIFY':           37,
+ }
+ 
+ IOCTL_NUMBERS = {
+-- 
+2.31.1
 
-Jason
