@@ -2,134 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 218D961FCA3
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:03:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A259D61FCBE
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:05:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232133AbiKGSD0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 13:03:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43868 "EHLO
+        id S233081AbiKGSFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 13:05:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233272AbiKGSCQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 13:02:16 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 627CB24940;
-        Mon,  7 Nov 2022 09:58:59 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A7GWQkp031956;
-        Mon, 7 Nov 2022 17:58:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=OtmPuK3MWiLF586NtC+bldTUVNylNT/bGGgI5w0Fq9c=;
- b=tEaZDi2UHVX11QxU6UoEIMv071RQMm9iqzjbdP5Zkbmm9BqKuFi1RARRCA9nYbgxAoa5
- LOIQNR+SswnfIuNoa1HMjKsNBt4OnLxi0/2E2+VmXRtCqkUygEMq2N+VM+W4r+av+7Qh
- ruaENJhnppcGZdv4eWE7ba9gmRthNw3sMIYRmbVwvdpPZ68qWe9/0lFLjj7uoAhcrS9Z
- nR5VOjceXevf9rwoR1BkKyBTWi1EsjrcE5+7s5By+wPbnA8uKDJdnIaiNUwQBGYVIh18
- LtpZyga9eCegesTY+EHPFLs2v1ho0G1FQXTfewe5Pi2Td4kszHEI0kpl5Ecq9Yr8/VZq yA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1f755gc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 17:58:26 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A7HbWEb003255;
-        Mon, 7 Nov 2022 17:58:25 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1f755fr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 17:58:25 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A7HoTaR015449;
-        Mon, 7 Nov 2022 17:58:24 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma01wdc.us.ibm.com with ESMTP id 3kngs3s8sd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 17:58:24 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com ([9.208.128.114])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A7HwMq33277472
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 7 Nov 2022 17:58:23 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7EA165805F;
-        Mon,  7 Nov 2022 17:58:22 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E17745805C;
-        Mon,  7 Nov 2022 17:58:17 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.65.225.56])
-        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  7 Nov 2022 17:58:17 +0000 (GMT)
-Message-ID: <9d5a57634244c268d20ac640e055cc0befd8a881.camel@linux.ibm.com>
-Subject: Re: [PATCH 06/44] KVM: s390: Move hardware setup/unsetup to
- init/exit
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Chao Gao <chao.gao@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Yuan Yao <yuan.yao@intel.com>
-Date:   Mon, 07 Nov 2022 12:58:17 -0500
-In-Reply-To: <20221102231911.3107438-7-seanjc@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
-         <20221102231911.3107438-7-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+        with ESMTP id S232439AbiKGSFF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 13:05:05 -0500
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A43EA24BD8
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 10:02:03 -0800 (PST)
+Received: by mail-wm1-x333.google.com with SMTP id v124-20020a1cac82000000b003cf7a4ea2caso10154794wme.5
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 10:02:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:user-agent:message-id:date:references:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VuTsw6+GkSRwP58GovhtYe/JYxk+oyo+mlW8nXi3XHk=;
+        b=c9L+/2+mr+pVaf+wpuESBoLqmizXoqXWcAlhmtmu9t6DBk0yMBH8Uk0jEUCbKU9YLV
+         5oDUYWjLaGbzaTXz8G2w1DM+iE3tFkI+D8wq4Yrz9k4pId5WbgjBNvanKY3J8Q69aQsm
+         YQ/+H+U6bwxOh7QDA1Ntbys5xrUcQFdOE+3uIKnxEWq5TrZ0SAsQo9EHomlmfg6MPbGG
+         EYezTniaGhsm8bPey5aoHm6x2YZmfb5kaKjPrEImej3mAzM3/4JF/9f0FsiDzjwDOVs6
+         ZIFVtGSzxG+1xoFAEJxrHhJLcBqi6FqUpkbjnVeIu/92+M2eXVYBKfscHvgzjiIPc86Q
+         EDuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:user-agent:message-id:date:references:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VuTsw6+GkSRwP58GovhtYe/JYxk+oyo+mlW8nXi3XHk=;
+        b=r4X2uVjtwdGrEB6LFPlEESd46NbaIOSt4EBBiZl1X2wcdSG57eIVydO4C3vkFHopb4
+         +6PYtPgUVKLLvqjgJPUy09Jmk8uA33PtZl2bidHHjitpXmW6moI20k7zir0PFbEqqCKq
+         EWhtHFa/NpN091ugWdNYP8RNiTA9IWPvEJo8w6iub0w6itFVaD6mz/L8npArsac9IWD4
+         UIFdm5DakwjxG0nr/7eQItsO+DhCIJEpEAcib3aAVhhJMY/Y0UOMOWGmGoeojfnVYV6O
+         9ZuRmxYid/tFk2e4qbMgvqMAh9ch9pqYZHNZefUpMYC87BjGa/WMS4u5AGK+t6e3GNcv
+         +BDw==
+X-Gm-Message-State: ACrzQf2EoFshXRgsYNjgBOTYLHmarpMu+7H9q2tRrrMRfUh9VeSwHCTB
+        /D2VjkFWCZxhx3Td8ZDum9YTbw==
+X-Google-Smtp-Source: AMsMyM5nRAXExBmaX/9edNvRducHDs1nArzvmQSX0pCwzRaBpCURrnomLsO/Kxet7CldyN/wPn+q+w==
+X-Received: by 2002:a05:600c:4fd5:b0:3cf:9e9b:68f5 with SMTP id o21-20020a05600c4fd500b003cf9e9b68f5mr9168709wmq.60.1667844122108;
+        Mon, 07 Nov 2022 10:02:02 -0800 (PST)
+Received: from localhost ([95.148.15.66])
+        by smtp.gmail.com with ESMTPSA id n1-20020a5d4841000000b002366c3eefccsm7718037wrs.109.2022.11.07.10.02.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Nov 2022 10:02:01 -0800 (PST)
+From:   Punit Agrawal <punit.agrawal@bytedance.com>
+To:     Usama Arif <usama.arif@bytedance.com>
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
+        yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+        maz@kernel.org, steven.price@arm.com, mark.rutland@arm.com,
+        bagasdotme@gmail.com, fam.zheng@bytedance.com,
+        liangma@liangbit.com, punit.agrawal@bytedance.com
+Subject: Re: [v2 3/6] KVM: arm64: Support pvlock preempted via shared structure
+References: <20221104062105.4119003-1-usama.arif@bytedance.com>
+        <20221104062105.4119003-4-usama.arif@bytedance.com>
+Date:   Mon, 07 Nov 2022 18:02:01 +0000
+Message-ID: <8735au3ap2.fsf@stealth>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: PPn9NNx-sO4I-vjSF70Y0K8sCUEkIPXR
-X-Proofpoint-GUID: xEDs-39vU-yJC_i-RzSPUb6Jd0sKq-pE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-07_08,2022-11-07_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 phishscore=0 adultscore=0 bulkscore=0 mlxlogscore=999
- impostorscore=0 suspectscore=0 priorityscore=1501 mlxscore=0 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211070140
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-11-02 at 23:18 +0000, Sean Christopherson wrote:
-> Now that kvm_arch_hardware_setup() is called immediately after
-> kvm_arch_init(), fold the guts of kvm_arch_hardware_(un)setup() into
-> kvm_arch_{init,exit}() as a step towards dropping one of the hooks.
->=20
-> No functional change intended.
->=20
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-> =C2=A0arch/s390/kvm/kvm-s390.c | 23 +++++++++++++----------
-> =C2=A01 file changed, 13 insertions(+), 10 deletions(-)
+Usama Arif <usama.arif@bytedance.com> writes:
 
-Reviewed-by: Eric Farman <farman@linux.ibm.com>
+> Implement the service call for configuring a shared structure between a
+> VCPU and the hypervisor in which the hypervisor can tell whether the
+> VCPU is running or not.
+>
+> The preempted field is zero if the VCPU is not preempted.
+> Any other value means the VCPU has been preempted.
+>
+> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
+> Signed-off-by: Usama Arif <usama.arif@bytedance.com>
+> ---
+>  Documentation/virt/kvm/arm/hypercalls.rst |  3 ++
+>  arch/arm64/include/asm/kvm_host.h         | 18 ++++++++++
+>  arch/arm64/include/uapi/asm/kvm.h         |  1 +
+>  arch/arm64/kvm/Makefile                   |  2 +-
+>  arch/arm64/kvm/arm.c                      |  8 +++++
+>  arch/arm64/kvm/hypercalls.c               |  8 +++++
+>  arch/arm64/kvm/pvlock.c                   | 43 +++++++++++++++++++++++
+>  tools/arch/arm64/include/uapi/asm/kvm.h   |  1 +
+>  8 files changed, 83 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/kvm/pvlock.c
+>
+> diff --git a/Documentation/virt/kvm/arm/hypercalls.rst b/Documentation/virt/kvm/arm/hypercalls.rst
+> index 3e23084644ba..872a16226ace 100644
+> --- a/Documentation/virt/kvm/arm/hypercalls.rst
+> +++ b/Documentation/virt/kvm/arm/hypercalls.rst
+> @@ -127,6 +127,9 @@ The pseudo-firmware bitmap register are as follows:
+>      Bit-1: KVM_REG_ARM_VENDOR_HYP_BIT_PTP:
+>        The bit represents the Precision Time Protocol KVM service.
+>  
+> +    Bit-2: KVM_REG_ARM_VENDOR_HYP_BIT_PV_LOCK:
+> +      The bit represents the Paravirtualized lock service.
+> +
+>  Errors:
+>  
+>      =======  =============================================================
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 45e2136322ba..18303b30b7e9 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -417,6 +417,11 @@ struct kvm_vcpu_arch {
+>  		u64 last_steal;
+>  		gpa_t base;
+>  	} steal;
+> +
+> +	/* Guest PV lock state */
+> +	struct {
+> +		gpa_t base;
+> +	} pv;
+
+Using "pv" for the structure isn't quite describing the usage well. It'd
+be better to call it "pv_lock" or "pvlock" at the least.
+
+[...]
+
