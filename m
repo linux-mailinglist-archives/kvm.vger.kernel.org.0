@@ -2,61 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D64D261EE94
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 10:16:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C11161EEAF
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 10:22:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231777AbiKGJQw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 04:16:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43468 "EHLO
+        id S231464AbiKGJVs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 04:21:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231700AbiKGJQg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 04:16:36 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9864010BC
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 01:16:35 -0800 (PST)
+        with ESMTP id S231573AbiKGJVk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 04:21:40 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23108167CF
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 01:21:39 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3526360F75
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 09:16:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97D72C433B5;
-        Mon,  7 Nov 2022 09:16:34 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B36D160F3E
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 09:21:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D70AC433C1;
+        Mon,  7 Nov 2022 09:21:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1667812594;
-        bh=/w3KQ4ekRSwyFLr5poURdPuohsmeyxZIMN9hwP3KB9c=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=IV2EqG/iDyOasW7fQPb8t20iKMKHK/mX8DiflB4092cKaA3eMU+atzIPq2VA3Xan1
-         4xbV53kvYn1t6aON6U9jAIsGZJDYEe9sQPd691ohQhVIMHdShobz2W/5pxut05HlgH
-         MkJ8rbqHYyQwUH6URlk6jkMBNJKjLRUm1m1XIZxEQnF4vVDXIP34CnYSInCQfm+WnE
-         gHmx5HltItlAd1ZISC+kGKgT5qrRxzJkpe8X5WTllvQmOMEzgjRx37b52LITXdfdSw
-         /NeygurmvcJQ8Cko1QDitI8c0thREK9nKnFlg0UuZwwuOiVDBJjhOkZwCy7wRFybzY
-         X6HGDITYwFHQg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        s=k20201202; t=1667812898;
+        bh=Qg31ejv/r9mPj2NkbcR5VRKWxl4krVjVLbPtDxF3eb4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=nrgOMUZbrd5cLsvbvqLVbqO1ZPQff1dS/kTVYGmLfWIdb/qygRHwyGw7ZHYfSAQVr
+         515MAnFA1PWwDOPF+hv+KUVaOxKWQHHuW+vpPZBfIKG6uJkiSdPc8cvgaIBnQ2zoi0
+         kN+NGRMlhT3fx/M24WHdFvQrbjmlGb0/owtSgFUKN6yG5tssV5b8tAwDzgL5Xway3Y
+         pyFdMaZeMNkDp1rkXa2vQDqYj7qbKPfuArOFgs/9PcpT4Q3/QAuU5nywwD6Xb8KMFI
+         1yqJI4zwJiUu1GXQ0Uycz23xnDAULPIow3SH7L0JFWuduKdQWLLSR1uC6kJ2E9wvUg
+         IBTZCcM6vXufg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1orxuE-004KxX-NP;
-        Mon, 07 Nov 2022 08:54:58 +0000
+        id 1oryK0-004LaN-3M;
+        Mon, 07 Nov 2022 09:21:36 +0000
+Date:   Mon, 07 Nov 2022 09:21:35 +0000
+Message-ID: <867d07qfvk.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org,
-        <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>
-Subject: [PATCH v3 14/14] KVM: arm64: PMU: Allow PMUv3p5 to be exposed to the guest
-Date:   Mon,  7 Nov 2022 08:54:35 +0000
-Message-Id: <20221107085435.2581641-15-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221107085435.2581641-1-maz@kernel.org>
-References: <20221107085435.2581641-1-maz@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
+        ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com,
+        will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+        pbonzini@redhat.com, seanjc@google.com, oliver.upton@linux.dev,
+        zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
+In-Reply-To: <Y2gh4x4MD8BJvogH@x1n>
+References: <20221104234049.25103-1-gshan@redhat.com>
+        <20221104234049.25103-4-gshan@redhat.com>
+        <87o7tkf5re.wl-maz@kernel.org>
+        <Y2ffRYoqlQOxgVtk@x1n>
+        <87iljrg7vd.wl-maz@kernel.org>
+        <Y2gh4x4MD8BJvogH@x1n>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com
+X-SA-Exim-Rcpt-To: peterx@redhat.com, gshan@redhat.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com, will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com, seanjc@google.com, oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -68,26 +74,116 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that the infrastructure is in place, bump the PMU support up
-to PMUv3p5.
+On Sun, 06 Nov 2022 21:06:43 +0000,
+Peter Xu <peterx@redhat.com> wrote:
+> 
+> On Sun, Nov 06, 2022 at 08:12:22PM +0000, Marc Zyngier wrote:
+> > Hi Peter,
+> > 
+> > On Sun, 06 Nov 2022 16:22:29 +0000,
+> > Peter Xu <peterx@redhat.com> wrote:
+> > > 
+> > > Hi, Marc,
+> > > 
+> > > On Sun, Nov 06, 2022 at 03:43:17PM +0000, Marc Zyngier wrote:
+> > > > > +Note that the bitmap here is only a backup of the ring structure, and
+> > > > > +normally should only contain a very small amount of dirty pages, which
+> > > > 
+> > > > I don't think we can claim this. It is whatever amount of memory is
+> > > > dirtied outside of a vcpu context, and we shouldn't make any claim
+> > > > regarding the number of dirty pages.
+> > > 
+> > > The thing is the current with-bitmap design assumes that the two logs are
+> > > collected in different windows of migration, while the dirty log is only
+> > > collected after the VM is stopped.  So collecting dirty bitmap and sending
+> > > the dirty pages within the bitmap will be part of the VM downtime.
+> > > 
+> > > It will stop to make sense if the dirty bitmap can contain a large portion
+> > > of the guest memory, because then it'll be simpler to just stop the VM,
+> > > transfer pages, and restart on dest node without any tracking mechanism.
+> > 
+> > Oh, I absolutely agree that the whole vcpu dirty ring makes zero sense
+> > in general. It only makes sense if the source of the dirty pages is
+> > limited to the vcpus, which is literally a corner case. Look at any
+> > real machine, and you'll quickly realise that this isn't the case, and
+> > that DMA *is* a huge source of dirty pages.
+> > 
+> > Here, we're just lucky enough not to have much DMA tracking yet. Once
+> > that happens (and I have it from people doing the actual work that it
+> > *is* happening), you'll realise that the dirty ring story is of very
+> > limited use. So I'd rather drop anything quantitative here, as this is
+> > likely to be wrong.
+> 
+> Is it a must that arm64 needs to track device DMAs using the same dirty
+> tracking interface rather than VFIO or any other interface?
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/pmu-emul.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+What does it change? At the end of the day, you want a list of dirty
+pages. How you obtain it is irrelevant.
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index dc163e1a1fcf..26293f842b0f 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -1059,6 +1059,6 @@ u8 kvm_arm_pmu_get_pmuver_limit(void)
- 	tmp = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
- 	tmp = cpuid_feature_cap_perfmon_field(tmp,
- 					      ID_AA64DFR0_EL1_PMUVer_SHIFT,
--					      ID_AA64DFR0_EL1_PMUVer_V3P4);
-+					      ID_AA64DFR0_EL1_PMUVer_V3P5);
- 	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), tmp);
- }
+> It's
+> definitely not the case for x86, but if it's true for arm64, then could the
+> DMA be spread across all the guest pages?  If it's also true, I really
+> don't know how this will work..
+
+Of course, all pages can be the target of DMA. It works the same way
+it works for the ITS: you sync the state, you obtain the dirty bits,
+you move on.
+
+And mimicking what x86 does is really not my concern (if you still
+think that arm64 is just another flavour of x86, stay tuned!  ;-).
+
+> 
+> We're only syncing the dirty bitmap once right now with the protocol.  If
+> that can cover most of the guest mem, it's same as non-live.  If we sync it
+> periodically, then it's the same as enabling dirty-log alone and the rings
+> are useless.
+
+I'm glad that you finally accept it: the ring *ARE* useless in the
+general sense. Only limited, CPU-only workloads can make any use of
+the current design. This probably covers a large proportion of what
+the cloud vendors do, but this doesn't work for general situations
+where you have a stream of dirty pages originating outside of the
+CPUs.
+
+[...]
+
+> > > I wanted to make it clear that we don't need CLEAR_LOG at all in this case,
+> > > as fundamentally clear log is about re-protect the guest pages, but if
+> > > we're with the restriction of above (having the dirty bmap the last to
+> > > collect and once and for all) then it'll make no sense to protect the guest
+> > > page at all at this stage since src host shouldn't run after the GET_LOG
+> > > then the CLEAR_LOG will be a vain effort.
+> > 
+> > That's not for you to decide, but userspace. I can perfectly expect
+> > userspace saving an ITS, getting the bitmap, saving the pages and then
+> > *clearing the log* before processing the next ITS. Or anything else.
+> 
+> I think I can get your point on why you're not happy with the document, but
+> IMHO how we document is one thing, how it'll work is another.  I preferred
+> explicit documentation because it'll help the app developer to support the
+> interface, also more docs to reference in the future; no strong opinion,
+> though.
+
+Here's my beef with the current documentation: it sets quantitative
+expectations. This is wrong. It also introduces undefined behaviours
+where there should be none. This is even worse, because there
+shouldn't be *any* undefined behaviour today, and I cannot see why the
+dirty rings would influence this.
+
+> However if there's fundamental statement that was literally wrong, then
+> it's another thing, and we may need to rethink.
+
+See above. If the undefined behaviour was just a mistake, let's drop
+it and move on. If you have spotted something that is indeed an
+undefined behaviour in using CLEAR_LOG when the VM is stopped, then
+live migration is already broken on arm64 *today*.
+
+And if that's the case, we should fix it now instead of adding the
+dirty ring stuff.
+
+Thanks,
+
+	M.
+
 -- 
-2.34.1
-
+Without deviation from the norm, progress is not possible.
