@@ -2,142 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6172D61FCF6
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:11:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 773D161FD03
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:13:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232862AbiKGSLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 13:11:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51334 "EHLO
+        id S232995AbiKGSNS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 13:13:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231921AbiKGSLP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 13:11:15 -0500
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE3AA252A9
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 10:09:15 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id h9so17515835wrt.0
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 10:09:15 -0800 (PST)
+        with ESMTP id S233055AbiKGSM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 13:12:57 -0500
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 433D327DF7
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 10:11:33 -0800 (PST)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-37063f855e5so112230137b3.3
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 10:11:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uOpqPDyTUSiqcW9AE9ZFTA2+wjqaCyh2aCjJrDKlnbA=;
-        b=mdr1STT8vj0QFWGZb2RRYOAyG3zzA5ctn5Ll2oh1jN5x8qIbZ8lIg5mKdBcxOTCOmu
-         bhpe6oylW71uAfxcyvBrWzh3aU/CPHIOm7uUe1zYlp3oqZKL+xYdLOUoHGGH0/O/Nt10
-         1tX20jYa4kPHhD6ivBX7xK38FuWE3g0ETVfJ87Mu9wQfDsnl3AognWL4fxNL8jDH197K
-         M5k/J+xmwkq7g0msatKv59uOl6d9TbVxkEueQ+cjNtxXI1ST9N5AsvAd42hsnHOj3wpk
-         bhPsPwfcio7B1y5dR20zt1HUa3QoxZ1Mn4PaXLSR2j3ruXUaddUa0m9/fXqo6VyQN2om
-         UBWg==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+XR/b1ELU8/BVxOd8KJkVYQZI42Oa0wfjRxT+gnAx+U=;
+        b=P2qRlGbRPeqjLnI25F3mlMqHC9MQEvfb/R1VhsDfsj+3sxStnSBKp7oW00gxieIEdq
+         vwkWdCy5N5FYiNDhJTkyr2Hn3ANnmuOzvLyFsKjwghh1r8HYPVxCNY5ELwn+lK6HAfK+
+         s1kW2cbdSkIL3ns2vbgiAVUUfvgKv+Ky8cWER4mn9NC2Q/Dk0bYDKDD7tAcI6pVKAHRx
+         pv468WUAsasfb52N/R8vXARQN2tnVAh/w0vY4Fj/bVc0hzOJ9rp73SutEppwO5gDEPZf
+         Fa5lzA0x6TTFVjpVy4ZTc+Wm2DZljleRTc8C87xscnT0llGzkxTG+GlWrlvXICWo3bQF
+         HIow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uOpqPDyTUSiqcW9AE9ZFTA2+wjqaCyh2aCjJrDKlnbA=;
-        b=QDY22gF/wc9vqsEEB5JAgpagthFUjwl/jHUTZCPhYfjh68m4XqJ9s0QsySmKwZoioL
-         cs/+GDnb1aZrLbcZYTnCg1CFwdss6LIu6wzfFmAfxb5+hJIVl+KNuf0a8BJqJ4QEXg0/
-         aGTE5uLgKYAg4aYfLhCyUl1A7s8nQFgxHy7/3OJfcnu68TFE+dY2pfCXV4xShw4Pv2yE
-         ZWIJYZ4catIXIbLENd5mpc2xW7Pg6XU3HAd+7/6R6uca8mUVhudwRjjAK2d/b764hnZB
-         Pys7hs8qOtV3EP39L12c1VS4Lz51S5Lk1fypCCamP/aSYW49GQZ3ns7Hj0TWJy5d0zhh
-         9vVA==
-X-Gm-Message-State: ACrzQf2Ce5hoBNljbFboF8Rro1rF6q7+AlgW9nZQlZ+x2EnSIbhdEm5I
-        6ps51seXCKHIwuz4VBGrX4quLw==
-X-Google-Smtp-Source: AMsMyM4VXf54h4Uw25CsOniEXMTUZ4koxgR7BvIQnTzVEHpwof+Db6MVYOTpNdTiT8wz4ojF/h6fgw==
-X-Received: by 2002:adf:dc06:0:b0:236:f36f:8263 with SMTP id t6-20020adfdc06000000b00236f36f8263mr18865909wri.522.1667844554317;
-        Mon, 07 Nov 2022 10:09:14 -0800 (PST)
-Received: from ?IPV6:2a02:6b6a:b4d7:0:ebf7:de38:f6bc:8fe8? ([2a02:6b6a:b4d7:0:ebf7:de38:f6bc:8fe8])
-        by smtp.gmail.com with ESMTPSA id g12-20020adffc8c000000b0022cd96b3ba6sm9140588wrr.90.2022.11.07.10.09.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Nov 2022 10:09:13 -0800 (PST)
-Message-ID: <de1327c2-f751-ac28-8dd7-7dd40bf1eab3@bytedance.com>
-Date:   Mon, 7 Nov 2022 18:09:13 +0000
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+XR/b1ELU8/BVxOd8KJkVYQZI42Oa0wfjRxT+gnAx+U=;
+        b=LAGBZqGNVLJBWbL9k+moIuars5heEynOClYRm/XuX9LRK5hVbeL2hQWXCGAT1zv3ZO
+         ZQaimBXXeMFylxOQI1PfXmpHQMiZptWe9yJo7iewP5MHkIAU//29Me+2kJRQUNPTuhNQ
+         CTFy0LGZUo6RjsI0rY9INmgcuZBPTf++WxxhhFkEoDpObzQ0PI5zE2PDmQFLgfXjk1A3
+         FEttcoxQq6zdpzQhO/zKpNxZpDo6Zq/E2NImDcnyvUa6fe3vXFs4AEJf0M+knd5mjxZC
+         AhXaNp4YdkjyTgXuEwWLk6L78F7MxjAgtuA5CCu1PFrbRy7S3d5MQyJRWBUg33Vbm4tK
+         lljg==
+X-Gm-Message-State: ACrzQf3Xpy0QA+dywekY/etz3bg18cdCPpg/ybOq/6cuzZukklrUSK5Q
+        zAVr4xkPfRrYK4ynT/B9WeneDq7mEp7jO2nhCim0oA==
+X-Google-Smtp-Source: AMsMyM4LCFaBMQSBBqMcThZ2SC66h3bgqrjpMiuecv55jF7Iu6VtJhRuJKKefxNn3lw/FHv9MNftX0YqeEpDb/8v1sU=
+X-Received: by 2002:a81:8201:0:b0:370:c85:7e4a with SMTP id
+ s1-20020a818201000000b003700c857e4amr48094046ywf.209.1667844692893; Mon, 07
+ Nov 2022 10:11:32 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [v2 3/6] KVM: arm64: Support pvlock preempted via shared
- structure
-Content-Language: en-US
-To:     Punit Agrawal <punit.agrawal@bytedance.com>
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
-        yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-        maz@kernel.org, steven.price@arm.com, mark.rutland@arm.com,
-        bagasdotme@gmail.com, fam.zheng@bytedance.com, liangma@liangbit.com
-References: <20221104062105.4119003-1-usama.arif@bytedance.com>
- <20221104062105.4119003-4-usama.arif@bytedance.com> <8735au3ap2.fsf@stealth>
-From:   Usama Arif <usama.arif@bytedance.com>
-In-Reply-To: <8735au3ap2.fsf@stealth>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221024113445.1022147-1-wei.w.wang@intel.com>
+ <Y1mlJqKdFtlgG3jR@google.com> <DS0PR11MB63731F2B467D4084F5C8D9B5DC339@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <Y1qnWFzekT27rYka@google.com> <CALzav=c4-FWVrWQebuYs--vbgnyPjEwZxfjSS1aMSRL3JMbWYw@mail.gmail.com>
+ <Y1rNm0E6/I5y6K2a@google.com> <20221028124106.oze32j2lkq5ykifj@kamzik> <Y1v6AEInngzRxSJ+@google.com>
+In-Reply-To: <Y1v6AEInngzRxSJ+@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 7 Nov 2022 10:11:06 -0800
+Message-ID: <CALzav=chUT9v4wYVVy9dSLcevhADxONaf9iCMOWQ_vUOwpkV9g@mail.gmail.com>
+Subject: Re: [PATCH v1 00/18] KVM selftests code consolidation and cleanup
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Andrew Jones <andrew.jones@linux.dev>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vipinsh@google.com" <vipinsh@google.com>,
+        "ajones@ventanamicro.com" <ajones@ventanamicro.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Oct 28, 2022 at 8:49 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Oct 28, 2022, Andrew Jones wrote:
+> > On Thu, Oct 27, 2022 at 06:27:39PM +0000, Sean Christopherson wrote:
+> > > On Thu, Oct 27, 2022, David Matlack wrote:
+> > > > On Thu, Oct 27, 2022 at 8:44 AM Sean Christopherson <seanjc@google.com> wrote:
+> > > > > I like the idea in theory, but that'd be a daunting task to set up, and quite the
+> > > > > maintenance nightmare.  There are probably thousands of file => scope mappings
+> > > > > throughout the kernel, with any number of exceptions and arbitrary rules.
+> > > >
+> > > > I was thinking about proposing this in checkpatch.pl, or in some
+> > > > KVM-specific check script. It seems like the following rule: If a
+> > > > commit only modifies files in tools/testing/selftests/kvm/*, then
+> > > > requires the shortlog match the regex "KVM: selftests: .*". That would
+> > > > handle the vast majority of cases without affecting other subsystems.
+> > > >
+> > > > Sean are you more concerned that if we start validating shortlogs in
+> > > > checkpatch.pl then eventually it will get too out of hand? (i.e. not
+> > > > so concerned with this specific case, but the general problem?)
+> > >
+> > > Ya, the general problem.  Hardcoding anything KVM specific in checkpatch.pl isn't
+> > > going to fly.  The checkpatch maintainers most definitely don't want to take on
+> > > the burden of maintaining subsystem rules.  Letting one subsystem add custom rules
+> > > effectively opens the flood gates to all subsystems adding custom rules.  And from
+> > > a KVM perspective, I don't want to have to get an Acked-by from a checkpatch
+> > > maintiainer just to tweak a KVM rule.
+> > >
+> > > The only somewhat feasible approach I can think of would be to provide a generic
+> > > "language" for shortlog scope rules, and have checkpatch look for a well-known
+> > > file in relevant directories, e.g. add arch/x86/kvm/SCOPES or whatever.  But even
+> > > that is a non-trivial problem to solve, as it means coming up with a "language"
+> > > that has a reasonable chance of working for many subsystems without generating too
+> > > many false positives.
+> > >
+> > > It's definitely doable, and likely not actually a maintenance nightmare (I wrote
+> > > that thinking of modifying a common rules file).  But it's still fairly daunting
+> > > as getting buy-in on something that affects the kernel at large tends to be easier
+> > > said then done.  Then again, I'm probably being pessimistic due to my sub-par
+> > > regex+scripting skills :-)
+> >
+> > How about adding support for checkpatch extension plugins? If we could add
+> > a plugin script, e.g. tools/testing/selftests/kvm/.checkpatch, and modify
+> > checkpatch to run .checkpatch scripts in the patched files' directories
+> > (and recursively in the parent directories) when found, then we'd get
+> > custom checkpatch behaviors. The scripts wouldn't even have to be written
+> > in Perl (but I say that a bit sadly, because I like Perl).
+>
+> That will work for simple cases, but patches that touch files in multiple directories
+> will be messy.  E.g. a patch that touches virt/kvm/ and arch/x86/kvm/ will have
+> two separate custom rules enforcing two different scopes.
+>
+> Recursively executing plugins will also be problematic, e.g. except for KVM, arch/x86/
+> is maintained by the tip-tree folks, and the tip-tree is quite opinionated on all
+> sorts of things, whereas KVM tends to be a bit more relaxed.
+>
+> Enforcing scope through plugins would also lead to some amount of duplicate code
+> throught subsystems.
+>
+> Anyways, if someone wants to pursue this, these ideas and the "requirement" should
+> be run by the checkpatch maintainers.  They have far more experience and authority
+> in this area, and I suspect we aren't the first people to want checkpatch to get
+> involved in enforcing shortlog scope.
 
+Documenting would at least be an improvement over what we have today
+since it would eliminate the need to re-explain the preferred rules
+every time. We can just point to the documentation when reviewing
+patches.
 
-On 07/11/2022 18:02, Punit Agrawal wrote:
-> Usama Arif <usama.arif@bytedance.com> writes:
-> 
->> Implement the service call for configuring a shared structure between a
->> VCPU and the hypervisor in which the hypervisor can tell whether the
->> VCPU is running or not.
->>
->> The preempted field is zero if the VCPU is not preempted.
->> Any other value means the VCPU has been preempted.
->>
->> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
->> Signed-off-by: Usama Arif <usama.arif@bytedance.com>
->> ---
->>   Documentation/virt/kvm/arm/hypercalls.rst |  3 ++
->>   arch/arm64/include/asm/kvm_host.h         | 18 ++++++++++
->>   arch/arm64/include/uapi/asm/kvm.h         |  1 +
->>   arch/arm64/kvm/Makefile                   |  2 +-
->>   arch/arm64/kvm/arm.c                      |  8 +++++
->>   arch/arm64/kvm/hypercalls.c               |  8 +++++
->>   arch/arm64/kvm/pvlock.c                   | 43 +++++++++++++++++++++++
->>   tools/arch/arm64/include/uapi/asm/kvm.h   |  1 +
->>   8 files changed, 83 insertions(+), 1 deletion(-)
->>   create mode 100644 arch/arm64/kvm/pvlock.c
->>
->> diff --git a/Documentation/virt/kvm/arm/hypercalls.rst b/Documentation/virt/kvm/arm/hypercalls.rst
->> index 3e23084644ba..872a16226ace 100644
->> --- a/Documentation/virt/kvm/arm/hypercalls.rst
->> +++ b/Documentation/virt/kvm/arm/hypercalls.rst
->> @@ -127,6 +127,9 @@ The pseudo-firmware bitmap register are as follows:
->>       Bit-1: KVM_REG_ARM_VENDOR_HYP_BIT_PTP:
->>         The bit represents the Precision Time Protocol KVM service.
->>   
->> +    Bit-2: KVM_REG_ARM_VENDOR_HYP_BIT_PV_LOCK:
->> +      The bit represents the Paravirtualized lock service.
->> +
->>   Errors:
->>   
->>       =======  =============================================================
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 45e2136322ba..18303b30b7e9 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -417,6 +417,11 @@ struct kvm_vcpu_arch {
->>   		u64 last_steal;
->>   		gpa_t base;
->>   	} steal;
->> +
->> +	/* Guest PV lock state */
->> +	struct {
->> +		gpa_t base;
->> +	} pv;
-> 
-> Using "pv" for the structure isn't quite describing the usage well. It'd
-> be better to call it "pv_lock" or "pvlock" at the least.
-> 
-Yes makes sense, will change in next patchset, Thanks.
-
-> [...]
-> 
+`git log --pretty=oneline` is not a great way to document shortlog
+scopes because it does not explain the rules (e.g. when to use "KVM:
+x86: " vs "KVM: x86/mmu: "), does not explain why things the way they
+are, and is inconsistent since we don't always catch every patch that
+goes by with a non-preferred shortlog scope.
