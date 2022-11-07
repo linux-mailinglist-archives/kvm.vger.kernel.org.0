@@ -2,70 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EBE561FD81
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:27:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 052B561FD96
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 19:30:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232412AbiKGS16 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 13:27:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43768 "EHLO
+        id S233051AbiKGSav (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 13:30:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232196AbiKGS14 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 13:27:56 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79A1F108
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 10:27:55 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id d10so11415305pfh.6
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 10:27:55 -0800 (PST)
+        with ESMTP id S232196AbiKGSat (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 13:30:49 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBACB193E2
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 10:30:48 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id v4-20020a17090a088400b00212cb0ed97eso11074625pjc.5
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 10:30:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+iBvU2UQj9bZ2gzUljEVe8v8u/eQ0GDuqYtysdhencY=;
-        b=A7IcD4QrqNXDJ8FoYG5GnTbgfgsKhB26fG7p5Ogc63sdVNg2zWmpsSs8zNI5NjkXhU
-         P4rKz0rAs2Q2hk3xecIpv6ebWVvmA5ZY7bcMYlVrTLaLwk3eqQ/pHrVCDAobnfO1F0ZJ
-         jKaooVbVZKCt32y/syBZ39VZwHOWJOWqcqQtVh2Kt2vQktr33y5HRgZUmkDnZhBg0Ih/
-         GhP0FAzjtWGxrlGOfK3dzjZcA0oN4bA13g6J6VFops7DDDUjibhFDpJMOqGO9HEgYWF6
-         Fsg3BhnaPKSlgW3WMlr9pYcfWLLtA289qvGRXwJM5R79MrdU9719XODvsYvMJhf9f7LR
-         R0VA==
+        bh=eOgVsIAsrne2RGr05kp3qZLB8zxsQRZ1bdjAelDdoHY=;
+        b=K744o80UvSD2QHtY98/IvJEitqOtWQg+H0OuAvIlpmM7D9VK0aQrl8OMyItoinxi5e
+         MHABQNT0asHUfLdnr0QiZy7vWPgMGjC+NNY0p3EO+nOFZdEntIOpOj55JDIViLMeBXJ5
+         5T0cqUD7Ox+4dB/5Wv2UrVwpcQuNSJIc5g+T/4TNmNCX2mYlHV8vFINTcW3nDC3U0MK6
+         bGgqSBtl2L/YtIwCXW1Z16aIYBZxpA4DcYUcLjjaPXScg3USaZ03/iX/iuCu98040NUZ
+         5K22snT6lnEcREoInNeAQB4Y6ifjwdDhLjJlPTZX8T2Fcd503LEaT/nXVFiOtGbQrHJh
+         MyIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+iBvU2UQj9bZ2gzUljEVe8v8u/eQ0GDuqYtysdhencY=;
-        b=G/1g6mfydxRPNzJs7OMHNW9H5jhUVq7gXxZ6HNj8YgJlbjGRkXnHFWzUbuarzmADbp
-         jmyYok0SRT6Y61lLVdid3lVHQxH87LXOW5HsKenG5lSR5ttZJnxJbHCCeKvSkKc9L/CH
-         /frhlx9Onk6E/CndGEk0YvPzEepkjWr1eHiFdrTsp/d+zQ78sVBbKog9QJYQnouAeRUz
-         zWzaPlEo4WgsDM+cyjbnuUoKIOvxAi0Rde1s0mHA08bcnVk6Fe0WuBs9T4ek7ymX3rLj
-         JLcwXtlH2+6L2xVdU2B2cgCbfQkwxhZoc7g35m3SlN5XjMUaLpc2uoK6obamLdzopvll
-         yotQ==
-X-Gm-Message-State: ANoB5pmHhE4VuTK2vrrPTOfasD++JuMRpsTTMMHWDnN0Mx1aY+RJQPmy
-        QwLW+oFfuqzmyZSoDL+kqf3OhuYcyBzw7w==
-X-Google-Smtp-Source: AA0mqf5amlU6JrBKS4Yk0oqeghtLeGdAH4BaMyja7iuu1SnKfEqMLfxDxcMsRvT5Jy7J8APi0lUh2g==
-X-Received: by 2002:a63:4a4c:0:b0:470:75a0:e8c3 with SMTP id j12-20020a634a4c000000b0047075a0e8c3mr6109376pgl.589.1667845674849;
-        Mon, 07 Nov 2022 10:27:54 -0800 (PST)
+        bh=eOgVsIAsrne2RGr05kp3qZLB8zxsQRZ1bdjAelDdoHY=;
+        b=z5KII4vv8f0xiBUHiXStg3h0DnKJO+tOcXXP83SO0f4Nq9a9bzsSF6FQC0nOQe2nGQ
+         H4c+ee62kwLioAuqqS6elQ6TBiFksHUEMX1gn4NeWs35VE+6E9be42Ih/RwaSDJGli0W
+         wz1lWq3hfVyBwF7fBpXuOp71EUAyvsQ4vxeCQtxKi9KkCArRRn43kZO1/+Bs+Pe11VBW
+         GRpvwNbindJYxveQRn/AR0Nxr5oga5l4yyT/PqgX8IclF2xz4tOj1er+gz4Uj4NeI2Gz
+         Age6/SQvosAtRmDNvLz32Fh7oUej+ELqepus6/lYkbeLITn+i3UwYK+4/DxwoXMhgLT3
+         u6Sg==
+X-Gm-Message-State: ACrzQf0BvCJY5fJrwnZeMMdlt5imFs1ZyzaEgq8QjhE2p+Tw513JNHD1
+        1/VmXvAkA38Sf8jIF9zDO0Tx4g==
+X-Google-Smtp-Source: AMsMyM5TCWfGrWZyWLKvedu2XldfcYy10WsNCUL7xcXO5xYqi31L5tAz/Zo5Y5slL7GJXF8IfQ0oSw==
+X-Received: by 2002:a17:902:834c:b0:187:49e0:fd4d with SMTP id z12-20020a170902834c00b0018749e0fd4dmr29535678pln.81.1667845848256;
+        Mon, 07 Nov 2022 10:30:48 -0800 (PST)
 Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id 70-20020a17090a09cc00b001f8c532b93dsm4633247pjo.15.2022.11.07.10.27.54
+        by smtp.gmail.com with ESMTPSA id o8-20020aa79788000000b0056c003f9169sm4822056pfp.196.2022.11.07.10.30.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Nov 2022 10:27:54 -0800 (PST)
-Date:   Mon, 7 Nov 2022 10:27:50 -0800
+        Mon, 07 Nov 2022 10:30:47 -0800 (PST)
+Date:   Mon, 7 Nov 2022 10:30:44 -0800
 From:   David Matlack <dmatlack@google.com>
 To:     Vipin Sharma <vipinsh@google.com>
 Cc:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/6] KVM: selftests: Test Hyper-V extended hypercall
- enablement
-Message-ID: <Y2lOJqLaLIBxEP7P@google.com>
+Subject: Re: [PATCH 5/6] KVM: selftests: Move hypercall() to hyper.h
+Message-ID: <Y2lO1HQtaMBCGpcZ@google.com>
 References: <20221105045704.2315186-1-vipinsh@google.com>
- <20221105045704.2315186-4-vipinsh@google.com>
+ <20221105045704.2315186-6-vipinsh@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221105045704.2315186-4-vipinsh@google.com>
+In-Reply-To: <20221105045704.2315186-6-vipinsh@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,64 +72,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 04, 2022 at 09:57:01PM -0700, Vipin Sharma wrote:
-> Test Extended hypercall CPUID enablement
-
-nit: Use complete sentences and provide more details on what exactly
-is being tested.
-
-The rest of the commit messages look pretty good so I assume you just
-forgot to fill this one in fully before sending to the mailing list :)
-
+On Fri, Nov 04, 2022 at 09:57:03PM -0700, Vipin Sharma wrote:
+> hypercall() can be used by other hyperv tests, move it to hyperv.h.
 > 
 > Signed-off-by: Vipin Sharma <vipinsh@google.com>
 > ---
->  tools/testing/selftests/kvm/include/x86_64/hyperv.h  | 4 ++++
->  tools/testing/selftests/kvm/x86_64/hyperv_features.c | 9 +++++++++
->  2 files changed, 13 insertions(+)
+>  .../selftests/kvm/include/x86_64/hyperv.h       | 17 +++++++++++++++++
+>  .../selftests/kvm/x86_64/hyperv_features.c      | 17 -----------------
+>  2 files changed, 17 insertions(+), 17 deletions(-)
 > 
 > diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> index b66910702c0a..075fd29071a6 100644
+> index 9d8c325af1d9..87d8d9e444f7 100644
 > --- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
 > +++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> @@ -110,6 +110,7 @@
->  #define HV_ACCESS_STATS				BIT(8)
->  #define HV_DEBUGGING				BIT(11)
->  #define HV_CPU_MANAGEMENT			BIT(12)
-> +#define HV_ENABLE_EXTENDED_HYPERCALLS		BIT(20)
->  #define HV_ISOLATION				BIT(22)
+> @@ -199,4 +199,21 @@ static inline uint64_t hv_linux_guest_id(void)
+>  	       ((uint64_t)LINUX_VERSION_CODE << 16);
+>  }
 >  
->  /* HYPERV_CPUID_FEATURES.EDX */
-> @@ -164,6 +165,9 @@
->  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE 0x00af
->  #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST 0x00b0
->  
-> +/* Extended hypercalls */
-> +#define HV_EXT_CALL_QUERY_CAPABILITIES		0x8001
+> +static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
+> +				vm_vaddr_t output_address, uint64_t *hv_status)
+> +{
+> +	uint8_t vector;
 > +
->  #define HV_FLUSH_ALL_PROCESSORS			BIT(0)
->  #define HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES	BIT(1)
->  #define HV_FLUSH_NON_GLOBAL_MAPPINGS_ONLY	BIT(2)
+> +	/* Note both the hypercall and the "asm safe" clobber r9-r11. */
+> +	asm volatile("mov %[output_address], %%r8\n\t"
+> +		     KVM_ASM_SAFE("vmcall")
+> +		     : "=a" (*hv_status),
+> +		       "+c" (control), "+d" (input_address),
+> +		       KVM_ASM_SAFE_OUTPUTS(vector)
+> +		     : [output_address] "r"(output_address),
+> +		       "a" (-EFAULT)
+> +		     : "cc", "memory", "r8", KVM_ASM_SAFE_CLOBBERS);
+> +	return vector;
+> +}
+
+Since this function is Hyper-V specific it probably makes sense to
+rename it to hyperv_hypercall() as part of moving it to library, e.g. to
+differentiate it from kvm_hypercall().
+
+> +
+>  #endif /* !SELFTEST_KVM_HYPERV_H */
 > diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> index 05b32e550a80..6b443ce456b6 100644
+> index b5a42cf1ad9d..31b22ee07dfb 100644
 > --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
 > +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> @@ -602,6 +602,15 @@ static void guest_test_hcalls_access(void)
->  			hcall->expect = HV_STATUS_SUCCESS;
->  			break;
->  		case 19:
-> +			hcall->control = HV_EXT_CALL_QUERY_CAPABILITIES;
-> +			hcall->expect = HV_STATUS_ACCESS_DENIED;
-> +			break;
-> +		case 20:
-> +			feat->ebx |= HV_ENABLE_EXTENDED_HYPERCALLS;
-> +			hcall->control = HV_EXT_CALL_QUERY_CAPABILITIES | HV_HYPERCALL_FAST_BIT;
-> +			hcall->expect = HV_STATUS_INVALID_PARAMETER;
-> +			break;
-> +		case 21:
->  			kvm_vm_free(vm);
->  			return;
->  		}
+> @@ -13,23 +13,6 @@
+>  #include "processor.h"
+>  #include "hyperv.h"
+>  
+> -static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
+> -				vm_vaddr_t output_address, uint64_t *hv_status)
+> -{
+> -	uint8_t vector;
+> -
+> -	/* Note both the hypercall and the "asm safe" clobber r9-r11. */
+> -	asm volatile("mov %[output_address], %%r8\n\t"
+> -		     KVM_ASM_SAFE("vmcall")
+> -		     : "=a" (*hv_status),
+> -		       "+c" (control), "+d" (input_address),
+> -		       KVM_ASM_SAFE_OUTPUTS(vector)
+> -		     : [output_address] "r"(output_address),
+> -		       "a" (-EFAULT)
+> -		     : "cc", "memory", "r8", KVM_ASM_SAFE_CLOBBERS);
+> -	return vector;
+> -}
+> -
+>  struct msr_data {
+>  	uint32_t idx;
+>  	bool available;
 > -- 
 > 2.38.1.273.g43a17bfeac-goog
 > 
