@@ -2,116 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FF2D61FE3E
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 20:10:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0642361FE4F
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 20:11:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232196AbiKGTJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 14:09:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45332 "EHLO
+        id S232346AbiKGTLJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 14:11:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232908AbiKGTJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 14:09:27 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BEF524953;
-        Mon,  7 Nov 2022 11:09:26 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A7IMGET008477;
-        Mon, 7 Nov 2022 19:08:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=8yB1T9kkcj6JZp4TFm1A7hnrKTeQoKKGrd8tbPdyOEs=;
- b=mPK9o5wVItAdUCHHrTW+8HPUpMJmXCn685NlXKeVscLMgyHN4njk8bVPEIHZQPcPLZqK
- Ztz8RCrPoADtS/PrmmIEoIPAMygo0OG+ehIy/Xh5qIWr83a/qhrmNPRWHT7LucYzuM6v
- GRY8EZO5Yi9cBmIGqjDcuXfelRLAZTOy12d0YJGmmFC79SKpFsiYDDpFKy4ciSN4pXgq
- ZH3CiU5g+v8IvCRrWHCXajaSzXembp+poMANK9d6PkKxLctLIG6WcGSnTwltbKhrZ/q9
- fu9tqSDViuxcUkN+0hEHKxNVgqwvD3l/8QHsqgCbXQ/CCD24BS1R0u7ACKjl2l8sEdL4 +A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1vspb26-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 19:08:57 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A7IgUpc024059;
-        Mon, 7 Nov 2022 19:08:56 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1vspb1g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 19:08:56 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A7J6ZLd012249;
-        Mon, 7 Nov 2022 19:08:55 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma01wdc.us.ibm.com with ESMTP id 3kngs3smh7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 19:08:55 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com ([9.208.128.114])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A7J8sh916712426
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 7 Nov 2022 19:08:54 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 26BC558068;
-        Mon,  7 Nov 2022 19:08:54 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 430D958060;
-        Mon,  7 Nov 2022 19:08:50 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.65.225.56])
-        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  7 Nov 2022 19:08:50 +0000 (GMT)
-Message-ID: <13c194d02d02a0e2adc006c724809b63c11f1e80.camel@linux.ibm.com>
-Subject: Re: [PATCH 30/44] KVM: Drop kvm_arch_check_processor_compat() hook
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Sean Christopherson <seanjc@google.com>,
+        with ESMTP id S232611AbiKGTKt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 14:10:49 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4DF629C82;
+        Mon,  7 Nov 2022 11:10:48 -0800 (PST)
+Received: from zn.tnic (p200300ea9733e71f329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e71f:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5052F1EC0567;
+        Mon,  7 Nov 2022 20:10:47 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1667848247;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=zgafXme/YlkPVTuatr/YKPrpFzsJCUOJ17VfQBIvcIA=;
+        b=YJ2hJxTGDz78MWs+NfxNQAyMXBGKrEZmSid4LJPUTmJhcqkjulwoXe2CRpAhwfWGGNZKQ6
+        6JPQWgbT+W8ye6miqzwlNMJ9vi0JFMbpNL4rbENdJMpKUORXbbOn5W6v74Kv+p7xWGIUiR
+        Qu2rcfVifxdsrSfF/1L0UBDJJRgfyW0=
+Date:   Mon, 7 Nov 2022 20:10:42 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Chao Gao <chao.gao@intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Yuan Yao <yuan.yao@intel.com>
-Date:   Mon, 07 Nov 2022 14:08:47 -0500
-In-Reply-To: <20221102231911.3107438-31-seanjc@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
-         <20221102231911.3107438-31-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-perf-users@vger.kernel.org,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH v2 2/5] x86/cpuid: refactor
+ setup_clear_cpu_cap()/clear_cpu_cap()
+Message-ID: <Y2lYMqLVP+00Rpu5@zn.tnic>
+References: <20220718141123.136106-1-mlevitsk@redhat.com>
+ <20220718141123.136106-3-mlevitsk@redhat.com>
+ <Y1LGkTXCksqAYLHD@zn.tnic>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: RHHp999uHGQe6ZCvMSlBReRcUeSiiV8m
-X-Proofpoint-GUID: DuaePqxTnOnEid3ZLdZuErIqRkSISZr5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-07_09,2022-11-07_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=793
- phishscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0
- bulkscore=0 spamscore=0 adultscore=0 suspectscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2211070152
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Y1LGkTXCksqAYLHD@zn.tnic>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -119,31 +75,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-11-02 at 23:18 +0000, Sean Christopherson wrote:
-> Drop kvm_arch_check_processor_compat() and its support code now that
-> all
-> architecture implementations are nops.
->=20
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-> =C2=A0arch/arm64/kvm/arm.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 7 =
-+------
-> =C2=A0arch/mips/kvm/mips.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 7 =
-+------
-> =C2=A0arch/powerpc/kvm/book3s.c=C2=A0 |=C2=A0 2 +-
-> =C2=A0arch/powerpc/kvm/e500.c=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
-> =C2=A0arch/powerpc/kvm/e500mc.c=C2=A0 |=C2=A0 2 +-
-> =C2=A0arch/powerpc/kvm/powerpc.c |=C2=A0 5 -----
-> =C2=A0arch/riscv/kvm/main.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 7 +----=
---
-> =C2=A0arch/s390/kvm/kvm-s390.c=C2=A0=C2=A0 |=C2=A0 7 +------
-> =C2=A0arch/x86/kvm/svm/svm.c=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 4 ++--
-> =C2=A0arch/x86/kvm/vmx/vmx.c=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 4 ++--
-> =C2=A0arch/x86/kvm/x86.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0 5 -----
-> =C2=A0include/linux/kvm_host.h=C2=A0=C2=A0 |=C2=A0 4 +---
-> =C2=A0virt/kvm/kvm_main.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 24 =
-+-----------------------
-> =C2=A013 files changed, 13 insertions(+), 67 deletions(-)
+On Fri, Oct 21, 2022 at 06:19:29PM +0200, Borislav Petkov wrote:
+> On Mon, Jul 18, 2022 at 05:11:20PM +0300, Maxim Levitsky wrote:
+> > Currently setup_clear_cpu_cap passes NULL 'struct cpuinfo_x86*'
+> > to clear_cpu_cap to indicate that capability should be cleared from boot_cpu_data.
+> > 
+> > Later that is used in clear_feature to do recursive call to
+> > clear_cpu_cap together with clearing the feature bit from 'cpu_caps_cleared'
+> > 
+> > Remove that code and just call the do_clear_cpu_cap on boot_cpu_data directly
+> > from the setup_clear_cpu_cap.
+> > 
+> > The only functional change this introduces is that now calling clear_cpu_cap
+> > explicitly on boot_cpu_data also sets the bits in cpu_caps_cleared,
+> > which is the only thing that makes sense anyway.
+> > 
+> > All callers of both functions were checked for this and fixed.
+> 
+> Change looks ok. What I can't grok is this sentence: what was checked
+> and fixed where?
 
-Reviewed-by: Eric Farman <farman@linux.ibm.com>	# s390
+Ok, I think I know what you mean. That:
+
+git grep -E "clear_cpu_cap.*boot"
+arch/x86/events/intel/lbr.c:1599:       clear_cpu_cap(&boot_cpu_data, X86_FEATURE_ARCH_LBR);
+arch/x86/kernel/alternative.c:746:              clear_cpu_cap(&boot_cpu_data, X86_FEATURE_UP);
+
+Right, so here's the difference:
+
+When you call setup_clear_cpu_cap(), it basically means, to disable the
+cap on *every* CPU. This is done with cpu_caps_cleared which gets ANDed
+in in apply_forced_caps().
+
+clear_cpu_cap() clears the bit *only* in the first parameter supplied.
+
+Now, that first parameter can be boot_cpu_data too but then, strictly
+speaking, clear_cpu_cap() would really do what you want it to do - to
+clear it only in its first param.
+
+If you really want to enforce that bit cleared everywhere, you need to
+use the setup_* variant.
+
+So this patch is actually incorrect but I admit, the CPU caps handling
+are kinda subtle and probably need cleaning.
+
+Lemme document it so that it is at least clear. Who knows, we might end
+up improving it in the process.
+
+:-)
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
