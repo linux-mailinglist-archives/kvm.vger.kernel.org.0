@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBE7F61EF4D
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 10:42:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A40A61EF51
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 10:42:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231671AbiKGJm0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 04:42:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36090 "EHLO
+        id S231726AbiKGJm3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 04:42:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231516AbiKGJmV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 04:42:21 -0500
+        with ESMTP id S231618AbiKGJmX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 04:42:23 -0500
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DA2013D3A
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 01:42:20 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 802F11742C
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 01:42:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667814140; x=1699350140;
+  t=1667814142; x=1699350142;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=H9gKd8KiwI+8Z8/tPxWpO+a0VKVq7oUxBrMwJjaDjY8=;
-  b=DyWTlvexdy/7m7nxGiS7t3/CIR6wUfvfOJf2TTO8G9uhq9yc59b5cC5n
-   BvfklDJ6VY+H4oL5wYNxYd/urNp/24eEupOATfX306HRUq0YkbLx0ywYZ
-   XzzO3X6MWt+3G7BoRyh3FU8viuLn8eXvXTsiVPk/2ILauTVZ0X7RKh+0B
-   weuVNsn3hKTQBSWMBvkihVf+cDRE/LUJCwn8phK0lhLNXt7ma5Y18+Ps6
-   YjY5dCNqft6Lm3Y717q72/P0t3Ayf7tJK21ew0Tgz9hc+OLtLGPAC/Z/W
-   JbryLYKpsvT0RficzyJsxMUFY+nSbKKyd04jUNa1rrMV4uhziqaISJKCB
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10523"; a="310370502"
+  bh=iFUBVXGqqQcvNJnn0mEHX46qen+2fKl508MhpYLUrbw=;
+  b=Kkuqf9qe95MVKYmcCsFMj3jVwTVNv3LTVSA5ohQb7l35qXPP9dpYeprq
+   wRLadlWuBUI0L2c7a+C1pAS4UIFVI91s2hSsayUMb0gCLZYaD9kD55tQT
+   WkJZ3LjDN0c7wNR2hVuUJ2EFJwF+EdbNRtd8uO+iCtilreqfEQiJzS2oe
+   ROkROOeg3H8YzZFQhoCFvJpo0/g8Vt6z3s1McV1dmQX10mp1+5iIQGfFX
+   /aZiL7Fmv/ewS3brkc3sAzUIiC6NbBd83wo8wPuSTQSkWybqdEM4Y4R9b
+   QZURP156mZmCxG9HaslqWZMTdnb9ulIZv6ecopC4CHLySC3Q8uI9e5rop
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10523"; a="310370510"
 X-IronPort-AV: E=Sophos;i="5.96,143,1665471600"; 
-   d="scan'208";a="310370502"
+   d="scan'208";a="310370510"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2022 01:42:20 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10523"; a="704810803"
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2022 01:42:22 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10523"; a="704810807"
 X-IronPort-AV: E=Sophos;i="5.96,143,1665471600"; 
-   d="scan'208";a="704810803"
+   d="scan'208";a="704810807"
 Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.73])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2022 01:42:18 -0800
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2022 01:42:20 -0800
 From:   Zhu Lingshan <lingshan.zhu@intel.com>
 To:     jasowang@redhat.com, mst@redhat.com
 Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         hang.yuan@intel.com, piotr.uminski@intel.com,
         Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH 1/4] vDPA/ifcvf: ifcvf base layer interfaces work on struct ifcvf_hw
-Date:   Mon,  7 Nov 2022 17:33:42 +0800
-Message-Id: <20221107093345.121648-2-lingshan.zhu@intel.com>
+Subject: [PATCH 2/4] vDPA/ifcvf: IRQ interfaces work on ifcvf_hw
+Date:   Mon,  7 Nov 2022 17:33:43 +0800
+Message-Id: <20221107093345.121648-3-lingshan.zhu@intel.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20221107093345.121648-1-lingshan.zhu@intel.com>
 References: <20221107093345.121648-1-lingshan.zhu@intel.com>
@@ -59,144 +59,247 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To be more rubust and low coupling in ifcvf base layer,
-this commit gets rid of struct ifcvf_adapter in ifcvf_base
-which is introduced in ifcvf_main.
-
-Now ifcvf base layer interfaces work on ifcvf_hw only, so that
-the base interfaces can be safely invoked since probe.
+In this commit, ifcvf IRQ interfaces work on ifcvf_hw,
+so these functions can be safely invoked before
+the adapter struct is allocated since probe.
 
 Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 ---
- drivers/vdpa/ifcvf/ifcvf_base.c | 30 +++++++-----------------------
- drivers/vdpa/ifcvf/ifcvf_base.h |  2 ++
- 2 files changed, 9 insertions(+), 23 deletions(-)
+ drivers/vdpa/ifcvf/ifcvf_main.c | 85 ++++++++++++++-------------------
+ 1 file changed, 37 insertions(+), 48 deletions(-)
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf_base.c
-index 3e4486bfa0b7..3ec5ca3aefe1 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.c
-@@ -10,11 +10,6 @@
+diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+index f9c0044c6442..bae518ff6234 100644
+--- a/drivers/vdpa/ifcvf/ifcvf_main.c
++++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+@@ -69,10 +69,9 @@ static void ifcvf_free_irq_vectors(void *data)
+ 	pci_free_irq_vectors(data);
+ }
  
- #include "ifcvf_base.h"
- 
--struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw)
--{
--	return container_of(hw, struct ifcvf_adapter, vf);
--}
--
- u16 ifcvf_set_vq_vector(struct ifcvf_hw *hw, u16 qid, int vector)
+-static void ifcvf_free_per_vq_irq(struct ifcvf_adapter *adapter)
++static void ifcvf_free_per_vq_irq(struct ifcvf_hw *vf)
  {
- 	struct virtio_pci_common_cfg __iomem *cfg = hw->common_cfg;
-@@ -37,8 +32,6 @@ u16 ifcvf_set_config_vector(struct ifcvf_hw *hw, int vector)
- static void __iomem *get_cap_addr(struct ifcvf_hw *hw,
- 				  struct virtio_pci_cap *cap)
+-	struct pci_dev *pdev = adapter->pdev;
+-	struct ifcvf_hw *vf = &adapter->vf;
++	struct pci_dev *pdev = vf->pdev;
+ 	int i;
+ 
+ 	for (i = 0; i < vf->nr_vring; i++) {
+@@ -83,10 +82,9 @@ static void ifcvf_free_per_vq_irq(struct ifcvf_adapter *adapter)
+ 	}
+ }
+ 
+-static void ifcvf_free_vqs_reused_irq(struct ifcvf_adapter *adapter)
++static void ifcvf_free_vqs_reused_irq(struct ifcvf_hw *vf)
  {
--	struct ifcvf_adapter *ifcvf;
--	struct pci_dev *pdev;
- 	u32 length, offset;
- 	u8 bar;
+-	struct pci_dev *pdev = adapter->pdev;
+-	struct ifcvf_hw *vf = &adapter->vf;
++	struct pci_dev *pdev = vf->pdev;
  
-@@ -46,17 +39,14 @@ static void __iomem *get_cap_addr(struct ifcvf_hw *hw,
- 	offset = le32_to_cpu(cap->offset);
- 	bar = cap->bar;
+ 	if (vf->vqs_reused_irq != -EINVAL) {
+ 		devm_free_irq(&pdev->dev, vf->vqs_reused_irq, vf);
+@@ -95,20 +93,18 @@ static void ifcvf_free_vqs_reused_irq(struct ifcvf_adapter *adapter)
  
--	ifcvf= vf_to_adapter(hw);
--	pdev = ifcvf->pdev;
--
- 	if (bar >= IFCVF_PCI_MAX_RESOURCE) {
--		IFCVF_DBG(pdev,
-+		IFCVF_DBG(hw->pdev,
- 			  "Invalid bar number %u to get capabilities\n", bar);
- 		return NULL;
+ }
+ 
+-static void ifcvf_free_vq_irq(struct ifcvf_adapter *adapter)
++static void ifcvf_free_vq_irq(struct ifcvf_hw *vf)
+ {
+-	struct ifcvf_hw *vf = &adapter->vf;
+ 
+ 	if (vf->msix_vector_status == MSIX_VECTOR_PER_VQ_AND_CONFIG)
+-		ifcvf_free_per_vq_irq(adapter);
++		ifcvf_free_per_vq_irq(vf);
+ 	else
+-		ifcvf_free_vqs_reused_irq(adapter);
++		ifcvf_free_vqs_reused_irq(vf);
+ }
+ 
+-static void ifcvf_free_config_irq(struct ifcvf_adapter *adapter)
++static void ifcvf_free_config_irq(struct ifcvf_hw *vf)
+ {
+-	struct pci_dev *pdev = adapter->pdev;
+-	struct ifcvf_hw *vf = &adapter->vf;
++	struct pci_dev *pdev = vf->pdev;
+ 
+ 	if (vf->config_irq == -EINVAL)
+ 		return;
+@@ -123,12 +119,12 @@ static void ifcvf_free_config_irq(struct ifcvf_adapter *adapter)
+ 	}
+ }
+ 
+-static void ifcvf_free_irq(struct ifcvf_adapter *adapter)
++static void ifcvf_free_irq(struct ifcvf_hw *vf)
+ {
+-	struct pci_dev *pdev = adapter->pdev;
++	struct pci_dev *pdev = vf->pdev;
+ 
+-	ifcvf_free_vq_irq(adapter);
+-	ifcvf_free_config_irq(adapter);
++	ifcvf_free_vq_irq(vf);
++	ifcvf_free_config_irq(vf);
+ 	ifcvf_free_irq_vectors(pdev);
+ }
+ 
+@@ -137,10 +133,9 @@ static void ifcvf_free_irq(struct ifcvf_adapter *adapter)
+  * It returns the number of allocated vectors, negative
+  * return value when fails.
+  */
+-static int ifcvf_alloc_vectors(struct ifcvf_adapter *adapter)
++static int ifcvf_alloc_vectors(struct ifcvf_hw *vf)
+ {
+-	struct pci_dev *pdev = adapter->pdev;
+-	struct ifcvf_hw *vf = &adapter->vf;
++	struct pci_dev *pdev = vf->pdev;
+ 	int max_intr, ret;
+ 
+ 	/* all queues and config interrupt  */
+@@ -160,10 +155,9 @@ static int ifcvf_alloc_vectors(struct ifcvf_adapter *adapter)
+ 	return ret;
+ }
+ 
+-static int ifcvf_request_per_vq_irq(struct ifcvf_adapter *adapter)
++static int ifcvf_request_per_vq_irq(struct ifcvf_hw *vf)
+ {
+-	struct pci_dev *pdev = adapter->pdev;
+-	struct ifcvf_hw *vf = &adapter->vf;
++	struct pci_dev *pdev = vf->pdev;
+ 	int i, vector, ret, irq;
+ 
+ 	vf->vqs_reused_irq = -EINVAL;
+@@ -190,15 +184,14 @@ static int ifcvf_request_per_vq_irq(struct ifcvf_adapter *adapter)
+ 
+ 	return 0;
+ err:
+-	ifcvf_free_irq(adapter);
++	ifcvf_free_irq(vf);
+ 
+ 	return -EFAULT;
+ }
+ 
+-static int ifcvf_request_vqs_reused_irq(struct ifcvf_adapter *adapter)
++static int ifcvf_request_vqs_reused_irq(struct ifcvf_hw *vf)
+ {
+-	struct pci_dev *pdev = adapter->pdev;
+-	struct ifcvf_hw *vf = &adapter->vf;
++	struct pci_dev *pdev = vf->pdev;
+ 	int i, vector, ret, irq;
+ 
+ 	vector = 0;
+@@ -224,15 +217,14 @@ static int ifcvf_request_vqs_reused_irq(struct ifcvf_adapter *adapter)
+ 
+ 	return 0;
+ err:
+-	ifcvf_free_irq(adapter);
++	ifcvf_free_irq(vf);
+ 
+ 	return -EFAULT;
+ }
+ 
+-static int ifcvf_request_dev_irq(struct ifcvf_adapter *adapter)
++static int ifcvf_request_dev_irq(struct ifcvf_hw *vf)
+ {
+-	struct pci_dev *pdev = adapter->pdev;
+-	struct ifcvf_hw *vf = &adapter->vf;
++	struct pci_dev *pdev = vf->pdev;
+ 	int i, vector, ret, irq;
+ 
+ 	vector = 0;
+@@ -265,29 +257,27 @@ static int ifcvf_request_dev_irq(struct ifcvf_adapter *adapter)
+ 
+ 	return 0;
+ err:
+-	ifcvf_free_irq(adapter);
++	ifcvf_free_irq(vf);
+ 
+ 	return -EFAULT;
+ 
+ }
+ 
+-static int ifcvf_request_vq_irq(struct ifcvf_adapter *adapter)
++static int ifcvf_request_vq_irq(struct ifcvf_hw *vf)
+ {
+-	struct ifcvf_hw *vf = &adapter->vf;
+ 	int ret;
+ 
+ 	if (vf->msix_vector_status == MSIX_VECTOR_PER_VQ_AND_CONFIG)
+-		ret = ifcvf_request_per_vq_irq(adapter);
++		ret = ifcvf_request_per_vq_irq(vf);
+ 	else
+-		ret = ifcvf_request_vqs_reused_irq(adapter);
++		ret = ifcvf_request_vqs_reused_irq(vf);
+ 
+ 	return ret;
+ }
+ 
+-static int ifcvf_request_config_irq(struct ifcvf_adapter *adapter)
++static int ifcvf_request_config_irq(struct ifcvf_hw *vf)
+ {
+-	struct pci_dev *pdev = adapter->pdev;
+-	struct ifcvf_hw *vf = &adapter->vf;
++	struct pci_dev *pdev = vf->pdev;
+ 	int config_vector, ret;
+ 
+ 	if (vf->msix_vector_status == MSIX_VECTOR_PER_VQ_AND_CONFIG)
+@@ -320,17 +310,16 @@ static int ifcvf_request_config_irq(struct ifcvf_adapter *adapter)
+ 
+ 	return 0;
+ err:
+-	ifcvf_free_irq(adapter);
++	ifcvf_free_irq(vf);
+ 
+ 	return -EFAULT;
+ }
+ 
+-static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
++static int ifcvf_request_irq(struct ifcvf_hw *vf)
+ {
+-	struct ifcvf_hw *vf = &adapter->vf;
+ 	int nvectors, ret, max_intr;
+ 
+-	nvectors = ifcvf_alloc_vectors(adapter);
++	nvectors = ifcvf_alloc_vectors(vf);
+ 	if (nvectors <= 0)
+ 		return -EFAULT;
+ 
+@@ -341,16 +330,16 @@ static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
+ 
+ 	if (nvectors == 1) {
+ 		vf->msix_vector_status = MSIX_VECTOR_DEV_SHARED;
+-		ret = ifcvf_request_dev_irq(adapter);
++		ret = ifcvf_request_dev_irq(vf);
+ 
+ 		return ret;
  	}
  
--	if (offset + length > pci_resource_len(pdev, bar)) {
--		IFCVF_DBG(pdev,
-+	if (offset + length > pci_resource_len(hw->pdev, bar)) {
-+		IFCVF_DBG(hw->pdev,
- 			  "offset(%u) + len(%u) overflows bar%u's capability\n",
- 			  offset, length, bar);
- 		return NULL;
-@@ -92,6 +82,7 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *pdev)
- 		IFCVF_ERR(pdev, "Failed to read PCI capability list\n");
- 		return -EIO;
- 	}
-+	hw->pdev = pdev;
+-	ret = ifcvf_request_vq_irq(adapter);
++	ret = ifcvf_request_vq_irq(vf);
+ 	if (ret)
+ 		return ret;
  
- 	while (pos) {
- 		ret = ifcvf_read_config_range(pdev, (u32 *)&cap,
-@@ -220,10 +211,8 @@ u64 ifcvf_get_features(struct ifcvf_hw *hw)
+-	ret = ifcvf_request_config_irq(adapter);
++	ret = ifcvf_request_config_irq(vf);
  
- int ifcvf_verify_min_features(struct ifcvf_hw *hw, u64 features)
- {
--	struct ifcvf_adapter *ifcvf = vf_to_adapter(hw);
--
- 	if (!(features & BIT_ULL(VIRTIO_F_ACCESS_PLATFORM)) && features) {
--		IFCVF_ERR(ifcvf->pdev, "VIRTIO_F_ACCESS_PLATFORM is not negotiated\n");
-+		IFCVF_ERR(hw->pdev, "VIRTIO_F_ACCESS_PLATFORM is not negotiated\n");
- 		return -EINVAL;
- 	}
+ 	if (ret)
+ 		return ret;
+@@ -479,7 +468,7 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
  
-@@ -232,13 +221,11 @@ int ifcvf_verify_min_features(struct ifcvf_hw *hw, u64 features)
+ 	if ((status & VIRTIO_CONFIG_S_DRIVER_OK) &&
+ 	    !(status_old & VIRTIO_CONFIG_S_DRIVER_OK)) {
+-		ret = ifcvf_request_irq(adapter);
++		ret = ifcvf_request_irq(vf);
+ 		if (ret) {
+ 			status = ifcvf_get_status(vf);
+ 			status |= VIRTIO_CONFIG_S_FAILED;
+@@ -511,7 +500,7 @@ static int ifcvf_vdpa_reset(struct vdpa_device *vdpa_dev)
  
- u32 ifcvf_get_config_size(struct ifcvf_hw *hw)
- {
--	struct ifcvf_adapter *adapter;
- 	u32 net_config_size = sizeof(struct virtio_net_config);
- 	u32 blk_config_size = sizeof(struct virtio_blk_config);
- 	u32 cap_size = hw->cap_dev_config_size;
- 	u32 config_size;
- 
--	adapter = vf_to_adapter(hw);
- 	/* If the onboard device config space size is greater than
- 	 * the size of struct virtio_net/blk_config, only the spec
- 	 * implementing contents size is returned, this is very
-@@ -253,7 +240,7 @@ u32 ifcvf_get_config_size(struct ifcvf_hw *hw)
- 		break;
- 	default:
- 		config_size = 0;
--		IFCVF_ERR(adapter->pdev, "VIRTIO ID %u not supported\n", hw->dev_type);
-+		IFCVF_ERR(hw->pdev, "VIRTIO ID %u not supported\n", hw->dev_type);
+ 	if (status_old & VIRTIO_CONFIG_S_DRIVER_OK) {
+ 		ifcvf_stop_datapath(adapter);
+-		ifcvf_free_irq(adapter);
++		ifcvf_free_irq(vf);
  	}
  
- 	return config_size;
-@@ -301,14 +288,11 @@ static void ifcvf_set_features(struct ifcvf_hw *hw, u64 features)
- 
- static int ifcvf_config_features(struct ifcvf_hw *hw)
- {
--	struct ifcvf_adapter *ifcvf;
--
--	ifcvf = vf_to_adapter(hw);
- 	ifcvf_set_features(hw, hw->req_features);
- 	ifcvf_add_status(hw, VIRTIO_CONFIG_S_FEATURES_OK);
- 
- 	if (!(ifcvf_get_status(hw) & VIRTIO_CONFIG_S_FEATURES_OK)) {
--		IFCVF_ERR(ifcvf->pdev, "Failed to set FEATURES_OK status\n");
-+		IFCVF_ERR(hw->pdev, "Failed to set FEATURES_OK status\n");
- 		return -EIO;
- 	}
- 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-index f5563f665cc6..63ce1f7f6841 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.h
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-@@ -89,6 +89,7 @@ struct ifcvf_hw {
- 	u16 nr_vring;
- 	/* VIRTIO_PCI_CAP_DEVICE_CFG size */
- 	u32 cap_dev_config_size;
-+	struct pci_dev *pdev;
- };
- 
- struct ifcvf_adapter {
-@@ -110,6 +111,7 @@ struct ifcvf_lm_cfg {
- struct ifcvf_vdpa_mgmt_dev {
- 	struct vdpa_mgmt_dev mdev;
- 	struct ifcvf_adapter *adapter;
-+	struct ifcvf_hw vf;
- 	struct pci_dev *pdev;
- };
- 
+ 	ifcvf_reset_vring(adapter);
 -- 
 2.31.1
 
