@@ -2,112 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3973A61FFAE
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 21:43:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CEBB6200CA
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 22:15:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232952AbiKGUnO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 15:43:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37168 "EHLO
+        id S233482AbiKGVPJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 16:15:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232489AbiKGUnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 15:43:09 -0500
+        with ESMTP id S233487AbiKGVOT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 16:14:19 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF43829C83
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 12:42:12 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D423317CA
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 13:10:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667853732;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1667855411;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=evzlFbUTnO3GwUjJoQCN6EwhyV6gOnjO3o6XcJLyk7g=;
-        b=V1V/0T60pxAWcPdNX8u1t3584GMXn5gEbpa+BnmX9e1S1Hcv0XXfNEcO9hhhY3wU4SmWaT
-        KNNOz7tBtTn2f9snBTNGd87lP+g1av4cjVSpAjMNA6ZzxOukR07hyKsgYjXml6HMVDwKXr
-        SkIIvRjSkd6FQ7d/u5cFWfLnpmX45F8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=S5uHAm/YMaHSV2rOFAm9u7M75Iy7HbODE/InmExnaAE=;
+        b=PRoAuTx6ivBM4dcWT6Elj0ieI/8F8YyTwMWEJ3LnJZXLzoHLilPpFpSqQW7iCqCcI6zJDs
+        DvNmuybthNlfj/odrOmdZ8rF8T7JkqRplyI6n8EmxMiWFQH6sEn7eG9b2URvM6p11D6FM1
+        XCXbdswLzKgROtHhyp4LFA0O1Yq0VjE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-522-nzaLirSENE-b3shYVeXcPA-1; Mon, 07 Nov 2022 15:42:10 -0500
-X-MC-Unique: nzaLirSENE-b3shYVeXcPA-1
-Received: by mail-wr1-f70.google.com with SMTP id w23-20020adf8bd7000000b002358f733307so3217863wra.17
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 12:42:10 -0800 (PST)
+ us-mta-228-JIpXlTFyO2Sw5Q_W9MpagQ-1; Mon, 07 Nov 2022 16:10:09 -0500
+X-MC-Unique: JIpXlTFyO2Sw5Q_W9MpagQ-1
+Received: by mail-wr1-f71.google.com with SMTP id e21-20020adfa455000000b002365c221b59so3268952wra.22
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 13:10:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=evzlFbUTnO3GwUjJoQCN6EwhyV6gOnjO3o6XcJLyk7g=;
-        b=w93IoaI2GQ1qyLA/EYgTJasQM55+9E2ADMq/3IRLLW7TCrJPXJc391Dg3yQdusaOWN
-         0nK20QKLO5OiwJEUSjXr30koN11CJWEFLRefz4tu+EZGnNXsLTE0/qsJkgXySJxs+DQm
-         +9HmZCX39Gw7a/nW9drlx3+V1TqnRTGWy343hY+NcTI78hB8w8e9ZEYQ3cedLqu8L/Z0
-         A/Un1iwHF2JJNv+JecjwUGq8hfbIBipXDSH+BpDnSSNucrpt7Xbm/VnORv7cDcoyzIoA
-         WIkWJR47Is8gKYSupA8Y37geMXB9jcV7Qo+28ee3Qe25JELrT5OinRc36SrhNXfKCpgx
-         FwRQ==
-X-Gm-Message-State: ACrzQf0Lru9bG9oh+83XUCyVjJ4+eH1Ame73DJ8bSz2dbHBy5+8Ob0PI
-        w0cQMMEKfM2JsZ7n1IMp49JQ+Y/v9WS5oeyBJJatqVtKY1t9laBa7O1mOkKhJ+O0vufUq3afjrZ
-        qHai/RzQO6Tfw
-X-Received: by 2002:a5d:4e88:0:b0:236:590:f5a9 with SMTP id e8-20020a5d4e88000000b002360590f5a9mr30678057wru.126.1667853729524;
-        Mon, 07 Nov 2022 12:42:09 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM6WrUGrbJ5bDelW9gjzQbAoXk9wPLV0dNxhMA028zBS3d1N8r/SEQc4SPIPfwfT8tBzm7vyBA==
-X-Received: by 2002:a5d:4e88:0:b0:236:590:f5a9 with SMTP id e8-20020a5d4e88000000b002360590f5a9mr30678048wru.126.1667853729282;
-        Mon, 07 Nov 2022 12:42:09 -0800 (PST)
-Received: from redhat.com ([169.150.226.212])
-        by smtp.gmail.com with ESMTPSA id v14-20020adfedce000000b00236883f2f5csm8369250wro.94.2022.11.07.12.42.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Nov 2022 12:42:08 -0800 (PST)
-Date:   Mon, 7 Nov 2022 15:42:03 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Eric Auger <eric.auger@redhat.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=S5uHAm/YMaHSV2rOFAm9u7M75Iy7HbODE/InmExnaAE=;
+        b=LB9ps1t4IDBOQoZ//hS0B4j74kIx6XvL4m8ezjKWcyq0r/UzTeKNs/cjvXtgQOwLFv
+         ARLi8pB/MWvsVqWCiK7jLe1nxTBAWKO4jus554Ayy/kybTvmO/gg12ejwV6FtBhfD+VY
+         +iKeL0gT6NktTTd+Dm/ZM4RWhGT8umleM2rOhN/ZFSd5XCoDmm5JZVtQZjY2GmQBUBmL
+         yqn7Pz3ceoCf9/+fC88BxZM+qRKajzb+MHtB1mDLoG4s5G9OExeZzqSohWTxXGx4dTSI
+         ugH+z56dkKaorvNxrPSewaDQOain4OZ1hEjBbT+eSIQFwSGLihy0LypwPCLZeaeexMzR
+         916Q==
+X-Gm-Message-State: ACrzQf09wi25sprw0gQDBYXACXZZ7F//omR/eViwK7irM9qKABQvfMNv
+        cKcJiFcUe5EUg1qP/C1/OUscFYJmrxVHjAPBgP1IyuJu7beaIIBnAiE3h29q57Pds7qabyN4L30
+        k1gG2TFRN2nl5
+X-Received: by 2002:a5d:4b45:0:b0:236:501f:7a41 with SMTP id w5-20020a5d4b45000000b00236501f7a41mr33248884wrs.516.1667855408486;
+        Mon, 07 Nov 2022 13:10:08 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM7OiDI4F9MI4Y77S9G7vRAA8ji/J8GVqtN7aNFdugsfuItxHBGzX5veSqv7kZTArZsQcUceGA==
+X-Received: by 2002:a5d:4b45:0:b0:236:501f:7a41 with SMTP id w5-20020a5d4b45000000b00236501f7a41mr33248873wrs.516.1667855408285;
+        Mon, 07 Nov 2022 13:10:08 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id i5-20020adffc05000000b0023660f6cecfsm8312230wrr.80.2022.11.07.13.10.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Nov 2022 13:10:07 -0800 (PST)
+Message-ID: <b8487793-d7b8-0557-a4c2-b62754e14830@redhat.com>
+Date:   Mon, 7 Nov 2022 22:10:06 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Reply-To: eric.auger@redhat.com
+Subject: Re: [RFC] vhost: Clear the pending messages on
+ vhost_init_device_iotlb()
+Content-Language: en-US
+To:     "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     eric.auger.pro@gmail.com, jasowang@redhat.com, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, peterx@redhat.com
-Subject: Re: [RFC] vhost: Clear the pending messages on
- vhost_init_device_iotlb()
-Message-ID: <20221107153924-mutt-send-email-mst@kernel.org>
 References: <20221107203431.368306-1-eric.auger@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221107203431.368306-1-eric.auger@redhat.com>
+ <20221107153924-mutt-send-email-mst@kernel.org>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20221107153924-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 09:34:31PM +0100, Eric Auger wrote:
-> When the vhost iotlb is used along with a guest virtual iommu
-> and the guest gets rebooted, some MISS messages may have been
-> recorded just before the reboot and spuriously executed by
-> the virtual iommu after the reboot. Despite the device iotlb gets
-> re-initialized, the messages are not cleared. Fix that by calling
-> vhost_clear_msg() at the end of vhost_init_device_iotlb().
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  drivers/vhost/vhost.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 40097826cff0..422a1fdee0ca 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -1751,6 +1751,7 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled)
->  	}
->  
->  	vhost_iotlb_free(oiotlb);
-> +	vhost_clear_msg(d);
->  
->  	return 0;
->  }
+Hi Michael,
+On 11/7/22 21:42, Michael S. Tsirkin wrote:
+> On Mon, Nov 07, 2022 at 09:34:31PM +0100, Eric Auger wrote:
+>> When the vhost iotlb is used along with a guest virtual iommu
+>> and the guest gets rebooted, some MISS messages may have been
+>> recorded just before the reboot and spuriously executed by
+>> the virtual iommu after the reboot. Despite the device iotlb gets
+>> re-initialized, the messages are not cleared. Fix that by calling
+>> vhost_clear_msg() at the end of vhost_init_device_iotlb().
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  drivers/vhost/vhost.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>> index 40097826cff0..422a1fdee0ca 100644
+>> --- a/drivers/vhost/vhost.c
+>> +++ b/drivers/vhost/vhost.c
+>> @@ -1751,6 +1751,7 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled)
+>>  	}
+>>  
+>>  	vhost_iotlb_free(oiotlb);
+>> +	vhost_clear_msg(d);
+>>  
+>>  	return 0;
+>>  }
+> Hmm.  Can't messages meanwhile get processes and affect the
+> new iotlb?
+Isn't the msg processing stopped at the moment this function is called
+(VHOST_SET_FEATURES)?
 
-Hmm.  Can't messages meanwhile get processes and affect the
-new iotlb?
+Thanks
 
-
-> -- 
-> 2.37.3
+Eric
+>
+>
+>> -- 
+>> 2.37.3
 
