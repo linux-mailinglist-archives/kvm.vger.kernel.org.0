@@ -2,173 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57CAF620166
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 22:46:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F0ED620180
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 22:57:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233545AbiKGVqj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 16:46:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36382 "EHLO
+        id S232277AbiKGV5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 16:57:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233029AbiKGVqh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 16:46:37 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB29727B3B;
-        Mon,  7 Nov 2022 13:46:36 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id v4-20020a17090a088400b00212cb0ed97eso11555319pjc.5;
-        Mon, 07 Nov 2022 13:46:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9On9UDwN9+FMOJXKCMZYipbKJoIjLKP2XZ3U7kBuoB0=;
-        b=GL+2Bxv6ry2q2tVdZRODeD97j7WTZ0CqlPqVG3cOZfSQ2lPpNfGbSsDDWxIi7pHIp0
-         4gPpC/0UyTeXngfMw/90jVGCYvfydu4VVDIBdRhsclgKtmxCEiA9BP4R87XQG30smBdC
-         1/LRsqd/o2s4hFf8dQGeyUXxQVNajfdobkSuQnz0LYFbUg3nN2WjiofwzLBJS7P0QSlq
-         3E2aD8E0qfRqk/z6hwmiW9lLNW6MmCIaXMhDFh5+LVoso6k/SENsDAmWDZa1hpQYz//Q
-         JF3KaJnULb3SlFFzyr0MclyB75dQs6HtyFHyOI25a5zATM3F+OUwHUTUTEkKDNPpwCyo
-         BpOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9On9UDwN9+FMOJXKCMZYipbKJoIjLKP2XZ3U7kBuoB0=;
-        b=FJyU5gVhqx8C6BF91TQJtgUBwKjQYbDfq1f/A4hWR/E7Tr666sl+HDaXW/wivkt/Qv
-         ufS3rSfx/z2Qv3mD5o+us1bnzBkn6V3aUfVeWdQvQdS2WALhTLiW0+jItDz3imq8s4sH
-         FGqtjcrwtZGdTAPkYoOCit3Du090u43jnjNqRtp/vQqpUjNR69sejB/6+GD0j1cwg/nc
-         h+UPQhfhgWdriQi3id9Fn/GVt1nZ5/0Ld50NReEei+RnARDXFNkkParyzb7TmXKkqabH
-         AEZoOlZTCNpd49rxdxE0ZmD4k1H6g6kRSXdJnsCIttjJdb6XDbxmWGck61ZkhmsL15xb
-         0gYQ==
-X-Gm-Message-State: ACrzQf1SXzal/VpUH8GGuPWuhvHvtkU9C5gKlIh40U1BN4TYEsODTarA
-        uGcW05z5ikqLH+Ud37fP/yE=
-X-Google-Smtp-Source: AMsMyM5nI4bmuY9lD4XinO2gz+Xc6KHSLBRiOXpXoSFa21NNV37M1qdfO6ImmoOBa63VChvhPC/Cjg==
-X-Received: by 2002:a17:90b:1d12:b0:20c:8edd:59a3 with SMTP id on18-20020a17090b1d1200b0020c8edd59a3mr52739175pjb.222.1667857596321;
-        Mon, 07 Nov 2022 13:46:36 -0800 (PST)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id i126-20020a626d84000000b0056c0b98617esm4981650pfc.0.2022.11.07.13.46.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Nov 2022 13:46:35 -0800 (PST)
-Date:   Mon, 7 Nov 2022 13:46:34 -0800
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Chao Gao <chao.gao@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
-Message-ID: <20221107214634.GE1063309@ls.amr.corp.intel.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221104071749.GC1063309@ls.amr.corp.intel.com>
- <Y2V1oslbw24/2Opd@google.com>
+        with ESMTP id S232112AbiKGV5b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 16:57:31 -0500
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50C0327DE5
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 13:57:29 -0800 (PST)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1667858248;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=K8pNk8hWUq4Y0+/KZMKfTCv81iZIAJaiRKw2wKJYvsE=;
+        b=N6Xlo3L3F26NzaElzf6V6LstKEForCmo6VqnF13KdaUb2R7f+OkCQPZbaqB5WxzuOamgci
+        halbKIs/tFt23TR+R95UMcp5PPaCj4Rchie+kdGC1y5iyFy8+6FtR2TcwJvxeEUuvmTN8R
+        +/Wb3+jbrSsXuPw76AUlmTDIBKJ3OKw=
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Quentin Perret <qperret@google.com>,
+        Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v5 00/14] KVM: arm64: Parallel stage-2 fault handling
+Date:   Mon,  7 Nov 2022 21:56:30 +0000
+Message-Id: <20221107215644.1895162-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y2V1oslbw24/2Opd@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 04, 2022 at 08:27:14PM +0000,
-Sean Christopherson <seanjc@google.com> wrote:
+Presently KVM only takes a read lock for stage 2 faults if it believes
+the fault can be fixed by relaxing permissions on a PTE (write unprotect
+for dirty logging). Otherwise, stage 2 faults grab the write lock, which
+predictably can pile up all the vCPUs in a sufficiently large VM.
 
-> On Fri, Nov 04, 2022, Isaku Yamahata wrote:
-> > Thanks for the patch series. I the rebased TDX KVM patch series and it worked.
-> > Since cpu offline needs to be rejected in some cases(To keep at least one cpu
-> > on a package), arch hook for cpu offline is needed.
-> 
-> I hate to bring this up because I doubt there's a real use case for SUSPEND with
-> TDX, but the CPU offline path isn't just for true offlining of CPUs.  When the
-> system enters SUSPEND, only the initiating CPU goes through kvm_suspend()+kvm_resume(),
-> all responding CPUs go through CPU offline+online.  I.e. disallowing all CPUs from
-> going "offline" will prevent suspending the system.
+Like the TDP MMU for x86, this series loosens the locking around
+manipulations of the stage 2 page tables to allow parallel faults. RCU
+and atomics are exploited to safely build/destroy the stage 2 page
+tables in light of multiple software observers.
 
-The current TDX KVM implementation disallows CPU package from offline only when
-TDs are running.  If no TD is running, CPU offline is allowed.  So before
-SUSPEND, TDs need to be killed via systemd or something.  After killing TDs, the
-system can enter into SUSPEND state.
+Patches 1-4 clean up the context associated with a page table walk / PTE
+visit. This is helpful for:
+ - Extending the context passed through for a visit
+ - Building page table walkers that operate outside of a kvm_pgtable
+   context (e.g. RCU callback)
+
+Patches 5-7 clean up the stage-2 map walkers by calling a helper to tear
+down removed tables. There is a small improvement here in that a broken
+PTE is replaced more quickly, as page table teardown happens afterwards.
+
+Patch 8 sprinkles in RCU to the page table walkers, punting the
+teardown of removed tables to an RCU callback.
+
+Patches 9-13 implement the meat of this series, extending the
+'break-before-make' sequence with atomics to realize locking on PTEs.
+Effectively a cmpxchg() is used to 'break' a PTE, thereby serializing
+changes to a given PTE.
+
+Finally, patch 14 flips the switch on all the new code and starts
+grabbing the read side of the MMU lock for stage 2 faults.
+
+Applies to 6.1-rc3. Tested with KVM selftests, kvm-unit-tests, and live
+migrating a 24 vCPU, 96GB VM that was running a Debian install.
+Confirmed all stage-2 table memory was freed by checking the
+SecPageTables stat in meminfo.
+
+Branch available at:
+
+  https://github.com/oupton/linux kvm-arm64/parallel_mmu
+
+benchmarked with dirty_log_perf_test, scaling from 1 to 48 vCPUs with
+4GB of memory per vCPU backed by THP.
+
+  ./dirty_log_perf_test -s anonymous_thp -m 2 -b 4G -v ${NR_VCPUS}
+
+Time to dirty memory:
+
+        +-------+----------+-------------------+
+        | vCPUs | 6.1-rc3  | 6.1-rc3 + series  |
+        +-------+----------+-------------------+
+        |     1 | 0.87s    | 0.93s             |
+        |     2 | 1.11s    | 1.16s             |
+        |     4 | 2.39s    | 1.27s             |
+        |     8 | 5.01s    | 1.39s             |
+        |    16 | 8.89s    | 2.07s             |
+        |    32 | 19.90s   | 4.45s             |
+        |    48 | 32.10s   | 6.23s             |
+        +-------+----------+-------------------+
+
+It is also worth mentioning that the time to populate memory has
+improved:
+
+        +-------+----------+-------------------+
+        | vCPUs | 6.1-rc3  | 6.1-rc3 + series  |
+        +-------+----------+-------------------+
+        |     1 | 0.21s    | 0.17s             |
+        |     2 | 0.26s    | 0.23s             |
+        |     4 | 0.39s    | 0.31s             |
+        |     8 | 0.68s    | 0.39s             |
+        |    16 | 1.26s    | 0.53s             |
+        |    32 | 2.51s    | 1.04s             |
+        |    48 | 3.94s    | 1.55s             |
+        +-------+----------+-------------------+
+
+v4 -> v5:
+ - Fix an obvious leak of table memory (Ricardo)
+
+v3 -> v4:
+ - Fix some type conversion misses caught by sparse (test robot)
+ - Squash RCU locking and RCU callback patches together into one (Sean)
+ - Commit message nits (Sean)
+ - Take a pointer to kvm_s2_mmu in stage2_try_break_pte(), in
+   anticipation of eager page splitting (Ricardo)
+
+v3: https://lore.kernel.org/kvmarm/20221027221752.1683510-1-oliver.upton@linux.dev/
+v4: https://lore.kernel.org/kvmarm/20221103091140.1040433-1-oliver.upton@linux.dev/
+
+Oliver Upton (14):
+  KVM: arm64: Combine visitor arguments into a context structure
+  KVM: arm64: Stash observed pte value in visitor context
+  KVM: arm64: Pass mm_ops through the visitor context
+  KVM: arm64: Don't pass kvm_pgtable through kvm_pgtable_walk_data
+  KVM: arm64: Add a helper to tear down unlinked stage-2 subtrees
+  KVM: arm64: Use an opaque type for pteps
+  KVM: arm64: Tear down unlinked stage-2 subtree after break-before-make
+  KVM: arm64: Protect stage-2 traversal with RCU
+  KVM: arm64: Atomically update stage 2 leaf attributes in parallel
+    walks
+  KVM: arm64: Split init and set for table PTE
+  KVM: arm64: Make block->table PTE changes parallel-aware
+  KVM: arm64: Make leaf->leaf PTE changes parallel-aware
+  KVM: arm64: Make table->block changes parallel-aware
+  KVM: arm64: Handle stage-2 faults in parallel
+
+ arch/arm64/include/asm/kvm_pgtable.h  |  92 +++-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |  21 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c       |  22 +-
+ arch/arm64/kvm/hyp/pgtable.c          | 628 ++++++++++++++------------
+ arch/arm64/kvm/mmu.c                  |  53 ++-
+ 5 files changed, 466 insertions(+), 350 deletions(-)
 
 
-> I don't see anything in the TDX series or the specs that suggests suspend+resume
-> is disallowed when TDX is enabled, so blocking that seems just as wrong as
-> preventing software from soft-offlining CPUs.
-
-When it comes to SUSPEND, it means suspend-to-idle, ACPI S1, S3, or S4.
-suspend-to-idle doesn't require CPU offline.
-
-Although CPU related spec doesn't mention about S3, the ACPI spec says
-
-  7.4.2.2 System _S1 State (Sleeping with Processor Context Maintained)
-  The processor-complex context is maintained.
-
-  7.4.2.4 System _S3 State or 7.4.2.5 System _S4 State
-  The processor-complex context is not maintained.
-
-It's safe to say the processor context related to TDX is complex, I think.
-Let me summarize the situation. What do you think?
-
-- While no TD running:
-  No additional limitation on CPU offline.
-
-- On TD creation:
-  If any of whole cpu package is software offlined, TD creation fails.
-  Alternative: forcibly online necessary CPUs, create TD, and offline CPUs
-
-- TD running:
-  Although it's not required to keep all CPU packages online, keep CPU package
-  from offlining for TD destruction.
-
-- TD destruction:
-  If any of whole cpu package is software offlined, TD destruction fails.
-  The current implementation prevents any cpu package from offlinining during
-  TD running.
-  Alternative:
-  - forcibly online necessary CPUs, destruct TD, and offline CPUs again and
-    allow CPU package to offline
-  - Stash TDX resources somewhere. When cpu packages are onlined, free those
-    release.
-
-- On SUSPEND:
-  TODO: Allow CPU offline if S1 is requested.
-  - suspend-to-idle: nothing to do because cpu offline isn't required
-  - ACPI S1: Need to allow offline CPUs.  This can be implemented by referencing
-    suspend_state_t pm_suspend_target_state is PM_SUSPEND_TO_STANBY.
-  - ACPI S3/S4: refuse cpu offline.  The system needs to kill all TDs before
-    starting SUSPEND process. This is what is implemented.
-
-Thanks,
+base-commit: 30a0b95b1335e12efef89dd78518ed3e4a71a763
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+2.38.1.431.g37b22c650d-goog
+
