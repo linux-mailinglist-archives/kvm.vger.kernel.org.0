@@ -2,90 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CA8B620199
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 22:58:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64ADC62019F
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 22:59:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232624AbiKGV6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 16:58:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40902 "EHLO
+        id S232642AbiKGV7y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 16:59:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233181AbiKGV6J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 16:58:09 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C127128E16;
-        Mon,  7 Nov 2022 13:58:03 -0800 (PST)
-Received: from zn.tnic (p200300ea9733e764329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e764:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4D3D41EC071E;
-        Mon,  7 Nov 2022 22:58:02 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1667858282;
+        with ESMTP id S233645AbiKGV7I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 16:59:08 -0500
+Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6262413D79
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 13:59:07 -0800 (PST)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1667858345;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=uQcKspdlDKpk49zfyausr9OngCMvETATkpBKm+sBLhk=;
-        b=Qwtyu/SGJvknZmcPnQ2RVX7AM+OQGNt7XRtmeoNiddst/4dyq3Twq5mY7V+q5GRPPX8JBv
-        oL90uqH946ccxeIPpTbSO4VMjvvJ1iOX4FrOWLBvAhr71mqYWcJDb7cztQmoChrcj7ydpF
-        EHzowFWLanlPhgD4che2ALb0pw2wqYw=
-Date:   Mon, 7 Nov 2022 22:57:58 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Jane Malalane <jane.malalane@citrix.com>,
-        Kees Cook <keescook@chromium.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-perf-users@vger.kernel.org,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v2 2/5] x86/cpuid: refactor
- setup_clear_cpu_cap()/clear_cpu_cap()
-Message-ID: <Y2l/ZibeaD3P8lBp@zn.tnic>
-References: <20220718141123.136106-1-mlevitsk@redhat.com>
- <20220718141123.136106-3-mlevitsk@redhat.com>
- <Y1LGkTXCksqAYLHD@zn.tnic>
- <Y2lYMqLVP+00Rpu5@zn.tnic>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Wjq4QDt9xZJvVi5eTYg9PIR4fiNZZIcRNu978aLl+WU=;
+        b=qlHqiut8sI1vgbFWY9FSD2/2a16CyuAbQeA3uuU451g2i3xwblSgrH+EwM2o5+2i2A0AB6
+        yhJj6DoLWjl8fbIbMIMQyIj812LambgYU75iuQ5zMrgqNsYFewtzJjQo/nqxX8aT2xL7dy
+        tu5OPjHn6rOJbipMkSGD1vkcJVqso30=
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Quentin Perret <qperret@google.com>,
+        Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v5 11/14] KVM: arm64: Make block->table PTE changes parallel-aware
+Date:   Mon,  7 Nov 2022 21:58:55 +0000
+Message-Id: <20221107215855.1895367-1-oliver.upton@linux.dev>
+In-Reply-To: <20221107215644.1895162-1-oliver.upton@linux.dev>
+References: <20221107215644.1895162-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y2lYMqLVP+00Rpu5@zn.tnic>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 08:10:42PM +0100, Borislav Petkov wrote:
-> Lemme document it so that it is at least clear. Who knows, we might end
-> up improving it in the process.
+In order to service stage-2 faults in parallel, stage-2 table walkers
+must take exclusive ownership of the PTE being worked on. An additional
+requirement of the architecture is that software must perform a
+'break-before-make' operation when changing the block size used for
+mapping memory.
 
-IOW, something like this. It's a start at least...
+Roll these two concepts together into helpers for performing a
+'break-before-make' sequence. Use a special PTE value to indicate a PTE
+has been locked by a software walker. Additionally, use an atomic
+compare-exchange to 'break' the PTE when the stage-2 page tables are
+possibly shared with another software walker. Elide the DSB + TLBI if
+the evicted PTE was invalid (and thus not subject to break-before-make).
 
-https://lore.kernel.org/r/20221107211505.8572-1-bp@alien8.de
+All of the atomics do nothing for now, as the stage-2 walker isn't fully
+ready to perform parallel walks.
 
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/hyp/pgtable.c | 80 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 75 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index f4dd77c6c97d..b9f0d792b8d9 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -49,6 +49,12 @@
+ #define KVM_INVALID_PTE_OWNER_MASK	GENMASK(9, 2)
+ #define KVM_MAX_OWNER_ID		1
+ 
++/*
++ * Used to indicate a pte for which a 'break-before-make' sequence is in
++ * progress.
++ */
++#define KVM_INVALID_PTE_LOCKED		BIT(10)
++
+ struct kvm_pgtable_walk_data {
+ 	struct kvm_pgtable_walker	*walker;
+ 
+@@ -674,6 +680,11 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
+ 	return !!pte;
+ }
+ 
++static bool stage2_pte_is_locked(kvm_pte_t pte)
++{
++	return !kvm_pte_valid(pte) && (pte & KVM_INVALID_PTE_LOCKED);
++}
++
+ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
+ {
+ 	if (!kvm_pgtable_walk_shared(ctx)) {
+@@ -684,6 +695,64 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+ 	return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
+ }
+ 
++/**
++ * stage2_try_break_pte() - Invalidates a pte according to the
++ *			    'break-before-make' requirements of the
++ *			    architecture.
++ *
++ * @ctx: context of the visited pte.
++ * @mmu: stage-2 mmu
++ *
++ * Returns: true if the pte was successfully broken.
++ *
++ * If the removed pte was valid, performs the necessary serialization and TLB
++ * invalidation for the old value. For counted ptes, drops the reference count
++ * on the containing table page.
++ */
++static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
++				 struct kvm_s2_mmu *mmu)
++{
++	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
++
++	if (stage2_pte_is_locked(ctx->old)) {
++		/*
++		 * Should never occur if this walker has exclusive access to the
++		 * page tables.
++		 */
++		WARN_ON(!kvm_pgtable_walk_shared(ctx));
++		return false;
++	}
++
++	if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
++		return false;
++
++	/*
++	 * Perform the appropriate TLB invalidation based on the evicted pte
++	 * value (if any).
++	 */
++	if (kvm_pte_table(ctx->old, ctx->level))
++		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
++	else if (kvm_pte_valid(ctx->old))
++		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
++
++	if (stage2_pte_is_counted(ctx->old))
++		mm_ops->put_page(ctx->ptep);
++
++	return true;
++}
++
++static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
++{
++	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
++
++	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
++
++	if (stage2_pte_is_counted(new))
++		mm_ops->get_page(ctx->ptep);
++
++	smp_store_release(ctx->ptep, new);
++}
++
+ static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
+ 			   struct kvm_pgtable_mm_ops *mm_ops)
+ {
+@@ -812,17 +881,18 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (!childp)
+ 		return -ENOMEM;
+ 
++	if (!stage2_try_break_pte(ctx, data->mmu)) {
++		mm_ops->put_page(childp);
++		return -EAGAIN;
++	}
++
+ 	/*
+ 	 * If we've run into an existing block mapping then replace it with
+ 	 * a table. Accesses beyond 'end' that fall within the new table
+ 	 * will be mapped lazily.
+ 	 */
+-	if (stage2_pte_is_counted(ctx->old))
+-		stage2_put_pte(ctx, data->mmu, mm_ops);
+-
+ 	new = kvm_init_table_pte(childp, mm_ops);
+-	mm_ops->get_page(ctx->ptep);
+-	smp_store_release(ctx->ptep, new);
++	stage2_make_pte(ctx, new);
+ 
+ 	return 0;
+ }
 -- 
-Regards/Gruss,
-    Boris.
+2.38.1.431.g37b22c650d-goog
 
-https://people.kernel.org/tglx/notes-about-netiquette
