@@ -2,129 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7776061EF61
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 10:44:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DED4661EF75
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 10:46:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231786AbiKGJoF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 04:44:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37730 "EHLO
+        id S231866AbiKGJqB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 04:46:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231810AbiKGJoC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 04:44:02 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BD4713E1A;
-        Mon,  7 Nov 2022 01:44:00 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A784emu008616;
-        Mon, 7 Nov 2022 09:44:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=6Q5qpTDHhRVei6uKryPLFEL8h18FwawYjLmVI7rjbi8=;
- b=Uh1F4oVJQXpna1EQKfKeGjy3VAckobMsGHFCDtgNnbQAseqRy5MTvFBmpQaBPZL+yb2/
- pD1Vk5DYOi42EP3C4t+Ql3oTS9Tmfl9p0nWN3anvXSIewsgmSwE2ECJ5PD8j2lyk96Di
- m8PoeLmg+el6lhC5kIpXX/HZZd2G43uBL5U1pwmuYEI7ds7rkVAgPygTbHstBuBTyCTf
- P6fX9afMQEssV6+XNKwfFjZO/gU6XyAKb98kvPM4I3qNpadQxUOJUdkczrhuyy7OXs0E
- 5MYtX+3RAXXAnLJPzZLpbaCd8sPKLxETYWv9fS+ac/STeo8gA2FmCeFcnx7IIihNWR8L 6Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kpx6c2mnw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 09:43:59 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A79UFd3000394;
-        Mon, 7 Nov 2022 09:43:59 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kpx6c2mmu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 09:43:59 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A79ZwJY007110;
-        Mon, 7 Nov 2022 09:43:57 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3kngncacpy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 09:43:56 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A79iV5C50594098
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 7 Nov 2022 09:44:31 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C7E5D4C044;
-        Mon,  7 Nov 2022 09:43:53 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 444374C04E;
-        Mon,  7 Nov 2022 09:43:53 +0000 (GMT)
-Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.ibm.com.com (unknown [9.171.94.163])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  7 Nov 2022 09:43:53 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        Rafael Mendonca <rafaelmendsr@gmail.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-Subject: [GIT PULL 2/2] KVM: s390: pci: Fix allocation size of aift kzdev elements
-Date:   Mon,  7 Nov 2022 10:43:29 +0100
-Message-Id: <20221107094329.81054-3-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20221107094329.81054-1-frankja@linux.ibm.com>
-References: <20221107094329.81054-1-frankja@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: c3-SxatJa-XdrK8ZwYTnb8_55OYBwTEG
-X-Proofpoint-ORIG-GUID: hh9psIlcgeHQn_0HogwJgobc063_0n7Q
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
-MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-07_02,2022-11-03_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 lowpriorityscore=0 spamscore=0 impostorscore=0
- mlxlogscore=785 bulkscore=0 clxscore=1015 suspectscore=0 malwarescore=0
- mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211070080
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231880AbiKGJp6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 04:45:58 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A1431403E
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 01:45:57 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8ACAD60FA6
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 09:45:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBAC4C433B5;
+        Mon,  7 Nov 2022 09:45:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667814356;
+        bh=zQoTGd/6Ej84Wf6Su9oZKeEiDrTouIHTcjBSxVwXd8E=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=N3rlZjjTd8PqeF26i6aVJ96Gu9sJVTuDdKYTk5Yga8JSfXMtWLpyegvK6NyXmHc1J
+         GckOWXxQLvTPyPgCyzSK7pbplRcqrPumOA1MJdsm857b0e/tCpgaywgHu+TPaN/hBR
+         f3ghaiMzS74N5pYP4IXhkJqMp5Zhmic1tUdG3o3R7g6gKMxo7DSe/R0jKpml+4XzB/
+         gjDmN6wfTMttqv9ixE/Wbv3V6X7GBjR7CJ8dh9F3BuTzT7vTUN/feRNyKHyAYGnpNh
+         JJeqlv6Oyr4E3FZEN6lu0PiwmiI2ZlAa+N/P2uukddaffKjvTgxy28QKkkM9vjnUIr
+         dkO10w+doZtSA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oryhV-004M1E-Go;
+        Mon, 07 Nov 2022 09:45:53 +0000
+Date:   Mon, 07 Nov 2022 09:45:53 +0000
+Message-ID: <864jvbqer2.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com,
+        andrew.jones@linux.dev, ajones@ventanamicro.com,
+        bgardon@google.com, dmatlack@google.com, will@kernel.org,
+        suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+        pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
+        oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
+In-Reply-To: <0f685682-ba39-53d4-766c-cc2b44ad48dc@redhat.com>
+References: <20221104234049.25103-1-gshan@redhat.com>
+        <20221104234049.25103-4-gshan@redhat.com>
+        <87o7tkf5re.wl-maz@kernel.org>
+        <0f685682-ba39-53d4-766c-cc2b44ad48dc@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com, will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com, oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Rafael Mendonca <rafaelmendsr@gmail.com>
+On Sun, 06 Nov 2022 21:40:49 +0000,
+Gavin Shan <gshan@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 11/6/22 11:43 PM, Marc Zyngier wrote:
+> > On Fri, 04 Nov 2022 23:40:45 +0000,
+> > Gavin Shan <gshan@redhat.com> wrote:
+> >> 
+> >> ARM64 needs to dirty memory outside of a VCPU context when VGIC/ITS is
+> >> enabled. It's conflicting with that ring-based dirty page tracking always
+> >> requires a running VCPU context.
+> >> 
+> >> Introduce a new flavor of dirty ring that requires the use of both VCPU
+> >> dirty rings and a dirty bitmap. The expectation is that for non-VCPU
+> >> sources of dirty memory (such as the VGIC/ITS on arm64), KVM writes to
+> >> the dirty bitmap. Userspace should scan the dirty bitmap before migrating
+> >> the VM to the target.
+> >> 
+> >> Use an additional capability to advertise this behavior. The newly added
+> >> capability (KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP) can't be enabled before
+> >> KVM_CAP_DIRTY_LOG_RING_ACQ_REL on ARM64. In this way, the newly added
+> >> capability is treated as an extension of KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
+> >> 
+> >> Suggested-by: Marc Zyngier <maz@kernel.org>
+> >> Suggested-by: Peter Xu <peterx@redhat.com>
+> >> Co-developed-by: Oliver Upton <oliver.upton@linux.dev>
+> >> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> >> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> >> Acked-by: Peter Xu <peterx@redhat.com>
+> >> ---
+> >>   Documentation/virt/kvm/api.rst | 33 ++++++++++++++++++-----
+> >>   include/linux/kvm_dirty_ring.h |  7 +++++
+> >>   include/linux/kvm_host.h       |  1 +
+> >>   include/uapi/linux/kvm.h       |  1 +
+> >>   virt/kvm/Kconfig               |  8 ++++++
+> >>   virt/kvm/dirty_ring.c          | 10 +++++++
+> >>   virt/kvm/kvm_main.c            | 49 +++++++++++++++++++++++++++-------
+> >>   7 files changed, 93 insertions(+), 16 deletions(-)
+> >> 
+> >> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> >> index eee9f857a986..2ec32bd41792 100644
+> >> --- a/Documentation/virt/kvm/api.rst
+> >> +++ b/Documentation/virt/kvm/api.rst
+> >> @@ -8003,13 +8003,6 @@ flushing is done by the KVM_GET_DIRTY_LOG ioctl).  To achieve that, one
+> >>   needs to kick the vcpu out of KVM_RUN using a signal.  The resulting
+> >>   vmexit ensures that all dirty GFNs are flushed to the dirty rings.
+> >>   -NOTE: the capability KVM_CAP_DIRTY_LOG_RING and the
+> >> corresponding
+> >> -ioctl KVM_RESET_DIRTY_RINGS are mutual exclusive to the existing ioctls
+> >> -KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG.  After enabling
+> >> -KVM_CAP_DIRTY_LOG_RING with an acceptable dirty ring size, the virtual
+> >> -machine will switch to ring-buffer dirty page tracking and further
+> >> -KVM_GET_DIRTY_LOG or KVM_CLEAR_DIRTY_LOG ioctls will fail.
+> >> -
+> >>   NOTE: KVM_CAP_DIRTY_LOG_RING_ACQ_REL is the only capability that
+> >>   should be exposed by weakly ordered architecture, in order to indicate
+> >>   the additional memory ordering requirements imposed on userspace when
+> >> @@ -8018,6 +8011,32 @@ Architecture with TSO-like ordering (such as x86) are allowed to
+> >>   expose both KVM_CAP_DIRTY_LOG_RING and KVM_CAP_DIRTY_LOG_RING_ACQ_REL
+> >>   to userspace.
+> >>   +After using the dirty rings, the userspace needs to detect the
+> >> capability
+> > 
+> > using? or enabling? What comes after suggest the latter.
+> > 
+> 
+> s/using/enabling in next revision :)
+> 
+> >> +of KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP to see whether the ring structures
+> >> +need to be backed by per-slot bitmaps. With this capability advertised
+> >> +and supported, it means the architecture can dirty guest pages without
+> > 
+> > If it is advertised, it is supported, right?
+> > 
+> 
+> Yes, s/advertised and supported/advertised in next revision.
+> 
+> >> +vcpu/ring context, so that some of the dirty information will still be
+> >> +maintained in the bitmap structure. KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
+> >> +can't be enabled until the capability of KVM_CAP_DIRTY_LOG_RING_ACQ_REL
+> >> +has been enabled.
+> >> +
+> >> +Note that the bitmap here is only a backup of the ring structure, and
+> >> +normally should only contain a very small amount of dirty pages, which
+> > 
+> > I don't think we can claim this. It is whatever amount of memory is
+> > dirtied outside of a vcpu context, and we shouldn't make any claim
+> > regarding the number of dirty pages.
+> > 
+> 
+> It's the pre-requisite to use the backup bitmap. Otherwise, the guest
+> will experience long down-time during migration, as mentioned by Peter
+> in another thread. So it's appropriate to mention the limit of dirty
+> pages here.
 
-The 'kzdev' field of struct 'zpci_aift' is an array of pointers to
-'kvm_zdev' structs. Allocate the proper size accordingly.
+See my alternative wording for this in the other sub-thread.
 
-Reported by Coccinelle:
-  WARNING: Use correct pointer type argument for sizeof
+> 
+> >> +needs to be transferred during VM downtime. Collecting the dirty bitmap
+> >> +should be the very last thing that the VMM does before transmitting state
+> >> +to the target VM. VMM needs to ensure that the dirty state is final and
+> >> +avoid missing dirty pages from another ioctl ordered after the bitmap
+> >> +collection.
+> >> +
+> >> +To collect dirty bits in the backup bitmap, the userspace can use the
+> >> +same KVM_GET_DIRTY_LOG ioctl. KVM_CLEAR_DIRTY_LOG shouldn't be needed
+> >> +and its behavior is undefined since collecting the dirty bitmap always
+> >> +happens in the last phase of VM's migration.
+> > 
+> > It isn't clear to me why KVM_CLEAR_DIRTY_LOG should be called out. If
+> > you have multiple devices that dirty the memory, such as multiple
+> > ITSs, why shouldn't userspace be allowed to snapshot the dirty state
+> > multiple time? This doesn't seem like a reasonable restriction, and I
+> > really dislike the idea of undefined behaviour here.
+> > 
+> 
+> It was actually documenting the expected QEMU's usage. With QEMU
+> excluded, KVM_CLEAR_DIRTY_LOG can be used as usual. Undefined behavior
+> seems not precise here. We can improve it like below, to avoid talking
+> about 'undefined behaviour'.
+> 
+>   To collect dirty bits in the backup bitmap, the userspace can use the
+>   same KVM_GET_DIRTY_LOG ioctl. KVM_CLEAR_DIRTY_LOG shouldn't be needed
+>   since collecting the dirty bitmap always happens in the last phase of
+>   VM's migration.
 
-Fixes: 98b1d33dac5f ("KVM: s390: pci: do initial setup for AEN interpretation")
-Signed-off-by: Rafael Mendonca <rafaelmendsr@gmail.com>
-Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Link: https://lore.kernel.org/r/20221026013234.960859-1-rafaelmendsr@gmail.com
-Message-Id: <20221026013234.960859-1-rafaelmendsr@gmail.com>
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- arch/s390/kvm/pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+That's better, but the "shouldn't be needed" wording makes things
+ambiguous, and we shouldn't mention migration at all (this is not the
+only purpose of this API). I'd suggest this:
 
-diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
-index c50c1645c0ae..ded1af2ddae9 100644
---- a/arch/s390/kvm/pci.c
-+++ b/arch/s390/kvm/pci.c
-@@ -126,7 +126,7 @@ int kvm_s390_pci_aen_init(u8 nisc)
- 		return -EPERM;
- 
- 	mutex_lock(&aift->aift_lock);
--	aift->kzdev = kcalloc(ZPCI_NR_DEVICES, sizeof(struct kvm_zdev),
-+	aift->kzdev = kcalloc(ZPCI_NR_DEVICES, sizeof(struct kvm_zdev *),
- 			      GFP_KERNEL);
- 	if (!aift->kzdev) {
- 		rc = -ENOMEM;
+   To collect dirty bits in the backup bitmap, userspace can use the
+   same KVM_GET_DIRTY_LOG ioctl. KVM_CLEAR_DIRTY_LOG isn't needed as
+   long as all the generation of the dirty bits is done in a single
+   pass.
+
+Thanks,
+
+	M.
+
 -- 
-2.37.3
-
+Without deviation from the norm, progress is not possible.
