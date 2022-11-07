@@ -2,217 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 47B8361F4B3
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 14:57:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C69361F4B5
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 14:58:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231734AbiKGN5u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 08:57:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45450 "EHLO
+        id S231875AbiKGN6L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 08:58:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231766AbiKGN5r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 08:57:47 -0500
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2073.outbound.protection.outlook.com [40.107.93.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B725E1D0E2;
-        Mon,  7 Nov 2022 05:57:46 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bTDF75lUZNeTe+uNLtwBt+mDJXP+PcYBe0G4/s/bBwukVoHDvsrpDW0hlJXuHOcxIi4xeR9+9L6u41UiKQa9SvtiDYPHG04SM+3qFQKKh019nRSoOyYfqqjxSgH8PZX8HAQAz2kn1teXT+J4PHnJHGyfQzFTwrqk2Z3DyKyTxWvEwjHLtHCKxSDb55cbxVRaKKKQUN3UZqhR+YTz99GHe9cE2lIGEcuSTTbsS36sCpHKJt14jR5Dnp25sYRbU/ZXhlI+UfsqhnbWj/FQKdfV2J5agmPPIX1m7Gsez2U0VDsPAKGsHseExRD1yOcwr+PSPQ8zMdzd5i4XdjESJkpBUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tya8+SvfMvAXd9qxFtkwJC29M3FyM7z3cyGjpEOpxWw=;
- b=d2UO5ckJCImY3qbEyIPcBlcAywQJfzpcFiFaSdtJI0asZCbmICda+UEnZWCTJgHHob8CT3ww7lr54eWVPYf+xHFTiUlw21vq0jvGBlvO0A3RSS44XuyeDWcNK0yrBA0gb15xDfyt8635q3ICPbJ3DKsFlljKRXXCgiBRSsHn18oHQvGeBLe/dYobQQswGL4LW0kJvOVI2ZkYU0D3x2G4bVV9jWJf2aHANDSONh5EnF+CLZCQcqya99yiNu4zAp3SUIEj62+BcylcWwo2/dbsruaV2kKGfOAsyhvFV4BtGRQk4LBqBQoyu4cOIXp41rPQ5KbDg0vtZMdJpqHgQfiHag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tya8+SvfMvAXd9qxFtkwJC29M3FyM7z3cyGjpEOpxWw=;
- b=qukudt3NJIelbLRc1BFw2FpZUq6JkAMep2MXNOtzjWiF8HEjujuScdSmy3JnDaw7ewR9LVw885hk1YZlIbcyHQoFu8w/SdAsPjxAIAdh7/yBBkj2K1wtf0d/zo99RTnRtPkPUXDxw28agXjdt9jaYo9404MuWW+XPbjuN7V5nQtAkfZomNw9XRgBl+ViXGjUhEt661Rt1XqazEog7RVoQNygA4cZ2ADBSznZHWNEE7Cgyno3fArkFiCtSyFFAbhujXBzWXDCI+Yzk+c3UolFv8XBw+5PTPb5kaWZLMNBC19U5ZUh5nhdkEBZ18/cFoPdbcOuZQCwGfYcEWDlXjwNoQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by IA1PR12MB6042.namprd12.prod.outlook.com (2603:10b6:208:3d6::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Mon, 7 Nov
- 2022 13:57:43 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Mon, 7 Nov 2022
- 13:57:43 +0000
-Date:   Mon, 7 Nov 2022 09:57:42 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@gmail.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Will Deacon <will@kernel.org>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH 10/10] iommufd: Allow iommufd to supply /dev/vfio/vfio
-Message-ID: <Y2kO1njmu6sU55S0@nvidia.com>
-References: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
- <10-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
- <20221026153133.44dc05c8.alex.williamson@redhat.com>
- <Y1wjFNxwPRm7S6yZ@nvidia.com>
- <20221031165311.0698e1ea.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221031165311.0698e1ea.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR16CA0012.namprd16.prod.outlook.com
- (2603:10b6:208:134::25) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S231519AbiKGN6I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 08:58:08 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECBE51D0D7
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 05:58:06 -0800 (PST)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A7Cq3me016621;
+        Mon, 7 Nov 2022 13:57:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=j8OI/kZE9NG/B9LHEppSpjKOHvhMjkXZRVhBgJaNTy0=;
+ b=VdDjsOjgVJDiW4uqXpXDZJm4j9hYW+kwosW/DwKZhYK4wN95NRJNSgRhGgpAW9GKiR6R
+ 1RKGDK+KK22k9Wd//tCRMCbWdW1sZnqO8x/tY5hS1jttxAztzme+0k37Y8vEUxHeMkiV
+ OfYZRfty8X3YdztGYdeX6tBMC56KWzBdpG4fmt/wWgmIndFrBxbFTHBxvulWSRqnsUOn
+ 6tzkheAeJOqGgxpHbpfMt1FCMSMx3qfnE2hGjqNiipDNx8zvgqExgmMnQahFwSgchi7z
+ FtdcD7KSX6d82V8Wn/a8bOJSp2spNzQrTgLjvxnXW105ru/Jev2E4v0uHaAy+xn8u876 UQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp14x4n6f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Nov 2022 13:57:53 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A7BUTTn021129;
+        Mon, 7 Nov 2022 13:57:52 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp14x4n4q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Nov 2022 13:57:52 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A7Do9Ci023822;
+        Mon, 7 Nov 2022 13:57:49 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3kngp5hx6y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Nov 2022 13:57:49 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A7DvkC459375922
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 7 Nov 2022 13:57:46 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 554E9AE045;
+        Mon,  7 Nov 2022 13:57:46 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 501D1AE04D;
+        Mon,  7 Nov 2022 13:57:45 +0000 (GMT)
+Received: from [9.171.53.254] (unknown [9.171.53.254])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  7 Nov 2022 13:57:45 +0000 (GMT)
+Message-ID: <621ac6ea-2513-0e78-ab3c-f8c2896ab89c@linux.ibm.com>
+Date:   Mon, 7 Nov 2022 14:57:45 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA1PR12MB6042:EE_
-X-MS-Office365-Filtering-Correlation-Id: e4253e08-5b0a-4d12-ff21-08dac0c80aca
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pLWpK5RTvTKtso2cPOgsl7sL6oNQgOkyo4NA83/AeOZDL/nvyv9GMJdpWU3aIVpyBGLobaB0+ScOWzOwPtW39hVOaQrQFMWrMdOUYpqRXHKZ/ipIj8Gzg6ZokMQ/3ejRlInrfk6TpIdCq+67Q8AA3OmBzBki2JeZ88k7dih2LCNYNNcG+iHhLFAOA3LFJxVV840ay8pJ4ndixIjqxqu5XOPB7AtvxdhFoL85Ulbxx+ZNp3FXx0OD+BWswlKrmRXHrvvF1DvfGid4CZlo4wvh4KNXeDAXCRuSTaNJlIG0OSG7LJbALv6IIgfRHzmjo/G3wPxx5GfAz3cVmw9jfI6LJj7qLSR1Wt2CSuQK3EpxnawtwNQrd1dd5SVQeQqDS2qD2oNMUJ4tnnc99WUEOe7F1D0Kn17iPFlHmtSpiHaJi1dDNk7nSXvj2engjISIS/sXhnFBKxMNDLx3AZkao9xKllXSsCKzAsoX8mQlvxJ2heneHzUWsL/+CWQtfMOwab/FqUHqDWAocliyexChTddKregpqD7PaO/jow+C26i6cmjEXUxfamHRsDsv8Kymf8GTnZHgSmOfTksMjMOAzyFJOSZr1KEAhR/HwAgeV/maV/S8gZpcaxkjaTkq+GUCBtSliNIKA4oyqHa4WfEYQW10Zv7OlVN+pGx0iT9LALgmOT50KJ6Pw0HXWRHYOZRV+tg+X90W0DG3Oqv8be4HzXp6QQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(346002)(396003)(376002)(39860400002)(136003)(451199015)(186003)(6512007)(26005)(6506007)(2616005)(38100700002)(83380400001)(7406005)(5660300002)(7416002)(2906002)(6916009)(6486002)(8936002)(41300700001)(478600001)(4326008)(316002)(66556008)(8676002)(66946007)(66476007)(54906003)(36756003)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FhrspaPtonHLLLLfaJBGNlVKgf7AkSUqqyL4XFWI/z1at0LMdLjhQKv2uOFx?=
- =?us-ascii?Q?FUkoAoXN8BvafY/UzVCTSUnEh6WWlMxnuguFRd04s+OEwJB6chHJGZNAV7bA?=
- =?us-ascii?Q?vV5McKnnMX+FuSZAuxk6ToIYcaKFjaGyDrQy/ZueYC8YBfW6wWjaCkCdWt/g?=
- =?us-ascii?Q?8nUZZKVLvYniqwnHnGYTotshtKSgmlAIdXLBIWa298lI0FitrRdZc07sZ0Dv?=
- =?us-ascii?Q?EgXlVKkAWpD8PYT4bgkRrK5TGvxZ2jBHBgGZ1uvGajqAKbXM9nisFed8ZX3J?=
- =?us-ascii?Q?ac9/iQ1B8nGRzRMak0ybCg1TKvcK1wM4TpPq7mtz15lHAFLW4yW9GZjYhqjp?=
- =?us-ascii?Q?Mi+ld6RfqUnTFVGM62Ma+W0lNPDwStSSrxdQ5zbMrswg0et9S1izYAkubrkl?=
- =?us-ascii?Q?wSxwXDZVUJRIy8I/PCI0rza735+xepnavxD/r8xHqZvsbMPKbrcztCBXOqh4?=
- =?us-ascii?Q?tQNPj1/Hx1CAjEYQPQ1DlCMLWrWOhJvBSgWDWf0osHeLqGj5+ngn46AbmNMM?=
- =?us-ascii?Q?o4H6t+8NaZze1mYdqrfzlvCC2IZ6FYaDmNch3qqRvT4LMcXzIXdrYdsrp3uy?=
- =?us-ascii?Q?K4+CGTokQ3VoLFebstDXEg71HhlrkK7BP5xp7N68z9yCdP4pzmIlFOwtKS8t?=
- =?us-ascii?Q?etbPYY5o9u4+1f0dPYAAsrhUSLv71gpDxbdj0v52DHHUfwlK1Mqg7BWPQROn?=
- =?us-ascii?Q?Dmc2gtEs/KSJftNVk5Waa8VCDxXl5rwS5WkFKbAqJsiOpY6+4f57TIprSaw8?=
- =?us-ascii?Q?/kOe8CkFM4xE0j01AE2vXM3SqrJv/W6WDcsRa/CVn4WBDifyWbQ1+SaYGh/b?=
- =?us-ascii?Q?fHsBXabk2ERsU0pEB+5WMRq/t1cKpZ2yyWOl/YM6KJZotzTHxtFYOfBTdp59?=
- =?us-ascii?Q?NA4AwznCdVedHTy/ke2G8v4t0v6YAZBgSyJtLK9aeM1QHDNGuwsqwcJce3BL?=
- =?us-ascii?Q?fRBneilylG9hlP7atHccQEMKRgXp31/Pl75VQHM7zXy5EdfYfTlLVl4ayAGF?=
- =?us-ascii?Q?ElPP2zFqufxdzmGZ9s0NanIPrYsP4V1ygxX93JLhFEUZqtTjrWepJmFg2SB2?=
- =?us-ascii?Q?IWuhk0mnHXVHEkpWoBH27+EHCXwlaTfBVwHdXrk0IXmsu+uhaHme8afOmufb?=
- =?us-ascii?Q?NcDyJTaTVj5KKkGbrKWyTheJOYH/N0vTyG65nVEE95s1q5BC3ypYtdyORg6N?=
- =?us-ascii?Q?H22SAn9LTU7v3UYkb6zVITOOlkEcDBWLUHry4n9PdTa9OCbhJjpKu9GFe9ja?=
- =?us-ascii?Q?wAo9+mPb0Z0axGMzIKhfc9YctmvKPalyQEhYkBOA3PUqn/8OBQ97E58LK54L?=
- =?us-ascii?Q?7kNZdwMlFBk1DAi1nX6dOcbfO4FjsUi40g6uFZNs9Xwukv6Myy0lvr9Naj/G?=
- =?us-ascii?Q?NThle6C1MkOehG8dtcP3S766T7ZEcpgR6vuZ7WGeLvzz7tWuLRF2d88vlOxt?=
- =?us-ascii?Q?WxhKrzNo4xNpMLLxOGcY8fAUq29wx7x0TIPihqM/5ZXSX6zNREfk+4qukX2t?=
- =?us-ascii?Q?3XZOydj6slv0dyNtTfsiDlgS/3bZWxA6NfsNH0lqCMO62Ocv8AVBLok8KFs1?=
- =?us-ascii?Q?hovDRp2kGcMau3I+ewg=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4253e08-5b0a-4d12-ff21-08dac0c80aca
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2022 13:57:43.6538
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wxVWrO8NCsDj9oMUJo2GGb3Mz9lEP+fbHvCvwY4l/6dANepnFB1fhfrnVjmBGPK3
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6042
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH v10 2/9] s390x/cpu topology: reporting the CPU topology to
+ the guest
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20221012162107.91734-1-pmorel@linux.ibm.com>
+ <20221012162107.91734-3-pmorel@linux.ibm.com>
+ <4c5afcb5754cb829cd8b9ddbf4f74e610d5f6012.camel@linux.ibm.com>
+ <d82372a9-581a-9544-eb6d-7b3e125926f5@linux.ibm.com>
+ <ebfe8dea72adaf23913797c482377f4fd58fd097.camel@linux.ibm.com>
+Content-Language: en-US
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <ebfe8dea72adaf23913797c482377f4fd58fd097.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ld0loP4o6t3JhFA2aUhUxiEurNRGBHzg
+X-Proofpoint-GUID: UKrIfHiyK32TwhwQgm16kfJmRzS6YTBf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-07_06,2022-11-07_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 malwarescore=0
+ priorityscore=1501 mlxlogscore=999 mlxscore=0 impostorscore=0
+ clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211070110
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 31, 2022 at 04:53:11PM -0600, Alex Williamson wrote:
-> On Fri, 28 Oct 2022 15:44:36 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+
+On 11/7/22 14:20, Janis Schoetterl-Glausch wrote:
+> On Fri, 2022-10-28 at 12:00 +0200, Pierre Morel wrote:
+>>
+>> On 10/27/22 22:42, Janis Schoetterl-Glausch wrote:
+>>> On Wed, 2022-10-12 at 18:21 +0200, Pierre Morel wrote:
+>>>> The guest can use the STSI instruction to get a buffer filled
+>>>> with the CPU topology description.
+>>>>
+>>>> Let us implement the STSI instruction for the basis CPU topology
+>>>> level, level 2.
+>>>>
+>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>> ---
+>>>>    include/hw/s390x/cpu-topology.h |   3 +
+>>>>    target/s390x/cpu.h              |  48 ++++++++++++++
+>>>>    hw/s390x/cpu-topology.c         |   8 ++-
+>>>>    target/s390x/cpu_topology.c     | 109 ++++++++++++++++++++++++++++++++
+>>>>    target/s390x/kvm/kvm.c          |   6 +-
+>>>>    target/s390x/meson.build        |   1 +
+>>>>    6 files changed, 172 insertions(+), 3 deletions(-)
+>>>>    create mode 100644 target/s390x/cpu_topology.c
+>>>>
+>>>> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+>>>> index 66c171d0bc..61c11db017 100644
+>>>> --- a/include/hw/s390x/cpu-topology.h
+>>>> +++ b/include/hw/s390x/cpu-topology.h
+>>>> @@ -13,6 +13,8 @@
+>>>>    #include "hw/qdev-core.h"
+>>>>    #include "qom/object.h"
+>>>>    
+>>>> +#define S390_TOPOLOGY_POLARITY_H  0x00
+>>>> +
+>>>>    typedef struct S390TopoContainer {
+>>>>        int active_count;
+>>>>    } S390TopoContainer;
+>>>> @@ -29,6 +31,7 @@ struct S390Topology {
+>>>>        S390TopoContainer *socket;
+>>>>        S390TopoTLE *tle;
+>>>>        MachineState *ms;
+>>>> +    QemuMutex topo_mutex;
+>>>>    };
+>>>>    
+>>>>    #define TYPE_S390_CPU_TOPOLOGY "s390-topology"
+>>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+>>>> index 7d6d01325b..d604aa9c78 100644
+>>>> --- a/target/s390x/cpu.h
+>>>> +++ b/target/s390x/cpu.h
+>>>>
+>>> [...]
+>>>> +
+>>>> +/* Maxi size of a SYSIB structure is when all CPU are alone in a container */
+>>>
+>>> Max or Maximum.
+>>>
+>>>> +#define S390_TOPOLOGY_SYSIB_SIZE (sizeof(SysIB_151x) +                         \
+>>>> +                                  S390_MAX_CPUS * (sizeof(SysIBTl_container) + \
+>>>> +                                                   sizeof(SysIBTl_cpu)))
+>>>
+>>> Currently this is 16+248*3*8 == 5968 and will grow with books, drawer support to
+>>> 16+248*5*8 == 9936 ...
+>>>
+>>> [...]
+>>>>
+>>>> +
+>>>> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar)
+>>>> +{
+>>>> +    uint64_t page[S390_TOPOLOGY_SYSIB_SIZE / sizeof(uint64_t)] = {};
+>>>
+>>> ... so calling this page is a bit misleading. Also why not make it a char[]?
+>>> And maybe use a union for type punning.
+>>
+>> OK, what about:
+>>
+>>       union {
+>>           char place_holder[S390_TOPOLOGY_SYSIB_SIZE];
+>>           SysIB_151x sysib;
+>>       } buffer QEMU_ALIGNED(8);
+>>
+> I don't think you need the QEMU_ALIGNED since SysIB_151x already has it. Not that it hurts to be
+> explicit. If you declared the tle member as uint64_t[], you should get the correct alignment
+> automatically and can then drop the explicit one.
+
+I find the explicit statement better. Why make it non explicit?
+
+> Btw, [] seems to be preferred over [0], at least there is a commit doing a conversion:
+> f7795e4096 ("misc: Replace zero-length arrays with flexible array member (automatic)")
+
+OK
+
+>>
+>>>
+>>>> +    SysIB_151x *sysib = (SysIB_151x *) page;
+>>>> +    int len;
+>>>> +
+>>>> +    if (s390_is_pv() || !s390_has_topology() ||
+>>>> +        sel2 < 2 || sel2 > S390_TOPOLOGY_MAX_MNEST) {
+>>>> +        setcc(cpu, 3);
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    len = setup_stsi(sysib, sel2);
+>>>
+>>> This should now be memory safe, but might be larger than 4k,
+>>> the maximum size of the SYSIB. I guess you want to set cc code 3
+>>> in this case and return.
+>>
+>> I do not find why the SYSIB can not be larger than 4k.
+>> Can you point me to this restriction?
 > 
-> > On Wed, Oct 26, 2022 at 03:31:33PM -0600, Alex Williamson wrote:
-> > > On Tue, 25 Oct 2022 15:50:45 -0300
-> > > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > >   
-> > > > If the VFIO container is compiled out, give a kconfig option for iommufd
-> > > > to provide the miscdev node with the same name and permissions as vfio
-> > > > uses.
-> > > > 
-> > > > The compatibility node supports the same ioctls as VFIO and automatically
-> > > > enables the VFIO compatible pinned page accounting mode.  
-> > > 
-> > > I think I'd like to see some sort of breadcrumb when /dev/vfio/vfio is
-> > > provided by something other than the vfio container code.  If we intend
-> > > to include this before P2P is resolved, that breadcrumb   
-> > 
-> > I don't belive I can get P2P done soon enough. I plan to do it after
-> > this is merged. Right now these two series are taking all my time.
-> > 
-> > > (dmesg I'm guessing) might also list any known limitations of the
-> > > compatibility to save time with debugging.  Thanks,  
-> > 
-> > Yes, that makes sense.
-> > 
-> > Do you want a dmesg at module load time, on every open, or a sysfs
-> > something? What seems like it would make it into a bug report?
+> Says so at the top of the description of STSI:
 > 
-> I think dmesg at module load time should probably be ok, every open
-> seems like harassment and sysfs would require updated support in
-> various bug reporting tools.  Users are often terrible about reporting
-> full dmesg in bugs, but they do often filter it for "IOMMU" or "VFIO",
-> so keep that in mind when crafting the log message.  Thanks,
+> The SYSIB is 4K bytes and must begin at a 4 K-byte
+> boundary; otherwise, a specification exception may
+> be recognized.
 
-This seems like the right approach, the message comes out once when it
-might be most useful:
+Right, I guess I can not read.
 
-@@ -176,8 +176,11 @@ static int iommufd_fops_open(struct inode *inode, struct file *filp)
-         * For compatibility with VFIO when /dev/vfio/vfio is opened we default
-         * to the same rlimit accounting as vfio uses.
-         */
--       if (filp->private_data == &vfio_misc_dev)
-+       if (IS_ENABLED(CONFIG_IOMMUFD_VFIO_CONTAINER) &&
-+           filp->private_data == &vfio_misc_dev) {
-                ictx->account_mode = IOPT_PAGES_ACCOUNT_MM;
-+               pr_info_once("IOMMUFD is providing /dev/vfio/vfio, not VFIO.\n");
-+       }
- 
-        xa_init_flags(&ictx->objects, XA_FLAGS_ALLOC1 | XA_FLAGS_ACCOUNT);
-        ictx->file = filp;
+So I will return CC=3 in case the length is greater than 4K
 
-Also this is needed:
 
-@@ -446,6 +449,7 @@ module_exit(iommufd_exit);
- 
- #if IS_ENABLED(CONFIG_IOMMUFD_VFIO_CONTAINER)
- MODULE_ALIAS_MISCDEV(VFIO_MINOR);
-+MODULE_ALIAS("devname:vfio/vfio");
- #endif
- MODULE_DESCRIPTION("I/O Address Space Management for passthrough devices");
- MODULE_LICENSE("GPL");
+thanks,
+Regards,
 
-Thanks,
-Jason
+Pierre
+
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
