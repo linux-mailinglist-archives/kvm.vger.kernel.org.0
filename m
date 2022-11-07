@@ -2,106 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 805A96203E1
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 00:41:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB0996203EB
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 00:45:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232601AbiKGXlI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 18:41:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58668 "EHLO
+        id S232396AbiKGXp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 18:45:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232518AbiKGXlH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 18:41:07 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1453317076;
-        Mon,  7 Nov 2022 15:41:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667864467; x=1699400467;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=HkPqplWnWgKasGuEjl+2C0+gJiDFRh+H10A4rXRH/Z0=;
-  b=PlIfBVJdQYf6s0VPQVtS18XWHJeHthWnS+DAvKp1Gd0x6wuG0KOmAPZo
-   6d3Hb97XbGSgkobs6GD9js9hWExAHDTagmbHnCpgbdIFYQ525nQrLKSOb
-   Ln7eP6jT1wRsZfQH4oGa0EuqNdfMTFyg6DFoezWNpQAi01G4S56PoSak7
-   intSfP4llqIpJA1g7FkIErhXlC9oVnmm4Vl1xa6MdJwebCq8jRpe6/ZnR
-   tpd7nYf+CJFEBz+jmLZZ2S+5GjrmWGWn/kJ7PXbzI4DI406HaRFCzHCgA
-   z8qdLsIR8tE2huoi4RIjK+naLfl1hUzd+JZi3ZhJOP+JcQafVjm/ChECu
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="309261744"
-X-IronPort-AV: E=Sophos;i="5.96,145,1665471600"; 
-   d="scan'208";a="309261744"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2022 15:41:06 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="630668969"
-X-IronPort-AV: E=Sophos;i="5.96,145,1665471600"; 
-   d="scan'208";a="630668969"
-Received: from peggykes-mobl.amr.corp.intel.com (HELO [10.251.7.244]) ([10.251.7.244])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2022 15:41:04 -0800
-Message-ID: <da41d7f0-68ea-0c21-1dca-218f8184a0f3@intel.com>
-Date:   Mon, 7 Nov 2022 15:41:03 -0800
+        with ESMTP id S231890AbiKGXpy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 18:45:54 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2061.outbound.protection.outlook.com [40.107.220.61])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D80DF1BE8A;
+        Mon,  7 Nov 2022 15:45:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lY1YgtW0ATiDj1lldme6ZNlHC5njAhQ8OdNr/zbWFjmoEkRIpcKpWCUnmrKzu0STlMoAUPUdFaWMDctrRLhcdB/XhrS/9gbys4Q880WeKTZB0fEbFJtlMlRfwCWMuF61U1y0OWPvNm4PBsVOkrAUaxO08cWPn4fvNFqvyO4qYhHtJeDAkeoplx3YssvDWyhafQd+d8aUXhhOmeshk9uremCjxcygQRA9Ou1Zn1X+CT3BkjJ7ufWLV8LIWpljbtRAINy6jzuqGrlF5RLyMu1EkddRjwLrehURB+4Kr6FnYVW2dHzWGhZco12r7TsYIcjuqxDzPfLWh/hg9kSRpsU1ag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kiaZYX3gHWEf7MSSHuq/Kc2LWU0eiwCCSed5eOu9Pj4=;
+ b=HtYrvpIGzmoeZL+A1s3xfPQCRRhC6jmmzzbELSdHW6NXhBB+HR6FL0AUvoai1t92v/xPfu8yMwXTnvpW+X9Ea/UPKainJqGtZrH0CQigE/01ASDPf3sY5ZL4qOmzK2sGuGPFeFtGxlPIkIqnxnFbSakSUpe6HaZ/mc6wa8I7sS0rgByN8BzQr/OyebN77suWFYLW0ebpmgehxpnG5h8ExwhXTt44EV9Htwzgu9cqaa4ys5jaEbi5udBTbkEezSs4oEin0YBx31ny0EiSYrL6BN6FpeXqd9sGgw2si+Tar9i0+ZnjFigCQmmGmHi4cpw+D54OM1Yca89n90IfC2UG3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kiaZYX3gHWEf7MSSHuq/Kc2LWU0eiwCCSed5eOu9Pj4=;
+ b=GeMExQ/ftThQo6SZIn7ZtWm33N1ci6wCtRFRyLXiUib/fWtuf+ObW0L8SDic1WuWNogDgnmSY8Zx0slIpKVmsUs0luagtNidLOShOSStkpDITyGjp/+1LKocpp6RzP0HzbJ47HV36yJzIxZLwNBxGLCybHh80nevK3lzZvFSjY99iT7FpgPZ5oV86SmpqxEFLiXDJ/t0BX2F+LiyKc7mqfrQadCsWdJ7zQmsbW6R9+oXSB2aq2y2tYN0FcDrnXwMri12rzw7ZrS34mr8NJ6FRCbUaIuu0cd+0xaFxP7DqWA+xIdc1dajQHRCadhqdw6isNTDi+T1znC8bZcvbfgWCw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BL3PR12MB6546.namprd12.prod.outlook.com (2603:10b6:208:38d::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Mon, 7 Nov
+ 2022 23:45:48 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Mon, 7 Nov 2022
+ 23:45:48 +0000
+Date:   Mon, 7 Nov 2022 19:45:46 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+Subject: Re: [PATCH 06/10] vfio-iommufd: Allow iommufd to be used in place of
+ a container fd
+Message-ID: <Y2mYql90K/Oi6BIO@nvidia.com>
+References: <6-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
+ <58917b42-bfdd-c352-4b20-68ff135f968e@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <58917b42-bfdd-c352-4b20-68ff135f968e@intel.com>
+X-ClientProxiedBy: BL0PR05CA0010.namprd05.prod.outlook.com
+ (2603:10b6:208:91::20) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH 2/3] x86/speculation: Support Automatic IBRS
-Content-Language: en-US
-To:     Kim Phillips <kim.phillips@amd.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>
-Cc:     x86@kernel.org, Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Babu Moger <Babu.Moger@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20221104213651.141057-1-kim.phillips@amd.com>
- <20221104213651.141057-3-kim.phillips@amd.com> <Y2WJjdY3wwQl9/q9@zn.tnic>
- <Y2ZEinL+wlIX+1Sn@hirez.programming.kicks-ass.net>
- <d413c064-ee9b-5853-9cf1-544adde22c8a@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <d413c064-ee9b-5853-9cf1-544adde22c8a@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL3PR12MB6546:EE_
+X-MS-Office365-Filtering-Correlation-Id: 04398a0a-3466-45d3-04f7-08dac11a31d7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: a96fq5yuUwXrAo+E0kpDxlHDm54AWEnVTpyP7ExI5JFlIOsIjE3osvwjrBbAg0CQKkqNGoJ8Ps9Y+H8ykcH4ionDmZFBlG3uaFJth4xxoNyCN8COnWrKdyT8vq28PQ/y7ZYEbQ3fBDQGEr3NgzNKZAKuKv3jXRC4I/C/OVjhXbmEqoCrD2XesGWznJXU1xVDXNHxCQym/ue5pdHZWF/HzDH0XQrnmptRCpeMjYhzA6gs6rLMwdxTywnL6WcVx8wBBS1RxmO/eEnF8LvC83koh3Dbh3Tnqnz4W10ttzl1/zkDfCiG35qCG/SPQlGliZKYfII6QmQG5ZnbI/meGX8WrVnTR1J+EhEeUk+C1cbRut/cDcdmO4CiyzO0oO+XA2kM14St2Re/B7DTcmzW7nG/H7LSFHB/gbiRbWgtzCz1vMibmTXvSzXDiKbpnomRQ0fC8gnT2Me77TUOKQFxRhILIwGQ+vi+vtzG36iSScqLnCxR9f6TFbtsB6uYYyXrNa7BV6YX90GxRadN1/it290ZpYXSSXiCAIxe3WjUcgWsWlRgEHPtoKqJFTYwF2tl+VX52qyvuNymtgzmKv4ZkZ4Uhe5dTdYBx+bdUyaLx2XmRxt8+ooS1B+qlqJpYSvaEBgtZesLgdroEp+xxvzW9fTvuSbak1hrRIUAkqmHUF9WMJDZoGcmxQzLRewF+g/6uGbNyJm7hiboHrqPOjSTaXr2aw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(136003)(366004)(346002)(39860400002)(396003)(451199015)(53546011)(6506007)(186003)(2616005)(6512007)(26005)(107886003)(5660300002)(38100700002)(36756003)(2906002)(41300700001)(8936002)(7416002)(8676002)(86362001)(6486002)(6916009)(316002)(66476007)(54906003)(66556008)(66946007)(7406005)(4744005)(4326008)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rBLnO6XxDwmeKmg7+mcw12qC8Bk6/GI0M6U6zSGfyIZM4o8M7kXepUCoNDjT?=
+ =?us-ascii?Q?kqODNMzkupSQ2liO3loRQ2vsqk8XH5L4vPofvdafCGb5q8lT+5bRmj/uISfY?=
+ =?us-ascii?Q?3CNecZ108Xk+8uToJCKOzFSs1LvnyYN8AawLcybtzDRs2nfn043cgiID14/c?=
+ =?us-ascii?Q?byubRTsqVSuXjxEW/o10WQlPNepvR/7bx6HiPhaCPDp6rZjydFG5U2l+txQ/?=
+ =?us-ascii?Q?+fagR7qQkwMpFQ6SOUmiCJdAK9xIUjnyJ88cM0fxasQm0fbE19snlAMTUI/y?=
+ =?us-ascii?Q?j8kRRmoZH7G3JG9veX2PqwiWcm8ydGawpaZk/VJxKCNFA4Eaye0csNkFAa9L?=
+ =?us-ascii?Q?a7ws/5/K04qNFafn+hoZRVOa/gUrkqMdcmBdaeNJKw8UjPJ05+R0ionxm4Kg?=
+ =?us-ascii?Q?COvZh0TzSPzN1+Xeq7eN0LwEJDojMjc3oEBCsA7SwVBgaRhepQl01Q5xMeE1?=
+ =?us-ascii?Q?AP/0EJqTm724vcvvf80fhkXFk+F6q1BAD6/kcUEMzc4sn3SFieY01soUf2J0?=
+ =?us-ascii?Q?sdMsvqqFHo/ghAIrbZwp5DKjt30zKAYHiTjWqOGbHcWTW1qIozkBnsLogr08?=
+ =?us-ascii?Q?GQxhUt5V9PMo9qPhqbFbOzQ3yMrUNtXGYZlH4xDM6gNxZC5WHVH7y6cnUmvx?=
+ =?us-ascii?Q?ENxBR3blXXk73tHcCTT6QFgzYreZCqo4RJ45k8CsBLCI2LOtMBI6CiItyZHQ?=
+ =?us-ascii?Q?I7aFWcX01qJchNuiEoThF9RWB7/Qd/QxsrleSoSy/tTaclG39EUHkyUrFHSd?=
+ =?us-ascii?Q?1J7P+YCmlD7FDLMsNSGQJINKKP+wXPqW/leEzpNBcx6Jy0p9ozq6mf8IunGg?=
+ =?us-ascii?Q?ta4Kd/zMrWNEPF0t1lIMnPWm8CCQUCaYiO2JVs0n2Knil0PdGy9ZOkjRL+c7?=
+ =?us-ascii?Q?RD8lpvKyMqnD+NjqeV3QzKCnOsDCZ+06zKXbQpZt3dz4jza+5rvqvFsFdCM8?=
+ =?us-ascii?Q?ykgZusJuFkb0fgW0Am47GC4SgEfPmywysn+rSP+uJihqU5AMPsnpMP3J8G0G?=
+ =?us-ascii?Q?jSwt1ajx0almgU3SI3V/j8Oj3Ei+FyESc2lxIfz+MRXP5GKRXo84ayzXzaSt?=
+ =?us-ascii?Q?kyIljCacLYDAIefZfclNLIwQMNJ9/LTNdFzILZQ+FKtU9tJVZ+FmuBpyR5RE?=
+ =?us-ascii?Q?XwGjPRDyfhWhfi3Po+q1s+twaCUBNP726GqkVcoJZEifhQpJxE24YAN+WFUp?=
+ =?us-ascii?Q?ovc1386JINOO3e83rrwrdU78/tYtJaM7OUMkk/oRNw5patKj8oTEw8sq064r?=
+ =?us-ascii?Q?g8oU6P+lb07cBQqRC/ukeLu1VEUD1kiPvuAzHaZyho/vljOpTA9+c55I4j5J?=
+ =?us-ascii?Q?itmm/OqeFChpMM6kfY16D/H6xtcDCNENvtjUBCAhbV2p9p+cZ+vSyaZZNTam?=
+ =?us-ascii?Q?bd4RFIjJyCZTjl8hq+ewTtTxWJUAwsZvnvVBMHVWpsvbofT8GxGjmt+HWlco?=
+ =?us-ascii?Q?yoKCtuW+8w6MR2mvifkrxhvaatD9QCApoF0Pmn4u9b8kk/qCyRp8Mb2cExSp?=
+ =?us-ascii?Q?l7/Jfn1WbqahtHKQoHQGtGfW/5zeQPdARJ6Dss4qEsn8N4Atq1KRjYNEil4e?=
+ =?us-ascii?Q?CVvAfx0AWreWm1RGDGo=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 04398a0a-3466-45d3-04f7-08dac11a31d7
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2022 23:45:47.8331
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LTRPO2ldXTp0iP9x7vE5HspCEikCBAiToECGgIcLu6xM3OSSS9kfqRRKRlzPr+eI
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6546
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/7/22 14:39, Kim Phillips wrote:
-> I've started a version that has AUTOIBRS reuse SPECTRE_V2_EIBRS
-> spectre_v2_mitigation enum, but, so far, it's change to bugs.c
-> looks bigger: 58 lines changed vs. 34 (see below).
+On Wed, Nov 02, 2022 at 03:28:20PM +0800, Yi Liu wrote:
+> On 2022/10/26 02:50, Jason Gunthorpe wrote:
+> > This makes VFIO_GROUP_SET_CONTAINER accept both a vfio container FD and an
+> > iommufd.
+> > 
+> > In iommufd mode an IOAS will exist after the SET_CONTAINER, but it will
+> > not be attached to any groups.
 > 
-> Let me know if you want me to send it as a part of a v2 submission
-> after I take care of the kvm CPUID review.
+> is there any special reason that we cannot attach the IOAS in the SET
+> container phase or SET_IOMMU phase?
 
-Thanks for putting that together.  I generally like how this looks.
+It is because iommufd has been deliberately made to work only on
+struct device * not iommu_groups, and when we go to do the
+SET_CONTAINER we have no idea what the device will be.
 
-I think it probably goes to a _bit_ too much trouble to turn off
-"eibrs,lfence/retpoline".  If someone goes to the trouble of specifying
-those, a warning or pr_info() is probably enough.  You don't need to
-actively override it.
+So defering the operation is the cleanest approach.
 
-> -    } else if (boot_cpu_has(X86_FEATURE_IBRS) && !spectre_v2_in_ibrs_mode(mode) &&
-> -           mode != SPECTRE_V2_AUTO_IBRS) {
-> +    } else if ((boot_cpu_has(X86_FEATURE_IBRS) && !spectre_v2_in_ibrs_mode(mode)) ||
-> +           (boot_cpu_has(X86_FEATURE_AUTOIBRS) && !spectre_v2_in_ibrs_mode(mode))) {
->          setup_force_cpu_cap(X86_FEATURE_USE_IBRS_FW);
->          pr_info("Enabling Restricted Speculation for firmware calls\n"); 
+> >  From a VFIO perspective this means that the VFIO_GROUP_GET_STATUS and
+> > VFIO_GROUP_FLAGS_VIABLE works subtly differently. With the container FD
+> > the iommu_group_claim_dma_owner() is done during SET_CONTAINER but for
+> > IOMMFD this is done during VFIO_GROUP_GET_DEVICE_FD. Meaning that
+> 
+> s/IOMMFD/IOMMUFD
 
-Did the "mode != SPECTRE_V2_AUTO_IBRS" check get dropped accidentally?
-Or is it unnecessary now?
+Done
+
+Jason
