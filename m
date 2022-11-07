@@ -2,78 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EADC61EDF1
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 09:57:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31F4F61EE86
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 10:16:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231553AbiKGI5v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 03:57:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57482 "EHLO
+        id S231742AbiKGJQk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 04:16:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231578AbiKGI5l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 03:57:41 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA036167CE;
-        Mon,  7 Nov 2022 00:57:33 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A77SOi1011918;
-        Mon, 7 Nov 2022 08:57:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=F+Y+mUpQRfC0L4FjD3P+zxYwZIHz8W1xZryoB01mvzA=;
- b=tOtHtbbmLgmx57H3pej1yeNXA259KTlVqQFK4r1kKWgF0OSGO+Vi/il88HQpuPUCAIfO
- 2mlZc81blXNVi26o+Lw2I5Z56MIP/fG2AEb5uDSL6mwDPHIvNA2j84VD3BG9M//VcLr8
- 8mhDdi1tzCSIZ16qga80E1Rq1S+rvnOC8WllnzTcW3IFY5ubVdUq777GWZSX4rsvcHo5
- A6FJJ7mhuvSUm76n4mm28/QHoO0twp0InoI+0f47745m74toA6RtQDPCOaRAOQnOdCsw
- 39bBovu/q5VRLG8JvLlMZz/1w+mqLmBK+biANollthrjQ3ePJFdEmPsgQ5JP/WZ4s2jj NQ== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1teux92-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 08:57:33 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A78p1Uj025764;
-        Mon, 7 Nov 2022 08:57:31 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 3kngqda9v7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 08:57:31 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A78plIH43843886
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 7 Nov 2022 08:51:47 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 17F1EA4051;
-        Mon,  7 Nov 2022 08:57:28 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B1F07A404D;
-        Mon,  7 Nov 2022 08:57:27 +0000 (GMT)
-Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  7 Nov 2022 08:57:27 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        pasic@linux.ibm.com, akrowiak@linux.ibm.com, jjherne@linux.ibm.com,
-        mimu@linux.ibm.com, vneethv@linux.ibm.com, oberpar@linux.ibm.com
-Subject: [PATCH v1] KVM: s390: GISA: sort out physical vs virtual pointers usage
-Date:   Mon,  7 Nov 2022 09:57:27 +0100
-Message-Id: <20221107085727.1533792-1-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.37.3
+        with ESMTP id S231794AbiKGJQP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 04:16:15 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3D8E1707B;
+        Mon,  7 Nov 2022 01:16:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667812570; x=1699348570;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4g54fovxN/9L+XvgL/metcK6kKTJLbBqfrqSz8Mliew=;
+  b=FlWsOlBebcuvjxAzkg8XdVHx4ZMRQad/2duY7tkFIIwwi0Iitv8j7if0
+   b/0mTkoVJXsqgx9zdfuWby+jcd73KRg8P2SMNRilOvnuY81FONlFtkIWG
+   +d8XFU4eVMr2tXwmO6eiV4+thOL/cCt60h5iv0BmRt1o8pAl/Mldh82fm
+   mnQzJztK092JSNpxTB+c0KYdfHt8HfNqedTzCeXPrCCvi9j0UW0VtNC9T
+   VcvCp9qYfmnYIJvBt8Tm4FFfQQFxeQcgjd5FrO0AVBkMd7gGb5bm9YrnS
+   IskMdad+Cg4F5VddCqjToIKyS0UWr1Xv1q8inT6G7cn96rgIDTyP0/dZy
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10523"; a="337083259"
+X-IronPort-AV: E=Sophos;i="5.96,143,1665471600"; 
+   d="scan'208";a="337083259"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2022 01:16:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10523"; a="741416530"
+X-IronPort-AV: E=Sophos;i="5.96,143,1665471600"; 
+   d="scan'208";a="741416530"
+Received: from skxmcp01.bj.intel.com ([10.240.193.86])
+  by fmsmga002.fm.intel.com with ESMTP; 07 Nov 2022 01:16:09 -0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: VMX: Do not trap VMFUNC instructions for L1 guests.
+Date:   Mon,  7 Nov 2022 16:27:27 +0800
+Message-Id: <20221107082727.1355797-1-yu.c.zhang@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: pxFb1Zd7Jj975ATAWmLPbyqhDt3HhA1I
-X-Proofpoint-ORIG-GUID: pxFb1Zd7Jj975ATAWmLPbyqhDt3HhA1I
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-07_02,2022-11-03_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 spamscore=0 malwarescore=0 mlxlogscore=999
- suspectscore=0 phishscore=0 priorityscore=1501 adultscore=0 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211070072
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,63 +57,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix virtual vs physical address confusion (which currently are the same).
+VMFUNC is not supported for L1 guests, and executing VMFUNC in
+L1 shall generate a #UD directly. Just disable it in secondary
+proc-based execution control for L1, instead of intercepting it
+and inject the #UD again.
 
-In chsc_sgib(), do the virtual-physical conversion in the caller since
-the caller needs to make sure it is a 31-bit address and zero has a
-special meaning (disassociating the GIB).
-
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
 ---
- arch/s390/kvm/interrupt.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 17 +++++------------
+ arch/x86/kvm/vmx/vmx.c    |  4 +++-
+ 2 files changed, 8 insertions(+), 13 deletions(-)
 
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index ab569faf0df2..ae018217eac8 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -3104,9 +3104,9 @@ static enum hrtimer_restart gisa_vcpu_kicker(struct hrtimer *timer)
- static void process_gib_alert_list(void)
- {
- 	struct kvm_s390_gisa_interrupt *gi;
-+	u32 final, gisa_phys, origin = 0UL;
- 	struct kvm_s390_gisa *gisa;
- 	struct kvm *kvm;
--	u32 final, origin = 0UL;
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 0c62352dda6a..8858c6c0979f 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -5793,11 +5793,11 @@ static int handle_vmfunc(struct kvm_vcpu *vcpu)
+ 	u32 function = kvm_rax_read(vcpu);
  
- 	do {
- 		/*
-@@ -3132,9 +3132,10 @@ static void process_gib_alert_list(void)
- 		 * interruptions asap.
- 		 */
- 		while (origin & GISA_ADDR_MASK) {
--			gisa = (struct kvm_s390_gisa *)(u64)origin;
-+			gisa_phys = origin;
-+			gisa = phys_to_virt(gisa_phys);
- 			origin = gisa->next_alert;
--			gisa->next_alert = (u32)(u64)gisa;
-+			gisa->next_alert = gisa_phys;
- 			kvm = container_of(gisa, struct sie_page2, gisa)->kvm;
- 			gi = &kvm->arch.gisa_int;
- 			if (hrtimer_active(&gi->timer))
-@@ -3418,6 +3419,7 @@ void kvm_s390_gib_destroy(void)
- 
- int kvm_s390_gib_init(u8 nisc)
- {
-+	u32 gib_origin;
- 	int rc = 0;
- 
- 	if (!css_general_characteristics.aiv) {
-@@ -3439,7 +3441,8 @@ int kvm_s390_gib_init(u8 nisc)
+ 	/*
+-	 * VMFUNC is only supported for nested guests, but we always enable the
+-	 * secondary control for simplicity; for non-nested mode, fake that we
+-	 * didn't by injecting #UD.
++	 * VMFUNC is only supported for nested guests, instead of triggering
++	 * a VM Exit, non-nested guests shall receive #UD directly.
+ 	 */
+ 	if (!is_guest_mode(vcpu)) {
++		vcpu_unimpl(vcpu, "vmx: unexpected vm exit EXIT_REASON_VMFUNC.\n");
+ 		kvm_queue_exception(vcpu, UD_VECTOR);
+ 		return 1;
  	}
+@@ -6808,6 +6808,7 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
+ 		SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
+ 		SECONDARY_EXEC_RDRAND_EXITING |
+ 		SECONDARY_EXEC_ENABLE_INVPCID |
++		SECONDARY_EXEC_ENABLE_VMFUNC |
+ 		SECONDARY_EXEC_RDSEED_EXITING |
+ 		SECONDARY_EXEC_XSAVES |
+ 		SECONDARY_EXEC_TSC_SCALING;
+@@ -6839,16 +6840,8 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
+ 				SECONDARY_EXEC_ENABLE_PML;
+ 			msrs->ept_caps |= VMX_EPT_AD_BIT;
+ 		}
+-	}
  
- 	gib->nisc = nisc;
--	if (chsc_sgib((u32)(u64)gib)) {
-+	gib_origin = virt_to_phys(gib);
-+	if (chsc_sgib(gib_origin)) {
- 		pr_err("Associating the GIB with the AIV facility failed\n");
- 		free_page((unsigned long)gib);
- 		gib = NULL;
+-	if (cpu_has_vmx_vmfunc()) {
+-		msrs->secondary_ctls_high |=
+-			SECONDARY_EXEC_ENABLE_VMFUNC;
+-		/*
+-		 * Advertise EPTP switching unconditionally
+-		 * since we emulate it
+-		 */
+-		if (enable_ept)
++		if (cpu_has_vmx_vmfunc())
+ 			msrs->vmfunc_controls =
+ 				VMX_VMFUNC_EPTP_SWITCHING;
+ 	}
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 65f092e4a81b..9e17de62eb37 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4483,6 +4483,9 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+ 				  SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
+ 	exec_control &= ~SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE;
+ 
++	/* VMFUNC is not supported for L1 guest, just disable it. */
++	exec_control &= ~SECONDARY_EXEC_ENABLE_VMFUNC;
++
+ 	/* SECONDARY_EXEC_DESC is enabled/disabled on writes to CR4.UMIP,
+ 	 * in vmx_set_cr4.  */
+ 	exec_control &= ~SECONDARY_EXEC_DESC;
+@@ -6000,7 +6003,6 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+ 	[EXIT_REASON_RDSEED]                  = kvm_handle_invalid_op,
+ 	[EXIT_REASON_PML_FULL]		      = handle_pml_full,
+ 	[EXIT_REASON_INVPCID]                 = handle_invpcid,
+-	[EXIT_REASON_VMFUNC]		      = handle_vmx_instruction,
+ 	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
+ 	[EXIT_REASON_ENCLS]		      = handle_encls,
+ 	[EXIT_REASON_BUS_LOCK]                = handle_bus_lock_vmexit,
 -- 
-2.37.3
+2.17.1
 
