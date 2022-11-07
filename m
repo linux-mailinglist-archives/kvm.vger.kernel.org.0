@@ -2,159 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EA9061F342
-	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 13:30:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A54161F428
+	for <lists+kvm@lfdr.de>; Mon,  7 Nov 2022 14:19:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231419AbiKGMau (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 07:30:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54184 "EHLO
+        id S232120AbiKGNTu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 08:19:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232312AbiKGM3O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 07:29:14 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E57513CCE;
-        Mon,  7 Nov 2022 04:29:13 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A7C9dox031474;
-        Mon, 7 Nov 2022 12:29:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=NJ875JqG8nx5lP+9Ofjvcl66nb8P9Ka7WbRGVcqVXas=;
- b=SevJlLChXDby5NAlmHm1ClTG4zsxa+D/1glIkj33OEldzp9Wf4Mj/YOzwUmJ5ycGeh4o
- FW5y3RHoH+nWJOTjbcfdKerrv9Hw/mc8N3a+ygev7fuTchQjlvHAWBqg/+5tHgs1cXX6
- FajVmCv/xhN27Mi7ajIKr0tOmZ00gW+vt7Dkcvz/y0k1YUgP95iJme1nNSPtvw+S0pL2
- 0JdLiJPwL9hxS46NBN9GRMxG+cO08+g5bB26f2rvQgmcQw1o9eQR+v+caBRPbMpTiMgR
- rtgPtaPXvOT/W0SiKCxjTykGc+mkZAnYd+5Wwr0FsFZ9eShzQ7J5FgutnNXBKh33kNod LQ== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1gm1p3r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 12:29:12 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A7CK02b023356;
-        Mon, 7 Nov 2022 12:29:10 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 3kngqgak54-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Nov 2022 12:29:10 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A7CT71A62456224
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 7 Nov 2022 12:29:07 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 216D411C058;
-        Mon,  7 Nov 2022 12:29:07 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D4E2F11C04C;
-        Mon,  7 Nov 2022 12:29:06 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  7 Nov 2022 12:29:06 +0000 (GMT)
-Date:   Mon, 7 Nov 2022 13:29:05 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v2 1/1] s390/mm: fix virtual-physical address confusion
- for swiotlb
-Message-ID: <20221107132905.1025414f@p-imbrenda>
-In-Reply-To: <20221107121221.156274-2-nrb@linux.ibm.com>
-References: <20221107121221.156274-1-nrb@linux.ibm.com>
-        <20221107121221.156274-2-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S231963AbiKGNTr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 08:19:47 -0500
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0DD71B78C;
+        Mon,  7 Nov 2022 05:19:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QTfnkAMzELzwVXLsYm9Xz2BYWDu7NCLHu1rhWx/gdytFcH2ny5aCD02ESX6Dfg+hF0qWfovNGYPLHt+I4ASDCJySdxpSCu0Bcw+MAgUda5qGy8DXT6VoYi2s8BA3cVv9pyPlwVmhc5A5/EaqHkq4EsYy1KDPhrL9e0U94m0EKWXGEqn85dzdN8rd8CElAEjNcYW78iabjAn94/ROZqlbkn+r3tISbpzPjYqeAvmFlhl/9EEZ9vixUfkFa4gFMYfiS2CkUJj0gBhAB8ucA1JUjygfiOmbBhzf5rsXQwhwHuzNG3O8rAneBhXmeIY1HB2EHBturZGz9ZlYbs9qp7AbKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4X5dG8QlSTh4dgjV3bEZBAoi/qJnVqmgFamMmqSL5G8=;
+ b=UcUyO1Rp21mamHpsd/Lp8FcRbDyMQ4zc3BVN5b5k2RHmrXM3EKMTqFgETqLPJt5bX40sRYMa/FlW/+H6sFAez8l5dMU/8AkndFRU/2NZNU0QBlE8mtWWVWAxx+Yl+nfDlfLLVjwj3w4MB5OBlqHtkBxRKuAYArNl0+n4H+hs4InVdYwKiZswcvL5Vx2dSMhx7yXdtlfv87iYQA03utchlJs+/1UDuGqDpXryj9wLHrOg8ugH2tNR0rq3+mmiDJZDfVlXgluTslN+BB5YTTgAy/2i5Gd78ErGpAfxdNH74N73EUKPwS1K8RYLkFZdRmasfHQLu/JrcrXlvmHfmTAAeA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4X5dG8QlSTh4dgjV3bEZBAoi/qJnVqmgFamMmqSL5G8=;
+ b=uemGWwacjLcTycDfZKyuSAW/nN3SW/HE5qu0tCWlkV8o/bAuAF43JVyeAIZPhbhpxXYdh5lPfZ6lg5m+Qb8lLYwNRN5aJBctrlcvmLJofzVBqJZCo+tU2Awn0LeWAhCNT0a8flRKlAePIxGrlN1MbzEbrLSYEIyahoq4whlEDghyZ5h/nyfoiV/KuMD6N86PoQ+O0pq1Au8/d4jf9eRmWjb3guqKX20CbAylZbmxripKjh880UZJ7/SEKvY521KT7u8D/vKRQNt5ASMeeevHVQDhi34/TISV23XJGIwI1ejCHYMVvq4VWi8sKfy8kCO3zJKma9sZw2i1HuPxioYp9A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DS7PR12MB5864.namprd12.prod.outlook.com (2603:10b6:8:7b::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Mon, 7 Nov
+ 2022 13:19:44 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Mon, 7 Nov 2022
+ 13:19:44 +0000
+Date:   Mon, 7 Nov 2022 09:19:43 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
+Subject: Re: [PATCH 04/10] vfio: Move storage of allow_unsafe_interrupts to
+ vfio_main.c
+Message-ID: <Y2kF75zVD581UeR2@nvidia.com>
+References: <0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
+ <4-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
+ <20221026152442.4855c5de.alex.williamson@redhat.com>
+ <Y1wiCc33Jh5QY+1f@nvidia.com>
+ <20221031164526.0712e456.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221031164526.0712e456.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL0PR1501CA0012.namprd15.prod.outlook.com
+ (2603:10b6:207:17::25) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Jnxt4Cf9_-yrTY4vsoN1TkaepRMjtdaC
-X-Proofpoint-GUID: Jnxt4Cf9_-yrTY4vsoN1TkaepRMjtdaC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-07_04,2022-11-03_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- lowpriorityscore=0 mlxscore=0 mlxlogscore=999 suspectscore=0 clxscore=1015
- priorityscore=1501 malwarescore=0 impostorscore=0 phishscore=0 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211070099
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB5864:EE_
+X-MS-Office365-Filtering-Correlation-Id: 76b3bbaa-d521-4298-a7dd-08dac0c2bc79
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: H6TZ3XjPKagGwPPhvwmWSWUXl6G4xGdbn+N1blCXYpTEOOBJe1u5gXPXwX877Em71HHUAVOwUyChOIMyL4HoxvOouw6XU/wviKYyooISg1u58/0QeGbQKsZnVNMzQ/5AqKBqQsNNODGn2uKo4A1oGOfNRrS1dDZQa4mbFouufD48xYZcgNvTnHaJLPa/Rygn97RcK8mrl39vIgI0O8npeA2VdduTKmgKH9mwFumhm333Ji2DzggemYAE8KYRaZ+bDYN8osQbWpBtwsDWHiOmWyWH+G4scgHvF5x2U6GiJeGb+hQL2TA9aSXOV35ScGWBJhnpgTBeN5jQg0mW7nF5xVCouki9WyhwG/gt7LmerMta5uolXhf5K/X+rOc5dIv2st6rbc8qooadQZiWqqzjbvJAMol2raHdGMAP+bta/f03V19TkpMd3keVz1nN7OmekgU5cGoVi77NA/20IGZnFwgk7O91R+4revLvud5DAAUkU8CqS/yl2RDLJ1W2A3R5gMPJM58gEqs4fPtoTv43ZUgd3wsK3Ys9t6jXMg730Cew7p9WcLoZWZQKECNjeRMFSBOwE+Au7pZH3lGIyrdxtnRY3WN8nyYSTgeNEV9jdoE2/+5uY3u0tddQ0IblQcePM22MhvxMvelUHZvetTeTSoMueHJXhuQVLO6m/b5Y7zN3RKpDc15jv6zZEGvhsoBm6n8S6cmlQ/4y+QS/1GghZA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(346002)(366004)(376002)(136003)(39860400002)(451199015)(478600001)(6486002)(38100700002)(86362001)(54906003)(6916009)(83380400001)(36756003)(8936002)(316002)(6506007)(6512007)(26005)(41300700001)(66946007)(66556008)(8676002)(66476007)(4326008)(186003)(2616005)(2906002)(7416002)(7406005)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3ycE2YlZfTG/oQoQNuNstdHGXUSS2MOxztYYF2Au9GQuT1CZdvQgX0GPg5H4?=
+ =?us-ascii?Q?+m73EF2k8+kgNsc76r9LXWETx3XzR0IyWxYFQmkgTqKsK9FpKlv8fWgHbAae?=
+ =?us-ascii?Q?qCW958njIzZ4sBDIjQeo36kRwp+IJoWdjyJYoe19g5RZ160DyxyIorcJWd56?=
+ =?us-ascii?Q?gYgzOwHCYHrI7EUpwOARfT5s42zbAvYaqzxzIMe5CG4azCij2nSJi9ddCc4D?=
+ =?us-ascii?Q?/McXeQkSsPEPK6VqaiycLAJ2b/bD+YhJS6acS3jbYKnkWaqXzsOxLQGE5V4p?=
+ =?us-ascii?Q?Hje0KxoKrGLWkJjjlllrQShfWax+VQNxU8lbPIfwgogCxANMTpXqqc97906z?=
+ =?us-ascii?Q?rrap+Ldg76EcpkTRL6+Ih1ZIAvEc8VSLDRMYWndJJb1ktNph6pC5/Mj1OOYB?=
+ =?us-ascii?Q?p2fi1moCAG1rJD+QPR4DkFzzv+ECQNuTbxlxsWG1tqM3JsIdc0YeacM2WqTA?=
+ =?us-ascii?Q?LB401VOkHDj0VWmImhkyCrYOtapuaMJeQvslhP1JG4lO03GgMqskdxC+cSt/?=
+ =?us-ascii?Q?AGVd9YunblzfL4buRvn7+KR42rFq69W4JxZtX6qjTKjrFa1EkmTqLdse08IN?=
+ =?us-ascii?Q?w3gxGBU7dovADzuvrp4ZofDmDvfI/6XiJzm1uj2hOOBSTcBc/A0tyFr4L07q?=
+ =?us-ascii?Q?nHQ8EvEvL2bEvHkxNNhxEiHN34PjOCnhAlFaWtxIhMoAb2Du1rTgUJw0JIMy?=
+ =?us-ascii?Q?vvNxNGt0x1bNfFwKAOwZn5XBaE2OUgGaLranlKdKY1YRDoG64Yl1YMEx2or6?=
+ =?us-ascii?Q?TuI0lh/xp9wq6e+1YRn28QgJeo24iFlq42zhWPlcWPO09xy8flkeFFCUhW6+?=
+ =?us-ascii?Q?0/mXaoIlCqYiKBJLvaIgOVVaHhDA8QDwXrk5tjTYP8H42P9on0XIi4G74uFK?=
+ =?us-ascii?Q?3eiSfxDVvbtU3xr8CBjxsttPngrXylFlxup1kdcRDO1cYJcvH63sGh1gWPay?=
+ =?us-ascii?Q?ua2D4wlzdPTPaK2gWQ6Nkcw5+sQG7pUV78GEqAOy6JJH+1wl2YxjG1IiVeBo?=
+ =?us-ascii?Q?3aLkSe82aVz6TZzq9PXGr4+uWkBv/leHwHB0Vi2wKfKMw6MVbOKCIuTiovEZ?=
+ =?us-ascii?Q?49fRzXh982yEX7VkzX5lTidMBoh+cQrk9N9MSfngDZSdjaspt5NNtwFQqmSu?=
+ =?us-ascii?Q?ro1nQAzxRD0Rz8+/YP4lY8IHWZAJI+iqIJq+vHd9Bn/fCc4nEKzYqwkTlYio?=
+ =?us-ascii?Q?rfxS4enyRHOKFGiBwOkiY5AGXh89wavb6nHtmIcO0wxrow2xROn6AkX0KvUN?=
+ =?us-ascii?Q?m7qCosnRtBJ3AwFvRZjmDqUCJ3ZswfAqTPpjuk2nVGXvKVpuXuRQVFiW5ZRb?=
+ =?us-ascii?Q?rlmOzg+0BVDN4OhNCp3gs+yFnaoy0B4yFNAZI12IrE2BCbF0YLqwJHTOYboJ?=
+ =?us-ascii?Q?bhfmnbA1QZcxE7Rgv4x0i+nWkL+1+4tdwT/mXoZ9DoIaJKiEsnY0o6/8wxal?=
+ =?us-ascii?Q?XHPrYFx+2efVGBvW8/RoIynU44pb0Olk++w7iaCbJnH/EpOvUdkDR+rj9S/C?=
+ =?us-ascii?Q?rCNu2im1dmsdYW5o2iYBKCWjTll3t+kRu4SeDVvcsN4zxCvNHbIvzkGTYkBW?=
+ =?us-ascii?Q?LAtIyrUYQKUCYj9aNAU=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 76b3bbaa-d521-4298-a7dd-08dac0c2bc79
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2022 13:19:44.8998
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MaisCtaZQ0vNJvx1NRF5hFN4IFlcFxcuV9hWzeWntYolr4QaV4CtsYEGio3yoHUt
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5864
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  7 Nov 2022 13:12:21 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
+On Mon, Oct 31, 2022 at 04:45:26PM -0600, Alex Williamson wrote:
 
-> swiotlb passes virtual addresses to set_memory_encrypted() and
-> set_memory_decrypted(), but uv_remove_shared() and uv_set_shared()
-> expect physical addresses. This currently works, because virtual
-> and physical addresses are the same.
+> > It is one idea, it depends how literal you want to be on "module
+> > parameters are ABI". IMHO it is a weak form of ABI and the need of
+> > this paramter in particular is not that common in modern times, AFAIK.
+> > 
+> > So perhaps we just also expose it through vfio.ko and expect people to
+> > migrate. That would give a window were both options are available.
 > 
-> Add virt_to_phys() to resolve the virtual-physical confusion.
-> 
-> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> That might be best.  Ultimately this is an opt-out of a feature that
+> has security implications, so I'd rather error on the side of requiring
+> the user to re-assert that opt-out.  It seems the potential good in
+> eliminating stale or unnecessary options outweighs any weak claims of
+> preserving an ABI for a module that's no longer in service.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Ok, lets do this
 
-> ---
->  arch/s390/include/asm/mem_encrypt.h |  4 ++--
->  arch/s390/mm/init.c                 | 12 ++++++------
->  2 files changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/mem_encrypt.h b/arch/s390/include/asm/mem_encrypt.h
-> index 08a8b96606d7..b85e13505a0f 100644
-> --- a/arch/s390/include/asm/mem_encrypt.h
-> +++ b/arch/s390/include/asm/mem_encrypt.h
-> @@ -4,8 +4,8 @@
->  
->  #ifndef __ASSEMBLY__
->  
-> -int set_memory_encrypted(unsigned long addr, int numpages);
-> -int set_memory_decrypted(unsigned long addr, int numpages);
-> +int set_memory_encrypted(unsigned long vaddr, int numpages);
-> +int set_memory_decrypted(unsigned long vaddr, int numpages);
->  
->  #endif	/* __ASSEMBLY__ */
->  
-> diff --git a/arch/s390/mm/init.c b/arch/s390/mm/init.c
-> index 97d66a3e60fb..d509656c67d7 100644
-> --- a/arch/s390/mm/init.c
-> +++ b/arch/s390/mm/init.c
-> @@ -140,25 +140,25 @@ void mark_rodata_ro(void)
->  	debug_checkwx();
->  }
->  
-> -int set_memory_encrypted(unsigned long addr, int numpages)
-> +int set_memory_encrypted(unsigned long vaddr, int numpages)
->  {
->  	int i;
->  
->  	/* make specified pages unshared, (swiotlb, dma_free) */
->  	for (i = 0; i < numpages; ++i) {
-> -		uv_remove_shared(addr);
-> -		addr += PAGE_SIZE;
-> +		uv_remove_shared(virt_to_phys((void *)vaddr));
-> +		vaddr += PAGE_SIZE;
->  	}
->  	return 0;
->  }
->  
-> -int set_memory_decrypted(unsigned long addr, int numpages)
-> +int set_memory_decrypted(unsigned long vaddr, int numpages)
->  {
->  	int i;
->  	/* make specified pages shared (swiotlb, dma_alloca) */
->  	for (i = 0; i < numpages; ++i) {
-> -		uv_set_shared(addr);
-> -		addr += PAGE_SIZE;
-> +		uv_set_shared(virt_to_phys((void *)vaddr));
-> +		vaddr += PAGE_SIZE;
->  	}
->  	return 0;
->  }
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -55,6 +55,11 @@ static struct vfio {
+ bool vfio_allow_unsafe_interrupts;
+ EXPORT_SYMBOL_GPL(vfio_allow_unsafe_interrupts);
+ 
++module_param_named(allow_unsafe_interrupts,
++                  vfio_allow_unsafe_interrupts, bool, S_IRUGO | S_IWUSR);
++MODULE_PARM_DESC(allow_unsafe_interrupts,
++                "Enable VFIO IOMMU support for on platforms without interrupt remapping support.");
++
+ static DEFINE_XARRAY(vfio_device_set_xa);
+ static const struct file_operations vfio_group_fops;
 
+> However, I'd question whether vfio is the right place for that new
+> module option.  As proposed, vfio is only passing it through to
+> iommufd, where an error related to lack of the hardware feature is
+> masked behind an -EPERM by the time it gets back to vfio, making any
+> sort of advisory to the user about the module option convoluted.  It
+> seems like iommufd should own the option to opt-out universally, not
+> just through the vfio use case.  Thanks,
+
+My thinking is this option shouldn't exist at all in other iommufd
+users. eg I don't see value in VDPA supporting it.
+
+So, let's wait and see if a need arises first. I'm reluctant to add
+options to disable kernel security without really good reasons.
+
+Jason
