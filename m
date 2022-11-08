@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC292621A0F
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 18:09:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 93B9F621A11
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 18:09:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234287AbiKHRJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 12:09:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45314 "EHLO
+        id S234164AbiKHRJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 12:09:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233736AbiKHRJM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 12:09:12 -0500
+        with ESMTP id S234229AbiKHRJO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 12:09:14 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB3C421E19
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 09:08:14 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE6334C267
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 09:08:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667927293;
+        s=mimecast20190719; t=1667927296;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=18cZXcVgJyLKC9lzh1MkmwE4AjL3G0XUfwNWSpydwoE=;
-        b=G7rvo3g0vn8LZYUs5UBp/YcSXFN/ctTPuoJlIJ4ug1Yig59CLLb03PNtEr8KA+gKA3Xzb2
-        4dGhStTFqvG6sqxTRvFHs6ApnqDKH5E3NDp1n4H0Xetw9f4tMD2Bg+5M6sL3YQtDtZV26Q
-        MrbUYNlILluWoS/57oKyRJN0g2iTzfc=
+        bh=BrFBzOip2xxuT2jz42nrG4oeTa43nCgGcjdRVPxQm7Q=;
+        b=fhkz1dLriM1nZEqY2Ara1xh6C2DfJNitoxRqH4cSa1VSk8+azyUtS0JRlB21IzMrfTJ6K/
+        dz7d3cawTu/XxYhla3mmA/tbZU1VhPnevMnGMDb2cLDx/m/rzJJdGwTS6Hf6ip3bKge3gI
+        Xfy+1YGjoatJwKHju+2J+IgZ8HnL5Ro=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-382--TS72wqTMBqdQ3Ioi5HGqQ-1; Tue, 08 Nov 2022 12:08:10 -0500
-X-MC-Unique: -TS72wqTMBqdQ3Ioi5HGqQ-1
+ us-mta-606-DfMxGGgvNGG7Wg5sy8FE5g-1; Tue, 08 Nov 2022 12:08:13 -0500
+X-MC-Unique: DfMxGGgvNGG7Wg5sy8FE5g-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E2386101E157;
-        Tue,  8 Nov 2022 17:08:08 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 400A4800186;
+        Tue,  8 Nov 2022 17:08:12 +0000 (UTC)
 Received: from eperezma.remote.csb (unknown [10.39.193.47])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E3E50C15BB5;
-        Tue,  8 Nov 2022 17:08:05 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 344DAC15BB5;
+        Tue,  8 Nov 2022 17:08:09 +0000 (UTC)
 From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Parav Pandit <parav@mellanox.com>,
@@ -54,9 +54,9 @@ Cc:     Parav Pandit <parav@mellanox.com>,
         Zhu Lingshan <lingshan.zhu@intel.com>, kvm@vger.kernel.org,
         "Gonglei (Arei)" <arei.gonglei@huawei.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v6 02/10] vhost: set SVQ device call handler at SVQ start
-Date:   Tue,  8 Nov 2022 18:07:47 +0100
-Message-Id: <20221108170755.92768-3-eperezma@redhat.com>
+Subject: [PATCH v6 03/10] vhost: Allocate SVQ device file descriptors at device start
+Date:   Tue,  8 Nov 2022 18:07:48 +0100
+Message-Id: <20221108170755.92768-4-eperezma@redhat.com>
 In-Reply-To: <20221108170755.92768-1-eperezma@redhat.com>
 References: <20221108170755.92768-1-eperezma@redhat.com>
 MIME-Version: 1.0
@@ -73,54 +73,151 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-By the end of this series CVQ is shadowed as long as the features
-support it.
+The next patches will start control SVQ if possible. However, we don't
+know if that will be possible at qemu boot anymore.
 
-Since we don't know at the beginning of qemu running if this is
-supported, move the event notifier handler setting to the start of the
-SVQ, instead of the start of qemu run.
+Delay device file descriptors until we know it at device start.
 
 Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
 ---
- hw/virtio/vhost-shadow-virtqueue.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/virtio/vhost-shadow-virtqueue.c | 31 ++------------------------
+ hw/virtio/vhost-vdpa.c             | 35 ++++++++++++++++++++++++------
+ 2 files changed, 30 insertions(+), 36 deletions(-)
 
 diff --git a/hw/virtio/vhost-shadow-virtqueue.c b/hw/virtio/vhost-shadow-virtqueue.c
-index 5bd14cad96..264ddc166d 100644
+index 264ddc166d..3b05bab44d 100644
 --- a/hw/virtio/vhost-shadow-virtqueue.c
 +++ b/hw/virtio/vhost-shadow-virtqueue.c
-@@ -648,6 +648,7 @@ void vhost_svq_start(VhostShadowVirtqueue *svq, VirtIODevice *vdev,
+@@ -715,43 +715,18 @@ void vhost_svq_stop(VhostShadowVirtqueue *svq)
+  * @iova_tree: Tree to perform descriptors translations
+  * @ops: SVQ owner callbacks
+  * @ops_opaque: ops opaque pointer
+- *
+- * Returns the new virtqueue or NULL.
+- *
+- * In case of error, reason is reported through error_report.
+  */
+ VhostShadowVirtqueue *vhost_svq_new(VhostIOVATree *iova_tree,
+                                     const VhostShadowVirtqueueOps *ops,
+                                     void *ops_opaque)
  {
-     size_t desc_size, driver_size, device_size;
- 
-+    event_notifier_set_handler(&svq->hdev_call, vhost_svq_handle_call);
-     svq->next_guest_avail_elem = NULL;
-     svq->shadow_avail_idx = 0;
-     svq->shadow_used_idx = 0;
-@@ -704,6 +705,7 @@ void vhost_svq_stop(VhostShadowVirtqueue *svq)
-     g_free(svq->desc_state);
-     qemu_vfree(svq->vring.desc);
-     qemu_vfree(svq->vring.used);
-+    event_notifier_set_handler(&svq->hdev_call, NULL);
- }
- 
- /**
-@@ -740,7 +742,6 @@ VhostShadowVirtqueue *vhost_svq_new(VhostIOVATree *iova_tree,
-     }
+-    g_autofree VhostShadowVirtqueue *svq = g_new0(VhostShadowVirtqueue, 1);
+-    int r;
+-
+-    r = event_notifier_init(&svq->hdev_kick, 0);
+-    if (r != 0) {
+-        error_report("Couldn't create kick event notifier: %s (%d)",
+-                     g_strerror(errno), errno);
+-        goto err_init_hdev_kick;
+-    }
+-
+-    r = event_notifier_init(&svq->hdev_call, 0);
+-    if (r != 0) {
+-        error_report("Couldn't create call event notifier: %s (%d)",
+-                     g_strerror(errno), errno);
+-        goto err_init_hdev_call;
+-    }
++    VhostShadowVirtqueue *svq = g_new0(VhostShadowVirtqueue, 1);
  
      event_notifier_init_fd(&svq->svq_kick, VHOST_FILE_UNBIND);
--    event_notifier_set_handler(&svq->hdev_call, vhost_svq_handle_call);
      svq->iova_tree = iova_tree;
      svq->ops = ops;
      svq->ops_opaque = ops_opaque;
-@@ -763,7 +764,6 @@ void vhost_svq_free(gpointer pvq)
+-    return g_steal_pointer(&svq);
+-
+-err_init_hdev_call:
+-    event_notifier_cleanup(&svq->hdev_kick);
+-
+-err_init_hdev_kick:
+-    return NULL;
++    return svq;
+ }
+ 
+ /**
+@@ -763,7 +738,5 @@ void vhost_svq_free(gpointer pvq)
+ {
      VhostShadowVirtqueue *vq = pvq;
      vhost_svq_stop(vq);
-     event_notifier_cleanup(&vq->hdev_kick);
--    event_notifier_set_handler(&vq->hdev_call, NULL);
-     event_notifier_cleanup(&vq->hdev_call);
+-    event_notifier_cleanup(&vq->hdev_kick);
+-    event_notifier_cleanup(&vq->hdev_call);
      g_free(vq);
  }
+diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+index 7f0ff4df5b..3df2775760 100644
+--- a/hw/virtio/vhost-vdpa.c
++++ b/hw/virtio/vhost-vdpa.c
+@@ -428,15 +428,11 @@ static int vhost_vdpa_init_svq(struct vhost_dev *hdev, struct vhost_vdpa *v,
+ 
+     shadow_vqs = g_ptr_array_new_full(hdev->nvqs, vhost_svq_free);
+     for (unsigned n = 0; n < hdev->nvqs; ++n) {
+-        g_autoptr(VhostShadowVirtqueue) svq;
++        VhostShadowVirtqueue *svq;
+ 
+         svq = vhost_svq_new(v->iova_tree, v->shadow_vq_ops,
+                             v->shadow_vq_ops_opaque);
+-        if (unlikely(!svq)) {
+-            error_setg(errp, "Cannot create svq %u", n);
+-            return -1;
+-        }
+-        g_ptr_array_add(shadow_vqs, g_steal_pointer(&svq));
++        g_ptr_array_add(shadow_vqs, svq);
+     }
+ 
+     v->shadow_vqs = g_steal_pointer(&shadow_vqs);
+@@ -864,11 +860,23 @@ static int vhost_vdpa_svq_set_fds(struct vhost_dev *dev,
+     const EventNotifier *event_notifier = &svq->hdev_kick;
+     int r;
+ 
++    r = event_notifier_init(&svq->hdev_kick, 0);
++    if (r != 0) {
++        error_setg_errno(errp, -r, "Couldn't create kick event notifier");
++        goto err_init_hdev_kick;
++    }
++
++    r = event_notifier_init(&svq->hdev_call, 0);
++    if (r != 0) {
++        error_setg_errno(errp, -r, "Couldn't create call event notifier");
++        goto err_init_hdev_call;
++    }
++
+     file.fd = event_notifier_get_fd(event_notifier);
+     r = vhost_vdpa_set_vring_dev_kick(dev, &file);
+     if (unlikely(r != 0)) {
+         error_setg_errno(errp, -r, "Can't set device kick fd");
+-        return r;
++        goto err_init_set_dev_fd;
+     }
+ 
+     event_notifier = &svq->hdev_call;
+@@ -876,8 +884,18 @@ static int vhost_vdpa_svq_set_fds(struct vhost_dev *dev,
+     r = vhost_vdpa_set_vring_dev_call(dev, &file);
+     if (unlikely(r != 0)) {
+         error_setg_errno(errp, -r, "Can't set device call fd");
++        goto err_init_set_dev_fd;
+     }
+ 
++    return 0;
++
++err_init_set_dev_fd:
++    event_notifier_set_handler(&svq->hdev_call, NULL);
++
++err_init_hdev_call:
++    event_notifier_cleanup(&svq->hdev_kick);
++
++err_init_hdev_kick:
+     return r;
+ }
+ 
+@@ -1089,6 +1107,9 @@ static void vhost_vdpa_svqs_stop(struct vhost_dev *dev)
+     for (unsigned i = 0; i < v->shadow_vqs->len; ++i) {
+         VhostShadowVirtqueue *svq = g_ptr_array_index(v->shadow_vqs, i);
+         vhost_vdpa_svq_unmap_rings(dev, svq);
++
++        event_notifier_cleanup(&svq->hdev_kick);
++        event_notifier_cleanup(&svq->hdev_call);
+     }
+ }
+ 
 -- 
 2.31.1
 
