@@ -2,135 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 330426207AF
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 04:45:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A8586207CC
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 04:51:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232926AbiKHDpW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 22:45:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58940 "EHLO
+        id S233213AbiKHDvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 22:51:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232907AbiKHDpU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 22:45:20 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B16D23178;
-        Mon,  7 Nov 2022 19:45:19 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id m14-20020a17090a3f8e00b00212dab39bcdso16772412pjc.0;
-        Mon, 07 Nov 2022 19:45:19 -0800 (PST)
+        with ESMTP id S233158AbiKHDvK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 22:51:10 -0500
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 479922D1F7;
+        Mon,  7 Nov 2022 19:51:07 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id cl5so18969466wrb.9;
+        Mon, 07 Nov 2022 19:51:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qckFeD/Pt+sjt3ZlSfmlazZQAbxsJ1ktBLsagW6IgrQ=;
-        b=FH9VAzFoXUR46qDebGlu3fcJnK6+nfGW4qTxltGPb6jzH3adwTNgTYkarxOUiNIlVO
-         8ONzopdMsT3HUr26AGwrr9HvIg2iNaLFMz8QRpOdIqGaNX3fdM174GJuvGX3030eiTh1
-         q7cpasGEeVPpB1eDaw9JREPbNBd65Ezz+Pfw/ZIztSwL847bk2FFrtlHrazQInx0eHf5
-         RuhcW6K85YkWY25fnBJZowCCzFOEkCGNNpO5Kv7rDYPvig7cI/smneUMCUe8j6ZkDoxN
-         6LJl0pEsUl4RojdAG7FQ8yyJLK3ybfAD8CgYw/FzDj8yVMpvDbkt2M53CNm3TKyeGKfm
-         /Itw==
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=d7AZ9fnN2tUylyfRKzR6a2/M1Lj+kB6r4vHswVHye90=;
+        b=iRI0RtEuyPEL9brryyCqDrPH0t1h4fEn+uW3ieYN0BYFRiVNGdVLnobfrepwYAxiQi
+         OcTjcSv7SrzEsCgjUaM8WGR8UpDHb89UAyquul3rqFSm9FpLlSGH/vQdbXNDJbhrQHsP
+         DPSQ19wHgpQVikcLwIGHk5eXRMWp2wFe1yF3p2/UU0oTG+854yNSqMMb8Hvat/PL1XNS
+         NuxJ15B4M7+NjcxTFsT8nGAC9OLLj+1wGJB/HdPJ2LQGsifme/Dm6YdqJLvaz9VyDaS4
+         TDYOWV1/Oy2eTZQaDJ40uuGQwSMZgBbJGebFof6tWmdg8A1aYMGBgBoLF0hD3hzJZMVA
+         Np0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qckFeD/Pt+sjt3ZlSfmlazZQAbxsJ1ktBLsagW6IgrQ=;
-        b=IMPiZi+2IwARTBK++NWyfQu0R0JD/r3TvUT1pa0b2lmjaXXY+5xpvA00ip1Lz2sXhS
-         goBpu1GkU7x62RIL824VfJ4FYDpF1Gfl5+NjjQg//hOMaO+WJd/VXUpiHtk9zblGKvaJ
-         f5rBZOuvEOf81P//aOJMKaduq3nxwTWaxnxl+G9pLKFHyQpPqDAleHam19czt5eAmF8/
-         fighw8YRxd4t6HRwPBDyZEyH4GtOInNKEoqxKig94J2kqf0Ygo9p492Gpn6bz56QwDGP
-         k4XR9/3BGE3MmV8iPZ1VuHjkfHjjPSq/vmIRZbWB+X0qNeZf7dkXFe4DTp6NQLOWPeLI
-         Vmqw==
-X-Gm-Message-State: ACrzQf0tHHKQ+//TpC0+OqBVjHhpxv4H1KAVA1gqCs3TKxbDw+5HWFQ3
-        WhPu+tMlrpuesuKe2/Am8uI=
-X-Google-Smtp-Source: AMsMyM5tBTqgUASBPjV21N8H6J2m+peEz7OGJWQsDcGg1rbGeXDb0doOv+V8wKJ1pTFS9FnJWBBTCg==
-X-Received: by 2002:a17:902:c94a:b0:186:e68a:9aad with SMTP id i10-20020a170902c94a00b00186e68a9aadmr53540653pla.72.1667879118728;
-        Mon, 07 Nov 2022 19:45:18 -0800 (PST)
-Received: from debian.me (subs02-180-214-232-93.three.co.id. [180.214.232.93])
-        by smtp.gmail.com with ESMTPSA id y15-20020a17090322cf00b00176d347e9a7sm5752203plg.233.2022.11.07.19.45.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Nov 2022 19:45:17 -0800 (PST)
-Received: by debian.me (Postfix, from userid 1000)
-        id 1B5A51038C6; Tue,  8 Nov 2022 10:45:10 +0700 (WIB)
-Date:   Tue, 8 Nov 2022 10:45:10 +0700
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     bpf@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v4 04/17] iommufd: Document overview of iommufd
-Message-ID: <Y2nQxvRQKYtSAfTc@debian.me>
-References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <4-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=d7AZ9fnN2tUylyfRKzR6a2/M1Lj+kB6r4vHswVHye90=;
+        b=F3MGCRtZSDKAvgV4odWTUIGDSBIarqhI+Cv22d3IBQyvOATA0x8IFg4HANSobxteGA
+         KAF31qpwUg/FsvmKR/ck0j7ER4eqHmxf/btPD5lIBKii5Sn5ojIFLlQYNEMwMBlyEGOf
+         FxeykWGBOjKnWRMfL6QMnV1kc80g/w66YAFBl7p1W2pKvxSH92ih0Yh3k+50zSf63bAx
+         yaJEA3HDhMQiqy6jRvIzg8YVMzDu9JSIaOgJ4E59o9w5ffLvPNVkdFqen65M0SHgrqex
+         jeDk6r/WxNLEISHZfHWiYhuyVq5wnjRD/XEa9KgIhLnCdaYwvfGn3LKpwti2xAqJvpkI
+         Bpdw==
+X-Gm-Message-State: ACrzQf021Kkjc8Z/3fv1yAYU3JEo3MBT66Bis5/e7rnaAQBGaHIEQ7Eb
+        jvHNCeOvA5lGyvp1O6hgW2bONFTf8fv1LSZVY3s=
+X-Google-Smtp-Source: AMsMyM79UydLpAGXMznv57REslScMwtPqZFPrZHQzooK8DtBHjHYLARnYUiAL6Eaev/mWtyMXbyR+qxy6LMn2K+lQNg=
+X-Received: by 2002:adf:e385:0:b0:236:91a6:bd1b with SMTP id
+ e5-20020adfe385000000b0023691a6bd1bmr33863115wrm.278.1667879465744; Mon, 07
+ Nov 2022 19:51:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="VlYIyqR9GGcDMQ/y"
-Content-Disposition: inline
-In-Reply-To: <4-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+From:   Hao Peng <flyingpenghao@gmail.com>
+Date:   Tue, 8 Nov 2022 11:50:54 +0800
+Message-ID: <CAPm50a++Cb=QfnjMZ2EnCj-Sb9Y4UM-=uOEtHAcjnNLCAAf-dQ@mail.gmail.com>
+Subject: [PATCH v3] KVM: x86: Keep the lock order consistent
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, inux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS
-        autolearn=no autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Peng Hao <flyingpeng@tencent.com>
 
---VlYIyqR9GGcDMQ/y
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Acquire SRCU before taking the gpc spinlock in wait_pending_event() so as
+to be consistent with all other functions that acquire both locks.  It's
+not illegal to acquire SRCU inside a spinlock, nor is there deadlock
+potential, but in general it's preferable to order locks from least
+restrictive to most restrictive, e.g. if wait_pending_event() needed to
+sleep for whatever reason, it could do so while holding SRCU, but would
+need to drop the spinlock.
 
-On Mon, Nov 07, 2022 at 08:48:57PM -0400, Jason Gunthorpe wrote:
-> From: Kevin Tian <kevin.tian@intel.com>
->=20
-> Add iommufd into the documentation tree, and supply initial documentation.
-> Much of this is linked from code comments by kdoc.
->=20
+Thanks Sean Christopherson for the comment.
 
-The documentation LGTM, thanks.
+Signed-off-by: Peng Hao <flyingpeng@tencent.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/xen.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 2dae413bd62a..766e8a4ca3ea 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -964,8 +964,8 @@ static bool wait_pending_event(struct kvm_vcpu
+*vcpu, int nr_ports,
+        bool ret = true;
+        int idx, i;
 
---=20
-An old man doll... just what I always wanted! - Clara
+-       read_lock_irqsave(&gpc->lock, flags);
+        idx = srcu_read_lock(&kvm->srcu);
++       read_lock_irqsave(&gpc->lock, flags);
+        if (!kvm_gfn_to_pfn_cache_check(kvm, gpc, gpc->gpa, PAGE_SIZE))
+                goto out_rcu;
 
---VlYIyqR9GGcDMQ/y
-Content-Type: application/pgp-signature; name="signature.asc"
+@@ -986,8 +986,8 @@ static bool wait_pending_event(struct kvm_vcpu
+*vcpu, int nr_ports,
+        }
 
------BEGIN PGP SIGNATURE-----
+  out_rcu:
+-       srcu_read_unlock(&kvm->srcu, idx);
+        read_unlock_irqrestore(&gpc->lock, flags);
++       srcu_read_unlock(&kvm->srcu, idx);
 
-iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY2nQwQAKCRD2uYlJVVFO
-ozsKAPwOuRyOmFizFmjuooe/gexDrhdGHJSdBsMEQGnAYJfwKgEAsJqlXtWAwodg
-hHXROiqV7JqrnspKYDSIglvCm5IePAc=
-=NHaN
------END PGP SIGNATURE-----
-
---VlYIyqR9GGcDMQ/y--
+        return ret;
+ }
+--
+2.27.0
