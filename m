@@ -2,109 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D826621CDC
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 20:18:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 582CB621CE0
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 20:18:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229851AbiKHTSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 14:18:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46614 "EHLO
+        id S229919AbiKHTSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 14:18:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229846AbiKHTS2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 14:18:28 -0500
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DFF2E0BB;
-        Tue,  8 Nov 2022 11:18:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1667935107; x=1699471107;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=6BKb+dUqONSEkaugyzdpmCsjm10RfxghitQMmA9uZM4=;
-  b=jXvwMEyj/Wb+wjpT7DK1yvOSpFrb5bGcPcl9eNtklxlW+QB/JT3JR6Z9
-   ysJVLDjKArQvuoB+AY1GKyYrH9HYChz48pbCzYyLgWCE2SMARfr/u1hzQ
-   Qm1soJWHFii39OGmi9rBJ72rUb5SLjyClwGCMZzYOOM+HTM2nSZfVaE8y
-   4=;
-X-IronPort-AV: E=Sophos;i="5.96,148,1665446400"; 
-   d="scan'208";a="148956021"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-7fa2de02.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2022 19:18:25 +0000
-Received: from EX13D50EUA003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2b-m6i4x-7fa2de02.us-west-2.amazon.com (Postfix) with ESMTPS id F09624171D;
-        Tue,  8 Nov 2022 19:18:23 +0000 (UTC)
-Received: from EX19D016EUA004.ant.amazon.com (10.252.50.4) by
- EX13D50EUA003.ant.amazon.com (10.43.165.81) with Microsoft SMTP Server (TLS)
- id 15.0.1497.42; Tue, 8 Nov 2022 19:18:22 +0000
-Received: from [192.168.25.119] (10.43.161.14) by
- EX19D016EUA004.ant.amazon.com (10.252.50.4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.1118.15; Tue, 8 Nov 2022 19:18:17 +0000
-Message-ID: <e99fe620-3510-aa1f-ff02-8f3c0c74e812@amazon.com>
-Date:   Tue, 8 Nov 2022 21:18:12 +0200
+        with ESMTP id S229877AbiKHTSo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 14:18:44 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63BC9175A9;
+        Tue,  8 Nov 2022 11:18:32 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A8JDR2Q024441;
+        Tue, 8 Nov 2022 19:18:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=y8j7WZTnEnj/qW2WCDBnYQXSr6VTyWeRPWnO/pLHYy4=;
+ b=arXGuHyGro1BNdkYe5U42aVMAurAnsLqmXhdGjhtKH3gyuN2eBxzGyPR6SDGUV0hV565
+ rEYLkkGty8J6jGBdHbvzVl2f36qIcNyEVXcYR4EEWdmxfX681Tp6gX/aecOxQhpmI3AJ
+ GuiW1deIh3vXKJnMFpgzSXFb0MZkUjlV/4YqOk4W/q5cudZTTNQDMrgMlkLliYpL+0BJ
+ l7r9uXx7bYS9snIpBoDirKRzbUf9qoPkKkeVpZ12f9QAqpPdNdMII8u9FOmQ5A6Kq+hW
+ Nl1ID6hpvwnD9kmWaF4OvU2igrsCDR8IiBO8IZScKtxddSdDmiUneUf8H4q8IqP1lOWM YQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kqw2ur43s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Nov 2022 19:18:16 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A8JEV7k027404;
+        Tue, 8 Nov 2022 19:18:16 GMT
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kqw2ur43h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Nov 2022 19:18:16 +0000
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A8J6O6c015955;
+        Tue, 8 Nov 2022 19:18:15 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma04wdc.us.ibm.com with ESMTP id 3kngptrgda-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Nov 2022 19:18:15 +0000
+Received: from smtpav02.dal12v.mail.ibm.com ([9.208.128.128])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A8JICXt11928284
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Nov 2022 19:18:13 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F36A15806D;
+        Tue,  8 Nov 2022 19:18:13 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ADE2658065;
+        Tue,  8 Nov 2022 19:18:12 +0000 (GMT)
+Received: from [9.160.191.98] (unknown [9.160.191.98])
+        by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  8 Nov 2022 19:18:12 +0000 (GMT)
+Message-ID: <f2f8b63c-ecc7-7413-7134-089d30ba8e7d@linux.ibm.com>
+Date:   Tue, 8 Nov 2022 14:18:12 -0500
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.4.1
-Subject: Re: [PATCH v1] MAINTAINERS: Update entries from the Nitro Enclaves
- section
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: S390 testing for IOMMUFD
 Content-Language: en-US
-To:     linux-kernel <linux-kernel@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>
-CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
-        Marcelo Cerri <marcelo.cerri@canonical.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Stefano Garzarella" <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Tim Gardner <tim.gardner@canonical.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>,
-        The AWS Nitro Enclaves Team 
-        <aws-nitro-enclaves-devel@amazon.com>
-References: <20221108185912.15792-1-andraprs@amazon.com>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-In-Reply-To: <20221108185912.15792-1-andraprs@amazon.com>
-X-Originating-IP: [10.43.161.14]
-X-ClientProxiedBy: EX13D42UWB001.ant.amazon.com (10.43.161.35) To
- EX19D016EUA004.ant.amazon.com (10.252.50.4)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-11.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+To:     Eric Farman <farman@linux.ibm.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+ <Y2msLjrbvG5XPeNm@nvidia.com>
+ <c32829c8-1259-7441-f6df-04f44a39ab2f@linux.ibm.com>
+ <Y2pffsdWwnfjrTbv@nvidia.com>
+ <67dafaf27cc029ffde1f7c474c2fd17907958d5a.camel@linux.ibm.com>
+ <Y2ppq9oeKZzk5F6h@nvidia.com>
+ <ce7bfc8b7efccf0fc35f89d3c79992dfba511b3a.camel@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <ce7bfc8b7efccf0fc35f89d3c79992dfba511b3a.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: MvG2WmSAJR_0TMf1RIUdf8bSPHVow40K
+X-Proofpoint-ORIG-GUID: 85j1czU6AYqD9zysLlrdvY7IS1gx9pYT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-07_11,2022-11-08_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 lowpriorityscore=0 malwarescore=0 mlxlogscore=999
+ adultscore=0 spamscore=0 impostorscore=0 phishscore=0 bulkscore=0
+ mlxscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211080121
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAwOC4xMS4yMDIyIDIwOjU5LCBBbmRyYSBQYXJhc2NoaXYgd3JvdGU6Cj4gVXBkYXRlIHRo
-ZSBsaXN0IG9mIG1haW50YWluZXJzIGZvciB0aGUgTml0cm8gRW5jbGF2ZXMgcHJvamVjdC4gQWxl
-eAo+IChsZXhudkApIGlzIG5vdCB3b3JraW5nIGF0IEFtYXpvbiBhbnltb3JlIGFuZCB0aGVyZSB3
-aWxsIGJlIHRoZSBzYW1lCj4gY2FzZSBmb3IgbWUgc3RhcnRpbmcgd2l0aCAyMDIzLgo+IAo+IEFk
-ZCBhIHJlZmVyZW5jZSB0byB0aGUgbWFpbGluZyBsaXN0IG9mIHRoZSBOaXRybyBFbmNsYXZlcyBk
-ZXZlbG9wbWVudAo+IHRlYW0uCj4gCj4gU2lnbmVkLW9mZi1ieTogQW5kcmEgUGFyYXNjaGl2IDxh
-bmRyYXByc0BhbWF6b24uY29tPgo+IC0tLQo+ICAgTUFJTlRBSU5FUlMgfCAzICstLQo+ICAgMSBm
-aWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAyIGRlbGV0aW9ucygtKQoKR3JlZywgcGxlYXNl
-IGxldCBtZSBrbm93IGlmIHRoZXJlIGFyZSBhbnkgdXBkYXRlcyBuZWVkZWQgZm9yIHRoZSBwYXRj
-aC4gCk90aGVyd2lzZSwgcGxlYXNlIGluY2x1ZGUgdGhlIHBhdGNoIGluIHRoZSBjaGFyLW1pc2Mg
-dHJlZS4KClRoYW5rIHlvdSB2ZXJ5IG11Y2ggdG8gYWxsIHRoZSBwZW9wbGUgd2hvIGhhdmUgaGVs
-cGVkIHdpdGggZGVzaWduIApkaXNjdXNzaW9ucywgaW1wbGVtZW50YXRpb24gYW5kIHRlc3Rpbmcs
-IGNvZGUgcmV2aWV3cywgaXNzdWVzIGZpeGluZywgCmRpc3Ryb3MgaW50ZWdyYXRpb24gYW5kIG92
-ZXJhbGwgbWFpbnRlbmFuY2UgZHVyaW5nIHRoZSBwYXN0IHllYXJzLiBUaGlzIApoYXMgYmVlbiBh
-IHVzZWZ1bCBleHBlcmllbmNlIGFuZCBJJ2xsIGtlZXAgdXAgaW1wcm92aW5nLgoKQW5kcmEKCj4g
-Cj4gZGlmZiAtLWdpdCBhL01BSU5UQUlORVJTIGIvTUFJTlRBSU5FUlMKPiBpbmRleCAwNDZmZjA2
-ZmY5N2YuLmFmMmMxNzhiYTBkYyAxMDA2NDQKPiAtLS0gYS9NQUlOVEFJTkVSUwo+ICsrKyBiL01B
-SU5UQUlORVJTCj4gQEAgLTE0NTY0LDEwICsxNDU2NCw5IEBAIFQ6CWdpdCBnaXQ6Ly9naXQua2Vy
-bmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvZGluZ3V5ZW4vbGludXguZ2l0Cj4gICBG
-OglhcmNoL25pb3MyLwo+ICAgCj4gICBOSVRSTyBFTkNMQVZFUyAoTkUpCj4gLU06CUFuZHJhIFBh
-cmFzY2hpdiA8YW5kcmFwcnNAYW1hem9uLmNvbT4KPiAtTToJQWxleGFuZHJ1IFZhc2lsZSA8bGV4
-bnZAYW1hem9uLmNvbT4KPiAgIE06CUFsZXhhbmRydSBDaW9ib3RhcnUgPGFsY2lvYUBhbWF6b24u
-Y29tPgo+ICAgTDoJbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZwo+ICtMOglUaGUgQVdTIE5p
-dHJvIEVuY2xhdmVzIFRlYW0gPGF3cy1uaXRyby1lbmNsYXZlcy1kZXZlbEBhbWF6b24uY29tPgo+
-ICAgUzoJU3VwcG9ydGVkCj4gICBXOglodHRwczovL2F3cy5hbWF6b24uY29tL2VjMi9uaXRyby9u
-aXRyby1lbmNsYXZlcy8KPiAgIEY6CURvY3VtZW50YXRpb24vdmlydC9uZV9vdmVydmlldy5yc3QK
-CgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciAoUm9tYW5pYSkgUy5SLkwuIHJlZ2lzdGVyZWQg
-b2ZmaWNlOiAyN0EgU2YuIExhemFyIFN0cmVldCwgVUJDNSwgZmxvb3IgMiwgSWFzaSwgSWFzaSBD
-b3VudHksIDcwMDA0NSwgUm9tYW5pYS4gUmVnaXN0ZXJlZCBpbiBSb21hbmlhLiBSZWdpc3RyYXRp
-b24gbnVtYmVyIEoyMi8yNjIxLzIwMDUuCg==
+On 11/8/22 10:29 AM, Eric Farman wrote:
+> On Tue, 2022-11-08 at 10:37 -0400, Jason Gunthorpe wrote:
+>> On Tue, Nov 08, 2022 at 09:19:17AM -0500, Eric Farman wrote:
+>>> On Tue, 2022-11-08 at 09:54 -0400, Jason Gunthorpe wrote:
+>>>> On Tue, Nov 08, 2022 at 08:50:53AM -0500, Matthew Rosato wrote:
+>>>>
+>>>>> FWIW, vfio-pci via s390 is working fine so far, though I'll put
+>>>>> it
+>>>>> through more paces over the next few weeks and report if I find
+>>>>> anything.
+>>>>
+>>>> OK great
+>>>>
+>>>>> As far as mdev drivers...  
+>>>>>
+>>>>> -ccw: Sounds like Eric is already aware there is an issue and
+>>>>> is
+>>>>> investigating (I see errors as well).
+>>>
+>>> I -think- the problem for -ccw is that the new vfio_pin_pages
+>>> requires
+>>> the input addresses to be page-aligned, and while most of ours are,
+>>> the
+>>> first one in any given transaction may not be. We never bothered to
+>>> mask off the addresses since it was handled for us, and we needed
+>>> to
+>>> keep the offsets anyway.
+>>>
+>>> By happenstance, I had some code that would do the masking
+>>> ourselves
+>>> (for an unrelated reason); I'll see if I can get that fit on top
+>>> and if
+>>> it helps matters. After coffee.
+>>
+>> Oh, yes, that makes alot of sense.
+>>
+>> Ah, if that is how VFIO worked we could match it like below:
+> 
+> That's a start. The pin appears to have worked, but the unpin fails at
+> the bottom of iommufd_access_unpin_pages:
+> 
+> WARN_ON(!iopt_area_contig_done(&iter));
+> 
+
+Update on why -ap is failing -- I see vfio_pin_pages requests from vfio_ap_irq_enable that are failing on -EINVAL -- input is not page-aligned, just like what vfio-ccw was hitting.
+
+I just tried a quick hack to force these to page-aligned requests and with that the vfio-ap tests I'm running start passing again.  So I think a proper fix in the iommufd code for this will also fix vfio-ap (we will test of course)
+
+>>
+>>  EXPORT_SYMBOL_NS_GPL(iommufd_access_unpin_pages, IOMMUFD);
+>>  
+>>  static bool iopt_area_contig_is_aligned(struct iopt_area_contig_iter
+>> *iter,
+>> -                                       bool first)
+>> +                                       bool first, unsigned long
+>> first_iova)
+>>  {
+>> -       if (iopt_area_start_byte(iter->area, iter->cur_iova) %
+>> PAGE_SIZE)
+>> +       unsigned long start_offset = first ? (first_iova % PAGE_SIZE)
+>> : 0;
+>> +
+>> +       if ((iopt_area_start_byte(iter->area, iter->cur_iova) %
+>> PAGE_SIZE) !=
+>> +           start_offset)
+>>                 return false;
+>>  
+>>         if (!iopt_area_contig_done(iter) &&
+>> @@ -607,7 +610,7 @@ int iommufd_access_pin_pages(struct
+>> iommufd_access *access, unsigned long iova,
+>>                         iopt_area_iova_to_index(area, iter.cur_iova);
+>>  
+>>                 if (area->prevent_access ||
+>> -                   !iopt_area_contig_is_aligned(&iter, first)) {
+>> +                   !iopt_area_contig_is_aligned(&iter, first, iova))
+>> {
+>>                         rc = -EINVAL;
+>>                         goto err_remove;
+>>                 }
+>>
+>> Jason
+> 
 
