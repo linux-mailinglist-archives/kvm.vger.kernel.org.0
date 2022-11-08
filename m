@@ -2,146 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3E12620750
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 04:10:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4148762076E
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 04:31:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233330AbiKHDKv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 22:10:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46680 "EHLO
+        id S232483AbiKHDby (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 22:31:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233122AbiKHDKt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 22:10:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D19183BC
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 19:09:53 -0800 (PST)
+        with ESMTP id S232420AbiKHDbw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 22:31:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF2F52F381
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 19:30:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667876993;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1667878257;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YRtjwtaorg58e8Zp57TXoIs8WKp2QJ/obFRTRLN8svw=;
-        b=YbLIhmU3zjSZsHz9I+ffsiQP+evoWVnp6JDBrB4hbJZAXE81QarMADGcwSsAHxwxcaosBb
-        XOYQacFlBXmZInsUHV+SgkiL+8a85OC5Qt/G2AXFCxZ3gybCNnGqcjrU9eeitMLBSZdKZ3
-        5/35jSyGTQ888kIdb+ziHrJAUds5igs=
-Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com
- [209.85.160.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-79-VVguTYSePtqEZJUhnmEdlg-1; Mon, 07 Nov 2022 22:09:49 -0500
-X-MC-Unique: VVguTYSePtqEZJUhnmEdlg-1
-Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-131f323c158so6512925fac.5
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 19:09:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YRtjwtaorg58e8Zp57TXoIs8WKp2QJ/obFRTRLN8svw=;
-        b=P1Zxlgu4U9U+TEhSnR3v58WC2KsabV8irkxVlW0LPObmdzQ5vNOqkCDg7egCMMENxL
-         +BVZbTRLrD6mi+2Aqi/QU1gZleKPrQVOlaJryqdAvhpuMIU+HV6W2aG+wU9tdTwY8hzK
-         U+kCyLUTEeloqGA7Hg35tl3nHRa53cXDk5m1fT6NqaudE2V0MnJ8sv4YEib6sFtRru0q
-         uYn0sGrD1re41KdkMFX/Yq5BDVbyxqVyF/NCoFaey9O7xHbYdR0Rv4JWpxSzRdIVCZTv
-         5M9GDjVj/Fc+BL70mCX8rQtQG6mllnSaFCqetKB73SDVl9XNkDc8pUM+t2B6+9oxeV1O
-         GSSQ==
-X-Gm-Message-State: ACrzQf3vhY3otm7i32ceIC6OIm46t0hvKJMJnDaM1szuhsloSlCcJkMP
-        EBDoo3bBvLXJMtuf+CO5cc8V7PgNfaBjlC6disInpuPuKCKneisX07LGew3bHuKdg5dEQys8USL
-        MtWyO62DQefUXU7O8N+DW/U1UTQdy
-X-Received: by 2002:a05:6808:181e:b0:35a:5959:5909 with SMTP id bh30-20020a056808181e00b0035a59595909mr12052282oib.35.1667876988556;
-        Mon, 07 Nov 2022 19:09:48 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM6BPJN6+RWLjuJmH1wJzS9NwxgnfXhSRGMuXsqjkcXwG8HMP9YZ06ug0yaAFlWBN/rcTRqzjG9mlnOGGsXVDR8=
-X-Received: by 2002:a05:6808:181e:b0:35a:5959:5909 with SMTP id
- bh30-20020a056808181e00b0035a59595909mr12052272oib.35.1667876988328; Mon, 07
- Nov 2022 19:09:48 -0800 (PST)
+        bh=MXx6rx2M/mmRKLLVDzilfzZ6VOr9m7fhipmi74uiKdY=;
+        b=AHcgpeRYYiu73aytkYX8Qe/HuPENxs75ZP2lJtKdSOQAqpa/0EXMP6l5+NmLeHoq2oRVQn
+        chd9Vc/kMYHIJi4VF84Lznb9H93ZXNqDmzc5khHgB+84RDEjOkGVGxaP//tOHEi8+Utbly
+        JjlGuhCSPHx0vTQ5E53Y76ibfJSFu0U=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-658-8l4CpRFiMBWCBYuJUt0cBQ-1; Mon, 07 Nov 2022 22:30:52 -0500
+X-MC-Unique: 8l4CpRFiMBWCBYuJUt0cBQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8FA1C101A528;
+        Tue,  8 Nov 2022 03:30:51 +0000 (UTC)
+Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6422E4C819;
+        Tue,  8 Nov 2022 03:30:45 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
+        ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com,
+        will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+        pbonzini@redhat.com, maz@kernel.org, peterx@redhat.com,
+        zhenyzha@redhat.com, shan.gavin@gmail.com
+References: <20221104234049.25103-1-gshan@redhat.com>
+ <20221104234049.25103-4-gshan@redhat.com> <Y2ks0NWEEfN8bWV1@google.com>
+ <1816d557-1546-f5f9-f2c3-25086c0826fa@redhat.com>
+ <Y2mtKjb8qc/vqKvQ@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <cadde3d3-8e2a-0952-8b30-2d7a75acbbc0@redhat.com>
+Date:   Tue, 8 Nov 2022 11:30:42 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-References: <20221107203431.368306-1-eric.auger@redhat.com>
- <20221107153924-mutt-send-email-mst@kernel.org> <b8487793-d7b8-0557-a4c2-b62754e14830@redhat.com>
- <20221107180022-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20221107180022-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 8 Nov 2022 11:09:36 +0800
-Message-ID: <CACGkMEsYyH5P2h6XkBgrW4O-xJXxdzzRa1+T2zjJ07OHiYObVA@mail.gmail.com>
-Subject: Re: [RFC] vhost: Clear the pending messages on vhost_init_device_iotlb()
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        peterx@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <Y2mtKjb8qc/vqKvQ@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 8, 2022 at 7:06 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Mon, Nov 07, 2022 at 10:10:06PM +0100, Eric Auger wrote:
-> > Hi Michael,
-> > On 11/7/22 21:42, Michael S. Tsirkin wrote:
-> > > On Mon, Nov 07, 2022 at 09:34:31PM +0100, Eric Auger wrote:
-> > >> When the vhost iotlb is used along with a guest virtual iommu
-> > >> and the guest gets rebooted, some MISS messages may have been
-> > >> recorded just before the reboot and spuriously executed by
-> > >> the virtual iommu after the reboot. Despite the device iotlb gets
-> > >> re-initialized, the messages are not cleared. Fix that by calling
-> > >> vhost_clear_msg() at the end of vhost_init_device_iotlb().
-> > >>
-> > >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> > >> ---
-> > >>  drivers/vhost/vhost.c | 1 +
-> > >>  1 file changed, 1 insertion(+)
-> > >>
-> > >> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > >> index 40097826cff0..422a1fdee0ca 100644
-> > >> --- a/drivers/vhost/vhost.c
-> > >> +++ b/drivers/vhost/vhost.c
-> > >> @@ -1751,6 +1751,7 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled)
-> > >>    }
-> > >>
-> > >>    vhost_iotlb_free(oiotlb);
-> > >> +  vhost_clear_msg(d);
-> > >>
-> > >>    return 0;
-> > >>  }
-> > > Hmm.  Can't messages meanwhile get processes and affect the
-> > > new iotlb?
-> > Isn't the msg processing stopped at the moment this function is called
-> > (VHOST_SET_FEATURES)?
-> >
-> > Thanks
-> >
-> > Eric
->
-> It's pretty late here I'm not sure.  You tell me what prevents it.
+Hi Oliver,
 
-So the proposed code assumes that Qemu doesn't process device IOTLB
-before VHOST_SET_FEAETURES. Consider there's no reset in the general
-vhost uAPI,  I wonder if it's better to move the clear to device code
-like VHOST_NET_SET_BACKEND. So we can clear it per vq?
+On 11/8/22 9:13 AM, Oliver Upton wrote:
+> On Tue, Nov 08, 2022 at 08:44:52AM +0800, Gavin Shan wrote:
+>> Frankly, I don't expect the capability to be disabled. Similar to KVM_CAP_DIRTY_LOG_RING
+>> or KVM_CAP_DIRTY_LOG_RING_ACQ_REL, it would a one-shot capability and only enablement is
+>> allowed. The disablement was suggested by Oliver without providing a clarify, even I dropped
+>> it for several times. I would like to see if there is particular reason why Oliver want
+>> to disable the capability.
+>>
+>>      kvm->dirty_ring_with_bitmap = cap->args[0];
+>>
+>> If Oliver agrees that the capability needn't to be disabled. The whole chunk of
+>> code can be squeezed into kvm_vm_ioctl_enable_dirty_log_ring_with_bitmap() to
+>> make kvm_vm_ioctl_enable_cap_generic() a bit clean, as I said above.
+> 
+> Sorry, I don't believe there is much use in disabling the cap, and
+> really that hunk just came from lazily matching the neigbhoring caps
+> when sketching out some suggestions. Oops!
+> 
 
->
-> BTW vhost_init_device_iotlb gets enabled parameter but ignores
-> it, we really should drop that.
+Ok. It doesn't really matter too much except the comments seems conflicting.
+Thanks for confirming it's unnecessary to disable the capability.
 
-Yes.
+>> Sean and Oliver, could you help to confirm if the changes look good to you? :)
+>>
+>>      static int kvm_vm_ioctl_enable_dirty_log_ring_with_bitmap(struct kvm *kvm)
+> 
+> This function name is ridiculously long...
+> 
 
->
-> Also, it looks like if features are set with VIRTIO_F_ACCESS_PLATFORM
-> and then cleared, iotlb is not properly cleared - bug?
+Yeah, It seems I tempted to make the function name as comments :)
 
-Not sure, old IOTLB may still work. But for safety, we need to disable
-device IOTLB in this case.
+>>      {
+>>          int i, r = 0;
+>>
+>>          if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+>>              !kvm->dirty_ring_size)
+>>              return -EINVAL;
+>>
+>>          mutex_lock(&kvm->slots_lock);
+>>
+>>          /* We only allow it to set once */
+>>          if (kvm->dirty_ring_with_bitmap) {
+>>              r = -EINVAL;
+>>              goto out_unlock;
+>>          }
+> 
+> I don't believe this check is strictly necessary. Something similar to
+> this makes sense with caps that take a numeric value (like
+> KVM_CAP_DIRTY_LOG_RING), but this one is a one-way boolean.
+> 
 
-Thanks
+Yep, it's not required strictly since it can represent two states.
 
->
->
-> > >
-> > >
-> > >> --
-> > >> 2.37.3
->
+>>
+>>          /*
+>>           * Avoid a race between memslot creation and enabling the ring +
+>>           * bitmap capability to guarantee that no memslots have been
+>>           * created without a bitmap.
+> 
+> You'll want to pick up Sean's suggestion on the comment which, again, I
+> drafted this in haste :-)
+> 
+
+Ok, no worries :)
+
+>>           */
+>>          for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+>>              if (!kvm_memslots_empty(__kvm_memslots(kvm, i))) {
+>>                  r = -EINVAL;
+>>                  goto out_unlock;
+>>              }
+>>          }
+> 
+> I'd much prefer you take Sean's suggestion and just create a helper to
+> test that all memslots are empty. You avoid the insanely long function
+> name and avoid the use of a goto statement. That is to say, leave the
+> rest of the implementation inline in kvm_vm_ioctl_enable_cap_generic()
+> 
+> static bool kvm_are_all_memslots_empty(struct kvm *kvm)
+> {
+> 	int i;
+> 
+> 	lockdep_assert_held(&kvm->slots_lock);
+> 
+> 	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> 		if (!kvm_memslots_empty(__kvm_memslots(kvm, i)))
+> 			return false;
+> 	}
+> 
+> 	return true;
+> }
+> 
+> static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+> 					   struct kvm_enable_cap *cap)
+> {
+> 	switch (cap->cap) {
+> 
+>       [...]
+> 
+> 	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP: {
+> 		int r = -EINVAL;
+> 
+> 		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+> 		    !kvm->dirty_ring_size)
+> 		    	return r;
+> 
+> 		mutex_lock(&kvm->slots_lock);
+> 
+> 		/*
+> 		 * For simplicity, allow enabling ring+bitmap if and only if
+> 		 * there are no memslots, e.g. to ensure all memslots allocate a
+> 		 * bitmap after the capability is enabled.
+> 		 */
+> 		if (kvm_are_all_memslots_empty(kvm)) {
+> 			kvm->dirty_ring_with_bitmap = true;
+> 			r = 0;
+> 		}
+> 
+> 		mutex_unlock(&kvm->slots_lock);
+> 		return r;
+> 	}
+> 
+> }
+
+Ok. Lets change the chunk as Sean suggested in v9, which should be posted soon.
+
+Thanks,
+Gavin
 
