@@ -2,181 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F1CC4621AA0
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 18:30:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 76E9F621ABA
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 18:32:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234387AbiKHR37 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 12:29:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34000 "EHLO
+        id S234455AbiKHRc5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 12:32:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232035AbiKHR34 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 12:29:56 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2089.outbound.protection.outlook.com [40.107.220.89])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9621B110C;
-        Tue,  8 Nov 2022 09:29:55 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b9slzge+P0vbEtpIJeiRYiFgVXouvZYSSPqIt2i3aETtx5Pn+ybieOD8MGAQyDCUoK3LEdlbe20Le63wplSBWVRc6TOJKnloGUwra+t6BXku0CGoMEEizWRVxHoguzVoJ+V+xAJfgKu7BDPAyi/qVcf9tD3aXWu74teTVKDxscWsxKIHikdjmRyrZ5TEV7eWDj0DUhNX3Ofj0ZB1wOoWc7GWOo7daSGA5WaF3mycYSbmowU2jkzhyhZrH0o2r30alma0TayoZLfC8U4qhu3OwYVF3w5KDVi6MiH7GQ//1BQdpNJddK4+l0y5eecyyK5gTtW8u4iLQ5xNoHvu/jSdfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I+w3+zwj93c2hKaRG4vJzUcOyhcWKvRv87j3AjqupI0=;
- b=ElzJ0E+AKG1cl/zx2DUOVyZ/jE44TgU7+RvmQN0ddO1BXlYjYEie51oLfGNcKcgytA6VKgxzahPFDgtQJa9VGxVYGV2YIfWicze0t6pZpHNUXeuc/3BhS79Ovq/HdpkRip8DB0XJFVWWWOgeOy25zzprfBbFbgkj2IextnOsS2CN5myJejQsdG/KXZiYQok4hQ0V124cl6J+fvtjhpQmikjwVSCfurXpsrqNe9Y7eUfONmIJiJT6CyNORyJqV7/q3AZQjDwqQ2YEmwXqzxJGz9Abq8m/DNYKS/MzU6q9dAGmbM9XSS7GtzTtzQ+xPdriAVsVWNk3oLpQ0L1ESPGOTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I+w3+zwj93c2hKaRG4vJzUcOyhcWKvRv87j3AjqupI0=;
- b=OI8CoNoOLTqaEUT+syHCkrTmRT95Fzd26mJzS0m7h2NNDPE7ZeWaSk2bAg5VqD6APQjkDxerm5PtyGxbSMDjB7JnXnNRBu248kS8BVdoEkItAnFdwtHeEJVlDGvZ+j1asarSeqCBlPF3BUnoeAN+iss/0re2odqeTM+u7LZIuPJLGzvfPEXqshKU9cZkKWOxSZ+RMFfEhf+49KZ0DTIhJcLTJW2me0WxGb/MrghcYSX1vcZcszIJedDUqoACJo5C/O13SK7BxhAd7G6eH0olzdxsX9YSD3Yg2/q2l430/m1rbUeUjLOq8Fw+e+ut6ZkKcl9q1YyOFKiPc/QxC/q2NQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SJ0PR12MB6712.namprd12.prod.outlook.com (2603:10b6:a03:44e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.23; Tue, 8 Nov
- 2022 17:29:54 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
- 17:29:54 +0000
-Date:   Tue, 8 Nov 2022 13:29:53 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v3 10/15] iommufd: IOCTLs for the io_pagetable
-Message-ID: <Y2qSEVu91SOfvVmO@nvidia.com>
-References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
- <10-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
- <BN9PR11MB52765289F880B8A7297077318C3B9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Y2kd/Ptt0iR6SGsh@nvidia.com>
- <BN9PR11MB5276706B744018EC6E36E1128C3F9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        with ESMTP id S234188AbiKHRcz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 12:32:55 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC83205DF
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 09:32:54 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id b11so14442590pjp.2
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 09:32:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MZQogisLwSbHOyDO71y6h2hjs6z+bsUaVgj9CQLEAfY=;
+        b=mWSwnjPBmtefrBI+Iv0duFPnOzCbI+xLnGb4gIOhNj2oRlYQHCAXeGHSxCrCIXib4F
+         TcYlVNSWew3+4v/Vh/tEbzFmhwQQpFIKb2Io7uDDcDbX/a77BF9FSjaMXeEU++5fPhS4
+         wV4oFDAIzEo4EbvvedPbLZpon8RpRn/+aywB0ORZKFjnFf5anz1VRyEl9E1MinpaOmFu
+         HoIxULC2Ncxn6Cydk2NciCR03SQQcgMlG8IRliTbt+7wN9gxJE1SFOnATOKg+Yh8S/d3
+         7OqLqoru/4rMnjq8YknOH+EwinZ+wY/uWT+vIB1gXFy8QjyiLQKuuOgBM/Lmb19aGxjj
+         VQNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MZQogisLwSbHOyDO71y6h2hjs6z+bsUaVgj9CQLEAfY=;
+        b=eB1vrJdqe3lTP/cAkLW5Okp3LP2hJPCb6MZvoCF2VTKjjh4AsViMIfpRRjl6l/+GEo
+         ROpBcALtsfu5dOFyvNWZHn1QzIPRP5Cggob1a6Th7bDXy9pta1rocOQlIVYxNS4qPAWz
+         DUllSDQCOsKFnZGi9DfZAqi6qcp+y11rkgwn2RipL/gdDTJOws3vU2Oukvdhi07C4RgD
+         k1i4XQyJ4eLu/fZMkkkO1e2BrFTF1lMeaqs429+TB9Gr4haiBhwDOI9Dn/TZNgGiousK
+         Ru9F1wbaipAS2oaofee06rRUtfuEEIjRcA+ovv34PByAVCBbHxdssM23CiXk1aAkimgL
+         zpoQ==
+X-Gm-Message-State: ACrzQf20ct/n3apYTFsctrNAunHVWCeNNR/UANC/6G0qy1Sk2EndrvJB
+        ow6NWiQKo5ZMuwtN5RSm3GQM/w==
+X-Google-Smtp-Source: AMsMyM4SbHj0OwMh/2EDaILPZtJz4V8czRxVapV6b6KiX6mxR2ahLNCtnWToon3uWrPRYLECAa+7uw==
+X-Received: by 2002:a17:903:32c8:b0:187:2718:5313 with SMTP id i8-20020a17090332c800b0018727185313mr44861840plr.82.1667928774219;
+        Tue, 08 Nov 2022 09:32:54 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 21-20020a170902c11500b00174c1855cd9sm7172411pli.267.2022.11.08.09.32.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Nov 2022 09:32:53 -0800 (PST)
+Date:   Tue, 8 Nov 2022 17:32:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com
+Subject: Re: [PATCH] KVM: move memslot invalidation later than possible
+ failures
+Message-ID: <Y2qSwlN26qWi3ZqH@google.com>
+References: <20221108084416.11447-1-yan.y.zhao@intel.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276706B744018EC6E36E1128C3F9@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR15CA0064.namprd15.prod.outlook.com
- (2603:10b6:208:237::33) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ0PR12MB6712:EE_
-X-MS-Office365-Filtering-Correlation-Id: e034aa1b-2e73-4d1b-13ab-08dac1aed93f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: szo+3HO3bqs3toT9tIp5NDeqA/CaKwIFJyvPBAy6Zh0KNLD7ffNHISteQik7t73upX/gKgvbBpq7BGeNF1hC2wfFkQwU1Yp3cebd+jnvvvDeUjsYX7n+9se30H9iZdztc2hkFRIfrQJcaRIGV87MwqhiSr2tem4bFnXtRKpHFDoVkMizYTG7YKWVt6KJZ/vLfVrQEamkMEue/q6/RT/vQQPSlhye8UVSYvW39UlADqNTlY0WF+iVw4l4YPlKl0Ckkh8FghZmGz17DitsQzOe5Sle3SrWFbuGXgpM2SyyWm3/AwEy5ua/KYtOKkVhTAfIw0CcHOnACkQSOKgaT9SzD8hCRsma87T+kewozk9lu5cWF1Z/gizhcJ4hl8LhYgg9Cu3RMV5b31LFBwz02zDj0y2v1RDr84O0BbmDKoRXQgU+QD58bo1WQbiYA1bn4eFtib62a8nGLt7580GbRRAymjhIkLJrAofv4fzjWGJHRi7+91O1VgwmKRFlS9CdU0slbs+YkObSsSyT6fFowRAfvO6stsJohYxT5Dm468Sw42AyBYzu+IEKWRJA5iWDXzvAnDSY3AKA0GoMqPJ1T7Xdq85h0Umatv7ZJp2DBSYnNMLlV3RbsHr8qb+2XC2EPBihF7jab1RmuQwfm7xUiaFkJ/GSP40VSMxSa+Y3m/UfhKhOl1vLwucAj5r/2WKg3DYs4Y29jW2P51EKs26hLRa6LQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(366004)(346002)(376002)(39860400002)(396003)(451199015)(186003)(478600001)(2906002)(7406005)(5660300002)(316002)(41300700001)(6916009)(8936002)(66556008)(66476007)(54906003)(6486002)(7416002)(66946007)(38100700002)(86362001)(4326008)(83380400001)(26005)(8676002)(6512007)(6506007)(2616005)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4oowAwkn1Vr9yfrzfqoiHlOPQ5z5IjOg2frC1x3zLDXcn7un1kKhgnm5e3C3?=
- =?us-ascii?Q?NB0VU6JRPN2wtZlIp+MwUQ6VdqCUSJLhqEyj4+2F9GF1jZJO9j9+v1QFMA/B?=
- =?us-ascii?Q?+GFV5nOhpwo8Grk9+yLbZQr0/RYgJqNObN5imbOkWFCKRZ9PRlj6LPZNQvvu?=
- =?us-ascii?Q?EKUp0wqgikbGotm9/9jxcCqMfYHodvawFECYylBIaagAPlntgtc0iS+sxDRv?=
- =?us-ascii?Q?cIZqiir3TaI75OkjxLaYdhiYT4q4Tx/1bHvzZJ0aZa1pfgdEoV8ZdIpkX4TJ?=
- =?us-ascii?Q?Dy3tsYEgcgunsr4KD8FI0ePu+O6DVRJVWqBYa/zfiVjli+0EBkaXShJeNmsE?=
- =?us-ascii?Q?ETeQNnLRpixeYbAB+r14QP8Rsyn5iAhD7qfTdi4XhLbv+uKc5LaH+LvWyAzB?=
- =?us-ascii?Q?+KaPavI6PKb7pZ6raPkh3WMu+e0RELGTI1LgE/dpy8hV1zzm+xnyB7PHvjwA?=
- =?us-ascii?Q?VRek9JB9m6B9vz0+LPs4bpQ6i1lzc+2Px54PeppFVuuiy/LUe9kb+YiB2iX7?=
- =?us-ascii?Q?o6pkC26HNN8MiBFChOKa5MIheh+r5EkcsGhJ/GO5XlFJoYLTwguC24poh1sO?=
- =?us-ascii?Q?wvItTtNXfEig7zWSopACytq6lYbq+iP+gk8yG0hjIrJZmBfQZQf+7sB4i277?=
- =?us-ascii?Q?kt9RFey6DqkcfLBlI820bG5ArpT5AFNjYFsa9IAd4Db1vZSisYk+7o7iDWQP?=
- =?us-ascii?Q?8VmsO3SYDZxK33IDKJH5NS+oouqZT2zjyRVl/uAcr/azv8IlUNpC89h8AQMq?=
- =?us-ascii?Q?WdHvSaSIjYq99nQRwN1txQo8yLZnjhdjNQncFM2IPhl8Yoj1oxd213mNanW1?=
- =?us-ascii?Q?fOp2Ob7yvkA4Lyr/HQMtyYLTmEMjkfV897dweG5peFN4oRYfMNO8YdnUBlkS?=
- =?us-ascii?Q?Cb+i3GU34YvV7SGPqHsLVVBvMtyVRazZWoaHSdPmsPrM/G9CR9t2GO3tuRkF?=
- =?us-ascii?Q?lLaC4fDbGtnHtgteZaIENr2d3mBCVkFuPIwMjDp73uTe3am8bTn7Y9zDfXij?=
- =?us-ascii?Q?SDR5BDqUAXdEEuvPSKsLKU+0AJNOKUmlO2eWFEgq9tGBaIC1hX0Eq58fmfxs?=
- =?us-ascii?Q?pIVSkk6BtoXTcG7PmTnO8glZLCTNeKwBa0HQoesYD/ye7aZPKr7VhfdJIqlL?=
- =?us-ascii?Q?qAysQtaZhn/U2eyd9Q/ck3bOtSFY62jb4faiFpXkolNCoZrNF159CG4Tjr6Z?=
- =?us-ascii?Q?fWhBTZPZJCx0C76tOO9BTq2q9HNBDj7SH0lGgGLIOeTXrFUx9mSeG+2DUMjr?=
- =?us-ascii?Q?tzz3X8Ym+22rXSydZRYYSRQs+d5qtTJANbOn6A78vfKL59aDyYj+r6fYauUY?=
- =?us-ascii?Q?K7HtL6AAgAaZEjYP5rJMYnA9aL7H9GYN9SiBKLfOsJuqFwkdsIQuHML9tHRS?=
- =?us-ascii?Q?xUkoh4nsL/LaJ7GLyjKvXpfCJUiN6g+dGfcWUlRtUpRYAcsDHwkB5wsKFGKx?=
- =?us-ascii?Q?Ar5Zi/Omk2MX9f9q4HBINtfRldmeZLjqkMrFJod7gwhfcM0p31kke8HPwoi5?=
- =?us-ascii?Q?xINbDxqyGVNsXz3N9pKO4wKHEIthWf3vToxaZ8PyUtbp2A04VuqTNmlwjwz7?=
- =?us-ascii?Q?zubJBOQP81taS253uYA=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e034aa1b-2e73-4d1b-13ab-08dac1aed93f
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2022 17:29:54.1481
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YlWOPDwudFZ4Hs+uke30CPgeR09+aVNxze4+zlgrn5nP2KVw2Xj50s/XUj63xieC
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6712
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20221108084416.11447-1-yan.y.zhao@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 08, 2022 at 02:05:20AM +0000, Tian, Kevin wrote:
-> > The concept was the allow list only really impacts domain
-> > attachment. When a user uses FIXED they have to know what they are
+On Tue, Nov 08, 2022, Yan Zhao wrote:
+> For memslot delete and move, kvm_invalidate_memslot() is required before
+> the real changes committed.
+> Besides swapping to an inactive slot, kvm_invalidate_memslot() will call
+> kvm_arch_flush_shadow_memslot() and further kvm_page_track_flush_slot() in
+> arch x86.
+> And according to the definition in kvm_page_track_notifier_node, users can
+> drop write-protection for the pages in the memory slot on receiving
+> .track_flush_slot.
+
+Ugh, that's a terrible API.  The entire page track API is a mess, e.g. KVMGT is
+forced to grab its own references to KVM and also needs to manually acquire/release
+mmu_lock in some flows but not others.
+
+Anyways, this is a flaw in the page track API that should be fixed.  Flushing a
+slot should not be overloaded to imply "this slot is gone", it should be a flush
+command, no more, no less.
+
+AFAICT, KVMGT never flushes anything, so fixing the bug should be a simple matter
+of adding another hook that's invoked when the memory region change is committed.
+
+That would allow KVMGT to fix another bug.  If a memory region is moved and the
+new region partially overlaps the old region, KVMGT technically probably wants to
+retain its write-protection scheme.  Though that's probably not worth supporting,
+might be better to say "don't move memory regions if KVMGT is enabled", because
+AFAIK there is no VMM that actually moves memory regions (KVM's MOVE support was
+broken for years and no one noticed).
+
+Actually, given that MOVE + KVMGT probably doesn't work regardless of where the
+region is moved to, maybe we can get away with rejecting MOVE if an external
+page tracker cares about the slot in question.
+
+> However, if kvm_prepare_memory_region() fails, the later
+> kvm_activate_memslot() will only swap back the original slot, leaving
+> previous write protection not recovered.
 > 
-> it also impacts automatic IOVA
+> This may not be a problem for kvm itself as a page tracker user, but may
+> cause problem to other page tracker users, e.g. kvmgt, whose
+> write-protected pages are removed from the write-protected list and not
+> added back.
 > 
-> > doing. There is not a good reason to deny the user to use any IOVA
-> > that is not restricted by the reserved list.
+> So call kvm_prepare_memory_region first for meta data preparation before
+> the slot invalidation so as to avoid failure and recovery.
+
+IIUC, this is purely a theoretical bug and practically speaking can't be a problem
+in practice, at least not without completely breaking KVMGT.
+
+On DELETE, kvm_prepare_memory_region() will never fail on x86 (s390's ultravisor
+protected VM case is the only scenario where DELETE can fail on any architecture).
+The common code in kvm_prepare_memory_region() does nothing for DELETE, ditto for
+kvm_arch_prepare_memory_region().
+
+And for MOVE, it can only fail in two scenarios: (1) the end gfn is beyond the
+max gfn, i.e. userspace gave bad input or (2) the new memslot is unaligned but
+the old memslot was not, and so KVM needs to allocate new metadata due to the new
+memslot needed larger arrays.
+
+As above MOVE is not handled correctly by KVMGT, so I highly doubt there is a VMM
+that supports KVMGT and moves relevant memory regions, let alove does something
+that can result in MOVE failing _and_ moves the memslot that KVMGT is shadowing.
+
+Heh, and MOVE + KVM_MEM_LOG_DIRTY_PAGES is also arguably broken, as KVM reuses
+the existing dirty bitmap but doesn't shift the dirty bits.  This is likely
+another combination that KVM can simply reject.
+
+Assuming this is indeed purely theoretical, that should be called out in the
+changelog.  Or as above, simply disallow MOVE in this case, which probably has
+my vote.
+
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+>  virt/kvm/kvm_main.c | 40 +++++++++++++++-------------------------
+>  1 file changed, 15 insertions(+), 25 deletions(-)
 > 
-> I just didn't get why different restrictions are applied to automatics vs.
-> fixed allocation.
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 25d7872b29c1..5f29011f432d 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1827,45 +1827,35 @@ static int kvm_set_memslot(struct kvm *kvm,
+>  	 */
+>  	mutex_lock(&kvm->slots_arch_lock);
+>  
+> -	/*
+> -	 * Invalidate the old slot if it's being deleted or moved.  This is
+> -	 * done prior to actually deleting/moving the memslot to allow vCPUs to
+> -	 * continue running by ensuring there are no mappings or shadow pages
+> -	 * for the memslot when it is deleted/moved.  Without pre-invalidation
+> -	 * (and without a lock), a window would exist between effecting the
+> -	 * delete/move and committing the changes in arch code where KVM or a
+> -	 * guest could access a non-existent memslot.
+> -	 *
+> -	 * Modifications are done on a temporary, unreachable slot.  The old
+> -	 * slot needs to be preserved in case a later step fails and the
+> -	 * invalidation needs to be reverted.
+> -	 */
+>  	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
+>  		invalid_slot = kzalloc(sizeof(*invalid_slot), GFP_KERNEL_ACCOUNT);
+>  		if (!invalid_slot) {
+>  			mutex_unlock(&kvm->slots_arch_lock);
+>  			return -ENOMEM;
+>  		}
+> -		kvm_invalidate_memslot(kvm, old, invalid_slot);
+>  	}
+>  
+>  	r = kvm_prepare_memory_region(kvm, old, new, change);
+>  	if (r) {
+> -		/*
+> -		 * For DELETE/MOVE, revert the above INVALID change.  No
+> -		 * modifications required since the original slot was preserved
+> -		 * in the inactive slots.  Changing the active memslots also
+> -		 * release slots_arch_lock.
+> -		 */
+> -		if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
+> -			kvm_activate_memslot(kvm, invalid_slot, old);
+> +		if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
+>  			kfree(invalid_slot);
+> -		} else {
+> -			mutex_unlock(&kvm->slots_arch_lock);
+> -		}
+> +
+> +		mutex_unlock(&kvm->slots_arch_lock);
+>  		return r;
+>  	}
+>  
+> +	/*
+> +	 * Invalidate the old slot if it's being deleted or moved.  This is
+> +	 * done prior to actually deleting/moving the memslot to allow vCPUs to
+> +	 * continue running by ensuring there are no mappings or shadow pages
+> +	 * for the memslot when it is deleted/moved.  Without pre-invalidation
+> +	 * (and without a lock), a window would exist between effecting the
+> +	 * delete/move and committing the changes in arch code where KVM or a
+> +	 * guest could access a non-existent memslot.
+> +	 */
+> +	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
+> +		kvm_invalidate_memslot(kvm, old, invalid_slot);
 
-Because it isn't a restriction on allocation, it is a restriction on
-domain attachment. (and this is a bit confusing and subtle, but it is
-what it was built for)
+I'm not 100% sure that simply moving kvm_invalidate_memslot() is functionally
+correct.  It might be, but there are so many subtleties in this code that I don't
+want to change this ordering unless absolutely necessary, or at least not without
+an in-depth analysis and a pile of tests.  E.g. it's possible one or more
+architectures relies on unmapping, flushing, and invalidating the old region
+prior to preparing the new region, e.g. to reuse arch memslot data.
 
-The purpose is to allow the IOMMU driver to allocate a domain with
-knowledge of what the user would like to do. For instance a small
-allowed range may allow the driver to allocate fewer hops in the IO
-page table, and a create a domain with a smaller aperture.
-
-"automatic" is supposed to find a good IOVA that is the best IOVA for
-that mapping. We have defined the best IOVA as one that doesn't reach
-into areas that future domains are allowed to mark as reserved.
-
-fixed can do anything legal, including violate the allowances if it
-wants. This just means a future domain attachment might fail. Domain's
-won't look at any currently mapped IOVA, only the allowance ranges
-when they size themselves.
-
-Jason
+> +
+>  	/*
+>  	 * For DELETE and MOVE, the working slot is now active as the INVALID
+>  	 * version of the old slot.  MOVE is particularly special as it reuses
+> -- 
+> 2.17.1
+> 
