@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C098C62064E
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 02:49:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 196EF620671
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 03:05:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233476AbiKHBtb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 20:49:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38422 "EHLO
+        id S233356AbiKHCFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 21:05:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233035AbiKHBta (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 20:49:30 -0500
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D906193CC
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 17:49:29 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id w14so18739833wru.8
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 17:49:29 -0800 (PST)
+        with ESMTP id S232950AbiKHCFI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 21:05:08 -0500
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 610CD13CEE
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 18:05:07 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id j15so18789841wrq.3
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 18:05:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xuvE4F/C8mjsWtuoVxb3zdO4+CnchffIGABRmA+Vuh0=;
-        b=Mdo/Cd0wbMHK75stARzp+VT1zkwi64tYYHeWBlv5vkB+zkrLZn72cRVp6p6edAXvyF
-         cqGU3Vvyi/lXq5nEQnd0/ETKSw9Tn1U5QGNU6dr0B8oaDRLG15MvWfc8E5luC09s+Da3
-         keOv5ywgRfe5ju+xfyswJEvczYPLyXEPl2KDJ2Crqukz+KN+nEwHVRLpk4xsQlQoab+5
-         ATe2NhQcYxXC9vWwEkjloyML4sr1JGQyKMmtLKGZZUm9BzJq5lR5xVt86ZWbJXsO3r/K
-         SLiOlq3unTkB+6smRWmj6sUV0t6pGahvH8FRTN65s3Q6NMvMLpUis+eIcH38aqcp2zjm
-         Pbsg==
+        bh=FUEPXHKzAMUHVmD4WvM6dOc560yHHvBZi3eb3Aooaf0=;
+        b=PLHcG5fH4ho2jlxitjL9A00nNuuJPjoWfZkPJdkmCf+9vSj/QHFnAUsMyoPdrwQw5e
+         Xoj0anXoEX67uDx3VlAWe/MDV6sJe8cKPlYWvBtuKPkq5JEgCuz1srm8ccE72kkByG17
+         /Ho4AV2CsTZRLI2ZP3Nvc7WA0kW8CF/kl6Wx7ShSyuR+WaNL2fwPfgottAyap+0UGKEW
+         OgfER170rd+rEQhzvfqbGrmZRdVyc8CBTURk7ReD2XGXydDGkqHs8rSgI+hCw+eH07Mk
+         WMCwoVl9Of8HpI/MjsKkFT19o2rs/9o2jgDkMTjNa+FudEJXc5mzW+ZiMArem/NRr8Sd
+         jVxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xuvE4F/C8mjsWtuoVxb3zdO4+CnchffIGABRmA+Vuh0=;
-        b=wJqv/32QqUhNni/oNsW7yrPHQQCsdZc8L2WF1wFj1hjIpRtDkz06HZxml+6X2sbCX5
-         ji20TsRaWzKTvGmA9xc7ZLoGtKqZ25dtrWmE4jxwe41MiXpK5yQGKHOrEgtxRMPCvmcU
-         djHXsBVFDMOwF+Eg4RYip3MlCFRx3UOsCp9rvgsDl/yJWnS3R3Za44qx2ugoic9wRbGi
-         s3RkOYAH31ThoAERAJS/Bkvwpe6r8eaQ5+48At8G+aUMQf6msk3uTv/BMiQ9xy5mQ/mG
-         xWAXb43UcrMevZ2+wTbYJPugooZQ6zo64wRHEdUza/sjyB5Dg6evXUV856NYZC1Y+9EA
-         e8tA==
-X-Gm-Message-State: ACrzQf102obYLNwr/eX2GfSlONcRllTVAR0x/PXNmyVbHrhLHGs5El9s
-        r+/gTSlVh6I8WMSegVBZJXuZC4zWTximrezkBJxbrQ==
-X-Google-Smtp-Source: AMsMyM45cXg/OhqoKKM/42Y8A1GcvODXHttPNpHG+ucd6vVaB/29yYBZSZRvZxDKG8k65RzBlCykj+hQyAqRS7DM0AI=
-X-Received: by 2002:adf:e94a:0:b0:236:6f5a:e89b with SMTP id
- m10-20020adfe94a000000b002366f5ae89bmr33610623wrn.451.1667872167428; Mon, 07
- Nov 2022 17:49:27 -0800 (PST)
+        bh=FUEPXHKzAMUHVmD4WvM6dOc560yHHvBZi3eb3Aooaf0=;
+        b=CnHbies331cz7td8IMvsOGor1yNHJaxB46ri74UoAvv2HyPuMlh3AkI5sPDRYdS7j1
+         a4SaYZAmXYZZT82qN5/b0TCQDTJ1V3yLED6hounessS1U16GhygDNfTdmUGI1Cc6mSNa
+         9++kXtZqOIz21GZnow3vHlxzTTeN56sJc82tfKNm6XtTOiKrH4B0Bg1LVK/LqpdP0aCN
+         ZXBegk6L4xS/4WdlsYr0VxJ4df37LlxHiqpWnGRf6DRt1T3pcuT4/A+BoBu6PtT91jQG
+         w3ZhSuLkUpHvB95g+6m29ellpm89t2dTRwYoPtffcNWScSrzQhcfC4cvylZRnLpf+uAx
+         9BDA==
+X-Gm-Message-State: ACrzQf2HUIcSFraUk0yTqoa6ZrTu4AA8AZE14cFW8J3RzF9zW7cIF1Xm
+        FOUHJEk2N3Zs9uczReBRgnhgXo9Cd1tmeiFsb7vpGw==
+X-Google-Smtp-Source: AMsMyM47ozfThHqf8FTKFr4zFo99pM6oLeEwjH+kPw6CR9OGe1ZvFhFIHsFE6TGcCUB1HO8S0khEO8qXfw2Qsz//jQs=
+X-Received: by 2002:adf:f081:0:b0:236:5e7c:4ec2 with SMTP id
+ n1-20020adff081000000b002365e7c4ec2mr32735182wro.641.1667873105816; Mon, 07
+ Nov 2022 18:05:05 -0800 (PST)
 MIME-Version: 1.0
-References: <20221105045704.2315186-1-vipinsh@google.com> <20221105045704.2315186-6-vipinsh@google.com>
- <Y2lO1HQtaMBCGpcZ@google.com>
-In-Reply-To: <Y2lO1HQtaMBCGpcZ@google.com>
+References: <20221105045704.2315186-1-vipinsh@google.com> <20221105045704.2315186-7-vipinsh@google.com>
+ <Y2lWG7wV+UvzX5jm@google.com>
+In-Reply-To: <Y2lWG7wV+UvzX5jm@google.com>
 From:   Vipin Sharma <vipinsh@google.com>
-Date:   Mon, 7 Nov 2022 17:48:51 -0800
-Message-ID: <CAHVum0c2QVyuxQxOQHOxmU2csgE1RHtJ7nLBWCHt6=ywuB-Tmw@mail.gmail.com>
-Subject: Re: [PATCH 5/6] KVM: selftests: Move hypercall() to hyper.h
+Date:   Mon, 7 Nov 2022 18:04:29 -0800
+Message-ID: <CAHVum0eM7NtBDRFhXa9pk9DAEere1q4XVTUti2TFZuKPiGK6LQ@mail.gmail.com>
+Subject: Re: [PATCH 6/6] KVM: selftests: Test Hyper-V extended hypercall exit
+ to userspace
 To:     David Matlack <dmatlack@google.com>
 Cc:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -60,7 +61,7 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,81 +69,211 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 7, 2022 at 10:30 AM David Matlack <dmatlack@google.com> wrote:
+On Mon, Nov 7, 2022 at 11:01 AM David Matlack <dmatlack@google.com> wrote:
 >
-> On Fri, Nov 04, 2022 at 09:57:03PM -0700, Vipin Sharma wrote:
-> > hypercall() can be used by other hyperv tests, move it to hyperv.h.
+> On Fri, Nov 04, 2022 at 09:57:04PM -0700, Vipin Sharma wrote:
+> > Hyper-V extended hypercalls by default exit to userspace. Verify
+> > userspace gets the call, update the result and then guest verifies
+> > result it received.
 > >
 > > Signed-off-by: Vipin Sharma <vipinsh@google.com>
 > > ---
-> >  .../selftests/kvm/include/x86_64/hyperv.h       | 17 +++++++++++++++++
-> >  .../selftests/kvm/x86_64/hyperv_features.c      | 17 -----------------
-> >  2 files changed, 17 insertions(+), 17 deletions(-)
+> >  tools/testing/selftests/kvm/.gitignore        |  1 +
+> >  tools/testing/selftests/kvm/Makefile          |  1 +
+> >  .../kvm/x86_64/hyperv_extended_hcalls.c       | 90 +++++++++++++++++++
+> >  3 files changed, 92 insertions(+)
+> >  create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_extended_hcalls.c
 > >
-> > diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> > index 9d8c325af1d9..87d8d9e444f7 100644
-> > --- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> > +++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> > @@ -199,4 +199,21 @@ static inline uint64_t hv_linux_guest_id(void)
-> >              ((uint64_t)LINUX_VERSION_CODE << 16);
-> >  }
-> >
-> > +static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
-> > +                             vm_vaddr_t output_address, uint64_t *hv_status)
-> > +{
-> > +     uint8_t vector;
+> > diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> > index 2f0d705db9db..ffe06dd1cc6e 100644
+> > --- a/tools/testing/selftests/kvm/.gitignore
+> > +++ b/tools/testing/selftests/kvm/.gitignore
+> > @@ -24,6 +24,7 @@
+> >  /x86_64/kvm_pv_test
+> >  /x86_64/hyperv_clock
+> >  /x86_64/hyperv_cpuid
+> > +/x86_64/hyperv_extended_hcalls
+>
+> nit: Any reason not to name this hyperv_extended_hypercalls? It's not
+> too long and as a non-Hyper-V developer it's easier to read.
+>
+
+I was keeping it consistent with other names like
+KVM_EXIT_HYPERV_HCALL, and struct hcall{} in struct kvm_hyperv_exit{}.
+
+I am fine with renaming it to hyperv_extended_hypercalls.
+
+> >  /x86_64/hyperv_features
+> >  /x86_64/hyperv_svm_test
+> >  /x86_64/max_vcpuid_cap_test
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > index 0172eb6cb6ee..366345099363 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -85,6 +85,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/emulator_error_test
+> >  TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
+> >  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
+> >  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+> > +TEST_GEN_PROGS_x86_64 += x86_64/hyperv_extended_hcalls
+> >  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
+> >  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_svm_test
+> >  TEST_GEN_PROGS_x86_64 += x86_64/kvm_clock_test
+> > diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hcalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hcalls.c
+> > new file mode 100644
+> > index 000000000000..d378877235d4
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hcalls.c
+> > @@ -0,0 +1,90 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Test Hyper-V extended hypercalls
+>
+> It would probably be worth adding a note in this comment that the
+> negative tests for extended hypercalls live in hyperv_features.c, that
+> way someone doesn't accidentally go down the rabbit hole of adding
+> negative tests here in the future.
+>
+
+Sure.
+
+> > + *
+> > + * Copyright 2020 Google LLC
+>
+> 2022 :)
+>
+> > + * Author: Vipin Sharma <vipinsh@google.com>
+> > + */
 > > +
-> > +     /* Note both the hypercall and the "asm safe" clobber r9-r11. */
-> > +     asm volatile("mov %[output_address], %%r8\n\t"
-> > +                  KVM_ASM_SAFE("vmcall")
-> > +                  : "=a" (*hv_status),
-> > +                    "+c" (control), "+d" (input_address),
-> > +                    KVM_ASM_SAFE_OUTPUTS(vector)
-> > +                  : [output_address] "r"(output_address),
-> > +                    "a" (-EFAULT)
-> > +                  : "cc", "memory", "r8", KVM_ASM_SAFE_CLOBBERS);
-> > +     return vector;
+> > +#include "kvm_util.h"
+> > +#include "processor.h"
+> > +#include "hyperv.h"
+> > +
+> > +/* Any value is fine */
+> > +#define EXT_CAPABILITIES 0xbull
+> > +
+> > +static void guest_code(vm_vaddr_t pgs_gpa, vm_vaddr_t output_pg_gva)
+> > +{
+> > +     uint64_t res, vector;
+> > +     uint64_t *output_gva;
+> > +
+> > +     wrmsr(HV_X64_MSR_GUEST_OS_ID, hv_linux_guest_id());
+> > +     wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
+> > +
+> > +     output_gva = (uint64_t *)output_pg_gva;
+> > +
+> > +     vector = hypercall(HV_EXT_CALL_QUERY_CAPABILITIES, pgs_gpa,
+> > +                        pgs_gpa + 4096, &res);
+> > +
+> > +     GUEST_ASSERT_1(!vector, vector);
+> > +     GUEST_ASSERT_2(res == HV_STATUS_SUCCESS, res, HV_STATUS_SUCCESS);
+>
+> GUEST_ASSERT_EQ(res, HV_STATUS_SUCCESS);
+>
+
+Copied things from hyperv_features test. This looks better, I will change it.
+
+> > +
+> > +     /* TLFS states output will be a uint64_t value */
+> > +     GUEST_ASSERT_2(*output_gva == EXT_CAPABILITIES, *output_gva,
+> > +                    EXT_CAPABILITIES);
+>
+> GUEST_ASSERT_EQ(*output_gva, EXT_CAPABILITIES);
+>
+> > +
+> > +     GUEST_DONE();
+> > +}
+> > +
+> > +static void guest_extended_hcall_test(void)
+> > +{
+> > +     struct kvm_vcpu *vcpu;
+> > +     struct kvm_run *run;
+> > +     struct kvm_vm *vm;
+> > +     struct ucall uc;
+> > +     vm_vaddr_t hcall_page;
+> > +     uint64_t *outval;
+> > +
+> > +     vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> > +     run = vcpu->run;
+> > +     vcpu_enable_cap(vcpu, KVM_CAP_HYPERV_ENFORCE_CPUID, 1);
+> > +     vcpu_set_hv_cpuid(vcpu);
+>
+> Check if KVM offers HV_ENABLE_EXTENDED_HYPERCALLS in CPUID, and skip the
+> test if not.
+>
+
+Sure.
+
+> > +
+> > +     /* Hypercall input/output */
+> > +     hcall_page = vm_vaddr_alloc_pages(vm, 2);
+> > +     memset(addr_gva2hva(vm, hcall_page), 0x0, 2 * getpagesize());
+>
+> s/getpagesize()/vm->page_size/
+>
+> > +     vcpu_args_set(vcpu, 2, addr_gva2gpa(vm, hcall_page), hcall_page + 4096);
+>
+> s/4096/vm->page_size/
+>
+> And to avoid hard-coding 4096 in guest_code(), you could pass in the GPA
+> of the ouput page as another argument.
+>
+
+Sounds good.
+
+> > +
+> > +     vcpu_run(vcpu);
+> > +
+> > +     TEST_ASSERT((run->exit_reason == KVM_EXIT_HYPERV),
+> > +                 "unexpected exit reason: %u (%s)", run->exit_reason,
+> > +                 exit_reason_str(run->exit_reason));
+> > +
+> > +     outval = addr_gpa2hva(vm, run->hyperv.u.hcall.params[1]);
+> > +     *outval = EXT_CAPABILITIES;
+> > +     run->hyperv.u.hcall.result = HV_STATUS_SUCCESS;
+> > +
+> > +     vcpu_run(vcpu);
+> > +
+> > +     TEST_ASSERT((run->exit_reason == KVM_EXIT_IO),
+> > +                 "unexpected exit reason: %u (%s)", run->exit_reason,
+> > +                 exit_reason_str(run->exit_reason));
+>
+> Optional: Asserting a specific exit reason is a pretty common pattern in
+> the x86 selftests. It'd be nice to create a common macro for it. e.g.
+>
+>         ASSERT_EXIT_REASON(vcpu, KVM_EXIT_IO);
+>
+
+This is much better. I can add a patch which creates this API.
+
+Should it be run or vcpu? Seems like everything needed is in struct kvm_run{}.
+
+> > +
+> > +     switch (get_ucall(vcpu, &uc)) {
+> > +     case UCALL_ABORT:
+> > +             REPORT_GUEST_ASSERT_2(uc, "arg1 = %ld, arg2 = %ld");
+> > +             break;
+> > +     case UCALL_DONE:
+> > +             break;
+> > +     default:
+> > +             TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
+> > +     }
+> > +
+> > +     kvm_vm_free(vm);
+> > +}
+> > +
+> > +int main(void)
+> > +{
+> > +     guest_extended_hcall_test();
+>
+> Why not just put all this in main()?
+>
+
+I will.
+
 > > +}
 >
-> Since this function is Hyper-V specific it probably makes sense to
-> rename it to hyperv_hypercall() as part of moving it to library, e.g. to
-> differentiate it from kvm_hypercall().
+> return 0?
 >
-
-Sounds good. Does it keeping it in header file "hyperv.h" seems fine
-or should I create a new "hyperv.c" lib file and move function
-definition there?
-
-> > +
-> >  #endif /* !SELFTEST_KVM_HYPERV_H */
-> > diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> > index b5a42cf1ad9d..31b22ee07dfb 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> > @@ -13,23 +13,6 @@
-> >  #include "processor.h"
-> >  #include "hyperv.h"
-> >
-> > -static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
-> > -                             vm_vaddr_t output_address, uint64_t *hv_status)
-> > -{
-> > -     uint8_t vector;
-> > -
-> > -     /* Note both the hypercall and the "asm safe" clobber r9-r11. */
-> > -     asm volatile("mov %[output_address], %%r8\n\t"
-> > -                  KVM_ASM_SAFE("vmcall")
-> > -                  : "=a" (*hv_status),
-> > -                    "+c" (control), "+d" (input_address),
-> > -                    KVM_ASM_SAFE_OUTPUTS(vector)
-> > -                  : [output_address] "r"(output_address),
-> > -                    "a" (-EFAULT)
-> > -                  : "cc", "memory", "r8", KVM_ASM_SAFE_CLOBBERS);
-> > -     return vector;
-> > -}
-> > -
-> >  struct msr_data {
-> >       uint32_t idx;
-> >       bool available;
 > > --
 > > 2.38.1.273.g43a17bfeac-goog
 > >
