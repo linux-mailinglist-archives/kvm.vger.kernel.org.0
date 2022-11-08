@@ -2,86 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A7456218B3
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 16:45:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 38C59621952
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 17:26:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234468AbiKHPpu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 10:45:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34816 "EHLO
+        id S234233AbiKHQ0i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 11:26:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234501AbiKHPpr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 10:45:47 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA92D58BD4
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 07:45:45 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id 7so13276015ybp.13
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 07:45:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3WmnLZviTEtGOd04KwL6mismfEZmWFzPvbjT4L9wHzc=;
-        b=PyrurgMiCSOMPjtWpQQibYYdz6w4YOWL+smQ01L99WmHlOWyZB6LEDiCXFuMbmG8LA
-         WWbx3zVcdP1uF8iZlVy4hS3Zo5mAv6wZMFQTKygOrW7zJqU98v8oNQDQl2p17Hgnbva4
-         7EZVXFMgLLccgQu/gU04QMDXhBzpwiQHajKrqfxBoRR9rRRJrrRpicJb611HLI3DSqCY
-         SldvM4h14vHZzhTsGQLOEMbZG5lQzN/19GT9A//6BJ3PJs1My9j5ogViA//DoATAStJX
-         k5a5YRvdXBwUNt3wHYsZrjExSxFtPSWGVezviYhJpU4eZxeqZr6Eiroupi+tAzKozpU2
-         X6tA==
+        with ESMTP id S233928AbiKHQ0h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 11:26:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 398711FF92
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 08:25:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667924741;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4jQy74ZlfgTAGdlikZL4pyUPBXZ8/ebOOwzW3CX4iwk=;
+        b=YMFtIxavRISVyaWvagEdaK0sG8RXtwk8352bLolj9MCsV9rGEPPSlU08A6sq2YsZnYBjHX
+        4EQFspiufX65jF5fqNBB4jUvBt/u/cPpyHnIYQOzUJqZDgB6GvARNJwJSXlI5ztM/g9/KL
+        sxqHQD7drQWQmTYmNWgB2aKUA4XlKnc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-563-3uOVuMZnOyWO6o4dVkg0ag-1; Tue, 08 Nov 2022 11:25:39 -0500
+X-MC-Unique: 3uOVuMZnOyWO6o4dVkg0ag-1
+Received: by mail-wm1-f70.google.com with SMTP id c10-20020a7bc84a000000b003cf81c2d3efso4037210wml.7
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 08:25:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3WmnLZviTEtGOd04KwL6mismfEZmWFzPvbjT4L9wHzc=;
-        b=DCdGrZ8o/Z+BTOqgWKP1DjAsFm1CXom5toQ1MuoWx5Tf/WoXiqZY85hhAOty+E5sty
-         wYy2UawMR7pVwgyNU/BI0y58zRjiOYmMH4nuRm73nceI/Q+Muj6AEp1Zp3DqjVNtcjjk
-         yqkeLEWuYEHhDp/E60GslKwbBgEjKiLlOueF+kCeW8A26iesNQjnEEhCytjRWbZFmLDH
-         DQ2IvU756SnznFEzV3BSZmo65UmEcnNgJ2w7w+GGA4VbENK0V0QMG5Wd4uNTvbd+mq3n
-         EUXRSwNbPJ7UokURFeUBbAenOWLbVwdX8zWUYyPQTa6ApD4BfHfbPMcGchxF3Psft5/W
-         aoUQ==
-X-Gm-Message-State: ACrzQf3Hl2eAQVHctLWsaejGgEvUys6Ja4cz/JdCck/l2/JF42ZJkd52
-        /78ZSbsl29aaVWiSnTNpuRWcRs0S5aTJhFPEjyA=
-X-Google-Smtp-Source: AMsMyM44pzUqCnadd4VjJw/YK/lkra4pmBy7tfkDjxKZBo5QUsk/LvtkrTBpymYLNTuoxVfNQ54iGrcoK48xpYBaPXY=
-X-Received: by 2002:a05:6902:191:b0:6cd:3a43:cda3 with SMTP id
- t17-20020a056902019100b006cd3a43cda3mr42710682ybh.207.1667922345030; Tue, 08
- Nov 2022 07:45:45 -0800 (PST)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4jQy74ZlfgTAGdlikZL4pyUPBXZ8/ebOOwzW3CX4iwk=;
+        b=l9rFScgsAiGTP9lRi0AyuMsJuc25ineq59RXhi6OPXP7DOStnN2XqQ3jeODxZlFADc
+         9U8nYWI1n9pnFLRASHFpFrUZsXSQ7ypnLGf2keKyqRIErZBrYJHM9GZhtepj1hyCGzux
+         IqmaP0AvRb4Mo4eraE/l1sT1/3KjU1JMf0snRBBdD7xf6/Z9j7Atj2UuRAPKByZx7Ygn
+         qkXm5psgsALQl0BlFWMzqr8zSNyS/D4Ty7FpyQ2NHFZClXskhHeEv6/SAdHV0lkbrmRJ
+         TOSJ8NBmLLBoZYNHrdV5h+J9wcHMYpTiXv/7p9v3K60qsoI4bIW5+1UrAXKoxLvVfZ9c
+         gPHg==
+X-Gm-Message-State: ACrzQf09jCq8wLWEjnvKcstcTZ799oQTRo13saMYJlOlF3gukM33vbKu
+        3f9jThmn8xLUNH8pv2vVg73q0vXldlXNduG4IslHIjisNMIDleYC2ACZLOwlCmQ4nhD+/VgV7Qm
+        PDCcZ/P02YRub
+X-Received: by 2002:a05:600c:1c1e:b0:3c6:fa3c:32a9 with SMTP id j30-20020a05600c1c1e00b003c6fa3c32a9mr47405725wms.203.1667924738607;
+        Tue, 08 Nov 2022 08:25:38 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM4wN1CbSK2UwZVMADUtaPh0RFDoA7/DTsc453ktjQjnO9KW8VMErardGfZu4ufvb8J3cKZZ+Q==
+X-Received: by 2002:a05:600c:1c1e:b0:3c6:fa3c:32a9 with SMTP id j30-20020a05600c1c1e00b003c6fa3c32a9mr47405704wms.203.1667924738384;
+        Tue, 08 Nov 2022 08:25:38 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id h19-20020a05600c351300b003b4ff30e566sm34421532wmq.3.2022.11.08.08.25.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Nov 2022 08:25:37 -0800 (PST)
+Message-ID: <8e3bd959-bf0b-9104-2ca2-b745c0d9ff48@redhat.com>
+Date:   Tue, 8 Nov 2022 17:25:36 +0100
 MIME-Version: 1.0
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Tue, 8 Nov 2022 10:45:33 -0500
-Message-ID: <CAJSP0QXc9MOUuU9amBorzV4hf9A9HWFZrtn3sZzJ-OkWMwvNPw@mail.gmail.com>
-Subject: Call for FOSDEM presentations on QEMU, KVM, and rust-vmm
-To:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>
-Cc:     Mahmoud Abdelghany <blackbeard334@protonmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-0.7 required=5.0 tests=BAYES_05,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [RFC PATCH 3/3] kvm: Atomic memslot updates
+Content-Language: en-US
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Yanan Wang <wangyanan55@huawei.com>, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>
+References: <20221104151454.136551-1-eesposit@redhat.com>
+ <20221104151454.136551-4-eesposit@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20221104151454.136551-4-eesposit@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-The yearly FOSDEM open source conference is now accepting talk
-proposals. FOSDEM '23 will be held in Brussels, Belgium on 4 & 5
-February.
+On 11/4/22 16:14, Emanuele Giuseppe Esposito wrote:
+> +    g_assert(qemu_mutex_iothread_locked());
 
-FOSDEM is a huge free conference about all things open source and an
-opportunity for anyone to present QEMU or KVM topics. Both in-person
-and pre-recorded talks are being accepted this year.
+Please add a comment here:
 
-Please consider submitting your talks to the following devrooms:
+     /* Block further invocations of the ioctls outside the BQL.  */
 
-Emulator Development Room:
-https://blackbeard334.github.io/fosdem23-emulator-devroom-cfp/
+> +    CPU_FOREACH(cpu) {
+> +        qemu_lockcnt_lock(&cpu->in_ioctl_lock);
+> +    }
+> +    qemu_lockcnt_lock(&kvm_in_ioctl_lock);
+>   
+> -    kvm_set_phys_mem(kml, section, false);
+> -    memory_region_unref(section->mr);
+> +    /* Inhibiting happens rarely, we can keep things simple and spin here. */
 
-Virtualization and IaaS devroom:
-https://fosdem.org/2023/schedule/track/virtualization_and_iaas/
+Not making it spin is pretty easy.  You can add a qemu_event_set to 
+kvm_set_in_ioctl() and kvm_cpu_set_in_ioctl(), and here something like:
 
-Rust devroom:
-https://rust-fosdem.github.io/
+     if (in_kvm_ioctls()) {
+         qemu_event_reset(&kvm_in_ioctl_event);
+         if (in_kvm_ioctls()) {
+             qemu_event_wait(&kvm_in_ioctl_event);
+         }
+     }
 
-Thanks,
-Stefan
+where in_kvm_ioctls() returns true if any (vCPU or KVM) lockcnt has a 
+nonzero count.
+
+Also please create a new header sysemu/accel-blocker.h and 
+accel/blocker.c or something like that with all the functions, because 
+this code can potentially be used by all KVM-like accelerators.
+
+Paolo
+
