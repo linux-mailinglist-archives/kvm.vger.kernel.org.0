@@ -2,197 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D18D621F1B
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 23:22:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0FE5621F5A
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 23:31:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229973AbiKHWWN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 17:22:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46578 "EHLO
+        id S230259AbiKHWbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 17:31:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230193AbiKHWVu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 17:21:50 -0500
+        with ESMTP id S230253AbiKHWad (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 17:30:33 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01A39663E1
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 14:19:52 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1742817AAA
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 14:28:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667945992;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
+        s=mimecast20190719; t=1667946517;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rM9d9QcLMO4Gb1UJawRpOr7BbjkeIgjtt3r4okgE/aQ=;
-        b=WOOp2kxv52pZUXq4KftQ0rTpFSujVop75FQG0fIlsK17AZp/Y/wheHIE9yVWiWTcL6BgZc
-        t92dtfwe4nJnpnPOWaErObGP0CVGvfZZNu9HrDzENzmLJlJ6z4lQzCvGzvC7Q7n+eAmw6q
-        9QXnZakRPDJ6WHui/lRtIMqMANEfWEI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-607-eW1u_DuAMGKbU_l2DpPbjg-1; Tue, 08 Nov 2022 17:19:46 -0500
-X-MC-Unique: eW1u_DuAMGKbU_l2DpPbjg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8B431380673F;
-        Tue,  8 Nov 2022 22:19:45 +0000 (UTC)
-Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 635324B3FC6;
-        Tue,  8 Nov 2022 22:19:39 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v9 3/7] KVM: Support dirty ring in conjunction with bitmap
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com,
-        andrew.jones@linux.dev, ajones@ventanamicro.com,
-        bgardon@google.com, dmatlack@google.com, will@kernel.org,
-        suzuki.poulose@arm.com, alexandru.elisei@arm.com,
-        pbonzini@redhat.com, maz@kernel.org, peterx@redhat.com,
-        oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
-References: <20221108041039.111145-1-gshan@redhat.com>
- <20221108041039.111145-4-gshan@redhat.com> <Y2qDCqFeL1vwqq3f@google.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
-Date:   Wed, 9 Nov 2022 06:19:36 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        bh=pAwH+5JDvufKDL3NMoeBuf7w8Ln38eP9Ts8frUc7hNk=;
+        b=AP9E/YatBORnNdyZAhw4GmmzpSxMmZMGLvdbanNR2Tl7e7VAJsfP1mWTZzOVMcdDXAyFcr
+        VjHXlhhjoQ4V7maq/eVxoiQN1OQY7808SlqJt3o6zCUWNEkqMRJtQdJ4uG5qXCjcwlIZkT
+        1pGqGmMbGkYTfrDO3QQL+1+tQdC5f+I=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-635-AN2_CwGKMnee2GyFM20-uQ-1; Tue, 08 Nov 2022 17:28:36 -0500
+X-MC-Unique: AN2_CwGKMnee2GyFM20-uQ-1
+Received: by mail-io1-f72.google.com with SMTP id r197-20020a6b8fce000000b006c3fc33424dso10043469iod.5
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 14:28:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pAwH+5JDvufKDL3NMoeBuf7w8Ln38eP9Ts8frUc7hNk=;
+        b=ILqpT3AVpzurk5lQJQNL3kLGNWOzf4TCXenJfbdldEX24V33dlB5EgR0GbBXs4gbD8
+         BpsrYB6BwtNI5yXLXRgvoPQJuU8tKSBytYSa2teUpA8F7tdNYLygM3VPoM2zAl+llNo7
+         DOu4AyEzIzkKNPauyEkK+8N0+D9pNhJFy8PtldlpcG86bBpP88RylOsjgIqYgFCF5b+M
+         eXHK4ZwpqIexsfwTqs8o8fsVRQ8UdK6IK4hEoUL1cXTZf0tRejUeNfPd1llOBegXQsCu
+         s0wcciHBb4tig3LT6eP3iM8YfiGBp5/R2/LivRd750ywYuou9H2erhJNMtWmorXzqH6G
+         TgrQ==
+X-Gm-Message-State: ACrzQf0rnI1aI3pjr1xjzvVESu5Do02cy8mDQLNYOKW2EHr8iWue+44P
+        GHfvnvSrLabeThfdlh0vy7IYsz7rZesjrVs05FZOSAvlHWbHIuX5baFwfWypp375bLZX0wK2mH8
+        FegTInE/CjFNC
+X-Received: by 2002:a05:6638:3e1b:b0:373:9526:ff23 with SMTP id co27-20020a0566383e1b00b003739526ff23mr1059582jab.25.1667946515340;
+        Tue, 08 Nov 2022 14:28:35 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM7qQUvxc2/UNOHomsJy1dPTa1Nkgqu6DzA5Et+Lrzoib29h+Bm9PbubEw1u6deu68awl9vxhQ==
+X-Received: by 2002:a05:6638:3e1b:b0:373:9526:ff23 with SMTP id co27-20020a0566383e1b00b003739526ff23mr1059545jab.25.1667946515058;
+        Tue, 08 Nov 2022 14:28:35 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id k9-20020a026609000000b003753b6452f9sm4039228jac.35.2022.11.08.14.28.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Nov 2022 14:28:34 -0800 (PST)
+Date:   Tue, 8 Nov 2022 15:28:31 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 10/11] vfio: Make vfio_container optionally compiled
+Message-ID: <20221108152831.1a2ed3df.alex.williamson@redhat.com>
+In-Reply-To: <10-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+        <10-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <Y2qDCqFeL1vwqq3f@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+On Mon,  7 Nov 2022 20:52:54 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-On 11/9/22 12:25 AM, Sean Christopherson wrote:
-> On Tue, Nov 08, 2022, Gavin Shan wrote:
->> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
->> index 800f9470e36b..228be1145cf3 100644
->> --- a/virt/kvm/Kconfig
->> +++ b/virt/kvm/Kconfig
->> @@ -33,6 +33,14 @@ config HAVE_KVM_DIRTY_RING_ACQ_REL
->>          bool
->>          select HAVE_KVM_DIRTY_RING
->>   
->> +# Only architectures that need to dirty memory outside of a vCPU
->> +# context should select this, advertising to userspace the
->> +# requirement to use a dirty bitmap in addition to the vCPU dirty
->> +# ring.
+> Add a kconfig CONFIG_VFIO_CONTAINER that controls compiling the container
+> code. If 'n' then only iommufd will provide the container service. All the
+> support for vfio iommu drivers, including type1, will not be built.
 > 
-> The Kconfig does more than advertise a feature to userspace.
+> This allows a compilation check that no inappropriate dependencies between
+> the device/group and container have been created.
 > 
->   # Allow enabling both the dirty bitmap and dirty ring.  Only architectures that
->   # need to dirty memory outside of a vCPU context should select this.
+> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/vfio/Kconfig  | 35 +++++++++++++++--------
+>  drivers/vfio/Makefile |  4 +--
+>  drivers/vfio/vfio.h   | 65 +++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 91 insertions(+), 13 deletions(-)
 > 
-
-Agreed. The comments will be adjusted accordingly.
-
->> +config HAVE_KVM_DIRTY_RING_WITH_BITMAP
-> 
-> I think we should replace "HAVE" with "NEED".  Any architecture that supports the
-> dirty ring can easily support ring+bitmap, but based on the discussion from v5[*],
-> the comment above, and the fact that the bitmap will _never_ be used in the
-> proposed implementation because x86 will always have a vCPU, this Kconfig should
-> only be selected if the bitmap is needed to support migration.
-> 
-> [*] https://lore.kernel.org/all/Y0SxnoT5u7+1TCT+@google.com
-> 
-
-Both look good to me. Lets change it to CONFIG_NEED_KVM_DIRTY_RING_WITH_BITMAP
-then.
-
->> +	bool
->> +	depends on HAVE_KVM_DIRTY_RING
->> +
->>   config HAVE_KVM_EVENTFD
->>          bool
->>          select EVENTFD
->> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
->> index fecbb7d75ad2..f95cbcdd74ff 100644
->> --- a/virt/kvm/dirty_ring.c
->> +++ b/virt/kvm/dirty_ring.c
->> @@ -21,6 +21,18 @@ u32 kvm_dirty_ring_get_rsvd_entries(void)
->>   	return KVM_DIRTY_RING_RSVD_ENTRIES + kvm_cpu_dirty_log_size();
->>   }
->>   
->> +bool kvm_use_dirty_bitmap(struct kvm *kvm)
->> +{
->> +	lockdep_assert_held(&kvm->slots_lock);
->> +
->> +	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
->> +}
->> +
->> +bool __weak kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
-> 
-> Rather than __weak, what about wrapping this with an #ifdef to effectively force
-> architectures to implement the override if they need ring+bitmap?  Given that the
-> bitmap will never be used if there's a running vCPU, selecting the Kconfig without
-> overriding this utility can't possibly be correct.
-> 
->    #ifndef CONFIG_NEED_KVM_DIRTY_RING_WITH_BITMAP
->    bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
->    {
-> 	return false;
->    }
->    #endif
-> 
-
-It's a good idea, which will be included to next revision :)
-
->> @@ -4588,6 +4608,29 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
->>   			return -EINVAL;
->>   
->>   		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
->> +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP: {
->> +		int r = -EINVAL;
->> +
->> +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
->> +		    !kvm->dirty_ring_size)
-> 
-> I have no objection to disallowing userspace from disabling the combo, but I
-> think it's worth requiring cap->args[0] to be '0' just in case we change our minds
-> in the future.
-> 
-
-I assume you're suggesting to have non-zero value in cap->args[0] to enable the
-capability.
-
-     if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
-         !kvm->dirty_ring_size || !cap->args[0])
-         return r;
-     
->> +			return r;
->> +
->> +		mutex_lock(&kvm->slots_lock);
->> +
->> +		/*
->> +		 * For simplicity, allow enabling ring+bitmap if and only if
->> +		 * there are no memslots, e.g. to ensure all memslots allocate
->> +		 * a bitmap after the capability is enabled.
->> +		 */
->> +		if (kvm_are_all_memslots_empty(kvm)) {
->> +			kvm->dirty_ring_with_bitmap = true;
->> +			r = 0;
->> +		}
->> +
->> +		mutex_unlock(&kvm->slots_lock);
->> +
->> +		return r;
->> +	}
->>   	default:
->>   		return kvm_vm_ioctl_enable_cap(kvm, cap);
->>   	}
+> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+> index 1118d322eec97d..286c1663bd7564 100644
+> --- a/drivers/vfio/Kconfig
+> +++ b/drivers/vfio/Kconfig
+> @@ -3,8 +3,8 @@ menuconfig VFIO
+>  	tristate "VFIO Non-Privileged userspace driver framework"
+>  	select IOMMU_API
+>  	depends on IOMMUFD || !IOMMUFD
+> -	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
+>  	select INTERVAL_TREE
+> +	select VFIO_CONTAINER if IOMMUFD=n
+>  	help
+>  	  VFIO provides a framework for secure userspace device drivers.
+>  	  See Documentation/driver-api/vfio.rst for more details.
+> @@ -12,6 +12,18 @@ menuconfig VFIO
+>  	  If you don't know what to do here, say N.
+>  
+>  if VFIO
+> +config VFIO_CONTAINER
+> +	bool "Support for the VFIO container /dev/vfio/vfio"
+> +	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
+> +	default y
+> +	help
+> +	  The VFIO container is the classic interface to VFIO for establishing
+> +	  IOMMU mappings. If N is selected here then IOMMUFD must be used to
+> +	  manage the mappings.
+> +
+> +	  Unless testing IOMMUFD say Y here.
+> +
+> +if VFIO_CONTAINER
+>  config VFIO_IOMMU_TYPE1
+>  	tristate
+>  	default n
+> @@ -21,16 +33,6 @@ config VFIO_IOMMU_SPAPR_TCE
+>  	depends on SPAPR_TCE_IOMMU
+>  	default VFIO
+>  
+> -config VFIO_SPAPR_EEH
+> -	tristate
+> -	depends on EEH && VFIO_IOMMU_SPAPR_TCE
+> -	default VFIO
+> -
+> -config VFIO_VIRQFD
+> -	tristate
+> -	select EVENTFD
+> -	default n
+> -
+>  config VFIO_NOIOMMU
+>  	bool "VFIO No-IOMMU support"
+>  	help
 
 
-Thanks,
-Gavin
+Perhaps this should have been obvious, but I'm realizing that
+vfio-noiommu mode is completely missing without VFIO_CONTAINER, which
+seems a barrier to deprecating VFIO_CONTAINER and perhaps makes it a
+question whether IOMMUFD should really be taking over /dev/vfio/vfio.
+No-iommu mode has users.  Thanks,
+
+Alex
 
