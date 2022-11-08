@@ -2,105 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6A78621021
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 13:18:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B09F6210B5
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 13:30:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234056AbiKHMSN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 07:18:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36842 "EHLO
+        id S234071AbiKHMaQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 07:30:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233703AbiKHMSL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 07:18:11 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C3F93E0A0;
-        Tue,  8 Nov 2022 04:18:10 -0800 (PST)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id BEAD01F897;
-        Tue,  8 Nov 2022 12:18:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1667909888; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QeUj1KQeijZc8VVyU5Jhg9NQ2cupqwdXYW1sF2iO20E=;
-        b=D7/6PUWNj0Ikd3aiqq8Zwis4IBwu0fRF8Xi40rePYUojl+9f0qZf9Gv4vfhpnFLVxzUnPu
-        RcHeQDtJ3HpYJrv0U7SQef4C+vbHSeDiOlSOgsq8BOOg6X35NS684w/Q6yl+j3GN/n8Jq/
-        hrZ4qJC25VSQ510tGYT6NW4Y7wB2bhM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1667909888;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QeUj1KQeijZc8VVyU5Jhg9NQ2cupqwdXYW1sF2iO20E=;
-        b=Eh5rMSTKnPpOmUDZVSU0beIStwJAZ205hU+JLe+dQuxTaTK28GlQozBvgsL7Mphpk3W+n1
-        BV6wqTs4PxVssMCg==
-Received: from hawking.suse.de (unknown [10.168.4.11])
-        by relay2.suse.de (Postfix) with ESMTP id EA6762C142;
-        Tue,  8 Nov 2022 12:18:07 +0000 (UTC)
-Received: by hawking.suse.de (Postfix, from userid 17005)
-        id 5D94D44039C; Tue,  8 Nov 2022 13:18:07 +0100 (CET)
-From:   Andreas Schwab <schwab@suse.de>
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] RISC-V: KVM: Exit run-loop immediately if xfer_to_guest
- fails
-References: <20221108115543.1425199-1-apatel@ventanamicro.com>
-X-Yow:  Now that I have my ``APPLE,'' I comprehend COST ACCOUNTING!!
-Date:   Tue, 08 Nov 2022 13:18:06 +0100
-In-Reply-To: <20221108115543.1425199-1-apatel@ventanamicro.com> (Anup Patel's
-        message of "Tue, 8 Nov 2022 17:25:43 +0530")
-Message-ID: <mvmiljpd4ht.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+        with ESMTP id S234129AbiKHMaI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 07:30:08 -0500
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DDA22EF52
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 04:30:06 -0800 (PST)
+Received: by mail-qk1-x731.google.com with SMTP id g10so8942909qkl.6
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 04:30:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SzBlYeGeT15Xra75w9IZDBjQ7Da3XKSmRdlnDJDYrko=;
+        b=cigNPlEtEE1k5xiZ9PvVBazoo9lUtOBUwB6YZSwBfhiXaLfnGYlViGJ/CkI7QbpyRc
+         DUkc/pXyGXkzwxwNKmQ/AVr17gtcnro/HIxn3z8V8Vc+39bff1bepY3CjxGya/RlhJQD
+         pm03SLH1zh1vk5Et08W05yayJWnxdxRnbNjb7jCohrMzy/0/FJWKkATniYBbpKgsaBKE
+         Z+OGb8Lsc3JgCU/vlNmJzwFukVrY1yODwKOWdcEffdpTGbLPgR5Erg+jlwzjZKljWkGx
+         l6m9q0cv+BGPJ+GX+X1NDb4hrmrYY0d2qQvBndPhFSr7mcH+QfGu5TnM80huZaOEkW4m
+         IdPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:reply-to:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SzBlYeGeT15Xra75w9IZDBjQ7Da3XKSmRdlnDJDYrko=;
+        b=cFYzfzJG5zfCDXi7xuYvR4pYzknE5MADHSHsRTNUKUs9NQPN8JcfkgTnlf1aBSC47L
+         E4+plzC3c9q/RjrAg19NnSwovXJ/ltxMOOWJ/dcTA9cKM/dugbSO2+aC0AWHwaXWd7NH
+         wjnQMgDUH/LKRC7ovOWttT+t77dHz0kclnTz94G1gXlLMsYYx3tfmLUZ9EtPj/s9fFAk
+         H5GolL5j/aCGBiZyOhr+lh3dbyVsL8jUkWMb/Zwgsk23oHIfTxedp35jl5GyCZEGoZkL
+         gAG/OZFythCv3cUyIYoHVmEUGCG86Mp7UU2tpRlC1l3zrxVEd+QP4Pl8wvEZ7Z+FWJVl
+         lFiQ==
+X-Gm-Message-State: ACrzQf1+eNUC5QHy4whKLy/B660jyMXUKVzZ/FX4g3W33XWPicS6azdp
+        4VblMfI9tQ2Erwk9AYyNDifAlatqWY1M7ZbQsJg=
+X-Google-Smtp-Source: AMsMyM58hZ1EPsKu7coHtKEAadQRfLUwq2/6MbLEjdgMZ+NpfmCkJjte0dLlRzUMReSpEc0nbvrKDwByTED+/niEF+4=
+X-Received: by 2002:ae9:eb48:0:b0:6fa:d61:4510 with SMTP id
+ b69-20020ae9eb48000000b006fa0d614510mr37684535qkg.768.1667910605712; Tue, 08
+ Nov 2022 04:30:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Received: by 2002:a05:6214:2f8a:b0:4bb:6e86:8303 with HTTP; Tue, 8 Nov 2022
+ 04:30:05 -0800 (PST)
+Reply-To: mr.abraham022@gmail.com
+From:   Mr Abraham <mr.abraham2021@gmail.com>
+Date:   Tue, 8 Nov 2022 12:30:05 +0000
+Message-ID: <CAJ2UK+YqK-OgWa-GbqjTU89edKqVZ5nqmL-j=gKpwP5uFtkvUA@mail.gmail.com>
+Subject: Greeting
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: Yes, score=5.0 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_FM_MR_MRS,
+        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2607:f8b0:4864:20:0:0:0:731 listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.4987]
+        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
+        *      digit
+        *      [mr.abraham022[at]gmail.com]
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
+        *       in digit
+        *      [mr.abraham2021[at]gmail.com]
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [mr.abraham2021[at]gmail.com]
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        *  0.0 T_HK_NAME_FM_MR_MRS No description available.
+        *  2.9 UNDISC_FREEM Undisclosed recipients + freemail reply-to
+        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
+        *      different freemails
+X-Spam-Level: *****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Nov 08 2022, Anup Patel wrote:
-
-> If xfer_to_guest_mode_handle_work() fails in the run-loop then exit
-> the run-loop immediately instead of doing it after some more work.
->
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->  arch/riscv/kvm/vcpu.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 71ebbc4821f0..17d5b3f8c2ee 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -984,8 +984,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  	while (ret > 0) {
->  		/* Check conditions before entering the guest */
->  		ret = xfer_to_guest_mode_handle_work(vcpu);
-> -		if (!ret)
-> -			ret = 1;
-> +		if (ret)
-> +			continue;
-
-If that is supposed to exit the loop, it would be clearer to just use
-break.
-
-> +		ret = 1;
-
-There is a condition on ret <= 0 later in the loop that no longer can be
-true.
-
--- 
-Andreas Schwab, SUSE Labs, schwab@suse.de
-GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
-"And now for something completely different."
+My Greeting, Did you receive the letter i sent to you. Please answer me.
+Regard, Mr.Abraham
