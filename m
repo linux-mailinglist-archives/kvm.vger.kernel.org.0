@@ -2,60 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D1506208F6
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 06:39:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF6DE6208F5
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 06:39:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232548AbiKHFg4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 00:36:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46740 "EHLO
+        id S233103AbiKHFjR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 00:39:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbiKHFgz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 00:36:55 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A7A6183B3
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 21:36:53 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id y4so13234742plb.2
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 21:36:53 -0800 (PST)
+        with ESMTP id S229521AbiKHFjP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 00:39:15 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D867C1A839
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 21:39:14 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id r61-20020a17090a43c300b00212f4e9cccdso16892426pjg.5
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 21:39:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BySxdp/7FbkyS9rQ/+SYkYHjIbHSrwzWviAFRY2ZPdQ=;
-        b=jlgow3Yb6SgeKXBbO3czTUh+xNvvjFHf5z9ViSJ61Te93gNnScVTxpPdHdT0l7k62F
-         lMrHOG03BfSjw2UfLzDRH+RXS0WR4VTQobaYGOSlEeJAzgE29G9Fs3PTFtSoRNJ2lsDP
-         rp0PpZoXb1pTQgLNwDewCRkXTSd0VD2UnGaEqh9OBYLx6U4QpTvTGuKtpRiWBAAdeDq6
-         BupIKIXcNl5Jz9YKhzqCZK1Zqb6IeNpvb7fpbUcyQY8vS/dUjH/ef8j3NZEU1GlKSkJ5
-         KtoaRb8jEUBKaeh9EDW7vyVfw83qUDyWWtZPLL7bbZyLBEvN6jw/u2ubAUqXn8x1atsw
-         HieA==
+        bh=Pz3TQvJYE17eelsCmAIKQH4K5ZpJA4fTVBa1z1nTTM8=;
+        b=IOwNbZZGA7GQ46cWFdsY+B8zogEIS2IXjVotgY9MfbBfAfpoa5E/uc/8KrHVc/Pwg+
+         F5ILEXrqOb0BxfkrFhUsLFMHq9NqlTWE1sy3CSju4txDxRFGMb7rJPZ3OHQeqh8pLGkV
+         A8Ws3BEJX/fDhOtwYRrUAKJzX63a4TJHYV1t0p4jGmkELlOj0/CCnuid55gKcVbtfGp/
+         hZU1/8MqdjbLhSC3XekuujoIMvuPvTczjvEZsK/3RwbQr+LLE/y93/zAYJZbq+CQpTOD
+         Qcl0dEbAq+GZ8eGtx06f8ADzYtJZb3CS6jizD9O7H+v+y/WeV+1wvRI4H4DbkLh3tkTP
+         mOtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BySxdp/7FbkyS9rQ/+SYkYHjIbHSrwzWviAFRY2ZPdQ=;
-        b=y7BBNnFgi0T2no3a9/lK8+seaL0X/6NewQv/ifvmoibZd8+ueB6RwGyQIONLElBv1A
-         1qU1IXdxgBgyoTj9vPScNTmAu+CiPgWhtwkh7HbrqKfCpB0JEiFf7+hhGPzUGYGOiIIE
-         ktAwrH9B4iBu0bNYV8cEdxPDzqa+xzRhTPso5sgE1C7o5Ty/uaTQvBGyivgmNnPFzD3X
-         hPRfqG+LArYnhH4x+tooOpVWqdbcvwgDscKVWHw3WW/ez9V4OkgFkkjxivFNqBpCZQl0
-         0nn9pgzS4qfIsQayvj0n9nslsXqeq2V7MwsVhm7zgUE6oHahHEis/O7SWZb6XmaN0Bdf
-         qtqg==
-X-Gm-Message-State: ACrzQf2MqlzDz5xhvYIUTJmbN6zghn4Hs8ni6UTqzswSYOAJvgHMOxyu
-        CDQVUKYuTiova9xkz11537RdAX/au83LH0JwHm0COg==
-X-Google-Smtp-Source: AMsMyM5h/BK7dlR9tXFEYHomDewWZpzTj+DR/oCqXMDG+trxJqZakFJMlhmhsO/VcM4HGEgEalX+qA4zQQDUKnfZXJ4=
-X-Received: by 2002:a17:902:7145:b0:187:2356:c29d with SMTP id
- u5-20020a170902714500b001872356c29dmr43846977plm.154.1667885812893; Mon, 07
- Nov 2022 21:36:52 -0800 (PST)
+        bh=Pz3TQvJYE17eelsCmAIKQH4K5ZpJA4fTVBa1z1nTTM8=;
+        b=pxV+OcvAlItFLcJaXl5vFw2CEwm/B7OVyjrKrKuuJ5LmZj5zLRSFgoKXEfIG8qb74C
+         sO/S91P6bBodDLJyBthwRqwyKyvCFFJuLwcsxMDmTSudSX2/RjFRErhu25Qs1bj8Lf/R
+         e629yG2Z4WroPCj63Mp/0t73yMLlV1QWKPwpMoT5WLf7IVv//zyi8tZJlTSlwTrVVJ27
+         kw6m3crgloCIeHI0T9J7fNQUozMYwnAwNUN7k3Ldk3Qt9q9RO0Qt3xwp9hp/x3dO4w2k
+         HlhfTvgRvOvJd0Wlrm0rtbAKLTkDZ9rQmQ7QQUyeN3AG6lsYEgivvLKNI1zyMUplGxOM
+         3I7A==
+X-Gm-Message-State: ACrzQf3DrPejs4B5t0de7CkW5UTcUvZDeqweZEVzFBvlxvYZ9QGR8KTb
+        xJzQTRRUR+LLMdYaJQQRCBVoNYiwXC1Kcv26AzL8Sw==
+X-Google-Smtp-Source: AMsMyM4s6UBfXivryrOibC1CJghXZh+LewJC7EVe1bijyzWBrmOnmSw5hn3QDTcMQZSqMPexbYbexJp1QaywwsPftvw=
+X-Received: by 2002:a17:903:3252:b0:186:59e9:8dca with SMTP id
+ ji18-20020a170903325200b0018659e98dcamr949010plb.154.1667885954190; Mon, 07
+ Nov 2022 21:39:14 -0800 (PST)
 MIME-Version: 1.0
-References: <20221028105402.2030192-1-maz@kernel.org> <20221028105402.2030192-12-maz@kernel.org>
- <CAAeT=FyiNeRun7oRL83AUkVabUSb9pxL2SS9yZwi1rjFnbhH6g@mail.gmail.com>
- <87tu3gfi8u.wl-maz@kernel.org> <CAAeT=FwViQRmyJjf3jxcWnLFQAYob8uvvx7QNhWyj6OmaYDKyg@mail.gmail.com>
- <86bkpmrjv8.wl-maz@kernel.org> <CAAeT=Fzp-7MMBJshAAQBgFwXLH2z5ASDgmDBLNJsQoFA=MSciw@mail.gmail.com>
- <87pme0fdvp.wl-maz@kernel.org>
-In-Reply-To: <87pme0fdvp.wl-maz@kernel.org>
+References: <20221107085435.2581641-1-maz@kernel.org> <20221107085435.2581641-12-maz@kernel.org>
+In-Reply-To: <20221107085435.2581641-12-maz@kernel.org>
 From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 7 Nov 2022 21:36:36 -0800
-Message-ID: <CAAeT=Fzgu1iaMmGXWZcmj9ifmchKXZXG2y7ksvQzoTGAQ=G-jw@mail.gmail.com>
-Subject: Re: [PATCH v2 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to
+Date:   Mon, 7 Nov 2022 21:38:57 -0800
+Message-ID: <CAAeT=FyR_4d1HzDjNEdVhsdgzRuBGuEwGuoMYY0xvi+YAbMqSg@mail.gmail.com>
+Subject: Re: [PATCH v3 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to
  be set from userspace
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -79,25 +75,85 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Marc,
 
-> > BTW, if we have no intention of supporting a mix of vCPUs with and
-> > without PMU, I think it would be nice if we have a clear comment on
-> > that in the code.  Or I'm hoping to disallow it if possible though.
+On Mon, Nov 7, 2022 at 1:16 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> I'm not sure we're in a position to do this right now. The current API
-> has always (for good or bad reasons) been per-vcpu as it is tied to
-> the vcpu initialisation.
+> Allow userspace to write ID_AA64DFR0_EL1, on the condition that only
+> the PMUver field can be altered and be at most the one that was
+> initially computed for the guest.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 40 ++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 39 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 7a4cd644b9c0..47c882401f3c 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1247,6 +1247,43 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+>         return 0;
+>  }
+>
+> +static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> +                              const struct sys_reg_desc *rd,
+> +                              u64 val)
+> +{
+> +       u8 pmuver, host_pmuver;
+> +       bool valid_pmu;
+> +
+> +       host_pmuver = kvm_arm_pmu_get_pmuver_limit();
+> +
+> +       /*
+> +        * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
+> +        * as it doesn't promise more than what the HW gives us. We
+> +        * allow an IMPDEF PMU though, only if no PMU is supported
+> +        * (KVM backward compatibility handling).
+> +        */
+> +       pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
+> +       if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver) ||
+> +           (pmuver != 0 && pmuver < ID_AA64DFR0_EL1_PMUVer_IMP))
 
-Thank you for your comments!
-Then, when a guest that has a mix of vCPUs with and without PMU,
-userspace can set kvm->arch.dfr0_pmuver to zero or IMPDEF, and the
-PMUVER for vCPUs with PMU will become 0 or IMPDEF as I mentioned.
-For instance, on the host whose PMUVER==1, if vCPU#0 has no PMU(PMUVER==0),
-vCPU#1 has PMU(PMUVER==1), if the guest is migrated to another host with
-same CPU features (PMUVER==1), if SET_ONE_REG of ID_AA64DFR0_EL1 for vCPU#0
-is done after for vCPU#1, kvm->arch.dfr0_pmuver will be set to 0, and
-the guest will see PMUVER==0 even for vCPU1.
-
-Should we be concerned about this case?
+Nit: Since this second condition cannot be true (right?), perhaps it might
+be rather confusing?  I wasn't able to understand what it meant until
+I see the equivalent check in set_id_dfr0_el1() (Maybe just me though:).
 
 Thank you,
 Reiji
+
+
+> +               return -EINVAL;
+> +
+> +       valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+> +
+> +       /* Make sure view register and PMU support do match */
+> +       if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+> +               return -EINVAL;
+> +
+> +       /* We can only differ with PMUver, and anything else is an error */
+> +       val ^= read_id_reg(vcpu, rd);
+> +       val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+> +       if (val)
+> +               return -EINVAL;
+> +
+> +       vcpu->kvm->arch.dfr0_pmuver = pmuver;
+> +
+> +       return 0;
+> +}
+> +
+>  /*
+>   * cpufeature ID register user accessors
+>   *
+> @@ -1508,7 +1545,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>         ID_UNALLOCATED(4,7),
+>
+>         /* CRm=5 */
+> -       ID_SANITISED(ID_AA64DFR0_EL1),
+> +       { SYS_DESC(SYS_ID_AA64DFR0_EL1), .access = access_id_reg,
+> +         .get_user = get_id_reg, .set_user = set_id_aa64dfr0_el1, },
+>         ID_SANITISED(ID_AA64DFR1_EL1),
+>         ID_UNALLOCATED(5,2),
+>         ID_UNALLOCATED(5,3),
+> --
+> 2.34.1
+>
+>
