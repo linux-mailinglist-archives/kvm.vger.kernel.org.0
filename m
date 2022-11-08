@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 76C18621A12
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 18:09:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC292621A0F
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 18:09:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234292AbiKHRJS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 12:09:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45354 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234269AbiKHRJQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S234287AbiKHRJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Tue, 8 Nov 2022 12:09:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45314 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233736AbiKHRJM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 12:09:12 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0351A528A3
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 09:08:15 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB3C421E19
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 09:08:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667927295;
+        s=mimecast20190719; t=1667927293;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3DZzVaTb8ZcE2rexgrMNXJqh3vRsjkFL61vNK5okDmI=;
-        b=X/m8brdQx5vtIRS9GFevzZNKiWTlOZlIEpqOmZVyRZcvmcXO74eAIGpNhUqNIQXEEQ8PTE
-        ciQcLncKNPQkGTjK/B/d0aGDSHa6KTxv8Cjaq8JNZY6cYqe6jWQSh52fpYIXy5AUrgc4Kf
-        0LFhyivJfKQHsUNiUWhDPUksLBY4HAg=
+        bh=18cZXcVgJyLKC9lzh1MkmwE4AjL3G0XUfwNWSpydwoE=;
+        b=G7rvo3g0vn8LZYUs5UBp/YcSXFN/ctTPuoJlIJ4ug1Yig59CLLb03PNtEr8KA+gKA3Xzb2
+        4dGhStTFqvG6sqxTRvFHs6ApnqDKH5E3NDp1n4H0Xetw9f4tMD2Bg+5M6sL3YQtDtZV26Q
+        MrbUYNlILluWoS/57oKyRJN0g2iTzfc=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-462-A4gXSZKiO5asIT9v3c_hvg-1; Tue, 08 Nov 2022 12:08:08 -0500
-X-MC-Unique: A4gXSZKiO5asIT9v3c_hvg-1
+ us-mta-382--TS72wqTMBqdQ3Ioi5HGqQ-1; Tue, 08 Nov 2022 12:08:10 -0500
+X-MC-Unique: -TS72wqTMBqdQ3Ioi5HGqQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9E1C0101AA47;
-        Tue,  8 Nov 2022 17:08:05 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E2386101E157;
+        Tue,  8 Nov 2022 17:08:08 +0000 (UTC)
 Received: from eperezma.remote.csb (unknown [10.39.193.47])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9F303C1E88E;
-        Tue,  8 Nov 2022 17:08:02 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E3E50C15BB5;
+        Tue,  8 Nov 2022 17:08:05 +0000 (UTC)
 From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Parav Pandit <parav@mellanox.com>,
@@ -54,9 +54,9 @@ Cc:     Parav Pandit <parav@mellanox.com>,
         Zhu Lingshan <lingshan.zhu@intel.com>, kvm@vger.kernel.org,
         "Gonglei (Arei)" <arei.gonglei@huawei.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v6 01/10] vdpa: Use v->shadow_vqs_enabled in vhost_vdpa_svqs_start & stop
-Date:   Tue,  8 Nov 2022 18:07:46 +0100
-Message-Id: <20221108170755.92768-2-eperezma@redhat.com>
+Subject: [PATCH v6 02/10] vhost: set SVQ device call handler at SVQ start
+Date:   Tue,  8 Nov 2022 18:07:47 +0100
+Message-Id: <20221108170755.92768-3-eperezma@redhat.com>
 In-Reply-To: <20221108170755.92768-1-eperezma@redhat.com>
 References: <20221108170755.92768-1-eperezma@redhat.com>
 MIME-Version: 1.0
@@ -73,39 +73,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This function used to trust in v->shadow_vqs != NULL to know if it must
-start svq or not.
+By the end of this series CVQ is shadowed as long as the features
+support it.
 
-This is not going to be valid anymore, as qemu is going to allocate svq
-unconditionally (but it will only start them conditionally).
+Since we don't know at the beginning of qemu running if this is
+supported, move the event notifier handler setting to the start of the
+SVQ, instead of the start of qemu run.
 
 Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
 ---
- hw/virtio/vhost-vdpa.c | 4 ++--
+ hw/virtio/vhost-shadow-virtqueue.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-index 7468e44b87..7f0ff4df5b 100644
---- a/hw/virtio/vhost-vdpa.c
-+++ b/hw/virtio/vhost-vdpa.c
-@@ -1029,7 +1029,7 @@ static bool vhost_vdpa_svqs_start(struct vhost_dev *dev)
-     Error *err = NULL;
-     unsigned i;
- 
--    if (!v->shadow_vqs) {
-+    if (!v->shadow_vqs_enabled) {
-         return true;
-     }
- 
-@@ -1082,7 +1082,7 @@ static void vhost_vdpa_svqs_stop(struct vhost_dev *dev)
+diff --git a/hw/virtio/vhost-shadow-virtqueue.c b/hw/virtio/vhost-shadow-virtqueue.c
+index 5bd14cad96..264ddc166d 100644
+--- a/hw/virtio/vhost-shadow-virtqueue.c
++++ b/hw/virtio/vhost-shadow-virtqueue.c
+@@ -648,6 +648,7 @@ void vhost_svq_start(VhostShadowVirtqueue *svq, VirtIODevice *vdev,
  {
-     struct vhost_vdpa *v = dev->opaque;
+     size_t desc_size, driver_size, device_size;
  
--    if (!v->shadow_vqs) {
-+    if (!v->shadow_vqs_enabled) {
-         return;
++    event_notifier_set_handler(&svq->hdev_call, vhost_svq_handle_call);
+     svq->next_guest_avail_elem = NULL;
+     svq->shadow_avail_idx = 0;
+     svq->shadow_used_idx = 0;
+@@ -704,6 +705,7 @@ void vhost_svq_stop(VhostShadowVirtqueue *svq)
+     g_free(svq->desc_state);
+     qemu_vfree(svq->vring.desc);
+     qemu_vfree(svq->vring.used);
++    event_notifier_set_handler(&svq->hdev_call, NULL);
+ }
+ 
+ /**
+@@ -740,7 +742,6 @@ VhostShadowVirtqueue *vhost_svq_new(VhostIOVATree *iova_tree,
      }
  
+     event_notifier_init_fd(&svq->svq_kick, VHOST_FILE_UNBIND);
+-    event_notifier_set_handler(&svq->hdev_call, vhost_svq_handle_call);
+     svq->iova_tree = iova_tree;
+     svq->ops = ops;
+     svq->ops_opaque = ops_opaque;
+@@ -763,7 +764,6 @@ void vhost_svq_free(gpointer pvq)
+     VhostShadowVirtqueue *vq = pvq;
+     vhost_svq_stop(vq);
+     event_notifier_cleanup(&vq->hdev_kick);
+-    event_notifier_set_handler(&vq->hdev_call, NULL);
+     event_notifier_cleanup(&vq->hdev_call);
+     g_free(vq);
+ }
 -- 
 2.31.1
 
