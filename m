@@ -2,234 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B9FE62126A
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 14:28:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD94A6212B3
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 14:42:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233953AbiKHN2H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 08:28:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33508 "EHLO
+        id S234374AbiKHNmF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 08:42:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234474AbiKHN2D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 08:28:03 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2056.outbound.protection.outlook.com [40.107.92.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37BE1554FD;
-        Tue,  8 Nov 2022 05:28:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WeqxVtiH8KNVMr2VLTjzxV0NTuzuNaHVt1+ZZe3tUdrp6f8Q+gndq8CFmF5qact471JLNHr6I4y2HoFBb7Dp0vaXyNkbmQJZIfenhR2AhU3p7W/VIHSPjNZ64LlotUB9VqYvjRXVlEnGGCaaJv4uTA6DQ7ECYSrBzqKtrndZ/UgzkRwc1xhf3tXqku2cOentqDym0p6FvFCnA3K670FELd622PPijM02wtthnhun27N1KmyBWVnLCWRoxWQMKDQhSqrlqHGnZmatfHVr9sxWTdDDgZtoqtn9FGbrHyv1i/qm088r6y+hvlSeyobChRfA+VSCYJ0yBmtbrTNcezEJ8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=anWd9qsmXPVJDhNrHatEy47iIrUfy+/8r5t/+YGNz44=;
- b=Ie9g9OAt8Vis5Vrnj4Nn0Oh+aCnBzJzdr+XXXcuNkhZWzeWxdSBJxuqB85Q8TUGc7PcHPbGOvr55GFfjJujjlZu6oBaeGmCxiD0QK132F79gaiuZxyZblLESjleZYMfIfYAYWTzg7K9BikhXUUu+oBXvTr4gPxlUwOLP4SfXSiyzOj5Opnz4H2eyz2wjjoLQA3TZnPxpg+zHWNSLUKrw7Re5vl0uYjLAhNV3xyNIQLEeKzRa4CMW12oW8L9DzDVn7NPx3I/sGu3XhLnrvt85YfVXxuHnUPP6GKDOnAUGbIkP2Mx38O3YkHSyqOdsyrOmqWM+m9mlurIsZRP6p1aqYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=anWd9qsmXPVJDhNrHatEy47iIrUfy+/8r5t/+YGNz44=;
- b=h1aKhNsbEHAmU9sn6rgFE+b/ARIimB6h8CdMFuSR/GyUVqWOXcRllAcdYNhWwriwXj3mKZqBuZPlFpItsiUCSAN9EkSoVR8FTLJlAimu872QrKucM9QfqbKwvwdyZTPbS7f+Y6Wdy5zDv+Piawnc0x6kqBEbbTtdF/+e1cxg3qxmgo3ANlSOm2V7lOj2gze8rd3V4SWv8IKUf/jmnWQtf4nUnchZNCcePWF+zlF4pVZRkK0OfHuv9oEJ0gmNuouEkou5eQmkw+iVFUhZAGN8L5EiGIcNsr0bjvQ/Mzy+VIcwyizs4nXNh2Rgg17oElHQ+no4sq3xOzGUTjAiYSh5Og==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CY8PR12MB7514.namprd12.prod.outlook.com (2603:10b6:930:92::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27; Tue, 8 Nov
- 2022 13:27:59 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
- 13:27:59 +0000
-Date:   Tue, 8 Nov 2022 09:27:57 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Nicolin Chen <nicolinc@nvidia.com>
-Cc:     bpf@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v4 15/17] iommufd: Add a selftest
-Message-ID: <Y2pZXStDpLla+P1u@nvidia.com>
-References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <15-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <Y2ntsDi4RSLtUVKm@Asurada-Nvidia>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y2ntsDi4RSLtUVKm@Asurada-Nvidia>
-X-ClientProxiedBy: MN2PR03CA0009.namprd03.prod.outlook.com
- (2603:10b6:208:23a::14) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S234442AbiKHNlu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 08:41:50 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B621D51C38;
+        Tue,  8 Nov 2022 05:41:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667914909; x=1699450909;
+  h=message-id:date:mime-version:from:subject:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=FmRgVS4cTjgYRBdIR1Sl5CCtDj0f4AUy7bzdc1murYw=;
+  b=NZUJPMEMU0skIf1/6SkrAr9OYPhY+PZblPx6Mxqwt1c2BBC4j/oIXuGw
+   w+xRjB0eLpbE1KoK28549yF8P7xUSqfQQmHwtL+U2+a/Y/2uKiVxLAe2+
+   1adGBI7/Ld2TkaVcikvDEWKQCKozAzrOy0POOkHi1Bh4NM98WosJ9DHDk
+   s65aDuh57oeTYitOWFq8QGYx2Mcqb7M9BfFmu/vJskVHUj68e3Ap9+YPg
+   dha1EJt3L10lcxgPUj9ldrHUAA9Itl/aBh9q6l00LFeUoA0pjaDTs/TkD
+   SrOFjMSbnfKoLBeez4LK8IV3u+lHlfb/4PxKKzyFFKibenXRv8qL6kQK/
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="310692476"
+X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; 
+   d="scan'208";a="310692476"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2022 05:41:49 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="811243110"
+X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; 
+   d="scan'208";a="811243110"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.255.28.143]) ([10.255.28.143])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2022 05:41:46 -0800
+Message-ID: <30be6d64-31bd-bfc8-72f7-fb57999e4566@linux.intel.com>
+Date:   Tue, 8 Nov 2022 21:41:44 +0800
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB7514:EE_
-X-MS-Office365-Filtering-Correlation-Id: 02d6114e-18bd-4b18-5f67-08dac18d0d79
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lcxSzgBPZMo2ihgPMUpvbqHH2YIZf17SMMGARXx+lKOeM4/esf1aOO248FliWfOm/10Ixr2tp6wSInO/PfTKx24VTUcdM2GXhiKaag1NNbJ0fhlGc5XdNgvtpjEDPDrQV4t3tyX+YVXsCirIrZ5AWH4hKdSCTOe23T30oKjb3J8vKksNQdYnFQK21K8jCl8bzWxPfUOvxkh33BBrbSsJ/CVcKL/aHtda+F5bDcY18tv4LGwWGkLGT0XfG31KsriGrrH2XSQ3aCtxhmfdr+tNwXG7WNXDcJGqPpw7pkq0YgPM+Fi1hnMUTqGiqCoBG4c5X/FQERj7XnhdCeACa8MfoiLYigxOmrntOHI2kYn1/7/OE2JYbjgFx2TKxmiF/dneGoFRuq5RrJ+quroH6NfLOLT7AHLojAwgeK70hcgop00xlOPzeQy1gyl0qIGZoQ7CkSwLn6rGlBGj90A22oJ4EGojvptOACwA+pY6/QDycIzJ42SlPah7uxrkwsIC7iNiZLRk9pNehW/rjgBsyNfdYz66VR0RFk3laH2AoAFNJ8uCkSU8+/vFCgH10l/TVjMJ1vbTgVjvAQZRI7qHxQSiFXFWyID/XVQHzjYmMyzhOMLGZ7/02dUnpjKZ19nNieqlNLD4I0dxvv8T3BsrvEubeJm5pvW0uGZxAbDGC5Dj53Yicuy7h5ZPTybgZovDpfIE4Yo/WveN1FKEm47PrIe7/iGu3T/tLljKWlOJJ6Ei1ShxKoiPhwjU9C8Ptj4A7Sr5
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(39860400002)(376002)(366004)(346002)(396003)(451199015)(6506007)(6512007)(26005)(83380400001)(5660300002)(38100700002)(2616005)(186003)(7416002)(7406005)(2906002)(37006003)(6486002)(54906003)(6636002)(6862004)(8676002)(478600001)(4326008)(41300700001)(8936002)(66476007)(66556008)(316002)(66946007)(36756003)(86362001)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bfh8MgF4bou5+BGsqzIEt3qlH+4ZlK3touwtpgZtFTYnAYOaNh771byJDHqh?=
- =?us-ascii?Q?TFMVeueH8b5IsOVqh6y6AptfHriNBTALB1QdHRrV7OCwFuyFKhmzDaVZRNFN?=
- =?us-ascii?Q?oQCrqF8BqS/mqSmAUkmF6WML0v0Q0+MzfaNUjIJLL5ByuW4AAFfBAZe1Wo3s?=
- =?us-ascii?Q?b7N2rC88u9nXHLu/1/PfL+M5BPbF8GF/AMEoARmHu+SEzVcmpnjhEzyCnBAz?=
- =?us-ascii?Q?4NWTxUE53U1AA5jGbKDCdYxBuwhBtq2bVTajLfI78cMVOSCcHWIeQTqHqBbu?=
- =?us-ascii?Q?X1p247pVD37Yaz6vrbfTjHpVfGy1fk98FvKrZIEGi6izDgbfN2tsSH2EsZ4I?=
- =?us-ascii?Q?arlMxge7TsWdjclVl2t/W1Y0XPva4bfm8b1Bt/fAy9IuDszzLBXwknUWyF3h?=
- =?us-ascii?Q?RkDtbZehGYNiWzQ93nqKGVan5qd0TeQe71UhsUtZ9uHNadNZ8ErdirwEARVS?=
- =?us-ascii?Q?QUsUv3VLEsnqdwHeDuKcmc7cBKRdfh9EOGTQegQH7gRw+41Z/Vkefvy8d++K?=
- =?us-ascii?Q?Vt6WjX2z8dtuFiL5OLtVlqyXNuDm9i4TmJRmaphHidMyEj92VrMqFdLUgE2m?=
- =?us-ascii?Q?hsIpZJUNr67mdeVguId31HF6GOc39Tx+g00KUlT/kbDVYQF/KWSlLJCrG5Fx?=
- =?us-ascii?Q?/fxi5pwLKQatC7Bxy10Mp3w03aTsBotUrCTLKsid907Z/8D9ovXX7gG+QGcY?=
- =?us-ascii?Q?bcxY0E/qziccMRfT6Dmg6ZgRymcB/INLFx+yz7MYwtleqZkI/lm8d4/akrJQ?=
- =?us-ascii?Q?g7gFH4otFuwdaq8jlnRJSWEqpfsyMwwBpGndvIDU761do+eVnm7PGL1DmX9o?=
- =?us-ascii?Q?hgc1bKsYjOSmko1CJzx9abUqZZoEaR3tr0GAaSSunaosT+QjS+ctTL6Um31K?=
- =?us-ascii?Q?oWNj3+QREuSETwrfWjuBjnnlRhsGx/95Bt5ZMMVKi1ZLx2FhN1woZ0HG1dlL?=
- =?us-ascii?Q?NfGhEDKyAVfD1UxxY75oXKL0GiVWOiBi09TIfLyF/gtTNrtsKveDPUrC+t7D?=
- =?us-ascii?Q?tmtVvfTTOt0qbErTmG/VrIsf4hPa4Ll/u6R65vKXTOt/m87F4WLiZ5CcGrlc?=
- =?us-ascii?Q?WZYtuA4kMkFNuGdVafSvbI3AgzPiU0v2HZ0dgRN4/00QD6Sa/aDMte5/PLZ7?=
- =?us-ascii?Q?DUqQCO0RM1T4Vr2SjXYDyigxqg7cZakyCMs/RcNppT7snwzzOnR4hgc9ESDt?=
- =?us-ascii?Q?rR/oGSn4+QEY8BoMxr71c702FqXGtKq6kE8xt0rsScag/lXh4Uv5eXyecuNl?=
- =?us-ascii?Q?ttkaKw8hZUfcb/2qsHLnLMP9J1y2Ku8GFd0+uJSycwv2vkjT4fIU7L4b+yE5?=
- =?us-ascii?Q?hsIlbHvvmlT72srhmHsZ8CgFAuOj1apCZ188pZZzCKXqrSrO6wgtMqPH2PBH?=
- =?us-ascii?Q?qzvgKaxJKEd+uwob+WUZgamsAFjhjwCM+Qjgbfli6PdkYfzBe8EM08iaQ7DG?=
- =?us-ascii?Q?k7tRPwf/EiXtuLuASPL5pZrJaOY22qLGNRDZj8yli5N0zbo6DlfmiLCailel?=
- =?us-ascii?Q?8N4QjB2IrvmL8zpdnJ94ET+Qg3Y2I+WCjJVATadykvoGGJ4B/JXo+YcOKk8W?=
- =?us-ascii?Q?BICtTzFzyNXkwuwYZIc=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02d6114e-18bd-4b18-5f67-08dac18d0d79
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2022 13:27:58.9298
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2SigL4fzAAIqRiSSjnto1zoiY8Gkp+FbHAxe2/jDW+H+y4mhtdWo6FoMfS/X2Z1h
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7514
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+Subject: Re: [PATCH v10 049/108] KVM: x86/tdp_mmu: Support TDX private mapping
+ for TDP MMU
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>
+References: <cover.1667110240.git.isaku.yamahata@intel.com>
+ <9d5595dfe1b5ab77bcb5650bc4d940dd977b0a32.1667110240.git.isaku.yamahata@intel.com>
+In-Reply-To: <9d5595dfe1b5ab77bcb5650bc4d940dd977b0a32.1667110240.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 09:48:32PM -0800, Nicolin Chen wrote:
-> On Mon, Nov 07, 2022 at 08:49:08PM -0400, Jason Gunthorpe wrote:
-> 
-> > diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
-> 
-> > +TEST_F(iommufd, cmd_length)
-> > +{
-> > +#define TEST_LENGTH(_struct, _ioctl)                                     \
-> > +	{                                                                \
-> > +		struct {                                                 \
-> > +			struct _struct cmd;                              \
-> > +			uint8_t extra;                                   \
-> > +		} cmd = { .cmd = { .size = sizeof(struct _struct) - 1 }, \
-> > +			  .extra = UINT8_MAX };                          \
-> > +		int old_errno;                                           \
-> > +		int rc;                                                  \
-> > +									 \
-> > +		EXPECT_ERRNO(EOPNOTSUPP, ioctl(self->fd, _ioctl, &cmd)); \
-> 
-> I guess it should be EINVAL corresponding to updated kernel code?
-> 
-> > +TEST_F(iommufd, cmd_ex_fail)
-> > +{
-> > +	struct {
-> > +		struct iommu_destroy cmd;
-> > +		__u64 future;
-> > +	} cmd = { .cmd = { .size = sizeof(cmd), .id = 0 } };
-> > +
-> > +	/* object id is invalid and command is longer */
-> > +	EXPECT_ERRNO(ENOENT, ioctl(self->fd, IOMMU_DESTROY, &cmd));
-> > +	/* future area is non-zero */
-> > +	cmd.future = 1;
-> > +	EXPECT_ERRNO(E2BIG, ioctl(self->fd, IOMMU_DESTROY, &cmd));
-> > +	/* Original command "works" */
-> > +	cmd.cmd.size = sizeof(cmd.cmd);
-> > +	EXPECT_ERRNO(ENOENT, ioctl(self->fd, IOMMU_DESTROY, &cmd));
-> > +	/* Short command fails */
-> > +	cmd.cmd.size = sizeof(cmd.cmd) - 1;
-> > +	EXPECT_ERRNO(EOPNOTSUPP, ioctl(self->fd, IOMMU_DESTROY, &cmd));
-> 
-> Ditto
 
-Oops, yes, I fixed these
+On 2022/10/30 14:22, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata<isaku.yamahata@intel.com>
+>
+> Allocate protected page table for private page table, and add hooks to
+> operate on protected page table.  This patch adds allocation/free of
+> protected page tables and hooks.  When calling hooks to update SPTE entry,
+> freeze the entry, call hooks and unfree
 
-> 
-> > +TEST_HARNESS_MAIN
-> > diff --git a/tools/testing/selftests/iommu/iommufd_fail_nth.c b/tools/testing/selftests/iommu/iommufd_fail_nth.c
-> 
-> > +static void fail_nth_first(struct __test_metadata *_metadata,
-> > +			   struct fail_nth_state *nth_state)
-> > +{
-> > +	char buf[300];
-> > +
-> > +	snprintf(buf, sizeof(buf), "/proc/self/task/%u/fail-nth", gettid());
-> 
-> Not sure what's missing, I have a build error at gettid. Copying
-> a solution from tools/perf/jvmti/jvmti_agent.c file, can fix with:
+unfreeze
 
-I think your glibc is probably old
 
-> ------------------------------
-> diff --git a/tools/testing/selftests/iommu/iommufd_fail_nth.c b/tools/testing/selftests/iommu/iommufd_fail_nth.c
-> index 99eaa9f32e0b..7704b3a754d3 100644
-> --- a/tools/testing/selftests/iommu/iommufd_fail_nth.c
-> +++ b/tools/testing/selftests/iommu/iommufd_fail_nth.c
-> @@ -19,6 +19,7 @@
->  
->  #define __EXPORTED_HEADERS__
->  #include <linux/vfio.h>
-> +#include <syscall.h> /* for gettid() */
->  
->  #include "iommufd_utils.h"
->  
-> @@ -84,6 +85,13 @@ struct fail_nth_state {
->         unsigned int iteration;
->  };
->  
-> +#ifndef HAVE_GETTID
-> +static inline pid_t gettid(void)
-> +{
-> +       return (pid_t)syscall(__NR_gettid);
-> +}
-> +#endif
+>   the entry to allow concurrent
+> updates on page tables.  Which is the advantage of TDP MMU.  As
+> kvm_gfn_shared_mask() returns false always, those hooks aren't called yet
+> with this patch.
+>
+> When the faulting GPA is private, the KVM fault is called private.  When
+> resolving private KVM,
 
-Ah, there is a lot of complicated makefile stuff to make this work,
-and it only works for perf/bpf not selftests
+private KVM fault？
 
-It looks like there is no reason for this to need gettid, we don't use
-threads. So this can just be getpid and that is portable.
 
-Thanks,
-Jason
+> allocate protected page table and call hooks to
+> operate on protected page table. On the change of the private PTE entry,
+> invoke kvm_x86_ops hook in __handle_changed_spte() to propagate the change
+> to protected page table. The following depicts the relationship.
+>
+>    private KVM page fault   |
+>        |                    |
+>        V                    |
+>   private GPA               |     CPU protected EPTP
+>        |                    |           |
+>        V                    |           V
+>   private PT root           |     protected PT root
+>        |                    |           |
+>        V                    |           V
+>     private PT --hook to propagate-->protected PT
+>        |                    |           |
+>        \--------------------+------\    |
+>                             |      |    |
+>                             |      V    V
+>                             |    private guest page
+>                             |
+>                             |
+>       non-encrypted memory  |    encrypted memory
+>                             |
+> PT: page table
+>
+> The existing KVM TDP MMU code uses atomic update of SPTE.  On populating
+> the EPT entry, atomically set the entry.  However, it requires TLB
+> shootdown to zap SPTE.  To address it, the entry is frozen with the special
+> SPTE value that clears the present bit. After the TLB shootdown, the entry
+> is set to the eventual value (unfreeze).
+>
+> For protected page table, hooks are called to update protected page table
+> in addition to direct access to the private SPTE. For the zapping case, it
+> works to freeze the SPTE. It can call hooks in addition to TLB shootdown.
+> For populating the private SPTE entry, there can be a race condition
+> without further protection
+>
+>    vcpu 1: populating 2M private SPTE
+>    vcpu 2: populating 4K private SPTE
+>    vcpu 2: TDX SEAMCALL to update 4K protected SPTE => error
+>    vcpu 1: TDX SEAMCALL to update 2M protected SPTE
+>
+> To avoid the race, the frozen SPTE is utilized.  Instead of atomic update
+> of the private entry, freeze the entry, call the hook that update protected
+> SPTE, set the entry to the final value.
+>
+> Support 4K page only at this stage.  2M page support can be done in future
+> patches.
+>
+> Co-developed-by: Kai Huang<kai.huang@intel.com>
+> Signed-off-by: Kai Huang<kai.huang@intel.com>
+> Signed-off-by: Isaku Yamahata<isaku.yamahata@intel.com>
+> ---
+>   arch/x86/include/asm/kvm-x86-ops.h |   5 +
+>   arch/x86/include/asm/kvm_host.h    |  11 ++
+>   arch/x86/kvm/mmu/mmu.c             |  15 +-
+>   arch/x86/kvm/mmu/mmu_internal.h    |  32 ++++
+>   arch/x86/kvm/mmu/tdp_iter.h        |   2 +-
+>   arch/x86/kvm/mmu/tdp_mmu.c         | 244 +++++++++++++++++++++++++----
+>   arch/x86/kvm/mmu/tdp_mmu.h         |   2 +-
+>   virt/kvm/kvm_main.c                |   1 +
+>   8 files changed, 280 insertions(+), 32 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index f28c9fd72ac4..1b01dc2098b0 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -94,6 +94,11 @@ KVM_X86_OP_OPTIONAL_RET0(set_tss_addr)
+>   KVM_X86_OP_OPTIONAL_RET0(set_identity_map_addr)
+>   KVM_X86_OP_OPTIONAL_RET0(get_mt_mask)
+>   KVM_X86_OP(load_mmu_pgd)
+> +KVM_X86_OP_OPTIONAL(link_private_spt)
+> +KVM_X86_OP_OPTIONAL(free_private_spt)
+> +KVM_X86_OP_OPTIONAL(set_private_spte)
+> +KVM_X86_OP_OPTIONAL(remove_private_spte)
+> +KVM_X86_OP_OPTIONAL(zap_private_spte)
+>   KVM_X86_OP(has_wbinvd_exit)
+>   KVM_X86_OP(get_l2_tsc_offset)
+>   KVM_X86_OP(get_l2_tsc_multiplier)
+>
+> @@ -509,9 +524,81 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
+>   		WARN_ON_ONCE(ret);
+>   	}
+>   
+> +	if (is_private_sp(sp) &&
+> +	    WARN_ON(static_call(kvm_x86_free_private_spt)(kvm, sp->gfn, sp->role.level,
+> +							  kvm_mmu_private_spt(sp)))) {
+> +		/*
+> +		 * Failed to unlink Secure EPT page and there is nothing to do
+> +		 * further.  Intentionally leak the page to prevent the kernel
+> +		 * from accessing the encrypted page.
+> +		 */
+> +		kvm_mmu_init_private_spt(sp, NULL);
+
+Do you think is it better to add some statistics for the intentinal 
+leakage?
+
+
+> +	}
+> +
+>   	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+>   }
+>   
+> pu, until a matching vcpu_put()
