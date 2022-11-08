@@ -2,121 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38C59621952
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 17:26:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 971FA62194F
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 17:25:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234233AbiKHQ0i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 11:26:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55634 "EHLO
+        id S234609AbiKHQZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 11:25:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233928AbiKHQ0h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 11:26:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 398711FF92
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 08:25:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667924741;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4jQy74ZlfgTAGdlikZL4pyUPBXZ8/ebOOwzW3CX4iwk=;
-        b=YMFtIxavRISVyaWvagEdaK0sG8RXtwk8352bLolj9MCsV9rGEPPSlU08A6sq2YsZnYBjHX
-        4EQFspiufX65jF5fqNBB4jUvBt/u/cPpyHnIYQOzUJqZDgB6GvARNJwJSXlI5ztM/g9/KL
-        sxqHQD7drQWQmTYmNWgB2aKUA4XlKnc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-563-3uOVuMZnOyWO6o4dVkg0ag-1; Tue, 08 Nov 2022 11:25:39 -0500
-X-MC-Unique: 3uOVuMZnOyWO6o4dVkg0ag-1
-Received: by mail-wm1-f70.google.com with SMTP id c10-20020a7bc84a000000b003cf81c2d3efso4037210wml.7
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 08:25:39 -0800 (PST)
+        with ESMTP id S232035AbiKHQZw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 11:25:52 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5A19222AE
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 08:25:50 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id m6-20020a17090a5a4600b00212f8dffec9so13877895pji.0
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 08:25:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZTF7zBV9BebekratF2JVorEYVbhlKTgdQ9m8AxTWHRk=;
+        b=rQzrBHKna1kMWB/FTWk17gtE5olvWShg6ghF8NLwazHqkAG98BIFOuEmDIqeZcx0Dq
+         x8TI9L3ATQXwCsMqDemKLxtgDjBO6h+7iozA96wlf4afwjPbN2O7/BmSACchQ1QsBSAY
+         eIxZleAKK3blkRPX68m5b61IHnX2CnofahbVYhopt+kNyHT7kfQuVhwWNAabRDMMmfhW
+         t8j80v6pWp0hGYnUJ7nEDa9DOVBX2Dq74yy9NjvDuZPIxoG6MTgPKpDOvKuo2WCJg9rz
+         asY7HP/PV4JhksLG2wQXKRcQ9jPcOh3uUTagyaE0gls3Uinuu0RmvyVj+HddGKugWBSj
+         XtPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4jQy74ZlfgTAGdlikZL4pyUPBXZ8/ebOOwzW3CX4iwk=;
-        b=l9rFScgsAiGTP9lRi0AyuMsJuc25ineq59RXhi6OPXP7DOStnN2XqQ3jeODxZlFADc
-         9U8nYWI1n9pnFLRASHFpFrUZsXSQ7ypnLGf2keKyqRIErZBrYJHM9GZhtepj1hyCGzux
-         IqmaP0AvRb4Mo4eraE/l1sT1/3KjU1JMf0snRBBdD7xf6/Z9j7Atj2UuRAPKByZx7Ygn
-         qkXm5psgsALQl0BlFWMzqr8zSNyS/D4Ty7FpyQ2NHFZClXskhHeEv6/SAdHV0lkbrmRJ
-         TOSJ8NBmLLBoZYNHrdV5h+J9wcHMYpTiXv/7p9v3K60qsoI4bIW5+1UrAXKoxLvVfZ9c
-         gPHg==
-X-Gm-Message-State: ACrzQf09jCq8wLWEjnvKcstcTZ799oQTRo13saMYJlOlF3gukM33vbKu
-        3f9jThmn8xLUNH8pv2vVg73q0vXldlXNduG4IslHIjisNMIDleYC2ACZLOwlCmQ4nhD+/VgV7Qm
-        PDCcZ/P02YRub
-X-Received: by 2002:a05:600c:1c1e:b0:3c6:fa3c:32a9 with SMTP id j30-20020a05600c1c1e00b003c6fa3c32a9mr47405725wms.203.1667924738607;
-        Tue, 08 Nov 2022 08:25:38 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM4wN1CbSK2UwZVMADUtaPh0RFDoA7/DTsc453ktjQjnO9KW8VMErardGfZu4ufvb8J3cKZZ+Q==
-X-Received: by 2002:a05:600c:1c1e:b0:3c6:fa3c:32a9 with SMTP id j30-20020a05600c1c1e00b003c6fa3c32a9mr47405704wms.203.1667924738384;
-        Tue, 08 Nov 2022 08:25:38 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id h19-20020a05600c351300b003b4ff30e566sm34421532wmq.3.2022.11.08.08.25.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Nov 2022 08:25:37 -0800 (PST)
-Message-ID: <8e3bd959-bf0b-9104-2ca2-b745c0d9ff48@redhat.com>
-Date:   Tue, 8 Nov 2022 17:25:36 +0100
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZTF7zBV9BebekratF2JVorEYVbhlKTgdQ9m8AxTWHRk=;
+        b=UfMIrTOZI9x+QrUi5e/1cXLNF1DvAqfNqe6k4wubkp2yNtTycZyt1r7RuqlowXTAci
+         bUj6+7DWZybPfbeccUqIs6fXghKrHv4DI+Ssa0S101smr7x3aC6imKrjb6XUO3wcbwFs
+         qTfsJ11KtKqTETGSelrDjY0Fb8dX2rGfhkK3pOKU5OPPfKkSU808W3mrHERb/bRoXLO0
+         H4BGRAoSWRte8DfI683Q9odnIv31Ys1wycWK0vQYFbgk0W4HUQTSnAbRUCGkRqWWdCny
+         uJMzobISlq2hLir4dTRnEkswTUJPoVPOE97Vpx7MAwdpx4ZHtTltj+TKdQLilaJVPxLS
+         0qxw==
+X-Gm-Message-State: ACrzQf3Ge1BgOX8xGVdcErRGflpgP3ijunrn2ol5gblQdNMZEaDjQGGZ
+        Br1zlC3YqMraWemiWyPSDpzOccyyQeBIwg==
+X-Google-Smtp-Source: AMsMyM5ulA1kczG/5edhpphYQpzdwQVBPzle22DMXKS1AiAksaw+qNmqzhYbIHAV8riAiSrCetMPNw==
+X-Received: by 2002:a17:902:8ecc:b0:188:5f4b:260e with SMTP id x12-20020a1709028ecc00b001885f4b260emr27873892plo.111.1667924750257;
+        Tue, 08 Nov 2022 08:25:50 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id ij22-20020a170902ab5600b0017f36638010sm7078822plb.276.2022.11.08.08.25.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Nov 2022 08:25:49 -0800 (PST)
+Date:   Tue, 8 Nov 2022 16:25:46 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com,
+        andrew.jones@linux.dev, ajones@ventanamicro.com,
+        bgardon@google.com, dmatlack@google.com, will@kernel.org,
+        suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+        pbonzini@redhat.com, maz@kernel.org, peterx@redhat.com,
+        oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v9 3/7] KVM: Support dirty ring in conjunction with bitmap
+Message-ID: <Y2qDCqFeL1vwqq3f@google.com>
+References: <20221108041039.111145-1-gshan@redhat.com>
+ <20221108041039.111145-4-gshan@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [RFC PATCH 3/3] kvm: Atomic memslot updates
-Content-Language: en-US
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        Yanan Wang <wangyanan55@huawei.com>, kvm@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>
-References: <20221104151454.136551-1-eesposit@redhat.com>
- <20221104151454.136551-4-eesposit@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221104151454.136551-4-eesposit@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221108041039.111145-4-gshan@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/4/22 16:14, Emanuele Giuseppe Esposito wrote:
-> +    g_assert(qemu_mutex_iothread_locked());
+On Tue, Nov 08, 2022, Gavin Shan wrote:
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 800f9470e36b..228be1145cf3 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -33,6 +33,14 @@ config HAVE_KVM_DIRTY_RING_ACQ_REL
+>         bool
+>         select HAVE_KVM_DIRTY_RING
+>  
+> +# Only architectures that need to dirty memory outside of a vCPU
+> +# context should select this, advertising to userspace the
+> +# requirement to use a dirty bitmap in addition to the vCPU dirty
+> +# ring.
 
-Please add a comment here:
+The Kconfig does more than advertise a feature to userspace.
 
-     /* Block further invocations of the ioctls outside the BQL.  */
+ # Allow enabling both the dirty bitmap and dirty ring.  Only architectures that
+ # need to dirty memory outside of a vCPU context should select this.
 
-> +    CPU_FOREACH(cpu) {
-> +        qemu_lockcnt_lock(&cpu->in_ioctl_lock);
-> +    }
-> +    qemu_lockcnt_lock(&kvm_in_ioctl_lock);
->   
-> -    kvm_set_phys_mem(kml, section, false);
-> -    memory_region_unref(section->mr);
-> +    /* Inhibiting happens rarely, we can keep things simple and spin here. */
+> +config HAVE_KVM_DIRTY_RING_WITH_BITMAP
 
-Not making it spin is pretty easy.  You can add a qemu_event_set to 
-kvm_set_in_ioctl() and kvm_cpu_set_in_ioctl(), and here something like:
+I think we should replace "HAVE" with "NEED".  Any architecture that supports the
+dirty ring can easily support ring+bitmap, but based on the discussion from v5[*],
+the comment above, and the fact that the bitmap will _never_ be used in the
+proposed implementation because x86 will always have a vCPU, this Kconfig should
+only be selected if the bitmap is needed to support migration.
 
-     if (in_kvm_ioctls()) {
-         qemu_event_reset(&kvm_in_ioctl_event);
-         if (in_kvm_ioctls()) {
-             qemu_event_wait(&kvm_in_ioctl_event);
-         }
-     }
+[*] https://lore.kernel.org/all/Y0SxnoT5u7+1TCT+@google.com
 
-where in_kvm_ioctls() returns true if any (vCPU or KVM) lockcnt has a 
-nonzero count.
+> +	bool
+> +	depends on HAVE_KVM_DIRTY_RING
+> +
+>  config HAVE_KVM_EVENTFD
+>         bool
+>         select EVENTFD
+> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+> index fecbb7d75ad2..f95cbcdd74ff 100644
+> --- a/virt/kvm/dirty_ring.c
+> +++ b/virt/kvm/dirty_ring.c
+> @@ -21,6 +21,18 @@ u32 kvm_dirty_ring_get_rsvd_entries(void)
+>  	return KVM_DIRTY_RING_RSVD_ENTRIES + kvm_cpu_dirty_log_size();
+>  }
+>  
+> +bool kvm_use_dirty_bitmap(struct kvm *kvm)
+> +{
+> +	lockdep_assert_held(&kvm->slots_lock);
+> +
+> +	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
+> +}
+> +
+> +bool __weak kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
 
-Also please create a new header sysemu/accel-blocker.h and 
-accel/blocker.c or something like that with all the functions, because 
-this code can potentially be used by all KVM-like accelerators.
+Rather than __weak, what about wrapping this with an #ifdef to effectively force
+architectures to implement the override if they need ring+bitmap?  Given that the
+bitmap will never be used if there's a running vCPU, selecting the Kconfig without
+overriding this utility can't possibly be correct.
 
-Paolo
+  #ifndef CONFIG_NEED_KVM_DIRTY_RING_WITH_BITMAP
+  bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
+  {
+	return false;
+  }
+  #endif
 
+> @@ -4588,6 +4608,29 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>  			return -EINVAL;
+>  
+>  		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+> +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP: {
+> +		int r = -EINVAL;
+> +
+> +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+> +		    !kvm->dirty_ring_size)
+
+I have no objection to disallowing userspace from disabling the combo, but I
+think it's worth requiring cap->args[0] to be '0' just in case we change our minds
+in the future.
+
+> +			return r;
+> +
+> +		mutex_lock(&kvm->slots_lock);
+> +
+> +		/*
+> +		 * For simplicity, allow enabling ring+bitmap if and only if
+> +		 * there are no memslots, e.g. to ensure all memslots allocate
+> +		 * a bitmap after the capability is enabled.
+> +		 */
+> +		if (kvm_are_all_memslots_empty(kvm)) {
+> +			kvm->dirty_ring_with_bitmap = true;
+> +			r = 0;
+> +		}
+> +
+> +		mutex_unlock(&kvm->slots_lock);
+> +
+> +		return r;
+> +	}
+>  	default:
+>  		return kvm_vm_ioctl_enable_cap(kvm, cap);
+>  	}
+> -- 
+> 2.23.0
+> 
