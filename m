@@ -2,96 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10E7B620D88
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 11:42:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27D39620EDC
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 12:24:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233884AbiKHKl6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 05:41:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34656 "EHLO
+        id S233888AbiKHLYP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 06:24:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233618AbiKHKl5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 05:41:57 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3D38BC99;
-        Tue,  8 Nov 2022 02:41:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667904115; x=1699440115;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=ygzPxUg72VhUSOIbY1MyPNpSeL0qLoDe3788f0cgiV8=;
-  b=lwMugXzlY3/qPJeGXt59y2CFerPbh9V7PR0DBdiWEdArznn9VUIA7q/8
-   ArufR6DZltC2M/xH50pVKagb52huIq8S8t3sBd83mUDnCcBZxAObpn2sQ
-   BqATTNlAsQi1Ppsnsi6dCHr3oK1k/2lsCYycslhLF+g435Fa2BCWrgSoY
-   E6IZNYFRAcXbTTv5DMR9VZFpoPAFeL7IiZsNErARRgYR9MGc0mdo7Zo+d
-   V6eXuTuomZ4ukhrA2CFTRVXf1fa+zNkT6r+jpJzhj8zxoKd/zHVm5GOTI
-   jc56fLnPHvJAs42AeepQIDYh7dho4garwzc/tLJWZygKUO72/GgInTLGA
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="294034004"
-X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; 
-   d="scan'208";a="294034004"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2022 02:41:55 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="705250995"
-X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; 
-   d="scan'208";a="705250995"
-Received: from wanglin4-mobl.ccr.corp.intel.com (HELO localhost) ([10.249.173.199])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2022 02:41:52 -0800
-Date:   Tue, 8 Nov 2022 18:41:52 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     seanjc@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: VMX: Do not trap VMFUNC instructions for L1 guests.
-Message-ID: <20221108104152.mij7vchxhfpbcfpb@linux.intel.com>
-References: <20221107082727.1355797-1-yu.c.zhang@linux.intel.com>
- <c8f036f4-6ab1-efbe-dd60-b934c21cb21d@redhat.com>
+        with ESMTP id S233835AbiKHLYH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 06:24:07 -0500
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46B36419A1
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 03:24:00 -0800 (PST)
+Received: by mail-io1-xd30.google.com with SMTP id p141so11183859iod.6
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 03:24:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5B7dfi7xVJ3OslQ0ALi00lhJojz9IHhiYsVHA/RHqOE=;
+        b=Z2xz0F62PYjCBDaPJAMQlwAdSUUQxdVmjdSE1e/TEz5D6nfB7qYhDRauEt75dK7gsB
+         gtVoTdjw0oTaDS+z3idasRk9nIwydmI3O/a8UQatcsDJqkbGbIVyT1SuNX1kSLffYta+
+         MRaPM04Hv5NGx1PX+KL+YO7lfN7BHKCLYUZEhYaO6bT3eGqzCEeqoQdWOoaKJxxIWVcR
+         X5vaz/veLMrOj/9U4MKzAbNWDLkTVcyykPfCiQUtOALLeK724DexTS9gS8OIc8PPRbY4
+         YNmg+MP12x4a8uFh/63hJCJOP6eBt/pwec9yaAniUfCEq02k0DzqkBqfTrX2eYh/P4iT
+         mINw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:reply-to:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5B7dfi7xVJ3OslQ0ALi00lhJojz9IHhiYsVHA/RHqOE=;
+        b=Nu5AgADiIqKP4Xc41jND92XYUkyxgLc6zNcsXcGOLyIqCLLbWV3JWnnvLoaXZtJMDU
+         LjRXdDESsqLbDtjTwg0p796vbapSNOChrk7L6fHgxQ9lp5xrmiKC7+9AP4Zo5z5wQvG3
+         46diER2BNWgNCZR8Y9k5sOwzW+WljLJ4IHCQd3wlishkLTlM0+72knFteRdq8P6FC6BP
+         wja1+cF6lQ4/269wtmhBeVlZX13slsMtCg0JZpzxbRUyh5OdFWpknVMlKASPWONWNf6I
+         zGuB6gtWPbVr4W3072MKybd8g8eBllynrVuBa3pOJP0UUYcTCQbTU87+Ufj1O/A4XMCy
+         kbtA==
+X-Gm-Message-State: ACrzQf3hITpCm+RiOhIB2iJCGWIbYAL2CoRvnRc1xpa0lbTyKywYLgNP
+        zHO+r5bqwVvje6x4NjhVThny/W6+49oMih4jLIU=
+X-Google-Smtp-Source: AMsMyM5kag4nOyXiv058CAI4vKxtxp06JiPON4WELDl5Ot316dAXYP1rZp27aB4pLGdFMhJREf8MTcDs+CaUCGO8K58=
+X-Received: by 2002:a05:6602:2b06:b0:67f:fdf6:ffc2 with SMTP id
+ p6-20020a0566022b0600b0067ffdf6ffc2mr34602043iov.111.1667906639638; Tue, 08
+ Nov 2022 03:23:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c8f036f4-6ab1-efbe-dd60-b934c21cb21d@redhat.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Received: by 2002:a05:6638:1921:0:0:0:0 with HTTP; Tue, 8 Nov 2022 03:23:59
+ -0800 (PST)
+Reply-To: mrinvest1010@gmail.com
+From:   "K. A. Mr. Kairi" <ctocik10@gmail.com>
+Date:   Tue, 8 Nov 2022 03:23:59 -0800
+Message-ID: <CAEbPynvH+BZ99HK-COU1=n6MNs96giewbsO80XYSawcxKUtHrA@mail.gmail.com>
+Subject: Re: My Response..
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: Yes, score=5.0 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2607:f8b0:4864:20:0:0:0:d30 listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5000]
+        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
+        *      digit
+        *      [mrinvest1010[at]gmail.com]
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
+        *       in digit
+        *      [ctocik10[at]gmail.com]
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [ctocik10[at]gmail.com]
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        *  2.9 UNDISC_FREEM Undisclosed recipients + freemail reply-to
+        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
+        *      different freemails
+X-Spam-Level: *****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 06:20:23PM +0100, Paolo Bonzini wrote:
-> On 11/7/22 09:27, Yu Zhang wrote:
-> > VMFUNC is not supported for L1 guests, and executing VMFUNC in
-> > L1 shall generate a #UD directly. Just disable it in secondary
-> > proc-based execution control for L1, instead of intercepting it
-> > and inject the #UD again.
-> > 
-> > Signed-off-by: Yu Zhang<yu.c.zhang@linux.intel.com>
-> 
-> Is this for TDX or similar?  The reason for a patch should be mentioned in
-> the commit message.
+-- 
+Dear
 
-Thanks for your quick reply, Paolo. 
+How are you, I have a serious client, whom will be interested to
+invest in your country, I got your Details through the Investment
+Network and world Global Business directory.
 
-It is not a new feature. Just a clean up for VMFUNC, which is not
-supported by KVM for L1 guest.
+Let me know if you are interested for more details.....
 
-According to Intel SDM 25.5.6.2 - "General Operation of the VMFUNC
-Instruction", The VMFUNC instruction causes an invalid-opcode exception
-(#UD) if the “enable VM functions” VM-execution controls is 0 or the
-value of EAX is greater than 63 (only VM functions 0–63 can be enable).
-Otherwise, the instruction causes a VM exit if the bit at position
-EAX is 0 in the VM-function controls (the selected VM function is not
-enabled)
-
-And since KVM only provides emulation of VMFUNC for nested guests,
-it is uncessary for KVM to intercept it and reinject a #UD. So just
-disable VMFUNC in VM-execution control for L1 guests.
-
-But please feel free to educate me if I missed some backgrounds about
-why this is enabled in the first place. Thanks!
-
-B.R.
-Yu
+Sincerely,
+Mr. Kairi Andrew
