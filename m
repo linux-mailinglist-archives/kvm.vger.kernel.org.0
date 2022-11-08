@@ -2,278 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 196EF620671
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 03:05:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85857620675
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 03:05:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233356AbiKHCFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 21:05:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44002 "EHLO
+        id S233126AbiKHCFv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 21:05:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232950AbiKHCFI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 21:05:08 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 610CD13CEE
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 18:05:07 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id j15so18789841wrq.3
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 18:05:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FUEPXHKzAMUHVmD4WvM6dOc560yHHvBZi3eb3Aooaf0=;
-        b=PLHcG5fH4ho2jlxitjL9A00nNuuJPjoWfZkPJdkmCf+9vSj/QHFnAUsMyoPdrwQw5e
-         Xoj0anXoEX67uDx3VlAWe/MDV6sJe8cKPlYWvBtuKPkq5JEgCuz1srm8ccE72kkByG17
-         /Ho4AV2CsTZRLI2ZP3Nvc7WA0kW8CF/kl6Wx7ShSyuR+WaNL2fwPfgottAyap+0UGKEW
-         OgfER170rd+rEQhzvfqbGrmZRdVyc8CBTURk7ReD2XGXydDGkqHs8rSgI+hCw+eH07Mk
-         WMCwoVl9Of8HpI/MjsKkFT19o2rs/9o2jgDkMTjNa+FudEJXc5mzW+ZiMArem/NRr8Sd
-         jVxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FUEPXHKzAMUHVmD4WvM6dOc560yHHvBZi3eb3Aooaf0=;
-        b=CnHbies331cz7td8IMvsOGor1yNHJaxB46ri74UoAvv2HyPuMlh3AkI5sPDRYdS7j1
-         a4SaYZAmXYZZT82qN5/b0TCQDTJ1V3yLED6hounessS1U16GhygDNfTdmUGI1Cc6mSNa
-         9++kXtZqOIz21GZnow3vHlxzTTeN56sJc82tfKNm6XtTOiKrH4B0Bg1LVK/LqpdP0aCN
-         ZXBegk6L4xS/4WdlsYr0VxJ4df37LlxHiqpWnGRf6DRt1T3pcuT4/A+BoBu6PtT91jQG
-         w3ZhSuLkUpHvB95g+6m29ellpm89t2dTRwYoPtffcNWScSrzQhcfC4cvylZRnLpf+uAx
-         9BDA==
-X-Gm-Message-State: ACrzQf2HUIcSFraUk0yTqoa6ZrTu4AA8AZE14cFW8J3RzF9zW7cIF1Xm
-        FOUHJEk2N3Zs9uczReBRgnhgXo9Cd1tmeiFsb7vpGw==
-X-Google-Smtp-Source: AMsMyM47ozfThHqf8FTKFr4zFo99pM6oLeEwjH+kPw6CR9OGe1ZvFhFIHsFE6TGcCUB1HO8S0khEO8qXfw2Qsz//jQs=
-X-Received: by 2002:adf:f081:0:b0:236:5e7c:4ec2 with SMTP id
- n1-20020adff081000000b002365e7c4ec2mr32735182wro.641.1667873105816; Mon, 07
- Nov 2022 18:05:05 -0800 (PST)
+        with ESMTP id S232196AbiKHCFt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 21:05:49 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE30213CEE;
+        Mon,  7 Nov 2022 18:05:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667873149; x=1699409149;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=YPFazzdgDBRKSlwyuS9HBqiOt1DafxZEynCO/zERrjE=;
+  b=fh2uv7EKZXzfdRCo/zr/l9J2bQU6Ude1dBDOeZi5qoRCUzjUZIPcMm0D
+   5lhS2ZooJarjOGGFtG9AAyrAE2eiLsHRkM5t9rzSh5yHH+cFqr5O1JOth
+   /OK5XstKBpT2GbYtdk6uqj0SCIX/e914D7XJXqWY1YoEDu5xoWwoVDWAx
+   iKxlleAsP6b8XCCtN5e/YONjba2wCqXD5K+mUrnfPz/8MFhvhLQE2gNnC
+   KgDGMOoW8TQvm6/7JkMh/HsWr0Welt6zdFq9PmoxwuaLsj+zRQp0/BP5E
+   MTg5CtD/AUoJFrXirS4oMBcNjduNKylg0sxWgmnLtwaNERdL0R3Wrm1VD
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="374850582"
+X-IronPort-AV: E=Sophos;i="5.96,145,1665471600"; 
+   d="scan'208";a="374850582"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2022 18:05:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="741750678"
+X-IronPort-AV: E=Sophos;i="5.96,145,1665471600"; 
+   d="scan'208";a="741750678"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga002.fm.intel.com with ESMTP; 07 Nov 2022 18:05:24 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 7 Nov 2022 18:05:24 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Mon, 7 Nov 2022 18:05:24 -0800
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.43) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Mon, 7 Nov 2022 18:05:24 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AYaucjoCpaqRJUWlsrOChin8hZzTixouOjxBJI9i/PFGeoH/QKcnlzO9GXOqmD9miTZ5BIBN1vn4wlKV3EgbhXPA6WQa7p0UA6g7qo4OjoNXCRM/TqfYIQZ/curPBnynoBqVwh3UTKTyZ56N2VRpmEBuqSvckzCAgjcRoKbXSrh8WBw5XXsKLd411qWsHEH287L90lg7eSuOI/C8wzrYTClhUaOrh29OC/AZlSZfUWM7WsMuI9gwYTe37qbxdsF9xA0q4Rgp/Du4er9pUyaiLDJEnS5cDONIfdIM/+riqLkQl6EzPUUycXUEswNhX5XBsVrf1k2PdNw5lO/b+PEaIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YPFazzdgDBRKSlwyuS9HBqiOt1DafxZEynCO/zERrjE=;
+ b=UnrmGrEoXnf0k9aU0ZGYJo+x1I3QcbeqFv5ZaZ/SfSSkrejXhWGQuHGr5obDlo8B8WAfayFcYhlFnp1+X+mSRaNY6iJRsgTkHDShC+rgCdMnpieeAGyFm3mL5cdBfP9DDX2KAUjluMZRO/rXGNuk37dTzHt8lWpMxPyYl9oOvxpClEqX63WYxyG9YqHIAFgOOrOA/l7PURluR3Ci2CHd1HIkUqd1VEma4gluDpt3NEwSaMdCKmqxbw4jtFQv/x99qJtRRhFsLOl1s4YER7d2T/hyjxIek1b8A5pVxy8t/g+Mbr5sBo4Ls3pOQ5/yfu7MtZk/dTWFzPIsIyKhxWTJWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by PH8PR11MB6682.namprd11.prod.outlook.com (2603:10b6:510:1c5::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27; Tue, 8 Nov
+ 2022 02:05:20 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::737e:211a:bb53:4cd7]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::737e:211a:bb53:4cd7%5]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
+ 02:05:20 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Lu Baolu <baolu.lu@linux.intel.com>,
+        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Joerg Roedel <joro@8bytes.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+        Nathan Chancellor <nathan@kernel.org>,
+        "Nick Desaulniers" <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        "Shameerali Kolothum Thodi" <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+Subject: RE: [PATCH v3 10/15] iommufd: IOCTLs for the io_pagetable
+Thread-Topic: [PATCH v3 10/15] iommufd: IOCTLs for the io_pagetable
+Thread-Index: AQHY6J1k/MYko282jUa1sWU0zIDdtq4uXG3ggAVGNgCAALiD8A==
+Date:   Tue, 8 Nov 2022 02:05:20 +0000
+Message-ID: <BN9PR11MB5276706B744018EC6E36E1128C3F9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <10-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <BN9PR11MB52765289F880B8A7297077318C3B9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y2kd/Ptt0iR6SGsh@nvidia.com>
+In-Reply-To: <Y2kd/Ptt0iR6SGsh@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH8PR11MB6682:EE_
+x-ms-office365-filtering-correlation-id: 0ab8c162-237c-4247-5a76-08dac12db04b
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Dy9YuDWBJOqGCv88uR9/9PGLDvAIDZyZ+K9oEJ+Q7yCB1+XG4B5PrlD+hJa9bS5obBoDhKDb5BpLb4b5pkRNAQfRxXOOTnnAbjbTLVbQE7n7k+tSeh6m7M0JXd1TvNgPduvkrnQvfjBP6o4lKyLhrnifn0GV6L76SgOUD4x20PE0XWvKgSoHK6MeVB7jDlMHZzzpzhAyq7SFH6YSjZirdYEg4YQWvrwbPkS6lFW2m4BKNXw0Du1V8vq71el7pM7tCrLMZQAFSAkQoHHoEYIj1mg2diaWxOmx8fGbKpe6LwDIv5wwp5KQjGjGzwPAuw2YwQxWl4Xd0z+kdeGWBmJ0I//lCzrHdVk05TwCz7lag3OPLUsxaQiiqvZ7qneRb3casSXJqhRwyYEvXI1YrY7ch0IdpBaO6zF7JUgNefRY6Jgw7dydlqz2VSfbhbKxsyByTYhZFlzI+GSpwBClRb1e4eFUpn51ykiP1B+pwQ37AUyyl1ghuLmmpmMynaatjqZhTwiNKkk5Ms+/fQvIVE0Cqa0FKAfPe14D6H5dcRsTqJiCbbMagTi5chZW3BSY+vRQPq38lsLyC7PemdDuAt5M5QSyV/Q42GFD4Yl3L1YTEXt+WMm0uIFhNheeJaIejevuJ+Zgs7WBML8qnsCenjEzt0Q9b4UPpMYymR8y0rM+p3J7uQhF3OSMdXaWzyR28+xOs92rLQJen0v6p4uS1OhKt8pfytrsqFiL3JiT5m9D7RqPsC5LiThY6+cYCXhLc6Bo7rEAmS9b013w9qwJR88m7w==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(396003)(366004)(376002)(136003)(346002)(451199015)(86362001)(55016003)(66446008)(64756008)(66476007)(66556008)(8676002)(66946007)(76116006)(7416002)(7406005)(5660300002)(6916009)(54906003)(41300700001)(8936002)(52536014)(71200400001)(2906002)(33656002)(186003)(478600001)(26005)(122000001)(9686003)(4326008)(316002)(7696005)(6506007)(83380400001)(38100700002)(38070700005)(82960400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?mbiF8itD6POeqnbtiRt9DlR5AyImd1+zR/fahV1q/ZYgT6tuC1MJHmSZZA8w?=
+ =?us-ascii?Q?Fn1Z+i5mfz1N1VE4Eqdi0CtCiNVco/hXVTeE2WiXy4Qat4hZmhn0HSPKuLMr?=
+ =?us-ascii?Q?tCC7ELpeYxNjQNvMe+gPwWeyb+DFq60rPPV5z+EoKeFPxiQ1lTQH3iPoNcNY?=
+ =?us-ascii?Q?t2Dsr8U6an1RRSiQ//RmJew8kg+dtiivMPa3opelYVa3ZPUhigMpXt/bJbzH?=
+ =?us-ascii?Q?2ZemXbl69e25aUGipXwv4pRG9g+KHfgayUGlfec0QFtTnxiksjXoL5njNu5Z?=
+ =?us-ascii?Q?ljrMRfrqyspKe5ksTSljAsP9Fk035y5fXmqajaTyhiY2505QQ3fyMGE0IvfD?=
+ =?us-ascii?Q?t3kJ4a+OPKUv8N8U0VPoDAmUWwfsBqGlGKilNFfTYcEtQcK/FrNv8mU8zvoM?=
+ =?us-ascii?Q?MZL2t9f6hVn3hxEhn/PcNS+2IUaZG8eJBm3oyQH1YCLAEx/Vlz+oqdWSqicg?=
+ =?us-ascii?Q?NiE5zBLoF2VKNYGFJNPZnPm7m9YLvwPN6NhkgDgfsbv3juzDdRiWEQeBQWeu?=
+ =?us-ascii?Q?wYbeeyiS5/k6K1o9YURSR5p1PWuc/KStsnvWlBLdN+BqbaZH+Q7qrsNrBhXr?=
+ =?us-ascii?Q?2Up+3tEY8pTtUCDLJQjyayqSEov7CpOWTXR82UzYGQWj+p4FFquurU5r0RWe?=
+ =?us-ascii?Q?dWlzrqoofjZ7hpvWYt3jysxSP6Lvye2KCHTy/lz44CLw0JrMy56dA+g9BwnH?=
+ =?us-ascii?Q?3YsnUy98w2O/Y4uJGrPG4ml9rUnYIfisivCvArQ4+dVsQhrBrNJkJ4VmUUkI?=
+ =?us-ascii?Q?VdBJHYvpnfjSdct2hQE9Dzsn9HbapkoTm9Yj1U2BcNHP6bAuyrZHDuS5Tozr?=
+ =?us-ascii?Q?nJgT7EOuAc6KbiaX+FWE5bgdQeC7mbvjT0yKa3/0vVHsFczkLwFYGG/QVxJW?=
+ =?us-ascii?Q?9rqdts/C7qnAHWkNaT1ZcmbS1bS5C9Xti92TxLKTo0bCp9hqPdtiNngL0e2t?=
+ =?us-ascii?Q?YgDi3VSNM3ViiFEFuz4bX/P/axiROKUU+BBgfdDAX02QKTcFtW0vqksPDrR2?=
+ =?us-ascii?Q?Xcp6T4GKAarbhUHBGMDSyfv15lmeA1nyAwHUHKyGtCuWcYlbLPNq9SsV+3Hk?=
+ =?us-ascii?Q?w4LFWhrUgPnNrOe5boNd1pQXdxUD40kT+R2xXikZqe3gzp4KGSlFukgMr6Qj?=
+ =?us-ascii?Q?oJaX7XA2RkeiggUcyQKoZm3BIXphxBxkpcOZSpxGM058EhO9F2SFiJafvVNg?=
+ =?us-ascii?Q?EHgziZzuHN7Ci3B+QKsJ55BsCMLRM7ShwrvXDJzmZWiDtr0CzKNoBBdAcFIm?=
+ =?us-ascii?Q?NlQlNL0gsBxQZF7QGbSw870fNVsyXWFoXNaXATFHtTR1xpAfXIHDQp3jWl5H?=
+ =?us-ascii?Q?n1vYtvXhsOYJBwb+tNUAHzMCoek29fEEV6V05kqLGQcVw9sMQ32lN+oY7f8X?=
+ =?us-ascii?Q?8wjALvQZpLY+UiJUw338G/ajbBD5PEMp210XWNYudw157MpIsOzvKuv/04Jb?=
+ =?us-ascii?Q?N/uGMMOqaQpkPmzrfl2hldGHW4Y8ouYsan0xIGA8K+hF17lT/VNVC3O1C/eo?=
+ =?us-ascii?Q?KGy1KGmR8dSV4T54i0ODH44ognrUtKvap9JTG5MyejLM7PEG4tw+Ll7sPbzb?=
+ =?us-ascii?Q?a55UfV+GwLoY6MLuHVD5kx6Hfgs9BlelyuQPVKmT?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20221105045704.2315186-1-vipinsh@google.com> <20221105045704.2315186-7-vipinsh@google.com>
- <Y2lWG7wV+UvzX5jm@google.com>
-In-Reply-To: <Y2lWG7wV+UvzX5jm@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Mon, 7 Nov 2022 18:04:29 -0800
-Message-ID: <CAHVum0eM7NtBDRFhXa9pk9DAEere1q4XVTUti2TFZuKPiGK6LQ@mail.gmail.com>
-Subject: Re: [PATCH 6/6] KVM: selftests: Test Hyper-V extended hypercall exit
- to userspace
-To:     David Matlack <dmatlack@google.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ab8c162-237c-4247-5a76-08dac12db04b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2022 02:05:20.1294
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LCZhvUageWVyY88BpvN3rE0SRvDg46uXvyJYoeiS9ILI8Axx+N93GutyQEA8VP8JH6lwFwstwd9SV0yGpPibXw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6682
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 7, 2022 at 11:01 AM David Matlack <dmatlack@google.com> wrote:
->
-> On Fri, Nov 04, 2022 at 09:57:04PM -0700, Vipin Sharma wrote:
-> > Hyper-V extended hypercalls by default exit to userspace. Verify
-> > userspace gets the call, update the result and then guest verifies
-> > result it received.
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Monday, November 7, 2022 11:02 PM
+> > > + * @allowed_iovas: Pointer to array of struct iommu_iova_range
+> > > + *
+> > > + * Ensure a range of IOVAs are always available for allocation. If t=
+his call
+> > > + * succeeds then IOMMU_IOAS_IOVA_RANGES will never return a list of
+> > > IOVA ranges
+> > > + * that are narrower than the ranges provided here. This call will f=
+ail if
+> > > + * IOMMU_IOAS_IOVA_RANGES is currently narrower than the given
+> ranges.
+> > > + *
+> > > + * When an IOAS is first created the IOVA_RANGES will be maximally
+> sized,
+> > > and as
+> > > + * devices are attached the IOVA will narrow based on the device
+> > > restrictions.
+> > > + * When an allowed range is specified any narrowing will be refused,=
+ ie
+> > > device
+> > > + * attachment can fail if the device requires limiting within the al=
+lowed
+> > > range.
+> > > + *
+> > > + * Automatic IOVA allocation is also impacted by this call. MAP will=
+ only
+> > > + * allocate within the allowed IOVAs if they are present.
 > >
-> > Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/.gitignore        |  1 +
-> >  tools/testing/selftests/kvm/Makefile          |  1 +
-> >  .../kvm/x86_64/hyperv_extended_hcalls.c       | 90 +++++++++++++++++++
-> >  3 files changed, 92 insertions(+)
-> >  create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_extended_hcalls.c
-> >
-> > diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> > index 2f0d705db9db..ffe06dd1cc6e 100644
-> > --- a/tools/testing/selftests/kvm/.gitignore
-> > +++ b/tools/testing/selftests/kvm/.gitignore
-> > @@ -24,6 +24,7 @@
-> >  /x86_64/kvm_pv_test
-> >  /x86_64/hyperv_clock
-> >  /x86_64/hyperv_cpuid
-> > +/x86_64/hyperv_extended_hcalls
->
-> nit: Any reason not to name this hyperv_extended_hypercalls? It's not
-> too long and as a non-Hyper-V developer it's easier to read.
->
+> > According to iopt_check_iova() FIXED_IOVA can specify an iova which
+> > is not in allowed list but in the list of reported IOVA_RANGES. Is it
+> > correct or make more sense to have FIXED_IOVA also under guard of
+> > the allowed list (if violating then fail the map call)?
+>=20
+> The concept was the allow list only really impacts domain
+> attachment. When a user uses FIXED they have to know what they are
 
-I was keeping it consistent with other names like
-KVM_EXIT_HYPERV_HCALL, and struct hcall{} in struct kvm_hyperv_exit{}.
+it also impacts automatic IOVA
 
-I am fine with renaming it to hyperv_extended_hypercalls.
+> doing. There is not a good reason to deny the user to use any IOVA
+> that is not restricted by the reserved list.
+>=20
 
-> >  /x86_64/hyperv_features
-> >  /x86_64/hyperv_svm_test
-> >  /x86_64/max_vcpuid_cap_test
-> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> > index 0172eb6cb6ee..366345099363 100644
-> > --- a/tools/testing/selftests/kvm/Makefile
-> > +++ b/tools/testing/selftests/kvm/Makefile
-> > @@ -85,6 +85,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/emulator_error_test
-> >  TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
-> >  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
-> >  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
-> > +TEST_GEN_PROGS_x86_64 += x86_64/hyperv_extended_hcalls
-> >  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
-> >  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_svm_test
-> >  TEST_GEN_PROGS_x86_64 += x86_64/kvm_clock_test
-> > diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hcalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hcalls.c
-> > new file mode 100644
-> > index 000000000000..d378877235d4
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hcalls.c
-> > @@ -0,0 +1,90 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * Test Hyper-V extended hypercalls
->
-> It would probably be worth adding a note in this comment that the
-> negative tests for extended hypercalls live in hyperv_features.c, that
-> way someone doesn't accidentally go down the rabbit hole of adding
-> negative tests here in the future.
->
-
-Sure.
-
-> > + *
-> > + * Copyright 2020 Google LLC
->
-> 2022 :)
->
-> > + * Author: Vipin Sharma <vipinsh@google.com>
-> > + */
-> > +
-> > +#include "kvm_util.h"
-> > +#include "processor.h"
-> > +#include "hyperv.h"
-> > +
-> > +/* Any value is fine */
-> > +#define EXT_CAPABILITIES 0xbull
-> > +
-> > +static void guest_code(vm_vaddr_t pgs_gpa, vm_vaddr_t output_pg_gva)
-> > +{
-> > +     uint64_t res, vector;
-> > +     uint64_t *output_gva;
-> > +
-> > +     wrmsr(HV_X64_MSR_GUEST_OS_ID, hv_linux_guest_id());
-> > +     wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
-> > +
-> > +     output_gva = (uint64_t *)output_pg_gva;
-> > +
-> > +     vector = hypercall(HV_EXT_CALL_QUERY_CAPABILITIES, pgs_gpa,
-> > +                        pgs_gpa + 4096, &res);
-> > +
-> > +     GUEST_ASSERT_1(!vector, vector);
-> > +     GUEST_ASSERT_2(res == HV_STATUS_SUCCESS, res, HV_STATUS_SUCCESS);
->
-> GUEST_ASSERT_EQ(res, HV_STATUS_SUCCESS);
->
-
-Copied things from hyperv_features test. This looks better, I will change it.
-
-> > +
-> > +     /* TLFS states output will be a uint64_t value */
-> > +     GUEST_ASSERT_2(*output_gva == EXT_CAPABILITIES, *output_gva,
-> > +                    EXT_CAPABILITIES);
->
-> GUEST_ASSERT_EQ(*output_gva, EXT_CAPABILITIES);
->
-> > +
-> > +     GUEST_DONE();
-> > +}
-> > +
-> > +static void guest_extended_hcall_test(void)
-> > +{
-> > +     struct kvm_vcpu *vcpu;
-> > +     struct kvm_run *run;
-> > +     struct kvm_vm *vm;
-> > +     struct ucall uc;
-> > +     vm_vaddr_t hcall_page;
-> > +     uint64_t *outval;
-> > +
-> > +     vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-> > +     run = vcpu->run;
-> > +     vcpu_enable_cap(vcpu, KVM_CAP_HYPERV_ENFORCE_CPUID, 1);
-> > +     vcpu_set_hv_cpuid(vcpu);
->
-> Check if KVM offers HV_ENABLE_EXTENDED_HYPERCALLS in CPUID, and skip the
-> test if not.
->
-
-Sure.
-
-> > +
-> > +     /* Hypercall input/output */
-> > +     hcall_page = vm_vaddr_alloc_pages(vm, 2);
-> > +     memset(addr_gva2hva(vm, hcall_page), 0x0, 2 * getpagesize());
->
-> s/getpagesize()/vm->page_size/
->
-> > +     vcpu_args_set(vcpu, 2, addr_gva2gpa(vm, hcall_page), hcall_page + 4096);
->
-> s/4096/vm->page_size/
->
-> And to avoid hard-coding 4096 in guest_code(), you could pass in the GPA
-> of the ouput page as another argument.
->
-
-Sounds good.
-
-> > +
-> > +     vcpu_run(vcpu);
-> > +
-> > +     TEST_ASSERT((run->exit_reason == KVM_EXIT_HYPERV),
-> > +                 "unexpected exit reason: %u (%s)", run->exit_reason,
-> > +                 exit_reason_str(run->exit_reason));
-> > +
-> > +     outval = addr_gpa2hva(vm, run->hyperv.u.hcall.params[1]);
-> > +     *outval = EXT_CAPABILITIES;
-> > +     run->hyperv.u.hcall.result = HV_STATUS_SUCCESS;
-> > +
-> > +     vcpu_run(vcpu);
-> > +
-> > +     TEST_ASSERT((run->exit_reason == KVM_EXIT_IO),
-> > +                 "unexpected exit reason: %u (%s)", run->exit_reason,
-> > +                 exit_reason_str(run->exit_reason));
->
-> Optional: Asserting a specific exit reason is a pretty common pattern in
-> the x86 selftests. It'd be nice to create a common macro for it. e.g.
->
->         ASSERT_EXIT_REASON(vcpu, KVM_EXIT_IO);
->
-
-This is much better. I can add a patch which creates this API.
-
-Should it be run or vcpu? Seems like everything needed is in struct kvm_run{}.
-
-> > +
-> > +     switch (get_ucall(vcpu, &uc)) {
-> > +     case UCALL_ABORT:
-> > +             REPORT_GUEST_ASSERT_2(uc, "arg1 = %ld, arg2 = %ld");
-> > +             break;
-> > +     case UCALL_DONE:
-> > +             break;
-> > +     default:
-> > +             TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
-> > +     }
-> > +
-> > +     kvm_vm_free(vm);
-> > +}
-> > +
-> > +int main(void)
-> > +{
-> > +     guest_extended_hcall_test();
->
-> Why not just put all this in main()?
->
-
-I will.
-
-> > +}
->
-> return 0?
->
-> > --
-> > 2.38.1.273.g43a17bfeac-goog
-> >
+I just didn't get why different restrictions are applied to automatics vs.
+fixed allocation.
