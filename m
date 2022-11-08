@@ -2,162 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 841CF620B99
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 09:57:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EDFC620B9C
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 09:57:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233498AbiKHI46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 03:56:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55414 "EHLO
+        id S233700AbiKHI5L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 03:57:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229843AbiKHI4y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 03:56:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01BD818E35
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 00:55:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667897756;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4yipTWvAKK59+UDaW0mZvnxyflOnwLDwk1GJZlatPJg=;
-        b=CuZR7opWThqtdRZIOQ7ABJ9I837OHqlJUjwEEnGY/U6703VbTypXmJCcVCvkkbNNqA6LQd
-        wca/zo0HAtS+BNKMobAdYr6ywp/dT0dpmORPzBskKQ+l9Y7Qjz+iSnFUPEVqjkfEZCw9eX
-        wlBTCEEjcI2shXeO0XfTkWAcx9DcXos=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-255-D0j0mjROPcCCWGUYDQ_mbQ-1; Tue, 08 Nov 2022 03:55:54 -0500
-X-MC-Unique: D0j0mjROPcCCWGUYDQ_mbQ-1
-Received: by mail-qk1-f198.google.com with SMTP id u6-20020a05620a430600b006e47fa02576so12401875qko.22
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 00:55:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4yipTWvAKK59+UDaW0mZvnxyflOnwLDwk1GJZlatPJg=;
-        b=gyHvEBERANQcw0UalWFiGMWbtM1ceF/miGO1bUEcJFKXQtHQ1JuO0mP4657cXWpQTP
-         1hx8B3BSkzOfDz1z7YUZHvBBA/3zKqRqvcmwmhNDEU+5+sY/v3XxG1mADtB5/5qwGQnC
-         8hWZZLJNvBX8V7w9sG9cU4tH99FJ1FXAiJ9BN0rwLJWv/t4uWonAOK1GFQLcBKJhVw02
-         VUZrwWEFsEXnpHC2GFSF+5o3aVqswK5QudekX0Q6hVVymot+S0Oi2eIYan7LVzj3fkWt
-         WmyQx60wjSfqQlSRZrzrkOYV2NN/MYjGW8Di2zHzs3P0doFhcrAOE5ilcl7Fh3i6dk4w
-         jkDA==
-X-Gm-Message-State: ACrzQf2xnsdzF5sRGomniWHphQhDoDvjWbSwoWZHG1aONmdHXX0ScDzd
-        KpA6H6Nn6zW3G1SggUkkzqIASHbWYlCiU+5LhmqMmSLwygi+GqzQKlvXl+oUVoi8yx44V7cDUXg
-        JM9jekOJbaK4r
-X-Received: by 2002:a37:603:0:b0:6fa:6fa6:1019 with SMTP id 3-20020a370603000000b006fa6fa61019mr20362206qkg.27.1667897754407;
-        Tue, 08 Nov 2022 00:55:54 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM4sAQ/1DJwa8nDgW33KcEepaQdX8eNEfpVaNQCy6RzDEu4X9alIhMotTbpwFmqZnXU/fXpW6A==
-X-Received: by 2002:a37:603:0:b0:6fa:6fa6:1019 with SMTP id 3-20020a370603000000b006fa6fa61019mr20362199qkg.27.1667897754116;
-        Tue, 08 Nov 2022 00:55:54 -0800 (PST)
-Received: from redhat.com ([138.199.52.3])
-        by smtp.gmail.com with ESMTPSA id r16-20020ac87ef0000000b003996aa171b9sm7624944qtc.97.2022.11.08.00.55.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Nov 2022 00:55:53 -0800 (PST)
-Date:   Tue, 8 Nov 2022 03:55:48 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        peterx@redhat.com
-Subject: Re: [RFC] vhost: Clear the pending messages on
- vhost_init_device_iotlb()
-Message-ID: <20221108035142-mutt-send-email-mst@kernel.org>
-References: <20221107203431.368306-1-eric.auger@redhat.com>
- <20221107153924-mutt-send-email-mst@kernel.org>
- <b8487793-d7b8-0557-a4c2-b62754e14830@redhat.com>
- <20221107180022-mutt-send-email-mst@kernel.org>
- <CACGkMEsYyH5P2h6XkBgrW4O-xJXxdzzRa1+T2zjJ07OHiYObVA@mail.gmail.com>
+        with ESMTP id S233397AbiKHI5J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 03:57:09 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC852F646;
+        Tue,  8 Nov 2022 00:57:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667897827; x=1699433827;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=DnY4GI4ctszLsVyKYIzppkno7Bey8nguHWmA/kMLyHw=;
+  b=DnrZ40FLZNp4HpAOUhYdGvXO856o+JOn8VvgUs8Gm3UVoSohheiIIdmm
+   WynVzysj7QeZT9cTgRATmJCpCicDboVEyrfsuQny0G5M0UiZBiBgQTXVP
+   NxGeUG6O46nV93bt+kBVtn2w5T9Y1f4FXx0xGxDBWYalT2LOE54Qg9q7V
+   ZryMEEhN/ClzDtYmfpRxESUIz+FMjVzcCrNNe2+a7QhNEjmwwJXEcyko/
+   5VuaIxToeMoGDiKeDodCVXruzjPkTaUvSKUw0qBzFMgy11GEPw/KjQtWX
+   DYhM8FF9qBMUu5vOp3dn83FJfNzHi6xKyMggEkFJdnmapkINL/c52hDxX
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="309354310"
+X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; 
+   d="scan'208";a="309354310"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2022 00:57:06 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="965511553"
+X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; 
+   d="scan'208";a="965511553"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga005.fm.intel.com with ESMTP; 08 Nov 2022 00:57:06 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 8 Nov 2022 00:57:05 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Tue, 8 Nov 2022 00:57:05 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.105)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Tue, 8 Nov 2022 00:57:05 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DZ4VpC3xHD5YXm+1/4TWyZLRZz6g1OZ1GoaUKaDFinx4hoFhI1wg1oivcgcsLOH/NbPIxRBNfwHDz1ufiIBVxDowSgbERVipkGl03tPCaJ4QsDQua9MZ6q4c3vzRVFT20Qwlku+s4TTAZQeighcKbzgCzPDIyJFuzVlQWPJ++QZUOXhysITneIVaBgJW3FzgJk7zca6OQqx05p6c2+xAmvCWRZos7Dj8UVGADggvnqV3K2KrmQqSJiCIGILDnX3+jhlz2zZ/8G9MLyNT3Wr6qKqfLolm98JPhYKFsuJcrwiXNN0cFscpjpQ+vfKXoTVwBbgiPBpIUUIRzLSlFwmGhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DnY4GI4ctszLsVyKYIzppkno7Bey8nguHWmA/kMLyHw=;
+ b=E5xosGtt2mMZNgjxHHH54sQ3F/w8nHfcXgRPO0VVAPgvlJ7MoVyXMp09wBEgmLTdAFevaOYnJfBZcrkxQlDVzziEKeTUs5hJCq00KLouTJaWxSlAHWRvF9pSCOvXumkVxH5DB+QUzR2lFiRyH7aMrzLjuIrMFnESFdLZRvvMl3poYxOTUGbvvIjEh8/qqVB+ePFr3A1R89TIE994i5ci/SoBnB2T3/P67jaFuVDJtgvAOtvD52k3g95u5YRPQQWfR3BJ3zP+q6aFVI8CGa1DvFYKRfk48Ev6TmVwj40JVGkphmszvw4VEYeyou0XIcuybYXivO3WpVorm9a+2NunoQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by CO6PR11MB5651.namprd11.prod.outlook.com (2603:10b6:5:356::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.25; Tue, 8 Nov
+ 2022 08:56:58 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::6eb:99bf:5c45:a94b]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::6eb:99bf:5c45:a94b%3]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
+ 08:56:58 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
+CC:     "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "Yao, Yuan" <yuan.yao@intel.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "farosas@linux.ibm.com" <farosas@linux.ibm.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "palmer@dabbelt.com" <palmer@dabbelt.com>,
+        "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+        "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "anup@brainfault.org" <anup@brainfault.org>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
+        "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "atishp@atishpatra.org" <atishp@atishpatra.org>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+Subject: Re: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
+Thread-Topic: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
+Thread-Index: AQHY7xGUTp4lUVPML0yWgaOmsA79Vq4uXPOAgADckACABM0oAIAAOK8AgABMrwCAADXwgA==
+Date:   Tue, 8 Nov 2022 08:56:58 +0000
+Message-ID: <9890f67846f1c2c6a12bd086fc822f0762966223.camel@intel.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+         <20221104071749.GC1063309@ls.amr.corp.intel.com>
+         <Y2V1oslbw24/2Opd@google.com>
+         <20221107214634.GE1063309@ls.amr.corp.intel.com>
+         <bf29fe1ac84cae8ddb06e566b56c653600a1901c.camel@intel.com>
+         <20221108054354.GA1708572@ls.amr.corp.intel.com>
+In-Reply-To: <20221108054354.GA1708572@ls.amr.corp.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|CO6PR11MB5651:EE_
+x-ms-office365-filtering-correlation-id: c7ea250f-9f74-4ffc-8590-08dac1673194
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: z8nILbfukv/920VsX9+cBmYnKv1pe5rhWpxDdbeHsz2bdBNnYR8XEUMbCMol3xC1PvdRMOCi9DRl3JV46wzn5El+0J1Ks9sgAXGwaKpyidPeiPswCDk2efKhLHFjStJro2F3ruM4H6PFpRIensyqYYKhXgxETtbOqais72q1CrqmXTZoUIK6WC9m8PmiYbU2hBUM6MgbHkpxH00thDxr+chaMyN54JSVxjWKGUx88ja0xs8R8a59Dqj9De8uzSt4LX2fB7sbWmi5FaTjL8FeSwEDiZt2g7dBDA2rZ7GqzfrX1WyfL5wS7xVAZZbSHQtf8w7GaTq8+Kr9bXb8NbZ7279GS3PNUxhTVj75BHLOEvnOGXnTkWcv69DR2WIofuRLkIHxcle07Lddw4AL5Mzgw1PUzIQ42PLoNHUXu+7R0tGMpCwHHC9lPB89w2zsP11rhZ9s0uGHBYuyXAmYWQ7AweebaFNTJ4CsEb7D0SLmqbXAsRej1FpJgdAizKUKIH7P6eyJufBCdj5ihdjB6pYUGaC8cc3ahwO2fUzOH2sVVD3310YZ3UI79Cehqppc6bvjNeFsJtm8aw9J/byEcezH0vJnzHvL0rRdv27QeYJ72e8QDdxFsV1R/kmaWJg9VrUryY8JaEUIxtnMqWJIDETR6xEIbuuiNbWLm5V6HxdqTh2SM46JVZix+2g/u63GwetXhnKPKeXMF7MULkOqonPkKKE8bJb7EcZCoZnMxSt3fa61T40ZNuEFJN98LBJm3/TJ
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(366004)(396003)(136003)(376002)(39860400002)(346002)(451199015)(2906002)(66946007)(478600001)(64756008)(8676002)(76116006)(66556008)(66476007)(8936002)(41300700001)(6486002)(7416002)(71200400001)(6512007)(7406005)(5660300002)(6916009)(4326008)(91956017)(66446008)(83380400001)(38070700005)(316002)(122000001)(82960400001)(86362001)(6506007)(107886003)(2616005)(38100700002)(26005)(54906003)(186003)(36756003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?QUNlWDZLWk9USzhQaDBCNm01RDhLV2YvYllqRGo1dFk3bDR1ckpEUkNmbVBx?=
+ =?utf-8?B?QlBoaFVqelBReGRVNzV0TXp6R2hJZmN3cWZKdjJOcVBNU0RDeFBoMEFLZnBt?=
+ =?utf-8?B?bjVxeS9lWFZIOThWRWxrRVZBck1mSGl4V1o2WGRpcWVzTzVHZU00YnNUYkIr?=
+ =?utf-8?B?bmIzQkZVMEhqU2o2Tnhnc2ladXpocUJPZVAxdWgrVDIrVGx3Q3E5dmNNVjhu?=
+ =?utf-8?B?djA1TVlPbkgwR1pkSmo3d09aWkt6Q1RZWUY0cjlac2QrWlAvQUk3OFVGVm5w?=
+ =?utf-8?B?dFcxVTRJWWRpSWVSSGhBNjY3VUhTQjZrNDZ4U3FkSUF6ZVQ0ZnJzaDVaNlY4?=
+ =?utf-8?B?Q2tScUdPME1sdm9IR1VPQlV6OHpwNFczcC8rL0E4WldKMnRXWEROaWNRdW1K?=
+ =?utf-8?B?cHlacGNkVWEwaFNwa0FlcklBVm93MmRWOUlTSDZKKzhJcjQ2eWkrRGZVTkcv?=
+ =?utf-8?B?TlgzK3k2STZwb3BzMHc4ZUJiU1U2TkdaUWgyREFteGVFWmFqYUJ2V1BWU3BO?=
+ =?utf-8?B?TVhFSWRIVm5jelFWVDJSZm0vSGVFcEJRamVUM3lIdzRPdGZZNCtDa29YaUlp?=
+ =?utf-8?B?VWxsV0dYRlVud1o5aTdMcVI4TWo2aUtPWk5HVzRXdkZIVlcweWRVNlZmL2Ix?=
+ =?utf-8?B?QXNycmVpQlJiOUJWZTllV1RINTZ5OGRkMUt5NWNzMkVvZUJpdm9rUlpwZkZ1?=
+ =?utf-8?B?by9uaTZ6a1ZRVEFBa3J3M1UyZ0V3UmNlUTlqS2VxSzZjcFBoZVljbWtYM3Vn?=
+ =?utf-8?B?Z3B4QzZIZnVRTFJqMFg0SzNKdW5abjE1YWNodjNvbERXc3lSNFFSTlA3VFdR?=
+ =?utf-8?B?bFBybWVVQ3lSNE1vSlVBcmpKOXNpWkk0T0s3dEUvY20wTldUa2tKSWx0VEdK?=
+ =?utf-8?B?M2VGY0lFZXJnZXo0ekFseFdUREFzM1RVZVRBVERhWkt3REhIQVRtZmZLN3E0?=
+ =?utf-8?B?RyswajF3MjZkWFdBYzY5ZzhDS0ZaSXlEeDBweUZJMDkrU0JTQUlUNVJGNCt3?=
+ =?utf-8?B?UVR6dzBxQWRTd1dhdVY4WjU3ekVwRHBaR2VRQU9WeUErSGJRd3NCemM1K08v?=
+ =?utf-8?B?NGlqemFuTWpENFdyODlBUi8xTmlNbFU5QkxhSXBlNm1scTFFQzdBTHFYUnI1?=
+ =?utf-8?B?WVVZa0RvVVR1LzE2ck40RHl0RkVQQUhnbUtLdHlDMVVZdy9LSUFQMzZ5UnlH?=
+ =?utf-8?B?QzFWZzRQMEVZU3drUWM5alFJOVJnVTZ5a0Z5dUpRYmxKVFM2K3AwTm5iMnJH?=
+ =?utf-8?B?REZtRWdqbzJEN3MwRnlMbUg3Ymh3TGlINzRtVUlSM3BkTkxOdnhUWWpXRU5L?=
+ =?utf-8?B?cVhDTE9EWlRvcmNJY24zdFlBamF6cDZPN2tTZThVTnNZcHZXc2lWeXN0MGY4?=
+ =?utf-8?B?STZJQU9vMWxzK3I0VGtCL2xOYm9rTUZDL3ZsYWhKT3VDbGZOSE1JUTVNQjV2?=
+ =?utf-8?B?bnR3OCt2dmNJNHQzelB1WDVZSDVTUmttRXNjSGlyK2s4T3ZZRDZkdlpoZzgr?=
+ =?utf-8?B?Tnp1d0RSVUt4VjNrR2Jyemk4NUgzTjdZaUZLRzd4b0l4bVVTdktNWUZlc0pH?=
+ =?utf-8?B?Tjc3dWJZVmxFb29GRFVHNjlXZ3lNL2QwbnY0WWN1Rkd6RU9kMkdzeng3MEEx?=
+ =?utf-8?B?V1FJT3ZZeEtjL0hFQklWdUtaa0ExWU5yUlZvbmEwT2lmWDVGblZJbEQ3cFo4?=
+ =?utf-8?B?ejU4RzdURlYwUXlWR3RCSTUzRHpOcGd0cmFNSUhwNGpoQ2ZOMkR5YmJqalJi?=
+ =?utf-8?B?bU8wKzZ5aGNxRGtPRjIrdWprNGpOYlMwK1NENjZDa1V2aUdlRTFoa3I0SnN6?=
+ =?utf-8?B?RjNMR0ZXQUhxR1Noa3BPL2lxZ3JXU01oelJBMjNsaVZBRWg2cDNRMUJDdk5M?=
+ =?utf-8?B?dVJGM1plSDlya1RCbjRwQWNwalFGRDhOdEVtMkRyb2FsM2daYnZQRXR5TjQv?=
+ =?utf-8?B?dElTZ3EzNzNmQzJIRlVLTGVuRHVSOTNnS2VSTkxISEJwSGVJSzJHaTd3c1pC?=
+ =?utf-8?B?TDkwWVkwd1lyQ1VxT2dEMFVBL0JlVTh4SmVxaVFYSzV4dWhieDhWbHlSOWZP?=
+ =?utf-8?B?TXozeUliVWtFenRFYUhWbDArcjdVbFZldTlUcjR6VEl6T01DdTZsd0NwV2xW?=
+ =?utf-8?B?bnQ0RnU2VnRIMWprL2xsSVVycG1KYytIMllWekI1TkhSK2lUVENxNks5Z2gw?=
+ =?utf-8?B?clE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <343C7E70FD73E4469ABC157AAE8098A5@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACGkMEsYyH5P2h6XkBgrW4O-xJXxdzzRa1+T2zjJ07OHiYObVA@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7ea250f-9f74-4ffc-8590-08dac1673194
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2022 08:56:58.3487
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2EoLGI5I2s7IBJ7vuf8qI4LOuhPlDlK4Gw8r59e1QyEl68UA007LGgukLW24AJNbiYINjkB8n2c+UY4WaliWqg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR11MB5651
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 08, 2022 at 11:09:36AM +0800, Jason Wang wrote:
-> On Tue, Nov 8, 2022 at 7:06 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Mon, Nov 07, 2022 at 10:10:06PM +0100, Eric Auger wrote:
-> > > Hi Michael,
-> > > On 11/7/22 21:42, Michael S. Tsirkin wrote:
-> > > > On Mon, Nov 07, 2022 at 09:34:31PM +0100, Eric Auger wrote:
-> > > >> When the vhost iotlb is used along with a guest virtual iommu
-> > > >> and the guest gets rebooted, some MISS messages may have been
-> > > >> recorded just before the reboot and spuriously executed by
-> > > >> the virtual iommu after the reboot. Despite the device iotlb gets
-> > > >> re-initialized, the messages are not cleared. Fix that by calling
-> > > >> vhost_clear_msg() at the end of vhost_init_device_iotlb().
-> > > >>
-> > > >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> > > >> ---
-> > > >>  drivers/vhost/vhost.c | 1 +
-> > > >>  1 file changed, 1 insertion(+)
-> > > >>
-> > > >> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > >> index 40097826cff0..422a1fdee0ca 100644
-> > > >> --- a/drivers/vhost/vhost.c
-> > > >> +++ b/drivers/vhost/vhost.c
-> > > >> @@ -1751,6 +1751,7 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled)
-> > > >>    }
-> > > >>
-> > > >>    vhost_iotlb_free(oiotlb);
-> > > >> +  vhost_clear_msg(d);
-> > > >>
-> > > >>    return 0;
-> > > >>  }
-> > > > Hmm.  Can't messages meanwhile get processes and affect the
-> > > > new iotlb?
-> > > Isn't the msg processing stopped at the moment this function is called
-> > > (VHOST_SET_FEATURES)?
-> > >
-> > > Thanks
-> > >
-> > > Eric
-> >
-> > It's pretty late here I'm not sure.  You tell me what prevents it.
-> 
-> So the proposed code assumes that Qemu doesn't process device IOTLB
-> before VHOST_SET_FEAETURES. Consider there's no reset in the general
-> vhost uAPI,  I wonder if it's better to move the clear to device code
-> like VHOST_NET_SET_BACKEND. So we can clear it per vq?
-
-Hmm this makes no sense to me. iommu sits between backend
-and frontend. Tying one to another is going to backfire.
-
-I'm thinking more along the lines of doing everything
-under iotlb_lock.
-
-
-
-> >
-> > BTW vhost_init_device_iotlb gets enabled parameter but ignores
-> > it, we really should drop that.
-> 
-> Yes.
-> 
-> >
-> > Also, it looks like if features are set with VIRTIO_F_ACCESS_PLATFORM
-> > and then cleared, iotlb is not properly cleared - bug?
-> 
-> Not sure, old IOTLB may still work. But for safety, we need to disable
-> device IOTLB in this case.
-> 
-> Thanks
-> 
-> >
-> >
-> > > >
-> > > >
-> > > >> --
-> > > >> 2.37.3
-> >
-
+T24gTW9uLCAyMDIyLTExLTA3IGF0IDIxOjQzIC0wODAwLCBJc2FrdSBZYW1haGF0YSB3cm90ZToN
+Cj4gT24gVHVlLCBOb3YgMDgsIDIwMjIgYXQgMDE6MDk6MjdBTSArMDAwMCwNCj4gIkh1YW5nLCBL
+YWkiIDxrYWkuaHVhbmdAaW50ZWwuY29tPiB3cm90ZToNCj4gDQo+ID4gT24gTW9uLCAyMDIyLTEx
+LTA3IGF0IDEzOjQ2IC0wODAwLCBJc2FrdSBZYW1haGF0YSB3cm90ZToNCj4gPiA+ID4gT24gRnJp
+LCBOb3YgMDQsIDIwMjIsIElzYWt1IFlhbWFoYXRhIHdyb3RlOg0KPiA+ID4gPiA+IFRoYW5rcyBm
+b3IgdGhlIHBhdGNoIHNlcmllcy4gSSB0aGUgcmViYXNlZCBURFggS1ZNIHBhdGNoIHNlcmllcyBh
+bmQgaXQNCj4gPiA+ID4gPiB3b3JrZWQuDQo+ID4gPiA+ID4gU2luY2UgY3B1IG9mZmxpbmUgbmVl
+ZHMgdG8gYmUgcmVqZWN0ZWQgaW4gc29tZSBjYXNlcyhUbyBrZWVwIGF0IGxlYXN0IG9uZQ0KPiA+
+ID4gPiA+IGNwdQ0KPiA+ID4gPiA+IG9uIGEgcGFja2FnZSksIGFyY2ggaG9vayBmb3IgY3B1IG9m
+ZmxpbmUgaXMgbmVlZGVkLg0KPiA+ID4gPiANCj4gPiA+ID4gSSBoYXRlIHRvIGJyaW5nIHRoaXMg
+dXAgYmVjYXVzZSBJIGRvdWJ0IHRoZXJlJ3MgYSByZWFsIHVzZSBjYXNlIGZvciBTVVNQRU5EDQo+
+ID4gPiA+IHdpdGgNCj4gPiA+ID4gVERYLCBidXQgdGhlIENQVSBvZmZsaW5lIHBhdGggaXNuJ3Qg
+anVzdCBmb3IgdHJ1ZSBvZmZsaW5pbmcgb2YgQ1BVcy7CoCBXaGVuDQo+ID4gPiA+IHRoZQ0KPiA+
+ID4gPiBzeXN0ZW0gZW50ZXJzIFNVU1BFTkQsIG9ubHkgdGhlIGluaXRpYXRpbmcgQ1BVIGdvZXMg
+dGhyb3VnaA0KPiA+ID4gPiBrdm1fc3VzcGVuZCgpK2t2bV9yZXN1bWUoKSwNCj4gPiA+ID4gYWxs
+IHJlc3BvbmRpbmcgQ1BVcyBnbyB0aHJvdWdoIENQVSBvZmZsaW5lK29ubGluZS7CoCBJLmUuIGRp
+c2FsbG93aW5nIGFsbA0KPiA+ID4gPiBDUFVzIGZyb20NCj4gPiA+ID4gZ29pbmcgIm9mZmxpbmUi
+IHdpbGwgcHJldmVudCBzdXNwZW5kaW5nIHRoZSBzeXN0ZW0uDQo+ID4gPiANCj4gPiA+IFRoZSBj
+dXJyZW50IFREWCBLVk0gaW1wbGVtZW50YXRpb24gZGlzYWxsb3dzIENQVSBwYWNrYWdlIGZyb20g
+b2ZmbGluZSBvbmx5DQo+ID4gPiB3aGVuDQo+ID4gPiBURHMgYXJlIHJ1bm5pbmcuwqAgSWYgbm8g
+VEQgaXMgcnVubmluZywgQ1BVIG9mZmxpbmUgaXMgYWxsb3dlZC7CoCBTbyBiZWZvcmUNCj4gPiA+
+IFNVU1BFTkQsIFREcyBuZWVkIHRvIGJlIGtpbGxlZCB2aWEgc3lzdGVtZCBvciBzb21ldGhpbmcu
+wqAgQWZ0ZXIga2lsbGluZyBURHMsDQo+ID4gPiB0aGUNCj4gPiA+IHN5c3RlbSBjYW4gZW50ZXIg
+aW50byBTVVNQRU5EIHN0YXRlLg0KPiA+IA0KPiA+IFRoaXMgc2VlbXMgbm90IGNvcnJlY3QuICBZ
+b3UgbmVlZCBvbmUgY3B1IGZvciBlYWNoIHRvIGJlIG9ubGluZSBpbiBvcmRlciB0bw0KPiA+IGNy
+ZWF0ZSBURCBhcyB3ZWxsLCBhcyBUREguTU5HLktFWS5DT05GSUcgbmVlZHMgdG8gYmUgY2FsbGVk
+IG9uIGFsbCBwYWNrYWdlcywNCj4gPiBjb3JyZWN0Pw0KPiANCj4gVGhhdCdzIGNvcnJlY3QuIElu
+IHN1Y2ggY2FzZSwgdGhlIGNyZWF0aW9uIG9mIFREIGZhaWxzLiAgVEQgY3JlYXRpb24gY2hlY2tz
+IGlmDQo+IGF0IGxlYXN0IG9uZSBjcHUgaXMgb25saW5lIG9uIGFsbCBDUFUgcGFja2FnZXMuICBJ
+ZiBubywgZXJyb3IuDQoNCkkgdGhpbmsgd2UgY2FuIGp1c3QgYWx3YXlzIHJlZnVzZSB0byBvZmZs
+aW5lIHRoZSBsYXN0IGNwdSBmb3IgZWFjaCBwYWNrYWdlIHdoZW4NClREWCBpcyBlbmFibGVkLiAg
+SXQncyBzaW1wbGVyIEkgZ3Vlc3MuDQo=
