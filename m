@@ -2,70 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF6DE6208F5
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 06:39:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C9C2620900
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 06:44:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233103AbiKHFjR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 00:39:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47562 "EHLO
+        id S233328AbiKHFn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 00:43:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbiKHFjP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 00:39:15 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D867C1A839
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 21:39:14 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id r61-20020a17090a43c300b00212f4e9cccdso16892426pjg.5
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 21:39:14 -0800 (PST)
+        with ESMTP id S233293AbiKHFn5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 00:43:57 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5118920BC8;
+        Mon,  7 Nov 2022 21:43:56 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id c2so13212771plz.11;
+        Mon, 07 Nov 2022 21:43:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pz3TQvJYE17eelsCmAIKQH4K5ZpJA4fTVBa1z1nTTM8=;
-        b=IOwNbZZGA7GQ46cWFdsY+B8zogEIS2IXjVotgY9MfbBfAfpoa5E/uc/8KrHVc/Pwg+
-         F5ILEXrqOb0BxfkrFhUsLFMHq9NqlTWE1sy3CSju4txDxRFGMb7rJPZ3OHQeqh8pLGkV
-         A8Ws3BEJX/fDhOtwYRrUAKJzX63a4TJHYV1t0p4jGmkELlOj0/CCnuid55gKcVbtfGp/
-         hZU1/8MqdjbLhSC3XekuujoIMvuPvTczjvEZsK/3RwbQr+LLE/y93/zAYJZbq+CQpTOD
-         Qcl0dEbAq+GZ8eGtx06f8ADzYtJZb3CS6jizD9O7H+v+y/WeV+1wvRI4H4DbkLh3tkTP
-         mOtA==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3UicMHRBXNKZ6klzBYtNlGfdpT3ipHtBcp9O7LuoFbE=;
+        b=XNdeC13pb4LjOBaRWcKMBNqFRJ+RgsbfVoNw18z5L+vfkg1SZceZjUxbLhiIy1qySy
+         Y4hI02da8j9ev8qt2sUsGeUiOSLlDAUgz5JUplPGm8kAk4jLtNdmDFZCCStM1EGIelNU
+         pjjtL4FSGAVwgisQucoSj4vLVpkgLqzZdzX9wYytiy3sfYNB3aYKj8S/Nug5gaKAa8gA
+         /5oDb+KCNmSa3bC/jNyCQmeij+quPN3cyVSSr1ovXCPVJxrqYAAydTsm3Q4bRt6yNhxm
+         6FVSyKTuVZN23UWZkdV6Uc7djgZpboRwjQPImKvKrchYImM3eB6pVBMtJk1jJ8Nfk6ob
+         kIoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Pz3TQvJYE17eelsCmAIKQH4K5ZpJA4fTVBa1z1nTTM8=;
-        b=pxV+OcvAlItFLcJaXl5vFw2CEwm/B7OVyjrKrKuuJ5LmZj5zLRSFgoKXEfIG8qb74C
-         sO/S91P6bBodDLJyBthwRqwyKyvCFFJuLwcsxMDmTSudSX2/RjFRErhu25Qs1bj8Lf/R
-         e629yG2Z4WroPCj63Mp/0t73yMLlV1QWKPwpMoT5WLf7IVv//zyi8tZJlTSlwTrVVJ27
-         kw6m3crgloCIeHI0T9J7fNQUozMYwnAwNUN7k3Ldk3Qt9q9RO0Qt3xwp9hp/x3dO4w2k
-         HlhfTvgRvOvJd0Wlrm0rtbAKLTkDZ9rQmQ7QQUyeN3AG6lsYEgivvLKNI1zyMUplGxOM
-         3I7A==
-X-Gm-Message-State: ACrzQf3DrPejs4B5t0de7CkW5UTcUvZDeqweZEVzFBvlxvYZ9QGR8KTb
-        xJzQTRRUR+LLMdYaJQQRCBVoNYiwXC1Kcv26AzL8Sw==
-X-Google-Smtp-Source: AMsMyM4s6UBfXivryrOibC1CJghXZh+LewJC7EVe1bijyzWBrmOnmSw5hn3QDTcMQZSqMPexbYbexJp1QaywwsPftvw=
-X-Received: by 2002:a17:903:3252:b0:186:59e9:8dca with SMTP id
- ji18-20020a170903325200b0018659e98dcamr949010plb.154.1667885954190; Mon, 07
- Nov 2022 21:39:14 -0800 (PST)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3UicMHRBXNKZ6klzBYtNlGfdpT3ipHtBcp9O7LuoFbE=;
+        b=MnFD0FKh03Z5ArKMuS2i+elCdil8z2E960T9XaCmwwi+AD58BPSjqA1R3INAnFN5tQ
+         n1lZAbEtaCSnS/NW9aZLRVTQOong6G94heldExo567ok/9UTmEdg+++JWuM3OAF+2qFI
+         0ToK3qRg2thG/YDb6kfCvelAkw+wNqyTVdSSburpjApHc/LCEP/6VVL7EqMzOmVm6hpk
+         fcg7vBj2000hEdQ+vy0PS8hI69WRBYFm13AdSb2Ug/sdXqGfUgHzZu7pJwjEjfjMA2+c
+         eQBMeqjmedOC59hwKdxTamjK799GS/2LbUdqWDpiZ5gVm3gZwF3G3A0DSz0oJNMP4XnF
+         cNBQ==
+X-Gm-Message-State: ACrzQf2Y1wqR/yzDOJt/DBeyHepQiJRdcgErEuUKGB/ObeCaqzxFHvt1
+        wOG7qEDttMoAxyb9Cx9zwotEVGwbGUImHg==
+X-Google-Smtp-Source: AMsMyM6Ssf7qu6Zt1cmqzeY+6ksfJF4jyx1t2euaZBhwzvq5JPVY+8zsaODdG48vWXQYQDWTdtSyvw==
+X-Received: by 2002:a17:90b:4a04:b0:213:587b:204e with SMTP id kk4-20020a17090b4a0400b00213587b204emr55088612pjb.98.1667886235549;
+        Mon, 07 Nov 2022 21:43:55 -0800 (PST)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id k21-20020a628415000000b0056bb06ce1cfsm5614872pfd.97.2022.11.07.21.43.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Nov 2022 21:43:55 -0800 (PST)
+Date:   Mon, 7 Nov 2022 21:43:54 -0800
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "Christopherson,, Sean" <seanjc@google.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Yao, Yuan" <yuan.yao@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "farosas@linux.ibm.com" <farosas@linux.ibm.com>,
+        "palmer@dabbelt.com" <palmer@dabbelt.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+        "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "anup@brainfault.org" <anup@brainfault.org>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
+        "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "atishp@atishpatra.org" <atishp@atishpatra.org>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+Subject: Re: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
+Message-ID: <20221108054354.GA1708572@ls.amr.corp.intel.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221104071749.GC1063309@ls.amr.corp.intel.com>
+ <Y2V1oslbw24/2Opd@google.com>
+ <20221107214634.GE1063309@ls.amr.corp.intel.com>
+ <bf29fe1ac84cae8ddb06e566b56c653600a1901c.camel@intel.com>
 MIME-Version: 1.0
-References: <20221107085435.2581641-1-maz@kernel.org> <20221107085435.2581641-12-maz@kernel.org>
-In-Reply-To: <20221107085435.2581641-12-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 7 Nov 2022 21:38:57 -0800
-Message-ID: <CAAeT=FyR_4d1HzDjNEdVhsdgzRuBGuEwGuoMYY0xvi+YAbMqSg@mail.gmail.com>
-Subject: Re: [PATCH v3 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to
- be set from userspace
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bf29fe1ac84cae8ddb06e566b56c653600a1901c.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,87 +113,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Tue, Nov 08, 2022 at 01:09:27AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-On Mon, Nov 7, 2022 at 1:16 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Allow userspace to write ID_AA64DFR0_EL1, on the condition that only
-> the PMUver field can be altered and be at most the one that was
-> initially computed for the guest.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 40 ++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 39 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 7a4cd644b9c0..47c882401f3c 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1247,6 +1247,43 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->         return 0;
->  }
->
-> +static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> +                              const struct sys_reg_desc *rd,
-> +                              u64 val)
-> +{
-> +       u8 pmuver, host_pmuver;
-> +       bool valid_pmu;
-> +
-> +       host_pmuver = kvm_arm_pmu_get_pmuver_limit();
-> +
-> +       /*
-> +        * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
-> +        * as it doesn't promise more than what the HW gives us. We
-> +        * allow an IMPDEF PMU though, only if no PMU is supported
-> +        * (KVM backward compatibility handling).
-> +        */
-> +       pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
-> +       if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver) ||
-> +           (pmuver != 0 && pmuver < ID_AA64DFR0_EL1_PMUVer_IMP))
+> On Mon, 2022-11-07 at 13:46 -0800, Isaku Yamahata wrote:
+> > > On Fri, Nov 04, 2022, Isaku Yamahata wrote:
+> > > > Thanks for the patch series. I the rebased TDX KVM patch series and it
+> > > > worked.
+> > > > Since cpu offline needs to be rejected in some cases(To keep at least one
+> > > > cpu
+> > > > on a package), arch hook for cpu offline is needed.
+> > > 
+> > > I hate to bring this up because I doubt there's a real use case for SUSPEND
+> > > with
+> > > TDX, but the CPU offline path isn't just for true offlining of CPUs.  When
+> > > the
+> > > system enters SUSPEND, only the initiating CPU goes through
+> > > kvm_suspend()+kvm_resume(),
+> > > all responding CPUs go through CPU offline+online.  I.e. disallowing all
+> > > CPUs from
+> > > going "offline" will prevent suspending the system.
+> > 
+> > The current TDX KVM implementation disallows CPU package from offline only
+> > when
+> > TDs are running.  If no TD is running, CPU offline is allowed.  So before
+> > SUSPEND, TDs need to be killed via systemd or something.  After killing TDs,
+> > the
+> > system can enter into SUSPEND state.
+> 
+> This seems not correct.  You need one cpu for each to be online in order to
+> create TD as well, as TDH.MNG.KEY.CONFIG needs to be called on all packages,
+> correct?
 
-Nit: Since this second condition cannot be true (right?), perhaps it might
-be rather confusing?  I wasn't able to understand what it meant until
-I see the equivalent check in set_id_dfr0_el1() (Maybe just me though:).
-
-Thank you,
-Reiji
-
-
-> +               return -EINVAL;
-> +
-> +       valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
-> +
-> +       /* Make sure view register and PMU support do match */
-> +       if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
-> +               return -EINVAL;
-> +
-> +       /* We can only differ with PMUver, and anything else is an error */
-> +       val ^= read_id_reg(vcpu, rd);
-> +       val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> +       if (val)
-> +               return -EINVAL;
-> +
-> +       vcpu->kvm->arch.dfr0_pmuver = pmuver;
-> +
-> +       return 0;
-> +}
-> +
->  /*
->   * cpufeature ID register user accessors
->   *
-> @@ -1508,7 +1545,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->         ID_UNALLOCATED(4,7),
->
->         /* CRm=5 */
-> -       ID_SANITISED(ID_AA64DFR0_EL1),
-> +       { SYS_DESC(SYS_ID_AA64DFR0_EL1), .access = access_id_reg,
-> +         .get_user = get_id_reg, .set_user = set_id_aa64dfr0_el1, },
->         ID_SANITISED(ID_AA64DFR1_EL1),
->         ID_UNALLOCATED(5,2),
->         ID_UNALLOCATED(5,3),
-> --
-> 2.34.1
->
->
+That's correct. In such case, the creation of TD fails.  TD creation checks if
+at least one cpu is online on all CPU packages.  If no, error.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
