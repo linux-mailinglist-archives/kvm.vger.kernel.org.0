@@ -2,102 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9CCC620CA7
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 10:49:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E67D6620CB3
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 10:54:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233719AbiKHJtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 04:49:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59814 "EHLO
+        id S232923AbiKHJyP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 04:54:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232911AbiKHJtS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 04:49:18 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53F7FDFE3
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 01:49:18 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id c2so13673895plz.11
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 01:49:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ueRenEMUtbiyFkdIer7I3YK8sgT01nadOHVMNYLxJmQ=;
-        b=dMKQbk3l1weg5mHsv7DWgE6byb/4ZAItiIrkluWJLkFGI5bPo19cYmlPbupUODauuW
-         1an85MQZ1Ps1s/Qc7zlRjCU51arfSjjw7/bOgR2JEmiY8TZ+TUPXTUMr8bmGMBgHkMEI
-         BGnAAoJ7jcYU4TxBJz2FCTW/D16GUoDqzhLpISG/XD8OFGZqRwU9FCLfwTvqeQtdpmW1
-         xCngOXnFMTuKThg1gVFqEXvML66U+urIie/jxtYJQklKu3Ib384pEjlWpCnyiAblpjF5
-         VdxaNbg/SOq8rQXrVxl1kY0jBvjaZV0W52h2ZZ4U8diGLQfEj0XDW38vYq6t5VEER8zf
-         zvSQ==
+        with ESMTP id S233607AbiKHJyN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 04:54:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D33D33BC
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 01:53:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667901198;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uzoGd4Gb3r/vu7Rkz4I2OXS3PO0nLcghMAIB6UW5rKQ=;
+        b=iaQ2QKmSYThrbKHx/Jwa9sCHXIcejSN76z7g7NdWfpkCvXZTkWpwAfF6Z4bD55CvLK/nYU
+        Gw/SeG5hCvCfiKi38VkNz9krX2OtO2ueJw8UcMUR4tOLroBOqBlGtrwSoQURbQ+lTyOhiC
+        w45z5PFztGqzF2u74NstGK++Bur56ag=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-357-lzQU3jaTNVm267xf0rj94w-1; Tue, 08 Nov 2022 04:53:16 -0500
+X-MC-Unique: lzQU3jaTNVm267xf0rj94w-1
+Received: by mail-wr1-f69.google.com with SMTP id n13-20020adf8b0d000000b0023658a75751so3824423wra.23
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 01:53:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:reply-to:mime-version
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ueRenEMUtbiyFkdIer7I3YK8sgT01nadOHVMNYLxJmQ=;
-        b=m1rMVbDnxWBaFWXPqmvBdNZzL8D1zXDzr2OYouSFGRSz3XO4ngyqpd2Z7JF2IDowLD
-         /io9KFul7/LejfCtmBNu5MtyIK9jECO20/J1WvBoi63G7DzqwIldBZEQXL3JEZAQEhBK
-         EMvz1JHeNK5faAYS+AjEeEqU4FO+BYAegLfO5LGe173JLPZadiaqCCgQTTn1CwYXYk04
-         jbFYCvJyB3y7yymxvKj/PgOWxl5gx11plST46LfKqmCAE1hmAqniuQQ/0LhiLr40/dls
-         yTlNuQ1OnNGdZR0pn3v1Xv/VSwq8P1x/eF8rb10bOCAo4ISv/0icEYkZ2rZ+9XTMDAyt
-         1UUg==
-X-Gm-Message-State: ACrzQf2HgdBFM2xS5EAB/zWmaE1c+OpEZu5t6c0pd8Z/wkk2VoRqZcbz
-        5NTz7kFrXP6/tIyPgc7k7+Mjvy4/vXelqZwGJdA=
-X-Google-Smtp-Source: AMsMyM5cAxqBH6+pZIzdjFxOixXEzpVKn5x9UbJn6gZNeM3mywoCm5xC4+qLq+UqCi/8E0ssZraMrpsgEfxkyTyK2mw=
-X-Received: by 2002:a17:902:9a0a:b0:188:4f8b:abb8 with SMTP id
- v10-20020a1709029a0a00b001884f8babb8mr29929667plp.157.1667900957880; Tue, 08
- Nov 2022 01:49:17 -0800 (PST)
+        bh=uzoGd4Gb3r/vu7Rkz4I2OXS3PO0nLcghMAIB6UW5rKQ=;
+        b=1oWa90UvcniIg42cjPK5gKGZOFlTA3XSzRjMPkcrqR5GdnjFKsmuxK9BjgamOCGjme
+         cpeMWbKLnJhXNadsOqfNzPZn/GO9oG20AerO3aehas0Ec1wY7LGG5+1dpxpSAyzeb+FC
+         VjpjQD1K3DRw6MEe15gtR88Sfr3RvvruthmB/CAi/Fq5yV2xjwp91KMLPs/v2TrY+kak
+         MwcOsrF+uNErpMXUh1T8Po2895dKBcSJFXrZDakENsxE22opjRaJE4q+fE7Q1R+HdXmE
+         FrSoL+j8gWAcBzSRDU2xrDrLQxAA3wxjQP+O0ZV/2UroLYtVQpm/lNY/yvYsueWqUDjT
+         j8oA==
+X-Gm-Message-State: ACrzQf1i1EtPOwz2jiXRGRWDyungc3uDleB3/Xu+9WgErwe08zVazxlz
+        hemmOoN91D3rQHjCGT0M0+ylWOkjm8KyxO61tPfL7dx8u/sbePRIGCfLDuOuqmqGiQZG7RpESmy
+        8cqSohn+mSWMg
+X-Received: by 2002:adf:f1c9:0:b0:236:49ee:8598 with SMTP id z9-20020adff1c9000000b0023649ee8598mr33921492wro.481.1667901195390;
+        Tue, 08 Nov 2022 01:53:15 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM6Ec9loeKZWPo0yMMthDKLz6II1hGxtRHuPK4ad2qBoZ7H0jm0uUtFY27W6viz5QAVEqGkTWA==
+X-Received: by 2002:adf:f1c9:0:b0:236:49ee:8598 with SMTP id z9-20020adff1c9000000b0023649ee8598mr33921483wro.481.1667901195176;
+        Tue, 08 Nov 2022 01:53:15 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:e3ec:5559:7c5c:1928? ([2001:b07:6468:f312:e3ec:5559:7c5c:1928])
+        by smtp.googlemail.com with ESMTPSA id t12-20020a5d6a4c000000b00228692033dcsm9831584wrw.91.2022.11.08.01.53.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Nov 2022 01:53:14 -0800 (PST)
+Message-ID: <adcb7098-5bae-7dc3-f48f-5c84fd3f4f7d@redhat.com>
+Date:   Tue, 8 Nov 2022 10:53:13 +0100
 MIME-Version: 1.0
-Received: by 2002:a05:6a10:e18f:b0:357:eb9f:644c with HTTP; Tue, 8 Nov 2022
- 01:49:16 -0800 (PST)
-Reply-To: te463602@gmail.com
-From:   "Dr. Moustapha Sanon" <moustaphasanon4@gmail.com>
-Date:   Tue, 8 Nov 2022 01:49:16 -0800
-Message-ID: <CAPX2G2bhsQhBdgsMGxGSAd_N=tg-TOugLDC-ka79G-V2znOPww@mail.gmail.com>
-Subject: Good Day,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=5.0 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2607:f8b0:4864:20:0:0:0:62c listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5001]
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [moustaphasanon4[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [moustaphasanon4[at]gmail.com]
-        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
-        *      digit
-        *      [te463602[at]gmail.com]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        *  2.9 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-X-Spam-Level: *****
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [kvm-unit-tests PATCH v5 26/27] x86/pmu: Update testcases to
+ cover AMD PMU
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Like Xu <likexu@tencent.com>,
+        Sandipan Das <sandipan.das@amd.com>
+References: <20221102225110.3023543-1-seanjc@google.com>
+ <20221102225110.3023543-27-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20221102225110.3023543-27-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
--- 
-Greetings,
-We are privileged and delighted to reach you via email" And we are
-urgently waiting to hear from you. and again your number is not
-connecting.
+On 11/2/22 23:51, Sean Christopherson wrote:
+> +		pmu.msr_gp_counter_base = MSR_F15H_PERF_CTR0;
+> +		pmu.msr_gp_event_select_base = MSR_F15H_PERF_CTL0;
+> +		if (!this_cpu_has(X86_FEATURE_PERFCTR_CORE))
+> +			pmu.nr_gp_counters = AMD64_NUM_COUNTERS;
+> +		else
+> +			pmu.nr_gp_counters = AMD64_NUM_COUNTERS_CORE;
+> +
 
-Thanks,
-Dr. Moustapha Sanon
+If X86_FEATURE_PERFCTR_CORE is not set, pmu.msr_gp_*_base should point 
+to MSR_K7_PERFCTR0/MSR_K7_EVNTSEL0:
+
+diff --git a/lib/x86/pmu.c b/lib/x86/pmu.c
+index af68f3a..8d5f69f 100644
+--- a/lib/x86/pmu.c
++++ b/lib/x86/pmu.c
+@@ -47,10 +47,13 @@ void pmu_init(void)
+  		pmu.msr_gp_event_select_base = MSR_F15H_PERF_CTL0;
+  		if (this_cpu_has(X86_FEATURE_AMD_PMU_V2))
+  			pmu.nr_gp_counters = cpuid(0x80000022).b & 0xf;
+-		else if (!this_cpu_has(X86_FEATURE_PERFCTR_CORE))
+-			pmu.nr_gp_counters = AMD64_NUM_COUNTERS;
+-		else
++		else if (this_cpu_has(X86_FEATURE_PERFCTR_CORE))
+  			pmu.nr_gp_counters = AMD64_NUM_COUNTERS_CORE;
++		else {
++			pmu.nr_gp_counters = AMD64_NUM_COUNTERS;
++			pmu.msr_gp_counter_base = MSR_K7_PERFCTR0;
++			pmu.msr_gp_event_select_base = MSR_K7_EVNTSEL0;
++		}
+
+  		pmu.gp_counter_width = PMC_DEFAULT_WIDTH;
+  		pmu.gp_counter_mask_length = pmu.nr_gp_counters;
+
+Paolo
+
