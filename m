@@ -2,182 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D843621AFB
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 18:46:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF0E9621B0A
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 18:48:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234603AbiKHRqk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 12:46:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43982 "EHLO
+        id S234640AbiKHRsH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 12:48:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233945AbiKHRqi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 12:46:38 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D37B554F2
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 09:46:37 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id b21so14819372plc.9
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 09:46:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cjSjC5m99kmUUHYC704oOlI8KJi6LTudhKVnFW3q+Mo=;
-        b=ftWxPl3+8IfelsK/irLrvblaLrX6dvTk43ZU1RGb7E7QhEuhpuFGQnZUs1B/6eqA8Y
-         9uQybJjBJrLcnswih9ZuqdP/IGzw5N1LHsBYZwMjKm4pxbrW1ieLuxCyIbeQvnPHGIX9
-         KlKI+02Y2PtkvzGrkUCj7EVO4k0DJZDFtOtuUtFMvCioPX+FiFS160StdFwaRhG4AwZY
-         /X/0r60JYMQEe4UtsauftLe+islfrGWTT7n2RWyEhP6x94J5Vb4QTPr7DjEYHP04yepW
-         KF97tjKStfZxjB8uLonmnyGRloE774fNFuZ/STi6vuLRLYYB1EDXjhtfDOqD4TBoTzbU
-         ZVkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cjSjC5m99kmUUHYC704oOlI8KJi6LTudhKVnFW3q+Mo=;
-        b=1opZbm5WoHw+WuNAhPGi6tYijDtWGjnNqt3JxW+mBXsvnJoPIuz0pnnfmQVfUqI4vV
-         /+snGeWh+sHB5HYK4qXev3G4gh4/23a/d12Kz+cZSIRBl7+Begy7CYaN9pAHOcYZV+oF
-         6w2Lbill+7m8TPR7ZvzH92QlZSFSIJ4j+5IhHEDk6vEGZbPt2aa0HFEfNFQb+cgKpELL
-         cUvMoHIKCAvavVA6plXjPtVHcNx957rmtwKH2l/kqTvSP4GAULonMhWGRtQT+rNXO56Z
-         fjT4jEug85F+F7mg4Sk21j/33oDsVhf+kznteqys3Iuhamtk4B/AepPOB8nFDdmL3FYn
-         EaDw==
-X-Gm-Message-State: ACrzQf0VAmg89018bVPNHsP5u/fkFt49uz4x+NoWyaYXFhSAtZRo9g1J
-        1iVKYQ1gtgBZyecuySvRzEZudA==
-X-Google-Smtp-Source: AMsMyM6IejjlUU0y+myBNmX6xdBJY00CqsdAF2QTJKOsZh5WixYj1ODA6TQRcmab3f8JPfGm8K7ciQ==
-X-Received: by 2002:a17:902:ea04:b0:187:4923:56f4 with SMTP id s4-20020a170902ea0400b00187492356f4mr35142106plg.97.1667929596484;
-        Tue, 08 Nov 2022 09:46:36 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b9-20020a170902d50900b00185402cfedesm7283578plg.246.2022.11.08.09.46.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Nov 2022 09:46:35 -0800 (PST)
-Date:   Tue, 8 Nov 2022 17:46:32 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
+        with ESMTP id S234116AbiKHRsF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 12:48:05 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2065.outbound.protection.outlook.com [40.107.244.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ACE154B33;
+        Tue,  8 Nov 2022 09:48:04 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n7XdmydpDAvUjoP4oIUpWJPKAFChx3xeBHEuAhO+ztuXIQjzJW9/Ewo7VjMXnjugEmT3/uoKKdNmRjooihQLYD/9HcvjIjkCzedxsUxOC8PGY6ygG1f+lW5EUai1gZFFmaMLkSU6+fasifMqQ5P0/NXyJtwHpFZ7mn/cYNjCFEe1WEWS5XdaJ7Ewsek1mfs0MNCmjn1Wonlg6dNuis4nvjce4Vo0Unu0itMeZWS9KXSYXHtOCWN6EO/WrRf8MTNWkFgq8fkDiEW+hr1mnBpcOaCqiERySqfxqaNDVJ6DipC2RBMUeqP1C4ylnpaq1drF+Sw41maENr03mc2ClQEKfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jeHYlu9SAGt/Mosgtf686dCJHqTcHN5+/ExDmhkfBMo=;
+ b=Hui8e4ppHyyYdy3DdATjLyA4LntWJa5SbMx8bzaNeEvMooYulRwTwb2q/9k3KkTevkbXae5fxrGwDJ/u0CjM/+Hfa7z2MpA2pJXj1YMcaQwfZUnEr0gnv5v3UxUaW2JnbVhcYmiALOP5gKJZteSPEAokgYL2p6G7pvlGZuZCAk9jDpm0OKKRBgFgFHNgF111PgammXJTFAQHD6u1MChSQn07AeFYYqI4DeFM6eBsUBrpCS4qDVwfkmdnAe8D3JgLNgR+8gRI0l5WRv0Bl1QcRc7kKh43HcEnyW9DihbN6cn6kR7p21ZHLpsepzoHxmJmyReeVi1i/ABnrOxorCPX7Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jeHYlu9SAGt/Mosgtf686dCJHqTcHN5+/ExDmhkfBMo=;
+ b=sd4kd+ypgWSjrXhqd+MPGnmgUYMgoHRdQ1HP5fQLxyr7wrx+U6cWjaeTTuxINiwB3+n1BBeyv802H+5u0g2v0lWYjP2iV/5MOC+HV2zls0Ex70PeyLQgquZyDaHWFVg1GksIyQ5EB5C3LnXz2dMrOj7s9iK6GbCkIDocubUqAFvsiYrKTHIobj//jCTC/hk9Cn/RM2WgjsScwhPEmC47pLXI9UbQPUih58x8bBF3XQe1bfBC86VorDl01ivYpp5o1U7gB7GHW/3l0wvgdjk5wicTOvq88NMYeQsct47+CmMjntd6IfDun5AXLuMM2jm2Ot9lASyoDg4kpfWH75sSUw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by MW4PR12MB7357.namprd12.prod.outlook.com (2603:10b6:303:219::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Tue, 8 Nov
+ 2022 17:48:02 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
+ 17:48:02 +0000
+Date:   Tue, 8 Nov 2022 13:48:01 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
         Eric Farman <farman@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Chao Gao <chao.gao@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
-Message-ID: <Y2qV+IGKyKQItMj2@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221104071749.GC1063309@ls.amr.corp.intel.com>
- <Y2V1oslbw24/2Opd@google.com>
- <20221107214634.GE1063309@ls.amr.corp.intel.com>
-MIME-Version: 1.0
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 07/11] vfio-iommufd: Support iommufd for physical VFIO
+ devices
+Message-ID: <Y2qWUdCD/zJ9JoXC@nvidia.com>
+References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <7-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <Y2ny84qOFQhtYVPF@Asurada-Nvidia>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221107214634.GE1063309@ls.amr.corp.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <Y2ny84qOFQhtYVPF@Asurada-Nvidia>
+X-ClientProxiedBy: BL1PR13CA0193.namprd13.prod.outlook.com
+ (2603:10b6:208:2be::18) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW4PR12MB7357:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6404cb71-e7e9-46b1-0533-08dac1b161ed
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5eKNYVY3b4AmJmouEWv3bsyDSoEwu8/lyu+21Xx+lXn+Ce/aAmzdSAK9joJtuBn0FywYgr3yJBzSOcJKI8XkKlDkrx9UIH0d3rB8bdrvWADTFSEGD2WpcZe8PbsxeBT3Tb27YoO/+zbMcCcRd43ULLv8YHbjltfPdxrgyGe+m+cXodh1iQXZiZikw3lFWCGC0papLB6/4ehzrML46hG6J50kanDqS1QiTYFlPEgunPrATkBEpSk7jfT8wUT/oA/NOAwPB8ZMt5lQUjiqxZFOBjzNH2VvWL/wBtPBLHbw7g8WWbasvgdTzsK6zATs+onZ3X4v8eYanZHPmfqou7f/wgPSOPNaAbvEmt8AY2NSaUh6RiKSJ1TzoRvcFdklT+LaNUU5Vnis4Zhdio3AS4ju7WO7QkcSHZsyDxFcO0k3g9+eGtOk9xiN29Dh5ZF7qXllUBC1hiy2Y92UHRjmj9pwIDArdtCxV1LE/7L1gMPGS4eq7LomhXYtrTubwc8uPpK0jXgSWtEObCmzXgmyB/7hUvOar4O4H2+/yJjpEVdHvfbF/K2jtn/sVWO3Is0A82ky1bFd05O7boP69GoMQBLG2JhqvTbsX5YN1Bieh9Wyb1ryhmu3zFNi5oCul61okS8/aV9Qt0UKbp5M3q1MpTmjq44SuH8srMiY3HGcfLUxXeYnujwYL76wXqnqi21/MyuMG9Uddx92rNXjfUgPdoeMYg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(346002)(396003)(136003)(39860400002)(376002)(451199015)(36756003)(86362001)(26005)(2906002)(6636002)(2616005)(186003)(6506007)(6512007)(83380400001)(66476007)(4326008)(8936002)(66946007)(66556008)(54906003)(8676002)(37006003)(7416002)(38100700002)(316002)(478600001)(6486002)(6862004)(5660300002)(41300700001)(7406005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Z52fAHGoHJ/Lr4LfYLT9oTKwPPKj3zUOS6mGCVAa7ENBmxwFrTloSIppD/Cd?=
+ =?us-ascii?Q?qAwTpAUxOkzJnQy4aBm6JPXkO1P1qdmzAlapQJXyuMuo8eCZxNLUt/L2z2cg?=
+ =?us-ascii?Q?/s8wTa94ID/DqsEpk9rLU58xdZZKqMLkmQgctAEmWkk8oC7a+uzZEzYKGfh/?=
+ =?us-ascii?Q?fbjRgm5lyWog0vJc3qOAzRrsrzPSzA0/CCX3O9dAxoJOKhmXRIkVRuf5qrxT?=
+ =?us-ascii?Q?+BM22fI/gApFVyCEjYaVRjZlBCXnto6rfy4YIy2qLJT3ikqyBTei5X92wmx7?=
+ =?us-ascii?Q?z0MIJ60FUWeEIfqdMASmUsua75CeSQtbWls5fjG/igCb43U1jT7tSH891BV0?=
+ =?us-ascii?Q?6vH7mNFgNAuhOU2Zi2f7LnzCe078msSuDqONNVbMRo1rjfv7Z1nW6kUP2ucc?=
+ =?us-ascii?Q?yE1WHUbx0AZ7P09Uj3WN94nsq2Y0McQjtDdw80ZZ3tp457q7/PJ9JO+KkN5X?=
+ =?us-ascii?Q?t/21vuiv0bXZRhnAzxYu+SojpiujYm3j4ZZIuYGql+8UpGwIrNurZLEe5YvJ?=
+ =?us-ascii?Q?ETH/sK9gh8gpCC9ciqqpJmdXZ7ppG5zQZERiGZW5OzPedfpJ/Ogevj9Xi44f?=
+ =?us-ascii?Q?dhszuOPhpRLuem5Kibm/Q+Q0k/ETmtcCVdbQ30pz948d4rcQ6cfzEdmCa0dJ?=
+ =?us-ascii?Q?NcwC1Bjh7n3vkGwN9K8PCmlntLnAE7ZZPeS4tdHj8FdUGw1oMqRYf3B5tceZ?=
+ =?us-ascii?Q?ZL+WlxWYjkWjESfVbECxvMrbRN7GYCRFzPxudaNjF7cJhVJwdTv6hOTqCyAq?=
+ =?us-ascii?Q?SqVqyaxqYPi68HITAym4apxYgHlSAQYqZeWrJYJxfPif3sWFj53SMiYCapCf?=
+ =?us-ascii?Q?4+NorpAkC/E7JPDxmKUgTY8gvbqQ2BOTqs7SAWOP9psGD5eJSOjqtNkGARMR?=
+ =?us-ascii?Q?APZvScrwYoQ+Hx9Z6Z95SE22aZAy/g6Jo+T0WXJkF970T++J3mfznObjRW0C?=
+ =?us-ascii?Q?gP0+Y/Mmf8nT0a4Bf6UuAsYlj1ppbsIq4SgCCaAfLmdQ2pJFNCnqBWbmbf9i?=
+ =?us-ascii?Q?qXfVBaUqWo/d5qnXuZgUdCVYw+96vYEarTUSaY7OzGsmb2l8COPzy0TXjDvF?=
+ =?us-ascii?Q?606iOjSlAOAhCZALxYoq0zhkUQKdSi/AYI23hbrk4rgJ3x8xL07ie65uvEUy?=
+ =?us-ascii?Q?wXkFVQM3d+CJ1eoqjTcSb1vE+3ppHlRUpVjQtf3FOcUjmUVnMb2m0fAt3SZu?=
+ =?us-ascii?Q?F4CIfgxnw+NU1D2x8Sn0KBkeBzBw2Lx9m0yz7pqJBn6Hhw7/I4AfR3q0CgZz?=
+ =?us-ascii?Q?YPjT35HU8XTnxoB3mbTPLrs4w3lSsZTHpOnpEUgJHEOnHwWgSP1+9kX5c/S2?=
+ =?us-ascii?Q?ShagY/s3qBN/RxHuemJGRPpAZMKEuGSPIb5FndVYD5CL23fedfw1oswCP2bI?=
+ =?us-ascii?Q?JAgndo6CzFKHY+Gz+gqg0A0tr7YelGCPtObobeRHta+tiiQLhF37PF4DbZ26?=
+ =?us-ascii?Q?XRGF93zhT3Eov25vfF5aInbIrxaDi8NY4iDWwkv/z03HkRE3uKdQDOykJswu?=
+ =?us-ascii?Q?p/VOr9k+dDwZOqosMj0XktHT/XbUzZD36IPy9Xu/NiuG4RdReSiReBDWiIFa?=
+ =?us-ascii?Q?OAecH7ffuu3fLzMknPY=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6404cb71-e7e9-46b1-0533-08dac1b161ed
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2022 17:48:02.4985
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RSWnIRCHmntKAaIjxldk7JtNXiaKa5x26gbY370CeUs5fGxtBmGXSVT2zABBP13g
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7357
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 07, 2022, Isaku Yamahata wrote:
-> On Fri, Nov 04, 2022 at 08:27:14PM +0000,
-> Sean Christopherson <seanjc@google.com> wrote:
-> 
-> > On Fri, Nov 04, 2022, Isaku Yamahata wrote:
-> > > Thanks for the patch series. I the rebased TDX KVM patch series and it worked.
-> > > Since cpu offline needs to be rejected in some cases(To keep at least one cpu
-> > > on a package), arch hook for cpu offline is needed.
-> > 
-> > I hate to bring this up because I doubt there's a real use case for SUSPEND with
-> > TDX, but the CPU offline path isn't just for true offlining of CPUs.  When the
-> > system enters SUSPEND, only the initiating CPU goes through kvm_suspend()+kvm_resume(),
-> > all responding CPUs go through CPU offline+online.  I.e. disallowing all CPUs from
-> > going "offline" will prevent suspending the system.
-> 
-> The current TDX KVM implementation disallows CPU package from offline only when
-> TDs are running.  If no TD is running, CPU offline is allowed.  So before
-> SUSPEND, TDs need to be killed via systemd or something.  After killing TDs, the
-> system can enter into SUSPEND state.
+On Mon, Nov 07, 2022 at 10:10:59PM -0800, Nicolin Chen wrote:
 
-Ah, I assumed offlining was disallowed if TDX was enabled.
+> > @@ -812,6 +821,7 @@ static int vfio_device_first_open(struct vfio_device *device)
+> >  	device->kvm = NULL;
+> >  	if (device->group->container)
+> >  		vfio_group_unuse_container(device->group);
+> > +	vfio_iommufd_unbind(device);
+> 
+> ...yet, missing here, which could result in kernel oops.
+> 
+> Should probably add something similar:
+> +	if (device->group->iommufd)
+> +		vfio_iommufd_unbind(device);
+> 
+> Or should check !vdev->iommufd_device inside the ->unbind.
 
-> > I don't see anything in the TDX series or the specs that suggests suspend+resume
-> > is disallowed when TDX is enabled, so blocking that seems just as wrong as
-> > preventing software from soft-offlining CPUs.
-> 
-> When it comes to SUSPEND, it means suspend-to-idle, ACPI S1, S3, or S4.
-> suspend-to-idle doesn't require CPU offline.
-> 
-> Although CPU related spec doesn't mention about S3, the ACPI spec says
-> 
->   7.4.2.2 System _S1 State (Sleeping with Processor Context Maintained)
->   The processor-complex context is maintained.
-> 
->   7.4.2.4 System _S3 State or 7.4.2.5 System _S4 State
->   The processor-complex context is not maintained.
-> 
-> It's safe to say the processor context related to TDX is complex, I think.
-> Let me summarize the situation. What do you think?
-> 
-> - While no TD running:
->   No additional limitation on CPU offline.
-> 
-> - On TD creation:
->   If any of whole cpu package is software offlined, TD creation fails.
->   Alternative: forcibly online necessary CPUs, create TD, and offline CPUs
+Lets keep it symmetric since the container is checked:
 
-The alternative isn't really viable because there's no way the kernel can guarantee
-a CPU can be onlined, i.e. the kernel would need to fallback of disallowing TD
-creation anyways.
+@@ -821,7 +821,8 @@ static int vfio_device_first_open(struct vfio_device *device)
+        device->kvm = NULL;
+        if (device->group->container)
+                vfio_group_unuse_container(device->group);
+-       vfio_iommufd_unbind(device);
++       else if (device->group->iommufd)
++               vfio_iommufd_unbind(device);
+ err_module_put:
+        mutex_unlock(&device->group->group_lock);
+        module_put(device->dev->driver->owner);
+@@ -840,7 +841,8 @@ static void vfio_device_last_close(struct vfio_device *device)
+        device->kvm = NULL;
+        if (device->group->container)
+                vfio_group_unuse_container(device->group);
+-       vfio_iommufd_unbind(device);
++       else if (device->group->iommufd)
++               vfio_iommufd_unbind(device);
+        mutex_unlock(&device->group->group_lock);
+        module_put(device->dev->driver->owner);
 
-> - TD running:
->   Although it's not required to keep all CPU packages online, keep CPU package
->   from offlining for TD destruction.
-> 
-> - TD destruction:
->   If any of whole cpu package is software offlined, TD destruction fails.
->   The current implementation prevents any cpu package from offlinining during
->   TD running.
->   Alternative:
->   - forcibly online necessary CPUs, destruct TD, and offline CPUs again and
->     allow CPU package to offline
->   - Stash TDX resources somewhere. When cpu packages are onlined, free those
->     release.
-> 
-> - On SUSPEND:
->   TODO: Allow CPU offline if S1 is requested.
-
-Is this actually a TODO?  I assume the kernel doesn't actually try to offline
-CPUs in this case, i.e. it Just Works.
-
->   - suspend-to-idle: nothing to do because cpu offline isn't required
->   - ACPI S1: Need to allow offline CPUs.  This can be implemented by referencing
->     suspend_state_t pm_suspend_target_state is PM_SUSPEND_TO_STANBY.
->   - ACPI S3/S4: refuse cpu offline.  The system needs to kill all TDs before
->     starting SUSPEND process. This is what is implemented.
-
-Looks good, disallowing SUSPEND with active TDs is a reasonable tradeoff.  As
-above, I highly doubt anyone actually cares.
+Thanks,
+Jason
