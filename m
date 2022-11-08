@@ -2,155 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F5CC620BF6
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 10:20:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34F02620C42
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 10:32:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233343AbiKHJUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 04:20:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39396 "EHLO
+        id S233253AbiKHJcp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 04:32:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232929AbiKHJUA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 04:20:00 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2041.outbound.protection.outlook.com [40.107.220.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E87E9DED7;
-        Tue,  8 Nov 2022 01:19:59 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gGa7zg0/DGGbm6UeRV9/J08ouG9AuY9Ml8yw+riD0GuNxMkwV48pYmIM/1wR87g+E6xhzCLOXAb1MHmWnHq0b8gkGfik4q60Z2pjoOY7IwtTYXwfsGJlrNtW+y4DBajGcCjl1ulgvaSSxXfzL7lkkKs6dODB/WKMF6aOlv0xRy5LE0ImDQtAjg3TSpg7Xn1jn99vNZhH7m5lFWcjabtISMEJpXe3qPhJu2CckHAyvs7vqH9ZzynOJFjYt3zz3OtLpuAPFzJ/rJADDe/2tR3bLhSr2ayaDW2ci2+wGrDPwwJ8uf4avjyHdrmqITWpf6OeScC303Sj6XxkRrfay4Q0MQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gACs/mcCcJ43oUOSadZwVFXG5Pc6F2WUBxUWZXAC8KI=;
- b=QEH928VBn9dAScc15ZMFFjlU993q5GPvCv0M/b8li4VQsHsKTmtlFJT+OaYYjswGytw/GPS4cZcd1YdFY59/B9IgScHlBxsZ9Y9Qb+qDqPaHZiwbU7inFJ4G9pzWCCLvJu9G7qc+B7jJBfHux9fqRSReM+T5JerIMq0JFNxLAe/DdRH/F6NKJ5kC2LxVlYIIUSmeby3n7en5iKxVgmraPp6M2s5vIUPvDh9nEFZgYjhs8kyO5LjEbBaaB7K4UT8VJwodwfPTL9lYDYtYCmPUyjYKXnbAXt/2ThqbCiDQb6I0NWi1EWMHdA/palvByJGUqRGJ4ZrYNyEBmOEPhz7NeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gACs/mcCcJ43oUOSadZwVFXG5Pc6F2WUBxUWZXAC8KI=;
- b=JUFt2nXErJeoxu0+foZFme4EMG0gslIPxvI5nHLMdNvAaG4MsQS7DY7sX3yDhVViWSZOlQnkS/vF03u/53xk3Xq+KcRpWTfU4d/eCa8/ZJ2fRmPtKqdraNYryhiahI1VS/sNDeE+1ilheXmEu33H0c1tggxm5Og9ULPGqnNOiC9AWKOKir2xy/TMVxk6748E5KYsLUWlMzSEW7mYWbjZCJfAqo9ez6D17Afihir2z2114V0kN4GkBQfxBKpIZRxPdtoZWcsqj4ZGVXGCs5ZcOK2B73rq21PklUAq4+3LtkjxPbYGNrPtRnNoy91MPXQO81UpD/uZkXjDlPymY44eYg==
-Received: from MW4PR03CA0338.namprd03.prod.outlook.com (2603:10b6:303:dc::13)
- by SJ0PR12MB6944.namprd12.prod.outlook.com (2603:10b6:a03:47b::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Tue, 8 Nov
- 2022 09:19:58 +0000
-Received: from CO1NAM11FT030.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:dc:cafe::83) by MW4PR03CA0338.outlook.office365.com
- (2603:10b6:303:dc::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27 via Frontend
- Transport; Tue, 8 Nov 2022 09:19:58 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- CO1NAM11FT030.mail.protection.outlook.com (10.13.174.125) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5791.20 via Frontend Transport; Tue, 8 Nov 2022 09:19:57 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Tue, 8 Nov 2022
- 01:19:52 -0800
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.29; Tue, 8 Nov 2022 01:19:51 -0800
-Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com
- (10.126.190.182) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29 via Frontend
- Transport; Tue, 8 Nov 2022 01:19:50 -0800
-Date:   Tue, 8 Nov 2022 01:19:48 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@gmail.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        <dri-devel@lists.freedesktop.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Eric Farman" <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        <intel-gfx@lists.freedesktop.org>,
-        <intel-gvt-dev@lists.freedesktop.org>, <iommu@lists.linux.dev>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        "Jason Herne" <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>,
-        Longfang Liu <liulongfang@huawei.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        "Halil Pasic" <pasic@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "Rodrigo Vivi" <rodrigo.vivi@intel.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Will Deacon <will@kernel.org>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2 00/11] Connect VFIO to IOMMUFD
-Message-ID: <Y2ofNKmmAIMGYLFK@Asurada-Nvidia>
-References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+        with ESMTP id S233383AbiKHJcl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 04:32:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 375D813F24
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 01:31:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667899901;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wORuoNKSEGIHseLSvWb8U/wTDNM4BG+j707oJXZ4j9I=;
+        b=Ah4ajqaE42Q56y2ekKGk1XqdjRNOyuDIcklz/dS8/K4nS8CVRaOXoASS773yOyUwJjj/N8
+        M2W7+aCHd5+FvVjlcIkxsKJLYlT9jIwr/QqFMo6IFMHe48q8QrcsLkndZ0wcX3jfrYPWoj
+        ZIBKtzk+FVjl6mYtxU1GITdWkHl5Jk0=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-19-sAEpnNpwPieoPaDvgFa8tw-1; Tue, 08 Nov 2022 04:31:39 -0500
+X-MC-Unique: sAEpnNpwPieoPaDvgFa8tw-1
+Received: by mail-qk1-f197.google.com with SMTP id bj1-20020a05620a190100b006fa12a05188so12332124qkb.4
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 01:31:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wORuoNKSEGIHseLSvWb8U/wTDNM4BG+j707oJXZ4j9I=;
+        b=bgcXrpki728nfrqyvnvJDO9CO/l3dit5Pnkkf5OXmp+zS7418coxcQk8rc1yNnKPKK
+         yJef9cjPhAt9Izp5JzZN3ozoU7JO/GWeFQPjlVqsqhZ/oosNN8PEiNYJ0mzC+I0fPiee
+         sZdm4ITUSO+RDrOBbs8Tt2HqvGaezWWQkDX/5ZivsH8mZvpxL0TH5mJfEJuAKDJVQouO
+         0lJTyK0a5iCh8nglKyUDUPN57Zcmw4ZB6UpM2bjj9AZFbp6nxYIMlnz6bFSnRD3GKX6h
+         GH4lVTWWi2nZ/nlzHHx+Od/Ag6PwasnSpM6uVx4YRJ/1iKKGJ1YHTr4zR5xtdIMvUVh/
+         bRaQ==
+X-Gm-Message-State: ACrzQf2J1dWyGVu4IWyiOscbap0ku2vw+BGJEKKq7uiEMRMwatY4d0ns
+        d3QJQkLIK5cSSxKUwnYeuaWOb8oUwmc7EVBra9ifnav7f1s2mkTpWeaM+0vIJZvHKHIJYw6gEc8
+        mUbKrFzMXgAhX
+X-Received: by 2002:ac8:4788:0:b0:3a5:6a2f:e77d with SMTP id k8-20020ac84788000000b003a56a2fe77dmr15500751qtq.562.1667899899158;
+        Tue, 08 Nov 2022 01:31:39 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM5r6u9VAFIEkP5ZvGS1wz6LtG1vG3jMrqncPoAa0QeUVMjh8Yu9Jeel/zWCsisC28rCmndQSA==
+X-Received: by 2002:ac8:4788:0:b0:3a5:6a2f:e77d with SMTP id k8-20020ac84788000000b003a56a2fe77dmr15500734qtq.562.1667899898878;
+        Tue, 08 Nov 2022 01:31:38 -0800 (PST)
+Received: from redhat.com ([138.199.52.3])
+        by smtp.gmail.com with ESMTPSA id o14-20020a05620a0d4e00b006eef13ef4c8sm8702771qkl.94.2022.11.08.01.31.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Nov 2022 01:31:38 -0800 (PST)
+Date:   Tue, 8 Nov 2022 04:31:33 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        peterx@redhat.com
+Subject: Re: [RFC] vhost: Clear the pending messages on
+ vhost_init_device_iotlb()
+Message-ID: <20221108041820-mutt-send-email-mst@kernel.org>
+References: <20221107203431.368306-1-eric.auger@redhat.com>
+ <20221107153924-mutt-send-email-mst@kernel.org>
+ <b8487793-d7b8-0557-a4c2-b62754e14830@redhat.com>
+ <20221107180022-mutt-send-email-mst@kernel.org>
+ <CACGkMEsYyH5P2h6XkBgrW4O-xJXxdzzRa1+T2zjJ07OHiYObVA@mail.gmail.com>
+ <20221108035142-mutt-send-email-mst@kernel.org>
+ <CACGkMEtFhmgKrKwTT8MdQG26wbi20Z5cTn69ycBtE17V+Kupuw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT030:EE_|SJ0PR12MB6944:EE_
-X-MS-Office365-Filtering-Correlation-Id: d6b1b581-7bb5-4908-52cd-08dac16a67ed
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jMW6FPbZJBXl/zfNVyXd2mtKnvB+gisbpt6xcvyvFllyIjLVcVhJoQDwqwcvW1iQjXTnDgPTjjV9K34r1FigQTTzjufFqySE21JoKeaddM98NgvR7xiXz97Wx7hXNTQht3/W2ylmPJdCeP50WaFpm0yVlByLYcsnfXYp05iA4rhFU/U27v8olgmrgXMe3oAve+4tJZdtjA+WvZenad5AfnuDCv16IBa2rAdb303m49tg11K2if5fY9ARWsHU2WpW8jr0d5uzal9DJqqmMJupTUNur1uFiTN94KLDIMtgbCfVwL8rWwT7z0mVUaCDE/7ALSYlLBhXzWD1E5nNhPndzV4X9JAbFt0AbemlsiOzOqBhsU7IWzUajnUojirDc0dsA/dI1H8mWYEZRZGED4Libjiw2H/g0sGA1ioaFKXOUZ/GH8op1qC6LQA0BOlvhmz28TfV9DOENt6Pvj86Sq3m7E7LzjBMvIwmz14WuO2hVQXP8uw/fgieFiVvZwNSNgngp8ZDbpl8KB1sACSAtF5rAa8qcdKIY8ZHpK163wY3ox7RJVjt5by0IaniTEwX70baeXKDBwhz30DKqpuHTosjl1rknuZ0Yz0Bz+JXJhvuvjVQL2Cb/dDerDzOJzEYyar698L8uEMkyPoT2BGQrjIta5qoitMN48TT2I1S1VlS7yrvoZQT0sRTyLaW+m4FXDfSilIKcXLp0IAjCz274lq/4EyxvYsmiv0/5qYLHo+Lj17WP6/Pebl3Bs6UHE6Oz+VHUFAeFKJ0ixl8DQLTMIzEhrFi3T+XkASMfS4dCdC6snl3DaMMOc0/c/utMyYLZ8/UKY8/A5ngQvMWBANDfUq/IXII8QThv+KkhTeU7V0V5m0=
-X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(39860400002)(346002)(136003)(451199015)(46966006)(36840700001)(40470700004)(356005)(82740400003)(7636003)(86362001)(83380400001)(40480700001)(40460700003)(4744005)(2906002)(55016003)(336012)(186003)(9686003)(426003)(47076005)(26005)(36860700001)(70206006)(4326008)(8676002)(7406005)(54906003)(6636002)(316002)(33716001)(7416002)(70586007)(82310400005)(8936002)(6862004)(478600001)(966005)(5660300002)(41300700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2022 09:19:57.9397
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d6b1b581-7bb5-4908-52cd-08dac16a67ed
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT030.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6944
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <CACGkMEtFhmgKrKwTT8MdQG26wbi20Z5cTn69ycBtE17V+Kupuw@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 08:52:44PM -0400, Jason Gunthorpe wrote:
+On Tue, Nov 08, 2022 at 05:13:50PM +0800, Jason Wang wrote:
+> On Tue, Nov 8, 2022 at 4:56 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, Nov 08, 2022 at 11:09:36AM +0800, Jason Wang wrote:
+> > > On Tue, Nov 8, 2022 at 7:06 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Mon, Nov 07, 2022 at 10:10:06PM +0100, Eric Auger wrote:
+> > > > > Hi Michael,
+> > > > > On 11/7/22 21:42, Michael S. Tsirkin wrote:
+> > > > > > On Mon, Nov 07, 2022 at 09:34:31PM +0100, Eric Auger wrote:
+> > > > > >> When the vhost iotlb is used along with a guest virtual iommu
+> > > > > >> and the guest gets rebooted, some MISS messages may have been
+> > > > > >> recorded just before the reboot and spuriously executed by
+> > > > > >> the virtual iommu after the reboot. Despite the device iotlb gets
+> > > > > >> re-initialized, the messages are not cleared. Fix that by calling
+> > > > > >> vhost_clear_msg() at the end of vhost_init_device_iotlb().
+> > > > > >>
+> > > > > >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> > > > > >> ---
+> > > > > >>  drivers/vhost/vhost.c | 1 +
+> > > > > >>  1 file changed, 1 insertion(+)
+> > > > > >>
+> > > > > >> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > > > > >> index 40097826cff0..422a1fdee0ca 100644
+> > > > > >> --- a/drivers/vhost/vhost.c
+> > > > > >> +++ b/drivers/vhost/vhost.c
+> > > > > >> @@ -1751,6 +1751,7 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled)
+> > > > > >>    }
+> > > > > >>
+> > > > > >>    vhost_iotlb_free(oiotlb);
+> > > > > >> +  vhost_clear_msg(d);
+> > > > > >>
+> > > > > >>    return 0;
+> > > > > >>  }
+> > > > > > Hmm.  Can't messages meanwhile get processes and affect the
+> > > > > > new iotlb?
+> > > > > Isn't the msg processing stopped at the moment this function is called
+> > > > > (VHOST_SET_FEATURES)?
+> > > > >
+> > > > > Thanks
+> > > > >
+> > > > > Eric
+> > > >
+> > > > It's pretty late here I'm not sure.  You tell me what prevents it.
+> > >
+> > > So the proposed code assumes that Qemu doesn't process device IOTLB
+> > > before VHOST_SET_FEAETURES. Consider there's no reset in the general
+> > > vhost uAPI,  I wonder if it's better to move the clear to device code
+> > > like VHOST_NET_SET_BACKEND. So we can clear it per vq?
+> >
+> > Hmm this makes no sense to me. iommu sits between backend
+> > and frontend. Tying one to another is going to backfire.
+> 
+> I think we need to emulate what real devices are doing. Device should
+> clear the page fault message during reset, so the driver won't read
+> anything after reset. But we don't have a per device stop or reset
+> message for vhost-net. That's why the VHOST_NET_SET_BACKEND came into
+> my mind.
 
-> This is on github: https://github.com/jgunthorpe/linux/commits/vfio_iommufd
-[...]
-> v2:
->  - Rebase to v6.1-rc3, v4 iommufd series
->  - Fixup comments and commit messages from list remarks
->  - Fix leaking of the iommufd for mdevs
->  - New patch to fix vfio modaliases when vfio container is disabled
->  - Add a dmesg once when the iommufd provided /dev/vfio/vfio is opened
->    to signal that iommufd is providing this
+That's not a reset message. Userspace can switch backends at will.
+I guess we could check when backend is set to -1.
+It's a hack but might work.
 
-I've redone my previous sanity tests. Except those reported bugs,
-things look fine. Once we fix those issues, GVT and other modules
-can run some more stressful tests, I think.
+> >
+> > I'm thinking more along the lines of doing everything
+> > under iotlb_lock.
+> 
+> I think the problem is we need to find a proper place to clear the
+> message. So I don't get how iotlb_lock can help: the message could be
+> still read from user space after the backend is set to NULL.
+> 
+> Thanks
+
+Well I think the real problem is this.
+
+vhost_net_set_features does:
+
+        if ((features & (1ULL << VIRTIO_F_ACCESS_PLATFORM))) {
+                if (vhost_init_device_iotlb(&n->dev, true))
+                        goto out_unlock;
+        }
+
+
+so we get a new iotlb each time features are set.
+
+But features can be changes while device is running.
+E.g.
+	VHOST_F_LOG_ALL
+
+
+Let's just say this hack of reusing feature bits for backend
+was not my brightest idea :(
+
+
+
+
+
+> >
+> >
+> >
+> > > >
+> > > > BTW vhost_init_device_iotlb gets enabled parameter but ignores
+> > > > it, we really should drop that.
+> > >
+> > > Yes.
+> > >
+> > > >
+> > > > Also, it looks like if features are set with VIRTIO_F_ACCESS_PLATFORM
+> > > > and then cleared, iotlb is not properly cleared - bug?
+> > >
+> > > Not sure, old IOTLB may still work. But for safety, we need to disable
+> > > device IOTLB in this case.
+> > >
+> > > Thanks
+> > >
+> > > >
+> > > >
+> > > > > >
+> > > > > >
+> > > > > >> --
+> > > > > >> 2.37.3
+> > > >
+> >
+
