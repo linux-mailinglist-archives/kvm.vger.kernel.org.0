@@ -2,205 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 491CA621B46
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 18:57:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 46C15621B45
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 18:57:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233751AbiKHR5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 12:57:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52222 "EHLO
+        id S234751AbiKHR5R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 12:57:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234133AbiKHR51 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 12:57:27 -0500
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6603B1E3DC
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 09:57:25 -0800 (PST)
-Received: by mail-yb1-xb35.google.com with SMTP id 7so13714508ybp.13
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 09:57:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=yq6SxkaZozukMrO18EMGqMBbnexsg8nmoacOgG58fTU=;
-        b=QScNn0Kp+hzyQhI7j3OHVC3ZpGfVww8KjVkmD7X2+zcn5ZVnkcYxIZLnHRr3uHL09Y
-         Eh6U8QLplXpfKJwW2PUO0ot67x9sW6/LuDaeFxiqOyT9N8CHQGrZugmNiImBTIPPWFrm
-         gKBdO70LZ3dNocFhsoFy54RWoUfWhkl/ZnEH/AI0AgoMl3augkKlcAb1f9v2fcGqMDbg
-         k/igdO7FTbVidXZT+j8CTA1fTr/UvT4i/LxmoDCF13ivGqHdyQo0AR/wlcb2/RSVQ/Vz
-         BVycsu1e+y0EPuVnlCBviEZSvh2eqGx5Zfzrp4Iux5/gX0Ar2y9RMPFDwiR9b3/pEMxY
-         58Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yq6SxkaZozukMrO18EMGqMBbnexsg8nmoacOgG58fTU=;
-        b=S+Omy3qEoEgI8pbip25hsgEeDeLAV4pp7wMhQ4tkwpFW1XDBn8xthIy0QC9Fu69jwI
-         PEPQ+Kk7A9JJOu71tYvFrBE6f9ALR9raJRwy+/zMG76yEJE3BeTYyC8oeea4LY9avo/y
-         GEPsDzwCDKmccIDLm2Fu2D4em6R/+oACOcxc7ibKGOLRwoUdoar1Hk8tE/XPb0pVeHbJ
-         gsGoXvT405zMiLZ9eWINgDywq/6qGRNY7mEmooJLYFUnQuqiOnHWGvmdV7E2pQSzMDip
-         GD+BzyiuO2fnD7WjSp8PkqEl4jQ3rjrLxkDyimNKhU6GnR5IAPC0PD1lMfKtLqIVJePA
-         1O+g==
-X-Gm-Message-State: ANoB5pk3Mk0kCEDaVyxr/9MP1YxdAOXW30Yvd3Lj9xAcx5uQBQrEYl2G
-        waMp3/OimR8rrPHX6vj5WoCVNFUMNE2DtmplaLpT0Ppd4RE=
-X-Google-Smtp-Source: AA0mqf4iqNsh5zLKqxE4owqIb5QivOPugZlsrSsWEsxhRGWffbKB62V6hcwEJxpvqyz9F2REc5qZ0rAi+mKHTqa21yU=
-X-Received: by 2002:a25:5888:0:b0:6d5:1100:5dcc with SMTP id
- m130-20020a255888000000b006d511005dccmr17158056ybb.0.1667930244512; Tue, 08
- Nov 2022 09:57:24 -0800 (PST)
+        with ESMTP id S234174AbiKHR5O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 12:57:14 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2083.outbound.protection.outlook.com [40.107.237.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E95161A80A;
+        Tue,  8 Nov 2022 09:57:13 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=azwt/z0z0F+vvhs+qrMw3snhOeTOWZKc4bLqlM1mOv30U8BU3kaSY8sikWisy5cFXHZgXPbYG/5dXto/QvTxBPHGVgT4sHeNvaUhNqOaherfOrwKIAzGYz/dzKiFKlFqD8D7QXho8n7xerb/0Cl04VsOPv/d7SxprdlhEPq3b0ii5GBtoJn+tRllrwEL5uIu4yM5euGIh/vP3SnPNtsTOIAcBTMcsGNgh1+b404MOW9ZaHC8tgRAUzxtTPUZGZHAb/SGBBFkITMhVQWja1YiFTPUIMLOfUL8160PySl3lzHL3jWVSmmyA3GwhfqH0+edkbIqHc53j9+U7wX6vgEpaQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0eB6UXbeCUZbPbpsR6COyGhET08rXi95JQRmA8dXsQQ=;
+ b=WpikBDAXm/LHv2pGjZQXkaOcT67+R6Her2StkxmxmQZP9joPWuW4Jq7ifNVtZZnkrxCNcFSW4A3HGwhuXzEQf26ULf03g3vSbn5tobOriejFl5pYgwpJZr07SsZ+Dyc6OAL8nlhcgIGTz7IWAATiFxifKZ0hU0Me0CuOuEdm8959ZZp+P/n9xewQOddgeU07+L5n8e5+idPKbO4GjvdExWP0/1XG9/MkFW4o1LLs9Ds5zSkOjVJJPg0hDtKPTFIERp6xuWX3tV8Nv3kJuYhmSBSmckgnfuWwBH56kA+DHFrhcHTbMlz3Ybs4myNSx0NRv6idd0CsUtNOHySgkqMAtg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0eB6UXbeCUZbPbpsR6COyGhET08rXi95JQRmA8dXsQQ=;
+ b=m7zmbKXGCBcnzvARHmgMqwPn2WsDsEJzrk0LIb3dJP7B0T3LERLNNl7mAJFXZk0ESuwbvJ3KXT3xtJdpUNCI1+HzqI7t+rlEY81vLXU3jVc+Ah6B2KgvGFHHEgQNZ6ZTaTSp1WzEBBPu+ljzMwZDREz4bAcyoYVf57+rqGr+/Frixdoi5N2NLbXvKyhc/mNfI29BSsXDtDIkpE8AMTdSh4vQvE+8jua76oECnlJqlKfgbTA6eLhiu2k1j2NV+ook52tlLkKfRmJYWE7xwt7UY3TfIXZgTHSNkisyAEyteqpUIFxhp39yDXFV6pjRCJI0EVchU5+jKspzhzW+MJbX0w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BL1PR12MB5029.namprd12.prod.outlook.com (2603:10b6:208:31d::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Tue, 8 Nov
+ 2022 17:57:12 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
+ 17:57:12 +0000
+Date:   Tue, 8 Nov 2022 13:57:11 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     bpf@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v4 12/17] iommufd: Add kAPI toward external drivers for
+ physical devices
+Message-ID: <Y2qYd4W2zlvHLfJ7@nvidia.com>
+References: <12-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+ <2cbd00ff-a51f-bd0f-1bd9-67db5f5d22f4@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2cbd00ff-a51f-bd0f-1bd9-67db5f5d22f4@intel.com>
+X-ClientProxiedBy: MN2PR16CA0030.namprd16.prod.outlook.com
+ (2603:10b6:208:134::43) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-References: <20221105045704.2315186-1-vipinsh@google.com> <20221105045704.2315186-5-vipinsh@google.com>
- <Y2lXld6G+Hp0FW3A@google.com> <CAHVum0ewgeA81T2ttPGB0V-2njdc1oqTjQWziKzTu_pzN+srxw@mail.gmail.com>
-In-Reply-To: <CAHVum0ewgeA81T2ttPGB0V-2njdc1oqTjQWziKzTu_pzN+srxw@mail.gmail.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 8 Nov 2022 09:56:57 -0800
-Message-ID: <CALzav=djtqYAchW0x=riSEtvoQAbpotjBeibBLWVQg4J2T5iiA@mail.gmail.com>
-Subject: Re: [PATCH 4/6] KVM: selftests: Make Hyper-V guest OS ID common
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5029:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0b077e7c-f595-4420-649b-08dac1b2a97b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fhYNGrLY27xyJxvq1mMqfFAX3DPyHyipRi3gLTT3qESUGaTpqMkwpXBkICQ2dldvpMIIAcD9nLLBDw6kFuVHK695qh04rZpGJC1kb0j8pkhsQFRhA+pn9tkivPj5a3JqdaJWte/Nyzm7h/9eNcrJfJknLyCqxvmvomytqACOLFxQfnbFPSByeXqQl5WYiDLZT8+9slJ0iKBXvsHzTAx58fUfCLw+Q4umvs4E0ki5hp6DRd1z9EmW/HL2EDXervVi3oChh0PzjYnzrnrELFoJjKFSjjIHZDdQRDj4tRGeZYwiMfpAf47EUhxXQA+/oujKAraBQ5V3kI6pR1B742KR+HQcNVAPKHUQ4sUjiY7OEfZaGkamtYYQ7/7aQvaFGYueJwybqv85qsMQOSIe3fUHt65jrX4BQHOed3lSf52rIXYAMaRXBVYcJu6Hs95zG0GklrA+YF/yLJ8r7X0H2zumwzD7q4xlHLdL8acGO7tr3SG77e/XA71tSfySob0YybNNgaUo9I4WcGkcMqCJmZhWFkrM2AKiISxwqZqLkIBrceF+/XgPf2TyRUdEaL3InN+dxHeBnUP7V+XW3CLQAwkSm8IAymQxznmWEGDuN23XiZO06bUzEqple+G28NudaQwWyHq1bro0uHjkwLMTuxQvAhzWCnHlrDiEkkEi+g+Lf3L2T6EDo1n3mBQr2crNbZFF
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(346002)(39860400002)(136003)(376002)(396003)(451199015)(26005)(38100700002)(2616005)(6506007)(6512007)(186003)(83380400001)(7416002)(5660300002)(2906002)(7406005)(478600001)(6916009)(316002)(6486002)(41300700001)(66476007)(4326008)(8936002)(66556008)(8676002)(54906003)(66946007)(36756003)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9nqBZGL3TiFn8nvqhYqBbai/pXfLbkXR1BXftWQuSduNgeN1a7MnoysRk9y7?=
+ =?us-ascii?Q?FspPwacFJQS3OobGs9y7yEMhTvVxWsJSFaiHsacuakKKgVELLH5qFOSbEKmG?=
+ =?us-ascii?Q?LQGabKYmnqIBb7Fxl3fZ+wG6fD5P6az1TMkMpVEHasP0ElIq2jqENLYKnDxV?=
+ =?us-ascii?Q?cEnldZaPBMiem/YFW7KC0b046iRsPwr0Rak8rMMyyKaRElforuZLZSyh4zAU?=
+ =?us-ascii?Q?QypATIkhD6fhTj/su5PIlxcDjz3ZD2bnWRghxorkcOf7ZDoPyUFWFt9dj8NL?=
+ =?us-ascii?Q?3aJrCXlJdKE+Y41wct1ykAOohpnNdejVFU9z1OqhJmup51wqjnqwoDR76dwP?=
+ =?us-ascii?Q?ogg8UDNEN/0gOFXNufuAqkvkqEZ21qTduYcF+w/wlgPgCw0ILdyR2X284srg?=
+ =?us-ascii?Q?idZlLAYDH2+W+wLGDk/CZzHlCtUKHfxZexPXIPPt1jPa8TUI3aFPLQfvFZb0?=
+ =?us-ascii?Q?i2/ThoqIcmZxhDHOhyhIborvjc+zDZs2AnE31d+jjgYR/ejwidm/y1xKPpRD?=
+ =?us-ascii?Q?kFhLXRC/T+GXtFmoTd723JXWaF0TusTfjw1K4VD23kkg7E50JJOVJG7NdeQ3?=
+ =?us-ascii?Q?e9z3a/daC8gYe4PJ98nieT+CpkhBaGXhXpASFw5hZKA5gkdN77+AzrB73gLG?=
+ =?us-ascii?Q?f4251Lbh4IukVUnLIqFw6Ma/a1zWh4wbnW40Z3mtup614Y1PCOgXz7n8JEPo?=
+ =?us-ascii?Q?MxV10Tmwj6gtQTHQJF6h0PSWviMrPcQVEdKJ9BEYouM6cT9lMBo8puYPh7RZ?=
+ =?us-ascii?Q?Z+ff0ZG/kcW52zOa/xlMr+XrfHDBHB9UlW7nmsfA3dH4Y0rBBw+bsvhwEm8A?=
+ =?us-ascii?Q?j0IAeUu5705xWriC+kjiC9Ne3bG2m1meDa757Gmkl4p1YSJ2E/R4m7uj+U4w?=
+ =?us-ascii?Q?dEGsZHHn6rVDdTx++uFG2XiSzd/2FOgh16NgGTlc9Qkn56A/XfarSLcm2fgR?=
+ =?us-ascii?Q?m8PXD0M4iXbW3oIx6NPXXN3TBTIAXAj4+1hoUxTBTKksnEIGhEBP1rBqRdX4?=
+ =?us-ascii?Q?dxRwJIT/yR5L2mnE/fqx1GbA/sQRX1hURFCl/TPM2oTCOLa3+FrilGI8B8DU?=
+ =?us-ascii?Q?OGn8B+sa9IdJMT8uqj6VWbPjIOOCmrR/Q+0Y/gajrqcLyUJeXF3zEK0g8mgt?=
+ =?us-ascii?Q?DA6389tnZ3VhdFXTj2M4meGNYjw08ypGlgL5KKFof+09ZZ0MpC56g4WKf0ca?=
+ =?us-ascii?Q?XVLfgLifKj6p31cGXJQM+UVbaw9iz55xGZ4PWKSAat5kdgU3oavzc7K7kDfs?=
+ =?us-ascii?Q?JFoxnfCGmcyxvxe93uXsR+kCxgLWvqu+FAUYeOdetvTN9+PJMawfk8P9CU6E?=
+ =?us-ascii?Q?aAAMyIC7rExMxFTwNMj3o870J7hmFelwJfKgBI1EPg+AKG/Zj1K9foDMdLdP?=
+ =?us-ascii?Q?+zdpTn+cFkLzbbLWv8nZVZNmHJDjjZ1GoWTId38Py8jPRfmrKEWJs1QXWuk/?=
+ =?us-ascii?Q?0Z/1MA3gtcaRN3af5byiURtM6ZJrHofLSgOXA9u3wv3GNHEYfV3Me7XISsxA?=
+ =?us-ascii?Q?E6vXsKEBCi4gzcnIPfxfPzF5gtjLmdGb31JJLeS5p5qDf1N1stqNN9sHNEby?=
+ =?us-ascii?Q?9gAnZljRmngA5eD7leA=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b077e7c-f595-4420-649b-08dac1b2a97b
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2022 17:57:11.9684
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tzcioPbbA5Glyc1btNeAb/KNQI28X9LE4HPjxl+xfhQQYs+IsV17GsLMQlZTzgTc
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5029
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 7, 2022 at 5:45 PM Vipin Sharma <vipinsh@google.com> wrote:
->
-> On Mon, Nov 7, 2022 at 11:08 AM David Matlack <dmatlack@google.com> wrote:
-> >
-> > On Fri, Nov 04, 2022 at 09:57:02PM -0700, Vipin Sharma wrote:
-> > > Make guest OS ID calculation common to all hyperv tests and similar to
-> > > hv_generate_guest_id().
-> >
-> > This commit makes the HV_LINUX_VENDOR_ID and adds LINUX_VERSION_CODE
-> > to existing tests. Can you split out the latter to a separate commit?
-> > Also what's the reason to add LINUX_VERSION_CODE to the mix?
-> >
->
-> I looked at the implementation in selftest and what is in the
-> include/asm-generic/mshyperv.h for the hv_generate_guest_id()
-> function, both looked different. I thought it would be nice to have
-> consistent logic at both places.
->
-> I can remove LINUX_VERISON_CODE if you prefer.
+On Tue, Nov 08, 2022 at 10:34:05PM +0800, Yi Liu wrote:
+> > +/**
+> > + * iommufd_device_bind - Bind a physical device to an iommu fd
+> > + * @ictx: iommufd file descriptor
+> > + * @dev: Pointer to a physical PCI device struct
+> > + * @id: Output ID number to return to userspace for this device
+> > + *
+> > + * A successful bind establishes an ownership over the device and returns
+> > + * struct iommufd_device pointer, otherwise returns error pointer.
+> > + *
+> > + * A driver using this API must set driver_managed_dma and must not touch
+> > + * the device until this routine succeeds and establishes ownership.
+> > + *
+> > + * Binding a PCI device places the entire RID under iommufd control.
+> > + *
+> > + * The caller must undo this with iommufd_unbind_device()
+> 
+> it should be iommufd_device_unbind() now.
 
-Using LINUX_VERSION_CODE here assumes the selftest will run on the
-same kernel that it was compiled with. This might not be the case in
-practice, e.g. if anyone runs the latest upstream selftests against
-their internal kernel (something we've discussed doing recently).
+Done
 
-The right way to incorporate the Linux version code would be for the
-selftest to query it from the host dynamically and use that (at which
-point hv_linux_guest_id() would actually have to be a function).
+> > +static int iommufd_device_do_attach(struct iommufd_device *idev,
+> > +				    struct iommufd_hw_pagetable *hwpt,
+> > +				    unsigned int flags)
+> > +{
+> > +	phys_addr_t sw_msi_start = 0;
+> > +	int rc;
+> > +
+> > +	mutex_lock(&hwpt->devices_lock);
+> > +
+> > +	/*
+> > +	 * Try to upgrade the domain we have, it is an iommu driver bug to
+> > +	 * report IOMMU_CAP_ENFORCE_CACHE_COHERENCY but fail
+> > +	 * enforce_cache_coherency when there are no devices attached to the
+> > +	 * domain.
+> > +	 */
+> > +	if (idev->enforce_cache_coherency && !hwpt->enforce_cache_coherency) {
+> > +		if (hwpt->domain->ops->enforce_cache_coherency)
+> > +			hwpt->enforce_cache_coherency =
+> > +				hwpt->domain->ops->enforce_cache_coherency(
+> > +					hwpt->domain);
+> > +		if (!hwpt->enforce_cache_coherency) {
+> > +			WARN_ON(list_empty(&hwpt->devices));
+> > +			rc = -EINVAL;
+> > +			goto out_unlock;
+> > +		}
+> > +	}
+> > +
+> > +	rc = iopt_table_enforce_group_resv_regions(&hwpt->ioas->iopt, idev->dev,
+> > +						   idev->group, &sw_msi_start);
+> > +	if (rc)
+> > +		goto out_unlock;
+> > +
+> > +	rc = iommufd_device_setup_msi(idev, hwpt, sw_msi_start, flags);
+> > +	if (rc)
+> > +		goto out_iova;
+> 
+> aren't the above two operations only once for a group? I remember you did
+> the two after iommu_attach_group().
 
-But since you don't strictly need it, it's probably best to just omit
-it for the time being.
+No, with the new attach logic per-device is simpler.
 
+iopt_table_enforce_group_resv_regions() tags all the reserved ranges
+with:
 
+		rc = iopt_reserve_iova(iopt, resv->start,
+				       resv->length - 1 + resv->start,
+				       device);
 
->
-> > >
-> > > Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> > > ---
-> > >  tools/testing/selftests/kvm/include/x86_64/hyperv.h  | 10 ++++++++++
-> > >  tools/testing/selftests/kvm/x86_64/hyperv_clock.c    |  2 +-
-> > >  tools/testing/selftests/kvm/x86_64/hyperv_features.c |  6 ++----
-> > >  tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c |  2 +-
-> > >  4 files changed, 14 insertions(+), 6 deletions(-)
-> > >
-> > > diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> > > index 075fd29071a6..9d8c325af1d9 100644
-> > > --- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> > > +++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> > > @@ -9,6 +9,10 @@
-> > >  #ifndef SELFTEST_KVM_HYPERV_H
-> > >  #define SELFTEST_KVM_HYPERV_H
-> > >
-> > > +#include <linux/version.h>
-> > > +
-> > > +#define HV_LINUX_VENDOR_ID                   0x8100
-> > > +
-> > >  #define HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS        0x40000000
-> > >  #define HYPERV_CPUID_INTERFACE                       0x40000001
-> > >  #define HYPERV_CPUID_VERSION                 0x40000002
-> > > @@ -189,4 +193,10 @@
-> > >  /* hypercall options */
-> > >  #define HV_HYPERCALL_FAST_BIT                BIT(16)
-> > >
-> > > +static inline uint64_t hv_linux_guest_id(void)
-> > > +{
-> > > +     return ((uint64_t)HV_LINUX_VENDOR_ID << 48) |
-> > > +            ((uint64_t)LINUX_VERSION_CODE << 16);
-> >
-> > This can be a compile-time constant (i.e. macro).
-> >
->
-> Yes, I will make it a macro in the next version.
->
-> > > +}
-> > > +
-> > >  #endif /* !SELFTEST_KVM_HYPERV_H */
-> > > diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-> > > index d576bc8ce823..f9112c5dc3f7 100644
-> > > --- a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-> > > +++ b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-> > > @@ -104,7 +104,7 @@ static void guest_main(struct ms_hyperv_tsc_page *tsc_page, vm_paddr_t tsc_page_
-> > >
-> > >       /* Set Guest OS id to enable Hyper-V emulation */
-> > >       GUEST_SYNC(1);
-> > > -     wrmsr(HV_X64_MSR_GUEST_OS_ID, (u64)0x8100 << 48);
-> > > +     wrmsr(HV_X64_MSR_GUEST_OS_ID, hv_linux_guest_id());
-> > >       GUEST_SYNC(2);
-> > >
-> > >       check_tsc_msr_rdtsc();
-> > > diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> > > index 6b443ce456b6..b5a42cf1ad9d 100644
-> > > --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> > > +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> > > @@ -13,8 +13,6 @@
-> > >  #include "processor.h"
-> > >  #include "hyperv.h"
-> > >
-> > > -#define LINUX_OS_ID ((u64)0x8100 << 48)
-> > > -
-> > >  static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
-> > >                               vm_vaddr_t output_address, uint64_t *hv_status)
-> > >  {
-> > > @@ -71,7 +69,7 @@ static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
-> > >
-> > >       GUEST_ASSERT(hcall->control);
-> > >
-> > > -     wrmsr(HV_X64_MSR_GUEST_OS_ID, LINUX_OS_ID);
-> > > +     wrmsr(HV_X64_MSR_GUEST_OS_ID, hv_linux_guest_id());
-> > >       wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
-> > >
-> > >       if (!(hcall->control & HV_HYPERCALL_FAST_BIT)) {
-> > > @@ -169,7 +167,7 @@ static void guest_test_msrs_access(void)
-> > >                        */
-> > >                       msr->idx = HV_X64_MSR_GUEST_OS_ID;
-> > >                       msr->write = 1;
-> > > -                     msr->write_val = LINUX_OS_ID;
-> > > +                     msr->write_val = hv_linux_guest_id();
-> > >                       msr->available = 1;
-> > >                       break;
-> > >               case 3:
-> > > diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-> > > index a380ad7bb9b3..2c13a144b04c 100644
-> > > --- a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-> > > +++ b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-> > > @@ -69,7 +69,7 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm)
-> > >
-> > >       GUEST_SYNC(1);
-> > >
-> > > -     wrmsr(HV_X64_MSR_GUEST_OS_ID, (u64)0x8100 << 48);
-> > > +     wrmsr(HV_X64_MSR_GUEST_OS_ID, hv_linux_guest_id());
-> > >
-> > >       GUEST_ASSERT(svm->vmcb_gpa);
-> > >       /* Prepare for L2 execution. */
-> > > --
-> > > 2.38.1.273.g43a17bfeac-goog
-> > >
+So they are all undone as each device detaches
+
+And iommufd_device_setup_msi() keeps track of what has happened to the
+domain via:
+
+		if (hwpt->msi_cookie)
+			return 0;
+		rc = iommu_get_msi_cookie(hwpt->domain, sw_msi_start);
+		if (rc)
+			return rc;
+		hwpt->msi_cookie = true;
+
+So it is OK to call it multiple times
+
+Thanks,
+Jason
