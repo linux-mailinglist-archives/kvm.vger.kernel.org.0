@@ -2,119 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E67D6620CB3
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 10:54:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7486620CF2
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 11:13:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232923AbiKHJyP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 04:54:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33728 "EHLO
+        id S233826AbiKHKN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 05:13:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233607AbiKHJyN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 04:54:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D33D33BC
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 01:53:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667901198;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uzoGd4Gb3r/vu7Rkz4I2OXS3PO0nLcghMAIB6UW5rKQ=;
-        b=iaQ2QKmSYThrbKHx/Jwa9sCHXIcejSN76z7g7NdWfpkCvXZTkWpwAfF6Z4bD55CvLK/nYU
-        Gw/SeG5hCvCfiKi38VkNz9krX2OtO2ueJw8UcMUR4tOLroBOqBlGtrwSoQURbQ+lTyOhiC
-        w45z5PFztGqzF2u74NstGK++Bur56ag=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-357-lzQU3jaTNVm267xf0rj94w-1; Tue, 08 Nov 2022 04:53:16 -0500
-X-MC-Unique: lzQU3jaTNVm267xf0rj94w-1
-Received: by mail-wr1-f69.google.com with SMTP id n13-20020adf8b0d000000b0023658a75751so3824423wra.23
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 01:53:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uzoGd4Gb3r/vu7Rkz4I2OXS3PO0nLcghMAIB6UW5rKQ=;
-        b=1oWa90UvcniIg42cjPK5gKGZOFlTA3XSzRjMPkcrqR5GdnjFKsmuxK9BjgamOCGjme
-         cpeMWbKLnJhXNadsOqfNzPZn/GO9oG20AerO3aehas0Ec1wY7LGG5+1dpxpSAyzeb+FC
-         VjpjQD1K3DRw6MEe15gtR88Sfr3RvvruthmB/CAi/Fq5yV2xjwp91KMLPs/v2TrY+kak
-         MwcOsrF+uNErpMXUh1T8Po2895dKBcSJFXrZDakENsxE22opjRaJE4q+fE7Q1R+HdXmE
-         FrSoL+j8gWAcBzSRDU2xrDrLQxAA3wxjQP+O0ZV/2UroLYtVQpm/lNY/yvYsueWqUDjT
-         j8oA==
-X-Gm-Message-State: ACrzQf1i1EtPOwz2jiXRGRWDyungc3uDleB3/Xu+9WgErwe08zVazxlz
-        hemmOoN91D3rQHjCGT0M0+ylWOkjm8KyxO61tPfL7dx8u/sbePRIGCfLDuOuqmqGiQZG7RpESmy
-        8cqSohn+mSWMg
-X-Received: by 2002:adf:f1c9:0:b0:236:49ee:8598 with SMTP id z9-20020adff1c9000000b0023649ee8598mr33921492wro.481.1667901195390;
-        Tue, 08 Nov 2022 01:53:15 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM6Ec9loeKZWPo0yMMthDKLz6II1hGxtRHuPK4ad2qBoZ7H0jm0uUtFY27W6viz5QAVEqGkTWA==
-X-Received: by 2002:adf:f1c9:0:b0:236:49ee:8598 with SMTP id z9-20020adff1c9000000b0023649ee8598mr33921483wro.481.1667901195176;
-        Tue, 08 Nov 2022 01:53:15 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:e3ec:5559:7c5c:1928? ([2001:b07:6468:f312:e3ec:5559:7c5c:1928])
-        by smtp.googlemail.com with ESMTPSA id t12-20020a5d6a4c000000b00228692033dcsm9831584wrw.91.2022.11.08.01.53.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Nov 2022 01:53:14 -0800 (PST)
-Message-ID: <adcb7098-5bae-7dc3-f48f-5c84fd3f4f7d@redhat.com>
-Date:   Tue, 8 Nov 2022 10:53:13 +0100
-MIME-Version: 1.0
+        with ESMTP id S233819AbiKHKN0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 05:13:26 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F9722D756;
+        Tue,  8 Nov 2022 02:13:20 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A89WvsG008722;
+        Tue, 8 Nov 2022 10:12:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=dbSjy/6KboOVvEXug4RHKIbkd5zdJQGaWqPn2F0vmvw=;
+ b=IgdXE9I+HvXUz4eIuyzU5UFe6yeJOGnCtSBWlJhIAh/xNHnbyrxJy/CbyK0p3C04yTMJ
+ GmhK3qDhp0LMLd7D6IRA53r4BdKKUUIikyZFBSLjCWpMX+SdlJl4zUU/Ye7RYesNTC2R
+ cTuiz7NAVy7f5XMiI7UPbfQNIzV2Qw7jd/68ba6w0V05eEJyttuBnCJyg+7ihpTdyAZP
+ FB+Q9JN0IkhL/5D8g6KkM77/vM2lSYzql0VjvT+Yxf9xO3F+K8wQvFs3q/sCh00B2cVy
+ KnMbh2bSnus9rSZW7FtOWRBX3RI6tYfwaKv0ceAxLlmdRGa1S3/dANyVmFaS0u+vDgcj rw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kqkjf33d6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Nov 2022 10:12:58 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A89mkPA021424;
+        Tue, 8 Nov 2022 10:12:58 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kqkjf33c1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Nov 2022 10:12:58 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A8A6TD7021901;
+        Tue, 8 Nov 2022 10:12:55 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03fra.de.ibm.com with ESMTP id 3kngp5ju97-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Nov 2022 10:12:55 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A8ACqI366060624
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Nov 2022 10:12:52 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 87C01A404D;
+        Tue,  8 Nov 2022 10:12:52 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D19E3A4051;
+        Tue,  8 Nov 2022 10:12:51 +0000 (GMT)
+Received: from [9.171.92.113] (unknown [9.171.92.113])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  8 Nov 2022 10:12:51 +0000 (GMT)
+Message-ID: <fbb84105-cc6e-59bd-b09c-0ea4353d7605@linux.ibm.com>
+Date:   Tue, 8 Nov 2022 11:12:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [kvm-unit-tests PATCH v5 26/27] x86/pmu: Update testcases to
- cover AMD PMU
+ Thunderbird/102.3.0
+Subject: Re: S390 testing for IOMMUFD
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+ <Y2msLjrbvG5XPeNm@nvidia.com>
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Like Xu <likexu@tencent.com>,
-        Sandipan Das <sandipan.das@amd.com>
-References: <20221102225110.3023543-1-seanjc@google.com>
- <20221102225110.3023543-27-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221102225110.3023543-27-seanjc@google.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <Y2msLjrbvG5XPeNm@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 88b1RjTTYRBxlBTkBjyzFSdWP3OuxAdE
+X-Proofpoint-GUID: Kk3uXu49M0BUpX-dT-SrN4RafkObPTS3
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-07_11,2022-11-07_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ priorityscore=1501 impostorscore=0 suspectscore=0 spamscore=0 bulkscore=0
+ mlxlogscore=999 lowpriorityscore=0 adultscore=0 mlxscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211080054
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/2/22 23:51, Sean Christopherson wrote:
-> +		pmu.msr_gp_counter_base = MSR_F15H_PERF_CTR0;
-> +		pmu.msr_gp_event_select_base = MSR_F15H_PERF_CTL0;
-> +		if (!this_cpu_has(X86_FEATURE_PERFCTR_CORE))
-> +			pmu.nr_gp_counters = AMD64_NUM_COUNTERS;
-> +		else
-> +			pmu.nr_gp_counters = AMD64_NUM_COUNTERS_CORE;
-> +
 
-If X86_FEATURE_PERFCTR_CORE is not set, pmu.msr_gp_*_base should point 
-to MSR_K7_PERFCTR0/MSR_K7_EVNTSEL0:
 
-diff --git a/lib/x86/pmu.c b/lib/x86/pmu.c
-index af68f3a..8d5f69f 100644
---- a/lib/x86/pmu.c
-+++ b/lib/x86/pmu.c
-@@ -47,10 +47,13 @@ void pmu_init(void)
-  		pmu.msr_gp_event_select_base = MSR_F15H_PERF_CTL0;
-  		if (this_cpu_has(X86_FEATURE_AMD_PMU_V2))
-  			pmu.nr_gp_counters = cpuid(0x80000022).b & 0xf;
--		else if (!this_cpu_has(X86_FEATURE_PERFCTR_CORE))
--			pmu.nr_gp_counters = AMD64_NUM_COUNTERS;
--		else
-+		else if (this_cpu_has(X86_FEATURE_PERFCTR_CORE))
-  			pmu.nr_gp_counters = AMD64_NUM_COUNTERS_CORE;
-+		else {
-+			pmu.nr_gp_counters = AMD64_NUM_COUNTERS;
-+			pmu.msr_gp_counter_base = MSR_K7_PERFCTR0;
-+			pmu.msr_gp_event_select_base = MSR_K7_EVNTSEL0;
-+		}
+Am 08.11.22 um 02:09 schrieb Jason Gunthorpe:
+> On Mon, Nov 07, 2022 at 08:48:53PM -0400, Jason Gunthorpe wrote:
+>> [
+>> This has been in linux-next for a little while now, and we've completed
+>> the syzkaller run. 1300 hours of CPU time have been invested since the
+>> last report with no improvement in coverage or new detections. syzkaller
+>> coverage reached 69%(75%), and review of the misses show substantial
+>> amounts are WARN_ON's and other debugging which are not expected to be
+>> covered.
+>> ]
+>>
+>> iommufd is the user API to control the IOMMU subsystem as it relates to
+>> managing IO page tables that point at user space memory.
+> 
+> [chop cc list]
+> 
+> s390 mdev maintainers,
+> 
+> Can I ask your help to test this with the two S390 mdev drivers? Now
+> that gvt is passing and we've covered alot of the QA ground it is a
+> good time to run it.
+> 
+> Take the branch from here:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/log/?h=for-next
 
-  		pmu.gp_counter_width = PMC_DEFAULT_WIDTH;
-  		pmu.gp_counter_mask_length = pmu.nr_gp_counters;
+> 
+> And build the kernel with
+> 
+> CONFIG_VFIO_CONTAINER=n
+> CONFIG_IOMMUFD=y
+> CONFIG_IOMMUFD_VFIO_CONTAINER=y
+> 
+> And your existing stuff should work with iommufd providing the iommu
+> support to vfio. There will be a dmesg confirming this.
 
-Paolo
+Gave it a quick spin with vfio_ap:
+[  401.679199] vfio_ap_mdev b01a7c33-9696-48b2-9a98-050e8e17c69a: Adding to iommu group 1
+[  402.085386] iommufd: IOMMUFD is providing /dev/vfio/vfio, not VFIO.
 
+Some tests seem to work, but others dont (running into timeouts). I need to look
+into that (or ideally Tony will have a look, FWIW tests.test_vfio_ap.VfioAPAssignMdevToGuestTest
+fails for me.
+
+
+The same kernel tree with defconfig (instead of CONFIG_IOMMUFD_VFIO_CONTAINER=y) works fine.
+> 
+> Let me know if there are any problems!
+> 
+> If I recall there was some desire from the S390 platform team to start
+> building on iommufd to create some vIOMMU acceleration for S390
+> guests, this is a necessary first step.
+> 
+> Thanks,
+> Jason
