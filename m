@@ -2,161 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 31E5A620A34
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 08:32:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 84F5A620A7E
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 08:42:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233495AbiKHHcw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 02:32:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36714 "EHLO
+        id S233759AbiKHHlv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 02:41:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233371AbiKHHcv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 02:32:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E129167D0
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 23:32:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667892720;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qMzkFr5wWO2ErYRr9fFrSjmX0hB7P0RxUcl1SJ2pD3Q=;
-        b=hZ44ZtDa/QzQvfgn//p4tx+h/YPJXBYwhalcEyWazUliUjDU4xAN9XxXndsyUBrx7B1sJf
-        MLJ8hM7Wfu3sbvib6TSd3iIInM6XaZ/IOviABhR9lHecrZJX+0fB7vLa+Ss2TIwMELmyqg
-        o0NS30b5Zrwsc3Y3SfxcPjAFVAFdHZ4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-34-4162CBUxN7S4yoNxFCLhcQ-1; Tue, 08 Nov 2022 02:31:52 -0500
-X-MC-Unique: 4162CBUxN7S4yoNxFCLhcQ-1
-Received: by mail-wm1-f69.google.com with SMTP id c130-20020a1c3588000000b003b56be513e1so6613415wma.0
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 23:31:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qMzkFr5wWO2ErYRr9fFrSjmX0hB7P0RxUcl1SJ2pD3Q=;
-        b=20tTQJ1UDSqhP8m89X0yCgfaiZee43cHusKJGwBxEhn0v6aXA/NtSK7paHJFoTlHpb
-         P+EP5MHfFIP2SxtTpvF4g0yj4d1JC4RSS/eH14Xb9o+96mrcAO4Bv2cEwRwOI69Zx8Cj
-         D0bMTMc6YZJErznIdkRKEHnPouhnP/MxWMmXyaWQyavIpdnmmSia9x1cSQSvd9m3Hra0
-         obx7WGAl23lawREFDFf68B+d1AUf2lRPOQmuncvsy9li4Buiq6Tz4riknZqsM9zlO1JX
-         Kcc2AOxkSqOHvPQXIYVDsxXYXgqIuf9XBlDTmX2GgIyy9PuMDc5AlfloFt45tbKMecnG
-         WvUw==
-X-Gm-Message-State: ANoB5pkuLNzNRhf/cl3sQrVGubzFh0Co4PgyYDMrMOk3tS2OAM1Tbd5z
-        D39HItm6nuTLzzeQbvFeJVtH+abm0kQqTvG8ZEyi0ybUa87NNKffM+pgtvYFgJmtgNmvoFe3dvc
-        GhGJU6ST6Iwrq
-X-Received: by 2002:a1c:a1c4:0:b0:3cf:a616:cc8d with SMTP id k187-20020a1ca1c4000000b003cfa616cc8dmr8088681wme.62.1667892710086;
-        Mon, 07 Nov 2022 23:31:50 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5uIx7UmC0fECL2xHHWwwpOMztkaHKJt1L2WyCKzX01NL2l1JGJEX5qifjLTMybc5+Tr12N5A==
-X-Received: by 2002:a1c:a1c4:0:b0:3cf:a616:cc8d with SMTP id k187-20020a1ca1c4000000b003cfa616cc8dmr8088667wme.62.1667892709861;
-        Mon, 07 Nov 2022 23:31:49 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id p4-20020a05600c1d8400b003b497138093sm10405740wms.47.2022.11.07.23.31.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Nov 2022 23:31:49 -0800 (PST)
-Message-ID: <c9c0ca0d-d100-c789-dbb8-b308652695e7@redhat.com>
-Date:   Tue, 8 Nov 2022 08:31:47 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC] vhost: Clear the pending messages on
- vhost_init_device_iotlb()
+        with ESMTP id S233733AbiKHHla (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 02:41:30 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56C3112A88;
+        Mon,  7 Nov 2022 23:41:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667893276; x=1699429276;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=K5trhJyxzhawoheb+MrXfrarZLJsp8ocMcrZeF2hCno=;
+  b=NDdxs4tw9BWR2AGYichQfb42O162TtGmqN3MMXsOqQ9yAGTSFVe0l+yH
+   SRmQyExFUYi8WG62N75sZ556TdDmW/5cRqmWqG4dtn7smVhfVYFA4e5DF
+   BlW9P/T9dPGm6UmFCuc+6IEcfCk5P8x6nm4vks1sjXSfBl+gk5wTb8CxL
+   S07+IEumMWY9w+jibnUEN9//fQR22F/VEVuGPWEiKMCMizHDeTo+V3C34
+   Ei3kUp+9femSG2udh0dJn6/L8XZNslL947ilaOAaDKAj+GIuKCEPRKcEn
+   M6Wb6lNRXg8uBgMG93QucIhI2xn4rKYshIkEehicCakkAzmFHP/xcRZdH
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="396926134"
+X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; 
+   d="scan'208";a="396926134"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2022 23:41:06 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="811146810"
+X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; 
+   d="scan'208";a="811146810"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga005.jf.intel.com with ESMTP; 07 Nov 2022 23:41:04 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 7 Nov 2022 23:41:04 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Mon, 7 Nov 2022 23:41:04 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.172)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Mon, 7 Nov 2022 23:41:03 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cqgNzMcGZsqcxp7F9VwgTnyuWmTSjiYK9gVY6erZvdZ9sc/782BSuJnQNhE5JvSBGDW+M/YPNVLyX2kFYmXG2ngRJgi5nAYtkhG/5QCxT7FY747yF8WuIQfGTXdKUXvmJYINyZxcLDcPrROz3QrtE0nEelXyDoN/6CQ2gqU4PlXemsb+Vjz6f7/JMANztf7v8auC36+T6hh9siB8CdvDtcFuGan+f5r+tLOEx/gthJBvwwiGGLXUxdhkAl3ovNCnGQK9rAmsvpod39SfnV7rrst+O8qcEju8leqkoyrJn/etfxYLge1PnKy0+KEQz2HncsAZxSRejYXA+fMgxWghUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=45bqNvxnpe0UC05vAJHfujnb6vN22ep0ya74q/hJx7U=;
+ b=k9z+WkqBKGJICQI2oMIILyEsdFlxHQkpEBJ4dcTaF6sp8rHsVkYCzlCP6dFfUkKe6EeHUQpC5CM8sEdtWzL5PcscWC0deXZK0JkaWA1xJpixx2vBgKG4X7Gzo5b8svj/Fv0FAWEkFGWOOs9yMKO/rejdxOAmDWvwaNSgGpDHC5yPJQaIo95b2VfYRVB+P/reOB9c5Xt8rY32CKr5NIvJxnPNmL5Ng8j69SYcARWMlL3rQIxoWHZ50qWhyk/dqsEwiniXtcgrV5MEJXK4npHhREibl6zOPwNkV6c+sG7NCq9M8t4ZDJ8gkldFnropKj3VoW27LoQltMBNiraWuUetYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by MW4PR11MB7055.namprd11.prod.outlook.com (2603:10b6:303:22b::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27; Tue, 8 Nov
+ 2022 07:41:02 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::ad39:e00a:a7cb:4ada]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::ad39:e00a:a7cb:4ada%7]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
+ 07:41:02 +0000
+Message-ID: <78d1994d-f6ac-7d1e-7d00-4a98c309bc5b@intel.com>
+Date:   Tue, 8 Nov 2022 15:41:25 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.11.0
+Subject: Re: [PATCH v2 07/11] vfio-iommufd: Support iommufd for physical VFIO
+ devices
 Content-Language: en-US
-To:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, peterx@redhat.com
-References: <20221107203431.368306-1-eric.auger@redhat.com>
- <20221107153924-mutt-send-email-mst@kernel.org>
- <b8487793-d7b8-0557-a4c2-b62754e14830@redhat.com>
- <20221107180022-mutt-send-email-mst@kernel.org>
- <CACGkMEsYyH5P2h6XkBgrW4O-xJXxdzzRa1+T2zjJ07OHiYObVA@mail.gmail.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <CACGkMEsYyH5P2h6XkBgrW4O-xJXxdzzRa1+T2zjJ07OHiYObVA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Nicolin Chen <nicolinc@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+CC:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        <dri-devel@lists.freedesktop.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Eric Farman" <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        <intel-gfx@lists.freedesktop.org>,
+        <intel-gvt-dev@lists.freedesktop.org>, <iommu@lists.linux.dev>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        "Jason Herne" <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>,
+        Longfang Liu <liulongfang@huawei.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        "Halil Pasic" <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "Rodrigo Vivi" <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>
+References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <7-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <Y2ny84qOFQhtYVPF@Asurada-Nvidia>
+From:   Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <Y2ny84qOFQhtYVPF@Asurada-Nvidia>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-ClientProxiedBy: SG2PR02CA0017.apcprd02.prod.outlook.com
+ (2603:1096:3:17::29) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|MW4PR11MB7055:EE_
+X-MS-Office365-Filtering-Correlation-Id: f103a80f-4d84-47f5-5088-08dac15c95c9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RkVD2135236drKujZef2j5ECx8/ujEiIfv0+ps3zY2QqOOeJiGNlLQIfSzz9+wGYGtKgFiydYcc1wTNSw+Ggpt4m9SzljfuGLvtmLchvuqeKV8VQ1LFn3HZHWB+R6UyRlTMAMvQ+tNRX37sV6/hN20bnrfP0wdKQ5uPGR7zszxK4WGBb1uaDHBCa4MuNNNMP4dr6m3XmQc3J+pid7hX9P/l/BD6GRbR0vXurUJ3U9A2KjQ044wpMkSo4/B9ytWAiQUTe71b6eJxej5/RuoA0P4NbqtiFRNL6uhOy/bTmJKjq9hE4xnLzztBJfNvWiBdCMkoNuhu/aNMSzYcBf9zWK7eRrb27VxKnRUr6ZkqBs47PKzw92K9jIrcegG5racEvfPizUUfOYZwi9cAy0RLyXu1xA7dvv9yTmEjPb6fyfEX9STbQw0/5biZ5XljKGGrf3nFRmJqHzIivz0jaZUj/iUxHw9I7Hxg7I+jeO8B3YPIXEX/a+5xV3K0eMrNvMPri3SYuVGGLXzJOKHDU8YIiuk9qMutvX9ATq0XfeCS9VuXZPxJidBwBQUiAUFTxlmzcUVIkvrCKl14jIgD9NBLeEOgkqYfbRbakFgyGDO3TA/YBjf0kRukzKXLL/53LaftRFeWHbced2B6Mlb17wJfRsrdVW4hm+voZuPJ5i0wky+32nFFdsbHb1/63uqOWmWZZN2kFG5LB/yPIMxm0BPjhpWneOdJrCH5LWATUuR8WfU90zQMSRdowmVHvZBhtaKLW6ZXEPBHgViDEfISGumr2X1PzmW6L/Hdq2tQXD3QXriM=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(346002)(376002)(39860400002)(396003)(366004)(451199015)(31686004)(31696002)(86362001)(53546011)(2906002)(6486002)(478600001)(82960400001)(38100700002)(36756003)(26005)(83380400001)(6512007)(2616005)(186003)(54906003)(66476007)(4326008)(8676002)(66946007)(66556008)(110136005)(6666004)(316002)(41300700001)(5660300002)(8936002)(6506007)(7406005)(7416002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Vi90OTdoRGN1OVphV2ZyZjZ1endnM0ovdmpEY3gyVnNSYm9kdVMyZmRJWDRF?=
+ =?utf-8?B?Tmh1SDQwQ0orb1NEaVJmejBKeUpQRkxWMTEzSjJKSXR3K08yc01yNFg0dUQ5?=
+ =?utf-8?B?cjkzcG8rN1lWN0o3WS9Nc0JqUGNCdVg5KzNQS2E4TkZpR1dKU200SmFWMUFu?=
+ =?utf-8?B?cHRXcmd2akE5a0t4RmkrNlhJMUg4WEw0UTVQL2I4NXNzeVpoSHUzYXpiYy9x?=
+ =?utf-8?B?M09ZVkJOL1cvUm1SWGQ2ZWU3RXVJWlhMcGpBWThZbkJieUtQWEFlU2NqN1Va?=
+ =?utf-8?B?bkR0SHJxNXlDaURNVTJnUXV3c1RJSUYwN3N5Y0tVTElXKzdFWnQ2NEFGaG9z?=
+ =?utf-8?B?VWQraVZRSDdyTjZZS01ma1NTWWRMVzJ0cHlram04c0RUNHh1N1JwRnZTc2J4?=
+ =?utf-8?B?TkxpV0IzMnRwU1pBNG41T2hRWHBmb0djOU1RUzVxMVhmUzdHeEw2eTF5cCth?=
+ =?utf-8?B?NXZjNlpPWlE0V1YyV1AwVWQ1cWhYbGhLUm1XTnRYc1VGVVNVK2g0LzB2WUtw?=
+ =?utf-8?B?RlBPZnJ2SVpNTzh4VnB2OG9CcituMmlZY1JBWlhSZ1JXbDd4WVhDeFFlUXBv?=
+ =?utf-8?B?NW5qRGJIQklGWFF6WDhieGFpOWFQa3h0UXU2VWdkdmc4ODJWeEduMXdJeTht?=
+ =?utf-8?B?RlJIVnZpZGt2bU5NQjNqck1BYXdGbk56clNYUkxER0tvem1BTHBLWlMvVU5y?=
+ =?utf-8?B?bmVyQ1BMN0dSOUs3cEczTDFKUnpIcDA3UGdpUnAwWDlxS005dGR5RWNQSTA3?=
+ =?utf-8?B?WnpTMWdEUTUyMDJCWnlNdGNsTTF4WnJKZGc2WXFjclQwdHJlTTNUbEp4WE93?=
+ =?utf-8?B?dkx3aUcxTFpNUUN6a2dzcWtXblRWY25CYk40ZGd5aTBHWkp2KzhoRzRvZEd2?=
+ =?utf-8?B?WjJLejNrL0JCclVIbTF4U0FNRkVrSkJqZ3FEY3lVd3hJVGxhenprSE5WTWpx?=
+ =?utf-8?B?cFA3c2toS2x6NUxNdmplYXlLZ2ROaW14a0w2NVVwYmp0T1pTdWpSVUU0YlVl?=
+ =?utf-8?B?VktpZWV3SFEzUmcxMnhWTVVOWjlxaHBqT1g3U2M3bmR4WUMvMTZPcGs4VzFI?=
+ =?utf-8?B?Y0MvRFZ1KytUb0pZbmJTOTRmc0F1dVpUV3hNK2FSNnFQSk1raEhVM1dkQnov?=
+ =?utf-8?B?ZzBtWUxUS2hxaUpLZEJmckN4WFVDS0VkaWN2andYUmUydFRGdFV2eU1wS3pr?=
+ =?utf-8?B?WG5QVDBJUWM2Q1lyVk1GOTZ1c1F6ZXllbUZISmUrTDFWZXE3bk1XNXEwZytI?=
+ =?utf-8?B?R2RiZlZGR2M1RDE3WHdnUU03ZzJrcnRmeXp0bS94WlZhZVNIdzhyM3dWdGNs?=
+ =?utf-8?B?eWt6Q01zZ3hvV24zZXM3RUZjQVR0eGRzYy8xbUNnN1V2RXUvbHlhOGpCNFls?=
+ =?utf-8?B?ZjVDejdLNm04bmt4YjZWQUoyaUhobHNZWTlCM3NiSk9xVHhpMkRxMWVaRGUy?=
+ =?utf-8?B?dzBFRXE1bHJCeDYzanY3OTNMZEhtRXMrQy9KR0VocktDVTJYak1panJvMnRn?=
+ =?utf-8?B?RUU5dWtFRDQwSXJCektGS1l0eHRYODc2RGs4OU1GL1FwaEt5NTN4Sit3aWZJ?=
+ =?utf-8?B?NEpTL3BBS2FXbFlRZjdxWUdrVWlOdnpXYmtkUitudzZMWVFpN2xNL0J1dUlG?=
+ =?utf-8?B?MTVYY1RWbm1XSTBqbFM5OG9VdkxKeW5naks5MFZjMVhoQ3A4NFgwUmpyRHpX?=
+ =?utf-8?B?UzViZzFLUnAwdTAzSGlQRTNRcVRPc0ordHY4U3FmcC94d09YWDRiYXl5QTk4?=
+ =?utf-8?B?R2tNNm5PbjZjaTlPbWUzYmNFZnJoVm1QY05CL3pwVThMb2pBZDlqMnpXTUlv?=
+ =?utf-8?B?Nk1UYm1IUFVQWkQ0T0wxWnNsVUtnV2FnN2Y0U1kvN2gwaWwxRDdieVZuWDZS?=
+ =?utf-8?B?WEY2TzZqYUluY0cvTXphNVo5R3crb3BkWTJlb2FqSWE4dDZyTHdVNDQyUVl4?=
+ =?utf-8?B?MEVKNVV1RXdVVFJUYzM5UnlKWnV6RFNKOUdIVW5HZ0lQRU42QldXRXQ5UU9x?=
+ =?utf-8?B?VGtWb2srWUR1MjlqL1M4RVV6SmNrUWVwd3lMODd1TWx1QTd3c1l4WlQ4QzVi?=
+ =?utf-8?B?VkRSaVZuTnJCd3I3dU9ZQXhKNThON1JvVElDYXJiOVZXK1B1RE5CZElENFE4?=
+ =?utf-8?Q?ng3w8vLtszJHkC0apaP1aDM0j?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f103a80f-4d84-47f5-5088-08dac15c95c9
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2022 07:41:02.4558
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: M5XwFuZ1qc+mRY9U9a9KpO6f7tdh6CDnufRtxgr2E1WQCWW96oJlU1WC1RSsGKqky58L6gvhuL72K6rSO67HAQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB7055
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2022/11/8 14:10, Nicolin Chen wrote:
+> On Mon, Nov 07, 2022 at 08:52:51PM -0400, Jason Gunthorpe wrote:
+> 
+>> @@ -795,6 +800,10 @@ static int vfio_device_first_open(struct vfio_device *device)
+>>   		ret = vfio_group_use_container(device->group);
+>>   		if (ret)
+>>   			goto err_module_put;
+>> +	} else if (device->group->iommufd) {
+>> +		ret = vfio_iommufd_bind(device, device->group->iommufd);
+> 
+> Here we check device->group->iommufd...
+> 
+>> +		if (ret)
+>> +			goto err_module_put;
+>>   	}
+>>   
+>>   	device->kvm = device->group->kvm;
+>> @@ -812,6 +821,7 @@ static int vfio_device_first_open(struct vfio_device *device)
+>>   	device->kvm = NULL;
+>>   	if (device->group->container)
+>>   		vfio_group_unuse_container(device->group);
+>> +	vfio_iommufd_unbind(device);
+> 
+> ...yet, missing here, which could result in kernel oops.
+> 
+> Should probably add something similar:
+> +	if (device->group->iommufd)
+> +		vfio_iommufd_unbind(device);
+> 
+> Or should check !vdev->iommufd_device inside the ->unbind.
 
+this check was in prior version, but removed in this version. any
+special reason? Jason?
 
-On 11/8/22 04:09, Jason Wang wrote:
-> On Tue, Nov 8, 2022 at 7:06 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->> On Mon, Nov 07, 2022 at 10:10:06PM +0100, Eric Auger wrote:
->>> Hi Michael,
->>> On 11/7/22 21:42, Michael S. Tsirkin wrote:
->>>> On Mon, Nov 07, 2022 at 09:34:31PM +0100, Eric Auger wrote:
->>>>> When the vhost iotlb is used along with a guest virtual iommu
->>>>> and the guest gets rebooted, some MISS messages may have been
->>>>> recorded just before the reboot and spuriously executed by
->>>>> the virtual iommu after the reboot. Despite the device iotlb gets
->>>>> re-initialized, the messages are not cleared. Fix that by calling
->>>>> vhost_clear_msg() at the end of vhost_init_device_iotlb().
->>>>>
->>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>> ---
->>>>>  drivers/vhost/vhost.c | 1 +
->>>>>  1 file changed, 1 insertion(+)
->>>>>
->>>>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->>>>> index 40097826cff0..422a1fdee0ca 100644
->>>>> --- a/drivers/vhost/vhost.c
->>>>> +++ b/drivers/vhost/vhost.c
->>>>> @@ -1751,6 +1751,7 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled)
->>>>>    }
->>>>>
->>>>>    vhost_iotlb_free(oiotlb);
->>>>> +  vhost_clear_msg(d);
->>>>>
->>>>>    return 0;
->>>>>  }
->>>> Hmm.  Can't messages meanwhile get processes and affect the
->>>> new iotlb?
->>> Isn't the msg processing stopped at the moment this function is called
->>> (VHOST_SET_FEATURES)?
->>>
->>> Thanks
->>>
->>> Eric
->> It's pretty late here I'm not sure.  You tell me what prevents it.
-> So the proposed code assumes that Qemu doesn't process device IOTLB
-> before VHOST_SET_FEAETURES. Consider there's no reset in the general
-> vhost uAPI,  I wonder if it's better to move the clear to device code
-> like VHOST_NET_SET_BACKEND. So we can clear it per vq?
+> 
+>>   err_module_put:
+>>   	mutex_unlock(&device->group->group_lock);
+>>   	module_put(device->dev->driver->owner);
+>> @@ -830,6 +840,7 @@ static void vfio_device_last_close(struct vfio_device *device)
+>>   	device->kvm = NULL;
+>>   	if (device->group->container)
+>>   		vfio_group_unuse_container(device->group);
+>> +	vfio_iommufd_unbind(device);
+> 
+> Ditto
 
-OK I will look at this alternative
->
->> BTW vhost_init_device_iotlb gets enabled parameter but ignores
->> it, we really should drop that.
-> Yes.
-Yes I saw that too. I will send a patch.
->
->> Also, it looks like if features are set with VIRTIO_F_ACCESS_PLATFORM
->> and then cleared, iotlb is not properly cleared - bug?
-> Not sure, old IOTLB may still work. But for safety, we need to disable
-> device IOTLB in this case.
-OK
-
-Thanks
-
-Eric
->
-> Thanks
->
->>
->>>>
->>>>> --
->>>>> 2.37.3
-
+-- 
+Regards,
+Yi Liu
