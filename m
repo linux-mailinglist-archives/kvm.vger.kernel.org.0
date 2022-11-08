@@ -2,298 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E69D620590
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 02:06:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D6BF62059F
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 02:09:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233262AbiKHBGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 20:06:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40692 "EHLO
+        id S233270AbiKHBJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 20:09:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233099AbiKHBGX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 20:06:23 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D056240BF
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 17:06:22 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id p12so7287471plq.4
-        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 17:06:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E01Oa1tuNVBV3Nw8IeSBu5E315kgqb9xSnaNRubhtgg=;
-        b=P3TIRdyb7BbLNpWrF+7qZPPVQvEOPBCwj2deEn0tkWCiaQJJV0ml/7ZTEMhtf3svkN
-         pVwNm6TUm3ib+KbixI0/HQUoSSCpM6eIlFr7SO5GFv084HqbkBPrH5NGPDpHMeeYwgc3
-         NtA/XWv2IM0RI4cQ0oMl7E621WFD2I2TS7HwqE6852Kwbku3jupiSeq4E3TDkrIweP6W
-         AoY3tf6m3V4t/9X3w3siJ/VsqHgYgbxVkXqcs9H4LJw7l/wVkO0SbmG/3IzuQBt2evIo
-         /FhzXK/8XI1+DO5VwbeJuhamxQYs3U3zPtKY+K6vMOOwImedqy58r4qhb0ZvAHgiwVQd
-         hibQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E01Oa1tuNVBV3Nw8IeSBu5E315kgqb9xSnaNRubhtgg=;
-        b=Y+1YgzVLfntP+WGuu/PDKDcOdML5DMqJkr0GpLJ/pz1n6iZhPW3Q/mtXe7GL2DPW0C
-         rWXRyFZ434vBHfgWbSgXv/H9iJ6zReecarURTB8u7O/ACW+VzhK8bkZCOBhZfYXOUSqj
-         uUrNBYoWEoNbnhIhUnTA9TTu2IGgSNWrgyYxknHG+GMR2TvYzGbLavIGWSzfZEQnW2Ke
-         XNKZVDRXHCqu3RKN7zRkGyTrhZUFm3gPm5pB0QcDOcC3TbP2i2zUFNMMZEARBa3CsA0o
-         4aj9inIuo630R5zLsBPEJyglRjnqozPxZC3qIJGTl/MFplLJBHjtSFw5RE+xYfK/Bml/
-         Qh3g==
-X-Gm-Message-State: ACrzQf1MSezGmZlaS2qOSkCFg6j0NsjLeYvwbJ++8PqClHjMv7G3+6Tp
-        4p+93yTVEkaQ07aZwL8IA5+obKA2a8x5hA==
-X-Google-Smtp-Source: AMsMyM7IRPuB+hkYd3dePhxYZibHC9hQsKuKbv65LlU3FnAEpDoj2sVsCadhxJikgBUZvMve22Jt6g==
-X-Received: by 2002:a17:902:b10d:b0:187:29fe:bda0 with SMTP id q13-20020a170902b10d00b0018729febda0mr41029538plr.16.1667869581719;
-        Mon, 07 Nov 2022 17:06:21 -0800 (PST)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id b29-20020a631b5d000000b0047022e07035sm4719435pgm.47.2022.11.07.17.06.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Nov 2022 17:06:20 -0800 (PST)
-Date:   Mon, 7 Nov 2022 17:06:15 -0800
-From:   David Matlack <dmatlack@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/3] Use TAP in some more KVM selftests
-Message-ID: <Y2mrh7h1jrZSPU5l@google.com>
-References: <20221004093131.40392-1-thuth@redhat.com>
- <Y0nOv6fqTe2NnPuu@google.com>
-MIME-Version: 1.0
+        with ESMTP id S231909AbiKHBJG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 20:09:06 -0500
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2082.outbound.protection.outlook.com [40.107.95.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E22A22539;
+        Mon,  7 Nov 2022 17:09:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EA5DHkDQ9sovL4luAp5vgMPHegR7GXm2upbdKIK2ok4CezgosYRgc5xiTuKHZgymQ94KXOIRh5Wf1FUoUTlbfi8tAwY/ui8ukyLDVLfvOkSnQ24TgPKXlve6RfB6aDBpN4TKWc2nlIfxjv6dBwX4RXWfue3rSYuRQkobRyF4egIYghqlzZK+IkRHqYxYwbpZzXqyCbMrTPuUU7qWVii8itPnp9iflS2D3RJzdoRGjQxMZtwZShPWZ3Vv9yfD1TIt++wxf6VvWG8qH5rAfzCyxgXxWyJo1W6pnGIFBVBkDe7yLed9SauI5n+EFZJvLk6Qy9U/R60p7gkajIRjeTJRjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/cz+MuQlbUArAQ+CDdk4dg6DbWlkvNMm3Sl/S+XOr/c=;
+ b=Dq30tBkFS5fH2PEfD53emJ9hzQk/6MG0LpoWdxh6XXN62Mniqs45fyggS+n3pNoPug6Gvhr2vQz6+4eu+SfqdH3an7DUQ7s7pEVA5WmFaeHmFXjx03PcwGAAzTyAUAyQAQSxn8buqmyf2Tv+Uuu9M1oYhxMqCggzRdc2tv44C/+V5qq49YERwq8Z0fK1UAvn/MuuTIYWVzVoHsbZWe6pB3Q9NXBNR23zRSpwCkRzmBFCcmTaOe/LL7lstpn7pm0V5Ayg2RXUq6toyl4aIaD7xeml7O7oP5vTe/DfKUrKi1URwqSF8gJK3kY0NGtepCac+VYfAy6PdQA7XtcT/EON1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/cz+MuQlbUArAQ+CDdk4dg6DbWlkvNMm3Sl/S+XOr/c=;
+ b=fmbGjJSwqfUkERawmHrceZCZ34CgmlR/xgGVBV/RdQV+9aGVCxT+zqRjqqbpMA12hpr1w/luKQLX+fM48mZgU5jMVQH9EYvxfLulNjb8WhfwNz0yihu2nXSHt/YksqFfB9a1UBgXswdRbcz09oYtWS5JvAopOqZC6YtV1IqYQGCggMKfmoC4lkzM8Ei3avGnsc8ov9axByY3S/yulFwkckKiksYN4QmHSUrUFlYMy3FCt1Knx/xeU7+kPbZWXdw6+Iqaex2Buhkf/mscu3H6RgW65WuWTpi0FAL3jFCQW+UsROeJx59KoYnJKqGVsdr9eLGtchert2XyBp3NgJ/Qqg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DS7PR12MB5768.namprd12.prod.outlook.com (2603:10b6:8:77::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Tue, 8 Nov
+ 2022 01:09:04 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
+ 01:09:03 +0000
+Date:   Mon, 7 Nov 2022 21:09:02 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+Subject: S390 testing for IOMMUFD
+Message-ID: <Y2msLjrbvG5XPeNm@nvidia.com>
+References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y0nOv6fqTe2NnPuu@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+X-ClientProxiedBy: BL1P222CA0006.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c7::11) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB5768:EE_
+X-MS-Office365-Filtering-Correlation-Id: 031d4671-14b7-46d9-931c-08dac125d3d2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: njAsIUiCtTw7vuGYoL9QZsfptcCeT9a8wdPzH1aOIid/Iuy6h6L4zRs9gW+5wBt4SveTtFJZfqPk2DamxIViTh9fKU1KTENcj21W0n5XiRO85CsQ57+5BJ7HjH/bbsCihF1LYpEkJ+OIjigVAm9kScxr4tUhUDmMSeR9Elb+hAmK3cozHxz+giLGslfq4O6Ujgq9A2gsH1J4PfMMb16F/RGM86+rxlBxx2L5O9zIasVv3b8UtfJdeHiiP22IPeRFjccUgndr/Vs2khD4lblYDtcH8nCR6mV1N2w8gS8aggGBSDtXDACC54Jm1T6/Pxcqou8jrYJ7F1j9bOXS2UyxeHR6MLJPkjtrbJbXiB7ioerye7fs4inLkcNETjRzQT5cgy5n4uvaIame+v53lzs2yjjRux9fES4SuJZ82dghdX168QdKet+zDZrv8Fdj5SmRdT7l1ZcXtx+sGl6SgHEuF/ZhBfotc5BSMOGILpgXl6C58tKnp4p88o+cBOuMyujxzP7glkKi3t8ojPqYdpXX4ZKy3yCx9l3BiDhtJ2SreC/N2slP6TXBr4sY9p31xy2K1Zl72ICPaEm8RMrMMJRTeE8WDPWwtjUQSm6eKcdjFWknfePYBpKkFWVjv3spy9t0fMw/uzrtSp5G1Xo6WPFeHlPEBc2llD8d+H8yk0fLZsyEwRSPiqK+tqN7N4ulbrxbwDNS1FlcoN35Sd8x0XARIs/sgIz+r0YSjRd05HcHnhHVHKYMZeWxrxGCXsB6PfKvCqFRDFdRHdT1M8P8GVFYUA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(39860400002)(366004)(396003)(376002)(136003)(451199015)(36756003)(86362001)(2906002)(7416002)(26005)(107886003)(6506007)(2616005)(186003)(6512007)(83380400001)(66556008)(66476007)(66946007)(54906003)(4326008)(8676002)(110136005)(316002)(478600001)(8936002)(5660300002)(966005)(6486002)(38100700002)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yUE1dT3VriS5Em5M5/rSyT9i9gO4sdVbZI3IZnvGFLN8X6cmbjSeaFvA7H8S?=
+ =?us-ascii?Q?4fOyF+VSVrBGz0+anuk4A2lz9/b7CHGXkBsQxlnFfZglcYhJOzOOHS10Oyol?=
+ =?us-ascii?Q?N520KIBR6BxrjadIZa/56MXTSvhHjqwMGVQBhkxzTcAtYnjVCsk3ZSNviol1?=
+ =?us-ascii?Q?85sJa3gfbbaQhQfNVJrakyPpTNBqma0TiMbLDo2egKWiZnGtrfAH1xuHUf2J?=
+ =?us-ascii?Q?i4mjPF+WHjS4KnssP6Fr0o7wOSgoCfLSFQwB1DZMSbQQcU95pSx/vPpO/nT6?=
+ =?us-ascii?Q?t+qL59jaHpOr/WFKKmTXPnACSWQv/oDRq0Wxd75sdziZPIZo6pI0CJ4LZjMO?=
+ =?us-ascii?Q?gyjuwVaXvBJnDmyszzA8+OuvYcbi5XNOnGjrVDLEh2iW5KBdRYR43+UfMowA?=
+ =?us-ascii?Q?5mwnd4Gg9PLZl5DPSUSXHTgPBng6SdNNwLPXXgMxdNSocFv7Ib61fcXGEktk?=
+ =?us-ascii?Q?EGDOaZU3MEpBoZt3Ed6FbUcogBRUK6wX3tQEJI7FfL7PGHGj6wrOIdiLHVUu?=
+ =?us-ascii?Q?ki3c8iq3elWZck97vYDHmyYcNfkK9pTIQRkxTa3O9zhMu1vyc2I4IOi07aQr?=
+ =?us-ascii?Q?NU8Khk6O1qp5exViJ1N7rsggA95wAaQXjdJbu78Ht53yULwu6r8l3vF8l9Xr?=
+ =?us-ascii?Q?nVkXNPLDMagUtebQOUjuEADNAha9z4EV72N7HGbaYnl8NkyQUFVkzSjK7Uh+?=
+ =?us-ascii?Q?XIeEFllvxTP8zc4TSWJPGLsFzt/TJF0uMjV1zq0FGa/4JZzw0+vwFpJxIcXO?=
+ =?us-ascii?Q?WFttIVdOV5Ut24CK9wAsJGdgwoWVaNW/lGO8kK+vvAoAv0DHqG3HSQPx6EPy?=
+ =?us-ascii?Q?CNhYT8YnOQcNZ8BUZwbH5h/ZulVS1qGXWt8mShs/S3U498NfMdAI1vGSbKV/?=
+ =?us-ascii?Q?EoXMiht+OXw8ShaBn8Gjatou5AJbU91HsRYfePNUwAXYyrOCUi+KQBx2iqS9?=
+ =?us-ascii?Q?rY2FOg1BF5X961BIvCnU9NrwxQeFNxSKfIDOJppLujVSNtRw1XMrzBqGwnOu?=
+ =?us-ascii?Q?5kokME2Zm2XWEZ1oCz8igFauAewRZeoun6WhFBCAHpzkLTOcKsCeM9nOB4Tl?=
+ =?us-ascii?Q?oMgfwZsAanG8k3NC9tgVsTIZZak2lnvUUWwAzqx2o1NMFf3F+AagUcv77dQm?=
+ =?us-ascii?Q?zmjKlnyf+9ExdSSAnFyb09HRkRZLQxiGeo1GaIEf4r4ENIcLhQFPd665rDWm?=
+ =?us-ascii?Q?/hS11tvFWUwlTC1AOoDrQYAgrG5LOGRUEcQLXNyNvTsCrb+tIHeS5hGR1QO2?=
+ =?us-ascii?Q?0eLdzUhUEJr3fiouuKXCfYkCLEQ41IN5RYd/T0ph2IK7ft346sJeLUku7wZI?=
+ =?us-ascii?Q?RN7brmDEC73gy089XfxuFdNRrMgSh0IfFp9cS/dI5lpP2L/NHjDP1yvEmKFF?=
+ =?us-ascii?Q?pfdgPG25JBvuJ86D3T10Dgx1xQhU1W9iUSjwZrgHt/2pSljLHxet84LkgwSp?=
+ =?us-ascii?Q?4hNRdBvislxW/lz2k/lHAB46KfKJbVhgnUwbQ6RR3wiTHTDCo1+LlXK02mNt?=
+ =?us-ascii?Q?YOthYQZIE/dkDefb5LGwu0SaKOvtLZ5rMouVp5WHJB160tjbIalH0Pvu654z?=
+ =?us-ascii?Q?KqKg0khapkDOn3mF4SA=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 031d4671-14b7-46d9-931c-08dac125d3d2
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2022 01:09:03.9339
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: icMN0k3U8rSZ8NxLvO25ocK28rxVPHRcSel4ZFk1voM+QtJ0CgPjZVmrupwMtUae
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5768
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 14, 2022 at 09:03:59PM +0000, Sean Christopherson wrote:
-> On Tue, Oct 04, 2022, Thomas Huth wrote:
-> > Many KVM selftests are completely silent. This has the disadvantage
-> > for the users that they do not know what's going on here. For example,
-> > some time ago, a tester asked me how to know whether a certain new
-> > sub-test has been added to one of the s390x test binaries or not (which
-> > he didn't compile on his own), which is hard to judge when there is no
-> > output. So I finally went ahead and implemented TAP output in the
-> > s390x-specific tests some months ago.
-> > 
-> > Now I wonder whether that could be a good strategy for the x86 and
-> > generic tests, too?
+On Mon, Nov 07, 2022 at 08:48:53PM -0400, Jason Gunthorpe wrote:
+> [
+> This has been in linux-next for a little while now, and we've completed
+> the syzkaller run. 1300 hours of CPU time have been invested since the
+> last report with no improvement in coverage or new detections. syzkaller
+> coverage reached 69%(75%), and review of the misses show substantial
+> amounts are WARN_ON's and other debugging which are not expected to be
+> covered.
+> ]
 > 
-> Taking Andrew's thoughts a step further, I'm in favor of adding TAP output, but
-> only if we implement it in such a way that it reduces the burden on writing new
-> tests.  I _really_ like that sync_regs_test's subtests are split into consumable
-> chunks, but I worry that the amount of boilerplate needed will deter test writes
-> and increase the maintenance cost.
-> 
-> And my experience with KVM-unit-tests is that letting test writers specify strings
-> for test names is a bad idea, e.g. using an arbitrary string creates a disconnect
-> between what the user sees and what code is running, and makes it unnecessarily
-> difficult to connect a failure back to code.  And if we ever support running
-> specific testcases by name (I'm still not sure this is a net positive), arbitrary
-> strings get really annoying because inevitably an arbitrary string will contain
-> characters that need to be escaped in the shell.
-> 
-> Adding a macro or three to let tests define and run testscases with minimal effort
-> would more or less eliminate the boilerplate.  And in theory providing semi-rigid
-> macros would help force simple tests to conform to standard patterns, which should
-> reduce the cost of someone new understanding the test, and would likely let us do
-> more automagic things in the future.
-> 
-> E.g. something like this in the test:
-> 
-> 	KVM_RUN_TESTCASES(vcpu,
-> 		test_clear_kvm_dirty_regs_bits,
-> 		test_set_invalid,
-> 		test_req_and_verify_all_valid_regs,
-> 		test_set_and_verify_various_reg_values,
-> 		test_clear_kvm_dirty_regs_bits,
-> 	);
+> iommufd is the user API to control the IOMMU subsystem as it relates to
+> managing IO page tables that point at user space memory.
 
-There is an existing framework in
-tools/testing/selftests/kselftest_harness.h that provides macros for
-setting up and running tests cases. I converted sync_regs_test to use it
-below as an example [1].
+[chop cc list]
 
-The harness runs each subtest in a child process, so sharing a VM/VCPU
-across test cases is not possible. This means setting up and tearing
-down a VM for every test case, but the harness makes this pretty easy
-with FIXTURE_{SETUP,TEARDOWN}(). With this harness, we can keep using
-TEST_ASSERT() as-is, and still run all test cases even if one fails.
-Plus no need for the hard-coded ksft_*() calls in main().
+s390 mdev maintainers,
 
-[1]
+Can I ask your help to test this with the two S390 mdev drivers? Now
+that gvt is passing and we've covered alot of the QA ground it is a
+good time to run it.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
-index 9b6db0b0b13e..11cf25d3e4a3 100644
---- a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
-@@ -20,6 +20,8 @@
- #include "kvm_util.h"
- #include "processor.h"
- 
-+#include "../kselftest_harness.h"
-+
- #define UCALL_PIO_PORT ((uint16_t)0x1000)
- 
- struct ucall uc_none = {
-@@ -80,26 +82,23 @@ static void compare_vcpu_events(struct kvm_vcpu_events *left,
- #define TEST_SYNC_FIELDS   (KVM_SYNC_X86_REGS|KVM_SYNC_X86_SREGS|KVM_SYNC_X86_EVENTS)
- #define INVALID_SYNC_FIELD 0x80000000
- 
--int main(int argc, char *argv[])
--{
--	struct kvm_vcpu *vcpu;
-+FIXTURE(sync_regs_test) {
- 	struct kvm_vm *vm;
--	struct kvm_run *run;
--	struct kvm_regs regs;
--	struct kvm_sregs sregs;
--	struct kvm_vcpu_events events;
--	int rv, cap;
--
--	/* Tell stdout not to buffer its content */
--	setbuf(stdout, NULL);
-+	struct kvm_vcpu *vcpu;
-+};
- 
--	cap = kvm_check_cap(KVM_CAP_SYNC_REGS);
--	TEST_REQUIRE((cap & TEST_SYNC_FIELDS) == TEST_SYNC_FIELDS);
--	TEST_REQUIRE(!(cap & INVALID_SYNC_FIELD));
-+FIXTURE_SETUP(sync_regs_test) {
-+	self->vm = vm_create_with_one_vcpu(&self->vcpu, guest_code);
-+}
- 
--	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+FIXTURE_TEARDOWN(sync_regs_test) {
-+	kvm_vm_free(self->vm);
-+}
- 
--	run = vcpu->run;
-+TEST_F(sync_regs_test, read_invalid) {
-+	struct kvm_run *run = self->vcpu->run;
-+	struct kvm_vcpu *vcpu = self->vcpu;
-+	int rv;
- 
- 	/* Request reading invalid register set from VCPU. */
- 	run->kvm_valid_regs = INVALID_SYNC_FIELD;
-@@ -115,6 +114,12 @@ int main(int argc, char *argv[])
- 		    "Invalid kvm_valid_regs did not cause expected KVM_RUN error: %d\n",
- 		    rv);
- 	run->kvm_valid_regs = 0;
-+}
-+
-+TEST_F(sync_regs_test, set_invalid) {
-+	struct kvm_run *run = self->vcpu->run;
-+	struct kvm_vcpu *vcpu = self->vcpu;
-+	int rv;
- 
- 	/* Request setting invalid register set into VCPU. */
- 	run->kvm_dirty_regs = INVALID_SYNC_FIELD;
-@@ -130,6 +135,15 @@ int main(int argc, char *argv[])
- 		    "Invalid kvm_dirty_regs did not cause expected KVM_RUN error: %d\n",
- 		    rv);
- 	run->kvm_dirty_regs = 0;
-+}
-+
-+TEST_F(sync_regs_test, req_and_verify_all_valid) {
-+	struct kvm_run *run = self->vcpu->run;
-+	struct kvm_vcpu *vcpu = self->vcpu;
-+	struct kvm_vcpu_events events;
-+	struct kvm_sregs sregs;
-+	struct kvm_regs regs;
-+	int rv;
- 
- 	/* Request and verify all valid register sets. */
- 	/* TODO: BUILD TIME CHECK: TEST_ASSERT(KVM_SYNC_X86_NUM_FIELDS != 3); */
-@@ -148,6 +162,22 @@ int main(int argc, char *argv[])
- 
- 	vcpu_events_get(vcpu, &events);
- 	compare_vcpu_events(&events, &run->s.regs.events);
-+}
-+
-+TEST_F(sync_regs_test, set_and_verify_various) {
-+	struct kvm_run *run = self->vcpu->run;
-+	struct kvm_vcpu *vcpu = self->vcpu;
-+	struct kvm_vcpu_events events;
-+	struct kvm_sregs sregs;
-+	struct kvm_regs regs;
-+	int rv;
-+
-+	run->kvm_valid_regs = TEST_SYNC_FIELDS;
-+	rv = _vcpu_run(vcpu);
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+		    "Unexpected exit reason: %u (%s),\n",
-+		    run->exit_reason,
-+		    exit_reason_str(run->exit_reason));
- 
- 	/* Set and verify various register values. */
- 	run->s.regs.regs.rbx = 0xBAD1DEA;
-@@ -176,6 +206,13 @@ int main(int argc, char *argv[])
- 
- 	vcpu_events_get(vcpu, &events);
- 	compare_vcpu_events(&events, &run->s.regs.events);
-+}
-+
-+TEST_F(sync_regs_test, clear_kvm_valid_and_dirty) {
-+	struct kvm_run *run = self->vcpu->run;
-+	struct kvm_vcpu *vcpu = self->vcpu;
-+	struct kvm_regs regs;
-+	int rv;
- 
- 	/* Clear kvm_dirty_regs bits, verify new s.regs values are
- 	 * overwritten with existing guest values.
-@@ -199,6 +236,7 @@ int main(int argc, char *argv[])
- 	run->kvm_valid_regs = 0;
- 	run->kvm_dirty_regs = 0;
- 	run->s.regs.regs.rbx = 0xAAAA;
-+	vcpu_regs_get(vcpu, &regs);
- 	regs.rbx = 0xBAC0;
- 	vcpu_regs_set(vcpu, &regs);
- 	rv = _vcpu_run(vcpu);
-@@ -213,6 +251,20 @@ int main(int argc, char *argv[])
- 	TEST_ASSERT(regs.rbx == 0xBAC0 + 1,
- 		    "rbx guest value incorrect 0x%llx.",
- 		    regs.rbx);
-+}
-+
-+TEST_F(sync_regs_test, clear_kvm_valid_regs) {
-+	struct kvm_run *run = self->vcpu->run;
-+	struct kvm_vcpu *vcpu = self->vcpu;
-+	struct kvm_regs regs;
-+	int rv;
-+
-+	run->kvm_valid_regs = TEST_SYNC_FIELDS;
-+	rv = _vcpu_run(vcpu);
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+		    "Unexpected exit reason: %u (%s),\n",
-+		    run->exit_reason,
-+		    exit_reason_str(run->exit_reason));
- 
- 	/* Clear kvm_valid_regs bits. Verify s.regs values are not overwritten
- 	 * with existing guest values but that guest values are overwritten
-@@ -233,8 +285,15 @@ int main(int argc, char *argv[])
- 	TEST_ASSERT(regs.rbx == 0xBBBB + 1,
- 		    "rbx guest value incorrect 0x%llx.",
- 		    regs.rbx);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	int cap;
- 
--	kvm_vm_free(vm);
-+	cap = kvm_check_cap(KVM_CAP_SYNC_REGS);
-+	TEST_REQUIRE((cap & TEST_SYNC_FIELDS) == TEST_SYNC_FIELDS);
-+	TEST_REQUIRE(!(cap & INVALID_SYNC_FIELD));
- 
--	return 0;
-+	return test_harness_run(argc, argv);
- }
+Take the branch from here:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/log/?h=for-next
+
+And build the kernel with 
+
+CONFIG_VFIO_CONTAINER=n
+CONFIG_IOMMUFD=y
+CONFIG_IOMMUFD_VFIO_CONTAINER=y
+
+And your existing stuff should work with iommufd providing the iommu
+support to vfio. There will be a dmesg confirming this.
+
+Let me know if there are any problems!
+
+If I recall there was some desire from the S390 platform team to start
+building on iommufd to create some vIOMMU acceleration for S390
+guests, this is a necessary first step.
+
+Thanks,
+Jason
