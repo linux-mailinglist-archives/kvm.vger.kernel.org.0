@@ -2,155 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E1BE9620A24
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 08:25:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31E5A620A34
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 08:32:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233397AbiKHHZr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 02:25:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34598 "EHLO
+        id S233495AbiKHHcw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 02:32:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229657AbiKHHZq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 02:25:46 -0500
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2059.outbound.protection.outlook.com [40.107.101.59])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2233ED7;
-        Mon,  7 Nov 2022 23:25:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NMOHzgJWCYwKtAmPb+5eUSvix917QxD9rgJu61r+0kejuluKZ/Xd2J5dVsOH2YUKyQwW9MBt6aW3at/H1MIUGYul9KLPaKiL7jLyO2RJCc8XR2fQXzlDc5n1EEFjkFkQR1RPb9XBa55HCqk8Hj2Hv2gCzF2cj4Shr2mYuiYX3CHYZto74rNI0u+xap0fSBIjB7c/0gwmIGZmro/Qn6pKgK4Ff32S0vT7UIPaJ9JLFC0VXNJU7iGjHo0wNMGudqlXwGIG2gogiZfkmwSpPIpPTR3kFEhkoJfacTZi1a1dzVUlJZzMNx6sijF3ai1b7Ky/lg8UVlCgjEUeP6UNJc7qtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=buEEKkH+NleZlKWBYBk+tbpXj3uKLBJs0wv54gSjpyA=;
- b=hWmubGBYnhSh0+SrNZtszQR9nq9LiuAfpZyTyWEqrK6/gMOPeuQY+j+UZeDEUknMiVkgXvrxo6T50oIxHOzq0yRlWSqfqs3vtP+mmlrNcKXiavGkMWiv03INDPfZRR1TZGij9fXl0M5BE+3mq8MjGL/QsxIHgZpAVdvgt1Rqa5A5P03KzvCR+D5nRj6gng+Du7QcI55yXglys+WIdyJluTkLfvi2fD+AnPvwhb8uihq/fhwYTB6uhWZ/zQf119/4oxskGkoOUtrouG/o19mibyLENJrr2EdO5L/1y9tFYdCu1RjO1az+2/ws6bSz1Xezt6WQdLIncBxoHeEv2IQXlw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=buEEKkH+NleZlKWBYBk+tbpXj3uKLBJs0wv54gSjpyA=;
- b=INVJV5yTzFYfZKVKa1f3FZsnWIxyOB68KwF0/jex/jcKhm+KV4o7anSa9vQRRNayRwtLSOghTXvz1s/wtaEJaNLaVEX1DnRclMmzftmwd5ICLyANIZmR5p9WPkd4FCY+o6wHh9I0fCKuI9rpkUSRhcA8zikIvOpmXwomQ+gdpldrvUcuMLKN2GX8RhAv8hpv3Q3F+shsuq4p4gFE0IQowrIfHqSc9uKYhPnyjuo0lyRYCURPNfsLXk36jo16KFivQWbWZ5lIGu+DVKvSkVtYqlGyf2R/MLIwl1SSZq6nRbqLcaXTS9SW2xFNaH+90l91XvDmlYeuc4IytuFmie5FnA==
-Received: from DS7P222CA0006.NAMP222.PROD.OUTLOOK.COM (2603:10b6:8:2e::23) by
- IA1PR12MB7518.namprd12.prod.outlook.com (2603:10b6:208:419::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Tue, 8 Nov
- 2022 07:25:43 +0000
-Received: from DM6NAM11FT061.eop-nam11.prod.protection.outlook.com
- (2603:10b6:8:2e:cafe::d3) by DS7P222CA0006.outlook.office365.com
- (2603:10b6:8:2e::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26 via Frontend
- Transport; Tue, 8 Nov 2022 07:25:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- DM6NAM11FT061.mail.protection.outlook.com (10.13.173.138) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5791.20 via Frontend Transport; Tue, 8 Nov 2022 07:25:42 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Mon, 7 Nov 2022
- 23:25:30 -0800
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.29; Mon, 7 Nov 2022 23:25:29 -0800
-Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29 via Frontend
- Transport; Mon, 7 Nov 2022 23:25:28 -0800
-Date:   Mon, 7 Nov 2022 23:25:26 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     <bpf@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>, <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, <linux-doc@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <llvm@lists.linux.dev>,
-        Nathan Chancellor <nathan@kernel.org>,
-        "Nick Desaulniers" <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        "Robin Murphy" <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        "Suravee Suthikulpanit" <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        "Jason Wang" <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        <kvm@vger.kernel.org>, "Matthew Rosato" <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>,
-        "Keqian Zhu" <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v4 16/17] iommufd: Add some fault injection points
-Message-ID: <Y2oEZgY6UmIDb4RP@Asurada-Nvidia>
-References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <16-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+        with ESMTP id S233371AbiKHHcv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 02:32:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E129167D0
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 23:32:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667892720;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qMzkFr5wWO2ErYRr9fFrSjmX0hB7P0RxUcl1SJ2pD3Q=;
+        b=hZ44ZtDa/QzQvfgn//p4tx+h/YPJXBYwhalcEyWazUliUjDU4xAN9XxXndsyUBrx7B1sJf
+        MLJ8hM7Wfu3sbvib6TSd3iIInM6XaZ/IOviABhR9lHecrZJX+0fB7vLa+Ss2TIwMELmyqg
+        o0NS30b5Zrwsc3Y3SfxcPjAFVAFdHZ4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-34-4162CBUxN7S4yoNxFCLhcQ-1; Tue, 08 Nov 2022 02:31:52 -0500
+X-MC-Unique: 4162CBUxN7S4yoNxFCLhcQ-1
+Received: by mail-wm1-f69.google.com with SMTP id c130-20020a1c3588000000b003b56be513e1so6613415wma.0
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 23:31:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qMzkFr5wWO2ErYRr9fFrSjmX0hB7P0RxUcl1SJ2pD3Q=;
+        b=20tTQJ1UDSqhP8m89X0yCgfaiZee43cHusKJGwBxEhn0v6aXA/NtSK7paHJFoTlHpb
+         P+EP5MHfFIP2SxtTpvF4g0yj4d1JC4RSS/eH14Xb9o+96mrcAO4Bv2cEwRwOI69Zx8Cj
+         D0bMTMc6YZJErznIdkRKEHnPouhnP/MxWMmXyaWQyavIpdnmmSia9x1cSQSvd9m3Hra0
+         obx7WGAl23lawREFDFf68B+d1AUf2lRPOQmuncvsy9li4Buiq6Tz4riknZqsM9zlO1JX
+         Kcc2AOxkSqOHvPQXIYVDsxXYXgqIuf9XBlDTmX2GgIyy9PuMDc5AlfloFt45tbKMecnG
+         WvUw==
+X-Gm-Message-State: ANoB5pkuLNzNRhf/cl3sQrVGubzFh0Co4PgyYDMrMOk3tS2OAM1Tbd5z
+        D39HItm6nuTLzzeQbvFeJVtH+abm0kQqTvG8ZEyi0ybUa87NNKffM+pgtvYFgJmtgNmvoFe3dvc
+        GhGJU6ST6Iwrq
+X-Received: by 2002:a1c:a1c4:0:b0:3cf:a616:cc8d with SMTP id k187-20020a1ca1c4000000b003cfa616cc8dmr8088681wme.62.1667892710086;
+        Mon, 07 Nov 2022 23:31:50 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5uIx7UmC0fECL2xHHWwwpOMztkaHKJt1L2WyCKzX01NL2l1JGJEX5qifjLTMybc5+Tr12N5A==
+X-Received: by 2002:a1c:a1c4:0:b0:3cf:a616:cc8d with SMTP id k187-20020a1ca1c4000000b003cfa616cc8dmr8088667wme.62.1667892709861;
+        Mon, 07 Nov 2022 23:31:49 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id p4-20020a05600c1d8400b003b497138093sm10405740wms.47.2022.11.07.23.31.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Nov 2022 23:31:49 -0800 (PST)
+Message-ID: <c9c0ca0d-d100-c789-dbb8-b308652695e7@redhat.com>
+Date:   Tue, 8 Nov 2022 08:31:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <16-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT061:EE_|IA1PR12MB7518:EE_
-X-MS-Office365-Filtering-Correlation-Id: 18253cbe-733f-4475-1acd-08dac15a71d7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uq8adAzRtw4LjUTDZRxkNXJzNrPOKfmfDSs5pZLDsEBbIZ04Ejhe1TihrTPXPupbeh0pN9mgxJYv1oo+ZuC6hHaUIKBGDJ4PUiEiMIGfbsco+PNon4G52YWPdqnHHQYGqalKpuMMRCzMZcM4JTFMZaRAieGODGykidmOELGLXxwrB1TffOF+bGo1CM6jtArxygXw2qS/yys5qyh8aLVlGrI1/JOaM0xGvJ/duoHwyIwoPajsmhmdNxqLrmhddvg1jWTAZmKZ9eYtwd9diU3ddFMY1NcZlhkc8GffqxRr6w0eX04pkoyd9NE0GZYcAE8kbJccrBZCAudw5YcRIcF+tEUlKCU6IHgbUArI+/3S/7pBZlswFFLRVlaYn8r73GiaHIrCL9WT40im6ftiTOFsWhLboxkBhut+O+BdPKoPJjsa6whjSSpV0nld1YTXjiWGBIBTq5FPSAylHdxOq5St9h7TZq9OryAsXvTU+L68xTE6t/yeLjP7e04Eh8TuHorSsfqqLSjQMmfFiD4dYzYs3zUB4k2EB68l1vHoZWRz76zlyDd+arZ/xihrIlE0Q+gUTswMnZNKg7LPKAMfyYE4RpEvuP+gRo/CKhbhDXdZtC65r1AxhnMg9RsqSGNKU4QUgSNknYsd4/ir1byUJzniR0l5ovN8stJPF2dXMbHTNxn26YTrDUMOFT6C1jyZIT7JyhCRuJ7+ihb1dMR3kayBeQ30SVA0v3ELQwR8JZ/8MiUEdCQ4yjDop6IiMOwh1wv7StZXj+tIigzV+Nd+UwIq8Q==
-X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(346002)(136003)(376002)(451199015)(36840700001)(46966006)(40470700004)(426003)(336012)(83380400001)(47076005)(82740400003)(356005)(7636003)(186003)(36860700001)(2906002)(7406005)(7416002)(4744005)(8936002)(6862004)(40480700001)(5660300002)(86362001)(33716001)(82310400005)(55016003)(478600001)(26005)(9686003)(70206006)(40460700003)(8676002)(316002)(41300700001)(70586007)(6636002)(4326008)(54906003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2022 07:25:42.6080
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18253cbe-733f-4475-1acd-08dac15a71d7
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT061.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7518
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Reply-To: eric.auger@redhat.com
+Subject: Re: [RFC] vhost: Clear the pending messages on
+ vhost_init_device_iotlb()
+Content-Language: en-US
+To:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, peterx@redhat.com
+References: <20221107203431.368306-1-eric.auger@redhat.com>
+ <20221107153924-mutt-send-email-mst@kernel.org>
+ <b8487793-d7b8-0557-a4c2-b62754e14830@redhat.com>
+ <20221107180022-mutt-send-email-mst@kernel.org>
+ <CACGkMEsYyH5P2h6XkBgrW4O-xJXxdzzRa1+T2zjJ07OHiYObVA@mail.gmail.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <CACGkMEsYyH5P2h6XkBgrW4O-xJXxdzzRa1+T2zjJ07OHiYObVA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 08:49:09PM -0400, Jason Gunthorpe wrote:
- 
-> diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
 
-> @@ -489,6 +494,15 @@ static int pages_to_xarray(struct xarray *xa, unsigned long start_index,
->  
->  		xas_lock(&xas);
->  		while (pages != end_pages) {
-> +			/* xarray does not participate in fault injection */
-> +			if (pages == half_pages && iommufd_should_fail()) {
-> +				xas_set_err(&xas, -EINVAL);
-> +				xas_unlock(&xas);
-> +				/* aka xas_destroy() */
-> +				xas_nomem(&xas, GFP_KERNEL);
-> +				goto err_clear;
 
-Coverity reports an "unchecked return value" at xas_nomem()...
+On 11/8/22 04:09, Jason Wang wrote:
+> On Tue, Nov 8, 2022 at 7:06 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>> On Mon, Nov 07, 2022 at 10:10:06PM +0100, Eric Auger wrote:
+>>> Hi Michael,
+>>> On 11/7/22 21:42, Michael S. Tsirkin wrote:
+>>>> On Mon, Nov 07, 2022 at 09:34:31PM +0100, Eric Auger wrote:
+>>>>> When the vhost iotlb is used along with a guest virtual iommu
+>>>>> and the guest gets rebooted, some MISS messages may have been
+>>>>> recorded just before the reboot and spuriously executed by
+>>>>> the virtual iommu after the reboot. Despite the device iotlb gets
+>>>>> re-initialized, the messages are not cleared. Fix that by calling
+>>>>> vhost_clear_msg() at the end of vhost_init_device_iotlb().
+>>>>>
+>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>> ---
+>>>>>  drivers/vhost/vhost.c | 1 +
+>>>>>  1 file changed, 1 insertion(+)
+>>>>>
+>>>>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>>>>> index 40097826cff0..422a1fdee0ca 100644
+>>>>> --- a/drivers/vhost/vhost.c
+>>>>> +++ b/drivers/vhost/vhost.c
+>>>>> @@ -1751,6 +1751,7 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled)
+>>>>>    }
+>>>>>
+>>>>>    vhost_iotlb_free(oiotlb);
+>>>>> +  vhost_clear_msg(d);
+>>>>>
+>>>>>    return 0;
+>>>>>  }
+>>>> Hmm.  Can't messages meanwhile get processes and affect the
+>>>> new iotlb?
+>>> Isn't the msg processing stopped at the moment this function is called
+>>> (VHOST_SET_FEATURES)?
+>>>
+>>> Thanks
+>>>
+>>> Eric
+>> It's pretty late here I'm not sure.  You tell me what prevents it.
+> So the proposed code assumes that Qemu doesn't process device IOTLB
+> before VHOST_SET_FEAETURES. Consider there's no reset in the general
+> vhost uAPI,  I wonder if it's better to move the clear to device code
+> like VHOST_NET_SET_BACKEND. So we can clear it per vq?
 
-> +err_clear:
->  	if (xas_error(&xas)) {
+OK I will look at this alternative
+>
+>> BTW vhost_init_device_iotlb gets enabled parameter but ignores
+>> it, we really should drop that.
+> Yes.
+Yes I saw that too. I will send a patch.
+>
+>> Also, it looks like if features are set with VIRTIO_F_ACCESS_PLATFORM
+>> and then cleared, iotlb is not properly cleared - bug?
+> Not sure, old IOTLB may still work. But for safety, we need to disable
+> device IOTLB in this case.
+OK
 
-...yet, I think we should be fine since we do xas_error here?
+Thanks
+
+Eric
+>
+> Thanks
+>
+>>
+>>>>
+>>>>> --
+>>>>> 2.37.3
+
