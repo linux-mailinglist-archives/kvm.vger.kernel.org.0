@@ -2,168 +2,298 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2514C620586
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 02:01:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E69D620590
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 02:06:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233252AbiKHBBG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 20:01:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38436 "EHLO
+        id S233262AbiKHBGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Nov 2022 20:06:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233071AbiKHBBD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 20:01:03 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1833A1EEFF;
-        Mon,  7 Nov 2022 17:01:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ACNMvap5rsF+g/0bX0XEqatshk784O43aOQ9HgmUbAsfz0c2bwTH48iW3+0e9Q+mUD77ZSXQlTaNC7Z0ieetnXJ5BpVsflZMlux1xJyJQ9ObuGJqpa27mW3uk0iook6+9aXjFhGaPpLKyGucN4PBv4Nj2EKVsepjI+vr4QBmV/oFKV4ssQNsrBhYtqqPXrOVtvEGjril2vZs/fSl9XjeqateOTRTs6v5uVUN5BytjnkXvFwCE6tFiWNmZJ21WBHGTI1SvksbJF3qFAkBIG2PXqRiHD1qiX77hdxfKHst+QgkT9gyGWa4yGJSmJyi0phNYLxYd28ZHQUwB5gshIMyxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=r2tILwaw0DgJrA7/RqrFSTMhwWLi5WmlhZwNa3dMvfE=;
- b=SYwdJQIrb24KpFBNEIqsC5U5mHS8nYzdojSDpgLHRpU2K79Nb6Hp7PYQLXHFTNwmhi35gXouKYKgpIIEBorcaaTHnZFuwM5p7ubCNYB3YYUqufeqBbTHNKQCU8T3BmIK4DgppwG5T2VXnTKD/OI3B2EKwxhZMFB/7cLzSnaO/irBOSmLl/59EiB+nEfdZBJrj+FuK6uOXDcg2jloMqSf0dyM7+yQ5gQLg+dwkU4X0cNRNJNvJGHnUSoddt7WdYjUZKSLoCL2vWd+ZBPJyDR2zY6KT3XAnjEp3WtPb7eSDIXTfCBDVsgoVMiEg7DGFv4QwPxuDkYizq8P4R6hLvrzqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r2tILwaw0DgJrA7/RqrFSTMhwWLi5WmlhZwNa3dMvfE=;
- b=phawVIzaQeILrZ/4jtzfpJEi2V6p7LY7JxjCHD19T2ZzJKzb8tJ09GuUi5S5+Axk2sVAi3FD2Vla2aa7723eW8/XYfATS/loVmxsGS5oAY2PbDiUbRQxtyK2gEqBlVvOP092VZmb9jgQGwDsRYZNMiEtdTqLLUJA2t5DF0y8z8em+tCn93JW5EfxPL27II7ipryTjvBCvhVgzYekOjyYYRKz/kUN+deKynm42n1Ln+igAcUZv/s2oI950Y6LqwB4pqWAFXXTQC/SewnhubdDCk6hhJ3TFPzm4K80qcYuXnCZKT9MFsL8IS1z6dWaNdIyxbosUzeSG7j1WLhkmYCV8A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS0PR12MB7581.namprd12.prod.outlook.com (2603:10b6:8:13d::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.22; Tue, 8 Nov
- 2022 01:01:01 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
- 01:01:01 +0000
-Date:   Mon, 7 Nov 2022 21:01:00 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     bpf@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v4 15/17] iommufd: Add a selftest
-Message-ID: <Y2mqTE8iCEds8otT@nvidia.com>
-References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <15-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+        with ESMTP id S233099AbiKHBGX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Nov 2022 20:06:23 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D056240BF
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 17:06:22 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id p12so7287471plq.4
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 17:06:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E01Oa1tuNVBV3Nw8IeSBu5E315kgqb9xSnaNRubhtgg=;
+        b=P3TIRdyb7BbLNpWrF+7qZPPVQvEOPBCwj2deEn0tkWCiaQJJV0ml/7ZTEMhtf3svkN
+         pVwNm6TUm3ib+KbixI0/HQUoSSCpM6eIlFr7SO5GFv084HqbkBPrH5NGPDpHMeeYwgc3
+         NtA/XWv2IM0RI4cQ0oMl7E621WFD2I2TS7HwqE6852Kwbku3jupiSeq4E3TDkrIweP6W
+         AoY3tf6m3V4t/9X3w3siJ/VsqHgYgbxVkXqcs9H4LJw7l/wVkO0SbmG/3IzuQBt2evIo
+         /FhzXK/8XI1+DO5VwbeJuhamxQYs3U3zPtKY+K6vMOOwImedqy58r4qhb0ZvAHgiwVQd
+         hibQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E01Oa1tuNVBV3Nw8IeSBu5E315kgqb9xSnaNRubhtgg=;
+        b=Y+1YgzVLfntP+WGuu/PDKDcOdML5DMqJkr0GpLJ/pz1n6iZhPW3Q/mtXe7GL2DPW0C
+         rWXRyFZ434vBHfgWbSgXv/H9iJ6zReecarURTB8u7O/ACW+VzhK8bkZCOBhZfYXOUSqj
+         uUrNBYoWEoNbnhIhUnTA9TTu2IGgSNWrgyYxknHG+GMR2TvYzGbLavIGWSzfZEQnW2Ke
+         XNKZVDRXHCqu3RKN7zRkGyTrhZUFm3gPm5pB0QcDOcC3TbP2i2zUFNMMZEARBa3CsA0o
+         4aj9inIuo630R5zLsBPEJyglRjnqozPxZC3qIJGTl/MFplLJBHjtSFw5RE+xYfK/Bml/
+         Qh3g==
+X-Gm-Message-State: ACrzQf1MSezGmZlaS2qOSkCFg6j0NsjLeYvwbJ++8PqClHjMv7G3+6Tp
+        4p+93yTVEkaQ07aZwL8IA5+obKA2a8x5hA==
+X-Google-Smtp-Source: AMsMyM7IRPuB+hkYd3dePhxYZibHC9hQsKuKbv65LlU3FnAEpDoj2sVsCadhxJikgBUZvMve22Jt6g==
+X-Received: by 2002:a17:902:b10d:b0:187:29fe:bda0 with SMTP id q13-20020a170902b10d00b0018729febda0mr41029538plr.16.1667869581719;
+        Mon, 07 Nov 2022 17:06:21 -0800 (PST)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id b29-20020a631b5d000000b0047022e07035sm4719435pgm.47.2022.11.07.17.06.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Nov 2022 17:06:20 -0800 (PST)
+Date:   Mon, 7 Nov 2022 17:06:15 -0800
+From:   David Matlack <dmatlack@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/3] Use TAP in some more KVM selftests
+Message-ID: <Y2mrh7h1jrZSPU5l@google.com>
+References: <20221004093131.40392-1-thuth@redhat.com>
+ <Y0nOv6fqTe2NnPuu@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <15-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
-X-ClientProxiedBy: MN2PR15CA0028.namprd15.prod.outlook.com
- (2603:10b6:208:1b4::41) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS0PR12MB7581:EE_
-X-MS-Office365-Filtering-Correlation-Id: e45f7b9a-df2a-4e7a-c9ed-08dac124b3fa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 80Ro+Qjf3yDlMw5N4FkEroO2S7ENqcz7ljLnHXFq1D6RtywATPg9q2qi/vFeLGHOdcGbEnCgRt0lr2uN0TBIRsr65asu4+W1xHHKshn4UQm/EIGIpm4ZwbeOZGttAO23eNxPU92/QaTsPk1EM1vQ16vKSY+z2HU+X6qHMS4LZ8i6zsgbNpBVF16kmRD2BftJM8USipKEVANMPwPhD7vkXLPIj0E76oN6yGXnpECdLcOFddwi0u94zPuJWH//0fyXeJfj3wvB5oMrDV0J2r6jD7h3AwZZ1tcAaUbVgOxPUjCrW2bQPV3CLqMA1v8VYe8FjtemdhvfUahEGuoAOJOCIat+LDXtHWIe8404+35S2z8bVhdWaBG3+nDDqcAWcDJ2RXa+ZRT9N3D/2292ayr+CWFYoqB2P/uEXYkEYsI7tyksFC+oG2Dmdo6R+JaNRnvePalb2Iw4rS6Gx7og7YWii7gY22vCc7Ki0duF9yweD28yYmQjOOOvEqUQQwRG4Rnwa8+kz5r9S3x/AQw1EWYoRRjotxs/zU1iZn6yBSVdPJWuRnLZa9U2YcFCTdGW+FgQtNfBcl/u6NmA7EBlKSfUKCM325uSO4YPID84BFWVUIuWkJLBl5JRKk7czarB9DS7/zXBn7CVxIAFPZWqtZ1wt6wB3IG0tlaRi4yIUUmC20/FC1jaqmmq16kV4c6hNFsRBh3Fgn9EsD3h31UCwMbZr08wJu4CTk3MVeEy9U2evhPxHm8hX9ceGNOVRCLkA8lPCTMM7XgX6BPPqO2KmzX4iAv57YTnrBTAyZJJkmFzqIj7Dj3vZnBPQocHdTB6ldi2sGWjBnuKvN9fQeuLSpFV0w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(39860400002)(376002)(396003)(366004)(346002)(451199015)(83380400001)(36756003)(921005)(26005)(86362001)(8676002)(41300700001)(6512007)(4326008)(66476007)(66556008)(66946007)(7406005)(966005)(186003)(478600001)(6486002)(6506007)(8936002)(5660300002)(7416002)(316002)(38100700002)(54906003)(110136005)(2906002)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?YjjV3C7F/GtnKq15bzUD59b7AvC7tOTBPEElbggKyqzTPFLz1OWHj90f+eKj?=
- =?us-ascii?Q?VSUo5cWqq9eCw0D7Xfw4Vx0005/+NHAqvq3YBwVJwKXh0OJFubRvG2w1gWil?=
- =?us-ascii?Q?ZmAKeH1j/LEbyGe1kB4hCIroRBRmLiT20GdwYoaHdOlYshXuh44Re7EW5to7?=
- =?us-ascii?Q?h4Pf8bZkKaZBf/d/0MJtV9k0Z87H+nP6STakbJA3kDKvuieRUxsyoXEq5W/F?=
- =?us-ascii?Q?GrZKDW/iG/0JbW5atfJkbr9GVPF0STS8Ls1zJwFQ8VaKm4QVQlGT7CKufeGU?=
- =?us-ascii?Q?XyxjEe4tJtL5D4ndWijW5kUY1XS5xJ6D5z1wS00JAbAggv80Aw7np1CYol1N?=
- =?us-ascii?Q?rV+OtS6QVje0nwMxUIdJ5l+zqVCwajs8n7phC+Q366+7vkm+xTR65q9QdkKB?=
- =?us-ascii?Q?hFEfT3unIfp4l1N7lLCHna5KFAKegWEI5VLRPEBo9zZlJYNUrLkxEzoBK9Ad?=
- =?us-ascii?Q?CYcfBmd0nPgIMWr+esOrTzgA34azj4h9BxPZSPMXdp0ZIR88foAFElBIkE/U?=
- =?us-ascii?Q?JdIdGUXSe7B061AELJcVmzCf9h1DX+MaqrbLASO8J1co5wh8Gl+mkosR+wl8?=
- =?us-ascii?Q?O58zn+poW3JAPFYMlcBIXbspus82hwhq2kTnnWh405/rzacAD7b4q59PI9QE?=
- =?us-ascii?Q?FJl5DR91PuzJo/+dWKUd5jlQDIG8/zeP5c0gqkbYSheCAk9VwnQ7LDKbPCq8?=
- =?us-ascii?Q?LqThNDU+QbjcjyJbtInXeUoOnf4Zerjwtq/ZNdoyAavUwNgvsvpBRxbkkNjU?=
- =?us-ascii?Q?5saWRWVC4Y0UWHT6qmJ5qI1LFBDgzA3ow5YLjef6u6hx+KLzO53KMYT3HkZi?=
- =?us-ascii?Q?ia6KDKqillsv2uT6PDsvzuNIzLQvp1EzrOBddjIEAa/ZQxwRVhKOipeBbe9F?=
- =?us-ascii?Q?q8hP4pg+0NHBudWLYOSdbFGeLBwVDPop0JMwNRg8IKlQTaBSGB5r33KR5cCk?=
- =?us-ascii?Q?C0TT49uWUwK7qyj+xxVH58458VgpAFtFvBhZIXtTLNCo0wt3Me9jtL1eDubY?=
- =?us-ascii?Q?gI6AqTbQ51vNb0xX/Hi4KvWks4gBEnT+qUyCmHifGv2ElNM72vO5HwVRMSBq?=
- =?us-ascii?Q?jmY9LZxrBo4SwY4+HO6eXqj9fAqmDkvL6StODeNm9i+0qLYIAG357a7fIMPm?=
- =?us-ascii?Q?m1zJobeAay+x1LYTfkv5kL0nmgVV9boGB764SruKxvNohk76x58L737Fj9+9?=
- =?us-ascii?Q?b0UosJQCqBSXgnH9fycDumLTBWoYsddxrRBRLxnStZNxL8w7BbboCWOjIC57?=
- =?us-ascii?Q?NiHp3ty8P7HJoc2OaAFRLB7Mtl7tBbHYCS2DalozeiW2BCU8LKs/8/+FPLxw?=
- =?us-ascii?Q?rYtL+CVgqLchW8CUk/xT8zEoqfhxCKDouRYMzYT6c7tNoVQhfnOniDyP0RqC?=
- =?us-ascii?Q?XhuVkkQpTOJGun55ecrEXcqxcsuSBP+0/tLxgs7/YLjzvK96MI7orXQdDHHt?=
- =?us-ascii?Q?30R0PIy2E1uzgdA89VC/+3nrd/gdprHxDQ4q9I6iBDunadCpZC+/B3ajBnz7?=
- =?us-ascii?Q?QGrB2dMv2y7x5z90ee305zZrjIxHMUO/WT4NXuW4brZPCVFGnDdhHqqocPD1?=
- =?us-ascii?Q?k0Sp+K+ejGm/EEarZ4s=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e45f7b9a-df2a-4e7a-c9ed-08dac124b3fa
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2022 01:01:01.0293
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2zP4WGbrZvAw953VI8GBxuvPe3WcsppvrORrqUgPDxuGwf372V/mvrCpIpWaXWsc
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7581
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <Y0nOv6fqTe2NnPuu@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 08:49:08PM -0400, Jason Gunthorpe wrote:
-> Cover the essential functionality of the iommufd with a directed
-> test. This aims to achieve reasonable functional coverage using the
-> in-kernel self test framework.
+On Fri, Oct 14, 2022 at 09:03:59PM +0000, Sean Christopherson wrote:
+> On Tue, Oct 04, 2022, Thomas Huth wrote:
+> > Many KVM selftests are completely silent. This has the disadvantage
+> > for the users that they do not know what's going on here. For example,
+> > some time ago, a tester asked me how to know whether a certain new
+> > sub-test has been added to one of the s390x test binaries or not (which
+> > he didn't compile on his own), which is hard to judge when there is no
+> > output. So I finally went ahead and implemented TAP output in the
+> > s390x-specific tests some months ago.
+> > 
+> > Now I wonder whether that could be a good strategy for the x86 and
+> > generic tests, too?
 > 
-> It provides a mock kernel module for the iommu_domain that allows it to
-> run without any HW and the mocking provides a way to directly validate
-> that the PFNs loaded into the iommu_domain are correct.
+> Taking Andrew's thoughts a step further, I'm in favor of adding TAP output, but
+> only if we implement it in such a way that it reduces the burden on writing new
+> tests.  I _really_ like that sync_regs_test's subtests are split into consumable
+> chunks, but I worry that the amount of boilerplate needed will deter test writes
+> and increase the maintenance cost.
 > 
-> The mock also simulates the rare case of PAGE_SIZE > iommu page size as
-> the mock will operate at a 2K iommu page size. This allows exercising all
-> of the calculations to support this mismatch.
+> And my experience with KVM-unit-tests is that letting test writers specify strings
+> for test names is a bad idea, e.g. using an arbitrary string creates a disconnect
+> between what the user sees and what code is running, and makes it unnecessarily
+> difficult to connect a failure back to code.  And if we ever support running
+> specific testcases by name (I'm still not sure this is a net positive), arbitrary
+> strings get really annoying because inevitably an arbitrary string will contain
+> characters that need to be escaped in the shell.
 > 
-> This allows achieving high coverage of the corner cases in the iopt_pages.
+> Adding a macro or three to let tests define and run testscases with minimal effort
+> would more or less eliminate the boilerplate.  And in theory providing semi-rigid
+> macros would help force simple tests to conform to standard patterns, which should
+> reduce the cost of someone new understanding the test, and would likely let us do
+> more automagic things in the future.
 > 
-> However, it is an unusually invasive config option to enable all of
-> this. The config option should not be enabled in a production kernel.
+> E.g. something like this in the test:
+> 
+> 	KVM_RUN_TESTCASES(vcpu,
+> 		test_clear_kvm_dirty_regs_bits,
+> 		test_set_invalid,
+> 		test_req_and_verify_all_valid_regs,
+> 		test_set_and_verify_various_reg_values,
+> 		test_clear_kvm_dirty_regs_bits,
+> 	);
 
-This patch crossed 100k so it was bounced from the vger lists.
+There is an existing framework in
+tools/testing/selftests/kselftest_harness.h that provides macros for
+setting up and running tests cases. I converted sync_regs_test to use it
+below as an example [1].
 
-If anyone didn't get it and would like to see it lore has it:
+The harness runs each subtest in a child process, so sharing a VM/VCPU
+across test cases is not possible. This means setting up and tearing
+down a VM for every test case, but the harness makes this pretty easy
+with FIXTURE_{SETUP,TEARDOWN}(). With this harness, we can keep using
+TEST_ASSERT() as-is, and still run all test cases even if one fails.
+Plus no need for the hard-coded ksft_*() calls in main().
 
-https://lore.kernel.org/linux-iommu/15-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com/
+[1]
 
-For the eventual v5 I will split the nth test into its own patch
-
-Jason
+diff --git a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
+index 9b6db0b0b13e..11cf25d3e4a3 100644
+--- a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
+@@ -20,6 +20,8 @@
+ #include "kvm_util.h"
+ #include "processor.h"
+ 
++#include "../kselftest_harness.h"
++
+ #define UCALL_PIO_PORT ((uint16_t)0x1000)
+ 
+ struct ucall uc_none = {
+@@ -80,26 +82,23 @@ static void compare_vcpu_events(struct kvm_vcpu_events *left,
+ #define TEST_SYNC_FIELDS   (KVM_SYNC_X86_REGS|KVM_SYNC_X86_SREGS|KVM_SYNC_X86_EVENTS)
+ #define INVALID_SYNC_FIELD 0x80000000
+ 
+-int main(int argc, char *argv[])
+-{
+-	struct kvm_vcpu *vcpu;
++FIXTURE(sync_regs_test) {
+ 	struct kvm_vm *vm;
+-	struct kvm_run *run;
+-	struct kvm_regs regs;
+-	struct kvm_sregs sregs;
+-	struct kvm_vcpu_events events;
+-	int rv, cap;
+-
+-	/* Tell stdout not to buffer its content */
+-	setbuf(stdout, NULL);
++	struct kvm_vcpu *vcpu;
++};
+ 
+-	cap = kvm_check_cap(KVM_CAP_SYNC_REGS);
+-	TEST_REQUIRE((cap & TEST_SYNC_FIELDS) == TEST_SYNC_FIELDS);
+-	TEST_REQUIRE(!(cap & INVALID_SYNC_FIELD));
++FIXTURE_SETUP(sync_regs_test) {
++	self->vm = vm_create_with_one_vcpu(&self->vcpu, guest_code);
++}
+ 
+-	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++FIXTURE_TEARDOWN(sync_regs_test) {
++	kvm_vm_free(self->vm);
++}
+ 
+-	run = vcpu->run;
++TEST_F(sync_regs_test, read_invalid) {
++	struct kvm_run *run = self->vcpu->run;
++	struct kvm_vcpu *vcpu = self->vcpu;
++	int rv;
+ 
+ 	/* Request reading invalid register set from VCPU. */
+ 	run->kvm_valid_regs = INVALID_SYNC_FIELD;
+@@ -115,6 +114,12 @@ int main(int argc, char *argv[])
+ 		    "Invalid kvm_valid_regs did not cause expected KVM_RUN error: %d\n",
+ 		    rv);
+ 	run->kvm_valid_regs = 0;
++}
++
++TEST_F(sync_regs_test, set_invalid) {
++	struct kvm_run *run = self->vcpu->run;
++	struct kvm_vcpu *vcpu = self->vcpu;
++	int rv;
+ 
+ 	/* Request setting invalid register set into VCPU. */
+ 	run->kvm_dirty_regs = INVALID_SYNC_FIELD;
+@@ -130,6 +135,15 @@ int main(int argc, char *argv[])
+ 		    "Invalid kvm_dirty_regs did not cause expected KVM_RUN error: %d\n",
+ 		    rv);
+ 	run->kvm_dirty_regs = 0;
++}
++
++TEST_F(sync_regs_test, req_and_verify_all_valid) {
++	struct kvm_run *run = self->vcpu->run;
++	struct kvm_vcpu *vcpu = self->vcpu;
++	struct kvm_vcpu_events events;
++	struct kvm_sregs sregs;
++	struct kvm_regs regs;
++	int rv;
+ 
+ 	/* Request and verify all valid register sets. */
+ 	/* TODO: BUILD TIME CHECK: TEST_ASSERT(KVM_SYNC_X86_NUM_FIELDS != 3); */
+@@ -148,6 +162,22 @@ int main(int argc, char *argv[])
+ 
+ 	vcpu_events_get(vcpu, &events);
+ 	compare_vcpu_events(&events, &run->s.regs.events);
++}
++
++TEST_F(sync_regs_test, set_and_verify_various) {
++	struct kvm_run *run = self->vcpu->run;
++	struct kvm_vcpu *vcpu = self->vcpu;
++	struct kvm_vcpu_events events;
++	struct kvm_sregs sregs;
++	struct kvm_regs regs;
++	int rv;
++
++	run->kvm_valid_regs = TEST_SYNC_FIELDS;
++	rv = _vcpu_run(vcpu);
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
++		    "Unexpected exit reason: %u (%s),\n",
++		    run->exit_reason,
++		    exit_reason_str(run->exit_reason));
+ 
+ 	/* Set and verify various register values. */
+ 	run->s.regs.regs.rbx = 0xBAD1DEA;
+@@ -176,6 +206,13 @@ int main(int argc, char *argv[])
+ 
+ 	vcpu_events_get(vcpu, &events);
+ 	compare_vcpu_events(&events, &run->s.regs.events);
++}
++
++TEST_F(sync_regs_test, clear_kvm_valid_and_dirty) {
++	struct kvm_run *run = self->vcpu->run;
++	struct kvm_vcpu *vcpu = self->vcpu;
++	struct kvm_regs regs;
++	int rv;
+ 
+ 	/* Clear kvm_dirty_regs bits, verify new s.regs values are
+ 	 * overwritten with existing guest values.
+@@ -199,6 +236,7 @@ int main(int argc, char *argv[])
+ 	run->kvm_valid_regs = 0;
+ 	run->kvm_dirty_regs = 0;
+ 	run->s.regs.regs.rbx = 0xAAAA;
++	vcpu_regs_get(vcpu, &regs);
+ 	regs.rbx = 0xBAC0;
+ 	vcpu_regs_set(vcpu, &regs);
+ 	rv = _vcpu_run(vcpu);
+@@ -213,6 +251,20 @@ int main(int argc, char *argv[])
+ 	TEST_ASSERT(regs.rbx == 0xBAC0 + 1,
+ 		    "rbx guest value incorrect 0x%llx.",
+ 		    regs.rbx);
++}
++
++TEST_F(sync_regs_test, clear_kvm_valid_regs) {
++	struct kvm_run *run = self->vcpu->run;
++	struct kvm_vcpu *vcpu = self->vcpu;
++	struct kvm_regs regs;
++	int rv;
++
++	run->kvm_valid_regs = TEST_SYNC_FIELDS;
++	rv = _vcpu_run(vcpu);
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
++		    "Unexpected exit reason: %u (%s),\n",
++		    run->exit_reason,
++		    exit_reason_str(run->exit_reason));
+ 
+ 	/* Clear kvm_valid_regs bits. Verify s.regs values are not overwritten
+ 	 * with existing guest values but that guest values are overwritten
+@@ -233,8 +285,15 @@ int main(int argc, char *argv[])
+ 	TEST_ASSERT(regs.rbx == 0xBBBB + 1,
+ 		    "rbx guest value incorrect 0x%llx.",
+ 		    regs.rbx);
++}
++
++int main(int argc, char **argv)
++{
++	int cap;
+ 
+-	kvm_vm_free(vm);
++	cap = kvm_check_cap(KVM_CAP_SYNC_REGS);
++	TEST_REQUIRE((cap & TEST_SYNC_FIELDS) == TEST_SYNC_FIELDS);
++	TEST_REQUIRE(!(cap & INVALID_SYNC_FIELD));
+ 
+-	return 0;
++	return test_harness_run(argc, argv);
+ }
