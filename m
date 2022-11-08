@@ -2,161 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD3C16215F9
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 15:19:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60ED56216BD
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 15:32:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235371AbiKHOT3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 09:19:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56604 "EHLO
+        id S234246AbiKHOcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 09:32:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233996AbiKHOT2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 09:19:28 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AA9F1706D;
-        Tue,  8 Nov 2022 06:19:27 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A8Dffbo004781;
-        Tue, 8 Nov 2022 14:19:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=P82klFAPF41E/7Wk5SY7BleX4eWwgo0YC/w7dPnHGew=;
- b=hHC1Si4nUIiCTSTs9jlhE1zdM3MchD76pRMKHbCsCsnqa3WO+KvPBGfv9gPwzOWJZFuS
- Zfqm9UXXaofANjV42H7HCpMlyj3YDW4PSqD3uq9LZn69F0gNBIpiotKuIN9JEmrJTrnx
- GLVdgFH6rdbDMGSpZTw6FZcjJg2iFw6lBIwm6rO9eY4md6k6+XN8zLhjIUb5OLlbbWwa
- wwzTzRwAqSYVaMiw+QZ98UhYnLiOfI2BpHUyAdX0aE7ZUh2oECygaTJZ/vO+ch0xiaVR
- b6LcOtTvdg/6vjTEOwVuNrJTtQ/Xhyo4J2y6zZo/33ikweIm55k+oWM1L6tNl9FlQrcE zQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kqmn707b2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Nov 2022 14:19:21 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A8CATDE026497;
-        Tue, 8 Nov 2022 14:19:21 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kqmn707am-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Nov 2022 14:19:21 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A8E64pJ012245;
-        Tue, 8 Nov 2022 14:19:20 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma01dal.us.ibm.com with ESMTP id 3kngsy4n3d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Nov 2022 14:19:20 +0000
-Received: from smtpav04.dal12v.mail.ibm.com ([9.208.128.131])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A8EJKEZ61931832
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Nov 2022 14:19:20 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E5D335804E;
-        Tue,  8 Nov 2022 14:19:18 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BD45258067;
-        Tue,  8 Nov 2022 14:19:17 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.65.225.56])
-        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  8 Nov 2022 14:19:17 +0000 (GMT)
-Message-ID: <67dafaf27cc029ffde1f7c474c2fd17907958d5a.camel@linux.ibm.com>
-Subject: Re: S390 testing for IOMMUFD
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
-        Kevin Tian <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>
-Date:   Tue, 08 Nov 2022 09:19:17 -0500
-In-Reply-To: <Y2pffsdWwnfjrTbv@nvidia.com>
-References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
-         <Y2msLjrbvG5XPeNm@nvidia.com>
-         <c32829c8-1259-7441-f6df-04f44a39ab2f@linux.ibm.com>
-         <Y2pffsdWwnfjrTbv@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: zU_aLDctE95q4PM0K1TFVz8H2S6xlWhe
-X-Proofpoint-ORIG-GUID: orXTUFs2GLPaEsF-in5OAPeQIzK23Mah
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S234291AbiKHObF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 09:31:05 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E707DFAD9
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 06:31:04 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id k15so13970151pfg.2
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 06:31:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SzBlYeGeT15Xra75w9IZDBjQ7Da3XKSmRdlnDJDYrko=;
+        b=plCZMl07mNxOy4FwEnJyPWecERqsJQyrHYHIsHPByWrtU1k24II845ABLvzsZ/utuV
+         xrfZ6D/e/ZRoyRjpbZ5oMDY9h9ndbu6gtWFiQs/CjHcVVSqci/vjYPMMyy1pnVJ69u5N
+         OM2Kwkcs/9db1KNzWi4t4Kki8xmdjDy37F969+9phg4q7Iutyq/zyteGqROU9T6wdO4n
+         lS/c2RFkn8H1h3UlswE5jNY6oMt5wQG8oq965L41J8fDh6fe1zek7KZifUk151Do70De
+         k9oKwcRkEhDvguAg4zcTYagV5rrGsvTLwyNtdWlzI5EY/CPrjAga8S7nNTzf3DHImH9S
+         a/jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:reply-to:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SzBlYeGeT15Xra75w9IZDBjQ7Da3XKSmRdlnDJDYrko=;
+        b=RBkwhlrJu1/KisxKukW7U2tbHDu4PMMBPsrXwSpZFkEs2nGl989603Nc+LSobi055D
+         DvY9iXYkzT8DRNtFhaLIB9dxG7Yos36GvTI/h9LF2TutQcg7AIm1EXdcXkkdkVLRc/vp
+         CAjLt8f8nBy+giSjRXDMB31vHZ1aLL5AjVYI7vlyciOOT19VvVPVWitAyjqJSlKO9XBa
+         ZhMtjHEyh/NqGKskBpf5D7eJF0nCJfmrWmQ++04+xAS5SL8nfLKDHNTcr/mPoHvmyJx3
+         mZstCHVICXGEErDQri7Ff5nDNQV0/mzuB8OaIY2swP8/giLdY2WtLMVJEKt+5V99/QXg
+         G7rg==
+X-Gm-Message-State: ACrzQf1g3MNAbLL9xUt5Y/Ffr+SU3N4CmvV9Uc/+OfHhW4IvS18xjRZl
+        zM6cYQH8oJKuENT2bOfBCuuwqdG8CMI+GvL4FbE=
+X-Google-Smtp-Source: AMsMyM5cpw1VKvG8gEasOMmG4UhkblJY7gBReqfbYX80x9OXEWSZokzXOm90JDY4L5h3JbfU+3ckCU+QNWhG8SGrNVo=
+X-Received: by 2002:a05:6a00:1da6:b0:56c:318a:f8ab with SMTP id
+ z38-20020a056a001da600b0056c318af8abmr56843835pfw.82.1667917864342; Tue, 08
+ Nov 2022 06:31:04 -0800 (PST)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-07_11,2022-11-08_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
- bulkscore=0 spamscore=0 clxscore=1011 adultscore=0 malwarescore=0
- priorityscore=1501 impostorscore=0 lowpriorityscore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211080084
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Received: by 2002:ac4:c8c2:0:b0:56a:d900:eb11 with HTTP; Tue, 8 Nov 2022
+ 06:31:03 -0800 (PST)
+Reply-To: mr.abraham022@gmail.com
+From:   "Mr.Abraham" <davidbraddy01@gmail.com>
+Date:   Tue, 8 Nov 2022 14:31:03 +0000
+Message-ID: <CAHGOU4PvdrNhE2KifzdPkFxZTCG5gy+23qf130PwnSmJcLRSew@mail.gmail.com>
+Subject: Greeting
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: Yes, score=5.0 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_FM_MR_MRS,
+        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2607:f8b0:4864:20:0:0:0:42b listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.4794]
+        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
+        *      digit
+        *      [mr.abraham022[at]gmail.com]
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
+        *       in digit
+        *      [davidbraddy01[at]gmail.com]
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [davidbraddy01[at]gmail.com]
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        *  0.0 T_HK_NAME_FM_MR_MRS No description available.
+        *  2.9 UNDISC_FREEM Undisclosed recipients + freemail reply-to
+        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
+        *      different freemails
+X-Spam-Level: *****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-11-08 at 09:54 -0400, Jason Gunthorpe wrote:
-> On Tue, Nov 08, 2022 at 08:50:53AM -0500, Matthew Rosato wrote:
->=20
-> > FWIW, vfio-pci via s390 is working fine so far, though I'll put it
-> > through more paces over the next few weeks and report if I find
-> > anything.
->=20
-> OK great
->=20
-> > As far as mdev drivers...=C2=A0=20
-> >=20
-> > -ccw: Sounds like Eric is already aware there is an issue and is
-> > investigating (I see errors as well).
-
-I -think- the problem for -ccw is that the new vfio_pin_pages requires
-the input addresses to be page-aligned, and while most of ours are, the
-first one in any given transaction may not be. We never bothered to
-mask off the addresses since it was handled for us, and we needed to
-keep the offsets anyway.
-
-By happenstance, I had some code that would do the masking ourselves
-(for an unrelated reason); I'll see if I can get that fit on top and if
-it helps matters. After coffee.
-
-Eric
-
-> >=20
-> > -ap: I see the exact same issue that Christian mentioned...=C2=A0 I'll
-> > talk to Tony & Jason about it.
->=20
-> A clue what is going wrong might get a quick realization on the
-> problem?
->=20
-> I'm guessing something in the vfio side more than the access
-> 'pinning'
-> part?
->=20
-> > > If I recall there was some desire from the S390 platform team to
-> > > start
-> > > building on iommufd to create some vIOMMU acceleration for S390
-> > > guests, this is a necessary first step.
-> >=20
-> > There's probably something here for -ccw in the future, but you
-> > might be thinking of s390 vfio-pci e.g. to implement the in-kernel
-> > handling of nested mappings on s390 -- yep, work in in progress
-> > here, not ready for sharing yet but I have been most recently
-> > basing
-> > my work on top of the nesting series
-> > https://github.com/yiliu1765/iommufd/tree/iommufd-v6.0-rc3-nesting
->=20
-> The relation is that if vfio-pci wants to do the above then
-> vfio-ccw/ap will have to run on iommufd when used in the same VM as
-> vfio-pci.
->=20
-> So we need it to work :)
->=20
-> Jason
+My Greeting, Did you receive the letter i sent to you. Please answer me.
+Regard, Mr.Abraham
