@@ -2,182 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52478620960
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 07:11:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDE406209FF
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 08:21:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233498AbiKHGLa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 01:11:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34248 "EHLO
+        id S233263AbiKHHVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 02:21:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233298AbiKHGLZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 01:11:25 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2088.outbound.protection.outlook.com [40.107.94.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64B444091D;
-        Mon,  7 Nov 2022 22:11:17 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mB77nHgcIwBe/gDrvOuxvZFGTq7XY2Yv2GdUWNBJfu50+beWoMKOW7CLGDuruZJi/zbCBr0yO+NmAhxVjoijWKfxlTOCQ1vYWjQaDQ7vr2j60BLPCNKD7gHOddlTPcVGBLtYRusR5s4sFw7cfAmOhoCqRtnmkz77+g6eTJAD5JzjebCq35yoshpuWj54Yy6nbadKkFPcx3etZFRTpX4LebgA09GdTmi/p68UrW5U4j6uumcLQt/UKbeJOQnXDFL+J+HifL6tBqSu75Vr7b8E8yNifoohjGXIjer2axue8OFudxlvrr+NNU+VvBzWjrM2//KEazAqAKPSCyEIQzGUNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WnoioEVcetE6Yu2IPySjPOqBNWEAAW/hHxIXxOXLPow=;
- b=biqu/XT3gOcXP05wI/rItoYuZ9eSUXjndP0OI1sbN/2YsAkOLI6aCXluX5Zmy0TSTUVZpkQAJMJ6S0mww8TPM/CiWihBc8Ywi1LIAyNF7Z+sstvoZwtnkDgEET6pXliLdJ5cLIhmjOIBWg3f3rGhDOB5uplYlv5JdsDPbPeyNwErdJuiuEgzSx++AdJz24vellj0zbRjO/Q50uhG6cDp2YBqtZTDfphbOl2LyH5+bxJgvSWwhwXPE7kGZ0H7wObAuG22DN8sYRhV6t+Ld6JebakwbsyXeHhMc5t8c1kIuCfwVgQqBdrIlbPDcdDDEj8cs2ZM0p8V0MYiBscp+PQyRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WnoioEVcetE6Yu2IPySjPOqBNWEAAW/hHxIXxOXLPow=;
- b=OQTdYViNzy2SXdnmQn79OYy2Wp1KHQjeWvzg+yRucidgTxeO5H3pS85ryTBxSNDTsFJ/9yIFpHLbCgRIMMGrARLqBeuXa80X0+0VdWhVDENlp0byB21off4IhyorIBPteX3RXAEY6yDavJno+GcWGO6iP33J3SonndIpbYq9rrO06cc++wivnHR68+feGoaoKo87RJCm8ii4wh6KrBPEkVBBpfB6sN0HIUn+cTcnfZ6DyU1vCn+ihC+g8BnP8F8dlD+cKaDqbk2PVt93k9Tu9teX7fG9m5yjC6GwetqTxEi1gGGAMDX4ql/MY0ULg4DZloba2O8jVsXgVEsU8gUgKA==
-Received: from BN9PR03CA0474.namprd03.prod.outlook.com (2603:10b6:408:139::29)
- by CY5PR12MB6623.namprd12.prod.outlook.com (2603:10b6:930:41::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27; Tue, 8 Nov
- 2022 06:11:15 +0000
-Received: from BN8NAM11FT007.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:139:cafe::6b) by BN9PR03CA0474.outlook.office365.com
- (2603:10b6:408:139::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26 via Frontend
- Transport; Tue, 8 Nov 2022 06:11:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN8NAM11FT007.mail.protection.outlook.com (10.13.177.109) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5791.20 via Frontend Transport; Tue, 8 Nov 2022 06:11:15 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Mon, 7 Nov 2022
- 22:11:03 -0800
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Mon, 7 Nov 2022
- 22:11:03 -0800
-Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com (10.129.68.10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29 via Frontend
- Transport; Mon, 7 Nov 2022 22:11:00 -0800
-Date:   Mon, 7 Nov 2022 22:10:59 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@gmail.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        <dri-devel@lists.freedesktop.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Eric Farman" <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        <intel-gfx@lists.freedesktop.org>,
-        <intel-gvt-dev@lists.freedesktop.org>, <iommu@lists.linux.dev>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        "Jason Herne" <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        with ESMTP id S232494AbiKHHVD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 02:21:03 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E9ED13D05;
+        Mon,  7 Nov 2022 23:21:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667892062; x=1699428062;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=upQwL5A0Maekh82raTC60T5oBKGppSiNQzfVbZZR6Q8=;
+  b=NHZNtum37Ge4b2nlVNYfhNWqQeDTgP1qrq3FaXkb/9JepQ1xobuoFHio
+   xA1ch3lfnVuWBN6NE6rVlH6Y90/WigCk9thA8qEijNyDaPkooyfOis+OZ
+   u334GIWAl3n/QSoVrQW+s4g6QgZX8NF3qAv+TYTOHYB0+h7me/Ox/daGR
+   YRF54QlGLpHFHLxpwFFK3F8R4c9Pl0wiwhVQXIda1xfgsM7cuFl2g3++L
+   P/865ao2BKIRjxHfTEQKJciWfW49XFgQ8IVeVA0qx1l92X5uJveR081M9
+   5qSSWBgCwZFjro/whtOeNKQsm24iAl6DeVwzMLYBFKO+cyPGRMGcNf5y9
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="312416933"
+X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; 
+   d="scan'208";a="312416933"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2022 23:21:01 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="638690908"
+X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; 
+   d="scan'208";a="638690908"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by fmsmga007.fm.intel.com with ESMTP; 07 Nov 2022 23:20:50 -0800
+Date:   Tue, 8 Nov 2022 15:16:24 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>,
-        Longfang Liu <liulongfang@huawei.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        "Halil Pasic" <pasic@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "Rodrigo Vivi" <rodrigo.vivi@intel.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Will Deacon <will@kernel.org>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2 07/11] vfio-iommufd: Support iommufd for physical VFIO
- devices
-Message-ID: <Y2ny84qOFQhtYVPF@Asurada-Nvidia>
-References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
- <7-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v9 4/8] KVM: Use gfn instead of hva for mmu_notifier_retry
+Message-ID: <20221108071624.GA76278@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <20221025151344.3784230-5-chao.p.peng@linux.intel.com>
+ <CA+EHjTySnJTuLB+XoRya6kS_zw2iMahW9-Ze70oKTf+6k0GrGQ@mail.gmail.com>
+ <20221104022813.GA4129873@chaop.bj.intel.com>
+ <Y2WSXLtcJOpWPtuv@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT007:EE_|CY5PR12MB6623:EE_
-X-MS-Office365-Filtering-Correlation-Id: d97beff8-2244-4707-e96b-08dac1500b2a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: eX/DR9d+WdmomNfqfq9LukMvFhRrxvqoBdlIzG396PRBPZiFVwezyg9OhmdoftZtaMoEnNiDQIuJSs5SiX/cf27tnnuI1xnPyyJh0vlBntzHq5lCyzYk67CJFDY1bzOolIth5MwGvz5Q5fa2E/OJNWjwsH5so5v2kwF6ZbCIISM7P8t6BLUYPiR+vtasm8vZ0M5YoTmjnUwEckKXKk4S9NfUW/6kcWtAAjbdOWgPjmoXMUxsNdEvN/OZpJR+vDZ1t/0Vd+348CKnI66sSFqdQPaR+sePlCY1u/xhLL/VZkpT618hxx8WKQBCzknlWvMnItgEhfrr+C6ZIaj1B+InL5FfAm91ZKwH/ZFOgAMPx7QE87xQg5WqKpYoNMA+27/pt/IiW05vvgoJOGqnak3qEBJN8HiPkho2uOM6SldQi6dTyH1n/6FrwHsJWCcvDtuMjU4jkOCsm/Jg99Hm/5pDGtoRi+QqahA3jZneoC1f1p1oobq5hXTpz+lSqWcKDRXnYqdeffnuH07YpCMk/miwMne4VD+H7mEEBnchz1QXyJQVVgAPoQ9wAaYQ9emhQVrWiuzEDPjxzLqBCs90/Bkz/FTrp9fhheTVjDP2Tp9nMFT14vXroDuCP/QmY/Grn915oe7ZpCSrjIozoFSyR8ngEveTzUrgONUp5mEP3KD+La+6unZlM4ZShQ6jatdEOa4IY3HNsvzYNIAnli0GhzokeS0wRqCVhQAUd9EU6cFHk4ma0M9fcW20qU8m4fsf9fXR3s7T4bjRwpOhCEGvUUKm1A==
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(136003)(39860400002)(396003)(451199015)(36840700001)(46966006)(40470700004)(82310400005)(36860700001)(83380400001)(33716001)(86362001)(82740400003)(7636003)(356005)(55016003)(478600001)(40480700001)(6862004)(8936002)(5660300002)(7406005)(7416002)(70586007)(70206006)(8676002)(4326008)(316002)(54906003)(6636002)(41300700001)(26005)(9686003)(186003)(426003)(47076005)(40460700003)(336012)(2906002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2022 06:11:15.3221
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d97beff8-2244-4707-e96b-08dac1500b2a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT007.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6623
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <Y2WSXLtcJOpWPtuv@google.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 08:52:51PM -0400, Jason Gunthorpe wrote:
+On Fri, Nov 04, 2022 at 10:29:48PM +0000, Sean Christopherson wrote:
+> On Fri, Nov 04, 2022, Chao Peng wrote:
+> > On Thu, Oct 27, 2022 at 11:29:14AM +0100, Fuad Tabba wrote:
+> > > Hi,
+> > > 
+> > > On Tue, Oct 25, 2022 at 4:19 PM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> > > >
+> > > > Currently in mmu_notifier validate path, hva range is recorded and then
+> > > > checked against in the mmu_notifier_retry_hva() of the page fault path.
+> > > > However, for the to be introduced private memory, a page fault may not
+> > > > have a hva associated, checking gfn(gpa) makes more sense.
+> > > >
+> > > > For existing non private memory case, gfn is expected to continue to
+> > > > work. The only downside is when aliasing multiple gfns to a single hva,
+> > > > the current algorithm of checking multiple ranges could result in a much
+> > > > larger range being rejected. Such aliasing should be uncommon, so the
+> > > > impact is expected small.
+> > > >
+> > > > It also fixes a bug in kvm_zap_gfn_range() which has already been using
+> > > 
+> > > nit: Now it's kvm_unmap_gfn_range().
+> > 
+> > Forgot to mention: the bug is still with kvm_zap_gfn_range(). It calls
+> > kvm_mmu_invalidate_begin/end with a gfn range but before this series
+> > kvm_mmu_invalidate_begin/end actually accept a hva range. Note it's
+> > unrelated to whether we use kvm_zap_gfn_range() or kvm_unmap_gfn_range()
+> > in the following patch (patch 05).
+> 
+> Grr, in the future, if you find an existing bug, please send a patch.  At the
+> very least, report the bug.
 
-> @@ -795,6 +800,10 @@ static int vfio_device_first_open(struct vfio_device *device)
->  		ret = vfio_group_use_container(device->group);
->  		if (ret)
->  			goto err_module_put;
-> +	} else if (device->group->iommufd) {
-> +		ret = vfio_iommufd_bind(device, device->group->iommufd);
+Agreed, this can be sent out separately from this series.
 
-Here we check device->group->iommufd...
+> The APICv case that this was added for could very
+> well be broken because of this, and the resulting failures would be an absolute
+> nightmare to debug.
 
-> +		if (ret)
-> +			goto err_module_put;
->  	}
+Given the apicv_inhibit should be rare, the change looks good to me.
+Just to be clear, your will send out this fix, right?
+
+Chao
+
+> 
+> Compile tested only...
+> 
+> --
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Fri, 4 Nov 2022 22:20:33 +0000
+> Subject: [PATCH] KVM: x86/mmu: Block all page faults during
+>  kvm_zap_gfn_range()
+> 
+> When zapping a GFN range, pass 0 => ALL_ONES for the to-be-invalidated
+> range to effectively block all page faults while the zap is in-progress.
+> The invalidation helpers take a host virtual address, whereas zapping a
+> GFN obviously provides a guest physical address and with the wrong unit
+> of measurement (frame vs. byte).
+> 
+> Alternatively, KVM could walk all memslots to get the associated HVAs,
+> but thanks to SMM, that would require multiple lookups.  And practically
+> speaking, kvm_zap_gfn_range() usage is quite rare and not a hot path,
+> e.g. MTRR and CR0.CD are almost guaranteed to be done only on vCPU0
+> during boot, and APICv inhibits are similarly infrequent operations.
+> 
+> Fixes: edb298c663fc ("KVM: x86/mmu: bump mmu notifier count in kvm_zap_gfn_range")
+> Cc: stable@vger.kernel.org
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 6f81539061d6..1ccb769f62af 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6056,7 +6056,7 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
 >  
->  	device->kvm = device->group->kvm;
-> @@ -812,6 +821,7 @@ static int vfio_device_first_open(struct vfio_device *device)
->  	device->kvm = NULL;
->  	if (device->group->container)
->  		vfio_group_unuse_container(device->group);
-> +	vfio_iommufd_unbind(device);
-
-...yet, missing here, which could result in kernel oops.
-
-Should probably add something similar:
-+	if (device->group->iommufd)
-+		vfio_iommufd_unbind(device);
-
-Or should check !vdev->iommufd_device inside the ->unbind.
-
->  err_module_put:
->  	mutex_unlock(&device->group->group_lock);
->  	module_put(device->dev->driver->owner);
-> @@ -830,6 +840,7 @@ static void vfio_device_last_close(struct vfio_device *device)
->  	device->kvm = NULL;
->  	if (device->group->container)
->  		vfio_group_unuse_container(device->group);
-> +	vfio_iommufd_unbind(device);
-
-Ditto
+>  	write_lock(&kvm->mmu_lock);
+>  
+> -	kvm_mmu_invalidate_begin(kvm, gfn_start, gfn_end);
+> +	kvm_mmu_invalidate_begin(kvm, 0, -1ul);
+>  
+>  	flush = kvm_rmap_zap_gfn_range(kvm, gfn_start, gfn_end);
+>  
+> @@ -6070,7 +6070,7 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+>  		kvm_flush_remote_tlbs_with_address(kvm, gfn_start,
+>  						   gfn_end - gfn_start);
+>  
+> -	kvm_mmu_invalidate_end(kvm, gfn_start, gfn_end);
+> +	kvm_mmu_invalidate_end(kvm, 0, -1ul);
+>  
+>  	write_unlock(&kvm->mmu_lock);
+>  }
+> 
+> base-commit: c12879206e47730ff5ab255bbf625b28ade4028f
+> -- 
