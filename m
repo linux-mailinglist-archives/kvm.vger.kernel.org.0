@@ -2,62 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 470A462081D
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 05:14:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D1506208F6
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 06:39:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233452AbiKHEOm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Nov 2022 23:14:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43646 "EHLO
+        id S232548AbiKHFg4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 00:36:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233379AbiKHEOM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Nov 2022 23:14:12 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDECD22B3A
-        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 20:13:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667880791;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UeYV9gtrEMC/f2NfGupIKl3UhHTgEqpO1AGhP6jS8dg=;
-        b=AxHYCO1yDo08kQIC+4pfEHFsL/bhCj0ybB6P0HJAcQyoNq4TNH0CVeqZSg9G2QWlWexHLu
-        0MdlKLDk64ygjO0yOo37hCvjJ/06lvOcGcfvJFhRo9K51EBpGbOR8aEJu1vED/yrX71Zzf
-        fLRn3w+dgTySNqki4UopHkT/KByI07A=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-397-OSlo_J59Oe64J_7pXqU6fw-1; Mon, 07 Nov 2022 23:13:03 -0500
-X-MC-Unique: OSlo_J59Oe64J_7pXqU6fw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ECA04833A0E;
-        Tue,  8 Nov 2022 04:13:02 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-78.bne.redhat.com [10.64.54.78])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D584735429;
-        Tue,  8 Nov 2022 04:12:56 +0000 (UTC)
-From:   Gavin Shan <gshan@redhat.com>
-To:     kvmarm@lists.linux.dev
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
-        ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com,
-        will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
-        pbonzini@redhat.com, maz@kernel.org, peterx@redhat.com,
-        oliver.upton@linux.dev, seanjc@google.com, zhenyzha@redhat.com,
-        shan.gavin@gmail.com
-Subject: [PATCH v9 7/7] KVM: selftests: Automate choosing dirty ring size in dirty_log_test
-Date:   Tue,  8 Nov 2022 12:10:39 +0800
-Message-Id: <20221108041039.111145-8-gshan@redhat.com>
-In-Reply-To: <20221108041039.111145-1-gshan@redhat.com>
-References: <20221108041039.111145-1-gshan@redhat.com>
+        with ESMTP id S229521AbiKHFgz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 00:36:55 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A7A6183B3
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 21:36:53 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id y4so13234742plb.2
+        for <kvm@vger.kernel.org>; Mon, 07 Nov 2022 21:36:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=BySxdp/7FbkyS9rQ/+SYkYHjIbHSrwzWviAFRY2ZPdQ=;
+        b=jlgow3Yb6SgeKXBbO3czTUh+xNvvjFHf5z9ViSJ61Te93gNnScVTxpPdHdT0l7k62F
+         lMrHOG03BfSjw2UfLzDRH+RXS0WR4VTQobaYGOSlEeJAzgE29G9Fs3PTFtSoRNJ2lsDP
+         rp0PpZoXb1pTQgLNwDewCRkXTSd0VD2UnGaEqh9OBYLx6U4QpTvTGuKtpRiWBAAdeDq6
+         BupIKIXcNl5Jz9YKhzqCZK1Zqb6IeNpvb7fpbUcyQY8vS/dUjH/ef8j3NZEU1GlKSkJ5
+         KtoaRb8jEUBKaeh9EDW7vyVfw83qUDyWWtZPLL7bbZyLBEvN6jw/u2ubAUqXn8x1atsw
+         HieA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BySxdp/7FbkyS9rQ/+SYkYHjIbHSrwzWviAFRY2ZPdQ=;
+        b=y7BBNnFgi0T2no3a9/lK8+seaL0X/6NewQv/ifvmoibZd8+ueB6RwGyQIONLElBv1A
+         1qU1IXdxgBgyoTj9vPScNTmAu+CiPgWhtwkh7HbrqKfCpB0JEiFf7+hhGPzUGYGOiIIE
+         ktAwrH9B4iBu0bNYV8cEdxPDzqa+xzRhTPso5sgE1C7o5Ty/uaTQvBGyivgmNnPFzD3X
+         hPRfqG+LArYnhH4x+tooOpVWqdbcvwgDscKVWHw3WW/ez9V4OkgFkkjxivFNqBpCZQl0
+         0nn9pgzS4qfIsQayvj0n9nslsXqeq2V7MwsVhm7zgUE6oHahHEis/O7SWZb6XmaN0Bdf
+         qtqg==
+X-Gm-Message-State: ACrzQf2MqlzDz5xhvYIUTJmbN6zghn4Hs8ni6UTqzswSYOAJvgHMOxyu
+        CDQVUKYuTiova9xkz11537RdAX/au83LH0JwHm0COg==
+X-Google-Smtp-Source: AMsMyM5h/BK7dlR9tXFEYHomDewWZpzTj+DR/oCqXMDG+trxJqZakFJMlhmhsO/VcM4HGEgEalX+qA4zQQDUKnfZXJ4=
+X-Received: by 2002:a17:902:7145:b0:187:2356:c29d with SMTP id
+ u5-20020a170902714500b001872356c29dmr43846977plm.154.1667885812893; Mon, 07
+ Nov 2022 21:36:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20221028105402.2030192-1-maz@kernel.org> <20221028105402.2030192-12-maz@kernel.org>
+ <CAAeT=FyiNeRun7oRL83AUkVabUSb9pxL2SS9yZwi1rjFnbhH6g@mail.gmail.com>
+ <87tu3gfi8u.wl-maz@kernel.org> <CAAeT=FwViQRmyJjf3jxcWnLFQAYob8uvvx7QNhWyj6OmaYDKyg@mail.gmail.com>
+ <86bkpmrjv8.wl-maz@kernel.org> <CAAeT=Fzp-7MMBJshAAQBgFwXLH2z5ASDgmDBLNJsQoFA=MSciw@mail.gmail.com>
+ <87pme0fdvp.wl-maz@kernel.org>
+In-Reply-To: <87pme0fdvp.wl-maz@kernel.org>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 7 Nov 2022 21:36:36 -0800
+Message-ID: <CAAeT=Fzgu1iaMmGXWZcmj9ifmchKXZXG2y7ksvQzoTGAQ=G-jw@mail.gmail.com>
+Subject: Re: [PATCH v2 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to
+ be set from userspace
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,92 +77,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In the dirty ring case, we rely on vcpu exit due to full dirty ring
-state. On ARM64 system, there are 4096 host pages when the host
-page size is 64KB. In this case, the vcpu never exits due to the
-full dirty ring state. The similar case is 4KB page size on host
-and 64KB page size on guest. The vcpu corrupts same set of host
-pages, but the dirty page information isn't collected in the main
-thread. This leads to infinite loop as the following log shows.
+Hi Marc,
 
-  # ./dirty_log_test -M dirty-ring -c 65536 -m 5
-  Setting log mode to: 'dirty-ring'
-  Test iterations: 32, interval: 10 (ms)
-  Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-  guest physical test memory offset: 0xffbffe0000
-  vcpu stops because vcpu is kicked out...
-  Notifying vcpu to continue
-  vcpu continues now.
-  Iteration 1 collected 576 pages
-  <No more output afterwards>
+> > BTW, if we have no intention of supporting a mix of vCPUs with and
+> > without PMU, I think it would be nice if we have a clear comment on
+> > that in the code.  Or I'm hoping to disallow it if possible though.
+>
+> I'm not sure we're in a position to do this right now. The current API
+> has always (for good or bad reasons) been per-vcpu as it is tied to
+> the vcpu initialisation.
 
-Fix the issue by automatically choosing the best dirty ring size,
-to ensure vcpu exit due to full dirty ring state. The option '-c'
-becomes a hint to the dirty ring count, instead of the value of it.
+Thank you for your comments!
+Then, when a guest that has a mix of vCPUs with and without PMU,
+userspace can set kvm->arch.dfr0_pmuver to zero or IMPDEF, and the
+PMUVER for vCPUs with PMU will become 0 or IMPDEF as I mentioned.
+For instance, on the host whose PMUVER==1, if vCPU#0 has no PMU(PMUVER==0),
+vCPU#1 has PMU(PMUVER==1), if the guest is migrated to another host with
+same CPU features (PMUVER==1), if SET_ONE_REG of ID_AA64DFR0_EL1 for vCPU#0
+is done after for vCPU#1, kvm->arch.dfr0_pmuver will be set to 0, and
+the guest will see PMUVER==0 even for vCPU1.
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 26 +++++++++++++++++---
- 1 file changed, 22 insertions(+), 4 deletions(-)
+Should we be concerned about this case?
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 8758c10ec850..a87e5f78ebf1 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -24,6 +24,9 @@
- #include "guest_modes.h"
- #include "processor.h"
- 
-+#define DIRTY_MEM_BITS 30 /* 1G */
-+#define PAGE_SHIFT_4K  12
-+
- /* The memory slot index to track dirty pages */
- #define TEST_MEM_SLOT_INDEX		1
- 
-@@ -273,6 +276,24 @@ static bool dirty_ring_supported(void)
- 
- static void dirty_ring_create_vm_done(struct kvm_vm *vm)
- {
-+	uint64_t pages;
-+	uint32_t limit;
-+
-+	/*
-+	 * We rely on vcpu exit due to full dirty ring state. Adjust
-+	 * the ring buffer size to ensure we're able to reach the
-+	 * full dirty ring state.
-+	 */
-+	pages = (1ul << (DIRTY_MEM_BITS - vm->page_shift)) + 3;
-+	pages = vm_adjust_num_guest_pages(vm->mode, pages);
-+	if (vm->page_size < getpagesize())
-+		pages = vm_num_host_pages(vm->mode, pages);
-+
-+	limit = 1 << (31 - __builtin_clz(pages));
-+	test_dirty_ring_count = 1 << (31 - __builtin_clz(test_dirty_ring_count));
-+	test_dirty_ring_count = min(limit, test_dirty_ring_count);
-+	pr_info("dirty ring count: 0x%x\n", test_dirty_ring_count);
-+
- 	/*
- 	 * Switch to dirty ring mode after VM creation but before any
- 	 * of the vcpu creation.
-@@ -685,9 +706,6 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, struct kvm_vcpu **vcpu,
- 	return vm;
- }
- 
--#define DIRTY_MEM_BITS 30 /* 1G */
--#define PAGE_SHIFT_4K  12
--
- struct test_params {
- 	unsigned long iterations;
- 	unsigned long interval;
-@@ -830,7 +848,7 @@ static void help(char *name)
- 	printf("usage: %s [-h] [-i iterations] [-I interval] "
- 	       "[-p offset] [-m mode]\n", name);
- 	puts("");
--	printf(" -c: specify dirty ring size, in number of entries\n");
-+	printf(" -c: hint to dirty ring size, in number of entries\n");
- 	printf("     (only useful for dirty-ring test; default: %"PRIu32")\n",
- 	       TEST_DIRTY_RING_COUNT);
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
--- 
-2.23.0
-
+Thank you,
+Reiji
