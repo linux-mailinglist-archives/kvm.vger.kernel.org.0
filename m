@@ -2,114 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68281621C6B
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 19:50:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CE44621C9A
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 19:59:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229587AbiKHSuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 13:50:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55402 "EHLO
+        id S229635AbiKHS7s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 13:59:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbiKHSts (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 13:49:48 -0500
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D629166CA5
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 10:48:50 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id y13so14582698pfp.7
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 10:48:50 -0800 (PST)
+        with ESMTP id S229551AbiKHS7q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 13:59:46 -0500
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBF3260EA8;
+        Tue,  8 Nov 2022 10:59:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1L5kOZNHYfCA3IRYVLUmKIQqOspk+Yz3BJ9Q+3CIhRs=;
-        b=W78BfCdzW3rFNxBBa9CJ99fIOIknqSWEHZQpGE4CP0gnNR+4VJ+1rYb8sEs0NBsASe
-         K4rEBjnnoCJk0a33aTy3cf9rfMp4VkUTZPwynhqWc6xUvWZh5c7hCT/NquaGP8tWiAmk
-         hcNg7xenoISlUZ3pmp4wYxBJpQOoNNtgg3hIJ2CWRKxb7/HZIa1PVdjWFm4ksV+cIxq8
-         YrF3aINsofbWuXc8co8smgqZQglTdPK9ATlmu723Lc7vcDYFsIrqGa+4SDMwuJYOSwOW
-         VL0XN5QRJNpA74ovJB+2axjmbYlMF5U+hQWpwC53WgZLq2bVPa2W9STH+x/xfs2jlapp
-         IPrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1L5kOZNHYfCA3IRYVLUmKIQqOspk+Yz3BJ9Q+3CIhRs=;
-        b=JW7/wx6DlGD/qK+a3BPBNfj1GugbRHY9vY3M/3BMUv1ke9tfJNN3V3snWy+5U9Lrb4
-         mK+vaUI01TcTxuWcL8yibYqN/MLQF12Veo3lDy7HELwMVoxWU9SszqcRdosI/dYZ2YEd
-         R+9y3qhLUpsfu50D61ziYqQcb/a168vxBqEw0XeLrBWZbQy1wV/2QN0Z2WqgL2SnK3Ub
-         lbQa5w9gPSFn75qA8blSxmgkKNcBGtM1XxBKnCdmi/CrrV7btVUWfQWt4FmTe7fKx3MG
-         pfvvq8gFJ5aFuEqveB8dXiLdWr+274mHvSQduYjZr9mKVJkOUlOJoNfuUp7XhM1b0URj
-         bc+w==
-X-Gm-Message-State: ACrzQf1t2Jc0g9jEs9uYxZs7K5COma3NQKw/qjpqYvPuLl7TdhPBML0M
-        TqcDS5HA/UjZCjWAGDqhZzuL7w==
-X-Google-Smtp-Source: AMsMyM5S9PjQE+J86OOSmzTz+w8ShiglmFoLAyopqlYc5Iemshl9f9rh9AOUnKWCV3mF3rIgtAIvgw==
-X-Received: by 2002:a05:6a00:1a44:b0:528:6af7:ff4a with SMTP id h4-20020a056a001a4400b005286af7ff4amr57736839pfv.78.1667933330266;
-        Tue, 08 Nov 2022 10:48:50 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id e13-20020a17090301cd00b0018855a22ccfsm7325722plh.91.2022.11.08.10.48.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Nov 2022 10:48:49 -0800 (PST)
-Date:   Tue, 8 Nov 2022 18:48:46 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "Aktas, Erdem" <erdemaktas@google.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "dmatlack@google.com" <dmatlack@google.com>
-Subject: Re: [PATCH v10 005/108] KVM: TDX: Initialize the TDX module when
- loading the KVM intel kernel module
-Message-ID: <Y2qkjnpZsWEFBe6G@google.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <99e5fcf2a7127347816982355fd4141ee1038a54.1667110240.git.isaku.yamahata@intel.com>
- <0feaa13fa5bf45258f2ebb8407eaefadf5c48976.camel@intel.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1667933986; x=1699469986;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=f/jLGb3VftbiMJ9+Hf3kCuMm11wmD3y9Crzv0IU8wPw=;
+  b=uh1ni13vxjFuqBIX+A01rosMSefaoENXUfXZGJalyhavXpakbFemJKdY
+   ZVcUChIDZ5l25Xo8fDDXkvtOhA/P1sODpD7lH9t2MoFN8m0B0yDEawmPy
+   9W7nb+5K+p9LnD6zg2q1mDdEodA7olh4D0K1HKcdMtGuDP9wiAQW3+LY6
+   8=;
+X-IronPort-AV: E=Sophos;i="5.96,148,1665446400"; 
+   d="scan'208";a="148956021"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-94edd59b.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2022 18:59:43 +0000
+Received: from EX13D25EUA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2c-m6i4x-94edd59b.us-west-2.amazon.com (Postfix) with ESMTPS id 4B4DC41991;
+        Tue,  8 Nov 2022 18:59:42 +0000 (UTC)
+Received: from EX19D016EUA004.ant.amazon.com (10.252.50.4) by
+ EX13D25EUA002.ant.amazon.com (10.43.165.40) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.42; Tue, 8 Nov 2022 18:59:40 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com.com (10.43.162.178) by
+ EX19D016EUA004.ant.amazon.com (10.252.50.4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.1118.15; Tue, 8 Nov 2022 18:59:35 +0000
+From:   Andra Paraschiv <andraprs@amazon.com>
+To:     linux-kernel <linux-kernel@vger.kernel.org>
+CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Marcelo Cerri <marcelo.cerri@canonical.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Tim Gardner <tim.gardner@canonical.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>,
+        "The AWS Nitro Enclaves Team" <aws-nitro-enclaves-devel@amazon.com>,
+        "Andra Paraschiv" <andraprs@amazon.com>
+Subject: [PATCH v1] MAINTAINERS: Update entries from the Nitro Enclaves section
+Date:   Tue, 8 Nov 2022 20:59:12 +0200
+Message-ID: <20221108185912.15792-1-andraprs@amazon.com>
+X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0feaa13fa5bf45258f2ebb8407eaefadf5c48976.camel@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Originating-IP: [10.43.162.178]
+X-ClientProxiedBy: EX13D44UWC001.ant.amazon.com (10.43.162.26) To
+ EX19D016EUA004.ant.amazon.com (10.252.50.4)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-11.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 08, 2022, Huang, Kai wrote:
-> > +int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
-> > +{
-> > +	int r;
-> > +
-> > +	if (!enable_ept) {
-> > +		pr_warn("Cannot enable TDX with EPT disabled\n");
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	/* MOVDIR64B instruction is needed. */
-> > +	if (!static_cpu_has(X86_FEATURE_MOVDIR64B)) {
+Update the list of maintainers for the Nitro Enclaves project. Alex
+(lexnv@) is not working at Amazon anymore and there will be the same
+case for me starting with 2023.
 
-Nit unrelated to Kai's comments: use boot_cpu_has(), not static_cpu_has().  This
-is run-once code that's not a hot path so there's zero reason to trigger patching.
+Add a reference to the mailing list of the Nitro Enclaves development
+team.
 
-> > +		pr_warn("Cannot enable TDX with MOVDIR64B supported ");
-> 					   ^
-> 					   without
-> > +		return -ENODEV;
-> > +	}
-> 
-> I think you should explain why MOVDIR64B is required, otherwise this just comes
-> out of blue.
-> 
-> Btw, is this absolutely required?  TDX also supports Li-mode, which doesn't have
-> integrity check.  So theoretically with Li-mode, normal zeroing is also OK but
-> doesn't need to use MOVDIR64B.
-> 
-> That being said, do we have a way to tell whether TDX works in Ci or Li mode?
-> 
-> 
-> 
+Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+---
+ MAINTAINERS | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 046ff06ff97f..af2c178ba0dc 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14564,10 +14564,9 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/dinguyen/linux.git
+ F:	arch/nios2/
+ 
+ NITRO ENCLAVES (NE)
+-M:	Andra Paraschiv <andraprs@amazon.com>
+-M:	Alexandru Vasile <lexnv@amazon.com>
+ M:	Alexandru Ciobotaru <alcioa@amazon.com>
+ L:	linux-kernel@vger.kernel.org
++L:	The AWS Nitro Enclaves Team <aws-nitro-enclaves-devel@amazon.com>
+ S:	Supported
+ W:	https://aws.amazon.com/ec2/nitro/nitro-enclaves/
+ F:	Documentation/virt/ne_overview.rst
+-- 
+2.37.1
+
+
+
+
+Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in Romania. Registration number J22/2621/2005.
+
