@@ -2,105 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27D39620EDC
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 12:24:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A0776620F22
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 12:33:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233888AbiKHLYP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 06:24:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35226 "EHLO
+        id S233744AbiKHLdZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 06:33:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233835AbiKHLYH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 06:24:07 -0500
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46B36419A1
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 03:24:00 -0800 (PST)
-Received: by mail-io1-xd30.google.com with SMTP id p141so11183859iod.6
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 03:24:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5B7dfi7xVJ3OslQ0ALi00lhJojz9IHhiYsVHA/RHqOE=;
-        b=Z2xz0F62PYjCBDaPJAMQlwAdSUUQxdVmjdSE1e/TEz5D6nfB7qYhDRauEt75dK7gsB
-         gtVoTdjw0oTaDS+z3idasRk9nIwydmI3O/a8UQatcsDJqkbGbIVyT1SuNX1kSLffYta+
-         MRaPM04Hv5NGx1PX+KL+YO7lfN7BHKCLYUZEhYaO6bT3eGqzCEeqoQdWOoaKJxxIWVcR
-         X5vaz/veLMrOj/9U4MKzAbNWDLkTVcyykPfCiQUtOALLeK724DexTS9gS8OIc8PPRbY4
-         YNmg+MP12x4a8uFh/63hJCJOP6eBt/pwec9yaAniUfCEq02k0DzqkBqfTrX2eYh/P4iT
-         mINw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:reply-to:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5B7dfi7xVJ3OslQ0ALi00lhJojz9IHhiYsVHA/RHqOE=;
-        b=Nu5AgADiIqKP4Xc41jND92XYUkyxgLc6zNcsXcGOLyIqCLLbWV3JWnnvLoaXZtJMDU
-         LjRXdDESsqLbDtjTwg0p796vbapSNOChrk7L6fHgxQ9lp5xrmiKC7+9AP4Zo5z5wQvG3
-         46diER2BNWgNCZR8Y9k5sOwzW+WljLJ4IHCQd3wlishkLTlM0+72knFteRdq8P6FC6BP
-         wja1+cF6lQ4/269wtmhBeVlZX13slsMtCg0JZpzxbRUyh5OdFWpknVMlKASPWONWNf6I
-         zGuB6gtWPbVr4W3072MKybd8g8eBllynrVuBa3pOJP0UUYcTCQbTU87+Ufj1O/A4XMCy
-         kbtA==
-X-Gm-Message-State: ACrzQf3hITpCm+RiOhIB2iJCGWIbYAL2CoRvnRc1xpa0lbTyKywYLgNP
-        zHO+r5bqwVvje6x4NjhVThny/W6+49oMih4jLIU=
-X-Google-Smtp-Source: AMsMyM5kag4nOyXiv058CAI4vKxtxp06JiPON4WELDl5Ot316dAXYP1rZp27aB4pLGdFMhJREf8MTcDs+CaUCGO8K58=
-X-Received: by 2002:a05:6602:2b06:b0:67f:fdf6:ffc2 with SMTP id
- p6-20020a0566022b0600b0067ffdf6ffc2mr34602043iov.111.1667906639638; Tue, 08
- Nov 2022 03:23:59 -0800 (PST)
+        with ESMTP id S233737AbiKHLdX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 06:33:23 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56965262E;
+        Tue,  8 Nov 2022 03:33:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667907202; x=1699443202;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=S8g2cgxm0XkvKABDo9lBb54Wb/JIUYvkql9q46/tkiE=;
+  b=DinQRuIX5mdAgFcdPdteAl2/3eQw7O1ItVjTHrMTUpLqYXvRuxkP5Y+U
+   wgLi6oF8s5g57h4zm69IH06zWoZfWqatxcSJXnQQvqpC7gDxq9DGfaxcm
+   a/XVtbdwvJzzZrrUVf0UvQhEb1DOzyVAOLAaRl66lOSJXNTan/2hRYLQY
+   W4zdlOjSPFvP2sC9V2pcD9k7rNYN2JGznjB6zGeJlvZkKWqyQVnFHJCnE
+   btYPYxHmfFOxliAhL9T+xBlzwhuz+sFq5OpgMRclmw5MfqYtVTjrovXcL
+   5GJwstjhkisYxRDoqbshv8hOw0qNBKRWF4f6eeekrFdDNy8ku6k8vmcuN
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="311827203"
+X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; 
+   d="scan'208";a="311827203"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2022 03:33:21 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="778894233"
+X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; 
+   d="scan'208";a="778894233"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga001.fm.intel.com with ESMTP; 08 Nov 2022 03:33:21 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 8 Nov 2022 03:33:20 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Tue, 8 Nov 2022 03:33:20 -0800
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.46) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Tue, 8 Nov 2022 03:33:20 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Gj5JtWtH+4YQh9rLGHA0AAjviqmI8v4kheYDxt5IizKsSRZq20zqNqXdaOFoAOsbFvg2HFbUfO9pWpMbwaM7NcduiP6oWAvn3p33nxOzR8a1Bq6KF2SEeLUhAmLeOKJ8aTz4UX6A0Du3TLHgEhUed0bs3gGXOAJ3MfDzT3lOYMoKrxs3fAVtix4z3D/44brrtTNE01vNyO4qjblGfDFtroGDbgOqN7U3U9fss52ombOaVrXy+hDRNYe609UROGW/7cWXGFUcvRZRIy6GMYIBmkcNAQwIt2mSFG6H2FF6pDIIZPWSiCBGIOgnweXiTV5DR1mReJERTtqpImjpjr+rnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S8g2cgxm0XkvKABDo9lBb54Wb/JIUYvkql9q46/tkiE=;
+ b=D90BdrgEPEcUiaXV5YYZJ9RYi1ACelW8c3/WFEHRcm1p5TGIMfZ6Lmr8NrGf25W8X6yp+BtieVQVK0jcf08yNa+V9Oq15mCMsmfSMQIqgcEgVfxOohISp61+RHuMMhjN8+vdZUqAUBN2ggVoZNvJzoYlMTvgsex0FP+HxtJ19GwOhjyJG+EMcACKYJDcJwW0xsCfu7f64wWHr75iuXcZ30zMFD/uOqHYWoeSKCGxGR+ZXI+CFoLllYZNwEhCQDe561efzrY0lXQaBpDrnAJQ0ccauCUU9yEsLXr+agqHAMOV6+6ce/q8J3RBOnhcHI1DGfn7H0XCRz58djWUmn1XSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by SA0PR11MB4606.namprd11.prod.outlook.com (2603:10b6:806:71::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Tue, 8 Nov
+ 2022 11:33:13 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::6eb:99bf:5c45:a94b]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::6eb:99bf:5c45:a94b%3]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
+ 11:33:13 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>
+CC:     "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "dmatlack@google.com" <dmatlack@google.com>,
+        "Christopherson,, Sean" <seanjc@google.com>
+Subject: Re: [PATCH v10 031/108] KVM: x86/mmu: Replace hardcoded value 0 for
+ the initial value for SPTE
+Thread-Topic: [PATCH v10 031/108] KVM: x86/mmu: Replace hardcoded value 0 for
+ the initial value for SPTE
+Thread-Index: AQHY7ChqFm18Dc57R0q52gblRqNeNK4083KA
+Date:   Tue, 8 Nov 2022 11:33:12 +0000
+Message-ID: <eab804a34b96dfdd74a816b92039fca9a81475f0.camel@intel.com>
+References: <cover.1667110240.git.isaku.yamahata@intel.com>
+         <0de1d5dfbce49b5e9d4f93289296b726180b8dd0.1667110240.git.isaku.yamahata@intel.com>
+In-Reply-To: <0de1d5dfbce49b5e9d4f93289296b726180b8dd0.1667110240.git.isaku.yamahata@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SA0PR11MB4606:EE_
+x-ms-office365-filtering-correlation-id: d896db59-969c-4208-fbc7-08dac17d053e
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 9qnoOm+ZTbumIbMDiP4xKR3V/HTEoDX5Dv6Z4qtCltJzu+kkLhh02NR++9QS0OmHy9b7y+F/Gifb98Zir5Yplh9lz5IdU7PRZh+UTFBL45BtV3GNR9z+BKHUlImz3attpbXjPF5VsvmF13FwrChExs8OaD8W3gjUsvO+Y4N1rJIHBjYrKEyL2gzzskEWXwslrbKt9VySejolqeRzFqrsg5WCUOpnsrALq9F9YFs1QixO8TXmAQx7zcoo8oxuKwv1Ko42nk8s+5wkjMGAexLJVeUQCXoqlhTN0GZQ+vlfnTvFCaUTXwWIhB/xaEkzgKCgUv/KgFKoDA6wGvyQFJzpCqfecJb3LC1WpGEDvfapuR6+T1lbOTRxm0DJEL3sQfMOzh0ydQgyCT1oTNRkI0TPI0Vn8zlMABk3iVtSDLOHb5qgNIf52rn87BDsmS4UqwIeXSxVC0YT4ec4vbhlv6PA/NlSwQ9v8mwyWVQlTnULQXzwEgsG0zg6JBDJFdJiWV5PcQ4cfWElrM0w13WL266yCR47/5SuBi/aF4xhtnKi54zw/zYicbYdye/U5OufStUZBEh/bp0hzhP5SqzFPIIJrlk7CwfKIcW5eyHG7B920vrKFi7SHiC31utwDU3Nm2LvVtx5m2uT4qgvTBqDE8Gy1+9x/sh4DZ/weUNfcHSNyaazQLJlV7xPKSBcFelGwtBfkvW2yDHQSmxKm7KZB5wuO4mcvq+zfUqfoZEgl5AEqyjaZCo1+ljQ6Y3ScxMioE28RWoZFP8Lk3BUr3029ga3BZugZtG27ZgROydflaMjtDU=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(396003)(376002)(136003)(366004)(346002)(451199015)(478600001)(966005)(6486002)(71200400001)(38100700002)(122000001)(82960400001)(110136005)(54906003)(6636002)(86362001)(36756003)(8936002)(316002)(6506007)(91956017)(26005)(41300700001)(6512007)(66946007)(38070700005)(66556008)(8676002)(4326008)(76116006)(66476007)(4744005)(64756008)(4001150100001)(66446008)(186003)(2616005)(5660300002)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UEcvYm9MSDZCSEVxaHVSTkgwOWY0Z0xvaldmeEJaUkxEcGd1YUtKcmllYUFV?=
+ =?utf-8?B?aXBzNExDcHNrdWx4TWdBYW85Z1JmYnhwNDkrYytYS1hIemV0ZXF0TjJLRFNn?=
+ =?utf-8?B?M1VjTFNzdmRteEZENzRxcERnUWRHZitVYnpadkVyc2pyS3o3VW56eGtpdVk0?=
+ =?utf-8?B?UXdEd2xIOUt4dkVCZm1aY1dhN1I1ZUxUUnBRWlN5THpOSTYveDhsU1NQUmxr?=
+ =?utf-8?B?ZDBYS1lMS1o5d2lwdGYxQmtvYkFraEF6NVI2OTZsZjlZejdSazdaTmFYZjNU?=
+ =?utf-8?B?NjdpWUFvd1VZbG81TDJLY1l6YzRaUXUwbU1ndXFvZm5aVTlMTW1LbWVnWDJz?=
+ =?utf-8?B?WmpkMkljV2xZeEJRbzg0ampGRHFtSERaRlZFN1RQaXdpeVl5VjM4NlFDSGJE?=
+ =?utf-8?B?U01GNjRGTEFVL0ZhTmJvS3ZEOG5ZemdQOE1na2x1eDZuc29aSE5YSmxTYURJ?=
+ =?utf-8?B?Y2Q0bzIyNUNFVXBEWnVHOHA3aGx3bnZBRmU0ZjE1ekFwZkNHUElNdDVjcVNU?=
+ =?utf-8?B?dWN2WncvQ1Jtek53NXRQeVhQZVBpQVJmSE13RC9Kb0tlVmJsRHZnTkZQNkhJ?=
+ =?utf-8?B?V25MYUpHZUVHT1kvT05MV3lIRDNFY1gvcXZ4QnRCN3JRdkNyMyswOHJFdkdJ?=
+ =?utf-8?B?NlRwK0JtU1RyODRhamFRcm1mdGthUUowLzMrYnBjdDg3WTlJdzFvQUFvRGs1?=
+ =?utf-8?B?RUIxRVp1c3lBNDBSekpyUm5OajB2VVFWK25YMkVtOG0vTUsxWTljYUlmM2Vy?=
+ =?utf-8?B?MjdXMm1xaThCNzc5TG1RczlGbEVWOUdsc0RHRFFqK2pWWlU4ME1UV3lPc1g0?=
+ =?utf-8?B?aVRSN0FTeitUQmlZL3NDcU9MMHN6VzB4WjZMdERZMFBnYW04TTBqL0JaSDZK?=
+ =?utf-8?B?TkVzbDdDYlpkQlNyTEFUWHVGZDZOQlQ4emRZbXlSaXltT1RTQ1dIZ0IzNzhk?=
+ =?utf-8?B?bDU2VHRWRXRDeWljcmVUSkUyWnlyc3RQY21EWHAwYnpCaURyR1N6RGJTenps?=
+ =?utf-8?B?eFcyWTRUODFzQUlFSUdwN1RTRzlHb3B3eGlmTFRDclM2UzhLUXRZaFJ5QmJj?=
+ =?utf-8?B?NGQ5Y0NuWTFtaG4rc0plM3JRcWJVZ0RPVWZPOXExbVp0OHVjWmhQWUFqcSto?=
+ =?utf-8?B?c3h0akhxdThaMitSRzZnMjRWWkdna09JTGVDR1MyUm9HWCtuMVlwL1JmUGpt?=
+ =?utf-8?B?QkUvejRSTjgwWTRXZGtrVWJhRjlKUmxSMkVBZTJYNVlEU1VYZ01oeGRSa3dU?=
+ =?utf-8?B?NHljaWZmaS9VaFllb3dDaVFXSU5CSk45c0Z2M0Jhalk1L2JLWklEb01FRmhB?=
+ =?utf-8?B?SWVncmpBQWcyQUhaYTZtcC93UDZER2dZalc5cC9reXRPT3VsVXlPYUJRU3pH?=
+ =?utf-8?B?TXl0SFhzSjd5ZHlCb3FUeEpjbnZlVUloa21tejBncXBDSWNSS2RyalJPZnI0?=
+ =?utf-8?B?dk42T25wTkVaNXdmK21EZDJ5S0QrbUxRcFFReXp3b214OTAxTC9KbzhNUWEz?=
+ =?utf-8?B?Ykc4VndTUDdFd3Zqa0RRUnAvV0JqSFM0V0RjemwyU0xwWUR1cmkwNkV4eVhj?=
+ =?utf-8?B?RVhNTUdVdSt5YXYyVFZpVjRua09aT0kzWVlsNlZ2UG5YK2tDNzh5L1pFeDFG?=
+ =?utf-8?B?dEpYMnFyNkJNSENMdlRhWGtyNVNTVDFxK2lQQXFYNUpKYmJ6TisxYzFNN2hP?=
+ =?utf-8?B?c0tRVzk0YXZuRWp4WjdIZndieEU2bUhzOVRuemo5UVpYQWZLNXdjU1B2YVp5?=
+ =?utf-8?B?YkpxWUFNZ1NDdUFSQW1ob01WYjQyVitmK0FaRlRBb2kwMTBuVWU1ZzloVHRv?=
+ =?utf-8?B?dkQ1b2RIK3VXL0JhOTNBT2pPaW1RZGNIeHZnK3I3U1VDNnNkU2RIaS9KUXpV?=
+ =?utf-8?B?eFZYR2ZudGJ2VWxLOVVCNTFQWWo4NEtUcDZZSlFKSFcrTmZCS0JMSW9IQjVK?=
+ =?utf-8?B?c2JvMUNIK3pBVDEzeC9oVzhpVERNNjl2TEYvSXpxRE5URk1hNGJ6ekNhUXBM?=
+ =?utf-8?B?QXhHTkhEWGdOVE81RVUxOHdDRUNad1h3ekp6d3lSMHdkOGdtK3N0WmV4ZTly?=
+ =?utf-8?B?dEs3U2ZybHpDQnpHbzlPcG1oK2NDQlZxZTRMcElwb1JxM1d4OFVORU9zVHBD?=
+ =?utf-8?B?K2dYVCtSVDQwN1NQYUtFZG1UZk52eXk3MTdZZHN4VVE3eEJHREtWbnJJdnVZ?=
+ =?utf-8?B?RlE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0391E4CC912D5440995F9A3AB101D05E@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Received: by 2002:a05:6638:1921:0:0:0:0 with HTTP; Tue, 8 Nov 2022 03:23:59
- -0800 (PST)
-Reply-To: mrinvest1010@gmail.com
-From:   "K. A. Mr. Kairi" <ctocik10@gmail.com>
-Date:   Tue, 8 Nov 2022 03:23:59 -0800
-Message-ID: <CAEbPynvH+BZ99HK-COU1=n6MNs96giewbsO80XYSawcxKUtHrA@mail.gmail.com>
-Subject: Re: My Response..
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=5.0 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2607:f8b0:4864:20:0:0:0:d30 listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5000]
-        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
-        *      digit
-        *      [mrinvest1010[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [ctocik10[at]gmail.com]
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [ctocik10[at]gmail.com]
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        *  2.9 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-X-Spam-Level: *****
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d896db59-969c-4208-fbc7-08dac17d053e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2022 11:33:12.8808
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: MVZsY7dUFQCKJXXwhwbUZ3D883b6lxK3LTlyfa/IIekeL50ALCchibP4b1L7dWKPpXl+i/QsFqUh+Mh+hxuE2A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4606
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
--- 
-Dear
-
-How are you, I have a serious client, whom will be interested to
-invest in your country, I got your Details through the Investment
-Network and world Global Business directory.
-
-Let me know if you are interested for more details.....
-
-Sincerely,
-Mr. Kairi Andrew
+T24gU2F0LCAyMDIyLTEwLTI5IGF0IDIzOjIyIC0wNzAwLCBpc2FrdS55YW1haGF0YUBpbnRlbC5j
+b20gd3JvdGU6DQo+IFRoZSBwbGFuIGlzIHRvIHVuY29uZGl0aW9uYWxseSBzZXQgdGhlICJzdXBw
+cmVzcyAjVkUiIGJpdCBmb3IgYm90aCBBTUQgYW5kDQo+IEludGVsIGFzOiAxKSBBTUQgaGFyZHdh
+cmUgZG9lc24ndCB1c2UgdGhpcyBiaXQ7IDIpIGZvciBjb252ZW50aW9uYWwgVk1YDQo+IGd1ZXN0
+cywgS1ZNIG5ldmVyIGVuYWJsZXMgdGhlICJFUFQtdmlvbGF0aW9uICNWRSIgaW4gVk1DUyBjb250
+cm9sIGFuZA0KPiAic3VwcHJlc3MgI1ZFIiBiaXQgaXMgaWdub3JlZCBieSBoYXJkd2FyZS4NCg0K
+SGkgSXNha3UsDQoNCiJBTUQgaGFyZHdhcmUgZG9lc24ndCB1c2UgdGhpcyBiaXQiIGlzIHdyb25n
+Og0KDQpodHRwczovL2xvcmUua2VybmVsLm9yZy9sa21sL2NvdmVyLjE2NTk4NTQ3OTAuZ2l0Lmlz
+YWt1LnlhbWFoYXRhQGludGVsLmNvbS9ULyNtNWVkNTk0MDRkYTQzNjc3ZTk5YWM1MWRkMTM2MGRj
+MjJiOTY0YmNiYg0K
