@@ -2,83 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE7C4621F9D
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 23:59:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E5FC62207C
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 00:53:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229958AbiKHW7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 17:59:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47612 "EHLO
+        id S229587AbiKHXx4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 18:53:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229868AbiKHW7Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 17:59:24 -0500
-Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D7AF6177F
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 14:59:23 -0800 (PST)
-Received: by mail-oo1-xc2d.google.com with SMTP id o140-20020a4a2c92000000b0049effb01130so792090ooo.9
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 14:59:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BksNmJr9/G65J0IUfruVbXUCosG4IvOng5/LXlEyWfc=;
-        b=sP90Hxk8uTXToM6rA+n0zpJf4uCmThqIh4903RqZLnhC5dvBplEpETcRcMMDOhghLN
-         FcbqjoX88LzuOcU2Kcahd5PpWUNrUYxOw4P04oNu0Be8nrVALqxMSV2EgNuU1nnkQId0
-         gAHqYW+Z6K/788cFCxGeL5pM9Au59ZUxSnt6ufp68NBeTK5M2oRK2g36FB+v/GQKFiLI
-         BDalbHYMSp/HVLxq++ub5yCc75h5UWJadDp8H/gyK+68DY0Zky2kLiWT4tjXxJ/rc1vm
-         AqyNUm767N3cugAIRaLVTrDpqT4v551YbPWeqKY7fj9VUfDyFsVefGX9i6o8YR45eb4O
-         /pRg==
+        with ESMTP id S229582AbiKHXxs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 18:53:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E970A5E9C9
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 15:52:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667951576;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oVnbsMQuohpGlkVlpHHCbpF7rU92xLtMbImV8X2HL+o=;
+        b=fXO982iQRwa6FsIDHdm1IjIRDPQsIBlawUMVIc0tlGC/7pX6ydB24/oH0EUPsq2i4sKdnx
+        MpoJj2kx0QGuXnBybEZVcp4oc110XrC1/4tDZ/xKFOpzoKvi4v37mb+clfVqT5MEHSIMTA
+        SMY0GhSHBbGtjnlg2mn3NnxQDUDiXeI=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-119-AmtkfStqM2SqUDkFYIq6OQ-1; Tue, 08 Nov 2022 18:52:55 -0500
+X-MC-Unique: AmtkfStqM2SqUDkFYIq6OQ-1
+Received: by mail-io1-f71.google.com with SMTP id n23-20020a056602341700b00689fc6dbfd6so10178334ioz.8
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 15:52:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BksNmJr9/G65J0IUfruVbXUCosG4IvOng5/LXlEyWfc=;
-        b=GaUyfLW/cEbmImRnFbBU1pbDVm2B5MLYHhgKTtIUIrWEX3ljMPRw8xcGBkKHJXhj4l
-         8f6vcOSy/WRzCoJ77W5Vh8yrUYQ3GECiywQTy61yRFxqd4pzDJTOYfKJGbLdIxaM/9Vx
-         a18ldFaeh5N3ZnLMqvgDJfdf9Zu22BRGw2CXYZMQRrXhdByFTWc04jiNQeGTrgYtmiGf
-         dZKA2LGo1uIjYqrp0ZzlxD4DH7qxTJmOrG8Die7zqTNu6/N+JBoO9cKxqQl39TrMBC88
-         H2a1DVHPLuAn1owvJaMc/EyODTMCTY57l+N6q9oMwlX1LxRQvNygLdVSIYpxCoTJpwIJ
-         TwNA==
-X-Gm-Message-State: ACrzQf3Ikkr6dd8DL2ydESRzURXxspQLL/7K8Bld1D36JPmhmDv4ATqP
-        URabDmoZjbuT7L1BNUBcvQ4O6qUmlPGll9qCEa0Z3w==
-X-Google-Smtp-Source: AMsMyM5B2SF57F48P+yb2v9B3TLUan4HlNTgXnRYSW6AKC/5CgdIGauhtqTai63v8JxRJZx2o1bcy0tk3RgoPJM7MzI=
-X-Received: by 2002:a4a:d8d4:0:b0:49c:e0de:ebbe with SMTP id
- c20-20020a4ad8d4000000b0049ce0deebbemr15766402oov.31.1667948362297; Tue, 08
- Nov 2022 14:59:22 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oVnbsMQuohpGlkVlpHHCbpF7rU92xLtMbImV8X2HL+o=;
+        b=Zpx4tmpcjDCMnZRaZ3aZbWRd2o6amnOyvnbMG+eCiG6a2fzY8hfN239M+y5msujoyu
+         6YzC6LAU0SYeoLHVFkgtV2x06wG5WZrPuVwXpv0w7d9iv0eUAN09tjbMF5Z9pwtJwD/t
+         f9KIXW6YF22oIcfhiAvE7h1XujwI8scZgdnfpvNzrzuaq/htyPp6VSLeG+bUruPond31
+         HS1DMZOqWg3IkWIdLOu6OeXP/0yop4Uj+WgwWm2I9v9Dldz5TWyhOiCb2MjC8D+W7QTD
+         et+QYaBwvxGZ4ByX/nWjF1VfRlAJGeTCka42K8yQRbshYMELzItPpJOSaA1sjnwGs9oN
+         o6pQ==
+X-Gm-Message-State: ACrzQf3WeaLmLCaijaYhmnG1m/6a+iyinmdsoCxjdK5/H543OkUpriX+
+        Tcj1tYgQqNHPUt6FsgvCIs8LpNR4Y+iZTJOisbxdqwKMSGwWvhuXe7qB/+8lZzYwTyFHoKwtd46
+        RUyVrCHe6233A
+X-Received: by 2002:a05:6e02:530:b0:2f9:a951:6480 with SMTP id h16-20020a056e02053000b002f9a9516480mr1277414ils.117.1667951574798;
+        Tue, 08 Nov 2022 15:52:54 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM7vRUkqb0kg42RpK2zEoARRgBQQ2mRJzftxKggGUR7Q7Ewjo44eYHhhSjlxF4k/Q+gKSKTq3A==
+X-Received: by 2002:a05:6e02:530:b0:2f9:a951:6480 with SMTP id h16-20020a056e02053000b002f9a9516480mr1277410ils.117.1667951574531;
+        Tue, 08 Nov 2022 15:52:54 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id p16-20020a056e02105000b002f966e3900bsm4231379ilj.80.2022.11.08.15.52.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Nov 2022 15:52:54 -0800 (PST)
+Date:   Tue, 8 Nov 2022 16:52:52 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Anthony DeRossi <ajderossi@gmail.com>
+Cc:     kvm@vger.kernel.org, cohuck@redhat.com, jgg@ziepe.ca,
+        kevin.tian@intel.com, abhsahu@nvidia.com, yishaih@nvidia.com
+Subject: Re: [PATCH v5 2/3] vfio: Export the device set open count
+Message-ID: <20221108165252.4b4dfeb2.alex.williamson@redhat.com>
+In-Reply-To: <20221105224458.8180-3-ajderossi@gmail.com>
+References: <20221105224458.8180-1-ajderossi@gmail.com>
+        <20221105224458.8180-3-ajderossi@gmail.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20221104213651.141057-1-kim.phillips@amd.com> <20221104213651.141057-4-kim.phillips@amd.com>
- <CALMp9eSpKGCYK_1r3o326ui5RVoH73_RR5-LR2Div9Jm5zvk6A@mail.gmail.com>
- <f25152d2-7045-94f4-d5dc-69b609c0be6a@amd.com> <CALMp9eQF7iPXCNkafmaGHY5Dzg+opt0xp+Y8ceML8RTxFyCo7A@mail.gmail.com>
- <4c8945ae-62c4-7550-dc75-068cca99e678@amd.com>
-In-Reply-To: <4c8945ae-62c4-7550-dc75-068cca99e678@amd.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 8 Nov 2022 14:59:11 -0800
-Message-ID: <CALMp9eRcLPpt-OuXiNFUQwrkyDxRXErY7U_U3PZE0qN_ep7wdw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] x86/speculation: Support Automatic IBRS under virtualization
-To:     Kim Phillips <kim.phillips@amd.com>
-Cc:     x86@kernel.org, Borislav Petkov <bp@alien8.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Babu Moger <Babu.Moger@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,57 +79,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 8, 2022 at 2:48 PM Kim Phillips <kim.phillips@amd.com> wrote:
->
-> On 11/7/22 4:42 PM, Jim Mattson wrote:
-> > On Mon, Nov 7, 2022 at 2:29 PM Kim Phillips <kim.phillips@amd.com> wrote:
-> >>
-> >> On 11/4/22 5:00 PM, Jim Mattson wrote:
-> >>> On Fri, Nov 4, 2022 at 2:38 PM Kim Phillips <kim.phillips@amd.com> wrote:
-> >>>>
-> >>>> VM Guests may want to use Auto IBRS, so propagate the CPUID to them.
-> >>>>
-> >>>> Co-developed-by: Babu Moger <Babu.Moger@amd.com>
-> >>>> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
-> >>>
-> >>> The APM says that, under AutoIBRS, CPL0 processes "have IBRS
-> >>> protection." I'm taking this to mean only that indirect branches in
-> >>> CPL0 are not subject to steering from a less privileged predictor
-> >>> mode. This would imply that indirect branches executed at CPL0 in L1
-> >>> could potentially be subject to steering by code running at CPL0 in
-> >>> L2, since L1 and L2 share hardware predictor modes.
-> >>
-> >> That's true for AMD processors that don't support Same Mode IBRS, also
-> >> documented in the APM.
-> >>
-> >> Processors that support AutoIBRS also support Same Mode IBRS (see
-> >> CPUID Fn8000_0008_EBX[IbrsSameMode] (bit 19)).
-> >>
-> >>> Fortunately, there is an IBPB when switching VMCBs in svm_vcpu_load().
-> >>> But it might be worth noting that this is necessary for AutoIBRS to
-> >>> work (unless it actually isn't).
-> >>
-> >> It is needed, but not for kernel/CPL0 code, rather to protect one
-> >> guest's user-space code from another's.
-> >
-> > The question is whether it's necessary when switching between L1 and
-> > L2 on the same vCPU of the same VM.
-> >
-> > On the Intel side, this was (erroneously) optimized away in commit
-> > 5c911beff20a ("KVM: nVMX: Skip IBPB when switching between vmcs01 and
-> > vmcs02").
->
-> Then why hasn't it been reverted?
+On Sat,  5 Nov 2022 15:44:57 -0700
+Anthony DeRossi <ajderossi@gmail.com> wrote:
 
-Sometimes, the wheels turn slowly. See
-https://lore.kernel.org/kvm/20221019213620.1953281-1-jmattson@google.com/.
+> The open count of a device set is the sum of the open counts of all
+> devices in the set. Drivers can use this value to determine whether
+> shared resources are in use without tracking them manually or accessing
+> the private open_count in vfio_device.
+> 
+> Signed-off-by: Anthony DeRossi <ajderossi@gmail.com>
+> ---
+>  drivers/vfio/vfio_main.c | 11 +++++++++++
+>  include/linux/vfio.h     |  1 +
+>  2 files changed, 12 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 9a4af880e941..ab34faabcebb 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -125,6 +125,17 @@ static void vfio_release_device_set(struct vfio_device *device)
+>  	xa_unlock(&vfio_device_set_xa);
+>  }
+>  
+> +unsigned int vfio_device_set_open_count(struct vfio_device_set *dev_set)
+> +{
+> +	struct vfio_device *cur;
+> +	unsigned int open_count = 0;
 
-> Does its rationale not make sense?:
->
->      The IBPB is intended to prevent one guest from attacking another, which
->      is unnecessary in the nested case as it's the same guest from KVM's
->      perspective.
+This can only be called while holding the dev_set->lock, so we should
+have an assert here:
 
-No, it doesn't. IBRS promises to protect the host from the guest. To
-properly virtualize IBRS, KVM has to provide that protection,
-regardless of its "perspective."
+	lockdep_assert_held(&dev_set->lock);
+
+The series looks ok to me otherwise, hopefully we'll get some
+additional reviews.  Thanks,
+
+Alex
+
+> +
+> +	list_for_each_entry(cur, &dev_set->device_list, dev_set_list)
+> +		open_count += cur->open_count;
+> +	return open_count;
+> +}
+> +EXPORT_SYMBOL_GPL(vfio_device_set_open_count);
+> +
+>  /*
+>   * Group objects - create, release, get, put, search
+>   */
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index e7cebeb875dd..fdd393f70b19 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -189,6 +189,7 @@ int vfio_register_emulated_iommu_dev(struct vfio_device *device);
+>  void vfio_unregister_group_dev(struct vfio_device *device);
+>  
+>  int vfio_assign_device_set(struct vfio_device *device, void *set_id);
+> +unsigned int vfio_device_set_open_count(struct vfio_device_set *dev_set);
+>  
+>  int vfio_mig_get_next_state(struct vfio_device *device,
+>  			    enum vfio_device_mig_state cur_fsm,
+
