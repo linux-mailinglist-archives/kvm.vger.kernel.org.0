@@ -2,150 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C9C2620900
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 06:44:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F34362090B
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 06:49:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233328AbiKHFn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 00:43:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48452 "EHLO
+        id S232366AbiKHFtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 00:49:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233293AbiKHFn5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 00:43:57 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5118920BC8;
-        Mon,  7 Nov 2022 21:43:56 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id c2so13212771plz.11;
-        Mon, 07 Nov 2022 21:43:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3UicMHRBXNKZ6klzBYtNlGfdpT3ipHtBcp9O7LuoFbE=;
-        b=XNdeC13pb4LjOBaRWcKMBNqFRJ+RgsbfVoNw18z5L+vfkg1SZceZjUxbLhiIy1qySy
-         Y4hI02da8j9ev8qt2sUsGeUiOSLlDAUgz5JUplPGm8kAk4jLtNdmDFZCCStM1EGIelNU
-         pjjtL4FSGAVwgisQucoSj4vLVpkgLqzZdzX9wYytiy3sfYNB3aYKj8S/Nug5gaKAa8gA
-         /5oDb+KCNmSa3bC/jNyCQmeij+quPN3cyVSSr1ovXCPVJxrqYAAydTsm3Q4bRt6yNhxm
-         6FVSyKTuVZN23UWZkdV6Uc7djgZpboRwjQPImKvKrchYImM3eB6pVBMtJk1jJ8Nfk6ob
-         kIoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3UicMHRBXNKZ6klzBYtNlGfdpT3ipHtBcp9O7LuoFbE=;
-        b=MnFD0FKh03Z5ArKMuS2i+elCdil8z2E960T9XaCmwwi+AD58BPSjqA1R3INAnFN5tQ
-         n1lZAbEtaCSnS/NW9aZLRVTQOong6G94heldExo567ok/9UTmEdg+++JWuM3OAF+2qFI
-         0ToK3qRg2thG/YDb6kfCvelAkw+wNqyTVdSSburpjApHc/LCEP/6VVL7EqMzOmVm6hpk
-         fcg7vBj2000hEdQ+vy0PS8hI69WRBYFm13AdSb2Ug/sdXqGfUgHzZu7pJwjEjfjMA2+c
-         eQBMeqjmedOC59hwKdxTamjK799GS/2LbUdqWDpiZ5gVm3gZwF3G3A0DSz0oJNMP4XnF
-         cNBQ==
-X-Gm-Message-State: ACrzQf2Y1wqR/yzDOJt/DBeyHepQiJRdcgErEuUKGB/ObeCaqzxFHvt1
-        wOG7qEDttMoAxyb9Cx9zwotEVGwbGUImHg==
-X-Google-Smtp-Source: AMsMyM6Ssf7qu6Zt1cmqzeY+6ksfJF4jyx1t2euaZBhwzvq5JPVY+8zsaODdG48vWXQYQDWTdtSyvw==
-X-Received: by 2002:a17:90b:4a04:b0:213:587b:204e with SMTP id kk4-20020a17090b4a0400b00213587b204emr55088612pjb.98.1667886235549;
-        Mon, 07 Nov 2022 21:43:55 -0800 (PST)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id k21-20020a628415000000b0056bb06ce1cfsm5614872pfd.97.2022.11.07.21.43.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Nov 2022 21:43:55 -0800 (PST)
-Date:   Mon, 7 Nov 2022 21:43:54 -0800
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "Christopherson,, Sean" <seanjc@google.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Yao, Yuan" <yuan.yao@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-        "farosas@linux.ibm.com" <farosas@linux.ibm.com>,
-        "palmer@dabbelt.com" <palmer@dabbelt.com>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-        "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
-        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "anup@brainfault.org" <anup@brainfault.org>,
-        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "james.morse@arm.com" <james.morse@arm.com>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
-        "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "atishp@atishpatra.org" <atishp@atishpatra.org>,
-        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-Subject: Re: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
-Message-ID: <20221108054354.GA1708572@ls.amr.corp.intel.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221104071749.GC1063309@ls.amr.corp.intel.com>
- <Y2V1oslbw24/2Opd@google.com>
- <20221107214634.GE1063309@ls.amr.corp.intel.com>
- <bf29fe1ac84cae8ddb06e566b56c653600a1901c.camel@intel.com>
+        with ESMTP id S230212AbiKHFtE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 00:49:04 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2059.outbound.protection.outlook.com [40.107.93.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E7C2B623;
+        Mon,  7 Nov 2022 21:49:00 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=A/HIjW7cXflqhLVnDbWr2suh3Y6BXCgAPq8ORJlsYDe4gIIhDsjIoqjr19lojE9q8LHzh/0kzMEYWPIXmLC4qPkUuEjAOcXIbiT+Wn/vNx1qBWQispFCh6YxtFftaTG9lulnCG/Q/yfeBcvVImJIHKTc6nyXW10ZQHrI0U/LajBuuHZ2MWHc/SRmncv0k2+jrN/50OkMURfYk48Imn5ut0dh5q7/kF3YqQyw2KjUUpubF/NqkZHQaklrPIK2U5fejbWKNhbrj61UAt9gQ2op9G+op752Y+k9HjfhM5GgIkJXMkoDs8lOo09G81BRpJBbWPMFKbyD1Nnn1HH0ZuuuGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1eB75dOmandimjEGrxhFcGUifEQ94vIACgHQdCRNjTg=;
+ b=S/B6iX+Nmo9L8kmmzc5jHXhf0LGs4cj1WNOM52xDlEcmCekuB0zFh0/D0horhbAetfIYs7eDOtNbMS3X+5nNzwkpaytrQV7iCtb1AqWaZoMEkxXnq6mwrsFthoYZa1dZRb+7V06+E7geByGQn+iFdkw/10Wm2Z5vqId5feSAs0iR3fGMVoBVPF8MZT4NGvBqHM5xwF+3LHx5gdxoPyTduB6D2OC/qvmK0Fra+WWtZrreG/Ywc9ZnxgLjhNO8/rw3x49C+m1VG9tVuPRT0/dSxIb8mxxlINHyHkYGCvpv5Xg864Vvd9U/3h160JGpP/6dx+1LOfhNJh9J9X5KYJ2OQQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1eB75dOmandimjEGrxhFcGUifEQ94vIACgHQdCRNjTg=;
+ b=EPXmVGT9O4SM6mmZ5qO4+Mj5xGprZZsLmxozR36cQHbchPEOm3y+RmisleoDa/CLOYEoT4Ch6LlZuA9TaIWfV5rkQvab1ZliSYFZmVb9lk8RfPb/KXWTLyEHzqqz7q9K1D9k40E8VUmWyuVAuSWVwtW8uEx7OCn12jfjT1LkO6UOJn0wcN4UruLDO+wTc1Dd+3mWuDxxFYgP9pEJm1kQNRKJFrB3UxWMvufLQKW7pjyz2FWrsiSMR84e7JZmKuoBMJYlL4KONz/dQtx8Gqvde0p1wNEpTgd0fE21N9qcU0Xpo/rr34Q/Itwkgfl4ErWkG8lnugKokKRdmMk9YkYT1w==
+Received: from DM6PR21CA0002.namprd21.prod.outlook.com (2603:10b6:5:174::12)
+ by PH7PR12MB6812.namprd12.prod.outlook.com (2603:10b6:510:1b6::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27; Tue, 8 Nov
+ 2022 05:48:50 +0000
+Received: from DM6NAM11FT033.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:174:cafe::c8) by DM6PR21CA0002.outlook.office365.com
+ (2603:10b6:5:174::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.2 via Frontend
+ Transport; Tue, 8 Nov 2022 05:48:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DM6NAM11FT033.mail.protection.outlook.com (10.13.172.221) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5791.20 via Frontend Transport; Tue, 8 Nov 2022 05:48:49 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Mon, 7 Nov 2022
+ 21:48:38 -0800
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Mon, 7 Nov 2022
+ 21:48:37 -0800
+Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29 via Frontend
+ Transport; Mon, 7 Nov 2022 21:48:34 -0800
+Date:   Mon, 7 Nov 2022 21:48:32 -0800
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     <bpf@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, <iommu@lists.linux.dev>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, <linux-doc@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <llvm@lists.linux.dev>,
+        Nathan Chancellor <nathan@kernel.org>,
+        "Nick Desaulniers" <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        "Robin Murphy" <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        "Suravee Suthikulpanit" <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        "Jason Wang" <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        <kvm@vger.kernel.org>, "Matthew Rosato" <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        "Keqian Zhu" <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v4 15/17] iommufd: Add a selftest
+Message-ID: <Y2ntsDi4RSLtUVKm@Asurada-Nvidia>
+References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+ <15-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <bf29fe1ac84cae8ddb06e566b56c653600a1901c.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <15-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT033:EE_|PH7PR12MB6812:EE_
+X-MS-Office365-Filtering-Correlation-Id: b3dc1d63-6ac6-466a-45f5-08dac14ce93e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: eY9/2Pq/KSGaLtPqfA+qytD9hPjW7b8nSINWBjAb/q1plT4kQppYPFPCfTu2jh1IjRi8PAtUVBYBDQcEW0N67shB/dPmDgwY9WB8ewEhoTxgomfAWD8u8Bo7dPyORCjKKFomyuj9TTBgksWvxs45agjr8PHCisG3MluoBEkled90MQvUboam6BJ7L6Sq87QQiF54bD72oXwnxJhGfVFD8IDj8Ah29MVf+Cl5bNbOBooscWQxhIskUi/SQY4zkVYW7wPrfPVNAfpQDg4zoGhAxy1mLvaB7icP0ly5MuI5hwnRDYvmJ069fy6xzH0S6eLoh50+/fNSP2BbDbrIneiNtKU5Dt/KhL9xsJ23c51ZlvgNII75NLnEPxWVK9YjqA+C1ItgsUOf7dkgoNNHawVaZtR1Lvnnryj7XACAaLZyVvOKdo1X4KAFnbfSNmvzlAX35rJw1odarUoMf6lRapUGSdajHWAeefBHevgdHKb9QXWHBE8HyM+TQohydc1ThHKNtepcZHvfi+uAmKDeS2PT+nrZOCIc2WfBoxrMKu1E0UWlkejesItZ7qG9QeFicqWxCYQA6N7AUL+B0MMJCixqh40nKZsW+4KzR67MjTwSPJ945UD7DUBnRSNDMls+gWT2Mp8OC6YYITSWnqFbi/2HY04oWbjn32lAvY0u8B1LDVm5csYk/Yylr+7R/C8Un6+tUszOeq7oQcdGLPb0rYmNR94LMYeVWEw6zHLd1UM7UthSuhvqtsFHNuzPlEuBXzXzCwBfQ99udhEbw1Is7xk6lA==
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(136003)(376002)(396003)(39860400002)(346002)(451199015)(46966006)(40470700004)(36840700001)(41300700001)(40480700001)(55016003)(9686003)(8936002)(6862004)(336012)(26005)(5660300002)(426003)(2906002)(478600001)(186003)(47076005)(7406005)(7416002)(4326008)(33716001)(82740400003)(7636003)(356005)(8676002)(70206006)(70586007)(83380400001)(36860700001)(86362001)(40460700003)(82310400005)(316002)(6636002)(54906003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2022 05:48:49.9631
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3dc1d63-6ac6-466a-45f5-08dac14ce93e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT033.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6812
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 08, 2022 at 01:09:27AM +0000,
-"Huang, Kai" <kai.huang@intel.com> wrote:
+On Mon, Nov 07, 2022 at 08:49:08PM -0400, Jason Gunthorpe wrote:
 
-> On Mon, 2022-11-07 at 13:46 -0800, Isaku Yamahata wrote:
-> > > On Fri, Nov 04, 2022, Isaku Yamahata wrote:
-> > > > Thanks for the patch series. I the rebased TDX KVM patch series and it
-> > > > worked.
-> > > > Since cpu offline needs to be rejected in some cases(To keep at least one
-> > > > cpu
-> > > > on a package), arch hook for cpu offline is needed.
-> > > 
-> > > I hate to bring this up because I doubt there's a real use case for SUSPEND
-> > > with
-> > > TDX, but the CPU offline path isn't just for true offlining of CPUs.  When
-> > > the
-> > > system enters SUSPEND, only the initiating CPU goes through
-> > > kvm_suspend()+kvm_resume(),
-> > > all responding CPUs go through CPU offline+online.  I.e. disallowing all
-> > > CPUs from
-> > > going "offline" will prevent suspending the system.
-> > 
-> > The current TDX KVM implementation disallows CPU package from offline only
-> > when
-> > TDs are running.  If no TD is running, CPU offline is allowed.  So before
-> > SUSPEND, TDs need to be killed via systemd or something.  After killing TDs,
-> > the
-> > system can enter into SUSPEND state.
-> 
-> This seems not correct.  You need one cpu for each to be online in order to
-> create TD as well, as TDH.MNG.KEY.CONFIG needs to be called on all packages,
-> correct?
+> diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
 
-That's correct. In such case, the creation of TD fails.  TD creation checks if
-at least one cpu is online on all CPU packages.  If no, error.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+> +TEST_F(iommufd, cmd_length)
+> +{
+> +#define TEST_LENGTH(_struct, _ioctl)                                     \
+> +	{                                                                \
+> +		struct {                                                 \
+> +			struct _struct cmd;                              \
+> +			uint8_t extra;                                   \
+> +		} cmd = { .cmd = { .size = sizeof(struct _struct) - 1 }, \
+> +			  .extra = UINT8_MAX };                          \
+> +		int old_errno;                                           \
+> +		int rc;                                                  \
+> +									 \
+> +		EXPECT_ERRNO(EOPNOTSUPP, ioctl(self->fd, _ioctl, &cmd)); \
+
+I guess it should be EINVAL corresponding to updated kernel code?
+
+> +TEST_F(iommufd, cmd_ex_fail)
+> +{
+> +	struct {
+> +		struct iommu_destroy cmd;
+> +		__u64 future;
+> +	} cmd = { .cmd = { .size = sizeof(cmd), .id = 0 } };
+> +
+> +	/* object id is invalid and command is longer */
+> +	EXPECT_ERRNO(ENOENT, ioctl(self->fd, IOMMU_DESTROY, &cmd));
+> +	/* future area is non-zero */
+> +	cmd.future = 1;
+> +	EXPECT_ERRNO(E2BIG, ioctl(self->fd, IOMMU_DESTROY, &cmd));
+> +	/* Original command "works" */
+> +	cmd.cmd.size = sizeof(cmd.cmd);
+> +	EXPECT_ERRNO(ENOENT, ioctl(self->fd, IOMMU_DESTROY, &cmd));
+> +	/* Short command fails */
+> +	cmd.cmd.size = sizeof(cmd.cmd) - 1;
+> +	EXPECT_ERRNO(EOPNOTSUPP, ioctl(self->fd, IOMMU_DESTROY, &cmd));
+
+Ditto
+
+> +TEST_HARNESS_MAIN
+> diff --git a/tools/testing/selftests/iommu/iommufd_fail_nth.c b/tools/testing/selftests/iommu/iommufd_fail_nth.c
+
+> +static void fail_nth_first(struct __test_metadata *_metadata,
+> +			   struct fail_nth_state *nth_state)
+> +{
+> +	char buf[300];
+> +
+> +	snprintf(buf, sizeof(buf), "/proc/self/task/%u/fail-nth", gettid());
+
+Not sure what's missing, I have a build error at gettid. Copying
+a solution from tools/perf/jvmti/jvmti_agent.c file, can fix with:
+------------------------------
+diff --git a/tools/testing/selftests/iommu/iommufd_fail_nth.c b/tools/testing/selftests/iommu/iommufd_fail_nth.c
+index 99eaa9f32e0b..7704b3a754d3 100644
+--- a/tools/testing/selftests/iommu/iommufd_fail_nth.c
++++ b/tools/testing/selftests/iommu/iommufd_fail_nth.c
+@@ -19,6 +19,7 @@
+ 
+ #define __EXPORTED_HEADERS__
+ #include <linux/vfio.h>
++#include <syscall.h> /* for gettid() */
+ 
+ #include "iommufd_utils.h"
+ 
+@@ -84,6 +85,13 @@ struct fail_nth_state {
+        unsigned int iteration;
+ };
+ 
++#ifndef HAVE_GETTID
++static inline pid_t gettid(void)
++{
++       return (pid_t)syscall(__NR_gettid);
++}
++#endif
++
+ static void fail_nth_first(struct __test_metadata *_metadata,
+                           struct fail_nth_state *nth_state)
+ {
+------------------------------
