@@ -2,96 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A3CEF620AF0
-	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 09:09:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81D6A620A62
+	for <lists+kvm@lfdr.de>; Tue,  8 Nov 2022 08:39:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232910AbiKHIJH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 03:09:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60948 "EHLO
+        id S233709AbiKHHjx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 02:39:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233734AbiKHIIi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 03:08:38 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 403731FF8B;
-        Tue,  8 Nov 2022 00:07:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=LwCgedXafwEPt8/fNTGd0hg7ywmKoM5jv7NpAinjw0o=; b=CE5kURuQzUML+Y5qGGUHpmZ+Qm
-        3/swCA5I5TJh09kWiZ+pcJ+7dya9D+wdxNV/UvOfrH/Op5nSb05OI8kfdht2WPzZr2EFYggM9veFL
-        K/iULMowBAADj5VOeE84C/rD6n2MZC/i1DOgpQMAyixVY7mxZkiLU7/nGxjhSAGHDuqUvPweNffgg
-        a/w2odk4WhnkG3hPFUHjq24hlkZ8WCnOvB2Kb6LTbbEo8NEZO4R++BsyioSD93T79KhkCiim3e1CO
-        5bBhwXMnpQxLJ/k8lcNKcp4pQJCBbpyIrbh9belKIJVRaivJshlcCj8YSRDlgR9xA8njloAersYPM
-        BKDgPDog==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1osJdQ-00A65A-7X; Tue, 08 Nov 2022 08:07:04 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3B103300244;
-        Tue,  8 Nov 2022 09:06:50 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 2347029B98571; Tue,  8 Nov 2022 09:06:50 +0100 (CET)
-Date:   Tue, 8 Nov 2022 09:06:50 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Kim Phillips <kim.phillips@amd.com>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Babu Moger <Babu.Moger@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] x86/speculation: Support Automatic IBRS
-Message-ID: <Y2oOGoh6wBdmG16k@hirez.programming.kicks-ass.net>
-References: <20221104213651.141057-1-kim.phillips@amd.com>
- <20221104213651.141057-3-kim.phillips@amd.com>
- <Y2WJjdY3wwQl9/q9@zn.tnic>
- <Y2ZEinL+wlIX+1Sn@hirez.programming.kicks-ass.net>
- <d413c064-ee9b-5853-9cf1-544adde22c8a@amd.com>
- <da41d7f0-68ea-0c21-1dca-218f8184a0f3@intel.com>
+        with ESMTP id S233665AbiKHHjg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 02:39:36 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05FF110C9
+        for <kvm@vger.kernel.org>; Mon,  7 Nov 2022 23:38:32 -0800 (PST)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.57])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4N60M309WJzmVlh;
+        Tue,  8 Nov 2022 15:38:07 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.58) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 8 Nov 2022 15:38:18 +0800
+From:   chenxiang <chenxiang66@hisilicon.com>
+To:     <alex.williamson@redhat.com>, <maz@kernel.org>
+CC:     <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <linuxarm@huawei.com>, Xiang Chen <chenxiang66@hisilicon.com>
+Subject: [PATCH] KVM: Add system call KVM_VERIFY_MSI to verify MSI vector
+Date:   Tue, 8 Nov 2022 16:08:57 +0800
+Message-ID: <1667894937-175291-1-git-send-email-chenxiang66@hisilicon.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <da41d7f0-68ea-0c21-1dca-218f8184a0f3@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.58]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 03:41:03PM -0800, Dave Hansen wrote:
-> On 11/7/22 14:39, Kim Phillips wrote:
-> > I've started a version that has AUTOIBRS reuse SPECTRE_V2_EIBRS
-> > spectre_v2_mitigation enum, but, so far, it's change to bugs.c
-> > looks bigger: 58 lines changed vs. 34 (see below).
-> > 
-> > Let me know if you want me to send it as a part of a v2 submission
-> > after I take care of the kvm CPUID review.
-> 
-> Thanks for putting that together.  I generally like how this looks.
-> 
-> I think it probably goes to a _bit_ too much trouble to turn off
-> "eibrs,lfence/retpoline".  If someone goes to the trouble of specifying
-> those, a warning or pr_info() is probably enough.  You don't need to
-> actively override it.
+From: Xiang Chen <chenxiang66@hisilicon.com>
 
-Not, even, just do it. User told you to, it's not technically
-impossible, so just go.
+Currently the numbers of MSI vectors come from register PCI_MSI_FLAGS
+which should be power-of-2, but in some scenaries it is not the same as
+the number that driver requires in guest, for example, a PCI driver wants
+to allocate 6 MSI vecotrs in guest, but as the limitation, it will allocate
+8 MSI vectors. So it requires 8 MSI vectors in qemu while the driver in
+guest only wants to allocate 6 MSI vectors.
+
+When GICv4.1 is enabled, we can see some exception print as following for
+above scenaro:
+vfio-pci 0000:3a:00.1: irq bypass producer (token 000000008f08224d) registration fails:66311
+
+In order to verify whether a MSI vector is valid, add KVM_VERIFY_MSI to do
+that. If there is a mapping, return 0, otherwise return negative value.
+
+This is the kernel part of adding system call KVM_VERIFY_MSI.
+
+Signed-off-by: Xiang Chen <chenxiang66@hisilicon.com>
+---
+ arch/arm64/kvm/vgic/vgic-irqfd.c |  5 +++++
+ arch/arm64/kvm/vgic/vgic-its.c   | 36 ++++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic.h       |  1 +
+ include/linux/kvm_host.h         |  2 +-
+ include/uapi/linux/kvm.h         |  2 ++
+ virt/kvm/kvm_main.c              |  9 +++++++++
+ 6 files changed, 54 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
+index 475059b..2312da6 100644
+--- a/arch/arm64/kvm/vgic/vgic-irqfd.c
++++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
+@@ -98,6 +98,11 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+ 	return vgic_its_inject_msi(kvm, &msi);
+ }
+ 
++int kvm_verify_msi(struct kvm *kvm, struct kvm_msi *msi)
++{
++	return vgic_its_verify_msi(kvm, msi);
++}
++
+ /**
+  * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
+  */
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 24d7778..cae6183 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -767,6 +767,42 @@ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
+ 	return 0;
+ }
+ 
++int vgic_its_verify_msi(struct kvm *kvm, struct kvm_msi *msi)
++{
++	struct vgic_its *its;
++	struct its_ite *ite;
++	struct kvm_vcpu *vcpu;
++	int ret = 0;
++
++	if (!irqchip_in_kernel(kvm) || (msi->flags & ~KVM_MSI_VALID_DEVID))
++		return -EINVAL;
++
++	if (!vgic_has_its(kvm))
++		return -ENODEV;
++
++	its = vgic_msi_to_its(kvm, msi);
++	if (IS_ERR(its))
++		return PTR_ERR(its);
++
++	mutex_lock(&its->its_lock);
++	if (!its->enabled) {
++		ret = -EBUSY;
++		goto unlock;
++	}
++	ite = find_ite(its, msi->devid, msi->data);
++	if (!ite || !its_is_collection_mapped(ite->collection)) {
++		ret = -E_ITS_INT_UNMAPPED_INTERRUPT;
++		goto unlock;
++	}
++
++	vcpu = kvm_get_vcpu(kvm, ite->collection->target_addr);
++	if (!vcpu)
++		ret = -E_ITS_INT_UNMAPPED_INTERRUPT;
++unlock:
++	mutex_unlock(&its->its_lock);
++	return ret;
++}
++
+ /*
+  * Queries the KVM IO bus framework to get the ITS pointer from the given
+  * doorbell address.
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index 0c8da72..d452150 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -240,6 +240,7 @@ int kvm_vgic_register_its_device(void);
+ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+ void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu);
+ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
++int vgic_its_verify_msi(struct kvm *kvm, struct kvm_msi *msi);
+ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
+ int vgic_v3_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 			 int offset, u32 *val);
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 32f259f..7923352 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1597,7 +1597,7 @@ void kvm_unregister_irq_ack_notifier(struct kvm *kvm,
+ int kvm_request_irq_source_id(struct kvm *kvm);
+ void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id);
+ bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+-
++int kvm_verify_msi(struct kvm *kvm, struct kvm_msi *msi);
+ /*
+  * Returns a pointer to the memslot if it contains gfn.
+  * Otherwise returns NULL.
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 0d5d441..72b28f8 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1543,6 +1543,8 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_PPC_SVM_OFF		  _IO(KVMIO,  0xb3)
+ #define KVM_ARM_MTE_COPY_TAGS	  _IOR(KVMIO,  0xb4, struct kvm_arm_copy_mte_tags)
+ 
++#define KVM_VERIFY_MSI            _IOW(KVMIO,  0xb5, struct kvm_msi)
++
+ /* ioctl for vm fd */
+ #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index e30f1b4..439bdd7 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4728,6 +4728,15 @@ static long kvm_vm_ioctl(struct file *filp,
+ 		r = kvm_send_userspace_msi(kvm, &msi);
+ 		break;
+ 	}
++	case KVM_VERIFY_MSI: {
++		struct kvm_msi msi;
++
++		r = -EFAULT;
++		if (copy_from_user(&msi, argp, sizeof(msi)))
++			goto out;
++		r = kvm_verify_msi(kvm, &msi);
++		break;
++	}
+ #endif
+ #ifdef __KVM_HAVE_IRQ_LINE
+ 	case KVM_IRQ_LINE_STATUS:
+-- 
+2.8.1
+
