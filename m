@@ -2,220 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A0F96224A5
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 08:30:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 181666224BB
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 08:36:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229923AbiKIHaq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 02:30:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38652 "EHLO
+        id S229917AbiKIHgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 02:36:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbiKIHaf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 02:30:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70A7C18E0F
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 23:29:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667978980;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YdtRIseNPT2+jZuZBXjbMtl4QnJDXpGj49sikX6Ctrg=;
-        b=Gjzw9R+o1oY4IXx5jPqGh+wqDtIl2eImVkMS184QS4VTP3l9eJ9x+D6nAdawPTjlAEwbUB
-        KVaoO84S9/AKOh19UtHtLD5jyW1WG9wQ6rWYqB+A1qwap+Jt8Q+1ucUgjSJZrAPc0oNgkY
-        /N5hYwlulXS9F0lgn+HXj4N/uPhifM4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-673-DhWDD25APU6LZXubNeVe3w-1; Wed, 09 Nov 2022 02:29:31 -0500
-X-MC-Unique: DhWDD25APU6LZXubNeVe3w-1
-Received: by mail-wm1-f71.google.com with SMTP id bg25-20020a05600c3c9900b003cf3ed7e27bso7738440wmb.4
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 23:29:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YdtRIseNPT2+jZuZBXjbMtl4QnJDXpGj49sikX6Ctrg=;
-        b=vARJ+bORnD5VPB0p6kY1wEgGMPqerQ8jexSk3i4YG8tSbax+2LEv2aLQFI0DU9XYBi
-         33o8xHhlb2fnNov9m33YyP4xVCBc3mVAUWEDxU8csNRtkLL9baKANPiWsiEAXN9PRlMx
-         c6zmhkUFDIEBn2AVi2GvoKdpXF6SSMAK5gosSaju7j52l089uEjnuheiOg7lMQPN1tMz
-         SQVC7IQXBRtZLG/JMTeU09BLbwjDtPeOLbK5OIT3j/8QRQffhi4PPZGJby2pch2HA3cH
-         7SsDMzL+HxYlXTFvtPDenFhk2jHPVruXMaY+JYx6grxL4lOB4c0DXXa79mcdqH1LtFse
-         i2hg==
-X-Gm-Message-State: ACrzQf1pEMWCYRiPbTrbYWoNfceyzlWE/HwgjaXfXzyYiphveGXSVFiG
-        vufo8pAr+4oFhjmbJtZVdH8aWLECJzlKePX58dXr/U+K6GlpHGsO7z0/VL5aQwHOeRX5iHYc5WY
-        ioidpcCigHz4j
-X-Received: by 2002:a05:6000:1a46:b0:236:9cb4:f2a7 with SMTP id t6-20020a0560001a4600b002369cb4f2a7mr37306598wry.141.1667978970229;
-        Tue, 08 Nov 2022 23:29:30 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM6lZrksHKbpKvgOL8qujWYkFgNg3u58w4jQeAHHstRZ695iSsZmVkU1mrU0juQJVtjl8RA1Ow==
-X-Received: by 2002:a05:6000:1a46:b0:236:9cb4:f2a7 with SMTP id t6-20020a0560001a4600b002369cb4f2a7mr37306583wry.141.1667978969917;
-        Tue, 08 Nov 2022 23:29:29 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id l16-20020adfe590000000b002365cd93d05sm12198397wrm.102.2022.11.08.23.29.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Nov 2022 23:29:29 -0800 (PST)
-Message-ID: <f09c1b91-647e-3547-1914-59a7e785cc95@redhat.com>
-Date:   Wed, 9 Nov 2022 08:29:28 +0100
+        with ESMTP id S229910AbiKIHf7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 02:35:59 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 014F31B1EA;
+        Tue,  8 Nov 2022 23:35:51 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 00F89B81D2A;
+        Wed,  9 Nov 2022 07:35:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16CA2C433D7;
+        Wed,  9 Nov 2022 07:35:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1667979348;
+        bh=QB013233+R/iglugH58wCtHW/3scKZz7VosiLXkZFvs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=S7eZY2mDXpccT9ZwV6U2RNKAi1eIc7W/1/kVLp9HEU1LqUwYQY5CXECheTUTOAVkv
+         968VjP00uhljDX5dOhDE5R2Odn8h2gJXIJQznABxMVenmSE4h7yEvrez5si5ud6xhN
+         L4eZP1K3zQFz4Wkamm91Z9EkrP+0svuZSlmGKPqQ=
+Date:   Wed, 9 Nov 2022 08:35:45 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Alexandru Ciobotaru <alcioa@amazon.com>,
+        Marcelo Cerri <marcelo.cerri@canonical.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Tim Gardner <tim.gardner@canonical.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>,
+        The AWS Nitro Enclaves Team 
+        <aws-nitro-enclaves-devel@amazon.com>
+Subject: Re: [PATCH v1] MAINTAINERS: Update entries from the Nitro Enclaves
+ section
+Message-ID: <Y2tYUeVXgIo7ONfA@kroah.com>
+References: <20221108185912.15792-1-andraprs@amazon.com>
+ <Y2qtFONe55pYI7oC@kroah.com>
+ <a302bf1b-0263-ccff-b8c9-a3ce9db65f55@amazon.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC] vhost: Clear the pending messages on
- vhost_init_device_iotlb()
-Content-Language: en-US
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, eric.auger.pro@gmail.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        peterx@redhat.com
-References: <20221107203431.368306-1-eric.auger@redhat.com>
- <20221107153924-mutt-send-email-mst@kernel.org>
- <b8487793-d7b8-0557-a4c2-b62754e14830@redhat.com>
- <20221107180022-mutt-send-email-mst@kernel.org>
- <CACGkMEsYyH5P2h6XkBgrW4O-xJXxdzzRa1+T2zjJ07OHiYObVA@mail.gmail.com>
- <20221108035142-mutt-send-email-mst@kernel.org>
- <CACGkMEtFhmgKrKwTT8MdQG26wbi20Z5cTn69ycBtE17V+Kupuw@mail.gmail.com>
- <20221108041820-mutt-send-email-mst@kernel.org>
- <7105abc8-85d1-63a4-7f77-a2b3e0177b6f@redhat.com>
- <CACGkMEuX-_+fce_rmc-DsBEfa84d1Kxxe2tE_REae2_JrqBWjw@mail.gmail.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <CACGkMEuX-_+fce_rmc-DsBEfa84d1Kxxe2tE_REae2_JrqBWjw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a302bf1b-0263-ccff-b8c9-a3ce9db65f55@amazon.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
+On Tue, Nov 08, 2022 at 10:53:34PM +0200, Paraschiv, Andra-Irina wrote:
+> 
+> 
+> On 08.11.2022 21:25, Greg KH wrote:
+> > 
+> > On Tue, Nov 08, 2022 at 08:59:12PM +0200, Andra Paraschiv wrote:
+> > > Update the list of maintainers for the Nitro Enclaves project. Alex
+> > > (lexnv@) is not working at Amazon anymore and there will be the same
+> > > case for me starting with 2023.
+> > > 
+> > > Add a reference to the mailing list of the Nitro Enclaves development
+> > > team.
+> > > 
+> > > Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+> > > ---
+> > >   MAINTAINERS | 3 +--
+> > >   1 file changed, 1 insertion(+), 2 deletions(-)
+> > > 
+> > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > index 046ff06ff97f..af2c178ba0dc 100644
+> > > --- a/MAINTAINERS
+> > > +++ b/MAINTAINERS
+> > > @@ -14564,10 +14564,9 @@ T:   git git://git.kernel.org/pub/scm/linux/kernel/git/dinguyen/linux.git
+> > >   F:   arch/nios2/
+> > > 
+> > >   NITRO ENCLAVES (NE)
+> > > -M:   Andra Paraschiv <andraprs@amazon.com>
+> > > -M:   Alexandru Vasile <lexnv@amazon.com>
+> > 
+> > I need an ack from Alexandru too.
+> 
+> He is not working at Amazon anymore, but I sent a message to him with the
+> reference to this mail thread. Hope that he could see the message and get
+> back with a reply on this mail thread.
 
-On 11/9/22 04:44, Jason Wang wrote:
-> On Tue, Nov 8, 2022 at 6:17 PM Eric Auger <eric.auger@redhat.com> wrote:
->> Hi Michael, Jason,
->>
->> On 11/8/22 10:31, Michael S. Tsirkin wrote:
->>> On Tue, Nov 08, 2022 at 05:13:50PM +0800, Jason Wang wrote:
->>>> On Tue, Nov 8, 2022 at 4:56 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->>>>> On Tue, Nov 08, 2022 at 11:09:36AM +0800, Jason Wang wrote:
->>>>>> On Tue, Nov 8, 2022 at 7:06 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->>>>>>> On Mon, Nov 07, 2022 at 10:10:06PM +0100, Eric Auger wrote:
->>>>>>>> Hi Michael,
->>>>>>>> On 11/7/22 21:42, Michael S. Tsirkin wrote:
->>>>>>>>> On Mon, Nov 07, 2022 at 09:34:31PM +0100, Eric Auger wrote:
->>>>>>>>>> When the vhost iotlb is used along with a guest virtual iommu
->>>>>>>>>> and the guest gets rebooted, some MISS messages may have been
->>>>>>>>>> recorded just before the reboot and spuriously executed by
->>>>>>>>>> the virtual iommu after the reboot. Despite the device iotlb gets
->>>>>>>>>> re-initialized, the messages are not cleared. Fix that by calling
->>>>>>>>>> vhost_clear_msg() at the end of vhost_init_device_iotlb().
->>>>>>>>>>
->>>>>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>>>>>>> ---
->>>>>>>>>>  drivers/vhost/vhost.c | 1 +
->>>>>>>>>>  1 file changed, 1 insertion(+)
->>>>>>>>>>
->>>>>>>>>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->>>>>>>>>> index 40097826cff0..422a1fdee0ca 100644
->>>>>>>>>> --- a/drivers/vhost/vhost.c
->>>>>>>>>> +++ b/drivers/vhost/vhost.c
->>>>>>>>>> @@ -1751,6 +1751,7 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled)
->>>>>>>>>>    }
->>>>>>>>>>
->>>>>>>>>>    vhost_iotlb_free(oiotlb);
->>>>>>>>>> +  vhost_clear_msg(d);
->>>>>>>>>>
->>>>>>>>>>    return 0;
->>>>>>>>>>  }
->>>>>>>>> Hmm.  Can't messages meanwhile get processes and affect the
->>>>>>>>> new iotlb?
->>>>>>>> Isn't the msg processing stopped at the moment this function is called
->>>>>>>> (VHOST_SET_FEATURES)?
->>>>>>>>
->>>>>>>> Thanks
->>>>>>>>
->>>>>>>> Eric
->>>>>>> It's pretty late here I'm not sure.  You tell me what prevents it.
->>>>>> So the proposed code assumes that Qemu doesn't process device IOTLB
->>>>>> before VHOST_SET_FEAETURES. Consider there's no reset in the general
->>>>>> vhost uAPI,  I wonder if it's better to move the clear to device code
->>>>>> like VHOST_NET_SET_BACKEND. So we can clear it per vq?
->>>>> Hmm this makes no sense to me. iommu sits between backend
->>>>> and frontend. Tying one to another is going to backfire.
->>>> I think we need to emulate what real devices are doing. Device should
->>>> clear the page fault message during reset, so the driver won't read
->>>> anything after reset. But we don't have a per device stop or reset
->>>> message for vhost-net. That's why the VHOST_NET_SET_BACKEND came into
->>>> my mind.
->>> That's not a reset message. Userspace can switch backends at will.
->>> I guess we could check when backend is set to -1.
->>> It's a hack but might work.
->>>
->>>>> I'm thinking more along the lines of doing everything
->>>>> under iotlb_lock.
->>>> I think the problem is we need to find a proper place to clear the
->>>> message. So I don't get how iotlb_lock can help: the message could be
->>>> still read from user space after the backend is set to NULL.
->>>>
->>>> Thanks
->>> Well I think the real problem is this.
->>>
->>> vhost_net_set_features does:
->>>
->>>         if ((features & (1ULL << VIRTIO_F_ACCESS_PLATFORM))) {
->>>                 if (vhost_init_device_iotlb(&n->dev, true))
->>>                         goto out_unlock;
->>>         }
->>>
->>>
->>> so we get a new iotlb each time features are set.
->>>
->>> But features can be changes while device is running.
->>> E.g.
->>>       VHOST_F_LOG_ALL
->>>
->>>
->>> Let's just say this hack of reusing feature bits for backend
->>> was not my brightest idea :(
->>>
->> Isn't vhost_init_device_iotlb() racy then, as d->iotlb is first updated with niotlb and later d->vqs[i]->iotlb is updated with niotlb. What does garantee this is done atomically?
->>
->> Shouldn't we hold the dev->mutex to make all the sequence atomic and
->> include vhost_clear_msg()?  Can't the vhost_clear_msg() take the dev lock?
-> It depends on where we want to place the vhost_clear_msg(), e.g in
-> most of the device ioctl, the dev->mutex has been held.
+Ok, if that doesn't happen, just send a version of that patch removing
+you.
 
-OK, I will double check and respin accordingly
+thanks,
 
-Eric
->
-> Thanks
->
->> Thanks
->>
->> Eric
->>
->>>
->>>
->>>>>
->>>>>>> BTW vhost_init_device_iotlb gets enabled parameter but ignores
->>>>>>> it, we really should drop that.
->>>>>> Yes.
->>>>>>
->>>>>>> Also, it looks like if features are set with VIRTIO_F_ACCESS_PLATFORM
->>>>>>> and then cleared, iotlb is not properly cleared - bug?
->>>>>> Not sure, old IOTLB may still work. But for safety, we need to disable
->>>>>> device IOTLB in this case.
->>>>>>
->>>>>> Thanks
->>>>>>
->>>>>>>>>> --
->>>>>>>>>> 2.37.3
-
+greg k-h
