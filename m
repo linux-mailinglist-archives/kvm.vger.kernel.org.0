@@ -2,252 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3768862339B
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 20:39:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C5296233EF
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 20:53:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230443AbiKITjD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 14:39:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39214 "EHLO
+        id S231896AbiKITxC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 14:53:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbiKITjB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 14:39:01 -0500
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 513E918B2A
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 11:38:58 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id g12so27422259wrs.10
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 11:38:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lh0nRP77OHPBfFy0WBZz6D0tz7ScfvXWOpoB+unsGmE=;
-        b=XT5OpEcAC2vJgaagUXubYidHz4EnH3vTp6IDL5PXT/hagaNDKVWsad3/AIWLbzAo4O
-         DOZvmdDpzRdb9mDIAOX/leK0v0Loqn6EjUleKllNnVU9SNVmKhZyeuk6dooCovbH96RT
-         CzDzEJhC0rrOhNDVbegsmz4PKxwEnIDkwN6yVGZyS7iq+Je/iYCbGsTpjhytvVkb73OW
-         xq9jPQJvhurPCa8tm9dYvd9LyvD5kdRBULt7I/gfW4r6nVKorAQ7unv9pQEHXiHBXgWS
-         WC2JdSp4cRic5ooJPTufmSc7PpqeRU29ZluZPNdQw9wBCq6qfQk2sq1Nv9NPZ74qvZmI
-         zDGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lh0nRP77OHPBfFy0WBZz6D0tz7ScfvXWOpoB+unsGmE=;
-        b=DRjYnt0csq+bX8s0Xw174+x9i340NPqWWU90TZWdd6YnwO0W95xVir+Oj4simRu8Dk
-         NalNC9TwjcLliH4fQNIpM3ZgATxC/FuWfZmpTypqx8T4ptVIr5p9rwkg6nARWUmfj5Qg
-         /2vtBetbrqwTbFgZQchMXVWP+aDsKux/wvjcAU5+fFhfDJXSo9yyEGYjPss4Rb6u5iZZ
-         2ewANqeEWiSv7DQaB0p1M0H5AcL1//MjYaUKR01cfoNCvfI1+19Py02LmH84Y2HxB4bF
-         sSRxvijiYTAM3EBBEbtsUTofulT+o4XEpHMBTkMWiXxks4AjmQIXT1YCgZpSgP5b0FHg
-         Ai2g==
-X-Gm-Message-State: ACrzQf2wy2q9+a+gkp82X7fh8XFWZjE50byTi4H0FeKo8yMry3NLZ1bb
-        kx71hsw3edYS5Ks9J54tSEJd6Q==
-X-Google-Smtp-Source: AMsMyM5Vv6j8+WGVmZnNA7DjnX36A/WyWoPzubWciasWpvIGo6jVmLL7077josfOvY5BLIa/A7nRRQ==
-X-Received: by 2002:a5d:6088:0:b0:236:bd20:2d07 with SMTP id w8-20020a5d6088000000b00236bd202d07mr36906705wrt.165.1668022736766;
-        Wed, 09 Nov 2022 11:38:56 -0800 (PST)
-Received: from ?IPV6:2a02:6b6a:b4d7:0:bc6a:614e:fac7:5a4c? ([2a02:6b6a:b4d7:0:bc6a:614e:fac7:5a4c])
-        by smtp.gmail.com with ESMTPSA id p33-20020a05600c1da100b003c71358a42dsm3352830wms.18.2022.11.09.11.38.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Nov 2022 11:38:55 -0800 (PST)
-Message-ID: <d39f639b-cd5c-15f4-e6cb-5e2525992acf@bytedance.com>
-Date:   Wed, 9 Nov 2022 19:38:55 +0000
+        with ESMTP id S231852AbiKITxA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 14:53:00 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2043.outbound.protection.outlook.com [40.107.237.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2904A2DA;
+        Wed,  9 Nov 2022 11:52:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fbcvza39OVXfjJVCQTar6Pt7XWxyP8ekRXr+HV5PC3DuS/Mfd99eSu2ZPknmfF1WrAGLJJrgSQRl7iJvFyVWKeEQ39ScYok+PjZZRchOnisxOiRM2Y/a9J/yajYprHJ+3jfkZUEjw2yqF1yZGVYTUD4tU1mkkTmJe6Y8K+Y1mMeoWfdxKxwfX1VtzKynxuX/zktGxygxOB6ViTfkPhEM+jhQyXNFDFN08JbcXtKPsFRJSSFgpKEo8FgkXJk727XKtFNoBYFusf/5LxYPr2PvkiEpgnDOQS9OpDGo/ua/5N0W2sp78WnWoFyiMizZJm3BcajDNCujzYc3fxABRY9oRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K+wj3rbazGYZ3sk5lhP0Nq551eUoE3CH0UgeW8u4eWI=;
+ b=Z9R8fDi1tDDpW2SXX/wtO1NbYDnXkBN2V/mIEmDiOg443juPuW5ku/SyQUDzgDvAEBSitKbufoJxPOMz0OPKCayK8UT0Fnskel6ATu2LNTOVgWk23VUzvN96RYEUZpihEKCKwAPcDkjkBCF/YmdLZzZuRq2Gem/6gWBpX718rf588JQ3ESfhN7qBow4NmXL3ZMctKXw0Xl4caFw1SBHxU3unX3LQiQ+iIjvdrt3iZbJHVU2bVKhZMGAi6ogW1BwV3LwFzs7p0B1GdO6zWxFn6tmk0BEA3UEPx3ef04FLSyLBrapYeOjiQH8xnLZ9lsWf5N41Fu8gy37kRYSpLDlafQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K+wj3rbazGYZ3sk5lhP0Nq551eUoE3CH0UgeW8u4eWI=;
+ b=tnP3nS3Ffq6JDiumj9VzFNyWdIwNM0jMdd/dKKpjU+ISK+5ktD3SJvTzszR/2ja14HKKswCtPm4gKxY6ny9XNO4JOCWVZfiRaH35/QRVvdx7uzr4IAU7pkG8k/33+pr2V1f8ZncwBVjRYtk9xjUOpEUuLhQGEzCA16SwLkIubk4hT/VDXGFzVm2c3wmjNKWsDr76iTfiNyvdLdWmTAheaS69/eZqUfbHnX7jXVpIkIQB7ZdXM7Wso/glqou2fK7jqYFDK+Ck9YP9DZH29bq/TVi33ORcH5spR1i3LCsA8hbZfIsaGSQauQGRtPXd5kYOfsgAP/Ozg8WAHC6oLoT19Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM4PR12MB5197.namprd12.prod.outlook.com (2603:10b6:5:394::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27; Wed, 9 Nov
+ 2022 19:52:57 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%7]) with mapi id 15.20.5791.027; Wed, 9 Nov 2022
+ 19:52:57 +0000
+Date:   Wed, 9 Nov 2022 15:52:55 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 10/11] vfio: Make vfio_container optionally compiled
+Message-ID: <Y2wFFy0cxIIlCeTu@nvidia.com>
+References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <10-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <20221108152831.1a2ed3df.alex.williamson@redhat.com>
+ <Y2r6YnhuR3SxslL6@nvidia.com>
+ <20221109101809.2ff08303.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221109101809.2ff08303.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR14CA0026.namprd14.prod.outlook.com
+ (2603:10b6:208:23e::31) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [v2 0/6] KVM: arm64: implement vcpu_is_preempted check
-Content-Language: en-US
-To:     Punit Agrawal <punit.agrawal@bytedance.com>
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
-        yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-        maz@kernel.org, steven.price@arm.com, mark.rutland@arm.com,
-        bagasdotme@gmail.com, fam.zheng@bytedance.com, liangma@liangbit.com
-References: <20221104062105.4119003-1-usama.arif@bytedance.com>
- <87wn861v3x.fsf@stealth>
-From:   Usama Arif <usama.arif@bytedance.com>
-In-Reply-To: <87wn861v3x.fsf@stealth>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5197:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6612d4bf-925f-415a-6b6d-08dac28bff72
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: rCh/AI5EYJX9wQGV3YKdx/fOaZkgHGdlGnv1zRtb5Lae9CtI7fjOvA6JBNe7sfLw5RYXFmQPATVgya4ZY52objWZcZdKfOcRW33gGnlKBQnYBQYGiXd1NUEq6FSFmDUWaLaJyXqy+OhBQIgh+ya4MgogG9375DTsofpXxgXfBkZ2BF/4ApTjbZVXgiwt7Lr4O+XrOj0l9Gsbmtlz3fvBlYEoNOc4QK2ojQ7ic8VuUWAyy15O57E3KzOCwqrmcSYxsxWNbhFXhmkAs1QA9pypvAFSmXN499S9+EJAIttdnsX1bd/m4n2PL8Exnpr+cKbEONzJnZnCWEDHQ7dwiMonFDpvXUtzEaI5L20wXClToMtZjWgo/fvu9ezFcVLxEpTTnVunQxUzyrZ8Kq0f2L2mNvzPRQ8w1KajrqruO+PfBdrCZ/jSsp0yeC4S/skZlQKHlvZOjlhlG71WecfvPtyEpOp4z5iQpS1HSyTQx5bliR/m2dlZ9CTuqFruDW2BzK/dz2cpT0IfIQCbYufa2VVbfgO//la3XaeSozgMTh1tIGIIZEaqvn4L7Wy0wn3RnjT+9m/FOMEfBmxug1e+jQ1TijIKnUDkWVE80Bey+l47h50MhjUkDbIOQggqPRsL9Y4TlcA0fQhiLxlP6/q7cTKhg9qzN3w7Lqqiogm6Dfo+392dvPLg14Fn4j5IU9QHBniGIIMlndOT+xUlm2XNBoLbcQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(366004)(376002)(136003)(39860400002)(346002)(451199015)(41300700001)(478600001)(83380400001)(38100700002)(86362001)(186003)(2906002)(6916009)(54906003)(316002)(7406005)(2616005)(6486002)(5660300002)(6512007)(36756003)(26005)(6506007)(8936002)(66556008)(7416002)(66476007)(66946007)(4326008)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?BATkKD42by+KTMfiLZIxVr0dDcf5/RH0dVVtp/wsESFaKuC3HUrt/WHqs4ZO?=
+ =?us-ascii?Q?9UkXGwKr1z/Frcb42SKFaJYnuTswDoLcyrsl2GTFSm8maC3ctnEIl9xs/zn0?=
+ =?us-ascii?Q?F//TOLqJ969Tqkn8qpEqlLqaGG/qVnNA8rvIrELl3rf55uCdq8HPB45Cff+C?=
+ =?us-ascii?Q?7UujIfZIxxKMYIwbeUxqigkOflo7mjhojhi/9Y6hDcgVhCrkL7p/ktlv5Ehw?=
+ =?us-ascii?Q?HPNjMjxAyjqiY2cBeyuYTyl1ZwrkoJkzLLBrYCmJ2ZJz6jFKST03gV/OaSQz?=
+ =?us-ascii?Q?SzZqP49W3qd74+35oCc8dT96VcJMnFVCzejijKug7tX/keoBLte69lgeUjdO?=
+ =?us-ascii?Q?53MC2tImEeBoqTQ6Y/VBVSSuWz/qbgE3ZEySy631OgnTU6mj4u3UX1hnHvAd?=
+ =?us-ascii?Q?IG8fx9eGkf2idTx7f9ittAu6XkLSnAYM87tl1O9EGNFWqfM9QqGI82xZAf6V?=
+ =?us-ascii?Q?yZ12yh6c/LyIC6hY+T9J7IJyaxNZ31haifhrTNW9D+mb0SiOGKOk8lysCvGF?=
+ =?us-ascii?Q?Stf2FvLP7SaqqkV8iBDJl2RCgt2LcoyFNo0Mtctv/NkgK9cOalGV0o9Soz4k?=
+ =?us-ascii?Q?4qh03xvewpofe7w0uyF+Hzui0HVEZu91r0KKoxobC6weZ8BDvHASPPR6s+dt?=
+ =?us-ascii?Q?o9CHcTo/UsQGIcPRKQ1NgUBwn6xrge2Az9+MdSry1KAwRImyM8AHGGn3DVCH?=
+ =?us-ascii?Q?rbH6UojSbrS1qt147y6F5RtPKfcKWDjB8IPyUAC5nWzrE2b4uVSd9DyT8aoO?=
+ =?us-ascii?Q?DVoJJk6BWp+d0hd1GzXdfBbJZwuyib/+GxY1G/rmmBJWqVlMk73t7ForYriP?=
+ =?us-ascii?Q?elQxdyrczGKzqtw7BWal+Nuw26hCU8fuDv1XoOLgsT0g9fS/laz/zrKpTKwm?=
+ =?us-ascii?Q?wihkVhdHzWGDqAvxZHTtdcoaNI1UZDorEjdwWByvHTUDHlwdmKPXaRiRkNlA?=
+ =?us-ascii?Q?+Vhtn+6qTUtNYQcOVEBGBoJXboXORzw5tyd/P0Yr4kL5QsaXGzag/3JIBW67?=
+ =?us-ascii?Q?BVdzzSLCdgGcFhYGHDf6F1O+ryM+UBw5qOuOfcFWjKDcocTSCnhyZwq60hRT?=
+ =?us-ascii?Q?Q8r3qlkyHGrA+iwMlD0lf94DfFTsrtOIBsYROTlS6zKFlKV5lYWivV2LUcll?=
+ =?us-ascii?Q?B6B29DOIWV8OGGQXASi1r0sN5wE4jV0ZO9Q25Ak9SRk8pn/RtwRtW5j02U8+?=
+ =?us-ascii?Q?mymIVs+8Ji81pVZPQ7qsFtGBS+ulyDTPS49yxdQVps2tCpLZNwoOWE4enNGW?=
+ =?us-ascii?Q?/2JXrDeDf0ByfNv3afaOx9RdA1V/rndWblRkD0jy2JElkICJN9QJ7X/q/6EN?=
+ =?us-ascii?Q?LQF3klPqwmjb1sYVIDoX/+ddmiQA9bfDBffFco/6gcPjZrTl0fOxrERGTrPv?=
+ =?us-ascii?Q?y/fyahz7SBEilhVrxVB9qtVUqjko/Pjts2E4fxiYnyDlidKS05QhpXJtvSit?=
+ =?us-ascii?Q?/LQv5B/ro8VwouaBwuwgt8L0KFRKSnsPArAxIYcD+6Wid4+NchhgbzMWF9Hq?=
+ =?us-ascii?Q?mUQlp6Pre3NFdw9wGKPMy2/HXamygOrdqUdC1rMtN4McqPAe7w0k7Lp5/4yh?=
+ =?us-ascii?Q?N3EDpzWzrhqtYuqI2eI=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6612d4bf-925f-415a-6b6d-08dac28bff72
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2022 19:52:57.0308
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vxSRHATUj0W9As4Mwgz0GTxpJXE0XJqo2U711mavVgNoPr/U/aXKtz6u68aRzzN3
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5197
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Nov 09, 2022 at 10:18:09AM -0700, Alex Williamson wrote:
 
+> DPDK supports no-iommu mode.
 
-On 07/11/2022 18:24, Punit Agrawal wrote:
-> Hi Usama,
-> 
-> Usama Arif <usama.arif@bytedance.com> writes:
-> 
->> This patchset adds support for vcpu_is_preempted in arm64, which allows the guest
->> to check if a vcpu was scheduled out, which is useful to know incase it was
->> holding a lock. vcpu_is_preempted can be used to improve
->> performance in locking (see owner_on_cpu usage in mutex_spin_on_owner,
->> mutex_can_spin_on_owner, rtmutex_spin_on_owner and osq_lock) and scheduling
->> (see available_idle_cpu which is used in several places in kernel/sched/fair.c
->> for e.g. in wake_affine to determine which CPU can run soonest):
->>
->> This patchset shows improvement on overcommitted hosts (vCPUs > pCPUS), as waiting
->> for preempted vCPUs reduces performance.
->>
->> This patchset is inspired from the para_steal_clock implementation and from the
->> work originally done by Zengruan Ye:
->> https://lore.kernel.org/linux-arm-kernel/20191226135833.1052-1-yezengruan@huawei.com/.
->>
->> All the results in the below experiments are done on an aws r6g.metal instance
->> which has 64 pCPUs.
->>
->> The following table shows the index results of UnixBench running on a 128 vCPU VM
->> with (6.0.0+vcpu_is_preempted) and without (6.0.0 base) the patchset.
->> TestName                                6.0.0 base  6.0.0+vcpu_is_preempted    % improvement for vcpu_is_preempted
->> Dhrystone 2 using register variables    187761      191274.7                   1.871368389
->> Double-Precision Whetstone              96743.6     98414.4                    1.727039308
->> Execl Throughput                        689.3       10426                      1412.548963
->> File Copy 1024 bufsize 2000 maxblocks   549.5       3165                       475.978162
->> File Copy 256 bufsize 500 maxblocks     400.7       2084.7                     420.2645371
->> File Copy 4096 bufsize 8000 maxblocks   894.3       5003.2                     459.4543218
->> Pipe Throughput                         76819.5     78601.5                    2.319723508
->> Pipe-based Context Switching            3444.8      13414.5                    289.4130283
->> Process Creation                        301.1       293.4                      -2.557289937
->> Shell Scripts (1 concurrent)            1248.1      28300.6                    2167.494592
->> Shell Scripts (8 concurrent)            781.2       26222.3                    3256.669227
->> System Call Overhead                    3426        3729.4                     8.855808523
->>
->> System Benchmarks Index Score           3053        11534                      277.7923354
->>
->> This shows a 277% overall improvement using these patches.
->>
->> The biggest improvement is in the shell scripts benchmark, which forks a lot of processes.
->> This acquires rwsem lock where a large chunk of time is spent in base 6.0.0 kernel.
->> This can be seen from one of the callstack of the perf output of the shell
->> scripts benchmark on 6.0.0 base (pseudo NMI enabled for perf numbers below):
->> - 33.79% el0_svc
->>     - 33.43% do_el0_svc
->>        - 33.43% el0_svc_common.constprop.3
->>           - 33.30% invoke_syscall
->>              - 17.27% __arm64_sys_clone
->>                 - 17.27% __do_sys_clone
->>                    - 17.26% kernel_clone
->>                       - 16.73% copy_process
->>                          - 11.91% dup_mm
->>                             - 11.82% dup_mmap
->>                                - 9.15% down_write
->>                                   - 8.87% rwsem_down_write_slowpath
->>                                      - 8.48% osq_lock
->>
->> Just under 50% of the total time in the shell script benchmarks ends up being
->> spent in osq_lock in the base 6.0.0 kernel:
->>    Children      Self  Command   Shared Object        Symbol
->>     17.19%    10.71%  sh      [kernel.kallsyms]  [k] osq_lock
->>      6.17%     4.04%  sort    [kernel.kallsyms]  [k] osq_lock
->>      4.20%     2.60%  multi.  [kernel.kallsyms]  [k] osq_lock
->>      3.77%     2.47%  grep    [kernel.kallsyms]  [k] osq_lock
->>      3.50%     2.24%  expr    [kernel.kallsyms]  [k] osq_lock
->>      3.41%     2.23%  od      [kernel.kallsyms]  [k] osq_lock
->>      3.36%     2.15%  rm      [kernel.kallsyms]  [k] osq_lock
->>      3.28%     2.12%  tee     [kernel.kallsyms]  [k] osq_lock
->>      3.16%     2.02%  wc      [kernel.kallsyms]  [k] osq_lock
->>      0.21%     0.13%  looper  [kernel.kallsyms]  [k] osq_lock
->>      0.01%     0.00%  Run     [kernel.kallsyms]  [k] osq_lock
->>
->> and this comes down to less than 1% total with 6.0.0+vcpu_is_preempted kernel:
->>    Children      Self  Command   Shared Object        Symbol
->>       0.26%     0.21%  sh      [kernel.kallsyms]  [k] osq_lock
->>       0.10%     0.08%  multi.  [kernel.kallsyms]  [k] osq_lock
->>       0.04%     0.04%  sort    [kernel.kallsyms]  [k] osq_lock
->>       0.02%     0.01%  grep    [kernel.kallsyms]  [k] osq_lock
->>       0.02%     0.02%  od      [kernel.kallsyms]  [k] osq_lock
->>       0.01%     0.01%  tee     [kernel.kallsyms]  [k] osq_lock
->>       0.01%     0.00%  expr    [kernel.kallsyms]  [k] osq_lock
->>       0.01%     0.01%  looper  [kernel.kallsyms]  [k] osq_lock
->>       0.00%     0.00%  wc      [kernel.kallsyms]  [k] osq_lock
->>       0.00%     0.00%  rm      [kernel.kallsyms]  [k] osq_lock
->>
->> To make sure, there is no change in performance when vCPUs < pCPUs, UnixBench
->> was run on a 32 CPU VM. The kernel with vcpu_is_preempted implemented
->> performed 0.9% better overall than base kernel, and the individual benchmarks
->> were within +/-2% improvement over 6.0.0 base.
->> Hence the patches have no negative affect when vCPUs < pCPUs.
->>
->>
->> The other method discussed in https://lore.kernel.org/linux-arm-kernel/20191226135833.1052-1-yezengruan@huawei.com/
->> was pv conditional yield by Marc Zyngier and Will Deacon to reduce vCPU reschedule
->> if the vCPU will exit immediately.
->> (https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pvcy).
->> The patches were ported to 6.0.0 kernel and tested with UnixBench with a 128 vCPU VM:
->>
->> TestName                                6.0.0 base  6.0.0+pvcy      % improvement for pvcy
->> Dhrystone 2 using register variables    187761      183128          -2.467498575
->> Double-Precision Whetstone              96743.6     96645           -0.101918887
->> Execl Throughput                        689.3       1019.8          47.9471928
->> File Copy 1024 bufsize 2000 maxblocks   549.5       2029.7          269.3721565
->> File Copy 256 bufsize 500 maxblocks     400.7       1439.4          259.2213626
->> File Copy 4096 bufsize 8000 maxblocks   894.3       3434.1          283.9986582
->> Pipe Throughput                         76819.5     74268.8         -3.320380893
->> Pipe-based Context Switching            3444.8      5963.3          73.11019508
->> Process Creation                        301.1       163.2           -45.79873796
->> Shell Scripts (1 concurrent)            1248.1      1859.7          49.00248378
->> Shell Scripts (8 concurrent)            781.2       1171            49.89759345
->> System Call Overhead                    3426        3194.4          -6.760070053
->>
->> System Benchmarks Index Score           3053        4605            50.83524402
->>
->> pvcy shows a smaller overall improvement (50%) compared to vcpu_is_preempted (277%).
->> Host side flamegraph analysis shows that ~60% of the host time when using pvcy
->> is spent in kvm_handle_wfx, compared with ~1.5% when using vcpu_is_preempted,
->> hence vcpu_is_preempted shows a larger improvement.
->>
->> It might be that pvcy can be used in combination with vcpu_is_preempted, but this
->> series is to start a discussion on vcpu_is_preempted as it shows a much bigger
->> improvement in performance and its much easier to review vcpu_is_preempted standalone.
-> 
-> Looking at both the patchsets - this one and the pvcy, it looks to me
-> that vcpu_is_preempted() and the pvcy patches are somewhat
-> orthogonal. The former is optimizing mutex and rwsem in their optimistic
-> spinning phase while the latter is going after spinlocks (via wfe).
-> 
-> Unless I'm missing something the features are not necessarily comparable
-> on the same workloads - unixbench is probably mutex heavy and doesn't
-> show as much benefit with just the pvcy changes. I wonder if it's easy
-> to have both the features enabled to see this in effect.
-> 
-> I've left some comments on the patches; but no need to respin just
-> yet. Let's see if there is any other feedback.
-> 
-> Thanks,
-> Punit
-> 
+Er? Huh? How? I thought no-iommu was for applications that didn't do
+DMA? How is DPDK getting packets in/out without DMA? I guess it snoops
+in /proc/ or something to learn PFNs of mlock'd memory? <shudder>
 
-There was a small bug in v2, where pv_lock_init was called too early in 
-the boot in setup_arch, hence pvlock_vcpu_state was not initialized for 
-vCPU 0 (the state was initialized for vCPUs 1-127 during secondary core 
-boot, hence the rest of the vCPUs were using pvlock correctly). I will 
-send the next revision making it an early_initcall along with addressing 
-Punits' comments, but will wait for further comments on v2 before 
-sending it. I have tested it with early_initcall and didnt see a 
-significant change in performance (which is expected as only 1 out of 
-128 vCPUs wasnt using pvlock correctly).
+> I agree that it's very useful for testing, I'm certainly not suggesting
+> to give up, but I'm not sure where no-iommu lives when iommufd owns
+> /dev/vfio/vfio.  Given the unsafe interrupts discussion, it doesn't
+> seem like the type of thing that would be a priority for iommufd.
 
-I tried pvcy+vcpu_is_preempted patches together and I see a slight 
-reduction in performance over pvcy only.
-As a summary, with the above changes to move to early_initcall included 
-the overall Unixbench score improvements are:
+Ah, I think the bit below will do the job, I'm not sure without doing
+some testing (and I don't think I have the necessary Intel NIC for
+DPDK). The basic point is no-iommu literally means 'do not use iommufd
+at all, do not create an iommufd_device or an iommufd_access'. VFIO
+can easially do that on its own.
 
-Change over 6.0.0 base kernel                 % improvement over base
-vcpu_is_preempted                             279%
-pvcy                                          51%
-pvcy+vcpu_is_preempted                        37%
+The only slightly messy bit is that uAPI requires the SET_CONTAINER
+which we can just NOP in vfio_compat. With more checks it could have
+higher fidelity of error cases, but not sure it is worth it.
 
-Thanks,
-Usama
+When we talk about the device cdev flow then I suggest that no-iommu
+simply requires -1 for the iommufd during bind - ie no iommufd is
+used or accepted and that is how the userspace knows/confirms it is in
+no-iommu mode.
 
+> We're on a path where vfio accepts an iommufd as a container, and
+> ultimately iommufd becomes the container provider, supplanting the
+> IOMMU driver registration aspect of vfio.  I absolutely want type1 and
+> spapr backends to get replaced by iommufd, but reluctance to support
+> aspects of vfio "legacy" behavior doesn't give me warm fuzzies about a
+> wholesale hand-off of the container to a different subsystem, for
+> example vs an iommufd shim spoofing type1 support.
 
-> [...]
-> 
+Well, I will agree to do everything required, just let's go through the
+process to understand the security situation and ensure we are still
+doing things the right way.
+
+> Unfortunately we no longer have a CONFIG_EXPERIMENTAL option to hide
+> behind for disabling VFIO_CONTAINER, so regardless of our intentions
+> that a transition is some time off, it may become an issue sooner than
+> we expect.
+
+We can add kconfig text discouraging that?
+
+diff --git a/drivers/iommu/iommufd/vfio_compat.c b/drivers/iommu/iommufd/vfio_compat.c
+index dbef3274803336..81f7594cfff8e0 100644
+--- a/drivers/iommu/iommufd/vfio_compat.c
++++ b/drivers/iommu/iommufd/vfio_compat.c
+@@ -259,6 +259,14 @@ static int iommufd_vfio_set_iommu(struct iommufd_ctx *ictx, unsigned long type)
+ 	struct iommufd_ioas *ioas = NULL;
+ 	int rc = 0;
+ 
++	/*
++	 * Emulation for NOIMMU is imperfect in that VFIO blocks almost all
++	 * other ioctls. We let them keep working but they mostly fail since no
++	 * IOAS should exist.
++	 */
++	if (IS_ENABLED(CONFIG_VFIO_NOIOMMU) && type == VFIO_NOIOMMU_IOMMU)
++		return 0;
++
+ 	if (type != VFIO_TYPE1_IOMMU && type != VFIO_TYPE1v2_IOMMU)
+ 		return -EINVAL;
+ 
+diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
+index 595c7b2146f88c..64a336ebc99b9f 100644
+--- a/drivers/vfio/iommufd.c
++++ b/drivers/vfio/iommufd.c
+@@ -18,6 +18,10 @@ int vfio_iommufd_bind(struct vfio_device *vdev, struct iommufd_ctx *ictx)
+ 
+ 	lockdep_assert_held(&vdev->dev_set->lock);
+ 
++	if (IS_ENABLED(CONFIG_VFIO_NO_IOMMU) &&
++	    vdev->group->type == VFIO_NO_IOMMU)
++		return 0;
++
+ 	/*
+ 	 * If the driver doesn't provide this op then it means the device does
+ 	 * not do DMA at all. So nothing to do.
+@@ -53,6 +57,10 @@ void vfio_iommufd_unbind(struct vfio_device *vdev)
+ {
+ 	lockdep_assert_held(&vdev->dev_set->lock);
+ 
++	if (IS_ENABLED(CONFIG_VFIO_NO_IOMMU) &&
++	    vdev->group->type == VFIO_NO_IOMMU)
++		return;
++
+ 	if (vdev->ops->unbind_iommufd)
+ 		vdev->ops->unbind_iommufd(vdev);
+ }
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index f3c48b8c45627d..08c5b05a129c2c 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -749,10 +749,13 @@ static int vfio_group_ioctl_set_container(struct vfio_group *group,
+ 	if (!IS_ERR(iommufd)) {
+ 		u32 ioas_id;
+ 
+-		ret = iommufd_vfio_compat_ioas_id(iommufd, &ioas_id);
+-		if (ret) {
+-			iommufd_ctx_put(group->iommufd);
+-			goto out_unlock;
++		if (!IS_ENABLED(CONFIG_VFIO_NO_IOMMU) ||
++		    group->type != VFIO_NO_IOMMU) {
++			ret = iommufd_vfio_compat_ioas_id(iommufd, &ioas_id);
++			if (ret) {
++				iommufd_ctx_put(group->iommufd);
++				goto out_unlock;
++			}
+ 		}
+ 
+ 		group->iommufd = iommufd;
