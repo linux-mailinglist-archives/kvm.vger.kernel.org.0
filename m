@@ -2,212 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D583622126
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 02:05:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B70162213E
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 02:14:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229992AbiKIBFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 20:05:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50640 "EHLO
+        id S229571AbiKIBOo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 20:14:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229464AbiKIBF0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 20:05:26 -0500
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2072.outbound.protection.outlook.com [40.107.93.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8207560349;
-        Tue,  8 Nov 2022 17:05:25 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M0975iEzpNUV9L+wcZdMB3glaGhUNXn3FFN0lM3nCXC3G3hdLBwpdKwgGrv0IRfYyZa7Y067T7UxqYl6B3+hMRFA2D9bnYJ7FKVHSU258osZPlAlA6yc3UenbkNevlPH+hW92+3goicpmHj5gxNma5rFEqERYXDSeu8Ok60PTi9Yv1AToyfjxwc5xhFBZ8UU+O4YsApjVdapsVgYfRXcnQswDGwg4xA89xOcz0Y189mBdNdRlDH2hYoLBL5swZsgesBTyDodrkw/MVZaJWZMab727gu8iJ+1hlBsHGblgcelzGv4GTVT/zQ3xuH/3dras7JNqXmVCWk8XM+GKFVUYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EHhhRZ9NeJ3jNGHSeBtbRZH3qJXwmf0nyqbItjt7iuA=;
- b=F1DKXci/Nh2IZEODJbx0tWuZ+ossyxQwU9v/OjLrFdulb4NqpLdJVI6dCv6/gqSlVc7nacRplF7sgB1jKU07YBdWXGvB2jsPtXWJBnKQFfvFwE2QyToRAUwYCLsVB6xfEecs9usUCTrKe4hTt16MAQHtESJLXMZyaC2ndO6zl+iw5L+d8AB4E7agCEHiLlws4cC0zpKy+uiDCSVYwvkzcL1Tow93TOn4K5q8KjVQYqqRcEfvxOiEN0+ooPf9xfoWyis8dNjAGLYdVAa6uMAXEaSQ5Gn3917Pb7+ViiO8YnjHuq92Tfb5LuHCj4Gy7BvliMnrxf9/c2VmLv+CQpO0XQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EHhhRZ9NeJ3jNGHSeBtbRZH3qJXwmf0nyqbItjt7iuA=;
- b=bqMUOBRw9CL2OYYaR1MAuwBn8q+jfnMMc49IVPZ/y/G/UBWOLvg7qfVRkU2K56Yu6r2bInKPIvdVavTTTg2oy8UYfZCbsx08KVjZmUkcuXyULCY4QrLD0KlI4vdg8mPIlZmQ/YXoZ7jHbABpmbOXWEKy66VsVtzsQhFVexMq84iQU3dyBRBL3NX9m4Umb+ZdXmcJHBYscNABZmwNHo6brPmuD7dOqz7sWuolwt7uyG1ddwHFdPgE+gyIn5xlJvwfdWBsJtTxohdzUI6t5nYJ/UHHz2TMZbhcvhM40luzbzF7veHSSzNGo6CovTe6Xhw6tQpMT/LZutY6ceTkfyRw5w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM6PR12MB4500.namprd12.prod.outlook.com (2603:10b6:5:28f::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27; Wed, 9 Nov
- 2022 01:05:23 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Wed, 9 Nov 2022
- 01:05:23 +0000
-Date:   Tue, 8 Nov 2022 21:05:21 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
-        dri-devel@lists.freedesktop.org,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Longfang Liu <liulongfang@huawei.com>,
-        linux-s390@vger.kernel.org, Yi Liu <yi.l.liu@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Will Deacon <will@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Halil Pasic <pasic@linux.ibm.com>, iommu@lists.linux.dev,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org, Zhi Wang <zhi.a.wang@intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: [PATCH 04/10] vfio: Move storage of allow_unsafe_interrupts to
- vfio_main.c
-Message-ID: <Y2r80RgytKpPtK58@nvidia.com>
-References: <4-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com>
- <20221026152442.4855c5de.alex.williamson@redhat.com>
- <Y1wiCc33Jh5QY+1f@nvidia.com>
- <20221031164526.0712e456.alex.williamson@redhat.com>
- <Y2kF75zVD581UeR2@nvidia.com>
- <20221107081853.18727337.alex.williamson@redhat.com>
- <Y2klGAUEUwpjWHw6@nvidia.com>
- <20221107110508.7f02abf4.alex.williamson@redhat.com>
- <Y2lSZwNT8f/RMoZf@nvidia.com>
- <20221108155520.4429c2e5.alex.williamson@redhat.com>
+        with ESMTP id S229452AbiKIBOm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 20:14:42 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 854655EFA2
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 17:14:41 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id d13-20020a17090a3b0d00b00213519dfe4aso485863pjc.2
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 17:14:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mKyqoiSkzBxH84Qr1HrrOE/dGdA0Clpog0p1k0piuQk=;
+        b=NPr9B+bL6MZyQd6+lKX/PXnLnGib/fJJFq8UcR8F8LF5J7fELeKpTzjznjUHoHxfe9
+         SpSj9AXF9c20esKhNKmLA2rEfjY/v3mVFSNpbz/4yCP7T1wQuE7gPtL99I+tM41GMrS0
+         S9a461pwEESX/mopimUh9uczdRblaJ8rYmDaPmxjpZMy8Zylp1GP+PrY/cbT0KJ5Rzzv
+         QmjYQgs6pfaZFeGPdA1aRFFdIIwxTcaRHgA6SNaKW2i1JPdiMdQ990riR6hNBbGMLvZa
+         fw95AQCa4zl84rA1FJPGcxB8TAORn40oGadFMGQKntQIv5zLeuKx0FSIzI7kdtJS4aX1
+         t+sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mKyqoiSkzBxH84Qr1HrrOE/dGdA0Clpog0p1k0piuQk=;
+        b=NjDgq9jedS2iM5yfl6B2ieWhw6DlfIClgS7daHxZ0TKYotrHAL4bjNwSshfCM23OkQ
+         vsvMUCuErQD5aJ53lJ2E0vb2G7tVE3TTbcQNGTdvRIJO5WrqOjfyR0wwjAKqyW8rC4jd
+         VMm04WvEM3CJGPHM8nTXYyNVvdZEePbEuSsaqyCvEfUdIwqGZeOzPcwDH2f+1dF29KVL
+         x7gcvtxPlm0eXtdT2k3KZUVzqbwSAmr3kUGV6ghu+cANflj7FRJZbAseiDFfOwX+1jjs
+         mlhQ3sNKChoI7DaBM6Ig3+0zXcUwjmsbchsSZJR5PFOqqYxYowQUjmgCBx/xkzsm6SdM
+         ldFQ==
+X-Gm-Message-State: ACrzQf1Ki0DJiN9Lt/v4b6JI+5puK1wnK6UC3vUTVwsEwtsgJKiAe1dx
+        4WpSywYHoEQM4niyAJsbnr7bKg==
+X-Google-Smtp-Source: AMsMyM7PPEGcQ4b3ZwhEoIVL/YGFcob35l/PUqwq5A6hdFlK6EVWV/qDf51V0hgcmjj6TzTi91N9rg==
+X-Received: by 2002:a17:902:ce82:b0:187:3591:edac with SMTP id f2-20020a170902ce8200b001873591edacmr42472495plg.153.1667956480932;
+        Tue, 08 Nov 2022 17:14:40 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id v126-20020a626184000000b00565cf8c52c8sm7198556pfb.174.2022.11.08.17.14.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Nov 2022 17:14:40 -0800 (PST)
+Date:   Wed, 9 Nov 2022 01:14:37 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        nathan@kernel.org, thomas.lendacky@amd.com,
+        andrew.cooper3@citrix.com, peterz@infradead.org,
+        jmattson@google.com, stable@vger.kernel.org
+Subject: Re: [PATCH v2 7/8] KVM: SVM: move MSR_IA32_SPEC_CTRL save/restore to
+ assembly
+Message-ID: <Y2r+/UYNeZ7ljYXC@google.com>
+References: <20221108151532.1377783-1-pbonzini@redhat.com>
+ <20221108151532.1377783-8-pbonzini@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221108155520.4429c2e5.alex.williamson@redhat.com>
-X-ClientProxiedBy: BLAPR03CA0142.namprd03.prod.outlook.com
- (2603:10b6:208:32e::27) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM6PR12MB4500:EE_
-X-MS-Office365-Filtering-Correlation-Id: 47019aae-9261-4639-0456-08dac1ee7aa2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oc37HMV1tjFDbacUnMBNq8ul01tEyQiq4xKk6rcfFhBTauTvnRxEc8FwPKfehV2sMFLOCRj/Fqdv8UOlU9SdgDu4iIYTloAcb0c0G3XmFHe7c92cu790/10c+2TuX7lgQplE5KHBXUCrKfcGsBIV3Pfu4FKWkaDRQiTdj16VwkgN1WVcTKzM/4G+UA9uu0qduLGmuCGBMzm+7+h9yv9K9kPaPN1HpgH+/rYzhrpcj+b9oIECkA11a5gcdyM7gl0gmou7bLFeypVQw+IrwCxa+G+R9J/xpx/QrWDpm9M60URy3qNs4ssi1Z/tUWA/6lkt5e3lGoVGUWwcICytxiC8zkcxrMH6bCn3B5ScUvcUI/m4xrNbDLP8iGb9LR4dDrlAxUqYu3vs3oo2UNfDx28zjzbKoyRWJ2xuYTGha58vNqGXlWrBInWuDN0jGUXo7e2S1hMxl9/xUtk5D267PTtYkYXrAHayb87ohSn606gMdmdtQwobpJipGYqq5W7wTdeHI4iay2hdn7+RIBzQdI2blt0qrta72bCBXXJHzYFFipnk8VFI/uMTRZhRmDHpE06ntAu9sI33icWIuqvkWQJUV3WKJ65oA7tqjTcIT1xOoctm8b9PWe+ZJ3h+WSG9wtoy+v5Eq4t2NggyRzKmkGL6ED5PmiZsfc50HwoEZrPJDNsaiH8q5BqW/r0XeNqPcCM4DDRnQZFAGzCHes0RQOgXOg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(136003)(396003)(376002)(366004)(39860400002)(451199015)(86362001)(36756003)(5660300002)(7406005)(2906002)(7416002)(2616005)(26005)(83380400001)(6506007)(6512007)(38100700002)(186003)(66556008)(66946007)(66476007)(316002)(6486002)(6916009)(54906003)(478600001)(4326008)(8676002)(41300700001)(8936002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?z7gK+r40wJ92wDUofu1z1ZsKUvj7iKBDKDUSG39YieaagVm0JMM0cOuUJ/h+?=
- =?us-ascii?Q?cEWEmpBehASSp5rwKbSFoVeMKy4W2Il0+PsdVacyUNVmFwgfF8S856XGSc9w?=
- =?us-ascii?Q?jUy892hnitcuG/KAATdT6ujbssysSnAunWJoJNd1JURZcap8Xd81pGDQvDTZ?=
- =?us-ascii?Q?VQHInVImb6yiJN/8lK3gDlk8jgDQoADu1lB7XwxNMldm5oKXJuhgl6zZZXHx?=
- =?us-ascii?Q?jsHdgjtDdERBBW7Y2OZqjTdNJWQKTlOmblgwih7Z8DroSH5S03OijU7oXhUg?=
- =?us-ascii?Q?ZtjLwQVcbARpwx0EXZLVRvucaa4NHqfSPQUpUZW6EGyjiev7kKfVMfs0HARz?=
- =?us-ascii?Q?snwQFwPbApmJARa0rA7whY81nMistgGWaY/XHREWAOISB1lJ/cU0sxydBEUc?=
- =?us-ascii?Q?bZCgQEblUtzWtA3JGJ9s75DotEnE3qGvp8eXgNVQopZeHBmbv4NEETakSVU4?=
- =?us-ascii?Q?crPw4d57Vt3xRBmcwN1u5PHBC4sRwljH1u00MyO7+s1qUurYeBWj7vpYnhsR?=
- =?us-ascii?Q?mHvvDhawBkiPrwv99Y+FhDj16I3Qp9EBLmSAJi/bO8YyYV/PL2mYa4tju1Ii?=
- =?us-ascii?Q?92WUyKbytTeK9F4pRjyceLWpxjwiWqoXR3VtTEFAhF4ZnUeurTLjhy4k29Dj?=
- =?us-ascii?Q?Fl0wOr1GhO80a3cpVdvFp9pTpfFS3FQjsdWzbxD9Xp9R1RjTuWbZvi4w0uRW?=
- =?us-ascii?Q?Lt4gskxvOVeiP9WQoC8zkjbBcOCdcm+plHhVcAk2YAJqdtfnBZgobqSDAl9X?=
- =?us-ascii?Q?qPaj5w8CmRaySgtwNFf//ZkxbaLOXS0OEijZ4Rmvu84w8JQL/bOUhILZWqyN?=
- =?us-ascii?Q?tfg4JPijEuVw7sBaRTJsZmve/FF+FG8R4VjeRpqSI48rLqU/UTzcmib12Ppe?=
- =?us-ascii?Q?JR1lTGCnD45t3ttS2YdEuV6yxEtPddwPMZ4mwiV8RSumRX6oGLxPc6A+dsPi?=
- =?us-ascii?Q?6KwrOct/A0W0RdKsYKpWEBR5pchCLewtYWIUfWQe+n1I5pfA2DjOVf/VNFG/?=
- =?us-ascii?Q?YghPqt1vCYLZ8W2pLhuShE/3kJE6FxYOe6iD0f0QsB4jXxP45Qzdom+FdNoM?=
- =?us-ascii?Q?mMTlfAu/MJv0WzVFnfBMgoNLvI0siLjbS66eyttSxnXSH17XBfObtNaajnJP?=
- =?us-ascii?Q?vnZNYfAIsvKphuxOrBPfh4UAOC5RpYxSQdLcTZpHj7vyO1GwtlyAHA9Yyfxz?=
- =?us-ascii?Q?kXeZcXCOR1JNoqlkwUEnTNEI2D05g02LKXQPJavnBUFDGUymMSNqGq2zpgwJ?=
- =?us-ascii?Q?dlQk7ljsNOeehpadK0ZMvaz52LTKhgVa/6esO57cspWu4iNhsjGwCmrjW2Th?=
- =?us-ascii?Q?qglhsGaZV3l+QT1TGz5/Ny2X2yP8PA+30zmzbmRUDwH8KPKGRVpGZy+dpHg9?=
- =?us-ascii?Q?2MZbmQifmC8YMlXhL2/A2KzlWY0+r2Mc83Z0nRtFlZB+MtiSY9BqBCwhJWVD?=
- =?us-ascii?Q?4O93EKG8yO+lrZ8tulHnrOO0VDG7p9CzeNY7+KOkSMRyfxhBHT2Srdy2tFMN?=
- =?us-ascii?Q?RN65gG3c7tRmwfUEM4jUYnZwzcJrKc+gp4QfGKIrhwl9dRecEy9zsypofxBA?=
- =?us-ascii?Q?fM1Du9SmF32XIIW70xA=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47019aae-9261-4639-0456-08dac1ee7aa2
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2022 01:05:23.2505
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G1Uaodfv4Io6CG7M+AYNa42Llokvv/dL0nwrwFuBkGnQEOv7k0AXVIUgrVH4FZ6F
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4500
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20221108151532.1377783-8-pbonzini@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 08, 2022 at 03:55:20PM -0700, Alex Williamson wrote:
+On Tue, Nov 08, 2022, Paolo Bonzini wrote:
+> diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
+> index 0a4272faf80f..a02eef724379 100644
+> --- a/arch/x86/kvm/svm/vmenter.S
+> +++ b/arch/x86/kvm/svm/vmenter.S
+> @@ -32,10 +32,70 @@
+>  
+>  .section .noinstr.text, "ax"
+>  
+> +.macro RESTORE_GUEST_SPEC_CTRL
+> +	/* No need to do anything if SPEC_CTRL is unset or V_SPEC_CTRL is set */
+> +	ALTERNATIVE_2 "", \
+> +		"jmp 800f", X86_FEATURE_MSR_SPEC_CTRL, \
+> +		"", X86_FEATURE_V_SPEC_CTRL
+> +801:
+> +.endm
+> +
+> +.macro RESTORE_HOST_SPEC_CTRL
+> +	/* No need to do anything if SPEC_CTRL is unset or V_SPEC_CTRL is set */
+> +	ALTERNATIVE_2 "", \
+> +		"jmp 900f", X86_FEATURE_MSR_SPEC_CTRL, \
+> +		"", X86_FEATURE_V_SPEC_CTRL
+> +901:
+> +.endm
+> +
+> +.macro RESTORE_SPEC_CTRL_BODY
 
-> > > So why exactly isn't this an issue for VDPA?  Are we just burying our
-> > > head in the sand that such platforms exists and can still be useful
-> > > given the appropriate risk vs reward trade-off?  
-> > 
-> > Simply that nobody has asked for it, and might never ask for it. This
-> > is all support for old platforms, and there just doesn't seem to be a
-> > "real" use case for very new (and actually rare) NIC hardware stuck
-> > into ancient platforms with this security problem.
-> 
-> vIOMMU support for interrupt remapping is relatively new, the nesting
-> case is important as well.
+Can we split these into separate macros?  It's a bit more typing, but it's not
+immediately obvious that these are two independent chunks (I was expecting a JMP
+from the 800 section into the 900 section).
 
-This is where we got hit. In the end we fixed the qemu..
+E.g. RESTORE_GUEST_SPEC_CTRL_BODY and RESTORE_HOST_SPEC_CTRL_BODY
 
-> > I'd be much more comfortable with this as a system wide iommufd flag
-> > if we also tied it to do some demonstration of privilege - eg a
-> > requirement to open iommufd with CAP_SYS_RAWIO for instance.
-> 
-> Which is not compatible to existing use cases, which is also why we
-> can't invent some way to allow some applications to run without CPU
-> mitigations, while requiring it for others as a baseline.
+> +800:
 
-Isn't it? Didn't we learn that libvirt runs as root and will open and
-pass the iommufd as root?
+Ugh, the multiple users makes it somewhat ugly, but rather than arbitrary numbers,
+what about using named labels to make it easier to understand the branches?
 
-> > That is the usual protocol for these kinds of insecurities..
-> 
-> Hmm, is it?
+E.g.
 
-I think so. At least you should have something to shut down an
-insecure feature in kernel lockdown modes. CAP_SYS_RAWIO is a simple
-way to do it.
+---
+ arch/x86/kvm/svm/vmenter.S | 43 +++++++++++++++++++++-----------------
+ 1 file changed, 24 insertions(+), 19 deletions(-)
 
-> > I think right now we can leave this as-is and we can wait for some
-> > more information to decide how best to proceed.
-> 
-> It's certainly not acceptable in the latest proposal, iommufd consumes
-> an option set by another module and when that module goes away, so does
-> any claim of compatibility.  The code becomes dead and the feature not
-> present.  The option doesn't belong on the vfio module.  Do we need a
-> vfio-iommufd module to host it?  Thanks,
+diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
+index a02eef724379..23fd7353f0d0 100644
+--- a/arch/x86/kvm/svm/vmenter.S
++++ b/arch/x86/kvm/svm/vmenter.S
+@@ -32,24 +32,24 @@
+ 
+ .section .noinstr.text, "ax"
+ 
+-.macro RESTORE_GUEST_SPEC_CTRL
++.macro RESTORE_GUEST_SPEC_CTRL name
+ 	/* No need to do anything if SPEC_CTRL is unset or V_SPEC_CTRL is set */
+ 	ALTERNATIVE_2 "", \
+-		"jmp 800f", X86_FEATURE_MSR_SPEC_CTRL, \
++		"jmp .Lrestore_guest_spec_ctrl\name", X86_FEATURE_MSR_SPEC_CTRL, \
+ 		"", X86_FEATURE_V_SPEC_CTRL
+-801:
++.Lpost_restore_guest_spec_ctrl\name:
+ .endm
+ 
+-.macro RESTORE_HOST_SPEC_CTRL
++.macro RESTORE_HOST_SPEC_CTRL name
+ 	/* No need to do anything if SPEC_CTRL is unset or V_SPEC_CTRL is set */
+ 	ALTERNATIVE_2 "", \
+-		"jmp 900f", X86_FEATURE_MSR_SPEC_CTRL, \
++		"jmp .Lrestore_host_spec_ctrl\name", X86_FEATURE_MSR_SPEC_CTRL, \
+ 		"", X86_FEATURE_V_SPEC_CTRL
+-901:
++.Lpost_restore_host_spec_ctrl\name:
+ .endm
+ 
+-.macro RESTORE_SPEC_CTRL_BODY
+-800:
++.macro RESTORE_GUEST_SPEC_CTRL_BODY name
++.Lrestore_guest_spec_ctrl\name:
+ 	/*
+ 	 * SPEC_CTRL handling: if the guest's SPEC_CTRL value differs from the
+ 	 * host's, write the MSR.  This is kept out-of-line so that the common
+@@ -61,13 +61,16 @@
+ 	 */
+ 	movl SVM_spec_ctrl(%_ASM_DI), %eax
+ 	cmp PER_CPU_VAR(x86_spec_ctrl_current), %eax
+-	je 801b
++	je .Lpost_restore_guest_spec_ctrl\name
++
+ 	mov $MSR_IA32_SPEC_CTRL, %ecx
+ 	xor %edx, %edx
+ 	wrmsr
+-	jmp 801b
++	jmp .Lpost_restore_guest_spec_ctrl\name
++.endm
+ 
+-900:
++.macro RESTORE_HOST_SPEC_CTRL_BODY name
++.Lrestore_host_spec_ctrl\name:
+ 	/* Same for after vmexit.  */
+ 	mov $MSR_IA32_SPEC_CTRL, %ecx
+ 
+@@ -76,18 +79,18 @@
+ 	 * if it was not intercepted during guest execution.
+ 	 */
+ 	cmpb $0, (%_ASM_SP)
+-	jnz 998f
++	jnz .Lskip_save_guest_spec_ctrl\name
+ 	rdmsr
+ 	movl %eax, SVM_spec_ctrl(%_ASM_DI)
+-998:
+ 
++.Lskip_save_guest_spec_ctrl\name:
+ 	/* Now restore the host value of the MSR if different from the guest's.  */
+ 	movl PER_CPU_VAR(x86_spec_ctrl_current), %eax
+ 	cmp SVM_spec_ctrl(%_ASM_DI), %eax
+-	je 901b
++	je .Lpost_restore_host_spec_ctrl\name
+ 	xor %edx, %edx
+ 	wrmsr
+-	jmp 901b
++	jmp .Lpost_restore_host_spec_ctrl\name
+ .endm
+ 
+ 
+@@ -259,7 +262,8 @@ SYM_FUNC_START(__svm_vcpu_run)
+ 	pop %_ASM_BP
+ 	RET
+ 
+-	RESTORE_SPEC_CTRL_BODY
++	RESTORE_GUEST_SPEC_CTRL_BODY
++	RESTORE_HOST_SPEC_CTRL_BODY
+ 
+ 10:	cmpb $0, kvm_rebooting
+ 	jne 2b
+@@ -310,7 +314,7 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
+ 	mov %_ASM_ARG1, %_ASM_DI
+ .endif
+ 
+-	RESTORE_GUEST_SPEC_CTRL
++	RESTORE_GUEST_SPEC_CTRL sev_es
+ 
+ 	/* Get svm->current_vmcb->pa into RAX. */
+ 	mov SVM_current_vmcb(%_ASM_DI), %_ASM_AX
+@@ -331,7 +335,7 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
+ 	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
+ #endif
+ 
+-	RESTORE_HOST_SPEC_CTRL
++	RESTORE_HOST_SPEC_CTRL sev_es
+ 
+ 	/*
+ 	 * Mitigate RETBleed for AMD/Hygon Zen uarch. RET should be
+@@ -359,7 +363,8 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
+ 	pop %_ASM_BP
+ 	RET
+ 
+-	RESTORE_SPEC_CTRL_BODY
++	RESTORE_GUEST_SPEC_CTRL_BODY sev_es
++	RESTORE_HOST_SPEC_CTRL_BODY sev_es
+ 
+ 3:	cmpb $0, kvm_rebooting
+ 	jne 2b
 
-I don't know, as I said in the other email, these little things need
-work and discussion to resolve. We need to recheck the security stuff
-against the 2022 kernel where things have changed. We don't need to do
-it all right now.
+base-commit: 0b242ada175d97a556866c48c80310860f634579
+-- 
 
-People who want allow_unsafe_interrupts to work will simply not set
-VFIO_CONTAINER=n at this time. Same with P2P, vfio-no-iommu and any
-other gaps we haven't discovered.
+> @@ -61,6 +126,8 @@ SYM_FUNC_START(__svm_vcpu_run)
+>  	mov %_ASM_ARG1, %_ASM_DI
+>  .endif
+>
 
-vfio-iommufd seems like overkill, I think your first suggestion to put
-in vfio.ko was more practical.
+Can you add a comment to all of these to call out that RAX, RCX, and RDX might
+get clobbered?  It's easy to overlook that detail, and it matters on 32-bit where
+the arguments use RCX and RDX.  And because the clobber is conditional, it wouldn't
+be that hard for a bug to escape initial testing.
 
-My only doubt is if we should make it system wide for everything - and
-I'm just a bit uncomfortable with that from a security POV. But maybe
-I don't quite know exactly what the risks are.
+	/* This might clobber RAX, RCX, and RDX! */
 
-Jason
+> +	RESTORE_GUEST_SPEC_CTRL
