@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8448862368A
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 23:26:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C315C62368B
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 23:27:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232249AbiKIW0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 17:26:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39254 "EHLO
+        id S232170AbiKIW06 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 17:26:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232180AbiKIW0I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 17:26:08 -0500
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 090752EF61
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 14:25:50 -0800 (PST)
-Received: by mail-qt1-x82a.google.com with SMTP id z6so45829qtv.5
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 14:25:49 -0800 (PST)
+        with ESMTP id S232266AbiKIW0l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 17:26:41 -0500
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DEC22EF72
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 14:26:31 -0800 (PST)
+Received: by mail-qt1-x82d.google.com with SMTP id cg5so28870qtb.12
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 14:26:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=EJ5hbNpYS+ert13sTz7i63mDVdE2zo94Ie0Np0yf4C4=;
-        b=cfMqImfZTMZnlKj2jdeEaJuDUP7VnyM66+m8J86n6SFssRHn0iIC2F9wa9MXxIn31Z
-         V8kmlz7nUwwssqiKl9tzw+mx5niRTVNADgJ9I3AlHHXI8VfDjaRlHu/bmn4MRdJ47DPe
-         CrMuHQLM7WtrkEWKHMDMahOPpewkokSAjHfMdpZfro0KZq9ttZ+fCtEwiKZn7goTjBM0
-         Aii7jVwY8t4PkHEUuasKl2+LOiTKvLvL9xHqXWcrjrkXQ1X+K0JlRwjQvreQ3wtuY4zv
-         YYs7AZMiXseOHBgOhkwLdHU6SoeaLqqIHpXqqrLvMtrtgY748im08EE1NJB+W2EDoeyZ
-         00PQ==
+        bh=oAUOBMxP8dB8Ir4YssWbNkMVg9cZDpEfU9BX91rgGak=;
+        b=VeneRhq1xpr9sS7YxPejbDBhvhUuXA02tdqAXvI4g0QCXwvd8iv715JsOCFB1ba/YM
+         hh30GYXP4CeXVDi8TiUJB0eOSF0Njs91ayxyuzLheDPSeJPYN8BkKE4Fo7X9fbYRvS5x
+         6PgQXKofa/HI12TNokqBYytIhXXjkqCujYKqJ4EEPtccpU/KiLDNg71HIaoWzKKovBIX
+         MRciazrFLm49uyl/LlGZlXs3CKly5WesDB/GkiystWQbyFBIX86FhWMzox4t9nKyMtA1
+         gUfHFE7acbAQkU3/k+67fke7tx2eaHCLmJM827CJVY8y4btUbC0Ps4xHRoz/79XLe7O+
+         K8ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EJ5hbNpYS+ert13sTz7i63mDVdE2zo94Ie0Np0yf4C4=;
-        b=fJk9nTXRTfUFgoVXmcerfkxKPOOrjM0oESrI3pN3pZTjY+PI4lazC8oS7w981OeEVN
-         dvAoGwCMCjQmBlHmhqSmthAixSDyW+cyYk1nERivOmLpgaN6t09adX+xQqsitG6B12i1
-         WOcG6ekM9ijPMhY0NajnA2BZsYvszwFP2aH/8cetSih1PStwuEcWGe1aviVql17i0F2v
-         N7v0lky9WAAmvhWBVaakP58GRsrRWCoGAdM+IKwiLCbDc74CYHJFthmK4y3/wUc9VqYb
-         1hiWhjLWnK4BggMRpNJics3Hh9RW4nFR7ecpDgjj6HPJr26CznHCLYZH0ylE2PX2nV0D
-         pY6A==
-X-Gm-Message-State: ANoB5pmL1layPsW46G2qcVKAaR2XjQ7acUyAhMta5tNljUYTKpI+AGeT
-        IQ1BGE5RYSJmWuOYnjIU/Z1viEBC3ttvOKFgQ07drQ==
-X-Google-Smtp-Source: AA0mqf6b1QwQU+t2rhpz0pYfoh8FoW+OMhhjudxrUGJuaDbrsZeDMXk8N/bPz9y5AXGikecVlQYPq4Ul5OIWkT/wRxI=
-X-Received: by 2002:ac8:5ac2:0:b0:3a5:afca:2322 with SMTP id
- d2-20020ac85ac2000000b003a5afca2322mr4280890qtd.500.1668032749051; Wed, 09
- Nov 2022 14:25:49 -0800 (PST)
+        bh=oAUOBMxP8dB8Ir4YssWbNkMVg9cZDpEfU9BX91rgGak=;
+        b=CQuA9htfvnHXlIfg3fp8MBiLP55K/z00rxZdaJjIjZcejULo5BA4/B9andOlLXqC8r
+         eUyvSx6uKa4LXz7PNLRwNYWEMCPTZYUJZ2DqVO1EMfuFsJtpjBCeV5WNQWmQHwbc4F88
+         swu6EYBli1GwU5ZNllniUkgbYsQHCYrCvxQjMOY1lqaY7cxCiY7X8E0//W9mmPwjSB9K
+         GRTO4JDAeTTd2m2EfNq5w+64HkiVD/EkDdUx+YwIZALXUp+Hty7Z2TjlDNh/CPexSLAY
+         N2URA9FJ8M0luFzXJZYt3EqrJbzwqMmSL5a3oKMq2pA6OOVfTSeI7DPy1OU1CFXKCFn/
+         6WjA==
+X-Gm-Message-State: ACrzQf2qz66BArI8K10lRCx80X9gTlXGUpFD3JA6qawp3l+uQZ9d/m71
+        If9INfMZiw8HsJoss6ZH7R6g7HkXIkrkP5ztG7Q9UA==
+X-Google-Smtp-Source: AMsMyM5Arj5J8c++baYRrsSAnGqOSTXeqtq+H9LxLTEfx8wPShN5wDgxrWhBJQMRLwIIQoeb2vb9+dRXg347LtQre4o=
+X-Received: by 2002:ac8:7d4d:0:b0:3a5:5987:432b with SMTP id
+ h13-20020ac87d4d000000b003a55987432bmr26360282qtb.566.1668032790527; Wed, 09
+ Nov 2022 14:26:30 -0800 (PST)
 MIME-Version: 1.0
-References: <20221107215644.1895162-1-oliver.upton@linux.dev> <20221107215644.1895162-9-oliver.upton@linux.dev>
-In-Reply-To: <20221107215644.1895162-9-oliver.upton@linux.dev>
+References: <20221107215644.1895162-1-oliver.upton@linux.dev> <20221107215644.1895162-10-oliver.upton@linux.dev>
+In-Reply-To: <20221107215644.1895162-10-oliver.upton@linux.dev>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 9 Nov 2022 14:25:38 -0800
-Message-ID: <CANgfPd9fynvsBLjio1zz0hPy4SGAd8XZfzYQaR_gg0UJrOyAcA@mail.gmail.com>
-Subject: Re: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
+Date:   Wed, 9 Nov 2022 14:26:19 -0800
+Message-ID: <CANgfPd9SK=9jUYh+aMXwYCf2-JtoJtSZ_BDmbjiZX=nvG-9uXA@mail.gmail.com>
+Subject: Re: [PATCH v5 09/14] KVM: arm64: Atomically update stage 2 leaf
+ attributes in parallel walks
 To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -75,185 +76,133 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 7, 2022 at 1:57 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+On Mon, Nov 7, 2022 at 1:58 PM Oliver Upton <oliver.upton@linux.dev> wrote:
 >
-> Use RCU to safely walk the stage-2 page tables in parallel. Acquire and
-> release the RCU read lock when traversing the page tables. Defer the
-> freeing of table memory to an RCU callback. Indirect the calls into RCU
-> and provide stubs for hypervisor code, as RCU is not available in such a
-> context.
+> The stage2 attr walker is already used for parallel walks. Since commit
+> f783ef1c0e82 ("KVM: arm64: Add fast path to handle permission relaxation
+> during dirty logging"), KVM acquires the read lock when
+> write-unprotecting a PTE. However, the walker only uses a simple store
+> to update the PTE. This is safe as the only possible race is with
+> hardware updates to the access flag, which is benign.
 >
-> The RCU protection doesn't amount to much at the moment, as readers are
-> already protected by the read-write lock (all walkers that free table
-> memory take the write lock). Nonetheless, a subsequent change will
-> futher relax the locking requirements around the stage-2 MMU, thereby
-> depending on RCU.
+> However, a subsequent change to KVM will allow more changes to the stage
+> 2 page tables to be done in parallel. Prepare the stage 2 attribute
+> walker by performing atomic updates to the PTE when walking in parallel.
 >
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h | 49 ++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 10 +++++-
->  arch/arm64/kvm/mmu.c                 | 14 +++++++-
->  3 files changed, 71 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/hyp/pgtable.c | 31 ++++++++++++++++++++++---------
+>  1 file changed, 22 insertions(+), 9 deletions(-)
 >
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index e70cf57b719e..7634b6964779 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -37,6 +37,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
->
->  typedef u64 kvm_pte_t;
->
-> +/*
-> + * RCU cannot be used in a non-kernel context such as the hyp. As such, page
-> + * table walkers used in hyp do not call into RCU and instead use other
-> + * synchronization mechanisms (such as a spinlock).
-> + */
-> +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
-> +
->  typedef kvm_pte_t *kvm_pteref_t;
->
->  static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-> @@ -44,6 +51,40 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
->         return pteref;
->  }
->
-> +static inline void kvm_pgtable_walk_begin(void) {}
-> +static inline void kvm_pgtable_walk_end(void) {}
-> +
-> +static inline bool kvm_pgtable_walk_lock_held(void)
-> +{
-> +       return true;
-
-Forgive my ignorance, but does hyp not use a MMU lock at all? Seems
-like this would be a good place to add a lockdep check.
-
-> +}
-> +
-> +#else
-> +
-> +typedef kvm_pte_t __rcu *kvm_pteref_t;
-> +
-> +static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-> +{
-> +       return rcu_dereference_check(pteref, !shared);
-
-Same here, could add a lockdep check depending on shared.
-
-> +}
-> +
-> +static inline void kvm_pgtable_walk_begin(void)
-> +{
-> +       rcu_read_lock();
-> +}
-> +
-> +static inline void kvm_pgtable_walk_end(void)
-> +{
-> +       rcu_read_unlock();
-> +}
-> +
-> +static inline bool kvm_pgtable_walk_lock_held(void)
-> +{
-> +       return rcu_read_lock_held();
-
-Likewise could do some lockdep here.
-
-> +}
-> +
-> +#endif
-> +
->  #define KVM_PTE_VALID                  BIT(0)
->
->  #define KVM_PTE_ADDR_MASK              GENMASK(47, PAGE_SHIFT)
-> @@ -202,11 +243,14 @@ struct kvm_pgtable {
->   *                                     children.
->   * @KVM_PGTABLE_WALK_TABLE_POST:       Visit table entries after their
->   *                                     children.
-> + * @KVM_PGTABLE_WALK_SHARED:           Indicates the page-tables may be shared
-> + *                                     with other software walkers.
->   */
->  enum kvm_pgtable_walk_flags {
->         KVM_PGTABLE_WALK_LEAF                   = BIT(0),
->         KVM_PGTABLE_WALK_TABLE_PRE              = BIT(1),
->         KVM_PGTABLE_WALK_TABLE_POST             = BIT(2),
-> +       KVM_PGTABLE_WALK_SHARED                 = BIT(3),
-
-Not sure if necessary, but it might pay to have 3 shared options:
-exclusive, shared mmu lock, no mmu lock if we ever want lockless fast
-page faults.
-
-
->  };
->
->  struct kvm_pgtable_visit_ctx {
-> @@ -223,6 +267,11 @@ struct kvm_pgtable_visit_ctx {
->  typedef int (*kvm_pgtable_visitor_fn_t)(const struct kvm_pgtable_visit_ctx *ctx,
->                                         enum kvm_pgtable_walk_flags visit);
->
-> +static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *ctx)
-> +{
-> +       return ctx->flags & KVM_PGTABLE_WALK_SHARED;
-> +}
-> +
->  /**
->   * struct kvm_pgtable_walker - Hook into a page-table walk.
->   * @cb:                Callback function to invoke during the walk.
 > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 7c9782347570..d8d963521d4e 100644
+> index d8d963521d4e..a34e2050f931 100644
 > --- a/arch/arm64/kvm/hyp/pgtable.c
 > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -171,6 +171,9 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
->                                   enum kvm_pgtable_walk_flags visit)
+> @@ -185,7 +185,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+>                                       kvm_pteref_t pteref, u32 level)
 >  {
->         struct kvm_pgtable_walker *walker = data->walker;
-> +
-> +       /* Ensure the appropriate lock is held (e.g. RCU lock for stage-2 MMU) */
-> +       WARN_ON_ONCE(kvm_pgtable_walk_shared(ctx) && !kvm_pgtable_walk_lock_held());
->         return walker->cb(ctx, visit);
+>         enum kvm_pgtable_walk_flags flags = data->walker->flags;
+> -       kvm_pte_t *ptep = kvm_dereference_pteref(pteref, false);
+> +       kvm_pte_t *ptep = kvm_dereference_pteref(pteref, flags & KVM_PGTABLE_WALK_SHARED);
+>         struct kvm_pgtable_visit_ctx ctx = {
+>                 .ptep   = ptep,
+>                 .old    = READ_ONCE(*ptep),
+> @@ -675,6 +675,16 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
+>         return !!pte;
 >  }
 >
-> @@ -281,8 +284,13 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
->                 .end    = PAGE_ALIGN(walk_data.addr + size),
->                 .walker = walker,
->         };
-> +       int r;
-> +
-> +       kvm_pgtable_walk_begin();
-> +       r = _kvm_pgtable_walk(pgt, &walk_data);
-> +       kvm_pgtable_walk_end();
->
-> -       return _kvm_pgtable_walk(pgt, &walk_data);
-> +       return r;
->  }
->
->  struct leaf_walk_data {
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 73ae908eb5d9..52e042399ba5 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -130,9 +130,21 @@ static void kvm_s2_free_pages_exact(void *virt, size_t size)
->
->  static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
->
-> +static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
+> +static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
 > +{
-> +       struct page *page = container_of(head, struct page, rcu_head);
-> +       void *pgtable = page_to_virt(page);
-> +       u32 level = page_private(page);
+> +       if (!kvm_pgtable_walk_shared(ctx)) {
+> +               WRITE_ONCE(*ctx->ptep, new);
+> +               return true;
+> +       }
 > +
-> +       kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, pgtable, level);
+> +       return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
 > +}
 > +
->  static void stage2_free_removed_table(void *addr, u32 level)
+>  static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
+>                            struct kvm_pgtable_mm_ops *mm_ops)
 >  {
-> -       kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, addr, level);
-> +       struct page *page = virt_to_page(addr);
+> @@ -986,7 +996,9 @@ static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>                     stage2_pte_executable(pte) && !stage2_pte_executable(ctx->old))
+>                         mm_ops->icache_inval_pou(kvm_pte_follow(pte, mm_ops),
+>                                                   kvm_granule_size(ctx->level));
+> -               WRITE_ONCE(*ctx->ptep, pte);
 > +
-> +       set_page_private(page, (unsigned long)level);
-> +       call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
+> +               if (!stage2_try_set_pte(ctx, pte))
+> +                       return -EAGAIN;
+>         }
+>
+>         return 0;
+> @@ -995,7 +1007,7 @@ static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>  static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+>                                     u64 size, kvm_pte_t attr_set,
+>                                     kvm_pte_t attr_clr, kvm_pte_t *orig_pte,
+> -                                   u32 *level)
+> +                                   u32 *level, enum kvm_pgtable_walk_flags flags)
+>  {
+>         int ret;
+>         kvm_pte_t attr_mask = KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI;
+> @@ -1006,7 +1018,7 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+>         struct kvm_pgtable_walker walker = {
+>                 .cb             = stage2_attr_walker,
+>                 .arg            = &data,
+> -               .flags          = KVM_PGTABLE_WALK_LEAF,
+> +               .flags          = flags | KVM_PGTABLE_WALK_LEAF,
+>         };
+>
+>         ret = kvm_pgtable_walk(pgt, addr, size, &walker);
+> @@ -1025,14 +1037,14 @@ int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  {
+>         return stage2_update_leaf_attrs(pgt, addr, size, 0,
+>                                         KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+> -                                       NULL, NULL);
+> +                                       NULL, NULL, 0);
 >  }
 >
->  static void kvm_host_get_page(void *addr)
+>  kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr)
+>  {
+>         kvm_pte_t pte = 0;
+>         stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
+> -                                &pte, NULL);
+> +                                &pte, NULL, 0);
+>         dsb(ishst);
+>         return pte;
+>  }
+> @@ -1041,7 +1053,7 @@ kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr)
+>  {
+>         kvm_pte_t pte = 0;
+>         stage2_update_leaf_attrs(pgt, addr, 1, 0, KVM_PTE_LEAF_ATTR_LO_S2_AF,
+> -                                &pte, NULL);
+> +                                &pte, NULL, 0);
+>         /*
+>          * "But where's the TLBI?!", you scream.
+>          * "Over in the core code", I sigh.
+> @@ -1054,7 +1066,7 @@ kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr)
+>  bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
+>  {
+>         kvm_pte_t pte = 0;
+> -       stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL);
+> +       stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL, 0);
+
+Would be nice to have an enum for KVM_PGTABLE_WALK_EXCLUSIVE so this
+doesn't just have to pass 0.
+
+
+>         return pte & KVM_PTE_LEAF_ATTR_LO_S2_AF;
+>  }
+>
+> @@ -1077,7 +1089,8 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+>         if (prot & KVM_PGTABLE_PROT_X)
+>                 clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+>
+> -       ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level);
+> +       ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level,
+> +                                      KVM_PGTABLE_WALK_SHARED);
+>         if (!ret)
+>                 kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
+>         return ret;
 > --
 > 2.38.1.431.g37b22c650d-goog
 >
