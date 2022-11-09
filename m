@@ -2,116 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D08976237B9
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 00:52:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1E5B6237CD
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 00:55:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232018AbiKIXwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 18:52:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48760 "EHLO
+        id S232068AbiKIXzz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 18:55:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231939AbiKIXwE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 18:52:04 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B91DEDF;
-        Wed,  9 Nov 2022 15:52:03 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A9M6Wmk026925;
-        Wed, 9 Nov 2022 23:51:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=r2y6FqBtbLq2FplQA0MEJ5QEQdgEf4YRwMBtghSYQ50=;
- b=NUoO9/P5o4yJwUu1TaYaJ9GIivUKJRvnKaAnO5G1f7SmkqRWmDAw6fRFpXdBrmV6gLDl
- RZ2IaQ3wTzFFDsPScmvNYA7xZ+e2oROB9i4sY9Xx9nyp/xkEkzGEWP1sZj2NH0AM4tBh
- HKoFOCUZ4RF+RHAAsjajGCfbP+YZM7eIIZfExWmWEyzVIG5Y4PRRsDpqM7ey7IM5Q6Dx
- wsRycAa3Xb4mcxO2RdnbHPADWgvwg8pqILqwkj1DbyyfsjSkB7yvfH5Pgil7Wy9OZ1DV
- fwGWwbaXMAHXMvCtcBWOJyobmX4qPysC6d/MWz1z3QG1uapdjgQCBvCXICS+SaASF1CE 8Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3krkgubm6e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Nov 2022 23:51:12 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A9NhXNd004196;
-        Wed, 9 Nov 2022 23:51:11 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3krkgubm66-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Nov 2022 23:51:11 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A9No9Gq008858;
-        Wed, 9 Nov 2022 23:51:10 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma01dal.us.ibm.com with ESMTP id 3kngsyh2p8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Nov 2022 23:51:10 +0000
-Received: from smtpav03.dal12v.mail.ibm.com ([9.208.128.129])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A9NpAlG47644974
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 9 Nov 2022 23:51:10 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6F6CD5805A;
-        Wed,  9 Nov 2022 23:51:08 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C9CCB58068;
-        Wed,  9 Nov 2022 23:51:05 +0000 (GMT)
-Received: from [9.160.191.98] (unknown [9.160.191.98])
-        by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Wed,  9 Nov 2022 23:51:05 +0000 (GMT)
-Message-ID: <6ddf657f-9ec7-6de5-62f4-508d61a467fe@linux.ibm.com>
-Date:   Wed, 9 Nov 2022 18:51:05 -0500
+        with ESMTP id S232057AbiKIXzr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 18:55:47 -0500
+Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD2E324F2C
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 15:55:41 -0800 (PST)
+Date:   Wed, 9 Nov 2022 23:55:31 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1668038136;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=CMDbvPwRm+rrl6bjWjpWDOlNg7vwputyd1P9f5sAr6k=;
+        b=TdavPo/9nDF2eoDdQROxJ9deOixtHkiiM66l+3DB4HC/VxfCurqHMnXZgooMmawAqSAHEp
+        dq3CDwbPCdQ4Y+S+dZSll286UnKJcKfKIw6vJitHvjbCJtNDshGqU2kiQYxQOu1dw535fw
+        LK72OZDLP2NaLxzryR8sVaq9n09Q8Xw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Quentin Perret <qperret@google.com>,
+        Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
+        kvmarm@lists.linux.dev
+Subject: Re: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
+Message-ID: <Y2w98zPmtefJlNfa@google.com>
+References: <20221107215644.1895162-1-oliver.upton@linux.dev>
+ <20221107215644.1895162-9-oliver.upton@linux.dev>
+ <Y2whaWo3SIOOMKOE@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH v4 15/17] iommufd: Add a selftest
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>, bpf@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-References: <15-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <15-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: NVWUBpQHwQeub4Vtor_WE-ljRzrQR9IE
-X-Proofpoint-GUID: ZRDWBG7lTzZ5mzkpMVZQghrekqNfJFmA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-09_06,2022-11-09_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- malwarescore=0 mlxlogscore=999 spamscore=0 clxscore=1011
- lowpriorityscore=0 adultscore=0 bulkscore=0 suspectscore=0
- priorityscore=1501 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2210170000 definitions=main-2211090177
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y2whaWo3SIOOMKOE@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
         SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -119,29 +56,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/7/22 7:49 PM, Jason Gunthorpe wrote:
-> Cover the essential functionality of the iommufd with a directed
-> test. This aims to achieve reasonable functional coverage using the
-> in-kernel self test framework.
+On Wed, Nov 09, 2022 at 09:53:45PM +0000, Sean Christopherson wrote:
+> On Mon, Nov 07, 2022, Oliver Upton wrote:
+> > Use RCU to safely walk the stage-2 page tables in parallel. Acquire and
+> > release the RCU read lock when traversing the page tables. Defer the
+> > freeing of table memory to an RCU callback. Indirect the calls into RCU
+> > and provide stubs for hypervisor code, as RCU is not available in such a
+> > context.
+> > 
+> > The RCU protection doesn't amount to much at the moment, as readers are
+> > already protected by the read-write lock (all walkers that free table
+> > memory take the write lock). Nonetheless, a subsequent change will
+> > futher relax the locking requirements around the stage-2 MMU, thereby
+> > depending on RCU.
 > 
-> It provides a mock kernel module for the iommu_domain that allows it to
-> run without any HW and the mocking provides a way to directly validate
-> that the PFNs loaded into the iommu_domain are correct.
-> 
-> The mock also simulates the rare case of PAGE_SIZE > iommu page size as
-> the mock will operate at a 2K iommu page size. This allows exercising all
-> of the calculations to support this mismatch.
-> 
-> This allows achieving high coverage of the corner cases in the iopt_pages.
-> 
-> However, it is an unusually invasive config option to enable all of
-> this. The config option should not be enabled in a production kernel.
-> 
-> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> Two somewhat off-topic questions (because I'm curious):
 
-Ran the selftests on s390 in both LPAR (z16) and a QEMU kvm guest using 1M hugepages, all tests are passing.
+Worth asking!
 
-Tested-by: Matthew Rosato <mjrosato@linux.ibm.com> # s390
+>  1. Are there plans to enable "fast" page faults on ARM?  E.g. to fixup access
+>     faults (handle_access_fault()) and/or write-protection faults without acquiring
+>     mmu_lock?
+
+I don't have any plans personally.
+
+OTOH, adding support for read-side access faults is trivial, I just
+didn't give it much thought as most large-scale implementations have
+FEAT_HAFDBS (hardware access flag management).
+
+>  2. If the answer to (1) is "yes!", what's the plan to protect the lockless walks
+>     for the RCU-less hypervisor code?
+
+If/when we are worried about fault serialization in the lowvisor I was
+thinking something along the lines of disabling interrupts and using
+IPIs as barriers before freeing removed table memory, crudely giving the
+same protection as RCU.
+
+--
+Thanks,
+Oliver
