@@ -2,104 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 181666224BB
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 08:36:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6DAA6224CC
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 08:42:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229917AbiKIHgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 02:36:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42920 "EHLO
+        id S229644AbiKIHmS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 02:42:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229910AbiKIHf7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 02:35:59 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 014F31B1EA;
-        Tue,  8 Nov 2022 23:35:51 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 00F89B81D2A;
-        Wed,  9 Nov 2022 07:35:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16CA2C433D7;
-        Wed,  9 Nov 2022 07:35:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1667979348;
-        bh=QB013233+R/iglugH58wCtHW/3scKZz7VosiLXkZFvs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=S7eZY2mDXpccT9ZwV6U2RNKAi1eIc7W/1/kVLp9HEU1LqUwYQY5CXECheTUTOAVkv
-         968VjP00uhljDX5dOhDE5R2Odn8h2gJXIJQznABxMVenmSE4h7yEvrez5si5ud6xhN
-         L4eZP1K3zQFz4Wkamm91Z9EkrP+0svuZSlmGKPqQ=
-Date:   Wed, 9 Nov 2022 08:35:45 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
-        Alexandru Ciobotaru <alcioa@amazon.com>,
-        Marcelo Cerri <marcelo.cerri@canonical.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Tim Gardner <tim.gardner@canonical.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>,
-        The AWS Nitro Enclaves Team 
-        <aws-nitro-enclaves-devel@amazon.com>
-Subject: Re: [PATCH v1] MAINTAINERS: Update entries from the Nitro Enclaves
- section
-Message-ID: <Y2tYUeVXgIo7ONfA@kroah.com>
-References: <20221108185912.15792-1-andraprs@amazon.com>
- <Y2qtFONe55pYI7oC@kroah.com>
- <a302bf1b-0263-ccff-b8c9-a3ce9db65f55@amazon.com>
+        with ESMTP id S229777AbiKIHmR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 02:42:17 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 783741DDE4
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 23:42:15 -0800 (PST)
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4N6cNq6r4bzHvKK;
+        Wed,  9 Nov 2022 15:41:47 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 9 Nov 2022 15:42:12 +0800
+Received: from [10.67.103.158] (10.67.103.158) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 9 Nov 2022 15:42:11 +0800
+Subject: Re: [PATCH vfio 01/13] vfio: Add an option to get migration data size
+To:     Yishai Hadas <yishaih@nvidia.com>, <alex.williamson@redhat.com>,
+        <jgg@nvidia.com>
+CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
+        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
+        <shayd@nvidia.com>, <maorg@nvidia.com>, <avihaih@nvidia.com>,
+        <cohuck@redhat.com>
+References: <20221106174630.25909-1-yishaih@nvidia.com>
+ <20221106174630.25909-2-yishaih@nvidia.com>
+From:   liulongfang <liulongfang@huawei.com>
+Message-ID: <ea4bc132-0520-f156-3fca-ec0a89e09a3d@huawei.com>
+Date:   Wed, 9 Nov 2022 15:42:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a302bf1b-0263-ccff-b8c9-a3ce9db65f55@amazon.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221106174630.25909-2-yishaih@nvidia.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.158]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 08, 2022 at 10:53:34PM +0200, Paraschiv, Andra-Irina wrote:
+On 2022/11/7 1:46, Yishai Hadas Wrote:
+> Add an option to get migration data size by introducing a new migration
+> feature named VFIO_DEVICE_FEATURE_MIG_DATA_SIZE.
 > 
+> Upon VFIO_DEVICE_FEATURE_GET the estimated data length that will be
+> required to complete STOP_COPY is returned.
 > 
-> On 08.11.2022 21:25, Greg KH wrote:
-> > 
-> > On Tue, Nov 08, 2022 at 08:59:12PM +0200, Andra Paraschiv wrote:
-> > > Update the list of maintainers for the Nitro Enclaves project. Alex
-> > > (lexnv@) is not working at Amazon anymore and there will be the same
-> > > case for me starting with 2023.
-> > > 
-> > > Add a reference to the mailing list of the Nitro Enclaves development
-> > > team.
-> > > 
-> > > Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
-> > > ---
-> > >   MAINTAINERS | 3 +--
-> > >   1 file changed, 1 insertion(+), 2 deletions(-)
-> > > 
-> > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > index 046ff06ff97f..af2c178ba0dc 100644
-> > > --- a/MAINTAINERS
-> > > +++ b/MAINTAINERS
-> > > @@ -14564,10 +14564,9 @@ T:   git git://git.kernel.org/pub/scm/linux/kernel/git/dinguyen/linux.git
-> > >   F:   arch/nios2/
-> > > 
-> > >   NITRO ENCLAVES (NE)
-> > > -M:   Andra Paraschiv <andraprs@amazon.com>
-> > > -M:   Alexandru Vasile <lexnv@amazon.com>
-> > 
-> > I need an ack from Alexandru too.
+> This option may better enable user space to consider before moving to
+> STOP_COPY whether it can meet the downtime SLA based on the returned
+> data.
 > 
-> He is not working at Amazon anymore, but I sent a message to him with the
-> reference to this mail thread. Hope that he could see the message and get
-> back with a reply on this mail thread.
+> The patch also includes the implementation for mlx5 and hisi for this
+> new option to make it feature complete for the existing drivers in this
+> area.
+> 
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> ---
+>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |  9 ++++++
+>  drivers/vfio/pci/mlx5/main.c                  | 18 +++++++++++
+>  drivers/vfio/pci/vfio_pci_core.c              |  3 +-
+>  drivers/vfio/vfio_main.c                      | 32 +++++++++++++++++++
+>  include/linux/vfio.h                          |  5 +++
+>  include/uapi/linux/vfio.h                     | 13 ++++++++
+>  6 files changed, 79 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> index 39eeca18a0f7..0c0c0c7f0521 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> @@ -957,6 +957,14 @@ hisi_acc_vfio_pci_set_device_state(struct vfio_device *vdev,
+>  	return res;
+>  }
+>  
+> +static int
+> +hisi_acc_vfio_pci_get_data_size(struct vfio_device *vdev,
+> +				unsigned long *stop_copy_length)
+> +{
+> +	*stop_copy_length = sizeof(struct acc_vf_data);
+> +	return 0;
+> +}
+> +
+>  static int
+>  hisi_acc_vfio_pci_get_device_state(struct vfio_device *vdev,
+>  				   enum vfio_device_mig_state *curr_state)
+> @@ -1213,6 +1221,7 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
+>  static const struct vfio_migration_ops hisi_acc_vfio_pci_migrn_state_ops = {
+>  	.migration_set_state = hisi_acc_vfio_pci_set_device_state,
+>  	.migration_get_state = hisi_acc_vfio_pci_get_device_state,
+> +	.migration_get_data_size = hisi_acc_vfio_pci_get_data_size,
+>  };
+>  
 
-Ok, if that doesn't happen, just send a version of that patch removing
-you.
+Reviewed-by: Longfang Liu <liulongfang@huawei.com>
 
-thanks,
+Thanks.
 
-greg k-h
+>  static int hisi_acc_vfio_pci_migrn_init_dev(struct vfio_device *core_vdev)
+> diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
+> index fd6ccb8454a2..4c7a39ffd247 100644
+> --- a/drivers/vfio/pci/mlx5/main.c
+> +++ b/drivers/vfio/pci/mlx5/main.c
+> @@ -512,6 +512,23 @@ mlx5vf_pci_set_device_state(struct vfio_device *vdev,
+>  	return res;
+>  }
+>  
+> +static int mlx5vf_pci_get_data_size(struct vfio_device *vdev,
+> +				    unsigned long *stop_copy_length)
+> +{
+> +	struct mlx5vf_pci_core_device *mvdev = container_of(
+> +		vdev, struct mlx5vf_pci_core_device, core_device.vdev);
+> +	size_t state_size;
+> +	int ret;
+> +
+> +	mutex_lock(&mvdev->state_mutex);
+> +	ret = mlx5vf_cmd_query_vhca_migration_state(mvdev,
+> +						    &state_size);
+> +	if (!ret)
+> +		*stop_copy_length = state_size;
+> +	mlx5vf_state_mutex_unlock(mvdev);
+> +	return ret;
+> +}
+> +
+>  static int mlx5vf_pci_get_device_state(struct vfio_device *vdev,
+>  				       enum vfio_device_mig_state *curr_state)
+>  {
+> @@ -577,6 +594,7 @@ static void mlx5vf_pci_close_device(struct vfio_device *core_vdev)
+>  static const struct vfio_migration_ops mlx5vf_pci_mig_ops = {
+>  	.migration_set_state = mlx5vf_pci_set_device_state,
+>  	.migration_get_state = mlx5vf_pci_get_device_state,
+> +	.migration_get_data_size = mlx5vf_pci_get_data_size,
+>  };
+>  
+>  static const struct vfio_log_ops mlx5vf_pci_log_ops = {
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index badc9d828cac..4d97ca66ba6c 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -2128,7 +2128,8 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
+>  
+>  	if (vdev->vdev.mig_ops) {
+>  		if (!(vdev->vdev.mig_ops->migration_get_state &&
+> -		      vdev->vdev.mig_ops->migration_set_state) ||
+> +		      vdev->vdev.mig_ops->migration_set_state &&
+> +		      vdev->vdev.mig_ops->migration_get_data_size) ||
+>  		    !(vdev->vdev.migration_flags & VFIO_MIGRATION_STOP_COPY))
+>  			return -EINVAL;
+>  	}
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 2d168793d4e1..b118e7b1bc59 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -1256,6 +1256,34 @@ vfio_ioctl_device_feature_mig_device_state(struct vfio_device *device,
+>  	return 0;
+>  }
+>  
+> +static int
+> +vfio_ioctl_device_feature_migration_data_size(struct vfio_device *device,
+> +					      u32 flags, void __user *arg,
+> +					      size_t argsz)
+> +{
+> +	struct vfio_device_feature_mig_data_size data_size = {};
+> +	unsigned long stop_copy_length;
+> +	int ret;
+> +
+> +	if (!device->mig_ops)
+> +		return -ENOTTY;
+> +
+> +	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_GET,
+> +				 sizeof(data_size));
+> +	if (ret != 1)
+> +		return ret;
+> +
+> +	ret = device->mig_ops->migration_get_data_size(device, &stop_copy_length);
+> +	if (ret)
+> +		return ret;
+> +
+> +	data_size.stop_copy_length = stop_copy_length;
+> +	if (copy_to_user(arg, &data_size, sizeof(data_size)))
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+>  static int vfio_ioctl_device_feature_migration(struct vfio_device *device,
+>  					       u32 flags, void __user *arg,
+>  					       size_t argsz)
+> @@ -1483,6 +1511,10 @@ static int vfio_ioctl_device_feature(struct vfio_device *device,
+>  		return vfio_ioctl_device_feature_logging_report(
+>  			device, feature.flags, arg->data,
+>  			feature.argsz - minsz);
+> +	case VFIO_DEVICE_FEATURE_MIG_DATA_SIZE:
+> +		return vfio_ioctl_device_feature_migration_data_size(
+> +			device, feature.flags, arg->data,
+> +			feature.argsz - minsz);
+>  	default:
+>  		if (unlikely(!device->ops->device_feature))
+>  			return -EINVAL;
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index e7cebeb875dd..5509451ae709 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -107,6 +107,9 @@ struct vfio_device_ops {
+>   * @migration_get_state: Optional callback to get the migration state for
+>   *         devices that support migration. It's mandatory for
+>   *         VFIO_DEVICE_FEATURE_MIGRATION migration support.
+> + * @migration_get_data_size: Optional callback to get the estimated data
+> + *          length that will be required to complete stop copy. It's mandatory for
+> + *          VFIO_DEVICE_FEATURE_MIGRATION migration support.
+>   */
+>  struct vfio_migration_ops {
+>  	struct file *(*migration_set_state)(
+> @@ -114,6 +117,8 @@ struct vfio_migration_ops {
+>  		enum vfio_device_mig_state new_state);
+>  	int (*migration_get_state)(struct vfio_device *device,
+>  				   enum vfio_device_mig_state *curr_state);
+> +	int (*migration_get_data_size)(struct vfio_device *device,
+> +				       unsigned long *stop_copy_length);
+>  };
+>  
+>  /**
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index d7d8e0922376..3e45dbaf190e 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1128,6 +1128,19 @@ struct vfio_device_feature_dma_logging_report {
+>  
+>  #define VFIO_DEVICE_FEATURE_DMA_LOGGING_REPORT 8
+>  
+> +/*
+> + * Upon VFIO_DEVICE_FEATURE_GET read back the estimated data length that will
+> + * be required to complete stop copy.
+> + *
+> + * Note: Can be called on each device state.
+> + */
+> +
+> +struct vfio_device_feature_mig_data_size {
+> +	__aligned_u64 stop_copy_length;
+> +};
+> +
+> +#define VFIO_DEVICE_FEATURE_MIG_DATA_SIZE 9
+> +
+>  /* -------- API for Type1 VFIO IOMMU -------- */
+>  
+>  /**
+> 
