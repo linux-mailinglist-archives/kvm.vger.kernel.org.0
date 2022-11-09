@@ -2,411 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 912606220FD
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 01:53:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59FC8622100
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 01:55:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbiKIAxv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 19:53:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44512 "EHLO
+        id S229952AbiKIAzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 19:55:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229911AbiKIAxt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 19:53:49 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCFC81F9E4
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 16:53:47 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id s196so14863016pgs.3
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 16:53:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=lSPwRWjaEF/LeVzWwfEyhyHq6my7W3G8KqemGhh/zlQ=;
-        b=KTXPFBq0j8DL7aghY2zF3UtVyVdwG5tWKkoRKkfPk2CGL/kZCHevjQLUilekZPEA4k
-         nK3vxdNv20fVQapDOb6SKuM7Gwbmp1NRWJuFoGVsf7f2ayP3r4VW9EnVw9+Zclqj0gDS
-         PsZpj9JFHXdN0WgSjKhVAqYdJtY/hVJE5uljMFPEHRe2RmDwnQPkSYwyEXJy69jGMjff
-         LhBQVbeQ0pJR2qx9d+eKj7np6bSovO5y7TYBPqhFr8sTitEBIM2Ci2+Zpl0PQqczXsOm
-         yiIE85Avse/JxmLgmtfUaPiOVAMCFJT+unGLlnR3mhlEyrIuk9vt4BOh+/qNiLGq+xV2
-         vUdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lSPwRWjaEF/LeVzWwfEyhyHq6my7W3G8KqemGhh/zlQ=;
-        b=1aWM03KC9T1Ha4LDXlOR4qBQsLbJm/X3KUDddFneLaVQj0KLbauvEijsoV1QDqZiMU
-         0QLinuKTqu0skUNZ5YDvridJ6BjGBRHYjo+0NB6/jiMXD/RPLRLCuO0fxk5ncIaq3jvg
-         yAfHGJ74CNl9Jut/j8WmW5DC9l4BUMVoof+ncBr5vtCOcPZrvZ9b8h/AjfQdcA65wNRQ
-         MWTEvCZr6SlTHuYcVpQHO85NUQtxBYSeQZXlmpc2ECypcsLR2UKyhoAp3CwI5vDX0i+V
-         5fMVwkgwWIJv4UlBIB/QY5fcWOpR9AWPVXT2e3qNRkJ0W+G/tcCSxdYZqOColQ8VzDx+
-         CoKw==
-X-Gm-Message-State: ACrzQf0hntWbyuRb8o8rT/COhgIkS/A90e42G9bSQzT3hIw3Ej20B0Gl
-        XFaQgQNr6fFonDwhGq5C/kPpwA==
-X-Google-Smtp-Source: AMsMyM4Yhi4/gggSnC74XQ5ZkcpZGD6bO98vhJvQj1gcS0CktwwTLuXp5UqTwzwaAUVm48YIp3WoPA==
-X-Received: by 2002:a63:185c:0:b0:46f:4a36:9a6f with SMTP id 28-20020a63185c000000b0046f4a369a6fmr48790934pgy.22.1667955227179;
-        Tue, 08 Nov 2022 16:53:47 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id p5-20020a170902780500b00186b06963f9sm7482264pll.180.2022.11.08.16.53.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Nov 2022 16:53:46 -0800 (PST)
-Date:   Wed, 9 Nov 2022 00:53:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        nathan@kernel.org, thomas.lendacky@amd.com,
-        andrew.cooper3@citrix.com, peterz@infradead.org,
-        jmattson@google.com, stable@vger.kernel.org
-Subject: Re: [PATCH v2 4/8] KVM: SVM: retrieve VMCB from assembly
-Message-ID: <Y2r6FqZyT4XxUkYB@google.com>
-References: <20221108151532.1377783-1-pbonzini@redhat.com>
- <20221108151532.1377783-5-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8nC9O1np0SJJrVJV"
+        with ESMTP id S229574AbiKIAzC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 19:55:02 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2048.outbound.protection.outlook.com [40.107.237.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 410C24E42B;
+        Tue,  8 Nov 2022 16:55:01 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UA2fjrfqMHfsC7hOlnU6ZN8iR00yWkU1d8hZ4kuznCys6IS5Om2GO7Ffopd3lZlSCRBA1JDf7l8P9nO/E/YLLB3m5hFDJelgEwjQO15JU4YCwg9accX09CnkiTIh+3uEizZCytycZ39jsJ7w6U5AowVmDp3DA3CSckkAlaJqAT9uVZ3vGTEJcDxejumHJc8MRisWkuK4+1YrrK7U1urZC8Zgjq5RjhsiEkKYM7MV89t2GvCZ1Xf26OrIu8Igo1kDxYp60hcZM6pj/75FoBa5eEj4Xszuao+BSxrl9AStazzHvlezmp/xMZKwxIG867M3q8SiM01FIYFq0626IklJng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UXsD0jHWLYYu8D9wwbQFyp/okv3kQrGJdPAl/4NsSX0=;
+ b=QcmRsBcE5/PGk+9iZePF1IueDf4ly3h8efeGEp9tx1Gw9MwnaF2el/FHnthOInmSFaKBYJHPOuxiZCfFtucvjxD67URanVGkZdMwr+oDay1uRRT4IqzaVL6qA6AhjqwrYSFuTj9V5tpVFAHt/IBJPQ3hZZ/C8fYibjML+/uGubQeZ8XhMaKnZhG/WwKKoLZZpEFs4fqTNLjZfP0yb1I2xoJaYcn7E5rjbczO4ZHdp6Ut79H0W/NnRu9UgNMhUH86KLRGwhlLiJVKPUkRpkcETNbFTh5rS9F2oVyT6HsjovacDLjXrfJ86JW+EgLDs3t+nirITLtx8clelPxZ7nT2Hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UXsD0jHWLYYu8D9wwbQFyp/okv3kQrGJdPAl/4NsSX0=;
+ b=NCmQBdzb4LFx3KYqbxLSYWRFDRHgkWDghDSyb882TF3qf1M9eDuA9JKwVg8GYVtVtuT227LsGjytaK74bgqqwpXpKF72yJFtzinicvkPKMtmo7fXiTRWuLbrNnXcn9DGsFBv7F0CI76+lSuW1a/XWAbq4vSoAV0+DeV1MXvShwaHOkcu98eGmjO+5vAkM4WQHiKIYDvUBp+qT68LRQRsQO1FTG0jNJNWey5uufGPg71acWmSIdlKEruvhC5hmGg6g+IsfsJDdscufwqDANLYCjuB9a1a478oh8Jn/1bED9dJuMixPbeNsEc5fiqVfCgZoviHJwGtwHfw0ANhxmyj3Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DS7PR12MB6285.namprd12.prod.outlook.com (2603:10b6:8:96::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5791.25; Wed, 9 Nov 2022 00:54:59 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5791.026; Wed, 9 Nov 2022
+ 00:54:59 +0000
+Date:   Tue, 8 Nov 2022 20:54:58 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 10/11] vfio: Make vfio_container optionally compiled
+Message-ID: <Y2r6YnhuR3SxslL6@nvidia.com>
+References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <10-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <20221108152831.1a2ed3df.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221108151532.1377783-5-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20221108152831.1a2ed3df.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR01CA0043.prod.exchangelabs.com (2603:10b6:208:23f::12)
+ To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB6285:EE_
+X-MS-Office365-Filtering-Correlation-Id: 98d274bb-b70d-492b-5321-08dac1ed0697
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GjtXM6iw/wEAtkXwU8YSlmJnMZ89KqBOLf62y/xYzAc8+omnGeezMaY7N4Ur+YwgXfZWdBazvY8c6R1e0i7sVCslgwFmQXlg6X2k8R9iVJq1m9qmmSe+vFZma9IMj723dEhH0ThK2JLMRpAmTPAswk7EfjowFxO0MPeQkrpH7/sK65t14spQMdqHzKMrtIb00Nw18uznvKifgq1YuoypcfxKjjQHDA254y7RzQfohH2ss3QKUC5FyHmvV6MvCTeiaYb1m9BjaqzdO048qBVhQNOQV6axaO+qMeHKb5E/cfxFoyo8cz/9WLSuOU7XtJBc1ifyrBEoZ79Y0scTCcGZ9WeSVrNopt7RXqMpYB2lCSQWGCbCE1tTcRenq1uHzSBzfx8x5lpdfLHjh5NE+TOCsA9RcETwcuJjFxgo40bqIGQU8BNlr8tFBECCc0sPDW88uYS5PCbC4DKv3zBiU7Ti/+teM+QtCtbHYdyGKdgbw8JHeyUrRGZXm0oXMWmZCZ2KrKGwJtzjjiqJWdiQSfaWGdIZsDX/fDJVUs2Oiyc9jctoi4wpAGRpOQ/CzXaOc8x98C4VCtUNMXs+yMT3oA/g5wB6EiQmHHOtF9IZtYKAHuyh8MdqXx/K24ru5lpq6kyQgsWp8gZns2qNzm5co1m8NXJpZ8TQk8roaPjNHZcreplAh2p0IjdemrPePJ352qBB25xzHl/9FTrT6Iyp9TvCLA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(366004)(346002)(39860400002)(396003)(376002)(451199015)(36756003)(38100700002)(6486002)(478600001)(8936002)(86362001)(7406005)(7416002)(41300700001)(6512007)(2616005)(186003)(316002)(66556008)(26005)(6506007)(4326008)(2906002)(6916009)(54906003)(66476007)(5660300002)(66946007)(8676002)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6CU1DDYQ+All0plxOwsQW0QL28WYA3ikA3QIri5O8hGhQJhPDYQon7lb10YH?=
+ =?us-ascii?Q?aRhEzkxv5Qj++RkDWk3mFNGCbPcTcjUF0pjs4r5xfpfT0WUqjDVbCJnvrtjZ?=
+ =?us-ascii?Q?8Za9UYYVZfo4bRaJLlG9DLo+i97cNNL1fPt8XZf8vjASB1UE4p7IPWuue6Mv?=
+ =?us-ascii?Q?xS7lrxlEKs9BghTtF8B8fml8D3qYEELT0+VVPRxHBxtUUegvvRDoc87uFfC3?=
+ =?us-ascii?Q?VnZYIT+qu3Y3De9FCUR4SirclY47voFT3QRQPMsUXozUS9tyHwT1wemp8HYj?=
+ =?us-ascii?Q?LkS0gM6bvIFY+hC0DUsTUMVdTN+WqXPwpLZYdJPSsWZ1JJbSciRLaUz0/l8W?=
+ =?us-ascii?Q?43IC1drxh6G+p6u5JF1lVymW9mfvbjaraOxbrAhAuRiJfKaaIjWSxIuswgjc?=
+ =?us-ascii?Q?EFxBtFedHMXhmA733/tx3w7ap6M7Eejc23qCq+Yo0mHEdVNMSajQuZb+ZNGs?=
+ =?us-ascii?Q?6q9AZC8LQQsH7xk3GFgFwnEyP4t31I03i211a3I6bAm7xf8t7TGTuzBNA8aX?=
+ =?us-ascii?Q?GGT7Pt/hVAb60c4hD6moteAxy1PX3pEKzmm1JrAxPJERHVC3uKxa4qh2qi3F?=
+ =?us-ascii?Q?74c/Ydp12AvADESw/ungHrmcgN53C+tMN0GsI0HSz3QQ0rXj9Yc/5vEVZPFx?=
+ =?us-ascii?Q?BEOj6Cm9g8K50ikJXiNd5fsVlwza8H2mZ+n/PeF7vOlnDvpCdRrhq/bmM2i4?=
+ =?us-ascii?Q?8wWVpiyL4VAgYjqCxxhZjJsacDncWwb9Gm+kbZGAuG2N4MoN2xUgrwDHtOZT?=
+ =?us-ascii?Q?fMRQ1ZpSS1h5RYV/UX68c1GeRntvIqaCS2eXFYi4gJTt8eoBwCs0wUuRCSTs?=
+ =?us-ascii?Q?OYMxqbX0YhFHcOlyObHhpdAjE3Ex2BKeOeGF8ATKng/MW9NPiDD5Vk5dxhjm?=
+ =?us-ascii?Q?sCkMgY/iMyz2qhumWlQLA7XKDwRyODYopyYHje5r2FnMfwqoDFZsEn/F5mCY?=
+ =?us-ascii?Q?h4soo/LrAiYwL066iRTdBkZDlofumE4CK+FqoWWGyx0jfh6NQJq1ofLnFrgs?=
+ =?us-ascii?Q?jSBannAYBk4lpqBFKXUYxIdAgsC3Z7zT14EPQoq3d397KTBAxbz8HgqK2N9w?=
+ =?us-ascii?Q?fmNVj37W02TcopUHyayWnMIw9SmYYo/we7LHDfptE7+MZxdHhMeiQN52Fjn/?=
+ =?us-ascii?Q?mzH+tV/Yz2s7NuDzrGGStExPkDz0KIpzH07BHYGZIomejmmwpSK2HYIAg6LK?=
+ =?us-ascii?Q?2a7KVzMoMioKMTO/u0o8SbH5a27Mof5Y/fBjNSuGwaHDpo7JU6kHkjO7JNMP?=
+ =?us-ascii?Q?D/x0HJiSw5GR1CLhcnD8/Nq4xdvzPAwHo94vWeDVDn2XXfSzivPyAsIM8nZ4?=
+ =?us-ascii?Q?aX2onnyZgnS74yMl5IfWiMmI1W8cUnoAZLjue8nQiVKQ4ax5rsjbRTwzqfSw?=
+ =?us-ascii?Q?Y2q50X6z4CCGyQhxEDRg06+s6A22NMj/HZC0oFU+olFAwjeUl8Y+/CFD6EUL?=
+ =?us-ascii?Q?z3OmMLI2M0pzvMaYwgw71/h+WwlmyXthbPKAJHsVfXn0ytbzryVz9R3APCEF?=
+ =?us-ascii?Q?OINMrw6rThD0IJ64EPhpFNArn5UUbnod4v5PnfUz1zxa3ykR+o1VHGeBRW9f?=
+ =?us-ascii?Q?Upct+v4FEG5L17CUQrQ=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 98d274bb-b70d-492b-5321-08dac1ed0697
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2022 00:54:59.1305
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YtxgORji82o1KT0cHLeOc0ByMRFKQ/t2AWMGGavR7eMvbe/jBG72VDLTsyIT0DvM
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6285
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Nov 08, 2022 at 03:28:31PM -0700, Alex Williamson wrote:
 
---8nC9O1np0SJJrVJV
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+> Perhaps this should have been obvious, but I'm realizing that
+> vfio-noiommu mode is completely missing without VFIO_CONTAINER, which
+> seems a barrier to deprecating VFIO_CONTAINER and perhaps makes it a
 
-On Tue, Nov 08, 2022, Paolo Bonzini wrote:
-> This is needed in order to keep the number of arguments to 3 or less,
-> after adding hsave_pa and spec_ctrl_intercepted.  32-bit builds only
-> support passing three arguments in registers, fortunately all other
-> data is reachable from the vcpu_svm struct.
+Yes, it is the same as the allow_unsafe_interrupts - it is something
+that currently goes missing if you turn off VFIO_CONTAINER.
 
-Is it actually a problem if parameters are passed on the stack?  The assembly
-code mostly creates a stack frame, i.e. %ebp can be used to pull values off the
-stack.
+This seems straightforward enough to resolve in a followup, we mostly
+just need someone with an existing no-iommu application to test
+compatability against. Keeping it working with the device cdev will
+also be a bit interesting. If you have or know about some application
+I can try to make a patch.
 
-I dont think it will matter in the end (more below), but hypothetically if we
-ended up with
+> question whether IOMMUFD should really be taking over /dev/vfio/vfio.
+> No-iommu mode has users.  
 
-  void __svm_vcpu_run(struct kvm_vcpu *vcpu, unsigned long vmcb_pa,
-		      unsigned long gsave_pa, unsigned long hsave_pa,
-		      bool spec_ctrl_intercepted);
+I view VFIO_CONTAINER=n as a process. An aspiration we can work
+toward.
 
-then the asm prologue would be something like:
+At this point there are few places that might want to use it. Android
+perhaps, for example. It is also useful for testing. One of the main
+values is you can switch the options and feed the kernel into an
+existing test environment and see what happens. This is how we are
+able to quickly get s390 mdev testing, for instance.
 
-	/*
-	 * Save @vcpu, @gsave_pa, @hsave_pa, and @spec_ctrl_intercepted, all of
-	 * which are needed after VM-Exit.
-	 */
-	push %_ASM_ARG1
-	push %_ASM_ARG3
+We are not going to get to a widely useful VFIO_CONTAINER=n if we
+don't have a target that people can test against and evaluate what
+compatability gaps may exist.
 
-  #ifdef CONFIG_X86_64
-	push %_ASM_ARG4
-	push %_ASM_ARG5
-  #else
-	push %_ASM_ARG4_EBP(%ebp)
-	push %_ASM_ARG5_EBP(%ebp)
-  #endif
+So, everytime we find something like this - let's think about how can
+we make iommufd compatibility handle it and not jump straight to
+giving up :)
 
-which is a few extra memory accesses, especially for 32-bit, but no one cares
-about 32-bit and I highly doubt a few extra PUSH+POP instructions will be noticeable.
+I'm kind of thinking v6.4 might be a reasonable kernel target when we
+might have closed off enough things.
 
-Threading in yesterday's conversation...
-
-> > What about adding dedicated structs to hold the non-regs params for VM-Enter and
-> > VMRUN?  Grabbing stuff willy-nilly in the assembly code makes the flows difficult
-> > to read as there's nothing in the C code that describes what fields are actually
-> > used.
->
-> What fields are actually used is (like with any other function)
-> "potentially all, you'll have to read the source code and in fact you
-> can just read asm-offsets.c instead".  What I mean is, I cannot offhand
-> see or remember what fields are touched by svm_prepare_switch_to_guest,
-> why would __svm_vcpu_run be any different?
-
-It's different because if it were a normal C function, it would simply take
-@vcpu, and maybe @spec_ctrl_intercepted to shave cycles after CLGI.  But because
-it's assembly and doesn't have to_svm() readily available (among other restrictions),
-__svm_vcpu_run() ends up taking a mishmash of parameters, which for me makes it
-rather difficult to understand what to expect.
-
-Oooh, and after much staring I realized that the address of the host save area
-is passed in because grabbing it after VM-Exit can't work.  That's subtle, and
-passing it in isn't strictly necessary; there's no reason the assembly code can't
-grab it and stash it on the stack.
-
-What about killing a few birds with one stone?  Move the host save area PA to
-its own per-CPU variable, and then grab that from assembly as well.  Then it's
-a bit more obvious why the address needs to be saved on the stack across VMRUN,
-and my whining about the prototype being funky goes away.  __svm_vcpu_run() and
-__svm_sev_es_vcpu_run() would have identical prototypes too.
-
-Attached patches would slot in early in the series.  Tested SVM and SME-enabled
-kernels, didn't test the SEV-ES bits.
-
---8nC9O1np0SJJrVJV
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-KVM-SVM-Add-a-helper-to-convert-a-SME-aware-PA-back-.patch"
-
-From 59a4b14ec509e30e614beaa20ceb920c181e3739 Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <seanjc@google.com>
-Date: Tue, 8 Nov 2022 15:25:41 -0800
-Subject: [PATCH 1/2] KVM: SVM: Add a helper to convert a SME-aware PA back to
- a struct page
-
-Add __sme_pa_to_page() to pair with __sme_page_pa() and use it to replace
-open coded equivalents, including for "iopm_base", which previously
-avoided having to do __sme_clr() by storing the raw PA in the global
-variable.
-
-Opportunistically convert __sme_page_pa() to a helper to provide type
-safety.
-
-No functional change intended.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/svm.c |  9 ++++-----
- arch/x86/kvm/svm/svm.h | 16 +++++++++++++++-
- 2 files changed, 19 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 58f0077d9357..bb7427fd1242 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1065,8 +1065,7 @@ static void svm_hardware_unsetup(void)
- 	for_each_possible_cpu(cpu)
- 		svm_cpu_uninit(cpu);
- 
--	__free_pages(pfn_to_page(iopm_base >> PAGE_SHIFT),
--	get_order(IOPM_SIZE));
-+	__free_pages(__sme_pa_to_page(iopm_base), get_order(IOPM_SIZE));
- 	iopm_base = 0;
- }
- 
-@@ -1243,7 +1242,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
- 	if (!kvm_hlt_in_guest(vcpu->kvm))
- 		svm_set_intercept(svm, INTERCEPT_HLT);
- 
--	control->iopm_base_pa = __sme_set(iopm_base);
-+	control->iopm_base_pa = iopm_base;
- 	control->msrpm_base_pa = __sme_set(__pa(svm->msrpm));
- 	control->int_ctl = V_INTR_MASKING_MASK;
- 
-@@ -1443,7 +1442,7 @@ static void svm_vcpu_free(struct kvm_vcpu *vcpu)
- 
- 	sev_free_vcpu(vcpu);
- 
--	__free_page(pfn_to_page(__sme_clr(svm->vmcb01.pa) >> PAGE_SHIFT));
-+	__free_page(__sme_pa_to_page(svm->vmcb01.pa));
- 	__free_pages(virt_to_page(svm->msrpm), get_order(MSRPM_SIZE));
- }
- 
-@@ -4970,7 +4969,7 @@ static __init int svm_hardware_setup(void)
- 
- 	iopm_va = page_address(iopm_pages);
- 	memset(iopm_va, 0xff, PAGE_SIZE * (1 << order));
--	iopm_base = page_to_pfn(iopm_pages) << PAGE_SHIFT;
-+	iopm_base = __sme_page_pa(iopm_pages);
- 
- 	init_msrpm_offsets();
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 6a7686bf6900..9a2567803006 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -24,7 +24,21 @@
- 
- #include "kvm_cache_regs.h"
- 
--#define __sme_page_pa(x) __sme_set(page_to_pfn(x) << PAGE_SHIFT)
-+/*
-+ * Helpers to convert to/from physical addresses for pages whose address is
-+ * consumed directly by hardware.  Even though it's a physical address, SVM
-+ * often restricts the address to the natural width, hence 'unsigned long'
-+ * instead of 'hpa_t'.
-+ */
-+static inline unsigned long __sme_page_pa(struct page *page)
-+{
-+	return __sme_set(page_to_pfn(page) << PAGE_SHIFT);
-+}
-+
-+static inline struct page *__sme_pa_to_page(unsigned long pa)
-+{
-+	return pfn_to_page(__sme_clr(pa) >> PAGE_SHIFT);
-+}
- 
- #define	IOPM_SIZE PAGE_SIZE * 3
- #define	MSRPM_SIZE PAGE_SIZE * 2
-
-base-commit: 88cd4a037496682f164e7ae8dac13cd4ec8edc2b
--- 
-2.38.1.431.g37b22c650d-goog
-
-
---8nC9O1np0SJJrVJV
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0002-KVM-SVM-Snapshot-host-save-area-PA-in-dedicated-per-.patch"
-
-From e9a4f9af27d7d384dc36ad66a9856f9decb8ce02 Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <seanjc@google.com>
-Date: Tue, 8 Nov 2022 15:32:58 -0800
-Subject: [PATCH 2/2] KVM: SVM: Snapshot host save area PA in dedicated per-CPU
- variable
-
-Track the SME-aware physical address of the host save area outside of
-"struct svm_cpu_data" so that a future patch can easily reference the
-address from assembly code.
-
-The "overhead" of always allocating the per-CPU data is more or less
-meaningless in the grand scheme.  And when KVM AMD is built as a module,
-it's actually more costly (by a single pointer) to dynamically allocate
-the struct, as the per-CPU data is allocated only when the module is
-loaded.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/svm.c | 30 ++++++++++++++++--------------
- arch/x86/kvm/svm/svm.h |  2 +-
- 2 files changed, 17 insertions(+), 15 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index bb7427fd1242..8fc02bef4f85 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -246,6 +246,7 @@ struct kvm_ldttss_desc {
- } __attribute__((packed));
- 
- DEFINE_PER_CPU(struct svm_cpu_data *, svm_data);
-+DEFINE_PER_CPU(unsigned long, svm_host_save_area_pa);
- 
- /*
-  * Only MSR_TSC_AUX is switched via the user return hook.  EFER is switched via
-@@ -597,7 +598,7 @@ static int svm_hardware_enable(void)
- 
- 	wrmsrl(MSR_EFER, efer | EFER_SVME);
- 
--	wrmsrl(MSR_VM_HSAVE_PA, __sme_page_pa(sd->save_area));
-+	wrmsrl(MSR_VM_HSAVE_PA, per_cpu(svm_host_save_area_pa, me));
- 
- 	if (static_cpu_has(X86_FEATURE_TSCRATEMSR)) {
- 		/*
-@@ -653,12 +654,13 @@ static void svm_cpu_uninit(int cpu)
- 
- 	per_cpu(svm_data, cpu) = NULL;
- 	kfree(sd->sev_vmcbs);
--	__free_page(sd->save_area);
-+	__free_page(__sme_pa_to_page(per_cpu(svm_host_save_area_pa, cpu)));
- 	kfree(sd);
- }
- 
- static int svm_cpu_init(int cpu)
- {
-+	struct page *host_save_area;
- 	struct svm_cpu_data *sd;
- 	int ret = -ENOMEM;
- 
-@@ -666,20 +668,20 @@ static int svm_cpu_init(int cpu)
- 	if (!sd)
- 		return ret;
- 	sd->cpu = cpu;
--	sd->save_area = alloc_page(GFP_KERNEL | __GFP_ZERO);
--	if (!sd->save_area)
--		goto free_cpu_data;
- 
- 	ret = sev_cpu_init(sd);
- 	if (ret)
--		goto free_save_area;
-+		goto free_cpu_data;
-+
-+	host_save_area = alloc_page(GFP_KERNEL | __GFP_ZERO);
-+	if (!host_save_area)
-+		goto free_cpu_data;
- 
- 	per_cpu(svm_data, cpu) = sd;
-+	per_cpu(svm_host_save_area_pa, cpu) = __sme_page_pa(host_save_area);
- 
- 	return 0;
- 
--free_save_area:
--	__free_page(sd->save_area);
- free_cpu_data:
- 	kfree(sd);
- 	return ret;
-@@ -1449,7 +1451,6 @@ static void svm_vcpu_free(struct kvm_vcpu *vcpu)
- static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
--	struct svm_cpu_data *sd = per_cpu(svm_data, vcpu->cpu);
- 
- 	if (sev_es_guest(vcpu->kvm))
- 		sev_es_unmap_ghcb(svm);
-@@ -1461,10 +1462,13 @@ static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
- 	 * Save additional host state that will be restored on VMEXIT (sev-es)
- 	 * or subsequent vmload of host save area.
- 	 */
--	vmsave(__sme_page_pa(sd->save_area));
-+	vmsave(per_cpu(svm_host_save_area_pa, vcpu->cpu));
- 	if (sev_es_guest(vcpu->kvm)) {
- 		struct sev_es_save_area *hostsa;
--		hostsa = (struct sev_es_save_area *)(page_address(sd->save_area) + 0x400);
-+		struct page *hostsa_page;
-+
-+		hostsa_page = __sme_pa_to_page(per_cpu(svm_host_save_area_pa, vcpu->cpu));
-+		hostsa = (struct sev_es_save_area *)(page_address(hostsa_page) + 0x400);
- 
- 		sev_es_prepare_switch_to_guest(hostsa);
- 	}
-@@ -3920,8 +3924,6 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
- 	if (sev_es_guest(vcpu->kvm)) {
- 		__svm_sev_es_vcpu_run(vmcb_pa);
- 	} else {
--		struct svm_cpu_data *sd = per_cpu(svm_data, vcpu->cpu);
--
- 		/*
- 		 * Use a single vmcb (vmcb01 because it's always valid) for
- 		 * context switching guest state via VMLOAD/VMSAVE, that way
-@@ -3932,7 +3934,7 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
- 		__svm_vcpu_run(vmcb_pa, (unsigned long *)&vcpu->arch.regs);
- 		vmsave(svm->vmcb01.pa);
- 
--		vmload(__sme_page_pa(sd->save_area));
-+		vmload(per_cpu(svm_host_save_area_pa, vcpu->cpu));
- 	}
- 
- 	guest_state_exit_irqoff();
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 9a2567803006..d9ec8ea69a56 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -303,7 +303,6 @@ struct svm_cpu_data {
- 	u32 min_asid;
- 	struct kvm_ldttss_desc *tss_desc;
- 
--	struct page *save_area;
- 	struct vmcb *current_vmcb;
- 
- 	/* index = sev_asid, value = vmcb pointer */
-@@ -311,6 +310,7 @@ struct svm_cpu_data {
- };
- 
- DECLARE_PER_CPU(struct svm_cpu_data *, svm_data);
-+DECLARE_PER_CPU(unsigned long, svm_host_save_area_pa);
- 
- void recalc_intercepts(struct vcpu_svm *svm);
- 
--- 
-2.38.1.431.g37b22c650d-goog
-
-
---8nC9O1np0SJJrVJV--
+Jason
