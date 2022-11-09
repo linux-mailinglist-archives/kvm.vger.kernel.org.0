@@ -2,133 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FB0562310D
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 18:07:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5463F623144
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 18:19:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231254AbiKIRHH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 12:07:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39166 "EHLO
+        id S231605AbiKIRTP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 12:19:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231645AbiKIRG7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 12:06:59 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 590E6F75
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 09:06:58 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bOGz9pKQZsNNcUfDEiv0ARKPW1hetrMeKVXQx1butRDuTfj3jXUhGXuNasvYZfa7KisyL5V/GnvJj0O6a6nRAf+47JJr5koAg6+VS+BV4u92yvtPrOfbQJ9KW8dw5EESHHD6r8zhUxdSaP7FT5xm70UQVcPtN0dmuScwR4XkXn3yUO3S+Qb/EZk2z8m6NafYwlMMCgXELOrSkK7d1VaNCFccy68LnvCJ5/xC0TEgjfBaiwA6jgzhfJbVRbUsTlm4z8AxRcWi4ltbgfNmLl5ABw3adhRH4ilMsRXqk//y2n8ZRaAtM+CN0bcXMLyUrbLY8NAmSxjuSgZYGt1XULTwsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZXVUVmjqguLhjMBl91yKAZhGoCjOXlHm+A8OPJfd/+4=;
- b=i5wtZEQ7IMuTOxgCGBdyAYxoqNMH7es+kDCBXjVfDgBpNFlELBvgzTaa99yBDPSiIFB3oQtglvM8o9tkbOllyEvX608RHe5iao9Hw+ch2FtW2HiWUF3JolkFuoEgvfyhdVGHxvGwM2/ebtk1dteTryXjwDjamEP38odkTwRbwAM7gWKwtxtgxcSH1rVBljJh43BQyrhQ5ZtuLMpKay7fDTZWqYUHlOz3T0bQZ1WCY4HzPu6WM+W/2cPr5PlJsSa2IHi4ay4G6v/Ia6UY4/IDjB+k4H8IwiGJUmhpOLP9/KkRwtnVjDAiREoN0nWIYZIWN26oh6AV0QpSAs2wqRiqfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZXVUVmjqguLhjMBl91yKAZhGoCjOXlHm+A8OPJfd/+4=;
- b=fDuEHmVLP4kae6Wdz1BBZ2wJngt2m7ne+YBhu/IPJmin9sBvN+z3icDlnEI80tIiQg9aYCuxHnSrJGZzwNrpImWoPskob98gUrCjwPLD7/FuwdzkDwZ549UT+XulceRHnThQAabkI7K8hqJvmuMrzCvXLzbPjXVL+TcphEcaU63vwHRrKL0Ekf45XEOpyIy6GSF6sXfTyDKzgP4RgQPHJSRDR/gQwtiPy0D+G2+ipMUn8GRgyyqh9cDuiKoZ/31vRzTeXXT3bAr6xKm9WO/sFaPUWq+AS8i7OZG8ol019wTTiOK9DtqMXixMPvwB3ICqSn2Vr2h1JLu4mEHRbyd0MQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MW4PR12MB6827.namprd12.prod.outlook.com (2603:10b6:303:20b::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.25; Wed, 9 Nov
- 2022 17:06:56 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%7]) with mapi id 15.20.5791.027; Wed, 9 Nov 2022
- 17:06:56 +0000
-Date:   Wed, 9 Nov 2022 13:06:55 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     alex.williamson@redhat.com, kvm@vger.kernel.org,
-        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
-        shayd@nvidia.com, maorg@nvidia.com, avihaih@nvidia.com,
-        cohuck@redhat.com
-Subject: Re: [PATCH vfio 02/13] vfio/mlx5: Fix a typo in
- mlx5vf_cmd_load_vhca_state()
-Message-ID: <Y2veLwbN6qjnZHhp@nvidia.com>
-References: <20221106174630.25909-1-yishaih@nvidia.com>
- <20221106174630.25909-3-yishaih@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221106174630.25909-3-yishaih@nvidia.com>
-X-ClientProxiedBy: BLAPR03CA0043.namprd03.prod.outlook.com
- (2603:10b6:208:32d::18) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S231305AbiKIRTO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 12:19:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C5E20BD9
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 09:18:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668014294;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xnXgn16clICsmrV6UyAUvoxroMB/57yAi6UKnX9zn/8=;
+        b=WndcJS31A/P1ODA6rTNvkj8ScMzPivQmeCG6ltyPMuPO1g1swQy+xgmfyc8m8Zz2ZYqiMY
+        ZamY13c6wvzFLt/XVdu232RdK3iv4UdrxV8m2NXNjELaIAabZonkYufPMCv/CH1/k39iXz
+        2JcrNuO1py88L9Pyi31Gxyu1TY8uSY0=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-237-JZg4tAd8M1qBHU4aWQm-UQ-1; Wed, 09 Nov 2022 12:18:13 -0500
+X-MC-Unique: JZg4tAd8M1qBHU4aWQm-UQ-1
+Received: by mail-io1-f72.google.com with SMTP id c23-20020a6b4e17000000b006db1063fc9aso6249124iob.14
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 09:18:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xnXgn16clICsmrV6UyAUvoxroMB/57yAi6UKnX9zn/8=;
+        b=U/L4Ecw22q5t5nTUTIK/CSbigUHQ2yauiBtezzy5ePIqqDcjwPKqAr6lH1LR8eC7+0
+         zlDJ7H+4tnVtLvf2XYk3NbkO7OxD9iQ1/7M8+jS/AaqWAWXzv5XcrrzK7k4pdj6DPJ13
+         J0qGtVwm6bDiqrwk9w0pNYhOkpNrOqX71LV3LdljvBGdQ2Pus7WE5X4xcR1oZO7xhAWb
+         /E2eyhCgQDfmf3bPNWT6+jfWanH0lBj3l2lM9euj2KiBfartp6s14v4YrZF2ikweBfJo
+         GPdVleY5DO+pmaFgz04Y10MhLcMaoZ1WNe135s0rQA5wVKCZT1nmV30dTYpJkAg6nsNc
+         TspQ==
+X-Gm-Message-State: ACrzQf2iRlCy81oqEe+x4wVHONL6udqp3QLpRjN6Jn8JRZzw3Bl01lTs
+        ImYA01K3gV11Sv+vaNe/n5M2UgEU66IHqyNTWyx0oFNnwo/hpekI0RhG48YwaP9KTZ00uOEoA+F
+        e2kJq5D6KGs9u
+X-Received: by 2002:a6b:e208:0:b0:6d7:b1a7:c220 with SMTP id z8-20020a6be208000000b006d7b1a7c220mr1771061ioc.7.1668014292520;
+        Wed, 09 Nov 2022 09:18:12 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM6F677E3Z9Fik/IZx4pkrsVOrB6N7Pz805qwA6pjiuY0YCpqNr/AQzfBn6PMq3gQd7YTPJ/wA==
+X-Received: by 2002:a6b:e208:0:b0:6d7:b1a7:c220 with SMTP id z8-20020a6be208000000b006d7b1a7c220mr1771033ioc.7.1668014292281;
+        Wed, 09 Nov 2022 09:18:12 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id i12-20020a056e02152c00b00300e6efca96sm5020565ilu.55.2022.11.09.09.18.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Nov 2022 09:18:11 -0800 (PST)
+Date:   Wed, 9 Nov 2022 10:18:09 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 10/11] vfio: Make vfio_container optionally compiled
+Message-ID: <20221109101809.2ff08303.alex.williamson@redhat.com>
+In-Reply-To: <Y2r6YnhuR3SxslL6@nvidia.com>
+References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+        <10-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+        <20221108152831.1a2ed3df.alex.williamson@redhat.com>
+        <Y2r6YnhuR3SxslL6@nvidia.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW4PR12MB6827:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3fb52ad1-bbe4-4c81-3124-08dac274ce92
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nC72lNX/KkOWfpqECUndvi0HDQL64eiWzsXbqngPG+a9sAolAUQuBDfyNetjx7b52Ba9yg/iYe/kKnh7QInN3jmN3JqJkhCw5twIDxKH0oN2rYJP86takjun5igEDRhdfesZMtl0U12060ZvwNpCgFgeVtIMwNVMfjhGhtQfmiBo6UTJcmYbJ4oFS59tfVHQzd60vb+ElvwIalrT4whbgTFQUQTxfciH17anlKs5Pouvwmd22NMJwN+jwERNRgraIqQB6UnoaEy8ACSVyjBqSSRoHqji1or7s4aHvZhW94jN1TJIYRr3VaiITsOPkRLdpfqxjv3c2xbSHjwTcs9/KrzXMetNppxhnyGtZEyrzIG4P4IE5iu/0wAtGwkqLOLGOY9pebuPaCtlDGZ4lXlEdNYn5xmLkrUQ0Ecf5rCh8tLAbACW/WwXsYg4c/Pcazo2LySA69MRdcwagym/Z8gOkSbj8kBBRbGK/10B5F46IgfNJh6vfXn/M9qmBFnjdY8B089x/Vk3AOGJVUWpOq3QE3qr0Lw69pO3qJF+x2S8I1DNMBD7ysuPDF/r+Akxgq/jVxNGAWGo8G2jpwgQnX2KXp9gzEKsgzHKF3HOGrs5sM7MrhFTQlIMWSsZPkwZ49MZBS9MncUdM0qLxbqwHlSspTnZBGNdnPxflJEr3/iXnYf4ZWnBVFTv0x8GG8+V82FqGaxCXhA1Mc9xrU3msQgH6w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(136003)(366004)(376002)(346002)(39860400002)(451199015)(36756003)(86362001)(5660300002)(2906002)(6862004)(38100700002)(8936002)(6486002)(6506007)(37006003)(66946007)(6636002)(8676002)(4326008)(4744005)(66556008)(316002)(41300700001)(6512007)(186003)(66476007)(26005)(83380400001)(2616005)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?WP1/K0awJ16aRJCsgAcndPtAE0d6Cabf0xM1Jl6jz8ackQCNf9ZD7wvmiuFM?=
- =?us-ascii?Q?EUWTjksSRnm+dyo+G1pgwZ/gO6vht/kMylqsqDcFEd74Yie8asiunjbFbXbt?=
- =?us-ascii?Q?MtNyjaJtL2AECLA47H4Y9ZUeHhsFvN6qryT9VQDUu4e2H8VsOV+wCsPpPu8A?=
- =?us-ascii?Q?a3mol4Taym/MMfzPoBdryxra6qdmop4WYB0O2KT2C7tGQ7136C21D9Nz28iz?=
- =?us-ascii?Q?eqkyRnL1Ah8J4ejhibSszwiDiMmyn2xOL2TRwNiiagnVNEMovL14X6l7SgXr?=
- =?us-ascii?Q?hjJK8cM/E7dgE9qu+IoNczTwDueJOxPYfzCmlakBChY9d9OCeMuAH13GObGY?=
- =?us-ascii?Q?oSCzICgr5d5dokE+4sJ1/P/fAEqdS6JltqErKwP8p5i2MqA9MW0t2mlSmeI8?=
- =?us-ascii?Q?6XuHKkjsIR+teeDqBCOCw3uMCZgGLcUyenSU8ePoksctjZUQkukBIoi1r2Kx?=
- =?us-ascii?Q?MKyiU3o2V/lei2WjwkaTPSeGcOPWbWy57zLBROZLWlVcXFAyR3Ii5rpCVsQy?=
- =?us-ascii?Q?VXabTNNyZmCJ6FsKc8vYCLEax6Ow1eH+pWz0cR0kQc2lHGstfg+mYVYwG5XY?=
- =?us-ascii?Q?VAoBy8WsQo7t6ycB9I46la0mNGFeL/kAv6Z1DdPy/vBMY8OFlWmaPcRhRxNL?=
- =?us-ascii?Q?uKY6jB3ULSfIAuFvk+pC9xgrVA2CaXyTV8vYlyeYoocd26wFrdMcPMKOnBWd?=
- =?us-ascii?Q?tAhtUlpIpNCriF5JvYCCgJkltDbZYb7+QnDlIFLS6Sx7Jf4LHetTgVQhgNXM?=
- =?us-ascii?Q?RQzZuZiT/MVTrzB0Al8yMpn3mjTzpdGzud01XAi8aV3HGYKTmT6R7MwUxrd5?=
- =?us-ascii?Q?z4jYk+f6BHen9SO9HY/MzvalDdxSKE7eEkRgfbPnuWfBKmbaC0vc1RnHDCXg?=
- =?us-ascii?Q?zVm7lz+bqpx1jYuyE3fCIUAm7zRrOjQcwd3TVfqkMEzCswwKBQnYe0NgaEWE?=
- =?us-ascii?Q?TLt13ZeT1+7VxR7+VkKHpcDlAN8E3+sbAEvBZnT30S8B9WvUr6PwIayO6DLC?=
- =?us-ascii?Q?SLT0hgq7O9/PIYkPmiAsO+/rv1mGdeWUGPGoiO88ux0jbwOpMtPekW3R59YH?=
- =?us-ascii?Q?mpcJFvJQ76+DBzxrlH8YRQ+Mfoy8ZEwtUTLFj9BicraXXgzrSFyImmSBxJVH?=
- =?us-ascii?Q?rWXhdqsQzOMI8yKjpoqxpE8UVf5HMmTMmlLaRzFC6EFlig0pLUhkGTsbsWYf?=
- =?us-ascii?Q?Ed+N26wKMNEliS+OH4cB11N6s+rCJkx/q14s5Wjd5w7VJxJ6y+nyG5muNxRZ?=
- =?us-ascii?Q?bONHINv4ByIyoXeDhbof56LwzmJQ5LkQz+VBxdGDEFgHHqHJEo48eBnuXXDJ?=
- =?us-ascii?Q?W0BFDTqGudrGsx4VfcRtGxSfxa/+lRv6FMY5sSIxM9d184AGVb15oKHvuuA9?=
- =?us-ascii?Q?eTfzc3HpdGXep0eU6m0/G/w8aCni/I0opCK1/SL9Tmraw2nc3iLbbXDj8Bkj?=
- =?us-ascii?Q?nOA0D+CkzexeEiOR/eLGXKufi+i1Z4D3aJ07zbnLxHx2lswEBCjZE/cOy8WB?=
- =?us-ascii?Q?uKeZB54E+Iw5Po2jsJKUG2PkEFGBrlDoEEkkdsI9YI5RCWiPAJCTchSzt/Na?=
- =?us-ascii?Q?KO1uKc6U0BH5OTOVWNc=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3fb52ad1-bbe4-4c81-3124-08dac274ce92
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2022 17:06:56.5590
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: azcPOCMsp45pSltg4VQ7LPrC4Of3t0rNaX8kFUzJKZ2Crw4jbohA21HbNQhmXgyo
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6827
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Nov 06, 2022 at 07:46:19PM +0200, Yishai Hadas wrote:
-> Fix a typo in mlx5vf_cmd_load_vhca_state() to use the 'load' memory
-> layout.
-> 
-> As in/out sizes are equal for save and load commands there wasn't any
-> functional issue.
-> 
-> Fixes: f1d98f346ee3 ("vfio/mlx5: Expose migration commands over mlx5 device")
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> ---
->  drivers/vfio/pci/mlx5/cmd.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+On Tue, 8 Nov 2022 20:54:58 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> On Tue, Nov 08, 2022 at 03:28:31PM -0700, Alex Williamson wrote:
+> 
+> > Perhaps this should have been obvious, but I'm realizing that
+> > vfio-noiommu mode is completely missing without VFIO_CONTAINER, which
+> > seems a barrier to deprecating VFIO_CONTAINER and perhaps makes it a  
+> 
+> Yes, it is the same as the allow_unsafe_interrupts - it is something
+> that currently goes missing if you turn off VFIO_CONTAINER.
+> 
+> This seems straightforward enough to resolve in a followup, we mostly
+> just need someone with an existing no-iommu application to test
+> compatability against. Keeping it working with the device cdev will
+> also be a bit interesting. If you have or know about some application
+> I can try to make a patch.
 
-Jason
+DPDK supports no-iommu mode.
+
+> > question whether IOMMUFD should really be taking over /dev/vfio/vfio.
+> > No-iommu mode has users.    
+> 
+> I view VFIO_CONTAINER=n as a process. An aspiration we can work
+> toward.
+> 
+> At this point there are few places that might want to use it. Android
+> perhaps, for example. It is also useful for testing. One of the main
+> values is you can switch the options and feed the kernel into an
+> existing test environment and see what happens. This is how we are
+> able to quickly get s390 mdev testing, for instance.
+> 
+> We are not going to get to a widely useful VFIO_CONTAINER=n if we
+> don't have a target that people can test against and evaluate what
+> compatability gaps may exist.
+> 
+> So, everytime we find something like this - let's think about how can
+> we make iommufd compatibility handle it and not jump straight to
+> giving up :)
+> 
+> I'm kind of thinking v6.4 might be a reasonable kernel target when we
+> might have closed off enough things.
+
+I agree that it's very useful for testing, I'm certainly not suggesting
+to give up, but I'm not sure where no-iommu lives when iommufd owns
+/dev/vfio/vfio.  Given the unsafe interrupts discussion, it doesn't
+seem like the type of thing that would be a priority for iommufd.
+
+We're on a path where vfio accepts an iommufd as a container, and
+ultimately iommufd becomes the container provider, supplanting the
+IOMMU driver registration aspect of vfio.  I absolutely want type1 and
+spapr backends to get replaced by iommufd, but reluctance to support
+aspects of vfio "legacy" behavior doesn't give me warm fuzzies about a
+wholesale hand-off of the container to a different subsystem, for
+example vs an iommufd shim spoofing type1 support.
+
+Unfortunately we no longer have a CONFIG_EXPERIMENTAL option to hide
+behind for disabling VFIO_CONTAINER, so regardless of our intentions
+that a transition is some time off, it may become an issue sooner than
+we expect.  Thanks,
+
+Alex
+
