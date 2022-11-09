@@ -2,135 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A6B362263A
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 10:06:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2ED46622666
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 10:12:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230300AbiKIJGS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 04:06:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43040 "EHLO
+        id S229647AbiKIJMP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 04:12:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230245AbiKIJGL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 04:06:11 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0463621808
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 01:06:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667984766; x=1699520766;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+JNLCXbPm/UrqSsWNqXLmoAAPfj8mhI4bJ9CrK93e6o=;
-  b=CRpp/o0BpznfQePP8nDbHySHKt14OXOj/IhYMtW1ilmOmXIW4J/56iMj
-   LpAnvIwxXq6Bo7CpybQJrup9zTyJL6Q0OqsJZlOpRK3K8B591OQtMPu4V
-   YtBcb1dpTRhxG+c1+Xf6c4KMVGIrBCCuOZlBZVW7M8fVozSKsKIEttrZj
-   +yyIjLIq3Pd9bFUTXSPrD1DwXutoYl+6H4gTfLZUATSgWqXdxRAvMJfyq
-   HBaDRnj2uVEPUzAXhJKkvLnFrB135JOjVKQ/P1mL4fUa+b8k9PMYCbWBP
-   JBvQ6d5lPAVw5KLerf3jc7Ji4Z56HjLMHuqRecyO+PH94PqVaU6H6tVMs
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10525"; a="298450478"
-X-IronPort-AV: E=Sophos;i="5.96,150,1665471600"; 
-   d="scan'208";a="298450478"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2022 01:06:05 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10525"; a="811564536"
-X-IronPort-AV: E=Sophos;i="5.96,150,1665471600"; 
-   d="scan'208";a="811564536"
-Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.255.29.36]) ([10.255.29.36])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2022 01:06:03 -0800
-Message-ID: <80cdd80a-16fa-ac75-0a89-5729b846efed@intel.com>
-Date:   Wed, 9 Nov 2022 17:06:01 +0800
+        with ESMTP id S229775AbiKIJLM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 04:11:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06CE722509
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 01:09:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667984995;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gp1nu7gDdjQPLi62onKx+VMmcKi4JmumYYSuGwj42UE=;
+        b=LdKLA2FXVctRvtCIUpblRGgkMXDjXdhza9IWOay45pNMe6IIf/Pcj3t0YDKUxeU4DEr7tB
+        xc8+6wEmU9Zdwp3G+YdCfM8ibk7AMBe5iaEI/cHyik9k8vk9GwbSL2ZPaKneI3Bt5jR49w
+        GLFdHP2CwhByfhUvfQEIXeNeFDeRFL8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-642-ZIFKMNSGPBeITOR-HvPt8Q-1; Wed, 09 Nov 2022 04:09:54 -0500
+X-MC-Unique: ZIFKMNSGPBeITOR-HvPt8Q-1
+Received: by mail-wm1-f70.google.com with SMTP id v125-20020a1cac83000000b003cfa148576dso4896212wme.3
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 01:09:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gp1nu7gDdjQPLi62onKx+VMmcKi4JmumYYSuGwj42UE=;
+        b=aNzi+uCDxpBSgGFAop+vWa8sFwiekXvEx/dm1qqBVZRptpwqPR7hIT/GgW8M/+Mx7o
+         lBZzjkqyvvWtj8Zyhl0KIm2dtWa4xyjtncHYeq+4JPuUGHP8HeQBowXSJVYiRLrRqaA4
+         zBtWktvFHsTGX02dI5t4tI/ui90DKeKmJqGSu5lVmDS2/3oNCcKmP4+qkrV6ZfEcyzKT
+         QF0a/XT7/vzPr2x7hpov3Yei5NDIQq/jgPLWZsWYSgIR9IoCu7Uf5KTN0rWzx1MzU5es
+         nzOJmYxYa1j9tcvI9U0aHxSm0gazhSb6feA0MLc5c1lUruimgs/VIQOygReuJFcFohMo
+         yCyg==
+X-Gm-Message-State: ACrzQf1pOTtERAFDMy/r12tOxc9t2ZJ1eeO49xit5nlVbWgQfsB7Rfxq
+        IAExx/ne/In0QWf+z5idaLxrc8Bl0Jt2nbSbl/IXMCunPXIPO9nCSegU4YZXC92+M7qKwb323aM
+        PXQAuegZ313WY
+X-Received: by 2002:a05:6000:16c8:b0:236:c60d:22b9 with SMTP id h8-20020a05600016c800b00236c60d22b9mr34218720wrf.526.1667984992769;
+        Wed, 09 Nov 2022 01:09:52 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM5b4W/+KStIQIEd31Opg71eedm54oI8YXOA25VraYMWJIMF7jYyeAE5P55LvkdaxbispEfo6g==
+X-Received: by 2002:a05:6000:16c8:b0:236:c60d:22b9 with SMTP id h8-20020a05600016c800b00236c60d22b9mr34218703wrf.526.1667984992514;
+        Wed, 09 Nov 2022 01:09:52 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id n19-20020a05600c3b9300b003b4c979e6bcsm1014454wms.10.2022.11.09.01.09.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Nov 2022 01:09:51 -0800 (PST)
+Message-ID: <7ba6da25-9ce4-f146-8480-c2614154fbb4@redhat.com>
+Date:   Wed, 9 Nov 2022 10:09:50 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.4.1
-Subject: Re: [PATCH 0/4] ifcvf/vDPA implement features provisioning
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH v2 4/8] KVM: SVM: retrieve VMCB from assembly
 Content-Language: en-US
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, hang.yuan@intel.com, piotr.uminski@intel.com
-References: <20221107093345.121648-1-lingshan.zhu@intel.com>
- <CACGkMEs9af1E1pLd2t8E71YBPF=rHkhfN8qO9_3=x6HVaCMAxg@mail.gmail.com>
- <0b15591f-9e49-6383-65eb-6673423f81ec@intel.com>
- <CACGkMEujqOFHv7QATWgYo=SdAKef5jQXi2-YksjgT-hxEgKNDQ@mail.gmail.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <CACGkMEujqOFHv7QATWgYo=SdAKef5jQXi2-YksjgT-hxEgKNDQ@mail.gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        nathan@kernel.org, thomas.lendacky@amd.com,
+        andrew.cooper3@citrix.com, peterz@infradead.org,
+        jmattson@google.com, stable@vger.kernel.org
+References: <20221108151532.1377783-1-pbonzini@redhat.com>
+ <20221108151532.1377783-5-pbonzini@redhat.com> <Y2r6FqZyT4XxUkYB@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Y2r6FqZyT4XxUkYB@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 11/9/22 01:53, Sean Christopherson wrote:
+> On Tue, Nov 08, 2022, Paolo Bonzini wrote:
+>> This is needed in order to keep the number of arguments to 3 or less,
+>> after adding hsave_pa and spec_ctrl_intercepted.  32-bit builds only
+>> support passing three arguments in registers, fortunately all other
+>> data is reachable from the vcpu_svm struct.
+> 
+> Is it actually a problem if parameters are passed on the stack?  The assembly
+> code mostly creates a stack frame, i.e. %ebp can be used to pull values off the
+> stack.
 
+It's not, but given how little love 32-bit KVM receives, I prefer to 
+stick to the subset of the ABI that is "equivalent" to 64-bit.
 
-On 11/9/2022 4:59 PM, Jason Wang wrote:
-> On Wed, Nov 9, 2022 at 4:14 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
->>
->>
->> On 11/9/2022 2:51 PM, Jason Wang wrote:
->>> On Mon, Nov 7, 2022 at 5:42 PM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
->>>> This series implements features provisioning for ifcvf.
->>>> By applying this series, we allow userspace to create
->>>> a vDPA device with selected (management device supported)
->>>> feature bits and mask out others.
->>> I don't see a direct relationship between the first 3 and the last.
->>> Maybe you can state the reason why the restructure is a must for the
->>> feature provisioning. Otherwise, we'd better split the series.
->> When introducing features provisioning ability to ifcvf, there is a need
->> to re-create vDPA devices
->> on a VF with different feature bits.
-> This seems a requirement even without feature provisioning? Device
-> could be deleted from the management device anyhow.
-Yes, we need this to delete and re-create a vDPA device.
+> no one cares about 32-bit and I highly doubt a few extra PUSH+POP
+> instructions will  be noticeable.
 
-We create vDPA device from a VF, so without features provisioning 
-requirements,
-we don't need to re-create the vDPA device. But with features provisioning,
-it is a must now.
+Same reasoning (no one cares about 32-bits), different conclusions...
 
-Thanks
+>> What fields are actually used is (like with any other function)
+>> "potentially all, you'll have to read the source code and in fact you
+>> can just read asm-offsets.c instead".  What I mean is, I cannot offhand
+>> see or remember what fields are touched by svm_prepare_switch_to_guest,
+>> why would __svm_vcpu_run be any different?
+> 
+> It's different because if it were a normal C function, it would simply take
+> @vcpu, and maybe @spec_ctrl_intercepted to shave cycles after CLGI.
 
+Not just for that, but especially to avoid making 
+msr_write_intercepted() noinstr.
 
->
-> Thakns
->
->> When remove a vDPA device, the container of struct vdpa_device (here is
->> ifcvf_adapter) is free-ed in
->> dev_del() interface, so we need to allocate ifcvf_adapter in dev_add()
->> than in probe(). That's
->> why I have re-factored the adapter/mgmt_dev code.
->>
->> For re-factoring the irq related code and ifcvf_base, let them work on
->> struct ifcvf_hw, the
->> reason is that the adapter is allocated in dev_add(), if we want theses
->> functions to work
->> before dev_add(), like in probe, we need them work on ifcvf_hw than the
->> adapter.
->>
->> Thanks
->> Zhu Lingshan
->>> Thanks
->>>
->>>> Please help review
->>>>
->>>> Thanks
->>>>
->>>> Zhu Lingshan (4):
->>>>     vDPA/ifcvf: ifcvf base layer interfaces work on struct ifcvf_hw
->>>>     vDPA/ifcvf: IRQ interfaces work on ifcvf_hw
->>>>     vDPA/ifcvf: allocate ifcvf_adapter in dev_add()
->>>>     vDPA/ifcvf: implement features provisioning
->>>>
->>>>    drivers/vdpa/ifcvf/ifcvf_base.c |  32 ++-----
->>>>    drivers/vdpa/ifcvf/ifcvf_base.h |  10 +-
->>>>    drivers/vdpa/ifcvf/ifcvf_main.c | 156 +++++++++++++++-----------------
->>>>    3 files changed, 89 insertions(+), 109 deletions(-)
->>>>
->>>> --
->>>> 2.31.1
->>>>
+> But because
+> it's assembly and doesn't have to_svm() readily available (among other restrictions),
+> __svm_vcpu_run() ends up taking a mishmash of parameters, which for me makes it
+> rather difficult to understand what to expect.
+
+Yeah, there could be three reasons to have parameters in assembly:
+
+* you just need them (@svm)
+
+* it's too much of a pain to compute it in assembly 
+(@spec_ctrl_intercepted, @hsave_pa)
+
+* it needs to be computed outside the clgi/stgi region (not happening 
+here, only mentioned for completeness)
+
+As this patch shows, @vmcb is not much of a pain to compute in assembly: 
+it is just two instructions, and not passing it in simplifies register 
+allocation (the weird push/pop goes away) because all the arguments 
+except @svm/_ASM_ARG1 are needed only after vmexit.
+
+> Oooh, and after much staring I realized that the address of the host save area
+> is passed in because grabbing it after VM-Exit can't work.  That's subtle, and
+> passing it in isn't strictly necessary; there's no reason the assembly code can't
+> grab it and stash it on the stack.
+
+Right, in fact that's not the reason why it's passed in---it's just to 
+avoid coding page_to_pfn() in assembly, and to limit the differences 
+between the regular and SEV-ES cases.  But using a per-CPU variable is 
+fine (either in addition to the struct page, which "wastes" 8 bytes per 
+CPU, or as a replacement).
+
+> What about killing a few birds with one stone?  Move the host save area PA to
+> its own per-CPU variable, and then grab that from assembly as well.
+
+I would still place it in struct svm_cpu_data itself, I'll see how it 
+looks and possibly post v3.
+
+Paolo
 
