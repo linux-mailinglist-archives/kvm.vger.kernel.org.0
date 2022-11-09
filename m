@@ -2,126 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E709622F9C
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 17:05:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8E5B622FA1
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 17:06:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231151AbiKIQFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 11:05:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51470 "EHLO
+        id S231289AbiKIQFy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 11:05:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbiKIQFd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 11:05:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2CE020F53
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 08:04:39 -0800 (PST)
+        with ESMTP id S231185AbiKIQFv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 11:05:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F6AE20F72
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 08:04:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668009879;
+        s=mimecast20190719; t=1668009890;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vlkkeMfxV44D/L3s5LRq3WQI02ckK3ct3NFXoV2Fvn8=;
-        b=RLA7cgEuy0yD0uO9VWHLJE/q2AF1i8Pg5eLPb7BlhUxvD8BAwHpCzOX98+HudQFEA1AyWW
-        Bv5iX190HckT3epr2KuBJF4i2MjY3OQw8gbJ2n/wZvIcATsik1fr3CYmwmlKCvzClhQzGo
-        iZHybtl7ZZKZEAxsCe6zaqCknG13BzE=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=lBkgf+uP/YsjwEv/Zat4qHyDX9ghIOy9Sg+JfdkUrSQ=;
+        b=Y7uhU7bOQtnZHILkKGbMGqny7W/KH17iM0QwzOU7yrvU2OogImKSOqtjKaWGKTOKXN2Sgn
+        +xD6OKEnLDSgdI+yVlLN+fpJ82kCxlfZEcRXdCw5DIDJfhLiMYmOmtP3lL4n/pQek107t2
+        ZQh/STxTpyZ4TvhfTFVT1lWBzsWZlEY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-187-Gr3UCNr6Pk6cLsum7m0XUQ-1; Wed, 09 Nov 2022 11:04:35 -0500
-X-MC-Unique: Gr3UCNr6Pk6cLsum7m0XUQ-1
-Received: by mail-io1-f72.google.com with SMTP id be26-20020a056602379a00b006dd80a0ba1cso2572224iob.11
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 08:04:35 -0800 (PST)
+ us-mta-338-kfjNnEM1N9SjJNzGB_TY_A-1; Wed, 09 Nov 2022 11:04:49 -0500
+X-MC-Unique: kfjNnEM1N9SjJNzGB_TY_A-1
+Received: by mail-wm1-f72.google.com with SMTP id z18-20020a05600c221200b003cf7fcc286aso758910wml.1
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 08:04:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vlkkeMfxV44D/L3s5LRq3WQI02ckK3ct3NFXoV2Fvn8=;
-        b=givNq8ituV3RXWiyeE7BX8DUv5kyhuqFjRwVWxplhdV0QpaR9SjJaHasgvlQeQQvyF
-         hh7Ok6ZTzEQ86UALwwnNsVTwsSutG6Kj7HSUYp3oWV33kXrPiCVRnTgew2WzN1+8w6eC
-         n+9XChvzm5G8Pe2volwlvpZ3J7aKohKtgW9bluH/+DnFHYb0yNCniR2qpfKNInAarrDv
-         esj+CspZJeFs6WIo7l2xdsmoRb5uK6U5TyqS80N3I6ZKx7psU0e+OVioSLRWkEcQAnTl
-         qUY1ct77uMDvoeZfNRgQ2jpbfroDZXWzeYmxPqAtiR63VDm3a+sE96ZJjvXbl97b7rXt
-         D8Bw==
-X-Gm-Message-State: ACrzQf2X/tskp03JAfWImYigtdJb5DWvAVedpgB0GU2Tkbt++X15IPw5
-        fnpESDg9rfVQyxBfCE57wAju6aax8iEuUyRFAikUvFJKju8Hzd0OcP3PLfF/JhYCh0a5XaN9uTq
-        Zx8HsOtNuUJX9
-X-Received: by 2002:a05:6e02:6c9:b0:2ff:a4d3:3ae with SMTP id p9-20020a056e0206c900b002ffa4d303aemr32883876ils.163.1668009874562;
-        Wed, 09 Nov 2022 08:04:34 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM7cyAN5brN5IYU7iI+TJHnZhix6eZxYlMZL72PBNXbZ/kasSYOws7sdmCYTOvWrRw6luGHkdQ==
-X-Received: by 2002:a05:6e02:6c9:b0:2ff:a4d3:3ae with SMTP id p9-20020a056e0206c900b002ffa4d303aemr32883869ils.163.1668009874368;
-        Wed, 09 Nov 2022 08:04:34 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id h8-20020a926c08000000b002ff54e19cb0sm5022981ilc.36.2022.11.09.08.04.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Nov 2022 08:04:33 -0800 (PST)
-Date:   Wed, 9 Nov 2022 09:04:31 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Anthony DeRossi <ajderossi@gmail.com>, kvm@vger.kernel.org,
-        cohuck@redhat.com, kevin.tian@intel.com, abhsahu@nvidia.com,
-        yishaih@nvidia.com
-Subject: Re: [PATCH v5 2/3] vfio: Export the device set open count
-Message-ID: <20221109090431.0e07382a.alex.williamson@redhat.com>
-In-Reply-To: <Y2r4yHY5re97WA7G@ziepe.ca>
-References: <20221105224458.8180-1-ajderossi@gmail.com>
-        <20221105224458.8180-3-ajderossi@gmail.com>
-        <Y2r4yHY5re97WA7G@ziepe.ca>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lBkgf+uP/YsjwEv/Zat4qHyDX9ghIOy9Sg+JfdkUrSQ=;
+        b=eXcvrDhhHvWXIQVPF4/GwLi7rnPDZdeZ2wDRcvBmMSKKbiWpWCcVuBJJq636jYj3T3
+         EQQ/jiuAHkDj1W9JMq3YqsZjPupVnhkoot8aing6NMFRrrJX6WWlG8dUKbk+BBL6orAa
+         lLNg2X8kb6ORAXbnhgJ/P2+whLm49jqQB9M4YFbE/tdqUYBco/dwvrqMx3MJp1z5Bmj/
+         nXS4ErQz7reWpN0EQ1lIcNy0m2pxNcVkYNeszDQq528VKLv/Xd7Lbw8IjG5uL9aE0ekE
+         xMLMmk5T96HSYSuKIXZI7ikeJx7c5HoDu7WEJuPqxln8W+MXXxZTOAPLy1ez8EnjoLZv
+         sKHw==
+X-Gm-Message-State: ACrzQf0943YZ3t2loH1MP7rm2zSHB5nl6j3bQbo/Rs+S2ujGZNTiAFf9
+        OR9WdSV0a2FAMNFejqbg20wwj7t+onkKySgXx5hopYG310Wa7brpLul/MUQsSyXSZO4uCOo8SU/
+        r+22UoptfP+P+
+X-Received: by 2002:a5d:5292:0:b0:236:ccb9:673b with SMTP id c18-20020a5d5292000000b00236ccb9673bmr34930287wrv.317.1668009887732;
+        Wed, 09 Nov 2022 08:04:47 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM4HgLnFrPxOWHNRB06tzRu9505xj1HfpUMdLUAJw6Qda4RwBKiIpJ9bQdaLn3FfmWg5+LKE5g==
+X-Received: by 2002:a5d:5292:0:b0:236:ccb9:673b with SMTP id c18-20020a5d5292000000b00236ccb9673bmr34930261wrv.317.1668009887458;
+        Wed, 09 Nov 2022 08:04:47 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id n17-20020a5d6611000000b002383edcde09sm13554431wru.59.2022.11.09.08.04.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Nov 2022 08:04:46 -0800 (PST)
+Message-ID: <cf24a179-3c19-f4b2-d62d-3c812f46c4dc@redhat.com>
+Date:   Wed, 9 Nov 2022 17:04:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 03/11] KVM: SVM: adjust register allocation for
+ __svm_vcpu_run
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        thomas.lendacky@amd.com, jmattson@google.com,
+        stable@vger.kernel.org
+References: <20221109145156.84714-1-pbonzini@redhat.com>
+ <20221109145156.84714-4-pbonzini@redhat.com> <Y2vFIR+T+9SFY0xO@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Y2vFIR+T+9SFY0xO@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 8 Nov 2022 20:48:08 -0400
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
+On 11/9/22 16:20, Sean Christopherson wrote:
+>> keep the pointer to the struct vcpu_svm in %rdi.  This way
+>> it is possible to load svm->vmcb01.pa in %rax without
+>> clobbering the pointer to svm itself.
+>
+> If you feel like doing fixup before pushing, add a note to call out that avoiding
+> RAX will also be "necessary" to play nice with loading/storing MSR_SPEC_CTRL?
+> When fiddling with this code, I found the RDMSR/WRMSR clobbers to be far more
+> problematic than the VMCB pointers.
 
-> On Sat, Nov 05, 2022 at 03:44:57PM -0700, Anthony DeRossi wrote:
-> > The open count of a device set is the sum of the open counts of all
-> > devices in the set. Drivers can use this value to determine whether
-> > shared resources are in use without tracking them manually or accessing
-> > the private open_count in vfio_device.
-> > 
-> > Signed-off-by: Anthony DeRossi <ajderossi@gmail.com>
-> > ---
-> >  drivers/vfio/vfio_main.c | 11 +++++++++++
-> >  include/linux/vfio.h     |  1 +
-> >  2 files changed, 12 insertions(+)  
-> 
-> >  
-> > +unsigned int vfio_device_set_open_count(struct vfio_device_set *dev_set)
-> > +{
-> > +	struct vfio_device *cur;
-> > +	unsigned int open_count = 0;  
-> 
-> I'd probably just make this a bool
-> 
-> 'vfio_device_set_last_close()'
-> 
-> And roll in the < 1 logic too
-> 
-> Nothing will ever need to know the number of fds open across the set.
+I tried to avoid the "in the future" phrasing which some people dislike. 
+  I'll rephrase anyway.  Even without taking 
+RDMSR/WRMSR/VMLOAD/VMRUN/VMSAVE into account, avoiding the potential 
+clash with 32-bit register arguments is a decent reason for the patch 
+anyway.
 
-'last_close' presumes the caller though, which seems bad form.  It's
-possible there are use cases for this in a 'first_open' scenario too.
-Something along the lines of 'singleton_open', but that's a horrible
-name, so we might as well just provide the count since we already have
-it.  Thanks,
-
-Alex
-
-> But this is fine as written
-> 
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> 
-> Jason
-> 
+Paolo
 
