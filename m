@@ -2,47 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09BAF622E6F
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 15:53:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C5030622E81
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 15:54:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231671AbiKIOxI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 09:53:08 -0500
+        id S231828AbiKIOyj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 09:54:39 -0500
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230446AbiKIOxE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 09:53:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCB5E1260D
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 06:52:01 -0800 (PST)
+        with ESMTP id S231706AbiKIOyI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 09:54:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 392331DA4C
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 06:52:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668005521;
+        s=mimecast20190719; t=1668005524;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=v7KekBuVbdaP/slMay7nDZlONr+EZdVeul1Pazjhqh4=;
-        b=Arqmb/iunuICv/rtXTzjUNVZsp3rRIq9QJzpA+D5WmjZWhRZOkywUPMmBxoPuciMebTcVo
-        fSDGzrJd0TWvSaxYhW7GBUSaoJHLyuqWX+yen90lSR+KUfOAO2NOStvAbzFI8EiDmvI4ad
-        41+nruDaIZ0GDxDwHj+AmBsamI5r9jM=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=obChpFxft7LarVNYEfsIB9XlboFatXpeV/jsLINF7g0=;
+        b=SmwOzgzbFryy/aSB8pY46Edb7cc2OSvysHwE9mzX1U/xsHZdOFVBm7vTWAg1T4ujWXoACf
+        lCmcsQjkAZop+UwfKv9fw40p/+XgTqwm3MFNubyfIls4JuvrJKVRV+OxFBhQit+KUtvVd3
+        4hBXe7kMszRBJalKh+zw9f2P7Lvn66I=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-152-fPQcFIf7Msyp74x4LmfT6g-1; Wed, 09 Nov 2022 09:51:59 -0500
-X-MC-Unique: fPQcFIf7Msyp74x4LmfT6g-1
+ us-mta-631-ojHq21STMMCbfiUwQe84jA-1; Wed, 09 Nov 2022 09:52:01 -0500
+X-MC-Unique: ojHq21STMMCbfiUwQe84jA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 17C7C2815215;
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4E2A580255D;
         Wed,  9 Nov 2022 14:51:59 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E36ED140EBF5;
-        Wed,  9 Nov 2022 14:51:58 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 208E7140EBF5;
+        Wed,  9 Nov 2022 14:51:59 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     thomas.lendacky@amd.com, jmattson@google.com, seanjc@google.com
-Subject: [PATCH 07/11] KVM: SVM: do not allocate struct svm_cpu_data dynamically
-Date:   Wed,  9 Nov 2022 09:51:52 -0500
-Message-Id: <20221109145156.84714-8-pbonzini@redhat.com>
+Cc:     thomas.lendacky@amd.com, jmattson@google.com, seanjc@google.com,
+        stable@vger.kernel.org
+Subject: [PATCH 08/11] KVM: SVM: move guest vmsave/vmload back to assembly
+Date:   Wed,  9 Nov 2022 09:51:53 -0500
+Message-Id: <20221109145156.84714-9-pbonzini@redhat.com>
 In-Reply-To: <20221109145156.84714-1-pbonzini@redhat.com>
 References: <20221109145156.84714-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -51,7 +52,7 @@ Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -59,182 +60,151 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The svm_data percpu variable is a pointer, but it is allocated when
-KVM is loaded (via svm_hardware_setup), not at hardware_enable time.
-Just allocate room for it statically, that is more efficient and
-does not waste any memory compared to the status quo.
+FILL_RETURN_BUFFER can access percpu data, therefore vmload of the
+host save area must be executed first.  First of all, move the VMCB
+vmsave/vmload to assembly, essentially undoing commit fb0c4a4fee5a ("KVM:
+SVM: move VMLOAD/VMSAVE to C code", 2021-03-15).  The reason for that
+commit was that it made it simpler to use a different VMCB for
+VMLOAD/VMSAVE versus VMRUN; but that is not a big hassle anymore thanks
+to the kvm-asm-offsets machinery.
 
+The idea on how to number the exception tables is stolen from
+a prototype patch by Peter Zijlstra.
+
+Cc: stable@vger.kernel.org
+Fixes: a149180fbcf3 ("x86: Add magic AMD return-thunk")
+Link: <https://lore.kernel.org/all/f571e404-e625-bae1-10e9-449b2eb4cbd8@citrix.com/>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/svm/sev.c |  4 ++--
- arch/x86/kvm/svm/svm.c | 41 +++++++++++++++--------------------------
- arch/x86/kvm/svm/svm.h |  2 +-
- 3 files changed, 18 insertions(+), 29 deletions(-)
+ arch/x86/kvm/kvm-asm-offsets.c |  1 +
+ arch/x86/kvm/svm/svm.c         |  9 -------
+ arch/x86/kvm/svm/vmenter.S     | 49 ++++++++++++++++++++++++++--------
+ 3 files changed, 39 insertions(+), 20 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 28064060413a..9b66ee34e264 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -196,7 +196,7 @@ static void sev_asid_free(struct kvm_sev_info *sev)
- 	__set_bit(sev->asid, sev_reclaim_asid_bitmap);
- 
- 	for_each_possible_cpu(cpu) {
--		sd = per_cpu(svm_data, cpu);
-+		sd = per_cpu_ptr(&svm_data, cpu);
- 		sd->sev_vmcbs[sev->asid] = NULL;
+diff --git a/arch/x86/kvm/kvm-asm-offsets.c b/arch/x86/kvm/kvm-asm-offsets.c
+index f1b694e431ae..f83e88b85bf2 100644
+--- a/arch/x86/kvm/kvm-asm-offsets.c
++++ b/arch/x86/kvm/kvm-asm-offsets.c
+@@ -16,6 +16,7 @@ static void __used common(void)
+ 		BLANK();
+ 		OFFSET(SVM_vcpu_arch_regs, vcpu_svm, vcpu.arch.regs);
+ 		OFFSET(SVM_current_vmcb, vcpu_svm, current_vmcb);
++		OFFSET(SVM_vmcb01, vcpu_svm, vmcb01);
+ 		OFFSET(KVM_VMCB_pa, kvm_vmcb_info, pa);
  	}
  
-@@ -2600,7 +2600,7 @@ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
- 
- void pre_sev_run(struct vcpu_svm *svm, int cpu)
- {
--	struct svm_cpu_data *sd = per_cpu(svm_data, cpu);
-+	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
- 	int asid = sev_get_asid(svm->vcpu.kvm);
- 
- 	/* Assign the asid allocated with this SEV guest */
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 0f873b298931..48274c93d78b 100644
+index 48274c93d78b..4e3a47eb5002 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -245,7 +245,7 @@ struct kvm_ldttss_desc {
- 	u32 zero1;
- } __attribute__((packed));
- 
--DEFINE_PER_CPU(struct svm_cpu_data *, svm_data);
-+DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
- 
- /*
-  * Only MSR_TSC_AUX is switched via the user return hook.  EFER is switched via
-@@ -581,12 +581,7 @@ static int svm_hardware_enable(void)
- 		pr_err("%s: err EOPNOTSUPP on %d\n", __func__, me);
- 		return -EINVAL;
- 	}
--	sd = per_cpu(svm_data, me);
--	if (!sd) {
--		pr_err("%s: svm_data is NULL on %d\n", __func__, me);
--		return -EINVAL;
--	}
--
-+	sd = per_cpu_ptr(&svm_data, me);
- 	sd->asid_generation = 1;
- 	sd->max_asid = cpuid_ebx(SVM_CPUID_FUNC) - 1;
- 	sd->next_asid = sd->max_asid + 1;
-@@ -646,41 +641,35 @@ static int svm_hardware_enable(void)
- 
- static void svm_cpu_uninit(int cpu)
- {
--	struct svm_cpu_data *sd = per_cpu(svm_data, cpu);
-+	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
- 
--	if (!sd)
-+	if (!sd->save_area)
- 		return;
- 
--	per_cpu(svm_data, cpu) = NULL;
- 	kfree(sd->sev_vmcbs);
- 	__free_page(sd->save_area);
--	kfree(sd);
-+	sd->save_area = NULL;
- }
- 
- static int svm_cpu_init(int cpu)
- {
--	struct svm_cpu_data *sd;
-+	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
- 	int ret = -ENOMEM;
- 
--	sd = kzalloc(sizeof(struct svm_cpu_data), GFP_KERNEL);
--	if (!sd)
--		return ret;
-+	memset(sd, 0, sizeof(struct svm_cpu_data));
- 	sd->save_area = alloc_page(GFP_KERNEL | __GFP_ZERO);
- 	if (!sd->save_area)
--		goto free_cpu_data;
-+		return ret;
- 
- 	ret = sev_cpu_init(sd);
- 	if (ret)
- 		goto free_save_area;
- 
--	per_cpu(svm_data, cpu) = sd;
--
- 	return 0;
- 
- free_save_area:
- 	__free_page(sd->save_area);
--free_cpu_data:
--	kfree(sd);
-+	sd->save_area = NULL;
- 	return ret;
- 
- }
-@@ -1424,7 +1413,7 @@ static void svm_clear_current_vmcb(struct vmcb *vmcb)
- 	int i;
- 
- 	for_each_online_cpu(i)
--		cmpxchg(&per_cpu(svm_data, i)->current_vmcb, vmcb, NULL);
-+		cmpxchg(per_cpu_ptr(&svm_data.current_vmcb, i), vmcb, NULL);
- }
- 
- static void svm_vcpu_free(struct kvm_vcpu *vcpu)
-@@ -1449,7 +1438,7 @@ static void svm_vcpu_free(struct kvm_vcpu *vcpu)
- static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
--	struct svm_cpu_data *sd = per_cpu(svm_data, vcpu->cpu);
-+	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
- 
- 	if (sev_es_guest(vcpu->kvm))
- 		sev_es_unmap_ghcb(svm);
-@@ -1486,7 +1475,7 @@ static void svm_prepare_host_switch(struct kvm_vcpu *vcpu)
- static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
--	struct svm_cpu_data *sd = per_cpu(svm_data, cpu);
-+	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
- 
- 	if (sd->current_vmcb != svm->vmcb) {
- 		sd->current_vmcb = svm->vmcb;
-@@ -3442,7 +3431,7 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 
- static void reload_tss(struct kvm_vcpu *vcpu)
- {
--	struct svm_cpu_data *sd = per_cpu(svm_data, vcpu->cpu);
-+	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
- 
- 	sd->tss_desc->type = 9; /* available 32/64-bit TSS */
- 	load_TR_desc();
-@@ -3450,7 +3439,7 @@ static void reload_tss(struct kvm_vcpu *vcpu)
- 
- static void pre_svm_run(struct kvm_vcpu *vcpu)
- {
--	struct svm_cpu_data *sd = per_cpu(svm_data, vcpu->cpu);
-+	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
- 	/*
-@@ -3919,7 +3908,7 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
- 	if (sev_es_guest(vcpu->kvm)) {
- 		__svm_sev_es_vcpu_run(svm);
+@@ -3910,16 +3910,7 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
  	} else {
--		struct svm_cpu_data *sd = per_cpu(svm_data, vcpu->cpu);
-+		struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
+ 		struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
  
- 		/*
- 		 * Use a single vmcb (vmcb01 because it's always valid) for
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 7540db9902a6..2af6a71126c1 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -293,7 +293,7 @@ struct svm_cpu_data {
- 	struct vmcb **sev_vmcbs;
- };
+-		/*
+-		 * Use a single vmcb (vmcb01 because it's always valid) for
+-		 * context switching guest state via VMLOAD/VMSAVE, that way
+-		 * the state doesn't need to be copied between vmcb01 and
+-		 * vmcb02 when switching vmcbs for nested virtualization.
+-		 */
+-		vmload(svm->vmcb01.pa);
+ 		__svm_vcpu_run(svm);
+-		vmsave(svm->vmcb01.pa);
+-
+ 		vmload(__sme_page_pa(sd->save_area));
+ 	}
  
--DECLARE_PER_CPU(struct svm_cpu_data *, svm_data);
-+DECLARE_PER_CPU(struct svm_cpu_data, svm_data);
+diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
+index d07bac1952c5..5bc2ed7d79c0 100644
+--- a/arch/x86/kvm/svm/vmenter.S
++++ b/arch/x86/kvm/svm/vmenter.S
+@@ -28,6 +28,8 @@
+ #define VCPU_R15	(SVM_vcpu_arch_regs + __VCPU_REGS_R15 * WORD_SIZE)
+ #endif
  
- void recalc_intercepts(struct vcpu_svm *svm);
++#define SVM_vmcb01_pa	(SVM_vmcb01 + KVM_VMCB_pa)
++
+ .section .noinstr.text, "ax"
+ 
+ /**
+@@ -55,6 +57,16 @@ SYM_FUNC_START(__svm_vcpu_run)
+ 	mov %_ASM_ARG1, %_ASM_DI
+ .endif
+ 
++	/*
++	 * Use a single vmcb (vmcb01 because it's always valid) for
++	 * context switching guest state via VMLOAD/VMSAVE, that way
++	 * the state doesn't need to be copied between vmcb01 and
++	 * vmcb02 when switching vmcbs for nested virtualization.
++	 */
++	mov SVM_vmcb01_pa(%_ASM_DI), %_ASM_AX
++1:	vmload %_ASM_AX
++2:
++
+ 	/* Get svm->current_vmcb->pa into RAX. */
+ 	mov SVM_current_vmcb(%_ASM_DI), %_ASM_AX
+ 	mov KVM_VMCB_pa(%_ASM_AX), %_ASM_AX
+@@ -80,16 +92,11 @@ SYM_FUNC_START(__svm_vcpu_run)
+ 	/* Enter guest mode */
+ 	sti
+ 
+-1:	vmrun %_ASM_AX
+-
+-2:	cli
+-
+-#ifdef CONFIG_RETPOLINE
+-	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
+-	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
+-#endif
++3:	vmrun %_ASM_AX
++4:
++	cli
+ 
+-	/* "POP" @svm to RAX. */
++	/* Pop @svm to RAX while it's the only available register. */
+ 	pop %_ASM_AX
+ 
+ 	/* Save all guest registers.  */
+@@ -110,6 +117,18 @@ SYM_FUNC_START(__svm_vcpu_run)
+ 	mov %r15, VCPU_R15(%_ASM_AX)
+ #endif
+ 
++	/* @svm can stay in RDI from now on.  */
++	mov %_ASM_AX, %_ASM_DI
++
++	mov SVM_vmcb01_pa(%_ASM_DI), %_ASM_AX
++5:	vmsave %_ASM_AX
++6:
++
++#ifdef CONFIG_RETPOLINE
++	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
++	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
++#endif
++
+ 	/*
+ 	 * Mitigate RETBleed for AMD/Hygon Zen uarch. RET should be
+ 	 * untrained as soon as we exit the VM and are back to the
+@@ -159,11 +178,19 @@ SYM_FUNC_START(__svm_vcpu_run)
+ 	pop %_ASM_BP
+ 	RET
+ 
+-3:	cmpb $0, kvm_rebooting
++10:	cmpb $0, kvm_rebooting
+ 	jne 2b
+ 	ud2
++30:	cmpb $0, kvm_rebooting
++	jne 4b
++	ud2
++50:	cmpb $0, kvm_rebooting
++	jne 6b
++	ud2
+ 
+-	_ASM_EXTABLE(1b, 3b)
++	_ASM_EXTABLE(1b, 10b)
++	_ASM_EXTABLE(3b, 30b)
++	_ASM_EXTABLE(5b, 50b)
+ 
+ SYM_FUNC_END(__svm_vcpu_run)
  
 -- 
 2.31.1
