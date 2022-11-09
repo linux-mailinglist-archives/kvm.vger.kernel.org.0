@@ -2,61 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D200B622571
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 09:29:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B670622572
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 09:29:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229987AbiKII3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 03:29:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41592 "EHLO
+        id S230075AbiKII3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 03:29:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229875AbiKII2k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 03:28:40 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 007802673;
-        Wed,  9 Nov 2022 00:28:24 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id 6so7475274pgm.6;
-        Wed, 09 Nov 2022 00:28:24 -0800 (PST)
+        with ESMTP id S229955AbiKII2l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 03:28:41 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00CA42DF4;
+        Wed,  9 Nov 2022 00:28:26 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id y203so16053316pfb.4;
+        Wed, 09 Nov 2022 00:28:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gfUfiLMSDty5pKmQVoXHf+IXuNDCfniw4Yx5uF+cedc=;
-        b=PnI7rvNSYoxT0RIx9PjwUuB4E8+I6ctdIzfJW5WPVkYFdo6fNDbFR5+nkOhGiD7tBC
-         paRtJh+4d2zHmWDnSy4Y/XW2fcRvniC+O8yMkHgBHztLiIMpK5I73nBppDoy6LhhEfJd
-         eMJBqwFEmV7OnrE5H9OFycKhGWh7qmVjtnJuA7uAfS+gQTLSjaeRkkq3RCmR2w6ovpWa
-         M4MmVKtUuyl9Tubbd82EaYTkkxk1Fa2dJ1FHt2W3QQA7PNjHIcHBTf0mFOOCO3Duga2x
-         EDGn6XabJSKE00eTmRCBNurRUy8frYI26f1/9ANQjFvp7ffzsenCgI5MysYXZ3hqSvGs
-         7Lbw==
+        bh=rsRdQU8Ady+UGmrXI+CqXDPucP2vHJde8y88ZmpGZsM=;
+        b=LKISIc2cB6Z6TO9vuFDS5ZgjgvbrRGTXBX69S8YrBIn0o1OHvc2k9kK8Kx6t6+VfuD
+         o8bCBUU6n2Fzs+eSZm9X5jFoWEgpt4tl0w+bMyANW/Zpk2v/2BHzD7QL6Iq6X/MZtsCm
+         rzmyM5DIu8P5S+7wi/49ISCXvUoPZDyDngxblUiYnY3oJ6PgYmMQKx/D4N0ft6YLewXf
+         sk9cQMXrM5vgs16LzKtFy3d9dewRtMSGyyMoWBowgUZwmendk2wya/p2hiM3RDOkcFt2
+         257FgWVBfrtCTtnYWk4ynJUnUugj9ZUga6NzbKbT2OOBIywsj6u0YytRIn8iTiYUcrzo
+         q7jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gfUfiLMSDty5pKmQVoXHf+IXuNDCfniw4Yx5uF+cedc=;
-        b=yvZ6iAsymmEYPcrzvxdF1rfflRqDDkMdP+KxUq5VN8D7LkjU/l9ei8fTm579ATxeDN
-         Lg80+eys4gfEq3Z7s58BmGEXhumPmNS8h8ONY83NBuuiP7rgFSOtN1KnNtTQMIQdZk6B
-         fpMs3IkTmLQbvZJXchThnKv+kVX8JOQWtQsrYgAn5RSq1niNUXBREETu2HBXaLytiUS+
-         EvAA9faQFm11uGthDXIx1KlMuAgEKQjBXy3fqQMsMn1W0D9B5NTC3ivffemYjVBWw6lf
-         Uiqh//c2pwQipaj71MqirqJB9ODVTYXnXcjD4cttKsomfa6K4RmveVQPLEFrHKY3rSUH
-         55BQ==
-X-Gm-Message-State: ACrzQf26yvuIgazzz/URlnSv9kJo8zZhAYQnaVrLicIsx3hKp7tiUF9k
-        DnmkmXKcMaA52gZrRnLU2cQ=
-X-Google-Smtp-Source: AMsMyM7nhrQmBZGVpIWYdjyBZ00IVGqrFU186h5QWpWJo3k8nZxDn0GdZCogTXkBwAGEX8l5ienUdw==
-X-Received: by 2002:a63:1145:0:b0:46a:e00c:579c with SMTP id 5-20020a631145000000b0046ae00c579cmr52119177pgr.279.1667982504412;
-        Wed, 09 Nov 2022 00:28:24 -0800 (PST)
+        bh=rsRdQU8Ady+UGmrXI+CqXDPucP2vHJde8y88ZmpGZsM=;
+        b=BMQ96bu9CBees8hdhpQmZXYb1keT7KvMqwdyziLq1ZHzzxpg9UHjOl+2+rKzFQuY76
+         fuClxejPqS1id2ftkVHP6MXPHvBoFlYLGYDmqRVYU6Fb0HNk0Sqmnh+T9B4UBalHbTh2
+         NRIgk1UJ/Ub24OM1eVtwjdJrRHgwn7Jy9wUmlY6GN+hpDGmhiMbkM0WuxF7YsSQ8xTtJ
+         PZoauSQirVxofAwSGhhv5OOXxuu6e2g2o2JwY5rxQI8x9epStVYHe/ZSh1MWUiUXpzEu
+         HMlF4axYm77J5lmp90kPtsw/wHhlPooQzrPOZLS5S91wUAn1JE3XoatLhqZfEF7FxrZE
+         lqng==
+X-Gm-Message-State: ACrzQf31ITDUByQfZ59GRsvlmEjCc4Ga980bMK5WPkVuMTWpC255E5W2
+        JmlJS1953kbaHIjKxIHZreg=
+X-Google-Smtp-Source: AMsMyM7uM/wr15aY5dKimOK9PE2hO2hPz/ddyvr/0+ef1EuLKlZcHLXgIJo1RN4nRzQ1ElZq3gS2mA==
+X-Received: by 2002:a63:d14a:0:b0:470:3fc2:bed5 with SMTP id c10-20020a63d14a000000b004703fc2bed5mr21992121pgj.590.1667982506475;
+        Wed, 09 Nov 2022 00:28:26 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id b14-20020a63d30e000000b00470537b9b0asm6587700pgg.51.2022.11.09.00.28.23
+        by smtp.gmail.com with ESMTPSA id b14-20020a63d30e000000b00470537b9b0asm6587700pgg.51.2022.11.09.00.28.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Nov 2022 00:28:24 -0800 (PST)
+        Wed, 09 Nov 2022 00:28:26 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH v3 2/3] KVM: x86/pmu: Add PRIR++ and PDist support for SPR and later models
-Date:   Wed,  9 Nov 2022 16:28:01 +0800
-Message-Id: <20221109082802.27543-3-likexu@tencent.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-perf-users@vger.kernel.org,
+        Kan Liang <kan.liang@linux.intel.com>
+Subject: [PATCH v3 3/3] perf/x86/intel: Expose EPT-friendly PEBS for SPR and future models
+Date:   Wed,  9 Nov 2022 16:28:02 +0800
+Message-Id: <20221109082802.27543-4-likexu@tencent.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221109082802.27543-1-likexu@tencent.com>
 References: <20221109082802.27543-1-likexu@tencent.com>
@@ -74,123 +77,54 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-The pebs capability on the SPR is basically the same as Ice Lake Server
-with the exception of two special facilities that have been enhanced and
-require special handling.
+According to Intel SDM, the EPT-friendly PEBS is supported by all the
+platforms after ICX, ADL and the future platforms with PEBS format 5.
 
-Upon triggering a PEBS assist, there will be a finite delay between the
-time the counter overflows and when the microcode starts to carry out
-its data collection obligations. Even if the delay is constant in core
-clock space, it invariably manifest as variable "skids" in instruction
-address space.
+Currently the only in-kernel user of this capability is KVM, which has
+very limited support for hybrid core pmu, so ADL and its successors do
+not currently expose this capability. When both hybrid core and PEBS
+format 5 are present, KVM will decide on its own merits.
 
-On the Ice Lake Server, the Precise Distribution of Instructions Retire
-(PDIR) facility mitigates the "skid" problem by providing an early
-indication of when the counter is about to overflow. On SPR, the PDIR
-counter available (Fixed 0) is unchanged, but the capability is enhanced
-to Instruction-Accurate PDIR (PDIR++), where PEBS is taken on the
-next instruction after the one that caused the overflow.
-
-SPR also introduces a new Precise Distribution (PDist) facility only on
-general programmable counter 0. Per Intel SDM, PDist eliminates any
-skid or shadowing effects from PEBS. With PDist, the PEBS record will
-be generated precisely upon completion of the instruction or operation
-that causes the counter to overflow (there is no "wait for next occurrence"
-by default).
-
-In terms of KVM handling, when guest accesses those special counters,
-the KVM needs to request the same index counters via the perf_event
-kernel subsystem to ensure that the guest uses the correct pebs hardware
-counter (PRIR++ or PDist). This is mainly achieved by adjusting the
-event precise level to the maximum, where the semantics of this magic
-number is mainly defined by the internal software context of perf_event
-and it's also backwards compatible as part of the user space interface.
-
-Opportunistically, refine confusing comments on TNT+, as the only
-ones that currently support pebs_ept are Ice Lake server and SPR (GLC+).
-
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: linux-perf-users@vger.kernel.org
+Suggested-by: Kan Liang <kan.liang@linux.intel.com>
 Signed-off-by: Like Xu <likexu@tencent.com>
+Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
 ---
- arch/x86/kvm/pmu.c | 45 +++++++++++++++++++++++++++++++++------------
- 1 file changed, 33 insertions(+), 12 deletions(-)
+Nit: This change is proposed to be applied via the KVM tree.
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 935c9d80ab50..3df48fc34e97 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -28,9 +28,18 @@
- struct x86_pmu_capability __read_mostly kvm_pmu_cap;
- EXPORT_SYMBOL_GPL(kvm_pmu_cap);
+ arch/x86/events/intel/core.c | 1 +
+ arch/x86/events/intel/ds.c   | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+index a646a5f9a235..15e061fbb2f3 100644
+--- a/arch/x86/events/intel/core.c
++++ b/arch/x86/events/intel/core.c
+@@ -6350,6 +6350,7 @@ __init int intel_pmu_init(void)
+ 		x86_pmu.pebs_constraints = intel_spr_pebs_event_constraints;
+ 		x86_pmu.extra_regs = intel_spr_extra_regs;
+ 		x86_pmu.limit_period = spr_limit_period;
++		x86_pmu.pebs_ept = 1;
+ 		x86_pmu.pebs_aliases = NULL;
+ 		x86_pmu.pebs_prec_dist = true;
+ 		x86_pmu.pebs_block = true;
+diff --git a/arch/x86/events/intel/ds.c b/arch/x86/events/intel/ds.c
+index 7839507b3844..185e66b4ce31 100644
+--- a/arch/x86/events/intel/ds.c
++++ b/arch/x86/events/intel/ds.c
+@@ -2293,8 +2293,10 @@ void __init intel_ds_init(void)
+ 			x86_pmu.large_pebs_flags |= PERF_SAMPLE_TIME;
+ 			break;
  
--static const struct x86_cpu_id vmx_icl_pebs_cpu[] = {
-+/* Precise Distribution of Instructions Retired (PDIR) */
-+static const struct x86_cpu_id vmx_pebs_pdir_cpu[] = {
- 	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_D, NULL),
- 	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_X, NULL),
-+	/* Instruction-Accurate PDIR (PDIR++) */
-+	X86_MATCH_INTEL_FAM6_MODEL(SAPPHIRERAPIDS_X, NULL),
-+	{}
-+};
-+
-+/* Precise Distribution (PDist) */
-+static const struct x86_cpu_id vmx_pebs_pdist_cpu[] = {
-+	X86_MATCH_INTEL_FAM6_MODEL(SAPPHIRERAPIDS_X, NULL),
- 	{}
- };
- 
-@@ -155,6 +164,28 @@ static void kvm_perf_overflow(struct perf_event *perf_event,
- 	kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
- }
- 
-+static u64 pmc_get_pebs_precise_level(struct kvm_pmc *pmc)
-+{
-+	/*
-+	 * For some model specific pebs counters with special capabilities
-+	 * (PDIR, PDIR++, PDIST), KVM needs to raise the event precise
-+	 * level to the maximum value (currently 3, backwards compatible)
-+	 * so that the perf subsystem would assign specific hardware counter
-+	 * with that capability for vPMC.
-+	 */
-+	if ((pmc->idx == 0 && x86_match_cpu(vmx_pebs_pdist_cpu)) ||
-+	    (pmc->idx == 32 && x86_match_cpu(vmx_pebs_pdir_cpu)))
-+		return 3;
-+
-+	/*
-+	 * The non-zero precision level of guest event makes the ordinary
-+	 * guest event becomes a guest PEBS event and triggers the host
-+	 * PEBS PMI handler to determine whether the PEBS overflow PMI
-+	 * comes from the host counters or the guest.
-+	 */
-+	return 1;
-+}
-+
- static int pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type, u64 config,
- 				 bool exclude_user, bool exclude_kernel,
- 				 bool intr)
-@@ -186,22 +217,12 @@ static int pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type, u64 config,
- 	}
- 	if (pebs) {
- 		/*
--		 * The non-zero precision level of guest event makes the ordinary
--		 * guest event becomes a guest PEBS event and triggers the host
--		 * PEBS PMI handler to determine whether the PEBS overflow PMI
--		 * comes from the host counters or the guest.
--		 *
- 		 * For most PEBS hardware events, the difference in the software
- 		 * precision levels of guest and host PEBS events will not affect
- 		 * the accuracy of the PEBS profiling result, because the "event IP"
- 		 * in the PEBS record is calibrated on the guest side.
--		 *
--		 * On Icelake everything is fine. Other hardware (GLC+, TNT+) that
--		 * could possibly care here is unsupported and needs changes.
- 		 */
--		attr.precise_ip = 1;
--		if (x86_match_cpu(vmx_icl_pebs_cpu) && pmc->idx == 32)
--			attr.precise_ip = 3;
-+		attr.precise_ip = pmc_get_pebs_precise_level(pmc);
- 	}
- 
- 	event = perf_event_create_kernel_counter(&attr, -1, current,
+-		case 4:
+ 		case 5:
++			x86_pmu.pebs_ept = 1;
++			fallthrough;
++		case 4:
+ 			x86_pmu.drain_pebs = intel_pmu_drain_pebs_icl;
+ 			x86_pmu.pebs_record_size = sizeof(struct pebs_basic);
+ 			if (x86_pmu.intel_cap.pebs_baseline) {
 -- 
 2.38.1
 
