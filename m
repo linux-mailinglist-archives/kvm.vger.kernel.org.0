@@ -2,76 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E5FC62207C
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 00:53:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20554622097
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 01:05:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229587AbiKHXx4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 18:53:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48658 "EHLO
+        id S229894AbiKIAFH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 19:05:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbiKHXxs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 18:53:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E970A5E9C9
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 15:52:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667951576;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oVnbsMQuohpGlkVlpHHCbpF7rU92xLtMbImV8X2HL+o=;
-        b=fXO982iQRwa6FsIDHdm1IjIRDPQsIBlawUMVIc0tlGC/7pX6ydB24/oH0EUPsq2i4sKdnx
-        MpoJj2kx0QGuXnBybEZVcp4oc110XrC1/4tDZ/xKFOpzoKvi4v37mb+clfVqT5MEHSIMTA
-        SMY0GhSHBbGtjnlg2mn3NnxQDUDiXeI=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-119-AmtkfStqM2SqUDkFYIq6OQ-1; Tue, 08 Nov 2022 18:52:55 -0500
-X-MC-Unique: AmtkfStqM2SqUDkFYIq6OQ-1
-Received: by mail-io1-f71.google.com with SMTP id n23-20020a056602341700b00689fc6dbfd6so10178334ioz.8
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 15:52:55 -0800 (PST)
+        with ESMTP id S229910AbiKIAFG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 19:05:06 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CA015EFBF
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 16:05:05 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id q9so15206682pfg.5
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 16:05:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8mN4lJ0ugApMl1P1+zNxhl9RCm2csyd+rIUafb5kLio=;
+        b=Ved11eCrNxyvfhZoDnk9yg1nEoH5NfSvLqbQQWkLH5gv7U3BpGORKcXovnYiMK0v0b
+         ZSJmkaQmxqFPifBVIoDVlY5gYp0CiXA4BrrRrrUe0/A7qvgSmFISzkMljW0ZOz1lINow
+         sH0rWbGMCHylbTsCaXEcKNRQZN17+MtUMq2LCR0l8Z5v86NGJNPMYetqm1q76nYCcJiw
+         ambwzPDpVv9v72wkGNUN/OcDvzd57cKfSPqAX4jbiQb//z/0+hCgw1HkxeKdhpcQsicK
+         UElHeJ0aV5lNcCgUUdKuY/qkz8GUWu9RwG2MJDk/dLFm5fUL4/t1o7Oh5BuyAkQEkunI
+         IF8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oVnbsMQuohpGlkVlpHHCbpF7rU92xLtMbImV8X2HL+o=;
-        b=Zpx4tmpcjDCMnZRaZ3aZbWRd2o6amnOyvnbMG+eCiG6a2fzY8hfN239M+y5msujoyu
-         6YzC6LAU0SYeoLHVFkgtV2x06wG5WZrPuVwXpv0w7d9iv0eUAN09tjbMF5Z9pwtJwD/t
-         f9KIXW6YF22oIcfhiAvE7h1XujwI8scZgdnfpvNzrzuaq/htyPp6VSLeG+bUruPond31
-         HS1DMZOqWg3IkWIdLOu6OeXP/0yop4Uj+WgwWm2I9v9Dldz5TWyhOiCb2MjC8D+W7QTD
-         et+QYaBwvxGZ4ByX/nWjF1VfRlAJGeTCka42K8yQRbshYMELzItPpJOSaA1sjnwGs9oN
-         o6pQ==
-X-Gm-Message-State: ACrzQf3WeaLmLCaijaYhmnG1m/6a+iyinmdsoCxjdK5/H543OkUpriX+
-        Tcj1tYgQqNHPUt6FsgvCIs8LpNR4Y+iZTJOisbxdqwKMSGwWvhuXe7qB/+8lZzYwTyFHoKwtd46
-        RUyVrCHe6233A
-X-Received: by 2002:a05:6e02:530:b0:2f9:a951:6480 with SMTP id h16-20020a056e02053000b002f9a9516480mr1277414ils.117.1667951574798;
-        Tue, 08 Nov 2022 15:52:54 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM7vRUkqb0kg42RpK2zEoARRgBQQ2mRJzftxKggGUR7Q7Ewjo44eYHhhSjlxF4k/Q+gKSKTq3A==
-X-Received: by 2002:a05:6e02:530:b0:2f9:a951:6480 with SMTP id h16-20020a056e02053000b002f9a9516480mr1277410ils.117.1667951574531;
-        Tue, 08 Nov 2022 15:52:54 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id p16-20020a056e02105000b002f966e3900bsm4231379ilj.80.2022.11.08.15.52.53
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8mN4lJ0ugApMl1P1+zNxhl9RCm2csyd+rIUafb5kLio=;
+        b=EadhpDO3NbR4dw8BEkI5YDhHKq3Gr17cMWfKncZyWzC0HfNIfdZd6ClrNdZDrjZbKQ
+         P4MdTiIUuKVYoI27KGMRoixbLJ5oF87XNR7pX9isRqxj5mNqFZkzyO/w1NOzK4S5261x
+         TP6awE1Ge5aJYUrYRrFnI46XqjYhHCJgAPjZkfVt7F5g6HnG9crD6eEy2rIOaep1C0uC
+         QR5nfiJ/yqr/c36oVFu7u86x8t5tunN0zYU/XHfJJnqA7qsbbC++Y+C5OZzh7bQ8ZU3T
+         bZMkmWxrCu/OsaiMlUMZPL1u4qfBOdJPGn3rFYhgasr6LHDP9u7ODveWq1UMMK68K79v
+         tAAg==
+X-Gm-Message-State: ACrzQf2pLVmOL496idwWoB1Kw5FHgFyCGu163lmQS5QN5OaREYYiBVpI
+        Y5og9llTO4q6CMoXrl9ALJ/WEw==
+X-Google-Smtp-Source: AMsMyM6lqHfLRza4xpTYFG5OCmO3t7QpGSB8EMMMXUfcY2HCMAhGNyyP1NkF3U+FKGNN9RZhDBNBYQ==
+X-Received: by 2002:a63:e153:0:b0:439:2fa3:74d1 with SMTP id h19-20020a63e153000000b004392fa374d1mr49274307pgk.85.1667952304721;
+        Tue, 08 Nov 2022 16:05:04 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id k21-20020a628415000000b0056bb06ce1cfsm7128531pfd.97.2022.11.08.16.05.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Nov 2022 15:52:54 -0800 (PST)
-Date:   Tue, 8 Nov 2022 16:52:52 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Anthony DeRossi <ajderossi@gmail.com>
-Cc:     kvm@vger.kernel.org, cohuck@redhat.com, jgg@ziepe.ca,
-        kevin.tian@intel.com, abhsahu@nvidia.com, yishaih@nvidia.com
-Subject: Re: [PATCH v5 2/3] vfio: Export the device set open count
-Message-ID: <20221108165252.4b4dfeb2.alex.williamson@redhat.com>
-In-Reply-To: <20221105224458.8180-3-ajderossi@gmail.com>
-References: <20221105224458.8180-1-ajderossi@gmail.com>
-        <20221105224458.8180-3-ajderossi@gmail.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        Tue, 08 Nov 2022 16:05:04 -0800 (PST)
+Date:   Wed, 9 Nov 2022 00:05:00 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com,
+        andrew.jones@linux.dev, ajones@ventanamicro.com,
+        bgardon@google.com, dmatlack@google.com, will@kernel.org,
+        suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+        pbonzini@redhat.com, maz@kernel.org, peterx@redhat.com,
+        oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v9 3/7] KVM: Support dirty ring in conjunction with bitmap
+Message-ID: <Y2rurDmCrXZaxY8F@google.com>
+References: <20221108041039.111145-1-gshan@redhat.com>
+ <20221108041039.111145-4-gshan@redhat.com>
+ <Y2qDCqFeL1vwqq3f@google.com>
+ <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,63 +79,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat,  5 Nov 2022 15:44:57 -0700
-Anthony DeRossi <ajderossi@gmail.com> wrote:
-
-> The open count of a device set is the sum of the open counts of all
-> devices in the set. Drivers can use this value to determine whether
-> shared resources are in use without tracking them manually or accessing
-> the private open_count in vfio_device.
+On Wed, Nov 09, 2022, Gavin Shan wrote:
+> Hi Sean,
 > 
-> Signed-off-by: Anthony DeRossi <ajderossi@gmail.com>
-> ---
->  drivers/vfio/vfio_main.c | 11 +++++++++++
->  include/linux/vfio.h     |  1 +
->  2 files changed, 12 insertions(+)
+> On 11/9/22 12:25 AM, Sean Christopherson wrote:
+> > I have no objection to disallowing userspace from disabling the combo, but I
+> > think it's worth requiring cap->args[0] to be '0' just in case we change our minds
+> > in the future.
+> > 
 > 
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 9a4af880e941..ab34faabcebb 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -125,6 +125,17 @@ static void vfio_release_device_set(struct vfio_device *device)
->  	xa_unlock(&vfio_device_set_xa);
->  }
->  
-> +unsigned int vfio_device_set_open_count(struct vfio_device_set *dev_set)
-> +{
-> +	struct vfio_device *cur;
-> +	unsigned int open_count = 0;
+> I assume you're suggesting to have non-zero value in cap->args[0] to enable the
+> capability.
+> 
+>     if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+>         !kvm->dirty_ring_size || !cap->args[0])
+>         return r;
 
-This can only be called while holding the dev_set->lock, so we should
-have an assert here:
+I was actually thinking of taking the lazy route and requiring userspace to zero
+the arg, i.e. treat it as a flags extensions.  Oh, wait, that's silly.  I always
+forget that `cap->flags` exists.
 
-	lockdep_assert_held(&dev_set->lock);
+Just this?
 
-The series looks ok to me otherwise, hopefully we'll get some
-additional reviews.  Thanks,
+	if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+	    !kvm->dirty_ring_size || cap->flags) 
+		return r;
 
-Alex
-
-> +
-> +	list_for_each_entry(cur, &dev_set->device_list, dev_set_list)
-> +		open_count += cur->open_count;
-> +	return open_count;
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_device_set_open_count);
-> +
->  /*
->   * Group objects - create, release, get, put, search
->   */
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index e7cebeb875dd..fdd393f70b19 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -189,6 +189,7 @@ int vfio_register_emulated_iommu_dev(struct vfio_device *device);
->  void vfio_unregister_group_dev(struct vfio_device *device);
->  
->  int vfio_assign_device_set(struct vfio_device *device, void *set_id);
-> +unsigned int vfio_device_set_open_count(struct vfio_device_set *dev_set);
->  
->  int vfio_mig_get_next_state(struct vfio_device *device,
->  			    enum vfio_device_mig_state cur_fsm,
-
+It'll be kinda awkward if KVM ever does add a flag to disable the bitmap, but
+that's seems quite unlikely and not the end of the world if it does happen.  And
+on the other hand, requiring '0' is less weird and less annoying for userspace
+_now_.
