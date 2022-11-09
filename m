@@ -2,89 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF68C623180
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 18:29:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B590662318B
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 18:32:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230415AbiKIR3n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 12:29:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49964 "EHLO
+        id S231482AbiKIRcu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 12:32:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbiKIR3m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 12:29:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDA583B9
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 09:28:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668014924;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XW3hyf1ELcPigroVZADXI+g6jgObLwrHXveAl76MUtQ=;
-        b=RwV5vtHtxql2pBkQAo6ZQHXK4vXTis+4hE5KDnpH7EbHKq7aWr3iT+hX9Z1UgsO9D/YLLP
-        QjQeP4TXmzGbTW/Kwbo8nUYCcuziXv3K262HJQ/0bMVxwXG/KWWrXsqQtpwUWP7mWLVxIB
-        ylalisDRXvduUyn3emfX8EcmXc5w7Bc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-294-S0nXNPjEPCir3a5N9QSmXA-1; Wed, 09 Nov 2022 12:28:22 -0500
-X-MC-Unique: S0nXNPjEPCir3a5N9QSmXA-1
-Received: by mail-wr1-f72.google.com with SMTP id e21-20020adfa455000000b002365c221b59so5250463wra.22
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 09:28:22 -0800 (PST)
+        with ESMTP id S230407AbiKIRcs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 12:32:48 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4ACA16590
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 09:32:47 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id 130so17345655pfu.8
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 09:32:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DniZYIrdQUoi19Dm9u4aWgvIz7zq8OgKhX/hNYiha0A=;
+        b=hkP9VUgPvWQqatGgQWkQhRjPcH9wd71PeA8E+GuyDXozXGtxCy7gxSpFLKhRxjAjV3
+         dCFha/1YCGU7QJwdAnz3SiUrvUi5PK1Ng8SJzGj9OoPdQtovjxy2OcMBUg+eZUydmeaC
+         xCG0NXjsD8zhLnZK7w3QkgK7q4vHRBta6xHaqYT69S31NLLNiTDmTpIYfvvd6IjwHjuq
+         jEHCkZKUTA5le4sLLpNKn6zyHC30cKemYxtap3vnNsBrI9+f5MVP1PHLP4ZZw3gQaU0u
+         et+bTmKPH+TszVA8tKuGcBUP6+s3Jp4g10tdMynZvQL0wjZqAy4URHGESNF/VVxEmGbQ
+         HNNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XW3hyf1ELcPigroVZADXI+g6jgObLwrHXveAl76MUtQ=;
-        b=bN33CXtwFP8Zd8QanPFBsotg8dxI5EHWUh2/I2XlM+B5Y07aA9avOJ2wzHHezxBzQp
-         PaBTgQXqil+6CfhTn0H1YjIqUuOElThQyqcwPUT6Sk79+5/plF0EVSzAFU2fflWYM0Qu
-         36xvtrzpqPtcDK4l0k8F9CI6E1FG9myaWW6DA+WUars1YGenmFXy8brCyyLxvYw0qFmq
-         m/yioDYjBSbDmdg+KFLkIGSwcM+0n/zuF1PojzgaPeGDmIchk7IvyBFEop49xDmC7/C6
-         0NXDmx8YhexSF+MJt+bxlxUkHe9l9FMp9l02P9E0gxvER6PHrYCgLd03i0WIrZQv/sJe
-         m82g==
-X-Gm-Message-State: ACrzQf1+oQS8g0MdWgPYRanLbr00yaabp9hlnEhE+EVrPTwnKvBIGZYH
-        2Ef5bft7u8GACKLIIhHU8FGIZYRWeP66zruC75PNiS8o66q6HkK+eRI+TrXZqdWq+mUwgIr6ZtQ
-        he5oQD3D+SGfH
-X-Received: by 2002:a5d:6589:0:b0:236:52af:3b70 with SMTP id q9-20020a5d6589000000b0023652af3b70mr37673590wru.349.1668014901230;
-        Wed, 09 Nov 2022 09:28:21 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM7X19OUH83gjS/DNM/0Z+6JG2EeYstuDpWUj7N0q8JkMcyNof68t4OpVEOqfNvS1GhfB2RYFw==
-X-Received: by 2002:a5d:6589:0:b0:236:52af:3b70 with SMTP id q9-20020a5d6589000000b0023652af3b70mr37673577wru.349.1668014901019;
-        Wed, 09 Nov 2022 09:28:21 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id t12-20020a5d6a4c000000b00228692033dcsm13744245wrw.91.2022.11.09.09.28.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Nov 2022 09:28:20 -0800 (PST)
-Message-ID: <e65197ac-9f42-77d4-76dc-0d1b1c5b1a9e@redhat.com>
-Date:   Wed, 9 Nov 2022 18:28:19 +0100
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DniZYIrdQUoi19Dm9u4aWgvIz7zq8OgKhX/hNYiha0A=;
+        b=OvfTd8nMZc98Js9qt2RQPw4z0aJd3SXsH3ny4NGbiTrlIpW9CyFEofqfFx9T/ZzUK2
+         Xca/uN3QH8dlcTgWdUlbToQP1YRL52B0rK8KVS+NhFXMdxakCZUgXOQ+sQj+1IbbxpSu
+         QkA957P5zdrGh5H3n4HQCOlkJ9Bc4Anckh7S5sCG+jIt5kb9jH/VlhrFQJoMS2G0pOZJ
+         cU6Sas6FHcPf7hEHscZNXJvRt1zxZ5wbs8hK8wcjGIEtzfco8EB5mrCuI8XPsIHRNQyi
+         ndbqzYdtnceKc9ctmSHtCTFArt7xFHccDMGQuDQO2PeQoFVWGNaIzE+LUWwnSxvkpbTo
+         CkQg==
+X-Gm-Message-State: ACrzQf0ewTSMk9mzR4iEtCBXtv+wT7KvIPKWTHN/6gcT1qzoS45tOv1A
+        xViJZNV7rr57g+njNsRdZbw6yw==
+X-Google-Smtp-Source: AMsMyM4OiymPkjMx8j345vhKCAFlCTF6IghoE3Ywv5QJvnGEZtrg39P+M9ihrgsG/ZQX+L0MLAbsbw==
+X-Received: by 2002:a05:6a00:2315:b0:56d:a084:a77d with SMTP id h21-20020a056a00231500b0056da084a77dmr49476799pfh.53.1668015167101;
+        Wed, 09 Nov 2022 09:32:47 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id im23-20020a170902bb1700b0017c37a5a2fdsm9240786plb.216.2022.11.09.09.32.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Nov 2022 09:32:46 -0800 (PST)
+Date:   Wed, 9 Nov 2022 17:32:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH] KVM: svm/avic: Drop "struct kvm_x86_ops" for
+ avic_hardware_setup()
+Message-ID: <Y2vkOxMcMJMdbDjL@google.com>
+References: <20221109115952.92816-1-likexu@tencent.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [GIT PULL 0/2] s390 fixes for 6.1-rc5
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, david@redhat.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org,
-        imbrenda@linux.ibm.com
-References: <20221107094329.81054-1-frankja@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221107094329.81054-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221109115952.92816-1-likexu@tencent.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/7/22 10:43, Janosch Frank wrote:
->    https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-master-6.1-1
++Maxim
 
-Pulled, thanks.
+On Wed, Nov 09, 2022, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
+> 
+> Even in commit 4bdec12aa8d6 ("KVM: SVM: Detect X2APIC virtualization
+> (x2AVIC) support"), where avic_hardware_setup() was first introduced,
+> its only pass-in parameter "struct kvm_x86_ops *ops" is not used at all.
 
-Paolo
+I assume the intent was to fill the AVIC ops so that they don't need to be exposed
+outside of avic.c.  I like the idea in theory, but unlike vmx_nested_ops they
+wouldn't be fully contained, which IMO would make the code as a whole more difficult
+to follow.
 
+Maxim, any objection?
+
+> Clean it up a bit to avoid compiler ranting from LLVM toolchain.
+> 
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
