@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E5C52622EB2
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 16:06:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90F38622ED1
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 16:14:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231838AbiKIPGi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 10:06:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42918 "EHLO
+        id S231905AbiKIPOM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 10:14:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231841AbiKIPGh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 10:06:37 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C3C51AD82
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 07:06:36 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id d20so16276854plr.10
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 07:06:36 -0800 (PST)
+        with ESMTP id S231892AbiKIPOK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 10:14:10 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA6B1182F
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 07:14:07 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id d20so16297012plr.10
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 07:14:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wHPhbbvw5zFQKI19I4sRlCQw5xxCQ/IYVwUpkVORIms=;
-        b=R/SWCxd+3hQJIoJnDxrsqdA56lLB5g+FgnJMOYd8l4iyIq96g+qxIwYGU0X8opCQfd
-         qTl67qlRX1cM4loGOVfON0qjK65rCHwemp7HPP7+J3JSi9QhlC23IwXQQXU33QhIAQsu
-         7SBqJGvSM4zIjGUjq/KemmRWQ9r8ojzN2AN3UG6ulpQ9oZPgWEsqjmvOogAN+WkgljqQ
-         eA/75xbxirqNB0iWC7CkaU+25AloDkSx+G24wbQbVj2ycJ3Ea9ljz1bIFzj15pboP0fn
-         So2czgfaa9+daUHBRcqu1U04LAR2sIG6io3ydzlVeHN1n/uBOtNyNcPSVCBzCPdjNtgY
-         5HAA==
+        bh=UtJwvJLci/JkatzPK3HpdffetRpjfLyKGKg9pHS1Les=;
+        b=MwKhsKJKuWT7rUX72ct9BRC3oqwZp+jCkoE4Wj4/KI6/IAHTVWqF+i1o6oWMA6UrEG
+         1h/4GOO/9ys3qzDeMRBQ2oZRjeXrAp/SvFOnZ6Cqh/qX215D9d/QEteSI5UvFpASq+Dk
+         7kCGz8qmfvs0D+OUhAMN6Zlbe6DO8JZWgxdLqReTuzVODyRy9yuH719baf+Kl6/q2zjA
+         vsI0dRXhaT6Vt0MU32TLShFbaXhdkyCn16OnvMzzEkKpmDUCakpm00+4ManMWm7JKc7j
+         q9avGzkB5W8zoWyqjelAmfCiQDV/O7qLitX3GLKtfjGd8dDKd8W8bN4yTVaQ0ZU4QuRk
+         mtyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wHPhbbvw5zFQKI19I4sRlCQw5xxCQ/IYVwUpkVORIms=;
-        b=hfEQPgvBl/c/bKMutk+B2KibaKIgs+RgBg7h6+a2dPyGiYrIx+zLB+cmmMVbMAozn3
-         OEv3V4M3cdny1V/sCYUTabKG9YoxWuLS/ipZgyHMkRmt2rwPDLpj+Tx6cMBh5f1EJtb5
-         XJ9yWRBayTD6UXxL++U+G22t1wFFFxinum82LVXEiqh/ejcpHub2GM72WrSsvLH8Fc7m
-         wjZSE10dYjj3AhWK9Ty4iibqUHsD9rc8qfaZlEQ4JIHCX162Rub/jtCV89LzWzDFq/0J
-         m6GEueX249a21R9V1ZGfgk0EaJKF5b6Nx1wrL6UGKxYeb2wNdfXFyR0mgOhPGnXF8TTH
-         FXEA==
-X-Gm-Message-State: ACrzQf3aG5QDbeQkmm6gOpZVcSOaSO9s7EaMUiWbiJU7kQJPquV6f+cO
-        1MhIlVlLTGTFTh6Vlpp8Q7oqSw==
-X-Google-Smtp-Source: AMsMyM6Z5xLVh5jZzjJlzADewH2T5jsFGuZx0MlXhl+qVr1AAl9XYi1PgOdRS78kxn+PpGeJKUGNKg==
-X-Received: by 2002:a17:90b:1d8a:b0:213:cdfa:8aa2 with SMTP id pf10-20020a17090b1d8a00b00213cdfa8aa2mr55457865pjb.204.1668006395438;
-        Wed, 09 Nov 2022 07:06:35 -0800 (PST)
+        bh=UtJwvJLci/JkatzPK3HpdffetRpjfLyKGKg9pHS1Les=;
+        b=dN3nXqjVyvQU++GCOBLIOPZuOTJa3DMiaqjDzYWAbACQjQBr7WPvKJCG7YPa1aXWv+
+         bfPgiuya1PVH/Ao2oywnKgAGeRq0l3iulsHft4bR7GAIy25/OL4aHJr+oND+T/ywTcYN
+         BmCcXrNCrD6Nbyf/kZumdZv5KJWVnpLJC3yK1r4TyIAiKP3SrAq/3r3YDBv+SI2HW4W1
+         uV3kV+Mjojq1nIQTKDPuiMuqtiZbs0VopHuOQVx9BXTgO71slhpw8PoaVzPmMhSzHwGJ
+         ND+YQNpm990pc1zyCP2TmLhsecIVVcuCnAVRe03vBGIyRXwzOuHsQQKn9Yqd4bDUel6W
+         xikQ==
+X-Gm-Message-State: ANoB5pkwASaOd3eJ+sB5Fcw5yG/NFbGVeHHK9WjFeguvtzsPKkQOG3Rk
+        9caFT14LpHjzfKYOLySK1Bs7rw==
+X-Google-Smtp-Source: AA0mqf5uG8MYfxZdmmvFGzKC7bnnIjzg8XzE+ryacGjVjx1GXT2Idp4er6qqAOaAC1YFbCO4UEwJcg==
+X-Received: by 2002:a17:902:ce88:b0:188:6429:fedd with SMTP id f8-20020a170902ce8800b001886429feddmr28807424plg.0.1668006846620;
+        Wed, 09 Nov 2022 07:14:06 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id j12-20020a170902da8c00b0017f5ad327casm9224672plx.103.2022.11.09.07.06.34
+        by smtp.gmail.com with ESMTPSA id n6-20020a170903110600b001865c298588sm9252603plh.258.2022.11.09.07.14.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Nov 2022 07:06:35 -0800 (PST)
-Date:   Wed, 9 Nov 2022 15:06:31 +0000
+        Wed, 09 Nov 2022 07:14:06 -0800 (PST)
+Date:   Wed, 9 Nov 2022 15:14:02 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         thomas.lendacky@amd.com, jmattson@google.com,
         stable@vger.kernel.org
-Subject: Re: [PATCH 01/11] KVM: x86: use a separate asm-offsets.c file
-Message-ID: <Y2vB96tzh8GqfmFF@google.com>
+Subject: Re: [PATCH 02/11] KVM: SVM: replace regs argument of __svm_vcpu_run
+ with vcpu_svm
+Message-ID: <Y2vDujWx1Zz29VvF@google.com>
 References: <20221109145156.84714-1-pbonzini@redhat.com>
- <20221109145156.84714-2-pbonzini@redhat.com>
+ <20221109145156.84714-3-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221109145156.84714-2-pbonzini@redhat.com>
+In-Reply-To: <20221109145156.84714-3-pbonzini@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,41 +74,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Nit, () on function names.  Maybe I should offer to buy you a beer every time you
+remember to add parantheses :-)
+
 On Wed, Nov 09, 2022, Paolo Bonzini wrote:
-> This already removes the ugly #includes from asm-offsets.c, but especially
-> it avoids a future error when asm-offsets will try to include svm/svm.h.
+> Since registers are reachable through vcpu_svm, and we will
+> need to access more fields of that struct, pass it instead
+> of the regs[] array.
 > 
-> This would not work for kernel/asm-offsets.c, because svm/svm.h
-> includes kvm_cache_regs.h which is not in the include path when
-> compiling asm-offsets.c.  The problem is not there if the .c file is
-> in arch/x86/kvm.
+> No functional change intended.
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
 > Cc: stable@vger.kernel.org
 > Fixes: a149180fbcf3 ("x86: Add magic AMD return-thunk")
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
 
 Reviewed-by: Sean Christopherson <seanjc@google.com>
-
-> diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-> index 8477d8bdd69c..0b5db4de4d09 100644
-> --- a/arch/x86/kvm/vmx/vmenter.S
-> +++ b/arch/x86/kvm/vmx/vmenter.S
-> @@ -1,12 +1,12 @@
->  /* SPDX-License-Identifier: GPL-2.0 */
->  #include <linux/linkage.h>
->  #include <asm/asm.h>
-> -#include <asm/asm-offsets.h>
->  #include <asm/bitsperlong.h>
->  #include <asm/kvm_vcpu_regs.h>
->  #include <asm/nospec-branch.h>
->  #include <asm/percpu.h>
->  #include <asm/segment.h>
-> +#include "kvm-asm-offsets.h"
-
-Do you have a preference on KVM files using dashes or underscores?  Outside of
-kvm-x86-ops.h and kvm-x86-pmu-ops.h, KVM x86 uses underscores.  I actually prefer
-dashes because they're slightly easier to type, but when there are only a few
-outliers I constantly mistype the names.  If dashes are generally, maybe we could
-gradually/opportunistically move in that direction?
