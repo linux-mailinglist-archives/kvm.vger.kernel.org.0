@@ -2,152 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2939F6220D5
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 01:32:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68AD66220EE
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 01:43:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229866AbiKIAc0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 19:32:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36036 "EHLO
+        id S229602AbiKIAnj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 19:43:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbiKIAcX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 19:32:23 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8A5161762
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 16:32:22 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id j12so15635537plj.5
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 16:32:22 -0800 (PST)
+        with ESMTP id S229591AbiKIAnh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 19:43:37 -0500
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEE3912D3B
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 16:43:35 -0800 (PST)
+Received: by mail-qt1-x832.google.com with SMTP id hh9so9613599qtb.13
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 16:43:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=ziepe.ca; s=google;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RQ1jZB3m3JNgwDhXjvr6dpP648h3M6Z1s+n2GIXxEIo=;
-        b=CRbqjBhRSNWKJ3gP6OhmCaglk6IoBDsubUDFV3xuv6NJpkfqtcN9cbk64wS63YwRkL
-         RYJuhevVxMdwp6TpG2m6ovEqDuDi1rwnzTwbi5q6x6UW9LIRkegtLbQR6q5gkS9ZH0d4
-         DlS9gO7IoPlW72kRJL68GlEhrzpniTOQ5j1auw/oqGpfNgGSlMSLVMCso9wiLUH0rjJK
-         Ss723yFE+QJqxvL0FnZFGbqdioM536DIOSQ4ubJ6BvOmnJ4OXZokz2QYGvXy3+supDzP
-         oyn6hCR3gkiZRzEElNgifAkcXPS+BZTIV1sfwb1ZkpZYjc64KOAyHnn3iNgBtCeNBj77
-         byfg==
+        bh=qZpiZmrUvCfPtBR1TeJ+FM1FAuTKRXAgy3PSmsZRMyo=;
+        b=SvoSXYgoYQUvz85DastB10X2PmNmCVo86EC6nwRD0LJAuuqqCSp66IKEsjGAETw+EN
+         PP1968e2RTDOF/qyPJ0HB173UgImb51yz7+LZgIzl1lPs6NnFnxpO9ImIw9PAp9E6dpK
+         3akDK5u0a8LEQ2fo9Z+anFx/ox9ayPZBYPw8aLAIYQLdtwPmH/A2eC07e6tapG6iddfd
+         Exip3a9zC/rk7qnLq9Z01ECc4E5cq98Pos0dt9ugaOKos0bPgo5vPATLzYUP/5m3DgE8
+         2HqaqKjZOY+zylckRjSuSXkT99MzuPbE2cBAkTiEA2OSIvTO0jEhDE3gpLFFrp8KnFqL
+         B2UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RQ1jZB3m3JNgwDhXjvr6dpP648h3M6Z1s+n2GIXxEIo=;
-        b=em99qF07NxYH+briD9asyZsJGn4csWtGJOIlOz+MUw0Mke/RZm/UdvDz5iaz8eOtzF
-         vALl/isSS3kJWUJSozqM/bzTTvukZCGPixLbtV2ZmsXvu6Osv/MfK9Tow3XdpovLofnx
-         qvZSQQsl3UKeVpy5vk4dZpRwpyyE5YUiW1AV5ePb8hgiOQUMMmldUrxbBuYvh81FOMfB
-         SK2wUTHglAPVmLz9nR6785+xWCOspfxa0qLfmuCLDtIyKAdZMfPlFvHtXMTLnn5LinwV
-         TzHEq3K8pW4EXHpTyXyPEzAOVxr9bi6csVCru4qyIAMo2fies1nqbossnShRVeAPpAq3
-         sqqQ==
-X-Gm-Message-State: ANoB5pmnjDsMQ0cNTwELNNoFSO4NU7yypA5Lhxdhle7DQr+Po1ZJKD3m
-        /3+zUP932ztOG4X/NsIaNNmLfQ==
-X-Google-Smtp-Source: AA0mqf47wfHd+WN4Dx8uEDBo8ewcqOBktb14YxfpMVMVZOcUCSxxNuC8Mn5JxqjFHWRaslv52qtr7A==
-X-Received: by 2002:a17:90b:1e10:b0:217:4fd0:acbd with SMTP id pg16-20020a17090b1e1000b002174fd0acbdmr25583534pjb.235.1667953942140;
-        Tue, 08 Nov 2022 16:32:22 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id s5-20020a17090a440500b0020b7de675a4sm6612962pjg.41.2022.11.08.16.32.21
+        bh=qZpiZmrUvCfPtBR1TeJ+FM1FAuTKRXAgy3PSmsZRMyo=;
+        b=zuWU13j8D3SZ1878XXqPGYlo8KaSQ+Vg52N8cii4RRaYVo+Ig379PkXQ8BCCAPa98x
+         l/PXOnnFHym+rretvHfawWI+uJSkSxVjSG7oFh4RlssEwI8wIHxcBLwsAZ5PSXeYm098
+         r0QWmT99WgypK+hyYRhH4NmcLeow0PLFZButccXZZlkZ2T4aPyvttLaEHtRfZOdgWSyP
+         5feC396Cw6PEiNQxL9N1y4pxX5mtmePwOxDXgDihFuaUVRZNN9g+CrD7L52aJHuM5vsn
+         4TKzCYiKgNPIpvcYdd5wIXfpZ3eJzS87FDiDnRcAIp3QgWPJliIoiu7H/tHCtj/mhHwx
+         suPw==
+X-Gm-Message-State: ACrzQf1g5xIEdL1EEcbYz3h1p2uzIs6hf5d07xYe6dU46QY5g+wb2no+
+        BbfBKuCq0QSAk7zuq+P5TfuNoA==
+X-Google-Smtp-Source: AMsMyM7TProS2w7iBSB4nY3UiX2hZr7xp7e/ItyV872FSIrGnGoRUj3GV5mSyw1Oq04FJPHlpQ7M1A==
+X-Received: by 2002:ac8:6998:0:b0:3a5:410a:1a33 with SMTP id o24-20020ac86998000000b003a5410a1a33mr31470392qtq.337.1667954614038;
+        Tue, 08 Nov 2022 16:43:34 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
+        by smtp.gmail.com with ESMTPSA id v14-20020a05620a440e00b006fab416015csm9416174qkp.25.2022.11.08.16.43.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Nov 2022 16:32:21 -0800 (PST)
-Date:   Wed, 9 Nov 2022 00:32:18 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com,
-        andrew.jones@linux.dev, ajones@ventanamicro.com,
-        bgardon@google.com, dmatlack@google.com, will@kernel.org,
-        suzuki.poulose@arm.com, alexandru.elisei@arm.com,
-        pbonzini@redhat.com, maz@kernel.org, peterx@redhat.com,
-        oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v9 3/7] KVM: Support dirty ring in conjunction with bitmap
-Message-ID: <Y2r1ErahBE3+Dsv8@google.com>
-References: <20221108041039.111145-1-gshan@redhat.com>
- <20221108041039.111145-4-gshan@redhat.com>
- <Y2qDCqFeL1vwqq3f@google.com>
- <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
- <Y2rurDmCrXZaxY8F@google.com>
- <49c18201-b73a-b654-7f8a-77befa80c61b@redhat.com>
+        Tue, 08 Nov 2022 16:43:33 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1osZBj-00HZmk-WA;
+        Tue, 08 Nov 2022 20:43:32 -0400
+Date:   Tue, 8 Nov 2022 20:43:31 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Anthony DeRossi <ajderossi@gmail.com>
+Cc:     kvm@vger.kernel.org, alex.williamson@redhat.com, cohuck@redhat.com,
+        kevin.tian@intel.com, abhsahu@nvidia.com, yishaih@nvidia.com
+Subject: Re: [PATCH v5 1/3] vfio: Fix container device registration life cycle
+Message-ID: <Y2r3syYBbIdb8dr4@ziepe.ca>
+References: <20221105224458.8180-1-ajderossi@gmail.com>
+ <20221105224458.8180-2-ajderossi@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <49c18201-b73a-b654-7f8a-77befa80c61b@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20221105224458.8180-2-ajderossi@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 09, 2022, Gavin Shan wrote:
-> Hi Sean,
+On Sat, Nov 05, 2022 at 03:44:56PM -0700, Anthony DeRossi wrote:
+> In vfio_device_open(), vfio_container_device_register() is always called
+> when open_count == 1. On error, vfio_device_container_unregister() is
+> only called when open_count == 1 and close_device is set. This leaks a
+> registration for devices without a close_device implementation.
 > 
-> On 11/9/22 8:05 AM, Sean Christopherson wrote:
-> > On Wed, Nov 09, 2022, Gavin Shan wrote:
-> > > On 11/9/22 12:25 AM, Sean Christopherson wrote:
-> > > > I have no objection to disallowing userspace from disabling the combo, but I
-> > > > think it's worth requiring cap->args[0] to be '0' just in case we change our minds
-> > > > in the future.
-> > > > 
-> > > 
-> > > I assume you're suggesting to have non-zero value in cap->args[0] to enable the
-> > > capability.
-> > > 
-> > >      if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
-> > >          !kvm->dirty_ring_size || !cap->args[0])
-> > >          return r;
-> > 
-> > I was actually thinking of taking the lazy route and requiring userspace to zero
-> > the arg, i.e. treat it as a flags extensions.  Oh, wait, that's silly.  I always
-> > forget that `cap->flags` exists.
-> > 
-> > Just this?
-> > 
-> > 	if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
-> > 	    !kvm->dirty_ring_size || cap->flags)
-> > 		return r;
-> > 
-> > It'll be kinda awkward if KVM ever does add a flag to disable the bitmap, but
-> > that's seems quite unlikely and not the end of the world if it does happen.  And
-> > on the other hand, requiring '0' is less weird and less annoying for userspace
-> > _now_.
-> > 
+> In vfio_device_fops_release(), vfio_device_container_unregister() is
+> called unconditionally. This can cause a device to be unregistered
+> multiple times.
 > 
-> I don't quiet understand the term "lazy route".
-
-"lazy" in that requiring a non-zero value would mean adding another #define,
-otherwise the extensibility is limited to two values.  Again, unlikely to matter,
-but it wouldn't make sense to go through the effort to provide some extensibility
-and then only allow for one possible extension.  If KVM is "lazy" and just requires
-flags to be '0', then there's no need for more #defines, and userspace doesn't
-have to pass more values in its enabling.
-
-> So you're still thinking of the possibility to allow disabling the capability
-> in future?
-
-Yes, or more likely, tweaking the behavior of ring+bitmap.  As is, the behavior
-is purely a fallback for a single case where KVM can't push to the dirty ring due
-to not having a running vCPU.  It's possible someone might come up with a use case
-where they want KVM to do something different, e.g. fallback to the bitmap if the
-ring is full.
-
-In other words, it's mostly to hedge against futures we haven't thought of.  Reserving
-cap->flags is cheap and easy for both KVM and userspace, so there's no real reason
-not to do so.
-
-> If so, cap->flags or cap->args[0] can be used. For now, we just
-> need a binding between cap->flags/args[0] with the operation of enabling the
-> capability. For example, "cap->flags == 0x0" means to enable the capability
-> for now, and "cap->flags != 0x0" to disable the capability in future.
+> Treating container device registration/unregistration uniformly (always
+> when open_count == 1) fixes both issues.
 > 
-> The suggested changes look good to me in either way. Sean, can I grab your
-> reviewed-by with your comments addressed?
+> Fixes: ce4b4657ff18 ("vfio: Replace the DMA unmapping notifier with a callback")
+> Signed-off-by: Anthony DeRossi <ajderossi@gmail.com>
+> ---
+>  drivers/vfio/vfio_main.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
 
-I'll look at v10, I don't like providing reviews that are conditional on changes
-that are more than nits.
+This seems to only effect the mbochs sample, but it looks OK
 
-That said, there're no remaining issues that can't be sorted out on top, so don't
-hold up v10 if I don't look at it in a timely manner for whatever reason.  I agree
-with Marc that it'd be good to get this in -next sooner than later.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+
+This will generate conflicts with the iommufd treee, so please lets
+think about how to avoid them..
+
+Jason
