@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AD0362228C
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 04:25:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EAD34622296
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 04:29:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230186AbiKIDZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 22:25:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44782 "EHLO
+        id S229875AbiKID3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 22:29:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230182AbiKIDZe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 22:25:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF0A91A056
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 19:24:38 -0800 (PST)
+        with ESMTP id S229552AbiKID3x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 22:29:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B60B2408E
+        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 19:28:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667964277;
+        s=mimecast20190719; t=1667964536;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=F1qirjMG3kZUXL8rp78PkVsEriIi9ata3YC3IMmDFgo=;
-        b=Rigx1i/2Ku9x3DLO5JOv66QoRAjFAwSu3neFsFQP7BdHMOqVhaPvr6OhOmOTdFtYqXCjG8
-        Vsx7rRBBKheMAVSShyfO8qKpYM+iMbfvvDYGK5gdiS2bkkwCIIkqQAVVBv3FFIia1vSjV7
-        xhwEL7dH2PAnBcJMIYO1JbuKUThpkLw=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=vD224Hogxka5wNQa91Zymh6Ygmv+WpD4Z+GDd/Nec64=;
+        b=KI8Bh2AKVRgiuJ9ox06JgNEYlfJcuLzZJjt9mcOJDFKWrLUk9ZW+C4cITtf02YVFx58iFV
+        Wh9sU3CVk5LQSo2QsryqA3n5cQw+Qem0B+2AoHkImP5B1jMH8YWxGTzwrhfCkP1L52erWR
+        wuOU91tMY8TRblJQhwE+BimAH+4CY24=
+Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com
+ [209.85.160.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-17-glIbiI6LM_ey842m3t2gXg-1; Tue, 08 Nov 2022 22:24:36 -0500
-X-MC-Unique: glIbiI6LM_ey842m3t2gXg-1
-Received: by mail-oo1-f70.google.com with SMTP id t9-20020a4a6049000000b00496bbda4343so4506679oof.22
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 19:24:36 -0800 (PST)
+ us-mta-564-S8Ad27HaNnSo_BHtd0Dk0A-1; Tue, 08 Nov 2022 22:28:55 -0500
+X-MC-Unique: S8Ad27HaNnSo_BHtd0Dk0A-1
+Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-13b88262940so8025865fac.15
+        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 19:28:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=F1qirjMG3kZUXL8rp78PkVsEriIi9ata3YC3IMmDFgo=;
-        b=w4QQTkHu0q0mswh2Tqx+KFJsVVZLuH6snj1HVRJKL2XpY+9bnfq3RjU+TkcoxzFMpv
-         nqyTw3GGsOXMKvJ9TLgKBbRB+uofm18l94neZd3khDn58s6LFecVw5ZllHl7WwzxYKZC
-         113uYulj5E8T4hlkdoLIINP2AeAlRjsPxw2JoL6nhpBu+tdHmlSgCZqzmqQXcm2Oexpn
-         SgB7QxBnN+7A4RcaqMtPA57lbJm8ApOQx7aEvDRVpg9lmIBt0+plMK4bSddPwH9PyVzh
-         e4qe8pO7P6sx5peR+TNmP5DfPlLWotajFvMFvU/kgNOzjr9GeWYo8OWbT/U9MwolhA7D
-         5RQQ==
-X-Gm-Message-State: ACrzQf1LFqg0hIiLk9yXRkRCpqji2NnrKLx/4gkIkycUtLWAqyt3F0Is
-        2E1diJHht1Ak1lViK9YzrpH95gd1MMzLzSdW/TWR09wc/08Aet/nZ7/K9gb/ndkbPx2Qrrdiv7Z
-        53cjQGXIBt21myRxXS7kcd3odOesq
-X-Received: by 2002:a4a:2ccf:0:b0:49e:b502:3a2b with SMTP id o198-20020a4a2ccf000000b0049eb5023a2bmr9788970ooo.57.1667964275440;
-        Tue, 08 Nov 2022 19:24:35 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM4TS8SZHDk+F11XcIXyOjWg7x3CStUwgN7DXqTHrvfbCTUgELD600O6A1TkWZj32gJcP6VoqsHMRgJlXrNy6A0=
+        bh=vD224Hogxka5wNQa91Zymh6Ygmv+WpD4Z+GDd/Nec64=;
+        b=4pWEsjEuUFk+8dxewFN5cdghir8SJGu+CsCF1fIDVA518lhIUsoxAkpay1t7pUxl5O
+         aWJwcHoi88VpoM3HaEFckoIebj6/BM2wPeQw/29xJKrWTP47x/SlTJKdQ6zEDkMQ9Wlm
+         3LYhyEFuogON6KUGr0YMUGwKEG8r25mIvwIZvmQpZJi/8zRRTFxK3g9kFuv9AUqjc63h
+         5qFxSDjo0hwSi7xgjNB/a9Bq3B0///fSeHSHiN2RTAZLyIQZdu9rhpqVlzQbmByNB8lO
+         palgfq8Gt+AAIr9fEYXl4W3tPls6Ih/U2+UdNE2R1Ddw/DeCWYdRx7wcYvjXQVwykO/9
+         v7+w==
+X-Gm-Message-State: ACrzQf19B0m1nnZ5UqmKTEWs6zdoaO68yhqYqQL4DlNkS5y8UI95nDDT
+        2ycnrMzcGajJ9hlbuJovvKN7cX41kubXKlBgp+OR2GnbvB1J9N/elcAKNCpZ7+tVyxkDuK5txQS
+        YstEMJ1dVdv2zsyx4XSBxhSOhm0JT
+X-Received: by 2002:a4a:2ccf:0:b0:49e:b502:3a2b with SMTP id o198-20020a4a2ccf000000b0049eb5023a2bmr9793071ooo.57.1667964533309;
+        Tue, 08 Nov 2022 19:28:53 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM7F+ESUW02GevhFXeHeZiWN+C8qmGvnQrxAgchRgTHWuxrTWr/5I2RPYR7pW6CVQHNQHYEXuWSbcbl1kJXQxyk=
 X-Received: by 2002:a4a:2ccf:0:b0:49e:b502:3a2b with SMTP id
- o198-20020a4a2ccf000000b0049eb5023a2bmr9788965ooo.57.1667964275202; Tue, 08
- Nov 2022 19:24:35 -0800 (PST)
+ o198-20020a4a2ccf000000b0049eb5023a2bmr9793067ooo.57.1667964533083; Tue, 08
+ Nov 2022 19:28:53 -0800 (PST)
 MIME-Version: 1.0
-References: <20221108103437.105327-1-sgarzare@redhat.com> <20221108103437.105327-2-sgarzare@redhat.com>
-In-Reply-To: <20221108103437.105327-2-sgarzare@redhat.com>
+References: <20221108103437.105327-1-sgarzare@redhat.com> <20221108103437.105327-3-sgarzare@redhat.com>
+In-Reply-To: <20221108103437.105327-3-sgarzare@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 9 Nov 2022 11:24:23 +0800
-Message-ID: <CACGkMEu+T1zX0XQbe2NR24MBC1LfV6ECv6vOm7ofrvqCJZ4avA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] vringh: fix range used in iotlb_translate()
+Date:   Wed, 9 Nov 2022 11:28:41 +0800
+Message-ID: <CACGkMEuRnqxESo=V2COnfUjP5jGLTXzNRt3=Tp2x-9jsS-RNGQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] vhost: fix range used in translate_desc()
 To:     Stefano Garzarella <sgarzare@redhat.com>
 Cc:     virtualization@lists.linux-foundation.org,
         linux-kernel@vger.kernel.org,
@@ -79,7 +79,7 @@ On Tue, Nov 8, 2022 at 6:34 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
 > vhost_iotlb_itree_first() requires `start` and `last` parameters
 > to search for a mapping that overlaps the range.
 >
-> In iotlb_translate() we cyclically call vhost_iotlb_itree_first(),
+> In translate_desc() we cyclically call vhost_iotlb_itree_first(),
 > incrementing `addr` by the amount already translated, so rightly
 > we move the `start` parameter passed to vhost_iotlb_itree_first(),
 > but we should hold the `last` parameter constant.
@@ -87,38 +87,52 @@ On Tue, Nov 8, 2022 at 6:34 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
 > Let's fix it by saving the `last` parameter value before incrementing
 > `addr` in the loop.
 >
-> Fixes: 9ad9c49cfe97 ("vringh: IOTLB support")
+> Fixes: 0bbe30668d89 ("vhost: factor out IOTLB")
 > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>
+> I'm not sure about the fixes tag. On the one I used this patch should
+> apply cleanly, but looking at the latest stable (4.9), maybe we should
+> use
+>
+> Fixes: a9709d6874d5 ("vhost: convert pre sorted vhost memory array to interval tree")
+
+I think this should be the right commit to fix.
+
+Other than this
 
 Acked-by: Jason Wang <jasowang@redhat.com>
 
-> ---
->  drivers/vhost/vringh.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+Thanks
+
 >
-> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> index 11f59dd06a74..828c29306565 100644
-> --- a/drivers/vhost/vringh.c
-> +++ b/drivers/vhost/vringh.c
-> @@ -1102,7 +1102,7 @@ static int iotlb_translate(const struct vringh *vrh,
->         struct vhost_iotlb_map *map;
->         struct vhost_iotlb *iotlb = vrh->iotlb;
->         int ret = 0;
+> Suggestions?
+> ---
+>  drivers/vhost/vhost.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 40097826cff0..3c2359570df9 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -2053,7 +2053,7 @@ static int translate_desc(struct vhost_virtqueue *vq, u64 addr, u32 len,
+>         struct vhost_dev *dev = vq->dev;
+>         struct vhost_iotlb *umem = dev->iotlb ? dev->iotlb : dev->umem;
+>         struct iovec *_iov;
 > -       u64 s = 0;
 > +       u64 s = 0, last = addr + len - 1;
+>         int ret = 0;
 >
->         spin_lock(vrh->iotlb_lock);
->
-> @@ -1114,8 +1114,7 @@ static int iotlb_translate(const struct vringh *vrh,
+>         while ((u64)len > s) {
+> @@ -2063,7 +2063,7 @@ static int translate_desc(struct vhost_virtqueue *vq, u64 addr, u32 len,
 >                         break;
 >                 }
 >
-> -               map = vhost_iotlb_itree_first(iotlb, addr,
-> -                                             addr + len - 1);
-> +               map = vhost_iotlb_itree_first(iotlb, addr, last);
->                 if (!map || map->start > addr) {
->                         ret = -EINVAL;
->                         break;
+> -               map = vhost_iotlb_itree_first(umem, addr, addr + len - 1);
+> +               map = vhost_iotlb_itree_first(umem, addr, last);
+>                 if (map == NULL || map->start > addr) {
+>                         if (umem != dev->iotlb) {
+>                                 ret = -EFAULT;
 > --
 > 2.38.1
 >
