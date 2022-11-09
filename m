@@ -2,66 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E647462374D
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 00:11:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD88D623798
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 00:41:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232040AbiKIXLS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 18:11:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59932 "EHLO
+        id S231623AbiKIXks (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 18:40:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232021AbiKIXK6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 18:10:58 -0500
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 159BC2C653
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 15:10:47 -0800 (PST)
-Received: by mail-qk1-x72a.google.com with SMTP id z17so172139qki.11
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 15:10:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hRjFkFpQEAlWbmW6ZzoH9mgUCJRJS9MGOK7XTirdLmU=;
-        b=I/Fg0ubP4DVB8hNVZynJK7xbdNgxcuj9ETjS1ETNibUuxo2U76UxZe6WzDfSQzQvE/
-         l+qe9g1XHvRqgcVx43EV4q84HjuAuPlRdLIIdlnfJ3uB09n8D54+ZDP1mYZOvXUKXRwW
-         Dni0aGsgsDndrt16nsNwjYqBd/cnqpi6c+PIj1WIwfFZ7NhVJXrUMkXmiHf71yL13vcz
-         l0z5oKLoQefZIsy0OMpNtIos/c2TyFenppFjxY8nNdnr92iJWjDCRP7ZMMUnl7OEiqlg
-         IhQQ1+y+tr5O5tnTjgY554W/VETBluFaKZDk27ZJkEVbsbOqkaZXI47EEwvbllJdeWn3
-         Jq/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hRjFkFpQEAlWbmW6ZzoH9mgUCJRJS9MGOK7XTirdLmU=;
-        b=jCVcPEqzOeawyZTCsVHM/Y7WUOecKsuXhBkLBcfGXN3dcXIuECPbd0UW8sc4s9V0Zi
-         ZWdb0pbl0+ONb/nULydSz6ImZ2CYHJZGEzXpqNkSR1Nm890AH92k1OymL+bOBezcLxvx
-         fEUvdFfeEMRBPaiA4rsqTffB5NRb0IpDGnueXkYBIOcFFMeO3wVH2TuzbgaiO+/EHQX7
-         FkVOe3w6MG/XNRNJJEhz6BgCEI6bEnFhdyPYPydAs29OIGywFNmtQvlNQW/QmKKL4DXi
-         /0c0hu/iW3/vGTg2/7Cd52pX6TqXaqswJbIlgDz2EoSTyuWrFQpLwnlH4749QMadY7ae
-         PO9A==
-X-Gm-Message-State: ACrzQf30L22dpoFRtg9hGmtnJ5eosyHlzKpyBp6EZgnJKjOcTOif7zi0
-        aE6hpxq22d8bBAs1ze3o8NO5eXkIyjJJPqAldlZFiQBNJWU=
-X-Google-Smtp-Source: AMsMyM7AGKnWa6sRcjc0skASa2rLnLGS1LLikRrsCYDrtVmHqFT4F3azHYCRIqhrIPOibp10IyPM7WErVxnG7Cvxd6I=
-X-Received: by 2002:a37:ad18:0:b0:6fa:b07:9e8d with SMTP id
- f24-20020a37ad18000000b006fa0b079e8dmr43975863qkm.670.1668035445904; Wed, 09
- Nov 2022 15:10:45 -0800 (PST)
+        with ESMTP id S229635AbiKIXkq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 18:40:46 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2047.outbound.protection.outlook.com [40.107.237.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14FE819016;
+        Wed,  9 Nov 2022 15:40:45 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GUL8AIUveIcwUPEBnlYgaqx775DGnC2Y8WzoR/NdONyj73hLR0v8MRGPZuf3q1Igz2vC+1oBty0U2cFQHvqzkryVX6GSJ00rvT+GX1cb+ftTazNNdkeH1PNWBsm2LiRA2+nv5mWUxY0MM3fRWOYofDyizaeP/aSCRxyLEk72APm2GN7eS9EnPJpmGpjFPz7XjLXMNzEQbk7LB23F4w1XHPSjnwbkcJTjLnUro4jGpDOr8Ebm2YoR2visJyBS53Vpo+BfIXUnKRzYMrmAvmzuV3ekGuB+kvEJE0vUnkrQYwkT+uloqFdvOyogfEJZy4ZuEYlmUK1r2MAkFCrGYkYiLw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cTfm7foHzCbZec/7hfj3S/VVh0uBxftPFvfC08+naRA=;
+ b=PXrIjWG+kGOZIDW6+I1+VXlOiLlxDxpgrH7l4goLrqr3ec0no1OGaYERKphMTVeLb0K+c3xHwW7EIuHBgoxbV/b1o8i2HFgN1OC/0zX2G5sIJZZSBjgy2aOaX+TOZzk1CXK0Lgc39rgnkHKVPIXz1npeLIuhoGXnj5dM2fCeJK5V1ITSrmwxlj0D6fjMJ/hLMgLFSQQ/hYChanhYFchP/08GAPxWhhCm6T0q6SsDtwbGYvqurlz6NH0GeyzevWmoVp8rB8tvb2+vw/Bcl8e8Hu7Zn13GTSCwWfFSZXjDMGohHGWMMH2pj4leyF7UtqMHQ2gjCZ02JjTemarF9Nudrw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gmail.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cTfm7foHzCbZec/7hfj3S/VVh0uBxftPFvfC08+naRA=;
+ b=PzXXQG3dMT6z0wM+NhyxcZILOabVAhowSoDHELgQdgQA/8QhcXlCntygEkOrCLYjGEkeHXNOKknwu7+Q/S2k36E1A5BPgX5PWZIXLHlRif9XuMBRFof2lhcWMJI7Muc9jOncFSPwvOQ760Wahug+WBhixNhk6TwnCqzKA0ULoXQ=
+Received: from BN7PR06CA0061.namprd06.prod.outlook.com (2603:10b6:408:34::38)
+ by BL1PR12MB5301.namprd12.prod.outlook.com (2603:10b6:208:31f::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27; Wed, 9 Nov
+ 2022 23:39:22 +0000
+Received: from BN8NAM11FT023.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:34:cafe::8e) by BN7PR06CA0061.outlook.office365.com
+ (2603:10b6:408:34::38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27 via Frontend
+ Transport; Wed, 9 Nov 2022 23:39:22 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT023.mail.protection.outlook.com (10.13.177.103) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5813.12 via Frontend Transport; Wed, 9 Nov 2022 23:39:22 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Wed, 9 Nov
+ 2022 17:39:19 -0600
+Date:   Wed, 9 Nov 2022 17:39:04 -0600
+From:   Michael Roth <michael.roth@amd.com>
+To:     Tianyu Lan <ltykernel@gmail.com>
+CC:     <luto@kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+        <bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+        <hpa@zytor.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
+        <jgross@suse.com>, <tiala@microsoft.com>, <kirill@shutemov.name>,
+        <jiangshan.ljs@antgroup.com>, <peterz@infradead.org>,
+        <ashish.kalra@amd.com>, <srutherford@google.com>,
+        <akpm@linux-foundation.org>, <anshuman.khandual@arm.com>,
+        <pawan.kumar.gupta@linux.intel.com>, <adrian.hunter@intel.com>,
+        <daniel.sneddon@linux.intel.com>,
+        <alexander.shishkin@linux.intel.com>, <sandipan.das@amd.com>,
+        <ray.huang@amd.com>, <brijesh.singh@amd.com>,
+        <thomas.lendacky@amd.com>, <venu.busireddy@oracle.com>,
+        <sterritt@google.com>, <tony.luck@intel.com>,
+        <samitolvanen@google.com>, <fenghua.yu@intel.com>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-hyperv@vger.kernel.org>, <linux-arch@vger.kernel.org>
+Subject: Re: [RFC PATCH 01/17] x86/boot: Check boot param's cc_blob_address
+ for direct boot mode
+Message-ID: <20221109233904.scct4fih3b3kvnyk@amd.com>
+References: <20221109205353.984745-1-ltykernel@gmail.com>
+ <20221109205353.984745-2-ltykernel@gmail.com>
 MIME-Version: 1.0
-References: <20221109185905.486172-1-dmatlack@google.com> <20221109185905.486172-3-dmatlack@google.com>
-In-Reply-To: <20221109185905.486172-3-dmatlack@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 9 Nov 2022 15:10:34 -0800
-Message-ID: <CANgfPd-URR79UT1==ctEfCUoZxYmGnNnn8n59WfreK_Moshk_w@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] KVM: x86/mmu: Split huge pages mapped by the TDP
- MMU on fault
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20221109205353.984745-2-ltykernel@gmail.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT023:EE_|BL1PR12MB5301:EE_
+X-MS-Office365-Filtering-Correlation-Id: dad9e2f2-0aad-4603-29c6-08dac2aba106
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fMGiyX0jM+C6sm/vkH//j6P/FZJ63m5OaSaYgkfzdn5qDPq1OqPVMyT1kxq0dCg8VHEotdo+9Vy2Cww3MlYhyumo5HLqPjLtNF+gB+42g5mxzmb/HIgqKNOKWNIb4wIt7Gaug3h44tnrjXyIAdzkXs+M/IfY3GHAw+LuP7Q0e7ULwt4AeZXhhIPu+/o8yk+jq8SsXFDE0S9M/876gynqF5ZhoB9Yk0xM3k8CPRX4xr65wIrV00S3RpalA+6JfDLABjjFiAGFNEhJ/PLaRIC4BjtJO6gRgo6gqNj2E7lLpTfKTZbnxOoO+ACCP479kYiOfT8UGSvUp6vCPBMEeedzlplS4DJLYtCfDVG0YMbjW0UwWduFku27bc/87F/FNr/0iV17aC5gD5AQuNjcE6T1jr+iTvT/ElCrlMwstk26t9kZW8PxsghoRj3ylcvczntQa75MFRRbKsfmQXYwMtnv50xKtZbSg0FRu84lZMFe0BObS9NZpLR9vdxUVeV3t/rK2qELjsa04hZ1BehU/tgARJSQlARxE5AV5HSTPolO+VkwiYLGb8E0O8jKD2dLkrZiD+pl+AaD+i1lhPL1pDKG9/vt0EaMFrlYPpSeLmeBtQP8yqoUBajcASsyHOo8nW7cs+OjdASKljEoKpSdu4kTyBYjB7h04wny65ZLlgQJSZxG9BEVzKcaoXp16f2R5VDfSsifyM4RibOVlnr9DXnHZOg+sk8P65eAkHYjksieIi7+YwaC0IisrlPID4jtwS5zzCGBnlRm+Zd4fW4wis8dEKDqxXqFh/FBwpZ5d+GtCJQ=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(396003)(346002)(39860400002)(376002)(136003)(451199015)(46966006)(36840700001)(40470700004)(81166007)(82740400003)(356005)(36756003)(36860700001)(86362001)(40480700001)(6666004)(316002)(40460700003)(45080400002)(54906003)(6916009)(70206006)(478600001)(7406005)(4326008)(70586007)(8936002)(2906002)(82310400005)(8676002)(7416002)(5660300002)(47076005)(426003)(336012)(41300700001)(44832011)(26005)(83380400001)(1076003)(186003)(16526019)(2616005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2022 23:39:22.2609
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: dad9e2f2-0aad-4603-29c6-08dac2aba106
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT023.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5301
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,205 +113,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 9, 2022 at 10:59 AM David Matlack <dmatlack@google.com> wrote:
->
-> Now that the TDP MMU has a mechanism to split huge pages, use it in the
-> fault path when a huge page needs to be replaced with a mapping at a
-> lower level.
->
-> This change reduces the negative performance impact of NX HugePages.
-> Prior to this change if a vCPU executed from a huge page and NX
-> HugePages was enabled, the vCPU would take a fault, zap the huge page,
-> and mapping the faulting address at 4KiB with execute permissions
-> enabled. The rest of the memory would be left *unmapped* and have to be
-> faulted back in by the guest upon access (read, write, or execute). If
-> guest is backed by 1GiB, a single execute instruction can zap an entire
-> GiB of its physical address space.
->
-> For example, it can take a VM longer to execute from its memory than to
-> populate that memory in the first place:
->
-> $ ./execute_perf_test -s anonymous_hugetlb_1gb -v96
->
-> Populating memory             : 2.748378795s
-> Executing from memory         : 2.899670885s
->
-> With this change, such faults split the huge page instead of zapping it,
-> which avoids the non-present faults on the rest of the huge page:
->
-> $ ./execute_perf_test -s anonymous_hugetlb_1gb -v96
->
-> Populating memory             : 2.729544474s
-> Executing from memory         : 0.111965688s   <---
->
-> This change also reduces the performance impact of dirty logging when
-> eager_page_split=N. eager_page_split=N (abbreviated "eps=N" below) can
-> be desirable for read-heavy workloads, as it avoids allocating memory to
-> split huge pages that are never written and avoids increasing the TLB
-> miss cost on reads of those pages.
->
->              | Config: ept=Y, tdp_mmu=Y, 5% writes           |
->              | Iteration 1 dirty memory time                 |
->              | --------------------------------------------- |
-> vCPU Count   | eps=N (Before) | eps=N (After) | eps=Y        |
-> ------------ | -------------- | ------------- | ------------ |
-> 2            | 0.332305091s   | 0.019615027s  | 0.006108211s |
-> 4            | 0.353096020s   | 0.019452131s  | 0.006214670s |
-> 8            | 0.453938562s   | 0.019748246s  | 0.006610997s |
-> 16           | 0.719095024s   | 0.019972171s  | 0.007757889s |
-> 32           | 1.698727124s   | 0.021361615s  | 0.012274432s |
-> 64           | 2.630673582s   | 0.031122014s  | 0.016994683s |
-> 96           | 3.016535213s   | 0.062608739s  | 0.044760838s |
->
-> Eager page splitting remains beneficial for write-heavy workloads, but
-> the gap is now reduced.
->
->              | Config: ept=Y, tdp_mmu=Y, 100% writes         |
->              | Iteration 1 dirty memory time                 |
->              | --------------------------------------------- |
-> vCPU Count   | eps=N (Before) | eps=N (After) | eps=Y        |
-> ------------ | -------------- | ------------- | ------------ |
-> 2            | 0.317710329s   | 0.296204596s  | 0.058689782s |
-> 4            | 0.337102375s   | 0.299841017s  | 0.060343076s |
-> 8            | 0.386025681s   | 0.297274460s  | 0.060399702s |
-> 16           | 0.791462524s   | 0.298942578s  | 0.062508699s |
-> 32           | 1.719646014s   | 0.313101996s  | 0.075984855s |
-> 64           | 2.527973150s   | 0.455779206s  | 0.079789363s |
-> 96           | 2.681123208s   | 0.673778787s  | 0.165386739s |
->
-> Further study is needed to determine if the remaining gap is acceptable
-> for customer workloads or if eager_page_split=N still requires a-priori
-> knowledge of the VM workload, especially when considering these costs
-> extrapolated out to large VMs with e.g. 416 vCPUs and 12TB RAM.
->
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> Reviewed-by: Mingwei Zhang <mizhang@google.com>
-
-Reviewed-by: Ben Gardon <bgardon@google.com>
-
+On Wed, Nov 09, 2022 at 03:53:36PM -0500, Tianyu Lan wrote:
+> From: Tianyu Lan <tiala@microsoft.com>
+> 
+> Hypervisor may pass cc blob address directly into boot param's cc
+> blob address in the direct boot mode. Check cc blcb hdr magic first
+> in the sev_enable() and use it as cc blob address if check successfully.
+> 
+> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
 > ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 73 ++++++++++++++++++--------------------
->  1 file changed, 35 insertions(+), 38 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 4e5b3ae824c1..e08596775427 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1146,6 +1146,9 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
->         return 0;
->  }
->
-> +static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
-> +                                  struct kvm_mmu_page *sp, bool shared);
-> +
->  /*
->   * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
->   * page tables and SPTEs to translate the faulting guest physical address.
-> @@ -1171,49 +1174,42 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->                 if (iter.level == fault->goal_level)
->                         break;
->
-> -               /*
-> -                * If there is an SPTE mapping a large page at a higher level
-> -                * than the target, that SPTE must be cleared and replaced
-> -                * with a non-leaf SPTE.
-> -                */
-> +               /* Step down into the lower level page table if it exists. */
->                 if (is_shadow_present_pte(iter.old_spte) &&
-> -                   is_large_pte(iter.old_spte)) {
-> -                       if (tdp_mmu_zap_spte_atomic(vcpu->kvm, &iter))
-> -                               break;
-> +                   !is_large_pte(iter.old_spte))
-> +                       continue;
->
-> -                       /*
-> -                        * The iter must explicitly re-read the spte here
-> -                        * because the new value informs the !present
-> -                        * path below.
-> -                        */
-> -                       iter.old_spte = kvm_tdp_mmu_read_spte(iter.sptep);
-> -               }
-> +               /*
-> +                * If SPTE has been frozen by another thread, just give up and
-> +                * retry, avoiding unnecessary page table allocation and free.
-> +                */
-> +               if (is_removed_spte(iter.old_spte))
-> +                       break;
->
-> -               if (!is_shadow_present_pte(iter.old_spte)) {
-> -                       /*
-> -                        * If SPTE has been frozen by another thread, just
-> -                        * give up and retry, avoiding unnecessary page table
-> -                        * allocation and free.
-> -                        */
-> -                       if (is_removed_spte(iter.old_spte))
-> -                               break;
-> +               /*
-> +                * The SPTE is either non-present or points to a huge page that
-> +                * needs to be split.
-> +                */
-> +               sp = tdp_mmu_alloc_sp(vcpu);
-> +               tdp_mmu_init_child_sp(sp, &iter);
->
-> -                       sp = tdp_mmu_alloc_sp(vcpu);
-> -                       tdp_mmu_init_child_sp(sp, &iter);
-> +               sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
->
-> -                       sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
-> +               if (is_shadow_present_pte(iter.old_spte))
-> +                       ret = tdp_mmu_split_huge_page(kvm, &iter, sp, true);
-> +               else
-> +                       ret = tdp_mmu_link_sp(kvm, &iter, sp, true);
->
-> -                       if (tdp_mmu_link_sp(kvm, &iter, sp, true)) {
-> -                               tdp_mmu_free_sp(sp);
-> -                               break;
-> -                       }
-> +               if (ret) {
-> +                       tdp_mmu_free_sp(sp);
-> +                       break;
-> +               }
->
-> -                       if (fault->huge_page_disallowed &&
-> -                           fault->req_level >= iter.level) {
-> -                               spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> -                               track_possible_nx_huge_page(kvm, sp);
-> -                               spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> -                       }
-> +               if (fault->huge_page_disallowed &&
-> +                   fault->req_level >= iter.level) {
-> +                       spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> +                       track_possible_nx_huge_page(kvm, sp);
-> +                       spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
->                 }
->         }
->
-> @@ -1477,6 +1473,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
->         return sp;
->  }
->
-> +/* Note, the caller is responsible for initializing @sp. */
->  static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
->                                    struct kvm_mmu_page *sp, bool shared)
+>  arch/x86/boot/compressed/sev.c | 27 ++++++++++++++++++++-------
+>  1 file changed, 20 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
+> index c93930d5ccbd..960968f8bf75 100644
+> --- a/arch/x86/boot/compressed/sev.c
+> +++ b/arch/x86/boot/compressed/sev.c
+> @@ -272,17 +272,24 @@ static void enforce_vmpl0(void)
+>  
+>  void sev_enable(struct boot_params *bp)
 >  {
-> @@ -1484,8 +1481,6 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
->         const int level = iter->level;
->         int ret, i;
->
-> -       tdp_mmu_init_child_sp(sp, iter);
-> -
->         /*
->          * No need for atomics when writing to sp->spt since the page table has
->          * not been linked in yet and thus is not reachable from any other CPU.
-> @@ -1561,6 +1556,8 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
->                                 continue;
->                 }
->
-> +               tdp_mmu_init_child_sp(sp, &iter);
+> +	struct cc_blob_sev_info *cc_info;
+>  	unsigned int eax, ebx, ecx, edx;
+>  	struct msr m;
+>  	bool snp;
+>  
+>  	/*
+> -	 * bp->cc_blob_address should only be set by boot/compressed kernel.
+> -	 * Initialize it to 0 to ensure that uninitialized values from
+> -	 * buggy bootloaders aren't propagated.
+> +	 * bp->cc_blob_address should only be set by boot/compressed
+> +	 * kernel and hypervisor with direct boot mode. Initialize it
+> +	 * to 0 after checking in order to ensure that uninitialized
+> +	 * values from buggy bootloaders aren't propagated.
+>  	 */
+> -	if (bp)
+> -		bp->cc_blob_address = 0;
+> +	if (bp) {
+> +		cc_info = (struct cc_blob_sev_info *)(unsigned long)
+> +			bp->cc_blob_address;
 > +
->                 if (tdp_mmu_split_huge_page(kvm, &iter, sp, shared))
->                         goto retry;
->
-> --
-> 2.38.1.431.g37b22c650d-goog
->
+> +		if (cc_info->magic != CC_BLOB_SEV_HDR_MAGIC)
+> +			bp->cc_blob_address = 0;
+
+It doesn't seem great to rely on SEV_HDR_MAGIC to determine whether
+bp->cc_blob_address is valid or not since it is only a 32-bit value.
+
+Would it be possible to use a setup_data entry of type SETUP_CC_BLOB
+in bp->hdr.setup_data instead? There's already handling for that in
+find_cc_blob_setup_data() so it should "just work".
+
+-Mike
