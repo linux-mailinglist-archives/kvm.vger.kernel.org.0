@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 081A462368C
+	by mail.lfdr.de (Postfix) with ESMTP id F3F8A62368D
 	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 23:27:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231927AbiKIW1C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 17:27:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39416 "EHLO
+        id S232137AbiKIW1D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 17:27:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232268AbiKIW0m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 17:26:42 -0500
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD9A420BFF
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 14:26:38 -0800 (PST)
-Received: by mail-qv1-xf31.google.com with SMTP id lf15so227149qvb.9
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 14:26:38 -0800 (PST)
+        with ESMTP id S232179AbiKIW0s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 17:26:48 -0500
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA42820F72
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 14:26:47 -0800 (PST)
+Received: by mail-qt1-x82d.google.com with SMTP id cg5so29227qtb.12
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 14:26:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BFALFEh11gYbShb1RAGYtj5dFXgHaYyKewnp1K6Oabw=;
-        b=nkpPoywYHDX5oTr3GbMz5tTHTbZRWuHW8NsemjQAHKz4xMNyjw9Kw3TWRe27yjr76z
-         IBZ1A+/qXFEjCKl27M3fE9pkpDU9I3JTR4zbvOj+4jCI9hqLDgluIov21g9AdxlOvH6f
-         6+jQxDfcpBkBuv8/es+JjRYaZuzv05sxFzhJp+iJ0ocYP1bVwD4kNHNJE54E0BHJKzvh
-         xm7E8paRC3gDOrz6zKCidGlV55d7khDLjydj3bnP0caZAz7Jv9eySzK7b3Kyiev3SnDD
-         pLccJJKiuNRt3H8cIeX8/LTgYv910T61kXFTc8Wa18t+rCI6AekXKlRECex2xYxVMoCn
-         GETg==
+        bh=ys/jQ8RbuqT3YumCTMbd+2452VktWwQQOObS7LSk5p4=;
+        b=mk9lRpuokDL/uAOGOKs/+T+PEfPR48B5jrdBCU4h3IJuESuNqf45ir8gw9bRIeOeS2
+         5boDsxOTz8DpWvHPjQhCVVSwOM6ovQKP64R6KI0RCxiP7tMx1y1DV02kaqZQLWfTIIIK
+         TbjJqgkN+FpzGJDz9nIIK8l9JHwSamFn0UQVHIRm3S8ypg8qo2oRFMAbGNEOyPMoHgVs
+         guGP5sgv0zVSjtqTSdAgYZhxbtjyozc30kfsiDsPFZZvSEgusnttdCQYnX0wMsBIhRsK
+         PS2Rwu4d/kFG+09LQxPgUcg1wT8Uk5LZsZZvFYYJUXzlidk4zjrNqzmeBbQj7G25Mb/i
+         N6DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BFALFEh11gYbShb1RAGYtj5dFXgHaYyKewnp1K6Oabw=;
-        b=7iHceU9k/7OCsQW1aq4uv6Os0wMcoOS8WKfux3ohAVmaw6iL0UKBIjEet4SLaAYi0R
-         tF7IVi//dvIcnY82inGX6tI9ogkeZbAjh7LZzUNi5tOqHiNlL1p6T3gXCNJWHhYzHgIu
-         jW1JqRig0jmzW+iJoNu6N+VYqfJGgMF71V5Q5Fgd4xH2wC6c0SB73Ae1g+0955dXr5f3
-         7kxU0db7efzMo5b1PLnBnkmCeDC552Bj4LFP/6V/MHZHBkK6urpz2RQ4rtE+z/y1uqFp
-         yx25+xylTVLgpiFkVAtSinFtV+WzTBR47ghzOqSKBObI5S7sXORGthFjcZbgP1DpG7Ni
-         s5eg==
-X-Gm-Message-State: ACrzQf1vQikDZRYboFfJ9tkpqrS7g2OUuV/AXv/jQ6NaRnUaWWW32XwQ
-        mDA+pC68eQKdD2UjblvbcRqmwwGBB57wbyiY/oqKEw==
-X-Google-Smtp-Source: AMsMyM67iMqLmmP+/O0bTNzsRNFWvVwvyyOSZ+AivFDFmfKATCCtpTElHUJLpL1k112VENpp1GALRfF2i5Y8/vcehHM=
-X-Received: by 2002:a05:6214:4103:b0:4b6:818c:eb7b with SMTP id
- kc3-20020a056214410300b004b6818ceb7bmr57729500qvb.28.1668032797696; Wed, 09
- Nov 2022 14:26:37 -0800 (PST)
+        bh=ys/jQ8RbuqT3YumCTMbd+2452VktWwQQOObS7LSk5p4=;
+        b=X4NA9zkLbMhqF5MOKpmxa1tuZvz7Xq4wfCOPv+srTmmg1nhB7RwnEmIyQciZZsw19m
+         6H4humzwGukS6MAc5Rihmmr3M3vMHHmwIx4Th0nwTdElb4YMRjm/7IlD6Ma1Z/C3B81Z
+         V5Qy2e+MqoP//HyYdQ2KXOTf4RENnfCSdFxsb8dBkUVlRRN20aU9ORKbJkXKkS1UExBO
+         MHNyUhoiXFHwM/rU2PfzvQnKr3BL9sTeb3Njgf+zf0xpf8gtk4KSLa2ybbui7W8XI1c6
+         8Tj3Y90NgeXuXWIfHsUn6cdsbCTQnfbXLOXtfq/X6nJHGgjrPIiP16JVsuZdV33WpIZl
+         JiMw==
+X-Gm-Message-State: ANoB5pkym1Zc+twJvF0ZDOsnvhlRtoj3qH3xh3FwR4M6600v9o++Xo6/
+        Jz1vOhtyhUF73v5yJihP8rQZNpitQJvu1qn7ZVvlUA==
+X-Google-Smtp-Source: AA0mqf78NDQ8xLt/Zae6fTGp38dnPf5BMr45qBFnT7kZ5Z23obSQYwTbVOjufSO4/KwQlp/1DoVnG+QFF53vnN4/bwY=
+X-Received: by 2002:ac8:5ac2:0:b0:3a5:afca:2322 with SMTP id
+ d2-20020ac85ac2000000b003a5afca2322mr4284025qtd.500.1668032807310; Wed, 09
+ Nov 2022 14:26:47 -0800 (PST)
 MIME-Version: 1.0
-References: <20221107215644.1895162-1-oliver.upton@linux.dev> <20221107215644.1895162-11-oliver.upton@linux.dev>
-In-Reply-To: <20221107215644.1895162-11-oliver.upton@linux.dev>
+References: <20221107215644.1895162-1-oliver.upton@linux.dev> <20221107215855.1895367-1-oliver.upton@linux.dev>
+In-Reply-To: <20221107215855.1895367-1-oliver.upton@linux.dev>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 9 Nov 2022 14:26:26 -0800
-Message-ID: <CANgfPd_XyTuXa6T01tL9v0tdaG7OUp=Mtikvo0tVNtoBW5stAg@mail.gmail.com>
-Subject: Re: [PATCH v5 10/14] KVM: arm64: Split init and set for table PTE
+Date:   Wed, 9 Nov 2022 14:26:36 -0800
+Message-ID: <CANgfPd9OSUfDGCQG8tHXTCYtrrCDnkgPZM6qPDaQF90bZsVCkA@mail.gmail.com>
+Subject: Re: [PATCH v5 11/14] KVM: arm64: Make block->table PTE changes parallel-aware
 To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -75,83 +75,149 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 7, 2022 at 1:58 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+On Mon, Nov 7, 2022 at 1:59 PM Oliver Upton <oliver.upton@linux.dev> wrote:
 >
-> Create a helper to initialize a table and directly call
-> smp_store_release() to install it (for now). Prepare for a subsequent
-> change that generalizes PTE writes with a helper.
+> In order to service stage-2 faults in parallel, stage-2 table walkers
+> must take exclusive ownership of the PTE being worked on. An additional
+> requirement of the architecture is that software must perform a
+> 'break-before-make' operation when changing the block size used for
+> mapping memory.
+>
+> Roll these two concepts together into helpers for performing a
+> 'break-before-make' sequence. Use a special PTE value to indicate a PTE
+> has been locked by a software walker. Additionally, use an atomic
+> compare-exchange to 'break' the PTE when the stage-2 page tables are
+> possibly shared with another software walker. Elide the DSB + TLBI if
+> the evicted PTE was invalid (and thus not subject to break-before-make).
+>
+> All of the atomics do nothing for now, as the stage-2 walker isn't fully
+> ready to perform parallel walks.
 >
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/hyp/pgtable.c | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
+>  arch/arm64/kvm/hyp/pgtable.c | 80 +++++++++++++++++++++++++++++++++---
+>  1 file changed, 75 insertions(+), 5 deletions(-)
 >
 > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index a34e2050f931..f4dd77c6c97d 100644
+> index f4dd77c6c97d..b9f0d792b8d9 100644
 > --- a/arch/arm64/kvm/hyp/pgtable.c
 > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -136,16 +136,13 @@ static void kvm_clear_pte(kvm_pte_t *ptep)
->         WRITE_ONCE(*ptep, 0);
+> @@ -49,6 +49,12 @@
+>  #define KVM_INVALID_PTE_OWNER_MASK     GENMASK(9, 2)
+>  #define KVM_MAX_OWNER_ID               1
+>
+> +/*
+> + * Used to indicate a pte for which a 'break-before-make' sequence is in
+> + * progress.
+> + */
+> +#define KVM_INVALID_PTE_LOCKED         BIT(10)
+> +
+>  struct kvm_pgtable_walk_data {
+>         struct kvm_pgtable_walker       *walker;
+>
+> @@ -674,6 +680,11 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
+>         return !!pte;
 >  }
 >
-> -static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp,
-> -                             struct kvm_pgtable_mm_ops *mm_ops)
-> +static kvm_pte_t kvm_init_table_pte(kvm_pte_t *childp, struct kvm_pgtable_mm_ops *mm_ops)
+> +static bool stage2_pte_is_locked(kvm_pte_t pte)
+> +{
+> +       return !kvm_pte_valid(pte) && (pte & KVM_INVALID_PTE_LOCKED);
+> +}
+> +
+>  static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
 >  {
-> -       kvm_pte_t old = *ptep, pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
-> +       kvm_pte_t pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
->
->         pte |= FIELD_PREP(KVM_PTE_TYPE, KVM_PTE_TYPE_TABLE);
->         pte |= KVM_PTE_VALID;
-> -
-> -       WARN_ON(kvm_pte_valid(old));
-
-Is there any reason to drop this warning?
-
-
-> -       smp_store_release(ptep, pte);
-> +       return pte;
+>         if (!kvm_pgtable_walk_shared(ctx)) {
+> @@ -684,6 +695,64 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+>         return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
 >  }
 >
->  static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
-> @@ -413,7 +410,7 @@ static bool hyp_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->  static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
->                           enum kvm_pgtable_walk_flags visit)
+> +/**
+> + * stage2_try_break_pte() - Invalidates a pte according to the
+> + *                         'break-before-make' requirements of the
+> + *                         architecture.
+> + *
+> + * @ctx: context of the visited pte.
+> + * @mmu: stage-2 mmu
+> + *
+> + * Returns: true if the pte was successfully broken.
+> + *
+> + * If the removed pte was valid, performs the necessary serialization and TLB
+> + * invalidation for the old value. For counted ptes, drops the reference count
+> + * on the containing table page.
+> + */
+> +static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+> +                                struct kvm_s2_mmu *mmu)
+> +{
+> +       struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> +
+> +       if (stage2_pte_is_locked(ctx->old)) {
+> +               /*
+> +                * Should never occur if this walker has exclusive access to the
+> +                * page tables.
+> +                */
+> +               WARN_ON(!kvm_pgtable_walk_shared(ctx));
+> +               return false;
+> +       }
+> +
+> +       if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
+> +               return false;
+> +
+> +       /*
+> +        * Perform the appropriate TLB invalidation based on the evicted pte
+> +        * value (if any).
+> +        */
+> +       if (kvm_pte_table(ctx->old, ctx->level))
+> +               kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> +       else if (kvm_pte_valid(ctx->old))
+> +               kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
+> +
+> +       if (stage2_pte_is_counted(ctx->old))
+> +               mm_ops->put_page(ctx->ptep);
+> +
+> +       return true;
+> +}
+> +
+> +static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
+> +{
+> +       struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> +
+> +       WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
+> +
+> +       if (stage2_pte_is_counted(new))
+> +               mm_ops->get_page(ctx->ptep);
+> +
+> +       smp_store_release(ctx->ptep, new);
+> +}
+> +
+>  static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
+>                            struct kvm_pgtable_mm_ops *mm_ops)
 >  {
-> -       kvm_pte_t *childp;
-> +       kvm_pte_t *childp, new;
->         struct hyp_map_data *data = ctx->arg;
->         struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->
-> @@ -427,8 +424,10 @@ static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> @@ -812,17 +881,18 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
 >         if (!childp)
 >                 return -ENOMEM;
 >
-> -       kvm_set_table_pte(ctx->ptep, childp, mm_ops);
-> +       new = kvm_init_table_pte(childp, mm_ops);
->         mm_ops->get_page(ctx->ptep);
-> +       smp_store_release(ctx->ptep, new);
+> +       if (!stage2_try_break_pte(ctx, data->mmu)) {
+> +               mm_ops->put_page(childp);
+> +               return -EAGAIN;
+> +       }
 > +
->         return 0;
->  }
->
-> @@ -796,7 +795,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->                                 struct stage2_map_data *data)
->  {
->         struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> -       kvm_pte_t *childp;
-> +       kvm_pte_t *childp, new;
->         int ret;
->
->         ret = stage2_map_walker_try_leaf(ctx, data);
-> @@ -821,8 +820,9 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->         if (stage2_pte_is_counted(ctx->old))
->                 stage2_put_pte(ctx, data->mmu, mm_ops);
->
-> -       kvm_set_table_pte(ctx->ptep, childp, mm_ops);
-> +       new = kvm_init_table_pte(childp, mm_ops);
->         mm_ops->get_page(ctx->ptep);
-> +       smp_store_release(ctx->ptep, new);
+>         /*
+>          * If we've run into an existing block mapping then replace it with
+>          * a table. Accesses beyond 'end' that fall within the new table
+>          * will be mapped lazily.
+>          */
+> -       if (stage2_pte_is_counted(ctx->old))
+> -               stage2_put_pte(ctx, data->mmu, mm_ops);
+> -
+>         new = kvm_init_table_pte(childp, mm_ops);
+
+Does it make any sense to move this before the "break" to minimize the
+critical section in which the PTE is locked?
+
+
+> -       mm_ops->get_page(ctx->ptep);
+> -       smp_store_release(ctx->ptep, new);
+> +       stage2_make_pte(ctx, new);
 >
 >         return 0;
 >  }
