@@ -2,183 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB7DE622CBE
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 14:49:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AF82622E57
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 15:49:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230231AbiKINtL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 08:49:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36354 "EHLO
+        id S231382AbiKIOt2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 09:49:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230223AbiKINtF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 08:49:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3683313D47
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 05:48:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668001694;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zW71t14jveGGZgaoQQW/oRTrMZaKQBZH55aeiywg1z4=;
-        b=dKvFPCOvBhYm3UpH3D6IncNNePD05WRMXl0Xh2dUfihhpOqxbxa5HF27aifTtuTSOsv9L9
-        Po4/WqvYPNQInXO+o76p/n60SN4M85tItpUvpS2RIQNMnEK7UhJ6sGUBdliJgnlNrTfMkM
-        pyzW5s7YYHBsQ5r7coNJvyK4xG5jHO0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-483-GOCqfvjYPGO-2oAtKwyI_A-1; Wed, 09 Nov 2022 08:48:13 -0500
-X-MC-Unique: GOCqfvjYPGO-2oAtKwyI_A-1
-Received: by mail-wr1-f69.google.com with SMTP id j25-20020adfa559000000b0023d5d7f95a2so3454346wrb.21
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 05:48:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zW71t14jveGGZgaoQQW/oRTrMZaKQBZH55aeiywg1z4=;
-        b=7PRu5rZ90aYK7LJHXYpZQGhokJ1g3W8s6R7fUJybaOAn/ceLjNhpWG/0C92Qf275gE
-         UMw30j/YSQdL2d6qq/b4TFFDNy9MQ1axE5BxOyDtCnZ8ykaHB8+Bf/22+KzN9jyc3v3c
-         7lLnDv6iGVoXppAYMuEGr+FOqLI2/m0lk4VBo1xwbuAGeZhX+rkNLFgHTT1c73ysFvZG
-         PWpvHI6AkQW3mHqa+SrPCOZs3SQXN9mkqK4dYrEpPsA55VQA7yuFA/P7lWXlHvGsdcpY
-         /wKWdhBHgpu1Fp3DCU5q4EPnPEXUHVA/IPVIcLvREuu00/YmWs7x1c+yZR3X2Ok36NE2
-         L0Vw==
-X-Gm-Message-State: ACrzQf37SifCb7r/CsRe7nJaGRa1USH+r02wtULL2hhFWtAXbdbS4ZtO
-        7kyo4z8V25pTWqvuhGSjSghutdyzKOFw3p+W+7flCVLacxoKkP6CS/29wMHz2LpySAJvtyu376N
-        dJVPfrTyqpsFz
-X-Received: by 2002:a1c:4b0f:0:b0:3cf:7bdd:e00b with SMTP id y15-20020a1c4b0f000000b003cf7bdde00bmr32346333wma.110.1668001692151;
-        Wed, 09 Nov 2022 05:48:12 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM78p2jb/ADj30WGIkRggDRp+A4tavN7K8n9FH6W+J9naIHHOt2dyB0ZdGpKfPgjZ2SFrm2Pag==
-X-Received: by 2002:a1c:4b0f:0:b0:3cf:7bdd:e00b with SMTP id y15-20020a1c4b0f000000b003cf7bdde00bmr32346318wma.110.1668001691902;
-        Wed, 09 Nov 2022 05:48:11 -0800 (PST)
-Received: from ovpn-194-83.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id m11-20020a5d4a0b000000b0022ca921dc67sm12874653wrq.88.2022.11.09.05.48.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Nov 2022 05:48:11 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Vipin Sharma <vipinsh@google.com>, seanjc@google.com,
-        pbonzini@redhat.com
-Cc:     dmatlack@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH 4/6] KVM: selftests: Make Hyper-V guest OS ID common
-In-Reply-To: <20221105045704.2315186-5-vipinsh@google.com>
-References: <20221105045704.2315186-1-vipinsh@google.com>
- <20221105045704.2315186-5-vipinsh@google.com>
-Date:   Wed, 09 Nov 2022 14:48:10 +0100
-Message-ID: <874jv8p7c5.fsf@ovpn-194-83.brq.redhat.com>
+        with ESMTP id S229590AbiKIOt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 09:49:26 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F34D9116C;
+        Wed,  9 Nov 2022 06:49:25 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A9EdGA9026409;
+        Wed, 9 Nov 2022 14:49:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : from : to : cc : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=ni/BG7gnOiqmRl9kheWYoxiUHrqf0PqdIfCsUfmenQ0=;
+ b=HPLJ6dfc5ctDIWPoNKoFU16g9vul+tO3IISY4yDQ0lPsYmdAzvYgvzznr+qB9cTb+CDT
+ rpfqCHGki7BwPLC39OwRwNE2oJnu2LQOFlYsHuXqw7CtL6tgjHbMCaesof/uT2EaBgPI
+ HVluPdDjWmpOakiavPHCjgVKI1r8U3yqN2zTGBxPeg+VGbZHAG5PKaBCNTw/2khVmECU
+ ta4mN8sZ++7vd47A5x5pc9A2CJuUW/AeDMODqMJNf8qdfIB3cEDLgkImfKTeRHVLJWxs
+ 3PEfqUqvns3jOtn0paDSdjebrJ1Cxfxpa+EB4Smn8vuREefRM0BD4v5oQ80snKpRNJ0l Sg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3krdtd10n3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Nov 2022 14:49:06 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A9EdL6l027041;
+        Wed, 9 Nov 2022 14:49:05 GMT
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3krdtd10mj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Nov 2022 14:49:05 +0000
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A9Ea0Jj009869;
+        Wed, 9 Nov 2022 14:49:04 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma03wdc.us.ibm.com with ESMTP id 3kngs7e9ph-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Nov 2022 14:49:04 +0000
+Received: from smtpav05.dal12v.mail.ibm.com ([9.208.128.132])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A9En7Q47602746
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Nov 2022 14:49:07 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 285CD58052;
+        Wed,  9 Nov 2022 14:49:03 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EF1BE5804C;
+        Wed,  9 Nov 2022 14:49:01 +0000 (GMT)
+Received: from [9.160.53.158] (unknown [9.160.53.158])
+        by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Wed,  9 Nov 2022 14:49:01 +0000 (GMT)
+Message-ID: <73dd6b0e-35c7-bb5d-b392-a9de012d4f92@linux.ibm.com>
+Date:   Wed, 9 Nov 2022 09:49:01 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: S390 testing for IOMMUFD
+Content-Language: en-US
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>
+References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+ <Y2msLjrbvG5XPeNm@nvidia.com>
+ <fbb84105-cc6e-59bd-b09c-0ea4353d7605@linux.ibm.com>
+ <d814e245-2255-15ce-cf3d-65788aa61689@linux.ibm.com>
+In-Reply-To: <d814e245-2255-15ce-cf3d-65788aa61689@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: vFMHgU3Okx5cKYLnBTGlNT2ab1WWRkFn
+X-Proofpoint-GUID: Nx0QGFwXOP3HzOJOKKP58wxdf8oGkskU
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-09_06,2022-11-09_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ lowpriorityscore=0 phishscore=0 mlxlogscore=999 mlxscore=0 malwarescore=0
+ clxscore=1015 priorityscore=1501 bulkscore=0 impostorscore=0
+ suspectscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2210170000 definitions=main-2211090110
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vipin Sharma <vipinsh@google.com> writes:
 
-> Make guest OS ID calculation common to all hyperv tests and similar to
-> hv_generate_guest_id().
+On 11/8/22 9:04 AM, Anthony Krowiak wrote:
+>
+> On 11/8/22 5:12 AM, Christian Borntraeger wrote:
+>>
+>>
+>> Am 08.11.22 um 02:09 schrieb Jason Gunthorpe:
+>>> On Mon, Nov 07, 2022 at 08:48:53PM -0400, Jason Gunthorpe wrote:
+>>>> [
+>>>> This has been in linux-next for a little while now, and we've 
+>>>> completed
+>>>> the syzkaller run. 1300 hours of CPU time have been invested since the
+>>>> last report with no improvement in coverage or new detections. 
+>>>> syzkaller
+>>>> coverage reached 69%(75%), and review of the misses show substantial
+>>>> amounts are WARN_ON's and other debugging which are not expected to be
+>>>> covered.
+>>>> ]
+>>>>
+>>>> iommufd is the user API to control the IOMMU subsystem as it 
+>>>> relates to
+>>>> managing IO page tables that point at user space memory.
+>>>
+>>> [chop cc list]
+>>>
+>>> s390 mdev maintainers,
+>>>
+>>> Can I ask your help to test this with the two S390 mdev drivers? Now
+>>> that gvt is passing and we've covered alot of the QA ground it is a
+>>> good time to run it.
+>>>
+>>> Take the branch from here:
+>>>
+>>> https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/log/?h=for-next 
+>>>
+>>
+>>>
+>>> And build the kernel with
+>>>
+>>> CONFIG_VFIO_CONTAINER=n
+>>> CONFIG_IOMMUFD=y
+>>> CONFIG_IOMMUFD_VFIO_CONTAINER=y
+>>>
+>>> And your existing stuff should work with iommufd providing the iommu
+>>> support to vfio. There will be a dmesg confirming this.
+>>
+>> Gave it a quick spin with vfio_ap:
+>> [  401.679199] vfio_ap_mdev b01a7c33-9696-48b2-9a98-050e8e17c69a: 
+>> Adding to iommu group 1
+>> [  402.085386] iommufd: IOMMUFD is providing /dev/vfio/vfio, not VFIO.
+>>
+>> Some tests seem to work, but others dont (running into timeouts). I 
+>> need to look
+>> into that (or ideally Tony will have a look, FWIW 
+>> tests.test_vfio_ap.VfioAPAssignMdevToGuestTest
+>> fails for me.
+>
+>
+> I'm looking into it.
 
-A similar (but without hv_linux_guest_id()) patch is present in my
-Hyper-V TLB flush update:
 
-https://lore.kernel.org/kvm/20221101145426.251680-32-vkuznets@redhat.com/
+I cloned the 
+https://lore.kernel.org/kvm/Y2q3nFXwOk9jul5u@nvidia.com/T/#m76a9c609c5ccd1494c05c6f598f9c8e75b7c9888 
+repo and ran the vfio_ap test cases. The tests ran without encountering 
+the errors related to the vfio_pin_pages() function, but I did see two 
+tests fail attempting to run crypto tests on the guest. I also saw a 
+WARN_ON stack trace in the dmesg output indicating a timeout occurred 
+trying to verify the completion of a queue reset. The reset problem has 
+reared its ugly head in our CI, so this may be a good thing as it will 
+allow me to debug why its happening.
+
 
 >
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  tools/testing/selftests/kvm/include/x86_64/hyperv.h  | 10 ++++++++++
->  tools/testing/selftests/kvm/x86_64/hyperv_clock.c    |  2 +-
->  tools/testing/selftests/kvm/x86_64/hyperv_features.c |  6 ++----
->  tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c |  2 +-
->  4 files changed, 14 insertions(+), 6 deletions(-)
 >
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> index 075fd29071a6..9d8c325af1d9 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> @@ -9,6 +9,10 @@
->  #ifndef SELFTEST_KVM_HYPERV_H
->  #define SELFTEST_KVM_HYPERV_H
->  
-> +#include <linux/version.h>
-> +
-> +#define HV_LINUX_VENDOR_ID			0x8100
-> +
->  #define HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS	0x40000000
->  #define HYPERV_CPUID_INTERFACE			0x40000001
->  #define HYPERV_CPUID_VERSION			0x40000002
-> @@ -189,4 +193,10 @@
->  /* hypercall options */
->  #define HV_HYPERCALL_FAST_BIT		BIT(16)
->  
-> +static inline uint64_t hv_linux_guest_id(void)
-> +{
-> +	return ((uint64_t)HV_LINUX_VENDOR_ID << 48) |
-> +	       ((uint64_t)LINUX_VERSION_CODE << 16);
-> +}
-> +
->  #endif /* !SELFTEST_KVM_HYPERV_H */
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-> index d576bc8ce823..f9112c5dc3f7 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-> @@ -104,7 +104,7 @@ static void guest_main(struct ms_hyperv_tsc_page *tsc_page, vm_paddr_t tsc_page_
->  
->  	/* Set Guest OS id to enable Hyper-V emulation */
->  	GUEST_SYNC(1);
-> -	wrmsr(HV_X64_MSR_GUEST_OS_ID, (u64)0x8100 << 48);
-> +	wrmsr(HV_X64_MSR_GUEST_OS_ID, hv_linux_guest_id());
->  	GUEST_SYNC(2);
->  
->  	check_tsc_msr_rdtsc();
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> index 6b443ce456b6..b5a42cf1ad9d 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> @@ -13,8 +13,6 @@
->  #include "processor.h"
->  #include "hyperv.h"
->  
-> -#define LINUX_OS_ID ((u64)0x8100 << 48)
-> -
->  static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
->  				vm_vaddr_t output_address, uint64_t *hv_status)
->  {
-> @@ -71,7 +69,7 @@ static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
->  
->  	GUEST_ASSERT(hcall->control);
->  
-> -	wrmsr(HV_X64_MSR_GUEST_OS_ID, LINUX_OS_ID);
-> +	wrmsr(HV_X64_MSR_GUEST_OS_ID, hv_linux_guest_id());
->  	wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
->  
->  	if (!(hcall->control & HV_HYPERCALL_FAST_BIT)) {
-> @@ -169,7 +167,7 @@ static void guest_test_msrs_access(void)
->  			 */
->  			msr->idx = HV_X64_MSR_GUEST_OS_ID;
->  			msr->write = 1;
-> -			msr->write_val = LINUX_OS_ID;
-> +			msr->write_val = hv_linux_guest_id();
->  			msr->available = 1;
->  			break;
->  		case 3:
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-> index a380ad7bb9b3..2c13a144b04c 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-> @@ -69,7 +69,7 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm)
->  
->  	GUEST_SYNC(1);
->  
-> -	wrmsr(HV_X64_MSR_GUEST_OS_ID, (u64)0x8100 << 48);
-> +	wrmsr(HV_X64_MSR_GUEST_OS_ID, hv_linux_guest_id());
->  
->  	GUEST_ASSERT(svm->vmcb_gpa);
->  	/* Prepare for L2 execution. */
-
--- 
-Vitaly
-
+>>
+>>
+>> The same kernel tree with defconfig (instead of 
+>> CONFIG_IOMMUFD_VFIO_CONTAINER=y) works fine.
+>>>
+>>> Let me know if there are any problems!
+>>>
+>>> If I recall there was some desire from the S390 platform team to start
+>>> building on iommufd to create some vIOMMU acceleration for S390
+>>> guests, this is a necessary first step.
+>>>
+>>> Thanks,
+>>> Jason
