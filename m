@@ -2,205 +2,406 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 125206222BB
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 04:45:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39CF26222FE
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 05:18:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229540AbiKIDpR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Nov 2022 22:45:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32794 "EHLO
+        id S229669AbiKIESn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Nov 2022 23:18:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbiKIDpP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Nov 2022 22:45:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4B4313CE7
-        for <kvm@vger.kernel.org>; Tue,  8 Nov 2022 19:44:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667965457;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1SzpVeGFSvJuoKb2g3I84q9t3Q2PU0091JEzT9e1Qh0=;
-        b=O/cJ9AJ8YRmr61PfwAIUGfqM8Jq2jek/yQ9L6jtceCFPeF+mVU0wLQHwN90N3Z2gZoybsw
-        wCELnpJVgJZaLk84uwFuV1UqTJbIqrzuI/Jvt4Y3cPxCNi+0hkFghboU0Pgz6YbpxWmTOf
-        d4kBk74KDvXzyqSlKLGGopjUQglRrWQ=
-Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
- [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-543-eCWUvyxzMDeESqjLrRHVrw-1; Tue, 08 Nov 2022 22:44:16 -0500
-X-MC-Unique: eCWUvyxzMDeESqjLrRHVrw-1
-Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-13cbfc38be2so7991150fac.0
-        for <kvm@vger.kernel.org>; Tue, 08 Nov 2022 19:44:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1SzpVeGFSvJuoKb2g3I84q9t3Q2PU0091JEzT9e1Qh0=;
-        b=zhyNt2iJ8O+BQyJKxnKHCYohhKunXP7c9ybgixKrCkV6iSUs/XCwWqf9pC8lN1mIV5
-         /RKBORoZFsG7pVdFLpzE+v1pebfP6x4gIX9r2fHF7wthTn0jOuPZ980U31jFCrPeezMD
-         hDe4VaqaY2BUcRKiaa11VooQ7DoQ37vF/LsqQ757+cznfT0Z4KBo6TBrmcHWet62gMzi
-         i5evL4b4WGUzT7de1MtaesXRfrVv/4a1Yyb4ygpMkUm7wDsStpE8p67aihrgoTcGkssd
-         OIfLRmAKuk8dMFcrnyrkWk6j7HJifMUL1mj/9jI5P2MJwf5sdXx9fRtZHmYuW6aFOUvO
-         oTBg==
-X-Gm-Message-State: ACrzQf0Mc+6u3LlKZr89/Hu0nffTbhSkpN7idbYjRCeP0ZbtSEhKpFjn
-        uQ29FLcZTrQHuqL/ma3fI4RPKC1B9skvE3MIDHY5gT+qcpwM0uaM8Ga2u5ixT/ciBYHLPnQedgb
-        luLXUm/jSmLfg4M8QdiEqNiTxL+hx
-X-Received: by 2002:a05:6808:181e:b0:35a:5959:5909 with SMTP id bh30-20020a056808181e00b0035a59595909mr14803962oib.35.1667965455530;
-        Tue, 08 Nov 2022 19:44:15 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM6706UrLNwyKe2vttKVh1ZtOJWzRUIuzEBoQnK1DCHM6gi/phgLdZny/rAkO0ET6NpmVgPN9DannOh8BBXGems=
-X-Received: by 2002:a05:6808:181e:b0:35a:5959:5909 with SMTP id
- bh30-20020a056808181e00b0035a59595909mr14803953oib.35.1667965455277; Tue, 08
- Nov 2022 19:44:15 -0800 (PST)
+        with ESMTP id S229488AbiKIESj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Nov 2022 23:18:39 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E090DCE0D;
+        Tue,  8 Nov 2022 20:18:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667967518; x=1699503518;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=zBd0WQHBdR3NPWzJNZfDs4ykgtZDGmbYGFzZ8L5rmrk=;
+  b=fAFMKNHw15zWY78fsi5/fwnE2M1yhsQ9J7CDxVMD5BvjXLJhc/ocnGSi
+   X+ndghdg/x7VQW9hQIedjzLSTy89lzq40zSrBqfaG3yhQLz8tHJVA8Z5c
+   C4gWiBrF+EmwnYsa8lN8DU8vMkhUHuKamA1K8LeDkPOd3qV61VeQSaQeY
+   N9NBhpyZ2XlbPCiBCmpihYLX7QswAj/1NPihyCeLNaGWLyiKl28o/T9AQ
+   h2stzUaNDMiCaECgXCsQlgr1LMQtMA/kuHMhfMLHwWh6erY8dDuJrmOou
+   GFmXR57iKdBnHyHXGJG5x0Hxka16WZxiL5Hc7cLKo41nV2vpLPTV3SP91
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10525"; a="373029544"
+X-IronPort-AV: E=Sophos;i="5.96,149,1665471600"; 
+   d="scan'208";a="373029544"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2022 20:18:36 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10525"; a="614533677"
+X-IronPort-AV: E=Sophos;i="5.96,149,1665471600"; 
+   d="scan'208";a="614533677"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by orsmga006.jf.intel.com with ESMTP; 08 Nov 2022 20:18:25 -0800
+Date:   Wed, 9 Nov 2022 12:13:58 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Yuan Yao <yuan.yao@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v9 6/8] KVM: Update lpage info when private/shared memory
+ are mixed
+Message-ID: <20221109041358.GA118963@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <20221025151344.3784230-7-chao.p.peng@linux.intel.com>
+ <20221108120805.kize74qgzsmarze5@yy-desk-7060>
 MIME-Version: 1.0
-References: <20221107203431.368306-1-eric.auger@redhat.com>
- <20221107153924-mutt-send-email-mst@kernel.org> <b8487793-d7b8-0557-a4c2-b62754e14830@redhat.com>
- <20221107180022-mutt-send-email-mst@kernel.org> <CACGkMEsYyH5P2h6XkBgrW4O-xJXxdzzRa1+T2zjJ07OHiYObVA@mail.gmail.com>
- <20221108035142-mutt-send-email-mst@kernel.org> <CACGkMEtFhmgKrKwTT8MdQG26wbi20Z5cTn69ycBtE17V+Kupuw@mail.gmail.com>
- <20221108041820-mutt-send-email-mst@kernel.org> <7105abc8-85d1-63a4-7f77-a2b3e0177b6f@redhat.com>
-In-Reply-To: <7105abc8-85d1-63a4-7f77-a2b3e0177b6f@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 9 Nov 2022 11:44:03 +0800
-Message-ID: <CACGkMEuX-_+fce_rmc-DsBEfa84d1Kxxe2tE_REae2_JrqBWjw@mail.gmail.com>
-Subject: Re: [RFC] vhost: Clear the pending messages on vhost_init_device_iotlb()
-To:     eric.auger@redhat.com
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, eric.auger.pro@gmail.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        peterx@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221108120805.kize74qgzsmarze5@yy-desk-7060>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 8, 2022 at 6:17 PM Eric Auger <eric.auger@redhat.com> wrote:
->
-> Hi Michael, Jason,
->
-> On 11/8/22 10:31, Michael S. Tsirkin wrote:
-> > On Tue, Nov 08, 2022 at 05:13:50PM +0800, Jason Wang wrote:
-> >> On Tue, Nov 8, 2022 at 4:56 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >>> On Tue, Nov 08, 2022 at 11:09:36AM +0800, Jason Wang wrote:
-> >>>> On Tue, Nov 8, 2022 at 7:06 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >>>>> On Mon, Nov 07, 2022 at 10:10:06PM +0100, Eric Auger wrote:
-> >>>>>> Hi Michael,
-> >>>>>> On 11/7/22 21:42, Michael S. Tsirkin wrote:
-> >>>>>>> On Mon, Nov 07, 2022 at 09:34:31PM +0100, Eric Auger wrote:
-> >>>>>>>> When the vhost iotlb is used along with a guest virtual iommu
-> >>>>>>>> and the guest gets rebooted, some MISS messages may have been
-> >>>>>>>> recorded just before the reboot and spuriously executed by
-> >>>>>>>> the virtual iommu after the reboot. Despite the device iotlb gets
-> >>>>>>>> re-initialized, the messages are not cleared. Fix that by calling
-> >>>>>>>> vhost_clear_msg() at the end of vhost_init_device_iotlb().
-> >>>>>>>>
-> >>>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>>>>>>> ---
-> >>>>>>>>  drivers/vhost/vhost.c | 1 +
-> >>>>>>>>  1 file changed, 1 insertion(+)
-> >>>>>>>>
-> >>>>>>>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> >>>>>>>> index 40097826cff0..422a1fdee0ca 100644
-> >>>>>>>> --- a/drivers/vhost/vhost.c
-> >>>>>>>> +++ b/drivers/vhost/vhost.c
-> >>>>>>>> @@ -1751,6 +1751,7 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled)
-> >>>>>>>>    }
-> >>>>>>>>
-> >>>>>>>>    vhost_iotlb_free(oiotlb);
-> >>>>>>>> +  vhost_clear_msg(d);
-> >>>>>>>>
-> >>>>>>>>    return 0;
-> >>>>>>>>  }
-> >>>>>>> Hmm.  Can't messages meanwhile get processes and affect the
-> >>>>>>> new iotlb?
-> >>>>>> Isn't the msg processing stopped at the moment this function is called
-> >>>>>> (VHOST_SET_FEATURES)?
-> >>>>>>
-> >>>>>> Thanks
-> >>>>>>
-> >>>>>> Eric
-> >>>>> It's pretty late here I'm not sure.  You tell me what prevents it.
-> >>>> So the proposed code assumes that Qemu doesn't process device IOTLB
-> >>>> before VHOST_SET_FEAETURES. Consider there's no reset in the general
-> >>>> vhost uAPI,  I wonder if it's better to move the clear to device code
-> >>>> like VHOST_NET_SET_BACKEND. So we can clear it per vq?
-> >>> Hmm this makes no sense to me. iommu sits between backend
-> >>> and frontend. Tying one to another is going to backfire.
-> >> I think we need to emulate what real devices are doing. Device should
-> >> clear the page fault message during reset, so the driver won't read
-> >> anything after reset. But we don't have a per device stop or reset
-> >> message for vhost-net. That's why the VHOST_NET_SET_BACKEND came into
-> >> my mind.
-> > That's not a reset message. Userspace can switch backends at will.
-> > I guess we could check when backend is set to -1.
-> > It's a hack but might work.
+On Tue, Nov 08, 2022 at 08:08:05PM +0800, Yuan Yao wrote:
+> On Tue, Oct 25, 2022 at 11:13:42PM +0800, Chao Peng wrote:
+> > When private/shared memory are mixed in a large page, the lpage_info may
+> > not be accurate and should be updated with this mixed info. A large page
+> > has mixed pages can't be really mapped as large page since its
+> > private/shared pages are from different physical memory.
 > >
-> >>> I'm thinking more along the lines of doing everything
-> >>> under iotlb_lock.
-> >> I think the problem is we need to find a proper place to clear the
-> >> message. So I don't get how iotlb_lock can help: the message could be
-> >> still read from user space after the backend is set to NULL.
-> >>
-> >> Thanks
-> > Well I think the real problem is this.
+> > Update lpage_info when private/shared memory attribute is changed. If
+> > both private and shared pages are within a large page region, it can't
+> > be mapped as large page. It's a bit challenge to track the mixed
+> > info in a 'count' like variable, this patch instead reserves a bit in
+> > 'disallow_lpage' to indicate a large page has mixed private/share pages.
 > >
-> > vhost_net_set_features does:
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |   8 +++
+> >  arch/x86/kvm/mmu/mmu.c          | 112 +++++++++++++++++++++++++++++++-
+> >  arch/x86/kvm/x86.c              |   2 +
+> >  include/linux/kvm_host.h        |  19 ++++++
+> >  virt/kvm/kvm_main.c             |  16 +++--
+> >  5 files changed, 152 insertions(+), 5 deletions(-)
 > >
-> >         if ((features & (1ULL << VIRTIO_F_ACCESS_PLATFORM))) {
-> >                 if (vhost_init_device_iotlb(&n->dev, true))
-> >                         goto out_unlock;
-> >         }
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 7551b6f9c31c..db811a54e3fd 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -37,6 +37,7 @@
+> >  #include <asm/hyperv-tlfs.h>
 > >
+> >  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+> > +#define __KVM_HAVE_ARCH_UPDATE_MEM_ATTR
 > >
-> > so we get a new iotlb each time features are set.
+> >  #define KVM_MAX_VCPUS 1024
 > >
-> > But features can be changes while device is running.
-> > E.g.
-> >       VHOST_F_LOG_ALL
+> > @@ -952,6 +953,13 @@ struct kvm_vcpu_arch {
+> >  #endif
+> >  };
 > >
+> > +/*
+> > + * Use a bit in disallow_lpage to indicate private/shared pages mixed at the
+> > + * level. The remaining bits are used as a reference count.
+> > + */
+> > +#define KVM_LPAGE_PRIVATE_SHARED_MIXED		(1U << 31)
+> > +#define KVM_LPAGE_COUNT_MAX			((1U << 31) - 1)
+> > +
+> >  struct kvm_lpage_info {
+> >  	int disallow_lpage;
+> >  };
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 33b1aec44fb8..67a9823a8c35 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -762,11 +762,16 @@ static void update_gfn_disallow_lpage_count(const struct kvm_memory_slot *slot,
+> >  {
+> >  	struct kvm_lpage_info *linfo;
+> >  	int i;
+> > +	int disallow_count;
 > >
-> > Let's just say this hack of reusing feature bits for backend
-> > was not my brightest idea :(
+> >  	for (i = PG_LEVEL_2M; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
+> >  		linfo = lpage_info_slot(gfn, slot, i);
+> > +
+> > +		disallow_count = linfo->disallow_lpage & KVM_LPAGE_COUNT_MAX;
+> > +		WARN_ON(disallow_count + count < 0 ||
+> > +			disallow_count > KVM_LPAGE_COUNT_MAX - count);
+> > +
+> >  		linfo->disallow_lpage += count;
+> > -		WARN_ON(linfo->disallow_lpage < 0);
+> >  	}
+> >  }
 > >
->
-> Isn't vhost_init_device_iotlb() racy then, as d->iotlb is first updated with niotlb and later d->vqs[i]->iotlb is updated with niotlb. What does garantee this is done atomically?
->
-> Shouldn't we hold the dev->mutex to make all the sequence atomic and
-> include vhost_clear_msg()?  Can't the vhost_clear_msg() take the dev lock?
+> > @@ -6910,3 +6915,108 @@ void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
+> >  	if (kvm->arch.nx_lpage_recovery_thread)
+> >  		kthread_stop(kvm->arch.nx_lpage_recovery_thread);
+> >  }
+> > +
+> > +static inline bool linfo_is_mixed(struct kvm_lpage_info *linfo)
+> > +{
+> > +	return linfo->disallow_lpage & KVM_LPAGE_PRIVATE_SHARED_MIXED;
+> > +}
+> > +
+> > +static inline void linfo_update_mixed(struct kvm_lpage_info *linfo, bool mixed)
+> > +{
+> > +	if (mixed)
+> > +		linfo->disallow_lpage |= KVM_LPAGE_PRIVATE_SHARED_MIXED;
+> > +	else
+> > +		linfo->disallow_lpage &= ~KVM_LPAGE_PRIVATE_SHARED_MIXED;
+> > +}
+> > +
+> > +static bool mem_attr_is_mixed_2m(struct kvm *kvm, unsigned int attr,
+> > +				 gfn_t start, gfn_t end)
+> > +{
+> > +	XA_STATE(xas, &kvm->mem_attr_array, start);
+> > +	gfn_t gfn = start;
+> > +	void *entry;
+> > +	bool shared = attr == KVM_MEM_ATTR_SHARED;
+> > +	bool mixed = false;
+> > +
+> > +	rcu_read_lock();
+> > +	entry = xas_load(&xas);
+> > +	while (gfn < end) {
+> > +		if (xas_retry(&xas, entry))
+> > +			continue;
+> > +
+> > +		KVM_BUG_ON(gfn != xas.xa_index, kvm);
+> > +
+> > +		if ((entry && !shared) || (!entry && shared)) {
+> > +			mixed = true;
+> > +			goto out;
+> > +		}
+> > +
+> > +		entry = xas_next(&xas);
+> > +		gfn++;
+> > +	}
+> > +out:
+> > +	rcu_read_unlock();
+> > +	return mixed;
+> > +}
+> > +
+> > +static bool mem_attr_is_mixed(struct kvm *kvm, struct kvm_memory_slot *slot,
+> > +			      int level, unsigned int attr,
+> > +			      gfn_t start, gfn_t end)
+> > +{
+> > +	unsigned long gfn;
+> > +	void *entry;
+> > +
+> > +	if (level == PG_LEVEL_2M)
+> > +		return mem_attr_is_mixed_2m(kvm, attr, start, end);
+> > +
+> > +	entry = xa_load(&kvm->mem_attr_array, start);
+> > +	for (gfn = start; gfn < end; gfn += KVM_PAGES_PER_HPAGE(level - 1)) {
+> > +		if (linfo_is_mixed(lpage_info_slot(gfn, slot, level - 1)))
+> > +			return true;
+> > +		if (xa_load(&kvm->mem_attr_array, gfn) != entry)
+> > +			return true;
+> > +	}
+> > +	return false;
+> > +}
+> > +
+> > +void kvm_arch_update_mem_attr(struct kvm *kvm, struct kvm_memory_slot *slot,
+> > +			      unsigned int attr, gfn_t start, gfn_t end)
+> > +{
+> > +
+> > +	unsigned long lpage_start, lpage_end;
+> > +	unsigned long gfn, pages, mask;
+> > +	int level;
+> > +
+> > +	WARN_ONCE(!(attr & (KVM_MEM_ATTR_PRIVATE | KVM_MEM_ATTR_SHARED)),
+> > +			"Unsupported mem attribute.\n");
+> > +
+> > +	/*
+> > +	 * The sequence matters here: we update the higher level basing on the
+> > +	 * lower level's scanning result.
+> > +	 */
+> > +	for (level = PG_LEVEL_2M; level <= KVM_MAX_HUGEPAGE_LEVEL; level++) {
+> > +		pages = KVM_PAGES_PER_HPAGE(level);
+> > +		mask = ~(pages - 1);
+> > +		lpage_start = max(start & mask, slot->base_gfn);
+> > +		lpage_end = (end - 1) & mask;
+> > +
+> > +		/*
+> > +		 * We only need to scan the head and tail page, for middle pages
+> > +		 * we know they are not mixed.
+> > +		 */
+> > +		linfo_update_mixed(lpage_info_slot(lpage_start, slot, level),
+> > +				   mem_attr_is_mixed(kvm, slot, level, attr,
+> > +						     lpage_start, start));
+> 
+> Looks only query the lpage_start, start is not enough:
+> 
+> A and B are private gfns from same lpage_start as below, A > B :
+> lpage_start
+>        |---------A
+>        |----B
+> 
+> Convert A to shared, this makes the upper 2M page to MIX.
+> Convert B to shared, this also makes the upper 2M page to MIX.
+> Convert B to private, this makes the upper 2M page to Non-MIX, but
+> it's incorrect, due to A is shared.
 
-It depends on where we want to place the vhost_clear_msg(), e.g in
-most of the device ioctl, the dev->mutex has been held.
+In previous versions this is actually "lpage_start, lpage_start +
+pages", e.g. covers the whole large page. While fixing another issue[*]
+in v8 this was wrongly changed to "lpage_start, start", at that time I
+made an assumption that "end > lpage_start + pages" so the remaining
+scanning in the same large page is useless if we know what attribute we
+will set, this is definitely not true though.
 
-Thanks
+[*]
+https://lore.kernel.org/linux-mm/20220930085914.GA2799703@chaop.bj.intel.com/
 
->
-> Thanks
->
-> Eric
->
+Thanks,
+Chao
+> 
+> Same to tail case.
+> 
+> > +
+> > +		if (lpage_start == lpage_end)
+> > +			return;
+> > +
+> > +		for (gfn = lpage_start + pages; gfn < lpage_end; gfn += pages)
+> > +			linfo_update_mixed(lpage_info_slot(gfn, slot, level),
+> > +					   false);
+> > +
+> > +		linfo_update_mixed(lpage_info_slot(lpage_end, slot, level),
+> > +				   mem_attr_is_mixed(kvm, slot, level, attr,
+> > +						     end, lpage_end + pages));
+> > +	}
+> > +}
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 02ad31f46dd7..4276ca73bd7b 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -12563,6 +12563,8 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
+> >  		if ((slot->base_gfn + npages) & (KVM_PAGES_PER_HPAGE(level) - 1))
+> >  			linfo[lpages - 1].disallow_lpage = 1;
+> >  		ugfn = slot->userspace_addr >> PAGE_SHIFT;
+> > +		if (kvm_slot_can_be_private(slot))
+> > +			ugfn |= slot->restricted_offset >> PAGE_SHIFT;
+> >  		/*
+> >  		 * If the gfn and userspace address are not aligned wrt each
+> >  		 * other, disable large page support for this slot.
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 4ce98fa0153c..6ce36065532c 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -2284,4 +2284,23 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+> >  /* Max number of entries allowed for each kvm dirty ring */
+> >  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
 > >
+> > +#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM
+> > +
+> > +#define KVM_MEM_ATTR_SHARED	0x0001
+> > +#define KVM_MEM_ATTR_PRIVATE	0x0002
+> > +
+> > +#ifdef __KVM_HAVE_ARCH_UPDATE_MEM_ATTR
+> > +void kvm_arch_update_mem_attr(struct kvm *kvm, struct kvm_memory_slot *slot,
+> > +			      unsigned int attr, gfn_t start, gfn_t end);
+> > +#else
+> > +static inline void kvm_arch_update_mem_attr(struct kvm *kvm,
+> > +					    struct kvm_memory_slot *slot,
+> > +					    unsigned int attr,
+> > +					    gfn_t start, gfn_t end)
+> > +{
+> > +}
+> > +#endif
+> > +
+> > +#endif /* CONFIG_KVM_GENERIC_PRIVATE_MEM */
+> > +
+> >  #endif
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index fc3835826ace..13a37b4d9e97 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -939,7 +939,8 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
 > >
+> >  #ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM
 > >
-> >>>
-> >>>
-> >>>>> BTW vhost_init_device_iotlb gets enabled parameter but ignores
-> >>>>> it, we really should drop that.
-> >>>> Yes.
-> >>>>
-> >>>>> Also, it looks like if features are set with VIRTIO_F_ACCESS_PLATFORM
-> >>>>> and then cleared, iotlb is not properly cleared - bug?
-> >>>> Not sure, old IOTLB may still work. But for safety, we need to disable
-> >>>> device IOTLB in this case.
-> >>>>
-> >>>> Thanks
-> >>>>
-> >>>>>
-> >>>>>>>
-> >>>>>>>> --
-> >>>>>>>> 2.37.3
->
-
+> > -static void kvm_unmap_mem_range(struct kvm *kvm, gfn_t start, gfn_t end)
+> > +static void kvm_unmap_mem_range(struct kvm *kvm, gfn_t start, gfn_t end,
+> > +				unsigned int attr)
+> >  {
+> >  	struct kvm_gfn_range gfn_range;
+> >  	struct kvm_memory_slot *slot;
+> > @@ -963,6 +964,7 @@ static void kvm_unmap_mem_range(struct kvm *kvm, gfn_t start, gfn_t end)
+> >  			gfn_range.slot = slot;
+> >
+> >  			r |= kvm_unmap_gfn_range(kvm, &gfn_range);
+> > +			kvm_arch_update_mem_attr(kvm, slot, attr, start, end);
+> >  		}
+> >  	}
+> >
+> > @@ -970,7 +972,6 @@ static void kvm_unmap_mem_range(struct kvm *kvm, gfn_t start, gfn_t end)
+> >  		kvm_flush_remote_tlbs(kvm);
+> >  }
+> >
+> > -#define KVM_MEM_ATTR_SHARED	0x0001
+> >  static int kvm_vm_ioctl_set_mem_attr(struct kvm *kvm, gpa_t gpa, gpa_t size,
+> >  				     bool is_private)
+> >  {
+> > @@ -979,6 +980,7 @@ static int kvm_vm_ioctl_set_mem_attr(struct kvm *kvm, gpa_t gpa, gpa_t size,
+> >  	void *entry;
+> >  	int idx;
+> >  	int r = 0;
+> > +	unsigned int attr;
+> >
+> >  	if (size == 0 || gpa + size < gpa)
+> >  		return -EINVAL;
+> > @@ -992,7 +994,13 @@ static int kvm_vm_ioctl_set_mem_attr(struct kvm *kvm, gpa_t gpa, gpa_t size,
+> >  	 * Guest memory defaults to private, kvm->mem_attr_array only stores
+> >  	 * shared memory.
+> >  	 */
+> > -	entry = is_private ? NULL : xa_mk_value(KVM_MEM_ATTR_SHARED);
+> > +	if (is_private) {
+> > +		attr = KVM_MEM_ATTR_PRIVATE;
+> > +		entry = NULL;
+> > +	} else {
+> > +		attr = KVM_MEM_ATTR_SHARED;
+> > +		entry = xa_mk_value(KVM_MEM_ATTR_SHARED);
+> > +	}
+> >
+> >  	idx = srcu_read_lock(&kvm->srcu);
+> >  	KVM_MMU_LOCK(kvm);
+> > @@ -1005,7 +1013,7 @@ static int kvm_vm_ioctl_set_mem_attr(struct kvm *kvm, gpa_t gpa, gpa_t size,
+> >  			goto err;
+> >  	}
+> >
+> > -	kvm_unmap_mem_range(kvm, start, end);
+> > +	kvm_unmap_mem_range(kvm, start, end, attr);
+> >
+> >  	goto ret;
+> >  err:
+> > --
+> > 2.25.1
+> >
