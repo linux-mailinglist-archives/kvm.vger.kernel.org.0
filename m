@@ -2,65 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B590662318B
-	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 18:32:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 073796231A6
+	for <lists+kvm@lfdr.de>; Wed,  9 Nov 2022 18:41:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231482AbiKIRcu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 12:32:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51014 "EHLO
+        id S231509AbiKIRlf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 12:41:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230407AbiKIRcs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 12:32:48 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4ACA16590
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 09:32:47 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id 130so17345655pfu.8
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 09:32:47 -0800 (PST)
+        with ESMTP id S231215AbiKIRld (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 12:41:33 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A73C824BF6
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 09:41:31 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id a14so26877104wru.5
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 09:41:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DniZYIrdQUoi19Dm9u4aWgvIz7zq8OgKhX/hNYiha0A=;
-        b=hkP9VUgPvWQqatGgQWkQhRjPcH9wd71PeA8E+GuyDXozXGtxCy7gxSpFLKhRxjAjV3
-         dCFha/1YCGU7QJwdAnz3SiUrvUi5PK1Ng8SJzGj9OoPdQtovjxy2OcMBUg+eZUydmeaC
-         xCG0NXjsD8zhLnZK7w3QkgK7q4vHRBta6xHaqYT69S31NLLNiTDmTpIYfvvd6IjwHjuq
-         jEHCkZKUTA5le4sLLpNKn6zyHC30cKemYxtap3vnNsBrI9+f5MVP1PHLP4ZZw3gQaU0u
-         et+bTmKPH+TszVA8tKuGcBUP6+s3Jp4g10tdMynZvQL0wjZqAy4URHGESNF/VVxEmGbQ
-         HNNg==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=FNYds1f9ZL8XgnZzTxl56q0EBnMAgb+3F/vcLxdiyjY=;
+        b=HmmYyp3Qgno4anKoP7Tf7q7d/WISnuBlr7BJ0D915Z10LN0M1vE/dszOUSQgaNAVNE
+         RKITKmFOgwtCpHDaED8lfP1ZxKBICMVarUiG3p5Pl7LMe2VUv3MCdu/7k8zo/82mHJ9r
+         nlNsD8K/sAdmL87VMjC2kb8HpC7mmXsu8+7WprnrK/J06z3WHg2BFQ3sLROPqXyg0JI4
+         If05iCBexuX8MSRjCYuypIhofqtgBQgo/qijG6nK4LO6odKCpgf/7mtAIwJCy7fVpBXh
+         hb/rBWawNDPHZZpGf/7vDmD170a95FAoDCE68DIdmz/JvWnpr/97hW6lvb8kyIvFR0Sd
+         QV6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DniZYIrdQUoi19Dm9u4aWgvIz7zq8OgKhX/hNYiha0A=;
-        b=OvfTd8nMZc98Js9qt2RQPw4z0aJd3SXsH3ny4NGbiTrlIpW9CyFEofqfFx9T/ZzUK2
-         Xca/uN3QH8dlcTgWdUlbToQP1YRL52B0rK8KVS+NhFXMdxakCZUgXOQ+sQj+1IbbxpSu
-         QkA957P5zdrGh5H3n4HQCOlkJ9Bc4Anckh7S5sCG+jIt5kb9jH/VlhrFQJoMS2G0pOZJ
-         cU6Sas6FHcPf7hEHscZNXJvRt1zxZ5wbs8hK8wcjGIEtzfco8EB5mrCuI8XPsIHRNQyi
-         ndbqzYdtnceKc9ctmSHtCTFArt7xFHccDMGQuDQO2PeQoFVWGNaIzE+LUWwnSxvkpbTo
-         CkQg==
-X-Gm-Message-State: ACrzQf0ewTSMk9mzR4iEtCBXtv+wT7KvIPKWTHN/6gcT1qzoS45tOv1A
-        xViJZNV7rr57g+njNsRdZbw6yw==
-X-Google-Smtp-Source: AMsMyM4OiymPkjMx8j345vhKCAFlCTF6IghoE3Ywv5QJvnGEZtrg39P+M9ihrgsG/ZQX+L0MLAbsbw==
-X-Received: by 2002:a05:6a00:2315:b0:56d:a084:a77d with SMTP id h21-20020a056a00231500b0056da084a77dmr49476799pfh.53.1668015167101;
-        Wed, 09 Nov 2022 09:32:47 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id im23-20020a170902bb1700b0017c37a5a2fdsm9240786plb.216.2022.11.09.09.32.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Nov 2022 09:32:46 -0800 (PST)
-Date:   Wed, 9 Nov 2022 17:32:43 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH] KVM: svm/avic: Drop "struct kvm_x86_ops" for
- avic_hardware_setup()
-Message-ID: <Y2vkOxMcMJMdbDjL@google.com>
-References: <20221109115952.92816-1-likexu@tencent.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FNYds1f9ZL8XgnZzTxl56q0EBnMAgb+3F/vcLxdiyjY=;
+        b=GEDilkVQgyrj99tsjcuCQ5tX1MEoUKY9IdqHXE6aBm+L4UAtunEIHwW8yaevyqDgKA
+         lKg4SOYgskQVqrQYy7ZRim9gFmGMKBqNYcq8fTpicVEMec+F5YkuaylIEJgVNponR+M2
+         t1EDG3yqDDOIFU+40fLxU7l+o+FgiTUDy9GHPd+c0+6O/mcUuSGrv/ov0TEAz8LKuoL7
+         vdlHxN8Z2M7Xi5N0brGvM/oPr4pbHdjP1XSz32kQcy57ymUzdJhKP3Mf9NmySvdfoLFJ
+         fDnLFvIeXLCYMUxWBA1WlR5JXEsrXHFN7YR/PsrOcu5APjNT+vv0PL7sy6/2ZtJ3+Enw
+         3img==
+X-Gm-Message-State: ACrzQf1sCfpAgo7g3uvGt7N8shHS8OrCg5kfUtu17GPDI93fkquN43MU
+        wtcOM/TmRBawBelwE4NvZVwYwfQcGpw9ks/NpWWMnYSqC6w=
+X-Google-Smtp-Source: AMsMyM6huWkt2OecZYhRv3lX19RTINP7yOdkpcvfpTxSimbMiYM0nhjhj9WtCSFAhcBpR3zCAEjNqLwPyqP+aFYw2bc=
+X-Received: by 2002:a5d:604c:0:b0:236:6deb:6d31 with SMTP id
+ j12-20020a5d604c000000b002366deb6d31mr38775518wrt.282.1668015690097; Wed, 09
+ Nov 2022 09:41:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221109115952.92816-1-likexu@tencent.com>
+References: <20221021205105.1621014-1-aaronlewis@google.com>
+ <Y1sAB0LlTPwnWjZp@google.com> <ed069cc3-bd0b-8d21-50b3-202e6e823ad2@gmail.com>
+In-Reply-To: <ed069cc3-bd0b-8d21-50b3-202e6e823ad2@gmail.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Wed, 9 Nov 2022 17:41:18 +0000
+Message-ID: <CAAAPnDFa2Udnv0-L2CxWNWXChs8dX1sugmJwf4TrnNy-hwaqjg@mail.gmail.com>
+Subject: Re: [PATCH v6 0/7] Introduce and test masked events
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -72,25 +68,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Maxim
+On Wed, Nov 9, 2022 at 11:28 AM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> On 28/10/2022 6:02 am, Sean Christopherson wrote:
+> >> Aaron Lewis (7):
+> >>    kvm: x86/pmu: Correct the mask used in a pmu event filter lookup
+> >>    kvm: x86/pmu: Remove impossible events from the pmu event filter
+> >>    kvm: x86/pmu: prepare the pmu event filter for masked events
+> >>    kvm: x86/pmu: Introduce masked events to the pmu event filter
+> >>    selftests: kvm/x86: Add flags when creating a pmu event filter
+> >>    selftests: kvm/x86: Add testing for KVM_SET_PMU_EVENT_FILTER
+> >>    selftests: kvm/x86: Test masked events
+> > One comment request in the last patch, but it's not the end of the world if it
+> > doesn't get added right away.
+> >
+> > An extra set of eyeballs from Paolo, Jim, and/or Like would be welcome as I don't
+> > consider myself trustworthy when it comes to PMU code...
+> >
+> > Reviewed-by: Sean Christopherson<seanjc@google.com>
+> >
+>
+> I'm not going to block these changes just because I don't use the
+> pmu-event-filter feature very heavily.
+> One of my concern is the relatively lower test coverage of pmu-event-filter
+> involved code, despite its predictable performance optimizations.
 
-On Wed, Nov 09, 2022, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
-> 
-> Even in commit 4bdec12aa8d6 ("KVM: SVM: Detect X2APIC virtualization
-> (x2AVIC) support"), where avic_hardware_setup() was first introduced,
-> its only pass-in parameter "struct kvm_x86_ops *ops" is not used at all.
+Is there something else you are hoping to see as far as testing goes
+other than the selftest?  Or is something missing in it?
 
-I assume the intent was to fill the AVIC ops so that they don't need to be exposed
-outside of avic.c.  I like the idea in theory, but unlike vmx_nested_ops they
-wouldn't be fully contained, which IMO would make the code as a whole more difficult
-to follow.
+>
+> Maybe a rebase version would attract more attention (or at least mine).
 
-Maxim, any objection?
+Sure, I'll send out v7 rebased on top of kvm/queue.
 
-> Clean it up a bit to avoid compiler ranting from LLVM toolchain.
-> 
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+>
+> Thanks,
+> Like Xu
