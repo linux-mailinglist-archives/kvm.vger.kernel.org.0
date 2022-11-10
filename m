@@ -2,120 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5350A623F4F
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 11:03:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 820B8623FBE
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 11:26:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229591AbiKJKDp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 05:03:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43280 "EHLO
+        id S229669AbiKJK0L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 05:26:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229503AbiKJKDo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 05:03:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF32E6B3A5
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 02:02:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668074562;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2q1t7C25N3Vp3tFlEZLX1WD9ENHtLq/HGn/qVSycOr4=;
-        b=Jj3S01Wk1ZNn0S0GlVQL9VSMXbRYQK5uv7EO/jZp57I1j0YrXqSCNk+QXvaZN8IFUE/Wh8
-        hxsrTtvWBzDIFtgLXUN8Hcs2ZcfFh9eKmDQ4rABlJpGxHmh7x0qTKpoFLu+oRDwVqVQSQD
-        Rae/lYrRTdzxAr21YNzz/Nb/SXW/RiY=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-332-i_P6EAapO7iLSyoqVZeKSw-1; Thu, 10 Nov 2022 05:02:41 -0500
-X-MC-Unique: i_P6EAapO7iLSyoqVZeKSw-1
-Received: by mail-pg1-f197.google.com with SMTP id u63-20020a638542000000b004701a0aa835so779085pgd.15
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 02:02:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2q1t7C25N3Vp3tFlEZLX1WD9ENHtLq/HGn/qVSycOr4=;
-        b=HzxNSP7QybTLzAqTHR0XNxfXV0ZL1tjasLbacCv7PXg8+cV66XmThsjUTpNi7vtvDP
-         GqnjtwEcyVzzlrZNRHCZ+Lj9Rph9fxXg2toz/RTkRFlCLb4KsQf9iawFw9LM6sqy+VVj
-         IpC8fbuj3VLjSLJ/Rs38zeD//75eRg+r1MS4fJMq05STefR/dJL2mvu88KeYJru+FPln
-         uKwJd6s/+eZBhdWWCWZZCnLiCSGjmTIP9oyw5G0UkHs1AYedk4jN8rwb+RJvC0bne/9n
-         mZeVbVfNDxY17khxgLCU6Ix8QZwqPY5Py3xcsNpBGg5zJU8CUH/J4FFIr+nEns3V7ETg
-         wDCw==
-X-Gm-Message-State: ANoB5pmCZPe6851oavBmmsP0QU1MsT/Cv/TNPXZXKnpeYTFxL0twGN1e
-        K02AcVNropp9i4JDn4UUsfr4fikkWduvriZdG4WMFvAueXGvoCCVgiPNbJqBKOoCjUPNNW2+i8k
-        XjGRMfayPGyEC
-X-Received: by 2002:a17:90a:64c5:b0:217:346c:6ed2 with SMTP id i5-20020a17090a64c500b00217346c6ed2mr31623561pjm.202.1668074560207;
-        Thu, 10 Nov 2022 02:02:40 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7FIh7WS8WC/aUKorNND7B0z1uT6DsvPJJ/B87AT2mIW3fRadQkmtnp/p6pMOxxrhW0OmWkQw==
-X-Received: by 2002:a17:90a:64c5:b0:217:346c:6ed2 with SMTP id i5-20020a17090a64c500b00217346c6ed2mr31623535pjm.202.1668074559631;
-        Thu, 10 Nov 2022 02:02:39 -0800 (PST)
-Received: from ovpn-194-83.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id m4-20020a63ed44000000b004388ba7e5a9sm8865479pgk.49.2022.11.10.02.02.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 02:02:38 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Vipin Sharma <vipinsh@google.com>, seanjc@google.com,
-        pbonzini@redhat.com
-Cc:     dmatlack@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/6] KVM: selftests: Make Hyper-V guest OS ID common
-In-Reply-To: <CAHVum0eYbQJvXY_TVyjadAYVrAcwXSEyJhpddkcBSohj+i+LqA@mail.gmail.com>
-References: <20221105045704.2315186-1-vipinsh@google.com>
- <20221105045704.2315186-5-vipinsh@google.com>
- <874jv8p7c5.fsf@ovpn-194-83.brq.redhat.com>
- <CAHVum0eYbQJvXY_TVyjadAYVrAcwXSEyJhpddkcBSohj+i+LqA@mail.gmail.com>
-Date:   Thu, 10 Nov 2022 11:02:28 +0100
-Message-ID: <87v8nnnn4b.fsf@ovpn-194-83.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S230097AbiKJK0G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 05:26:06 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BB96663DC
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 02:26:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AF20561218
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 10:26:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1099DC433C1;
+        Thu, 10 Nov 2022 10:26:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668075960;
+        bh=usVvc3qUSQzUyfwxt7bBhJT3G4j6rz4r+fc3JVOfoHM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ZfHO/A++9eV+bGyB9OV1AWT0/Z3ZHUQTBRPipeaAgPfF3Cl+i2WCaoT+sX7XX4YzF
+         yB8AYZyiCieu22R1vmylE8/UpHLkH1A0ETcdTSHvNUiewF9jwN68Ept7f9tz4jY3Jh
+         QCTHbvCGJzijmcRR7GBYe1GpSwxeSllvWkAM+wN5xUhhHrCsP99yHPQHtls7FZlU1s
+         IA0nt4hLT00Q1KZCS/JHYKCbwkOSKPlZ8p3cJVRrsSnpKyi+/NWJyAjmKe6WueOlkG
+         SzoneKfJGPQPHEvVTezhDsP5B9oXe7wDXQbK+59w0uF9dcc8UAOdTS5EzD7hQ4ayDR
+         U/hO9KL/VtsPA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ot4kv-0057cS-HF;
+        Thu, 10 Nov 2022 10:25:57 +0000
+Date:   Thu, 10 Nov 2022 10:25:57 +0000
+Message-ID: <86sfirp0lm.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
+        ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com,
+        will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+        pbonzini@redhat.com, peterx@redhat.com, oliver.upton@linux.dev,
+        zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v9 3/7] KVM: Support dirty ring in conjunction with bitmap
+In-Reply-To: <672eb11b-19db-9a9f-1898-8d2af0d45724@redhat.com>
+References: <20221108041039.111145-1-gshan@redhat.com>
+        <20221108041039.111145-4-gshan@redhat.com>
+        <Y2qDCqFeL1vwqq3f@google.com>
+        <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
+        <Y2rurDmCrXZaxY8F@google.com>
+        <49c18201-b73a-b654-7f8a-77befa80c61b@redhat.com>
+        <Y2r1ErahBE3+Dsv8@google.com>
+        <672eb11b-19db-9a9f-1898-8d2af0d45724@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, seanjc@google.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com, will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com, peterx@redhat.com, oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vipin Sharma <vipinsh@google.com> writes:
+Hi Gavin,
 
-> On Wed, Nov 9, 2022 at 5:48 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->>
->> Vipin Sharma <vipinsh@google.com> writes:
->>
->> > Make guest OS ID calculation common to all hyperv tests and similar to
->> > hv_generate_guest_id().
->>
->> A similar (but without hv_linux_guest_id()) patch is present in my
->> Hyper-V TLB flush update:
->>
->> https://lore.kernel.org/kvm/20221101145426.251680-32-vkuznets@redhat.com/
->>
->
-> After getting feedback from David, I decided to remove
-> LINUX_VERSION_CODE in v2. Our patches are functionally identical now.
->
-> @Sean, Paolo, Vitaly
-> Should I be rebasing my v2 on top of TLB flush patch series and remove
-> patch 4 and 5 from my series? I am not sure how these situations are
-> handled.
->
-> @Vitaly
-> Are you planning to send v14?
->
-> If yes, then for v13 Patch 31 (KVM: selftests: Move HYPERV_LINUX_OS_ID
-> definition to a common header) will you keep it same or will you
-> modify it to add  HYPERV_LINUX_OS_ID  in hyperv_clock.c and
-> hyperv_svm_test.c?
->
-> If not, then I can add a patch in my series to change those two files
-> if I end up rebasing on top of your series.
->
+On Wed, 09 Nov 2022 00:51:21 +0000,
+Gavin Shan <gshan@redhat.com> wrote:
+> 
+> On 11/9/22 8:32 AM, Sean Christopherson wrote:
+> > That said, there're no remaining issues that can't be sorted out
+> > on top, so don't hold up v10 if I don't look at it in a timely
+> > manner for whatever reason.  I agree with Marc that it'd be good
+> > to get this in -next sooner than later.
+> > 
+> 
+> Sure. I would give v9 a few days, prior to posting v10. I'm not sure
+> if other people still have concerns. If there are more comments, I
+> want to address all of them in v10 :)
 
-Rumor has it that v13 is going to be merged to kvm/queue soon so I have
-no plans for v14 at this point. Fingers crossed)
+Please post v10 ASAP. I'm a bit behind on queuing stuff, and I'll be
+travelling next week, making it a bit more difficult to be on top of
+things. So whatever I can put into -next now is good.
+
+Thanks,
+
+	M.
 
 -- 
-Vitaly
-
+Without deviation from the norm, progress is not possible.
