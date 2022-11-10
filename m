@@ -2,72 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 54E3D62398B
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 03:06:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A84C8623993
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 03:09:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232527AbiKJCF6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 21:05:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57524 "EHLO
+        id S232375AbiKJCJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 21:09:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232537AbiKJCF3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 21:05:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83299B7F0
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 18:04:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668045847;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XUbS7kkdkTb1FJ8Puq8bD35jK/Y5vjFwMtJetj4Fh+E=;
-        b=Ue5ORKb0Et8WljuZnU6/4cdjT2cIOfc+l77TOjOOMVYaADtqSRQpJqk3e6jtqNvZlxWaRM
-        PONbwn1q6P/bc3BTjbS9PTozbBQOWyqFtGuwiDiBs6GjFgLbn1TwjsJew0EPmRq/1koLux
-        4YpU1iy+tKBC4FcB9d/S0wja8IpQgZY=
-Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
- [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-516-yPhGyOqPMAyp83orNRambg-1; Wed, 09 Nov 2022 21:04:06 -0500
-X-MC-Unique: yPhGyOqPMAyp83orNRambg-1
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-13bf576ffa6so378698fac.9
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 18:04:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XUbS7kkdkTb1FJ8Puq8bD35jK/Y5vjFwMtJetj4Fh+E=;
-        b=vvdpzi1VQpMhrawnIHG4qQNS7AnO8dW69RAFHwAgfsHl5h1A31FwdzI/jPGjjHfLHY
-         5MY6GkiKBkB8VkLAhQSf1TuIPBdHmcLAQkMtrCjXQk/0Vzmz7wX2gHIRED92HUyJ5uz9
-         lh71f2x3NRdvabdR6AYfehJGDOMCPJyCLEB0bM1t2bmqzJBvw44SExxQgrSfHmlMZLf6
-         CX1vdhWd/y6WhGs9qCraRvQyipACHdQJh/aV9SyhUEjm1H7nYYnEEPqm8u2ba5ViD7en
-         tD4oo9j5qZocbum/jJuwVPLIqAqJCoq4bTMfWSsHoUDF2CFxcYk1hF0zc6PaxokqxyW1
-         2D2Q==
-X-Gm-Message-State: ACrzQf1SherbbiP5hrQ/X21H9Sq/3uGPaa4YaZzpqcL6ZJRGO+9ZEmA6
-        vgWzhwKXdhxg4rN3yvVqrDNYIg4LTt+ODK5n85tsHgiGUhWH6lP+0L9gDxnOqEBXhV3/An+jGDc
-        +F73ij3APdSPMnSdjNI6GBgSOCMYf
-X-Received: by 2002:a9d:604f:0:b0:66c:64d6:1bb4 with SMTP id v15-20020a9d604f000000b0066c64d61bb4mr984598otj.201.1668045842957;
-        Wed, 09 Nov 2022 18:04:02 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM45UkiwIqipZjueepL0FmRYOH9f819x2rJtJU36H2CB7TpfTuSLZCNIGl3lRKPzdZ9V6etpqCxhc4a3+nN7pxg=
-X-Received: by 2002:a9d:604f:0:b0:66c:64d6:1bb4 with SMTP id
- v15-20020a9d604f000000b0066c64d61bb4mr984589otj.201.1668045842684; Wed, 09
- Nov 2022 18:04:02 -0800 (PST)
+        with ESMTP id S231828AbiKJCJZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 21:09:25 -0500
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99EAFFAE0;
+        Wed,  9 Nov 2022 18:09:24 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4N74yn6VjLz4xGT;
+        Thu, 10 Nov 2022 13:09:21 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1668046162;
+        bh=yYAo6orz4PQyawTZ7XwqSAZd30ekfwNX0vXirxhu7Io=;
+        h=Date:From:To:Cc:Subject:From;
+        b=uMg7Ib9z5n/UMhs/NawTAZl6UMVnz48f6bIyvSr/lMhfooUcxV2VkwzKxMC3lOqSO
+         Z2L7b5rKhAXDPVkkAN9PeIpmBrxmtRXMckShWJXoPVdzHykB81E/uANHunhvgjK33a
+         M76qvUfqYL2y43oviV5y8GSmYbceNZNOzYy9MYAw8ZQgf6GT7/fwJUR9h4t2JavKmM
+         H7+TG9unPQEtTgCa5l+HhI56vk8yUtrs9UPJ0MlWrFc2GBF2By7dTGN+uuzcis3NXq
+         pBtCLrrvP5DLkQQRUJ6aGEUkUSPb4OARI7XR6hlDyJuOgBLThxc9JipXtnf7Je2vNL
+         R+DPRtWeAZRtA==
+Date:   Thu, 10 Nov 2022 13:09:20 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the tip tree with the kvm-fixes tree
+Message-ID: <20221110130920.55a7d583@canb.auug.org.au>
 MIME-Version: 1.0
-References: <20221109154213.146789-1-sgarzare@redhat.com>
-In-Reply-To: <20221109154213.146789-1-sgarzare@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Thu, 10 Nov 2022 10:03:50 +0800
-Message-ID: <CACGkMEu8qVjDwBmsow17ct6QtgPd-Bch7Z7jKiHveicGPVrrvg@mail.gmail.com>
-Subject: Re: [PATCH] vhost-vdpa: fix potential memory leak during the release
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, eperezma@redhat.com,
-        netdev@vger.kernel.org, kvm@vger.kernel.org,
-        Gautam Dawar <gautam.dawar@xilinx.com>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Type: multipart/signed; boundary="Sig_/I/CbxKwYia5swyvyn4Bfs1N";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,98 +54,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 9, 2022 at 11:42 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> Before commit 3d5698793897 ("vhost-vdpa: introduce asid based IOTLB")
-> we call vhost_vdpa_iotlb_unmap(v, iotlb, 0ULL, 0ULL - 1) during the
-> release to free all the resources allocated when processing user IOTLB
-> messages through vhost_vdpa_process_iotlb_update().
-> That commit changed the handling of IOTLB a bit, and we accidentally
-> removed some code called during the release.
->
-> We partially fixed with commit 037d4305569a ("vhost-vdpa: call
-> vhost_vdpa_cleanup during the release") but a potential memory leak is
-> still there as showed by kmemleak if the application does not send
-> VHOST_IOTLB_INVALIDATE or crashes:
->
->   unreferenced object 0xffff888007fbaa30 (size 16):
->     comm "blkio-bench", pid 914, jiffies 4294993521 (age 885.500s)
->     hex dump (first 16 bytes):
->       40 73 41 07 80 88 ff ff 00 00 00 00 00 00 00 00  @sA.............
->     backtrace:
->       [<0000000087736d2a>] kmem_cache_alloc_trace+0x142/0x1c0
->       [<0000000060740f50>] vhost_vdpa_process_iotlb_msg+0x68c/0x901 [vhost_vdpa]
->       [<0000000083e8e205>] vhost_chr_write_iter+0xc0/0x4a0 [vhost]
->       [<000000008f2f414a>] vhost_vdpa_chr_write_iter+0x18/0x20 [vhost_vdpa]
->       [<00000000de1cd4a0>] vfs_write+0x216/0x4b0
->       [<00000000a2850200>] ksys_write+0x71/0xf0
->       [<00000000de8e720b>] __x64_sys_write+0x19/0x20
->       [<0000000018b12cbb>] do_syscall_64+0x3f/0x90
->       [<00000000986ec465>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
->
-> Let's fix calling vhost_vdpa_iotlb_unmap() on the whole range in
-> vhost_vdpa_remove_as(). We move that call before vhost_dev_cleanup()
-> since we need a valid v->vdev.mm in vhost_vdpa_pa_unmap().
-> vhost_iotlb_reset() call can be removed, since vhost_vdpa_iotlb_unmap()
-> on the whole range removes all the entries.
->
-> The kmemleak log reported was observed with a vDPA device that has `use_va`
-> set to true (e.g. VDUSE). This patch has been tested with both types of
-> devices.
->
-> Fixes: 037d4305569a ("vhost-vdpa: call vhost_vdpa_cleanup during the release")
-> Fixes: 3d5698793897 ("vhost-vdpa: introduce asid based IOTLB")
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+--Sig_/I/CbxKwYia5swyvyn4Bfs1N
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Hi all,
 
-> ---
->  drivers/vhost/vdpa.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 166044642fd5..b08e07fc7d1f 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -65,6 +65,10 @@ static DEFINE_IDA(vhost_vdpa_ida);
->
->  static dev_t vhost_vdpa_major;
->
-> +static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v,
-> +                                  struct vhost_iotlb *iotlb,
-> +                                  u64 start, u64 last);
-> +
->  static inline u32 iotlb_to_asid(struct vhost_iotlb *iotlb)
->  {
->         struct vhost_vdpa_as *as = container_of(iotlb, struct
-> @@ -135,7 +139,7 @@ static int vhost_vdpa_remove_as(struct vhost_vdpa *v, u32 asid)
->                 return -EINVAL;
->
->         hlist_del(&as->hash_link);
-> -       vhost_iotlb_reset(&as->iotlb);
-> +       vhost_vdpa_iotlb_unmap(v, &as->iotlb, 0ULL, 0ULL - 1);
->         kfree(as);
->
->         return 0;
-> @@ -1162,14 +1166,14 @@ static void vhost_vdpa_cleanup(struct vhost_vdpa *v)
->         struct vhost_vdpa_as *as;
->         u32 asid;
->
-> -       vhost_dev_cleanup(&v->vdev);
-> -       kfree(v->vdev.vqs);
-> -
->         for (asid = 0; asid < v->vdpa->nas; asid++) {
->                 as = asid_to_as(v, asid);
->                 if (as)
->                         vhost_vdpa_remove_as(v, asid);
->         }
-> +
-> +       vhost_dev_cleanup(&v->vdev);
-> +       kfree(v->vdev.vqs);
->  }
->
->  static int vhost_vdpa_open(struct inode *inode, struct file *filep)
-> --
-> 2.38.1
->
+Today's linux-next merge of the tip tree got a conflict in:
 
+  arch/x86/kernel/asm-offsets.c
+
+between commit:
+
+  debc5a1ec0d1 ("KVM: x86: use a separate asm-offsets.c file")
+
+from the kvm-fixes tree and commits:
+
+  c063a217bc07 ("x86/percpu: Move current_top_of_stack next to current_task=
+")
+  5d8213864ade ("x86/retbleed: Add SKL return thunk")
+
+from the tip tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc arch/x86/kernel/asm-offsets.c
+index 437308004ef2,13afdbbee349..000000000000
+--- a/arch/x86/kernel/asm-offsets.c
++++ b/arch/x86/kernel/asm-offsets.c
+@@@ -107,4 -108,14 +107,9 @@@ static void __used common(void
+  	OFFSET(TSS_sp0, tss_struct, x86_tss.sp0);
+  	OFFSET(TSS_sp1, tss_struct, x86_tss.sp1);
+  	OFFSET(TSS_sp2, tss_struct, x86_tss.sp2);
++=20
++ 	OFFSET(X86_top_of_stack, pcpu_hot, top_of_stack);
++ #ifdef CONFIG_CALL_DEPTH_TRACKING
++ 	OFFSET(X86_call_depth, pcpu_hot, call_depth);
++ #endif
+ -
+ -	if (IS_ENABLED(CONFIG_KVM_INTEL)) {
+ -		BLANK();
+ -		OFFSET(VMX_spec_ctrl, vcpu_vmx, spec_ctrl);
+ -	}
+  }
+
+--Sig_/I/CbxKwYia5swyvyn4Bfs1N
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmNsXVAACgkQAVBC80lX
+0GyyFgf/QVGuyy/XIJyjdNpwPzzP5l2bC3sXYNTjngCNytpK65voxV4L4Tyh957D
+QUqCwWzj8bcz+rHWHZxlY5Nn+S+NKnjb2I3OzG6S6PItIey2jdh2tDxVC5wj5mC4
+bIqES7erhaPfpGFw1E9sbYwglY/5fZHIl3kY6AHi0V2BwXda92a+CBT+5fHNC9Ne
+R6gXMy/qAOJdM4lo5nm4dsyjDrU7jVCIxzx3AjjELf1Gu3y/rMXTTP+XI1YuFwrw
+t6NgbvMa2zkWFxgXU+5d/2eq54oZFZ9A0xkRJeqklJ2/jrwijCBBlIbQb8nDZWUD
+1+BQKj7v1LLIOhe6R6bXsbsKw35U3Q==
+=3u65
+-----END PGP SIGNATURE-----
+
+--Sig_/I/CbxKwYia5swyvyn4Bfs1N--
