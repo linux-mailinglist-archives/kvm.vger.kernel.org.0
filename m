@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 330A7623927
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:48:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69FB7623928
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:48:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232220AbiKJBs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 20:48:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45876 "EHLO
+        id S232093AbiKJBsd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 20:48:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232131AbiKJBs1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 20:48:27 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C7731179
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 17:48:26 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id t3-20020a170902e84300b00186ab03043dso304275plg.20
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 17:48:26 -0800 (PST)
+        with ESMTP id S231769AbiKJBs3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 20:48:29 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4BA63CC
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 17:48:29 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-352e29ff8c2so2884577b3.21
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 17:48:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=daDWJEg62ng3VYHUROoCBAV65+QlkqFHNrop2NyZODI=;
-        b=np3hHMwFmg3zyf+XIJlCgqYHS/rYTVi1+gp/E7D0SV7NRd3OEG0uJFYn+JGp7+NA2x
-         8wLSk9lG8xLFuHh0sUwa4rGkXLwT4Ppez7wxW3la/WPVK1Gpy/iHDkWwn9yCQZlafh6+
-         YYmrQDLM4cjdzPTjVqiwBNbWaZJBcA0FD3CiTp8EnEgtcbw7FkeKGynIFl2ukCaEVZ/5
-         uatpTZF3YJMFldetRARaUekEgmzA9MF+sWAXpOm0pHAiOxPzoR7e3BczA5kjSzDl6ARv
-         3IQL5Ug7l+byTMc5JOMQrIT9s/7PtYKD88z/864Ww9XFdJQgg2ZHlRTGixc8osKu/vpZ
-         suow==
+        bh=CMXdygVTSbBCKeUpnZU+Zfw0wyqCZJgQrO/T3Nib2So=;
+        b=qiHalsDEb1I+Y6YxWi8QLwXCS2CwHqMjWkXRsKiGWTPmAUzrxZeYiamee4gK0Nw/mW
+         VVFSbvYm0O+KtQWjSfnaIVaDYxMkZw6oA2FIOfEuD6aOoX/DbbQalsrn1aR4eah+6Fyf
+         Ojx8c20kqDCjAqraadTD1vyPH9s+5SqwKbousDrjzxKtI28RRHYTX0/vRDhLLaBj7TPZ
+         rlBUC6QU/lIVEVf6WU7cLYfSVA/PULhu+tVRwkbSZtbyKUkl1RvTSjCpPYEoDNjXJAcS
+         DilJvsNJ/v4iGm5m9wBcAYWUdMQAy9AsT6lyI7wBvgy7Y1kaislpFxWS3E6nyCUwH7Nm
+         NJmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=daDWJEg62ng3VYHUROoCBAV65+QlkqFHNrop2NyZODI=;
-        b=3vhfm1L7RnG1yqQALYUx3lmLO4gx4MTDWuS0CsQBO3O7VsfFnmr3Bu5R4Xy6k2py50
-         nf+wiq747WLaT3qg69T7chTt9rtCoUMezcT8GhVLdYJxSwIoOxQmj9q/92bbB2KXKjIA
-         v9f/C8+rTarmer0inHu5x6dnmEYjbh2c/9pkgz73Af979GkvzFKRsuRkBDeoS/t8QYr7
-         6EnOZOJVj2Y6keBTU2LeJ/IREN7YSoUAjsgN/w05iSyu0PHN4DQBse2gDHCoupwQXP6x
-         64kwW8kmZKRzp2+s8d0mm98bECYTa6AUXScxZhHqv38Jtu6x6PcCsp6m97PaOn7oOBEd
-         W3TQ==
-X-Gm-Message-State: ACrzQf04gr2wVDLDl0d4xogOH+ZM/QOb8xCMBQmguAnsMnSbFhXDMjR3
-        cUHAZeKRh95cvaSr9tF32nW0M44JsnA=
-X-Google-Smtp-Source: AMsMyM5Y7LYgwhXwuVsTa6jt22FphDA9I+k6xqd3AbEw2IfLP+IwbzaWBEA8n/qVf3S5Yg+kc/IAJa/fhDM=
+        bh=CMXdygVTSbBCKeUpnZU+Zfw0wyqCZJgQrO/T3Nib2So=;
+        b=p7cMa5YrfJnqxTRMqOIAkq0bJpC0m40IBDPI70xp6jaVPGUHq6Cgay9xv4YVFOWysq
+         DIhlp9H5NR/PQmZ+f46J/vWfMXgVjiYid2vee1J50b1ejQ/VNp04B8WhbhyyceqrS3Hw
+         ejpgAr3Bi5DJVfbD3fqn8XRLbfr7ZsrKayio5JF1cS3VbrYlArKR5wPrz+Ub7HTdlqnA
+         91Usy3r58TNiWqhz1FBXhpoTsgaHRMu9FwtGhOcYtJ1NFC5gvenpvuwSe9XuR1Kcf9eJ
+         30459xg8PKWWRSW8bmQrAx5ENRrKAiiTXpa8CMoqAGU/ZtO+ojJGuwicVtp+Q90BUccz
+         qHJw==
+X-Gm-Message-State: ACrzQf3uglZp/ABmxnRosPkMnG1E6r63KnrjAZL3RaWjTFnEPgna0V3d
+        KWxJTz0Ylnk9GOeL1jtQ/prku8Hsftw=
+X-Google-Smtp-Source: AMsMyM6G00RY/cYIWt+U8yjGU4flmrLChx2b7c/C7uxpk73UstEL/s0ZGDm9/+Wa2vhRo8cavI2BoU5+kVg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:7249:b0:188:5391:cec2 with SMTP id
- c9-20020a170902724900b001885391cec2mr1098435pll.78.1668044905785; Wed, 09 Nov
- 2022 17:48:25 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a81:7503:0:b0:368:70a8:9791 with SMTP id
+ q3-20020a817503000000b0036870a89791mr1204058ywc.197.1668044907433; Wed, 09
+ Nov 2022 17:48:27 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 10 Nov 2022 01:48:20 +0000
+Date:   Thu, 10 Nov 2022 01:48:21 +0000
 In-Reply-To: <20221110014821.1548347-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221110014821.1548347-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221110014821.1548347-2-seanjc@google.com>
-Subject: [PATCH 1/2] KVM: x86/mmu: Don't rely on page-track mechanism to flush
- on memslot change
+Message-ID: <20221110014821.1548347-3-seanjc@google.com>
+Subject: [PATCH 2/2] KVM: x86/mmu: Register page-tracker on first shadow root allocation
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -71,85 +70,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Call kvm_mmu_zap_all_fast() directly when flushing a memslot instead of
-bounding through the page-track mechanism.  KVM (unfortunately) needs to
-zap and flush all page tables on memslot DELETE/MOVE irrespective of
-whether KVM is shadowing guest page tables.
-
-This will allow changing KVM to register a page-track notifier on the
-first shadow root allocation, and will also allow deleting the misguided
-kvm_page_track_flush_slot() hook itself once KVM-GT also moves to a
-different method for reacting to memslot changes.
-
-No functional change intended.
+Defer registering KVM's shadow page tracker until the first shadow root
+allocation now that KVM doesn't rely on the tracker to zap+flush SPTEs
+when a memslot is moved or deleted.
 
 Cc: Yan Zhao <yan.y.zhao@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/mmu/mmu.c          | 10 +---------
- arch/x86/kvm/x86.c              |  2 ++
- 3 files changed, 4 insertions(+), 9 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 81114a376c4e..382cfffb7e6c 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1765,6 +1765,7 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
- void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
- 				   const struct kvm_memory_slot *memslot);
- void kvm_mmu_zap_all(struct kvm *kvm);
-+void kvm_mmu_zap_all_fast(struct kvm *kvm);
- void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
- void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
- 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 93c389eaf471..0a5ae07a190e 100644
+index 0a5ae07a190e..d35a86a60d4f 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5943,7 +5943,7 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
-  * not use any resource of the being-deleted slot or all slots
-  * after calling the function.
-  */
--static void kvm_mmu_zap_all_fast(struct kvm *kvm)
-+void kvm_mmu_zap_all_fast(struct kvm *kvm)
- {
- 	lockdep_assert_held(&kvm->slots_lock);
+@@ -3678,11 +3678,14 @@ static int mmu_first_shadow_root_alloc(struct kvm *kvm)
+ 		}
+ 	}
  
-@@ -5999,13 +5999,6 @@ static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
- 	return unlikely(!list_empty_careful(&kvm->arch.zapped_obsolete_pages));
- }
++out_success:
++	/* Register KVM's page-tracker to react to guest writes to gPTEs. */
++	kvm_page_track_register_notifier(kvm, &kvm->arch.mmu_sp_tracker);
++
+ 	/*
+ 	 * Ensure that shadow_root_allocated becomes true strictly after
+ 	 * all the related pointers are set.
+ 	 */
+-out_success:
+ 	smp_store_release(&kvm->arch.shadow_root_allocated, true);
  
--static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
--			struct kvm_memory_slot *slot,
--			struct kvm_page_track_notifier_node *node)
--{
--	kvm_mmu_zap_all_fast(kvm);
--}
--
+ out_unlock:
+@@ -6001,7 +6004,6 @@ static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
+ 
  int kvm_mmu_init_vm(struct kvm *kvm)
  {
- 	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
-@@ -6021,7 +6014,6 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+-	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
+ 	int r;
+ 
+ 	INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
+@@ -6013,8 +6015,7 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+ 	if (r < 0)
  		return r;
  
- 	node->track_write = kvm_mmu_pte_write;
--	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
- 	kvm_page_track_register_notifier(kvm, node);
+-	node->track_write = kvm_mmu_pte_write;
+-	kvm_page_track_register_notifier(kvm, node);
++	kvm->arch.mmu_sp_tracker.track_write = kvm_mmu_pte_write;
  
  	kvm->arch.split_page_header_cache.kmem_cache = mmu_page_header_cache;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e46e458c5b08..5da86fe3c113 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12550,6 +12550,8 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
- void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
- 				   struct kvm_memory_slot *slot)
+ 	kvm->arch.split_page_header_cache.gfp_zero = __GFP_ZERO;
+@@ -6036,9 +6037,8 @@ static void mmu_free_vm_memory_caches(struct kvm *kvm)
+ 
+ void kvm_mmu_uninit_vm(struct kvm *kvm)
  {
-+	kvm_mmu_zap_all_fast(kvm);
-+
- 	kvm_page_track_flush_slot(kvm, slot);
- }
+-	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
+-
+-	kvm_page_track_unregister_notifier(kvm, node);
++	if (kvm_shadow_root_allocated(kvm))
++		kvm_page_track_unregister_notifier(kvm, &kvm->arch.mmu_sp_tracker);
+ 
+ 	kvm_mmu_uninit_tdp_mmu(kvm);
  
 -- 
 2.38.1.431.g37b22c650d-goog
