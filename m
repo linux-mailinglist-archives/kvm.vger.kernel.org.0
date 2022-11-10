@@ -2,212 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F22DF623E8E
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 10:27:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25C91623E90
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 10:27:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229887AbiKJJ1F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 04:27:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50954 "EHLO
+        id S229894AbiKJJ1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 04:27:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229764AbiKJJ1E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 04:27:04 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDE776A697;
-        Thu, 10 Nov 2022 01:27:03 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id l22-20020a17090a3f1600b00212fbbcfb78so4207776pjc.3;
-        Thu, 10 Nov 2022 01:27:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yYm73sNWFFE4EpN1dR1Cx+FmfgIhAJM/KoAjWBFI0pU=;
-        b=S11BeIH9//OPm5srXrPrTgYJzz+5OmimB+1dMAHEycfVcEf/NOwXJJCasXSpwsi2WG
-         UOA5OtVZRUVwZvvindZLVt7X0OSeuXvxce6yQLh04fsADzfFiuhgfa8+o7hJBk8sqUYg
-         /g/2MlWduEstk/j84Fh338RjO+zz/JPMMSvEFVw9oYyysODTKYdIJKPYnX5Xt/0BqEyy
-         QpGaD+nhn84sHfYtINI9c/MJsy0vxK0VKVL/AD4Eky+WTKW6IlHVCW0Fa1YMXaMmFni+
-         2CFoeh6S04RYG7p27QOVEES6blCCO5A7Wr1ifVghvF3synbsdUBcBULux77gbKPd3BiV
-         5hSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yYm73sNWFFE4EpN1dR1Cx+FmfgIhAJM/KoAjWBFI0pU=;
-        b=ftkbzfvLNYlqD/HA3l7pmpvfx5J+CveiEY7BM4dBeM3lM2u64kH0HSYGdMMx4TlaBa
-         tzWuhmI6opJsSp1hD3NXuq09wd7CNc+yy3QcarYJyqKg2Pcg4DzruEFOXPd5uwD9VHXJ
-         3YCMXIBXKq4YEXoeJKLnIxmnN6Gm01sSudk9lFkvvXAgux2sewcmlDa0GkF/QaGrDHeQ
-         WTN2SjuhKPoK8WERyy6FuFJlm6Hg85/qBKlLPaDZvsepfn976FviT36fF2GlAgsvDDd/
-         LKkyeJVvW0J+1yJ0mD277kbBuxRWFD+mPiFpuJr2go8AqwtaIVU3jF883BoJcL1q8xaa
-         IDQQ==
-X-Gm-Message-State: ACrzQf3/pV1SD+Ze15eCBegZ5hEkvTrCifPbHZdl4gWGWEbcpA0oG059
-        zam/QhSFcysdmnto2z+/6sLf1gv8Jjg7VSYV
-X-Google-Smtp-Source: AMsMyM4EseASGx+Zu4adT2uRSUFLBvFguQM9DVRUkpSniAgkjaOqOeWtMXnKvUStdK8wRa+SV9ecEA==
-X-Received: by 2002:a17:902:bc88:b0:185:4421:250 with SMTP id bb8-20020a170902bc8800b0018544210250mr62698002plb.29.1668072423183;
-        Thu, 10 Nov 2022 01:27:03 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id s11-20020a170902ea0b00b0018700ba9090sm10718065plg.185.2022.11.10.01.27.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Nov 2022 01:27:02 -0800 (PST)
-Message-ID: <948ec6a5-3f30-e8c2-9629-12235f1e1367@gmail.com>
-Date:   Thu, 10 Nov 2022 17:26:55 +0800
+        with ESMTP id S229896AbiKJJ1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 04:27:16 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 361836A6B2
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 01:27:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668072435; x=1699608435;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=DjFcL5BKDS3lx6Tya3zdhgH6ECLByTkf5CQ6PVKRDKk=;
+  b=gfjY3dfxanM8PLF6E+3UplP4fygEB7VGVma1Oo5MNBbI5GPGcQdg03RE
+   uAxlykxXe6HM2r6Gs5qA1rMzjKXLLuVA5vzLgzpNO0JCZG7DrBcjhLsLR
+   U3p7qtcG1mN8UFwC/pznBy4RmIqHdFcaaCtcYKg2sS+J+jOUWu9XUwSt2
+   pGO9G9LOx5FQ8XDtXfdoJlWLQAp2MxUtsV6zlNw0x+Vu0daLtkkoZlv30
+   AEG7rEbsh6Wvl0jlPxbKy9YCi6vPpF03jqoUk3AfOsx1LCu1gk1HAGrAY
+   +Z0njqyTPOXRNriBWr5AI2BHEYB37kic7EPZYMgm7lH/QYd05mz2fH+rE
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="298760016"
+X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
+   d="scan'208";a="298760016"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 01:27:14 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="706077499"
+X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
+   d="scan'208";a="706077499"
+Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.249.171.70]) ([10.249.171.70])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 01:27:12 -0800
+Message-ID: <604ae2ce-5e00-3d08-fcfb-0d3fd3c505a3@intel.com>
+Date:   Thu, 10 Nov 2022 17:27:10 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.4.2
-Subject: Re: [PATCH v2 3/3] KVM: x86/cpuid: Add AMD CPUID ExtPerfMonAndDbg
- leaf 0x80000022
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.4.1
+Subject: Re: [PATCH 0/4] ifcvf/vDPA implement features provisioning
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>
-References: <20220919093453.71737-1-likexu@tencent.com>
- <20220919093453.71737-4-likexu@tencent.com> <Y1sIHXX3HEJEXJm+@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <Y1sIHXX3HEJEXJm+@google.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, hang.yuan@intel.com, piotr.uminski@intel.com
+References: <20221107093345.121648-1-lingshan.zhu@intel.com>
+ <CACGkMEs9af1E1pLd2t8E71YBPF=rHkhfN8qO9_3=x6HVaCMAxg@mail.gmail.com>
+ <0b15591f-9e49-6383-65eb-6673423f81ec@intel.com>
+ <CACGkMEujqOFHv7QATWgYo=SdAKef5jQXi2-YksjgT-hxEgKNDQ@mail.gmail.com>
+ <80cdd80a-16fa-ac75-0a89-5729b846efed@intel.com>
+ <CACGkMEu-5TbA3Ky2qgn-ivfhgfJ2b12mDJgq8iNgHce8qu3ApA@mail.gmail.com>
+ <03657084-98ab-93bc-614a-e6cc7297d93e@intel.com>
+ <d59c311f-ba9f-4c00-28f8-c50e099adb9f@redhat.com>
+ <3286ad00-e432-da69-a041-6a3032494470@intel.com>
+ <CACGkMEuca97Cv+XuKxmHHHgAQYsayZvJRtpONCCqcEE8qMu5Kw@mail.gmail.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+In-Reply-To: <CACGkMEuca97Cv+XuKxmHHHgAQYsayZvJRtpONCCqcEE8qMu5Kw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/10/2022 6:37 am, Sean Christopherson wrote:
-> On Mon, Sep 19, 2022, Like Xu wrote:
->> From: Sandipan Das <sandipan.das@amd.com>
+
+
+On 11/10/2022 5:13 PM, Jason Wang wrote:
+> On Thu, Nov 10, 2022 at 4:59 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
 >>
->> From: Sandipan Das <sandipan.das@amd.com>
-> 
-> Duplicate "From:"s.
-> 
->> CPUID leaf 0x80000022 i.e. ExtPerfMonAndDbg advertises some
->> new performance monitoring features for AMD processors.
-> 
-> Wrap changelogs closer to ~75 chars.
-> 
->> Bit 0 of EAX indicates support for Performance Monitoring
->> Version 2 (PerfMonV2) features. If found to be set during
->> PMU initialization, the EBX bits of the same CPUID function
->> can be used to determine the number of available PMCs for
->> different PMU types.
 >>
->> Expose the relevant bits via KVM_GET_SUPPORTED_CPUID so
->> that guests can make use of the PerfMonV2 features.
+>> On 11/10/2022 2:29 PM, Jason Wang wrote:
+>>> 在 2022/11/10 14:20, Zhu, Lingshan 写道:
+>>>>
+>>>> On 11/10/2022 11:49 AM, Jason Wang wrote:
+>>>>> On Wed, Nov 9, 2022 at 5:06 PM Zhu, Lingshan
+>>>>> <lingshan.zhu@intel.com> wrote:
+>>>>>>
+>>>>>> On 11/9/2022 4:59 PM, Jason Wang wrote:
+>>>>>>> On Wed, Nov 9, 2022 at 4:14 PM Zhu, Lingshan
+>>>>>>> <lingshan.zhu@intel.com> wrote:
+>>>>>>>> On 11/9/2022 2:51 PM, Jason Wang wrote:
+>>>>>>>>> On Mon, Nov 7, 2022 at 5:42 PM Zhu Lingshan
+>>>>>>>>> <lingshan.zhu@intel.com> wrote:
+>>>>>>>>>> This series implements features provisioning for ifcvf.
+>>>>>>>>>> By applying this series, we allow userspace to create
+>>>>>>>>>> a vDPA device with selected (management device supported)
+>>>>>>>>>> feature bits and mask out others.
+>>>>>>>>> I don't see a direct relationship between the first 3 and the last.
+>>>>>>>>> Maybe you can state the reason why the restructure is a must for
+>>>>>>>>> the
+>>>>>>>>> feature provisioning. Otherwise, we'd better split the series.
+>>>>>>>> When introducing features provisioning ability to ifcvf, there is
+>>>>>>>> a need
+>>>>>>>> to re-create vDPA devices
+>>>>>>>> on a VF with different feature bits.
+>>>>>>> This seems a requirement even without feature provisioning? Device
+>>>>>>> could be deleted from the management device anyhow.
+>>>>>> Yes, we need this to delete and re-create a vDPA device.
+>>>>> I wonder if we need something that works for -stable.
+>>>> I can add a fix tag, so these three patches could apply to stable
+>>>
+>>> It's too huge for -stable.
+>>>
+>>>
+>>>>> AFAIK, we can move the vdpa_alloc_device() from probe() to dev_add()
+>>>>> and it seems to work?
+>>>> Yes and this is done in this series and that's why we need these
+>>>> refactoring code.
+>>>
+>>> I meant there's probably no need to change the association of existing
+>>> structure but just do the allocation in dev_add(), then we will have a
+>>> patch with much more small changeset that fit for -stable.
+>> Patch 1(ifcvf_base only work on ifcvf_hw) and patch 2(irq functions only
+>> work on ifcvf_hw) are not needed for stable.
+>> I have already done this allocation of ifcvf_adapter which is the
+>> container of struct vdpa_device in dev_add() in Patch 3, this should be
+>> merged to stable.
+>> Patch 3 is huge but necessary, not only allocate ifcvf_adapter in
+>> dev_add(), it also refactors the structures of ifcvf_mgmt_dev and
+>> ifcvf_adapter,
+>> because we need to initialize the VF's hw structure ifcvf_hw(which was a
+>> member of ifcvf_adapter but now should be a member of ifcvf_mgmt_dev) in
+>> probe.
 >>
->> Co-developed-by: Like Xu <likexu@tencent.com>
->> Signed-off-by: Like Xu <likexu@tencent.com>
->> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
->> ---
->>   arch/x86/include/asm/perf_event.h |  8 ++++++++
->>   arch/x86/kvm/cpuid.c              | 32 ++++++++++++++++++++++++++++++-
->>   2 files changed, 39 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
->> index f6fc8dd51ef4..c848f504e467 100644
->> --- a/arch/x86/include/asm/perf_event.h
->> +++ b/arch/x86/include/asm/perf_event.h
->> @@ -214,6 +214,14 @@ union cpuid_0x80000022_ebx {
->>   	unsigned int		full;
->>   };
->>   
->> +union cpuid_0x80000022_eax {
->> +	struct {
->> +		/* Performance Monitoring Version 2 Supported */
->> +		unsigned int	perfmon_v2:1;
->> +	} split;
->> +	unsigned int		full;
->> +};
-> 
-> I'm not a fan of perf's unions, but I at least understand the value added for
-> CPUID entries that are a bunch of multi-bit values.  However, this leaf appears
-> to be a pure features leaf.  In which case a union just makes life painful.
-> 
-> Please add a CPUID_8000_0022_EAX kvm_only_cpuid_leafs entry (details in link[*]
-> below) so that KVM can write sane code like
-> 
-> 	guest_cpuid_has(X86_FEATURE_AMD_PMU_V2)
-> 
-> and cpuid_entry_override() instead of manually filling in information.
-> 
-> where appropriate.
-> 
-> [*] https://lore.kernel.org/all/Y1AQX3RfM+awULlE@google.com
+>> Is it still huge?
+> Then please reorder the patches, stable-kernel-rules.rst said:
+>
+>   - It cannot be bigger than 100 lines, with context.
+>
+> Let's see.
+It is over 180 lines, so maybe re-ordering can not help here, I will try 
+to split patch 3.
 
-When someone is selling syntactic sugar in the kernel space, extra attention
-needs to be paid to runtime performance (union) and memory footprint 
-(reverse_cpuid).
+Thanks,
+Zhu Lingshan
+>
+> Thanks
+>
+>> Thanks
+>>> Thanks
+>>>
+>>>
+>>>> By the way, do you have any comments to the patches?
+>>>>
+>>>> Thanks,
+>>>> Zhu Lingshan
+>>>>> Thanks
+>>>>>
+>>>>>> We create vDPA device from a VF, so without features provisioning
+>>>>>> requirements,
+>>>>>> we don't need to re-create the vDPA device. But with features
+>>>>>> provisioning,
+>>>>>> it is a must now.
+>>>>>>
+>>>>>> Thanks
+>>>>>>
+>>>>>>
+>>>>>>> Thakns
+>>>>>>>
+>>>>>>>> When remove a vDPA device, the container of struct vdpa_device
+>>>>>>>> (here is
+>>>>>>>> ifcvf_adapter) is free-ed in
+>>>>>>>> dev_del() interface, so we need to allocate ifcvf_adapter in
+>>>>>>>> dev_add()
+>>>>>>>> than in probe(). That's
+>>>>>>>> why I have re-factored the adapter/mgmt_dev code.
+>>>>>>>>
+>>>>>>>> For re-factoring the irq related code and ifcvf_base, let them
+>>>>>>>> work on
+>>>>>>>> struct ifcvf_hw, the
+>>>>>>>> reason is that the adapter is allocated in dev_add(), if we want
+>>>>>>>> theses
+>>>>>>>> functions to work
+>>>>>>>> before dev_add(), like in probe, we need them work on ifcvf_hw
+>>>>>>>> than the
+>>>>>>>> adapter.
+>>>>>>>>
+>>>>>>>> Thanks
+>>>>>>>> Zhu Lingshan
+>>>>>>>>> Thanks
+>>>>>>>>>
+>>>>>>>>>> Please help review
+>>>>>>>>>>
+>>>>>>>>>> Thanks
+>>>>>>>>>>
+>>>>>>>>>> Zhu Lingshan (4):
+>>>>>>>>>>       vDPA/ifcvf: ifcvf base layer interfaces work on struct
+>>>>>>>>>> ifcvf_hw
+>>>>>>>>>>       vDPA/ifcvf: IRQ interfaces work on ifcvf_hw
+>>>>>>>>>>       vDPA/ifcvf: allocate ifcvf_adapter in dev_add()
+>>>>>>>>>>       vDPA/ifcvf: implement features provisioning
+>>>>>>>>>>
+>>>>>>>>>>      drivers/vdpa/ifcvf/ifcvf_base.c |  32 ++-----
+>>>>>>>>>>      drivers/vdpa/ifcvf/ifcvf_base.h |  10 +-
+>>>>>>>>>>      drivers/vdpa/ifcvf/ifcvf_main.c | 156
+>>>>>>>>>> +++++++++++++++-----------------
+>>>>>>>>>>      3 files changed, 89 insertions(+), 109 deletions(-)
+>>>>>>>>>>
+>>>>>>>>>> --
+>>>>>>>>>> 2.31.1
+>>>>>>>>>>
 
-Applied for this case, while the cpuid_0x80000022_eax will be used again
-in the perf core since the other new AMD PMU features are pacing at the door.
-
-> 
->>   struct x86_pmu_capability {
->>   	int		version;
->>   	int		num_counters_gp;
->> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->> index 75dcf7a72605..34ba845c91b7 100644
->> --- a/arch/x86/kvm/cpuid.c
->> +++ b/arch/x86/kvm/cpuid.c
->> @@ -1094,7 +1094,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->>   		entry->edx = 0;
->>   		break;
->>   	case 0x80000000:
->> -		entry->eax = min(entry->eax, 0x80000021);
->> +		entry->eax = min(entry->eax, 0x80000022);
->>   		/*
->>   		 * Serializing LFENCE is reported in a multitude of ways, and
->>   		 * NullSegClearsBase is not reported in CPUID on Zen2; help
->> @@ -1203,6 +1203,36 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->>   		if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
->>   			entry->eax |= BIT(6);
->>   		break;
->> +	/* AMD Extended Performance Monitoring and Debug */
->> +	case 0x80000022: {
->> +		union cpuid_0x80000022_eax eax;
->> +		union cpuid_0x80000022_ebx ebx;
->> +
->> +		entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
->> +		if (!enable_pmu)
-> 
-> Shouldn't
-> 
-> 	case 0xa: { /* Architectural Performance Monitoring */
-> 
-> also check enable_pmu instead of X86_FEATURE_ARCH_PERFMON?
-
-Applied as a separate patch, though KVM will have zero-padded kvm_pmu_cap to do
-subsequent assignments when !enable_pmu but that doesn't hurt.
-
-> 
->> +			break;
->> +
->> +		if (kvm_pmu_cap.version > 1) {
->> +			/* AMD PerfMon is only supported up to V2 in the KVM. */
->> +			eax.split.perfmon_v2 = 1;
-> 
-> With a proper CPUID_8000_0022_EAX, this becomes:
-> 
-> 		entry->ecx = entry->edx = 0;
-> 		if (!enable_pmu || !kvm_cpu_cap_has(X86_FEATURE_AMD_PMU_V2)) {
-> 			entry->eax = entry->ebx;
-> 			break;
-> 		}
-> 
-> 		cpuid_entry_override(entry, CPUID_8000_0022_EAX);
-> 
-> 		...
-
-Then in this code block, we will have:
-
-	/* AMD PerfMon is only supported up to V2 in the KVM. */
-	entry->eax |= BIT(0);
-
-to cover AMD Perfmon V3+, any better move ?
-
-> 
-> 		entry->ebx = ebx.full;
