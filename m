@@ -2,210 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 25C91623E90
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 10:27:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52983623EA0
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 10:31:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229894AbiKJJ1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 04:27:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51196 "EHLO
+        id S229791AbiKJJbH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 04:31:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229896AbiKJJ1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 04:27:16 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 361836A6B2
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 01:27:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668072435; x=1699608435;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=DjFcL5BKDS3lx6Tya3zdhgH6ECLByTkf5CQ6PVKRDKk=;
-  b=gfjY3dfxanM8PLF6E+3UplP4fygEB7VGVma1Oo5MNBbI5GPGcQdg03RE
-   uAxlykxXe6HM2r6Gs5qA1rMzjKXLLuVA5vzLgzpNO0JCZG7DrBcjhLsLR
-   U3p7qtcG1mN8UFwC/pznBy4RmIqHdFcaaCtcYKg2sS+J+jOUWu9XUwSt2
-   pGO9G9LOx5FQ8XDtXfdoJlWLQAp2MxUtsV6zlNw0x+Vu0daLtkkoZlv30
-   AEG7rEbsh6Wvl0jlPxbKy9YCi6vPpF03jqoUk3AfOsx1LCu1gk1HAGrAY
-   +Z0njqyTPOXRNriBWr5AI2BHEYB37kic7EPZYMgm7lH/QYd05mz2fH+rE
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="298760016"
-X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
-   d="scan'208";a="298760016"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 01:27:14 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="706077499"
-X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
-   d="scan'208";a="706077499"
-Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.249.171.70]) ([10.249.171.70])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 01:27:12 -0800
-Message-ID: <604ae2ce-5e00-3d08-fcfb-0d3fd3c505a3@intel.com>
-Date:   Thu, 10 Nov 2022 17:27:10 +0800
+        with ESMTP id S229517AbiKJJbF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 04:31:05 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 294E760D9;
+        Thu, 10 Nov 2022 01:31:04 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id q9so1450981pfg.5;
+        Thu, 10 Nov 2022 01:31:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1EvpDdZ4hxcipg3MQAInCVCspubJ3uS0BC6hXCLOf3U=;
+        b=VLao0cXkAY92G2p1UszK3LD1hHzo5JKXYUXoOGc1CU/6NqeHnqjaxahdLAW55ynq6a
+         HW0ColHyQXlrfep5aM4JgxTYFd2eJ9eYp4eHMWRExB5lH9CotPkKJ9gBt6CcKWf+b7+b
+         LLErN5sw4qWqixwC3GqNeRDh6EwxVLM2ESzeOLCQgXOV93rn0vFlmOpW49YWoQqPXCzR
+         3lIi3Z1cdaapAKGETVC9o0nlnAogohAPpHpLQ65KW6UIImwCiYBJYT9IAm4PcvmA4xpg
+         AXrKN7MZyLeG7vZcizsK2unw6/+ZQ1EWybqZ2gnqROoGVHcuFu61S0JkGf/zsuy+fATw
+         h+rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1EvpDdZ4hxcipg3MQAInCVCspubJ3uS0BC6hXCLOf3U=;
+        b=PAuHdb9SQ6saMI8kGs7o32LBB3qAXIOhjdTkxHdW7xhEsol5VM/Cxd8BNb16XNhEmT
+         0Uk2Bo7V2m3ahjZhmUo8A1HrqfRpW9HqMJWU2Ac3c4May58gcGcF2Xq/Eb+pQ7FB+Hg1
+         SswlWc2SDcjMmoio/cDgy85PNGork99kmo7RbU6q03jZSGjtROQ7YUOaD+UpZ5BYLkrL
+         fOntuGzXRCo0WgdyLcfwL8gyXRY0oV+Pb/vks2qe2dWECny1qwHnr/6RTFbl4Agm0v+F
+         CNFzKRZ6VZgDImuw7dkKvUWfdGIYL5PmEhLgQwfFpRbvIna7pIqy6va/bOGREdNOe7Lr
+         83wg==
+X-Gm-Message-State: ACrzQf2cEUCzk/FBktQ+F28fOFCOJRw8tu35Mz2HWMr36Utn0220m4Ci
+        R0OrPmkRVURF7H3TcfNYYjM=
+X-Google-Smtp-Source: AMsMyM78iiI/P+DpqpOA4p4lxe7GrKwstfV8mS9lP7o9wCPkGkzc4m7eiJTeoMbliQXRPEaHy5Nm5w==
+X-Received: by 2002:a62:1a97:0:b0:562:5587:12d6 with SMTP id a145-20020a621a97000000b00562558712d6mr62997671pfa.37.1668072663634;
+        Thu, 10 Nov 2022 01:31:03 -0800 (PST)
+Received: from debian.me (subs03-180-214-233-66.three.co.id. [180.214.233.66])
+        by smtp.gmail.com with ESMTPSA id l3-20020a17090a384300b00213c7cf21c0sm2677928pjf.5.2022.11.10.01.31.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Nov 2022 01:31:03 -0800 (PST)
+Received: by debian.me (Postfix, from userid 1000)
+        id A3B96104223; Thu, 10 Nov 2022 16:30:59 +0700 (WIB)
+Date:   Thu, 10 Nov 2022 16:30:59 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     bpf@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v4 04/17] iommufd: Document overview of iommufd
+Message-ID: <Y2zE0zfnQ7mt740i@debian.me>
+References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+ <4-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.4.1
-Subject: Re: [PATCH 0/4] ifcvf/vDPA implement features provisioning
-Content-Language: en-US
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, hang.yuan@intel.com, piotr.uminski@intel.com
-References: <20221107093345.121648-1-lingshan.zhu@intel.com>
- <CACGkMEs9af1E1pLd2t8E71YBPF=rHkhfN8qO9_3=x6HVaCMAxg@mail.gmail.com>
- <0b15591f-9e49-6383-65eb-6673423f81ec@intel.com>
- <CACGkMEujqOFHv7QATWgYo=SdAKef5jQXi2-YksjgT-hxEgKNDQ@mail.gmail.com>
- <80cdd80a-16fa-ac75-0a89-5729b846efed@intel.com>
- <CACGkMEu-5TbA3Ky2qgn-ivfhgfJ2b12mDJgq8iNgHce8qu3ApA@mail.gmail.com>
- <03657084-98ab-93bc-614a-e6cc7297d93e@intel.com>
- <d59c311f-ba9f-4c00-28f8-c50e099adb9f@redhat.com>
- <3286ad00-e432-da69-a041-6a3032494470@intel.com>
- <CACGkMEuca97Cv+XuKxmHHHgAQYsayZvJRtpONCCqcEE8qMu5Kw@mail.gmail.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <CACGkMEuca97Cv+XuKxmHHHgAQYsayZvJRtpONCCqcEE8qMu5Kw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Nov 07, 2022 at 08:48:57PM -0400, Jason Gunthorpe wrote:
+> From: Kevin Tian <kevin.tian@intel.com>
+> 
+> Add iommufd into the documentation tree, and supply initial documentation.
+> Much of this is linked from code comments by kdoc.
+> 
 
+The patch also exposes htmldocs warnings as Stephen Rothwell has
+reported on linux-next [1] due to the copyright comments mistaken for
+kernel-doc comments, so I have applied the fixup:
 
-On 11/10/2022 5:13 PM, Jason Wang wrote:
-> On Thu, Nov 10, 2022 at 4:59 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
->>
->>
->> On 11/10/2022 2:29 PM, Jason Wang wrote:
->>> 在 2022/11/10 14:20, Zhu, Lingshan 写道:
->>>>
->>>> On 11/10/2022 11:49 AM, Jason Wang wrote:
->>>>> On Wed, Nov 9, 2022 at 5:06 PM Zhu, Lingshan
->>>>> <lingshan.zhu@intel.com> wrote:
->>>>>>
->>>>>> On 11/9/2022 4:59 PM, Jason Wang wrote:
->>>>>>> On Wed, Nov 9, 2022 at 4:14 PM Zhu, Lingshan
->>>>>>> <lingshan.zhu@intel.com> wrote:
->>>>>>>> On 11/9/2022 2:51 PM, Jason Wang wrote:
->>>>>>>>> On Mon, Nov 7, 2022 at 5:42 PM Zhu Lingshan
->>>>>>>>> <lingshan.zhu@intel.com> wrote:
->>>>>>>>>> This series implements features provisioning for ifcvf.
->>>>>>>>>> By applying this series, we allow userspace to create
->>>>>>>>>> a vDPA device with selected (management device supported)
->>>>>>>>>> feature bits and mask out others.
->>>>>>>>> I don't see a direct relationship between the first 3 and the last.
->>>>>>>>> Maybe you can state the reason why the restructure is a must for
->>>>>>>>> the
->>>>>>>>> feature provisioning. Otherwise, we'd better split the series.
->>>>>>>> When introducing features provisioning ability to ifcvf, there is
->>>>>>>> a need
->>>>>>>> to re-create vDPA devices
->>>>>>>> on a VF with different feature bits.
->>>>>>> This seems a requirement even without feature provisioning? Device
->>>>>>> could be deleted from the management device anyhow.
->>>>>> Yes, we need this to delete and re-create a vDPA device.
->>>>> I wonder if we need something that works for -stable.
->>>> I can add a fix tag, so these three patches could apply to stable
->>>
->>> It's too huge for -stable.
->>>
->>>
->>>>> AFAIK, we can move the vdpa_alloc_device() from probe() to dev_add()
->>>>> and it seems to work?
->>>> Yes and this is done in this series and that's why we need these
->>>> refactoring code.
->>>
->>> I meant there's probably no need to change the association of existing
->>> structure but just do the allocation in dev_add(), then we will have a
->>> patch with much more small changeset that fit for -stable.
->> Patch 1(ifcvf_base only work on ifcvf_hw) and patch 2(irq functions only
->> work on ifcvf_hw) are not needed for stable.
->> I have already done this allocation of ifcvf_adapter which is the
->> container of struct vdpa_device in dev_add() in Patch 3, this should be
->> merged to stable.
->> Patch 3 is huge but necessary, not only allocate ifcvf_adapter in
->> dev_add(), it also refactors the structures of ifcvf_mgmt_dev and
->> ifcvf_adapter,
->> because we need to initialize the VF's hw structure ifcvf_hw(which was a
->> member of ifcvf_adapter but now should be a member of ifcvf_mgmt_dev) in
->> probe.
->>
->> Is it still huge?
-> Then please reorder the patches, stable-kernel-rules.rst said:
->
->   - It cannot be bigger than 100 lines, with context.
->
-> Let's see.
-It is over 180 lines, so maybe re-ordering can not help here, I will try 
-to split patch 3.
+---- >8 ----
 
-Thanks,
-Zhu Lingshan
->
-> Thanks
->
->> Thanks
->>> Thanks
->>>
->>>
->>>> By the way, do you have any comments to the patches?
->>>>
->>>> Thanks,
->>>> Zhu Lingshan
->>>>> Thanks
->>>>>
->>>>>> We create vDPA device from a VF, so without features provisioning
->>>>>> requirements,
->>>>>> we don't need to re-create the vDPA device. But with features
->>>>>> provisioning,
->>>>>> it is a must now.
->>>>>>
->>>>>> Thanks
->>>>>>
->>>>>>
->>>>>>> Thakns
->>>>>>>
->>>>>>>> When remove a vDPA device, the container of struct vdpa_device
->>>>>>>> (here is
->>>>>>>> ifcvf_adapter) is free-ed in
->>>>>>>> dev_del() interface, so we need to allocate ifcvf_adapter in
->>>>>>>> dev_add()
->>>>>>>> than in probe(). That's
->>>>>>>> why I have re-factored the adapter/mgmt_dev code.
->>>>>>>>
->>>>>>>> For re-factoring the irq related code and ifcvf_base, let them
->>>>>>>> work on
->>>>>>>> struct ifcvf_hw, the
->>>>>>>> reason is that the adapter is allocated in dev_add(), if we want
->>>>>>>> theses
->>>>>>>> functions to work
->>>>>>>> before dev_add(), like in probe, we need them work on ifcvf_hw
->>>>>>>> than the
->>>>>>>> adapter.
->>>>>>>>
->>>>>>>> Thanks
->>>>>>>> Zhu Lingshan
->>>>>>>>> Thanks
->>>>>>>>>
->>>>>>>>>> Please help review
->>>>>>>>>>
->>>>>>>>>> Thanks
->>>>>>>>>>
->>>>>>>>>> Zhu Lingshan (4):
->>>>>>>>>>       vDPA/ifcvf: ifcvf base layer interfaces work on struct
->>>>>>>>>> ifcvf_hw
->>>>>>>>>>       vDPA/ifcvf: IRQ interfaces work on ifcvf_hw
->>>>>>>>>>       vDPA/ifcvf: allocate ifcvf_adapter in dev_add()
->>>>>>>>>>       vDPA/ifcvf: implement features provisioning
->>>>>>>>>>
->>>>>>>>>>      drivers/vdpa/ifcvf/ifcvf_base.c |  32 ++-----
->>>>>>>>>>      drivers/vdpa/ifcvf/ifcvf_base.h |  10 +-
->>>>>>>>>>      drivers/vdpa/ifcvf/ifcvf_main.c | 156
->>>>>>>>>> +++++++++++++++-----------------
->>>>>>>>>>      3 files changed, 89 insertions(+), 109 deletions(-)
->>>>>>>>>>
->>>>>>>>>> --
->>>>>>>>>> 2.31.1
->>>>>>>>>>
+diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
+index 536a34d099968d..76b3761a89423e 100644
+--- a/drivers/iommu/iommufd/device.c
++++ b/drivers/iommu/iommufd/device.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-/* Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
++/*
++ * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
+  */
+ #include <linux/iommufd.h>
+ #include <linux/slab.h>
+diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
+index 1eeb326f74f005..fc4c80ec0511f4 100644
+--- a/drivers/iommu/iommufd/main.c
++++ b/drivers/iommu/iommufd/main.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-/* Copyright (C) 2021 Intel Corporation
++/*
++ * Copyright (C) 2021 Intel Corporation
+  * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
+  *
+  * iommufd provides control over the IOMMU HW objects created by IOMMU kernel
 
+Thanks.
+
+-- 
+An old man doll... just what I always wanted! - Clara
