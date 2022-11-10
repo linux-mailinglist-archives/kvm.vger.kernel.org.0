@@ -2,140 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 200F9623CF0
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 08:53:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EF10623DB7
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 09:44:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232710AbiKJHw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 02:52:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58494 "EHLO
+        id S232885AbiKJIoa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 03:44:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232364AbiKJHwz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 02:52:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B45FE20F5A
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 23:52:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668066720;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0BukYDFp+3V0lSdmBo/7OCIgvVdGhW19qZEuq21xG+s=;
-        b=W6glME9WiAPrprNL0sXtFDK8KsNiiob8nOPYcEIO0/dW0Y8trhVO/uL89W6MrT+xRaPEp9
-        evPqUEgZO7FAOX+404EgbIFP9z9J6Icq8L2wNYHKfKjGAvtmMn5BdYfi9ydRwNo6jaCX9B
-        lWEvAZ46IKwAlCOcsyHjPqR7z7bnfVQ=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-204-Jkehuv4UN3yfpYpIaor4hA-1; Thu, 10 Nov 2022 02:51:59 -0500
-X-MC-Unique: Jkehuv4UN3yfpYpIaor4hA-1
-Received: by mail-pf1-f198.google.com with SMTP id x11-20020a056a000bcb00b0056c6ec11eefso656589pfu.14
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 23:51:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0BukYDFp+3V0lSdmBo/7OCIgvVdGhW19qZEuq21xG+s=;
-        b=yznoTyS2z76OC9RnQ+2IqF8yDhAc/y25XB+U0SpHSYgYsZWLd0BJN3PqqUmnKqYdrM
-         uv+cfo4TGRN5upYYqXW2nXgtrECJ+11zauAbpXvoPPZRkFMD3L3r6xWSdWK9GfRYrIhf
-         slGFzxyrd8SsI4RmdShwYMhbsZ+eTmbyKQV+iAHP/0FZY+GFumqfiH2FjFB7F9Yz7GKr
-         jrROvr7IhjvNjTPmSURqs1RGXiXrvPY9vwxpExH4w9iBCMneWLElcmSzBtK37nOxPxy2
-         JjFpu21UOvQUZfxedTike9oGd/u9wMjhuiBMf34GVu01on/6WhnvUJav98sN+VGLstPo
-         4IXw==
-X-Gm-Message-State: ACrzQf35xgIK29m6pedrgdfZ3DObItMUb+KQ7pChLXY5mFyBBKaKq5W7
-        eABh/NU9CLONduM/nDVSsPeQ+pLmsjktGAUuF1mbdVkfl9rvtI5Qwrq4navQCN+hp+oHNOgdP7w
-        KOVs+l4e6S2fH
-X-Received: by 2002:a05:6a00:3017:b0:56c:d93a:ac5f with SMTP id ay23-20020a056a00301700b0056cd93aac5fmr2047775pfb.48.1668066716034;
-        Wed, 09 Nov 2022 23:51:56 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM62llp4+rX7BDLVjqGS33okh97ITleFTCr5eit2hngy1azqFGjBcv7rs8d1DCZ+cEAoJNFZhw==
-X-Received: by 2002:a05:6a00:3017:b0:56c:d93a:ac5f with SMTP id ay23-20020a056a00301700b0056cd93aac5fmr2047760pfb.48.1668066715600;
-        Wed, 09 Nov 2022 23:51:55 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-234.retail.telecomitalia.it. [82.53.134.234])
-        by smtp.gmail.com with ESMTPSA id d10-20020a17090a628a00b0020669c8bd87sm2444283pjj.36.2022.11.09.23.51.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Nov 2022 23:51:55 -0800 (PST)
-Date:   Thu, 10 Nov 2022 08:51:42 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, eperezma@redhat.com,
-        netdev@vger.kernel.org, kvm@vger.kernel.org,
-        Gautam Dawar <gautam.dawar@xilinx.com>,
-        Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost-vdpa: fix potential memory leak during the release
-Message-ID: <20221110075142.f6yr7wagqa33rjjn@sgarzare-redhat>
-References: <20221109154213.146789-1-sgarzare@redhat.com>
- <20221109124430-mutt-send-email-mst@kernel.org>
+        with ESMTP id S229568AbiKJIo0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 03:44:26 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2692E2935C;
+        Thu, 10 Nov 2022 00:44:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668069865; x=1699605865;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kBkbc2MQ9c/NiFCQRoAmN+okU0cL5VhONw3TYm+Zy/Q=;
+  b=hb93gx1CTv7oyCqCIBMIdyDEOccsHVuW92kzYNOJQvPtXxTT4x0USNYa
+   MP/TCtJKuanwyJkbYXnhA4veCH0UUoxNBYlJY6ArKOCyLsHToplHSj/v3
+   wAm1fs/PsDEqtFbAVTT/ywDA3fot/9aFWJxYWAxHUZ7gU+fPmuLPdBY7f
+   rYreYxdFDMixja+rhYF7TENw2xxQvuBZwMhB647Z1A8P/3XFXZP9sPIac
+   j6bv+ki4gC+HHQzX+XIg3dYELQkgDunGVUyCkh2CmILCxKIQRedopTCpF
+   sGhPL9lgSavHVqHYDFkw8pWud1eMgceEaUjpYwfmJ4+00UptUQjqW2teb
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="308879708"
+X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
+   d="scan'208";a="308879708"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 00:44:24 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="779692262"
+X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
+   d="scan'208";a="779692262"
+Received: from shiningy-mobl1.ccr.corp.intel.com (HELO localhost) ([10.255.28.247])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 00:44:21 -0800
+Date:   Thu, 10 Nov 2022 16:44:19 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Eric Li <ercli@ucdavis.edu>,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Liu Jingqi <jingqi.liu@intel.com>
+Subject: Re: [PATCH v5 05/15] KVM: nVMX: Let userspace set nVMX MSR to any
+ _host_ supported value
+Message-ID: <20221110084418.t7iv5zlfgiu77gfn@linux.intel.com>
+References: <20221031163907.w64vyg5twzvv2nho@linux.intel.com>
+ <Y2ABrnRzg729ZZNI@google.com>
+ <20221101101801.zxcjswoesg2gltri@linux.intel.com>
+ <Y2FePYteNrEfZ7D5@google.com>
+ <20221102085414.fk2xss74jvtzs6mr@linux.intel.com>
+ <Y2Px90RQydMUoiRH@google.com>
+ <20221107082714.fq3sw7qii4unlcn2@linux.intel.com>
+ <Y2kfCz02tQSUkMKS@google.com>
+ <20221108102120.qdlgqlgvdi6wi22u@linux.intel.com>
+ <Y2qhaSr/d2ds+nqD@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221109124430-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <Y2qhaSr/d2ds+nqD@google.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 09, 2022 at 12:47:19PM -0500, Michael S. Tsirkin wrote:
->On Wed, Nov 09, 2022 at 04:42:13PM +0100, Stefano Garzarella wrote:
->> Before commit 3d5698793897 ("vhost-vdpa: introduce asid based IOTLB")
->> we call vhost_vdpa_iotlb_unmap(v, iotlb, 0ULL, 0ULL - 1) during the
->> release to free all the resources allocated when processing user IOTLB
->> messages through vhost_vdpa_process_iotlb_update().
->> That commit changed the handling of IOTLB a bit, and we accidentally
->> removed some code called during the release.
->>
->> We partially fixed with commit 037d4305569a ("vhost-vdpa: call
->> vhost_vdpa_cleanup during the release") but a potential memory leak is
->> still there as showed by kmemleak if the application does not send
->> VHOST_IOTLB_INVALIDATE or crashes:
->>
->>   unreferenced object 0xffff888007fbaa30 (size 16):
->>     comm "blkio-bench", pid 914, jiffies 4294993521 (age 885.500s)
->>     hex dump (first 16 bytes):
->>       40 73 41 07 80 88 ff ff 00 00 00 00 00 00 00 00  @sA.............
->>     backtrace:
->>       [<0000000087736d2a>] kmem_cache_alloc_trace+0x142/0x1c0
->>       [<0000000060740f50>] vhost_vdpa_process_iotlb_msg+0x68c/0x901 [vhost_vdpa]
->>       [<0000000083e8e205>] vhost_chr_write_iter+0xc0/0x4a0 [vhost]
->>       [<000000008f2f414a>] vhost_vdpa_chr_write_iter+0x18/0x20 [vhost_vdpa]
->>       [<00000000de1cd4a0>] vfs_write+0x216/0x4b0
->>       [<00000000a2850200>] ksys_write+0x71/0xf0
->>       [<00000000de8e720b>] __x64_sys_write+0x19/0x20
->>       [<0000000018b12cbb>] do_syscall_64+0x3f/0x90
->>       [<00000000986ec465>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
->>
->> Let's fix calling vhost_vdpa_iotlb_unmap() on the whole range in
->> vhost_vdpa_remove_as(). We move that call before vhost_dev_cleanup()
->> since we need a valid v->vdev.mm in vhost_vdpa_pa_unmap().
->> vhost_iotlb_reset() call can be removed, since vhost_vdpa_iotlb_unmap()
->> on the whole range removes all the entries.
->>
->> The kmemleak log reported was observed with a vDPA device that has `use_va`
->> set to true (e.g. VDUSE). This patch has been tested with both types of
->> devices.
->>
->> Fixes: 037d4305569a ("vhost-vdpa: call vhost_vdpa_cleanup during the release")
->> Fixes: 3d5698793897 ("vhost-vdpa: introduce asid based IOTLB")
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->
->It's fine, just pls don't say "potential" here in the subject, let's
->avoid pleonasms
+> 
+> No.  Again, KVM _should never_ manipulate VMX MSRs in response to CPUID changes.
+> Keeping the existing behavior would be done purely to maintain backwards
+> compability with existing userspace, not because it's strictly the right thing to do.
+> 
+> E.g. as a strawman, a weird userspace could do KVM_SET_MSRS => KVM_SET_CPUID =>
+> KVM_SET_CPUID, where the first KVM_SET_CPUID reset to a base config and the second
+> KVM_SET_CPUID incorporates "optional" features.  In that case, clearing bits in
+> the VMX MSRs on the first KVM_SET_CPUID would do the wrong thing if the second
+> KVM_SET_CPUID enabled the relevant features.
+> 
+> AFAIK, no userspace actually does something odd like that, whereas there are VMMs
+> that do KVM_SET_MSRS before KVM_SET_CPUID, e.g. disable a feature in VMX MSRs but
+> later enable the feature in CPUID for L1.  And so disabling features is likely
+> safe-ish, but enabling feature most definitely can cause problems for userspace.
+> 
+> Hrm, actually, there are likely older VMMs that never set VMX MSRs, and so dropping
+> the "enable features" code might not be safe either.  Grr.  The obvious solution
+> would be to add a quirk, but maybe we can avoid a quirk by skipping KVM's
+> misguided updates if userspace has set the MSR.  That should work for a userspace
+> that deliberately sets the MSR during setup, and for a userspace that blindly
+> migrates the MSR since the migrated value should already be correct/sane.
+> 
+Oh. Just saw your new selftest code, and fininally get your point(I hope
+so...).  Thanks!
 
-Got it, I'll avoid in the future.
+> > BTW, I found my previous understanding of what vmx_adjust_secondary_exec_control()
+> > currently does was also wrong. It could also be used for EXITING controls. And
+> > for such flags(e.g., SECONDARY_EXEC_RDRAND_EXITING), values for the nested settings
+> > (vmx->nested.msrs.secondary_ctls_high) and for the L1 execution controls(*exec_control)
+> > could be opposite. So the statement:
+> > 	"1> For now, what vmx_adjust_secondary_exec_control() does, is to enable/
+> > 	 disable a feature in VMX MSR(and nVMX MSR) based on cpuid changes."
+> > is wrong.
+> 
+> No, it's correct.  The EXITING controls are just inverted feature flags.  E.g. if
+> RDRAND is disabled in CPUID, KVM sets the EXITING control so that KVM intercepts
+> RDRAND in order to inject #UD.
+> 
+> 	[EXIT_REASON_RDRAND]                  = kvm_handle_invalid_op,
+> 
 
->- it's a memory leak, yes it triggers under some coditions
->but little is unconditional in this world :)
+Well, suppose
+- cpu_has_vmx_rdrand() is true;
+- meanwhile guest_cpuid_has(vcpu, X86_FEATURE_RDRAND) is false.
 
-Nothing could be more true :-)
+And then, what vmx_adjust_secondary_exec_control() currently does is:
+1> keep the SECONDARY_EXEC_RDRAND_EXITING set in L1 secondary proc-
+based execution control.
+2> and then clear the SECONDARY_EXEC_RDRAND_EXITING in the high bits
+of IA32_VMX_PROCBASED_CTLS2 MSR for nested by
+        vmx->nested.msrs.secondary_ctls_high &= ~control;
+That means for L1 VMM, SECONDARY_EXEC_RDRAND_EXITING must be cleared
+in its(VMCS12's) secondary proc-based VM-execution control, even when
+rdrand is disabled in L1's and L2's CPUID.
 
->
->No need to repost.
->
+I wonder, for native environment, if an instruction is not supported,
+will the allowed 1-setting for its corresponding exiting feature in
+IA32_VMX_PROCBASED_CTLS2 MSR be set, or be cleared? Maybe it should
+be cleared, and executing such instruction in non-root will just get
+a #UD directly instead of triggering a VM-Exit?
 
-Thanks,
-Stefano
+Note: I do not think this will cause any problem, just curious if L1
+VMM can observe a behavior that's not supposed to be in native scenario(
+only because what we are doing in KVM). 
+
+B.R.
+Yu
 
