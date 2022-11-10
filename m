@@ -2,103 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 820B8623FBE
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 11:26:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A3F8623FBF
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 11:28:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229669AbiKJK0L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 05:26:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55210 "EHLO
+        id S229541AbiKJK2t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 05:28:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230097AbiKJK0G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 05:26:06 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BB96663DC
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 02:26:01 -0800 (PST)
+        with ESMTP id S229463AbiKJK2s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 05:28:48 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7E2E17597
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 02:28:47 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AF20561218
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 10:26:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1099DC433C1;
-        Thu, 10 Nov 2022 10:26:00 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7F8CCB82164
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 10:28:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2698BC433C1;
+        Thu, 10 Nov 2022 10:28:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668075960;
-        bh=usVvc3qUSQzUyfwxt7bBhJT3G4j6rz4r+fc3JVOfoHM=;
+        s=k20201202; t=1668076125;
+        bh=xXzZzs5/fLCfogb13unEvFd90Zp8K6Hd5OUAlRpv9fM=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ZfHO/A++9eV+bGyB9OV1AWT0/Z3ZHUQTBRPipeaAgPfF3Cl+i2WCaoT+sX7XX4YzF
-         yB8AYZyiCieu22R1vmylE8/UpHLkH1A0ETcdTSHvNUiewF9jwN68Ept7f9tz4jY3Jh
-         QCTHbvCGJzijmcRR7GBYe1GpSwxeSllvWkAM+wN5xUhhHrCsP99yHPQHtls7FZlU1s
-         IA0nt4hLT00Q1KZCS/JHYKCbwkOSKPlZ8p3cJVRrsSnpKyi+/NWJyAjmKe6WueOlkG
-         SzoneKfJGPQPHEvVTezhDsP5B9oXe7wDXQbK+59w0uF9dcc8UAOdTS5EzD7hQ4ayDR
-         U/hO9KL/VtsPA==
+        b=Pjk7wWdQedbJEOMbhGjbTOxS6rpJFsew3Q8W/0QQgV0USCNbRLtt1QwSP2Hh//abw
+         ps6pfE4HuGSbOBI0rGl1l1w1CsJ9ysdXLcw3T0mybccPyn21r/OTp7uXd1HE8jImHl
+         BGaxxrrzZZaXytbZz2VQ12ENuMLgZnTNz+UxfkgzRU7zXam5B0nVMcCdB2UfRczQrb
+         WAVA+yU1rPpo+Wi7HUlkX3lxrM2j2j7BuZ3AECkn3LcfaGVEy7xKHhQki9s1JpACaM
+         QkaS1AjHvlf5BmR6wOuxOfJVszD09uIDQbEV57hEWR+8vreHyqsbrpXslH/ehZodQj
+         VWSLyPNoVHqrA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1ot4kv-0057cS-HF;
-        Thu, 10 Nov 2022 10:25:57 +0000
-Date:   Thu, 10 Nov 2022 10:25:57 +0000
-Message-ID: <86sfirp0lm.wl-maz@kernel.org>
+        id 1ot4na-0057df-Qg;
+        Thu, 10 Nov 2022 10:28:43 +0000
+Date:   Thu, 10 Nov 2022 10:28:42 +0000
+Message-ID: <86r0ybp0h1.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
-        ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com,
-        will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
-        pbonzini@redhat.com, peterx@redhat.com, oliver.upton@linux.dev,
-        zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v9 3/7] KVM: Support dirty ring in conjunction with bitmap
-In-Reply-To: <672eb11b-19db-9a9f-1898-8d2af0d45724@redhat.com>
-References: <20221108041039.111145-1-gshan@redhat.com>
-        <20221108041039.111145-4-gshan@redhat.com>
-        <Y2qDCqFeL1vwqq3f@google.com>
-        <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
-        <Y2rurDmCrXZaxY8F@google.com>
-        <49c18201-b73a-b654-7f8a-77befa80c61b@redhat.com>
-        <Y2r1ErahBE3+Dsv8@google.com>
-        <672eb11b-19db-9a9f-1898-8d2af0d45724@redhat.com>
+To:     "chenxiang (M)" <chenxiang66@hisilicon.com>
+Cc:     <alex.williamson@redhat.com>, <kvm@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, <linuxarm@huawei.com>
+Subject: Re: [PATCH] KVM: Add system call KVM_VERIFY_MSI to verify MSI vector
+In-Reply-To: <a55310da-2ed3-f837-71c2-d09764f83538@hisilicon.com>
+References: <1667894937-175291-1-git-send-email-chenxiang66@hisilicon.com>
+        <86wn85pq8f.wl-maz@kernel.org>
+        <a55310da-2ed3-f837-71c2-d09764f83538@hisilicon.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gshan@redhat.com, seanjc@google.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com, will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com, peterx@redhat.com, oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Rcpt-To: chenxiang66@hisilicon.com, alex.williamson@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, linuxarm@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Gavin,
+On Wed, 09 Nov 2022 06:21:18 +0000,
+"chenxiang (M)" <chenxiang66@hisilicon.com> wrote:
+>=20
+> Hi Marc,
+>=20
+>=20
+> =E5=9C=A8 2022/11/8 20:47, Marc Zyngier =E5=86=99=E9=81=93:
+> > On Tue, 08 Nov 2022 08:08:57 +0000,
+> > chenxiang <chenxiang66@hisilicon.com> wrote:
+> >> From: Xiang Chen <chenxiang66@hisilicon.com>
+> >>=20
+> >> Currently the numbers of MSI vectors come from register PCI_MSI_FLAGS
+> >> which should be power-of-2, but in some scenaries it is not the same as
+> >> the number that driver requires in guest, for example, a PCI driver wa=
+nts
+> >> to allocate 6 MSI vecotrs in guest, but as the limitation, it will all=
+ocate
+> >> 8 MSI vectors. So it requires 8 MSI vectors in qemu while the driver in
+> >> guest only wants to allocate 6 MSI vectors.
+> >>=20
+> >> When GICv4.1 is enabled, we can see some exception print as following =
+for
+> >> above scenaro:
+> >> vfio-pci 0000:3a:00.1: irq bypass producer (token 000000008f08224d) re=
+gistration fails:66311
+> >>=20
+> >> In order to verify whether a MSI vector is valid, add KVM_VERIFY_MSI t=
+o do
+> >> that. If there is a mapping, return 0, otherwise return negative value.
+> >>=20
+> >> This is the kernel part of adding system call KVM_VERIFY_MSI.
+> > Exposing something that is an internal implementation detail to
+> > userspace feels like the absolute wrong way to solve this issue.
+> >=20
+> > Can you please characterise the issue you're having? Is it that vfio
+> > tries to enable an interrupt for which there is no virtual ITS
+> > mapping? Shouldn't we instead try and manage this in the kernel?
+>=20
+> Before i reported the issue to community, you gave a suggestion about
+> the issue, but not sure whether i misundertood your meaning.
+> You can refer to the link for more details about the issue.
+> https://lkml.kernel.org/lkml/87cze9lcut.wl-maz@kernel.org/T/
 
-On Wed, 09 Nov 2022 00:51:21 +0000,
-Gavin Shan <gshan@redhat.com> wrote:
-> 
-> On 11/9/22 8:32 AM, Sean Christopherson wrote:
-> > That said, there're no remaining issues that can't be sorted out
-> > on top, so don't hold up v10 if I don't look at it in a timely
-> > manner for whatever reason.  I agree with Marc that it'd be good
-> > to get this in -next sooner than later.
-> > 
-> 
-> Sure. I would give v9 a few days, prior to posting v10. I'm not sure
-> if other people still have concerns. If there are more comments, I
-> want to address all of them in v10 :)
+Right. It would have been helpful to mention this earlier. Anyway, I
+would really like this to be done without involving userspace at all.
 
-Please post v10 ASAP. I'm a bit behind on queuing stuff, and I'll be
-travelling next week, making it a bit more difficult to be on top of
-things. So whatever I can put into -next now is good.
+But first, can you please confirm that the VM works as expected
+despite the message? If that's the case, we only need to handle the
+case where this is a multi-MSI setup, and I think this can be done in
+VFIO, without involving userspace.
 
 Thanks,
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
