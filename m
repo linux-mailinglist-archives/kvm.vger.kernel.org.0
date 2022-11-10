@@ -2,74 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF2576242A6
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 13:57:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A0836242F7
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 14:11:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229593AbiKJM54 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 07:57:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53444 "EHLO
+        id S230449AbiKJNLH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 08:11:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbiKJM5z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 07:57:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89F6F1FFB8
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 04:56:54 -0800 (PST)
+        with ESMTP id S230445AbiKJNKp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 08:10:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7654299
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 05:09:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668085013;
+        s=mimecast20190719; t=1668085786;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jS8OHYvX+RFJyPMobgu3Swmgc9dl0FKn3jnAC7W8AEY=;
-        b=KGUf7M8QoCv5gxuMaRVJfqSHx9mYq1k6Q5gFntS+7qrsPXskxFfkJfAEznFzMpQnHPNLnO
-        kR6bIlqkabqIJTNLSzeNSSaPUyZffEr3s/qoQLDnQllF7dnjfZE4me6lgxX5As+eyc4FkI
-        eumWNCQDKF5bDwdp0MMB+xwBTNPmsAE=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=g7yzyeLEGg0cjDYwQZn2MaPQ/bepIB2IEoD4XBCdYOM=;
+        b=VdPQwJTiykdNd9VxldGZwtp7pp3R6M9DYXkRHZmXZsV/cUApSZul3my/Um/PowMsLEPs8K
+        pyt0ZJRbKgfKpossx7LZY+J5HngkHIIw71aN9MwBhCJdWw7/5DxlVr2oODejj/zFVpeBAm
+        rPfuArpictcoD8CtsbKVk2YsznZfq3w=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-481-AGFS8sRpN-icPqhCe6wPPA-1; Thu, 10 Nov 2022 07:56:52 -0500
-X-MC-Unique: AGFS8sRpN-icPqhCe6wPPA-1
-Received: by mail-pg1-f200.google.com with SMTP id x23-20020a634857000000b0043c700f6441so961729pgk.21
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 04:56:52 -0800 (PST)
+ us-mta-204-YufLHzHIPfKrRAoBbhjQCA-1; Thu, 10 Nov 2022 08:09:45 -0500
+X-MC-Unique: YufLHzHIPfKrRAoBbhjQCA-1
+Received: by mail-pf1-f200.google.com with SMTP id e8-20020a056a00162800b0056e953c5088so1028439pfc.2
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 05:09:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jS8OHYvX+RFJyPMobgu3Swmgc9dl0FKn3jnAC7W8AEY=;
-        b=PGQM8jldvWvtSQ9YuJSOesZs5jZqh7Et2bOw1DLF7mtZASJFxvpCoaVaoVCwjrPOma
-         DCj7N4d0/tIhhSLMbUjClnRDlKF88XhePAjF/IF3pe807GOJQIZ9IyxmP8c2w0Dd5J+R
-         YUoiRxrFnYmCu7GSOFl3w/19mHUdKS5y4DQQdYew9w630Dd9mzi96bGtXB9dMNQfcQlX
-         R1TmxN5eFDceYeTj3pTFfPyRPg14Yv9InEzzgQm657tN7cHlBNEZHsGeuC3bHYuXAjGC
-         Y5C2C5Wykxwzc6vZSFdTLUNIod/SlztnABB5h9j0vVID/zgun4GjmgHyPtIeELv/Ll9K
-         PHaw==
-X-Gm-Message-State: ACrzQf2zLJj6IeaQG5HJSHHgpaE66wCSvONuwpNMpQz1zxY2QkBQ6/Y4
-        WMMBRJe1eH8fiMO3alm4giqZPe4B6xCbubGVRdJyojG3q903Ub7SPUwkYuKbEuFkfE/wEbE+F06
-        ow9zKSHbI5JWibq8ceJOvGvcp4kTL
-X-Received: by 2002:a63:40c4:0:b0:470:18d5:e914 with SMTP id n187-20020a6340c4000000b0047018d5e914mr35128927pga.58.1668085011364;
-        Thu, 10 Nov 2022 04:56:51 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM73AiJ/tFA+L0uf7V/sAqT2Ut/jA/N6LjkyupDWLgaZJP43gptz6xz4rukdQyecVU9Fj8PKSI/Z2Nj87VjS1Bc=
-X-Received: by 2002:a63:40c4:0:b0:470:18d5:e914 with SMTP id
- n187-20020a6340c4000000b0047018d5e914mr35128918pga.58.1668085011097; Thu, 10
- Nov 2022 04:56:51 -0800 (PST)
+        bh=g7yzyeLEGg0cjDYwQZn2MaPQ/bepIB2IEoD4XBCdYOM=;
+        b=Eu2SJRH+trpNFFLHYevZ/7/1lnKOONCyvfUAiWgMEb1XLEVvBAMYsqX317S0jdz8mf
+         aaL2JKc1wtawH+OaI77PWYeRunEUBaXM1Ok8yhBEUyGvfUzgumstn21+pSatwQzj5P8w
+         6fNTx/A3nHGX81+41iRyj5ys83+GDX39p9uOacBMCFM0hpxu8Iy6mkxrjdSRuwmSQOkZ
+         15yLbaYNT6//yiByZqZOphJX/IWHSRhfvWRwWH40klq7xPQXXCRokR/YH4SpCV7iiF34
+         UD29nycse3SuRMTRlLrzA9q+X3jTOIPJjk4Kj0Evw4zEkhhwVFvXmQHsiVuAQiSTamp0
+         jHHA==
+X-Gm-Message-State: ACrzQf0DH2rlisrIPaIrK94ymMKWzDkLRT5QwbEvxv7m6RNCpOKBTAIC
+        +4nijIImyLs9XN/7C3xin13xIKHE1Bzh55dxL7ftXTQ8ocQunxfh75wfkZWsygYLAZZEJthhBdv
+        HPVVoLASsgvp6dsupWUZhkgB/nGq6
+X-Received: by 2002:a17:902:ce82:b0:187:3591:edac with SMTP id f2-20020a170902ce8200b001873591edacmr48453114plg.153.1668085783799;
+        Thu, 10 Nov 2022 05:09:43 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM6KOEWfHhPK/2I37RD9J6zoYrru3BZj2gmnXvReWU8tS7nSkaqP/coNopRBOSYlstVFJkhfgWl9FCCsZ/0xYEE=
+X-Received: by 2002:a17:902:ce82:b0:187:3591:edac with SMTP id
+ f2-20020a170902ce8200b001873591edacmr48453093plg.153.1668085783523; Thu, 10
+ Nov 2022 05:09:43 -0800 (PST)
 MIME-Version: 1.0
-References: <20221108170755.92768-1-eperezma@redhat.com> <20221110072455-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20221110072455-mutt-send-email-mst@kernel.org>
+References: <20221108170755.92768-1-eperezma@redhat.com> <20221108170755.92768-6-eperezma@redhat.com>
+ <56bfad97-74d2-8570-c391-83ecf9965cfd@redhat.com>
+In-Reply-To: <56bfad97-74d2-8570-c391-83ecf9965cfd@redhat.com>
 From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Thu, 10 Nov 2022 13:56:14 +0100
-Message-ID: <CAJaqyWfCC9W_Dec3EqSxBk_CQ9E-CRDu947EKfyQtxQNZXeDOw@mail.gmail.com>
-Subject: Re: [PATCH v6 00/10] ASID support in vhost-vdpa net
-To:     "Michael S. Tsirkin" <mst@redhat.com>
+Date:   Thu, 10 Nov 2022 14:09:07 +0100
+Message-ID: <CAJaqyWd47QdBoSm9RdF2yx21hKv_=YRp3uvP13Qb9PaVksss7Q@mail.gmail.com>
+Subject: Re: [PATCH v6 05/10] vdpa: move SVQ vring features check to net/
+To:     Jason Wang <jasowang@redhat.com>
 Cc:     qemu-devel@nongnu.org, Parav Pandit <parav@mellanox.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Si-Wei Liu <si-wei.liu@oracle.com>,
         Laurent Vivier <lvivier@redhat.com>,
         Harpreet Singh Anand <hanand@xilinx.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
         Gautam Dawar <gdawar@xilinx.com>,
         Liuxiangdong <liuxiangdong5@huawei.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, Cindy Lu <lulu@redhat.com>,
-        Eli Cohen <eli@mellanox.com>,
+        Cindy Lu <lulu@redhat.com>, Eli Cohen <eli@mellanox.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Zhu Lingshan <lingshan.zhu@intel.com>, kvm@vger.kernel.org,
         "Gonglei (Arei)" <arei.gonglei@huawei.com>,
@@ -86,91 +87,133 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 10, 2022 at 1:25 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Tue, Nov 08, 2022 at 06:07:45PM +0100, Eugenio P=C3=A9rez wrote:
-> > Control VQ is the way net devices use to send changes to the device sta=
-te, like
-> > the number of active queues or its mac address.
-> >
-> > QEMU needs to intercept this queue so it can track these changes and is=
- able to
-> > migrate the device. It can do it from 1576dbb5bbc4 ("vdpa: Add x-svq to
-> > NetdevVhostVDPAOptions"). However, to enable x-svq implies to shadow al=
-l VirtIO
-> > device's virtqueues, which will damage performance.
-> >
-> > This series adds address space isolation, so the device and the guest
-> > communicate directly with them (passthrough) and CVQ communication is s=
-plit in
-> > two: The guest communicates with QEMU and QEMU forwards the commands to=
- the
-> > device.
-> >
-> > Comments are welcome. Thanks!
+On Thu, Nov 10, 2022 at 6:40 AM Jason Wang <jasowang@redhat.com> wrote:
 >
 >
-> This is not 7.2 material, right?
+> =E5=9C=A8 2022/11/9 01:07, Eugenio P=C3=A9rez =E5=86=99=E9=81=93:
+> > The next patches will start control SVQ if possible. However, we don't
+> > know if that will be possible at qemu boot anymore.
+>
+>
+> If I was not wrong, there's no device specific feature that is checked
+> in the function. So it should be general enough to be used by devices
+> other than net. Then I don't see any advantage of doing this.
 >
 
-No it is not.
+Because vhost_vdpa_init_svq is called at qemu boot, failing if it is
+not possible to shadow the Virtqueue.
 
-I should have noted it after PATCH in the subject, sorry.
+Now the CVQ will be shadowed if possible, so we need to check this at
+device start, not at initialization. To store this information at boot
+time is not valid anymore, because v->shadow_vqs_enabled is not valid
+at this time anymore.
 
-> > v6:
-> > - Do not allocate SVQ resources like file descriptors if SVQ cannot be =
-used.
-> > - Disable shadow CVQ if the device does not support it because of net
-> >   features.
+Thanks!
+
+> Thanks
+>
+>
 > >
-> > v5:
-> > - Move vring state in vhost_vdpa_get_vring_group instead of using a
-> >   parameter.
-> > - Rename VHOST_VDPA_NET_CVQ_PASSTHROUGH to VHOST_VDPA_NET_DATA_ASID
+> > Since the moved checks will be already evaluated at net/ to know if it
+> > is ok to shadow CVQ, move them.
 > >
-> > v4:
-> > - Rebased on last CVQ start series, that allocated CVQ cmd bufs at load
-> > - Squash vhost_vdpa_cvq_group_is_independent.
-> > - Do not check for cvq index on vhost_vdpa_net_prepare, we only have on=
-e
-> >   that callback registered in that NetClientInfo.
-> > - Add comment specifying behavior if device does not support _F_ASID
-> > - Update headers to a later Linux commit to not to remove SETUP_RNG_SEE=
-D
+> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > ---
+> >   hw/virtio/vhost-vdpa.c | 33 ++-------------------------------
+> >   net/vhost-vdpa.c       |  3 ++-
+> >   2 files changed, 4 insertions(+), 32 deletions(-)
 > >
-> > v3:
-> > - Do not return an error but just print a warning if vdpa device initia=
-lization
-> >   returns failure while getting AS num of VQ groups
-> > - Delete extra newline
+> > diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+> > index 3df2775760..146f0dcb40 100644
+> > --- a/hw/virtio/vhost-vdpa.c
+> > +++ b/hw/virtio/vhost-vdpa.c
+> > @@ -402,29 +402,9 @@ static int vhost_vdpa_get_dev_features(struct vhos=
+t_dev *dev,
+> >       return ret;
+> >   }
 > >
-> > v2:
-> > - Much as commented on series [1], handle vhost_net backend through
-> >   NetClientInfo callbacks instead of directly.
-> > - Fix not freeing SVQ properly when device does not support CVQ
-> > - Add BIT_ULL missed checking device's backend feature for _F_ASID.
+> > -static int vhost_vdpa_init_svq(struct vhost_dev *hdev, struct vhost_vd=
+pa *v,
+> > -                               Error **errp)
+> > +static void vhost_vdpa_init_svq(struct vhost_dev *hdev, struct vhost_v=
+dpa *v)
+> >   {
+> >       g_autoptr(GPtrArray) shadow_vqs =3D NULL;
+> > -    uint64_t dev_features, svq_features;
+> > -    int r;
+> > -    bool ok;
+> > -
+> > -    if (!v->shadow_vqs_enabled) {
+> > -        return 0;
+> > -    }
+> > -
+> > -    r =3D vhost_vdpa_get_dev_features(hdev, &dev_features);
+> > -    if (r !=3D 0) {
+> > -        error_setg_errno(errp, -r, "Can't get vdpa device features");
+> > -        return r;
+> > -    }
+> > -
+> > -    svq_features =3D dev_features;
+> > -    ok =3D vhost_svq_valid_features(svq_features, errp);
+> > -    if (unlikely(!ok)) {
+> > -        return -1;
+> > -    }
 > >
-> > Eugenio P=C3=A9rez (10):
-> >   vdpa: Use v->shadow_vqs_enabled in vhost_vdpa_svqs_start & stop
-> >   vhost: set SVQ device call handler at SVQ start
-> >   vhost: Allocate SVQ device file descriptors at device start
-> >   vdpa: add vhost_vdpa_net_valid_svq_features
-> >   vdpa: move SVQ vring features check to net/
-> >   vdpa: Allocate SVQ unconditionally
-> >   vdpa: Add asid parameter to vhost_vdpa_dma_map/unmap
-> >   vdpa: Store x-svq parameter in VhostVDPAState
-> >   vdpa: Add listener_shadow_vq to vhost_vdpa
-> >   vdpa: Always start CVQ in SVQ mode
+> >       shadow_vqs =3D g_ptr_array_new_full(hdev->nvqs, vhost_svq_free);
+> >       for (unsigned n =3D 0; n < hdev->nvqs; ++n) {
+> > @@ -436,7 +416,6 @@ static int vhost_vdpa_init_svq(struct vhost_dev *hd=
+ev, struct vhost_vdpa *v,
+> >       }
 > >
-> >  include/hw/virtio/vhost-vdpa.h     |  10 +-
-> >  hw/virtio/vhost-shadow-virtqueue.c |  35 +-----
-> >  hw/virtio/vhost-vdpa.c             | 114 ++++++++++---------
-> >  net/vhost-vdpa.c                   | 171 ++++++++++++++++++++++++++---
-> >  hw/virtio/trace-events             |   4 +-
-> >  5 files changed, 222 insertions(+), 112 deletions(-)
+> >       v->shadow_vqs =3D g_steal_pointer(&shadow_vqs);
+> > -    return 0;
+> >   }
 > >
-> > --
-> > 2.31.1
+> >   static int vhost_vdpa_init(struct vhost_dev *dev, void *opaque, Error=
+ **errp)
+> > @@ -461,11 +440,7 @@ static int vhost_vdpa_init(struct vhost_dev *dev, =
+void *opaque, Error **errp)
+> >       dev->opaque =3D  opaque ;
+> >       v->listener =3D vhost_vdpa_memory_listener;
+> >       v->msg_type =3D VHOST_IOTLB_MSG_V2;
+> > -    ret =3D vhost_vdpa_init_svq(dev, v, errp);
+> > -    if (ret) {
+> > -        goto err;
+> > -    }
+> > -
+> > +    vhost_vdpa_init_svq(dev, v);
+> >       vhost_vdpa_get_iova_range(v);
 > >
+> >       if (!vhost_vdpa_first_dev(dev)) {
+> > @@ -476,10 +451,6 @@ static int vhost_vdpa_init(struct vhost_dev *dev, =
+void *opaque, Error **errp)
+> >                                  VIRTIO_CONFIG_S_DRIVER);
+> >
+> >       return 0;
+> > -
+> > -err:
+> > -    ram_block_discard_disable(false);
+> > -    return ret;
+> >   }
+> >
+> >   static void vhost_vdpa_host_notifier_uninit(struct vhost_dev *dev,
+> > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> > index d3b1de481b..fb35b17ab4 100644
+> > --- a/net/vhost-vdpa.c
+> > +++ b/net/vhost-vdpa.c
+> > @@ -117,9 +117,10 @@ static bool vhost_vdpa_net_valid_svq_features(uint=
+64_t features, Error **errp)
+> >       if (invalid_dev_features) {
+> >           error_setg(errp, "vdpa svq does not work with features 0x%" P=
+RIx64,
+> >                      invalid_dev_features);
+> > +        return false;
+> >       }
+> >
+> > -    return !invalid_dev_features;
+> > +    return vhost_svq_valid_features(features, errp);
+> >   }
+> >
+> >   static int vhost_vdpa_net_check_device_id(struct vhost_net *net)
 >
 
