@@ -2,110 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F9D8623E09
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 09:54:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 631A2623E19
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 09:56:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232903AbiKJIyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 03:54:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57880 "EHLO
+        id S229555AbiKJI4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 03:56:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232589AbiKJIx6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 03:53:58 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44E7DB73;
-        Thu, 10 Nov 2022 00:53:58 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2AA8g8ok030252;
-        Thu, 10 Nov 2022 08:53:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- from : to : subject : message-id : date; s=pp1;
- bh=uz/aImqsgxHCq9BN4+ASQhwVId+s2B0fl/1A02hRKP4=;
- b=h7RmZrUWAkK9Ygc4JCNZWF71Nh8ZgSDlFELUGTwOllt1Xang6a/rS2ZV8HhG8YpbBkXP
- fXwn7SKgpdGxAtzydzl873H1XM4VBVGYcWGFJVxTn/sf4jocTVMEsMXHg+xRvV5e1ILs
- XhXrV3Cv4NYXFpeaOvbe5VTA4ti8ZHaZlboHcSdq83B5iKdRBKX6AGbivsxRo+8dadsB
- lOVVKG19X53IJLyNXeJS1G/J2R99C+SCnCoGfnKbok0v/oe8KCgYI2fcjY2PFgFCBWCI
- jZFJLqDDWhF9QoGAtz8WCYkMGYRlLuEwni2TWXb76u2EOpGLkSNYOAwRBRO2UZ/pwTxT 1w== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3krx0yrdk5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Nov 2022 08:53:57 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AA8bIQ3009484;
-        Thu, 10 Nov 2022 08:53:55 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3kngqdewds-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Nov 2022 08:53:55 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AA8rqJo62194024
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Nov 2022 08:53:52 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 37FEEAE057;
-        Thu, 10 Nov 2022 08:53:52 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1990AAE056;
-        Thu, 10 Nov 2022 08:53:52 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.74.83])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 10 Nov 2022 08:53:52 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S229508AbiKJI4t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 03:56:49 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3510A3F078;
+        Thu, 10 Nov 2022 00:56:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=l+TRjxo7IPalxZWdUpMe9P3L9tHl56uBoUPSHQDClug=; b=itZ6NJLr08T6NzZSXaCaokzqO7
+        nOoBXXdFOAhHkbIveoPKgHiz4exubCS5EHcbAl4GCqVtd6aq5aVGLEve9xeoBAWkz1h33SbmL6g5B
+        tNNvQRm0Eg53EpuKMxNRNTkhdz6ytqB+JhsMo8ATtae1cRXJGocWeNEHgBluPxA6VsPmQxXLoLFSV
+        Cmz4V54lT1BoIoJ+ThQ5n9LaGSebcHqEcaKbOphN2NHSRl6/1bCepiJgu4BJfZbbkrgS6LBEW8pvc
+        zXtpz0gyDbVY2Q0zEHXl1BGIVqEAAL//f2ASd0FD7Nu444FBU3ksT1OEjNuMvEpnvjac3Zq7kNkzh
+        Si/nDkzA==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ot3Lu-00AF2Q-OK; Thu, 10 Nov 2022 08:56:10 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 2E700300137;
+        Thu, 10 Nov 2022 09:56:01 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 11C02201A6C3D; Thu, 10 Nov 2022 09:56:01 +0100 (CET)
+Date:   Thu, 10 Nov 2022 09:56:01 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Xin Li <xin3.li@intel.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, seanjc@google.com,
+        pbonzini@redhat.com, kevin.tian@intel.com
+Subject: Re: [RESEND PATCH 2/6] x86/traps: add a system interrupt table for
+ system interrupt dispatch
+Message-ID: <Y2y8obdYDXo9vlH/@hirez.programming.kicks-ass.net>
+References: <20221110061545.1531-1-xin3.li@intel.com>
+ <20221110061545.1531-3-xin3.li@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20221109202157.1050545-3-farman@linux.ibm.com>
-References: <20221109202157.1050545-1-farman@linux.ibm.com> <20221109202157.1050545-3-farman@linux.ibm.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        Eric Farman <farman@linux.ibm.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>
-Subject: Re: [PATCH 2/2] vfio/ccw: identify CCW data addresses as physical
-Message-ID: <166807043186.13521.16767588635336490628@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Thu, 10 Nov 2022 09:53:51 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: mV9gJ0PJyAB5R1gRr_J0jeu4slNtQ9oO
-X-Proofpoint-ORIG-GUID: mV9gJ0PJyAB5R1gRr_J0jeu4slNtQ9oO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-10_06,2022-11-09_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 mlxlogscore=766 priorityscore=1501 bulkscore=0
- adultscore=0 suspectscore=0 clxscore=1015 mlxscore=0 spamscore=0
- malwarescore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2210170000 definitions=main-2211100064
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221110061545.1531-3-xin3.li@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Eric Farman (2022-11-09 21:21:57)
-> The CCW data address created by vfio-ccw is that of an IDAL
-> built by this code. Since this address is used by real hardware,
-> it should be a physical address rather than a virtual one.
-> Let's clarify it as such in the ORB.
->=20
-> Similarly, once the I/O has completed the memory for that IDAL
-> needs to be released, so convert the CCW data address back to
-> a virtual address so that kfree() can process it.
->=20
-> Note: this currently doesn't fix a real bug, since virtual
-> addresses are identical to physical ones.
->=20
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+On Wed, Nov 09, 2022 at 10:15:41PM -0800, Xin Li wrote:
+> Upon receiving an external interrupt, KVM VMX reinjects it through
+> calling the interrupt handler in its IDT descriptor on the current
+> kernel stack, which essentially uses the IDT as an interrupt dispatch
+> table.
+> 
+> However the IDT is one of the lowest level critical data structures
+> between a x86 CPU and the Linux kernel, we should avoid using it
+> *directly* whenever possible, espeically in a software defined manner.
+> 
+> On x86, external interrupts are divided into the following groups
+>   1) system interrupts
+>   2) external device interrupts
+> With the IDT, system interrupts are dispatched through the IDT
+> directly, while external device interrupts are all routed to the
+> external interrupt dispatch function common_interrupt(), which
+> dispatches external device interrupts through a per-CPU external
+> interrupt dispatch table vector_irq.
+> 
+> To eliminate dispatching external interrupts through the IDT, add
+> a system interrupt handler table for dispatching a system interrupt
+> to its corresponding handler directly. Thus a software based dispatch
+> function will be:
+> 
+>   void external_interrupt(struct pt_regs *regs, u8 vector)
+>   {
+>     if (is_system_interrupt(vector))
+>       system_interrupt_handler_table[vector_to_sysvec(vector)](regs);
+>     else /* external device interrupt */
+>       common_interrupt(regs, vector);
+>   }
+> 
+> What's more, with the Intel FRED (Flexible Return and Event Delivery)
+> architecture, IDT, the hardware based event dispatch table, is gone,
+> and the Linux kernel needs to dispatch events to their handlers with
+> vector to handler mappings, the dispatch function external_interrupt()
+> is also needed.
+> 
+> Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+> Signed-off-by: Xin Li <xin3.li@intel.com>
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+This is not a valid SOB, it would suggest hpa is the author, but he's
+not in in From.
+
+> ---
+>  arch/x86/include/asm/traps.h |  8 ++++++
+>  arch/x86/kernel/traps.c      | 55 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 63 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/traps.h b/arch/x86/include/asm/traps.h
+> index 47ecfff2c83d..3dc63d753bda 100644
+> --- a/arch/x86/include/asm/traps.h
+> +++ b/arch/x86/include/asm/traps.h
+> @@ -47,4 +47,12 @@ void __noreturn handle_stack_overflow(struct pt_regs *regs,
+>  				      struct stack_info *info);
+>  #endif
+>  
+> +/*
+> + * How system interrupt handlers are called.
+> + */
+> +#define DECLARE_SYSTEM_INTERRUPT_HANDLER(f)			\
+> +	void f (struct pt_regs *regs __maybe_unused,		\
+> +		unsigned long vector __maybe_unused)
+> +typedef DECLARE_SYSTEM_INTERRUPT_HANDLER((*system_interrupt_handler));
+> +
+>  #endif /* _ASM_X86_TRAPS_H */
+> diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
+> index 178015a820f0..95dd917ef9ad 100644
+> --- a/arch/x86/kernel/traps.c
+> +++ b/arch/x86/kernel/traps.c
+> @@ -1444,6 +1444,61 @@ DEFINE_IDTENTRY_SW(iret_error)
+>  }
+>  #endif
+>  
+> +#define SYSV(x,y) [(x) - FIRST_SYSTEM_VECTOR] = (system_interrupt_handler)y
+> +
+> +#pragma GCC diagnostic push
+> +#pragma GCC diagnostic ignored "-Wcast-function-type"
+
+How does this not break CFI ?
