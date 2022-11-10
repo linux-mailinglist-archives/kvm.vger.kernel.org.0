@@ -2,81 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27D5E62469E
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 17:08:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A6DD6246D2
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 17:24:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230462AbiKJQIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 11:08:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43914 "EHLO
+        id S231336AbiKJQYt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 11:24:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230421AbiKJQIM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 11:08:12 -0500
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DE443FBA7
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 08:08:11 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id i3so2576944pfc.11
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 08:08:11 -0800 (PST)
+        with ESMTP id S230266AbiKJQYq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 11:24:46 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F0D625C3
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 08:24:46 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id y203so2656881pfb.4
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 08:24:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5i9am9ZGIzhHBarQ4CVKXjQOqS5CsjqHtn91r9AuZdM=;
-        b=rCHlxMoi045zIPTBFTR5wOetTaNeBOkVIuuuu8r14JHPul4Mn37vCh8rF7AYkCs3IM
-         MbhDXpEZxluZZuY3NPEmdGoBbTDk1V/4Is3bH4ebP/hirSBmgsk4RkaOWVJxhPaurltx
-         Zw9XMPzoWhoCVwnQEa47lD1Xf2ySe2wodHGn7w3Z7gPKlrLegbotd84q13oxLWS8Cwg2
-         u00trBRVWphIUtiHj3i6uHvO0gA5hqC+OEmkvPsf3QMNkedG9iAUyQgK0yJFbqBA383K
-         J5qeiO8jhOunJisxT/Qb4CRujMm15qsTkU/EK/gqyukOSC3aDd3j7jgBdewDsmhGeZ6/
-         /9RQ==
+        bh=WcMoIuzERReXkNIiGnXAzD6h4jC6olJQLjpcLn6f5Sc=;
+        b=NshAAGjbOWp2UaqB8yHIDc79FeUgA3+ARWkKcBBymxThMtu6ZEdv1EZtSczjZEBUvx
+         byGzK/Z5yaMCb+kt6Z3rcTecuNB9ZlAq2HKImDcRRN6prrOcTvKioth47J7L6l3f+oEH
+         QI4krkfeWg+5GU/8Mgnwg+DMg1g7TwuCaHki6dsyVQK/IpdZC4osFmJmQV4qPFbTdFgi
+         03uRKfCOnKag9zE1sHsnc2LbrVzflfQAZV92+/5UPRc+q8DW+x8opYnO/T9Z2CYtn+wv
+         h81oZhI8y3FBBFw9lB0lT+9V8q4bpXyCw9GflMU3rEV/5v7/sAI3Mv2i3l9V4fmLSUJZ
+         aEtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5i9am9ZGIzhHBarQ4CVKXjQOqS5CsjqHtn91r9AuZdM=;
-        b=ZiS8IsJbX5gPec4XVT+ymKfGEDd613jxJ7PHKNK+32NTXhCSaflNsYIySLY+eEuOua
-         aTXmAfzfIE5e4ZSTHxHPz1XbOK0hFQqbappYMU6Ry5WmElr+d2DfI9jNPCgDEJeM6MH5
-         jMiCT733hlugzIR44tYEtiICVvZNHIG1SgyQoo2jTo4S5tCae4nYauPfaAhVeHjVG4gw
-         PLTDf1ghu8gv/lmmy6cOIsV/ur8AzRI3SuOI63MG/ViIAsizBHD8FLbpzZeQJHVorNsb
-         QJmGDrGIaiEidq/oJAKBwV9iIm2JjXP3qkqOJg4iZVf53+USiU8Q94X3BsX9WRXFZOyi
-         mTZQ==
-X-Gm-Message-State: ACrzQf1ynSSkDzNh35J8E70GpNYq78uxp5Oo0IcxPwArZoL/YIoGLySu
-        WXzd59gDDGdxFw5MWrc8hGq+Ng==
-X-Google-Smtp-Source: AMsMyM6Z1FpgZndN99IbDJkphFvBsDJk1hvm3Ux8V482SqALWj3/9wXjHDDHXuHSo9fVAqGpdujT9Q==
-X-Received: by 2002:a63:1110:0:b0:46f:b040:f5a with SMTP id g16-20020a631110000000b0046fb0400f5amr48941469pgl.84.1668096490460;
-        Thu, 10 Nov 2022 08:08:10 -0800 (PST)
+        bh=WcMoIuzERReXkNIiGnXAzD6h4jC6olJQLjpcLn6f5Sc=;
+        b=Zbpamlq8+Bi/+MRGUXO22DSaQBA0wd967jJ3V5Qd8LLf1kTcQ9tz7/TXPiVJMOggBt
+         CtE/t3MiRdw7WT4yDGLMq2knuInLHXcaR2S6ZU3JxeCG4Wnd9dcy2Y9slgOK7lXpK3Pl
+         smYiqpBVYObWGJ0a9wmv8tEQ74+sNZHkmkLX36TxbIsCxa1be6DhZAYoxWlITX/bcLmU
+         HOyy0sIw2yjK1fMnf7ESZOjbY3dPUjY0xmQr4n46Nsz36LzOKAeBfsVhibroAdXPBOC8
+         qTsqRmtQM/xfeTNonaoJfT4a5v7d2nhYj/YrPgxVtwTDUkQtQswezWVRHjuGkbQARW3S
+         Wkvg==
+X-Gm-Message-State: ACrzQf16Kru6Jth5uh1f937fKTQu8S9A3fNC3JRVhwpptzXtabOEQQVF
+        JPBhV6VWgGHCX+VZrL8XT8K5YA==
+X-Google-Smtp-Source: AMsMyM4sjlTERLuDr34bKS3XJQZnGMKmSIsHN7pN4gYnwG7sfGxHrUaLK08YhR6C4iMcmDzCIYGCMA==
+X-Received: by 2002:a62:5e06:0:b0:56b:e3f8:824f with SMTP id s6-20020a625e06000000b0056be3f8824fmr65425089pfb.84.1668097485605;
+        Thu, 10 Nov 2022 08:24:45 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a19-20020aa794b3000000b0056c2e497ad6sm10676455pfl.93.2022.11.10.08.08.09
+        by smtp.gmail.com with ESMTPSA id w13-20020a1709027b8d00b00186c5e8b1d0sm11331800pll.149.2022.11.10.08.24.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 08:08:09 -0800 (PST)
-Date:   Thu, 10 Nov 2022 16:08:05 +0000
+        Thu, 10 Nov 2022 08:24:45 -0800 (PST)
+Date:   Thu, 10 Nov 2022 16:24:40 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Eric Li <ercli@ucdavis.edu>,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Liu Jingqi <jingqi.liu@intel.com>
-Subject: Re: [PATCH v5 05/15] KVM: nVMX: Let userspace set nVMX MSR to any
- _host_ supported value
-Message-ID: <Y20h5aynYP1DatVg@google.com>
-References: <Y2ABrnRzg729ZZNI@google.com>
- <20221101101801.zxcjswoesg2gltri@linux.intel.com>
- <Y2FePYteNrEfZ7D5@google.com>
- <20221102085414.fk2xss74jvtzs6mr@linux.intel.com>
- <Y2Px90RQydMUoiRH@google.com>
- <20221107082714.fq3sw7qii4unlcn2@linux.intel.com>
- <Y2kfCz02tQSUkMKS@google.com>
- <20221108102120.qdlgqlgvdi6wi22u@linux.intel.com>
- <Y2qhaSr/d2ds+nqD@google.com>
- <20221110084418.t7iv5zlfgiu77gfn@linux.intel.com>
+To:     Xin Li <xin3.li@intel.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, pbonzini@redhat.com,
+        kevin.tian@intel.com
+Subject: Re: [RESEND PATCH 4/6] x86/traps: add external_interrupt() to
+ dispatch external interrupts
+Message-ID: <Y20lyBl67GDZVOeB@google.com>
+References: <20221110061545.1531-1-xin3.li@intel.com>
+ <20221110061545.1531-5-xin3.li@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221110084418.t7iv5zlfgiu77gfn@linux.intel.com>
+In-Reply-To: <20221110061545.1531-5-xin3.li@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -88,56 +75,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 10, 2022, Yu Zhang wrote:
-> > > BTW, I found my previous understanding of what vmx_adjust_secondary_exec_control()
-> > > currently does was also wrong. It could also be used for EXITING controls. And
-> > > for such flags(e.g., SECONDARY_EXEC_RDRAND_EXITING), values for the nested settings
-> > > (vmx->nested.msrs.secondary_ctls_high) and for the L1 execution controls(*exec_control)
-> > > could be opposite. So the statement:
-> > > 	"1> For now, what vmx_adjust_secondary_exec_control() does, is to enable/
-> > > 	 disable a feature in VMX MSR(and nVMX MSR) based on cpuid changes."
-> > > is wrong.
-> > 
-> > No, it's correct.  The EXITING controls are just inverted feature flags.  E.g. if
-> > RDRAND is disabled in CPUID, KVM sets the EXITING control so that KVM intercepts
-> > RDRAND in order to inject #UD.
-> > 
-> > 	[EXIT_REASON_RDRAND]                  = kvm_handle_invalid_op,
-> > 
-> 
-> Well, suppose
-> - cpu_has_vmx_rdrand() is true;
-> - meanwhile guest_cpuid_has(vcpu, X86_FEATURE_RDRAND) is false.
-> 
-> And then, what vmx_adjust_secondary_exec_control() currently does is:
-> 1> keep the SECONDARY_EXEC_RDRAND_EXITING set in L1 secondary proc-
-> based execution control.
-> 2> and then clear the SECONDARY_EXEC_RDRAND_EXITING in the high bits
-> of IA32_VMX_PROCBASED_CTLS2 MSR for nested by
->         vmx->nested.msrs.secondary_ctls_high &= ~control;
-> That means for L1 VMM, SECONDARY_EXEC_RDRAND_EXITING must be cleared
-> in its(VMCS12's) secondary proc-based VM-execution control, even when
-> rdrand is disabled in L1's and L2's CPUID.
+On Wed, Nov 09, 2022, Xin Li wrote:
+> +__visible noinstr void external_interrupt(struct pt_regs *regs,
+> +					  unsigned int vector)
+> +{
+> +	unsigned int sysvec = vector - FIRST_SYSTEM_VECTOR;
+> +
+> +	BUG_ON(vector < FIRST_EXTERNAL_VECTOR);
 
-Again, it is _userspace's_ responsibility to provide a sane, consistent CPU model
-to the guest.
-
-> I wonder, for native environment, if an instruction is not supported,
-> will the allowed 1-setting for its corresponding exiting feature in
-> IA32_VMX_PROCBASED_CTLS2 MSR be set, or be cleared? Maybe it should
-> be cleared, and executing such instruction in non-root will just get
-> a #UD directly instead of triggering a VM-Exit?
-
-For any reasonable interpretation of the SDM, it's a moot point.  The SDM doesn't
-call out these scenarios for instructions like RDTSCP because they're nonsensical,
-but for other instructions that can be trapped by the hypervisor and can take a
-#UD when they're supported, the #UD is prioritized of the VM-Exit.  E.g. VMX
-instructions have pseudocode like:
-
-  IF not in VMX operation
-    THEN #UD;
-  ELSIF in VMX non-root operation
-    THEN VM exit;
-
-In other words, if the CPU doesn't recognize an instruction, it will generate a
-#UD without getting to the (presumed) microcode flow that checks for VM-Exit.
+Why not return an error up the stack?  KVM and/or CPU bugs aren't unheard of.
+Dropping an IRQ obviously isn't ideal, but there's a non-zero chance that letting
+KVM WARN and kill the VM will keep the host alive and thus other VMs running.  A
+somewhat sophisticated setup might even react to the VM being killed by migrating
+other VMs off the system and initiating host maintenance.
