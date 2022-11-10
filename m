@@ -2,147 +2,384 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34D7E624869
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 18:34:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 315826248AB
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 18:52:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229941AbiKJRe3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 12:34:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54088 "EHLO
+        id S231243AbiKJRwu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 12:52:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbiKJRe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 12:34:28 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0CE11A05D
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 09:34:26 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id b1-20020a17090a7ac100b00213fde52d49so2212386pjl.3
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 09:34:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4uOheR7r7m1kjkcyZ6oyIyEKRnuu3+TLL1zhKhAvKRI=;
-        b=mfo3+qZAwVGYMyvKBX3HHCLgBFY1howkNCLfeZpn90ReyRTMxtq7KEjcT7t5pd8Jur
-         ccc0iuLCKk09ZO0/G0gpuNYg2DCLLdNs+zs33V7XKAt9Mljwv/kGCnVgRi9pg4+XSxH7
-         /kx+2lqZkZOXOK0SfBhGvz2/UbseZh1aHhoalv9yH4Tiv3NTVHdbsn8beM9/T3x4Pqd9
-         UFbD4kVgz3atWrjQ3ufz/e+gxNTaorp4BmiZmqsSi4VGUfspd1Ek7uvhChGgJjXfN1lV
-         nUzeum4MuSEy4LOBm8LrVHIfQ/ADZXiOqKLnagR5qlM3NnzNRZCmYz4UsCDLLZhIRxhT
-         gD/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4uOheR7r7m1kjkcyZ6oyIyEKRnuu3+TLL1zhKhAvKRI=;
-        b=rEvsRiv4+FifptVa5vDuA04jlmcKKFkPZqKla2Tn+5unyLg+d6ArckpMBUzDBGQZDB
-         a02oZfFnmgfMYXzg963hUtrn/ckupSmcrGReuRklMbrc0WpQ91PPkai7Tm70aPrG1hC2
-         Jil1mabF4u0nMqmWSaJtM2xPeJWSzx+gJ9a1tk8k1YOerZENJwPS7qGlS9zro/3ttHAG
-         pmfvVqC+M4aTW8GjK8hDp1a2U7RWJXbMYvRTf8wp13YhezGWjtThHQKScYMtqr9Ic6/g
-         kKBixc5sw5fekyI72azjTcGfZ8ECUNm8AkXMLFDrdB5LcA7ElR9GW5mGK8dxhV0F6+dG
-         jwRg==
-X-Gm-Message-State: ACrzQf38vAzL3X0YxRbdWtmemkSlhbO8iPbQRYBLrLlEcx30dcQ2umZ6
-        o4RLTPQB+oB/r02Nhrk9e0uo0Q==
-X-Google-Smtp-Source: AMsMyM5Ghv5NHHVY/JKK+E8hTrh/nqsWeFZLDQZeUl2dkUhPV7aiVhPj2m9O3qyxj0RSulo6af57yQ==
-X-Received: by 2002:a17:90b:4d07:b0:1ef:521c:f051 with SMTP id mw7-20020a17090b4d0700b001ef521cf051mr85630126pjb.164.1668101666364;
-        Thu, 10 Nov 2022 09:34:26 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id p27-20020aa79e9b000000b0052d4cb47339sm10435527pfq.151.2022.11.10.09.34.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 09:34:25 -0800 (PST)
-Date:   Thu, 10 Nov 2022 17:34:21 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>
-Subject: Re: [PATCH v2 3/3] KVM: x86/cpuid: Add AMD CPUID ExtPerfMonAndDbg
- leaf 0x80000022
-Message-ID: <Y202HcmVLa0woaCF@google.com>
-References: <20220919093453.71737-1-likexu@tencent.com>
- <20220919093453.71737-4-likexu@tencent.com>
- <Y1sIHXX3HEJEXJm+@google.com>
- <948ec6a5-3f30-e8c2-9629-12235f1e1367@gmail.com>
-MIME-Version: 1.0
+        with ESMTP id S231366AbiKJRwn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 12:52:43 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2046.outbound.protection.outlook.com [40.107.92.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FE2A4B99A;
+        Thu, 10 Nov 2022 09:52:42 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YQqKJYgyBiCv/uCZoiy2I4TpDnbVhWEtvmhE7EZwETt+DqpcI/bGx9HDsZmmfaoVSzIJJ4MXxFK1PvRnVgWu0iVhr3xRAfg17bh6PsyCqYdAk7xTj9j5APdRiMVJhKa/5Q+60JhV3qTs9C0gFbCTUaeFgfTT5RhWwoOIXvg3uV0eOcDh8RjnyoyuZpgEZ4Np6Xelbn2Gc4qt/DptXFeBYHrRUSY/Z5CxHGFx7FFuXa/5OCk1zIOqk+GBr1vls8+bmT62hc/snm7FDvG/ehAfKPwgd1E/aL6X8gNp1rqNwLqb5xhqL38QNR2u8MiDnyMbIKfA2KewSKaaUNyKW9ADvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6JbzYuTfN+Gc5UEm3r0QzNY3bufN9b77BhYIkCTdv6E=;
+ b=gXdvWk1dAokJDt89egr9Q05+J7L8s2m30aLUu0+vrPxazjC9vtpuqrRScrUQr4QMO10/PuPYkybXsioIZcr7hDos1M/gt1VjMuKpZ/Vty9NBAyFiY2fZNnFl83/ksSJ6AcVeLvmFR7hiEIwvT4zogqtRfDo+9R/8fJSyEGD2rbmoSptUKR42ouotYTU1iyINPUmHy4qU88jrVWpMZDSrqbSHb+WExnWF+fGaruFQfs8S0MfCt3wbthKpbsPkxrTCGpyZY/jaCrXVz3e1TezhJyIA4NBpKkiWb3R28wrF5N7qxwQAz5CDjGN69B6+JaB6Hjh8ipjiJMqXrXrD1ou8WA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6JbzYuTfN+Gc5UEm3r0QzNY3bufN9b77BhYIkCTdv6E=;
+ b=cTkaFooUdZlSq7Uhf5oocauX38wQz2N+8qZBBtaYG0S0roVUcVLVUSqdhfg1YFNwLZzKnFJFMD6MfxGVBgnHiql9gkgj4xSq1Cufxx/6LAuiy9pqNGbTkZ5Xczt1IcQNbA5gZW+18vNp3+53XEsUvlPUO26YBg+1pRs+DZHO2N1x0GGaWPMpeljv/h2gdUG3ZKp8EvSp9W9zCpf2qjt3GmUGqcWx7l9TE9pU5mD77mUk5YVhx1DP1lYduSPfaUlPdBdZWhb4SomHc0noidqkov9z2c7eJnM/rmod9GVPezweftYbM5+/ET52Scn6s3EaL3DCewxhAiNruNUKPRv3Qw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH7PR12MB8037.namprd12.prod.outlook.com (2603:10b6:510:27d::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.25; Thu, 10 Nov
+ 2022 17:52:40 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%7]) with mapi id 15.20.5791.027; Thu, 10 Nov 2022
+ 17:52:40 +0000
+Date:   Thu, 10 Nov 2022 13:52:39 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Longfang Liu <liulongfang@huawei.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 10/11] vfio: Make vfio_container optionally compiled
+Message-ID: <Y206Z5vMwcyQK7d7@nvidia.com>
+References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <10-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <20221108152831.1a2ed3df.alex.williamson@redhat.com>
+ <Y2r6YnhuR3SxslL6@nvidia.com>
+ <20221109101809.2ff08303.alex.williamson@redhat.com>
+ <Y2wFFy0cxIIlCeTu@nvidia.com>
+ <BN9PR11MB5276494548F01A42694E366A8C019@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <948ec6a5-3f30-e8c2-9629-12235f1e1367@gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <BN9PR11MB5276494548F01A42694E366A8C019@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR16CA0004.namprd16.prod.outlook.com
+ (2603:10b6:208:134::17) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB8037:EE_
+X-MS-Office365-Filtering-Correlation-Id: f2f47a69-bce3-4f85-9028-08dac3445c4c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: uSR/TP6Bw3mHEiTS+qI38/blJ+DPwLQGXBB5R1z80o9zfxwmbsrWCtx7yqOn8FCnnnHd2C952SoXE27CKfqaEMN1CukCLddLS0pi8DAaekmrgxbHxK0tRIMWiC8Y+CHsgL6EPTr9vuQlhAXcvt/1nZ6WNZrj8yINhpVVWbczOmR0/n76T5yu7rmqVv735d7Veg3V9/1PMeXD9NEhpm/TzGgvr0PaSRR0w9Dfo8j8EBysYbHUadO3eRCuXnobD8ZbjUcA2wHqedbQo1vgSylEnB9pL/T/XRh7JtXWOtUmckeJbiqo1AS9uhoF4mcWwqyLbc8bJJRHjApk8LGz5z5g35oBC46LKYf6oSvEn/vVyug8iJCN2ZJv+IxKef6oTtPmhplrB3XlBMYmrm/MZuKr/6BkLJSSGUPrZNRxtdSU6krVfekl08cqiy4SwrPNUGbLY/ZZ6F07sdfSB/XC5EUQTj8r4h2VpmUO0X9gtJEjMehJ63ZVaBfh3kdKEEq/O5GCIRxvjovw0il1VH7hLtU8xu+6vwoqRG/9kwZ3ztfcG01/5bg7snpBRutYHkNAeb6y91tZ6n5U//HrBoMqOb9UqaU2LgbBbBYRIwsMrom2NCT30Bi/TH1W0SdqEkiDCuVrm4+OXSoMvtA+vK6iNRymuIQp9zlR0ksf0euvINPpFPjQGSzm2fNViYOerd51b8ZSQJMuffYv7XwHYjPyZm8juQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(39860400002)(366004)(376002)(346002)(451199015)(66946007)(8936002)(2906002)(36756003)(7416002)(316002)(54906003)(8676002)(38100700002)(41300700001)(66476007)(186003)(4326008)(6916009)(6486002)(7406005)(478600001)(5660300002)(6506007)(66556008)(26005)(2616005)(6512007)(83380400001)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?EpePv7KkyJyH5m9xB4PlaBxMUZkQZkGfMj9Ge40E/RerqmTsPYLVKZUJNAyu?=
+ =?us-ascii?Q?RyW9y8GWr5bSLMRp3/YxkcZKMO4wuDaUmz2+UYDYpJTCOsKzEvcEZaOLNqMc?=
+ =?us-ascii?Q?5vusdtMl1S2Wxx0+6UdGm2FrshPz5DJiKs1bxhytsgSYne88Cvrn6+Pit0Uw?=
+ =?us-ascii?Q?HE9ZWR0J3Kol41Qjb/pUNbATAUXEFdtNl/P+3uHumJxl6QZmI02K80pe0GSl?=
+ =?us-ascii?Q?CSc8gxnnZ6ZHlCr6nW243xm+8cQ81dot0r0kNBFUYt+Kact6ntwO2ocy9VkI?=
+ =?us-ascii?Q?/IaHhFLiIxDyWMKdIOmofbn8D9p5RGzJLvnYGrAYFbfL25+UVnoXauW+iTA2?=
+ =?us-ascii?Q?hKR8gh9qP0+pRRuWBGRfX7BDF1K6LYrT6Eske4Ge8FPqA67JZmLKh5XXGXGA?=
+ =?us-ascii?Q?g8+dYCNh7cG6+w5HiNlTf5bZ858+NL8h0M8aEELXt+abA+jrAY5FMMrwJA7R?=
+ =?us-ascii?Q?boxCX1czbXtPvuFuo/1zVsNRp2HKGmUexjy/8bCql0DYD0a+9AVkGI0Uq6ZP?=
+ =?us-ascii?Q?J4pZi8ngKLPmysIKTgOUrciKd0nnLBZ2osjvJju0A8axfszZAEbMxYvyu2mt?=
+ =?us-ascii?Q?kQl6zx0tDadPj45h5Yc03eXLQHGl90B6jr9jcEOhGyxkBoDIH3icmQYQcsAH?=
+ =?us-ascii?Q?ERKDtfj3LshPfPGEgp9PzduS6mJneW8p+zlwW1dVayB3nN/qOhnsgdHgQ2R3?=
+ =?us-ascii?Q?3nI1rIsQwgDFND23N4O0K5K00sd/KDio0dUtEFzt7XrU81/G2s9QJ1whMGa+?=
+ =?us-ascii?Q?sGUjJuZ1FD1iRKoiL05sa+7g98d4FkfYNHjX43T08dtdxPmugMAiLqXvaNdl?=
+ =?us-ascii?Q?VdNqy3a6Baw5lGAxfzK4rnRzuNnyc/25MgZaWd8uHDwkciQzWPrBgCW/mG/Y?=
+ =?us-ascii?Q?ol2kGAXkHNWuMwqHmN79Vxy5rItg8J75rsCcifV9fweGr6mhhe+/ZANMqkl8?=
+ =?us-ascii?Q?4Jwwo4ye8t6ojMRQLTRl8UdiNVFFGAtpHfZz7w/GLDVs7Qe5X67g9DCewVek?=
+ =?us-ascii?Q?s+8DL++PBy+kqvB2h+lLCNvXF/YN0LyxXDhC+S/NZrRxltCS5hOhFt5sQOcy?=
+ =?us-ascii?Q?QuYAZaIFEN5jfMpzFKFejZr0/6WU6AxlHh+YrRDYUWDAKpK01avfPlKSAjpa?=
+ =?us-ascii?Q?rPHEvLZUIMl39IelHoJ2Mmgwe2m1Dk7EGK1ekLe1D7x50r/2HdoP8biCjFGk?=
+ =?us-ascii?Q?JiaWkVHSsQIujQ1zvUmBTPVQTlcN+eUga8X1VS+HOQXrBEGd8j2xENjiM8al?=
+ =?us-ascii?Q?QOoJQdbd6KeLJHtX7H6q2jktwVjWokHI6CgmLRx7yHadjRy5ehV8O1Hyzr7o?=
+ =?us-ascii?Q?fUIhHCVRaXg6cq1qSH2PRWG62BwyJ795c+L/tx9BskygdtpMZv0KlW8pRyIn?=
+ =?us-ascii?Q?GBR73RKEvs8/Nihone0k8aeTf2m6dUtQDhlfQWj51hzOhli3pxTcS2N+WVU/?=
+ =?us-ascii?Q?sQgMVWdEBhufCnhzDUmgxkN65b6UpvHnF791P+8sd4lqpQZ6kCxkdpMPNuaN?=
+ =?us-ascii?Q?dFlX6+ONBBgzQ6HCIf56KNfxYkyA4PgK+Yv9fdpsOqvFVnj9jBAB2qaqw4fE?=
+ =?us-ascii?Q?dd5t/RTFgeFBcLI9isY=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2f47a69-bce3-4f85-9028-08dac3445c4c
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2022 17:52:40.2247
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wVKW7GDojg9LWAuPdKbuSkyUDrANaY6OuVZr6K2m6EfIqs3fKI8ZsadPu2noquXC
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8037
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 10, 2022, Like Xu wrote:
-> On 28/10/2022 6:37 am, Sean Christopherson wrote:
-> > I'm not a fan of perf's unions, but I at least understand the value added for
-> > CPUID entries that are a bunch of multi-bit values.  However, this leaf appears
-> > to be a pure features leaf.  In which case a union just makes life painful.
-> > 
-> > Please add a CPUID_8000_0022_EAX kvm_only_cpuid_leafs entry (details in link[*]
-> > below) so that KVM can write sane code like
-> > 
-> > 	guest_cpuid_has(X86_FEATURE_AMD_PMU_V2)
-> > 
-> > and cpuid_entry_override() instead of manually filling in information.
-> > 
-> > where appropriate.
-> > 
-> > [*] https://lore.kernel.org/all/Y1AQX3RfM+awULlE@google.com
+On Thu, Nov 10, 2022 at 06:57:57AM +0000, Tian, Kevin wrote:
+
+> > +	/*
+> > +	 * Emulation for NOIMMU is imperfect in that VFIO blocks almost all
+> > +	 * other ioctls. We let them keep working but they mostly fail since no
+> > +	 * IOAS should exist.
+> > +	 */
+> > +	if (IS_ENABLED(CONFIG_VFIO_NOIOMMU) && type ==
+> > VFIO_NOIOMMU_IOMMU)
+> > +		return 0;
+> > +
+> >  	if (type != VFIO_TYPE1_IOMMU && type != VFIO_TYPE1v2_IOMMU)
+> >  		return -EINVAL;
 > 
-> When someone is selling syntactic sugar in the kernel space, extra attention
-> needs to be paid to runtime performance (union) and memory footprint
-> (reverse_cpuid).
+> also need a check in iommufd_vfio_check_extension() so only
+> VFIO_NOIOMMU_IOMMU is supported in no-iommu mode.
 
-No.  Just no.
+Mm, and some permission checks too
 
-First off, this is more than syntactic sugar.  KVM has had multiple bugs in the
-past due to manually querying/filling CPUID entries.  The reverse-CPUID infrastructure
-guards against some of those bugs by limiting potential bugs to the leaf definition
-and the feature definition.  I.e. we only need to get the cpuid_leafs+X86_FEATURE_*
-definitions correct.
-
-Second, this code is not remotely performance sensitive, and the memory footprint
-of the reverse_cpuid table is laughably small.  It's literally 8 bytes per entry
-FOR THE ENTIRE KERNEL.  And that's ignoring the fact that the table might even be
-optimized away entirely since it's really just a switch statement that doesn't
-use a helper function.
-
-> > With a proper CPUID_8000_0022_EAX, this becomes:
-> > 
-> > 		entry->ecx = entry->edx = 0;
-> > 		if (!enable_pmu || !kvm_cpu_cap_has(X86_FEATURE_AMD_PMU_V2)) {
-> > 			entry->eax = entry->ebx;
-> > 			break;
-> > 		}
-> > 
-> > 		cpuid_entry_override(entry, CPUID_8000_0022_EAX);
-> > 
-> > 		...
+> > +		if (!IS_ENABLED(CONFIG_VFIO_NO_IOMMU) ||
+> > +		    group->type != VFIO_NO_IOMMU) {
+> > +			ret = iommufd_vfio_compat_ioas_id(iommufd,
+> > &ioas_id);
+> > +			if (ret) {
+> > +				iommufd_ctx_put(group->iommufd);
+> > +				goto out_unlock;
+> > +			}
+> >  		}
 > 
-> Then in this code block, we will have:
+> with above I suppose other ioctls (map/unmap/etc.) are implicitly blocked
+> given get_compat_ioas() will fail in those paths. this is good.
 > 
-> 	/* AMD PerfMon is only supported up to V2 in the KVM. */
-> 	entry->eax |= BIT(0);
+> btw vfio container requires exact match between group->type and
+> container->noiommu, i.e. noiommu group can be only attached to noiommu
+> container. this is another thing to be paired up.
 
-I can't tell exactly what you're suggesting, but if you're implying that you don't
-want to add CPUID_8000_0022_EAX, then NAK.  Open coding CPUID feature bit
-manipulations in KVM is not acceptable.
+Sure, as below
 
-If I'm misunderstanding and there's something that isn't handled by
-cpuid_entry_override(), then the correct way to force a CPUID feature bit is:
+So, the missing ingredient here is somone who has the necessary device
+to test dpdk? I wonder if qemu e1000 is able to do this path?
 
-	cpuid_entry_set(entry, X86_FEATURE_AMD_PMU_V2);
+diff --git a/drivers/iommu/iommufd/vfio_compat.c b/drivers/iommu/iommufd/vfio_compat.c
+index dbef3274803336..c20e55ddc9aa81 100644
+--- a/drivers/iommu/iommufd/vfio_compat.c
++++ b/drivers/iommu/iommufd/vfio_compat.c
+@@ -26,16 +26,35 @@ static struct iommufd_ioas *get_compat_ioas(struct iommufd_ctx *ictx)
+ }
+ 
+ /**
+- * iommufd_vfio_compat_ioas_id - Return the IOAS ID that vfio should use
++ * iommufd_vfio_compat_ioas_get_id - Ensure a comat IOAS exists
++ * @ictx: Context to operate on
++ *
++ * Return the ID of the current compatability ioas. The ID can be passed into
++ * other functions that take an ioas_id.
++ */
++int iommufd_vfio_compat_ioas_get_id(struct iommufd_ctx *ictx, u32 *out_ioas_id)
++{
++	struct iommufd_ioas *ioas;
++
++	ioas = get_compat_ioas(ictx);
++	if (IS_ERR(ioas))
++		return PTR_ERR(ioas);
++	*out_ioas_id = ioas->obj.id;
++	iommufd_put_object(&ioas->obj);
++	return 0;
++}
++EXPORT_SYMBOL_NS_GPL(iommufd_vfio_compat_ioas_get_id, IOMMUFD_VFIO);
++
++/**
++ * iommufd_vfio_compat_ioas_create_id - Return the IOAS ID that vfio should use
+  * @ictx: Context to operate on
+- * @out_ioas_id: The ioas_id the caller should use
+  *
+  * The compatibility IOAS is the IOAS that the vfio compatibility ioctls operate
+  * on since they do not have an IOAS ID input in their ABI. Only attaching a
+- * group should cause a default creation of the internal ioas, this returns the
+- * existing ioas if it has already been assigned somehow.
++ * group should cause a default creation of the internal ioas, this does nothing
++ * if an existing ioas has already been assigned somehow.
+  */
+-int iommufd_vfio_compat_ioas_id(struct iommufd_ctx *ictx, u32 *out_ioas_id)
++int iommufd_vfio_compat_ioas_create_id(struct iommufd_ctx *ictx)
+ {
+ 	struct iommufd_ioas *ioas = NULL;
+ 	struct iommufd_ioas *out_ioas;
+@@ -53,7 +72,6 @@ int iommufd_vfio_compat_ioas_id(struct iommufd_ctx *ictx, u32 *out_ioas_id)
+ 	}
+ 	xa_unlock(&ictx->objects);
+ 
+-	*out_ioas_id = out_ioas->obj.id;
+ 	if (out_ioas != ioas) {
+ 		iommufd_put_object(&out_ioas->obj);
+ 		iommufd_object_abort(ictx, &ioas->obj);
+@@ -68,7 +86,7 @@ int iommufd_vfio_compat_ioas_id(struct iommufd_ctx *ictx, u32 *out_ioas_id)
+ 	iommufd_object_finalize(ictx, &ioas->obj);
+ 	return 0;
+ }
+-EXPORT_SYMBOL_NS_GPL(iommufd_vfio_compat_ioas_id, IOMMUFD_VFIO);
++EXPORT_SYMBOL_NS_GPL(iommufd_vfio_compat_ioas_create_id, IOMMUFD_VFIO);
+ 
+ int iommufd_vfio_ioas(struct iommufd_ucmd *ucmd)
+ {
+@@ -230,6 +248,9 @@ static int iommufd_vfio_check_extension(struct iommufd_ctx *ictx,
+ 	case VFIO_UNMAP_ALL:
+ 		return 1;
+ 
++	case VFIO_NOIOMMU_IOMMU:
++	return IS_ENABLED(CONFIG_VFIO_NOIOMMU);
++
+ 	case VFIO_DMA_CC_IOMMU:
+ 		return iommufd_vfio_cc_iommu(ictx);
+ 
+@@ -259,6 +280,17 @@ static int iommufd_vfio_set_iommu(struct iommufd_ctx *ictx, unsigned long type)
+ 	struct iommufd_ioas *ioas = NULL;
+ 	int rc = 0;
+ 
++	/*
++	 * Emulation for NOIMMU is imperfect in that VFIO blocks almost all
++	 * other ioctls. We let them keep working but they mostly fail since no
++	 * IOAS should exist.
++	 */
++	if (IS_ENABLED(CONFIG_VFIO_NOIOMMU) && type == VFIO_NOIOMMU_IOMMU) {
++		if (!capable(CAP_SYS_RAWIO))
++			return -EPERM;
++		return 0;
++	}
++
+ 	if (type != VFIO_TYPE1_IOMMU && type != VFIO_TYPE1v2_IOMMU)
+ 		return -EINVAL;
+ 
+diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
+index 595c7b2146f88c..daa8039da7a8fa 100644
+--- a/drivers/vfio/iommufd.c
++++ b/drivers/vfio/iommufd.c
+@@ -18,6 +18,21 @@ int vfio_iommufd_bind(struct vfio_device *vdev, struct iommufd_ctx *ictx)
+ 
+ 	lockdep_assert_held(&vdev->dev_set->lock);
+ 
++	if (IS_ENABLED(CONFIG_VFIO_NO_IOMMU) &&
++	    vdev->group->type == VFIO_NO_IOMMU) {
++		if (!capable(CAP_SYS_RAWIO))
++			return -EPERM;
++
++		/*
++		 * Require no compat ioas to be assigned to proceed. The basic
++		 * statement is that the user cannot have done something that
++		 * implies they expected translation to exist
++		 */
++		if (!iommufd_vfio_compat_ioas_get_id(ictx, &ioas_id))
++			return -EPERM;
++		return 0;
++	}
++
+ 	/*
+ 	 * If the driver doesn't provide this op then it means the device does
+ 	 * not do DMA at all. So nothing to do.
+@@ -29,7 +44,7 @@ int vfio_iommufd_bind(struct vfio_device *vdev, struct iommufd_ctx *ictx)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = iommufd_vfio_compat_ioas_id(ictx, &ioas_id);
++	ret = iommufd_vfio_compat_ioas_get_id(ictx, &ioas_id);
+ 	if (ret)
+ 		goto err_unbind;
+ 	ret = vdev->ops->attach_ioas(vdev, &ioas_id);
+@@ -53,6 +68,10 @@ void vfio_iommufd_unbind(struct vfio_device *vdev)
+ {
+ 	lockdep_assert_held(&vdev->dev_set->lock);
+ 
++	if (IS_ENABLED(CONFIG_VFIO_NO_IOMMU) &&
++	    vdev->group->type == VFIO_NO_IOMMU)
++		return;
++
+ 	if (vdev->ops->unbind_iommufd)
+ 		vdev->ops->unbind_iommufd(vdev);
+ }
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index f3c48b8c45627d..b59eff30968a1e 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -747,12 +747,13 @@ static int vfio_group_ioctl_set_container(struct vfio_group *group,
+ 
+ 	iommufd = iommufd_ctx_from_file(f.file);
+ 	if (!IS_ERR(iommufd)) {
+-		u32 ioas_id;
+-
+-		ret = iommufd_vfio_compat_ioas_id(iommufd, &ioas_id);
+-		if (ret) {
+-			iommufd_ctx_put(group->iommufd);
+-			goto out_unlock;
++		if (!IS_ENABLED(CONFIG_VFIO_NO_IOMMU) ||
++		    group->type != VFIO_NO_IOMMU) {
++			ret = iommufd_vfio_compat_ioas_create_id(iommufd);
++			if (ret) {
++				iommufd_ctx_put(group->iommufd);
++				goto out_unlock;
++			}
+ 		}
+ 
+ 		group->iommufd = iommufd;
+diff --git a/include/linux/iommufd.h b/include/linux/iommufd.h
+index 7a5d64a1dae482..bf2b3ea5f90fd2 100644
+--- a/include/linux/iommufd.h
++++ b/include/linux/iommufd.h
+@@ -61,7 +61,8 @@ void iommufd_access_unpin_pages(struct iommufd_access *access,
+ 				unsigned long iova, unsigned long length);
+ int iommufd_access_rw(struct iommufd_access *access, unsigned long iova,
+ 		      void *data, size_t len, unsigned int flags);
+-int iommufd_vfio_compat_ioas_id(struct iommufd_ctx *ictx, u32 *out_ioas_id);
++int iommufd_vfio_compat_ioas_get_id(struct iommufd_ctx *ictx, u32 *out_ioas_id);
++int iommufd_vfio_compat_ioas_create_id(struct iommufd_ctx *ictx);
+ #else /* !CONFIG_IOMMUFD */
+ static inline struct iommufd_ctx *iommufd_ctx_from_file(struct file *file)
+ {
+@@ -93,8 +94,7 @@ static inline int iommufd_access_rw(struct iommufd_access *access, unsigned long
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static inline int iommufd_vfio_compat_ioas_id(struct iommufd_ctx *ictx,
+-					      u32 *out_ioas_id)
++static inline int iommufd_vfio_compat_ioas_create_id(struct iommufd_ctx *ictx)
+ {
+ 	return -EOPNOTSUPP;
+ }
 
-> to cover AMD Perfmon V3+, any better move ?
-
-Huh?  If/when V3+ comes along, the above
-
-	cpuid_entry_override(entry, CPUID_8000_0022_EAX);
-
-will continue to do the right thing because KVM will (a) advertise V2 if it's
-supported in hardware and (b) NOT advertise V3+ because the relevant CPUID bit(s)
-will not be set in kvm_cpu_caps until KVM gains the necessary support.
