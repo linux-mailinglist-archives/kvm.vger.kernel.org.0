@@ -2,155 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A306C624063
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 11:51:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98A32624073
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 11:55:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230282AbiKJKvl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 05:51:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42348 "EHLO
+        id S230335AbiKJKz0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 05:55:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230295AbiKJKvk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 05:51:40 -0500
+        with ESMTP id S229588AbiKJKzY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 05:55:24 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAAE06A744
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 02:50:36 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4650A6A742
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 02:54:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668077436;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1668077663;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UeYV9gtrEMC/f2NfGupIKl3UhHTgEqpO1AGhP6jS8dg=;
-        b=XJqEvdpeiTjVhqWFpB3vXk4JE7ns1916KuxlS/Ql/lbKzu6zoIs9sQG0w+wsirAxa7I4Xy
-        j7KkH0sYZfgjhDkNoLjGZpu8BzWcN6xln+xNo3i4yfWSG0sXck5S0BJh7XIne/KZQV/lv1
-        6kIYRXciHTFSO4o2dAitH6ZUz/AaUrY=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=NpgGU2I/tE+Cblp78lY33qKu10Xyg6kfJBT0/tIEJsk=;
+        b=SP3joMHGO969nuhErU6PU/Su6gOc6/obPoAk5L+KtAD1QMQ1R42hgPKVTPTyGYmfvXgWhk
+        tnuhp3IT/cQeJrlOdEHOeHfhlIZX1ILNsknahd5ZRmJOWG4c7unvMcmps0gEkQ49Uw2YYi
+        EjQhChARZoYtE++XAP4w8e5IOUrHu8w=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-631-CkpLQw9hPkacLJJ5CzWDyw-1; Thu, 10 Nov 2022 05:50:29 -0500
-X-MC-Unique: CkpLQw9hPkacLJJ5CzWDyw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-317-7OyvaXjfPfyzXgoyEastcg-1; Thu, 10 Nov 2022 05:54:22 -0500
+X-MC-Unique: 7OyvaXjfPfyzXgoyEastcg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E0BA13816EA9;
-        Thu, 10 Nov 2022 10:50:28 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-49.bne.redhat.com [10.64.54.49])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E4941415114;
-        Thu, 10 Nov 2022 10:50:22 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6779F833AEF;
+        Thu, 10 Nov 2022 10:54:21 +0000 (UTC)
+Received: from [10.64.54.49] (vpn2-54-49.bne.redhat.com [10.64.54.49])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 44E19C1908A;
+        Thu, 10 Nov 2022 10:54:15 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v3 0/6] KVM: selftests: memslot_perf_test: aarch64
+ cleanup/fixes
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
+        ajones@ventanamicro.com, kvmarm@lists.linux.dev, shuah@kernel.org,
+        peterx@redhat.com, oliver.upton@linux.dev, seanjc@google.com,
+        ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+References: <20221020071209.559062-1-gshan@redhat.com>
+ <91d563b6-5f1c-5ecc-0a40-7d8838770b22@maciej.szmigiero.name>
 From:   Gavin Shan <gshan@redhat.com>
-To:     kvmarm@lists.linux.dev
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, maz@kernel.org,
-        seanjc@google.com, shuah@kernel.org, catalin.marinas@arm.com,
-        andrew.jones@linux.dev, ajones@ventanamicro.com,
-        bgardon@google.com, dmatlack@google.com, will@kernel.org,
-        suzuki.poulose@arm.com, alexandru.elisei@arm.com,
-        pbonzini@redhat.com, peterx@redhat.com, oliver.upton@linux.dev,
-        zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: [PATCH v10 7/7] KVM: selftests: Automate choosing dirty ring size in dirty_log_test
-Date:   Thu, 10 Nov 2022 18:49:14 +0800
-Message-Id: <20221110104914.31280-8-gshan@redhat.com>
-In-Reply-To: <20221110104914.31280-1-gshan@redhat.com>
-References: <20221110104914.31280-1-gshan@redhat.com>
+Message-ID: <3903eeef-e037-9651-6041-0d16c29d67b0@redhat.com>
+Date:   Thu, 10 Nov 2022 18:54:13 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <91d563b6-5f1c-5ecc-0a40-7d8838770b22@maciej.szmigiero.name>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In the dirty ring case, we rely on vcpu exit due to full dirty ring
-state. On ARM64 system, there are 4096 host pages when the host
-page size is 64KB. In this case, the vcpu never exits due to the
-full dirty ring state. The similar case is 4KB page size on host
-and 64KB page size on guest. The vcpu corrupts same set of host
-pages, but the dirty page information isn't collected in the main
-thread. This leads to infinite loop as the following log shows.
+Hi Marc,
 
-  # ./dirty_log_test -M dirty-ring -c 65536 -m 5
-  Setting log mode to: 'dirty-ring'
-  Test iterations: 32, interval: 10 (ms)
-  Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-  guest physical test memory offset: 0xffbffe0000
-  vcpu stops because vcpu is kicked out...
-  Notifying vcpu to continue
-  vcpu continues now.
-  Iteration 1 collected 576 pages
-  <No more output afterwards>
+On 10/25/22 7:18 AM, Maciej S. Szmigiero wrote:
+> On 20.10.2022 09:12, Gavin Shan wrote:
+>> kvm/selftests/memslots_perf_test doesn't work with 64KB-page-size-host
+>> and 4KB-page-size-guest on aarch64. In the implementation, the host and
+>> guest page size have been hardcoded to 4KB. It's ovbiously not working
+>> on aarch64 which supports 4KB, 16KB, 64KB individually on host and guest.
+>>
+>> This series tries to fix it. After the series is applied, the test runs
+>> successfully with 64KB-page-size-host and 4KB-page-size-guest.
+>>
+>>     # ./memslots_perf_tests -v -s 512
+>>
+>> Since we're here, the code is cleaned up a bit as PATCH[1-3] do. The
+>> other patches are fixes to handle the mismatched host/guest page
+>> sized.
+>>
+>> v1: https://lore.kernel.org/kvmarm/20221014071914.227134-1-gshan@redhat.com/T/#t
+>> v2: https://lore.kernel.org/kvmarm/20221018040454.405719-1-gshan@redhat.com/T/#t
+>>
+>> Changelog
+>> =========
+>> v3:
+>>    * Improved comments about MEM_TEST_MOVE_SIZE, which is set
+>>      to 64KB in PATCH[v3 4/6] and finally fixed to 192KB in
+>>      PATCH[v3 5/6].                                              (Maciej)
+>>    * Use size instead of pages to do the comparison in
+>>      test_memslot_move_prepare()                                 (Maciej)
+>>    * Use tools/include/linux/sizes.h instead of inventing
+>>      our own macros.                                             (Oliver)
+>> v2:
+>>    * Pick the smaller value between the ones specified by
+>>      user or probed from KVM_CAP_NR_MEMSLOTS in PATCH[v2 3/6]    (Maciej)
+>>    * Improved comments about MEM_TEST_MOVE_SIZE in
+>>      PATCH[v2 4/6]                                               (Maciej)
+>>    * Avoid mismatched guest page size after VM is started in
+>>      prepare_vm() in PATCH[v2 4/6]                               (Maciej)
+>>    * Fix condition to check MEM_TEST_{UNMAP, UNMAP_CHUNK}_SIZE
+>>      in check_memory_size() in PATCH[v2 4/6]                     (Maciej)
+>>    * Define base and huge page size in kvm_util_base.h in
+>>      PATCH[v2 5/6]                                               (Sean)
+>>    * Add checks on host/guest page size in check_memory_size()
+>>      and fail early if any of them exceeds 64KB in PATCH[v2 5/6] (Maciej)
+>>
+>>
+>> Gavin Shan (6):
+>>    KVM: selftests: memslot_perf_test: Use data->nslots in prepare_vm()
+>>    KVM: selftests: memslot_perf_test: Consolidate loop conditions in
+>>      prepare_vm()
+>>    KVM: selftests: memslot_perf_test: Probe memory slots for once
+>>    KVM: selftests: memslot_perf_test: Support variable guest page size
+>>    KVM: selftests: memslot_perf_test: Consolidate memory
+>>    KVM: selftests: memslot_perf_test: Report optimal memory slots
+>>
+> 
+> This patch set now looks good to me, so for the whole series:
+> Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> 
 
-Fix the issue by automatically choosing the best dirty ring size,
-to ensure vcpu exit due to full dirty ring state. The option '-c'
-becomes a hint to the dirty ring count, instead of the value of it.
+If possible, could you please merge this series to 'next' branch either?
+I hope it can be merged early because our downstream needs the fixes to
+make the test case work. It's definitely fine to wait for more comments,
+but I haven't receive any more comments in last month :)
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 26 +++++++++++++++++---
- 1 file changed, 22 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 8758c10ec850..a87e5f78ebf1 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -24,6 +24,9 @@
- #include "guest_modes.h"
- #include "processor.h"
- 
-+#define DIRTY_MEM_BITS 30 /* 1G */
-+#define PAGE_SHIFT_4K  12
-+
- /* The memory slot index to track dirty pages */
- #define TEST_MEM_SLOT_INDEX		1
- 
-@@ -273,6 +276,24 @@ static bool dirty_ring_supported(void)
- 
- static void dirty_ring_create_vm_done(struct kvm_vm *vm)
- {
-+	uint64_t pages;
-+	uint32_t limit;
-+
-+	/*
-+	 * We rely on vcpu exit due to full dirty ring state. Adjust
-+	 * the ring buffer size to ensure we're able to reach the
-+	 * full dirty ring state.
-+	 */
-+	pages = (1ul << (DIRTY_MEM_BITS - vm->page_shift)) + 3;
-+	pages = vm_adjust_num_guest_pages(vm->mode, pages);
-+	if (vm->page_size < getpagesize())
-+		pages = vm_num_host_pages(vm->mode, pages);
-+
-+	limit = 1 << (31 - __builtin_clz(pages));
-+	test_dirty_ring_count = 1 << (31 - __builtin_clz(test_dirty_ring_count));
-+	test_dirty_ring_count = min(limit, test_dirty_ring_count);
-+	pr_info("dirty ring count: 0x%x\n", test_dirty_ring_count);
-+
- 	/*
- 	 * Switch to dirty ring mode after VM creation but before any
- 	 * of the vcpu creation.
-@@ -685,9 +706,6 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, struct kvm_vcpu **vcpu,
- 	return vm;
- }
- 
--#define DIRTY_MEM_BITS 30 /* 1G */
--#define PAGE_SHIFT_4K  12
--
- struct test_params {
- 	unsigned long iterations;
- 	unsigned long interval;
-@@ -830,7 +848,7 @@ static void help(char *name)
- 	printf("usage: %s [-h] [-i iterations] [-I interval] "
- 	       "[-p offset] [-m mode]\n", name);
- 	puts("");
--	printf(" -c: specify dirty ring size, in number of entries\n");
-+	printf(" -c: hint to dirty ring size, in number of entries\n");
- 	printf("     (only useful for dirty-ring test; default: %"PRIu32")\n",
- 	       TEST_DIRTY_RING_COUNT);
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
--- 
-2.23.0
+Thanks,
+Gavin
 
