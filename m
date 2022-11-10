@@ -2,407 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34CA3623B48
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 06:32:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CF77623B4E
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 06:34:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232272AbiKJFb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 00:31:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52364 "EHLO
+        id S232268AbiKJFeH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 00:34:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232240AbiKJFb5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 00:31:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 900C42791D
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 21:31:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668058262;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mUhPQ523FQXEwEShbr/ZK0zilNgPQe+Jzsl/7np/mh4=;
-        b=FKSoEMvvuuG40tvg4X9LNLoGcYx3zIPdWGTUoCjRIG3J1+pbVxaE34QuxaHev3nRm/iZ99
-        9rB8fC43VZHf/hRIkJj+vYZCyXxRx5LClVc3CMP69hyjizzm/FhbMxvPzpvO6uqOBbU58T
-        klN9Fxf/HjnXEUFn9J2pYzDG9UDigYo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-464-f8rYropFO8qvYtGzML-UMQ-1; Thu, 10 Nov 2022 00:30:55 -0500
-X-MC-Unique: f8rYropFO8qvYtGzML-UMQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1301A833AED;
-        Thu, 10 Nov 2022 05:30:55 +0000 (UTC)
-Received: from [10.64.54.49] (vpn2-54-49.bne.redhat.com [10.64.54.49])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B3B54112132C;
-        Thu, 10 Nov 2022 05:30:49 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v5 03/14] KVM: arm64: Pass mm_ops through the visitor
- context
-To:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Quentin Perret <qperret@google.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        with ESMTP id S232243AbiKJFeD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 00:34:03 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 169B52A976;
+        Wed,  9 Nov 2022 21:34:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668058443; x=1699594443;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=6Ql5lYuvy8Bj27wqlCoeH4CuRDS3+snw7xjE5rp1FDY=;
+  b=AUeRQ/ipUVak5CLC6drsS/99o/hSvkbw1VUgKkIF8DjA1O7O6AtW3ZJj
+   Or38Pu8Wh3sDjE+yDcdQn+cdH17cQHxFYC04n9jMkTOAYlXc4cbQgjXzZ
+   SMS9wTd4SOaBg2VJp4itR4fqVsknieDMQrQAIqNI7rqdCE4GtRS3o1lU/
+   a6cBlRH+uC/JV2/FOMJ2fcdySMpxJFL9ERPjRv4i68kW7jZesPBcTj4/P
+   N1CktQAbrpUb7faXxv5IGc4PRuNNWikKu+b/hyDQ2y6Bl/yYhhxR4ppSB
+   odSt7fvfS8DiyIPCiDA9Myzyauu28/9y3yENOS4u8DkzUvrLjhkSy0O38
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="311216654"
+X-IronPort-AV: E=Sophos;i="5.96,152,1665471600"; 
+   d="scan'208";a="311216654"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2022 21:34:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="779637047"
+X-IronPort-AV: E=Sophos;i="5.96,152,1665471600"; 
+   d="scan'208";a="779637047"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga001.fm.intel.com with ESMTP; 09 Nov 2022 21:34:02 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 9 Nov 2022 21:34:01 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 9 Nov 2022 21:34:01 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Wed, 9 Nov 2022 21:34:01 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Wed, 9 Nov 2022 21:34:01 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NZ2hK1s97nFDRT7FsTjK7WJpRC36hpDuqxXx1lxwMWKhZqGia6KLHO3KNqNXnozAmsvcriVk2SaFhGxtgi42ZPvW4b+a/dtBqe5zcT+TO0L02XgYTJ8ncYdeOCNu2Gf34uK8sGL827DbBiR1fnqbX104nX3z2VF+qkifW063dn2E6hwQtXX7OGKDs1Z5RmQ5wXemEXH44hdvzRv2b4HvJ9F/lTbYxQMP+WfEJQftprVvtXoTvIJNfXbZOhnE5W/cm1D1v6DpcMqmlDf6s1JV8e8wYGpo1w1D1I0XiNo6Iy18V/tt3XAY7HOvvxaDvi8oHuYdBIxeB1NUFn5wLq/6Ng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6Ql5lYuvy8Bj27wqlCoeH4CuRDS3+snw7xjE5rp1FDY=;
+ b=W7ziRUqEIdfle0xqsAou0sJlALTJwsEkJLV4rRt7mKyKTajEKswHdrO3O7jQYBTp8jN1cx+mWnJ0lB2BBrDXoHgapnh+N2oI6qe6wvpg2fn/q8wIjCFY8tT01+kB0Bo9raW1v3y+DpOc0E+jmQD6i0dpQkdpc7OL8DTwBi9rNt62Y2KCeGuZfoqCxC1UAjt1r1Y6Nzosf0q1wLs/TB9eJ+DzarJ2FCgOPNFmm3Q2zXpGWN84bLk1JIEXCYwkNYDbUjrmnPTDJbh5aa3f19Vt5w9XVHdj6j1KTykDmaFl5gpYtgVt0D4huCO1f/EDr7z7yvrFDPFjdVbivPPqKK5qcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by LV2PR11MB6046.namprd11.prod.outlook.com (2603:10b6:408:17a::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27; Thu, 10 Nov
+ 2022 05:33:54 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::737e:211a:bb53:4cd7]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::737e:211a:bb53:4cd7%6]) with mapi id 15.20.5813.012; Thu, 10 Nov 2022
+ 05:33:54 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Eric Farman" <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        "Joonas Lahtinen" <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Longfang Liu <liulongfang@huawei.com>,
+        "Matthew Rosato" <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        "Shameer Kolothum" <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
         Will Deacon <will@kernel.org>,
-        Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev
-References: <20221107215644.1895162-1-oliver.upton@linux.dev>
- <20221107215644.1895162-4-oliver.upton@linux.dev>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <d45112fc-d024-2430-0624-7cd9af697860@redhat.com>
-Date:   Thu, 10 Nov 2022 13:30:47 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <20221107215644.1895162-4-oliver.upton@linux.dev>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>
+CC:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: RE: [PATCH v2 08/11] vfio-iommufd: Support iommufd for emulated VFIO
+ devices
+Thread-Topic: [PATCH v2 08/11] vfio-iommufd: Support iommufd for emulated VFIO
+ devices
+Thread-Index: AQHY8wx6rIsjRsa7HkeXFSvgQ3pBSa43pYbw
+Date:   Thu, 10 Nov 2022 05:33:54 +0000
+Message-ID: <BN9PR11MB5276592240B7916E23E94DDD8C019@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <8-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+In-Reply-To: <8-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_FILL_THIS_FORM_SHORT autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|LV2PR11MB6046:EE_
+x-ms-office365-filtering-correlation-id: 1fd67505-30e9-4c53-e210-08dac2dd2821
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: gD9OgEPrMQ6lLmH6xgkUc6iR1YqqPGx986Er3uEGYbDlDTMFyTs7bbjMH4rWkQbTixMhXCUVvzI0Saqr99XDnJiTadAqcU0YutZTbC79iG8fWEcbdWIY63olIxn60EOEviVKzwnfWb5WmnQEbUq91AqNUzt30p6cRleLU4kjsHXk09dpr5cnSt/PQw9oBHTf7uiaSbzjvbbddSSpXQplvnxUpSjMYDXBge6ZWOfprvOkSSV/i+QAS2rDlnH2PanvspouPnDveZYGvDUxbJpYrYLhUIVdhX2jwgc+DLuW6AKzqfwBMX4lVV/UPjI9HPXL1iWX/sHneHim+iRQy5ZzPxvdNr8UzvwNC2tjt3nlswBx1cnFRxpW0g+F54HJ268lMYbn3X59GuTraYH4GdAoDDjX2sdNhDQHbU62asaLqI8LZezoeNoxUutf6fpO8X8T8k0hdGQchYgo5rJOceYe1LOO7lrTqYVXhQY/Gh8rA1EaTwuUcnjCLGXLu/Eussclk4URhbJEX08+eZYbNJRD3jWuqrPpcwgRQTAOUry2mFNaCqsB65IHVlOJWLfZAUlxPsFgXoJyW8pdspNBcDJ5nnSOzpWMVcyIGNeaz/JHq3TpZe5h1vBQ38GRoAhxVF3CAxDIWqLQCiY0Y2AA1PTJ+KqGBcYSfgIeDOpv9h1BlHbRmjTEFAGD0232DmZQZ3/wS1G1hA+IIxCrCYzgwIjs5+0RZvLv2QtM6eNKHXMr46r13IJj79VsCN+aB1OeFgP3RpIvKzTBZNWkRFjwRhPFKuIzS+h950jNZ0hFDw/my18=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(346002)(136003)(366004)(39860400002)(376002)(451199015)(478600001)(4744005)(8936002)(52536014)(5660300002)(38070700005)(6636002)(41300700001)(83380400001)(38100700002)(86362001)(7406005)(7416002)(55016003)(7696005)(9686003)(26005)(6506007)(82960400001)(71200400001)(122000001)(54906003)(66946007)(64756008)(66446008)(66476007)(921005)(66556008)(186003)(4326008)(76116006)(110136005)(8676002)(316002)(2906002)(33656002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?4ITizG2B1h6t035FMSXokeo+2LD2ykQ0gCmMc8vaNV/k6h1zkppuGvbeJI7B?=
+ =?us-ascii?Q?BlUHr8Or3Echh+LIAPj2rphS998jsbTlsYJUJcZzmRG2ApgdqlSbzdAUtShU?=
+ =?us-ascii?Q?PPApC5gYxtNFuA12KvcJpP/13WMar46QfZmWCH4OUOuSqQrTQKGr6X4Io7gZ?=
+ =?us-ascii?Q?tKsacMcOAhKvFnYbAEBJIbXhiRLWA2J5ORlOKdaA0YKtbMXUAKg1y9n2aHHW?=
+ =?us-ascii?Q?/e7Q7A9U39sWXxfF37Kc5gKinF2EPaQun1LAAXu3z+57WGyoDFHVWP7zoUiG?=
+ =?us-ascii?Q?rbFXQ5KhO72tSUCnU/Np5CUqJIm6DpvcCkcJXrL6l73bc2L75eiJAQHA/vYz?=
+ =?us-ascii?Q?6aIQH1ma3ps97iq1h+4wfh7EygM7wGOuW+P5QKZr9syOCMl1wmd2mUHqCcrJ?=
+ =?us-ascii?Q?l4LiH2twXqhwegF4lAecml1rPEcIra+tG2aJQNjkr8Lm+BdpWL5+hPc3DrUz?=
+ =?us-ascii?Q?TybUJUD0ACbaglZB44OqBSCYtr+jVmSBLi74m3LM6juwIkqja3u/gwK3JRE/?=
+ =?us-ascii?Q?d5oq2fP5QhxOduRfvS5EJ1zvqwlivnTW/qW0hn7XD7KHxteoseRmwB+YLWnO?=
+ =?us-ascii?Q?+PpCBWrgPnB8j+Pcx5pd4DuYyWQeeIBpozqn4j4+a8pav2r20jdXKUBud3Re?=
+ =?us-ascii?Q?n13bNQWsHLrqkjxVM+MW5JxQFTjWZsxIBYIDA89m09uRmULJPDC0QPJIhq9J?=
+ =?us-ascii?Q?tPyWsxTzx/ZEoLcZ4yZsEjODDWwIXPXSVMJhTvjwZnpfAVVWIK8Z4Tm5Ssn+?=
+ =?us-ascii?Q?sIgk42C/0CkpoZSNKFGm2Utc7SDLt4JuQXM1McuPxPcNfXnSnhXhdoOw/ELZ?=
+ =?us-ascii?Q?iiao9Dl28Xf2higLN+fo2wef0vwmA93pMV4FYZzFekOw5yBqbMVOky066e3+?=
+ =?us-ascii?Q?UtZ4KlyeAm8oUeY6xyP2cNHNYZb1EEYNnqIcB9HhG/pkSWRn0zG++Bq8jdc+?=
+ =?us-ascii?Q?KKZr1GNCIWDSihBiQvGcSQHLn0ZZp358JMsiQHNIteJ780Ym1BabxxkUyv7v?=
+ =?us-ascii?Q?yZtvg9L8h/PrUc5a2ELY7/rnKlFx9xH5tFNqEWMZqB68I9Wzsh+CY+Pmj5hp?=
+ =?us-ascii?Q?U0iMbTtBZ/kdbysX9y9Yn+zRKYt3ObXEXoLNl+/rrip+bjpf1UKaw/KMHTCY?=
+ =?us-ascii?Q?6sro6xvVhRMkvh61fmhokEx2Vbn9sfV/OOxaLtEJSV3gO8O46hrh9doR9ACN?=
+ =?us-ascii?Q?lGughhVjUqsfV33kejpq83BBdcIsFnVJyx/P4xxBG3P9/uPTmHtQBoGih8vU?=
+ =?us-ascii?Q?aFVJ9Ap3YGhzePYjlX7z4JcRVhOg7LiNf/LlEPxHtIKmxtLuUKbqY1Lo6fCr?=
+ =?us-ascii?Q?oOoyaYRoNjDusIRvOwBA4VyAv3zN/jh35ug3MeHz1jOb6kASdlfbDtxI67Js?=
+ =?us-ascii?Q?bIiYmbF5L+btoDH7g50p0YgfgmsQrX5gclh4Chm/4wzi5FdtcTfBoKgVscfZ?=
+ =?us-ascii?Q?npyx4yHbKYQiTyvPpj12JKjlUAvu8JUjPIwI6UJmhw4Mur+74DnyU9QlFG6H?=
+ =?us-ascii?Q?bt7B2l2uj8Mib2iG5DQ9JErAmsE6U2EWQEKVnjXQUWue6UP6h1DxjA71jzDB?=
+ =?us-ascii?Q?MmhQHtMZXDAIxm+51p5dv4v3U8TRtQbpUR4xzmjj?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1fd67505-30e9-4c53-e210-08dac2dd2821
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Nov 2022 05:33:54.2591
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nCSOacdwrCBEFOIF66qko3ZsOirLMbtk1qGummJYytWDsHnkVhUNIgaZTtUHetM3G3CeoxV/BP85rqQJC8iksQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR11MB6046
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/8/22 5:56 AM, Oliver Upton wrote:
-> As a prerequisite for getting visitors off of struct kvm_pgtable, pass
-> mm_ops through the visitor context.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->   arch/arm64/include/asm/kvm_pgtable.h |  1 +
->   arch/arm64/kvm/hyp/nvhe/setup.c      |  3 +-
->   arch/arm64/kvm/hyp/pgtable.c         | 63 +++++++++++-----------------
->   3 files changed, 26 insertions(+), 41 deletions(-)
-> 
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Tuesday, November 8, 2022 8:53 AM
+>=20
+> Emulated VFIO devices are calling vfio_register_emulated_iommu_dev() and
+> consist of all the mdev drivers.
+>=20
+> Like the physical drivers, support for iommufd is provided by the driver
+> supplying the correct standard ops. Provide ops from the core that
+> duplicate what vfio_register_emulated_iommu_dev() does.
+>=20
+> Emulated drivers are where it is more likely to see variation in the
+> iommfd support ops. For instance IDXD will probably need to setup both a
+> iommfd_device context linked to a PASID and an iommufd_access context to
+> support all their mdev operations.
+>=20
+> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 14d4b68a1e92..a752793482cb 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -203,6 +203,7 @@ struct kvm_pgtable_visit_ctx {
->   	kvm_pte_t				*ptep;
->   	kvm_pte_t				old;
->   	void					*arg;
-> +	struct kvm_pgtable_mm_ops		*mm_ops;
->   	u64					addr;
->   	u64					end;
->   	u32					level;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index 6af443c9d78e..1068338d77f3 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -189,7 +189,7 @@ static void hpool_put_page(void *addr)
->   static int finalize_host_mappings_walker(const struct kvm_pgtable_visit_ctx *ctx,
->   					 enum kvm_pgtable_walk_flags visit)
->   {
-> -	struct kvm_pgtable_mm_ops *mm_ops = ctx->arg;
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->   	enum kvm_pgtable_prot prot;
->   	enum pkvm_page_state state;
->   	phys_addr_t phys;
-> @@ -239,7 +239,6 @@ static int finalize_host_mappings(void)
->   	struct kvm_pgtable_walker walker = {
->   		.cb	= finalize_host_mappings_walker,
->   		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
-> -		.arg	= pkvm_pgtable.mm_ops,
->   	};
->   	int i, ret;
->   
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index fb3696b3a997..db25e81a9890 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -181,9 +181,10 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
->   }
->   
->   static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
-> -			      kvm_pte_t *pgtable, u32 level);
-> +			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pte_t *pgtable, u32 level);
->   
->   static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
-> +				      struct kvm_pgtable_mm_ops *mm_ops,
->   				      kvm_pte_t *ptep, u32 level)
->   {
->   	enum kvm_pgtable_walk_flags flags = data->walker->flags;
-> @@ -191,6 +192,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
->   		.ptep	= ptep,
->   		.old	= READ_ONCE(*ptep),
->   		.arg	= data->walker->arg,
-> +		.mm_ops	= mm_ops,
->   		.addr	= data->addr,
->   		.end	= data->end,
->   		.level	= level,
-> @@ -218,8 +220,8 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
->   		goto out;
->   	}
->   
-> -	childp = kvm_pte_follow(ctx.old, data->pgt->mm_ops);
-> -	ret = __kvm_pgtable_walk(data, childp, level + 1);
-> +	childp = kvm_pte_follow(ctx.old, mm_ops);
-> +	ret = __kvm_pgtable_walk(data, mm_ops, childp, level + 1);
->   	if (ret)
->   		goto out;
->   
-> @@ -231,7 +233,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
->   }
->   
->   static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
-> -			      kvm_pte_t *pgtable, u32 level)
-> +			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pte_t *pgtable, u32 level)
->   {
->   	u32 idx;
->   	int ret = 0;
-> @@ -245,7 +247,7 @@ static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
->   		if (data->addr >= data->end)
->   			break;
->   
-> -		ret = __kvm_pgtable_visit(data, ptep, level);
-> +		ret = __kvm_pgtable_visit(data, mm_ops, ptep, level);
->   		if (ret)
->   			break;
->   	}
-> @@ -269,7 +271,7 @@ static int _kvm_pgtable_walk(struct kvm_pgtable_walk_data *data)
->   	for (idx = kvm_pgd_page_idx(data); data->addr < data->end; ++idx) {
->   		kvm_pte_t *ptep = &pgt->pgd[idx * PTRS_PER_PTE];
->   
-> -		ret = __kvm_pgtable_walk(data, ptep, pgt->start_level);
-> +		ret = __kvm_pgtable_walk(data, pgt->mm_ops, ptep, pgt->start_level);
->   		if (ret)
->   			break;
->   	}
-> @@ -332,7 +334,6 @@ int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
->   struct hyp_map_data {
->   	u64				phys;
->   	kvm_pte_t			attr;
-> -	struct kvm_pgtable_mm_ops	*mm_ops;
->   };
->   
->   static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
-> @@ -400,7 +401,7 @@ static bool hyp_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->   	if (ctx->old == new)
->   		return true;
->   	if (!kvm_pte_valid(ctx->old))
-> -		data->mm_ops->get_page(ctx->ptep);
-> +		ctx->mm_ops->get_page(ctx->ptep);
->   	else if (WARN_ON((ctx->old ^ new) & ~KVM_PTE_LEAF_ATTR_HI_SW))
->   		return false;
->   
-> @@ -413,7 +414,7 @@ static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
->   {
->   	kvm_pte_t *childp;
->   	struct hyp_map_data *data = ctx->arg;
-> -	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->   
->   	if (hyp_map_walker_try_leaf(ctx, data))
->   		return 0;
-> @@ -436,7 +437,6 @@ int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
->   	int ret;
->   	struct hyp_map_data map_data = {
->   		.phys	= ALIGN_DOWN(phys, PAGE_SIZE),
-> -		.mm_ops	= pgt->mm_ops,
->   	};
->   	struct kvm_pgtable_walker walker = {
->   		.cb	= hyp_map_walker,
-> @@ -454,18 +454,13 @@ int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
->   	return ret;
->   }
->   
-> -struct hyp_unmap_data {
-> -	u64				unmapped;
-> -	struct kvm_pgtable_mm_ops	*mm_ops;
-> -};
-> -
->   static int hyp_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
->   			    enum kvm_pgtable_walk_flags visit)
->   {
->   	kvm_pte_t *childp = NULL;
->   	u64 granule = kvm_granule_size(ctx->level);
-> -	struct hyp_unmap_data *data = ctx->arg;
-> -	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
-> +	u64 *unmapped = ctx->arg;
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->   
->   	if (!kvm_pte_valid(ctx->old))
->   		return -EINVAL;
-> @@ -486,7 +481,7 @@ static int hyp_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
->   		kvm_clear_pte(ctx->ptep);
->   		dsb(ishst);
->   		__tlbi_level(vale2is, __TLBI_VADDR(ctx->addr, 0), ctx->level);
-> -		data->unmapped += granule;
-> +		*unmapped += granule;
->   	}
->   
->   	dsb(ish);
-> @@ -501,12 +496,10 @@ static int hyp_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
->   
->   u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
->   {
-> -	struct hyp_unmap_data unmap_data = {
-> -		.mm_ops	= pgt->mm_ops,
-> -	};
-> +	u64 unmapped = 0;
->   	struct kvm_pgtable_walker walker = {
->   		.cb	= hyp_unmap_walker,
-> -		.arg	= &unmap_data,
-> +		.arg	= &unmapped,
->   		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
->   	};
->   
-> @@ -514,7 +507,7 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
->   		return 0;
->   
->   	kvm_pgtable_walk(pgt, addr, size, &walker);
-> -	return unmap_data.unmapped;
-> +	return unmapped;
->   }
->   
->   int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits,
-> @@ -538,7 +531,7 @@ int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits,
->   static int hyp_free_walker(const struct kvm_pgtable_visit_ctx *ctx,
->   			   enum kvm_pgtable_walk_flags visit)
->   {
-> -	struct kvm_pgtable_mm_ops *mm_ops = ctx->arg;
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->   
->   	if (!kvm_pte_valid(ctx->old))
->   		return 0;
-> @@ -556,7 +549,6 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
->   	struct kvm_pgtable_walker walker = {
->   		.cb	= hyp_free_walker,
->   		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
-> -		.arg	= pgt->mm_ops,
->   	};
->   
->   	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
-> @@ -575,8 +567,6 @@ struct stage2_map_data {
->   	struct kvm_s2_mmu		*mmu;
->   	void				*memcache;
->   
-> -	struct kvm_pgtable_mm_ops	*mm_ops;
-> -
->   	/* Force mappings to page granularity */
->   	bool				force_pte;
->   };
-> @@ -725,7 +715,7 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->   	kvm_pte_t new;
->   	u64 granule = kvm_granule_size(ctx->level), phys = data->phys;
->   	struct kvm_pgtable *pgt = data->mmu->pgt;
-> -	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->   
->   	if (!stage2_leaf_mapping_allowed(ctx, data))
->   		return -E2BIG;
-> @@ -773,7 +763,7 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
->   	if (!stage2_leaf_mapping_allowed(ctx, data))
->   		return 0;
->   
-> -	data->childp = kvm_pte_follow(ctx->old, data->mm_ops);
-> +	data->childp = kvm_pte_follow(ctx->old, ctx->mm_ops);
->   	kvm_clear_pte(ctx->ptep);
->   
->   	/*
-> @@ -789,7 +779,7 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
->   static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->   				struct stage2_map_data *data)
->   {
-> -	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->   	kvm_pte_t *childp;
->   	int ret;
->   
-> @@ -831,7 +821,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->   static int stage2_map_walk_table_post(const struct kvm_pgtable_visit_ctx *ctx,
->   				      struct stage2_map_data *data)
->   {
-> -	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->   	kvm_pte_t *childp;
->   	int ret = 0;
->   
-> @@ -898,7 +888,6 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
->   		.phys		= ALIGN_DOWN(phys, PAGE_SIZE),
->   		.mmu		= pgt->mmu,
->   		.memcache	= mc,
-> -		.mm_ops		= pgt->mm_ops,
->   		.force_pte	= pgt->force_pte_cb && pgt->force_pte_cb(addr, addr + size, prot),
->   	};
->   	struct kvm_pgtable_walker walker = {
-> @@ -929,7 +918,6 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
->   		.phys		= KVM_PHYS_INVALID,
->   		.mmu		= pgt->mmu,
->   		.memcache	= mc,
-> -		.mm_ops		= pgt->mm_ops,
->   		.owner_id	= owner_id,
->   		.force_pte	= true,
->   	};
-> @@ -953,7 +941,7 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
->   {
->   	struct kvm_pgtable *pgt = ctx->arg;
->   	struct kvm_s2_mmu *mmu = pgt->mmu;
-> -	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->   	kvm_pte_t *childp = NULL;
->   	bool need_flush = false;
->   
-> @@ -1007,7 +995,6 @@ struct stage2_attr_data {
->   	kvm_pte_t			attr_clr;
->   	kvm_pte_t			pte;
->   	u32				level;
-> -	struct kvm_pgtable_mm_ops	*mm_ops;
->   };
->   
->   static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> @@ -1015,7 +1002,7 @@ static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
->   {
->   	kvm_pte_t pte = ctx->old;
->   	struct stage2_attr_data *data = ctx->arg;
-> -	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->   
->   	if (!kvm_pte_valid(ctx->old))
->   		return 0;
-> @@ -1055,7 +1042,6 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
->   	struct stage2_attr_data data = {
->   		.attr_set	= attr_set & attr_mask,
->   		.attr_clr	= attr_clr & attr_mask,
-> -		.mm_ops		= pgt->mm_ops,
->   	};
->   	struct kvm_pgtable_walker walker = {
->   		.cb		= stage2_attr_walker,
-> @@ -1198,7 +1184,7 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
->   static int stage2_free_walker(const struct kvm_pgtable_visit_ctx *ctx,
->   			      enum kvm_pgtable_walk_flags visit)
->   {
-> -	struct kvm_pgtable_mm_ops *mm_ops = ctx->arg;
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
->   
->   	if (!stage2_pte_is_counted(ctx->old))
->   		return 0;
-> @@ -1218,7 +1204,6 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
->   		.cb	= stage2_free_walker,
->   		.flags	= KVM_PGTABLE_WALK_LEAF |
->   			  KVM_PGTABLE_WALK_TABLE_POST,
-> -		.arg	= pgt->mm_ops,
->   	};
->   
->   	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
-> 
-
+this looks good to me overall. but I'll wait for next version to ack
+after the change for s390 is settled down and incorporated.
