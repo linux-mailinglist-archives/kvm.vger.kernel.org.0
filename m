@@ -2,68 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44F4A62393C
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:53:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 54E3D62398B
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 03:06:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232195AbiKJBx4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 20:53:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49048 "EHLO
+        id S232527AbiKJCF6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 21:05:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231828AbiKJBxw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 20:53:52 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F655FA5
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 17:53:51 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id io19so316239plb.8
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 17:53:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xZdzpZw/ENWxCqA4wlnghR1lTnm3T7o1w8LSdyqeUPk=;
-        b=UPkpteuWjTrqlV3M5V4vaPe9d6OavmhLwikc4tWfiwKfNaZiBFfi2Csm1ku7MY8H7J
-         etYkc1QOpDv5M3I2m7CaIQaPTSAjtZjJ1+4FecEorAglf6qbBU4PwGaHsNsA6CU27KMj
-         r36PtKU7hLfM2xTm3+dD9ROUl1J2y3eI4wc6x6DV2F5KnNWYWAXNvlE6AHlrz49FixPk
-         aS6rM/xac+GtY/4zzaLMzNQCnL1T/fjzBNpCqzxH0wGIgo2UhYgGV/BW4o88ZLxumsy9
-         590PrOqT54KiDdHsDWrsQljP9vn5yKgIMvj1gRu84glTTQ/9PvSkIZWWk/cJauVobT9T
-         9M2Q==
+        with ESMTP id S232537AbiKJCF3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 21:05:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83299B7F0
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 18:04:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668045847;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XUbS7kkdkTb1FJ8Puq8bD35jK/Y5vjFwMtJetj4Fh+E=;
+        b=Ue5ORKb0Et8WljuZnU6/4cdjT2cIOfc+l77TOjOOMVYaADtqSRQpJqk3e6jtqNvZlxWaRM
+        PONbwn1q6P/bc3BTjbS9PTozbBQOWyqFtGuwiDiBs6GjFgLbn1TwjsJew0EPmRq/1koLux
+        4YpU1iy+tKBC4FcB9d/S0wja8IpQgZY=
+Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
+ [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-516-yPhGyOqPMAyp83orNRambg-1; Wed, 09 Nov 2022 21:04:06 -0500
+X-MC-Unique: yPhGyOqPMAyp83orNRambg-1
+Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-13bf576ffa6so378698fac.9
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 18:04:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xZdzpZw/ENWxCqA4wlnghR1lTnm3T7o1w8LSdyqeUPk=;
-        b=vsZLaWBotsLRd04H8Haz6o27LY6qm/l0tDR1BRLKgQ0/0OBzr/nkD7ApB7VJ1m3NBS
-         aEgFYyZ4QQVI3bzeMKaahO6UmsHFYFuYLCRcliN1Xk1WrZhJm2KzbNfWNTLmXq/t0ZT1
-         Hevn9a/uXezN9BGD/xBVP8PXGoLIpTMs5rdHD0d7EIC3DDSfIASw0QMGE38lzY1lZv0U
-         Vzvu6HdBaIu879bo6mG5u21cY871eN4RGwefHT6xZvYYT4FXR8rHDrQspKjR0s63We+3
-         PUvnVhrACvwGEfhLMxEovBrwysCb8JayRzzdKKYH4Dk+MZ5ZQP0aIwHsV0aVo7TNra1R
-         5kiA==
-X-Gm-Message-State: ACrzQf3BOKTkHv1FPhid8TPS3d6aHRXCLOwrBso4AgrMz2y4OJKqapYB
-        ijeGp/I68nE5TMKVZFB+qbitLA==
-X-Google-Smtp-Source: AMsMyM6bFJovHbW/ieNf3ywfnz9QlzCJ2EdGSnCZT3CdD0YZxRb6o0ucoGNEwDnq375jB4W31r6Hfg==
-X-Received: by 2002:a17:902:bc83:b0:187:85a:28b4 with SMTP id bb3-20020a170902bc8300b00187085a28b4mr61860660plb.96.1668045230870;
-        Wed, 09 Nov 2022 17:53:50 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id s5-20020a170903200500b00172cb8b97a8sm9792882pla.5.2022.11.09.17.53.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Nov 2022 17:53:50 -0800 (PST)
-Date:   Thu, 10 Nov 2022 01:53:47 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com
-Subject: Re: [PATCH] KVM: do not prepare new memslot for KVM_MR_DELETE
-Message-ID: <Y2xZq8Xn0Bk4de+R@google.com>
-References: <20221110012204.3919-1-yan.y.zhao@intel.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XUbS7kkdkTb1FJ8Puq8bD35jK/Y5vjFwMtJetj4Fh+E=;
+        b=vvdpzi1VQpMhrawnIHG4qQNS7AnO8dW69RAFHwAgfsHl5h1A31FwdzI/jPGjjHfLHY
+         5MY6GkiKBkB8VkLAhQSf1TuIPBdHmcLAQkMtrCjXQk/0Vzmz7wX2gHIRED92HUyJ5uz9
+         lh71f2x3NRdvabdR6AYfehJGDOMCPJyCLEB0bM1t2bmqzJBvw44SExxQgrSfHmlMZLf6
+         CX1vdhWd/y6WhGs9qCraRvQyipACHdQJh/aV9SyhUEjm1H7nYYnEEPqm8u2ba5ViD7en
+         tD4oo9j5qZocbum/jJuwVPLIqAqJCoq4bTMfWSsHoUDF2CFxcYk1hF0zc6PaxokqxyW1
+         2D2Q==
+X-Gm-Message-State: ACrzQf1SherbbiP5hrQ/X21H9Sq/3uGPaa4YaZzpqcL6ZJRGO+9ZEmA6
+        vgWzhwKXdhxg4rN3yvVqrDNYIg4LTt+ODK5n85tsHgiGUhWH6lP+0L9gDxnOqEBXhV3/An+jGDc
+        +F73ij3APdSPMnSdjNI6GBgSOCMYf
+X-Received: by 2002:a9d:604f:0:b0:66c:64d6:1bb4 with SMTP id v15-20020a9d604f000000b0066c64d61bb4mr984598otj.201.1668045842957;
+        Wed, 09 Nov 2022 18:04:02 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM45UkiwIqipZjueepL0FmRYOH9f819x2rJtJU36H2CB7TpfTuSLZCNIGl3lRKPzdZ9V6etpqCxhc4a3+nN7pxg=
+X-Received: by 2002:a9d:604f:0:b0:66c:64d6:1bb4 with SMTP id
+ v15-20020a9d604f000000b0066c64d61bb4mr984589otj.201.1668045842684; Wed, 09
+ Nov 2022 18:04:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221110012204.3919-1-yan.y.zhao@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+References: <20221109154213.146789-1-sgarzare@redhat.com>
+In-Reply-To: <20221109154213.146789-1-sgarzare@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Thu, 10 Nov 2022 10:03:50 +0800
+Message-ID: <CACGkMEu8qVjDwBmsow17ct6QtgPd-Bch7Z7jKiHveicGPVrrvg@mail.gmail.com>
+Subject: Re: [PATCH] vhost-vdpa: fix potential memory leak during the release
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, eperezma@redhat.com,
+        netdev@vger.kernel.org, kvm@vger.kernel.org,
+        Gautam Dawar <gautam.dawar@xilinx.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,26 +75,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 10, 2022, Yan Zhao wrote:
-> kvm_prepare_memory_region() is not useful for KVM_MR_DELETE,
-> and each kvm_arch_prepare_memory_region() does nothing more than returning
-> 0 for KVM_MR_DELETE.
+On Wed, Nov 9, 2022 at 11:42 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>
+> Before commit 3d5698793897 ("vhost-vdpa: introduce asid based IOTLB")
+> we call vhost_vdpa_iotlb_unmap(v, iotlb, 0ULL, 0ULL - 1) during the
+> release to free all the resources allocated when processing user IOTLB
+> messages through vhost_vdpa_process_iotlb_update().
+> That commit changed the handling of IOTLB a bit, and we accidentally
+> removed some code called during the release.
+>
+> We partially fixed with commit 037d4305569a ("vhost-vdpa: call
+> vhost_vdpa_cleanup during the release") but a potential memory leak is
+> still there as showed by kmemleak if the application does not send
+> VHOST_IOTLB_INVALIDATE or crashes:
+>
+>   unreferenced object 0xffff888007fbaa30 (size 16):
+>     comm "blkio-bench", pid 914, jiffies 4294993521 (age 885.500s)
+>     hex dump (first 16 bytes):
+>       40 73 41 07 80 88 ff ff 00 00 00 00 00 00 00 00  @sA.............
+>     backtrace:
+>       [<0000000087736d2a>] kmem_cache_alloc_trace+0x142/0x1c0
+>       [<0000000060740f50>] vhost_vdpa_process_iotlb_msg+0x68c/0x901 [vhost_vdpa]
+>       [<0000000083e8e205>] vhost_chr_write_iter+0xc0/0x4a0 [vhost]
+>       [<000000008f2f414a>] vhost_vdpa_chr_write_iter+0x18/0x20 [vhost_vdpa]
+>       [<00000000de1cd4a0>] vfs_write+0x216/0x4b0
+>       [<00000000a2850200>] ksys_write+0x71/0xf0
+>       [<00000000de8e720b>] __x64_sys_write+0x19/0x20
+>       [<0000000018b12cbb>] do_syscall_64+0x3f/0x90
+>       [<00000000986ec465>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>
+> Let's fix calling vhost_vdpa_iotlb_unmap() on the whole range in
+> vhost_vdpa_remove_as(). We move that call before vhost_dev_cleanup()
+> since we need a valid v->vdev.mm in vhost_vdpa_pa_unmap().
+> vhost_iotlb_reset() call can be removed, since vhost_vdpa_iotlb_unmap()
+> on the whole range removes all the entries.
+>
+> The kmemleak log reported was observed with a vDPA device that has `use_va`
+> set to true (e.g. VDUSE). This patch has been tested with both types of
+> devices.
+>
+> Fixes: 037d4305569a ("vhost-vdpa: call vhost_vdpa_cleanup during the release")
+> Fixes: 3d5698793897 ("vhost-vdpa: introduce asid based IOTLB")
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-This is not true, s390 has an error path that fires in the DELETE case.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-	/* When we are protected, we should not change the memory slots */
-	if (kvm_s390_pv_get_handle(kvm))
-		return -EINVAL;
+> ---
+>  drivers/vhost/vdpa.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 166044642fd5..b08e07fc7d1f 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -65,6 +65,10 @@ static DEFINE_IDA(vhost_vdpa_ida);
+>
+>  static dev_t vhost_vdpa_major;
+>
+> +static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v,
+> +                                  struct vhost_iotlb *iotlb,
+> +                                  u64 start, u64 last);
+> +
+>  static inline u32 iotlb_to_asid(struct vhost_iotlb *iotlb)
+>  {
+>         struct vhost_vdpa_as *as = container_of(iotlb, struct
+> @@ -135,7 +139,7 @@ static int vhost_vdpa_remove_as(struct vhost_vdpa *v, u32 asid)
+>                 return -EINVAL;
+>
+>         hlist_del(&as->hash_link);
+> -       vhost_iotlb_reset(&as->iotlb);
+> +       vhost_vdpa_iotlb_unmap(v, &as->iotlb, 0ULL, 0ULL - 1);
+>         kfree(as);
+>
+>         return 0;
+> @@ -1162,14 +1166,14 @@ static void vhost_vdpa_cleanup(struct vhost_vdpa *v)
+>         struct vhost_vdpa_as *as;
+>         u32 asid;
+>
+> -       vhost_dev_cleanup(&v->vdev);
+> -       kfree(v->vdev.vqs);
+> -
+>         for (asid = 0; asid < v->vdpa->nas; asid++) {
+>                 as = asid_to_as(v, asid);
+>                 if (as)
+>                         vhost_vdpa_remove_as(v, asid);
+>         }
+> +
+> +       vhost_dev_cleanup(&v->vdev);
+> +       kfree(v->vdev.vqs);
+>  }
+>
+>  static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+> --
+> 2.38.1
+>
 
-	if (change == KVM_MR_DELETE || change == KVM_MR_FLAGS_ONLY)
-		return 0;
-
-
-> So, just don't call into kvm_prepare_memory_region() to avoid unnecessary
-> error handling for KVM_MR_DELETE.
-
-Even if the s390 case didn't exit, I would still prefer keeping the code as is.
-I agree that a "dummy" call is somewhat confusing, but skipping the arch call
-for one operation is equally confusing and could easily lead to future bugs,
-e.g. if the order of changes were reversed and an s390 developer wasn't aware
-that s390's arch hook would be bypassed on memslot deletion.
