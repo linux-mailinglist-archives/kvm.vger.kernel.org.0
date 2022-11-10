@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8508623903
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:40:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18BC3623904
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:41:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231982AbiKJBk4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 20:40:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39876 "EHLO
+        id S232312AbiKJBlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 20:41:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230254AbiKJBk4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 20:40:56 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 600B0275DD
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 17:40:55 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id k5so448407pjo.5
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 17:40:55 -0800 (PST)
+        with ESMTP id S232356AbiKJBlB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 20:41:01 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97BFB275C2
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 17:41:00 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id k15so470136pfg.2
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 17:41:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=84cwfiBGbrsdwBAij7CyOZvNXUFWqLFNrDP4kbpFKkE=;
-        b=qCXI+4uxaI0QXY+ysm5ECir9vYQngH6y6YoQHruOb+5+o8YvyWOQ6YJ+ZA1YHWX6HQ
-         XJiYlfILz3Vd0/vbsoNtpprUe7l9PUbgp1TWJQs7KBvruFIgbzQ3oWCr79vBQpFr5+4/
-         1InntebPsbLaiQhrAM8nggu+EFyZ+dK0tMvGlzLK4JmNG5l+YHbRTBHJkilalx6LLRHb
-         GZE/P9lFyzeLRVQD/QttSArRNvMhagFdj3+FPodgORvlqV8j5EnVQiuyDRGKjFa5ydYP
-         Aeb0vw5QmsS9HvisNm0L4VEx+bU0eCI2YmPUoPVH0ZeQqnEpQ3+BKUdrbRh0gxMWW1GS
-         27jg==
+        bh=o+09jyLU6lDhuNs5pMZSMI1gUeLpq4TEKRbF8Z7vfAE=;
+        b=quGu/dIyNoNYfoUaLOnhPpC6Drh6MzlOQVIRdx+/tN9n66ne2Y2jhdye0zFUICK7Os
+         L+ggQFPVgGPzF0xL53MmKLhsT24S5NwvyPVRXeu3zeQdUsNQ+T5FVrid56SVQRqej6JU
+         ugxRe8Cpp30PV0h7NJfND2HeYo/UhyY+TLVyjzeCoHi3+hzOzg2O/qa7yf8PoAAYFUMj
+         /QSiFaYXnnf5GaoCxd3K9IY4Rn7eoWBCbTzQHkh+xqnoQIbQHqcLnq2zt0qBpZiQWX+s
+         5ZLdDiQg35w0yltAiV3gitf/aYAunI0+QZKrfCmD3w5jYbH0l/Lk4Q+SEnWrBMZ6qHTr
+         1UlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=84cwfiBGbrsdwBAij7CyOZvNXUFWqLFNrDP4kbpFKkE=;
-        b=VWruH9nUpwV7BfxZnmqqfnId34tmEA1lV2cb/0bAaHZ4mELyJdItutcc0/48aMEhRS
-         SxD3qGM9yqgWzAOxngC0DWpMufIC73Ic8pXazpCZfIeJHAMaBkebe5PrP9sj8oS5Do/7
-         hOFjfUjFjZmfQprMXfuZvQLgxgeUbaW+rObZ4ddwKHDO0WGHQpm4hNA1X2H9f0sl9Pfd
-         qS6DBnQWdm1kHSHHlpDfBH2Q7y7ClPMB3/tLOu1tOCnFtU6zl1vSYq69V9yx6NJJSZJ/
-         033KUeoKSHqiBQyvYAH1CbMd8sOcRXvIZo/CAL93GHDHaFBoPapiPISwK0WAyQnOf4cQ
-         NISw==
-X-Gm-Message-State: ACrzQf3OjAlnhY8bCYGkPXOnJ+2jralmduDr7O+ty8ALp2A7m7V2YeVZ
-        koc2D/1bqymgt8g3YlLbLHME0Qg5UTs6Sg==
-X-Google-Smtp-Source: AMsMyM60CL1UDHRLUQ2TodZYTLE5/UEcWzfehasbPeR99B/866gAJ6+DKGZmHMPl9I6zc+Vyyh/e6g==
-X-Received: by 2002:a17:902:ef85:b0:187:85d:bd2e with SMTP id iz5-20020a170902ef8500b00187085dbd2emr60381202plb.31.1668044454704;
-        Wed, 09 Nov 2022 17:40:54 -0800 (PST)
+        bh=o+09jyLU6lDhuNs5pMZSMI1gUeLpq4TEKRbF8Z7vfAE=;
+        b=j7njg8mlvbDDRYVfvYGWbYmX7wxSY+IdBSBnQlAg1gVkQun+/05/1Q56f0drF+1Nje
+         YHKXca6e7wxZBSqRhpmIH1gMiabeh2u5BCUn/9QeY0Dp0b4ZIdzKQQArEDrTU+xyjnKS
+         5yomDwmRzwz+QckoT4Qv04hANV+fynevrmgz4rqhEdNpfbA5NQ4XJ11q2cFtuzDm3oW7
+         7U7Rp7dr3WFszyUBt3KZgZNJ8BdU9hh/N3qF8ujOp0hmEjXQEtKiPhAAfzGLOQX6k5Wn
+         zu1Td9rqLsRT4e+8tQVHOGU41uuI4wZ4ZkN45LkvVUFBLNjaNbFtMvauGyd07P/o5F95
+         T80w==
+X-Gm-Message-State: ACrzQf0d2WMu9jIP0nJYQvgdF3xXhBjCZ0IpcKQOrcmr5LgvjWAvU9cg
+        EbDqgE4l3xRjjHcb0XRGnGz7c5M3qkUfnw==
+X-Google-Smtp-Source: AMsMyM5GBPV0dHnu0qo+eAe5l/VAmWFRds6l8diPV/W5VpWGrDHyAmKIM0csPNEnbAEMrJSaxfCuZg==
+X-Received: by 2002:aa7:9145:0:b0:556:d001:b830 with SMTP id 5-20020aa79145000000b00556d001b830mr1570995pfi.62.1668044459914;
+        Wed, 09 Nov 2022 17:40:59 -0800 (PST)
 Received: from crazyhorse.local ([174.127.229.57])
-        by smtp.googlemail.com with ESMTPSA id pj4-20020a17090b4f4400b00212cf2fe8c3sm3091836pjb.1.2022.11.09.17.40.54
+        by smtp.googlemail.com with ESMTPSA id pj4-20020a17090b4f4400b00212cf2fe8c3sm3091836pjb.1.2022.11.09.17.40.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Nov 2022 17:40:54 -0800 (PST)
+        Wed, 09 Nov 2022 17:40:59 -0800 (PST)
 From:   Anthony DeRossi <ajderossi@gmail.com>
 To:     kvm@vger.kernel.org
 Cc:     alex.williamson@redhat.com, cohuck@redhat.com, jgg@nvidia.com,
         kevin.tian@intel.com, abhsahu@nvidia.com, yishaih@nvidia.com
-Subject: [PATCH v6 1/3] vfio: Fix container device registration life cycle
-Date:   Wed,  9 Nov 2022 17:40:25 -0800
-Message-Id: <20221110014027.28780-2-ajderossi@gmail.com>
+Subject: [PATCH v6 2/3] vfio: Export the device set open count
+Date:   Wed,  9 Nov 2022 17:40:26 -0800
+Message-Id: <20221110014027.28780-3-ajderossi@gmail.com>
 X-Mailer: git-send-email 2.37.4
 In-Reply-To: <20221110014027.28780-1-ajderossi@gmail.com>
 References: <20221110014027.28780-1-ajderossi@gmail.com>
@@ -71,58 +71,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In vfio_device_open(), vfio_device_container_register() is always called
-when open_count == 1. On error, vfio_device_container_unregister() is
-only called when open_count == 1 and close_device is set. This leaks a
-registration for devices without a close_device implementation.
+The open count of a device set is the sum of the open counts of all
+devices in the set. Drivers can use this value to determine whether
+shared resources are in use without tracking them manually or accessing
+the private open_count in vfio_device.
 
-In vfio_device_fops_release(), vfio_device_container_unregister() is
-called unconditionally. This can cause a device to be unregistered
-multiple times.
-
-Treating container device registration/unregistration uniformly (always
-when open_count == 1) fixes both issues.
-
-Fixes: ce4b4657ff18 ("vfio: Replace the DMA unmapping notifier with a callback")
 Signed-off-by: Anthony DeRossi <ajderossi@gmail.com>
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 ---
- drivers/vfio/vfio_main.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ drivers/vfio/vfio_main.c | 13 +++++++++++++
+ include/linux/vfio.h     |  1 +
+ 2 files changed, 14 insertions(+)
 
 diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 2d168793d4e1..9a4af880e941 100644
+index 9a4af880e941..6e8804fe0095 100644
 --- a/drivers/vfio/vfio_main.c
 +++ b/drivers/vfio/vfio_main.c
-@@ -801,8 +801,9 @@ static struct file *vfio_device_open(struct vfio_device *device)
- err_close_device:
- 	mutex_lock(&device->dev_set->lock);
- 	mutex_lock(&device->group->group_lock);
--	if (device->open_count == 1 && device->ops->close_device) {
--		device->ops->close_device(device);
-+	if (device->open_count == 1) {
-+		if (device->ops->close_device)
-+			device->ops->close_device(device);
+@@ -125,6 +125,19 @@ static void vfio_release_device_set(struct vfio_device *device)
+ 	xa_unlock(&vfio_device_set_xa);
+ }
  
- 		vfio_device_container_unregister(device);
- 	}
-@@ -1017,10 +1018,12 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
- 	mutex_lock(&device->dev_set->lock);
- 	vfio_assert_device_open(device);
- 	mutex_lock(&device->group->group_lock);
--	if (device->open_count == 1 && device->ops->close_device)
--		device->ops->close_device(device);
-+	if (device->open_count == 1) {
-+		if (device->ops->close_device)
-+			device->ops->close_device(device);
++unsigned int vfio_device_set_open_count(struct vfio_device_set *dev_set)
++{
++	struct vfio_device *cur;
++	unsigned int open_count = 0;
++
++	lockdep_assert_held(&dev_set->lock);
++
++	list_for_each_entry(cur, &dev_set->device_list, dev_set_list)
++		open_count += cur->open_count;
++	return open_count;
++}
++EXPORT_SYMBOL_GPL(vfio_device_set_open_count);
++
+ /*
+  * Group objects - create, release, get, put, search
+  */
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index e7cebeb875dd..fdd393f70b19 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -189,6 +189,7 @@ int vfio_register_emulated_iommu_dev(struct vfio_device *device);
+ void vfio_unregister_group_dev(struct vfio_device *device);
  
--	vfio_device_container_unregister(device);
-+		vfio_device_container_unregister(device);
-+	}
- 	mutex_unlock(&device->group->group_lock);
- 	device->open_count--;
- 	if (device->open_count == 0)
+ int vfio_assign_device_set(struct vfio_device *device, void *set_id);
++unsigned int vfio_device_set_open_count(struct vfio_device_set *dev_set);
+ 
+ int vfio_mig_get_next_state(struct vfio_device *device,
+ 			    enum vfio_device_mig_state cur_fsm,
 -- 
 2.37.4
 
