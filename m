@@ -2,188 +2,390 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA1D8624B05
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 20:55:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DF67624B2D
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 21:06:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231248AbiKJTz3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 14:55:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47754 "EHLO
+        id S231429AbiKJUGo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 15:06:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230076AbiKJTz2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 14:55:28 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34EB2B9B;
-        Thu, 10 Nov 2022 11:55:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668110127; x=1699646127;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=S09aoKSMapltJQ8Gu2c1nCNLf1C9h248Yw9FiTgrlCk=;
-  b=M9HPEyB8EmXwA5CbgsjZvInjPUo4D59ECPb7NJB/UO9nPMTlldp3HYwI
-   sdp1UDu+nDLHmVUATj+fzBYpbiiRX1gfBVKxJJ78UeDwlZaygnfsCm4RZ
-   fQAWsWcEfHiMgZ02QoK018F6LJPhVLzcfH/cUhIJxoewDtlT/Ia91kqcr
-   q2db1HfnJpc1ywxBAAG+HQBAufdIYLmxZDkAV2rulFdExnJ+0lmEDrTmP
-   MtB4ZARaKBomEEgknUsj4lCqdfhp9ZDZR+eX45D3YEeOeZtqHcJSQk/S8
-   +ve0Dh5lMR/oong1OGi4G5Vr5BWNdDswfDyoJPg1TvQ+Q4hve0HQA9b2k
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="313207002"
-X-IronPort-AV: E=Sophos;i="5.96,154,1665471600"; 
-   d="scan'208";a="313207002"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 11:55:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="743000121"
-X-IronPort-AV: E=Sophos;i="5.96,154,1665471600"; 
-   d="scan'208";a="743000121"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga002.fm.intel.com with ESMTP; 10 Nov 2022 11:55:25 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 10 Nov 2022 11:55:25 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Thu, 10 Nov 2022 11:55:25 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Thu, 10 Nov 2022 11:55:25 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mT65X0HQXEJeE8LOpn6Gha+RMYlkqaUbQprnKD+9P5Rlo+YqFcWmkXUohR5IFieoVZd0lDfjuUwS7Nw1boE5/v/Vis4esdK89bvv7nBjvhcJmpTr/WY+iuVhFCv9BnBaBHsLsxZ84IwNnDZoFUcDqqS3kZELk1kV7v4/okIhdWI/OOoJGIMG08KBOEUw/9dHkXNAzbsrStMN4Fp6SgQ4lrd2QrT8StpnH2p+g0X7rXFek4OpJdVWkqYutrgD9sMraNJysYy191bcnNRKMwWcuYouFafVJVr8UCG8Jnp42aI0dRgyB/5yortw6TkosFBZI45GVVeWXJVMIGkRoY2rwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nCesrJ4ZlndBqdt7wtVQ2pNk14GR9YpV/vfTC2/Uq2o=;
- b=Js9JjRmX9hsF9TOmigfX8aCcej+VCdw7ptbNgrUvpa7bdeNcvakChLAYPMBu6RpxWcdPfq4Zyn73jqo0HMLvrESAT3pl8ImHzsBAHO4U7MKQTj2Davq57PijK+yq2j1VFaJTd9arRvbokimGzPhLcg5c2xo/Q13Kji9nVo5GqslTCAj2BET3RVTRj6pUK+pHsQ+cvIyDojgrpvAvHwBSYJoFi3HPSR0/172sdV2VMcGi9iDY6jdzl0EQF/NwuYwtuweT1Abqq/O6kPFuhA1xrTI3n9O5Ucka0CmjExuGW5HJ5ho+YbOMaxQ6BjEWfyYvnwN13bwXlvKR/xbECX9Pag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN6PR1101MB2161.namprd11.prod.outlook.com
- (2603:10b6:405:52::15) by MN2PR11MB4599.namprd11.prod.outlook.com
- (2603:10b6:208:26d::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.13; Thu, 10 Nov
- 2022 19:55:22 +0000
-Received: from BN6PR1101MB2161.namprd11.prod.outlook.com
- ([fe80::40a1:5197:e1df:bb6c]) by BN6PR1101MB2161.namprd11.prod.outlook.com
- ([fe80::40a1:5197:e1df:bb6c%11]) with mapi id 15.20.5813.013; Thu, 10 Nov
- 2022 19:55:22 +0000
-From:   "Li, Xin3" <xin3.li@intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: RE: [RESEND PATCH 2/6] x86/traps: add a system interrupt table for
- system interrupt dispatch
-Thread-Topic: [RESEND PATCH 2/6] x86/traps: add a system interrupt table for
- system interrupt dispatch
-Thread-Index: AQHY9M85Yu9uY6afW02HaiePlaJ2sq432uWAgAC2DaA=
-Date:   Thu, 10 Nov 2022 19:55:22 +0000
-Message-ID: <BN6PR1101MB21619E2092AFF048422C6311A8019@BN6PR1101MB2161.namprd11.prod.outlook.com>
-References: <20221110061545.1531-1-xin3.li@intel.com>
- <20221110061545.1531-3-xin3.li@intel.com>
- <Y2y8obdYDXo9vlH/@hirez.programming.kicks-ass.net>
-In-Reply-To: <Y2y8obdYDXo9vlH/@hirez.programming.kicks-ass.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.6.500.17
-dlp-reaction: no-action
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN6PR1101MB2161:EE_|MN2PR11MB4599:EE_
-x-ms-office365-filtering-correlation-id: 35660864-6927-4a76-b1a9-08dac35580a6
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: iwsLYRGoObEFsKVp5ll6/4peXmLaxlhLl0DazVvmqGieuGhZ7XnurINfVQPM+MUMYBOiSMIMkMBEK398zuOypxha2hBhOkd03CoDAHj++TM6HrOfGUCee1fy6w11reoWdpF7D/Xdc1t11pLc0uxiDlI+kcskAhDX/z/248I4+8PzuJo+AGnlPxA5QnRjLMZPScAfqXhkh5gpkCcqKoCWTAXbhyMCQjtxq8xqemIGneZTinRleJj8todpgV8bOGHgPz9POrIMe2CI+P/D/HYrsa3i33+1v0PB6heJPu2nQxwutpXtt5s14akFycE4mdXinMeYuFbrdrSLad8rc5/3PgYOaTAH636vpbAdEi5PJ+RachL2BkE7+C4v2tdmpdz8pGR9VmdUdVrg2fpyJ27StC2C/n7eC6Dx5HbKwqhDIpGII/gGDPqXVekJPfFKwVzbAVEtyB70SF66aOD9upFwHtlgG2bozQFJkIOOWX20oum3lH0tZFs7uvohNb1Dq/vfRiK8ghbC5rGwxF5hjyCl0kaJNhP/hwISFaB+9UH+8thbPSxZb6ZCtxHj5YYLAkQsxUna/j8dq8VjQ1mkdlRdEHkotuUhngSnUfKSsmcwJlHgQOWPB0GIo6Dd/iLho8955kxgcUJwhHlE8BNQBtM+Awd49Eq1cgvK0lOLDKN42xby49qbYFIsJVjuzIKKKZRBU7aIYxYBUlVEOXXdALK0CekwNv84vQ2W1FUHu3v7JmG67Zmnz6nXj1sOr05s8NoyCAAZouzUqhXH13lyctwvHA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN6PR1101MB2161.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(366004)(396003)(136003)(346002)(39860400002)(376002)(451199015)(122000001)(38100700002)(4744005)(41300700001)(33656002)(82960400001)(2906002)(86362001)(4326008)(38070700005)(6506007)(7696005)(9686003)(26005)(478600001)(66476007)(316002)(64756008)(8676002)(66446008)(76116006)(66946007)(71200400001)(55016003)(66556008)(7416002)(186003)(8936002)(54906003)(5660300002)(52536014)(6916009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?C+6WVSatpfChnMP0kJYVM8lQFjrXzYIHppdISL8dkyTxfTsPt/dveBzbWBzl?=
- =?us-ascii?Q?nIOg3uHNJgRNw358FeesfqlazkSEyGjnTRJIVz542IGQEcmDsj7P+0NVUqDr?=
- =?us-ascii?Q?nK021BGLqW1SMqvycokYVibbKvZMWCsBTccpYekvb/KXNCNlWa6OpbN5Yva3?=
- =?us-ascii?Q?VpJb6VVbY5tG6ERxA1UnbOMPPRu7I35ppdUe9Y0W2wqiC2AQr+t8OzX2J4CL?=
- =?us-ascii?Q?purWK2bCXLgBttjeRY8oMJ22/klcfEYPjyjcNuguUKeslVOweKegT/WJF9NC?=
- =?us-ascii?Q?3TUR+mFZPNhT00GKAxRPS7TwoORH/QYPUGDouCelhtuqbs9NlHNoetU0vjvU?=
- =?us-ascii?Q?E7/LsWz82UFzafOolNLz0STDhqVKm6xp1JfJFnqy60a6ih0XRbW9iyyLUQGK?=
- =?us-ascii?Q?WnOui7dtBzZLsZOeE5oHdtlicsX0KWNj8kHWGR6MvFQccAnJWBq6s+4EvQ31?=
- =?us-ascii?Q?nKZP31/nTRKaOp9p2+PDa8Zk/QQ8v+CLPPGeSJJxU2pZZ2YnOZW9Ye8c0p+C?=
- =?us-ascii?Q?mhxq1RYv/VWHf1VndyUA3DtuZ3AupAKeLdVFa7b6y6Zo2S2PHbmcH6mTT9bk?=
- =?us-ascii?Q?n1V/g1fdlC462JlbKEedRiLPh5lSG2ZUTqp+3BlrcEzke50MC4DT6HW1urHI?=
- =?us-ascii?Q?2Gb7EGjJC+CqKcCgo7Kb7LqGmeRSoYAg2IqDq9GvWNz6jch1VjbZ56I34k5l?=
- =?us-ascii?Q?DZu9ig2xpAg0+zQhelfklatG0f8ifqsPFSP+Dtq3tjid4ucixIlxL3ywdJvQ?=
- =?us-ascii?Q?I73CMFzgXQbVCWXWO52UG1ddSrIgGxQJ384/+9qB+z8aFzQUdrDdrJ6dolv6?=
- =?us-ascii?Q?pNXtM5vWLqvl2tl0PRWREnDOFPzv9yGgQTSVF2DiGHklAhqm5zH58GRSI+o0?=
- =?us-ascii?Q?F1x2ilerLeIpJpOf1UPc8lZL511RiVlG2d1WSBCoMqzqifcRsZ6N2UvG6tzr?=
- =?us-ascii?Q?4laehYST50fXPDGhhFPt/YGEnUyVE1D7g9V08ywNPAlvFkOdU2cTN4l5ebWS?=
- =?us-ascii?Q?rNa8aVDz5euQQzkZ6VJ0/rmMW+ztj1kihgzJd0OWxFwGN2vc1ALsnD6setPG?=
- =?us-ascii?Q?8jJEKvqkQwLGrrqRNIysa+NAQ0IbHY8RiwZhe6fhQRcyvBc7m60CRBuA6Jqu?=
- =?us-ascii?Q?3pEwBG1/amu0JiQzolTX7bs2wsuPojBfNPDGt0IbGK5Vsdm+TydyO8SqoHrd?=
- =?us-ascii?Q?qnlIszgsPp9kgM7xpJbd/EcgILq4J02oMLOzskuIMKUKBSGTiO4VMvibkczl?=
- =?us-ascii?Q?Q2AI/JDA6RRUd2RwC6FktkGrELRvGOY49AfDvQl5SiKxzZ6dsaLZhxwO3+5O?=
- =?us-ascii?Q?kPw1UBAMX9LavWOOI/YBB3y7GNQ1HDwCKq3npjcvSmmjtxQ+PDilIbMigNAc?=
- =?us-ascii?Q?Ag2myoADLChWpJPLoY/zfJckbuDsnaCXGFsdSUBuwSn1yWDk6L9VpGbk6r/1?=
- =?us-ascii?Q?s9K3Qtw4bOBOfcXvc6DAF0VnKcKdkqHIa96dmRqLwimS2r8+LVBzLl3fVw/s?=
- =?us-ascii?Q?FgRwBSzVjdXkszFqJ1TIgRihG4bIsCrxZKd5HdKWMHeSZYShg2kRLKSJcR73?=
- =?us-ascii?Q?V2t5d+fQlWQup/O1xtU=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S231419AbiKJUGk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 15:06:40 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3B862DAB5
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 12:06:38 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id 130so2636221pgc.5
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 12:06:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qAlpSiWPFJC6v5OKKunr5qvlqoVrXquKYjzcoe1SyVc=;
+        b=s9HF6LHGTF6eKfCzsKX9FWUdVKeTMh/pkFaFPKYT0H/d4OcOkPXr+0PLIQfX6kQ8cC
+         Q64JtYebCdaU4ruWo7vOG4vxzCvbf/2RKLE1KNtbitWQ8USo0uklGuWav/4tDaTlFs6W
+         J6Y4kL0unkMwatSWRT7ksIKS8SVHxhP1XKVRgR1T1zWDYn6jIqZIsJGf7oOlihyXVFbd
+         0fJb0UlwvmxM7pKZs3I6/RrzXuReRbcfrXYqhpPSmf2PKsS1vNFDHltDDL3yKYYAvjar
+         0KJ9USRBIJHcvcJeqnyACzk9N+VJy0yc4DTHiyUqXB49s0LJfIJy8GxXJG4zJMQkeMSU
+         tXrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qAlpSiWPFJC6v5OKKunr5qvlqoVrXquKYjzcoe1SyVc=;
+        b=5FcWL7GHiGI+vt3aMFs9sI0AC8OPEwQvkZz5PmBGlTHfWGqYfPIwvbvwVl6tcTWzt0
+         Y+ELf4o752L/a2NBQfJkcdiuBk5c8MDZosmyF+9enMxjhtK3tmklcwq4ErAMLvhQXBvI
+         o+dV3HoXPJhbKbNKrc4KMRgi+QvFAs8K/2qpfRF4af/d5T8IzmJkjei5TkaHDUZ4LfEF
+         ddJJMYMt+9GBa84CcBtvgwgVmguG6JFDHXFdiLIGp2rM+ycELzvIKBt1m5cCqMuPj+gb
+         Zj0iqD7yDGZ0KtZ5hTJboYSQTRzsiHeGcVRuCvhlR32QVuuDFsI3hb6iz9IRoqoHpqow
+         oPsQ==
+X-Gm-Message-State: ACrzQf2ciCZFM/CfdIDeZ8Jtj6cJvUBgRsJB0jUvRpAXHyEACx4n3f0x
+        qK36MvJW6igxiExArS3M4AGNLg==
+X-Google-Smtp-Source: AMsMyM5mFyfKXM8lYQiQhk8wd0EOlRpGOMeyUwap0ARCZELHfNLQu3vKFpmelexnZtvDHcT8xi35cA==
+X-Received: by 2002:a63:ff45:0:b0:46a:e818:b622 with SMTP id s5-20020a63ff45000000b0046ae818b622mr3140651pgk.550.1668110797941;
+        Thu, 10 Nov 2022 12:06:37 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id d15-20020a170902cecf00b001871461688esm69853plg.175.2022.11.10.12.06.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Nov 2022 12:06:37 -0800 (PST)
+Date:   Thu, 10 Nov 2022 20:06:33 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v9 4/8] KVM: Use gfn instead of hva for mmu_notifier_retry
+Message-ID: <Y21ZyTdIHSe4HLkU@google.com>
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <20221025151344.3784230-5-chao.p.peng@linux.intel.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN6PR1101MB2161.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 35660864-6927-4a76-b1a9-08dac35580a6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Nov 2022 19:55:22.4234
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hVjM4OzgFg1C/JiK1pwSfyPI4SRa2p7LxfeN02Dxms85hJkgBelw5oCLQCUacSFV0Nw9HPgsRpB0IpwZp4G9kw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4599
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221025151344.3784230-5-chao.p.peng@linux.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
-> > Signed-off-by: Xin Li <xin3.li@intel.com>
->=20
-> This is not a valid SOB, it would suggest hpa is the author, but he's not=
- in in
-> From.
+On Tue, Oct 25, 2022, Chao Peng wrote:
+> @@ -715,15 +715,9 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+>  	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
+>  }
+>  
+> -void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+> -			      unsigned long end)
+> +static inline
 
-HPA wrote the initial dispatch code for FRED, and I worked with him to
-refactor it for KVM/VMX NMI/IRQ dispatch.  So use SOB from both.  No?
+Don't tag static functions with "inline" unless they're in headers, in which case
+the inline is effectively required.  In pretty much every scenario, the compiler
+can do a better job of optimizing inline vs. non-inline, i.e. odds are very good
+the compiler would inline this helper anyways, and if not, there would likely be
+a good reason not to inline it.
 
-> > diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c index
-> > 178015a820f0..95dd917ef9ad 100644
-> > --- a/arch/x86/kernel/traps.c
-> > +++ b/arch/x86/kernel/traps.c
-> > @@ -1444,6 +1444,61 @@ DEFINE_IDTENTRY_SW(iret_error)  }  #endif
-> >
-> > +#define SYSV(x,y) [(x) - FIRST_SYSTEM_VECTOR] =3D
-> > +(system_interrupt_handler)y
-> > +
-> > +#pragma GCC diagnostic push
-> > +#pragma GCC diagnostic ignored "-Wcast-function-type"
->=20
-> How does this not break CFI ?
+It'll be a moot point in this case (more below), but this would also reduce the
+line length and avoid the wrap.
 
-I wasn't aware of it, will check.
+> void update_invalidate_range(struct kvm *kvm, gfn_t start,
+> +							    gfn_t end)
+
+I appreciate the effort to make this easier to read, but making such a big divergence
+from the kernel's preferred formatting is often counter-productive, e.g. I blinked a
+few times when first reading this code.
+
+Again, moot point this time (still below ;-) ), but for future reference, better
+options are to either let the line poke out or simply wrap early to get the
+bundling of parameters that you want, e.g.
+
+  static inline void update_invalidate_range(struct kvm *kvm, gfn_t start, gfn_t end)
+
+or 
+
+  static inline void update_invalidate_range(struct kvm *kvm,
+					     gfn_t start, gfn_t end)
+
+>  {
+> -	/*
+> -	 * The count increase must become visible at unlock time as no
+> -	 * spte can be established without taking the mmu_lock and
+> -	 * count is also read inside the mmu_lock critical section.
+> -	 */
+> -	kvm->mmu_invalidate_in_progress++;
+>  	if (likely(kvm->mmu_invalidate_in_progress == 1)) {
+>  		kvm->mmu_invalidate_range_start = start;
+>  		kvm->mmu_invalidate_range_end = end;
+> @@ -744,6 +738,28 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+>  	}
+>  }
+>  
+> +static void mark_invalidate_in_progress(struct kvm *kvm, gfn_t start, gfn_t end)
+
+Splitting the helpers this way yields a weird API overall, e.g. it's possible
+(common, actually) to have an "end" without a "begin".
+
+Taking the range in the "end" is also dangerous/misleading/imbalanced, because _if_
+there are multiple ranges in a batch, each range would need to be unwound
+independently, e.g. the invocation of the "end" helper in
+kvm_mmu_notifier_invalidate_range_end() is flat out wrong, it just doesn't cause
+problems because KVM doesn't (currently) try to unwind regions (and probably never
+will, but that's beside the point).
+
+Rather than shunt what is effectively the "begin" into a separate helper, provide
+three separate APIs, e.g. begin, range_add, end.  That way, begin+end don't take a
+range and thus are symmetrical, always paired, and can't screw up unwinding since
+they don't have a range to unwind.
+
+It'll require three calls in every case, but that's not the end of the world since
+none of these flows are super hot paths.
+
+> +{
+> +	/*
+> +	 * The count increase must become visible at unlock time as no
+> +	 * spte can be established without taking the mmu_lock and
+> +	 * count is also read inside the mmu_lock critical section.
+> +	 */
+> +	kvm->mmu_invalidate_in_progress++;
+
+This should invalidate (ha!) mmu_invalidate_range_{start,end}, and then WARN in
+mmu_invalidate_retry() if the range isn't valid.  And the "add" helper should
+WARN if mmu_invalidate_in_progress == 0.
+
+> +}
+> +
+> +static bool kvm_mmu_handle_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+
+"handle" is waaaay too generic.  Just match kvm_unmap_gfn_range() and call it
+kvm_mmu_unmap_gfn_range().  This is a local function so it's unlikely to collide
+with arch code, now or in the future.
+
+> +{
+> +	update_invalidate_range(kvm, range->start, range->end);
+> +	return kvm_unmap_gfn_range(kvm, range);
+> +}
+
+Overall, this?  Compile tested only...
+
+---
+ arch/x86/kvm/mmu/mmu.c   |  8 +++++---
+ include/linux/kvm_host.h | 33 +++++++++++++++++++++------------
+ virt/kvm/kvm_main.c      | 30 +++++++++++++++++++++---------
+ 3 files changed, 47 insertions(+), 24 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 93c389eaf471..d4b373e3e524 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4259,7 +4259,7 @@ static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+ 		return true;
+ 
+ 	return fault->slot &&
+-	       mmu_invalidate_retry_hva(vcpu->kvm, mmu_seq, fault->hva);
++	       mmu_invalidate_retry_gfn(vcpu->kvm, mmu_seq, fault->gfn);
+ }
+ 
+ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+@@ -6098,7 +6098,9 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+ 
+ 	write_lock(&kvm->mmu_lock);
+ 
+-	kvm_mmu_invalidate_begin(kvm, gfn_start, gfn_end);
++	kvm_mmu_invalidate_begin(kvm);
++
++	kvm_mmu_invalidate_range_add(kvm, gfn_start, gfn_end);
+ 
+ 	flush = kvm_rmap_zap_gfn_range(kvm, gfn_start, gfn_end);
+ 
+@@ -6112,7 +6114,7 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+ 		kvm_flush_remote_tlbs_with_address(kvm, gfn_start,
+ 						   gfn_end - gfn_start);
+ 
+-	kvm_mmu_invalidate_end(kvm, gfn_start, gfn_end);
++	kvm_mmu_invalidate_end(kvm);
+ 
+ 	write_unlock(&kvm->mmu_lock);
+ }
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index e6e66c5e56f2..29aa6d6827cc 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -778,8 +778,8 @@ struct kvm {
+ 	struct mmu_notifier mmu_notifier;
+ 	unsigned long mmu_invalidate_seq;
+ 	long mmu_invalidate_in_progress;
+-	unsigned long mmu_invalidate_range_start;
+-	unsigned long mmu_invalidate_range_end;
++	gfn_t mmu_invalidate_range_start;
++	gfn_t mmu_invalidate_range_end;
+ #endif
+ 	struct list_head devices;
+ 	u64 manual_dirty_log_protect;
+@@ -1378,10 +1378,9 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
+ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+ #endif
+ 
+-void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+-			      unsigned long end);
+-void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
+-			    unsigned long end);
++void kvm_mmu_invalidate_begin(struct kvm *kvm);
++void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
++void kvm_mmu_invalidate_end(struct kvm *kvm);
+ 
+ long kvm_arch_dev_ioctl(struct file *filp,
+ 			unsigned int ioctl, unsigned long arg);
+@@ -1952,9 +1951,9 @@ static inline int mmu_invalidate_retry(struct kvm *kvm, unsigned long mmu_seq)
+ 	return 0;
+ }
+ 
+-static inline int mmu_invalidate_retry_hva(struct kvm *kvm,
++static inline int mmu_invalidate_retry_gfn(struct kvm *kvm,
+ 					   unsigned long mmu_seq,
+-					   unsigned long hva)
++					   gfn_t gfn)
+ {
+ 	lockdep_assert_held(&kvm->mmu_lock);
+ 	/*
+@@ -1963,10 +1962,20 @@ static inline int mmu_invalidate_retry_hva(struct kvm *kvm,
+ 	 * that might be being invalidated. Note that it may include some false
+ 	 * positives, due to shortcuts when handing concurrent invalidations.
+ 	 */
+-	if (unlikely(kvm->mmu_invalidate_in_progress) &&
+-	    hva >= kvm->mmu_invalidate_range_start &&
+-	    hva < kvm->mmu_invalidate_range_end)
+-		return 1;
++	if (unlikely(kvm->mmu_invalidate_in_progress)) {
++		/*
++		 * Dropping mmu_lock after bumping mmu_invalidate_in_progress
++		 * but before updating the range is a KVM bug.
++		 */
++		if (WARN_ON_ONCE(kvm->mmu_invalidate_range_start == INVALID_GPA ||
++				 kvm->mmu_invalidate_range_end == INVALID_GPA))
++			return 1;
++
++		if (gfn >= kvm->mmu_invalidate_range_start &&
++		    gfn < kvm->mmu_invalidate_range_end)
++			return 1;
++	}
++
+ 	if (kvm->mmu_invalidate_seq != mmu_seq)
+ 		return 1;
+ 	return 0;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 43bbe4fde078..e9e03b979f77 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -540,9 +540,7 @@ static void kvm_mmu_notifier_invalidate_range(struct mmu_notifier *mn,
+ 
+ typedef bool (*hva_handler_t)(struct kvm *kvm, struct kvm_gfn_range *range);
+ 
+-typedef void (*on_lock_fn_t)(struct kvm *kvm, unsigned long start,
+-			     unsigned long end);
+-
++typedef void (*on_lock_fn_t)(struct kvm *kvm);
+ typedef void (*on_unlock_fn_t)(struct kvm *kvm);
+ 
+ struct kvm_hva_range {
+@@ -628,7 +626,8 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+ 				locked = true;
+ 				KVM_MMU_LOCK(kvm);
+ 				if (!IS_KVM_NULL_FN(range->on_lock))
+-					range->on_lock(kvm, range->start, range->end);
++					range->on_lock(kvm);
++
+ 				if (IS_KVM_NULL_FN(range->handler))
+ 					break;
+ 			}
+@@ -715,8 +714,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+ 	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
+ }
+ 
+-void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+-			      unsigned long end)
++void kvm_mmu_invalidate_begin(struct kvm *kvm)
+ {
+ 	/*
+ 	 * The count increase must become visible at unlock time as no
+@@ -724,6 +722,15 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+ 	 * count is also read inside the mmu_lock critical section.
+ 	 */
+ 	kvm->mmu_invalidate_in_progress++;
++
++	kvm->mmu_invalidate_range_start = INVALID_GPA;
++	kvm->mmu_invalidate_range_end = INVALID_GPA;
++}
++
++void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
++{
++	WARN_ON_ONCE(!kvm->mmu_invalidate_in_progress);
++
+ 	if (likely(kvm->mmu_invalidate_in_progress == 1)) {
+ 		kvm->mmu_invalidate_range_start = start;
+ 		kvm->mmu_invalidate_range_end = end;
+@@ -744,6 +751,12 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+ 	}
+ }
+ 
++static bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
++	return kvm_unmap_gfn_range(kvm, range);
++}
++
+ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+ 					const struct mmu_notifier_range *range)
+ {
+@@ -752,7 +765,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+ 		.start		= range->start,
+ 		.end		= range->end,
+ 		.pte		= __pte(0),
+-		.handler	= kvm_unmap_gfn_range,
++		.handler	= kvm_mmu_unmap_gfn_range,
+ 		.on_lock	= kvm_mmu_invalidate_begin,
+ 		.on_unlock	= kvm_arch_guest_memory_reclaimed,
+ 		.flush_on_ret	= true,
+@@ -791,8 +804,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+ 	return 0;
+ }
+ 
+-void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
+-			    unsigned long end)
++void kvm_mmu_invalidate_end(struct kvm *kvm)
+ {
+ 	/*
+ 	 * This sequence increase will notify the kvm page fault that
+
+base-commit: d663b8a285986072428a6a145e5994bc275df994
+-- 
+
