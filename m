@@ -2,141 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 631A2623E19
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 09:56:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 12B49623E25
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 09:59:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229555AbiKJI4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 03:56:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33396 "EHLO
+        id S229520AbiKJI7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 03:59:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbiKJI4t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 03:56:49 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3510A3F078;
-        Thu, 10 Nov 2022 00:56:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l+TRjxo7IPalxZWdUpMe9P3L9tHl56uBoUPSHQDClug=; b=itZ6NJLr08T6NzZSXaCaokzqO7
-        nOoBXXdFOAhHkbIveoPKgHiz4exubCS5EHcbAl4GCqVtd6aq5aVGLEve9xeoBAWkz1h33SbmL6g5B
-        tNNvQRm0Eg53EpuKMxNRNTkhdz6ytqB+JhsMo8ATtae1cRXJGocWeNEHgBluPxA6VsPmQxXLoLFSV
-        Cmz4V54lT1BoIoJ+ThQ5n9LaGSebcHqEcaKbOphN2NHSRl6/1bCepiJgu4BJfZbbkrgS6LBEW8pvc
-        zXtpz0gyDbVY2Q0zEHXl1BGIVqEAAL//f2ASd0FD7Nu444FBU3ksT1OEjNuMvEpnvjac3Zq7kNkzh
-        Si/nDkzA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ot3Lu-00AF2Q-OK; Thu, 10 Nov 2022 08:56:10 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 2E700300137;
-        Thu, 10 Nov 2022 09:56:01 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 11C02201A6C3D; Thu, 10 Nov 2022 09:56:01 +0100 (CET)
-Date:   Thu, 10 Nov 2022 09:56:01 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Xin Li <xin3.li@intel.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, seanjc@google.com,
-        pbonzini@redhat.com, kevin.tian@intel.com
-Subject: Re: [RESEND PATCH 2/6] x86/traps: add a system interrupt table for
- system interrupt dispatch
-Message-ID: <Y2y8obdYDXo9vlH/@hirez.programming.kicks-ass.net>
-References: <20221110061545.1531-1-xin3.li@intel.com>
- <20221110061545.1531-3-xin3.li@intel.com>
+        with ESMTP id S229447AbiKJI67 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 03:58:59 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63CB6B4B3
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 00:58:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668070738; x=1699606738;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Taky/eDmY8zE2pNKcx7/mrBZx3iMQ8bamvaFCuUdNdk=;
+  b=ZVwSiGEk7u7VozYdqp6tWl5O+dRiO5cLOuy2x9Qu5DF7VGC6evjiwbBp
+   lo2Uq+7qw3jk3FZ6IPSUoBgYASEXth6d738NM+jRIwuAmpFIZ/1E1YEtB
+   bpdooUod6LLLRA3O3tPtM6/wiHGHqVGu0fTXJkXIPzDKyHfEGOdcwI8P8
+   YcQkf64G6qES0P17CNrxqn/rIt4Y8o4lISZc/prQCNxo7OXjT8VkI6SDa
+   5UKrtIfWgyj3EO4MDqZvlldW3bbCzm0f22Oolcm+JWEht7YpkjMwR/zH+
+   maO+mv2vFIn0MxzXrtgzHp0Q/+b2V2swhuMN5wNv7XUeWZz22xYgntD9T
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="375504302"
+X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
+   d="scan'208";a="375504302"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 00:58:57 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="811966711"
+X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
+   d="scan'208";a="811966711"
+Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.249.171.70]) ([10.249.171.70])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 00:58:54 -0800
+Message-ID: <3286ad00-e432-da69-a041-6a3032494470@intel.com>
+Date:   Thu, 10 Nov 2022 16:58:52 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221110061545.1531-3-xin3.li@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.4.1
+Subject: Re: [PATCH 0/4] ifcvf/vDPA implement features provisioning
+Content-Language: en-US
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, hang.yuan@intel.com, piotr.uminski@intel.com
+References: <20221107093345.121648-1-lingshan.zhu@intel.com>
+ <CACGkMEs9af1E1pLd2t8E71YBPF=rHkhfN8qO9_3=x6HVaCMAxg@mail.gmail.com>
+ <0b15591f-9e49-6383-65eb-6673423f81ec@intel.com>
+ <CACGkMEujqOFHv7QATWgYo=SdAKef5jQXi2-YksjgT-hxEgKNDQ@mail.gmail.com>
+ <80cdd80a-16fa-ac75-0a89-5729b846efed@intel.com>
+ <CACGkMEu-5TbA3Ky2qgn-ivfhgfJ2b12mDJgq8iNgHce8qu3ApA@mail.gmail.com>
+ <03657084-98ab-93bc-614a-e6cc7297d93e@intel.com>
+ <d59c311f-ba9f-4c00-28f8-c50e099adb9f@redhat.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+In-Reply-To: <d59c311f-ba9f-4c00-28f8-c50e099adb9f@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 09, 2022 at 10:15:41PM -0800, Xin Li wrote:
-> Upon receiving an external interrupt, KVM VMX reinjects it through
-> calling the interrupt handler in its IDT descriptor on the current
-> kernel stack, which essentially uses the IDT as an interrupt dispatch
-> table.
-> 
-> However the IDT is one of the lowest level critical data structures
-> between a x86 CPU and the Linux kernel, we should avoid using it
-> *directly* whenever possible, espeically in a software defined manner.
-> 
-> On x86, external interrupts are divided into the following groups
->   1) system interrupts
->   2) external device interrupts
-> With the IDT, system interrupts are dispatched through the IDT
-> directly, while external device interrupts are all routed to the
-> external interrupt dispatch function common_interrupt(), which
-> dispatches external device interrupts through a per-CPU external
-> interrupt dispatch table vector_irq.
-> 
-> To eliminate dispatching external interrupts through the IDT, add
-> a system interrupt handler table for dispatching a system interrupt
-> to its corresponding handler directly. Thus a software based dispatch
-> function will be:
-> 
->   void external_interrupt(struct pt_regs *regs, u8 vector)
->   {
->     if (is_system_interrupt(vector))
->       system_interrupt_handler_table[vector_to_sysvec(vector)](regs);
->     else /* external device interrupt */
->       common_interrupt(regs, vector);
->   }
-> 
-> What's more, with the Intel FRED (Flexible Return and Event Delivery)
-> architecture, IDT, the hardware based event dispatch table, is gone,
-> and the Linux kernel needs to dispatch events to their handlers with
-> vector to handler mappings, the dispatch function external_interrupt()
-> is also needed.
-> 
-> Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
-> Signed-off-by: Xin Li <xin3.li@intel.com>
 
-This is not a valid SOB, it would suggest hpa is the author, but he's
-not in in From.
 
-> ---
->  arch/x86/include/asm/traps.h |  8 ++++++
->  arch/x86/kernel/traps.c      | 55 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 63 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/traps.h b/arch/x86/include/asm/traps.h
-> index 47ecfff2c83d..3dc63d753bda 100644
-> --- a/arch/x86/include/asm/traps.h
-> +++ b/arch/x86/include/asm/traps.h
-> @@ -47,4 +47,12 @@ void __noreturn handle_stack_overflow(struct pt_regs *regs,
->  				      struct stack_info *info);
->  #endif
->  
-> +/*
-> + * How system interrupt handlers are called.
-> + */
-> +#define DECLARE_SYSTEM_INTERRUPT_HANDLER(f)			\
-> +	void f (struct pt_regs *regs __maybe_unused,		\
-> +		unsigned long vector __maybe_unused)
-> +typedef DECLARE_SYSTEM_INTERRUPT_HANDLER((*system_interrupt_handler));
-> +
->  #endif /* _ASM_X86_TRAPS_H */
-> diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
-> index 178015a820f0..95dd917ef9ad 100644
-> --- a/arch/x86/kernel/traps.c
-> +++ b/arch/x86/kernel/traps.c
-> @@ -1444,6 +1444,61 @@ DEFINE_IDTENTRY_SW(iret_error)
->  }
->  #endif
->  
-> +#define SYSV(x,y) [(x) - FIRST_SYSTEM_VECTOR] = (system_interrupt_handler)y
-> +
-> +#pragma GCC diagnostic push
-> +#pragma GCC diagnostic ignored "-Wcast-function-type"
+On 11/10/2022 2:29 PM, Jason Wang wrote:
+>
+> 在 2022/11/10 14:20, Zhu, Lingshan 写道:
+>>
+>>
+>> On 11/10/2022 11:49 AM, Jason Wang wrote:
+>>> On Wed, Nov 9, 2022 at 5:06 PM Zhu, Lingshan 
+>>> <lingshan.zhu@intel.com> wrote:
+>>>>
+>>>>
+>>>> On 11/9/2022 4:59 PM, Jason Wang wrote:
+>>>>> On Wed, Nov 9, 2022 at 4:14 PM Zhu, Lingshan 
+>>>>> <lingshan.zhu@intel.com> wrote:
+>>>>>>
+>>>>>> On 11/9/2022 2:51 PM, Jason Wang wrote:
+>>>>>>> On Mon, Nov 7, 2022 at 5:42 PM Zhu Lingshan 
+>>>>>>> <lingshan.zhu@intel.com> wrote:
+>>>>>>>> This series implements features provisioning for ifcvf.
+>>>>>>>> By applying this series, we allow userspace to create
+>>>>>>>> a vDPA device with selected (management device supported)
+>>>>>>>> feature bits and mask out others.
+>>>>>>> I don't see a direct relationship between the first 3 and the last.
+>>>>>>> Maybe you can state the reason why the restructure is a must for 
+>>>>>>> the
+>>>>>>> feature provisioning. Otherwise, we'd better split the series.
+>>>>>> When introducing features provisioning ability to ifcvf, there is 
+>>>>>> a need
+>>>>>> to re-create vDPA devices
+>>>>>> on a VF with different feature bits.
+>>>>> This seems a requirement even without feature provisioning? Device
+>>>>> could be deleted from the management device anyhow.
+>>>> Yes, we need this to delete and re-create a vDPA device.
+>>> I wonder if we need something that works for -stable.
+>> I can add a fix tag, so these three patches could apply to stable
+>
+>
+> It's too huge for -stable.
+>
+>
+>>>
+>>> AFAIK, we can move the vdpa_alloc_device() from probe() to dev_add()
+>>> and it seems to work?
+>> Yes and this is done in this series and that's why we need these
+>> refactoring code.
+>
+>
+> I meant there's probably no need to change the association of existing 
+> structure but just do the allocation in dev_add(), then we will have a 
+> patch with much more small changeset that fit for -stable.
+Patch 1(ifcvf_base only work on ifcvf_hw) and patch 2(irq functions only 
+work on ifcvf_hw) are not needed for stable.
+I have already done this allocation of ifcvf_adapter which is the 
+container of struct vdpa_device in dev_add() in Patch 3, this should be 
+merged to stable.
+Patch 3 is huge but necessary, not only allocate ifcvf_adapter in 
+dev_add(), it also refactors the structures of ifcvf_mgmt_dev and 
+ifcvf_adapter,
+because we need to initialize the VF's hw structure ifcvf_hw(which was a 
+member of ifcvf_adapter but now should be a member of ifcvf_mgmt_dev) in 
+probe.
 
-How does this not break CFI ?
+Is it still huge?
+
+Thanks
+>
+> Thanks
+>
+>
+>>
+>> By the way, do you have any comments to the patches?
+>>
+>> Thanks,
+>> Zhu Lingshan
+>>>
+>>> Thanks
+>>>
+>>>> We create vDPA device from a VF, so without features provisioning
+>>>> requirements,
+>>>> we don't need to re-create the vDPA device. But with features 
+>>>> provisioning,
+>>>> it is a must now.
+>>>>
+>>>> Thanks
+>>>>
+>>>>
+>>>>> Thakns
+>>>>>
+>>>>>> When remove a vDPA device, the container of struct vdpa_device 
+>>>>>> (here is
+>>>>>> ifcvf_adapter) is free-ed in
+>>>>>> dev_del() interface, so we need to allocate ifcvf_adapter in 
+>>>>>> dev_add()
+>>>>>> than in probe(). That's
+>>>>>> why I have re-factored the adapter/mgmt_dev code.
+>>>>>>
+>>>>>> For re-factoring the irq related code and ifcvf_base, let them 
+>>>>>> work on
+>>>>>> struct ifcvf_hw, the
+>>>>>> reason is that the adapter is allocated in dev_add(), if we want 
+>>>>>> theses
+>>>>>> functions to work
+>>>>>> before dev_add(), like in probe, we need them work on ifcvf_hw 
+>>>>>> than the
+>>>>>> adapter.
+>>>>>>
+>>>>>> Thanks
+>>>>>> Zhu Lingshan
+>>>>>>> Thanks
+>>>>>>>
+>>>>>>>> Please help review
+>>>>>>>>
+>>>>>>>> Thanks
+>>>>>>>>
+>>>>>>>> Zhu Lingshan (4):
+>>>>>>>>      vDPA/ifcvf: ifcvf base layer interfaces work on struct 
+>>>>>>>> ifcvf_hw
+>>>>>>>>      vDPA/ifcvf: IRQ interfaces work on ifcvf_hw
+>>>>>>>>      vDPA/ifcvf: allocate ifcvf_adapter in dev_add()
+>>>>>>>>      vDPA/ifcvf: implement features provisioning
+>>>>>>>>
+>>>>>>>>     drivers/vdpa/ifcvf/ifcvf_base.c |  32 ++-----
+>>>>>>>>     drivers/vdpa/ifcvf/ifcvf_base.h |  10 +-
+>>>>>>>>     drivers/vdpa/ifcvf/ifcvf_main.c | 156 
+>>>>>>>> +++++++++++++++-----------------
+>>>>>>>>     3 files changed, 89 insertions(+), 109 deletions(-)
+>>>>>>>>
+>>>>>>>> -- 
+>>>>>>>> 2.31.1
+>>>>>>>>
+>>
+>
+
