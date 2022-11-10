@@ -2,146 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EF10623DB7
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 09:44:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F9D8623E09
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 09:54:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232885AbiKJIoa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 03:44:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54748 "EHLO
+        id S232903AbiKJIyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 03:54:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229568AbiKJIo0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 03:44:26 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2692E2935C;
-        Thu, 10 Nov 2022 00:44:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668069865; x=1699605865;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kBkbc2MQ9c/NiFCQRoAmN+okU0cL5VhONw3TYm+Zy/Q=;
-  b=hb93gx1CTv7oyCqCIBMIdyDEOccsHVuW92kzYNOJQvPtXxTT4x0USNYa
-   MP/TCtJKuanwyJkbYXnhA4veCH0UUoxNBYlJY6ArKOCyLsHToplHSj/v3
-   wAm1fs/PsDEqtFbAVTT/ywDA3fot/9aFWJxYWAxHUZ7gU+fPmuLPdBY7f
-   rYreYxdFDMixja+rhYF7TENw2xxQvuBZwMhB647Z1A8P/3XFXZP9sPIac
-   j6bv+ki4gC+HHQzX+XIg3dYELQkgDunGVUyCkh2CmILCxKIQRedopTCpF
-   sGhPL9lgSavHVqHYDFkw8pWud1eMgceEaUjpYwfmJ4+00UptUQjqW2teb
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="308879708"
-X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
-   d="scan'208";a="308879708"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 00:44:24 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="779692262"
-X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
-   d="scan'208";a="779692262"
-Received: from shiningy-mobl1.ccr.corp.intel.com (HELO localhost) ([10.255.28.247])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 00:44:21 -0800
-Date:   Thu, 10 Nov 2022 16:44:19 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Eric Li <ercli@ucdavis.edu>,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Liu Jingqi <jingqi.liu@intel.com>
-Subject: Re: [PATCH v5 05/15] KVM: nVMX: Let userspace set nVMX MSR to any
- _host_ supported value
-Message-ID: <20221110084418.t7iv5zlfgiu77gfn@linux.intel.com>
-References: <20221031163907.w64vyg5twzvv2nho@linux.intel.com>
- <Y2ABrnRzg729ZZNI@google.com>
- <20221101101801.zxcjswoesg2gltri@linux.intel.com>
- <Y2FePYteNrEfZ7D5@google.com>
- <20221102085414.fk2xss74jvtzs6mr@linux.intel.com>
- <Y2Px90RQydMUoiRH@google.com>
- <20221107082714.fq3sw7qii4unlcn2@linux.intel.com>
- <Y2kfCz02tQSUkMKS@google.com>
- <20221108102120.qdlgqlgvdi6wi22u@linux.intel.com>
- <Y2qhaSr/d2ds+nqD@google.com>
+        with ESMTP id S232589AbiKJIx6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 03:53:58 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44E7DB73;
+        Thu, 10 Nov 2022 00:53:58 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2AA8g8ok030252;
+        Thu, 10 Nov 2022 08:53:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : cc :
+ from : to : subject : message-id : date; s=pp1;
+ bh=uz/aImqsgxHCq9BN4+ASQhwVId+s2B0fl/1A02hRKP4=;
+ b=h7RmZrUWAkK9Ygc4JCNZWF71Nh8ZgSDlFELUGTwOllt1Xang6a/rS2ZV8HhG8YpbBkXP
+ fXwn7SKgpdGxAtzydzl873H1XM4VBVGYcWGFJVxTn/sf4jocTVMEsMXHg+xRvV5e1ILs
+ XhXrV3Cv4NYXFpeaOvbe5VTA4ti8ZHaZlboHcSdq83B5iKdRBKX6AGbivsxRo+8dadsB
+ lOVVKG19X53IJLyNXeJS1G/J2R99C+SCnCoGfnKbok0v/oe8KCgYI2fcjY2PFgFCBWCI
+ jZFJLqDDWhF9QoGAtz8WCYkMGYRlLuEwni2TWXb76u2EOpGLkSNYOAwRBRO2UZ/pwTxT 1w== 
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3krx0yrdk5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Nov 2022 08:53:57 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AA8bIQ3009484;
+        Thu, 10 Nov 2022 08:53:55 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3kngqdewds-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 10 Nov 2022 08:53:55 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AA8rqJo62194024
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Nov 2022 08:53:52 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 37FEEAE057;
+        Thu, 10 Nov 2022 08:53:52 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1990AAE056;
+        Thu, 10 Nov 2022 08:53:52 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.74.83])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 10 Nov 2022 08:53:52 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y2qhaSr/d2ds+nqD@google.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20221109202157.1050545-3-farman@linux.ibm.com>
+References: <20221109202157.1050545-1-farman@linux.ibm.com> <20221109202157.1050545-3-farman@linux.ibm.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        Eric Farman <farman@linux.ibm.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>
+Subject: Re: [PATCH 2/2] vfio/ccw: identify CCW data addresses as physical
+Message-ID: <166807043186.13521.16767588635336490628@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Thu, 10 Nov 2022 09:53:51 +0100
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: mV9gJ0PJyAB5R1gRr_J0jeu4slNtQ9oO
+X-Proofpoint-ORIG-GUID: mV9gJ0PJyAB5R1gRr_J0jeu4slNtQ9oO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-10_06,2022-11-09_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 mlxlogscore=766 priorityscore=1501 bulkscore=0
+ adultscore=0 suspectscore=0 clxscore=1015 mlxscore=0 spamscore=0
+ malwarescore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2210170000 definitions=main-2211100064
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> 
-> No.  Again, KVM _should never_ manipulate VMX MSRs in response to CPUID changes.
-> Keeping the existing behavior would be done purely to maintain backwards
-> compability with existing userspace, not because it's strictly the right thing to do.
-> 
-> E.g. as a strawman, a weird userspace could do KVM_SET_MSRS => KVM_SET_CPUID =>
-> KVM_SET_CPUID, where the first KVM_SET_CPUID reset to a base config and the second
-> KVM_SET_CPUID incorporates "optional" features.  In that case, clearing bits in
-> the VMX MSRs on the first KVM_SET_CPUID would do the wrong thing if the second
-> KVM_SET_CPUID enabled the relevant features.
-> 
-> AFAIK, no userspace actually does something odd like that, whereas there are VMMs
-> that do KVM_SET_MSRS before KVM_SET_CPUID, e.g. disable a feature in VMX MSRs but
-> later enable the feature in CPUID for L1.  And so disabling features is likely
-> safe-ish, but enabling feature most definitely can cause problems for userspace.
-> 
-> Hrm, actually, there are likely older VMMs that never set VMX MSRs, and so dropping
-> the "enable features" code might not be safe either.  Grr.  The obvious solution
-> would be to add a quirk, but maybe we can avoid a quirk by skipping KVM's
-> misguided updates if userspace has set the MSR.  That should work for a userspace
-> that deliberately sets the MSR during setup, and for a userspace that blindly
-> migrates the MSR since the migrated value should already be correct/sane.
-> 
-Oh. Just saw your new selftest code, and fininally get your point(I hope
-so...).  Thanks!
+Quoting Eric Farman (2022-11-09 21:21:57)
+> The CCW data address created by vfio-ccw is that of an IDAL
+> built by this code. Since this address is used by real hardware,
+> it should be a physical address rather than a virtual one.
+> Let's clarify it as such in the ORB.
+>=20
+> Similarly, once the I/O has completed the memory for that IDAL
+> needs to be released, so convert the CCW data address back to
+> a virtual address so that kfree() can process it.
+>=20
+> Note: this currently doesn't fix a real bug, since virtual
+> addresses are identical to physical ones.
+>=20
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-> > BTW, I found my previous understanding of what vmx_adjust_secondary_exec_control()
-> > currently does was also wrong. It could also be used for EXITING controls. And
-> > for such flags(e.g., SECONDARY_EXEC_RDRAND_EXITING), values for the nested settings
-> > (vmx->nested.msrs.secondary_ctls_high) and for the L1 execution controls(*exec_control)
-> > could be opposite. So the statement:
-> > 	"1> For now, what vmx_adjust_secondary_exec_control() does, is to enable/
-> > 	 disable a feature in VMX MSR(and nVMX MSR) based on cpuid changes."
-> > is wrong.
-> 
-> No, it's correct.  The EXITING controls are just inverted feature flags.  E.g. if
-> RDRAND is disabled in CPUID, KVM sets the EXITING control so that KVM intercepts
-> RDRAND in order to inject #UD.
-> 
-> 	[EXIT_REASON_RDRAND]                  = kvm_handle_invalid_op,
-> 
-
-Well, suppose
-- cpu_has_vmx_rdrand() is true;
-- meanwhile guest_cpuid_has(vcpu, X86_FEATURE_RDRAND) is false.
-
-And then, what vmx_adjust_secondary_exec_control() currently does is:
-1> keep the SECONDARY_EXEC_RDRAND_EXITING set in L1 secondary proc-
-based execution control.
-2> and then clear the SECONDARY_EXEC_RDRAND_EXITING in the high bits
-of IA32_VMX_PROCBASED_CTLS2 MSR for nested by
-        vmx->nested.msrs.secondary_ctls_high &= ~control;
-That means for L1 VMM, SECONDARY_EXEC_RDRAND_EXITING must be cleared
-in its(VMCS12's) secondary proc-based VM-execution control, even when
-rdrand is disabled in L1's and L2's CPUID.
-
-I wonder, for native environment, if an instruction is not supported,
-will the allowed 1-setting for its corresponding exiting feature in
-IA32_VMX_PROCBASED_CTLS2 MSR be set, or be cleared? Maybe it should
-be cleared, and executing such instruction in non-root will just get
-a #UD directly instead of triggering a VM-Exit?
-
-Note: I do not think this will cause any problem, just curious if L1
-VMM can observe a behavior that's not supposed to be in native scenario(
-only because what we are doing in KVM). 
-
-B.R.
-Yu
-
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
