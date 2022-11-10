@@ -2,182 +2,254 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D32816238DA
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:30:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11F566238E2
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:33:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232312AbiKJBaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 20:30:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60700 "EHLO
+        id S232287AbiKJBdg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 20:33:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232288AbiKJBaL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 20:30:11 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B59318E19
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 17:30:11 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id f126-20020a255184000000b006cb2aebd124so523022ybb.11
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 17:30:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=MwcsabIB4BaNJTZXLskYlIE6OYIcO08VWcBRJDU6GBY=;
-        b=hqcslbD7QX+04riaiUMb4oE5H0KGB0y2jsZBE+cI1SYe90LgB1Jnz4F7RxzZkT7/j/
-         uUwMwVt5PMLKMbBUOfNSNcG4tpMoCPsucflKBJIT2+dpMWYuTmZaK3I0wlt/j/9jJ768
-         ONZSyzM1wPgVeNiHFxoECj4DLH/GkIcQte9f6qNio5JxpxR7zhwXMMb8Jz8FLp11xLJJ
-         1Ryb4YabWzDpFSqFqB2jmx7ylbSDDartSDSXuq2cAsMP6pJ72Zh1bwN3jfIP7QSsEdcF
-         q2wArMCyFhhHuM4ZApu0I/4ltv6p4EQt/XAqdDxrbOj2oJXSjsrTxN9l26PCrX/PivEs
-         RiHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MwcsabIB4BaNJTZXLskYlIE6OYIcO08VWcBRJDU6GBY=;
-        b=6wGBZfDqBlJHOqkLI69UBlsEHLOCTLZklD2tjd/ywrh64ADXl97neYoKqp+etxjMVq
-         +MBYYFXyxCGNrXFSzRwBFPEcZ+fvrsFv5RgjKBU2/fZvItOgrl9Ro8wDskAJhpm1fZ8b
-         RC5mbwg8g3Qb3ANu0o1w/rI5mzT+hElru5Ssll6xt9tGSB/aLoFC/niA1BTBnnO4gu7a
-         Fx3BbcWujeZ6hAc4haCFMd14H6k83v9VRRbwgFt+Ns8utaD8iOz9I7s8OFF90GgO++kL
-         9iLkuuLZSb69NgxVnFKc1UN9RN+vYx4iCLg2h0+bdkg5S30KdARosL2hC1qXEtw+1Gz2
-         n6yQ==
-X-Gm-Message-State: ACrzQf36+ndiEu8VUAJQU1zIsQbCWcPzoBgGXG8LLojYT1wqa4oLvb8C
-        shpjq/q1Sbwt4WzCIMOigoGAv1uLpOI=
-X-Google-Smtp-Source: AMsMyM7GLLzY/flUF6cQMZtB3ZvhxPRMfSN25EHpYCrV4KC+IEtuKh5x3uCcs5AHkTwj8S/m9/P9sJFtxvw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:5b82:0:b0:36b:c476:c27e with SMTP id
- p124-20020a815b82000000b0036bc476c27emr1150133ywb.320.1668043810152; Wed, 09
- Nov 2022 17:30:10 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 10 Nov 2022 01:30:03 +0000
-In-Reply-To: <20221110013003.1421895-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20221110013003.1421895-1-seanjc@google.com>
-X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221110013003.1421895-4-seanjc@google.com>
-Subject: [PATCH 3/3] KVM: SVM: Make module params and other variables
- read-only after init
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229861AbiKJBdd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 20:33:33 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 936A7B6A;
+        Wed,  9 Nov 2022 17:33:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668044008; x=1699580008;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=TkY9xe9VRhHHEMgQO57IySIsxFYa7haWrXrer0WoONI=;
+  b=J5a4E+QzGX/OW+BcdGlSkRr5pJJkLyPxwpymApB4HfmE8V47jv1BRsJu
+   ivZasoIaNNWdnDz6RLL3Q92FuC/tRAi8X1KYPIW56cIpf5EjEnUfmKKCi
+   kH0OTqmGu3Rk96fxdbmcPHFIMLrsEQEQ/p2EWvXUUBpN5eJho9vka/Xy6
+   85HNMzfZIf5V9hyd141yu2ELk0JBqQMFGgb5aWCQKYuwip+lCjLS35XSt
+   /6KEVjdg5pntindshwh4VwMWr/76ebZuVxzQMRjsifsjgibNssFj/N/kl
+   o1Kpqlih6FYVyjuVg0xA6HHfTV1e0OP7GCWmEjtZ1aqDMQxME28pFxt7l
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="373289084"
+X-IronPort-AV: E=Sophos;i="5.96,152,1665471600"; 
+   d="scan'208";a="373289084"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2022 17:33:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="762095155"
+X-IronPort-AV: E=Sophos;i="5.96,152,1665471600"; 
+   d="scan'208";a="762095155"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga004.jf.intel.com with ESMTP; 09 Nov 2022 17:33:27 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 9 Nov 2022 17:33:27 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 9 Nov 2022 17:33:27 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Wed, 9 Nov 2022 17:33:27 -0800
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.44) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Wed, 9 Nov 2022 17:33:27 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=B48x+6e3cqlmJjoNPZx7yHzQlxsgl9u2cNe4p4TDPnov9r5t/qyf4wEGtVIZlh2MWSbTlfqTmAhbBGa54X7wqQAvhmZgATYFpCvLPtTeLN8jVfNe6udM3eLPT9vZazk2iW0sDh3zfN7UvHK0h5gZjOOwYuioFf17JSRt1nPhPbSRIQXdf81g7dmc8LTM1PNY+RWeD7ozmisvgYUwx9xk9D4PZTSgysEaDNGRIog/bD71dJwm2IP+uV1ItETaa/JHZz2d5fxIdUWMT83wV5Bwmn4mdfyhPMQYxdtqyd+J/WyxwW+7EWDRgdDTcKg1IQ5o6PzSUCmhUUF3sV/TMCOfDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TkY9xe9VRhHHEMgQO57IySIsxFYa7haWrXrer0WoONI=;
+ b=LbD5j1/YSAkzwlEwtviWG9oUrBPT4JrZyYEivonF9r9MiCaXT/sZK1H9pounEzwGROIAsBvbvtaXytUOfArkiRpvDaRV4QZI5DcYKki52s1wMhdsXQ/6QAYti88kQ3TK4jDdEWuhnaJe/jrGSHZTbdHc/jwcdL6SBApeN15KTwH5WL+vIz2zHmIAhL1erN1cVBP+TXsQXPtB9RzL1eB6yq1TMz8ab9Oe2CY+J8q5mjV0L+j29cHvkciGvEgEIQYa2ILv/BBMp8kSjkVoEh7IaXNCPEORrul/ZDVd2pGmDSmDwC+zjhoab2edZmjiiivAVsYZ4hx267igphdg7QiuLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by SA0PR11MB4623.namprd11.prod.outlook.com (2603:10b6:806:95::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.13; Thu, 10 Nov
+ 2022 01:33:24 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::6eb:99bf:5c45:a94b]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::6eb:99bf:5c45:a94b%3]) with mapi id 15.20.5791.026; Thu, 10 Nov 2022
+ 01:33:24 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+        "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+        "palmer@dabbelt.com" <palmer@dabbelt.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "anup@brainfault.org" <anup@brainfault.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>
+CC:     "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Yao, Yuan" <yuan.yao@intel.com>,
+        "farosas@linux.ibm.com" <farosas@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "atishp@atishpatra.org" <atishp@atishpatra.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+Subject: Re: [PATCH 38/44] KVM: Disable CPU hotplug during hardware enabling
+Thread-Topic: [PATCH 38/44] KVM: Disable CPU hotplug during hardware enabling
+Thread-Index: AQHY7xJy2pUg1L4bCkib6AOkbzD9bK43arEA
+Date:   Thu, 10 Nov 2022 01:33:24 +0000
+Message-ID: <88e920944de70e7d69a98f74005b49c59b5aaa3b.camel@intel.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+         <20221102231911.3107438-39-seanjc@google.com>
+In-Reply-To: <20221102231911.3107438-39-seanjc@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SA0PR11MB4623:EE_
+x-ms-office365-filtering-correlation-id: 76d1e07e-31da-4d8f-474f-08dac2bb8f3a
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: OTBqLXzqOxt9OgBLaVjpyL1S/we7vZvHTFGfP5EFr/zfOeUe1/K7RHSE/FdeCCCHwx5kwisiArgIsshONbpp1DnRd0ISVKwL0xYANsPvqeuVbQZq4+XEdALqR/2q12k4V9dWk8Mzwm3gMZzEihw8MJnrVvIEgFikK4o1xehXQD5NBMFhqFmHZb35QVhGEByl7Lg4WKinmTkGBhcc1yHQVvE1UfYVnmeQlDAecLOKTh1qt7YrbyKpVbUfvg/6k/0FjPzqqyKBy5miZThIraO0Cfgs81l8gJoBre2dgSF1AAcOGKHW/kIGyYwp/JDtQEjcV5qbbZPYrUS8dd13lgUGPX7HzwBdfz+4Zp8goehHI1ylMLVmyAnn96xEfy+QmGqZ2DoGKEPd3WtIXciKmgPqi+9je237X9GUf5pDGJgDQ+ZesdRszqMB9znTawd30u9fBWt/SGkrml+aTbEEaTAdf7o78+Bv2xqNybMe1/eCAtENY9mrvnjzqyW9tbHWOsRtfEnoDJ2IA4nG6+tGDk38d8hAzNpcJkgpPsyopYSVlayh4LOrpfdpm5urwlg314XG6+xrwLasXQcE4oWKgYeDX6GeQZ8jMNHL4KQfVickiNxsaDI7NTa2vRBBxx/RyjVbQKPSw6TT4bB2U1YRUnQ9zxljIM6d8iz8NvIv5f1Ji83W2HWMuPu2hWazq3WwdZICxSH71U3eZSWTpcYQpS1ZhbvAgGDIiLI4cchv7lG9vwpHJAUFyuzOq3nPPAROC/YeJNWce4cczBeC050jlM/zXaGA7bk95K18F36ZIKjL38U=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(396003)(136003)(366004)(376002)(346002)(451199015)(36756003)(6512007)(26005)(38070700005)(921005)(82960400001)(38100700002)(122000001)(83380400001)(110136005)(186003)(2616005)(6506007)(2906002)(8936002)(91956017)(7406005)(7416002)(5660300002)(66556008)(66946007)(66476007)(8676002)(76116006)(66446008)(64756008)(86362001)(4326008)(41300700001)(478600001)(54906003)(316002)(6486002)(71200400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZlEycitRcndZMHE4T1BaeFhtV1BNc2NxUUV5NE41S0NaQmgyNWpCUXNNMWFk?=
+ =?utf-8?B?SFVSeGxyUmRwNCtwa2hzcjl0U1FlcTFuV3prVDd4K3NjMnl5RTQ0bkY4WVJX?=
+ =?utf-8?B?Y2RsZ295RzJlZzJkOU1hVmVndWxGZ3lhZlhRSWg4WmMzeDEvU3ArUzNYbml2?=
+ =?utf-8?B?d3NQTEpsQUZrUFNoY20rSTIzdmJaSzhCemFUUnAxZTEvQlR0dkVDRm1IcGNy?=
+ =?utf-8?B?QkFlRDJPeC9LZWVYT3NDL1V0ckhGLzhqNUpQZ0xQNktOOG0xaDVNVTdZOTc5?=
+ =?utf-8?B?MDU3WFJCYUxpa1gvWWVYSVUra0djdGM4ajlIV0tRcU9UNzM4V3phbHhyOWJm?=
+ =?utf-8?B?YTM4aThqZ09ubUZBSDRPSEJnQStCRFM1aGRuVEFhUVUzZ0VPUFlMckwxZTkw?=
+ =?utf-8?B?d3pyNXV3Rnl0YmVIa2xCQ1NDeHpiTXl1eUZzTXhUSUxvbVJITlA0aVlOSzhj?=
+ =?utf-8?B?QkpWNHNVVDkyelVleldBQ0kyL3g4WDFnaGZOUFQyUG4rRVBiVjBlUXVlQ2xo?=
+ =?utf-8?B?UHNVZksvd3RSMnFsUUtzQzJrNmcrd2s0RVlvYnlCUzh5bk5lRDVjb3p5Vk1J?=
+ =?utf-8?B?eU94M2xmc0YzanhMWXMxWmtiYW9WcDREWmIzVjJZa3pqQWZKbERXMnREamk3?=
+ =?utf-8?B?SEpKQUNqaUpMQ0c1K0RraGc0V2lzSHcwbXhZR0tQUWhob1Yrc3RpMFRESWFL?=
+ =?utf-8?B?WC9FQ0ZSZU1FV0E2b0did2xrNmZsN3ZYK0NtN1grT0dzTmdlQnpSVXNXSGZJ?=
+ =?utf-8?B?WUI2OS9kYlk2OGhiZktmcEZRTXI5aEw2U0F5a2RIUmJjY2R1R1FHRWFHOEph?=
+ =?utf-8?B?elFHdVR4YUlVYzNkZDhRb2tST3dCM0J3RHAzT2hzLzFHZStIWGlLcjJ0WlpH?=
+ =?utf-8?B?YkhqTEhFUzdDV1N2UXpwK24xTElGekM3SU5UVzRwcHZDOFh1c0lpOGlMZm5I?=
+ =?utf-8?B?SjArRUIvbXlkWGRNRWF0TE10MExmZkxDMUxoMWZPdzFBUGowaG16MnBhTGhJ?=
+ =?utf-8?B?TTBTNlV1RHlBeXV1SXB1ZzV4aUpLeHJ0TTEvWGJPTjdDZkhzNmVGN2VQWVZu?=
+ =?utf-8?B?aEp1dUNwdkdoVDQ0R2kyRzdpTE53TS9oZ1BMTUU1NFptREJPSFR4ZWZkYUZC?=
+ =?utf-8?B?c0tPMHV3UWFrMWNMYnd3NGRDSURidW8xL3VMbjNWYkd6c0V1OTcxQ0tjR1VS?=
+ =?utf-8?B?SDZqREcrYTB6WkhoUnM3dUtLbXI1ZlBqdytlRDIremtkUGI1V1BLTHNhOHRI?=
+ =?utf-8?B?Zm5TbC9XMFVQem5FOFBmdWlONjYxRTg1NkJzeVA3a0ZxdEp0b3VnOEoyUTdF?=
+ =?utf-8?B?cnBSK3pjWkZFRGdnblE5UnZUR080OVp2ZlA1OTY1QjRVT3dZVmMweEFIc3pr?=
+ =?utf-8?B?MERNaXJVRi95czJQTHNvQmxpY0NINTlKblNDeE95bFd5NThtWHlpcmVNMTZX?=
+ =?utf-8?B?eDFGZG5pdjFZVkVzb1BHbE1kSThScTdtZVAyb0NXVTRyRVNQeWk3ei93L0pV?=
+ =?utf-8?B?RTNFcnNHd05USHdFeUpNdHd6dXNNQjdhK1FwV25RTTVZbGhOamtLb0ZKeFBC?=
+ =?utf-8?B?MmViVUxOMUY1a05uNVUwaTZoMU5EYmR5b0tjTHlCUUJHSGJHMUtvWUp1eDJH?=
+ =?utf-8?B?QUwzZ2hEVytZWFBGWG1GWVlwV3RGMG9SYklwZHJrOG1ZejFoWXVzVkJPSWZH?=
+ =?utf-8?B?SENMTlZsOVA3V00va2RONTlXeWJURVZXaEpHMGttK3lSNTg1cHJlSnVKQ050?=
+ =?utf-8?B?bU9SaVFpSmZmUDV3c0lFeURvV1Z1VzEvSWxlVmpYQ1dYaVNwTnRSckU1MEg1?=
+ =?utf-8?B?RDZKQTh5M0ZncmZVdm1neXZ0WEo5dVBZeEFLZ0p2OFl3djMzWTVvR21KZ1BF?=
+ =?utf-8?B?NFBQeTB6S0lmUmFuMEVnL1R5enJPekFnZUlXKzI1VkJlTkZtWDVTSm1BNWVl?=
+ =?utf-8?B?cGtkMmI2UDB6YnZlcUwyYkFnTzAvdHViaFdzK2JPaU1QQ2t1L2dCYk9odHFN?=
+ =?utf-8?B?Z0dDQ0JNeHk1RkhsTGtSQkJUclFPSDBpVzFaUUVoK3ZYeE9BQmFLUkhKR1I0?=
+ =?utf-8?B?T1hpMzdNcTdvS1ZxVGJPbUNtSVF2cnpkdFc1VExoeUJ3Nm5DcitXVUM2Ui9Q?=
+ =?utf-8?B?WnoyV0x5Q1d6RHloa08rOHNGTlUvcWdDais1azVVUXllZmh3VlBWODBGdy8w?=
+ =?utf-8?B?YXc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AAC50776C82C2D408B9A4C7A80A90724@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 76d1e07e-31da-4d8f-474f-08dac2bb8f3a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Nov 2022 01:33:24.3355
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: AXp31sRQFOE374i/gEEVtG9bJph8iJCDRqW4ST1MAToMWe2sww2814eSG22Iu/jURZU8cgMY1Lc+PSbiP7EqeA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4623
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tag SVM's module params and global variables that are configured under
-the svm_init() umbrella as read-only after init.  The global knobs should
-never change once KVM is fully loaded.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/svm.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index e96c808fa8d3..f13d96e1dd0c 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -168,70 +168,70 @@ static const struct svm_direct_access_msrs {
-  *	count only mode.
-  */
- 
--static unsigned short pause_filter_thresh = KVM_DEFAULT_PLE_GAP;
-+static unsigned short pause_filter_thresh __ro_after_init = KVM_DEFAULT_PLE_GAP;
- module_param(pause_filter_thresh, ushort, 0444);
- 
--static unsigned short pause_filter_count = KVM_SVM_DEFAULT_PLE_WINDOW;
-+static unsigned short pause_filter_count __ro_after_init = KVM_SVM_DEFAULT_PLE_WINDOW;
- module_param(pause_filter_count, ushort, 0444);
- 
- /* Default doubles per-vcpu window every exit. */
--static unsigned short pause_filter_count_grow = KVM_DEFAULT_PLE_WINDOW_GROW;
-+static unsigned short pause_filter_count_grow __ro_after_init = KVM_DEFAULT_PLE_WINDOW_GROW;
- module_param(pause_filter_count_grow, ushort, 0444);
- 
- /* Default resets per-vcpu window every exit to pause_filter_count. */
--static unsigned short pause_filter_count_shrink = KVM_DEFAULT_PLE_WINDOW_SHRINK;
-+static unsigned short pause_filter_count_shrink __ro_after_init = KVM_DEFAULT_PLE_WINDOW_SHRINK;
- module_param(pause_filter_count_shrink, ushort, 0444);
- 
- /* Default is to compute the maximum so we can never overflow. */
--static unsigned short pause_filter_count_max = KVM_SVM_DEFAULT_PLE_WINDOW_MAX;
-+static unsigned short pause_filter_count_max __ro_after_init = KVM_SVM_DEFAULT_PLE_WINDOW_MAX;
- module_param(pause_filter_count_max, ushort, 0444);
- 
- /*
-  * Use nested page tables by default.  Note, NPT may get forced off by
-  * svm_hardware_setup() if it's unsupported by hardware or the host kernel.
-  */
--bool npt_enabled = true;
-+bool npt_enabled __ro_after_init = true;
- module_param_named(npt, npt_enabled, bool, 0444);
- 
- /* allow nested virtualization in KVM/SVM */
--static int nested = true;
-+static int nested __ro_after_init = true;
- module_param(nested, int, S_IRUGO);
- 
- /* enable/disable Next RIP Save */
--static int nrips = true;
-+static int nrips __ro_after_init = true;
- module_param(nrips, int, 0444);
- 
- /* enable/disable Virtual VMLOAD VMSAVE */
--static int vls = true;
-+static int vls __ro_after_init = true;
- module_param(vls, int, 0444);
- 
- /* enable/disable Virtual GIF */
--int vgif = true;
-+int vgif __ro_after_init = true;
- module_param(vgif, int, 0444);
- 
- /* enable/disable LBR virtualization */
--static int lbrv = true;
-+static int lbrv __ro_after_init = true;
- module_param(lbrv, int, 0444);
- 
--static int tsc_scaling = true;
-+static int tsc_scaling __ro_after_init = true;
- module_param(tsc_scaling, int, 0444);
- 
- /*
-  * enable / disable AVIC.  Because the defaults differ for APICv
-  * support between VMX and SVM we cannot use module_param_named.
-  */
--static bool avic;
-+static bool avic __ro_after_init;
- module_param(avic, bool, 0444);
- 
- bool __read_mostly dump_invalid_vmcb;
- module_param(dump_invalid_vmcb, bool, 0644);
- 
- 
--bool intercept_smi = true;
-+bool intercept_smi __ro_after_init = true;
- module_param(intercept_smi, bool, 0444);
- 
- 
--static bool svm_gp_erratum_intercept = true;
-+static bool svm_gp_erratum_intercept __ro_after_init = true;
- 
- static u8 rsm_ins_bytes[] = "\x0f\xaa";
- 
-@@ -255,7 +255,7 @@ DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
-  * RDTSCP and RDPID are not used in the kernel, specifically to allow KVM to
-  * defer the restoration of TSC_AUX until the CPU returns to userspace.
-  */
--static int tsc_aux_uret_slot __read_mostly = -1;
-+static int tsc_aux_uret_slot __ro_after_init = -1;
- 
- static const u32 msrpm_ranges[] = {0, 0xc0000000, 0xc0010000};
- 
--- 
-2.38.1.431.g37b22c650d-goog
-
+T24gV2VkLCAyMDIyLTExLTAyIGF0IDIzOjE5ICswMDAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBGcm9tOiBDaGFvIEdhbyA8Y2hhby5nYW9AaW50ZWwuY29tPg0KPiANCj4gRGlzYWJs
+ZSBDUFUgaG90cGx1ZyBkdXJpbmcgaGFyZHdhcmVfZW5hYmxlX2FsbCgpIHRvIHByZXZlbnQgdGhl
+IGNvcm5lcg0KPiBjYXNlIHdoZXJlIGlmIHRoZSBmb2xsb3dpbmcgc2VxdWVuY2Ugb2NjdXJzOg0K
+PiANCj4gwqAgMS4gQSBob3RwbHVnZ2VkIENQVSBtYXJrcyBpdHNlbGYgb25saW5lIGluIGNwdV9v
+bmxpbmVfbWFzaw0KPiDCoCAyLiBUaGUgaG90cGx1Z2dlZCBDUFUgZW5hYmxlcyBpbnRlcnJ1cHQg
+YmVmb3JlIGludm9raW5nIEtWTSdzIE9OTElORQ0KPiDCoMKgwqDCoCBjYWxsYmFjaw0KPiDCoCAz
+wqAgaGFyZHdhcmVfZW5hYmxlX2FsbCgpIGlzIGludm9rZWQgb24gYW5vdGhlciBDUFUgcmlnaHQN
+Cj4gDQo+IHRoZSBob3RwbHVnZ2VkIENQVSB3aWxsIGJlIGluY2x1ZGVkIGluIG9uX2VhY2hfY3B1
+KCkgYW5kIHRodXMgZ2V0IHNlbnQNCj4gdGhyb3VnaCBoYXJkd2FyZV9lbmFibGVfbm9sb2NrKCkg
+YmVmb3JlIGt2bV9vbmxpbmVfY3B1KCkgaXMgY2FsbGVkLg0KPiANCj4gwqDCoMKgwqDCoMKgwqAg
+c3RhcnRfc2Vjb25kYXJ5IHsgLi4uDQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBz
+ZXRfY3B1X29ubGluZShzbXBfcHJvY2Vzc29yX2lkKCksIHRydWUpOyA8LSAxDQo+IMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAuLi4NCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIGxvY2FsX2lycV9lbmFibGUoKTvCoCA8LSAyDQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCAuLi4NCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNwdV9zdGFydHVw
+X2VudHJ5KENQVUhQX0FQX09OTElORV9JRExFKTsgPC0gMw0KPiDCoMKgwqDCoMKgwqDCoCB9DQo+
+IA0KPiBLVk0gY3VycmVudGx5IGZ1ZGdlcyBhcm91bmQgdGhpcyByYWNlIGJ5IGtlZXBpbmcgdHJh
+Y2sgb2Ygd2hpY2ggQ1BVcyBoYXZlDQo+IGRvbmUgaGFyZHdhcmUgZW5hYmxpbmcgKHNlZSBjb21t
+aXQgMWI2YzAxNjgxOGE1ICJLVk06IEtlZXAgdHJhY2sgb2Ygd2hpY2gNCj4gY3B1cyBoYXZlIHZp
+cnR1YWxpemF0aW9uIGVuYWJsZWQiKSwgYnV0IHRoYXQncyBhbiBpbmVmZmljaWVudCwgY29udm9s
+dXRlZCwNCj4gYW5kIGhhY2t5IHNvbHV0aW9uLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogQ2hhbyBH
+YW8gPGNoYW8uZ2FvQGludGVsLmNvbT4NCj4gW3NlYW46IHNwbGl0IHRvIHNlcGFyYXRlIHBhdGNo
+LCB3cml0ZSBjaGFuZ2Vsb2ddDQo+IFNpZ25lZC1vZmYtYnk6IFNlYW4gQ2hyaXN0b3BoZXJzb24g
+PHNlYW5qY0Bnb29nbGUuY29tPg0KPiAtLS0NCj4gwqBhcmNoL3g4Ni9rdm0veDg2LmPCoCB8wqAg
+OCArKysrKysrLQ0KPiDCoHZpcnQva3ZtL2t2bV9tYWluLmMgfCAxMCArKysrKysrKysrDQo+IMKg
+MiBmaWxlcyBjaGFuZ2VkLCAxNyBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBk
+aWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3g4Ni5jIGIvYXJjaC94ODYva3ZtL3g4Ni5jDQo+IGlu
+ZGV4IGE3YjFkOTE2ZWNiMi4uYTE1ZTU0YmEwNDcxIDEwMDY0NA0KPiAtLS0gYS9hcmNoL3g4Ni9r
+dm0veDg2LmMNCj4gKysrIGIvYXJjaC94ODYva3ZtL3g4Ni5jDQo+IEBAIC05MjgzLDcgKzkyODMs
+MTMgQEAgc3RhdGljIGludCBrdm1feDg2X2NoZWNrX3Byb2Nlc3Nvcl9jb21wYXRpYmlsaXR5KHN0
+cnVjdCBrdm1feDg2X2luaXRfb3BzICpvcHMpDQo+IMKgCWludCBjcHUgPSBzbXBfcHJvY2Vzc29y
+X2lkKCk7DQo+IMKgCXN0cnVjdCBjcHVpbmZvX3g4NiAqYyA9ICZjcHVfZGF0YShjcHUpOw0KPiDC
+oA0KPiAtCVdBUk5fT04oIWlycXNfZGlzYWJsZWQoKSk7DQo+ICsJLyoNCj4gKwkgKiBDb21wYXRp
+YmlsaXR5IGNoZWNrcyBhcmUgZG9uZSB3aGVuIGxvYWRpbmcgS1ZNIGFuZCB3aGVuIGVuYWJsaW5n
+DQo+ICsJICogaGFyZHdhcmUsIGUuZy4gZHVyaW5nIENQVSBob3RwbHVnLCB0byBlbnN1cmUgYWxs
+IG9ubGluZSBDUFVzIGFyZQ0KPiArCSAqIGNvbXBhdGlibGUsIGkuZS4gS1ZNIHNob3VsZCBuZXZl
+ciBwZXJmb3JtIGEgY29tcGF0aWJpbGl0eSBjaGVjayBvbg0KPiArCSAqIGFuIG9mZmxpbmUgQ1BV
+Lg0KPiArCSAqLw0KPiArCVdBUk5fT04oIWlycXNfZGlzYWJsZWQoKSAmJiBjcHVfYWN0aXZlKGNw
+dSkpOw0KPiDCoA0KDQpBbHNvLCB0aGUgbG9naWMgb2Y6DQoNCgkhaXJxc19kaXNhYmxlZCgpICYm
+IGNwdV9hY3RpdmUoY3B1KQ0KDQppcyBxdWl0ZSB3ZWlyZC4NCg0KVGhlIG9yaWdpbmFsICJXQVJO
+KCFpcnFzX2Rpc2FibGVkKCkpIiBpcyByZWFzb25hYmxlIGJlY2F1c2UgaW4gU1RBUlRJTkcgc2Vj
+dGlvbg0KdGhlIElSUSBpcyBpbmRlZWQgZGlzYWJsZWQuDQoNCkJ1dCB0aGlzIGRvZXNuJ3QgbWFr
+ZSBzZW5zZSBhbnltb3JlIGFmdGVyIHdlIG1vdmUgdG8gT05MSU5FIHNlY3Rpb24sIGluIHdoaWNo
+DQpJUlEgaGFzIGFscmVhZHkgYmVlbiBlbmFibGVkIChzZWUgc3RhcnRfc2Vjb25kYXJ5KCkpLiAg
+SUlVQyB0aGUgV0FSTl9PTigpDQpkb2Vzbid0IGdldCBleHBsb2RlZCBpcyBwdXJlbHkgYmVjYXVz
+ZSB0aGVyZSdzIGFuIGFkZGl0aW9uYWwgY3B1X2FjdGl2ZShjcHUpDQpjaGVjay4NCg0KU28sIGEg
+bW9yZSByZWFzb25hYmxlIGNoZWNrIHNob3VsZCBiZSBzb21ldGhpbmcgbGlrZToNCg0KCVdBUk5f
+T04oaXJxc19kaXNhYmxlZCgpIHx8IGNwdV9hY3RpdmUoY3B1KSB8fCAhY3B1X29ubGluZShjcHUp
+KTsNCg0KT3Igd2UgY2FuIHNpbXBseSBkbzoNCg0KCVdBUk5fT04oIWNwdV9vbmxpbmUoY3B1KSB8
+fCBjcHVfYWN0aXZlKGNwdSkpOw0KDQooYmVjYXVzZSBJIGRvbid0IGtub3cgd2hldGhlciBpdCdz
+IHBvc3NpYmxlIElSUSBjYW4gc29tZWhvdyBnZXQgZGlzYWJsZWQgaW4NCk9OTElORSBzZWN0aW9u
+KS4NCg0KQnR3IGFib3ZlIGlzIHB1cmVseSBiYXNlZCBvbiBjb2RlIGFuYWx5c2lzLCBidXQgSSBo
+YXZlbid0IGRvbmUgYW55IHRlc3QuDQo=
