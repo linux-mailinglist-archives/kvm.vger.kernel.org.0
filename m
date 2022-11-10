@@ -2,55 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16484623877
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 01:57:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CFCC62387A
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 01:57:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231387AbiKJA5S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 19:57:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46272 "EHLO
+        id S232131AbiKJA5Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 19:57:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231899AbiKJA5J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 19:57:09 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA219205CF
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 16:57:08 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id n1-20020a170902f60100b00179c0a5c51fso244195plg.7
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 16:57:08 -0800 (PST)
+        with ESMTP id S232046AbiKJA5L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 19:57:11 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A11EA20F56
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 16:57:10 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id x8-20020aa79568000000b0056dd717e051so171031pfq.11
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 16:57:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eUq0vFA8ndY9d6ONKF6p5o14/szo67j4mO31X1fzXhQ=;
-        b=ISnjkw4UhuHmVKuUmoCNvGEqjV3MQKsrd9zzkNWNwK8a5nTV5bjg+MAfo5L3xdGRlH
-         I0bzMV0ysYNJajwQ0GqoVKfcBtI3elSbtl+H99V23yzRL4DL16WsVVSKaCaB4IznNo71
-         5JIfdPkB5N0lAq/MAzTD1wvFA5xFsZoasy3Bf1EJshqmdFWP+IBW5krsZlRwypozTO8Q
-         30XcaOD5aQh+PopTn9CMmqzy+ML1WhKHi2ZS9JzEkl1BLzwu/MWAmLGQBh4/WwqlPMuj
-         IRkiKYYSWwd8xRcApXG60iCqKce2bCZN5qmzIjAkGyes06ExYOFbWEJpqGE5cENTJW64
-         64Bw==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=sfZqtehmJAKW3XdILp4Pa+j/G6SeiEXkrRjwBXbPNQ4=;
+        b=R7MO5UZg7uZuGhIBEVZ0K4sBRl8uHVbSzpOR8CzrHMoASp/lJy34BFMEJHsE8QIqZ+
+         sGptJIr7AgU4nzsg/w0iyGjWoaNtEPB3XPsCTmvjm0wVVuHpbtlG982CUVHn8CnDy5CA
+         sjkyyVXgKgtz3Zttb/ukzdRtLTijU4LiFs7fGlnv+JSvcEbqHn0kmD1dAFd2X4kJPF+x
+         jzF4z1P9e1xclKp9nHV5MLieEWO+nZ2pb9SH6c06g6yeVbTDqkJaXZdUIuW+bMpVbx1o
+         tOAUda2uGLt459EygROZFC4+2hwWi0rjATlKT0xIuw8ScDvX5JeqNiBqNSTx3oEXA9FU
+         4zqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eUq0vFA8ndY9d6ONKF6p5o14/szo67j4mO31X1fzXhQ=;
-        b=qVa5XnpyeKlPRyUo9HrqT/gLejhjYURA9ewJpepIb7pVjq/lju/k8WobpTgo/RwXYz
-         CWULpmISXuDIrbqq+YtIb3Dfaobr0BUPpdA2PgvejZyIBaPYLLhguTzidWlQ7IkuAADN
-         NMZ20+CvCsCG/qapwZdpMT1WdVkKUXdxtzanbOIZFrBcyJxAJs2aKeTYC4FXPnbRIqE7
-         SW51i13bdzg9E64PA7m8x49jO9+GkVMfNRy1SFagSsBVh94tW1Ng78fjmR99AFI9hchX
-         N4cI6p7Lu006+0+6rYNaSjzEjE2s9xWWHLTFRcPOzMNXQbe40mcKdS6vDqu6wvgCTqCh
-         DPYA==
-X-Gm-Message-State: ACrzQf1tT6MrkGEAzmGWOn7dW3MrWq7pzN1gd03fDPbyOUevABnrDgvC
-        aReQrsCEW8B/UhNV09xXi7RMIIW4EDY=
-X-Google-Smtp-Source: AMsMyM69pqxrJF/SLakpGezFAlKg1pWH1oDKq/6oavYLLCQJLbq60mbR5Ufk/J/JEHcclX2miXFSWxZ1eis=
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sfZqtehmJAKW3XdILp4Pa+j/G6SeiEXkrRjwBXbPNQ4=;
+        b=RsabM9SKhT6j/u3nQB2+1tAST893mmOO3NOHcuKazMClz3H/a5n+T3Uda6lQKv856C
+         kOZTEt5feNhsrIDGCrjXJnQjC3sAuAatFmRCPJxlHTN0XMmkJeLfLidCItEyV/ZrnWCv
+         0EtvnDTxEvCySksf3QzoEAIEyv0TPlRPNupNQeAF2GZ8/NPPC89Ld8myO2y7n0XPEeof
+         DmyAM1yJ6vIIjDORQifGShRlDkrXxQEMDsQLmQobs1lTLsAY7SPu6ZlSD9v0vh25a5Zh
+         VwIZyK4Fv9lzN4DTAp5D51BtFTXsMKCWgFDtFy8bLlkI/nS6BDppalTwaCqm3iYK8X4z
+         rbng==
+X-Gm-Message-State: ACrzQf0Ax9g8Q9iEBmOIWWwK8cUTzK6R4F7h7Mb/d4lDNLm5OqECLRw5
+        BimonJMie3/FqNAJA1y4/ZqAaUjr+a8=
+X-Google-Smtp-Source: AMsMyM4WRNtIl3Riz4W8+eM2I9MeCMHVFp7PazBTAuTfgJdkEPJzdC5uVayhgT5JdlqoyKb/XWxH/+oQuv8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:8549:0:b0:56c:ba99:7951 with SMTP id
- y9-20020aa78549000000b0056cba997951mr63536349pfn.83.1668041828368; Wed, 09
- Nov 2022 16:57:08 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:ce88:b0:186:b345:97c0 with SMTP id
+ f8-20020a170902ce8800b00186b34597c0mr64227380plg.13.1668041830237; Wed, 09
+ Nov 2022 16:57:10 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 10 Nov 2022 00:57:04 +0000
+Date:   Thu, 10 Nov 2022 00:57:05 +0000
+In-Reply-To: <20221110005706.1064832-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20221110005706.1064832-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221110005706.1064832-1-seanjc@google.com>
-Subject: [PATCH 0/2] KVM: nVMX: Fix another case where KVM overrides VMX MSRs
+Message-ID: <20221110005706.1064832-2-seanjc@google.com>
+Subject: [PATCH 1/2] KVM: nVMX: Don't muck with allowed sec exec controls on
+ CPUID changes
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -67,32 +71,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix another case where KVM overrides the VMX MSRs (well, just the one MSR)
-during KVM_SET_CPUID.  Similar to somewhat recent reverts
+Don't modify the set of allowed secondary execution controls, i.e. the
+virtual MSR_IA32_VMX_PROCBASED_CTLS2, in response to guest CPUID changes.
+To avoid breaking old userspace that never sets the VMX MSRs, i.e. relies
+on KVM to provide a consistent vCPU model, keep the existing behavior if
+userspace has never written MSR_IA32_VMX_PROCBASED_CTLS2.
 
-  8805875aa473 ("Revert "KVM: nVMX: Do not expose MPX VMX controls when guest MPX disabled"")
-  9389d5774aca ("Revert "KVM: nVMX: Expose load IA32_PERF_GLOBAL_CTRL VM-{Entry,Exit} control"")
+KVM should not modify the VMX capabilities presented to L1 based on CPUID
+as doing so may discard explicit settings provided by userspace.  E.g. if
+userspace does KVM_SET_MSRS => KVM_SET_CPUID and disables a feature in
+the VMX MSRs but not CPUID (to prevent exposing the feature to L2), then
+stuffing the VMX MSRs during KVM_SET_CPUID will expose the feature to L2
+against userspace's wishes.
 
-undo misguided KVM behavior where KVM overrides allowed-1 settings in the
-secondary execution controls in response to changes to the guest's CPUID
-model.  To avoid breaking userspace that doesn't take ownership of the
-VMX MSRs, go hands off if and only if userpace sets the MSR in question
+Alternatively, KVM could add a quirk, but that's less than ideal as a VMM
+that is affected by the bug would need to be updated in order to opt out
+of the buggy behavior.  The "has the MSR ever been written" logic handles
+both the case where an enlightened userspace sets the MSR during setup,
+and the case where userspace blindly migrates the MSR, as the migrated
+value will already have been sanitized by the source KVM or explicitly
+set by the source VMM.
 
-Sean Christopherson (2):
-  KVM: nVMX: Don't muck with allowed sec exec controls on CPUID changes
-  KVM: selftests: Test KVM's handling of VMX's sec exec MSR on
-    KVM_SET_CPUID
+Reported-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/capabilities.h | 1 +
+ arch/x86/kvm/vmx/nested.c       | 3 +++
+ arch/x86/kvm/vmx/vmx.c          | 2 +-
+ 3 files changed, 5 insertions(+), 1 deletion(-)
 
- arch/x86/kvm/vmx/capabilities.h               |  1 +
- arch/x86/kvm/vmx/nested.c                     |  3 +
- arch/x86/kvm/vmx/vmx.c                        |  2 +-
- .../selftests/kvm/include/x86_64/processor.h  |  1 +
- .../selftests/kvm/include/x86_64/vmx.h        |  4 +-
- .../selftests/kvm/x86_64/vmx_msrs_test.c      | 92 +++++++++++++++++++
- 6 files changed, 100 insertions(+), 3 deletions(-)
-
-
-base-commit: d663b8a285986072428a6a145e5994bc275df994
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index cd2ac9536c99..7b08d6006f52 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -51,6 +51,7 @@ struct nested_vmx_msrs {
+ 	u64 cr4_fixed1;
+ 	u64 vmcs_enum;
+ 	u64 vmfunc_controls;
++	bool secondary_set_by_userspace;
+ };
+ 
+ struct vmcs_config {
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 61a2e551640a..e537526d996c 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1256,6 +1256,9 @@ vmx_restore_control_msr(struct vcpu_vmx *vmx, u32 msr_index, u64 data)
+ 	if (!is_bitwise_subset(supported, data, GENMASK_ULL(63, 32)))
+ 		return -EINVAL;
+ 
++	if (msr_index == MSR_IA32_VMX_PROCBASED_CTLS2)
++		vmx->nested.msrs.secondary_set_by_userspace = true;
++
+ 	vmx_get_control_msr(&vmx->nested.msrs, msr_index, &lowp, &highp);
+ 	*lowp = data;
+ 	*highp = data >> 32;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index aca88524fd1e..e5eec41bc1d5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4428,7 +4428,7 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
+ 	 * Update the nested MSR settings so that a nested VMM can/can't set
+ 	 * controls for features that are/aren't exposed to the guest.
+ 	 */
+-	if (nested) {
++	if (nested && !vmx->nested.msrs.secondary_set_by_userspace) {
+ 		if (enabled)
+ 			vmx->nested.msrs.secondary_ctls_high |= control;
+ 		else
 -- 
 2.38.1.431.g37b22c650d-goog
 
