@@ -2,94 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 95FF1623AC4
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 05:04:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E91AB623AA8
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 04:51:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232532AbiKJEE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 23:04:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57804 "EHLO
+        id S232774AbiKJDvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 22:51:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230093AbiKJEE0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 23:04:26 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5A1E1B799;
-        Wed,  9 Nov 2022 20:04:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668053066; x=1699589066;
-  h=from:to:cc:subject:date:message-id;
-  bh=IuypqxgY8qtYaoRik5R/iYUQhD+/hT5Hbcf2oINORCk=;
-  b=FO5QaFx2dA3nsAdBm1u3jmi2B6gwGF+TjJl2lq0N+mOThpwSK7NaVcwF
-   9Craev6kABzVujymSTTW+ipL6wYkLvvr3NlgN1WQgmJiW9pHQVsCVD+tC
-   L34lZ99rKGaRS0MB8q8RsT+2af6Do5pYMnTxocfk7bpmZfGjEwBLsi2cW
-   U2WtFZF8cq+Vb0645XMRT92shL37i2g4+26TYdpwA9/CXrX0t3e3G28L0
-   NFvV0mTDdxhxiGXGeLf8mZxPycJD2jqC1dQ9IoeBgmpw9VCQ4Qcx1GChH
-   1UAqQMeR8OpC9szTHsZwXOfXquB11BWZgpjPi7LLFLpcQ7toQmxOKGsIo
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="312334022"
-X-IronPort-AV: E=Sophos;i="5.96,152,1665471600"; 
-   d="scan'208";a="312334022"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2022 20:04:25 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="811889757"
-X-IronPort-AV: E=Sophos;i="5.96,152,1665471600"; 
-   d="scan'208";a="811889757"
-Received: from yzhao56-desk.sh.intel.com ([10.238.200.254])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2022 20:04:23 -0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com,
-        Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH] KVM: x86/mmu: avoid accidentally go to shadow path for 0 count tdp root
-Date:   Thu, 10 Nov 2022 11:41:22 +0800
-Message-Id: <20221110034122.9892-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.17.1
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232431AbiKJDvC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 22:51:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D88E2F016
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 19:50:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668052201;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=60TErWgB0U0U1ocEUPR6YUn8kraoamkgfQY4MoeZxSA=;
+        b=DyigSyuQrIFip8vN+KyTs/6qRA0y6E2P26kGKohol+gFlRtt88KjkGR0Y0jezfXWqZ1Tuw
+        1cRB86XMCZGy9H4WnwvJto4cCVwtTd0M6zY6t08b3YW3a+aHoTI0UMuQZm6OcvsLUrAC9f
+        rDJdZJyRRpikvOWjH9YISdIn0BMbdmQ=
+Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com
+ [209.85.160.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-572-RcY8gfy0PQ2I2Om01s55KA-1; Wed, 09 Nov 2022 22:49:59 -0500
+X-MC-Unique: RcY8gfy0PQ2I2Om01s55KA-1
+Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-13b9bcc6b4cso478361fac.13
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 19:49:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=60TErWgB0U0U1ocEUPR6YUn8kraoamkgfQY4MoeZxSA=;
+        b=HTmBwendI6rxSJSZfeWN6QNNiwlkZ1oR2G+OT4LhmJlVKBIXs+3RV6UQUt5sZ6FlHs
+         k/9oZs+FijtZF479UdkoU96rBD2cW55h2lL5SAHM08lKhZubs8RyM+zi6n/67eIBhysF
+         Cz3+YNsDLSzeZ0RHFvW9cGMN7JPfSI+77BE75lIBEGiizd60c8lRezUNnc2jTkMbnD6c
+         /z4P+faqWabclxQR+nx2P6xixT0no3miKLM5jOzAGoP/5s4vMHQLY2aIueVi+Otb93UF
+         FUpGd7B5hSI/tbUWOjQFCfnqz34QvOqVAAJTR7vT3ibOXek6Ix59hYSPEOF2oC9LQ3RM
+         POZA==
+X-Gm-Message-State: ACrzQf1pU5vf1+cs/2EVXfc5/9BgjL1hGfY84Z2Wy75eDK4ZbzZ0z+EO
+        cNqNbvEBfuvMQtEVO5QsUb7rD49tqeySzyj9h/lEjzDnMYCPNkhP/oBlZkcZ9avVdC1xDz1wC6m
+        O6mbEO7ALWgF/77p6GzV6J0j9Oo98
+X-Received: by 2002:a05:6871:54e:b0:13b:29b7:e2e8 with SMTP id t14-20020a056871054e00b0013b29b7e2e8mr45759489oal.35.1668052199260;
+        Wed, 09 Nov 2022 19:49:59 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM6Yn+hSnYW2dtP/B4LNuU0FW2fGT1rkHGvoIuVlS3fet4Oamq0Y/5dGPg9Iq0HjoNmQTXjGOGpClzetCS9bnaE=
+X-Received: by 2002:a05:6871:54e:b0:13b:29b7:e2e8 with SMTP id
+ t14-20020a056871054e00b0013b29b7e2e8mr45759486oal.35.1668052199063; Wed, 09
+ Nov 2022 19:49:59 -0800 (PST)
+MIME-Version: 1.0
+References: <20221107093345.121648-1-lingshan.zhu@intel.com>
+ <CACGkMEs9af1E1pLd2t8E71YBPF=rHkhfN8qO9_3=x6HVaCMAxg@mail.gmail.com>
+ <0b15591f-9e49-6383-65eb-6673423f81ec@intel.com> <CACGkMEujqOFHv7QATWgYo=SdAKef5jQXi2-YksjgT-hxEgKNDQ@mail.gmail.com>
+ <80cdd80a-16fa-ac75-0a89-5729b846efed@intel.com>
+In-Reply-To: <80cdd80a-16fa-ac75-0a89-5729b846efed@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Thu, 10 Nov 2022 11:49:47 +0800
+Message-ID: <CACGkMEu-5TbA3Ky2qgn-ivfhgfJ2b12mDJgq8iNgHce8qu3ApA@mail.gmail.com>
+Subject: Re: [PATCH 0/4] ifcvf/vDPA implement features provisioning
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, hang.yuan@intel.com, piotr.uminski@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm mmu uses "if (is_tdp_mmu(vcpu->arch.mmu))" to choose between tdp mmu
-and shadow path.
-If a root is a tdp mmu page while its root_count is 0, it's not valid to
-go to the shadow path.
+On Wed, Nov 9, 2022 at 5:06 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
+>
+>
+>
+> On 11/9/2022 4:59 PM, Jason Wang wrote:
+> > On Wed, Nov 9, 2022 at 4:14 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
+> >>
+> >>
+> >> On 11/9/2022 2:51 PM, Jason Wang wrote:
+> >>> On Mon, Nov 7, 2022 at 5:42 PM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+> >>>> This series implements features provisioning for ifcvf.
+> >>>> By applying this series, we allow userspace to create
+> >>>> a vDPA device with selected (management device supported)
+> >>>> feature bits and mask out others.
+> >>> I don't see a direct relationship between the first 3 and the last.
+> >>> Maybe you can state the reason why the restructure is a must for the
+> >>> feature provisioning. Otherwise, we'd better split the series.
+> >> When introducing features provisioning ability to ifcvf, there is a need
+> >> to re-create vDPA devices
+> >> on a VF with different feature bits.
+> > This seems a requirement even without feature provisioning? Device
+> > could be deleted from the management device anyhow.
+> Yes, we need this to delete and re-create a vDPA device.
 
-So, return true and add a warn on zero root count.
+I wonder if we need something that works for -stable.
 
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- arch/x86/kvm/mmu/tdp_mmu.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+AFAIK, we can move the vdpa_alloc_device() from probe() to dev_add()
+and it seems to work?
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index c163f7cc23ca..58b4881654a9 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -74,6 +74,7 @@ static inline bool is_tdp_mmu(struct kvm_mmu *mmu)
- {
- 	struct kvm_mmu_page *sp;
- 	hpa_t hpa = mmu->root.hpa;
-+	bool is_tdp;
- 
- 	if (WARN_ON(!VALID_PAGE(hpa)))
- 		return false;
-@@ -84,7 +85,10 @@ static inline bool is_tdp_mmu(struct kvm_mmu *mmu)
- 	 * pae_root page, not a shadow page.
- 	 */
- 	sp = to_shadow_page(hpa);
--	return sp && is_tdp_mmu_page(sp) && sp->root_count;
-+	is_tdp = sp && is_tdp_mmu_page(sp);
-+	WARN_ON(is_tdp && !refcount_read(&sp->tdp_mmu_root_count));
-+
-+	return is_tdp;
- }
- #else
- static inline int kvm_mmu_init_tdp_mmu(struct kvm *kvm) { return 0; }
--- 
-2.17.1
+Thanks
+
+>
+> We create vDPA device from a VF, so without features provisioning
+> requirements,
+> we don't need to re-create the vDPA device. But with features provisioning,
+> it is a must now.
+>
+> Thanks
+>
+>
+> >
+> > Thakns
+> >
+> >> When remove a vDPA device, the container of struct vdpa_device (here is
+> >> ifcvf_adapter) is free-ed in
+> >> dev_del() interface, so we need to allocate ifcvf_adapter in dev_add()
+> >> than in probe(). That's
+> >> why I have re-factored the adapter/mgmt_dev code.
+> >>
+> >> For re-factoring the irq related code and ifcvf_base, let them work on
+> >> struct ifcvf_hw, the
+> >> reason is that the adapter is allocated in dev_add(), if we want theses
+> >> functions to work
+> >> before dev_add(), like in probe, we need them work on ifcvf_hw than the
+> >> adapter.
+> >>
+> >> Thanks
+> >> Zhu Lingshan
+> >>> Thanks
+> >>>
+> >>>> Please help review
+> >>>>
+> >>>> Thanks
+> >>>>
+> >>>> Zhu Lingshan (4):
+> >>>>     vDPA/ifcvf: ifcvf base layer interfaces work on struct ifcvf_hw
+> >>>>     vDPA/ifcvf: IRQ interfaces work on ifcvf_hw
+> >>>>     vDPA/ifcvf: allocate ifcvf_adapter in dev_add()
+> >>>>     vDPA/ifcvf: implement features provisioning
+> >>>>
+> >>>>    drivers/vdpa/ifcvf/ifcvf_base.c |  32 ++-----
+> >>>>    drivers/vdpa/ifcvf/ifcvf_base.h |  10 +-
+> >>>>    drivers/vdpa/ifcvf/ifcvf_main.c | 156 +++++++++++++++-----------------
+> >>>>    3 files changed, 89 insertions(+), 109 deletions(-)
+> >>>>
+> >>>> --
+> >>>> 2.31.1
+> >>>>
+>
 
