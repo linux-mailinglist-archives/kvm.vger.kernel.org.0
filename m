@@ -2,218 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A0836242F7
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 14:11:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CA1462431A
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 14:21:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230449AbiKJNLH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 08:11:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35556 "EHLO
+        id S229637AbiKJNV6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 08:21:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230445AbiKJNKp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 08:10:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7654299
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 05:09:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668085786;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=g7yzyeLEGg0cjDYwQZn2MaPQ/bepIB2IEoD4XBCdYOM=;
-        b=VdPQwJTiykdNd9VxldGZwtp7pp3R6M9DYXkRHZmXZsV/cUApSZul3my/Um/PowMsLEPs8K
-        pyt0ZJRbKgfKpossx7LZY+J5HngkHIIw71aN9MwBhCJdWw7/5DxlVr2oODejj/zFVpeBAm
-        rPfuArpictcoD8CtsbKVk2YsznZfq3w=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-204-YufLHzHIPfKrRAoBbhjQCA-1; Thu, 10 Nov 2022 08:09:45 -0500
-X-MC-Unique: YufLHzHIPfKrRAoBbhjQCA-1
-Received: by mail-pf1-f200.google.com with SMTP id e8-20020a056a00162800b0056e953c5088so1028439pfc.2
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 05:09:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g7yzyeLEGg0cjDYwQZn2MaPQ/bepIB2IEoD4XBCdYOM=;
-        b=Eu2SJRH+trpNFFLHYevZ/7/1lnKOONCyvfUAiWgMEb1XLEVvBAMYsqX317S0jdz8mf
-         aaL2JKc1wtawH+OaI77PWYeRunEUBaXM1Ok8yhBEUyGvfUzgumstn21+pSatwQzj5P8w
-         6fNTx/A3nHGX81+41iRyj5ys83+GDX39p9uOacBMCFM0hpxu8Iy6mkxrjdSRuwmSQOkZ
-         15yLbaYNT6//yiByZqZOphJX/IWHSRhfvWRwWH40klq7xPQXXCRokR/YH4SpCV7iiF34
-         UD29nycse3SuRMTRlLrzA9q+X3jTOIPJjk4Kj0Evw4zEkhhwVFvXmQHsiVuAQiSTamp0
-         jHHA==
-X-Gm-Message-State: ACrzQf0DH2rlisrIPaIrK94ymMKWzDkLRT5QwbEvxv7m6RNCpOKBTAIC
-        +4nijIImyLs9XN/7C3xin13xIKHE1Bzh55dxL7ftXTQ8ocQunxfh75wfkZWsygYLAZZEJthhBdv
-        HPVVoLASsgvp6dsupWUZhkgB/nGq6
-X-Received: by 2002:a17:902:ce82:b0:187:3591:edac with SMTP id f2-20020a170902ce8200b001873591edacmr48453114plg.153.1668085783799;
-        Thu, 10 Nov 2022 05:09:43 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM6KOEWfHhPK/2I37RD9J6zoYrru3BZj2gmnXvReWU8tS7nSkaqP/coNopRBOSYlstVFJkhfgWl9FCCsZ/0xYEE=
-X-Received: by 2002:a17:902:ce82:b0:187:3591:edac with SMTP id
- f2-20020a170902ce8200b001873591edacmr48453093plg.153.1668085783523; Thu, 10
- Nov 2022 05:09:43 -0800 (PST)
+        with ESMTP id S230349AbiKJNVz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 08:21:55 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7F766B399
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 05:21:53 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7F009B821A2
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 13:21:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20B72C433C1;
+        Thu, 10 Nov 2022 13:21:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668086511;
+        bh=vsKYJwz6b+8G9OYObnAUmHW9XZF2g9Jn8L3VpwTYoLo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Cw9PUhvxJOphnbK+yH0weDhtE/IJ9rrAJtFBNWJ2OCUmFFXZ7mxR5nYCBMRtxoVAl
+         SATrNZktcM7DppSFMnU+61XPpGqM0/6Ty6QFUAwHtk8/t6Ibe4bCVN9olBTRvLCJtC
+         6hhCZUHQT6gadLeUFZDtSjZXyg5wPWgq2/dh2mkrp7jE/98NOr5VXAOTQmfHgRzrVt
+         Q/tT43TCO3pG/dC/0r5B99h6oQ8z8q6yVufZzrRqegOt7mR8erArTIwZjTvvARF2rq
+         U8UKFHHDI+TkjNp84mBDHXNb33v96p5B3eiQ5IBw790HhW6MNyt4gXXas0CME2bqQs
+         bEJKPNpBRBjbQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ot7V7-0059yG-00;
+        Thu, 10 Nov 2022 13:21:49 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, Gavin Shan <gshan@redhat.com>
+Cc:     catalin.marinas@arm.com, kvm@vger.kernel.org,
+        ajones@ventanamicro.com, bgardon@google.com, shuah@kernel.org,
+        shan.gavin@gmail.com, kvmarm@lists.cs.columbia.edu,
+        dmatlack@google.com, andrew.jones@linux.dev, zhenyzha@redhat.com,
+        pbonzini@redhat.com, will@kernel.org
+Subject: Re: [PATCH v10 0/7] KVM: arm64: Enable ring-based dirty memory tracking
+Date:   Thu, 10 Nov 2022 13:21:46 +0000
+Message-Id: <166808649563.2653656.5582018167024205345.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221110104914.31280-1-gshan@redhat.com>
+References: <20221110104914.31280-1-gshan@redhat.com>
 MIME-Version: 1.0
-References: <20221108170755.92768-1-eperezma@redhat.com> <20221108170755.92768-6-eperezma@redhat.com>
- <56bfad97-74d2-8570-c391-83ecf9965cfd@redhat.com>
-In-Reply-To: <56bfad97-74d2-8570-c391-83ecf9965cfd@redhat.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Thu, 10 Nov 2022 14:09:07 +0100
-Message-ID: <CAJaqyWd47QdBoSm9RdF2yx21hKv_=YRp3uvP13Qb9PaVksss7Q@mail.gmail.com>
-Subject: Re: [PATCH v6 05/10] vdpa: move SVQ vring features check to net/
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     qemu-devel@nongnu.org, Parav Pandit <parav@mellanox.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Gautam Dawar <gdawar@xilinx.com>,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Cindy Lu <lulu@redhat.com>, Eli Cohen <eli@mellanox.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>, kvm@vger.kernel.org,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, gshan@redhat.com, catalin.marinas@arm.com, kvm@vger.kernel.org, ajones@ventanamicro.com, bgardon@google.com, shuah@kernel.org, shan.gavin@gmail.com, kvmarm@lists.cs.columbia.edu, dmatlack@google.com, andrew.jones@linux.dev, zhenyzha@redhat.com, pbonzini@redhat.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 10, 2022 at 6:40 AM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2022/11/9 01:07, Eugenio P=C3=A9rez =E5=86=99=E9=81=93:
-> > The next patches will start control SVQ if possible. However, we don't
-> > know if that will be possible at qemu boot anymore.
->
->
-> If I was not wrong, there's no device specific feature that is checked
-> in the function. So it should be general enough to be used by devices
-> other than net. Then I don't see any advantage of doing this.
->
+On Thu, 10 Nov 2022 18:49:07 +0800, Gavin Shan wrote:
+> This series enables the ring-based dirty memory tracking for ARM64.
+> The feature has been available and enabled on x86 for a while. It
+> is beneficial when the number of dirty pages is small in a checkpointing
+> system or live migration scenario. More details can be found from
+> fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking").
+> 
+> For PATCH[v9 3/7], Peter's ack-by is kept since the recent changes
+> don't fundamentally break what he agreed. However, it would be nice
+> for Peter to double confirm.
+> 
+> [...]
 
-Because vhost_vdpa_init_svq is called at qemu boot, failing if it is
-not possible to shadow the Virtqueue.
+Applied to next, thanks!
 
-Now the CVQ will be shadowed if possible, so we need to check this at
-device start, not at initialization. To store this information at boot
-time is not valid anymore, because v->shadow_vqs_enabled is not valid
-at this time anymore.
+[1/7] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
+      commit: cf87ac739e488055a6046a410caa8f4da108948f
+[2/7] KVM: Move declaration of kvm_cpu_dirty_log_size() to kvm_dirty_ring.h
+      commit: e8a18565e59303ac12c626a161d72bd890bd2062
+[3/7] KVM: Support dirty ring in conjunction with bitmap
+      commit: 86bdf3ebcfe1ded055282536fecce13001874740
+[4/7] KVM: arm64: Enable ring-based dirty memory tracking
+      commit: 9cb1096f8590bc590326087bea65db932b53c3b5
+[5/7] KVM: selftests: Use host page size to map ring buffer in dirty_log_test
+      commit: a737f5ffb1e883e580730122be11c9eb832a7749
+[6/7] KVM: selftests: Clear dirty ring states between two modes in dirty_log_test
+      commit: 7167190ddb863bd061c0c6b61f4cec94184b40da
+[7/7] KVM: selftests: Automate choosing dirty ring size in dirty_log_test
+      commit: dc6df7d4d0633e65850d5372ae9f1234bcc6e26e
 
-Thanks!
+Cheers,
 
-> Thanks
->
->
-> >
-> > Since the moved checks will be already evaluated at net/ to know if it
-> > is ok to shadow CVQ, move them.
-> >
-> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > ---
-> >   hw/virtio/vhost-vdpa.c | 33 ++-------------------------------
-> >   net/vhost-vdpa.c       |  3 ++-
-> >   2 files changed, 4 insertions(+), 32 deletions(-)
-> >
-> > diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-> > index 3df2775760..146f0dcb40 100644
-> > --- a/hw/virtio/vhost-vdpa.c
-> > +++ b/hw/virtio/vhost-vdpa.c
-> > @@ -402,29 +402,9 @@ static int vhost_vdpa_get_dev_features(struct vhos=
-t_dev *dev,
-> >       return ret;
-> >   }
-> >
-> > -static int vhost_vdpa_init_svq(struct vhost_dev *hdev, struct vhost_vd=
-pa *v,
-> > -                               Error **errp)
-> > +static void vhost_vdpa_init_svq(struct vhost_dev *hdev, struct vhost_v=
-dpa *v)
-> >   {
-> >       g_autoptr(GPtrArray) shadow_vqs =3D NULL;
-> > -    uint64_t dev_features, svq_features;
-> > -    int r;
-> > -    bool ok;
-> > -
-> > -    if (!v->shadow_vqs_enabled) {
-> > -        return 0;
-> > -    }
-> > -
-> > -    r =3D vhost_vdpa_get_dev_features(hdev, &dev_features);
-> > -    if (r !=3D 0) {
-> > -        error_setg_errno(errp, -r, "Can't get vdpa device features");
-> > -        return r;
-> > -    }
-> > -
-> > -    svq_features =3D dev_features;
-> > -    ok =3D vhost_svq_valid_features(svq_features, errp);
-> > -    if (unlikely(!ok)) {
-> > -        return -1;
-> > -    }
-> >
-> >       shadow_vqs =3D g_ptr_array_new_full(hdev->nvqs, vhost_svq_free);
-> >       for (unsigned n =3D 0; n < hdev->nvqs; ++n) {
-> > @@ -436,7 +416,6 @@ static int vhost_vdpa_init_svq(struct vhost_dev *hd=
-ev, struct vhost_vdpa *v,
-> >       }
-> >
-> >       v->shadow_vqs =3D g_steal_pointer(&shadow_vqs);
-> > -    return 0;
-> >   }
-> >
-> >   static int vhost_vdpa_init(struct vhost_dev *dev, void *opaque, Error=
- **errp)
-> > @@ -461,11 +440,7 @@ static int vhost_vdpa_init(struct vhost_dev *dev, =
-void *opaque, Error **errp)
-> >       dev->opaque =3D  opaque ;
-> >       v->listener =3D vhost_vdpa_memory_listener;
-> >       v->msg_type =3D VHOST_IOTLB_MSG_V2;
-> > -    ret =3D vhost_vdpa_init_svq(dev, v, errp);
-> > -    if (ret) {
-> > -        goto err;
-> > -    }
-> > -
-> > +    vhost_vdpa_init_svq(dev, v);
-> >       vhost_vdpa_get_iova_range(v);
-> >
-> >       if (!vhost_vdpa_first_dev(dev)) {
-> > @@ -476,10 +451,6 @@ static int vhost_vdpa_init(struct vhost_dev *dev, =
-void *opaque, Error **errp)
-> >                                  VIRTIO_CONFIG_S_DRIVER);
-> >
-> >       return 0;
-> > -
-> > -err:
-> > -    ram_block_discard_disable(false);
-> > -    return ret;
-> >   }
-> >
-> >   static void vhost_vdpa_host_notifier_uninit(struct vhost_dev *dev,
-> > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> > index d3b1de481b..fb35b17ab4 100644
-> > --- a/net/vhost-vdpa.c
-> > +++ b/net/vhost-vdpa.c
-> > @@ -117,9 +117,10 @@ static bool vhost_vdpa_net_valid_svq_features(uint=
-64_t features, Error **errp)
-> >       if (invalid_dev_features) {
-> >           error_setg(errp, "vdpa svq does not work with features 0x%" P=
-RIx64,
-> >                      invalid_dev_features);
-> > +        return false;
-> >       }
-> >
-> > -    return !invalid_dev_features;
-> > +    return vhost_svq_valid_features(features, errp);
-> >   }
-> >
-> >   static int vhost_vdpa_net_check_device_id(struct vhost_net *net)
->
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
