@@ -2,40 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57680624782
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 17:50:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B936D624785
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 17:50:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232704AbiKJQuR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 11:50:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49198 "EHLO
+        id S232237AbiKJQuW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 11:50:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232667AbiKJQtx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 11:49:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C2EC62E1
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 08:48:14 -0800 (PST)
+        with ESMTP id S232511AbiKJQt5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 11:49:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AC056450
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 08:48:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668098893;
+        s=mimecast20190719; t=1668098898;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=TqTk3iARBWuKOOf8pMxkaVE9+5uAE54PiKz0+D5q5yw=;
-        b=Y9ituNF8eumkab8UnsOwjQlGjTHi5hIb8v+Mo2xRjT1EpHh3DOUGY9dFOaAqwlFXi6NoDY
-        5ObQG7q97yqK3hojWuSC9/+jKTvgfPHMj+8bqCRtHdXSD8PABawxTHOY5kQjGJbxXI1SVp
-        E2neba09G82+TetZD0eUGKkc1LY2cpk=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mCeFUvd8Kq8Qt7Mn84nMP6ZZ97jPIWZ4yJQYiSlWipM=;
+        b=VFOj3ozp4aboLBh5Ba55xrsPwzZNKy5ingvVQuhaEMTqG+lJHJYQW7JC4fPP5TN3wJ1OLN
+        OSxAz8I7YfblfCth6bUGVDc1hfUfehevycKr1W8yZC0psSzB+FFnBDEVaqKqU1tMKM0mdP
+        vui1uJmDyHtwTYxEfIXbR8z1ow4+paU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-605-rhucC4mqN2mKQ3hyMKlxyw-1; Thu, 10 Nov 2022 11:48:12 -0500
-X-MC-Unique: rhucC4mqN2mKQ3hyMKlxyw-1
+ us-mta-38-cUdW0m5kOUiIb1_hL1gLog-1; Thu, 10 Nov 2022 11:48:12 -0500
+X-MC-Unique: cUdW0m5kOUiIb1_hL1gLog-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 769F4381FA42;
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C028887B2AC;
         Thu, 10 Nov 2022 16:48:09 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C4AA040C94AA;
-        Thu, 10 Nov 2022 16:48:08 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8081C40C94AA;
+        Thu, 10 Nov 2022 16:48:09 +0000 (UTC)
 From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -45,9 +46,11 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
         Yanan Wang <wangyanan55@huawei.com>, kvm@vger.kernel.org,
         Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Subject: [PATCH v2 0/3] KVM: allow listener to stop all vcpus before
-Date:   Thu, 10 Nov 2022 11:48:04 -0500
-Message-Id: <20221110164807.1306076-1-eesposit@redhat.com>
+Subject: [PATCH v2 1/3] accel: introduce accelerator blocker API
+Date:   Thu, 10 Nov 2022 11:48:05 -0500
+Message-Id: <20221110164807.1306076-2-eesposit@redhat.com>
+In-Reply-To: <20221110164807.1306076-1-eesposit@redhat.com>
+References: <20221110164807.1306076-1-eesposit@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
@@ -61,60 +64,236 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-QEMU needs to perform memslots operations like merging and splitting,
-and each operation requires more than a single ioctl.
-Therefore if a vcpu is concurrently reading the same memslots,
-it could end up reading something that was temporarly deleted.
-For example, merging two memslots into one would imply:
-DELETE(m1)
-DELETE(m2)
-CREATE(m1+m2)
+This API allows the accelerators to prevent vcpus from issuing
+new ioctls while execting a critical section marked with the
+accel-ioctl_inhibit_begin/end functions.
 
-And a vcpu could attempt to read m2 right after it is deleted, but
-before the new one is created.
+Note that all functions submitting ioctls must mark where the
+ioctl is being called with accel_{cpu_}set_in_ioctl().
 
-This approach is 100% QEMU-based. No KVM API modification is involved,
-but implies that QEMU must make sure no new ioctl is running and all
-vcpus are stopped.
+This API requires the caller to always hold the BQL.
+API documentation is in sysemu/accel-blocker.h
 
-The logic and code are basically taken from David Hildenbrand
-proposal given a while ago while reviewing a previous attempt where
-I suggested to solve the above problem directly in KVM by extending
-its API.
+Internally, it uses a QemuLockCnt together with a per-CPU QemuLockCnt
+(to minimize cache line bouncing) to keep avoid that new ioctls
+run when the critical section starts, and a QemuEvent to wait
+that all running ioctls finish.
 
-This is the original code:
-https://github.com/davidhildenbrand/qemu/commit/86b1bf546a8d00908e33f7362b0b61e2be8dbb7a
-
-I just split the patch in three smaller patches, and used a
-QemuLockCnt instead of counter + mutex.
-
-RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=1979276
-
-Emanuele
+Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
 ---
-v2:
-* use QemuEvent instead of spinning in ioctl_inhibit_begin
-* move the blocker API in a separate file and header, so that other accel can
-  use it if they want.
-
-David Hildenbrand (1):
-  kvm: Atomic memslot updates
-
-Emanuele Giuseppe Esposito (2):
-  accel: introduce accelerator blocker API
-  KVM: keep track of running ioctls
-
  accel/accel-blocker.c          | 139 +++++++++++++++++++++++++++++++++
- accel/kvm/kvm-all.c            | 107 ++++++++++++++++++++++---
  accel/meson.build              |   2 +-
- hw/core/cpu-common.c           |   2 +
- include/hw/core/cpu.h          |   3 +
  include/sysemu/accel-blocker.h |  45 +++++++++++
- include/sysemu/kvm_int.h       |   8 ++
- 7 files changed, 294 insertions(+), 12 deletions(-)
+ 3 files changed, 185 insertions(+), 1 deletion(-)
  create mode 100644 accel/accel-blocker.c
  create mode 100644 include/sysemu/accel-blocker.h
 
+diff --git a/accel/accel-blocker.c b/accel/accel-blocker.c
+new file mode 100644
+index 0000000000..2701a05945
+--- /dev/null
++++ b/accel/accel-blocker.c
+@@ -0,0 +1,139 @@
++/*
++ * QEMU accel blocker class
++ *
++ * Copyright (c) 2014 Red Hat Inc.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/thread.h"
++#include "qemu/main-loop.h"
++#include "hw/core/cpu.h"
++#include "sysemu/accel-blocker.h"
++
++static QemuLockCnt accel_in_ioctl_lock;
++static QemuEvent accel_in_ioctl_event;
++
++void accel_blocker_init(void)
++{
++    qemu_lockcnt_init(&accel_in_ioctl_lock);
++    qemu_event_init(&accel_in_ioctl_event, false);
++}
++
++void accel_set_in_ioctl(bool in_ioctl)
++{
++    if (likely(qemu_mutex_iothread_locked())) {
++        return;
++    }
++    if (in_ioctl) {
++        /* block if lock is taken in kvm_ioctl_inhibit_begin() */
++        qemu_lockcnt_inc(&accel_in_ioctl_lock);
++    } else {
++        qemu_lockcnt_dec(&accel_in_ioctl_lock);
++        /* change event to SET. If event was BUSY, wake up all waiters */
++        qemu_event_set(&accel_in_ioctl_event);
++    }
++}
++
++void accel_cpu_set_in_ioctl(CPUState *cpu, bool in_ioctl)
++{
++    if (unlikely(qemu_mutex_iothread_locked())) {
++        return;
++    }
++    if (in_ioctl) {
++        /* block if lock is taken in kvm_ioctl_inhibit_begin() */
++        qemu_lockcnt_inc(&cpu->in_ioctl_lock);
++    } else {
++        qemu_lockcnt_dec(&cpu->in_ioctl_lock);
++        /* change event to SET. If event was BUSY, wake up all waiters */
++        qemu_event_set(&accel_in_ioctl_event);
++    }
++}
++
++static int accel_in_ioctls(void)
++{
++    CPUState *cpu;
++    int ret = qemu_lockcnt_count(&accel_in_ioctl_lock);
++
++    CPU_FOREACH(cpu) {
++        ret += qemu_lockcnt_count(&cpu->in_ioctl_lock);
++    }
++
++    return  ret;
++}
++
++void accel_ioctl_inhibit_begin(void)
++{
++    CPUState *cpu;
++
++    /*
++     * We allow to inhibit only when holding the BQL, so we can identify
++     * when an inhibitor wants to issue an ioctl easily.
++     */
++    g_assert(qemu_mutex_iothread_locked());
++
++    /* Block further invocations of the ioctls outside the BQL.  */
++    CPU_FOREACH(cpu) {
++        qemu_lockcnt_lock(&cpu->in_ioctl_lock);
++    }
++    qemu_lockcnt_lock(&accel_in_ioctl_lock);
++
++    /* Keep waiting until there are running ioctls */
++    while (accel_in_ioctls()) {
++        /* Reset event to FREE. */
++        qemu_event_reset(&accel_in_ioctl_event);
++
++        if (accel_in_ioctls()) {
++
++            CPU_FOREACH(cpu) {
++                /* exit the ioctl */
++                qemu_cpu_kick(cpu);
++            }
++
++            /*
++             * If event is still FREE, and there are ioctls still in progress,
++             * wait.
++             *
++             *  If an ioctl finishes before qemu_event_wait(), it will change
++             * the event state to SET. This will prevent qemu_event_wait() from
++             * blocking, but it's not a problem because if other ioctls are
++             * still running (accel_in_ioctls is true) the loop will iterate
++             * once more and reset the event status to FREE so that it can wait
++             * properly.
++             *
++             * If an ioctls finishes while qemu_event_wait() is blocking, then
++             * it will be waken up, but also here the while loop makes sure
++             * to re-enter the wait if there are other running ioctls.
++             */
++            qemu_event_wait(&accel_in_ioctl_event);
++        }
++    }
++}
++
++void accel_ioctl_inhibit_end(void)
++{
++    CPUState *cpu;
++
++    qemu_lockcnt_unlock(&accel_in_ioctl_lock);
++    CPU_FOREACH(cpu) {
++        qemu_lockcnt_unlock(&cpu->in_ioctl_lock);
++    }
++}
++
+diff --git a/accel/meson.build b/accel/meson.build
+index b9a963cf80..a0d49c4f31 100644
+--- a/accel/meson.build
++++ b/accel/meson.build
+@@ -1,4 +1,4 @@
+-specific_ss.add(files('accel-common.c'))
++specific_ss.add(files('accel-common.c', 'accel-blocker.c'))
+ softmmu_ss.add(files('accel-softmmu.c'))
+ user_ss.add(files('accel-user.c'))
+ 
+diff --git a/include/sysemu/accel-blocker.h b/include/sysemu/accel-blocker.h
+new file mode 100644
+index 0000000000..135ebea566
+--- /dev/null
++++ b/include/sysemu/accel-blocker.h
+@@ -0,0 +1,45 @@
++/*
++ * Accelerator blocking API, to prevent new ioctls from starting and wait the
++ * running ones finish.
++ * This mechanism differs from pause/resume_all_vcpus() in that it does not
++ * release the BQL.
++ *
++ *  Copyright (c) 2014 Red Hat Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++#ifndef ACCEL_BLOCKER_H
++#define ACCEL_BLOCKER_H
++
++#include "qemu/osdep.h"
++#include "qemu/accel.h"
++#include "sysemu/cpus.h"
++
++extern void accel_blocker_init(void);
++
++/*
++ * accel_set_in_ioctl/accel_cpu_set_in_ioctl:
++ * Mark when ioctl is about to run or just finished.
++ * If @in_ioctl is true, then mark it is beginning. Otherwise marks that it is
++ * ending.
++ *
++ * These functions will block after accel_ioctl_inhibit_begin() is called,
++ * preventing new ioctls to run. They will continue only after
++ * accel_ioctl_inibith_end().
++ */
++extern void accel_set_in_ioctl(bool in_ioctl);
++extern void accel_cpu_set_in_ioctl(CPUState *cpu, bool in_ioctl);
++
++/*
++ * accel_ioctl_inhibit_begin/end: start/end critical section
++ * Between these two calls, no ioctl marked with accel_set_in_ioctl() and
++ * accel_cpu_set_in_ioctl() is allowed to run.
++ *
++ * This allows the caller to access shared data or perform operations without
++ * worrying of concurrent vcpus accesses.
++ */
++extern void accel_ioctl_inhibit_begin(void);
++extern void accel_ioctl_inhibit_end(void);
++
++#endif /* ACCEL_BLOCKER_H */
 -- 
 2.31.1
 
