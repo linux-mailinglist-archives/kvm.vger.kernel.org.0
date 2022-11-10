@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CFCC62387A
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 01:57:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6319623879
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 01:57:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232131AbiKJA5Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 19:57:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46284 "EHLO
+        id S231863AbiKJA5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 19:57:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232046AbiKJA5L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 19:57:11 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A11EA20F56
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 16:57:10 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id x8-20020aa79568000000b0056dd717e051so171031pfq.11
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 16:57:10 -0800 (PST)
+        with ESMTP id S232070AbiKJA5N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 19:57:13 -0500
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CCB7205CF
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 16:57:12 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-348608c1cd3so2234657b3.10
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 16:57:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=sfZqtehmJAKW3XdILp4Pa+j/G6SeiEXkrRjwBXbPNQ4=;
-        b=R7MO5UZg7uZuGhIBEVZ0K4sBRl8uHVbSzpOR8CzrHMoASp/lJy34BFMEJHsE8QIqZ+
-         sGptJIr7AgU4nzsg/w0iyGjWoaNtEPB3XPsCTmvjm0wVVuHpbtlG982CUVHn8CnDy5CA
-         sjkyyVXgKgtz3Zttb/ukzdRtLTijU4LiFs7fGlnv+JSvcEbqHn0kmD1dAFd2X4kJPF+x
-         jzF4z1P9e1xclKp9nHV5MLieEWO+nZ2pb9SH6c06g6yeVbTDqkJaXZdUIuW+bMpVbx1o
-         tOAUda2uGLt459EygROZFC4+2hwWi0rjATlKT0xIuw8ScDvX5JeqNiBqNSTx3oEXA9FU
-         4zqw==
+        bh=BdmLOLo8ckIk/eD8WeKbjTM/d1aHn6rPzktWT2f3TMg=;
+        b=nInUs4Ycp74MNj1eD35CUJaL9lY8Eyb/h/dJTD9lddbutaqGfVtOhuNKr6/aqataUf
+         D+LG0Us77KMejXtXhg74og6a+QN9BvagZO3ckJPxn4UkqL3/S2Z9oDvlUyxkNBIzIO23
+         R3uyrfeG60VquBerxrXE+yn8BZLDTdFyHXoSL3lVGE1mjfiHVRKqXhhZkWPDI64BCd9V
+         GE1DKPPeHrX2AVw8RDWpstDiRB4R6twhE4WhGcEoF6LV9eYeNshRmLjbK8yhd4mRBtvo
+         XtFih4V+i+5V5Jmkh7TuYVAQ/a7gMCWJnjGWN9ebSY2gHYfGZAs86db01pTbAyMu7W6a
+         IXTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=sfZqtehmJAKW3XdILp4Pa+j/G6SeiEXkrRjwBXbPNQ4=;
-        b=RsabM9SKhT6j/u3nQB2+1tAST893mmOO3NOHcuKazMClz3H/a5n+T3Uda6lQKv856C
-         kOZTEt5feNhsrIDGCrjXJnQjC3sAuAatFmRCPJxlHTN0XMmkJeLfLidCItEyV/ZrnWCv
-         0EtvnDTxEvCySksf3QzoEAIEyv0TPlRPNupNQeAF2GZ8/NPPC89Ld8myO2y7n0XPEeof
-         DmyAM1yJ6vIIjDORQifGShRlDkrXxQEMDsQLmQobs1lTLsAY7SPu6ZlSD9v0vh25a5Zh
-         VwIZyK4Fv9lzN4DTAp5D51BtFTXsMKCWgFDtFy8bLlkI/nS6BDppalTwaCqm3iYK8X4z
-         rbng==
-X-Gm-Message-State: ACrzQf0Ax9g8Q9iEBmOIWWwK8cUTzK6R4F7h7Mb/d4lDNLm5OqECLRw5
-        BimonJMie3/FqNAJA1y4/ZqAaUjr+a8=
-X-Google-Smtp-Source: AMsMyM4WRNtIl3Riz4W8+eM2I9MeCMHVFp7PazBTAuTfgJdkEPJzdC5uVayhgT5JdlqoyKb/XWxH/+oQuv8=
+        bh=BdmLOLo8ckIk/eD8WeKbjTM/d1aHn6rPzktWT2f3TMg=;
+        b=fYSoXCfKcJg1Ieqy6tEJPKT9i7tOIMWEj5E9QX7ps0K2MNH7hwYlBSFvFVzmABvRsB
+         EFKirw7qpbNSjh8K3Oa6n54amLArPbW1vEhi/P1KrRE6Rx9tL3Hk7rnNqPspAob5IMwe
+         0rDreoMaolond6hwkLiBbmKKNfBkjD6B5+QODGdFP9fIc+pL7JKTHdiownnJr+LaEToP
+         n5fHvi98yjV8MRUQxiBJdNKAgeEjYDx2SNSa/UiY/zjd6lWmKWJjRGrcD0kkmqMwQBRo
+         zPxYBLdbtZGTdwIPXmIMyhApUjHoKrccoAQGHMDVEO5eUT6mpdjI0/IMXw3CZvWlx0wj
+         WchA==
+X-Gm-Message-State: ACrzQf37wRptXRmVcmIPhgqD5Q/y32Pvkfq6YELv40UVdLBfSnZdBFfp
+        y4tqel10EF+sx5e6BhR4XzAb+j8iLG0=
+X-Google-Smtp-Source: AMsMyM79BCIYl/M4CjNpTv0V3PnHIdX4gE+4yaKq6ANayIGqsadRmR8lklQDD2uxGhCoCB5HTo3KbLSmYoo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ce88:b0:186:b345:97c0 with SMTP id
- f8-20020a170902ce8800b00186b34597c0mr64227380plg.13.1668041830237; Wed, 09
- Nov 2022 16:57:10 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:cf4f:0:b0:6cc:5c06:ab92 with SMTP id
+ f76-20020a25cf4f000000b006cc5c06ab92mr61037330ybg.295.1668041831797; Wed, 09
+ Nov 2022 16:57:11 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 10 Nov 2022 00:57:05 +0000
+Date:   Thu, 10 Nov 2022 00:57:06 +0000
 In-Reply-To: <20221110005706.1064832-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221110005706.1064832-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221110005706.1064832-2-seanjc@google.com>
-Subject: [PATCH 1/2] KVM: nVMX: Don't muck with allowed sec exec controls on
- CPUID changes
+Message-ID: <20221110005706.1064832-3-seanjc@google.com>
+Subject: [PATCH 2/2] KVM: selftests: Test KVM's handling of VMX's sec exec MSR
+ on KVM_SET_CPUID
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -63,7 +63,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,74 +71,164 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't modify the set of allowed secondary execution controls, i.e. the
-virtual MSR_IA32_VMX_PROCBASED_CTLS2, in response to guest CPUID changes.
-To avoid breaking old userspace that never sets the VMX MSRs, i.e. relies
-on KVM to provide a consistent vCPU model, keep the existing behavior if
-userspace has never written MSR_IA32_VMX_PROCBASED_CTLS2.
+Verify that KVM does, and does not, modify the allowed set of VMX's
+secondary execution controls during KVM_SET_CPUID.  Historically, KVM has
+modified select bits in response to guest CPUID changes to try and force
+a consistent CPU model.  KVM's meddling causes problems if userspace
+invokes KVM_SET_CPUID after explicitly setting the MSR, as KVM may end up
+overriding a legal userspace config.
 
-KVM should not modify the VMX capabilities presented to L1 based on CPUID
-as doing so may discard explicit settings provided by userspace.  E.g. if
-userspace does KVM_SET_MSRS => KVM_SET_CPUID and disables a feature in
-the VMX MSRs but not CPUID (to prevent exposing the feature to L2), then
-stuffing the VMX MSRs during KVM_SET_CPUID will expose the feature to L2
-against userspace's wishes.
+Newer, fixed KVM versions maintain the historical meddling for backwards
+compatibility, but only if userspace has never set the MSR for the vCPU.
+I.e. KVM transfers ownership to userspace on the first write.
 
-Alternatively, KVM could add a quirk, but that's less than ideal as a VMM
-that is affected by the bug would need to be updated in order to opt out
-of the buggy behavior.  The "has the MSR ever been written" logic handles
-both the case where an enlightened userspace sets the MSR during setup,
-and the case where userspace blindly migrates the MSR, as the migrated
-value will already have been sanitized by the source KVM or explicitly
-set by the source VMM.
+Opportunistically fix some funky names in tools' definitions for a few
+secondary execution controls.
 
-Reported-by: Yu Zhang <yu.c.zhang@linux.intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/capabilities.h | 1 +
- arch/x86/kvm/vmx/nested.c       | 3 +++
- arch/x86/kvm/vmx/vmx.c          | 2 +-
- 3 files changed, 5 insertions(+), 1 deletion(-)
+ .../selftests/kvm/include/x86_64/processor.h  |  1 +
+ .../selftests/kvm/include/x86_64/vmx.h        |  4 +-
+ .../selftests/kvm/x86_64/vmx_msrs_test.c      | 92 +++++++++++++++++++
+ 3 files changed, 95 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index cd2ac9536c99..7b08d6006f52 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -51,6 +51,7 @@ struct nested_vmx_msrs {
- 	u64 cr4_fixed1;
- 	u64 vmcs_enum;
- 	u64 vmfunc_controls;
-+	bool secondary_set_by_userspace;
- };
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index e8ca0d8a6a7e..d01de81fc0ed 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -101,6 +101,7 @@ struct kvm_x86_cpu_feature {
+ #define	X86_FEATURE_INVPCID		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 10)
+ #define	X86_FEATURE_RTM			KVM_X86_CPU_FEATURE(0x7, 0, EBX, 11)
+ #define	X86_FEATURE_MPX			KVM_X86_CPU_FEATURE(0x7, 0, EBX, 14)
++#define X86_FEATURE_RDSEED		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 18)
+ #define	X86_FEATURE_SMAP		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 20)
+ #define	X86_FEATURE_PCOMMIT		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 22)
+ #define	X86_FEATURE_CLFLUSHOPT		KVM_X86_CPU_FEATURE(0x7, 0, EBX, 23)
+diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+index 71b290b6469d..56c1771ba6b8 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
++++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+@@ -61,8 +61,8 @@
+ #define SECONDARY_EXEC_SHADOW_VMCS		0x00004000
+ #define SECONDARY_EXEC_RDSEED_EXITING		0x00010000
+ #define SECONDARY_EXEC_ENABLE_PML		0x00020000
+-#define SECONDARY_EPT_VE			0x00040000
+-#define SECONDARY_ENABLE_XSAV_RESTORE		0x00100000
++#define SECONDARY_EXEC_EPT_VE			0x00040000
++#define SECONDARY_EXEC_ENABLE_XSAVES		0x00100000
+ #define SECONDARY_EXEC_TSC_SCALING		0x02000000
  
- struct vmcs_config {
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 61a2e551640a..e537526d996c 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1256,6 +1256,9 @@ vmx_restore_control_msr(struct vcpu_vmx *vmx, u32 msr_index, u64 data)
- 	if (!is_bitwise_subset(supported, data, GENMASK_ULL(63, 32)))
- 		return -EINVAL;
+ #define PIN_BASED_EXT_INTR_MASK			0x00000001
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_msrs_test.c b/tools/testing/selftests/kvm/x86_64/vmx_msrs_test.c
+index 322d561b4260..dbd60a989b28 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_msrs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_msrs_test.c
+@@ -12,6 +12,96 @@
+ #include "kvm_util.h"
+ #include "vmx.h"
  
-+	if (msr_index == MSR_IA32_VMX_PROCBASED_CTLS2)
-+		vmx->nested.msrs.secondary_set_by_userspace = true;
++static void vmx_sec_exec_assert_allowed(struct kvm_vcpu *vcpu,
++					const char *name, uint64_t ctrl)
++{
++	TEST_ASSERT(vcpu_get_msr(vcpu, MSR_IA32_VMX_PROCBASED_CTLS2) & ctrl,
++		    "Expected '%s' to be allowed in sec exec controls", name);
++}
 +
- 	vmx_get_control_msr(&vmx->nested.msrs, msr_index, &lowp, &highp);
- 	*lowp = data;
- 	*highp = data >> 32;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index aca88524fd1e..e5eec41bc1d5 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4428,7 +4428,7 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
- 	 * Update the nested MSR settings so that a nested VMM can/can't set
- 	 * controls for features that are/aren't exposed to the guest.
- 	 */
--	if (nested) {
-+	if (nested && !vmx->nested.msrs.secondary_set_by_userspace) {
- 		if (enabled)
- 			vmx->nested.msrs.secondary_ctls_high |= control;
- 		else
++static void vmx_sec_exec_assert_denied(struct kvm_vcpu *vcpu,
++				       const char *name, uint64_t ctrl)
++{
++	TEST_ASSERT(!(vcpu_get_msr(vcpu, MSR_IA32_VMX_PROCBASED_CTLS2) & ctrl),
++		    "Expected '%s' to be denied in sec exec controls", name);
++}
++
++static void vmx_sec_exec_control_test(struct kvm_vcpu *vcpu,
++				      const char *name,
++				      struct kvm_x86_cpu_feature feature,
++				      uint64_t ctrl, bool kvm_owned)
++{
++	/* Allowed-1 settings are in the upper 32 bits. */
++	ctrl <<= 32;
++
++	if (!this_cpu_has(feature))
++		return;
++
++	if (kvm_owned) {
++		vcpu_set_cpuid_feature(vcpu, feature);
++		vmx_sec_exec_assert_allowed(vcpu, name, ctrl);
++
++		vcpu_clear_cpuid_feature(vcpu, feature);
++		vmx_sec_exec_assert_denied(vcpu, name, ctrl);
++
++		/* Make sure KVM is actually toggling the bit. */
++		vcpu_set_cpuid_feature(vcpu, feature);
++		vmx_sec_exec_assert_allowed(vcpu, name, ctrl);
++	} else {
++		vcpu_set_msr(vcpu, MSR_IA32_VMX_PROCBASED_CTLS2,
++			     vcpu_get_msr(vcpu, MSR_IA32_VMX_PROCBASED_CTLS2) | ctrl);
++		vmx_sec_exec_assert_allowed(vcpu, name, ctrl);
++
++		vcpu_set_cpuid_feature(vcpu, feature);
++		vmx_sec_exec_assert_allowed(vcpu, name, ctrl);
++
++		vcpu_clear_cpuid_feature(vcpu, feature);
++		vmx_sec_exec_assert_allowed(vcpu, name, ctrl);
++
++		vcpu_set_msr(vcpu, MSR_IA32_VMX_PROCBASED_CTLS2,
++			     vcpu_get_msr(vcpu, MSR_IA32_VMX_PROCBASED_CTLS2) & ~ctrl);
++		vmx_sec_exec_assert_denied(vcpu, name, ctrl);
++
++		vcpu_set_cpuid_feature(vcpu, feature);
++		vmx_sec_exec_assert_denied(vcpu, name, ctrl);
++
++		vcpu_clear_cpuid_feature(vcpu, feature);
++		vmx_sec_exec_assert_denied(vcpu, name, ctrl);
++	}
++}
++
++#define vmx_sec_exec_feature_test(vcpu, name, kvm_owned)			\
++	vmx_sec_exec_control_test(vcpu, #name, X86_FEATURE_##name,		\
++				  SECONDARY_EXEC_ENABLE_##name, kvm_owned)
++
++#define vmx_sec_exec_exiting_test(vcpu, name, kvm_owned)			\
++	vmx_sec_exec_control_test(vcpu, #name, X86_FEATURE_##name,		\
++				  SECONDARY_EXEC_##name##_EXITING, kvm_owned)
++
++static void vmx_sec_exec_controls_test(struct kvm_vcpu *vcpu)
++{
++	int i;
++
++	if (this_cpu_has(X86_FEATURE_XSAVE))
++		vcpu_set_cpuid_feature(vcpu, X86_FEATURE_XSAVE);
++
++	if (this_cpu_has(X86_FEATURE_RDPID))
++		vcpu_clear_cpuid_feature(vcpu, X86_FEATURE_RDPID);
++
++	/*
++	 * Verify that for features KVM has historically taken control of, KVM
++	 * updates PROCBASED_CTLS2 during KVM_SET_CPUID if userspace has never
++	 * set the MSR, but leaves it alone once userspace writes the MSR.
++	 */
++	for (i = 0; i < 2; i++) {
++		vmx_sec_exec_feature_test(vcpu, XSAVES, !i);
++		vmx_sec_exec_feature_test(vcpu, RDTSCP, !i);
++		vmx_sec_exec_feature_test(vcpu, INVPCID, !i);
++		vmx_sec_exec_exiting_test(vcpu, RDRAND, !i);
++		vmx_sec_exec_exiting_test(vcpu, RDSEED, !i);
++	}
++}
++
+ static void vmx_fixed1_msr_test(struct kvm_vcpu *vcpu, uint32_t msr_index,
+ 				  uint64_t mask)
+ {
+@@ -78,6 +168,8 @@ int main(void)
+ 	/* No need to actually do KVM_RUN, thus no guest code. */
+ 	vm = vm_create_with_one_vcpu(&vcpu, NULL);
+ 
++	vmx_sec_exec_controls_test(vcpu);
++
+ 	vmx_save_restore_msrs_test(vcpu);
+ 
+ 	kvm_vm_free(vm);
 -- 
 2.38.1.431.g37b22c650d-goog
 
