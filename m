@@ -2,69 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E91AB623AA8
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 04:51:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AFF4623AF4
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 05:18:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232774AbiKJDvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 22:51:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49728 "EHLO
+        id S231535AbiKJESZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 23:18:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232431AbiKJDvC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 22:51:02 -0500
+        with ESMTP id S231501AbiKJESU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 23:18:20 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D88E2F016
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 19:50:02 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26566122
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 20:17:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668052201;
+        s=mimecast20190719; t=1668053840;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=60TErWgB0U0U1ocEUPR6YUn8kraoamkgfQY4MoeZxSA=;
-        b=DyigSyuQrIFip8vN+KyTs/6qRA0y6E2P26kGKohol+gFlRtt88KjkGR0Y0jezfXWqZ1Tuw
-        1cRB86XMCZGy9H4WnwvJto4cCVwtTd0M6zY6t08b3YW3a+aHoTI0UMuQZm6OcvsLUrAC9f
-        rDJdZJyRRpikvOWjH9YISdIn0BMbdmQ=
-Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com
- [209.85.160.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=hZ47d7jrOigedO39iu9a033pdJ+h7flGkGadTHehkDc=;
+        b=ckai44fIhmDjMhpiJ9pTqXqEJaav+jLruvnkQoSbVT5NbZ6gTfYRg37i4jefgGae1jMC/f
+        tyonbanVGMj65cRWFqxGnjRHMt2BcQsCCf1mNg0IIOPguahVI2qNhOQz4athkMWzBuvQqs
+        AgPAf0tEzEp8btMYitJyWxXJwOyZHMA=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-572-RcY8gfy0PQ2I2Om01s55KA-1; Wed, 09 Nov 2022 22:49:59 -0500
-X-MC-Unique: RcY8gfy0PQ2I2Om01s55KA-1
-Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-13b9bcc6b4cso478361fac.13
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 19:49:59 -0800 (PST)
+ us-mta-584-dHxXJZEbMOWoOegblOXeUg-1; Wed, 09 Nov 2022 23:17:19 -0500
+X-MC-Unique: dHxXJZEbMOWoOegblOXeUg-1
+Received: by mail-il1-f198.google.com with SMTP id d2-20020a056e020be200b00300ecc7e0d4so776161ilu.5
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 20:17:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=60TErWgB0U0U1ocEUPR6YUn8kraoamkgfQY4MoeZxSA=;
-        b=HTmBwendI6rxSJSZfeWN6QNNiwlkZ1oR2G+OT4LhmJlVKBIXs+3RV6UQUt5sZ6FlHs
-         k/9oZs+FijtZF479UdkoU96rBD2cW55h2lL5SAHM08lKhZubs8RyM+zi6n/67eIBhysF
-         Cz3+YNsDLSzeZ0RHFvW9cGMN7JPfSI+77BE75lIBEGiizd60c8lRezUNnc2jTkMbnD6c
-         /z4P+faqWabclxQR+nx2P6xixT0no3miKLM5jOzAGoP/5s4vMHQLY2aIueVi+Otb93UF
-         FUpGd7B5hSI/tbUWOjQFCfnqz34QvOqVAAJTR7vT3ibOXek6Ix59hYSPEOF2oC9LQ3RM
-         POZA==
-X-Gm-Message-State: ACrzQf1pU5vf1+cs/2EVXfc5/9BgjL1hGfY84Z2Wy75eDK4ZbzZ0z+EO
-        cNqNbvEBfuvMQtEVO5QsUb7rD49tqeySzyj9h/lEjzDnMYCPNkhP/oBlZkcZ9avVdC1xDz1wC6m
-        O6mbEO7ALWgF/77p6GzV6J0j9Oo98
-X-Received: by 2002:a05:6871:54e:b0:13b:29b7:e2e8 with SMTP id t14-20020a056871054e00b0013b29b7e2e8mr45759489oal.35.1668052199260;
-        Wed, 09 Nov 2022 19:49:59 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM6Yn+hSnYW2dtP/B4LNuU0FW2fGT1rkHGvoIuVlS3fet4Oamq0Y/5dGPg9Iq0HjoNmQTXjGOGpClzetCS9bnaE=
-X-Received: by 2002:a05:6871:54e:b0:13b:29b7:e2e8 with SMTP id
- t14-20020a056871054e00b0013b29b7e2e8mr45759486oal.35.1668052199063; Wed, 09
- Nov 2022 19:49:59 -0800 (PST)
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hZ47d7jrOigedO39iu9a033pdJ+h7flGkGadTHehkDc=;
+        b=G7Gps1xg/PJa5r8hUOW2aXMSAtL1wZ4xJaPZHIiQ9nNNrQxY9bzxqiU4ncE7o+6GrJ
+         tJv6lDuxzJsNLvQPZUEuw51C02B4kHdpRDW2bKRd7fzSCm5ABo4U+TXuEEQqbyZc4oZj
+         kAn039MPCwHLd2Ph9DUUq3XIlD3gyKVDAEUB8AzwekVctURVXxIbu5gdYDdikGIN2xzf
+         fjAeY1SmVYClkMDLVANGa9Hc5Tk+Je36fjHwS2yUulj10iLrsL/HaykDeQazYiEH/Pus
+         atCFr9SGRMZpZ7ETJ8YLRK6LM9gFWoehRBVdwhXXliED7kCkhGnybZegLaNnzufhc8+I
+         30aQ==
+X-Gm-Message-State: ANoB5pm1poSFzGljAQLWY7Bt6H6hTwI4YzYs6nWIpS/MlIGY394YDick
+        K7+Th6rhLxHMWJ73Oy63gDLmQR22dLrKXf7RJ9ENwxX/ZreyDtIEy2UzdgIApoK2GrUKvbIMmnH
+        z+xauaxNC4mgr
+X-Received: by 2002:a6b:8f11:0:b0:6db:6299:112f with SMTP id r17-20020a6b8f11000000b006db6299112fmr1769515iod.25.1668053837803;
+        Wed, 09 Nov 2022 20:17:17 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6sbbaPt3dZk6/bz4BjYFMtE07XpPzigTWD86T6EMAfrbVtdds8ENAIgaYcg1xifZhURs9DAw==
+X-Received: by 2002:a6b:8f11:0:b0:6db:6299:112f with SMTP id r17-20020a6b8f11000000b006db6299112fmr1769511iod.25.1668053837604;
+        Wed, 09 Nov 2022 20:17:17 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id y19-20020a056638229300b00375147442f3sm5416744jas.16.2022.11.09.20.17.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Nov 2022 20:17:17 -0800 (PST)
+Date:   Wed, 9 Nov 2022 21:17:15 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     Anthony DeRossi <ajderossi@gmail.com>, <kvm@vger.kernel.org>,
+        <cohuck@redhat.com>, <jgg@nvidia.com>, <kevin.tian@intel.com>,
+        <abhsahu@nvidia.com>, <yishaih@nvidia.com>
+Subject: Re: [PATCH v6 3/3] vfio/pci: Check the device set open count on
+ reset
+Message-ID: <20221109211715.7cdacf3d.alex.williamson@redhat.com>
+In-Reply-To: <49b64e4b-43b9-ec7b-23d2-2fa1bf921046@intel.com>
+References: <20221110014027.28780-1-ajderossi@gmail.com>
+        <20221110014027.28780-4-ajderossi@gmail.com>
+        <49b64e4b-43b9-ec7b-23d2-2fa1bf921046@intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20221107093345.121648-1-lingshan.zhu@intel.com>
- <CACGkMEs9af1E1pLd2t8E71YBPF=rHkhfN8qO9_3=x6HVaCMAxg@mail.gmail.com>
- <0b15591f-9e49-6383-65eb-6673423f81ec@intel.com> <CACGkMEujqOFHv7QATWgYo=SdAKef5jQXi2-YksjgT-hxEgKNDQ@mail.gmail.com>
- <80cdd80a-16fa-ac75-0a89-5729b846efed@intel.com>
-In-Reply-To: <80cdd80a-16fa-ac75-0a89-5729b846efed@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Thu, 10 Nov 2022 11:49:47 +0800
-Message-ID: <CACGkMEu-5TbA3Ky2qgn-ivfhgfJ2b12mDJgq8iNgHce8qu3ApA@mail.gmail.com>
-Subject: Re: [PATCH 0/4] ifcvf/vDPA implement features provisioning
-To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, hang.yuan@intel.com, piotr.uminski@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -75,83 +82,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 9, 2022 at 5:06 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
->
->
->
-> On 11/9/2022 4:59 PM, Jason Wang wrote:
-> > On Wed, Nov 9, 2022 at 4:14 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
-> >>
-> >>
-> >> On 11/9/2022 2:51 PM, Jason Wang wrote:
-> >>> On Mon, Nov 7, 2022 at 5:42 PM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
-> >>>> This series implements features provisioning for ifcvf.
-> >>>> By applying this series, we allow userspace to create
-> >>>> a vDPA device with selected (management device supported)
-> >>>> feature bits and mask out others.
-> >>> I don't see a direct relationship between the first 3 and the last.
-> >>> Maybe you can state the reason why the restructure is a must for the
-> >>> feature provisioning. Otherwise, we'd better split the series.
-> >> When introducing features provisioning ability to ifcvf, there is a need
-> >> to re-create vDPA devices
-> >> on a VF with different feature bits.
-> > This seems a requirement even without feature provisioning? Device
-> > could be deleted from the management device anyhow.
-> Yes, we need this to delete and re-create a vDPA device.
+On Thu, 10 Nov 2022 11:03:29 +0800
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-I wonder if we need something that works for -stable.
+> Hi DeRossi,
+> 
+> On 2022/11/10 09:40, Anthony DeRossi wrote:
+> > vfio_pci_dev_set_needs_reset() inspects the open_count of every device
+> > in the set to determine whether a reset is allowed. The current device
+> > always has open_count == 1 within vfio_pci_core_disable(), effectively
+> > disabling the reset logic. This field is also documented as private in
+> > vfio_device, so it should not be used to determine whether other devices
+> > in the set are open.  
+> 
+> haven't went through the prior version. maybe may question has been already
+> answered. My question is:
+> 
+> the major reason is the order problem in vfio_main.c. close_device() is
+> always called before decreasing open_count to be 0. So even other device
+> has no open fd, the current vfio_device still have one open count. So why
+> can't we just switch the order of open_count-- and close_device()?
 
-AFAIK, we can move the vdpa_alloc_device() from probe() to dev_add()
-and it seems to work?
+This is what was originally proposed and Jason shot it down:
 
-Thanks
+https://lore.kernel.org/all/Y1kY0I4lr7KntbWp@ziepe.ca/
+ 
+> > Checking for vfio_device_set_open_count() > 1 on the device set fixes
+> > both issues  
+> tbh. it's weird to me that a driver needs to know the internal logic of
+> vfio core before knowing it needs to check the vfio_device_set_open_count()
+> in this way. Is vfio-pci the only driver that needs to do this check or
+> there are other drivers? If there are other drivers, maybe fixing the order
+> in core is better.
 
->
-> We create vDPA device from a VF, so without features provisioning
-> requirements,
-> we don't need to re-create the vDPA device. But with features provisioning,
-> it is a must now.
->
-> Thanks
->
->
-> >
-> > Thakns
-> >
-> >> When remove a vDPA device, the container of struct vdpa_device (here is
-> >> ifcvf_adapter) is free-ed in
-> >> dev_del() interface, so we need to allocate ifcvf_adapter in dev_add()
-> >> than in probe(). That's
-> >> why I have re-factored the adapter/mgmt_dev code.
-> >>
-> >> For re-factoring the irq related code and ifcvf_base, let them work on
-> >> struct ifcvf_hw, the
-> >> reason is that the adapter is allocated in dev_add(), if we want theses
-> >> functions to work
-> >> before dev_add(), like in probe, we need them work on ifcvf_hw than the
-> >> adapter.
-> >>
-> >> Thanks
-> >> Zhu Lingshan
-> >>> Thanks
-> >>>
-> >>>> Please help review
-> >>>>
-> >>>> Thanks
-> >>>>
-> >>>> Zhu Lingshan (4):
-> >>>>     vDPA/ifcvf: ifcvf base layer interfaces work on struct ifcvf_hw
-> >>>>     vDPA/ifcvf: IRQ interfaces work on ifcvf_hw
-> >>>>     vDPA/ifcvf: allocate ifcvf_adapter in dev_add()
-> >>>>     vDPA/ifcvf: implement features provisioning
-> >>>>
-> >>>>    drivers/vdpa/ifcvf/ifcvf_base.c |  32 ++-----
-> >>>>    drivers/vdpa/ifcvf/ifcvf_base.h |  10 +-
-> >>>>    drivers/vdpa/ifcvf/ifcvf_main.c | 156 +++++++++++++++-----------------
-> >>>>    3 files changed, 89 insertions(+), 109 deletions(-)
-> >>>>
-> >>>> --
-> >>>> 2.31.1
-> >>>>
->
+Please see the evolution of reflck into device sets.  Both PCI and FSL
+can have multiple devices in a set, AIUI.  The driver defines the set.
+This ability to test for the last close among devices in the set is a
+fundamental feature of the original reflck.  Thanks,
+
+Alex
 
