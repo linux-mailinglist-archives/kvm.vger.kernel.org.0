@@ -2,120 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E1B9623C03
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 07:40:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A09AA623BB0
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 07:20:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232707AbiKJGj5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 01:39:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48186 "EHLO
+        id S231611AbiKJGUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 01:20:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232585AbiKJGjd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 01:39:33 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EE89317C9;
-        Wed,  9 Nov 2022 22:39:26 -0800 (PST)
+        with ESMTP id S229484AbiKJGUR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 01:20:17 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B76E2A40D
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 22:20:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668062366; x=1699598366;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dhU3XR4qiKmtU3OBrwyj0ws6KT1curnwZdVb3a04z6Y=;
-  b=GkEmVS1iYmZecvvE1vB0m2WsfTqVv7ygBKLKlv01sgVBUsd2/WtGTDz8
-   YrhuBvydlL2NByRtdTPRyfGyhamP0HLF7mmcIsN8AZYqoZX6hseFA8sXG
-   lp9yhJIuWRZ3eDzj2vim+W4iNxVktwf0juN39LEF7YkT2ndaxewANeEC7
-   n0cRMJy9IjagJBtRSV6Rd35YPLhkKZ9pkvtsIKjHe4CNiN2oLCsedoO2y
-   wMcf5Y9AYpqOFlqVee1EgMlU/z77ivDLDfNsXnZa8QNk+qnF52SvVGMHW
-   0gkCZVyE8jrRm6UF9dLP+v6OcY83Zg3lIWacv5idmGZBsus0mz5GTDqKK
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="375474023"
-X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
-   d="scan'208";a="375474023"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2022 22:39:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="588057257"
-X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
-   d="scan'208";a="588057257"
-Received: from unknown (HELO fred..) ([172.25.112.68])
-  by orsmga003.jf.intel.com with ESMTP; 09 Nov 2022 22:39:25 -0800
-From:   Xin Li <xin3.li@intel.com>
-To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
-Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, seanjc@google.com,
-        pbonzini@redhat.com, kevin.tian@intel.com
-Subject: [RESEND PATCH 6/6] x86/traps: remove unused NMI entry exc_nmi_noist()
-Date:   Wed,  9 Nov 2022 22:15:45 -0800
-Message-Id: <20221110061545.1531-7-xin3.li@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221110061545.1531-1-xin3.li@intel.com>
-References: <20221110061545.1531-1-xin3.li@intel.com>
+  t=1668061216; x=1699597216;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=hGWyxUkydtXJwvX4mK86sh+r5ydD25pAvx1mMuicHDs=;
+  b=UuZImFDI44ZoKE/2cUGMkBrddZZ+6Kjc46kLD+bOytcacMPgasdd2J4M
+   k9obyyp/8HbRuhwHpX+SntawQMwIvQcX3TwvkT0HWXMpMf/SOIyTxCbgD
+   2MBcgbWmQ5g/NKOeb5RgWHJnkpvipFq6ueagd/43Br1+MWPi1z5Eo0njL
+   pWGsuB6Wc6JItZzgcUP30WJsSGNbxW5o6M9LdK2YarU9ep/AedfWk80+p
+   6kJXR4ihKXoUD3W1jPsEit8VcHfPdwF+T+ti1NLZjTmcj/Yk/ERtAOCTj
+   +pSVEKi0PXHjFNpwnFSsbUcgiqTDmo5DlLIMZRREUWJCCjPW0gzCvFKF4
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="290944328"
+X-IronPort-AV: E=Sophos;i="5.96,152,1665471600"; 
+   d="scan'208";a="290944328"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2022 22:20:16 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="779647842"
+X-IronPort-AV: E=Sophos;i="5.96,152,1665471600"; 
+   d="scan'208";a="779647842"
+Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.249.171.70]) ([10.249.171.70])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2022 22:20:14 -0800
+Message-ID: <03657084-98ab-93bc-614a-e6cc7297d93e@intel.com>
+Date:   Thu, 10 Nov 2022 14:20:12 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.4.1
+Subject: Re: [PATCH 0/4] ifcvf/vDPA implement features provisioning
+Content-Language: en-US
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, hang.yuan@intel.com, piotr.uminski@intel.com
+References: <20221107093345.121648-1-lingshan.zhu@intel.com>
+ <CACGkMEs9af1E1pLd2t8E71YBPF=rHkhfN8qO9_3=x6HVaCMAxg@mail.gmail.com>
+ <0b15591f-9e49-6383-65eb-6673423f81ec@intel.com>
+ <CACGkMEujqOFHv7QATWgYo=SdAKef5jQXi2-YksjgT-hxEgKNDQ@mail.gmail.com>
+ <80cdd80a-16fa-ac75-0a89-5729b846efed@intel.com>
+ <CACGkMEu-5TbA3Ky2qgn-ivfhgfJ2b12mDJgq8iNgHce8qu3ApA@mail.gmail.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+In-Reply-To: <CACGkMEu-5TbA3Ky2qgn-ivfhgfJ2b12mDJgq8iNgHce8qu3ApA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After the introduction of kvm_vmx_reinject_irq(), exc_nmi_noist()
-is no longer needed, thus remove it.
 
-Signed-off-by: Xin Li <xin3.li@intel.com>
----
- arch/x86/include/asm/idtentry.h | 15 ---------------
- arch/x86/kernel/nmi.c           | 10 ----------
- 2 files changed, 25 deletions(-)
 
-diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
-index 72184b0b2219..da28ac17c57a 100644
---- a/arch/x86/include/asm/idtentry.h
-+++ b/arch/x86/include/asm/idtentry.h
-@@ -581,21 +581,6 @@ DECLARE_IDTENTRY_RAW(X86_TRAP_MC,	xenpv_exc_machine_check);
- #endif
- 
- /* NMI */
--
--#if defined(CONFIG_X86_64) && IS_ENABLED(CONFIG_KVM_INTEL)
--/*
-- * Special NOIST entry point for VMX which invokes this on the kernel
-- * stack. asm_exc_nmi() requires an IST to work correctly vs. the NMI
-- * 'executing' marker.
-- *
-- * On 32bit this just uses the regular NMI entry point because 32-bit does
-- * not have ISTs.
-- */
--DECLARE_IDTENTRY(X86_TRAP_NMI,		exc_nmi_noist);
--#else
--#define asm_exc_nmi_noist		asm_exc_nmi
--#endif
--
- DECLARE_IDTENTRY_NMI(X86_TRAP_NMI,	exc_nmi);
- #ifdef CONFIG_XEN_PV
- DECLARE_IDTENTRY_RAW(X86_TRAP_NMI,	xenpv_exc_nmi);
-diff --git a/arch/x86/kernel/nmi.c b/arch/x86/kernel/nmi.c
-index cec0bfa3bc04..816bb59a4ba4 100644
---- a/arch/x86/kernel/nmi.c
-+++ b/arch/x86/kernel/nmi.c
-@@ -527,16 +527,6 @@ DEFINE_IDTENTRY_RAW(exc_nmi)
- 		mds_user_clear_cpu_buffers();
- }
- 
--#if defined(CONFIG_X86_64) && IS_ENABLED(CONFIG_KVM_INTEL)
--DEFINE_IDTENTRY_RAW(exc_nmi_noist)
--{
--	exc_nmi(regs);
--}
--#endif
--#if IS_MODULE(CONFIG_KVM_INTEL)
--EXPORT_SYMBOL_GPL(asm_exc_nmi_noist);
--#endif
--
- void stop_nmi(void)
- {
- 	ignore_nmis++;
--- 
-2.34.1
+On 11/10/2022 11:49 AM, Jason Wang wrote:
+> On Wed, Nov 9, 2022 at 5:06 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
+>>
+>>
+>> On 11/9/2022 4:59 PM, Jason Wang wrote:
+>>> On Wed, Nov 9, 2022 at 4:14 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
+>>>>
+>>>> On 11/9/2022 2:51 PM, Jason Wang wrote:
+>>>>> On Mon, Nov 7, 2022 at 5:42 PM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+>>>>>> This series implements features provisioning for ifcvf.
+>>>>>> By applying this series, we allow userspace to create
+>>>>>> a vDPA device with selected (management device supported)
+>>>>>> feature bits and mask out others.
+>>>>> I don't see a direct relationship between the first 3 and the last.
+>>>>> Maybe you can state the reason why the restructure is a must for the
+>>>>> feature provisioning. Otherwise, we'd better split the series.
+>>>> When introducing features provisioning ability to ifcvf, there is a need
+>>>> to re-create vDPA devices
+>>>> on a VF with different feature bits.
+>>> This seems a requirement even without feature provisioning? Device
+>>> could be deleted from the management device anyhow.
+>> Yes, we need this to delete and re-create a vDPA device.
+> I wonder if we need something that works for -stable.
+I can add a fix tag, so these three patches could apply to stable
+>
+> AFAIK, we can move the vdpa_alloc_device() from probe() to dev_add()
+> and it seems to work?
+Yes and this is done in this series and that's why we need these
+refactoring code.
+
+By the way, do you have any comments to the patches?
+
+Thanks,
+Zhu Lingshan
+>
+> Thanks
+>
+>> We create vDPA device from a VF, so without features provisioning
+>> requirements,
+>> we don't need to re-create the vDPA device. But with features provisioning,
+>> it is a must now.
+>>
+>> Thanks
+>>
+>>
+>>> Thakns
+>>>
+>>>> When remove a vDPA device, the container of struct vdpa_device (here is
+>>>> ifcvf_adapter) is free-ed in
+>>>> dev_del() interface, so we need to allocate ifcvf_adapter in dev_add()
+>>>> than in probe(). That's
+>>>> why I have re-factored the adapter/mgmt_dev code.
+>>>>
+>>>> For re-factoring the irq related code and ifcvf_base, let them work on
+>>>> struct ifcvf_hw, the
+>>>> reason is that the adapter is allocated in dev_add(), if we want theses
+>>>> functions to work
+>>>> before dev_add(), like in probe, we need them work on ifcvf_hw than the
+>>>> adapter.
+>>>>
+>>>> Thanks
+>>>> Zhu Lingshan
+>>>>> Thanks
+>>>>>
+>>>>>> Please help review
+>>>>>>
+>>>>>> Thanks
+>>>>>>
+>>>>>> Zhu Lingshan (4):
+>>>>>>      vDPA/ifcvf: ifcvf base layer interfaces work on struct ifcvf_hw
+>>>>>>      vDPA/ifcvf: IRQ interfaces work on ifcvf_hw
+>>>>>>      vDPA/ifcvf: allocate ifcvf_adapter in dev_add()
+>>>>>>      vDPA/ifcvf: implement features provisioning
+>>>>>>
+>>>>>>     drivers/vdpa/ifcvf/ifcvf_base.c |  32 ++-----
+>>>>>>     drivers/vdpa/ifcvf/ifcvf_base.h |  10 +-
+>>>>>>     drivers/vdpa/ifcvf/ifcvf_main.c | 156 +++++++++++++++-----------------
+>>>>>>     3 files changed, 89 insertions(+), 109 deletions(-)
+>>>>>>
+>>>>>> --
+>>>>>> 2.31.1
+>>>>>>
 
