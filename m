@@ -2,132 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A0DB624448
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 15:29:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CDE46244A6
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 15:49:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231352AbiKJO3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 09:29:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56230 "EHLO
+        id S231280AbiKJOtT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 09:49:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231357AbiKJO24 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 09:28:56 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBB932A415;
-        Thu, 10 Nov 2022 06:28:55 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2AADF8c5018964;
-        Thu, 10 Nov 2022 14:28:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=cQiqgBQrdHZc6YQIYzpdwluHu6IRtl7nBe8wtqk6DLQ=;
- b=jgsfDPzwe009UYYxgL6IrtxkPkKV59I0FPYWM7YUfXdGpXu8iSQkJrFEezC4xnRG+N9A
- gLZegi07N+GTZgOQVhH6CcFrcxECS5AUUttDB2WyQ/0vGv5a7t0L6J8N3kXBbzFm7l0P
- PrZk0tU2FTMh3shfHZSEty1RODg8QLpjjMQF1hv3UYIXR5IVNDCLbiySiQbit2d+1kzw
- csV/UBtN3eRScooTYwYsGn30fF49FnGp8EJskkY8VGV6NV3PLgX7Rtj6HUjtqurh7aR8
- PQJ+c9c/kX2V8BbuE9O8UDoK2k3ifjF21S2DC+UvGI46wS/1aXTxAQ0T+U3m6mrx0M/D sQ== 
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ks212a6t3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Nov 2022 14:28:55 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AAEN9Fk002508;
-        Thu, 10 Nov 2022 14:28:54 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma04dal.us.ibm.com with ESMTP id 3kngmtp4gr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 10 Nov 2022 14:28:54 +0000
-Received: from smtpav01.dal12v.mail.ibm.com ([9.208.128.133])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AAESsbK17301970
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Nov 2022 14:28:54 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A403B58057;
-        Thu, 10 Nov 2022 14:28:52 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6B71758058;
-        Thu, 10 Nov 2022 14:28:51 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.65.229.253])
-        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 10 Nov 2022 14:28:51 +0000 (GMT)
-Message-ID: <906322b1c53dfef15d8f5141f7af15a480dc434e.camel@linux.ibm.com>
-Subject: Re: [PATCH 1/2] vfio-ccw: sort out physical vs virtual pointers
- usage
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Date:   Thu, 10 Nov 2022 09:28:51 -0500
-In-Reply-To: <166807228813.13521.7185648742806016994@t14-nrb>
-References: <20221109202157.1050545-1-farman@linux.ibm.com>
-         <20221109202157.1050545-2-farman@linux.ibm.com>
-         <166807228813.13521.7185648742806016994@t14-nrb>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+        with ESMTP id S230137AbiKJOtS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 09:49:18 -0500
+Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0856E17063;
+        Thu, 10 Nov 2022 06:49:16 -0800 (PST)
+Received: from localhost (unknown [IPv6:2601:281:8300:73::5f6])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id 1DF6B732;
+        Thu, 10 Nov 2022 14:49:15 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 1DF6B732
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+        t=1668091755; bh=OnvK+2tUvYAfL0KCrr72dtwv0xTn5bAGv19wZNYmwMU=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=f+dcELpnMaM1I4cy5d4quAPLBjCS/LGb+m7YcVxJ6Z39qJd41+owPjkcNC3fnzh+0
+         2cVitnOOfzPKSqEzvOo8aJptjL4/EwAfILChx9pe2CeyyS7um7qnkYijGs6By4hsy3
+         JRvNdmD3FXnAmMqbW4YW6otpVoSTjRJOGidR25+yyypyVOzlnKP/h0/lFRRPPUB4j+
+         XTy7Yse+CL3yzh9nxnqHsoC/ooZbTZf/ifnGaRuVNSYQbcWeaXSQOh+dM4UfrttnxT
+         h3iWuKUsFl3UT0CI3U5dx4ffobEydI44ecNfpm3/bxGQi8nqR9b04rIizVN2dFkMpv
+         8BmSo3l60hlPg==
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     bpf@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>,
+        iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v4 04/17] iommufd: Document overview of iommufd
+In-Reply-To: <Y2zE0zfnQ7mt740i@debian.me>
+References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+ <4-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+ <Y2zE0zfnQ7mt740i@debian.me>
+Date:   Thu, 10 Nov 2022 07:49:14 -0700
+Message-ID: <87v8nmhnkl.fsf@meer.lwn.net>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: eaSQGZyhwys3DKPLJ2cp9W-6VOBLxDFA
-X-Proofpoint-ORIG-GUID: eaSQGZyhwys3DKPLJ2cp9W-6VOBLxDFA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-10_08,2022-11-09_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=774
- adultscore=0 priorityscore=1501 suspectscore=0 bulkscore=0 malwarescore=0
- spamscore=0 lowpriorityscore=0 phishscore=0 impostorscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2211100101
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-11-10 at 10:24 +0100, Nico Boehr wrote:
-> Quoting Eric Farman (2022-11-09 21:21:56)
-> > From: Alexander Gordeev <agordeev@linux.ibm.com>
-> >=20
-> > The ORB is a construct that is sent to the real hardware,
-> > so should contain a physical address in its interrupt
-> > parameter field. Let's clarify that.
->=20
-> Maybe I don't get it, but I think the commit description is
-> inaccurate. The PoP
-> says (p. 15-25):
->=20
-> > Bits 0-31 of word 0 are
-> > preserved unmodified in the subchannel until
-> > replaced by a subsequent START SUBCHANNEL or
-> > MODIFY SUBCHANNEL instruction. These bits are
-> > placed in word 1 of the interruption code when an I/O
-> > interruption occurs and when an interruption request
-> > is cleared by the execution of TEST PENDING
-> > INTERRUPTION.
->=20
-> So the hardware actually doesn't care what kind of address this is.
-> Rather, the
-> CIO driver expects the intparam to be a physical address - probably
-> so it fits
-> 32 bits -, see do_cio_interrupt.
+Bagas Sanjaya <bagasdotme@gmail.com> writes:
 
-Right, it doesn't even need to be an address; we could write 0xdeadbeef
-if we wanted, so long as that could be decoded by the driver on the
-interrupt side. I really just wanted to point out that it was sent to
-the channel, not that the channel (or anything else on the hardware
-side) used it. What about this?
+> On Mon, Nov 07, 2022 at 08:48:57PM -0400, Jason Gunthorpe wrote:
+>> From: Kevin Tian <kevin.tian@intel.com>
+>> 
+>> Add iommufd into the documentation tree, and supply initial documentation.
+>> Much of this is linked from code comments by kdoc.
+>> 
+>
+> The patch also exposes htmldocs warnings as Stephen Rothwell has
+> reported on linux-next [1] due to the copyright comments mistaken for
+> kernel-doc comments, so I have applied the fixup:
+>
+> ---- >8 ----
+>
+> diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
+> index 536a34d099968d..76b3761a89423e 100644
+> --- a/drivers/iommu/iommufd/device.c
+> +++ b/drivers/iommu/iommufd/device.c
+> @@ -1,5 +1,6 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
+> -/* Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
+> +/*
+> + * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
 
-   The ORB's interrupt parameter field is stored unmodified into the
-   interruption code when an I/O interrupt occurs. As this reflects
-   a real device, let's store the physical address of the subchannel
-   struct so it can be used when processing an interrupt.
+Um ... this makes no sense at all.  If kernel-doc thought that was a
+kernel-doc comment, the problem is there, not here.
+
+<looks>
+
+So the report you're referring to is
+
+  https://lore.kernel.org/linux-next/20221110182938.40ce2651@canb.auug.org.au/
+
+?  If so, this change will not fix the problem.  That error:
+
+> drivers/iommu/iommufd/device.c:1: warning: no structured comments found
+> drivers/iommu/iommufd/main.c:1: warning: no structured comments found
+
+is caused by using .. kernel-doc:: directives to extract documentation
+from files where none exists - thus "no structured comments found".
+
+The *real* problem, methinks, is that the directives are added in patch 4
+of the series, but the documentation doesn't show up until later.  So
+the real fix would be to simply move this patch down.  Or just not worry
+about it, since it all works out in the end and nobody will be bisecting
+a docs build.
+
+Bagas, you are *again* misadvising people.  Please stop doing that!
+
+Thanks,
+
+jon
