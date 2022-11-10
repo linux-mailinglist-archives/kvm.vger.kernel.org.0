@@ -2,134 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69FB7623928
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:48:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18C60623956
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:55:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232093AbiKJBsd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 20:48:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45942 "EHLO
+        id S232483AbiKJBzB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 20:55:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231769AbiKJBs3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 20:48:29 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4BA63CC
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 17:48:29 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-352e29ff8c2so2884577b3.21
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 17:48:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=CMXdygVTSbBCKeUpnZU+Zfw0wyqCZJgQrO/T3Nib2So=;
-        b=qiHalsDEb1I+Y6YxWi8QLwXCS2CwHqMjWkXRsKiGWTPmAUzrxZeYiamee4gK0Nw/mW
-         VVFSbvYm0O+KtQWjSfnaIVaDYxMkZw6oA2FIOfEuD6aOoX/DbbQalsrn1aR4eah+6Fyf
-         Ojx8c20kqDCjAqraadTD1vyPH9s+5SqwKbousDrjzxKtI28RRHYTX0/vRDhLLaBj7TPZ
-         rlBUC6QU/lIVEVf6WU7cLYfSVA/PULhu+tVRwkbSZtbyKUkl1RvTSjCpPYEoDNjXJAcS
-         DilJvsNJ/v4iGm5m9wBcAYWUdMQAy9AsT6lyI7wBvgy7Y1kaislpFxWS3E6nyCUwH7Nm
-         NJmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CMXdygVTSbBCKeUpnZU+Zfw0wyqCZJgQrO/T3Nib2So=;
-        b=p7cMa5YrfJnqxTRMqOIAkq0bJpC0m40IBDPI70xp6jaVPGUHq6Cgay9xv4YVFOWysq
-         DIhlp9H5NR/PQmZ+f46J/vWfMXgVjiYid2vee1J50b1ejQ/VNp04B8WhbhyyceqrS3Hw
-         ejpgAr3Bi5DJVfbD3fqn8XRLbfr7ZsrKayio5JF1cS3VbrYlArKR5wPrz+Ub7HTdlqnA
-         91Usy3r58TNiWqhz1FBXhpoTsgaHRMu9FwtGhOcYtJ1NFC5gvenpvuwSe9XuR1Kcf9eJ
-         30459xg8PKWWRSW8bmQrAx5ENRrKAiiTXpa8CMoqAGU/ZtO+ojJGuwicVtp+Q90BUccz
-         qHJw==
-X-Gm-Message-State: ACrzQf3uglZp/ABmxnRosPkMnG1E6r63KnrjAZL3RaWjTFnEPgna0V3d
-        KWxJTz0Ylnk9GOeL1jtQ/prku8Hsftw=
-X-Google-Smtp-Source: AMsMyM6G00RY/cYIWt+U8yjGU4flmrLChx2b7c/C7uxpk73UstEL/s0ZGDm9/+Wa2vhRo8cavI2BoU5+kVg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:7503:0:b0:368:70a8:9791 with SMTP id
- q3-20020a817503000000b0036870a89791mr1204058ywc.197.1668044907433; Wed, 09
- Nov 2022 17:48:27 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 10 Nov 2022 01:48:21 +0000
-In-Reply-To: <20221110014821.1548347-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20221110014821.1548347-1-seanjc@google.com>
-X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221110014821.1548347-3-seanjc@google.com>
-Subject: [PATCH 2/2] KVM: x86/mmu: Register page-tracker on first shadow root allocation
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yan Zhao <yan.y.zhao@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232410AbiKJByt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 20:54:49 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A00A27B35;
+        Wed,  9 Nov 2022 17:54:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668045288; x=1699581288;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=uiULuwZpOSthgGSoIhQHAYKYU4Q0iMPtiXNcMYxg49s=;
+  b=ZyjJcCYu5J0aqzYCoUfQIw/C65GEiDTxoJNfukp9jNZwbwu3+dMmrrOd
+   m38pOdqdV9got21bbefjoE3255aXGvkUds4toIc4k1dXdgvs/ZjmKwjzW
+   lQgbHjKphLO0M453rN2Uvh7B4p/gb2wCdq8SV2VAypVhDyKP1ZuKsXHr5
+   ro+nuvw+P/XXaYn/J5DrtkgKqxfi61YmbqdnBpPpmdovRhUBS1zSlL3zA
+   UpfNtql2X78zMG7yeSeH9fVZ3I7cm3MtLEc7mOIYxbHSWprMO8uA/puRa
+   HQmlqBM/d1Q7lK/QHZtXOdh+ayunSf+T7RHR4TrZt4BcbNqNqQXm6L2Xv
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="290899829"
+X-IronPort-AV: E=Sophos;i="5.96,152,1665471600"; 
+   d="scan'208";a="290899829"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2022 17:52:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="762099752"
+X-IronPort-AV: E=Sophos;i="5.96,152,1665471600"; 
+   d="scan'208";a="762099752"
+Received: from jiaxichen-precision-3650-tower.sh.intel.com ([10.239.159.75])
+  by orsmga004.jf.intel.com with ESMTP; 09 Nov 2022 17:52:47 -0800
+From:   Jiaxi Chen <jiaxi.chen@linux.intel.com>
+To:     kvm@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, ndesaulniers@google.com,
+        alexandre.belloni@bootlin.com, peterz@infradead.org,
+        jpoimboe@kernel.org, chang.seok.bae@intel.com,
+        pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
+        jmattson@google.com, sandipan.das@amd.com, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
+        keescook@chromium.org, nathan@kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/7] x86: KVM: Advertise CPUID of new Intel platform
+Date:   Thu, 10 Nov 2022 09:52:45 +0800
+Message-Id: <20221110015252.202566-1-jiaxi.chen@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Defer registering KVM's shadow page tracker until the first shadow root
-allocation now that KVM doesn't rely on the tracker to zap+flush SPTEs
-when a memslot is moved or deleted.
+Latest Intel platform Granite Rapids/Sierra Forest has introduced below
+new instructions and CPUIDs:
 
-Cc: Yan Zhao <yan.y.zhao@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ - CMPccXADD CPUID.(EAX=7,ECX=1):EAX[bit 7]
+ - AMX-FP16 CPUID.(EAX=7,ECX=1):EAX[bit 21]
+ - AVX-IFMA CPUID.(EAX=7,ECX=1):EAX[bit 23]
+ - AVX-VNNI-INT8 CPUID.(EAX=7,ECX=1):EDX[bit 4]
+ - AVX-NE-CONVERT CPUID.(EAX=7,ECX=1):EDX[bit 5]
+ - PREFETCHITI CPUID.(EAX=7,ECX=1):EDX[bit 14]
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 0a5ae07a190e..d35a86a60d4f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3678,11 +3678,14 @@ static int mmu_first_shadow_root_alloc(struct kvm *kvm)
- 		}
- 	}
- 
-+out_success:
-+	/* Register KVM's page-tracker to react to guest writes to gPTEs. */
-+	kvm_page_track_register_notifier(kvm, &kvm->arch.mmu_sp_tracker);
-+
- 	/*
- 	 * Ensure that shadow_root_allocated becomes true strictly after
- 	 * all the related pointers are set.
- 	 */
--out_success:
- 	smp_store_release(&kvm->arch.shadow_root_allocated, true);
- 
- out_unlock:
-@@ -6001,7 +6004,6 @@ static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
- 
- int kvm_mmu_init_vm(struct kvm *kvm)
- {
--	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
- 	int r;
- 
- 	INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
-@@ -6013,8 +6015,7 @@ int kvm_mmu_init_vm(struct kvm *kvm)
- 	if (r < 0)
- 		return r;
- 
--	node->track_write = kvm_mmu_pte_write;
--	kvm_page_track_register_notifier(kvm, node);
-+	kvm->arch.mmu_sp_tracker.track_write = kvm_mmu_pte_write;
- 
- 	kvm->arch.split_page_header_cache.kmem_cache = mmu_page_header_cache;
- 	kvm->arch.split_page_header_cache.gfp_zero = __GFP_ZERO;
-@@ -6036,9 +6037,8 @@ static void mmu_free_vm_memory_caches(struct kvm *kvm)
- 
- void kvm_mmu_uninit_vm(struct kvm *kvm)
- {
--	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
--
--	kvm_page_track_unregister_notifier(kvm, node);
-+	if (kvm_shadow_root_allocated(kvm))
-+		kvm_page_track_unregister_notifier(kvm, &kvm->arch.mmu_sp_tracker);
- 
- 	kvm_mmu_uninit_tdp_mmu(kvm);
- 
+Details can be found in recent Intel ISE (Instruction Set
+Extensions)[1].
+
+This patch series advertises KVM support of these CPUIDs to host
+userspace.
+
+[1] Intel ISE: https://cdrdv2.intel.com/v1/dl/getContent/671368
+
+v3:
+ - Remain CPUID_8000_001F_EAX in the last leaf of cpuid_leaf[]
+ - Replace CPUID_7_1_EAX with CPUID_LNX_5, waiting for future new CPUIDs
+
+v2:
+https://lore.kernel.org/all/20221103025030.78371-1-jiaxi.chen@linux.intel.com/
+ - Remove vague descriptions in the changelogs, including pronouns and
+   "this patch" kind of things.
+ - Move the two CPUIDs of cpuid_leaf[12] CPUID_7_1_EAX to kvm-only
+   subleaves.
+ - Replace cpuid_leaf[12] CPUID_7_1_EAX with the last leaf
+   CPUID_8000_001F_EAX to shorten array length.
+ - Change the newly-added CPUID leaf [CPUID_7_1_EDX] in v1 into kvm-only
+   subleaves. 
+
+v1:
+https://lore.kernel.org/all/20221019084734.3590760-1-jiaxi.chen@linux.intel.com/
+
+Jiaxi Chen (7):
+  x86: KVM: Move existing x86 CPUID leaf [CPUID_7_1_EAX] to kvm-only
+    leaf
+  x86: KVM: Advertise CMPccXADD CPUID to user space
+  x86: KVM: Advertise AMX-FP16 CPUID to user space
+  x86: KVM: Advertise AVX-IFMA CPUID to user space
+  x86: KVM: Advertise AVX-VNNI-INT8 CPUID to user space
+  x86: KVM: Advertise AVX-NE-CONVERT CPUID to user space
+  x86: KVM: Advertise PREFETCHIT0/1 CPUID to user space
+
+ arch/x86/include/asm/cpufeature.h  |  2 +-
+ arch/x86/include/asm/cpufeatures.h |  4 +---
+ arch/x86/kernel/cpu/common.c       |  6 ------
+ arch/x86/kernel/cpu/cpuid-deps.c   |  1 -
+ arch/x86/kvm/cpuid.c               | 11 ++++++++---
+ arch/x86/kvm/reverse_cpuid.h       | 15 +++++++++++++++
+ 6 files changed, 25 insertions(+), 14 deletions(-)
+
+
+base-commit: 30a0b95b1335e12efef89dd78518ed3e4a71a763
 -- 
-2.38.1.431.g37b22c650d-goog
+2.27.0
 
