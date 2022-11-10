@@ -2,46 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FD4A62434D
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 14:34:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 38772624368
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 14:41:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230043AbiKJNeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 08:34:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52688 "EHLO
+        id S230508AbiKJNlE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 08:41:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229874AbiKJNeV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 08:34:21 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 343D81FCE3
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 05:34:20 -0800 (PST)
+        with ESMTP id S229916AbiKJNlC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 08:41:02 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04451165A5
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 05:40:55 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DBFCDB821AC
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 13:34:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B112C433D6;
-        Thu, 10 Nov 2022 13:34:17 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 954E161759
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 13:40:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E861FC433C1;
+        Thu, 10 Nov 2022 13:40:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668087257;
-        bh=CxU5CLs5OzAY7rGv18GgAC+P9XrarCRDN5MlMlNYwc0=;
+        s=k20201202; t=1668087654;
+        bh=Uh+wsUnI7Md4CmgoSgZilMSyoJPGZ0sZeCob4b+9zvI=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Ig3W1MeBQMrSMV0bQOlZ63AAFX/0x05D4mvVeQpGUSLykXvxa4WbCPvHWf9WbSWGq
-         7mwKiCYgBH0guWQT0Yo2Z/ZvIo9tX+gqnQfcg/hOktDB5keIM66X2DFpRImUKuaBQB
-         y27td9nyeWERrxZ37BcQoHZTEnlW9hk3sR4MI8NZ1AADpwt2CWZVZ9XJY+nEb4z/R0
-         3qD4ZtDye4MjatDM8IL8SIWKZD3UkhdrRCW9Sxhc0q9Amnk6q+uWgjcBkRwxMInt/O
-         WIiERHFhc8sJeSbcpVr2PRLHAWGOrzV6h9xhIg0ok0I1A929w+P3gKpZizpHX1VMKq
-         SPbynZR5N5kBA==
+        b=j2qX8jezCMmmAUlPIOh3JkbewFuuKHVylCMMe9vaFnYdjVqFyw+yFKug5VD7w6LPX
+         YQSF2HCAI3FdBwto8Rs6vW2ZPDT1H8p1c6vTgSB58rAauOusqIK45tLxUP2zCBDnk+
+         essciJC7FuMjHWWRHYMejtDrFs/NJphMIcYL3v8HhIU8/H/u9dNYXnLI5dAW7rWfGJ
+         +VBrZm+6s47zelBALBAt/ca/mtT8zHIsHEEVTjDNar0xUs/CH6XP31bkGhzC7r6LY+
+         hLepqjVsrf58FJBnkaRFqm8ohVznTCtbLioIea0JzvYl6G+EpT5JXuXtnL23ml1u48
+         x4iSXoVwi3Lww==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1ot7h9-005A9N-90;
-        Thu, 10 Nov 2022 13:34:15 +0000
-Date:   Thu, 10 Nov 2022 13:34:14 +0000
-Message-ID: <86mt8zorvt.wl-maz@kernel.org>
+        id 1ot7nX-005AFs-Jq;
+        Thu, 10 Nov 2022 13:40:51 +0000
+Date:   Thu, 10 Nov 2022 13:40:50 +0000
+Message-ID: <86leojorkt.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Ben Gardon <bgardon@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
         James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -50,20 +51,21 @@ Cc:     Oliver Upton <oliver.upton@linux.dev>,
         David Matlack <dmatlack@google.com>,
         Quentin Perret <qperret@google.com>,
         Gavin Shan <gshan@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
-In-Reply-To: <CANgfPd9fynvsBLjio1zz0hPy4SGAd8XZfzYQaR_gg0UJrOyAcA@mail.gmail.com>
+        Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v5 09/14] KVM: arm64: Atomically update stage 2 leaf attributes in parallel walks
+In-Reply-To: <CANgfPd_=6r1pmuNbrEdiom4JpryUBkVxxxmKTCN+xfiAQYrP0w@mail.gmail.com>
 References: <20221107215644.1895162-1-oliver.upton@linux.dev>
-        <20221107215644.1895162-9-oliver.upton@linux.dev>
-        <CANgfPd9fynvsBLjio1zz0hPy4SGAd8XZfzYQaR_gg0UJrOyAcA@mail.gmail.com>
+        <20221107215644.1895162-10-oliver.upton@linux.dev>
+        <CANgfPd9SK=9jUYh+aMXwYCf2-JtoJtSZ_BDmbjiZX=nvG-9uXA@mail.gmail.com>
+        <Y2wswsHgDHIIXram@google.com>
+        <CANgfPd_=6r1pmuNbrEdiom4JpryUBkVxxxmKTCN+xfiAQYrP0w@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: bgardon@google.com, oliver.upton@linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, reijiw@google.com, ricarkol@google.com, dmatlack@google.com, qperret@google.com, gshan@redhat.com, peterx@redhat.com, will@kernel.org, seanjc@google.com, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: bgardon@google.com, seanjc@google.com, oliver.upton@linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, reijiw@google.com, ricarkol@google.com, dmatlack@google.com, qperret@google.com, gshan@redhat.com, peterx@redhat.com, will@kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -75,75 +77,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 09 Nov 2022 22:25:38 +0000,
+On Wed, 09 Nov 2022 23:00:16 +0000,
 Ben Gardon <bgardon@google.com> wrote:
 > 
-> On Mon, Nov 7, 2022 at 1:57 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> On Wed, Nov 9, 2022 at 2:42 PM Sean Christopherson <seanjc@google.com> wrote:
 > >
-> > Use RCU to safely walk the stage-2 page tables in parallel. Acquire and
-> > release the RCU read lock when traversing the page tables. Defer the
-> > freeing of table memory to an RCU callback. Indirect the calls into RCU
-> > and provide stubs for hypervisor code, as RCU is not available in such a
-> > context.
+> > On Wed, Nov 09, 2022, Ben Gardon wrote:
+> > > On Mon, Nov 7, 2022 at 1:58 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > > @@ -1054,7 +1066,7 @@ kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr)
+> > > >  bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
+> > > >  {
+> > > >         kvm_pte_t pte = 0;
+> > > > -       stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL);
+> > > > +       stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL, 0);
+> > >
+> > > Would be nice to have an enum for KVM_PGTABLE_WALK_EXCLUSIVE so this
+> > > doesn't just have to pass 0.
 > >
-> > The RCU protection doesn't amount to much at the moment, as readers are
-> > already protected by the read-write lock (all walkers that free table
-> > memory take the write lock). Nonetheless, a subsequent change will
-> > futher relax the locking requirements around the stage-2 MMU, thereby
-> > depending on RCU.
+> > That's also dangerous though since the param is a set of flags, not unique,
+> > arbitrary values.  E.g. this won't do the expected thing
 > >
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h | 49 ++++++++++++++++++++++++++++
-> >  arch/arm64/kvm/hyp/pgtable.c         | 10 +++++-
-> >  arch/arm64/kvm/mmu.c                 | 14 +++++++-
-> >  3 files changed, 71 insertions(+), 2 deletions(-)
+> >         if (flags & KVM_PGTABLE_WALK_EXCLUSIVE)
 > >
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index e70cf57b719e..7634b6964779 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -37,6 +37,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
-> >
-> >  typedef u64 kvm_pte_t;
-> >
-> > +/*
-> > + * RCU cannot be used in a non-kernel context such as the hyp. As such, page
-> > + * table walkers used in hyp do not call into RCU and instead use other
-> > + * synchronization mechanisms (such as a spinlock).
-> > + */
-> > +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
-> > +
-> >  typedef kvm_pte_t *kvm_pteref_t;
-> >
-> >  static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-> > @@ -44,6 +51,40 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
-> >         return pteref;
-> >  }
-> >
-> > +static inline void kvm_pgtable_walk_begin(void) {}
-> > +static inline void kvm_pgtable_walk_end(void) {}
-> > +
-> > +static inline bool kvm_pgtable_walk_lock_held(void)
-> > +{
-> > +       return true;
+> > I assume compilers would complain, but never say never when it comes to compilers :-)
 > 
-> Forgive my ignorance, but does hyp not use a MMU lock at all? Seems
-> like this would be a good place to add a lockdep check.
+> Yeah, I was thinking about that too. IMO using one enum for multiple
+> flags is kind of an abuse of the enum. If you're going to put multiple
+> orthogonal flags in an int or whatever, it would probably be best to
+> have separate enums for each flag. That way you can define masks to
+> extract the enum from the int and only compare with == and != as
+> opposed to using &.
 
-For normal KVM, we don't mess with the page tables in the HYP code *at
-all*. That's just not the place. It is for pKVM that this is a bit
-different, as EL2 is where the stuff happens.
+Too late. The kernel is filled of this (look at the irq code, for
+example), and we happily use this construct all over the (oh wait!)
+page table code to construct permissions and other things.
 
-Lockdep at EL2 is wishful thinking. However, we have the next best
-thing, which is an assertion such as:
-
-	hyp_assert_lock_held(&host_kvm.lock);
-
-though at the moment, this is a *global* lock that serialises
-everyone, as a guest stage-2 operation usually affects the host
-stage-2 as well (ownership change and such). Quentin should be able to
-provide more details on that.
+At this stage, this is an established construct. Compiler people can
+try and break this habit, good luck to them ;-).
 
 	M.
 
