@@ -2,122 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F50C6244F8
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 16:01:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03D6862453C
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 16:10:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231156AbiKJPBi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 10:01:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51126 "EHLO
+        id S231302AbiKJPKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 10:10:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230320AbiKJPBb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 10:01:31 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8D81408E;
-        Thu, 10 Nov 2022 07:01:30 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id i3so2371862pfc.11;
-        Thu, 10 Nov 2022 07:01:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zz159+nxp6aQdQ7yNB3j3jGqMel9Ite57CMkzXKwRIU=;
-        b=gnJM86DEAlr0mbDlTkhLQtdEVC4gTqfTPQizoE5xRLcUQgBiBc78N7ZfYCv3xGaf6m
-         SoFCkmv83rJ0FF6m7mQJTalJYinJs59k9gAN/47Q+W3DDk696zHjDZ4iPHkUryTS9YFz
-         ujJ3i8+KAn0laRP23MVyjJ1dFAxdr9V1Xwm9CAVs10FiZaLF9o43W+Nz5K3n0NxI2r3T
-         Hn8XLAooeFglG3N0+Qg0Q/IHRMlZjk3/Wfp7oP4iJWi/6Lkij0k0YAesmxueQl9QLut+
-         20brb7946zLFcWdt7K4x5UojRHYGgt5w/lj3KsCfTwYxIkL/Q8gaixP5vyjsoRa7Cwhe
-         /IPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zz159+nxp6aQdQ7yNB3j3jGqMel9Ite57CMkzXKwRIU=;
-        b=WpstT+8k2XNrugMpc7rxWu3DvfbR06r0I9peI+kEZhCJNCjXfVI8hzvza8Nwpi80XD
-         kCxdnmwRLFcHYoDPp2eaZlYdHzetJzK7ojDnvIJ3j5PyuXWduQc5NX6V89Tm/sOG8t3w
-         /1UzNbcCVHOv70MV2f52Y3ZHfX7qs5O9YBadJsYbECRGPxaxzAgcc+Sy9dwvO6gzCRgD
-         W0m3KVEoaU/zKL5pk4riEk/CZeUVuK5gXQX1qsnOOmXZ8yhERl8svEq5lKov+cBWeZw2
-         Pf3cQPg7smoZVyLCK10Qb4ViMDwWKWO/ImMg8psY/Mw4cL1a4gEh+bDNJReeMiM24uYw
-         9o8A==
-X-Gm-Message-State: ACrzQf3JkEEBUTfip6Fy5d2gc+Y3eJJSg89jX9cxHrKRmYZfg8AOhhxo
-        k10JZiU+Y75khqCxswuPq68=
-X-Google-Smtp-Source: AMsMyM41vXNzICd0ORtm32x6FgWNlDIol38nrTOt3DYJwzlqSsYgmeh8S3o/NWl8S1B1BaY2ITv8YQ==
-X-Received: by 2002:a62:32c4:0:b0:56c:d54a:9201 with SMTP id y187-20020a6232c4000000b0056cd54a9201mr2822045pfy.55.1668092489721;
-        Thu, 10 Nov 2022 07:01:29 -0800 (PST)
-Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
-        by smtp.gmail.com with ESMTPSA id 72-20020a62194b000000b00562677968aesm10244639pfz.72.2022.11.10.07.01.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Nov 2022 07:01:29 -0800 (PST)
-Message-ID: <42195460-8086-ce7b-fd8f-2017bad36d47@gmail.com>
-Date:   Thu, 10 Nov 2022 23:01:17 +0800
+        with ESMTP id S230000AbiKJPKU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 10:10:20 -0500
+Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6336E2BB0D;
+        Thu, 10 Nov 2022 07:10:20 -0800 (PST)
+Received: from localhost (unknown [IPv6:2601:281:8300:73::5f6])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id A5B6C37E;
+        Thu, 10 Nov 2022 15:10:19 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net A5B6C37E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+        t=1668093019; bh=mBBbrMtJ5EuS0waUjuX4ugyR94/nkClQDPlg7UQzF8Y=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=fMIg9GgJX6Yi1LkwBsIBU6h2mwkmwarirOjb/su2PGoW6AQeQJK3eTJId6Wxgil4l
+         Isz1r9IqAHVjwMQEAXh8FUAe/HP+Qnx00HR8yjoI8ICNEAIL1PP8ePz3X2Plh48pxF
+         s14Sz9HSryXXL1Xt55tLGvXFHkHGn8kzD3QGaojQbuyZ+o9OimM08WYil3dA9eYvcO
+         Z9yBE7PlH6ZqDTWq62s3OReyeP7aOtfgGZsa4h6ndsxoAM2vv6kfJr+Ns8aLZIP4Fo
+         X3/yxLKBIz/ZczuKvT46AUTA3r/AK+YM0HL8BIbykjzoBQY2TLNel2Aj3/ZswAkEM4
+         W97k7Z43jx6jw==
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Bagas Sanjaya <bagasdotme@gmail.com>, bpf@vger.kernel.org,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v4 04/17] iommufd: Document overview of iommufd
+In-Reply-To: <Y20QotPsxivvV53l@nvidia.com>
+References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+ <4-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+ <Y2zE0zfnQ7mt740i@debian.me> <87v8nmhnkl.fsf@meer.lwn.net>
+ <Y20QotPsxivvV53l@nvidia.com>
+Date:   Thu, 10 Nov 2022 08:10:19 -0700
+Message-ID: <87r0yahmlg.fsf@meer.lwn.net>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [RFC PATCH 01/17] x86/boot: Check boot param's cc_blob_address
- for direct boot mode
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        thomas.lendacky@amd.com, venu.busireddy@oracle.com,
-        sterritt@google.com, tony.luck@intel.com, samitolvanen@google.com,
-        fenghua.yu@intel.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-arch@vger.kernel.org
-References: <20221109205353.984745-1-ltykernel@gmail.com>
- <20221109205353.984745-2-ltykernel@gmail.com>
- <20221109233904.scct4fih3b3kvnyk@amd.com>
-From:   Tianyu Lan <ltykernel@gmail.com>
-In-Reply-To: <20221109233904.scct4fih3b3kvnyk@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/10/2022 7:39 AM, Michael Roth wrote:
->> -	 * bp->cc_blob_address should only be set by boot/compressed kernel.
->> -	 * Initialize it to 0 to ensure that uninitialized values from
->> -	 * buggy bootloaders aren't propagated.
->> +	 * bp->cc_blob_address should only be set by boot/compressed
->> +	 * kernel and hypervisor with direct boot mode. Initialize it
->> +	 * to 0 after checking in order to ensure that uninitialized
->> +	 * values from buggy bootloaders aren't propagated.
->>   	 */
->> -	if (bp)
->> -		bp->cc_blob_address = 0;
->> +	if (bp) {
->> +		cc_info = (struct cc_blob_sev_info *)(unsigned long)
->> +			bp->cc_blob_address;
->> +
->> +		if (cc_info->magic != CC_BLOB_SEV_HDR_MAGIC)
->> +			bp->cc_blob_address = 0;
-> It doesn't seem great to rely on SEV_HDR_MAGIC to determine whether
-> bp->cc_blob_address is valid or not since it is only a 32-bit value.
-> 
-> Would it be possible to use a setup_data entry of type SETUP_CC_BLOB
-> in bp->hdr.setup_data instead? There's already handling for that in
-> find_cc_blob_setup_data() so it should "just work".
+Jason Gunthorpe <jgg@nvidia.com> writes:
 
-Hi Michael:
-	Thanks for your review. I will have a try. Hypervisor may set 
-cc_blob_address directly and so propose this.
+> On Thu, Nov 10, 2022 at 07:49:14AM -0700, Jonathan Corbet wrote:
+>
+>> The *real* problem, methinks, is that the directives are added in patch 4
+>> of the series, but the documentation doesn't show up until later.  So
+>> the real fix would be to simply move this patch down.  Or just not worry
+>> about it, since it all works out in the end and nobody will be bisecting
+>> a docs build.
+>
+> That is half the problem, the other is this:
+>
+> https://lore.kernel.org/r/0-v1-c80e152ce63b+12-kdoc_export_ns_jgg@nvidia.com
+>
+> Since even after the whole series the EXPORT_NS functions don't parse
+> properly. I'm going to put this patch before the doc patch and ignore
+> the bisection problem.
+>
+> I'd like someone to say they are happy with the perl :)
 
+I'm not happy with *any* perl! :)
 
+I've been sitting on that patch because I was under the impression
+another version was coming - was that wrong?
 
+Thanks,
 
+jon
