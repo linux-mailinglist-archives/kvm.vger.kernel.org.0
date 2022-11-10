@@ -2,163 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 882286244E3
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 15:54:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F50C6244F8
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 16:01:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230132AbiKJOyj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 09:54:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43476 "EHLO
+        id S231156AbiKJPBi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 10:01:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229559AbiKJOyh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 09:54:37 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2085.outbound.protection.outlook.com [40.107.92.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22CE1EE03;
-        Thu, 10 Nov 2022 06:54:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JyVy6IdjJc+nGzeb1tgCDoZBGvEfyoJwRY1Xf1+nM/P+sUfFh4mLB5cmN0SfV5ZFkurtqlj9YKGaI5kY7QSLbdykcTo9YCKuhFSbqpsrcrXW3Hng6A3tDEWqQ7+mQkydJvzDXSrwxWY3t+0eUBwnAy9AhTlBXY9ODmAEdZfZRoZ1PZj45/Iwsk5EGqLy+4sZC9DQMr2YiumlgzZHwAmLGsrHjYLOT2DdonRC6PNKZQcb6/oUGrDZipnf3pZKNGrnvDv3ePsiaM5EXzW3JVXGP6AJ4z95sEA98U9gqcG1ClKerviugRLqn2G7FUEmS4dXvzGZNmA6dXVmQfzjm0MFIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Dj4TmsQPf9RJJqLRYEWv/RAKSL9UG9dfOP+BqU/daY8=;
- b=CcUxMZQWWY5iP9hAFQvWnjQVK752B6KZgT7eela6SzVewcrYFOFn2gKipO2QFLfRpHJrGnXWnuN7F0ZXqE5Kau1iX4qYNyftgSM6HM/ADA3LD0Q22nqMtCC8Z+YvxqRE73Vdi3gt6XXRCVYMND83lVECpeDztq0K/Nk2MLWP3sTaAfRvCnItI4046U4kgAw9EpeHl09UosXz5WIYvXYNGybj+zSjAowF/ORsp+2nJqZIb1lBPN5FkAcm0xPDJCkeOQk8BTtp45TY0FoBlLGnrh4PcoJui0g9nFR9lxpyFyxlTvfdlDXTf8eGBGGIdJ/+82HcZ2SLUoj5svZoZ6KTRw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Dj4TmsQPf9RJJqLRYEWv/RAKSL9UG9dfOP+BqU/daY8=;
- b=hULVvjM/S9dQwXK7+cl8zTZFjYKcCLdLnCSmWlauGEj20QW8YQfokN/SDjSXyGILyYWBbNozncs59l0V30hpvURcWVtThICbefkqbYJM6B7WzvfCYzT8U1EurcG6mLFs8FfUWvm87Wvs+ITGuTsUP4xSaO0Bd4ifzIFS1vH7sI1Rq2SAnmEmkkrYXms1d+GBf+Nqc3QzRNL58wqk7jzIXCSaslb8UTVSx/UPmCWTajq3cBkmTs1f++eeyWbYcm2fcLVBeU61QEOYi20erlfuiCPileb70OoJ0ylNzybxnt/U0R/wjMUN+6zRtMEnU4kXZFx1kPaAKsKkB6ok4ZXuZw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA0PR12MB4366.namprd12.prod.outlook.com (2603:10b6:806:72::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.12; Thu, 10 Nov
- 2022 14:54:27 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%7]) with mapi id 15.20.5791.027; Thu, 10 Nov 2022
- 14:54:27 +0000
-Date:   Thu, 10 Nov 2022 10:54:26 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>, bpf@vger.kernel.org,
-        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v4 04/17] iommufd: Document overview of iommufd
-Message-ID: <Y20QotPsxivvV53l@nvidia.com>
-References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <4-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <Y2zE0zfnQ7mt740i@debian.me>
- <87v8nmhnkl.fsf@meer.lwn.net>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87v8nmhnkl.fsf@meer.lwn.net>
-X-ClientProxiedBy: BL0PR1501CA0016.namprd15.prod.outlook.com
- (2603:10b6:207:17::29) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S230320AbiKJPBb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 10:01:31 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8D81408E;
+        Thu, 10 Nov 2022 07:01:30 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id i3so2371862pfc.11;
+        Thu, 10 Nov 2022 07:01:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zz159+nxp6aQdQ7yNB3j3jGqMel9Ite57CMkzXKwRIU=;
+        b=gnJM86DEAlr0mbDlTkhLQtdEVC4gTqfTPQizoE5xRLcUQgBiBc78N7ZfYCv3xGaf6m
+         SoFCkmv83rJ0FF6m7mQJTalJYinJs59k9gAN/47Q+W3DDk696zHjDZ4iPHkUryTS9YFz
+         ujJ3i8+KAn0laRP23MVyjJ1dFAxdr9V1Xwm9CAVs10FiZaLF9o43W+Nz5K3n0NxI2r3T
+         Hn8XLAooeFglG3N0+Qg0Q/IHRMlZjk3/Wfp7oP4iJWi/6Lkij0k0YAesmxueQl9QLut+
+         20brb7946zLFcWdt7K4x5UojRHYGgt5w/lj3KsCfTwYxIkL/Q8gaixP5vyjsoRa7Cwhe
+         /IPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zz159+nxp6aQdQ7yNB3j3jGqMel9Ite57CMkzXKwRIU=;
+        b=WpstT+8k2XNrugMpc7rxWu3DvfbR06r0I9peI+kEZhCJNCjXfVI8hzvza8Nwpi80XD
+         kCxdnmwRLFcHYoDPp2eaZlYdHzetJzK7ojDnvIJ3j5PyuXWduQc5NX6V89Tm/sOG8t3w
+         /1UzNbcCVHOv70MV2f52Y3ZHfX7qs5O9YBadJsYbECRGPxaxzAgcc+Sy9dwvO6gzCRgD
+         W0m3KVEoaU/zKL5pk4riEk/CZeUVuK5gXQX1qsnOOmXZ8yhERl8svEq5lKov+cBWeZw2
+         Pf3cQPg7smoZVyLCK10Qb4ViMDwWKWO/ImMg8psY/Mw4cL1a4gEh+bDNJReeMiM24uYw
+         9o8A==
+X-Gm-Message-State: ACrzQf3JkEEBUTfip6Fy5d2gc+Y3eJJSg89jX9cxHrKRmYZfg8AOhhxo
+        k10JZiU+Y75khqCxswuPq68=
+X-Google-Smtp-Source: AMsMyM41vXNzICd0ORtm32x6FgWNlDIol38nrTOt3DYJwzlqSsYgmeh8S3o/NWl8S1B1BaY2ITv8YQ==
+X-Received: by 2002:a62:32c4:0:b0:56c:d54a:9201 with SMTP id y187-20020a6232c4000000b0056cd54a9201mr2822045pfy.55.1668092489721;
+        Thu, 10 Nov 2022 07:01:29 -0800 (PST)
+Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
+        by smtp.gmail.com with ESMTPSA id 72-20020a62194b000000b00562677968aesm10244639pfz.72.2022.11.10.07.01.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Nov 2022 07:01:29 -0800 (PST)
+Message-ID: <42195460-8086-ce7b-fd8f-2017bad36d47@gmail.com>
+Date:   Thu, 10 Nov 2022 23:01:17 +0800
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA0PR12MB4366:EE_
-X-MS-Office365-Filtering-Correlation-Id: bc0d34b8-db76-49be-ed69-08dac32b770a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pE3/3KZklYlHHVDdd3V19BorOqhABkuXx7jB+oBVj02Fg/X5emFjeNMPzXsapdHc0Xe2e5MSRtc5yW20wVHbylV5K6gC1sv4obdgVdwIR8u8RMv3gbnnLgCxB0aGIy4sb2Sb8pAkxsWsZoths7m2JikQDx1AI4r8OFRE17RMsIa7hW1Won7gRr9Rne8LUU8bKHbl2be3haNnbMdy2CxiQPnAwu94lwCOCvClm+QA4GtnAMcCnw9NdFNenDjek72whk1WJB9BHM1km6BvxRlfISAf8F2lAcrOeS5RuB/mz/TP5PzRZQRQArGnd3hAz/y+K0BpVSbGs+SBrg1AxzV8i2qULZsDWyhMk6bCUuAVSg6oaxb0sycQ0G6fg1bflMr/UPnTlfUgpzf90AXDUwt9hlNyPqf3LE1cnJkk89ylAtF/Shg4oiGt5vYShgtyd2831I0/a8nPp9I1Mk2DhB2EL6gMfXiINHZVJ0SZNKP/++1YBv+Vgye38Us/JTCIf61d8E/ChcWF8reaFlVLHB4aR35/jMoCXJZSnXIW1vMej/KjgWSh5ffjZJXv5kIANFLLrSAbqQYu7Nl+/uddgnfgTm++sWuXhrmHEwOtaBlIyvvKDypT3OGyMo5QtWdUVeV9VB+44nRjcGtWluP4PxAIYc08bfsVV8lCI1mr+M223IvV85GG7aokI0SI4n1Y1tQKv3LHCjkqW7c7xxQyA8qF2IdwDB8bz4j8VkdZGn8NEXIafrl07sDFz/FWH11iAJ9YIN5ZkOqGRbXUd3BzwEVMiA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(346002)(136003)(396003)(376002)(39860400002)(451199015)(38100700002)(7406005)(86362001)(7416002)(478600001)(8936002)(6486002)(5660300002)(966005)(4326008)(66946007)(316002)(66556008)(66476007)(8676002)(41300700001)(54906003)(2616005)(186003)(2906002)(4744005)(6916009)(26005)(6506007)(6512007)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?j4jzD4wAodg6TTtvxAQmU+PjAfyRJT2XfJbBj4ItZVbtvZQKH6oIwkZ/n3/9?=
- =?us-ascii?Q?Ix6UBNcm0LEoElv+g58HV3PzYLTCW5wysssAvaP5RAic8+8r5C1uTIIw2PVZ?=
- =?us-ascii?Q?VdwWlXeNOIq0ELyTCw3x7wTl27L4x+5o+gp9kXKT2VFhzjbDK1TByTuYPnjJ?=
- =?us-ascii?Q?NoPeBUhVGOEKkyUA7ZNLK3z89F+HHcMa3Y0cXTZNd3uSS0K/IBcHmtEKp8it?=
- =?us-ascii?Q?hri1eFPLd3LBwcC9MIkZCGz8rgMLcKophm6piPunbM015N/M7qu25jI/Qe9K?=
- =?us-ascii?Q?sRXlAKadbVLICb1caQ2WbGE1sIepjJfty2i0ibdloUdvrMvHC+L78V5fLtaK?=
- =?us-ascii?Q?C/ZKgaE5GD85ndhcQ/5Z5l9ipceW4XqAyVLebYcg7wJ2EY708RXsBOZJiS0L?=
- =?us-ascii?Q?4+HeS2fDpKBWHMeXE3i0oil/KN7sxcf1aV6oqMDsH8/vT7V1/Mv5spl26gdT?=
- =?us-ascii?Q?en57t4QNFLmWKNXEXBYvqfF0gn8MbKV9J7FsZoWSTS8IQaPpkFOLDXc2Ar43?=
- =?us-ascii?Q?CdbMjPKFh3t+Balea1dsAadSdQQgzZ31hBVN6MWTDvYzf6DIM7uFnK+4KRgu?=
- =?us-ascii?Q?15MWLYzaaTjcmFtdnKrehVnwn1Ef9ShNGA3mgAbbrJYV7m8A8CkeVW6BfRtl?=
- =?us-ascii?Q?VChHiKr2SBVtVt+08005EgG/OTnonCQvB0TDIRdpqmp7loo79stHr+4eH6bc?=
- =?us-ascii?Q?AmRVmELaxydfzHQ8CSE9FtzmCU4MNhivtej0vQvfRVn39tTNm0QA/v3Sen4I?=
- =?us-ascii?Q?/0zDg0NKkddq5RyVUlYgEZM3eYDYN9XfsxQCKpkqP8pBA6+OxSacWvNW66Nv?=
- =?us-ascii?Q?6KNOmRKJa6chV7IWBdT3Azk55G/9TOIDZkRDAbYL6jtlcub/xOEGMNrUaYl9?=
- =?us-ascii?Q?TAuBOmCuvmk3YbrlEXKHUWWSCVd16z5tbhfFZUmpukma3CWOVWif1i6wFarX?=
- =?us-ascii?Q?9SLahTEeMtmOctQJsaDoo0s6i5ay+EKuXDZWhgBuQdVTeqljb8FjokVbpq0w?=
- =?us-ascii?Q?pKmMaPOb3kHvExDliuXBf36V4KwJ5p0dN8raCmxsuwKrKurwLofmF2OdaOIO?=
- =?us-ascii?Q?UkUGsw/KKkeu1m5ZeJhsqbWAJrmPMKkQeVnlQebaILGCbQfX33c4muc7Dxxi?=
- =?us-ascii?Q?x+1jnmMhf/rhHTGx5Z5Qx0i9Gy9LD/+mMmKksSzoisTZeQZtA1eMTLNOY8A/?=
- =?us-ascii?Q?QVMCPcl53TLUc+f3mQxDJgX9qKKlRX43XMNmG/4pjSore/HdBkYRnMQ5iEFw?=
- =?us-ascii?Q?lI6ciB9ZCaZi8A2EgzxaGOFC+ksFBdBvhpnvDGPIcF+B2tJX0PoHeLxib6x9?=
- =?us-ascii?Q?mhkTWryTEMTpn4SaCLz4Dc52F85UR36FhCFdHOFDDwbKyGWIyFWiAm1czDLT?=
- =?us-ascii?Q?XsBlKQ77bBt5pgyEFUswFIEJiOXBlIIErBcqDUH6ViXOsc2Cft2PL2kc066A?=
- =?us-ascii?Q?JJKy3EgFJJNiEBcU/d0Rxz7bJxG/6IvelwL+h1WRKVysrQU1Vx62ynVlqrdG?=
- =?us-ascii?Q?3W8ALbb2phCBb/2Xb9ce7DU0lEPwiYq+oadc6oPe5Zs1huSwRButuT7YN21t?=
- =?us-ascii?Q?yAIRWjk0sQSROqDvXxI=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc0d34b8-db76-49be-ed69-08dac32b770a
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2022 14:54:27.5967
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1p1TIGZm7WeQ/SSF7jTLDZcBrTD40ggnBcj7IfuoZtSxWgKnXP4tQMIk9BUx6O8B
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4366
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [RFC PATCH 01/17] x86/boot: Check boot param's cc_blob_address
+ for direct boot mode
+Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
+        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, peterz@infradead.org,
+        ashish.kalra@amd.com, srutherford@google.com,
+        akpm@linux-foundation.org, anshuman.khandual@arm.com,
+        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
+        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
+        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
+        thomas.lendacky@amd.com, venu.busireddy@oracle.com,
+        sterritt@google.com, tony.luck@intel.com, samitolvanen@google.com,
+        fenghua.yu@intel.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-arch@vger.kernel.org
+References: <20221109205353.984745-1-ltykernel@gmail.com>
+ <20221109205353.984745-2-ltykernel@gmail.com>
+ <20221109233904.scct4fih3b3kvnyk@amd.com>
+From:   Tianyu Lan <ltykernel@gmail.com>
+In-Reply-To: <20221109233904.scct4fih3b3kvnyk@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 10, 2022 at 07:49:14AM -0700, Jonathan Corbet wrote:
+On 11/10/2022 7:39 AM, Michael Roth wrote:
+>> -	 * bp->cc_blob_address should only be set by boot/compressed kernel.
+>> -	 * Initialize it to 0 to ensure that uninitialized values from
+>> -	 * buggy bootloaders aren't propagated.
+>> +	 * bp->cc_blob_address should only be set by boot/compressed
+>> +	 * kernel and hypervisor with direct boot mode. Initialize it
+>> +	 * to 0 after checking in order to ensure that uninitialized
+>> +	 * values from buggy bootloaders aren't propagated.
+>>   	 */
+>> -	if (bp)
+>> -		bp->cc_blob_address = 0;
+>> +	if (bp) {
+>> +		cc_info = (struct cc_blob_sev_info *)(unsigned long)
+>> +			bp->cc_blob_address;
+>> +
+>> +		if (cc_info->magic != CC_BLOB_SEV_HDR_MAGIC)
+>> +			bp->cc_blob_address = 0;
+> It doesn't seem great to rely on SEV_HDR_MAGIC to determine whether
+> bp->cc_blob_address is valid or not since it is only a 32-bit value.
+> 
+> Would it be possible to use a setup_data entry of type SETUP_CC_BLOB
+> in bp->hdr.setup_data instead? There's already handling for that in
+> find_cc_blob_setup_data() so it should "just work".
 
-> The *real* problem, methinks, is that the directives are added in patch 4
-> of the series, but the documentation doesn't show up until later.  So
-> the real fix would be to simply move this patch down.  Or just not worry
-> about it, since it all works out in the end and nobody will be bisecting
-> a docs build.
+Hi Michael:
+	Thanks for your review. I will have a try. Hypervisor may set 
+cc_blob_address directly and so propose this.
 
-That is half the problem, the other is this:
 
-https://lore.kernel.org/r/0-v1-c80e152ce63b+12-kdoc_export_ns_jgg@nvidia.com
 
-Since even after the whole series the EXPORT_NS functions don't parse
-properly. I'm going to put this patch before the doc patch and ignore
-the bisection problem.
 
-I'd like someone to say they are happy with the perl :)
-
-Jason
