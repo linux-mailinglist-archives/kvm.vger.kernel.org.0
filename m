@@ -2,117 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8241B624A65
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 20:14:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D0996624A78
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 20:19:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230142AbiKJTOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 14:14:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56762 "EHLO
+        id S231157AbiKJTTQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 14:19:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230032AbiKJTOE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 14:14:04 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAF41275DB
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 11:14:03 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9541EB82314
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 19:14:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CC41C433C1;
-        Thu, 10 Nov 2022 19:14:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668107641;
-        bh=T79CFtYcyb6c1mZV9P2/O70KOCeYCcKUaMZB5RbWzdg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=M71ylMGIDoqohUmZgQHkfUullJTju+MiiJxtGl2+/DK3+Qe5lxPAOrA0bVmDx8pME
-         TObqBbsw343dZSNcM+pdNcOA2W8p7uCF8r/VeNwnIb8aG8eSRO1hHzUb9G+ASqce+m
-         CsOmTLmoxv+Ca+xzaCi56t1cLcxbQ+RGppq5plgPxP4kJJP7l46E/O1C8oOXHrIc4A
-         QFbnsFVJpTwQ6zWpp84hWIWB/6XtPto7eP5f+LIlpRImONfGI/zz9i+DlZNBJQWJn4
-         +5SqLoaK/TFPwCCUDIdcoeam5e7EQDyTmFYy3IFrrsQZFo6WP+bms9uIc3S/UBbkY1
-         pONGyRuYZrC/g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1otCzu-005Ekr-OL;
-        Thu, 10 Nov 2022 19:13:58 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     andrew.jones@linux.dev, kvm@vger.kernel.org,
-        Ricardo Koller <ricarkol@google.com>, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu
-Cc:     bgardon@google.com, oupton@google.com, reijiw@google.com,
-        pbonzini@redhat.com, eric.auger@redhat.com, rananta@google.com,
-        axelrasmussen@google.com, alexandru.elisei@arm.com,
-        dmatlack@google.com, seanjc@google.com
-Subject: Re: [PATCH v10 00/14] KVM: selftests: Add aarch64/page_fault_test
-Date:   Thu, 10 Nov 2022 19:13:53 +0000
-Message-Id: <166810762188.3361918.17667021556485650781.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221017195834.2295901-1-ricarkol@google.com>
-References: <20221017195834.2295901-1-ricarkol@google.com>
+        with ESMTP id S229757AbiKJTTO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 14:19:14 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2059.outbound.protection.outlook.com [40.107.220.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B9FC7655;
+        Thu, 10 Nov 2022 11:19:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cWzUGtpJgTF7wR04g9NYSt56Ylw3f6BP+g4rZK4p0xVtUJKsEgW/zNj+pyHKLXvuaRHuH4rDwQfa6qYhYM9uH3F2ND7mscZ6CLCzesnKRmwfVN3MDJHyoLLvvoLJosDNQ1KNzbfiyzIvxMjFVTjGtKOhIebUd2Gxc86eOa+oEuKSoM/bA3XFRAO3rQPcIpQfrNeZYkyl+CWFksWVF/FMvYGTQoPky1zW9QsRyAO70fBvVjvusEmfHoGu9/YNxXrRyVUgNZnyMR6NyoZKFe0YjC8WesO7t+lTIKhXzhETa9sioZQWeDxAiWgoKNy7J3WxRtcN5LqC8xE4/gMN7ftdjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aTBjqopfkP2iYv3rIuTb2Aw1BThon7runQkBpsK9mA0=;
+ b=SvvWF+zG/a3NVSPw39ImlhRK0lsEGN6XlUr11GZnjF3098lMIq5Bzx+Vmnljob7z+6QLygkF0SouilnNqD+20VEGyjsVGcxGtmP/qR0wDr/QYJPLf0eLEotPQos7iMGh9tRzdRFITrGM7fnpn+TkC25fG+KFsiOW2VrtowJ/7WIWRlW7denjrleGG957lgoYbDBposhjHWzITj50pAvNwHdILfaO03q/8QwtgDFwdfitVLFj15pegxmjhNty333q5K2r/oqHHyXC/zjJiA5xnjg7wSRkRuKSFi1kazxJXNux6iZMKX6xoE20xkxAl087aB7s1wHaIDBtNBAT5kk3XQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aTBjqopfkP2iYv3rIuTb2Aw1BThon7runQkBpsK9mA0=;
+ b=Wh+FFSZh4gg1/VsEhaf+4fPwGA9POxfU4Yh9aPyu/FA+Nd1N76qk1Zn7epLyNK9GVaZhQhT8tSqTrlWl7S9mfR+eHwoj8xclm9ZqjtJ2gahIWJpPfevA0RTk1al4WtzcshduMmpKGlZzkwwJeMEOUibEltjNoqZYdlNDW+MqXeaHk4rS5Tqaa4Af8iJel35sRw+LHR5pn+/V8qZ2sU0QQ1uki270CbybUo/jD9hExHTxF1yI1uoGg4/4hA0oEQwxxVtW9DSjQ109YQ5snV2LZOtv5YhpZxmaMs8d6qVEuQF9fKmYCzkr6UNvnvLoZNTdtG7kz4EamrjmA7X7JMqOQA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SJ1PR12MB6052.namprd12.prod.outlook.com (2603:10b6:a03:489::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Thu, 10 Nov
+ 2022 19:19:09 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%7]) with mapi id 15.20.5791.027; Thu, 10 Nov 2022
+ 19:19:09 +0000
+Date:   Thu, 10 Nov 2022 15:19:08 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
+        dri-devel@lists.freedesktop.org,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Longfang Liu <liulongfang@huawei.com>,
+        linux-s390@vger.kernel.org, Yi Liu <yi.l.liu@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Will Deacon <will@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Halil Pasic <pasic@linux.ibm.com>, iommu@lists.linux.dev,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org, Zhi Wang <zhi.a.wang@intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: Re: [PATCH 04/10] vfio: Move storage of allow_unsafe_interrupts to
+ vfio_main.c
+Message-ID: <Y21OrMoVW/x84qkX@nvidia.com>
+References: <Y1wiCc33Jh5QY+1f@nvidia.com>
+ <20221031164526.0712e456.alex.williamson@redhat.com>
+ <Y2kF75zVD581UeR2@nvidia.com>
+ <20221107081853.18727337.alex.williamson@redhat.com>
+ <Y2klGAUEUwpjWHw6@nvidia.com>
+ <20221107110508.7f02abf4.alex.williamson@redhat.com>
+ <Y2lSZwNT8f/RMoZf@nvidia.com>
+ <20221108155520.4429c2e5.alex.williamson@redhat.com>
+ <Y2r80RgytKpPtK58@nvidia.com>
+ <20221109112822.7a8c5f7a.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221109112822.7a8c5f7a.alex.williamson@redhat.com>
+X-ClientProxiedBy: BLAPR03CA0168.namprd03.prod.outlook.com
+ (2603:10b6:208:32f::6) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: andrew.jones@linux.dev, kvm@vger.kernel.org, ricarkol@google.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, bgardon@google.com, oupton@google.com, reijiw@google.com, pbonzini@redhat.com, eric.auger@redhat.com, rananta@google.com, axelrasmussen@google.com, alexandru.elisei@arm.com, dmatlack@google.com, seanjc@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ1PR12MB6052:EE_
+X-MS-Office365-Filtering-Correlation-Id: 12268162-4f3d-416d-90f8-08dac3507141
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RQQRDG37XMLx2c3C9YMUdn5HG0jmhWQgodFg+Sc7JCdMfJc8VT1yusnkYHjyrcOIdF9PzlgIZpZojC1KJiCzYTt8xroWx0XF8RST1O73gI//QwC0bRt/L3H3uHQXVaSh1DLaLp8/QQd+QXd43dGmyZjSUkwfLTqPwtnWXV0htdQpu85Qj6QALUcQee5jHgr9flr3Zc6+FSbqHtIf6CI2CbzsS4R+6oEHaLiFa15Ig5G1cFCtiBcJwBS1A8qSE79FuN7ZKkEKdsnnuio5C+UojqxsjTTV2SKb2ASsXDNo7K57RSi//uEA48zEoOAvMQICu59EVESgCtjl+2ctBm8zETyEDgiz58ySPgeJqWb4xjP+MrtGQgPp8Uv7hAeCzuQdAWunat/RGc7QKt2qhg2o7Kao67ekI2VnxkbgQv1NuZMVJHasVTfMStwEnG3P7+TzJJfLZy6CkR3RinWmk6v6NIMjAUxa7QmTqAfZIr3GDZvArzo7ag+7MfyWxXKlgW5MRDK++upxSDKiwsREG5Jqxn25htDK1/p3mkhLxPFjQXxO8XniTyqjGZRf6wm7pJJ9ipMurjPd8ou419yji9UhwR8daR2VKBtl/6/AjOZkneeurwSij1NTh5MqKQTMKplNw55m75kT18J3vBRfe1kHGq2A0jvoN0pixKq68SZM2YAUhpQZ373iT8FGl/oDYEFa4KUruU1O9TggtrovWS7UnQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(39860400002)(376002)(366004)(346002)(451199015)(41300700001)(2906002)(54906003)(66946007)(4326008)(6916009)(8676002)(316002)(66476007)(66556008)(6486002)(36756003)(38100700002)(7416002)(8936002)(186003)(478600001)(83380400001)(6512007)(7406005)(26005)(5660300002)(6506007)(86362001)(2616005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?EPc3QBCu5Z3+C63oUEZZ+2TSUPcspMygtP/4Y3AiHrovjwc5hL7bd2YMYAbc?=
+ =?us-ascii?Q?h7er+Ewfk/gme0fr0KhVsb55T+SxlAyPyH/zGMT1nlM1fYDJ9mM8TFlgsTIb?=
+ =?us-ascii?Q?ceVVLCBtlEp/XCwSgmt8DRuQlFqPHXiNTIAnWOp7DIuAqpqOeUMWIQbz6Kdl?=
+ =?us-ascii?Q?DXOsN4Dos05rCux/feY4MKT9U7aykNlM7T3UETQw2Z+t4GRvNmdF2/2ONz7v?=
+ =?us-ascii?Q?Y2OfI/oCEh5h7EH+FWGkZtivx6jdchVMJfGhAf02ytWnC+LzPyOertlqZxQz?=
+ =?us-ascii?Q?UQpL+75GRkdTBGuFwo3NpFL4+X7A7zyk7X07qVZdtJpqlPM4T9ZVzJLoObKf?=
+ =?us-ascii?Q?uTlhGcHI3vn28DtcLCvnQSrWa3ZujPzjwc93uuUtCiOg15sCmQV6OjsS6fOF?=
+ =?us-ascii?Q?CiKDQGwG2F4BYfQi7wtFMNZJ9Ylvo4rNU0RFqM5f1QwdJE2jt9bw1vrOXtyA?=
+ =?us-ascii?Q?fxcJPmLabw511lXwCJ7I/UahJOHSkH5L289AxmnVyl1gxVhxV8o2yqAxF6EA?=
+ =?us-ascii?Q?q6KZM+KHXGk4yMaB3f17Lxa+AFKrtPd0yYYtL2UCqE6BcH+9ytMBec+nTqtZ?=
+ =?us-ascii?Q?gLFSmjWE9FXNWsQd2XMFAw/y/Fe+o0rnmOotMfzPE+mBAgyLh+8N6rtt0h8x?=
+ =?us-ascii?Q?+PIvtMNyg8o0EsoO/QT5hHCF9B8raFXC/p6mh9z3Rh1NAEELHysDjR2+YdtR?=
+ =?us-ascii?Q?c+lDUSmGWrJ/Onz5jqG6b6KRbMU2COHYYc5j1HbCaicb3jBZcxX7jfDZYsO1?=
+ =?us-ascii?Q?5YRyEfWPFf+diqLYYMdL6dR7cKdPykgRenCSPq/rHQ6e0MxqZEYyMMt5dfBg?=
+ =?us-ascii?Q?uRdXAP41avbEkG/nKzBPkBUpn0NVXO72P2CKP5gWuxCNypDg8+Kf5RZ5r+KK?=
+ =?us-ascii?Q?Ol0iMb7ZhtqKW9fBnihxQlyKnRNwfjALjOWIAhDv+7TfqoEJGl2fjxFytrfC?=
+ =?us-ascii?Q?jtRseIkH1S9HPBGGuhmWtqGUKX2WhfXHgBsL0OFBTO2Ye0IKYSSiI3wrlhLJ?=
+ =?us-ascii?Q?wxu/jyEpviEADe8O6wGVWwYqfg/X/MsMkIlmHtAGdwgTxKm5eneb7+eN9Kxz?=
+ =?us-ascii?Q?Vy/2+FnTHqEuksddwbe7qv8GDcf9sihddYiVmXrO3WALfs8QXAo4jPJIj6O2?=
+ =?us-ascii?Q?l6DCz/UGZ4TEIzICngGvgLIZY1fJRpLouZD3F06oB/YOyt8fWyvJ5hnxG3xL?=
+ =?us-ascii?Q?fuh54yJAtPASxOjQrdE7IGwu/4pLE+W6U8Dc8CFMkRZL7SjGLeRhigLMu/9g?=
+ =?us-ascii?Q?JPHO1//tK9bu/+rr/2W+IXNMLD2V9Pp1d8PqMwb73FHmMyl2iIHF7bsAxkfy?=
+ =?us-ascii?Q?oKzQC/GUTfBgH5KKjUOOXAPHwMevDLS9EzQZgH4HaTVdv6GCYVkQKEzkPwgh?=
+ =?us-ascii?Q?5gK4mliuXfzRgP7Uph8RXZsJaWrI3imUJ/SBD2M02p5QUQWVhjHug35osPpW?=
+ =?us-ascii?Q?lhg/caMsseTwAxe2x4DDKRU6ASBL2WJfnk704xXKNDfqaDXCa3H7s3ElN+9R?=
+ =?us-ascii?Q?3Sp7nsnNdVCJUyY6BUsyIcU7wnNJPKRn53C4jzzOyQ1R6abvN2CfwRRDeIax?=
+ =?us-ascii?Q?olO3N1a5VEkwcGJ2LuY=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 12268162-4f3d-416d-90f8-08dac3507141
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2022 19:19:09.5031
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KhIS4XsQ1mYSxKJe1cs0owUJGnvDFtl0EEw55K40eHW8SZ/qUDrZA8OeY+ktEGdR
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6052
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 17 Oct 2022 19:58:20 +0000, Ricardo Koller wrote:
-> This series adds a new aarch64 selftest for testing stage 2 fault handling
-> for various combinations of guest accesses (e.g., write, S1PTW), backing
-> sources (e.g., anon), and types of faults (e.g., read on hugetlbfs with a
-> hole, write on a readonly memslot). Each test tries a different combination
-> and then checks that the access results in the right behavior (e.g., uffd
-> faults with the right address and write/read flag). Some interesting
-> combinations are:
+On Wed, Nov 09, 2022 at 11:28:22AM -0700, Alex Williamson wrote:
+> > > > I'd be much more comfortable with this as a system wide iommufd flag
+> > > > if we also tied it to do some demonstration of privilege - eg a
+> > > > requirement to open iommufd with CAP_SYS_RAWIO for instance.  
+> > > 
+> > > Which is not compatible to existing use cases, which is also why we
+> > > can't invent some way to allow some applications to run without CPU
+> > > mitigations, while requiring it for others as a baseline.  
+> > 
+> > Isn't it? Didn't we learn that libvirt runs as root and will open and
+> > pass the iommufd as root?
 > 
-> [...]
+> We're jumping ahead to native iommufd support here, what happens when
+> VFIO_CONTAINER=n and it's QEMU opening the fds, with only file access
+> privileges?
 
-Applied to next, thanks!
+Yes, but I am thinking aloud about how to best to do this in native
+iommufd modes.
 
-[01/14] KVM: selftests: Add a userfaultfd library
-        commit: a93871d0ea9fd59fb5eb783619334183d7f07f51
-[02/14] KVM: selftests: aarch64: Add virt_get_pte_hva() library function
-        commit: 228f324dc718f702e8777164c4e2e7426824fb13
-[03/14] KVM: selftests: Add missing close and munmap in __vm_mem_region_delete()
-        commit: b6b03b86c0250a80b671313dbc0d7bcdbab78f41
-[04/14] KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1 using sysreg.h macros
-        commit: 41f5189ea9c08f7fc28340a7aefc93d0d2dcb769
-[05/14] tools: Copy bitfield.h from the kernel sources
-        commit: 590b949597b1e811d35df2f32021dd17d8e47f8c
-[06/14] KVM: selftests: Stash backing_src_type in struct userspace_mem_region
-        commit: bd3ed7e1a47eb7b3838ca09439f1eb289ec3be1f
-[07/14] KVM: selftests: Add vm->memslots[] and enum kvm_mem_region_type
-        commit: 290c5b54012b7f05e9c51af32d557574bf69a654
-[08/14] KVM: selftests: Fix alignment in virt_arch_pgd_alloc() and vm_vaddr_alloc()
-        commit: 5485e822e31a75dfac3713d94b6b22025d4895da
-[09/14] KVM: selftests: Use the right memslot for code, page-tables, and data allocations
-        commit: 1446e331432d7f24ed56b870ad605a4345fee43f
-[10/14] KVM: selftests: aarch64: Add aarch64/page_fault_test
-        commit: 35c5810157124cb71aaa939cd2d5508192714877
-[11/14] KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
-        commit: 3b1d915659c64dce079f4926a648f2271faea008
-[12/14] KVM: selftests: aarch64: Add dirty logging tests into page_fault_test
-        commit: a4edf25b3e25656c69cbc768d1c704868e4a616f
-[13/14] KVM: selftests: aarch64: Add readonly memslot tests into page_fault_test
-        commit: 45acde40f538a30e759f3b3f4aa5089edf097b2f
-[14/14] KVM: selftests: aarch64: Add mix of tests into page_fault_test
-        commit: ff2b5509e1d252cd18bb1430b5461d5044701559
+> > I think so. At least you should have something to shut down an
+> > insecure feature in kernel lockdown modes. CAP_SYS_RAWIO is a simple
+> > way to do it.
+> 
+> How are CPU vulnerabilities handled in lockdown mode, do apps require
+> certain capabilities to run fast vs safe, or do we simply disallow
+> unsafe globally in lockdown?  I think we have a lot more leniency to
+> ignore/disallow flags that enable global insecurities when any sort of
+> lockdown is imposed.
 
-Cheers,
+The CPU things are all information leaks from the kernel to
+userspace. lockdown is about preserving kernel operating integrity -
+eg preventing modification of hijacking of the running kernel.
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+So, like you say below, this is kind of in between, it is not
+information leakage, and it is is hopefully not an integrity issue.
 
+Being more of a DOS maybe it is fine under the lockdown scenarios. At
+least I am happier to hear that.
 
+> > vfio-iommufd seems like overkill, I think your first suggestion to put
+> > in vfio.ko was more practical.
+> 
+> Convenient perhaps, but architecturally the wrong place for it.
+
+Ah, that is pretty subjective. If the architecture is that the iommufd
+user subsystem opts-in to this insecurity then it is an OK place
+
+If it is that iommufd sets it globaly for the whole system it is the
+wrong place.
+
+We could also talk about a per-vfio_device sysfs to control this? Then
+we can make the sysfs only appear for vfio_devices using the
+iommu_domain part of iommufd/vfio. That has a nice sort of compat
+shape as we can make the existing module option default the sysfs to
+insecure
+
+Jason
