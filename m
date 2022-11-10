@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 18BC3623904
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:41:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECA13623905
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:41:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232312AbiKJBlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 20:41:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39970 "EHLO
+        id S231449AbiKJBlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 20:41:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232356AbiKJBlB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 20:41:01 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97BFB275C2
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 17:41:00 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id k15so470136pfg.2
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 17:41:00 -0800 (PST)
+        with ESMTP id S229806AbiKJBlD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 20:41:03 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F305F26ADF
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 17:41:02 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id v4-20020a17090a088400b00212cb0ed97eso360752pjc.5
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 17:41:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=o+09jyLU6lDhuNs5pMZSMI1gUeLpq4TEKRbF8Z7vfAE=;
-        b=quGu/dIyNoNYfoUaLOnhPpC6Drh6MzlOQVIRdx+/tN9n66ne2Y2jhdye0zFUICK7Os
-         L+ggQFPVgGPzF0xL53MmKLhsT24S5NwvyPVRXeu3zeQdUsNQ+T5FVrid56SVQRqej6JU
-         ugxRe8Cpp30PV0h7NJfND2HeYo/UhyY+TLVyjzeCoHi3+hzOzg2O/qa7yf8PoAAYFUMj
-         /QSiFaYXnnf5GaoCxd3K9IY4Rn7eoWBCbTzQHkh+xqnoQIbQHqcLnq2zt0qBpZiQWX+s
-         5ZLdDiQg35w0yltAiV3gitf/aYAunI0+QZKrfCmD3w5jYbH0l/Lk4Q+SEnWrBMZ6qHTr
-         1UlA==
+        bh=pwT50tglKE+MepvfiCbo0G+dkcZKB4IaKAiycehi8Ik=;
+        b=mYNV32i26BJCNdBwFgU6MnJMup/CdKVESp/2YW1JfIFAmBJcuchMruzI80M0Jxi6cN
+         wi0CXaShYRe/x9f7qbTbzHDQNV0oXFr1vX6EvpsbsUIGtG5nm1sMpTCuLhi0Gpzy1+OC
+         jK7IkRnHRC+uyjCfJ/7rO2cxrQPOi2UgG3cMWasePxaJuSsfyS2tZoBOeoiJ5ItSAxTS
+         htN/sPRr1d1nYLVGQ2F5dnxBepqgIsxE/4ioPpxFSYi7m4WYskPTjXwQx/jRl9OjgKN0
+         O031uRav2POLk7BeUZFzusas8gl6Yuqssz7qV4/Oy+kKZQrzCbdpa0tiiRkWTZkvzWhF
+         fyyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=o+09jyLU6lDhuNs5pMZSMI1gUeLpq4TEKRbF8Z7vfAE=;
-        b=j7njg8mlvbDDRYVfvYGWbYmX7wxSY+IdBSBnQlAg1gVkQun+/05/1Q56f0drF+1Nje
-         YHKXca6e7wxZBSqRhpmIH1gMiabeh2u5BCUn/9QeY0Dp0b4ZIdzKQQArEDrTU+xyjnKS
-         5yomDwmRzwz+QckoT4Qv04hANV+fynevrmgz4rqhEdNpfbA5NQ4XJ11q2cFtuzDm3oW7
-         7U7Rp7dr3WFszyUBt3KZgZNJ8BdU9hh/N3qF8ujOp0hmEjXQEtKiPhAAfzGLOQX6k5Wn
-         zu1Td9rqLsRT4e+8tQVHOGU41uuI4wZ4ZkN45LkvVUFBLNjaNbFtMvauGyd07P/o5F95
-         T80w==
-X-Gm-Message-State: ACrzQf0d2WMu9jIP0nJYQvgdF3xXhBjCZ0IpcKQOrcmr5LgvjWAvU9cg
-        EbDqgE4l3xRjjHcb0XRGnGz7c5M3qkUfnw==
-X-Google-Smtp-Source: AMsMyM5GBPV0dHnu0qo+eAe5l/VAmWFRds6l8diPV/W5VpWGrDHyAmKIM0csPNEnbAEMrJSaxfCuZg==
-X-Received: by 2002:aa7:9145:0:b0:556:d001:b830 with SMTP id 5-20020aa79145000000b00556d001b830mr1570995pfi.62.1668044459914;
-        Wed, 09 Nov 2022 17:40:59 -0800 (PST)
+        bh=pwT50tglKE+MepvfiCbo0G+dkcZKB4IaKAiycehi8Ik=;
+        b=1T85HzgKjI7z6qqzg8IA3Ep7HfSrhhoMNL9QLAqEOJ6D14B3XvDWiBdYlRpeE6Fwhs
+         r+ecm+WaGZRLcqKO+Ls3AGxxaE5oqKofHeJ3wLZQwIsw+XgHQlgvTktr5m0gVx5xY4di
+         dHyHjrjyVuHQXwjReKC3tR3b76uq7T9Vye+VbHtLLX9Bq+lkxd+QJTcuYz8YhApnbDRk
+         3AfEme2W+VohbySsj5IaHYVyLzqIlUjfkFinuFz7eQS1cg6DAdVzrILJiCIvdAIGJHwv
+         pMN90+4qtZ39vWATnXW0XWqIJJkc8bCsPpN6m1HKSAiKGTG+4/qrKoeK4V/NwcBI1FuE
+         jfkQ==
+X-Gm-Message-State: ACrzQf0/KattfrtF5s6ZS6mwTllhxN42EJjyMV1BxJ+gkcfMqPGHKWb6
+        5STa91Nhx3lj82uWkvLbdxT15ZIo4iweog==
+X-Google-Smtp-Source: AMsMyM7U9BCksOXtpVUhG0K6a5oUQ/EAQCoNj97xPijocpst7A4L0xLdJGYt3SBgy/PZg7ykPUJeOg==
+X-Received: by 2002:a17:903:32cb:b0:187:4b3a:15f3 with SMTP id i11-20020a17090332cb00b001874b3a15f3mr40560524plr.5.1668044462383;
+        Wed, 09 Nov 2022 17:41:02 -0800 (PST)
 Received: from crazyhorse.local ([174.127.229.57])
-        by smtp.googlemail.com with ESMTPSA id pj4-20020a17090b4f4400b00212cf2fe8c3sm3091836pjb.1.2022.11.09.17.40.59
+        by smtp.googlemail.com with ESMTPSA id pj4-20020a17090b4f4400b00212cf2fe8c3sm3091836pjb.1.2022.11.09.17.41.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Nov 2022 17:40:59 -0800 (PST)
+        Wed, 09 Nov 2022 17:41:01 -0800 (PST)
 From:   Anthony DeRossi <ajderossi@gmail.com>
 To:     kvm@vger.kernel.org
 Cc:     alex.williamson@redhat.com, cohuck@redhat.com, jgg@nvidia.com,
         kevin.tian@intel.com, abhsahu@nvidia.com, yishaih@nvidia.com
-Subject: [PATCH v6 2/3] vfio: Export the device set open count
-Date:   Wed,  9 Nov 2022 17:40:26 -0800
-Message-Id: <20221110014027.28780-3-ajderossi@gmail.com>
+Subject: [PATCH v6 3/3] vfio/pci: Check the device set open count on reset
+Date:   Wed,  9 Nov 2022 17:40:27 -0800
+Message-Id: <20221110014027.28780-4-ajderossi@gmail.com>
 X-Mailer: git-send-email 2.37.4
 In-Reply-To: <20221110014027.28780-1-ajderossi@gmail.com>
 References: <20221110014027.28780-1-ajderossi@gmail.com>
@@ -71,55 +71,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The open count of a device set is the sum of the open counts of all
-devices in the set. Drivers can use this value to determine whether
-shared resources are in use without tracking them manually or accessing
-the private open_count in vfio_device.
+vfio_pci_dev_set_needs_reset() inspects the open_count of every device
+in the set to determine whether a reset is allowed. The current device
+always has open_count == 1 within vfio_pci_core_disable(), effectively
+disabling the reset logic. This field is also documented as private in
+vfio_device, so it should not be used to determine whether other devices
+in the set are open.
 
+Checking for vfio_device_set_open_count() > 1 on the device set fixes
+both issues.
+
+After commit 2cd8b14aaa66 ("vfio/pci: Move to the device set
+infrastructure"), failure to create a new file for a device would cause
+the reset to be skipped due to open_count being decremented after
+calling close_device() in the error path.
+
+After commit eadd86f835c6 ("vfio: Remove calls to
+vfio_group_add_container_user()"), releasing a device would always skip
+the reset due to an ordering change in vfio_device_fops_release().
+
+Failing to reset the device leaves it in an unknown state, potentially
+causing errors when it is accessed later or bound to a different driver.
+
+This issue was observed with a Radeon RX Vega 56 [1002:687f] (rev c3)
+assigned to a Windows guest. After shutting down the guest, unbinding
+the device from vfio-pci, and binding the device to amdgpu:
+
+[  548.007102] [drm:psp_hw_start [amdgpu]] *ERROR* PSP create ring failed!
+[  548.027174] [drm:psp_hw_init [amdgpu]] *ERROR* PSP firmware loading failed
+[  548.027242] [drm:amdgpu_device_fw_loading [amdgpu]] *ERROR* hw_init of IP block <psp> failed -22
+[  548.027306] amdgpu 0000:0a:00.0: amdgpu: amdgpu_device_ip_init failed
+[  548.027308] amdgpu 0000:0a:00.0: amdgpu: Fatal error during GPU init
+
+Fixes: 2cd8b14aaa66 ("vfio/pci: Move to the device set infrastructure")
+Fixes: eadd86f835c6 ("vfio: Remove calls to vfio_group_add_container_user()")
 Signed-off-by: Anthony DeRossi <ajderossi@gmail.com>
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 ---
- drivers/vfio/vfio_main.c | 13 +++++++++++++
- include/linux/vfio.h     |  1 +
- 2 files changed, 14 insertions(+)
+ drivers/vfio/pci/vfio_pci_core.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 9a4af880e941..6e8804fe0095 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -125,6 +125,19 @@ static void vfio_release_device_set(struct vfio_device *device)
- 	xa_unlock(&vfio_device_set_xa);
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index badc9d828cac..e030c2120183 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -2488,12 +2488,12 @@ static bool vfio_pci_dev_set_needs_reset(struct vfio_device_set *dev_set)
+ 	struct vfio_pci_core_device *cur;
+ 	bool needs_reset = false;
+ 
+-	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
+-		/* No VFIO device in the set can have an open device FD */
+-		if (cur->vdev.open_count)
+-			return false;
++	/* No other VFIO device in the set can be open. */
++	if (vfio_device_set_open_count(dev_set) > 1)
++		return false;
++
++	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list)
+ 		needs_reset |= cur->needs_reset;
+-	}
+ 	return needs_reset;
  }
  
-+unsigned int vfio_device_set_open_count(struct vfio_device_set *dev_set)
-+{
-+	struct vfio_device *cur;
-+	unsigned int open_count = 0;
-+
-+	lockdep_assert_held(&dev_set->lock);
-+
-+	list_for_each_entry(cur, &dev_set->device_list, dev_set_list)
-+		open_count += cur->open_count;
-+	return open_count;
-+}
-+EXPORT_SYMBOL_GPL(vfio_device_set_open_count);
-+
- /*
-  * Group objects - create, release, get, put, search
-  */
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index e7cebeb875dd..fdd393f70b19 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -189,6 +189,7 @@ int vfio_register_emulated_iommu_dev(struct vfio_device *device);
- void vfio_unregister_group_dev(struct vfio_device *device);
- 
- int vfio_assign_device_set(struct vfio_device *device, void *set_id);
-+unsigned int vfio_device_set_open_count(struct vfio_device_set *dev_set);
- 
- int vfio_mig_get_next_state(struct vfio_device *device,
- 			    enum vfio_device_mig_state cur_fsm,
 -- 
 2.37.4
 
