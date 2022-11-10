@@ -2,75 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B3B262434C
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 14:34:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FD4A62434D
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 14:34:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229960AbiKJNeS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 08:34:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52614 "EHLO
+        id S230043AbiKJNeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 08:34:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229869AbiKJNeQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 08:34:16 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F24A29348
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 05:34:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668087255; x=1699623255;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=LtPqHvmuWic76sbnvozsbBdlM1v91QAQMFuoC+fVIbg=;
-  b=JHLXsT2DTr2EdTidt4txA/9HH/FWfaoqgscrxgquIccwG7PK+fGLEYuX
-   EZ3QhjDmO+FTLRPFA+6OOwgPm1QEAo2/PKamQDt+0vbGtbFEbBFAsPdDK
-   LEEAD9Iae/SFKp16dB1Ko46TggGfE3G9R1yDT4gIXk2gwOyNKpCt4b+6S
-   yPpiNJRg6oeehsht1El38TNGFCFpZZ2AC+q9A6pv++benFdYu8xA1CM7h
-   I44QKiXgJKnxx5cHSZj6OPo/p1j3g2S0FyH98KixagZARc4/01MWAOZkP
-   vggflg5LWMXsBB086iEQX6zRVpiglxtzJlHbBhJuxqtg9gDBJw+22mJ5o
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="310021251"
-X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
-   d="scan'208";a="310021251"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 05:34:15 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="966409935"
-X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
-   d="scan'208";a="966409935"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga005.fm.intel.com with ESMTP; 10 Nov 2022 05:34:14 -0800
-Message-ID: <962e4c3181f2018cd139ea8709025ab8771a3a4a.camel@linux.intel.com>
-Subject: Re: [PATCH v2 8/9] KVM: x86: When guest set CR3, handle LAM bits
- semantics
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     pbonzini@redhat.com, seanjc@google.com,
-        kirill.shutemov@linux.intel.com
-Cc:     kvm@vger.kernel.org
-Date:   Thu, 10 Nov 2022 21:34:13 +0800
-In-Reply-To: <20221110132848.330793-9-robert.hu@linux.intel.com>
-References: <20221110132848.330793-1-robert.hu@linux.intel.com>
-         <20221110132848.330793-9-robert.hu@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229874AbiKJNeV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 08:34:21 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 343D81FCE3
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 05:34:20 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id DBFCDB821AC
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 13:34:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B112C433D6;
+        Thu, 10 Nov 2022 13:34:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668087257;
+        bh=CxU5CLs5OzAY7rGv18GgAC+P9XrarCRDN5MlMlNYwc0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Ig3W1MeBQMrSMV0bQOlZ63AAFX/0x05D4mvVeQpGUSLykXvxa4WbCPvHWf9WbSWGq
+         7mwKiCYgBH0guWQT0Yo2Z/ZvIo9tX+gqnQfcg/hOktDB5keIM66X2DFpRImUKuaBQB
+         y27td9nyeWERrxZ37BcQoHZTEnlW9hk3sR4MI8NZ1AADpwt2CWZVZ9XJY+nEb4z/R0
+         3qD4ZtDye4MjatDM8IL8SIWKZD3UkhdrRCW9Sxhc0q9Amnk6q+uWgjcBkRwxMInt/O
+         WIiERHFhc8sJeSbcpVr2PRLHAWGOrzV6h9xhIg0ok0I1A929w+P3gKpZizpHX1VMKq
+         SPbynZR5N5kBA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ot7h9-005A9N-90;
+        Thu, 10 Nov 2022 13:34:15 +0000
+Date:   Thu, 10 Nov 2022 13:34:14 +0000
+Message-ID: <86mt8zorvt.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Quentin Perret <qperret@google.com>,
+        Gavin Shan <gshan@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
+In-Reply-To: <CANgfPd9fynvsBLjio1zz0hPy4SGAd8XZfzYQaR_gg0UJrOyAcA@mail.gmail.com>
+References: <20221107215644.1895162-1-oliver.upton@linux.dev>
+        <20221107215644.1895162-9-oliver.upton@linux.dev>
+        <CANgfPd9fynvsBLjio1zz0hPy4SGAd8XZfzYQaR_gg0UJrOyAcA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: bgardon@google.com, oliver.upton@linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, reijiw@google.com, ricarkol@google.com, dmatlack@google.com, qperret@google.com, gshan@redhat.com, peterx@redhat.com, will@kernel.org, seanjc@google.com, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-11-10 at 21:28 +0800, Robert Hoo wrote:
-> When only changes LAM bits, ask next vcpu run to load mmu pgd, so
-> that it
-> will build new CR3 with LAM bits updates. No TLB flush needed on this
-> case.
-> When changes on effective addresses, no matter LAM bits changes or
-> not, go
-> through normal pgd update process.
+On Wed, 09 Nov 2022 22:25:38 +0000,
+Ben Gardon <bgardon@google.com> wrote:
+> 
+> On Mon, Nov 7, 2022 at 1:57 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > Use RCU to safely walk the stage-2 page tables in parallel. Acquire and
+> > release the RCU read lock when traversing the page tables. Defer the
+> > freeing of table memory to an RCU callback. Indirect the calls into RCU
+> > and provide stubs for hypervisor code, as RCU is not available in such a
+> > context.
+> >
+> > The RCU protection doesn't amount to much at the moment, as readers are
+> > already protected by the read-write lock (all walkers that free table
+> > memory take the write lock). Nonetheless, a subsequent change will
+> > futher relax the locking requirements around the stage-2 MMU, thereby
+> > depending on RCU.
+> >
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 49 ++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/hyp/pgtable.c         | 10 +++++-
+> >  arch/arm64/kvm/mmu.c                 | 14 +++++++-
+> >  3 files changed, 71 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index e70cf57b719e..7634b6964779 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -37,6 +37,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
+> >
+> >  typedef u64 kvm_pte_t;
+> >
+> > +/*
+> > + * RCU cannot be used in a non-kernel context such as the hyp. As such, page
+> > + * table walkers used in hyp do not call into RCU and instead use other
+> > + * synchronization mechanisms (such as a spinlock).
+> > + */
+> > +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
+> > +
+> >  typedef kvm_pte_t *kvm_pteref_t;
+> >
+> >  static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
+> > @@ -44,6 +51,40 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
+> >         return pteref;
+> >  }
+> >
+> > +static inline void kvm_pgtable_walk_begin(void) {}
+> > +static inline void kvm_pgtable_walk_end(void) {}
+> > +
+> > +static inline bool kvm_pgtable_walk_lock_held(void)
+> > +{
+> > +       return true;
+> 
+> Forgive my ignorance, but does hyp not use a MMU lock at all? Seems
+> like this would be a good place to add a lockdep check.
 
-Forgot to update commit message here. Should have removed "No TLB flush
-needed on this case".
+For normal KVM, we don't mess with the page tables in the HYP code *at
+all*. That's just not the place. It is for pKVM that this is a bit
+different, as EL2 is where the stuff happens.
 
+Lockdep at EL2 is wishful thinking. However, we have the next best
+thing, which is an assertion such as:
+
+	hyp_assert_lock_held(&host_kvm.lock);
+
+though at the moment, this is a *global* lock that serialises
+everyone, as a guest stage-2 operation usually affects the host
+stage-2 as well (ownership change and such). Quentin should be able to
+provide more details on that.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
