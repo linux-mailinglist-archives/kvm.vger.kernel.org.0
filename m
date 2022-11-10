@@ -2,64 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A672623B3F
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 06:29:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFA63623B43
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 06:30:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231298AbiKJF3j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 00:29:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51984 "EHLO
+        id S231960AbiKJFas (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 00:30:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbiKJF3f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 00:29:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94A0455BF
-        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 21:28:40 -0800 (PST)
+        with ESMTP id S229484AbiKJFao (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 00:30:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2D5A10FEE
+        for <kvm@vger.kernel.org>; Wed,  9 Nov 2022 21:29:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668058119;
+        s=mimecast20190719; t=1668058189;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FZ9yNZRWrzRVhGuUcnX8i46nuRNhbHXIg73hJkv2J6c=;
-        b=hdVx6xiIgl5fUZuWGyyUk0L5pVavpMdwx4jGzNDcqZcu3JGZibJymuaVKkgnfxV3wEB8WQ
-        p+/i+ntHxmpOLIIBDvZJJ14iqv/mdeGO9oeQ01q0LmThZDxZ7CVFphcjjSiznfduWSaJoQ
-        emLnzl9fC5GuiUg1ojBO8O3BwxmExNk=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=MIhAVnv+/+S3krzuCVUj1n9SXlWXtXtQLWkbB7aRrMc=;
+        b=D4RLn66022/jyC5WLiJqw29RNYwmm7xNputUcXAESkxiIcJVMFdEg9LfZ6gSwlp8JHPBwP
+        OJrAHYzGdc38sY6MC9+bH5SYcbS/R44K1TgvdH1Ra16B6ADoA2/LoAjquJDLvSCzxlZD6r
+        KrUdU1JltU3/xS/RCgMDKhx+uyLdehw=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-515-Z_wQxi4oOcOIXSAP9U09aA-1; Thu, 10 Nov 2022 00:28:38 -0500
-X-MC-Unique: Z_wQxi4oOcOIXSAP9U09aA-1
-Received: by mail-oi1-f199.google.com with SMTP id v129-20020acaac87000000b0035a4772703cso282875oie.14
-        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 21:28:38 -0800 (PST)
+ us-mta-18-aftOBiWGP9y0R1kP93UkSA-1; Thu, 10 Nov 2022 00:29:46 -0500
+X-MC-Unique: aftOBiWGP9y0R1kP93UkSA-1
+Received: by mail-oo1-f70.google.com with SMTP id h7-20020a4a6f07000000b0049f2024e47dso286927ooc.17
+        for <kvm@vger.kernel.org>; Wed, 09 Nov 2022 21:29:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FZ9yNZRWrzRVhGuUcnX8i46nuRNhbHXIg73hJkv2J6c=;
-        b=UQn/IUhXVseQiRgVNbDGLP9ib91LYHx/ZwGRV9VAUplMNUwbIWKNJ6E9Aiz4Ac2WHZ
-         MiLeD+Q7I+1JMAki5dxGTUPwswOrdg4qDhFvar66efTSZD/8vMTqf1SjX/B/tXK7ProT
-         oqhGBi6E8pEqT8RMoL3k8uaCqqLChfUqMStzsFJJFjUfWQIV2jJRQgU3QCAWQldkA8J1
-         Kkyx2hPRmswZBYiuawWmMgEfxEt+ehStB4XttXgDdh7aZmEZ+iMeRWqarvPjXvRHaiwi
-         OQZJHt+EucvJdueWp6BG9taAL5l4YT3mdRhf4RGusm4QukEKcIc6/OJZY6npX6vPjHgN
-         vePA==
-X-Gm-Message-State: ACrzQf15WOKytuljabKBj9ZGvhnLkYQzJZVVG+zCyPKnuI66fN6gxSub
-        RCzoKZ165lptmaoE2MW5wM8Jlakkc6cb+/+/FDiBLhazRiqOnFFpqo9mQSHc00gSuiNiVqDPgp8
-        fGHmUw0C+SmTosFn1qhTmmfrrKyOh
-X-Received: by 2002:a05:6871:54e:b0:13b:29b7:e2e8 with SMTP id t14-20020a056871054e00b0013b29b7e2e8mr45848516oal.35.1668058117442;
-        Wed, 09 Nov 2022 21:28:37 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM5B16fN8VF8lBDbDb2ll+gYuLLDYt1XE0XjaaKO1pEu2jEE1ZLsIgbSLNm2JA0dpBB7rBsdmF3wknx0vsGViYM=
+        bh=MIhAVnv+/+S3krzuCVUj1n9SXlWXtXtQLWkbB7aRrMc=;
+        b=enGmeU+qgA45KaxAlL3wyviiNCK+KbYrrcVJFez1MvhG39kGt2vsaegn9GCmqCc7nS
+         eX7NtNiEZz3XLSCDalRi0PbbTxKSjarf18VyhiIwi9lN5ylxCpN2EGCkBc+bi95+kPGo
+         jX2eFMKtmfxHe+FkpgDgHsLlpnxd+PVAvCxkNjwd+07qe+q7Vaj5vP+dXJhqfHkFGoA3
+         +8FptKmYLjOMzMvmUTdSmj2TpgLggB+glau1AQOfYx+ldrf9TYNxTZXJFZEFYArdnd4W
+         vvnUHGPRXBKbm3GJwYHuJ8T0UJPNropbOJF12wt2jIz73pSyKCyxhVJI8rlkhgtKukpQ
+         KPcw==
+X-Gm-Message-State: ACrzQf1MLL6lP3EdWKvDVVq00pbG9GyqPcVxEYnhDZnVTytq1y4+C1OK
+        VC3m0PF/3DXyEnR7kp+ww5a3CRnpGiAItStjAP4cLijcr8yzsQM2vE8a7hw4XkEOMQB8lTIQpGI
+        Rcjuq+0/mwSoZpijswn7QFHYB1F1A
+X-Received: by 2002:a05:6871:54e:b0:13b:29b7:e2e8 with SMTP id t14-20020a056871054e00b0013b29b7e2e8mr45849462oal.35.1668058185488;
+        Wed, 09 Nov 2022 21:29:45 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM5hvq2a3d534EXhf5VZh8Fa4rg/SX3V11YbzbGDsvCqCrH5WxHXv9/kAXS+loSnWVxVAvFpzJXGcRagOwroa2Y=
 X-Received: by 2002:a05:6871:54e:b0:13b:29b7:e2e8 with SMTP id
- t14-20020a056871054e00b0013b29b7e2e8mr45848507oal.35.1668058117216; Wed, 09
- Nov 2022 21:28:37 -0800 (PST)
+ t14-20020a056871054e00b0013b29b7e2e8mr45849448oal.35.1668058185297; Wed, 09
+ Nov 2022 21:29:45 -0800 (PST)
 MIME-Version: 1.0
-References: <20221108170755.92768-1-eperezma@redhat.com> <20221108170755.92768-4-eperezma@redhat.com>
-In-Reply-To: <20221108170755.92768-4-eperezma@redhat.com>
+References: <20221108170755.92768-1-eperezma@redhat.com> <20221108170755.92768-5-eperezma@redhat.com>
+In-Reply-To: <20221108170755.92768-5-eperezma@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Thu, 10 Nov 2022 13:28:24 +0800
-Message-ID: <CACGkMEvPeJhjB=CV5-XagUw7urpjRgLa+F9KB2qpd3s_kjEZ8g@mail.gmail.com>
-Subject: Re: [PATCH v6 03/10] vhost: Allocate SVQ device file descriptors at
- device start
+Date:   Thu, 10 Nov 2022 13:29:33 +0800
+Message-ID: <CACGkMEvpXdAfSLXtpEsjsrRQ_iMjLk_PjmYh7p9HpuDpDvH_UA@mail.gmail.com>
+Subject: Re: [PATCH v6 04/10] vdpa: add vhost_vdpa_net_valid_svq_features
 To:     =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
 Cc:     qemu-devel@nongnu.org, Parav Pandit <parav@mellanox.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
@@ -90,164 +89,69 @@ X-Mailing-List: kvm@vger.kernel.org
 On Wed, Nov 9, 2022 at 1:08 AM Eugenio P=C3=A9rez <eperezma@redhat.com> wro=
 te:
 >
-> The next patches will start control SVQ if possible. However, we don't
-> know if that will be possible at qemu boot anymore.
->
-> Delay device file descriptors until we know it at device start.
+> It will be reused at vdpa device start so let's extract in its own functi=
+on
 >
 > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> ---
 
 Acked-by: Jason Wang <jasowang@redhat.com>
 
 Thanks
 
-> ---
->  hw/virtio/vhost-shadow-virtqueue.c | 31 ++------------------------
->  hw/virtio/vhost-vdpa.c             | 35 ++++++++++++++++++++++++------
->  2 files changed, 30 insertions(+), 36 deletions(-)
+>  net/vhost-vdpa.c | 26 +++++++++++++++++---------
+>  1 file changed, 17 insertions(+), 9 deletions(-)
 >
-> diff --git a/hw/virtio/vhost-shadow-virtqueue.c b/hw/virtio/vhost-shadow-=
-virtqueue.c
-> index 264ddc166d..3b05bab44d 100644
-> --- a/hw/virtio/vhost-shadow-virtqueue.c
-> +++ b/hw/virtio/vhost-shadow-virtqueue.c
-> @@ -715,43 +715,18 @@ void vhost_svq_stop(VhostShadowVirtqueue *svq)
->   * @iova_tree: Tree to perform descriptors translations
->   * @ops: SVQ owner callbacks
->   * @ops_opaque: ops opaque pointer
-> - *
-> - * Returns the new virtqueue or NULL.
-> - *
-> - * In case of error, reason is reported through error_report.
->   */
->  VhostShadowVirtqueue *vhost_svq_new(VhostIOVATree *iova_tree,
->                                      const VhostShadowVirtqueueOps *ops,
->                                      void *ops_opaque)
->  {
-> -    g_autofree VhostShadowVirtqueue *svq =3D g_new0(VhostShadowVirtqueue=
-, 1);
-> -    int r;
-> -
-> -    r =3D event_notifier_init(&svq->hdev_kick, 0);
-> -    if (r !=3D 0) {
-> -        error_report("Couldn't create kick event notifier: %s (%d)",
-> -                     g_strerror(errno), errno);
-> -        goto err_init_hdev_kick;
-> -    }
-> -
-> -    r =3D event_notifier_init(&svq->hdev_call, 0);
-> -    if (r !=3D 0) {
-> -        error_report("Couldn't create call event notifier: %s (%d)",
-> -                     g_strerror(errno), errno);
-> -        goto err_init_hdev_call;
-> -    }
-> +    VhostShadowVirtqueue *svq =3D g_new0(VhostShadowVirtqueue, 1);
->
->      event_notifier_init_fd(&svq->svq_kick, VHOST_FILE_UNBIND);
->      svq->iova_tree =3D iova_tree;
->      svq->ops =3D ops;
->      svq->ops_opaque =3D ops_opaque;
-> -    return g_steal_pointer(&svq);
-> -
-> -err_init_hdev_call:
-> -    event_notifier_cleanup(&svq->hdev_kick);
-> -
-> -err_init_hdev_kick:
-> -    return NULL;
-> +    return svq;
+> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> index e370ecb8eb..d3b1de481b 100644
+> --- a/net/vhost-vdpa.c
+> +++ b/net/vhost-vdpa.c
+> @@ -106,6 +106,22 @@ VHostNetState *vhost_vdpa_get_vhost_net(NetClientSta=
+te *nc)
+>      return s->vhost_net;
 >  }
 >
->  /**
-> @@ -763,7 +738,5 @@ void vhost_svq_free(gpointer pvq)
->  {
->      VhostShadowVirtqueue *vq =3D pvq;
->      vhost_svq_stop(vq);
-> -    event_notifier_cleanup(&vq->hdev_kick);
-> -    event_notifier_cleanup(&vq->hdev_call);
->      g_free(vq);
->  }
-> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-> index 7f0ff4df5b..3df2775760 100644
-> --- a/hw/virtio/vhost-vdpa.c
-> +++ b/hw/virtio/vhost-vdpa.c
-> @@ -428,15 +428,11 @@ static int vhost_vdpa_init_svq(struct vhost_dev *hd=
-ev, struct vhost_vdpa *v,
->
->      shadow_vqs =3D g_ptr_array_new_full(hdev->nvqs, vhost_svq_free);
->      for (unsigned n =3D 0; n < hdev->nvqs; ++n) {
-> -        g_autoptr(VhostShadowVirtqueue) svq;
-> +        VhostShadowVirtqueue *svq;
->
->          svq =3D vhost_svq_new(v->iova_tree, v->shadow_vq_ops,
->                              v->shadow_vq_ops_opaque);
-> -        if (unlikely(!svq)) {
-> -            error_setg(errp, "Cannot create svq %u", n);
-> -            return -1;
-> -        }
-> -        g_ptr_array_add(shadow_vqs, g_steal_pointer(&svq));
-> +        g_ptr_array_add(shadow_vqs, svq);
->      }
->
->      v->shadow_vqs =3D g_steal_pointer(&shadow_vqs);
-> @@ -864,11 +860,23 @@ static int vhost_vdpa_svq_set_fds(struct vhost_dev =
-*dev,
->      const EventNotifier *event_notifier =3D &svq->hdev_kick;
->      int r;
->
-> +    r =3D event_notifier_init(&svq->hdev_kick, 0);
-> +    if (r !=3D 0) {
-> +        error_setg_errno(errp, -r, "Couldn't create kick event notifier"=
-);
-> +        goto err_init_hdev_kick;
+> +static bool vhost_vdpa_net_valid_svq_features(uint64_t features, Error *=
+*errp)
+> +{
+> +    uint64_t invalid_dev_features =3D
+> +        features & ~vdpa_svq_device_features &
+> +        /* Transport are all accepted at this point */
+> +        ~MAKE_64BIT_MASK(VIRTIO_TRANSPORT_F_START,
+> +                         VIRTIO_TRANSPORT_F_END - VIRTIO_TRANSPORT_F_STA=
+RT);
+> +
+> +    if (invalid_dev_features) {
+> +        error_setg(errp, "vdpa svq does not work with features 0x%" PRIx=
+64,
+> +                   invalid_dev_features);
 > +    }
 > +
-> +    r =3D event_notifier_init(&svq->hdev_call, 0);
-> +    if (r !=3D 0) {
-> +        error_setg_errno(errp, -r, "Couldn't create call event notifier"=
-);
-> +        goto err_init_hdev_call;
-> +    }
+> +    return !invalid_dev_features;
+> +}
 > +
->      file.fd =3D event_notifier_get_fd(event_notifier);
->      r =3D vhost_vdpa_set_vring_dev_kick(dev, &file);
->      if (unlikely(r !=3D 0)) {
->          error_setg_errno(errp, -r, "Can't set device kick fd");
-> -        return r;
-> +        goto err_init_set_dev_fd;
->      }
+>  static int vhost_vdpa_net_check_device_id(struct vhost_net *net)
+>  {
+>      uint32_t device_id;
+> @@ -675,15 +691,7 @@ int net_init_vhost_vdpa(const Netdev *netdev, const =
+char *name,
+>      if (opts->x_svq) {
+>          struct vhost_vdpa_iova_range iova_range;
 >
->      event_notifier =3D &svq->hdev_call;
-> @@ -876,8 +884,18 @@ static int vhost_vdpa_svq_set_fds(struct vhost_dev *=
-dev,
->      r =3D vhost_vdpa_set_vring_dev_call(dev, &file);
->      if (unlikely(r !=3D 0)) {
->          error_setg_errno(errp, -r, "Can't set device call fd");
-> +        goto err_init_set_dev_fd;
->      }
->
-> +    return 0;
-> +
-> +err_init_set_dev_fd:
-> +    event_notifier_set_handler(&svq->hdev_call, NULL);
-> +
-> +err_init_hdev_call:
-> +    event_notifier_cleanup(&svq->hdev_kick);
-> +
-> +err_init_hdev_kick:
->      return r;
->  }
->
-> @@ -1089,6 +1107,9 @@ static void vhost_vdpa_svqs_stop(struct vhost_dev *=
-dev)
->      for (unsigned i =3D 0; i < v->shadow_vqs->len; ++i) {
->          VhostShadowVirtqueue *svq =3D g_ptr_array_index(v->shadow_vqs, i=
-);
->          vhost_vdpa_svq_unmap_rings(dev, svq);
-> +
-> +        event_notifier_cleanup(&svq->hdev_kick);
-> +        event_notifier_cleanup(&svq->hdev_call);
->      }
->  }
+> -        uint64_t invalid_dev_features =3D
+> -            features & ~vdpa_svq_device_features &
+> -            /* Transport are all accepted at this point */
+> -            ~MAKE_64BIT_MASK(VIRTIO_TRANSPORT_F_START,
+> -                             VIRTIO_TRANSPORT_F_END - VIRTIO_TRANSPORT_F=
+_START);
+> -
+> -        if (invalid_dev_features) {
+> -            error_setg(errp, "vdpa svq does not work with features 0x%" =
+PRIx64,
+> -                       invalid_dev_features);
+> +        if (!vhost_vdpa_net_valid_svq_features(features, errp)) {
+>              goto err_svq;
+>          }
 >
 > --
 > 2.31.1
