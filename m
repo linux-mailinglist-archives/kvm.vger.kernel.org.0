@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44503624A21
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 20:04:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2E25624A23
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 20:04:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230422AbiKJTEE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 14:04:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47442 "EHLO
+        id S231349AbiKJTER (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 14:04:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231221AbiKJTD6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 14:03:58 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E441845A2C
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 11:03:55 -0800 (PST)
+        with ESMTP id S231167AbiKJTEB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 14:04:01 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BAE63E09D
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 11:03:59 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6108AB82320
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 19:03:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB6A4C433D6;
-        Thu, 10 Nov 2022 19:03:49 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 24A7DB8218E
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 19:03:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 905C4C433D7;
+        Thu, 10 Nov 2022 19:03:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668107033;
-        bh=pqNqaPMNyTG7t95dy+I/SJcyH9e6ilAes12kwqrxsfI=;
+        s=k20201202; t=1668107036;
+        bh=mOL4Ec60ezI5bZVyIc/dh1MfcoV902eT+uFOLxuGxDA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bc/z6bPJLbmwATOBM74DrWNWUPp/VbxbxGHGuqM/MkdjGnRgosZGziB0WYSnUdrtY
-         TP2p3IPCAN9CwrARa28R5yy5qVGj0OKc+MtTcPGbJXZpJ2Ps55E98ZPwLGer5UPamV
-         wpoonzJzH0NwlCOxyl5YVAe2vonhvL09NdF6NM2sRAepXg7bkoofr1qg6lvEItx/mS
-         I5w1GMIAZovjDakn7nAGOoNvW8E2PMmdsbxRRN4hjofBpWgCof/vdJVqKZ6ngaWhZQ
-         Dfw8JOsZ8wKHD4/K0f23u8iACLLZwPL8XHlNJnASMzMt8m7/mqd0m5TrbPSII00ZHJ
-         WCnUJiIjqX+qA==
+        b=MZUfNbyUXHX587pgVvmiVpr1mKiRd3ORLMYlQMPGfjtdWbR19l/Je2bFDIJrzUXq3
+         jENgs1weyYhw1TK/EZ9JJ8uGsyzUp4WpHMgbTAp322Z6MbfmWlVSLhekHJB0j8UCXV
+         EVwFM9CJwzdN97B0qqsAXrEcHLkSXtjTSwNZHVOQ2UcWsDhIQ6fGj5aOl7C7Ihmcgi
+         KL3AJ8DtEkoNxv/ufQXhojBij+ccj5y2XNy2FyQw/XpfPnYQRQSwbeJlchlJIYCqTq
+         tssnr+Jp0yrNezPLXJ/0oAjAyl9/2Zz+PZb1Ba3wwB9Cl37GQztlqFO2I91/aT43XS
+         ZjArso1Lx5BVQ==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.linux.dev
 Cc:     Will Deacon <will@kernel.org>,
@@ -48,9 +48,9 @@ Cc:     Will Deacon <will@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v6 12/26] KVM: arm64: Add infrastructure to create and track pKVM instances at EL2
-Date:   Thu, 10 Nov 2022 19:02:45 +0000
-Message-Id: <20221110190259.26861-13-will@kernel.org>
+Subject: [PATCH v6 13/26] KVM: arm64: Instantiate pKVM hypervisor VM and vCPU structures from EL1
+Date:   Thu, 10 Nov 2022 19:02:46 +0000
+Message-Id: <20221110190259.26861-14-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221110190259.26861-1-will@kernel.org>
 References: <20221110190259.26861-1-will@kernel.org>
@@ -67,758 +67,351 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Fuad Tabba <tabba@google.com>
 
-Introduce a global table (and lock) to track pKVM instances at EL2, and
-provide hypercalls that can be used by the untrusted host to create and
-destroy pKVM VMs and their vCPUs. pKVM VM/vCPU state is directly
-accessible only by the trusted hypervisor (EL2).
+With the pKVM hypervisor at EL2 now offering hypercalls to the host for
+creating and destroying VM and vCPU structures, plumb these in to the
+existing arm64 KVM backend to ensure that the hypervisor data structures
+are allocated and initialised on first vCPU run for a pKVM guest.
 
-Each pKVM VM is directly associated with an untrusted host KVM instance,
-and is referenced by the host using an opaque handle. Future patches
-will provide hypercalls to allow the host to initialize/set/get pKVM
-VM/vCPU state using the opaque handle.
+In the host, 'struct kvm_protected_vm' is introduced to hold the handle
+of the pKVM VM instance as well as to track references to the memory
+donated to the hypervisor so that it can be freed back to the host
+allocator following VM teardown. The stage-2 page-table, hypervisor VM
+and vCPU structures are allocated separately so as to avoid the need for
+a large physically-contiguous allocation in the host at run-time.
 
 Tested-by: Vincent Donnefort <vdonnefort@google.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
-Co-developed-by: Will Deacon <will@kernel.org>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_asm.h              |   3 +
- arch/arm64/include/asm/kvm_host.h             |   8 +
- arch/arm64/include/asm/kvm_pgtable.h          |   8 +
- arch/arm64/include/asm/kvm_pkvm.h             |   8 +
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   3 +
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  58 +++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  31 ++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  14 +
- arch/arm64/kvm/hyp/nvhe/pkvm.c                | 380 ++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/setup.c               |   8 +
- arch/arm64/kvm/hyp/pgtable.c                  |   9 +
- arch/arm64/kvm/pkvm.c                         |   1 +
- 12 files changed, 531 insertions(+)
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+ arch/arm64/include/asm/kvm_host.h  |  14 ++-
+ arch/arm64/include/asm/kvm_pkvm.h  |   4 +
+ arch/arm64/kvm/arm.c               |  14 +++
+ arch/arm64/kvm/hyp/hyp-constants.c |   3 +
+ arch/arm64/kvm/hyp/nvhe/pkvm.c     |  15 +++-
+ arch/arm64/kvm/pkvm.c              | 138 +++++++++++++++++++++++++++++
+ 6 files changed, 182 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 53035763e48e..de52ba775d48 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -76,6 +76,9 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_init_traps,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
- };
- 
- #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 45e2136322ba..d3dd7ab9c79e 100644
+index d3dd7ab9c79e..467393e7331f 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -115,6 +115,8 @@ struct kvm_smccc_features {
- 	unsigned long vendor_hyp_bmap;
- };
+@@ -117,6 +117,16 @@ struct kvm_smccc_features {
  
-+typedef unsigned int pkvm_handle_t;
+ typedef unsigned int pkvm_handle_t;
+ 
++struct kvm_protected_vm {
++	pkvm_handle_t handle;
++
++	struct {
++		void *pgd;
++		void *vm;
++		void *vcpus[KVM_MAX_VCPUS];
++	} hyp_donations;
++};
 +
  struct kvm_arch {
  	struct kvm_s2_mmu mmu;
  
-@@ -166,6 +168,12 @@ struct kvm_arch {
- 
- 	/* Hypercall features firmware registers' descriptor */
+@@ -170,10 +180,10 @@ struct kvm_arch {
  	struct kvm_smccc_features smccc_feat;
-+
-+	/*
-+	 * For an untrusted host VM, 'pkvm_handle' is used to lookup
-+	 * the associated pKVM instance in the hypervisor.
-+	 */
-+	pkvm_handle_t pkvm_handle;
+ 
+ 	/*
+-	 * For an untrusted host VM, 'pkvm_handle' is used to lookup
++	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+ 	 * the associated pKVM instance in the hypervisor.
+ 	 */
+-	pkvm_handle_t pkvm_handle;
++	struct kvm_protected_vm pkvm;
  };
  
  struct kvm_vcpu_fault_info {
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 1b098bd4cd37..4f6d79fe4352 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -288,6 +288,14 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
-  */
- u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift);
- 
-+/**
-+ * kvm_pgtable_stage2_pgd_size() - Helper to compute size of a stage-2 PGD
-+ * @vtcr:	Content of the VTCR register.
-+ *
-+ * Return: the size (in bytes) of the stage-2 PGD
-+ */
-+size_t kvm_pgtable_stage2_pgd_size(u64 vtcr);
-+
- /**
-  * __kvm_pgtable_stage2_init() - Initialise a guest stage-2 page-table.
-  * @pgt:	Uninitialised page-table structure to initialise.
 diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 8f7b8a2314bb..f4e3133d6550 100644
+index f4e3133d6550..01129b0d4c68 100644
 --- a/arch/arm64/include/asm/kvm_pkvm.h
 +++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -9,6 +9,9 @@
- #include <linux/memblock.h>
- #include <asm/kvm_pgtable.h>
+@@ -14,6 +14,10 @@
  
-+/* Maximum number of VMs that can co-exist under pKVM. */
-+#define KVM_MAX_PVMS 255
-+
  #define HYP_MEMBLOCK_REGIONS 128
  
++int pkvm_init_host_vm(struct kvm *kvm);
++int pkvm_create_hyp_vm(struct kvm *kvm);
++void pkvm_destroy_hyp_vm(struct kvm *kvm);
++
  extern struct memblock_region kvm_nvhe_sym(hyp_memory)[];
-@@ -40,6 +43,11 @@ static inline unsigned long hyp_vmemmap_pages(size_t vmemmap_entry_size)
- 	return res >> PAGE_SHIFT;
- }
+ extern unsigned int kvm_nvhe_sym(hyp_memblock_nr);
  
-+static inline unsigned long hyp_vm_table_pages(void)
-+{
-+	return PAGE_ALIGN(KVM_MAX_PVMS * sizeof(void *)) >> PAGE_SHIFT;
-+}
-+
- static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
- {
- 	unsigned long total = 0, i;
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 0a6d3e7f2a43..ce9a796a85ee 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -11,6 +11,7 @@
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 94d33e296e10..30d6fc5d3a93 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -37,6 +37,7 @@
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_asm.h>
  #include <asm/kvm_mmu.h>
- #include <asm/kvm_pgtable.h>
- #include <asm/virt.h>
-+#include <nvhe/pkvm.h>
- #include <nvhe/spinlock.h>
- 
- /*
-@@ -68,10 +69,12 @@ bool addr_is_memory(phys_addr_t phys);
- int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
- int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id);
- int kvm_host_prepare_stage2(void *pgt_pool_base);
-+int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd);
- void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
- 
- int hyp_pin_shared_mem(void *from, void *to);
- void hyp_unpin_shared_mem(void *from, void *to);
-+void reclaim_guest_pages(struct pkvm_hyp_vm *vm);
- 
- static __always_inline void __load_host_stage2(void)
- {
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-new file mode 100644
-index 000000000000..8c653a3b9501
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -0,0 +1,58 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2021 Google LLC
-+ * Author: Fuad Tabba <tabba@google.com>
-+ */
-+
-+#ifndef __ARM64_KVM_NVHE_PKVM_H__
-+#define __ARM64_KVM_NVHE_PKVM_H__
-+
 +#include <asm/kvm_pkvm.h>
-+
-+/*
-+ * Holds the relevant data for maintaining the vcpu state completely at hyp.
-+ */
-+struct pkvm_hyp_vcpu {
-+	struct kvm_vcpu vcpu;
-+
-+	/* Backpointer to the host's (untrusted) vCPU instance. */
-+	struct kvm_vcpu *host_vcpu;
-+};
-+
-+/*
-+ * Holds the relevant data for running a protected vm.
-+ */
-+struct pkvm_hyp_vm {
-+	struct kvm kvm;
-+
-+	/* Backpointer to the host's (untrusted) KVM instance. */
-+	struct kvm *host_kvm;
-+
-+	/* The guest's stage-2 page-table managed by the hypervisor. */
-+	struct kvm_pgtable pgt;
-+
-+	/*
-+	 * The number of vcpus initialized and ready to run.
-+	 * Modifying this is protected by 'vm_table_lock'.
-+	 */
-+	unsigned int nr_vcpus;
-+
-+	/* Array of the hyp vCPU structures for this VM. */
-+	struct pkvm_hyp_vcpu *vcpus[];
-+};
-+
-+static inline struct pkvm_hyp_vm *
-+pkvm_hyp_vcpu_to_hyp_vm(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	return container_of(hyp_vcpu->vcpu.kvm, struct pkvm_hyp_vm, kvm);
-+}
-+
-+void pkvm_hyp_vm_table_init(void *tbl);
-+
-+int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
-+		   unsigned long pgd_hva);
-+int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
-+		     unsigned long vcpu_hva);
-+int __pkvm_teardown_vm(pkvm_handle_t handle);
-+
-+#endif /* __ARM64_KVM_NVHE_PKVM_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 3cea4b6ac23e..b5f3fcfe9135 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -15,6 +15,7 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/sections.h>
  
- #include <nvhe/mem_protect.h>
- #include <nvhe/mm.h>
+@@ -150,6 +151,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	if (ret)
+ 		goto out_free_stage2_pgd;
+ 
++	ret = pkvm_init_host_vm(kvm);
++	if (ret)
++		goto out_free_stage2_pgd;
++
+ 	if (!zalloc_cpumask_var(&kvm->arch.supported_cpus, GFP_KERNEL)) {
+ 		ret = -ENOMEM;
+ 		goto out_free_stage2_pgd;
+@@ -187,6 +192,9 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 
+ 	kvm_vgic_destroy(kvm);
+ 
++	if (is_protected_kvm_enabled())
++		pkvm_destroy_hyp_vm(kvm);
++
+ 	kvm_destroy_vcpus(kvm);
+ 
+ 	kvm_unshare_hyp(kvm, kvm + 1);
+@@ -569,6 +577,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ 	if (ret)
+ 		return ret;
+ 
++	if (is_protected_kvm_enabled()) {
++		ret = pkvm_create_hyp_vm(kvm);
++		if (ret)
++			return ret;
++	}
++
+ 	if (!irqchip_in_kernel(kvm)) {
+ 		/*
+ 		 * Tell the rest of the code that there are userspace irqchip
+diff --git a/arch/arm64/kvm/hyp/hyp-constants.c b/arch/arm64/kvm/hyp/hyp-constants.c
+index b3742a6691e8..b257a3b4bfc5 100644
+--- a/arch/arm64/kvm/hyp/hyp-constants.c
++++ b/arch/arm64/kvm/hyp/hyp-constants.c
+@@ -2,9 +2,12 @@
+ 
+ #include <linux/kbuild.h>
+ #include <nvhe/memory.h>
 +#include <nvhe/pkvm.h>
- #include <nvhe/trap_handler.h>
  
- DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
-@@ -191,6 +192,33 @@ static void handle___pkvm_vcpu_init_traps(struct kvm_cpu_context *host_ctxt)
- 	__pkvm_vcpu_init_traps(kern_hyp_va(vcpu));
- }
- 
-+static void handle___pkvm_init_vm(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(struct kvm *, host_kvm, host_ctxt, 1);
-+	DECLARE_REG(unsigned long, vm_hva, host_ctxt, 2);
-+	DECLARE_REG(unsigned long, pgd_hva, host_ctxt, 3);
-+
-+	host_kvm = kern_hyp_va(host_kvm);
-+	cpu_reg(host_ctxt, 1) = __pkvm_init_vm(host_kvm, vm_hva, pgd_hva);
-+}
-+
-+static void handle___pkvm_init_vcpu(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(pkvm_handle_t, handle, host_ctxt, 1);
-+	DECLARE_REG(struct kvm_vcpu *, host_vcpu, host_ctxt, 2);
-+	DECLARE_REG(unsigned long, vcpu_hva, host_ctxt, 3);
-+
-+	host_vcpu = kern_hyp_va(host_vcpu);
-+	cpu_reg(host_ctxt, 1) = __pkvm_init_vcpu(handle, host_vcpu, vcpu_hva);
-+}
-+
-+static void handle___pkvm_teardown_vm(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(pkvm_handle_t, handle, host_ctxt, 1);
-+
-+	cpu_reg(host_ctxt, 1) = __pkvm_teardown_vm(handle);
-+}
-+
- typedef void (*hcall_t)(struct kvm_cpu_context *);
- 
- #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
-@@ -220,6 +248,9 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__vgic_v3_save_aprs),
- 	HANDLE_FUNC(__vgic_v3_restore_aprs),
- 	HANDLE_FUNC(__pkvm_vcpu_init_traps),
-+	HANDLE_FUNC(__pkvm_init_vm),
-+	HANDLE_FUNC(__pkvm_init_vcpu),
-+	HANDLE_FUNC(__pkvm_teardown_vm),
- };
- 
- static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 06c6a24c0eae..459957b3082e 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -141,6 +141,20 @@ int kvm_host_prepare_stage2(void *pgt_pool_base)
+ int main(void)
+ {
+ 	DEFINE(STRUCT_HYP_PAGE_SIZE,	sizeof(struct hyp_page));
++	DEFINE(PKVM_HYP_VM_SIZE,	sizeof(struct pkvm_hyp_vm));
++	DEFINE(PKVM_HYP_VCPU_SIZE,	sizeof(struct pkvm_hyp_vcpu));
  	return 0;
  }
- 
-+int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
-+{
-+	vm->pgt.pgd = pgd;
-+	return 0;
-+}
-+
-+void reclaim_guest_pages(struct pkvm_hyp_vm *vm)
-+{
-+	unsigned long nr_pages;
-+
-+	nr_pages = kvm_pgtable_stage2_pgd_size(vm->kvm.arch.vtcr) >> PAGE_SHIFT;
-+	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(vm->pgt.pgd), nr_pages));
-+}
-+
- int __pkvm_prot_finalize(void)
- {
- 	struct kvm_s2_mmu *mmu = &host_mmu.arch.mmu;
 diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 85d3b7ae720f..64f448b64201 100644
+index 64f448b64201..80b8fb5b79fd 100644
 --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
 +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -7,6 +7,9 @@
- #include <linux/kvm_host.h>
- #include <linux/mm.h>
- #include <nvhe/fixed_config.h>
-+#include <nvhe/mem_protect.h>
-+#include <nvhe/memory.h>
-+#include <nvhe/pkvm.h>
- #include <nvhe/trap_handler.h>
+@@ -324,7 +324,7 @@ static pkvm_handle_t insert_vm_table_entry(struct kvm *host_kvm,
+ 	if (idx < 0)
+ 		return idx;
+ 
+-	hyp_vm->kvm.arch.pkvm_handle = idx_to_vm_handle(idx);
++	hyp_vm->kvm.arch.pkvm.handle = idx_to_vm_handle(idx);
+ 
+ 	/* VMID 0 is reserved for the host */
+ 	atomic64_set(&mmu->vmid.id, idx + 1);
+@@ -333,7 +333,7 @@ static pkvm_handle_t insert_vm_table_entry(struct kvm *host_kvm,
+ 	mmu->pgt = &hyp_vm->pgt;
+ 
+ 	vm_table[idx] = hyp_vm;
+-	return hyp_vm->kvm.arch.pkvm_handle;
++	return hyp_vm->kvm.arch.pkvm.handle;
+ }
  
  /*
-@@ -183,3 +186,380 @@ void __pkvm_vcpu_init_traps(struct kvm_vcpu *vcpu)
- 	pvm_init_traps_aa64mmfr0(vcpu);
- 	pvm_init_traps_aa64mmfr1(vcpu);
+@@ -458,10 +458,10 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
+ 		goto err_remove_vm_table_entry;
+ 	hyp_spin_unlock(&vm_table_lock);
+ 
+-	return hyp_vm->kvm.arch.pkvm_handle;
++	return hyp_vm->kvm.arch.pkvm.handle;
+ 
+ err_remove_vm_table_entry:
+-	remove_vm_table_entry(hyp_vm->kvm.arch.pkvm_handle);
++	remove_vm_table_entry(hyp_vm->kvm.arch.pkvm.handle);
+ err_unlock:
+ 	hyp_spin_unlock(&vm_table_lock);
+ err_remove_mappings:
+@@ -528,6 +528,7 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
+ {
+ 	struct pkvm_hyp_vm *hyp_vm;
+ 	struct kvm *host_kvm;
++	unsigned int idx;
+ 	size_t vm_size;
+ 	int err;
+ 
+@@ -553,6 +554,12 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
+ 	unpin_host_vcpus(hyp_vm->vcpus, hyp_vm->nr_vcpus);
+ 
+ 	/* Return the metadata pages to the host */
++	for (idx = 0; idx < hyp_vm->nr_vcpus; ++idx) {
++		struct pkvm_hyp_vcpu *hyp_vcpu = hyp_vm->vcpus[idx];
++
++		unmap_donated_memory(hyp_vcpu, sizeof(*hyp_vcpu));
++	}
++
+ 	host_kvm = hyp_vm->host_kvm;
+ 	vm_size = pkvm_get_hyp_vm_size(hyp_vm->kvm.created_vcpus);
+ 	unmap_donated_memory(hyp_vm, vm_size);
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 71493136e59c..8c443b915e43 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -6,6 +6,7 @@
+ 
+ #include <linux/kvm_host.h>
+ #include <linux/memblock.h>
++#include <linux/mutex.h>
+ #include <linux/sort.h>
+ 
+ #include <asm/kvm_pkvm.h>
+@@ -94,3 +95,140 @@ void __init kvm_hyp_reserve(void)
+ 	kvm_info("Reserved %lld MiB at 0x%llx\n", hyp_mem_size >> 20,
+ 		 hyp_mem_base);
  }
 +
 +/*
-+ * Start the VM table handle at the offset defined instead of at 0.
-+ * Mainly for sanity checking and debugging.
++ * Allocates and donates memory for hypervisor VM structs at EL2.
++ *
++ * Allocates space for the VM state, which includes the hyp vm as well as
++ * the hyp vcpus.
++ *
++ * Stores an opaque handler in the kvm struct for future reference.
++ *
++ * Return 0 on success, negative error code on failure.
 + */
-+#define HANDLE_OFFSET 0x1000
-+
-+static unsigned int vm_handle_to_idx(pkvm_handle_t handle)
++static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
 +{
-+	return handle - HANDLE_OFFSET;
++	size_t pgd_sz, hyp_vm_sz, hyp_vcpu_sz;
++	struct kvm_vcpu *host_vcpu;
++	pkvm_handle_t handle;
++	void *pgd, *hyp_vm;
++	unsigned long idx;
++	int ret;
++
++	if (host_kvm->created_vcpus < 1)
++		return -EINVAL;
++
++	pgd_sz = kvm_pgtable_stage2_pgd_size(host_kvm->arch.vtcr);
++
++	/*
++	 * The PGD pages will be reclaimed using a hyp_memcache which implies
++	 * page granularity. So, use alloc_pages_exact() to get individual
++	 * refcounts.
++	 */
++	pgd = alloc_pages_exact(pgd_sz, GFP_KERNEL_ACCOUNT);
++	if (!pgd)
++		return -ENOMEM;
++
++	/* Allocate memory to donate to hyp for vm and vcpu pointers. */
++	hyp_vm_sz = PAGE_ALIGN(size_add(PKVM_HYP_VM_SIZE,
++					size_mul(sizeof(void *),
++						 host_kvm->created_vcpus)));
++	hyp_vm = alloc_pages_exact(hyp_vm_sz, GFP_KERNEL_ACCOUNT);
++	if (!hyp_vm) {
++		ret = -ENOMEM;
++		goto free_pgd;
++	}
++
++	/* Donate the VM memory to hyp and let hyp initialize it. */
++	ret = kvm_call_hyp_nvhe(__pkvm_init_vm, host_kvm, hyp_vm, pgd);
++	if (ret < 0)
++		goto free_vm;
++
++	handle = ret;
++
++	host_kvm->arch.pkvm.handle = handle;
++	host_kvm->arch.pkvm.hyp_donations.pgd = pgd;
++	host_kvm->arch.pkvm.hyp_donations.vm = hyp_vm;
++
++	/* Donate memory for the vcpus at hyp and initialize it. */
++	hyp_vcpu_sz = PAGE_ALIGN(PKVM_HYP_VCPU_SIZE);
++	kvm_for_each_vcpu(idx, host_vcpu, host_kvm) {
++		void *hyp_vcpu;
++
++		/* Indexing of the vcpus to be sequential starting at 0. */
++		if (WARN_ON(host_vcpu->vcpu_idx != idx)) {
++			ret = -EINVAL;
++			goto destroy_vm;
++		}
++
++		hyp_vcpu = alloc_pages_exact(hyp_vcpu_sz, GFP_KERNEL_ACCOUNT);
++		if (!hyp_vcpu) {
++			ret = -ENOMEM;
++			goto destroy_vm;
++		}
++
++		host_kvm->arch.pkvm.hyp_donations.vcpus[idx] = hyp_vcpu;
++
++		ret = kvm_call_hyp_nvhe(__pkvm_init_vcpu, handle, host_vcpu,
++					hyp_vcpu);
++		if (ret)
++			goto destroy_vm;
++	}
++
++	return 0;
++
++destroy_vm:
++	pkvm_destroy_hyp_vm(host_kvm);
++	return ret;
++free_vm:
++	free_pages_exact(hyp_vm, hyp_vm_sz);
++free_pgd:
++	free_pages_exact(pgd, pgd_sz);
++	return ret;
 +}
 +
-+static pkvm_handle_t idx_to_vm_handle(unsigned int idx)
-+{
-+	return idx + HANDLE_OFFSET;
-+}
-+
-+/*
-+ * Spinlock for protecting state related to the VM table. Protects writes
-+ * to 'vm_table' and 'nr_table_entries' as well as reads and writes to
-+ * 'last_hyp_vcpu_lookup'.
-+ */
-+static DEFINE_HYP_SPINLOCK(vm_table_lock);
-+
-+/*
-+ * The table of VM entries for protected VMs in hyp.
-+ * Allocated at hyp initialization and setup.
-+ */
-+static struct pkvm_hyp_vm **vm_table;
-+
-+void pkvm_hyp_vm_table_init(void *tbl)
-+{
-+	WARN_ON(vm_table);
-+	vm_table = tbl;
-+}
-+
-+/*
-+ * Return the hyp vm structure corresponding to the handle.
-+ */
-+static struct pkvm_hyp_vm *get_vm_by_handle(pkvm_handle_t handle)
-+{
-+	unsigned int idx = vm_handle_to_idx(handle);
-+
-+	if (unlikely(idx >= KVM_MAX_PVMS))
-+		return NULL;
-+
-+	return vm_table[idx];
-+}
-+
-+static void unpin_host_vcpu(struct kvm_vcpu *host_vcpu)
-+{
-+	if (host_vcpu)
-+		hyp_unpin_shared_mem(host_vcpu, host_vcpu + 1);
-+}
-+
-+static void unpin_host_vcpus(struct pkvm_hyp_vcpu *hyp_vcpus[],
-+			     unsigned int nr_vcpus)
-+{
-+	int i;
-+
-+	for (i = 0; i < nr_vcpus; i++)
-+		unpin_host_vcpu(hyp_vcpus[i]->host_vcpu);
-+}
-+
-+static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
-+			     unsigned int nr_vcpus)
-+{
-+	hyp_vm->host_kvm = host_kvm;
-+	hyp_vm->kvm.created_vcpus = nr_vcpus;
-+	hyp_vm->kvm.arch.vtcr = host_mmu.arch.vtcr;
-+}
-+
-+static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
-+			      struct pkvm_hyp_vm *hyp_vm,
-+			      struct kvm_vcpu *host_vcpu,
-+			      unsigned int vcpu_idx)
++int pkvm_create_hyp_vm(struct kvm *host_kvm)
 +{
 +	int ret = 0;
 +
-+	if (hyp_pin_shared_mem(host_vcpu, host_vcpu + 1))
-+		return -EBUSY;
-+
-+	if (host_vcpu->vcpu_idx != vcpu_idx) {
-+		ret = -EINVAL;
-+		goto done;
-+	}
-+
-+	hyp_vcpu->host_vcpu = host_vcpu;
-+
-+	hyp_vcpu->vcpu.kvm = &hyp_vm->kvm;
-+	hyp_vcpu->vcpu.vcpu_id = READ_ONCE(host_vcpu->vcpu_id);
-+	hyp_vcpu->vcpu.vcpu_idx = vcpu_idx;
-+
-+	hyp_vcpu->vcpu.arch.hw_mmu = &hyp_vm->kvm.arch.mmu;
-+done:
-+	if (ret)
-+		unpin_host_vcpu(host_vcpu);
-+	return ret;
-+}
-+
-+static int find_free_vm_table_entry(struct kvm *host_kvm)
-+{
-+	int i;
-+
-+	for (i = 0; i < KVM_MAX_PVMS; ++i) {
-+		if (!vm_table[i])
-+			return i;
-+	}
-+
-+	return -ENOMEM;
-+}
-+
-+/*
-+ * Allocate a VM table entry and insert a pointer to the new vm.
-+ *
-+ * Return a unique handle to the protected VM on success,
-+ * negative error code on failure.
-+ */
-+static pkvm_handle_t insert_vm_table_entry(struct kvm *host_kvm,
-+					   struct pkvm_hyp_vm *hyp_vm)
-+{
-+	struct kvm_s2_mmu *mmu = &hyp_vm->kvm.arch.mmu;
-+	int idx;
-+
-+	hyp_assert_lock_held(&vm_table_lock);
-+
-+	/*
-+	 * Initializing protected state might have failed, yet a malicious
-+	 * host could trigger this function. Thus, ensure that 'vm_table'
-+	 * exists.
-+	 */
-+	if (unlikely(!vm_table))
-+		return -EINVAL;
-+
-+	idx = find_free_vm_table_entry(host_kvm);
-+	if (idx < 0)
-+		return idx;
-+
-+	hyp_vm->kvm.arch.pkvm_handle = idx_to_vm_handle(idx);
-+
-+	/* VMID 0 is reserved for the host */
-+	atomic64_set(&mmu->vmid.id, idx + 1);
-+
-+	mmu->arch = &hyp_vm->kvm.arch;
-+	mmu->pgt = &hyp_vm->pgt;
-+
-+	vm_table[idx] = hyp_vm;
-+	return hyp_vm->kvm.arch.pkvm_handle;
-+}
-+
-+/*
-+ * Deallocate and remove the VM table entry corresponding to the handle.
-+ */
-+static void remove_vm_table_entry(pkvm_handle_t handle)
-+{
-+	hyp_assert_lock_held(&vm_table_lock);
-+	vm_table[vm_handle_to_idx(handle)] = NULL;
-+}
-+
-+static size_t pkvm_get_hyp_vm_size(unsigned int nr_vcpus)
-+{
-+	return size_add(sizeof(struct pkvm_hyp_vm),
-+		size_mul(sizeof(struct pkvm_hyp_vcpu *), nr_vcpus));
-+}
-+
-+static void *map_donated_memory_noclear(unsigned long host_va, size_t size)
-+{
-+	void *va = (void *)kern_hyp_va(host_va);
-+
-+	if (!PAGE_ALIGNED(va))
-+		return NULL;
-+
-+	if (__pkvm_host_donate_hyp(hyp_virt_to_pfn(va),
-+				   PAGE_ALIGN(size) >> PAGE_SHIFT))
-+		return NULL;
-+
-+	return va;
-+}
-+
-+static void *map_donated_memory(unsigned long host_va, size_t size)
-+{
-+	void *va = map_donated_memory_noclear(host_va, size);
-+
-+	if (va)
-+		memset(va, 0, size);
-+
-+	return va;
-+}
-+
-+static void __unmap_donated_memory(void *va, size_t size)
-+{
-+	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(va),
-+				       PAGE_ALIGN(size) >> PAGE_SHIFT));
-+}
-+
-+static void unmap_donated_memory(void *va, size_t size)
-+{
-+	if (!va)
-+		return;
-+
-+	memset(va, 0, size);
-+	__unmap_donated_memory(va, size);
-+}
-+
-+static void unmap_donated_memory_noclear(void *va, size_t size)
-+{
-+	if (!va)
-+		return;
-+
-+	__unmap_donated_memory(va, size);
-+}
-+
-+/*
-+ * Initialize the hypervisor copy of the protected VM state using the
-+ * memory donated by the host.
-+ *
-+ * Unmaps the donated memory from the host at stage 2.
-+ *
-+ * host_kvm: A pointer to the host's struct kvm.
-+ * vm_hva: The host va of the area being donated for the VM state.
-+ *	   Must be page aligned.
-+ * pgd_hva: The host va of the area being donated for the stage-2 PGD for
-+ *	    the VM. Must be page aligned. Its size is implied by the VM's
-+ *	    VTCR.
-+ *
-+ * Return a unique handle to the protected VM on success,
-+ * negative error code on failure.
-+ */
-+int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
-+		   unsigned long pgd_hva)
-+{
-+	struct pkvm_hyp_vm *hyp_vm = NULL;
-+	size_t vm_size, pgd_size;
-+	unsigned int nr_vcpus;
-+	void *pgd = NULL;
-+	int ret;
-+
-+	ret = hyp_pin_shared_mem(host_kvm, host_kvm + 1);
-+	if (ret)
-+		return ret;
-+
-+	nr_vcpus = READ_ONCE(host_kvm->created_vcpus);
-+	if (nr_vcpus < 1) {
-+		ret = -EINVAL;
-+		goto err_unpin_kvm;
-+	}
-+
-+	vm_size = pkvm_get_hyp_vm_size(nr_vcpus);
-+	pgd_size = kvm_pgtable_stage2_pgd_size(host_mmu.arch.vtcr);
-+
-+	ret = -ENOMEM;
-+
-+	hyp_vm = map_donated_memory(vm_hva, vm_size);
-+	if (!hyp_vm)
-+		goto err_remove_mappings;
-+
-+	pgd = map_donated_memory_noclear(pgd_hva, pgd_size);
-+	if (!pgd)
-+		goto err_remove_mappings;
-+
-+	init_pkvm_hyp_vm(host_kvm, hyp_vm, nr_vcpus);
-+
-+	hyp_spin_lock(&vm_table_lock);
-+	ret = insert_vm_table_entry(host_kvm, hyp_vm);
-+	if (ret < 0)
-+		goto err_unlock;
-+
-+	ret = kvm_guest_prepare_stage2(hyp_vm, pgd);
-+	if (ret)
-+		goto err_remove_vm_table_entry;
-+	hyp_spin_unlock(&vm_table_lock);
-+
-+	return hyp_vm->kvm.arch.pkvm_handle;
-+
-+err_remove_vm_table_entry:
-+	remove_vm_table_entry(hyp_vm->kvm.arch.pkvm_handle);
-+err_unlock:
-+	hyp_spin_unlock(&vm_table_lock);
-+err_remove_mappings:
-+	unmap_donated_memory(hyp_vm, vm_size);
-+	unmap_donated_memory(pgd, pgd_size);
-+err_unpin_kvm:
-+	hyp_unpin_shared_mem(host_kvm, host_kvm + 1);
-+	return ret;
-+}
-+
-+/*
-+ * Initialize the hypervisor copy of the protected vCPU state using the
-+ * memory donated by the host.
-+ *
-+ * handle: The handle for the protected vm.
-+ * host_vcpu: A pointer to the corresponding host vcpu.
-+ * vcpu_hva: The host va of the area being donated for the vcpu state.
-+ *	     Must be page aligned. The size of the area must be equal to
-+ *	     the page-aligned size of 'struct pkvm_hyp_vcpu'.
-+ * Return 0 on success, negative error code on failure.
-+ */
-+int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
-+		     unsigned long vcpu_hva)
-+{
-+	struct pkvm_hyp_vcpu *hyp_vcpu;
-+	struct pkvm_hyp_vm *hyp_vm;
-+	unsigned int idx;
-+	int ret;
-+
-+	hyp_vcpu = map_donated_memory(vcpu_hva, sizeof(*hyp_vcpu));
-+	if (!hyp_vcpu)
-+		return -ENOMEM;
-+
-+	hyp_spin_lock(&vm_table_lock);
-+
-+	hyp_vm = get_vm_by_handle(handle);
-+	if (!hyp_vm) {
-+		ret = -ENOENT;
-+		goto unlock;
-+	}
-+
-+	idx = hyp_vm->nr_vcpus;
-+	if (idx >= hyp_vm->kvm.created_vcpus) {
-+		ret = -EINVAL;
-+		goto unlock;
-+	}
-+
-+	ret = init_pkvm_hyp_vcpu(hyp_vcpu, hyp_vm, host_vcpu, idx);
-+	if (ret)
-+		goto unlock;
-+
-+	hyp_vm->vcpus[idx] = hyp_vcpu;
-+	hyp_vm->nr_vcpus++;
-+unlock:
-+	hyp_spin_unlock(&vm_table_lock);
-+
-+	if (ret)
-+		unmap_donated_memory(hyp_vcpu, sizeof(*hyp_vcpu));
++	mutex_lock(&host_kvm->lock);
++	if (!host_kvm->arch.pkvm.handle)
++		ret = __pkvm_create_hyp_vm(host_kvm);
++	mutex_unlock(&host_kvm->lock);
 +
 +	return ret;
 +}
 +
-+int __pkvm_teardown_vm(pkvm_handle_t handle)
++void pkvm_destroy_hyp_vm(struct kvm *host_kvm)
 +{
-+	struct pkvm_hyp_vm *hyp_vm;
-+	struct kvm *host_kvm;
-+	size_t vm_size;
-+	int err;
++	unsigned long idx, nr_vcpus = host_kvm->created_vcpus;
++	size_t pgd_sz, hyp_vm_sz;
 +
-+	hyp_spin_lock(&vm_table_lock);
-+	hyp_vm = get_vm_by_handle(handle);
-+	if (!hyp_vm) {
-+		err = -ENOENT;
-+		goto err_unlock;
++	if (host_kvm->arch.pkvm.handle)
++		WARN_ON(kvm_call_hyp_nvhe(__pkvm_teardown_vm,
++					  host_kvm->arch.pkvm.handle));
++
++	host_kvm->arch.pkvm.handle = 0;
++
++	for (idx = 0; idx < nr_vcpus; ++idx) {
++		void *hyp_vcpu = host_kvm->arch.pkvm.hyp_donations.vcpus[idx];
++
++		if (!hyp_vcpu)
++			break;
++
++		free_pages_exact(hyp_vcpu, PAGE_ALIGN(PKVM_HYP_VCPU_SIZE));
 +	}
 +
-+	if (WARN_ON(hyp_page_count(hyp_vm))) {
-+		err = -EBUSY;
-+		goto err_unlock;
-+	}
++	hyp_vm_sz = PAGE_ALIGN(size_add(PKVM_HYP_VM_SIZE,
++					size_mul(sizeof(void *), nr_vcpus)));
++	pgd_sz = kvm_pgtable_stage2_pgd_size(host_kvm->arch.vtcr);
 +
-+	/* Ensure the VMID is clean before it can be reallocated */
-+	__kvm_tlb_flush_vmid(&hyp_vm->kvm.arch.mmu);
-+	remove_vm_table_entry(handle);
-+	hyp_spin_unlock(&vm_table_lock);
++	free_pages_exact(host_kvm->arch.pkvm.hyp_donations.vm, hyp_vm_sz);
++	free_pages_exact(host_kvm->arch.pkvm.hyp_donations.pgd, pgd_sz);
++}
 +
-+	/* Reclaim guest pages (including page-table pages) */
-+	reclaim_guest_pages(hyp_vm);
-+	unpin_host_vcpus(hyp_vm->vcpus, hyp_vm->nr_vcpus);
-+
-+	/* Return the metadata pages to the host */
-+	host_kvm = hyp_vm->host_kvm;
-+	vm_size = pkvm_get_hyp_vm_size(hyp_vm->kvm.created_vcpus);
-+	unmap_donated_memory(hyp_vm, vm_size);
-+	hyp_unpin_shared_mem(host_kvm, host_kvm + 1);
++int pkvm_init_host_vm(struct kvm *host_kvm)
++{
++	mutex_init(&host_kvm->lock);
 +	return 0;
-+
-+err_unlock:
-+	hyp_spin_unlock(&vm_table_lock);
-+	return err;
 +}
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 0312c9c74a5a..2be72fbe7279 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -16,6 +16,7 @@
- #include <nvhe/memory.h>
- #include <nvhe/mem_protect.h>
- #include <nvhe/mm.h>
-+#include <nvhe/pkvm.h>
- #include <nvhe/trap_handler.h>
- 
- unsigned long hyp_nr_cpus;
-@@ -24,6 +25,7 @@ unsigned long hyp_nr_cpus;
- 			 (unsigned long)__per_cpu_start)
- 
- static void *vmemmap_base;
-+static void *vm_table_base;
- static void *hyp_pgt_base;
- static void *host_s2_pgt_base;
- static struct kvm_pgtable_mm_ops pkvm_pgtable_mm_ops;
-@@ -40,6 +42,11 @@ static int divide_memory_pool(void *virt, unsigned long size)
- 	if (!vmemmap_base)
- 		return -ENOMEM;
- 
-+	nr_pages = hyp_vm_table_pages();
-+	vm_table_base = hyp_early_alloc_contig(nr_pages);
-+	if (!vm_table_base)
-+		return -ENOMEM;
-+
- 	nr_pages = hyp_s1_pgtable_pages();
- 	hyp_pgt_base = hyp_early_alloc_contig(nr_pages);
- 	if (!hyp_pgt_base)
-@@ -314,6 +321,7 @@ void __noreturn __pkvm_init_finalise(void)
- 	if (ret)
- 		goto out;
- 
-+	pkvm_hyp_vm_table_init(vm_table_base);
- out:
- 	/*
- 	 * We tail-called to here from handle___pkvm_init() and will not return,
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index cdf8e76b0be1..a1a27f88a312 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1200,6 +1200,15 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
- 	return 0;
- }
- 
-+size_t kvm_pgtable_stage2_pgd_size(u64 vtcr)
-+{
-+	u32 ia_bits = VTCR_EL2_IPA(vtcr);
-+	u32 sl0 = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
-+	u32 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
-+
-+	return kvm_pgd_pages(ia_bits, start_level) * PAGE_SIZE;
-+}
-+
- static int stage2_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
- 			      enum kvm_pgtable_walk_flags flag,
- 			      void * const arg)
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 34229425b25d..71493136e59c 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -71,6 +71,7 @@ void __init kvm_hyp_reserve(void)
- 
- 	hyp_mem_pages += hyp_s1_pgtable_pages();
- 	hyp_mem_pages += host_s2_pgtable_pages();
-+	hyp_mem_pages += hyp_vm_table_pages();
- 	hyp_mem_pages += hyp_vmemmap_pages(STRUCT_HYP_PAGE_SIZE);
- 
- 	/*
 -- 
 2.38.1.431.g37b22c650d-goog
 
