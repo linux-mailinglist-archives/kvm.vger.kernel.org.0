@@ -2,76 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC8DD624B9D
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 21:18:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2910C624B94
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 21:18:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231802AbiKJUSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 15:18:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59284 "EHLO
+        id S231690AbiKJUSL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 15:18:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231886AbiKJUR5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 15:17:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6042D4E420
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 12:17:00 -0800 (PST)
+        with ESMTP id S231873AbiKJURy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 15:17:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89CD94E430
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 12:16:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668111419;
+        s=mimecast20190719; t=1668111412;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6jVthbHjsTliThw/p0W05BCO6UHI57XyGWMI/k60PAs=;
-        b=Gz3GXv555USYV0Pz8YjgKCueQn5h9TS5QQuJBAw0laUwVGQ0sBrMXLxpRqLStU/79IMkkl
-        SIgtodx5/TtH5Grdw34oDESkHj8Eh/G3h3PR1Gt8FyUbyoN8BWwBvm2Em/menS+yvk4qgu
-        9+vPHB7TNzDEHALkJ4Hbih/GX7MVdEU=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=uVnV2DDw0Jhdp1QeqoFk0F1Z/gE4Ln1RaOhIXeyW3wU=;
+        b=eb7m06FVuj56TbnRfCdCA0z5gmAE6iMC25Tma95NHHqVm8hmx1Y4+0bC3PDF6YiqXZnPZN
+        zkwVDIOLxVYTjcq0WXAH/i4Xtlb00KM2pEAUzQXSo95hbs57JKFPY2K6GxKkFeDaZBv++y
+        tZwWb13a7N1cZJ1gFBScv6x4W+dytmE=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-498-whhFlv0gM1-Q3SGs3K3NIQ-1; Thu, 10 Nov 2022 15:16:58 -0500
-X-MC-Unique: whhFlv0gM1-Q3SGs3K3NIQ-1
-Received: by mail-io1-f72.google.com with SMTP id f25-20020a5d8799000000b006a44e33ddb6so1800001ion.1
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 12:16:58 -0800 (PST)
+ us-mta-365-NTZORkUkMIeYhKlBgL0o2w-1; Thu, 10 Nov 2022 15:16:51 -0500
+X-MC-Unique: NTZORkUkMIeYhKlBgL0o2w-1
+Received: by mail-io1-f71.google.com with SMTP id i6-20020a5d88c6000000b006d088a0e518so1776532iol.19
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 12:16:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6jVthbHjsTliThw/p0W05BCO6UHI57XyGWMI/k60PAs=;
-        b=iBnoli4wgopjSGJb0VKs0bgwENfKFXSFp+4nohrT9pPYQhdLPEdtvVdvMV0I3FItTh
-         dSBZX2IQEIXjKkWhdLewsgFUcvuH1RITwnNFM+FCQlzwoGNsw3lRU9S7xVWL5z6Q97UQ
-         QBQzW8a/s97nj4nh0+lqSZNEWdC08gho5uxCmmvPprpZGhTQh/ziRtKutuK8k5h1ADPf
-         TzRDQTE/RBCRjAMUUqP2zEio6+hGPEromHjXUvRN+w9ysKoV1sgP/R6CII49s7Z/sh0Z
-         2gx+9qTZxQw2Gh6bUxnkiFG+eupjzn6MDSZqpG6bMyVitDdHDuC7pNl7X7Q8Lo8D7Qjp
-         aU2A==
-X-Gm-Message-State: ACrzQf206wq9D7y3sv+BjGJJMxn0OyHoKlJQMgIbDRqboDuRAXNM/dSv
-        ZyASGD5XlhPvvyzGEXb9T4V8Q4nw6QVJUH5nVt1LaFvY4z7rT3zNGYD8pfgNs5C6H4F9D8sYZR4
-        xa7d3/ziAazKK
-X-Received: by 2002:a05:6638:4919:b0:375:4f73:2951 with SMTP id cx25-20020a056638491900b003754f732951mr3657949jab.176.1668111417630;
-        Thu, 10 Nov 2022 12:16:57 -0800 (PST)
-X-Google-Smtp-Source: AMsMyM5BoAL/Rz3PAEVkeaRyE8GNyh17wSv8Mr+bQu1wUNvGeLEm23D7yAmh5J8mtuN74xZ7ywZn2A==
-X-Received: by 2002:a05:6638:4919:b0:375:4f73:2951 with SMTP id cx25-20020a056638491900b003754f732951mr3657943jab.176.1668111417385;
-        Thu, 10 Nov 2022 12:16:57 -0800 (PST)
+        bh=uVnV2DDw0Jhdp1QeqoFk0F1Z/gE4Ln1RaOhIXeyW3wU=;
+        b=e0qC4TaIxTJ0PJ93kXdPIrGB+nTVadi29ByOgqI6jIuvNwyoT7Ya5DX5xgN4pgtXvl
+         hBpmbp+R13/p9sQ0UKEh8T+MdtkHZ7pfAP2XX1fdfgcDEm+5GR4AhGQWvHuYv2lUVQKe
+         JCSuURaNlf5LxMlBLiPYJWKz2+YcxrZMHTjJZ5y+nv7EIh4tL3ynpzCqIUr1scyT61cz
+         f+3Qzr3AjBb9ffe3oOhWLkALHwt475i58v9ILO0Z53rjKvzGzfQsSQ/ra886UqWBxbrM
+         WW7jd4aD33AQsSjaC5BJ49IL/ixyN/uwt6O283Ym5Lmbc7yEcAkPn1rYozPDTmx5caJJ
+         QAcA==
+X-Gm-Message-State: ACrzQf2xphy/amJv3gFpVEKiNYgbQPbRT9NmHOuGjL/qRTaxfPYZA+ah
+        XMPac+kgkl3vNQpRWEDfSKv6Wt1Lm8uc9ZSxgedh5t9iCnjmPbz/VbKRcl/OQ643RtMPTYCybBQ
+        /93a5LE3x6Qzy
+X-Received: by 2002:a92:d70b:0:b0:2f9:516b:25f3 with SMTP id m11-20020a92d70b000000b002f9516b25f3mr3482759iln.156.1668111410911;
+        Thu, 10 Nov 2022 12:16:50 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM7kmGLkxawxZSF0r3BGM7XEMkdaMXz0cdBNGYH99+jL5O4ssCKnWMKVWwzHqb43uql1tb9xRA==
+X-Received: by 2002:a92:d70b:0:b0:2f9:516b:25f3 with SMTP id m11-20020a92d70b000000b002f9516b25f3mr3482749iln.156.1668111410617;
+        Thu, 10 Nov 2022 12:16:50 -0800 (PST)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id i7-20020a0566022c8700b006bbea9f45cesm25981iow.38.2022.11.10.12.16.56
+        by smtp.gmail.com with ESMTPSA id i7-20020a0566022c8700b006bbea9f45cesm25981iow.38.2022.11.10.12.16.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 12:16:56 -0800 (PST)
-Date:   Thu, 10 Nov 2022 13:16:28 -0700
+        Thu, 10 Nov 2022 12:16:49 -0800 (PST)
+Date:   Thu, 10 Nov 2022 13:16:32 -0700
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Anthony DeRossi <ajderossi@gmail.com>
-Cc:     kvm@vger.kernel.org, cohuck@redhat.com, jgg@nvidia.com,
-        kevin.tian@intel.com, abhsahu@nvidia.com, yishaih@nvidia.com
-Subject: Re: [PATCH v6 0/3] vfio/pci: Check the device set open count on
- reset
-Message-ID: <20221110131628.362df0b1.alex.williamson@redhat.com>
-In-Reply-To: <20221110014027.28780-1-ajderossi@gmail.com>
-References: <20221110014027.28780-1-ajderossi@gmail.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>, Yi Liu <yi.l.liu@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        David Airlie <airlied@gmail.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v3 0/7] vfio-ccw parent rework
+Message-ID: <20221110131632.4e00f87d.alex.williamson@redhat.com>
+In-Reply-To: <20221104142007.1314999-1-farman@linux.ibm.com>
+References: <20221104142007.1314999-1-farman@linux.ibm.com>
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,62 +108,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  9 Nov 2022 17:40:24 -0800
-Anthony DeRossi <ajderossi@gmail.com> wrote:
+On Fri,  4 Nov 2022 15:20:00 +0100
+Eric Farman <farman@linux.ibm.com> wrote:
 
-> This series fixes an issue where devices bound to vfio-pci are not reset when
-> they are released. Skipping the reset has unpredictable results depending on
-> the device, and can cause errors when accessing the device later or binding to
-> a different driver.
+> Hi Alex,
 > 
-> The first patch in this series fixes a life cycle issue that was discovered in
-> an earlier revision of the series.
+> Here's the (last?) update to the vfio-ccw lifecycle changes that I've sent
+> recently, and were previously discussed at various points [1][2].
 > 
-> Thank you Alex, Jason, and Kevin for your reviews and feedback. This revision
-> includes the changes suggested on v5, but without any changes to
-> vfio_device_set_open_count().
+> Patches 1-5 rework the behavior of the vfio-ccw driver's private struct.
+> In summary, the mdev pieces are split out of vfio_ccw_private and into a
+> new vfio_ccw_parent struct that will continue to follow today's lifecycle.
+> The remainder (bulk) of the private struct moves to follow the mdev
+> probe/remove pair. There's opportunity for further separation of the
+> things in the private struct, which would simplify some of the vfio-ccw
+> code, but it got too hairy as I started that. Once vfio-ccw is no longer
+> considered unique, those cleanups can happen at our leisure. 
 > 
-> Anthony
+> Patch 6 removes the trickery where vfio-ccw uses vfio_init_device instead of
+> vfio_alloc_device, and thus removes vfio_init_device from the outside world.
 > 
-> v5 -> v6:
-> - Added a call to lockdep_assert_held() in patch 3
-> - Corrected "vfio_container_device_register()" in the patch 1 commit message
-> v5: https://lore.kernel.org/kvm/20221105224458.8180-1-ajderossi@gmail.com/
+> Patch 7 removes vfio_free_device from vfio-ccw and the other drivers (hello,
+> CC list!), letting it be handled by vfio_device_release directly.
 > 
-> v4 -> v5:
-> - Replaced patch 2 with a patch that introduces a new function to get the
->   open count of a device set
-> - Updated patch 3 to use the new function
-> v4: https://lore.kernel.org/kvm/20221104195727.4629-1-ajderossi@gmail.com/
+> I believe this covers everything in this space; let me know if not!
 > 
-> v3 -> v4:
-> - Added a patch to fix device registration life cycle
-> - Added a patch to add a public open_count on vfio_device_set
-> - Changed the implementation to avoid private open_count usage
-> v3: https://lore.kernel.org/kvm/20221102055732.2110-1-ajderossi@gmail.com/
+> Thanks,
+> Eric
 > 
-> v2 -> v3:
-> - Added WARN_ON()
-> - Revised commit message
-> v2: https://lore.kernel.org/kvm/20221026194245.1769-1-ajderossi@gmail.com/
+> [1] https://lore.kernel.org/kvm/0-v3-57c1502c62fd+2190-ccw_mdev_jgg@nvidia.com/
+> [2] https://lore.kernel.org/kvm/20220602171948.2790690-1-farman@linux.ibm.com/
 > 
-> v1 -> v2:
-> - Changed reset behavior instead of open_count ordering
-> - Retitled from "vfio: Decrement open_count before close_device()"
-> v1: https://lore.kernel.org/kvm/20221025193820.4412-1-ajderossi@gmail.com/
+> v2->v3:
+>  - [MR] Added r-b to remaining patches (Thank you!)
+>  - Patch 1:
+>    [gfx checkpatch] Whitespace
+>    [EF] Remove put_device(&parent->dev)
+>    [MR] Fix error exit when alloc of parent fails
+>    [MR] Check for !private on sch_probe error path
+>  - Patch 3:
+>    [EF] Fix error exit when alloc of private fails
+>  - Patch 6:
+>    [AW] Added ack (Thank you!)
+>  - Patch 7:
+>    [CH, AK] Added r-b (Thank you!)
+>    [AW] Added ack (Thank you!)
+> v2: https://lore.kernel.org/kvm/20221102150152.2521475-1-farman@linux.ibm.com/
+> v1: https://lore.kernel.org/kvm/20221019162135.798901-1-farman@linux.ibm.com/
 > 
-> Anthony DeRossi (3):
->   vfio: Fix container device registration life cycle
->   vfio: Export the device set open count
->   vfio/pci: Check the device set open count on reset
+> Eric Farman (7):
+>   vfio/ccw: create a parent struct
+>   vfio/ccw: remove private->sch
+>   vfio/ccw: move private initialization to callback
+>   vfio/ccw: move private to mdev lifecycle
+>   vfio/ccw: remove release completion
+>   vfio/ccw: replace vfio_init_device with _alloc_
+>   vfio: Remove vfio_free_device
 > 
->  drivers/vfio/pci/vfio_pci_core.c | 10 +++++-----
->  drivers/vfio/vfio_main.c         | 26 +++++++++++++++++++++-----
->  include/linux/vfio.h             |  1 +
->  3 files changed, 27 insertions(+), 10 deletions(-)
+>  drivers/gpu/drm/i915/gvt/kvmgt.c      |   1 -
+>  drivers/s390/cio/vfio_ccw_chp.c       |   5 +-
+>  drivers/s390/cio/vfio_ccw_drv.c       | 173 +++++++++++---------------
+>  drivers/s390/cio/vfio_ccw_fsm.c       |  27 ++--
+>  drivers/s390/cio/vfio_ccw_ops.c       | 107 +++++++++++-----
+>  drivers/s390/cio/vfio_ccw_private.h   |  37 ++++--
+>  drivers/s390/crypto/vfio_ap_ops.c     |   6 -
+>  drivers/vfio/fsl-mc/vfio_fsl_mc.c     |   1 -
+>  drivers/vfio/pci/vfio_pci_core.c      |   1 -
+>  drivers/vfio/platform/vfio_amba.c     |   1 -
+>  drivers/vfio/platform/vfio_platform.c |   1 -
+>  drivers/vfio/vfio_main.c              |  32 ++---
+>  include/linux/vfio.h                  |   3 -
+>  samples/vfio-mdev/mbochs.c            |   1 -
+>  samples/vfio-mdev/mdpy.c              |   1 -
+>  samples/vfio-mdev/mtty.c              |   1 -
+>  16 files changed, 196 insertions(+), 202 deletions(-)
 > 
 
-Applied to vfio for-linus branch for v6.1.  Thanks,
+Applied to vfio next branch for v6.2.  Thanks,
 
 Alex
 
