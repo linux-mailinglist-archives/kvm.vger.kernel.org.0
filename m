@@ -2,112 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E3FF62395A
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:55:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5471E623946
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 02:54:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232537AbiKJBzT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Nov 2022 20:55:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50606 "EHLO
+        id S232378AbiKJBye (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Nov 2022 20:54:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232471AbiKJBy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Nov 2022 20:54:58 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3541A29CB7;
-        Wed,  9 Nov 2022 17:54:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668045297; x=1699581297;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=JwR3352mQmtvv3jNZ1XhkuwmOLMITQeiSm1roomzunE=;
-  b=ZXfVE4Yb05m6NPFUCyDK6lApk9Au3uFRXaqPRw3PcRBn7gLzb4/ypK37
-   gXsqU4Rqta/XCPceGJ3Uk/hfHMGfC93jQptBayxaqXd9SuShtxqyN79sz
-   R95Ueb8jHURgnvG63OpUTYMZPYqYWdZbKPYrXg1mC2om3gnJ3jZ9FKSwk
-   T8LUsS7bw1G7ZvsN/1oJFI6wZsIC6XuacsO9gtiAsGVJtcfynbuHZ/dQT
-   soUprHNdHjlQ0SGLjy1RC1KHcoSzS/DUV2bhkN1cnbdnn8NsUtGrZM17/
-   /IUeSPhzi2JtHV3okZCDwMRAdxhBviKWhPybOQp591qf+mB5d5t7z9WqN
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="294522235"
-X-IronPort-AV: E=Sophos;i="5.96,152,1665471600"; 
-   d="scan'208";a="294522235"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2022 17:53:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="762100153"
-X-IronPort-AV: E=Sophos;i="5.96,152,1665471600"; 
-   d="scan'208";a="762100153"
-Received: from jiaxichen-precision-3650-tower.sh.intel.com ([10.239.159.75])
-  by orsmga004.jf.intel.com with ESMTP; 09 Nov 2022 17:53:30 -0800
-From:   Jiaxi Chen <jiaxi.chen@linux.intel.com>
-To:     kvm@vger.kernel.org
-Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, ndesaulniers@google.com,
-        alexandre.belloni@bootlin.com, peterz@infradead.org,
-        jpoimboe@kernel.org, chang.seok.bae@intel.com,
-        pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
-        jmattson@google.com, sandipan.das@amd.com, tony.luck@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
-        keescook@chromium.org, nathan@kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 7/7] x86: KVM: Advertise PREFETCHIT0/1 CPUID to user space
-Date:   Thu, 10 Nov 2022 09:52:52 +0800
-Message-Id: <20221110015252.202566-8-jiaxi.chen@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221110015252.202566-1-jiaxi.chen@linux.intel.com>
-References: <20221110015252.202566-1-jiaxi.chen@linux.intel.com>
+        with ESMTP id S232134AbiKJBy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Nov 2022 20:54:27 -0500
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A88D5B860;
+        Wed,  9 Nov 2022 17:54:26 -0800 (PST)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1668045261;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=e4NKzeDtoFaN8kBUL712bSOeRfxgXb7x1ONm16Q4y+o=;
+        b=r+LeK2mnGqElNPkM/9TRPhVOvTFfQU8Rq0YfxxyXVdeML0jqbULDujWLfU8U1jjDWCD4C2
+        bVcdvjUU6nvu6U93vhCJgsXxxiFjIGkI2iLdiUr8nLHnlO2oEX2LmV4/c/k87TwZDZINUN
+        A0g7LwBg2Bp+kUYlRQ7hek5somRyq2I=
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Raghavendra Rao Ananta <rananta@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [RFC PATCH 2/3] KVM: arm64: Allow userspace to trap SMCCC sub-ranges
+Date:   Thu, 10 Nov 2022 01:53:26 +0000
+Message-Id: <20221110015327.3389351-3-oliver.upton@linux.dev>
+In-Reply-To: <20221110015327.3389351-1-oliver.upton@linux.dev>
+References: <20221110015327.3389351-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Latest Intel platform Granite Rapids has introduced a new instruction -
-PREFETCHIT0/1, which moves code to memory (cache) closer to the
-processor depending on specific hints.
+As the SMCCC (and related specifications) march towards an
+'everything and the kitchen sink' interface for interacting with a
+system, it is less likely that KVM will implement every supported
+feature.
 
-The bit definition:
-CPUID.(EAX=7,ECX=1):EDX[bit 14]
+Add a capability that allows userspace to trap hypercall ranges,
+allowing the VMM to mix-and-match between calls handled in userspace vs.
+KVM.
 
-This CPUID is exposed to user space. Besides, there is no other VMX
-control for this instruction.
-
-Signed-off-by: Jiaxi Chen <jiaxi.chen@linux.intel.com>
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/x86/kvm/cpuid.c         | 2 +-
- arch/x86/kvm/reverse_cpuid.h | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h |  5 ++++
+ arch/arm64/include/uapi/asm/kvm.h | 15 ++++++++++
+ arch/arm64/kvm/arm.c              | 10 +++++++
+ arch/arm64/kvm/hypercalls.c       | 48 +++++++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h          |  1 +
+ 5 files changed, 79 insertions(+)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 47ac2a502d91..9021a80b3553 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -662,7 +662,7 @@ void kvm_set_cpu_caps(void)
- 	);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e33ed7c09a28..cc3872f1900c 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -52,6 +52,9 @@
  
- 	kvm_cpu_cap_init_scattered(CPUID_7_1_EDX,
--		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT)
-+		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT) | F(PREFETCHITI)
- 	);
+ #define KVM_HAVE_MMU_RWLOCK
  
- 	kvm_cpu_cap_mask(CPUID_D_1_EAX,
-diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
-index b8addd85b062..884aebe7b3c2 100644
---- a/arch/x86/kvm/reverse_cpuid.h
-+++ b/arch/x86/kvm/reverse_cpuid.h
-@@ -36,6 +36,7 @@ enum kvm_only_cpuid_leafs {
- /* Intel-defined sub-features, CPUID level 0x00000007:1 (EDX) */
- #define X86_FEATURE_AVX_VNNI_INT8       KVM_X86_FEATURE(CPUID_7_1_EDX, 4)
- #define X86_FEATURE_AVX_NE_CONVERT      KVM_X86_FEATURE(CPUID_7_1_EDX, 5)
-+#define X86_FEATURE_PREFETCHITI         KVM_X86_FEATURE(CPUID_7_1_EDX, 14)
++#define KVM_ARM_USER_HYPERCALL_FLAGS	\
++		GENMASK_ULL(KVM_ARM_USER_HYPERCALL_FLAGS_COUNT - 1, 0)
++
+ /*
+  * Mode of operation configurable with kvm-arm.mode early param.
+  * See Documentation/admin-guide/kernel-parameters.txt for more information.
+@@ -104,11 +107,13 @@ struct kvm_arch_memory_slot {
+ /**
+  * struct kvm_smccc_features: Descriptor of the hypercall services exposed to the guests
+  *
++ * @user_trap_bmap: Bitmap of SMCCC function ranges trapped to userspace
+  * @std_bmap: Bitmap of standard secure service calls
+  * @std_hyp_bmap: Bitmap of standard hypervisor service calls
+  * @vendor_hyp_bmap: Bitmap of vendor specific hypervisor service calls
+  */
+ struct kvm_smccc_features {
++	unsigned long user_trap_bmap;
+ 	unsigned long std_bmap;
+ 	unsigned long std_hyp_bmap;
+ 	unsigned long vendor_hyp_bmap;
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 316917b98707..07fa3f597e61 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -370,6 +370,21 @@ enum {
+ #endif
+ };
  
- struct cpuid_reg {
- 	u32 function;
++enum {
++	KVM_ARM_USER_HYPERCALL_OWNER_ARCH		= 0,
++	KVM_ARM_USER_HYPERCALL_OWNER_CPU		= 1,
++	KVM_ARM_USER_HYPERCALL_OWNER_SIP		= 2,
++	KVM_ARM_USER_HYPERCALL_OWNER_OEM		= 3,
++	KVM_ARM_USER_HYPERCALL_OWNER_STANDARD		= 4,
++	KVM_ARM_USER_HYPERCALL_OWNER_STANDARD_HYP	= 5,
++	KVM_ARM_USER_HYPERCALL_OWNER_VENDOR_HYP		= 6,
++	KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_APP	= 7,
++	KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_OS		= 8,
++#ifdef __KERNEL__
++	KVM_ARM_USER_HYPERCALL_FLAGS_COUNT,
++#endif
++};
++
+ /* Device Control API: ARM VGIC */
+ #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+ #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 6f0b56e7f8c7..6e8a222fc295 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -100,6 +100,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		r = 0;
+ 		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
+ 		break;
++	case KVM_CAP_ARM_USER_HYPERCALLS:
++		if (cap->args[0] & ~KVM_ARM_USER_HYPERCALL_FLAGS)
++			return -EINVAL;
++
++		r = 0;
++		kvm->arch.smccc_feat.user_trap_bmap = cap->args[0];
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+@@ -285,6 +292,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+ 		r = system_has_full_ptr_auth();
+ 		break;
++	case KVM_CAP_ARM_USER_HYPERCALLS:
++		r = KVM_ARM_USER_HYPERCALL_FLAGS;
++		break;
+ 	default:
+ 		r = 0;
+ 	}
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 62ce45d0d957..22a23b12201d 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -92,6 +92,49 @@ static bool kvm_hvc_call_default_allowed(u32 func_id)
+ 	}
+ }
+ 
++static bool kvm_hvc_call_user_trapped(struct kvm_vcpu *vcpu, u32 func_id)
++{
++	struct kvm *kvm = vcpu->kvm;
++	unsigned long *bmap = &kvm->arch.smccc_feat.user_trap_bmap;
++
++	switch (ARM_SMCCC_OWNER_NUM(func_id)) {
++	case ARM_SMCCC_OWNER_ARCH:
++		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_ARCH, bmap);
++	case ARM_SMCCC_OWNER_CPU:
++		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_CPU, bmap);
++	case ARM_SMCCC_OWNER_SIP:
++		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_SIP, bmap);
++	case ARM_SMCCC_OWNER_OEM:
++		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_OEM, bmap);
++	case ARM_SMCCC_OWNER_STANDARD:
++		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_STANDARD, bmap);
++	case ARM_SMCCC_OWNER_STANDARD_HYP:
++		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_STANDARD_HYP, bmap);
++	case ARM_SMCCC_OWNER_VENDOR_HYP:
++		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_VENDOR_HYP, bmap);
++	case ARM_SMCCC_OWNER_TRUSTED_APP ... ARM_SMCCC_OWNER_TRUSTED_APP_END:
++		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_APP, bmap);
++	case ARM_SMCCC_OWNER_TRUSTED_OS ... ARM_SMCCC_OWNER_TRUSTED_OS_END:
++		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_OS, bmap);
++	default:
++		return false;
++	}
++}
++
++static void kvm_hvc_prepare_user_trap(struct kvm_vcpu *vcpu)
++{
++	struct kvm_run *run = vcpu->run;
++
++	run->exit_reason	= KVM_EXIT_HYPERCALL;
++	run->hypercall.nr	= smccc_get_function(vcpu);
++	run->hypercall.args[0]	= smccc_get_arg(vcpu, 1);
++	run->hypercall.args[1]	= smccc_get_arg(vcpu, 2);
++	run->hypercall.args[2]	= smccc_get_arg(vcpu, 3);
++	run->hypercall.args[3]	= smccc_get_arg(vcpu, 4);
++	run->hypercall.args[4]	= smccc_get_arg(vcpu, 5);
++	run->hypercall.args[5]	= smccc_get_arg(vcpu, 6);
++}
++
+ static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
+ {
+ 	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
+@@ -128,6 +171,11 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 	u32 feature;
+ 	gpa_t gpa;
+ 
++	if (kvm_hvc_call_user_trapped(vcpu, func_id)) {
++		kvm_hvc_prepare_user_trap(vcpu);
++		return 0;
++	}
++
+ 	if (!kvm_hvc_call_allowed(vcpu, func_id))
+ 		goto out;
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 0d5d4419139a..ea6c1983a545 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1178,6 +1178,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_ZPCI_OP 221
+ #define KVM_CAP_S390_CPU_TOPOLOGY 222
+ #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
++#define KVM_CAP_ARM_USER_HYPERCALLS 224
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
-2.27.0
+2.38.1.431.g37b22c650d-goog
 
