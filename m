@@ -2,168 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C27596247A7
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 17:54:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0C526247B9
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 17:59:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232308AbiKJQym (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 11:54:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55910 "EHLO
+        id S232688AbiKJQ7E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 11:59:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232384AbiKJQyj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 11:54:39 -0500
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2042.outbound.protection.outlook.com [40.107.93.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D86A22296;
-        Thu, 10 Nov 2022 08:54:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G5lkpbdIhpnlkvDX5mStyX0fBlcn3d5LSVr8M+dxYBDpC0zThTHZwpOn/nSIZHNefnjtwiECiLThK/XjWfekHW/2jFIGzwoAEDkl4vljcNTU6nglOstIpzgwg1zfa1auVFLjRgPEJp86IvT3YOVj9yI5cKgVHGkQigxFPU3t3KzSaDcVfEqOYEtwITjNhAmAZoyP81sxse0MEPMKVbEMo0T4vSw2WI5AW8jXY+Am5R+veqXhunAdUzgCNYO5y2cwc5cG7DWwU8UNBosNxx6k4SwRTR+gvzY36DpAwOFPjo5J+hJP0NfRVApPJW2xW+jh1ymalrLOSX8BGfVyPDX5Yg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wrrZWZU6FbMwGAp0zUwc1YwU9yX3ebzjFEAhB6dLDHE=;
- b=S9t7EvQSgCQufGH7W+jG0PJ4FihKYt57ig626+NfZUdQV6acewqaQCAGlAlxgY8qBaiqQcj4Yek0pjhnIVd0IQjy6imeePrTHY3dLdfT4UMFdhZdtkPV5OcZDLiZblldd1O948YPQ1HZcKre7Rmh1pZ4umhga7bcTF8ZwfR1n7gxMPLjBy/1mBSYaGCRDJqKFdhQjtPOoEy/mmRWc1Dyea8KoThOyHOtdzXMaa1GA/ImqPIeI5knGFUiTlrmWLn+YvFz0jg/RumlGfzDZTxdShoMyNvXE9QBoA5bTJdxA8+9KN/2GXq6Ya7Ug+At9N5WnhKU0bXFH2MBaZ/wLotvsw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wrrZWZU6FbMwGAp0zUwc1YwU9yX3ebzjFEAhB6dLDHE=;
- b=j9kJ236b1S8pdlZJppX8dmRIfnYC3nkbiTu5pftWJLXMNeoVazXUvACuzqiw6J3f9NYH9rKWeDXwq30VOtkE06NfgXPmUaWjhkdHOfDJ2isVDjWW26Hzm099lAuEc7gBlwpOYaBTZIptmDUcaTkXfWZH8D0vn0EU64ZoVMZzH7XlIBLywTtO1k6VM7kJ5ohma6rIZDO3unwfdTeawhzVTEee2pLzeLs9DjJBqv8+CoG+3pUFDW2DuzR+Km4+fBaLH38AylnHjJEzn2apIevwkE+ibt0xn///b7nokK/Xn+yFejSrOfLxm4fpgT6JH/2mCwag44fXJ3dl/FgjsgblWg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM4PR12MB5168.namprd12.prod.outlook.com (2603:10b6:5:397::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.13; Thu, 10 Nov
- 2022 16:54:34 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%7]) with mapi id 15.20.5791.027; Thu, 10 Nov 2022
- 16:54:34 +0000
-Date:   Thu, 10 Nov 2022 12:54:33 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>, bpf@vger.kernel.org,
-        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v4 04/17] iommufd: Document overview of iommufd
-Message-ID: <Y20syTS/BUzPdu/i@nvidia.com>
-References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <4-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <Y2zE0zfnQ7mt740i@debian.me>
- <87v8nmhnkl.fsf@meer.lwn.net>
- <Y20QotPsxivvV53l@nvidia.com>
- <87r0yahmlg.fsf@meer.lwn.net>
- <Y20XhjH96k4x7qdx@nvidia.com>
- <87mt8yhlqr.fsf@meer.lwn.net>
- <Y20Y9Jlp3vG8x27a@nvidia.com>
- <87iljmhknj.fsf@meer.lwn.net>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87iljmhknj.fsf@meer.lwn.net>
-X-ClientProxiedBy: BL0PR02CA0103.namprd02.prod.outlook.com
- (2603:10b6:208:51::44) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S232694AbiKJQ7D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 11:59:03 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9329F11A27
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 08:59:01 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id 4so1926072pli.0
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 08:59:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=++qaNnNL5OJX09F4SmymJbSNGTe4YNGKf8knlNeZLIM=;
+        b=LnpIznW50UbJYIR0PEtWeJYNJ+5rH6MIlZozMzFMTwSQvTcP33ucW9c9lQSevvLDXI
+         QyB5+yXhMZUDNlkwdSbDFjM7JR9S8ttOodJeLQApsp/g1X2g7iaiRMpztbbtLirGmHXP
+         Ok5MPlCZ4tZXNzdoN/5EaAFNU5i/kMEU+Pj6UbsvHwVNko95a9bIdjWXiNhQrkyCMZcF
+         1gbXxHeTac5BLcvPalQHTWFwjbFrO0re69/ZDM4/c7ATiGknmYZEnSteDE0eFOsuiUGv
+         o02wNWrUZNQBtGle02WgOsPhE6Inb5/XeEtyenAcor9m9bnEppDYL8UdqJt6p1agDB2o
+         ED2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=++qaNnNL5OJX09F4SmymJbSNGTe4YNGKf8knlNeZLIM=;
+        b=IWh/Ps5qB+6dS+sWHnr4SKx+8sCoWZOBQ5S7iSxHAsLQzqNpUBIyZdaQ4EbmuX1hMb
+         mZmJtp25x5rfu5BOHRJ41olMUk8sLS9riaTMHGTEza/CLiXHdEcauD0Zr1MmQb6v/I0L
+         HBgJndCU+5gHXM1tTRfPcBKU3LBLIfagVwba8ICHVQAZNRVDtZLITcGl6labt19rjiRe
+         p4CfjBjKJ/W+Fu2kZmH8Rwha9a88OShurjmjW430R+lGdOi19Z95OuDo3xj4pz0V4o/q
+         rjyhGlDljyCvdWw/yT11UIj3pelvT6mPN7APsacyqkDZEJeMezwwI7QOG98BeY7KWe/F
+         jmKg==
+X-Gm-Message-State: ANoB5pm/5biNkW5F+gL0MOOou6OigjkaGJ0t3vsE3joMaYXMY6VjKdHY
+        CSIAiUrVaSpGxgVFbXciWHEL0g==
+X-Google-Smtp-Source: AA0mqf4HLI0425WgRwXjVOczy7lGJ1ZoFRhJMikRvyU6kmBBe6o5W1MVmVmeziJeqm75+QzM+47Lew==
+X-Received: by 2002:a17:902:6aca:b0:188:736c:befa with SMTP id i10-20020a1709026aca00b00188736cbefamr1100928plt.8.1668099540938;
+        Thu, 10 Nov 2022 08:59:00 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id n63-20020a17090a5ac500b00200461cfa99sm3302123pji.11.2022.11.10.08.59.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Nov 2022 08:59:00 -0800 (PST)
+Date:   Thu, 10 Nov 2022 16:58:56 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+        "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+        "palmer@dabbelt.com" <palmer@dabbelt.com>,
+        "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "anup@brainfault.org" <anup@brainfault.org>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "atishp@atishpatra.org" <atishp@atishpatra.org>,
+        "farosas@linux.ibm.com" <farosas@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "Yao, Yuan" <yuan.yao@intel.com>,
+        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+Subject: Re: [PATCH 38/44] KVM: Disable CPU hotplug during hardware enabling
+Message-ID: <Y20t0AMNqvtyOwp2@google.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-39-seanjc@google.com>
+ <88e920944de70e7d69a98f74005b49c59b5aaa3b.camel@intel.com>
+ <b198fe971cecd301f0c7c66028cfd71dd7ba7e62.camel@intel.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5168:EE_
-X-MS-Office365-Filtering-Correlation-Id: 360eb242-d9e6-436c-f0c0-08dac33c3e81
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rwxmx1iXsZM2P9JOzKyKtzHaybCdg4a23beaDXgfhbOe59qIlSy47xFt10c38aM7Rqnrh4c3g3Er5Nn1BUVCpB0FED8Dw5Er3Py1pJrUM5IzZjo1eRt+v5YcZcl6AiMVy6LzX78jiO9ghZ9pmzBfbtFAs/h1Nhic9JI6Wyv0XoFpZpzSacqnpC1kq0D6j1RyRtJebrYmTT4l20ytFM3CKsA3tBfPNS9apCme3E8ILhUqABXFDcef+9KrEkU/9/YzY0Z9BX8p+WhqGA6qC4jn8PBdShY63DKXKk8S6KMPCV0sDF3+YNwpMWRNWZL8vaGhbMvO9FXm93ALu/hQcSRUSNjVdr1Cy7VHadwLCFu4Ukjefqle1nQa2uElm+H+K8az3rYhbC3dN/5vrWiWe7YeEi9Em1jCg03YKnN9aHe/1qEt4kZfzNAhNVi3Dq79sZVdJxfV01TO1Bg/1q8hUp17UqtX36i5lDWbgPWino/s7b3eJpV2XJveMDfbulP9wji6EPQtDImq4dDii9l5KBZAEiJbdqYaVvLvdn+A/cndcH53uEBboHnbC2J2xL+myq75ngKQAUKZORhCrhvIZDVh76fR6TyGwTwmbHIH40XcDk8B8Egz7Ux/hCN9Me3cLOsTEgFifu0qJMF97b+vPQkQjcFUMwH0fCd/KGjvevRf2p4FCfdo3nBFiRPyU0Idbwse
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(39860400002)(396003)(366004)(136003)(346002)(451199015)(316002)(6916009)(54906003)(2616005)(41300700001)(4744005)(5660300002)(7406005)(186003)(7416002)(86362001)(2906002)(6506007)(66476007)(66556008)(66946007)(4326008)(6512007)(8676002)(26005)(36756003)(8936002)(478600001)(6486002)(66899015)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GdKpjsLOzgrJweAdI8yhSjX6izTEQjJlPgMw32X9prbwsgM2BbeSyKFPNmpI?=
- =?us-ascii?Q?OoNUuRqqIaMyzSnCHnkePegLZN4yii+lLYZWRS0uQ8dNovy9ya7d42cx5tlT?=
- =?us-ascii?Q?66RBK7LPIUPuPR115yZYz2pVyrfDdcS3DWZfOQzngGFA0wLBBG2f3lXYGgNr?=
- =?us-ascii?Q?2aiMXuXxgqL8i2kW9q4GcfFG596CN4YhzUqCWZ3V7T54sUEqw2kD85X+NSKT?=
- =?us-ascii?Q?OX+oZrYn1YSqx74x97xy30CJBDM8E3VzFFdY+QN0wIVAIUuKiUqhnx+qxC/J?=
- =?us-ascii?Q?NVMXYFFQwMxSHvlqWOUB/I1oWA8W/vWZWLC8RNNX3pBDBGDZMa/VUB3MXP+k?=
- =?us-ascii?Q?MHDavhd+AhbMjVor0cESTmu9YcJN9tWgbON0ESNPFosTMeFnoTNe/wzMFoiD?=
- =?us-ascii?Q?GODykfpfEEx0LsffMpnA8Wn0SXTAfLYV8y3LYjyh4PFiqQDzXl6vuf/CQiN/?=
- =?us-ascii?Q?R65Acm8C8NbpxhFjNd1H5kCKywHxekyoa+js1pNy8/wA0JyAGOkJ34SOMNp+?=
- =?us-ascii?Q?dJQxYviG0hsNPTg6InkotTDTobx2+0cRk7xPCJJV52dhGQNUEQyyl/b8CZUj?=
- =?us-ascii?Q?Qs8P0AKey6e99xyD4D5NImRcoAN/YrflMYV31iTZKpe8xxXqgBJ7vehYJgF2?=
- =?us-ascii?Q?/cB3yRfecBvsFDhK5u10EYlpvH/UXWXV6G1b5VAAbBy8HsVt83ZHhSaKQCVh?=
- =?us-ascii?Q?DXP4e8i9eO9A6+jBuTd2mBL8zdZZFnLwsYuj52r1aN4do7paMMhmyFCFucmN?=
- =?us-ascii?Q?yVc4CDAamOjESTEKbUEs30FlEw2SkYtmwfBCKQ5FPOsff9ERLllRnlD0oM0I?=
- =?us-ascii?Q?oJi0PV1KckleHBdPciEThdyRlLo3Q00d7jXmCOgYiYSRN503cQQr+w9y4hn1?=
- =?us-ascii?Q?Y4ibFewGTYPEqyWuVm80EMNMl5Ghm3Lu3dg5ifesFPbZX+gvCSHLnUjnCQMF?=
- =?us-ascii?Q?B1uealH4znnJTf5MDgNSgS27yV7ZB4KoMIhCX6AojkFhV0HIFYPmHx7g/826?=
- =?us-ascii?Q?WSzSyThQN1WEWiBUDle32w+NkeXaCPKisl8I9D5YbP4Y69636Vr0TLmIY+2X?=
- =?us-ascii?Q?wcJ1oF/TACfzv/PE2gD3c1qNbii16iA51o8BmJZ7WZSqLvt73K1lef/edlUy?=
- =?us-ascii?Q?3zv7QNJ2shGTFh23SVgZGzN3WKqgQquew/1qeKbCxqQxE0/s8xkIXaghyyQm?=
- =?us-ascii?Q?oHS9avFEW6DRehuelzPrjLBVR+0/y2HuAOFzeWKKtTlpgb8cNkjOg3evl92l?=
- =?us-ascii?Q?qvPDSis2TZqQuILy5uhv5UhA+ao3yr+EjoyidAEHLI/JHSXqTV9olULhG2Tv?=
- =?us-ascii?Q?u4ptBkUzmWaR96KEbcw4CAqRMCM+jDsvQ6XddqIp9Kwc6E2ypOuyrzSZ7AX6?=
- =?us-ascii?Q?njff+qt6gTzUr6j4gzNEsNNE9drl2QLDZ/qj2PD42AYHG5Hd/BjkPI3NPFru?=
- =?us-ascii?Q?XEYyFJ7ZSoLyNNqFQsSwMfWliEi04Uzdp8KmcygX5hnbZK6GGa9GvGhB8Ahi?=
- =?us-ascii?Q?dYU2lOYKePzYz395wURR2OPaariEPEpzwG0dsUtJu0kj7sJR1g61C8kcg6aS?=
- =?us-ascii?Q?iTHaa+cI4jykR4SkaVc=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 360eb242-d9e6-436c-f0c0-08dac33c3e81
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2022 16:54:34.1753
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GCTv8Tm8aHz7unUKyCYXkIPepOdo94/TOH35QO4mAEnbTgb/xjiTNVXGr4RtDY46
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5168
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b198fe971cecd301f0c7c66028cfd71dd7ba7e62.camel@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 10, 2022 at 08:52:16AM -0700, Jonathan Corbet wrote:
-> Jason Gunthorpe <jgg@nvidia.com> writes:
+On Thu, Nov 10, 2022, Huang, Kai wrote:
+> On Thu, 2022-11-10 at 01:33 +0000, Huang, Kai wrote:
+> > > @@ -9283,7 +9283,13 @@ static int
+> > > kvm_x86_check_processor_compatibility(struct kvm_x86_init_ops *ops)
+> > >  	int cpu = smp_processor_id();
+> > >  	struct cpuinfo_x86 *c = &cpu_data(cpu);
+> > >  
+> > > -	WARN_ON(!irqs_disabled());
+> > > +	/*
+> > > +	 * Compatibility checks are done when loading KVM and when enabling
+> > > +	 * hardware, e.g. during CPU hotplug, to ensure all online CPUs are
+> > > +	 * compatible, i.e. KVM should never perform a compatibility check
+> > > on
+> > > +	 * an offline CPU.
+> > > +	 */
+> > > +	WARN_ON(!irqs_disabled() && cpu_active(cpu));
+> > >  
+> > 
+> > Also, the logic of:
+> > 
+> > 	!irqs_disabled() && cpu_active(cpu)
+> > 
+> > is quite weird.
+> > 
+> > The original "WARN(!irqs_disabled())" is reasonable because in STARTING
+> > section
+> > the IRQ is indeed disabled.
+> > 
+> > But this doesn't make sense anymore after we move to ONLINE section, in which
+> > IRQ has already been enabled (see start_secondary()).  IIUC the WARN_ON()
+> > doesn't get exploded is purely because there's an additional cpu_active(cpu)
+> > check.
+> > 
+> > So, a more reasonable check should be something like:
+> > 
+> > 	WARN_ON(irqs_disabled() || cpu_active(cpu) || !cpu_online(cpu));
+> > 
+> > Or we can simply do:
+> > 
+> > 	WARN_ON(!cpu_online(cpu) || cpu_active(cpu));
+> > 
+> > (because I don't know whether it's possible IRQ can somehow get disabled in
+> > ONLINE section).
+> > 
+> > Btw above is purely based on code analysis, but I haven't done any test.
 > 
-> >> Single is nicer but it's not worth a great deal of angst; nothing we do
-> >> is going to turn kernel-doc into a thing of beauty :)
-> >
-> > I will leave it be then because it is a bit tricky to tell if the new
-> > regex breaks anything, and the first three attempts to create it
-> > didn't work at all...
+> Hmm.. I wasn't thinking thoroughly.  I forgot CPU compatibility check also
+> happens on all online cpus when loading KVM.  For this case, IRQ is disabled and
+> cpu_active() is true.  For the hotplug case, IRQ is enabled but  cpu_active() is
+> false.
 > 
-> That's fine.  If you want to keep it as part of your series feel free to
-> add:
-> 
-> Acked-by: Jonathan Corbet <corbet@lwn.net>
+> So WARN_ON(!irqs_disabled() && cpu_active(cpu)) looks reasonable.  Sorry for the
+> noise.  Just needed some time to connect the comment with the code.
 
-Thanks, I'll keep it together since nothing else needs this right now
-
-Jason
+No worries, more than once while working through this code, I've considered setting
+up one of those evidence boards from the movies with string and push pins to help
+connect all the dots.
