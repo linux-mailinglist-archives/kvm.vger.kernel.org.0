@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3B7062478D
-	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 17:50:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3777624796
+	for <lists+kvm@lfdr.de>; Thu, 10 Nov 2022 17:51:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232434AbiKJQua (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 11:50:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49402 "EHLO
+        id S232820AbiKJQu7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 11:50:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232402AbiKJQuI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 11:50:08 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB4F5A470
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 08:49:34 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id e7-20020a17090a77c700b00216928a3917so5178348pjs.4
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 08:49:34 -0800 (PST)
+        with ESMTP id S232570AbiKJQuj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 11:50:39 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AC129FEF
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 08:50:37 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id q9so2710074pfg.5
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 08:50:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rPjVc+C4keVB9JNeySRKdiTbUPe13351AhOJe9TtZf8=;
-        b=OOR4bwRUplBbyMMh2BEwu+86VP3qxijSJnezQ7clymoLz9HUcLonm3WyVFc88kB5fY
-         O/E+L3vna3lCH6PwuGGALEpEbdqf//FCQPJXnQH0fruVZmuKpiXxpksMlHLNli5FBIVk
-         yHcqF3ftlcFWSWpaRO18yKIRlZ4MLKYwLTrjNA/qL4cv528Rj8wkmrotYw4AfXaxmJus
-         pcCX78Uh4a0+xqNPkY5yiRwsOaQfBATcwvX2XL8kq2aQkn5xXT0ESqE2s4sWnkM2XUP1
-         lN0YUhWFEsDiU77d2rUZObTRDQeLPD96HT9QdyztVtB+kfc9jl7KnKnrsPBskzRSRVH/
-         XRTg==
+        bh=ngpTqFXA20Qov7vlYrPcJjUI8sUR/quxgJrGzBa7LTQ=;
+        b=dFHHoN/Nh+VXrE9JsY3e3+fkRaRAvb1aGnzgeGfgDdwTgSMupLwM8ROA3+W4pYGjY0
+         5rtK6lElI+DgF0DyaiLvpiaAorCWCegKieghDDMY6o0ECE7iPV/tCP64EmRRyb1QKnLg
+         h1cjN79kb5l9jgix2MCBmxfqZYQuwhlkODvDz7ZvaH4sxe61Ml97iSmSMtvAoCeE4p6S
+         zdFuv8u4MZbd4uwMLlGMYvkNsSjoXRG5kz2GxfEgOPys7+fCqRAsVr0dupEjPva4LkLJ
+         QEyjxBRtbWEN1lQAedlvI4TNbWVV6gyxLgVr0x17HRSOYZcACGBuRj0/yzFNApiBrJr+
+         O6JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rPjVc+C4keVB9JNeySRKdiTbUPe13351AhOJe9TtZf8=;
-        b=dyPQPrJM/J8fcBP46MewyS0bbWqIi3KJ92SNHn8VdSyijA8Cn5ihlp35o/r9uztYPC
-         W/l1yD1kGBrb405OATvQNAtKtrh8sJOeETuG91VWEBJ5ykEX9yyaBeCuCinbWcDmgr+g
-         aCCdDg4AsHtevvi6NBiXuy7nfa+H0jPoQSlprdu83RUeKodCsJ85qrBeyt0ntITmpat3
-         yAza5MbqHw1cxXtcA3B48hyrQnOnWgHbUFZYfN1O3rrcdvu9H240tNXWnt2ECkfqen8p
-         oZ1nqqowdEyVh3epu+9clQOjiBIhyMbeWSp/USaX1Pmbp3zxi2E7XUmaRtfROvS51u03
-         Wptg==
-X-Gm-Message-State: ACrzQf2/HrRjStnMs7X9hAFHbJIj15H0ZcDxRGs8lwGLzSWboA/EMq8+
-        qGYAHEJ6k+GWEpe3SkbDK4cV5Q==
-X-Google-Smtp-Source: AMsMyM7nQN/gdgW0z481CkQ/WjHrrL4d++/kzaSXhuKO9UuGt09a3AowKSZBoBJ0HDICWxNrCbdrGA==
-X-Received: by 2002:a17:902:d50c:b0:187:460:bf9c with SMTP id b12-20020a170902d50c00b001870460bf9cmr65545589plg.4.1668098974180;
-        Thu, 10 Nov 2022 08:49:34 -0800 (PST)
+        bh=ngpTqFXA20Qov7vlYrPcJjUI8sUR/quxgJrGzBa7LTQ=;
+        b=aJ5xt3A6FdE8Jajhd8zk7yYPMx7HOi9W6ZMmG9U3+0oChqwC7lIEIXnG+RQtCAQCuY
+         w3WnMITZBsOyMnhhQ8iOK4DBxjXq8eLlNNaVjOuCqxyhG5cSPUpGnPr7cz01PxRX0deg
+         iklHNM24K80J+XCwsN3uPWNwI3y/KIBVbNfcOUutZejO0ZBb7YKlZYR11mUsTBxgo7y2
+         A0AtM5ewLTJsESiX+tU+8+rFpKnx5GFvRJYsmAEsnXKypwgXgp65pAc1yGjJVwEpSojz
+         6XcQ8ae1JuGYxh23Xm5Uqf5j258nyC4wI3wxpDTLs9rf/TXzPPrfZtc+ys2LDpfGqMc5
+         ZUiA==
+X-Gm-Message-State: ACrzQf2rlvbI6pmctvBd9stva5sRjrGiHp7XlY7vB+UClbiDivk4Bk+s
+        veX4s3p3dAlfCM/aLagn6J2Wxg==
+X-Google-Smtp-Source: AMsMyM41GjMawKBCP5Kop4vnrwekEGW/LOSR6lYqiErYbTmquFxjglLK4Ryhg/mdPPwnXrGhT3xNoQ==
+X-Received: by 2002:aa7:8d08:0:b0:56b:a4f6:e030 with SMTP id j8-20020aa78d08000000b0056ba4f6e030mr3031241pfe.85.1668099036440;
+        Thu, 10 Nov 2022 08:50:36 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id c3-20020a17090a020300b00205d85cfb30sm3288107pjc.20.2022.11.10.08.49.33
+        by smtp.gmail.com with ESMTPSA id m2-20020a170902db0200b00186f81bb3f0sm11518667plx.122.2022.11.10.08.50.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 08:49:33 -0800 (PST)
-Date:   Thu, 10 Nov 2022 16:49:29 +0000
+        Thu, 10 Nov 2022 08:50:35 -0800 (PST)
+Date:   Thu, 10 Nov 2022 16:50:32 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Robert Hoo <robert.hu@linux.intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
@@ -81,20 +81,20 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Chao Gao <chao.gao@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 37/44] KVM: Rename and move CPUHP_AP_KVM_STARTING to
- ONLINE section
-Message-ID: <Y20rmaU14rZFFCZI@google.com>
+Subject: Re: [PATCH 32/44] KVM: x86: Unify pr_fmt to use module name for all
+ KVM modules
+Message-ID: <Y20r2NR9MaBbOGLn@google.com>
 References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-38-seanjc@google.com>
- <301a8a33a5cbe5b4fd3efe03b05bb8410a46e9f5.camel@linux.intel.com>
+ <20221102231911.3107438-33-seanjc@google.com>
+ <ff0e8701d02ee161d064f92c8b742c2cc061bce0.camel@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <301a8a33a5cbe5b4fd3efe03b05bb8410a46e9f5.camel@linux.intel.com>
+In-Reply-To: <ff0e8701d02ee161d064f92c8b742c2cc061bce0.camel@linux.intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -103,38 +103,8 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Nov 10, 2022, Robert Hoo wrote:
-> > -static int kvm_starting_cpu(unsigned int cpu)
-> > +static int kvm_online_cpu(unsigned int cpu)
-> >  {
-> > +	int ret = 0;
-> > +
-> >  	raw_spin_lock(&kvm_count_lock);
-> > -	if (kvm_usage_count)
-> > +	/*
-> > +	 * Abort the CPU online process if hardware virtualization
-> > cannot
-> > +	 * be enabled. Otherwise running VMs would encounter
-> > unrecoverable
-> > +	 * errors when scheduled to this CPU.
-> > +	 */
-> > +	if (kvm_usage_count) {
-> > +		WARN_ON_ONCE(atomic_read(&hardware_enable_failed));
-> > +
-> >  		hardware_enable_nolock(NULL);
-> > +		if (atomic_read(&hardware_enable_failed)) {
-> > +			atomic_set(&hardware_enable_failed, 0);
-> 
-> I see other places using this hardware_enable_failed with atomic_inc(),
-> should here use atomic_dec() instead of straightly set to 0?
+> After this patch set, still find some printk()s left in arch/x86/kvm/*,
+> consider clean all of them up?
 
-Meh, both options are flawed.  E.g. if hardware_enable_failed was left dangling
-(the WARN above), then atomic_dec() won't remedy the problem and KVM will reject
-onlining CPUs indefinitely.  Forcing the atomic back to '0' will remedy that
-particular issue, but could lead to problems if there are other bugs.
-
-> Though here is embraced by spin_lock, hardware_enable_nolock() can be
-> invoked in other places in parallel?
-
-Only because of a KVM bug, which gets fixed in the next patch:
-
-  KVM: Disable CPU hotplug during hardware enabling
+Hmm, yeah, I suppose at this point it makes sense to tack on a patch to clean
+them up.
