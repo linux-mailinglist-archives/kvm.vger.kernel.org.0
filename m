@@ -2,109 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA4C0625E00
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 16:14:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 15941625E2D
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 16:20:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234368AbiKKPOk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 10:14:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39704 "EHLO
+        id S234454AbiKKPUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 10:20:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234949AbiKKPOM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 10:14:12 -0500
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3752787B8
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 07:12:19 -0800 (PST)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-3775545dc24so46556467b3.7
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 07:12:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mRwD4q1oXYsS4gdSliEkfcIBmvSTpaDci200wLy4Z4k=;
-        b=bQ/5hEGbLYOnrAyjfgUGSIYyDxjnvrlQUtR5gXpnHEEZDfJKjLJ+dOsTLH/LBJDeoV
-         IL06n9OgQ+FFqz1pCF6LhqqF+gqo3WugXf/P0lthXVHIRPrlo0mHHfMJqhYZgPQoHrRy
-         ONLMZZ0QNntH2mo8pg45a2C8L2Zp5pnqYD4fmSJpOzYQCofmh4ybsKUmU3XmAmhcQshG
-         t0v0GvqYQhdPLMc+rNzbimn2RNIMIUSaweM9VmIP/NAJRNrdr5gAD58P7hzaVZJfR/Ks
-         WxP0l2Xjj4C5AymI8YUxKahwzlYzJKYiXoVyhFrFBF6ZISgBpwxANx3wprhN6ogXUN4j
-         oLjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mRwD4q1oXYsS4gdSliEkfcIBmvSTpaDci200wLy4Z4k=;
-        b=28BWjHJLoyPhALpKkZ1ZY69l47w14vgw+FMkuYNF/E8P15isNEIPDoWQFcoAJzMfim
-         IRuYd1UwBB3UP/Vz8ia7i98Oc6VvW46+KD5AvHJTzq6WK7VFvT82yKAqgvu/rj65V6gl
-         A4eDO06Ydy4rMUrBxY/tlHHIfKlp0AjZ2QqpygCgSfGr12hEsR4xlkUK+2HESvsI4M6n
-         VRzYUbZ6Z7JZK428nJ+4FWDHpvbuCFKfbSlNzBqRe7lM6ctEZM4Zvqq1Tq1T1HzUZFbE
-         JF9syYndS1lObnkvTf56RAdRjTGNuDJ7ldkryDsA7bwPgkriKlhidruQxLDVXNGtCFqn
-         pAuQ==
-X-Gm-Message-State: ANoB5pnVQExzrPq1j5GM1ifq4y4CwWUwZ6Aj2nvojlG5hGmAoHxfN1V3
-        A5RiP8agti9MSYa0GdeHtyxfpfYqYyZgkAMb0sn8ZQ==
-X-Google-Smtp-Source: AA0mqf4D3VEMEpied9d1LqE9AKSEtbRZju0zw2Rp0ZDogoffXUYvG+XGJfuYyAWagG+Dk8PsVhRhhHiMSUZ8UDIHhEc=
-X-Received: by 2002:a0d:ed06:0:b0:368:b923:b500 with SMTP id
- w6-20020a0ded06000000b00368b923b500mr2286799ywe.10.1668179538779; Fri, 11 Nov
- 2022 07:12:18 -0800 (PST)
-MIME-Version: 1.0
-From:   Alexander Potapenko <glider@google.com>
-Date:   Fri, 11 Nov 2022 16:11:42 +0100
-Message-ID: <CAG_fn=W0vXvFrQdRhZiCriz7JjM+zLzKQY+z36j+UqPYnsmq_Q@mail.gmail.com>
-Subject: Making KMSAN compatible with paravirtualization
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Juergen Gross <jgross@suse.com>, srivatsa@csail.mit.edu
-Cc:     Peter Zijlstra <peterz@infradead.org>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S234446AbiKKPTk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 10:19:40 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6990D814C6
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 07:19:10 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1B516B82648
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 15:19:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AACABC43470;
+        Fri, 11 Nov 2022 15:19:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668179947;
+        bh=Myih+8eSXLKw3bm/7g/0UFkXRjh+SapEsLznCy0f9CI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=dVcPkuhWLZcqwcllPFPJ1OK1KqydWxpSIA33Nh7cJaW/Q6wTeT77ronYe0J4TUpUB
+         /ndiA/6wu3YBHOsS5XTg4Zx04bhlC39whiL+oNms3WyYvmXlRYXagsxlT5MxMEgcbG
+         04gwZmRCuBmaiLWeC3NVJEwOV9lAoRPTfC3KAP7+s9EzR3KVIunpSwlAFkNRxJRXMf
+         QeJNNF/auixMZfG6iCdqQA8Nq+taeG2Jq/1RHgl+qR70QbruE+ylatjc/q19EPhi/q
+         iKHmWVazlYj9dIlebQhOZOpfeZ7E2lY50ggMzDS/PxpVed+eFTGO/iTwN/SuIu6tb0
+         Hdwh7iCvZ3V9A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1otVo9-005SPW-7g;
+        Fri, 11 Nov 2022 15:19:05 +0000
+Date:   Fri, 11 Nov 2022 15:19:04 +0000
+Message-ID: <86h6z5plhz.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
+        ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com,
+        will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+        pbonzini@redhat.com, peterx@redhat.com, oliver.upton@linux.dev,
+        zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v10 3/7] KVM: Support dirty ring in conjunction with bitmap
+In-Reply-To: <1cfa0286-9a42-edd9-beab-02f95fc440ad@redhat.com>
+References: <20221110104914.31280-1-gshan@redhat.com>
+        <20221110104914.31280-4-gshan@redhat.com>
+        <Y20q3lq5oc2gAqr+@google.com>
+        <1cfa0286-9a42-edd9-beab-02f95fc440ad@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, seanjc@google.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com, will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com, peterx@redhat.com, oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Thu, 10 Nov 2022 23:47:41 +0000,
+Gavin Shan <gshan@redhat.com> wrote:
+> 
+> commit b05377ecbe003f12c8b79846fa3a300401dcab68 (HEAD -> kvm/arm64_dirtyring)
+> Author: Gavin Shan <gshan@redhat.com>
+> Date:   Fri Nov 11 07:13:12 2022 +0800
+> 
+>     KVM: Push dirty information unconditionally to backup bitmap
+>         In mark_page_dirty_in_slot(), we bail out when no running vcpu
+> exists and
+>     a running vcpu context is strictly required by architecture. It may cause
+>     backwards compatible issue. Currently, saving vgic/its tables is the only
+>     case where no running vcpu context is required. We may have other unknown
+>     cases where no running vcpu context exists and it's reported by the warning
+>     message. For this, the application is going to enable the backup bitmap for
+>     the unknown cases. However, the dirty information can't be pushed to the
+>     backup bitmap even though the backup bitmap has been enabled, until the
+>     unknown cases are added to the allowed list of non-running vcpu context
+>     with extra code changes to the host kernel.
+>         In order to make the new application, where the backup bitmap
+> has been
+>     enabled, to work with the unchanged host, we continue to push the dirty
+>     information to the backup bitmap instead of bailing out early.
+>         Suggested-by: Sean Christopherson <seanjc@google.com>
+>     Signed-off-by: Gavin Shan <gshan@redhat.com>
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 2719e10dd37d..03e6a38094c1 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3308,8 +3308,7 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>         if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
+>                 return;
+>  -       if
+> (WARN_ON_ONCE(!kvm_arch_allow_write_without_running_vcpu(kvm) &&
+> !vcpu))
+> -               return;
+> +       WARN_ON_ONCE(!vcpu && !kvm_arch_allow_write_without_running_vcpu(kvm));
 
-While investigating KMSAN's incompatibilities with the default Ubuntu
-config (https://github.com/google/kmsan/issues/89#issuecomment-1310702949),
-I figured out that a kernel won't boot with both CONFIG_KMSAN=3Dy and
-CONFIG_XEN_PV=3Dy.
+I'm happy with this.
 
-In particular, it may crash in load_percpu_segment():
+>  #endif
+>          if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
+> @@ -3318,7 +3317,7 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>                  if (kvm->dirty_ring_size && vcpu)
+>                         kvm_dirty_ring_push(vcpu, slot, rel_gfn);
+> -               else
+> +               else if (memslot->dirty_bitmap)
+>                         set_bit_le(rel_gfn, memslot->dirty_bitmap);
 
-        __loadsegment_simple(gs, 0);
-        wrmsrl(MSR_GS_BASE, cpu_kernelmode_gs_base(cpu));
+But that I don't get. Or rather, I don't get the commit message that
+matches this hunk. Do we want to catch the case where all of the
+following are true:
 
-Here the value of %gs between __loadsegment_simple() and wrmsrl() is
-zero, so when KMSAN's __msan_get_context_state() instrumentation
-function is called before the actual WRMSR instruction is performed,
-it will attempt to access percpu data and crash.
+- we don't have a vcpu,
+- we're allowed to log non-vcpu dirtying
+- we *only* have the ring?
 
-Unless instructed otherwise (by noinstr or __no_sanitize_memory on the
-source level, or by KMSAN_SANITIZE :=3D n on the Makefile level), KMSAN
-inserts instrumentation at function prologue for every non-inlined
-function, including native_write_msr().
+If so, can we please capture that in the commit message?
 
-Marking native_write_msr() noinstr actually makes the kernel boot for
-me, but I am not sure if this is enough. In fact we'll need to fix
-every situation in which instrumentation code may be called with
-invalid %gs value. Do you think this is feasible? Overall, should we
-care about KMSAN working with paravirtualization?
+Thanks,
 
-Thank you,
---=20
-Alexander Potapenko
-Software Engineer
+	M.
 
-Google Germany GmbH
-Erika-Mann-Stra=C3=9Fe, 33
-80636 M=C3=BCnchen
-
-Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Liana Sebastian
-Registergericht und -nummer: Hamburg, HRB 86891
-Sitz der Gesellschaft: Hamburg
+-- 
+Without deviation from the norm, progress is not possible.
