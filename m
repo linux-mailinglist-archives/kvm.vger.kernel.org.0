@@ -2,101 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A98962584F
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 11:27:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4808D6258DF
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 11:55:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233861AbiKKK1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 05:27:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36670 "EHLO
+        id S233237AbiKKKzx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 05:55:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233769AbiKKK1T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 05:27:19 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B56DB64E6;
-        Fri, 11 Nov 2022 02:27:18 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id o13so4081024pgu.7;
-        Fri, 11 Nov 2022 02:27:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HAd+4xMrLdn7uEK5OU9JGHuakvbD4Z5nbQFr3uazpz0=;
-        b=fDpKlPQnYum4rSpRNBJ0Rv5Bvhz2rA00jSi1bCfcvR//TNAabls0hd5JiAZFJBi3IW
-         jNbSk7k6F6Uq+e4UMsU405CStaqt5NYzjNC4D7p/N94zq7BnOmQtF6ULjrXCvBudpIsD
-         peXrXgcKlxQCQmmrl5t8LOFJlZ0vLZOz64NH3bBRsi+0H3k4XX5oKSnb+fSpMoFZd1Oh
-         BHLKIX21/Qtauifnl+v6vtNYE3P/mH24DFyiHeEx6EmtElkL9qE1qbD5GmvS1p58+P3I
-         VyDdiM5Yrqk5Q61L52sLKEC1y5j6TPTeRibUly+o8g8tci2DSMW8HN+/BADFnLdLLTlr
-         GgXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HAd+4xMrLdn7uEK5OU9JGHuakvbD4Z5nbQFr3uazpz0=;
-        b=Alz1olhAyxl1Ei6vkFjAraugbwE5SFEvyuK5smygg472lYytP0efhMI3y4Lw+EwSEr
-         Gk+F58c9oHDcNJQ/8SMvy0hvpvC4XaKcRvjoogG0GvZei0cxEzai0HREnzESHS6M7Oki
-         u50WDasfVv2fHjNPBcWMkDukUmY3tjO9Zg71VuMDP1UszLk2tcVXHfsWEPArmFVKa7sw
-         AMZeXOuoxjUlGT9pwRmnMoOqBEoPf7XZ1Tvwut+dskFDEYP2fMMGcira5dS16sWSHOEH
-         eHeMZ12U8ICP47fEPRXNq5evSq7wB/dybAJNaXEXgpcERh9KUEVcd5PoW0j6wBXcfspx
-         FPeg==
-X-Gm-Message-State: ANoB5pl4KH9l7PBxpDHIIZNEpfuJ1AHCGTT2vD16YK3ykHshwfT8xJVJ
-        mvv2ekdCCdjTpQEaxpNwORQ=
-X-Google-Smtp-Source: AA0mqf5a4yZhpWZx4cQLkE1r6JMLphPS+YDXlfuj0q5W1lHa9iuPUTkIbk7qNvIZRrjs1vLLtVuJAQ==
-X-Received: by 2002:aa7:88d2:0:b0:56b:8181:fe3e with SMTP id k18-20020aa788d2000000b0056b8181fe3emr1955735pff.57.1668162438306;
-        Fri, 11 Nov 2022 02:27:18 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id u67-20020a626046000000b0056b6acb58a0sm1248612pfb.102.2022.11.11.02.27.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Nov 2022 02:27:18 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 8/8] KVM: x86/cpuid: Use fast return for cpuid "0xa" leaf when !enable_pmu
-Date:   Fri, 11 Nov 2022 18:26:45 +0800
-Message-Id: <20221111102645.82001-9-likexu@tencent.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221111102645.82001-1-likexu@tencent.com>
-References: <20221111102645.82001-1-likexu@tencent.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S233195AbiKKKzv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 05:55:51 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34957A1B8;
+        Fri, 11 Nov 2022 02:55:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668164149; x=1699700149;
+  h=from:to:cc:subject:date:message-id;
+  bh=O2g9ozphUY908mOhpsa+b7OyhsmdMF5WwXwnWaF1F/o=;
+  b=Ykm04UUT+XHMJNapWJWasUgXTrlj+tUUWHgI4w8U1VjBpZYf4sxOCiQ0
+   /S9fDsxZHc7mHSJIVHCypksTk2YcFu9HwzSsT1vMKZsVb3IGh4EPnlrEc
+   RwCz5iQK55WJ74ZzgYIX7iU7kmHcaSAzQ3weN4oc7+/RFLwkCxQXwgNsR
+   cqRZnSvEyf0duzQr/XDz7ht7imjJoNhTfIFKi4JKF5895wCI2RDAiiGKM
+   9X6jPZfakdGGv6EfDY8HPINxCq2aWD0Y5Z7fCIijs/pxh/Jt27QOIOEpb
+   DOFuBtmq2gl8UtLcSqVMb/CCo89P2ZurnfdkbWsleHx0dxGzFf6JEsoAb
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="373707862"
+X-IronPort-AV: E=Sophos;i="5.96,156,1665471600"; 
+   d="scan'208";a="373707862"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2022 02:55:48 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="668779140"
+X-IronPort-AV: E=Sophos;i="5.96,156,1665471600"; 
+   d="scan'208";a="668779140"
+Received: from yzhao56-desk.sh.intel.com ([10.238.200.254])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2022 02:55:46 -0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, zhenyuw@linux.intel.com,
+        Yan Zhao <yan.y.zhao@intel.com>
+Subject: [PATCH v2 0/3] add track_remove_slot and remove track_flush_slot
+Date:   Fri, 11 Nov 2022 18:32:47 +0800
+Message-Id: <20221111103247.22275-1-yan.y.zhao@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+This series is based on Sean's series
+https://lore.kernel.org/all/20221110014821.1548347-1-seanjc@google.com/,
+which allows KVM internal user of page track not to rely on the page track
+hook .track_flush_slot.
 
-Although when !enable_pmu, KVM will have zero-padded kvm_pmu_cap to do
-subsequent cpuid leaf assignments, one extra branch instruction saves
-a few subsequent zero-assignment instructions, speeding things up a bit.
+Page track hook track_flush_slot is for notification of slot flush and
+is called when a slot DELETE/MOVE is on-going.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/cpuid.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Page track hook track_remove_slot is for notification of slot removal
+and is called when the slot DELETE/MOVE has been committed.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index df551fa66ccc..719290ff6d77 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -922,7 +922,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		union cpuid10_eax eax;
- 		union cpuid10_edx edx;
+As KVMGT, the only external user of page track, actually only cares about
+when slot removal indeed happens, this series switches KVMGT to use the new
+hook .track_remove_slot.
+And as there are no users to .track_flush_slot any more, this hook is
+removed.
+
+v2:
+Corrected wrong email address of Sean. sorry.
  
--		if (!static_cpu_has(X86_FEATURE_ARCH_PERFMON)) {
-+		if (!enable_pmu || !static_cpu_has(X86_FEATURE_ARCH_PERFMON)) {
- 			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
- 			break;
- 		}
+Yan Zhao (3):
+  KVM: x86: add a new page track hook track_remove_slot
+  drm/i915/gvt: switch from track_flush_slot to track_remove_slot
+  KVM: x86: Remove the unused page track hook track_flush_slot
+
+ arch/x86/include/asm/kvm_page_track.h | 8 ++++----
+ arch/x86/kvm/mmu/page_track.c         | 8 ++++----
+ arch/x86/kvm/x86.c                    | 5 +++--
+ drivers/gpu/drm/i915/gvt/kvmgt.c      | 6 +++---
+ 4 files changed, 14 insertions(+), 13 deletions(-)
+
 -- 
-2.38.1
+2.17.1
 
