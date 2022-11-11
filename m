@@ -2,67 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F36162549E
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 08:50:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66ABC6254BD
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 08:57:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231615AbiKKHuK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 02:50:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34082 "EHLO
+        id S232890AbiKKH5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 02:57:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230232AbiKKHuI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 02:50:08 -0500
+        with ESMTP id S232540AbiKKH5U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 02:57:20 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E58DC54B12
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 23:49:15 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A7A263CE2
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 23:56:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668152954;
+        s=mimecast20190719; t=1668153388;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lQ2OMg/XDBnbe2LjD68xEzX2Z9rZ/ij03O6xGIiQqzA=;
-        b=ZU/COOHMj0h7XzjFkRFfO5mr1A8OfIXN0odcQ1mlCP77IEZE/MxsAjPuo9NvC7ia4JW1gf
-        M9wioTqkOMuC+h6Ju57sXIVml4wW+BA/flhWZ9usui7JGYN9qU4DkypL3ebHkq7zB0B171
-        AXTeR7SwRtXgayE8ucUSn4d8Zpgmi0E=
+        bh=UnTFHda/akjWgwzpX/PE2gG9WoMnoW6YdEZHH3/oXhA=;
+        b=b0kFjco/D3tiDcc1NeN4LN+tj9tWIWlnItUIrlMz822T3Gm1VFEeHwmXYG/he/dS4EalP7
+        xUsh6ITAwC2CMP/IkjLZ0/5w0kEOS0sWc48XicDwC6e5h1q96i4LAo1F0MFExQ+YCQ1LjY
+        fTkcfvAa2fbunhe8Dw6wPqajPC0h9Bc=
 Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
  [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-553-XzhX5PKiNBimW_Dp5SI1Bw-1; Fri, 11 Nov 2022 02:49:12 -0500
-X-MC-Unique: XzhX5PKiNBimW_Dp5SI1Bw-1
-Received: by mail-pf1-f199.google.com with SMTP id cj8-20020a056a00298800b0056cee8a0cf8so2365248pfb.9
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 23:49:12 -0800 (PST)
+ us-mta-237-B6d_fBQ-MU2HmgvI5440dQ-1; Fri, 11 Nov 2022 02:56:25 -0500
+X-MC-Unique: B6d_fBQ-MU2HmgvI5440dQ-1
+Received: by mail-pf1-f199.google.com with SMTP id x8-20020aa79568000000b0056dd717e051so2395782pfq.11
+        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 23:56:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lQ2OMg/XDBnbe2LjD68xEzX2Z9rZ/ij03O6xGIiQqzA=;
-        b=epBjb9uafLunqDx0hv2kt5f3rYbayuIPw4I0Tg0lFUQH1hTue+CaucV4L18b3x24Pd
-         hwazvMxhwvGMOa44Olhz7vgmKd980KL3yZSH1Pj38N8hLB4opNfqGl1ocT5d+ve003dG
-         Tl6coYON04HSTjcKjowm9uHQz4SFyjjZQcQiYuBI1DRjdiHr+e0rgUp5fnzjy1J/nHCB
-         9Grg4TdI8D+R3KiUf9bvfb3LaRm7E7BIasOquEy4aVMFXhZxUqFI5GzYBHWi6sEZq0Xo
-         rVt4A4lqP6b9q6W1vjZ/0T24mQ5bm4bKA7/sRmh9baLYjv4kH2VgN124/MwIc7bkA4kc
-         oVlQ==
-X-Gm-Message-State: ANoB5pnnfaQ5QZLWTW+nlqSuLFMe5SJoBQhfnyJ9vvTtq3Q4z6PbN+rL
-        +gw/bkitggz6csLEEXkft85KC3pJgDd5yXicqVZHFioj8xeYtuIEqPdPX/TXEotMu2AweqG5Ewa
-        UHZW+tkQczvxT
-X-Received: by 2002:a17:902:d353:b0:180:be71:6773 with SMTP id l19-20020a170902d35300b00180be716773mr1580524plk.42.1668152950585;
-        Thu, 10 Nov 2022 23:49:10 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5hugxwU3w8Xl0Dv7S4TgEzgOZHCVEsrDcsWDpBKgH57oQNNCHlxuBgcCknkXEzU/xAGZjPTQ==
-X-Received: by 2002:a17:902:d353:b0:180:be71:6773 with SMTP id l19-20020a170902d35300b00180be716773mr1580496plk.42.1668152950286;
-        Thu, 10 Nov 2022 23:49:10 -0800 (PST)
-Received: from [10.72.13.217] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id p13-20020a17090b010d00b002009db534d1sm1000708pjz.24.2022.11.10.23.49.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Nov 2022 23:49:09 -0800 (PST)
-Message-ID: <be553273-7c06-78f7-4d23-de9f46a210b1@redhat.com>
-Date:   Fri, 11 Nov 2022 15:48:58 +0800
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UnTFHda/akjWgwzpX/PE2gG9WoMnoW6YdEZHH3/oXhA=;
+        b=tqWVCWRkv/V+CMLVTM0K+slXP/74gb2VXcs1IZumzCu0boWcAr+wMfo8nHFB7VQbF1
+         UDH9mjQitbMexB2Moseq7+apYKt1avgnfzL3hzNKiFq8Q+BFHhjIgWrFJRBfQkZKJF+x
+         iUEQw+yfUyd+hiwO6u/vLCj5J4hF6/oYBfhWngWDIHxXxr6InLyEue6LnxcOss1Nchz4
+         VjwD9GlbR3jY1yNgucSJkthMqRSa22vtVTz4KvKKOzNYmpm4O6z+l7P1EuPZ+q8TPC+V
+         3SMerYLJgjqxVmDGYD/2R3eABNY4JgSSZIQBZDsRJCJ+q8kyBiIkXHBC1bs8eMKubeJ4
+         6nfw==
+X-Gm-Message-State: ANoB5pnRBndEa3i0vblAbaae8MjeWF3EzX9H9ZezIcFB8O9MXRD0YSQf
+        444uhW5jBM2qtgL0wVya7xkIuknGFbTSaxE+YLKXEZ47KzqLCIcHGr7ZCEVHCqNLKfC0aeOZrFu
+        sWYCZ7D9DVSTpvdc0/4KRcbI3aEQk
+X-Received: by 2002:a63:535e:0:b0:46f:98cf:3bb6 with SMTP id t30-20020a63535e000000b0046f98cf3bb6mr666998pgl.332.1668153384466;
+        Thu, 10 Nov 2022 23:56:24 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6zj1smmqmQGSImMBVUk1UvMmcC8P5xYJwYwpl7RXo60Jkv/KNrmV2ZAEYOYogj39nEjkRMlN4zw6vJdgQTQH4=
+X-Received: by 2002:a63:535e:0:b0:46f:98cf:3bb6 with SMTP id
+ t30-20020a63535e000000b0046f98cf3bb6mr666975pgl.332.1668153384152; Thu, 10
+ Nov 2022 23:56:24 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.4.2
-Subject: Re: [PATCH v6 09/10] vdpa: Add listener_shadow_vq to vhost_vdpa
-Content-Language: en-US
-To:     Eugenio Perez Martin <eperezma@redhat.com>
+References: <20221108170755.92768-1-eperezma@redhat.com> <20221108170755.92768-6-eperezma@redhat.com>
+ <56bfad97-74d2-8570-c391-83ecf9965cfd@redhat.com> <CAJaqyWd47QdBoSm9RdF2yx21hKv_=YRp3uvP13Qb9PaVksss7Q@mail.gmail.com>
+ <aa82783b-b1f5-a82b-5136-1f7f7725a433@redhat.com>
+In-Reply-To: <aa82783b-b1f5-a82b-5136-1f7f7725a433@redhat.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Fri, 11 Nov 2022 08:55:48 +0100
+Message-ID: <CAJaqyWfmTn1_o2z2S_o=bu2mD=r0+T=1+dh_WOwbpQaYQK0YSQ@mail.gmail.com>
+Subject: Re: [PATCH v6 05/10] vdpa: move SVQ vring features check to net/
+To:     Jason Wang <jasowang@redhat.com>
 Cc:     qemu-devel@nongnu.org, Parav Pandit <parav@mellanox.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Si-Wei Liu <si-wei.liu@oracle.com>,
@@ -77,128 +76,182 @@ Cc:     qemu-devel@nongnu.org, Parav Pandit <parav@mellanox.com>,
         Zhu Lingshan <lingshan.zhu@intel.com>, kvm@vger.kernel.org,
         "Gonglei (Arei)" <arei.gonglei@huawei.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-References: <20221108170755.92768-1-eperezma@redhat.com>
- <20221108170755.92768-10-eperezma@redhat.com>
- <CACGkMEsr=fpbbOpUBHawt5DR+nTWcK1uMzXgorEcbijso1wsMQ@mail.gmail.com>
- <CAJaqyWemKoRNd6_uvFc79qYe+7pbavJSjnZuczxk5uxSZZdZ2Q@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <CAJaqyWemKoRNd6_uvFc79qYe+7pbavJSjnZuczxk5uxSZZdZ2Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-在 2022/11/10 21:47, Eugenio Perez Martin 写道:
-> On Thu, Nov 10, 2022 at 7:01 AM Jason Wang <jasowang@redhat.com> wrote:
->> On Wed, Nov 9, 2022 at 1:08 AM Eugenio Pérez <eperezma@redhat.com> wrote:
->>> The memory listener that thells the device how to convert GPA to qemu's
->>> va is registered against CVQ vhost_vdpa. This series try to map the
->>> memory listener translations to ASID 0, while it maps the CVQ ones to
->>> ASID 1.
->>>
->>> Let's tell the listener if it needs to register them on iova tree or
->>> not.
->>>
->>> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
->>> ---
->>> v5: Solve conflict about vhost_iova_tree_remove accepting mem_region by
->>>      value.
->>> ---
->>>   include/hw/virtio/vhost-vdpa.h | 2 ++
->>>   hw/virtio/vhost-vdpa.c         | 6 +++---
->>>   net/vhost-vdpa.c               | 1 +
->>>   3 files changed, 6 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/include/hw/virtio/vhost-vdpa.h b/include/hw/virtio/vhost-vdpa.h
->>> index 6560bb9d78..0c3ed2d69b 100644
->>> --- a/include/hw/virtio/vhost-vdpa.h
->>> +++ b/include/hw/virtio/vhost-vdpa.h
->>> @@ -34,6 +34,8 @@ typedef struct vhost_vdpa {
->>>       struct vhost_vdpa_iova_range iova_range;
->>>       uint64_t acked_features;
->>>       bool shadow_vqs_enabled;
->>> +    /* The listener must send iova tree addresses, not GPA */
-
-
-Btw, cindy's vIOMMU series will make it not necessarily GPA any more.
-
-
->>> +    bool listener_shadow_vq;
->>>       /* IOVA mapping used by the Shadow Virtqueue */
->>>       VhostIOVATree *iova_tree;
->>>       GPtrArray *shadow_vqs;
->>> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
->>> index 8fd32ba32b..e3914fa40e 100644
->>> --- a/hw/virtio/vhost-vdpa.c
->>> +++ b/hw/virtio/vhost-vdpa.c
->>> @@ -220,7 +220,7 @@ static void vhost_vdpa_listener_region_add(MemoryListener *listener,
->>>                                            vaddr, section->readonly);
->>>
->>>       llsize = int128_sub(llend, int128_make64(iova));
->>> -    if (v->shadow_vqs_enabled) {
->>> +    if (v->listener_shadow_vq) {
->>>           int r;
->>>
->>>           mem_region.translated_addr = (hwaddr)(uintptr_t)vaddr,
->>> @@ -247,7 +247,7 @@ static void vhost_vdpa_listener_region_add(MemoryListener *listener,
->>>       return;
->>>
->>>   fail_map:
->>> -    if (v->shadow_vqs_enabled) {
->>> +    if (v->listener_shadow_vq) {
->>>           vhost_iova_tree_remove(v->iova_tree, mem_region);
->>>       }
->>>
->>> @@ -292,7 +292,7 @@ static void vhost_vdpa_listener_region_del(MemoryListener *listener,
->>>
->>>       llsize = int128_sub(llend, int128_make64(iova));
->>>
->>> -    if (v->shadow_vqs_enabled) {
->>> +    if (v->listener_shadow_vq) {
->>>           const DMAMap *result;
->>>           const void *vaddr = memory_region_get_ram_ptr(section->mr) +
->>>               section->offset_within_region +
->>> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
->>> index 85a318faca..02780ee37b 100644
->>> --- a/net/vhost-vdpa.c
->>> +++ b/net/vhost-vdpa.c
->>> @@ -570,6 +570,7 @@ static NetClientState *net_vhost_vdpa_init(NetClientState *peer,
->>>       s->vhost_vdpa.index = queue_pair_index;
->>>       s->always_svq = svq;
->>>       s->vhost_vdpa.shadow_vqs_enabled = svq;
->>> +    s->vhost_vdpa.listener_shadow_vq = svq;
->> Any chance those above two can differ?
->>
-> If CVQ is shadowed but data VQs are not, shadow_vqs_enabled is true
-> but listener_shadow_vq is not.
+On Fri, Nov 11, 2022 at 8:34 AM Jason Wang <jasowang@redhat.com> wrote:
 >
-> It is more clear in the next commit, where only shadow_vqs_enabled is
-> set to true at vhost_vdpa_net_cvq_start.
+>
+> =E5=9C=A8 2022/11/10 21:09, Eugenio Perez Martin =E5=86=99=E9=81=93:
+> > On Thu, Nov 10, 2022 at 6:40 AM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> =E5=9C=A8 2022/11/9 01:07, Eugenio P=C3=A9rez =E5=86=99=E9=81=93:
+> >>> The next patches will start control SVQ if possible. However, we don'=
+t
+> >>> know if that will be possible at qemu boot anymore.
+> >>
+> >> If I was not wrong, there's no device specific feature that is checked
+> >> in the function. So it should be general enough to be used by devices
+> >> other than net. Then I don't see any advantage of doing this.
+> >>
+> > Because vhost_vdpa_init_svq is called at qemu boot, failing if it is
+> > not possible to shadow the Virtqueue.
+> >
+> > Now the CVQ will be shadowed if possible, so we need to check this at
+> > device start, not at initialization.
+>
+>
+> Any reason we can't check this at device start? We don't need
+> driver_features and we can do any probing to make sure cvq has an unique
+> group during initialization time.
+>
 
+We need the CVQ index to check if it has an independent group. CVQ
+index depends on the features the guest's ack:
+* If it acks _F_MQ, it is the last one.
+* If it doesn't, CVQ idx is 2.
 
-Ok, the name looks a little bit confusing. I wonder if it's better to 
-use shadow_cvq and shadow_data ?
-
-Thanks
-
+We cannot have acked features at initialization, and they could
+change: It is valid for a guest to ack _F_MQ, then reset the device,
+then not ack it.
 
 >
-> Thanks!
+> >   To store this information at boot
+> > time is not valid anymore, because v->shadow_vqs_enabled is not valid
+> > at this time anymore.
 >
->> Thanks
->>
->>>       s->vhost_vdpa.iova_tree = iova_tree;
->>>       if (!is_datapath) {
->>>           s->cvq_cmd_out_buffer = qemu_memalign(qemu_real_host_page_size(),
->>> --
->>> 2.31.1
->>>
+>
+> Ok, but this doesn't explain why it is net specific but vhost-vdpa specif=
+ic.
+>
+
+We can try to move it to a vhost op, but we have the same problem as
+the svq array allocation: We don't have the right place in vhost ops
+to check this. Maybe vhost_set_features is the right one here?
+
+Thanks!
+
+> Thanks
+>
+>
+> >
+> > Thanks!
+> >
+> >> Thanks
+> >>
+> >>
+> >>> Since the moved checks will be already evaluated at net/ to know if i=
+t
+> >>> is ok to shadow CVQ, move them.
+> >>>
+> >>> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> >>> ---
+> >>>    hw/virtio/vhost-vdpa.c | 33 ++-------------------------------
+> >>>    net/vhost-vdpa.c       |  3 ++-
+> >>>    2 files changed, 4 insertions(+), 32 deletions(-)
+> >>>
+> >>> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+> >>> index 3df2775760..146f0dcb40 100644
+> >>> --- a/hw/virtio/vhost-vdpa.c
+> >>> +++ b/hw/virtio/vhost-vdpa.c
+> >>> @@ -402,29 +402,9 @@ static int vhost_vdpa_get_dev_features(struct vh=
+ost_dev *dev,
+> >>>        return ret;
+> >>>    }
+> >>>
+> >>> -static int vhost_vdpa_init_svq(struct vhost_dev *hdev, struct vhost_=
+vdpa *v,
+> >>> -                               Error **errp)
+> >>> +static void vhost_vdpa_init_svq(struct vhost_dev *hdev, struct vhost=
+_vdpa *v)
+> >>>    {
+> >>>        g_autoptr(GPtrArray) shadow_vqs =3D NULL;
+> >>> -    uint64_t dev_features, svq_features;
+> >>> -    int r;
+> >>> -    bool ok;
+> >>> -
+> >>> -    if (!v->shadow_vqs_enabled) {
+> >>> -        return 0;
+> >>> -    }
+> >>> -
+> >>> -    r =3D vhost_vdpa_get_dev_features(hdev, &dev_features);
+> >>> -    if (r !=3D 0) {
+> >>> -        error_setg_errno(errp, -r, "Can't get vdpa device features")=
+;
+> >>> -        return r;
+> >>> -    }
+> >>> -
+> >>> -    svq_features =3D dev_features;
+> >>> -    ok =3D vhost_svq_valid_features(svq_features, errp);
+> >>> -    if (unlikely(!ok)) {
+> >>> -        return -1;
+> >>> -    }
+> >>>
+> >>>        shadow_vqs =3D g_ptr_array_new_full(hdev->nvqs, vhost_svq_free=
+);
+> >>>        for (unsigned n =3D 0; n < hdev->nvqs; ++n) {
+> >>> @@ -436,7 +416,6 @@ static int vhost_vdpa_init_svq(struct vhost_dev *=
+hdev, struct vhost_vdpa *v,
+> >>>        }
+> >>>
+> >>>        v->shadow_vqs =3D g_steal_pointer(&shadow_vqs);
+> >>> -    return 0;
+> >>>    }
+> >>>
+> >>>    static int vhost_vdpa_init(struct vhost_dev *dev, void *opaque, Er=
+ror **errp)
+> >>> @@ -461,11 +440,7 @@ static int vhost_vdpa_init(struct vhost_dev *dev=
+, void *opaque, Error **errp)
+> >>>        dev->opaque =3D  opaque ;
+> >>>        v->listener =3D vhost_vdpa_memory_listener;
+> >>>        v->msg_type =3D VHOST_IOTLB_MSG_V2;
+> >>> -    ret =3D vhost_vdpa_init_svq(dev, v, errp);
+> >>> -    if (ret) {
+> >>> -        goto err;
+> >>> -    }
+> >>> -
+> >>> +    vhost_vdpa_init_svq(dev, v);
+> >>>        vhost_vdpa_get_iova_range(v);
+> >>>
+> >>>        if (!vhost_vdpa_first_dev(dev)) {
+> >>> @@ -476,10 +451,6 @@ static int vhost_vdpa_init(struct vhost_dev *dev=
+, void *opaque, Error **errp)
+> >>>                                   VIRTIO_CONFIG_S_DRIVER);
+> >>>
+> >>>        return 0;
+> >>> -
+> >>> -err:
+> >>> -    ram_block_discard_disable(false);
+> >>> -    return ret;
+> >>>    }
+> >>>
+> >>>    static void vhost_vdpa_host_notifier_uninit(struct vhost_dev *dev,
+> >>> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> >>> index d3b1de481b..fb35b17ab4 100644
+> >>> --- a/net/vhost-vdpa.c
+> >>> +++ b/net/vhost-vdpa.c
+> >>> @@ -117,9 +117,10 @@ static bool vhost_vdpa_net_valid_svq_features(ui=
+nt64_t features, Error **errp)
+> >>>        if (invalid_dev_features) {
+> >>>            error_setg(errp, "vdpa svq does not work with features 0x%=
+" PRIx64,
+> >>>                       invalid_dev_features);
+> >>> +        return false;
+> >>>        }
+> >>>
+> >>> -    return !invalid_dev_features;
+> >>> +    return vhost_svq_valid_features(features, errp);
+> >>>    }
+> >>>
+> >>>    static int vhost_vdpa_net_check_device_id(struct vhost_net *net)
+>
 
