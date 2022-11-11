@@ -2,68 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B1DB626103
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 19:25:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCD26626135
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 19:35:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233172AbiKKSZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 13:25:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59816 "EHLO
+        id S233096AbiKKSe7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 13:34:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232004AbiKKSZm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 13:25:42 -0500
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF024C245
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 10:25:40 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id l14so7521788wrw.2
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 10:25:40 -0800 (PST)
+        with ESMTP id S231261AbiKKSe6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 13:34:58 -0500
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F1F178A6
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 10:34:57 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id j15so7549921wrq.3
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 10:34:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=G49Mn+39h2vPHN4AzQaatrKwexURVZpgkUVTRaS+5Pc=;
-        b=WB/wwEOIACBjbBhKnyfseiSz3pDcL9oZTsaYCULkUqK3NEvW0UQwVPMxFjZ6EBZLBa
-         epcz/PYPc+SWbDx2qfiyXulkJo0Tmc6G0c4IEY52tTo7MF7SL/hTwoQn1pyR3J7pHu6K
-         12gNv78rx8nYNn6Xhlnm0u+lsZ9P4GNJ8g2ohlNkDb1Z553J2IqQOLizgZmzkYCx5b9v
-         OPg7jOUuOgzbd4GyUJ0DDJ4Y9M7+lQoYivaRYQAtt9MPVrl7pXdoMAHvBe77mMwzsRaB
-         b11UK9xHiz8WTKIxB4ZaapVY7+7CYkn2rLnQ6fQ5a5wwXeTYDEVi45qMMACsMWYMbE58
-         X1QQ==
+        bh=KjvcD/bUb6v85GBYMsY2wRda3lPUntOnEJ8cQndopVc=;
+        b=j07ZcctBaiVRR4dHoUX9jCUfu4N4o7HNNO6oPYNq/GaPjeAsFFnZJfoBUGtZa7iaVC
+         q7Tk8wIPIr3lqDUZ/U9GgOVskORuQJhX2zf3JXG98i1S58y29kCb7N+62SW+0myhkOtD
+         QVqjnwVU8Hbe6zEOhXf/wVIJW3kZmpxtnHDeFJAvao/pPWbSHgAtY+tHi3oNMubkT0ai
+         nIGN8RERXD+MGSz1CQTDUPYbIngyaiSRAHT0SucBRJNeS6/MCbvLg97iJTEbGPF27foP
+         3euQevj5rwR32v2a/X8vycNPPui7dx2sG4u5N9cozpWDNekiDzJ4y1b0Ej5lURnLsFq2
+         hfTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=G49Mn+39h2vPHN4AzQaatrKwexURVZpgkUVTRaS+5Pc=;
-        b=N0alVUalzASe3B7/fJHxpS2cMaXvCbq10ZbxOVCtJkeLFyB4wkqtvMslml1cJiAKY/
-         5YMvqhKhmpLEtJBcyiKrCJAoRt3jMjmnME0fTx+jB1zmXLG3FEbFf2VSqQW1gnvQVsVN
-         xJjnZbsuwhexGbLBCCcowCZP9qbv4m/cfxPBhm+QaNHgvZFyxQG5kYej3BOn/6dIX+de
-         aj8uTXGWO3l4ggG4zTOhv1/QJ19WciKqUlYs7BmYlS/rD2WieLsjeVOKmX4Eqg9SEN2F
-         p2fItGD+3+1+k5TeV4DuVbseqk/AvaJ+nyD2ln8uSt+vR/qHRpyN/dDq6MLnBK49vyEr
-         Ywkg==
-X-Gm-Message-State: ANoB5pkVQUgXSacU50nurSl5NgobM/QTWNNPig9TynkGu36NsMpuhLeG
-        OeoHps/j3MjJUXWP5KnVv97etA==
-X-Google-Smtp-Source: AA0mqf649pn/4HiKtJfKmwJfm2X7mYbRMg2bPJtphdYBi2AHk6GnUw0/kw8d4Q/eRXLE0FMEOrggXA==
-X-Received: by 2002:adf:ea4d:0:b0:236:8fa1:47cf with SMTP id j13-20020adfea4d000000b002368fa147cfmr2101859wrn.50.1668191139036;
-        Fri, 11 Nov 2022 10:25:39 -0800 (PST)
+        bh=KjvcD/bUb6v85GBYMsY2wRda3lPUntOnEJ8cQndopVc=;
+        b=q5gywP+2rIl4+FRQxDBjUhPdFiOw365mSoiCE6EFnyvQq341dfiVBQhkuCBs/ESq/E
+         fD34so5K2KXDkV3hdtuzPUWS+JArYlLYkp6ObbBBane++7vBl8NZVRKfUEcwZ+YlwfS3
+         hMBcxZi1rq+vE+FPoDgJP/Eu5E80O2326hN/FYzIEE8XgG9Gvij3ulVL5EyRt3xl99kQ
+         HeZkezfwfeVsI353DfCpc2yZqb83kgDJbQFMUGm+ZhI7FhnpsroTLBB1krwMl/HCCdWy
+         yHrBZ7HMHCCKDEj/K/tLUh0LoC7v7oBg4i/9Cj5Gx+7J8OJslj7MPFOa5nBtVPHWFhUZ
+         SsqA==
+X-Gm-Message-State: ANoB5pkq/U4R4177+zh2Mx8JC9rs3t7/+D5kqCrtdXc6Vk8ctNULTf22
+        JKWkk/2CSXDRl368XhvKj7jUNaIB6CVoKw==
+X-Google-Smtp-Source: AA0mqf4jHdXwT+07aSV3JQymPXLBWFlFBOCfyq7XM6J/G1XScEyOZkpznnYp/Nm7WZcPlAxOogtz+A==
+X-Received: by 2002:a5d:68c1:0:b0:236:84b5:c0d8 with SMTP id p1-20020a5d68c1000000b0023684b5c0d8mr2071393wrw.342.1668191695330;
+        Fri, 11 Nov 2022 10:34:55 -0800 (PST)
 Received: from zen.linaroharston ([185.81.254.11])
-        by smtp.gmail.com with ESMTPSA id n7-20020adffe07000000b002366f9bd717sm2921843wrr.45.2022.11.11.10.25.36
+        by smtp.gmail.com with ESMTPSA id u17-20020a05600c4d1100b003cfb7c02542sm3505512wmp.11.2022.11.11.10.34.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Nov 2022 10:25:37 -0800 (PST)
+        Fri, 11 Nov 2022 10:34:51 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 0B9BF1FFBC;
+        by zen.linaroharston (Postfix) with ESMTP id F38891FFB8;
         Fri, 11 Nov 2022 18:25:36 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     f4bug@amsat.org,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Peter Maydell <peter.maydell@linaro.org>,
+        Wenchao Wang <wenchao.wang@intel.com>,
+        Kamil Rytarowski <kamil@netbsd.org>,
+        Reinoud Zandijk <reinoud@netbsd.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        qemu-arm@nongnu.org (open list:ARM KVM CPUs),
-        kvm@vger.kernel.org (open list:Overall KVM CPUs)
-Subject: [PATCH  v5 04/20] target/arm: ensure KVM traps set appropriate MemTxAttrs
-Date:   Fri, 11 Nov 2022 18:25:19 +0000
-Message-Id: <20221111182535.64844-5-alex.bennee@linaro.org>
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        haxm-team@intel.com (open list:X86 HAXM CPUs),
+        kvm@vger.kernel.org (open list:X86 KVM CPUs)
+Subject: [PATCH  v5 13/20] target/i386: add explicit initialisation for MexTxAttrs
+Date:   Fri, 11 Nov 2022 18:25:28 +0000
+Message-Id: <20221111182535.64844-14-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221111182535.64844-1-alex.bennee@linaro.org>
 References: <20221111182535.64844-1-alex.bennee@linaro.org>
@@ -79,71 +82,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Although most KVM users will use the in-kernel GIC emulation it is
-perfectly possible not to. In this case we need to ensure the
-MemTxAttrs are correctly populated so the GIC can divine the source
-CPU of the operation.
+Where appropriate initialise with MEMTXATTRS_CPU otherwise use
+MEMTXATTRS_UNSPECIFIED instead of the null initialiser.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
 ---
-v3
-  - new for v3
-v5
-  - tags
-  - use MEMTXATTRS_PCI
----
- target/arm/kvm.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ target/i386/cpu.h           | 4 +++-
+ target/i386/hax/hax-all.c   | 2 +-
+ target/i386/nvmm/nvmm-all.c | 2 +-
+ target/i386/sev.c           | 2 +-
+ target/i386/whpx/whpx-all.c | 2 +-
+ 5 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index f022c644d2..bb4cdbfbd5 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -803,13 +803,14 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index d4bc19577a..04ab96b076 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -2246,7 +2246,9 @@ static inline uint32_t cpu_compute_eflags(CPUX86State *env)
+ 
+ static inline MemTxAttrs cpu_get_mem_attrs(CPUX86State *env)
  {
-     ARMCPU *cpu;
-     uint32_t switched_level;
-+    MemTxAttrs attrs = MEMTXATTRS_CPU(cs);
- 
-     if (kvm_irqchip_in_kernel()) {
-         /*
-          * We only need to sync timer states with user-space interrupt
-          * controllers, so return early and save cycles if we don't.
-          */
--        return MEMTXATTRS_UNSPECIFIED;
-+        return attrs;
-     }
- 
-     cpu = ARM_CPU(cs);
-@@ -850,7 +851,7 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
-         qemu_mutex_unlock_iothread();
-     }
- 
--    return MEMTXATTRS_UNSPECIFIED;
+-    return ((MemTxAttrs) { .secure = (env->hflags & HF_SMM_MASK) != 0 });
++    MemTxAttrs attrs = MEMTXATTRS_CPU(env_cpu(env));
++    attrs.secure = (env->hflags & HF_SMM_MASK) != 0;
 +    return attrs;
  }
  
- void kvm_arm_vm_state_change(void *opaque, bool running, RunState state)
-@@ -1005,6 +1006,7 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
-     hwaddr xlat, len, doorbell_gpa;
-     MemoryRegionSection mrs;
-     MemoryRegion *mr;
-+    MemTxAttrs attrs = MEMTXATTRS_PCI(dev);
+ static inline int32_t x86_get_a20_mask(CPUX86State *env)
+diff --git a/target/i386/hax/hax-all.c b/target/i386/hax/hax-all.c
+index b185ee8de4..337090e16f 100644
+--- a/target/i386/hax/hax-all.c
++++ b/target/i386/hax/hax-all.c
+@@ -385,7 +385,7 @@ static int hax_handle_io(CPUArchState *env, uint32_t df, uint16_t port,
+ {
+     uint8_t *ptr;
+     int i;
+-    MemTxAttrs attrs = { 0 };
++    MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
  
-     if (as == &address_space_memory) {
-         return 0;
-@@ -1014,8 +1016,7 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+     if (!df) {
+         ptr = (uint8_t *) buffer;
+diff --git a/target/i386/nvmm/nvmm-all.c b/target/i386/nvmm/nvmm-all.c
+index b75738ee9c..cb0720a6fa 100644
+--- a/target/i386/nvmm/nvmm-all.c
++++ b/target/i386/nvmm/nvmm-all.c
+@@ -502,7 +502,7 @@ nvmm_vcpu_post_run(CPUState *cpu, struct nvmm_vcpu_exit *exit)
+ static void
+ nvmm_io_callback(struct nvmm_io *io)
+ {
+-    MemTxAttrs attrs = { 0 };
++    MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+     int ret;
  
-     RCU_READ_LOCK_GUARD();
+     ret = address_space_rw(&address_space_io, io->port, attrs, io->data,
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 32f7dbac4e..292cbcdd92 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -1274,7 +1274,7 @@ bool sev_add_kernel_loader_hashes(SevKernelLoaderContext *ctx, Error **errp)
+     uint8_t *hashp;
+     size_t hash_len = HASH_SIZE;
+     hwaddr mapped_len = sizeof(*padded_ht);
+-    MemTxAttrs attrs = { 0 };
++    MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+     bool ret = true;
  
--    mr = address_space_translate(as, address, &xlat, &len, true,
--                                 MEMTXATTRS_UNSPECIFIED);
-+    mr = address_space_translate(as, address, &xlat, &len, true, attrs);
- 
-     if (!mr) {
-         return 1;
+     /*
+diff --git a/target/i386/whpx/whpx-all.c b/target/i386/whpx/whpx-all.c
+index e738d83e81..42846144dd 100644
+--- a/target/i386/whpx/whpx-all.c
++++ b/target/i386/whpx/whpx-all.c
+@@ -791,7 +791,7 @@ static HRESULT CALLBACK whpx_emu_ioport_callback(
+     void *ctx,
+     WHV_EMULATOR_IO_ACCESS_INFO *IoAccess)
+ {
+-    MemTxAttrs attrs = { 0 };
++    MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+     address_space_rw(&address_space_io, IoAccess->Port, attrs,
+                      &IoAccess->Data, IoAccess->AccessSize,
+                      IoAccess->Direction);
 -- 
 2.34.1
 
