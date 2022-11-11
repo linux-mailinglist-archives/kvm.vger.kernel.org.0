@@ -2,138 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE3D16260F7
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 19:19:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B1DB626103
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 19:25:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233225AbiKKSTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 13:19:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57670 "EHLO
+        id S233172AbiKKSZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 13:25:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232851AbiKKSTV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 13:19:21 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F24EE2B
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 10:19:20 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id v28so5519154pfi.12
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 10:19:20 -0800 (PST)
+        with ESMTP id S232004AbiKKSZm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 13:25:42 -0500
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF024C245
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 10:25:40 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id l14so7521788wrw.2
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 10:25:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E/joC3rBRu6szzAGRTFTKxdLKepicTRIoPul13yjtyo=;
-        b=XeJT6PZtgqR21XiJLI4nL1rULhXugV6G1Aak5971SzkfNU+Yve4TGSaM3c1rXphMJq
-         UNq8HXQJ9aI09BO/HX+6xKh6RC8IvrjlK0RuGIaeBkfCvEUYI70a9Ux0Kh8ybQchY2B2
-         zA9L3w0F+Kj39RljYeEuJqoaAjnuNXOAv+p9tWkbEa75m3I+k66/Y+sVdF5CWt+bKSI3
-         rJFhdjE792ZFpMf5YJjeDzj8zde8jaspzGHNLXGmqKn1lTKSj3TvMrCoZUiB6zC4shd6
-         XvTNZVwLvIIlCO2hPdCnYq6WMP+IW85H5uuwStvr2mZRwdrimn1rc1ANrx69zoVug5v+
-         K8Uw==
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G49Mn+39h2vPHN4AzQaatrKwexURVZpgkUVTRaS+5Pc=;
+        b=WB/wwEOIACBjbBhKnyfseiSz3pDcL9oZTsaYCULkUqK3NEvW0UQwVPMxFjZ6EBZLBa
+         epcz/PYPc+SWbDx2qfiyXulkJo0Tmc6G0c4IEY52tTo7MF7SL/hTwoQn1pyR3J7pHu6K
+         12gNv78rx8nYNn6Xhlnm0u+lsZ9P4GNJ8g2ohlNkDb1Z553J2IqQOLizgZmzkYCx5b9v
+         OPg7jOUuOgzbd4GyUJ0DDJ4Y9M7+lQoYivaRYQAtt9MPVrl7pXdoMAHvBe77mMwzsRaB
+         b11UK9xHiz8WTKIxB4ZaapVY7+7CYkn2rLnQ6fQ5a5wwXeTYDEVi45qMMACsMWYMbE58
+         X1QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E/joC3rBRu6szzAGRTFTKxdLKepicTRIoPul13yjtyo=;
-        b=MbgIIFK0z7zAhqko7En3BX58Xd9oL9u+qKrYFhVqT6dO03CehnHVllFniRQHpQnjAi
-         KokwymKsrMLXjkNffWlZHttC+jYzIiCnRLSamWpq5jZF1gR1g2dF4V02kfwIadVVJGrN
-         01IFhKhCuxzjK3IiQEFKHZqgJDSZ12jR/y0lnpM0FZ/3jZtiHuF/tZOKFawAl/8CGB7R
-         PMq2qSCq3GTMCHxY5QvNmtxfK+JJGjO+aK083tj/nRp9qttcQGzyAwq7XKmBGC1HCt+0
-         7H1o3JuK3r5DrAU7vfki7FcvME1slWZnPeZiVU/Q6sfntLhGJLPW/FAsxmojlycerz1n
-         VBgA==
-X-Gm-Message-State: ANoB5plX6dQiSckzJeIz3Kv1RfY6SaXB4YlQKW+GxBvlRl+ILqhBBrGa
-        uXCRRduWB0MCgcPVw9oUQBQv2w==
-X-Google-Smtp-Source: AA0mqf7HFVgDPir8+MW/ttweKldJ4iGrAcZDLN5q/SpYzFAno64kC//kH/RNaqrmyuvit8zaDFItUg==
-X-Received: by 2002:a05:6a00:3022:b0:560:e4d1:8df5 with SMTP id ay34-20020a056a00302200b00560e4d18df5mr3945850pfb.39.1668190759766;
-        Fri, 11 Nov 2022 10:19:19 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id q19-20020aa78433000000b0056bcfe015c9sm1865286pfn.204.2022.11.11.10.19.18
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G49Mn+39h2vPHN4AzQaatrKwexURVZpgkUVTRaS+5Pc=;
+        b=N0alVUalzASe3B7/fJHxpS2cMaXvCbq10ZbxOVCtJkeLFyB4wkqtvMslml1cJiAKY/
+         5YMvqhKhmpLEtJBcyiKrCJAoRt3jMjmnME0fTx+jB1zmXLG3FEbFf2VSqQW1gnvQVsVN
+         xJjnZbsuwhexGbLBCCcowCZP9qbv4m/cfxPBhm+QaNHgvZFyxQG5kYej3BOn/6dIX+de
+         aj8uTXGWO3l4ggG4zTOhv1/QJ19WciKqUlYs7BmYlS/rD2WieLsjeVOKmX4Eqg9SEN2F
+         p2fItGD+3+1+k5TeV4DuVbseqk/AvaJ+nyD2ln8uSt+vR/qHRpyN/dDq6MLnBK49vyEr
+         Ywkg==
+X-Gm-Message-State: ANoB5pkVQUgXSacU50nurSl5NgobM/QTWNNPig9TynkGu36NsMpuhLeG
+        OeoHps/j3MjJUXWP5KnVv97etA==
+X-Google-Smtp-Source: AA0mqf649pn/4HiKtJfKmwJfm2X7mYbRMg2bPJtphdYBi2AHk6GnUw0/kw8d4Q/eRXLE0FMEOrggXA==
+X-Received: by 2002:adf:ea4d:0:b0:236:8fa1:47cf with SMTP id j13-20020adfea4d000000b002368fa147cfmr2101859wrn.50.1668191139036;
+        Fri, 11 Nov 2022 10:25:39 -0800 (PST)
+Received: from zen.linaroharston ([185.81.254.11])
+        by smtp.gmail.com with ESMTPSA id n7-20020adffe07000000b002366f9bd717sm2921843wrr.45.2022.11.11.10.25.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Nov 2022 10:19:18 -0800 (PST)
-Date:   Fri, 11 Nov 2022 18:19:15 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, zhenyuw@linux.intel.com
-Subject: Re: [PATCH v2 1/3] KVM: x86: add a new page track hook
- track_remove_slot
-Message-ID: <Y26SI3uh8JV0vvO6@google.com>
-References: <20221111103247.22275-1-yan.y.zhao@intel.com>
- <20221111103350.22326-1-yan.y.zhao@intel.com>
+        Fri, 11 Nov 2022 10:25:37 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 0B9BF1FFBC;
+        Fri, 11 Nov 2022 18:25:36 +0000 (GMT)
+From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     f4bug@amsat.org,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        qemu-arm@nongnu.org (open list:ARM KVM CPUs),
+        kvm@vger.kernel.org (open list:Overall KVM CPUs)
+Subject: [PATCH  v5 04/20] target/arm: ensure KVM traps set appropriate MemTxAttrs
+Date:   Fri, 11 Nov 2022 18:25:19 +0000
+Message-Id: <20221111182535.64844-5-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221111182535.64844-1-alex.bennee@linaro.org>
+References: <20221111182535.64844-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221111103350.22326-1-yan.y.zhao@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TL;DR: I'm going to try to add more aggressive patches for this into my series to
-clean up the KVM side of things, along with many more patches to clean up the page
-track APIs.
+Although most KVM users will use the in-kernel GIC emulation it is
+perfectly possible not to. In this case we need to ensure the
+MemTxAttrs are correctly populated so the GIC can divine the source
+CPU of the operation.
 
-I'll post patches next week if things go well (fingers crossed), and if not I'll
-give an update 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-On Fri, Nov 11, 2022, Yan Zhao wrote:
-> Page track hook track_remove_slot is used to notify users that a slot
-> has been removed and is called when a slot DELETE/MOVE is about to be
-> completed.
+---
+v3
+  - new for v3
+v5
+  - tags
+  - use MEMTXATTRS_PCI
+---
+ target/arm/kvm.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-Phrase this as a command, and explain _why_ the new hook is being added, e.g.
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index f022c644d2..bb4cdbfbd5 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -803,13 +803,14 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+ {
+     ARMCPU *cpu;
+     uint32_t switched_level;
++    MemTxAttrs attrs = MEMTXATTRS_CPU(cs);
+ 
+     if (kvm_irqchip_in_kernel()) {
+         /*
+          * We only need to sync timer states with user-space interrupt
+          * controllers, so return early and save cycles if we don't.
+          */
+-        return MEMTXATTRS_UNSPECIFIED;
++        return attrs;
+     }
+ 
+     cpu = ARM_CPU(cs);
+@@ -850,7 +851,7 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+         qemu_mutex_unlock_iothread();
+     }
+ 
+-    return MEMTXATTRS_UNSPECIFIED;
++    return attrs;
+ }
+ 
+ void kvm_arm_vm_state_change(void *opaque, bool running, RunState state)
+@@ -1005,6 +1006,7 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+     hwaddr xlat, len, doorbell_gpa;
+     MemoryRegionSection mrs;
+     MemoryRegion *mr;
++    MemTxAttrs attrs = MEMTXATTRS_PCI(dev);
+ 
+     if (as == &address_space_memory) {
+         return 0;
+@@ -1014,8 +1016,7 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+ 
+     RCU_READ_LOCK_GUARD();
+ 
+-    mr = address_space_translate(as, address, &xlat, &len, true,
+-                                 MEMTXATTRS_UNSPECIFIED);
++    mr = address_space_translate(as, address, &xlat, &len, true, attrs);
+ 
+     if (!mr) {
+         return 1;
+-- 
+2.34.1
 
-  Add a new page track hook, track_remove_slot(), that is called when a
-  memslot DELETE/MOVE operation is about to be committed.  The "remove"
-  hook will be used by KVMGT and will effectively replace the existing
-  track_flush_slot() altogether now that KVM itself doesn't rely on the
-  "flush" hook either.
-
-  The "flush" hook is flawed as it's invoked before the memslot operation
-  is guaranteed, i.e. KVM might ultimately keep the existing memslot without
-  notifying external page track users, a.k.a. KVMGT.
-
-> Users of this hook can drop write protections in the removed slot.
-
-Hmm, actually, on second thought, after thinking about what KVGT is doing in
-response to the memslot update, I think we should be more aggressive and actively
-prevent MOVE if there are external page trackers, i.e. if KVMGT is attached.
-
-Dropping write protections when a memslot is being deleted is a waste of cycles.
-The memslot and thus gfn_track is literally being deleted immediately after invoking
-the hook, updating gfn_track from KVMGT is completely unecessary.
-
-I.e. if we kill off the MOVE path, then KVMGT just needs to delete its hash table
-entry.
-
-Oooh!  Looking at this code again made me realize that the larger page track cleanup
-that I want to do might actually work.  Long story short, I want to stop forcing
-KVMGT to poke into KVM internals, but I thought there was a lock inversion problem.
-
-But AFAICT, there is no such problem.  And the cleanup I want to do will actually
-fix an existing KVMGT bug: kvmgt_page_track_write() invokes kvmgt_gfn_is_write_protected()
-without holding mmu_lock, and thus could consume garbage when walking the hash
-table.
-
-  static void kvmgt_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa,
-		const u8 *val, int len,
-		struct kvm_page_track_notifier_node *node)
-  {
-	struct intel_vgpu *info =
-		container_of(node, struct intel_vgpu, track_node);
-
-	if (kvmgt_gfn_is_write_protected(info, gpa_to_gfn(gpa)))
-		intel_vgpu_page_track_handler(info, gpa,
-						     (void *)val, len);
-  }
-
-Acquiring mmu_lock isn't an option as intel_vgpu_page_track_handler() might sleep,
-e.g. when acquiring vgpu_lock.
-
-Let me see if the clean up I have in mind will actually work.  If it does, I think
-the end result will be quite nice for both KVM and KVMGT.
