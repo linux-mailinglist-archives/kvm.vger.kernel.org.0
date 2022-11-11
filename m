@@ -2,114 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 948066258A7
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 11:46:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F5836258AD
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 11:49:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232918AbiKKKqT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 05:46:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49026 "EHLO
+        id S232803AbiKKKtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 05:49:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232574AbiKKKqS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 05:46:18 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 976FC64CF
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 02:46:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=cbppjbbD/CnYxNOoIxdeSyOSlREN+zemPAlPBQJbNrY=; b=V6Nlf+YgL0Mc84GV7UB65L2Dgs
-        ycu0OOGanwtm08Fnb0Ed4Whn418IHP4jsiS8Wydrh4eFdLtHZkz6jr9sYWFuA4POScz5/TnBGHGb/
-        0kkMbnq6fbb2lPyMNxI1epJ7eIzCkQ5XAKegyM8TqS4cHhbJ2gucf2cBUY982I8FnblMdEq0v/CYY
-        IiGbQpELYsfruDKkeU6YX509Qm8GUtTXxeD7thkkyy7pSwn18G1yj2w9eGNclmDvQvTXwFpdBsms1
-        fa85b83bi5loCba+3NgC9iLK1U3gHGz5EDcPWRCxAKXwyMQ/8zizhhaCqNw/I7M3T3dghNDAsx4f5
-        NiXY8H/g==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1otRXn-0000jx-Vw; Fri, 11 Nov 2022 10:45:56 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 64511300244;
-        Fri, 11 Nov 2022 11:45:53 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 4C39A2B8EC738; Fri, 11 Nov 2022 11:45:53 +0100 (CET)
-Date:   Fri, 11 Nov 2022 11:45:53 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "H. Peter Anvin" <hpa@zytor.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        "Li, Xin3" <xin3.li@intel.com>,
-        "linux-kernel@vger.kernnel.org" <linux-kernel@vger.kernnel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: Re: [PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq() for
- NMI/IRQ reinjection
-Message-ID: <Y24n4bHoFBuHVid5@hirez.programming.kicks-ass.net>
-References: <20221110055347.7463-1-xin3.li@intel.com>
- <20221110055347.7463-6-xin3.li@intel.com>
- <Y20f8v9ObO+IPwU+@google.com>
- <BN6PR1101MB2161C2C3910C2912079122D2A8019@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <Y21ktSq1QlWZxs6n@google.com>
- <Y24Tm2P34jI3+E1R@hirez.programming.kicks-ass.net>
- <3A1B7743-9448-405A-8BE4-E1BDAB4D62F8@zytor.com>
+        with ESMTP id S232825AbiKKKta (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 05:49:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 492845F94
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 02:48:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668163711;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4xZXYzX//SCthjxfoxPXs7VbypzGHRDY565s7tRX7fI=;
+        b=IyPV51sg6cpPms1II6zA8Zwz14fJg+xDklH1al44QL04iqYn4+1vPUliG2UeehEpz475nL
+        M3Qa07e6cWAEq4GRgSL6e70NOxl7f9Hcq7EkhhvgBqp0FMcMeljPcFDjyPIvh51zPcFjsC
+        MjKnubo3jx2DDq6/zS4yXMNr64ef+FE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-617-h75uTowROKGMIdw3v4T0vw-1; Fri, 11 Nov 2022 05:48:30 -0500
+X-MC-Unique: h75uTowROKGMIdw3v4T0vw-1
+Received: by mail-wr1-f69.google.com with SMTP id v14-20020adf8b4e000000b0024174021277so127581wra.13
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 02:48:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4xZXYzX//SCthjxfoxPXs7VbypzGHRDY565s7tRX7fI=;
+        b=2UggJz6xcK4nAgOrQPwacxY+rgPJH/JwlYsglIEXthULfw6NdheW8vf1M6PMqW2qsh
+         Zz1UYSj6SE94bc6I/wke0OP9gzEVlny6QxumIAyWAmGvWqAAWIFBQyuccdfx3QovUtPp
+         40FivMSbFhBNqLdcypYdwOIhvz7kdyWiPa+8ZJaRfezbSeQp1D4I+pM4MF0rrxt1UtY+
+         FSzIn4AnRDWlBD61RZQFGI030L1ZsC72clYdgBzlUO+pKaw7xrSt4h9lIIqODq/LAN7N
+         KTj5a/qDiKiNroT9FSwLwnzgIgL2Y46cZRpE+s/KYneAcqByT+LrG6Yd25ercw+2q4LO
+         /7TQ==
+X-Gm-Message-State: ANoB5pmm4ONSKXT+EsCjiCJrh4bp0Z5zBmh31vumU6W2tMfZTyeIepcc
+        1EJNGa0qGk9pttD9UYegMZdjZ/DL1mWddvrm+yE/VK9gKupj5OjGflVdnhXezGBQ28VEJSrpfFS
+        r4tV08FJ2Qxuk
+X-Received: by 2002:a5d:4c82:0:b0:236:56a6:823e with SMTP id z2-20020a5d4c82000000b0023656a6823emr870608wrs.495.1668163709071;
+        Fri, 11 Nov 2022 02:48:29 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6UIf/FE35s97C3qgAJi8XmxKJI7BAtYamrbZSPQ2i8PaD7UqbY+0IJoMS/ROo9EGxDaDyUSA==
+X-Received: by 2002:a5d:4c82:0:b0:236:56a6:823e with SMTP id z2-20020a5d4c82000000b0023656a6823emr870595wrs.495.1668163708800;
+        Fri, 11 Nov 2022 02:48:28 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id bj19-20020a0560001e1300b0022cdb687bf9sm1319651wrb.0.2022.11.11.02.48.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Nov 2022 02:48:28 -0800 (PST)
+Message-ID: <9e6288e1-0c51-bd3f-5cee-c71049ffa684@redhat.com>
+Date:   Fri, 11 Nov 2022 11:48:27 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3A1B7743-9448-405A-8BE4-E1BDAB4D62F8@zytor.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH v2 1/3] accel: introduce accelerator blocker API
+Content-Language: en-US
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Yanan Wang <wangyanan55@huawei.com>, kvm@vger.kernel.org
+References: <20221110164807.1306076-1-eesposit@redhat.com>
+ <20221110164807.1306076-2-eesposit@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20221110164807.1306076-2-eesposit@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 11, 2022 at 01:29:35AM -0800, H. Peter Anvin wrote:
-> On November 11, 2022 1:19:23 AM PST, Peter Zijlstra <peterz@infradead.org> wrote:
-> >On Thu, Nov 10, 2022 at 08:53:09PM +0000, Sean Christopherson wrote:
-> >> On Thu, Nov 10, 2022, Li, Xin3 wrote:
-> >
-> >> > > > + * call thus the values in the pt_regs structure are not used in
-> >> > > > + * executing NMI/IRQ handlers,
-> >> > > 
-> >> > > Won't this break stack traces to some extent?
-> >> > > 
-> >> > 
-> >> > The pt_regs structure, and its IP/CS, is NOT part of the call stack, thus
-> >> > I don't see a problem. No?
-> >
-> >I'm not sure what Xin3 is trying to say, but NMI/IRQ handers use pt_regs
-> >a *LOT*. pt_regs *MUST* be correct.
-> 
-> What is "correct" in this context? 
+On 11/10/22 17:48, Emanuele Giuseppe Esposito wrote:
+> +/*
+> + * QEMU accel blocker class
 
-I don't know since I don't really speak virt, but I could image the
-regset that would match the vmrun (or whatever intel decided to call
-that again) instruction.
+"Lock to inhibit accelerator ioctls"
 
-> Could you describe what aspects of
-> the register image you rely on, and what you expect them to be?
+> + *
+> + * Copyright (c) 2014 Red Hat Inc.
 
-We rely on CS,IP,FLAGS,SS,SP to be coherent and usable at the very least
-(must be able to start an unwind from it). But things like perf (NMI)
-access *all* of them and possibly copy them out to userspace. Perf can
-also try and use the segment registers in order to try and establish a
-linear address.
+2022, you can also add an Author line.
 
-Some exceptions (#GP) access whatever is needed to fully decode and
-emulate the instruction (IOPL,UMIP,etc..) including the segment
-registers.
+> +static int accel_in_ioctls(void)
 
-> Currently KVM basically stuff random data into pt_regs; this at least
-> makes it explicitly zero.
+Return bool (and return early if ret becomes true).
 
-:-( Both is broken. Once again proving to me that virt is a bunch of
-duck-tape at best.
+> +void accel_ioctl_inhibit_begin(void)
+> +{
+> +    CPUState *cpu;
+> +
+> +    /*
+> +     * We allow to inhibit only when holding the BQL, so we can identify
+> +     * when an inhibitor wants to issue an ioctl easily.
+> +     */
+> +    g_assert(qemu_mutex_iothread_locked());
+> +
+> +    /* Block further invocations of the ioctls outside the BQL.  */
+> +    CPU_FOREACH(cpu) {
+> +        qemu_lockcnt_lock(&cpu->in_ioctl_lock);
+> +    }
+> +    qemu_lockcnt_lock(&accel_in_ioctl_lock);
+> +
+> +    /* Keep waiting until there are running ioctls */
+> +    while (accel_in_ioctls()) {
+> +        /* Reset event to FREE. */
+> +        qemu_event_reset(&accel_in_ioctl_event);
+> +
+> +        if (accel_in_ioctls()) {
+> +
+> +            CPU_FOREACH(cpu) {
+> +                /* exit the ioctl */
+> +                qemu_cpu_kick(cpu);
+
+Only kick if the lockcnt count is > 0? (this is not racy; if it is == 0, 
+it cannot ever become > 0 again while the lock is taken)
+
+> diff --git a/include/sysemu/accel-blocker.h b/include/sysemu/accel-blocker.h
+> new file mode 100644
+> index 0000000000..135ebea566
+> --- /dev/null
+> +++ b/include/sysemu/accel-blocker.h
+> @@ -0,0 +1,45 @@
+> +/*
+> + * Accelerator blocking API, to prevent new ioctls from starting and wait the
+> + * running ones finish.
+> + * This mechanism differs from pause/resume_all_vcpus() in that it does not
+> + * release the BQL.
+> + *
+> + *  Copyright (c) 2014 Red Hat Inc.
+
+2022, you can also add an Author line here too.
+
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#ifndef ACCEL_BLOCKER_H
+> +#define ACCEL_BLOCKER_H
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/accel.h"
+
+qemu/accel.h not needed?
+
+> +#include "sysemu/cpus.h"
+> +
+> +extern void accel_blocker_init(void);
+> +
+> +/*
+> + * accel_set_in_ioctl/accel_cpu_set_in_ioctl:
+> + * Mark when ioctl is about to run or just finished.
+> + * If @in_ioctl is true, then mark it is beginning. Otherwise marks that it is
+> + * ending.
+> + *
+> + * These functions will block after accel_ioctl_inhibit_begin() is called,
+> + * preventing new ioctls to run. They will continue only after
+> + * accel_ioctl_inibith_end().
+> + */
+> +extern void accel_set_in_ioctl(bool in_ioctl);
+> +extern void accel_cpu_set_in_ioctl(CPUState *cpu, bool in_ioctl);
+
+Why not just
+
+extern void accel_ioctl_begin(void);
+extern void accel_ioctl_end(void);
+extern void accel_cpu_ioctl_begin(CPUState *cpu);
+extern void accel_cpu_ioctl_end(CPUState *cpu);
+
+?
+
+Otherwise it's very nice.
+
+Paolo
+
