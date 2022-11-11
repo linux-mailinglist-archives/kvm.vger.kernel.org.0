@@ -2,130 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FC18626206
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 20:34:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 13DA8626242
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 20:42:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233878AbiKKTeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 14:34:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35628 "EHLO
+        id S234252AbiKKTmz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 14:42:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233898AbiKKTeH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 14:34:07 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2CB567124;
-        Fri, 11 Nov 2022 11:34:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=re1xEC6k7MwZnaDsgXlcM1FC9AzckvHp8TB1sTA3mF0=; b=bGucnxcMeuxE0K1iwsx2lvLt1Y
-        HP2vOL+Yga26V3XNxf4TJCY37B8AfzAMswhmZMkIkldaaDpibqEl8eLfQEixZzlycR5MGNGYSJjgc
-        00E1jNkYEHB50Ujye1TJQCCD7vbLL+r1xW+CCID6omjbHdLhZDFc8fayjqqMKpNEXkRXmCOfzn45T
-        UkhsD6CrT3UcF/pYx5f5pwMv7JmNThTlqjtzPhXHMvGsowsMy01sFC1NM+nZX8fb7Y9m1FzJ6DVfq
-        iMP9aI2YPhS/DVopa+r49H1Cg9RvcOKfd8t0kxKHe/hMgI2xo1S1fMbFuxHSavxZwY6mPreIJlxFZ
-        RjVqdPog==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1otZma-00DItQ-JG; Fri, 11 Nov 2022 19:33:47 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id A810D300137;
-        Fri, 11 Nov 2022 20:33:36 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 9154B209EDD10; Fri, 11 Nov 2022 20:33:36 +0100 (CET)
-Date:   Fri, 11 Nov 2022 20:33:36 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Li, Xin3" <xin3.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: Re: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
- for NMI/IRQ reinjection
-Message-ID: <Y26jkHfK9INwU7Yy@hirez.programming.kicks-ass.net>
-References: <20221110061545.1531-1-xin3.li@intel.com>
- <20221110061545.1531-6-xin3.li@intel.com>
- <Y2y+YgBUYuUHbPtd@hirez.programming.kicks-ass.net>
- <BN6PR1101MB2161976800EB14B74A24D9F3A8019@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <Y24SoNKZtj/NPSGy@hirez.programming.kicks-ass.net>
- <6097036e-063f-5175-72b2-8935b12af853@redhat.com>
- <Y24908NWCdzUNqI0@hirez.programming.kicks-ass.net>
- <6fd26a70-3774-6ae7-73ea-4653aee106f0@redhat.com>
- <Y25a0Z2tOMWYZs4j@hirez.programming.kicks-ass.net>
- <BN6PR1101MB216141A21353AB84CEA541DFA8009@BN6PR1101MB2161.namprd11.prod.outlook.com>
+        with ESMTP id S234083AbiKKTmy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 14:42:54 -0500
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C2267F555
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 11:42:53 -0800 (PST)
+Date:   Fri, 11 Nov 2022 19:42:46 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1668195771;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=489V1xO2Jk4quKvIvlMb+9p2vWfkmCHH5cQqMf67ius=;
+        b=ctsL1hsC7qEw5KiW28UAtXJRlnFS4iPL22CHt0GFvCmPRUlo8Rsweb1Y6WREvqho0r9sXc
+        N657AWKzK8lHkXEclZcbTk1apEVn4VSgW4n9PysclSm15DxsXi37Yd1oYbNU8SA3MqXrE4
+        7J/tg6Q6syps7GjxLcmOHG3ltCVunSU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+        Sean Christopherson <seanjc@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Quentin Perret <qperret@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Fuad Tabba <tabba@google.com>, kernel-team@android.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v6 00/26] KVM: arm64: Introduce pKVM hyp VM and vCPU
+ state at EL2
+Message-ID: <Y26ltgCIObKpRTWx@google.com>
+References: <20221110190259.26861-1-will@kernel.org>
+ <86edu9ph3d.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <BN6PR1101MB216141A21353AB84CEA541DFA8009@BN6PR1101MB2161.namprd11.prod.outlook.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <86edu9ph3d.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 11, 2022 at 06:06:12PM +0000, Li, Xin3 wrote:
-> > On Fri, Nov 11, 2022 at 01:48:26PM +0100, Paolo Bonzini wrote:
-> > > On 11/11/22 13:19, Peter Zijlstra wrote:
-> > > > On Fri, Nov 11, 2022 at 01:04:27PM +0100, Paolo Bonzini wrote:
-> > > > > On Intel you can optionally make it hold onto IRQs, but NMIs are
-> > > > > always eaten by the VMEXIT and have to be reinjected manually.
-> > > >
-> > > > That 'optionally' thing worries me -- as in, KVM is currently
-> > > > opting-out?
-> > >
-> > > Yes, because "If the “process posted interrupts” VM-execution control
-> > > is 1, the “acknowledge interrupt on exit” VM-exit control is 1" (SDM
-> > > 26.2.1.1, checks on VM-Execution Control Fields).  Ipse dixit.  Posted
-> > > interrupts are available and used on all processors since I think Ivy Bridge.
+On Fri, Nov 11, 2022 at 04:54:14PM +0000, Marc Zyngier wrote:
+> On Thu, 10 Nov 2022 19:02:33 +0000,
+> Will Deacon <will@kernel.org> wrote:
 > > 
-> > (imagine the non-coc compliant reaction here)
+> > Hi all,
 > > 
-> > So instead of fixing it, they made it worse :-(
+> > This is version six of the pKVM EL2 state series, extending the pKVM
+> > hypervisor code so that it can dynamically instantiate and manage VM
+> > data structures without the host being able to access them directly.
+> > These structures consist of a hyp VM, a set of hyp vCPUs and the stage-2
+> > page-table for the MMU. The pages used to hold the hypervisor structures
+> > are returned to the host when the VM is destroyed.
 > > 
-> > And now FRED is arguably making it worse again, and people wonder why I
-> > hate virt...
+> > Previous versions are archived at:
+> > 
+> >   Mega-patch: https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
+> >   v2: https://lore.kernel.org/all/20220630135747.26983-1-will@kernel.org/
+> >   v3: https://lore.kernel.org/kvmarm/20220914083500.5118-1-will@kernel.org/
+> >   v4: https://lore.kernel.org/kvm/20221017115209.2099-1-will@kernel.org/
+> >   v5: https://lore.kernel.org/r/20221020133827.5541-1-will@kernel.org
+> > 
+> > The changes since v5 include:
+> > 
+> >   * Fix teardown ordering so that the host 'kvm' structure remains pins
+> >     while the memcache is being filled.
+> > 
+> >   * Fixed a kerneldoc typo.
+> > 
+> >   * Included a patch from Oliver to rework the 'pkvm_mem_transition'
+> >     structure and it's handling of the completer address.
+> > 
+> >   * Tweaked some commit messages and added new R-b tags.
+> > 
+> > As before, the final patch is RFC since it illustrates a very naive use
+> > of the new hypervisor structures and subsequent changes will improve on
+> > this once we have the guest private memory story sorted out.
+> > 
+> > Oliver: I'm pretty sure we're going to need to revert your completer
+> > address cleanup as soon as we have guest-host sharing. We want to keep
+> > the 'pkvm_mem_transition' structure 'const', but we will only know the
+> > host address (PA) after walking the guest stage-2 and so we're going to
+> > want to track that separately. Anyway, I've included it here at the end
+> > so Marc can decide what he wants to do!
 > 
-> Maybe I take it wrong, but FRED doesn't make anything worse. Fred entry
-> code will call external_interrupt() immediately for IRQs.
+> Thanks, I guess... :-/
+> 
+> If this patch is going to be reverted, I'd rather not take it (without
+> guest/host sharing, we don't have much of a hypervisor).
 
-But what about NMIs, afaict this is all horribly broken for NMIs.
++1, I'm more than happy being told my patch doesn't work :)
 
-So the whole VMX thing latches the NMI (which stops NMI recursion),
-right?
+Having said that, if there are parts of the design that I've whined
+about that are intentional then please educate me. Some things haven't
+been quite as obvious, but I know you folks have been working on this
+feature for a while.
 
-But then you drop out of noinstr code, which means any random exception
-can happen (kprobes #BP, hw_breakpoint #DB, or even #PF due to random
-nonsense like *SAN). This exception will do IRET and clear the NMI
-latch, all before you get to run any of the NMI code.
+I probably need to give the full patch-bomb another read to get all the
+context too.
 
-Note how the normal NMI code is very careful to clear DR7 and both
-kprobes and hw_breakpoint know not to accept noinstr code as targets.
-
-You threw all that out the window.
-
-Also, NMI is IST, and with FRED it will run on a different stack as
-well, directly calling external_interrupt() doesn't honour that either.
-
-> You really really don't like the context how VMX dispatches NMI/IRQs (which has
-> been there for a long time), right?
-
-I really really hate this with a passion. The fact that it's been this
-way is no justification for keeping it. Crap is crap.
-
-Intel should have taken an example of SVM in this regard, and not
-doubled down and extended this NMI hole to regular IRQs. These are
-exactly the kind of exception delivery trainwrecks FRED is supposed to
-fix, except in this case it appears it doesn't :/
+--
+Thanks,
+Oliver
