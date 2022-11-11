@@ -2,109 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01FBA626323
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 21:45:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D019626435
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 23:08:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234510AbiKKUpT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 15:45:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37020 "EHLO
+        id S234515AbiKKWIm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 17:08:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231625AbiKKUpQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 15:45:16 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B15185470;
-        Fri, 11 Nov 2022 12:45:16 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id b185so5820092pfb.9;
-        Fri, 11 Nov 2022 12:45:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c2HEMasltS1yPDvm91ly5x6KiWjgyLEEQdyLS8IioLg=;
-        b=WhNAkXgslHhgAVdqKqP96D2lYVEu4NjGjwFnynZQv0Ksv9mmQ8fLWO2TlDA/wdmqhI
-         r/wK8sUUHo1Qo9l5wVfYkJifcBohQQVj9yJMMWMp9jdfqxwLheOzQpHI3Ph+fYpHss5G
-         aVDHp8QNjRafeb3g1VtNCZwFtJ6SL4yPJup4GNy/46YC9plYFnzBZec7WCCF/+DOPNGQ
-         cn30A+H1YKbtiGK3J0Yr96GuKukoX2bEEY6S+ZEedvaZHYZrMSQfqapXjIoiW6xbE75y
-         NThBNQlsbEfEkY/Ii2dWa+Bud5P4sYf15hH9pG9lCeBtj1swd7r9gRUGddo23zYC58GU
-         tY+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c2HEMasltS1yPDvm91ly5x6KiWjgyLEEQdyLS8IioLg=;
-        b=dgX1XtVsZ4Ns7S2a9EtH6WMT/Glygirg1rFAw4jOaePzgPtpVdzfV1RiSGIBHnkEoY
-         oQ8jB91QodoS5GuLq8ssnLyFtu4npFnyBmF93QuueENwGqdUhQx5qJ296jSyVHRZqK8I
-         9GuQz5bbGzOLqbJoClCDYZ2A5Ot0wipSjPLZuFoTSIqwE3tCFjDgvvQigsrJ3GXkvq52
-         fQ05T7vqvg3WThuFdf1aXRqx/o1wbfXZHS0nxpuufVPuaTHUPIlSY0XiN3MUhwh1RU7P
-         W3TxtUQZ/9zBhTlpiEp7ogFUO6ydW+3e9y3DWGkMRyDtWLPUB7ulOgKpIwgNSA2+A9gJ
-         cEyA==
-X-Gm-Message-State: ANoB5pn1KuwcExa83QnSljZwxfXKkmpfJzvD5MyAfKxn8o7yDCGPC4Ee
-        uDm/cpcrU7R15um5bUo5LKU=
-X-Google-Smtp-Source: AA0mqf5er9K38GzKed6ziwcftvLjT+F+/+up4GF5V4OAMHFjsUW5j4AijUg1UqXF5k6oHfEPEEatGg==
-X-Received: by 2002:a63:224b:0:b0:45c:562f:b2b9 with SMTP id t11-20020a63224b000000b0045c562fb2b9mr3109177pgm.245.1668199515444;
-        Fri, 11 Nov 2022 12:45:15 -0800 (PST)
-Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
-        by smtp.gmail.com with ESMTPSA id 133-20020a62168b000000b0056b9124d441sm1969714pfw.218.2022.11.11.12.45.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Nov 2022 12:45:14 -0800 (PST)
-Date:   Fri, 11 Nov 2022 20:45:13 +0000
-From:   Bobby Eshleman <bobbyeshleman@gmail.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
+        with ESMTP id S234527AbiKKWIH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 17:08:07 -0500
+Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C632788559;
+        Fri, 11 Nov 2022 14:07:36 -0800 (PST)
+Received: from [127.0.0.1] ([73.223.250.219])
+        (authenticated bits=0)
+        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 2ABM79Ie1232560
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Fri, 11 Nov 2022 14:07:09 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 2ABM79Ie1232560
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+        s=2022110601; t=1668204430;
+        bh=qiOQuHaGOzvrf8e0omxIQW2OX158BWNc3RVEXRzilII=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=FpzBJKmRL7vLt1n0fTRXI/3MnL6r/SLyWOXChBzaiYC02z4cW1rUisXtZbIUc1F2Y
+         lcE8KLkxje0L9FOhPALFGd4sc8s9mobABzWcwXvUWCJQiw4wk31c8TzdsRhDAZHPcA
+         wWd/F9/UUdxF/TPOFhB/fbxEwqXuGpJdZKtRf3lzKDQY6bfxNgSD1LzuMEkIl3MCaJ
+         YVSLC9jrYc4WRvwWWjlb/biHXzG3cL519UDQIVgBR8mxijnJtUd1ckroyhThW1rDr+
+         lT1Tk/iikZdR9/I/ARUFTEQm2To7+HbVqHQqKOYz1CaAuYVWxMrsvPAAkLZPczDE3V
+         sR9Yc0jANWYUA==
+Date:   Fri, 11 Nov 2022 14:07:05 -0800
+From:   "H. Peter Anvin" <hpa@zytor.com>
+To:     "Li, Xin3" <xin3.li@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Bobby Eshleman <bobby.eshleman@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "edumazet@google.com" <edumazet@google.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        kernel <kernel@sberdevices.ru>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [RFC PATCH v3 00/11] virtio/vsock: experimental zerocopy receive
-Message-ID: <Y260WSJKJXtaJQZi@bullseye>
-References: <f60d7e94-795d-06fd-0321-6972533700c5@sberdevices.ru>
- <20221111134715.qxgu7t4c7jse24hp@sgarzare-redhat>
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: =?US-ASCII?Q?RE=3A_=5BRESEND_PATCH_2/6=5D_x86/traps=3A_add_a_system?= =?US-ASCII?Q?_interrupt_table_for_system_interrupt_dispatch?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <BN6PR1101MB21619E2092AFF048422C6311A8019@BN6PR1101MB2161.namprd11.prod.outlook.com>
+References: <20221110061545.1531-1-xin3.li@intel.com> <20221110061545.1531-3-xin3.li@intel.com> <Y2y8obdYDXo9vlH/@hirez.programming.kicks-ass.net> <BN6PR1101MB21619E2092AFF048422C6311A8019@BN6PR1101MB2161.namprd11.prod.outlook.com>
+Message-ID: <EA13BAB1-FD67-4145-9325-5705FEE6915A@zytor.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221111134715.qxgu7t4c7jse24hp@sgarzare-redhat>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_PASS,
+        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 11, 2022 at 02:47:15PM +0100, Stefano Garzarella wrote:
-> Hi Arseniy,
-> maybe we should start rebasing this series on the new support for skbuff: https://lore.kernel.org/lkml/20221110171723.24263-1-bobby.eshleman@bytedance.com/
-> 
-> CCing Bobby to see if it's easy to integrate since you're both changing the
-> packet allocation.
-> 
+On November 10, 2022 11:55:22 AM PST, "Li, Xin3" <xin3=2Eli@intel=2Ecom> wr=
+ote:
+>> > Signed-off-by: H=2E Peter Anvin (Intel) <hpa@zytor=2Ecom>
+>> > Signed-off-by: Xin Li <xin3=2Eli@intel=2Ecom>
+>>=20
+>> This is not a valid SOB, it would suggest hpa is the author, but he's n=
+ot in in
+>> From=2E
+>
+>HPA wrote the initial dispatch code for FRED, and I worked with him to
+>refactor it for KVM/VMX NMI/IRQ dispatch=2E  So use SOB from both=2E  No?
+>
+>> > diff --git a/arch/x86/kernel/traps=2Ec b/arch/x86/kernel/traps=2Ec in=
+dex
+>> > 178015a820f0=2E=2E95dd917ef9ad 100644
+>> > --- a/arch/x86/kernel/traps=2Ec
+>> > +++ b/arch/x86/kernel/traps=2Ec
+>> > @@ -1444,6 +1444,61 @@ DEFINE_IDTENTRY_SW(iret_error)  }  #endif
+>> >
+>> > +#define SYSV(x,y) [(x) - FIRST_SYSTEM_VECTOR] =3D
+>> > +(system_interrupt_handler)y
+>> > +
+>> > +#pragma GCC diagnostic push
+>> > +#pragma GCC diagnostic ignored "-Wcast-function-type"
+>>=20
+>> How does this not break CFI ?
+>
+>I wasn't aware of it, will check=2E
+>
 
-This looks like the packet allocation can be married somewhat nicely in
-since SKBs may be built from pages using build_skb(). There may be some
-tweaking necessary though, since it also uses the tail chunk of the page
-to hold struct skb_shared_info IIRC.
-
-I left some comments on the patch with the allocator in it.
-
-> 
-> Maybe to avoid having to rebase everything later, it's already worthwhile to
-> start using Bobby's patch with skbuff.
-> 
-
-I'll be waiting until Monday to see if some more feedback comes in
-before sending out v4, so I expect v4 early next week, FWIW.
-
-Best,
-Bobby
+It doesn't break CFI because the arguments passed is always a strict super=
+set of the ones expected and they are free enough that they are always pass=
+ed in registers=2E
