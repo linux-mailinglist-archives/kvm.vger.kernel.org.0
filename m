@@ -2,293 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA0C9624FB3
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 02:39:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F222624FFB
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 03:06:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229463AbiKKBjD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 20:39:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54154 "EHLO
+        id S230323AbiKKCGK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 21:06:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229636AbiKKBjC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 20:39:02 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3C6B60EBE
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 17:38:59 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id 140so2174739pfz.6
-        for <kvm@vger.kernel.org>; Thu, 10 Nov 2022 17:38:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RS3a6hLMxUUoEPjaozjVNm3jkJhC+H0XClz14w/jfaA=;
-        b=SoG++eGsogNhOXHNYNGSQwqVVuREga4mMXnUJPEp2Aaf3wDTjmN4pUpcDu6NyDyk/7
-         ZCrJ5tCMaVWUaaxyvaQrhL0T5FiyghxHxIWcZucG8+WiPsxAaytMKmY0pIZmkCvM/P3A
-         FzRDVfuDDdZ0ZvXjDTxrK9PvmsGmkf3tvXZwJCbLUSF0TG776tNA1944kmAMkLT9zZec
-         fBYk+3bEeWzmhZC19FCrSr44X5QV+XC8WpwQgvzfkBuRNUn1T3FMjmURa/IIpEBzEphS
-         S5BEZ0ZwTijqaaaZMQZlcNfQrroFpxn8GJ4NeHygg9gK3xqWbjbKbAj8qSY8fGLozXvu
-         Gsig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RS3a6hLMxUUoEPjaozjVNm3jkJhC+H0XClz14w/jfaA=;
-        b=3rthrvzFMfYI5t+mDlIZV1Y2y8DA5e+21x7xaTx0FMFWGbpqqtFCvCf0WpjWn7muwC
-         BFLTIDf3tenMGuoWZjII3PdjPqEYGnJg4F3gbIB8F9RmPMZtRlUSdlUijDuaEcc0LNOR
-         /9TxRU0sYWgPKhaFu8JtHOunTIUpCd/HpaMN201zQ1wprfcZdoA8YrFRheBdwH2Nva6t
-         afRZcPPDuSAlcV81SD8bKJYFh007HTSCywqkTkRFC9+F6oHXYZTHvc+l5COiU62X2gGK
-         pLy0lyyU2H+tMtqenBwY9kx8X+CD8mOMUHs3TdZYp0z3AiMUHJ/+Zi93aZJRAcLdvh/N
-         Fv/Q==
-X-Gm-Message-State: ACrzQf3ePYAJe0Qtc5vJf+zF8poGXRdHnOpcxlLpGBJY4I+wuPYxY/E8
-        bXJ7nEjeBMKSkxxQKHWjiJlpwQ==
-X-Google-Smtp-Source: AMsMyM5NZekdvfkLtC3kWWLVHXrB1AuT7u9X73tzeCo4RhIdse0v2yQHD++RSAOfBDE10qOQXDbeUA==
-X-Received: by 2002:a63:e62:0:b0:46f:e658:a8ff with SMTP id 34-20020a630e62000000b0046fe658a8ffmr4116215pgo.493.1668130739232;
-        Thu, 10 Nov 2022 17:38:59 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id z6-20020aa79486000000b005636326fdbfsm310014pfk.78.2022.11.10.17.38.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 17:38:58 -0800 (PST)
-Date:   Fri, 11 Nov 2022 01:38:53 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Chao Gao <chao.gao@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Yuan Yao <yuan.yao@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH 10/44] KVM: VMX: Clean up eVMCS enabling if KVM
- initialization fails
-Message-ID: <Y22nrQ7aziK0NMOE@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-11-seanjc@google.com>
- <87mt98qfi2.fsf@ovpn-194-252.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        with ESMTP id S229958AbiKKCGI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 21:06:08 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CCE75D6BF;
+        Thu, 10 Nov 2022 18:06:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668132366; x=1699668366;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=XcHlKstWJwcqypYdcJFLgWyXK/c+pS5/NlMwS5QdMMg=;
+  b=EgkhvPbabUjden6Kt+Gqd67ar/65OIc1unY4nhvmnHCuJFRHHl3OsWsj
+   jz3DLWP5a88IQyF2ZcOJvk3AR+EAajV24r24oNVDyXyxDpSmRyxOoyRU2
+   gHtCYWdDE4nNdFHh/aBum/SnlTlVXQ9kdiX9l56QKIcg76/n2kYNWMvDQ
+   6cj7K3LGFWYwwGptNWsmS1FokRR4mZSREhD+88ELgm1UJnkoZTnH6lgW/
+   s0gJhbCdKCQFfm9vrzpnZG05FAcav0bU9FcNiRCNBFflJ//kQKayfSKsj
+   IJTjxHHxaT2xcTmMbCr7qeAQ4vqU92mx+nMbHy49+XJHAYAUPzBzvAhJl
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="338265190"
+X-IronPort-AV: E=Sophos;i="5.96,155,1665471600"; 
+   d="scan'208";a="338265190"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 18:03:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="670583054"
+X-IronPort-AV: E=Sophos;i="5.96,155,1665471600"; 
+   d="scan'208";a="670583054"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga001.jf.intel.com with ESMTP; 10 Nov 2022 18:03:42 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 10 Nov 2022 18:03:41 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Thu, 10 Nov 2022 18:03:41 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.105)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Thu, 10 Nov 2022 18:03:41 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=je07pAJ4aXvkKb5JcjwVP1oyaVrHWrlAOf+D3qpaOoOjbk9gW8fNG2g3tj5wGIo/KNoyH1Fln+c4l/oG5GFGehJuc31nxg7CMcSOtbj7D9nKH5UOk9BCjhmimVCgf7A7y4EtYs+2fiAqiyoPJZo9rHTQM/2tSYEPQzqU6rKEPXfQZ3ms3nCMmJgCXojkjSry5ijb6b8kGiSdYl7Ks6VvxjFnLVlAXfWFHiSgU7Cu7MMtkkCJSkWjSBqudqMuyYXAQLQltxd36jgwBhVMR47hdFP+IRl5FxN7DOLDyIA9iwS0mBcz1JbSpG7oFNQzJPMRzkf2tvdC1nbiIGCVP7PQ1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qr9AowaRUWTs5Ucc7h8SipER1JCAv9SQSIb2oehzCIs=;
+ b=HjAtQboUPylTImd+sVrxGaC1atRXDAHr4D2zf4ocwPECc05iW1pD3eZ+Eq/IgB6kezlaxSQBq2eXrUn4o9M/H9+Yg3BdsIWkjVGyX/8qVWCHAP7fa1ZNDAWcJ5Jw4JJxsS/VyZjttmNvJPRZdRkmqymmmU2k5kx1QWPwVjXfXNye4L1lpzCd2/h160zSKKzQsa1CJaUoJOLQLmkqEMlaPYZGBiD5UdpQINpj6rbZDVvG0NsDNIw6UedKHuOFtXEb+7geeyKPY+oT/fUJOQyVO1mreGFbx6R6bjAXfrHKy5mbObvG16fpcXZcNsnjHdod1t+gblVD63UkWRw7xh5FGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ DS7PR11MB6061.namprd11.prod.outlook.com (2603:10b6:8:74::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5791.26; Fri, 11 Nov 2022 02:03:38 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::dc06:6d36:dc8a:fe7f]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::dc06:6d36:dc8a:fe7f%7]) with mapi id 15.20.5813.013; Fri, 11 Nov 2022
+ 02:03:38 +0000
+Date:   Fri, 11 Nov 2022 09:40:54 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: x86/mmu: avoid accidentally go to shadow path for 0
+ count tdp root
+Message-ID: <Y22oJhrIxSgkMrj4@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20221110034122.9892-1-yan.y.zhao@intel.com>
+ <Y20svCKydu/iS0TY@google.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <87mt98qfi2.fsf@ovpn-194-252.brq.redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <Y20svCKydu/iS0TY@google.com>
+X-ClientProxiedBy: SI2PR06CA0011.apcprd06.prod.outlook.com
+ (2603:1096:4:186::16) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DS7PR11MB6061:EE_
+X-MS-Office365-Filtering-Correlation-Id: 696eef92-6269-4e0a-651c-08dac388f2f7
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: epau7QtPDZNTsaccBy7GcT9zG9PgdKPqilTGAwZkq8rjIfXo7D85kqmZSMH6EQo/Hkj1LlEY9euXpA75k+DTRo9GTsBjEtlJgM+RGiSPc9c4gtOfnwsuD+aHbbgOUzCWZR4o3iKD7crPDIXXNs4rj302kEbu2HD2Jrlrm2csPRCEjtowOMbOx9djdIUHKcAMjXw8wUkYU6N/62wH8ZDq2vT/YZHuB5iXiQiRLX7S19VneYMHx5KXmENYqBZQ1vcnfEfjcTjOD1JB3vjcVrtohr7pboSImQ5qvyPjV4S0I1aALrAD34OoKOZTT1CLj1SEwyhAKgADO3TWRV8jsvniownnd46M3u/e3sw7hbna60uU44rwbxIM7nKHChNzD54hAB5pZmbOUulnWb/waWG6NmOyJI0cmRgZv/xV7kTkSV5fCCOZir8m8j1AtHbDHncWojyeDEvOgElJTMH5ZL8PX7KxNE7qmBub0d9eJtzCN/IHS5EXMk8zVcbiqeQOV4HqPxI4GCNFnWiuj2Jujg929WStpjpI4dd6upBFrsCeHfwVYH7mg6SQITM+G4uZdZaCC6oTrclAxJIUSHfBPBTi1VPjp7VxtoBfLn21HARZvj9MhOcDH3oueDqF7aPMlor8kVdAT6kEtFeBnw1KzBpqkavKZZHg7jh8A+m23Hl2ivLZ8QbYp9OFIH0evisfymzYUdGQjGK15aEOh0xDSWDrLH2B3EE9oAMYjwpGuzT3kb/OxBBxzdsmC75+v5uh1EPk
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(376002)(136003)(366004)(346002)(396003)(451199015)(86362001)(82960400001)(2906002)(6916009)(6506007)(6666004)(3450700001)(186003)(26005)(83380400001)(8676002)(38100700002)(66556008)(316002)(66946007)(66476007)(478600001)(4326008)(966005)(6512007)(5660300002)(41300700001)(6486002)(8936002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PSBb5lvZ2FG0XevQLMdiUX5ZtkGT9DZd1V6euqIsfSQ0uXj5HPM89sXKw7DE?=
+ =?us-ascii?Q?3+sx4ydhyr/i1AspIIAjOdAh5vbmfDQTsxLmHtTGZwvbraLFBp+GRFjzODXn?=
+ =?us-ascii?Q?dzJo+lM1TKcS6dMW7Hknehhm/p5hFwDu2uv/7h2DqvIcft5WofAI5pBcNO3S?=
+ =?us-ascii?Q?jBACPkxnp691Jz2AmD+tEn1vSZfb3KpgLP8RYg6mioTFrqcXuZDxqHRAdDnb?=
+ =?us-ascii?Q?Z3GsPDvIKKpwsViR0yKmmjdFIYBafWhMm5TQmc5t98UXUoPwBI36l6HX89Ck?=
+ =?us-ascii?Q?P3emqd9OEUKImWmP/x4qGWw6ZjXSTjq0OpmZ7hlPUWLgyccQ2G+OmivC6TQv?=
+ =?us-ascii?Q?3OzzumcdX+SJxHG0nxeV/KYqSj/ylhmlPxe+c/x+2AhEsiVgvDep4Vzc2bX7?=
+ =?us-ascii?Q?ajkOuYgPtc/v6MNowj1tkCDmqXzR6djJQ881NOrHri82gplMGsVAB29GOtyx?=
+ =?us-ascii?Q?Ypikzf1tALlR3WKg/AbZNnJ7qx1YM6vx70UaUjzqf59QdoHIl0L0RPDT8odO?=
+ =?us-ascii?Q?weniXnzAv/thg9ByUFXsuq4cSQ+eZqUTr9iaOfuf9227YM4JL3WPSSpCU+KW?=
+ =?us-ascii?Q?M0/mcz8GXTwAem09hZ1iDg5XbXbFxF5gzuLSWeVd43kl2cho7MDBQZXe8vfD?=
+ =?us-ascii?Q?OdTeYIGNU8nXrqkXtpnjA5Qr7OrF+pgj4PDsOccTAE87GX0znhbviKV9Wy3h?=
+ =?us-ascii?Q?bx8c9L8hNTt6JFaPs8lVIktbf8WNtNG1t/JCkgf/1L6VY6QguM3ek90nmp4m?=
+ =?us-ascii?Q?jN7xRPUwAH7bcHhjLNpmVwmC3GHiMxyUEMs3FKHjO2RKVpPCua+zOavrnVcX?=
+ =?us-ascii?Q?GLLssT9g1lU4rc3LRbhelWZnP5Fif08Ujsi7NLCtI/mum7uaz8a+uthyz/sz?=
+ =?us-ascii?Q?V5UrA2jqtdxpaiFJlACzc5DHDLzopKCp7/vQdWH4D4yJiv0K5rJISzKUMCXN?=
+ =?us-ascii?Q?BGqsnGteGFIrXiRvLQ76oS66WFLyyD1g/YEu5YYyncbLMQMsefnDf9qJ8kjq?=
+ =?us-ascii?Q?jG70EDD36nrJki9DtX2PGaUokoTe8VmHywJicZ7tda0wQKlOtidr2sNf3Gip?=
+ =?us-ascii?Q?mEhllz42mKPyLtOnkFkoDbRGN8mhxD5BL6cP+xYc9VTG1GJYvfHbh+d5zsNW?=
+ =?us-ascii?Q?sKAQdSo7e8rsGF1EA/x+DUGfIJut4LIQHKty0VW9ztL/iS3mMHyv6++kgzSF?=
+ =?us-ascii?Q?HjneX/H3aEMGXrNpWhn7P0MqnHakeuSC+c8vnmbwHho8vALA58EkW8DxZHcz?=
+ =?us-ascii?Q?DkLK8DT5zfaQsFHJV2lKtwaME9vcsJEak9aKmAsYR6O4BLKY4T2ETZAlUSbx?=
+ =?us-ascii?Q?ADP02fG/jvuTkfpWO4322A5KOOhi0TXo5cs9cyajAYR6tZLx8iE7HTZvBSik?=
+ =?us-ascii?Q?+Ow8kSVg2Em061UQpfMv8fEP0+5ptl1lPpzpAsBaoXM0uSiCoMgZs6RyDxSo?=
+ =?us-ascii?Q?PyNM9E/zEJU5N9ec5xMOndahzUzjaYsdfHwyuo6ZrhQHps9Rgxtday6891z5?=
+ =?us-ascii?Q?zQwAkMK9MXhx1Ohu/pNqzB/uf57vbkvmINhLTrQ+lLyNwqPGMomWNTHRJKOR?=
+ =?us-ascii?Q?gKlNLT10ueU2BiaT/5FwSe9HaoRLoKLBtFStJYc3KWOH8O+WIxcmg6UiZQ39?=
+ =?us-ascii?Q?cw=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 696eef92-6269-4e0a-651c-08dac388f2f7
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2022 02:03:38.7176
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /XiPLPyuSwppVXXiprxSXc3W3kAbjsan/bUoOqyYnpSoeNw02KTkmxw5Lp3Lxx7hNxlioBuAtF3HsoM4dD8l8g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6061
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 03, 2022, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> > +	/*
-> > +	 * Reset everything to support using non-enlightened VMCS access later
-> > +	 * (e.g. when we reload the module with enlightened_vmcs=0)
-> > +	 */
-> > +	for_each_online_cpu(cpu) {
-> > +		vp_ap =	hv_get_vp_assist_page(cpu);
+On Thu, Nov 10, 2022 at 04:54:20PM +0000, Sean Christopherson wrote:
+> On Thu, Nov 10, 2022, Yan Zhao wrote:
+> > kvm mmu uses "if (is_tdp_mmu(vcpu->arch.mmu))" to choose between tdp mmu
+> > and shadow path.
+> > If a root is a tdp mmu page while its root_count is 0, it's not valid to
+> > go to the shadow path.
+> > 
+> > So, return true and add a warn on zero root count.
+> > 
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > ---
+> >  arch/x86/kvm/mmu/tdp_mmu.h | 6 +++++-
+> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> > index c163f7cc23ca..58b4881654a9 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> > @@ -74,6 +74,7 @@ static inline bool is_tdp_mmu(struct kvm_mmu *mmu)
+> >  {
+> >  	struct kvm_mmu_page *sp;
+> >  	hpa_t hpa = mmu->root.hpa;
+> > +	bool is_tdp;
+> >  
+> >  	if (WARN_ON(!VALID_PAGE(hpa)))
+> >  		return false;
+> > @@ -84,7 +85,10 @@ static inline bool is_tdp_mmu(struct kvm_mmu *mmu)
+> >  	 * pae_root page, not a shadow page.
+> >  	 */
+> >  	sp = to_shadow_page(hpa);
+> > -	return sp && is_tdp_mmu_page(sp) && sp->root_count;
+> > +	is_tdp = sp && is_tdp_mmu_page(sp);
+> > +	WARN_ON(is_tdp && !refcount_read(&sp->tdp_mmu_root_count));
 > > +
-> > +		if (!vp_ap)
-> > +			continue;
-> > +
-> > +		vp_ap->nested_control.features.directhypercall = 0;
-> > +		vp_ap->current_nested_vmcs = 0;
-> > +		vp_ap->enlighten_vmentry = 0;
-> > +	}
+> > +	return is_tdp;
 > 
-> Unrelated to your patch but while looking at this code I got curious
-> about why don't we need a protection against CPU offlining here. Turns
-> out that even when we offline a CPU, its VP assist page remains
-> allocated (see hv_cpu_die()), we just write '0' to the MSR and thus
-
-Heh, "die".  Hyper-V is quite dramatic.
-
-> accessing the page is safe. The consequent hv_cpu_init(), however, does
-> not restore VP assist page when it's already allocated:
+> I have a series/patch that drops this code entirely, I would rather just go that
+> route directly.
 > 
-> # rdmsr -p 24 0x40000073
-> 10212f001
-> # echo 0 > /sys/devices/system/cpu/cpu24/online 
-> # echo 1 > /sys/devices/system/cpu/cpu24/online 
-> # rdmsr -p 24 0x40000073
-> 0
-> 
-> The culprit is commit e5d9b714fe402 ("x86/hyperv: fix root partition
-> faults when writing to VP assist page MSR"). A patch is inbound.
-> 
-> 'hv_root_partition' case is different though. We do memunmap() and reset
-> VP assist page to zero so it is theoretically possible we're going to
-> clash. Unless I'm missing some obvious reason why module unload can't
-> coincide with CPU offlining, we may be better off surrounding this with
-> cpus_read_lock()/cpus_read_unlock(). 
+> https://lore.kernel.org/all/20221012181702.3663607-9-seanjc@google.com
+Thanks for pointing me to this link.
+Yes, it's a much better fix!
 
-I finally see what you're concerned about.  If a CPU goes offline and its assist
-page is unmapped, zeroing out the nested/eVMCS stuff will fault.
-
-I think the real problem is that the purging of the eVMCS is in the wrong place.
-Move the clearing to vmx_hardware_disable() and then the CPU hotplug bug goes
-away once KVM disables hotplug during hardware enabling/disable later in the series.
-There's no need to wait until module exit, e.g. it's not like it costs much to
-clear a few variables, and IIUC the state is used only when KVM is actively using
-VMX/eVMCS.
-
-However, I believe there's a second bug.  KVM's CPU online hook is called before
-Hyper-V's online hook (CPUHP_AP_ONLINE_DYN).  Before this series, which moves KVM's
-hook from STARTING to ONLINE, KVM's hook is waaaay before Hyper-V's.  That means
-that hv_cpu_init()'s allocation of the VP assist page will come _after_ KVM's
-check in vmx_hardware_enable()
-
-	/*
-	 * This can happen if we hot-added a CPU but failed to allocate
-	 * VP assist page for it.
-	 */
-	if (static_branch_unlikely(&enable_evmcs) &&
-	    !hv_get_vp_assist_page(cpu))
-		return -EFAULT;
-
-I.e. CPU hotplug will never work if KVM is running VMs as a Hyper-V guest.  I bet
-you can repro by doing a SUSPEND+RESUME.
-
-Can you try to see if that's actually a bug?  If so, the only sane fix seems to
-be to add a dedicated ONLINE action for Hyper-V.  Per patch
-
-  KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
-
-from this series, CPUHP_AP_KVM_ONLINE needs to be before CPUHP_AP_SCHED_WAIT_EMPTY
-to ensure there are no tasks, i.e. no vCPUs, running on the to-be-unplugged CPU.
-
-Back to the original bug, proposed fix is below.  The other advantage of moving
-the reset to hardware disabling is that the "cleanup" is just disabling the static
-key, and at that point can simply be deleted as there's no need to disable the
-static key when kvm-intel is unloaded since kvm-intel owns the key.  I.e. this
-patch (that we're replying to) would get replaced with a patch to delete the
-disabling of the static key.
-
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Nov 2022 17:28:08 -0800
-Subject: [PATCH] KVM: VMX: Reset eVMCS controls in VP assist page during
- hardware disabling
-
-Reset the eVMCS controls in the per-CPU VP assist page during hardware
-disabling instead of waiting until kvm-intel's module exit.  The controls
-are activated if and only if KVM creates a VM, i.e. don't need to be
-reset if hardware is never enabled.
-
-Doing the reset during hardware disabling will naturally fix a potential
-NULL pointer deref bug once KVM disables CPU hotplug while enabling and
-disabling hardware (which is necessary to fix a variety of bugs).  If the
-kernel is running as the root partition, the VP assist page is unmapped
-during CPU hot unplug, and so KVM's clearing of the eVMCS controls needs
-to occur with CPU hot(un)plug disabled, otherwise KVM could attempt to
-write to a CPU's VP assist page after it's unmapped.
-
-Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/vmx.c | 50 +++++++++++++++++++++++++-----------------
- 1 file changed, 30 insertions(+), 20 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index aca88524fd1e..ae13aa3e8a1d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -552,6 +552,33 @@ static int hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static void hv_reset_evmcs(void)
-+{
-+	struct hv_vp_assist_page *vp_ap;
-+
-+	if (!static_branch_unlikely(&enable_evmcs))
-+		return;
-+
-+	/*
-+	 * KVM should enable eVMCS if and only if all CPUs have a VP assist
-+	 * page, and should reject CPU onlining if eVMCS is enabled the CPU
-+	 * doesn't have a VP assist page allocated.
-+	 */
-+	vp_ap = hv_get_vp_assist_page(smp_processor_id());
-+	if (WARN_ON_ONCE(!vp_ap))
-+		return;
-+
-+	/*
-+	 * Reset everything to support using non-enlightened VMCS access later
-+	 * (e.g. when we reload the module with enlightened_vmcs=0)
-+	 */
-+	vp_ap->nested_control.features.directhypercall = 0;
-+	vp_ap->current_nested_vmcs = 0;
-+	vp_ap->enlighten_vmentry = 0;
-+}
-+
-+#else /* IS_ENABLED(CONFIG_HYPERV) */
-+static void hv_reset_evmcs(void) {}
- #endif /* IS_ENABLED(CONFIG_HYPERV) */
- 
- /*
-@@ -2497,6 +2524,8 @@ static void vmx_hardware_disable(void)
- 	if (cpu_vmxoff())
- 		kvm_spurious_fault();
- 
-+	hv_reset_evmcs();
-+
- 	intel_pt_handle_vmx(0);
- }
- 
-@@ -8463,27 +8492,8 @@ static void vmx_exit(void)
- 	kvm_exit();
- 
- #if IS_ENABLED(CONFIG_HYPERV)
--	if (static_branch_unlikely(&enable_evmcs)) {
--		int cpu;
--		struct hv_vp_assist_page *vp_ap;
--		/*
--		 * Reset everything to support using non-enlightened VMCS
--		 * access later (e.g. when we reload the module with
--		 * enlightened_vmcs=0)
--		 */
--		for_each_online_cpu(cpu) {
--			vp_ap =	hv_get_vp_assist_page(cpu);
--
--			if (!vp_ap)
--				continue;
--
--			vp_ap->nested_control.features.directhypercall = 0;
--			vp_ap->current_nested_vmcs = 0;
--			vp_ap->enlighten_vmentry = 0;
--		}
--
-+	if (static_branch_unlikely(&enable_evmcs))
- 		static_branch_disable(&enable_evmcs);
--	}
- #endif
- 	vmx_cleanup_l1d_flush();
- 
-
-base-commit: 5f47ba6894477dfbdc5416467a25fb7acb47d404
--- 
+Thanks
+Yan
 
