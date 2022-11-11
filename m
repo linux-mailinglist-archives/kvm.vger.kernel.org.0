@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35E20625849
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 11:27:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A73A2625843
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 11:27:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233833AbiKKK12 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 05:27:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36564 "EHLO
+        id S233726AbiKKK1R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 05:27:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233859AbiKKK1M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233861AbiKKK1M (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 11 Nov 2022 05:27:12 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 718E2129;
-        Fri, 11 Nov 2022 02:27:08 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id c15-20020a17090a1d0f00b0021365864446so4347223pjd.4;
-        Fri, 11 Nov 2022 02:27:08 -0800 (PST)
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BEE7BA7;
+        Fri, 11 Nov 2022 02:27:10 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id b62so4120258pgc.0;
+        Fri, 11 Nov 2022 02:27:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Fw4sOvoR84ZfYmrPFudlSRO8vcVAsXtD50u1XCvbbYs=;
-        b=IEjH+/rf/ViIuR0iNyDdq7FSgDMqbAJ6zYcRWQeYTJqOvkl/jmGq1fFt2YWm2ZZR38
-         t01cRnCY+HxsmPgBzgLAp4ztHYoA20Fyn+0h3FOxSHz81WprOdrLUgUlcN5jqew7VI1E
-         yyVlCY9VEZBnLYTPUl1e65mIxqI/o8LSAgrd0jaF2TZdUW04Tr7KqmhF5EVQ0NAiCBlJ
-         dC/HJNQ9ikWvJIxUtviTvIPYv6PcArSXnS2FCf1kt40mxCXOByAe4nmv3Ft/UM/hZp/1
-         m+zxvgYPSsQK+4yK2MPMvV6XuJL926XWjWY5wr8nHRx+v+gZFZVny1v1xXF3UOj2Dvho
-         PEKQ==
+        bh=cbN3qr5bzEZl5U34w1vkWcXf/4eP6mzBa1StTcgxd5s=;
+        b=GXe7AiJJFKxQS3u6FzrDrnU3J1Vehxc2NNxyNGV2V40949Ti4Og8jdm1TZkHlTCG8v
+         m4OkUX7jJUJoswKtxlgqK7nbh9qfhEd8rs/X/tSYp4YbOZLBLHzekedjxAeJTS2TW5aX
+         tcY3qH1HKmBPE8AfuG/aI/HLW7+qjd1Y03Q6WkGOssqPkBChPqM2qcyWX/8ywDiJDpjN
+         bIyEB7c1XOp+bNVm4IDG2DJ++XCoyPIM3EhzgWBnn0lv1cdYDT3jDzTPXLy47Wdi9vzV
+         LXY+ENoG5CepfUyufH/nrOh9kHrY5H3m0VKOH3halI7MwsOmKPMpZtDsq9Z2zD0Hveni
+         JW9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Fw4sOvoR84ZfYmrPFudlSRO8vcVAsXtD50u1XCvbbYs=;
-        b=Y719hlSbRWC+o5VqIO+s2LJFpS7OHJTABubNnFD4wbqr9FtL37JVU1D1JnPtDYqNA7
-         20xVQEEMEXA+UZ9lczakw3b7A6mUF74il0T+Cd6b0O1vkLeT7J/BGOOA79ZhEUurqB7I
-         r0eAsVRZXaHmC+mQoPFECBaTfL0gJaC864Hz+lzW//mPEqgsuhfgyLUXLitD9Sq//o3m
-         kwvBfqGjSzXBai39e888HZ2Aagb/xip/YjTqIIEXv0l6ZFDibDxlfXVwnB0RowQ9qPTD
-         fLsoQbwiabPEK72VFUQChzF9b/SWyRHhkL6NiYpZLfM8w65rAfMNoE1BfxEEAbiWUa/3
-         0e8A==
-X-Gm-Message-State: ANoB5pm9yJ6v3rxLKtAUF2XwxIJsGUwlv97wnExwz9rWSIERkMydBDJs
-        edn5uHV5uJKFp/auh0roEeJ3ZV02etk+Vu+h
-X-Google-Smtp-Source: AA0mqf7FoXhde3HlFvc5OEAGQtRIbVGfB9oWpzQlhiIkXerI8kmVA4MvoWETzE5t08LGHKTvm6KJ+g==
-X-Received: by 2002:a17:902:ef87:b0:188:6429:d7bd with SMTP id iz7-20020a170902ef8700b001886429d7bdmr1935438plb.30.1668162427990;
-        Fri, 11 Nov 2022 02:27:07 -0800 (PST)
+        bh=cbN3qr5bzEZl5U34w1vkWcXf/4eP6mzBa1StTcgxd5s=;
+        b=lTMl0Ml0YPO6v9m1zAW+oNFBS/Zpx87/sZdCaf6GIhTY6sIvSPDm4353LgSctJIJZI
+         3W3m+zNbM3dkY4kZWqDIjgAa5u3sGFHI3LFUG0wGS0IrWW+3c0ShqFZUaH8WKmMRYUDT
+         MrOYGkEuUzG28SWo1StdJWxaoxkdWe9s+FsNBUw13p/OmnScbVgLMxlRD9jpIqiyQSYH
+         j5LluqGNX2EkMJXju80Cwxcez1aqvp0zH++O6wX7YniC3qX1qfocz0Ytk6lfoY+RLBHF
+         FItsK3YzT0cPI8QY8UPq4PcYQH2S49AWsfdXf9WhT+5V0frmY2vxpK6x+5VW4cpOY1ew
+         yVnA==
+X-Gm-Message-State: ANoB5pnZI2EIzMxA7A6kBTChXvKx9nbWTP4u+9Jd/aTdc32qnEQ0Q6Sy
+        W8JWR9f0UxDLhkspkg8BJFkT/DMq2vmDtjGo
+X-Google-Smtp-Source: AA0mqf4Wev/6JT3zidyiQry1Egvyuf5bCahCyiZQxPKQ+EV88WMNQ24mz8j8Z4xdMC7TRsifLpGPCQ==
+X-Received: by 2002:a63:d103:0:b0:460:ea43:93c6 with SMTP id k3-20020a63d103000000b00460ea4393c6mr1088171pgg.173.1668162429586;
+        Fri, 11 Nov 2022 02:27:09 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id u67-20020a626046000000b0056b6acb58a0sm1248612pfb.102.2022.11.11.02.27.06
+        by smtp.gmail.com with ESMTPSA id u67-20020a626046000000b0056b6acb58a0sm1248612pfb.102.2022.11.11.02.27.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Nov 2022 02:27:07 -0800 (PST)
+        Fri, 11 Nov 2022 02:27:09 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 2/8] KVM: VMX: Refactor intel_pmu_set_msr() to align with other set_msr() helpers
-Date:   Fri, 11 Nov 2022 18:26:39 +0800
-Message-Id: <20221111102645.82001-3-likexu@tencent.com>
+Subject: [PATCH v3 3/8] KVM: x86/pmu: Rewrite reprogram_counters() to improve performance
+Date:   Fri, 11 Nov 2022 18:26:40 +0800
+Message-Id: <20221111102645.82001-4-likexu@tencent.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221111102645.82001-1-likexu@tencent.com>
 References: <20221111102645.82001-1-likexu@tencent.com>
@@ -72,174 +72,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+From: Like Xu <likexu@tencent.com>
 
-Invert the flows in intel_pmu_set_msr()'s case statements so that they
-follow the kernel's preferred style of:
+A valid pmc is always tested before using pmu->reprogram_pmi. Eliminate
+this part of the redundancy by setting the counter's bitmask directly,
+and in addition, trigger KVM_REQ_PMU only once to save more cpu cycles.
 
-	if (<not valid>)
-		return <error>
-
-	<commit change>
-	return <success>
-
-which is also the style used by every other set_msr() helper (except
-AMD's PMU variant, which doesn't use a switch statement).
-
-Opportunstically move the "val == current" checks below the validity
-checks.  Except for the one-off case for MSR_P6_EVNTSEL2, the reserved
-bit checks are extremely cheap, and the guest is unlikely to frequently
-write the current value, i.e. avoiding the reserved bit checks doesn't
-add much (any?) value.
-
-No functional change intended.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 81 +++++++++++++++++++-----------------
- 1 file changed, 42 insertions(+), 39 deletions(-)
+ arch/x86/kvm/pmu.h           | 11 +++++++++++
+ arch/x86/kvm/vmx/pmu_intel.c | 12 ------------
+ 2 files changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index f81cf54a245f..2f7cd388859c 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -397,44 +397,43 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 
- 	switch (msr) {
- 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
--		if (pmu->fixed_ctr_ctrl == data)
--			return 0;
--		if (!(data & pmu->fixed_ctr_ctrl_mask)) {
-+		if (data & pmu->fixed_ctr_ctrl_mask)
-+			return 1;
-+
-+		if (pmu->fixed_ctr_ctrl != data)
- 			reprogram_fixed_counters(pmu, data);
--			return 0;
--		}
- 		break;
- 	case MSR_CORE_PERF_GLOBAL_STATUS:
--		if (msr_info->host_initiated) {
--			pmu->global_status = data;
--			return 0;
--		}
--		break; /* RO MSR */
-+		if (!msr_info->host_initiated)
-+			return 1; /* RO MSR */
-+
-+		pmu->global_status = data;
-+		break;
- 	case MSR_CORE_PERF_GLOBAL_CTRL:
--		if (pmu->global_ctrl == data)
--			return 0;
--		if (kvm_valid_perf_global_ctrl(pmu, data)) {
-+		if (!kvm_valid_perf_global_ctrl(pmu, data))
-+			return 1;
-+
-+		if (pmu->global_ctrl != data) {
- 			diff = pmu->global_ctrl ^ data;
- 			pmu->global_ctrl = data;
- 			reprogram_counters(pmu, diff);
--			return 0;
- 		}
- 		break;
- 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
--		if (!(data & pmu->global_ovf_ctrl_mask)) {
--			if (!msr_info->host_initiated)
--				pmu->global_status &= ~data;
--			return 0;
--		}
-+		if (data & pmu->global_ovf_ctrl_mask)
-+			return 1;
-+
-+		if (!msr_info->host_initiated)
-+			pmu->global_status &= ~data;
- 		break;
- 	case MSR_IA32_PEBS_ENABLE:
--		if (pmu->pebs_enable == data)
--			return 0;
--		if (!(data & pmu->pebs_enable_mask)) {
-+		if (data & pmu->pebs_enable_mask)
-+			return 1;
-+
-+		if (pmu->pebs_enable != data) {
- 			diff = pmu->pebs_enable ^ data;
- 			pmu->pebs_enable = data;
- 			reprogram_counters(pmu, diff);
--			return 0;
- 		}
- 		break;
- 	case MSR_IA32_DS_AREA:
-@@ -442,15 +441,14 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 1;
- 		if (is_noncanonical_address(data, vcpu))
- 			return 1;
-+
- 		pmu->ds_area = data;
--		return 0;
-+		break;
- 	case MSR_PEBS_DATA_CFG:
--		if (pmu->pebs_data_cfg == data)
--			return 0;
--		if (!(data & pmu->pebs_data_cfg_mask)) {
--			pmu->pebs_data_cfg = data;
--			return 0;
--		}
-+		if (data & pmu->pebs_data_cfg_mask)
-+			return 1;
-+
-+		pmu->pebs_data_cfg = data;
- 		break;
- 	default:
- 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
-@@ -458,33 +456,38 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			if ((msr & MSR_PMC_FULL_WIDTH_BIT) &&
- 			    (data & ~pmu->counter_bitmask[KVM_PMC_GP]))
- 				return 1;
-+
- 			if (!msr_info->host_initiated &&
- 			    !(msr & MSR_PMC_FULL_WIDTH_BIT))
- 				data = (s64)(s32)data;
- 			pmc->counter += data - pmc_read_counter(pmc);
- 			pmc_update_sample_period(pmc);
--			return 0;
-+			break;
- 		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
- 			pmc->counter += data - pmc_read_counter(pmc);
- 			pmc_update_sample_period(pmc);
--			return 0;
-+			break;
- 		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
--			if (data == pmc->eventsel)
--				return 0;
- 			reserved_bits = pmu->reserved_bits;
- 			if ((pmc->idx == 2) &&
- 			    (pmu->raw_event_mask & HSW_IN_TX_CHECKPOINTED))
- 				reserved_bits ^= HSW_IN_TX_CHECKPOINTED;
--			if (!(data & reserved_bits)) {
-+			if (data & reserved_bits)
-+				return 1;
-+
-+			if (data != pmc->eventsel) {
- 				pmc->eventsel = data;
- 				kvm_pmu_request_counter_reprogam(pmc);
--				return 0;
- 			}
--		} else if (intel_pmu_handle_lbr_msrs_access(vcpu, msr_info, false))
--			return 0;
-+			break;
-+		} else if (intel_pmu_handle_lbr_msrs_access(vcpu, msr_info, false)) {
-+			break;
-+		}
-+		/* Not a known PMU MSR. */
-+		return 1;
- 	}
- 
--	return 1;
-+	return 0;
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 2b5376ba66ea..be552c8217a0 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -189,6 +189,17 @@ static inline void kvm_pmu_request_counter_reprogam(struct kvm_pmc *pmc)
+ 	kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
  }
  
- static void setup_fixed_pmc_eventsel(struct kvm_pmu *pmu)
++static inline void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
++{
++	int bit;
++
++	if (diff) {
++		for_each_set_bit(bit, (unsigned long *)&diff, X86_PMC_IDX_MAX)
++			__set_bit(bit, pmu->reprogram_pmi);
++		kvm_make_request(KVM_REQ_PMU, pmu_to_vcpu(pmu));
++	}
++}
++
+ void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
+ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
+ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 2f7cd388859c..db704eea2d7c 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -68,18 +68,6 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
+ 	}
+ }
+ 
+-static void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
+-{
+-	int bit;
+-	struct kvm_pmc *pmc;
+-
+-	for_each_set_bit(bit, (unsigned long *)&diff, X86_PMC_IDX_MAX) {
+-		pmc = intel_pmc_idx_to_pmc(pmu, bit);
+-		if (pmc)
+-			kvm_pmu_request_counter_reprogam(pmc);
+-	}
+-}
+-
+ static bool intel_hw_event_available(struct kvm_pmc *pmc)
+ {
+ 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
 -- 
 2.38.1
 
