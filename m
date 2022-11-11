@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88C566258E3
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 11:56:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B5116258EA
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 11:57:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233296AbiKKK4p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 05:56:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55014 "EHLO
+        id S233247AbiKKK5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 05:57:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232918AbiKKK4n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 05:56:43 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A8CC6A;
-        Fri, 11 Nov 2022 02:56:43 -0800 (PST)
+        with ESMTP id S231167AbiKKK53 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 05:57:29 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8457AC6A;
+        Fri, 11 Nov 2022 02:57:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668164203; x=1699700203;
+  t=1668164248; x=1699700248;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=u7QIWUi0C6/FBWEuiDhVYicRF9D5dHYcVP0Zb/o5lgM=;
-  b=IbNuZXiGuAg/xzRtMi5TEzGdW564+9OE8b1PXsFm3EGMGDev7jKgq2h8
-   VZTbsxJXwd3wyrCIWHACvhZ+xeD1CQ/CVvhXjeITLnSZ2E072s9/N/mOT
-   KDI728URM/67mTm0A722SCJR1aPNBkc6Ux/zo9GdXv2c8VkpSkjHaqtsk
-   +k7xKzfQYSe7JVAnAtsxxdzX3te75pkT6Da2JhEVJrYs7pa1rfCngkZW/
-   rIhWgQ7dUfbtFXC3opl0i+drO5QzyFLw4mq0XlqeL4gor222TFTQYehQU
-   DMH14nrcErxFAmJe/fyq8FYGZgW+ECneC5/fLklIhpS5KE4wd19JyP287
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="313364622"
+  bh=z+C69Y9MYwYBkL7n0zgCNzMBgSh88lPHbyHq9bc80sM=;
+  b=YaHkUB+NCBfiFB9pJaXnrj/VgwPSsKNfVdU8kb1n6D1r7lrrNTL0Pnh7
+   YdTBXYbRBgy3TuFCdwxZIHo3rSLOlt7sr8BSeGxvkCVHqKJ/l6sRroehD
+   36Uel2pD2PsXMdJGViD1kHRDUDdcttxjiVwfEJE56VViweYbgFqcAfMOa
+   Mi0hLHa8YCDqMgcrT9Van6SRneMCKzz1QwM9olNGA00TE9r+MXhp2gwY0
+   02qkwRbsc/mnLgDRk+0crvDWGbvMLTDoyIiejQzXzQmTymqT6RdwPW8JX
+   EtPEL9jsIPuEjQCHsY1OSapkqmLvORx+CHt05SZPgRC3/JGDBUlPfiNcq
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="291980534"
 X-IronPort-AV: E=Sophos;i="5.96,156,1665471600"; 
-   d="scan'208";a="313364622"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2022 02:56:42 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="637549316"
+   d="scan'208";a="291980534"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2022 02:57:28 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="631998597"
 X-IronPort-AV: E=Sophos;i="5.96,156,1665471600"; 
-   d="scan'208";a="637549316"
+   d="scan'208";a="631998597"
 Received: from yzhao56-desk.sh.intel.com ([10.238.200.254])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2022 02:56:40 -0800
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2022 02:57:25 -0800
 From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, zhenyuw@linux.intel.com,
-        Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH v2 1/3] KVM: x86: add a new page track hook track_remove_slot
-Date:   Fri, 11 Nov 2022 18:33:50 +0800
-Message-Id: <20221111103350.22326-1-yan.y.zhao@intel.com>
+To:     intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org
+Cc:     zhenyuw@linux.intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        seanjc@google.com, Yan Zhao <yan.y.zhao@intel.com>
+Subject: [PATCH v2 2/3] drm/i915/gvt: switch from track_flush_slot to track_remove_slot
+Date:   Fri, 11 Nov 2022 18:34:36 +0800
+Message-Id: <20221111103436.22381-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20221111103247.22275-1-yan.y.zhao@intel.com>
 References: <20221111103247.22275-1-yan.y.zhao@intel.com>
@@ -58,103 +58,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Page track hook track_remove_slot is used to notify users that a slot
-has been removed and is called when a slot DELETE/MOVE is about to be
-completed.
-
-Users of this hook can drop write protections in the removed slot.
-
-Note:
-Since KVM_MR_MOVE currently never actually happens in KVM/QEMU, and has
-never been properly supported in the external page track user, we just
-use the hook track_remove_slot to notify users of the old slot being
-removed.
+KVMGT only cares about when a slot is indeed removed.
+So switch to use track_remove_slot which is called when a slot is removed.
 
 Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
 Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- arch/x86/include/asm/kvm_page_track.h | 11 +++++++++++
- arch/x86/kvm/mmu/page_track.c         | 26 ++++++++++++++++++++++++++
- arch/x86/kvm/x86.c                    |  3 +++
- 3 files changed, 40 insertions(+)
+ drivers/gpu/drm/i915/gvt/kvmgt.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
-index eb186bc57f6a..046b024d1813 100644
---- a/arch/x86/include/asm/kvm_page_track.h
-+++ b/arch/x86/include/asm/kvm_page_track.h
-@@ -44,6 +44,16 @@ struct kvm_page_track_notifier_node {
- 	 */
- 	void (*track_flush_slot)(struct kvm *kvm, struct kvm_memory_slot *slot,
- 			    struct kvm_page_track_notifier_node *node);
-+	/*
-+	 * It is called when memory slot is moved or removed
-+	 * users can drop write-protection for the pages in that memory slot
-+	 *
-+	 * @kvm: the kvm where memory slot being moved or removed
-+	 * @slot: the memory slot being moved or removed
-+	 * @node: this node
-+	 */
-+	void (*track_remove_slot)(struct kvm *kvm, struct kvm_memory_slot *slot,
-+				  struct kvm_page_track_notifier_node *node);
- };
+diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+index 714221f9a131..9582d047471f 100644
+--- a/drivers/gpu/drm/i915/gvt/kvmgt.c
++++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+@@ -109,7 +109,7 @@ struct gvt_dma {
+ static void kvmgt_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa,
+ 		const u8 *val, int len,
+ 		struct kvm_page_track_notifier_node *node);
+-static void kvmgt_page_track_flush_slot(struct kvm *kvm,
++static void kvmgt_page_track_remove_slot(struct kvm *kvm,
+ 		struct kvm_memory_slot *slot,
+ 		struct kvm_page_track_notifier_node *node);
  
- int kvm_page_track_init(struct kvm *kvm);
-@@ -76,4 +86,5 @@ kvm_page_track_unregister_notifier(struct kvm *kvm,
- void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
- 			  int bytes);
- void kvm_page_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot);
-+void kvm_page_track_remove_slot(struct kvm *kvm, struct kvm_memory_slot *slot);
- #endif
-diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-index 2e09d1b6249f..4d6bab1d61c9 100644
---- a/arch/x86/kvm/mmu/page_track.c
-+++ b/arch/x86/kvm/mmu/page_track.c
-@@ -300,3 +300,29 @@ void kvm_page_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
- 			n->track_flush_slot(kvm, slot, n);
- 	srcu_read_unlock(&head->track_srcu, idx);
+@@ -673,7 +673,7 @@ static int intel_vgpu_open_device(struct vfio_device *vfio_dev)
+ 	gvt_cache_init(vgpu);
+ 
+ 	vgpu->track_node.track_write = kvmgt_page_track_write;
+-	vgpu->track_node.track_flush_slot = kvmgt_page_track_flush_slot;
++	vgpu->track_node.track_remove_slot = kvmgt_page_track_remove_slot;
+ 	kvm_get_kvm(vgpu->vfio_device.kvm);
+ 	kvm_page_track_register_notifier(vgpu->vfio_device.kvm,
+ 					 &vgpu->track_node);
+@@ -1617,7 +1617,7 @@ static void kvmgt_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa,
+ 						     (void *)val, len);
  }
-+
-+/*
-+ * Notify the node that memory slot is removed or moved so that it can
-+ * drop write-protection for the pages in the memory slot.
-+ *
-+ * The node should figure out it has any write-protected pages in this slot
-+ * by itself.
-+ */
-+void kvm_page_track_remove_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
-+{
-+	struct kvm_page_track_notifier_head *head;
-+	struct kvm_page_track_notifier_node *n;
-+	int idx;
-+
-+	head = &kvm->arch.track_notifier_head;
-+
-+	if (hlist_empty(&head->track_notifier_list))
-+		return;
-+
-+	idx = srcu_read_lock(&head->track_srcu);
-+	hlist_for_each_entry_srcu(n, &head->track_notifier_list, node,
-+				srcu_read_lock_held(&head->track_srcu))
-+		if (n->track_remove_slot)
-+			n->track_remove_slot(kvm, slot, n);
-+	srcu_read_unlock(&head->track_srcu, idx);
-+}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 916ebbc81e52..a24a4a2ad1a0 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12844,6 +12844,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				const struct kvm_memory_slot *new,
- 				enum kvm_mr_change change)
+ 
+-static void kvmgt_page_track_flush_slot(struct kvm *kvm,
++static void kvmgt_page_track_remove_slot(struct kvm *kvm,
+ 		struct kvm_memory_slot *slot,
+ 		struct kvm_page_track_notifier_node *node)
  {
-+	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
-+		kvm_page_track_remove_slot(kvm, old);
-+
- 	if (!kvm->arch.n_requested_mmu_pages &&
- 	    (change == KVM_MR_CREATE || change == KVM_MR_DELETE)) {
- 		unsigned long nr_mmu_pages;
 -- 
 2.17.1
 
