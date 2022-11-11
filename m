@@ -2,78 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 836F56262FD
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 21:35:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01FBA626323
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 21:45:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234180AbiKKUfU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 15:35:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60604 "EHLO
+        id S234510AbiKKUpT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 15:45:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233192AbiKKUfS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 15:35:18 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 303B11583F;
-        Fri, 11 Nov 2022 12:35:18 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id 6so5241159pgm.6;
-        Fri, 11 Nov 2022 12:35:18 -0800 (PST)
+        with ESMTP id S231625AbiKKUpQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 15:45:16 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B15185470;
+        Fri, 11 Nov 2022 12:45:16 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id b185so5820092pfb.9;
+        Fri, 11 Nov 2022 12:45:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YCMPU3HV90X3WiMtwGJY9HCNz2GAEAWPUbWr5rH9PwM=;
-        b=N+wlzuG5A4aC2jE7VxxEaMoCJvWY9E1jhzUcTzBRQuVpmlfEt24/Vi6nHHPeRMYF/T
-         Ga8lCzDrsFZYvGPvgYr0iZdQWCn17jfl74Qpof7BGCFHGpfx0mh5vx7UorlDgDyaIQI3
-         DhbezMk4Y2aRVV6iaYTMGYmI0osMjE95vtYy47FuKNfhsaKH74Ulh9o8aqVsQJnhcKSY
-         bghfa27hD3czmEhcw62NLxc+mWRHc+o0lXckhUTo0iv3C5Nb67Y0loz2wokFOXnnw/xw
-         N6/iFptkzrZywnZ+zWQs9/0tJL6ETtholGH76wYAyzab8JAJcxAOZvQ2Trm+4gBng0FL
-         RJ/A==
+        bh=c2HEMasltS1yPDvm91ly5x6KiWjgyLEEQdyLS8IioLg=;
+        b=WhNAkXgslHhgAVdqKqP96D2lYVEu4NjGjwFnynZQv0Ksv9mmQ8fLWO2TlDA/wdmqhI
+         r/wK8sUUHo1Qo9l5wVfYkJifcBohQQVj9yJMMWMp9jdfqxwLheOzQpHI3Ph+fYpHss5G
+         aVDHp8QNjRafeb3g1VtNCZwFtJ6SL4yPJup4GNy/46YC9plYFnzBZec7WCCF/+DOPNGQ
+         cn30A+H1YKbtiGK3J0Yr96GuKukoX2bEEY6S+ZEedvaZHYZrMSQfqapXjIoiW6xbE75y
+         NThBNQlsbEfEkY/Ii2dWa+Bud5P4sYf15hH9pG9lCeBtj1swd7r9gRUGddo23zYC58GU
+         tY+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YCMPU3HV90X3WiMtwGJY9HCNz2GAEAWPUbWr5rH9PwM=;
-        b=sEOqfbNmS/E9cum5UujZdPrGNJ/mgg0Rh5J1HcHgPz8Iv0slYEso7Rt7i7ZPxu+MQM
-         APFhQB9SsbbTVUfTeqZ2C0gmSEND78iTJR8dJKY2/ga1jUx32TW9x6oDrTByoAJFqhGY
-         GlfgFlqh0iiF5kLCCP/h8x2A9cSUGO5q+teTzfdAPD3VzvEbOw3wT1OjekrPl7KVOteP
-         3r5dmlPLUvzSN3s2kwrqdsLV5KmkGNlt9zxTXkm6i6jkJTM3CBX2lHpwCBu7SblRdRes
-         Hij+w96kG7On8xzjDBpto7NQFV8U/v57TWzHvezkJnLhf0N2eIarMPptW5mGIEnY/xr3
-         2uFA==
-X-Gm-Message-State: ANoB5pkjMt4uNnyZ5z9JA6neiIo2bylp73pkNRhPYUSyqn1XIVtXt+WI
-        LCUvRSzmnPa7PZcrVAJLJtE=
-X-Google-Smtp-Source: AA0mqf5BgcU1nCW7Xiia2kiZuzzfn3ngIHZ5kCHH0xFgk3cOcLpAIsbLFtE4BSMTW8jr1UNJj5Kk4g==
-X-Received: by 2002:a63:b51:0:b0:42b:9219:d14e with SMTP id a17-20020a630b51000000b0042b9219d14emr3110834pgl.176.1668198917520;
-        Fri, 11 Nov 2022 12:35:17 -0800 (PST)
-Received: from localhost (ec2-13-57-97-131.us-west-1.compute.amazonaws.com. [13.57.97.131])
-        by smtp.gmail.com with ESMTPSA id u3-20020a170902e80300b0016d72804664sm2120792plg.205.2022.11.11.12.35.16
+        bh=c2HEMasltS1yPDvm91ly5x6KiWjgyLEEQdyLS8IioLg=;
+        b=dgX1XtVsZ4Ns7S2a9EtH6WMT/Glygirg1rFAw4jOaePzgPtpVdzfV1RiSGIBHnkEoY
+         oQ8jB91QodoS5GuLq8ssnLyFtu4npFnyBmF93QuueENwGqdUhQx5qJ296jSyVHRZqK8I
+         9GuQz5bbGzOLqbJoClCDYZ2A5Ot0wipSjPLZuFoTSIqwE3tCFjDgvvQigsrJ3GXkvq52
+         fQ05T7vqvg3WThuFdf1aXRqx/o1wbfXZHS0nxpuufVPuaTHUPIlSY0XiN3MUhwh1RU7P
+         W3TxtUQZ/9zBhTlpiEp7ogFUO6ydW+3e9y3DWGkMRyDtWLPUB7ulOgKpIwgNSA2+A9gJ
+         cEyA==
+X-Gm-Message-State: ANoB5pn1KuwcExa83QnSljZwxfXKkmpfJzvD5MyAfKxn8o7yDCGPC4Ee
+        uDm/cpcrU7R15um5bUo5LKU=
+X-Google-Smtp-Source: AA0mqf5er9K38GzKed6ziwcftvLjT+F+/+up4GF5V4OAMHFjsUW5j4AijUg1UqXF5k6oHfEPEEatGg==
+X-Received: by 2002:a63:224b:0:b0:45c:562f:b2b9 with SMTP id t11-20020a63224b000000b0045c562fb2b9mr3109177pgm.245.1668199515444;
+        Fri, 11 Nov 2022 12:45:15 -0800 (PST)
+Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
+        by smtp.gmail.com with ESMTPSA id 133-20020a62168b000000b0056b9124d441sm1969714pfw.218.2022.11.11.12.45.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Nov 2022 12:35:17 -0800 (PST)
-Date:   Fri, 11 Nov 2022 20:35:15 +0000
+        Fri, 11 Nov 2022 12:45:14 -0800 (PST)
+Date:   Fri, 11 Nov 2022 20:45:13 +0000
 From:   Bobby Eshleman <bobbyeshleman@gmail.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc:     Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
         Krasnov Arseniy <oxffffaa@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Bobby Eshleman <bobby.eshleman@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "virtualization@lists.linux-foundation.org" 
         <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: Re: [RFC PATCH v3 01/11] virtio/vsock: rework packet allocation logic
-Message-ID: <Y0CnlSu8u5SBUb2N@bullseye>
+        "edumazet@google.com" <edumazet@google.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        kernel <kernel@sberdevices.ru>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [RFC PATCH v3 00/11] virtio/vsock: experimental zerocopy receive
+Message-ID: <Y260WSJKJXtaJQZi@bullseye>
 References: <f60d7e94-795d-06fd-0321-6972533700c5@sberdevices.ru>
- <f896b8fd-50d2-2512-3966-3775245e9b96@sberdevices.ru>
+ <20221111134715.qxgu7t4c7jse24hp@sgarzare-redhat>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f896b8fd-50d2-2512-3966-3775245e9b96@sberdevices.ru>
+In-Reply-To: <20221111134715.qxgu7t4c7jse24hp@sgarzare-redhat>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -84,112 +83,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Nov 06, 2022 at 07:36:02PM +0000, Arseniy Krasnov wrote:
-> To support zerocopy receive, packet's buffer allocation is changed: for
-> buffers which could be mapped to user's vma we can't use 'kmalloc()'(as
-> kernel restricts to map slab pages to user's vma) and raw buddy
-> allocator now called. But, for tx packets(such packets won't be mapped
-> to user), previous 'kmalloc()' way is used, but with special flag in
-> packet's structure which allows to distinguish between 'kmalloc()' and
-> raw pages buffers.
+On Fri, Nov 11, 2022 at 02:47:15PM +0100, Stefano Garzarella wrote:
+> Hi Arseniy,
+> maybe we should start rebasing this series on the new support for skbuff: https://lore.kernel.org/lkml/20221110171723.24263-1-bobby.eshleman@bytedance.com/
 > 
-> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-
-Hey Arseniy, great work here!
-
-> ---
->  drivers/vhost/vsock.c                   |  1 +
->  include/linux/virtio_vsock.h            |  1 +
->  net/vmw_vsock/virtio_transport.c        |  8 ++++++--
->  net/vmw_vsock/virtio_transport_common.c | 10 +++++++++-
->  4 files changed, 17 insertions(+), 3 deletions(-)
+> CCing Bobby to see if it's easy to integrate since you're both changing the
+> packet allocation.
 > 
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index 5703775af129..65475d128a1d 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -399,6 +399,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
->  		return NULL;
->  	}
->  
-> +	pkt->slab_buf = true;
->  	pkt->buf_len = pkt->len;
->  
->  	nbytes = copy_from_iter(pkt->buf, pkt->len, &iov_iter);
-> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-> index 35d7eedb5e8e..d02cb7aa922f 100644
-> --- a/include/linux/virtio_vsock.h
-> +++ b/include/linux/virtio_vsock.h
-> @@ -50,6 +50,7 @@ struct virtio_vsock_pkt {
->  	u32 off;
->  	bool reply;
->  	bool tap_delivered;
-> +	bool slab_buf;
->  };
 
-WRT the sk_buff series, I bet this bool will not be needed after the
-rebase.
+This looks like the packet allocation can be married somewhat nicely in
+since SKBs may be built from pages using build_skb(). There may be some
+tweaking necessary though, since it also uses the tail chunk of the page
+to hold struct skb_shared_info IIRC.
 
->  
->  struct virtio_vsock_pkt_info {
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> index ad64f403536a..19909c1e9ba3 100644
-> --- a/net/vmw_vsock/virtio_transport.c
-> +++ b/net/vmw_vsock/virtio_transport.c
-> @@ -255,16 +255,20 @@ static void virtio_vsock_rx_fill(struct virtio_vsock *vsock)
->  	vq = vsock->vqs[VSOCK_VQ_RX];
->  
->  	do {
-> +		struct page *buf_page;
-> +
->  		pkt = kzalloc(sizeof(*pkt), GFP_KERNEL);
->  		if (!pkt)
->  			break;
->  
-> -		pkt->buf = kmalloc(buf_len, GFP_KERNEL);
-> -		if (!pkt->buf) {
-> +		buf_page = alloc_page(GFP_KERNEL);
-> +
-> +		if (!buf_page) {
+I left some comments on the patch with the allocator in it.
 
-I think it should not be too hard to use build_skb() around the page
-here after rebasing onto the sk_buff series.
+> 
+> Maybe to avoid having to rebase everything later, it's already worthwhile to
+> start using Bobby's patch with skbuff.
+> 
 
->  			virtio_transport_free_pkt(pkt);
->  			break;
->  		}
->  
-> +		pkt->buf = page_to_virt(buf_page);
->  		pkt->buf_len = buf_len;
->  		pkt->len = buf_len;
->  
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index a9980e9b9304..37e8dbfe2f5d 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -69,6 +69,7 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
->  		if (!pkt->buf)
->  			goto out_pkt;
->  
-> +		pkt->slab_buf = true;
->  		pkt->buf_len = len;
->  
->  		err = memcpy_from_msg(pkt->buf, info->msg, len);
-> @@ -1339,7 +1340,14 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
->  
->  void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
->  {
-> -	kvfree(pkt->buf);
-> +	if (pkt->buf_len) {
-> +		if (pkt->slab_buf)
-> +			kvfree(pkt->buf);
-> +		else
-> +			free_pages((unsigned long)pkt->buf,
-> +				   get_order(pkt->buf_len));
-> +	}
-> +
->  	kfree(pkt);
->  }
->  EXPORT_SYMBOL_GPL(virtio_transport_free_pkt);
-> -- 
-> 2.35.0
+I'll be waiting until Monday to see if some more feedback comes in
+before sending out v4, so I expect v4 early next week, FWIW.
+
+Best,
+Bobby
