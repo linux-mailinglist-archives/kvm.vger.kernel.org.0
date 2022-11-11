@@ -2,137 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34079624FE4
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 02:46:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AACC2625108
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 03:48:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232575AbiKKBqb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Nov 2022 20:46:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59596 "EHLO
+        id S233030AbiKKCsF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Nov 2022 21:48:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232426AbiKKBqa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Nov 2022 20:46:30 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DBE8256;
-        Thu, 10 Nov 2022 17:46:29 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id o7so3252179pjj.1;
-        Thu, 10 Nov 2022 17:46:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=H7HdYeM1Wk/Qq62PaBBPXF+Pby5oSXzutxyUY3L3Tjw=;
-        b=TQM1A9OGHyHLvekGPLggb7MJP/o+IB9VBA2JF8t0gD8FMJadtowHy09Z34JM/46b2R
-         wTpH0lQ8BflS5+jG0vOKqVCGKWYnXKFlJqB89gsJmxNiiVe0DNejwjnJymvlwQyHiQoc
-         g0ndwlHu2B8b6eRAU7byeaq4+rj+Aih2wwwPTdQ2nn37z6+dNSSfu1cJAi+C9dzPsB6q
-         EeRg/mVH8W0JjkKEwRBFrZesLN5vRM4IwV50MOxuT7Z4S0D1DoIDPiQBzU4oGz260gNR
-         M4IUr5SbLHuMTeEQFFjU67nIbtaRfrWv9VUmtgBO18Hv1FT866WPT+Ep/FVvMf6zowS0
-         /v9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H7HdYeM1Wk/Qq62PaBBPXF+Pby5oSXzutxyUY3L3Tjw=;
-        b=O291MwO3TzCFBEts0YcjYA8QJx3gkzG+6k7wlw9jj7Htsd7KrWTe1cFJAsv6QByy6A
-         pG/64VCiWhXKvunnSwmwHRayh7kOflwAyeoVcXTrNNhgIWDovmP18ht8Iuv6KjcREKiX
-         2LP3Rx342KwP/zXr6sTbILbcPuuEuIrbiZCWCcgbgZ2xckv78MBunpSHsKVY9UzNAZ6S
-         6Uz23ECmBjXrnmkwlVJtc5w6t0f8tT1gGU8P9127jd+aQnwmqSVUA2T+5H7MHNtdca4f
-         udJv2n99dCmbvS52/fT/H/mQ9H/oQb+vCeGMUYjEYUK4S7RC15901AnuRMJe7dDha++m
-         zaQQ==
-X-Gm-Message-State: ANoB5pngsY1o3hKP+1O7OFIK/yVnSF0IMtgqciWCGl3ISuIVh2d0md9D
-        DSmOE127HCgsR2B1ABsI7to=
-X-Google-Smtp-Source: AA0mqf7gp2K6uu/Cr3Sggtrh7Qn5BRbs2JbSwN7nqAEB0pxAS61IUKBc/jWB4J5JumGeCw+i9zJYfg==
-X-Received: by 2002:a17:903:cd:b0:186:905e:f964 with SMTP id x13-20020a17090300cd00b00186905ef964mr207154plc.162.1668131189132;
-        Thu, 10 Nov 2022 17:46:29 -0800 (PST)
-Received: from [192.168.43.80] (subs03-180-214-233-84.three.co.id. [180.214.233.84])
-        by smtp.gmail.com with ESMTPSA id i4-20020a056a00004400b0056b1ecef957sm326146pfk.37.2022.11.10.17.46.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Nov 2022 17:46:28 -0800 (PST)
-Message-ID: <615a32d3-41ad-c318-9a96-4dea3c486fa0@gmail.com>
-Date:   Fri, 11 Nov 2022 08:46:16 +0700
+        with ESMTP id S232953AbiKKCrp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Nov 2022 21:47:45 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0132B7B20F;
+        Thu, 10 Nov 2022 18:41:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668134495; x=1699670495;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=B0mtmyLE0adFFQbeHdd+IlzOgsWO3mDVTGK4pb75+yw=;
+  b=UIJrYG7ZthKyelyluBV1wpCoHvuYoUtC+rz9oUDFJZQyyrhK1q9k85M9
+   RPbfXTfKm8guEO1IkSSZr1d7KVSzdkUe/29I7W+GsVKoPJgwIFUmB9tyJ
+   SFnK8ZO+ugPwqqrT1tDvE2O3vTu65wra4D2ux8LPHnl8v9swRx8nZE2EC
+   Fv/IatC2SugbsetO6u/6sQ3cenyMVGdBiZHINVKT5+liQrLN4XxpS/a9H
+   6Tj0tyCZ9fJ77BDA48RygHoDUZOSZO9ozA/2VF+p0b+DpjB2QmyrEoJdj
+   WbJb5too6uSQ3kKj+Bb3k6YWA3whqmhJqveZVG52wJJs15AM9C0SMRCCO
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="310219619"
+X-IronPort-AV: E=Sophos;i="5.96,155,1665471600"; 
+   d="scan'208";a="310219619"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2022 18:41:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="743120727"
+X-IronPort-AV: E=Sophos;i="5.96,155,1665471600"; 
+   d="scan'208";a="743120727"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga002.fm.intel.com with ESMTP; 10 Nov 2022 18:41:10 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 10 Nov 2022 18:41:09 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Thu, 10 Nov 2022 18:41:09 -0800
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.46) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Thu, 10 Nov 2022 18:41:09 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZmW9UgF5LT5Gft6Oo2iCm6+Bo0WWcfVdvBKJwsGfL0ymtMnWhkgKsf5cR2deMmFPCOoavtXriGy8Q/GWBq91mkrni4skl9UIC9uqUmFIz2ONm0q9dpprOOqyUc1q2FHR8kVW31pJaWmdtRhig2VsYijGxBDWbWi5idJUidjbNTtjSnCJXERiwxWB/n+vhc7GETjyFWGpwBaKnV8EmsARHdtpdCcemEKMukJC1CxeHgb+BYW3/l0107yF15KnIpWcBUs+xiXw2b97X4ZNH+rEF/qrE6SLCp0lzRRZm7RWsCjW6wCiCmup4QIcW/kNEv4HfioGIJxYNlBB5U4QfNSdXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7gb+hXHEZYRA5MpZlryDB4rXwvlXBvAuIgRohAYCOXI=;
+ b=PjM4228sTBZ+zeaUSfq52QROjoGRFBURkcWVcOhC0ZiclcmLWjDpitkA4SYrcCKg1ZIem/friqdKjgol7Ci56ov5zlDFofcGDV2Qia/MmHNQwXpbIoZ5iQ3kYi0VsHLivDWroqeYvgw9Qaucat15qmZ4ZiF6tTNqCNzR+r+qexadxyX5XVAyPU1oWliW/111HWfKIWofhuDct12//1GnBJgzHOUgqJP7n02o17Xq2hcCVLlrnxJK2mYfM+GNY2wkrXSfY16lLueGc/4IcJZuUJOpGE1N20K4VTmsiI0AGo9pEBQWIfRCr2QQNUp/fEU8LMKZ2fKxSsRLqWQhEeRoMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ DM4PR11MB6213.namprd11.prod.outlook.com (2603:10b6:8:ae::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5813.13; Fri, 11 Nov 2022 02:41:02 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::dc06:6d36:dc8a:fe7f]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::dc06:6d36:dc8a:fe7f%7]) with mapi id 15.20.5813.013; Fri, 11 Nov 2022
+ 02:41:02 +0000
+Date:   Fri, 11 Nov 2022 10:18:13 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/2] KVM: x86/mmu: Don't rely on page-track mechanism to
+ flush on memslot change
+Message-ID: <Y22w5XEhv4hU2wPc@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20221110014821.1548347-1-seanjc@google.com>
+ <20221110014821.1548347-2-seanjc@google.com>
+ <Y2xheotNkWPVKsIl@yzhao56-desk.sh.intel.com>
+ <Y20wDoCz90jhxrU6@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <Y20wDoCz90jhxrU6@google.com>
+X-ClientProxiedBy: SI1PR02CA0007.apcprd02.prod.outlook.com
+ (2603:1096:4:1f7::6) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH v4 04/17] iommufd: Document overview of iommufd
-To:     Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@nvidia.com>
-Cc:     bpf@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>,
-        iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <4-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com> <Y2zE0zfnQ7mt740i@debian.me>
- <87v8nmhnkl.fsf@meer.lwn.net>
-Content-Language: en-US
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <87v8nmhnkl.fsf@meer.lwn.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS
-        autolearn=no autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DM4PR11MB6213:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6d9cc8ad-b9ec-4c3e-7ccc-08dac38e2c3e
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: FAMOfjJ7MdnWqVpDsjPdwZJEwf8JxIRnLInNX3XkGHNyPkcu248fGRDljtfhiln1723rPfsHhONl71Z2k3QpTVzk89t/AuEIkniuTSMidIXF2XN8WzcuFpjjk2BwAWidvJlS+aB7cSJdIegg8bgMgTleX8ENjOzxMwrC4kUdcglqg1J67idz6JBkzFNzA3qU8UcOfHWFGE8kXMVHwvCsFAY/pBKcnxkf4TVbMUGnAMZjurNK+2ZPKnrrjkKR4Lp6So7+pDDA6AaHhc4QSPMqjgu1NJJzXHnWDZaLzFsqCIgKfuaycRUzU7KFyrJRXxRnjMjiEfUOprZym7/pQVBWUGEC5UllW+TyqgXYQGh1EiL97Hlmw+1uVx8x/rldEpdhUqFMjPulxssvHaSHrxwPGE7saRPciQzGzSIh8d4B5UTLu3eMKtLHecU60Mf0NAcW4RSiaJpFIVwq8IAAWDco/ZYp8kwnC17mgpUuM3MfQZdSklhml8XkbQkNlm6CXXgjA7tWHiuew6INykKCctvhq+2E0nIsPrknsYd2D3KVZhyIXt4EhmYnCOnWRV+g1WNygtKhdA5j4UymtEvWbV8umsQTnehFkPTynUUnOQ7n5VhQjDa37MU19wbfu8F8CjglKcQjJ1WWAXvOB9CHO+/KA8v2/r+n9B8Ysy6S5Zs9k0163WqtCm8N/ID6uiPIdfp7KcTl+IIgjAOyuEnuWjOMlw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(366004)(376002)(396003)(136003)(346002)(451199015)(186003)(66556008)(66946007)(8936002)(5660300002)(41300700001)(3450700001)(38100700002)(82960400001)(66476007)(4326008)(2906002)(8676002)(86362001)(6512007)(26005)(6916009)(316002)(83380400001)(6506007)(478600001)(6666004)(6486002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?uVzGqwen5nfOkK7zRq9b+3yBTW1HkKzErrC9rMVbqq6hkU6z6si+ALtqpvyG?=
+ =?us-ascii?Q?Z3k1rTrL7aoWbYC/08YjauZn+eK4nSuZwLS2UrXT978JE4u9h6s/n6j+0ezk?=
+ =?us-ascii?Q?cfsqGEOP3WtO232mTL4d1THUhJWK8HIw7V4oXNAcUJjORqf/fTAy7Yg60j6r?=
+ =?us-ascii?Q?HO9huI+lh0o+1wAloupWo41ln8kVEr+vjzBn5SS898VVxLV6b1YrxcTFWHYE?=
+ =?us-ascii?Q?0zkkKqzTGYqatXvfkQfDKKkAbO82cev9bnYsCWhMCc69grwCCo4wYgG2UGwU?=
+ =?us-ascii?Q?w5OhsT0p67DOX/qvPq8QR6ls1wYuc8ZKeYk6vCL64jG5S/sYCXTPLLIwlkd0?=
+ =?us-ascii?Q?BHn1p/LljuOBw0Zo0eEyqHSRqcnOdz98i3YqNCPf2n9CxR+pdmTviePLwLzN?=
+ =?us-ascii?Q?IXV0pOE1EzPnAwyhzJK9IBTZNRfuODTu0pd1WlbXUG9gZSrBA1bGl4NEeKUj?=
+ =?us-ascii?Q?vvlSdYs8yFOmWzRIbMK/D1j3cqSJgh4teAIuEhQW4IcDJUhW0CSbqnkfZbK2?=
+ =?us-ascii?Q?p7U8TWCI25rq5HKP/2zm0UJEtxASAw3vDa6w5aeH1rp0HSPOmsqcrtS9kDsq?=
+ =?us-ascii?Q?oGmc+d2sAe8F3GVHIB+jYNRs7mOYptQKODMDHXq8dKzH8sq7YV2AWsCu2mA9?=
+ =?us-ascii?Q?Dp6PEBPnaj3Z/ky7ZdWIGP9RVF0yrmfOhRAEzR2RuiQRb0GuSoLkKzaPEcUZ?=
+ =?us-ascii?Q?5k/Qk4TJIQSDHjtp28xGFmLomJLBXpCQcymvjfoEJ/tFpmnNj+/D7BnohSDS?=
+ =?us-ascii?Q?rmv7dm4vDbrBgijbo3vUp2s+U78zz9WDvbsjpZf+4wT+9RN+A8f/cpyaiyED?=
+ =?us-ascii?Q?WxM465qvKYf2TPIpwJcrRT+OboUuDA8F3sNr3GANpeQ5SvavYebZn17mL2w/?=
+ =?us-ascii?Q?zaknVrFlxs9hX+Hq6MfIyOyPT4SUy2CUIREOdxfR44M4nF6j1c5ReNUW8++k?=
+ =?us-ascii?Q?vk+XCYvWQ7VSjNxsellLTt/4OuYhErXM4NQQc3PoBXkLE5ZtpB8FFTA3tel4?=
+ =?us-ascii?Q?GgPy4kN2bX1huF6bfj+V/BkAs0mofI9CGkIM7NEY2xSr2OlO2elZ5JT7p/Px?=
+ =?us-ascii?Q?OGUPIdDzMNFK8Vhj7KGYH6ZcLmlLztkuhf6MelAIN+7RT36DhGZC4W/AFHox?=
+ =?us-ascii?Q?QsUzErz7/ecpcCAP3tRNhJrz3ES9f7N+DnBCEj2HYbcL7p55K8Cj1gScthrf?=
+ =?us-ascii?Q?6oO+x62stx/cJgnsCCfcy0wNZEyeibI53fhyql9O5MjUFWAcbwqQYaBQoSbn?=
+ =?us-ascii?Q?2DWMdhPgAVQ8UQEPvCbUIEvhPsS8TIkLNDMdzjwIZWta03DIOoLUaKeaRbwT?=
+ =?us-ascii?Q?xpgRk5tO/SEOHRmk0hnH5Ut9Pz3M6Mnu/W5ZihOZxTH+uyN1r/RXoWavDmNn?=
+ =?us-ascii?Q?BlEJBeIJqMPT3Uc9RxLghtQ10cVvYa8VwhJGCx+u6sRsMQlzZU/sjAB3MsMk?=
+ =?us-ascii?Q?vqubvKqgkIDlYD4KwCaLtfSy7GhNH2UNs6feAGHCXipdyk+5CDrgKt8J59g7?=
+ =?us-ascii?Q?O5S8nIi5TMipc+7eZ0Q3b5tCbxpqRzwOqrEVTXhdkNn1lWsWg+V2irf8JNzX?=
+ =?us-ascii?Q?Odh1tJKzISYqoe2pn0FDGfD9vTrTKO8C7/O6u/2+9UTqWM6TRpVIbslA1WOq?=
+ =?us-ascii?Q?eA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d9cc8ad-b9ec-4c3e-7ccc-08dac38e2c3e
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2022 02:41:02.2661
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: G2WlMUdtPYDf6QskrPioAdfDNYcXwXiCDDG6a6ZxsNMmpJMhpZjpS/RLWhmyiucLwOuZh43p1uOy8P0UpMLrKg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6213
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/10/22 21:49, Jonathan Corbet wrote:
-> So the report you're referring to is
+On Thu, Nov 10, 2022 at 05:08:30PM +0000, Sean Christopherson wrote:
+> On Thu, Nov 10, 2022, Yan Zhao wrote:
+> > On Thu, Nov 10, 2022 at 01:48:20AM +0000, Sean Christopherson wrote:
+> > > Call kvm_mmu_zap_all_fast() directly when flushing a memslot instead of
+> > > bounding through the page-track mechanism.  KVM (unfortunately) needs to
+> > > zap and flush all page tables on memslot DELETE/MOVE irrespective of
+> > > whether KVM is shadowing guest page tables.
+> > > 
+> > > This will allow changing KVM to register a page-track notifier on the
+> > > first shadow root allocation, and will also allow deleting the misguided
+> > > kvm_page_track_flush_slot() hook itself once KVM-GT also moves to a
+> > > different method for reacting to memslot changes.
+> > >
+> > <...>
+> > > @@ -6021,7 +6014,6 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+> > >  		return r;
+> > >  
+> > >  	node->track_write = kvm_mmu_pte_write;
+> > > -	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
+> > >  	kvm_page_track_register_notifier(kvm, node);
+> > >  
+> > >  	kvm->arch.split_page_header_cache.kmem_cache = mmu_page_header_cache;
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index e46e458c5b08..5da86fe3c113 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -12550,6 +12550,8 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+> > >  void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+> > >  				   struct kvm_memory_slot *slot)
+> > >  {
+> > > +	kvm_mmu_zap_all_fast(kvm);
+> > > +
+> > >  	kvm_page_track_flush_slot(kvm, slot);
+> > Could we move this kvm_page_track_flush_slot() to right before
+> > kvm_commit_memory_region()?
 > 
->   https://lore.kernel.org/linux-next/20221110182938.40ce2651@canb.auug.org.au/
+> More or less.  The page-track stuff is x86-specific, just move it into x86's
+> kvm_arch_commit_memory_region().
 > 
-
-Ah, I forget to refer to that link!
-
-> ?  If so, this change will not fix the problem.  That error:
+> > As KVM now does not need track_flush_slot any more and kvmgt is the only user
+> > to track_flush_slot, we can rename it to track_slot_changed to notify
+> > the new/deleted/moved slot.
+> > Do you think it's good?
 > 
->> drivers/iommu/iommufd/device.c:1: warning: no structured comments found
->> drivers/iommu/iommufd/main.c:1: warning: no structured comments found
+> Given that KVM/KVM-GT have never propery supported the MOVE case, and (IIUC) that
+> there's no danger to the kernel if KVM-GT fails to write-protect a moved memslot,
+> I would say just change the hook to ->remove_memslot().  I.e. even if the memslot
+> is being moved, simply notify KVM-GT that the old memslot is being removed.
+>
+I think it should be good.
+We can refine the support of MOVE later after it really happens.
+Will do it by following your suggestions and based on this series :)
+
+Thanks
+Yan
+
+> E.g.
 > 
-> is caused by using .. kernel-doc:: directives to extract documentation
-> from files where none exists - thus "no structured comments found".
-> 
-
--ENOENT files :)
-
-> The *real* problem, methinks, is that the directives are added in patch 4
-> of the series, but the documentation doesn't show up until later.  So
-> the real fix would be to simply move this patch down.  Or just not worry
-> about it, since it all works out in the end and nobody will be bisecting
-> a docs build.
-> 
-> Bagas, you are *again* misadvising people.  Please stop doing that!
-> 
-
-OK, thanks.
-
--- 
-An old man doll... just what I always wanted! - Clara
-
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 5a2821ca03b8..437e3832e377 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12566,6 +12566,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>                                 const struct kvm_memory_slot *new,
+>                                 enum kvm_mr_change change)
+>  {
+> +       if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
+> +               kvm_page_track_remove_memslot(kvm, old);
+> +
+>         if (!kvm->arch.n_requested_mmu_pages &&
+>             (change == KVM_MR_CREATE || change == KVM_MR_DELETE)) {
+>                 unsigned long nr_mmu_pages;
