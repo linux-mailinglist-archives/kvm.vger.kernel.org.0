@@ -2,129 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CCEB62600D
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 18:07:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B5AB62601C
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 18:09:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234166AbiKKRHF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 12:07:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46604 "EHLO
+        id S234121AbiKKRI5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 12:08:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233768AbiKKRGt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 12:06:49 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9BA773422;
-        Fri, 11 Nov 2022 09:06:48 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2ABGrWjC027496;
-        Fri, 11 Nov 2022 17:06:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=+1JT3i0OUmdtvKwwNNS5GNLVUJmNSC/hwxshkEqDE8E=;
- b=eAr+Aa6a7LQTNh242QtIec7PSWYzRPlvIxpriSVgtvH4bC+4f2zZbpkaek2yRpeGslZH
- WiRlEVbM5i+GIB+j/XmOssLe4SETfhoLHDiP4K8QsHODcDQOXzp67XsKur25HepxRrpK
- LE7/kDioUMM2N/2gat4Lvet8t9TEcj2SWVQKXVzr+JQ5/iUdF8htaLLmBZnSWtZgW2iq
- CQk4XhynqK5nAOeyBWulCIhm9Kzlwws3qP7WOg6pv1scijJaCWtBrIoiS+cT6V2CkKcn
- WiRbsP4p058s78EM9Ozll8Z4hGqaKBanWEwNfo53SW4SDz3uvENQnhdqIH2v9Bw3ufWu 1Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kstag8bbm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Nov 2022 17:06:47 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ABH0K6l021444;
-        Fri, 11 Nov 2022 17:06:47 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kstag8b9r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Nov 2022 17:06:47 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ABH5oLi018876;
-        Fri, 11 Nov 2022 17:06:45 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06fra.de.ibm.com with ESMTP id 3kngq8pnnh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Nov 2022 17:06:45 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ABH6glu1639018
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 11 Nov 2022 17:06:42 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EE1FF4C044;
-        Fri, 11 Nov 2022 17:06:41 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 689D64C040;
-        Fri, 11 Nov 2022 17:06:41 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.171.65.74])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 11 Nov 2022 17:06:41 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
-        david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com
-Subject: [PATCH v16 6/6] KVM: s390: pv: module parameter to fence asynchronous destroy
-Date:   Fri, 11 Nov 2022 18:06:32 +0100
-Message-Id: <20221111170632.77622-7-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221111170632.77622-1-imbrenda@linux.ibm.com>
-References: <20221111170632.77622-1-imbrenda@linux.ibm.com>
+        with ESMTP id S234308AbiKKRI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 12:08:29 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D07E185451
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 09:07:49 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id b11so4935426pjp.2
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 09:07:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LICHPg6UnYkTNsPkbQmwYKBGSoVvJ3ggmuJEwwsBdfE=;
+        b=XZlbgoFLBfg1b1W761+z1PDAgEb20H2QO0ci+u5UoReXW/AglYt37kfLNyiRzXCbun
+         16a/vNSD6OLG51wXjymdIRV5K9+yHSAOu082YpoTDDKE/vWKWzBoXD0ip80QsNnXeMJr
+         XUiBolJ/U5H4SS51K9h10zFLgGeuRJ3ETLcS/qaSX/VswfZGD0HWGQophC9d+8et+N8D
+         Rcu5KGn6L35gbiXzVxNNzg/1YqsSpk7Imvy500y3L07kqkpPLt+0VZ5sct2ejFIWJ747
+         3+UH3Cce+XE9LjmMHIqul5KXKnZHUHLmRehpGUfslQ2VrfCosOP4gZwFjBB/ttBcN/Ae
+         9vMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LICHPg6UnYkTNsPkbQmwYKBGSoVvJ3ggmuJEwwsBdfE=;
+        b=7AtDFsU1Df43mbmIbM4o+VcgUjemjlGBTj0GaOf5kv/EH//oRIh9uIAkdNl5eOeq5I
+         BPL3omIar8iQPAM8ammOtl3BsIrHo5J71lHjYFbaCqrMq0YgEa/jJhHAjeroCrjHJExL
+         T23HTABWkbDL1PWa8Xn1tm74NJqem4vrYHYJJwSgrsr+FDXBHR+lC6u5IwGb0YOaFl5h
+         cBq+PnKXfuBSLXPyd1QC83CdL/JmF2/ZXar28RsopCkDC1bgo5OHpgnu9kj3ABrgvaoh
+         JaIVV17jWPonP0SwJ2s5EYidg3cCNugA5VZuMBmkk758Hf/95hednQMvZgmZwq6hcI20
+         FP/A==
+X-Gm-Message-State: ANoB5pki8LT3+TEjqBpvyGnxJUftczImXuYZPAeKjyfNGocTKSO05o77
+        cBJKtYtXxI3wCyIzdk1HYto+mA==
+X-Google-Smtp-Source: AA0mqf5Uo+YykjZZDEd2A/F0GfL+xhYTbei/GO+GSdCfD2x/gs2dZlHf5v1zmNbQnCxh9OBRghbP8A==
+X-Received: by 2002:a17:90b:4b50:b0:213:5c5f:f440 with SMTP id mi16-20020a17090b4b5000b002135c5ff440mr2919822pjb.15.1668186460347;
+        Fri, 11 Nov 2022 09:07:40 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id f18-20020a63e312000000b004582e25a595sm1591902pgh.41.2022.11.11.09.07.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Nov 2022 09:07:39 -0800 (PST)
+Date:   Fri, 11 Nov 2022 17:07:35 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, zhenyuw@linux.intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com
+Subject: Re: [PATCH v2 2/3] drm/i915/gvt: switch from track_flush_slot to
+ track_remove_slot
+Message-ID: <Y26BV9a9q8nBz/+7@google.com>
+References: <20221111103247.22275-1-yan.y.zhao@intel.com>
+ <20221111103436.22381-1-yan.y.zhao@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: UzYzXfZSFM6tpGlhzEjOUBizsTtWA5lC
-X-Proofpoint-ORIG-GUID: MKWqEm0Kf4MV9XEyonoyo52U1yjlp6fg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-11_08,2022-11-11_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 mlxscore=0 bulkscore=0 lowpriorityscore=0
- malwarescore=0 impostorscore=0 mlxlogscore=999 clxscore=1015
- suspectscore=0 adultscore=0 phishscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2211110115
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221111103436.22381-1-yan.y.zhao@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the module parameter "async_destroy", to allow the asynchronous
-destroy mechanism to be switched off. This might be useful for
-debugging purposes.
+On Fri, Nov 11, 2022, Yan Zhao wrote:
+> KVMGT only cares about when a slot is indeed removed.
+> So switch to use track_remove_slot which is called when a slot is removed.
 
-The parameter is enabled by default since the feature is opt-in anyway.
+This should capture the original motivation, i.e. that the existing
+->track_flush_slot() hook is theoretically flawed.  I think it also makes sense
+to call out that KVMGT undoubtedly does the wrong thing if a memslot is moved,
+but that (a) KVMGT has never supported moving memslots and (b) there's no sane
+use case for moving memslots that might be used by the guest for the GTT.
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
----
- arch/s390/kvm/kvm-s390.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Bonus points if you can figure out a way to capture the restriction in the docs,
+e.g. somewhere in gpu/i915.rst?
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index b6cc7d2935c0..8a0c884bf737 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -209,7 +209,13 @@ unsigned int diag9c_forwarding_hz;
- module_param(diag9c_forwarding_hz, uint, 0644);
- MODULE_PARM_DESC(diag9c_forwarding_hz, "Maximum diag9c forwarding per second, 0 to turn off");
- 
--static int async_destroy;
-+/*
-+ * allow asynchronous deinit for protected guests; enable by default since
-+ * the feature is opt-in anyway
-+ */
-+static int async_destroy = 1;
-+module_param(async_destroy, int, 0444);
-+MODULE_PARM_DESC(async_destroy, "Asynchronous destroy for protected guests");
- 
- /*
-  * For now we handle at most 16 double words as this is what the s390 base
--- 
-2.38.1
+Lastly, provide a link to the original discussion which provides even more context.
 
+Link: https://lore.kernel.org/all/20221108084416.11447-1-yan.y.zhao@intel.com
+
+> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
