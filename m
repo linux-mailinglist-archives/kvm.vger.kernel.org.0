@@ -2,97 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B5AB62601C
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 18:09:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F5BA62602C
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 18:12:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234121AbiKKRI5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 12:08:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47648 "EHLO
+        id S234071AbiKKRMG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 12:12:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234308AbiKKRI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 12:08:29 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D07E185451
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 09:07:49 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id b11so4935426pjp.2
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 09:07:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LICHPg6UnYkTNsPkbQmwYKBGSoVvJ3ggmuJEwwsBdfE=;
-        b=XZlbgoFLBfg1b1W761+z1PDAgEb20H2QO0ci+u5UoReXW/AglYt37kfLNyiRzXCbun
-         16a/vNSD6OLG51wXjymdIRV5K9+yHSAOu082YpoTDDKE/vWKWzBoXD0ip80QsNnXeMJr
-         XUiBolJ/U5H4SS51K9h10zFLgGeuRJ3ETLcS/qaSX/VswfZGD0HWGQophC9d+8et+N8D
-         Rcu5KGn6L35gbiXzVxNNzg/1YqsSpk7Imvy500y3L07kqkpPLt+0VZ5sct2ejFIWJ747
-         3+UH3Cce+XE9LjmMHIqul5KXKnZHUHLmRehpGUfslQ2VrfCosOP4gZwFjBB/ttBcN/Ae
-         9vMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LICHPg6UnYkTNsPkbQmwYKBGSoVvJ3ggmuJEwwsBdfE=;
-        b=7AtDFsU1Df43mbmIbM4o+VcgUjemjlGBTj0GaOf5kv/EH//oRIh9uIAkdNl5eOeq5I
-         BPL3omIar8iQPAM8ammOtl3BsIrHo5J71lHjYFbaCqrMq0YgEa/jJhHAjeroCrjHJExL
-         T23HTABWkbDL1PWa8Xn1tm74NJqem4vrYHYJJwSgrsr+FDXBHR+lC6u5IwGb0YOaFl5h
-         cBq+PnKXfuBSLXPyd1QC83CdL/JmF2/ZXar28RsopCkDC1bgo5OHpgnu9kj3ABrgvaoh
-         JaIVV17jWPonP0SwJ2s5EYidg3cCNugA5VZuMBmkk758Hf/95hednQMvZgmZwq6hcI20
-         FP/A==
-X-Gm-Message-State: ANoB5pki8LT3+TEjqBpvyGnxJUftczImXuYZPAeKjyfNGocTKSO05o77
-        cBJKtYtXxI3wCyIzdk1HYto+mA==
-X-Google-Smtp-Source: AA0mqf5Uo+YykjZZDEd2A/F0GfL+xhYTbei/GO+GSdCfD2x/gs2dZlHf5v1zmNbQnCxh9OBRghbP8A==
-X-Received: by 2002:a17:90b:4b50:b0:213:5c5f:f440 with SMTP id mi16-20020a17090b4b5000b002135c5ff440mr2919822pjb.15.1668186460347;
-        Fri, 11 Nov 2022 09:07:40 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id f18-20020a63e312000000b004582e25a595sm1591902pgh.41.2022.11.11.09.07.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Nov 2022 09:07:39 -0800 (PST)
-Date:   Fri, 11 Nov 2022 17:07:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, zhenyuw@linux.intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com
-Subject: Re: [PATCH v2 2/3] drm/i915/gvt: switch from track_flush_slot to
- track_remove_slot
-Message-ID: <Y26BV9a9q8nBz/+7@google.com>
-References: <20221111103247.22275-1-yan.y.zhao@intel.com>
- <20221111103436.22381-1-yan.y.zhao@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221111103436.22381-1-yan.y.zhao@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S234313AbiKKRMB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 12:12:01 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9170ADF9B
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 09:12:00 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2B37A62068
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 17:12:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B0BBC433D6;
+        Fri, 11 Nov 2022 17:11:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668186719;
+        bh=TdxutI1XV0aUY/REXRLlQEMl+uODGYf9T0Ad8c8nxgU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=VDxHwGYqe8S/l8FYc1joK4hEgM/w1GVuLyVFG86I2OrVqmXmvDpsl7vl58cEbdgYk
+         8Ky9h/+IOCGm6oa88sRVIUJlyqpG1A44pYR/oOmfeEPJIClelvjxT26ESvemwrmIJT
+         YV+h6OLAIPa/PMDZ33VMVezJkWQ4opqwq8Khu8SwGl8xFxR/KGvtwazYQWn+G6M2pI
+         j+8Mqpz6R3MapLXW26Ga9N0ef/65S77oWZcjN0nf0PZzcNgTPbcDca5aaXHBTS+gBU
+         NPMBK8e4+GnHyEQgLvxr8OO+NnJGbkUGjrvdaSmBc772h1HVci+ilFndHSFz5PmKb/
+         +17Nz2OV2lSbQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1otXZN-005Tbb-7n;
+        Fri, 11 Nov 2022 17:11:57 +0000
+Date:   Fri, 11 Nov 2022 17:11:56 +0000
+Message-ID: <86cz9tpg9v.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Will Deacon <will@kernel.org>
+Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Quentin Perret <qperret@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>, kernel-team@android.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v6 12/26] KVM: arm64: Add infrastructure to create and track pKVM instances at EL2
+In-Reply-To: <20221110190259.26861-13-will@kernel.org>
+References: <20221110190259.26861-1-will@kernel.org>
+        <20221110190259.26861-13-will@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, seanjc@google.com, vdonnefort@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, chao.p.peng@linux.intel.com, qperret@google.com, suzuki.poulose@arm.com, mark.rutland@arm.com, tabba@google.com, oliver.upton@linux.dev, kernel-team@android.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 11, 2022, Yan Zhao wrote:
-> KVMGT only cares about when a slot is indeed removed.
-> So switch to use track_remove_slot which is called when a slot is removed.
+On Thu, 10 Nov 2022 19:02:45 +0000,
+Will Deacon <will@kernel.org> wrote:
+> 
+> From: Fuad Tabba <tabba@google.com>
+> 
+> Introduce a global table (and lock) to track pKVM instances at EL2, and
+> provide hypercalls that can be used by the untrusted host to create and
+> destroy pKVM VMs and their vCPUs. pKVM VM/vCPU state is directly
+> accessible only by the trusted hypervisor (EL2).
+> 
+> Each pKVM VM is directly associated with an untrusted host KVM instance,
+> and is referenced by the host using an opaque handle. Future patches
+> will provide hypercalls to allow the host to initialize/set/get pKVM
+> VM/vCPU state using the opaque handle.
+> 
+> Tested-by: Vincent Donnefort <vdonnefort@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> Co-developed-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Will Deacon <will@kernel.org>
 
-This should capture the original motivation, i.e. that the existing
-->track_flush_slot() hook is theoretically flawed.  I think it also makes sense
-to call out that KVMGT undoubtedly does the wrong thing if a memslot is moved,
-but that (a) KVMGT has never supported moving memslots and (b) there's no sane
-use case for moving memslots that might be used by the guest for the GTT.
+[...]
 
-Bonus points if you can figure out a way to capture the restriction in the docs,
-e.g. somewhere in gpu/i915.rst?
+> +static void unmap_donated_memory_noclear(void *va, size_t size)
+> +{
+> +	if (!va)
+> +		return;
+> +
+> +	__unmap_donated_memory(va, size);
+> +}
 
-Lastly, provide a link to the original discussion which provides even more context.
+This triggers a warning that persist until patch #19 (unused static
+function) and breaks my build (I've enabled CONFIG_WERROR).
 
-Link: https://lore.kernel.org/all/20221108084416.11447-1-yan.y.zhao@intel.com
+I'm going to stick a __maybe_unused there, and drop it once it is
+used...
 
-> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> ---
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
