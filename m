@@ -2,46 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E040B625E75
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 16:36:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F20AA625EA0
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 16:47:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233690AbiKKPgI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 10:36:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52938 "EHLO
+        id S234025AbiKKPrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 10:47:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232921AbiKKPgH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 10:36:07 -0500
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3832DF60;
-        Fri, 11 Nov 2022 07:36:02 -0800 (PST)
-Received: from kwepemi100025.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4N82lX0PG6zJnZL;
-        Fri, 11 Nov 2022 23:32:56 +0800 (CST)
-Received: from DESKTOP-27KDQMV.china.huawei.com (10.174.148.223) by
- kwepemi100025.china.huawei.com (7.221.188.158) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 11 Nov 2022 23:35:58 +0800
-From:   "Longpeng(Mike)" <longpeng2@huawei.com>
-To:     <stefanha@redhat.com>, <mst@redhat.com>, <jasowang@redhat.com>,
-        <sgarzare@redhat.com>
-CC:     <virtualization@lists.linux-foundation.org>,
-        <arei.gonglei@huawei.com>, <yechuan@huawei.com>,
-        <huangzhichao@huawei.com>, <linux-kernel@vger.kernel.org>,
-        <xiehong@huawei.com>, <parav@nvidia.com>, <kvm@vger.kernel.org>,
-        <lingshan.zhu@intel.com>, <lulu@redhat.com>,
-        Longpeng <longpeng2@huawei.com>
-Subject: [RFC] vdpa: clear the device when opening/releasing it
-Date:   Fri, 11 Nov 2022 23:35:55 +0800
-Message-ID: <20221111153555.1295-1-longpeng2@huawei.com>
-X-Mailer: git-send-email 2.25.0.windows.1
+        with ESMTP id S233981AbiKKPrn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 10:47:43 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AA4F532ED
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 07:47:42 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 57736B82650
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 15:47:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6017C433C1;
+        Fri, 11 Nov 2022 15:47:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668181659;
+        bh=ieiibTmDrFYVTnTf2P9P+mwebXpKPMN4HIQwkxrTT54=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=BDJqlCSoXKUc2tIHGpdf46XyjiJUb0FugqmunaImzUbYD+eF7V80k+OHqrcLpwITP
+         y3d6rGZJdZDq0ike5/4kPHFA2iw6BiUdAiH7QkUxMJuVU1D7FWIPqlArkNn5SwKUOl
+         6ad6sW/OPY5SIePylKYuf+AS1QJnYhSnCKERBbmYmdVqu3gsIHVbMDB5Hl5H9J+HCI
+         zb6+GQFdTSI2CWyIfh5M7lMh6MbYiWk5KSvFgydPEIkKe0lrP6j/wlZ12uMMVGm+4F
+         HUtuRX8P6dTMgCuyqiJC7ngDqNT/Y1Axp4tWFazvj2Vvu8mHpyUKYqiA+HOtZpi2fC
+         uo/bAX3FlljSA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1otWFl-005Shi-Fz;
+        Fri, 11 Nov 2022 15:47:37 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     James Morse <james.morse@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Quentin Perret <qperret@google.com>, Peter Xu <peterx@redhat.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+        Ben Gardon <bgardon@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Sean Christopherson <seanjc@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Gavin Shan <gshan@redhat.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v5 00/14] KVM: arm64: Parallel stage-2 fault handling
+Date:   Fri, 11 Nov 2022 15:47:34 +0000
+Message-Id: <166818113574.3365943.966631047504377265.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221107215644.1895162-1-oliver.upton@linux.dev>
+References: <20221107215644.1895162-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.174.148.223]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemi100025.china.huawei.com (7.221.188.158)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: james.morse@arm.com, oliver.upton@linux.dev, alexandru.elisei@arm.com, qperret@google.com, peterx@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org, kvmarm@lists.linux.dev, bgardon@google.com, ricarkol@google.com, linux-arm-kernel@lists.infradead.org, seanjc@google.com, reijiw@google.com, gshan@redhat.com, dmatlack@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -49,175 +73,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Longpeng <longpeng2@huawei.com>
+On Mon, 7 Nov 2022 21:56:30 +0000, Oliver Upton wrote:
+> Presently KVM only takes a read lock for stage 2 faults if it believes
+> the fault can be fixed by relaxing permissions on a PTE (write unprotect
+> for dirty logging). Otherwise, stage 2 faults grab the write lock, which
+> predictably can pile up all the vCPUs in a sufficiently large VM.
+> 
+> Like the TDP MMU for x86, this series loosens the locking around
+> manipulations of the stage 2 page tables to allow parallel faults. RCU
+> and atomics are exploited to safely build/destroy the stage 2 page
+> tables in light of multiple software observers.
+> 
+> [...]
 
-We should do some deeply cleanup when opening or releasing the device,
-e.g trigger FLR if it is PCIe device.
+I've gone over this for quite a while, and while I'm still sh*t
+scared about it, I've decided to let it simmer in -next for a bit.
 
-Signed-off-by: Longpeng <longpeng2@huawei.com>
----
- drivers/vdpa/alibaba/eni_vdpa.c    | 2 +-
- drivers/vdpa/ifcvf/ifcvf_main.c    | 2 +-
- drivers/vdpa/mlx5/net/mlx5_vnet.c  | 2 +-
- drivers/vdpa/vdpa_sim/vdpa_sim.c   | 2 +-
- drivers/vdpa/vdpa_user/vduse_dev.c | 2 +-
- drivers/vdpa/virtio_pci/vp_vdpa.c  | 2 +-
- drivers/vhost/vdpa.c               | 4 ++--
- drivers/virtio/virtio_vdpa.c       | 2 +-
- include/linux/vdpa.h               | 7 ++++---
- 9 files changed, 13 insertions(+), 12 deletions(-)
+If anything goes wrong or that someone spots something ugly,
+it will be easy to simply drop the branch. For simple fixes, they
+can go on top.
 
-diff --git a/drivers/vdpa/alibaba/eni_vdpa.c b/drivers/vdpa/alibaba/eni_vdpa.c
-index 5a09a09cca70..07215b174dd6 100644
---- a/drivers/vdpa/alibaba/eni_vdpa.c
-+++ b/drivers/vdpa/alibaba/eni_vdpa.c
-@@ -226,7 +226,7 @@ static void eni_vdpa_set_status(struct vdpa_device *vdpa, u8 status)
- 		eni_vdpa_free_irq(eni_vdpa);
- }
- 
--static int eni_vdpa_reset(struct vdpa_device *vdpa)
-+static int eni_vdpa_reset(struct vdpa_device *vdpa, bool clear)
- {
- 	struct eni_vdpa *eni_vdpa = vdpa_to_eni(vdpa);
- 	struct virtio_pci_legacy_device *ldev = &eni_vdpa->ldev;
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index f9c0044c6442..b9a6ac18f358 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -496,7 +496,7 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
- 	ifcvf_set_status(vf, status);
- }
- 
--static int ifcvf_vdpa_reset(struct vdpa_device *vdpa_dev)
-+static int ifcvf_vdpa_reset(struct vdpa_device *vdpa_dev, bool clear)
- {
- 	struct ifcvf_adapter *adapter;
- 	struct ifcvf_hw *vf;
-diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-index 90913365def4..6f06f9c464a3 100644
---- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-+++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-@@ -2560,7 +2560,7 @@ static void init_group_to_asid_map(struct mlx5_vdpa_dev *mvdev)
- 		mvdev->group2asid[i] = 0;
- }
- 
--static int mlx5_vdpa_reset(struct vdpa_device *vdev)
-+static int mlx5_vdpa_reset(struct vdpa_device *vdev, bool clear)
- {
- 	struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
- 	struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index b071f0d842fb..7438a89ce939 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -504,7 +504,7 @@ static void vdpasim_set_status(struct vdpa_device *vdpa, u8 status)
- 	spin_unlock(&vdpasim->lock);
- }
- 
--static int vdpasim_reset(struct vdpa_device *vdpa)
-+static int vdpasim_reset(struct vdpa_device *vdpa, bool clear)
- {
- 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
- 
-diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
-index 35dceee3ed56..e5fee28233c0 100644
---- a/drivers/vdpa/vdpa_user/vduse_dev.c
-+++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-@@ -691,7 +691,7 @@ static void vduse_vdpa_set_config(struct vdpa_device *vdpa, unsigned int offset,
- 	/* Now we only support read-only configuration space */
- }
- 
--static int vduse_vdpa_reset(struct vdpa_device *vdpa)
-+static int vduse_vdpa_reset(struct vdpa_device *vdpa, bool clear)
- {
- 	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
- 	int ret = vduse_dev_set_status(dev, 0);
-diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
-index d35fac5cde11..3db25b622a57 100644
---- a/drivers/vdpa/virtio_pci/vp_vdpa.c
-+++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
-@@ -226,7 +226,7 @@ static void vp_vdpa_set_status(struct vdpa_device *vdpa, u8 status)
- 	vp_modern_set_status(mdev, status);
- }
- 
--static int vp_vdpa_reset(struct vdpa_device *vdpa)
-+static int vp_vdpa_reset(struct vdpa_device *vdpa, bool clear)
- {
- 	struct vp_vdpa *vp_vdpa = vdpa_to_vp(vdpa);
- 	struct virtio_pci_modern_device *mdev = vp_vdpa_to_mdev(vp_vdpa);
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 166044642fd5..fdda08cd7e7a 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -212,7 +212,7 @@ static int vhost_vdpa_reset(struct vhost_vdpa *v)
- 
- 	v->in_batch = 0;
- 
--	return vdpa_reset(vdpa);
-+	return vdpa_reset(vdpa, true);
- }
- 
- static long vhost_vdpa_get_device_id(struct vhost_vdpa *v, u8 __user *argp)
-@@ -269,7 +269,7 @@ static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
- 			vhost_vdpa_unsetup_vq_irq(v, i);
- 
- 	if (status == 0) {
--		ret = vdpa_reset(vdpa);
-+		ret = vdpa_reset(vdpa, false);
- 		if (ret)
- 			return ret;
- 	} else
-diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
-index 9670cc79371d..8f6ae689547e 100644
---- a/drivers/virtio/virtio_vdpa.c
-+++ b/drivers/virtio/virtio_vdpa.c
-@@ -99,7 +99,7 @@ static void virtio_vdpa_reset(struct virtio_device *vdev)
- {
- 	struct vdpa_device *vdpa = vd_get_vdpa(vdev);
- 
--	vdpa_reset(vdpa);
-+	vdpa_reset(vdpa, false);
- }
- 
- static bool virtio_vdpa_notify(struct virtqueue *vq)
-diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
-index 6d0f5e4e82c2..a0b917743b66 100644
---- a/include/linux/vdpa.h
-+++ b/include/linux/vdpa.h
-@@ -218,6 +218,7 @@ struct vdpa_map_file {
-  *				@status: virtio device status
-  * @reset:			Reset device
-  *				@vdev: vdpa device
-+ *				@clear: need device/function level clear or not, e.g pcie_flr.
-  *				Returns integer: success (0) or error (< 0)
-  * @suspend:			Suspend or resume the device (optional)
-  *				@vdev: vdpa device
-@@ -322,7 +323,7 @@ struct vdpa_config_ops {
- 	u32 (*get_vendor_id)(struct vdpa_device *vdev);
- 	u8 (*get_status)(struct vdpa_device *vdev);
- 	void (*set_status)(struct vdpa_device *vdev, u8 status);
--	int (*reset)(struct vdpa_device *vdev);
-+	int (*reset)(struct vdpa_device *vdev, bool clear);
- 	int (*suspend)(struct vdpa_device *vdev);
- 	size_t (*get_config_size)(struct vdpa_device *vdev);
- 	void (*get_config)(struct vdpa_device *vdev, unsigned int offset,
-@@ -427,14 +428,14 @@ static inline struct device *vdpa_get_dma_dev(struct vdpa_device *vdev)
- 	return vdev->dma_dev;
- }
- 
--static inline int vdpa_reset(struct vdpa_device *vdev)
-+static inline int vdpa_reset(struct vdpa_device *vdev, bool clear)
- {
- 	const struct vdpa_config_ops *ops = vdev->config;
- 	int ret;
- 
- 	down_write(&vdev->cf_lock);
- 	vdev->features_valid = false;
--	ret = ops->reset(vdev);
-+	ret = ops->reset(vdev, clear);
- 	up_write(&vdev->cf_lock);
- 	return ret;
- }
+[01/14] KVM: arm64: Combine visitor arguments into a context structure
+        commit: dfc7a7769ab7f2a2f629c673717ef1fa7b63aa42
+[02/14] KVM: arm64: Stash observed pte value in visitor context
+        commit: 83844a2317ecad935f6735abd854e4bf3f757040
+[03/14] KVM: arm64: Pass mm_ops through the visitor context
+        commit: 2a611c7f87f26cca405da63a57f06d0e4dc14240
+[04/14] KVM: arm64: Don't pass kvm_pgtable through kvm_pgtable_walk_data
+        commit: fa002e8e79b3f980455ba585c1f47b26680de5b9
+[05/14] KVM: arm64: Add a helper to tear down unlinked stage-2 subtrees
+        commit: 8e94e1252cc054bb31fd3e9a15235cd831970ec1
+[06/14] KVM: arm64: Use an opaque type for pteps
+        commit: 6b91b8f95cadd3441c056182daf9024475ac4a91
+[07/14] KVM: arm64: Tear down unlinked stage-2 subtree after break-before-make
+        commit: 5c359cca1faf6d7671537fe1c240e8668467864d
+[08/14] KVM: arm64: Protect stage-2 traversal with RCU
+        commit: c3119ae45dfb6038ca458ab5ba7a9fba2810845b
+[09/14] KVM: arm64: Atomically update stage 2 leaf attributes in parallel walks
+        commit: ca5de2448c3b4c018fe3d6223df8b59068be1cd7
+[10/14] KVM: arm64: Split init and set for table PTE
+        commit: 331aa3a0547d1c794587e0df374d13b16645e832
+[11/14] KVM: arm64: Make block->table PTE changes parallel-aware
+        commit: 0ab12f3574db6cb432917a667f9392a88e8f0dfc
+[12/14] KVM: arm64: Make leaf->leaf PTE changes parallel-aware
+        commit: 946fbfdf336b811479e024136c7cabc00157b6b9
+[13/14] KVM: arm64: Make table->block changes parallel-aware
+        commit: af87fc03cfdf6893011df419588d27acdfb9c197
+[14/14] KVM: arm64: Handle stage-2 faults in parallel
+        commit: 1577cb5823cefdff4416f272a88143ee933d97f5
+
+Fingers crossed,
+
+	M.
 -- 
-2.23.0
+Without deviation from the norm, progress is not possible.
+
 
