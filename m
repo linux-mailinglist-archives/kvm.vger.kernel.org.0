@@ -2,85 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D327F6256E1
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 10:30:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 16B9E625757
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 10:55:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233564AbiKKJa3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 04:30:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44074 "EHLO
+        id S233533AbiKKJzR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 04:55:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233210AbiKKJa1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 04:30:27 -0500
-Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 695232BC1
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 01:30:25 -0800 (PST)
-Received: from [127.0.0.1] ([73.223.250.219])
-        (authenticated bits=0)
-        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 2AB9TcS21056258
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Fri, 11 Nov 2022 01:29:39 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 2AB9TcS21056258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2022110601; t=1668158979;
-        bh=R0fe+AlnvAFw5TZnVBEA/ox25VFVoJ0d4AP+6Gt7TM4=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=05UPhLZXTWNGis4Ka61ZJSv1UBR1+wYpGfuz51prVuRV+/Kqxr43I2JiuWPmcxNgN
-         +eozCh8ON1BvOgu9K/1WYxogId8NWZVK+LRjE1mb4IR21ugxB2Xh6Dbo2I3QHtawpz
-         eoRbHk43X9XkjQGqSniEozncvZW2L5TnBUGEw3izidRmFeTFo562bf2C66yM99RYfG
-         YDifyDF5iXlrWmmRbpgU9OshKhQfM1aO0LArNUbY/rj7i0iAS2teczh2uWX9mKOGzJ
-         WBeqV7SeRvRZI1Cp67RiiiA09y5ccf/FY/YxkkBlobC3NR2DzkZEAbq/DkHSQdICEf
-         lxv3atv2JDMhw==
-Date:   Fri, 11 Nov 2022 01:29:35 -0800
-From:   "H. Peter Anvin" <hpa@zytor.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>
-CC:     "Li, Xin3" <xin3.li@intel.com>,
-        "linux-kernel@vger.kernnel.org" <linux-kernel@vger.kernnel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_5/6=5D_KVM=3A_x86/VMX=3A_add_kvm=5Fvmx=5F?= =?US-ASCII?Q?reinject=5Fnmi=5Firq=28=29_for_NMI/IRQ_reinjection?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <Y24Tm2P34jI3+E1R@hirez.programming.kicks-ass.net>
-References: <20221110055347.7463-1-xin3.li@intel.com> <20221110055347.7463-6-xin3.li@intel.com> <Y20f8v9ObO+IPwU+@google.com> <BN6PR1101MB2161C2C3910C2912079122D2A8019@BN6PR1101MB2161.namprd11.prod.outlook.com> <Y21ktSq1QlWZxs6n@google.com> <Y24Tm2P34jI3+E1R@hirez.programming.kicks-ass.net>
-Message-ID: <3A1B7743-9448-405A-8BE4-E1BDAB4D62F8@zytor.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_PASS,
-        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S232580AbiKKJzQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 04:55:16 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 573196712A;
+        Fri, 11 Nov 2022 01:55:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668160515; x=1699696515;
+  h=from:to:cc:subject:date:message-id;
+  bh=GJYrYNUtpEQsFbSwvNRlRAKIkv76R0GmUW9rcH9SpOA=;
+  b=YzOdIChvvlseMqCDnr7cmZIkpuRgmwbiCJm9GvAiPteKTwUKkIX3A4Zp
+   KJQeQJqIDBAjUfTad4vTWBhhdqJZUn5WNmDvtUd4GA1nnAaoetjltOilu
+   mV0DbZJOGzt4y5C+OM8ksXn6LtxN6QZtdQRwzebVvHavfyw2KV3XqlGyW
+   IIRj0Tz51anLfLUs/1qcvYSmYjDVUZKpOfNwhOoIJa41rhPrysOpkXwt9
+   3Tr6R3g2VazndeTCsGFlFYDUkQ9hCTV7EYOAJ1w4gFokPCTQv9eteEEc3
+   GwTHtuQbY+gHbJCMgiyDHBQyKRZk+u3zZicuLYSFQMOU6GYQERVTYVGz6
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="309194747"
+X-IronPort-AV: E=Sophos;i="5.96,156,1665471600"; 
+   d="scan'208";a="309194747"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2022 01:55:14 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10527"; a="701165687"
+X-IronPort-AV: E=Sophos;i="5.96,156,1665471600"; 
+   d="scan'208";a="701165687"
+Received: from yzhao56-desk.sh.intel.com ([10.238.200.254])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2022 01:55:12 -0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, zhenyuw@linux.intel.com,
+        Yan Zhao <yan.y.zhao@intel.com>
+Subject: [PATCH 0/3] add track_remove_slot and remove track_flush_slot
+Date:   Fri, 11 Nov 2022 17:32:22 +0800
+Message-Id: <20221111093222.3148-1-yan.y.zhao@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On November 11, 2022 1:19:23 AM PST, Peter Zijlstra <peterz@infradead=2Eorg=
-> wrote:
->On Thu, Nov 10, 2022 at 08:53:09PM +0000, Sean Christopherson wrote:
->> On Thu, Nov 10, 2022, Li, Xin3 wrote:
->
->> > > > + * call thus the values in the pt_regs structure are not used in
->> > > > + * executing NMI/IRQ handlers,
->> > >=20
->> > > Won't this break stack traces to some extent?
->> > >=20
->> >=20
->> > The pt_regs structure, and its IP/CS, is NOT part of the call stack, =
-thus
->> > I don't see a problem=2E No?
->
->I'm not sure what Xin3 is trying to say, but NMI/IRQ handers use pt_regs
->a *LOT*=2E pt_regs *MUST* be correct=2E
+This series is based on Sean's series
+https://lore.kernel.org/all/20221110014821.1548347-1-seanjc@google.com/,
+which allows KVM internal user of page track not to rely on the page track
+hook .track_flush_slot.
 
-What is "correct" in this context? Could you describe what aspects of the =
-register image you rely on, and what you expect them to be? Currently KVM b=
-asically stuff random data into pt_regs; this at least makes it explicitly =
-zero=2E
+Page track hook track_flush_slot is for notification of slot flush and
+is called when a slot DELETE/MOVE is on-going.
+
+Page track hook track_remove_slot is for notification of slot removal
+and is called when the slot DELETE/MOVE has been committed.
+
+As KVMGT, the only external user of page track, actually only cares about
+when slot removal indeed happens, this series switches KVMGT to use the new
+hook .track_remove_slot.
+And as there are no users to .track_flush_slot any more, this hook is
+removed.
+ 
+Yan Zhao (3):
+  KVM: x86: add a new page track hook track_remove_slot
+  drm/i915/gvt: switch from track_flush_slot to track_remove_slot
+  KVM: x86: Remove the unused page track hook track_flush_slot
+
+ arch/x86/include/asm/kvm_page_track.h | 8 ++++----
+ arch/x86/kvm/mmu/page_track.c         | 8 ++++----
+ arch/x86/kvm/x86.c                    | 5 +++--
+ drivers/gpu/drm/i915/gvt/kvmgt.c      | 6 +++---
+ 4 files changed, 14 insertions(+), 13 deletions(-)
+
+-- 
+2.17.1
+
