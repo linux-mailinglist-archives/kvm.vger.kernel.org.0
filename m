@@ -2,155 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A1F66261BD
-	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 20:06:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F8B06261D3
+	for <lists+kvm@lfdr.de>; Fri, 11 Nov 2022 20:25:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233673AbiKKTG3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 14:06:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55932 "EHLO
+        id S233096AbiKKTZC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Nov 2022 14:25:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230303AbiKKTG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 14:06:26 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E8A6391FF
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 11:06:21 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 95FF8620B3
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 19:06:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3515C433D6;
-        Fri, 11 Nov 2022 19:06:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668193579;
-        bh=glUZLqZQVoxiOyzIfHGRfq6bY6J3iXv73EeOSZbGuyI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RCBMVH408hR6/dNC2gHgo8eXBO9ISeYqcfw0MnUnTjUhENnIn4IGEBkQh/18pmJyD
-         mRpvEOxI8tstgnQERg/ZjUfO7dk42BJPM5FlYpRM8N3YYOySErzlVPGgtdwxl1ZiGr
-         pQRUVAhma5N1O7OoJF4bflUWIPnUiGmSJo4UIMjdRY0ljuG6fcob0OuM0G2c+6AF84
-         shi4o3fgBvtQJWNkT7puMyy7Q7n9uQ68gxrDjBbDYjw4+sy3l++psfdYBd7I03agnx
-         ft/td6Kl43SCJBZ10nmHAq4onJbtRSGso7AXnaJiwh8P2Q6Z38gnDkaHa/HIYI1poS
-         c1dJvDVXqZ0SA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1otZM1-005Ux5-IC;
-        Fri, 11 Nov 2022 19:06:17 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev
-Cc:     Vincent Donnefort <vdonnefort@google.com>,
-        James Morse <james.morse@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com, Quentin Perret <qperret@google.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Sean Christopherson <seanjc@google.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>
-Subject: Re: [PATCH v6 00/26] KVM: arm64: Introduce pKVM hyp VM and vCPU state at EL2
-Date:   Fri, 11 Nov 2022 19:06:14 +0000
-Message-Id: <166819337067.3836113.13147674500457473286.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221110190259.26861-1-will@kernel.org>
-References: <20221110190259.26861-1-will@kernel.org>
+        with ESMTP id S230114AbiKKTZA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Nov 2022 14:25:00 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E4BA67124
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 11:24:59 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id c15-20020a17090a1d0f00b0021365864446so5493532pjd.4
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 11:24:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AxDp+EkD87kpMInKBl+LqOH4m+/gAkqQGadUGYz6imk=;
+        b=JrBJh1AMaFf7HysUT/6UJQF/qbl41OarMhYVo2i7ZxjMRLJP1h1K8Q5HOy9xWBmQ0D
+         5iibihGVOWSQ5Vtz5BP61jw1fAoe4i/F3UJjMQo52Lxm9nQ47LQZupdPYjztg6jMWx+H
+         T68KrUeOo8N+5w5qNvHJhMpbONZo3Rd8jjPHxSnV0lYzBfEZug9yss5TWUseTqnUGJp4
+         qNW/0FP9XXn39yTGOKFdheWOK21FMDuxjQK8Fc+5yolQqM8Ym9y/Jv/AjnFrhxV6JVpg
+         +m2QR/JMGHF5Ib8vum6EYpDkwbIpPVpFm0EWeLyfZw70mvt6plT248T+DbnNaa6sqIzP
+         nLLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AxDp+EkD87kpMInKBl+LqOH4m+/gAkqQGadUGYz6imk=;
+        b=PaOGChrUcCrQRnhXQ0FVv/fS20NypmeO62ESwyAg6TPoCBiCytEUBe8eFyCqeuHw7A
+         J52JzzCNi8uRm8I5xQrcZf6LPOP5xIYASSNR4hJALaroDcVzde+GAqX7045GuJmbITYR
+         3Xv63LR98Rg+E2puGldToR/SAMMNjCZyzwvPf6DN+T/UOxEhmxO66/U7x/ZJV7Cv1/0X
+         fB82fhF8zZi9XRQevryBLlhBbfNzFHgDfyLIoYGgf406hEkSPYZi0MkzmGotAIKzpVjq
+         QX9be8KpX40wLPPYkJeIkHLl6ga0BHeHOXLAqmyM6nnOJfNR8yY388pwV53GSlgxyxcG
+         M1OA==
+X-Gm-Message-State: ANoB5pl5/e1Dx22otlzZHnBPbefyiqXyWzhkoI4CSiegiMFsToHSDKrF
+        WpZqKO7oGsNH16/4YXFm4+CZ+A==
+X-Google-Smtp-Source: AA0mqf5ZbausSSTGDH3GxyU9FLxKQpB98WwClDgs3zQB3EW0Q+QDIUfV4z8lo4t6hYoLbkbz+nB74g==
+X-Received: by 2002:a17:90a:d70e:b0:212:f52e:55c9 with SMTP id y14-20020a17090ad70e00b00212f52e55c9mr3443412pju.56.1668194698948;
+        Fri, 11 Nov 2022 11:24:58 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id a13-20020a170902eccd00b0017f9db0236asm2103301plh.82.2022.11.11.11.24.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Nov 2022 11:24:58 -0800 (PST)
+Date:   Fri, 11 Nov 2022 19:24:55 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH 0/2] KVM: x86/mmu: Use page-track only for... page
+ tracking
+Message-ID: <Y26hhw8yD96Z4eZf@google.com>
+References: <20221110014821.1548347-1-seanjc@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, vdonnefort@google.com, james.morse@arm.com, mark.rutland@arm.com, alexandru.elisei@arm.com, kernel-team@android.com, qperret@google.com, philmd@linaro.org, suzuki.poulose@arm.com, tabba@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, seanjc@google.com, catalin.marinas@arm.com, chao.p.peng@linux.intel.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221110014821.1548347-1-seanjc@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 10 Nov 2022 19:02:33 +0000, Will Deacon wrote:
-> This is version six of the pKVM EL2 state series, extending the pKVM
-> hypervisor code so that it can dynamically instantiate and manage VM
-> data structures without the host being able to access them directly.
-> These structures consist of a hyp VM, a set of hyp vCPUs and the stage-2
-> page-table for the MMU. The pages used to hold the hypervisor structures
-> are returned to the host when the VM is destroyed.
+On Thu, Nov 10, 2022, Sean Christopherson wrote:
+> Don't bounce through the page-track notifier when zapping+flushing SPTEs
+> in response to memslot changes as the need to zap+flush isn't strictly
+> limited to page-tracking.  With that done, register KVM's notifier on the
+> first allocation of a shadow root, as KVM's ->track_write() hook is used
+> only to react to writes to gPTEs.
 > 
-> [...]
+> Aside from avoiding a RETPOLINE on emulated writes, dropping KVM's internal
+> use will allow removing ->track_flush_slot() altogether once KVM-GT moves
+> to a different hook[*].  Tracking "flushes" of slots is a poor fit for
+> KVM-GT's needs as KVM-GT needs to drop its write-protection only when a
+> memslot change is guaranteed to be committed, whereas the "flush" call is
+> speculative in the sense that KVM may abort a memslot update after flushing
+> the original memslot.
+> 
+> https://lore.kernel.org/all/20221108084416.11447-1-yan.y.zhao@intel.com
+> 
+> Sean Christopherson (2):
+>   KVM: x86/mmu: Don't rely on page-track mechanism to flush on memslot
+>     change
+>   KVM: x86/mmu: Register page-tracker on first shadow root allocation
 
-As for Oliver's series, I've tentatively applied this to -next.
-I've dropped Oliver's patch for now, but kept the RFC one. Maybe I'll
-change my mind.
-
-Anyway, there was an interesting number of conflicts between the two
-series, which I tried to resolve as well as I could, but it is likely
-I broke something (although it compiles, so it must be perfect).
-
-Please have a look and shout if/when you spot something.
-
-[01/26] KVM: arm64: Move hyp refcount manipulation helpers to common header file
-        commit: 0f4f7ae10ee4e6403659b2d9ddf05424eecde45b
-[02/26] KVM: arm64: Allow attaching of non-coalescable pages to a hyp pool
-        commit: 72a5bc0f153ce8ca80e9abbd1d9adec7d586915a
-[03/26] KVM: arm64: Back the hypervisor 'struct hyp_page' array for all memory
-        commit: 8e6bcc3a4502a0d8d065466efd888b6b59b85789
-[04/26] KVM: arm64: Fix-up hyp stage-1 refcounts for all pages mapped at EL2
-        commit: 0d16d12eb26ef85602ef8a678d94825a66772774
-[05/26] KVM: arm64: Unify identifiers used to distinguish host and hypervisor
-        commit: 33bc332d4061e95db55594893c4f80105b1dd813
-[06/26] KVM: arm64: Implement do_donate() helper for donating memory
-        commit: 1ed5c24c26f48ff61dc5d97c655769821f36a622
-[07/26] KVM: arm64: Prevent the donation of no-map pages
-        commit: 43c1ff8b75011bc3e3e923adf31ba815864a2494
-[08/26] KVM: arm64: Add helpers to pin memory shared with the hypervisor at EL2
-        commit: 9926cfce8dcb880255f30ab9ac930add787e1ead
-[09/26] KVM: arm64: Include asm/kvm_mmu.h in nvhe/mem_protect.h
-        commit: 4d968b12e6bbe4440f4f220c41d779e02df8af1a
-[10/26] KVM: arm64: Add hyp_spinlock_t static initializer
-        commit: 1c80002e3264552d8b9c0e162e09aa4087403716
-[11/26] KVM: arm64: Rename 'host_kvm' to 'host_mmu'
-        commit: 5304002dc3754a5663d75c977bfa2d9e3c08906d
-[12/26] KVM: arm64: Add infrastructure to create and track pKVM instances at EL2
-        commit: a1ec5c70d3f63d8a143fb83cd7f53bd8ff2f72c8
-[13/26] KVM: arm64: Instantiate pKVM hypervisor VM and vCPU structures from EL1
-        commit: 9d0c063a4d1d10ef8e6288899b8524413e40cfa0
-[14/26] KVM: arm64: Add per-cpu fixmap infrastructure at EL2
-        commit: aa6948f82f0b7060fbbac21911dc7996b144ba3c
-[15/26] KVM: arm64: Initialise hypervisor copies of host symbols unconditionally
-        commit: 6c165223e9a6384aa1e934b90f2650e71adb972a
-[16/26] KVM: arm64: Provide I-cache invalidation by virtual address at EL2
-        commit: 13e248aab73d2f1c27b458ef09d38b44f3e5bf2e
-[17/26] KVM: arm64: Add generic hyp_memcache helpers
-        commit: 717a7eebac106a5cc5d5493f8eef9cf4ae6edf19
-[18/26] KVM: arm64: Consolidate stage-2 initialisation into a single function
-        commit: 315775ff7c6de497dd07c3f6eff499fb538783eb
-[19/26] KVM: arm64: Instantiate guest stage-2 page-tables at EL2
-        commit: 60dfe093ec13b056856c672e1daa35134be38283
-[20/26] KVM: arm64: Return guest memory from EL2 via dedicated teardown memcache
-        commit: f41dff4efb918db68923a826e966ca62c7c8e929
-[21/26] KVM: arm64: Unmap 'kvm_arm_hyp_percpu_base' from the host
-        commit: fe41a7f8c0ee3ee2f682f8c28c7e1c5ff2be8a79
-[22/26] KVM: arm64: Maintain a copy of 'kvm_arm_vmid_bits' at EL2
-        commit: 73f38ef2ae531b180685173e0923225551434fcb
-[23/26] KVM: arm64: Explicitly map 'kvm_vgic_global_state' at EL2
-        commit: 27eb26bfff5d358d42911d04bbecc62e659ec32b
-[24/26] KVM: arm64: Don't unnecessarily map host kernel sections at EL2
-        commit: 169cd0f8238f2598b85d2db2e15828e8f8da18e5
-[25/26] KVM: arm64: Clean out the odd handling of completer_addr
-        (no commit info)
-[26/26] KVM: arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()
-        commit: be66e67f175096f283c9d5614c4991fc9e7ed975
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+Don't merge this series, I'm going to (hopefully) send a (much larger) v2 that
+more aggressively cleans up the page tracker APIs, and will replace patch 2 with
+a completely different patch.
