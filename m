@@ -2,152 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB2B5626619
-	for <lists+kvm@lfdr.de>; Sat, 12 Nov 2022 01:54:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45183626726
+	for <lists+kvm@lfdr.de>; Sat, 12 Nov 2022 06:33:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234545AbiKLAyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Nov 2022 19:54:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54264 "EHLO
+        id S231562AbiKLF3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Nov 2022 00:29:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233739AbiKLAyl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Nov 2022 19:54:41 -0500
-Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7A6F654C9
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 16:54:39 -0800 (PST)
-Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-13bd19c3b68so7106215fac.7
-        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 16:54:39 -0800 (PST)
+        with ESMTP id S229991AbiKLF3M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Nov 2022 00:29:12 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E38A10563
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 21:29:07 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id q1so5922189pgl.11
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 21:29:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=kgzkdJJVzDtfUCfjBoOKWIQr0MtI60EXGo2WL5sLdD8=;
-        b=WJ1Dtcx0YU6v7BVgFhOTmX5g6b5V2u81n5W+od/LZ7/ePypFpcJ3B2/cO6y5T9Hb1s
-         yGLP2KzMKL2tz7tYL10UX9VT2BDESGgDfGicz6IIzTLAXbGixb0NFv+uatTxemVEh/iP
-         sj51/eI+NB3Y5W0e42kxC8GeNas1/hiO1nVjDt5AZZ3o3Ub8nTGV9TSEaFCeqYs4dRQO
-         BT75ccM4UwqN3Hu64t4SL7Fzqq2bZPnpCgNB8CcGojBn1Euw156C0sN6shCUgnQMXfSf
-         JNT+gVM8ZJ7BtrG9jh7rcg8AeI4W2uENCEw6XEshXKW/DmLDxqNErQJ/EoZvkZZCjafN
-         dnYQ==
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=q5gU8ipiRrz8dtkFTDLWFTjOXTZAEzfd68uklGNyxIQ=;
+        b=EsTcS/5gFSUpcGEYuuw2MGupOY8zjopRu0ktKqja7Dj6kFaFr5ZxZTsgNGVL3TDH3O
+         T0D8Y5J/QHqver1RNfGmBRzlhyh0xOFhQk750LXsWEdMMIPXC70dvKJQqX31E0/UyTzR
+         AXdS6eSb5jXwkpUwNrbjQUKFlXmN6y9vLRrF8dVI1cSmyHiYvrSCoCTMeDd70zZ1Tft6
+         jHQAIqIgfZv0TkafOOVqQqlbaKviSfFh3eMjElAWFmKOqIFfdE7IY0HqqmQ/WMS4SGG3
+         cOstR0jkru4i8Csf/UNpYQBFT9FpSElmEAMXG3mmJVaevLcJKiS6wG1VV+2kkinQOQzj
+         RG4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kgzkdJJVzDtfUCfjBoOKWIQr0MtI60EXGo2WL5sLdD8=;
-        b=iJ0C5/+VkQpVIcrd8/ECWbCV+yMqGGXMp8MJ3iCqa99G7HhNIdqlZhW1YCJw/CBGT2
-         3vshHQEIujWPuXRL/i0FV4SmkS9e0kIMS9gXyADwLKFZnj4mfBcHkFKUeqmmyRdf/z6O
-         ZPdVYz1gDofmkiYBJUTUVocBHowrk6qU6xRIg64mLRe4E/N4NR8xZNULA90m7C2sIsAr
-         PNAzMK8GXZCugm0Nt5AYdV/5gCdUjoqoF4a0u4O8ZtWsmt02gs82PM3x/teGrE3EeZQT
-         D8AgkN0Ydea1AU936+mV9kUOs7oXlZkBwZzaZPdULLPcDfvmKtGc1g0gGjVUnD2CxDGA
-         Ok/A==
-X-Gm-Message-State: ANoB5pmK7bPeU21LgyPGjS4PWWZFvGwARl7qUjDhGaIfPc1iEFGvNcoz
-        qKnb7EpovbCNT41V/jjl6CqDmHzMUiuaxH4AXeGIrg==
-X-Google-Smtp-Source: AA0mqf6ijLfQXIUSX8tefl3g9CbymBdUGXdxWM4Kt+K4kfIGcLQ9nZanl88lLdkCxJohVixchA4ivqQsSeJrMapImFo=
-X-Received: by 2002:a05:6870:2e07:b0:132:af5d:e4eb with SMTP id
- oi7-20020a0568702e0700b00132af5de4ebmr2389146oab.112.1668214478327; Fri, 11
- Nov 2022 16:54:38 -0800 (PST)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=q5gU8ipiRrz8dtkFTDLWFTjOXTZAEzfd68uklGNyxIQ=;
+        b=akGYKkUhIsyeSFuYkoGtvVH6yka6TILVoiheXuZo8+Vh3pJU/mrOEYaTR3TorcPCzc
+         Cb5y3lwjRiSMkU7RGEz7wvwOworey0uTauGO+R+VI9T6PQ0wncHr2YjHeGQQGAs5FY+V
+         lnljoi+GpKFfo4+682YbJ1TWjAAUjPsRxZ4fRy+7T5slPP7WIM/13mo898SBDrdK04sM
+         T5iDUajWy9CW9EQsKtGpSFYgUkQ3dBB8fdaIE5eUrOSj9vI3VTxYVcktaHFKyeBl4Yia
+         bi0d4QJeRs1QUJU2px+2uVBUJu02x+P3cmJFRrIE9ioi1Obhi+wS3GzXOFaFgMRnswQs
+         eMUg==
+X-Gm-Message-State: ANoB5pn6c8QkD6FVBiVhVS8fHlBlN42ApRvNVKjP6aVnUpje8qVNPdAv
+        kQFAPMHAZPRX75GPx/WkZ9eR7w==
+X-Google-Smtp-Source: AA0mqf5nYyjlASOS9piFe90wdi4YeHxP3ydP5US24xV2Sg8mf4qxnEKSccJW83HBVHf8OxSdOh9xkw==
+X-Received: by 2002:a63:e00d:0:b0:464:45b5:745c with SMTP id e13-20020a63e00d000000b0046445b5745cmr4430453pgh.118.1668230946854;
+        Fri, 11 Nov 2022 21:29:06 -0800 (PST)
+Received: from ?IPV6:2001:44b8:2176:c800:8228:b676:fb42:ee07? (2001-44b8-2176-c800-8228-b676-fb42-ee07.static.ipv6.internode.on.net. [2001:44b8:2176:c800:8228:b676:fb42:ee07])
+        by smtp.gmail.com with ESMTPSA id a4-20020aa795a4000000b0056d7cc80ea4sm2476240pfk.110.2022.11.11.21.29.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Nov 2022 21:29:06 -0800 (PST)
+Message-ID: <97d50924-66c3-80d7-30cf-f157da6477aa@linaro.org>
+Date:   Sat, 12 Nov 2022 15:29:00 +1000
 MIME-Version: 1.0
-References: <20221104213651.141057-1-kim.phillips@amd.com> <20221104213651.141057-3-kim.phillips@amd.com>
- <Y2WJjdY3wwQl9/q9@zn.tnic> <Y2ZEinL+wlIX+1Sn@hirez.programming.kicks-ass.net>
- <d413c064-ee9b-5853-9cf1-544adde22c8a@amd.com> <Y247gY9NKYi34er6@zn.tnic>
- <Y25CwmylusloNKsr@quatroqueijos.cascardo.eti.br> <fb91bbc0-7a25-2f2a-163c-517f20dff6db@amd.com>
-In-Reply-To: <fb91bbc0-7a25-2f2a-163c-517f20dff6db@amd.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 11 Nov 2022 16:54:27 -0800
-Message-ID: <CALMp9eT-XHz2GyWsQt+5eeGGm-9kvCj5PxC8GibEyc9rXoUcEw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] x86/speculation: Support Automatic IBRS
-To:     Kim Phillips <kim.phillips@amd.com>
-Cc:     Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Peter Zijlstra <peterz@infradead.org>, x86@kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH v5 04/20] target/arm: ensure KVM traps set appropriate
+ MemTxAttrs
+Content-Language: en-US
+To:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     f4bug@amsat.org, Peter Maydell <peter.maydell@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Babu Moger <Babu.Moger@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        "open list:ARM KVM CPUs" <qemu-arm@nongnu.org>,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
+References: <20221111182535.64844-1-alex.bennee@linaro.org>
+ <20221111182535.64844-5-alex.bennee@linaro.org>
+From:   Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20221111182535.64844-5-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 11, 2022 at 4:46 PM Kim Phillips <kim.phillips@amd.com> wrote:
->
-> On 11/11/22 6:40 AM, Thadeu Lima de Souza Cascardo wrote:
-> > On Fri, Nov 11, 2022 at 01:09:37PM +0100, Borislav Petkov wrote:
-> >> On Mon, Nov 07, 2022 at 04:39:02PM -0600, Kim Phillips wrote:
-> >>> I've started a version that has AUTOIBRS reuse SPECTRE_V2_EIBRS
-> >>> spectre_v2_mitigation enum, but, so far, it's change to bugs.c
-> >>> looks bigger: 58 lines changed vs. 34 (see below).
-> >>
-> >> It can be smaller. You simply do:
-> >>
-> >>      if (cpu_has(c, X86_FEATURE_AUTOIBRS))
-> >>              setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
-> >>
-> >> and the rest should just work - see below.
-> >>
-> >> And yes, as Peter says, when the user requests something, the user
-> >> should get it. No matter whether it makes sense or not.
->
-> OK & thanks.
->
-> >> @@ -1474,11 +1477,19 @@ static void __init spectre_v2_select_mitigation(void)
-> >>              break;
-> >>
-> >>      case SPECTRE_V2_CMD_EIBRS_LFENCE:
-> >> -            mode = SPECTRE_V2_EIBRS_LFENCE;
-> >> +            if (boot_cpu_has(X86_FEATURE_AUTOIBRS)) {
-> >> +                    pr_err(SPECTRE_V2_EIBRS_AMD_MSG);
-> >> +                    mode = SPECTRE_V2_EIBRS;
-> >> +            } else
-> >> +                    mode = SPECTRE_V2_EIBRS_LFENCE;
-> >>              break;
-> >>
-> >>      case SPECTRE_V2_CMD_EIBRS_RETPOLINE:
-> >> -            mode = SPECTRE_V2_EIBRS_RETPOLINE;
-> >> +            if (boot_cpu_has(X86_FEATURE_AUTOIBRS)) {
-> >> +                    pr_err(SPECTRE_V2_EIBRS_AMD_MSG);
-> >> +                    mode = SPECTRE_V2_EIBRS;
-> >> +            } else
-> >> +                    mode = SPECTRE_V2_EIBRS_RETPOLINE;
-> >>              break;
-> >>      }
-> >>
-> >
-> > I am confused here. Isn't the agreement that the user should get what they
-> > asked for? That is, instead of warning and changing the mode to
-> > SPECTRE_V2_EIBRS, the kernel should still use lfence or retpoline as requested?
-> >
-> > The point of those options was to protect against Branch History Injection
-> > attacks and Intra-Mode Branch Target Injection attacks. The first one might not
-> > affect the CPUs that support AUTOIBRS, though we haven't heard that.
-> >
-> > The second one (IMBTI) is very likely still possible with AUTOIBRS and
-> > retpolines should still protect against those attacks. So users who want to be
-> > paranoid should still be able to opt for "eibrs,retpoline" and have retpolines
-> > enabled.
->
-> I've removed the above and have the complete diff below.  It includes patch 1/3 and
-> drops 3/3 for now due to Jim Mattson's comments.  After some more testing, I'll
-> resubmit.
+On 11/12/22 04:25, Alex Bennée wrote:
+> Although most KVM users will use the in-kernel GIC emulation it is
+> perfectly possible not to. In this case we need to ensure the
+> MemTxAttrs are correctly populated so the GIC can divine the source
+> CPU of the operation.
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+> ---
+> v3
+>    - new for v3
+> v5
+>    - tags
+>    - use MEMTXATTRS_PCI
+> ---
 
-I bought the argument that AutoIBRS => Same Mode IBRS, so L2 should
-not be able to steer L1's indirect branches, even if they share a
-predictor mode.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
