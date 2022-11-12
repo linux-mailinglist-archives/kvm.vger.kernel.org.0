@@ -2,212 +2,635 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A4E7626782
-	for <lists+kvm@lfdr.de>; Sat, 12 Nov 2022 07:35:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E13146267DA
+	for <lists+kvm@lfdr.de>; Sat, 12 Nov 2022 08:55:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234766AbiKLGfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Nov 2022 01:35:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46844 "EHLO
+        id S234657AbiKLHz6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Nov 2022 02:55:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233739AbiKLGfo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Nov 2022 01:35:44 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98C0412639;
-        Fri, 11 Nov 2022 22:35:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668234943; x=1699770943;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=0Nf8vJPHBoztI8XqTswYYv1Xzd3YZOK/pagCAD6V23k=;
-  b=Q4MXUv+oCsMJkaYTsIP5QDFDPDwQjyrQ6bDh4pP5tFOyphRpwYsFVvwv
-   2gmcPPGrspxgWo19tkk9Y0oniwfKnLcWM7qAPhCWRDtwgJR3mDt+qQBrD
-   g8rSlp1m82TS8PvE7pV9bgyzbYLvxQNjV6lBvUBzJSQKkkyHRhPYkz1pg
-   52SmU/j4k/4ylLhG/ksZxwRp5wnSXfwEZ9os4XHHtdfwUWKWmLrgeakft
-   V3jccYmY/yqkG7Ed8iyQtbs7q15i/6kVizEwQWaeFujJpbLgIJQjF8mJ9
-   iSMZUm3O7dIOXnHY3mQWVjaUY2n0TG76b7swDH1qJno4YjYZxUEwdKboK
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10528"; a="398001033"
-X-IronPort-AV: E=Sophos;i="5.96,158,1665471600"; 
-   d="scan'208";a="398001033"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2022 22:35:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10528"; a="967011562"
-X-IronPort-AV: E=Sophos;i="5.96,158,1665471600"; 
-   d="scan'208";a="967011562"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga005.fm.intel.com with ESMTP; 11 Nov 2022 22:35:42 -0800
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 11 Nov 2022 22:35:42 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Fri, 11 Nov 2022 22:35:42 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.170)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Fri, 11 Nov 2022 22:35:42 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ma3/vPi+qrYKWJw/F0uIGLGQ3ZZQQvkdtlDZipJM0zvEPe9sVpjs6TMIQak6le+Gk2KdmXbCsDNQ1RoT9ci0caLxakSNq79MpqcOe+dNoHvpwPCk9ylAnvjVF4B2N2Ob87oGeIzr9d8yYSmr+r/4CI3OvUu1NpkcH1JWBH6bmq15VidA27GxW9FdS5LQK5ty5mxXntnZDe/piAGiixRCRAyM5Hs7LuySOoBR4yct4wcnoFlPuBV52++2HnYUKq2qNA9klWKEkIFcSJGZpAZ2yegGa5Qqi+glRGNzlBOOYNKAVPv+j2j+bQhS3QwNlX1hvn/65ZTjRAXx0fq5AqedAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0Nf8vJPHBoztI8XqTswYYv1Xzd3YZOK/pagCAD6V23k=;
- b=JQt3IsICJSxUTwSL/kS1SHKDgUK5A0pPXvYSf7lneg9iCl9FwauKCLosPaZKuyZtKyZ6l5n/+7bB8sldQSygRx0avgKRh8MJVU7/bfVw7ZdPV9Q8KSqRiJ/Q0TAMJ2A0QNpOJlfjF8lwP2FIVyAubO/u8zVl9CX9PQPghhWcTsZ1NLr9FQRUZAMiHWVjLpnajRa4/BXMoNHPN/aZhS0HMSnEiM4g4GJIfs3cFo7vk12E2AukJYzuEiCRkPDn1S0NTgJ2W2NcQ7ztMt/+Vm/rKFjlpwsl+09/ubV0WiMLcTMvgpVrxMcrQcUu9s/XsWKPG0+apDm/f0dDbSYEygWJrw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN6PR1101MB2161.namprd11.prod.outlook.com
- (2603:10b6:405:52::15) by MN0PR11MB6208.namprd11.prod.outlook.com
- (2603:10b6:208:3c4::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Sat, 12 Nov
- 2022 06:35:39 +0000
-Received: from BN6PR1101MB2161.namprd11.prod.outlook.com
- ([fe80::40a1:5197:e1df:bb6c]) by BN6PR1101MB2161.namprd11.prod.outlook.com
- ([fe80::40a1:5197:e1df:bb6c%11]) with mapi id 15.20.5813.015; Sat, 12 Nov
- 2022 06:35:39 +0000
-From:   "Li, Xin3" <xin3.li@intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: RE: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
- for NMI/IRQ reinjection
-Thread-Topic: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
- for NMI/IRQ reinjection
-Thread-Index: AQHY9M9YytlyKV7ob0GK/oJbeBhPY6433PwAgACmfxCAAO8aAIAAL0qAgAAENoCAAAgUAIAAGnuAgAA1qHCAACERAIAAtwpQ
-Date:   Sat, 12 Nov 2022 06:35:39 +0000
-Message-ID: <BN6PR1101MB216163B12055F02E8C54D2BFA8039@BN6PR1101MB2161.namprd11.prod.outlook.com>
-References: <20221110061545.1531-1-xin3.li@intel.com>
- <20221110061545.1531-6-xin3.li@intel.com>
- <Y2y+YgBUYuUHbPtd@hirez.programming.kicks-ass.net>
- <BN6PR1101MB2161976800EB14B74A24D9F3A8019@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <Y24SoNKZtj/NPSGy@hirez.programming.kicks-ass.net>
- <6097036e-063f-5175-72b2-8935b12af853@redhat.com>
- <Y24908NWCdzUNqI0@hirez.programming.kicks-ass.net>
- <6fd26a70-3774-6ae7-73ea-4653aee106f0@redhat.com>
- <Y25a0Z2tOMWYZs4j@hirez.programming.kicks-ass.net>
- <BN6PR1101MB216141A21353AB84CEA541DFA8009@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <Y26jkHfK9INwU7Yy@hirez.programming.kicks-ass.net>
-In-Reply-To: <Y26jkHfK9INwU7Yy@hirez.programming.kicks-ass.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.6.500.17
-dlp-reaction: no-action
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN6PR1101MB2161:EE_|MN0PR11MB6208:EE_
-x-ms-office365-filtering-correlation-id: 6b1748c3-c2d2-4427-628a-08dac4781d5e
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: j9NgkVkEuCxqAwcpx9//uSSLTFMGeEDa0QbPHVU5UBd7ajEBQd3iNNNTU/ie3k27VQyWaIYcj7B4A2g4q5jQ5eFU/UI/xsjCYhM0ggMau2dO6mHpUjNhQxEkIZgrxCCX18SjfcACdU7j7R11OgBGkNyK6sioZBIX4lXNMv+XlKhx02tWHvwCPRYg/WzdxAIJ4hpV9tmhahaMq8tnd5N9nUg6EosI+1ToMspznv9MAgdODE1E+mrnJA1Rdhx941YS9HjUjcQzCCCQ4ssXLlTi6AWXkJhhMjxZKsIh+UBorN3596rJnR2lu1ZyJy8dm09gkk8Y16M4A6bZ0/gJpBsemu+bkRpesWWMgMl2ha8SyelG9NBIjubwjaxKeExsJwTzlNBUTQ/oLJfdLwMA9C+cGHFJz5XeB11CeFaqsobn5wS4UeaHD6xrQ9BxoKUcObFtOlaldS4QeykGhsmPJu+YjBvWFbwvGU+BqbPP4yhJ+4hIyr2CdyjrVN2+y5meGndz8jIptt4GBeyAe5jQeN80IbdLzgafXfcXbbQmYXIufoAh5IyZHQsk+xKl5u22CqpWsmRcxvktZbdAC5wXFbyDIIVUsMuKfVA3EOonbJl2cv7zueEqKl+ZwISGn+qtU7AVILYy//TzpuZYM3k9OtNkeqxdISm+uQez1cazwvSL6gAANJeU51JDP5xDPVhciw86KaIRVr0og1+5AEcEZakKLQC7hIWsG+Ov48Pq4mYD4dHD7CalOIilFDY8KiKGSNGaOizHabls5UXKeKT9SG/evQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN6PR1101MB2161.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(346002)(39860400002)(376002)(366004)(396003)(451199015)(186003)(9686003)(38100700002)(83380400001)(7696005)(6506007)(8676002)(8936002)(66476007)(76116006)(26005)(7416002)(5660300002)(2906002)(71200400001)(6916009)(82960400001)(54906003)(66946007)(55016003)(478600001)(64756008)(316002)(66446008)(41300700001)(4326008)(52536014)(122000001)(33656002)(66556008)(86362001)(38070700005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?L09PU1pXa1FLVGV5M2pXL08zTVdJUU5GNWdMY0twZHFFS0dqb2ZpSks3WTNr?=
- =?utf-8?B?KzZpVEJiYWlaak5XT2JUeURpS09OcVBmTFhDSEtZNGlPYmlqL1VQZ1RnUEE2?=
- =?utf-8?B?UzM2TUdYNHJ4YWkwbmc1KytsSHhsNUttbTZ4aWh4UkhQRmh6SjJJaHluSmtQ?=
- =?utf-8?B?b1kvN09SU0tZQmlYbTdnVkxENHJlZ1NpbTVXRXhBOFUzc2hGd1BTZHJza21x?=
- =?utf-8?B?MjJtbjN2TGd6MzdreUhhN250MlFNOTZ4STRlREl2S2JEc1I1ZjhOVTNaVU5J?=
- =?utf-8?B?enJCQXhoaEZvcnZYNE44d1d1SUdGVERBMmJLV2ZhUDk2QjJ5L0U5WTl6MU1Z?=
- =?utf-8?B?OWlPZnQ0d2ozNm1nNnZSR3Vjai80aktjWFpFVjRGbHoySlhROEp6Y1EwdFdW?=
- =?utf-8?B?YXVpMEU4YUl1Y1E5RWRWeDZBRlJnejlBZ04rUHA4MzBUdjhKWGpsd2pSOUpV?=
- =?utf-8?B?TWVBSVUzZnVCQVZ5VHNqYWw4ZXhybFl1Mzh6YU9YekV3cW14bU9iWUQ3Wk1K?=
- =?utf-8?B?dGRtSUxDOWNmSFRLMUtXeGQyNGRuQ2JnZEVvdG96SmJsb2svYm5sMlFnVmNI?=
- =?utf-8?B?OUE2cGFwQWdhSDdPWTJNY0hjYm1XV3ArRTBOS2daUjhUemFwNytnc1Fuc3hm?=
- =?utf-8?B?WE1sb0FSdDNmMWRlRzAxU01rMjlNZHNyOTdjdk5yZXQ0T04rMmRFZGtidUlq?=
- =?utf-8?B?bUpyU09BellXN002SXRJaFBlTzl6RFdxTEFpM3JEaEJyWE9JTHNTMWxiUHEr?=
- =?utf-8?B?SXlhSlpZRUgvelF0V05tUm9tdExWc3hEUGp5R0RqMUx5bzhDakhhSnluYzAy?=
- =?utf-8?B?MGp1SU43RzJnNGE2Zy81ZTJ4SGFoVjFiQVRROU4vTENDeUpDYjVqMmRSdDg1?=
- =?utf-8?B?SElEQjhHK25sTUlHVDlUaDh0MFpySnFPTHoyaklFbTd3ekFPVXZQZWsrY3Ix?=
- =?utf-8?B?dE83VGEzODMwYms4OTVwQVJ5MjkydGVOeUdxTFpoblpEeTI0M0RzK0N2bXVu?=
- =?utf-8?B?VEJZTVl5SEdxdHN2UTluMlF0ZlNieGtSVW15RE1YQy9kVmFlbzlPZVkvUUQ0?=
- =?utf-8?B?cWFEcWNkaHpZWEsvbTQxYmZRTkZ2eSs3ODJ0djdlU1VLcElFU01wYXM1RHFN?=
- =?utf-8?B?a053NmRVSWU0eGs4MGFpaDBwL2xYR0FZdFg5QWx5SVRyQXBvQlY1NkZ6SGdX?=
- =?utf-8?B?ZnZKTkJFbGlHTEY4T09vWGluV1BKb3RkelB0S2V0cWp5NFZrME80RlNtVitT?=
- =?utf-8?B?cElOb3FaTkpqZUpoR0d5TzVxNWo3Zlpwc3Ayc2RxbVpzR3VEUGV6QkZIY3JP?=
- =?utf-8?B?dTBuMm5yT254KzlUYVE4MlJQLzFzNkxzVXpBM3AzanZraGtOeVcySWRzeS9T?=
- =?utf-8?B?WGEyYktCWEJkNU5FaGlUblpNZlJtRnhYWkpUZGtxU2l5azVWdWRGZCt2T1lW?=
- =?utf-8?B?MVZJZWF3aGkwbGNGWGxqMmozT3dLN2ZMcTNiOEpKSkM2clBMc1ovdjRrU09H?=
- =?utf-8?B?S25id0NiYmpXeDBKdExjbDBxTEVFSWlSdGFQOGxoeUNlQ21JZElEbVZPeDQ1?=
- =?utf-8?B?YVdNa3NhYXhTYm1iNnBLcVBJQ3grc0taZzdNc2Z6RE93NVdsZUxXTVk4MGlB?=
- =?utf-8?B?UE5KeDFudzQ2aEJVQkRPUmFVWW9YQU40NWZXUFM3aTIwTmdEZW1hNVJpejEr?=
- =?utf-8?B?RXd4QnJTeWM4aXdkWm1qQ29qNXllMGxzL1dlaDJONGJGQ0Q2NlVXZVFRcUpW?=
- =?utf-8?B?UlQxQU5sZVdZNUtZU21heXU1eUJSSVJqWHk4RTQ2QTN4U04yQmVrUEFjWjNq?=
- =?utf-8?B?SnZLQTgvWUNRVkFBYkxlSGhhalZ0YVZGMDFQajZGSjd3cHNQaHFvYzVpUTd5?=
- =?utf-8?B?WjBvVEZ4UVhpNWhrMWpuc3J0cHBrNGlvL0VhNnFpSHVQK2N4cGxOQVY1aEg1?=
- =?utf-8?B?UDUyMlVRU3F0eUdzYlBDaHRteCtjUElKNUVwOFpBdjFXdE9WSGN0eHR6NHMx?=
- =?utf-8?B?Q1NtVTNGS2Ira1FhWk9VRzhRVDgrWEpNMUZpNWtVTHltbzF1UUNpLzhCUFlj?=
- =?utf-8?B?U0tuZG80cVNNWU9vamxQZkpsdmxkRjllc3FrN0JVVmNvRWYyRlEyQ3cyNllK?=
- =?utf-8?Q?5ndI=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S230170AbiKLHz5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Nov 2022 02:55:57 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84291FCD6
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 23:55:55 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id 6so6104876pgm.6
+        for <kvm@vger.kernel.org>; Fri, 11 Nov 2022 23:55:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=y6EtP1Qjdh6B95kwSPzSGW2ptWL2ACP203geTKQqyBY=;
+        b=tdZT8tmtoToheAj7p27omikLKmlhxwjXq2iBy2YxumwEvolVn4mo/cur4uC6uWlmPc
+         lNTpqauJxBBVYMaykKPY7XS7uybQRuZa2o5BmVsWj3puxKpylRSdlv8/pdTFv6aAre0/
+         0+rUZ7p1npgc+8aX/Wc8Ygw2HJE13cBtaluhw4z9F5ysk69vb2lIWl7NR+u7ViVEgREb
+         YbWOwCVFxuqaYb9g3gnVDwb8givvJSaAHBcq6KX9Ex+XmO7KTB5G7VfRmTKptHW7w9th
+         vdP4TwQA24TMIGdJ7jqx2KkH8393ylL2Oh0FMMyodi38I+ILpJ6uwy3daTwldghf8vBw
+         fQ8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y6EtP1Qjdh6B95kwSPzSGW2ptWL2ACP203geTKQqyBY=;
+        b=RSOB4csf0IvuPDpmKZGOYVcttumhJC0GpFq3kO9J+gJ1hGpv72CIvNqkUu4hwQETKT
+         +uxNoimMvvQYwXZ5h/iBKHMT7AD8e+1bEk/gPyVaA2cjkTYhUvPAKNh6Zd3oMU+yI/5j
+         2g4AruWkE4IXrPUgn6e1bYNbpqYWCd5SGSPolwyRcW4OtA4rFfmpEml5aCahRyTPiSfo
+         SPoXMiY65hyrSobh80AOYLpTeY0vzwM6fqARMPLJ2EKH+2Do++aR8uy9iYl9dzqx04Y2
+         q1jVsTROj5BPXuY3siFVAxNoC5ozsWrp35TFE2+4MfcgDmf5s8JEy2nXPO/njaYOsuNk
+         6C4Q==
+X-Gm-Message-State: ANoB5plT200gjCow3bFKmmdbyax5Vi90S4A5JKCP9DylUnKK8wkUSZrP
+        kn7T7oP/grUbB7ZvnBj868up7tpFo9xlwO/T/i8erA==
+X-Google-Smtp-Source: AA0mqf6BbgpCCuOcPrqGy/gyr6/MVU6fFyhe2rCEYLEZczasQW/VPxTjEDNRvOfikCgJ+r+VIXnXt/zM3irAjVm8vpo=
+X-Received: by 2002:a63:4a21:0:b0:46f:d9f:476 with SMTP id x33-20020a634a21000000b0046f0d9f0476mr4509621pga.468.1668239754753;
+ Fri, 11 Nov 2022 23:55:54 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN6PR1101MB2161.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b1748c3-c2d2-4427-628a-08dac4781d5e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Nov 2022 06:35:39.3564
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lSKHMNls36H+dPvUKmLPdBhjiqWlN3N+xijb3A3c51uDXT070lRULi63emjEGINyw/I2vWNcp9iiO1qla7hMDQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6208
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20221107085435.2581641-1-maz@kernel.org> <20221107085435.2581641-3-maz@kernel.org>
+In-Reply-To: <20221107085435.2581641-3-maz@kernel.org>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Fri, 11 Nov 2022 23:55:38 -0800
+Message-ID: <CAAeT=FwNKZhc=a4Jggw-ENL=9G26QTU7OsRbHd2+F+=ZTPt24w@mail.gmail.com>
+Subject: Re: [PATCH v3 02/14] KVM: arm64: PMU: Align chained counter
+ implementation with architecture pseudocode
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiA+ID4gU28gaW5zdGVhZCBvZiBmaXhpbmcgaXQsIHRoZXkgbWFkZSBpdCB3b3JzZSA6LSgNCj4g
-PiA+DQo+ID4gPiBBbmQgbm93IEZSRUQgaXMgYXJndWFibHkgbWFraW5nIGl0IHdvcnNlIGFnYWlu
-LCBhbmQgcGVvcGxlIHdvbmRlcg0KPiA+ID4gd2h5IEkgaGF0ZSB2aXJ0Li4uDQo+ID4NCj4gPiBN
-YXliZSBJIHRha2UgaXQgd3JvbmcsIGJ1dCBGUkVEIGRvZXNuJ3QgbWFrZSBhbnl0aGluZyB3b3Jz
-ZS4gRnJlZA0KPiA+IGVudHJ5IGNvZGUgd2lsbCBjYWxsIGV4dGVybmFsX2ludGVycnVwdCgpIGlt
-bWVkaWF0ZWx5IGZvciBJUlFzLg0KPiANCj4gQnV0IHdoYXQgYWJvdXQgTk1JcywgYWZhaWN0IHRo
-aXMgaXMgYWxsIGhvcnJpYmx5IGJyb2tlbiBmb3IgTk1Jcy4NCg0KTk1JcyBhcmUgTk9UIGhhbmRs
-ZWQgYnkgZXh0ZXJuYWxfaW50ZXJydXB0KCksIHdoaWNoIGlzIGludHJvZHVjZWQgaW4gcGF0Y2gg
-NC4NCg0KVGhlIE5NSSBoYW5kbGluZyBpcyBhZGRlZCB0byBrdm1fdm14X3JlaW5qZWN0X25taV9p
-cnEoKSBpbiBwYXRjaCA1IHB1cmVseSBmb3IgVk1YIG9ubHkuDQoNCj4gDQo+IFNvIHRoZSB3aG9s
-ZSBWTVggdGhpbmcgbGF0Y2hlcyB0aGUgTk1JICh3aGljaCBzdG9wcyBOTUkgcmVjdXJzaW9uKSwg
-cmlnaHQ/DQo+IA0KPiBCdXQgdGhlbiB5b3UgZHJvcCBvdXQgb2Ygbm9pbnN0ciBjb2RlLCB3aGlj
-aCBtZWFucyBhbnkgcmFuZG9tIGV4Y2VwdGlvbiBjYW4NCj4gaGFwcGVuIChrcHJvYmVzICNCUCwg
-aHdfYnJlYWtwb2ludCAjREIsIG9yIGV2ZW4gI1BGIGR1ZSB0byByYW5kb20NCj4gbm9uc2Vuc2Ug
-bGlrZSAqU0FOKS4gVGhpcyBleGNlcHRpb24gd2lsbCBkbyBJUkVUIGFuZCBjbGVhciB0aGUgTk1J
-IGxhdGNoLCBhbGwNCj4gYmVmb3JlIHlvdSBnZXQgdG8gcnVuIGFueSBvZiB0aGUgTk1JIGNvZGUu
-DQo+IA0KPiBOb3RlIGhvdyB0aGUgbm9ybWFsIE5NSSBjb2RlIGlzIHZlcnkgY2FyZWZ1bCB0byBj
-bGVhciBEUjcgYW5kIGJvdGgga3Byb2Jlcw0KPiBhbmQgaHdfYnJlYWtwb2ludCBrbm93IG5vdCB0
-byBhY2NlcHQgbm9pbnN0ciBjb2RlIGFzIHRhcmdldHMuDQo+IA0KPiBZb3UgdGhyZXcgYWxsIHRo
-YXQgb3V0IHRoZSB3aW5kb3cuDQo+IA0KPiBBbHNvLCBOTUkgaXMgSVNULCBhbmQgd2l0aCBGUkVE
-IGl0IHdpbGwgcnVuIG9uIGEgZGlmZmVyZW50IHN0YWNrIGFzIHdlbGwsIGRpcmVjdGx5DQo+IGNh
-bGxpbmcgZXh0ZXJuYWxfaW50ZXJydXB0KCkgZG9lc24ndCBob25vdXIgdGhhdCBlaXRoZXIuDQo+
-IA0KPiA+IFlvdSByZWFsbHkgcmVhbGx5IGRvbid0IGxpa2UgdGhlIGNvbnRleHQgaG93IFZNWCBk
-aXNwYXRjaGVzIE5NSS9JUlFzDQo+ID4gKHdoaWNoIGhhcyBiZWVuIHRoZXJlIGZvciBhIGxvbmcg
-dGltZSksIHJpZ2h0Pw0KPiANCj4gSSByZWFsbHkgcmVhbGx5IGhhdGUgdGhpcyB3aXRoIGEgcGFz
-c2lvbi4gVGhlIGZhY3QgdGhhdCBpdCdzIGJlZW4gdGhpcyB3YXkgaXMgbm8NCj4ganVzdGlmaWNh
-dGlvbiBmb3Iga2VlcGluZyBpdC4gQ3JhcCBpcyBjcmFwLg0KPiANCj4gSW50ZWwgc2hvdWxkIGhh
-dmUgdGFrZW4gYW4gZXhhbXBsZSBvZiBTVk0gaW4gdGhpcyByZWdhcmQsIGFuZCBub3QgZG91Ymxl
-ZA0KPiBkb3duIGFuZCBleHRlbmRlZCB0aGlzIE5NSSBob2xlIHRvIHJlZ3VsYXIgSVJRcy4gVGhl
-c2UgYXJlIGV4YWN0bHkgdGhlIGtpbmQgb2YNCj4gZXhjZXB0aW9uIGRlbGl2ZXJ5IHRyYWlud3Jl
-Y2tzIEZSRUQgaXMgc3VwcG9zZWQgdG8gZml4LCBleGNlcHQgaW4gdGhpcyBjYXNlIGl0DQo+IGFw
-cGVhcnMgaXQgZG9lc24ndCA6Lw0K
+Hi Marc,
+
+On Mon, Nov 7, 2022 at 12:54 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Ricardo recently pointed out that the PMU chained counter emulation
+> in KVM wasn't quite behaving like the one on actual hardware, in
+> the sense that a chained counter would expose an overflow on
+> both halves of a chained counter, while KVM would only expose the
+> overflow on the top half.
+>
+> The difference is subtle, but significant. What does the architecture
+> say (DDI0087 H.a):
+>
+> - Up to PMUv3p4, all counters but the cycle counter are 32bit
+>
+> - A 32bit counter that overflows generates a CHAIN event on the
+>   adjacent counter after exposing its own overflow status
+>
+> - The CHAIN event is accounted if the counter is correctly
+>   configured (CHAIN event selected and counter enabled)
+>
+> This all means that our current implementation (which uses 64bit
+> perf events) prevents us from emulating this overflow on the lower half.
+>
+> How to fix this? By implementing the above, to the letter.
+>
+> This largly results in code deletion, removing the notions of
+> "counter pair", "chained counters", and "canonical counter".
+> The code is further restructured to make the CHAIN handling similar
+> to SWINC, as the two are now extremely similar in behaviour.
+>
+> Reported-by: Ricardo Koller <ricarkol@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 312 ++++++++++----------------------------
+>  include/kvm/arm_pmu.h     |   2 -
+>  2 files changed, 83 insertions(+), 231 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 0003c7d37533..a38b3127f649 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -15,16 +15,14 @@
+>  #include <kvm/arm_pmu.h>
+>  #include <kvm/arm_vgic.h>
+>
+> +#define PERF_ATTR_CFG1_COUNTER_64BIT   BIT(0)
+
+Although this isn't the new code (but just a name change),
+wouldn't it be nicer to have armv8pmu_event_is_64bit()
+(in arch/arm64/kernel/perf_event.c) use the macro as well ?
+
+> +
+>  DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
+>
+>  static LIST_HEAD(arm_pmus);
+>  static DEFINE_MUTEX(arm_pmus_lock);
+>
+>  static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
+> -static void kvm_pmu_update_pmc_chained(struct kvm_vcpu *vcpu, u64 select_idx);
+> -static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
+> -
+> -#define PERF_ATTR_CFG1_KVM_PMU_CHAINED 0x1
+>
+>  static u32 kvm_pmu_event_mask(struct kvm *kvm)
+>  {
+> @@ -57,6 +55,11 @@ static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
+>                 __vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
+>  }
+>
+> +static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
+> +{
+> +       return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX);
+> +}
+> +
+>  static struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
+>  {
+>         struct kvm_pmu *pmu;
+> @@ -69,91 +72,22 @@ static struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
+>  }
+>
+>  /**
+> - * kvm_pmu_pmc_is_chained - determine if the pmc is chained
+> - * @pmc: The PMU counter pointer
+> - */
+> -static bool kvm_pmu_pmc_is_chained(struct kvm_pmc *pmc)
+> -{
+> -       struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+> -
+> -       return test_bit(pmc->idx >> 1, vcpu->arch.pmu.chained);
+> -}
+> -
+> -/**
+> - * kvm_pmu_idx_is_high_counter - determine if select_idx is a high/low counter
+> - * @select_idx: The counter index
+> - */
+> -static bool kvm_pmu_idx_is_high_counter(u64 select_idx)
+> -{
+> -       return select_idx & 0x1;
+> -}
+> -
+> -/**
+> - * kvm_pmu_get_canonical_pmc - obtain the canonical pmc
+> - * @pmc: The PMU counter pointer
+> - *
+> - * When a pair of PMCs are chained together we use the low counter (canonical)
+> - * to hold the underlying perf event.
+> - */
+> -static struct kvm_pmc *kvm_pmu_get_canonical_pmc(struct kvm_pmc *pmc)
+> -{
+> -       if (kvm_pmu_pmc_is_chained(pmc) &&
+> -           kvm_pmu_idx_is_high_counter(pmc->idx))
+> -               return pmc - 1;
+> -
+> -       return pmc;
+> -}
+> -static struct kvm_pmc *kvm_pmu_get_alternate_pmc(struct kvm_pmc *pmc)
+> -{
+> -       if (kvm_pmu_idx_is_high_counter(pmc->idx))
+> -               return pmc - 1;
+> -       else
+> -               return pmc + 1;
+> -}
+> -
+> -/**
+> - * kvm_pmu_idx_has_chain_evtype - determine if the event type is chain
+> + * kvm_pmu_get_counter_value - get PMU counter value
+>   * @vcpu: The vcpu pointer
+>   * @select_idx: The counter index
+>   */
+> -static bool kvm_pmu_idx_has_chain_evtype(struct kvm_vcpu *vcpu, u64 select_idx)
+> -{
+> -       u64 eventsel, reg;
+> -
+> -       select_idx |= 0x1;
+> -
+> -       if (select_idx == ARMV8_PMU_CYCLE_IDX)
+> -               return false;
+> -
+> -       reg = PMEVTYPER0_EL0 + select_idx;
+> -       eventsel = __vcpu_sys_reg(vcpu, reg) & kvm_pmu_event_mask(vcpu->kvm);
+> -
+> -       return eventsel == ARMV8_PMUV3_PERFCTR_CHAIN;
+> -}
+> -
+> -/**
+> - * kvm_pmu_get_pair_counter_value - get PMU counter value
+> - * @vcpu: The vcpu pointer
+> - * @pmc: The PMU counter pointer
+> - */
+> -static u64 kvm_pmu_get_pair_counter_value(struct kvm_vcpu *vcpu,
+> -                                         struct kvm_pmc *pmc)
+> +u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+>  {
+> -       u64 counter, counter_high, reg, enabled, running;
+> -
+> -       if (kvm_pmu_pmc_is_chained(pmc)) {
+> -               pmc = kvm_pmu_get_canonical_pmc(pmc);
+> -               reg = PMEVCNTR0_EL0 + pmc->idx;
+> +       u64 counter, reg, enabled, running;
+> +       struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +       struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+>
+> -               counter = __vcpu_sys_reg(vcpu, reg);
+> -               counter_high = __vcpu_sys_reg(vcpu, reg + 1);
+> +       if (!kvm_vcpu_has_pmu(vcpu))
+> +               return 0;
+>
+> -               counter = lower_32_bits(counter) | (counter_high << 32);
+> -       } else {
+> -               reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+> -                     ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
+> -               counter = __vcpu_sys_reg(vcpu, reg);
+> -       }
+> +       reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+> +               ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
+> +       counter = __vcpu_sys_reg(vcpu, reg);
+>
+>         /*
+>          * The real counter value is equal to the value of counter register plus
+> @@ -163,29 +97,7 @@ static u64 kvm_pmu_get_pair_counter_value(struct kvm_vcpu *vcpu,
+>                 counter += perf_event_read_value(pmc->perf_event, &enabled,
+>                                                  &running);
+>
+> -       return counter;
+> -}
+> -
+> -/**
+> - * kvm_pmu_get_counter_value - get PMU counter value
+> - * @vcpu: The vcpu pointer
+> - * @select_idx: The counter index
+> - */
+> -u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+> -{
+> -       u64 counter;
+> -       struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> -       struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> -
+> -       if (!kvm_vcpu_has_pmu(vcpu))
+> -               return 0;
+> -
+> -       counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+> -
+> -       if (kvm_pmu_pmc_is_chained(pmc) &&
+> -           kvm_pmu_idx_is_high_counter(select_idx))
+> -               counter = upper_32_bits(counter);
+> -       else if (select_idx != ARMV8_PMU_CYCLE_IDX)
+> +       if (select_idx != ARMV8_PMU_CYCLE_IDX)
+
+Nit:Using 'pmc->idx' instead of 'select_idx' appears to be more consistent.
+
+
+>                 counter = lower_32_bits(counter);
+>
+>         return counter;
+> @@ -218,7 +130,6 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+>   */
+>  static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
+>  {
+> -       pmc = kvm_pmu_get_canonical_pmc(pmc);
+>         if (pmc->perf_event) {
+>                 perf_event_disable(pmc->perf_event);
+>                 perf_event_release_kernel(pmc->perf_event);
+> @@ -236,11 +147,10 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+>  {
+>         u64 counter, reg, val;
+>
+> -       pmc = kvm_pmu_get_canonical_pmc(pmc);
+>         if (!pmc->perf_event)
+>                 return;
+>
+> -       counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+> +       counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
+>
+>         if (pmc->idx == ARMV8_PMU_CYCLE_IDX) {
+>                 reg = PMCCNTR_EL0;
+> @@ -252,9 +162,6 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+>
+>         __vcpu_sys_reg(vcpu, reg) = val;
+>
+> -       if (kvm_pmu_pmc_is_chained(pmc))
+> -               __vcpu_sys_reg(vcpu, reg + 1) = upper_32_bits(counter);
+> -
+>         kvm_pmu_release_perf_event(pmc);
+>  }
+>
+> @@ -285,8 +192,6 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
+>
+>         for_each_set_bit(i, &mask, 32)
+>                 kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
+> -
+> -       bitmap_zero(vcpu->arch.pmu.chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
+>  }
+>
+>  /**
+> @@ -340,11 +245,8 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>
+>                 pmc = &pmu->pmc[i];
+>
+> -               /* A change in the enable state may affect the chain state */
+> -               kvm_pmu_update_pmc_chained(vcpu, i);
+>                 kvm_pmu_create_perf_event(vcpu, i);
+>
+> -               /* At this point, pmc must be the canonical */
+>                 if (pmc->perf_event) {
+>                         perf_event_enable(pmc->perf_event);
+>                         if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
+> @@ -375,11 +277,8 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>
+>                 pmc = &pmu->pmc[i];
+>
+> -               /* A change in the enable state may affect the chain state */
+> -               kvm_pmu_update_pmc_chained(vcpu, i);
+>                 kvm_pmu_create_perf_event(vcpu, i);
+
+Do we still need to call kvm_pmu_update_pmc_chained() here even
+with this patch ? (I would think the reason why the function was
+called here was because the chain state change could affect the
+backed perf event attribute before).
+I have the same comment for kvm_pmu_enable_counter_mask().
+
+
+>
+> -               /* At this point, pmc must be the canonical */
+>                 if (pmc->perf_event)
+>                         perf_event_disable(pmc->perf_event);
+>         }
+> @@ -484,6 +383,48 @@ static void kvm_pmu_perf_overflow_notify_vcpu(struct irq_work *work)
+>         kvm_vcpu_kick(vcpu);
+>  }
+>
+> +/*
+> + * Perform an increment on any of the counters described in @mask,
+> + * generating the overflow if required, and propagate it as a chained
+> + * event if possible.
+> + */
+> +static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
+> +                                     unsigned long mask, u32 event)
+> +{
+> +       int i;
+> +
+> +       if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
+> +               return;
+> +
+> +       /* Weed out disabled counters */
+> +       mask &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+> +
+> +       for_each_set_bit(i, &mask, ARMV8_PMU_CYCLE_IDX) {
+> +               u64 type, reg;
+> +
+> +               /* Filter on event type */
+> +               type = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
+> +               type &= kvm_pmu_event_mask(vcpu->kvm);
+> +               if (type != event)
+> +                       continue;
+> +
+> +               /* Increment this counter */
+> +               reg = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
+> +               reg = lower_32_bits(reg);
+> +               __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
+> +
+> +               if (reg) /* No overflow? move on */
+> +                       continue;
+> +
+> +               /* Mark overflow */
+> +               __vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(i);
+> +
+> +               if (kvm_pmu_counter_can_chain(vcpu, i))
+> +                       kvm_pmu_counter_increment(vcpu, BIT(i + 1),
+> +                                                 ARMV8_PMUV3_PERFCTR_CHAIN);
+> +       }
+> +}
+> +
+>  /**
+>   * When the perf event overflows, set the overflow status and inform the vcpu.
+>   */
+> @@ -514,6 +455,10 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+>
+>         __vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(idx);
+>
+> +       if (kvm_pmu_counter_can_chain(vcpu, idx))
+> +               kvm_pmu_counter_increment(vcpu, BIT(idx + 1),
+> +                                         ARMV8_PMUV3_PERFCTR_CHAIN);
+> +
+>         if (kvm_pmu_overflow_status(vcpu)) {
+>                 kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+>
+> @@ -533,50 +478,7 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+>   */
+>  void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
+>  {
+> -       struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> -       int i;
+> -
+> -       if (!kvm_vcpu_has_pmu(vcpu))
+> -               return;
+> -
+> -       if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
+> -               return;
+> -
+> -       /* Weed out disabled counters */
+> -       val &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+> -
+> -       for (i = 0; i < ARMV8_PMU_CYCLE_IDX; i++) {
+> -               u64 type, reg;
+> -
+> -               if (!(val & BIT(i)))
+> -                       continue;
+> -
+> -               /* PMSWINC only applies to ... SW_INC! */
+> -               type = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
+> -               type &= kvm_pmu_event_mask(vcpu->kvm);
+> -               if (type != ARMV8_PMUV3_PERFCTR_SW_INCR)
+> -                       continue;
+> -
+> -               /* increment this even SW_INC counter */
+> -               reg = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
+> -               reg = lower_32_bits(reg);
+> -               __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
+> -
+> -               if (reg) /* no overflow on the low part */
+> -                       continue;
+> -
+> -               if (kvm_pmu_pmc_is_chained(&pmu->pmc[i])) {
+> -                       /* increment the high counter */
+> -                       reg = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i + 1) + 1;
+> -                       reg = lower_32_bits(reg);
+> -                       __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i + 1) = reg;
+> -                       if (!reg) /* mark overflow on the high counter */
+> -                               __vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(i + 1);
+> -               } else {
+> -                       /* mark overflow on low counter */
+> -                       __vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(i);
+> -               }
+> -       }
+> +       kvm_pmu_counter_increment(vcpu, val, ARMV8_PMUV3_PERFCTR_SW_INCR);
+>  }
+>
+>  /**
+> @@ -625,18 +527,11 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>  {
+>         struct arm_pmu *arm_pmu = vcpu->kvm->arch.arm_pmu;
+>         struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> -       struct kvm_pmc *pmc;
+> +       struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+>         struct perf_event *event;
+>         struct perf_event_attr attr;
+>         u64 eventsel, counter, reg, data;
+>
+> -       /*
+> -        * For chained counters the event type and filtering attributes are
+> -        * obtained from the low/even counter. We also use this counter to
+> -        * determine if the event is enabled/disabled.
+> -        */
+> -       pmc = kvm_pmu_get_canonical_pmc(&pmu->pmc[select_idx]);
+> -
+>         reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+>               ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + pmc->idx;
+>         data = __vcpu_sys_reg(vcpu, reg);
+> @@ -647,8 +542,12 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>         else
+>                 eventsel = data & kvm_pmu_event_mask(vcpu->kvm);
+>
+> -       /* Software increment event doesn't need to be backed by a perf event */
+> -       if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR)
+> +       /*
+> +        * Neither SW increment nor chained events need to be backed
+> +        * by a perf event.
+> +        */
+> +       if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR ||
+> +           eventsel == ARMV8_PMUV3_PERFCTR_CHAIN)
+>                 return;
+>
+>         /*
+> @@ -670,30 +569,21 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>         attr.exclude_host = 1; /* Don't count host events */
+>         attr.config = eventsel;
+>
+> -       counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+> +       counter = kvm_pmu_get_counter_value(vcpu, select_idx);
+
+Nit: Since all existing codes in the function use pmc->idx,
+I would think it would be better to use 'pmc->idx' instead of
+'select_idx' consistently.
+
+
+> -       if (kvm_pmu_pmc_is_chained(pmc)) {
+> -               /**
+> -                * The initial sample period (overflow count) of an event. For
+> -                * chained counters we only support overflow interrupts on the
+> -                * high counter.
+> -                */
+> +       /*
+> +        * If counting with a 64bit counter, advertise it to the perf
+> +        * code, carefully dealing with the initial sample period.
+> +        */
+> +       if (kvm_pmu_idx_is_64bit(vcpu, select_idx)) {
+
+I have the same comments on this as above.
+
+Thank you,
+Reiji
+
+
+
+
+> +               attr.config1 |= PERF_ATTR_CFG1_COUNTER_64BIT;
+>                 attr.sample_period = (-counter) & GENMASK(63, 0);
+> -               attr.config1 |= PERF_ATTR_CFG1_KVM_PMU_CHAINED;
+> -
+> -               event = perf_event_create_kernel_counter(&attr, -1, current,
+> -                                                        kvm_pmu_perf_overflow,
+> -                                                        pmc + 1);
+>         } else {
+> -               /* The initial sample period (overflow count) of an event. */
+> -               if (kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+> -                       attr.sample_period = (-counter) & GENMASK(63, 0);
+> -               else
+> -                       attr.sample_period = (-counter) & GENMASK(31, 0);
+> +               attr.sample_period = (-counter) & GENMASK(31, 0);
+> +       }
+>
+> -               event = perf_event_create_kernel_counter(&attr, -1, current,
+> +       event = perf_event_create_kernel_counter(&attr, -1, current,
+>                                                  kvm_pmu_perf_overflow, pmc);
+> -       }
+>
+>         if (IS_ERR(event)) {
+>                 pr_err_once("kvm: pmu event creation failed %ld\n",
+> @@ -704,41 +594,6 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>         pmc->perf_event = event;
+>  }
+>
+> -/**
+> - * kvm_pmu_update_pmc_chained - update chained bitmap
+> - * @vcpu: The vcpu pointer
+> - * @select_idx: The number of selected counter
+> - *
+> - * Update the chained bitmap based on the event type written in the
+> - * typer register and the enable state of the odd register.
+> - */
+> -static void kvm_pmu_update_pmc_chained(struct kvm_vcpu *vcpu, u64 select_idx)
+> -{
+> -       struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> -       struct kvm_pmc *pmc = &pmu->pmc[select_idx], *canonical_pmc;
+> -       bool new_state, old_state;
+> -
+> -       old_state = kvm_pmu_pmc_is_chained(pmc);
+> -       new_state = kvm_pmu_idx_has_chain_evtype(vcpu, pmc->idx) &&
+> -                   kvm_pmu_counter_is_enabled(vcpu, pmc->idx | 0x1);
+> -
+> -       if (old_state == new_state)
+> -               return;
+> -
+> -       canonical_pmc = kvm_pmu_get_canonical_pmc(pmc);
+> -       kvm_pmu_stop_counter(vcpu, canonical_pmc);
+> -       if (new_state) {
+> -               /*
+> -                * During promotion from !chained to chained we must ensure
+> -                * the adjacent counter is stopped and its event destroyed
+> -                */
+> -               kvm_pmu_stop_counter(vcpu, kvm_pmu_get_alternate_pmc(pmc));
+> -               set_bit(pmc->idx >> 1, vcpu->arch.pmu.chained);
+> -               return;
+> -       }
+> -       clear_bit(pmc->idx >> 1, vcpu->arch.pmu.chained);
+> -}
+> -
+>  /**
+>   * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
+>   * @vcpu: The vcpu pointer
+> @@ -766,7 +621,6 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+>
+>         __vcpu_sys_reg(vcpu, reg) = data & mask;
+>
+> -       kvm_pmu_update_pmc_chained(vcpu, select_idx);
+>         kvm_pmu_create_perf_event(vcpu, select_idx);
+>  }
+>
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index c0b868ce6a8f..96b192139a23 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -11,7 +11,6 @@
+>  #include <asm/perf_event.h>
+>
+>  #define ARMV8_PMU_CYCLE_IDX            (ARMV8_PMU_MAX_COUNTERS - 1)
+> -#define ARMV8_PMU_MAX_COUNTER_PAIRS    ((ARMV8_PMU_MAX_COUNTERS + 1) >> 1)
+>
+>  #ifdef CONFIG_HW_PERF_EVENTS
+>
+> @@ -29,7 +28,6 @@ struct kvm_pmu {
+>         struct irq_work overflow_work;
+>         struct kvm_pmu_events events;
+>         struct kvm_pmc pmc[ARMV8_PMU_MAX_COUNTERS];
+> -       DECLARE_BITMAP(chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
+>         int irq_num;
+>         bool created;
+>         bool irq_level;
+> --
+> 2.34.1
+>
