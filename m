@@ -2,105 +2,259 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CAD4626938
-	for <lists+kvm@lfdr.de>; Sat, 12 Nov 2022 12:41:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D472F626961
+	for <lists+kvm@lfdr.de>; Sat, 12 Nov 2022 13:40:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234861AbiKLLlU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Nov 2022 06:41:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40952 "EHLO
+        id S234710AbiKLMkR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Nov 2022 07:40:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230365AbiKLLlT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Nov 2022 06:41:19 -0500
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47236634B;
-        Sat, 12 Nov 2022 03:41:13 -0800 (PST)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id D565D5FD8A;
-        Sat, 12 Nov 2022 14:41:09 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1668253269;
-        bh=tEC8qWPcYzh5C+P7qHhW3cPWbhJ7pLhopk4AV/Opjww=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=bA9sARAhl9oZo6driejGSDil7LBmiT1wZ0FRpoJ52dicXUZGVG5cbj5cKUbCMSo+I
-         LPW3Ua96wS5wZ2O2DNyF14LdQdtvfj5DGf2p9A2TK184HH402JsJcSLx/oopM1EHXb
-         2nc/0ZB+cTepqejzo3qklvcM1LakFzTsbFwj8SvDAdFt3VMF7U+oQdRXOGRev0iFZM
-         YaQSIy/S41cu41Z8oLyLVlOaG9VeuhqmF6R1y1T2F9tfDChQORdcFgQhG4hpolKEcR
-         paxHyhYfyS0CHz2HnLL1cQ0NHZSksWV4AL3SsEXrixb4QpjBVgEw4rwgjHv/hcA2vA
-         vQ4EaA7MsbpUw==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Sat, 12 Nov 2022 14:41:05 +0300 (MSK)
-From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To:     Bobby Eshleman <bobbyeshleman@gmail.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-CC:     Krasnov Arseniy <oxffffaa@gmail.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Bobby Eshleman <bobby.eshleman@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "edumazet@google.com" <edumazet@google.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        kernel <kernel@sberdevices.ru>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [RFC PATCH v3 00/11] virtio/vsock: experimental zerocopy receive
-Thread-Topic: [RFC PATCH v3 00/11] virtio/vsock: experimental zerocopy receive
-Thread-Index: AQHY8hatKKTuchPoekmnGA3HAR0Si645kb6AgAB0yICAAPn8gA==
-Date:   Sat, 12 Nov 2022 11:40:59 +0000
-Message-ID: <3de0302f-bd4f-5df1-9de5-cbc3b3dd94f8@sberdevices.ru>
-References: <f60d7e94-795d-06fd-0321-6972533700c5@sberdevices.ru>
- <20221111134715.qxgu7t4c7jse24hp@sgarzare-redhat> <Y260WSJKJXtaJQZi@bullseye>
-In-Reply-To: <Y260WSJKJXtaJQZi@bullseye>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3C62CF393163484A89D015B7E010F57A@sberdevices.ru>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/11/12 07:44:00 #20572870
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232342AbiKLMkP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Nov 2022 07:40:15 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78D4711152
+        for <kvm@vger.kernel.org>; Sat, 12 Nov 2022 04:40:14 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 25F06B80315
+        for <kvm@vger.kernel.org>; Sat, 12 Nov 2022 12:40:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FCAEC433D6;
+        Sat, 12 Nov 2022 12:40:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668256811;
+        bh=BtDS21E0zXMKBuDPAchV3ZZrdiDGkpu1m8zPgSJAf1c=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=FRxvrMJWQo4ZPZpg9CBD0FLXBSRyE2c4HAQDaNgYKhBaEwOvFBQ/Q5Va7kVy71OXV
+         JX5gcBKcw0l4uuZ+33qPzQb41ftWQfH9pmkw2MQXdn7wIsBnd4ZXJMnT1Lw5MsEhTN
+         a0D4R3mbmae934cO1CHlzMPT8XrdrteteuCEbzCXIeBRltNXxIPivyZZ6UPg7vqdGP
+         aDucdzTF762yA+JgeZXYQD7aY1mN3gDSU/vseigSh5PtrNpxQN9S9p0MCybmhhtrd3
+         se9EJ8c9Yf8dLm9oA+Sn6F3PEfnQaHs5bZRagVJCqQtR6X+VnSyrHlaZA/CZxN+CFv
+         VznRP/N0bxbQw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1otpnt-005bqs-7w;
+        Sat, 12 Nov 2022 12:40:09 +0000
+Date:   Sat, 12 Nov 2022 12:39:47 +0000
+Message-ID: <87edu8uz1o.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v3 02/14] KVM: arm64: PMU: Align chained counter implementation with architecture pseudocode
+In-Reply-To: <CAAeT=FwNKZhc=a4Jggw-ENL=9G26QTU7OsRbHd2+F+=ZTPt24w@mail.gmail.com>
+References: <20221107085435.2581641-1-maz@kernel.org>
+        <20221107085435.2581641-3-maz@kernel.org>
+        <CAAeT=FwNKZhc=a4Jggw-ENL=9G26QTU7OsRbHd2+F+=ZTPt24w@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMTEuMTEuMjAyMiAyMzo0NSwgQm9iYnkgRXNobGVtYW4gd3JvdGU6DQo+IE9uIEZyaSwgTm92
-IDExLCAyMDIyIGF0IDAyOjQ3OjE1UE0gKzAxMDAsIFN0ZWZhbm8gR2FyemFyZWxsYSB3cm90ZToN
-Cj4+IEhpIEFyc2VuaXksDQo+PiBtYXliZSB3ZSBzaG91bGQgc3RhcnQgcmViYXNpbmcgdGhpcyBz
-ZXJpZXMgb24gdGhlIG5ldyBzdXBwb3J0IGZvciBza2J1ZmY6IGh0dHBzOi8vbG9yZS5rZXJuZWwu
-b3JnL2xrbWwvMjAyMjExMTAxNzE3MjMuMjQyNjMtMS1ib2JieS5lc2hsZW1hbkBieXRlZGFuY2Uu
-Y29tLw0KPj4NCj4+IENDaW5nIEJvYmJ5IHRvIHNlZSBpZiBpdCdzIGVhc3kgdG8gaW50ZWdyYXRl
-IHNpbmNlIHlvdSdyZSBib3RoIGNoYW5naW5nIHRoZQ0KPj4gcGFja2V0IGFsbG9jYXRpb24uDQo+
-Pg0KPiANCj4gVGhpcyBsb29rcyBsaWtlIHRoZSBwYWNrZXQgYWxsb2NhdGlvbiBjYW4gYmUgbWFy
-cmllZCBzb21ld2hhdCBuaWNlbHkgaW4NCj4gc2luY2UgU0tCcyBtYXkgYmUgYnVpbHQgZnJvbSBw
-YWdlcyB1c2luZyBidWlsZF9za2IoKS4gVGhlcmUgbWF5IGJlIHNvbWUNCj4gdHdlYWtpbmcgbmVj
-ZXNzYXJ5IHRob3VnaCwgc2luY2UgaXQgYWxzbyB1c2VzIHRoZSB0YWlsIGNodW5rIG9mIHRoZSBw
-YWdlDQo+IHRvIGhvbGQgc3RydWN0IHNrYl9zaGFyZWRfaW5mbyBJSVJDLg0KPiANCj4gSSBsZWZ0
-IHNvbWUgY29tbWVudHMgb24gdGhlIHBhdGNoIHdpdGggdGhlIGFsbG9jYXRvciBpbiBpdC4NCkhl
-bGxvIEJvYmJ5LA0KDQp0aGFua3MgZm9yIHJldmlldy4gSSdsbCByZWJhc2UgbXkgcGF0Y2hzZXQg
-b24gWW91ciBza2J1ZmYgc3VwcG9ydC4NCj4gDQo+Pg0KPj4gTWF5YmUgdG8gYXZvaWQgaGF2aW5n
-IHRvIHJlYmFzZSBldmVyeXRoaW5nIGxhdGVyLCBpdCdzIGFscmVhZHkgd29ydGh3aGlsZSB0bw0K
-Pj4gc3RhcnQgdXNpbmcgQm9iYnkncyBwYXRjaCB3aXRoIHNrYnVmZi4NCj4+DQo+IA0KPiBJJ2xs
-IGJlIHdhaXRpbmcgdW50aWwgTW9uZGF5IHRvIHNlZSBpZiBzb21lIG1vcmUgZmVlZGJhY2sgY29t
-ZXMgaW4NCj4gYmVmb3JlIHNlbmRpbmcgb3V0IHY0LCBzbyBJIGV4cGVjdCB2NCBlYXJseSBuZXh0
-IHdlZWssIEZXSVcuDQpPbmUgcmVxdWVzdCBmcm9tIG1lLCBjb3VsZCBZb3UgcGxlYXNlIENDIG1l
-IGZvciBuZXh0IHZlcnNpb25zIG9mDQpZb3VyIHBhdGNoc2V0LCBiZWNhdXNlOg0KMSkgSSdsbCBh
-bHdheXMgaGF2ZSBsYXRlc3QgdmVyc2lvbiBvZiBza2J1ZmYgc3VwcG9ydC4NCjIpIEknbGwgc2Vl
-IHJldmlldyBwcm9jZXNzIGFsc28uDQoNCk15IGNvbnRhY3RzOg0Kb3hmZmZmYWFAZ21haWwuY29t
-DQpBVktyYXNub3ZAc2JlcmRldmljZXMucnUNCg0KVGhhbmtzLCBBcnNlbml5DQoNCj4gDQo+IEJl
-c3QsDQo+IEJvYmJ5DQoNCg==
+Hi Reiji,
+
+On Sat, 12 Nov 2022 07:55:38 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Mon, Nov 7, 2022 at 12:54 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Ricardo recently pointed out that the PMU chained counter emulation
+> > in KVM wasn't quite behaving like the one on actual hardware, in
+> > the sense that a chained counter would expose an overflow on
+> > both halves of a chained counter, while KVM would only expose the
+> > overflow on the top half.
+> >
+> > The difference is subtle, but significant. What does the architecture
+> > say (DDI0087 H.a):
+> >
+> > - Up to PMUv3p4, all counters but the cycle counter are 32bit
+> >
+> > - A 32bit counter that overflows generates a CHAIN event on the
+> >   adjacent counter after exposing its own overflow status
+> >
+> > - The CHAIN event is accounted if the counter is correctly
+> >   configured (CHAIN event selected and counter enabled)
+> >
+> > This all means that our current implementation (which uses 64bit
+> > perf events) prevents us from emulating this overflow on the lower half.
+> >
+> > How to fix this? By implementing the above, to the letter.
+> >
+> > This largly results in code deletion, removing the notions of
+> > "counter pair", "chained counters", and "canonical counter".
+> > The code is further restructured to make the CHAIN handling similar
+> > to SWINC, as the two are now extremely similar in behaviour.
+> >
+> > Reported-by: Ricardo Koller <ricarkol@google.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/pmu-emul.c | 312 ++++++++++----------------------------
+> >  include/kvm/arm_pmu.h     |   2 -
+> >  2 files changed, 83 insertions(+), 231 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index 0003c7d37533..a38b3127f649 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
+> > @@ -15,16 +15,14 @@
+> >  #include <kvm/arm_pmu.h>
+> >  #include <kvm/arm_vgic.h>
+> >
+> > +#define PERF_ATTR_CFG1_COUNTER_64BIT   BIT(0)
+> 
+> Although this isn't the new code (but just a name change),
+> wouldn't it be nicer to have armv8pmu_event_is_64bit()
+> (in arch/arm64/kernel/perf_event.c) use the macro as well ?
+
+We tried that in the past, and the amount of churn wasn't really worth
+it. I'm happy to revisit this in the future, but probably as a
+separate patch.
+
+[...]
+
+> > @@ -163,29 +97,7 @@ static u64 kvm_pmu_get_pair_counter_value(struct kvm_vcpu *vcpu,
+> >                 counter += perf_event_read_value(pmc->perf_event, &enabled,
+> >                                                  &running);
+> >
+> > -       return counter;
+> > -}
+> > -
+> > -/**
+> > - * kvm_pmu_get_counter_value - get PMU counter value
+> > - * @vcpu: The vcpu pointer
+> > - * @select_idx: The counter index
+> > - */
+> > -u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+> > -{
+> > -       u64 counter;
+> > -       struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> > -       struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> > -
+> > -       if (!kvm_vcpu_has_pmu(vcpu))
+> > -               return 0;
+> > -
+> > -       counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+> > -
+> > -       if (kvm_pmu_pmc_is_chained(pmc) &&
+> > -           kvm_pmu_idx_is_high_counter(select_idx))
+> > -               counter = upper_32_bits(counter);
+> > -       else if (select_idx != ARMV8_PMU_CYCLE_IDX)
+> > +       if (select_idx != ARMV8_PMU_CYCLE_IDX)
+> 
+> Nit:Using 'pmc->idx' instead of 'select_idx' appears to be more consistent.
+
+Well, this is the exact opposite of Oliver's comment last time. I
+initially used pmc->idx, but it made the diff somehow larger and also
+more difficult to understand what changed.
+
+In the end, I'd rather rework the whole file to consistently use
+vcpu+idx or pmc, as the mixed use of both is annoying. And that's
+probably a cleanup patch for later.
+
+[...]
+
+> > @@ -340,11 +245,8 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+> >
+> >                 pmc = &pmu->pmc[i];
+> >
+> > -               /* A change in the enable state may affect the chain state */
+> > -               kvm_pmu_update_pmc_chained(vcpu, i);
+> >                 kvm_pmu_create_perf_event(vcpu, i);
+> >
+> > -               /* At this point, pmc must be the canonical */
+> >                 if (pmc->perf_event) {
+> >                         perf_event_enable(pmc->perf_event);
+> >                         if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
+> > @@ -375,11 +277,8 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+> >
+> >                 pmc = &pmu->pmc[i];
+> >
+> > -               /* A change in the enable state may affect the chain state */
+> > -               kvm_pmu_update_pmc_chained(vcpu, i);
+> >                 kvm_pmu_create_perf_event(vcpu, i);
+> 
+> Do we still need to call kvm_pmu_update_pmc_chained() here even
+> with this patch ? (I would think the reason why the function was
+> called here was because the chain state change could affect the
+> backed perf event attribute before).
+> I have the same comment for kvm_pmu_enable_counter_mask().
+
+Do you mean kvm_pmu_create_perf_event() instead? I think we can drop
+the one on disable. But the one on enable is required, as we need to
+be able to start counting an event even if the guest hasn't programmed
+the event number (unlikely, but allowed by the architecture). It can
+be made conditional though.
+
+I have the following fix queued:
+
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 26293f842b0f..b7a5f75d008d 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -277,9 +277,9 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+ 
+ 		pmc = &pmu->pmc[i];
+ 
+-		kvm_pmu_create_perf_event(vcpu, i);
+-
+-		if (pmc->perf_event) {
++		if (!pmc->perf_event) {
++			kvm_pmu_create_perf_event(vcpu, i);
++		} else {
+ 			perf_event_enable(pmc->perf_event);
+ 			if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
+ 				kvm_debug("fail to enable perf event\n");
+@@ -309,8 +309,6 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+ 
+ 		pmc = &pmu->pmc[i];
+ 
+-		kvm_pmu_create_perf_event(vcpu, i);
+-
+ 		if (pmc->perf_event)
+ 			perf_event_disable(pmc->perf_event);
+ 	}
+
+[...]
+
+> > @@ -670,30 +569,21 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+> >         attr.exclude_host = 1; /* Don't count host events */
+> >         attr.config = eventsel;
+> >
+> > -       counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+> > +       counter = kvm_pmu_get_counter_value(vcpu, select_idx);
+> 
+> Nit: Since all existing codes in the function use pmc->idx,
+> I would think it would be better to use 'pmc->idx' instead of
+> 'select_idx' consistently.
+
+See my above comment about the need for a more global cleanup of this
+file, and the ask to keep the patch focused on the actual rework.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
