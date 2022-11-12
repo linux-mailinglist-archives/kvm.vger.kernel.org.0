@@ -2,100 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BA2F6268C0
-	for <lists+kvm@lfdr.de>; Sat, 12 Nov 2022 11:05:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDE9362692C
+	for <lists+kvm@lfdr.de>; Sat, 12 Nov 2022 12:34:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234859AbiKLKFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Nov 2022 05:05:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42502 "EHLO
+        id S234888AbiKLLeS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Nov 2022 06:34:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234858AbiKLKFn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Nov 2022 05:05:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4EB5248C0
-        for <kvm@vger.kernel.org>; Sat, 12 Nov 2022 02:04:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668247483;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YNPWveXNga0scY6/51aebupOAjiaIyJv8HXR04747GY=;
-        b=iHbjH2Q+Mj7yRaes/zqWnX5biv2HzJ8tP3UCyLEijUVN0xUR6y4WCxu4FrjSwMgpUe881M
-        nNbDPlfQsj8OnnArxKmBTojHUJE+j9zn5ZTACmg/1rcB0FRZbPcj2I6rRUc+jRNhhzSg75
-        hKS3LFMPI30h3mRNXDRkaf5L9EJPS9k=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-91-23T7CmQMMxq2btIs--dQOw-1; Sat, 12 Nov 2022 05:04:37 -0500
-X-MC-Unique: 23T7CmQMMxq2btIs--dQOw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S231534AbiKLLeP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Nov 2022 06:34:15 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72AA6248EF
+        for <kvm@vger.kernel.org>; Sat, 12 Nov 2022 03:34:13 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 03D85101A528;
-        Sat, 12 Nov 2022 10:04:37 +0000 (UTC)
-Received: from [10.67.24.81] (unknown [10.67.24.81])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A8B8202322E;
-        Sat, 12 Nov 2022 10:04:31 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: selftests: Build access_tracking_perf_test for
- arm64
-To:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D322160AFF
+        for <kvm@vger.kernel.org>; Sat, 12 Nov 2022 11:34:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33375C433D6;
+        Sat, 12 Nov 2022 11:34:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668252852;
+        bh=TICsOqZ+F6SCs8G9lz3hREYCxOxvmit4kwLHuA53NFE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=RJaaG/Yy84x70uMAmz/9oA2n9R0eQJaoaskobxifQYzrQfTHFC59bzXC40+Zi0yz4
+         0BiG+sQ4zb0GGUtGTbweCSivDNXN3jICCLOE0ZC6u2wgxdFR1rlKxPlOK/CBg7Qcnd
+         sAPwFfnPN6BXSnPv/ScjxXa2QW6rh0Ii1npijKIJz5wnfEMuFNA0rct2vg72Sa1JPv
+         9It3jDsczE10BO01LZ8jSlbNIhIBaG6/vu1hHDNoiETnh8txCFoZkMg7nKqcohPjam
+         othJH4WbbTiNwa235KuT+Fh3w/Ow5xSz3A13xuZiriX5Unbd0mI7W1X81cASGMtS9P
+         UmtAURCR5iuFQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1otom1-005bXl-MX;
+        Sat, 12 Nov 2022 11:34:09 +0000
+Date:   Sat, 12 Nov 2022 11:34:09 +0000
+Message-ID: <86bkpcpfta.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+        Vincent Donnefort <vdonnefort@google.com>,
         James Morse <james.morse@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-References: <20221111231946.944807-1-oliver.upton@linux.dev>
- <20221111231946.944807-3-oliver.upton@linux.dev>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <8a578b9d-b2a8-a1f9-2a8c-c0109c863723@redhat.com>
-Date:   Sat, 12 Nov 2022 18:04:26 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <20221111231946.944807-3-oliver.upton@linux.dev>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        kernel-team@android.com, Quentin Perret <qperret@google.com>,
+        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Sean Christopherson <seanjc@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>
+Subject: Re: [PATCH v6 00/26] KVM: arm64: Introduce pKVM hyp VM and vCPU state at EL2
+In-Reply-To: <Y26rzvyLQ/1juAAz@google.com>
+References: <20221110190259.26861-1-will@kernel.org>
+        <166819337067.3836113.13147674500457473286.b4-ty@kernel.org>
+        <Y26rzvyLQ/1juAAz@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, will@kernel.org, kvmarm@lists.linux.dev, vdonnefort@google.com, james.morse@arm.com, mark.rutland@arm.com, alexandru.elisei@arm.com, kernel-team@android.com, qperret@google.com, philmd@linaro.org, suzuki.poulose@arm.com, tabba@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, seanjc@google.com, catalin.marinas@arm.com, chao.p.peng@linux.intel.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_FILL_THIS_FORM_SHORT autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/12/22 7:19 AM, Oliver Upton wrote:
-> Does exactly what it says on the tin.
+On Fri, 11 Nov 2022 20:08:46 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->   tools/testing/selftests/kvm/Makefile | 1 +
->   1 file changed, 1 insertion(+)
+> On Fri, Nov 11, 2022 at 07:06:14PM +0000, Marc Zyngier wrote:
+> > On Thu, 10 Nov 2022 19:02:33 +0000, Will Deacon wrote:
+> > > This is version six of the pKVM EL2 state series, extending the pKVM
+> > > hypervisor code so that it can dynamically instantiate and manage VM
+> > > data structures without the host being able to access them directly.
+> > > These structures consist of a hyp VM, a set of hyp vCPUs and the stage-2
+> > > page-table for the MMU. The pages used to hold the hypervisor structures
+> > > are returned to the host when the VM is destroyed.
+> > > 
+> > > [...]
+> > 
+> > As for Oliver's series, I've tentatively applied this to -next.
+> > I've dropped Oliver's patch for now, but kept the RFC one. Maybe I'll
+> > change my mind.
+> > 
+> > Anyway, there was an interesting number of conflicts between the two
+> > series, which I tried to resolve as well as I could, but it is likely
+> > I broke something (although it compiles, so it must be perfect).
+> > 
+> > Please have a look and shout if/when you spot something.
+> 
+> Here is where you and I diverged on the conflict resolution, neither
+> amounts to a whole lot but feel free to squash in. Hoping that Will + co
+> can test the pKVM side of this.
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> index f2c4672697c2..318298eb3d6b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> @@ -265,7 +265,7 @@ static int __create_fixmap_slot_cb(const struct kvm_pgtable_visit_ctx *ctx,
+>  {
+>  	struct hyp_fixmap_slot *slot = per_cpu_ptr(&fixmap_slots, (u64)ctx->arg);
+>  
+> -	if (!kvm_pte_valid(*ctx->ptep) || ctx->level != KVM_PGTABLE_MAX_LEVELS - 1)
+> +	if (!kvm_pte_valid(ctx->old) || ctx->level != KVM_PGTABLE_MAX_LEVELS - 1)
+>  		return -EINVAL;
+>  
+>  	slot->addr = ctx->addr;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index b47d969ae4d3..110f04627785 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -190,7 +190,7 @@ static void hpool_put_page(void *addr)
+>  }
+>  
+>  static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> -					 enum kvm_pgtable_walk_flags visit)
+> +				     enum kvm_pgtable_walk_flags visit)
+>  {
+>  	enum kvm_pgtable_prot prot;
+>  	enum pkvm_page_state state;
 > 
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+Thanks. I've folded that in the resolution and regenerated the -next
+branch after taking another patch from Gavin in the dirty-ring series.
 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 0172eb6cb6ee..4c0ff91a8964 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -156,6 +156,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/psci_test
->   TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
->   TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
->   TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
-> +TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
->   TEST_GEN_PROGS_aarch64 += demand_paging_test
->   TEST_GEN_PROGS_aarch64 += dirty_log_test
->   TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
-> 
+I've managed to test the result on both VHE and nVHE this morning, and
+the wheels are still attached. I don't have a good setup for pKVM at
+the moment though, and it is likely that the rest of the monster
+series will need some rework.
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
