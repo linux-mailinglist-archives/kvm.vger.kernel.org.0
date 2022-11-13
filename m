@@ -2,130 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE6CD6271A2
-	for <lists+kvm@lfdr.de>; Sun, 13 Nov 2022 19:20:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D1A0662725B
+	for <lists+kvm@lfdr.de>; Sun, 13 Nov 2022 20:52:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235443AbiKMSUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Nov 2022 13:20:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60120 "EHLO
+        id S235314AbiKMTwt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Nov 2022 14:52:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232799AbiKMSU3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Nov 2022 13:20:29 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 344FF255;
-        Sun, 13 Nov 2022 10:20:29 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.5) with ESMTP id 2ADIGS83009191;
-        Sun, 13 Nov 2022 18:20:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : content-type : in-reply-to :
- mime-version; s=pp1; bh=EYCIkaYzDxwuZXC3UHhvzR3SuHH7w40UTQ1Xugj8ahY=;
- b=Rotm8+wtBJ+je6vfvL6pES/0Lk0vdZC/iNW/l3dP21K2ogLZgS7aXMiUonQLTXo0VmJ7
- qa95W1smRrMY6g95NdJVIc+/PhOlC/Emo9HIhr3cUmORqllJmyPzOGAkP4MIZ8E/9UUM
- MUjjkuRO3SPLqVa31xGM+e7jxfU8gCccZlXfXVtuOh/ICEn+0HVnoiHW0l4xyCIq4N1Q
- zb6Gc/b1aCER9G1GZ8unERo6M8ggp+Ra8XWc2lrxzzx/AQ1pMMNqismRN2vp2wSFofHD
- UhpUnknpvjN1z1Hp6616MLzecACiOYWLryDJgjtYJUYS/mUJBD3okxP8mzSQgHorv0FA fA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ku5qe820x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 13 Nov 2022 18:20:25 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ADIKPqZ020536;
-        Sun, 13 Nov 2022 18:20:25 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ku5qe8200-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 13 Nov 2022 18:20:24 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ADI7crI026412;
-        Sun, 13 Nov 2022 18:20:22 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 3kt348sjy0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 13 Nov 2022 18:20:22 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ADIEPOb15860198
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 13 Nov 2022 18:14:25 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 19BC3AE051;
-        Sun, 13 Nov 2022 18:20:19 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 75BA1AE045;
-        Sun, 13 Nov 2022 18:20:18 +0000 (GMT)
-Received: from osiris (unknown [9.145.44.108])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Sun, 13 Nov 2022 18:20:18 +0000 (GMT)
-Date:   Sun, 13 Nov 2022 19:20:17 +0100
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Heiko Carstens <hca@linux.ibm.com>
-Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: Re: [PATCH 5/5] s390/uaccess: add cmpxchg_user_key()
-Message-ID: <Y3E1YdKzSItZOKWW@osiris>
-References: <20221012205609.2811294-1-scgl@linux.ibm.com>
- <20221012205609.2811294-2-scgl@linux.ibm.com>
- <Y2J61LWSV+HolIeT@osiris>
- <Y2J8axs+bcQ2dO/l@osiris>
- <f604b6038c4a8bad5123e1f1f14b15c2190f28e9.camel@linux.ibm.com>
- <Y2womHanaMzETfwU@osiris>
- <31fcea80f54c5f53012489f29ebedba775672919.camel@linux.ibm.com>
- <Y2zhNhFjIJPKJao8@osiris>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y2zhNhFjIJPKJao8@osiris>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _xiOF1Jsu-3d-DSHhSjh8yCQj6PQO7jn
-X-Proofpoint-ORIG-GUID: ghWzfo4_mknh7pGsI72MDn6dEfYiWgTH
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S233522AbiKMTws (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Nov 2022 14:52:48 -0500
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B158F02A
+        for <kvm@vger.kernel.org>; Sun, 13 Nov 2022 11:52:47 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id cl5so13894108wrb.9
+        for <kvm@vger.kernel.org>; Sun, 13 Nov 2022 11:52:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qWO23xnS3wIXo4WLaXT4GHJCm28qhVBHEppB+5gRgPM=;
+        b=crIuF+eLXNjMNS8XQGjabMSQib9Hj2HW0+RyIz26h+stRJx0/3J+22qcL9fuhw3ZIM
+         lLEljZNXPYGXo3nGwjlCpqtponpVkq4OJ+u7jljBFaQxHHFt58SClxDsPh7RhPj4cr7g
+         iLiGYkJCnVOYeVJfnIcyYiZddK0onlu5e+2CUifh1Wvj/UWNdBGOT8zUXBOi4McJLIpB
+         Lt92DfOjPi4Ic8i7NnYMbCeePUCbJKfsDRXk6L0YVimhQGN6gSeWZMWDJjlpH9fSdaXa
+         Ak39k1vsAt0Ac7NjAQsr7CW8vgjBkLvkYt4M1naAiPiUo7l3zPkh1rPUMKvw4oLI8vdk
+         ELiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qWO23xnS3wIXo4WLaXT4GHJCm28qhVBHEppB+5gRgPM=;
+        b=UwooqqDv9IS+434eD+d8HOg3KYV2VREH0JnBTErofFr0plAk5Tb6m25eJurDEX1Cj4
+         dzI9YRaocy4BXKEBIVX07nnETEgoejFzpCgjOFVoLyOAMynpXoJaZIt4N+IY8f8DRoVU
+         48Vk9J3rYtra1d36oOSWGnUZcQ5UUn+R2mq1py9D61PB0Yeh1eqytKx+ytKbRKbMSv+q
+         GnwKZCgd++Yb9sxBuMxMzxhYRhsVGhY2ZkK41douiZZhxD35REXJy65ap8s4ONjMN52A
+         TKehzR/kCsHhIDXYuzP3OLOQzRY9+3JgG0ipJ/hBePwcyItbK+5ccXN8dj0b3g3FeGI7
+         IjAQ==
+X-Gm-Message-State: ANoB5plPsYq8rreSVR9DjHd7KKm9YuPcH8Yu+S5FhO1aD3NzbATg/8yi
+        /IjPsY+gwASFWAkK7DPeZ4MlSw==
+X-Google-Smtp-Source: AA0mqf7sMq0OyUcSL21mAlDJhflDL8mb7VyNfAnXPSRQAIO6vZQ0Fb2fzbkHniELTUx43mfDTdojFg==
+X-Received: by 2002:adf:e852:0:b0:236:8d39:6f84 with SMTP id d18-20020adfe852000000b002368d396f84mr5511705wrn.152.1668369166155;
+        Sun, 13 Nov 2022 11:52:46 -0800 (PST)
+Received: from [192.168.1.115] ([185.126.107.38])
+        by smtp.gmail.com with ESMTPSA id b15-20020adff24f000000b002345cb2723esm7585981wrp.17.2022.11.13.11.52.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 13 Nov 2022 11:52:45 -0800 (PST)
+Message-ID: <1cba26d1-a96f-f1dd-6d58-72ffaec7efb1@linaro.org>
+Date:   Sun, 13 Nov 2022 20:52:43 +0100
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-13_12,2022-11-11_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 adultscore=0 mlxscore=0 bulkscore=0 impostorscore=0
- clxscore=1015 mlxlogscore=728 priorityscore=1501 suspectscore=0
- malwarescore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2210170000 definitions=main-2211130121
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.4.2
+Subject: Re: [PATCH v5 15/20] hw/i386: update vapic_write to use MemTxAttrs
+Content-Language: en-US
+To:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     f4bug@amsat.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
+References: <20221111182535.64844-1-alex.bennee@linaro.org>
+ <20221111182535.64844-16-alex.bennee@linaro.org>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <20221111182535.64844-16-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 10, 2022 at 12:32:06PM +0100, Heiko Carstens wrote:
-> > That's why I asked about cmpxchg.h. If you don't want non-cosmetic changes to the existing
-> > cmpxchg function and consistency of the new key checked function, then obviously the loop
-> > condition needs to be the same.
+On 11/11/22 19:25, Alex Bennée wrote:
+> This allows us to drop the current_cpu hack and properly model an
+> invalid access to the vapic.
 > 
-> Such a change is fine of course, even though compare-and-swap for one and
-> two byte patterns don't really matter. I would appreciate if you could send
-> one or two patches on-top of this series which adds the improved logic to
-> (now) both variants.
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>   hw/i386/kvmvapic.c | 19 +++++++++++--------
+>   1 file changed, 11 insertions(+), 8 deletions(-)
 > 
-> And, since the question will come up anyway: as soon as we agreed on a
-> complete patch series, I think we should go for a features branch on s390's
-> kernel.org tree which would contain the first five patches sent by me plus
-> potential addon patches provided by you.
-> This tree can then be pulled in by the kvms390 tree where your kvm specific
-> patches can then be applied on top.
+> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+> index 43f8a8f679..a76ed07199 100644
+> --- a/hw/i386/kvmvapic.c
+> +++ b/hw/i386/kvmvapic.c
+> @@ -635,20 +635,21 @@ static int vapic_prepare(VAPICROMState *s)
+>       return 0;
+>   }
+>   
+> -static void vapic_write(void *opaque, hwaddr addr, uint64_t data,
+> -                        unsigned int size)
+> +static MemTxResult vapic_write(void *opaque, hwaddr addr, uint64_t data,
+> +                               unsigned int size, MemTxAttrs attrs)
+>   {
+>       VAPICROMState *s = opaque;
+> +    CPUState *cs;
+>       X86CPU *cpu;
+>       CPUX86State *env;
+>       hwaddr rom_paddr;
+>   
+> -    if (!current_cpu) {
+> -        return;
+> +    if (attrs.requester_type != MTRT_CPU) {
+> +        return MEMTX_ACCESS_ERROR;
+>       }
+> -
+> -    cpu_synchronize_state(current_cpu);
+> -    cpu = X86_CPU(current_cpu);
+> +    cs = qemu_get_cpu(attrs.requester_id);
+> +    cpu_synchronize_state(cs);
+> +    cpu = X86_CPU(cs);
+>       env = &cpu->env;
+>   
+>       /*
+> @@ -708,6 +709,8 @@ static void vapic_write(void *opaque, hwaddr addr, uint64_t data,
+>           }
+>           break;
+>       }
+> +
+> +    return MEMTX_OK;
+>   }
+>   
+>   static uint64_t vapic_read(void *opaque, hwaddr addr, unsigned size)
+> @@ -716,7 +719,7 @@ static uint64_t vapic_read(void *opaque, hwaddr addr, unsigned size)
+>   }
+>   
+>   static const MemoryRegionOps vapic_ops = {
+> -    .write = vapic_write,
+> +    .write_with_attrs = vapic_write,
+>       .read = vapic_read,
 
-FWIW, pushed a non-stable work-in-progress branch to
-git://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git wip/cmpxchg_user_key
+Shouldn't we do the same for the read() path?
 
-This includes also an updated patch, which fixes the missing shift of
-the access key.
+>       .endianness = DEVICE_NATIVE_ENDIAN,
+>   };
+
