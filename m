@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8C02626FBA
-	for <lists+kvm@lfdr.de>; Sun, 13 Nov 2022 14:33:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F28EC626FC5
+	for <lists+kvm@lfdr.de>; Sun, 13 Nov 2022 14:37:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235215AbiKMNdA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Nov 2022 08:33:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47230 "EHLO
+        id S235214AbiKMNg7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Nov 2022 08:36:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231972AbiKMNc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Nov 2022 08:32:59 -0500
+        with ESMTP id S231972AbiKMNg6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Nov 2022 08:36:58 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C687AFAC5;
-        Sun, 13 Nov 2022 05:32:56 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FE001054C;
+        Sun, 13 Nov 2022 05:36:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=in2O/a9qLvwFLNtcB3MFl0zAbBPnQnAnMBCpvQ7sLZs=; b=pNYH9TaHa1HPTpXcZCMpqJiJat
-        /4QkGgDd8lQitCHSTroMYs18UYlXUoOTaapULf/HabConDMBDKo0a0LI9pTSP55R/+3x42+fK+VGF
-        dA3w+icwpx/i7jpysZdhAYLAk4i5nWYnxQDiACYUg3Qii5t0ex/HjbG/G7HBJpdOwGqQjCci1KuSV
-        XhtwUcYiyM7tcgtBUQ4LE2gW2xjwhCxifiwVTXlU9Kprnppncjhec65f5pAJzjXCR2E7wxVFI9oHR
-        PheKFV+Jl/rFBVZRiXeffuoHB3pwCWvPfrqt+7/X+ZwqufazbWR1FiXR4Q4ECw8egE4x1SOBoboDc
-        CalI5rPg==;
+        bh=+5W/rm55sbudDoR2jp+QWudjlU6iWqFWpTdM8VlS9js=; b=srJarTibGuT+sNxSD1zG468C+7
+        i2xJoCtvmwzPdFLLj35Ty9hUSLSxvMWr4ov3sTidqYBK709e/nFBtswX7sj/m4dBoCBF0U5orm7wm
+        10QJCaBlTDupBV+Rovwmsz0YXYr2PraS2AZsc4JhX14H6z5Mlz9vxHSO5UibBG1VL1QkYz2wZ88pf
+        YVzQF88XIU1abYtZBI8sDPSbnbR7K6/gSpdhVU5BRabrXdOIlx9fgkLjaUOgQLSHmy1Q3X/Z8a9cW
+        82iNFuV3YmXSjfzu5MlPRUJoFOSbloine9UNSicPF4KFD6aBaYb4U5Zb06Y1r/yn0KeBjhMQTYo7s
+        30Ul4vHg==;
 Received: from 54-240-197-228.amazon.com ([54.240.197.228] helo=freeip.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ouD6U-00EgFg-N9; Sun, 13 Nov 2022 13:32:55 +0000
-Message-ID: <c30b46557c9c59b9f4c8c3a2139bd506a81f7ee1.camel@infradead.org>
+        id 1ouDAS-00EgQt-6m; Sun, 13 Nov 2022 13:37:00 +0000
+Message-ID: <89ea0f72514d93967b679a01960d05b34a90ea14.camel@infradead.org>
 Subject: Re: [PATCH 03/16] KVM: x86: set gfn-to-pfn cache length
  consistently with VM word size
 From:   David Woodhouse <dwmw2@infradead.org>
@@ -36,14 +36,15 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, mhal@rbox.co,
         Paul Durrant <pdurrant@amazon.co.uk>,
         Metin Kaya <metikaya@amazon.co.uk>
-Date:   Sun, 13 Nov 2022 13:32:46 +0000
-In-Reply-To: <c61f6089-57b7-e00f-d5ed-68e62237eab0@redhat.com>
+Date:   Sun, 13 Nov 2022 13:36:52 +0000
+In-Reply-To: <c30b46557c9c59b9f4c8c3a2139bd506a81f7ee1.camel@infradead.org>
 References: <20221027161849.2989332-1-pbonzini@redhat.com>
          <20221027161849.2989332-4-pbonzini@redhat.com>
          <Y1q+a3gtABqJPmmr@google.com>
          <c61f6089-57b7-e00f-d5ed-68e62237eab0@redhat.com>
+         <c30b46557c9c59b9f4c8c3a2139bd506a81f7ee1.camel@infradead.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-DiOVFhyRoAb889tkGkTb"
+        boundary="=-t/CDHtkly/XvN2gTisxB"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -57,48 +58,23 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-DiOVFhyRoAb889tkGkTb
+--=-t/CDHtkly/XvN2gTisxB
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2022-10-28 at 13:36 +0200, Paolo Bonzini wrote:
-> We _should_ be following the Xen API, which does not even say that the
-> areas have to fit in a single page.  In fact, even Linux's
->=20
->          struct vcpu_register_runstate_memory_area area;
->=20
->          area.addr.v =3D &per_cpu(xen_runstate, cpu);
->          if (HYPERVISOR_vcpu_op(VCPUOP_register_runstate_memory_area,
->                                 xen_vcpu_nr(cpu), &area))
->=20
-> could fail or not just depending on the linker's whims, if I'm not
-> very confused.
->=20
-> Other data structures *do* have to fit in a page, but the runstate area
-> does not and it's exactly the one where the cache comes the most handy.
-> For this I'm going to wait for David to answer.
+On Sun, 2022-11-13 at 13:32 +0000, David Woodhouse wrote:
+> For the runstate area, I think we can live with using a gfn_to_hva
+> cache instead, and writing via the userspace address (with appropriate
+> atomicity for the RUNSTATE_runnable case as we have at the moment
+> gating the refresh).
 
-Yeah, I recall vetting a bunch of these to ensure that it's safe to
-assume that it does fit within the page... but that clearly isn't true
-for the runstate_area.
+Which mostly involves just reverting commit a795cd43c5b5 I think?
 
-As things stand, I believe a guest is perfectly entitled to provide a
-region which crosses a page boundary, and Xen copes with that. But as
-you say, KVM doesn't.
-
-However, I don't think this *is* the case where the cache comes in the
-most handy. The cache is really useful where we have to do *atomic*
-operations on guest addresses, and doing so directly is a whole lot
-nicer than futex-style try-it-and-fail-gracefully operations on
-userspace addresses.
-
-For the runstate area, I think we can live with using a gfn_to_hva
-cache instead, and writing via the userspace address (with appropriate
-atomicity for the RUNSTATE_runnable case as we have at the moment
-gating the refresh).
+IIRC the reason for that commit was mostly consistency with other
+things that really *did* want to be switched to gpc.=20
 
 
---=-DiOVFhyRoAb889tkGkTb
+--=-t/CDHtkly/XvN2gTisxB
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -190,25 +166,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTEzMTMzMjQ2WjAvBgkqhkiG9w0BCQQxIgQg1hGtZK3v
-+UfT2aam+UR6t9bXs43rCFGmTWzP7zradMgwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTEzMTMzNjUyWjAvBgkqhkiG9w0BCQQxIgQgGDa36VVz
+78w/cCPs/eUTrh+4us2Cb01+YqU5F+TXqTwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBnxIw22O+/TXAPQfXDDUVZx00JPMYabDWC
-rgDC2s2qrVoFiSAxTLjkrfBbLYskPiDKZ2g6wDGeQOGZX3lb+l6bPGSK9fvq/h3LJjXpBztY09cE
-C4qJGcQmX5MTdutKjTHibUFTse3hLvYjIthTmrn8ukUuN9WggsgFB5AHGzMaMZ5vl6k25Rs2+J5I
-FEW94dl5Q7VjN2JvzgtBT1K3wU99U+iA63CbhB1dR0OZ3cp753/NsCD3FjfzaGZO4+spvp1q/Oht
-87zpvu7QuQiF9LW2BV7w4kbzqEwPh04LER4M36WiKqW6a37j/DqwSM8g1feo3Bv3VesNFINwIcCQ
-Ufq2zJ3z3DSuEbIMEJh9HePFxGZB4+Ijto8qu/PNuLwzQUnnYvZaaoUcSLwDNC6OdpoyfuJ/nJQJ
-n9Lmp72L4mEc4c0S4rH4eEABtfytN5Tdij4pTzHj3Mc7blUwIDcUh3qXW7AiMja7+EPIimlpfjx+
-suspI5Xl3Xi0g97ybjJl1qYb3f2E+oSbYZt63N2GcFUS2uQLR9aFbyetFAX0HETVK299/us6ys+T
-d7+mu/LbPOrvzd5VUN+7ImtpWoadO/UrE6M9IPeUSTEOqEtuab06GE0Q7S4d9j7n5nOCZdVxdyjV
-pgCB9Dh4sZSmrW29PzjGlgl32r0KJsJ2qkYGpWCo+wAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBdL7T6N7VdOqXiO+HAm5omcgRPpziPRwUv
+QFBB6s9dU5x3jcRTgqGKLGZYO7TcOP87Vlcoc7NqPDIWBO2VvPjN8YDUaFUZPWI7oqO3z/EzFYkB
+/vI3TWxgg1g66EqwkEy9qpN/fLQ6nbbxbWdv8aGqy2VB74M2RzA7PVu9D5De/ga2LAyfVy2kQZbh
+UA2lHN2lHyBx0+PSLsSk+3d/pRNubOwh8nDG4p7Smf6WJScAoZA4kl/nPNK2+XK3zZvHAMq04aWT
+3I5rid6EpQU8IcLqduU7e+EEXpw8Axtcj3q0DqMfPrfMqD7ktmfBHO8v9fcfn5BUhPQ78yxMoxzm
+PTZr/7+JYBrVLMVcunVR8C1/e7jWZgqhd/IjcBsro+or4aLOUqnh0N3iWwN7RENJWbeBFhQSTgud
+z3veiYfzKK+FGJOllrwd9fK/P0Tab6dRM2vcEiCKZsc12XGQx3CD1XPP5MBnPiI011LkfAKJvJgN
+EA1Y27bhrYYGtwafVrL+8ih39yy6OvJaNrLWWVoFwNk3r6DGoYAWNaCIRzOveMvdOkf9Zn2UyV+u
+MUxjLf/0YOZQPHdmf85i1lsFCA8lb0YjmspnA8SuUCC+B1rB1UyulYWb/Dmdf8HYlRrmXewYRt/X
+IXaONfhLv1+YwCCFQwHzU1TSVMTNc8h9Hq7j8FBusgAAAAAAAA==
 
 
---=-DiOVFhyRoAb889tkGkTb--
+--=-t/CDHtkly/XvN2gTisxB--
 
