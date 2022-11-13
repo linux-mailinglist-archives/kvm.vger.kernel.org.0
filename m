@@ -2,120 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1806D626EDA
-	for <lists+kvm@lfdr.de>; Sun, 13 Nov 2022 11:04:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E3739626EEC
+	for <lists+kvm@lfdr.de>; Sun, 13 Nov 2022 11:21:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235229AbiKMKEr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Nov 2022 05:04:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34118 "EHLO
+        id S235248AbiKMKVJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Nov 2022 05:21:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229753AbiKMKEp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Nov 2022 05:04:45 -0500
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30D375F40;
-        Sun, 13 Nov 2022 02:04:42 -0800 (PST)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id DD2D25FD20;
-        Sun, 13 Nov 2022 13:04:38 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1668333878;
-        bh=9rOROH2iebzLRkDA8NLvRPT2sy7/Kmmx1bzHXtL+1do=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=CdMPwgCnQ/YOIoUpFWj/vOdlIPUHT83RZeDLR+6+fiWC6UTjrd7O9juBsfMj9e0me
-         7VLWg5lVcdm5NUmpSK6Bf6MtskHPskZ+y/WreimzhPEhxWsVq7Dy17NiwXTN2jQ79g
-         i2XtYSCyNWt34uM4p98xcryCiP5Qy/jbF1/mCJSOCkUgAT38ZJIaxqOn627PAWDPjR
-         22DPApo4qdRpNjhH3qVZEmDU5/fwv7zfL149APKERzBriqmtzYVzlS8Hyj4fLCjzLG
-         mB473yJznuFEiJonTvTlrXUeZj1zY8sYLS8Sobysk0v7Tv1rs/OE7u2bOmx2/oLYzZ
-         znz1ygF9I43Bw==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Sun, 13 Nov 2022 13:04:36 +0300 (MSK)
-From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To:     Bobby Eshleman <bobbyeshleman@gmail.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-CC:     Krasnov Arseniy <oxffffaa@gmail.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Bobby Eshleman <bobby.eshleman@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "edumazet@google.com" <edumazet@google.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        kernel <kernel@sberdevices.ru>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [RFC PATCH v3 00/11] virtio/vsock: experimental zerocopy receive
-Thread-Topic: [RFC PATCH v3 00/11] virtio/vsock: experimental zerocopy receive
-Thread-Index: AQHY8hatKKTuchPoekmnGA3HAR0Si645kb6AgAB0yICAAPn8gIABd2GA
-Date:   Sun, 13 Nov 2022 10:04:22 +0000
-Message-ID: <d4c3afcc-e8f3-d81c-597a-5311280e8e51@sberdevices.ru>
-References: <f60d7e94-795d-06fd-0321-6972533700c5@sberdevices.ru>
- <20221111134715.qxgu7t4c7jse24hp@sgarzare-redhat> <Y260WSJKJXtaJQZi@bullseye>
- <3de0302f-bd4f-5df1-9de5-cbc3b3dd94f8@sberdevices.ru>
-In-Reply-To: <3de0302f-bd4f-5df1-9de5-cbc3b3dd94f8@sberdevices.ru>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CAE0D643183BAB419460FB3C6014DF3C@sberdevices.ru>
-Content-Transfer-Encoding: base64
+        with ESMTP id S231972AbiKMKVH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Nov 2022 05:21:07 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F20911807
+        for <kvm@vger.kernel.org>; Sun, 13 Nov 2022 02:21:06 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E2ADF60B46
+        for <kvm@vger.kernel.org>; Sun, 13 Nov 2022 10:21:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F5F7C433C1;
+        Sun, 13 Nov 2022 10:21:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668334865;
+        bh=bAJllN46EPAoI4gsSpHJ8M3EPpj3jJg9OxPG1MEqQGU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=f/2fqifuG1M7A6Z1OoNTm5evuC9kytJ96vnnCcLxjISUV6M2tb8Q3ZHZq/krY1zFF
+         XtLIOQvUqtszAZNN7M9LKtvS8CUK6rA0xfahPNnR28FVoEF8ueWSvaRGtTjQDpueoV
+         HZGZ39sWZWiJJ+WOlbg+W9xZGHhfVrMcCo77eAfHn9BB6Bm9+Ki18QppuaHEOnRHmb
+         0+RrUPSoyh/cZE+q3P6fo8HvOBUEVt5rjQnQhHU/uln1tGhYsBydlswsLY84WXPHtK
+         +FJmq+apzfdcgphjmNNKZoDYXAh52892zNWfandT7T5pOVGe6J6jKwMlplFWd0Jobw
+         dh4QEhWOb1Y9g==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ouA6o-005mZw-T8;
+        Sun, 13 Nov 2022 10:21:02 +0000
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/11/13 04:55:00 #20572880
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Date:   Sun, 13 Nov 2022 10:21:02 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v3 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to
+ be set from userspace
+In-Reply-To: <CAAeT=FyR_4d1HzDjNEdVhsdgzRuBGuEwGuoMYY0xvi+YAbMqSg@mail.gmail.com>
+References: <20221107085435.2581641-1-maz@kernel.org>
+ <20221107085435.2581641-12-maz@kernel.org>
+ <CAAeT=FyR_4d1HzDjNEdVhsdgzRuBGuEwGuoMYY0xvi+YAbMqSg@mail.gmail.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <136ee516118c97b8f3e4792b8ec9752a@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMTIuMTEuMjAyMiAxNDo0MCwgQXJzZW5peSBLcmFzbm92IHdyb3RlOg0KDQpIZWxsbyBhZ2Fp
-biBCb2JieSwNCg0KaSB3YXNuJ3QgQ0NlZCBpbiBZb3VyIHBhdGNoc2V0LCBidXQgSSByZXZpZXcg
-aXQgYW55d2F5IGFuZCB3cml0ZSBjb21tZW50cyBoZXJlIGluIHRoaXMNCm1hbm5lcjopIEkgZm91
-bmQgc3RyYW5nZSB0aGluZzoNCg0KSW4gJ3ZpcnRpb190cmFuc3BvcnRfcmVjdl9lbnF1ZXVlKCkn
-IG5ldyBwYWNrZXQgY291bGQgYmUgY29waWVkIHRvIHRoZSBsYXN0IHBhY2tldCBpbg0KcnggcXVl
-dWUoc2tiIGluIGN1cnJlbnQgdmVyc2lvbikuIER1cmluZyBjb3B5IFlvdSB1cGRhdGUgbGFzdCBz
-a2IgbGVuZ3RoIGJ5IGNhbGwNCidza2JfcHV0KGxhc3Rfc2tiLCBza2ItPmxlbiknIGluc2lkZSAn
-bWVtY3B5KCknLiBTbyAnbGFzdF9za2InIG5vdyBoYXZlIG5ldyBsZW5ndGgsDQpidXQgaGVhZGVy
-IG9mIHBhY2tldCBpcyBub3QgdXBkYXRlZC4NCg0KTm93IGxldCdzIGxvb2sgdG8gJ3ZpcnRpb190
-cmFuc3BvcnRfc2VxcGFja2V0X2RvX2RlcXVldWUoKScsIGl0IHVzZXMgdmFsdWUgZnJvbSBwYWNr
-ZXQncw0KaGVhZGVyIGFzICdwa3RfbGVuJywgbm90IGZyb20gc2tiOg0KDQpwa3RfbGVuID0gKHNp
-emVfdClsZTMyX3RvX2NwdShoZHItPmxlbik7DQoNCkkgdGhpbmsgd2UgbmVlZCB0byB1cGRhdGUg
-bGFzdCBwYWNrZXQncyBoZWFkZXIgZHVyaW5nIG1lcmdpbmcgbmV3IHBhY2tldCB0byBsYXN0IHBh
-Y2tldA0Kb2YgcnggcXVldWUuDQoNClRoYW5rcywgQXJzZW5peQ0KDQoNCj4gT24gMTEuMTEuMjAy
-MiAyMzo0NSwgQm9iYnkgRXNobGVtYW4gd3JvdGU6DQo+PiBPbiBGcmksIE5vdiAxMSwgMjAyMiBh
-dCAwMjo0NzoxNVBNICswMTAwLCBTdGVmYW5vIEdhcnphcmVsbGEgd3JvdGU6DQo+Pj4gSGkgQXJz
-ZW5peSwNCj4+PiBtYXliZSB3ZSBzaG91bGQgc3RhcnQgcmViYXNpbmcgdGhpcyBzZXJpZXMgb24g
-dGhlIG5ldyBzdXBwb3J0IGZvciBza2J1ZmY6IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xrbWwv
-MjAyMjExMTAxNzE3MjMuMjQyNjMtMS1ib2JieS5lc2hsZW1hbkBieXRlZGFuY2UuY29tLw0KPj4+
-DQo+Pj4gQ0NpbmcgQm9iYnkgdG8gc2VlIGlmIGl0J3MgZWFzeSB0byBpbnRlZ3JhdGUgc2luY2Ug
-eW91J3JlIGJvdGggY2hhbmdpbmcgdGhlDQo+Pj4gcGFja2V0IGFsbG9jYXRpb24uDQo+Pj4NCj4+
-DQo+PiBUaGlzIGxvb2tzIGxpa2UgdGhlIHBhY2tldCBhbGxvY2F0aW9uIGNhbiBiZSBtYXJyaWVk
-IHNvbWV3aGF0IG5pY2VseSBpbg0KPj4gc2luY2UgU0tCcyBtYXkgYmUgYnVpbHQgZnJvbSBwYWdl
-cyB1c2luZyBidWlsZF9za2IoKS4gVGhlcmUgbWF5IGJlIHNvbWUNCj4+IHR3ZWFraW5nIG5lY2Vz
-c2FyeSB0aG91Z2gsIHNpbmNlIGl0IGFsc28gdXNlcyB0aGUgdGFpbCBjaHVuayBvZiB0aGUgcGFn
-ZQ0KPj4gdG8gaG9sZCBzdHJ1Y3Qgc2tiX3NoYXJlZF9pbmZvIElJUkMuDQo+Pg0KPj4gSSBsZWZ0
-IHNvbWUgY29tbWVudHMgb24gdGhlIHBhdGNoIHdpdGggdGhlIGFsbG9jYXRvciBpbiBpdC4NCj4g
-SGVsbG8gQm9iYnksDQo+IA0KPiB0aGFua3MgZm9yIHJldmlldy4gSSdsbCByZWJhc2UgbXkgcGF0
-Y2hzZXQgb24gWW91ciBza2J1ZmYgc3VwcG9ydC4NCj4+DQo+Pj4NCj4+PiBNYXliZSB0byBhdm9p
-ZCBoYXZpbmcgdG8gcmViYXNlIGV2ZXJ5dGhpbmcgbGF0ZXIsIGl0J3MgYWxyZWFkeSB3b3J0aHdo
-aWxlIHRvDQo+Pj4gc3RhcnQgdXNpbmcgQm9iYnkncyBwYXRjaCB3aXRoIHNrYnVmZi4NCj4+Pg0K
-Pj4NCj4+IEknbGwgYmUgd2FpdGluZyB1bnRpbCBNb25kYXkgdG8gc2VlIGlmIHNvbWUgbW9yZSBm
-ZWVkYmFjayBjb21lcyBpbg0KPj4gYmVmb3JlIHNlbmRpbmcgb3V0IHY0LCBzbyBJIGV4cGVjdCB2
-NCBlYXJseSBuZXh0IHdlZWssIEZXSVcuDQo+IE9uZSByZXF1ZXN0IGZyb20gbWUsIGNvdWxkIFlv
-dSBwbGVhc2UgQ0MgbWUgZm9yIG5leHQgdmVyc2lvbnMgb2YNCj4gWW91ciBwYXRjaHNldCwgYmVj
-YXVzZToNCj4gMSkgSSdsbCBhbHdheXMgaGF2ZSBsYXRlc3QgdmVyc2lvbiBvZiBza2J1ZmYgc3Vw
-cG9ydC4NCj4gMikgSSdsbCBzZWUgcmV2aWV3IHByb2Nlc3MgYWxzby4NCj4gDQo+IE15IGNvbnRh
-Y3RzOg0KPiBveGZmZmZhYUBnbWFpbC5jb20NCj4gQVZLcmFzbm92QHNiZXJkZXZpY2VzLnJ1DQo+
-IA0KPiBUaGFua3MsIEFyc2VuaXkNCj4gDQo+Pg0KPj4gQmVzdCwNCj4+IEJvYmJ5DQo+IA0KDQo=
+On 2022-11-08 05:38, Reiji Watanabe wrote:
+> Hi Marc,
+> 
+> On Mon, Nov 7, 2022 at 1:16 AM Marc Zyngier <maz@kernel.org> wrote:
+>> 
+>> Allow userspace to write ID_AA64DFR0_EL1, on the condition that only
+>> the PMUver field can be altered and be at most the one that was
+>> initially computed for the guest.
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  arch/arm64/kvm/sys_regs.c | 40 
+>> ++++++++++++++++++++++++++++++++++++++-
+>>  1 file changed, 39 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 7a4cd644b9c0..47c882401f3c 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -1247,6 +1247,43 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu 
+>> *vcpu,
+>>         return 0;
+>>  }
+>> 
+>> +static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>> +                              const struct sys_reg_desc *rd,
+>> +                              u64 val)
+>> +{
+>> +       u8 pmuver, host_pmuver;
+>> +       bool valid_pmu;
+>> +
+>> +       host_pmuver = kvm_arm_pmu_get_pmuver_limit();
+>> +
+>> +       /*
+>> +        * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
+>> +        * as it doesn't promise more than what the HW gives us. We
+>> +        * allow an IMPDEF PMU though, only if no PMU is supported
+>> +        * (KVM backward compatibility handling).
+>> +        */
+>> +       pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), 
+>> val);
+>> +       if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > 
+>> host_pmuver) ||
+>> +           (pmuver != 0 && pmuver < ID_AA64DFR0_EL1_PMUVer_IMP))
+> 
+> Nit: Since this second condition cannot be true (right?), perhaps it 
+> might
+> be rather confusing?  I wasn't able to understand what it meant until
+> I see the equivalent check in set_id_dfr0_el1() (Maybe just me 
+> though:).
+
+Ah, that's just me being tainted with the AArch32 version which
+doesn't start at 1 for PMUv3. I'll drop it.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
