@@ -2,220 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B18C626F12
-	for <lists+kvm@lfdr.de>; Sun, 13 Nov 2022 11:56:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C8C02626FBA
+	for <lists+kvm@lfdr.de>; Sun, 13 Nov 2022 14:33:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235313AbiKMK4z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Nov 2022 05:56:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43866 "EHLO
+        id S235215AbiKMNdA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Nov 2022 08:33:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233797AbiKMK4y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Nov 2022 05:56:54 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC2C2E0C3
-        for <kvm@vger.kernel.org>; Sun, 13 Nov 2022 02:56:53 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 07D2B60B7E
-        for <kvm@vger.kernel.org>; Sun, 13 Nov 2022 10:56:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63216C433C1;
-        Sun, 13 Nov 2022 10:56:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668337012;
-        bh=trm3rGMA5rnXiFoEQpHrSOOXOS+O2YdKgkWR5wd2uEU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=eG+tavAcGQRly3lVfo/slzAGhIA564/xTuBI16ruL5eug3Vw5HcvzqARORkDpUIx9
-         PX/lsQDPIBrITMxho9ssAhANu8EmK/SfqTD4CU0HlCv8lT50Ie7Vfrkmg6F9xImaYd
-         bdMoyTyC+zW1/wW8htnGWFbExAkc40B5c+2mq56OOsdqOPj6/ipbYIPTzT96FuH086
-         8MI5Fr0OK01OZB+OwxywjeSL9heBXZaeNbQGZ5FGM7CCJN2CqyB1l48BeAnsvnZjit
-         uCpica9AfR5T1w6xxFvNYMYcaBxH1/1/4B00bpEd7u1QZJIGnrz6epBqO4qOzVwk6O
-         cQreR24V5MByQ==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1ouAfS-005mlQ-2P;
-        Sun, 13 Nov 2022 10:56:50 +0000
+        with ESMTP id S231972AbiKMNc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Nov 2022 08:32:59 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C687AFAC5;
+        Sun, 13 Nov 2022 05:32:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=in2O/a9qLvwFLNtcB3MFl0zAbBPnQnAnMBCpvQ7sLZs=; b=pNYH9TaHa1HPTpXcZCMpqJiJat
+        /4QkGgDd8lQitCHSTroMYs18UYlXUoOTaapULf/HabConDMBDKo0a0LI9pTSP55R/+3x42+fK+VGF
+        dA3w+icwpx/i7jpysZdhAYLAk4i5nWYnxQDiACYUg3Qii5t0ex/HjbG/G7HBJpdOwGqQjCci1KuSV
+        XhtwUcYiyM7tcgtBUQ4LE2gW2xjwhCxifiwVTXlU9Kprnppncjhec65f5pAJzjXCR2E7wxVFI9oHR
+        PheKFV+Jl/rFBVZRiXeffuoHB3pwCWvPfrqt+7/X+ZwqufazbWR1FiXR4Q4ECw8egE4x1SOBoboDc
+        CalI5rPg==;
+Received: from 54-240-197-228.amazon.com ([54.240.197.228] helo=freeip.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ouD6U-00EgFg-N9; Sun, 13 Nov 2022 13:32:55 +0000
+Message-ID: <c30b46557c9c59b9f4c8c3a2139bd506a81f7ee1.camel@infradead.org>
+Subject: Re: [PATCH 03/16] KVM: x86: set gfn-to-pfn cache length
+ consistently with VM word size
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, mhal@rbox.co,
+        Paul Durrant <pdurrant@amazon.co.uk>,
+        Metin Kaya <metikaya@amazon.co.uk>
+Date:   Sun, 13 Nov 2022 13:32:46 +0000
+In-Reply-To: <c61f6089-57b7-e00f-d5ed-68e62237eab0@redhat.com>
+References: <20221027161849.2989332-1-pbonzini@redhat.com>
+         <20221027161849.2989332-4-pbonzini@redhat.com>
+         <Y1q+a3gtABqJPmmr@google.com>
+         <c61f6089-57b7-e00f-d5ed-68e62237eab0@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-DiOVFhyRoAb889tkGkTb"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Date:   Sun, 13 Nov 2022 10:56:49 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v2 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to
- be set from userspace
-In-Reply-To: <CAAeT=Fzgu1iaMmGXWZcmj9ifmchKXZXG2y7ksvQzoTGAQ=G-jw@mail.gmail.com>
-References: <20221028105402.2030192-1-maz@kernel.org>
- <20221028105402.2030192-12-maz@kernel.org>
- <CAAeT=FyiNeRun7oRL83AUkVabUSb9pxL2SS9yZwi1rjFnbhH6g@mail.gmail.com>
- <87tu3gfi8u.wl-maz@kernel.org>
- <CAAeT=FwViQRmyJjf3jxcWnLFQAYob8uvvx7QNhWyj6OmaYDKyg@mail.gmail.com>
- <86bkpmrjv8.wl-maz@kernel.org>
- <CAAeT=Fzp-7MMBJshAAQBgFwXLH2z5ASDgmDBLNJsQoFA=MSciw@mail.gmail.com>
- <87pme0fdvp.wl-maz@kernel.org>
- <CAAeT=Fzgu1iaMmGXWZcmj9ifmchKXZXG2y7ksvQzoTGAQ=G-jw@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <37d0738282f1a37cdb931686d0b89ac0@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-11-08 05:36, Reiji Watanabe wrote:
-> Hi Marc,
-> 
->> > BTW, if we have no intention of supporting a mix of vCPUs with and
->> > without PMU, I think it would be nice if we have a clear comment on
->> > that in the code.  Or I'm hoping to disallow it if possible though.
->> 
->> I'm not sure we're in a position to do this right now. The current API
->> has always (for good or bad reasons) been per-vcpu as it is tied to
->> the vcpu initialisation.
-> 
-> Thank you for your comments!
-> Then, when a guest that has a mix of vCPUs with and without PMU,
-> userspace can set kvm->arch.dfr0_pmuver to zero or IMPDEF, and the
-> PMUVER for vCPUs with PMU will become 0 or IMPDEF as I mentioned.
-> For instance, on the host whose PMUVER==1, if vCPU#0 has no 
-> PMU(PMUVER==0),
-> vCPU#1 has PMU(PMUVER==1), if the guest is migrated to another host 
-> with
-> same CPU features (PMUVER==1), if SET_ONE_REG of ID_AA64DFR0_EL1 for 
-> vCPU#0
-> is done after for vCPU#1, kvm->arch.dfr0_pmuver will be set to 0, and
-> the guest will see PMUVER==0 even for vCPU1.
-> 
-> Should we be concerned about this case?
 
-Yeah, this is a real problem. The issue is that we want to keep
-track of two separate bits of information:
+--=-DiOVFhyRoAb889tkGkTb
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-- what is the revision of the PMU when the PMU is supported?
-- what is the PMU unsupported or IMPDEF?
+On Fri, 2022-10-28 at 13:36 +0200, Paolo Bonzini wrote:
+> We _should_ be following the Xen API, which does not even say that the
+> areas have to fit in a single page.  In fact, even Linux's
+>=20
+>          struct vcpu_register_runstate_memory_area area;
+>=20
+>          area.addr.v =3D &per_cpu(xen_runstate, cpu);
+>          if (HYPERVISOR_vcpu_op(VCPUOP_register_runstate_memory_area,
+>                                 xen_vcpu_nr(cpu), &area))
+>=20
+> could fail or not just depending on the linker's whims, if I'm not
+> very confused.
+>=20
+> Other data structures *do* have to fit in a page, but the runstate area
+> does not and it's exactly the one where the cache comes the most handy.
+> For this I'm going to wait for David to answer.
 
-and we use the same field for both, which clearly cannot work
-if we allow vcpus with and without PMUs in the same VM.
+Yeah, I recall vetting a bunch of these to ensure that it's safe to
+assume that it does fit within the page... but that clearly isn't true
+for the runstate_area.
 
-I've now switched to an implementation where I track both
-the architected version as well as the version exposed when
-no PMU is supported, see below.
+As things stand, I believe a guest is perfectly entitled to provide a
+region which crosses a page boundary, and Xen copes with that. But as
+you say, KVM doesn't.
 
-We still cannot track both no-PMU *and* impdef-PMU, nor can we
-track multiple PMU revisions. But that's not a thing as far as
-I am concerned.
+However, I don't think this *is* the case where the cache comes in the
+most handy. The cache is really useful where we have to do *atomic*
+operations on guest addresses, and doing so directly is a whole lot
+nicer than futex-style try-it-and-fail-gracefully operations on
+userspace addresses.
 
-Thanks,
+For the runstate area, I think we can live with using a gfn_to_hva
+cache instead, and writing via the userspace address (with appropriate
+atomicity for the RUNSTATE_runnable case as we have at the moment
+gating the refresh).
 
-         M.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h 
-b/arch/arm64/include/asm/kvm_host.h
-index 90c9a2dd3f26..cc44e3bc528d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -163,7 +163,10 @@ struct kvm_arch {
+--=-DiOVFhyRoAb889tkGkTb
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-  	u8 pfr0_csv2;
-  	u8 pfr0_csv3;
--	u8 dfr0_pmuver;
-+	struct {
-+		u8 imp:4;
-+		u8 unimp:4;
-+	} dfr0_pmuver;
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTEzMTMzMjQ2WjAvBgkqhkiG9w0BCQQxIgQg1hGtZK3v
++UfT2aam+UR6t9bXs43rCFGmTWzP7zradMgwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBnxIw22O+/TXAPQfXDDUVZx00JPMYabDWC
+rgDC2s2qrVoFiSAxTLjkrfBbLYskPiDKZ2g6wDGeQOGZX3lb+l6bPGSK9fvq/h3LJjXpBztY09cE
+C4qJGcQmX5MTdutKjTHibUFTse3hLvYjIthTmrn8ukUuN9WggsgFB5AHGzMaMZ5vl6k25Rs2+J5I
+FEW94dl5Q7VjN2JvzgtBT1K3wU99U+iA63CbhB1dR0OZ3cp753/NsCD3FjfzaGZO4+spvp1q/Oht
+87zpvu7QuQiF9LW2BV7w4kbzqEwPh04LER4M36WiKqW6a37j/DqwSM8g1feo3Bv3VesNFINwIcCQ
+Ufq2zJ3z3DSuEbIMEJh9HePFxGZB4+Ijto8qu/PNuLwzQUnnYvZaaoUcSLwDNC6OdpoyfuJ/nJQJ
+n9Lmp72L4mEc4c0S4rH4eEABtfytN5Tdij4pTzHj3Mc7blUwIDcUh3qXW7AiMja7+EPIimlpfjx+
+suspI5Xl3Xi0g97ybjJl1qYb3f2E+oSbYZt63N2GcFUS2uQLR9aFbyetFAX0HETVK299/us6ys+T
+d7+mu/LbPOrvzd5VUN+7ImtpWoadO/UrE6M9IPeUSTEOqEtuab06GE0Q7S4d9j7n5nOCZdVxdyjV
+pgCB9Dh4sZSmrW29PzjGlgl32r0KJsJ2qkYGpWCo+wAAAAAAAA==
 
-  	/* Hypercall features firmware registers' descriptor */
-  	struct kvm_smccc_features smccc_feat;
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 6b3ed524630d..f956aab438c7 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -168,7 +168,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long 
-type)
-  	 * Initialise the default PMUver before there is a chance to
-  	 * create an actual PMU.
-  	 */
--	kvm->arch.dfr0_pmuver = kvm_arm_pmu_get_pmuver_limit();
-+	kvm->arch.dfr0_pmuver.imp = kvm_arm_pmu_get_pmuver_limit();
 
-  	return ret;
-  out_free_stage2_pgd:
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 95100896de72..615cb148e22a 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1069,14 +1069,9 @@ static bool access_arch_timer(struct kvm_vcpu 
-*vcpu,
-  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
-  {
-  	if (kvm_vcpu_has_pmu(vcpu))
--		return vcpu->kvm->arch.dfr0_pmuver;
-+		return vcpu->kvm->arch.dfr0_pmuver.imp;
+--=-DiOVFhyRoAb889tkGkTb--
 
--	/* Special case for IMPDEF PMUs that KVM has exposed in the past... */
--	if (vcpu->kvm->arch.dfr0_pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
--		return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
--
--	/* The real "no PMU" */
--	return 0;
-+	return vcpu->kvm->arch.dfr0_pmuver.unimp;
-  }
-
-  static u8 perfmon_to_pmuver(u8 perfmon)
-@@ -1295,7 +1290,10 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu 
-*vcpu,
-  	if (val)
-  		return -EINVAL;
-
--	vcpu->kvm->arch.dfr0_pmuver = pmuver;
-+	if (valid_pmu)
-+		vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
-+	else
-+		vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
-
-  	return 0;
-  }
-@@ -1332,7 +1330,10 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
-  	if (val)
-  		return -EINVAL;
-
--	vcpu->kvm->arch.dfr0_pmuver = perfmon_to_pmuver(perfmon);
-+	if (valid_pmu)
-+		vcpu->kvm->arch.dfr0_pmuver.imp = perfmon_to_pmuver(perfmon);
-+	else
-+		vcpu->kvm->arch.dfr0_pmuver.unimp = perfmon_to_pmuver(perfmon);
-
-  	return 0;
-  }
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 3d526df9f3c5..628775334d5e 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -93,7 +93,7 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
-   * Evaluates as true when emulating PMUv3p5, and false otherwise.
-   */
-  #define kvm_pmu_is_3p5(vcpu)						\
--	(vcpu->kvm->arch.dfr0_pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P5)
-+	(vcpu->kvm->arch.dfr0_pmuver.imp >= ID_AA64DFR0_EL1_PMUVer_V3P5)
-
-  u8 kvm_arm_pmu_get_pmuver_limit(void);
-
--- 
-Jazz is not dead. It just smells funny...
