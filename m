@@ -2,227 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3921628BEB
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 23:17:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68AC2628C10
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 23:24:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236156AbiKNWRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 17:17:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52462 "EHLO
+        id S237411AbiKNWYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 17:24:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237899AbiKNWRK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 17:17:10 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2062.outbound.protection.outlook.com [40.107.243.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03CE415821;
-        Mon, 14 Nov 2022 14:17:05 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NEQFH4XNEXfuTsYWdTscAUSjPJJi1NVOnOzyar8RyTnvMonJVbowMKNEtiEt+xgk197/aqp+dyWlMfwVcAqsLC8HCes43rpM92FzXUld87AFvlvvtpQ1fsPFxtx48S1slF7dEOEwee7vpsXmCaqdKA88FBxJwuuxjxVVDy+FinZU3S5naeBarp8ca1ZwoHK6Xtawuk3sShNTF8sKm3Jxu7a/6WZdmmHVvqV5KMyfvJSP+cD5wPMTG5DGjEQrDkKQ2qkym9DFMHCjDTU7L8TEtAVP5l6hlQc6dW/6VGcF2+Uq2NHkbuOCWhYmooUzK/kdIG0Si6JrhIAJXJFgWT2nzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V263XsirVYEAXt3LlFbznJtLX/k6bQ/ZmYJY3BrLdh4=;
- b=Jg8tdWopLvubATC82KN8z3XrTPAJM8ggSDqaYl7GocZoAWRN8x+LPJlECABBuRLE7FuSogtUacj+50UWbLLu9YC9KSSv+tbFJNImWro0qJX2F4fyp1zpgkkBkh4su3BwM8RDCNe8/3EkZS8q+NlyBDqFwJvJEStf+LV3Of/jgtfACRgqU6FMppWGDKbvxO4Mk40pH6sOXkOA6BHUEaEGDWjEhZvL3SugW9+avuJ5c3vZy/iwUgLkauhGRNl302RUGgdpV2CWSPpc7J7Yv0+F+IGae+2JxFOSYYZU0GzU3OzQUG+QsrEgmTjd3tHn4D7Ub8bv25SyibMHnfv6W77J8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=shutemov.name smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V263XsirVYEAXt3LlFbznJtLX/k6bQ/ZmYJY3BrLdh4=;
- b=bjxbgtsvfgNu+8WCr1l+i06Ye+u9kpAx5onyymdtsuTgxhM9BxsUOI6cNFEPJWULrtdDLzCPpGEFlECno28i2EivB07sXzL2hkSDSbJxIfiP/3t+gwDjiXcXaJt3dj5+G6Z/hoQo01OcEUKNj4itbnYnrfd8iWwGD2Nm4HkEe3g=
-Received: from DS7PR05CA0079.namprd05.prod.outlook.com (2603:10b6:8:57::9) by
- BN9PR12MB5244.namprd12.prod.outlook.com (2603:10b6:408:101::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.17; Mon, 14 Nov
- 2022 22:17:02 +0000
-Received: from DM6NAM11FT013.eop-nam11.prod.protection.outlook.com
- (2603:10b6:8:57:cafe::a6) by DS7PR05CA0079.outlook.office365.com
- (2603:10b6:8:57::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.8 via Frontend
- Transport; Mon, 14 Nov 2022 22:17:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT013.mail.protection.outlook.com (10.13.173.142) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5813.12 via Frontend Transport; Mon, 14 Nov 2022 22:17:02 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 14 Nov
- 2022 16:17:01 -0600
-Date:   Mon, 14 Nov 2022 16:16:32 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-CC:     Vlastimil Babka <vbabka@suse.cz>,
-        Chao Peng <chao.p.peng@linux.intel.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-        <linux-api@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        <luto@kernel.org>, <jun.nakajima@intel.com>,
-        <dave.hansen@intel.com>, <ak@linux.intel.com>, <david@redhat.com>,
-        <aarcange@redhat.com>, <ddutile@redhat.com>, <dhildenb@redhat.com>,
-        Quentin Perret <qperret@google.com>, <tabba@google.com>,
-        <mhocko@suse.com>, Muchun Song <songmuchun@bytedance.com>,
-        <wei.w.wang@intel.com>
-Subject: Re: [PATCH v9 1/8] mm: Introduce memfd_restricted system call to
- create restricted user memory
-Message-ID: <20221114221632.5xaz24adkghfjr2q@amd.com>
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <20221025151344.3784230-2-chao.p.peng@linux.intel.com>
- <20221031174738.fklhlia5fmaiinpe@amd.com>
- <20221101113729.GA4015495@chaop.bj.intel.com>
- <20221101151944.rhpav47pdulsew7l@amd.com>
- <20a11042-2cfb-8f42-9d80-6672e155ca2c@suse.cz>
- <20221114152843.ylxe4dis254vrj5u@box.shutemov.name>
+        with ESMTP id S237266AbiKNWYp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 17:24:45 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 582DF17E28;
+        Mon, 14 Nov 2022 14:24:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=5zvK4A/3b3sb4CLf5RZydU6DNS9ZjkNiDzZm6RENhIc=; b=OMYZGsmUt+liz9HAuSBKl8M2TZ
+        bMAUenEkBY249GcxJDtWxLyigyV0uX0oS+OLilugs67xokCPzUx6I54daWAKw7h4Z33k0DMfp9uYE
+        YhvtQnc2a/zlhnMp61DzpLrbeI+wY3wvDVmBUVJRqdek14s+JZsRmVay76TiInF3Qn7zZ/t5CY3Hb
+        9D99sYB/ZaS2Ljzt5YMTYdncVIhhefG7nyubsCTteTs36UJton49SuSalT67c6j2ziQrDZD9Fh1aW
+        QhGyezEdwwcBoyFVrDLHtAXiMjdDdNUm39Sk0EvX6q5QkCvx5VBzqipA0rzlwcGByo1uYJ8I3yBCS
+        f8Kv5LgQ==;
+Received: from [205.251.233.106] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ouhsf-00FpUP-6F; Mon, 14 Nov 2022 22:24:41 +0000
+Message-ID: <fde14caa0cf774b2b46f1124644a3b326a0a8f09.camel@infradead.org>
+Subject: Re: [PATCH] KVM: x86/xen: Make number of event channels defines
+ less magical
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paul Durrant <paul@xen.org>
+Date:   Mon, 14 Nov 2022 14:24:32 -0800
+In-Reply-To: <Y3KZVUCCH+YQDbqu@google.com>
+References: <20221114181632.3279119-1-seanjc@google.com>
+         <629d6d90ce95b9db74f0101a4428be1119c4bfc7.camel@infradead.org>
+         <Y3KZVUCCH+YQDbqu@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-w1Qxjn7ruFH1U2x8yMNo"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20221114152843.ylxe4dis254vrj5u@box.shutemov.name>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT013:EE_|BN9PR12MB5244:EE_
-X-MS-Office365-Filtering-Correlation-Id: b6cee322-9008-4610-fa69-08dac68df47e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9BY3zSEoSRZKSh2wRev1auNh/P6OFerGFjzhoOrcPX1T5R9uqvGV/3ga/CWspUlvYlSwVSM7pdl07edr+1YCWV7IkOlcyKIm/ytcxs6bBjgIO5wokGGK2WonExKAf6E2n6rQ5WlIdcU0IJDeJ7zd9NseIyZWHhVFqrHkhWP6jV1zEX2bteHtggeOk46jmcWFBIgoRD3NRKj4Gcu0lUsUQtucjJNiTQ0MUOq96tG4XeQ3T91HhTR7kzH9G29Jv4jCqNNQufnluCWk1ulOluD3OpB/11cx5+fs8ylm9TNrJHYrKmm0JrwrW9sUqMEYJ/J+Fr/sn4S4zp6dALBootMdnM1wRYUsYEV/yt36eaIvYdsL1gJsYTJjuMmJN/P5Wm/bYsxvCWc/9M9TZ7BxqKfyZSe3zEhNjG4S1URS7a+8vCTnPrdMT7QQ49RnmvhCPaMbEaYeMPWJ1usW/kUZTCseb/jeIYrbHpj06eBWiTC9uObY4wqWhj7ns7/mjOOhtSK5+TpHMadt2wBddpgF+KkFmP8Y5rMkc/kae2EGxYDg6vNDycTLDeyviJQn8fVBX9gT9hYN9Zu3rB9mW382Lbffqyq65iklgEm0ZY6tZQjIyHFSoRMiojnWpVc4bUec4LPlmS2xI2RpsQnYdBpPoASMzg88QxAA1bQ4v4FiV8KNUUIsjI8eTGi9t6/4uSakNT6DTRghYUNKUt7NUHWlJZZvBlOtYosfO95lA7cPogHDJsiaNL/4xna0qJFo4RWDZH+kAT13ncYvqgvLicN9qIQDe7pMLttDrHTnptBv2nsV/n+0C4VH6ssK66jmnYqlwhUs
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(136003)(376002)(346002)(396003)(39860400002)(451199015)(36840700001)(46966006)(40470700004)(47076005)(186003)(5660300002)(6916009)(54906003)(36860700001)(83380400001)(316002)(2906002)(53546011)(40460700003)(41300700001)(1076003)(44832011)(8936002)(36756003)(16526019)(2616005)(7416002)(336012)(426003)(7406005)(40480700001)(8676002)(70586007)(4326008)(26005)(70206006)(66899015)(82310400005)(478600001)(6666004)(86362001)(82740400003)(81166007)(356005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2022 22:17:02.0059
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b6cee322-9008-4610-fa69-08dac68df47e
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT013.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5244
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 14, 2022 at 06:28:43PM +0300, Kirill A. Shutemov wrote:
-> On Mon, Nov 14, 2022 at 03:02:37PM +0100, Vlastimil Babka wrote:
-> > On 11/1/22 16:19, Michael Roth wrote:
-> > > On Tue, Nov 01, 2022 at 07:37:29PM +0800, Chao Peng wrote:
-> > >> > 
-> > >> >   1) restoring kernel directmap:
-> > >> > 
-> > >> >      Currently SNP (and I believe TDX) need to either split or remove kernel
-> > >> >      direct mappings for restricted PFNs, since there is no guarantee that
-> > >> >      other PFNs within a 2MB range won't be used for non-restricted
-> > >> >      (which will cause an RMP #PF in the case of SNP since the 2MB
-> > >> >      mapping overlaps with guest-owned pages)
-> > >> 
-> > >> Has the splitting and restoring been a well-discussed direction? I'm
-> > >> just curious whether there is other options to solve this issue.
-> > > 
-> > > For SNP it's been discussed for quite some time, and either splitting or
-> > > removing private entries from directmap are the well-discussed way I'm
-> > > aware of to avoid RMP violations due to some other kernel process using
-> > > a 2MB mapping to access shared memory if there are private pages that
-> > > happen to be within that range.
-> > > 
-> > > In both cases the issue of how to restore directmap as 2M becomes a
-> > > problem.
-> > > 
-> > > I was also under the impression TDX had similar requirements. If so,
-> > > do you know what the plan is for handling this for TDX?
-> > > 
-> > > There are also 2 potential alternatives I'm aware of, but these haven't
-> > > been discussed in much detail AFAIK:
-> > > 
-> > > a) Ensure confidential guests are backed by 2MB pages. shmem has a way to
-> > >    request 2MB THP pages, but I'm not sure how reliably we can guarantee
-> > >    that enough THPs are available, so if we went that route we'd probably
-> > >    be better off requiring the use of hugetlbfs as the backing store. But
-> > >    obviously that's a bit limiting and it would be nice to have the option
-> > >    of using normal pages as well. One nice thing with invalidation
-> > >    scheme proposed here is that this would "Just Work" if implement
-> > >    hugetlbfs support, so an admin that doesn't want any directmap
-> > >    splitting has this option available, otherwise it's done as a
-> > >    best-effort.
-> > > 
-> > > b) Implement general support for restoring directmap as 2M even when
-> > >    subpages might be in use by other kernel threads. This would be the
-> > >    most flexible approach since it requires no special handling during
-> > >    invalidations, but I think it's only possible if all the CPA
-> > >    attributes for the 2M range are the same at the time the mapping is
-> > >    restored/unsplit, so some potential locking issues there and still
-> > >    chance for splitting directmap over time.
-> > 
-> > I've been hoping that
-> > 
-> > c) using a mechanism such as [1] [2] where the goal is to group together
-> > these small allocations that need to increase directmap granularity so
-> > maximum number of large mappings are preserved.
-> 
-> As I mentioned in the other thread the restricted memfd can be backed by
-> secretmem instead of plain memfd. It already handles directmap with care.
 
-It looks like it would handle direct unmapping/cleanup nicely, but it
-seems to lack fallocate(PUNCH_HOLE) support which we'd probably want to
-avoid additional memory requirements. I think once we added that we'd
-still end up needing some sort of handling for the invalidations.
+--=-w1Qxjn7ruFH1U2x8yMNo
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Also, I know Chao has been considering hugetlbfs support, I assume by
-leveraging the support that already exists in shmem. Ideally SNP would
-be able to make use of that support as well, but relying on a separate
-backend seems likely to result in more complications getting there
-later.
+On Mon, 2022-11-14 at 19:39 +0000, Sean Christopherson wrote:
+> Ugh.  I worried that might be the case.  An alternative approach to help =
+document
+> things from a KVM perspective would be something like:
+>=20
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index 93c628d3e3a9..7769f3b98af0 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -1300,6 +1300,9 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
+> =20
+>  static inline int max_evtchn_port(struct kvm *kvm)
+>  {
+> +       BUILD_BUG_ON(EVTCHN_2L_NR_CHANNELS !=3D
+> +                    (sizeof_field(struct shared_info, evtchn_pending) * =
+BITS_PER_BYTE));
+> +
+>         if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode)
+>                 return EVTCHN_2L_NR_CHANNELS;
+>         else
 
-> 
-> But I don't think it has to be part of initial restricted memfd
-> implementation. It is SEV-specific requirement and AMD folks can extend
-> implementation as needed later.
+Not really sure I see the point of that.
 
-Admittedly the suggested changes to the invalidation mechanism made a
-lot more sense to me when I was under the impression that TDX would have
-similar requirements and we might end up with a common hook. Since that
-doesn't actually seem to be the case, it makes sense to try to do it as
-a platform-specific hook for SNP.
+There are two main reasons for that kind of BUILD_BUG_ON(). I've added
+a few of them asserting that the size of the structure and its compat
+variant are identical, and thus documenting *why* the code lacks compat
+handling. For example...
 
-I think, given a memslot, a GFN range, and kvm_restricted_mem_get_pfn(),
-we should be able to get the same information needed to figure out whether
-the range is backed by huge pages or not. I'll see how that works out
-instead.
+	/*
+	 * Next, write the new runstate. This is in the *same* place
+	 * for 32-bit and 64-bit guests, asserted here for paranoia.
+	 */
+	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, state) !=3D
+		     offsetof(struct compat_vcpu_runstate_info, state));
 
-Thanks,
+The second reason is to prevent accidental screwups where our local
+definition of a structure varies from the official ABI. Like these:
 
-Mike
+	/* Paranoia checks on the 32-bit struct layout */
+	BUILD_BUG_ON(offsetof(struct compat_shared_info, wc) !=3D 0x900);
+	BUILD_BUG_ON(offsetof(struct compat_shared_info, arch.wc_sec_hi) !=3D 0x92=
+4);
+	BUILD_BUG_ON(offsetof(struct pvclock_vcpu_time_info, version) !=3D 0);
 
-> 
-> -- 
->   Kiryl Shutsemau / Kirill A. Shutemov
+I don't really see the above fulfilling either of those use cases.
+Given that the definition of the evtchn_pending field is:
+
+        xen_ulong_t evtchn_pending[sizeof(xen_ulong_t) * 8];
+
+It's fairly tautological that the number of event channels supported is
+BITS_PER_ULONG * BITS_PER_ULONG. Which is sizeof(xen_ulong_t)=C2=B2 * 64 as
+defined in the official Xen headers.
+
+I don't know that we really need to add our own sanity check on the
+headers we imported from Xen. It doesn't seem to add much.
+
+No objection to cleaning up the COMPAT one though, as in your original
+patch.
+
+
+--=-w1Qxjn7ruFH1U2x8yMNo
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTE0MjIyNDMyWjAvBgkqhkiG9w0BCQQxIgQgGRtLxaBi
+u+K5e2nTGDzW9eiRjRhJffQ8PHdDgzKd9qcwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAPqOF7ajAvlf2Mz+T70GGy26IvA1HCbIxt
+YDMoB4wu/Fqv+bAWvLqtHvO7zHU+BdVcQV+n0JjLmSaSxCLYKTaMwcXBkioOrOw0Z0m9909dONN+
+kE9WEtQchZHP5aaUV4nD6dZzbN+Mfu2dPfrhY3YFMlYHHP1tAgvjYDt6jmxUrdZCgUN/GnaXAaxW
+7GZ7ykVCUK87ySYRJ5rCfCRK0IyOAxWdcI8DbX7pTYWTJVEP9PU9QNBMEpV34SuZzIcGo2mEE0OX
+GkL2Zf+UP98SfGIoOhbP7AKdO5+BGOuOOAGVcRJfmKWNSYUMrQzqHxGNEWRPBbTzBLaRujdUupMV
+zrIqp+5p7t9VI+MbQdifAmAgdFu7ApzJNDhMayF7+Hp+HqCwslUFT/PFPAuRdI2d0vlJtSzAGbkg
+525JIDyEks2hzbB4ZBmqA05RqGb/wGsKHt/XZ8AhW3NuPXg6O1O9mcThcBjHgvs4QoXk8iq6LhWO
+mcDpW2/1y1d14tBromPnWIt1O4tAiwo7y23H/rgIdnFr1fZGeL9Dh8Yky/TFI+xgIeckocM8ytbe
+4LMXkwzy4DL0LDYV8hntcR/ugELUH3tH/kcogfoFFDoxMofly1gROvYCdDBhhxZ345aYHeDJnhfb
+z79V5cTVR4aGmHDKoYJfH8OnIsP4+FhjMiFK8PJEZQAAAAAAAA==
+
+
+--=-w1Qxjn7ruFH1U2x8yMNo--
+
