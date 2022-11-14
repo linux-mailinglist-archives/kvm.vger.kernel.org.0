@@ -2,95 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E20C6278BC
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 10:09:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39ABB627949
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 10:44:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236356AbiKNJJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 04:09:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55422 "EHLO
+        id S235961AbiKNJo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 04:44:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235826AbiKNJJQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 04:09:16 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D865330A;
-        Mon, 14 Nov 2022 01:09:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=CmCkVP6XVasiawMWAc2MfoRTytUQFHnWEyNdl8YOQ2s=; b=sJPpFzwZM45thglm1Lcdyxo+hB
-        /kqvQJXKkVETWLF3wT7rXwfO8CE/lwpxaayg0f9hTslmteCjyVriq71W1GMQrgyWKxT9p1tjrfzlX
-        h8aN9mrCczTIN1mqdShxKbMeaJ3uPsgFeQliRvSUvmPeZwh4j32mfhRHIl98JloUN4FcvsTs6nL7Q
-        yy6zxw1NnYlE93wllagjvtdqocPe+2BrzVqXwF/O+yr/xCpZHq8Y2fgQPqcPbrEXvrF1fRvsaJNr0
-        8alPAyIVFlxo9FTNHezy+JCEeN5Ln2onNVxA6C/vukjgqFqk5CLClrecLboV9ogydeVMV0oyYTywu
-        0ExVDnwg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ouVSd-00FNEY-ER; Mon, 14 Nov 2022 09:08:59 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        with ESMTP id S236008AbiKNJoz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 04:44:55 -0500
+X-Greylist: delayed 432 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 14 Nov 2022 01:44:55 PST
+Received: from relay.mgdcloud.pe (relay.mgdcloud.pe [201.234.116.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 498BE192B9
+        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 01:44:55 -0800 (PST)
+Received: from relay.mgdcloud.pe (localhost.localdomain [127.0.0.1])
+        by relay.mgdcloud.pe (Proxmox) with ESMTP id 128D2229817;
+        Mon, 14 Nov 2022 04:36:33 -0500 (-05)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cgracephoto.com;
+         h=cc:content-description:content-transfer-encoding:content-type
+        :content-type:date:from:from:message-id:mime-version:reply-to
+        :reply-to:subject:subject:to:to; s=Relay; bh=POmmLhbs6/14Mhmcbsw
+        HpX0H+MIlo+W0e6cG8XDkBG8=; b=kVGemHP2Ezq2C1j2GPEqAS9hLjvLaaFyuUx
+        twbprDAfDDMwoBbSe6uAoJHoYvwJ/xFVpACDKYmYszFZV9oModvACCmHQHLZfKGF
+        EdJreSY6oCZA72Tumf8pUsz2r1o0zmqxiNs61auvAKTwMOjKkwmc8sSWJqmY6Vvq
+        J6aoZK/oBtzHNwt5T4F5qaeCmD9hdd1XI95OOvH4Q2swbvFd+aaUcBgUBHfFoTv0
+        jklcFM8eqvGbA6kT6yZfBHJUlmXfNw5C8RIjlsHxZ2IkIAdkKnauRNv6xJjomklR
+        qacR6rPyBQ/XCL/wgpjiaMj8kdVTpGlX07L8MF6KfDTTslubDVA==
+Received: from portal.mgd.pe (portal.mgd.pe [107.1.2.10])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B08F2300282;
-        Mon, 14 Nov 2022 10:08:51 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 7BF392C8037C6; Mon, 14 Nov 2022 10:08:51 +0100 (CET)
-Date:   Mon, 14 Nov 2022 10:08:51 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Li, Xin3" <xin3.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: Re: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
- for NMI/IRQ reinjection
-Message-ID: <Y3IFo9NrAcYalBzM@hirez.programming.kicks-ass.net>
-References: <Y2y+YgBUYuUHbPtd@hirez.programming.kicks-ass.net>
- <BN6PR1101MB2161976800EB14B74A24D9F3A8019@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <Y24SoNKZtj/NPSGy@hirez.programming.kicks-ass.net>
- <6097036e-063f-5175-72b2-8935b12af853@redhat.com>
- <Y24908NWCdzUNqI0@hirez.programming.kicks-ass.net>
- <6fd26a70-3774-6ae7-73ea-4653aee106f0@redhat.com>
- <Y25a0Z2tOMWYZs4j@hirez.programming.kicks-ass.net>
- <BN6PR1101MB216141A21353AB84CEA541DFA8009@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <Y26jkHfK9INwU7Yy@hirez.programming.kicks-ass.net>
- <BN6PR1101MB2161E8217F50D18C56E5864EA8059@BN6PR1101MB2161.namprd11.prod.outlook.com>
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by relay.mgdcloud.pe (Proxmox) with ESMTPS id EDD6022980F;
+        Mon, 14 Nov 2022 04:36:32 -0500 (-05)
+Received: from localhost (localhost [127.0.0.1])
+        by portal.mgd.pe (Postfix) with ESMTP id CD00120187D81;
+        Mon, 14 Nov 2022 04:36:32 -0500 (-05)
+Received: from portal.mgd.pe ([127.0.0.1])
+        by localhost (portal.mgd.pe [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id 5YqyzD5cKZDK; Mon, 14 Nov 2022 04:36:32 -0500 (-05)
+Received: from localhost (localhost [127.0.0.1])
+        by portal.mgd.pe (Postfix) with ESMTP id 819C620187D83;
+        Mon, 14 Nov 2022 04:36:32 -0500 (-05)
+X-Virus-Scanned: amavisd-new at mgd.pe
+Received: from portal.mgd.pe ([127.0.0.1])
+        by localhost (portal.mgd.pe [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id kSCWoesmlOxX; Mon, 14 Nov 2022 04:36:32 -0500 (-05)
+Received: from [103.125.190.179] (unknown [103.125.190.179])
+        by portal.mgd.pe (Postfix) with ESMTPSA id 3EB2D20187D81;
+        Mon, 14 Nov 2022 04:36:25 -0500 (-05)
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN6PR1101MB2161E8217F50D18C56E5864EA8059@BN6PR1101MB2161.namprd11.prod.outlook.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: Strategic plan
+To:     Recipients <cindy@cgracephoto.com>
+From:   "Mr.IgorS. Lvovich" <cindy@cgracephoto.com>
+Date:   Mon, 14 Nov 2022 01:36:25 -0800
+Reply-To: richad.tang@yahoo.com.hk
+Message-Id: <20221114093626.3EB2D20187D81@portal.mgd.pe>
+X-Spam-Status: No, score=4.2 required=5.0 tests=BAYES_50,DKIM_INVALID,
+        DKIM_SIGNED,FREEMAIL_FORGED_REPLYTO,HK_NAME_MR_MRS,RCVD_IN_SBL,
+        SPF_FAIL,SPF_HELO_PASS,TO_EQ_FM_DOM_SPF_FAIL,TO_EQ_FM_SPF_FAIL
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 14, 2022 at 04:39:40AM +0000, Li, Xin3 wrote:
+Hello
+I will like to use the liberty of this medium to inform you as a consultant=
+,that my principal is interested in investing his bond/funds as a silent bu=
+siness partner in your company.Taking into proper
+consideration the Return on Investment(ROI) based on a ten (10) year strate=
+gic plan.
+I shall give you details when you reply.
 
-> > But what about NMIs, afaict this is all horribly broken for NMIs.
-> > 
-> > So the whole VMX thing latches the NMI (which stops NMI recursion), right?
-> > 
-> > But then you drop out of noinstr code, which means any random exception can
-> > happen (kprobes #BP, hw_breakpoint #DB, or even #PF due to random
-> > nonsense like *SAN). This exception will do IRET and clear the NMI latch, all
-> > before you get to run any of the NMI code.
-> 
-> What you said here implies that we have this problem in the existing code.
-> Because a fake iret stack is created to call the NMI handler in the IDT NMI
-> descriptor, which lastly executes the IRET instruction.
+Regards,
 
-I can't follow; of course the IDT handler terminates with IRET, it has
-to no?
-
-And yes, the current code appears to suffer the same defect.
