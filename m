@@ -2,148 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EEE496288A2
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 19:56:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D135F6288E0
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 20:05:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236195AbiKNS4f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 13:56:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43558 "EHLO
+        id S236823AbiKNTFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 14:05:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbiKNS4d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 13:56:33 -0500
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1D111C405
-        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 10:56:31 -0800 (PST)
-Date:   Mon, 14 Nov 2022 18:56:25 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1668452190;
+        with ESMTP id S230520AbiKNTFO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 14:05:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65CD760F9
+        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 11:04:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668452654;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Q5udZ+ISDmPheWfBt897YJ48hWO5BmuEk3t0+EgBqyY=;
-        b=qZZvxC+eJaT/x29y7C98Iv0te2QPyvqPHPnSQau+WHWzWl3J3lyFpvRx4+Q97icgQOWhUm
-        ubcx7aaMR4ASeegeaahM1IxcIf844OwQpiN2QMgXJp39Zk0wFUcFYKCuJs8JeVMy47Ylps
-        50eVXZsTXpHNMuCUdCq9f/UU1S2iSxo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
-        qperret@google.com, catalin.marinas@arm.com,
-        andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-        ricarkol@gmail.com
-Subject: Re: [RFC PATCH 06/12] KVM: arm64: Split block PTEs without using
- break-before-make
-Message-ID: <Y3KPWTj0KwLtL535@google.com>
-References: <20221112081714.2169495-1-ricarkol@google.com>
- <20221112081714.2169495-7-ricarkol@google.com>
+        bh=1B6nLTDuPebHJGyEVjgwH031QeW3UBO4n3I89vsx0DI=;
+        b=AF3jXeaPyv4mJYfYldbAmG2tn0XdPZLYoq/GYfA/pA9HgZ4ioDgTCoWotLqREaLjEsf1W8
+        le1H7q/WiGaDxzFMIjECQhhqlqQGZzhgnaeXF5LU3L9D8UkEVhUlWSXcfFNYGhAEGqRsdZ
+        3Y/cX91c07kRqEPG5tF0GhMuXXN3E4g=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-328-HFh3RMFfPLS3KTuZXcrqGQ-1; Mon, 14 Nov 2022 14:04:13 -0500
+X-MC-Unique: HFh3RMFfPLS3KTuZXcrqGQ-1
+Received: by mail-il1-f200.google.com with SMTP id n8-20020a056e02100800b00300906a2170so9702167ilj.2
+        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 11:04:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1B6nLTDuPebHJGyEVjgwH031QeW3UBO4n3I89vsx0DI=;
+        b=SAsvx3hN0eSDYHkaYkiaIuBGc7l3Z5iCHeLX8yvpRN6TkXjsbbkjXaKzqidp2Juqmj
+         u615Llpex02/6kAYV8pQpuhnmj8c49/PI+GkuYgPo9JvtjA1iXcJPFhs/BV7fdfCej1P
+         dmESJcfHKoxujBC3zB3Z0OoLoIEBoni8ZYcWun+x9XiGoZ15gcieOrkwtIbR5rmV/PyG
+         62pdLqLxSr5o92q0jlYXK6LLLWf753Rlr/n4Vh0QV95+bPH46kmdoHQvPQczOkN2gGq+
+         jNPQFNd7fRUCuWwGkHUV9Md5HmJ31gEhZqcm5E3JyuuxvGRlzeeSD94IgyNrxqZ8/4Qs
+         2kpw==
+X-Gm-Message-State: ANoB5pneqNGyuRcOSCjvX5TRO8GxOuHKCQMrpnqmdq7aofHyNADdpWqU
+        UoAaoZHmu80eDuX6iBbYbu11guLUQ/rDUjQKLaX0nR6kcJqZJ7e4/0xjWW1OfZtwWbL0lQKmU7P
+        oWypIflnvrZZ1
+X-Received: by 2002:a92:cc4a:0:b0:2f9:32c2:a10a with SMTP id t10-20020a92cc4a000000b002f932c2a10amr6751808ilq.47.1668452652245;
+        Mon, 14 Nov 2022 11:04:12 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf49zkiZ5xNuupHN70MsYb1YtxvgHFAHTdIild0fejwZjcHqQ82yArlb+zfqeOpT0dYfF0UzvA==
+X-Received: by 2002:a92:cc4a:0:b0:2f9:32c2:a10a with SMTP id t10-20020a92cc4a000000b002f932c2a10amr6751794ilq.47.1668452652030;
+        Mon, 14 Nov 2022 11:04:12 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id o16-20020a02a1d0000000b003751977da74sm3837315jah.102.2022.11.14.11.04.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Nov 2022 11:04:11 -0800 (PST)
+Date:   Mon, 14 Nov 2022 12:04:10 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, <kvm@vger.kernel.org>,
+        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
+        <leonro@nvidia.com>, <shayd@nvidia.com>, <maorg@nvidia.com>,
+        <avihaih@nvidia.com>, <cohuck@redhat.com>
+Subject: Re: [PATCH vfio 01/13] vfio: Add an option to get migration data
+ size
+Message-ID: <20221114120410.5facb7e5.alex.williamson@redhat.com>
+In-Reply-To: <dae6bdc2-eee5-daaf-e98f-1ca278310f3d@nvidia.com>
+References: <20221106174630.25909-1-yishaih@nvidia.com>
+        <20221106174630.25909-2-yishaih@nvidia.com>
+        <Y2veI4vCSO1xUi/C@nvidia.com>
+        <dae6bdc2-eee5-daaf-e98f-1ca278310f3d@nvidia.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221112081714.2169495-7-ricarkol@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 12, 2022 at 08:17:08AM +0000, Ricardo Koller wrote:
-> Breaking a huge-page block PTE into an equivalent table of smaller PTEs
-> does not require using break-before-make (BBM) when FEAT_BBM level 2 is
-> implemented. Add the respective check for eager page splitting and avoid
-> using BBM.
+On Sun, 13 Nov 2022 18:58:50 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
+
+> On 09/11/2022 19:06, Jason Gunthorpe wrote:
+> > On Sun, Nov 06, 2022 at 07:46:18PM +0200, Yishai Hadas wrote:  
+> >> Add an option to get migration data size by introducing a new migration
+> >> feature named VFIO_DEVICE_FEATURE_MIG_DATA_SIZE.
+> >>
+> >> Upon VFIO_DEVICE_FEATURE_GET the estimated data length that will be
+> >> required to complete STOP_COPY is returned.
+> >>
+> >> This option may better enable user space to consider before moving to
+> >> STOP_COPY whether it can meet the downtime SLA based on the returned
+> >> data.
+> >>
+> >> The patch also includes the implementation for mlx5 and hisi for this
+> >> new option to make it feature complete for the existing drivers in this
+> >> area.
+> >>
+> >> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> >> ---
+> >>   .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |  9 ++++++
+> >>   drivers/vfio/pci/mlx5/main.c                  | 18 +++++++++++
+> >>   drivers/vfio/pci/vfio_pci_core.c              |  3 +-
+> >>   drivers/vfio/vfio_main.c                      | 32 +++++++++++++++++++
+> >>   include/linux/vfio.h                          |  5 +++
+> >>   include/uapi/linux/vfio.h                     | 13 ++++++++
+> >>   6 files changed, 79 insertions(+), 1 deletion(-)  
+> > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> >
+> > Jason  
 > 
-> Also take care of possible Conflict aborts.  According to the rules
-> specified in the Arm ARM (DDI 0487H.a) section "Support levels for changing
-> block size" D5.10.1, this can result in a Conflict abort. So, handle it by
-> clearing all VM TLB entries.
+> Alex,
 > 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-
-I'd suggest adding the TLB conflict abort handler as a separate commit
-prior to actually relaxing break-before-make requirements.
-
-> ---
->  arch/arm64/include/asm/esr.h     |  1 +
->  arch/arm64/include/asm/kvm_arm.h |  1 +
->  arch/arm64/kvm/hyp/pgtable.c     | 10 +++++++++-
->  arch/arm64/kvm/mmu.c             |  6 ++++++
->  4 files changed, 17 insertions(+), 1 deletion(-)
+> Are we fine with taking the first 2 patches from this series ?
 > 
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index 15b34fbfca66..6f5b976396e7 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -114,6 +114,7 @@
->  #define ESR_ELx_FSC_ACCESS	(0x08)
->  #define ESR_ELx_FSC_FAULT	(0x04)
->  #define ESR_ELx_FSC_PERM	(0x0C)
-> +#define ESR_ELx_FSC_CONFLICT	(0x30)
->  
->  /* ISS field definitions for Data Aborts */
->  #define ESR_ELx_ISV_SHIFT	(24)
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 0df3fc3a0173..58e7cbe3c250 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -333,6 +333,7 @@
->  #define FSC_SECC_TTW1	(0x1d)
->  #define FSC_SECC_TTW2	(0x1e)
->  #define FSC_SECC_TTW3	(0x1f)
-> +#define FSC_CONFLICT	ESR_ELx_FSC_CONFLICT
->  
->  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
->  #define HPFAR_MASK	(~UL(0xf))
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 9c42eff6d42e..36b81df5687e 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1267,6 +1267,11 @@ static int stage2_create_removed(kvm_pte_t *ptep, u64 phys, u32 level,
->  	return __kvm_pgtable_visit(&data, mm_ops, ptep, level);
->  }
->  
-> +static bool stage2_has_bbm_level2(void)
-> +{
-> +	return cpus_have_const_cap(ARM64_HAS_STAGE2_BBM2);
-> +}
-> +
->  struct stage2_split_data {
->  	struct kvm_s2_mmu		*mmu;
->  	void				*memcache;
-> @@ -1308,7 +1313,10 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
->  	 */
->  	WARN_ON(stage2_create_removed(&new, phys, level, attr, mc, mm_ops));
->  
-> -	stage2_put_pte(ctx, data->mmu, mm_ops);
-> +	if (stage2_has_bbm_level2())
-> +		mm_ops->put_page(ctx->ptep);
-> +	else
-> +		stage2_put_pte(ctx, data->mmu, mm_ops);
->  
->  	/*
->  	 * Note, the contents of the page table are guaranteed to be made
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 8f26c65693a9..318f7b0aa20b 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1481,6 +1481,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		return 1;
->  	}
->  
-> +	/* Conflict abort? */
-> +	if (fault_status == FSC_CONFLICT) {
-> +		kvm_flush_remote_tlbs(vcpu->kvm);
+> For this one we have reviewed-by from Jason and Longfang Liu, the next 
+> patch has also a reviewed-by Jason and is very simple.
+> 
+> Please let me know if you want me to send them separately outside of 
+> this pre_copy series and add the mentioned reviewed-by or that you can 
+> just collect them out from the list by yourself.
 
-You don't need to perfom a broadcasted invalidation in this case. A
-local invalidation using the guest's VMID should suffice.
+Applied 1 & 2 to vfio next branch for v6.2.  Thanks,
 
---
-Thanks,
-Oliver
+Alex
+
