@@ -2,102 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AA48627C48
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 12:28:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 75751627C6F
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 12:37:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236523AbiKNL2u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 06:28:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55742 "EHLO
+        id S236120AbiKNLh2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 06:37:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236480AbiKNL2e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 06:28:34 -0500
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09C7C1B8;
-        Mon, 14 Nov 2022 03:27:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1668425271; x=1699961271;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=EKaNBkM/mr4z1EzacJF1XB0oHO557xsn5TcBYFdi/cY=;
-  b=J7CD9pPeMNPRUv/L2kDen8RLywT1wLrZ0W6eyEgextyq5wI+Qdo1pXEK
-   o5LRauayfMCk/cqrAQImHOPOrKdLGr/WzNloatHXKFNUhxrL2L+Cf2Tsg
-   oHjqF5eSInwWZlDmhFGsyNgwwb8hI1pgZot0njq0nKJSEd7ZSTRVJVpOV
-   o=;
-X-IronPort-AV: E=Sophos;i="5.96,161,1665446400"; 
-   d="scan'208";a="266316986"
-Subject: RE: [PATCH 03/16] KVM: x86: set gfn-to-pfn cache length consistently with VM
- word size
-Thread-Topic: [PATCH 03/16] KVM: x86: set gfn-to-pfn cache length consistently with VM
- word size
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2022 11:27:48 +0000
-Received: from EX13D44EUC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com (Postfix) with ESMTPS id C058941771;
-        Mon, 14 Nov 2022 11:27:45 +0000 (UTC)
-Received: from EX19D043EUC003.ant.amazon.com (10.252.61.176) by
- EX13D44EUC001.ant.amazon.com (10.43.164.236) with Microsoft SMTP Server (TLS)
- id 15.0.1497.42; Mon, 14 Nov 2022 11:27:44 +0000
-Received: from EX19D032EUC002.ant.amazon.com (10.252.61.185) by
- EX19D043EUC003.ant.amazon.com (10.252.61.176) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.20; Mon, 14 Nov 2022 11:27:44 +0000
-Received: from EX19D032EUC002.ant.amazon.com ([fe80::e696:121c:a227:174]) by
- EX19D032EUC002.ant.amazon.com ([fe80::e696:121c:a227:174%3]) with mapi id
- 15.02.1118.020; Mon, 14 Nov 2022 11:27:44 +0000
-From:   "Durrant, Paul" <pdurrant@amazon.co.uk>
-To:     David Woodhouse <dwmw2@infradead.org>,
+        with ESMTP id S229484AbiKNLh1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 06:37:27 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 622D3E0C7;
+        Mon, 14 Nov 2022 03:37:26 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EFDF061044;
+        Mon, 14 Nov 2022 11:37:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5718EC433C1;
+        Mon, 14 Nov 2022 11:37:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668425845;
+        bh=X1WXUuEiCKYnCaSnllroe9lO9yo1oclX61iorR2hfP8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=W8W7cT4G0eRhxxQtb/fG1Agad036i8WDiWbKv+7fyVCRbtdWrMK0YRAUyw3aA0cHv
+         ZixjCxb6xkWxqH5vTFUokG6TPXIq7Ol4JOU4fSPj46hFKxF9o6LqvVYGAf/qIj0dRx
+         fzjrxfpBWMiGe9oed60NTUh8lNzyzzztJ24pcs+XFTQKWOSURKyt2/4vkP2VMwB4hU
+         2AXgwCfpB9N9TCctCLljVhTZhCWNhexgwkpNsr3ukcvsbqh3zrRDfkPWGGY5+s3sqc
+         uNh4JUM9cFMn4VTneWbR/GZGzDkGHZVvYV/vwdjfN4/ZrdQ+0qVyexESqBNmYgvaoh
+         sm39gLiANN6CA==
+Received: from [82.3.55.76] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ouXmE-005wky-Vy;
+        Mon, 14 Nov 2022 11:37:23 +0000
+Date:   Mon, 14 Nov 2022 11:36:56 +0000
+Message-ID: <878rkdvkbr.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mhal@rbox.co" <mhal@rbox.co>,
-        "Kaya, Metin" <metikaya@amazon.co.uk>
-Thread-Index: AQHY92SFmObiXdVPIUW/qubrVXRQSK482zAAgAFtZ4A=
-Date:   Mon, 14 Nov 2022 11:27:44 +0000
-Message-ID: <000fac2ae9394da6b51c2138c5816a45@amazon.co.uk>
-References: <20221027161849.2989332-1-pbonzini@redhat.com>
-         <20221027161849.2989332-4-pbonzini@redhat.com>
-         <Y1q+a3gtABqJPmmr@google.com>
-         <c61f6089-57b7-e00f-d5ed-68e62237eab0@redhat.com>
-         <c30b46557c9c59b9f4c8c3a2139bd506a81f7ee1.camel@infradead.org>
- <89ea0f72514d93967b679a01960d05b34a90ea14.camel@infradead.org>
-In-Reply-To: <89ea0f72514d93967b679a01960d05b34a90ea14.camel@infradead.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.106.82.12]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-Spam-Status: No, score=-11.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        Raghavendra Rao Ananta <rananta@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 2/3] KVM: arm64: Allow userspace to trap SMCCC sub-ranges
+In-Reply-To: <Y27dHf+PRt+G4jNg@google.com>
+References: <20221110015327.3389351-1-oliver.upton@linux.dev>
+        <20221110015327.3389351-3-oliver.upton@linux.dev>
+        <86o7tfov7v.wl-maz@kernel.org>
+        <Y21pktYPLPM6eYga@google.com>
+        <87fsepvqw5.wl-maz@kernel.org>
+        <Y27dHf+PRt+G4jNg@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.3.55.76
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBEYXZpZCBXb29kaG91c2UgPGR3
-bXcyQGluZnJhZGVhZC5vcmc+DQo+IFNlbnQ6IDEzIE5vdmVtYmVyIDIwMjIgMTM6MzcNCj4gVG86
-IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+OyBTZWFuIENocmlzdG9waGVyc29u
-DQo+IDxzZWFuamNAZ29vZ2xlLmNvbT4NCj4gQ2M6IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5v
-cmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IG1oYWxAcmJveC5jbzsNCj4gRHVycmFudCwgUGF1bCA8
-cGR1cnJhbnRAYW1hem9uLmNvLnVrPjsgS2F5YSwgTWV0aW4gPG1ldGlrYXlhQGFtYXpvbi5jby51
-az4NCj4gU3ViamVjdDogUkU6IFtFWFRFUk5BTF1bUEFUQ0ggMDMvMTZdIEtWTTogeDg2OiBzZXQg
-Z2ZuLXRvLXBmbiBjYWNoZSBsZW5ndGgNCj4gY29uc2lzdGVudGx5IHdpdGggVk0gd29yZCBzaXpl
-DQo+IA0KPiBPbiBTdW4sIDIwMjItMTEtMTMgYXQgMTM6MzIgKzAwMDAsIERhdmlkIFdvb2Rob3Vz
-ZSB3cm90ZToNCj4gPiBGb3IgdGhlIHJ1bnN0YXRlIGFyZWEsIEkgdGhpbmsgd2UgY2FuIGxpdmUg
-d2l0aCB1c2luZyBhIGdmbl90b19odmENCj4gPiBjYWNoZSBpbnN0ZWFkLCBhbmQgd3JpdGluZyB2
-aWEgdGhlIHVzZXJzcGFjZSBhZGRyZXNzICh3aXRoIGFwcHJvcHJpYXRlDQo+ID4gYXRvbWljaXR5
-IGZvciB0aGUgUlVOU1RBVEVfcnVubmFibGUgY2FzZSBhcyB3ZSBoYXZlIGF0IHRoZSBtb21lbnQN
-Cj4gPiBnYXRpbmcgdGhlIHJlZnJlc2gpLg0KPiANCj4gV2hpY2ggbW9zdGx5IGludm9sdmVzIGp1
-c3QgcmV2ZXJ0aW5nIGNvbW1pdCBhNzk1Y2Q0M2M1YjUgSSB0aGluaz8NCj4gDQo+IElJUkMgdGhl
-IHJlYXNvbiBmb3IgdGhhdCBjb21taXQgd2FzIG1vc3RseSBjb25zaXN0ZW5jeSB3aXRoIG90aGVy
-DQo+IHRoaW5ncyB0aGF0IHJlYWxseSAqZGlkKiB3YW50IHRvIGJlIHN3aXRjaGVkIHRvIGdwYy4N
-Cg0KQSBzdHJhaWdodCByZXZlcnNpb24gd291bGQgcmUtaW50cm9kdWNlIHRoZSBwYWdlLXNwYW5u
-aW5nIGNoZWNrIGluIGt2bV94ZW5fdmNwdV9zZXRfYXR0cigpIGJ1dCBJIHRoaW5rIHdlIGNhbiBq
-dXN0IGxlYXZlIHRoYXQgb3V0Lg0KDQogIFBhdWwNCg==
+On Fri, 11 Nov 2022 23:39:09 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Fri, Nov 11, 2022 at 08:26:02AM +0000, Marc Zyngier wrote:
+> > On Thu, 10 Nov 2022 21:13:54 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > The goal of what I was trying to get at is that either the kernel or
+> > > userspace takes ownership of a range that has an ABI, but not both. i.e.
+> > > you really wouldn't want some VMM or cloud provider trapping portions of
+> > > KVM's vendor-specific range while still reporting a 'vanilla' ABI at the
+> > > time of discovery. Same goes for PSCI, TRNG, etc.
+> > 
+> > But I definitely think this is one of the major use cases. For
+> > example, there is value in taking PSCI to userspace in order to
+> > implement a newer version of the spec, or to support sub-features that
+> > KVM doesn't (want to) implement. I don't think this changes the ABI from
+> > the guest perspective.
+> 
+> I disagree for the implications of partially trapping the 'Vendor
+> Specific Hypervisor Service'. If the UID for the range still reports KVM
+> but userspace decided to add some new widget, then from the guest
+> perspective that widget is now part of KVM's own ABI with the guest.
+
+But that's what I mean by "I don't think this changes the ABI from the
+guest perspective". The guest cannot know who is doing the emulation
+anyway, so it is userspace's duty to preserve the illusion. At the
+end of the day, this is only a configuration mechanism, and it is no
+different from all other configuration bits (i.e. they need to be
+identical on both side for migration).
+
+> Trapping the whole range is a bit of a hack to workaround the need for
+> more complicated verification of a hypercall filter.
+
+We already need these things for architected hypercalls. Once we have
+the infrastructure, it doesn't matter anymore which range this is for.
+
+> 
+> But for everything else, I'm fine with arbitrary function filtering.
+> Userspace is always welcome to shoot itself in the foot.
+> 
+> > pKVM also has a use case for this where userspace gets a notification
+> > of the hypercall that a guest has performed to share memory.
+> 
+> Is that hypercall in the 'Vendor Specific Hypervisor Service' range?
+
+Yes. It is get another KVM hypercall.
+
+> 
+> > Communication with a TEE also is on the cards, as would be a FFA
+> > implementation. All of this could be implemented in KVM, or in
+> > userspace, depending what users of these misfeatures want to do.
+> 
+> I'm very hopeful that by forwarding all of this to userspace we can get
+> out of the business of implementing every darn spec that comes along.
+
+Good luck. All the TEEs have private, home grown APIs, and every
+vendor will want to implement their own crap (i.e. there is no spec).
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
