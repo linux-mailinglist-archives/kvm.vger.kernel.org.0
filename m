@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38BA26279AC
+	by mail.lfdr.de (Postfix) with ESMTP id D1CCF6279AE
 	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 10:56:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236315AbiKNJ4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 04:56:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58344 "EHLO
+        id S236629AbiKNJ4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 04:56:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236399AbiKNJ4h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 04:56:37 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F3E7BE24;
-        Mon, 14 Nov 2022 01:56:35 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id 4so9638496pli.0;
-        Mon, 14 Nov 2022 01:56:35 -0800 (PST)
+        with ESMTP id S236419AbiKNJ4j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 04:56:39 -0500
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0723165A2;
+        Mon, 14 Nov 2022 01:56:37 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id s196so9828426pgs.3;
+        Mon, 14 Nov 2022 01:56:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Iv8aD5Z+J8UMbfgYhwe609HmQbmCamCps+Dpq149rpE=;
-        b=FXStPibLbOG/9CCbZ8D/H9eLK7qnJZTYehf/duOCNvVyF+HgQ1FbkJPuA1PI7t1g1S
-         5jJpjSiCiHyl5zFVThANYqAw3RipQ53N4UgzlebIpdwgjLcb9MxmdQaZla4kX7dGCWgh
-         3S68ZQ5uCXe3FDytDdpMuH/pBDs8UxEOBoHYPf9GRPZajXfIs0+1E/bwjlW/EC0tySU7
-         CuyK3SKCVPIGwObKUXA8JG7JpmFoRenYWTDovPmfBhkvCPFfTI5aRhXiRlJv6jEG3z0m
-         9gOYYEl/GGiEbqKheSaGO+Cr2kjgBDKfLyRvxWWXNyqlDXLOuRYogSD5djnIu2CuVdei
-         6Zew==
+        bh=sZzbiUUovd/knB9WKfRQOL0A2eGvTbe8l4R1H4rSzDg=;
+        b=QWvM9ArtgMtR6hTyVC8lBBUinc428E0xRHcZYLDJKB6peRLsW1DxSnlXIJG8sgAmof
+         LOsEvPthMMigNG1sKlwnEhK9gfDKukd/hoVWTW4ahYt6f5tT/p9PqNArh97hi6yFAevz
+         1DPACG8BKRKoF7ola4/ogOWRjyfA4+FL87OXbuGmGuQPfB/+agImSuavB/H0cNtEGm2p
+         1GgSWBsSdIixxX4r21ig0wUFy+34uBuIpdm/gRrV4bjpbA56L9aNMpDpdXeqH6hJmETa
+         wU/MSvqN+1e9ot9ogTqJnNU5qClO9V/WYOPEt1LQqVABpsxuZQCihjd2dzMlMrzUjM1e
+         pk/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Iv8aD5Z+J8UMbfgYhwe609HmQbmCamCps+Dpq149rpE=;
-        b=h9NkQVkwh3Fa+4ugDQ61dlICQo5Euxi6dzP7P2Jxz8x+bIif5Ymk3kmfT1xwwQnhpx
-         uPtmQiXqUqI3sdO1ZVXH6J7lppJ6GLqh8zHiqli+tHENSDdemeXcwNkb9N+qE4kfkVV0
-         QM4hggLEjX6bS+DeSlfZ08PgWHelguzi5sRZBU/aeX8YIQKHuSJ2XkRCNbPITU9Io6lK
-         QFDFNSKAliIMqd0bMcHF6rSZL+z3mn6fzofdSklYqpqdOTjX7Lg12CAp06IjZaAqCp/R
-         hsuFRdqzJjyIAr4GpoJ/KA8U9D2PJGGkkJtlh7TL8oK9SR14fqs0v37OmJxiVbHtK2PN
-         +sUQ==
-X-Gm-Message-State: ANoB5pkFAfr1Ovku596H4Mg2nQfiDrzUVDI0IyZmqDceeh3eHx7nMM2f
-        YpT99iM7DTMWllOuB1s51hw=
-X-Google-Smtp-Source: AA0mqf74+7evEHWgYxy2OtfB5uirGA0xxicccVzJJREgHAU4SQkSiDZxt+Rin/iTcrWvbKAyAIuciA==
-X-Received: by 2002:a17:903:552:b0:185:4889:7e03 with SMTP id jo18-20020a170903055200b0018548897e03mr13225424plb.80.1668419794919;
-        Mon, 14 Nov 2022 01:56:34 -0800 (PST)
+        bh=sZzbiUUovd/knB9WKfRQOL0A2eGvTbe8l4R1H4rSzDg=;
+        b=WoiCnxffb5+dk0WSnMBTYc8LkySGdcIG5E/fdjJhIG/wNQQu3L0KK3US2ilhbVH0Ks
+         PR2487q3Zu+JPkcHu8SVlxYIhvteMvs2mUwEk+5L04pY5sZvDkDq7qYMK1gLBMWGfIEl
+         CmLU9a2xjDAZRcCKXomsEHRa6z89A/6c7Skhr9ZB7m6HG9SNdI5gs18f0Yx5LbAgQ//R
+         5/7syfbGG1baC4PRsC+vIWAzfldUUdQVjGzNHJpOOY5NxKYWGvXcTwV+rma6w2UCEoq+
+         u8rE6m5im3tRPrUdLc6ahGb9wjiPJcopgs/PqZ3/9htT/tVwgoEqI8iPjADsUn8+DVur
+         o3SA==
+X-Gm-Message-State: ANoB5pnxFcoZwEulU/dNcTJ7d7oKEkUnVYyxhqq1/98Psmie8pqQMLxx
+        8ycTXVBXX6SiQRY97Sr6afUT+MGjHX+zbB3m
+X-Google-Smtp-Source: AA0mqf5PDmly7AdCJGPD6R5du9295x5scJD8lpbMqByzhP9dEWBPp7jVslw95qCIeHhiXSB4Hk7zUg==
+X-Received: by 2002:a63:d810:0:b0:46f:98ce:2311 with SMTP id b16-20020a63d810000000b0046f98ce2311mr10986521pgh.413.1668419797169;
+        Mon, 14 Nov 2022 01:56:37 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id d29-20020aa797bd000000b0056c6e59fb69sm6266472pfq.83.2022.11.14.01.56.33
+        by smtp.gmail.com with ESMTPSA id d29-20020aa797bd000000b0056c6e59fb69sm6266472pfq.83.2022.11.14.01.56.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Nov 2022 01:56:34 -0800 (PST)
+        Mon, 14 Nov 2022 01:56:36 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 03/14] KVM: x86: Remove unnecessary export of kvm_get_apic_base()
-Date:   Mon, 14 Nov 2022 17:55:55 +0800
-Message-Id: <20221114095606.39785-4-likexu@tencent.com>
+Subject: [PATCH 04/14] KVM: x86: Remove unnecessary export of kvm_set_apic_base()
+Date:   Mon, 14 Nov 2022 17:55:56 +0800
+Message-Id: <20221114095606.39785-5-likexu@tencent.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221114095606.39785-1-likexu@tencent.com>
 References: <20221114095606.39785-1-likexu@tencent.com>
@@ -74,7 +74,7 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-Don't export x86's kvm_get_apic_base(), the helper isn't used by
+Don't export x86's kvm_set_apic_base(), the helper isn't used by
 KVM x86's vendor modules.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
@@ -83,17 +83,17 @@ Signed-off-by: Like Xu <likexu@tencent.com>
  1 file changed, 1 deletion(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e46e458c5b08..1c5a675dc04a 100644
+index 1c5a675dc04a..38a42ca86ab2 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -463,7 +463,6 @@ u64 kvm_get_apic_base(struct kvm_vcpu *vcpu)
- {
- 	return vcpu->arch.apic_base;
+@@ -490,7 +490,6 @@ int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	kvm_recalculate_apic_map(vcpu->kvm);
+ 	return 0;
  }
--EXPORT_SYMBOL_GPL(kvm_get_apic_base);
+-EXPORT_SYMBOL_GPL(kvm_set_apic_base);
  
- enum lapic_mode kvm_get_apic_mode(struct kvm_vcpu *vcpu)
- {
+ /*
+  * Handle a fault on a hardware virtualization (VMX or SVM) instruction.
 -- 
 2.38.1
 
