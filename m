@@ -2,179 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0574D6286F9
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 18:25:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C150B62873D
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 18:36:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237295AbiKNRYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 12:24:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59682 "EHLO
+        id S236786AbiKNRgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 12:36:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbiKNRYh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 12:24:37 -0500
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2071.outbound.protection.outlook.com [40.107.96.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DF99B3F;
-        Mon, 14 Nov 2022 09:24:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WnU1zE4lYuLoOUx8b3gOVBmokoa8iP5Im/tCdNBjtY2T9hzEX1ktPFJKBIiDPFG6Bywr0XiGLNYO3froLSFhOBuDK92DD2jMexUws4OIFO8tzSD/iCoAtg0VNjQzm+xGYEBFF7UWUcmTEV8DeVxaMUF+Sx7YJG3NbZ5+XmWcLcCg0sCWV8H1QS/61blnHN1j7P5RKrZxezo5V7NXTyeyxq+X/isb7RJyorp1QT+mGO3T5rRBZQoYDAQ5yCQn5t8j2/LC7nme8z8VabEF/vs5rFhI/VrocQU/E7644sMeRPdJgPjvGg1Fq2StxLTIorqDfnCC5pKg4M/hnKDWai3ECQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kwIOB9zB3MavKCsJ6S5ofGsfkj1j8MBubPux7SHcxmQ=;
- b=XExogWWYo8Lhm31X9rC4PT4Tw8HdDWKg5pVQ4Gg9Cc3UsPx10NetluT4DivNSdlQFJLiYB3XRleRyKuUzP1IK4fzpw+MiO8cLpgjSE9v2p5t1rA9qgSWc5aCa7ZqGeiZ23Cyz6GpNBqUkwvl8NsNWcLZ/eQNLPI7cRhSBstnll/9PEqQak/bjp3FbWsHZxWLz5nm6+6zcQz3uxcyzqJsCTa/frv22/dlMpePnaDul8lVvKMn0NwLDzY0pzTykMF2hXFUK/oZOfZFJZ0g9gWy0dHZpA6QaXW0XV9ICnAaQab3zty73xPXUqFj9MMstBXpQIHWgd7WQfeOreMOkdeprQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kwIOB9zB3MavKCsJ6S5ofGsfkj1j8MBubPux7SHcxmQ=;
- b=R8zxCHkIafe4T/T9Wa9679rVJMEH8YnWZUozCrcp9PXRmkdjqPDkj8V0d6kZqoiGaxL4mWKF+cy84cStTGaiyMMiyGygS5/KMxkf8RP5iKvOYN3B6wWDiKBHdOg333+EdsP8uOkUvnObn5jA31KIXL4bKeki4xYmcU9XoIU+Ke359FENKGFnrKBLUv1echvbfm3CXvSofdTtAXKBwdYl+vKagal5GTaixvP/NiajpR9Mp1ZpzY8AkauuboE3g8eKBaxEXQokUmkkqG3Rmrn+tE0bp4WJfTQO5XpfUxry5asdeYqY/at7NT7RLWcr59rjcOZmsTqhpa4VEmdD2GGhEQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BL1PR12MB5996.namprd12.prod.outlook.com (2603:10b6:208:39c::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.17; Mon, 14 Nov
- 2022 17:24:34 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%7]) with mapi id 15.20.5813.017; Mon, 14 Nov 2022
- 17:24:34 +0000
-Date:   Mon, 14 Nov 2022 13:24:33 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
+        with ESMTP id S237855AbiKNRga (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 12:36:30 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78E69DFE9;
+        Mon, 14 Nov 2022 09:36:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ksgv6Kw4v5TEWhEkSQdZRXW2PsFsQyYCc02bWY0gFA0=; b=LZgzetV6GwJwJDe1nd6cAGWu0q
+        Yd8f//0t4coxj6obqiffxxUBxxZd/wlsG6fxeWUjjKimFYn8kGcH5hGoMxYmxrAKTgoYjGUeBOM66
+        HcQcTNVBfO5KiO7yzV9xYHWJ6TZLKg0uOq894FhQhorkdLd1C8/FcCvsL/bXXhC/ukK0nry6Pk/SF
+        SAPZ6RS9oC58rCsFjFfyqN5mX2arvXV1pfkS82BRCed7RwCi0dMjIB+bB7pViLypNsgnWR11yZJpg
+        NMRpc+XN/OS/qKojLUGMwBhs1wNKKXBNofk4qvf229VBNSeSDAb+G8t2RnQF+T06X0D0yuZ1913HS
+        NOCGPDkw==;
+Received: from [205.251.233.234] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oudNi-00FbrO-Cu; Mon, 14 Nov 2022 17:36:27 +0000
+Message-ID: <b44f75f9d6c66f33cab85cbe463cc388d48ac7eb.camel@infradead.org>
+Subject: Re: [EXTERNAL][PATCH 03/16] KVM: x86: set gfn-to-pfn cache length
+ consistently with VM word size
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mhal@rbox.co" <mhal@rbox.co>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v4 07/17] iommufd: PFN handling for iopt_pages
-Message-ID: <Y3J50bvzPallqYD/@nvidia.com>
-References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <7-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <BN9PR11MB5276F9A4AC8861005DDBB3A08C009@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276F9A4AC8861005DDBB3A08C009@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL1PR13CA0406.namprd13.prod.outlook.com
- (2603:10b6:208:2c2::21) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        "Durrant, Paul" <pdurrant@amazon.co.uk>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Kaya, Metin" <metikaya@amazon.co.uk>
+Date:   Mon, 14 Nov 2022 09:36:14 -0800
+In-Reply-To: <Y3Jt11kcj8lQ+NCN@google.com>
+References: <20221027161849.2989332-1-pbonzini@redhat.com>
+         <20221027161849.2989332-4-pbonzini@redhat.com>
+         <Y1q+a3gtABqJPmmr@google.com>
+         <c61f6089-57b7-e00f-d5ed-68e62237eab0@redhat.com>
+         <c30b46557c9c59b9f4c8c3a2139bd506a81f7ee1.camel@infradead.org>
+         <994314051112513787cc4bd0c7d2694e15190d0f.camel@amazon.co.uk>
+         <Y3Jt11kcj8lQ+NCN@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-xV9e+/arMUMTQw/NOxnB"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5996:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8a4417e9-0029-4cab-a89b-08dac665190c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2TzekCX640LuparpjKHqQdUeSVCgRlxHF2AV1OXh9c3EUiXaZTOGwjqIIFp5+ucrrgLFbP12rh6yzcn3GLgn+5VdHpo1LNRS7Ho/v71bhO/oTgRsq3teQCO/Bxv7O15+nU4jXoJu7O06AYE38rMLJ4PgCvk/vS7Tjz9eUlADCNX2myQA4iDoRb2qzHPeZh3zgDTKrvyvAcyivyi82OzdlrDevDXXlkUQ37ppk6sCaa6JhJW8YxItdEv6RIlrgfqBOIvh5IkQjVggwamm2bp4zVnnGdY9+nXNNCLFmPljeGt+2TU1yFMewLPbRB3qyzdE0dX4GyGUXz8yzbUYrccdXERslXWgcDSFeQnyurYFEmGLD1ZYvGgOTAj6wkzSPq5JOrDWPkvSiYvcJPJiR955xQL28lXB5o1ZlBplkPyoPgu3OFJBV6HnTTQAzqPvChDywul6Ck6rCAwfVcvSCLuuYjeOfkUdz234/J04W3lFZuaSmXBLgLaGEoLg5hGZ4kEzOeYXSRHFkto9AGnJgRCBxx6lPn/I3vwTPDVhp6biqZm4mrbdhmHNcGYpJpTgXHyPAyXyb4G4HV1WRTnIn4dlClc4Ov5D0MKaGRD/nqS151531rF5Tw+On/A8drlU+LD8VZlYpxI9DHOkKIXIALlwtPRm1YkelZ5fb1Yx1onAuBwfgIR3L0/ZwOCFJQOH7+M7edRo2RowPEo34FuskgjDdw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(136003)(39860400002)(346002)(366004)(376002)(451199015)(6486002)(8936002)(4744005)(41300700001)(38100700002)(83380400001)(7406005)(7416002)(478600001)(5660300002)(6506007)(66946007)(66476007)(36756003)(66556008)(186003)(86362001)(6512007)(26005)(316002)(2616005)(6916009)(54906003)(2906002)(4326008)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LtZ9hyF3cUStlJxerCqXAnkfwst+5XDJWJVYW0YVjarr6VY73Yy7PkjA3BFi?=
- =?us-ascii?Q?/FUV8oOu0b4fQLw0i0Rz2URxvKbPP6KWYwQgs19mcalNypGqHFYNwnE48aNg?=
- =?us-ascii?Q?VI2OKygnITNAHhnwfBY1b0eYGoaezTB84ltja95d6MS9pPT1ABjjl84FzjFj?=
- =?us-ascii?Q?/MoHDxrwrLBn2JFn6uixXPgXwesdJnUxMpe5Vp+G16zgF/AfvfQNwTggTqdz?=
- =?us-ascii?Q?bCkfq+woN/w5/HnmZ3uHKcgECk34zmvC+ZKK4R7tdnvDZ1NS2aBuoVqDrypI?=
- =?us-ascii?Q?9aQxe+f7qOndMI/bZaIPklx2zcqEIZ/qKhiv9ehwviFxZKw+vtTDdBUGA0ve?=
- =?us-ascii?Q?b9ZGCMkBlPDlhHwhFKs8sUpDxhCTGfJMz/nIihidTt/H86mclGnenCtLhZ27?=
- =?us-ascii?Q?l72nardboudLZnXUgIkuUvHHkeh4lL70idgL3XRCfdEkIgyYcEVKNPe/ODED?=
- =?us-ascii?Q?Twb0allteHRUQDuGVaNB2Lo1j/L8YFjNNnrfHVGCf90v0goCzbweP0i+4vmW?=
- =?us-ascii?Q?OkyG2D/4mcmTboRbLgTqByNHMblPd6FsUxRyK5mwiJ+kUckrHWSTb2yKUg4X?=
- =?us-ascii?Q?dgxcIv5ven8QSwlqM9TNo3E6dSeIrcHS7It7ZXduwOmcZ5uM3r28msf7k+5d?=
- =?us-ascii?Q?ZlD/s1I+Dnv61EGqIa9WDwrepXRwU0C8U5jd/ZsvtK0AuNh7/8W9B/pQRool?=
- =?us-ascii?Q?WpZtmmND/9ld0vIPCxIRqNzEY5yZYvEjwuz4L4glprIO2TGY8zXmWewbGsxz?=
- =?us-ascii?Q?fmhQgDx4XRn+f4C0ZzbPP9acnnVpaLry5R1eSZCb08BUWkRxnHl1sE9Z/0q0?=
- =?us-ascii?Q?EMFiZW+6k3lgCrOcIFIMQxWvTBWl97YO+DPebgcH2xFRJ5Os0mI691bc+ySG?=
- =?us-ascii?Q?Jg8Uauw9r0M0v0aoqD+o1WW/d+N6luQYOJc2jxfMIfF6BNse1IOA+NRChkwh?=
- =?us-ascii?Q?nEwm2W+ZTaZit6IDMnpa+/yQcbnnlf6XvxEYdW9LBdfg1KOWJsXShDKzbDsf?=
- =?us-ascii?Q?hILX2wGF9ejesokf/0QsqNVElSiwm4K1owJFLOjDGw2NNHtTmPrdeZ8fKRAp?=
- =?us-ascii?Q?5hZ7woUAgXcgOdVcoa/kug6dEQWL4jB6S3HcqC2SCLwP8bD4lJybXARkLXN5?=
- =?us-ascii?Q?+a+fe3QKM62Apce7d81LKjJMayfn3xD3VgtRTjXR5LiMV3x1G9czKCnUD9u1?=
- =?us-ascii?Q?3YPi8H/8stL2bhxvcNJpoE+27x/uS+3vkiPsZWrbLTZvdaXB6AxEvXUsCMsQ?=
- =?us-ascii?Q?MVeqkZ2PegE1SoyHYkSdxi07VT/rAarN/68U/MSMLDtdyaEEYnApTLcGQeE/?=
- =?us-ascii?Q?0kric4zyHOqCvkS5Gpi4o1iABnCjd37JCxRQxpc5s5QjQ8YYYQwenpYutjsJ?=
- =?us-ascii?Q?BR5yNFzDFQK6IWeLFpXHXq3TnJ+zvVmUHg5mgtQ7HqT0JaV43sgASd5pWhCy?=
- =?us-ascii?Q?rzCm8t83dYCsynWNi5UYuPagHTK5i6RcvFFMzdE98zGqXjYPIxIlrFPLV761?=
- =?us-ascii?Q?2BDL/ad41V9lGZp7ZKZV9s3QQGQ4Lb8k1iQQjG8KWQmBkNlVrooNKoC9s9mU?=
- =?us-ascii?Q?8kyuLDvS8bYNaVkrEj0=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a4417e9-0029-4cab-a89b-08dac665190c
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2022 17:24:34.3102
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KrPjOpYhpz0irUXMICTjHzZg7He2DtPZwQ79MAdore+hNQxjxEX1eH5G27T0DMI0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5996
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 11, 2022 at 11:09:08AM +0000, Tian, Kevin wrote:
-> <...2nd part>
-> 
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Tuesday, November 8, 2022 8:49 AM
-> > +
-> > +/* pfn_reader_user is just the pin_user_pages() path */
-> > +struct pfn_reader_user {
-> > +	struct page **upages;
-> > +	size_t upages_len;
-> > +	unsigned long upages_start;
-> > +	unsigned long upages_end;
-> > +	unsigned int gup_flags;
-> > +	int locked;
-> 
-> document what locked==-1/0/1 means
 
-+       /*
-+        * 1 means mmget() and mmap_read_lock(), 0 means only mmget(), -1 is
-+        * neither
-+        */
+--=-xV9e+/arMUMTQw/NOxnB
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, 2022-11-14 at 16:33 +0000, Sean Christopherson wrote:
+> On Mon, Nov 14, 2022, Woodhouse, David wrote:
+> > Most other data structures, including the pvclock info (both Xen and
+> > native KVM), could potentially cross page boundaries. And isn't that
+> > also true for things that we'd want to use the GPC for in nesting?
+>=20
+> Off the top of my head, no.  Except for MSR and I/O permission bitmaps, w=
+hich
+> are >4KiB, things that are referenced by physical address are <=3D4KiB an=
+d must be
+> naturally aligned.  nVMX does temporarily map L1's MSR bitmap, but that c=
+ould be
+> split into two separate mappings if necessary.
+>=20
+> > For the runstate info I suggested reverting commit a795cd43c5b5 but
+> > that doesn't actually work because it still has the same problem. Even
+> > the gfn-to-hva cache still only really works for a single page, and
+> > things like kvm_write_guest_offset_cached() will fall back to using
+> > kvm_write_guest() in the case where it crosses a page boundary.
+> >=20
+> > I'm wondering if the better fix is to allow the GPC to map more than
+> > one page.
+>=20
+> I agree that KVM should drop the "no page splits" restriction, but I don'=
+t think
+> that would necessarily solve all KVM Xen issues.  KVM still needs to prec=
+isely
+> handle the "correct" struct size, e.g. if one of the structs is placed at=
+ the very
+> end of the page such that the smaller compat version doesn't split a page=
+ but the
+> 64-bit version does.
+
+I think we can be more explicit that the guest 'long' mode shall never
+change while anything is mapped. Xen automatically detects that a guest
+is in 64-bit mode very early on, either in the first 'fill the
+hypercall page' MSR write, or when setting HVM_PARAM_CALLBACK_IRQ to
+configure interrupt routing.
+
+Strictly speaking, a guest could put itself into 32-bit mode and set
+HVM_PARAM_CALLBACK_IRQ *again*. Xen would only update the wallclock
+time in that case, and makes no attempt to convert anything else. I
+don't think we need to replicate that.
+
+On kexec/soft reset it could go back to 32-bit mode, but the soft reset
+unmaps everything so that's OK.
+
+I looked at making the GPC handle multiple pages but can't see how to
+sanely do it for the IOMEM case. vmap() takes a list of *pages* not
+PFNs, and memremap_pages() is... overly complex.
+
+But if we can reduce it to *just* the runstate info that potentially
+needs >1 page, then we can probably handle that with using two GPC (or
+maybe GHC) caches for it.=20
+
+--=-xV9e+/arMUMTQw/NOxnB
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTE0MTczNjE0WjAvBgkqhkiG9w0BCQQxIgQgqS+3oGV1
+En+wV9xkjGsHaTSEztYTroGY4TkH4VS9ECUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBevLRh4TFo9A6oZGlLK7ImE1ssCKm3RvB/
+iOly9dUjjRF4zjT8kr1kbSEbYGen3BenjNm3wA+6zWeoVZKxVkYDiR6IVjLE9xYe1dnnTRmZVwrA
+k5ijNpoeuk6yMYpjCPv6Qh/G6fRiBfNCFlZXXwyeq6Sn0snW5aJlunm0SkYwJjcz9BTq9AGiz+Ex
+gDT4LiQszhT3j/hX+0Xqf/bY8rv+pBqqm1/cgQ8xJ7pS7cG/1wZhlz+wdsNX4OkVw7qv7fM3dMsS
+W0/Z3ycTnlQpORqTQe2NHVMWew/p46qOz9yQVdDXiUu7TrlQwYHZalnquvzw+4khOTvjsl5zUMVL
+3km5LBGu48gua9g7e4YhKC202frUCRptxnoboQvmI2uq6b8xttRcDRKa1a9xfWK6RPsELEd49LmM
+GeSsF9fCY+Cz9Sp7I5n1nR8EMwK39HgvlhnKSdraqXEe8KscPt9U4rTJlYwTWPay47jkdObxRi/C
+q66xRcuIgQEpWJ32kUdbSO6+Yov8yYCXZNdTT3m4Mph32gshm3fhgjkAIk1JQnoBM77XA7naWm7g
+chOEglW+Cde9qqmziax26aEOGhhj3HztHl4uBcGOsOO7fwqh7aZKI5iVAJ5RdDh622Kwep0HFaWa
+uOmqSrL4QMUICY7Bpxj+VEY1DFp5zwpu7vxLSv/VGwAAAAAAAA==
 
 
-> > +/* Process a single span in the access_itree */
-> 
-> in all storages.
+--=-xV9e+/arMUMTQw/NOxnB--
 
-+/* Process a single span to load it from the proper storage */
-
-Thanks,
-Jason
