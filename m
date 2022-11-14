@@ -2,325 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 722826284D9
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 17:17:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F12C5628589
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 17:37:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237406AbiKNQRK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 11:17:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52638 "EHLO
+        id S237739AbiKNQhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 11:37:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237410AbiKNQQ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 11:16:58 -0500
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E3652ED7F
-        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 08:16:49 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id w14so19162974wru.8
-        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 08:16:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o2wttqJnXSnC6uZPwQbYPo9kiCshXn3+hg9VUqJAS7M=;
-        b=AS14hnGGiqK/73Br6q4ctHEmYxSJLtmg4E6RwnYAOOonyG/OWiunyXCsv7l0YMbtxk
-         FFiLStmuVhfqOD4nRXePmg33rDgkhxfEKBse9x0PAKsiyCQO1+x208lVfXsnwgKfWyS1
-         HhIBvVEFz+mGT3Qdx3QkEcIfFLEiHz2BSWcMpcz2/z43xy9PA/QS5W2OnbWjoBne6CK+
-         hql4JFuXceWIKP+O34L+ElNlZzKoe2HGANi6KfdHUujdmLGCS2aMr7ouKbsDBe96/3We
-         b0C4ESmCPIstXLjLoytDuMus1COG6HNXX6U+iGPIoLn2zVZCzctbKN2u1+jx8P8GSE1z
-         sSMQ==
+        with ESMTP id S238071AbiKNQhN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 11:37:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAFE74B9BC
+        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 08:31:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668443490;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ojH/psRRzArBJAwxVzugaljJuwFZRup6Gb5bmk7DgwQ=;
+        b=V/h55OwPjyuYWgHzUniO2ecU7WcR48LkZbn4bZvdorTt6vKj+OyO2GVHaEShyeVUP973WI
+        hep1csGybo6QkvR398tFTN8Uv/uf6n504DnIxpIDN369xHBgi5oNnIbpnw1d57qXDs354H
+        LMNGVVs1GVT0vm28dqiVsTqlOll4EBY=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-132-yBr9F_ZJNfOcMvywvz6soQ-1; Mon, 14 Nov 2022 11:31:29 -0500
+X-MC-Unique: yBr9F_ZJNfOcMvywvz6soQ-1
+Received: by mail-pl1-f197.google.com with SMTP id k15-20020a170902c40f00b001887cd71fe6so9282524plk.5
+        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 08:31:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=o2wttqJnXSnC6uZPwQbYPo9kiCshXn3+hg9VUqJAS7M=;
-        b=sNOOeo36tFP1zjCvfKn9H4QrZl4CNHPVUNExSoQgDkzW+46smXOnf1Ko2Nx7LX/+cW
-         8rMTX6xZ/7+gPNHOM39IhFJe8dTTUSxwkBHnrmgK5ZFCb/u4fCm3kvbiB9PXwXUltO+g
-         1/huD3z6L9kqXic+3wK/76J4AGN6VLehbhe6f+n+YUXC+n2TgWBKpqIxWU6e7xUGvn3y
-         SYoWpRV7ELuT3d9YDIT6MPORcPES1HqU9xE7Vmyzy0s6/cIEbrBhwRLI0iKpx0agKzJ9
-         2Ig6xMfFB4w+YwtzqwJSHcmsVKigrAcKZNpwh2UwC4dw+0mLlJxyIQLDBkMDyT3Lat+a
-         hN9A==
-X-Gm-Message-State: ANoB5pm/TSND7kzZ6CgNwNMKbbEzCS7XYrZqtlGCeLuwgvEcNG1nHT4l
-        Jzt6hpwG+Ip4dvVGCkzS0ixUaQ==
-X-Google-Smtp-Source: AA0mqf7ZKNStJWa0mWZO3bJ4kIF1ETNlGvcQZphUqWfvliInpXUyj1tpislQW3IoJFdPrnY5nyeH8Q==
-X-Received: by 2002:adf:fac3:0:b0:22e:244d:687a with SMTP id a3-20020adffac3000000b0022e244d687amr8045877wrs.82.1668442607847;
-        Mon, 14 Nov 2022 08:16:47 -0800 (PST)
-Received: from zen.linaroharston ([185.81.254.11])
-        by smtp.gmail.com with ESMTPSA id n18-20020a7bcbd2000000b003cf9bf5208esm18044922wmi.19.2022.11.14.08.16.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Nov 2022 08:16:46 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 9F2D91FFB7;
-        Mon, 14 Nov 2022 16:16:45 +0000 (GMT)
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <20221025151344.3784230-3-chao.p.peng@linux.intel.com>
-User-agent: mu4e 1.9.2; emacs 28.2.50
-From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v9 2/8] KVM: Extend the memslot to support fd-based
- private memory
-Date:   Mon, 14 Nov 2022 16:04:59 +0000
-In-reply-to: <20221025151344.3784230-3-chao.p.peng@linux.intel.com>
-Message-ID: <877czxbjf6.fsf@linaro.org>
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ojH/psRRzArBJAwxVzugaljJuwFZRup6Gb5bmk7DgwQ=;
+        b=5bxDC9ExfQFT1fBZRwXlkJewSnpdmao5o+iYvrP7qcgdnt57gBwm9Oo5sEIH+MnDRo
+         HVEOwrT9eQtYxGXKYtH97wVzGhHczRmId2cgNlZE0RYDUuf5G2Yf4bjxfWVbUWAA/Wxq
+         5MGz8Nf0sx3Jr237PucD5BTXFzhfqJulerKKjuaTgmASpcI9SLFYZSC/5JkjCtT4yBtB
+         2ARorV3vwVKw3I0lZNh5Dg/jEp8KxGUeWFhQ/TOJGST0uzxcsEiI1g9ZTMi8ChIhIQCv
+         8fAudcxiAfayu5guGt0Md0vfAP0M2SOEesU3amh9APOkluwcgDaoUY8r4UVS6HwrYRVU
+         fvhQ==
+X-Gm-Message-State: ANoB5pkyIsIZ3q0kSumU/ToPATNq+h0p3f/DifZoU0OhmzY/udrqV8FH
+        lAYaYwLbYYFsvfRyPZVBfViekJfmUDIB2aqy4OT6zLsAAWKVC+iun2kPjn7VVqdOMKnGMTP2vX8
+        lxQVdVpfZrrB5oAD/pXNGv1fqDcQP
+X-Received: by 2002:a17:902:ccca:b0:188:aa84:14 with SMTP id z10-20020a170902ccca00b00188aa840014mr150375ple.17.1668443488065;
+        Mon, 14 Nov 2022 08:31:28 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4R9JZBu4RFHn7Ru1bTBL82/OuXiBi35elHsJcx/x4J3VxQPRa+NoAcmIQWZ/Qqx1MYow2GBAROuzHp4Pb+Rpc=
+X-Received: by 2002:a17:902:ccca:b0:188:aa84:14 with SMTP id
+ z10-20020a170902ccca00b00188aa840014mr150351ple.17.1668443487712; Mon, 14 Nov
+ 2022 08:31:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20221108170755.92768-1-eperezma@redhat.com> <20221108170755.92768-10-eperezma@redhat.com>
+ <CACGkMEsr=fpbbOpUBHawt5DR+nTWcK1uMzXgorEcbijso1wsMQ@mail.gmail.com>
+ <CAJaqyWemKoRNd6_uvFc79qYe+7pbavJSjnZuczxk5uxSZZdZ2Q@mail.gmail.com>
+ <be553273-7c06-78f7-4d23-de9f46a210b1@redhat.com> <CAJaqyWeZWQgGm7XZ-+DBHNS4XW_-GgWeeOqTb82v__jS8ONRyQ@mail.gmail.com>
+ <6a35e659-698e-ff71-fe9b-06e15809c9e4@redhat.com>
+In-Reply-To: <6a35e659-698e-ff71-fe9b-06e15809c9e4@redhat.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Mon, 14 Nov 2022 17:30:51 +0100
+Message-ID: <CAJaqyWeF7bNuu-e6g4RghBkc-5oqEAuaEVbJ9uDgGPWWsP36Lg@mail.gmail.com>
+Subject: Re: [PATCH v6 09/10] vdpa: Add listener_shadow_vq to vhost_vdpa
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     qemu-devel@nongnu.org, Parav Pandit <parav@mellanox.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Gautam Dawar <gdawar@xilinx.com>,
+        Liuxiangdong <liuxiangdong5@huawei.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Cindy Lu <lulu@redhat.com>, Eli Cohen <eli@mellanox.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>, kvm@vger.kernel.org,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-Chao Peng <chao.p.peng@linux.intel.com> writes:
-
-> In memory encryption usage, guest memory may be encrypted with special
-> key and can be accessed only by the guest itself. We call such memory
-> private memory. It's valueless and sometimes can cause problem to allow
-> userspace to access guest private memory. This new KVM memslot extension
-> allows guest private memory being provided though a restrictedmem
-> backed file descriptor(fd) and userspace is restricted to access the
-> bookmarked memory in the fd.
+On Mon, Nov 14, 2022 at 5:30 AM Jason Wang <jasowang@redhat.com> wrote:
 >
-<snip>
-> To make code maintenance easy, internally we use a binary compatible
-> alias struct kvm_user_mem_region to handle both the normal and the
-> '_ext' variants.
+>
+> =E5=9C=A8 2022/11/11 21:12, Eugenio Perez Martin =E5=86=99=E9=81=93:
+> > On Fri, Nov 11, 2022 at 8:49 AM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> =E5=9C=A8 2022/11/10 21:47, Eugenio Perez Martin =E5=86=99=E9=81=93:
+> >>> On Thu, Nov 10, 2022 at 7:01 AM Jason Wang <jasowang@redhat.com> wrot=
+e:
+> >>>> On Wed, Nov 9, 2022 at 1:08 AM Eugenio P=C3=A9rez <eperezma@redhat.c=
+om> wrote:
+> >>>>> The memory listener that thells the device how to convert GPA to qe=
+mu's
+> >>>>> va is registered against CVQ vhost_vdpa. This series try to map the
+> >>>>> memory listener translations to ASID 0, while it maps the CVQ ones =
+to
+> >>>>> ASID 1.
+> >>>>>
+> >>>>> Let's tell the listener if it needs to register them on iova tree o=
+r
+> >>>>> not.
+> >>>>>
+> >>>>> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> >>>>> ---
+> >>>>> v5: Solve conflict about vhost_iova_tree_remove accepting mem_regio=
+n by
+> >>>>>       value.
+> >>>>> ---
+> >>>>>    include/hw/virtio/vhost-vdpa.h | 2 ++
+> >>>>>    hw/virtio/vhost-vdpa.c         | 6 +++---
+> >>>>>    net/vhost-vdpa.c               | 1 +
+> >>>>>    3 files changed, 6 insertions(+), 3 deletions(-)
+> >>>>>
+> >>>>> diff --git a/include/hw/virtio/vhost-vdpa.h b/include/hw/virtio/vho=
+st-vdpa.h
+> >>>>> index 6560bb9d78..0c3ed2d69b 100644
+> >>>>> --- a/include/hw/virtio/vhost-vdpa.h
+> >>>>> +++ b/include/hw/virtio/vhost-vdpa.h
+> >>>>> @@ -34,6 +34,8 @@ typedef struct vhost_vdpa {
+> >>>>>        struct vhost_vdpa_iova_range iova_range;
+> >>>>>        uint64_t acked_features;
+> >>>>>        bool shadow_vqs_enabled;
+> >>>>> +    /* The listener must send iova tree addresses, not GPA */
+> >>
+> >> Btw, cindy's vIOMMU series will make it not necessarily GPA any more.
+> >>
+> > Yes, this comment should be tuned then. But the SVQ iova_tree will not
+> > be equal to vIOMMU one because shadow vrings.
+> >
+> > But maybe SVQ can inspect both instead of having all the duplicated ent=
+ries.
+> >
+> >>>>> +    bool listener_shadow_vq;
+> >>>>>        /* IOVA mapping used by the Shadow Virtqueue */
+> >>>>>        VhostIOVATree *iova_tree;
+> >>>>>        GPtrArray *shadow_vqs;
+> >>>>> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+> >>>>> index 8fd32ba32b..e3914fa40e 100644
+> >>>>> --- a/hw/virtio/vhost-vdpa.c
+> >>>>> +++ b/hw/virtio/vhost-vdpa.c
+> >>>>> @@ -220,7 +220,7 @@ static void vhost_vdpa_listener_region_add(Memo=
+ryListener *listener,
+> >>>>>                                             vaddr, section->readonl=
+y);
+> >>>>>
+> >>>>>        llsize =3D int128_sub(llend, int128_make64(iova));
+> >>>>> -    if (v->shadow_vqs_enabled) {
+> >>>>> +    if (v->listener_shadow_vq) {
+> >>>>>            int r;
+> >>>>>
+> >>>>>            mem_region.translated_addr =3D (hwaddr)(uintptr_t)vaddr,
+> >>>>> @@ -247,7 +247,7 @@ static void vhost_vdpa_listener_region_add(Memo=
+ryListener *listener,
+> >>>>>        return;
+> >>>>>
+> >>>>>    fail_map:
+> >>>>> -    if (v->shadow_vqs_enabled) {
+> >>>>> +    if (v->listener_shadow_vq) {
+> >>>>>            vhost_iova_tree_remove(v->iova_tree, mem_region);
+> >>>>>        }
+> >>>>>
+> >>>>> @@ -292,7 +292,7 @@ static void vhost_vdpa_listener_region_del(Memo=
+ryListener *listener,
+> >>>>>
+> >>>>>        llsize =3D int128_sub(llend, int128_make64(iova));
+> >>>>>
+> >>>>> -    if (v->shadow_vqs_enabled) {
+> >>>>> +    if (v->listener_shadow_vq) {
+> >>>>>            const DMAMap *result;
+> >>>>>            const void *vaddr =3D memory_region_get_ram_ptr(section-=
+>mr) +
+> >>>>>                section->offset_within_region +
+> >>>>> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> >>>>> index 85a318faca..02780ee37b 100644
+> >>>>> --- a/net/vhost-vdpa.c
+> >>>>> +++ b/net/vhost-vdpa.c
+> >>>>> @@ -570,6 +570,7 @@ static NetClientState *net_vhost_vdpa_init(NetC=
+lientState *peer,
+> >>>>>        s->vhost_vdpa.index =3D queue_pair_index;
+> >>>>>        s->always_svq =3D svq;
+> >>>>>        s->vhost_vdpa.shadow_vqs_enabled =3D svq;
+> >>>>> +    s->vhost_vdpa.listener_shadow_vq =3D svq;
+> >>>> Any chance those above two can differ?
+> >>>>
+> >>> If CVQ is shadowed but data VQs are not, shadow_vqs_enabled is true
+> >>> but listener_shadow_vq is not.
+> >>>
+> >>> It is more clear in the next commit, where only shadow_vqs_enabled is
+> >>> set to true at vhost_vdpa_net_cvq_start.
+> >>
+> >> Ok, the name looks a little bit confusing. I wonder if it's better to
+> >> use shadow_cvq and shadow_data ?
+> >>
+> > I'm ok with renaming it, but struct vhost_vdpa is generic across all
+> > kind of devices, and it does not know if it is a datapath or not for
+> > the moment.
+> >
+> > Maybe listener_uses_iova_tree?
+>
+>
+> I think "iova_tree" is something that is internal to svq implementation,
+> it's better to define the name from the view of vhost_vdpa level.
+>
 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 0d5d4419139a..f1ae45c10c94 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -103,6 +103,33 @@ struct kvm_userspace_memory_region {
->  	__u64 userspace_addr; /* start of the userspace allocated memory */
->  };
->=20=20
-> +struct kvm_userspace_memory_region_ext {
-> +	struct kvm_userspace_memory_region region;
-> +	__u64 restricted_offset;
-> +	__u32 restricted_fd;
-> +	__u32 pad1;
-> +	__u64 pad2[14];
-> +};
-> +
-> +#ifdef __KERNEL__
-> +/*
-> + * kvm_user_mem_region is a kernel-only alias of kvm_userspace_memory_re=
-gion_ext
-> + * that "unpacks" kvm_userspace_memory_region so that KVM can directly a=
-ccess
-> + * all fields from the top-level "extended" region.
-> + */
-> +struct kvm_user_mem_region {
-> +	__u32 slot;
-> +	__u32 flags;
-> +	__u64 guest_phys_addr;
-> +	__u64 memory_size;
-> +	__u64 userspace_addr;
-> +	__u64 restricted_offset;
-> +	__u32 restricted_fd;
-> +	__u32 pad1;
-> +	__u64 pad2[14];
-> +};
-> +#endif
+I don't get this, vhost_vdpa struct already has a pointer to its iova_tree.
 
-I'm not sure I buy the argument this makes the code maintenance easier
-because you now have multiple places to update if you extend the field.
-Was this simply to avoid changing:
+Thanks!
 
-  foo->slot to foo->region.slot
-
-in the underlying code?
-
-> +
->  /*
->   * The bit 0 ~ bit 15 of kvm_memory_region::flags are visible for usersp=
-ace,
->   * other bits are reserved for kvm internal use which are defined in
-> @@ -110,6 +137,7 @@ struct kvm_userspace_memory_region {
->   */
->  #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
->  #define KVM_MEM_READONLY	(1UL << 1)
-> +#define KVM_MEM_PRIVATE		(1UL << 2)
->=20=20
->  /* for KVM_IRQ_LINE */
->  struct kvm_irq_level {
-> @@ -1178,6 +1206,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_S390_ZPCI_OP 221
->  #define KVM_CAP_S390_CPU_TOPOLOGY 222
->  #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
-> +#define KVM_CAP_PRIVATE_MEM 224
->=20=20
->  #ifdef KVM_CAP_IRQ_ROUTING
->=20=20
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 800f9470e36b..9ff164c7e0cc 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -86,3 +86,6 @@ config KVM_XFER_TO_GUEST_WORK
->=20=20
->  config HAVE_KVM_PM_NOTIFIER
->         bool
-> +
-> +config HAVE_KVM_RESTRICTED_MEM
-> +       bool
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index e30f1b4ecfa5..8dace78a0278 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1526,7 +1526,7 @@ static void kvm_replace_memslot(struct kvm *kvm,
->  	}
->  }
->=20=20
-> -static int check_memory_region_flags(const struct kvm_userspace_memory_r=
-egion *mem)
-> +static int check_memory_region_flags(const struct kvm_user_mem_region *m=
-em)
->  {
->  	u32 valid_flags =3D KVM_MEM_LOG_DIRTY_PAGES;
->=20=20
-> @@ -1920,7 +1920,7 @@ static bool kvm_check_memslot_overlap(struct kvm_me=
-mslots *slots, int id,
->   * Must be called holding kvm->slots_lock for write.
->   */
->  int __kvm_set_memory_region(struct kvm *kvm,
-> -			    const struct kvm_userspace_memory_region *mem)
-> +			    const struct kvm_user_mem_region *mem)
->  {
->  	struct kvm_memory_slot *old, *new;
->  	struct kvm_memslots *slots;
-> @@ -2024,7 +2024,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
->=20=20
->  int kvm_set_memory_region(struct kvm *kvm,
-> -			  const struct kvm_userspace_memory_region *mem)
-> +			  const struct kvm_user_mem_region *mem)
->  {
->  	int r;
->=20=20
-> @@ -2036,7 +2036,7 @@ int kvm_set_memory_region(struct kvm *kvm,
->  EXPORT_SYMBOL_GPL(kvm_set_memory_region);
->=20=20
->  static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
-> -					  struct kvm_userspace_memory_region *mem)
-> +					  struct kvm_user_mem_region *mem)
->  {
->  	if ((u16)mem->slot >=3D KVM_USER_MEM_SLOTS)
->  		return -EINVAL;
-> @@ -4627,6 +4627,33 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *k=
-vm)
->  	return fd;
->  }
->=20=20
-> +#define SANITY_CHECK_MEM_REGION_FIELD(field)					\
-> +do {										\
-> +	BUILD_BUG_ON(offsetof(struct kvm_user_mem_region, field) !=3D		\
-> +		     offsetof(struct kvm_userspace_memory_region, field));	\
-> +	BUILD_BUG_ON(sizeof_field(struct kvm_user_mem_region, field) !=3D		\
-> +		     sizeof_field(struct kvm_userspace_memory_region, field));	\
-> +} while (0)
-> +
-> +#define SANITY_CHECK_MEM_REGION_EXT_FIELD(field)					\
-> +do {											\
-> +	BUILD_BUG_ON(offsetof(struct kvm_user_mem_region, field) !=3D			\
-> +		     offsetof(struct kvm_userspace_memory_region_ext, field));		\
-> +	BUILD_BUG_ON(sizeof_field(struct kvm_user_mem_region, field) !=3D			\
-> +		     sizeof_field(struct kvm_userspace_memory_region_ext, field));	\
-> +} while (0)
-> +
-> +static void kvm_sanity_check_user_mem_region_alias(void)
-> +{
-> +	SANITY_CHECK_MEM_REGION_FIELD(slot);
-> +	SANITY_CHECK_MEM_REGION_FIELD(flags);
-> +	SANITY_CHECK_MEM_REGION_FIELD(guest_phys_addr);
-> +	SANITY_CHECK_MEM_REGION_FIELD(memory_size);
-> +	SANITY_CHECK_MEM_REGION_FIELD(userspace_addr);
-> +	SANITY_CHECK_MEM_REGION_EXT_FIELD(restricted_offset);
-> +	SANITY_CHECK_MEM_REGION_EXT_FIELD(restricted_fd);
-> +}
-
-Do we have other examples in the kernel that jump these hoops?
-
->  static long kvm_vm_ioctl(struct file *filp,
->  			   unsigned int ioctl, unsigned long arg)
->  {
-> @@ -4650,14 +4677,20 @@ static long kvm_vm_ioctl(struct file *filp,
->  		break;
->  	}
->  	case KVM_SET_USER_MEMORY_REGION: {
-> -		struct kvm_userspace_memory_region kvm_userspace_mem;
-> +		struct kvm_user_mem_region mem;
-> +		unsigned long size =3D sizeof(struct kvm_userspace_memory_region);
-> +
-> +		kvm_sanity_check_user_mem_region_alias();
->=20=20
->  		r =3D -EFAULT;
-> -		if (copy_from_user(&kvm_userspace_mem, argp,
-> -						sizeof(kvm_userspace_mem)))
-> +		if (copy_from_user(&mem, argp, size))
-> +			goto out;
-> +
-> +		r =3D -EINVAL;
-> +		if (mem.flags & KVM_MEM_PRIVATE)
->  			goto out;
-
-Hmm I can see in the later code you explicitly check for the
-KVM_MEM_PRIVATE flag with:
-
-		if (get_user(flags, (u32 __user *)(argp + flags_offset)))
-			goto out;
-
-		if (flags & KVM_MEM_PRIVATE)
-			size =3D sizeof(struct kvm_userspace_memory_region_ext);
-		else
-			size =3D sizeof(struct kvm_userspace_memory_region);
-
-I think it would make sense to bring that sanity checking forward into
-this patch to avoid the validation logic working in two different ways
-over the series.
-
->=20=20
-> -		r =3D kvm_vm_ioctl_set_memory_region(kvm, &kvm_userspace_mem);
-> +		r =3D kvm_vm_ioctl_set_memory_region(kvm, &mem);
->  		break;
->  	}
->  	case KVM_GET_DIRTY_LOG: {
-
-
---=20
-Alex Benn=C3=A9e
