@@ -2,233 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68AC2628C10
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 23:24:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EC3B628D2E
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 00:09:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237411AbiKNWYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 17:24:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58146 "EHLO
+        id S238095AbiKNXJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 18:09:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237266AbiKNWYp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 17:24:45 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 582DF17E28;
-        Mon, 14 Nov 2022 14:24:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=5zvK4A/3b3sb4CLf5RZydU6DNS9ZjkNiDzZm6RENhIc=; b=OMYZGsmUt+liz9HAuSBKl8M2TZ
-        bMAUenEkBY249GcxJDtWxLyigyV0uX0oS+OLilugs67xokCPzUx6I54daWAKw7h4Z33k0DMfp9uYE
-        YhvtQnc2a/zlhnMp61DzpLrbeI+wY3wvDVmBUVJRqdek14s+JZsRmVay76TiInF3Qn7zZ/t5CY3Hb
-        9D99sYB/ZaS2Ljzt5YMTYdncVIhhefG7nyubsCTteTs36UJton49SuSalT67c6j2ziQrDZD9Fh1aW
-        QhGyezEdwwcBoyFVrDLHtAXiMjdDdNUm39Sk0EvX6q5QkCvx5VBzqipA0rzlwcGByo1uYJ8I3yBCS
-        f8Kv5LgQ==;
-Received: from [205.251.233.106] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ouhsf-00FpUP-6F; Mon, 14 Nov 2022 22:24:41 +0000
-Message-ID: <fde14caa0cf774b2b46f1124644a3b326a0a8f09.camel@infradead.org>
-Subject: Re: [PATCH] KVM: x86/xen: Make number of event channels defines
- less magical
-From:   David Woodhouse <dwmw2@infradead.org>
+        with ESMTP id S231864AbiKNXIt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 18:08:49 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E56438BE;
+        Mon, 14 Nov 2022 15:05:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668467155; x=1700003155;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=iDhMjdt4WxLOz8gXd/cLrlJv3oQ/tPwGApsr9KdBC9A=;
+  b=U3ZOh1f494h5D2x5ThaHwOXjE2EzlQsttZ9QMjLUdWB37lEQoG0/ATUR
+   vBwelMREuGRY6WAcq0K6VJO1D5nLNKPH1zK7qCCqVYZtQ+aATzaEGC45W
+   DH4HbvcQkd7caZgds9JDy5BGo7T9BEFF5oetpBz25KxSXKCjATLJDUfe9
+   4+RgxsONBofmbEw7kuL65VCKg6OI2koiDBgGECx8w1FTfELn2VVgClSqX
+   druNZmHQsbLFE/njJtogr7RscOPPTF1yHQjCHYqwjOPf6NJyr04nJK2bF
+   StwhVlkMzsfHnizLmK9+3rl9exSiGz1TK6Z2yD7gsgI2GRA+7qj4yplKe
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="309733034"
+X-IronPort-AV: E=Sophos;i="5.96,164,1665471600"; 
+   d="scan'208";a="309733034"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2022 15:05:45 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="813448272"
+X-IronPort-AV: E=Sophos;i="5.96,164,1665471600"; 
+   d="scan'208";a="813448272"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga005.jf.intel.com with ESMTP; 14 Nov 2022 15:05:44 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 14 Nov 2022 15:05:44 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Mon, 14 Nov 2022 15:05:44 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.109)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Mon, 14 Nov 2022 15:05:41 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XC4iSGENToiWXVKK7VJekit62mPyiEQZFO36jCodyhU+iFnmwlQppSdek/b1Ju8Sw92ZaRGuVZ49M0tT3E811+KqUQd5jaWJ0HEq+c3YBZVMZwuK8iUVmAGxHDv10eHmun5BL4bHoOO1CLjiDygApFmfbsNIqFJ37wVtbVYqnYe/bJfsETvdRaH6gNqlZ9N5+iqtTSCIhLdxu15bIJ4ejb2vdbH2qqor94ZfDYnZbHzKiRW4YOwzgVnzmcP+H4DTVSbLjSwUu1fLTZcL1qmg6UuOg879+GjGCrdpROLpFsdSUjukQUrKlDE5z9PNqmJESC5Of9BwF/EsXdhfys1KzA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Oi36g8hBsvnoM3wzrGb1U9v1akHk+K673ZlMo24TChA=;
+ b=iv0oxpI6SFTrAvAOPCgi5c5x3QOu+q3zioRyug680+p190PE4ImNTq4LAhWur3Rv/KWksRJarphYr+tqfDJq5nW21urpwHRZ5rz6KGI7W/aWVfHGDrHIIaD9ggvZHtqffSV9gN1fjTvDJKmxhnKiGeP1GlcDaV3RQbKvOrxaC2kq7PXIjvEyFhWJSJLMxh9Lq30KV7z3uSwq6tWRuZdO5peNjaJ5mQOvr2dpDueFmJ+UppULXlAt6cgPmin0Ffn1h8keMf8aRjyJbXB/3ggJ3U4za5DK86nywbUsBWDZQ9li/ahGE+iNaiBZo6f3H+IeLO3XoH+0MKxWVrqQ+8/ggg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ PH0PR11MB4792.namprd11.prod.outlook.com (2603:10b6:510:32::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5813.17; Mon, 14 Nov 2022 23:05:39 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::dc06:6d36:dc8a:fe7f]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::dc06:6d36:dc8a:fe7f%7]) with mapi id 15.20.5813.017; Mon, 14 Nov 2022
+ 23:05:39 +0000
+Date:   Tue, 15 Nov 2022 06:42:45 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paul Durrant <paul@xen.org>
-Date:   Mon, 14 Nov 2022 14:24:32 -0800
-In-Reply-To: <Y3KZVUCCH+YQDbqu@google.com>
-References: <20221114181632.3279119-1-seanjc@google.com>
-         <629d6d90ce95b9db74f0101a4428be1119c4bfc7.camel@infradead.org>
-         <Y3KZVUCCH+YQDbqu@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-w1Qxjn7ruFH1U2x8yMNo"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <pbonzini@redhat.com>, <intel-gfx@lists.freedesktop.org>,
+        <intel-gvt-dev@lists.freedesktop.org>, <zhenyuw@linux.intel.com>
+Subject: Re: [PATCH v2 1/3] KVM: x86: add a new page track hook
+ track_remove_slot
+Message-ID: <Y3LEZXWqk6ztuf7x@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20221111103247.22275-1-yan.y.zhao@intel.com>
+ <20221111103350.22326-1-yan.y.zhao@intel.com>
+ <Y26SI3uh8JV0vvO6@google.com>
+ <Y27ivXea5SjR5lat@yzhao56-desk.sh.intel.com>
+ <Y27sG3AqVX8yLUgR@google.com>
+ <Y3GUdqxnPJvc6SPI@yzhao56-desk.sh.intel.com>
+ <Y3JtonYdDYOhbmfG@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <Y3JtonYdDYOhbmfG@google.com>
+X-ClientProxiedBy: SG2PR03CA0093.apcprd03.prod.outlook.com
+ (2603:1096:4:7c::21) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH0PR11MB4792:EE_
+X-MS-Office365-Filtering-Correlation-Id: 051a5b2f-5f28-43e2-a4d0-08dac694bf36
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Bvwk/9HQlvH8wIQNldTNDsItzXHlhOeDMPzzjHsxvghLkl4U8Tvd77JqFJhoSGq1aB2LgiV2ILRvasrrPbTN9ezRwrDqSkJ7ylgz867qKFNxId358n1dnyaW4Fx7jNVs+2wNtp0Xd88bBESeofIqZ9CSmxbhpxl5+msSeIioQv7QeYHPu2b/5HHnb+5Y0jW0TgkZ2coN9GtRR9RqluizAQIv7jLen12QrjDuDF9Eb5QBOydfuywOg/4IO0lin1nVaakRuP8uf6fIMKTI7kIBiT9ne33zjCZCMRAaStv5mhUhQEGZ6PYLaMDYMoF4wAmpVfZZhpFRTdpzUFhUrUxdZzmfgq7pEob7Oa4UpXPP7WpcMkPEz+0hbZE9zdAdRzOB8gzuawg/KtYtAFJbHyBDtcn9n2tyLXsExKtn3AbixJ2e9wxsBU1AmYITYYl3pf0W/k/J0QvfpetATeLDmq7zEkRDnP2s7Mr0rnNffI7QzFTD1OSCdluZwmyTBaIjs8DxOCZ5jZag7BwrMIfCIvuZStQNqz+AfiGmPzGo4ur6CWH2NjaQRl9NwRHn0Fdja3rTj5fJ3pEZoIp9mvAdIGIIcmfezUToi735NA5Z/uFgkQMCqRxNvfKvOZKufbKHp2OdjWxhNglz9ncMgQyl/GnysKrSJJv4DpQRoeMQ+Yjpqk50RsekOnWsNkb8rr3jrO2WAt3J+jLSuFg3rVw6a4hHDQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(376002)(366004)(136003)(346002)(396003)(451199015)(82960400001)(6916009)(316002)(38100700002)(66476007)(5660300002)(66946007)(8936002)(41300700001)(8676002)(6506007)(83380400001)(4326008)(26005)(186003)(6512007)(6486002)(86362001)(478600001)(6666004)(66556008)(2906002)(3450700001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?0YXQ1Ep+oGvSdg5CSRQqIQyeBMAwHOFmWmOlIx3Cd+km1Lvb0x5mbMBfUVzd?=
+ =?us-ascii?Q?YZTh7zrR61Ymt70ev2XownzsjNbPfcRNJb6N4hpCWsYMNsAlKCR/ItQSnAea?=
+ =?us-ascii?Q?moTSb1a5uTauXg8tdwHdFlU5zFu16Y8DceWvlfHhFVjwQcpV7Q4xmDNu6JHG?=
+ =?us-ascii?Q?Nuhf57s9gNu88+yhQRIvrXRGrPZL94n6qeMbTWnHKqTV6NjF74dcOcqfgdSR?=
+ =?us-ascii?Q?7Ao5nF9yTrBDjSYy6D5HakYASGs6oOxVw0gWVNtyU8NGQhotCokyrBj6fsOf?=
+ =?us-ascii?Q?R/+4wTIaHD+Hyx6u0+vSAPPFRTJT5BxauxkwiArlO0GMlvhz+bvVhQ8DoNu+?=
+ =?us-ascii?Q?k2UHRZlkvpF6hMHbvd7gxmO+6HBskvLCQ+bzLYLf9OzFuM9JY2M1PqSlve7d?=
+ =?us-ascii?Q?+SPDL0BB6Jr/UZTvglooapVFQfYT6En2OUTodlUxElyI0LMnLv0pD3eJcdZN?=
+ =?us-ascii?Q?xjOTsCAwVVU6ad3HCGWZVY/r6J/o8WdwEe/2tMmo4jFam/HrFJ79DIaLVxph?=
+ =?us-ascii?Q?stLl+TUC2qDqX2owpfQO5NMnogNxjcpCT37lnjmmXYcQTMJQl6R66Fk3/vbc?=
+ =?us-ascii?Q?rxFQWvVjnuIZBmyHghAJqk8G4tmX40MXp+Zc0VXFh1mMQZSyN9TMy1trTE5M?=
+ =?us-ascii?Q?oefUx06YpMg3padz2V8qDrvbM7xXBxowH4luW8iTB9y2JDo3IHDtV1dpXhEK?=
+ =?us-ascii?Q?Lm7j7Xh2jvi5fONeyOziO0bjIsbwkwDimjYm1f9uR4CSUrld/sLCTQFTXuag?=
+ =?us-ascii?Q?4hO83eOa0XiRMJzYzocL0Zxdv9UQlbPvW4GMagi4vki3kahNEixqIdj2Ko05?=
+ =?us-ascii?Q?ugUfb3/XCdp/yHelvmJKVRQ/7sD43Vk/fHxbKfTGWMUszvuAQOQ+E3ch3vUt?=
+ =?us-ascii?Q?CZWRtfqQ4U+69+diAr57uuUlnFvatbtWu0V6Qug/7aU80ZNODzbg7u5Hspx2?=
+ =?us-ascii?Q?46mWCGj2OSo2XchQxttUdQxOW1xRL5uZiYKbyRe9CZQ7L74t5QxvplDG4GR5?=
+ =?us-ascii?Q?DjS+qIfoxOyJ8ga9P9Dfm3T00JCpQ0EW5DNAlJ9+UHWrl3x/ZdgswjxW+/F/?=
+ =?us-ascii?Q?mC//Xg+iRAk7xqc800ptELKWxQcK6BWCnoxPicSicLeeCnzflzoz3WL7Nnjl?=
+ =?us-ascii?Q?g0UXoHm4ZWlHaWsEWrjt+4pAQ9SZdsRd8lDfJmLxlf7x3F8I7yg/aMPAV1K2?=
+ =?us-ascii?Q?sZgqmr4EW/gW5Ek6fk3nQ/I0LN1/Q+FJuiv+mEZSFTSuyfUu4fK9gOcaJ/c4?=
+ =?us-ascii?Q?3YzC7neWG1+9v+jkqYdvb8y1vdfOyUm2EoWjSUK2uqxBokIBxF7+M85GympX?=
+ =?us-ascii?Q?L6jR4l/Sx7WWyF38TTY8sGxa6qHw0hyvCjz3VYz8SC2PYeSwRm6rWrRJEKwE?=
+ =?us-ascii?Q?mCOMk5AKDp0BGdar5fi0IMa7O4o8JPmDTConb/8omtvyaiAREQEUc3Z1mkjq?=
+ =?us-ascii?Q?PBtfbT61YEbeYxefkJ0ELne/FmiOouGBv/M3X8p5DJOgSDmZq88BtorYvcxp?=
+ =?us-ascii?Q?MvW1B0wDwqWA5pMcXYfjPtpWnb2daGbk8dn05cCQ6K6hc4L0Dq2D2M9z1GEB?=
+ =?us-ascii?Q?xfuuj8U5m68Wyr1FY8uE12llg8VY1Pnm9Klz6qzL?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 051a5b2f-5f28-43e2-a4d0-08dac694bf36
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2022 23:05:39.3397
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lYU1FBmxeELgR7Y6v9b+HzZ5VsPV1aVrHs9ZEtc1zTVPBfoOTYqisBns/F9m24ohl4GbOMMllfcnnfmPdqZNWA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4792
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Nov 14, 2022 at 04:32:34PM +0000, Sean Christopherson wrote:
+> On Mon, Nov 14, 2022, Yan Zhao wrote:
+> > On Sat, Nov 12, 2022 at 12:43:07AM +0000, Sean Christopherson wrote:
+> > > On Sat, Nov 12, 2022, Yan Zhao wrote:
+> > > > And I'm also not sure if a slots_arch_lock is required for
+> > > > kvm_slot_page_track_add_page() and kvm_slot_page_track_remove_page().
+> > > 
+> > > It's not required.  slots_arch_lock protects interaction between memslot updates
+> > In kvm_slot_page_track_add_page() and kvm_slot_page_track_remove_page(),
+> > slot->arch.gfn_track[mode][index] is updated in update_gfn_track(),
+> > do you know which lock is used to protect it?
+> 
+> mmu_lock protects the count, kvm->srcu protects the slot, and shadow_root_allocated
+> protects that validity of gfn_track, i.e. shadow_root_allocated ensures that KVM
+> allocates gfn_track for all memslots when shadow paging is activated.
+Hmm, thanks for the reply.
+but in direct_page_fault(),
+if (page_fault_handle_page_track(vcpu, fault))
+	return RET_PF_EMULATE;
 
---=-w1Qxjn7ruFH1U2x8yMNo
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+slot->arch.gfn_track is read without any mmu_lock is held.
+> 
+> The cleanup series I'm prepping adds lockdep assertions for the relevant paths, e.g. 
+> 
+> $ git grep -B 8 -E "update_gfn_write_track.*;"
+> arch/x86/kvm/mmu/page_track.c-void __kvm_write_track_add_gfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+> arch/x86/kvm/mmu/page_track.c-                         gfn_t gfn)
+> arch/x86/kvm/mmu/page_track.c-{
+> arch/x86/kvm/mmu/page_track.c-  lockdep_assert_held_write(&kvm->mmu_lock);
+> arch/x86/kvm/mmu/page_track.c-
+> arch/x86/kvm/mmu/page_track.c-  if (KVM_BUG_ON(!kvm_page_track_write_tracking_enabled(kvm), kvm))
+> arch/x86/kvm/mmu/page_track.c-          return;
+> arch/x86/kvm/mmu/page_track.c-
+> arch/x86/kvm/mmu/page_track.c:  update_gfn_write_track(slot, gfn, 1);
+> --
+> arch/x86/kvm/mmu/page_track.c-void __kvm_write_track_remove_gfn(struct kvm *kvm,
+> arch/x86/kvm/mmu/page_track.c-                            struct kvm_memory_slot *slot, gfn_t gfn)
+> arch/x86/kvm/mmu/page_track.c-{
+> arch/x86/kvm/mmu/page_track.c-  lockdep_assert_held_write(&kvm->mmu_lock);
+> arch/x86/kvm/mmu/page_track.c-
+> arch/x86/kvm/mmu/page_track.c-  if (KVM_BUG_ON(!kvm_page_track_write_tracking_enabled(kvm), kvm))
+> arch/x86/kvm/mmu/page_track.c-          return;
+> arch/x86/kvm/mmu/page_track.c-
+> arch/x86/kvm/mmu/page_track.c:  update_gfn_write_track(slot, gfn, -1);
+yes, it will be helpful.
 
-On Mon, 2022-11-14 at 19:39 +0000, Sean Christopherson wrote:
-> Ugh.  I worried that might be the case.  An alternative approach to help =
-document
-> things from a KVM perspective would be something like:
->=20
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index 93c628d3e3a9..7769f3b98af0 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -1300,6 +1300,9 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
-> =20
->  static inline int max_evtchn_port(struct kvm *kvm)
->  {
-> +       BUILD_BUG_ON(EVTCHN_2L_NR_CHANNELS !=3D
-> +                    (sizeof_field(struct shared_info, evtchn_pending) * =
-BITS_PER_BYTE));
-> +
->         if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode)
->                 return EVTCHN_2L_NR_CHANNELS;
->         else
+Besides, will WRITE_ONCE or atomic_add in update_gfn_write_track() to
+update slot->arch.gfn_track be better?
 
-Not really sure I see the point of that.
-
-There are two main reasons for that kind of BUILD_BUG_ON(). I've added
-a few of them asserting that the size of the structure and its compat
-variant are identical, and thus documenting *why* the code lacks compat
-handling. For example...
-
-	/*
-	 * Next, write the new runstate. This is in the *same* place
-	 * for 32-bit and 64-bit guests, asserted here for paranoia.
-	 */
-	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, state) !=3D
-		     offsetof(struct compat_vcpu_runstate_info, state));
-
-The second reason is to prevent accidental screwups where our local
-definition of a structure varies from the official ABI. Like these:
-
-	/* Paranoia checks on the 32-bit struct layout */
-	BUILD_BUG_ON(offsetof(struct compat_shared_info, wc) !=3D 0x900);
-	BUILD_BUG_ON(offsetof(struct compat_shared_info, arch.wc_sec_hi) !=3D 0x92=
-4);
-	BUILD_BUG_ON(offsetof(struct pvclock_vcpu_time_info, version) !=3D 0);
-
-I don't really see the above fulfilling either of those use cases.
-Given that the definition of the evtchn_pending field is:
-
-        xen_ulong_t evtchn_pending[sizeof(xen_ulong_t) * 8];
-
-It's fairly tautological that the number of event channels supported is
-BITS_PER_ULONG * BITS_PER_ULONG. Which is sizeof(xen_ulong_t)=C2=B2 * 64 as
-defined in the official Xen headers.
-
-I don't know that we really need to add our own sanity check on the
-headers we imported from Xen. It doesn't seem to add much.
-
-No objection to cleaning up the COMPAT one though, as in your original
-patch.
-
-
---=-w1Qxjn7ruFH1U2x8yMNo
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTE0MjIyNDMyWjAvBgkqhkiG9w0BCQQxIgQgGRtLxaBi
-u+K5e2nTGDzW9eiRjRhJffQ8PHdDgzKd9qcwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAPqOF7ajAvlf2Mz+T70GGy26IvA1HCbIxt
-YDMoB4wu/Fqv+bAWvLqtHvO7zHU+BdVcQV+n0JjLmSaSxCLYKTaMwcXBkioOrOw0Z0m9909dONN+
-kE9WEtQchZHP5aaUV4nD6dZzbN+Mfu2dPfrhY3YFMlYHHP1tAgvjYDt6jmxUrdZCgUN/GnaXAaxW
-7GZ7ykVCUK87ySYRJ5rCfCRK0IyOAxWdcI8DbX7pTYWTJVEP9PU9QNBMEpV34SuZzIcGo2mEE0OX
-GkL2Zf+UP98SfGIoOhbP7AKdO5+BGOuOOAGVcRJfmKWNSYUMrQzqHxGNEWRPBbTzBLaRujdUupMV
-zrIqp+5p7t9VI+MbQdifAmAgdFu7ApzJNDhMayF7+Hp+HqCwslUFT/PFPAuRdI2d0vlJtSzAGbkg
-525JIDyEks2hzbB4ZBmqA05RqGb/wGsKHt/XZ8AhW3NuPXg6O1O9mcThcBjHgvs4QoXk8iq6LhWO
-mcDpW2/1y1d14tBromPnWIt1O4tAiwo7y23H/rgIdnFr1fZGeL9Dh8Yky/TFI+xgIeckocM8ytbe
-4LMXkwzy4DL0LDYV8hntcR/ugELUH3tH/kcogfoFFDoxMofly1gROvYCdDBhhxZ345aYHeDJnhfb
-z79V5cTVR4aGmHDKoYJfH8OnIsP4+FhjMiFK8PJEZQAAAAAAAA==
-
-
---=-w1Qxjn7ruFH1U2x8yMNo--
-
+Thanks
+Yan
