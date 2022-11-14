@@ -2,177 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8115628D6E
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 00:29:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 47F4F628D86
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 00:36:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236658AbiKNX3S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 18:29:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40808 "EHLO
+        id S236724AbiKNXgk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 18:36:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237821AbiKNX3J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 18:29:09 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5691B647D
-        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 15:29:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668468548; x=1700004548;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0KkYvm5wCH4Zs4tVezdy5XoZ+qfuiVYyA22a/r2vt4g=;
-  b=fd/O+PLPVD3dYVL0HmO2UgtfsBVjQxWjuuK6/fb7Hshhgqr+U1tl22jz
-   qwWnwRsxcOhMgXN9F1osjDLQ+BBNSvSTvwZE8VwQ7znCzNuR2WY3YLIgQ
-   ETzabgjDOGREUyZem2yFoqblRpCIAmEZN3CPMhMpQ11xjIZJPWQ9eoEMp
-   ZHc9zKxojwefM7vXzbbMski0mC9i09cjIJcIiFEjeejj4FU3f1RzM68lG
-   iAUjKIzh7O6fAfN4bgGSLemsP063ZIOmKVAbtRem/Wfh8MmHbSsldVmrb
-   xX7at7iJ2AH9JQDtL/7PQLthODr+S7N+zdirSeeIMkOOpZAA05vV90c/V
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="295472901"
-X-IronPort-AV: E=Sophos;i="5.96,164,1665471600"; 
-   d="scan'208";a="295472901"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2022 15:29:07 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="702204750"
-X-IronPort-AV: E=Sophos;i="5.96,164,1665471600"; 
-   d="scan'208";a="702204750"
-Received: from yjiang5-mobl.amr.corp.intel.com (HELO localhost) ([10.212.78.37])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2022 15:29:07 -0800
-Date:   Mon, 14 Nov 2022 15:29:06 -0800
-From:   Yunhong Jiang <yunhong.jiang@linux.intel.com>
-To:     Shivam Kumar <shivam.kumar1@nutanix.com>
-Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
-        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
-        kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-Subject: Re: [PATCH v7 1/4] KVM: Implement dirty quota-based throttling of
- vcpus
-Message-ID: <20221114232906.GA7867@yjiang5-mobl.amr.corp.intel.com>
-References: <20221113170507.208810-1-shivam.kumar1@nutanix.com>
- <20221113170507.208810-2-shivam.kumar1@nutanix.com>
+        with ESMTP id S236364AbiKNXgi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 18:36:38 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2049.outbound.protection.outlook.com [40.107.244.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 902AD9FD8;
+        Mon, 14 Nov 2022 15:36:36 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E0OiHE2tRbQWhjDzIdU8WUeGe2eQ45H+spO9EOujqYdUhSyujhgPh6niW9AxjQN8kn8HWtbCcIvaOCy5LZiIPzBE5hB6rUSgrowlrRb+w4mL0+OLzzARi0VXADq9uFwf4cJYVA3nSh3W0yQ+lfCDh8VHA2QkIwDhBWcDLjsQPtJjFS665HboEyrb5ZhMwnyegQ8ZPN4DfBSWqc64Q2n9oVzwCGqBi408jq1JMSRkFoQl5c3usOgydMM8DEqgjFsrBDuGlbwHCwXrOPwhRFuh6J7T6MBh74VxtTCTkigO5Veavr2LUbmi9mlFZYB3eZdu+LrWOLcesY3NeV67coyBOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9xrAWZSILDlomG/qAa79h/Q0/uaWhu9vzOzoxcvMC7I=;
+ b=c+ovHnxXoCYKZRBxKn6cc95bETjP+t9H9j2SyDfHNN7e3DhZjJRXRjm45d8XBlED0cEzgJWpOoQDrmnJKiI/P2JjniIjOuBPYrl9jZp9KBT/bbQ4sJGT1G+mm9qjxY74oTNyOdjvH9+g5TPet1p77GtRCytQddN4w11BvkeV0NKgWagdD68mpW0SpMeS8jWzXKSL31zRwmX2/CsBE8L8h9iHpT5hnRJ8odyFIwbrJzmUeOFLuPJkfcgAv7uE1Mwsl4X6r2MME8slnJ65RXWo3cfVdLPyuhaKkJItwTwX/ddEtaJfdY56fkkYQNUoE9KdvEgM6cAky8mIaqrIDkOtqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9xrAWZSILDlomG/qAa79h/Q0/uaWhu9vzOzoxcvMC7I=;
+ b=LnTnKtoZFp5UMPTGh4iYzZUiJB8cdENiGxH5BKfRZEObWrfPwNnMnkyICY6qfb8LnKR9Y3VEOC44UCq8gAx2+URHvvbr0Ni4Uq39waTx2P2w6i+FKBTlJGXpERSN4YyTyiRcYTqWV0hKiPQoMsmQchZezVUIFMtV6TP54qzHkYo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by BL1PR12MB5707.namprd12.prod.outlook.com (2603:10b6:208:386::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.17; Mon, 14 Nov
+ 2022 23:36:34 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::395:21e6:abfd:7894]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::395:21e6:abfd:7894%6]) with mapi id 15.20.5813.017; Mon, 14 Nov 2022
+ 23:36:34 +0000
+Message-ID: <c2ce6317-aa51-2a2b-2d75-ad1fd269f3fa@amd.com>
+Date:   Mon, 14 Nov 2022 17:36:29 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
+Content-Language: en-US
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     vbabka@suse.cz, x86@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+        thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, michael.roth@amd.com,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        "Kaplan, David" <David.Kaplan@amd.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
+ <Y0grhk1sq2tf/tUl@zn.tnic> <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
+ <Y1e5oC9QyDlKpxZ9@zn.tnic> <6511c122-d5cc-3f8d-9651-7c2cd67dc5af@amd.com>
+ <Y2A6/ZwvKhpNBTMP@zn.tnic> <dc89b2f4-1053-91ac-aeac-bb3b25f9ebc7@amd.com>
+ <Y2JS7kn8Q9P4rXso@zn.tnic>
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <Y2JS7kn8Q9P4rXso@zn.tnic>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH0PR03CA0074.namprd03.prod.outlook.com
+ (2603:10b6:610:cc::19) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221113170507.208810-2-shivam.kumar1@nutanix.com>
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|BL1PR12MB5707:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9e36b446-b4a0-4f94-783a-08dac699108e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TPEoaheO4KNdF6HboC5+0io3JTVk8Uqaw8M1H52nSO4Im1D5xcgABUq23Ti5haY7+uVM2B67gxhzJcsB9tPDqRnRpS2FLtMUa6I2iWE9ZmIwKwA+LQ92HtzxELczZAI/QtVYCoqH94swqwC0h61KkMI4+/DvPsYdMeH4qBGwj7vMES4e2ewXxVza1Wa4rh3fkLMppcAXcTi0dCSCL95qaLEtaXufTgjntda7O3h0WjtyQh5NyRtAW3lwXnqtzaj5tXmXdJk25TRaT+q8c8KoJuUC8AMnEGa9rf80VGbvxAe6nuKNrXCTxFPf+Qh0zzfgpZmugUfc0lMdrVr15YGY9OCdKkEZ+l5sTFhruR37K3fyibVdXo0aYccspGgI/c14FNX6XcQezOj21YJUMEj/AaCOkEFcSbc63Lr9nmj8C16WwaAmuZhA/UgjYJNZsqny8l9A7HmzC0+OM2uOTzViyUQh8Wv3KtwbpucYC5nQsVhRMskt05Vq6suipYDfUv8fJZuRK120v578AD05k4WlTJZqCw8a3UONUJd00ruNR19LSzDUcIvaU1oE8tYK7juA/dDLimlvyyQXl4TqzjnGMtw0l+r1aDH73/WoSWywM5QntLzsRmB6dUkfCnKQccIx/QiAaiWE2W/c0c/Zuds9oIAerbKmmJdY8yy79McTEwxQDF/fmuL8kL3Fd1UWw2sw1ax1h188ZGL43nejBTL+/YRsHRazZjLbiGxTrK2iGQADQWRlU+HOwo2ujK3T2Y1Cdk//1oPDtodz4eZ5xRPCObU8De16yh8rWftw6RIrWBmCXoPmvYHyMdumXMsR7JaQ1HyeEk0srteGkuJeaXoSHw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(376002)(346002)(39860400002)(366004)(396003)(451199015)(66946007)(2906002)(38100700002)(66556008)(66476007)(36756003)(4326008)(8676002)(6916009)(6666004)(186003)(53546011)(316002)(6512007)(26005)(2616005)(83380400001)(31696002)(6506007)(86362001)(478600001)(6486002)(31686004)(8936002)(5660300002)(7416002)(7406005)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L3haWDI3MXBRa1REdG9xQml0c08vY2JtWEZIQWNvdWpzUm00cDV1bkpuZXJ2?=
+ =?utf-8?B?ZWRsNWdNNHpOZ1hGZklVaVVwU20zYlY0UGowTDdNRlZORGZLVW83NXdHZFZ1?=
+ =?utf-8?B?N3YxRnhyQU1BV0l3eEgrS2tTSUNSbHBrRWpMYVdERTJQdnV0eWVPR0tmL1cv?=
+ =?utf-8?B?ZFhya2N4MWw5cGxHYkRFY2dPNXZ0bUM1UXJsR1hkTEtON3RHbXUrZ1c0aUw4?=
+ =?utf-8?B?Wmk2ckxsdmhOQTFXZ0RobHhRbWUxM1RoaG1UWGxLRVJGUDFEQWxkZXJFQ05X?=
+ =?utf-8?B?YTNwVkZTKzd3K1YzNWZBU1huV2t0UGg1WVpZTm5tVDNxekRGOVZ6MzZRRVRL?=
+ =?utf-8?B?Q01JRzFaRVFsbW1MaGRSVWlSUnlSaFdQVUNBNXBnN3BDL3kxWWNpNU9iTkVT?=
+ =?utf-8?B?aHJzcTY3TkNvYll5dDFnNUZTd2srRUt0aGtOV1EzYkhHaTFLR2RNa0toSzhi?=
+ =?utf-8?B?ZlB2cUJQUjYxc1FrMVRlblA0bnNHTVBMY3Z6YTBPYnNQY0RrN2xSWkVUSkZJ?=
+ =?utf-8?B?NWRTUG5LYm5XRy85TmJETUxnQlY5YnIxdGtFa0I2M3RkZ1BjRlZCQzJHRVRs?=
+ =?utf-8?B?WXNtWG1wbFlIcE9ZMC9RTTNIdXI1RGgzL2U4QmREVFZ6Z0hVc1RDUW14ckw4?=
+ =?utf-8?B?Ri9tdEJ0cWw1RXh3K05wVHVjVEp5eFZWM1B5Vk9WRWwyTGd0TGNJenkvZ2hS?=
+ =?utf-8?B?cloxMU56c3A0TlBQT0Ztd1p5Q1NEZ2hjTnRpNVNaU1lJaUdXaDgxTXZKQTZ5?=
+ =?utf-8?B?QW5MVjhSZ2Q3V3ZTczVDb2NwSTByQVp1TlpScEpIeE5JZzNITy9oemNObGpD?=
+ =?utf-8?B?enBFV2xEcm11VUN4clVjck9PSmhYNHd4aUZqWHordVd1V1B0emlpRXhaeU43?=
+ =?utf-8?B?T20wcWQ3R3MwZHA5LzlrK1l3VndzMmUyM2pCOXVPdXlldDNocFNieElSSm5l?=
+ =?utf-8?B?eDBCM1l5K3p0Ty9mQkdLa0poQ1ZuL3VRYytHU2hRbE1QN0tzblYzWEc1UHNp?=
+ =?utf-8?B?UnFHU2JjSG55a3dyUjZRSGRpK0V4R2hTb0NBalN0NVFPUDNaOUtuVlJXQTZn?=
+ =?utf-8?B?RmhvL0ptVUFhcUV3aG94cjdQa3ZVMkdxc3ljT2hVSEhIY2xsQzdDR0NBMWEy?=
+ =?utf-8?B?dWxPaXI2YzBleW1GclZsSWI2V25pOWExaUg3NjNCMWhNSmROVEVWUktLaXdw?=
+ =?utf-8?B?VkZ1QTM2bXcrZUpCMkE5STFIdkV2alZnNEtFcWFCazZ3SlczOHFBZ3JCVjhS?=
+ =?utf-8?B?Y0U4V0lVajY3OHNZZzhuM1pSc0hBenB5UXgrRVdYbGIvNXd6UlF1aEkrRmp5?=
+ =?utf-8?B?MlZOb2FtaEtNM3ZNMjF5Mks3UFlWZlpDZTE3Y1RpSWhzaWdKUmFIZzdiYlhn?=
+ =?utf-8?B?Q3JRZGhkWG9LNHZDNnAyaUlpWGFiZjdVa0cxT2lUMXc3RFpiSnQ5ZnNlWmNT?=
+ =?utf-8?B?ZDcrZXlHZFpqd2FVYW1yOWUrbE9jOTl5UFN3SUhISkxnMlBkTjNMV3IzVVRl?=
+ =?utf-8?B?OUQ0QkJWNnV1Qy9TakFpczNGNVYwUXJucjcvRDFpQm9majNKL1pBaXNTWFE4?=
+ =?utf-8?B?RUsyVG5xUzM1YWdvSXJtN2dJZE9MTUlMUytDbWNjVnh6RjFYeFR1ekNFTzhk?=
+ =?utf-8?B?VDU3RUhEYjNUbVpPM0wwTDRFWmpkVHE0QVdJVXJEcHVaanAzN0FjVUpTYlBo?=
+ =?utf-8?B?bVp4VDVSczNzZzh4dWFzaEJWZm1rMFdhSXpCd240N2tkWGZ4ZjNuR0dDNTZi?=
+ =?utf-8?B?dUdId1VObythQUFhZWQ4SGtGZGordERTYmlrZUtxUnh5bnNnWEVmWk9STEsy?=
+ =?utf-8?B?dUpJYkIyb1JSYlc4YXl0eVVabm9naWJ4SEpZZStydTJmMG1ZQlh5YmlpRDk0?=
+ =?utf-8?B?RDAwT25vTnhTUnJnM2JGcEJxQVFQMk1UUTE3YkNHRnN4QjhCNW8zUUlVay9x?=
+ =?utf-8?B?TWhVY0ZSbmFWNlFtUnllQkdNQWZLakgxbER2MmJTRi9YTjVBY1NOZEwvY1Vw?=
+ =?utf-8?B?bGxKYTJzRnp6S1ptbCtGa1R3S2FTUDFBSU1KY1ovWkxldjFBZjhSRFA3c25O?=
+ =?utf-8?B?RGI3dUtQOWFYWXhDUWhzTUg3bnJvejV6OFpFRTAyTStMNEpLdFFqOUJaRVhm?=
+ =?utf-8?Q?z/rhgy8O+DgFY/17g7GYLBzyr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e36b446-b4a0-4f94-783a-08dac699108e
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2022 23:36:34.0477
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 451b0rTMcJT/m2fzjQyApsmH8yGJIMTCnUY3egAdqMCsuug4iMaocfKV3351Zzf1WwQ+in8mG2DclCayLev08w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5707
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Nov 13, 2022 at 05:05:06PM +0000, Shivam Kumar wrote:
-> Define variables to track and throttle memory dirtying for every vcpu.
-> 
-> dirty_count:    Number of pages the vcpu has dirtied since its creation,
->                 while dirty logging is enabled.
-> dirty_quota:    Number of pages the vcpu is allowed to dirty. To dirty
->                 more, it needs to request more quota by exiting to
->                 userspace.
-> 
-> Implement the flow for throttling based on dirty quota.
-> 
-> i) Increment dirty_count for the vcpu whenever it dirties a page.
-> ii) Exit to userspace whenever the dirty quota is exhausted (i.e. dirty
-> count equals/exceeds dirty quota) to request more dirty quota.
-> 
-> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
-> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
-> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
-> ---
->  Documentation/virt/kvm/api.rst | 35 ++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/Kconfig           |  1 +
->  include/linux/kvm_host.h       |  5 ++++-
->  include/linux/kvm_types.h      |  1 +
->  include/uapi/linux/kvm.h       | 13 +++++++++++++
->  tools/include/uapi/linux/kvm.h |  1 +
->  virt/kvm/Kconfig               |  4 ++++
->  virt/kvm/kvm_main.c            | 25 +++++++++++++++++++++---
->  8 files changed, 81 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index eee9f857a986..4568faa33c6d 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6513,6 +6513,26 @@ array field represents return values. The userspace should update the return
->  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
->  spec refer, https://github.com/riscv/riscv-sbi-doc.
->  
-> +::
-> +
-> +		/* KVM_EXIT_DIRTY_QUOTA_EXHAUSTED */
-> +		struct {
-> +			__u64 count;
-> +			__u64 quota;
-> +		} dirty_quota_exit;
-> +
-> +If exit reason is KVM_EXIT_DIRTY_QUOTA_EXHAUSTED, it indicates that the VCPU has
-> +exhausted its dirty quota. The 'dirty_quota_exit' member of kvm_run structure
-> +makes the following information available to the userspace:
-> +    count: the current count of pages dirtied by the VCPU, can be
-> +    skewed based on the size of the pages accessed by each vCPU.
-> +    quota: the observed dirty quota just before the exit to userspace.
-> +
-> +The userspace can design a strategy to allocate the overall scope of dirtying
-> +for the VM among the vcpus. Based on the strategy and the current state of dirty
-> +quota throttling, the userspace can make a decision to either update (increase)
-> +the quota or to put the VCPU to sleep for some time.
-> +
->  ::
->  
->      /* KVM_EXIT_NOTIFY */
-> @@ -6567,6 +6587,21 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
->  
->  ::
->  
-> +	/*
-> +	 * Number of pages the vCPU is allowed to have dirtied over its entire
-> +	 * lifetime.  KVM_RUN exits with KVM_EXIT_DIRTY_QUOTA_EXHAUSTED if the quota
-> +	 * is reached/exceeded.
-> +	 */
-> +	__u64 dirty_quota;
-> +
-> +Please note that enforcing the quota is best effort, as the guest may dirty
-> +multiple pages before KVM can recheck the quota.  However, unless KVM is using
-> +a hardware-based dirty ring buffer, e.g. Intel's Page Modification Logging,
-> +KVM will detect quota exhaustion within a handful of dirtied pages.  If a
-> +hardware ring buffer is used, the overrun is bounded by the size of the buffer
-> +(512 entries for PML).
-> +
-> +::
->    };
->  
->  
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index 67be7f217e37..bdbd36321d52 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -48,6 +48,7 @@ config KVM
->  	select KVM_VFIO
->  	select SRCU
->  	select INTERVAL_TREE
-> +	select HAVE_KVM_DIRTY_QUOTA
->  	select HAVE_KVM_PM_NOTIFIER if PM
->  	help
->  	  Support hosting fully virtualized guest machines using hardware
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 18592bdf4c1b..0b9b5c251a04 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -151,11 +151,12 @@ static inline bool is_error_page(struct page *page)
->  #define KVM_REQUEST_NO_ACTION      BIT(10)
->  /*
->   * Architecture-independent vcpu->requests bit members
-> - * Bits 3-7 are reserved for more arch-independent bits.
-> + * Bits 5-7 are reserved for more arch-independent bits.
->   */
->  #define KVM_REQ_TLB_FLUSH         (0 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_VM_DEAD           (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_UNBLOCK           2
-> +#define KVM_REQ_DIRTY_QUOTA_EXIT  4
-Sorry if I missed anything. Why it's 4 instead of 3?
+Hello Boris,
 
+On 11/2/2022 6:22 AM, Borislav Petkov wrote:
+> On Mon, Oct 31, 2022 at 04:58:38PM -0500, Kalra, Ashish wrote:
+>>       if (snp_lookup_rmpentry(pfn, &rmp_level)) {
+>>              do_sigbus(regs, error_code, address, VM_FAULT_SIGBUS);
+>>              return RMP_PF_RETRY;
+> 
+> Does this issue some halfway understandable error message why the
+> process got killed?
+> 
+>> Will look at adding our own recovery function for the same, but that will
+>> again mark the pages as poisoned, right ?
+> 
+> Well, not poisoned but PG_offlimits or whatever the mm folks agree upon.
+> Semantically, it'll be handled the same way, ofc.
+
+Added a new PG_offlimits flag and a simple corresponding handler for it.
+
+But there is still added complexity of handling hugepages as part of
+reclamation failures (both HugeTLB and transparent hugepages) and that
+means calling more static functions in mm/memory_failure.c
+
+There is probably a more appropriate handler in mm/memory-failure.c:
+
+soft_offline_page() - this will mark the page as HWPoisoned and also has
+handling for hugepages. And we can avoid adding a new page flag too.
+
+soft_offline_page - Soft offline a page.
+Soft offline a page, by migration or invalidation, without killing anything.
+
+So, this looks like a good option to call
+soft_offline_page() instead of memory_failure() in case of
+failure to transition the page back to HV/shared state via 
+SNP_RECLAIM_CMD and/or RMPUPDATE instruction.
+
+Thanks,
+Ashish
+
+> 
+>> Still waiting for some/more feedback from mm folks on the same.
+> 
+> Just send the patch and they'll give it.
+> 
+> Thx.
+> 
