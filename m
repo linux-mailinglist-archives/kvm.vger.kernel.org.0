@@ -2,289 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E4EF6281DF
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 15:02:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 509FC628268
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 15:23:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229909AbiKNOCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 09:02:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46926 "EHLO
+        id S236618AbiKNOXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 09:23:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235865AbiKNOCm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 09:02:42 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10FEA2AC7F;
-        Mon, 14 Nov 2022 06:02:39 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 9CA5722B02;
-        Mon, 14 Nov 2022 14:02:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1668434558; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mayE7Lg0BQ8hDkq+3cJ1RU+23EhKOBsT9P5RmwpQqZg=;
-        b=CRVfTYw9S79rQb/maxbJb5Rb+xGiQrI/zNIQUn8hti/eA+HHOydrfJXOCPvacAZvtp+qfG
-        NyUu7a0lynHJoULvD0Ym4rGHZQ8ntVqyIgSyza22+c5pXt6yBQC3quckfvjk+eCJo2n6CU
-        DJTqPmMf+ZSOKq19iXMVwvt3TIeiv7A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1668434558;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mayE7Lg0BQ8hDkq+3cJ1RU+23EhKOBsT9P5RmwpQqZg=;
-        b=edS4ElukmcUiY4HgCNAWi+BGiMSz4zN4KxQqC3YhbOyfv7rJQWyINb0mhFlFH83SBx0dEJ
-        qVX43crJKTJVDaBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 02E9A13A92;
-        Mon, 14 Nov 2022 14:02:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Q2I1AH5KcmM7XQAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Mon, 14 Nov 2022 14:02:38 +0000
-Message-ID: <20a11042-2cfb-8f42-9d80-6672e155ca2c@suse.cz>
-Date:   Mon, 14 Nov 2022 15:02:37 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH v9 1/8] mm: Introduce memfd_restricted system call to
- create restricted user memory
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        with ESMTP id S236456AbiKNOXk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 09:23:40 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2062.outbound.protection.outlook.com [40.107.223.62])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DEDD6173;
+        Mon, 14 Nov 2022 06:23:38 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jHqkuchDTBQGkmn1geW0k1PHuZIF9FBHPsn+o7B7EPybCRa9XZ+FmjBnpBM06Phm/yb2at3ktcTPbFuBgDja7AmUhUMo6ftZk8BEAkdu9EEaJUPyYdptEFniIhS8r5wO9NprOnhUi6kZKM95349rFv37SPHkuyIcvHihZohOS7RBcF223Y6+9ySc5GgSVrg4r1Xlk2oJ2Fi2VXpj9aKMUZDFnjxeaW5FGiT9qT5g/IQnOnC10LOVrSVaS6eIeNxxfQYaTMuc/UTEbTF52RlEBfXhXfOobV9oANWAxrdz+Tbuo3hY6axQQsOHtkIXfR+bC30LzgOAE/XkKiHiXsHO5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KOflxrAuFEFahPkY/8FItOR1D/JtKkWgHb56I4RIqPo=;
+ b=kbiuT5Nry+nqmuopNwUdMnosO1W+YrbeV2wG5FWdYhcFRPMiNgEZEuj44NzcTtu3vMRxrvVT36AGiJCXVIzgNIHIfxIkh2WPKNel97GSI+mEargS2ZIQLRcr/E/B0C2mYoXY8Q0WUpIPBh9+ic6+3Fa2OrBd06aeaKsVE9gE3xlPA6jUkRdXoI1UC9lk9O4HIy4YogXEIl18u+ubqCGzSkb3aXMV7qTWq3x1+mp0Ig1XgpYIcQmcT6Ywf2t+owInVcLTJM4l9wtPNY4iYh77dvNijhvHJ/L8PMIFrFbkNFoyWzV2d7NLc37DTkk8DzcezzebuKrbVRXuF5mG/98cCQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KOflxrAuFEFahPkY/8FItOR1D/JtKkWgHb56I4RIqPo=;
+ b=cw3bAUux4zLhRk+mEgyQnmCVFvh7XzNliDlw9D7tJ/Hvv1L0f1p84nWnFYBsXpwF5POnGIDOsOBZl3G44iAgx67/YUQceeLbukvz1QQ4hwhSRHD0jjAmaEqgvzTPaIbLcpB3SU/+ErTyUTAH57jJSR3Ez+4FOZ5Pq4mXLuZwk3ur/cAf/H9y4OlmlvPBn7+r7jfBPKkcd7Par+HeWGWR30MGeFMgMzfvBjWy3giEFginXH8/4wnBCWwr+B0dzvhINIh1NzY+oFA/Q4Lwd2NjBRNNrVYOkF7Hvfs/a/sISC1hNC9q5hv8hncJXKI2Fm1rWimbq1XgyTPySwc/g5ov4w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH7PR12MB5710.namprd12.prod.outlook.com (2603:10b6:510:1e1::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.17; Mon, 14 Nov
+ 2022 14:23:36 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%7]) with mapi id 15.20.5813.017; Mon, 14 Nov 2022
+ 14:23:36 +0000
+Date:   Mon, 14 Nov 2022 10:23:35 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        mhocko@suse.com, Muchun Song <songmuchun@bytedance.com>,
-        wei.w.wang@intel.com
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <20221025151344.3784230-2-chao.p.peng@linux.intel.com>
- <20221031174738.fklhlia5fmaiinpe@amd.com>
- <20221101113729.GA4015495@chaop.bj.intel.com>
- <20221101151944.rhpav47pdulsew7l@amd.com>
-From:   Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <20221101151944.rhpav47pdulsew7l@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_SOFTFAIL autolearn=ham autolearn_force=no
-        version=3.4.6
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 00/11] Connect VFIO to IOMMUFD
+Message-ID: <Y3JPZwEHjGDU4Oyq@nvidia.com>
+References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <f54c2a93-539f-4520-0561-fbe5cea7772f@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f54c2a93-539f-4520-0561-fbe5cea7772f@linux.ibm.com>
+X-ClientProxiedBy: MN2PR11CA0001.namprd11.prod.outlook.com
+ (2603:10b6:208:23b::6) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB5710:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1f406f3c-90b0-400c-5e10-08dac64bd146
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: V7u/C852C+L5RwoCbs4t51+j0dyRmUI7oIRPKCadvkricy3+kfPopRAZ4f7LNxtqi4ihXFzzhD8R8kNCI+ZUQEdhn/4Qk3PcaGRL/1nABVmxnl78xKTcpDeMDi24BMmObaKy6r9fyY0Py1adbc+0NyfiGlaqEKEWSjF3tpgmxMgcqRpfDx+1LNhw2Sco7kC8xkBJaQrCfO3YiTuToGElSMSRgbuSnnUtgGWieC8L8/ea8ujkBtAFL7i76eTkae7rLfdJAD/W3HvP6pIxKHAbvGjWWlR+lgLDS0NbCIM2oipDizELpRRZWfc8sjgdAH9oaLS1YKnjDq4Nnxdxz204GmoNMN3Wc4H6yagHvpcoKnPw9oLnzTZSbCgB1flgLyJBdQsVWDoh72Z2kSggTY73Ws1YyEvWYSNHKnTb2zLEfnZovXkPd33P/ipW82DPWzsuQnG/RH3Mwhzz1taYNV1+xhwl4imVn3BxgABKbeJ3s1Rs6bCQV7njq2q+2V6DV2pjoylfIwVfzeiJzk6fznGNr1fSHRg6AaZd4tT1Ev+0jk9zreJT6f/ikfjsRrBcPgTGQZZy3zo7WJ4EX1I0izJ5qaIdNpudutINpEzEM0adD/B0O98uh00ZJxIxVPv30xJCM5iYt/xf0EYibVyU9OynDS+YdV4NPmBVVE9c42/t7dvZTfdil/nV5GpQIGyPuUh6zETa8a7/4eNZT+y6UGMPBw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(396003)(136003)(366004)(346002)(451199015)(2906002)(41300700001)(8936002)(2616005)(5660300002)(186003)(86362001)(7406005)(7416002)(36756003)(6506007)(8676002)(66556008)(4326008)(66946007)(66476007)(54906003)(316002)(6916009)(6512007)(478600001)(83380400001)(26005)(38100700002)(53546011)(6486002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3kTfEnHqvnK24X1cG5nriTcNOlNAORG48kj85yyd/gf0++C7+ppPskW2n3N5?=
+ =?us-ascii?Q?RLb0Sn7hEgbgf521jALZjMpglceM3+Jbzi8JyoW7i4E1zURhOZEonbP86jPl?=
+ =?us-ascii?Q?osUyFYjsRxg2TSHdZ14bqDuWEx4G2A+sE+LiieDQzDMnFmwfgxHeGFkEqN4j?=
+ =?us-ascii?Q?Z2vVyrhOQiRlIjElJ0tLMHeGXtWzjLZg4iRvE36ZtH3CORR0mi4G6B2yR9WV?=
+ =?us-ascii?Q?1x1+DpADITwMBt7yQ8nWkrEhygAasJVu6wNIH7PluQbKmlJaIvNy+PW9q9Mr?=
+ =?us-ascii?Q?yhHx+4nNqmlOqWlnJrSVF4uZjGa6R5EONQ0Xt414CdM5fSW0Xpu5e6fLBKYD?=
+ =?us-ascii?Q?BxIBiBtsGF0QcpdSIKbNexUxzHK2q268pFwxcniRI6wda1qApngi1Se092lk?=
+ =?us-ascii?Q?ObdNMVknkm/DE0lSKvdPcp1oCeB1pYj8yZh4YEV5VOGXS/po5/n9EHTRwMdT?=
+ =?us-ascii?Q?ALJWasncY69d893FkYBznFGNBJltwA30ehsBhUZOn4t3st61j0d/j3tJgQZD?=
+ =?us-ascii?Q?wgOnPRTFTbWugoefRNOH6iiZ3QAy3PokdhRcHXu4Toxq5Wh2zLyqqXFSYq+R?=
+ =?us-ascii?Q?NtULuKNzP0AxF0mFBKU63SWloJpRu+AgupkYrBLVD8oNN8KuWUiBMgqSxRVY?=
+ =?us-ascii?Q?L7ykEsty25z6WAylF7RbJz0cGaq2EbR+0Q6tA4uEFNyabd9gF1hDmXgOGpUF?=
+ =?us-ascii?Q?1JoH0PxfAiIU1vqi7NnAUmfLc1O0ycxhbTFT46J3OYztglWGgKsoRDAPYCqX?=
+ =?us-ascii?Q?InCz8S1QZ+sN3d8uhisM85oNxUvU0Slw4i9mc6n+D8E4Zx+hgNGCoX8wN+4P?=
+ =?us-ascii?Q?mL3gQge28HcWAX5j4xbEnES6pe4rpMlPXfzxkUCrPGqOg9tIkowiGPugUfRz?=
+ =?us-ascii?Q?eNIGmgK0sfWcShmpXNMtLIIYEp3jTn6nXRpax4+MG4LKkmzCoMgnyGAMgpSk?=
+ =?us-ascii?Q?SsCZITDpX/jLbM5oe4OWimi712nVjXHrj/UvfMeQle7Z8+TLG9G2FjSvUrV4?=
+ =?us-ascii?Q?OjwVuWspWf6E0XwAm5mEt6MoOwOCfSpUKbxD/461WI8/Sg0XufoaP+m56YoV?=
+ =?us-ascii?Q?b5oZxJP6AwygbyKHNoDwarmhEEw41Jl2NYCPrJVKrubspVnksHVGhc23RdaW?=
+ =?us-ascii?Q?29hoORvsaFHjmjDw1R7f1iUTp+pf8cbQK57D05EXuvw0trN1Ljueb3MIwv9T?=
+ =?us-ascii?Q?BwyBvzJzQHxlXRbHhakKJ55+8qjVGnxrfo19sHT2l28hcO5DUCfVYy3GKPOe?=
+ =?us-ascii?Q?AJ2JkNpFKNcRgQJjGSvDRju+PHK1wNiSQ0Rn4BSCnUn0Zum2YmlPrfs6sVlx?=
+ =?us-ascii?Q?z3zt23qNK9SM+0CZCMHFh1QkjkddqJNICEPPXRGyQWHS9LTF+3otMYVrn6En?=
+ =?us-ascii?Q?3BT2l71/aFIUREHvsy8fLCgkIrukH67NzMj9Sh7XKagmQzykp4qTDipJhY2t?=
+ =?us-ascii?Q?QlFMzg8U8wKPyA5x53oP7fSJ9YX5nh+T7hkwl38HfzBwBRltly5+WqO6SFEG?=
+ =?us-ascii?Q?I9AVbl849SsZEzPOcFzV2cfhitBnZvJUK6F6iQWTpb+/yhBSR9Ey2dXxhQxl?=
+ =?us-ascii?Q?1T9Obnh4DDLjP0i4SSA=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f406f3c-90b0-400c-5e10-08dac64bd146
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2022 14:23:36.4273
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FyOpqxz+5Q6mS9tDQnYf81m1x6u6K/uNRTSmzLrKRcbHSSGYjHEJInjA3MsBxHcR
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5710
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/1/22 16:19, Michael Roth wrote:
-> On Tue, Nov 01, 2022 at 07:37:29PM +0800, Chao Peng wrote:
->> > 
->> >   1) restoring kernel directmap:
->> > 
->> >      Currently SNP (and I believe TDX) need to either split or remove kernel
->> >      direct mappings for restricted PFNs, since there is no guarantee that
->> >      other PFNs within a 2MB range won't be used for non-restricted
->> >      (which will cause an RMP #PF in the case of SNP since the 2MB
->> >      mapping overlaps with guest-owned pages)
->> 
->> Has the splitting and restoring been a well-discussed direction? I'm
->> just curious whether there is other options to solve this issue.
+On Thu, Nov 10, 2022 at 10:01:13PM -0500, Matthew Rosato wrote:
+> On 11/7/22 7:52 PM, Jason Gunthorpe wrote:
+> > This series provides an alternative container layer for VFIO implemented
+> > using iommufd. This is optional, if CONFIG_IOMMUFD is not set then it will
+> > not be compiled in.
+> > 
+> > At this point iommufd can be injected by passing in a iommfd FD to
+> > VFIO_GROUP_SET_CONTAINER which will use the VFIO compat layer in iommufd
+> > to obtain the compat IOAS and then connect up all the VFIO drivers as
+> > appropriate.
+> > 
+> > This is temporary stopping point, a following series will provide a way to
+> > directly open a VFIO device FD and directly connect it to IOMMUFD using
+> > native ioctls that can expose the IOMMUFD features like hwpt, future
+> > vPASID and dynamic attachment.
+> > 
+> > This series, in compat mode, has passed all the qemu tests we have
+> > available, including the test suites for the Intel GVT mdev. Aside from
+> > the temporary limitation with P2P memory this is belived to be fully
+> > compatible with VFIO.
 > 
-> For SNP it's been discussed for quite some time, and either splitting or
-> removing private entries from directmap are the well-discussed way I'm
-> aware of to avoid RMP violations due to some other kernel process using
-> a 2MB mapping to access shared memory if there are private pages that
-> happen to be within that range.
-> 
-> In both cases the issue of how to restore directmap as 2M becomes a
-> problem.
-> 
-> I was also under the impression TDX had similar requirements. If so,
-> do you know what the plan is for handling this for TDX?
-> 
-> There are also 2 potential alternatives I'm aware of, but these haven't
-> been discussed in much detail AFAIK:
-> 
-> a) Ensure confidential guests are backed by 2MB pages. shmem has a way to
->    request 2MB THP pages, but I'm not sure how reliably we can guarantee
->    that enough THPs are available, so if we went that route we'd probably
->    be better off requiring the use of hugetlbfs as the backing store. But
->    obviously that's a bit limiting and it would be nice to have the option
->    of using normal pages as well. One nice thing with invalidation
->    scheme proposed here is that this would "Just Work" if implement
->    hugetlbfs support, so an admin that doesn't want any directmap
->    splitting has this option available, otherwise it's done as a
->    best-effort.
-> 
-> b) Implement general support for restoring directmap as 2M even when
->    subpages might be in use by other kernel threads. This would be the
->    most flexible approach since it requires no special handling during
->    invalidations, but I think it's only possible if all the CPA
->    attributes for the 2M range are the same at the time the mapping is
->    restored/unsplit, so some potential locking issues there and still
->    chance for splitting directmap over time.
+> AFAICT there is no equivalent means to specify
+> vfio_iommu_type1.dma_entry_limit when using iommufd; looks like
+> we'll just always get the default 65535.
 
-I've been hoping that
+No, there is no arbitary limit on iommufd
 
-c) using a mechanism such as [1] [2] where the goal is to group together
-these small allocations that need to increase directmap granularity so
-maximum number of large mappings are preserved. But I guess that means
-knowing at allocation time that this will happen. So I've been wondering how
-this would be possible to employ in the SNP/UPM case? I guess it depends on
-how we expect the private/shared conversions to happen in practice, and I
-don't know the details. I can imagine the following complications:
+> Was this because you envision the limit being not applicable for
+> iommufd (limits will be enforced via either means and eventually we
+> won't want to ) or was it an oversight?
 
-- a memfd_restricted region is created such that it's 2MB large/aligned,
-i.e. like case a) above, we can allocate it normally. Now, what if a 4k page
-in the middle is to be temporarily converted to shared for some
-communication between host and guest (can such thing happen?). With the
-punch hole approach, I wonder if we end up fragmenting directmap
-unnecessarily? IIUC the now shared page will become backed by some other
-page (as the memslot supports both private and shared pages simultaneously).
-But does it make sense to really split the direct mapping (and e.g. the
-shmem page?) We could leave the whole 2MB unmapped without splitting if we
-didn't free the private 4k subpage.
+The limit here is primarily about limiting userspace abuse of the
+interface.
 
-- a restricted region is created that's below 2MB. If something like [1] is
-merged, it could be used for the backing pages to limit directmap
-fragmentation. But then in case it's eventually fallocated to become larger
-and gain one more more 2MB aligned ranges, the result is suboptimal. Unless
-in that case we migrate the existing pages to a THP-backed shmem, kinda like
-khugepaged collapses hugepages. But that would have to be coordinated with
-the guest, maybe not even possible?
+iommufd is using GFP_KERNEL_ACCOUNT which shifts the responsiblity to
+cgroups, which is similar to how KVM works.
 
-[1] https://lore.kernel.org/all/20220127085608.306306-1-rppt@kernel.org/
-[2] https://lwn.net/Articles/894557/
+So, for a VM sandbox you'd set a cgroup limit and if a hostile
+userspace in the sanbox decides to try to OOM the system it will hit
+that limit, regardless of which kernel APIs it tries to abuse.
 
->> 
->> > 
->> >      Previously we were able to restore 2MB mappings to some degree
->> >      since both shared/restricted pages were all pinned, so anything
->> >      backed by a THP (or hugetlb page once that is implemented) at guest
->> >      teardown could be restored as 2MB direct mapping.
->> > 
->> >      Invalidation seems like the most logical time to have this happen,
->> 
->> Currently invalidation only happens at user-initiated fallocate(). It
->> does not cover the VM teardown case where the restoring might also be
->> expected to be handled.
-> 
-> Right, I forgot to add that in my proposed changes I added invalidations
-> for any still-allocated private pages present when the restricted memfd
-> notifier is unregistered. This was needed to avoid leaking pages back to
-> the kernel that still need directmap or RMP table fixups. I also added
-> similar invalidations for memfd->release(), since it seems possible that
-> userspace might close() it before shutting down guest, but maybe the
-> latter is not needed if KVM takes a reference on the FD during life of
-> the guest.
-> 
->> 
->> >      but whether or not to restore as 2MB requires the order to be 2MB
->> >      or larger, and for GPA range being invalidated to cover the entire
->> >      2MB (otherwise it means the page was potentially split and some
->> >      subpages free back to host already, in which case it can't be
->> >      restored as 2MB).
->> > 
->> >   2) Potentially less invalidations:
->> >       
->> >      If we pass the entire folio or compound_page as part of
->> >      invalidation, we only needed to issue 1 invalidation per folio.
->> 
->> I'm not sure I agree, the current invalidation covers the whole range
->> that passed from userspace and the invalidation is invoked only once for
->> each usrspace fallocate().
-> 
-> That's true, it only reduces invalidations if we decide to provide a
-> struct page/folio as part of the invalidation callbacks, which isn't
-> the case yet. Sorry for the confusion.
-> 
->> 
->> > 
->> >   3) Potentially useful for hugetlbfs support:
->> > 
->> >      One issue with hugetlbfs is that we don't support splitting the
->> >      hugepage in such cases, which was a big obstacle prior to UPM. Now
->> >      however, we may have the option of doing "lazy" invalidations where
->> >      fallocate(PUNCH_HOLE, ...) won't free a shmem-allocate page unless
->> >      all the subpages within the 2M range are either hole-punched, or the
->> >      guest is shut down, so in that way we never have to split it. Sean
->> >      was pondering something similar in another thread:
->> > 
->> >        https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Flinux-mm%2FYyGLXXkFCmxBfu5U%40google.com%2F&amp;data=05%7C01%7Cmichael.roth%40amd.com%7C3aba56bf7d574c749ea708dabbfe2224%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638028997419628807%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=c7gSLjJEAxuX8xmMiTDMUHNwUdQNKN00xqtAZAEeow8%3D&amp;reserved=0
->> > 
->> >      Issuing invalidations with folio-granularity ties in fairly well
->> >      with this sort of approach if we end up going that route.
->> 
->> There is semantics difference between the current one and the proposed
->> one: The invalidation range is exactly what userspace passed down to the
->> kernel (being fallocated) while the proposed one will be subset of that
->> (if userspace-provided addr/size is not aligned to power of two), I'm
->> not quite confident this difference has no side effect.
-> 
-> In theory userspace should not be allocating/hole-punching restricted
-> pages for GPA ranges that are already mapped as private in the xarray,
-> and KVM could potentially fail such requests (though it does currently).
-> 
-> But if we somehow enforced that, then we could rely on
-> KVM_MEMORY_ENCRYPT_REG_REGION to handle all the MMU invalidation stuff,
-> which would free up the restricted fd invalidation callbacks to be used
-> purely to handle doing things like RMP/directmap fixups prior to returning
-> restricted pages back to the host. So that was sort of my thinking why the
-> new semantics would still cover all the necessary cases.
-> 
-> -Mike
-> 
->> 
->> > 
->> > I need to rework things for v9, and we'll probably want to use struct
->> > folio instead of struct page now, but as a proof-of-concept of sorts this
->> > is what I'd added on top of v8 of your patchset to implement 1) and 2):
->> > 
->> >   https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fmdroth%2Flinux%2Fcommit%2F127e5ea477c7bd5e4107fd44a04b9dc9e9b1af8b&amp;data=05%7C01%7Cmichael.roth%40amd.com%7C3aba56bf7d574c749ea708dabbfe2224%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638028997419628807%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=jOFT0iLmeU7rKniEkWOsTf2%2FPI13EAw4Qm7arI1q970%3D&amp;reserved=0
->> > 
->> > Does an approach like this seem reasonable? Should be work this into the
->> > base restricted memslot support?
->> 
->> If the above mentioned semantics difference is not a problem, I don't
->> have strong objection on this.
->> 
->> Sean, since you have much better understanding on this, what is your
->> take on this?
->> 
->> Chao
->> > 
->> > Thanks,
->> > 
->> > Mike
+This work is not entirely complete as we also need the iommu driver to
+use GFP_KERNEL_ACCOUNT for allocations connected to the iommu_domain,
+particularly for allocations of the IO page tables themselves - which
+can be quite big.
 
+Jason
