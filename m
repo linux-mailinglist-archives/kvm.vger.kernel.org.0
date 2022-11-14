@@ -2,125 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41A34628D5C
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 00:24:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A8115628D6E
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 00:29:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232052AbiKNXYX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 18:24:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39058 "EHLO
+        id S236658AbiKNX3S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 18:29:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231836AbiKNXYW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 18:24:22 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BFCBFD6
-        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 15:24:21 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id h193so11606485pgc.10
-        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 15:24:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=isFHkEsP4U7bls6+qnM9Ylr3wjVvZ13ykkMwbt8BoQw=;
-        b=LWOYZLNMNZwSReaa3uSIz6jrXnI/Rr2JJojN/mxQAoov+trhlXXYow2KlUgLSLOQNt
-         ZW2OzsnCNJyIe0jqPWkR9ZzyTPJEWIuEna29fGERlsILjuqFaWuvNMHAjBfyj/8J2iTM
-         av9glh1vpo4WQkSfE8gZuaPFZM3yC2lp28zgCrtZ9GLYBz/baZLGQ+SDS0GELJmvch6x
-         WUA4myeaVI/WzyMRmE3H5TzBhk+lbhbRX2wdPrutAyFLrnIQfpM4spqXksL3d5D3RkA8
-         ycNQkoQXFwg5TBGtWGPeaFxxPJnx1ytnsmzeovhKe8r1LjJuWhWeI0/MgHAJeRpY+EsW
-         4pYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=isFHkEsP4U7bls6+qnM9Ylr3wjVvZ13ykkMwbt8BoQw=;
-        b=5G5zwyNpXxRZd7MIkogxDW7cNkEIllE5FoDuQSiEozUs0ExE7uSxaPr5J84dE6cOgD
-         tOLVHRca/Kc+qzOxhTk9eQwzADY5EyPoJ8pXUQGL4zxG/msWtSqdLJqxoKDKpxyc0VPZ
-         L1zlh8C1t0tQg9FpHcQx5B6QxDvj4a2WLkbncpPhsqbFHuRbnKw4xi8wRWgnuzKvzB4N
-         4OjIRerNAGm3YNbtiwZF1wA9iuulUe9F3dRAWT9NqMmlit2Z1mVLrli83sIcYAeNOYz8
-         gWqt+wdVVrM55CLiwU/Tkkd7pKyANNQfjIWVQ5t9A2W8k61AXobpTZTG5PCUaMLLDbLd
-         Iwqg==
-X-Gm-Message-State: ANoB5pk5fxFHuPa1Gyybm6vJk6TXQqjKVU0avN4l0HuSLki7hkndNJRx
-        IDi76jxZnYANWYZ0r2DIbmx22g==
-X-Google-Smtp-Source: AA0mqf4XwefhBFMM95veTWx+1D5wJMGN873P83ISTzdr6a1eJB1Sel9VSsLR59mWLNxeNAm/G0SBYg==
-X-Received: by 2002:a63:1801:0:b0:470:7886:e200 with SMTP id y1-20020a631801000000b004707886e200mr13714841pgl.111.1668468260709;
-        Mon, 14 Nov 2022 15:24:20 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id v5-20020a622f05000000b00571f66721aesm4132497pfv.42.2022.11.14.15.24.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Nov 2022 15:24:20 -0800 (PST)
-Date:   Mon, 14 Nov 2022 23:24:16 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, zhenyuw@linux.intel.com
-Subject: Re: [PATCH v2 1/3] KVM: x86: add a new page track hook
- track_remove_slot
-Message-ID: <Y3LOIKueyTUoJ00B@google.com>
-References: <20221111103247.22275-1-yan.y.zhao@intel.com>
- <20221111103350.22326-1-yan.y.zhao@intel.com>
- <Y26SI3uh8JV0vvO6@google.com>
- <Y27ivXea5SjR5lat@yzhao56-desk.sh.intel.com>
- <Y27sG3AqVX8yLUgR@google.com>
- <Y3GUdqxnPJvc6SPI@yzhao56-desk.sh.intel.com>
- <Y3JtonYdDYOhbmfG@google.com>
- <Y3LEZXWqk6ztuf7x@yzhao56-desk.sh.intel.com>
+        with ESMTP id S237821AbiKNX3J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 18:29:09 -0500
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5691B647D
+        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 15:29:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668468548; x=1700004548;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0KkYvm5wCH4Zs4tVezdy5XoZ+qfuiVYyA22a/r2vt4g=;
+  b=fd/O+PLPVD3dYVL0HmO2UgtfsBVjQxWjuuK6/fb7Hshhgqr+U1tl22jz
+   qwWnwRsxcOhMgXN9F1osjDLQ+BBNSvSTvwZE8VwQ7znCzNuR2WY3YLIgQ
+   ETzabgjDOGREUyZem2yFoqblRpCIAmEZN3CPMhMpQ11xjIZJPWQ9eoEMp
+   ZHc9zKxojwefM7vXzbbMski0mC9i09cjIJcIiFEjeejj4FU3f1RzM68lG
+   iAUjKIzh7O6fAfN4bgGSLemsP063ZIOmKVAbtRem/Wfh8MmHbSsldVmrb
+   xX7at7iJ2AH9JQDtL/7PQLthODr+S7N+zdirSeeIMkOOpZAA05vV90c/V
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="295472901"
+X-IronPort-AV: E=Sophos;i="5.96,164,1665471600"; 
+   d="scan'208";a="295472901"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2022 15:29:07 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="702204750"
+X-IronPort-AV: E=Sophos;i="5.96,164,1665471600"; 
+   d="scan'208";a="702204750"
+Received: from yjiang5-mobl.amr.corp.intel.com (HELO localhost) ([10.212.78.37])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2022 15:29:07 -0800
+Date:   Mon, 14 Nov 2022 15:29:06 -0800
+From:   Yunhong Jiang <yunhong.jiang@linux.intel.com>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
+        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
+        kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v7 1/4] KVM: Implement dirty quota-based throttling of
+ vcpus
+Message-ID: <20221114232906.GA7867@yjiang5-mobl.amr.corp.intel.com>
+References: <20221113170507.208810-1-shivam.kumar1@nutanix.com>
+ <20221113170507.208810-2-shivam.kumar1@nutanix.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y3LEZXWqk6ztuf7x@yzhao56-desk.sh.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20221113170507.208810-2-shivam.kumar1@nutanix.com>
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 15, 2022, Yan Zhao wrote:
-> On Mon, Nov 14, 2022 at 04:32:34PM +0000, Sean Christopherson wrote:
-> > On Mon, Nov 14, 2022, Yan Zhao wrote:
-> > > On Sat, Nov 12, 2022 at 12:43:07AM +0000, Sean Christopherson wrote:
-> > > > On Sat, Nov 12, 2022, Yan Zhao wrote:
-> > > > > And I'm also not sure if a slots_arch_lock is required for
-> > > > > kvm_slot_page_track_add_page() and kvm_slot_page_track_remove_page().
-> > > > 
-> > > > It's not required.  slots_arch_lock protects interaction between memslot updates
-> > > In kvm_slot_page_track_add_page() and kvm_slot_page_track_remove_page(),
-> > > slot->arch.gfn_track[mode][index] is updated in update_gfn_track(),
-> > > do you know which lock is used to protect it?
-> > 
-> > mmu_lock protects the count, kvm->srcu protects the slot, and shadow_root_allocated
-> > protects that validity of gfn_track, i.e. shadow_root_allocated ensures that KVM
-> > allocates gfn_track for all memslots when shadow paging is activated.
-> Hmm, thanks for the reply.
-> but in direct_page_fault(),
-> if (page_fault_handle_page_track(vcpu, fault))
-> 	return RET_PF_EMULATE;
+On Sun, Nov 13, 2022 at 05:05:06PM +0000, Shivam Kumar wrote:
+> Define variables to track and throttle memory dirtying for every vcpu.
 > 
-> slot->arch.gfn_track is read without any mmu_lock is held.
-
-That's a fast path that deliberately reads out of mmu_lock.  A false positive
-only results in unnecessary emulation, and any false positive is inherently prone
-to races anyways, e.g. fault racing with zap.
-
-> > arch/x86/kvm/mmu/page_track.c-void __kvm_write_track_remove_gfn(struct kvm *kvm,
-> > arch/x86/kvm/mmu/page_track.c-                            struct kvm_memory_slot *slot, gfn_t gfn)
-> > arch/x86/kvm/mmu/page_track.c-{
-> > arch/x86/kvm/mmu/page_track.c-  lockdep_assert_held_write(&kvm->mmu_lock);
-> > arch/x86/kvm/mmu/page_track.c-
-> > arch/x86/kvm/mmu/page_track.c-  if (KVM_BUG_ON(!kvm_page_track_write_tracking_enabled(kvm), kvm))
-> > arch/x86/kvm/mmu/page_track.c-          return;
-> > arch/x86/kvm/mmu/page_track.c-
-> > arch/x86/kvm/mmu/page_track.c:  update_gfn_write_track(slot, gfn, -1);
-> yes, it will be helpful.
+> dirty_count:    Number of pages the vcpu has dirtied since its creation,
+>                 while dirty logging is enabled.
+> dirty_quota:    Number of pages the vcpu is allowed to dirty. To dirty
+>                 more, it needs to request more quota by exiting to
+>                 userspace.
 > 
-> Besides, will WRITE_ONCE or atomic_add in update_gfn_write_track() to
-> update slot->arch.gfn_track be better?
+> Implement the flow for throttling based on dirty quota.
+> 
+> i) Increment dirty_count for the vcpu whenever it dirties a page.
+> ii) Exit to userspace whenever the dirty quota is exhausted (i.e. dirty
+> count equals/exceeds dirty quota) to request more dirty quota.
+> 
+> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
+> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
+> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 35 ++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/Kconfig           |  1 +
+>  include/linux/kvm_host.h       |  5 ++++-
+>  include/linux/kvm_types.h      |  1 +
+>  include/uapi/linux/kvm.h       | 13 +++++++++++++
+>  tools/include/uapi/linux/kvm.h |  1 +
+>  virt/kvm/Kconfig               |  4 ++++
+>  virt/kvm/kvm_main.c            | 25 +++++++++++++++++++++---
+>  8 files changed, 81 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index eee9f857a986..4568faa33c6d 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6513,6 +6513,26 @@ array field represents return values. The userspace should update the return
+>  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+>  spec refer, https://github.com/riscv/riscv-sbi-doc.
+>  
+> +::
+> +
+> +		/* KVM_EXIT_DIRTY_QUOTA_EXHAUSTED */
+> +		struct {
+> +			__u64 count;
+> +			__u64 quota;
+> +		} dirty_quota_exit;
+> +
+> +If exit reason is KVM_EXIT_DIRTY_QUOTA_EXHAUSTED, it indicates that the VCPU has
+> +exhausted its dirty quota. The 'dirty_quota_exit' member of kvm_run structure
+> +makes the following information available to the userspace:
+> +    count: the current count of pages dirtied by the VCPU, can be
+> +    skewed based on the size of the pages accessed by each vCPU.
+> +    quota: the observed dirty quota just before the exit to userspace.
+> +
+> +The userspace can design a strategy to allocate the overall scope of dirtying
+> +for the VM among the vcpus. Based on the strategy and the current state of dirty
+> +quota throttling, the userspace can make a decision to either update (increase)
+> +the quota or to put the VCPU to sleep for some time.
+> +
+>  ::
+>  
+>      /* KVM_EXIT_NOTIFY */
+> @@ -6567,6 +6587,21 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+>  
+>  ::
+>  
+> +	/*
+> +	 * Number of pages the vCPU is allowed to have dirtied over its entire
+> +	 * lifetime.  KVM_RUN exits with KVM_EXIT_DIRTY_QUOTA_EXHAUSTED if the quota
+> +	 * is reached/exceeded.
+> +	 */
+> +	__u64 dirty_quota;
+> +
+> +Please note that enforcing the quota is best effort, as the guest may dirty
+> +multiple pages before KVM can recheck the quota.  However, unless KVM is using
+> +a hardware-based dirty ring buffer, e.g. Intel's Page Modification Logging,
+> +KVM will detect quota exhaustion within a handful of dirtied pages.  If a
+> +hardware ring buffer is used, the overrun is bounded by the size of the buffer
+> +(512 entries for PML).
+> +
+> +::
+>    };
+>  
+>  
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 67be7f217e37..bdbd36321d52 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -48,6 +48,7 @@ config KVM
+>  	select KVM_VFIO
+>  	select SRCU
+>  	select INTERVAL_TREE
+> +	select HAVE_KVM_DIRTY_QUOTA
+>  	select HAVE_KVM_PM_NOTIFIER if PM
+>  	help
+>  	  Support hosting fully virtualized guest machines using hardware
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 18592bdf4c1b..0b9b5c251a04 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -151,11 +151,12 @@ static inline bool is_error_page(struct page *page)
+>  #define KVM_REQUEST_NO_ACTION      BIT(10)
+>  /*
+>   * Architecture-independent vcpu->requests bit members
+> - * Bits 3-7 are reserved for more arch-independent bits.
+> + * Bits 5-7 are reserved for more arch-independent bits.
+>   */
+>  #define KVM_REQ_TLB_FLUSH         (0 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_VM_DEAD           (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_UNBLOCK           2
+> +#define KVM_REQ_DIRTY_QUOTA_EXIT  4
+Sorry if I missed anything. Why it's 4 instead of 3?
 
-WRITE_ONCE() won't suffice, it needs to be atomic.  Switching to atomic_inc/dec
-isn't worth it so long as KVM's shadow MMU takes mmu_lock for write, i.e. while
-the accounting is mutually exclusive for other reasons in both KVM and KVMGT.
