@@ -2,72 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A229F628B25
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 22:12:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6DD4628B5E
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 22:30:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237367AbiKNVMG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 16:12:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49266 "EHLO
+        id S236843AbiKNVab (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 16:30:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237585AbiKNVMD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 16:12:03 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B466B35
-        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 13:12:02 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id j16so21369683lfe.12
-        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 13:12:02 -0800 (PST)
+        with ESMTP id S237593AbiKNVaY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 16:30:24 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30219192B1
+        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 13:30:23 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id c15-20020a17090a1d0f00b0021365864446so11980753pjd.4
+        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 13:30:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u5c3d/R+hycXfam13b38ezR7QlhNG6bgVdrzTMUaN84=;
-        b=gLgG3OpNKby3lv5oeGlMTQIBqbd4rH+hf5lU9WR9tNVSZhRpz8Eg+IiiKlc5MmvGud
-         jqZKDAXH6MxopShoaNjBJIU6NrYJTcIFmDf50fztvHW3i88Hn+h8rFsjBuLSS8Huh4Tw
-         Wb76NZ8CKNxc3c/Kayxyjg9WhaYMPp9jcDs5kvGrsnZ+tTyhuKYf8ANzuEEeNE5q/Cms
-         T1+S0GxM1LplONxje+wQ9NsRyhavaQf/LRyRsRRKSgIAEJ+myBf+MgVjK7lQgcnK7++b
-         pYknsRlYqNh6ArZsj0KEtYqVZ74/f+v6kypIxZ0qzTN3XMp6J6hzcBNIIgrNLn/Gx5hY
-         wqzg==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wvi7jckV1mmNMhx4gjnU9C4imhYwalEXctJsv4GFNHw=;
+        b=P01+MGoZ8z6OJ6i/I0CeNTrSmLbSvvrqXFBXNMZg9DtXwTRBQypk3uARXLTq0mPVDa
+         RUvjstPcs7kyfg4+iq30JFacIPHtD1Rs7hvwWEwB3CRZIEVHV4T5ZLVmC/sa1HLwGFKm
+         t0rZyZigG8f/buJV2a/7q3w6S17ODSRD5IVvobROqkVpUQ8ul8OhVvevghcdXvBso/kK
+         3hpms+rbY33rLOAs9p0Y5E6Hi6Ah6+IP2wtDbYUcGJ820bH6ILEK6n+ujhMTBjL27I92
+         pDpeDD08IVgP16apuVyhdA28n9vD4xUCYKdJOtfSpxo+OqcZRRixJJKVEgUOJzTYbKgG
+         ajVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u5c3d/R+hycXfam13b38ezR7QlhNG6bgVdrzTMUaN84=;
-        b=PGRlrenkgvmbUP0pM2Ec5z2uERzWk4dKYQC0k+us4+e1EF9kqoQ81qiXXj2U7wteno
-         czKWbfqMU6Vl+O1FpPepgENF+P303J/5KklK2McrpZWKZ1HP/bWE7CsWITeoyycnM84l
-         6M/mEA/qEWV0OuUDbyqPcKYBqMXj6Zz75I9DL9sk1ZqJqDbkz4u9Z/tVq9GlkD4+Jm1S
-         7re4g77UQVysmbWRZAjO3/kczIlz68IYVYV/p+Dk6PnkUGqVGwYHcd6AapLcF2sCBGFm
-         tdcPT5wbb5+q6SsVSjKW18BK2nEYOpmdPt5QsVaoWZ3moOoQLW/P8h8sM2aKpfnh2xBP
-         0IkQ==
-X-Gm-Message-State: ANoB5pmQrIK/sgjhHC2bxf3m/DehqezGBF0/6xhqSFJX7wK1Z3l2M2Pm
-        zNRgP6roNAPUWQrYv6C4XiEm+lJUD02mH3baQT36mQ==
-X-Google-Smtp-Source: AA0mqf4zUvucihZccorNDZ1AY4kY2YidMwjV9r0sqjVG0rZ0b4dE+xzTXK4ef0/H4Xqz3BIKETnfQpjDZ85U8fUiT90=
-X-Received: by 2002:a05:6512:2033:b0:4b0:8a8f:8e28 with SMTP id
- s19-20020a056512203300b004b08a8f8e28mr4329430lfs.682.1668460320419; Mon, 14
- Nov 2022 13:12:00 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wvi7jckV1mmNMhx4gjnU9C4imhYwalEXctJsv4GFNHw=;
+        b=td4VDT+/7didsSbPXjFSwFzPTjLRzoXaEGC0cnmisCWL78rtISymrsTFG99Ea3f2Z3
+         dfAXGDBfkNIF9VDuJkz3ZN5V2f0tLJVBHNmeyMmhxdi8SpSgPRPdqFbXovsrFYJpeEmA
+         6rtS2t+EKbx1A+0bbk9D9Qj7u1wRW4RgWTTh++XsaywASzBhNg+iZcmy1OaIMQJEJdEm
+         89CHAlrCU+z6OGArZydVIdmRp68iEOAX+PAvxJkw5MGCNBkZwyDYH/pqdbgTRor0pZzI
+         7T78M03BsBzkd2LN0Kx1G+xfGvCjP4myEREeSpoLyFARz2HkMbRVVuj0ltnnIPPLIDUg
+         W2Xg==
+X-Gm-Message-State: ANoB5pmVr+sQaseqKA0ndgcWXJD7wh+40Mef0jrwCCAyvdiqpyhELXZ1
+        zYq1tMUEKlG8DUPJL8/Tjl+Qcw==
+X-Google-Smtp-Source: AA0mqf6wsJljRUFZlqeYlIdX49r/psHgrlAyhVMWPIRzV4/FjRUWK9cb47cT/3890HjLC7xkjizOkw==
+X-Received: by 2002:a17:90a:53a6:b0:212:bf31:d00 with SMTP id y35-20020a17090a53a600b00212bf310d00mr15228352pjh.33.1668461422593;
+        Mon, 14 Nov 2022 13:30:22 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id x5-20020a63cc05000000b0046ec0ef4a7esm6349479pgf.78.2022.11.14.13.30.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Nov 2022 13:30:22 -0800 (PST)
+Date:   Mon, 14 Nov 2022 21:30:18 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Greg Edwards <gedwards@ddn.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH] KVM: x86: Allow APICv APIC ID inhibit to be cleared on
+ legacy kernels
+Message-ID: <Y3KzarZ5xzExFrj9@google.com>
+References: <20221114202037.254176-1-gedwards@ddn.com>
 MIME-Version: 1.0
-References: <20221103152318.88354-1-pgonda@google.com> <Y258U+8oF/eo14U+@zn.tnic>
-In-Reply-To: <Y258U+8oF/eo14U+@zn.tnic>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Mon, 14 Nov 2022 14:11:48 -0700
-Message-ID: <CAMkAt6p2zXnE-ew+pJk_UpZAEFZFdCOPThNn3hSFqYOQG81t-g@mail.gmail.com>
-Subject: Re: [PATCH V4] virt: sev: Prevent IV reuse in SNP guest driver
-To:     Borislav Petkov <bp@suse.de>
-Cc:     thomas.lendacky@amd.com, Dionna Glaze <dionnaglaze@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Haowen Bai <baihaowen@meizu.com>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221114202037.254176-1-gedwards@ddn.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,251 +73,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 11, 2022 at 9:46 AM Borislav Petkov <bp@suse.de> wrote:
->
-> On Thu, Nov 03, 2022 at 08:23:18AM -0700, Peter Gonda wrote:
-> > The ASP and an SNP guest use a series of AES-GCM keys called VMPCKs to
->
-> ASP?
->
-> That must be the AMD Secure Processor or so but pls write it out.
->
-> > communicate securely with each other. The IV to this scheme is a
-> > sequence number that both the ASP and the guest track. Currently this
-> > sequence number in a guest request must exactly match the sequence
-> > number tracked by the ASP. This means that if the guest sees an error
-> > from the host during a request it can only retry that exact request or
-> > disable the VMPCK to prevent an IV reuse. AES-GCM cannot tolerate IV
-> > reuse see:
-> > https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/docum=
-ents/bcm/comments/800-38-series-drafts/gcm/joux_comments.pdf
->
-> Right, how stable will that link be?
->
-> IOW, perhaps quote the paper name and authors so that people can find it
-> on their own.
->
-> > To handle userspace querying the cert_data length handle_guest_request(=
-)
-> > now: saves the number of pages required by the host, retries the reques=
-t
->
-> This needs to sound like this:
->
-> "In order to address this, save the number of pages ..."
->
-> IOW, as the docs say:
->
-> "Describe your changes in imperative mood, e.g. "make xyzzy do frotz"
-> instead of "[This patch] makes xyzzy do frotz" or "[I] changed xyzzy
-> to do frotz", as if you are giving orders to the codebase to change
-> its behaviour."
+On Mon, Nov 14, 2022, Greg Edwards wrote:
+> Legacy kernels prior to commit 4399c03c6780 ("x86/apic: Remove
+> verify_local_APIC()") write the xAPIC ID of the boot CPU twice to verify
+> a functioning local APIC.  This results in APIC acceleration inhibited
+> on these kernels for reason APICV_INHIBIT_REASON_APIC_ID_MODIFIED.
+> 
+> Allow the APICV_INHIBIT_REASON_APIC_ID_MODIFIED inhibit reason to be
+> cleared if/when the xAPIC ID is set back to the expected vcpu_id value.
+> This occurs on the second xAPIC ID write in verify_local_APIC().
+> 
+> Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base")
+> Signed-off-by: Greg Edwards <gedwards@ddn.com>
+> ---
+>  arch/x86/kvm/lapic.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index d7639d126e6c..4064d0af094d 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2075,8 +2075,13 @@ static void kvm_lapic_xapic_id_updated(struct kvm_lapic *apic)
+>  	if (KVM_BUG_ON(apic_x2apic_mode(apic), kvm))
+>  		return;
+>  
+> -	if (kvm_xapic_id(apic) == apic->vcpu->vcpu_id)
+> +	if (kvm_xapic_id(apic) == apic->vcpu->vcpu_id) {
+> +		/* Legacy kernels prior to 4399c03c6780 write APIC ID twice. */
+> +		if (!kvm_apicv_activated(kvm))
+> +			kvm_clear_apicv_inhibit(kvm,
+> +					APICV_INHIBIT_REASON_APIC_ID_MODIFIED);
 
-Thanks for detailed review. Working on cleaning up the text for a V5.
+This sadly doesn't work because the inhibit is per-VM, i.e. will do the wrong
+thing if there are still vCPU's with different APIC IDs.
 
->
-> > without requesting the extended data, then returns the number of pages
-> > required.
-> >
-> > Fixes: fce96cf044308 ("virt: Add SEV-SNP guest driver")
->
-> I'm guessing this needs to go to stable?
->
-> > Signed-off-by: Peter Gonda <pgonda@google.com>
-> > Reported-by: Peter Gonda <pgonda@google.com>
-> > Cc: Dionna Glaze <dionnaglaze@google.com>
-> > Cc: Borislav Petkov <bp@suse.de>
-> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> > Cc: Michael Roth <michael.roth@amd.com>
-> > Cc: Haowen Bai <baihaowen@meizu.com>
-> > Cc: Yang Yingliang <yangyingliang@huawei.com>
-> > Cc: Marc Orr <marcorr@google.com>
-> > Cc: David Rientjes <rientjes@google.com>
-> > Cc: Ashish Kalra <Ashish.Kalra@amd.com>
-> > Cc: linux-kernel@vger.kernel.org
-> > Cc: kvm@vger.kernel.org
-> > ---
-> > Tested by placing each of the guest requests: attestation quote,
-> > extended attestation quote, and get key. Then tested the extended
-> > attestation quote certificate length querying.
-> >
-> > V4
-> >  * As suggested by Dionna moved the extended request retry logic into
-> >    the driver.
-> >  * Due to big change in patch dropped any reviewed-by tags.
-> >
-> > ---
-> >  drivers/virt/coco/sev-guest/sev-guest.c | 70 +++++++++++++++++++------
-> >  1 file changed, 53 insertions(+), 17 deletions(-)
-> >
-> > diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coc=
-o/sev-guest/sev-guest.c
-> > index f422f9c58ba79..7dd6337ebdd5b 100644
-> > --- a/drivers/virt/coco/sev-guest/sev-guest.c
-> > +++ b/drivers/virt/coco/sev-guest/sev-guest.c
-> > @@ -41,7 +41,7 @@ struct snp_guest_dev {
-> >       struct device *dev;
-> >       struct miscdevice misc;
-> >
-> > -     void *certs_data;
-> > +     u8 (*certs_data)[SEV_FW_BLOB_MAX_SIZE];
-> >       struct snp_guest_crypto *crypto;
-> >       struct snp_guest_msg *request, *response;
-> >       struct snp_secrets_page_layout *layout;
-> > @@ -67,8 +67,27 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp=
-_dev)
-> >       return true;
-> >  }
-> >
-> > +/*
-> > + * If we receive an error from the host or ASP we have two options. We=
- can
->
-> Please use passive voice in your commit message: no "we" or "I", etc,
-> and describe your changes in imperative mood.
->
-> Bottom line is: personal pronouns are ambiguous in text, especially with
-> so many parties/companies/etc developing the kernel so let's avoid them
-> please.
->
-> > + * either retry the exact same encrypted request or we can discontinue=
- using the
-> > + * VMPCK.
-> > + *
-> > + * This is because in the current encryption scheme GHCB v2 uses AES-G=
-CM to
-> > + * encrypt the requests. The IV for this scheme is the sequence number=
-. GCM
-> > + * cannot tolerate IV reuse.
-> > + *
-> > + * The ASP FW v1.51 only increments the sequence numbers on a successf=
-ul
-> > + * guest<->ASP back and forth and only accepts messages at its exact s=
-equence
-> > + * number.
-> > + *
-> > + * So if we were to reuse the sequence number the encryption scheme is
-> > + * vulnerable. If we encrypt the sequence number for a fresh IV the AS=
-P will
-> > + * reject our request.
-> > + */
-> >  static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
-> >  {
-> > +     dev_alert(snp_dev->dev, "Disabling vmpck_id: %d to prevent IV reu=
-se.\n",
-> > +               vmpck_id);
-> >       memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
-> >       snp_dev->vmpck =3D NULL;
-> >  }
-> > @@ -323,32 +342,49 @@ static int handle_guest_request(struct snp_guest_=
-dev *snp_dev, u64 exit_code, in
-> >
-> >       /* Call firmware to process the request */
-> >       rc =3D snp_issue_guest_request(exit_code, &snp_dev->input, &err);
-> > +
-> > +     /*
-> > +      * If the extended guest request fails due to having to small of =
-a
->
-> "... too small... "
->
-> > +      * certificate data buffer retry the same guest request without t=
-he
-> > +      * extended data request.
-> > +      */
-> > +     if (exit_code =3D=3D SVM_VMGEXIT_EXT_GUEST_REQUEST &&
-> > +         err =3D=3D SNP_GUEST_REQ_INVALID_LEN) {
-> > +             const unsigned int certs_npages =3D snp_dev->input.data_n=
-pages;
-> > +
-> > +             exit_code =3D SVM_VMGEXIT_GUEST_REQUEST;
-> > +             rc =3D snp_issue_guest_request(exit_code, &snp_dev->input=
-, &err);
-> > +
-> > +             err =3D SNP_GUEST_REQ_INVALID_LEN;
->
-> Huh, why are we overwriting err here?
->
-> > +             snp_dev->input.data_npages =3D certs_npages;
-> > +     }
-> > +
-> >       if (fw_err)
-> >               *fw_err =3D err;
-> >
-> > -     if (rc)
-> > -             return rc;
-> > +     if (rc) {
-> > +             dev_alert(snp_dev->dev,
-> > +                       "Detected error from ASP request. rc: %d, fw_er=
-r: %llu\n",
-> > +                       rc, *fw_err);
-> > +             goto disable_vmpck;
-> > +     }
-> >
-> > -     /*
-> > -      * The verify_and_dec_payload() will fail only if the hypervisor =
-is
-> > -      * actively modifying the message header or corrupting the encryp=
-ted payload.
-> > -      * This hints that hypervisor is acting in a bad faith. Disable t=
-he VMPCK so that
-> > -      * the key cannot be used for any communication. The key is disab=
-led to ensure
-> > -      * that AES-GCM does not use the same IV while encrypting the req=
-uest payload.
-> > -      */
-> >       rc =3D verify_and_dec_payload(snp_dev, resp_buf, resp_sz);
-> >       if (rc) {
-> >               dev_alert(snp_dev->dev,
-> > -                       "Detected unexpected decode failure, disabling =
-the vmpck_id %d\n",
-> > -                       vmpck_id);
-> > -             snp_disable_vmpck(snp_dev);
-> > -             return rc;
-> > +                       "Detected unexpected decode failure from ASP. r=
-c: %d\n",
-> > +                       rc);
-> > +             goto disable_vmpck;
-> >       }
-> >
-> >       /* Increment to new message sequence after payload decryption was=
- successful. */
-> >       snp_inc_msg_seqno(snp_dev);
-> >
-> >       return 0;
-> > +
-> > +disable_vmpck:
-> > +     snp_disable_vmpck(snp_dev);
-> > +     return rc;
-> >  }
-> >
-> >  static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_=
-request_ioctl *arg)
-> > @@ -676,7 +712,7 @@ static int __init sev_guest_probe(struct platform_d=
-evice *pdev)
-> >       if (!snp_dev->response)
-> >               goto e_free_request;
-> >
-> > -     snp_dev->certs_data =3D alloc_shared_pages(dev, SEV_FW_BLOB_MAX_S=
-IZE);
-> > +     snp_dev->certs_data =3D alloc_shared_pages(dev, sizeof(*snp_dev->=
-certs_data));
->
-> What's that change for?
->
-> I went searching for that ->certs_data only ot realize that it is an
-> array of size of SEV_FW_BLOB_MAX_SIZE elems.
+Does skipping the check if the APIC is disabled help[*]?  At a glance, I can't
+tell if the APIC is enabled/disabled at that point in time.  It's not a true fix,
+but it's a lot easier to backport if it remedies the issue.
 
-Do you want this change reverted? I liked the extra readability of the
-sizeof(*snp_dev->certs_data) but its unnecessary for this change.
+For a proper fix, this entire path should be moved to kvm_recalculate_apic_map()
+so that can can safely toggle the inhibit, e.g. the recalc helper already deals
+with multiple vCPUs changing their APIC state in parallel.  I don't think the fix
+will be too difficult to craft such that it's backport friendly, but it would need
+to be slotted into the series containing the aforementioned fix.
 
->
-> Thx.
->
-> --
-> Regards/Gruss,
->     Boris.
->
-> SUSE Software Solutions Germany GmbH
-> GF: Ivo Totev, Andrew Myers, Andrew McDonald, Martje Boudien Moerman
-> (HRB 36809, AG N=C3=BCrnberg)
+[*] https://lore.kernel.org/all/20221001005915.2041642-6-seanjc@google.com
+
+---
+ arch/x86/kvm/lapic.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 5de1c7aa1ce9..67260f7ce43a 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2072,6 +2072,9 @@ static void kvm_lapic_xapic_id_updated(struct kvm_lapic *apic)
+ {
+ 	struct kvm *kvm = apic->vcpu->kvm;
+ 
++	if (!kvm_apic_hw_enabled(apic))
++		return;
++
+ 	if (KVM_BUG_ON(apic_x2apic_mode(apic), kvm))
+ 		return;
+ 
+
