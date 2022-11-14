@@ -2,155 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 76600628831
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 19:20:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A7E462886C
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 19:39:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236120AbiKNSUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 13:20:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50036 "EHLO
+        id S235954AbiKNSjZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 13:39:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236514AbiKNSUI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 13:20:08 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E2F7DFE5
-        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 10:20:06 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A74C9B810E5
-        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 18:20:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5655CC4314E;
-        Mon, 14 Nov 2022 18:20:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668450004;
-        bh=CD83SZx2AI5bChI77ue3CZ0IPIH2kxQlAWgz+MlsjTU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YZAnv8ydk7//8upX12rjHE1xKI8Ny5ESoTwjMY3bbKfJeaZtfds1epVNCEqll0pik
-         wP3PFAIVGCbMeK0ldBArv5pXENbjtuzn+yYXqr+XiX2zI5lXLNIi8MGnBV5ySEgkIo
-         IviBQBxvvM2mUSjMVGEtKiWxwFB2HYbI+vnAfSXLvCEb6HNKxgGtzMcQHYbkyGgYgY
-         fT48uv++b/yuNtm+1CmFi+vOTDJOulj716/D3JS7rLn2PWpZyX+MHyeY2iNzjPNxc8
-         z2J2v3+XoKcGUfYT7cA9u4XEYd2nSKiYtVlsd5/RWpjCWLCfj/4nkCjB9RduzYyjLD
-         6/4bISUHQJ0zA==
-Date:   Mon, 14 Nov 2022 18:19:57 +0000
-From:   Will Deacon <will@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        Sean Christopherson <seanjc@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v6 00/26] KVM: arm64: Introduce pKVM hyp VM and vCPU
- state at EL2
-Message-ID: <20221114181956.GD31476@willie-the-truck>
-References: <20221110190259.26861-1-will@kernel.org>
- <86edu9ph3d.wl-maz@kernel.org>
- <Y26ltgCIObKpRTWx@google.com>
+        with ESMTP id S235772AbiKNSjX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 13:39:23 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 333B55F50;
+        Mon, 14 Nov 2022 10:39:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=oO6t/aSdhcayk4RY4zkY/5ANhtzEDw2hRrJGDO/JkzU=; b=WeD0doc3gBZDaiQJDXy9Tic5mz
+        bB4DF+HfI2HjKupHFb2DBNEOA3vQzW2dXh7VkfjWcIpuN9PTYet/gYaOa3HCz8zyo7gG1TNdF3tQS
+        +HTsYbdEx4gPAPxTkSMTgBD0aQVyycEiIj0uoUE2e0XgOcCa/Pwli8QSKXM5acRgJ64upEcGIzMGI
+        SErdr6K+NIfpnLcjlU5geop9vRHjXaPDNYS2e46M7MLB/AI6RzuxAZ9xBu6sZPLrJDInBEFz9VKfp
+        1BLzZLpWQIDs8F3QHYmfJgWmxZXgX0r8t/1fYdyC0/BNbi/b9y5d4nnlT8tWjHn/OFQ5CPJV+weqe
+        szBpmmxQ==;
+Received: from [205.251.233.234] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oueMd-00FfAV-SQ; Mon, 14 Nov 2022 18:39:24 +0000
+Message-ID: <629d6d90ce95b9db74f0101a4428be1119c4bfc7.camel@infradead.org>
+Subject: Re: [PATCH] KVM: x86/xen: Make number of event channels defines
+ less magical
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paul Durrant <paul@xen.org>
+Date:   Mon, 14 Nov 2022 10:39:15 -0800
+In-Reply-To: <20221114181632.3279119-1-seanjc@google.com>
+References: <20221114181632.3279119-1-seanjc@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-zmVCXn7s7WtxWV02RUa0"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y26ltgCIObKpRTWx@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Oliver,
 
-On Fri, Nov 11, 2022 at 07:42:46PM +0000, Oliver Upton wrote:
-> On Fri, Nov 11, 2022 at 04:54:14PM +0000, Marc Zyngier wrote:
-> > On Thu, 10 Nov 2022 19:02:33 +0000,
-> > Will Deacon <will@kernel.org> wrote:
-> > > 
-> > > Hi all,
-> > > 
-> > > This is version six of the pKVM EL2 state series, extending the pKVM
-> > > hypervisor code so that it can dynamically instantiate and manage VM
-> > > data structures without the host being able to access them directly.
-> > > These structures consist of a hyp VM, a set of hyp vCPUs and the stage-2
-> > > page-table for the MMU. The pages used to hold the hypervisor structures
-> > > are returned to the host when the VM is destroyed.
-> > > 
-> > > Previous versions are archived at:
-> > > 
-> > >   Mega-patch: https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
-> > >   v2: https://lore.kernel.org/all/20220630135747.26983-1-will@kernel.org/
-> > >   v3: https://lore.kernel.org/kvmarm/20220914083500.5118-1-will@kernel.org/
-> > >   v4: https://lore.kernel.org/kvm/20221017115209.2099-1-will@kernel.org/
-> > >   v5: https://lore.kernel.org/r/20221020133827.5541-1-will@kernel.org
-> > > 
-> > > The changes since v5 include:
-> > > 
-> > >   * Fix teardown ordering so that the host 'kvm' structure remains pins
-> > >     while the memcache is being filled.
-> > > 
-> > >   * Fixed a kerneldoc typo.
-> > > 
-> > >   * Included a patch from Oliver to rework the 'pkvm_mem_transition'
-> > >     structure and it's handling of the completer address.
-> > > 
-> > >   * Tweaked some commit messages and added new R-b tags.
-> > > 
-> > > As before, the final patch is RFC since it illustrates a very naive use
-> > > of the new hypervisor structures and subsequent changes will improve on
-> > > this once we have the guest private memory story sorted out.
-> > > 
-> > > Oliver: I'm pretty sure we're going to need to revert your completer
-> > > address cleanup as soon as we have guest-host sharing. We want to keep
-> > > the 'pkvm_mem_transition' structure 'const', but we will only know the
-> > > host address (PA) after walking the guest stage-2 and so we're going to
-> > > want to track that separately. Anyway, I've included it here at the end
-> > > so Marc can decide what he wants to do!
-> > 
-> > Thanks, I guess... :-/
-> > 
-> > If this patch is going to be reverted, I'd rather not take it (without
-> > guest/host sharing, we don't have much of a hypervisor).
-> 
-> +1, I'm more than happy being told my patch doesn't work :)
-> 
-> Having said that, if there are parts of the design that I've whined
-> about that are intentional then please educate me. Some things haven't
-> been quite as obvious, but I know you folks have been working on this
-> feature for a while.
+--=-zmVCXn7s7WtxWV02RUa0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Oh sure, I replied on your patches previously:
+On Mon, 2022-11-14 at 18:16 +0000, Sean Christopherson wrote:
+> Use BITS_PER_BYTE and sizeof_field() to compute the number of Xen event
+> channels.  The compat version at least uses sizeof_field(), but the
+> regular version open codes sizeof_field(), BITS_PER_BYTE, and combines
+> literals in the process, which makes it far too difficult to understand
+> relatively straightforward code.
+>=20
+> No functional change intended.
 
-https://lore.kernel.org/r/20221110104215.GA26282@willie-the-truck
+Slightly dubious about changing the regular one, since that's just
+imported directly from Xen public header files.
 
-But here's some more detail...
+--=-zmVCXn7s7WtxWV02RUa0
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-If a guest issues a SHARE hypercall to share a page with the host, then
-we'll end up in a situation where we have the guest as the initiator and
-the host as the completer of the share operation. At the point at which
-we populate the initial (const) 'pkvm_mem_transition' structure, all we
-will have in our hand is the guest IPA of the page being shared. We can't
-determine the host (completer) address from this without first walking the
-guest stage-2 page-table, which happens as part of the guest initiate_share
-code, so that's why the completer address is decoupled from the rest of the
-structure -- essentially, it's determine by the initiator after it performs
-its check.
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTE0MTgzOTE1WjAvBgkqhkiG9w0BCQQxIgQgdsNaPr2E
+ejA8Z4JwboyMjcJAtQmK/UtfWR2uboQpbH8wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBIyZzBWxyn0hwqWe7vTo+1WaT1U1bcuUe5
+6p2BJPQVsFMC68Y9z0WEaK5UgO4TyzSvxsCfllPU5HegTz8v3NKYYsw/7FSNfECuBOonszWoNRBr
+lYp1d/HQA8atehKx28Q3WYNR7ugbJTYk4mJB75Qecja3TMBl/GIk8OTGn32g2pb4DVEmjtpJaHNa
+jT0SfNkXLYqM80QatoL+XhSrgGwJDLJQRtn2f9hXkBqsmT8t9kmHwgGgiQQ2a0Eeyby+oXzoDShK
+Xb79a7EL+oe/yZh0uNjvz0XXKqic8KtNW/d1w6QRw3L5xlqXkY3N0YfnLkMALXR+Eh3NBmyPTwY0
+aX5SPVR8mG/2P5eM4wyM9VfgE6KjbDRIrvX2nLO9on+cCl9E6owfaJm5R/FEZzhpfJB6XzkI5+/y
+0FyJVSXctKc0QUU4F6FE08d1HkVP+734A3XpRYtoqpi+ZFsYPxfAiTDD+1cCXfsja/y+nj2NXTyV
+huK08qZ0X2qrYdG5phag9+iRdl/yNOvWJwHaW17P1SPRuwYBib2RgGTuewFnFtrp5w6cNBANyf8c
+YkaEGZP0+FXMPWI+l2efuWx+GDp7hPawdqE07PWH/sST1Nr1tdkLjyTOYaM8sDcpnzd861duy322
+uAzbDXDBopIVIejZJ+OFgSjI/L83SvR3jQHAN7PfugAAAAAAAA==
 
-Please do shout if there's something else you're not sure about or if the
-above is unclear.
 
-> I probably need to give the full patch-bomb another read to get all the
-> context too.
+--=-zmVCXn7s7WtxWV02RUa0--
 
-We'll probably drop another one of those once 6.2 is out, although we're
-going to need the guest private memory story to be resolved before we can
-progress much there, I think.
-
-Will
