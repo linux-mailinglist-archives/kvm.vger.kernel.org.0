@@ -2,140 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75751627C6F
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 12:37:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26C6F627D2A
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 12:57:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236120AbiKNLh2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 06:37:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33782 "EHLO
+        id S236101AbiKNL5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 06:57:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbiKNLh1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 06:37:27 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 622D3E0C7;
-        Mon, 14 Nov 2022 03:37:26 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EFDF061044;
-        Mon, 14 Nov 2022 11:37:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5718EC433C1;
-        Mon, 14 Nov 2022 11:37:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668425845;
-        bh=X1WXUuEiCKYnCaSnllroe9lO9yo1oclX61iorR2hfP8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=W8W7cT4G0eRhxxQtb/fG1Agad036i8WDiWbKv+7fyVCRbtdWrMK0YRAUyw3aA0cHv
-         ZixjCxb6xkWxqH5vTFUokG6TPXIq7Ol4JOU4fSPj46hFKxF9o6LqvVYGAf/qIj0dRx
-         fzjrxfpBWMiGe9oed60NTUh8lNzyzzztJ24pcs+XFTQKWOSURKyt2/4vkP2VMwB4hU
-         2AXgwCfpB9N9TCctCLljVhTZhCWNhexgwkpNsr3ukcvsbqh3zrRDfkPWGGY5+s3sqc
-         uNh4JUM9cFMn4VTneWbR/GZGzDkGHZVvYV/vwdjfN4/ZrdQ+0qVyexESqBNmYgvaoh
-         sm39gLiANN6CA==
-Received: from [82.3.55.76] (helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1ouXmE-005wky-Vy;
-        Mon, 14 Nov 2022 11:37:23 +0000
-Date:   Mon, 14 Nov 2022 11:36:56 +0000
-Message-ID: <878rkdvkbr.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
+        with ESMTP id S237158AbiKNL5L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 06:57:11 -0500
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 701192183D
+        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 03:54:13 -0800 (PST)
+Received: by mail-wm1-x334.google.com with SMTP id v7so7324480wmn.0
+        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 03:54:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UFrv/gZh3M5M+GHa7rgQfMzZBcJfOT6Htd7GIwYXDjY=;
+        b=EUoeLavTVlHYdJZCNph9EHvSI+oEmosznJ6f/upKgsdxBCVKAD+wKTTxF2HefZF4aJ
+         +voBzLkimQpEK0QSkfAiC1ct7gmCt04TDRoYbiQk2+ZrURn8qyzn7B8NaLHEY4CnDGm6
+         2jfadRSEAwkAURqUwVqJzHS0olixUeaFGq8/b2tw1FpYy5tfyimf03hvtmiBkAGD8Dwl
+         b0COvNcSFazcgu2nDWFiq0ZFNQbDFye/UqRwXqYAyjzv+ihl5HvLX0qY0nWmYQKPF5Em
+         ZwJAftOJ9dK9vLfL3ce4f68mG7VbwAJZ0JD+C1zsDfb08VanEK8T+D9r6Jo/S49b7wiV
+         j91A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UFrv/gZh3M5M+GHa7rgQfMzZBcJfOT6Htd7GIwYXDjY=;
+        b=wL+BluhldPPYdr81wOlc00SC/RPH861VFkbNiYC6cO6QuS9UgtVUtKWo0Uu2HsXgdS
+         jJ06FK3QjzX+NZfl/DbMrF9Cgmz4aGpxhV0f8b87vZ1IYXliDk5IvuhmjBE96TAMsX0Q
+         AGgIsALKvl+2vQpXcFOd9mWO+kQJhu9EBGKOCdXL+cK4xHJY8KwzGly8uRvAVo27za1J
+         LvuvwZxWJTHCPEa/uO4fPXXHhQXdDTT7/19cwSb4lFSPbNfcHTQjZfhMn+mDn8F18Kzt
+         4p9SyZlXxZqRFv7rIkQ5ovXEXDF+x/wgQz21cPZY7/mBWOwMSyRwwQYYwTz6LP2K6AUg
+         +R4g==
+X-Gm-Message-State: ANoB5plgAb28GcKOKEAjm4+wYRe3QXLWXlzqBNLxEkBQwjUHE7FzcTZ+
+        JII7UxQJwA4PVphIhg/oSm200g==
+X-Google-Smtp-Source: AA0mqf403V0vwqaE+mnyncg76u8ir3wUv9Nm7KTIlaElnQNtqjHebbBnqedRs9sCRLI9w2BMk0/32Q==
+X-Received: by 2002:a05:600c:2315:b0:3cf:ae53:918f with SMTP id 21-20020a05600c231500b003cfae53918fmr7727329wmo.131.1668426851811;
+        Mon, 14 Nov 2022 03:54:11 -0800 (PST)
+Received: from zen.linaroharston ([185.81.254.11])
+        by smtp.gmail.com with ESMTPSA id c17-20020adffb11000000b002417f35767asm6097766wrr.40.2022.11.14.03.54.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Nov 2022 03:54:11 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 5E6971FFB7;
+        Mon, 14 Nov 2022 11:54:10 +0000 (GMT)
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+User-agent: mu4e 1.9.2; emacs 28.2.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 2/3] KVM: arm64: Allow userspace to trap SMCCC sub-ranges
-In-Reply-To: <Y27dHf+PRt+G4jNg@google.com>
-References: <20221110015327.3389351-1-oliver.upton@linux.dev>
-        <20221110015327.3389351-3-oliver.upton@linux.dev>
-        <86o7tfov7v.wl-maz@kernel.org>
-        <Y21pktYPLPM6eYga@google.com>
-        <87fsepvqw5.wl-maz@kernel.org>
-        <Y27dHf+PRt+G4jNg@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.3.55.76
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        AKASHI Takahiro <takahiro.akashi@linaro.org>
+Subject: Re: [PATCH v9 0/8] KVM: mm: fd-based approach for supporting KVM
+Date:   Mon, 14 Nov 2022 11:43:37 +0000
+In-reply-to: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+Message-ID: <87k03xbvkt.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 11 Nov 2022 23:39:09 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Fri, Nov 11, 2022 at 08:26:02AM +0000, Marc Zyngier wrote:
-> > On Thu, 10 Nov 2022 21:13:54 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > The goal of what I was trying to get at is that either the kernel or
-> > > userspace takes ownership of a range that has an ABI, but not both. i.e.
-> > > you really wouldn't want some VMM or cloud provider trapping portions of
-> > > KVM's vendor-specific range while still reporting a 'vanilla' ABI at the
-> > > time of discovery. Same goes for PSCI, TRNG, etc.
-> > 
-> > But I definitely think this is one of the major use cases. For
-> > example, there is value in taking PSCI to userspace in order to
-> > implement a newer version of the spec, or to support sub-features that
-> > KVM doesn't (want to) implement. I don't think this changes the ABI from
-> > the guest perspective.
-> 
-> I disagree for the implications of partially trapping the 'Vendor
-> Specific Hypervisor Service'. If the UID for the range still reports KVM
-> but userspace decided to add some new widget, then from the guest
-> perspective that widget is now part of KVM's own ABI with the guest.
 
-But that's what I mean by "I don't think this changes the ABI from the
-guest perspective". The guest cannot know who is doing the emulation
-anyway, so it is userspace's duty to preserve the illusion. At the
-end of the day, this is only a configuration mechanism, and it is no
-different from all other configuration bits (i.e. they need to be
-identical on both side for migration).
+Chao Peng <chao.p.peng@linux.intel.com> writes:
 
-> Trapping the whole range is a bit of a hack to workaround the need for
-> more complicated verification of a hypercall filter.
+<snip>
+> Introduction
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> KVM userspace being able to crash the host is horrible. Under current
+> KVM architecture, all guest memory is inherently accessible from KVM
+> userspace and is exposed to the mentioned crash issue. The goal of this
+> series is to provide a solution to align mm and KVM, on a userspace
+> inaccessible approach of exposing guest memory.=20
+>
+> Normally, KVM populates secondary page table (e.g. EPT) by using a host
+> virtual address (hva) from core mm page table (e.g. x86 userspace page
+> table). This requires guest memory being mmaped into KVM userspace, but
+> this is also the source where the mentioned crash issue can happen. In
+> theory, apart from those 'shared' memory for device emulation etc, guest
+> memory doesn't have to be mmaped into KVM userspace.
+>
+> This series introduces fd-based guest memory which will not be mmaped
+> into KVM userspace. KVM populates secondary page table by using a
+> fd/offset pair backed by a memory file system. The fd can be created
+> from a supported memory filesystem like tmpfs/hugetlbfs and KVM can
+> directly interact with them with newly introduced in-kernel interface,
+> therefore remove the KVM userspace from the path of accessing/mmaping
+> the guest memory.=20
+>
+> Kirill had a patch [2] to address the same issue in a different way. It
+> tracks guest encrypted memory at the 'struct page' level and relies on
+> HWPOISON to reject the userspace access. The patch has been discussed in
+> several online and offline threads and resulted in a design document [3]
+> which is also the original proposal for this series. Later this patch
+> series evolved as more comments received in community but the major
+> concepts in [3] still hold true so recommend reading.
+>
+> The patch series may also be useful for other usages, for example, pure
+> software approach may use it to harden itself against unintentional
+> access to guest memory. This series is designed with these usages in
+> mind but doesn't have code directly support them and extension might be
+> needed.
 
-We already need these things for architected hypercalls. Once we have
-the infrastructure, it doesn't matter anymore which range this is for.
+There are a couple of additional use cases where having a consistent
+memory interface with the kernel would be useful.
 
-> 
-> But for everything else, I'm fine with arbitrary function filtering.
-> Userspace is always welcome to shoot itself in the foot.
-> 
-> > pKVM also has a use case for this where userspace gets a notification
-> > of the hypercall that a guest has performed to share memory.
-> 
-> Is that hypercall in the 'Vendor Specific Hypervisor Service' range?
+  - Xen DomU guests providing other domains with VirtIO backends
 
-Yes. It is get another KVM hypercall.
+  Xen by default doesn't give other domains special access to a domains
+  memory. The guest can grant access to regions of its memory to other
+  domains for this purpose.=20
 
-> 
-> > Communication with a TEE also is on the cards, as would be a FFA
-> > implementation. All of this could be implemented in KVM, or in
-> > userspace, depending what users of these misfeatures want to do.
-> 
-> I'm very hopeful that by forwarding all of this to userspace we can get
-> out of the business of implementing every darn spec that comes along.
+  - pKVM on ARM
 
-Good luck. All the TEEs have private, home grown APIs, and every
-vendor will want to implement their own crap (i.e. there is no spec).
+  Similar to Xen, pKVM moves the management of the page tables into the
+  hypervisor and again doesn't allow those domains to share memory by
+  default.
 
-	M.
+  - VirtIO loopback
 
--- 
-Without deviation from the norm, progress is not possible.
+  This allows for VirtIO devices for the host kernel to be serviced by
+  backends running in userspace. Obviously the memory userspace is
+  allowed to access is strictly limited to the buffers and queues
+  because giving userspace unrestricted access to the host kernel would
+  have consequences.
+
+All of these VirtIO backends work with vhost-user which uses memfds to
+pass references to guest memory from the VMM to the backend
+implementation.
+
+> mm change
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D
+> Introduces a new memfd_restricted system call which can create memory
+> file that is restricted from userspace access via normal MMU operations
+> like read(), write() or mmap() etc and the only way to use it is
+> passing it to a third kernel module like KVM and relying on it to
+> access the fd through the newly added restrictedmem kernel interface.
+> The restrictedmem interface bridges the memory file subsystems
+> (tmpfs/hugetlbfs etc) and their users (KVM in this case) and provides
+> bi-directional communication between them.=20
+>
+>
+> KVM change
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> Extends the KVM memslot to provide guest private (encrypted) memory from
+> a fd. With this extension, a single memslot can maintain both private
+> memory through private fd (restricted_fd/restricted_offset) and shared
+> (unencrypted) memory through userspace mmaped host virtual address
+> (userspace_addr). For a particular guest page, the corresponding page in
+> KVM memslot can be only either private or shared and only one of the
+> shared/private parts of the memslot is visible to guest. For how this
+> new extension is used in QEMU, please refer to kvm_set_phys_mem() in
+> below TDX-enabled QEMU repo.
+>
+> Introduces new KVM_EXIT_MEMORY_FAULT exit to allow userspace to get the
+> chance on decision-making for shared <-> private memory conversion. The
+> exit can be an implicit conversion in KVM page fault handler or an
+> explicit conversion from guest OS.
+>
+> Extends existing SEV ioctls KVM_MEMORY_ENCRYPT_{UN,}REG_REGION to
+> convert a guest page between private <-> shared. The data maintained in
+> these ioctls tells the truth whether a guest page is private or shared
+> and this information will be used in KVM page fault handler to decide
+> whether the private or the shared part of the memslot is visible to
+> guest.
+>
+<snip>
+
+--=20
+Alex Benn=C3=A9e
