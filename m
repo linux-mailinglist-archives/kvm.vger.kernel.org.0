@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA82A6279C3
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 10:59:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EFCAE6279C9
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 10:59:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237054AbiKNJ7C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 04:59:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59662 "EHLO
+        id S236395AbiKNJ7P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 04:59:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236970AbiKNJ61 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 04:58:27 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB16B1FCFA;
-        Mon, 14 Nov 2022 01:57:09 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id d13-20020a17090a3b0d00b00213519dfe4aso10143097pjc.2;
-        Mon, 14 Nov 2022 01:57:09 -0800 (PST)
+        with ESMTP id S236981AbiKNJ6e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 04:58:34 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A37E1FF81;
+        Mon, 14 Nov 2022 01:57:10 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id q9so10507050pfg.5;
+        Mon, 14 Nov 2022 01:57:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bB9HJirhisx3kp/ZaMEke/U77Qzx+ccScf9+6dZL8Nk=;
-        b=CKgu1TtBXStLVDqtwlA/m7sYxkPhNeqIHQBcTqq1ULx84QTN75Ai3t+vXNZGdnkARM
-         qaIqJiK+iuRtvLEsQmI7uRv8wUkPMdJquaHd+bLQPEqfPsjD07CxpLGGy/IYxzakWhHT
-         aPDuQs9yrgV1+/32PksGzrhPpAyCKlRgB/x8xh3kEIKX+mAS5HGkbcarKCpHF8NBJH0V
-         V5uvnzdHXVjiuK6R/qLYdAaB2D29YZfPBy1N7/3ruvUxKFd/SMk4/SF42cFkVhV9n5NU
-         PjmK4b2eBcqFDOwLxK1LP8C5J5t0N1tgkryHNGGjcPqDqwe66pmwpLWuirDJsKSFa8w3
-         +gbA==
+        bh=ccZiWPsj90sIvFSVbuXn3m5I4XZuLJxz6wzsnjwAo5w=;
+        b=k8cTh9C06Opq104Iymh5+kbFbPD7WZPNGa7NSxb0kfk01Rht+Y8vodld11NScwj1Mq
+         GBG/q+uexLG+y0/X1zrdhGk2W8+AW68F5ZJ8b2bWFgA+duw+xOv15DDXVkDeW8tOWb9D
+         lyVMd4dOX7+CBj51RM6pSVDzsldk6sV35WEKY389ncXkv2KAOs20gxwn7usITqUTEFT9
+         UmLXcMNdKutk1pFLre5vgPzWLVFlYT+nrtwvPkGK2nivFbM4A4pXEFoh1RPgpyk6XH2C
+         K09FN7Fz6pkuHZC325s7SErYOsK/Fvcv9tFtzS3XWQVNjSPXjiGmaiCEim8rKXrQePaK
+         41xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bB9HJirhisx3kp/ZaMEke/U77Qzx+ccScf9+6dZL8Nk=;
-        b=jz9w7nVfNCx6I449vjygJmG6HCynyw08tnYohzri4IpUy22N8wd54w6OmsVunT7+Kg
-         fYlig+7+aZ8BJkuHOWZn08rzS/FjO4uHKdHpQBPMKpVjCz5DpUBSXXhd8ib0xAnvSJfK
-         ryHjDSqJD+N2KOIG+HTRWhc50HGLWKwjYNqMd60jMJ2wEjHKIf5PMw3udAZuuRGFUYwA
-         zppky+DddigpdeBE+neQ988LV4BZ9CBQRFmxP5iaapgBLIRZWcY9r0Yn63NHIjiVKxDD
-         LLa9dJEYyKKthhbSW9Tr7ahawApy3epN1AzrgmZECXmnbHjZxuPiH8l62XppkDV5O1IL
-         eSSA==
-X-Gm-Message-State: ANoB5pkvu2f1ZeO0g818uV9rSNSyTxTgSndPo4fJjXSLvrTBZn6gxnro
-        HXbI2QuOC1sitvK6tQ/YwBY=
-X-Google-Smtp-Source: AA0mqf7kwrRosWCRmtuNPi4Yx6pfZ0CV447TytTF6RF1n3H/CBY+hnwRssDRzaR5W/05fyPt3XDjZA==
-X-Received: by 2002:a17:90b:24e:b0:212:c6f4:fa5 with SMTP id fz14-20020a17090b024e00b00212c6f40fa5mr13278473pjb.49.1668419815362;
-        Mon, 14 Nov 2022 01:56:55 -0800 (PST)
+        bh=ccZiWPsj90sIvFSVbuXn3m5I4XZuLJxz6wzsnjwAo5w=;
+        b=V4osZdCR79Fn/K3bcsE1vTu29sxSOk4OZD1/E0xfXssLpFkjvIjLJDPQod6Lo0eEPM
+         mc3wqpilJLbQgjGgSSjaQgJil3mgW8D77LqzmQZa55UQ3pNTVQY0zLWQZOS5N5nxr/Mg
+         THfpqMeumUfAtakI8ovGzVu4Xv4zDeek2aydoz3V/FGVR6zwR1eup6xuuDSxjGCuANot
+         vjXoaJRvFmIDsGZy0Eg9QS8vQkq79BW9EI39tCWPEPdGQlVrE/kUFcI7dsJ+IZBpAULk
+         0Ik8zEojkeHzfqHMHitIHYKIuDkbkNlJLGj4ZkyjGNws8pNLn7S2WWWKoNMwbR4058bC
+         oWWA==
+X-Gm-Message-State: ANoB5pkQloDGpJ5Oo13htK1XRkbVBxD6iFBnzcuPznP9JBT6Md1eKFYy
+        eCBrsKI7Y+SJ9EEkLpiCXg8=
+X-Google-Smtp-Source: AA0mqf6rKk1TAJ1xRxMxsJCgCfngtD6Auhmpz6x7+FlXTw0eG3bhllrlDX7cMkDQ3Ef87psdHJcSXQ==
+X-Received: by 2002:a62:e117:0:b0:53e:6210:96de with SMTP id q23-20020a62e117000000b0053e621096demr13163504pfh.58.1668419817537;
+        Mon, 14 Nov 2022 01:56:57 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id d29-20020aa797bd000000b0056c6e59fb69sm6266472pfq.83.2022.11.14.01.56.53
+        by smtp.gmail.com with ESMTPSA id d29-20020aa797bd000000b0056c6e59fb69sm6266472pfq.83.2022.11.14.01.56.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Nov 2022 01:56:55 -0800 (PST)
+        Mon, 14 Nov 2022 01:56:57 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 13/14] KVM: x86: Remove unnecessary export of kvm_lapic_hv_timer_in_use()
-Date:   Mon, 14 Nov 2022 17:56:05 +0800
-Message-Id: <20221114095606.39785-14-likexu@tencent.com>
+Subject: [PATCH 14/14] KVM: x86: Remove unnecessary export of kvm_apic_update_apicv()
+Date:   Mon, 14 Nov 2022 17:56:06 +0800
+Message-Id: <20221114095606.39785-15-likexu@tencent.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221114095606.39785-1-likexu@tencent.com>
 References: <20221114095606.39785-1-likexu@tencent.com>
@@ -74,7 +74,7 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-Don't export x86's kvm_lapic_hv_timer_in_use(), the helper isn't used by
+Don't export x86's kvm_apic_update_apicv(), the helper isn't used by
 KVM x86's vendor modules.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
@@ -83,16 +83,16 @@ Signed-off-by: Like Xu <likexu@tencent.com>
  1 file changed, 1 deletion(-)
 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 5243e619fb0d..f59e7db2af2f 100644
+index f59e7db2af2f..b55042462d39 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -1913,7 +1913,6 @@ bool kvm_lapic_hv_timer_in_use(struct kvm_vcpu *vcpu)
- 
- 	return vcpu->arch.apic->lapic_timer.hv_timer_in_use;
+@@ -2430,7 +2430,6 @@ void kvm_apic_update_apicv(struct kvm_vcpu *vcpu)
+ 		apic->isr_count = count_vectors(apic->regs + APIC_ISR);
+ 	}
  }
--EXPORT_SYMBOL_GPL(kvm_lapic_hv_timer_in_use);
+-EXPORT_SYMBOL_GPL(kvm_apic_update_apicv);
  
- static void cancel_hv_timer(struct kvm_lapic *apic)
+ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
  {
 -- 
 2.38.1
