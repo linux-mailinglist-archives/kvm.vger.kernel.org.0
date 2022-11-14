@@ -2,66 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 041E3627544
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 05:29:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDD1E62754F
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 05:31:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235750AbiKNE3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Nov 2022 23:29:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42238 "EHLO
+        id S235817AbiKNEbX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Nov 2022 23:31:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235771AbiKNE3I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Nov 2022 23:29:08 -0500
+        with ESMTP id S235338AbiKNEbR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Nov 2022 23:31:17 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EEB96588
-        for <kvm@vger.kernel.org>; Sun, 13 Nov 2022 20:28:10 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1E4F63A1
+        for <kvm@vger.kernel.org>; Sun, 13 Nov 2022 20:30:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668400090;
+        s=mimecast20190719; t=1668400222;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FnCPqOnBW63b7XhnZnGIx9/kne/rAammMftT5XFzR5g=;
-        b=cfC6hP/FBf/gY3l7ty4Tr7/7Sby/A3Q1yT+kyX2OosdEYAxU4M6p11UaIj/nhbI2Jr6Km6
-        a9VyzGmGYq6afBb5BSJ0/AoAycjV+77uhyM8KsBRxFVABrGXkaBPAN3WbOOz5lSKCk7jAA
-        BWHEryEWi2wSpDVYkFKfBGIse+GpuVY=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=KfG44Vz1URbgkpQEdXRZWY0nTsuZKI0JGhM4zYGq6UE=;
+        b=F+ZW4ZtNjCbH/XbvdXvCeLJlHJ4WMNVgbgQwTzc18CMWoc26P0qMdKsP4rGiLdfQf59l23
+        SwcdrSTtH+R+5nrg7oGUeS5CV7Jbu/n3siODevDRuiXhvTgUfDMNa/bBH+QwIJAYomiIkP
+        ZJeR3YW4S1DjUZP03QldxRzHT93MY8M=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-383-153U5ty_Peq0gShKWpnlNw-1; Sun, 13 Nov 2022 23:28:09 -0500
-X-MC-Unique: 153U5ty_Peq0gShKWpnlNw-1
-Received: by mail-pl1-f197.google.com with SMTP id e13-20020a17090301cd00b001871e6f8714so8142694plh.14
-        for <kvm@vger.kernel.org>; Sun, 13 Nov 2022 20:28:09 -0800 (PST)
+ us-mta-499-ZK5kYWIdOkujZzBaG99gJg-1; Sun, 13 Nov 2022 23:30:20 -0500
+X-MC-Unique: ZK5kYWIdOkujZzBaG99gJg-1
+Received: by mail-pl1-f200.google.com with SMTP id a6-20020a170902ecc600b00186f035ed74so8115463plh.12
+        for <kvm@vger.kernel.org>; Sun, 13 Nov 2022 20:30:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FnCPqOnBW63b7XhnZnGIx9/kne/rAammMftT5XFzR5g=;
-        b=u60cw2OeFblaXk4pISGZs70UpB5dCwT5t30f1dSKCZH2vdbOP627flu6snwzSjpqjP
-         RaDW38vH5Lk87WgULJ0bX3elUtlTQ6zJ5Qp0oe2/r/p1zKkNXWU6iq+rTqzj6cOYHm9v
-         2XA/7QhL7tVgH097i/zNkmm4itLuIUwUZdVXnxP8jzn9M3fIXnCwvqb1MbMLNSQcb9OV
-         quvXV4hat8FGu/qt6etFcF6EsuqHEw1niSVAmJCLeqcknmi6IY9x8st4MuiX7wTS9q/e
-         Oar3l3qg7PhWPqOZQcA/pBu7ZdwU8PMEXbioIEToB4nwjKtySOJRdJcXgmwDYa0ulC01
-         Vpiw==
-X-Gm-Message-State: ANoB5pm4ARGSN50AslQKqNngzT74OhPW9X4yXsCx/KzDH3taYmbeI5N2
-        26IwOvYIPyd1O9STKEhXQZKl/wrh6LFYxy66G3GHWMcJJFCjaLMwCGxUnrY4BiVAuqgv8ihw3OA
-        4VP9W20zx6pnp
-X-Received: by 2002:aa7:8891:0:b0:562:9a93:7c91 with SMTP id z17-20020aa78891000000b005629a937c91mr12396622pfe.21.1668400086235;
-        Sun, 13 Nov 2022 20:28:06 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4MSmogPA49SumDAra8YDZaD+LuGediWf2p+caEJdzTmcM8EfESj0XKWavlCI1S/GvM7VsnNA==
-X-Received: by 2002:aa7:8891:0:b0:562:9a93:7c91 with SMTP id z17-20020aa78891000000b005629a937c91mr12396604pfe.21.1668400085859;
-        Sun, 13 Nov 2022 20:28:05 -0800 (PST)
+        bh=KfG44Vz1URbgkpQEdXRZWY0nTsuZKI0JGhM4zYGq6UE=;
+        b=GBcfEw3QUAERVj1hmeFXH0VacBXJSfXLxqrhGN+QwFXFemLSIVKXt3J7LPf5r3iqRB
+         GrTZR8WlyrOd6VfjJpTLv2kCzg97uvg2Sqky4j21YXd5qtUVHcAgi168Iw/oT44tuxyc
+         6/1vPlRQ7gjo8FdXC6M3jbCe1hC+2L4RU8RWycXv549ueKT2a/0kv/VG0Cp0MuSeCFCR
+         gpdt4MwM6r/r+STL2T4hjqUNfvd0aXW0u83vkY+rv0PM/u/YLxApx2YhNntcF7c2H4FD
+         Wq6QgcEryYmnCrIbex4f2XyKL17s0fDTArjEvyQgi9Bm5UmVQc3ri4Z0VkE0jb1Cx4C4
+         cPyw==
+X-Gm-Message-State: ANoB5pk++4a+46g8TO1NY9qaPIRJb3diD65HXfYi2KOFBnsfZGQgoobi
+        /wlTaMK+rz3sh4Zr4PSZqxtGWGfzlyo+gDkNZKZBy1avL6WMyanajZlhSXrobl4/pyYbkhSpcOA
+        7RVr9ioCutE9g
+X-Received: by 2002:a17:903:3308:b0:186:d89d:f0bc with SMTP id jk8-20020a170903330800b00186d89df0bcmr12144129plb.19.1668400219488;
+        Sun, 13 Nov 2022 20:30:19 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4JGvLcGS0rUrYEviFQkpojH+lEE7BEpMuELAsAPQuEtf4LBl9s7c8lbM64KlBjB5Q420+QeQ==
+X-Received: by 2002:a17:903:3308:b0:186:d89d:f0bc with SMTP id jk8-20020a170903330800b00186d89df0bcmr12144113plb.19.1668400219229;
+        Sun, 13 Nov 2022 20:30:19 -0800 (PST)
 Received: from [10.72.13.180] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id w13-20020a627b0d000000b0056ee49d6e95sm5525565pfc.86.2022.11.13.20.27.58
+        by smtp.gmail.com with ESMTPSA id i8-20020a170902c94800b00187197c4999sm6134805pla.167.2022.11.13.20.30.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Nov 2022 20:28:04 -0800 (PST)
-Message-ID: <cbe9b99c-3a8a-7c73-155a-306c9a28972d@redhat.com>
-Date:   Mon, 14 Nov 2022 12:27:56 +0800
+        Sun, 13 Nov 2022 20:30:18 -0800 (PST)
+Message-ID: <6a35e659-698e-ff71-fe9b-06e15809c9e4@redhat.com>
+Date:   Mon, 14 Nov 2022 12:30:08 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.4.2
-Subject: Re: [PATCH v6 07/10] vdpa: Add asid parameter to
- vhost_vdpa_dma_map/unmap
+Subject: Re: [PATCH v6 09/10] vdpa: Add listener_shadow_vq to vhost_vdpa
 Content-Language: en-US
 To:     Eugenio Perez Martin <eperezma@redhat.com>
 Cc:     qemu-devel@nongnu.org, Parav Pandit <parav@mellanox.com>,
@@ -79,13 +78,13 @@ Cc:     qemu-devel@nongnu.org, Parav Pandit <parav@mellanox.com>,
         "Gonglei (Arei)" <arei.gonglei@huawei.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 References: <20221108170755.92768-1-eperezma@redhat.com>
- <20221108170755.92768-8-eperezma@redhat.com>
- <CACGkMEvzw283JE9Uo6kqKuAJ4CWpWyHciHe8DazLEP5Xzw91wg@mail.gmail.com>
- <CAJaqyWcbYLzdEcPMMjDNWsGV4bkb8NTJnNHj5Wp+v4WbM+LHeQ@mail.gmail.com>
- <fa24552a-4d82-4da9-bf15-10d75893afa3@redhat.com>
- <CAJaqyWc3zjYxFHe6ucZNOKq0e_b_cNajh5CHzHNBnnRiwbNEHg@mail.gmail.com>
+ <20221108170755.92768-10-eperezma@redhat.com>
+ <CACGkMEsr=fpbbOpUBHawt5DR+nTWcK1uMzXgorEcbijso1wsMQ@mail.gmail.com>
+ <CAJaqyWemKoRNd6_uvFc79qYe+7pbavJSjnZuczxk5uxSZZdZ2Q@mail.gmail.com>
+ <be553273-7c06-78f7-4d23-de9f46a210b1@redhat.com>
+ <CAJaqyWeZWQgGm7XZ-+DBHNS4XW_-GgWeeOqTb82v__jS8ONRyQ@mail.gmail.com>
 From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <CAJaqyWc3zjYxFHe6ucZNOKq0e_b_cNajh5CHzHNBnnRiwbNEHg@mail.gmail.com>
+In-Reply-To: <CAJaqyWeZWQgGm7XZ-+DBHNS4XW_-GgWeeOqTb82v__jS8ONRyQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -99,263 +98,116 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-在 2022/11/11 21:02, Eugenio Perez Martin 写道:
-> On Fri, Nov 11, 2022 at 8:41 AM Jason Wang <jasowang@redhat.com> wrote:
+在 2022/11/11 21:12, Eugenio Perez Martin 写道:
+> On Fri, Nov 11, 2022 at 8:49 AM Jason Wang <jasowang@redhat.com> wrote:
 >>
->> 在 2022/11/10 21:22, Eugenio Perez Martin 写道:
->>> On Thu, Nov 10, 2022 at 6:51 AM Jason Wang <jasowang@redhat.com> wrote:
+>> 在 2022/11/10 21:47, Eugenio Perez Martin 写道:
+>>> On Thu, Nov 10, 2022 at 7:01 AM Jason Wang <jasowang@redhat.com> wrote:
 >>>> On Wed, Nov 9, 2022 at 1:08 AM Eugenio Pérez <eperezma@redhat.com> wrote:
->>>>> So the caller can choose which ASID is destined.
+>>>>> The memory listener that thells the device how to convert GPA to qemu's
+>>>>> va is registered against CVQ vhost_vdpa. This series try to map the
+>>>>> memory listener translations to ASID 0, while it maps the CVQ ones to
+>>>>> ASID 1.
 >>>>>
->>>>> No need to update the batch functions as they will always be called from
->>>>> memory listener updates at the moment. Memory listener updates will
->>>>> always update ASID 0, as it's the passthrough ASID.
->>>>>
->>>>> All vhost devices's ASID are 0 at this moment.
+>>>>> Let's tell the listener if it needs to register them on iova tree or
+>>>>> not.
 >>>>>
 >>>>> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
 >>>>> ---
->>>>> v5:
->>>>> * Solve conflict, now vhost_vdpa_svq_unmap_ring returns void
->>>>> * Change comment on zero initialization.
->>>>>
->>>>> v4: Add comment specifying behavior if device does not support _F_ASID
->>>>>
->>>>> v3: Deleted unneeded space
+>>>>> v5: Solve conflict about vhost_iova_tree_remove accepting mem_region by
+>>>>>       value.
 >>>>> ---
->>>>>    include/hw/virtio/vhost-vdpa.h |  8 +++++---
->>>>>    hw/virtio/vhost-vdpa.c         | 29 +++++++++++++++++++----------
->>>>>    net/vhost-vdpa.c               |  6 +++---
->>>>>    hw/virtio/trace-events         |  4 ++--
->>>>>    4 files changed, 29 insertions(+), 18 deletions(-)
+>>>>>    include/hw/virtio/vhost-vdpa.h | 2 ++
+>>>>>    hw/virtio/vhost-vdpa.c         | 6 +++---
+>>>>>    net/vhost-vdpa.c               | 1 +
+>>>>>    3 files changed, 6 insertions(+), 3 deletions(-)
 >>>>>
 >>>>> diff --git a/include/hw/virtio/vhost-vdpa.h b/include/hw/virtio/vhost-vdpa.h
->>>>> index 1111d85643..6560bb9d78 100644
+>>>>> index 6560bb9d78..0c3ed2d69b 100644
 >>>>> --- a/include/hw/virtio/vhost-vdpa.h
 >>>>> +++ b/include/hw/virtio/vhost-vdpa.h
->>>>> @@ -29,6 +29,7 @@ typedef struct vhost_vdpa {
->>>>>        int index;
->>>>>        uint32_t msg_type;
->>>>>        bool iotlb_batch_begin_sent;
->>>>> +    uint32_t address_space_id;
->>>> So the trick is let device specific code to zero this during allocation?
->>>>
->>> Yes, but I don't see how that is a trick :). All other parameters also
->>> trust it to be 0 at allocation.
->>>
->>>>>        MemoryListener listener;
+>>>>> @@ -34,6 +34,8 @@ typedef struct vhost_vdpa {
 >>>>>        struct vhost_vdpa_iova_range iova_range;
 >>>>>        uint64_t acked_features;
->>>>> @@ -42,8 +43,9 @@ typedef struct vhost_vdpa {
->>>>>        VhostVDPAHostNotifier notifier[VIRTIO_QUEUE_MAX];
->>>>>    } VhostVDPA;
->>>>>
->>>>> -int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
->>>>> -                       void *vaddr, bool readonly);
->>>>> -int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, hwaddr iova, hwaddr size);
->>>>> +int vhost_vdpa_dma_map(struct vhost_vdpa *v, uint32_t asid, hwaddr iova,
->>>>> +                       hwaddr size, void *vaddr, bool readonly);
->>>>> +int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, uint32_t asid, hwaddr iova,
->>>>> +                         hwaddr size);
->>>>>
->>>>>    #endif
+>>>>>        bool shadow_vqs_enabled;
+>>>>> +    /* The listener must send iova tree addresses, not GPA */
+>>
+>> Btw, cindy's vIOMMU series will make it not necessarily GPA any more.
+>>
+> Yes, this comment should be tuned then. But the SVQ iova_tree will not
+> be equal to vIOMMU one because shadow vrings.
+>
+> But maybe SVQ can inspect both instead of having all the duplicated entries.
+>
+>>>>> +    bool listener_shadow_vq;
+>>>>>        /* IOVA mapping used by the Shadow Virtqueue */
+>>>>>        VhostIOVATree *iova_tree;
+>>>>>        GPtrArray *shadow_vqs;
 >>>>> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
->>>>> index 23efb8f49d..8fd32ba32b 100644
+>>>>> index 8fd32ba32b..e3914fa40e 100644
 >>>>> --- a/hw/virtio/vhost-vdpa.c
 >>>>> +++ b/hw/virtio/vhost-vdpa.c
->>>>> @@ -72,22 +72,24 @@ static bool vhost_vdpa_listener_skipped_section(MemoryRegionSection *section,
->>>>>        return false;
->>>>>    }
+>>>>> @@ -220,7 +220,7 @@ static void vhost_vdpa_listener_region_add(MemoryListener *listener,
+>>>>>                                             vaddr, section->readonly);
 >>>>>
->>>>> -int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
->>>>> -                       void *vaddr, bool readonly)
->>>>> +int vhost_vdpa_dma_map(struct vhost_vdpa *v, uint32_t asid, hwaddr iova,
->>>>> +                       hwaddr size, void *vaddr, bool readonly)
->>>>>    {
->>>>>        struct vhost_msg_v2 msg = {};
->>>>>        int fd = v->device_fd;
->>>>>        int ret = 0;
+>>>>>        llsize = int128_sub(llend, int128_make64(iova));
+>>>>> -    if (v->shadow_vqs_enabled) {
+>>>>> +    if (v->listener_shadow_vq) {
+>>>>>            int r;
 >>>>>
->>>>>        msg.type = v->msg_type;
->>>>> +    msg.asid = asid; /* 0 if vdpa device does not support asid */
->>>> The comment here is confusing. If this is a requirement, we need either
->>>>
->>>> 1) doc this
->>>>
->>>> or
->>>>
->>>> 2) perform necessary checks in the function itself.
->>>>
->>> I only documented it in vhost_vdpa_dma_unmap and now I realize it.
->>> Would it work to just copy that comment here?
->>
->> Probably, and let's move the comment above the function definition.
->>
->>
->>>>>        msg.iotlb.iova = iova;
->>>>>        msg.iotlb.size = size;
->>>>>        msg.iotlb.uaddr = (uint64_t)(uintptr_t)vaddr;
->>>>>        msg.iotlb.perm = readonly ? VHOST_ACCESS_RO : VHOST_ACCESS_RW;
->>>>>        msg.iotlb.type = VHOST_IOTLB_UPDATE;
+>>>>>            mem_region.translated_addr = (hwaddr)(uintptr_t)vaddr,
+>>>>> @@ -247,7 +247,7 @@ static void vhost_vdpa_listener_region_add(MemoryListener *listener,
+>>>>>        return;
 >>>>>
->>>>> -   trace_vhost_vdpa_dma_map(v, fd, msg.type, msg.iotlb.iova, msg.iotlb.size,
->>>>> -                            msg.iotlb.uaddr, msg.iotlb.perm, msg.iotlb.type);
->>>>> +    trace_vhost_vdpa_dma_map(v, fd, msg.type, msg.asid, msg.iotlb.iova,
->>>>> +                             msg.iotlb.size, msg.iotlb.uaddr, msg.iotlb.perm,
->>>>> +                             msg.iotlb.type);
->>>>>
->>>>>        if (write(fd, &msg, sizeof(msg)) != sizeof(msg)) {
->>>>>            error_report("failed to write, fd=%d, errno=%d (%s)",
->>>>> @@ -98,18 +100,24 @@ int vhost_vdpa_dma_map(struct vhost_vdpa *v, hwaddr iova, hwaddr size,
->>>>>        return ret;
->>>>>    }
->>>>>
->>>>> -int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, hwaddr iova, hwaddr size)
->>>>> +int vhost_vdpa_dma_unmap(struct vhost_vdpa *v, uint32_t asid, hwaddr iova,
->>>>> +                         hwaddr size)
->>>>>    {
->>>>>        struct vhost_msg_v2 msg = {};
->>>>>        int fd = v->device_fd;
->>>>>        int ret = 0;
->>>>>
->>>>>        msg.type = v->msg_type;
->>>>> +    /*
->>>>> +     * The caller must set asid = 0 if the device does not support asid.
->>>>> +     * This is not an ABI break since it is set to 0 by the initializer anyway.
->>>>> +     */
->>>>> +    msg.asid = asid;
->>>>>        msg.iotlb.iova = iova;
->>>>>        msg.iotlb.size = size;
->>>>>        msg.iotlb.type = VHOST_IOTLB_INVALIDATE;
->>>>>
->>>>> -    trace_vhost_vdpa_dma_unmap(v, fd, msg.type, msg.iotlb.iova,
->>>>> +    trace_vhost_vdpa_dma_unmap(v, fd, msg.type, msg.asid, msg.iotlb.iova,
->>>>>                                   msg.iotlb.size, msg.iotlb.type);
->>>>>
->>>>>        if (write(fd, &msg, sizeof(msg)) != sizeof(msg)) {
->>>>> @@ -229,7 +237,7 @@ static void vhost_vdpa_listener_region_add(MemoryListener *listener,
+>>>>>    fail_map:
+>>>>> -    if (v->shadow_vqs_enabled) {
+>>>>> +    if (v->listener_shadow_vq) {
+>>>>>            vhost_iova_tree_remove(v->iova_tree, mem_region);
 >>>>>        }
 >>>>>
->>>>>        vhost_vdpa_iotlb_batch_begin_once(v);
->>>>> -    ret = vhost_vdpa_dma_map(v, iova, int128_get64(llsize),
->>>>> +    ret = vhost_vdpa_dma_map(v, 0, iova, int128_get64(llsize),
->>>> Can we use v->address_space_id here? Then we don't need to modify this
->>>> line when we support multiple asids logic in the future.
+>>>>> @@ -292,7 +292,7 @@ static void vhost_vdpa_listener_region_del(MemoryListener *listener,
+>>>>>
+>>>>>        llsize = int128_sub(llend, int128_make64(iova));
+>>>>>
+>>>>> -    if (v->shadow_vqs_enabled) {
+>>>>> +    if (v->listener_shadow_vq) {
+>>>>>            const DMAMap *result;
+>>>>>            const void *vaddr = memory_region_get_ram_ptr(section->mr) +
+>>>>>                section->offset_within_region +
+>>>>> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+>>>>> index 85a318faca..02780ee37b 100644
+>>>>> --- a/net/vhost-vdpa.c
+>>>>> +++ b/net/vhost-vdpa.c
+>>>>> @@ -570,6 +570,7 @@ static NetClientState *net_vhost_vdpa_init(NetClientState *peer,
+>>>>>        s->vhost_vdpa.index = queue_pair_index;
+>>>>>        s->always_svq = svq;
+>>>>>        s->vhost_vdpa.shadow_vqs_enabled = svq;
+>>>>> +    s->vhost_vdpa.listener_shadow_vq = svq;
+>>>> Any chance those above two can differ?
 >>>>
->>> The registered memory listener is the one of the last vhost_vdpa, the
->>> one that handles the last queue.
+>>> If CVQ is shadowed but data VQs are not, shadow_vqs_enabled is true
+>>> but listener_shadow_vq is not.
 >>>
->>> If all data virtqueues are not shadowed but CVQ is,
->>> v->address_space_id is 1 with the current code.
+>>> It is more clear in the next commit, where only shadow_vqs_enabled is
+>>> set to true at vhost_vdpa_net_cvq_start.
 >>
->> Ok, right. So let's add a comment here. It would be even better to
->> define the macro for data vq asid in this patch.
+>> Ok, the name looks a little bit confusing. I wonder if it's better to
+>> use shadow_cvq and shadow_data ?
 >>
-> I agree that it must be changed to a macro.
+> I'm ok with renaming it, but struct vhost_vdpa is generic across all
+> kind of devices, and it does not know if it is a datapath or not for
+> the moment.
 >
-> However, currently the _ASID macros belong to net/ . Maybe to declare
-> VHOST_VDPA_GPA_ASID in include/hw/virtio/vhost-vdpa.h and just let
-> VHOST_VDPA_NET_CVQ_ASID in net/vhost-vdpa.c?
->
-> Thanks!
+> Maybe listener_uses_iova_tree?
 
 
-That should be fine.
+I think "iova_tree" is something that is internal to svq implementation, 
+it's better to define the name from the view of vhost_vdpa level.
 
 Thanks
 
 
 >
->> Thanks
->>
->>
->>>    But the listener is
->>> actually mapping the ASID 0, not 1.
->>>
->>> Another alternative is to register it to the last data virtqueue, not
->>> the last queue of vhost_vdpa. But it is hard to express it in a
->>> generic way at virtio/vhost-vdpa.c . To have a boolean indicating the
->>> vhost_vdpa we want to register its memory listener?
->>>
->>> It seems easier to me to simply assign 0 at GPA translations. If SVQ
->>> is enabled for all queues, then 0 is GPA to qemu's VA + SVQ stuff. If
->>> it is not, 0 is always GPA to qemu's VA.
->>>
->>> Thanks!
->>>
->>>> Thanks
->>>>
->>>>>                                 vaddr, section->readonly);
->>>>>        if (ret) {
->>>>>            error_report("vhost vdpa map fail!");
->>>>> @@ -303,7 +311,7 @@ static void vhost_vdpa_listener_region_del(MemoryListener *listener,
->>>>>            vhost_iova_tree_remove(v->iova_tree, *result);
->>>>>        }
->>>>>        vhost_vdpa_iotlb_batch_begin_once(v);
->>>>> -    ret = vhost_vdpa_dma_unmap(v, iova, int128_get64(llsize));
->>>>> +    ret = vhost_vdpa_dma_unmap(v, 0, iova, int128_get64(llsize));
->>>>>        if (ret) {
->>>>>            error_report("vhost_vdpa dma unmap error!");
->>>>>        }
->>>>> @@ -884,7 +892,7 @@ static void vhost_vdpa_svq_unmap_ring(struct vhost_vdpa *v, hwaddr addr)
->>>>>        }
->>>>>
->>>>>        size = ROUND_UP(result->size, qemu_real_host_page_size());
->>>>> -    r = vhost_vdpa_dma_unmap(v, result->iova, size);
->>>>> +    r = vhost_vdpa_dma_unmap(v, v->address_space_id, result->iova, size);
->>>>>        if (unlikely(r < 0)) {
->>>>>            error_report("Unable to unmap SVQ vring: %s (%d)", g_strerror(-r), -r);
->>>>>            return;
->>>>> @@ -924,7 +932,8 @@ static bool vhost_vdpa_svq_map_ring(struct vhost_vdpa *v, DMAMap *needle,
->>>>>            return false;
->>>>>        }
->>>>>
->>>>> -    r = vhost_vdpa_dma_map(v, needle->iova, needle->size + 1,
->>>>> +    r = vhost_vdpa_dma_map(v, v->address_space_id, needle->iova,
->>>>> +                           needle->size + 1,
->>>>>                               (void *)(uintptr_t)needle->translated_addr,
->>>>>                               needle->perm == IOMMU_RO);
->>>>>        if (unlikely(r != 0)) {
->>>>> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
->>>>> index fb35b17ab4..ca1acc0410 100644
->>>>> --- a/net/vhost-vdpa.c
->>>>> +++ b/net/vhost-vdpa.c
->>>>> @@ -258,7 +258,7 @@ static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *addr)
->>>>>            return;
->>>>>        }
->>>>>
->>>>> -    r = vhost_vdpa_dma_unmap(v, map->iova, map->size + 1);
->>>>> +    r = vhost_vdpa_dma_unmap(v, v->address_space_id, map->iova, map->size + 1);
->>>>>        if (unlikely(r != 0)) {
->>>>>            error_report("Device cannot unmap: %s(%d)", g_strerror(r), r);
->>>>>        }
->>>>> @@ -298,8 +298,8 @@ static int vhost_vdpa_cvq_map_buf(struct vhost_vdpa *v, void *buf, size_t size,
->>>>>            return r;
->>>>>        }
->>>>>
->>>>> -    r = vhost_vdpa_dma_map(v, map.iova, vhost_vdpa_net_cvq_cmd_page_len(), buf,
->>>>> -                           !write);
->>>>> +    r = vhost_vdpa_dma_map(v, v->address_space_id, map.iova,
->>>>> +                           vhost_vdpa_net_cvq_cmd_page_len(), buf, !write);
->>>>>        if (unlikely(r < 0)) {
->>>>>            goto dma_map_err;
->>>>>        }
->>>>> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
->>>>> index 820dadc26c..0ad9390307 100644
->>>>> --- a/hw/virtio/trace-events
->>>>> +++ b/hw/virtio/trace-events
->>>>> @@ -30,8 +30,8 @@ vhost_user_write(uint32_t req, uint32_t flags) "req:%d flags:0x%"PRIx32""
->>>>>    vhost_user_create_notifier(int idx, void *n) "idx:%d n:%p"
->>>>>
->>>>>    # vhost-vdpa.c
->>>>> -vhost_vdpa_dma_map(void *vdpa, int fd, uint32_t msg_type, uint64_t iova, uint64_t size, uint64_t uaddr, uint8_t perm, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" uaddr: 0x%"PRIx64" perm: 0x%"PRIx8" type: %"PRIu8
->>>>> -vhost_vdpa_dma_unmap(void *vdpa, int fd, uint32_t msg_type, uint64_t iova, uint64_t size, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" type: %"PRIu8
->>>>> +vhost_vdpa_dma_map(void *vdpa, int fd, uint32_t msg_type, uint32_t asid, uint64_t iova, uint64_t size, uint64_t uaddr, uint8_t perm, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" asid: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" uaddr: 0x%"PRIx64" perm: 0x%"PRIx8" type: %"PRIu8
->>>>> +vhost_vdpa_dma_unmap(void *vdpa, int fd, uint32_t msg_type, uint32_t asid, uint64_t iova, uint64_t size, uint8_t type) "vdpa:%p fd: %d msg_type: %"PRIu32" asid: %"PRIu32" iova: 0x%"PRIx64" size: 0x%"PRIx64" type: %"PRIu8
->>>>>    vhost_vdpa_listener_begin_batch(void *v, int fd, uint32_t msg_type, uint8_t type)  "vdpa:%p fd: %d msg_type: %"PRIu32" type: %"PRIu8
->>>>>    vhost_vdpa_listener_commit(void *v, int fd, uint32_t msg_type, uint8_t type)  "vdpa:%p fd: %d msg_type: %"PRIu32" type: %"PRIu8
->>>>>    vhost_vdpa_listener_region_add(void *vdpa, uint64_t iova, uint64_t llend, void *vaddr, bool readonly) "vdpa: %p iova 0x%"PRIx64" llend 0x%"PRIx64" vaddr: %p read-only: %d"
->>>>> --
->>>>> 2.31.1
->>>>>
+> Thanks!
+>
 
