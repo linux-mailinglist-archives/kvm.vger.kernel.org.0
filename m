@@ -2,68 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D1CE62834E
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 15:56:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5234862835A
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 15:59:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237040AbiKNO4H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 09:56:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59598 "EHLO
+        id S236428AbiKNO7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 09:59:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237068AbiKNOz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 09:55:59 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA4092C103;
-        Mon, 14 Nov 2022 06:55:58 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.5) with ESMTP id 2AEEe01b016648;
-        Mon, 14 Nov 2022 14:55:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=fqKTGIO2jE8deoyOm/DWSJOF09dxfDZxr8vIhsAJle4=;
- b=fyRJC8akQniM25UdBBkTo3RNz2iN8SVoLEBe142d6baOO1AL7z+NW+RJQ6Y5GXQXEGek
- 0c/dUqmtLRTUowVHqaubf/UJp7LXPWPek1gG3OB0KwtjsxXkv8elricNW3vq5NW2njdb
- w/aEVWvlkpnNRbKA4XaPren5u6qLISCT/YhdywQz0C94RiIxJe32u8mnbhpB8xm2kgOL
- 8p+d9/g0Etb3VIzfMHmg4K/v9ff/eYctAfhu0KL2wK+5zlpts1TK4yrWgyTQxuaCYGeG
- 66JTPuRiPCsINqdu0fpDLF5t619/Z92WtRBp6zcKp6ZX55M8dd3wX21U6wenh9h6fxXx Yg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kuqmt0d5h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Nov 2022 14:55:29 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AEEefR5018422;
-        Mon, 14 Nov 2022 14:55:28 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kuqmt0d4t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Nov 2022 14:55:28 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AEEpDn0022586;
-        Mon, 14 Nov 2022 14:55:26 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma03dal.us.ibm.com with ESMTP id 3kt349hv8e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Nov 2022 14:55:26 +0000
-Received: from smtpav04.dal12v.mail.ibm.com ([9.208.128.131])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AEEtT6M65733038
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Nov 2022 14:55:29 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C55DB58052;
-        Mon, 14 Nov 2022 14:55:24 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C56DB58062;
-        Mon, 14 Nov 2022 14:55:21 +0000 (GMT)
-Received: from [9.160.3.49] (unknown [9.160.3.49])
-        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 14 Nov 2022 14:55:21 +0000 (GMT)
-Message-ID: <2890d53a-2437-c74c-2082-1ee29414878f@linux.ibm.com>
-Date:   Mon, 14 Nov 2022 09:55:21 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH v2 00/11] Connect VFIO to IOMMUFD
-To:     Jason Gunthorpe <jgg@nvidia.com>
+        with ESMTP id S236453AbiKNO7R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 09:59:17 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2058.outbound.protection.outlook.com [40.107.244.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 614006394;
+        Mon, 14 Nov 2022 06:59:16 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AcYrzJFFaDGciRm+nCGyewe6kgodYGTdxFlUmk49Nku30qrw9ommnchI3LCenj/d0HFOYZpgczSG5Ctm96/WWJnYjtkHre/I9y6yObBSlwt/vAtlRDXCBeSh/rw6KRtKs1P4HRbx7TDqEGSr6Ga2E21zQk+MKoh7JJwdfZdF7RgEvnhmQ1q211TQY055G1BWolV8ghkyLRQV3X56uG4PfZwWMmj201y2IPh1Bh4eLAsG352gW07wZf8Jddse0IrHpwknTwygsdiaFX4Efd/sUDoT2edTyCdi9/o74sDVKYqGQEa4dGjHcMtVpyfJRHxhFXbPatXqJi9TDbR5MQR2tA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hcHq69i/R3KFtpvlq0hyBzFJJ59bvQIvZC6vqOpV2OU=;
+ b=HlkaoUuh9WUlZs3YkxO894gl6ZFBQDdGMnOKkXTQfCYiXV5xJAaPxgR3lvvsl48izk0UOxcRymQBq57SBn5hHXOJwjGCbSAYz4Dd8JRT66n3QcjPCm5IhVEu3lbIcarPkdHOofu1gFF2uOhSpIhsiJ3OdOSyevJLC4/NLsN5ybI7DI/bIXcGAI5Z0nFS0oI/o8hlCOIq3Mv2eeEaRit6rejgeB++wOo99zTYIvI02YWVhCSerZZqU9iC43J0gpr1NKH1KXejxuuisYMCd+Bw7Qg+TVj3LnTZJbwRZHM6x9J+SUVq/VygR8tk4Js3ow6MriKJ3dZpxYrULAdRoaal0w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hcHq69i/R3KFtpvlq0hyBzFJJ59bvQIvZC6vqOpV2OU=;
+ b=MOCY271AHQikX3ZxQk4A/SJYt6c6FSUi+0pcyhM85tQDc+Jq2h7ipeORBC2z7lSwnMrozgAOAhKbyOadOKtZTazev2eu5+l90xb6ado05bk0lFQ44+BN4XJ6qIh57Bd0lX1gHKiTYv4OOc0+fKu7EHkYs83Vbga+t591U8lvIUEpBkCuV6nBBIlx7aVZIJ5bxVQPydF+NWqRVj6nrx8U4Oyl5/rnIw0D4ELB0bmYLgkG+0/CYxcw0RtoWfnNZv7rA3Uk57JlpPY5VQRTMI0kjqA2UpbRTJCMPeoopUDHPPud2AfFqLMfhuZYJELiE5gNQJYbXgbMlm5drIDINnRSKw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH7PR12MB5687.namprd12.prod.outlook.com (2603:10b6:510:13e::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.17; Mon, 14 Nov
+ 2022 14:59:14 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%7]) with mapi id 15.20.5813.017; Mon, 14 Nov 2022
+ 14:59:14 +0000
+Date:   Mon, 14 Nov 2022 10:59:13 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
 Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
         David Airlie <airlied@gmail.com>,
         Tony Krowiak <akrowiak@linux.ibm.com>,
@@ -101,85 +80,89 @@ Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
         Lu Baolu <baolu.lu@linux.intel.com>,
         Nicolin Chen <nicolinc@nvidia.com>,
         "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 00/11] Connect VFIO to IOMMUFD
+Message-ID: <Y3JXwd4sZJfm/Il2@nvidia.com>
 References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
  <f54c2a93-539f-4520-0561-fbe5cea7772f@linux.ibm.com>
  <Y3JPZwEHjGDU4Oyq@nvidia.com>
-Content-Language: en-US
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <Y3JPZwEHjGDU4Oyq@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: dBrd63fegQfRUKjt3UIsxah8kwhEL6ZM
-X-Proofpoint-GUID: dDymrDDZIbN5X0CC3sVQFV42JXGQNI1t
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-14_12,2022-11-11_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- suspectscore=0 impostorscore=0 adultscore=0 clxscore=1015
- lowpriorityscore=0 spamscore=0 priorityscore=1501 mlxscore=0 bulkscore=0
- mlxlogscore=792 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211140103
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+ <2890d53a-2437-c74c-2082-1ee29414878f@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2890d53a-2437-c74c-2082-1ee29414878f@linux.ibm.com>
+X-ClientProxiedBy: BL1PR13CA0411.namprd13.prod.outlook.com
+ (2603:10b6:208:2c2::26) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB5687:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6992e931-78a6-4340-8ec9-08dac650cb8a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: AHD5DTENRskcRS3rZ6cW0unLo9yE24E0Tehcki6S6yCx7fqWR74NdtxW8O0RWXsPlO+T9J+JS+p1HJRgM+peTKBDnSaAQt4A7e1O4Nw27loBiCAgG5Of2z5cC4i4JIuFUNBQUPRjRAGWmpSfmxJTwzwjGHIZO7ZyLgbAZc0nANpsVDB7JgJ3s7ft+Ja+36KUOCFW9g39VpDYj+J/hlVMoZkTpVbYSLARqcpii/TkrzNnrLV+Fjm5nREdhjglbWzqnVQeYJfpt8ZTMPRI0DCmPkgKzAatvmiU3bSf1yp2PzQ3dizt8iz59x/Z8GBul5rCIvcZDH1nPt2EK/c4wmqBbaWm4IoRq5PC79HQRwG8sNwzAZwZVofLZjMyenb6ClBuW7fJKoRtkX4pD/5XBYWeC5VHxc+s+pI8ngL6cQUZZi0I14MFo6e3FeccUGjtg49Uoyv/KUpHtR0P2W632X+vlyvfFJIMRyeGyhBXnRVflwPG/dBtrP3E3wQJsmRlInjRfVQrCmmnisSTvBxaSy6Mcz4+y8W0eMwhgvO6Vwlv7HepBo1SP2W3C7JeyKsW26Ah79MjxSXUG1JS1hu8i97+IJd9f9u6cdJ5MZTfXvWPxT7QsX+Vzoymy857PMEYFZkpTXOb+4gxdrIihR/mgKX8LHeifI1l9LFGK3exJbwXD8v6E74JVhxYZg3+RK/nFtaafUPVlndosaaCQYzA8Euevg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(39860400002)(396003)(366004)(136003)(376002)(451199015)(7406005)(4744005)(7416002)(8936002)(5660300002)(66476007)(8676002)(66556008)(41300700001)(4326008)(66946007)(316002)(54906003)(6916009)(36756003)(6486002)(26005)(6512007)(6506007)(478600001)(2616005)(186003)(2906002)(83380400001)(38100700002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9ssMh4Da/KpTmoeaMwDSQvY5ZhVLXnpRX8OYVeYwy9LWIqcxX3Ltub08l9UR?=
+ =?us-ascii?Q?8iKSCisU1/DMZnAlWmt8lPO2isKhQaW7pHCnqt7IuTqlc5D29X/ZwZhmwaWm?=
+ =?us-ascii?Q?5IAsUiIHjqSDUvKTXeoT9rSf58KpEKWn90PtN3aDZMXuH+aQ8qKsG6uQxJ8J?=
+ =?us-ascii?Q?8XqpuWCNTi0eDuScc8urz6UhYO2k/95/QvpsYyMLQuy9LeYtyVC1wEgqvoT/?=
+ =?us-ascii?Q?ARNhFOi9oTkNIiPfbi8rTyH0vNJKIFdqT+3Sr9vWnQP6eTZr0Pf0/H3rxV3U?=
+ =?us-ascii?Q?HMd82T4zNT21j4DVI1HcphFWKqxGbsai6szyj7oEQXwG+EabtRwtDFMtdrNq?=
+ =?us-ascii?Q?QfZER9QYD72LKAYGHhGBRA965wuh1NBcPAKsaJNV2faScQnyXgk1UclwMcKP?=
+ =?us-ascii?Q?taOXmBVRhr8Jz7j1eiQQQWN9FXK2hGbKGIUoGOFvRwCQE89kNLzFrqYLlC9i?=
+ =?us-ascii?Q?N7VVrH6ksiCFfGDVORTJqtiKvtVPPh/OtmmH3jsHDjqMhuMz+LH/Lv/LaAlk?=
+ =?us-ascii?Q?2H4j5S/cJeP4ik9Bx0an0U5A58K5vkqZX9o2fiU3O7cNIUJqRA3DVR6IDJmF?=
+ =?us-ascii?Q?oFgExer/fewCqQZd5aSqaNfh/Y476jjyuKZiCGg3g3+zOxef8/tydMFWaKqL?=
+ =?us-ascii?Q?/s0MnV/yqhVxDKb0xsmfuP0Xf9CS+6sTHNnF4tfk1/O5uxDuzN3mTKKUjftg?=
+ =?us-ascii?Q?zPhXEM8m7pYKBpUR02gpfArHBkBJYh1UjX7jImLd44NzZhA8dU6sAr6tuEJ9?=
+ =?us-ascii?Q?sjbszLuFd78WG5OL+bB5m0MOxhUAmBotuAfuVQKkCopL2+1TeoqaaWqp0Gfh?=
+ =?us-ascii?Q?P+UDFGIJp1uA55UBhSiMl2qQ7P6d9ZEz2u+juJeoFha1sEmM87wcdHb37Puq?=
+ =?us-ascii?Q?COz7vtKEH20XqQ661WrgulXYK/aifnh71mlqqmEVGCj67DaifaA4B/6yQyD8?=
+ =?us-ascii?Q?WzPuFiZaqBZI9Fx7xoerTL3j4GOVcA6U+c00pfd7TsLeum9CCIoClKWroMQ2?=
+ =?us-ascii?Q?/YOCqIi1F/S1NGurzVqCWLxzcgCyMuygvgbgM3cE6me/o1KIIircj1OuZ9mg?=
+ =?us-ascii?Q?pFlxURLIdoH0a5twNojbRX1Lw3v6HwA5RgIJNOmTHg/fzENbsVi/vQvtEYjn?=
+ =?us-ascii?Q?rx3whiLBnHJD/Z5WsgrqWW8lWC4P8unvewKwpkzvGN9MGfMi28V1EKg8U/31?=
+ =?us-ascii?Q?KvPHwYYUo1qFMyftJ9U8yf2fGseA9ce+XuarsTrsKWCWC1AQOpH+5BabqZgJ?=
+ =?us-ascii?Q?ma9LVGCN8DURu9EcF7tOLt36oN8g5Qv9I+EFA6nj/EwYiCfGp7vYQNmH54pq?=
+ =?us-ascii?Q?dMwnz9qs7do8smtNBYb2nYCGt268xTNnjpQgo2TAoPwcXlUGHG3e9XY1Y5gD?=
+ =?us-ascii?Q?vkjTJf7CRr6ltA+d61OhKEyh38Q45DOUaD5MPWsKSq8fc5V2OoiNotqFNVWp?=
+ =?us-ascii?Q?mRX37P1liw2wkaDbtMcfpfBaOnLFmwfA3iLNNblTro1WAkfiVT7hM8VV7GtL?=
+ =?us-ascii?Q?HxSUAHNOUiy5I7pHmdV9PZE0FDMH3ka+a7HKINOS5ecRgHvUujzmO/4Q6f6E?=
+ =?us-ascii?Q?Ojuea8w/s+egdZpwTmU=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6992e931-78a6-4340-8ec9-08dac650cb8a
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2022 14:59:14.4009
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: beVLXJPTWV9Vi9RX7z/KzWtr4QUUCyew+PpPHsMnMbHqyZTiZqnL4zAh0KYchw55
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5687
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/14/22 9:23 AM, Jason Gunthorpe wrote:
-> On Thu, Nov 10, 2022 at 10:01:13PM -0500, Matthew Rosato wrote:
->> On 11/7/22 7:52 PM, Jason Gunthorpe wrote:
->>> This series provides an alternative container layer for VFIO implemented
->>> using iommufd. This is optional, if CONFIG_IOMMUFD is not set then it will
->>> not be compiled in.
->>>
->>> At this point iommufd can be injected by passing in a iommfd FD to
->>> VFIO_GROUP_SET_CONTAINER which will use the VFIO compat layer in iommufd
->>> to obtain the compat IOAS and then connect up all the VFIO drivers as
->>> appropriate.
->>>
->>> This is temporary stopping point, a following series will provide a way to
->>> directly open a VFIO device FD and directly connect it to IOMMUFD using
->>> native ioctls that can expose the IOMMUFD features like hwpt, future
->>> vPASID and dynamic attachment.
->>>
->>> This series, in compat mode, has passed all the qemu tests we have
->>> available, including the test suites for the Intel GVT mdev. Aside from
->>> the temporary limitation with P2P memory this is belived to be fully
->>> compatible with VFIO.
->>
->> AFAICT there is no equivalent means to specify
->> vfio_iommu_type1.dma_entry_limit when using iommufd; looks like
->> we'll just always get the default 65535.
+On Mon, Nov 14, 2022 at 09:55:21AM -0500, Matthew Rosato wrote:
+> >> AFAICT there is no equivalent means to specify
+> >> vfio_iommu_type1.dma_entry_limit when using iommufd; looks like
+> >> we'll just always get the default 65535.
+> > 
+> > No, there is no arbitary limit on iommufd
 > 
-> No, there is no arbitary limit on iommufd
+> Yeah, that's what I suspected.  But FWIW, userspace checks the
+> advertised limit via VFIO_IOMMU_GET_INFO /
+> VFIO_IOMMU_TYPE1_INFO_DMA_AVAIL, and this is still being advertised
+> as 65535 when using iommufd.  I don't think there is a defined way
+> to return 'ignore this value'.
 
-Yeah, that's what I suspected.  But FWIW, userspace checks the advertised limit via VFIO_IOMMU_GET_INFO / VFIO_IOMMU_TYPE1_INFO_DMA_AVAIL, and this is still being advertised as 65535 when using iommufd.  I don't think there is a defined way to return 'ignore this value'. 
+Is something using this? Should we make it much bigger?
 
-This should go away later when we bind to iommufd directly since QEMU would not be sharing the type1 codepath in userspace. 
-
-> 
->> Was this because you envision the limit being not applicable for
->> iommufd (limits will be enforced via either means and eventually we
->> won't want to ) or was it an oversight?
-> 
-> The limit here is primarily about limiting userspace abuse of the
-> interface.
-> 
-> iommufd is using GFP_KERNEL_ACCOUNT which shifts the responsiblity to
-> cgroups, which is similar to how KVM works.
-> 
-> So, for a VM sandbox you'd set a cgroup limit and if a hostile
-> userspace in the sanbox decides to try to OOM the system it will hit
-> that limit, regardless of which kernel APIs it tries to abuse.
-> 
-> This work is not entirely complete as we also need the iommu driver to
-> use GFP_KERNEL_ACCOUNT for allocations connected to the iommu_domain,
-> particularly for allocations of the IO page tables themselves - which
-> can be quite big.
-> 
-> Jason
-
+Jason
