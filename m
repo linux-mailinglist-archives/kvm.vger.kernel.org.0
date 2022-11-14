@@ -2,128 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 337EF6283C9
-	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 16:22:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C30426283DD
+	for <lists+kvm@lfdr.de>; Mon, 14 Nov 2022 16:29:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236019AbiKNPWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 10:22:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47486 "EHLO
+        id S236399AbiKNP3P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 10:29:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234078AbiKNPWu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 10:22:50 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53D751FCEB;
-        Mon, 14 Nov 2022 07:22:49 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.5) with ESMTP id 2AEFHMr7005097;
-        Mon, 14 Nov 2022 15:21:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=/Z1ovYZEh50gAU/VDhHQTeJLnVQKYU8Bz/YxvyJhsrc=;
- b=BtXFdoq8w/tLgRG9MgZvfmbltvdE8NU9syTmC0EeARe6GIWyMYcZ3T6QwtEKNKIJReV1
- cBrkuxBg5fb0Q+4mmDS1rbVu6uKE8udpbz4IUnQVwPFrQ3wwpQa1vh8hMwxNZLdtGnIT
- e0sCx/U2Aqo43RkDj7tlVp8pCCf3diigWlT2yCYdbYqnyjtwlh6yFTUmvdo84G4EURbi
- focoEW/DIGmVMVYIlPiv4e7v0+1SJJxlJBoUUk4HtTWwFqG7UQRZJLyF8TdPPLOpoviO
- J9fP8HBBwk54zHx+/PuNTPZDdVWfYahBO7ubdoaY42EkZp0Bg0O+oTCv/M5mumlQO0iT yw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kur6e82bj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Nov 2022 15:21:57 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AEFHmUD006072;
-        Mon, 14 Nov 2022 15:21:56 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kur6e82b2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Nov 2022 15:21:56 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AEFLH0S002920;
-        Mon, 14 Nov 2022 15:21:55 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma03dal.us.ibm.com with ESMTP id 3kt349j2m7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Nov 2022 15:21:55 +0000
-Received: from smtpav04.dal12v.mail.ibm.com ([9.208.128.131])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AEFLw7b62980488
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Nov 2022 15:21:58 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7585658052;
-        Mon, 14 Nov 2022 15:21:53 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 67AA95805A;
-        Mon, 14 Nov 2022 15:21:50 +0000 (GMT)
-Received: from [9.160.3.49] (unknown [9.160.3.49])
-        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 14 Nov 2022 15:21:50 +0000 (GMT)
-Message-ID: <5ab00688-aa61-171c-13b4-e9aea7a6a09d@linux.ibm.com>
-Date:   Mon, 14 Nov 2022 10:21:50 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH v2 00/11] Connect VFIO to IOMMUFD
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Airlie <airlied@gmail.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        with ESMTP id S236934AbiKNP2z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 10:28:55 -0500
+Received: from wnew3-smtp.messagingengine.com (wnew3-smtp.messagingengine.com [64.147.123.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19A79E09C;
+        Mon, 14 Nov 2022 07:28:52 -0800 (PST)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailnew.west.internal (Postfix) with ESMTP id BD4962B067C3;
+        Mon, 14 Nov 2022 10:28:48 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Mon, 14 Nov 2022 10:28:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1668439728; x=1668446928; bh=Nk
+        bbGytzJ7I7fdZjJ8Fl0BV2oDQacMuRT8wrkqNypwg=; b=L+fg9psCjGWR+Q4jar
+        Mh8WPN0CCVKtE8QULFZl/REBBGfEYLOoG5tTfwzN2fLvRfihDZ0CUPaHxOTUYHgN
+        +f0XudZX5n2uU9Zk262NyzcpFGRRDtJoWAoc8JwvaQmfWt8ENHQA6z/bl7D7zv1j
+        stjmAjSQgumSVaN7IVmX7VjTeL7anz0EPhVYEJbMwNJF0wgd5r6RGPz80nDeGRIS
+        5U9ySXNkmdE/w/yBigY3Rx3yFbACIc4cb0hBrdw/YOLobVtkqXvHu1Wc+/Tc+Mo0
+        TsAi0HYkU2U+JWkiZhU99J/Rd1WejZwmC3+i8aR3e2dYkVY3CF08l1y9hbmQUXj5
+        XQoA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; t=1668439728; x=1668446928; bh=NkbbGytzJ7I7fdZjJ8Fl0BV2oDQa
+        cMuRT8wrkqNypwg=; b=OSToxW/AKRZaXNJ4BEd/AfCajCfbDqN1unwhNaXMlb9t
+        gBO67tNkQ7mqXA1AQ+PhqQadLiKZ6cu5xEbfTKv1UtTrVeWL9sP4ytoewiuSj1Ks
+        BBC694bRwD2HHIJeQSaeEBV2jt9gSr7nEGve1a7AVzb3q2yf7pOa1kMcencyzD/z
+        3DFaSyJ7bmfdtINjvmK8PGAsAt9Yq9t5XdVVz6oLDmHHq+3tD+atDSuLlkEUfNWG
+        r0CU0ehV3Oq8cdxwsBSBfEkWuWaYR8G1HRnSlk1MucqsgCqrtCknz01vR9JGWymU
+        ec23kvRXthssYr0nlcCFXMk42bb8tf09b03GWaO3aQ==
+X-ME-Sender: <xms:r15yY_0QRYhyAkn-aGlVslxWDhm_9bvHMBd6L_bA6_qmkRguiYaqfg>
+    <xme:r15yY-Gl3WluqhzR5HczYZyXS396xm8TKAb-aw0uzyy_Lwjlq_FFDx78c9GcSLxVg
+    omFr3Xg_KAP38qJKcY>
+X-ME-Received: <xmr:r15yY_4eNDfu6njZp1k19j2OAE3egUL8KFpHjFGbrTkXA6fmmfh5gR4fdxZPNA5MVmYq0A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrgedvgdehtdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttddttddttddvnecuhfhrohhmpedfmfhirhhi
+    lhhlucetrdcuufhhuhhtvghmohhvfdcuoehkihhrihhllhesshhhuhhtvghmohhvrdhnrg
+    hmvgeqnecuggftrfgrthhtvghrnhephfeigefhtdefhedtfedthefghedutddvueehtedt
+    tdehjeeukeejgeeuiedvkedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepkhhirhhilhhlsehshhhuthgvmhhovhdrnhgrmhgv
+X-ME-Proxy: <xmx:r15yY03SFHC1V2ev4RxYj9TRgPZ9wbV1HZ2kMPfVye6Ouoozly-5pA>
+    <xmx:r15yYyF9Dk-M3xacDgcx9XiIc2UyNRI_n1wX8zQbg2MGr7E4GWvUYA>
+    <xmx:r15yY1-J6Sa29ay92N9akyCSYEV3nNXagqOnIPGeHpRBz_8zvlV44w>
+    <xmx:sF5yY3QIa2TGTJD3XJpjfYjCXVPw48yakbN9YPL0_2IRk6C7cvZVbImWW3U>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 14 Nov 2022 10:28:46 -0500 (EST)
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id 18B2A109875; Mon, 14 Nov 2022 18:28:43 +0300 (+03)
+Date:   Mon, 14 Nov 2022 18:28:43 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Vlastimil Babka <vbabka@suse.cz>
+Cc:     Michael Roth <michael.roth@amd.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Will Deacon <will@kernel.org>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
- <f54c2a93-539f-4520-0561-fbe5cea7772f@linux.ibm.com>
- <Y3JPZwEHjGDU4Oyq@nvidia.com>
- <2890d53a-2437-c74c-2082-1ee29414878f@linux.ibm.com>
- <Y3JXwd4sZJfm/Il2@nvidia.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <Y3JXwd4sZJfm/Il2@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: GAIJeCod5S4Fb_X4JFlyEbCg5Huv7a9e
-X-Proofpoint-GUID: 8gBKnPNxv1dolpQF6DJK7SrP9tixHzI1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-14_12,2022-11-11_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- lowpriorityscore=0 impostorscore=0 mlxlogscore=999 mlxscore=0
- suspectscore=0 phishscore=0 priorityscore=1501 adultscore=0 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211140107
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        mhocko@suse.com, Muchun Song <songmuchun@bytedance.com>,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v9 1/8] mm: Introduce memfd_restricted system call to
+ create restricted user memory
+Message-ID: <20221114152843.ylxe4dis254vrj5u@box.shutemov.name>
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <20221025151344.3784230-2-chao.p.peng@linux.intel.com>
+ <20221031174738.fklhlia5fmaiinpe@amd.com>
+ <20221101113729.GA4015495@chaop.bj.intel.com>
+ <20221101151944.rhpav47pdulsew7l@amd.com>
+ <20a11042-2cfb-8f42-9d80-6672e155ca2c@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20a11042-2cfb-8f42-9d80-6672e155ca2c@suse.cz>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
         SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -131,23 +119,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/14/22 9:59 AM, Jason Gunthorpe wrote:
-> On Mon, Nov 14, 2022 at 09:55:21AM -0500, Matthew Rosato wrote:
->>>> AFAICT there is no equivalent means to specify
->>>> vfio_iommu_type1.dma_entry_limit when using iommufd; looks like
->>>> we'll just always get the default 65535.
->>>
->>> No, there is no arbitary limit on iommufd
->>
->> Yeah, that's what I suspected.  But FWIW, userspace checks the
->> advertised limit via VFIO_IOMMU_GET_INFO /
->> VFIO_IOMMU_TYPE1_INFO_DMA_AVAIL, and this is still being advertised
->> as 65535 when using iommufd.  I don't think there is a defined way
->> to return 'ignore this value'.
+On Mon, Nov 14, 2022 at 03:02:37PM +0100, Vlastimil Babka wrote:
+> On 11/1/22 16:19, Michael Roth wrote:
+> > On Tue, Nov 01, 2022 at 07:37:29PM +0800, Chao Peng wrote:
+> >> > 
+> >> >   1) restoring kernel directmap:
+> >> > 
+> >> >      Currently SNP (and I believe TDX) need to either split or remove kernel
+> >> >      direct mappings for restricted PFNs, since there is no guarantee that
+> >> >      other PFNs within a 2MB range won't be used for non-restricted
+> >> >      (which will cause an RMP #PF in the case of SNP since the 2MB
+> >> >      mapping overlaps with guest-owned pages)
+> >> 
+> >> Has the splitting and restoring been a well-discussed direction? I'm
+> >> just curious whether there is other options to solve this issue.
+> > 
+> > For SNP it's been discussed for quite some time, and either splitting or
+> > removing private entries from directmap are the well-discussed way I'm
+> > aware of to avoid RMP violations due to some other kernel process using
+> > a 2MB mapping to access shared memory if there are private pages that
+> > happen to be within that range.
+> > 
+> > In both cases the issue of how to restore directmap as 2M becomes a
+> > problem.
+> > 
+> > I was also under the impression TDX had similar requirements. If so,
+> > do you know what the plan is for handling this for TDX?
+> > 
+> > There are also 2 potential alternatives I'm aware of, but these haven't
+> > been discussed in much detail AFAIK:
+> > 
+> > a) Ensure confidential guests are backed by 2MB pages. shmem has a way to
+> >    request 2MB THP pages, but I'm not sure how reliably we can guarantee
+> >    that enough THPs are available, so if we went that route we'd probably
+> >    be better off requiring the use of hugetlbfs as the backing store. But
+> >    obviously that's a bit limiting and it would be nice to have the option
+> >    of using normal pages as well. One nice thing with invalidation
+> >    scheme proposed here is that this would "Just Work" if implement
+> >    hugetlbfs support, so an admin that doesn't want any directmap
+> >    splitting has this option available, otherwise it's done as a
+> >    best-effort.
+> > 
+> > b) Implement general support for restoring directmap as 2M even when
+> >    subpages might be in use by other kernel threads. This would be the
+> >    most flexible approach since it requires no special handling during
+> >    invalidations, but I think it's only possible if all the CPA
+> >    attributes for the 2M range are the same at the time the mapping is
+> >    restored/unsplit, so some potential locking issues there and still
+> >    chance for splitting directmap over time.
 > 
-> Is something using this? Should we make it much bigger?
+> I've been hoping that
+> 
+> c) using a mechanism such as [1] [2] where the goal is to group together
+> these small allocations that need to increase directmap granularity so
+> maximum number of large mappings are preserved.
 
-Yes, s390 when doing lazy unmapping likes to use larger amounts of concurrent DMA, so there can be cases where we want to raise this limit.
+As I mentioned in the other thread the restricted memfd can be backed by
+secretmem instead of plain memfd. It already handles directmap with care.
 
-The initial value of 65535 is already pretty arbitrary (U16_MAX) -- If iommufd is doing its own management and this value becomes deprecated in this scenario, and we can't set it to a magic value that says 'ignore me' then maybe it just makes sense for now to set it arbitrarily larger when using iommufd e.g. U32_MAX?
+But I don't think it has to be part of initial restricted memfd
+implementation. It is SEV-specific requirement and AMD folks can extend
+implementation as needed later.
 
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
