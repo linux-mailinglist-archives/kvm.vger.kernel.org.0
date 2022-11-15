@@ -2,201 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 729876294DB
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 10:53:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BFDD86295BD
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 11:25:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238131AbiKOJx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 04:53:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44754 "EHLO
+        id S232523AbiKOKZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 05:25:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbiKOJxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 04:53:25 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D08AB201AB;
-        Tue, 15 Nov 2022 01:53:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668506002; x=1700042002;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=4aNJ2YOK3rk2Xxfz14Mm6Z9Et6IN8H9Ru4xzr7aFyfQ=;
-  b=iEHP5yrylc3dN9Ft4O9vX6CY9FcWopVW6KOkWSPVuv0oX1dd7oyzUBDq
-   OWSp+OfxYERu57A0erLFuuAIS5Ga69Wx6/JYzpKfzXfxGs3dprdJB99lY
-   4M4KMjVkXI9VJNPg/gA+gtIK5CrYxGHClFkAywLl0J1SrzonF9U07a1jW
-   vMOPMWnDdWLk93DeS8377PwC6/v+Nmu9e2VaP1/VDkyzPCCqTifnQAsoA
-   UFLsbaLVdJYtw9NRS/skND0r4+aAzXXSRqIftHPZfjZjTf3ebffnpI0FN
-   3taijOhfsTw80pkPoEQ+tS45J3MGxl4bW2O0s5QmKYEXhuAuXPNpnMOYi
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="314021391"
-X-IronPort-AV: E=Sophos;i="5.96,165,1665471600"; 
-   d="scan'208";a="314021391"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2022 01:53:22 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="702376949"
-X-IronPort-AV: E=Sophos;i="5.96,165,1665471600"; 
-   d="scan'208";a="702376949"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by fmsmga008.fm.intel.com with ESMTP; 15 Nov 2022 01:53:11 -0800
-Date:   Tue, 15 Nov 2022 17:48:46 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Vlastimil Babka <vbabka@suse.cz>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        mhocko@suse.com, Muchun Song <songmuchun@bytedance.com>,
-        wei.w.wang@intel.com
-Subject: Re: [PATCH v9 1/8] mm: Introduce memfd_restricted system call to
- create restricted user memory
-Message-ID: <20221115094846.GB338422@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <20221025151344.3784230-2-chao.p.peng@linux.intel.com>
- <20221031174738.fklhlia5fmaiinpe@amd.com>
- <20221101113729.GA4015495@chaop.bj.intel.com>
- <20221101151944.rhpav47pdulsew7l@amd.com>
- <20a11042-2cfb-8f42-9d80-6672e155ca2c@suse.cz>
- <20221114152843.ylxe4dis254vrj5u@box.shutemov.name>
- <20221114221632.5xaz24adkghfjr2q@amd.com>
+        with ESMTP id S229634AbiKOKZr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 05:25:47 -0500
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E079EB4AF
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 02:25:46 -0800 (PST)
+Received: by mail-ot1-x330.google.com with SMTP id 46-20020a9d0631000000b00666823da25fso8300222otn.0
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 02:25:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=2t/5Fwa+kcrVYytVyoGhwhA0LJjVEpVh4ghi2At6TpQ=;
+        b=CEem9Gsy++2rAsQ/k1o5liFOA2uPpAASYqhA6AnuHXBHfXB4od6axyNPZtCv6GEK53
+         5ykhhjViwhhCa62lVWXsEvwATbyPa/8qHDk7ndWMqu/hopblMmBOBNK94HetZnzbdqR2
+         vuDFPvgX4MSsDRkycRv/VfG+ZJFx8q6ppWO/TYWasr3cFfxjWEgiVIzipQ7EaTg2lSru
+         X0P5dR5HnaBMEV+K3U9/shsubjx3F28hkyHoSOgDZ1ogfigVwM4VIANbkdOxbIiwRMG0
+         5IB0isoBbrvsZZsT4ToVtecXCu5+TSmm6j/5iVMQwQaamAcAKLa6sBSzeZZOq0Y/NxQy
+         tRaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2t/5Fwa+kcrVYytVyoGhwhA0LJjVEpVh4ghi2At6TpQ=;
+        b=M6pZJJigxCIsYgPh5pgQDor1lVSU7FCkDBrdMQ//chixyCL56fGBw316akFjclln/Q
+         8ZUhK0dwT2U2r5KM8ruV70XSEwOvRD06m0zB+kH/PGbA+tw+FXCaqW7ceaw7aSWKC0g3
+         Ahw0lapa99jc3roFjpVorNqFOjYrYSkRDLpsTu63/pUcXYTMOhQwldOX/ihPeQtkCD9D
+         u97/P1Xpsg5OtWaTjU9vKRD4YdFL7U6EPwd95L/x7fxPaVpHyaEov0CF0cLC+/7v0fnh
+         RsT0F262HJtQAEpv/4Ipedhnj9Ku3vulFfXvh8TPxWLKwe6U8iAhhr7E6HPri/ypPkJp
+         3klg==
+X-Gm-Message-State: ANoB5pm2H61syRZyuJ2YCX25kjlx9OOPFGWW+q6BKshtkR6QGDSOQ1qL
+        jgBbfzyHC26wU3dlMy8IEWtGyZFUcJCLeIBMr56Ctg==
+X-Google-Smtp-Source: AA0mqf5VuYJHPM+V6ecnOYF/+hnmZj0D7vizVbqN/Zav7eTQIgtl+v3njMF45IQfXgvQoS+y1N/AHOPDG2c8OcZCMKk=
+X-Received: by 2002:a9d:32f:0:b0:66c:7982:2d45 with SMTP id
+ 44-20020a9d032f000000b0066c79822d45mr8358758otv.123.1668507946033; Tue, 15
+ Nov 2022 02:25:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221114221632.5xaz24adkghfjr2q@amd.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <200906190927.34831.borntraeger@de.ibm.com> <20221112161942.3197544-1-dvyukov@google.com>
+ <20221114080345-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20221114080345-mutt-send-email-mst@kernel.org>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Tue, 15 Nov 2022 11:25:35 +0100
+Message-ID: <CACT4Y+bsjzCvYvVWoHM2GNC1CuR4xDoqjD5WSPkv=oWq+WAt4A@mail.gmail.com>
+Subject: Re: [PATCH/RFC] virtio_test: A module for testing virtio via userspace
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     borntraeger@de.ibm.com, virtualization@lists.linux-foundation.org,
+        syzkaller <syzkaller@googlegroups.com>,
+        KVM list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 14, 2022 at 04:16:32PM -0600, Michael Roth wrote:
-> On Mon, Nov 14, 2022 at 06:28:43PM +0300, Kirill A. Shutemov wrote:
-> > On Mon, Nov 14, 2022 at 03:02:37PM +0100, Vlastimil Babka wrote:
-> > > On 11/1/22 16:19, Michael Roth wrote:
-> > > > On Tue, Nov 01, 2022 at 07:37:29PM +0800, Chao Peng wrote:
-> > > >> > 
-> > > >> >   1) restoring kernel directmap:
-> > > >> > 
-> > > >> >      Currently SNP (and I believe TDX) need to either split or remove kernel
-> > > >> >      direct mappings for restricted PFNs, since there is no guarantee that
-> > > >> >      other PFNs within a 2MB range won't be used for non-restricted
-> > > >> >      (which will cause an RMP #PF in the case of SNP since the 2MB
-> > > >> >      mapping overlaps with guest-owned pages)
-> > > >> 
-> > > >> Has the splitting and restoring been a well-discussed direction? I'm
-> > > >> just curious whether there is other options to solve this issue.
-> > > > 
-> > > > For SNP it's been discussed for quite some time, and either splitting or
-> > > > removing private entries from directmap are the well-discussed way I'm
-> > > > aware of to avoid RMP violations due to some other kernel process using
-> > > > a 2MB mapping to access shared memory if there are private pages that
-> > > > happen to be within that range.
-> > > > 
-> > > > In both cases the issue of how to restore directmap as 2M becomes a
-> > > > problem.
-> > > > 
-> > > > I was also under the impression TDX had similar requirements. If so,
-> > > > do you know what the plan is for handling this for TDX?
-> > > > 
-> > > > There are also 2 potential alternatives I'm aware of, but these haven't
-> > > > been discussed in much detail AFAIK:
-> > > > 
-> > > > a) Ensure confidential guests are backed by 2MB pages. shmem has a way to
-> > > >    request 2MB THP pages, but I'm not sure how reliably we can guarantee
-> > > >    that enough THPs are available, so if we went that route we'd probably
-> > > >    be better off requiring the use of hugetlbfs as the backing store. But
-> > > >    obviously that's a bit limiting and it would be nice to have the option
-> > > >    of using normal pages as well. One nice thing with invalidation
-> > > >    scheme proposed here is that this would "Just Work" if implement
-> > > >    hugetlbfs support, so an admin that doesn't want any directmap
-> > > >    splitting has this option available, otherwise it's done as a
-> > > >    best-effort.
-> > > > 
-> > > > b) Implement general support for restoring directmap as 2M even when
-> > > >    subpages might be in use by other kernel threads. This would be the
-> > > >    most flexible approach since it requires no special handling during
-> > > >    invalidations, but I think it's only possible if all the CPA
-> > > >    attributes for the 2M range are the same at the time the mapping is
-> > > >    restored/unsplit, so some potential locking issues there and still
-> > > >    chance for splitting directmap over time.
-> > > 
-> > > I've been hoping that
-> > > 
-> > > c) using a mechanism such as [1] [2] where the goal is to group together
-> > > these small allocations that need to increase directmap granularity so
-> > > maximum number of large mappings are preserved.
-> > 
-> > As I mentioned in the other thread the restricted memfd can be backed by
-> > secretmem instead of plain memfd. It already handles directmap with care.
-> 
-> It looks like it would handle direct unmapping/cleanup nicely, but it
-> seems to lack fallocate(PUNCH_HOLE) support which we'd probably want to
-> avoid additional memory requirements. I think once we added that we'd
-> still end up needing some sort of handling for the invalidations.
-> 
-> Also, I know Chao has been considering hugetlbfs support, I assume by
-> leveraging the support that already exists in shmem. Ideally SNP would
-> be able to make use of that support as well, but relying on a separate
-> backend seems likely to result in more complications getting there
-> later.
-> 
-> > 
-> > But I don't think it has to be part of initial restricted memfd
-> > implementation. It is SEV-specific requirement and AMD folks can extend
-> > implementation as needed later.
-> 
-> Admittedly the suggested changes to the invalidation mechanism made a
-> lot more sense to me when I was under the impression that TDX would have
-> similar requirements and we might end up with a common hook. Since that
-> doesn't actually seem to be the case, it makes sense to try to do it as
-> a platform-specific hook for SNP.
-> 
-> I think, given a memslot, a GFN range, and kvm_restricted_mem_get_pfn(),
-> we should be able to get the same information needed to figure out whether
-> the range is backed by huge pages or not. I'll see how that works out
-> instead.
+On Mon, 14 Nov 2022 at 14:06, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Sat, Nov 12, 2022 at 05:19:42PM +0100, Dmitry Vyukov wrote:
+> > I am looking for a test module that allows
+> > to create a transient virtio device that can be used to activate a virtio
+> > driver are communicate with it as if from the host.
+> > Does such thing exist already?
+> > Or how are virtio transports/drivers tested/fuzzed nowadays?
+> >
+> > Thanks
+>
+> Just coding it up in qemu is probably easiest.  This is how we test
+> most things.
 
-Sounds a viable solution, just that kvm_restricted_mem_get_pfn() will
-only give you the ability to check a page, not a range. But you can
-still call it many times I think.
+This works for some testing scenarios, but has important downsides:
+ - fixed number of global virtio devices, so tests are not
+hermetic/parallel and proper fuzzing is impossible
+ - tests running inside of the kernel can't control the device
+behavior, so lots of scenarios are untestable/unfuzzable
+ - not suitable for most CI/fuzzing systems that run in clouds (nested
+virt is very slow)
+ - require special setup per test suite (not scalable for CI/fuzzing
+systems that test all of kernel)
 
-The invalidation callback will be still needed, it gives you the chance
-to do the restoring.
+A better and flexible approach to stub devices is to implement them
+inside of the kernel and allow creation of new transient instances
+(e.g. /dev/net/tun). Such stubs allow proper fuzzing, allow
+self-contained tests, allow the test to control stub behavior and are
+compatible with all machines (cloud, physical hw).
 
-Chao
-> 
-> Thanks,
-> 
-> Mike
-> 
-> > 
-> > -- 
-> >   Kiryl Shutsemau / Kirill A. Shutemov
+Is my understanding of how such in-kernel stub device can be
+implemented correct?
+A stub driver could create struct virtio_device and call
+register_virtio_device() directly skipping all of the bus/probing
+code.
+The virtio_device implementation will be parallel to virtio_mmio/pci
+and implement its own virtio_config_ops and notify/kick callback.
+This will allow us to test all of the virtio device drivers (console,
+balloon, virtio sound/gpu, etc), but not the virtio_mmio/pci nor the
+real probing code.
+
+Is there a reasonable way to also test virtio_mmio/pci/probing from
+within the kernel?
