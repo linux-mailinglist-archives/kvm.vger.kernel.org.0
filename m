@@ -2,318 +2,374 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CAEB7629711
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:17:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFCDA629747
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:21:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230375AbiKOLRV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 06:17:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54018 "EHLO
+        id S229930AbiKOLVu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 06:21:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232544AbiKOLQc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 06:16:32 -0500
-Received: from mail-wm1-x349.google.com (mail-wm1-x349.google.com [IPv6:2a00:1450:4864:20::349])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B05D21BEB3
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:30 -0800 (PST)
-Received: by mail-wm1-x349.google.com with SMTP id c1-20020a7bc001000000b003cfe40fca79so1148077wmb.6
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RrwzRsB22pRwqfA6j+FOYGMh9VZ422ekWmaxzemiqxQ=;
-        b=Slp7czprnwmYuZ415Tpi7Ar8cf0xmT3saibucqgkljWMwisDYhB8IylzI3jvbakIkK
-         197ZHBFwH8avTYXwIS+gIpUU5yhvU4TEn0jVsAAigBPiIXsQDPQW6iE+BDmsFhjXDowu
-         SLd66Ucil0UFwbsURF6Ae5J+Sl18SVhduaNtockidnm6FNm23QWxMLScwIAbV9GdJ0Na
-         0h8ozf56B+AhoDuV13QWJc4sjz4chg3KdGLFFijzGFp9GaCvBiiFeAT1wX0EeeW0iRRk
-         hRpCnqmiTxFt652sdI4uG/jKT8ai/gCup+OJ83sTgp6xrS9fKDNSQZj4d3jesm0JNePp
-         Bc4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RrwzRsB22pRwqfA6j+FOYGMh9VZ422ekWmaxzemiqxQ=;
-        b=gNSx22iko5COVIaMjemfp4SngJ9sEaj0RYiMeLeP2e2m3o2KSG9NYxdQm52gJcfV6o
-         tOjsicFbLaxF2PQSfO0tU6upUpCnr3t45xm5pmzp/rU5Vd/zodsXN1dGoOCHAvQ1bIkt
-         5nsJKxZ8faEb6cj9MEKlHn6AdX5FnzhLNdUbbYPqphbIXNOIpFz8tWNz2Ze2gwKYeE8T
-         eG/eyKBDJ+wVCcmfyNmkXR2ShXpk2rkbrbq7GKeUkU+cHvsdpzoGeF4dcwmovWgbvFHC
-         0SLYNgnsiztRavp+FL93CwHy4HCH/9qPcVyQ/ERu0Ru54XiCKoDwRjtwCtyv21hLN1tT
-         nbcg==
-X-Gm-Message-State: ANoB5pkSrvpA/mLD+cy2D7K5ukF2QfwU+PZqikmbjaGnbHbDHGbgo7k0
-        UXZJNAuHvP9cSSsf3O32qx/ZndNfiSo/JcyrYB9wdPAKvQFbdOGbBI0yEr+JGn6radYf1ufmG1/
-        D2ak8RDIaf5BBVmmTfxpUZUThZRdRPcihOSqCcrA0qF/AJRlApL/eyP0=
-X-Google-Smtp-Source: AA0mqf4DPzMK2Ddtk7GAom5Xpda1Ji5kjnD6ltgEtOTk2ID6j31UQC3Y3382smQQNTmAlKxlME5yNKfQag==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:adf:f508:0:b0:22e:5149:441d with SMTP id
- q8-20020adff508000000b0022e5149441dmr10245660wro.661.1668510989265; Tue, 15
- Nov 2022 03:16:29 -0800 (PST)
-Date:   Tue, 15 Nov 2022 11:15:49 +0000
-In-Reply-To: <20221115111549.2784927-1-tabba@google.com>
-Mime-Version: 1.0
-References: <20221115111549.2784927-1-tabba@google.com>
-X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221115111549.2784927-18-tabba@google.com>
-Subject: [PATCH kvmtool v1 17/17] Pass the memory file descriptor and offset
- when registering ram
-From:   Fuad Tabba <tabba@google.com>
-To:     kvm@vger.kernel.org
-Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
-        alexandru.elisei@arm.com, will@kernel.org, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S237965AbiKOLVa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 06:21:30 -0500
+Received: from smtpout2.mo529.mail-out.ovh.net (smtpout2.mo529.mail-out.ovh.net [79.137.123.220])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4777EDF6
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:21:29 -0800 (PST)
+Received: from mxplan5.mail.ovh.net (unknown [10.108.1.111])
+        by mo529.mail-out.ovh.net (Postfix) with ESMTPS id A3B9C13ECD2B1;
+        Tue, 15 Nov 2022 12:21:26 +0100 (CET)
+Received: from kaod.org (37.59.142.102) by DAG4EX2.mxp5.local (172.16.2.32)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Tue, 15 Nov
+ 2022 12:21:25 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-102R0042edbf7ec-9577-408d-b2b2-3fc11dfe2b36,
+                    4108EF7A520F6C47CD43A20CA0BA38D18DA47D40) smtp.auth=clg@kaod.org
+X-OVh-ClientIp: 82.64.250.170
+Message-ID: <10b55b2a-e736-6aeb-8265-6758ca83213c@kaod.org>
+Date:   Tue, 15 Nov 2022 12:21:24 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH v11 04/11] s390x/cpu topology: reporting the CPU topology
+ to the guest
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, <qemu-s390x@nongnu.org>
+CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
+        <pasic@linux.ibm.com>, <richard.henderson@linaro.org>,
+        <david@redhat.com>, <thuth@redhat.com>, <cohuck@redhat.com>,
+        <mst@redhat.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <ehabkost@redhat.com>, <marcel.apfelbaum@gmail.com>,
+        <eblake@redhat.com>, <armbru@redhat.com>, <seiden@linux.ibm.com>,
+        <nrb@linux.ibm.com>, <scgl@linux.ibm.com>, <frankja@linux.ibm.com>,
+        <berrange@redhat.com>
+References: <20221103170150.20789-1-pmorel@linux.ibm.com>
+ <20221103170150.20789-5-pmorel@linux.ibm.com>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+In-Reply-To: <20221103170150.20789-5-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.102]
+X-ClientProxiedBy: DAG3EX2.mxp5.local (172.16.2.22) To DAG4EX2.mxp5.local
+ (172.16.2.32)
+X-Ovh-Tracer-GUID: 0acc4f91-31ea-496a-bcd8-e8dbc2a3d87a
+X-Ovh-Tracer-Id: 8517995748307471315
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvgedrgeeggddvjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfhisehtjeertddtfeejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepuedutdetleegjefhieekgeffkefhleevgfefjeevffejieevgeefhefgtdfgiedtnecukfhppeduvdejrddtrddtrddupdefjedrheelrddugedvrddutddvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepuddvjedrtddrtddruddpmhgrihhlfhhrohhmpeeotghlgheskhgrohgurdhorhhgqedpnhgspghrtghpthhtohepuddprhgtphhtthhopehpmhhorhgvlheslhhinhhugidrihgsmhdrtghomhdpshgtghhlsehlihhnuhigrdhisghmrdgtohhmpdhnrhgssehlihhnuhigrdhisghmrdgtohhmpdhsvghiuggvnheslhhinhhugidrihgsmhdrtghomhdprghrmhgsrhhusehrvgguhhgrthdrtghomhdpvggslhgrkhgvsehrvgguhhgrthdrtghomhdpmhgrrhgtvghlrdgrphhfvghlsggruhhmsehgmhgrihhlrdgtohhmpdgvhhgrsghkohhsthesrhgvughhrghtrdgtohhmpdhkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
+ hfrhgrnhhkjhgrsehlihhnuhigrdhisghmrdgtohhmpdhpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdgtohhhuhgtkhesrhgvughhrghtrdgtohhmpdhthhhuthhhsehrvgguhhgrthdrtghomhdpuggrvhhiugesrhgvughhrghtrdgtohhmpdhrihgthhgrrhgurdhhvghnuggvrhhsohhnsehlihhnrghrohdrohhrghdpphgrshhitgeslhhinhhugidrihgsmhdrtghomhdpsghorhhnthhrrggvghgvrhesuggvrdhisghmrdgtohhmpdhqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgpdhqvghmuhdqshefledtgiesnhhonhhgnhhurdhorhhgpdhmshhtsehrvgguhhgrthdrtghomhdpsggvrhhrrghnghgvsehrvgguhhgrthdrtghomhdpoffvtefjohhsthepmhhohedvledpmhhouggvpehsmhhtphhouhht
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since the memory file descriptor is the canonical reference to guest
-memory, pass that and the offset when registering guest memory.
-Future fd-based kvm proposals might even not require a userspace
-address [*].
+Hello Pierre,
 
-No functional change intended.
+On 11/3/22 18:01, Pierre Morel wrote:
+> The guest can use the STSI instruction to get a buffer filled
+> with the CPU topology description.
+> 
+> Let us implement the STSI instruction for the basis CPU topology
+> level, level 2.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   include/hw/s390x/cpu-topology.h |   6 ++
+>   target/s390x/cpu.h              |  77 ++++++++++++++++++++++++
+>   hw/s390x/cpu-topology.c         |   1 -
+>   target/s390x/cpu_topology.c     | 100 ++++++++++++++++++++++++++++++++
+>   target/s390x/kvm/kvm.c          |   6 +-
+>   target/s390x/meson.build        |   1 +
+>   6 files changed, 189 insertions(+), 2 deletions(-)
+>   create mode 100644 target/s390x/cpu_topology.c
+> 
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+> index 4e16a2153d..6fec10e032 100644
+> --- a/include/hw/s390x/cpu-topology.h
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -16,6 +16,11 @@
+>   #define S390_TOPOLOGY_CPU_IFL 0x03
+>   #define S390_TOPOLOGY_MAX_ORIGIN ((63 + S390_MAX_CPUS) / 64)
+>   
+> +#define S390_TOPOLOGY_POLARITY_HORIZONTAL      0x00
+> +#define S390_TOPOLOGY_POLARITY_VERTICAL_LOW    0x01
+> +#define S390_TOPOLOGY_POLARITY_VERTICAL_MEDIUM 0x02
+> +#define S390_TOPOLOGY_POLARITY_VERTICAL_HIGH   0x03
+> +
+>   typedef struct S390TopoSocket {
+>       int active_count;
+>       uint64_t mask[S390_TOPOLOGY_MAX_ORIGIN];
+> @@ -26,6 +31,7 @@ struct S390Topology {
+>       uint32_t nr_cpus;
+>       uint32_t nr_sockets;
+>       S390TopoSocket *socket;
+> +    bool topology_needed;
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
 
-[*] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.intel.com/
----
- arm/aarch64/pvtime.c |  2 +-
- arm/kvm.c            |  3 ++-
- hw/cfi_flash.c       |  4 +++-
- hw/vesa.c            |  2 +-
- include/kvm/kvm.h    | 17 +++++++++--------
- kvm.c                |  3 ++-
- mips/kvm.c           |  6 +++---
- powerpc/kvm.c        |  2 +-
- riscv/kvm.c          |  2 +-
- vfio/core.c          |  3 ++-
- x86/kvm.c            |  6 +++---
- 11 files changed, 28 insertions(+), 22 deletions(-)
+This is unused in this patch. Introduced too soon ?
 
-diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-index a7ba03e..9b06ee4 100644
---- a/arm/aarch64/pvtime.c
-+++ b/arm/aarch64/pvtime.c
-@@ -28,7 +28,7 @@ static int pvtime__alloc_region(struct kvm *kvm)
- 	}
- 
- 	ret = kvm__register_ram(kvm, ARM_PVTIME_BASE,
--				ARM_PVTIME_SIZE, mem);
-+				ARM_PVTIME_SIZE, mem, mem_fd, 0);
- 	if (ret) {
- 		munmap(mem, ARM_PVTIME_SIZE);
- 		close(mem_fd);
-diff --git a/arm/kvm.c b/arm/kvm.c
-index 5cceef8..8772a55 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -50,7 +50,8 @@ void kvm__init_ram(struct kvm *kvm)
- 	phys_start	= kvm->cfg.ram_addr;
- 	phys_size	= kvm->ram_size;
- 
--	err = kvm__register_ram(kvm, phys_start, phys_size, kvm->ram_start);
-+	err = kvm__register_ram(kvm, phys_start, phys_size, kvm->ram_start,
-+		kvm->ram_fd, 0);
- 	if (err)
- 		die("Failed to register %lld bytes of memory at physical "
- 		    "address 0x%llx [err %d]", phys_size, phys_start, err);
-diff --git a/hw/cfi_flash.c b/hw/cfi_flash.c
-index 7faecdf..92a6567 100644
---- a/hw/cfi_flash.c
-+++ b/hw/cfi_flash.c
-@@ -131,6 +131,7 @@ struct cfi_flash_device {
- 	u32			size;
- 
- 	void			*flash_memory;
-+	int			flash_fd;
- 	u8			program_buffer[PROGRAM_BUFF_SIZE];
- 	unsigned long		*lock_bm;
- 	u64			block_address;
-@@ -451,7 +452,7 @@ static int map_flash_memory(struct kvm *kvm, struct cfi_flash_device *sfdev)
- 	int ret;
- 
- 	ret = kvm__register_mem(kvm, sfdev->base_addr, sfdev->size,
--				sfdev->flash_memory,
-+				sfdev->flash_memory, sfdev->flash_fd, 0,
- 				KVM_MEM_TYPE_RAM | KVM_MEM_TYPE_READONLY);
- 	if (!ret)
- 		sfdev->is_mapped = true;
-@@ -583,6 +584,7 @@ static struct cfi_flash_device *create_flash_device_file(struct kvm *kvm,
- 		ret = -errno;
- 		goto out_free;
- 	}
-+	sfdev->flash_fd = fd;
- 	sfdev->base_addr = KVM_FLASH_MMIO_BASE;
- 	sfdev->state = READY;
- 	sfdev->read_mode = READ_ARRAY;
-diff --git a/hw/vesa.c b/hw/vesa.c
-index 522ffa3..277d638 100644
---- a/hw/vesa.c
-+++ b/hw/vesa.c
-@@ -102,7 +102,7 @@ struct framebuffer *vesa__init(struct kvm *kvm)
- 		goto close_memfd;
- 	}
- 
--	r = kvm__register_dev_mem(kvm, VESA_MEM_ADDR, VESA_MEM_SIZE, mem);
-+	r = kvm__register_dev_mem(kvm, VESA_MEM_ADDR, VESA_MEM_SIZE, mem, mem_fd, 0);
- 	if (r < 0)
- 		goto unmap_dev;
- 
-diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-index f0be524..33cae9d 100644
---- a/include/kvm/kvm.h
-+++ b/include/kvm/kvm.h
-@@ -135,24 +135,25 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
- bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
- int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
- int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
--		      enum kvm_mem_type type);
-+		      int memfd, u64 offset, enum kvm_mem_type type);
- static inline int kvm__register_ram(struct kvm *kvm, u64 guest_phys, u64 size,
--				    void *userspace_addr)
-+				    void *userspace_addr, int memfd, u64 offset)
- {
--	return kvm__register_mem(kvm, guest_phys, size, userspace_addr,
--				 KVM_MEM_TYPE_RAM);
-+	return kvm__register_mem(kvm, guest_phys, size, userspace_addr, memfd,
-+				 offset, KVM_MEM_TYPE_RAM);
- }
- 
- static inline int kvm__register_dev_mem(struct kvm *kvm, u64 guest_phys,
--					u64 size, void *userspace_addr)
-+					u64 size, void *userspace_addr,
-+					int memfd, u64 offset)
- {
--	return kvm__register_mem(kvm, guest_phys, size, userspace_addr,
--				 KVM_MEM_TYPE_DEVICE);
-+	return kvm__register_mem(kvm, guest_phys, size, userspace_addr, memfd,
-+				 offset, KVM_MEM_TYPE_DEVICE);
- }
- 
- static inline int kvm__reserve_mem(struct kvm *kvm, u64 guest_phys, u64 size)
- {
--	return kvm__register_mem(kvm, guest_phys, size, NULL,
-+	return kvm__register_mem(kvm, guest_phys, size, NULL, -1, 0,
- 				 KVM_MEM_TYPE_RESERVED);
- }
- 
-diff --git a/kvm.c b/kvm.c
-index a1eb365..0c6ed3d 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -256,7 +256,8 @@ out:
- }
- 
- int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
--		      void *userspace_addr, enum kvm_mem_type type)
-+		      void *userspace_addr, int memfd, u64 offset,
-+		      enum kvm_mem_type type)
- {
- 	struct kvm_mem_bank *merged = NULL;
- 	struct kvm_mem_bank *bank;
-diff --git a/mips/kvm.c b/mips/kvm.c
-index 0a0d025..ebb2b19 100644
---- a/mips/kvm.c
-+++ b/mips/kvm.c
-@@ -38,21 +38,21 @@ void kvm__init_ram(struct kvm *kvm)
- 		phys_size  = kvm->ram_size;
- 		host_mem   = kvm->ram_start;
- 
--		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-+		kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
- 	} else {
- 		/* one region for memory that fits below MMIO range */
- 		phys_start = 0;
- 		phys_size  = KVM_MMIO_START;
- 		host_mem   = kvm->ram_start;
- 
--		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-+		kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
- 
- 		/* one region for rest of memory */
- 		phys_start = KVM_MMIO_START + KVM_MMIO_SIZE;
- 		phys_size  = kvm->ram_size - KVM_MMIO_START;
- 		host_mem   = kvm->ram_start + KVM_MMIO_START;
- 
--		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-+		kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
- 	}
- }
- 
-diff --git a/powerpc/kvm.c b/powerpc/kvm.c
-index 8d467e9..c36c497 100644
---- a/powerpc/kvm.c
-+++ b/powerpc/kvm.c
-@@ -88,7 +88,7 @@ void kvm__init_ram(struct kvm *kvm)
- 		    "overlaps MMIO!\n",
- 		    phys_size);
- 
--	kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-+	kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
- }
- 
- void kvm__arch_set_cmdline(char *cmdline, bool video)
-diff --git a/riscv/kvm.c b/riscv/kvm.c
-index 4a2a3df..bb79c5d 100644
---- a/riscv/kvm.c
-+++ b/riscv/kvm.c
-@@ -38,7 +38,7 @@ void kvm__init_ram(struct kvm *kvm)
- 	phys_size	= kvm->ram_size;
- 	host_mem	= kvm->ram_start;
- 
--	err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-+	err = kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
- 	if (err)
- 		die("Failed to register %lld bytes of memory at physical "
- 		    "address 0x%llx [err %d]", phys_size, phys_start, err);
-diff --git a/vfio/core.c b/vfio/core.c
-index 3ff2c0b..ea189a0 100644
---- a/vfio/core.c
-+++ b/vfio/core.c
-@@ -255,7 +255,8 @@ int vfio_map_region(struct kvm *kvm, struct vfio_device *vdev,
- 	region->host_addr = base;
- 
- 	ret = kvm__register_dev_mem(kvm, region->guest_phys_addr, map_size,
--				    region->host_addr);
-+				    region->host_addr, vdev->fd,
-+				    region->info.offset);
- 	if (ret) {
- 		vfio_dev_err(vdev, "failed to register region with KVM");
- 		return ret;
-diff --git a/x86/kvm.c b/x86/kvm.c
-index 8d29904..cee82d3 100644
---- a/x86/kvm.c
-+++ b/x86/kvm.c
-@@ -107,7 +107,7 @@ void kvm__init_ram(struct kvm *kvm)
- 		phys_size  = kvm->ram_size;
- 		host_mem   = kvm->ram_start;
- 
--		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-+		kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
- 	} else {
- 		/* First RAM range from zero to the PCI gap: */
- 
-@@ -115,7 +115,7 @@ void kvm__init_ram(struct kvm *kvm)
- 		phys_size  = KVM_32BIT_GAP_START;
- 		host_mem   = kvm->ram_start;
- 
--		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-+		kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
- 
- 		/* Second RAM range from 4GB to the end of RAM: */
- 
-@@ -123,7 +123,7 @@ void kvm__init_ram(struct kvm *kvm)
- 		phys_size  = kvm->ram_size - phys_start;
- 		host_mem   = kvm->ram_start + phys_start;
- 
--		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-+		kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
- 	}
- }
- 
--- 
-2.38.1.431.g37b22c650d-goog
+  
+>   };
+>   
+>   #define TYPE_S390_CPU_TOPOLOGY "s390-topology"
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index c9066b2496..69a7523146 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -567,6 +567,81 @@ typedef union SysIB {
+>   } SysIB;
+>   QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
+>   
+> +/*
+> + * CPU Topology List provided by STSI with fc=15 provides a list
+> + * of two different Topology List Entries (TLE) types to specify
+> + * the topology hierarchy.
+> + *
+> + * - Container Topology List Entry
+> + *   Defines a container to contain other Topology List Entries
+> + *   of any type, nested containers or CPU.
+> + * - CPU Topology List Entry
+> + *   Specifies the CPUs position, type, entitlement and polarization
+> + *   of the CPUs contained in the last Container TLE.
+> + *
+> + * There can be theoretically up to five levels of containers, QEMU
+> + * uses only one level, the socket level.
+> + *
+> + * A container of with a nesting level (NL) greater than 1 can only
+> + * contain another container of nesting level NL-1.
+> + *
+> + * A container of nesting level 1 (socket), contains as many CPU TLE
+> + * as needed to describe the position and qualities of all CPUs inside
+> + * the container.
+> + * The qualities of a CPU are polarization, entitlement and type.
+> + *
+> + * The CPU TLE defines the position of the CPUs of identical qualities
+> + * using a 64bits mask which first bit has its offset defined by
+> + * the CPU address orgin field of the CPU TLE like in:
+> + * CPU address = origin * 64 + bit position within the mask
+> + *
+> + */
+> +/* Container type Topology List Entry */
+> +typedef struct SysIBTl_container {
+> +        uint8_t nl;
+> +        uint8_t reserved[6];
+> +        uint8_t id;
+> +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_container;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_container) != 8);
+> +
+> +/* CPU type Topology List Entry */
+> +typedef struct SysIBTl_cpu {
+> +        uint8_t nl;
+> +        uint8_t reserved0[3];
+> +        uint8_t reserved1:5;
+> +        uint8_t dedicated:1;
+> +        uint8_t polarity:2;
+> +        uint8_t type;
+> +        uint16_t origin;
+> +        uint64_t mask;
+> +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_cpu;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) != 16);
+> +
+> +#define S390_TOPOLOGY_MAG  6
+> +#define S390_TOPOLOGY_MAG6 0
+> +#define S390_TOPOLOGY_MAG5 1
+> +#define S390_TOPOLOGY_MAG4 2
+> +#define S390_TOPOLOGY_MAG3 3
+> +#define S390_TOPOLOGY_MAG2 4
+> +#define S390_TOPOLOGY_MAG1 5
+> +/* Configuration topology */
+> +typedef struct SysIB_151x {
+> +    uint8_t  reserved0[2];
+> +    uint16_t length;
+> +    uint8_t  mag[S390_TOPOLOGY_MAG];
+> +    uint8_t  reserved1;
+> +    uint8_t  mnest;
+> +    uint32_t reserved2;
+> +    char tle[0];
+> +} QEMU_PACKED QEMU_ALIGNED(8) SysIB_151x;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIB_151x) != 16);
+> +
+> +/* Max size of a SYSIB structure is when all CPU are alone in a container */
+> +#define S390_TOPOLOGY_SYSIB_SIZE (sizeof(SysIB_151x) +                         \
+> +                                  S390_MAX_CPUS * (sizeof(SysIBTl_container) + \
+> +                                                   sizeof(SysIBTl_cpu)))
+> +
+> +
+>   /* MMU defines */
+>   #define ASCE_ORIGIN           (~0xfffULL) /* segment table origin             */
+>   #define ASCE_SUBSPACE         0x200       /* subspace group control           */
+> @@ -845,4 +920,6 @@ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
+>   
+>   #include "exec/cpu-all.h"
+>   
+> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar);
+> +
+>   #endif
+> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> index 6af41d3d7b..9fa8ca1261 100644
+> --- a/hw/s390x/cpu-topology.c
+> +++ b/hw/s390x/cpu-topology.c
+> @@ -44,7 +44,6 @@ void s390_topology_new_cpu(S390CPU *cpu)
+>       int socket_id;
+>   
+>       socket_id = core_id / topo->nr_cpus;
+> -
+
+Unnecessary change.
+
+Thanks,
+
+C.
+
+
+
+>       /*
+>        * At the core level, each CPU is represented by a bit in a 64bit
+>        * uint64_t which represent the presence of a CPU.
+> diff --git a/target/s390x/cpu_topology.c b/target/s390x/cpu_topology.c
+> new file mode 100644
+> index 0000000000..a1179d8e95
+> --- /dev/null
+> +++ b/target/s390x/cpu_topology.c
+> @@ -0,0 +1,100 @@
+> +/*
+> + * QEMU S390x CPU Topology
+> + *
+> + * Copyright IBM Corp. 2022
+> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "cpu.h"
+> +#include "hw/s390x/pv.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/s390x/cpu-topology.h"
+> +#include "hw/s390x/sclp.h"
+> +
+> +static char *fill_container(char *p, int level, int id)
+> +{
+> +    SysIBTl_container *tle = (SysIBTl_container *)p;
+> +
+> +    tle->nl = level;
+> +    tle->id = id;
+> +    return p + sizeof(*tle);
+> +}
+> +
+> +static char *fill_tle_cpu(char *p, uint64_t mask, int origin)
+> +{
+> +    SysIBTl_cpu *tle = (SysIBTl_cpu *)p;
+> +
+> +    tle->nl = 0;
+> +    tle->dedicated = 1;
+> +    tle->polarity = S390_TOPOLOGY_POLARITY_HORIZONTAL;
+> +    tle->type = S390_TOPOLOGY_CPU_IFL;
+> +    tle->origin = cpu_to_be64(origin * 64);
+> +    tle->mask = cpu_to_be64(mask);
+> +    return p + sizeof(*tle);
+> +}
+> +
+> +static char *s390_top_set_level2(S390Topology *topo, char *p)
+> +{
+> +    int i, origin;
+> +
+> +    for (i = 0; i < topo->nr_sockets; i++) {
+> +        if (!topo->socket[i].active_count) {
+> +            continue;
+> +        }
+> +        p = fill_container(p, 1, i);
+> +        for (origin = 0; origin < S390_TOPOLOGY_MAX_ORIGIN; origin++) {
+> +            uint64_t mask = 0L;
+> +
+> +            mask = topo->socket[i].mask[origin];
+> +            if (mask) {
+> +                p = fill_tle_cpu(p, mask, origin);
+> +            }
+> +        }
+> +    }
+> +    return p;
+> +}
+> +
+> +static int setup_stsi(S390CPU *cpu, SysIB_151x *sysib, int level)
+> +{
+> +    S390Topology *topo = (S390Topology *)cpu->topology;
+> +    char *p = sysib->tle;
+> +
+> +    sysib->mnest = level;
+> +    switch (level) {
+> +    case 2:
+> +        sysib->mag[S390_TOPOLOGY_MAG2] = topo->nr_sockets;
+> +        sysib->mag[S390_TOPOLOGY_MAG1] = topo->nr_cpus;
+> +        p = s390_top_set_level2(topo, p);
+> +        break;
+> +    }
+> +
+> +    return p - (char *)sysib;
+> +}
+> +
+> +#define S390_TOPOLOGY_MAX_MNEST 2
+> +
+> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar)
+> +{
+> +    union {
+> +        char place_holder[S390_TOPOLOGY_SYSIB_SIZE];
+> +        SysIB_151x sysib;
+> +    } buffer QEMU_ALIGNED(8);
+> +    int len;
+> +
+> +    if (s390_is_pv() || !s390_has_topology() ||
+> +        sel2 < 2 || sel2 > S390_TOPOLOGY_MAX_MNEST) {
+> +        setcc(cpu, 3);
+> +        return;
+> +    }
+> +
+> +    len = setup_stsi(cpu, &buffer.sysib, sel2);
+> +
+> +    buffer.sysib.length = cpu_to_be16(len);
+> +    s390_cpu_virt_mem_write(cpu, addr, ar, &buffer.sysib, len);
+> +    setcc(cpu, 0);
+> +}
+> +
+> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+> index 3ac7ec9acf..7dc96f3663 100644
+> --- a/target/s390x/kvm/kvm.c
+> +++ b/target/s390x/kvm/kvm.c
+> @@ -51,6 +51,7 @@
+>   #include "hw/s390x/s390-virtio-ccw.h"
+>   #include "hw/s390x/s390-virtio-hcall.h"
+>   #include "hw/s390x/pv.h"
+> +#include "hw/s390x/cpu-topology.h"
+>   
+>   #ifndef DEBUG_KVM
+>   #define DEBUG_KVM  0
+> @@ -1919,9 +1920,12 @@ static int handle_stsi(S390CPU *cpu)
+>           if (run->s390_stsi.sel1 != 2 || run->s390_stsi.sel2 != 2) {
+>               return 0;
+>           }
+> -        /* Only sysib 3.2.2 needs post-handling for now. */
+>           insert_stsi_3_2_2(cpu, run->s390_stsi.addr, run->s390_stsi.ar);
+>           return 0;
+> +    case 15:
+> +        insert_stsi_15_1_x(cpu, run->s390_stsi.sel2, run->s390_stsi.addr,
+> +                           run->s390_stsi.ar);
+> +        return 0;
+>       default:
+>           return 0;
+>       }
+> diff --git a/target/s390x/meson.build b/target/s390x/meson.build
+> index 84c1402a6a..890ccfa789 100644
+> --- a/target/s390x/meson.build
+> +++ b/target/s390x/meson.build
+> @@ -29,6 +29,7 @@ s390x_softmmu_ss.add(files(
+>     'sigp.c',
+>     'cpu-sysemu.c',
+>     'cpu_models_sysemu.c',
+> +  'cpu_topology.c',
+>   ))
+>   
+>   s390x_user_ss = ss.source_set()
 
