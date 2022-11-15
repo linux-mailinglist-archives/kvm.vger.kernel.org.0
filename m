@@ -2,116 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FCA6629302
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 09:12:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2C1A62936E
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 09:42:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232380AbiKOIME (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 03:12:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38778 "EHLO
+        id S232930AbiKOImw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 03:42:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232569AbiKOILz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 03:11:55 -0500
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D114B6306
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 00:11:53 -0800 (PST)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1668499911;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=HdmIUkOsbc0SLEpzSHddpL0douASw16AtuL4IcfFUoo=;
-        b=BBwnfdAI0eZdISle4nnLDlwm8Zc61V0cqBkn6IdchhyEnm8dPLPmuaMZeIKAAziI7dNQs9
-        /J4CA4EFUdsp4QYl8XXCIu+ancd0M/ug4s2FUwq3MqouKuUeHbK3ajyCP0NxTb06+wZ8p+
-        ob0cVig2uyNbWuS1k5cMGkxtZTZm7zs=
-From:   Guoqing Jiang <guoqing.jiang@linux.dev>
-Subject: kvm-unit-tests: inconsistent test result between run_tests.sh and
- standalone test
-To:     kvm@vger.kernel.org
-Message-ID: <9bf9defb-1482-8f8a-7e8e-d07ab2f51852@linux.dev>
-Date:   Tue, 15 Nov 2022 16:11:48 +0800
+        with ESMTP id S232816AbiKOImp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 03:42:45 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DA5B140B3;
+        Tue, 15 Nov 2022 00:42:44 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AF8e2b7016507;
+        Tue, 15 Nov 2022 08:42:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=AxfTlUSKDKgzTGxKC2vg1IAdhEC+Nz0PvMbt/LdbZqk=;
+ b=SftsNggrF0YZjql4kYd2bF4bwn7iYTKmT+8EMAk8im2d9/oecCGGUtmxx/PeBhLRbMjk
+ PfRc7qY/nSPY2l9Ct188ZCIls2x8269wAtRTttjJBBaleMCw1LwBumdlhe9KNMKjuE5I
+ r4genSdaFeMm+/4wXBqQEV7SI72KyjqJB6zd1GglJbeG/yWpoOUof5zEqdEZ3yNFNNn6
+ 66eqHZdkbvI2gT4klLsYFNTF/E2TEguzgxgrc/fg8mBZo7/WpC11qRgwNptR2x8lKS7E
+ Y3t/oHBT1npZmO90on+vGB5SEbUEVJUFvI4Wj+JqubTzWR4vKOKUe/gXK5Z677vbIokG pw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kv7f881n6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Nov 2022 08:42:43 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AF8eETK017447;
+        Tue, 15 Nov 2022 08:42:43 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kv7f881mq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Nov 2022 08:42:43 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AF8Zntn032489;
+        Tue, 15 Nov 2022 08:42:41 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3kt3492xgk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Nov 2022 08:42:40 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AF8gbx61704694
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Nov 2022 08:42:37 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 949A9A405F;
+        Tue, 15 Nov 2022 08:42:37 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 26A09A405B;
+        Tue, 15 Nov 2022 08:42:37 +0000 (GMT)
+Received: from [9.171.74.64] (unknown [9.171.74.64])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 15 Nov 2022 08:42:37 +0000 (GMT)
+Message-ID: <d9d73722-f1f5-3ba9-e9f5-538ee4f4ba2e@linux.ibm.com>
+Date:   Tue, 15 Nov 2022 09:42:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH v16 0/6] KVM: s390: pv: implement lazy destroy for reboot
 Content-Language: en-US
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, thuth@redhat.com, david@redhat.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        scgl@linux.ibm.com, seiden@linux.ibm.com, nrb@linux.ibm.com
+References: <20221111170632.77622-1-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20221111170632.77622-1-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9naloPUGpkJo60TRCQomBLb-eJJdilWU
+X-Proofpoint-ORIG-GUID: 3M_XFSOX-aPVB799sh7uUNtn4NcWO0jW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-15_04,2022-11-11_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1011
+ malwarescore=0 spamscore=0 adultscore=0 mlxscore=0 lowpriorityscore=0
+ mlxlogscore=816 impostorscore=0 bulkscore=0 priorityscore=1501
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211150058
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On 11/11/22 18:06, Claudio Imbrenda wrote:
+> Previously, when a protected VM was rebooted or when it was shut down,
+> its memory was made unprotected, and then the protected VM itself was
+> destroyed. Looping over the whole address space can take some time,
+> considering the overhead of the various Ultravisor Calls (UVCs). This
+> means that a reboot or a shutdown would take a potentially long amount
+> of time, depending on the amount of used memory.
+> 
 
-I find the two test results (pmu and intel_cet) are quite different, but 
-other
-test results are consistent.
+Well, this was a journey :)
 
-gjiang@x1:~/source/kvm-unit-tests> ./run_tests.sh
-...
-*PASS pmu (142 tests)*
-...
-*FAIL intel_cet*
-...
-
-1. pmu standalone test
-gjiang@x1:~/source/kvm-unit-tests/tests> ./pmu
-BUILD_HEAD=73d9d850
-timeout -k 1s --foreground 90s /usr/bin/qemu-system-x86_64 --no-reboot 
--nodefaults -device pc-testdev -device 
-isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device 
-pci-testdev -machine accel=kvm -kernel /tmp/tmp.Bai8UEIh2F -smp 1 -cpu 
-max # -initrd /tmp/tmp.DFE9VFPOdp
-enabling apic
-smp: waiting for 0 APs
-paging enabled
-cr0 = 80010011
-cr3 = 1007000
-cr4 = 20
-PMU version:         2
-GP counters:         4
-GP counter width:    48
-Mask length:         7
-Fixed counters:      3
-Fixed counter width: 48
-PASS: core cycles-0
-...
-FAIL: llc misses-0
-FAIL: llc misses-1
-FAIL: llc misses-2
-FAIL: llc misses-3
-...
-SUMMARY: 142 tests, 4 unexpected failures
-*FAIL pmu (142 tests, 4 unexpected failures)
-
-*And
-
-gjiang@x1:~/source/kvm-unit-tests> ./x86-run ./x86/pmu.flat
-/usr/bin/qemu-system-x86_64 --no-reboot -nodefaults -device pc-testdev 
--device isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio 
--device pci-testdev -machine accel=kvm -kernel ./x86/pmu.flat # -initrd 
-/tmp/tmp.jiEHps3KLW
-enabling apic
-smp: waiting for 0 APs
-paging enabled
-cr0 = 80010011
-cr3 = 1007000
-cr4 = 20
-*SKIP: No pmu is detected!**
-**SUMMARY: 1 tests, 1 skipped*
-
-**
-2. intel_cet
-gjiang@x1:~/source/kvm-unit-tests/tests> ./intel_cet
-BUILD_HEAD=73d9d850
-*skip intel_cet (test kernel not present)*
-
-Then I am not sure which test result should be correct, standalone test
-or run all tests. Or am I missed something fundamentally?
-
-Thanks for your reply in advance.
-
-Guoqing
+Thanks, picked
