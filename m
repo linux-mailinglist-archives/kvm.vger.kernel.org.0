@@ -2,123 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FE2662A435
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 22:36:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E72862A43E
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 22:38:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238722AbiKOVg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 16:36:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58162 "EHLO
+        id S238802AbiKOViy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 16:38:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238570AbiKOVgY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 16:36:24 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B7E424F3D;
-        Tue, 15 Nov 2022 13:36:23 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E1381336D8;
-        Tue, 15 Nov 2022 21:36:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1668548181; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dlenJjpDzLcxo3DWLnYtaPtdkt0KhciARPTv6BR7Ky0=;
-        b=uyz9uSIKl8YjXXq95m/Rf4xRo/PRtAeTRkaCCeBrmWSPpkSoisELGpK7ZgFz6Kq5XCA59C
-        1Ndo3iN/KK9/AJkawe5qcGBA0awBaGMbBKFAZwXXhtz9IStzhQWUOR7t+LlP9On03FYDpb
-        a5yb7XAMuslCgX2YMPKKmIH9rojuBZk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1668548181;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dlenJjpDzLcxo3DWLnYtaPtdkt0KhciARPTv6BR7Ky0=;
-        b=fHa3Wajmy0bbb5yUoFvoQZ5nhwtxA7CXUym/vI2atKyujCRdZmw1pxEsNypju/KTFtmiT5
-        Q8pFrKOGENR8HlAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C1C6A13A91;
-        Tue, 15 Nov 2022 21:36:21 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id dYfXLlUGdGMrMwAAMHmgww
-        (envelope-from <bp@suse.de>); Tue, 15 Nov 2022 21:36:21 +0000
-Date:   Tue, 15 Nov 2022 22:36:17 +0100
-From:   Borislav Petkov <bp@suse.de>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     thomas.lendacky@amd.com, Dionna Glaze <dionnaglaze@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Haowen Bai <baihaowen@meizu.com>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH V4] virt: sev: Prevent IV reuse in SNP guest driver
-Message-ID: <Y3QGUb0TVd2M9qow@zn.tnic>
-References: <20221103152318.88354-1-pgonda@google.com>
- <Y258U+8oF/eo14U+@zn.tnic>
- <CAMkAt6p2zXnE-ew+pJk_UpZAEFZFdCOPThNn3hSFqYOQG81t-g@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMkAt6p2zXnE-ew+pJk_UpZAEFZFdCOPThNn3hSFqYOQG81t-g@mail.gmail.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S238790AbiKOViw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 16:38:52 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D7D4F5AB
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 13:38:50 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id n12-20020a170902e54c00b00188515e81a6so12284663plf.23
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 13:38:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=svCMw+RaLDOYb1vqpYARG5pCSZevHShYbQvFoMbmBJQ=;
+        b=pwMbojnsCf9knVk3mY2LzdmP9u4GdT5s825DJV9W8WItQzHCXB3AZYTBakzggIR2zx
+         fNvtuTxYjykqA+Pw8MHuptNCqrR6sq43OfbBXFaslxfpCcz8ndxe8JmqzrV5XFX+XFWZ
+         OwGjjWsZcD1D1mQ4E6bA8GUpJS6jOFtYJLuA+NMzcL2DhUR8S+Ox9DRWhDmJLz1Ljqvl
+         j6w3T6PkAnd/sHMQlaswetwTJpoWzMY8+RwG4CKFS40vMzbxkK+UguvSwdkfTHbEjWtc
+         +BdbaZliRcFhWKsmaGoSULZdWrKF/v3TXb+kbAwlowS002KNmUVqjZMXP+JmVbncMQh7
+         iriA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=svCMw+RaLDOYb1vqpYARG5pCSZevHShYbQvFoMbmBJQ=;
+        b=sN5OAUJUPBPiudfRfuNObqcIvVAZm2J/w78QJXfOuVevhEDa/9EUjpYUCqgfJcnPJn
+         buhWRhnjJj5nNmwyNwOVvxkw9xtQuIFmd2CLCrL9NA4Yc0b6XUF2D9H7N+foWKy5g3hC
+         Uj5z+6+L1AvpvYoPzH3Z7tu3SAqpqwF50N8QoeMlBd1Qj6U7H094Z5P/hcAbrV18j8yb
+         S5OrhkgDs6kx8HlMUHUGt/FwaFve+TJzDmRfH5Br6HTLHtIVAsAAzVv5eOQQ8zVwyAJ6
+         xcPubWkoni0OScIIKKstG3xK3YNbfWhBoB1ag5zkM6rMRgO3QjsnWCDZ9tPCI0Nu0hYZ
+         8MRA==
+X-Gm-Message-State: ANoB5pnQ7SXe55ThkhboN0bRLkA6kdKFTnUkEGRYF/rLL96GhKqqQnkV
+        48m0QVQ/OzT89z0gU+O6a0RM+2Lm0m0ernte
+X-Google-Smtp-Source: AA0mqf6BP7srN54MyQo4D89SWDafzg4ksV4X4roYb3TAZUxWy47LFnZoHuAXkW20HFnCXSwLIUQDQ7WD3fGoV6I2
+X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
+ (user=vannapurve job=sendgmr) by 2002:a17:902:cec2:b0:17f:8a20:d9b5 with SMTP
+ id d2-20020a170902cec200b0017f8a20d9b5mr5918630plg.76.1668548329463; Tue, 15
+ Nov 2022 13:38:49 -0800 (PST)
+Date:   Tue, 15 Nov 2022 21:38:42 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
+Message-ID: <20221115213845.3348210-1-vannapurve@google.com>
+Subject: [V4 PATCH 0/3] Minor improvements to the selftest setup logic
+From:   Vishal Annapurve <vannapurve@google.com>
+To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     pbonzini@redhat.com, shuah@kernel.org, bgardon@google.com,
+        seanjc@google.com, oupton@google.com, peterx@redhat.com,
+        vkuznets@redhat.com, dmatlack@google.com, pgonda@google.com,
+        andrew.jones@linux.dev, Vishal Annapurve <vannapurve@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 14, 2022 at 02:11:48PM -0700, Peter Gonda wrote:
-> Thanks for detailed review. Working on cleaning up the text for a V5.
+This series is posted in context of the discussion at:
+https://lore.kernel.org/lkml/Ywa9T+jKUpaHLu%2Fl@google.com/
 
-Yeah, and I have some questions in my reply which you haven't
-addressed...
+Major changes:
+1) Move common startup logic to a single function in kvm_util.c
+2) Introduce following APIs:
+	kvm_selftest_arch_init: to perform arch specific common startup.
+	kvm_arch_vm_post_create: to perform arch specific common setup
+		after VM creation.
 
-> > > @@ -676,7 +712,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
-> > >       if (!snp_dev->response)
-> > >               goto e_free_request;
-> > >
-> > > -     snp_dev->certs_data = alloc_shared_pages(dev, SEV_FW_BLOB_MAX_SIZE);
-> > > +     snp_dev->certs_data = alloc_shared_pages(dev, sizeof(*snp_dev->certs_data));
-> >
-> > What's that change for?
-> >
-> > I went searching for that ->certs_data only ot realize that it is an
-> > array of size of SEV_FW_BLOB_MAX_SIZE elems.
-> 
-> Do you want this change reverted? I liked the extra readability of the
-> sizeof(*snp_dev->certs_data) but its unnecessary for this change.
+Changelog
+=========
+v4:
+* Removed the patch to precompute cpu type, will be introduced as part of
+  a separate series in future.
+v3:
+* Original series is split into two and this v3 version contains the
+  improvements to selftest and VM setup.
+  * Planning to upload the second series to execute hypercall
+    instruction according to cpu type separately.
+* Addressed comments from David and Sean.
+link to v3:
+https://lore.kernel.org/lkml/20221013121319.994170-1-vannapurve@google.com/
+v2:
+* Addressed comments from Andrew and David
+  * Common function with constructor attribute used to setup initial state
+  * Changes are split in more logical granules as per feedback
+link to v2:
+https://lore.kernel.org/all/20220915000448.1674802-1-vannapurve@google.com/
 
-Really?
+Vishal Annapurve (3):
+  KVM: selftests: move common startup logic to kvm_util.c
+  KVM: selftests: Add arch specific initialization
+  KVM: selftests: Add arch specific post vm creation hook
 
-I think using a define which is a SIZE define is better. Especially if
-you look at
-
-	sizeof(*snp_dev->certs_data)
-
-and wonder what type ->certs_data is.
-
-And it's not like it'll go out of sync since it is an array of size,
-well, SEV_FW_BLOB_MAX_SIZE.
-
-:-)
-
-Thx.
+ .../selftests/kvm/aarch64/arch_timer.c        |  3 ---
+ .../selftests/kvm/aarch64/hypercalls.c        |  2 --
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |  3 ---
+ .../selftests/kvm/include/kvm_util_base.h     |  9 ++++++++
+ .../selftests/kvm/lib/aarch64/processor.c     | 18 ++++++++--------
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 21 ++++++++++++++++---
+ .../selftests/kvm/lib/x86_64/processor.c      |  6 ++++++
+ .../testing/selftests/kvm/memslot_perf_test.c |  3 ---
+ tools/testing/selftests/kvm/rseq_test.c       |  3 ---
+ tools/testing/selftests/kvm/s390x/memop.c     |  2 --
+ tools/testing/selftests/kvm/s390x/resets.c    |  2 --
+ .../selftests/kvm/s390x/sync_regs_test.c      |  3 ---
+ .../selftests/kvm/set_memory_region_test.c    |  3 ---
+ .../kvm/x86_64/cr4_cpuid_sync_test.c          |  3 ---
+ .../kvm/x86_64/emulator_error_test.c          |  3 ---
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       |  3 ---
+ .../selftests/kvm/x86_64/platform_info_test.c |  3 ---
+ .../kvm/x86_64/pmu_event_filter_test.c        |  3 ---
+ .../selftests/kvm/x86_64/set_sregs_test.c     |  3 ---
+ .../kvm/x86_64/svm_nested_soft_inject_test.c  |  3 ---
+ .../selftests/kvm/x86_64/sync_regs_test.c     |  3 ---
+ .../selftests/kvm/x86_64/userspace_io_test.c  |  3 ---
+ .../kvm/x86_64/userspace_msr_exit_test.c      |  3 ---
+ 23 files changed, 42 insertions(+), 66 deletions(-)
 
 -- 
-Regards/Gruss,
-    Boris.
+2.38.1.431.g37b22c650d-goog
 
-SUSE Software Solutions Germany GmbH
-GF: Ivo Totev, Andrew Myers, Andrew McDonald, Martje Boudien Moerman
-(HRB 36809, AG Nürnberg)
