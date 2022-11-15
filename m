@@ -2,88 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ACCE629754
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:26:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18E47629759
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:28:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229803AbiKOL00 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 06:26:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33746 "EHLO
+        id S230297AbiKOL2E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 06:28:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiKOL0Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 06:26:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 814D223BF1
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:25:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668511523;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aT+b5dXBRecEAQJF15AlCAQC0KtlV1l6U/BfyOFECSo=;
-        b=KnyY3LkbCRRL5vOajaim+5Gxbcb8W/YJf8XqDpwBQgcdJlOdaLRK+JmIbHGsN0YveUbYBR
-        2QKgRWYKLlRHtmO62nA+1m1bnOX5A4iWDnUOfXXxWPxSNdNNKIEi83+cxUio8wrUeGsG8p
-        iz2eqNLRwQys0XdnltZI9oXlmbjphOM=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-134-XJZTV83JNI-BY8vxcSk6Gg-1; Tue, 15 Nov 2022 06:25:22 -0500
-X-MC-Unique: XJZTV83JNI-BY8vxcSk6Gg-1
-Received: by mail-pf1-f199.google.com with SMTP id u18-20020a627912000000b0056d93d8b8bdso7647246pfc.16
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:25:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aT+b5dXBRecEAQJF15AlCAQC0KtlV1l6U/BfyOFECSo=;
-        b=U+NVN7ClCEE9uFjYPPTN4eAGQ2i/qIpL9TldphlNFxQi0hW2D2O3IKUXR67uw/qVXK
-         c3lPFjiXncdSU82WLqjSp4Jsw1X+TpRdHQMCaJn+rI+2C0A9eCQK5dZoHj4SxTi9aZcC
-         c7Kkb8llm0CccUYxkuPyDpLDZN1zla6isirapySI9uA1T9QrN+hxtCwgqDoodIi7XsA6
-         TiwX2Wh5epA7LVLBviXGjHLASvIAsu3IIRxS7B5d2iPWjW/k912PRsHIJHkPmNp4UDy6
-         17Ht3DlMrkk17u0xMzNMCa5atfhJjaG5Nnp/vanTiKWysAwxBoF6F+7spkF8PoClpDq+
-         hn7w==
-X-Gm-Message-State: ANoB5pmYV3DIeX1JZTQ1uleNUdxbItCHYFALRZMsr0+i9Pq+AcHzuGle
-        vhxyKhcyrXZHce15rrhn9ycTezIiaQULuy7fGfw85xTV/5mecjZL8QKLOYoj78C1h2ilY3OmaWX
-        OK18h3FJaeg0yGSKtKjU6UbvJtFUc
-X-Received: by 2002:a17:90b:798:b0:213:13ab:c309 with SMTP id l24-20020a17090b079800b0021313abc309mr1779515pjz.80.1668511521276;
-        Tue, 15 Nov 2022 03:25:21 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf75DC/ANBkbLcI1U3nD5Wjv+wCNizfkP4cQfGY3YqL0gXsCfJ8k2JQJxXVXrDH/7b3Ghf5/RQz2lvP2qEiAb6Q=
-X-Received: by 2002:a17:90b:798:b0:213:13ab:c309 with SMTP id
- l24-20020a17090b079800b0021313abc309mr1779479pjz.80.1668511520980; Tue, 15
- Nov 2022 03:25:20 -0800 (PST)
-MIME-Version: 1.0
-References: <20221108170755.92768-1-eperezma@redhat.com> <20221108170755.92768-10-eperezma@redhat.com>
- <CACGkMEsr=fpbbOpUBHawt5DR+nTWcK1uMzXgorEcbijso1wsMQ@mail.gmail.com>
- <CAJaqyWemKoRNd6_uvFc79qYe+7pbavJSjnZuczxk5uxSZZdZ2Q@mail.gmail.com>
- <be553273-7c06-78f7-4d23-de9f46a210b1@redhat.com> <CAJaqyWeZWQgGm7XZ-+DBHNS4XW_-GgWeeOqTb82v__jS8ONRyQ@mail.gmail.com>
- <6a35e659-698e-ff71-fe9b-06e15809c9e4@redhat.com> <CAJaqyWeF7bNuu-e6g4RghBkc-5oqEAuaEVbJ9uDgGPWWsP36Lg@mail.gmail.com>
- <CACGkMEvvjC21XjMEwcv6QP=WKTH2Vh-3dfZkR6vVFi67SWYYvw@mail.gmail.com>
-In-Reply-To: <CACGkMEvvjC21XjMEwcv6QP=WKTH2Vh-3dfZkR6vVFi67SWYYvw@mail.gmail.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Tue, 15 Nov 2022 12:24:44 +0100
-Message-ID: <CAJaqyWdFsN1dEmMn92oOH_2cCEt1uYXunr876jd5EYBCXf+Xug@mail.gmail.com>
-Subject: Re: [PATCH v6 09/10] vdpa: Add listener_shadow_vq to vhost_vdpa
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     qemu-devel@nongnu.org, Parav Pandit <parav@mellanox.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Gautam Dawar <gdawar@xilinx.com>,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Cindy Lu <lulu@redhat.com>, Eli Cohen <eli@mellanox.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>, kvm@vger.kernel.org,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S229505AbiKOL2B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 06:28:01 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2053.outbound.protection.outlook.com [40.107.243.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3D7E23E9B
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:27:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PT5YE3pXFgS4l4RIxrHbTj/EZjHuIXghIfaYzozO8Q8EFboq5sMth/ewnD5yM+2HPoHVtoHLattYVZuwkITL3X8uUp4x9o/QxaCUHrv3ErSOb8C85uN94yJ/X9q75msKEShbk8k3JVhulRW97Fjy1h6gKrCgxEF+F7Z92ZFtnJvhhccI9oG/wStr2Urkw4fchRBzM27ljFVktMLxBc/w2Eqykj1J4+iF1uCcCcHRYNwn8ycnuSOWvCtdfQc8yl1gAYFTAV0CnSzidg5I+5zv47R0D5kWL0qvqzL9CqjNDO5WxeOid279/bmNNXCbRuT5FNvb46foOUctZmTd+H425g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6o38+sIf/GqUg8OeRHlpv3D1sUUxdxYGq+4P7zu0QQU=;
+ b=AAnST8Uo2QJc3WBbS9SyQmG6kYdQSlYs0dtXZXjrrWQsqkemRGFXBsTBAmiIddXSoedi7PQIZaS3g/7iAMEF3w2GOyVEpjtkUqLc6qRK0FBA/Lfqa2jOHzOeqV5dOy22TxDDqzC0+vig+P+6P+vJxthsSRiwLGrUgQk3KJ080ZdYDSLRSs+olM1AD90RjxIb3oujEH+6sbG+waQdXJfE3bFWNVv1darO4VuUobRQ1etaa8cOgesnG4pq8H9YV28bPrjdUrfJOZ48Ac5Ho1MBqdkGfjEUR0hSeSZtduUUozQE/YZlJyJek5Y/6Nzcxre81zgIHXi/XsLUUf8Qsu9vzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6o38+sIf/GqUg8OeRHlpv3D1sUUxdxYGq+4P7zu0QQU=;
+ b=HgQsJ6lZTvUYd3Lft04Z5Sw/JoJR9nwAnIjb3MjjScf2xBXFsze8MUCQPf7wldbM3RHkEl2H7l6UFg5Fx8aEewBOizBhieZbI84W03QGJYmoL22YvkDY5l7YQTHNSdkVLZD7+luHqmO6xH/HoASCf2OClSLevouJZBlD/FWcfsY=
+Received: from DM6PR12MB3082.namprd12.prod.outlook.com (2603:10b6:5:11b::12)
+ by DS0PR12MB7509.namprd12.prod.outlook.com (2603:10b6:8:137::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.16; Tue, 15 Nov
+ 2022 11:27:57 +0000
+Received: from DM6PR12MB3082.namprd12.prod.outlook.com
+ ([fe80::4838:942a:8267:5ec0]) by DM6PR12MB3082.namprd12.prod.outlook.com
+ ([fe80::4838:942a:8267:5ec0%7]) with mapi id 15.20.5813.018; Tue, 15 Nov 2022
+ 11:27:56 +0000
+From:   "Gupta, Nipun" <Nipun.Gupta@amd.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
+        "Anand, Harpreet" <harpreet.anand@amd.com>
+Subject: RE: IRQ affinity from VFIO API interface
+Thread-Topic: IRQ affinity from VFIO API interface
+Thread-Index: Adj4E4QdRzmK2kWOR2ytM0xkrT5X3gAKxusAACmcM5A=
+Date:   Tue, 15 Nov 2022 11:27:56 +0000
+Message-ID: <DM6PR12MB308232371114A287E8C3CB49E8049@DM6PR12MB3082.namprd12.prod.outlook.com>
+References: <DM6PR12MB3082B79FA197958F10F61205E8059@DM6PR12MB3082.namprd12.prod.outlook.com>
+ <20221114083446.5a1cba71.alex.williamson@redhat.com>
+In-Reply-To: <20221114083446.5a1cba71.alex.williamson@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-11-15T11:27:54Z;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=2c0095db-53b6-4cc2-8059-bf8d89b8d32b;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB3082:EE_|DS0PR12MB7509:EE_
+x-ms-office365-filtering-correlation-id: 8b28168d-39f4-4fc0-c4a7-08dac6fc71bb
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 0qXtJc6W0XtUT4Vz3uEmvANqW6HeVQblM91icjvichmoPWKCbyZbvMusGpRAMom2119XLLwZAneeyyhg1uMRMrFGpm3TMV+8QE4MnI9Avb1ZN2b9OvkwVipRo69H9UxdgX/hDgPKI0iM+YYFb8lZYwu5iF0TIVR4E6WfJGoj8cxC+Li0hQ1VNBM/PrLmbzmpB0JnaCdk2UqemCaj89/KDLGY48yXDGf95WcFSRwvx/ctU5beel/5eSdCmVqHB4aJHkM74Bwt9v0yNb/MU0Y3NHaxxD+x3gWBV0zzbhkL6LJSFvyt3iwjOPiBnZMhbQleyTI6SPzJZc791ZzOj+EIHhNXIcTr3ekerCYX0/mEKPsZZUhiLPNQGPSqRkBIZQSLrODa5ScZ5OY1YihRTVgVywsLf1kCHehc32+See8BeXHSiF/W5HlOGXfA9oGYgoQ+2YjX+BpVCFe5+OenTkagKdL8X9jcFFdbHuluZIGGXsSxrZGQmjH/oRYIqIs/VJHt0Prw2qcVGQyq1sh6tKjRR2vkiN/SFUgX1p684ezZSTiFiwzfaX6olf/cDBB5UIBTZFbnk0iHeG3Er87mT9MRKJ1c7fbmxIXdbbqtMFCTIH5xPojcH/I3OpP+T2ANYyD3+IRnq1UdJBnJnc1sZ68tpKby6CzXt5zaGxp+xHZUxTFD9UdvM7XKoAYEF0yZ5zPHDwjwtyD70Xq0U5X6CDBp4qbTtRKi1uvXgpygdhWY7kKIU7RP2q2BkfIe52NiNi+106owRKJV04M5VNzRWwElIw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3082.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(346002)(366004)(376002)(136003)(396003)(451199015)(122000001)(83380400001)(478600001)(38070700005)(33656002)(86362001)(38100700002)(55016003)(71200400001)(64756008)(5660300002)(8936002)(6916009)(54906003)(66556008)(66946007)(8676002)(41300700001)(186003)(76116006)(316002)(66446008)(66476007)(9686003)(26005)(7696005)(6506007)(55236004)(2906002)(52536014)(53546011)(4326008)(66899015);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TPYrIVucCFei07kUbEad9nbpPBD6d4Yk7/PB9dZ4Gs3KAgU4dPFa2J8eN8UW?=
+ =?us-ascii?Q?iv+OkoisIo8zzN9yBXMkGHQyiQPHKDtpZscTfJXHo994rOvES4ZjEb/MBuVH?=
+ =?us-ascii?Q?Kxs0s2CyR52I2CQGTIMfEGaSnqWcdAIfSc4lRKPRIJEjB5FQPGXtc+63kajl?=
+ =?us-ascii?Q?hHkr33EHmcXsefJa7AzsirUc+jM5rQRRT8vrT8sBm/KNvduFKyxCUc1Wsfoy?=
+ =?us-ascii?Q?49T7P09PnpF7Ay3Pexe99Hjn5ryjRJerzpFYazo8WV5AnOcsJpQX+7dnXnHs?=
+ =?us-ascii?Q?izbD8f2AcEBEWewTMRGzCf14+Nn/lP5oOglYMvQJ1pisGMbTBMHSHMB6Si2G?=
+ =?us-ascii?Q?btiUDVk/NJTpv6jaO5GEoxSMhiA9H+bEWL4iHWBdf90YCZN8NgCd+DBVx5Yu?=
+ =?us-ascii?Q?YbbSfjSv000vl3sxxb9MkG6fPXVa56XldjHGtgtL1JLttzObScQHVPJ+JxDz?=
+ =?us-ascii?Q?Goy0qHaKCZvwnP/glBs/ZEQ62L6/Aaa9DkdCrTjD/S9QRX9oLPr04djVBiz/?=
+ =?us-ascii?Q?WW/OEcXT8NILCxoCkr55rKe9gCLIO0vLRCTHd1HC0q2Ep0RAWXQVDXKzRwaI?=
+ =?us-ascii?Q?bMrVWKS9qG9XvQAn6gMLLIPpNjnxmpU9xFunL9f74JOawBVe02d1xuqp91TL?=
+ =?us-ascii?Q?z+lBZyHeGHohOjiEo1Jlo0L7Qy610oiHcBOB4EGum5+FewdXCxWvBFnGvsxV?=
+ =?us-ascii?Q?RObkKPhR+3ClR+8q+vvLb9KxxXXakQmOTdm64wJaPeoZrp+T679qHq+T4ggC?=
+ =?us-ascii?Q?qKjHdndGGa3n7zwL17StqRHpfctWNTCph8NTyjylAskexP+KEJf6Ib/hoWnI?=
+ =?us-ascii?Q?dolC5esL6j1DDifDQo09bplfko4dlZ3QsVQwjT5wkCsWazRPNPcuk35t5hJD?=
+ =?us-ascii?Q?peeiZwxFyPpkU5cngPiHuvH/BZbuyvYGtYxtTOPhmEacP8FWwyGkbD/0sfZK?=
+ =?us-ascii?Q?KrbCw0nILFIEpKrBEyKvJtG3iR8Of3wXF6aP9ClxZPbXjFLaVLTCdy788gxM?=
+ =?us-ascii?Q?YvVkYH390dnhabNxvFqDgl8JC9OTeaY09LyGXoaODHauwGY5YXSinPeJPha4?=
+ =?us-ascii?Q?8jjYUsTIeLPEiTBNm7ccU/NrW8OTSIaedSpLZ0nCjXxT/9EjSpjnShdHiax0?=
+ =?us-ascii?Q?fY77bW37XihP+JoKpP9icVFKAnQxFRW4QdotLDU0Wvsauffk1JFMHtQW0uQi?=
+ =?us-ascii?Q?olyOvqVMZogXt6e8Kv+g1monAgMf8U1s7ntdUcnXlXJejM4tCjfoNGmduVDJ?=
+ =?us-ascii?Q?5Mi79Sr/vO4oz3cx0KlVdmgmkjhPaIxQ9QO9rDGzovA7ThAx14BjJ/SHM9fN?=
+ =?us-ascii?Q?yrFAbwNfPun+PxfHdlatbKMiYKeidBRzjewXsJylXmS+i4FE6p4boC4vwkue?=
+ =?us-ascii?Q?Byn8pq2M+0CR3wPETT1Cf81oub36+iAvrbdzj3+O30rlkaEc7mD2Y1bmpXQP?=
+ =?us-ascii?Q?52TD/4IOtt9r11lni+YTgFFNNWUKFY+EvSGAC3Z+8KNZ0VpxZR9RKu1fUMrO?=
+ =?us-ascii?Q?chslijRPHvsVPkXUOi5EvIKoTucqPtIb2Z5eRYDiJKjRHxhnlmevTpDPWGSp?=
+ =?us-ascii?Q?DvF2DiOhCkEc45Sfb3Y=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3082.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b28168d-39f4-4fc0-c4a7-08dac6fc71bb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Nov 2022 11:27:56.8223
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Jw5ce3Km5uHjCW0JjEPpABCp1UQ0NAf/ZV/wl0c0GsgurVDDMNamZOCp2YvXY7IN
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7509
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,164 +124,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 15, 2022 at 4:04 AM Jason Wang <jasowang@redhat.com> wrote:
->
-> On Tue, Nov 15, 2022 at 12:31 AM Eugenio Perez Martin
-> <eperezma@redhat.com> wrote:
+[AMD Official Use Only - General]
+
+
+
+> -----Original Message-----
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Monday, November 14, 2022 9:05 PM
+> To: Gupta, Nipun <Nipun.Gupta@amd.com>
+> Cc: cohuck@redhat.com; kvm@vger.kernel.org; Agarwal, Nikhil
+> <nikhil.agarwal@amd.com>; Anand, Harpreet <harpreet.anand@amd.com>
+> Subject: Re: IRQ affinity from VFIO API interface
+>=20
+> Caution: This message originated from an External Source. Use proper caut=
+ion
+> when opening attachments, clicking links, or responding.
+>=20
+>=20
+> On Mon, 14 Nov 2022 10:29:14 +0000
+> "Gupta, Nipun" <Nipun.Gupta@amd.com> wrote:
+>=20
+> > [AMD Official Use Only - General]
 > >
-> > On Mon, Nov 14, 2022 at 5:30 AM Jason Wang <jasowang@redhat.com> wrote:
-> > >
-> > >
-> > > =E5=9C=A8 2022/11/11 21:12, Eugenio Perez Martin =E5=86=99=E9=81=93:
-> > > > On Fri, Nov 11, 2022 at 8:49 AM Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > >>
-> > > >> =E5=9C=A8 2022/11/10 21:47, Eugenio Perez Martin =E5=86=99=E9=81=
-=93:
-> > > >>> On Thu, Nov 10, 2022 at 7:01 AM Jason Wang <jasowang@redhat.com> =
-wrote:
-> > > >>>> On Wed, Nov 9, 2022 at 1:08 AM Eugenio P=C3=A9rez <eperezma@redh=
-at.com> wrote:
-> > > >>>>> The memory listener that thells the device how to convert GPA t=
-o qemu's
-> > > >>>>> va is registered against CVQ vhost_vdpa. This series try to map=
- the
-> > > >>>>> memory listener translations to ASID 0, while it maps the CVQ o=
-nes to
-> > > >>>>> ASID 1.
-> > > >>>>>
-> > > >>>>> Let's tell the listener if it needs to register them on iova tr=
-ee or
-> > > >>>>> not.
-> > > >>>>>
-> > > >>>>> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > > >>>>> ---
-> > > >>>>> v5: Solve conflict about vhost_iova_tree_remove accepting mem_r=
-egion by
-> > > >>>>>       value.
-> > > >>>>> ---
-> > > >>>>>    include/hw/virtio/vhost-vdpa.h | 2 ++
-> > > >>>>>    hw/virtio/vhost-vdpa.c         | 6 +++---
-> > > >>>>>    net/vhost-vdpa.c               | 1 +
-> > > >>>>>    3 files changed, 6 insertions(+), 3 deletions(-)
-> > > >>>>>
-> > > >>>>> diff --git a/include/hw/virtio/vhost-vdpa.h b/include/hw/virtio=
-/vhost-vdpa.h
-> > > >>>>> index 6560bb9d78..0c3ed2d69b 100644
-> > > >>>>> --- a/include/hw/virtio/vhost-vdpa.h
-> > > >>>>> +++ b/include/hw/virtio/vhost-vdpa.h
-> > > >>>>> @@ -34,6 +34,8 @@ typedef struct vhost_vdpa {
-> > > >>>>>        struct vhost_vdpa_iova_range iova_range;
-> > > >>>>>        uint64_t acked_features;
-> > > >>>>>        bool shadow_vqs_enabled;
-> > > >>>>> +    /* The listener must send iova tree addresses, not GPA */
-> > > >>
-> > > >> Btw, cindy's vIOMMU series will make it not necessarily GPA any mo=
-re.
-> > > >>
-> > > > Yes, this comment should be tuned then. But the SVQ iova_tree will =
-not
-> > > > be equal to vIOMMU one because shadow vrings.
-> > > >
-> > > > But maybe SVQ can inspect both instead of having all the duplicated=
- entries.
-> > > >
-> > > >>>>> +    bool listener_shadow_vq;
-> > > >>>>>        /* IOVA mapping used by the Shadow Virtqueue */
-> > > >>>>>        VhostIOVATree *iova_tree;
-> > > >>>>>        GPtrArray *shadow_vqs;
-> > > >>>>> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-> > > >>>>> index 8fd32ba32b..e3914fa40e 100644
-> > > >>>>> --- a/hw/virtio/vhost-vdpa.c
-> > > >>>>> +++ b/hw/virtio/vhost-vdpa.c
-> > > >>>>> @@ -220,7 +220,7 @@ static void vhost_vdpa_listener_region_add(=
-MemoryListener *listener,
-> > > >>>>>                                             vaddr, section->rea=
-donly);
-> > > >>>>>
-> > > >>>>>        llsize =3D int128_sub(llend, int128_make64(iova));
-> > > >>>>> -    if (v->shadow_vqs_enabled) {
-> > > >>>>> +    if (v->listener_shadow_vq) {
-> > > >>>>>            int r;
-> > > >>>>>
-> > > >>>>>            mem_region.translated_addr =3D (hwaddr)(uintptr_t)va=
-ddr,
-> > > >>>>> @@ -247,7 +247,7 @@ static void vhost_vdpa_listener_region_add(=
-MemoryListener *listener,
-> > > >>>>>        return;
-> > > >>>>>
-> > > >>>>>    fail_map:
-> > > >>>>> -    if (v->shadow_vqs_enabled) {
-> > > >>>>> +    if (v->listener_shadow_vq) {
-> > > >>>>>            vhost_iova_tree_remove(v->iova_tree, mem_region);
-> > > >>>>>        }
-> > > >>>>>
-> > > >>>>> @@ -292,7 +292,7 @@ static void vhost_vdpa_listener_region_del(=
-MemoryListener *listener,
-> > > >>>>>
-> > > >>>>>        llsize =3D int128_sub(llend, int128_make64(iova));
-> > > >>>>>
-> > > >>>>> -    if (v->shadow_vqs_enabled) {
-> > > >>>>> +    if (v->listener_shadow_vq) {
-> > > >>>>>            const DMAMap *result;
-> > > >>>>>            const void *vaddr =3D memory_region_get_ram_ptr(sect=
-ion->mr) +
-> > > >>>>>                section->offset_within_region +
-> > > >>>>> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> > > >>>>> index 85a318faca..02780ee37b 100644
-> > > >>>>> --- a/net/vhost-vdpa.c
-> > > >>>>> +++ b/net/vhost-vdpa.c
-> > > >>>>> @@ -570,6 +570,7 @@ static NetClientState *net_vhost_vdpa_init(=
-NetClientState *peer,
-> > > >>>>>        s->vhost_vdpa.index =3D queue_pair_index;
-> > > >>>>>        s->always_svq =3D svq;
-> > > >>>>>        s->vhost_vdpa.shadow_vqs_enabled =3D svq;
-> > > >>>>> +    s->vhost_vdpa.listener_shadow_vq =3D svq;
-> > > >>>> Any chance those above two can differ?
-> > > >>>>
-> > > >>> If CVQ is shadowed but data VQs are not, shadow_vqs_enabled is tr=
-ue
-> > > >>> but listener_shadow_vq is not.
-> > > >>>
-> > > >>> It is more clear in the next commit, where only shadow_vqs_enable=
-d is
-> > > >>> set to true at vhost_vdpa_net_cvq_start.
-> > > >>
-> > > >> Ok, the name looks a little bit confusing. I wonder if it's better=
- to
-> > > >> use shadow_cvq and shadow_data ?
-> > > >>
-> > > > I'm ok with renaming it, but struct vhost_vdpa is generic across al=
-l
-> > > > kind of devices, and it does not know if it is a datapath or not fo=
-r
-> > > > the moment.
-> > > >
-> > > > Maybe listener_uses_iova_tree?
-> > >
-> > >
-> > > I think "iova_tree" is something that is internal to svq implementati=
-on,
-> > > it's better to define the name from the view of vhost_vdpa level.
-> > >
+> > Hi Alex, Cornelia and other VFIO experts,
 > >
-> > I don't get this, vhost_vdpa struct already has a pointer to its iova_t=
-ree.
->
-> Yes, this is a suggestion to improve the readability of the code. So
-> what I meant is to have a name to demonstrate why we need to use
-> iova_tree instead of "uses_iova_tree".
->
+> > We are using VFIO for the user-space applications (like DPDK) and need
+> > control to affine MSI interrupts to a particular CPU. One of the ways t=
+o
+> > affine interrupts are to use /proc/interrupts interface and set the smp=
+_affinity,
+> > but we could not locate any API interface in VFIO from where this can b=
+e done.
+> >
+> > Can you please let me know if there is any other way to provide the CPU
+> > affinity, or does it seem legitimate to update "struct vfio_irq_set" to=
+ support
+> > the above said functionality.
+>=20
+> There is currently no way to set interrupt affinity via the vfio API.
+> You're welcome to propose something.  Thanks,
 
-I understand.
+Thanks for the information.
+We shall then come up with something on this soon.
 
-Knowing that the listener will be always bound to data vqs (being net,
-blk, ...), I think it is ok to rename it to shadow_data.
+Regards,
+Nipun
 
-But I think there is no way to add shadow_cvq properly from
-hw/virtio/vhost-vdpa.c , since we don't know if the vhost_vdpa belongs
-to a datapath or not. Would it work just to rename listener_shadow_vq
-to shadow_data?
-
-Thanks!
-
+>=20
+> Alex
