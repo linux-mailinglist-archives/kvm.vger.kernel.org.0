@@ -2,710 +2,387 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7001628DF0
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 01:06:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FBB4628E1D
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 01:16:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236156AbiKOAG2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 19:06:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56424 "EHLO
+        id S237310AbiKOAQs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 19:16:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231940AbiKOAG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 19:06:26 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72DA75F68
-        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 16:06:24 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id be13so21999783lfb.4
-        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 16:06:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Az9IN8Zy1dJmBRFuDXhjgx3aGXqJvvzc74n4e9Jt26g=;
-        b=kqUOFEkegtme2mkhbD4Uil3tRf50K+VQP7vXlPGBjCgIbHzRga0AvXBquvfT39LicL
-         labZrsZ2ngDm1S4DOXhW9bNQp0ag5bOKHrUbpphasCEUwIKaVSzHr6598tnDgGGkIwzx
-         sBicPU81ymnx7/9IAktLVz9fb5YAKFDN3D0act5ZF2pdFvbm1/XsDNDpxgVVLx23NFIZ
-         FzvQQIKKoDbuqNts+l/ijHYR8e76a7SZ77rT7y0jTB7QRepC4ow+QiwkQQZUddZx9eWk
-         /d1ve75v4eYDNeCNvoPWtFmpj7qZg2zObiazWjEUng0CfJzMBZPqHifSmSLuz/U7BVmM
-         io9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Az9IN8Zy1dJmBRFuDXhjgx3aGXqJvvzc74n4e9Jt26g=;
-        b=1Bo4oEvDMN+zmvCvWLeSPou9V7ekVUq06glE3wYYt7hGIJgxJ5/czsZyO3YsmqYhvJ
-         prWI+RD8ZuvN3OHAPSlxLSYj66K72Zw35x6ncUKi0s7y1ehOOXpOg4a9g6ZCrlvnyI9C
-         XT5SwgXfPl8CNjoaXNfTL7dXdKs3RFJi2Iw8JtnsUAKNLRHiDI5lC9lDwyM94XPA0RPw
-         y+HZjdzHhLkDWT7xGQx0qi876ASu02HutyY7p9FdmigfR3rpepmIPugT/RO2ldE+V/iF
-         LW1D9aU3/wj2fMhxZ1JYM5G9ixL6dMZN7jdh2+NBALS+MTo8EJ043UNMg2o16mdGyBgT
-         ii3A==
-X-Gm-Message-State: ANoB5pmDx8alhQOVWQ2eNJFMSD6wa0XViZ18Kh5soFFRtaaKaDObC5Kv
-        saAYj3oEenxGqpDRmHk0JefNlfuR5qnlVgA/fJO7Hw==
-X-Google-Smtp-Source: AA0mqf7gX3vqtDi3Yxs47Cl+MK4x4aGqDk7az/9AZvPqY8qzUX5ZW2cLAnPFLGSy61pSQZSXZP0tHCzwk6xxkixN23s=
-X-Received: by 2002:a05:6512:b8c:b0:4a4:5f2e:49b3 with SMTP id
- b12-20020a0565120b8c00b004a45f2e49b3mr4723628lfv.148.1668470782274; Mon, 14
- Nov 2022 16:06:22 -0800 (PST)
+        with ESMTP id S231940AbiKOAQo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 19:16:44 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92B5E1CB2A;
+        Mon, 14 Nov 2022 16:16:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ahpEIJ4GDvrwnqGq2eo6btmT/lzv+l/M2LxtAJiFlyk=; b=OgZMs0XG9X+1xgz1A3rct4rL+8
+        yRHueNN8R2rkwJ0kLq5Fjpqqk0M1+dMjhJ8ysu+oB7Qy/GkeA7VyP9/s8gRsg6d0nbJwSTuz9jtYi
+        LLvhgsm+DarMW0Qt9Ig5kK4WFs25hWuwD6pAORgtTVElsGCWt1+dCyA5AbNUrz2hQnMn7pd0lVQxy
+        7ophEGnpnM1pZOTZNAcOPhMSO2Tas9bss5E+TdtzzIPO99Ot9YEKPuwE1LiXH3EDzJIqr4thlD/WY
+        AmRVhawdH4uhdO/yUuhJMfLO58YhwFcZ4N1Qi58XRHYImKj+bteaEOfx2JLwC1u0Jp6pH3L5ae1RK
+        j5atTk4A==;
+Received: from [205.251.233.106] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oujcx-00Fvea-56; Tue, 15 Nov 2022 00:16:35 +0000
+Message-ID: <95d6d0a68cb8a4277be0066c26b482e7554c7f26.camel@infradead.org>
+Subject: Re: [PATCH 03/16] KVM: x86: set gfn-to-pfn cache length
+ consistently with VM word size
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     "Durrant, Paul" <pdurrant@amazon.co.uk>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mhal@rbox.co" <mhal@rbox.co>,
+        "Kaya, Metin" <metikaya@amazon.co.uk>
+Date:   Mon, 14 Nov 2022 16:16:25 -0800
+In-Reply-To: <000fac2ae9394da6b51c2138c5816a45@amazon.co.uk>
+References: <20221027161849.2989332-1-pbonzini@redhat.com>
+         <20221027161849.2989332-4-pbonzini@redhat.com>
+         <Y1q+a3gtABqJPmmr@google.com>
+         <c61f6089-57b7-e00f-d5ed-68e62237eab0@redhat.com>
+         <c30b46557c9c59b9f4c8c3a2139bd506a81f7ee1.camel@infradead.org>
+         <89ea0f72514d93967b679a01960d05b34a90ea14.camel@infradead.org>
+         <000fac2ae9394da6b51c2138c5816a45@amazon.co.uk>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-oYGOM8btHNpbF3RUdezY"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-References: <cover.1667110240.git.isaku.yamahata@intel.com> <fb337a67e17715977e46523d1344cb2a7f46a37a.1667110240.git.isaku.yamahata@intel.com>
-In-Reply-To: <fb337a67e17715977e46523d1344cb2a7f46a37a.1667110240.git.isaku.yamahata@intel.com>
-From:   Sagi Shahar <sagis@google.com>
-Date:   Mon, 14 Nov 2022 16:06:10 -0800
-Message-ID: <CAAhR5DFGvGQmf95hrGcK0uvawvFrzdCisnEtvLV8k8pM3FRV_w@mail.gmail.com>
-Subject: Re: [PATCH v10 016/108] KVM: TDX: create/destroy VM structure
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Kai Huang <kai.huang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 29, 2022 at 11:24 PM <isaku.yamahata@intel.com> wrote:
->
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
->
-> As the first step to create TDX guest, create/destroy VM struct.  Assign
-> TDX private Host Key ID (HKID) to the TDX guest for memory encryption and
-> allocate extra pages for the TDX guest. On destruction, free allocated
-> pages, and HKID.
->
-> Before tearing down private page tables, TDX requires some resources of the
-> guest TD to be destroyed (i.e. keyID must have been reclaimed, etc).  Add
-> flush_shadow_all_private callback before tearing down private page tables
-> for it.
->
-> Add a second kvm_x86_ops hook in kvm_arch_destroy_vm() to support TDX's
-> destruction path, which needs to first put the VM into a teardown state,
-> then free per-vCPU resources, and finally free per-VM resources.
->
-> Co-developed-by: Kai Huang <kai.huang@intel.com>
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |   2 +
->  arch/x86/include/asm/kvm_host.h    |   2 +
->  arch/x86/kvm/vmx/main.c            |  34 ++-
->  arch/x86/kvm/vmx/tdx.c             | 411 +++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/tdx.h             |   2 +
->  arch/x86/kvm/vmx/x86_ops.h         |  11 +
->  arch/x86/kvm/x86.c                 |   8 +
->  7 files changed, 467 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index 8a5c5ae70bc5..3a29a6b31ee8 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -21,7 +21,9 @@ KVM_X86_OP(has_emulated_msr)
->  KVM_X86_OP(vcpu_after_set_cpuid)
->  KVM_X86_OP(is_vm_type_supported)
->  KVM_X86_OP(vm_init)
-> +KVM_X86_OP_OPTIONAL(flush_shadow_all_private)
->  KVM_X86_OP_OPTIONAL(vm_destroy)
-> +KVM_X86_OP_OPTIONAL(vm_free)
->  KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
->  KVM_X86_OP(vcpu_create)
->  KVM_X86_OP(vcpu_free)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 2a41a93a80f3..2870155ce6fb 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1472,7 +1472,9 @@ struct kvm_x86_ops {
->         bool (*is_vm_type_supported)(unsigned long vm_type);
->         unsigned int vm_size;
->         int (*vm_init)(struct kvm *kvm);
-> +       void (*flush_shadow_all_private)(struct kvm *kvm);
->         void (*vm_destroy)(struct kvm *kvm);
-> +       void (*vm_free)(struct kvm *kvm);
->
->         /* Create, but do not attach this VCPU */
->         int (*vcpu_precreate)(struct kvm *kvm);
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 0900ff2f2390..d01a946a18cf 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -29,18 +29,44 @@ static __init int vt_hardware_setup(void)
->         return 0;
->  }
->
-> +static void vt_hardware_unsetup(void)
-> +{
-> +       tdx_hardware_unsetup();
-> +       vmx_hardware_unsetup();
-> +}
-> +
->  static int vt_vm_init(struct kvm *kvm)
->  {
->         if (is_td(kvm))
-> -               return -EOPNOTSUPP;     /* Not ready to create guest TD yet. */
-> +               return tdx_vm_init(kvm);
->
->         return vmx_vm_init(kvm);
->  }
->
-> +static void vt_flush_shadow_all_private(struct kvm *kvm)
-> +{
-> +       if (is_td(kvm))
-> +               return tdx_mmu_release_hkid(kvm);
-> +}
-> +
-> +static void vt_vm_destroy(struct kvm *kvm)
-> +{
-> +       if (is_td(kvm))
-> +               return;
-> +
-> +       vmx_vm_destroy(kvm);
-> +}
-> +
-> +static void vt_vm_free(struct kvm *kvm)
-> +{
-> +       if (is_td(kvm))
-> +               return tdx_vm_free(kvm);
-> +}
-> +
->  struct kvm_x86_ops vt_x86_ops __initdata = {
->         .name = "kvm_intel",
->
-> -       .hardware_unsetup = vmx_hardware_unsetup,
-> +       .hardware_unsetup = vt_hardware_unsetup,
->         .check_processor_compatibility = vmx_check_processor_compatibility,
->
->         .hardware_enable = vmx_hardware_enable,
-> @@ -50,7 +76,9 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->         .is_vm_type_supported = vt_is_vm_type_supported,
->         .vm_size = sizeof(struct kvm_vmx),
->         .vm_init = vt_vm_init,
-> -       .vm_destroy = vmx_vm_destroy,
-> +       .flush_shadow_all_private = vt_flush_shadow_all_private,
-> +       .vm_destroy = vt_vm_destroy,
-> +       .vm_free = vt_vm_free,
->
->         .vcpu_precreate = vmx_vcpu_precreate,
->         .vcpu_create = vmx_vcpu_create,
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 530e72f85762..ec88dde0d300 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -32,6 +32,401 @@ struct tdx_capabilities {
->  /* Capabilities of KVM + the TDX module. */
->  static struct tdx_capabilities tdx_caps;
->
-> +/*
-> + * Some TDX SEAMCALLs (TDH.MNG.CREATE, TDH.PHYMEM.CACHE.WB,
-> + * TDH.MNG.KEY.RECLAIMID, TDH.MNG.KEY.FREEID etc) tries to acquire a global lock
-> + * internally in TDX module.  If failed, TDX_OPERAND_BUSY is returned without
-> + * spinning or waiting due to a constraint on execution time.  It's caller's
-> + * responsibility to avoid race (or retry on TDX_OPERAND_BUSY).  Use this mutex
-> + * to avoid race in TDX module because the kernel knows better about scheduling.
-> + */
-> +static DEFINE_MUTEX(tdx_lock);
-> +static struct mutex *tdx_mng_key_config_lock;
-> +
-> +static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
-> +{
-> +       return pa | ((hpa_t)hkid << boot_cpu_data.x86_phys_bits);
-> +}
-> +
-> +static inline bool is_td_created(struct kvm_tdx *kvm_tdx)
-> +{
-> +       return kvm_tdx->tdr.added;
-> +}
-> +
-> +static inline void tdx_hkid_free(struct kvm_tdx *kvm_tdx)
-> +{
-> +       tdx_keyid_free(kvm_tdx->hkid);
-> +       kvm_tdx->hkid = -1;
-> +}
-> +
-> +static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
-> +{
-> +       return kvm_tdx->hkid > 0;
-> +}
-> +
-> +static void tdx_clear_page(unsigned long page)
-> +{
-> +       const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
-> +       unsigned long i;
-> +
-> +       /*
-> +        * Zeroing the page is only necessary for systems with MKTME-i:
-> +        * when re-assign one page from old keyid to a new keyid, MOVDIR64B is
-> +        * required to clear/write the page with new keyid to prevent integrity
-> +        * error when read on the page with new keyid.
-> +        *
-> +        * The cache line could be poisoned (even without MKTME-i), clear the
-> +        * poison bit.
-> +        */
-> +       for (i = 0; i < PAGE_SIZE; i += 64)
-> +               movdir64b((void *)(page + i), zero_page);
-> +       /*
-> +        * MOVDIR64B store uses WC buffer.  Prevent following memory reads
-> +        * from seeing potentially poisoned cache.
-> +        */
-> +       __mb();
-> +}
-> +
-> +static int tdx_reclaim_page(unsigned long va, hpa_t pa, bool do_wb, u16 hkid)
-> +{
-> +       struct tdx_module_output out;
-> +       u64 err;
-> +
-> +       do {
-> +               err = tdh_phymem_page_reclaim(pa, &out);
-> +               /*
-> +                * TDH.PHYMEM.PAGE.RECLAIM is allowed only when TD is shutdown.
-> +                * state.  i.e. destructing TD.
-> +                * TDH.PHYMEM.PAGE.RECLAIM  requires TDR and target page.
-> +                * Because we're destructing TD, it's rare to contend with TDR.
-> +                */
-> +       } while (err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX));
-> +       if (WARN_ON_ONCE(err)) {
-> +               pr_tdx_error(TDH_PHYMEM_PAGE_RECLAIM, err, &out);
-> +               return -EIO;
-> +       }
-> +
-> +       if (do_wb) {
-> +               /*
-> +                * Only TDR page gets into this path.  No contention is expected
-> +                * because the last page of TD.
-> +                */
-> +               err = tdh_phymem_page_wbinvd(set_hkid_to_hpa(pa, hkid));
-> +               if (WARN_ON_ONCE(err)) {
-> +                       pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
-> +                       return -EIO;
-> +               }
-> +       }
-> +
-> +       tdx_clear_page(va);
-> +       return 0;
-> +}
-> +
-> +static int tdx_alloc_td_page(struct tdx_td_page *page)
-> +{
-> +       page->va = __get_free_page(GFP_KERNEL_ACCOUNT);
-> +       if (!page->va)
-> +               return -ENOMEM;
-> +
-> +       page->pa = __pa(page->va);
-> +       return 0;
-> +}
-> +
-> +static inline void tdx_mark_td_page_added(struct tdx_td_page *page)
-> +{
-> +       WARN_ON_ONCE(page->added);
-> +       page->added = true;
-> +}
-> +
-> +static void tdx_reclaim_td_page(struct tdx_td_page *page)
-> +{
-> +       if (page->added) {
-> +               /*
-> +                * TDCX are being reclaimed.  TDX module maps TDCX with HKID
-> +                * assigned to the TD.  Here the cache associated to the TD
-> +                * was already flushed by TDH.PHYMEM.CACHE.WB before here, So
-> +                * cache doesn't need to be flushed again.
-> +                */
-> +               if (tdx_reclaim_page(page->va, page->pa, false, 0))
-> +                       return;
-> +
-> +               page->added = false;
-> +       }
-> +       if (page->va) {
-> +               free_page(page->va);
-> +               page->va = 0;
-> +       }
-> +}
-> +
-> +static int tdx_do_tdh_phymem_cache_wb(void *param)
-> +{
-> +       u64 err = 0;
-> +
-> +       do {
-> +               err = tdh_phymem_cache_wb(!!err);
-> +       } while (err == TDX_INTERRUPTED_RESUMABLE);
-> +
-> +       /* Other thread may have done for us. */
-> +       if (err == TDX_NO_HKID_READY_TO_WBCACHE)
-> +               err = TDX_SUCCESS;
-> +       if (WARN_ON_ONCE(err)) {
-> +               pr_tdx_error(TDH_PHYMEM_CACHE_WB, err, NULL);
-> +               return -EIO;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +void tdx_mmu_release_hkid(struct kvm *kvm)
-> +{
-> +       struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +       cpumask_var_t packages;
-> +       bool cpumask_allocated;
-> +       u64 err;
-> +       int ret;
-> +       int i;
-> +
-> +       if (!is_hkid_assigned(kvm_tdx))
-> +               return;
-> +
-> +       if (!is_td_created(kvm_tdx))
-> +               goto free_hkid;
-> +
-> +       cpumask_allocated = zalloc_cpumask_var(&packages, GFP_KERNEL);
-> +       cpus_read_lock();
-> +       for_each_online_cpu(i) {
-> +               if (cpumask_allocated &&
-> +                       cpumask_test_and_set_cpu(topology_physical_package_id(i),
-> +                                               packages))
-> +                       continue;
-> +
-> +               /*
-> +                * We can destroy multiple the guest TDs simultaneously.
-> +                * Prevent tdh_phymem_cache_wb from returning TDX_BUSY by
-> +                * serialization.
-> +                */
-> +               mutex_lock(&tdx_lock);
-> +               ret = smp_call_on_cpu(i, tdx_do_tdh_phymem_cache_wb, NULL, 1);
-> +               mutex_unlock(&tdx_lock);
-> +               if (ret)
-> +                       break;
-> +       }
-> +       cpus_read_unlock();
-> +       free_cpumask_var(packages);
-> +
-> +       mutex_lock(&tdx_lock);
-> +       err = tdh_mng_key_freeid(kvm_tdx->tdr.pa);
-> +       mutex_unlock(&tdx_lock);
-> +       if (WARN_ON_ONCE(err)) {
-> +               pr_tdx_error(TDH_MNG_KEY_FREEID, err, NULL);
-> +               pr_err("tdh_mng_key_freeid failed. HKID %d is leaked.\n",
-> +                       kvm_tdx->hkid);
-> +               return;
-> +       }
-> +
-> +free_hkid:
-> +       tdx_hkid_free(kvm_tdx);
-> +}
-> +
-> +void tdx_vm_free(struct kvm *kvm)
-> +{
-> +       struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +       int i;
-> +
-> +       /* Can't reclaim or free TD pages if teardown failed. */
-> +       if (is_hkid_assigned(kvm_tdx))
-> +               return;
-> +
-> +       if (kvm_tdx->tdcs) {
-> +               for (i = 0; i < tdx_caps.tdcs_nr_pages; i++)
-> +                       tdx_reclaim_td_page(&kvm_tdx->tdcs[i]);
-> +               kfree(kvm_tdx->tdcs);
-> +       }
-> +
-> +       /*
-> +        * TDX module maps TDR with TDX global HKID.  TDX module may access TDR
-> +        * while operating on TD (Especially reclaiming TDCS).  Cache flush with
-> +        * TDX global HKID is needed.
-> +        */
-> +       if (kvm_tdx->tdr.added &&
-> +               tdx_reclaim_page(kvm_tdx->tdr.va, kvm_tdx->tdr.pa, true,
-> +                               tdx_global_keyid))
-> +               return;
-> +
-> +       free_page(kvm_tdx->tdr.va);
-> +}
-> +
-> +static int tdx_do_tdh_mng_key_config(void *param)
-> +{
-> +       hpa_t *tdr_p = param;
-> +       u64 err;
-> +
-> +       do {
-> +               err = tdh_mng_key_config(*tdr_p);
-> +
-> +               /*
-> +                * If it failed to generate a random key, retry it because this
-> +                * is typically caused by an entropy error of the CPU's random
-> +                * number generator.
-> +                */
-> +       } while (err == TDX_KEY_GENERATION_FAILED);
-> +
-> +       if (WARN_ON_ONCE(err)) {
-> +               pr_tdx_error(TDH_MNG_KEY_CONFIG, err, NULL);
-> +               return -EIO;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +int tdx_vm_init(struct kvm *kvm)
-> +{
-> +       struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +       cpumask_var_t packages;
-> +       int ret, i;
-> +       u64 err;
-> +
-> +       ret = tdx_keyid_alloc();
 
-Can we skip the hkid allocation at such an early stage?
-This makes intra-host migration more complicated as the hkid of the
-destination VM is already allocated before we have a chance to migrate
-the state from the source VM.
+--=-oYGOM8btHNpbF3RUdezY
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I remember you had an internal version that already did that in
-https://github.com/intel/tdx/blob/552dd80c48f67ca01bcdd10667e0c11efd375177/arch/x86/kvm/vmx/tdx.c#L508
+On Mon, 2022-11-14 at 11:27 +0000, Durrant, Paul wrote:
+> > On Sun, 2022-11-13 at 13:32 +0000, David Woodhouse wrote:
+> > > For the runstate area, I think we can live with using a gfn_to_hva
+> > > cache instead, and writing via the userspace address (with appropriat=
+e
+> > > atomicity for the RUNSTATE_runnable case as we have at the moment
+> > > gating the refresh).
+> >=20
+> > Which mostly involves just reverting commit a795cd43c5b5 I think?
+> >=20
+> > IIRC the reason for that commit was mostly consistency with other
+> > things that really *did* want to be switched to gpc.
+>=20
+> A straight reversion would re-introduce the page-spanning check in
+> kvm_xen_vcpu_set_attr() but I think we can just leave that out.
 
-> +       if (ret < 0)
-> +               return ret;
-> +       kvm_tdx->hkid = ret;
-> +
-> +       ret = tdx_alloc_td_page(&kvm_tdx->tdr);
-> +       if (ret)
-> +               goto free_hkid;
-> +
-> +       kvm_tdx->tdcs = kcalloc(tdx_caps.tdcs_nr_pages, sizeof(*kvm_tdx->tdcs),
-> +                               GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> +       if (!kvm_tdx->tdcs)
-> +               goto free_tdr;
-> +       for (i = 0; i < tdx_caps.tdcs_nr_pages; i++) {
-> +               ret = tdx_alloc_td_page(&kvm_tdx->tdcs[i]);
-> +               if (ret)
-> +                       goto free_tdcs;
-> +       }
-> +
-> +       if (!zalloc_cpumask_var(&packages, GFP_KERNEL)) {
-> +               ret = -ENOMEM;
-> +               goto free_tdcs;
-> +       }
-> +       cpus_read_lock();
-> +       /*
-> +        * Need at least one CPU of the package to be online in order to
-> +        * program all packages for host key id.  Check it.
-> +        */
-> +       for_each_present_cpu(i)
-> +               cpumask_set_cpu(topology_physical_package_id(i), packages);
-> +       for_each_online_cpu(i)
-> +               cpumask_clear_cpu(topology_physical_package_id(i), packages);
-> +       if (!cpumask_empty(packages)) {
-> +               ret = -EIO;
-> +               /*
-> +                * Because it's hard for human operator to figure out the
-> +                * reason, warn it.
-> +                */
-> +               pr_warn("All packages need to have online CPU to create TD. Online CPU and retry.\n");
-> +               goto free_packages;
-> +       }
-> +
-> +       /*
-> +        * Acquire global lock to avoid TDX_OPERAND_BUSY:
-> +        * TDH.MNG.CREATE and other APIs try to lock the global Key Owner
-> +        * Table (KOT) to track the assigned TDX private HKID.  It doesn't spin
-> +        * to acquire the lock, returns TDX_OPERAND_BUSY instead, and let the
-> +        * caller to handle the contention.  This is because of time limitation
-> +        * usable inside the TDX module and OS/VMM knows better about process
-> +        * scheduling.
-> +        *
-> +        * APIs to acquire the lock of KOT:
-> +        * TDH.MNG.CREATE, TDH.MNG.KEY.FREEID, TDH.MNG.VPFLUSHDONE, and
-> +        * TDH.PHYMEM.CACHE.WB.
-> +        */
-> +       mutex_lock(&tdx_lock);
-> +       err = tdh_mng_create(kvm_tdx->tdr.pa, kvm_tdx->hkid);
-> +       mutex_unlock(&tdx_lock);
-> +       if (WARN_ON_ONCE(err)) {
-> +               pr_tdx_error(TDH_MNG_CREATE, err, NULL);
-> +               ret = -EIO;
-> +               goto free_packages;
-> +       }
-> +       tdx_mark_td_page_added(&kvm_tdx->tdr);
-> +
-> +       for_each_online_cpu(i) {
-> +               int pkg = topology_physical_package_id(i);
-> +
-> +               if (cpumask_test_and_set_cpu(pkg, packages))
-> +                       continue;
-> +
-> +               /*
-> +                * Program the memory controller in the package with an
-> +                * encryption key associated to a TDX private host key id
-> +                * assigned to this TDR.  Concurrent operations on same memory
-> +                * controller results in TDX_OPERAND_BUSY.  Avoid this race by
-> +                * mutex.
-> +                */
-> +               mutex_lock(&tdx_mng_key_config_lock[pkg]);
-> +               ret = smp_call_on_cpu(i, tdx_do_tdh_mng_key_config,
-> +                                     &kvm_tdx->tdr.pa, true);
-> +               mutex_unlock(&tdx_mng_key_config_lock[pkg]);
-> +               if (ret)
-> +                       break;
-> +       }
-> +       cpus_read_unlock();
-> +       free_cpumask_var(packages);
-> +       if (ret)
-> +               goto teardown;
-> +
-> +       for (i = 0; i < tdx_caps.tdcs_nr_pages; i++) {
-> +               err = tdh_mng_addcx(kvm_tdx->tdr.pa, kvm_tdx->tdcs[i].pa);
-> +               if (WARN_ON_ONCE(err)) {
-> +                       pr_tdx_error(TDH_MNG_ADDCX, err, NULL);
-> +                       ret = -EIO;
-> +                       goto teardown;
-> +               }
-> +               tdx_mark_td_page_added(&kvm_tdx->tdcs[i]);
-> +       }
-> +
-> +       /*
-> +        * Note, TDH_MNG_INIT cannot be invoked here.  TDH_MNG_INIT requires a dedicated
-> +        * ioctl() to define the configure CPUID values for the TD.
-> +        */
-> +       return 0;
-> +
-> +       /*
-> +        * The sequence for freeing resources from a partially initialized TD
-> +        * varies based on where in the initialization flow failure occurred.
-> +        * Simply use the full teardown and destroy, which naturally play nice
-> +        * with partial initialization.
-> +        */
-> +teardown:
-> +       tdx_mmu_release_hkid(kvm);
-> +       tdx_vm_free(kvm);
-> +       return ret;
-> +
-> +free_packages:
-> +       cpus_read_unlock();
-> +       free_cpumask_var(packages);
-> +free_tdcs:
-> +       for (i = 0; i < tdx_caps.tdcs_nr_pages; i++) {
-> +               if (!kvm_tdx->tdcs[i].va)
-> +                       continue;
-> +               free_page(kvm_tdx->tdcs[i].va);
-> +       }
-> +       kfree(kvm_tdx->tdcs);
-> +       kvm_tdx->tdcs = NULL;
-> +free_tdr:
-> +       if (kvm_tdx->tdr.va) {
-> +               free_page(kvm_tdx->tdr.va);
-> +               kvm_tdx->tdr.added = false;
-> +               kvm_tdx->tdr.va = 0;
-> +               kvm_tdx->tdr.pa = 0;
-> +       }
-> +free_hkid:
-> +       if (kvm_tdx->hkid != -1)
-> +               tdx_hkid_free(kvm_tdx);
-> +       return ret;
-> +}
-> +
->  static int __init tdx_module_setup(void)
->  {
->         const struct tdsysinfo_struct *tdsysinfo;
-> @@ -82,6 +477,8 @@ bool tdx_is_vm_type_supported(unsigned long type)
->
->  int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
->  {
-> +       int max_pkgs;
-> +       int i;
->         int r;
->
->         if (!enable_ept) {
-> @@ -95,6 +492,14 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
->                 return -ENODEV;
->         }
->
-> +       max_pkgs = topology_max_packages();
-> +       tdx_mng_key_config_lock = kcalloc(max_pkgs, sizeof(*tdx_mng_key_config_lock),
-> +                                  GFP_KERNEL);
-> +       if (!tdx_mng_key_config_lock)
-> +               return -ENOMEM;
-> +       for (i = 0; i < max_pkgs; i++)
-> +               mutex_init(&tdx_mng_key_config_lock[i]);
-> +
->         /* TDX requires VMX. */
->         r = vmxon_all();
->         if (!r)
-> @@ -103,3 +508,9 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
->
->         return r;
->  }
-> +
-> +void tdx_hardware_unsetup(void)
-> +{
-> +       /* kfree accepts NULL. */
-> +       kfree(tdx_mng_key_config_lock);
-> +}
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 98999bf3f188..938314635b47 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -17,6 +17,8 @@ struct kvm_tdx {
->
->         struct tdx_td_page tdr;
->         struct tdx_td_page *tdcs;
-> +
-> +       int hkid;
->  };
->
->  struct vcpu_tdx {
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index ac1688b0b0e3..95da978c9aa9 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -133,9 +133,20 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
->  #ifdef CONFIG_INTEL_TDX_HOST
->  int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
->  bool tdx_is_vm_type_supported(unsigned long type);
-> +void tdx_hardware_unsetup(void);
-> +
-> +int tdx_vm_init(struct kvm *kvm);
-> +void tdx_mmu_release_hkid(struct kvm *kvm);
-> +void tdx_vm_free(struct kvm *kvm);
->  #else
->  static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
->  static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
-> +static inline void tdx_hardware_unsetup(void) {}
-> +
-> +static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
-> +static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
-> +static inline void tdx_flush_shadow_all_private(struct kvm *kvm) {}
-> +static inline void tdx_vm_free(struct kvm *kvm) {}
->  #endif
->
->  #endif /* __KVM_X86_VMX_X86_OPS_H */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 91053fdc4512..4b22196cb12c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12702,6 +12702,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->         kvm_page_track_cleanup(kvm);
->         kvm_xen_destroy_vm(kvm);
->         kvm_hv_destroy_vm(kvm);
-> +       static_call_cond(kvm_x86_vm_free)(kvm);
->  }
->
->  static void memslot_rmap_free(struct kvm_memory_slot *slot)
-> @@ -13012,6 +13013,13 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->
->  void kvm_arch_flush_shadow_all(struct kvm *kvm)
->  {
-> +       /*
-> +        * kvm_mmu_zap_all() zaps both private and shared page tables.  Before
-> +        * tearing down private page tables, TDX requires some TD resources to
-> +        * be destroyed (i.e. keyID must have been reclaimed, etc).  Invoke
-> +        * kvm_x86_flush_shadow_all_private() for this.
-> +        */
-> +       static_call_cond(kvm_x86_flush_shadow_all_private)(kvm);
->         kvm_mmu_zap_all(kvm);
->  }
->
-> --
-> 2.25.1
->
+That check matches the behaviour of kvm_gfn_to_hva_cache_init() which
+deliberately clears ghc->memslot if it crosses a page. (Although I
+don't see why; it only really needs to do that if it crosses over onto
+a second *memslot*, surely?)
+
+So we'd then hit this in kvm_xen_update_runstate_guest():
+
+       /* We made sure it fits in a single page */
+       BUG_ON(!ghc->memslot);
+
+We'd need a fallback code path for the page-crossing (or memslot-
+crossing) case, and the natural way to do that is to just use
+kvm_write_guest(). In the RUNSTATE_runnable case where we can't sleep,
+can we get away with using pagefault_disable() around a call to
+kvm_write_guest()?=20
+
+The worst case here is kind of awful; it's a compat guest with the
+first half of its ->state_entry_time being on the first page, and the
+second half of it being on the second page.
+
+I'm playing with using a second GPC for the overrun onto the second
+page. Debating if it's already too ugly to live before I even fix up
+the actual copying part...
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_hos=
+t.h
+index 81114a376c4e..3fc08f416aa3 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -647,6 +647,7 @@ struct kvm_vcpu_xen {
+ 	struct gfn_to_pfn_cache vcpu_info_cache;
+ 	struct gfn_to_pfn_cache vcpu_time_info_cache;
+ 	struct gfn_to_pfn_cache runstate_cache;
++	struct gfn_to_pfn_cache runstate2_cache;
+ 	u64 last_steal;
+ 	u64 runstate_entry_time;
+ 	u64 runstate_times[4];
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 4b8e9628fbf5..e297569bbc8d 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -201,35 +201,59 @@ static void kvm_xen_update_runstate(struct kvm_vcpu *=
+v, int state)
+ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+ {
+ 	struct kvm_vcpu_xen *vx =3D &v->arch.xen;
+-	struct gfn_to_pfn_cache *gpc =3D &vx->runstate_cache;
++	struct gfn_to_pfn_cache *gpc1 =3D &vx->runstate_cache;
++	struct gfn_to_pfn_cache *gpc2 =3D &vx->runstate2_cache;
+ 	uint64_t *user_times;
+ 	unsigned long flags;
+-	size_t user_len;
++	size_t user_len1, user_len2 =3D 0;
+ 	int *user_state;
+=20
+ 	kvm_xen_update_runstate(v, state);
+=20
+-	if (!vx->runstate_cache.active)
++	if (!gpc1->active)
+ 		return;
+=20
+ 	if (IS_ENABLED(CONFIG_64BIT) && v->kvm->arch.xen.long_mode)
+-		user_len =3D sizeof(struct vcpu_runstate_info);
++		user_len1 =3D sizeof(struct vcpu_runstate_info);
+ 	else
+-		user_len =3D sizeof(struct compat_vcpu_runstate_info);
++		user_len1 =3D sizeof(struct compat_vcpu_runstate_info);
+=20
+-	read_lock_irqsave(&gpc->lock, flags);
+-	while (!kvm_gfn_to_pfn_cache_check(v->kvm, gpc, gpc->gpa,
+-					   user_len)) {
+-		read_unlock_irqrestore(&gpc->lock, flags);
++	if ((gpc1->gpa & ~PAGE_MASK) + user_len1 >=3D PAGE_SIZE) {
++		user_len2 =3D user_len1;
++		user_len1 =3D PAGE_SIZE - (gpc1->gpa & ~PAGE_MASK);
++		user_len2 -=3D user_len1;
++	}
++
++ retry:
++	read_lock_irqsave(&gpc1->lock, flags);
++	while (!kvm_gfn_to_pfn_cache_check(v->kvm, gpc1, gpc1->gpa,
++					   user_len1)) {
++		read_unlock_irqrestore(&gpc1->lock, flags);
+=20
+ 		/* When invoked from kvm_sched_out() we cannot sleep */
+ 		if (state =3D=3D RUNSTATE_runnable)
+ 			return;
+=20
+-		if (kvm_gfn_to_pfn_cache_refresh(v->kvm, gpc, gpc->gpa, user_len))
++		if (kvm_gfn_to_pfn_cache_refresh(v->kvm, gpc1, gpc1->gpa, user_len1))
+ 			return;
+=20
+-		read_lock_irqsave(&gpc->lock, flags);
++		read_lock_irqsave(&gpc1->lock, flags);
++	}
++	if (user_len2) {
++		read_lock(&gpc2->lock);
++		if (!kvm_gfn_to_pfn_cache_check(v->kvm, gpc2, gpc2->gpa, user_len2)) {
++			read_unlock(&gpc2->lock);
++			read_unlock_irqrestore(&gpc1->lock, flags);
++
++			if (state =3D=3D RUNSTATE_runnable)
++				return;
++
++			if (kvm_gfn_to_pfn_cache_refresh(v->kvm, gpc2,
++							 gpc2->gpa, user_len2))
++				return;
++
++			goto retry;
++		}
+ 	}
+=20
+ 	/*
+@@ -584,23 +608,52 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, stru=
+ct kvm_xen_vcpu_attr *data)
+ 			kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
+ 		break;
+=20
+-	case KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADDR:
++	case KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADDR: {
++		size_t sz;
++
+ 		if (!sched_info_on()) {
+ 			r =3D -EOPNOTSUPP;
+ 			break;
+ 		}
+ 		if (data->u.gpa =3D=3D GPA_INVALID) {
++			r =3D 0;
++		deactivate_out:
+ 			kvm_gpc_deactivate(vcpu->kvm,
+ 					   &vcpu->arch.xen.runstate_cache);
+-			r =3D 0;
++		deactivate2_out:
++			kvm_gpc_deactivate(vcpu->kvm,
++					   &vcpu->arch.xen.runstate2_cache);
+ 			break;
+ 		}
+=20
+-		r =3D kvm_gpc_activate(vcpu->kvm, &vcpu->arch.xen.runstate_cache,
+-				     NULL, KVM_HOST_USES_PFN, data->u.gpa,
+-				     sizeof(struct vcpu_runstate_info));
++		if (IS_ENABLED(CONFIG_64BIT) && vcpu->kvm->arch.xen.long_mode)
++			sz =3D sizeof(struct vcpu_runstate_info);
++		else
++			sz =3D sizeof(struct compat_vcpu_runstate_info);
++
++		/* Handle structures which cross a page boundary by using two GPCs */
++		if ((data->u.gpa & ~PAGE_MASK) + sz <=3D PAGE_SIZE) {
++			r =3D kvm_gpc_activate(vcpu->kvm, &vcpu->arch.xen.runstate_cache,
++					     NULL, KVM_HOST_USES_PFN, data->u.gpa,
++					     sizeof(struct vcpu_runstate_info));
++			goto deactivate2_out;
++		} else {
++			/* Map the end of the first page... */
++			r =3D kvm_gpc_activate(vcpu->kvm, &vcpu->arch.xen.runstate_cache,
++					     NULL, KVM_HOST_USES_PFN, data->u.gpa,
++					     PAGE_SIZE - (data->u.gpa & ~PAGE_MASK));
++			if (r)
++				goto deactivate2_out;
++			/* ... and the start of the second. */
++			sz -=3D PAGE_SIZE - (data->u.gpa & ~PAGE_MASK);
++			r =3D kvm_gpc_activate(vcpu->kvm, &vcpu->arch.xen.runstate2_cache,
++					     NULL, KVM_HOST_USES_PFN,
++					     (data->u.gpa + PAGE_SIZE) & PAGE_MASK, sz);
++			if (r)
++				goto deactivate_out;
++		}
+ 		break;
+-
++	}
+ 	case KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_CURRENT:
+ 		if (!sched_info_on()) {
+ 			r =3D -EOPNOTSUPP;
+@@ -1834,6 +1887,7 @@ void kvm_xen_init_vcpu(struct kvm_vcpu *vcpu)
+ 	timer_setup(&vcpu->arch.xen.poll_timer, cancel_evtchn_poll, 0);
+=20
+ 	kvm_gpc_init(&vcpu->arch.xen.runstate_cache);
++	kvm_gpc_init(&vcpu->arch.xen.runstate2_cache);
+ 	kvm_gpc_init(&vcpu->arch.xen.vcpu_info_cache);
+ 	kvm_gpc_init(&vcpu->arch.xen.vcpu_time_info_cache);
+ }
+@@ -1844,6 +1898,7 @@ void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
+ 		kvm_xen_stop_timer(vcpu);
+=20
+ 	kvm_gpc_deactivate(vcpu->kvm, &vcpu->arch.xen.runstate_cache);
++	kvm_gpc_deactivate(vcpu->kvm, &vcpu->arch.xen.runstate2_cache);
+ 	kvm_gpc_deactivate(vcpu->kvm, &vcpu->arch.xen.vcpu_info_cache);
+ 	kvm_gpc_deactivate(vcpu->kvm, &vcpu->arch.xen.vcpu_time_info_cache);
+=20
+
+--=-oYGOM8btHNpbF3RUdezY
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTE1MDAxNjI1WjAvBgkqhkiG9w0BCQQxIgQgTK07VyZS
+m2sbSiyJWlLy/qw95wzW6dDUe22ih8XM13swgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCIZlmgXmvupOZAlIh9fZJLkc5higFEpMiO
+F1879fwFrKWuAQjfm4+MifA7SKy1qfyo1+YKerIDlnirjHnG0KdkpZTZJnw+E5NDJn52EU/bUH+u
+kynjk2B6cdV3SzDmrHXJHkEsqiUjYYiw8pqaNlt83cZkHIfyHmm8MmH/uNZ0aLhXu9rL/K7oLyQi
+FIKeCs8c1HQV1ixIUlm/A58MINejWhiNmMT+Oca8ralx5R2Ja2r2fe6wUpowYbiNcxZV7u6ICuUr
+9uifz/p+qdecn0z3YHv2WyHc1u9SR5xvyaj4pybTWwHJUxNXLgZw9i0/K25HATNve+O27Ae8w22T
+vEgZIokc/O03sH1awUqjBzemx69Xif1DaEqNLG3Jeb91KnM8o+aAdSnkW+r4AYUCGF5AED4tZ/x0
+JImvLq5SAOfn/j5SkNYt5wiEIkEqoZGoYjwrZAkSfRTMA49pv+NnVDNfeTZ7qLMCXOYX65qqgCeN
+aDA/BJ5GTFq+98OMLnI5zbKiBlJZj+Qgiwn+JCYduNpTb/TLwLMc/Cnuag9cXSHmPWZjJZrYf/ar
+kfzieMQ5qPkrO+MNxEP5tuHJ1RHhDHMMwkM5e4M7wyvJkC3UUPR0AXBjHMwoBDHO3nx3Y0JAdfaL
+bveAQyClS+KOnhxzq4L9toiAdu07FTpyGxoT7kMUVgAAAAAAAA==
+
+
+--=-oYGOM8btHNpbF3RUdezY--
+
