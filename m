@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52108629708
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:16:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0122D62970B
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:16:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230350AbiKOLQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 06:16:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51892 "EHLO
+        id S237872AbiKOLQy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 06:16:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229666AbiKOLQS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 06:16:18 -0500
-Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F171B6D
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:17 -0800 (PST)
-Received: by mail-wm1-x34a.google.com with SMTP id bi19-20020a05600c3d9300b003cf9d6c4016so10366541wmb.8
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:17 -0800 (PST)
+        with ESMTP id S229495AbiKOLQV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 06:16:21 -0500
+Received: from mail-wm1-x349.google.com (mail-wm1-x349.google.com [IPv6:2a00:1450:4864:20::349])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEABA5F8C
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:19 -0800 (PST)
+Received: by mail-wm1-x349.google.com with SMTP id c5-20020a1c3505000000b003c56da8e894so10388503wma.0
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NIh7hm1vgq4axzRzMsuAHgxMQ1Qyi0g563BuecOU0iE=;
-        b=o/Jm+iBUclqgHWET7gEwK75p2CjV30bgbQzC70E902kLfWQgtP44WMCJ0lCGQqmDsK
-         BkhQCaFXmTT6VQwO03RVgDIaKaPqybik6PgGWyf3IYT4nAMwa5yVjGCSbfCAiXHNHJLT
-         II7lS9qvGkpgd+0D1+oq09Ug7VgotF7yYOm6RV+XzHMYwzdMBHFWy5zB4v5ziRjIm2Ef
-         l95IWqLwDLgnQ73kYtckKrDKTNUD2QXd9SipslLlxZrscMStpAH5JpaQMZzP0TypFgAk
-         ZSbJlvLM1JIX2bmz6WhU2muRiE8uuukk3dMyPjvNfeFTNf++M17He9b/kIlhfz5Fl1na
-         qTbA==
+        bh=lM2yp/osnDi1TeBXG+cCa07bf+K2sNDUuqRai/Rm3iA=;
+        b=QqGHZuFt9BpKZpnu1D4I30sZEaQLAMgs4U88rGIHONK9CZbID9l7eFDMzmr4R9tFH2
+         5jP0ICK+/ug9aIsQAGfv+5ERmuNsytJ7OR6XO7Fw3NFTN8Gsx7hM7xoYd5FYpH/btxw4
+         wcfMS8FSX3RJjFRrMIYIBCu8Zgs09OvxUjZaOMmCbFFs5D2ZI9YxHRZOfHgZtefek1QZ
+         r4BV/vDh+RUc31ebxuH2+KLVqp8gW3deY9arRnC/bPvwLvJWb1XkP3VpI0JrOaIf779F
+         wqSNtYub+fyFvIFk92aUdvRNgrWI1WWL7qwyGg64ha6Gljr6XZxhoqvnvFql743VGDxG
+         upqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NIh7hm1vgq4axzRzMsuAHgxMQ1Qyi0g563BuecOU0iE=;
-        b=waVs5W4PDehJ1fPrRF0z/kmcunNlkxbbpuHxX/Vfz3G4TwoufupCYJlhsrWpcRZ4aT
-         /wE5XcuGucO+yb1HoGSa6kHJw07NcZzAdo7evDSoRBz9pkcrm2iVTTnQvD0iLJRT8p6j
-         ojstkocaCQL9+u6wEaAwzJU3q00sqJt1cukgvgd/XrKNs2TKIN6wSFxuNdh8DMVa+zsE
-         He5Fx9GDTu/7tqxDsf5xlyKh8ZoJZT97h94jXqpcKonzOAycTOG29P/hkhIHHMMMujl6
-         0oud1ATAaFXncfSc6wNJMkIZPe5fEzyW9FdD//daD9jC5XuE7Dh/6YniSU7XCFCc6wAD
-         UiTA==
-X-Gm-Message-State: ANoB5plykhUIh6nz79zdHrSqRdwUWB9vri4lbZKOIhrGAOhpYgWqNSKs
-        RjDsI9/04cKKpYpdksQ9hl/gAwPX7/hagQEO1g9n7AiuvJVKiZvAdUVwwXd/X5KmmYHI9QEvmrZ
-        eoYlbrErSkAYOy9uT/KxZxHHt7zS87WSnOh90Cs/mPL/lcrmyaWiDpZA=
-X-Google-Smtp-Source: AA0mqf5wOnNfPMSuwQH//NTcL25qBdsbJ1MQADv5FF1HKdx1IxtXGrKCoiQ9oiCnCxXlBzmsAxpp76icwQ==
+        bh=lM2yp/osnDi1TeBXG+cCa07bf+K2sNDUuqRai/Rm3iA=;
+        b=t5ei9hLoQ463RczoAGmfRJWHtzPIb5/AxdT0zgzw1F2DqkJAq6XTA0zXlfpNs8iCnc
+         1Vf7HUzLNI2/SvAqA1DVZWUV3qPJMjBM9akxoZ30bVUFTXN1H0dqTPCFx0dbZqaqH+R1
+         9FYkuW3naMvuGh6iwht41dn9K4GDVqwPZeCKWoR3iqcVE/8PLWHcX5ijJ3c9XEcRy1Bl
+         4gcKAhs9JrPag5cn/z99ZSMv6gAaQ/seVbSYwgY8YMpUGv05tU2NvVvdww8EqtwTtJxj
+         9JytmZZj2iSgCb0iVy9leJ9zWBJzr0MA22+RpEVUG/OaQhijCQBqpktTan9NADoKSSKu
+         g2TA==
+X-Gm-Message-State: ANoB5pm2MpwUjwwUxr/xrVqKRsxVkrSVtmAhrGnzYScgr9pFLNWDy1b6
+        +r5b9guzRdgnUKmY9AgsMAYfV9aen0LH1UsDZSFztufW+6Gaq4cnkjcPRfTOF2iaZlcihIGMp9X
+        fHzkb4IUEMrxJw8UF2VZozigwRzgZMT3qPgb2OovHI2EYlM76VsoATBg=
+X-Google-Smtp-Source: AA0mqf5yc2TO3aBf8mgzQGCaT6xkTcG4eeSytOnceUTf+c8ZtwUaAPxkK/Ck1/soa22THgPSTMi/oRksFg==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a1c:a302:0:b0:3c4:5806:104e with SMTP id
- m2-20020a1ca302000000b003c45806104emr1108716wme.42.1668510975995; Tue, 15 Nov
- 2022 03:16:15 -0800 (PST)
-Date:   Tue, 15 Nov 2022 11:15:43 +0000
+ (user=tabba job=sendgmr) by 2002:a05:600c:3b19:b0:3cf:7514:a80d with SMTP id
+ m25-20020a05600c3b1900b003cf7514a80dmr204260wms.0.1668510978137; Tue, 15 Nov
+ 2022 03:16:18 -0800 (PST)
+Date:   Tue, 15 Nov 2022 11:15:44 +0000
 In-Reply-To: <20221115111549.2784927-1-tabba@google.com>
 Mime-Version: 1.0
 References: <20221115111549.2784927-1-tabba@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221115111549.2784927-12-tabba@google.com>
-Subject: [PATCH kvmtool v1 11/17] Add a function that allocates aligned memory
- if specified
+Message-ID: <20221115111549.2784927-13-tabba@google.com>
+Subject: [PATCH kvmtool v1 12/17] Use new function to align memory
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
@@ -69,79 +68,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a variant of mmap_anon_or_hugetlbfs() that allocates memory
-aligned as specified. This function doesn't map or allocate more
-memory than the requested amount.
+Use the new mmap_anon_or_hugetlbfs_align() to allocate memory
+aligned as needed instead of doing it at the caller while
+allocating and mapping more than needed.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- util/util.c | 41 ++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 38 insertions(+), 3 deletions(-)
+ arm/kvm.c   | 10 +++++-----
+ riscv/kvm.c | 10 +++++-----
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/util/util.c b/util/util.c
-index 278bcc2..953e2d8 100644
---- a/util/util.c
-+++ b/util/util.c
-@@ -129,10 +129,17 @@ int memfd_alloc(u64 size, bool hugetlb, u64 blk_size)
- 	return fd;
- }
+diff --git a/arm/kvm.c b/arm/kvm.c
+index c84983e..0e5bfad 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -37,17 +37,17 @@ void kvm__init_ram(struct kvm *kvm)
+ 	 * 2M trumps 64K, so let's go with that.
+ 	 */
+ 	kvm->ram_size = kvm->cfg.ram_size;
+-	kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
+-	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm,
++	kvm->arch.ram_alloc_size = kvm->ram_size;
++	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs_align(kvm,
+ 						kvm->cfg.hugetlbfs_path,
+-						kvm->arch.ram_alloc_size);
++						kvm->arch.ram_alloc_size,
++						SZ_2M);
  
--/* This function wraps the decision between hugetlbfs map (if requested) or normal mmap */
--void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
-+/*
-+ * This function allocates memory aligned to align_sz.
-+ * It also wraps the decision between hugetlbfs (if requested) or normal mmap.
-+ */
-+void *mmap_anon_or_hugetlbfs_align(struct kvm *kvm, const char *htlbfs_path,
-+				   u64 size, u64 align_sz)
- {
- 	u64 blk_size = 0;
-+	u64 total_map = size + align_sz;
-+	u64 start_off, end_off;
-+	void *addr_map, *addr_align;
- 	int fd;
+ 	if (kvm->arch.ram_alloc_start == MAP_FAILED)
+ 		die("Failed to map %lld bytes for guest memory (%d)",
+ 		    kvm->arch.ram_alloc_size, errno);
  
- 	/*
-@@ -152,10 +159,38 @@ void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
- 		kvm->ram_pagesize = getpagesize();
- 	}
+-	kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
+-					SZ_2M);
++	kvm->ram_start = kvm->arch.ram_alloc_start;
  
-+	/* Create a mapping with room for alignment without allocating. */
-+	addr_map = mmap(NULL, total_map, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS,
-+			-1, 0);
-+	if (addr_map == MAP_FAILED)
-+		return MAP_FAILED;
-+
- 	fd = memfd_alloc(size, htlbfs_path, blk_size);
- 	if (fd < 0)
- 		return MAP_FAILED;
+ 	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+ 		MADV_MERGEABLE);
+diff --git a/riscv/kvm.c b/riscv/kvm.c
+index 4d6f5cb..e26b4f0 100644
+--- a/riscv/kvm.c
++++ b/riscv/kvm.c
+@@ -70,17 +70,17 @@ void kvm__arch_init(struct kvm *kvm)
+ 	 * 2M trumps 64K, so let's go with that.
+ 	 */
+ 	kvm->ram_size = min(kvm->cfg.ram_size, (u64)RISCV_MAX_MEMORY(kvm));
+-	kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
+-	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm,
++	kvm->arch.ram_alloc_size = kvm->ram_size;
++	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs_align(kvm,
+ 						kvm->cfg.hugetlbfs_path,
+-						kvm->arch.ram_alloc_size);
++						kvm->arch.ram_alloc_size,
++						SZ_2M);
  
-+	/* Map the allocated memory in the fd to the specified alignment. */
-+	addr_align = (void *)ALIGN((u64)addr_map, align_sz);
-+	if (mmap(addr_align, size, PROT_RW, MAP_PRIVATE | MAP_FIXED, fd, 0) ==
-+	    MAP_FAILED) {
-+		close(fd);
-+		return MAP_FAILED;
-+	}
-+
-+	/* Remove the mapping for unused address ranges. */
-+	start_off = addr_align - addr_map;
-+	if (start_off)
-+		munmap(addr_map, start_off);
-+
-+	end_off = align_sz - start_off;
-+	if (end_off)
-+		munmap((void *)((u64)addr_align + size), end_off);
-+
- 	kvm->ram_fd = fd;
--	return mmap(NULL, size, PROT_RW, MAP_PRIVATE, kvm->ram_fd, 0);
-+	return addr_align;
-+}
-+
-+void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
-+{
-+	return mmap_anon_or_hugetlbfs_align(kvm, htlbfs_path, size, 0);
- }
+ 	if (kvm->arch.ram_alloc_start == MAP_FAILED)
+ 		die("Failed to map %lld bytes for guest memory (%d)",
+ 		    kvm->arch.ram_alloc_size, errno);
+ 
+-	kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
+-					SZ_2M);
++	kvm->ram_start = kvm->arch.ram_alloc_start;
+ 
+ 	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+ 		MADV_MERGEABLE);
 -- 
 2.38.1.431.g37b22c650d-goog
 
