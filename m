@@ -2,328 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72618629C33
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 15:37:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 122E6629C96
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 15:49:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231258AbiKOOhJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 09:37:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53694 "EHLO
+        id S230489AbiKOOtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 09:49:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiKOOhH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 09:37:07 -0500
-Received: from wnew1-smtp.messagingengine.com (wnew1-smtp.messagingengine.com [64.147.123.26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 864511401B;
-        Tue, 15 Nov 2022 06:37:06 -0800 (PST)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailnew.west.internal (Postfix) with ESMTP id CBBF72B066D4;
-        Tue, 15 Nov 2022 09:37:00 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Tue, 15 Nov 2022 09:37:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1668523020; x=1668530220; bh=Ad
-        wHQwvOiKtA9P6Y0u9jZFsfpkfO0GgABx1clW0axSM=; b=b1yM/7FEcClWE/shk7
-        Ikib6jlxMdJrJr/Np4NeX2vDsT0AQEo7W07O2V0AaFy5qOOmVENeqdMC1eOTss/x
-        gRTEG1I0SEPeGT2VXeUG6zIbnD6dHdscBUIuGCJQevQzFC+UUbeDEQzmVWYglSbN
-        V6l8IX93vkcm6THTPmR2V23AmrGLkx3Uw0BSgusDSjHt07Pe6LYtFORGK17dDOyJ
-        mUAC7eH0TebAPnCXT78QyJejukQ4RmIG9X+xYUcryppXfcRiROQsTbMI4sAO7EDC
-        CudXWZVJtpcFPN0el9OFhJUGGjVAjTjCWR1BAxqgAUQSMDvc16NjQvgP8x4GEFW+
-        vcqg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1668523020; x=1668530220; bh=AdwHQwvOiKtA9P6Y0u9jZFsfpkfO
-        0GgABx1clW0axSM=; b=TDFbZVnuyahpqh8vT886YvKR1Ol2nKo8U+/J2ZElxrSQ
-        n2E5oSia7W6dD5yqxCZIxtzirSEFghTFlB7mAZp87wZnlFZbGO46OQUsMT2osyl9
-        yPocZOwpYwDL035DaZVzu2fC+ZQ9iYm406ihwqwdqNIfGftbDX8htxDt5TxRGBCF
-        +t23+33E4F1FO6nCpO9HhFlan0REtgnmZubj2wzg+HGVJNuF0NRuofZSdV1AscI9
-        wZM2jrp9pfXmJMsJLubXwhmDN9eZtg4PyMSFlT3Df9EGLoL+1pB420R3iPOlGcpK
-        lO65lG2pvjcQkovGbuVTllzqbhbtgdDPLNEsVzpDog==
-X-ME-Sender: <xms:CqRzY68BT2_MOQCpJaG-rHi3ZvX2DPUi1AORdEmnduWa6W-16sqpUQ>
-    <xme:CqRzY6sNcfcHf50KqgQ8kjcZzIU9uf7mU-dKtVHD2JzEBS25E00gx7lMBqWe_yZZn
-    CIXpJ3thavR8r76dE4>
-X-ME-Received: <xmr:CqRzYwDMbsjb5gxiP2OVgmcfVzPPyfJPLm1H0JkcrIAuZCoD9aYl6xTxWo_PDgIpjBv9KQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrgeeggdeiiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttddttddttddvnecuhfhrohhmpedfmfhirhhi
-    lhhlucetrdcuufhhuhhtvghmohhvfdcuoehkihhrihhllhesshhhuhhtvghmohhvrdhnrg
-    hmvgeqnecuggftrfgrthhtvghrnhephfeigefhtdefhedtfedthefghedutddvueehtedt
-    tdehjeeukeejgeeuiedvkedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomhepkhhirhhilhhlsehshhhuthgvmhhovhdrnhgrmhgv
-X-ME-Proxy: <xmx:CqRzYydIWDcubtT3THtqv8FWKHCS--BtaBzbgq3OhwTX20vuyo-laQ>
-    <xmx:CqRzY_OGoXMgKcwLte8bRp93aLlKDKHNuTTJfy3wCFsePEWbCpapGw>
-    <xmx:CqRzY8lj7_1L0OWPwtgl65FvZmhL0RNn1SNgP5_j7hMUObZk6dJuAg>
-    <xmx:DKRzYycI2DAmg3G1dRRamPnUVJyM4m05tNWQKBXs1AUq7Ug2T3ZwfJ76r9Y>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 15 Nov 2022 09:36:57 -0500 (EST)
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id CAA2F10997B; Tue, 15 Nov 2022 17:36:54 +0300 (+03)
-Date:   Tue, 15 Nov 2022 17:36:54 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Hugh Dickins <hughd@google.com>
-Cc:     Vishal Annapurve <vannapurve@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S229926AbiKOOtN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 09:49:13 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2077.outbound.protection.outlook.com [40.107.223.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F4FE10FF2;
+        Tue, 15 Nov 2022 06:49:12 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W1CajyqRI3hwTH5OTG4V0QR5L2zHOeT0YbJbVraIKr++t6t2hly+oQqRv3SQt8Nk8CA0SCOGEoPrx3ol79ZOv6ItdCDYYYRE+vHzedPGWnc8kZ36wCnbI47Vk8lupyf+2L1WLvXVh6Z6VmzmWZ2W6ucfmAwpQUIYvIG2h0pGYXdBCHeYRK0i3UZqpTeFW4zwiFV6MtqyWLgrstnBlGu4ChHVfLjvt5EU75Nq5dm0Yp3fnkJBg/iL2TagsVfy+P9C2TYq6aM3qaCZHqAjUxnXFTSmbg6f/Ocj16pRYB62Yb5NSRz3Co0maimD8G2L27y3v9q4pNbZRjLbqhautUqlvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6yvfH4zQLQ+BI3FnwlxjOgFeNphjhDMZUMeTQED5QcE=;
+ b=Yh0kcJE/KTmtJXd9MZdHqlkw/Eb1BCNpocEH0Hs1G6kPxJ5/lj7rDeufvSMLrCLx14pcMr+J3wjppjT6cJNWvhhvhzaPf+YeahWX1aL+Qq/rzCb69L7p/81X6v0ko9KyKNqGNVgqLIvqY5lMr/fv2/mHzhEuEu8xwN5hjRZm9C4ZrfxV/L/Nw/ybLnh5uWs6lszl2mzRYU26TYTCABnRJ9h0vOKxTUBn8JJkYKWrl3JqKYWs+lfAPRPrdek66aKYvIU6FVc0+1cBg02qMzuDY9t5ckM0vorOb0+3qixjfJET2Pxq1dpDUqqkCtF/wYl0+T/uKVCpUZvK8Al+8xu+9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6yvfH4zQLQ+BI3FnwlxjOgFeNphjhDMZUMeTQED5QcE=;
+ b=AVWV6bh6ZpGyENu7uFjR2LsFoEt3yZpDlWjKB4AgDJSSJG36fk0ak9G6VOMLn4BWrYW9K3LJ+zf6sp25SnE3X5QsbOW/jMOyzM2z4M2eyU6WLzT8VoT0Fsx4qNVWxCpwUxOLLbdgYNo+ylqN/YBtWvFQ32sSLAayZ1hbZ9Ok8wi5NIq7FiXqVT57/X7GBQXJOSkU2Voqq5B487xn8rJNcyqFDeBaqQ7dNjBBpXSEIBrHFHi1Mh4IxmMhnna+egLMm8hCmgyDUG+GrQ3GKR9o06VOwDtqWI187FF4PEAlYmfK4AE9a9h8j+ONsS4Y20WS87qmKc1flQJOUNQ8wOMFfg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BN9PR12MB5274.namprd12.prod.outlook.com (2603:10b6:408:11f::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.17; Tue, 15 Nov
+ 2022 14:49:10 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%7]) with mapi id 15.20.5813.017; Tue, 15 Nov 2022
+ 14:49:10 +0000
+Date:   Tue, 15 Nov 2022 10:49:09 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
         Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v9 0/8] KVM: mm: fd-based approach for supporting KVM
-Message-ID: <20221115143654.rqpf72hzdtrd3xyw@box.shutemov.name>
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <CAGtprH-av3K6YxUbz1cAsQp4w2ce35UrfBF-u7Q_qCuTNMdvzQ@mail.gmail.com>
- <20221108004141.GF1063309@ls.amr.corp.intel.com>
- <20221109155404.istawiyvwr3yffag@box.shutemov.name>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v4 08/17] iommufd: Algorithms for PFN storage
+Message-ID: <Y3Om5Wv2rE4fH9y4@nvidia.com>
+References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+ <8-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
+ <BN9PR11MB52762E5ACAAE7D7B398730D78C059@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y3KCvnLOZpGXAGhU@nvidia.com>
+ <BN9PR11MB5276E1EFCCDBDFA8D6C58FF78C049@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221109155404.istawiyvwr3yffag@box.shutemov.name>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BN9PR11MB5276E1EFCCDBDFA8D6C58FF78C049@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL1PR13CA0015.namprd13.prod.outlook.com
+ (2603:10b6:208:256::20) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BN9PR12MB5274:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7d039fb5-51cb-465a-52e6-08dac7188e17
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: lnzxflYdm9UGCQVLyp8NXQOVjhsUOJf1Cl2d2QxaRT1/gSuLbJIHT5Ucx2G+cCOnsNFO8611T3r5GbDgR8w1Syv3A1pXYdmGQY91qMFzQaOnMnk5GSv24UL34WeCk33Bl0yTnEV+m77gG56UeASS5B0LMgsayBik/aHkZgbTOT1ogoRNNXnq/guK2uftDblXCg/H6H3XbGtevoSqBxvdSuYIHOKHlvZF2HRzH4N/tSQWkg+eo4x5aG5T+FQf3xlSA4rl0JG/Zz0s13V73+09zoVh8xZEPOTJQZKrzBy53OdntVTFS9O/NkoExmx41+i+RFE9LenB/pkBzB1KA2XX/WboGjiUk0YG0sjEUcaww8v61qNI1txQOoU0G7CJCIqpVCqDSbB+I+XjZiEf0yjX7sNDZOkn5nNGWTxkXT1SMUoPKF7EL1+Fa289ZoMrBlv23rN22t+DxGq0UAVLE8tuXrv5QE6RhC1nFtIwBAhc55GuGLhwsg6OBTL+a8Q6Ma6iDeYB1NjIO5snOmtwhxP2E7T83J/k1ASyW5T2c4uYsniUcBzcTbxdnzooilt9ouEQS8s3qVntmr1eeSHen0xoQNGiDQXMb2Ca1WNJlz2L5cNZk5h3cqh3LcBozp3EFSJjtiLVm26QPs/N8Bwj8XwmSfKJn7xurY0EbZDJdxPzXz2HLRO49S0SNT3TVe4tFphP5L2CtPBNxRKCUycp82r5+Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(366004)(376002)(39860400002)(346002)(396003)(451199015)(6486002)(478600001)(54906003)(6916009)(6506007)(4326008)(7416002)(5660300002)(26005)(66556008)(7406005)(66476007)(316002)(66946007)(8676002)(6512007)(186003)(8936002)(41300700001)(36756003)(2616005)(83380400001)(2906002)(38100700002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YjF3ejNwYTg5ZU1BMkt6TjZaVHhIalFLcUNTY3FOOVVwYmtqbHpqdWxScjgw?=
+ =?utf-8?B?K0gyVjQzMCtITldnZ0JoYStxd1liOW45NEpvV0J6d2NDWGVpWWFiUXZocCt0?=
+ =?utf-8?B?RnFRL08zcy9hblMwOGlFVCsySmVwOVVtSmtlNVNMOWxpVTFtbGdHU3ptNVpk?=
+ =?utf-8?B?b2hPM0x6VWppWEtlRm5ENm85Nk5wNGprUVlTcUFOcE4zVG12bm5VVi8wdllD?=
+ =?utf-8?B?eFR1bTNqUFFGcWxqTEl3TEZkVUl1ejRjRnA2cXV3QzBCaC9ZM25udXU2WTlj?=
+ =?utf-8?B?Qk5iTTFBbEQ0bkVpRThrNXd0a2xxemM1YkZhSTNFS1ZHcUZ1bHJEWGJPZGpC?=
+ =?utf-8?B?bUZwNDJDakxoc2VyU0NzRWljb0tyWXNaTzgyd1lHTDN0YnU3bDNuL2JDT1Vq?=
+ =?utf-8?B?VkMzMjZWZE9QNUpXbkQ4d0pSa2dJUUVVY0RNYkozYnlsWWpaSDFRaC85Mk9I?=
+ =?utf-8?B?UjFsclp0RDZqQ1JhWDRWRDd2R2JsWEpDdnNMVDYvU0pOMTZEbkxlVUNZMXJV?=
+ =?utf-8?B?TlV0VFBwME83YWNxOWVzMWpvTmhvWVlVZ0d3b2k1cTBhd2c4Z2tvSnU2Tjhk?=
+ =?utf-8?B?UnpQNU5XQVA3b2VXcU5ERkZIcDhkWVRETkE5QUEvcVVuN0h1NVdhYUxsK2dh?=
+ =?utf-8?B?T0dtZkRYdkN1TlVRUVhjNTFwOXhwQ0N2OExVeGFxanR2Y2xBV3pZRkI5NEF0?=
+ =?utf-8?B?ZnFoQkpYalF0ZEppaU5IUnJvb1FXQytuZ2ZoSTJ5Y3oxNnlVMjQvRG83bkpH?=
+ =?utf-8?B?NVQvNTY0Z01ZVmJEWVE0NEoxeG5nN3l2YmtTd0h5cE4rT3ZYSlFWQ0p0L2d2?=
+ =?utf-8?B?Yk9oaUJZZmlZRWp6Wkk4dDlZZ2szOVNrTDFpT3I5WWVrT1lYWnhqQlgxdWVw?=
+ =?utf-8?B?UVZqRlVTQWxtV1Ezc1ZLOVV5UTJvc0taaXk4SStvWlErUUhPUjBvVlFoYVVG?=
+ =?utf-8?B?S3JVVGwzSEFtR1c3SGpJUmVsWmFBeHdNSFJOMDVlTURyWDRxanMwVEZqbXN5?=
+ =?utf-8?B?ZkE0aVYrdytJOUxxTkd4MTdiOGRVWkM2N0JiNGpyOXphWTlMTTRrcXpwK1R0?=
+ =?utf-8?B?dHFXZkduOUcyeW9OZDMydU9WUXVoQ1FOaDFJeGIyODhYWitOUHcwdit0eXNo?=
+ =?utf-8?B?TnIrMCtqL0V0b1lKQkV5THFGZ1RKVkJ6bzZ5cVVSNnRaMTdFM01lcWVVTEtr?=
+ =?utf-8?B?eFIwMU5URkQzNzhwQkdoblBPeWZzYkZBYzl4YVZNVEw1SjBLVmwzaFM3Wi9h?=
+ =?utf-8?B?azgrQWFtcmF2WnpTTjRBNU1TMjdhZDVLeUFzRnUzdEJ3R3ErL1hwbm9JQkRa?=
+ =?utf-8?B?Nm9jOUg2ejZYbno2MHVZZnhPVjJuU2NEemNkdzJHZlUveWVnd1h6UDZYclcr?=
+ =?utf-8?B?clk1SHc2K1FHUVZ2ZERvOEdzcHVVc2VpWEpUV2taeERBQ1pZRDk2VStDNGFx?=
+ =?utf-8?B?TXB5TnloNXhZd1FaNEFqTjZ3a0pZY0RHSVFnYWV2M3FOSFpRcU9GUnRsZlMy?=
+ =?utf-8?B?bS92UDJEaFd5L0xJVElwaXREUDMrMWJvalBhdVQvd0h3VVFBRWF6Zks3VW5a?=
+ =?utf-8?B?eXVwTHROOU1xcVFlV292Q2ZkcDBBNC9NTmVWRStKS3hyS1J3WjhtZXYrL3Zx?=
+ =?utf-8?B?OW9NTUtBUFNUamxreVJwczhOVXhlOUhxZTc5OHZaRGw2VUZ4bEt3Y1NhdU1p?=
+ =?utf-8?B?d1RxMFBMdGNzQjRoWVdxSjJxcDJ3NXUrdTVmTjBwWFpFMjJQbWFIWXg5QnVl?=
+ =?utf-8?B?RUxiVUZTMkFWZmhZK1BmU0RHVk1rOE83Ri84QUhGMW9HSHNBMjgybHVERU1M?=
+ =?utf-8?B?dTNTcXJ4LzJuQnQwZjNaQi9TSkl4ZnlabnMvcFN4SmpCa3h4UzFzelFhLy83?=
+ =?utf-8?B?bDJ4OGMwVDlSSEJKRlp6ZHZKOFoyQWhQMHRVVEVxU0FkK29EOVFKd0h1L0J0?=
+ =?utf-8?B?U3A2a2Y2SnB1ejVZRWhJcjFlTkR6T3E5eE1oWnVNT3FjTjIzVnYrRDlDSitG?=
+ =?utf-8?B?T0FsTGRvQlB3U0FmSXZIZ20rdFlkZldNanRXWWNCaEpNTEVDelFucTkxdGZ0?=
+ =?utf-8?B?T2RkaVpCaXpyeXlZalJ3N3lNUjNLR1RLZ3VrcHUvZkRrdEZaZjRVWmlrQ09M?=
+ =?utf-8?Q?5Ubs=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d039fb5-51cb-465a-52e6-08dac7188e17
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2022 14:49:10.5413
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BzjbWCnghH+s561FdWy6OnhsmnvfDNmB1Cyp+w2cupUzMYInTAaf6F0y1f15TruF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5274
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 09, 2022 at 06:54:04PM +0300, Kirill A. Shutemov wrote:
-> On Mon, Nov 07, 2022 at 04:41:41PM -0800, Isaku Yamahata wrote:
-> > On Thu, Nov 03, 2022 at 05:43:52PM +0530,
-> > Vishal Annapurve <vannapurve@google.com> wrote:
-> > 
-> > > On Tue, Oct 25, 2022 at 8:48 PM Chao Peng <chao.p.peng@linux.intel.com> wrote:
-> > > >
-> > > > This patch series implements KVM guest private memory for confidential
-> > > > computing scenarios like Intel TDX[1]. If a TDX host accesses
-> > > > TDX-protected guest memory, machine check can happen which can further
-> > > > crash the running host system, this is terrible for multi-tenant
-> > > > configurations. The host accesses include those from KVM userspace like
-> > > > QEMU. This series addresses KVM userspace induced crash by introducing
-> > > > new mm and KVM interfaces so KVM userspace can still manage guest memory
-> > > > via a fd-based approach, but it can never access the guest memory
-> > > > content.
-> > > >
-> > > > The patch series touches both core mm and KVM code. I appreciate
-> > > > Andrew/Hugh and Paolo/Sean can review and pick these patches. Any other
-> > > > reviews are always welcome.
-> > > >   - 01: mm change, target for mm tree
-> > > >   - 02-08: KVM change, target for KVM tree
-> > > >
-> > > > Given KVM is the only current user for the mm part, I have chatted with
-> > > > Paolo and he is OK to merge the mm change through KVM tree, but
-> > > > reviewed-by/acked-by is still expected from the mm people.
-> > > >
-> > > > The patches have been verified in Intel TDX environment, but Vishal has
-> > > > done an excellent work on the selftests[4] which are dedicated for this
-> > > > series, making it possible to test this series without innovative
-> > > > hardware and fancy steps of building a VM environment. See Test section
-> > > > below for more info.
-> > > >
-> > > >
-> > > > Introduction
-> > > > ============
-> > > > KVM userspace being able to crash the host is horrible. Under current
-> > > > KVM architecture, all guest memory is inherently accessible from KVM
-> > > > userspace and is exposed to the mentioned crash issue. The goal of this
-> > > > series is to provide a solution to align mm and KVM, on a userspace
-> > > > inaccessible approach of exposing guest memory.
-> > > >
-> > > > Normally, KVM populates secondary page table (e.g. EPT) by using a host
-> > > > virtual address (hva) from core mm page table (e.g. x86 userspace page
-> > > > table). This requires guest memory being mmaped into KVM userspace, but
-> > > > this is also the source where the mentioned crash issue can happen. In
-> > > > theory, apart from those 'shared' memory for device emulation etc, guest
-> > > > memory doesn't have to be mmaped into KVM userspace.
-> > > >
-> > > > This series introduces fd-based guest memory which will not be mmaped
-> > > > into KVM userspace. KVM populates secondary page table by using a
-> > > 
-> > > With no mappings in place for userspace VMM, IIUC, looks like the host
-> > > kernel will not be able to find the culprit userspace process in case
-> > > of Machine check error on guest private memory. As implemented in
-> > > hwpoison_user_mappings, host kernel tries to look at the processes
-> > > which have mapped the pfns with hardware error.
-> > > 
-> > > Is there a modification needed in mce handling logic of the host
-> > > kernel to immediately send a signal to the vcpu thread accessing
-> > > faulting pfn backing guest private memory?
-> > 
-> > mce_register_decode_chain() can be used.  MCE physical address(p->mce_addr)
-> > includes host key id in addition to real physical address.  By searching used
-> > hkid by KVM, we can determine if the page is assigned to guest TD or not. If
-> > yes, send SIGBUS.
-> > 
-> > kvm_machine_check() can be enhanced for KVM specific use.  This is before
-> > memory_failure() is called, though.
-> > 
-> > any other ideas?
+On Tue, Nov 15, 2022 at 03:06:57AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Tuesday, November 15, 2022 2:03 AM
+> > -		mutex_lock(&area->pages->mutex);
+> > -		rc = iopt_pages_add_access(area->pages, index, last_index,
+> > -					   out_pages, flags);
+> > -		if (rc) {
+> > -			mutex_unlock(&area->pages->mutex);
+> > +		rc = iopt_pages_add_access(area, index, last_index,
+> > out_pages,
+> > +					   flags);
+> > +		if (rc)
 > 
-> That's too KVM-centric. It will not work for other possible user of
-> restricted memfd.
+> iopt_area_add_access(), which I suppose you have already fixed when
+> compiling this change. but just in case... 😊
 > 
-> I tried to find a way to get it right: we need to get restricted memfd
-> code info about corrupted page so it can invalidate its users. On the next
-> request of the page the user will see an error. In case of KVM, the error
-> will likely escalate to SIGBUS.
+> > @@ -1819,40 +1838,49 @@ iopt_pages_get_exact_access(struct iopt_pages
+> > *pages, unsigned long index,
+> >   *
+> >   * This should be undone through a matching call to
+> > iopt_pages_remove_access()
 > 
-> The problem is that core-mm code that handles memory failure knows nothing
-> about restricted memfd. It only sees that the page belongs to a normal
-> memfd.
+> iopt_area_remove_access()
 > 
-> AFAICS, there's no way to get it intercepted from the shim level. shmem
-> code has to be patches. shmem_error_remove_page() has to call into
-> restricted memfd code.
+> > @@ -1865,11 +1893,11 @@ int iopt_pages_add_access(struct iopt_pages
+> > *pages, unsigned long start_index,
+> >   * Undo iopt_pages_add_access() and unpin the pages if necessary. The
 > 
-> Hugh, are you okay with this? Or maybe you have a better idea?
+> iopt_area_add_access()
+> 
+> with above,
 
-Okay, here is what I've come up with. It doesn't touch shmem code, but
-hooks up directly into memory-failure.c. It is still ugly, but should be
-tolerable.
+Yep, I got those
 
-restrictedmem_error_page() loops over all restrictedmem inodes. It is
-slow, but memory failure is not hot path (I hope).
-
-Only build-tested. Chao, could you hook up ->error for KVM and get it
-tested?
-
-diff --git a/include/linux/restrictedmem.h b/include/linux/restrictedmem.h
-index 9c37c3ea3180..c2700c5daa43 100644
---- a/include/linux/restrictedmem.h
-+++ b/include/linux/restrictedmem.h
-@@ -12,6 +12,8 @@ struct restrictedmem_notifier_ops {
- 				 pgoff_t start, pgoff_t end);
- 	void (*invalidate_end)(struct restrictedmem_notifier *notifier,
- 			       pgoff_t start, pgoff_t end);
-+	void (*error)(struct restrictedmem_notifier *notifier,
-+			       pgoff_t start, pgoff_t end);
- };
- 
- struct restrictedmem_notifier {
-@@ -34,6 +36,8 @@ static inline bool file_is_restrictedmem(struct file *file)
- 	return file->f_inode->i_sb->s_magic == RESTRICTEDMEM_MAGIC;
- }
- 
-+void restrictedmem_error_page(struct page *page, struct address_space *mapping);
-+
- #else
- 
- static inline void restrictedmem_register_notifier(struct file *file,
-@@ -57,6 +61,11 @@ static inline bool file_is_restrictedmem(struct file *file)
- 	return false;
- }
- 
-+static inline void restrictedmem_error_page(struct page *page,
-+					    struct address_space *mapping)
-+{
-+}
-+
- #endif /* CONFIG_RESTRICTEDMEM */
- 
- #endif /* _LINUX_RESTRICTEDMEM_H */
-diff --git a/mm/memory-failure.c b/mm/memory-failure.c
-index e7ac570dda75..ee85e46c6992 100644
---- a/mm/memory-failure.c
-+++ b/mm/memory-failure.c
-@@ -62,6 +62,7 @@
- #include <linux/page-isolation.h>
- #include <linux/pagewalk.h>
- #include <linux/shmem_fs.h>
-+#include <linux/restrictedmem.h>
- #include "swap.h"
- #include "internal.h"
- #include "ras/ras_event.h"
-@@ -939,6 +940,8 @@ static int me_pagecache_clean(struct page_state *ps, struct page *p)
- 		goto out;
- 	}
- 
-+	restrictedmem_error_page(p, mapping);
-+
- 	/*
- 	 * The shmem page is kept in page cache instead of truncating
- 	 * so is expected to have an extra refcount after error-handling.
-diff --git a/mm/restrictedmem.c b/mm/restrictedmem.c
-index e5bf8907e0f8..0dcdff0d8055 100644
---- a/mm/restrictedmem.c
-+++ b/mm/restrictedmem.c
-@@ -29,6 +29,18 @@ static void restrictedmem_notifier_invalidate(struct restrictedmem_data *data,
- 	mutex_unlock(&data->lock);
- }
- 
-+static void restrictedmem_notifier_error(struct restrictedmem_data *data,
-+				 pgoff_t start, pgoff_t end)
-+{
-+	struct restrictedmem_notifier *notifier;
-+
-+	mutex_lock(&data->lock);
-+	list_for_each_entry(notifier, &data->notifiers, list) {
-+			notifier->ops->error(notifier, start, end);
-+	}
-+	mutex_unlock(&data->lock);
-+}
-+
- static int restrictedmem_release(struct inode *inode, struct file *file)
- {
- 	struct restrictedmem_data *data = inode->i_mapping->private_data;
-@@ -248,3 +260,30 @@ int restrictedmem_get_page(struct file *file, pgoff_t offset,
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(restrictedmem_get_page);
-+
-+void restrictedmem_error_page(struct page *page, struct address_space *mapping)
-+{
-+	struct super_block *sb = restrictedmem_mnt->mnt_sb;
-+	struct inode *inode, *next;
-+
-+	if (!shmem_mapping(mapping))
-+		return;
-+
-+	spin_lock(&sb->s_inode_list_lock);
-+	list_for_each_entry_safe(inode, next, &sb->s_inodes, i_sb_list) {
-+		struct restrictedmem_data *data = inode->i_mapping->private_data;
-+		struct file *memfd = data->memfd;
-+
-+		if (memfd->f_mapping == mapping) {
-+			pgoff_t start, end;
-+
-+			spin_unlock(&sb->s_inode_list_lock);
-+
-+			start = page->index;
-+			end = start + thp_nr_pages(page);
-+			restrictedmem_notifier_error(data, start, end);
-+			return;
-+		}
-+	}
-+	spin_unlock(&sb->s_inode_list_lock);
-+}
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+Thanks,
+Jason
