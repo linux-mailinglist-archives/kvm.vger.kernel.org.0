@@ -2,62 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0636E629B07
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 14:48:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A62CE629B34
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 14:52:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230393AbiKONsb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 08:48:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49024 "EHLO
+        id S238039AbiKONwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 08:52:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230245AbiKONs2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 08:48:28 -0500
-Received: from 1.mo552.mail-out.ovh.net (1.mo552.mail-out.ovh.net [178.32.96.117])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E9A729A
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 05:48:24 -0800 (PST)
-Received: from mxplan5.mail.ovh.net (unknown [10.108.16.128])
-        by mo552.mail-out.ovh.net (Postfix) with ESMTPS id 9007223D65;
-        Tue, 15 Nov 2022 13:48:22 +0000 (UTC)
-Received: from kaod.org (37.59.142.103) by DAG4EX2.mxp5.local (172.16.2.32)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Tue, 15 Nov
- 2022 14:48:21 +0100
-Authentication-Results: garm.ovh; auth=pass (GARM-103G005bb55cdf2-9856-4aa8-a050-ccf5654acd50,
-                    4108EF7A520F6C47CD43A20CA0BA38D18DA47D40) smtp.auth=clg@kaod.org
-X-OVh-ClientIp: 82.64.250.170
-Message-ID: <b5540c7e-3c06-565a-6571-55c167ec347b@kaod.org>
-Date:   Tue, 15 Nov 2022 14:48:20 +0100
+        with ESMTP id S238524AbiKONwR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 08:52:17 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865202C11D;
+        Tue, 15 Nov 2022 05:51:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668520269; x=1700056269;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=rzDa1w87uPv5RkrD80lJDw/6LefV+W240M22vdBwoKg=;
+  b=FhqlTjeexnr7vZn3yHRx28OHbKUn064xK8cM8ixKT8yLss8kUWtqT7RG
+   8zt5PGhAO8B6jiccJrBCRsl9kwKPR2agoRGkTuL3M3YArCnvKUJF1Jvh9
+   JZoVzQJiAUmfywfThKdgX36VwMxofMZW/QmXUp/nZAYIRV0tj4Q9IQEuD
+   MqdF60s4adXIjdbUCbEIemeau5j4BOTUZp5xOGfu30ftgNUNjZnuYmEv4
+   u6+XuzE8uF+6uwwC6D6mQLQxotBJZENrt7I94bZUOiaTvD6Lqmy7xZ6K4
+   26Q0ZoBftUna72nuQh+eTyY13iJv/ZeP0Kp3anBzZrlG9bW0O30Tco+9r
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="299778621"
+X-IronPort-AV: E=Sophos;i="5.96,166,1665471600"; 
+   d="scan'208";a="299778621"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2022 05:51:01 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="638949362"
+X-IronPort-AV: E=Sophos;i="5.96,166,1665471600"; 
+   d="scan'208";a="638949362"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.172.114]) ([10.249.172.114])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2022 05:50:55 -0800
+Message-ID: <f8607d23-afaa-2670-dd03-2ae8ec1e79a0@intel.com>
+Date:   Tue, 15 Nov 2022 21:50:51 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH v11 09/11] s390x/cpu topology: add topology machine
- property
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.4.2
+Subject: Re: [PATCH v3 1/7] x86: KVM: Move existing x86 CPUID leaf
+ [CPUID_7_1_EAX] to kvm-only leaf
+To:     Jiaxi Chen <jiaxi.chen@linux.intel.com>, kvm@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, ndesaulniers@google.com,
+        alexandre.belloni@bootlin.com, peterz@infradead.org,
+        jpoimboe@kernel.org, chang.seok.bae@intel.com,
+        pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
+        jmattson@google.com, sandipan.das@amd.com, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
+        keescook@chromium.org, nathan@kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20221110015252.202566-1-jiaxi.chen@linux.intel.com>
+ <20221110015252.202566-2-jiaxi.chen@linux.intel.com>
 Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, <qemu-s390x@nongnu.org>
-CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
-        <pasic@linux.ibm.com>, <richard.henderson@linaro.org>,
-        <david@redhat.com>, <thuth@redhat.com>, <cohuck@redhat.com>,
-        <mst@redhat.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <ehabkost@redhat.com>, <marcel.apfelbaum@gmail.com>,
-        <eblake@redhat.com>, <armbru@redhat.com>, <seiden@linux.ibm.com>,
-        <nrb@linux.ibm.com>, <scgl@linux.ibm.com>, <frankja@linux.ibm.com>,
-        <berrange@redhat.com>
-References: <20221103170150.20789-1-pmorel@linux.ibm.com>
- <20221103170150.20789-10-pmorel@linux.ibm.com>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-In-Reply-To: <20221103170150.20789-10-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20221110015252.202566-2-jiaxi.chen@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.103]
-X-ClientProxiedBy: DAG1EX2.mxp5.local (172.16.2.2) To DAG4EX2.mxp5.local
- (172.16.2.32)
-X-Ovh-Tracer-GUID: 757e0c7c-2a11-4284-8ce8-938ac63e83e2
-X-Ovh-Tracer-Id: 10999479142332009427
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvgedrgeeggdehiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfhisehtjeertddtfeejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepkefhvefhheeiffduvefhfeeitefhleevudfgkedujeduieetfeffgfffvdelueelnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepuddvjedrtddrtddruddpfeejrdehledrudegvddruddtfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoegtlhhgsehkrghougdrohhrgheqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepphhmohhrvghlsehlihhnuhigrdhisghmrdgtohhmpdhstghglheslhhinhhugidrihgsmhdrtghomhdpnhhrsgeslhhinhhugidrihgsmhdrtghomhdpshgvihguvghnsehlihhnuhigrdhisghmrdgtohhmpdgrrhhmsghruhesrhgvughhrghtrdgtohhmpdgvsghlrghkvgesrhgvughhrghtrdgtohhmpdhmrghrtggvlhdrrghpfhgvlhgsrghumhesghhmrghilhdrtghomhdpvghhrggskhhoshhtsehrvgguhhgrthdrtghomhdpkh
- hvmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdpfhhrrghnkhhjrgeslhhinhhugidrihgsmhdrtghomhdpphgsohhniihinhhisehrvgguhhgrthdrtghomhdptghohhhutghksehrvgguhhgrthdrtghomhdpthhhuhhthhesrhgvughhrghtrdgtohhmpdgurghvihgusehrvgguhhgrthdrtghomhdprhhitghhrghrugdrhhgvnhguvghrshhonheslhhinhgrrhhordhorhhgpdhprghsihgtsehlihhnuhigrdhisghmrdgtohhmpdgsohhrnhhtrhgrvghgvghrseguvgdrihgsmhdrtghomhdpqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghdpqhgvmhhuqdhsfeeltdigsehnohhnghhnuhdrohhrghdpmhhsthesrhgvughhrghtrdgtohhmpdgsvghrrhgrnhhgvgesrhgvughhrghtrdgtohhmpdfovfetjfhoshhtpehmohehhedvpdhmohguvgepshhmthhpohhuth
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,247 +73,138 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/3/22 18:01, Pierre Morel wrote:
-> We keep the possibility to switch on/off the topology on newer
-> machines with the property topology=[on|off].
-
-The code has changed. You will need to rebase. May be after the
-8.0 machine is introduced, or include Cornelia's patch in the
-respin.
-
-https://lore.kernel.org/qemu-devel/20221111124534.129111-1-cohuck@redhat.com/
-
+On 11/10/2022 9:52 AM, Jiaxi Chen wrote:
+> cpuid_leaf[12] CPUID_7_1_EAX has only two bits are in use currently:
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>   - AVX-VNNI CPUID.(EAX=7,ECX=1):EAX[bit 4]
+>   - AVX512-BF16 CPUID.(EAX=7,ECX=1):EAX[bit 5]
+> 
+> These two bits have no other kernel usages other than the guest
+> CPUID advertisement in KVM. Given that and to save space for kernel
+> feature bits, move these two bits to the kvm-only subleaves. The
+> existing leaf cpuid_leafs[12] is set to CPUID_LNX_5 so future feature
+> can pick it. This basically reverts:
+> 
+>   - commit b85a0425d805 ("Enumerate AVX Vector Neural Network
+> instructions")
+>   - commit b302e4b176d0 ("x86/cpufeatures: Enumerate the new AVX512
+> BFLOAT16 instructions")
+>   - commit 1085a6b585d7 ("KVM: Expose AVX_VNNI instruction to guset")
+
+FYI, LAM support has been queued in tip 
+https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/commit/?id=aa387b1b1e666cacffc0b7ac7e0949a68013b2d9
+
+It adds
+
++#define X86_FEATURE_LAM			(12*32+26) /* Linear Address Masking */
+
+and conflict with this patch.
+
+Seen from the ISE, there are more bits defined in CPUID_7_1_EAX. And I 
+believe Intel will define more and it's likely some of them will be used 
+by kernel just like LAM.
+
+> Signed-off-by: Jiaxi Chen <jiaxi.chen@linux.intel.com>
 > ---
->   include/hw/boards.h                |  3 +++
->   include/hw/s390x/cpu-topology.h    |  8 +++-----
->   include/hw/s390x/s390-virtio-ccw.h |  1 +
->   hw/core/machine.c                  |  3 +++
->   hw/s390x/cpu-topology.c            | 19 +++++++++++++++++++
->   hw/s390x/s390-virtio-ccw.c         | 28 ++++++++++++++++++++++++++++
->   util/qemu-config.c                 |  4 ++++
->   qemu-options.hx                    |  6 +++++-
->   8 files changed, 66 insertions(+), 6 deletions(-)
+>   arch/x86/include/asm/cpufeature.h  | 2 +-
+>   arch/x86/include/asm/cpufeatures.h | 4 +---
+>   arch/x86/kernel/cpu/common.c       | 6 ------
+>   arch/x86/kernel/cpu/cpuid-deps.c   | 1 -
+>   arch/x86/kvm/cpuid.c               | 2 +-
+>   arch/x86/kvm/reverse_cpuid.h       | 5 +++++
+>   6 files changed, 8 insertions(+), 12 deletions(-)
 > 
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 311ed17e18..67147c47bf 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -379,6 +379,9 @@ struct MachineState {
->       } \
->       type_init(machine_initfn##_register_types)
+> diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
+> index 1a85e1fb0922..b2905ddd7ab4 100644
+> --- a/arch/x86/include/asm/cpufeature.h
+> +++ b/arch/x86/include/asm/cpufeature.h
+> @@ -24,7 +24,7 @@ enum cpuid_leafs
+>   	CPUID_7_0_EBX,
+>   	CPUID_D_1_EAX,
+>   	CPUID_LNX_4,
+> -	CPUID_7_1_EAX,
+> +	CPUID_LNX_5,
+>   	CPUID_8000_0008_EBX,
+>   	CPUID_6_EAX,
+>   	CPUID_8000_000A_EDX,
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> index b71f4f2ecdd5..ec468d6eaf06 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -305,9 +305,7 @@
+>   #define X86_FEATURE_USE_IBPB_FW		(11*32+16) /* "" Use IBPB during runtime firmware calls */
+>   #define X86_FEATURE_RSB_VMEXIT_LITE	(11*32+17) /* "" Fill RSB on VM exit when EIBRS is enabled */
 >   
-> +extern GlobalProperty hw_compat_7_2[];
-> +extern const size_t hw_compat_7_2_len;
-> +
->   extern GlobalProperty hw_compat_7_1[];
->   extern const size_t hw_compat_7_1_len;
+> -/* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
+> -#define X86_FEATURE_AVX_VNNI		(12*32+ 4) /* AVX VNNI instructions */
+> -#define X86_FEATURE_AVX512_BF16		(12*32+ 5) /* AVX512 BFLOAT16 instructions */
+> +/* Linux-defined mapping, word 12 */
 >   
-> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
-> index 6fec10e032..f566394302 100644
-> --- a/include/hw/s390x/cpu-topology.h
-> +++ b/include/hw/s390x/cpu-topology.h
-> @@ -12,6 +12,8 @@
->   
->   #include "hw/qdev-core.h"
->   #include "qom/object.h"
-> +#include "cpu.h"
-> +#include "hw/s390x/s390-virtio-ccw.h"
->   
->   #define S390_TOPOLOGY_CPU_IFL 0x03
->   #define S390_TOPOLOGY_MAX_ORIGIN ((63 + S390_MAX_CPUS) / 64)
-> @@ -38,10 +40,6 @@ struct S390Topology {
->   OBJECT_DECLARE_SIMPLE_TYPE(S390Topology, S390_CPU_TOPOLOGY)
->   
->   void s390_topology_new_cpu(S390CPU *cpu);
+>   /* AMD-defined CPU features, CPUID level 0x80000008 (EBX), word 13 */
+>   #define X86_FEATURE_CLZERO		(13*32+ 0) /* CLZERO instruction */
+> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+> index 3e508f239098..0c19c84d7ba0 100644
+> --- a/arch/x86/kernel/cpu/common.c
+> +++ b/arch/x86/kernel/cpu/common.c
+> @@ -1026,12 +1026,6 @@ void get_cpu_cap(struct cpuinfo_x86 *c)
+>   		c->x86_capability[CPUID_7_0_EBX] = ebx;
+>   		c->x86_capability[CPUID_7_ECX] = ecx;
+>   		c->x86_capability[CPUID_7_EDX] = edx;
 > -
-> -static inline bool s390_has_topology(void)
-> -{
-> -    return false;
-> -}
-> +bool s390_has_topology(void);
+> -		/* Check valid sub-leaf index before accessing it */
+> -		if (eax >= 1) {
+> -			cpuid_count(0x00000007, 1, &eax, &ebx, &ecx, &edx);
+> -			c->x86_capability[CPUID_7_1_EAX] = eax;
+> -		}
+>   	}
 >   
->   #endif
-> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-> index 89fca3f79f..d7602aedda 100644
-> --- a/include/hw/s390x/s390-virtio-ccw.h
-> +++ b/include/hw/s390x/s390-virtio-ccw.h
-> @@ -28,6 +28,7 @@ struct S390CcwMachineState {
->       bool dea_key_wrap;
->       bool pv;
->       bool zpcii_disable;
-> +    bool cpu_topology;
->       uint8_t loadparm[8];
->       void *topology;
->   };
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index aa520e74a8..4f46d4ef23 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -40,6 +40,9 @@
->   #include "hw/virtio/virtio-pci.h"
->   #include "qom/object_interfaces.h"
+>   	/* Extended state features: level 0x0000000d */
+> diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
+> index c881bcafba7d..a88e0e8c39fa 100644
+> --- a/arch/x86/kernel/cpu/cpuid-deps.c
+> +++ b/arch/x86/kernel/cpu/cpuid-deps.c
+> @@ -68,7 +68,6 @@ static const struct cpuid_dep cpuid_deps[] = {
+>   	{ X86_FEATURE_CQM_OCCUP_LLC,		X86_FEATURE_CQM_LLC   },
+>   	{ X86_FEATURE_CQM_MBM_TOTAL,		X86_FEATURE_CQM_LLC   },
+>   	{ X86_FEATURE_CQM_MBM_LOCAL,		X86_FEATURE_CQM_LLC   },
+> -	{ X86_FEATURE_AVX512_BF16,		X86_FEATURE_AVX512VL  },
+>   	{ X86_FEATURE_AVX512_FP16,		X86_FEATURE_AVX512BW  },
+>   	{ X86_FEATURE_ENQCMD,			X86_FEATURE_XSAVES    },
+>   	{ X86_FEATURE_PER_THREAD_MBA,		X86_FEATURE_MBA       },
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 7065462378e2..89f5e7f0402b 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -656,7 +656,7 @@ void kvm_set_cpu_caps(void)
+>   	if (boot_cpu_has(X86_FEATURE_AMD_SSBD))
+>   		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL_SSBD);
 >   
-> +GlobalProperty hw_compat_7_2[] = {};
-> +const size_t hw_compat_7_2_len = G_N_ELEMENTS(hw_compat_7_2);
-> +
->   GlobalProperty hw_compat_7_1[] = {};
->   const size_t hw_compat_7_1_len = G_N_ELEMENTS(hw_compat_7_1);
+> -	kvm_cpu_cap_mask(CPUID_7_1_EAX,
+> +	kvm_cpu_cap_init_scattered(CPUID_7_1_EAX,
+>   		F(AVX_VNNI) | F(AVX512_BF16)
+>   	);
 >   
-> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-> index fc220bd8ac..c1550cc1e8 100644
-> --- a/hw/s390x/cpu-topology.c
-> +++ b/hw/s390x/cpu-topology.c
-> @@ -73,6 +73,25 @@ void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra)
->       }
->   }
+> diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+> index a19d473d0184..674de5b24f8d 100644
+> --- a/arch/x86/kvm/reverse_cpuid.h
+> +++ b/arch/x86/kvm/reverse_cpuid.h
+> @@ -13,6 +13,7 @@
+>    */
+>   enum kvm_only_cpuid_leafs {
+>   	CPUID_12_EAX	 = NCAPINTS,
+> +	CPUID_7_1_EAX,
+>   	NR_KVM_CPU_CAPS,
 >   
-> +bool s390_has_topology(void)
-> +{
-> +    static S390CcwMachineState *ccw;
-> +    Object *obj;
-> +
-> +    if (ccw) {
-> +        return ccw->cpu_topology;
-
-Shouldn't we test the capability also ?
-
-	return s390mc->topology_capable && ccw->cpu_topology;
-
-> +    }
-> +
-> +    /* we have to bail out for the "none" machine */
-> +    obj = object_dynamic_cast(qdev_get_machine(),
-> +                              TYPE_S390_CCW_MACHINE);
-> +    if (!obj) {
-> +        return false;
-> +    }
-
-Should be an assert I think.
-
-> +    ccw = S390_CCW_MACHINE(obj);
-> +    return ccw->cpu_topology;
-> +}
-> +
->   /*
->    * s390_topology_new_cpu:
->    * @cpu: a pointer to the new CPU
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index f1a9d6e793..ebb5615337 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -710,6 +710,26 @@ bool hpage_1m_allowed(void)
->       return get_machine_class()->hpage_1m_allowed;
->   }
+>   	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+> @@ -24,6 +25,10 @@ enum kvm_only_cpuid_leafs {
+>   #define KVM_X86_FEATURE_SGX1		KVM_X86_FEATURE(CPUID_12_EAX, 0)
+>   #define KVM_X86_FEATURE_SGX2		KVM_X86_FEATURE(CPUID_12_EAX, 1)
 >   
-> +static inline bool machine_get_topology(Object *obj, Error **errp)
-> +{
-> +    S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
+> +/* Intel-defined sub-features, CPUID level 0x00000007:1 (EAX) */
+> +#define X86_FEATURE_AVX_VNNI            KVM_X86_FEATURE(CPUID_7_1_EAX, 4)
+> +#define X86_FEATURE_AVX512_BF16         KVM_X86_FEATURE(CPUID_7_1_EAX, 5)
 > +
-> +    return ms->cpu_topology;
-> +}
-> +
-> +static inline void machine_set_topology(Object *obj, bool value, Error **errp)
-> +{
-> +    S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
-
-You could introduce :
-
-        S390CcwMachineClass *s390mc = S390_CCW_MACHINE_GET_CLASS(ms);
-
-
-> +
-> +    if (!get_machine_class()->topology_capable) {
-
-and
-             !s390mc->topology_capable
-
-> +        error_setg(errp, "Property cpu-topology not available on machine %s",
-> +                   get_machine_class()->parent_class.name);
-> +        return;
-> +    }
-> +
-> +    ms->cpu_topology = value;
-> +}
-> +
->   static void machine_get_loadparm(Object *obj, Visitor *v,
->                                    const char *name, void *opaque,
->                                    Error **errp)
-> @@ -809,6 +829,12 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->                                      machine_set_zpcii_disable);
->       object_class_property_set_description(oc, "zpcii-disable",
->               "disable zPCI interpretation facilties");
-> +
-> +    object_class_property_add_bool(oc, "topology",
-> +                                   machine_get_topology,
-> +                                   machine_set_topology);
-> +    object_class_property_set_description(oc, "topology",
-> +            "enable CPU topology");
->   }
->   
->   static inline void s390_machine_initfn(Object *obj)
-> @@ -818,6 +844,7 @@ static inline void s390_machine_initfn(Object *obj)
->       ms->aes_key_wrap = true;
->       ms->dea_key_wrap = true;
->       ms->zpcii_disable = false;
-> +    ms->cpu_topology = true;
->   }
->   
->   static const TypeInfo ccw_machine_info = {
-> @@ -888,6 +915,7 @@ static void ccw_machine_7_1_instance_options(MachineState *machine)
->       s390_cpudef_featoff_greater(16, 1, S390_FEAT_PAIE);
->       s390_set_qemu_cpu_model(0x8561, 15, 1, qemu_cpu_feat);
->       ms->zpcii_disable = true;
-> +    ms->cpu_topology = true;
-
-shouldn't this be false ?
-
-
-Thanks,
-
-C.
-
->   }
->   
->   static void ccw_machine_7_1_class_options(MachineClass *mc)
-> diff --git a/util/qemu-config.c b/util/qemu-config.c
-> index 5325f6bf80..0a040552bd 100644
-> --- a/util/qemu-config.c
-> +++ b/util/qemu-config.c
-> @@ -240,6 +240,10 @@ static QemuOptsList machine_opts = {
->               .name = "zpcii-disable",
->               .type = QEMU_OPT_BOOL,
->               .help = "disable zPCI interpretation facilities",
-> +        },{
-> +            .name = "topology",
-> +            .type = QEMU_OPT_BOOL,
-> +            .help = "disable CPU topology",
->           },
->           { /* End of list */ }
->       }
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index eb38e5dc40..ef59b28a03 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -38,7 +38,8 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
->       "                hmat=on|off controls ACPI HMAT support (default=off)\n"
->       "                memory-backend='backend-id' specifies explicitly provided backend for main RAM (default=none)\n"
->       "                cxl-fmw.0.targets.0=firsttarget,cxl-fmw.0.targets.1=secondtarget,cxl-fmw.0.size=size[,cxl-fmw.0.interleave-granularity=granularity]\n"
-> -    "                zpcii-disable=on|off disables zPCI interpretation facilities (default=off)\n",
-> +    "                zpcii-disable=on|off disables zPCI interpretation facilities (default=off)\n"
-> +    "                topology=on|off disables CPU topology (default=off)\n",
->       QEMU_ARCH_ALL)
->   SRST
->   ``-machine [type=]name[,prop=value[,...]]``
-> @@ -163,6 +164,9 @@ SRST
->           Disables zPCI interpretation facilties on s390-ccw hosts.
->           This feature can be used to disable hardware virtual assists
->           related to zPCI devices. The default is off.
-> +
-> +    ``topology=on|off``
-> +        Disables CPU topology on for S390 machines starting with s390-ccw-virtio-7.3.
->   ERST
->   
->   DEF("M", HAS_ARG, QEMU_OPTION_M,
+>   struct cpuid_reg {
+>   	u32 function;
+>   	u32 index;
 
