@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 59838629707
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:16:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52108629708
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:16:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232655AbiKOLQo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 06:16:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53636 "EHLO
+        id S230350AbiKOLQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 06:16:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbiKOLQQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 06:16:16 -0500
-Received: from mail-wm1-x349.google.com (mail-wm1-x349.google.com [IPv6:2a00:1450:4864:20::349])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C095FAA
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:15 -0800 (PST)
-Received: by mail-wm1-x349.google.com with SMTP id u9-20020a05600c00c900b003cfb12839d6so3664555wmm.5
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:15 -0800 (PST)
+        with ESMTP id S229666AbiKOLQS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 06:16:18 -0500
+Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F171B6D
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:17 -0800 (PST)
+Received: by mail-wm1-x34a.google.com with SMTP id bi19-20020a05600c3d9300b003cf9d6c4016so10366541wmb.8
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IOlnWRW2tAFQ5q+3RbVn/g3jOsn3BcEoAmGRbW4y3Sc=;
-        b=cRTT7FmrUcUcNEWFAa1X868DOxSsppIh+SyOm+tP+0wPPmhMYg4CXwAzjYZNQrf8Ay
-         f+4qQP2DEfbUxzLgOoW8KF5W9utjfEQSyxBzAm1pdmnWjjWvpqL1Kxhji2+ezVzmde18
-         dyFMqiZEB4cj71oPlHnxjT7b+YUEnJRH1fO7izSI0RVvGreIdS1HNzQnWRxIaSNYKKsm
-         SCvOBCw33L47YfXdEtr8vHSJ7fkkr6uxVjrxR3MewQwsoo5U+YYGd0rSFzDcs4DE0FVG
-         JeqyhnYkiWcp54jgk7R1jE3thCUvIw6wU/w6LRPBPLcuM+0Zk6lUeHeY/6jHBJ6i0G3c
-         l8hw==
+        bh=NIh7hm1vgq4axzRzMsuAHgxMQ1Qyi0g563BuecOU0iE=;
+        b=o/Jm+iBUclqgHWET7gEwK75p2CjV30bgbQzC70E902kLfWQgtP44WMCJ0lCGQqmDsK
+         BkhQCaFXmTT6VQwO03RVgDIaKaPqybik6PgGWyf3IYT4nAMwa5yVjGCSbfCAiXHNHJLT
+         II7lS9qvGkpgd+0D1+oq09Ug7VgotF7yYOm6RV+XzHMYwzdMBHFWy5zB4v5ziRjIm2Ef
+         l95IWqLwDLgnQ73kYtckKrDKTNUD2QXd9SipslLlxZrscMStpAH5JpaQMZzP0TypFgAk
+         ZSbJlvLM1JIX2bmz6WhU2muRiE8uuukk3dMyPjvNfeFTNf++M17He9b/kIlhfz5Fl1na
+         qTbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IOlnWRW2tAFQ5q+3RbVn/g3jOsn3BcEoAmGRbW4y3Sc=;
-        b=4GTBHCVrayOUBjk6ejkABPp6tQ1Mvpkm52lq2lpBGooG02OLoDPFEdp4GPC2XBVbi1
-         avsiAiAS6NIAE9obS7Cr7Ve2Ivwaoin910WVvgm2/OH8fdCCUQERNiMMUviyZ6JhCWKj
-         MkVyKlLlrAis0oJf50b2iEiRZJO+ro7o707b7HZFkYsHTsKsyh7cQGoy+IC4QN0g0Q9N
-         ojB9xkuHMZNUzxoEP4Wlb5TI7oiOl+tjZKOWRk7BqrGsOrg5TVmLOln/xadCKPw8n/qp
-         xb+tHR1cw4HU0BPJzbhqynse11Vp4R5cLLpBrtP/v/4DxMhwBEksun4BvRLUzPsa/PjD
-         178A==
-X-Gm-Message-State: ANoB5pkK6gt96geAehbUFsADJT23O2BLE+NHeHqX46cwPeltmdZWzVnI
-        8xHRAzLGqDzXtTqi2D2vaI1udFfZJKO8b6TFMOXHDGtxrnPIakhPPvH1ud0KfNLvEXwhFlhXeUN
-        Agjl0Hdm/zt/gbThTxIQwmYViOHShWrH+CrN23pTVTFmT9S1qC/ZxNes=
-X-Google-Smtp-Source: AA0mqf6VGAgxpyvtv2yP0V7yDiDmmgBgURvRdQwSSoc5dpPVgUgfygd5TDuKQhKBfMRZsJB08qvqeHN+nQ==
+        bh=NIh7hm1vgq4axzRzMsuAHgxMQ1Qyi0g563BuecOU0iE=;
+        b=waVs5W4PDehJ1fPrRF0z/kmcunNlkxbbpuHxX/Vfz3G4TwoufupCYJlhsrWpcRZ4aT
+         /wE5XcuGucO+yb1HoGSa6kHJw07NcZzAdo7evDSoRBz9pkcrm2iVTTnQvD0iLJRT8p6j
+         ojstkocaCQL9+u6wEaAwzJU3q00sqJt1cukgvgd/XrKNs2TKIN6wSFxuNdh8DMVa+zsE
+         He5Fx9GDTu/7tqxDsf5xlyKh8ZoJZT97h94jXqpcKonzOAycTOG29P/hkhIHHMMMujl6
+         0oud1ATAaFXncfSc6wNJMkIZPe5fEzyW9FdD//daD9jC5XuE7Dh/6YniSU7XCFCc6wAD
+         UiTA==
+X-Gm-Message-State: ANoB5plykhUIh6nz79zdHrSqRdwUWB9vri4lbZKOIhrGAOhpYgWqNSKs
+        RjDsI9/04cKKpYpdksQ9hl/gAwPX7/hagQEO1g9n7AiuvJVKiZvAdUVwwXd/X5KmmYHI9QEvmrZ
+        eoYlbrErSkAYOy9uT/KxZxHHt7zS87WSnOh90Cs/mPL/lcrmyaWiDpZA=
+X-Google-Smtp-Source: AA0mqf5wOnNfPMSuwQH//NTcL25qBdsbJ1MQADv5FF1HKdx1IxtXGrKCoiQ9oiCnCxXlBzmsAxpp76icwQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:310c:b0:3cf:d58f:f66e with SMTP id
- g12-20020a05600c310c00b003cfd58ff66emr98626wmo.165.1668510973867; Tue, 15 Nov
- 2022 03:16:13 -0800 (PST)
-Date:   Tue, 15 Nov 2022 11:15:42 +0000
+ (user=tabba job=sendgmr) by 2002:a1c:a302:0:b0:3c4:5806:104e with SMTP id
+ m2-20020a1ca302000000b003c45806104emr1108716wme.42.1668510975995; Tue, 15 Nov
+ 2022 03:16:15 -0800 (PST)
+Date:   Tue, 15 Nov 2022 11:15:43 +0000
 In-Reply-To: <20221115111549.2784927-1-tabba@google.com>
 Mime-Version: 1.0
 References: <20221115111549.2784927-1-tabba@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221115111549.2784927-11-tabba@google.com>
-Subject: [PATCH kvmtool v1 10/17] Allocate vesa memory with memfd
+Message-ID: <20221115111549.2784927-12-tabba@google.com>
+Subject: [PATCH kvmtool v1 11/17] Add a function that allocates aligned memory
+ if specified
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
@@ -68,94 +69,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ensure that all guest memory is fd-based.
+Add a variant of mmap_anon_or_hugetlbfs() that allocates memory
+aligned as specified. This function doesn't map or allocate more
+memory than the requested amount.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- framebuffer.c             |  2 ++
- hw/vesa.c                 | 15 +++++++++++++--
- include/kvm/framebuffer.h |  1 +
- 3 files changed, 16 insertions(+), 2 deletions(-)
+ util/util.c | 41 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 38 insertions(+), 3 deletions(-)
 
-diff --git a/framebuffer.c b/framebuffer.c
-index fb8f51d..a025293 100644
---- a/framebuffer.c
-+++ b/framebuffer.c
-@@ -73,6 +73,8 @@ int fb__exit(struct kvm *kvm)
- 				fb->targets[i]->stop(fb);
+diff --git a/util/util.c b/util/util.c
+index 278bcc2..953e2d8 100644
+--- a/util/util.c
++++ b/util/util.c
+@@ -129,10 +129,17 @@ int memfd_alloc(u64 size, bool hugetlb, u64 blk_size)
+ 	return fd;
+ }
  
- 		munmap(fb->mem, fb->mem_size);
-+		if (fb->mem_fd >= 0)
-+			close(fb->mem_fd);
- 	}
- 
- 	return 0;
-diff --git a/hw/vesa.c b/hw/vesa.c
-index 7f82cdb..522ffa3 100644
---- a/hw/vesa.c
-+++ b/hw/vesa.c
-@@ -41,6 +41,7 @@ static struct framebuffer vesafb = {
- 	.depth		= VESA_BPP,
- 	.mem_addr	= VESA_MEM_ADDR,
- 	.mem_size	= VESA_MEM_SIZE,
-+	.mem_fd		= -1,
- };
- 
- static void vesa_pci_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
-@@ -66,6 +67,7 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+-/* This function wraps the decision between hugetlbfs map (if requested) or normal mmap */
+-void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
++/*
++ * This function allocates memory aligned to align_sz.
++ * It also wraps the decision between hugetlbfs (if requested) or normal mmap.
++ */
++void *mmap_anon_or_hugetlbfs_align(struct kvm *kvm, const char *htlbfs_path,
++				   u64 size, u64 align_sz)
  {
- 	u16 vesa_base_addr;
- 	char *mem;
-+	int mem_fd;
- 	int r;
+ 	u64 blk_size = 0;
++	u64 total_map = size + align_sz;
++	u64 start_off, end_off;
++	void *addr_map, *addr_align;
+ 	int fd;
  
- 	BUILD_BUG_ON(!is_power_of_two(VESA_MEM_SIZE));
-@@ -88,22 +90,31 @@ struct framebuffer *vesa__init(struct kvm *kvm)
- 	if (r < 0)
- 		goto unregister_ioport;
- 
--	mem = mmap(NULL, VESA_MEM_SIZE, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
--	if (mem == MAP_FAILED) {
-+	mem_fd = memfd_alloc(ARM_PVTIME_SIZE, false, 0, 0);
-+	if (mem_fd < 0) {
- 		r = -errno;
- 		goto unregister_device;
+ 	/*
+@@ -152,10 +159,38 @@ void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+ 		kvm->ram_pagesize = getpagesize();
  	}
  
-+	mem = mmap(NULL, VESA_MEM_SIZE, PROT_RW, MAP_PRIVATE, mem_fd, 0);
-+	if (mem == MAP_FAILED) {
-+		r = -errno;
-+		goto close_memfd;
++	/* Create a mapping with room for alignment without allocating. */
++	addr_map = mmap(NULL, total_map, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS,
++			-1, 0);
++	if (addr_map == MAP_FAILED)
++		return MAP_FAILED;
++
+ 	fd = memfd_alloc(size, htlbfs_path, blk_size);
+ 	if (fd < 0)
+ 		return MAP_FAILED;
+ 
++	/* Map the allocated memory in the fd to the specified alignment. */
++	addr_align = (void *)ALIGN((u64)addr_map, align_sz);
++	if (mmap(addr_align, size, PROT_RW, MAP_PRIVATE | MAP_FIXED, fd, 0) ==
++	    MAP_FAILED) {
++		close(fd);
++		return MAP_FAILED;
 +	}
 +
- 	r = kvm__register_dev_mem(kvm, VESA_MEM_ADDR, VESA_MEM_SIZE, mem);
- 	if (r < 0)
- 		goto unmap_dev;
- 
- 	vesafb.mem = mem;
-+	vesafb.mem_fd = mem_fd;
- 	vesafb.kvm = kvm;
- 	return fb__register(&vesafb);
- 
- unmap_dev:
- 	munmap(mem, VESA_MEM_SIZE);
-+close_memfd:
-+	close(mem_fd);
- unregister_device:
- 	device__unregister(&vesa_device);
- unregister_ioport:
-diff --git a/include/kvm/framebuffer.h b/include/kvm/framebuffer.h
-index e3200e5..c340273 100644
---- a/include/kvm/framebuffer.h
-+++ b/include/kvm/framebuffer.h
-@@ -22,6 +22,7 @@ struct framebuffer {
- 	char				*mem;
- 	u64				mem_addr;
- 	u64				mem_size;
-+	int				mem_fd;
- 	struct kvm			*kvm;
- 
- 	unsigned long			nr_targets;
++	/* Remove the mapping for unused address ranges. */
++	start_off = addr_align - addr_map;
++	if (start_off)
++		munmap(addr_map, start_off);
++
++	end_off = align_sz - start_off;
++	if (end_off)
++		munmap((void *)((u64)addr_align + size), end_off);
++
+ 	kvm->ram_fd = fd;
+-	return mmap(NULL, size, PROT_RW, MAP_PRIVATE, kvm->ram_fd, 0);
++	return addr_align;
++}
++
++void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
++{
++	return mmap_anon_or_hugetlbfs_align(kvm, htlbfs_path, size, 0);
+ }
 -- 
 2.38.1.431.g37b22c650d-goog
 
