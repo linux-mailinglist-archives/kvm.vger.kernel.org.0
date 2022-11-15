@@ -2,93 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D7DF62A3B1
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 22:03:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FE2662A435
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 22:36:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238685AbiKOVD5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 16:03:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39086 "EHLO
+        id S238722AbiKOVg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 16:36:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231402AbiKOVDy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 16:03:54 -0500
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 107D42529B
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 13:03:53 -0800 (PST)
-Received: by mail-lf1-x12d.google.com with SMTP id r12so26428257lfp.1
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 13:03:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XN/JoD1Jkh5RiwHD+lQjGD3lA2y98OeJdmQsFCxCuyA=;
-        b=YC7UsN5xOK3nqbxoyurBd6rrth0X426lMlB7j8sex1g/gGjk9AeOVRXplLiix8pquB
-         Q0WinLExp7O5/KaHgxOxOrIqphur4o5c+BO/gpIY4qLkabHcGVRf3vXIXzWL2fyeB32K
-         y5mKhjfvgmCCxcvTgqHjrRZQvb+tJmH8x0MmzvYhUjYuuhLpWkgCe+VJfmzbkzpQRuS/
-         pfoWsWXMD/9Jd2NFvZ9zhlPhWDXK+CH989ra/XOO34rLN9DPjHMYypKc4No+xzhaYUEi
-         HXIoVQt7yBmUToOg8c1PSeeinfq3A4bTI72KM1vNTPamZY/EhbkYWXLelBNm1d7cjIpt
-         lw9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XN/JoD1Jkh5RiwHD+lQjGD3lA2y98OeJdmQsFCxCuyA=;
-        b=3Ue+7EIDx/y3y8XBWJALYUV1QsKKupyjB0Jxvn4oOg3d0tK4i0xvkF7XTOJzPpinAW
-         NWzQeXcFou/fCUm3chj0AVFpxxqbeofA4t6q+k9w8/eKwm8NpGalQKk1giQmZ5qsbbVL
-         wOnF0agsbLqvhYd8y9KDaW0kqSvjDFBDwYsB6J+cTxJzWXnLwhEOZUk6xu3jx6DYdDZx
-         FRAZ6QmN4V41g2clqtPdYYyaHghiP0yhTQsm5MMDi41KYieiiH4u5tQQDHeE5h4r1S46
-         IPcNaj0soP5DI21eX1USMmEd/mnpmo5k+G6vSCgW329jzKjtdMvV3y1EaYDo85Tlp87X
-         MzIw==
-X-Gm-Message-State: ANoB5pnnyG/v7V8Y+MjjOzjMvkwUFXpc3WBEmL7Z4X1a2ItrwFUxym1K
-        pO48CzJiHMmiaMGM6qWicMtmzYaMGSrWlvSVgw9Xjw==
-X-Google-Smtp-Source: AA0mqf5h/MrxXfn9SLFayYGdwbJTkogFj7iMO7hUREB7Wsjo9WV5llZFJPBWslWVyPzAU5FhF+cFETW9exE+uGEBiKI=
-X-Received: by 2002:a05:6512:2033:b0:4b0:8a8f:8e28 with SMTP id
- s19-20020a056512203300b004b08a8f8e28mr5782626lfs.682.1668546231091; Tue, 15
- Nov 2022 13:03:51 -0800 (PST)
+        with ESMTP id S238570AbiKOVgY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 16:36:24 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B7E424F3D;
+        Tue, 15 Nov 2022 13:36:23 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id E1381336D8;
+        Tue, 15 Nov 2022 21:36:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1668548181; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dlenJjpDzLcxo3DWLnYtaPtdkt0KhciARPTv6BR7Ky0=;
+        b=uyz9uSIKl8YjXXq95m/Rf4xRo/PRtAeTRkaCCeBrmWSPpkSoisELGpK7ZgFz6Kq5XCA59C
+        1Ndo3iN/KK9/AJkawe5qcGBA0awBaGMbBKFAZwXXhtz9IStzhQWUOR7t+LlP9On03FYDpb
+        a5yb7XAMuslCgX2YMPKKmIH9rojuBZk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1668548181;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dlenJjpDzLcxo3DWLnYtaPtdkt0KhciARPTv6BR7Ky0=;
+        b=fHa3Wajmy0bbb5yUoFvoQZ5nhwtxA7CXUym/vI2atKyujCRdZmw1pxEsNypju/KTFtmiT5
+        Q8pFrKOGENR8HlAg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C1C6A13A91;
+        Tue, 15 Nov 2022 21:36:21 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id dYfXLlUGdGMrMwAAMHmgww
+        (envelope-from <bp@suse.de>); Tue, 15 Nov 2022 21:36:21 +0000
+Date:   Tue, 15 Nov 2022 22:36:17 +0100
+From:   Borislav Petkov <bp@suse.de>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     thomas.lendacky@amd.com, Dionna Glaze <dionnaglaze@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Haowen Bai <baihaowen@meizu.com>,
+        Yang Yingliang <yangyingliang@huawei.com>,
+        Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH V4] virt: sev: Prevent IV reuse in SNP guest driver
+Message-ID: <Y3QGUb0TVd2M9qow@zn.tnic>
+References: <20221103152318.88354-1-pgonda@google.com>
+ <Y258U+8oF/eo14U+@zn.tnic>
+ <CAMkAt6p2zXnE-ew+pJk_UpZAEFZFdCOPThNn3hSFqYOQG81t-g@mail.gmail.com>
 MIME-Version: 1.0
-References: <20221013121319.994170-1-vannapurve@google.com> <20221013121319.994170-2-vannapurve@google.com>
-In-Reply-To: <20221013121319.994170-2-vannapurve@google.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 15 Nov 2022 14:03:39 -0700
-Message-ID: <CAMkAt6rEWm3x3nqcss4R9Dzar55=P6EazmD0J-kq+HEs5qT9QQ@mail.gmail.com>
-Subject: Re: [V3 PATCH 1/4] KVM: selftests: move common startup logic to kvm_util.c
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        shuah@kernel.org, bgardon@google.com, seanjc@google.com,
-        oupton@google.com, peterx@redhat.com, vkuznets@redhat.com,
-        dmatlack@google.com, Andrew Jones <andrew.jones@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMkAt6p2zXnE-ew+pJk_UpZAEFZFdCOPThNn3hSFqYOQG81t-g@mail.gmail.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 13, 2022 at 6:13 AM Vishal Annapurve <vannapurve@google.com> wrote:
->
-> Consolidate common startup logic in one place by implementing a single
-> setup function with __attribute((constructor)) for all selftests within
-> kvm_util.c.
->
-> This allows moving logic like:
->         /* Tell stdout not to buffer its content */
->         setbuf(stdout, NULL);
-> to a single file for all selftests.
->
-> This will also allow any required setup at entry in future to be done in
-> common main function.
->
-> More context is discussed at:
-> https://lore.kernel.org/lkml/Ywa9T+jKUpaHLu%2Fl@google.com/
->
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
-> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+On Mon, Nov 14, 2022 at 02:11:48PM -0700, Peter Gonda wrote:
+> Thanks for detailed review. Working on cleaning up the text for a V5.
 
-Reviewed-by: Peter Gonda <pgonda@google.com>
+Yeah, and I have some questions in my reply which you haven't
+addressed...
+
+> > > @@ -676,7 +712,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+> > >       if (!snp_dev->response)
+> > >               goto e_free_request;
+> > >
+> > > -     snp_dev->certs_data = alloc_shared_pages(dev, SEV_FW_BLOB_MAX_SIZE);
+> > > +     snp_dev->certs_data = alloc_shared_pages(dev, sizeof(*snp_dev->certs_data));
+> >
+> > What's that change for?
+> >
+> > I went searching for that ->certs_data only ot realize that it is an
+> > array of size of SEV_FW_BLOB_MAX_SIZE elems.
+> 
+> Do you want this change reverted? I liked the extra readability of the
+> sizeof(*snp_dev->certs_data) but its unnecessary for this change.
+
+Really?
+
+I think using a define which is a SIZE define is better. Especially if
+you look at
+
+	sizeof(*snp_dev->certs_data)
+
+and wonder what type ->certs_data is.
+
+And it's not like it'll go out of sync since it is an array of size,
+well, SEV_FW_BLOB_MAX_SIZE.
+
+:-)
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+SUSE Software Solutions Germany GmbH
+GF: Ivo Totev, Andrew Myers, Andrew McDonald, Martje Boudien Moerman
+(HRB 36809, AG Nürnberg)
