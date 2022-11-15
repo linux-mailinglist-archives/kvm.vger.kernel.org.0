@@ -2,250 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0931628F51
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 02:32:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 798B6628F1B
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 02:17:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236120AbiKOBcF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Nov 2022 20:32:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37592 "EHLO
+        id S236205AbiKOBRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Nov 2022 20:17:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231799AbiKOBb5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Nov 2022 20:31:57 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE79A6555;
-        Mon, 14 Nov 2022 17:31:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668475895; x=1700011895;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=KaT9o/ttzfouIACWirut3uCAiSUvyAPsI+b3uC3k/YY=;
-  b=hRoc8KbKp1FX4NathNwQ/2T5jBaQ2J1L1BKW1EbQedU7g6YkU+eMzJzg
-   ICytqyQIniXpG1vKonlvlY9dvtEh76AwLReReSiWA0KDKXJLTBmjLbcCo
-   Tf+jUnrEiiFNac7k3l+x54fDyYoRnqOHaSgtqjXjvQPqpWaLepdb+fj8L
-   exm5DG2xP1mMO6jvYDk4VsR32g/NMU7j5+xt0O+MtV0uLoCr68kYwa2Jl
-   tF0ld9iikI5lS72tOx+x8F+cdukhqXVad8TC0NeH4mmFb8pScCfMPJpNa
-   UzMOPR7D8Fj56pVyLCS5iNqhs8q9XaXUaSIid2Y+3t+k8hzoSJXMNoefh
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="309757907"
-X-IronPort-AV: E=Sophos;i="5.96,164,1665471600"; 
-   d="scan'208";a="309757907"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2022 17:31:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="616554260"
-X-IronPort-AV: E=Sophos;i="5.96,164,1665471600"; 
-   d="scan'208";a="616554260"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga006.jf.intel.com with ESMTP; 14 Nov 2022 17:31:35 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 14 Nov 2022 17:31:34 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 14 Nov 2022 17:31:34 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Mon, 14 Nov 2022 17:31:34 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.170)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Mon, 14 Nov 2022 17:31:31 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TbZ2U9hBB41LuyKsb07n+tsxNk0X8hszIqalrdg045k6zmgyt9Wg0dJ8Yk5nzQD0eEYGvvK0INaPRZGv5ff+fcC8punWhC6QN+yx8RJEImgYgCsAstwZ3m3tKGLi+gI0akQykeQ38RnrOigYT4elfNJXDIUOJEZ/93paMxWVaahQdIfwOFpVMoBbUV3/BhcbdO1l2LItSkNk49BS/Yiz6fye6FNky9VE3PjtMw2Eji+eR5mY+OzTZn/Ah1By7UMlPqtJpHcuLMH/IJI+d2+kqCZ+jMgeKalJeRM4mLfQp8jW88QNgrdFpfOVm+tUwREK7HSuy74MU8mzRe2sAfUDLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=r71uB4xp1dW1m402KMb6Amp6Juy4YKRqYML20j4g2F4=;
- b=KlOJK80wq7E1RmiOQGDGSm+BydIXiZMpWP7UnobsozGLoFDWG+g25F6/e2Nqq2z7eyCsklg/vvRpL/WX0/vvgokq/zxM1MU/4BM3i8tjTKodQXKVoFl81UqH7UbNJeKYXV4Oad+oFet7cl1XqGDMrMTWhpIln3rjeindf6y7WW4wmGAgS8QbIfFuVB9eK3x5aUgLhmtkmCyJ6hM9BcQ/iF7fmb6/TKPOQjIbjkJrPcgJfG0fmvxrI+JRQxs2+/0nzNgbGcrg7pIQKABCQOHNdninhYjWSNCl1KSsDG/iJ4o5P58YPCuY6jj2lETK/B3mj697e69zUsgCmW389EzWNg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- DM4PR11MB6408.namprd11.prod.outlook.com (2603:10b6:8:b7::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5813.17; Tue, 15 Nov 2022 01:31:26 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::dc06:6d36:dc8a:fe7f]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::dc06:6d36:dc8a:fe7f%7]) with mapi id 15.20.5813.017; Tue, 15 Nov 2022
- 01:31:26 +0000
-Date:   Tue, 15 Nov 2022 09:08:38 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <pbonzini@redhat.com>, <intel-gfx@lists.freedesktop.org>,
-        <intel-gvt-dev@lists.freedesktop.org>, <zhenyuw@linux.intel.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86: add a new page track hook
- track_remove_slot
-Message-ID: <Y3LmloAFnNpHDumV@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20221111103350.22326-1-yan.y.zhao@intel.com>
- <Y26SI3uh8JV0vvO6@google.com>
- <Y27ivXea5SjR5lat@yzhao56-desk.sh.intel.com>
- <Y27sG3AqVX8yLUgR@google.com>
- <Y3GUdqxnPJvc6SPI@yzhao56-desk.sh.intel.com>
- <Y3JtonYdDYOhbmfG@google.com>
- <Y3LEZXWqk6ztuf7x@yzhao56-desk.sh.intel.com>
- <Y3LOIKueyTUoJ00B@google.com>
- <Y3LNplTrOpJdxyEW@yzhao56-desk.sh.intel.com>
- <Y3Ljjji0Bwt5+WxH@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Y3Ljjji0Bwt5+WxH@google.com>
-X-ClientProxiedBy: SG2P153CA0033.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c7::20)
- To DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6)
+        with ESMTP id S235981AbiKOBR2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Nov 2022 20:17:28 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B48315FE4;
+        Mon, 14 Nov 2022 17:17:27 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AF144Em011372;
+        Tue, 15 Nov 2022 01:17:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=v5qxHwZRSrEklg/Y29DH5jcZrOETt0IZmMrBfAAu1uo=;
+ b=j2duxABM1EDylhhv6JusTSHWzMM/i/16Yd11mUx9/9rD20+6LkwQ8wzd1tEBiMDPoLOA
+ K+XuU5Q0kNTJbpNsxQoECmfc1ofk1h87TnVa6ch6Tmvlt2d9tC6ZFzm+uvemgGOs0q7Y
+ +V3I2Fx/666sTUU+Eprb5uful5OsKwvaPjvd6g1rU0N0j4a2ebncyMenLxju0oT8nO7Z
+ g5EIg6wO0DLOvJh/9KYnbX7j/OkHcRdhukd1Lv6018XiWdxG9SJARMXsK8PxosGLwhTW
+ mXMASPxbL+hQ0EG7iXpXw6KbE486T8vP60IH+2I6vktGBw+zxFi1jqPdqfOPl61gFMl7 Xg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kv0sg886d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Nov 2022 01:17:04 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AF14mhU013878;
+        Tue, 15 Nov 2022 01:17:04 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kv0sg885y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Nov 2022 01:17:04 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AF16UOF023719;
+        Tue, 15 Nov 2022 01:17:02 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma01dal.us.ibm.com with ESMTP id 3kt349dft8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Nov 2022 01:17:02 +0000
+Received: from smtpav04.dal12v.mail.ibm.com ([9.208.128.131])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AF1H23x8585858
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Nov 2022 01:17:02 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9010A58052;
+        Tue, 15 Nov 2022 01:17:00 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 91EA25804E;
+        Tue, 15 Nov 2022 01:16:57 +0000 (GMT)
+Received: from [9.160.3.49] (unknown [9.160.3.49])
+        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 15 Nov 2022 01:16:57 +0000 (GMT)
+Message-ID: <41c38082-bdc6-4df0-6fc3-8c8fe307dfa4@linux.ibm.com>
+Date:   Mon, 14 Nov 2022 20:16:57 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH v2 00/11] Connect VFIO to IOMMUFD
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
+Cc:     Nicolin Chen <nicolinc@nvidia.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Airlie <airlied@gmail.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, iommu@lists.linux.dev,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Longfang Liu <liulongfang@huawei.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>
+References: <0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com>
+ <Y2ofNKmmAIMGYLFK@Asurada-Nvidia>
+ <9b2bb9f2-fc82-dd01-84ff-c2fe45e1a48a@intel.com>
+ <Y2vb4fuPZdYKR1M1@nvidia.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <Y2vb4fuPZdYKR1M1@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: XhP4FCrn3gfeRfda6c43jYijtyrx4oqp
+X-Proofpoint-ORIG-GUID: cKSFtegJBR8Bg-fuisl7smJ4mDwyk76N
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DM4PR11MB6408:EE_
-X-MS-Office365-Filtering-Correlation-Id: 536fd2a4-0319-48c7-1707-08dac6a91cf7
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: j8zPPtEfSOyeCVA6gHqC+CYaKaqiUUqonz2+J1Sf4tz8pLNlAQte+57UWeCkOwCSjUenLwOUuPO+XWURmpFQohifPfYueeHvlmszdFBRP6Lb55zJAXm29zUYB0JuCHTKskx9AP5/INFM4OVxignpYhQ64fSltNM4h4SsxGbh51QWH3li7B8RyTYM2zosv8xnGGmyt1SZZmrUi2Zr/Vg5xKKxopQjswy9ZQJsOTWLMRcGNt50BRsNo6TaZglUJ9vCQfpuf+Q4IXbyweYISlacW77Qe5WkNM+/rl9MIeWbt4JsL5w5sioqzzOOBH1qKxWsghqOwxHFoerUd45esiiZsL3Cq8EVaLt/Wd6PPp/osS2xSSibx9nU+MVY+Gz0qmNSCggrsRXA3vsXT9pTME5+H5Mqxbcmnw3rUN6OlwUVhQ7T56VIk42MkC03UEIE3fFeDTua3+DabzmzTYdFEDQyIG8taFQPAOXiG74XGOpVBFagTclKbIrKvxvbNX9iPTDV+B65Ru1RazoJAUPzYez+xa4Sg10s+gPByQKcxDpSRRltg8gG4/0x9GxcunHamHmZ7VVEok80WJCPnsBpvEN0r9UUxL7PbQ00SUKXARkn+v48seyTJOGLTYRziH1OzoPwPA/HTTfTiNUckdRtBgNFmcTsW/ulqhnFD6TcqaBVs2KgYnNRuhufA7gmm5N0loX+rPzAIZAgkA2oPGrcWHPZvg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(346002)(376002)(396003)(366004)(136003)(451199015)(8936002)(3450700001)(5660300002)(8676002)(66476007)(66556008)(41300700001)(4326008)(66946007)(6916009)(316002)(6486002)(6506007)(6666004)(6512007)(26005)(478600001)(186003)(2906002)(83380400001)(38100700002)(86362001)(82960400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GsK4kqwLDD1t6B9twv2gq2i6WlgcHa1+injvj8pGuSt9AejwvFplr682e0ad?=
- =?us-ascii?Q?wEb9EDN+mTo4a2e1R2Qp1GwYy5CKZs7UgvyYG6l65aJ1caJizd8UZeSxPYzD?=
- =?us-ascii?Q?1H9oTRKA5jZpKIB380QdJovY66Qt4fLJcJZ20In8SdlALtvs/BRbyC+i9zpV?=
- =?us-ascii?Q?SwcBXfg+jOrbqkKXAI+skdmGEfsOdIf24hKQto+EYp+kcHw33/7kBYreuNo3?=
- =?us-ascii?Q?Cw/mawja2wiTVe5bZjHTA6o4qdvWtedI59zHvlJg1XVPTtsvJdyTHL16g00v?=
- =?us-ascii?Q?rmM4nN2J1q/jHOrz2hReAdo3O2SXtqpq/JjbLEuPrQ3Dzq61a7hPli77pd/A?=
- =?us-ascii?Q?LBM609H/vjC4VX3nPANIcvcKq9zfryj0S2V7PNGWcnCkwP+EwnIzdnr8tvGy?=
- =?us-ascii?Q?Tfv09+Z3kPAUBZlgU53j4CZ12BPdBjGeHEue7yUbQq9k2P9vj1C6nOzKsCQk?=
- =?us-ascii?Q?on3Kang/qnn/sr+i++5KWIaULQO7ky3JoR5YcUHLhFoYiFoFwlHtea9DTwYV?=
- =?us-ascii?Q?GnvRTTl4vYWsHcGSnPDaIiOUl00iisxI+iXoRbHfDzAjQpI3p3RYe8ev5cBS?=
- =?us-ascii?Q?nk4lCudIclSQDnpnxpNeLIKCamA7iVbeVJtR4hCZD3dMQ74EjRb8M6hdDltW?=
- =?us-ascii?Q?OX8sgDCgEpGMkELxnHVCqtH4x8vQ8odDeAJZaCtqTaQ5r8PTKZKcYCDGhj0r?=
- =?us-ascii?Q?C+3xPMw2LRWIkXm5eznjtXAyHLwj+L6BvbhuG2rWe2KddomHtelDdQ3XJqxj?=
- =?us-ascii?Q?t6vUUkheBSQGB5J6kDDH7IpPlLl+L6rSu9AdVozED//5UxvpgkGUVnJxW4Cs?=
- =?us-ascii?Q?dDhp23srhhd9VlSX7WjQk/04yZ7MsMmK6tKxnGVssE+I+yRnnMCw3NgIqMA2?=
- =?us-ascii?Q?vx7BHr6Iz0I01P2iSyLrB89bslViXNlQ18jaAZ8IWlC/Gmls1Nki8VymrgVZ?=
- =?us-ascii?Q?4WWt1QNUrGzB3gz+7Hd1/Tj/gl2Hdoh00nPseYnqAT+zN8LDJ5BL7xOwo9ef?=
- =?us-ascii?Q?TMtX420ZuAHgx07q7vmzoxTVE84UiJuOejoZgNtz/nZgCLxfGlUpwTo0Z/8Z?=
- =?us-ascii?Q?OkZafDg1irb1eXmiwcftN+FPbO657F5yZrX7N649qQ9PKLwlH7tzCz4OziRy?=
- =?us-ascii?Q?A6HCvFIn9N2E8MS2vfVget9ahhTon286Buj7avISHBWFKa72MxeBZWury6GM?=
- =?us-ascii?Q?u/TLx+TqubPjy4myGZkZLK+Ag+s3WBnesVMzv2Z19IMYMlwCY3CgMKyrt24E?=
- =?us-ascii?Q?U9DJWY9jb6re17yeLGz+6rXVE+g8G8DXSKGYfyNqsmpth6nefi531XDpjaca?=
- =?us-ascii?Q?JrmP7jQBWg0xj3Bz5zUigdRLFoGdzqMYwWH8VefUHHR4B+9IXeDQS6S2luFM?=
- =?us-ascii?Q?z7HvdKPEc4F8NCpwvJmsByYwinQFMNki4aBgTfNkwRNQ+FdCIZIwm+jRkFp+?=
- =?us-ascii?Q?FkycnG0IlDfRePHfpiazArrzOGbZv9eqjGQYncdHmgLVG20jDe8pTwbYlsHC?=
- =?us-ascii?Q?K+FWpChiT+uiPEDwqN9UTq8jIySYx6YEIvEClBb6HDoKJ3xh8LtrxPlhjOyM?=
- =?us-ascii?Q?WpciUHihAx3tmTRb7FZdiFxUjS2cI/lvLUI7Aj5lEB1ZHn4YuXMJY8OincCw?=
- =?us-ascii?Q?Kg=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 536fd2a4-0319-48c7-1707-08dac6a91cf7
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2022 01:31:26.5324
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 20xYvDTE+O1KN/v1SX/7JBisSDCAtaj8KxyKDzweVLGZ9FhpBiSiPO5i7nw0N0czAudry6zXDuXdxCchqazShg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6408
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-14_15,2022-11-11_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 suspectscore=0 bulkscore=0 mlxlogscore=999 spamscore=0
+ lowpriorityscore=0 adultscore=0 clxscore=1015 priorityscore=1501
+ phishscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211150006
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 15, 2022 at 12:55:42AM +0000, Sean Christopherson wrote:
-> On Tue, Nov 15, 2022, Yan Zhao wrote:
-> > On Mon, Nov 14, 2022 at 11:24:16PM +0000, Sean Christopherson wrote:
-> > > On Tue, Nov 15, 2022, Yan Zhao wrote:
-> > > > On Mon, Nov 14, 2022 at 04:32:34PM +0000, Sean Christopherson wrote:
-> > > > > On Mon, Nov 14, 2022, Yan Zhao wrote:
-> > > > > > On Sat, Nov 12, 2022 at 12:43:07AM +0000, Sean Christopherson wrote:
-> > > > > > > On Sat, Nov 12, 2022, Yan Zhao wrote:
-> > > > > > > > And I'm also not sure if a slots_arch_lock is required for
-> > > > > > > > kvm_slot_page_track_add_page() and kvm_slot_page_track_remove_page().
-> > > > > > > 
-> > > > > > > It's not required.  slots_arch_lock protects interaction between memslot updates
-> > > > > > In kvm_slot_page_track_add_page() and kvm_slot_page_track_remove_page(),
-> > > > > > slot->arch.gfn_track[mode][index] is updated in update_gfn_track(),
-> > > > > > do you know which lock is used to protect it?
-> > > > > 
-> > > > > mmu_lock protects the count, kvm->srcu protects the slot, and shadow_root_allocated
-> > > > > protects that validity of gfn_track, i.e. shadow_root_allocated ensures that KVM
-> > > > > allocates gfn_track for all memslots when shadow paging is activated.
-> > > > Hmm, thanks for the reply.
-> > > > but in direct_page_fault(),
-> > > > if (page_fault_handle_page_track(vcpu, fault))
-> > > > 	return RET_PF_EMULATE;
-> > > > 
-> > > > slot->arch.gfn_track is read without any mmu_lock is held.
-> > > 
-> > > That's a fast path that deliberately reads out of mmu_lock.  A false positive
-> > > only results in unnecessary emulation, and any false positive is inherently prone
-> > > to races anyways, e.g. fault racing with zap.
-> > what about false negative?
-> > If the fast path read 0 count, no page track write callback will be called and write
-> > protection will be removed in the slow path.
+On 11/9/22 11:57 AM, Jason Gunthorpe wrote:
+> On Tue, Nov 08, 2022 at 11:18:03PM +0800, Yi Liu wrote:
+>> On 2022/11/8 17:19, Nicolin Chen wrote:
+>>> On Mon, Nov 07, 2022 at 08:52:44PM -0400, Jason Gunthorpe wrote:
+>>>
+>>>> This is on github: https://github.com/jgunthorpe/linux/commits/vfio_iommufd
+>>> [...]
+>>>> v2:
+>>>>   - Rebase to v6.1-rc3, v4 iommufd series
+>>>>   - Fixup comments and commit messages from list remarks
+>>>>   - Fix leaking of the iommufd for mdevs
+>>>>   - New patch to fix vfio modaliases when vfio container is disabled
+>>>>   - Add a dmesg once when the iommufd provided /dev/vfio/vfio is opened
+>>>>     to signal that iommufd is providing this
+>>>
+>>> I've redone my previous sanity tests. Except those reported bugs,
+>>> things look fine. Once we fix those issues, GVT and other modules
+>>> can run some more stressful tests, I think.
+>>
+>> our side is also starting test (gvt, nic passthrough) this version. need to
+>> wait a while for the result.
 > 
-> No.  For a false negative to occur, a different task would have to create a SPTE
-> and write-protect the GFN _while holding mmu_lock_.  And then after acquiring
-> mmu_lock, the vCPU that got the false negative would call make_spte(), which would
-> detect that making the SPTE writable is disallowed due to the GFN being write-protected.
+> I've updated the branches with the two functional fixes discussed on
+> the list plus all the doc updates.
 > 
-> 	if (pte_access & ACC_WRITE_MASK) {
-> 		spte |= PT_WRITABLE_MASK | shadow_mmu_writable_mask;
-> 
-> 		/*
-> 		 * Optimization: for pte sync, if spte was writable the hash
-> 		 * lookup is unnecessary (and expensive). Write protection
-> 		 * is responsibility of kvm_mmu_get_page / kvm_mmu_sync_roots.
-> 		 * Same reasoning can be applied to dirty page accounting.
-> 		 */
-> 		if (is_writable_pte(old_spte))
-> 			goto out;
-> 
-> 		/*
-> 		 * Unsync shadow pages that are reachable by the new, writable
-> 		 * SPTE.  Write-protect the SPTE if the page can't be unsync'd,
-> 		 * e.g. it's write-tracked (upper-level SPs) or has one or more
-> 		 * shadow pages and unsync'ing pages is not allowed.
-> 		 */
-> 		if (mmu_try_to_unsync_pages(vcpu->kvm, slot, gfn, can_unsync, prefetch)) {
-> 			pgprintk("%s: found shadow page for %llx, marking ro\n",
-> 				 __func__, gfn);
-> 			wrprot = true;
-> 			pte_access &= ~ACC_WRITE_MASK;
-> 			spte &= ~(PT_WRITABLE_MASK | shadow_mmu_writable_mask);
-> 		}
-> 	}
-> 
-> 
-> 
-> int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
-> 			    gfn_t gfn, bool can_unsync, bool prefetch)
-> {
-> 	struct kvm_mmu_page *sp;
-> 	bool locked = false;
-> 
-> 	/*
-> 	 * Force write-protection if the page is being tracked.  Note, the page
-> 	 * track machinery is used to write-protect upper-level shadow pages,
-> 	 * i.e. this guards the role.level == 4K assertion below!
-> 	 */
-> 	if (kvm_slot_page_track_is_active(kvm, slot, gfn, KVM_PAGE_TRACK_WRITE))
-> 		return -EPERM;
-> 
-> 	...
-> }
 
-Oh, you are right! I thought mmu_try_to_unsync_pages() is only for the
-shadow mmu, and overlooked that TDP MMU will also go into it.
+For s390, tested vfio-pci against some data mover workloads using QEMU on s390x with CONFIG_VFIO_CONTAINER=y and =n using zPCI interpretation assists (over ism/SMC-D, mlx5 and NVMe) and without zPCI interpretation assists (over mlx5 and NVMe) - will continue testing with more aggressive workloads.  
+(I did not run with CONFIG_IOMMUFD_TEST other than when building the selftest, but I see you mentioned this to Yi -- I'll incorporate that setting into future runs.)
 
-Thanks for the detailed explanation.
+Ran the self-tests on s390 in LPAR and within a QEMU guest -- all tests pass (used 1M hugepages)
 
-Thanks
-Yan
+Did light regression testing of vfio-ap and vfio-ccw on s390x with CONFIG_VFIO_CONTAINER=y and =n.
+
+Didn't see it in your branch yet, but also verified the proposed change to iommufd_fill_cap_dma_avail (.avail = U32_MAX) would work as expected.
+
+Tested-by: Matthew Rosato <mjrosato@linux.ibm.com> 
+
+
