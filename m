@@ -2,71 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0506962A478
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 22:48:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6BC962AD82
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 23:01:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231383AbiKOVsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 16:48:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39320 "EHLO
+        id S231947AbiKOWBS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 17:01:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231415AbiKOVsp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 16:48:45 -0500
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FD6DB4A5
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 13:48:42 -0800 (PST)
-Received: by mail-lj1-x233.google.com with SMTP id c25so19373993ljr.8
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 13:48:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XChCKSa55RQw6aM9/4oFMt9X2omy2D4G5ZLlpjkEFO4=;
-        b=RyWCXB6UCoN1qux5VOCmOhwPaRc0OmJOOlnYaLt4N+f00XTtQ3g7RtRIcknQlcwpki
-         L/wWD/URypy9LdYt4NbRp2XvFEkmSKpWGPojY4Woop3Kr6cnhFG3M4ziG6eM2x7Ee57f
-         0n1AcsrB+XShanoYsjjxQC+NlsBT/dUFk+vaNRNHvuYN+uhIRCXeSJ3iU2ZOmoV+UvC8
-         G4B6yvTIVXSWJWWLZFJJzg8yoyshOgxADu8QwWlP1vm4iBgkWlDxhW+uXmYZkbUbOqFZ
-         GpJZ/KD3auYO9TadQ3c1GcRFgBGbHlnqIF9ue8cd9GWVJI1DdfALsL+KZ1jqDpPC2w7M
-         y4Gw==
+        with ESMTP id S229731AbiKOWBQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 17:01:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBD692F661
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 14:00:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668549615;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yWVdEQSGnUT5FS0ewLKb5wfJc/7a9atoeI2Gx/iKg8A=;
+        b=alJkGfKlOA/h7ECiOCDur/V8bQPThGbiGduffscX8sQkYd8esCkqcfHyCoaq6gvOsGem3R
+        Qkv+gJwAGjMGGwDPni1ALp2ZyyNiSs9Mel0CQ8L1XmdRgmcDh0bGcZaP8flQYzrop3/FAM
+        G0s6aGtW2uQ0Upc9CJ9z6w+hXdaiJn0=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-351-HT7YJyB6P7qi2oP6wjOKEA-1; Tue, 15 Nov 2022 17:00:13 -0500
+X-MC-Unique: HT7YJyB6P7qi2oP6wjOKEA-1
+Received: by mail-io1-f72.google.com with SMTP id j17-20020a5d93d1000000b006bcdc6b49cbso7947170ioo.22
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 14:00:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XChCKSa55RQw6aM9/4oFMt9X2omy2D4G5ZLlpjkEFO4=;
-        b=WLnaxrvBbWOrnHcXDBIIzgDu/heIv+Nv4Ha4ee2AYgUZWtkBa0FIU2jePnMfAKc+4k
-         CPzdj86uF0QpGJg1Afr971fPL8kkgtiP66yTzpeduAG1pGCaZLBL49QoWFyYyvAp1p8J
-         6mqKuN8cO99LvLd9nQSw62UkebEo4wmDVncCpgcM/74lmk/ksOu51gw2bEuXup++KC/Y
-         hzq+Zmza64nCeJwxpqmDsMmaK+dYvnV5d1BczeIVPwESoyM7/b9pzcWDVpMiot4qM76i
-         3YrNax5CWqRCXVAAtrPtlC8Lmu0qkA1nr7uyYu6h/mnDXf69/HTUsU0mEGb2EMvnaghK
-         kwXw==
-X-Gm-Message-State: ANoB5pk5h41qua/m0ClAytwbtCAGClylWBGUbo/W8YZbM1G3umWvnA7z
-        rIF76ZDYaBbExdc2a51lLhw7fDPcN4/cVypqgLTaxQ==
-X-Google-Smtp-Source: AA0mqf61z8RzseM7p7vQjqsEmE4nVk/t9E4uhyLhP3ph+ffPsM9rsTu/w7loWNxS9duZEsoJDENrCJnoXc5XJD6/6pw=
-X-Received: by 2002:a2e:9c59:0:b0:26f:dfb2:9bfd with SMTP id
- t25-20020a2e9c59000000b0026fdfb29bfdmr7176265ljj.455.1668548920546; Tue, 15
- Nov 2022 13:48:40 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yWVdEQSGnUT5FS0ewLKb5wfJc/7a9atoeI2Gx/iKg8A=;
+        b=xjOobTjf1uK1o/oE8dbtksVyfnFFkLgCVAPeyNMv+eoUl4dZ3h+kBK0QT3XxkHrmbB
+         2giKpdh1hAgZ7NYnEeLgtouPzg9oY/ETdXrkJB9DIvRBlZ70tFCXcwQTtAzOxbU6QZBF
+         bgjxu1v70j+Ja95+CtqKTW0GCC6/lF2ZPyxAVmCHxWoqkYuACjIcFhRLNEuJSArkLU0r
+         ALFMvis8UAN4WCv/LrAjrZkvRCiEWYdFE0CTHAr9Lx1hammKRS/lECfi0k/7Q+BdCcci
+         iBKkn/l7ATrBj1GApRqFkDdKNOOaINMhryT6eve4RRwDcgzxe5Jal7oFvkitUyb9kPr0
+         iBug==
+X-Gm-Message-State: ANoB5pk4CXoFQOiam572fK8pq5hD7K4XogjjjhkML6u45H7IxrAwCWSS
+        EviFSYtqAsdWR+aTF2MYC9yVlCXqtTDfPjLnmrW31T4SrZy4ohWl4X/lpk3fdpIIjCoKtUv2wbv
+        Q+m4xICoi13Fk
+X-Received: by 2002:a05:6638:3f17:b0:375:ca55:284e with SMTP id ck23-20020a0566383f1700b00375ca55284emr9180780jab.248.1668549612757;
+        Tue, 15 Nov 2022 14:00:12 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7oQSLhB2PYlLP7mKdWIRx+wC8V8U3i1U/ad+EQyX/KiYKoJehO7s0GWEhKea9lm6xMuQBKiA==
+X-Received: by 2002:a05:6638:3f17:b0:375:ca55:284e with SMTP id ck23-20020a0566383f1700b00375ca55284emr9180764jab.248.1668549612485;
+        Tue, 15 Nov 2022 14:00:12 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id cd15-20020a0566381a0f00b0037494035324sm5218448jab.48.2022.11.15.14.00.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Nov 2022 14:00:11 -0800 (PST)
+Date:   Tue, 15 Nov 2022 15:00:09 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [patch 09/10] vfio/fsl-mc: Remove linux/msi.h include
+Message-ID: <20221115150009.7bca909e.alex.williamson@redhat.com>
+In-Reply-To: <20221113202428.826924043@linutronix.de>
+References: <20221113201935.776707081@linutronix.de>
+        <20221113202428.826924043@linutronix.de>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20221103152318.88354-1-pgonda@google.com> <Y258U+8oF/eo14U+@zn.tnic>
- <CAMkAt6p2zXnE-ew+pJk_UpZAEFZFdCOPThNn3hSFqYOQG81t-g@mail.gmail.com> <Y3QGUb0TVd2M9qow@zn.tnic>
-In-Reply-To: <Y3QGUb0TVd2M9qow@zn.tnic>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 15 Nov 2022 14:48:28 -0700
-Message-ID: <CAMkAt6qUpthB893PWXcNvdZbVmwDs1Ca-5BYwEsxnHEOM_TEsA@mail.gmail.com>
-Subject: Re: [PATCH V4] virt: sev: Prevent IV reuse in SNP guest driver
-To:     Borislav Petkov <bp@suse.de>
-Cc:     thomas.lendacky@amd.com, Dionna Glaze <dionnaglaze@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Haowen Bai <baihaowen@meizu.com>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,45 +80,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 15, 2022 at 2:36 PM Borislav Petkov <bp@suse.de> wrote:
->
-> On Mon, Nov 14, 2022 at 02:11:48PM -0700, Peter Gonda wrote:
-> > Thanks for detailed review. Working on cleaning up the text for a V5.
->
-> Yeah, and I have some questions in my reply which you haven't
-> addressed...
+On Sun, 13 Nov 2022 21:34:08 +0100 (CET)
+Thomas Gleixner <tglx@linutronix.de> wrote:
 
-Ah I was just applying answers to those in the comments/commit description.
+> Nothing in this file needs anything from linux/msi.h
+> 
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Diana Craciun <diana.craciun@oss.nxp.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: kvm@vger.kernel.org
+> ---
+>  drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c |    1 -
+>  1 file changed, 1 deletion(-)
+> 
+> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+> @@ -8,7 +8,6 @@
+>  #include <linux/slab.h>
+>  #include <linux/types.h>
+>  #include <linux/eventfd.h>
+> -#include <linux/msi.h>
+>  
+>  #include "linux/fsl/mc.h"
+>  #include "vfio_fsl_mc_private.h"
+> 
 
-I have replied back to your first post.
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
 
->
-> > > > @@ -676,7 +712,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
-> > > >       if (!snp_dev->response)
-> > > >               goto e_free_request;
-> > > >
-> > > > -     snp_dev->certs_data = alloc_shared_pages(dev, SEV_FW_BLOB_MAX_SIZE);
-> > > > +     snp_dev->certs_data = alloc_shared_pages(dev, sizeof(*snp_dev->certs_data));
-> > >
-> > > What's that change for?
-> > >
-> > > I went searching for that ->certs_data only ot realize that it is an
-> > > array of size of SEV_FW_BLOB_MAX_SIZE elems.
-> >
-> > Do you want this change reverted? I liked the extra readability of the
-> > sizeof(*snp_dev->certs_data) but its unnecessary for this change.
->
-> Really?
->
-> I think using a define which is a SIZE define is better. Especially if
-> you look at
->
->         sizeof(*snp_dev->certs_data)
->
-> and wonder what type ->certs_data is.
->
-> And it's not like it'll go out of sync since it is an array of size,
-> well, SEV_FW_BLOB_MAX_SIZE.
->
-
-OK! I'll revert this part of the change.
