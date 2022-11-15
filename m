@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34CC762970F
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:17:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E8AA629710
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:17:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238090AbiKOLRC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 06:17:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53860 "EHLO
+        id S229779AbiKOLRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 06:17:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229913AbiKOLQ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 06:16:27 -0500
-Received: from mail-wr1-x449.google.com (mail-wr1-x449.google.com [IPv6:2a00:1450:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C22E614B
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:26 -0800 (PST)
-Received: by mail-wr1-x449.google.com with SMTP id u13-20020adfa18d000000b00236566b5b40so2657942wru.9
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:26 -0800 (PST)
+        with ESMTP id S232197AbiKOLQa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 06:16:30 -0500
+Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5ACA13CD8
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:28 -0800 (PST)
+Received: by mail-wm1-x34a.google.com with SMTP id m34-20020a05600c3b2200b003cf549cb32bso10386694wms.1
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:16:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C9R+z2LfKFQNn3W3okfxPlt0ApO8wFNDoYzLdWHqipE=;
-        b=TEb62ETv4s/fBxh8STMq8bC+bnsCcOj4LS7CIyyc0mr356/Rwu6h6Sx9SSHU3Kx5SZ
-         y6Qm+g596y9sON2XOJS28ERfBmIWcnlaIbVdcZ3/41zzbe6XwIfiXPBIQFQTEe7+7Xun
-         v9MkhqvSqVkFJV7Z5udpPF1KOoZSUIQxw9IUu/imSn5v3LRImQws0/efQ7swdr6VwLw9
-         ctVoc4qb/ASFJnlVYvDhNVbbq/YixCeWAy1ZUPH89VZUrGQm0oaUy4XUJbMZKAmmQjBQ
-         PIYhqUtgqxkJNYlob4O+T1cxXRu/BOpzdXxsjZwRkjLkyv8UuY0mAioRAgHiXtN0gqnu
-         9+yQ==
+        bh=sE/AjWGs85/jSnKi8kMix3x7KNT1E0UXCsHHKkvydVw=;
+        b=Fhf8kzCbiOIw1urSU9e47/uZlsJ3VJeGJu/AiGsRB+hJ7XrqDOy+HRkYzEnXgwwRJJ
+         ZRq0/9U9t9HylcL89/DJhxMSsEjr20fn+qkeaSaxW8VgzqAtzv0DVgxVgOBF7IcYhken
+         JwUZTD+gY6TV/HADNOYE+aVemozVHFOurUPJpNAb5lUDFpzLsSI1AgOgRCmvAI+PGf0w
+         vQ3OjFPyvyfgpEysXKMaVIBZ/Sv/XyQl4qp3KqOumjQRpslt5KN0se6WhbT73WKwH8N4
+         XHh8qPAkMWd40bxd6AJxyWXtrxy2pyIT/XuzD/k1c1HXXuzIZvegmtjf3CtCg6Z7s/Mm
+         KBMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C9R+z2LfKFQNn3W3okfxPlt0ApO8wFNDoYzLdWHqipE=;
-        b=6+C4MiafL/tDrNjJlfVbwxJyZC7Z5sQp1gOsc+xQuEWK3ACKgm2YEcSGpdiJP3Qrny
-         mkK3wuMJmh8W2DvLOEjywK36Kg9bfm3q+cySC6Bzlu687yw+7wyTMLVCuKCyAdk8cBmX
-         7uDOkaUw0dr2ldM+MOcMm6+prCgx1XRo6VpGSetTtdG3qbZRbJx29OmvlFsd+NSXqtAw
-         0aX/GhcuXqoUhPqJw4DqBL0oTmZlvzrH5v06CXDM3ZaoEmJNbPrqev3W9Mr+9MCmXX43
-         f6xco/hRfQK5A4BX6LVTHrBX6qFC0kbtf9lqGUW8lr9PCHjawjX+1h/7OJDC8vKZzy8w
-         JhVw==
-X-Gm-Message-State: ANoB5pk1n32379bmxwV6XeHPe7DjMQNAuDYqXkl6KnaKvZsKyokp55d9
-        NbfS7f+QYZfy0v3FknMGXKn3P6YN1r/JE/M3zttN7vcR/i0Tmcr/a1hA44PqBBZeHJMuonR54A1
-        D/z6qFuFSCSb5Gsi5w+25HdHZZHKbIDRpbo/kjtKYDaQMfm4VqsXEeW4=
-X-Google-Smtp-Source: AA0mqf7BCbGj3TedjfZGh/xq4ME17hGxGp4AlXDiQ8fzErVnCv8X/Qi4OqbvXB8dgg0VpGlnDyA3jhlRjA==
+        bh=sE/AjWGs85/jSnKi8kMix3x7KNT1E0UXCsHHKkvydVw=;
+        b=fEiBSS60HvhDze3yzjDN7D13SGwg5eiCt0u+FdQHic4SmVdlittKLZy78VOrE43ghz
+         1A1MwAYmSgX4tbtgl4YNHYkM/NwMtnUwHTKt9xwjihb9WpCj/CIHyOrFAeILOZaiLzhI
+         X4zCL0Hi0yds8GfEBi/Y5H7sWE598/vRLNWfGxqQb2upNcatP+LK9BFxXZAU+AtLWUn4
+         fPFsFb68BXf3G81UCnRQhjGmtCvQrz1Wf4dFRPx8Ck/kyD+Rr2Ydpm4yDAKykiA4yus6
+         ZXesZZmTS0jh1tKobDh2+aVLF5il+9V+n3pTEHMWPRT9scHVHTXDMkdBxQTo8R6c//Iv
+         7iSQ==
+X-Gm-Message-State: ANoB5pmz6tI+uexFvU8PDpXw4b0J4e51U0AsUUHKh2hv0KyNPo2M2x74
+        ZHNdQnY4zmBg0iHHsCZNQlMTWpaBtOLV8ZLA17dZQYgp9L0YsG6wjYEp4ZTtrXP+L10IFoaWFkm
+        Ol/HY/e30FeePDJ1cu8vY0IFt9YH7XvFLvBpHxyHYON0vfvYltp0pddY=
+X-Google-Smtp-Source: AA0mqf4DUpAVLKt4u3X4kUyNKM+2ktYZQ0+aAP8X+Rz8jazkzEAeqUm3O0+LLgWkUMpgxQAD6ssxWXbIBw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:3c93:b0:3b4:cd96:1748 with SMTP id
- bg19-20020a05600c3c9300b003b4cd961748mr120128wmb.2.1668510984581; Tue, 15 Nov
- 2022 03:16:24 -0800 (PST)
-Date:   Tue, 15 Nov 2022 11:15:47 +0000
+ (user=tabba job=sendgmr) by 2002:a05:600c:54ed:b0:3cf:486f:2700 with SMTP id
+ jb13-20020a05600c54ed00b003cf486f2700mr1114421wmb.83.1668510987166; Tue, 15
+ Nov 2022 03:16:27 -0800 (PST)
+Date:   Tue, 15 Nov 2022 11:15:48 +0000
 In-Reply-To: <20221115111549.2784927-1-tabba@google.com>
 Mime-Version: 1.0
 References: <20221115111549.2784927-1-tabba@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221115111549.2784927-16-tabba@google.com>
-Subject: [PATCH kvmtool v1 15/17] Remove no-longer unused macro
+Message-ID: <20221115111549.2784927-17-tabba@google.com>
+Subject: [PATCH kvmtool v1 16/17] Factor out set_user_memory_region code
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
@@ -68,27 +68,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Not needed anymore since we're not doing anonymous allocation.
+This is common code, and will be reused in the future when
+setting memory regions using file descriptors.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- include/kvm/util.h | 1 -
- 1 file changed, 1 deletion(-)
+ kvm.c | 53 ++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 28 insertions(+), 25 deletions(-)
 
-diff --git a/include/kvm/util.h b/include/kvm/util.h
-index 369603b..f807fcc 100644
---- a/include/kvm/util.h
-+++ b/include/kvm/util.h
-@@ -35,7 +35,6 @@
- extern bool do_debug_print;
+diff --git a/kvm.c b/kvm.c
+index 695c038..a1eb365 100644
+--- a/kvm.c
++++ b/kvm.c
+@@ -193,10 +193,30 @@ int kvm__exit(struct kvm *kvm)
+ }
+ core_exit(kvm__exit);
  
- #define PROT_RW (PROT_READ|PROT_WRITE)
--#define MAP_ANON_NORESERVE (MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE)
++
++static int set_user_memory_region(int vm_fd, u32 slot, u32 flags,
++				  u64 guest_phys, u64 size,
++				  u64 userspace_addr)
++{
++	int ret = 0;
++	struct kvm_userspace_memory_region mem = {
++		.slot			= slot,
++		.flags			= flags,
++		.guest_phys_addr	= guest_phys,
++		.memory_size		= size,
++		.userspace_addr		= (unsigned long)userspace_addr,
++	};
++
++	ret = ioctl(vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
++	if (ret < 0)
++		ret = -errno;
++
++	return ret;
++}
++
+ int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+ 		     void *userspace_addr)
+ {
+-	struct kvm_userspace_memory_region mem;
+ 	struct kvm_mem_bank *bank;
+ 	int ret;
  
- extern void die(const char *err, ...) NORETURN __attribute__((format (printf, 1, 2)));
- extern void die_perror(const char *s) NORETURN;
+@@ -220,18 +240,10 @@ int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+ 		goto out;
+ 	}
+ 
+-	mem = (struct kvm_userspace_memory_region) {
+-		.slot			= bank->slot,
+-		.guest_phys_addr	= guest_phys,
+-		.memory_size		= 0,
+-		.userspace_addr		= (unsigned long)userspace_addr,
+-	};
+-
+-	ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
+-	if (ret < 0) {
+-		ret = -errno;
++	ret = set_user_memory_region(kvm->vm_fd, bank->slot, 0, guest_phys, 0,
++				     (u64) userspace_addr);
++	if (ret < 0)
+ 		goto out;
+-	}
+ 
+ 	list_del(&bank->list);
+ 	free(bank);
+@@ -246,7 +258,6 @@ out:
+ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+ 		      void *userspace_addr, enum kvm_mem_type type)
+ {
+-	struct kvm_userspace_memory_region mem;
+ 	struct kvm_mem_bank *merged = NULL;
+ 	struct kvm_mem_bank *bank;
+ 	struct list_head *prev_entry;
+@@ -327,19 +338,11 @@ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+ 		flags |= KVM_MEM_READONLY;
+ 
+ 	if (type != KVM_MEM_TYPE_RESERVED) {
+-		mem = (struct kvm_userspace_memory_region) {
+-			.slot			= slot,
+-			.flags			= flags,
+-			.guest_phys_addr	= guest_phys,
+-			.memory_size		= size,
+-			.userspace_addr		= (unsigned long)userspace_addr,
+-		};
+-
+-		ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
+-		if (ret < 0) {
+-			ret = -errno;
++		ret = set_user_memory_region(kvm->vm_fd, slot, flags,
++					     guest_phys, size,
++					     (u64) userspace_addr);
++		if (ret < 0)
+ 			goto out;
+-		}
+ 	}
+ 
+ 	list_add(&bank->list, prev_entry);
 -- 
 2.38.1.431.g37b22c650d-goog
 
