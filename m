@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F1CA1629700
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:16:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60FF8629701
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:16:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230254AbiKOLQY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 06:16:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50654 "EHLO
+        id S232253AbiKOLQa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 06:16:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229913AbiKOLQD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230215AbiKOLQD (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 15 Nov 2022 06:16:03 -0500
-Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EB261C92C
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:15:57 -0800 (PST)
-Received: by mail-wr1-x44a.google.com with SMTP id d10-20020adfa34a000000b00236616a168bso2686889wrb.18
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:15:56 -0800 (PST)
+Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E84DD21245
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:15:58 -0800 (PST)
+Received: by mail-wm1-x34a.google.com with SMTP id e8-20020a05600c218800b003cf634f5280so3661731wme.8
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:15:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O/NNSbnKNScLxQezfUEJjKeiglH5FHoDcqljUqXxi7g=;
-        b=Mc7Ipzvl2EBGkxU/sF2iYiRh9YfNLbDn67MEPFVJegy3GCKjVsv4CIABfNxxvDHrNv
-         Qxrd7LuxSTz33HdPYUI7cwpbL328VSHmfS7qtN4aKQw5R8PEGlmTtW53b+wjwJ3p/HQk
-         DM90uhNiZ3wTecjmmZNdVYuk9a0RGD1HhJhS6Ggw3H+wdpkralqG76K0gjZ9SWEjR+Qb
-         0qgKnLNH+KsfBh99Z+itkRANz3uzN4516GPIXukDax77Z5IPFUZBE2B4k9YWGecxtEf+
-         rc1vKhNMdqk8E40na64eo49rM7NhIwrlm6AX2iAweRaKnw2hx3+nPi4A6rbAEjrvGuUe
-         r1zQ==
+        bh=g3Dqg5oaANYsw5kvQe0hPdcfy+Ftql0DSTHDS61yT+o=;
+        b=GDCeTkd/EHU5mNYUXMJgBs5syjSYqt69jcUeKReb+x6soAiPky3Ex9xxbtkLHu4Ko5
+         wXBvlN/QNs8DPzBfEolIk/KtUXwZLNdqpx4h8AZzUCNLP0ojlcOwPv9/xppRA+wXlCoD
+         99N7LiVU1qQ3ZA4h3rSRz3RrrVJLc3NGf9VJufvCXD/+YzwPhzGzhMhvngesRlLCA/bJ
+         OSyfMZssgXfn+6hDuq2844WnFKQPxpcKkXDIkuDSwKGOgWF6a+7k4bhqFImWXmHbMVpR
+         8pOYDongkHgvz54x1kcFWRoYWFLnnfJHRjC91+DvggumA5070t9Wi/BHkA6buJTmJ85k
+         bk5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O/NNSbnKNScLxQezfUEJjKeiglH5FHoDcqljUqXxi7g=;
-        b=2qAlLY18AMI2eOoze3gws7cX6ks3udPKqml+rzrFAmhjF3XZ/IMKKk8cYpzXB+J6OS
-         hrbrpfh/fIoPtxwk7TFYEA3RSS8AeJJftCKHuE/l4N3O14JDialcNh6BdRptvAwCFPq1
-         460tyLYlf92iOSdTZWXG0h9RCvyyc59a5x1BE1HqKv23z41kd+wbKfjWajm50sIL12f/
-         k0QuCxaRl0mQIU57bnfAGBowXO+8MUSYttX+vY026ebANLAU5IAFWQ2xWQAVg0C5Lbmz
-         ud7jX6dYa+8IBaGoCMVtBNWwTwqywsD1kD4gnwIwemkCIUGwvl/bctptqT73Wcxju9xY
-         jzJA==
-X-Gm-Message-State: ANoB5pkdyx9mndclNzGEAGHFdql/a1B1So7Pq0UDzPTqBzSRcdvF0hwO
-        g2PRkQkPqd7fyhRlHaMplFH/kTbss3BfXEUSgKg9JrOfPkuCfsh2HoS/GZD1wRM9z58B85tvDU7
-        DqutlMQyZTqTaqSq/uEKwEam/kxExXoUVVdPBGxqOBIMauLUTExU5Wrc=
-X-Google-Smtp-Source: AA0mqf5DK9hK8xKAZ8Br3M0Yd3LumBnZIQrrzZgrZsK0e9SbArG8LHPO+Tkph6cVRX/IuREm4iOyg/DqYA==
+        bh=g3Dqg5oaANYsw5kvQe0hPdcfy+Ftql0DSTHDS61yT+o=;
+        b=ZKOv8itwizRFCX9EACYMHvR5g0Q7ihCUo80iPoeoHgC8t3iXFYOvuaZi+eIq5tbrub
+         sYykinCRJZPHSVheLP1OhWdD9/QPCIoxQb5/DLCQ7YccCe2CDN6j39qGp9xKPEmVLW/m
+         NFyFJG3kuub8GTeG4QP8wRyVUElXbucaxMNQAuTUgG0h6fvl5Tgb4Yn3muNAVs3N3WYz
+         yZ4ig4PEuRSA8F5e7upHFtBA2fPlaxVY2NcyzRjwI1J3SalAs4rpgP88p8UY7iJ3VXhB
+         dKOy4HhLqJGZ+hXDP6SbnsNfUxcjwqWmkSKk++/p5lQKJm+xCPWS/Zywdn97S/597kOu
+         2bvg==
+X-Gm-Message-State: ANoB5pk9EbCTJePtjjv0yq1IToLOvW0GX11SkeFnibV+hsEvisXVxy6b
+        nPEwlVbPz/PnnSoXgm95BckIVZWS4Q9TGMFImYAN0z+rhHZH2h3Y6HTq/2N5juLVrYIHVfVbLza
+        MaUMl6NLdNAOn89ag4B9hscSZsYX6ZYsmidNEKTvH5D/7DwaR/K/RsXU=
+X-Google-Smtp-Source: AA0mqf4VeI1LbGM7ZGkgpAyFad1HNZyx6QxLUQdhQykv6h+1GjjmAvnYdmpwqKAh3B+53VHovpNGbAfCuA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a7b:c013:0:b0:3cf:90de:7724 with SMTP id
- c19-20020a7bc013000000b003cf90de7724mr55230wmb.18.1668510955400; Tue, 15 Nov
- 2022 03:15:55 -0800 (PST)
-Date:   Tue, 15 Nov 2022 11:15:34 +0000
+ (user=tabba job=sendgmr) by 2002:adf:f489:0:b0:236:5102:bd4c with SMTP id
+ l9-20020adff489000000b002365102bd4cmr10067270wro.415.1668510957448; Tue, 15
+ Nov 2022 03:15:57 -0800 (PST)
+Date:   Tue, 15 Nov 2022 11:15:35 +0000
 In-Reply-To: <20221115111549.2784927-1-tabba@google.com>
 Mime-Version: 1.0
 References: <20221115111549.2784927-1-tabba@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221115111549.2784927-3-tabba@google.com>
-Subject: [PATCH kvmtool v1 02/17] Make mmap_hugetlbfs() static
+Message-ID: <20221115111549.2784927-4-tabba@google.com>
+Subject: [PATCH kvmtool v1 03/17] Rename parameter in mmap_anon_or_hugetlbfs()
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
@@ -68,41 +68,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This function isn't used outside of util.c.
+For consistency with other similar functions in the same file and
+for brevity.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- include/kvm/util.h | 1 -
- util/util.c        | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ include/kvm/util.h | 2 +-
+ util/util.c        | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/include/kvm/util.h b/include/kvm/util.h
-index b494548..b0c3684 100644
+index b0c3684..61a205b 100644
 --- a/include/kvm/util.h
 +++ b/include/kvm/util.h
-@@ -140,7 +140,6 @@ static inline int pow2_size(unsigned long x)
+@@ -140,6 +140,6 @@ static inline int pow2_size(unsigned long x)
  }
  
  struct kvm;
--void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
- void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size);
+-void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size);
++void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
  
  #endif /* KVM__UTIL_H */
 diff --git a/util/util.c b/util/util.c
-index 1877105..093bd3b 100644
+index 093bd3b..22b64b6 100644
 --- a/util/util.c
 +++ b/util/util.c
-@@ -81,7 +81,7 @@ void die_perror(const char *s)
- 	exit(1);
+@@ -118,14 +118,14 @@ static void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
  }
  
--void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
-+static void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+ /* This function wraps the decision between hugetlbfs map (if requested) or normal mmap */
+-void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size)
++void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
  {
- 	char mpath[PATH_MAX];
- 	int fd;
+-	if (hugetlbfs_path)
++	if (htlbfs_path)
+ 		/*
+ 		 * We don't /need/ to map guest RAM from hugetlbfs, but we do so
+ 		 * if the user specifies a hugetlbfs path.
+ 		 */
+-		return mmap_hugetlbfs(kvm, hugetlbfs_path, size);
++		return mmap_hugetlbfs(kvm, htlbfs_path, size);
+ 	else {
+ 		kvm->ram_pagesize = getpagesize();
+ 		return mmap(NULL, size, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
 -- 
 2.38.1.431.g37b22c650d-goog
 
