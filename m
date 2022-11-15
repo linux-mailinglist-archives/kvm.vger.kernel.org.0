@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF8526296FE
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:16:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D77DD6296FF
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 12:16:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229587AbiKOLQS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 06:16:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52738 "EHLO
+        id S229803AbiKOLQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 06:16:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbiKOLQB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229661AbiKOLQB (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 15 Nov 2022 06:16:01 -0500
-Received: from mail-wm1-x349.google.com (mail-wm1-x349.google.com [IPv6:2a00:1450:4864:20::349])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C4041D317
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:15:52 -0800 (PST)
-Received: by mail-wm1-x349.google.com with SMTP id x10-20020a05600c420a00b003cfa33f2e7cso8185328wmh.2
-        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:15:52 -0800 (PST)
+Received: from mail-wr1-x449.google.com (mail-wr1-x449.google.com [IPv6:2a00:1450:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9676B1B9C8
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:15:54 -0800 (PST)
+Received: by mail-wr1-x449.google.com with SMTP id d10-20020adfa34a000000b00236616a168bso2686859wrb.18
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 03:15:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=cvPpR2F+tEbIsjOdTWxZyeLbkSo/LagbLW2D8ypevZY=;
-        b=PUQnk9WPLhh/n8IxX1FEIepjld99wsmhlNBVZQ4ObMBcKbbavCbtoQRN20oETit7q6
-         KkR+CGDu6Av8sT6uLyOPP27vpq5CCpaRNQ27f0Mq1nzQitXUowQXUkDifSsLvUgJONp6
-         wl8Nh6s9cRriyoYDp/Ep5UuzkxHiWAmI5Q4AhV7ETjUURRU8I1j78qhQDvF468hb95Kq
-         BK26tl4hsSTP0VmNqDiA2OrPLzrK5lsrMnnOWndKzObPi+IPzd+gvNz9GcKlXDzHusCf
-         XQEwvR0SYaKhfuvHXSfAQinrUZWH5PmhYDYljlmGURB3v4o4mg10in2P71zSXJ8HMzPr
-         vLeQ==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=e/OndFv4+hmhVq9SAVUchluz3WYiOe7MOTmH3Il+F48=;
+        b=oY2omYev3mrlBBTVldpbIhtG22X/nKyTJ1jQBLLaBiCeiy/7D8Y0Ze4Jt6xynz/yX6
+         dMVKV3QHNU3fuWygsEi5tYYv0cgnAjyg4Qjl75kjPJ9tB6TWXcr74j0R0h4pE1cGifVx
+         fH0StiT4CBP8KNjA6OnkiohMQQLdlkgqhPziEYsXSXjPcRT2v0iKamvpxEfIPJ0jej24
+         wyeDW3xmA2Zu/b/0iSm2z2sUdcBlI85/ErtDdeCGpv+kOmRBtEjZFoOUkzBzavMVRYFj
+         lHQAR46oZbArdSkamgJF6Cff59aA8RCXGVdVPs7UhbDEpmWMzZ/eJQbBc8ghXJ5gA9Ax
+         vI7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cvPpR2F+tEbIsjOdTWxZyeLbkSo/LagbLW2D8ypevZY=;
-        b=Qn3LYlVMDSZKwoJ4F36loWd7e4yh3g/SKvMfMgfCZd/uHUvraTUFqmWFNHQ8yhIYFr
-         eT1oTu4Qf5uz9oKgewKSTFTWa34omq+PEE2q33XMYMI8Z1TBhg1LW+ey+Lf9Y9wBrPCQ
-         hsBCy/XZPYoDS2Rlmse8BfNlrb56ZZ230oudUhJNoLw5+ltuzJCrCu3ZGLDbwyZvDyYN
-         WPrdlZZ7CSVRgjCUadHqcbXigBo60sAnzJbZTZ0bJT+hxdfq/k/0Gg5RbciT1THR4VvX
-         UCJeVFfw9vtvwQpKbfjnNhBJx19Y9MxYO1oTIFijyYTe9sgbuzK11tHMVr41WfbyDfGX
-         avRg==
-X-Gm-Message-State: ANoB5plxIhw5HPBJyYnAbwOoWf0IjYhciRVYDM/mGbkVJluBKg0h7btW
-        3DPkVSttPemWDzv3aPiCjN6VDbeL47aA4Zpotm3JGnbgpJXqOq5cklaHIKbWLYNVrKG6svvS0sd
-        v0+ChF/dL2mw54k6gJYZljMG0jFu1syXqSdOndiqOkrHQ6nVtWmtBRjI=
-X-Google-Smtp-Source: AA0mqf5iCdXdz/Nrwkq/jCBFBzKTuOujCIbm4DbZMLn5RCLq/Fq5uzz8L8e6xsEOpE/CpA6DyaaywQO/EQ==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e/OndFv4+hmhVq9SAVUchluz3WYiOe7MOTmH3Il+F48=;
+        b=SPMKBMtV86AAw4g6qr497FZC29kFpmE35Felp0cIxJAsIkaUGzJQ9G9z8Kdm416DGq
+         1TnQhsYbk8jYyRv8uUvSNBLNQfnTgpNS8l8OQGpoGHu4vKNdIsr6OR4SJlKf9KxVG19g
+         /dqKqfojpz/eUpx83bNwgna+mCaVMsHvT2liGGGz+9I+JMiTJQzLVi/DzZ/v8mJExLPX
+         +RYt4Y9lny3tNolklonSJr7Ea/yix/FR2FxYQrC+KofQM1vZBt23BBG/imhh+GPCgUJ6
+         dkJdF/rtsADXkbpB8tXIsD+WOY+H1c+lWj2n+Ywp+kdhMK+NBRX8jhqjC1GhNp90e9KG
+         Tkig==
+X-Gm-Message-State: ANoB5pk8EcyCyeoyPhmGU4jvNLx+M19eskE8gfLUWM5UF7rVrhxKhd/O
+        ZfRLAWttGGy10QVacg0xWjsf/m0ALjRqT2SerDJ5P7uHQNICFUmjYd5maTTYzvgnhDfOr6rAhe7
+        Mb+UIrtBZ7irehAg7VUAy7gg4xj4LEPk6gsU78IN+wQVxLeRjdTOLFN8=
+X-Google-Smtp-Source: AA0mqf6RT95dr1Vf9xPW5BAQMoH5P1aV0LZZy0wCQmxtWHHyEaYShHsd7tPEc7+NoI7KBqMUMn14vEyOAQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:a55:b0:3cf:d8b1:246c with SMTP id
- c21-20020a05600c0a5500b003cfd8b1246cmr1046645wmq.165.1668510951163; Tue, 15
- Nov 2022 03:15:51 -0800 (PST)
-Date:   Tue, 15 Nov 2022 11:15:32 +0000
+ (user=tabba job=sendgmr) by 2002:a7b:cc8a:0:b0:3b4:7e87:895f with SMTP id
+ p10-20020a7bcc8a000000b003b47e87895fmr1099830wma.30.1668510953176; Tue, 15
+ Nov 2022 03:15:53 -0800 (PST)
+Date:   Tue, 15 Nov 2022 11:15:33 +0000
+In-Reply-To: <20221115111549.2784927-1-tabba@google.com>
 Mime-Version: 1.0
+References: <20221115111549.2784927-1-tabba@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221115111549.2784927-1-tabba@google.com>
-Subject: [PATCH kvmtool v1 00/17] Use memfd for guest vm memory allocation
+Message-ID: <20221115111549.2784927-2-tabba@google.com>
+Subject: [PATCH kvmtool v1 01/17] Initialize the return value in kvm__for_each_mem_bank()
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
@@ -66,65 +68,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch series moves kvmtool from allocating guest vm memory
-using anonymous mmap to using memfd/ftruncate. The main
-motivation is to ease the transition to the fd-based kvm guest
-memory proposal [*]. It also facilitates using ipc memory sharing
-should that be needed in the future. Moreover, it removes the
-need for using temporary files if the memory is backed by
-hugetlbfs.
+If none of the bank types match, the function would return an
+uninitialized value.
 
-In the process of this rework, this patch series fixes a bug
-(uninitalized return value). It also adds a memory allocation
-function that allocates aligned memory without the need to
-over-map/allocate. This facilitates refactoring, which simplifies
-the code and removes a lot of the arch-specific code.
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
-/fuad
-
-[*] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.intel.com/
-
-Fuad Tabba (17):
-  Initialize the return value in kvm__for_each_mem_bank()
-  Make mmap_hugetlbfs() static
-  Rename parameter in mmap_anon_or_hugetlbfs()
-  Add hostmem va to debug print
-  Factor out getting the hugetlb block size
-  Use memfd for hugetlbfs when allocating guest ram
-  Make blk_size a parameter and pass it to mmap_hugetlbfs()
-  Use memfd for all guest ram allocations
-  Allocate pvtime memory with memfd
-  Allocate vesa memory with memfd
-  Add a function that allocates aligned memory if specified
-  Use new function to align memory
-  Remove struct fields and code used for alignment
-  Replace kvm_arch_delete_ram with kvm_delete_ram
-  Remove no-longer unused macro
-  Factor out set_user_memory_region code
-  Pass the memory file descriptor and offset when registering ram
-
- arm/aarch64/pvtime.c              |  20 ++++-
- arm/include/arm-common/kvm-arch.h |   7 --
- arm/kvm.c                         |  35 +++------
- framebuffer.c                     |   2 +
- hw/cfi_flash.c                    |   4 +-
- hw/vesa.c                         |  17 ++++-
- include/kvm/framebuffer.h         |   1 +
- include/kvm/kvm.h                 |  19 ++---
- include/kvm/util.h                |   7 +-
- kvm.c                             |  69 ++++++++++-------
- mips/kvm.c                        |  11 +--
- powerpc/kvm.c                     |   7 +-
- riscv/include/kvm/kvm-arch.h      |   7 --
- riscv/kvm.c                       |  26 ++-----
- util/util.c                       | 119 +++++++++++++++++++++++-------
- vfio/core.c                       |   3 +-
- x86/kvm.c                         |  11 +--
- 17 files changed, 209 insertions(+), 156 deletions(-)
-
-
-base-commit: e17d182ad3f797f01947fc234d95c96c050c534b
+diff --git a/kvm.c b/kvm.c
+index 42b8812..78bc0d8 100644
+--- a/kvm.c
++++ b/kvm.c
+@@ -387,7 +387,7 @@ int kvm__for_each_mem_bank(struct kvm *kvm, enum kvm_mem_type type,
+ 			   int (*fun)(struct kvm *kvm, struct kvm_mem_bank *bank, void *data),
+ 			   void *data)
+ {
+-	int ret;
++	int ret = 0;
+ 	struct kvm_mem_bank *bank;
+ 
+ 	list_for_each_entry(bank, &kvm->mem_banks, list) {
 -- 
 2.38.1.431.g37b22c650d-goog
 
