@@ -2,117 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 960A66293B0
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 09:57:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BA59629427
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 10:19:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233081AbiKOI5F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 03:57:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59914 "EHLO
+        id S238086AbiKOJTQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 04:19:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237459AbiKOI5A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 03:57:00 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F9A420F65;
-        Tue, 15 Nov 2022 00:56:59 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AF8rm3e015433;
-        Tue, 15 Nov 2022 08:56:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=9K16PVaszELkFcfxK/QfEDUWv8H3W4NPdl++z4H22ug=;
- b=DRBJe0AgT1lyhfGuca0J6u7btMBKDONWCg567wzbQuZ3IzknMG7ltE4z66OMgWp9FkZM
- X7kWc4zSvkdgTwPVw2MlMOKbyp7p5MBun5Mglk9bb4qmMz6TsZsh/0hnjGO+3t5ji40p
- 5SUS0pM/jiZdIB/zhAVDWlFt99wLyqWgAAgEruzd+bW/kEJImtuOW4qxhivuPMjmLjTa
- 31yVMzJIyhtL8mSjXIb7eYwbtOo38jtyJ6iDTCUOYrNzfvdO3fIO4HxoacQcE3iZQS+o
- uaqnjAiD/pZ6Q2FWK0lHmphjSijeemuAJKOLZ85n1G2YKLpXYzBPyzohPT8h69hs5Nrn Ag== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kv6xdh8h0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Nov 2022 08:56:58 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AF8pdva000508;
-        Tue, 15 Nov 2022 08:56:56 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 3kt348v0p1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Nov 2022 08:56:56 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AF8uqqu13500736
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Nov 2022 08:56:52 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D43EAA405C;
-        Tue, 15 Nov 2022 08:56:52 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 77C9BA4054;
-        Tue, 15 Nov 2022 08:56:52 +0000 (GMT)
-Received: from [9.171.74.64] (unknown [9.171.74.64])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Nov 2022 08:56:52 +0000 (GMT)
-Message-ID: <659501fc-0ddc-2db6-cdcb-4990d5c46817@linux.ibm.com>
-Date:   Tue, 15 Nov 2022 09:56:52 +0100
+        with ESMTP id S238074AbiKOJTB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 04:19:01 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 022EE220F1;
+        Tue, 15 Nov 2022 01:18:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=3JrxPzcorZeK61/Wcg0xBe2/JrcIdLGSAklAl931rsA=; b=gTwwKyN4DOB1IbNxKigY+Tep5Q
+        W/smCH9eIzXkbqRYiHkN3Eg2FAW400kL4lvd2gDiDAtm2cMh3exWUy7mwC5Wltsud/RWeyFTZpNEL
+        UGs60j5DZ0gacNe7ZHhKLCW/ujI6V/ka6c9cLiMFYiPs4Mzox05EUnLZpVRQWqJZWrUOgZi6z3JVS
+        oQF7M7rp+ZKh9tUp1gNHDz9iF6/qViakLpSr77FDLytxiesy2BfRrTvaQA+e09OU5AupSobnassTQ
+        gNA1CuU3RY3b9a09AGLN0ft7D4lqYAIUjrcv0kTxiX26oEWNkrLHsXMuDEna6m2wTjqSLBNW9qMbg
+        5M+y7bvw==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ous4u-00GN7o-9I; Tue, 15 Nov 2022 09:18:00 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 19F75300422;
+        Tue, 15 Nov 2022 10:17:53 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id EB17920167EB2; Tue, 15 Nov 2022 10:17:52 +0100 (CET)
+Date:   Tue, 15 Nov 2022 10:17:52 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Li, Xin3" <xin3.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
+ for NMI/IRQ reinjection
+Message-ID: <Y3NZQBJugRt07udw@hirez.programming.kicks-ass.net>
+References: <Y24SoNKZtj/NPSGy@hirez.programming.kicks-ass.net>
+ <6097036e-063f-5175-72b2-8935b12af853@redhat.com>
+ <Y24908NWCdzUNqI0@hirez.programming.kicks-ass.net>
+ <6fd26a70-3774-6ae7-73ea-4653aee106f0@redhat.com>
+ <Y25a0Z2tOMWYZs4j@hirez.programming.kicks-ass.net>
+ <BN6PR1101MB216141A21353AB84CEA541DFA8009@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y26jkHfK9INwU7Yy@hirez.programming.kicks-ass.net>
+ <BN6PR1101MB2161E8217F50D18C56E5864EA8059@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y3IFo9NrAcYalBzM@hirez.programming.kicks-ass.net>
+ <BN6PR1101MB2161299749E12D484DE9302BA8049@BN6PR1101MB2161.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, pasic@linux.ibm.com,
-        akrowiak@linux.ibm.com, jjherne@linux.ibm.com
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        borntraeger@linux.ibm.com, imbrenda@linux.ibm.com
-References: <20221108152610.735205-1-nrb@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v1] s390/vfio-ap: GISA: sort out physical vs virtual
- pointers usage
-In-Reply-To: <20221108152610.735205-1-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: bfYHNrVXE0g0wu2VdCILSw4Tg8nyAbYq
-X-Proofpoint-ORIG-GUID: bfYHNrVXE0g0wu2VdCILSw4Tg8nyAbYq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-15_04,2022-11-11_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- priorityscore=1501 malwarescore=0 mlxlogscore=999 adultscore=0 bulkscore=0
- impostorscore=0 clxscore=1015 phishscore=0 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2211150061
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN6PR1101MB2161299749E12D484DE9302BA8049@BN6PR1101MB2161.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/8/22 16:26, Nico Boehr wrote:
-> Fix virtual vs physical address confusion (which currently are the same)
-> for the GISA when enabling the IRQ.
+On Tue, Nov 15, 2022 at 07:50:49AM +0000, Li, Xin3 wrote:
+> > > > But what about NMIs, afaict this is all horribly broken for NMIs.
+> > > >
+> > > > So the whole VMX thing latches the NMI (which stops NMI recursion),
+> > right?
+> > > >
+> > > > But then you drop out of noinstr code, which means any random
+> > > > exception can happen (kprobes #BP, hw_breakpoint #DB, or even #PF
+> > > > due to random nonsense like *SAN). This exception will do IRET and
+> > > > clear the NMI latch, all before you get to run any of the NMI code.
+> > >
+> > > What you said here implies that we have this problem in the existing code.
+> > > Because a fake iret stack is created to call the NMI handler in the
+> > > IDT NMI descriptor, which lastly executes the IRET instruction.
+> > 
+> > I can't follow; of course the IDT handler terminates with IRET, it has to no?
 > 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   drivers/s390/crypto/vfio_ap_ops.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 0b4cc8c597ae..20859cabbced 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -429,7 +429,7 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
->   
->   	aqic_gisa.isc = nisc;
->   	aqic_gisa.ir = 1;
-> -	aqic_gisa.gisa = (uint64_t)gisa >> 4;
-> +	aqic_gisa.gisa = (uint64_t)virt_to_phys(gisa) >> 4;
+> With FRED, ERETS/ERETU replace IRET, and use bit 28 of the popped CS field
+> to control whether to unblock NMI. If bit 28 of the field (above the selector)
+> is 1, ERETS/ERETU unblocks NMIs.
 
-I'd suggest doing s/uint64_t/u64/ or s/uint64_t/unsigned long/ but I'm 
-wondering if (u32)(u64) would be more appropriate anyway.
+Yes, I know that. It is one of the many improvements FRED brings.
+Ideally the IBT WAIT-FOR-ENDBR state also gets squirreled away in the
+hardware exception frame, but that's still up in the air I believe :/
 
-@halil @christian ?
+Anyway.. given there is interrupt priority and NMI is pretty much on top
+of everything else the reinject crap *should* run NMI first. That way
+NMI runs with the latch disabled and whatever other pending interrupts
+will run later.
 
->   
->   	status = ap_aqic(q->apqn, aqic_gisa, h_nib);
->   	switch (status.response_code) {
-
+But that all is still broken because afaict the current code also leaves
+noinstr -- and once you leave noinstr (or use a static_key, static_call
+or anything else that *can* change at runtime) you can't guarantee
+nothing.
