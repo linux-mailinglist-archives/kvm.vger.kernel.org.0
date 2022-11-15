@@ -2,213 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2ABE76291CD
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 07:26:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D206E6291FA
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 07:45:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231808AbiKOG0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 01:26:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50652 "EHLO
+        id S230415AbiKOGpy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 01:45:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231215AbiKOG0J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 01:26:09 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3053E1EED8;
-        Mon, 14 Nov 2022 22:26:01 -0800 (PST)
+        with ESMTP id S229671AbiKOGpw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 01:45:52 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9177F175BE
+        for <kvm@vger.kernel.org>; Mon, 14 Nov 2022 22:45:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668493562; x=1700029562;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=1PHSc28MLoqCNxc55bftmviMW6b76byQ3VC8Hj66d3k=;
-  b=TAdMuLmyShPsit90mY2ntkEL+4TqF1LvL6OvZbLl1Y+JPufYOKyl61E5
-   TDWHFyOIwzX28Otm7Ai4Dro/IQQyPfnP18u0gqCUGC7vEHFATAmQtqHw9
-   HuT0k2iS5F2HRQ8EN/sDpzTv1vZg91v3yN/k5Ihnz5pVa5qG4035e0cg2
-   xHBo3rwRpabhtuy7erCjgQPqUO0jwutCZpm1hcR0xxC8Ts80yv0xVxZNT
-   2UiJZJIclZWlpERcw8TyryEpkuRziH5HVIvezdXHkJ4SdRS9Uwdi07Yax
-   9z7lgQ7DZdXNcISJ8Ku76x+qEVmk+/Q2fERoxg4EQwN25RfMqywRrE8ir
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="376442996"
+  t=1668494751; x=1700030751;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MbgJm33/q+Xwm8S9brHjby47xADlPHNidmVhEFQwxUM=;
+  b=gFTJzn6rvN0MlxKm8yjPr+G+kuxK3KPkdZFJPvFMT2BHD8tn1hsOz30G
+   OG5CTIOOunCWOj4Bh9yjG/1CQxdDBKJhiA4wVAGtV8sVz58K8EvrgqWoE
+   F7rAIcdXAkBUJpinIcwZ5YVnGvyxHYEc1omb9fVH1jPyoCFMs7DRIhdsb
+   6eDm7GnjohVMwHTkF8/yw7x/oVgjRCCn9BmQEJ979LqOKlQuTEXnpH5Dz
+   rJSb0PTOXGUdCey0+okFMc08mY/Aw3tMMrh29TAUYmmmS0ARh3Ys+iWr+
+   nInIZcmr3U7ATooa7Nv5zJAxTgLe/YsDq5i3AkjlhuUGYtOjiJaTSCQUo
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="313327541"
 X-IronPort-AV: E=Sophos;i="5.96,165,1665471600"; 
-   d="scan'208";a="376442996"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2022 22:25:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="702314830"
+   d="scan'208";a="313327541"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2022 22:45:51 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="727837330"
 X-IronPort-AV: E=Sophos;i="5.96,165,1665471600"; 
-   d="scan'208";a="702314830"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga008.fm.intel.com with ESMTP; 14 Nov 2022 22:25:32 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 14 Nov 2022 22:25:32 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 14 Nov 2022 22:25:31 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Mon, 14 Nov 2022 22:25:31 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.175)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Mon, 14 Nov 2022 22:25:31 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cE+eUcceiJGC7bGVRqE1h12eVYNYXuAEwkUOZRWApxqnOkNFtoa/w0RPa1T9ohpys1r6pVWqkpwVfkc33Pqo4RuCkxK9OCqtpUj8Tg8oy1RBeAjJkSVDMGVmQVV0QZv9ui2KkWh2DYztSdjAZWHL2u1SAOMC9WgxzGUsDkHlQoV6ZbQyjfE/fYM0Rs6pWuQNnrYHkDaT6X/MGEIhpVYzAcPgGHphRKYk81lwhcaCuso2DtsX3O5GEOR6xK+3C3+nFZD3yc8R0RjRXauLXErxz7J9jhBJC5PsMxYUJWhn0ivkku/prq89GSVLNUusqUinPe2694GpYAC299RyMw4suQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4u529f7URe1ZPrRiFESVla3tw1q+KfhBaF7xj8iP/M4=;
- b=T+4ZRyFgGd6Bes2E6rsjedk2iQTvPD/RgGx/yokFPUknOQNtUhzRVa7mcnLsYGurwKi3hhFPKbN60WbBDUlsd/DIQ7G3r7UJhRQVR2nSb/HGDhp1IjoRu3acynp9YttDwebh8EzPbcLMlL+uLRUjj57igB5tKXwvGYyNtbIiBS2qRc2C9WLIqs6KzU36rTygJCHApy73+JWAKa8wgK3JAaIRr+50GK3LuU/QSNLOrAZS014XM2x9hXWi+W9pdqrpAsLWeAZrWNxtoPzXdu+o3E/Qtc53EuJ/CDyTLQVfXKeggNbSgjq29qL0Cn6Gj1HNKNVXC7d3EG/eE9/eNzMbgw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB4824.namprd11.prod.outlook.com (2603:10b6:510:38::13)
- by DM8PR11MB5606.namprd11.prod.outlook.com (2603:10b6:8:3c::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.18; Tue, 15 Nov
- 2022 06:25:24 +0000
-Received: from PH0PR11MB4824.namprd11.prod.outlook.com
- ([fe80::83be:d8ee:31bb:4814]) by PH0PR11MB4824.namprd11.prod.outlook.com
- ([fe80::83be:d8ee:31bb:4814%8]) with mapi id 15.20.5813.018; Tue, 15 Nov 2022
- 06:25:24 +0000
-From:   "Mi, Dapeng1" <dapeng1.mi@intel.com>
-To:     "Christopherson,, Sean" <seanjc@google.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>
-Subject: RE: [PATCH] KVM: x86: disable halt polling when powersave governor is
- used
-Thread-Topic: [PATCH] KVM: x86: disable halt polling when powersave governor
- is used
-Thread-Index: AQHYyNSFRsRhvKGUt0S7LgkC+L5J3K4DWToAgADh46CAG1uagIAgTX6g
-Date:   Tue, 15 Nov 2022 06:25:24 +0000
-Message-ID: <PH0PR11MB48245F82B9F5352878FD84B5CD049@PH0PR11MB4824.namprd11.prod.outlook.com>
-References: <20220915073121.1038840-1-dapeng1.mi@intel.com>
- <Y0BnKIW+7sqJbTyY@google.com>
- <PH0PR11MB48240C29F1DEBC79EA933285CD5E9@PH0PR11MB4824.namprd11.prod.outlook.com>
- <Y1gXseyl0f3IUnDh@google.com>
-In-Reply-To: <Y1gXseyl0f3IUnDh@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
-dlp-version: 11.6.500.17
-dlp-product: dlpe-windows
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB4824:EE_|DM8PR11MB5606:EE_
-x-ms-office365-filtering-correlation-id: c5d9e427-fbe0-43ca-83e1-08dac6d22e0c
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ed3Uh+EHuAXlfGYbm1wBtZQbdgSVNpVJj+YLCqXLmddF+htoV/goxvUbjfjrYPC9hwbolxjgsJWF/TApYvwxlBUoylpPVoF4fKYC2KVDYEkAfCp08al8NMs973eQz5Fer+ClR4nle02DKdZOlkEeKdmRyiExs2LJHty9ljizUhdx0PQ2NxgujyAJ4IwKRtBj4KeJoAd17/xs5LJzaSOv0L8FsfprEhzwDBw6Q+0PjkC7SzTpVfSNkj8kf3BIdu6Axia/KYAoNurooQaTOvZ+DvfZxM18Wqi3RZ9ckZvaWAt6If58iHhU1AHZ2r7V3dXS77VTJKSE6XECsjlJSBrDhAye1NRZSxYz99Z9HZffc3HFxrIpnvYqzAVtzE9e+1PRbkgd3bXEiUs5r0o15W8gYFZw5Eto+pPhnJkSBpmfWnY+/bOz0rudaQve6zZ47CZFRJLH4AO6x7T3c1ZAlATGOL4zn5lbnkYmlKoxi0kFFHQ9wNYYWxyMGJwIbO4vWCBBZgI4RE6n/MEd88gvG/p1sYG8+z7M47x21ruAWtAJ4I+ilru0n3UcTFDa8A9djdb3DR5M3cK6C0kihvEqkIvwfdU/B4BZEydhlKPB/DMs6qLoMOhB//ZEEbV1jKqO2QIVT5eoAhlW2MXIa8nIeypQhoRCVunx/zqWNEx+x25UH76J+OuPS0+E+HFsDFIG960PDF/bqo9lp3Si8gN5hBPKT/Iig+TCidKJ7vjBQY5t2V1MrcEqC9EQlAS2trLlXFjkXn2YQLfEnFL7oNtBJqsqeg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4824.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(346002)(39860400002)(376002)(366004)(136003)(451199015)(26005)(82960400001)(9686003)(316002)(86362001)(55016003)(33656002)(2906002)(41300700001)(76116006)(66556008)(64756008)(66946007)(66476007)(66446008)(38100700002)(8936002)(4326008)(8676002)(52536014)(5660300002)(186003)(122000001)(478600001)(71200400001)(54906003)(6916009)(53546011)(7696005)(6506007)(38070700005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?aN8b7m1aFUwS4LzT2MV1ABA3FZ8NaZsgtEnUM/br5HFEQ/UaXZ4ztfhx/bYs?=
- =?us-ascii?Q?0O+MwCxQMi75V71RI8wI1BM4aejDR67AlO3JJkhoTvX50shCxw/ZtoJ+OaGI?=
- =?us-ascii?Q?FirzVmaFtx/84rSMYw8gFfj1IwCYWsHNK8UJbpJ8K9CTo3O/uO/1UjjX4VeH?=
- =?us-ascii?Q?q40TTh+Sz0jSYYEjFDEbYtdM8hZhKKSdRfNhOU7OTbgb83VIYJbRPBRsRzxA?=
- =?us-ascii?Q?Zq8DceDcO3iUS42wuIxFc2aI4b2OqJf/xEfk9u4Ig+ictkJAGLOKNnztS3tB?=
- =?us-ascii?Q?gMEnBOgP6lp5aTj0TqTedPqNn4gjzhA9xCeTomyU8JGtltGSdS4Z/BG3752F?=
- =?us-ascii?Q?CJHJMRPUJ4CbnUfbmJHG9cP7PwylGKLzSNX1Rd3Ty33FxTW3i0XOtKwqKgXo?=
- =?us-ascii?Q?WbbRZ/nm3yLGQTwGMUZU/mBMfeRM7pMdCKV82qC0pRTT3tAb+5fNAkQYBID+?=
- =?us-ascii?Q?SNfv8SKrJHtJlzEiSj/O+TyFAKpsJ+iPVEr8nmXUle/hq2Y9rhQl/54MUDiJ?=
- =?us-ascii?Q?Bfib1HVYx8CToWEkA17giyUt0S3uWxTwiFBS1Rqb6BS6z8XEXCNDbBMaHQ7y?=
- =?us-ascii?Q?F1+vZTOF+ME3LUez+DtZz+Yl8gnnSOqpx2GRZND1WIcQoZtoQ7lMHuPM74MC?=
- =?us-ascii?Q?RPnJfHKnmGL+/qgQ6drvF/d0L9IQ4tUcqIFo24WGkOP1KDXCUzkRfCHMHZ9D?=
- =?us-ascii?Q?xBt8zllmCCC5mgrAIMMFE6WVYN/gLV0xe+F8RJv5a5G2Mi76wQTaf+8oxXDf?=
- =?us-ascii?Q?iwpG8GWhue8Qu76mA0QTQhO8mjUx3S4GYuKDbO/dG5RKYKD/IquGPPBwdblD?=
- =?us-ascii?Q?JuDRpOQ3oOzaUSNRP/CFVdj9q1vCT6iKc7ucNDtWtn0KHCnbD++yQKV6BdYo?=
- =?us-ascii?Q?sNON0OE2GipdVpYCgdmz1jzbiyKs3V43UoRrAv3ES93RB05VWeTtc5ArV2Kb?=
- =?us-ascii?Q?uDYcGtRemROOXlnsivhNeSnOT7V7o3/A6Qw7713YlQ0Kxo7ntkuFqjwd2pDj?=
- =?us-ascii?Q?ROwFyA7nQSxxBuKOrIur2Wbqb0GQNfvCbX5USEHOrzpvTo/S05mo0QaY6Jhj?=
- =?us-ascii?Q?O3TUnlqf8I/VrP4OKJHntUdSuetmSdSLW5Eb16h09Orpk3q8V2mkZVGkzrCS?=
- =?us-ascii?Q?bEFqY0/umyqMOwIgH1+sFskpon5z6xffEnhTIz1bMe6Jd5vytlxKTUmn9M/Q?=
- =?us-ascii?Q?11fAafoyUv/hej+DOFvmMfB+3jqPVFQR8WZDyTnYQET8K6n2cR9MEHrzl0Zb?=
- =?us-ascii?Q?vzZSYFXZftyYIQMLNryD/cZXZe76QJlvbVGuQQrBbnibyvmMmOGpqbEdQG9V?=
- =?us-ascii?Q?Do4F5X/aRlmfQlTk4/1zOb3G+3PnyS6AsKqdC9EsTZN7lGQigEzp2aEFAWg5?=
- =?us-ascii?Q?6tuXza0oNv5WMQ/CbPqF6EgBadFacMAwJvYkMokJbJUAXefq732wuYlD9hpQ?=
- =?us-ascii?Q?J+XzaUyaGUgBUB6oLlugkeObdsDwKxwd+zlG+e/Fh0UmM7mmlIOtV1TSC/GF?=
- =?us-ascii?Q?w+bCR3w6xg/8pSFVLtGarX1XK3tZsYsWwctexO2xPvqnoXsOHGgWhydYfYYs?=
- =?us-ascii?Q?6qsBgbCCxEjKLEv+ea7MYuVBN0MH6s/1rdip/OAS?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="727837330"
+Received: from yjiang5-mobl.amr.corp.intel.com (HELO localhost) ([10.212.70.225])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2022 22:45:50 -0800
+Date:   Mon, 14 Nov 2022 22:45:47 -0800
+From:   Yunhong Jiang <yunhong.jiang@linux.intel.com>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
+        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
+        kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v7 2/4] KVM: x86: Dirty quota-based throttling of vcpus
+Message-ID: <20221115064547.GA8417@yjiang5-mobl.amr.corp.intel.com>
+References: <20221113170507.208810-1-shivam.kumar1@nutanix.com>
+ <20221113170507.208810-3-shivam.kumar1@nutanix.com>
+ <20221115001652.GB7867@yjiang5-mobl.amr.corp.intel.com>
+ <176f503e-933b-f36e-5a59-6321049df8f7@nutanix.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4824.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5d9e427-fbe0-43ca-83e1-08dac6d22e0c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Nov 2022 06:25:24.4194
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: D4ta8OGC702CLYZ1BP6DhG3FRQNq9pwM/U9y+S+slCQHUJkqbBL+BQ5JB0NR0rdVGr+Xoqf21TaiR9/qWTqj1w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR11MB5606
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <176f503e-933b-f36e-5a59-6321049df8f7@nutanix.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Sean Christopherson <seanjc@google.com>
-> Sent: Wednesday, October 26, 2022 1:07 AM
-> To: Mi, Dapeng1 <dapeng1.mi@intel.com>
-> Cc: pbonzini@redhat.com; tglx@linutronix.de; mingo@redhat.com;
-> dave.hansen@linux.intel.com; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org; zhenyuw@linux.intel.com
-> Subject: Re: [PATCH] KVM: x86: disable halt polling when powersave
-> governor is used
->=20
-> On Sat, Oct 08, 2022, Mi, Dapeng1 wrote:
-> > > > +				!strncmp(policy->governor->name,
-> > > "powersave",
-> > >
-> > > KVM should not be comparing magic strings.  If the cpufreq subsystem
-> > > can't get
-> > > policy->policy right, then that needs to be fixed.
-> >
-> > Yeah, using magic strings looks a little bit strange, but this is what
-> > is cpufreq doing.  Currently cpufreq mechanism supports two kinds of
-> > drivers, one is the driver which has the built-in governor, like intel_=
-pstate
-> driver.
-> > For this kind of driver, the cpufreq governor is saved in the
-> > policy->policy field. The other is the traditional driver which is
-> > independent with cpufreq governor and the cpufreq governor type is
-> saved in the governor->name field.
-> > For the second kind of cpufreq driver, the policy->policy field is
-> > meaningless and we have to read the governor name.
->=20
-> That doesn't mean it's ok to bleed those internal details into KVM.  I wo=
-uld
-> much rather cpufreq provide a helper to get the effective policy, e.g.
->=20
->   unsigned int cpufreq_cpu_get_policy(unsigned int cpu)
->   {
-> 	struct cpufreq_policy *policy =3D cpufreq_cpu_get(cpu);
-> 	unsigned int pol;
->=20
-> 	if (!policy)
-> 		return CPUFREQ_POLICY_UNKNOWN;
->=20
-> 	pol =3D policy->policy
-> 	if (pol =3D=3D CPUFREQ_POLICY_UNKNOWN && policy->governor)
-> 		pol =3D cpufreq_parse_policy(policy->governor->name);
->=20
-> 	cpufreq_cpu_put(policy);
->   }
+On Tue, Nov 15, 2022 at 10:25:31AM +0530, Shivam Kumar wrote:
+> 
+> 
+> On 15/11/22 5:46 am, Yunhong Jiang wrote:
+> > On Sun, Nov 13, 2022 at 05:05:08PM +0000, Shivam Kumar wrote:
+> > > Exit to userspace whenever the dirty quota is exhausted (i.e. dirty count
+> > > equals/exceeds dirty quota) to request more dirty quota.
+> > > 
+> > > Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
+> > > Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
+> > > Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> > > Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> > > Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
+> > > ---
+> > >   arch/x86/kvm/mmu/spte.c |  4 ++--
+> > >   arch/x86/kvm/vmx/vmx.c  |  3 +++
+> > >   arch/x86/kvm/x86.c      | 28 ++++++++++++++++++++++++++++
+> > >   3 files changed, 33 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> > > index 2e08b2a45361..c0ed35abbf2d 100644
+> > > --- a/arch/x86/kvm/mmu/spte.c
+> > > +++ b/arch/x86/kvm/mmu/spte.c
+> > > @@ -228,9 +228,9 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+> > >   		  "spte = 0x%llx, level = %d, rsvd bits = 0x%llx", spte, level,
+> > >   		  get_rsvd_bits(&vcpu->arch.mmu->shadow_zero_check, spte, level));
+> > > -	if ((spte & PT_WRITABLE_MASK) && kvm_slot_dirty_track_enabled(slot)) {
+> > > +	if (spte & PT_WRITABLE_MASK) {
+> > >   		/* Enforced by kvm_mmu_hugepage_adjust. */
+> > > -		WARN_ON(level > PG_LEVEL_4K);
+> > > +		WARN_ON(level > PG_LEVEL_4K && kvm_slot_dirty_track_enabled(slot));
+> > >   		mark_page_dirty_in_slot(vcpu->kvm, slot, gfn);
+> > >   	}
+> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > > index 63247c57c72c..cc130999eddf 100644
+> > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > @@ -5745,6 +5745,9 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
+> > >   		 */
+> > >   		if (__xfer_to_guest_mode_work_pending())
+> > >   			return 1;
+> > > +
+> > > +		if (kvm_test_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu))
+> > > +			return 1;
+> > Any reason for this check? Is this quota related to the invalid
+> > guest state? Sorry if I missed anything here.
+> Quoting Sean:
+> "And thinking more about silly edge cases, VMX's big emulation loop for
+> invalid
+> guest state when unrestricted guest is disabled should probably explicitly
+> check
+> the dirty quota.  Again, I doubt it matters to anyone's use case, but it is
+> treated
+> as a full run loop for things like pending signals, it'd be good to be
+> consistent."
+> 
+> Please see v4 for details. Thanks.
+Thank you for the sharing.
+> > 
+> > >   	}
+> > >   	return 1;
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index ecea83f0da49..1a960fbb51f4 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -10494,6 +10494,30 @@ void __kvm_request_immediate_exit(struct kvm_vcpu *vcpu)
+> > >   }
+> > >   EXPORT_SYMBOL_GPL(__kvm_request_immediate_exit);
+> > > +static inline bool kvm_check_dirty_quota_request(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> > > +	struct kvm_run *run;
+> > > +
+> > > +	if (kvm_check_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu)) {
+> > > +		run = vcpu->run;
+> > > +		run->exit_reason = KVM_EXIT_DIRTY_QUOTA_EXHAUSTED;
+> > > +		run->dirty_quota_exit.count = vcpu->stat.generic.pages_dirtied;
+> > > +		run->dirty_quota_exit.quota = READ_ONCE(run->dirty_quota);
+> > > +
+> > > +		/*
+> > > +		 * Re-check the quota and exit if and only if the vCPU still
+> > > +		 * exceeds its quota.  If userspace increases (or disables
+> > > +		 * entirely) the quota, then no exit is required as KVM is
+> > > +		 * still honoring its ABI, e.g. userspace won't even be aware
+> > > +		 * that KVM temporarily detected an exhausted quota.
+> > > +		 */
+> > > +		return run->dirty_quota_exit.count >= run->dirty_quota_exit.quota;
+> > Would it be better to check before updating the vcpu->run?
+> The reason for checking it at the last moment is to avoid invalid exits to
+> userspace as much as possible.
 
-Thanks Sean for reviewing. Would do in next version.
+So if the userspace increases the quota, then the above vcpu->run change just
+leaves some garbage information on vcpu->run and the exit_reason is
+misleading. Possibly it's ok since this information will not be used anymore.
+
+Not sure how critical is the time spent on the vcpu->run update.
