@@ -2,330 +2,320 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE55F629464
-	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 10:34:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55988629454
+	for <lists+kvm@lfdr.de>; Tue, 15 Nov 2022 10:31:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237870AbiKOJeP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 04:34:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57682 "EHLO
+        id S237647AbiKOJba (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 04:31:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232359AbiKOJeB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 04:34:01 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0E4F12A83;
-        Tue, 15 Nov 2022 01:33:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668504840; x=1700040840;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=dNsM3rb5V+KYXYHSWNPt0esoX7Bknd1ZB3DIEqhegvE=;
-  b=laSyQh9BYUDcQhpk6onkC9y1IzD78AgQ/VF08NtB1LAiCm3ZcVJyjf+D
-   ZhQN3y6h2XpasQdGf0d1DomcbrAk/v33UmJMnKfp5otsD1Ff/X6B8vpgB
-   h0MYr9jGqjtQ77xXr18+Xf7oqWq05I3UpT/1C8KKMl7+PsBj+Eag6ZHo+
-   tdXoUYob1eAgebzDA54+or1o8mbfpGNcGo+TGvJ7yn3qJZh8vwBP/4vWE
-   bZAKt6XeVwdT10i7JG7yVPLpzyqlIEJormRM6k325mq7zm0ufWkwr5XzL
-   zWiQWJjXQUa0wD6dZJuTIEns2F4pa0UXemG/+RdchABkpBZVAIghUcrCs
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="299733891"
-X-IronPort-AV: E=Sophos;i="5.96,165,1665471600"; 
-   d="scan'208";a="299733891"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2022 01:33:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10531"; a="702370731"
-X-IronPort-AV: E=Sophos;i="5.96,165,1665471600"; 
-   d="scan'208";a="702370731"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by fmsmga008.fm.intel.com with ESMTP; 15 Nov 2022 01:33:31 -0800
-Date:   Tue, 15 Nov 2022 17:29:06 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        with ESMTP id S232437AbiKOJbV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 04:31:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2CF7F001
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 01:30:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668504620;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PI4QkJgg5xRejZYnaDkrohoS+PcA0MTFv2A75peo2zg=;
+        b=JkU0WQcmtoZTK94+GGlj6Z+rGcg0ySjV9BzywnJ6cXqZ0cetxDn08u3ca5TjnZVvoAD1nF
+        7g/RwCmMCzotuwVvZ73w69wyghXSrilVXQQs64Gv32gkj69cnHEjjs5TIOjDhhrWh6ycy4
+        wwnIKxyzyK0hTb+eZyF/3gG0OItPCPo=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-653-r68Q1EGYNyWuAw3BcReuFQ-1; Tue, 15 Nov 2022 04:30:18 -0500
+X-MC-Unique: r68Q1EGYNyWuAw3BcReuFQ-1
+Received: by mail-ej1-f70.google.com with SMTP id nc4-20020a1709071c0400b0078a5ceb571bso6892805ejc.4
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 01:30:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PI4QkJgg5xRejZYnaDkrohoS+PcA0MTFv2A75peo2zg=;
+        b=2w8BA7CUJPyAVWXXPLkZRTepzuSCP3dJ3g8HIs+rpVWAYuph+Lu7ovxQ3EJXIsjBZR
+         HftMaEJp5hRdhLLclMrkiC0PpaN0xxbLSdmtj+ieCuY/TRTNqzyfycqUsBn68MUQeX2V
+         xmZRjEELZOgKj18IFWkh5f5ZFI/Wg3MFSP1X7eK7OdATbwekvG7ycyHks1YS1/Z8VzPj
+         gjYlu+Uo4HzAzWzU3SzD6f+GeAt3dUOcY7rNK3sWFIFTi+4gfyDvLbkQh+t7ByVY90nU
+         2EiOtagax4jtRdCD/xtp1xuEEjK8VqqwvAphmO6vak/sWcPrxLA1RXm762rg/fhMNLf3
+         VTvQ==
+X-Gm-Message-State: ANoB5pkLPPh9BRthwQZ+xP2NjA0RTYQ9CxKzbPBEWiCDjM1D6VHvWf5R
+        fgf9W8EMjjIV8QeTG+CihIFZ7RIJP8b7if2SnUIwRNWB+EJUT4uw97RW47c+uOea9SnpDWMwPm1
+        7e66GISUBQJ5C
+X-Received: by 2002:a50:fe13:0:b0:461:565e:8779 with SMTP id f19-20020a50fe13000000b00461565e8779mr14489174edt.387.1668504617480;
+        Tue, 15 Nov 2022 01:30:17 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5Zsa4CnM7XTxV75wUJGjjLzRgPV7NQ4412B1eIJSCcezAuycjNE+mpvlda5nQMKDxwK/vVkA==
+X-Received: by 2002:a50:fe13:0:b0:461:565e:8779 with SMTP id f19-20020a50fe13000000b00461565e8779mr14489153edt.387.1668504617196;
+        Tue, 15 Nov 2022 01:30:17 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id ew13-20020a056402538d00b004642b35f89esm5950875edb.9.2022.11.15.01.30.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Nov 2022 01:30:16 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Atish Patra <atishp@atishpatra.org>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Chao Gao <chao.gao@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v9 2/8] KVM: Extend the memslot to support fd-based
- private memory
-Message-ID: <20221115092906.GA338422@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <20221025151344.3784230-3-chao.p.peng@linux.intel.com>
- <877czxbjf6.fsf@linaro.org>
+        Yuan Yao <yuan.yao@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+Subject: Re: [PATCH 10/44] KVM: VMX: Clean up eVMCS enabling if KVM
+ initialization fails
+In-Reply-To: <Y22nrQ7aziK0NMOE@google.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-11-seanjc@google.com>
+ <87mt98qfi2.fsf@ovpn-194-252.brq.redhat.com> <Y22nrQ7aziK0NMOE@google.com>
+Date:   Tue, 15 Nov 2022 10:30:14 +0100
+Message-ID: <87sfikmuop.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <877czxbjf6.fsf@linaro.org>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 14, 2022 at 04:04:59PM +0000, Alex Bennée wrote:
-> 
-> Chao Peng <chao.p.peng@linux.intel.com> writes:
-> 
-> > In memory encryption usage, guest memory may be encrypted with special
-> > key and can be accessed only by the guest itself. We call such memory
-> > private memory. It's valueless and sometimes can cause problem to allow
-> > userspace to access guest private memory. This new KVM memslot extension
-> > allows guest private memory being provided though a restrictedmem
-> > backed file descriptor(fd) and userspace is restricted to access the
-> > bookmarked memory in the fd.
-> >
-> <snip>
-> > To make code maintenance easy, internally we use a binary compatible
-> > alias struct kvm_user_mem_region to handle both the normal and the
-> > '_ext' variants.
-> 
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index 0d5d4419139a..f1ae45c10c94 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -103,6 +103,33 @@ struct kvm_userspace_memory_region {
-> >  	__u64 userspace_addr; /* start of the userspace allocated memory */
-> >  };
-> >  
-> > +struct kvm_userspace_memory_region_ext {
-> > +	struct kvm_userspace_memory_region region;
-> > +	__u64 restricted_offset;
-> > +	__u32 restricted_fd;
-> > +	__u32 pad1;
-> > +	__u64 pad2[14];
-> > +};
-> > +
-> > +#ifdef __KERNEL__
-> > +/*
-> > + * kvm_user_mem_region is a kernel-only alias of kvm_userspace_memory_region_ext
-> > + * that "unpacks" kvm_userspace_memory_region so that KVM can directly access
-> > + * all fields from the top-level "extended" region.
-> > + */
-> > +struct kvm_user_mem_region {
-> > +	__u32 slot;
-> > +	__u32 flags;
-> > +	__u64 guest_phys_addr;
-> > +	__u64 memory_size;
-> > +	__u64 userspace_addr;
-> > +	__u64 restricted_offset;
-> > +	__u32 restricted_fd;
-> > +	__u32 pad1;
-> > +	__u64 pad2[14];
-> > +};
-> > +#endif
-> 
-> I'm not sure I buy the argument this makes the code maintenance easier
-> because you now have multiple places to update if you extend the field.
-> Was this simply to avoid changing:
-> 
->   foo->slot to foo->region.slot
-> 
-> in the underlying code?
+Sean Christopherson <seanjc@google.com> writes:
 
-That is one of the reasons, by doing this we can also avoid confusion to
-deal with '_ext' and the 'base' struct for different functions spread
-across KVM code. No doubt now I need update every places where the
-'base' struct is being used, but that makes future maintenance easier,
-e.g. adding another new field or even extend the memslot structure again
-would just require changes to the flat struct here and the places where
-the new field is actually used.
+> On Thu, Nov 03, 2022, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>> > +	/*
+>> > +	 * Reset everything to support using non-enlightened VMCS access later
+>> > +	 * (e.g. when we reload the module with enlightened_vmcs=0)
+>> > +	 */
+>> > +	for_each_online_cpu(cpu) {
+>> > +		vp_ap =	hv_get_vp_assist_page(cpu);
+>> > +
+>> > +		if (!vp_ap)
+>> > +			continue;
+>> > +
+>> > +		vp_ap->nested_control.features.directhypercall = 0;
+>> > +		vp_ap->current_nested_vmcs = 0;
+>> > +		vp_ap->enlighten_vmentry = 0;
+>> > +	}
+>> 
+>> Unrelated to your patch but while looking at this code I got curious
+>> about why don't we need a protection against CPU offlining here. Turns
+>> out that even when we offline a CPU, its VP assist page remains
+>> allocated (see hv_cpu_die()), we just write '0' to the MSR and thus
+>
+> Heh, "die".  Hyper-V is quite dramatic.
+>
+>> accessing the page is safe. The consequent hv_cpu_init(), however, does
+>> not restore VP assist page when it's already allocated:
+>> 
+>> # rdmsr -p 24 0x40000073
+>> 10212f001
+>> # echo 0 > /sys/devices/system/cpu/cpu24/online 
+>> # echo 1 > /sys/devices/system/cpu/cpu24/online 
+>> # rdmsr -p 24 0x40000073
+>> 0
+>> 
+>> The culprit is commit e5d9b714fe402 ("x86/hyperv: fix root partition
+>> faults when writing to VP assist page MSR"). A patch is inbound.
+>> 
+>> 'hv_root_partition' case is different though. We do memunmap() and reset
+>> VP assist page to zero so it is theoretically possible we're going to
+>> clash. Unless I'm missing some obvious reason why module unload can't
+>> coincide with CPU offlining, we may be better off surrounding this with
+>> cpus_read_lock()/cpus_read_unlock(). 
+>
+> I finally see what you're concerned about.  If a CPU goes offline and its assist
+> page is unmapped, zeroing out the nested/eVMCS stuff will fault.
+>
+> I think the real problem is that the purging of the eVMCS is in the wrong place.
+> Move the clearing to vmx_hardware_disable() and then the CPU hotplug bug goes
+> away once KVM disables hotplug during hardware enabling/disable later in the series.
+> There's no need to wait until module exit, e.g. it's not like it costs much to
+> clear a few variables, and IIUC the state is used only when KVM is actively using
+> VMX/eVMCS.
+>
+> However, I believe there's a second bug.  KVM's CPU online hook is called before
+> Hyper-V's online hook (CPUHP_AP_ONLINE_DYN).  Before this series, which moves KVM's
+> hook from STARTING to ONLINE, KVM's hook is waaaay before Hyper-V's.  That means
+> that hv_cpu_init()'s allocation of the VP assist page will come _after_ KVM's
+> check in vmx_hardware_enable()
+>
+> 	/*
+> 	 * This can happen if we hot-added a CPU but failed to allocate
+> 	 * VP assist page for it.
+> 	 */
+> 	if (static_branch_unlikely(&enable_evmcs) &&
+> 	    !hv_get_vp_assist_page(cpu))
+> 		return -EFAULT;
+>
+> I.e. CPU hotplug will never work if KVM is running VMs as a Hyper-V guest.  I bet
+> you can repro by doing a SUSPEND+RESUME.
+>
+> Can you try to see if that's actually a bug?  If so, the only sane fix seems to
+> be to add a dedicated ONLINE action for Hyper-V.  
 
-> 
-> > +
-> >  /*
-> >   * The bit 0 ~ bit 15 of kvm_memory_region::flags are visible for userspace,
-> >   * other bits are reserved for kvm internal use which are defined in
-> > @@ -110,6 +137,7 @@ struct kvm_userspace_memory_region {
-> >   */
-> >  #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
-> >  #define KVM_MEM_READONLY	(1UL << 1)
-> > +#define KVM_MEM_PRIVATE		(1UL << 2)
-> >  
-> >  /* for KVM_IRQ_LINE */
-> >  struct kvm_irq_level {
-> > @@ -1178,6 +1206,7 @@ struct kvm_ppc_resize_hpt {
-> >  #define KVM_CAP_S390_ZPCI_OP 221
-> >  #define KVM_CAP_S390_CPU_TOPOLOGY 222
-> >  #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
-> > +#define KVM_CAP_PRIVATE_MEM 224
-> >  
-> >  #ifdef KVM_CAP_IRQ_ROUTING
-> >  
-> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> > index 800f9470e36b..9ff164c7e0cc 100644
-> > --- a/virt/kvm/Kconfig
-> > +++ b/virt/kvm/Kconfig
-> > @@ -86,3 +86,6 @@ config KVM_XFER_TO_GUEST_WORK
-> >  
-> >  config HAVE_KVM_PM_NOTIFIER
-> >         bool
-> > +
-> > +config HAVE_KVM_RESTRICTED_MEM
-> > +       bool
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index e30f1b4ecfa5..8dace78a0278 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -1526,7 +1526,7 @@ static void kvm_replace_memslot(struct kvm *kvm,
-> >  	}
-> >  }
-> >  
-> > -static int check_memory_region_flags(const struct kvm_userspace_memory_region *mem)
-> > +static int check_memory_region_flags(const struct kvm_user_mem_region *mem)
-> >  {
-> >  	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
-> >  
-> > @@ -1920,7 +1920,7 @@ static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
-> >   * Must be called holding kvm->slots_lock for write.
-> >   */
-> >  int __kvm_set_memory_region(struct kvm *kvm,
-> > -			    const struct kvm_userspace_memory_region *mem)
-> > +			    const struct kvm_user_mem_region *mem)
-> >  {
-> >  	struct kvm_memory_slot *old, *new;
-> >  	struct kvm_memslots *slots;
-> > @@ -2024,7 +2024,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> >  EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
-> >  
-> >  int kvm_set_memory_region(struct kvm *kvm,
-> > -			  const struct kvm_userspace_memory_region *mem)
-> > +			  const struct kvm_user_mem_region *mem)
-> >  {
-> >  	int r;
-> >  
-> > @@ -2036,7 +2036,7 @@ int kvm_set_memory_region(struct kvm *kvm,
-> >  EXPORT_SYMBOL_GPL(kvm_set_memory_region);
-> >  
-> >  static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
-> > -					  struct kvm_userspace_memory_region *mem)
-> > +					  struct kvm_user_mem_region *mem)
-> >  {
-> >  	if ((u16)mem->slot >= KVM_USER_MEM_SLOTS)
-> >  		return -EINVAL;
-> > @@ -4627,6 +4627,33 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
-> >  	return fd;
-> >  }
-> >  
-> > +#define SANITY_CHECK_MEM_REGION_FIELD(field)					\
-> > +do {										\
-> > +	BUILD_BUG_ON(offsetof(struct kvm_user_mem_region, field) !=		\
-> > +		     offsetof(struct kvm_userspace_memory_region, field));	\
-> > +	BUILD_BUG_ON(sizeof_field(struct kvm_user_mem_region, field) !=		\
-> > +		     sizeof_field(struct kvm_userspace_memory_region, field));	\
-> > +} while (0)
-> > +
-> > +#define SANITY_CHECK_MEM_REGION_EXT_FIELD(field)					\
-> > +do {											\
-> > +	BUILD_BUG_ON(offsetof(struct kvm_user_mem_region, field) !=			\
-> > +		     offsetof(struct kvm_userspace_memory_region_ext, field));		\
-> > +	BUILD_BUG_ON(sizeof_field(struct kvm_user_mem_region, field) !=			\
-> > +		     sizeof_field(struct kvm_userspace_memory_region_ext, field));	\
-> > +} while (0)
-> > +
-> > +static void kvm_sanity_check_user_mem_region_alias(void)
-> > +{
-> > +	SANITY_CHECK_MEM_REGION_FIELD(slot);
-> > +	SANITY_CHECK_MEM_REGION_FIELD(flags);
-> > +	SANITY_CHECK_MEM_REGION_FIELD(guest_phys_addr);
-> > +	SANITY_CHECK_MEM_REGION_FIELD(memory_size);
-> > +	SANITY_CHECK_MEM_REGION_FIELD(userspace_addr);
-> > +	SANITY_CHECK_MEM_REGION_EXT_FIELD(restricted_offset);
-> > +	SANITY_CHECK_MEM_REGION_EXT_FIELD(restricted_fd);
-> > +}
-> 
-> Do we have other examples in the kernel that jump these hoops?
+It seems we can't get away without a dedicated stage for Hyper-V anyway,
+e.g. see our discussion with Michael:
 
-grep -rn 'BUILD_BUG_ON(offsetof' can give you some hint on other usages
-in the kernel. But for a quick check you can look:
-  siginfo_buildtime_checks()
+https://lore.kernel.org/linux-hyperv/878rkqr7ku.fsf@ovpn-192-136.brq.redhat.com/
 
-> 
-> >  static long kvm_vm_ioctl(struct file *filp,
-> >  			   unsigned int ioctl, unsigned long arg)
-> >  {
-> > @@ -4650,14 +4677,20 @@ static long kvm_vm_ioctl(struct file *filp,
-> >  		break;
-> >  	}
-> >  	case KVM_SET_USER_MEMORY_REGION: {
-> > -		struct kvm_userspace_memory_region kvm_userspace_mem;
-> > +		struct kvm_user_mem_region mem;
-> > +		unsigned long size = sizeof(struct kvm_userspace_memory_region);
-> > +
-> > +		kvm_sanity_check_user_mem_region_alias();
-> >  
-> >  		r = -EFAULT;
-> > -		if (copy_from_user(&kvm_userspace_mem, argp,
-> > -						sizeof(kvm_userspace_mem)))
-> > +		if (copy_from_user(&mem, argp, size))
-> > +			goto out;
-> > +
-> > +		r = -EINVAL;
-> > +		if (mem.flags & KVM_MEM_PRIVATE)
-> >  			goto out;
-> 
-> Hmm I can see in the later code you explicitly check for the
-> KVM_MEM_PRIVATE flag with:
-> 
-> 		if (get_user(flags, (u32 __user *)(argp + flags_offset)))
-> 			goto out;
-> 
-> 		if (flags & KVM_MEM_PRIVATE)
-> 			size = sizeof(struct kvm_userspace_memory_region_ext);
-> 		else
-> 			size = sizeof(struct kvm_userspace_memory_region);
-> 
-> I think it would make sense to bring that sanity checking forward into
-> this patch to avoid the validation logic working in two different ways
-> over the series.
+All these issues are more or less "theoretical" as there's no real CPU
+hotplug on Hyper-V/Azure. Yes, it is possible to trigger problems by
+doing CPU offline/online but I don't see how this may come handy outside
+of testing envs.
 
-That is my original code actually, then Sean suggested to change to
-current code[*], the reason is these two pathes are for different
-purpose, this patch introduces the data structures but the later patch
-actually makes use of the '_ext' variant.
+> Per patch
+>
+>   KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
+>
+> from this series, CPUHP_AP_KVM_ONLINE needs to be before CPUHP_AP_SCHED_WAIT_EMPTY
+> to ensure there are no tasks, i.e. no vCPUs, running on the to-be-unplugged CPU.
+>
+> Back to the original bug, proposed fix is below.  The other advantage of moving
+> the reset to hardware disabling is that the "cleanup" is just disabling the static
+> key, and at that point can simply be deleted as there's no need to disable the
+> static key when kvm-intel is unloaded since kvm-intel owns the key.  I.e. this
+> patch (that we're replying to) would get replaced with a patch to delete the
+> disabling of the static key.
+>
 
-[*] https://lkml.kernel.org/kvm/YuQ6QWcdZLdStkWl@google.com/
+From a quick glance looks good to me, I'll try to find some time to work
+on this issue. I will likely end up proposing a dedicated CPU hotplug
+stage for Hyper-V (which needs to happen before KVM's
+CPUHP_AP_KVM_ONLINE on CPU hotplug and after on unplug) anyway.
 
-Chao
-> 
-> >  
-> > -		r = kvm_vm_ioctl_set_memory_region(kvm, &kvm_userspace_mem);
-> > +		r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
-> >  		break;
-> >  	}
-> >  	case KVM_GET_DIRTY_LOG: {
-> 
-> 
-> -- 
-> Alex Bennée
+Thanks for looking into this!
+
+> --
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Thu, 10 Nov 2022 17:28:08 -0800
+> Subject: [PATCH] KVM: VMX: Reset eVMCS controls in VP assist page during
+>  hardware disabling
+>
+> Reset the eVMCS controls in the per-CPU VP assist page during hardware
+> disabling instead of waiting until kvm-intel's module exit.  The controls
+> are activated if and only if KVM creates a VM, i.e. don't need to be
+> reset if hardware is never enabled.
+>
+> Doing the reset during hardware disabling will naturally fix a potential
+> NULL pointer deref bug once KVM disables CPU hotplug while enabling and
+> disabling hardware (which is necessary to fix a variety of bugs).  If the
+> kernel is running as the root partition, the VP assist page is unmapped
+> during CPU hot unplug, and so KVM's clearing of the eVMCS controls needs
+> to occur with CPU hot(un)plug disabled, otherwise KVM could attempt to
+> write to a CPU's VP assist page after it's unmapped.
+>
+> Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 50 +++++++++++++++++++++++++-----------------
+>  1 file changed, 30 insertions(+), 20 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index aca88524fd1e..ae13aa3e8a1d 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -552,6 +552,33 @@ static int hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> +static void hv_reset_evmcs(void)
+> +{
+> +	struct hv_vp_assist_page *vp_ap;
+> +
+> +	if (!static_branch_unlikely(&enable_evmcs))
+> +		return;
+> +
+> +	/*
+> +	 * KVM should enable eVMCS if and only if all CPUs have a VP assist
+> +	 * page, and should reject CPU onlining if eVMCS is enabled the CPU
+> +	 * doesn't have a VP assist page allocated.
+> +	 */
+> +	vp_ap = hv_get_vp_assist_page(smp_processor_id());
+> +	if (WARN_ON_ONCE(!vp_ap))
+> +		return;
+> +
+> +	/*
+> +	 * Reset everything to support using non-enlightened VMCS access later
+> +	 * (e.g. when we reload the module with enlightened_vmcs=0)
+> +	 */
+> +	vp_ap->nested_control.features.directhypercall = 0;
+> +	vp_ap->current_nested_vmcs = 0;
+> +	vp_ap->enlighten_vmentry = 0;
+> +}
+> +
+> +#else /* IS_ENABLED(CONFIG_HYPERV) */
+> +static void hv_reset_evmcs(void) {}
+>  #endif /* IS_ENABLED(CONFIG_HYPERV) */
+>  
+>  /*
+> @@ -2497,6 +2524,8 @@ static void vmx_hardware_disable(void)
+>  	if (cpu_vmxoff())
+>  		kvm_spurious_fault();
+>  
+> +	hv_reset_evmcs();
+> +
+>  	intel_pt_handle_vmx(0);
+>  }
+>  
+> @@ -8463,27 +8492,8 @@ static void vmx_exit(void)
+>  	kvm_exit();
+>  
+>  #if IS_ENABLED(CONFIG_HYPERV)
+> -	if (static_branch_unlikely(&enable_evmcs)) {
+> -		int cpu;
+> -		struct hv_vp_assist_page *vp_ap;
+> -		/*
+> -		 * Reset everything to support using non-enlightened VMCS
+> -		 * access later (e.g. when we reload the module with
+> -		 * enlightened_vmcs=0)
+> -		 */
+> -		for_each_online_cpu(cpu) {
+> -			vp_ap =	hv_get_vp_assist_page(cpu);
+> -
+> -			if (!vp_ap)
+> -				continue;
+> -
+> -			vp_ap->nested_control.features.directhypercall = 0;
+> -			vp_ap->current_nested_vmcs = 0;
+> -			vp_ap->enlighten_vmentry = 0;
+> -		}
+> -
+> +	if (static_branch_unlikely(&enable_evmcs))
+>  		static_branch_disable(&enable_evmcs);
+> -	}
+>  #endif
+>  	vmx_cleanup_l1d_flush();
+>  
+>
+> base-commit: 5f47ba6894477dfbdc5416467a25fb7acb47d404
+
+-- 
+Vitaly
+
