@@ -2,304 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F64262C89F
-	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 20:02:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41F8662C8BA
+	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 20:07:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234129AbiKPTCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Nov 2022 14:02:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59712 "EHLO
+        id S233358AbiKPTHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Nov 2022 14:07:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229863AbiKPTCW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Nov 2022 14:02:22 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2057.outbound.protection.outlook.com [40.107.244.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B8C731201;
-        Wed, 16 Nov 2022 11:02:21 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fD+97ZWfd2MNUy+GOB4rDcgpeu9My/4R9M/o/JewSsMducDVQ8eTjpN/f8s3+51ZYDZgzr5XsuBeUMXiJBK1AL4I3QDfGZ0Mv12MqJEt4Uq62azpylHAGZLi9MyGzbZTL453pBQuaajiXALvnHCuWnzZQwzT9vHi4XjlvPa61dza4h+grxrWdEWJI7EGxIAxzD1I2TQ7cHNao8waoazNqbJPwzrE1ch/n1nL6R9fdNuUmrulfhgHWvuMya3IV/99KaX8Iv1bPCgGo5nIknIdr7mJFPMRabZpZY9nYWCXPlNH7UpR08WpYTtK3yklRnDi+mSo7uO0iEynU+2DrejCRA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2M+zKUDQz+iz7jXx7oo3P/JPauyWDDTbL0Dy29TSSuM=;
- b=IQM8HgWxwjBH8vGVcVCCIKMMVnOPHgehgJnV0ECrp9AIIvTdZ+r47B0GxhtcxrKPezjcGd+S6As4jnr56E/17GqZ+rVpPVkzew9ddsnO+8CGFiXRzbG8rUQMn11tQwBAvmkDSWdpIvSO1i/AnSHdrPR4ql/09yxbXqcWvEQ+5LEwTxsoY0KnNL1ZbpJ9GelTi9aOkAMKsha9htS6VtgqLXekAkX4VuNXy74f2pzD26GqIlg5OblpN0uBVGuLxF1V4a/z+ykVnNnBrvPL/9W9KgB13CMdg9rf8PGwY2d+oG2yW3vTPlyp6zwaZN7/mcO25PGe9sxwxQpZiQ86Z3ehdA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2M+zKUDQz+iz7jXx7oo3P/JPauyWDDTbL0Dy29TSSuM=;
- b=N8AsPToodJnyjSgS7Jf4VorMUffTNY8Ros2b1B9CiKsjoz/kFUIkJ9QsB4V+aIrTRUoh4ulbpXmED2aG144ZULg0xgCFeZRa8UJMlPjcdjlaAby/o+dEV+Grdf9f9c10O+NQvTS75otSSKiCReqNxkXjbAD3y/d5m8/+V71pMN8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by PH0PR12MB7096.namprd12.prod.outlook.com (2603:10b6:510:21d::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.17; Wed, 16 Nov
- 2022 19:02:19 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::4da8:e3eb:20eb:f00]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::4da8:e3eb:20eb:f00%2]) with mapi id 15.20.5813.018; Wed, 16 Nov 2022
- 19:02:17 +0000
-Message-ID: <3e50c258-8732-088c-d9d8-dfaae82213f0@amd.com>
-Date:   Wed, 16 Nov 2022 13:02:14 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH V5] virt: sev: Prevent IV reuse in SNP guest driver
-Content-Language: en-US
-To:     Peter Gonda <pgonda@google.com>
-Cc:     Borislav Petkov <bp@suse.de>, Michael Roth <michael.roth@amd.com>,
-        Haowen Bai <baihaowen@meizu.com>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>, stable@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20221116175558.2373112-1-pgonda@google.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20221116175558.2373112-1-pgonda@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR20CA0039.namprd20.prod.outlook.com
- (2603:10b6:208:235::8) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        with ESMTP id S229931AbiKPTHG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Nov 2022 14:07:06 -0500
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F93561765
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 11:07:02 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id ay14-20020a05600c1e0e00b003cf6ab34b61so2391162wmb.2
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 11:07:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RrIEWhRQRlR3NVC7xZs7jfrYAvxywp8v6T2LfNTij+Q=;
+        b=Jx3yqn06j6rS5Fs5NvtNZW3afRbtKDAjyYZ/cbyT5J0fw+x5DSiBa34zecJ2zXBEP6
+         dXVq49aZkpeYNlw8FZCjejz+X8sYE98oXGoc760qT01ItS+LpGXs0KR6luYi6XidGGnJ
+         izQy2tFtJsUmRdujni2tPVUtXn9CPZshGLwHnmOZlDGECGPB/n+QnPoJLt8dAH9evwNe
+         fhOCmkSkLWIbZ04JJ1cM5aaZNcxxY3L6QunV484wNTFteoVmyskDXedR8UqBBpqCdgYP
+         ARhbe6kOrZMHvVRuGOwhLHdlqHzOAwDs9awbU2PksEIQB6p43e6EtlScRKP2mnLQYKXa
+         PFRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RrIEWhRQRlR3NVC7xZs7jfrYAvxywp8v6T2LfNTij+Q=;
+        b=sfVR0w8kWumPEKlL3EcDunMpWkyIY8DEOkPIJ48JVQar8VtSKjVLUMRzhZ0AxMWmAU
+         5kGuAPo9SLPDW4rhUiZTnrPLdr2hIYRgP/pRcC+nI+iubWQE0ByJ7zbTbqMe7T5PDJlt
+         vExKWgKZ/miMn1BkUXBFJ/bk/fYbqXBI3bVRSwPZEKAuuxnrAIUntynuRxr8Q5ccIvhE
+         fLN+5KiUNHURSbiXaMJlUuFgkZ1OWKSjQTwY9kOUHekkGX/1p0eYyKR2AhcaV0MHNvdV
+         /StDxlSA4u2AXilA4FgZHARx8EIHfYfyGMiZjspPKfoJiuAgSqMsQodYHHkweqP+Az4q
+         QS9w==
+X-Gm-Message-State: ANoB5plwyb/6OpUI8DnBce0zewpm1rBAbpQ7bkyyObFGB/gZe/6RIS7v
+        P9fM/y/Cd6jlOOCq2skHukTWww==
+X-Google-Smtp-Source: AA0mqf5UxIGeoP/5D5Yx/z21S7fh+uGiPqn06sMVoycK8I50cpSvwpmmKvt4/Ece9ChnPUGalp4tAQ==
+X-Received: by 2002:a05:600c:3d0c:b0:3cf:f66c:9246 with SMTP id bh12-20020a05600c3d0c00b003cff66c9246mr2115368wmb.27.1668625620910;
+        Wed, 16 Nov 2022 11:07:00 -0800 (PST)
+Received: from zen.linaroharston ([185.81.254.11])
+        by smtp.gmail.com with ESMTPSA id p13-20020adfe60d000000b00236e9755c02sm15976702wrm.111.2022.11.16.11.07.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Nov 2022 11:07:00 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id BDA921FFB7;
+        Wed, 16 Nov 2022 19:06:59 +0000 (GMT)
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <20221025151344.3784230-4-chao.p.peng@linux.intel.com>
+ <87cz9o9mr8.fsf@linaro.org> <20221116031441.GA364614@chaop.bj.intel.com>
+User-agent: mu4e 1.9.2; emacs 28.2.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v9 3/8] KVM: Add KVM_EXIT_MEMORY_FAULT exit
+Date:   Wed, 16 Nov 2022 19:03:49 +0000
+In-reply-to: <20221116031441.GA364614@chaop.bj.intel.com>
+Message-ID: <87mt8q90rw.fsf@linaro.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|PH0PR12MB7096:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5235e525-aa69-46dd-ac58-08dac805149e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: yytGplZ719u4waJfX1gTOaJ8elo+EZuhHSDOtVJYZ3fsEPy/iyoRH1pv9Ynik8rqM66Z2KAl/gwzkqALuseArftZ1XuRO6gjp4NMoogiiIIUMM3nQv9LuBOfFuaqz8Yzdskx9iUW85mwSYHYup0L/O05LoX8uUG5CXxBhA2zx1ZQh7Tdv7f5/d+Thth73+Iypv1JHPWnXYtT1VVXk0YqZSp/BXxhJ55FT9YY5GmRufYRqmMiAlnhFifI6SPOLzEpur+NEIpVzG5NvCRsw3svkPDyTuhERwb8IpuUQBVG0iUiJ1WgiVM24k/AASgrUCn3WG+f6GJuKLUkQ1W0cwGMmIsL0/uYDaXcicPFoQIjeH0HyueK2ro3BelNqUfEIH6iBMZiHSGY9aibr8q4wCGSKWVQ4xdWWuqhym/Gtj8ToeUXJGitCCUH7J3Ekq6luXFtKxpqeUyp+thMAW5oQ1WuRe9H3jaCbwYEFcucrwlgeTmwSVda9ocaUPTmW7NvosKpHNW4SnNKQBR5D5khtU5eQDt1hhsGGvl4cBrzB+S4yOwkDx94ATBkg0hQ/TNYqO+6LOJ0SYp5iz2k0vnZtq5y2uEGLZ0cGeIjfzGxg0i+p+SqTTv3V+GVL5GXXFfDDtXUZwyRBvjthuYlRC5XaSApWGfmOJ8SgHYO3AHoRiQ6Ysk35kv6ZA/sdXoQkdig9csI2a1bR8S50k1aYVpINukNJOkogoi0vNfazriVWb8gjpVHueUbwT9YNrUE3/JtoYCyib8kjI3g1JBwfp+LEGfG6ztpNslD2qQG+4aYsXXFzMQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(39860400002)(136003)(366004)(376002)(396003)(451199015)(31686004)(8936002)(7416002)(5660300002)(66556008)(66476007)(8676002)(4326008)(41300700001)(66946007)(316002)(6916009)(54906003)(6486002)(36756003)(6512007)(26005)(6506007)(6666004)(53546011)(478600001)(31696002)(2616005)(2906002)(83380400001)(186003)(38100700002)(86362001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y0JocEp2elByTzNxUWNMRkM4TlF2YUhEbUtKd003VFFyZld3TnZ1RXdMbFM3?=
- =?utf-8?B?c2hzS25SOHdNTGNpbHpIWng3UDZMQUNIQTk0ZEFLZFVmUUxZWGhNcXVONEpW?=
- =?utf-8?B?Y0REMGkwWVVLRE5CbmxEcEptMGNmdVQ0bzA1NUd2MHJTM3hGMkxPNlJNZGo0?=
- =?utf-8?B?VXQ5Q0R0aWtocUljbENtTFBMMzdFUUFYRk5RVisxMk9NSlV3MUF3TW9WSWpt?=
- =?utf-8?B?QWJ4SVBoRDFmTE9jMnJNMkRpd25YNHNBZ2ltUDk2WmY1NGJNaGJBZzhOcTdh?=
- =?utf-8?B?ZnU0MWx0eTlUdVVEQ0xwNmtGK1lkZGgxMVFybXg3UkkyZHl6NkdyVTZQUldQ?=
- =?utf-8?B?UEFFTXpZTFJMSEw2YStZaHR3Q1pTQ1V2dldLcElwdVZhZUZjc3V0TlN4UWtp?=
- =?utf-8?B?Nmd1bnR6UWp6Q3lCTE11a3c2UUFNaEF5QWJwQk0wQ2Z5dDBzSWhTTnBiRnpv?=
- =?utf-8?B?MjdvNkh6SXNyTTFodFRUYk16Y3RBUVU2RkpPbklzWjRxQkNrY3c3bjByOXVk?=
- =?utf-8?B?bHlqYm56T1lIMXkwTk13bC8xdDJ4RFp6eWZJRlpURXBlRGVXVkFaYTFTdlpt?=
- =?utf-8?B?MFdxZVkwNVhZbjFJcDZleEhqQ3dDWnBqOHl4L2pKdUd1WnNrQ0w3VGl1My80?=
- =?utf-8?B?NzJ5RDd1MnpoOE1vVzJRMkNnTlAzM0VWWTJUZSs0VWdYTkJMRGY2Sm5KNjEx?=
- =?utf-8?B?R0tMbGJnUnFRTm5na1o3VlZCTjN2MFcybzZvNkRlby9kUDcyNjlDVS9GQVl4?=
- =?utf-8?B?TFpsNU9IUGhlcGl3YlVRZGlEYWg4MzBYUnpTVmVGaXg4NmZmK2Qya3NpT2or?=
- =?utf-8?B?ZXZaSkVKa3A0eEpzdjIxZVl0T3E1RFhSMElGcGpCaThvcTFJVWFQcDdTaDNl?=
- =?utf-8?B?QXNPRGlmNTAra1dtQVVST1QvdmRYL1l2c2wyQXM1VUNBOWNuRHhqWkExbktR?=
- =?utf-8?B?S1BWaDJzTFMxdW9TM1V5aGhsNWVGVVFTNHF5S1pEOGROOVZZR2R3ZkY2ZkNM?=
- =?utf-8?B?aTRyZDEyd3lNYTBDbmNZSWd0MmZEaXBjS2k4R25BdmN5UzlkaEpDeWk3S1FU?=
- =?utf-8?B?enBSaERMVEVqTEdacUFtdGRZdHZyU1kvemUydkN4VjduZ1BvRGVJTHRJaWxZ?=
- =?utf-8?B?cUN0RlYzZzdoRkJnczMreldEUlNiY1BnOWdxZWJKMVpndjdmWXQ3em4yNFlq?=
- =?utf-8?B?S3hUd2UybHdibGZLRVMrTzZoMWlTazZPOXN6ZVpjdmRpU0lNYVdZSTBnZDls?=
- =?utf-8?B?NTJyMVRLN0dyQUJiajdvQS9mQUlmRk9UbStoR0VRZjRPSFBOWVZuK3VRbTZv?=
- =?utf-8?B?OE5qbFNVeUF0ZDQydVcyVGlmZlNTcEJzS3FxbmZjbEp2a1BmM2JCRmtEZzJy?=
- =?utf-8?B?UFBNT1ZYQ2lMVitZWTlmRXdva0NNNTdOUlNidjQxKzNCWUVHcithR25iUDhF?=
- =?utf-8?B?enZCNEV5bUNXSDZ4OVR2UnZ0Q3VMUWJxRkV4ZkhyZ2NCN2w4eUdxam11UkZm?=
- =?utf-8?B?ZWVmV1hjdHBjRlpNVWY4TzNYMDFiZGpzQXpHYXVuZ0xOREtIR25qelpTWUs5?=
- =?utf-8?B?NFd0djV1eVNRajhjOUVQeEZFL1QwalVBTXMrVDlmUmZ2SjNVdlFHUXdTaVZE?=
- =?utf-8?B?Y05nRWdXVmJNc2VXb3J1YnZ2TCs0OHd6cW5sOGdtTWh2azJmUFRKS1hMSnVL?=
- =?utf-8?B?d3preFVzWWVGVFkxSWhaV2hLS2ZsZTA5aVNSTUVOUVh6RjhIV1JsWUNxdmp2?=
- =?utf-8?B?bU5zbGFhV3J6MjRoVUp1dnFmYSswbFh2N1NxZnBPU25JTFZoZmUzTExlSThs?=
- =?utf-8?B?U3FhZFNDNitod0xad1hSZXk2NmJRR0oxclU4SFBoM0oxdUt1OWhsZUxNQUJV?=
- =?utf-8?B?cFpMM2VxZmdXQ2ZqbXp0KzhZcFZISzArVTBBbFNGclUzZXNlejFVK2ZLdC9m?=
- =?utf-8?B?RDBxcEZ4K1VRbjNjTHBhSW44YWY1SEk1S2lQLzBWMURpUWlkeVNBYmtzdks1?=
- =?utf-8?B?b0tORm1EK1pMSE4zWlYyNXpNNCticU8zYkQwR1Ixb040Y1lUSm52L1ZtbW9K?=
- =?utf-8?B?ZDdGVlAxTWh4ZEFMRUFtRmRNUkZ6OS9xcmtZT1VjZTF6TXMrYzIxaHlweDlG?=
- =?utf-8?Q?PHlALw1UbgjWhpfanAQ1nWFNC?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5235e525-aa69-46dd-ac58-08dac805149e
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2022 19:02:17.4087
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gvS+eWQxPf6udg+qDeYgNinNc5B0x0ueaJ1Q7mW8ESTBg2uJ3NX72GzPVtM78p6UIxniQJx6rJlIiXBXJCI2pw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7096
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/16/22 11:55, Peter Gonda wrote:
-> The AMD Secure Processor (ASP) and an SNP guest use a series of
-> AES-GCM keys called VMPCKs to communicate securely with each other.
-> The IV to this scheme is a sequence number that both the ASP and the
-> guest track. Currently this sequence number in a guest request must
-> exactly match the sequence number tracked by the ASP. This means that
-> if the guest sees an error from the host during a request it can only
-> retry that exact request or disable the VMPCK to prevent an IV reuse.
-> AES-GCM cannot tolerate IV reuse see: "Authentication Failures in NIST
-> version of GCM" - Antoine Joux et al.
-> 
-> In order to address this make handle_guest_request() delete the VMPCK
-> on any non successful return. To allow userspace querying the cert_data
-> length make handle_guest_request() safe the number of pages required by
 
-s/safe/save/
+Chao Peng <chao.p.peng@linux.intel.com> writes:
 
-> the host, then handle_guest_request() retry the request without
+> On Tue, Nov 15, 2022 at 04:56:12PM +0000, Alex Benn=C3=A9e wrote:
+>>=20
+>> Chao Peng <chao.p.peng@linux.intel.com> writes:
+>>=20
+>> > This new KVM exit allows userspace to handle memory-related errors. It
+>> > indicates an error happens in KVM at guest memory range [gpa, gpa+size=
+).
+>> > The flags includes additional information for userspace to handle the
+>> > error. Currently bit 0 is defined as 'private memory' where '1'
+>> > indicates error happens due to private memory access and '0' indicates
+>> > error happens due to shared memory access.
+>> >
+>> > When private memory is enabled, this new exit will be used for KVM to
+>> > exit to userspace for shared <-> private memory conversion in memory
+>> > encryption usage. In such usage, typically there are two kind of memory
+>> > conversions:
+>> >   - explicit conversion: happens when guest explicitly calls into KVM
+>> >     to map a range (as private or shared), KVM then exits to userspace
+>> >     to perform the map/unmap operations.
+>> >   - implicit conversion: happens in KVM page fault handler where KVM
+>> >     exits to userspace for an implicit conversion when the page is in a
+>> >     different state than requested (private or shared).
+>> >
+>> > Suggested-by: Sean Christopherson <seanjc@google.com>
+>> > Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+>> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+>> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+>> > ---
+>> >  Documentation/virt/kvm/api.rst | 23 +++++++++++++++++++++++
+>> >  include/uapi/linux/kvm.h       |  9 +++++++++
+>> >  2 files changed, 32 insertions(+)
+>> >
+>> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/a=
+pi.rst
+>> > index f3fa75649a78..975688912b8c 100644
+>> > --- a/Documentation/virt/kvm/api.rst
+>> > +++ b/Documentation/virt/kvm/api.rst
+>> > @@ -6537,6 +6537,29 @@ array field represents return values. The users=
+pace should update the return
+>> >  values of SBI call before resuming the VCPU. For more details on RISC=
+-V SBI
+>> >  spec refer, https://github.com/riscv/riscv-sbi-doc.
+>> >=20=20
+>> > +::
+>> > +
+>> > +		/* KVM_EXIT_MEMORY_FAULT */
+>> > +		struct {
+>> > +  #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1 << 0)
+>> > +			__u32 flags;
+>> > +			__u32 padding;
+>> > +			__u64 gpa;
+>> > +			__u64 size;
+>> > +		} memory;
+>> > +
+>> > +If exit reason is KVM_EXIT_MEMORY_FAULT then it indicates that the VC=
+PU has
+>> > +encountered a memory error which is not handled by KVM kernel module =
+and
+>> > +userspace may choose to handle it. The 'flags' field indicates the me=
+mory
+>> > +properties of the exit.
+>> > +
+>> > + - KVM_MEMORY_EXIT_FLAG_PRIVATE - indicates the memory error is cause=
+d by
+>> > +   private memory access when the bit is set. Otherwise the memory er=
+ror is
+>> > +   caused by shared memory access when the bit is clear.
+>>=20
+>> What does a shared memory access failure entail?
+>
+> In the context of confidential computing usages, guest can issue a
+> shared memory access while the memory is actually private from the host
+> point of view. This exit with bit 0 cleared gives userspace a chance to
+> convert the private memory to shared memory on host.
 
-... then have handle_guest_request() ...
+I think this should be explicit rather than implied by the absence of
+another flag. Sean suggested you might want flags for RWX failures so
+maybe something like:
 
-> requesting the extended data, then return the number of pages required
-> back to userspace.
-> 
-> Fixes: fce96cf044308 ("virt: Add SEV-SNP guest driver")
-> Signed-off-by: Peter Gonda <pgonda@google.com>
-> Reported-by: Peter Gonda <pgonda@google.com>
+	KVM_MEMORY_EXIT_SHARED_FLAG_READ	(1 << 0)
+	KVM_MEMORY_EXIT_SHARED_FLAG_WRITE	(1 << 1)
+	KVM_MEMORY_EXIT_SHARED_FLAG_EXECUTE	(1 << 2)
+        KVM_MEMORY_EXIT_FLAG_PRIVATE            (1 << 3)
 
-Just some nits on the commit message and comments below, otherwise
+which would allow you to signal the various failure modes of the shared
+region, or that you had accessed private memory.
 
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+>
+>>=20
+>> If you envision any other failure modes it might be worth making it
+>> explicit with additional flags.
+>
+> Sean mentioned some more usages[1][]2] other than the memory conversion
+> for confidential usage. But I would leave those flags being added in the
+> future after those usages being well discussed.
+>
+> [1] https://lkml.kernel.org/r/20200617230052.GB27751@linux.intel.com
+> [2] https://lore.kernel.org/all/YKxJLcg%2FWomPE422@google.com
+>
+>> I also wonder if a bitmask makes sense if
+>> there can only be one reason for a failure? Maybe all that is needed is
+>> a reason enum?
+>
+> Tough we only have one reason right now but we still want to leave room
+> for future extension. Enum can express a single value at once well but
+> bitmask makes it possible to express multiple orthogonal flags.
 
-> Cc: Borislav Petkov <bp@suse.de>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Michael Roth <michael.roth@amd.com>
-> Cc: Haowen Bai <baihaowen@meizu.com>
-> Cc: Yang Yingliang <yangyingliang@huawei.com>
-> Cc: Marc Orr <marcorr@google.com>
-> Cc: David Rientjes <rientjes@google.com>
-> Cc: Dionna Glaze <dionnaglaze@google.com>
-> Cc: Ashish Kalra <Ashish.Kalra@amd.com>
-> Cc: stable@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: kvm@vger.kernel.org
-> ---
->   drivers/virt/coco/sev-guest/sev-guest.c | 83 ++++++++++++++++++++-----
->   1 file changed, 69 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
-> index f422f9c58ba79..64b4234c14da8 100644
-> --- a/drivers/virt/coco/sev-guest/sev-guest.c
-> +++ b/drivers/virt/coco/sev-guest/sev-guest.c
-> @@ -67,8 +67,27 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
->   	return true;
->   }
->   
-> +/*
-> + * If an error is received from the host or AMD Secure Processor (ASP) there
-> + * are two options. Either retry the exact same encrypted request or discontinue
-> + * using the VMPCK.
-> + *
-> + * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
-> + * encrypt the requests. The IV for this scheme is the sequence number. GCM
-> + * cannot tolerate IV reuse.
-> + *
-> + * The ASP FW v1.51 only increments the sequence numbers on a successful
-> + * guest<->ASP back and forth and only accepts messages at its exact sequence
-> + * number.
-> + *
-> + * So if the sequence number were to be reused the encryption scheme is
-> + * vulnerable. If the sequence number were incremented for a fresh IV the ASP
-> + * will reject the request.
-> + */
->   static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
->   {
-> +	dev_alert(snp_dev->dev, "Disabling vmpck_id: %d to prevent IV reuse.\n",
-> +		  vmpck_id);
->   	memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
->   	snp_dev->vmpck = NULL;
->   }
-> @@ -321,34 +340,70 @@ static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, in
->   	if (rc)
->   		return rc;
->   
-> -	/* Call firmware to process the request */
-> +	/*
-> +	 * Call firmware to process the request. In this function the encrypted
-> +	 * message enters shared memory with the host. So after this call the
-> +	 * sequence number must be incremented or the VMPCK must be deleted to
-> +	 * prevent reuse of the IV.
-> +	 */
->   	rc = snp_issue_guest_request(exit_code, &snp_dev->input, &err);
-> +
-> +	/*
-> +	 * If the extended guest request fails due to having too small of a
-> +	 * certificate data buffer retry the same guest request without the
-> +	 * extended data request in order to not have to reuse the IV.
+I agree if multiple orthogonal failures can occur at once a bitmask is
+the right choice.
 
-... in order to increment the sequence number to avoid reuse of the IV.
+>
+> Chao
+>>=20
+>> > +
+>> > +'gpa' and 'size' indicate the memory range the error occurs at. The u=
+serspace
+>> > +may handle the error and return to KVM to retry the previous memory a=
+ccess.
+>> > +
+>> >  ::
+>> >=20=20
+>> >      /* KVM_EXIT_NOTIFY */
+>> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> > index f1ae45c10c94..fa60b032a405 100644
+>> > --- a/include/uapi/linux/kvm.h
+>> > +++ b/include/uapi/linux/kvm.h
+>> > @@ -300,6 +300,7 @@ struct kvm_xen_exit {
+>> >  #define KVM_EXIT_RISCV_SBI        35
+>> >  #define KVM_EXIT_RISCV_CSR        36
+>> >  #define KVM_EXIT_NOTIFY           37
+>> > +#define KVM_EXIT_MEMORY_FAULT     38
+>> >=20=20
+>> >  /* For KVM_EXIT_INTERNAL_ERROR */
+>> >  /* Emulate instruction failed. */
+>> > @@ -538,6 +539,14 @@ struct kvm_run {
+>> >  #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
+>> >  			__u32 flags;
+>> >  		} notify;
+>> > +		/* KVM_EXIT_MEMORY_FAULT */
+>> > +		struct {
+>> > +#define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1 << 0)
+>> > +			__u32 flags;
+>> > +			__u32 padding;
+>> > +			__u64 gpa;
+>> > +			__u64 size;
+>> > +		} memory;
+>> >  		/* Fix the size of the union. */
+>> >  		char padding[256];
+>> >  	};
+>>=20
+>>=20
+>> --=20
+>> Alex Benn=C3=A9e
 
-> +	 */
-> +	if (exit_code == SVM_VMGEXIT_EXT_GUEST_REQUEST &&
-> +	    err == SNP_GUEST_REQ_INVALID_LEN) {
-> +		const unsigned int certs_npages = snp_dev->input.data_npages;
-> +
-> +		exit_code = SVM_VMGEXIT_GUEST_REQUEST;
-> +
-> +		/*
-> +		 * If this call to the firmware succeeds the sequence number can
-> +		 * be incremented allowing for continued use of the VMPCK. If
-> +		 * there is an error reflected in the return value, this value
-> +		 * is checked further down and the result will be the deletion
-> +		 * of the VMPCK and the error code being propagated back to the
-> +		 * user as an IOCLT return code.
 
-s/IOCLT/ioctl()/
-
-Thanks,
-Tom
-
-> +		 */
-> +		rc = snp_issue_guest_request(exit_code, &snp_dev->input, &err);
-> +
-> +		/*
-> +		 * Override the error to inform callers the given extended
-> +		 * request buffer size was too small and give the caller the
-> +		 * required buffer size.
-> +		 */
-> +		err = SNP_GUEST_REQ_INVALID_LEN;
-> +		snp_dev->input.data_npages = certs_npages;
-> +	}
-> +
->   	if (fw_err)
->   		*fw_err = err;
->   
-> -	if (rc)
-> -		return rc;
-> +	if (rc) {
-> +		dev_alert(snp_dev->dev,
-> +			  "Detected error from ASP request. rc: %d, fw_err: %llu\n",
-> +			  rc, *fw_err);
-> +		goto disable_vmpck;
-> +	}
->   
-> -	/*
-> -	 * The verify_and_dec_payload() will fail only if the hypervisor is
-> -	 * actively modifying the message header or corrupting the encrypted payload.
-> -	 * This hints that hypervisor is acting in a bad faith. Disable the VMPCK so that
-> -	 * the key cannot be used for any communication. The key is disabled to ensure
-> -	 * that AES-GCM does not use the same IV while encrypting the request payload.
-> -	 */
->   	rc = verify_and_dec_payload(snp_dev, resp_buf, resp_sz);
->   	if (rc) {
->   		dev_alert(snp_dev->dev,
-> -			  "Detected unexpected decode failure, disabling the vmpck_id %d\n",
-> -			  vmpck_id);
-> -		snp_disable_vmpck(snp_dev);
-> -		return rc;
-> +			  "Detected unexpected decode failure from ASP. rc: %d\n",
-> +			  rc);
-> +		goto disable_vmpck;
->   	}
->   
->   	/* Increment to new message sequence after payload decryption was successful. */
->   	snp_inc_msg_seqno(snp_dev);
->   
->   	return 0;
-> +
-> +disable_vmpck:
-> +	snp_disable_vmpck(snp_dev);
-> +	return rc;
->   }
->   
->   static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_ioctl *arg)
+--=20
+Alex Benn=C3=A9e
