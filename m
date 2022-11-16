@@ -2,88 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 70A3A62CAB5
-	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 21:22:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DB6B62CB6A
+	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 21:50:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229863AbiKPUWa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Nov 2022 15:22:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46486 "EHLO
+        id S233325AbiKPUua (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Nov 2022 15:50:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233488AbiKPUW2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Nov 2022 15:22:28 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 017B76314B
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 12:22:28 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id c203so7419072pfc.11
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 12:22:27 -0800 (PST)
+        with ESMTP id S233430AbiKPUu3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Nov 2022 15:50:29 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEA12623BB
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 12:50:26 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id o7-20020a170902d4c700b001868cdac9adso14730996plg.13
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 12:50:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4LYQkdPPYclVVL0mv9lfUFrLftkqNX02YsTqGcI/i4s=;
-        b=mYpsnOr/EviedU0QTHToHpyNTjNV1Hk2bgkyfpy6F919jZVMSEj1B4cRKwO2wmMRsh
-         Fdh18hNmFxnTbS+JnTnC8Ct+VkUqUM3I2j1fI7z6TSvYH01xVLlx0hrxNIl78cuQP2DX
-         sylayksZBCUnCz2qIq/zHfOETtZJBJDbuVop8oqEGhCXw43cgTQRhGHPBce/pPn2sK7n
-         t5RBFy7D2XvHiBjPXe9Jx02ItOLbmQkZzTtts8g6xfBr4XqCPv/82c290UXH2xB1bm2U
-         fb6wnJXEVbOqPawzL4YaWJ61x3M5r2EB9MtOEnjxUx8JGjAtUp4oawTZh4jIrQKW0U0p
-         8FuQ==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vm8HknjbQpP5x1fHUQZ8Fa+JhrBUsKYRYb84Ljw06/8=;
+        b=BxC9ZIiQoKs8ZVqFtGoVwkhZjhvx+R8PRQB6GTtgA210grIKaMUfq2t0MWY3kI6kkp
+         Ri7QGvFmdcQHkk1hdrwKgiBlH7UL9kkXPXLqHdnAIp3PIrrDNkNKuXekVJ7+ZRLfdmPg
+         cQkuCip07OmxTzEL5JEZGej5dA3zvd1W4OtdIo2gBJqiIu2fJkfRqzbucnRGJGmvoaGQ
+         JeagXDUkI3LTmVilwN+XEnCxUy4kfrqeJ1CvBsbW5yvysO4wop2f/STxLeY9zAtDUUFw
+         n8gsLiJIOgQlD8T85gNo08kYyGRdhjrlcaafVDzmuk2vc2ElQCmnrFZnsbi5bwPjtr2C
+         xOpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4LYQkdPPYclVVL0mv9lfUFrLftkqNX02YsTqGcI/i4s=;
-        b=xNJP9+01t+mgBmXjjEY/0qmsiNWLvOsgCCtKYoWOlrIojF1zHfa53Uxhp/BOX2ArfP
-         WaQcEVmjppNYLVpCdbI3UdjOEJk8Shp5NCTuomTeq4fEcBUdk23bL89FZ9YmDb5wKy4Q
-         CdyAG4TAHGNqS4u4Jyl4N9bJSotgMJNElVZVGofJnEiDQ+7ZaxC6b7fzREOhj5bZlIx3
-         LWB/4je+QLKfGOiPwFfkX6BQmEJhyo6g4CZbuIU7KP66HF12AZQYU79lLJkmVyZyMa4g
-         4xU6FmaVtyk+X8ce6DjaKKGNPT5bKV+FlqxbRCtdwwwBEgX6ONfcHxtzggx67z32/iyx
-         PMpA==
-X-Gm-Message-State: ANoB5pknPjd7AvPcb/HlCH7L913CtCdOxpWvlf9xNeeDW5ndj5K+MGXE
-        +lXhZbpUustGjqyRMgErYmXNdQ==
-X-Google-Smtp-Source: AA0mqf5y4iEpzUBnDzzes8Cbrw1PLU42nl76HNcYIJNlTxb/BSYtwsbBOqALTB/fDZOpR1CW4mLNLQ==
-X-Received: by 2002:a63:f80b:0:b0:476:f69c:2304 with SMTP id n11-20020a63f80b000000b00476f69c2304mr2175184pgh.77.1668630147417;
-        Wed, 16 Nov 2022 12:22:27 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id w193-20020a627bca000000b00571bdf45888sm10255955pfc.154.2022.11.16.12.22.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Nov 2022 12:22:26 -0800 (PST)
-Date:   Wed, 16 Nov 2022 20:22:23 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Kim Phillips <kim.phillips@amd.com>, x86@kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Babu Moger <Babu.Moger@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] x86/cpufeatures: Add support for cpuid leaf
- 80000021/EAX (FeatureExt2Eax)
-Message-ID: <Y3VGf8WsvxZ/S1aI@google.com>
-References: <20221104213651.141057-1-kim.phillips@amd.com>
- <20221104213651.141057-2-kim.phillips@amd.com>
- <Y2WIy2A1RuQE/9SK@zn.tnic>
- <c00b1a65-c885-c874-79cb-16011ac82eb3@amd.com>
- <Y3TQsUmTieC4NnO/@zn.tnic>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y3TQsUmTieC4NnO/@zn.tnic>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vm8HknjbQpP5x1fHUQZ8Fa+JhrBUsKYRYb84Ljw06/8=;
+        b=hiN04OP8tpc1si2i8V7eOY8OIb01T4fvJuZr2pVwPZo5NLuSasiAYkoyW3/nAUXlsJ
+         ef0h437luD53Yi7QWaaW+nNnDREA1P3k5eunH6syCL1xlAX+O1s1ihmSw0DzUgawWBx4
+         k3MdhvsuW/AE2bWWH+Gou4QiPl+iBIYL1lFv03E6GmVPSWUlSdbSQZdUpsSDpzaxkLqd
+         3dgHbYq1cMgNBbjbt9kZgOxptPhVYpP1FrPiwQLuObkuASdq+vF09QYMqzeLptVccDgg
+         a93Gme1y/Yxe1YiS71boLi0vu5QpPBDEq2NqL2HDcSwvI0npzRoDz0C1wVbUnm39L/80
+         snkA==
+X-Gm-Message-State: ANoB5pmENFHrW4H60lxkCOFFYLUvBDlnxhYCRFqfLJUIXRweW/Rbq40T
+        MOsJRnsYSuXf5Vivuua16ukUf2UFfzr3yCmM8g==
+X-Google-Smtp-Source: AA0mqf41ZmTXB/mfU/GsYmUkRkGNKElgXElKSWsJxXMeA5xlBE38lutMTDBINT6VM1Rkky14pOwbEWAq8JgrwGlebg==
+X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
+ (user=ackerleytng job=sendgmr) by 2002:aa7:9041:0:b0:572:9681:1018 with SMTP
+ id n1-20020aa79041000000b0057296811018mr6472865pfo.39.1668631826322; Wed, 16
+ Nov 2022 12:50:26 -0800 (PST)
+Date:   Wed, 16 Nov 2022 20:50:25 +0000
+In-Reply-To: <20221025151344.3784230-8-chao.p.peng@linux.intel.com>
+Mime-Version: 1.0
+References: <20221025151344.3784230-8-chao.p.peng@linux.intel.com>
+X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
+Message-ID: <20221116205025.1510291-1-ackerleytng@google.com>
+Subject: Re: [PATCH v9 7/8] KVM: Handle page fault for private memory
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     chao.p.peng@linux.intel.com
+Cc:     aarcange@redhat.com, ak@linux.intel.com, akpm@linux-foundation.org,
+        bfields@fieldses.org, bp@alien8.de, corbet@lwn.net,
+        dave.hansen@intel.com, david@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, hpa@zytor.com, hughd@google.com,
+        jlayton@kernel.org, jmattson@google.com, joro@8bytes.org,
+        jun.nakajima@intel.com, kirill.shutemov@linux.intel.com,
+        kvm@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, luto@kernel.org, mail@maciej.szmigiero.name,
+        mhocko@suse.com, michael.roth@amd.com, mingo@redhat.com,
+        pbonzini@redhat.com, qemu-devel@nongnu.org, qperret@google.com,
+        rppt@kernel.org, seanjc@google.com, shuah@kernel.org,
+        songmuchun@bytedance.com, steven.price@arm.com, tabba@google.com,
+        tglx@linutronix.de, vannapurve@google.com, vbabka@suse.cz,
+        vkuznets@redhat.com, wanpengli@tencent.com, wei.w.wang@intel.com,
+        x86@kernel.org, yu.c.zhang@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,24 +82,152 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 16, 2022, Borislav Petkov wrote:
-> On Tue, Nov 15, 2022 at 05:10:50PM -0600, Kim Phillips wrote:
-> > When trying to wire up a scattered host AUTOIBRS version up to
-> > kvm, I couldn't get past all the reverse_cpuid_check()
-> > BUILD_BUGs demanding exclusivity between h/w and "Linux"
-> > (s/w) FEATUREs.
+> A memslot with KVM_MEM_PRIVATE being set can include both fd-based
+> private memory and hva-based shared memory. Architecture code (like TDX
+> code) can tell whether the on-going fault is private or not. This patch
+> adds a 'is_private' field to kvm_page_fault to indicate this and
+> architecture code is expected to set it.
+>
+> To handle page fault for such memslot, the handling logic is different
+> depending on whether the fault is private or shared. KVM checks if
+> 'is_private' matches the host's view of the page (maintained in
+> mem_attr_array).
+>   - For a successful match, private pfn is obtained with
+>     restrictedmem_get_page () from private fd and shared pfn is obtained
+>     with existing get_user_pages().
+>   - For a failed match, KVM causes a KVM_EXIT_MEMORY_FAULT exit to
+>     userspace. Userspace then can convert memory between private/shared
+>     in host's view and retry the fault.
+>
+> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c          | 56 +++++++++++++++++++++++++++++++--
+>  arch/x86/kvm/mmu/mmu_internal.h | 14 ++++++++-
+>  arch/x86/kvm/mmu/mmutrace.h     |  1 +
+>  arch/x86/kvm/mmu/spte.h         |  6 ++++
+>  arch/x86/kvm/mmu/tdp_mmu.c      |  3 +-
+>  include/linux/kvm_host.h        | 28 +++++++++++++++++
+>  6 files changed, 103 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 67a9823a8c35..10017a9f26ee 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3030,7 +3030,7 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn,
+>
+>  int kvm_mmu_max_mapping_level(struct kvm *kvm,
+>  			      const struct kvm_memory_slot *slot, gfn_t gfn,
+> -			      int max_level)
+> +			      int max_level, bool is_private)
+>  {
+>  	struct kvm_lpage_info *linfo;
+>  	int host_level;
+> @@ -3042,6 +3042,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
+>  			break;
+>  	}
+>
+> +	if (is_private)
+> +		return max_level;
+> +
+>  	if (max_level == PG_LEVEL_4K)
+>  		return PG_LEVEL_4K;
+>
+> @@ -3070,7 +3073,8 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  	 * level, which will be used to do precise, accurate accounting.
+>  	 */
+>  	fault->req_level = kvm_mmu_max_mapping_level(vcpu->kvm, slot,
+> -						     fault->gfn, fault->max_level);
+> +						     fault->gfn, fault->max_level,
+> +						     fault->is_private);
+>  	if (fault->req_level == PG_LEVEL_4K || fault->huge_page_disallowed)
+>  		return;
+>
+> @@ -4141,6 +4145,32 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>  	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
+>  }
+>
+> +static inline u8 order_to_level(int order)
+> +{
+> +	BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
+> +
+> +	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
+> +		return PG_LEVEL_1G;
+> +
+> +	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
+> +		return PG_LEVEL_2M;
+> +
+> +	return PG_LEVEL_4K;
+> +}
+> +
+> +static int kvm_faultin_pfn_private(struct kvm_page_fault *fault)
+>  +{
+>  +	int order;
+>  +	struct kvm_memory_slot *slot = fault->slot;
+>  +
+>  +	if (kvm_restricted_mem_get_pfn(slot, fault->gfn, &fault->pfn, &order))
+>+		return RET_PF_RETRY;
+>+
+>+	fault->max_level = min(order_to_level(order), fault->max_level);
+>+	fault->map_writable = !(slot->flags & KVM_MEM_READONLY);
+>+	return RET_PF_CONTINUE;
+>+}
+>+
+> static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> {
+> 	struct kvm_memory_slot *slot = fault->slot;
+>@@ -4173,6 +4203,22 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> 			return RET_PF_EMULATE;
+> 	}
+>
+>+	if (kvm_slot_can_be_private(slot) &&
+>+	    fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
+>+		vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+>+		if (fault->is_private)
+>+			vcpu->run->memory.flags = KVM_MEMORY_EXIT_FLAG_PRIVATE;
+>+		else
+>+			vcpu->run->memory.flags = 0;
+>+		vcpu->run->memory.padding = 0;
+>+		vcpu->run->memory.gpa = fault->gfn << PAGE_SHIFT;
+>+		vcpu->run->memory.size = PAGE_SIZE;
+>+		return RET_PF_USER;
+>+	}
+>+
+>+	if (fault->is_private)
+>+		return kvm_faultin_pfn_private(fault);
+>+
 
-FWIW, it's not exclusivity per se, it's to ensure that any CPUID bits KVM wants
-to advertise to userspace uses the architectural definition and not the kernel's
-software defined info.  This allows KVM to do things like
+Since each memslot may also not be backed by restricted memory, we
+should also check if the memslot has been set up for private memory
+with
 
-	if (guest_cpuid_has(X86_FEATURE_AUTOIBRS))
+	if (fault->is_private && kvm_slot_can_be_private(slot))
+		return kvm_faultin_pfn_private(fault);
 
-and guarantee that the lookup on guest CPUID, which follows the architectural
-layout, will look at the correct leaf+subleaf+reg+bit.
+Without this check, restrictedmem_get_page will get called with NULL
+in slot->restricted_file, which causes a NULL pointer dereference.
 
-> I guess something like below.
-> 
-> Sean, can you pls check the KVM bits whether I've done them all right?
-
-Looks correct.
+> 	async = false;
+> 	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, &async,
+> 					  fault->write, &fault->map_writable,
+>@@ -5557,6 +5603,9 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+> 			return -EIO;
+> 	}
+>
+>+	if (r == RET_PF_USER)
+>+		return 0;
+>+
+> 	if (r < 0)
+> 		return r;
+> 	if (r != RET_PF_EMULATE)
+>@@ -6408,7 +6457,8 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+> 		 */
+> 		if (sp->role.direct &&
+> 		    sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn,
+>-							       PG_LEVEL_NUM)) {
+>+							       PG_LEVEL_NUM,
+>+							       false)) {
+> 			kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
+>
+> 			if (kvm_available_flush_tlb_with_range())
