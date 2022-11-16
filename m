@@ -2,312 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04D8A62BE5E
-	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 13:40:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3990062C1CA
+	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 16:07:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239064AbiKPMkP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Nov 2022 07:40:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59590 "EHLO
+        id S232009AbiKPPHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Nov 2022 10:07:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231194AbiKPMju (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Nov 2022 07:39:50 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5484D116C
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 04:39:48 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AGBdYap009661;
-        Wed, 16 Nov 2022 12:39:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=m6WiBs7GyAPFVARgKy/MKSARc9RK6vbpu7hf/mZYE3M=;
- b=G81yPu799OJ3ixa5FsWmjk8SHOhNPhMn4nMODTiDw9xssjosU6LsrenLKNWHRH31O8wM
- 0oR/EnVFSrOP8Kl+LcbkqOn1IAq6siNwm1o/CcKiMYvDeaU1pto5zDoxIJWho/jOzaA6
- 9DdBqrd2X9PEZ/5EEjpdoRFmCQMMk3CSaVpIX5+6+Jr/ECAg462prPu3MG8p2SXa7+Sk
- XXi4boHm82gLyD4vEWSEzRl3WT01I3BvTiGeLvEiMy4y6Gz9nzt7OjMIosmSRfFLlvEL
- aiYTHQLNxWDOjg8Ox8dLgIyVNw8AxnfDBdsjLh45SW9PJAhN7KCNV6tQiJw1AvIoTz5Y Iw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kvy639h93-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Nov 2022 12:39:31 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AGBeMnw011433;
-        Wed, 16 Nov 2022 12:39:31 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kvy639h89-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Nov 2022 12:39:31 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AGCYtST025701;
-        Wed, 16 Nov 2022 12:39:29 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma05fra.de.ibm.com with ESMTP id 3kt3494drj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Nov 2022 12:39:29 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AGCdQbN39452962
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Nov 2022 12:39:26 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0F1085204F;
-        Wed, 16 Nov 2022 12:39:26 +0000 (GMT)
-Received: from [9.152.222.245] (unknown [9.152.222.245])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 711575204E;
-        Wed, 16 Nov 2022 12:39:25 +0000 (GMT)
-Message-ID: <757660a9-97e7-5529-dcf2-a575c19cee28@linux.ibm.com>
-Date:   Wed, 16 Nov 2022 13:39:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH v11 09/11] s390x/cpu topology: add topology machine
- property
-Content-Language: en-US
-To:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
-        frankja@linux.ibm.com, berrange@redhat.com
-References: <20221103170150.20789-1-pmorel@linux.ibm.com>
- <20221103170150.20789-10-pmorel@linux.ibm.com>
- <b5540c7e-3c06-565a-6571-55c167ec347b@kaod.org>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <b5540c7e-3c06-565a-6571-55c167ec347b@kaod.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7MB61aTf8Ve4-jmELiPFXgnmzrhmUmGQ
-X-Proofpoint-ORIG-GUID: E1LjSLgDsEcE5AX7RYTEoSSrmBI7vgrX
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S234511AbiKPPHI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Nov 2022 10:07:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ECE82C12B
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 07:06:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668611168;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=4M/cw6ef4s1XoAY3sHRgxbzvzfqw6pweVurl5mgMOdg=;
+        b=dLyN6GOTYCImXbNGWgI1o5QazRx4tJrGAEyvFNbpqQQfQRjJaD9uXCIdjHy/NMVNShPW59
+        t/uUkYSMK5d1/XouShe7GzkLTKF4VJFpYgyyuR97ag2XQfyyjMt46Mjg4JzSx1qJIRmLas
+        6myX9E592ZHNY9tt8bpVAUDR/vtUgo8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-253--1h7nsc5NNK3DueANgyxVg-1; Wed, 16 Nov 2022 10:06:07 -0500
+X-MC-Unique: -1h7nsc5NNK3DueANgyxVg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 78F162833B00;
+        Wed, 16 Nov 2022 15:06:06 +0000 (UTC)
+Received: from eperezma.remote.csb (unknown [10.39.192.144])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2BF09140EBF3;
+        Wed, 16 Nov 2022 15:06:03 +0000 (UTC)
+From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Gautam Dawar <gdawar@xilinx.com>, Eli Cohen <eli@mellanox.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Cindy Lu <lulu@redhat.com>,
+        Liuxiangdong <liuxiangdong5@huawei.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
+Subject: [PATCH for 8.0 v7 00/10] ASID support in vhost-vdpa net
+Date:   Wed, 16 Nov 2022 16:05:46 +0100
+Message-Id: <20221116150556.1294049-1-eperezma@redhat.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-16_03,2022-11-16_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=999
- malwarescore=0 phishscore=0 suspectscore=0 priorityscore=1501
- impostorscore=0 lowpriorityscore=0 clxscore=1015 mlxscore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211160087
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Control VQ is the way net devices use to send changes to the device state, =
+like=0D
+the number of active queues or its mac address.=0D
+=0D
+QEMU needs to intercept this queue so it can track these changes and is abl=
+e to=0D
+migrate the device. It can do it from 1576dbb5bbc4 ("vdpa: Add x-svq to=0D
+NetdevVhostVDPAOptions"). However, to enable x-svq implies to shadow all Vi=
+rtIO=0D
+device's virtqueues, which will damage performance.=0D
+=0D
+This series adds address space isolation, so the device and the guest=0D
+communicate directly with them (passthrough) and CVQ communication is split=
+ in=0D
+two: The guest communicates with QEMU and QEMU forwards the commands to the=
+=0D
+device.=0D
+=0D
+This patch add new features so is targeted for qemu 8.0.=0D
+=0D
+Comments are welcome. Thanks!=0D
+=0D
+v7:=0D
+- Never ask for number of address spaces, just react if isolation is not=0D
+  possible.=0D
+- Return ASID ioctl errors instead of masking them as if the device has=0D
+  no asid.=0D
+- Rename listener_shadow_vq to shadow_data=0D
+- Move comment on zero initailization of vhost_vdpa_dma_map above the=0D
+  functions.=0D
+- Add VHOST_VDPA_GUEST_PA_ASID macro.=0D
+=0D
+v6:=0D
+- Do not allocate SVQ resources like file descriptors if SVQ cannot be used=
+.=0D
+- Disable shadow CVQ if the device does not support it because of net=0D
+  features.=0D
+=0D
+v5:=0D
+- Move vring state in vhost_vdpa_get_vring_group instead of using a=0D
+  parameter.=0D
+- Rename VHOST_VDPA_NET_CVQ_PASSTHROUGH to VHOST_VDPA_NET_DATA_ASID=0D
+=0D
+v4:=0D
+- Rebased on last CVQ start series, that allocated CVQ cmd bufs at load=0D
+- Squash vhost_vdpa_cvq_group_is_independent.=0D
+- Do not check for cvq index on vhost_vdpa_net_prepare, we only have one=0D
+  that callback registered in that NetClientInfo.=0D
+- Add comment specifying behavior if device does not support _F_ASID=0D
+- Update headers to a later Linux commit to not to remove SETUP_RNG_SEED=0D
+=0D
+v3:=0D
+- Do not return an error but just print a warning if vdpa device initializa=
+tion=0D
+  returns failure while getting AS num of VQ groups=0D
+- Delete extra newline=0D
+=0D
+v2:=0D
+- Much as commented on series [1], handle vhost_net backend through=0D
+  NetClientInfo callbacks instead of directly.=0D
+- Fix not freeing SVQ properly when device does not support CVQ=0D
+- Add BIT_ULL missed checking device's backend feature for _F_ASID.=0D
+=0D
+Eugenio P=C3=A9rez (10):=0D
+  vdpa: Use v->shadow_vqs_enabled in vhost_vdpa_svqs_start & stop=0D
+  vhost: set SVQ device call handler at SVQ start=0D
+  vhost: Allocate SVQ device file descriptors at device start=0D
+  vdpa: add vhost_vdpa_net_valid_svq_features=0D
+  vdpa: move SVQ vring features check to net/=0D
+  vdpa: Allocate SVQ unconditionally=0D
+  vdpa: Add asid parameter to vhost_vdpa_dma_map/unmap=0D
+  vdpa: Store x-svq parameter in VhostVDPAState=0D
+  vdpa: Add shadow_data to vhost_vdpa=0D
+  vdpa: Always start CVQ in SVQ mode if possible=0D
+=0D
+ include/hw/virtio/vhost-vdpa.h     |  16 ++-=0D
+ hw/virtio/vhost-shadow-virtqueue.c |  35 +------=0D
+ hw/virtio/vhost-vdpa.c             | 121 ++++++++++++-----------=0D
+ net/vhost-vdpa.c                   | 152 ++++++++++++++++++++++++++---=0D
+ hw/virtio/trace-events             |   4 +-=0D
+ 5 files changed, 217 insertions(+), 111 deletions(-)=0D
+=0D
+-- =0D
+2.31.1=0D
+=0D
 
-
-On 11/15/22 14:48, Cédric Le Goater wrote:
-> On 11/3/22 18:01, Pierre Morel wrote:
->> We keep the possibility to switch on/off the topology on newer
->> machines with the property topology=[on|off].
-> 
-> The code has changed. You will need to rebase. May be after the
-> 8.0 machine is introduced, or include Cornelia's patch in the
-> respin.
-> 
-> https://lore.kernel.org/qemu-devel/20221111124534.129111-1-cohuck@redhat.com/
-> 
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   include/hw/boards.h                |  3 +++
->>   include/hw/s390x/cpu-topology.h    |  8 +++-----
->>   include/hw/s390x/s390-virtio-ccw.h |  1 +
->>   hw/core/machine.c                  |  3 +++
->>   hw/s390x/cpu-topology.c            | 19 +++++++++++++++++++
->>   hw/s390x/s390-virtio-ccw.c         | 28 ++++++++++++++++++++++++++++
->>   util/qemu-config.c                 |  4 ++++
->>   qemu-options.hx                    |  6 +++++-
->>   8 files changed, 66 insertions(+), 6 deletions(-)
->>
->> diff --git a/include/hw/boards.h b/include/hw/boards.h
->> index 311ed17e18..67147c47bf 100644
->> --- a/include/hw/boards.h
->> +++ b/include/hw/boards.h
->> @@ -379,6 +379,9 @@ struct MachineState {
->>       } \
->>       type_init(machine_initfn##_register_types)
->> +extern GlobalProperty hw_compat_7_2[];
->> +extern const size_t hw_compat_7_2_len;
->> +
->>   extern GlobalProperty hw_compat_7_1[];
->>   extern const size_t hw_compat_7_1_len;
->> diff --git a/include/hw/s390x/cpu-topology.h 
->> b/include/hw/s390x/cpu-topology.h
->> index 6fec10e032..f566394302 100644
->> --- a/include/hw/s390x/cpu-topology.h
->> +++ b/include/hw/s390x/cpu-topology.h
->> @@ -12,6 +12,8 @@
->>   #include "hw/qdev-core.h"
->>   #include "qom/object.h"
->> +#include "cpu.h"
->> +#include "hw/s390x/s390-virtio-ccw.h"
->>   #define S390_TOPOLOGY_CPU_IFL 0x03
->>   #define S390_TOPOLOGY_MAX_ORIGIN ((63 + S390_MAX_CPUS) / 64)
->> @@ -38,10 +40,6 @@ struct S390Topology {
->>   OBJECT_DECLARE_SIMPLE_TYPE(S390Topology, S390_CPU_TOPOLOGY)
->>   void s390_topology_new_cpu(S390CPU *cpu);
->> -
->> -static inline bool s390_has_topology(void)
->> -{
->> -    return false;
->> -}
->> +bool s390_has_topology(void);
->>   #endif
->> diff --git a/include/hw/s390x/s390-virtio-ccw.h 
->> b/include/hw/s390x/s390-virtio-ccw.h
->> index 89fca3f79f..d7602aedda 100644
->> --- a/include/hw/s390x/s390-virtio-ccw.h
->> +++ b/include/hw/s390x/s390-virtio-ccw.h
->> @@ -28,6 +28,7 @@ struct S390CcwMachineState {
->>       bool dea_key_wrap;
->>       bool pv;
->>       bool zpcii_disable;
->> +    bool cpu_topology;
->>       uint8_t loadparm[8];
->>       void *topology;
->>   };
->> diff --git a/hw/core/machine.c b/hw/core/machine.c
->> index aa520e74a8..4f46d4ef23 100644
->> --- a/hw/core/machine.c
->> +++ b/hw/core/machine.c
->> @@ -40,6 +40,9 @@
->>   #include "hw/virtio/virtio-pci.h"
->>   #include "qom/object_interfaces.h"
->> +GlobalProperty hw_compat_7_2[] = {};
->> +const size_t hw_compat_7_2_len = G_N_ELEMENTS(hw_compat_7_2);
->> +
->>   GlobalProperty hw_compat_7_1[] = {};
->>   const size_t hw_compat_7_1_len = G_N_ELEMENTS(hw_compat_7_1);
->> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
->> index fc220bd8ac..c1550cc1e8 100644
->> --- a/hw/s390x/cpu-topology.c
->> +++ b/hw/s390x/cpu-topology.c
->> @@ -73,6 +73,25 @@ void s390_handle_ptf(S390CPU *cpu, uint8_t r1, 
->> uintptr_t ra)
->>       }
->>   }
->> +bool s390_has_topology(void)
->> +{
->> +    static S390CcwMachineState *ccw;
->> +    Object *obj;
->> +
->> +    if (ccw) {
->> +        return ccw->cpu_topology;
-> 
-> Shouldn't we test the capability also ?
-> 
->      return s390mc->topology_capable && ccw->cpu_topology;
-
-yes thanks
-
-> 
->> +    }
->> +
->> +    /* we have to bail out for the "none" machine */
->> +    obj = object_dynamic_cast(qdev_get_machine(),
->> +                              TYPE_S390_CCW_MACHINE);
->> +    if (!obj) {
->> +        return false;
->> +    }
-> 
-> Should be an assert I think.
-
-OK
-
-> 
->> +    ccw = S390_CCW_MACHINE(obj);
->> +    return ccw->cpu_topology;
->> +}
->> +
->>   /*
->>    * s390_topology_new_cpu:
->>    * @cpu: a pointer to the new CPU
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index f1a9d6e793..ebb5615337 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -710,6 +710,26 @@ bool hpage_1m_allowed(void)
->>       return get_machine_class()->hpage_1m_allowed;
->>   }
->> +static inline bool machine_get_topology(Object *obj, Error **errp)
->> +{
->> +    S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
->> +
->> +    return ms->cpu_topology;
->> +}
->> +
->> +static inline void machine_set_topology(Object *obj, bool value, 
->> Error **errp)
->> +{
->> +    S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
-> 
-> You could introduce :
-> 
->         S390CcwMachineClass *s390mc = S390_CCW_MACHINE_GET_CLASS(ms);
-
-Yes thanks
-
-> 
-> 
->> +
->> +    if (!get_machine_class()->topology_capable) {
-> 
-> and
->              !s390mc->topology_capable
-> 
->> +        error_setg(errp, "Property cpu-topology not available on 
->> machine %s",
->> +                   get_machine_class()->parent_class.name);
->> +        return;
->> +    }
->> +
->> +    ms->cpu_topology = value;
->> +}
->> +
->>   static void machine_get_loadparm(Object *obj, Visitor *v,
->>                                    const char *name, void *opaque,
->>                                    Error **errp)
->> @@ -809,6 +829,12 @@ static void ccw_machine_class_init(ObjectClass 
->> *oc, void *data)
->>                                      machine_set_zpcii_disable);
->>       object_class_property_set_description(oc, "zpcii-disable",
->>               "disable zPCI interpretation facilties");
->> +
->> +    object_class_property_add_bool(oc, "topology",
->> +                                   machine_get_topology,
->> +                                   machine_set_topology);
->> +    object_class_property_set_description(oc, "topology",
->> +            "enable CPU topology");
->>   }
->>   static inline void s390_machine_initfn(Object *obj)
->> @@ -818,6 +844,7 @@ static inline void s390_machine_initfn(Object *obj)
->>       ms->aes_key_wrap = true;
->>       ms->dea_key_wrap = true;
->>       ms->zpcii_disable = false;
->> +    ms->cpu_topology = true;
->>   }
->>   static const TypeInfo ccw_machine_info = {
->> @@ -888,6 +915,7 @@ static void 
->> ccw_machine_7_1_instance_options(MachineState *machine)
->>       s390_cpudef_featoff_greater(16, 1, S390_FEAT_PAIE);
->>       s390_set_qemu_cpu_model(0x8561, 15, 1, qemu_cpu_feat);
->>       ms->zpcii_disable = true;
->> +    ms->cpu_topology = true;
-> 
-> shouldn't this be false ?
-
-:) yes
-I forgot to change this when I change the logic.
-
-Thanks,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
