@@ -2,142 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1816762C867
-	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 19:55:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F64262C89F
+	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 20:02:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234270AbiKPSzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Nov 2022 13:55:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52876 "EHLO
+        id S234129AbiKPTCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Nov 2022 14:02:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239287AbiKPSy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Nov 2022 13:54:58 -0500
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2053.outbound.protection.outlook.com [40.107.101.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DBFB654C1;
-        Wed, 16 Nov 2022 10:53:45 -0800 (PST)
+        with ESMTP id S229863AbiKPTCW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Nov 2022 14:02:22 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2057.outbound.protection.outlook.com [40.107.244.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B8C731201;
+        Wed, 16 Nov 2022 11:02:21 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ro26fusu6otApd5rQyYgP3VO9GaYvQPdoW/alRZMoFKWTB/2ilZRnvEjrW4jFISugMGDOt5rOfTQCEjz50zPBs7fj0RJfdcdF8Go6rsJrhbJPna5CldsQmaD8yhoXn2TkVBToUU7fF1TJ2zP8vrrL3Z3sNqnx99aBUM98avN7Ewl/6Ujo5c+jNZXSUMe/8xZHkGccO4vUClgkIKO8dPD6MmRQ0VNtcj1xOiU2fa4kPLxKbrndi0s/2TfD+p3oaH+p9JuZc+HpMnlwltkI7Cnru2g4jPxYTV26mK/Bb9QNS+TZ8McfUlRZLS4J+7GssNuXcDSOFApshHN7RNuKjGU5w==
+ b=fD+97ZWfd2MNUy+GOB4rDcgpeu9My/4R9M/o/JewSsMducDVQ8eTjpN/f8s3+51ZYDZgzr5XsuBeUMXiJBK1AL4I3QDfGZ0Mv12MqJEt4Uq62azpylHAGZLi9MyGzbZTL453pBQuaajiXALvnHCuWnzZQwzT9vHi4XjlvPa61dza4h+grxrWdEWJI7EGxIAxzD1I2TQ7cHNao8waoazNqbJPwzrE1ch/n1nL6R9fdNuUmrulfhgHWvuMya3IV/99KaX8Iv1bPCgGo5nIknIdr7mJFPMRabZpZY9nYWCXPlNH7UpR08WpYTtK3yklRnDi+mSo7uO0iEynU+2DrejCRA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8UkIagF1d99o20SCsMaBbvUSNbhqPrZZV1gKvFDx5wE=;
- b=mmQdNhO13hu//f6EW7QfLUeEhgGCrNTycgx6ydEDSdmZ0V2k1cOY2elwTIeHicp+xKICOiSw7GpApZzHJ+vSHtt8+wRS7gzXnTLmjbj20fNuY/8i1e7fhRIGJQt+gH28EoRY/ZbfbgOCK+sdxEGQDwui9wKIbkAYSrBbmkyukfv5rl7HhkmVZFDbu/nLS72rFj7/NfXAkklYYHug5SmENV6HsPWWcTu54GscyRjAZx9z3ce9QMU5TWyuK4bqKLrF5qfSall1R9ffyBe+Miskq56A0h/oH2fr61qbTJbIvVx1D8hciNwbp8TCW/oSj2MuzJEMRhN5ROhdCc1ZBZBykA==
+ bh=2M+zKUDQz+iz7jXx7oo3P/JPauyWDDTbL0Dy29TSSuM=;
+ b=IQM8HgWxwjBH8vGVcVCCIKMMVnOPHgehgJnV0ECrp9AIIvTdZ+r47B0GxhtcxrKPezjcGd+S6As4jnr56E/17GqZ+rVpPVkzew9ddsnO+8CGFiXRzbG8rUQMn11tQwBAvmkDSWdpIvSO1i/AnSHdrPR4ql/09yxbXqcWvEQ+5LEwTxsoY0KnNL1ZbpJ9GelTi9aOkAMKsha9htS6VtgqLXekAkX4VuNXy74f2pzD26GqIlg5OblpN0uBVGuLxF1V4a/z+ykVnNnBrvPL/9W9KgB13CMdg9rf8PGwY2d+oG2yW3vTPlyp6zwaZN7/mcO25PGe9sxwxQpZiQ86Z3ehdA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8UkIagF1d99o20SCsMaBbvUSNbhqPrZZV1gKvFDx5wE=;
- b=N5rX13OWewBCgAd9Oh2qHJ4wFz6AVW3yD4Xdbr3IFf5HS/SOJaxNaNCo6lPMdtF5rKFEcGmRmavUIXMlZFm+Foy/+6TruO1j70pHVrn04HVz7JaIizkfaaTHK5fI4IPN5hmvfJq/anNPqiNmf8OXMTFsnJaCWVJbbJM2VxBPGZA=
+ bh=2M+zKUDQz+iz7jXx7oo3P/JPauyWDDTbL0Dy29TSSuM=;
+ b=N8AsPToodJnyjSgS7Jf4VorMUffTNY8Ros2b1B9CiKsjoz/kFUIkJ9QsB4V+aIrTRUoh4ulbpXmED2aG144ZULg0xgCFeZRa8UJMlPjcdjlaAby/o+dEV+Grdf9f9c10O+NQvTS75otSSKiCReqNxkXjbAD3y/d5m8/+V71pMN8=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SN7PR12MB8025.namprd12.prod.outlook.com (2603:10b6:806:340::12) with
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by PH0PR12MB7096.namprd12.prod.outlook.com (2603:10b6:510:21d::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Wed, 16 Nov
- 2022 18:53:43 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::395:21e6:abfd:7894]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::395:21e6:abfd:7894%6]) with mapi id 15.20.5813.018; Wed, 16 Nov 2022
- 18:53:43 +0000
-Message-ID: <834d41e7-44f8-53f9-a1fa-0cdb5aaff30f@amd.com>
-Date:   Wed, 16 Nov 2022 12:53:36 -0600
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.17; Wed, 16 Nov
+ 2022 19:02:19 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::4da8:e3eb:20eb:f00]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::4da8:e3eb:20eb:f00%2]) with mapi id 15.20.5813.018; Wed, 16 Nov 2022
+ 19:02:17 +0000
+Message-ID: <3e50c258-8732-088c-d9d8-dfaae82213f0@amd.com>
+Date:   Wed, 16 Nov 2022 13:02:14 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH V5] virt: sev: Prevent IV reuse in SNP guest driver
 Content-Language: en-US
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Vlastimil Babka <vbabka@suse.cz>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        michael.roth@amd.com, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org,
-        "Kaplan, David" <David.Kaplan@amd.com>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Oscar Salvador <osalvador@suse.de>
-References: <dc89b2f4-1053-91ac-aeac-bb3b25f9ebc7@amd.com>
- <Y2JS7kn8Q9P4rXso@zn.tnic> <c2ce6317-aa51-2a2b-2d75-ad1fd269f3fa@amd.com>
- <7882353e-2b13-d35a-b462-cef35ee56f51@suse.cz>
- <5b27a05e-09ad-9139-67b1-77b90731419f@amd.com>
- <9d9f1afe-c981-4df9-f012-89c4cb783cc3@amd.com>
- <973c6f79-38ad-aa30-bfec-c2a1c7db5d70@suse.cz>
- <8692e736-7518-d6d2-ae83-720e42e7a059@amd.com>
- <41b8c83e-2a1a-1dda-945e-99329ca8e7e9@suse.cz>
- <711e6027-1b4f-4aed-47a6-305396d05893@amd.com> <Y3Us9wSX9DrWqCyq@zn.tnic>
-From:   "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <Y3Us9wSX9DrWqCyq@zn.tnic>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     Borislav Petkov <bp@suse.de>, Michael Roth <michael.roth@amd.com>,
+        Haowen Bai <baihaowen@meizu.com>,
+        Yang Yingliang <yangyingliang@huawei.com>,
+        Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>, stable@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20221116175558.2373112-1-pgonda@google.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20221116175558.2373112-1-pgonda@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR14CA0017.namprd14.prod.outlook.com
- (2603:10b6:208:23e::22) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+X-ClientProxiedBy: MN2PR20CA0039.namprd20.prod.outlook.com
+ (2603:10b6:208:235::8) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|SN7PR12MB8025:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4865fd36-edd4-48aa-5921-08dac803e21e
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|PH0PR12MB7096:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5235e525-aa69-46dd-ac58-08dac805149e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2zATeLJU0hDHEzzfM9zN/QCLXrAGNVZ+swOvnGDQ0ZBoxjY0LreZphjFj2U6ZzUmOcTp/BOi9Axo/39+0I3MMczHQMnCRwmacPwdQW6Qfzw7Aw9YQKjG/M3YiTfKCNL4QuVo+2JaFXuVJxZ+i9UQbriJJQp+VDsbb5qOPthWfRU3azFFLWQCMJf8+6hWNR4XutfgbAAg2iK1npKfQtz+OlS4b5zv/j18cQSmF491brApT6srX3LnDjpCHQEzKf6JC9oZya/TBySaC4mxz9RoXT9w5TAJFY/SKR4eQ9IBBCT2UKP3rVRycp07rqldgafUBWIU1grbMYgxQE9LQ9OnWfIhmBSqQP7s4NWtnD5dwMA6yQIxci7Rfi2+7KxjHvRUOV5S4541ReB2B45Qbrz+cyewcGBzhj4z5kn33n+keU6+5xGXd7ikd0iPSj9uycxTO+slU1jsbct7rTobITjQ7byjOoFRxh0b840UPQ+cZhjED8JYxDG+J/7eZSoJUSHkRlOPT1IKQliiNXuo55JwWO+DkETn2B2Oj8zd6mcmq1VxpUVggVp+0mzmVQsni14hL4k9WNwH3dKnliYI7ryJ154NRFB1Ija+/St86GceJlLgq6QW8ZzNnAsbeO1zWnXpvBuF2uJHnY/IRm3Yn4RkcaZ7U7zUAovA0nTH0dtTTm0IRByKiTGY+exlHwpeku+yjGiotT/+sq9Gv5/45fyNZUpwdNlk4gxuiPr3QX9f7qnmHJFlC8YKmHxBH/HvthLni7MIvJIqEyCl66OKOJB8EyDDraW/fyvN+2mX78QugUo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(346002)(136003)(39860400002)(366004)(451199015)(6666004)(83380400001)(86362001)(31686004)(6486002)(478600001)(36756003)(4326008)(66556008)(66476007)(8676002)(54906003)(6916009)(316002)(53546011)(66946007)(6506007)(2616005)(186003)(41300700001)(38100700002)(31696002)(2906002)(8936002)(5660300002)(7416002)(7406005)(26005)(6512007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: yytGplZ719u4waJfX1gTOaJ8elo+EZuhHSDOtVJYZ3fsEPy/iyoRH1pv9Ynik8rqM66Z2KAl/gwzkqALuseArftZ1XuRO6gjp4NMoogiiIIUMM3nQv9LuBOfFuaqz8Yzdskx9iUW85mwSYHYup0L/O05LoX8uUG5CXxBhA2zx1ZQh7Tdv7f5/d+Thth73+Iypv1JHPWnXYtT1VVXk0YqZSp/BXxhJ55FT9YY5GmRufYRqmMiAlnhFifI6SPOLzEpur+NEIpVzG5NvCRsw3svkPDyTuhERwb8IpuUQBVG0iUiJ1WgiVM24k/AASgrUCn3WG+f6GJuKLUkQ1W0cwGMmIsL0/uYDaXcicPFoQIjeH0HyueK2ro3BelNqUfEIH6iBMZiHSGY9aibr8q4wCGSKWVQ4xdWWuqhym/Gtj8ToeUXJGitCCUH7J3Ekq6luXFtKxpqeUyp+thMAW5oQ1WuRe9H3jaCbwYEFcucrwlgeTmwSVda9ocaUPTmW7NvosKpHNW4SnNKQBR5D5khtU5eQDt1hhsGGvl4cBrzB+S4yOwkDx94ATBkg0hQ/TNYqO+6LOJ0SYp5iz2k0vnZtq5y2uEGLZ0cGeIjfzGxg0i+p+SqTTv3V+GVL5GXXFfDDtXUZwyRBvjthuYlRC5XaSApWGfmOJ8SgHYO3AHoRiQ6Ysk35kv6ZA/sdXoQkdig9csI2a1bR8S50k1aYVpINukNJOkogoi0vNfazriVWb8gjpVHueUbwT9YNrUE3/JtoYCyib8kjI3g1JBwfp+LEGfG6ztpNslD2qQG+4aYsXXFzMQ=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(39860400002)(136003)(366004)(376002)(396003)(451199015)(31686004)(8936002)(7416002)(5660300002)(66556008)(66476007)(8676002)(4326008)(41300700001)(66946007)(316002)(6916009)(54906003)(6486002)(36756003)(6512007)(26005)(6506007)(6666004)(53546011)(478600001)(31696002)(2616005)(2906002)(83380400001)(186003)(38100700002)(86362001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TWJiaTluRTRRNkhGOVJhNGpOd3l6bit2Nlh0Mk8reE9UR2RYYXErcWhOQkdR?=
- =?utf-8?B?dFNSeit5ckJ4bSs0RzVDSjdIeThuc052Q3dLODNJTEhYYWhhbUtWZ1NqY05O?=
- =?utf-8?B?RjFqdVkrWG1zU1hCK3FkUkZYMGVSZ2hyZ3JaR3lWb1FNUEd0aW1rRnpyRlYw?=
- =?utf-8?B?WUUwcWEvOVM4emlGZHVrR3RwYU5vcEs3QVpaOFk4SDFqak5Kem85YlRDdFpM?=
- =?utf-8?B?R1ZCL0lWSHZ3cXRIbVh1WnRwQ1hMV05KMENweW9US204MGhiK0cxUlIybmlo?=
- =?utf-8?B?eHczUnJsaGRNYmNRVVh4TGlKTE02aFliM2JnNG5lbmxBdEFKUXZNTHZiOWx2?=
- =?utf-8?B?SkN3TXcveE51VkdZaWRRZi9MR0ZVV3RldzRHazRBWUp1QmQ5RkNxbFJ0cFF0?=
- =?utf-8?B?ZGF6cFg3RU1LTXMzUStPYUliYWE0bnVRUldsSWpoMnU1K1JSVUNMUWkzeTYr?=
- =?utf-8?B?Smp6ZUcrTjV1aWJ3MjV3NjdjcmJKZ2k4TUNLcjR1S2l1M2hWUHBqSkxPMzhD?=
- =?utf-8?B?NmpTWnQreDZISEYvRFhIcENXblR4Qi9UbzUvTnJTNkpsNjFWdVFxN25JK0Na?=
- =?utf-8?B?T0p0eENVNUJuVjFtMWxZVW5WYWExUTByS3lXT0Rad2w1VzVGRXlvZWdVcS9N?=
- =?utf-8?B?SjlZWVB3SGdSTFovRno4VnF2VWUxeWJiWmhQSWowa2RHaVlLSitxMXZVU3Rk?=
- =?utf-8?B?KzVVNHA1blhQcU56dWNvMVVIMkt3ZUtJcDNzZVVXczhucUZCeGwyUUJkVGRB?=
- =?utf-8?B?LzlIU2h1bmd3L0EyK3FGcnB1MFJqd0RUb0c4SXJheGpzZUxmYkJqS3NGYWZj?=
- =?utf-8?B?dkhtbkp3K0x5SmxlWWtyNC9MUUhsVHdFVHlYVXI5WTBTNDlmOTZ5aHlhNFVK?=
- =?utf-8?B?VHcrTkcyZElOWTdJTUs3L01wUVB2N2F3MzBjVWsvUklqUWVON2Rwa1NwTkJH?=
- =?utf-8?B?cGM0aDEyUmpzTXdnaFNWcGg1NkZtMnpjM2VkZ2JjZWdRcGx3N2R3Q3pEbEZl?=
- =?utf-8?B?V1A5Mm5UWGo5MGtCdWFLVmdIelhsam04VG1rSGxKaW12UktiNGprMjgweFV4?=
- =?utf-8?B?a3JKVnIza0dCN2JHZTExdmczSldjTTRpQSs2RUtqVDdYWENubG9zN0UxN1gv?=
- =?utf-8?B?dFZlbWUyTDcvWXM1QWN1dGJ5NWlTTXZ4WUVrOGFSQ0hKOWZCRFRiZ2dTNXdN?=
- =?utf-8?B?ODlIRXdzcmVYSUx2R0JVWmx1MFRHOU5kVHBvMHFsTWYveS9KN3prRjR6ZDdV?=
- =?utf-8?B?SW43Vjg4ZkZWLytHTUQ0aE1zY0FpbXl4OWwvK3Q1L3IvMWlmdnN0S2J0TDNt?=
- =?utf-8?B?WjI1Q0YyVEZZSXZFRWxhbHNCcittQmZlOWJkQXY2SGdZdDJKYUd4R3VJeFRQ?=
- =?utf-8?B?SjBncmV4aDNvcGU3UkYrcHZxVWtjM1A5czA5RUlwR0lHQmpqZFdUNG1YZHp2?=
- =?utf-8?B?M3lQTGN1a0dKWnVML1BqMWx5R1hwU3lVQy9CTVJCTC9qTU5LY21XZjd2MUZk?=
- =?utf-8?B?T3FublI0Wjl0MGFCTXRYQlozdHRreE5PRTdodHErc0p3N1lLUWJhNHEyWE8v?=
- =?utf-8?B?OGgrVGVSSS9rS21WZTI2VHhVSzI4SEFEbFBIbWUwVytzQlE5bS9oQm8wWHMy?=
- =?utf-8?B?RGVOekxZK3BRZnlUZWt4VWxrdS9haFhBMnppZ285UzB2UUVoeWxKNWRZRlh2?=
- =?utf-8?B?TXVsVGNxOHBtZjBUQXVTOVJCeHNoeUZQem15SmpMNnpwWU5UQjBwWjJaZmpL?=
- =?utf-8?B?Qkg1Tmp4Z25nVG1SdzBwSm4yQ25VajExcHdyTTQ0VDYvbFdWZzlqVll4UitZ?=
- =?utf-8?B?VnN4V1FxMlBkM1d0OER1eExheGoyTTZld1UxY2xOeXNXN1RMOEVhM0pHYUdh?=
- =?utf-8?B?UGJkNzRBcks5ODZrWE05NU4wVnlzWkVmMUxPK0prbmpOK1RUb1dyb3RRcWVi?=
- =?utf-8?B?WGVUVmFWZnA4akJqZkFWRDJUajMvSkI4MVJHNDhNUjJlamVVUVg1Qkhid0Z2?=
- =?utf-8?B?MG96TmJDdml2MnNQS1JYdTMvVG9Pb05ESkMvanNtekp5bW5LKy9URnR1eWVu?=
- =?utf-8?B?SkNNU2R5VnVIMEduTTlaV2tDNU9vRUJPc1FmdGE5TkFOSmNOVjcvUThBZHJq?=
- =?utf-8?Q?Av6H6hP5gIQORolV69nObEJ/i?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y0JocEp2elByTzNxUWNMRkM4TlF2YUhEbUtKd003VFFyZld3TnZ1RXdMbFM3?=
+ =?utf-8?B?c2hzS25SOHdNTGNpbHpIWng3UDZMQUNIQTk0ZEFLZFVmUUxZWGhNcXVONEpW?=
+ =?utf-8?B?Y0REMGkwWVVLRE5CbmxEcEptMGNmdVQ0bzA1NUd2MHJTM3hGMkxPNlJNZGo0?=
+ =?utf-8?B?VXQ5Q0R0aWtocUljbENtTFBMMzdFUUFYRk5RVisxMk9NSlV3MUF3TW9WSWpt?=
+ =?utf-8?B?QWJ4SVBoRDFmTE9jMnJNMkRpd25YNHNBZ2ltUDk2WmY1NGJNaGJBZzhOcTdh?=
+ =?utf-8?B?ZnU0MWx0eTlUdVVEQ0xwNmtGK1lkZGgxMVFybXg3UkkyZHl6NkdyVTZQUldQ?=
+ =?utf-8?B?UEFFTXpZTFJMSEw2YStZaHR3Q1pTQ1V2dldLcElwdVZhZUZjc3V0TlN4UWtp?=
+ =?utf-8?B?Nmd1bnR6UWp6Q3lCTE11a3c2UUFNaEF5QWJwQk0wQ2Z5dDBzSWhTTnBiRnpv?=
+ =?utf-8?B?MjdvNkh6SXNyTTFodFRUYk16Y3RBUVU2RkpPbklzWjRxQkNrY3c3bjByOXVk?=
+ =?utf-8?B?bHlqYm56T1lIMXkwTk13bC8xdDJ4RFp6eWZJRlpURXBlRGVXVkFaYTFTdlpt?=
+ =?utf-8?B?MFdxZVkwNVhZbjFJcDZleEhqQ3dDWnBqOHl4L2pKdUd1WnNrQ0w3VGl1My80?=
+ =?utf-8?B?NzJ5RDd1MnpoOE1vVzJRMkNnTlAzM0VWWTJUZSs0VWdYTkJMRGY2Sm5KNjEx?=
+ =?utf-8?B?R0tMbGJnUnFRTm5na1o3VlZCTjN2MFcybzZvNkRlby9kUDcyNjlDVS9GQVl4?=
+ =?utf-8?B?TFpsNU9IUGhlcGl3YlVRZGlEYWg4MzBYUnpTVmVGaXg4NmZmK2Qya3NpT2or?=
+ =?utf-8?B?ZXZaSkVKa3A0eEpzdjIxZVl0T3E1RFhSMElGcGpCaThvcTFJVWFQcDdTaDNl?=
+ =?utf-8?B?QXNPRGlmNTAra1dtQVVST1QvdmRYL1l2c2wyQXM1VUNBOWNuRHhqWkExbktR?=
+ =?utf-8?B?S1BWaDJzTFMxdW9TM1V5aGhsNWVGVVFTNHF5S1pEOGROOVZZR2R3ZkY2ZkNM?=
+ =?utf-8?B?aTRyZDEyd3lNYTBDbmNZSWd0MmZEaXBjS2k4R25BdmN5UzlkaEpDeWk3S1FU?=
+ =?utf-8?B?enBSaERMVEVqTEdacUFtdGRZdHZyU1kvemUydkN4VjduZ1BvRGVJTHRJaWxZ?=
+ =?utf-8?B?cUN0RlYzZzdoRkJnczMreldEUlNiY1BnOWdxZWJKMVpndjdmWXQ3em4yNFlq?=
+ =?utf-8?B?S3hUd2UybHdibGZLRVMrTzZoMWlTazZPOXN6ZVpjdmRpU0lNYVdZSTBnZDls?=
+ =?utf-8?B?NTJyMVRLN0dyQUJiajdvQS9mQUlmRk9UbStoR0VRZjRPSFBOWVZuK3VRbTZv?=
+ =?utf-8?B?OE5qbFNVeUF0ZDQydVcyVGlmZlNTcEJzS3FxbmZjbEp2a1BmM2JCRmtEZzJy?=
+ =?utf-8?B?UFBNT1ZYQ2lMVitZWTlmRXdva0NNNTdOUlNidjQxKzNCWUVHcithR25iUDhF?=
+ =?utf-8?B?enZCNEV5bUNXSDZ4OVR2UnZ0Q3VMUWJxRkV4ZkhyZ2NCN2w4eUdxam11UkZm?=
+ =?utf-8?B?ZWVmV1hjdHBjRlpNVWY4TzNYMDFiZGpzQXpHYXVuZ0xOREtIR25qelpTWUs5?=
+ =?utf-8?B?NFd0djV1eVNRajhjOUVQeEZFL1QwalVBTXMrVDlmUmZ2SjNVdlFHUXdTaVZE?=
+ =?utf-8?B?Y05nRWdXVmJNc2VXb3J1YnZ2TCs0OHd6cW5sOGdtTWh2azJmUFRKS1hMSnVL?=
+ =?utf-8?B?d3preFVzWWVGVFkxSWhaV2hLS2ZsZTA5aVNSTUVOUVh6RjhIV1JsWUNxdmp2?=
+ =?utf-8?B?bU5zbGFhV3J6MjRoVUp1dnFmYSswbFh2N1NxZnBPU25JTFZoZmUzTExlSThs?=
+ =?utf-8?B?U3FhZFNDNitod0xad1hSZXk2NmJRR0oxclU4SFBoM0oxdUt1OWhsZUxNQUJV?=
+ =?utf-8?B?cFpMM2VxZmdXQ2ZqbXp0KzhZcFZISzArVTBBbFNGclUzZXNlejFVK2ZLdC9m?=
+ =?utf-8?B?RDBxcEZ4K1VRbjNjTHBhSW44YWY1SEk1S2lQLzBWMURpUWlkeVNBYmtzdks1?=
+ =?utf-8?B?b0tORm1EK1pMSE4zWlYyNXpNNCticU8zYkQwR1Ixb040Y1lUSm52L1ZtbW9K?=
+ =?utf-8?B?ZDdGVlAxTWh4ZEFMRUFtRmRNUkZ6OS9xcmtZT1VjZTF6TXMrYzIxaHlweDlG?=
+ =?utf-8?Q?PHlALw1UbgjWhpfanAQ1nWFNC?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4865fd36-edd4-48aa-5921-08dac803e21e
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5235e525-aa69-46dd-ac58-08dac805149e
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2022 18:53:43.2318
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2022 19:02:17.4087
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LWyW+0x9LgX0hQQO5W0wVtDSC05iAXlY6fXbiE2T2SPzZNOwx6YbPNLZLDtIH5DaDYnnwo7ThdeFSlrJ0eadsQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8025
+X-MS-Exchange-CrossTenant-UserPrincipalName: gvS+eWQxPf6udg+qDeYgNinNc5B0x0ueaJ1Q7mW8ESTBg2uJ3NX72GzPVtM78p6UIxniQJx6rJlIiXBXJCI2pw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7096
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
@@ -148,37 +129,177 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/16/2022 12:33 PM, Borislav Petkov wrote:
-> On Wed, Nov 16, 2022 at 12:01:11PM -0600, Kalra, Ashish wrote:
->> Ok, so i will work on implementing this leaked pages list and put it on a
->> sev/snp associated structure.
+On 11/16/22 11:55, Peter Gonda wrote:
+> The AMD Secure Processor (ASP) and an SNP guest use a series of
+> AES-GCM keys called VMPCKs to communicate securely with each other.
+> The IV to this scheme is a sequence number that both the ASP and the
+> guest track. Currently this sequence number in a guest request must
+> exactly match the sequence number tracked by the ASP. This means that
+> if the guest sees an error from the host during a request it can only
+> retry that exact request or disable the VMPCK to prevent an IV reuse.
+> AES-GCM cannot tolerate IV reuse see: "Authentication Failures in NIST
+> version of GCM" - Antoine Joux et al.
 > 
-> See __sgx_sanitize_pages() and the poison list there, for an example.
-> 
->> Also to add here, we will actually get a not-present #PF instead of the RMP
->> violation #PF on writing to these leaked pages, as these pages would have
->> been removed from the kernel direct map.
-> 
-> So if you do the list and still have the kernel raise a RMP fault for
-> those pages, traversing that list in the RMP handler to check whether
-> the page is there on it, should be a lot faster operation than doing the
-> #PF thing and removing them from the direct map.
-> 
+> In order to address this make handle_guest_request() delete the VMPCK
+> on any non successful return. To allow userspace querying the cert_data
+> length make handle_guest_request() safe the number of pages required by
 
-Actually, these host allocated pages would have already been removed 
-from the kernel direct map, when they were transitioned to the firmware 
-state. So actually the not-present #PF fault will happen on any 
-read/write access to these leaked pages instead of the RMP violation #PF 
-(not-present #PF has higher priority than RMP violation #PF).
+s/safe/save/
 
-If these pages cannot be reclaimed, they are unsafe to use and cannot be 
-added back to the kernel direct map.
+> the host, then handle_guest_request() retry the request without
+
+... then have handle_guest_request() ...
+
+> requesting the extended data, then return the number of pages required
+> back to userspace.
+> 
+> Fixes: fce96cf044308 ("virt: Add SEV-SNP guest driver")
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> Reported-by: Peter Gonda <pgonda@google.com>
+
+Just some nits on the commit message and comments below, otherwise
+
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Michael Roth <michael.roth@amd.com>
+> Cc: Haowen Bai <baihaowen@meizu.com>
+> Cc: Yang Yingliang <yangyingliang@huawei.com>
+> Cc: Marc Orr <marcorr@google.com>
+> Cc: David Rientjes <rientjes@google.com>
+> Cc: Dionna Glaze <dionnaglaze@google.com>
+> Cc: Ashish Kalra <Ashish.Kalra@amd.com>
+> Cc: stable@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: kvm@vger.kernel.org
+> ---
+>   drivers/virt/coco/sev-guest/sev-guest.c | 83 ++++++++++++++++++++-----
+>   1 file changed, 69 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
+> index f422f9c58ba79..64b4234c14da8 100644
+> --- a/drivers/virt/coco/sev-guest/sev-guest.c
+> +++ b/drivers/virt/coco/sev-guest/sev-guest.c
+> @@ -67,8 +67,27 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
+>   	return true;
+>   }
+>   
+> +/*
+> + * If an error is received from the host or AMD Secure Processor (ASP) there
+> + * are two options. Either retry the exact same encrypted request or discontinue
+> + * using the VMPCK.
+> + *
+> + * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
+> + * encrypt the requests. The IV for this scheme is the sequence number. GCM
+> + * cannot tolerate IV reuse.
+> + *
+> + * The ASP FW v1.51 only increments the sequence numbers on a successful
+> + * guest<->ASP back and forth and only accepts messages at its exact sequence
+> + * number.
+> + *
+> + * So if the sequence number were to be reused the encryption scheme is
+> + * vulnerable. If the sequence number were incremented for a fresh IV the ASP
+> + * will reject the request.
+> + */
+>   static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
+>   {
+> +	dev_alert(snp_dev->dev, "Disabling vmpck_id: %d to prevent IV reuse.\n",
+> +		  vmpck_id);
+>   	memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
+>   	snp_dev->vmpck = NULL;
+>   }
+> @@ -321,34 +340,70 @@ static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, in
+>   	if (rc)
+>   		return rc;
+>   
+> -	/* Call firmware to process the request */
+> +	/*
+> +	 * Call firmware to process the request. In this function the encrypted
+> +	 * message enters shared memory with the host. So after this call the
+> +	 * sequence number must be incremented or the VMPCK must be deleted to
+> +	 * prevent reuse of the IV.
+> +	 */
+>   	rc = snp_issue_guest_request(exit_code, &snp_dev->input, &err);
+> +
+> +	/*
+> +	 * If the extended guest request fails due to having too small of a
+> +	 * certificate data buffer retry the same guest request without the
+> +	 * extended data request in order to not have to reuse the IV.
+
+... in order to increment the sequence number to avoid reuse of the IV.
+
+> +	 */
+> +	if (exit_code == SVM_VMGEXIT_EXT_GUEST_REQUEST &&
+> +	    err == SNP_GUEST_REQ_INVALID_LEN) {
+> +		const unsigned int certs_npages = snp_dev->input.data_npages;
+> +
+> +		exit_code = SVM_VMGEXIT_GUEST_REQUEST;
+> +
+> +		/*
+> +		 * If this call to the firmware succeeds the sequence number can
+> +		 * be incremented allowing for continued use of the VMPCK. If
+> +		 * there is an error reflected in the return value, this value
+> +		 * is checked further down and the result will be the deletion
+> +		 * of the VMPCK and the error code being propagated back to the
+> +		 * user as an IOCLT return code.
+
+s/IOCLT/ioctl()/
 
 Thanks,
-Ashish
+Tom
 
-> And sorry for misleading you about UPM - we were thinking wrong
-> yesterday.
-> 
-> Thx.
-> 
+> +		 */
+> +		rc = snp_issue_guest_request(exit_code, &snp_dev->input, &err);
+> +
+> +		/*
+> +		 * Override the error to inform callers the given extended
+> +		 * request buffer size was too small and give the caller the
+> +		 * required buffer size.
+> +		 */
+> +		err = SNP_GUEST_REQ_INVALID_LEN;
+> +		snp_dev->input.data_npages = certs_npages;
+> +	}
+> +
+>   	if (fw_err)
+>   		*fw_err = err;
+>   
+> -	if (rc)
+> -		return rc;
+> +	if (rc) {
+> +		dev_alert(snp_dev->dev,
+> +			  "Detected error from ASP request. rc: %d, fw_err: %llu\n",
+> +			  rc, *fw_err);
+> +		goto disable_vmpck;
+> +	}
+>   
+> -	/*
+> -	 * The verify_and_dec_payload() will fail only if the hypervisor is
+> -	 * actively modifying the message header or corrupting the encrypted payload.
+> -	 * This hints that hypervisor is acting in a bad faith. Disable the VMPCK so that
+> -	 * the key cannot be used for any communication. The key is disabled to ensure
+> -	 * that AES-GCM does not use the same IV while encrypting the request payload.
+> -	 */
+>   	rc = verify_and_dec_payload(snp_dev, resp_buf, resp_sz);
+>   	if (rc) {
+>   		dev_alert(snp_dev->dev,
+> -			  "Detected unexpected decode failure, disabling the vmpck_id %d\n",
+> -			  vmpck_id);
+> -		snp_disable_vmpck(snp_dev);
+> -		return rc;
+> +			  "Detected unexpected decode failure from ASP. rc: %d\n",
+> +			  rc);
+> +		goto disable_vmpck;
+>   	}
+>   
+>   	/* Increment to new message sequence after payload decryption was successful. */
+>   	snp_inc_msg_seqno(snp_dev);
+>   
+>   	return 0;
+> +
+> +disable_vmpck:
+> +	snp_disable_vmpck(snp_dev);
+> +	return rc;
+>   }
+>   
+>   static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_ioctl *arg)
