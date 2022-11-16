@@ -2,475 +2,267 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B3B562B790
-	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 11:18:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6010262B798
+	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 11:20:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233074AbiKPKSG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Nov 2022 05:18:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54020 "EHLO
+        id S233171AbiKPKUI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Nov 2022 05:20:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233038AbiKPKSF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Nov 2022 05:18:05 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3E1B1573D
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 02:18:03 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AG8mvOG029735;
-        Wed, 16 Nov 2022 10:17:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=hsCK5oAssZcDcSpCm8qAahByPqFupFQwLOZJCv9GQhw=;
- b=ZxYm8KCizwu22GkKM3d7D4pidKhPnwAoW2uzYU36NQLJmYIjlHg+xf8B8ejwsdlZXrxY
- C4RErfd7PKqR3tc8yDFMk9vgW6G2EqhpmY8v4YiARt2lYseXMrfTfOzDLyUCeJKhQgcK
- av9JkNs42jlNRYRcl19Gs+uuU8YUEpAKT7XLuKmjMU6MdXlRBYI6A6gF/pSSoGzH60Ui
- bYpGHoVlq0XcRDGsb9LrBEIJnioZrgdSLhFndYylt+7KYM6nQQJ+pyCoFtP+6nS15QhV
- wrSM1gi5+jFXdiS29k4GwOGDtRkD2SAQo6DA94jFY+s9UqdWU+0MPk1/MLlwdh7o4jAa 4w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kvvpc9yub-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Nov 2022 10:17:51 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AG9sRaU011215;
-        Wed, 16 Nov 2022 10:17:50 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kvvpc9ytr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Nov 2022 10:17:50 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AGABheY015940;
-        Wed, 16 Nov 2022 10:17:48 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 3kt348wqfa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Nov 2022 10:17:48 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AGAHj1J63963524
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Nov 2022 10:17:45 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4FF3052052;
-        Wed, 16 Nov 2022 10:17:45 +0000 (GMT)
-Received: from [9.152.222.245] (unknown [9.152.222.245])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B7DE652050;
-        Wed, 16 Nov 2022 10:17:44 +0000 (GMT)
-Message-ID: <8e184318-d362-36e7-1930-671660cfddea@linux.ibm.com>
-Date:   Wed, 16 Nov 2022 11:17:44 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH v11 03/11] s390x/cpu topology: core_id sets s390x CPU
- topology
+        with ESMTP id S229801AbiKPKUH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Nov 2022 05:20:07 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2085.outbound.protection.outlook.com [40.107.220.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 885B312A9D;
+        Wed, 16 Nov 2022 02:20:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=I2hFwo9F0dAacHqTkE6CsYdHVn1LZ8WreKUsF4ZiHBrihEiFENMrnJQutcjYUso31g6SgVR0ExkdXm6eJvd+Eg/TL7ozjjyN2oTk9NHqDQTnpRsjrL1xR8xqo0lMnHjBoyqh6bDGnTyJrAaQa7dk+mCplKimCi2WZNP24Oc1slbR5iF85IBS0ulCs4BNjhXhywK2xXOVr1RwcITYjZqS9wUAoznhLCVMqHigg5E7Tcfzsu5TajmZXA8i28HfUAHr2dzco3+Khf1c/ZSUInrN8lZgNmPowSnJfn9TJMen1nmDA5SCIXHBicktC2iesUl7shzByWPukfDL+/RZ5DC6Mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0B+4SO4SCmdqLKKG7vS6vUqwAozhNwIbNV6nwBemID8=;
+ b=KFWGOI55BUI+16j2vhTgNvl56oK9GO+KnOKgKlBA8aH4S/8beD+ycpQODAJJ3jgflJrYIQ/KLDkyQxNx/LJK2IjSFTeccn8lQbueNPZShpUqTLauRa9fIWrHI0nVwNjTC/f2PI0JH0S0wfnz/Gy0tsg3y8w59+GmEaWST3sb7jKyE4qYaoE0njgoFl2ZOwfK2CWum0SpuoIFuUSfemo5yA8p3v5pDjOnhSenHrgU3QIFmIZgbHKK0J/EdHKNGoehugfQc6U5jVhSqi4jgVt7+7/tvU+uyvodz9cT3zadai7rD3uLGj+Znb/tzNmZA2hcXzxeJLLKmUlb4ljp6QtFhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0B+4SO4SCmdqLKKG7vS6vUqwAozhNwIbNV6nwBemID8=;
+ b=TXEfTEe5UB7NLlHVH7IPxVI3H+AA2dmb33gbXqHqF7v6C6Xt0OBANMHQhR9quSkZ6/vZDyt8WGHYq65cV8DW75ToqSQTpBpONok2DpVA7ILmFvs/vwv4JR9r0x1OFaHK1aoFTwrlW2I970uA2yzv7XlFyaLP1MHl2wjcHPrxnTQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SN7PR12MB6959.namprd12.prod.outlook.com (2603:10b6:806:261::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.19; Wed, 16 Nov
+ 2022 10:20:03 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::395:21e6:abfd:7894]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::395:21e6:abfd:7894%6]) with mapi id 15.20.5813.018; Wed, 16 Nov 2022
+ 10:20:03 +0000
+Message-ID: <8692e736-7518-d6d2-ae83-720e42e7a059@amd.com>
+Date:   Wed, 16 Nov 2022 04:19:56 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
 Content-Language: en-US
-To:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
-        frankja@linux.ibm.com, berrange@redhat.com
-References: <20221103170150.20789-1-pmorel@linux.ibm.com>
- <20221103170150.20789-4-pmorel@linux.ibm.com>
- <a21a6342-1fe2-e6c0-61f9-6bb68cbd2574@kaod.org>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <a21a6342-1fe2-e6c0-61f9-6bb68cbd2574@kaod.org>
+To:     Vlastimil Babka <vbabka@suse.cz>, Borislav Petkov <bp@alien8.de>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        michael.roth@amd.com, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org,
+        "Kaplan, David" <David.Kaplan@amd.com>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Oscar Salvador <osalvador@suse.de>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
+ <Y0grhk1sq2tf/tUl@zn.tnic> <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
+ <Y1e5oC9QyDlKpxZ9@zn.tnic> <6511c122-d5cc-3f8d-9651-7c2cd67dc5af@amd.com>
+ <Y2A6/ZwvKhpNBTMP@zn.tnic> <dc89b2f4-1053-91ac-aeac-bb3b25f9ebc7@amd.com>
+ <Y2JS7kn8Q9P4rXso@zn.tnic> <c2ce6317-aa51-2a2b-2d75-ad1fd269f3fa@amd.com>
+ <7882353e-2b13-d35a-b462-cef35ee56f51@suse.cz>
+ <5b27a05e-09ad-9139-67b1-77b90731419f@amd.com>
+ <9d9f1afe-c981-4df9-f012-89c4cb783cc3@amd.com>
+ <973c6f79-38ad-aa30-bfec-c2a1c7db5d70@suse.cz>
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <973c6f79-38ad-aa30-bfec-c2a1c7db5d70@suse.cz>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: yOWL_QqN0oqOI0llYfj3Up48o3lG1nwA
-X-Proofpoint-ORIG-GUID: 2NYA6kl-3RUmWjYgpjon7URPEd2jXCir
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-16_01,2022-11-15_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 spamscore=0 mlxlogscore=999 impostorscore=0
- priorityscore=1501 clxscore=1015 bulkscore=0 adultscore=0 suspectscore=0
- mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211160071
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-ClientProxiedBy: CH0PR04CA0043.namprd04.prod.outlook.com
+ (2603:10b6:610:77::18) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|SN7PR12MB6959:EE_
+X-MS-Office365-Filtering-Correlation-Id: 097c2853-463d-468f-3ec3-08dac7bc200e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pEiFTot3uejJQkwT8xAzoihzZAaaCwibhVthAfKh0RUIAQ3lB3kktgbm/hO7k1ghk+SSJA9+mBrjDn8kCC8r9QTp7X9f4+sC+POZhnAyPLLL8fV1e+LnRWC0yw3+PqAG274YuuN68HnmkcS075+TGnnova7qhHdoVN3hYhBmAeNEA/6Pml/rHtd89NMu955RQ5rdKXTRutEYRwRPh9AVHJ5ly2uYiEUi8c4NdwEVy8ajF0B9bpwqiMx5ROqsnhDCzqe/xF1w+wG+3ApFs2sacGVdkH7pWZlaRoAWKw1V1oMcnRg8naI6uWI7IlsURh6to2WUDrdJ7O5yf6qAQf4ruxks5i1NUHcb5WXP+WcIliWput2mFAihdaITP0vsuRR83gyEEwOu4r/PWgZ8jg2A7hc2z5CR6L8kLYWvF2iSdMJH+MXsEZ3Ml9LzZKfnJHJ68EKdAAAS8vxCv8a8164uNtIpqjleOjd/BYgNuoYvFUTW5xffNJG9jDcB5YJOMBCZFB8hghtvbAocpICuWMpoxIkAXruxCVy+sxg2bhz5ZB8tNThCBJorxRHdk8tWqs84tnEbwgPq3L57T+FPZSp8xieqbTmRzQxJSrd9zrKqIcHq1YWbBk8cYI18mkOvPmJhZoxA+yyFv6DDw+VnqseRwaoBaTdqhtBaYuDZyfBvyVh/FTV3TdZkgaEd5LwVWAMf8ANWsjMKLThqsYUyk8wSVdnyLfmrCwxNIH7UsjPw6O5B+THYgWpSmMntpKerR3W+85KeuTZBBiSXuzhb+CV21v+EUG26yTVvKLSDyeALGRnh5vcCrgcVohKgElJ2QLin
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(136003)(346002)(376002)(396003)(366004)(451199015)(45080400002)(6666004)(478600001)(53546011)(54906003)(6506007)(110136005)(6486002)(31686004)(966005)(316002)(26005)(6512007)(7416002)(41300700001)(2616005)(66946007)(66476007)(8676002)(4326008)(66556008)(36756003)(7406005)(5660300002)(2906002)(186003)(8936002)(31696002)(83380400001)(38100700002)(86362001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eTRhYTBHSE92WTVTUnY5dG1vb2s2OTEwc3ZCMGYzWkU0R0laLzBma0VhL2JO?=
+ =?utf-8?B?MkdPZFlhVFIxUUMzdENxQ2g4Mm9OQ3lUVWZ2dnJNeWl2S1l5Zmpsc0hTbjlL?=
+ =?utf-8?B?bUQveldaY29nbHNJRnJzUFk0WXc4UGJJVUdETkUwRXgrczFKUzFmZEY1ZGsv?=
+ =?utf-8?B?ZXNDOUUwVXdmSk5XV29xQ0twd29DWHpYZWZpTnJyVlhGdDBTa1pDV0VpY1R4?=
+ =?utf-8?B?MFNFbThTYnZqQ3lDV3NYVjJFcDUxVUtPWU8yN0dxelJFbGU3T3BNKzZVZVph?=
+ =?utf-8?B?ZW5zVWM2cUpkcFpkSk4vQmlpeC9IallJTXh0S1lmYzN5RE9oMHJaYzhDVXpK?=
+ =?utf-8?B?UjhYRnlvWDd6ZTRLTTNSbGRFR3NnVy9FNGN3ZDBBQVpOU1FtYWFCdXo3RFVG?=
+ =?utf-8?B?amhYTGNjVHdIRFF1V1BEREs0Y1pWOUNaZnZKTHVGaWVLSzU5S2htWVcvOEp4?=
+ =?utf-8?B?SXVCbFdJaHl0anlxSG5qWHVyZTBXSFlQa1k1NHpMWUhVaUdMajB1WjRMZGNm?=
+ =?utf-8?B?ak9NNlNJTnBmWlpVVm1tZVJLdzU5ci9sNk9Ub25GejNuQ0IrbFJHQm56ZFly?=
+ =?utf-8?B?MDRDcFM0Ty9ELytVK09tWU9jck96S1dpZWZ3KzhUS1ZlYTIzWW9tZ1J6Uzh5?=
+ =?utf-8?B?UzEvcFN5NStVWWRmbkgyUk43dTlnQlFaMDI2R0p6WVpUeGVXTTNDTVN5c2Rr?=
+ =?utf-8?B?T0QxZHEvOHNUZ2RxK3E1WGY4VksxYUpSNXJhelN0ZE85WTZTV0lYaXhlYTFa?=
+ =?utf-8?B?bTNneEJXVnE1aGF4bmZZSldsTis2c1hPQXVHZlAzckZRYUpySWhXWEgrbzdE?=
+ =?utf-8?B?b2N5dHprbkpMc2ZEdFhyOW10WnlUVkk5dklRTmlBNmNBMGtzT293dkN5MUV4?=
+ =?utf-8?B?YkREYldLcUFadHhNU2xTYkJNZksrUE5KSHJCSWtLaUc0T3FlN1pSSndxMzRX?=
+ =?utf-8?B?RmUrenBRR09YTS9FZVVLbWRHWkVzaU54bG8ydmRzZmZxckxDQy9DeUJ3MkJT?=
+ =?utf-8?B?MWNOSjFKVkhzanU4WnVVZFVIRHU3M3Q5QmdsNkI4K3FIWTNPQVNWN0RqRGZU?=
+ =?utf-8?B?REthZ0tYSVlXWXVRYXpSalVOTlluYzViaElKc1dUZm1YcFlQWm1qQXJxcDAw?=
+ =?utf-8?B?bU9OTU1LM0NEUUdaYThzZVZPbzFxdUdJSXAxTk9qUHNLa0pGNDRHeHBvVDYz?=
+ =?utf-8?B?dFc1UytZYjNITklVUUVnVlMvV0lYR1RJc2crcG4zOEw4T3h5cTJXc0RvWjBP?=
+ =?utf-8?B?Z3ViU2ZKN0dKOHppcFBiamJTWTNCYWRxblZrMnN4NEt3bEFSZVlEU0NGMlJB?=
+ =?utf-8?B?K1o4YW5yc2l4QnU5Zk9LYmpwRldabU0vRm5ia3Z3UVk2ekN1OVdjU2NNWHY2?=
+ =?utf-8?B?NkdlRUdDa3lvNFY4M1I1bmg4V3d4V1VjenhBVTI0ZVNESHdyc1hKbkVVaHN5?=
+ =?utf-8?B?L0t4QjhRdGFnbG9PKzB3TUZnazh5Um5seFBUczhJMVVyTzFSb2twOWxyWC9n?=
+ =?utf-8?B?SDhFdTA1THZCUm13MXlvcjFIRU9nRzRZRTlINnJHcDV3Vk8ybTU5Q0dSZXZP?=
+ =?utf-8?B?RVZ5YytCTzFlbWhIUU1TZnFtZ2d5cno5WWhKam1zSkZDZzlSTUNGaWUzMnZJ?=
+ =?utf-8?B?R2h4YUNjWWFzSFJxZkxtRlowbE9HOHRzVkxvS255dkdyMEQzdHU2ajc1bW9X?=
+ =?utf-8?B?VzNpanl2VThuSHYrMVFGSkZBWGp1UUZWSHJjN0tZQUJHL0ZHd3dvdVc5UTdK?=
+ =?utf-8?B?Ukc2ZThTZU16QlpBNmgvU2hmT0ZmeGxzd1NUa3VqSjVVMC9oa1pYUWFtV3VM?=
+ =?utf-8?B?RXh0a0FZSzl0bVVCMTFuejV5WTZyYWFsY2FhRW9GU0NIaldmRTY2czlXaEt1?=
+ =?utf-8?B?VldId1pTQ0dINklpb1pZZlVXUmRuSGZWdWZzdHE2M1VBcnNFaUFYaklSaGJr?=
+ =?utf-8?B?S01WY1JIRkJ1YzA0QkN2cHppZHMrdTVTYlAzMlo1R09zUGdvbUxYSW5DTmpG?=
+ =?utf-8?B?WXo1MHdFdDZTOFRWZmZwdEQ4TzdZdHcwRjdMZ0F0d2wrSGdCQ21KVHVFQ242?=
+ =?utf-8?B?d0JNekZ2c3pwaFFZZWphUDlSS0JHcXNieGJHMC9HMStTRVFzM2w5b1Nzb25L?=
+ =?utf-8?Q?yUhlxXMf+G02ecJbJIrOS7Ttt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 097c2853-463d-468f-3ec3-08dac7bc200e
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2022 10:20:03.3492
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CKnpBdwPGDgyX8y5GnmZ2GTN1gISvZnumBl9khP22dC4NJ0GDniQ9WDyWAJ54R4a4+1ywlYMp8jONgZkSRBIow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6959
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 11/15/22 12:15, Cédric Le Goater wrote:
-> Hello Pierre,
-> 
-> On 11/3/22 18:01, Pierre Morel wrote:
->> In the S390x CPU topology the core_id specifies the CPU address
->> and the position of the core withing the topology.
+On 11/16/2022 3:08 AM, Vlastimil Babka wrote:
+> On 11/15/22 19:15, Kalra, Ashish wrote:
 >>
->> Let's build the topology based on the core_id.
+>> On 11/15/2022 11:24 AM, Kalra, Ashish wrote:
+>>> Hello Vlastimil,
+>>>
+>>> On 11/15/2022 9:14 AM, Vlastimil Babka wrote:
+>>>> Cc'ing memory failure folks, the beinning of this subthread is here:
+>>>>
+>>>> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra%40amd.com%2F&amp;data=05%7C01%7Cashish.kalra%40amd.com%7C38f8b76238014c67049308dac7b213a5%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638041865033588985%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=DDm7tZhUJLy%2BMzS1SXUnsBmBQnAI5dqR6tWZhCKRMEI%3D&amp;reserved=0
+>>>>
+>>>> On 11/15/22 00:36, Kalra, Ashish wrote:
+>>>>> Hello Boris,
+>>>>>
+>>>>> On 11/2/2022 6:22 AM, Borislav Petkov wrote:
+>>>>>> On Mon, Oct 31, 2022 at 04:58:38PM -0500, Kalra, Ashish wrote:
+>>>>>>>         if (snp_lookup_rmpentry(pfn, &rmp_level)) {
+>>>>>>>                do_sigbus(regs, error_code, address, VM_FAULT_SIGBUS);
+>>>>>>>                return RMP_PF_RETRY;
+>>>>>>
+>>>>>> Does this issue some halfway understandable error message why the
+>>>>>> process got killed?
+>>>>>>
+>>>>>>> Will look at adding our own recovery function for the same, but that will
+>>>>>>> again mark the pages as poisoned, right ?
+>>>>>>
+>>>>>> Well, not poisoned but PG_offlimits or whatever the mm folks agree upon.
+>>>>>> Semantically, it'll be handled the same way, ofc.
+>>>>>
+>>>>> Added a new PG_offlimits flag and a simple corresponding handler for it.
+>>>>
+>>>> One thing is, there's not enough page flags to be adding more (except
+>>>> aliases for existing) for cases that can avoid it, but as Boris says, if
+>>>> using alias to PG_hwpoison it depends what will become confused with the
+>>>> actual hwpoison.
+>>>>
+>>>>> But there is still added complexity of handling hugepages as part of
+>>>>> reclamation failures (both HugeTLB and transparent hugepages) and that
+>>>>> means calling more static functions in mm/memory_failure.c
+>>>>>
+>>>>> There is probably a more appropriate handler in mm/memory-failure.c:
+>>>>>
+>>>>> soft_offline_page() - this will mark the page as HWPoisoned and also has
+>>>>> handling for hugepages. And we can avoid adding a new page flag too.
+>>>>>
+>>>>> soft_offline_page - Soft offline a page.
+>>>>> Soft offline a page, by migration or invalidation, without killing
+>>>>> anything.
+>>>>>
+>>>>> So, this looks like a good option to call
+>>>>> soft_offline_page() instead of memory_failure() in case of
+>>>>> failure to transition the page back to HV/shared state via SNP_RECLAIM_CMD
+>>>>> and/or RMPUPDATE instruction.
+>>>>
+>>>> So it's a bit unclear to me what exact situation we are handling here. The
+>>>> original patch here seems to me to be just leaking back pages that are
+>>>> unsafe for further use. soft_offline_page() seems to fit that scenario of a
+>>>> graceful leak before something is irrepairably corrupt and we page fault
+>>>> on it.
+>>>> But then in the thread you discus PF handling and killing. So what is the
+>>>> case here? If we detect this need to call snp_leak_pages() does it mean:
+>>>>
+>>>> a) nobody that could page fault at them (the guest?) is running anymore, we
+>>>> are tearing it down, we just can't reuse the pages further on the host
+>>>
+>>> The host can page fault on them, if anything on the host tries to write to
+>>> these pages. Host reads will return garbage data.
+>>>
+>>>> - seem like soft_offline_page() could work, but maybe we could just put the
+>>>> pages on some leaked lists without special page? The only thing that should
+>>>> matter is not to free the pages to the page allocator so they would be
+>>>> reused by something else.
+>>>>
+>>>> b) something can stil page fault at them (what?) - AFAIU can't be resolved
+>>>> without killing something, memory_failure() might limit the damage
+>>>
+>>> As i mentioned above, host writes will cause RMP violation page fault.
+>>>
 >>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   include/hw/s390x/cpu-topology.h    |  41 ++++++++++
->>   include/hw/s390x/s390-virtio-ccw.h |   1 +
->>   target/s390x/cpu.h                 |   2 +
->>   hw/s390x/cpu-topology.c            | 125 +++++++++++++++++++++++++++++
->>   hw/s390x/s390-virtio-ccw.c         |  23 ++++++
->>   hw/s390x/meson.build               |   1 +
->>   6 files changed, 193 insertions(+)
->>   create mode 100644 include/hw/s390x/cpu-topology.h
->>   create mode 100644 hw/s390x/cpu-topology.c
->>
->> diff --git a/include/hw/s390x/cpu-topology.h 
->> b/include/hw/s390x/cpu-topology.h
->> new file mode 100644
->> index 0000000000..4e16a2153d
->> --- /dev/null
->> +++ b/include/hw/s390x/cpu-topology.h
->> @@ -0,0 +1,41 @@
->> +/*
->> + * CPU Topology
->> + *
->> + * Copyright IBM Corp. 2022
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or 
->> (at
->> + * your option) any later version. See the COPYING file in the top-level
->> + * directory.
->> + */
->> +#ifndef HW_S390X_CPU_TOPOLOGY_H
->> +#define HW_S390X_CPU_TOPOLOGY_H
->> +
->> +#include "hw/qdev-core.h"
->> +#include "qom/object.h"
->> +
->> +#define S390_TOPOLOGY_CPU_IFL 0x03
->> +#define S390_TOPOLOGY_MAX_ORIGIN ((63 + S390_MAX_CPUS) / 64)
->> +
->> +typedef struct S390TopoSocket {
->> +    int active_count;
->> +    uint64_t mask[S390_TOPOLOGY_MAX_ORIGIN];
->> +} S390TopoSocket;
->> +
->> +struct S390Topology {
->> +    SysBusDevice parent_obj;
->> +    uint32_t nr_cpus;
->> +    uint32_t nr_sockets;
->> +    S390TopoSocket *socket;
->> +};
->> +
->> +#define TYPE_S390_CPU_TOPOLOGY "s390-topology"
->> +OBJECT_DECLARE_SIMPLE_TYPE(S390Topology, S390_CPU_TOPOLOGY)
->> +
->> +void s390_topology_new_cpu(S390CPU *cpu);
->> +
->> +static inline bool s390_has_topology(void)
->> +{
->> +    return false;
->> +}
->> +
->> +#endif
->> diff --git a/include/hw/s390x/s390-virtio-ccw.h 
->> b/include/hw/s390x/s390-virtio-ccw.h
->> index 4f8a39abda..23b472708d 100644
->> --- a/include/hw/s390x/s390-virtio-ccw.h
->> +++ b/include/hw/s390x/s390-virtio-ccw.h
->> @@ -29,6 +29,7 @@ struct S390CcwMachineState {
->>       bool pv;
->>       bool zpcii_disable;
->>       uint8_t loadparm[8];
->> +    void *topology;
+>> And to add here, if its a guest private page, then the above fault cannot be
+>> resolved, so the faulting process is terminated.
 > 
-> I think it is safe to use 'DeviceState *' or 'Object *' for the pointer
-> under machine. What is most practical.
+> BTW would this not be mostly resolved as part of rebasing to UPM?
+> - host will not have these pages mapped in the first place (both kernel
+> directmap and qemu userspace)
+> - guest will have them mapped, but I assume that the conversion from private
+> to shared (that might fail?) can only happen after guest's mappings are
+> invalidated in the first place?
+> 
 
-OK, DeviceState bring one less cast..
+Yes, that will be true for guest private pages. But then there are host 
+allocated pages for firmware use which will remain in firmware page 
+state or reclaim state if they can't be transitioned back to HV/shared 
+state once the firmware releases them back to the host and accessing 
+them at this point can potentially cause RMP violation #PF.
 
-> 
->>   };
->>   struct S390CcwMachineClass {
->> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->> index 7d6d01325b..c9066b2496 100644
->> --- a/target/s390x/cpu.h
->> +++ b/target/s390x/cpu.h
->> @@ -175,6 +175,8 @@ struct ArchCPU {
->>       /* needed for live migration */
->>       void *irqstate;
->>       uint32_t irqstate_saved_size;
->> +    /* Topology this CPU belongs too */
->> +    void *topology;
-> 
-> However, under the CPU, we don't know what the future changes reserve
-> for us and I would call the attribute 'opaque' or 'machine_data'.
-> 
-> For now, it only holds a reference to the S390Topology device model
-> but it could become a struct with time.
+Again i don't think this is going to happen regularly or frequently so 
+it will be a rare error case where the page reclamation, i.e., the 
+transition back to HV/shared state fails and now these pages are no 
+longer safe to be used.
 
-OK, I use machine_data
+Referring back to your thoughts about putting these pages on some leaked
+pages list, do any such leaked pages list exist currently ?
 
-> 
-> 
->>   };
->> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
->> new file mode 100644
->> index 0000000000..6af41d3d7b
->> --- /dev/null
->> +++ b/hw/s390x/cpu-topology.c
->> @@ -0,0 +1,125 @@
->> +/*
->> + * CPU Topology
->> + *
->> + * Copyright IBM Corp. 2022
->> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
->> +
->> + * This work is licensed under the terms of the GNU GPL, version 2 or 
->> (at
->> + * your option) any later version. See the COPYING file in the top-level
->> + * directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qapi/error.h"
->> +#include "qemu/error-report.h"
->> +#include "hw/sysbus.h"
->> +#include "hw/qdev-properties.h"
->> +#include "hw/boards.h"
->> +#include "qemu/typedefs.h"
->> +#include "target/s390x/cpu.h"
->> +#include "hw/s390x/s390-virtio-ccw.h"
->> +#include "hw/s390x/cpu-topology.h"
->> +
->> +/*
->> + * s390_topology_new_cpu:
->> + * @cpu: a pointer to the new CPU
->> + *
->> + * The topology pointed by S390CPU, gives us the CPU topology
->> + * established by the -smp QEMU aruments.
->> + * The core-id is used to calculate the position of the CPU inside
->> + * the topology:
->> + *  - the socket, container TLE, containing the CPU, we have one socket
->> + *    for every nr_cpus (nr_cpus = smp.cores * smp.threads)
->> + *  - the CPU TLE inside the socket, we have potentionly up to 4 CPU TLE
->> + *    in a container TLE with the assumption that all CPU are identical
->> + *    with the same polarity and entitlement because we have maximum 256
->> + *    CPUs and each TLE can hold up to 64 identical CPUs.
->> + *  - the bit in the 64 bit CPU TLE core mask
->> + */
->> +void s390_topology_new_cpu(S390CPU *cpu)
->> +{
->> +    S390Topology *topo = (S390Topology *)cpu->topology;
-> 
-> where is cpu->topology set ?
+Thanks,
+Ashish
 
-In the caller but this is reworked anyway due to a rearangement of the 
-function.
-
+>>>
+>>>>>
+>>>>>>
+>>>>>>> Still waiting for some/more feedback from mm folks on the same.
+>>>>>>
+>>>>>> Just send the patch and they'll give it.
+>>>>>>
+>>>>>> Thx.
+>>>>>>
+>>>>
 > 
->> +    int core_id = cpu->env.core_id;
->> +    int bit, origin;
->> +    int socket_id;
->> +
->> +    socket_id = core_id / topo->nr_cpus;
->> +
->> +    /*
->> +     * At the core level, each CPU is represented by a bit in a 64bit
->> +     * uint64_t which represent the presence of a CPU.
->> +     * The firmware assume that all CPU in a CPU TLE have the same
->> +     * type, polarization and are all dedicated or shared.
->> +     * In that case the origin variable represents the offset of the 
->> first
->> +     * CPU in the CPU container.
->> +     * More than 64 CPUs per socket are represented in several CPU 
->> containers
->> +     * inside the socket container.
->> +     * The only reason to have several S390TopologyCores inside a 
->> socket is
->> +     * to have more than 64 CPUs.
->> +     * In that case the origin variable represents the offset of the 
->> first CPU
->> +     * in the CPU container. More than 64 CPUs per socket are 
->> represented in
->> +     * several CPU containers inside the socket container.
->> +     */
->> +    bit = core_id;
->> +    origin = bit / 64;
->> +    bit %= 64;
->> +    bit = 63 - bit;
->> +
->> +    topo->socket[socket_id].active_count++;
->> +    set_bit(bit, &topo->socket[socket_id].mask[origin]);
->> +}
->> +
->> +/**
->> + * s390_topology_realize:
->> + * @dev: the device state
->> + * @errp: the error pointer (not used)
->> + *
->> + * During realize the machine CPU topology is initialized with the
->> + * QEMU -smp parameters.
->> + * The maximum count of CPU TLE in the all Topology can not be greater
->> + * than the maximum CPUs.
->> + */
->> +static void s390_topology_realize(DeviceState *dev, Error **errp)
->> +{
->> +    MachineState *ms = MACHINE(qdev_get_machine());
-> 
-> hmm,
-
-will disappear
-
-> 
->> +    S390Topology *topo = S390_CPU_TOPOLOGY(dev);
->> +
->> +    topo->nr_cpus = ms->smp.cores * ms->smp.threads;
->> +    topo->nr_sockets = ms->smp.sockets;
-> 
-> These properties should be set in s390_init_topology() with :
-> 
->    object_property_set_int(OBJECT(dev), "num-cpus",
->                            ms->smp.cores * ms->smp.threads, errp);
-> 
->    object_property_set_int(OBJECT(dev), "num-sockets",
->                            ms->smp.sockets, errp);
-> 
-> before calling sysbus_realize_and_unref()
-
-OK, done
-
-> 
-> 
->> +    topo->socket = g_new0(S390TopoSocket, topo->nr_sockets);
-> 
-> For consistency, you could add an unrealize handler to free the array.
-
-yes
-
-> 
->> +}
->> +
->> +static Property s390_topology_properties[] = {
->> +    DEFINE_PROP_UINT32("nr_cpus", S390Topology, nr_cpus, 1),
->> +    DEFINE_PROP_UINT32("nr_sockets", S390Topology, nr_sockets, 1),
-> 
-> A quick audit of the property names in QEMU code shows that a "num-" prefix
-> is usually preferred.
-
-OK
-
-> 
->> +    DEFINE_PROP_END_OF_LIST(),
->> +};
->> +
->> +/**
->> + * topology_class_init:
->> + * @oc: Object class
->> + * @data: (not used)
->> + *
->> + * A very simple object we will need for reset and migration.
->> + */
->> +static void topology_class_init(ObjectClass *oc, void *data)
->> +{
->> +    DeviceClass *dc = DEVICE_CLASS(oc);
->> +
->> +    dc->realize = s390_topology_realize;
->> +    device_class_set_props(dc, s390_topology_properties);
->> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
->> +}
->> +
->> +static const TypeInfo cpu_topology_info = {
->> +    .name          = TYPE_S390_CPU_TOPOLOGY,
->> +    .parent        = TYPE_SYS_BUS_DEVICE,
->> +    .instance_size = sizeof(S390Topology),
->> +    .class_init    = topology_class_init,
->> +};
->> +
->> +static void topology_register(void)
->> +{
->> +    type_register_static(&cpu_topology_info);
->> +}
->> +type_init(topology_register);
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index 9ab91df5b1..5776d3e58f 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -44,6 +44,7 @@
->>   #include "hw/s390x/pv.h"
->>   #include "migration/blocker.h"
->>   #include "qapi/visitor.h"
->> +#include "hw/s390x/cpu-topology.h"
->>   static Error *pv_mig_blocker;
->> @@ -102,6 +103,19 @@ static void s390_init_cpus(MachineState *machine)
->>       }
->>   }
->> +static void s390_init_topology(MachineState *machine)
->> +{
->> +    DeviceState *dev;
->> +
->> +    if (s390_has_topology()) {
-> 
-> I would move the s390_has_topology() check in the caller.
-
-yes
-
-> 
->> +        dev = qdev_new(TYPE_S390_CPU_TOPOLOGY);
->> +        object_property_add_child(&machine->parent_obj,
->> +                                  TYPE_S390_CPU_TOPOLOGY, OBJECT(dev));
->> +        sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
->> +        S390_CCW_MACHINE(machine)->topology = dev;
-> 
-> and I would move the assignment in the caller also.
-> 
->> +    }
->> +}
->> +
->>   static const char *const reset_dev_types[] = {
->>       TYPE_VIRTUAL_CSS_BRIDGE,
->>       "s390-sclp-event-facility",
->> @@ -252,6 +266,9 @@ static void ccw_init(MachineState *machine)
->>       /* init memory + setup max page size. Required for the CPU model */
->>       s390_memory_init(machine->ram);
->> +    /* Adding the topology must be done before CPU initialization */
->> +    s390_init_topology(machine);
->> +
->>       /* init CPUs (incl. CPU model) early so s390_has_feature() works */
->>       s390_init_cpus(machine);
->> @@ -314,6 +331,12 @@ static void s390_cpu_plug(HotplugHandler 
->> *hotplug_dev,
->>       g_assert(!ms->possible_cpus->cpus[cpu->env.core_id].cpu);
->>       ms->possible_cpus->cpus[cpu->env.core_id].cpu = OBJECT(dev);
->> +    /* Inserting the CPU in the Topology can not fail */
->> +    if (S390_CCW_MACHINE(ms)->topology) {
->> +        cpu->topology = S390_CCW_MACHINE(ms)->topology;
-> 
-> Two QOM cast. One should be enough. Please introduce a local variable.
-> 
->> +        s390_topology_new_cpu(cpu);
-> 
-> I would pass the 'topology' object as a parameter of 
-> s390_topology_new_cpu()
-> and do the cpu->topology assignment in the same routine.
-> 
-> May be rename it also to :
-> 
->    void s390_topology_add_cpu(S390Topology *topo, S390CPU *cpu)
-
-OK, better.
-
-> 
-> 
-> Thanks,
-> 
-> C.
-
-
-Thanks a lot for your reviewing.
-
-Regards,
-Pierre
-
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
