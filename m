@@ -2,218 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E13E62B1C6
-	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 04:19:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDEB562B1DD
+	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 04:35:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231998AbiKPDTV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 22:19:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40804 "EHLO
+        id S232138AbiKPDfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 22:35:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229766AbiKPDTS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 22:19:18 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FA88C11;
-        Tue, 15 Nov 2022 19:19:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668568757; x=1700104757;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=I/nWquwbUx6Foszq8Q3bav+jUHNq3BtFcT49kSsIgfs=;
-  b=ktRpWaJvXRBckL+Yjs4AQ6OjY/Hb1OzkSwA2aShI3Sl0Dcb2X1Ca+n1p
-   04iQQM4RNbLIQD+12UXGOJXmuvkGJZbrCdVGGcmOYPfTRnXejP2HKhNki
-   hEjEk84ThqB0ysjG8XJfa6mON7kcR9LnrGL0LDf9BW4ANeONzc2ROoFFh
-   8Yn7rP1ps7ZeIsumXwuXoKuxEJ7foAScGgys0l2us62qW3My7LIpBNO40
-   GwW3ubTIKtjqHw5A14vYJDT0DcyZpzwJml9RiDKjMbOogib02XXM6ga7s
-   L0813erSeaLTFlOliku1qail/mfVDt5fIKa687X2ADQgPBQqMeGyHr0ES
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10532"; a="295799639"
-X-IronPort-AV: E=Sophos;i="5.96,167,1665471600"; 
-   d="scan'208";a="295799639"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2022 19:19:16 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10532"; a="633472721"
-X-IronPort-AV: E=Sophos;i="5.96,167,1665471600"; 
-   d="scan'208";a="633472721"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga007.jf.intel.com with ESMTP; 15 Nov 2022 19:19:05 -0800
-Date:   Wed, 16 Nov 2022 11:14:41 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v9 3/8] KVM: Add KVM_EXIT_MEMORY_FAULT exit
-Message-ID: <20221116031441.GA364614@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <20221025151344.3784230-4-chao.p.peng@linux.intel.com>
- <87cz9o9mr8.fsf@linaro.org>
+        with ESMTP id S232285AbiKPDfK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 22:35:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E392326EB
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 19:34:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668569652;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TNHR8SSjrDMJFhcA9aKCFjRxkzUSsMDKZLk1c8l72Xs=;
+        b=i8LTXFo5gBe3O4CffVMq1N19Q6LLy3D626Rp0YWWUfAVvROWZ0JpX9zbkAROAvsG6MTGjr
+        1Az4RFC91puSJN3yKnOwPp7Tn00qZt/JZi3JFqGuVJYDtOksWUgAkBQTLu7Fq5dhONwbRk
+        1p2WCRzwFuxt/Xq/oTMxr8srSYNAVLE=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-586-D5_m4_-lPGeVAulsjAhutQ-1; Tue, 15 Nov 2022 22:34:10 -0500
+X-MC-Unique: D5_m4_-lPGeVAulsjAhutQ-1
+Received: by mail-ot1-f70.google.com with SMTP id c25-20020a056830349900b0066d31b7ca49so8412727otu.4
+        for <kvm@vger.kernel.org>; Tue, 15 Nov 2022 19:34:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TNHR8SSjrDMJFhcA9aKCFjRxkzUSsMDKZLk1c8l72Xs=;
+        b=rXL4WHnyG76cJ04ZqQ0Gck4V7OQKpoGE7LdrrW+U9HWyTHrKwrl4rLTkVQH7uYX/gF
+         PykqlBziZqcx9zy6DREcq/1GFXT4kD1011aXVI0rSXa7idaUmyh3UtMVZyrTI75DMWH5
+         wcAAzTotD7EHa9fvfPjpYsYyzJRe3uQSzxt3MyYXUgNXCT0F0+xwXHL+vUXXUBtPiYRJ
+         5CFA7UwXgEwBswc45PCE6RWPBTqVHZl8Xytvjmq2D1ZSjfv78W+/lWct3OioalCcYCsg
+         dzlC4Y63Q+cvEFi3osbP1x4T65LXA5LvRbxNNypPBp6J2wmp80cxV/FUY7zondaOT3wo
+         Jfbw==
+X-Gm-Message-State: ANoB5pk1ip0FpRWAiRCveCh/trCpuVyPCdo95CCn5ItYGphCoSlmaTt5
+        hgNjGLfnLHKpkPLAl/f9oT5dyV7w+Iwo/tjSAQTajMTK6ovWCQNDI+Bu7l05GrWrHIeViTkwAGN
+        FcT7OQwedi1JLtJKLE5aJIYz1PvKg
+X-Received: by 2002:a4a:bd8b:0:b0:480:8f4a:7062 with SMTP id k11-20020a4abd8b000000b004808f4a7062mr8881397oop.57.1668569649671;
+        Tue, 15 Nov 2022 19:34:09 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5pyS8MnsETYO/Vo5l7EgUeOSwNBJABKBfTYJiOfBwe5cCDlSK+BySS4HprbMgmtFMnnyXJeApZnpv4d0oGEbk=
+X-Received: by 2002:a4a:bd8b:0:b0:480:8f4a:7062 with SMTP id
+ k11-20020a4abd8b000000b004808f4a7062mr8881374oop.57.1668569649403; Tue, 15
+ Nov 2022 19:34:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87cz9o9mr8.fsf@linaro.org>
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221108170755.92768-1-eperezma@redhat.com> <20221108170755.92768-10-eperezma@redhat.com>
+ <CACGkMEsr=fpbbOpUBHawt5DR+nTWcK1uMzXgorEcbijso1wsMQ@mail.gmail.com>
+ <CAJaqyWemKoRNd6_uvFc79qYe+7pbavJSjnZuczxk5uxSZZdZ2Q@mail.gmail.com>
+ <be553273-7c06-78f7-4d23-de9f46a210b1@redhat.com> <CAJaqyWeZWQgGm7XZ-+DBHNS4XW_-GgWeeOqTb82v__jS8ONRyQ@mail.gmail.com>
+ <6a35e659-698e-ff71-fe9b-06e15809c9e4@redhat.com> <CAJaqyWeF7bNuu-e6g4RghBkc-5oqEAuaEVbJ9uDgGPWWsP36Lg@mail.gmail.com>
+ <CACGkMEvvjC21XjMEwcv6QP=WKTH2Vh-3dfZkR6vVFi67SWYYvw@mail.gmail.com> <CAJaqyWdFsN1dEmMn92oOH_2cCEt1uYXunr876jd5EYBCXf+Xug@mail.gmail.com>
+In-Reply-To: <CAJaqyWdFsN1dEmMn92oOH_2cCEt1uYXunr876jd5EYBCXf+Xug@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Wed, 16 Nov 2022 11:33:58 +0800
+Message-ID: <CACGkMEuQHi19JZjSPRNBw_Ct2GZ7aOXKAB=YJkKgzc-+oswzew@mail.gmail.com>
+Subject: Re: [PATCH v6 09/10] vdpa: Add listener_shadow_vq to vhost_vdpa
+To:     Eugenio Perez Martin <eperezma@redhat.com>
+Cc:     qemu-devel@nongnu.org, Parav Pandit <parav@mellanox.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Gautam Dawar <gdawar@xilinx.com>,
+        Liuxiangdong <liuxiangdong5@huawei.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Cindy Lu <lulu@redhat.com>, Eli Cohen <eli@mellanox.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>, kvm@vger.kernel.org,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 15, 2022 at 04:56:12PM +0000, Alex Bennée wrote:
-> 
-> Chao Peng <chao.p.peng@linux.intel.com> writes:
-> 
-> > This new KVM exit allows userspace to handle memory-related errors. It
-> > indicates an error happens in KVM at guest memory range [gpa, gpa+size).
-> > The flags includes additional information for userspace to handle the
-> > error. Currently bit 0 is defined as 'private memory' where '1'
-> > indicates error happens due to private memory access and '0' indicates
-> > error happens due to shared memory access.
+On Tue, Nov 15, 2022 at 7:25 PM Eugenio Perez Martin
+<eperezma@redhat.com> wrote:
+>
+> On Tue, Nov 15, 2022 at 4:04 AM Jason Wang <jasowang@redhat.com> wrote:
 > >
-> > When private memory is enabled, this new exit will be used for KVM to
-> > exit to userspace for shared <-> private memory conversion in memory
-> > encryption usage. In such usage, typically there are two kind of memory
-> > conversions:
-> >   - explicit conversion: happens when guest explicitly calls into KVM
-> >     to map a range (as private or shared), KVM then exits to userspace
-> >     to perform the map/unmap operations.
-> >   - implicit conversion: happens in KVM page fault handler where KVM
-> >     exits to userspace for an implicit conversion when the page is in a
-> >     different state than requested (private or shared).
+> > On Tue, Nov 15, 2022 at 12:31 AM Eugenio Perez Martin
+> > <eperezma@redhat.com> wrote:
+> > >
+> > > On Mon, Nov 14, 2022 at 5:30 AM Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > > >
+> > > >
+> > > > =E5=9C=A8 2022/11/11 21:12, Eugenio Perez Martin =E5=86=99=E9=81=93=
+:
+> > > > > On Fri, Nov 11, 2022 at 8:49 AM Jason Wang <jasowang@redhat.com> =
+wrote:
+> > > > >>
+> > > > >> =E5=9C=A8 2022/11/10 21:47, Eugenio Perez Martin =E5=86=99=E9=81=
+=93:
+> > > > >>> On Thu, Nov 10, 2022 at 7:01 AM Jason Wang <jasowang@redhat.com=
+> wrote:
+> > > > >>>> On Wed, Nov 9, 2022 at 1:08 AM Eugenio P=C3=A9rez <eperezma@re=
+dhat.com> wrote:
+> > > > >>>>> The memory listener that thells the device how to convert GPA=
+ to qemu's
+> > > > >>>>> va is registered against CVQ vhost_vdpa. This series try to m=
+ap the
+> > > > >>>>> memory listener translations to ASID 0, while it maps the CVQ=
+ ones to
+> > > > >>>>> ASID 1.
+> > > > >>>>>
+> > > > >>>>> Let's tell the listener if it needs to register them on iova =
+tree or
+> > > > >>>>> not.
+> > > > >>>>>
+> > > > >>>>> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > > > >>>>> ---
+> > > > >>>>> v5: Solve conflict about vhost_iova_tree_remove accepting mem=
+_region by
+> > > > >>>>>       value.
+> > > > >>>>> ---
+> > > > >>>>>    include/hw/virtio/vhost-vdpa.h | 2 ++
+> > > > >>>>>    hw/virtio/vhost-vdpa.c         | 6 +++---
+> > > > >>>>>    net/vhost-vdpa.c               | 1 +
+> > > > >>>>>    3 files changed, 6 insertions(+), 3 deletions(-)
+> > > > >>>>>
+> > > > >>>>> diff --git a/include/hw/virtio/vhost-vdpa.h b/include/hw/virt=
+io/vhost-vdpa.h
+> > > > >>>>> index 6560bb9d78..0c3ed2d69b 100644
+> > > > >>>>> --- a/include/hw/virtio/vhost-vdpa.h
+> > > > >>>>> +++ b/include/hw/virtio/vhost-vdpa.h
+> > > > >>>>> @@ -34,6 +34,8 @@ typedef struct vhost_vdpa {
+> > > > >>>>>        struct vhost_vdpa_iova_range iova_range;
+> > > > >>>>>        uint64_t acked_features;
+> > > > >>>>>        bool shadow_vqs_enabled;
+> > > > >>>>> +    /* The listener must send iova tree addresses, not GPA *=
+/
+> > > > >>
+> > > > >> Btw, cindy's vIOMMU series will make it not necessarily GPA any =
+more.
+> > > > >>
+> > > > > Yes, this comment should be tuned then. But the SVQ iova_tree wil=
+l not
+> > > > > be equal to vIOMMU one because shadow vrings.
+> > > > >
+> > > > > But maybe SVQ can inspect both instead of having all the duplicat=
+ed entries.
+> > > > >
+> > > > >>>>> +    bool listener_shadow_vq;
+> > > > >>>>>        /* IOVA mapping used by the Shadow Virtqueue */
+> > > > >>>>>        VhostIOVATree *iova_tree;
+> > > > >>>>>        GPtrArray *shadow_vqs;
+> > > > >>>>> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+> > > > >>>>> index 8fd32ba32b..e3914fa40e 100644
+> > > > >>>>> --- a/hw/virtio/vhost-vdpa.c
+> > > > >>>>> +++ b/hw/virtio/vhost-vdpa.c
+> > > > >>>>> @@ -220,7 +220,7 @@ static void vhost_vdpa_listener_region_ad=
+d(MemoryListener *listener,
+> > > > >>>>>                                             vaddr, section->r=
+eadonly);
+> > > > >>>>>
+> > > > >>>>>        llsize =3D int128_sub(llend, int128_make64(iova));
+> > > > >>>>> -    if (v->shadow_vqs_enabled) {
+> > > > >>>>> +    if (v->listener_shadow_vq) {
+> > > > >>>>>            int r;
+> > > > >>>>>
+> > > > >>>>>            mem_region.translated_addr =3D (hwaddr)(uintptr_t)=
+vaddr,
+> > > > >>>>> @@ -247,7 +247,7 @@ static void vhost_vdpa_listener_region_ad=
+d(MemoryListener *listener,
+> > > > >>>>>        return;
+> > > > >>>>>
+> > > > >>>>>    fail_map:
+> > > > >>>>> -    if (v->shadow_vqs_enabled) {
+> > > > >>>>> +    if (v->listener_shadow_vq) {
+> > > > >>>>>            vhost_iova_tree_remove(v->iova_tree, mem_region);
+> > > > >>>>>        }
+> > > > >>>>>
+> > > > >>>>> @@ -292,7 +292,7 @@ static void vhost_vdpa_listener_region_de=
+l(MemoryListener *listener,
+> > > > >>>>>
+> > > > >>>>>        llsize =3D int128_sub(llend, int128_make64(iova));
+> > > > >>>>>
+> > > > >>>>> -    if (v->shadow_vqs_enabled) {
+> > > > >>>>> +    if (v->listener_shadow_vq) {
+> > > > >>>>>            const DMAMap *result;
+> > > > >>>>>            const void *vaddr =3D memory_region_get_ram_ptr(se=
+ction->mr) +
+> > > > >>>>>                section->offset_within_region +
+> > > > >>>>> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> > > > >>>>> index 85a318faca..02780ee37b 100644
+> > > > >>>>> --- a/net/vhost-vdpa.c
+> > > > >>>>> +++ b/net/vhost-vdpa.c
+> > > > >>>>> @@ -570,6 +570,7 @@ static NetClientState *net_vhost_vdpa_ini=
+t(NetClientState *peer,
+> > > > >>>>>        s->vhost_vdpa.index =3D queue_pair_index;
+> > > > >>>>>        s->always_svq =3D svq;
+> > > > >>>>>        s->vhost_vdpa.shadow_vqs_enabled =3D svq;
+> > > > >>>>> +    s->vhost_vdpa.listener_shadow_vq =3D svq;
+> > > > >>>> Any chance those above two can differ?
+> > > > >>>>
+> > > > >>> If CVQ is shadowed but data VQs are not, shadow_vqs_enabled is =
+true
+> > > > >>> but listener_shadow_vq is not.
+> > > > >>>
+> > > > >>> It is more clear in the next commit, where only shadow_vqs_enab=
+led is
+> > > > >>> set to true at vhost_vdpa_net_cvq_start.
+> > > > >>
+> > > > >> Ok, the name looks a little bit confusing. I wonder if it's bett=
+er to
+> > > > >> use shadow_cvq and shadow_data ?
+> > > > >>
+> > > > > I'm ok with renaming it, but struct vhost_vdpa is generic across =
+all
+> > > > > kind of devices, and it does not know if it is a datapath or not =
+for
+> > > > > the moment.
+> > > > >
+> > > > > Maybe listener_uses_iova_tree?
+> > > >
+> > > >
+> > > > I think "iova_tree" is something that is internal to svq implementa=
+tion,
+> > > > it's better to define the name from the view of vhost_vdpa level.
+> > > >
+> > >
+> > > I don't get this, vhost_vdpa struct already has a pointer to its iova=
+_tree.
 > >
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst | 23 +++++++++++++++++++++++
-> >  include/uapi/linux/kvm.h       |  9 +++++++++
-> >  2 files changed, 32 insertions(+)
+> > Yes, this is a suggestion to improve the readability of the code. So
+> > what I meant is to have a name to demonstrate why we need to use
+> > iova_tree instead of "uses_iova_tree".
 > >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index f3fa75649a78..975688912b8c 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -6537,6 +6537,29 @@ array field represents return values. The userspace should update the return
-> >  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
-> >  spec refer, https://github.com/riscv/riscv-sbi-doc.
-> >  
-> > +::
-> > +
-> > +		/* KVM_EXIT_MEMORY_FAULT */
-> > +		struct {
-> > +  #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1 << 0)
-> > +			__u32 flags;
-> > +			__u32 padding;
-> > +			__u64 gpa;
-> > +			__u64 size;
-> > +		} memory;
-> > +
-> > +If exit reason is KVM_EXIT_MEMORY_FAULT then it indicates that the VCPU has
-> > +encountered a memory error which is not handled by KVM kernel module and
-> > +userspace may choose to handle it. The 'flags' field indicates the memory
-> > +properties of the exit.
-> > +
-> > + - KVM_MEMORY_EXIT_FLAG_PRIVATE - indicates the memory error is caused by
-> > +   private memory access when the bit is set. Otherwise the memory error is
-> > +   caused by shared memory access when the bit is clear.
-> 
-> What does a shared memory access failure entail?
+>
+> I understand.
+>
+> Knowing that the listener will be always bound to data vqs (being net,
+> blk, ...), I think it is ok to rename it to shadow_data.
+>
+> But I think there is no way to add shadow_cvq properly from
+> hw/virtio/vhost-vdpa.c , since we don't know if the vhost_vdpa belongs
+> to a datapath or not. Would it work just to rename listener_shadow_vq
+> to shadow_data?
 
-In the context of confidential computing usages, guest can issue a
-shared memory access while the memory is actually private from the host
-point of view. This exit with bit 0 cleared gives userspace a chance to
-convert the private memory to shared memory on host.
+This should work.
 
-> 
-> If you envision any other failure modes it might be worth making it
-> explicit with additional flags.
+Thanks
 
-Sean mentioned some more usages[1][]2] other than the memory conversion
-for confidential usage. But I would leave those flags being added in the
-future after those usages being well discussed.
+>
+> Thanks!
+>
 
-[1] https://lkml.kernel.org/r/20200617230052.GB27751@linux.intel.com
-[2] https://lore.kernel.org/all/YKxJLcg%2FWomPE422@google.com
-
-> I also wonder if a bitmask makes sense if
-> there can only be one reason for a failure? Maybe all that is needed is
-> a reason enum?
-
-Tough we only have one reason right now but we still want to leave room
-for future extension. Enum can express a single value at once well but
-bitmask makes it possible to express multiple orthogonal flags.
-
-Chao
-> 
-> > +
-> > +'gpa' and 'size' indicate the memory range the error occurs at. The userspace
-> > +may handle the error and return to KVM to retry the previous memory access.
-> > +
-> >  ::
-> >  
-> >      /* KVM_EXIT_NOTIFY */
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index f1ae45c10c94..fa60b032a405 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -300,6 +300,7 @@ struct kvm_xen_exit {
-> >  #define KVM_EXIT_RISCV_SBI        35
-> >  #define KVM_EXIT_RISCV_CSR        36
-> >  #define KVM_EXIT_NOTIFY           37
-> > +#define KVM_EXIT_MEMORY_FAULT     38
-> >  
-> >  /* For KVM_EXIT_INTERNAL_ERROR */
-> >  /* Emulate instruction failed. */
-> > @@ -538,6 +539,14 @@ struct kvm_run {
-> >  #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
-> >  			__u32 flags;
-> >  		} notify;
-> > +		/* KVM_EXIT_MEMORY_FAULT */
-> > +		struct {
-> > +#define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1 << 0)
-> > +			__u32 flags;
-> > +			__u32 padding;
-> > +			__u64 gpa;
-> > +			__u64 size;
-> > +		} memory;
-> >  		/* Fix the size of the union. */
-> >  		char padding[256];
-> >  	};
-> 
-> 
-> -- 
-> Alex Bennée
