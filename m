@@ -2,101 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68E8F62C7B2
-	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 19:33:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDE4D62C831
+	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 19:51:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239222AbiKPSdl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Nov 2022 13:33:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38712 "EHLO
+        id S238905AbiKPSvt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Nov 2022 13:51:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230203AbiKPSdh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Nov 2022 13:33:37 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49E0D115F;
-        Wed, 16 Nov 2022 10:33:34 -0800 (PST)
-Received: from zn.tnic (p200300ea9733e74b329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e74b:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 22CA91EC0138;
-        Wed, 16 Nov 2022 19:33:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1668623613;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=Ms5H47kTpr48KRWEJSYgNO3SJlSnLGzl1g2kZ6eGJmc=;
-        b=ZvkX+n9jOMsxQsBufShjvTUDKX6y1XF7McZHTcsLjyFgqo04Ix83CRkbmiA3mCbdMiOAGt
-        0wuDhCO9kMb8aXQkzWvWJtgBz0O1pvo4l3RRkziC4O6DSODhtg9ae9GGVcTY4fxs3IJLiQ
-        EmRuHlwmOO7hZDcZ/p5j+28F3Pv3bas=
-Date:   Wed, 16 Nov 2022 19:33:27 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc:     Vlastimil Babka <vbabka@suse.cz>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        michael.roth@amd.com, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org,
-        "Kaplan, David" <David.Kaplan@amd.com>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Oscar Salvador <osalvador@suse.de>
-Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-Message-ID: <Y3Us9wSX9DrWqCyq@zn.tnic>
-References: <dc89b2f4-1053-91ac-aeac-bb3b25f9ebc7@amd.com>
- <Y2JS7kn8Q9P4rXso@zn.tnic>
- <c2ce6317-aa51-2a2b-2d75-ad1fd269f3fa@amd.com>
- <7882353e-2b13-d35a-b462-cef35ee56f51@suse.cz>
- <5b27a05e-09ad-9139-67b1-77b90731419f@amd.com>
- <9d9f1afe-c981-4df9-f012-89c4cb783cc3@amd.com>
- <973c6f79-38ad-aa30-bfec-c2a1c7db5d70@suse.cz>
- <8692e736-7518-d6d2-ae83-720e42e7a059@amd.com>
- <41b8c83e-2a1a-1dda-945e-99329ca8e7e9@suse.cz>
- <711e6027-1b4f-4aed-47a6-305396d05893@amd.com>
+        with ESMTP id S238875AbiKPSvJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Nov 2022 13:51:09 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C128E49B63
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 10:48:47 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id d59-20020a17090a6f4100b00213202d77e1so3194924pjk.2
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 10:48:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=A0w6P3/5rWNmrPimfeWShNgQxfD7eWOB8psbtgB4eNM=;
+        b=iuHU2XySbRBXDBvmb7KGdjsTrJ11MtKm8XUWbJgiH+mJZH0mrNKnmVkYWIqEN8KH+D
+         TMTSgskSxS+dz6pqJQ/6lU5YOrdG2ZlIZWDOaRJRiQwsbQA3PrerGAmObwm4ynhLdSAK
+         ipQyS23YgpxwcwZ6vh4k2Bq/MDUW0MakaENRTi4n4z7trqezhQAU1VBvvRliz6hMutEA
+         9nByJ3f7EiBHZeDsD30/pNhrYplPoCDi15C49ph/4Z5Ug6emFwiauN/3keUjTSc8xjjS
+         9rhI8o2gCdwKZQMaSLBrQFcQ5PC0p5wqf3PICwkpXgJE4dUBiCSgdG/Zg1bcsS/uJXqa
+         0yLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A0w6P3/5rWNmrPimfeWShNgQxfD7eWOB8psbtgB4eNM=;
+        b=APdAMCkgmh4estKj+w9wNWreFIv4/GHS29EOpAcfmVNYvbNGUP3XhwgsD7rTdClr2A
+         nUmN7lbCBwUi6QLexI35S9vTvotgbpVE07bONMIOgs4I5Fq3HmhmxAYa9clHU/Ur+QHg
+         BtOrwFpuF1Bn/qet6fdOMTxz7wzVCOxfkT2XEvvlIvO21hNwLa7iSi81WgvpXlylNaW6
+         pI1JVgxBXha4ivTuU+a6e3XiEwE8T5uVeUj3s2zTfXbCBsPQZU+NSHlPQjtq2VzjVe1x
+         6C901+H0+TIMorJ155zwuz+jZh+sNF2wrgj03G/B62ib/zGY0AKGyiZkCyovDupkuWxZ
+         xC4w==
+X-Gm-Message-State: ANoB5plJO3g5IzXdAvvS2TkoRwBJExSmkUDFZoD1RuXVBkWVR10/My9m
+        JBJa7VCzt3+GBa0LyGxhr8y3HQ==
+X-Google-Smtp-Source: AA0mqf7gsXMWPLCwPxYnb+HvqYNLX3WPvDWV8mKDKQpAZsMJhL2t5iqRN/vftj6zV72w0hUj24psag==
+X-Received: by 2002:a17:90b:3c0d:b0:20d:478a:9d75 with SMTP id pb13-20020a17090b3c0d00b0020d478a9d75mr5030085pjb.149.1668624527166;
+        Wed, 16 Nov 2022 10:48:47 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 7-20020a621507000000b0056c0b98617esm11265827pfv.0.2022.11.16.10.48.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Nov 2022 10:48:46 -0800 (PST)
+Date:   Wed, 16 Nov 2022 18:48:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, Linux API <linux-api@vger.kernel.org>,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Fuad Tabba <tabba@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Muchun Song <songmuchun@bytedance.com>,
+        Wei W Wang <wei.w.wang@intel.com>
+Subject: Re: [PATCH v9 3/8] KVM: Add KVM_EXIT_MEMORY_FAULT exit
+Message-ID: <Y3Uwi2lc4NDrdzML@google.com>
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <20221025151344.3784230-4-chao.p.peng@linux.intel.com>
+ <2e252f4f-7d45-42ac-a88f-fa8045fe3748@app.fastmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <711e6027-1b4f-4aed-47a6-305396d05893@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <2e252f4f-7d45-42ac-a88f-fa8045fe3748@app.fastmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 16, 2022 at 12:01:11PM -0600, Kalra, Ashish wrote:
-> Ok, so i will work on implementing this leaked pages list and put it on a
-> sev/snp associated structure.
+On Wed, Nov 16, 2022, Andy Lutomirski wrote:
+> 
+> 
+> On Tue, Oct 25, 2022, at 8:13 AM, Chao Peng wrote:
+> > diff --git a/Documentation/virt/kvm/api.rst 
+> > b/Documentation/virt/kvm/api.rst
+> > index f3fa75649a78..975688912b8c 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -6537,6 +6537,29 @@ array field represents return values. The 
+> > userspace should update the return
+> >  values of SBI call before resuming the VCPU. For more details on 
+> > RISC-V SBI
+> >  spec refer, https://github.com/riscv/riscv-sbi-doc.
+> > 
+> > +::
+> > +
+> > +		/* KVM_EXIT_MEMORY_FAULT */
+> > +		struct {
+> > +  #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1 << 0)
+> > +			__u32 flags;
+> > +			__u32 padding;
+> > +			__u64 gpa;
+> > +			__u64 size;
+> > +		} memory;
+> > +
+> 
+> Would it make sense to also have a field for the access type (read, write,
+> execute, etc)?  I realize that shared <-> private conversion doesn't strictly
+> need this, but it seems like it could be useful for logging failures and also
+> for avoiding a second immediate fault if the type gets converted but doesn't
+> have the right protection yet.
 
-See __sgx_sanitize_pages() and the poison list there, for an example.
+I don't think a separate field is necessary, that info can be conveyed via flags.
+Though maybe we should go straight to a u64 for flags.  Hmm, and maybe avoid bits
+0-3 so that if/when RWX info is conveyed the flags can align with
+PROT_{READ,WRITE,EXEC} and the EPT flags, e.g.
 
-> Also to add here, we will actually get a not-present #PF instead of the RMP
-> violation #PF on writing to these leaked pages, as these pages would have
-> been removed from the kernel direct map.
+	KVM_MEMORY_EXIT_FLAG_READ	(1 << 0)
+	KVM_MEMORY_EXIT_FLAG_WRITE	(1 << 1)
+	KVM_MEMORY_EXIT_FLAG_EXECUTE	(1 << 2)
 
-So if you do the list and still have the kernel raise a RMP fault for
-those pages, traversing that list in the RMP handler to check whether
-the page is there on it, should be a lot faster operation than doing the
-#PF thing and removing them from the direct map.
-
-And sorry for misleading you about UPM - we were thinking wrong
-yesterday.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> (Obviously, if this were changed, KVM would need the ability to report that
+> it doesn't actually know the mode.)
+> 
+> --Andy
