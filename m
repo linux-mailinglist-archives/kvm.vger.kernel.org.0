@@ -2,168 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45C3962B172
-	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 03:41:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ACD4B62B1AD
+	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 04:09:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231639AbiKPCln (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 21:41:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53486 "EHLO
+        id S231862AbiKPDJA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 22:09:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230175AbiKPCll (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 21:41:41 -0500
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 834D331ED3;
-        Tue, 15 Nov 2022 18:41:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668566500; x=1700102500;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=BRybwp664iYFi9JIaLJps6hbL+wEUrOLNCSci+W3Drs=;
-  b=V7CUywRHxTo5U9NMXN4s0HgEBx6WfRvLl3N0m7EMj3c3Gh9jNaKKIi85
-   XDcoCouoy375U1qQiEQuyvA0PXFUSZyrmIcmFokSHxXdDRtgi1oZ/igrw
-   8LgHQatpeEKA9kGaXx+ZVTJtT2gtIFV4VOPkbckVWj7WODZajt7CP3TIY
-   M4ycKIjI4uf5v1TlACEEBoHJeSgveGd+FvuOZh5iNkMFceGWTjgWJ1Ihy
-   CpeGntm+fpiFQOr2kfomq2A8aBM4ywKMrQ33WcxhbEdrV6f0rYbSQOV3/
-   FzX+p8j3fFVFHwSGmGqmy842rkeYD06Sl7O813RXM7OB634YQjoSUCaYi
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10532"; a="292819184"
-X-IronPort-AV: E=Sophos;i="5.96,167,1665471600"; 
-   d="scan'208";a="292819184"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2022 18:41:40 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10532"; a="590022666"
-X-IronPort-AV: E=Sophos;i="5.96,167,1665471600"; 
-   d="scan'208";a="590022666"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.3.76]) ([10.238.3.76])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2022 18:41:37 -0800
-Message-ID: <74ac8612-f4c9-6299-a5d8-6dd4652b6c1f@linux.intel.com>
-Date:   Wed, 16 Nov 2022 10:41:34 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v10 077/108] KVM: x86: Add a switch_db_regs flag to handle
- TDX's auto-switched behavior
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        with ESMTP id S230244AbiKPDI4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 22:08:56 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F87D10056;
+        Tue, 15 Nov 2022 19:08:55 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EC941B818E0;
+        Wed, 16 Nov 2022 03:08:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F2B1C433D6;
+        Wed, 16 Nov 2022 03:08:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668568132;
+        bh=Zd6O46v+aOYouGnAna4jIIJwIb+cPMsXGDMUfy7dDc0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=n8zFaBT8FSrppdZnfPmFvvxlCBHBydmyVNfoo/OChYwOrnOBkjltj3DTJWd363Tv1
+         WSOhxfcntqPbc/cHA5UJfqPkm9SkDKTxgFDEZ0sLGP4alGnEcmCjNzcJhY8VdVxMSG
+         nd8wk6qhWl141iiJhkM3b5NJaFHrONNKYP//Wc2Qa3AhytabEUseOUWS+Wo78pmkSx
+         qB6f/F/eP0qziMdvYyDd4mPJ9rxVGM9zRt4ZSU0K5T1l2dJx/0m40HNs9oyxiHbaqN
+         SMniSji+W31VO0hskljfBfWd2m74AzVOnZ7BmpAgj3fGdNwgyV9bOsuTLXAbaMQOnt
+         celo2gvZygaLQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ov8nC-006Lpn-4m;
+        Wed, 16 Nov 2022 03:08:50 +0000
+Date:   Wed, 16 Nov 2022 03:08:49 +0000
+Message-ID: <868rkbppdq.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
         linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Chao Gao <chao.gao@intel.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <e7a026dce86cc2fc9397db92775b00cb29e82439.1667110240.git.isaku.yamahata@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <e7a026dce86cc2fc9397db92775b00cb29e82439.1667110240.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Subject: Re: [PATCH v2] KVM: arm64: Don't acquire RCU read lock for exclusive table walks
+In-Reply-To: <20221115225502.2240227-1-oliver.upton@linux.dev>
+References: <20221115225502.2240227-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kvmarm@lists.linux.dev, m.szyprowski@samsung.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 10/30/2022 2:23 PM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> Add a flag, KVM_DEBUGREG_AUTO_SWITCHED_GUEST, to skip saving/restoring DRs
-> irrespective of any other flags.  TDX-SEAM unconditionally saves and
-> restores guest DRs and reset to architectural INIT state on TD exit.
-> So, KVM needs to save host DRs before TD enter without restoring guest DRs
-> and restore host DRs after TD exit.
->
-> Opportunistically convert the KVM_DEBUGREG_* definitions to use BIT().
->
-> Reported-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Co-developed-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+On Tue, 15 Nov 2022 22:55:02 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Marek reported a BUG resulting from the recent parallel faults changes,
+> as the hyp stage-1 map walker attempted to allocate table memory while
+> holding the RCU read lock:
+> 
+>   BUG: sleeping function called from invalid context at
+>   include/linux/sched/mm.h:274
+>   in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 1, name: swapper/0
+>   preempt_count: 0, expected: 0
+>   RCU nest depth: 1, expected: 0
+>   2 locks held by swapper/0/1:
+>     #0: ffff80000a8a44d0 (kvm_hyp_pgd_mutex){+.+.}-{3:3}, at:
+>   __create_hyp_mappings+0x80/0xc4
+>     #1: ffff80000a927720 (rcu_read_lock){....}-{1:2}, at:
+>   kvm_pgtable_walk+0x0/0x1f4
+>   CPU: 2 PID: 1 Comm: swapper/0 Not tainted 6.1.0-rc3+ #5918
+>   Hardware name: Raspberry Pi 3 Model B (DT)
+>   Call trace:
+>     dump_backtrace.part.0+0xe4/0xf0
+>     show_stack+0x18/0x40
+>     dump_stack_lvl+0x8c/0xb8
+>     dump_stack+0x18/0x34
+>     __might_resched+0x178/0x220
+>     __might_sleep+0x48/0xa0
+>     prepare_alloc_pages+0x178/0x1a0
+>     __alloc_pages+0x9c/0x109c
+>     alloc_page_interleave+0x1c/0xc4
+>     alloc_pages+0xec/0x160
+>     get_zeroed_page+0x1c/0x44
+>     kvm_hyp_zalloc_page+0x14/0x20
+>     hyp_map_walker+0xd4/0x134
+>     kvm_pgtable_visitor_cb.isra.0+0x38/0x5c
+>     __kvm_pgtable_walk+0x1a4/0x220
+>     kvm_pgtable_walk+0x104/0x1f4
+>     kvm_pgtable_hyp_map+0x80/0xc4
+>     __create_hyp_mappings+0x9c/0xc4
+>     kvm_mmu_init+0x144/0x1cc
+>     kvm_arch_init+0xe4/0xef4
+>     kvm_init+0x3c/0x3d0
+>     arm_init+0x20/0x30
+>     do_one_initcall+0x74/0x400
+>     kernel_init_freeable+0x2e0/0x350
+>     kernel_init+0x24/0x130
+>     ret_from_fork+0x10/0x20
+> 
+> Since the hyp stage-1 table walkers are serialized by kvm_hyp_pgd_mutex,
+> RCU protection really doesn't add anything. Don't acquire the RCU read
+> lock for an exclusive walk. While at it, add a warning which codifies
+> the lack of support for shared walks in the hypervisor code.
+> 
+> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->   arch/x86/include/asm/kvm_host.h |  9 +++++++--
->   arch/x86/kvm/vmx/tdx.c          |  1 +
->   arch/x86/kvm/x86.c              | 11 ++++++++---
->   3 files changed, 16 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index fdb00d96e954..082e94f78c66 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -583,8 +583,13 @@ struct kvm_pmu {
->   struct kvm_pmu_ops;
->   
->   enum {
-> -	KVM_DEBUGREG_BP_ENABLED = 1,
-> -	KVM_DEBUGREG_WONT_EXIT = 2,
-> +	KVM_DEBUGREG_BP_ENABLED		= BIT(0),
-> +	KVM_DEBUGREG_WONT_EXIT		= BIT(1),
+> 
+> Applies on top of the parallel faults series that was picked up last
+> week. Tested with kvm-arm.mode={nvhe,protected} on an Ampere Altra
+> system.
+> 
+> v1 -> v2:
+>  - Took Will's suggestion of conditioning RCU on a flag, small tweak to
+>    use existing bit instead (Thanks!)
+> 
+>  arch/arm64/include/asm/kvm_pgtable.h | 22 ++++++++++++++++------
+>  arch/arm64/kvm/hyp/pgtable.c         |  5 +++--
+>  2 files changed, 19 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index a874ce0ce7b5..d4c7321fa652 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -51,8 +51,16 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
+>  	return pteref;
+>  }
+>  
+> -static inline void kvm_pgtable_walk_begin(void) {}
+> -static inline void kvm_pgtable_walk_end(void) {}
+> +static inline void kvm_pgtable_walk_begin(bool shared)
+> +{
 > +	/*
-> +	 * Guest debug registers are saved/restored by hardware on exit from
-> +	 * or enter guest. KVM needn't switch them.
+> +	 * Due to the lack of RCU (or a similar protection scheme), only
+> +	 * non-shared table walkers are allowed in the hypervisor.
 > +	 */
-> +	KVM_DEBUGREG_AUTO_SWITCH	= BIT(2),
->   };
->   
->   struct kvm_mtrr_range {
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index fc4de83a2df8..57767ef3353b 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -429,6 +429,7 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
->   
->   	vcpu->arch.efer = EFER_SCE | EFER_LME | EFER_LMA | EFER_NX;
->   
-> +	vcpu->arch.switch_db_regs = KVM_DEBUGREG_AUTO_SWITCH;
->   	vcpu->arch.cr0_guest_owned_bits = -1ul;
->   	vcpu->arch.cr4_guest_owned_bits = -1ul;
->   
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 4d4b71c4cdb1..ad7b227b68dd 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10779,7 +10779,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->   	if (vcpu->arch.guest_fpu.xfd_err)
->   		wrmsrl(MSR_IA32_XFD_ERR, vcpu->arch.guest_fpu.xfd_err);
->   
-> -	if (unlikely(vcpu->arch.switch_db_regs)) {
-> +	if (unlikely(vcpu->arch.switch_db_regs & ~KVM_DEBUGREG_AUTO_SWITCH)) {
->   		set_debugreg(0, 7);
->   		set_debugreg(vcpu->arch.eff_db[0], 0);
->   		set_debugreg(vcpu->arch.eff_db[1], 1);
-> @@ -10822,6 +10822,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->   	 */
->   	if (unlikely(vcpu->arch.switch_db_regs & KVM_DEBUGREG_WONT_EXIT)) {
->   		WARN_ON(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP);
-> +		WARN_ON(vcpu->arch.switch_db_regs & KVM_DEBUGREG_AUTO_SWITCH);
->   		static_call(kvm_x86_sync_dirty_debug_regs)(vcpu);
->   		kvm_update_dr0123(vcpu);
->   		kvm_update_dr7(vcpu);
-> @@ -10834,8 +10835,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->   	 * care about the messed up debug address registers. But if
->   	 * we have some of them active, restore the old state.
->   	 */
-> -	if (hw_breakpoint_active())
-> -		hw_breakpoint_restore();
-> +	if (hw_breakpoint_active()) {
-> +		if (!(vcpu->arch.switch_db_regs & KVM_DEBUGREG_AUTO_SWITCH))
-> +			hw_breakpoint_restore();
-> +		else
-> +			set_debugreg(__this_cpu_read(cpu_dr7), 7);
+> +	WARN_ON(shared);
+> +}
+> +
+> +static inline void kvm_pgtable_walk_end(bool shared) {}
+>  
+>  static inline bool kvm_pgtable_walk_lock_held(void)
+>  {
+> @@ -68,14 +76,16 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
+>  	return rcu_dereference_check(pteref, !shared);
+>  }
+>  
+> -static inline void kvm_pgtable_walk_begin(void)
+> +static inline void kvm_pgtable_walk_begin(bool shared)
 
-Why only restore dr7 when TD exit?
+I'm not crazy about this sort of parameters. I think it would make a
+lot more sense to pass a pointer to the walker structure and do the
+flag check inside the helper.
 
-According to the commit message, dr0~dr3 are also reset to architectural 
-INIT value on TD exit.
+That way, we avoid extra churn if/when we need extra state or
+bookkeeping around the walk.
 
+Thanks,
 
+	M.
 
-> +	}
->   
->   	vcpu->arch.last_vmentry_cpu = vcpu->cpu;
->   	vcpu->arch.last_guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
+-- 
+Without deviation from the norm, progress is not possible.
