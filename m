@@ -2,254 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 876EC62CC42
-	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 22:07:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BBAB62CC9F
+	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 22:23:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239251AbiKPVHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Nov 2022 16:07:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47306 "EHLO
+        id S233438AbiKPVXV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Nov 2022 16:23:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239012AbiKPVGt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Nov 2022 16:06:49 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2066.outbound.protection.outlook.com [40.107.244.66])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E2B76A742
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 13:05:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f+SSgb2MI6OxD4X87xyy5vb5X+bHaO+4OdRjK/ZoLpZHxXfi8grhzucmziIAi3wakaJBImN29mUZhhgwbEoJttd/UVrUx8uyW71WbioAgBQzbWGchnarkr8yYKsluqOAxEAgTehcLzCyg2/wtqiyfgwl5PnEVNoxh7pHa8dQcZOZSGGIS9VafTrcVZD0ukVjTSpR5bUwBSKKi98bHokNvdpyRMwY04mw+L0UakyZUIDih/kR/8zDHkpQajHHeqmYsp3XaeJsPG4SdesxJEWitJ8mSFB4q11rcJUHBjhZetHs6wu8luWVcfFpWZ5pVoNVLSkfJXxz+oAV+xQtqwlFRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H6o+CnCyJp98qOc57tj1WKsWwpgAWvJ5o4Yjl00Hy/o=;
- b=WgWQzZoYp9s1ORU9V1GM9cx/OQr61a9Lp4GWVTKrqOEQQ430w7traC2q+ZtLKz2ZFXUgy+KE+vnXy4OmAiEV77LHKRcpUrIEsUucaWa/dPxy+QB4cCvnntDJr/31dSyj/TYh/W4lzbgiILExX2ykidQcPAwbKgC5YpNbshDi9bC8h7csE7DlDEWOCzW6hAQDeEt4fbppgdnN7Pe3NSNZ9v5lYEdjlPCUcwQnOTG2DG8v8f4o80AD05zP5lrdfVr2chX8ehxhr8AE0r01bKxHnHeAl9JjAiKE3t6SD/Lt1wGleoOEhOviBA0dQ3xZdZqlcjgkgQH7eFLNdMq1OPA4Qw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H6o+CnCyJp98qOc57tj1WKsWwpgAWvJ5o4Yjl00Hy/o=;
- b=tdNh39ZzEvXwTzzZTIAszxbFqAVSObH//Mr42ZhAxFDKpvqJda2ICt12AcUGNTWXIy+XmytjsHYDkX1shZ25D7oFlxvryO76NFnXvzyPeKCXxou55rllL8CvBPrGLllVMoxm/n+QwMGW46HtYBIDUMjpSbfaaV+0A8zIri8k92QnGOHSd8MiXGf2EbHdu+35JRHx44gZbizF0VCf5UZ4+5ZUcspnkeE6eBo0u3PpTC+EHbi53eMnCldOkfq6IoBcMP65B+htGdb3Gu8EevMXV7ASlE6OiXqR1DUH+mUvgf/kadu2A6/ExoLWwzbCtIyBHgs7AlkNGVRBd9quRKEnKw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SJ0PR12MB5609.namprd12.prod.outlook.com (2603:10b6:a03:42c::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.19; Wed, 16 Nov
- 2022 21:05:41 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%7]) with mapi id 15.20.5813.017; Wed, 16 Nov 2022
- 21:05:41 +0000
-From:   Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Lixiao Yang <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Yi Liu <yi.l.liu@intel.com>, Yu He <yu.he@intel.com>
-Subject: [PATCH v3 11/11] iommufd: Allow iommufd to supply /dev/vfio/vfio
-Date:   Wed, 16 Nov 2022 17:05:36 -0400
-Message-Id: <11-v3-50561e12d92b+313-vfio_iommufd_jgg@nvidia.com>
-In-Reply-To: <0-v3-50561e12d92b+313-vfio_iommufd_jgg@nvidia.com>
-References: 
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MN2PR20CA0015.namprd20.prod.outlook.com
- (2603:10b6:208:e8::28) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S232548AbiKPVXR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Nov 2022 16:23:17 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4B79627CE
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 13:23:16 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id k22so18694723pfd.3
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 13:23:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XI3flRxAcr7a8D6XkYb5LrTIYauo43Fkflx+GElcf/8=;
+        b=KeDg06mR9OW3BaVPOUUPuJktjN0VXrg1Klb/4isAeIvSHdWd19Cd66dnPiu7rwgwA4
+         8J9oJNcrEgQvrPvJXpOmZ5YRXB65CpYlYymSMvmYrkKHeWa9ErzDzbuN4LQDsJ3qzgHh
+         c/Iwja6lx94jXNWhCiYsQzaoG2BS3nSELrDWMs/moiqHhr2swfmqz8ykZEfjU6bwtbGv
+         FQlxYxZuboZukLV5AJ0OKXzlYDxuCvaUj36nDXMys8XrU/a8X2dPt/a9g6rj02GndS7j
+         JEFh1ky/1MTtvAZUYN2egguM8/VT+t+v5zcEM8VAdFsyV3M7lhNzUX8Ph12ETb0toOMF
+         SUnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XI3flRxAcr7a8D6XkYb5LrTIYauo43Fkflx+GElcf/8=;
+        b=fZYsM87WY8CxUrnpr8wKfEnL0qFZJeiMrvyDSrvf64wWgynOunJPE3d858rxdzQzET
+         PJcI/FpkEwtvE0o3aIC76tmY4m+p1nHJwIF18VhzNnBSPpjAn5uuWk1XaQzf2eqkwafx
+         4FNr8tkJiH9Wrg3TPL6GoggjRSObUzJn0T66yfYiB2FmwGQPReJIFvtqvnOGI111ucf0
+         ruZAQU6TIWMGIrV/V60gdSiGW22PXNmd0qzpoVYOt13v6hOh7O/7upQj1AI+KcfldNcF
+         bz+elMOWx+SUNA1+nr2TMo0eeoo8Vxo8IN0fCHl0N6nkcgg6bWtA2+ARVAhHeBxK8m6G
+         7zCQ==
+X-Gm-Message-State: ANoB5plwbFLuFxsoUtGunNCmYFehogTaSsJF/cikUGzt6o1X9Bi2nJzn
+        Fqm3xjvrVfSvDAnrApe3hFP65w==
+X-Google-Smtp-Source: AA0mqf4/zo/G/YMsUhOm2m0gIgxC3Py8wQnBnsPxuDWf8Kc/jHdthJ8Ig2e1OBLVuSS6PWrlf6QxUQ==
+X-Received: by 2002:aa7:9ec7:0:b0:56e:3a98:f02 with SMTP id r7-20020aa79ec7000000b0056e3a980f02mr25227890pfq.53.1668633796157;
+        Wed, 16 Nov 2022 13:23:16 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id v6-20020a626106000000b0056bb6dc882fsm11345319pfb.130.2022.11.16.13.23.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Nov 2022 13:23:15 -0800 (PST)
+Date:   Wed, 16 Nov 2022 21:23:12 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Greg Edwards <gedwards@ddn.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH v2] KVM: x86: Allow APICv APIC ID inhibit to be cleared
+Message-ID: <Y3VUwKJlnu+sNnV+@google.com>
+References: <20221114202037.254176-1-gedwards@ddn.com>
+ <20221116205123.18737-1-gedwards@ddn.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ0PR12MB5609:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5ef02632-d489-42a1-6e8c-08dac8164fef
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fulbDuHTnLPPdMDXLQyVjHnA6FgZwdIjn91E+66ujVpTXK4yCvqPgTza77QHh8JcXMO4AEj0qs3N4pvAvQltwTpiUoni56R8T/e8qGUKaCuNldOUrTM2sCJgHKzmf6NQz12+k3WtXXazO8JkVmxqAEXvy/cOOcieOz/Bn8zjxYFznCfGParDG1yLOVpnusHsvyf/Jp9GSScWJ8p+/WFpdirRZiKDTm6uDbIMGkSrXJyBWjBQKxiqkZHhObz6zlcF2BXSBumyx+8O2G8MmpD/0Ishx32NcU47oBqjRT/F3qWHQfAWhpodEdZ38OzaQ5eeojbYVnuJ6z4eEbDK1BdjDOARkQVgV1/EztZZAIvipN0xwmdEcq97/KcuCgPp0Xm35tSHr5uBnin9d3+CFGi5sMWmOrB8jKkDkZIeZlzFAFf0G63c0I06y5hs/RLIuMFnMvtnh5Yc1KFheMxRXy09/Eh/5mvkhpPetWNpEp+cMlXSyvBLAW+Sow1ATKQaRISlsJfy9ejqRF7+bVP8M2+i07Dqs2/kZKMIXrX0eaG4M8PZu+SMqKJJYdVrTPVg2+Da5WM9y0Eo4LlJ7Zu6H6vaKexMsxqho6ATjtRJ/t3B0nsLp1HqNshgiRYJbastnDfyLh/RAbFPAvZ18sRPLDPLyhNmo1zi1ML+QqtKjPfI+wEOxeNwiqnthKedwmbGEwnv/YqqXVeFwCy7Mvitr8F1md00TRtlMNDOi2iJijSxs3/aVpVNk5soS2z19LA+Yjqo
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(396003)(366004)(376002)(39860400002)(136003)(451199015)(109986013)(86362001)(36756003)(38100700002)(54906003)(316002)(6506007)(6486002)(478600001)(2906002)(5660300002)(7416002)(186003)(2616005)(6666004)(8936002)(66556008)(4326008)(66476007)(66946007)(83380400001)(6512007)(41300700001)(26005)(8676002)(266003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?OjQWzDQSD5lUtG+VJJW+ZgBfjc4ugKiDGDD2gjH3KZNfwPTFuKIG//NGCiqI?=
- =?us-ascii?Q?bnXqnUd3T6QHXAzZj0aY8D1ZspndzZ8qhWdEJkphVocsxScR34QYuUb6wtAz?=
- =?us-ascii?Q?xXbPR6PYs/a7QkiVYzae91tup3HR5mWcYaqzkRBKMqPgmwQnZ0NL9curo0ws?=
- =?us-ascii?Q?HJgvB5i7OQPC4OyvKtBfdZoiH0XH4Dz1HhhpKpI5jYlt9XecsdgHhh2Bz9e/?=
- =?us-ascii?Q?RmMnlZfGD4cbIJ0heUJUSraigLCxRWcJ2UDUSCmLyWnykJ7x4cJuovM483EA?=
- =?us-ascii?Q?wNo/TcS0jPaSlHk+sPkTL/rATllXVW2UJVY5/l3kiapXxdQIRskAJ8KvFPTy?=
- =?us-ascii?Q?ZPNVVsQ5Yi/9w4gxVQ+b6NRr/9HpkRFftn18akZ/d2rZB24yDhRlaNubxiLB?=
- =?us-ascii?Q?+7ByyhtzZT56g4whHbVAUaVzPwvtz0LPi3tBRbv/rGuw5f3acWHAosLlRoMP?=
- =?us-ascii?Q?hqM1JLec2VqtzMHps6oAcjshZeAeHuxqtsf0NOCiLrmrtOfzcwR/nmkwi8JN?=
- =?us-ascii?Q?xgqPsXwbZof8KU2NZTzYuZdGTaMAX89k+GgagasYd8cUGHLnpIioVH+LPPZi?=
- =?us-ascii?Q?7LZIrzAVesMjBIsJpeNg/j4+/eQnb5H4sp2yQvJUoB7WJJzRZVLwaTjIo4oU?=
- =?us-ascii?Q?DkOav9my41UN+yZx3hYxAXgCUeRcmqiIjxMOHWjn+TN7PNUSa8wcgQXm+df+?=
- =?us-ascii?Q?yComwq20Ww7BdGpKlxSnOJbfgrGY//zNXM/4gnyGyqnn+CYir2mdNbAQzPmF?=
- =?us-ascii?Q?lzpZu96eq5UmuIEgio0pkWbu/xoPSdmKGiYzCuZAhWK3FLa+1H2pshxePDIR?=
- =?us-ascii?Q?Q33uQMs/I+O7/M3IlyanGB2f6EEGWBd4NMHEbXQxQO4ww3Z1EI+nskkqwlzr?=
- =?us-ascii?Q?puSGVI0vBZyzPy1IhuthRxlhXkXvU05/FI6jm6jmeiJti9YJLxyFvGHIRzT2?=
- =?us-ascii?Q?2SbhCUwCmE35DHey6EzLtsU3ahMfX6cz+1XsZfZZV2h944djekBOhgwKpDgT?=
- =?us-ascii?Q?/wLQ+zSkWNpAU4UTtoBJrTfCGexlKBHdm97gVx5JfkkNpRhYInaJNtiDKcz2?=
- =?us-ascii?Q?Ieig48F/Cc+A8AglPIFTy2/kMKzPIHTj+C2J0fKTEp/p5xFHDclonpVpKbGB?=
- =?us-ascii?Q?4f0jAeS57pSAhWOdxxU46i93XoDlAOAC5qivVj5XHQW53M696Ph3xgXLqZA+?=
- =?us-ascii?Q?GXAJuE1927XOhKCodweImhlbTTbKHs+1/EolFe7ngr/MCQDYfSp3E/nNi3Dc?=
- =?us-ascii?Q?DoykQX1QfCQmNQWFig5ELtrgawgTJO3vnDblCtMB07bJSBrkIdWm2LHW39ni?=
- =?us-ascii?Q?pR9/EXL4TTTUilyo+g/ralOWl9niWgJVqnxReHOFtm/n62skL/EZHeXhIapQ?=
- =?us-ascii?Q?lThhNMkOA3Ymi8UjqilnHz9EBisKRyRKbfBeiEia9X6PTR9mz+lNsqGtBTtp?=
- =?us-ascii?Q?l51pNE3XgrM/VzaSSw0OqPAQRYcyml6qCGYJyosZ9pI7COv7BvWG9FiJ10h3?=
- =?us-ascii?Q?WPfagR/mJeCmkmf19ItZbejo6dL63kqLqGlRUVvBcAq9nmW+r8Yvt9W6nuh9?=
- =?us-ascii?Q?159cPV3FHXY4lXnpINI=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ef02632-d489-42a1-6e8c-08dac8164fef
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2022 21:05:38.3835
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +ScedFBieUdAc1GrNKS9USWhdxyVzw+0vBifeA/+rSTGQVOFrUyEhtjB1jk4UgR6
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5609
-X-Spam-Status: No, score=1.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_PASS,
-        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: *
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221116205123.18737-1-gedwards@ddn.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
-To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If the VFIO container is compiled out, give a kconfig option for iommufd
-to provide the miscdev node with the same name and permissions as vfio
-uses.
+On Wed, Nov 16, 2022, Greg Edwards wrote:
+> Legacy kernels prior to commit 4399c03c6780 ("x86/apic: Remove
+> verify_local_APIC()") write the APIC ID of the boot CPU twice to verify
+> a functioning local APIC.  This results in APIC acceleration inhibited
+> on these kernels for reason APICV_INHIBIT_REASON_APIC_ID_MODIFIED.
+> 
+> Allow the APICV_INHIBIT_REASON_APIC_ID_MODIFIED inhibit reason to be
+> cleared if/when all APICs in xAPIC mode set their APIC ID back to the
+> expected vcpu_id value.
+> 
+> Fold the functionality previously in kvm_lapic_xapic_id_updated() into
+> kvm_recalculate_apic_map(), as this allows us examine all APICs in one
+> pass.
+> 
+> Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base")
+> Signed-off-by: Greg Edwards <gedwards@ddn.com>
+> ---
+> Changes from v1:
+>   * Fold kvm_lapic_xapic_id_updated() into kvm_recalculate_apic_map() and
+>     verify no APICs in xAPIC mode have a modified APIC ID before clearing
+>     APICV_INHIBIT_REASON_APIC_ID_MODIFIED.  [Sean]
+>   * Rebase on top of Sean's APIC fixes+cleanups series.  [Sean]
+>     https://lore.kernel.org/all/20221001005915.2041642-1-seanjc@google.com/
+> 
+>  arch/x86/kvm/lapic.c | 45 +++++++++++++++++++-------------------------
+>  1 file changed, 19 insertions(+), 26 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 9b3af49d2524..362472da6e7f 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -236,6 +236,7 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+>  	struct kvm_vcpu *vcpu;
+>  	unsigned long i;
+>  	u32 max_id = 255; /* enough space for any xAPIC ID */
+> +	bool xapic_id_modified = false;
 
-The compatibility node supports the same ioctls as VFIO and automatically
-enables the VFIO compatible pinned page accounting mode.
+Maybe "xapic_id_mismatch"?  E.g. if KVM ends up back because the xAPIC ID was
+modified back to be vcpu_id, then this is somewhat misleading from super pedantic
+point of view.  "modified" was ok when the inhibit was a one-way street.
 
-Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-Tested-by: Yi Liu <yi.l.liu@intel.com>
-Tested-by: Lixiao Yang <lixiao.yang@intel.com>
-Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Tested-by: Yu He <yu.he@intel.com>
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Reviewed-by: Yi Liu <yi.l.liu@intel.com>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
----
- drivers/iommu/iommufd/Kconfig | 12 ++++++++++++
- drivers/iommu/iommufd/main.c  | 36 +++++++++++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+)
+>  	/* Read kvm->arch.apic_map_dirty before kvm->arch.apic_map.  */
+>  	if (atomic_read_acquire(&kvm->arch.apic_map_dirty) == CLEAN)
+> @@ -285,6 +286,19 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+>  		xapic_id = kvm_xapic_id(apic);
+>  		x2apic_id = kvm_x2apic_id(apic);
+>  
+> +		if (!apic_x2apic_mode(apic)) {
+> +			/*
+> +			 * Deliberately truncate the vCPU ID when detecting a
+> +			 * modified APIC ID to avoid false positives if the
+> +			 * vCPU ID, i.e. x2APIC ID, is a 32-bit value.  If the
+> +			 * wrap/truncation results in unwanted aliasing, APICv
+> +			 * will be inhibited as part of updating KVM's
+> +			 * optimized APIC maps.
 
-diff --git a/drivers/iommu/iommufd/Kconfig b/drivers/iommu/iommufd/Kconfig
-index 399a2edeaef6de..f387f803dc6f7f 100644
---- a/drivers/iommu/iommufd/Kconfig
-+++ b/drivers/iommu/iommufd/Kconfig
-@@ -12,6 +12,18 @@ config IOMMUFD
- 	  If you don't know what to do here, say N.
- 
- if IOMMUFD
-+config IOMMUFD_VFIO_CONTAINER
-+	bool "IOMMUFD provides the VFIO container /dev/vfio/vfio"
-+	depends on VFIO && !VFIO_CONTAINER
-+	default VFIO && !VFIO_CONTAINER
-+	help
-+	  IOMMUFD will provide /dev/vfio/vfio instead of VFIO. This relies on
-+	  IOMMUFD providing compatibility emulation to give the same ioctls.
-+	  It provides an option to build a kernel with legacy VFIO components
-+	  removed.
-+
-+	  Unless testing IOMMUFD say N here.
-+
- config IOMMUFD_TEST
- 	bool "IOMMU Userspace API Test support"
- 	depends on RUNTIME_TESTING_MENU
-diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
-index ab3fa05f38505d..1eeb326f74f005 100644
---- a/drivers/iommu/iommufd/main.c
-+++ b/drivers/iommu/iommufd/main.c
-@@ -18,6 +18,7 @@
- #include <uapi/linux/iommufd.h>
- #include <linux/iommufd.h>
- 
-+#include "io_pagetable.h"
- #include "iommufd_private.h"
- #include "iommufd_test.h"
- 
-@@ -25,6 +26,7 @@ struct iommufd_object_ops {
- 	void (*destroy)(struct iommufd_object *obj);
- };
- static const struct iommufd_object_ops iommufd_object_ops[];
-+static struct miscdevice vfio_misc_dev;
- 
- struct iommufd_object *_iommufd_object_alloc(struct iommufd_ctx *ictx,
- 					     size_t size,
-@@ -170,6 +172,16 @@ static int iommufd_fops_open(struct inode *inode, struct file *filp)
- 	if (!ictx)
- 		return -ENOMEM;
- 
-+	/*
-+	 * For compatibility with VFIO when /dev/vfio/vfio is opened we default
-+	 * to the same rlimit accounting as vfio uses.
-+	 */
-+	if (IS_ENABLED(CONFIG_IOMMUFD_VFIO_CONTAINER) &&
-+	    filp->private_data == &vfio_misc_dev) {
-+		ictx->account_mode = IOPT_PAGES_ACCOUNT_MM;
-+		pr_info_once("IOMMUFD is providing /dev/vfio/vfio, not VFIO.\n");
-+	}
-+
- 	xa_init_flags(&ictx->objects, XA_FLAGS_ALLOC1 | XA_FLAGS_ACCOUNT);
- 	ictx->file = filp;
- 	filp->private_data = ictx;
-@@ -395,6 +407,15 @@ static struct miscdevice iommu_misc_dev = {
- 	.mode = 0660,
- };
- 
-+
-+static struct miscdevice vfio_misc_dev = {
-+	.minor = VFIO_MINOR,
-+	.name = "vfio",
-+	.fops = &iommufd_fops,
-+	.nodename = "vfio/vfio",
-+	.mode = 0666,
-+};
-+
- static int __init iommufd_init(void)
- {
- 	int ret;
-@@ -402,18 +423,33 @@ static int __init iommufd_init(void)
- 	ret = misc_register(&iommu_misc_dev);
- 	if (ret)
- 		return ret;
-+
-+	if (IS_ENABLED(CONFIG_IOMMUFD_VFIO_CONTAINER)) {
-+		ret = misc_register(&vfio_misc_dev);
-+		if (ret)
-+			goto err_misc;
-+	}
- 	iommufd_test_init();
- 	return 0;
-+err_misc:
-+	misc_deregister(&iommu_misc_dev);
-+	return ret;
- }
- 
- static void __exit iommufd_exit(void)
- {
- 	iommufd_test_exit();
-+	if (IS_ENABLED(CONFIG_IOMMUFD_VFIO_CONTAINER))
-+		misc_deregister(&vfio_misc_dev);
- 	misc_deregister(&iommu_misc_dev);
- }
- 
- module_init(iommufd_init);
- module_exit(iommufd_exit);
- 
-+#if IS_ENABLED(CONFIG_IOMMUFD_VFIO_CONTAINER)
-+MODULE_ALIAS_MISCDEV(VFIO_MINOR);
-+MODULE_ALIAS("devname:vfio/vfio");
-+#endif
- MODULE_DESCRIPTION("I/O Address Space Management for passthrough devices");
- MODULE_LICENSE("GPL");
--- 
-2.38.1
+Heh, the last sentence is stale since this _is_ the flow updates the optimized
+maps.
 
+> +			 */
+> +			if (xapic_id != (u8)x2apic_id)
+
+It's more than a bit silly, but I would rather this use vcpu->vcpu_id instead of
+x2apic_id.  KVM's requirement is that the xAPIC ID must match the vCPU ID.  The
+reason I called out x2APIC in the comment was to hint at why KVM even supports
+32-bit vCPU IDs.  The fact that KVM also makes the x2APIC ID immutable is orthogonal,
+which makes the above check somewhat confusing (even though they're identical under
+the hood).
+
+And we should fold the two if-statements together, then the block comment can be
+placed outside of the if and have more less indentation to deal with.
+
+How about:
+		/*
+		 * Deliberately truncate the vCPU ID when detecting a mismatched
+		 * APIC ID to avoid false positives if the vCPU ID, i.e. x2APIC
+		 * ID, is a 32-bit value.  Any unwanted aliasing due to
+		 * truncation results will be detected below.
+		 */
+		if (!apic_x2apic_mode(apic) && xapic_id != vcpu->vcpu_id)
+			xapic_id_mismatch = true;
