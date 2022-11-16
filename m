@@ -2,914 +2,322 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 588BF62B0A7
-	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 02:41:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2592B62B0B7
+	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 02:47:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231184AbiKPBlJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Nov 2022 20:41:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56094 "EHLO
+        id S231409AbiKPBrM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Nov 2022 20:47:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231893AbiKPBk6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Nov 2022 20:40:58 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35FA22A704;
-        Tue, 15 Nov 2022 17:40:54 -0800 (PST)
+        with ESMTP id S229655AbiKPBrK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Nov 2022 20:47:10 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A922626541;
+        Tue, 15 Nov 2022 17:47:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668562854; x=1700098854;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=OG3uE8kppiT6eb/RiYENvLbhE4EYDMTDuL4WGP4/i3g=;
-  b=Y3nPSr/sPjewmSnRr5YcoMdosT7oJARR+TN36o/qvUJMBsU4btsDF2Bh
-   pff8J0LLSZ0r1leJ2MW6jG00sPNbUnDCaEeVsSMPamHWpzqad52lbAKKi
-   DEcjvc7xyH6L4LwPaIM8DtVkOLBtUAxHbSb0eUFxoTTTK0AniGKpPSHAX
-   MoIGlCShAOwlRSjksIVwGd0yIgiCBmSGFL9ECOsxQ+qC4mY2A5o8p+Cn6
-   ibvNIHUScHfpqQQUo5N7OnswJcJbRBmBM9l3FSCJH0ElVt6hvE5+/7qvW
-   klJZPz/6YvzHe7NMKnyPorsV137lpxV50j/8zGND9Awtmh/try0yshMg0
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10532"; a="312424753"
+  t=1668563228; x=1700099228;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=Mau0LE7ACRC5uxvYPmJkveKAExIXw120xLwnM8PzuPE=;
+  b=BsF7VUcBPn88Ee+vE7uhoxzbJJDTsRik74Y1+OGJtA11h6UMqCjhYszd
+   Pf+DAP/zQDkX2y6Hp/bIg+OLPJlNjIwqWVlJC2xup/qpLlF4gngVN7iye
+   jhQR3Rfu1exV/si8glsCh51RBrMOEB1lPFd6tmz64rT9LlrQ6af3TEH6T
+   d20vSPc81wK8C6tlKD+Hcdc6kLZNHYX2pqcDNhhxE2d6lnR9waqcDf0Yh
+   gCD9EmL2FeoxcqsFm16qbKiTOh0jnoPzczVoW4iwsSMejCwDRg9AK9izY
+   XBoHzqbRRFNq40F4WiqF6WeLmlGWEfLIQSbxfrAPxQTycXsQaSXnBdctg
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10532"; a="339228734"
 X-IronPort-AV: E=Sophos;i="5.96,167,1665471600"; 
-   d="scan'208";a="312424753"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2022 17:40:53 -0800
+   d="scan'208";a="339228734"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2022 17:47:08 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10532"; a="764134362"
+X-IronPort-AV: E=McAfee;i="6500,9779,10532"; a="813897182"
 X-IronPort-AV: E=Sophos;i="5.96,167,1665471600"; 
-   d="scan'208";a="764134362"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga004.jf.intel.com with ESMTP; 15 Nov 2022 17:40:53 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+   d="scan'208";a="813897182"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga005.jf.intel.com with ESMTP; 15 Nov 2022 17:47:07 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 15 Nov 2022 17:40:52 -0800
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ 15.1.2375.31; Tue, 15 Nov 2022 17:47:06 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 15 Nov 2022 17:47:06 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
  fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 15 Nov 2022 17:40:52 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Tue, 15 Nov 2022 17:40:52 -0800
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.44) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ 15.1.2375.31 via Frontend Transport; Tue, 15 Nov 2022 17:47:06 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.175)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Tue, 15 Nov 2022 17:40:52 -0800
+ 15.1.2375.31; Tue, 15 Nov 2022 17:47:06 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FH6EN3WMZ0DWWu9bvqFVRl2m9brNJZcKZgL1jPyf1TIrn0avXjbMKcfR14ylumg8o91IcHLGk/croLQTxYi4dYqdAVMEbxBEUwfdZ8UvzaWLppXanHPq30cZDuxBx1nMOAXhOEWdE75ZD74rJW9+vpr1WE32yrsFlHh5AfEpIRkL8+yyhd6B71nqQFByY//fiy/2Gup/g/fLTNljejC8CJWj3spyRwukiKxhfk3o0xu2OgVVthlDY5w0oyXaAx3urwPGh3Yf5nFHh2L/mGbi6g6p/M1NHLe0PI5I4SNa60S8F1OMyFJYjzrQ8pGwsBO/+o2AL8HgPbKhinunE1suqw==
+ b=BM+WtL8obOtiBXd9s/gKH5TunKtCi5IfUm2Kd7N9EgqLp9l4lhUhdnGia3ZGA6skXLzvd1gCW5/q4euUTpV16/iGfK07s8q2xo/NreTMbamLYY+ScPxqivUKwpE2JX1Ul36r4MBD7UukHeKyvPnCJ8c656YF9nirtPBEWU9SAC8cmFaB2jXslKfwiKf1g1UXLPv5fMJd7s+AZMyLg/SOa7eaGGAoTCGQrBmvWtAU3u9qiOChIcBxo5BtNscrM+YJB+0ihtGUeeUJX+/C+oUkz2PQr+eVVGOrxeUf7JPb88RURuLVU8NUWEht8k/aiwUdC1N0PM5V/FqNmbVXg8lf5w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hRqFuo9J6QgtzfE81jFPck/rUj0/wHbM3PAQmPBeMZ0=;
- b=OqX5wxsroUIzR+dCom4Wr4VBTUeNj/FcBpVhQZBnMKlsUcGFZ4NY92zNxIH5Iw8a+JsFMGnOZbjFmdZSvJULuGUqPidFJnmAUhfl4m0cCnrbqTeZGnpBiKKBVpo77N6kp+/kmG47upK8G0nhC4nY3JMiKAa71KtdQryIZqtg6Cu6NsOuYOOjisJg8+dFBBS7j3FSGRtfAgE3cmkDUzVgyfuhHxaMWiNObjEs9IWU37pdRfbEjZg44XsjFqsCUTp7GHkCTjmgjzIAHNwVmpfIyBif71mFs/HXHFOdy4qLc4eEMizmGiPR/KSRebx3tu4DvSvx+bZVtkeWcXkyQVBByg==
+ bh=Mau0LE7ACRC5uxvYPmJkveKAExIXw120xLwnM8PzuPE=;
+ b=imD6LkY7pP4SLhptmtE6Y0gQMAtWCMrUwycL4OmIsvryoF5jXRBSkdPsZPAl271XLjhpbSNoQhtczhDJfsoIRjrn8KSlGSfztx4ILZtIO4iTVUZHC/sfug7+aph+tlEL5u5zAv/y5elKiKrt6zBvgE8fnVS9z3B8v2FBMswPLQiXitgTnYUVzC2/KWXdRAKb/0YCykDMdpKUASBoPXQZ0tprTG86Ni1ziMfXB/S4SFEHAx4sv76pN9ZRVRTkCBy33AzvEhcbNXl44MiUOa42soKDg8/4IHcpwYoDweqDgfXsmdbadnKAlxNDpjidrfht3YGuFDvcol2EWABcxDXRmw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SA2PR11MB5052.namprd11.prod.outlook.com (2603:10b6:806:fa::15)
- by SA2PR11MB5114.namprd11.prod.outlook.com (2603:10b6:806:114::19) with
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by BL1PR11MB5955.namprd11.prod.outlook.com (2603:10b6:208:386::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.18; Wed, 16 Nov
- 2022 01:40:48 +0000
-Received: from SA2PR11MB5052.namprd11.prod.outlook.com
- ([fe80::d95b:a6f1:ed4d:5327]) by SA2PR11MB5052.namprd11.prod.outlook.com
- ([fe80::d95b:a6f1:ed4d:5327%9]) with mapi id 15.20.5813.017; Wed, 16 Nov 2022
- 01:40:48 +0000
-Message-ID: <67b782ee-c95c-d6bc-3cca-cdfe75f4bf6a@intel.com>
-Date:   Wed, 16 Nov 2022 09:40:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.4.2
-Subject: Re: [PATCH v10 049/108] KVM: x86/tdp_mmu: Support TDX private mapping
- for TDP MMU
+ 2022 01:46:52 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e%9]) with mapi id 15.20.5813.017; Wed, 16 Nov 2022
+ 01:46:52 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+        "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+        "palmer@dabbelt.com" <palmer@dabbelt.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "anup@brainfault.org" <anup@brainfault.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>
+CC:     "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Yao, Yuan" <yuan.yao@intel.com>,
+        "farosas@linux.ibm.com" <farosas@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "atishp@atishpatra.org" <atishp@atishpatra.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+Subject: Re: [PATCH 13/44] KVM: x86: Serialize vendor module initialization
+ (hardware setup)
+Thread-Topic: [PATCH 13/44] KVM: x86: Serialize vendor module initialization
+ (hardware setup)
+Thread-Index: AQHY7xHq2cS0mXAh8EqkP3LwhIvmL65A3HGA
+Date:   Wed, 16 Nov 2022 01:46:51 +0000
+Message-ID: <e8e3b4c7bf3bd733c626618b57f9bf2f1835770e.camel@intel.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+         <20221102231911.3107438-14-seanjc@google.com>
+In-Reply-To: <20221102231911.3107438-14-seanjc@google.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     <isaku.yamahata@intel.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     <isaku.yamahata@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        <erdemaktas@google.com>, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <9d5595dfe1b5ab77bcb5650bc4d940dd977b0a32.1667110240.git.isaku.yamahata@intel.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <9d5595dfe1b5ab77bcb5650bc4d940dd977b0a32.1667110240.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2PR02CA0007.apcprd02.prod.outlook.com
- (2603:1096:4:194::23) To SA2PR11MB5052.namprd11.prod.outlook.com
- (2603:10b6:806:fa::15)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|BL1PR11MB5955:EE_
+x-ms-office365-filtering-correlation-id: ba13ab62-4e14-4773-a7a4-08dac7746ef2
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: WZCT0SncC51GO28yUD+xZHv0F4f2xc+3Ke3MQyn8WbqwtI+86vkq/Ld3DvGoYtuj9/8awapGgAqMGb2Y1j5sUz8rWx233IuZV1NkW1nmCKLfJlv9dV7Fl10boHcuDdlHKvlXJkdUeodxyOD0neUoXoKYSG3SkHReH3KAV2e7tFC9QxpJ2arwPfobyI5XqSkxt6986GJSPhEqGay9V0QMF2JAYMUSmET3ijSDDn/96rIMfEsmUSvt/Sqt/GzbgohJ5lVlyi6igdM8HGmX44sz3ChRq6lQLugozcqY47cEs57J+jfiSB+3OVRMbLOd6m/wnDg+/53BmP5DZnZtvmm6xhjprt3LsmQbh6M14fpNYDF+3FASrqur4Ifjkruvg69UcI1C5Y9ORQpjZCaBQEHfxzMmzvOGPQ2CkNX1/pBojI/JGB+J612DsHTRdhjQWkHAnCSZtVsemoU1cnRe9BOhKlwCSFzOJvZx6jGgwayb4GUSKzg/q9Qegt6ipiWWwdYRlf6naIA5AUrJhqVDyu5KdDW0NbXBFiERHP6V47zXLy4+XqGhFqakdQLjtoS3HmW2xqzlzU4qC6HmhF9npPUBA5UodXCB7ZB7FknpQ42f7k+9l54lcyjp8Zpad3edk30ae0byU4EE6t42FlXPayWcNwsbHrLtAs6glZcHaOP7swghjVkXdzxnL2fB2iqF0allyj1N95bliC6EAG0fY1hMbR7y3WXRbYbSCvu3oDWDFFSAbW7fu2xvPaPRZvwys78Efe9GMJFwASOvTMnYdW/PzXvYAdIPJoJ0YPpJQBoWqfc=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(136003)(39860400002)(366004)(376002)(396003)(451199015)(71200400001)(478600001)(122000001)(6486002)(110136005)(54906003)(76116006)(186003)(316002)(26005)(6512007)(83380400001)(66556008)(4326008)(64756008)(8676002)(36756003)(2616005)(66946007)(66476007)(8936002)(91956017)(66446008)(41300700001)(38070700005)(921005)(38100700002)(5660300002)(82960400001)(7416002)(7406005)(6506007)(86362001)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MmsvRGt0LzhNeU54QWk4Um0xNmNmQThVQUpla2lCK2VwRnduQjRxWk1VOHdy?=
+ =?utf-8?B?WlB3SkFOV2RZNUs3YW5JVnNwcU5xTENwWWJ4c1Q2a2JtL3VuV3Q1RXI2SW5s?=
+ =?utf-8?B?ZDVEWVZ4SmpJVThLdlY5dXdpS1dndmZHUVFiVi9DTk9Xem96MjJjT0o0WmpV?=
+ =?utf-8?B?bWNLN0FTTytWeVRQSEtJaUs2eERjSmNkbzNiUFVDR3o0S2pDTEMrT0J0aC9F?=
+ =?utf-8?B?a3dDSS9sSG84TmU3Q0Irai81STJIQ0FmVGMwOWVtUTRLTGZEeEpFSnJia0U4?=
+ =?utf-8?B?ekFyWGNxRlBJMXE1K0tyZjc5SWtOd2xvZ0toN0gxQS9KS3czUHlsbGhETFJu?=
+ =?utf-8?B?VXhoTHhZVVpLZUZUbm4vVXNKTG5GanJIc2NERFNxVXlZS1J5bVVlcmh0NUxS?=
+ =?utf-8?B?d2Q5ZzZzUWE5Yk1rSDNhcXNOcHhSVUp0dm1BT2ZDK0t0ano3MVI3UzdLT2Z5?=
+ =?utf-8?B?Zy9WcnFFWWN6a29WM1RmTDJYZnpGck8wdHN2RFpIOXNROFlwYlBRWWFDSHFS?=
+ =?utf-8?B?WnZxc2NJdGNKMUFROUlEMjFjR0NpamtFakVEZTZaeVoxNFZERjBqWGVpck1F?=
+ =?utf-8?B?Y3dIaEs4cTFnTG5KazZTNnAzVytFRHZHVG1JUGNFTEpjcDFVOE11aFBKT1dL?=
+ =?utf-8?B?dkVpNUgyRENwYm5vazRacjJ2WWtqMU8rOTh6T2hFaXdkM2g2Mm82VC9zNHg3?=
+ =?utf-8?B?Ky8wcUwxYmMrYnpVQUpnNXUzcWdUSVYySE4ySWh6YTFHUEhWS1N0S3VUYmJM?=
+ =?utf-8?B?dDc2bCtzRVJuNWpKK0N1Zld1SVdKNFF6OW8zVm1YRTlZck43OXhtZmYvTkQw?=
+ =?utf-8?B?RGFEMWUxT2w1ampKR0hoS3BQUG9oZkxTendQdmRmcW85aW1JYm56bDZuNjRy?=
+ =?utf-8?B?MGxYWWJVQjR6akZEK3Q4bFRQczl3TGV4UE5SK1QvWG5SdFh1Zk93R1o3RVhO?=
+ =?utf-8?B?d3prd0JLeHY2VWxxeGNRYXhKbWRJVU5uNWw4cVJKVndrTTdjSG1vaUNzSFFm?=
+ =?utf-8?B?NWh5dXVaSGpVWTUxUXBvWjltNDU0OHhMTXBrV0RvaVAyWDNXeTIwYmIrQUtX?=
+ =?utf-8?B?N2ZaV2prMWxBL3k2aVEzYUx1LzFHczdOUnZKUGJ6cExSMVlVRUd2cUNDaTB2?=
+ =?utf-8?B?ckZUTm1rNHRsMUNzay83L1BNWDJZZHczMWdlaERCUkI2YjFxUGJ5ZzhYM0dI?=
+ =?utf-8?B?VXBzVlR1TmR4RHlsRWJsSWJwVktLS1JxNGJCdmpRTXVUR1lJQ1hQb01ZQ3RP?=
+ =?utf-8?B?azdJeXI2VzRncVppeTZ2eGtmV3dFeCtNb0l0ZXBnYy8zalhIdnRidXhMZG13?=
+ =?utf-8?B?MmxsTUV3bkhNTmNyT2dNOWI2SXRKZzBJVVhuMWVkMEljeEFNLy9oRWppT1hL?=
+ =?utf-8?B?SWpNWU5tdTVyTWZLK3d2TG1GbHhRSkZhK21yc1grVHlZQ2JxVWJXYXkrZFd1?=
+ =?utf-8?B?VVNnVHQvem5VT2d5TVd2UEo3WklwNU5oRS9Kd25DS2hvRE0wQjljbDRPQjF5?=
+ =?utf-8?B?VnJPRUpkOUNld0EzSzFhcHlXUUFReDQwSVRrVmlVWTN1am0yelBsUDI1WnZP?=
+ =?utf-8?B?TDhvM3JWbFVkeHNVUDZubmFDUEp4RTdQem5vMnV2NTRPOWs1Q2J0MUJHdWdY?=
+ =?utf-8?B?WXZ5SU9mMDhKaXBDZGduWEVuclliOXJxRS80c0tkd0tzaWNkVEN1SjBYZ0Ur?=
+ =?utf-8?B?NmovQWFYb1V1K1lZbzNKdnRGQVZTRXZwMFQ5Q1UrbXpuclNySE5pNXlsSnJv?=
+ =?utf-8?B?M1VOUmQ1Y3hZR1hZVHZyT3pXSUxyOUZjbFBWM1hXWW1CK21mb2NxcjdpR0VF?=
+ =?utf-8?B?UWs2dHFLOEdhMTM5M0dZa0ttaldUSVhVSEh1K1dTeUR3YVBxSURHN0JJcGtq?=
+ =?utf-8?B?eTRydk5EWGpmaVZibTllMXFkMTY4UDJJSDM0K0s0L1M3a1R1dm1JOTBHQU1F?=
+ =?utf-8?B?aEE0U1lMQVZVN0trZWNQUUpGTXk2TUEzOGd1VVQ0TE9vTitVczN4UFlJRmJZ?=
+ =?utf-8?B?N0dxbUUrcis2eC9iOVlVU2o0Sm14Nlhsa1Y0SzQrblh6RnJhNGNuNUJlM3RZ?=
+ =?utf-8?B?NHpuK2JENmNNSlRVSGpjRThEWC9ualhDdXR6TDIyVXNHNjZiZEhZZk1WeldE?=
+ =?utf-8?B?WmVrcFhoK05CRWhQQUJwS1QrUllXZWRvQVBDejd6QlM0R2FPbVBDdUxnM0d4?=
+ =?utf-8?B?a1E9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1EFCF1F2EBB7CE48AB9819352B425CDF@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PR11MB5052:EE_|SA2PR11MB5114:EE_
-X-MS-Office365-Filtering-Correlation-Id: 30bfe09f-9ecf-463e-1a56-08dac77395e0
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: X86GikzYLNdrDNEv1t7FiUnEIi3QmjwfdFOisfbSeAcXEm5+O4GJJ3rrI/KI6KN3YuLNnP9FNINV/gqk6H5WukGK2JfOpFJ7X7g/rekeKPQSaT2V+yxNZMiIEkB58KRyweqcChqY7s94C82kBasasbon5QTbruU7fJxLEPXsd0Zvyi13zz2FFaQfAg4mi/kJQCDR5xu0utVyLUiavFdSEMnUIKNPRAH+RvG7tMc6A7mnLVH5q5nDrtkakrp8DhdvfeIzFpR0WO6MfMlPxVLGmg3we9S+Q+z6t4R9Oc7VoBE3t7aCnz/OZjagHMM5Sckg/JPsrIgrukoVGXS5WyM0GaTZKS3Ta5OK53xBLq41u+r92A6BB5mj4W4s6UU8rEoNJS6hdCheTUwO6hsWsz4GauW2u8mA5QjI2YzhiE96g1rmUVdribLBHLUfZClGZIqYfq8wcA7FKyZ/wiIcdfEzcC9VkGs798e5DIRFobKjWqcAEsr6QNIARNd35zSDyxo5SDpkGUjoGYmeG/QGVqkDXbkqXOVF7j0Wmuv+II7Q8t1XJjSqQfzrzZR9uDJkgZxivKBTCSQAQGQFuBgLmq2Akiz/QhtRR/jE2wRiV0C+pgwxsH+LXbmzU7SDkZ/j8Y6LusZO4QKRsb+surrbxPB2iDzyir5HsvojyTKHGSsRgVWw6ZcKq+kaImysz/AC7lRWBpR/OY1zKh/+tI/mMD4cb3tXHIFtUPO09dk3G6ew4pAwR9vENV3loRi3u1FtGWO9G3zWIW+EEGWJ/iFL2WHDFTOMx4wqAs3K33G/LBO5Gzw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR11MB5052.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(346002)(396003)(376002)(39860400002)(366004)(451199015)(31686004)(478600001)(53546011)(6506007)(6486002)(54906003)(107886003)(6666004)(86362001)(316002)(6512007)(82960400001)(31696002)(26005)(38100700002)(8676002)(4326008)(8936002)(36756003)(66556008)(66946007)(41300700001)(66476007)(44832011)(2616005)(186003)(5660300002)(83380400001)(30864003)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dzFBa09ZSW1pZGhWU3d0dlg5VzhJSlVDWjNnVVFNRmgyenJlZjYvSUhJR1dk?=
- =?utf-8?B?c3FMbzNjZENaUFVSUWduOTgrWExZcUIzNTk0OXlQUHNzNVZVTFFHME9oSng3?=
- =?utf-8?B?OEJqUk5kdGNYaEhyQzlWanVYUE45c29HbnRDOTdHNWtuUGRBdFJvTVQ3VkVF?=
- =?utf-8?B?TXNLYyszaXM1V0ZsQUJvUWN6YzVRTUwvdXdBa1lxUjY2NGhjSzNmcFFBdU1Q?=
- =?utf-8?B?Q0RlQkN5NkZScUdaVkVLTmpWU08zRHZyWHNYRWlXZSttMWI5NGhxcVhibXdI?=
- =?utf-8?B?Vjl6Q0pLUS9iOEJhZG1seHlUanVyOWZaK3lWZWE4NGNscnpzbVB4bTlHOTFt?=
- =?utf-8?B?YkEyNWIyajNyMXQzbkxXNlZJenUxbEJzSk4yS3preHFMRWJDTWE0SW40Z0lX?=
- =?utf-8?B?aEo3WkY1MGRzcFk3TTJPSHZrazFtWDNWWkpIMlpKYk5icVlDMy90d2x6Si9w?=
- =?utf-8?B?dy9PaEN0KytGd1djc0hyRUZuM3h3T0JyQ1BrUGlwSkhBcVNEaWFkQnQzZWl3?=
- =?utf-8?B?R3pka3o3Vkk4aDk3eFRveGlLYzQvRXc2ZzRQYm1sanpiNi9LQXhCSjlVdzdS?=
- =?utf-8?B?SnhKUHRqeFBrbytSbUhCOXB5andnaGZyaG4vU2xjK2xudWFudjJwQXBBOXdh?=
- =?utf-8?B?dHJ2a3d5NjFxSWxkcld2cFlsaCtQTXlwUFo1ek5NUWZhcE1MeE9MSkhrUlhq?=
- =?utf-8?B?ZTRoQ2tDSmlkclJ2LzhtL1F4NXIwT2NObGZrNCtlMmxNSTNkalVjRlJpeFVm?=
- =?utf-8?B?M08wTTVyV1c4TkRETUpWZUhQSDIveDVaenU4UlNhWWRvZEgyYkZXOHQzSVh1?=
- =?utf-8?B?M1Z5Q1RLRGhqV1B3Mi8zYXRpYlZzNlZRVStHUFRCUGo2WmZDNGV6ejIvZWha?=
- =?utf-8?B?Nk1QQndzSEx5ejZLK25jNHVrNm5INitmUFoxdHlnSzk3V2tTNGNZeFg5Unpj?=
- =?utf-8?B?SWoyZy9yNVpINHNuM01RaVpudSt6dWdHVW9KRkFoWXlOL1hJL3lldFY0TnVj?=
- =?utf-8?B?VTl6a2hsWHRGTHB3emVBRUsxNHc0WWNEZ0FScjlyQ1VGNk5BdnFqU1lUTVJU?=
- =?utf-8?B?TEpmc0xuUDVkT25PaVlOMTZYUTN4eUhlcUNXdnpmM1cyNDhqekZPSnpvWVUw?=
- =?utf-8?B?WUZRMmdkSnMvTFBOZVcvWElLdmwrK3VzZXhxWHUyQ0k2MmsrRFdNbmcvbTdv?=
- =?utf-8?B?SktkY2VkMlJ5RS9DYXNyNHFqMjFkSi80M3NOclRQOVZnZ3REb2Z5OG5QeG91?=
- =?utf-8?B?MVh3UmdsVTJCZnVnelI2cTVQaEl4dTE4L2gyV2tacVdYZ1R3cnNuL0ZoSGlp?=
- =?utf-8?B?dDJlWVFNdnM0blM2UGZaSlRZeVR4aVgrSzZqcFJCUGt0WFp6OXZGZXVQZEFn?=
- =?utf-8?B?U3BSWXJaUnNFVlVzeXhyQkFjRkZlWGJCcURLaVgyeEptL3hZRUxwZG9oejNS?=
- =?utf-8?B?S1N0NTkxRkl4NlF0SlIyU1hvcHZ5RnB5S3Q3ZTlIUlZGdHBuOWFKU1dQbWZD?=
- =?utf-8?B?eklTUEwxRGczSytuL2tmU0xVYzBXckhPQjBmVGh3TThtejZCKzVvb3hmV3JL?=
- =?utf-8?B?NEhzWTQwR1N5QjErRGhMb054eFRsUU1lMHJ4bGNZbnVqT3hqY0ExRUhzQi9S?=
- =?utf-8?B?akkvMjFNQ0czU3prdDVaMlMzeWVaNElQajlHc0N1VWlEZ1dMTXVUWnVicVYx?=
- =?utf-8?B?STJjUGZEcFMrN1NFWXZkWDE5T0dYdkh5NjVTMVh6SDYzQVo5Y0JLbUU3VDRq?=
- =?utf-8?B?OWFJK3V0ekl4WkJjRDZDd3JKQ0s4bmVCNFdKajBuSks1SXdYUXVuQ29ITFA1?=
- =?utf-8?B?ZE56NFBtRk9pWFhFUEROeHF1T2QzTFNCZnNpZmVvYmhqMXhZS2tLTEdrVzNQ?=
- =?utf-8?B?TDVvZzBBOU4wZkZ3bTR0c3JTNERERFJFZGF1WngyTXp3WjJveXBEblp1bHhV?=
- =?utf-8?B?Z25FNi9vQUtSK1VCTUQzNy9jbGRIcnBXQUJBY1lRSUxJcjJmSm5CcWpXcWl6?=
- =?utf-8?B?RW5qQlhBcFU1SzlFSkFYZ3lQd1dFcWZlbDZjY0pIRHpoVkc2bXdzRHhGT3Nw?=
- =?utf-8?B?MjJmOFpCWk4zSDZWenFja0ViWkl0NCtqSis0ejV3TW5QVFRhSktyRWRRT2Rr?=
- =?utf-8?Q?77XeFSL/YFiCBgHrn9suM7MX4?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 30bfe09f-9ecf-463e-1a56-08dac77395e0
-X-MS-Exchange-CrossTenant-AuthSource: SA2PR11MB5052.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2022 01:40:48.4140
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba13ab62-4e14-4773-a7a4-08dac7746ef2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Nov 2022 01:46:51.7407
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2IKKQObpEw0C+pZHmCS4j73VArP6axt158/8m7IXen3GABBJ88BdfB4m4BRPfmXGy2cmY32vthmETafInoXSJA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5114
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QKK1Ze0TAVAfwWgEyaoUrtbbVOPHC0I6JwVjIkCWtOO486x0EtRlFirBY/ui7f2i3e59aPw5QoBSkPS993g+Zg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5955
 X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 10/30/2022 2:22 PM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> Allocate protected page table for private page table, and add hooks to
-> operate on protected page table.  This patch adds allocation/free of
-> protected page tables and hooks.  When calling hooks to update SPTE entry,
-> freeze the entry, call hooks and unfree the entry to allow concurrent
-> updates on page tables.  Which is the advantage of TDP MMU.  As
-> kvm_gfn_shared_mask() returns false always, those hooks aren't called yet
-> with this patch.
->
-> When the faulting GPA is private, the KVM fault is called private.  When
-> resolving private KVM, allocate protected page table and call hooks to
-> operate on protected page table. On the change of the private PTE entry,
-> invoke kvm_x86_ops hook in __handle_changed_spte() to propagate the change
-> to protected page table. The following depicts the relationship.
->
->    private KVM page fault   |
->        |                    |
->        V                    |
->   private GPA               |     CPU protected EPTP
->        |                    |           |
->        V                    |           V
->   private PT root           |     protected PT root
->        |                    |           |
->        V                    |           V
->     private PT --hook to propagate-->protected PT
->        |                    |           |
->        \--------------------+------\    |
->                             |      |    |
->                             |      V    V
->                             |    private guest page
->                             |
->                             |
->       non-encrypted memory  |    encrypted memory
->                             |
-> PT: page table
->
-> The existing KVM TDP MMU code uses atomic update of SPTE.  On populating
-> the EPT entry, atomically set the entry.  However, it requires TLB
-> shootdown to zap SPTE.  To address it, the entry is frozen with the special
-> SPTE value that clears the present bit. After the TLB shootdown, the entry
-> is set to the eventual value (unfreeze).
->
-> For protected page table, hooks are called to update protected page table
-> in addition to direct access to the private SPTE. For the zapping case, it
-> works to freeze the SPTE. It can call hooks in addition to TLB shootdown.
-> For populating the private SPTE entry, there can be a race condition
-> without further protection
->
->    vcpu 1: populating 2M private SPTE
->    vcpu 2: populating 4K private SPTE
->    vcpu 2: TDX SEAMCALL to update 4K protected SPTE => error
->    vcpu 1: TDX SEAMCALL to update 2M protected SPTE
->
-> To avoid the race, the frozen SPTE is utilized.  Instead of atomic update
-> of the private entry, freeze the entry, call the hook that update protected
-> SPTE, set the entry to the final value.
->
-> Support 4K page only at this stage.  2M page support can be done in future
-> patches.
->
-> Co-developed-by: Kai Huang <kai.huang@intel.com>
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/include/asm/kvm-x86-ops.h |   5 +
->   arch/x86/include/asm/kvm_host.h    |  11 ++
->   arch/x86/kvm/mmu/mmu.c             |  15 +-
->   arch/x86/kvm/mmu/mmu_internal.h    |  32 ++++
->   arch/x86/kvm/mmu/tdp_iter.h        |   2 +-
->   arch/x86/kvm/mmu/tdp_mmu.c         | 244 +++++++++++++++++++++++++----
->   arch/x86/kvm/mmu/tdp_mmu.h         |   2 +-
->   virt/kvm/kvm_main.c                |   1 +
->   8 files changed, 280 insertions(+), 32 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index f28c9fd72ac4..1b01dc2098b0 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -94,6 +94,11 @@ KVM_X86_OP_OPTIONAL_RET0(set_tss_addr)
->   KVM_X86_OP_OPTIONAL_RET0(set_identity_map_addr)
->   KVM_X86_OP_OPTIONAL_RET0(get_mt_mask)
->   KVM_X86_OP(load_mmu_pgd)
-> +KVM_X86_OP_OPTIONAL(link_private_spt)
-> +KVM_X86_OP_OPTIONAL(free_private_spt)
-> +KVM_X86_OP_OPTIONAL(set_private_spte)
-> +KVM_X86_OP_OPTIONAL(remove_private_spte)
-> +KVM_X86_OP_OPTIONAL(zap_private_spte)
->   KVM_X86_OP(has_wbinvd_exit)
->   KVM_X86_OP(get_l2_tsc_offset)
->   KVM_X86_OP(get_l2_tsc_multiplier)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 381df2c8136d..5f9634c130d0 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -467,6 +467,7 @@ struct kvm_mmu {
->   			 struct kvm_mmu_page *sp);
->   	void (*invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa);
->   	struct kvm_mmu_root_info root;
-> +	hpa_t private_root_hpa;
->   	union kvm_cpu_role cpu_role;
->   	union kvm_mmu_page_role root_role;
->   
-> @@ -1613,6 +1614,16 @@ struct kvm_x86_ops {
->   	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
->   			     int root_level);
->   
-> +	int (*link_private_spt)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
-> +				void *private_spt);
-> +	int (*free_private_spt)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
-> +				void *private_spt);
-> +	int (*set_private_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
-> +				 kvm_pfn_t pfn);
-> +	int (*remove_private_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
-> +				    kvm_pfn_t pfn);
-> +	int (*zap_private_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level);
-> +
->   	bool (*has_wbinvd_exit)(void);
->   
->   	u64 (*get_l2_tsc_offset)(struct kvm_vcpu *vcpu);
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 0237e143299c..02e7b5cf3231 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3646,7 +3646,12 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
->   		goto out_unlock;
->   
->   	if (is_tdp_mmu_enabled(vcpu->kvm)) {
-> -		root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu);
-> +		if (kvm_gfn_shared_mask(vcpu->kvm) &&
-> +		    !VALID_PAGE(mmu->private_root_hpa)) {
-> +			root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu, true);
-> +			mmu->private_root_hpa = root;
-> +		}
-> +		root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu, false);
->   		mmu->root.hpa = root;
->   	} else if (shadow_root_level >= PT64_ROOT_4LEVEL) {
->   		root = mmu_alloc_root(vcpu, 0, 0, shadow_root_level);
-> @@ -4357,7 +4362,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->   	unsigned long mmu_seq;
->   	int r;
->   
-> -	fault->gfn = fault->addr >> PAGE_SHIFT;
-> +	fault->gfn = gpa_to_gfn(fault->addr) & ~kvm_gfn_shared_mask(vcpu->kvm);
->   	fault->slot = kvm_vcpu_gfn_to_memslot(vcpu, fault->gfn);
->   
->   	if (page_fault_handle_page_track(vcpu, fault))
-> @@ -5893,6 +5898,7 @@ static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
->   
->   	mmu->root.hpa = INVALID_PAGE;
->   	mmu->root.pgd = 0;
-> +	mmu->private_root_hpa = INVALID_PAGE;
->   	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
->   		mmu->prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
->   
-> @@ -6116,7 +6122,7 @@ static void kvm_mmu_zap_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
->   		};
->   
->   		/*
-> -		 * this handles both private gfn and shared gfn.
-> +		 * This handles both private gfn and shared gfn.
->   		 * All private page should be zapped on memslot deletion.
->   		 */
->   		flush = kvm_tdp_mmu_unmap_gfn_range(kvm, &range, flush, true);
-> @@ -6919,6 +6925,9 @@ int kvm_mmu_vendor_module_init(void)
->   void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
->   {
->   	kvm_mmu_unload(vcpu);
-> +	if (is_tdp_mmu_enabled(vcpu->kvm))
-> +		mmu_free_root_page(vcpu->kvm, &vcpu->arch.mmu->private_root_hpa,
-> +				NULL);
->   	free_mmu_pages(&vcpu->arch.root_mmu);
->   	free_mmu_pages(&vcpu->arch.guest_mmu);
->   	mmu_free_memory_caches(vcpu);
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index 4c013124534b..508e8402c07a 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -6,6 +6,8 @@
->   #include <linux/kvm_host.h>
->   #include <asm/kvm_host.h>
->   
-> +#include "mmu.h"
-> +
->   #undef MMU_DEBUG
->   
->   #ifdef MMU_DEBUG
-> @@ -209,11 +211,29 @@ static inline void kvm_mmu_alloc_private_spt(struct kvm_vcpu *vcpu,
->   	}
->   }
->   
-> +static inline int kvm_alloc_private_spt_for_split(struct kvm_mmu_page *sp, gfp_t gfp)
-> +{
-> +	gfp &= ~__GFP_ZERO;
-> +	sp->private_spt = (void *)__get_free_page(gfp);
-> +	if (!sp->private_spt)
-> +		return -ENOMEM;
-> +	return 0;
-> +}
-> +
->   static inline void kvm_mmu_free_private_spt(struct kvm_mmu_page *sp)
->   {
->   	if (sp->private_spt)
->   		free_page((unsigned long)sp->private_spt);
->   }
-> +
-> +static inline gfn_t kvm_gfn_for_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> +				     gfn_t gfn)
-> +{
-> +	if (is_private_sp(root))
-> +		return kvm_gfn_private(kvm, gfn);
-> +	else
-> +		return kvm_gfn_shared(kvm, gfn);
-> +}
->   #else
->   static inline void *kvm_mmu_private_spt(struct kvm_mmu_page *sp)
->   {
-> @@ -230,9 +250,20 @@ static inline void kvm_mmu_alloc_private_spt(struct kvm_vcpu *vcpu,
->   {
->   }
->   
-> +static inline int kvm_alloc_private_spt_for_split(struct kvm_mmu_page *sp, gfp_t gfp)
-> +{
-> +	return -ENOMEM;
-> +}
-> +
->   static inline void kvm_mmu_free_private_spt(struct kvm_mmu_page *sp)
->   {
->   }
-> +
-> +static inline gfn_t kvm_gfn_for_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> +				     gfn_t gfn)
-> +{
-> +	return gfn;
-> +}
->   #endif
->   
->   static inline bool kvm_mmu_page_ad_need_write_protect(struct kvm_mmu_page *sp)
-> @@ -367,6 +398,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->   		.is_tdp = likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault),
->   		.nx_huge_page_workaround_enabled =
->   			is_nx_huge_page_enabled(vcpu->kvm),
-> +		.is_private = kvm_is_private_gpa(vcpu->kvm, cr2_or_gpa),
->   
->   		.max_level = vcpu->kvm->arch.tdp_max_page_level,
->   		.req_level = PG_LEVEL_4K,
-> diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-> index 9e56a5b1024c..eab62baf8549 100644
-> --- a/arch/x86/kvm/mmu/tdp_iter.h
-> +++ b/arch/x86/kvm/mmu/tdp_iter.h
-> @@ -71,7 +71,7 @@ struct tdp_iter {
->   	tdp_ptep_t pt_path[PT64_ROOT_MAX_LEVEL];
->   	/* A pointer to the current SPTE */
->   	tdp_ptep_t sptep;
-> -	/* The lowest GFN mapped by the current SPTE */
-> +	/* The lowest GFN (shared bits included) mapped by the current SPTE */
->   	gfn_t gfn;
->   	/* The level of the root page given to the iterator */
->   	int root_level;
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index bdb50c26849f..0e053b96444a 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -285,6 +285,9 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu,
->   	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
->   	sp->role = role;
->   
-> +	if (kvm_mmu_page_role_is_private(role))
-> +		kvm_mmu_alloc_private_spt(vcpu, NULL, sp);
-> +
->   	return sp;
->   }
->   
-> @@ -305,7 +308,8 @@ static void tdp_mmu_init_sp(struct kvm_mmu_page *sp, tdp_ptep_t sptep,
->   	trace_kvm_mmu_get_page(sp, true);
->   }
->   
-> -hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
-> +static struct kvm_mmu_page *kvm_tdp_mmu_get_vcpu_root(struct kvm_vcpu *vcpu,
-> +						      bool private)
->   {
->   	union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
->   	struct kvm *kvm = vcpu->kvm;
-> @@ -317,6 +321,8 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
->   	 * Check for an existing root before allocating a new one.  Note, the
->   	 * role check prevents consuming an invalid root.
->   	 */
-> +	if (private)
-> +		kvm_mmu_page_role_set_private(&role);
->   	for_each_tdp_mmu_root(kvm, root, kvm_mmu_role_as_id(role)) {
->   		if (root->role.word == role.word &&
->   		    kvm_tdp_mmu_get_root(root))
-> @@ -333,11 +339,17 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
->   	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
->   
->   out:
-> -	return __pa(root->spt);
-> +	return root;
-> +}
-> +
-> +hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu, bool private)
-> +{
-> +	return __pa(kvm_tdp_mmu_get_vcpu_root(vcpu, private)->spt);
->   }
->   
->   static int __must_check handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> -					    u64 old_spte, u64 new_spte, int level,
-> +					    u64 old_spte, u64 new_spte,
-> +					    union kvm_mmu_page_role role,
->   					    bool shared);
->   
->   static void handle_changed_spte_acc_track(u64 old_spte, u64 new_spte, int level)
-> @@ -364,6 +376,8 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
->   
->   	if ((!is_writable_pte(old_spte) || pfn_changed) &&
->   	    is_writable_pte(new_spte)) {
-> +		/* For memory slot operations, use GFN without aliasing */
-> +		gfn = gfn & ~kvm_gfn_shared_mask(kvm);
->   		slot = __gfn_to_memslot(__kvm_memslots(kvm, as_id), gfn);
->   		mark_page_dirty_in_slot(kvm, slot, gfn);
->   	}
-> @@ -500,7 +514,8 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
->   							  REMOVED_SPTE, level);
->   		}
->   		ret = handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
-> -					  old_spte, REMOVED_SPTE, level, shared);
-> +					  old_spte, REMOVED_SPTE, sp->role,
-> +					  shared);
->   		/*
->   		 * We are removing page tables.  Because in TDX case we don't
->   		 * zap private page tables except tearing down VM.  It means
-> @@ -509,9 +524,81 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
->   		WARN_ON_ONCE(ret);
->   	}
->   
-> +	if (is_private_sp(sp) &&
-> +	    WARN_ON(static_call(kvm_x86_free_private_spt)(kvm, sp->gfn, sp->role.level,
-> +							  kvm_mmu_private_spt(sp)))) {
-> +		/*
-> +		 * Failed to unlink Secure EPT page and there is nothing to do
-> +		 * further.  Intentionally leak the page to prevent the kernel
-> +		 * from accessing the encrypted page.
-> +		 */
-> +		kvm_mmu_init_private_spt(sp, NULL);
-> +	}
-> +
->   	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
->   }
->   
-> +static void *get_private_spt(gfn_t gfn, u64 new_spte, int level)
-> +{
-> +	if (is_shadow_present_pte(new_spte) && !is_last_spte(new_spte, level)) {
-> +		struct kvm_mmu_page *sp = to_shadow_page(pfn_to_hpa(spte_to_pfn(new_spte)));
-> +		void *private_spt = kvm_mmu_private_spt(sp);
-> +
-> +		WARN_ON_ONCE(!private_spt);
-> +		WARN_ON_ONCE(sp->role.level + 1 != level);
-> +		WARN_ON_ONCE(sp->gfn != gfn);
-> +		return private_spt;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +static int __must_check handle_changed_private_spte(struct kvm *kvm, gfn_t gfn,
-> +						    u64 old_spte, u64 new_spte,
-> +						    int level)
-> +{
-> +	bool was_present = is_shadow_present_pte(old_spte);
-> +	bool is_present = is_shadow_present_pte(new_spte);
-> +	bool was_leaf = was_present && is_last_spte(old_spte, level);
-> +	bool is_leaf = is_present && is_last_spte(new_spte, level);
-> +	kvm_pfn_t old_pfn = spte_to_pfn(old_spte);
-> +	kvm_pfn_t new_pfn = spte_to_pfn(new_spte);
-> +	int ret;
-
-int ret = 0;
-
-> +
-> +	lockdep_assert_held(&kvm->mmu_lock);
-> +	if (is_present) {
-> +		/* TDP MMU doesn't change present -> present */
-> +		KVM_BUG_ON(was_present, kvm);
-> +
-> +		/*
-> +		 * Use different call to either set up middle level
-> +		 * private page table, or leaf.
-> +		 */
-> +		if (is_leaf)
-> +			ret = static_call(kvm_x86_set_private_spte)(kvm, gfn, level, new_pfn);
-> +		else {
-> +			void *private_spt = get_private_spt(gfn, new_spte, level);
-> +
-> +			KVM_BUG_ON(!private_spt, kvm);
-> +			ret = static_call(kvm_x86_link_private_spt)(kvm, gfn, level, private_spt);
-> +		}
-> +	} else if (was_leaf) {
-> +		/* non-present -> non-present doesn't make sense. */
-> +		KVM_BUG_ON(!was_present, kvm);
-> +		/*
-> +		 * Zap private leaf SPTE.  Zapping private table is done
-> +		 * below in handle_removed_tdp_mmu_page().
-> +		 */
-> +		lockdep_assert_held_write(&kvm->mmu_lock);
-> +		ret = static_call(kvm_x86_zap_private_spte)(kvm, gfn, level);
-> +		if (!ret) {
-> +			ret = static_call(kvm_x86_remove_private_spte)(kvm, gfn, level, old_pfn);
-> +			WARN_ON_ONCE(ret);
-> +		}
-> +	}
-
-Otherwise, "ret" may be returned without initialization. Then it will 
-trigger the WARN_ON_ONCE(ret) after handle_changed_spte() in patch 48.
-
-> +	return ret;
-> +}
-> +
->   /**
->    * __handle_changed_spte - handle bookkeeping associated with an SPTE change
->    * @kvm: kvm instance
-> @@ -519,7 +606,7 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
->    * @gfn: the base GFN that was mapped by the SPTE
->    * @old_spte: The value of the SPTE before the change
->    * @new_spte: The value of the SPTE after the change
-> - * @level: the level of the PT the SPTE is part of in the paging structure
-> + * @role: the role of the PT the SPTE is part of in the paging structure
->    * @shared: This operation may not be running under the exclusive use of
->    *	    the MMU lock and the operation must synchronize with other
->    *	    threads that might be modifying SPTEs.
-> @@ -528,14 +615,18 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
->    * This function must be called for all TDP SPTE modifications.
->    */
->   static int __must_check __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> -					      u64 old_spte, u64 new_spte, int level,
-> -					      bool shared)
-> +					      u64 old_spte, u64 new_spte,
-> +					      union kvm_mmu_page_role role, bool shared)
->   {
-> +	bool is_private = kvm_mmu_page_role_is_private(role);
-> +	int level = role.level;
->   	bool was_present = is_shadow_present_pte(old_spte);
->   	bool is_present = is_shadow_present_pte(new_spte);
->   	bool was_leaf = was_present && is_last_spte(old_spte, level);
->   	bool is_leaf = is_present && is_last_spte(new_spte, level);
-> -	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
-> +	kvm_pfn_t old_pfn = spte_to_pfn(old_spte);
-> +	kvm_pfn_t new_pfn = spte_to_pfn(new_spte);
-> +	bool pfn_changed = old_pfn != new_pfn;
->   
->   	WARN_ON(level > PT64_ROOT_MAX_LEVEL);
->   	WARN_ON(level < PG_LEVEL_4K);
-> @@ -602,7 +693,7 @@ static int __must_check __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t
->   
->   	if (was_leaf && is_dirty_spte(old_spte) &&
->   	    (!is_present || !is_dirty_spte(new_spte) || pfn_changed))
-> -		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
-> +		kvm_set_pfn_dirty(old_pfn);
->   
->   	/*
->   	 * Recursively handle child PTs if the change removed a subtree from
-> @@ -611,26 +702,42 @@ static int __must_check __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t
->   	 * pages are kernel allocations and should never be migrated.
->   	 */
->   	if (was_present && !was_leaf &&
-> -	    (is_leaf || !is_present || WARN_ON_ONCE(pfn_changed)))
-> +	    (is_leaf || !is_present || WARN_ON_ONCE(pfn_changed))) {
-> +		KVM_BUG_ON(is_private != is_private_sptep(spte_to_child_pt(old_spte, level)),
-> +			   kvm);
->   		handle_removed_pt(kvm, spte_to_child_pt(old_spte, level), shared);
-> +	}
->   
-> +	/*
-> +	 * Special handling for the private mapping.  We are either
-> +	 * setting up new mapping at middle level page table, or leaf,
-> +	 * or tearing down existing mapping.
-> +	 *
-> +	 * This is after handling lower page table by above
-> +	 * handle_remove_tdp_mmu_page().  Secure-EPT requires to remove
-> +	 * Secure-EPT tables after removing children.
-> +	 */
-> +	if (is_private &&
-> +	    /* Ignore change of software only bits. e.g. host_writable */
-> +	    (was_leaf != is_leaf || was_present != is_present || pfn_changed))
-> +		return handle_changed_private_spte(kvm, gfn, old_spte, new_spte, role.level);
->   	return 0;
->   }
->   
->   static int __must_check handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> -					    u64 old_spte, u64 new_spte, int level,
-> +					    u64 old_spte, u64 new_spte,
-> +					    union kvm_mmu_page_role role,
->   					    bool shared)
->   {
->   	int ret;
->   
-> -	ret = __handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level,
-> -				    shared);
-> +	ret = __handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, role, shared);
->   	if (ret)
->   		return ret;
->   
-> -	handle_changed_spte_acc_track(old_spte, new_spte, level);
-> +	handle_changed_spte_acc_track(old_spte, new_spte, role.level);
->   	handle_changed_spte_dirty_log(kvm, as_id, gfn, old_spte,
-> -				      new_spte, level);
-> +				      new_spte, role.level);
->   	return 0;
->   }
->   
-> @@ -656,6 +763,24 @@ static inline int __must_check tdp_mmu_set_spte_atomic(struct kvm *kvm,
->   						       struct tdp_iter *iter,
->   						       u64 new_spte)
->   {
-> +	/*
-> +	 * For conventional page table, the update flow is
-> +	 * - update STPE with atomic operation
-> +	 * - handle changed SPTE. __handle_changed_spte()
-> +	 * NOTE: __handle_changed_spte() (and functions) must be safe against
-> +	 * concurrent update.  It is an exception to zap SPTE.  See
-> +	 * tdp_mmu_zap_spte_atomic().
-> +	 *
-> +	 * For private page table, callbacks are needed to propagate SPTE
-> +	 * change into the protected page table.  In order to atomically update
-> +	 * both the SPTE and the protected page tables with callbacks, utilize
-> +	 * freezing SPTE.
-> +	 * - Freeze the SPTE. Set entry to REMOVED_SPTE.
-> +	 * - Trigger callbacks for protected page tables. __handle_changed_spte()
-> +	 * - Unfreeze the SPTE.  Set the entry to new_spte.
-> +	 */
-> +	bool freeze_spte = is_private_sptep(iter->sptep) && !is_removed_spte(new_spte);
-> +	u64 tmp_spte = freeze_spte ? REMOVED_SPTE : new_spte;
->   	u64 *sptep = rcu_dereference(iter->sptep);
->   	int ret;
->   
-> @@ -673,14 +798,24 @@ static inline int __must_check tdp_mmu_set_spte_atomic(struct kvm *kvm,
->   	 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs and
->   	 * does not hold the mmu_lock.
->   	 */
-> -	if (!try_cmpxchg64(sptep, &iter->old_spte, new_spte))
-> +	if (!try_cmpxchg64(sptep, &iter->old_spte, tmp_spte))
->   		return -EBUSY;
->   
->   	ret = __handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-> -				    new_spte, iter->level, true);
-> +				    new_spte, sptep_to_sp(sptep)->role, true);
->   	if (!ret)
->   		handle_changed_spte_acc_track(iter->old_spte, new_spte, iter->level);
->   
-> +	if (ret) {
-> +		/*
-> +		 * !freeze_spte means this fault isn't private.  No call to
-> +		 * operation on Secure EPT.
-> +		 */
-> +		WARN_ON_ONCE(!freeze_spte);
-> +		__kvm_tdp_mmu_write_spte(sptep, iter->old_spte);
-> +	} else if (freeze_spte)
-> +		__kvm_tdp_mmu_write_spte(sptep, new_spte);
-> +
->   	return ret;
->   }
->   
-> @@ -750,6 +885,7 @@ static u64 __tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
->   			      u64 old_spte, u64 new_spte, gfn_t gfn, int level,
->   			      bool record_acc_track, bool record_dirty_log)
->   {
-> +	union kvm_mmu_page_role role;
->   	int ret;
->   
->   	lockdep_assert_held_write(&kvm->mmu_lock);
-> @@ -765,7 +901,9 @@ static u64 __tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
->   
->   	old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte, new_spte, level);
->   
-> -	ret = __handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level, false);
-> +	role = sptep_to_sp(sptep)->role;
-> +	role.level = level;
-> +	ret = __handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, role, false);
->   	/* Because write spin lock is held, no race.  It should success. */
->   	WARN_ON_ONCE(ret);
->   
-> @@ -819,8 +957,11 @@ static inline void tdp_mmu_set_spte_no_dirty_log(struct kvm *kvm,
->   			continue;					\
->   		else
->   
-> -#define tdp_mmu_for_each_pte(_iter, _mmu, _start, _end)		\
-> -	for_each_tdp_pte(_iter, to_shadow_page(_mmu->root.hpa), _start, _end)
-> +#define tdp_mmu_for_each_pte(_iter, _mmu, _private, _start, _end)	\
-> +	for_each_tdp_pte(_iter,						\
-> +		 to_shadow_page((_private) ? _mmu->private_root_hpa :	\
-> +				_mmu->root.hpa),			\
-> +		_start, _end)
->   
->   /*
->    * Yield if the MMU lock is contended or this thread needs to return control
-> @@ -983,6 +1124,14 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
->   	if (!zap_private && is_private_sp(root))
->   		return false;
->   
-> +	/*
-> +	 * start and end doesn't have GFN shared bit.  This function zaps
-> +	 * a region including alias.  Adjust shared bit of [start, end) if the
-> +	 * root is shared.
-> +	 */
-> +	start = kvm_gfn_for_root(kvm, root, start);
-> +	end = kvm_gfn_for_root(kvm, root, end);
-> +
->   	rcu_read_lock();
->   
->   	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_4K, start, end) {
-> @@ -1111,10 +1260,19 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
->   	WARN_ON(sp->role.level != fault->goal_level);
->   	if (unlikely(!fault->slot))
->   		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
-> -	else
-> -		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
-> -					 fault->pfn, iter->old_spte, fault->prefetch, true,
-> -					 fault->map_writable, &new_spte);
-> +	else {
-> +		unsigned long pte_access = ACC_ALL;
-> +		gfn_t gfn_unalias = iter->gfn & ~kvm_gfn_shared_mask(vcpu->kvm);
-> +
-> +		/* TDX shared GPAs are no executable, enforce this for the SDV. */
-> +		if (kvm_gfn_shared_mask(vcpu->kvm) && !fault->is_private)
-> +			pte_access &= ~ACC_EXEC_MASK;
-> +
-> +		wrprot = make_spte(vcpu, sp, fault->slot, pte_access,
-> +				   gfn_unalias, fault->pfn, iter->old_spte,
-> +				   fault->prefetch, true, fault->map_writable,
-> +				   &new_spte);
-> +	}
->   
->   	if (new_spte == iter->old_spte)
->   		ret = RET_PF_SPURIOUS;
-> @@ -1214,6 +1372,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->   {
->   	struct kvm_mmu *mmu = vcpu->arch.mmu;
->   	struct tdp_iter iter;
-> +	gfn_t raw_gfn;
-> +	bool is_private = fault->is_private;
->   	int ret;
->   
->   	kvm_mmu_hugepage_adjust(vcpu, fault);
-> @@ -1222,7 +1382,17 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->   
->   	rcu_read_lock();
->   
-> -	tdp_mmu_for_each_pte(iter, mmu, fault->gfn, fault->gfn + 1) {
-> +	raw_gfn = gpa_to_gfn(fault->addr);
-> +
-> +	if (is_error_noslot_pfn(fault->pfn) ||
-> +	    !kvm_pfn_to_refcounted_page(fault->pfn)) {
-> +		if (is_private) {
-> +			rcu_read_unlock();
-> +			return -EFAULT;
-> +		}
-> +	}
-> +
-> +	tdp_mmu_for_each_pte(iter, mmu, is_private, raw_gfn, raw_gfn + 1) {
->   		if (fault->nx_huge_page_workaround_enabled)
->   			disallowed_hugepage_adjust(fault, iter.old_spte, iter.level);
->   
-> @@ -1238,6 +1408,12 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->   		    is_large_pte(iter.old_spte)) {
->   			if (tdp_mmu_zap_spte_atomic(vcpu->kvm, &iter))
->   				break;
-> +			/*
-> +			 * TODO: large page support.
-> +			 * Doesn't support large page for TDX now
-> +			 */
-> +			KVM_BUG_ON(is_private_sptep(iter.sptep), vcpu->kvm);
-> +
->   
->   			/*
->   			 * The iter must explicitly re-read the spte here
-> @@ -1480,6 +1656,12 @@ static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp, union kvm_mm
->   
->   	sp->role = role;
->   	sp->spt = (void *)__get_free_page(gfp);
-> +	if (kvm_mmu_page_role_is_private(role)) {
-> +		if (kvm_alloc_private_spt_for_split(sp, gfp)) {
-> +			free_page((unsigned long)sp->spt);
-> +			sp->spt = NULL;
-> +		}
-> +	}
->   	if (!sp->spt) {
->   		kmem_cache_free(mmu_page_header_cache, sp);
->   		return NULL;
-> @@ -1495,6 +1677,11 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
->   	union kvm_mmu_page_role role = tdp_iter_child_role(iter);
->   	struct kvm_mmu_page *sp;
->   
-> +	KVM_BUG_ON(kvm_mmu_page_role_is_private(role) !=
-> +		   is_private_sptep(iter->sptep), kvm);
-> +	/* TODO: Large page isn't supported for private SPTE yet. */
-> +	KVM_BUG_ON(kvm_mmu_page_role_is_private(role), kvm);
-> +
->   	/*
->   	 * Since we are allocating while under the MMU lock we have to be
->   	 * careful about GFP flags. Use GFP_NOWAIT to avoid blocking on direct
-> @@ -1929,7 +2116,7 @@ int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
->   	if (WARN_ON_ONCE(kvm_gfn_shared_mask(vcpu->kvm)))
->   		return leaf;
->   
-> -	tdp_mmu_for_each_pte(iter, mmu, gfn, gfn + 1) {
-> +	tdp_mmu_for_each_pte(iter, mmu, false, gfn, gfn + 1) {
->   		leaf = iter.level;
->   		sptes[leaf] = iter.old_spte;
->   	}
-> @@ -1956,7 +2143,10 @@ u64 *kvm_tdp_mmu_fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, u64 addr,
->   	gfn_t gfn = addr >> PAGE_SHIFT;
->   	tdp_ptep_t sptep = NULL;
->   
-> -	tdp_mmu_for_each_pte(iter, mmu, gfn, gfn + 1) {
-> +	/* fast page fault for private GPA isn't supported. */
-> +	WARN_ON_ONCE(kvm_is_private_gpa(vcpu->kvm, addr));
-> +
-> +	tdp_mmu_for_each_pte(iter, mmu, false, gfn, gfn + 1) {
->   		*spte = iter.old_spte;
->   		sptep = iter.sptep;
->   	}
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-> index c98c7df449a8..695175c921a5 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.h
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-> @@ -5,7 +5,7 @@
->   
->   #include <linux/kvm_host.h>
->   
-> -hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
-> +hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu, bool private);
->   
->   __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
->   {
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index dda2f2ec4faa..8c996f40b544 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -211,6 +211,7 @@ struct page *kvm_pfn_to_refcounted_page(kvm_pfn_t pfn)
->   
->   	return NULL;
->   }
-> +EXPORT_SYMBOL_GPL(kvm_pfn_to_refcounted_page);
->   
->   /*
->    * Switches to specified vcpu, until a matching vcpu_put()
+T24gV2VkLCAyMDIyLTExLTAyIGF0IDIzOjE4ICswMDAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBBY3F1aXJlIGEgbmV3IG11dGV4LCB2ZW5kb3JfbW9kdWxlX2xvY2ssIGluIGt2bV94
+ODZfdmVuZG9yX2luaXQoKSB3aGlsZQ0KPiBkb2luZyBoYXJkd2FyZSBzZXR1cCB0byBlbnN1cmUg
+dGhhdCBjb25jdXJyZW50IGNhbGxzIGFyZSBmdWxseSBzZXJpYWxpemVkLg0KPiBLVk0gcmVqZWN0
+cyBhdHRlbXB0cyB0byBsb2FkIHZlbmRvciBtb2R1bGVzIGlmIGEgZGlmZmVyZW50IG1vZHVsZSBo
+YXMNCj4gYWxyZWFkeSBiZWVuIGxvYWRlZCwgYnV0IGRvZXNuJ3QgaGFuZGxlIHRoZSBjYXNlIHdo
+ZXJlIG11bHRpcGxlIHZlbmRvcg0KPiBtb2R1bGVzIGFyZSBsb2FkZWQgYXQgdGhlIHNhbWUgdGlt
+ZSwgYW5kIG1vZHVsZV9pbml0KCkgZG9lc24ndCBydW4gdW5kZXINCj4gdGhlIGdsb2JhbCBtb2R1
+bGVfbXV0ZXguDQo+IA0KPiBOb3RlLCBpbiBwcmFjdGljZSwgdGhpcyBpcyBsaWtlbHkgYSBiZW5p
+Z24gYnVnIGFzIG5vIHBsYXRmb3JtIGV4aXN0cyB0aGF0DQo+IHN1cHBvcnRzIGJvdGggU1ZNIGFu
+ZCBWTVgsIGkuZS4gYmFycmluZyBhIHdlaXJkIFZNIHNldHVwLCBvbmUgb2YgdGhlDQo+IHZlbmRv
+ciBtb2R1bGVzIGlzIGd1YXJhbnRlZWQgdG8gZmFpbCBhIHN1cHBvcnQgY2hlY2sgYmVmb3JlIG1v
+ZGlmeWluZw0KPiBjb21tb24gS1ZNIHN0YXRlLg0KPiANCj4gQWx0ZXJuYXRpdmVseSwgS1ZNIGNv
+dWxkIHBlcmZvcm0gYW4gYXRvbWljIENNUFhDSEcgb24gLmhhcmR3YXJlX2VuYWJsZSwNCj4gYnV0
+IHRoYXQgY29tZXMgd2l0aCBpdHMgb3duIHVnbGluZXNzIGFzIGl0IHdvdWxkIHJlcXVpcmUgc2V0
+dGluZw0KPiAuaGFyZHdhcmVfZW5hYmxlIGJlZm9yZSBzdWNjZXNzIGlzIGd1YXJhbnRlZWQsIGUu
+Zy4gYXR0ZW1wdGluZyB0byBsb2FkDQo+IHRoZSAid3JvbmciIGNvdWxkIHJlc3VsdCBpbiBzcHVy
+aW91cyBmYWlsdXJlIHRvIGxvYWQgdGhlICJyaWdodCIgbW9kdWxlLg0KPiANCj4gSW50cm9kdWNl
+IGEgbmV3IG11dGV4IGFzIHVzaW5nIGt2bV9sb2NrIGlzIGV4dHJlbWVseSBkZWFkbG9jayBwcm9u
+ZSBkdWUNCj4gdG8ga3ZtX2xvY2sgYmVpbmcgdGFrZW4gdW5kZXIgY3B1c193cml0ZV9sb2NrKCks
+IGFuZCBpbiB0aGUgZnV0dXJlLCB1bmRlcg0KPiB1bmRlciBjcHVzX3JlYWRfbG9jaygpLiAgQW55
+IG9wZXJhdGlvbiB0aGF0IHRha2VzIGNwdXNfcmVhZF9sb2NrKCkgd2hpbGUNCj4gaG9sZGluZyBr
+dm1fbG9jayB3b3VsZCBwb3RlbnRpYWxseSBkZWFkbG9jaywgZS5nLiBrdm1fdGltZXJfaW5pdCgp
+IHRha2VzDQo+IGNwdXNfcmVhZF9sb2NrKCkgdG8gcmVnaXN0ZXIgYSBjYWxsYmFjay4gIEluIHRo
+ZW9yeSwgS1ZNIGNvdWxkIGF2b2lkDQo+IHN1Y2ggcHJvYmxlbWF0aWMgcGF0aHMsIGkuZS4gZG8g
+bGVzcyBzZXR1cCB1bmRlciBrdm1fbG9jaywgYnV0IGF2b2lkaW5nDQo+IGFsbCBjYWxscyB0byBj
+cHVzX3JlYWRfbG9jaygpIGlzIHN1YnRseSBkaWZmaWN1bHQgYW5kIHRodXMgZnJhZ2lsZS4gIEUu
+Zy4NCj4gdXBkYXRpbmcgc3RhdGljIGNhbGxzIGFsc28gYWNxdWlyZXMgY3B1c19yZWFkX2xvY2so
+KS4NCj4gDQo+IEludmVydGluZyB0aGUgbG9jayBvcmRlcmluZywgaS5lLiBhbHdheXMgdGFraW5n
+IGt2bV9sb2NrIG91dHNpZGUNCj4gY3B1c19yZWFkX2xvY2soKSwgaXMgbm90IGEgdmlhYmxlIG9w
+dGlvbiwgZS5nLiBrdm1fb25saW5lX2NwdSgpIHRha2VzDQo+IGt2bV9sb2NrIGFuZCBpcyBjYWxs
+ZWQgdW5kZXIgY3B1c193cml0ZV9sb2NrKCkuDQoNCiJrdm1fb25saW5lX2NwdSgpIHRha2VzIGt2
+bV9sb2NrIGFuZCBpcyBjYWxsZWQgdW5kZXIgY3B1c193cml0ZV9sb2NrKCkiIGhhc24ndA0KaGFw
+cGVuZWQgeWV0Lg0KDQo+IA0KPiBUaGUgbG9ja2RlcCBzcGxhdCBiZWxvdyBpcyBkZXBlbmRlbnQg
+b24gZnV0dXJlIHBhdGNoZXMgdG8gdGFrZQ0KPiBjcHVzX3JlYWRfbG9jaygpIGluIGhhcmR3YXJl
+X2VuYWJsZV9hbGwoKSwgYnV0IGFzIGFib3ZlLCBkZWFkbG9jayBpcw0KPiBhbHJlYWR5IGlzIGFs
+cmVhZHkgcG9zc2libGUuDQoNCklJVUMga3ZtX2xvY2sgYnkgZGVzaWduIGlzIHN1cHBvc2VkIHRv
+IHByb3RlY3Qgdm1fbGlzdCwgdGh1cyBJTUhPIG5hdHVyYWxseSBpdA0KZG9lc24ndCBmaXQgdG8g
+cHJvdGVjdCBtdWx0aXBsZSB2ZW5kb3IgbW9kdWxlIGxvYWRpbmcuDQoNCkxvb2tzIGFib3ZlIGFy
+Z3VtZW50IGlzIGdvb2QgZW5vdWdoLiAgSSBhbSBub3Qgc3VyZSAgd2hldGhlciB3ZSBuZWVkIGFk
+ZGl0aW9uYWwNCmp1c3RpZmljYXRpb24gd2hpY2ggY29tZXMgZnJvbSBmdXR1cmUgcGF0Y2hlcy4g
+OikNCg0KQWxzbywgZG8geW91IGFsc28gd2FudCB0byB1cGRhdGUgRG9jdW1lbnRhdGlvbi92aXJ0
+L2t2bS9sb2NraW5nLnJzdCIgaW4gdGhpcw0KcGF0Y2g/DQoNCj4gDQo+IA0KPiAgID09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KPiAgIFdBUk5J
+Tkc6IHBvc3NpYmxlIGNpcmN1bGFyIGxvY2tpbmcgZGVwZW5kZW5jeSBkZXRlY3RlZA0KPiAgIDYu
+MC4wLXNtcC0tN2VjOTMyNDRmMTk0LWluaXQyICMyNyBUYWludGVkOiBHICAgICAgICAgICBPDQo+
+ICAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+DQo+ICAgc3RhYmxlLzI1MTgzMyBpcyB0cnlpbmcgdG8gYWNxdWlyZSBsb2NrOg0KPiAgIGZmZmZm
+ZmZmYzA5N2VhMjggKGt2bV9sb2NrKXsrLisufS17MzozfSwgYXQ6IGhhcmR3YXJlX2VuYWJsZV9h
+bGwrMHgxZi8weGMwIFtrdm1dDQo+IA0KPiAgICAgICAgICAgICAgICBidXQgdGFzayBpcyBhbHJl
+YWR5IGhvbGRpbmcgbG9jazoNCj4gICBmZmZmZmZmZmEyNDU2ODI4IChjcHVfaG90cGx1Z19sb2Nr
+KXsrKysrfS17MDowfSwgYXQ6IGhhcmR3YXJlX2VuYWJsZV9hbGwrMHhmLzB4YzAgW2t2bV0NCj4g
+DQo+ICAgICAgICAgICAgICAgIHdoaWNoIGxvY2sgYWxyZWFkeSBkZXBlbmRzIG9uIHRoZSBuZXcg
+bG9jay4NCj4gDQo+ICAgICAgICAgICAgICAgIHRoZSBleGlzdGluZyBkZXBlbmRlbmN5IGNoYWlu
+IChpbiByZXZlcnNlIG9yZGVyKSBpczoNCj4gDQo+ICAgICAgICAgICAgICAgIC0+ICMxIChjcHVf
+aG90cGx1Z19sb2NrKXsrKysrfS17MDowfToNCj4gICAgICAgICAgY3B1c19yZWFkX2xvY2srMHgy
+YS8weGEwDQo+ICAgICAgICAgIF9fY3B1aHBfc2V0dXBfc3RhdGUrMHgyYi8weDYwDQo+ICAgICAg
+ICAgIF9fa3ZtX3g4Nl92ZW5kb3JfaW5pdCsweDE2YS8weDE4NzAgW2t2bV0NCj4gICAgICAgICAg
+a3ZtX3g4Nl92ZW5kb3JfaW5pdCsweDIzLzB4NDAgW2t2bV0NCj4gICAgICAgICAgMHhmZmZmZmZm
+ZmMwYTRkMDJiDQo+ICAgICAgICAgIGRvX29uZV9pbml0Y2FsbCsweDExMC8weDIwMA0KPiAgICAg
+ICAgICBkb19pbml0X21vZHVsZSsweDRmLzB4MjUwDQo+ICAgICAgICAgIGxvYWRfbW9kdWxlKzB4
+MTczMC8weDE4ZjANCj4gICAgICAgICAgX19zZV9zeXNfZmluaXRfbW9kdWxlKzB4Y2EvMHgxMDAN
+Cj4gICAgICAgICAgX194NjRfc3lzX2Zpbml0X21vZHVsZSsweDFkLzB4MjANCj4gICAgICAgICAg
+ZG9fc3lzY2FsbF82NCsweDNkLzB4ODANCj4gICAgICAgICAgZW50cnlfU1lTQ0FMTF82NF9hZnRl
+cl9od2ZyYW1lKzB4NjMvMHhjZA0KPiANCj4gICAgICAgICAgICAgICAgLT4gIzAgKGt2bV9sb2Nr
+KXsrLisufS17MzozfToNCj4gICAgICAgICAgX19sb2NrX2FjcXVpcmUrMHgxNmY0LzB4MzBkMA0K
+PiAgICAgICAgICBsb2NrX2FjcXVpcmUrMHhiMi8weDE5MA0KPiAgICAgICAgICBfX211dGV4X2xv
+Y2srMHg5OC8weDZmMA0KPiAgICAgICAgICBtdXRleF9sb2NrX25lc3RlZCsweDFiLzB4MjANCj4g
+ICAgICAgICAgaGFyZHdhcmVfZW5hYmxlX2FsbCsweDFmLzB4YzAgW2t2bV0NCj4gICAgICAgICAg
+a3ZtX2Rldl9pb2N0bCsweDQ1ZS8weDkzMCBba3ZtXQ0KPiAgICAgICAgICBfX3NlX3N5c19pb2N0
+bCsweDc3LzB4YzANCj4gICAgICAgICAgX194NjRfc3lzX2lvY3RsKzB4MWQvMHgyMA0KPiAgICAg
+ICAgICBkb19zeXNjYWxsXzY0KzB4M2QvMHg4MA0KPiAgICAgICAgICBlbnRyeV9TWVNDQUxMXzY0
+X2FmdGVyX2h3ZnJhbWUrMHg2My8weGNkDQo+IA0KPiAgICAgICAgICAgICAgICBvdGhlciBpbmZv
+IHRoYXQgbWlnaHQgaGVscCB1cyBkZWJ1ZyB0aGlzOg0KPiANCj4gICAgUG9zc2libGUgdW5zYWZl
+IGxvY2tpbmcgc2NlbmFyaW86DQo+IA0KPiAgICAgICAgICBDUFUwICAgICAgICAgICAgICAgICAg
+ICBDUFUxDQo+ICAgICAgICAgIC0tLS0gICAgICAgICAgICAgICAgICAgIC0tLS0NCj4gICAgIGxv
+Y2soY3B1X2hvdHBsdWdfbG9jayk7DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IGxvY2soa3ZtX2xvY2spOw0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsb2Nr
+KGNwdV9ob3RwbHVnX2xvY2spOw0KPiAgICAgbG9jayhrdm1fbG9jayk7DQo+IA0KPiAgICAgICAg
+ICAgICAgICAgKioqIERFQURMT0NLICoqKg0KPiANCj4gICAxIGxvY2sgaGVsZCBieSBzdGFibGUv
+MjUxODMzOg0KPiAgICAjMDogZmZmZmZmZmZhMjQ1NjgyOCAoY3B1X2hvdHBsdWdfbG9jayl7Kysr
+K30tezA6MH0sIGF0OiBoYXJkd2FyZV9lbmFibGVfYWxsKzB4Zi8weGMwIFtrdm1dDQo+IA0KPiBT
+aWduZWQtb2ZmLWJ5OiBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuamNAZ29vZ2xlLmNvbT4NCj4g
+LS0tDQo+ICBhcmNoL3g4Ni9rdm0veDg2LmMgfCAxOCArKysrKysrKysrKysrKysrLS0NCj4gIDEg
+ZmlsZSBjaGFuZ2VkLCAxNiBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlm
+ZiAtLWdpdCBhL2FyY2gveDg2L2t2bS94ODYuYyBiL2FyY2gveDg2L2t2bS94ODYuYw0KPiBpbmRl
+eCBhMGNhNDAxZDNjZGYuLjIxODcwNzU5N2JlYSAxMDA2NDQNCj4gLS0tIGEvYXJjaC94ODYva3Zt
+L3g4Ni5jDQo+ICsrKyBiL2FyY2gveDg2L2t2bS94ODYuYw0KPiBAQCAtMTI4LDYgKzEyOCw3IEBA
+IHN0YXRpYyBpbnQga3ZtX3ZjcHVfZG9fc2luZ2xlc3RlcChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUp
+Ow0KPiAgc3RhdGljIGludCBfX3NldF9zcmVnczIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1
+Y3Qga3ZtX3NyZWdzMiAqc3JlZ3MyKTsNCj4gIHN0YXRpYyB2b2lkIF9fZ2V0X3NyZWdzMihzdHJ1
+Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fc3JlZ3MyICpzcmVnczIpOw0KPiAgDQo+ICtz
+dGF0aWMgREVGSU5FX01VVEVYKHZlbmRvcl9tb2R1bGVfbG9jayk7DQo+ICBzdHJ1Y3Qga3ZtX3g4
+Nl9vcHMga3ZtX3g4Nl9vcHMgX19yZWFkX21vc3RseTsNCj4gIA0KPiAgI2RlZmluZSBLVk1fWDg2
+X09QKGZ1bmMpCQkJCQkgICAgIFwNCj4gQEAgLTkyODAsNyArOTI4MSw3IEBAIHZvaWQga3ZtX2Fy
+Y2hfZXhpdCh2b2lkKQ0KPiAgDQo+ICB9DQo+ICANCj4gLWludCBrdm1feDg2X3ZlbmRvcl9pbml0
+KHN0cnVjdCBrdm1feDg2X2luaXRfb3BzICpvcHMpDQo+ICtzdGF0aWMgaW50IF9fa3ZtX3g4Nl92
+ZW5kb3JfaW5pdChzdHJ1Y3Qga3ZtX3g4Nl9pbml0X29wcyAqb3BzKQ0KPiAgew0KPiAgCXU2NCBo
+b3N0X3BhdDsNCj4gIAlpbnQgcjsNCj4gQEAgLTk0MTMsNiArOTQxNCwxNyBAQCBpbnQga3ZtX3g4
+Nl92ZW5kb3JfaW5pdChzdHJ1Y3Qga3ZtX3g4Nl9pbml0X29wcyAqb3BzKQ0KPiAgCWttZW1fY2Fj
+aGVfZGVzdHJveSh4ODZfZW11bGF0b3JfY2FjaGUpOw0KPiAgCXJldHVybiByOw0KPiAgfQ0KPiAr
+DQo+ICtpbnQga3ZtX3g4Nl92ZW5kb3JfaW5pdChzdHJ1Y3Qga3ZtX3g4Nl9pbml0X29wcyAqb3Bz
+KQ0KPiArew0KPiArCWludCByOw0KPiArDQo+ICsJbXV0ZXhfbG9jaygmdmVuZG9yX21vZHVsZV9s
+b2NrKTsNCj4gKwlyID0gX19rdm1feDg2X3ZlbmRvcl9pbml0KG9wcyk7DQo+ICsJbXV0ZXhfdW5s
+b2NrKCZ2ZW5kb3JfbW9kdWxlX2xvY2spOw0KPiArDQo+ICsJcmV0dXJuIHI7DQo+ICt9DQo+ICBF
+WFBPUlRfU1lNQk9MX0dQTChrdm1feDg2X3ZlbmRvcl9pbml0KTsNCj4gIA0KPiAgdm9pZCBrdm1f
+eDg2X3ZlbmRvcl9leGl0KHZvaWQpDQo+IEBAIC05NDM1LDcgKzk0NDcsNiBAQCB2b2lkIGt2bV94
+ODZfdmVuZG9yX2V4aXQodm9pZCkNCj4gIAljYW5jZWxfd29ya19zeW5jKCZwdmNsb2NrX2d0b2Rf
+d29yayk7DQo+ICAjZW5kaWYNCj4gIAlzdGF0aWNfY2FsbChrdm1feDg2X2hhcmR3YXJlX3Vuc2V0
+dXApKCk7DQo+IC0Ja3ZtX3g4Nl9vcHMuaGFyZHdhcmVfZW5hYmxlID0gTlVMTDsNCj4gIAlrdm1f
+bW11X3ZlbmRvcl9tb2R1bGVfZXhpdCgpOw0KPiAgCWZyZWVfcGVyY3B1KHVzZXJfcmV0dXJuX21z
+cnMpOw0KPiAgCWttZW1fY2FjaGVfZGVzdHJveSh4ODZfZW11bGF0b3JfY2FjaGUpOw0KPiBAQCAt
+OTQ0Myw2ICs5NDU0LDkgQEAgdm9pZCBrdm1feDg2X3ZlbmRvcl9leGl0KHZvaWQpDQo+ICAJc3Rh
+dGljX2tleV9kZWZlcnJlZF9mbHVzaCgma3ZtX3hlbl9lbmFibGVkKTsNCj4gIAlXQVJOX09OKHN0
+YXRpY19icmFuY2hfdW5saWtlbHkoJmt2bV94ZW5fZW5hYmxlZC5rZXkpKTsNCj4gICNlbmRpZg0K
+PiArCW11dGV4X2xvY2soJnZlbmRvcl9tb2R1bGVfbG9jayk7DQo+ICsJa3ZtX3g4Nl9vcHMuaGFy
+ZHdhcmVfZW5hYmxlID0gTlVMTDsNCj4gKwltdXRleF91bmxvY2soJnZlbmRvcl9tb2R1bGVfbG9j
+ayk7DQo+ICB9DQo+ICBFWFBPUlRfU1lNQk9MX0dQTChrdm1feDg2X3ZlbmRvcl9leGl0KTsNCj4g
+IA0KDQo=
