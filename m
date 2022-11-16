@@ -2,163 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D600562B665
-	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 10:23:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1254662B6F3
+	for <lists+kvm@lfdr.de>; Wed, 16 Nov 2022 10:54:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238830AbiKPJXN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Nov 2022 04:23:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44214 "EHLO
+        id S229794AbiKPJx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Nov 2022 04:53:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238850AbiKPJWr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Nov 2022 04:22:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB78C26127
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 01:21:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668590506;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3EOhbuo2gRM/DssIyTkIu890ZZZpDw/V+Xymwp3BqTI=;
-        b=H/rU4/0CoONTHQysWo88R2zxVK/sL9KAK4Gs6DwfCq3jX27rhnrstB/IFSuCaQEwSCV/Df
-        sJD5Zzc3RN/mFitah8ddVRXF8deCGc9SeZTS3k6IPNAEOoI6IfWLE0W7VTn1gicMxryz+A
-        HqOVcUDqt14vevWJzNLmskYGKcsE/KI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-391-1MX4CEdmMM2fHrmkFDu_PA-1; Wed, 16 Nov 2022 04:21:45 -0500
-X-MC-Unique: 1MX4CEdmMM2fHrmkFDu_PA-1
-Received: by mail-wm1-f69.google.com with SMTP id j2-20020a05600c1c0200b003cf7397fc9bso9713564wms.5
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 01:21:45 -0800 (PST)
+        with ESMTP id S229582AbiKPJxz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Nov 2022 04:53:55 -0500
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9792CFAD3
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 01:53:52 -0800 (PST)
+Received: by mail-wm1-x334.google.com with SMTP id ja4-20020a05600c556400b003cf6e77f89cso2735852wmb.0
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 01:53:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zze9Wsxt3ysTHHvg5WBu0SQosVjbcwx2aPdUf6crt3Y=;
+        b=I2T59KEQLxIXM2pHNfvD9YeKkkSHE4ZyMd/bqV2bIhQhCd4r7G3BFqEMlifLl2/V3U
+         Ltzz2PryU6B8uAKFDvsVQ1vtZoIrK9vgSISfVLVmvC111IWlhiu150wSuOeQnJ6nS591
+         EbyyF/lv+oHj3JMgx+8zk0gz81qJBc38w/3AY8cHqHQDXz76GRaAPK34tu5ONO4yvzJi
+         2AZTRHZQV9qWmZROHiHvF+90nX6/MmF+WWmcZMOj7hNAIEiOmXfJs2/gtzUTPmnerT3Y
+         SDwEvPH6Zu2ekiEIvkl//9IDw/jJhHIejKcAMlZV7e7jFfc0EIr02UqMzf+azaJwFDJT
+         h21A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3EOhbuo2gRM/DssIyTkIu890ZZZpDw/V+Xymwp3BqTI=;
-        b=YQm2bpQikwDtdYGM3NuZRvYKv2ANogY6XZFlC/RFoHy1LvSTpjpaK/ibT2RSeGruXS
-         VdVp8x4XdOWYK2hlIdKJRIjFcHyKlrtQ/1xMUWBH1amYHd5aTjcmrTWKFgIer5DpdvC7
-         ga6pRym3Z3pzRcUHaqHz5Zqvi0ONMuWBGHzyW0j/hMaLs1HJcr+0+z+NlRMfGmGVNCLE
-         kVkd80uKZNEDvgg9p8FtvYGnVZ4X+ADnwzWCGzucywCAOfHbzRZ/Psu9n46+Vkmp4MsF
-         wrB/2UOHfaskaFbJQjahzP8vKL+pDZQQ4suHaz6yRYo8bEea8HqVtGfBrlru0HvkjMkK
-         1aTw==
-X-Gm-Message-State: ANoB5plR42CD96ywhbECA78oFjE9MB2VhpvVN9xuUv8RO83I1jJl/Se6
-        WygVGMeNGfpbFFfqEPUlTi82yQc7g/KBbbQShnR/lyGEFu9HzfLh++BSmot+q10Ef7sgWnweOu8
-        zLdmZS2MgrhKV
-X-Received: by 2002:a05:600c:54ec:b0:3cf:8443:e4a with SMTP id jb12-20020a05600c54ec00b003cf84430e4amr1518263wmb.27.1668590504436;
-        Wed, 16 Nov 2022 01:21:44 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf49QFmou4lunmLxHQn36tqy8/rLrUnxj3S5xa0/8E8EOoMtE4mnY2S/BAQLRycObOfX9ZpmOg==
-X-Received: by 2002:a05:600c:54ec:b0:3cf:8443:e4a with SMTP id jb12-20020a05600c54ec00b003cf84430e4amr1518242wmb.27.1668590504174;
-        Wed, 16 Nov 2022 01:21:44 -0800 (PST)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id u17-20020a05600c19d100b003c6f8d30e40sm1516316wmq.31.2022.11.16.01.21.42
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=zze9Wsxt3ysTHHvg5WBu0SQosVjbcwx2aPdUf6crt3Y=;
+        b=Kykf1DSoe0Tk6/czJkP9nN34jlYRJVbECJaWWdig+bE4IE9eq6Juxgf3Ugz5QC5VDQ
+         DJTNwhiGfL0eLDERZ4XfQ0IQ/J8ZbzyyCH049MBYwPwjeQBNMeRjIg4+mhDe0YMM80nL
+         IF4gbknIuNqr399XYgcxYaJh7pEVySSoulZCYASdgJcR1MxGraijR0n43mOYFjzl8DBH
+         D17/bHEDWnC5IaF6JcILHVOylUlsIQ++Jib/U6cxugFGOBpObQainx3zNqGBQairJWDa
+         1uYu2M2/YeqAEFz7RqZpCi5qpkaw/9OWIR3CDiL+cgSd6sTD1dFGyzhXblBkbNfx57Ac
+         sfmA==
+X-Gm-Message-State: ANoB5pl9QnOoxrz1cOU2WpBkDQ1nK6z9NuiWNMWq2XWiVYp7WDzVi/tN
+        UvHKh+EWY9wt+lopTG1M1RVYTw==
+X-Google-Smtp-Source: AA0mqf450k4KT3b612+SvZbSE765F/0XKp3AXD24C9sDIk/4dxF+lDjo+r4A3/pJpT3ovdAyPzm4jg==
+X-Received: by 2002:a7b:ca43:0:b0:3cf:ade4:d529 with SMTP id m3-20020a7bca43000000b003cfade4d529mr1563443wml.193.1668592431026;
+        Wed, 16 Nov 2022 01:53:51 -0800 (PST)
+Received: from zen.linaroharston ([185.81.254.11])
+        by smtp.gmail.com with ESMTPSA id l42-20020a05600c1d2a00b003cf4eac8e80sm2160083wms.23.2022.11.16.01.53.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Nov 2022 01:21:43 -0800 (PST)
-Message-ID: <f764c7a1eb4a9fe294f04ea48db2dae9c18116c8.camel@redhat.com>
-Subject: Re: [PATCHv5 0/8] Virtual NMI feature
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Santosh Shukla <santosh.shukla@amd.com>, pbonzini@redhat.com,
-        seanjc@google.com, jmattson@google.com
-Cc:     kvm@vger.kernel.org, joro@8bytes.org, linux-kernel@vger.kernel.org,
-        mail@maciej.szmigiero.name, thomas.lendacky@amd.com,
-        vkuznets@redhat.com
-Date:   Wed, 16 Nov 2022 11:21:42 +0200
-In-Reply-To: <fc8813c6-0091-8571-d934-e33d7d56123d@amd.com>
-References: <20221027083831.2985-1-santosh.shukla@amd.com>
-         <d109feb8-7d07-0bf1-f4ad-76d4230ed498@amd.com>
-         <869d05b2ce0437efae1cf505cf4028ceb4920ce2.camel@redhat.com>
-         <fc8813c6-0091-8571-d934-e33d7d56123d@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        Wed, 16 Nov 2022 01:53:50 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id B067B1FFB7;
+        Wed, 16 Nov 2022 09:53:49 +0000 (GMT)
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <87k03xbvkt.fsf@linaro.org> <20221116050022.GC364614@chaop.bj.intel.com>
+User-agent: mu4e 1.9.2; emacs 28.2.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        AKASHI Takahiro <takahiro.akashi@linaro.org>
+Subject: Re: [PATCH v9 0/8] KVM: mm: fd-based approach for supporting KVM
+Date:   Wed, 16 Nov 2022 09:40:23 +0000
+In-reply-to: <20221116050022.GC364614@chaop.bj.intel.com>
+Message-ID: <87v8nf8bte.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-11-16 at 11:10 +0530, Santosh Shukla wrote:
-> Hi Maxim,
-> 
-> On 11/14/2022 8:01 PM, Maxim Levitsky wrote:
-> > On Mon, 2022-11-14 at 13:32 +0530, Santosh Shukla wrote:
-> > > 
-> > > 
-> > > On 10/27/2022 2:08 PM, Santosh Shukla wrote:
-> > > > VNMI Spec is at [1].
-> > > > 
-> > > > Change History:
-> > > > 
-> > > > v5 (6.1-rc2)
-> > > > 01,02,06 - Renamed s/X86_FEATURE_V_NMI/X86_FEATURE_AMD_VNMI (Jim Mattson)
-> > > > 
-> > > 
-> > > Gentle reminder.
-> > > 
-> > > Thanks,
-> > > Santosh
-> > > 
-> > 
-> > I started reviewing it today and I think there are still few issues,
-> > and the biggest one is that if a NMI arrives while vNMI injection
-> > is pending, current code just drops such NMI.
-> > 
-> > We had a discussion about this, like forcing immeditate vm exit
-> 
-> I believe, We discussed above case in [1] i.e.. HW can handle
-> the second (/pending)virtual NMI while the guest processing first virtual NMI w/o vmexit.
-> is it same scenario or different one that you are mentioning?
-> 
-> [1] https://lore.kernel.org/lkml/1782cdbb-8274-8c3d-fa98-29147f1e5d1e@amd.com/
 
-You misunderstood the issue.
+Chao Peng <chao.p.peng@linux.intel.com> writes:
 
-Hardware can handle the case when a NMI is in service (that is V_NMI_MASK is set) and another one is injected 
-(V_NMI_PENDING can be set),
+> On Mon, Nov 14, 2022 at 11:43:37AM +0000, Alex Benn=C3=A9e wrote:
+>>=20
+>> Chao Peng <chao.p.peng@linux.intel.com> writes:
+>>=20
+>> <snip>
+>> > Introduction
+>> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> > KVM userspace being able to crash the host is horrible. Under current
+>> > KVM architecture, all guest memory is inherently accessible from KVM
+>> > userspace and is exposed to the mentioned crash issue. The goal of this
+>> > series is to provide a solution to align mm and KVM, on a userspace
+>> > inaccessible approach of exposing guest memory.=20
+>> >
+>> > Normally, KVM populates secondary page table (e.g. EPT) by using a host
+>> > virtual address (hva) from core mm page table (e.g. x86 userspace page
+>> > table). This requires guest memory being mmaped into KVM userspace, but
+>> > this is also the source where the mentioned crash issue can happen. In
+>> > theory, apart from those 'shared' memory for device emulation etc, gue=
+st
+>> > memory doesn't have to be mmaped into KVM userspace.
+>> >
+>> > This series introduces fd-based guest memory which will not be mmaped
+>> > into KVM userspace. KVM populates secondary page table by using a
+>> > fd/offset pair backed by a memory file system. The fd can be created
+>> > from a supported memory filesystem like tmpfs/hugetlbfs and KVM can
+>> > directly interact with them with newly introduced in-kernel interface,
+>> > therefore remove the KVM userspace from the path of accessing/mmaping
+>> > the guest memory.=20
+>> >
+>> > Kirill had a patch [2] to address the same issue in a different way. It
+>> > tracks guest encrypted memory at the 'struct page' level and relies on
+>> > HWPOISON to reject the userspace access. The patch has been discussed =
+in
+>> > several online and offline threads and resulted in a design document [=
+3]
+>> > which is also the original proposal for this series. Later this patch
+>> > series evolved as more comments received in community but the major
+>> > concepts in [3] still hold true so recommend reading.
+>> >
+>> > The patch series may also be useful for other usages, for example, pure
+>> > software approach may use it to harden itself against unintentional
+>> > access to guest memory. This series is designed with these usages in
+>> > mind but doesn't have code directly support them and extension might be
+>> > needed.
+>>=20
+>> There are a couple of additional use cases where having a consistent
+>> memory interface with the kernel would be useful.
+>
+> Thanks very much for the info. But I'm not so confident that the current
+> memfd_restricted() implementation can be useful for all these usages.=20
+>
+>>=20
+>>   - Xen DomU guests providing other domains with VirtIO backends
+>>=20
+>>   Xen by default doesn't give other domains special access to a domains
+>>   memory. The guest can grant access to regions of its memory to other
+>>   domains for this purpose.=20
+>
+> I'm trying to form my understanding on how this could work and what's
+> the benefit for a DomU guest to provide memory through memfd_restricted().
+> AFAICS, memfd_restricted() can help to hide the memory from DomU userspac=
+e,
+> but I assume VirtIO backends are still in DomU uerspace and need access
+> that memory, right?
 
-but it is not possible to handle the case when a NMI is already injected (V_NMI_PENDING set) but
-and KVM wants to inject another one before the first one went into the service (that is V_NMI_MASK is not set
-yet).
+They need access to parts of the memory. At the moment you run your
+VirtIO domains in the Dom0 and give them access to the whole of a DomU's
+address space - however the Xen model is by default the guests memory is
+inaccessible to other domains on the system. The DomU guest uses the Xen
+grant model to expose portions of its address space to other domains -
+namely for the VirtIO queues themselves and any pages containing buffers
+involved in the VirtIO transaction. My thought was that looks like a
+guest memory interface which is mostly inaccessible (private) with some
+holes in it where memory is being explicitly shared with other domains.
 
-Also same can happen when NMIs are blocked in SMM, since V_NMI_MASK is set despite no NMI in service,
-we will be able to inject only one NMI by setting the V_NMI_PENDING.
+What I want to achieve is a common userspace API with defined semantics
+for what happens when private and shared regions are accessed. Because
+having each hypervisor/confidential computing architecture define its
+own special API for accessing this memory is just a recipe for
+fragmentation and makes sharing common VirtIO backends impossible.
 
-I think I was able to solve all these issues and I will today post a modified patch series of yours,
-which should cover all these cases and have some nice refactoring as well.
+>
+>>=20
+>>   - pKVM on ARM
+>>=20
+>>   Similar to Xen, pKVM moves the management of the page tables into the
+>>   hypervisor and again doesn't allow those domains to share memory by
+>>   default.
+>
+> Right, we already had some discussions on this in the past versions.
+>
+>>=20
+>>   - VirtIO loopback
+>>=20
+>>   This allows for VirtIO devices for the host kernel to be serviced by
+>>   backends running in userspace. Obviously the memory userspace is
+>>   allowed to access is strictly limited to the buffers and queues
+>>   because giving userspace unrestricted access to the host kernel would
+>>   have consequences.
+>
+> Okay, but normal memfd_create() should work for it, right? And
+> memfd_restricted() instead may not work as it unmaps the memory from
+> userspace.
+>
+>>=20
+>> All of these VirtIO backends work with vhost-user which uses memfds to
+>> pass references to guest memory from the VMM to the backend
+>> implementation.
+>
+> Sounds to me these are the places where normal memfd_create() can act on.
+> VirtIO backends work on the mmap-ed memory which currently is not the
+> case for memfd_restricted(). memfd_restricted() has different design
+> purpose that unmaps the memory from userspace and employs some kernel
+> callbacks so other kernel modules can make use of the memory with these
+> callbacks instead of userspace virtual address.
 
+Maybe my understanding is backwards then. Are you saying a guest starts
+with all its memory exposed and then selectively unmaps the private
+regions? Is this driven by the VMM or the guest itself?
 
-Best regards,
-	Maxim Levitsky
-
-
-> 
-> Thanks,
-> Santosh
-> 
-> > in this case and such but I have a simplier idea:
-> > 
-> > In this case we can just open the NMI window in the good old way
-> > by intercepting IRET, STGI, and or RSM (which is intercepted anyway),
-> > 
-> > and only if we already *just* intercepted IRET, only then just drop 
-> > the new NMI instead of single stepping over it based on reasoning that
-> > its 3rd NMI (one is almost done the servicing (its IRET is executing),
-> > one is pending injection, and we want to inject another one.
-> > 
-> > Does this sound good to you? It won't work for SEV-ES as it looks
-> > like it doesn't intercept IRET, but it might be a reasonable tradeof
-> > for SEV-ES guests to accept that we can't inject a NMI if one is
-> > already pending injection.
-> > 
-> > Best regards,
-> >         Maxim Levitsky
-> > 
-> 
-
-
+--=20
+Alex Benn=C3=A9e
