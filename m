@@ -2,88 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF4F662DD46
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 14:53:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CDE962DD86
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 15:06:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240088AbiKQNxF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 08:53:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60516 "EHLO
+        id S239679AbiKQOGW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 09:06:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234299AbiKQNxB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 08:53:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B675F46
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 05:52:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668693125;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iUQbYRrYAQh/wXl2eewRoMg367mHrFNS/hTaBe7S+kM=;
-        b=CTkQUCK4V34CT2ZWPhzl3xhxF8PrB8Nh6TH6VM3NtVPhbl4KqBn3a+Jef7RlxrRlDTgdM2
-        MM590s/Gl9fAPj4jWajAVVZMYuK3RkWn0D7WkXtzVAm+BqOvKFX3uG92uJWi7gQxEuCaG9
-        Tned4DaHlwvYsLoTtnCPB+C0gnO7rRo=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-374-Yiqy2vlBPlKR24ZLge6C1w-1; Thu, 17 Nov 2022 08:52:03 -0500
-X-MC-Unique: Yiqy2vlBPlKR24ZLge6C1w-1
-Received: by mail-ej1-f71.google.com with SMTP id hb35-20020a170907162300b007ae6746f240so1129778ejc.12
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 05:52:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iUQbYRrYAQh/wXl2eewRoMg367mHrFNS/hTaBe7S+kM=;
-        b=yCMMq/8IU6PcdeerboeVrh8q0FVjoA9N7s4JUa3u4vzp47gDIX+D+w3lBzFesGRpiw
-         jlP06x0AyfjOWN1G2MPWCLrf/Lt6EMlOW0u0ZPBfyLORzvtzf5/n0FUx3cknB01wONqm
-         rg+S4rq32Wwk7c3bJBnMFfd5LS3sJ5qK0fysVOu4Ifi/LnHG3ir8ZipvsO2Kfrr/hXyo
-         0t5h8856u0/qsJ03lA5k4zsE+8GVlstmXbQpfMd/SwA3l/Z5xCwUCusvUywznmdb0skE
-         +nRSd2mEG2Nj0FKHvN1RUVAENU6wV2JF1UJHLfOyWkIjs9VQleFtuFIKCldeVceb4Inn
-         dQcg==
-X-Gm-Message-State: ANoB5pkY//juPbIsfdq4yVDKBU2bq0qtvW5zhA61SrPup5c6y9hS7qUN
-        JsUhs/EfnLCqDVs3Xc3sMTYPPrGsbBWq8SYFJaXWLaiA2M3h9mCN9OI8uAzrZIN8cJJ1KBDlx5d
-        Hr7IePEUcmW1J
-X-Received: by 2002:a17:906:b0cd:b0:78d:8c6b:397b with SMTP id bk13-20020a170906b0cd00b0078d8c6b397bmr2113802ejb.364.1668693122527;
-        Thu, 17 Nov 2022 05:52:02 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5qVWzt7dcLEy98Aha61tfPsTRq04CofPLqTGWxwOfKVQMjfvXmzZmfJjH9AhmWfTX86VlF0g==
-X-Received: by 2002:a17:906:b0cd:b0:78d:8c6b:397b with SMTP id bk13-20020a170906b0cd00b0078d8c6b397bmr2113795ejb.364.1668693122367;
-        Thu, 17 Nov 2022 05:52:02 -0800 (PST)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id cn16-20020a0564020cb000b0045c010d0584sm565973edb.47.2022.11.17.05.52.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Nov 2022 05:52:01 -0800 (PST)
-Message-ID: <f8b3a882-5086-9bd0-70c3-abddd1bb6bbb@redhat.com>
-Date:   Thu, 17 Nov 2022 14:52:00 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [kvm-unit-tests GIT PULL] x86: Fixes, cleanups, and new sub-tests
-Content-Language: en-US
+        with ESMTP id S234051AbiKQOGU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 09:06:20 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D79A71FFB7
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 06:06:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 71EBC61E1D
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 14:06:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB02AC433C1;
+        Thu, 17 Nov 2022 14:06:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668693978;
+        bh=kCS8Of28HB7CHeBVEnZW0E4IDz+/mMdpFVTWPQ6Q5T0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=L9VoBIhX3a4FgmFRxV5QpMBGnPOoZRn3o8bHVay6W/NByeVv26FlxFMlwouK3RN5J
+         BdONYVhroF4OOtFeuBatZOGPsrA5KDVBK+7cgi+ZyKCE6tNLuNhKfBxiKPbUROvcBT
+         NZrPNpg7ylDfI16sI6kMxlUye4fV0dgtKhO7kt630g6JBshf2gSxHrWZqYQNJ8vTgF
+         SKtjUvb0l6UzN6+jEIInuVBG7bW4c8VYguQ85IADZ+ynEqUceQxnO4eKFqqSlzxnFh
+         nmWqv3KcsJjfD/4skqzrBs3r2KPw4p2A44jHwEHtn7krcOXzEuKMhlwSWdiJQMnoNN
+         HN6jo80Xc9RfQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ovfWy-006jxa-Ge;
+        Thu, 17 Nov 2022 14:06:16 +0000
+Date:   Thu, 17 Nov 2022 14:06:15 +0000
+Message-ID: <861qq1ptew.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-References: <Y3KtFCBIQFHl1uOJ@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Y3KtFCBIQFHl1uOJ@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Reiji Watanabe <reijiw@google.com>, kvm@vger.kernel.org,
+        Colin Ian King <colin.i.king@gmail.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Gautam Menghani <gautammenghani201@gmail.com>,
+        Peter Gonda <pgonda@google.com>,
+        Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [GIT PULL] KVM: selftests: Early pile of updates for 6.2
+In-Reply-To: <Y3WKCRJbbvhnyDg1@google.com>
+References: <Y3WKCRJbbvhnyDg1@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, oliver.upton@linux.dev, reijiw@google.com, kvm@vger.kernel.org, colin.i.king@gmail.com, coltonlewis@google.com, dmatlack@google.com, vipinsh@google.com, gautammenghani201@gmail.com, pgonda@google.com, vannapurve@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/14/22 22:03, Sean Christopherson wrote:
->    https://github.com/kvm-x86/kvm-unit-tests  tags/for_paolo
+On Thu, 17 Nov 2022 01:10:33 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> Please pull a set of selftests updates for 6.2.  Many of these changes are
+> prep work for future selftests, e.g. for SEV and TDX, and/or have myriad
+> conflicts, e.g. the former "perf util" code.  I am hoping to get these
+> changes queued up for 6.2 sooner than later so that the chain of dependent
+> work doesn't get too long.
+> 
+> Except for the ARM single-step changes[*], everything has been posted for
+> quite some time and/or has gone through multiple rounds of review.
+> 
+> The ARM single-step changes are a last minute fix to resolve a hilarious
+> (IMO) collision between the pool-based ucall implementation and the
+> recently added single-step test.  Turns out that GCC will generate older
+> flavors of atomics that rely on a monitor to detect conflicts, and that
 
-Pulled, thanks (I checked the conflict resolution and the different AMD 
-fixup and they're fine indeed).
+A quick nit, and to make things clear: there is no "older flavours of
+atomics". These are exclusive accesses, and atomics are, well,
+atomics. The tests seem to use the former, which cannot guarantee
+forward progress. Yes, this is utter crap.
 
-Paolo
+> monitor is cleared by eret.  gdb is allegedly smart enough to skip over
+> atomic sequences, but our selftest... not so much.
 
+I'm not sure how GDB performs this feat without completely messing
+things up in some cases...
+
+But it brings another question. Shouldn't these tests actively use
+atomics when on 8.1+ HW?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
