@@ -2,316 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE39362DDA3
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 15:12:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EBDD62DDDA
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 15:21:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240300AbiKQOMP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 09:12:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44358 "EHLO
+        id S240327AbiKQOVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 09:21:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240309AbiKQOMK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 09:12:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5E1563156
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 06:11:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668694281;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OlLrSSMbwVVcvwLiCEyrUAl/hBKl9/UeS33gdDNhRBk=;
-        b=e4r2RMU/wy1+iYoIr7e/+79d+rHLfIrEL7pIzz0LjctML5StQs5iDakltYi7JtZ6vQFj68
-        5nxyJohvs3ubY/GQUQafBmGuyaCizcvSjwSco5NYxO0ZEoZhyvBV3P/Q3QKQxjbzbV4qKC
-        vacTlGyaWJCv0lNUZerDxEyUt1M4vaE=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-399-qR9ZebiGMhyzTxmuEEOz5g-1; Thu, 17 Nov 2022 09:11:20 -0500
-X-MC-Unique: qR9ZebiGMhyzTxmuEEOz5g-1
-Received: by mail-ed1-f71.google.com with SMTP id f17-20020a056402355100b00466481256f6so1290435edd.19
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 06:11:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OlLrSSMbwVVcvwLiCEyrUAl/hBKl9/UeS33gdDNhRBk=;
-        b=ZXojPYSgRNJwo8lMkrUgCDFa/U94wSZRMnEWi4pGLaKhxPgwnJg9R7CvTr70r2Lgrx
-         JGqKL2QVFO9hXpzQDh5P9laSWIgJQGyQErMN+s8XIfBHrKiDdP+UpQOn6KuSjucAlLZS
-         wAqfKi5ElYPY1nsXF08wTNTs9Bc1DpoYRZi0CgCaFuUpa06wFBmsfF/V3RUGsJ9Rh2GI
-         bdinCttmNQZKmxGdG4X2yJ5+WgLp7xgHmmOqEkQsbDEz5phtmGkaGP25ITHg3EHDlnjt
-         xN+RCFOy+HX6FWTtp2ySQ6ewv9ltHXCyPMxi+Sb2UUQeWNU9HvgSHPIlzpuwVUAKSaA5
-         GFZw==
-X-Gm-Message-State: ANoB5pmr5zRG9qoqYINVl2VgvY7bn7ZPAKkqrRf3SxTLSORH8hr40/pP
-        ImuTB/Y81s/9wZ8baDuQAVCZneuPtfF+iZ460swvuQW3VXHstW+r8nHUfFCzU6gKTgNsGUBdsQG
-        4qcWwCSLqTATD
-X-Received: by 2002:a17:906:8994:b0:7ae:ea4:583c with SMTP id gg20-20020a170906899400b007ae0ea4583cmr2228386ejc.587.1668694278982;
-        Thu, 17 Nov 2022 06:11:18 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6IYElszwPJOT+AYLB0Zz7A5cEBtAPN4M1gIB/FA9wkBwwm8V3jwp/hM/ogA+uVfGavOrPBNg==
-X-Received: by 2002:a17:906:8994:b0:7ae:ea4:583c with SMTP id gg20-20020a170906899400b007ae0ea4583cmr2228355ejc.587.1668694278658;
-        Thu, 17 Nov 2022 06:11:18 -0800 (PST)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id 17-20020a170906219100b0073d753759fasm416838eju.172.2022.11.17.06.11.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Nov 2022 06:11:17 -0800 (PST)
-Message-ID: <a0f9bd0e-0cf2-9364-ac71-9a0b005a99e8@redhat.com>
-Date:   Thu, 17 Nov 2022 15:11:14 +0100
+        with ESMTP id S240373AbiKQOVd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 09:21:33 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F6EC77225;
+        Thu, 17 Nov 2022 06:21:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668694890; x=1700230890;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=QAS2h8V2dfght1SJU/Na0JcJSN/AEZSVl08JRBsGjdI=;
+  b=NNK2xzoKjwI6qrmzmGmeKxLrNmv1MfC5ADjD6m8RHOc5qInpX8GUo6Kc
+   DGxFqUcjxrFSxNgjlG6pAFy+WDmFjandV5TQM4N6SsjF0ito1788+EDl+
+   H5+XYRvEc5yS8+cPIzx8zzTd3zL73kJ1dSrkXXa/Zs6DUma1Ls4bUAUH8
+   7OPnFgL4uM5NiL++90N5G2kik3Z8LhOB4Ee65e3421zTIjyEi7ViQHN+V
+   qUmBIlieRBS0vf/6d1u/PWIq6fQo/FdDSlVTcNrbhFh8rjJeNTtnJJ1ZW
+   0vusI+e60KUZESmSxqDOLI5XdLgX6B/nwtsIM49grAuhoJJhuZ8f1gd25
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10534"; a="312874347"
+X-IronPort-AV: E=Sophos;i="5.96,171,1665471600"; 
+   d="scan'208";a="312874347"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2022 06:21:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10534"; a="634066426"
+X-IronPort-AV: E=Sophos;i="5.96,171,1665471600"; 
+   d="scan'208";a="634066426"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by orsmga007.jf.intel.com with ESMTP; 17 Nov 2022 06:21:17 -0800
+Date:   Thu, 17 Nov 2022 22:16:53 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        AKASHI Takahiro <takahiro.akashi@linaro.org>
+Subject: Re: [PATCH v9 0/8] KVM: mm: fd-based approach for supporting KVM
+Message-ID: <20221117141653.GE422408@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <87k03xbvkt.fsf@linaro.org>
+ <20221116050022.GC364614@chaop.bj.intel.com>
+ <87v8nf8bte.fsf@linaro.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [GIT PULL] KVM: selftests: Early pile of updates for 6.2
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Reiji Watanabe <reijiw@google.com>, kvm@vger.kernel.org,
-        Colin Ian King <colin.i.king@gmail.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Gautam Menghani <gautammenghani201@gmail.com>,
-        Peter Gonda <pgonda@google.com>,
-        Vishal Annapurve <vannapurve@google.com>
-References: <Y3WKCRJbbvhnyDg1@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Y3WKCRJbbvhnyDg1@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87v8nf8bte.fsf@linaro.org>
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/17/22 02:10, Sean Christopherson wrote:
-> Please pull a set of selftests updates for 6.2.  Many of these changes are
-> prep work for future selftests, e.g. for SEV and TDX, and/or have myriad
-> conflicts, e.g. the former "perf util" code.  I am hoping to get these
-> changes queued up for 6.2 sooner than later so that the chain of dependent
-> work doesn't get too long.
+On Wed, Nov 16, 2022 at 09:40:23AM +0000, Alex Bennée wrote:
 > 
-> Except for the ARM single-step changes[*], everything has been posted for
-> quite some time and/or has gone through multiple rounds of review.
+> Chao Peng <chao.p.peng@linux.intel.com> writes:
 > 
-> The ARM single-step changes are a last minute fix to resolve a hilarious
-> (IMO) collision between the pool-based ucall implementation and the
-> recently added single-step test.  Turns out that GCC will generate older
-> flavors of atomics that rely on a monitor to detect conflicts, and that
-> monitor is cleared by eret.  gdb is allegedly smart enough to skip over
-> atomic sequences, but our selftest... not so much.
+> > On Mon, Nov 14, 2022 at 11:43:37AM +0000, Alex Bennée wrote:
+> >> 
+> >> Chao Peng <chao.p.peng@linux.intel.com> writes:
+> >> 
+> >> <snip>
+> >> > Introduction
+> >> > ============
+> >> > KVM userspace being able to crash the host is horrible. Under current
+> >> > KVM architecture, all guest memory is inherently accessible from KVM
+> >> > userspace and is exposed to the mentioned crash issue. The goal of this
+> >> > series is to provide a solution to align mm and KVM, on a userspace
+> >> > inaccessible approach of exposing guest memory. 
+> >> >
+> >> > Normally, KVM populates secondary page table (e.g. EPT) by using a host
+> >> > virtual address (hva) from core mm page table (e.g. x86 userspace page
+> >> > table). This requires guest memory being mmaped into KVM userspace, but
+> >> > this is also the source where the mentioned crash issue can happen. In
+> >> > theory, apart from those 'shared' memory for device emulation etc, guest
+> >> > memory doesn't have to be mmaped into KVM userspace.
+> >> >
+> >> > This series introduces fd-based guest memory which will not be mmaped
+> >> > into KVM userspace. KVM populates secondary page table by using a
+> >> > fd/offset pair backed by a memory file system. The fd can be created
+> >> > from a supported memory filesystem like tmpfs/hugetlbfs and KVM can
+> >> > directly interact with them with newly introduced in-kernel interface,
+> >> > therefore remove the KVM userspace from the path of accessing/mmaping
+> >> > the guest memory. 
+> >> >
+> >> > Kirill had a patch [2] to address the same issue in a different way. It
+> >> > tracks guest encrypted memory at the 'struct page' level and relies on
+> >> > HWPOISON to reject the userspace access. The patch has been discussed in
+> >> > several online and offline threads and resulted in a design document [3]
+> >> > which is also the original proposal for this series. Later this patch
+> >> > series evolved as more comments received in community but the major
+> >> > concepts in [3] still hold true so recommend reading.
+> >> >
+> >> > The patch series may also be useful for other usages, for example, pure
+> >> > software approach may use it to harden itself against unintentional
+> >> > access to guest memory. This series is designed with these usages in
+> >> > mind but doesn't have code directly support them and extension might be
+> >> > needed.
+> >> 
+> >> There are a couple of additional use cases where having a consistent
+> >> memory interface with the kernel would be useful.
+> >
+> > Thanks very much for the info. But I'm not so confident that the current
+> > memfd_restricted() implementation can be useful for all these usages. 
+> >
+> >> 
+> >>   - Xen DomU guests providing other domains with VirtIO backends
+> >> 
+> >>   Xen by default doesn't give other domains special access to a domains
+> >>   memory. The guest can grant access to regions of its memory to other
+> >>   domains for this purpose. 
+> >
+> > I'm trying to form my understanding on how this could work and what's
+> > the benefit for a DomU guest to provide memory through memfd_restricted().
+> > AFAICS, memfd_restricted() can help to hide the memory from DomU userspace,
+> > but I assume VirtIO backends are still in DomU uerspace and need access
+> > that memory, right?
 > 
-> Note, there's one KVM x86 patch hiding in here (cleanup for code that gets
-> copied into selftests), but its quite innocuous and shouldn't conflict
-> with anything.
-> 
-> Regarding the "perf util" conflicts, I'm mostly certain I got them right,
-> but it wouldn't be a bad idea for the folks involved (Cc'd) to double
-> check that the end result looks correct.
+> They need access to parts of the memory. At the moment you run your
+> VirtIO domains in the Dom0 and give them access to the whole of a DomU's
+> address space - however the Xen model is by default the guests memory is
+> inaccessible to other domains on the system. The DomU guest uses the Xen
+> grant model to expose portions of its address space to other domains -
+> namely for the VirtIO queues themselves and any pages containing buffers
+> involved in the VirtIO transaction. My thought was that looks like a
+> guest memory interface which is mostly inaccessible (private) with some
+> holes in it where memory is being explicitly shared with other domains.
 
-Pulled, thanks.  I have adjusted the merge log to mention LDREX/STREX 
-instead of atomics.
+Yes, similar in conception. For KVM, memfd_restricted() is used by host
+OS, guest will issue conversion between private and shared for its
+memory range. This is similar to Xen DomU guest grants its memory to
+other domains. Similarly, I guess to make memfd_restricted() being really
+useful for Xen, it should be run on the VirtIO backend domain (e.g.
+equivalent to the host position for KVM).
 
-Paolo
+> 
+> What I want to achieve is a common userspace API with defined semantics
+> for what happens when private and shared regions are accessed. Because
+> having each hypervisor/confidential computing architecture define its
+> own special API for accessing this memory is just a recipe for
+> fragmentation and makes sharing common VirtIO backends impossible.
 
-> [*] https://lore.kernel.org/all/20221117002350.2178351-1-seanjc@google.com
-> 
-> 
-> The following changes since commit d663b8a285986072428a6a145e5994bc275df994:
-> 
->    KVM: replace direct irq.h inclusion (2022-11-09 12:31:37 -0500)
-> 
-> are available in the Git repository at:
-> 
->    https://github.com/kvm-x86/linux tags/kvm-selftests-6.2-1
-> 
-> for you to fetch changes up to 5c107f7085f45e071bbcf13006fffccd8e5de0e1:
-> 
->    KVM: selftests: Assert in prepare_eptp() that nEPT is supported (2022-11-16 16:59:07 -0800)
-> 
-> ----------------------------------------------------------------
-> KVM selftests updates for 6.2
-> 
-> perf_util:
->   - Add support for pinning vCPUs in dirty_log_perf_test.
->   - Add a lightweight psuedo RNG for guest use, and use it to randomize
->     the access pattern and write vs. read percentage in the so called
->     "perf util" tests.
->   - Rename the so called "perf_util" framework to "memstress".
-> 
-> ucall:
->   - Add a common pool-based ucall implementation (code dedup and pre-work
->     for running SEV (and beyond) guests in selftests.
->   - Fix an issue in ARM's single-step test when using the new pool-based
->     implementation; atomics don't play nice with single-step exceptions.
-> 
-> init:
->   - Provide a common constructor and arch hook, which will eventually be
->     used by x86 to automatically select the right hypercall (AMD vs. Intel).
-> 
-> x86:
->   - Clean up x86's page tabe management.
->   - Clean up and enhance the "smaller maxphyaddr" test, and add a related
->     test to cover generic emulation failure.
->   - Clean up the nEPT support checks.
->   - Add X86_PROPERTY_* framework to retrieve multi-bit CPUID values.
-> 
-> ----------------------------------------------------------------
-> Colin Ian King (1):
->        KVM: selftests: Fix spelling mistake "begining" -> "beginning"
-> 
-> Colton Lewis (4):
->        KVM: selftests: implement random number generator for guest code
->        KVM: selftests: create -r argument to specify random seed
->        KVM: selftests: randomize which pages are written vs read
->        KVM: selftests: randomize page access order
-> 
-> David Matlack (13):
->        KVM: selftests: Rename perf_test_util.[ch] to memstress.[ch]
->        KVM: selftests: Rename pta (short for perf_test_args) to args
->        KVM: selftests: Rename perf_test_util symbols to memstress
->        KVM: selftests: Rename emulator_error_test to smaller_maxphyaddr_emulation_test
->        KVM: selftests: Explicitly require instructions bytes
->        KVM: selftests: Delete dead ucall code
->        KVM: selftests: Move flds instruction emulation failure handling to header
->        KVM: x86/mmu: Use BIT{,_ULL}() for PFERR masks
->        KVM: selftests: Copy KVM PFERR masks into selftests
->        KVM: selftests: Expect #PF(RSVD) when TDP is disabled
->        KVM: selftests: Add a test for KVM_CAP_EXIT_ON_EMULATION_FAILURE
->        KVM: selftests: Check for KVM nEPT support using "feature" MSRs
->        KVM: selftests: Assert in prepare_eptp() that nEPT is supported
-> 
-> Gautam Menghani (1):
->        KVM: selftests: Don't assume vcpu->id is '0' in xAPIC state test
-> 
-> Peter Gonda (2):
->        tools: Add atomic_test_and_set_bit()
->        KVM: selftests: Add ucall pool based implementation
-> 
-> Sean Christopherson (28):
->        KVM: arm64: selftests: Disable single-step with correct KVM define
->        KVM: arm64: selftests: Disable single-step without relying on ucall()
->        KVM: selftests: Consolidate common code for populating ucall struct
->        KVM: selftests: Consolidate boilerplate code in get_ucall()
->        KVM: selftests: Automatically do init_ucall() for non-barebones VMs
->        KVM: selftests: Make arm64's MMIO ucall multi-VM friendly
->        KVM: selftests: Drop now-unnecessary ucall_uninit()
->        KVM: selftests: Drop helpers to read/write page table entries
->        KVM: selftests: Drop reserved bit checks from PTE accessor
->        KVM: selftests: Remove useless shifts when creating guest page tables
->        KVM: selftests: Verify parent PTE is PRESENT when getting child PTE
->        KVM: selftests: Use virt_get_pte() when getting PTE pointer
->        KVM: selftests: Use vm_get_page_table_entry() in addr_arch_gva2gpa()
->        KVM: selftests: Play nice with huge pages when getting PTEs/GPAs
->        KVM: selftests: Avoid JMP in non-faulting path of KVM_ASM_SAFE()
->        KVM: selftests: Provide error code as a KVM_ASM_SAFE() output
->        KVM: selftests: Add X86_FEATURE_PAE and use it calc "fallback" MAXPHYADDR
->        KVM: selftests: Refactor X86_FEATURE_* framework to prep for X86_PROPERTY_*
->        KVM: selftests: Add X86_PROPERTY_* framework to retrieve CPUID values
->        KVM: selftests: Use X86_PROPERTY_MAX_KVM_LEAF in CPUID test
->        KVM: selftests: Refactor kvm_cpuid_has() to prep for X86_PROPERTY_* support
->        KVM: selftests: Add kvm_cpu_*() support for X86_PROPERTY_*
->        KVM: selftests: Convert AMX test to use X86_PROPRETY_XXX
->        KVM: selftests: Convert vmx_pmu_caps_test to use X86_PROPERTY_*
->        KVM: selftests: Add PMU feature framework, use in PMU event filter test
->        KVM: selftests: Add dedicated helpers for getting x86 Family and Model
->        KVM: selftests: Add and use KVM helpers for x86 Family and Model
->        KVM: selftests: Drop helpers for getting specific KVM supported CPUID entry
-> 
-> Vipin Sharma (7):
->        KVM: selftests: Add missing break between -e and -g option in dirty_log_perf_test
->        KVM: selftests: Put command line options in alphabetical order in dirty_log_perf_test
->        KVM: selftests: Add atoi_paranoid() to catch errors missed by atoi()
->        KVM: selftests: Use SZ_* macros from sizes.h in max_guest_memory_test.c
->        KVM: selftests: Shorten the test args in memslot_modification_stress_test.c
->        KVM: selftests: Add atoi_positive() and atoi_non_negative() for input validation
->        KVM: selftests: Allowing running dirty_log_perf_test on specific CPUs
-> 
-> Vishal Annapurve (3):
->        KVM: selftests: move common startup logic to kvm_util.c
->        KVM: selftests: Add arch specific initialization
->        KVM: selftests: Add arch specific post vm creation hook
-> 
->   arch/x86/include/asm/kvm_host.h                                          |  20 +++---
->   tools/arch/x86/include/asm/atomic.h                                      |   7 ++
->   tools/include/asm-generic/atomic-gcc.h                                   |  12 ++++
->   tools/testing/selftests/kvm/.gitignore                                   |   3 +-
->   tools/testing/selftests/kvm/Makefile                                     |   8 ++-
->   tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c                    |   3 -
->   tools/testing/selftests/kvm/aarch64/arch_timer.c                         |  29 ++------
->   tools/testing/selftests/kvm/aarch64/debug-exceptions.c                   |  32 ++++-----
->   tools/testing/selftests/kvm/aarch64/hypercalls.c                         |   3 -
->   tools/testing/selftests/kvm/aarch64/psci_test.c                          |   1 -
->   tools/testing/selftests/kvm/aarch64/vgic_init.c                          |   2 -
->   tools/testing/selftests/kvm/aarch64/vgic_irq.c                           |  10 +--
->   tools/testing/selftests/kvm/access_tracking_perf_test.c                  |  22 +++---
->   tools/testing/selftests/kvm/demand_paging_test.c                         |  24 +++----
->   tools/testing/selftests/kvm/dirty_log_perf_test.c                        | 130 ++++++++++++++++++++++-----------
->   tools/testing/selftests/kvm/dirty_log_test.c                             |   3 -
->   tools/testing/selftests/kvm/include/kvm_util_base.h                      |  28 ++++++++
->   tools/testing/selftests/kvm/include/memstress.h                          |  72 +++++++++++++++++++
->   tools/testing/selftests/kvm/include/perf_test_util.h                     |  63 ----------------
->   tools/testing/selftests/kvm/include/test_util.h                          |  25 +++++++
->   tools/testing/selftests/kvm/include/ucall_common.h                       |  10 ++-
->   tools/testing/selftests/kvm/include/x86_64/processor.h                   | 364 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------------------
->   tools/testing/selftests/kvm/include/x86_64/vmx.h                         |   2 +-
->   tools/testing/selftests/kvm/kvm_page_table_test.c                        |   6 +-
->   tools/testing/selftests/kvm/lib/aarch64/processor.c                      |  18 ++---
->   tools/testing/selftests/kvm/lib/aarch64/ucall.c                          | 102 ++++----------------------
->   tools/testing/selftests/kvm/lib/elf.c                                    |   2 +-
->   tools/testing/selftests/kvm/lib/kvm_util.c                               |  85 +++++++++++++++++++++-
->   tools/testing/selftests/kvm/lib/{perf_test_util.c => memstress.c}        | 133 ++++++++++++++++++++--------------
->   tools/testing/selftests/kvm/lib/riscv/ucall.c                            |  42 ++---------
->   tools/testing/selftests/kvm/lib/s390x/ucall.c                            |  39 ++--------
->   tools/testing/selftests/kvm/lib/test_util.c                              |  36 ++++++++++
->   tools/testing/selftests/kvm/lib/ucall_common.c                           | 103 ++++++++++++++++++++++++++
->   tools/testing/selftests/kvm/lib/x86_64/{perf_test_util.c => memstress.c} |  37 +++++-----
->   tools/testing/selftests/kvm/lib/x86_64/processor.c                       | 225 +++++++++++++++++++++++----------------------------------
->   tools/testing/selftests/kvm/lib/x86_64/ucall.c                           |  39 ++--------
->   tools/testing/selftests/kvm/lib/x86_64/vmx.c                             |  12 ++--
->   tools/testing/selftests/kvm/max_guest_memory_test.c                      |  21 +++---
->   tools/testing/selftests/kvm/memslot_modification_stress_test.c           |  38 +++++-----
->   tools/testing/selftests/kvm/memslot_perf_test.c                          |  28 ++------
->   tools/testing/selftests/kvm/rseq_test.c                                  |   4 --
->   tools/testing/selftests/kvm/s390x/memop.c                                |   2 -
->   tools/testing/selftests/kvm/s390x/resets.c                               |   2 -
->   tools/testing/selftests/kvm/s390x/sync_regs_test.c                       |   3 -
->   tools/testing/selftests/kvm/set_memory_region_test.c                     |   5 +-
->   tools/testing/selftests/kvm/steal_time.c                                 |   1 -
->   tools/testing/selftests/kvm/system_counter_offset_test.c                 |   1 -
->   tools/testing/selftests/kvm/x86_64/amx_test.c                            | 105 +++++++--------------------
->   tools/testing/selftests/kvm/x86_64/cpuid_test.c                          |  11 +--
->   tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c                 |   3 -
->   tools/testing/selftests/kvm/x86_64/emulator_error_test.c                 | 193 -------------------------------------------------
->   tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c      |  45 ++++++++++++
->   tools/testing/selftests/kvm/x86_64/flds_emulation.h                      |  55 ++++++++++++++
->   tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c                        |   3 -
->   tools/testing/selftests/kvm/x86_64/hyperv_features.c                     |   3 +-
->   tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c                  |   5 +-
->   tools/testing/selftests/kvm/x86_64/platform_info_test.c                  |   3 -
->   tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c               |  77 +++++---------------
->   tools/testing/selftests/kvm/x86_64/set_sregs_test.c                      |   3 -
->   tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c   | 111 ++++++++++++++++++++++++++++
->   tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c         |   3 -
->   tools/testing/selftests/kvm/x86_64/sync_regs_test.c                      |   3 -
->   tools/testing/selftests/kvm/x86_64/userspace_io_test.c                   |   3 -
->   tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c             |   3 -
->   tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c                  |   1 +
->   tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c                   |  19 +----
->   tools/testing/selftests/kvm/x86_64/xapic_state_test.c                    |   4 +-
->   67 files changed, 1353 insertions(+), 1157 deletions(-)
->   create mode 100644 tools/testing/selftests/kvm/include/memstress.h
->   delete mode 100644 tools/testing/selftests/kvm/include/perf_test_util.h
->   rename tools/testing/selftests/kvm/lib/{perf_test_util.c => memstress.c} (63%)
->   create mode 100644 tools/testing/selftests/kvm/lib/ucall_common.c
->   rename tools/testing/selftests/kvm/lib/x86_64/{perf_test_util.c => memstress.c} (68%)
->   delete mode 100644 tools/testing/selftests/kvm/x86_64/emulator_error_test.c
->   create mode 100644 tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
->   create mode 100644 tools/testing/selftests/kvm/x86_64/flds_emulation.h
->   create mode 100644 tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
-> 
+Yes, I agree. That's interesting to explore.
 
+> 
+> >
+> >> 
+> >>   - pKVM on ARM
+> >> 
+> >>   Similar to Xen, pKVM moves the management of the page tables into the
+> >>   hypervisor and again doesn't allow those domains to share memory by
+> >>   default.
+> >
+> > Right, we already had some discussions on this in the past versions.
+> >
+> >> 
+> >>   - VirtIO loopback
+> >> 
+> >>   This allows for VirtIO devices for the host kernel to be serviced by
+> >>   backends running in userspace. Obviously the memory userspace is
+> >>   allowed to access is strictly limited to the buffers and queues
+> >>   because giving userspace unrestricted access to the host kernel would
+> >>   have consequences.
+> >
+> > Okay, but normal memfd_create() should work for it, right? And
+> > memfd_restricted() instead may not work as it unmaps the memory from
+> > userspace.
+> >
+> >> 
+> >> All of these VirtIO backends work with vhost-user which uses memfds to
+> >> pass references to guest memory from the VMM to the backend
+> >> implementation.
+> >
+> > Sounds to me these are the places where normal memfd_create() can act on.
+> > VirtIO backends work on the mmap-ed memory which currently is not the
+> > case for memfd_restricted(). memfd_restricted() has different design
+> > purpose that unmaps the memory from userspace and employs some kernel
+> > callbacks so other kernel modules can make use of the memory with these
+> > callbacks instead of userspace virtual address.
+> 
+> Maybe my understanding is backwards then. Are you saying a guest starts
+> with all its memory exposed and then selectively unmaps the private
+> regions? Is this driven by the VMM or the guest itself?
+
+For confidential computing usages, normally guest starts with all guest
+memory being private, e.g,  cannot be accessed by host. The memory will
+be lived in memfd_restricted() memory and not exposed to host userspace
+VMM like QEMU. Guest then can selectively map its private sub regions
+(e.g. VirtIO queue in the guest VirtIO frontend driver) as shared so
+host backend driver in QEMU can see it. When this happens, new shared
+mapping will be established in KVM and the new memory will be provided
+from normal mmap-able memory, then QEMU can do whatever it can do for
+the device emulation.
+
+Thanks,
+Chao
+> 
+> -- 
+> Alex Bennée
