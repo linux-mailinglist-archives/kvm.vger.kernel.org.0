@@ -2,86 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BD7462E601
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 21:36:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A35D62E619
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 21:44:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240483AbiKQUgT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 15:36:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37980 "EHLO
+        id S234784AbiKQUoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 15:44:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238946AbiKQUgS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 15:36:18 -0500
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7252E657E4
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 12:36:17 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id n20so8219516ejh.0
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 12:36:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MmBSzpTQgrhdycBHu+zmSBD54hUCoH6IXmpPlYlFYQg=;
-        b=O4RHLJDyx1Syh1iv5MNxTaz1+KPIpBIMMh74nc1xy+iM9LTtkI2rhmPXIzbkk6uKj3
-         2y/YU4VEsdCpqlw4ExsUtXlykbWOUZMr4RZpi9ILCa17p0tqYkDsS3vr7KyaL/UXHW5r
-         AUJW8/i1zK29qLCndfmymPA0NHTuFT2n8Fq85ZwkQqtw+15kXh1UnXWvgjFBkT/VhFnA
-         O+lyPClIl6NiwAp3zSxYgvS3A52gfoWACL9KhvLcfDt38t9PxvQFQEfATOz1ycuyN4md
-         DPOGHucwGZL4p95VydWhzKum4xFFieiW++T4e16x/jf3MPs0bWkvbvVk6evuHhpFQqIv
-         9SDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MmBSzpTQgrhdycBHu+zmSBD54hUCoH6IXmpPlYlFYQg=;
-        b=lxZ0AzM0418WwcOjb77VTkPwwJ+JykdWtBv3uRI+F6ar0ymB1AzzLPS1Tu5oh79888
-         UIP7/vN5fkqgr+0P50pes5ebiPc0P79fMkCh3TFQ7NTSzA/4om67mrBgQgQxLCJh1Q9S
-         K53QPll85+urqXpolHqPklJWLgs27MbgLoOP058vylJNBRXph/SpnCfjIK7wG+cNHjAP
-         hz9tjmEcTNzHR2lDP01fBj85b1QPO7xIjGWV/lFHL1sNHodjTQXbV1NNCX5FKEBil8xY
-         iZoDOo1YyRchPGqnTl10m4x6zzBxx1ffCmMx484ngkUjlORyyiZUax/F9hBqx8OS73KJ
-         8NXg==
-X-Gm-Message-State: ANoB5pmnDxQtXlqX80OzM0PsvAPJ92rVOkZcHGZPRjSD0P5YiWv6e8xm
-        BnqckVFlZJ7OC1mhYSGZUZvqrrtNDw==
-X-Google-Smtp-Source: AA0mqf60Ihpr3mOqz4jL6rtt4ahQ0W3SAp+RGBq4yvJyqO4vTyCkLtHbMHSzrPdOT7maGw4fxVg7vw==
-X-Received: by 2002:a17:906:b29a:b0:78d:b695:1d68 with SMTP id q26-20020a170906b29a00b0078db6951d68mr3573158ejz.235.1668717375939;
-        Thu, 17 Nov 2022 12:36:15 -0800 (PST)
-Received: from p183 ([46.53.253.26])
-        by smtp.gmail.com with ESMTPSA id eq5-20020a056402298500b00461cdda400esm963471edb.4.2022.11.17.12.36.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Nov 2022 12:36:15 -0800 (PST)
-Date:   Thu, 17 Nov 2022 23:36:13 +0300
-From:   Alexey Dobriyan <adobriyan@gmail.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, adobriyan@gmail.com
-Subject: [PATCH] vmx: use mov instead of lea in __vmx_vcpu_run()
-Message-ID: <Y3abPTOAxbLOpnVN@p183>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232126AbiKQUof (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 15:44:35 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A76A5597
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 12:44:35 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9BBF661E76
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 20:44:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DF43C433C1;
+        Thu, 17 Nov 2022 20:44:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668717874;
+        bh=lyFlAiXX/0sekMpQruZl7vUjQEm9ivtWTX1+AuNEpv4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=YsB77V1Hae177FvyJ47xC7qQCr2z1TyL3GPcGVocr2+KgFY2N2EZn2bbQjc3YDrNm
+         DyM6SDEOldv1muUykG221IPqtZpiK4rxq+9yh/JZje8B2O0hjmdVoKYYPrt0P6MeVo
+         5i0F1qQ2207XkNihG8j6v7gJToeSso1fVbDVHDdei6zp0NNVQjsYsyPyoHqpdkpcK9
+         0GGo5p3TDdrWCsd7lP5xNZWS2aCix/ob0fEPMzMEdfFVCpuO8LGdVznBcc2GGPnkWY
+         zvbFPkiKrQjh2/JPNNsjyBpXaj/zoVyXn6d7cnSW+3eXojPqwUcaDfh2qf7zagzWNS
+         2mVvIL55k+fEg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ovlkN-006pQE-LK;
+        Thu, 17 Nov 2022 20:44:31 +0000
+Date:   Thu, 17 Nov 2022 20:44:30 +0000
+Message-ID: <86v8ndnwep.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com,
+        borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v7 3/4] KVM: arm64: Dirty quota-based throttling of vcpus
+In-Reply-To: <20221113170507.208810-4-shivam.kumar1@nutanix.com>
+References: <20221113170507.208810-1-shivam.kumar1@nutanix.com>
+        <20221113170507.208810-4-shivam.kumar1@nutanix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: shivam.kumar1@nutanix.com, pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org, shaju.abraham@nutanix.com, manish.mishra@nutanix.com, anurag.madnawat@nutanix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-"mov rsi, rsp" is equivalent to "lea rsi, [rsp]" but 1 byte shorter.
+On Sun, 13 Nov 2022 17:05:10 +0000,
+Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
+> 
+> Exit to userspace whenever the dirty quota is exhausted (i.e. dirty count
+> equals/exceeds dirty quota) to request more dirty quota.
+> 
+> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
+> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
+> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
+> ---
+>  arch/arm64/kvm/arm.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 94d33e296e10..850024982dd9 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -746,6 +746,15 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>  
+>  		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+>  			return kvm_vcpu_suspend(vcpu);
+> +
+> +		if (kvm_check_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu)) {
+> +			struct kvm_run *run = vcpu->run;
+> +
+> +			run->exit_reason = KVM_EXIT_DIRTY_QUOTA_EXHAUSTED;
+> +			run->dirty_quota_exit.count = vcpu->stat.generic.pages_dirtied;
+> +			run->dirty_quota_exit.quota = vcpu->dirty_quota;
+> +			return 0;
+> +		}
+>  	}
+>  
+>  	return 1;
 
-Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
----
+As pointed out by others, this should be common code. This would
+definitely avoid the difference in behaviour between architectures.
 
- arch/x86/kvm/vmx/vmenter.S | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+	M.
 
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -72,7 +72,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
- 	/* Copy @flags to BL, _ASM_ARG3 is volatile. */
- 	mov %_ASM_ARG3B, %bl
- 
--	lea (%_ASM_SP), %_ASM_ARG2
-+	mov %_ASM_SP, %_ASM_ARG2
- 	call vmx_update_host_rsp
- 
- 	ALTERNATIVE "jmp .Lspec_ctrl_done", "", X86_FEATURE_MSR_SPEC_CTRL
+-- 
+Without deviation from the norm, progress is not possible.
