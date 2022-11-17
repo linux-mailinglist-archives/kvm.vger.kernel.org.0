@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06F4B62CF5F
+	by mail.lfdr.de (Postfix) with ESMTP id ED1D462CF60
 	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 01:17:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232521AbiKQARV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Nov 2022 19:17:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52502 "EHLO
+        id S233888AbiKQARW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Nov 2022 19:17:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229703AbiKQARR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Nov 2022 19:17:17 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE89D2F3AE
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 16:17:16 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id a6-20020a170902ecc600b00186f035ed74so61729plh.12
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 16:17:16 -0800 (PST)
+        with ESMTP id S230287AbiKQART (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Nov 2022 19:17:19 -0500
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBDD12F3AE
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 16:17:18 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-348608c1cd3so3511727b3.10
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 16:17:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=m4x7FJ0UuVDG9aKbpg4fk0axLXovply23MnsYgQwgnc=;
-        b=Pdlb4ZEqSP7apDZmvoYP6nhT5PGh0PcuB86pZgU5/RNRGXSkLUZEHf9KpYhFKXCzOz
-         DgqSzZSf1IgZeh1HKuM8L1gmEitKqV2iPVDWDw8EcIpsfN0kIORNsCqxwSXVJei3Rb2u
-         YlKt2XiM5XxeBfhnZq0ovgOwQVyfR6PmFJtMzRNszlP6c1qP4R2cvAxYg/QtkIhop4d8
-         fjTJTA9EoJS/Ac2V39phArl4s9bQgc/onuwLQAMiOQNNEJvNYLXw9VF9WVqCCstnESvz
-         W/pX8fnVU5O7izquIn7WV6/n1wAwwZmyFpCMi5soMgkr7im7xDNGMkSMRW/ELIbwsxoy
-         mPgg==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wWePj0bQA1/kzPBMW9NDA2i6PqA43d1wk3qWgf/1HPQ=;
+        b=Ccqan6Io0sccVr56cWwZ5bc8eYLQQ8TsUx7pJZYs5pgYbAH7BABVJVA7h5OuJFMVs8
+         p0Dhn38bluFQFKnNyFs9v+f2314YeOkSztoi6UT8c7MAq8lXp44rtJLR2R5+D+0O8Etl
+         kFFtW1Bv1wXWEggnpnQ6rHisTDDSdPlGxT7/KqrCFIMMCEGbT4pz2IvI2bGNZngU5kxM
+         Zy2yBmCFlzFjpbYTYdSLEsdOLk1xNhpm1tB1r4XgWR2GOLUOn8kO32Ik0LxcTAb1FjSJ
+         vNb+jqDVMAqlmOOj+Er3hcvqCJotWSHGz64xBqehCpeHslXn6xYfbOZjZ9mEL3Xi2+Q0
+         VivA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=m4x7FJ0UuVDG9aKbpg4fk0axLXovply23MnsYgQwgnc=;
-        b=iZiEy4QIoez0TcQkZcYiicOKnsf6bmpY6sL6rWqwKUSw9SrWvZucUpEoSwnYCVpQCu
-         O+9SGKzPhBmLFA698VSgkcH8+eqLJqn986EHsX85QWNb9lbPvSkB96JXut44voCZYpTC
-         M+yumpowm0AelAn139UCwXdh/DX2VGL+hM3AR4jxI0My4RH9d/pJhR8dKEOezUQdjhrc
-         JAnNAgR0YYKGPTDsyuX2s5Inp5ZyWGxq8zdrnlpBLbcNtDLxJuEfDT4VH6GW47AuaUAl
-         57NmIK4C3n69bPwZ7FM27on3CvcFD2z38vuWGwbFvykbEXEreRZB4cshv+0mKRneaRwd
-         nupA==
-X-Gm-Message-State: ANoB5pljAUUxMz14jMSR6k3XNYUKyARi+srVVi6tz3U+nt41NLxxANJa
-        hnIMsziUsy4DdICtFwCKy2g0maDLbb5mnQ==
-X-Google-Smtp-Source: AA0mqf79OafXf7+4o5SXmdQvPZvR8/Ks93l/NfPUG4GH5/+aPARoFR70hMGjrm0JvqTiWS8XV6X9iaRe52nB7A==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wWePj0bQA1/kzPBMW9NDA2i6PqA43d1wk3qWgf/1HPQ=;
+        b=bp5Q6bdkUURQBaoXGk8M8P6wKS0cfFONPUK47QE7Q+wUjoxV2UCynnTZs2gg9yH8P8
+         dnCjugedmZLyC94+OWzFkbYFqUVeFFgApY7zjrOxIooL12bk1gwpJVGFWIRwRFkRgRI8
+         c66x1irGEGHghhWZ0R0chYWMfSJI5+ojP91Wi0l7y0k6W+U9msuua8gjIxYv8trHCC+s
+         5akK6SeKG9RSwiykt/MjpeKZx+CC+B7Pf6m9ZnWKadA52Bex7GEFvcoRbo8NMA4W9HIX
+         cfoelg3izNGXNWDOHsE1V/UXq0pr9bQfnQj7c3pdnbdxkGyePEiEieQ9T5BBFMM5zczW
+         YcGg==
+X-Gm-Message-State: ACrzQf3xNj3GPhTtvKkxk1NrJjUw396tl75DjGfWT0nVsTaybvMBuK4f
+        EiqwyTFL7oS1BWOhk59WY+lHwir9MhkwzQ==
+X-Google-Smtp-Source: AMsMyM6mqt9TJeQDgekBXV4PA9YAEpC68Hafg4FU8gT5Xw8qZCKneVC03BOR+B0yQpSxPQQdevYnXHmhUyvPxg==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a05:6a00:15d1:b0:572:4ea6:ddc7 with SMTP
- id o17-20020a056a0015d100b005724ea6ddc7mr517972pfu.26.1668644236188; Wed, 16
- Nov 2022 16:17:16 -0800 (PST)
-Date:   Wed, 16 Nov 2022 16:16:54 -0800
+ (user=dmatlack job=sendgmr) by 2002:a0d:cbd3:0:b0:357:adb2:41af with SMTP id
+ n202-20020a0dcbd3000000b00357adb241afmr63171409ywd.240.1668644237665; Wed, 16
+ Nov 2022 16:17:17 -0800 (PST)
+Date:   Wed, 16 Nov 2022 16:16:55 -0800
+In-Reply-To: <20221117001657.1067231-1-dmatlack@google.com>
 Mime-Version: 1.0
+References: <20221117001657.1067231-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221117001657.1067231-1-dmatlack@google.com>
-Subject: [RFC PATCH 0/3] KVM: Restore original behavior of kvm.halt_poll_ns
+Message-ID: <20221117001657.1067231-2-dmatlack@google.com>
+Subject: [RFC PATCH 1/3] KVM: Cap vcpu->halt_poll_ns before halting rather
+ than after
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Jon Cargille <jcargill@google.com>,
@@ -68,35 +71,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series restores the original behavior of the module parameter
-kvm.halt_poll_ns in VMs not using KVM_CAP_HALT_POLL. This should allow
-admins to administer VMs not using KVM_CAP_HALT_POLL just as they were
-before this capability was introduced.
+Cap vcpu->halt_poll_ns based on the max halt polling time just before
+halting, rather than after the last halt. This arguably provides better
+accuracy if an admin disables halt polling in between halts, although
+the improvement is nominal.
 
-VMs that use KVM_CAP_HALT_POLL can be administered through userspace
-changes that invoke KVM_CAP_HALT_POLL (i.e. the capability can be
-invoked multiple times to change the max halt poll time).
+A side-effect of this change is that grow_halt_poll_ns() no longer needs
+to access vcpu->kvm->max_halt_poll_ns, which will be useful in a future
+commit where the max halt polling time can come from the module parameter
+halt_poll_ns instead.
 
-If any admin needs a system-wide override of KVM_CAP_HALT_POLL we can
-add that through a new mechanism (e.g. a new bool module parameter).
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ virt/kvm/kvm_main.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Compile-tested only. I want to get feedback from Christian and Yunan if
-this approach would address their concerns.
-
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Yanan Wang <wangyanan55@huawei.com>
-
-David Matlack (3):
-  KVM: Cap vcpu->halt_poll_ns before halting rather than after
-  KVM: Avoid re-reading kvm->max_halt_poll_ns during halt-polling
-  KVM: Obey kvm.halt_poll_ns in VMs not using KVM_CAP_HALT_POLL
-
- include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      | 52 ++++++++++++++++++++++++++++++++--------
- 2 files changed, 43 insertions(+), 10 deletions(-)
-
-
-base-commit: d663b8a285986072428a6a145e5994bc275df994
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 43bbe4fde078..4b868f33c45d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3385,9 +3385,6 @@ static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
+ 	if (val < grow_start)
+ 		val = grow_start;
+ 
+-	if (val > vcpu->kvm->max_halt_poll_ns)
+-		val = vcpu->kvm->max_halt_poll_ns;
+-
+ 	vcpu->halt_poll_ns = val;
+ out:
+ 	trace_kvm_halt_poll_ns_grow(vcpu->vcpu_id, val, old);
+@@ -3500,11 +3497,16 @@ static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
+ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+ {
+ 	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
+-	bool do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
+ 	ktime_t start, cur, poll_end;
+ 	bool waited = false;
++	bool do_halt_poll;
+ 	u64 halt_ns;
+ 
++	if (vcpu->halt_poll_ns > vcpu->kvm->max_halt_poll_ns)
++		vcpu->halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
++
++	do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
++
+ 	start = cur = poll_end = ktime_get();
+ 	if (do_halt_poll) {
+ 		ktime_t stop = ktime_add_ns(start, vcpu->halt_poll_ns);
 -- 
 2.38.1.431.g37b22c650d-goog
 
