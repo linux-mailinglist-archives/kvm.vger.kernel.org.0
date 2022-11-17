@@ -2,249 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B110D62D1C5
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 04:37:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A35562D263
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 05:45:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234567AbiKQDhu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Nov 2022 22:37:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54248 "EHLO
+        id S234528AbiKQEpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Nov 2022 23:45:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232905AbiKQDhs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Nov 2022 22:37:48 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2B3553EF0;
-        Wed, 16 Nov 2022 19:37:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668656267; x=1700192267;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=orK1bULw9Zlxy1Moo+nWrDNHM7pV29EPHix0E39r7ng=;
-  b=fuZH7gMtF/E358cpdZ/Q519mH92VL2p2PX1OeGeqYQcAesOEm0z2PIxR
-   JyN68cMTy5FS+papuxpTNXpKnWcDBdroMKLxj35X4C9B8uJznONvw7f6H
-   6vO6fZyD/fVOV+eUgmYhiDnWDFc7MMvsJEnmsfwbgrzKkd3k6WSEtcNJG
-   yqOAO0xptxmfq3x4l6NcjYAbuhtAXviL2XlgiU7BW+yJ90IZv40pE2rZO
-   n/MBxOf6QcAx65391GwSVLbb6HaEkHNTEHf8nbnYZEnZMnByi94sYWGjZ
-   tMHQiMlD9ynSVmoWqnPRllIS8qDAbMxb2xmICJ5XePhkvl3FkT6MRendG
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10533"; a="339568544"
-X-IronPort-AV: E=Sophos;i="5.96,169,1665471600"; 
-   d="scan'208";a="339568544"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2022 19:37:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10533"; a="814352996"
-X-IronPort-AV: E=Sophos;i="5.96,169,1665471600"; 
-   d="scan'208";a="814352996"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga005.jf.intel.com with ESMTP; 16 Nov 2022 19:37:47 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Wed, 16 Nov 2022 19:37:47 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Wed, 16 Nov 2022 19:37:47 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Wed, 16 Nov 2022 19:37:46 -0800
+        with ESMTP id S234000AbiKQEpG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Nov 2022 23:45:06 -0500
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2087.outbound.protection.outlook.com [40.107.94.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6304B48747;
+        Wed, 16 Nov 2022 20:45:01 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oPJmFV2WnLL6esOD/3Ik9OWJPmBoMdb9n5WC4BBeV4D9T5dwq4yirpOdSWYZwqet082C1NAtxhw5PdN/HB3s+7d5YDjNh8eSlANv+W3FiBHGLM53Gw0AyV5pV1PwcFo3E1EoqLcrSAExI5SfdthOuF3Yo/+rj2xxKwh5WSKb9H4xylKFjt/4qgPMEo53LPdMyH6ZrhWjmnRIw3qMoWDHS9ooY3Vp+bABfugPlIb79qVD4mfrO0DUEow2yRtBzGyG2raIMl4dpE+blioYbY856NzzyF31oMAloxnYGZB7mS6835zvJNgV07UPSU7jvwHnsKjGmiY3bxOxuvZl98ZvHg==
+ b=bvW68UGrHYezazw/HrY3/jbBbIvmayNypy5BeK+Y9YeoAtKiLeEVPsQE/Ae/3tGFRPkJwdn/DwqqzEiY9FaQJgpRQEpE9j2aWqWxuWnxv3qwXx8jMTPwrdEqU4ymysu1RhBWdf+vK1j0A+gEtg88kKFwLcezTpLQ1j/oFcpplzDJQCOBLbkNn83/wiDPxaJ3W08en7jpRbFOz5jOo9/LzdMUNzlyba/STEYfi/8hI35cOuLyoDYgejpKyfqx0JIxD2IkwH9yP/u5bPa0z4f8s7qWiiOZPzwQ8UjMW7hJzAagdDz4ZU4nLd0WXtjk+fuN1ucwJTvr35Kok0DCO+04hg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JUz9UaQI8kuz3KvQ2vt4I1cgu2Po2NgRLjQ2O5K3NE0=;
- b=GPvgRpnYaeIq/pXSZH3M3PDYXRzaJitsiHZtyuceYfHruAKCycpjvdfSXZcZiXE/cWg8lnTDGQqEBhmOQ70QYRkHMZR+mBVhHRTiCIfPblJRwngTe945D/Fe5aKcZ8Bd0Cj9iiC+Y1Ua0aeRqB1V3JgJR6CQXPbHWUZk4IKHbCN/65dmG7/uMg3ROlr7P/SFrhlzafmR6ovbIwcNceyxyoiktXUSbVKSaa3lc3BdX6yN3nDQWyZGs/S64uue9Ip/SNLzJdu/qjyDGLownkFJjbSpWIrPafBI2saY8p8y2hu1jtAEm3+hFLX706anraNbGjvVteZ16wE+OM+zkhBoKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM5PR1101MB2172.namprd11.prod.outlook.com (2603:10b6:4:50::12)
- by SJ2PR11MB7647.namprd11.prod.outlook.com (2603:10b6:a03:4c3::8) with
+ bh=SlrRFHQCFrZ21kW3wSZHbnli+sSJ10JduFtslfmePq0=;
+ b=F5pzAcrJ4jaerAPSmHg06zY45isOufPbnj0ynJ0hTCruKegtX879T/RQNUReTJ+KF3E8BJ60r59S2+mWoAzGqU2LjP+aqA067B5QqbtROYw/h438Sbk5N89/fl88yEyAmrOX3pHxpjqKppWSzEH3mxHwIacF+ojTMqVOBkvPWWGhBXVQGMrTxKsJ1WTOqecuq9QAn7Y4MHl8WPjnbPUZMC+bJ6ibxbXQX2UJyHZpJLh2sHGYwt+fqapgEt6NYfvj0ItO6+e+IfFjk8lG0fPo2pBUjk9sinKtZZG3sqYIBK9rKZ3KoD3DAcemMta8NPzUz/Bbe20yAtJNrLEta01ukA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SlrRFHQCFrZ21kW3wSZHbnli+sSJ10JduFtslfmePq0=;
+ b=PTvcxJDdufjREdavHkpBI6VyMNxUZUcdSIk4MkoMbG2j8PQCsI3zPUmEJ8nv4oRkA9AlZZ0pOgvZrGN5TRgDjIZxWQjCV1fWNKsO7sqP2GJSXHUgYrDnKK6kz9BEQF2LtKuR99NPeo+sT167+HYmcx9MKDOFgUbgm9O7JexXNOE=
+Received: from MW4PR04CA0245.namprd04.prod.outlook.com (2603:10b6:303:88::10)
+ by IA1PR12MB6329.namprd12.prod.outlook.com (2603:10b6:208:3e5::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.13; Thu, 17 Nov
- 2022 03:37:41 +0000
-Received: from DM5PR1101MB2172.namprd11.prod.outlook.com
- ([fe80::8100:4fe1:7c5:275a]) by DM5PR1101MB2172.namprd11.prod.outlook.com
- ([fe80::8100:4fe1:7c5:275a%11]) with mapi id 15.20.5813.019; Thu, 17 Nov 2022
- 03:37:40 +0000
-From:   "Li, Xin3" <xin3.li@intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: RE: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
- for NMI/IRQ reinjection
-Thread-Topic: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
- for NMI/IRQ reinjection
-Thread-Index: AQHY9M9YytlyKV7ob0GK/oJbeBhPY6433PwAgACmfxCAAO8aAIAAL0qAgAAENoCAAAgUAIAAGnuAgAA1qHCAACERAIADuBAAgABQYICAAXpoEIAAGnIAgAK/reA=
-Date:   Thu, 17 Nov 2022 03:37:40 +0000
-Message-ID: <DM5PR1101MB2172D7D7BC49255DB3752802A8069@DM5PR1101MB2172.namprd11.prod.outlook.com>
-References: <Y24SoNKZtj/NPSGy@hirez.programming.kicks-ass.net>
- <6097036e-063f-5175-72b2-8935b12af853@redhat.com>
- <Y24908NWCdzUNqI0@hirez.programming.kicks-ass.net>
- <6fd26a70-3774-6ae7-73ea-4653aee106f0@redhat.com>
- <Y25a0Z2tOMWYZs4j@hirez.programming.kicks-ass.net>
- <BN6PR1101MB216141A21353AB84CEA541DFA8009@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <Y26jkHfK9INwU7Yy@hirez.programming.kicks-ass.net>
- <BN6PR1101MB2161E8217F50D18C56E5864EA8059@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <Y3IFo9NrAcYalBzM@hirez.programming.kicks-ass.net>
- <BN6PR1101MB2161299749E12D484DE9302BA8049@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <Y3NZQBJugRt07udw@hirez.programming.kicks-ass.net>
-In-Reply-To: <Y3NZQBJugRt07udw@hirez.programming.kicks-ass.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.6.500.17
-dlp-reaction: no-action
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM5PR1101MB2172:EE_|SJ2PR11MB7647:EE_
-x-ms-office365-filtering-correlation-id: 03a2a8bc-1392-4634-41fb-08dac84d1478
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 0Qb12Dugy5tBGicrL7f2mWUjTk7XmRb7uO1spcKPGFVWhTqKqb5fRgNpkiAtvQ7J4QNxDCR9wTw4SWP8B03Wkq+JyOuuWFB7/8QoCjp6Wj4gzTzwgsCqUXBXsH/m8Tdn6Ojt5w1H68UxMOfNhN5TSNERSJ1jnDqAKCV3tEwIpa4TyEKbjTWL+r1LoQJEgnSoroVmapuNI094ewVagYITxVGp2+Si6KCv39sPzSN5JKN1UoT3vCls9Ku7YbhFGt+O7EZv+ciREOr+tB3LljHC2+quV1SNpgQvT0W1G0V8B9dxMSes7+5SQx8kgxUTbrZVBBPwKN4c6zZBxBPRdHmtRykcfkwqieHwQ3pI9gQbYPJLfW6DGvEMn/rKLJx323UHOxDAKRQ7rPKlQVnExbbeiNPGrrNXY7dUaI70jkoWZFdebWXjUablnkC1XULgq8Ao0sdwjnu7W8QphkI95pXX8h5aK2WQswbK8aOZ/basvXR2TT9XzONznBpXrjBJAA1k3qA7Zz1Rd6xFBtyzYvPlK6/iVxgiYGICE3dc1Xu2v6a9joW1JZAowU29hCJ02gKcmHK1cRLIQHWUJ2mx8mD6E7dWCAQcd1WTrFyiqg5KBAwhyEiJcCWG3vkYWmDBZWC7yLDYq8DOEOsSm+iObIQSsA6AlaIZmV4HqZApMQvvQ91si3qjyB/dQQZuKVWWQuE/6tbCIlbJuuqeO02SMZjx3gA6CWVGyHjNIciXGBuP6JPxQv4HmVMDrNl7EDvaYJnKp8eFzkNkgbB67hnvoZZw0g==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR1101MB2172.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(136003)(39860400002)(376002)(346002)(366004)(451199015)(66899015)(33656002)(86362001)(38070700005)(7416002)(5660300002)(186003)(2906002)(122000001)(26005)(83380400001)(6506007)(7696005)(38100700002)(66476007)(478600001)(64756008)(66446008)(66946007)(52536014)(76116006)(316002)(8676002)(55016003)(6916009)(9686003)(71200400001)(54906003)(41300700001)(82960400001)(66556008)(4326008)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?pOZ77kbfwR9m6n8740N0CLPRFE3IJXIBkPVVA2excRqkFeKtmItlCs42R4AI?=
- =?us-ascii?Q?nnPN0hnpKDLvHx8+Rfsnmk5UJLXMBI78lGGlEiULW0oStrmboLNObdWVL9Ez?=
- =?us-ascii?Q?06MOivdwTuLzRL57A/7QoS2QlbuCpEHG4C8/v55ZS/tlQYPHkif0HFsUJfpc?=
- =?us-ascii?Q?nIPNXzy96Sl/6u3aE/S9f4Pqkq/fLhQdoaKJJeUBcmZUj7Mhazk4r12Mh5pa?=
- =?us-ascii?Q?FaWyY3tPijx/qn4Uvpoih4CKY5HABX6O8bTe6bBXUeh6jIlFgYQqPq8mCeGx?=
- =?us-ascii?Q?W6C91c7MKP/FUy8o6LA64krwvA7T9zPD01zdRdbhqfCr12/r2kqvtbGTvJIt?=
- =?us-ascii?Q?P0v9oo+/345iBoz1tvgZdBLy9iADVe/t5ob0f5tEODzW19vJS+8VjpuH8bZ7?=
- =?us-ascii?Q?WdecyUGx/advlFTrBPtLecJViECb5kj5bZBnRYiWblB6HTsYkUCOK9gPnEHR?=
- =?us-ascii?Q?oQwxgRziCf+9RwLLe+fWzEPUz2qRRFkWaoEEqF+VLaCePNPQb27vhCAwogRT?=
- =?us-ascii?Q?5KlkuuFz3i82SLgbNvATKFj1Ru78Md0oMOaQQPdF9Icey1YTqUFIqFqCFTnb?=
- =?us-ascii?Q?wSa46SGrOMX0PVmR9gosquBox19YWDugdSoHgTUhL1JPicuJ1rCBGehO+7KJ?=
- =?us-ascii?Q?G+y8CTwo7Dl0jq1nDZbvbYmBfyjJ0IPmm3IMYixt4+AkcnHqeMm6zETmWxZS?=
- =?us-ascii?Q?8y0BKBl6XrlkGQP4ne6reiD49tnTuFAHEaNvK8OfMZIiMzAQlDKsxUGNQO6I?=
- =?us-ascii?Q?cwvFlyw75cycgfbQQYu9NNz32HOgndOntI/fD84LAaT+sGopmNUih+ScYOvJ?=
- =?us-ascii?Q?BTBVxnCZV/0nIrAe29Bc5C2PC9eB5kLozVUq84HPSLa2fx+cBl5B/Drfe3YX?=
- =?us-ascii?Q?etJeM5DVNAN84HwwYPgMGoQuwVVocMlPN6YfZdc1W571kpURfUSFsyi4K2fB?=
- =?us-ascii?Q?ZRXJm/lRoM8tcNLMKEYuzR55HQF7oOZ8qBOq8XwajC5Dv1X0V5aTucO9T3VU?=
- =?us-ascii?Q?gWfX9PwZ08oUQxkS4ArftfV0sGJmfbZwuuqoovFvlKeTODE/byQIEZRy81qY?=
- =?us-ascii?Q?OTCZ8qI2H6yWPc27r09Yg56gkAhk4e76nme/kegCUcueRmdA33M8jSONWNQH?=
- =?us-ascii?Q?c6ajoHUKTOKorKcDaOnkCchKljovykVfeRot5YgXOS7mQVVf63SXOkRTWClV?=
- =?us-ascii?Q?GgYRaSAgIWxiTmZmH9so1f6tR2wi+ZSSN6aun7zdDyACZIAAMsAxZVEczxLp?=
- =?us-ascii?Q?hWe9FQsvKRYrn1iOzy0w9rAg7oGqlWE2Z1SjDI6tACtT+ELSIdsZxxK9IZI1?=
- =?us-ascii?Q?lZykE8h9kj+blHVJleKOvOkK4Vugc9stZnX54YunMWHZ9FxISiWxIslmln1b?=
- =?us-ascii?Q?8HpIaajhw5f7Js+pVOoWjiV9f9WWZE3xIu/cf1qOfItVW1O1cDGgOB31lrHY?=
- =?us-ascii?Q?W9pok8+ZUB5ZbgkRKpvWySrBe9lg2OKP5AJmx478Pf/NwS+lmm/1Ugf3GKEZ?=
- =?us-ascii?Q?KsHX1VxDLlzdYI7KJT93Gb72ErQ3E8hZhDmrc6ZmavVSkJqb7V+H7HG4IHpY?=
- =?us-ascii?Q?lIu9HPgi63M4RM7kv5k=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.17; Thu, 17 Nov
+ 2022 04:44:58 +0000
+Received: from CO1NAM11FT078.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:88:cafe::91) by MW4PR04CA0245.outlook.office365.com
+ (2603:10b6:303:88::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.20 via Frontend
+ Transport; Thu, 17 Nov 2022 04:44:57 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT078.mail.protection.outlook.com (10.13.175.177) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5834.8 via Frontend Transport; Thu, 17 Nov 2022 04:44:57 +0000
+Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 16 Nov
+ 2022 22:44:53 -0600
+From:   Nikunj A Dadhania <nikunj@amd.com>
+To:     <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+        <kvm@vger.kernel.org>
+CC:     <bp@alien8.de>, <mingo@redhat.com>, <tglx@linutronix.de>,
+        <dave.hansen@linux.intel.com>, <seanjc@google.com>,
+        <pbonzini@redhat.com>, <thomas.lendacky@amd.com>, <nikunj@amd.com>,
+        <michael.roth@amd.com>, <stable@kernel.org>
+Subject: [PATCH] x86/sev: Add SEV-SNP guest feature negotiation support
+Date:   Thu, 17 Nov 2022 10:14:33 +0530
+Message-ID: <20221117044433.244656-1-nikunj@amd.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR1101MB2172.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 03a2a8bc-1392-4634-41fb-08dac84d1478
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Nov 2022 03:37:40.7652
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT078:EE_|IA1PR12MB6329:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4c1838f3-616b-4f28-01a4-08dac8567aaa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: clgGznXRavXskn0+EQWLSkCs2LAFHCgoVmNLzNfnPFyMqc6ye5B4U72x7pBGF4YLHdpKL7vPMaZ/TIDyRaBpmACJ0VxKZvywmC6Y1vCRIhcTrXCE2EvX3YR/OfR90EgJlH5w5AmjpnXzaYnq9Wcvm/40/4PhsIyH6BQPC9JkelAqtXrgtuAvt0AaZMAYrU/WjY8XY6dpNtE7opZPdZGDxNVqfbcUKjF95pJAFuOz6tTzB1dwPKZ0SA0gY3J35U1LWe8o3SVOljvbZ9bGW95UY/n2a01hLIWpkcfMjOGCdtzsI0eKfQLrnpmKEy9I8Oc2DHDCGQFKNFXuKTxFYwziU02w1GDnFVSsVWLyHGOEk39XyZQRHmYNqCJTwRh6ywn2F0EsdCpTPljXOcgO1n7gAjrvVnN7GKY3r8BG+lvHiZ+SY/jfuoWiCwVOZEFN+PZ8im1TwjGv5ajSMD9/RJa07twezZMV6+ye9nCmUpj0zCD2fjNiMhdzdbYX/ZeR7IK6u+JxDHLySC86k6Gr1te0m35RAeZQKrxVyFj/lwDwtZCvRdgCx99CLbm/Gh09k0hwM15Yy+O4Eafn0lhlBcq8f71Bn+fk0Q2lNfd0YwUnUh9S0Vc2Pd75UB8vcNfd5eQcJ/pveCV7HgDkUsahSLfQJJnpHme16AZSB05kkW+x9LFvMrQhqoBrEQ7mEZsmoTfVRqhpDKakK6LsLWxeo59Gxshg7uLLW5WlTXTNo0g72vSofMzzRT9vzQg/Oy1IU89HrD96i6tVTPrPJ3rJOnQ66g==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(396003)(346002)(39860400002)(376002)(136003)(451199015)(40470700004)(36840700001)(46966006)(41300700001)(7416002)(4326008)(36756003)(16526019)(2616005)(1076003)(8676002)(8936002)(316002)(5660300002)(70586007)(336012)(26005)(70206006)(186003)(82740400003)(36860700001)(40460700003)(40480700001)(83380400001)(47076005)(82310400005)(426003)(2906002)(81166007)(356005)(6666004)(966005)(478600001)(110136005)(54906003)(7696005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2022 04:44:57.5488
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 55OuwNiX8/qepFbN2iDSEyYCu8IL2sgRjaBEnDNFPEsfr7D+/P3Ch64zou4DqxOQ5LXoy8maX1GrwRB0aoqvRw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7647
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c1838f3-616b-4f28-01a4-08dac8567aaa
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT078.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6329
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+SEV_STATUS indicates features that hypervisor has enabled. Guest
+kernel may not support all the features that the hypervisor has
+enabled. If the hypervisor has enabled an unsupported feature,
+notify the hypervisor and terminate the boot.
 
-> > > > > But what about NMIs, afaict this is all horribly broken for NMIs.
-> > > > >
-> > > > > So the whole VMX thing latches the NMI (which stops NMI
-> > > > > recursion),
-> > > right?
-> > > > >
-> > > > > But then you drop out of noinstr code, which means any random
-> > > > > exception can happen (kprobes #BP, hw_breakpoint #DB, or even
-> > > > > #PF due to random nonsense like *SAN). This exception will do
-> > > > > IRET and clear the NMI latch, all before you get to run any of th=
-e NMI
-> code.
-> > > >
-> > > > What you said here implies that we have this problem in the existin=
-g
-> code.
-> > > > Because a fake iret stack is created to call the NMI handler in
-> > > > the IDT NMI descriptor, which lastly executes the IRET instruction.
-> > >
-> > > I can't follow; of course the IDT handler terminates with IRET, it ha=
-s to no?
-> >
-> > With FRED, ERETS/ERETU replace IRET, and use bit 28 of the popped CS
-> > field to control whether to unblock NMI. If bit 28 of the field (above
-> > the selector) is 1, ERETS/ERETU unblocks NMIs.
->=20
-> Yes, I know that. It is one of the many improvements FRED brings.
-> Ideally the IBT WAIT-FOR-ENDBR state also gets squirreled away in the
-> hardware exception frame, but that's still up in the air I believe :/
->=20
-> Anyway.. given there is interrupt priority and NMI is pretty much on top =
-of
-> everything else the reinject crap *should* run NMI first. That way NMI ru=
-ns
-> with the latch disabled and whatever other pending interrupts will run la=
-ter.
->=20
-> But that all is still broken because afaict the current code also leaves =
-noinstr --
-> and once you leave noinstr (or use a static_key, static_call or anything =
-else that
-> *can* change at runtime) you can't guarantee nothing.
+More details in AMD64 APM[1] Vol 2: 15.34.10 SEV_STATUS MSR
 
-For NMI, HPA asked me to use "int $2", as it switches to the NMI IST stack =
-to
-execute the NMI handler, essentially like how HW deals with a NMI in host. =
-and
-I tested it with NMI watchdog, it looks working fine.
+[1] https://www.amd.com/system/files/TechDocs/40332_4.05.pdf
 
-For IRQs, we still use the dispatch table, but with a new func added in
-DEFINE_IDTENTRY_SYSVEC with the noinstr entry/exit code removed:
+Fixes: cbd3d4f7c4e5 ("x86/sev: Check SEV-SNP features support")
+CC: Michael Roth <michael.roth@amd.com>
+CC: Tom Lendacky <thomas.lendacky@amd.com>
+CC: <stable@kernel.org>
+Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+---
+ arch/x86/boot/compressed/sev.c   | 18 +++++++++++++
+ arch/x86/include/asm/msr-index.h | 46 +++++++++++++++++++++++++++++---
+ 2 files changed, 61 insertions(+), 3 deletions(-)
 
-#define DEFINE_IDTENTRY_SYSVEC(func)                                    \
-static void __##func(struct pt_regs *regs);                             \
-                                                                        \
-__visible noinstr void func(struct pt_regs *regs)                       \
-{                                                                       \
-        irqentry_state_t state =3D irqentry_enter(regs);                  \
-                                                                        \
-        instrumentation_begin();                                        \
-        kvm_set_cpu_l1tf_flush_l1d();                                   \
-        run_sysvec_on_irqstack_cond(__##func, regs);                    \
-        instrumentation_end();                                          \
-        irqentry_exit(regs, state);                                     \
-}                                                                       \
-                                                                        \
-+void dispatch_table_##func(struct pt_regs *regs)                        \
-+{                                                                       \
-+        kvm_set_cpu_l1tf_flush_l1d();                                   \
-+        run_sysvec_on_irqstack_cond(__##func, regs);                    \
+diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
+index c93930d5ccbd..847d26e761a6 100644
+--- a/arch/x86/boot/compressed/sev.c
++++ b/arch/x86/boot/compressed/sev.c
+@@ -270,6 +270,17 @@ static void enforce_vmpl0(void)
+ 		sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_NOT_VMPL0);
+ }
+ 
++static bool snp_guest_feature_supported(void)
++{
++	u64 guest_support = SNP_GUEST_SUPPORT_REQUIRED & ~SNP_GUEST_SUPPORT_AVAILABLE;
++
++	/*
++	 * Return true when SEV features that hypervisor has enabled are
++	 * also supported by SNP guest kernel
++	 */
++	return !(sev_status & guest_support);
 +}
-+                                                                       \
-                                                                        \
-static noinline void __##func(struct pt_regs *regs)
++
+ void sev_enable(struct boot_params *bp)
+ {
+ 	unsigned int eax, ebx, ecx, edx;
+@@ -335,6 +346,13 @@ void sev_enable(struct boot_params *bp)
+ 		if (!(get_hv_features() & GHCB_HV_FT_SNP))
+ 			sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_UNSUPPORTED);
+ 
++		/*
++		 * Terminate the boot if hypervisor has enabled a feature
++		 * unsupported by the guest.
++		 */
++		if (!snp_guest_feature_supported())
++			sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_UNSUPPORTED);
++
+ 		enforce_vmpl0();
+ 	}
+ 
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 4a2af82553e4..d33691b4cb24 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -567,9 +567,49 @@
+ #define MSR_AMD64_SEV_ENABLED_BIT	0
+ #define MSR_AMD64_SEV_ES_ENABLED_BIT	1
+ #define MSR_AMD64_SEV_SNP_ENABLED_BIT	2
+-#define MSR_AMD64_SEV_ENABLED		BIT_ULL(MSR_AMD64_SEV_ENABLED_BIT)
+-#define MSR_AMD64_SEV_ES_ENABLED	BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
+-#define MSR_AMD64_SEV_SNP_ENABLED	BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
++#define MSR_AMD64_SEV_ENABLED				BIT_ULL(MSR_AMD64_SEV_ENABLED_BIT)
++#define MSR_AMD64_SEV_ES_ENABLED			BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
++#define MSR_AMD64_SEV_SNP_ENABLED			BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
++#define MSR_AMD64_SNP_VTOM_ENABLED			BIT_ULL(3)
++#define MSR_AMD64_SNP_REFLECT_VC_ENABLED		BIT_ULL(4)
++#define MSR_AMD64_SNP_RESTRICTED_INJ_ENABLED		BIT_ULL(5)
++#define MSR_AMD64_SNP_ALT_INJ_ENABLED			BIT_ULL(6)
++#define MSR_AMD64_SNP_DEBUG_SWAP_ENABLED		BIT_ULL(7)
++#define MSR_AMD64_SNP_PREVENT_HOST_IBS_ENABLED		BIT_ULL(8)
++#define MSR_AMD64_SNP_BTB_ISOLATION_ENABLED		BIT_ULL(9)
++#define MSR_AMD64_SNP_VMPL_SSS_ENABLED			BIT_ULL(10)
++#define MSR_AMD64_SNP_SECURE_TSC_ENABLED		BIT_ULL(11)
++#define MSR_AMD64_SNP_VMGEXIT_PARAM_ENABLED		BIT_ULL(12)
++#define MSR_AMD64_SNP_IBS_VIRT_ENABLED			BIT_ULL(14)
++#define MSR_AMD64_SNP_VMSA_REG_PROTECTION_ENABLED	BIT_ULL(16)
++#define MSR_AMD64_SNP_SMT_PROTECTION_ENABLED		BIT_ULL(17)
++/* Prevent hypervisor to enable undefined feature bits */
++#define MSR_AMD64_SNP_BIT13_RESERVED			BIT_ULL(13)
++#define MSR_AMD64_SNP_BIT15_RESERVED			BIT_ULL(15)
++#define MSR_AMD64_SNP_MASK_RESERVED			GENMASK_ULL(63, 18)
++
++/*
++ * Features that needs enlightened guest and cannot be supported with
++ * unmodified SNP guest kernel. This is subset of SEV_FEATURES.
++ */
++#define SNP_GUEST_SUPPORT_REQUIRED (MSR_AMD64_SNP_VTOM_ENABLED |		\
++				    MSR_AMD64_SNP_REFLECT_VC_ENABLED |		\
++				    MSR_AMD64_SNP_RESTRICTED_INJ_ENABLED |	\
++				    MSR_AMD64_SNP_ALT_INJ_ENABLED |		\
++				    MSR_AMD64_SNP_VMPL_SSS_ENABLED |		\
++				    MSR_AMD64_SNP_SECURE_TSC_ENABLED |		\
++				    MSR_AMD64_SNP_VMGEXIT_PARAM_ENABLED |	\
++				    MSR_AMD64_SNP_BIT13_RESERVED_ENABLED |	\
++				    MSR_AMD64_SNP_VMSA_REG_PROTECTION_ENABLED | \
++				    MSR_AMD64_SNP_BIT15_RESERVED_ENABLED |	\
++				    MSR_AMD64_SNP_MASK_RESERVED_ENABLED)
++/*
++ * Subset of SNP_GUEST_SUPPORT_REQUIRED, advertising the features that are
++ * supported in this enlightened guest kernel. As and when new features are
++ * added in the guest kernel, corresponding bit for this feature needs to be
++ * added as part of SNP_GUEST_SUPPORT_AVAILABLE.
++ */
++#define SNP_GUEST_SUPPORT_AVAILABLE (0)
+ 
+ #define MSR_AMD64_VIRT_SPEC_CTRL	0xc001011f
+ 
+-- 
+2.32.0
 
-How do you think?
