@@ -2,151 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9319462E014
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 16:39:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0797F62E058
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 16:51:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239737AbiKQPjD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 10:39:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51196 "EHLO
+        id S239654AbiKQPvq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 10:51:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239734AbiKQPif (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 10:38:35 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E010D6D
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 07:38:30 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AHDiNjE003452;
-        Thu, 17 Nov 2022 15:38:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=dcBMfT02/fhemNoSV9+WXoatCkSif082BaKQDc7l+Sg=;
- b=Dvt2g0sdtTJ0//LpuMZcK4c5c8b5MGC08eVmD1X3IVUM4pnPbCEpDUPBHnbqaHPt2GzH
- /WhTGc5obGq0J+BaNBDw2BgqAuyVPERuJacVvk0mGQrcLfYPnys62prMQX6Ti8p8ubct
- i3xqfPGQnnpeun9smdZ6MqDPkQV43nBSbXRnMBBLjVcp4JTH+g6coRQGWUDkvoFA8Spq
- oYfIb2p0Egsu0xkfwV0/7Wy11T6g/zkHwawWk7NsWOeHUnuAf6Ze1wmEQ+GQV+v0RopM
- iC/nHubHQLNddUeXeFs+YgSiwZlbZ6xYQ42brYtdM8vCcxMEUBtFcE65GwNCzzAcDm+q Aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kwmjtp08w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Nov 2022 15:38:22 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AHE3s1T023968;
-        Thu, 17 Nov 2022 15:38:22 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kwmjtp08a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Nov 2022 15:38:22 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AHFadNk032721;
-        Thu, 17 Nov 2022 15:38:20 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 3kt2rjfr3q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Nov 2022 15:38:20 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AHFcH3f65405332
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 17 Nov 2022 15:38:18 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E122EAE04D;
-        Thu, 17 Nov 2022 15:38:17 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 907A3AE045;
-        Thu, 17 Nov 2022 15:38:17 +0000 (GMT)
-Received: from [9.171.13.174] (unknown [9.171.13.174])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 17 Nov 2022 15:38:17 +0000 (GMT)
-Message-ID: <92123fcd-32c3-4e68-a7a6-234588f6a661@de.ibm.com>
-Date:   Thu, 17 Nov 2022 16:38:17 +0100
+        with ESMTP id S234802AbiKQPvl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 10:51:41 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BFF2769EC
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 07:51:41 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id o7so2018255pjj.1
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 07:51:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FyuGzGxEZRHvEr/JeItK3VvnrH3Vjqzh4TosRHWmsqQ=;
+        b=R1HkdKDDMrNBJhdZpT5wuNeVm7ykr/NYLcK4lYns8I72luzpoJnd9hOVUIJ37xXzpF
+         Y9R1C+K2PAGUXcUWln5cbPjqIPmgeqBLB8XvSWAkW5dfMc3/44T/vapbL2o7yHWGZMZS
+         BAbYjVGK7csYo1tAbSgDbOiGiiMUaP+xUVQP5s1TdW+x1SauV9jA8mFMRXIopQnyY8SG
+         EqANano7h0k0HxMKq6lwz7WLlCStKn017xkNzAWs2WVFoQD2pIJzANNt16M5tNSVwgyN
+         wPRTcgN+CTw2/kD038EMM3AWbYdVqHcanplRBcqNhUS55tRvTXJrPqPZhseKlgXeCpbC
+         WtVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FyuGzGxEZRHvEr/JeItK3VvnrH3Vjqzh4TosRHWmsqQ=;
+        b=wll+RaOtgGrZIUYG5ZMR+7GWAcuJAoe6KTbSIaQu7TfRGL/xNNWi7yVpNLZSOONCp9
+         ERoLHlW/7ygeyFoNTqGUE2iyfGOzjkjyX3rLu2ChTFSR22XiccCrNPmLxtbxArGk0p79
+         Ag6V8NAeN2M0UXBVC3zfYNq0KU7Xc5UDHyb1ttbf6v+c4ZXaa4GF1M+7EEv9TdV6DbEy
+         I4a0NztEeYFHnTtqsRBtGUtKNIAoDgpNZhDMFIwqJSEVS2rCaRvldCgVbuVK8j+jyC+h
+         7KS6x6Lllbr5l/kSbxAez3wOciYma5xTjkFyxCoS3Vg61Ysr1ELnMQcf/ZUUo2Bunupn
+         7kzg==
+X-Gm-Message-State: ANoB5pn6R8+FKnm2AibUMLlib5UOkIdXrzcBevGhqRuxntTq1+uJkKY4
+        vw6bDOmKsCPhwUzF30l6mKVzaA==
+X-Google-Smtp-Source: AA0mqf4f9nYQrcGMW8xmaLKyDIuzI7Mvy29gSNkwlHyOvpLbAxZFoBrxeJiGiwkH4bLZqzd/HC0rUQ==
+X-Received: by 2002:a17:902:e414:b0:188:b8cf:85b with SMTP id m20-20020a170902e41400b00188b8cf085bmr3238147ple.126.1668700300567;
+        Thu, 17 Nov 2022 07:51:40 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id q13-20020a170902a3cd00b0017f778d4543sm1482631plb.241.2022.11.17.07.51.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Nov 2022 07:51:40 -0800 (PST)
+Date:   Thu, 17 Nov 2022 15:51:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Li, Xin3" <xin3.li@intel.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
+ for NMI/IRQ reinjection
+Message-ID: <Y3ZYiKbJacmejY3K@google.com>
+References: <Y24908NWCdzUNqI0@hirez.programming.kicks-ass.net>
+ <6fd26a70-3774-6ae7-73ea-4653aee106f0@redhat.com>
+ <Y25a0Z2tOMWYZs4j@hirez.programming.kicks-ass.net>
+ <BN6PR1101MB216141A21353AB84CEA541DFA8009@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y26jkHfK9INwU7Yy@hirez.programming.kicks-ass.net>
+ <BN6PR1101MB2161E8217F50D18C56E5864EA8059@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y3IFo9NrAcYalBzM@hirez.programming.kicks-ass.net>
+ <BN6PR1101MB2161299749E12D484DE9302BA8049@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y3NZQBJugRt07udw@hirez.programming.kicks-ass.net>
+ <DM5PR1101MB2172D7D7BC49255DB3752802A8069@DM5PR1101MB2172.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [RFC PATCH 1/3] KVM: Cap vcpu->halt_poll_ns before halting rather
- than after
-Content-Language: en-US
-To:     David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jon Cargille <jcargill@google.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Yanan Wang <wangyanan55@huawei.com>
-References: <20221117001657.1067231-1-dmatlack@google.com>
- <20221117001657.1067231-2-dmatlack@google.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-In-Reply-To: <20221117001657.1067231-2-dmatlack@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dzmcwKc9IHN0YfUHtRJbhevWGWfk7m3S
-X-Proofpoint-ORIG-GUID: e74_DRMraw3t7A7zA6-u2N1UQ_5i8okz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-17_06,2022-11-17_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 adultscore=0 phishscore=0 malwarescore=0 spamscore=0
- mlxscore=0 mlxlogscore=624 bulkscore=0 clxscore=1011 lowpriorityscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211170116
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM5PR1101MB2172D7D7BC49255DB3752802A8069@DM5PR1101MB2172.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 17.11.22 um 01:16 schrieb David Matlack:
-> Cap vcpu->halt_poll_ns based on the max halt polling time just before
-> halting, rather than after the last halt. This arguably provides better
-> accuracy if an admin disables halt polling in between halts, although
-> the improvement is nominal.
+On Thu, Nov 17, 2022, Li, Xin3 wrote:
 > 
-> A side-effect of this change is that grow_halt_poll_ns() no longer needs
-> to access vcpu->kvm->max_halt_poll_ns, which will be useful in a future
-> commit where the max halt polling time can come from the module parameter
-> halt_poll_ns instead.
+> > > > > > But what about NMIs, afaict this is all horribly broken for NMIs.
+> > > > > > So the whole VMX thing latches the NMI (which stops NMI
+> > > > > > recursion), right?
+> > > > > >
+> > > > > > But then you drop out of noinstr code, which means any random
+> > > > > > exception can happen (kprobes #BP, hw_breakpoint #DB, or even
+> > > > > > #PF due to random nonsense like *SAN). This exception will do
+> > > > > > IRET and clear the NMI latch, all before you get to run any of the
+> > > > > > NMI code.
+> > > > >
+> > > > > What you said here implies that we have this problem in the existing code.
+> > > > > Because a fake iret stack is created to call the NMI handler in
+> > > > > the IDT NMI descriptor, which lastly executes the IRET instruction.
+> > > >
+> > > > I can't follow; of course the IDT handler terminates with IRET, it has to no?
+> > > >
+> > > > And yes, the current code appears to suffer the same defect.
+
+That defect isn't going to be fixed simply by changing how KVM forwards NMIs
+though.  IIUC, _everything_ between VM-Exit and the invocation of the NMI handler
+needs to be noinstr.  On VM-Exit due to NMI, NMIs are blocked.  If a #BP/#DB/#PF
+occurs before KVM gets to kvm_x86_handle_exit_irqoff(), the subsequent IRET will
+unblock NMIs before the original NMI is serviced, i.e. a second NMI could come in
+at anytime regardless of how KVM forwards the NMI to the kernel.
+
+Is there any way to solve this without tagging everything noinstr?  There is a
+metric shit ton of code between VM-Exit and the handling of NMIs, and much of that
+code is common helpers.  It might be possible to hoist NMI handler much earlier,
+though we'd need to do a super thorough audit to ensure all necessary host state
+is restored.
+
+> > > With FRED, ERETS/ERETU replace IRET, and use bit 28 of the popped CS
+> > > field to control whether to unblock NMI. If bit 28 of the field (above
+> > > the selector) is 1, ERETS/ERETU unblocks NMIs.
+
+Side topic, there's a bug in the ISE docs.  Section "9.4.2 NMI Blocking" states
+that bit 16 holds the "unblock NMI" magic, which I'm guessing is a holdover from
+an earlier revision of FRED.
+
+  As specified in Section 6.1.3 and Section 6.2.3, ERETS and ERETU each unblocks NMIs
+  if bit 16 of the popped CS field is 1. The following items detail how this behavior may be
+  changed in VMX non-root operation, depending on the settings of certain VM-execution
+  controls:
+
+> > Yes, I know that. It is one of the many improvements FRED brings.
+> > Ideally the IBT WAIT-FOR-ENDBR state also gets squirreled away in the
+> > hardware exception frame, but that's still up in the air I believe :/
+> > 
+> > Anyway.. given there is interrupt priority and NMI is pretty much on top of
+> > everything else the reinject crap *should* run NMI first. That way NMI runs
+> > with the latch disabled and whatever other pending interrupts will run later.
+> >
+> > But that all is still broken because afaict the current code also leaves noinstr --
+> > and once you leave noinstr (or use a static_key, static_call or anything else that
+> > *can* change at runtime) you can't guarantee nothing.
 > 
-> Signed-off-by: David Matlack <dmatlack@google.com>
+> For NMI, HPA asked me to use "int $2", as it switches to the NMI IST stack to
+> execute the NMI handler, essentially like how HW deals with a NMI in host. and
+> I tested it with NMI watchdog, it looks working fine.
 
-Looks sane
+Heh, well yeah, because that's how KVM used to handle NMIs back before I reworked
+NMI handling to use the direct call method.  Ironically, that original change was
+done in part to try and make it _easier_ to deal with FRED (back before FRED was
+publicly disclosed).
 
-Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+If KVM reverts to INTn, the fix to route KVM=>NMI through the non-IST entry can
+be reverted too.
 
-
-> ---
->   virt/kvm/kvm_main.c | 10 ++++++----
->   1 file changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 43bbe4fde078..4b868f33c45d 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3385,9 +3385,6 @@ static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
->   	if (val < grow_start)
->   		val = grow_start;
->   
-> -	if (val > vcpu->kvm->max_halt_poll_ns)
-> -		val = vcpu->kvm->max_halt_poll_ns;
-> -
->   	vcpu->halt_poll_ns = val;
->   out:
->   	trace_kvm_halt_poll_ns_grow(vcpu->vcpu_id, val, old);
-> @@ -3500,11 +3497,16 @@ static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
->   void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
->   {
->   	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
-> -	bool do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
->   	ktime_t start, cur, poll_end;
->   	bool waited = false;
-> +	bool do_halt_poll;
->   	u64 halt_ns;
->   
-> +	if (vcpu->halt_poll_ns > vcpu->kvm->max_halt_poll_ns)
-> +		vcpu->halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
-> +
-> +	do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
-> +
->   	start = cur = poll_end = ktime_get();
->   	if (do_halt_poll) {
->   		ktime_t stop = ktime_add_ns(start, vcpu->halt_poll_ns);
+  a217a6593cec ("KVM/VMX: Invoke NMI non-IST entry instead of IST entry")
+  1a5488ef0dcf ("KVM: VMX: Invoke NMI handler via indirect call instead of INTn")
