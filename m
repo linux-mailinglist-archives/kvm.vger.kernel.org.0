@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32EE262DE4F
+	by mail.lfdr.de (Postfix) with ESMTP id 7EC8662DE50
 	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 15:35:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240504AbiKQOfD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 09:35:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58706 "EHLO
+        id S240508AbiKQOfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 09:35:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240335AbiKQOeX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 09:34:23 -0500
+        with ESMTP id S240380AbiKQOe0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 09:34:26 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72DB47722F
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 06:33:20 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ABB6CFE
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 06:33:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668695599;
+        s=mimecast20190719; t=1668695603;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ps9mGB4FWMNZUhRI7eqw38JkpYxzOMfFPzgwHnz9dQU=;
-        b=TM47knEtFRRA6Gq+5og+Xghrp/9GBkU3e8EVkZBAK2y48z/FvVxLKhAYFzgmmckqqE7IjH
-        tNjR+0wkovxLfW74HlSP0JmFIJRXuRcuVhmNgAV/sU9i7Dz5yIVLXbLNff79YqUT1z58Ap
-        goXqPrwjbU87LyC2aBzBJrhiWhg0wrE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=BudyXha3IcL4zFH4dWy8hg4aRuVxU+goAgJkX7rkDuY=;
+        b=Hz7SpdrnqgBK53jPlQS4PLZR1WYPFfQ4V87eVdaNxHMRTGhkxAPIHar9/pwZpccbHfIHCO
+        4rtCipHggV6zMvp+t1xH3XxO9TFmPbgZRmX9Ac6Bls5fZnL4m0uRjN0iocWUwLbmXVYyYb
+        M1vylmtyosM1PRz4hnNqnmS5TpNe1+E=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-389-Jy4x4LlPPDyb9i2N1ngPYQ-1; Thu, 17 Nov 2022 09:33:14 -0500
-X-MC-Unique: Jy4x4LlPPDyb9i2N1ngPYQ-1
+ us-mta-621-Us5Zwb9hM2abFqYnaijUSQ-1; Thu, 17 Nov 2022 09:33:18 -0500
+X-MC-Unique: Us5Zwb9hM2abFqYnaijUSQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 62DAC1C08978;
-        Thu, 17 Nov 2022 14:33:13 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 34EF2185A78B;
+        Thu, 17 Nov 2022 14:33:17 +0000 (UTC)
 Received: from amdlaptop.tlv.redhat.com (dhcp-4-238.tlv.redhat.com [10.35.4.238])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DAF482166B29;
-        Thu, 17 Nov 2022 14:33:09 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AD9872166B29;
+        Thu, 17 Nov 2022 14:33:13 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -58,9 +58,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>, x86@kernel.org,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Santosh Shukla <santosh.shukla@amd.com>
-Subject: [PATCH 07/13] KVM: SVM: Add VNMI support in get/set_nmi_mask
-Date:   Thu, 17 Nov 2022 16:32:36 +0200
-Message-Id: <20221117143242.102721-8-mlevitsk@redhat.com>
+Subject: [PATCH 08/13] KVM: SVM: Report NMI not allowed when Guest busy handling VNMI
+Date:   Thu, 17 Nov 2022 16:32:37 +0200
+Message-Id: <20221117143242.102721-9-mlevitsk@redhat.com>
 In-Reply-To: <20221117143242.102721-1-mlevitsk@redhat.com>
 References: <20221117143242.102721-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -68,7 +68,7 @@ Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,127 +78,63 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Santosh Shukla <santosh.shukla@amd.com>
 
-VMCB intr_ctrl bit12 (V_NMI_MASK) is set by the processor when handling
-NMI in guest and is cleared after the NMI is handled. Treat V_NMI_MASK
-as read-only in the hypervisor except for the SMM case where hypervisor
-before entring and after leaving SMM mode requires to set and unset
-V_NMI_MASK.
-
-Adding API(get_vnmi_vmcb) in order to return the correct vmcb for L1 or
-L2.
+In the VNMI case, Report NMI is not allowed when V_NMI_PENDING is set
+which mean virtual NMI already pended for Guest to process while
+the Guest is busy handling the current virtual NMI. The Guest
+will first finish handling the current virtual NMI and then it will
+take the pended event w/o vmexit.
 
 Maxim:
-   - made set_vnmi_mask/clear_vnmi_mask/is_vnmi_mask warn if called
-     without vNMI enabled
-   - clear IRET intercept in svm_set_nmi_mask even with vNMI
+  - disable NMI window unconditionally for now.
 
 Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/svm.c | 18 ++++++++++++++-
- arch/x86/kvm/svm/svm.h | 52 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+), 1 deletion(-)
+ arch/x86/kvm/svm/svm.c |  6 ++++++
+ arch/x86/kvm/svm/svm.h | 11 +++++++++++
+ 2 files changed, 17 insertions(+)
 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 08a7b2a0a29f3a..c16f68f6c4f7d7 100644
+index c16f68f6c4f7d7..cfec4c98bb589b 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -3618,13 +3618,29 @@ static int svm_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+@@ -3595,6 +3595,9 @@ bool svm_nmi_blocked(struct kvm_vcpu *vcpu)
+ 	if (is_guest_mode(vcpu) && nested_exit_on_nmi(svm))
+ 		return false;
  
- static bool svm_get_nmi_mask(struct kvm_vcpu *vcpu)
- {
--	return !!(vcpu->arch.hflags & HF_NMI_MASK);
-+	struct vcpu_svm *svm = to_svm(vcpu);
++	if (is_vnmi_enabled(svm) && is_vnmi_pending_set(svm))
++		return true;
 +
-+	if (is_vnmi_enabled(svm))
-+		return is_vnmi_mask_set(svm);
-+	else
-+		return !!(vcpu->arch.hflags & HF_NMI_MASK);
- }
+ 	ret = (vmcb->control.int_state & SVM_INTERRUPT_SHADOW_MASK) ||
+ 	      (vcpu->arch.hflags & HF_NMI_MASK);
  
- static void svm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
+@@ -3732,6 +3735,9 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
  {
  	struct vcpu_svm *svm = to_svm(vcpu);
  
-+	if (is_vnmi_enabled(svm)) {
-+		if (masked)
-+			set_vnmi_mask(svm);
-+		else {
-+			clear_vnmi_mask(svm);
-+			if (!sev_es_guest(vcpu->kvm))
-+				svm_clr_intercept(svm, INTERCEPT_IRET);
-+		}
++	if (is_vnmi_enabled(svm))
 +		return;
-+	}
 +
- 	if (masked) {
- 		vcpu->arch.hflags |= HF_NMI_MASK;
- 		if (!sev_es_guest(vcpu->kvm))
+ 	if ((vcpu->arch.hflags & (HF_NMI_MASK | HF_IRET_MASK)) == HF_NMI_MASK)
+ 		return; /* IRET will cause a vm exit */
+ 
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index f5383104d00580..bf7f4851dee204 100644
+index bf7f4851dee204..5f2ee72c6e3125 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -35,6 +35,7 @@ extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
- extern bool npt_enabled;
- extern int vgif;
- extern bool intercept_smi;
-+extern bool vnmi;
- 
- enum avic_modes {
- 	AVIC_MODE_NONE = 0,
-@@ -531,6 +532,57 @@ static inline bool is_x2apic_msrpm_offset(u32 offset)
- 	       (msr < (APIC_BASE_MSR + 0x100));
+@@ -583,6 +583,17 @@ static inline void clear_vnmi_mask(struct vcpu_svm *svm)
+ 	vmcb->control.int_ctl &= ~V_NMI_MASK;
  }
  
-+static inline struct vmcb *get_vnmi_vmcb(struct vcpu_svm *svm)
-+{
-+	if (!vnmi)
-+		return NULL;
 +
-+	if (is_guest_mode(&svm->vcpu))
-+		return svm->nested.vmcb02.ptr;
-+	else
-+		return svm->vmcb01.ptr;
-+}
-+
-+static inline bool is_vnmi_enabled(struct vcpu_svm *svm)
++static inline bool is_vnmi_pending_set(struct vcpu_svm *svm)
 +{
 +	struct vmcb *vmcb = get_vnmi_vmcb(svm);
 +
 +	if (vmcb)
-+		return !!(vmcb->control.int_ctl & V_NMI_ENABLE);
++		return !!(vmcb->control.int_ctl & V_NMI_PENDING);
 +	else
 +		return false;
-+}
-+
-+static inline bool is_vnmi_mask_set(struct vcpu_svm *svm)
-+{
-+	struct vmcb *vmcb = get_vnmi_vmcb(svm);
-+
-+	if (!WARN_ON_ONCE(!vmcb))
-+		return false;
-+
-+	return !!(vmcb->control.int_ctl & V_NMI_MASK);
-+}
-+
-+static inline void set_vnmi_mask(struct vcpu_svm *svm)
-+{
-+	struct vmcb *vmcb = get_vnmi_vmcb(svm);
-+
-+	if (!WARN_ON_ONCE(!vmcb))
-+		return;
-+
-+	vmcb->control.int_ctl |= V_NMI_MASK;
-+}
-+
-+static inline void clear_vnmi_mask(struct vcpu_svm *svm)
-+{
-+	struct vmcb *vmcb = get_vnmi_vmcb(svm);
-+
-+	if (!WARN_ON_ONCE(!vmcb))
-+		return;
-+
-+	vmcb->control.int_ctl &= ~V_NMI_MASK;
 +}
 +
  /* svm.c */
