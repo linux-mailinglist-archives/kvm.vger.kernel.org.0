@@ -2,84 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C73162D4DA
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 09:13:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C137D62D56D
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 09:48:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239478AbiKQINu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 03:13:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58122 "EHLO
+        id S239636AbiKQIs1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 03:48:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239432AbiKQINt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 03:13:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED44D54
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 00:12:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668672773;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7MfPYtVSB6cIa8juSj1mGPDS9yTAQ9Zmv6K/nL8ei8M=;
-        b=Ph9qhK7iHQG2HtSsP87Dk0Fhk0Q+zaZbXNia6W25u4HLyJfw8eaze9gmc+VeSEtGj4STvv
-        1v1AsGyUX9X4FTThBF20QzfMN7GcSfKn8ljyMtnIX0Ov6A1/dKhjaAXu38exdMkoy+GuUi
-        yvHpunSMljln/lfTncVXTa4A1ATZVvw=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-503-T2SffG9RMx-02czZRqYT3g-1; Thu, 17 Nov 2022 03:12:44 -0500
-X-MC-Unique: T2SffG9RMx-02czZRqYT3g-1
-Received: by mail-qt1-f199.google.com with SMTP id n12-20020ac85a0c000000b003a5849497f9so1023681qta.20
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 00:12:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7MfPYtVSB6cIa8juSj1mGPDS9yTAQ9Zmv6K/nL8ei8M=;
-        b=BVT6zVUYC4MdI/0PX9UoaRhX64tP7QfKBb4Lrv8gFgkWBo7PviPFTADev2sg/vvEUu
-         9N9prLo8V2CBand6x0+kdirdqs5w3WWuR+S7Pzg0+BLlT5ny/PyBmX0gtzx9X+31Oezz
-         PyF5MNLR2EM+pQlYCbezSdCu2BHN4ZYOnwNh0AVUJcyNmEUXv/6etnErwSsgshv0qP6c
-         3+tHilAysdCdoNYGKQLxEkJ/oCzjJtiSoWkzzxuZ6gSbkFvJERpnqbg34HMUjj0wGDi3
-         OfO4ph1eJRifo2zfs5c4MPK2A7RJca/Ddws6sWqPDRJ5HqRuVUr/ONdcCkB5xv8pz1O4
-         pcpw==
-X-Gm-Message-State: ANoB5pnt1b10SX7GxYt/pwI6pM4Xg/te8vI3AZ9o6CJJ1iS9GVBxcL70
-        Mbtw5H5QzH5Al1jLsdm1qtmQqbQJpJVdi76qnnS6Lw3siDCpGeC+XfL622wEEScDlo6vKcDr6CT
-        HCHXONnJYb1UDFQhUdh2VXXuN2bIf
-X-Received: by 2002:a37:34a:0:b0:6fa:1972:8cc6 with SMTP id 71-20020a37034a000000b006fa19728cc6mr751397qkd.577.1668672764019;
-        Thu, 17 Nov 2022 00:12:44 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7PIo5aZg/VzA5KBEBcnnksAAb2QGALeIf8clZbvXgbt4Jj5TqPRYp36pJt8LVLCa7vQn9/NUnGnV3b982Wxyk=
-X-Received: by 2002:a37:34a:0:b0:6fa:1972:8cc6 with SMTP id
- 71-20020a37034a000000b006fa19728cc6mr751370qkd.577.1668672763732; Thu, 17 Nov
- 2022 00:12:43 -0800 (PST)
+        with ESMTP id S239633AbiKQIsU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 03:48:20 -0500
+Received: from 6.mo548.mail-out.ovh.net (6.mo548.mail-out.ovh.net [188.165.58.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 205504877C
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 00:48:04 -0800 (PST)
+Received: from mxplan5.mail.ovh.net (unknown [10.109.146.208])
+        by mo548.mail-out.ovh.net (Postfix) with ESMTPS id 2E93923456;
+        Thu, 17 Nov 2022 08:40:55 +0000 (UTC)
+Received: from kaod.org (37.59.142.106) by DAG4EX2.mxp5.local (172.16.2.32)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Thu, 17 Nov
+ 2022 09:40:54 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-106R006b2a10884-91aa-4e32-a075-8607d02e4ad9,
+                    AE5717285A2AC47C671D2CB192D1CF6730B7D7F3) smtp.auth=clg@kaod.org
+X-OVh-ClientIp: 82.64.250.170
+Message-ID: <1888d31f-227f-7edf-4cc8-dd88a9b19435@kaod.org>
+Date:   Thu, 17 Nov 2022 09:40:53 +0100
 MIME-Version: 1.0
-References: <20221116150556.1294049-1-eperezma@redhat.com> <20221116150556.1294049-11-eperezma@redhat.com>
- <f22d530b-3c5e-5b94-948d-594608668687@redhat.com> <CAJaqyWfj0dAnto_S003ei28Y9Ei+8JJApcGN4K+P-7yH683VGA@mail.gmail.com>
-In-Reply-To: <CAJaqyWfj0dAnto_S003ei28Y9Ei+8JJApcGN4K+P-7yH683VGA@mail.gmail.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Thu, 17 Nov 2022 09:12:07 +0100
-Message-ID: <CAJaqyWcrQMPGsxUKsbYyNUVX0q-_gFdxQ3yuGZ+oFaSZ-f0LPg@mail.gmail.com>
-Subject: Re: [PATCH for 8.0 v7 10/10] vdpa: Always start CVQ in SVQ mode if possible
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-        Gautam Dawar <gdawar@xilinx.com>, Eli Cohen <eli@mellanox.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Cindy Lu <lulu@redhat.com>,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Parav Pandit <parav@mellanox.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH v11 04/11] s390x/cpu topology: reporting the CPU topology
+ to the guest
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, <qemu-s390x@nongnu.org>
+CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
+        <pasic@linux.ibm.com>, <richard.henderson@linaro.org>,
+        <david@redhat.com>, <thuth@redhat.com>, <cohuck@redhat.com>,
+        <mst@redhat.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <ehabkost@redhat.com>, <marcel.apfelbaum@gmail.com>,
+        <eblake@redhat.com>, <armbru@redhat.com>, <seiden@linux.ibm.com>,
+        <nrb@linux.ibm.com>, <scgl@linux.ibm.com>, <frankja@linux.ibm.com>,
+        <berrange@redhat.com>
+References: <20221103170150.20789-1-pmorel@linux.ibm.com>
+ <20221103170150.20789-5-pmorel@linux.ibm.com>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+In-Reply-To: <20221103170150.20789-5-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.106]
+X-ClientProxiedBy: DAG8EX1.mxp5.local (172.16.2.71) To DAG4EX2.mxp5.local
+ (172.16.2.32)
+X-Ovh-Tracer-GUID: 16fa6fb5-3336-40c2-ac69-1d24956c7d5a
+X-Ovh-Tracer-Id: 17552498076302347219
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvgedrgeejgdduvdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgihesthejredttdefjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeuuddtteelgeejhfeikeegffekhfelvefgfeejveffjeeiveegfeehgfdtgfeitdenucfkphepuddvjedrtddrtddruddpfeejrdehledrudegvddruddtieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoegtlhhgsehkrghougdrohhrgheqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepphhmohhrvghlsehlihhnuhigrdhisghmrdgtohhmpdhstghglheslhhinhhugidrihgsmhdrtghomhdpnhhrsgeslhhinhhugidrihgsmhdrtghomhdpshgvihguvghnsehlihhnuhigrdhisghmrdgtohhmpdgrrhhmsghruhesrhgvughhrghtrdgtohhmpdgvsghlrghkvgesrhgvughhrghtrdgtohhmpdhmrghrtggvlhdrrghpfhgvlhgsrghumhesghhmrghilhdrtghomhdpvghhrggskhhoshhtsehrvgguhhgrthdrtghomhdpkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+ dpfhhrrghnkhhjrgeslhhinhhugidrihgsmhdrtghomhdpphgsohhniihinhhisehrvgguhhgrthdrtghomhdptghohhhutghksehrvgguhhgrthdrtghomhdpthhhuhhthhesrhgvughhrghtrdgtohhmpdgurghvihgusehrvgguhhgrthdrtghomhdprhhitghhrghrugdrhhgvnhguvghrshhonheslhhinhgrrhhordhorhhgpdhprghsihgtsehlihhnuhigrdhisghmrdgtohhmpdgsohhrnhhtrhgrvghgvghrseguvgdrihgsmhdrtghomhdpqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghdpqhgvmhhuqdhsfeeltdigsehnohhnghhnuhdrohhrghdpmhhsthesrhgvughhrghtrdgtohhmpdgsvghrrhgrnhhgvgesrhgvughhrghtrdgtohhmpdfovfetjfhoshhtpehmohehgeekpdhmohguvgepshhmthhpohhuth
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,296 +65,304 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 8:43 AM Eugenio Perez Martin
-<eperezma@redhat.com> wrote:
+On 11/3/22 18:01, Pierre Morel wrote:
+> The guest can use the STSI instruction to get a buffer filled
+> with the CPU topology description.
+> 
+> Let us implement the STSI instruction for the basis CPU topology
+> level, level 2.
 >
-> On Thu, Nov 17, 2022 at 7:52 AM Jason Wang <jasowang@redhat.com> wrote:
-> >
-> >
-> > =E5=9C=A8 2022/11/16 23:05, Eugenio P=C3=A9rez =E5=86=99=E9=81=93:
-> > > Isolate control virtqueue in its own group, allowing to intercept con=
-trol
-> > > commands but letting dataplane run totally passthrough to the guest.
-> > >
-> > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > > ---
-> > > v7:
-> > > * Never ask for number of address spaces, just react if isolation is =
-not
-> > >    possible.
-> > > * Return ASID ioctl errors instead of masking them as if the device h=
-as
-> > >    no asid.
-> > > * Simplify net_init_vhost_vdpa logic
-> > > * Add "if possible" suffix
-> > >
-> > > v6:
-> > > * Disable control SVQ if the device does not support it because of
-> > > features.
-> > >
-> > > v5:
-> > > * Fixing the not adding cvq buffers when x-svq=3Don is specified.
-> > > * Move vring state in vhost_vdpa_get_vring_group instead of using a
-> > >    parameter.
-> > > * Rename VHOST_VDPA_NET_CVQ_PASSTHROUGH to VHOST_VDPA_NET_DATA_ASID
-> > >
-> > > v4:
-> > > * Squash vhost_vdpa_cvq_group_is_independent.
-> > > * Rebased on last CVQ start series, that allocated CVQ cmd bufs at lo=
-ad
-> > > * Do not check for cvq index on vhost_vdpa_net_prepare, we only have =
-one
-> > >    that callback registered in that NetClientInfo.
-> > >
-> > > v3:
-> > > * Make asid related queries print a warning instead of returning an
-> > >    error and stop the start of qemu.
-> > > ---
-> > >   hw/virtio/vhost-vdpa.c |   3 +-
-> > >   net/vhost-vdpa.c       | 117 ++++++++++++++++++++++++++++++++++++++=
-+--
-> > >   2 files changed, 114 insertions(+), 6 deletions(-)
-> > >
-> > > diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-> > > index 852baf8b2c..a29a18a6a9 100644
-> > > --- a/hw/virtio/vhost-vdpa.c
-> > > +++ b/hw/virtio/vhost-vdpa.c
-> > > @@ -653,7 +653,8 @@ static int vhost_vdpa_set_backend_cap(struct vhos=
-t_dev *dev)
-> > >   {
-> > >       uint64_t features;
-> > >       uint64_t f =3D 0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2 |
-> > > -        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH;
-> > > +        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH |
-> > > +        0x1ULL << VHOST_BACKEND_F_IOTLB_ASID;
-> > >       int r;
-> > >
-> > >       if (vhost_vdpa_call(dev, VHOST_GET_BACKEND_FEATURES, &features)=
-) {
-> > > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> > > index a9c864741a..dc13a49311 100644
-> > > --- a/net/vhost-vdpa.c
-> > > +++ b/net/vhost-vdpa.c
-> > > @@ -101,6 +101,8 @@ static const uint64_t vdpa_svq_device_features =
-=3D
-> > >       BIT_ULL(VIRTIO_NET_F_RSC_EXT) |
-> > >       BIT_ULL(VIRTIO_NET_F_STANDBY);
-> > >
-> > > +#define VHOST_VDPA_NET_CVQ_ASID 1
-> > > +
-> > >   VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
-> > >   {
-> > >       VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
-> > > @@ -242,6 +244,40 @@ static NetClientInfo net_vhost_vdpa_info =3D {
-> > >           .check_peer_type =3D vhost_vdpa_check_peer_type,
-> > >   };
-> > >
-> > > +static int64_t vhost_vdpa_get_vring_group(int device_fd, unsigned vq=
-_index)
-> > > +{
-> > > +    struct vhost_vring_state state =3D {
-> > > +        .index =3D vq_index,
-> > > +    };
-> > > +    int r =3D ioctl(device_fd, VHOST_VDPA_GET_VRING_GROUP, &state);
-> > > +
-> > > +    if (unlikely(r < 0)) {
-> > > +        error_report("Cannot get VQ %u group: %s", vq_index,
-> > > +                     g_strerror(errno));
-> > > +        return r;
-> > > +    }
-> > > +
-> > > +    return state.num;
-> > > +}
-> > > +
-> > > +static int vhost_vdpa_set_address_space_id(struct vhost_vdpa *v,
-> > > +                                           unsigned vq_group,
-> > > +                                           unsigned asid_num)
-> > > +{
-> > > +    struct vhost_vring_state asid =3D {
-> > > +        .index =3D vq_group,
-> > > +        .num =3D asid_num,
-> > > +    };
-> > > +    int r;
-> > > +
-> > > +    r =3D ioctl(v->device_fd, VHOST_VDPA_SET_GROUP_ASID, &asid);
-> > > +    if (unlikely(r < 0)) {
-> > > +        error_report("Can't set vq group %u asid %u, errno=3D%d (%s)=
-",
-> > > +                     asid.index, asid.num, errno, g_strerror(errno))=
-;
-> > > +    }
-> > > +    return r;
-> > > +}
-> > > +
-> > >   static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *ad=
-dr)
-> > >   {
-> > >       VhostIOVATree *tree =3D v->iova_tree;
-> > > @@ -316,11 +352,69 @@ dma_map_err:
-> > >   static int vhost_vdpa_net_cvq_start(NetClientState *nc)
-> > >   {
-> > >       VhostVDPAState *s;
-> > > -    int r;
-> > > +    struct vhost_vdpa *v;
-> > > +    uint64_t backend_features;
-> > > +    int64_t cvq_group;
-> > > +    int cvq_index, r;
-> > >
-> > >       assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
-> > >
-> > >       s =3D DO_UPCAST(VhostVDPAState, nc, nc);
-> > > +    v =3D &s->vhost_vdpa;
-> > > +
-> > > +    v->shadow_data =3D s->always_svq;
-> > > +    v->shadow_vqs_enabled =3D s->always_svq;
-> > > +    s->vhost_vdpa.address_space_id =3D VHOST_VDPA_GUEST_PA_ASID;
-> > > +
-> > > +    if (s->always_svq) {
-> > > +        goto out;
-> > > +    }
-> > > +
-> > > +    /* Backend features are not available in v->dev yet. */
-> > > +    r =3D ioctl(v->device_fd, VHOST_GET_BACKEND_FEATURES, &backend_f=
-eatures);
-> > > +    if (unlikely(r < 0)) {
-> > > +        error_report("Cannot get vdpa backend_features: %s(%d)",
-> > > +            g_strerror(errno), errno);
-> > > +        return -1;
-> > > +    }
-> > > +    if (!(backend_features & VHOST_BACKEND_F_IOTLB_ASID) ||
-> > > +        !vhost_vdpa_net_valid_svq_features(v->dev->features, NULL)) =
-{
-> >
-> >
-> > I think there should be some logic to block migration in this case?
-> >
->
-> Since vhost_vdpa are not shadowed they don't expose _F_LOG, so
-> migration is blocked that way.
->
-> We can override it to make its message a little bit clearer.
->
-> >
-> > > +        return 0;
-> > > +    }
-> > > +
-> > > +    /**
-> > > +     * Check if all the virtqueues of the virtio device are in a dif=
-ferent vq
-> > > +     * than the last vq. VQ group of last group passed in cvq_group.
-> > > +     */
-> > > +    cvq_index =3D v->dev->vq_index_end - 1;
-> > > +    cvq_group =3D vhost_vdpa_get_vring_group(v->device_fd, cvq_index=
-);
-> > > +    if (unlikely(cvq_group < 0)) {
-> > > +        return cvq_group;x
-> > > +    }
-> > > +    for (int i =3D 0; i < cvq_index; ++i) {
-> > > +        int64_t group =3D vhost_vdpa_get_vring_group(v->device_fd, i=
-);
-> > > +
-> > > +        if (unlikely(group < 0)) {
-> > > +            return group;
-> > > +        }
-> > > +
-> > > +        if (unlikely(group =3D=3D cvq_group)) {
-> > > +            warn_report(
-> > > +                "CVQ %"PRId64" group is the same as VQ %d one (%"PRI=
-d64")",
-> > > +                cvq_group, i, group);
-> > > +            return 0;
-> >
-> >
-> > Ditto.
-> >
-> >
-> > > +        }
-> > > +    }
-> > > +
-> > > +    r =3D vhost_vdpa_set_address_space_id(v, cvq_group, VHOST_VDPA_N=
-ET_CVQ_ASID);
-> > > +    if (unlikely(r < 0)) {
-> > > +        return r;
-> > > +    } else {
-> > > +        v->shadow_vqs_enabled =3D true;
-> > > +        s->vhost_vdpa.address_space_id =3D VHOST_VDPA_NET_CVQ_ASID;
-> > > +    }
-> > > +
-> > > +out:
-> > >       if (!s->vhost_vdpa.shadow_vqs_enabled) {
-> > >           return 0;
-> > >       }
-> > > @@ -652,6 +746,7 @@ int net_init_vhost_vdpa(const Netdev *netdev, con=
-st char *name,
-> > >       g_autoptr(VhostIOVATree) iova_tree =3D NULL;
-> > >       NetClientState *nc;
-> > >       int queue_pairs, r, i =3D 0, has_cvq =3D 0;
-> > > +    bool svq_cvq;
-> > >
-> > >       assert(netdev->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
-> > >       opts =3D &netdev->u.vhost_vdpa;
-> > > @@ -693,12 +788,24 @@ int net_init_vhost_vdpa(const Netdev *netdev, c=
-onst char *name,
-> > >           return queue_pairs;
-> > >       }
-> > >
-> > > -    if (opts->x_svq) {
-> > > -        struct vhost_vdpa_iova_range iova_range;
-> > > +    svq_cvq =3D opts->x_svq || has_cvq;
-> > > +    if (svq_cvq) {
-> > > +        Error *warn =3D NULL;
-> > >
-> > > -        if (!vhost_vdpa_net_valid_svq_features(features, errp)) {
-> > > -            goto err_svq;
-> > > +        svq_cvq =3D vhost_vdpa_net_valid_svq_features(features,
-> > > +                                                   opts->x_svq ? err=
-p : &warn);
-> > > +        if (!svq_cvq) {
-> > > +            if (opts->x_svq) {
-> > > +                goto err_svq;
-> > > +            } else {
-> > > +                warn_reportf_err(warn, "Cannot shadow CVQ: ");
-> >
-> >
-> > This seems suspicious, we reach here we we can't just use svq for cvq.
-> >
->
-> Right, but what is the suspicious part?
->
-> >
-> >
-> > > +            }
-> > >           }
-> >
-> >
-> > The above logic is not easy to follow. I guess the root cause is the
-> > variable name. It looks to me svq_cvq is better to be renamed as "svq"?
-> >
->
-> Yes, we can rename it. I'll send a newer version with the rename.
->
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   include/hw/s390x/cpu-topology.h |   6 ++
+>   target/s390x/cpu.h              |  77 ++++++++++++++++++++++++
+>   hw/s390x/cpu-topology.c         |   1 -
+>   target/s390x/cpu_topology.c     | 100 ++++++++++++++++++++++++++++++++
+>   target/s390x/kvm/kvm.c          |   6 +-
+>   target/s390x/meson.build        |   1 +
+>   6 files changed, 189 insertions(+), 2 deletions(-)
+>   create mode 100644 target/s390x/cpu_topology.c
+> 
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+> index 4e16a2153d..6fec10e032 100644
+> --- a/include/hw/s390x/cpu-topology.h
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -16,6 +16,11 @@
+>   #define S390_TOPOLOGY_CPU_IFL 0x03
+>   #define S390_TOPOLOGY_MAX_ORIGIN ((63 + S390_MAX_CPUS) / 64)
+>   
+> +#define S390_TOPOLOGY_POLARITY_HORIZONTAL      0x00
+> +#define S390_TOPOLOGY_POLARITY_VERTICAL_LOW    0x01
+> +#define S390_TOPOLOGY_POLARITY_VERTICAL_MEDIUM 0x02
+> +#define S390_TOPOLOGY_POLARITY_VERTICAL_HIGH   0x03
+> +
+>   typedef struct S390TopoSocket {
+>       int active_count;
+>       uint64_t mask[S390_TOPOLOGY_MAX_ORIGIN];
+> @@ -26,6 +31,7 @@ struct S390Topology {
+>       uint32_t nr_cpus;
+>       uint32_t nr_sockets;
+>       S390TopoSocket *socket;
+> +    bool topology_needed;
+>   };
+>   
+>   #define TYPE_S390_CPU_TOPOLOGY "s390-topology"
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index c9066b2496..69a7523146 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -567,6 +567,81 @@ typedef union SysIB {
+>   } SysIB;
+>   QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
+>   
+> +/*
+> + * CPU Topology List provided by STSI with fc=15 provides a list
+> + * of two different Topology List Entries (TLE) types to specify
+> + * the topology hierarchy.
+> + *
+> + * - Container Topology List Entry
+> + *   Defines a container to contain other Topology List Entries
+> + *   of any type, nested containers or CPU.
+> + * - CPU Topology List Entry
+> + *   Specifies the CPUs position, type, entitlement and polarization
+> + *   of the CPUs contained in the last Container TLE.
+> + *
+> + * There can be theoretically up to five levels of containers, QEMU
+> + * uses only one level, the socket level.
+> + *
+> + * A container of with a nesting level (NL) greater than 1 can only
+> + * contain another container of nesting level NL-1.
+> + *
+> + * A container of nesting level 1 (socket), contains as many CPU TLE
+> + * as needed to describe the position and qualities of all CPUs inside
+> + * the container.
+> + * The qualities of a CPU are polarization, entitlement and type.
+> + *
+> + * The CPU TLE defines the position of the CPUs of identical qualities
+> + * using a 64bits mask which first bit has its offset defined by
+> + * the CPU address orgin field of the CPU TLE like in:
+> + * CPU address = origin * 64 + bit position within the mask
+> + *
+> + */
+> +/* Container type Topology List Entry */
+> +typedef struct SysIBTl_container {
+> +        uint8_t nl;
+> +        uint8_t reserved[6];
+> +        uint8_t id;
+> +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_container;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_container) != 8);
+> +
+> +/* CPU type Topology List Entry */
+> +typedef struct SysIBTl_cpu {
+> +        uint8_t nl;
+> +        uint8_t reserved0[3];
+> +        uint8_t reserved1:5;
+> +        uint8_t dedicated:1;
+> +        uint8_t polarity:2;
+> +        uint8_t type;
+> +        uint16_t origin;
+> +        uint64_t mask;
+> +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_cpu;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) != 16);
+> +
+> +#define S390_TOPOLOGY_MAG  6
+> +#define S390_TOPOLOGY_MAG6 0
+> +#define S390_TOPOLOGY_MAG5 1
+> +#define S390_TOPOLOGY_MAG4 2
+> +#define S390_TOPOLOGY_MAG3 3
+> +#define S390_TOPOLOGY_MAG2 4
+> +#define S390_TOPOLOGY_MAG1 5
+> +/* Configuration topology */
+> +typedef struct SysIB_151x {
+> +    uint8_t  reserved0[2];
+> +    uint16_t length;
+> +    uint8_t  mag[S390_TOPOLOGY_MAG];
+> +    uint8_t  reserved1;
+> +    uint8_t  mnest;
+> +    uint32_t reserved2;
+> +    char tle[0];
+> +} QEMU_PACKED QEMU_ALIGNED(8) SysIB_151x;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIB_151x) != 16);
+> +
+> +/* Max size of a SYSIB structure is when all CPU are alone in a container */
+> +#define S390_TOPOLOGY_SYSIB_SIZE (sizeof(SysIB_151x) +                         \
+> +                                  S390_MAX_CPUS * (sizeof(SysIBTl_container) + \
+> +                                                   sizeof(SysIBTl_cpu)))
+> +
+> +
+>   /* MMU defines */
+>   #define ASCE_ORIGIN           (~0xfffULL) /* segment table origin             */
+>   #define ASCE_SUBSPACE         0x200       /* subspace group control           */
+> @@ -845,4 +920,6 @@ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
+>   
+>   #include "exec/cpu-all.h"
+>   
+> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar);
+> +
+>   #endif
+> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> index 6af41d3d7b..9fa8ca1261 100644
+> --- a/hw/s390x/cpu-topology.c
+> +++ b/hw/s390x/cpu-topology.c
+> @@ -44,7 +44,6 @@ void s390_topology_new_cpu(S390CPU *cpu)
+>       int socket_id;
+>   
+>       socket_id = core_id / topo->nr_cpus;
+> -
+>       /*
+>        * At the core level, each CPU is represented by a bit in a 64bit
+>        * uint64_t which represent the presence of a CPU.
+> diff --git a/target/s390x/cpu_topology.c b/target/s390x/cpu_topology.c
+> new file mode 100644
+> index 0000000000..a1179d8e95
+> --- /dev/null
+> +++ b/target/s390x/cpu_topology.c
+> @@ -0,0 +1,100 @@
+> +/*
+> + * QEMU S390x CPU Topology
+> + *
+> + * Copyright IBM Corp. 2022
+> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "cpu.h"
+> +#include "hw/s390x/pv.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/s390x/cpu-topology.h"
+> +#include "hw/s390x/sclp.h"
+> +
+> +static char *fill_container(char *p, int level, int id)
+> +{
+> +    SysIBTl_container *tle = (SysIBTl_container *)p;
+> +
+> +    tle->nl = level;
+> +    tle->id = id;
+> +    return p + sizeof(*tle);
+> +}
+> +
+> +static char *fill_tle_cpu(char *p, uint64_t mask, int origin)
+> +{
+> +    SysIBTl_cpu *tle = (SysIBTl_cpu *)p;
+> +
+> +    tle->nl = 0;
+> +    tle->dedicated = 1;
+> +    tle->polarity = S390_TOPOLOGY_POLARITY_HORIZONTAL;
+> +    tle->type = S390_TOPOLOGY_CPU_IFL;
+> +    tle->origin = cpu_to_be64(origin * 64);
+> +    tle->mask = cpu_to_be64(mask);
+> +    return p + sizeof(*tle);
+> +}
+> +
+> +static char *s390_top_set_level2(S390Topology *topo, char *p)
+> +{
+> +    int i, origin;
+> +
+> +    for (i = 0; i < topo->nr_sockets; i++) {
+> +        if (!topo->socket[i].active_count) {
+> +            continue;
+> +        }
+> +        p = fill_container(p, 1, i);
+> +        for (origin = 0; origin < S390_TOPOLOGY_MAX_ORIGIN; origin++) {
+> +            uint64_t mask = 0L;
+> +
+> +            mask = topo->socket[i].mask[origin];
+> +            if (mask) {
+> +                p = fill_tle_cpu(p, mask, origin);
+> +            }
+> +        }
+> +    }
+> +    return p;
+> +}
 
-Another possibility is to get rid of the variable and allocate the
-iova_tree unconditionally. We could send the log in
-vhost_vdpa_net_cvq_start, or make that message the vhost migration
-blocker.
+Why is it not possible to compute this topo information at "runtime",
+when stsi is called, without maintaining state in an extra S390Topology
+object ? Couldn't we loop on the CPU list to gather the topology bits
+for the same result ?
 
-Thanks!
+It would greatly simplify the feature.
 
-> Thanks!
->
-> > Thanks
-> >
-> >
-> > > +    }
-> > > +
-> > > +    if (svq_cvq) {
-> > > +        /* Allocate a common iova tree if there is a possibility of =
-SVQ */
-> > > +        struct vhost_vdpa_iova_range iova_range;
-> > >
-> > >           vhost_vdpa_get_iova_range(vdpa_device_fd, &iova_range);
-> > >           iova_tree =3D vhost_iova_tree_new(iova_range.first, iova_ra=
-nge.last);
-> >
+C.
+
+> +static int setup_stsi(S390CPU *cpu, SysIB_151x *sysib, int level)
+> +{
+> +    S390Topology *topo = (S390Topology *)cpu->topology;
+> +    char *p = sysib->tle;
+> +
+> +    sysib->mnest = level;
+> +    switch (level) {
+> +    case 2:
+> +        sysib->mag[S390_TOPOLOGY_MAG2] = topo->nr_sockets;
+> +        sysib->mag[S390_TOPOLOGY_MAG1] = topo->nr_cpus;
+> +        p = s390_top_set_level2(topo, p);
+> +        break;
+> +    }
+> +
+> +    return p - (char *)sysib;
+> +}
+> +
+> +#define S390_TOPOLOGY_MAX_MNEST 2
+> +
+> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar)
+> +{
+> +    union {
+> +        char place_holder[S390_TOPOLOGY_SYSIB_SIZE];
+> +        SysIB_151x sysib;
+> +    } buffer QEMU_ALIGNED(8);
+> +    int len;
+> +
+> +    if (s390_is_pv() || !s390_has_topology() ||
+> +        sel2 < 2 || sel2 > S390_TOPOLOGY_MAX_MNEST) {
+> +        setcc(cpu, 3);
+> +        return;
+> +    }
+> +
+> +    len = setup_stsi(cpu, &buffer.sysib, sel2);
+> +
+> +    buffer.sysib.length = cpu_to_be16(len);
+> +    s390_cpu_virt_mem_write(cpu, addr, ar, &buffer.sysib, len);
+> +    setcc(cpu, 0);
+> +}
+> +
+> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+> index 3ac7ec9acf..7dc96f3663 100644
+> --- a/target/s390x/kvm/kvm.c
+> +++ b/target/s390x/kvm/kvm.c
+> @@ -51,6 +51,7 @@
+>   #include "hw/s390x/s390-virtio-ccw.h"
+>   #include "hw/s390x/s390-virtio-hcall.h"
+>   #include "hw/s390x/pv.h"
+> +#include "hw/s390x/cpu-topology.h"
+>   
+>   #ifndef DEBUG_KVM
+>   #define DEBUG_KVM  0
+> @@ -1919,9 +1920,12 @@ static int handle_stsi(S390CPU *cpu)
+>           if (run->s390_stsi.sel1 != 2 || run->s390_stsi.sel2 != 2) {
+>               return 0;
+>           }
+> -        /* Only sysib 3.2.2 needs post-handling for now. */
+>           insert_stsi_3_2_2(cpu, run->s390_stsi.addr, run->s390_stsi.ar);
+>           return 0;
+> +    case 15:
+> +        insert_stsi_15_1_x(cpu, run->s390_stsi.sel2, run->s390_stsi.addr,
+> +                           run->s390_stsi.ar);
+> +        return 0;
+>       default:
+>           return 0;
+>       }
+> diff --git a/target/s390x/meson.build b/target/s390x/meson.build
+> index 84c1402a6a..890ccfa789 100644
+> --- a/target/s390x/meson.build
+> +++ b/target/s390x/meson.build
+> @@ -29,6 +29,7 @@ s390x_softmmu_ss.add(files(
+>     'sigp.c',
+>     'cpu-sysemu.c',
+>     'cpu_models_sysemu.c',
+> +  'cpu_topology.c',
+>   ))
+>   
+>   s390x_user_ss = ss.source_set()
 
