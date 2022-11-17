@@ -2,296 +2,294 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A502262D067
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 02:10:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A63BC62D0B8
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 02:39:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233521AbiKQBKk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Nov 2022 20:10:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53234 "EHLO
+        id S238981AbiKQBjf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Nov 2022 20:39:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231634AbiKQBKj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Nov 2022 20:10:39 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F481DF11
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 17:10:37 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id k7so174182pll.6
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 17:10:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7v+d6JaDwJ1bpDb3Wp/Ga4NomYsL48wpwJx8dilZwfw=;
-        b=WIg3/uWSqDpX6Onm/kPloKuk/2+xMLTM0HDwO+4o/Sl+ZDde873x1lzDTJnfVrIQCU
-         aTsG5Yc9J4fWtWHq5MHON7C6QMA3JzwJaLoTCEEjYTWj28cxXcJ0xVOBecnqsl9hGcJx
-         tD3gISsdr6P+3hP/nMRKirHZztE4LgDDwVOgt1q0wa+pCgZMMj4jr4nWjw91nRtcGVxv
-         2eQIuA81x/LD2MJ/az+ZAfgdyGuNseL6aQrXAeyYg0qT1XXls0x4C3hYBAlryFGfvmP7
-         6AWkcM//51S0WG93r6WY8gWlujcirESGNiMSgsuELaB3YAHmhgKC9f+Z6WjaldSyHyg+
-         4LoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7v+d6JaDwJ1bpDb3Wp/Ga4NomYsL48wpwJx8dilZwfw=;
-        b=xF2Y5g/VK5nGGQn4ORV1TZR/m3hhisseKMuwYmMNHdkH6DPg2+MMYJcqRcDLT7Q8Vs
-         pBL8jFZtvHT0rCRGcA8gjYzmwzOxaEai1/XmpX9fxXOqlx1PanPSjxbrFvZWqHxhIXFq
-         landKUoY7nQtnw/xnhEfAyRD7vobfNSwZCzRpVjIgBZLaqf1XMi8JIYJgrc243kRGdQ8
-         dagkZwnWNKl3BJUWsmmcO71NdpYZaJ6TQqHi+cl6UrAaVrdx5zeqFZX6p2O6EK4e9ql2
-         vF1upfTr6BD9UaMsSzdiWVrtrq30754TWdyisM2OlmRsxJclowOzMadK0TaMqg1AtRL/
-         RJ7g==
-X-Gm-Message-State: ANoB5plRsNV8YqGwIdPbE4ymqA8YCnVlPbCshLh0BolrXwjDpEuHNBhA
-        Jhrj79YacEZ8aQDt85OO+ha9cQ==
-X-Google-Smtp-Source: AA0mqf54RD5Pvk0svu38D8EFgCtS0Yk3hYxgOG1/bS1Fw8Mnp0BPEvRTFzA0mAmuATEQ3ScwkDA+Tg==
-X-Received: by 2002:a17:902:eb86:b0:188:c395:1748 with SMTP id q6-20020a170902eb8600b00188c3951748mr315085plg.155.1668647437276;
-        Wed, 16 Nov 2022 17:10:37 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id p129-20020a622987000000b0055f209690c0sm11547853pfp.50.2022.11.16.17.10.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Nov 2022 17:10:36 -0800 (PST)
-Date:   Thu, 17 Nov 2022 01:10:33 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Reiji Watanabe <reijiw@google.com>, kvm@vger.kernel.org,
-        Colin Ian King <colin.i.king@gmail.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Gautam Menghani <gautammenghani201@gmail.com>,
-        Peter Gonda <pgonda@google.com>,
-        Vishal Annapurve <vannapurve@google.com>
-Subject: [GIT PULL] KVM: selftests: Early pile of updates for 6.2
-Message-ID: <Y3WKCRJbbvhnyDg1@google.com>
+        with ESMTP id S231734AbiKQBjb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Nov 2022 20:39:31 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC62561BBC;
+        Wed, 16 Nov 2022 17:39:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668649170; x=1700185170;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=iBQpeqrtaHGlrge5TfNnTDad4mJORWaXlqenRg3OArc=;
+  b=XBhm4HhnVxhirx1J586eiUsJNly3R74bSW9V6bWJ4Ys5fvScgzerShA+
+   Bz3/V8irIYwjeKED6mg9qJ/UMWhLWppx4f+S1ASxGzUNWvjTiOfDbVt32
+   a2UaPnueuDfSD2NtlS0Jq4bzR16m9jAzSpIzm7l3EQfBO4DNcIap7+r0Z
+   p19VBJ7aNPFu2P2GX/an1SDJYugHSirtgxwbAg0Ck0t9qCeP6Tf0pQFv+
+   0BU1UVDymMCctC1GDtpnix9kiQ8RU16hC3Y2kU5DQk67JWvYXKCSO+Zvf
+   c5Uq+GiaSZ1EUtTmCQ4eCwPImC9L4CL96vnHZP2SSRY72646bG5xmEiul
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10533"; a="314538005"
+X-IronPort-AV: E=Sophos;i="5.96,169,1665471600"; 
+   d="scan'208";a="314538005"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2022 17:39:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10533"; a="670723222"
+X-IronPort-AV: E=Sophos;i="5.96,169,1665471600"; 
+   d="scan'208";a="670723222"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga008.jf.intel.com with ESMTP; 16 Nov 2022 17:39:29 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 16 Nov 2022 17:39:29 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 16 Nov 2022 17:39:28 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Wed, 16 Nov 2022 17:39:28 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.175)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Wed, 16 Nov 2022 17:39:28 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cUJJAM0OnPzMzwrUiuKyjQBi/h6/n1jmeEfJadXhe4wk0tKN8g1AHExRtK+nd1iuqEcaZe23D/pRVPb4Yb/YPjjjzk4nMnFOItAgFCsbyInk4zPETqCAyuv5bQ08lqL+LXvpXu4DN9htR+0DnbRxOm6W4gxVkRiKKKti1AejBrRCBqHTCjWmfoHYDVVhK/xCEflH9hOqC5AFZUJ6LX9bjQfEuBfGEN3qHuVlJhJBFwFKxbCSI1wPX9Zy23gE5l10Yz2iurTtWJocQSMXKKQH0P+7S2ID4t5PXSHxYxu1I6pK5ojxqkrrJE0KG8jTwDPS53HvE1LqjPc87YIMb7SL6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iBQpeqrtaHGlrge5TfNnTDad4mJORWaXlqenRg3OArc=;
+ b=YCuFPumyD+VHGSr49gei7XRDynCw7FNloKxZCLc3lrkjSALWJTBMBdVl4A9TROZPmRGc2PINbB5o0us9v9EoM2zo3UAR8rSOTr5F7SthxCwh0Ax2OAqVU5GmAhl1PHGfmhPG0g0wuyJL/MSx/gKGvSGqQHTYG+9z/O+kfnvz6RfgwUBsaN1Mw+RLgYClfiJlDrPZP4rdB+qhkC96rNH8uJhd4yc23KHDMnQQMFflESr4tIDQcOA1pKYCU9CI4W5y79CU7GF44qHJnVEsb6tcsDnKK8FrCUhJPpWcLqZl5i2Bpjdm8zmM/+FYhh3qFYo1kyLTcjeRfnj9B6QUK5ymqA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by PH0PR11MB5879.namprd11.prod.outlook.com (2603:10b6:510:142::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.17; Thu, 17 Nov
+ 2022 01:39:23 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e%9]) with mapi id 15.20.5813.017; Thu, 17 Nov 2022
+ 01:39:23 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "Christopherson,, Sean" <seanjc@google.com>
+CC:     "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "Yao, Yuan" <yuan.yao@intel.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "farosas@linux.ibm.com" <farosas@linux.ibm.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "palmer@dabbelt.com" <palmer@dabbelt.com>,
+        "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+        "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "anup@brainfault.org" <anup@brainfault.org>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "atishp@atishpatra.org" <atishp@atishpatra.org>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+Subject: Re: [PATCH 38/44] KVM: Disable CPU hotplug during hardware enabling
+Thread-Topic: [PATCH 38/44] KVM: Disable CPU hotplug during hardware enabling
+Thread-Index: AQHY7xJy2pUg1L4bCkib6AOkbzD9bK43arEAgAAKuoCACQqcAIABDjUAgABQgACAAI30AA==
+Date:   Thu, 17 Nov 2022 01:39:23 +0000
+Message-ID: <7fb66c497b6c41049167b05c63267cbc301b1c20.camel@intel.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+         <20221102231911.3107438-39-seanjc@google.com>
+         <88e920944de70e7d69a98f74005b49c59b5aaa3b.camel@intel.com>
+         <b198fe971cecd301f0c7c66028cfd71dd7ba7e62.camel@intel.com>
+         <Y3PzhANShVlTXVg1@google.com>
+         <95ca433349eca601bdd2b16d70f59ba8e56d8e3f.camel@intel.com>
+         <Y3UZtoIidMyE8qVz@google.com>
+In-Reply-To: <Y3UZtoIidMyE8qVz@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|PH0PR11MB5879:EE_
+x-ms-office365-filtering-correlation-id: 6ab8cb02-59d6-4afa-68ce-08dac83c8e15
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: f5P0R/Sa6DuiidOTMabBVeIjLdxD66eSqMIXFhlMaPUtNU3o+UHhq1yVIaW2G2O8w0YHsAY4I14z/RxfFI1hjJOYxg+++F9HHUIApk3RxirGTbgDkx2x3Gk44hnaiezXFfHpvLeU0J76+uykkwIBsl9gH6phpn39Fo0Y6MImU2tHQl9selW1zIf+shYEpa5mm4zdCxXeO64E2Ah7+pn39DHwxvs+mhUw8vCQpD/ftVtexOtex+eAl7t2bNejDExX+9bNQEk3DA2vhwP19k3SsVHGUj7Km3stfOT/luH+SuE92H3LmEFrCttoy6k7GAJ/7cTR83wRbmG5K7cjqS875jrtFpFCWzPOVpJ+rVwMSG4aBivKUdq8r+i12nLgzvJicqVE8Xlhem7TNqXs8CKCYqTnrrYVTKdFXt1NdYaddtXNV0MHbnpqw812o+94U+UK0mQ8aEUyDpk/H/4MBH5w44s4lZ/2xWh6yMlQv0qm/RT2sMh/jk/YUyo1qSIppD3xaEr5t+II4HruGDjRaF7EaeeCbE8DMS66L2vWpEcFaqUr0FwwmclQX77arRj/TMEX0gPN59bCdkQVqLxWJZNp5Lkou5KAuWmj0USLmPQ+A3U5UHUAZ1fcX237haOAHgRjrU05zC2EVP4o74OVAddIpUDXI4TQdyAwZlFNe/RDNRUtn59Aw19TF2NufSUNPM66V0XGOrLyhARmWYFfM0Xzd7GCor2UlzoxuWkNZTNNTdlqH8Z44phNNjk/XCT97e8jvCb7FrwuSf5F/vXJc1/4Xg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(396003)(346002)(366004)(39860400002)(136003)(451199015)(6916009)(54906003)(6506007)(316002)(83380400001)(2906002)(4001150100001)(41300700001)(186003)(8936002)(36756003)(26005)(7416002)(2616005)(64756008)(6512007)(66946007)(66556008)(66446008)(91956017)(76116006)(7406005)(8676002)(5660300002)(4326008)(66476007)(38070700005)(478600001)(6486002)(122000001)(38100700002)(86362001)(107886003)(71200400001)(82960400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NkcyVTBOV0hwSE1Rbi9VVm03VDN1VlZkZXZmUitSZCtRSWdWak5BekFwOVEw?=
+ =?utf-8?B?Qjh2Ykk2TjJyWVdOTHN4VE9FYVhMWGx3cy9RMERZQVJqU01xNTk0Mk9Qa0pO?=
+ =?utf-8?B?WUZ0R1loOGdRUXhZQzZHcHFEZkRZT2h6UGZ0L2lPbTNwYlN1WHVHbWlmS0pI?=
+ =?utf-8?B?Q3lnL0RMeEg3MlZUTXBmYzFOblhYNytnZzFZM2VRUnBqVlNaaU8zSFcrdCtT?=
+ =?utf-8?B?L3RYTG81NXlXMXROdjJWbjQ4VTM5ZEpWM1NDekpyZjdHVERFSnM3ZGxwaGxG?=
+ =?utf-8?B?WDg0eERYTnl1eUJCWnNIb2Fnc3N3NWRsaE9na2Q2N2ZFb2RWSWJqLy9rUDZM?=
+ =?utf-8?B?S1V5YmJORkZaUlJLVVBCTDdjS3ZxSFNlRXJLeGI5Y3RHaWUyZ0QwZ293SEFT?=
+ =?utf-8?B?Y0NReUo0NlJ6LzBZU3NUR3hXM2gwSWxaOXZxbm5USXM3ZllRcGt4R2NRUWVD?=
+ =?utf-8?B?aG1SNkllOEQrUGJGVU5UNW5XNkw3a3B5enU5WWk0ZjVhajdtdGIxTzl6Vzdy?=
+ =?utf-8?B?M0MvZU85OUlsSWQ4VjRob1JPVlNJYVFnZzNiZEgxT0pKTHNBL1RDVEkvQkJU?=
+ =?utf-8?B?a3FlYVluQVlHd2k1ZjZJeUlCUEhROC84SEo1Q0ZVZVR0cmdFZm5QSG95Nlcr?=
+ =?utf-8?B?NExGdVA0ZjQwejNsR3diVHkrTVNwKysraFA3clZMRGRTdFlaM1lLM0FndUdk?=
+ =?utf-8?B?MHVpeTQwZU1aeUNRRmh0VXNlc3NJUThlTUhTNDdBQVB6Z2l3V0YzSkRheVZT?=
+ =?utf-8?B?TSs5Q0RYbGVONGJScC9rd3NwblM5ckhKYm9kUGdNZDIwRkZSeEdqdXlPcVpW?=
+ =?utf-8?B?TTc2WEkwNjVmeThER0lFTHZ5VzdPWUtyZGhEZVRxTi9HajBNQmJBWm5oTWkv?=
+ =?utf-8?B?UGhHNXZ1bHpXR0g5ZDV0dFNmZFRUSXBPdXgyeUllMFhwZzB0R0hETXlFcksy?=
+ =?utf-8?B?ai9zRE81MkRIcGpEVEUzS3UzdFM0NytmbHprZTA4R0NsM2ViNFpkRlcwRkg1?=
+ =?utf-8?B?YUU5b1NENkVqd2oyVjR3bktERWt6MkNMRDNnaitzRzlzcUJueDlsZnJNbVd0?=
+ =?utf-8?B?QlAra1B5dnlETnIrL0RCR2hVZGR2d21ST0NPTlgwZzBGZmxPS01ZNUVQdkJY?=
+ =?utf-8?B?YVdJOXY4Vm1HOFl2VjhzdERISnN2RUd0R1FXN1RpZ1dqZGMyZENoUVdLamth?=
+ =?utf-8?B?OXhOZ3ZSdXVQTE1MTmNiVlUyTWtzVFh2L24vK0VCRE5paUxQbk82ZmRFeXlm?=
+ =?utf-8?B?bEVoYnVOWDRVQzhmTVVYMXZrL25xTExjY01YZzltOVlGS2t0SGozSTAxSW5p?=
+ =?utf-8?B?WEhQUU1nMVlYeWZ2eHJiM21xUEVpbTl4azluUWFyTXM4dkJMYWs4R3VEc2pr?=
+ =?utf-8?B?QVU1ZE5CUlZuckw3WUpsUHd1YnNoZkx2dWlWcjZmMUdNNE91NHo2Ri96bVNw?=
+ =?utf-8?B?UHJDT2FaWWF3Q0JjVVoxM2FrM3NwL2ZwdElUa0V4c3Vac1JOaW94dEFpMWVU?=
+ =?utf-8?B?UVpTYTVIK2NLRXplMkVIQjlYOHdVRVVmZVdtdW9ndWEvVmZNc29FbTVCSDJt?=
+ =?utf-8?B?YzQzQjVNcS9JMS9obkU1TzU5Nm9JMGUxV2ZITldKRXZyK1Y4SFpCOWZxRm4z?=
+ =?utf-8?B?SDdPdk8xZWc1VHJ0OGh3Rkg2ekZ6T3B1Q2NyU2J3MzZnbEtyMWZIOEl6YXBM?=
+ =?utf-8?B?bysxNG5XYWxyRkEzMVk1Sk9VWnZyb2xwZ3ZSRDJYV0s0SEQ1QTNCYkI3SVZE?=
+ =?utf-8?B?ZU1YRHEvdE9PYXJvOFMzdUlnRGNEZnBucEVaTjU4Y1FJSlNxelN4bTdKYWpa?=
+ =?utf-8?B?ZC9LWmU1UHN2QWkrRHozOG5tb0xhbE1ibkY2aHBudS9UdjJHbWlpYVQ0QXhK?=
+ =?utf-8?B?Z2MvM3dOMS80NjR0cmRiMWtvcEtUN2lpTTcyNXYrSjM1MHY2TkVYcFZ5R2Vl?=
+ =?utf-8?B?b2t2TElMckpqNVRGQ1ZXTE94engyNE5vd3QxUWdSS1FIREJ6cEZZTFhLN2Jp?=
+ =?utf-8?B?ajVMS1pLTXJRUkw0cmxud2hPcXZFdkczSmFYZURnQ0pQdUViMFZ3dlBueGRp?=
+ =?utf-8?B?aU40ZGdscTJoUHdlOVhpL1Z4Mlc3azI0OWgrL2hwNm1JeDJpd3dSZEhMZm9l?=
+ =?utf-8?B?VnprR1M5bWlGZHFwWS8yYUxQdXRYanpENVZrczB6aUpRZGdsVDBRV3cvRmN0?=
+ =?utf-8?B?ZEE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F54AC5CCCB2F23488B6462F9C09B78E2@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6ab8cb02-59d6-4afa-68ce-08dac83c8e15
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Nov 2022 01:39:23.3394
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: BQ+AQyt25yfnSs7G/WSbu9oz3roM3teoSn2opyX0oJVGKMwSJlJtNSsPqvPPmXqgn4THPWjDmYbKYURTbBoPoQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5879
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Please pull a set of selftests updates for 6.2.  Many of these changes are
-prep work for future selftests, e.g. for SEV and TDX, and/or have myriad
-conflicts, e.g. the former "perf util" code.  I am hoping to get these
-changes queued up for 6.2 sooner than later so that the chain of dependent
-work doesn't get too long.
-
-Except for the ARM single-step changes[*], everything has been posted for
-quite some time and/or has gone through multiple rounds of review.
-
-The ARM single-step changes are a last minute fix to resolve a hilarious
-(IMO) collision between the pool-based ucall implementation and the
-recently added single-step test.  Turns out that GCC will generate older
-flavors of atomics that rely on a monitor to detect conflicts, and that
-monitor is cleared by eret.  gdb is allegedly smart enough to skip over
-atomic sequences, but our selftest... not so much.
-
-Note, there's one KVM x86 patch hiding in here (cleanup for code that gets
-copied into selftests), but its quite innocuous and shouldn't conflict
-with anything.
-
-Regarding the "perf util" conflicts, I'm mostly certain I got them right,
-but it wouldn't be a bad idea for the folks involved (Cc'd) to double
-check that the end result looks correct.
-
-[*] https://lore.kernel.org/all/20221117002350.2178351-1-seanjc@google.com
-
-
-The following changes since commit d663b8a285986072428a6a145e5994bc275df994:
-
-  KVM: replace direct irq.h inclusion (2022-11-09 12:31:37 -0500)
-
-are available in the Git repository at:
-
-  https://github.com/kvm-x86/linux tags/kvm-selftests-6.2-1
-
-for you to fetch changes up to 5c107f7085f45e071bbcf13006fffccd8e5de0e1:
-
-  KVM: selftests: Assert in prepare_eptp() that nEPT is supported (2022-11-16 16:59:07 -0800)
-
-----------------------------------------------------------------
-KVM selftests updates for 6.2
-
-perf_util:
- - Add support for pinning vCPUs in dirty_log_perf_test.
- - Add a lightweight psuedo RNG for guest use, and use it to randomize
-   the access pattern and write vs. read percentage in the so called
-   "perf util" tests.
- - Rename the so called "perf_util" framework to "memstress".
-
-ucall:
- - Add a common pool-based ucall implementation (code dedup and pre-work
-   for running SEV (and beyond) guests in selftests.
- - Fix an issue in ARM's single-step test when using the new pool-based
-   implementation; atomics don't play nice with single-step exceptions.
-
-init:
- - Provide a common constructor and arch hook, which will eventually be
-   used by x86 to automatically select the right hypercall (AMD vs. Intel).
-
-x86:
- - Clean up x86's page tabe management.
- - Clean up and enhance the "smaller maxphyaddr" test, and add a related
-   test to cover generic emulation failure.
- - Clean up the nEPT support checks.
- - Add X86_PROPERTY_* framework to retrieve multi-bit CPUID values.
-
-----------------------------------------------------------------
-Colin Ian King (1):
-      KVM: selftests: Fix spelling mistake "begining" -> "beginning"
-
-Colton Lewis (4):
-      KVM: selftests: implement random number generator for guest code
-      KVM: selftests: create -r argument to specify random seed
-      KVM: selftests: randomize which pages are written vs read
-      KVM: selftests: randomize page access order
-
-David Matlack (13):
-      KVM: selftests: Rename perf_test_util.[ch] to memstress.[ch]
-      KVM: selftests: Rename pta (short for perf_test_args) to args
-      KVM: selftests: Rename perf_test_util symbols to memstress
-      KVM: selftests: Rename emulator_error_test to smaller_maxphyaddr_emulation_test
-      KVM: selftests: Explicitly require instructions bytes
-      KVM: selftests: Delete dead ucall code
-      KVM: selftests: Move flds instruction emulation failure handling to header
-      KVM: x86/mmu: Use BIT{,_ULL}() for PFERR masks
-      KVM: selftests: Copy KVM PFERR masks into selftests
-      KVM: selftests: Expect #PF(RSVD) when TDP is disabled
-      KVM: selftests: Add a test for KVM_CAP_EXIT_ON_EMULATION_FAILURE
-      KVM: selftests: Check for KVM nEPT support using "feature" MSRs
-      KVM: selftests: Assert in prepare_eptp() that nEPT is supported
-
-Gautam Menghani (1):
-      KVM: selftests: Don't assume vcpu->id is '0' in xAPIC state test
-
-Peter Gonda (2):
-      tools: Add atomic_test_and_set_bit()
-      KVM: selftests: Add ucall pool based implementation
-
-Sean Christopherson (28):
-      KVM: arm64: selftests: Disable single-step with correct KVM define
-      KVM: arm64: selftests: Disable single-step without relying on ucall()
-      KVM: selftests: Consolidate common code for populating ucall struct
-      KVM: selftests: Consolidate boilerplate code in get_ucall()
-      KVM: selftests: Automatically do init_ucall() for non-barebones VMs
-      KVM: selftests: Make arm64's MMIO ucall multi-VM friendly
-      KVM: selftests: Drop now-unnecessary ucall_uninit()
-      KVM: selftests: Drop helpers to read/write page table entries
-      KVM: selftests: Drop reserved bit checks from PTE accessor
-      KVM: selftests: Remove useless shifts when creating guest page tables
-      KVM: selftests: Verify parent PTE is PRESENT when getting child PTE
-      KVM: selftests: Use virt_get_pte() when getting PTE pointer
-      KVM: selftests: Use vm_get_page_table_entry() in addr_arch_gva2gpa()
-      KVM: selftests: Play nice with huge pages when getting PTEs/GPAs
-      KVM: selftests: Avoid JMP in non-faulting path of KVM_ASM_SAFE()
-      KVM: selftests: Provide error code as a KVM_ASM_SAFE() output
-      KVM: selftests: Add X86_FEATURE_PAE and use it calc "fallback" MAXPHYADDR
-      KVM: selftests: Refactor X86_FEATURE_* framework to prep for X86_PROPERTY_*
-      KVM: selftests: Add X86_PROPERTY_* framework to retrieve CPUID values
-      KVM: selftests: Use X86_PROPERTY_MAX_KVM_LEAF in CPUID test
-      KVM: selftests: Refactor kvm_cpuid_has() to prep for X86_PROPERTY_* support
-      KVM: selftests: Add kvm_cpu_*() support for X86_PROPERTY_*
-      KVM: selftests: Convert AMX test to use X86_PROPRETY_XXX
-      KVM: selftests: Convert vmx_pmu_caps_test to use X86_PROPERTY_*
-      KVM: selftests: Add PMU feature framework, use in PMU event filter test
-      KVM: selftests: Add dedicated helpers for getting x86 Family and Model
-      KVM: selftests: Add and use KVM helpers for x86 Family and Model
-      KVM: selftests: Drop helpers for getting specific KVM supported CPUID entry
-
-Vipin Sharma (7):
-      KVM: selftests: Add missing break between -e and -g option in dirty_log_perf_test
-      KVM: selftests: Put command line options in alphabetical order in dirty_log_perf_test
-      KVM: selftests: Add atoi_paranoid() to catch errors missed by atoi()
-      KVM: selftests: Use SZ_* macros from sizes.h in max_guest_memory_test.c
-      KVM: selftests: Shorten the test args in memslot_modification_stress_test.c
-      KVM: selftests: Add atoi_positive() and atoi_non_negative() for input validation
-      KVM: selftests: Allowing running dirty_log_perf_test on specific CPUs
-
-Vishal Annapurve (3):
-      KVM: selftests: move common startup logic to kvm_util.c
-      KVM: selftests: Add arch specific initialization
-      KVM: selftests: Add arch specific post vm creation hook
-
- arch/x86/include/asm/kvm_host.h                                          |  20 +++---
- tools/arch/x86/include/asm/atomic.h                                      |   7 ++
- tools/include/asm-generic/atomic-gcc.h                                   |  12 ++++
- tools/testing/selftests/kvm/.gitignore                                   |   3 +-
- tools/testing/selftests/kvm/Makefile                                     |   8 ++-
- tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c                    |   3 -
- tools/testing/selftests/kvm/aarch64/arch_timer.c                         |  29 ++------
- tools/testing/selftests/kvm/aarch64/debug-exceptions.c                   |  32 ++++-----
- tools/testing/selftests/kvm/aarch64/hypercalls.c                         |   3 -
- tools/testing/selftests/kvm/aarch64/psci_test.c                          |   1 -
- tools/testing/selftests/kvm/aarch64/vgic_init.c                          |   2 -
- tools/testing/selftests/kvm/aarch64/vgic_irq.c                           |  10 +--
- tools/testing/selftests/kvm/access_tracking_perf_test.c                  |  22 +++---
- tools/testing/selftests/kvm/demand_paging_test.c                         |  24 +++----
- tools/testing/selftests/kvm/dirty_log_perf_test.c                        | 130 ++++++++++++++++++++++-----------
- tools/testing/selftests/kvm/dirty_log_test.c                             |   3 -
- tools/testing/selftests/kvm/include/kvm_util_base.h                      |  28 ++++++++
- tools/testing/selftests/kvm/include/memstress.h                          |  72 +++++++++++++++++++
- tools/testing/selftests/kvm/include/perf_test_util.h                     |  63 ----------------
- tools/testing/selftests/kvm/include/test_util.h                          |  25 +++++++
- tools/testing/selftests/kvm/include/ucall_common.h                       |  10 ++-
- tools/testing/selftests/kvm/include/x86_64/processor.h                   | 364 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------------------
- tools/testing/selftests/kvm/include/x86_64/vmx.h                         |   2 +-
- tools/testing/selftests/kvm/kvm_page_table_test.c                        |   6 +-
- tools/testing/selftests/kvm/lib/aarch64/processor.c                      |  18 ++---
- tools/testing/selftests/kvm/lib/aarch64/ucall.c                          | 102 ++++----------------------
- tools/testing/selftests/kvm/lib/elf.c                                    |   2 +-
- tools/testing/selftests/kvm/lib/kvm_util.c                               |  85 +++++++++++++++++++++-
- tools/testing/selftests/kvm/lib/{perf_test_util.c => memstress.c}        | 133 ++++++++++++++++++++--------------
- tools/testing/selftests/kvm/lib/riscv/ucall.c                            |  42 ++---------
- tools/testing/selftests/kvm/lib/s390x/ucall.c                            |  39 ++--------
- tools/testing/selftests/kvm/lib/test_util.c                              |  36 ++++++++++
- tools/testing/selftests/kvm/lib/ucall_common.c                           | 103 ++++++++++++++++++++++++++
- tools/testing/selftests/kvm/lib/x86_64/{perf_test_util.c => memstress.c} |  37 +++++-----
- tools/testing/selftests/kvm/lib/x86_64/processor.c                       | 225 +++++++++++++++++++++++----------------------------------
- tools/testing/selftests/kvm/lib/x86_64/ucall.c                           |  39 ++--------
- tools/testing/selftests/kvm/lib/x86_64/vmx.c                             |  12 ++--
- tools/testing/selftests/kvm/max_guest_memory_test.c                      |  21 +++---
- tools/testing/selftests/kvm/memslot_modification_stress_test.c           |  38 +++++-----
- tools/testing/selftests/kvm/memslot_perf_test.c                          |  28 ++------
- tools/testing/selftests/kvm/rseq_test.c                                  |   4 --
- tools/testing/selftests/kvm/s390x/memop.c                                |   2 -
- tools/testing/selftests/kvm/s390x/resets.c                               |   2 -
- tools/testing/selftests/kvm/s390x/sync_regs_test.c                       |   3 -
- tools/testing/selftests/kvm/set_memory_region_test.c                     |   5 +-
- tools/testing/selftests/kvm/steal_time.c                                 |   1 -
- tools/testing/selftests/kvm/system_counter_offset_test.c                 |   1 -
- tools/testing/selftests/kvm/x86_64/amx_test.c                            | 105 +++++++--------------------
- tools/testing/selftests/kvm/x86_64/cpuid_test.c                          |  11 +--
- tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c                 |   3 -
- tools/testing/selftests/kvm/x86_64/emulator_error_test.c                 | 193 -------------------------------------------------
- tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c      |  45 ++++++++++++
- tools/testing/selftests/kvm/x86_64/flds_emulation.h                      |  55 ++++++++++++++
- tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c                        |   3 -
- tools/testing/selftests/kvm/x86_64/hyperv_features.c                     |   3 +-
- tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c                  |   5 +-
- tools/testing/selftests/kvm/x86_64/platform_info_test.c                  |   3 -
- tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c               |  77 +++++---------------
- tools/testing/selftests/kvm/x86_64/set_sregs_test.c                      |   3 -
- tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c   | 111 ++++++++++++++++++++++++++++
- tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c         |   3 -
- tools/testing/selftests/kvm/x86_64/sync_regs_test.c                      |   3 -
- tools/testing/selftests/kvm/x86_64/userspace_io_test.c                   |   3 -
- tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c             |   3 -
- tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c                  |   1 +
- tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c                   |  19 +----
- tools/testing/selftests/kvm/x86_64/xapic_state_test.c                    |   4 +-
- 67 files changed, 1353 insertions(+), 1157 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/include/memstress.h
- delete mode 100644 tools/testing/selftests/kvm/include/perf_test_util.h
- rename tools/testing/selftests/kvm/lib/{perf_test_util.c => memstress.c} (63%)
- create mode 100644 tools/testing/selftests/kvm/lib/ucall_common.c
- rename tools/testing/selftests/kvm/lib/x86_64/{perf_test_util.c => memstress.c} (68%)
- delete mode 100644 tools/testing/selftests/kvm/x86_64/emulator_error_test.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/flds_emulation.h
- create mode 100644 tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
+T24gV2VkLCAyMDIyLTExLTE2IGF0IDE3OjExICswMDAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBPbiBXZWQsIE5vdiAxNiwgMjAyMiwgSHVhbmcsIEthaSB3cm90ZToNCj4gPiBPbiBU
+dWUsIDIwMjItMTEtMTUgYXQgMjA6MTYgKzAwMDAsIFNlYW4gQ2hyaXN0b3BoZXJzb24gd3JvdGU6
+DQo+ID4gPiBPbiBUaHUsIE5vdiAxMCwgMjAyMiwgSHVhbmcsIEthaSB3cm90ZToNCj4gPiA+ID4g
+T24gVGh1LCAyMDIyLTExLTEwIGF0IDAxOjMzICswMDAwLCBIdWFuZywgS2FpIHdyb3RlOg0KPiA+
+ID4gPiBIbW0uLiBJIHdhc24ndCB0aGlua2luZyB0aG9yb3VnaGx5LiAgSSBmb3Jnb3QgQ1BVIGNv
+bXBhdGliaWxpdHkgY2hlY2sgYWxzbw0KPiA+ID4gPiBoYXBwZW5zIG9uIGFsbCBvbmxpbmUgY3B1
+cyB3aGVuIGxvYWRpbmcgS1ZNLiAgRm9yIHRoaXMgY2FzZSwgSVJRIGlzIGRpc2FibGVkIGFuZA0K
+PiA+ID4gPiBjcHVfYWN0aXZlKCkgaXMgdHJ1ZS4gIEZvciB0aGUgaG90cGx1ZyBjYXNlLCBJUlEg
+aXMgZW5hYmxlZCBidXQgIGNwdV9hY3RpdmUoKSBpcw0KPiA+ID4gPiBmYWxzZS4NCj4gPiA+IA0K
+PiA+ID4gQWN0dWFsbHksIHlvdSdyZSByaWdodCAoYW5kIHdyb25nKS4gIFlvdSdyZSByaWdodCBp
+biB0aGF0IHRoZSBXQVJOIGlzIGZsYXdlZC4gIEFuZA0KPiA+ID4gdGhlIHJlYXNvbiBmb3IgdGhh
+dCBpcyBiZWNhdXNlIHlvdSdyZSB3cm9uZyBhYm91dCB0aGUgaG90cGx1ZyBjYXNlLiAgSW4gdGhp
+cyB2ZXJzaW9uDQo+ID4gPiBvZiB0aGluZ3MsIHRoZSBjb21wYXRpYmlsaXR5IGNoZWNrcyBhcmUg
+cm91dGVkIHRocm91Z2ggaGFyZHdhcmUgZW5hYmxpbmcsIGkuZS4gdGhpcw0KPiA+ID4gZmxvdyBp
+cyB1c2VkIG9ubHkgd2hlbiBsb2FkaW5nIEtWTS4gIFRoaXMgaGVscGVyIHNob3VsZCBvbmx5IGJl
+IGNhbGxlZCB2aWEgU01QIGZ1bmN0aW9uDQo+ID4gPiBjYWxsLCB3aGljaCBtZWFucyB0aGF0IElS
+UXMgc2hvdWxkIGFsd2F5cyBiZSBkaXNhYmxlZC4NCj4gPiANCj4gPiBEaWQgeW91IG1lYW4gYmVs
+b3cgY29kZSBjaGFuZ2UgaW4gbGF0ZXIgcGF0Y2ggIltQQVRDSCAzOS80NF0gS1ZNOiBEcm9wDQo+
+ID4ga3ZtX2NvdW50X2xvY2sgYW5kIGluc3RlYWQgcHJvdGVjdCBrdm1fdXNhZ2VfY291bnQgd2l0
+aCBrdm1fbG9jayI/DQo+ID4gDQo+ID4gIAkvKg0KPiA+ICAJICogQWJvcnQgdGhlIENQVSBvbmxp
+bmUgcHJvY2VzcyBpZiBoYXJkd2FyZSB2aXJ0dWFsaXphdGlvbiBjYW5ub3QNCj4gPiAgCSAqIGJl
+IGVuYWJsZWQuIE90aGVyd2lzZSBydW5uaW5nIFZNcyB3b3VsZCBlbmNvdW50ZXIgdW5yZWNvdmVy
+YWJsZQ0KPiA+IEBAIC01MDM5LDEzICs1MDM5LDE2IEBAIHN0YXRpYyBpbnQga3ZtX29ubGluZV9j
+cHUodW5zaWduZWQgaW50IGNwdSkNCj4gPiAgCWlmIChrdm1fdXNhZ2VfY291bnQpIHsNCj4gPiAg
+CQlXQVJOX09OX09OQ0UoYXRvbWljX3JlYWQoJmhhcmR3YXJlX2VuYWJsZV9mYWlsZWQpKTsNCj4g
+PiAgDQo+ID4gKwkJbG9jYWxfaXJxX3NhdmUoZmxhZ3MpOw0KPiA+ICAJCWhhcmR3YXJlX2VuYWJs
+ZV9ub2xvY2soTlVMTCk7DQo+ID4gKwkJbG9jYWxfaXJxX3Jlc3RvcmUoZmxhZ3MpOw0KPiANCj4g
+U29ydCBvZi4gIFdoYXQgSSB3YXMgc2F5aW5nIGlzIHRoYXQgaW4gdGhpcyB2MSwgdGhlIGNvbXBh
+dGliaWxpdHkgY2hlY2tzIHRoYXQgYXJlDQo+IGRvbmUgZHVyaW5nIGhhcndhcmUgZW5hYmxpbmcg
+YXJlIGluaXRpYXRlZCBmcm9tIHZlbmRvciBjb2RlLCBpLmUuIFZNWCBhbmQgU1ZNIGNhbGwNCj4g
+e3N2bSx2bXh9X2NoZWNrX3Byb2Nlc3Nvcl9jb21wYXQoKSBkaXJlY3RseS4gIEFzIGEgcmVzdWx0
+LCB0aGUgY29tcGF0IGNoZWNrcyB0aGF0DQo+IGFyZSBoYW5kbGVkIGluIGNvbW1vbiBjb2RlOg0K
+PiANCj4gCWlmIChfX2NyNF9yZXNlcnZlZF9iaXRzKGNwdV9oYXMsIGMpICE9DQo+IAkgICAgX19j
+cjRfcmVzZXJ2ZWRfYml0cyhjcHVfaGFzLCAmYm9vdF9jcHVfZGF0YSkpDQo+IAkJcmV0dXJuIC1F
+SU87DQo+IA0KPiBhcmUgc2tpcHBlZC4gIEFuZCBpZiB0aGF0J3MgZml4ZWQsIHRoZW4gdGhlIGFi
+b3ZlIGhhcmR3YXJlX2VuYWJsZV9ub2xvY2soKSBjYWxsDQo+IHdpbGwgYm91bmNlIHRocm91Z2gg
+a3ZtX3g4Nl9jaGVja19wcm9jZXNzb3JfY29tcGF0aWJpbGl0eSgpIHdpdGggSVJRcyBlbmFibGVk
+DQo+IG9uY2UgdGhlIEtWTSBob3RwbHVnIGhvb2sgaXMgbW92ZWQgdG8gdGhlIE9OTElORSBzZWN0
+aW9uLg0KDQpPaCBJIHNlZS4gIFNvIHlvdSBzdGlsbCB3YW50IHRoZSBrdm1feDg2X29wcy0+Y2hl
+Y2tfcHJvY2Vzc29yX2NvbXBhdGliaWxpdHkoKSwNCmluIG9yZGVyIHRvIGF2b2lkIGR1cGxpY2F0
+aW5nIHRoZSBhYm92ZSBjb2RlIGluIFNWTSBhbmQgVk1YLg0KDQo+IA0KPiBBcyBhYm92ZSwgdGhl
+IHNpbXBsZSAiZml4IiB3b3VsZCBiZSB0byBkaXNhYmxlIElSUXMsIGJ1dCB0aGF0J3Mgbm90IGFj
+dHVhbGx5DQo+IG5lY2Vzc2FyeS4gIFRoZSBvbmx5IHJlcXVpcmVtZW50IGlzIHRoYXQgcHJlZW1w
+dGlvbiBpcyBkaXNhYmxlZCBzbyB0aGF0IHRoZSBjaGVja3MNCj4gYXJlIGRvbmUgb24gdGhlIGN1
+cnJlbnQgQ1BVLiDCoA0KPiANCg0KUHJvYmFibHkgZXZlbiBwcmVlbXB0aW9uIGlzIGFsbG93ZWQs
+IGFzIGxvbmcgYXMgdGhlIGNvbXBhdGliaWxpdHkgY2hlY2sgaXMgbm90DQpzY2hlZHVsZWQgdG8g
+YW5vdGhlciBjcHUuDQoNCg0KPiBUaGUgIklSUXMgZGlzYWJsZWQiIGNoZWNrIHdhcyBhIGRlbGli
+ZXJhdGVseQ0KPiBhZ3Jlc3NpdmUgV0FSTiB0aGF0IHdhcyBhZGRlZCB0byBndWFyZCBhZ2FpbnN0
+IGRvaW5nIGNvbXBhdGliaWxpdHkgY2hlY2tzIGZyb20NCj4gdGhlICJ3cm9uZyIgbG9jYXRpb24u
+DQo+IA0KPiBFLmcuIHRoaXMgaXMgd2hhdCBJIGVuZGVkIHVwIHdpdGggZm9yIGEgY2hhbmdlbG9n
+IHRvIGRyb3AgdGhlIGlycXNfZGlzYWJsZWQoKQ0KPiBjaGVjayBhbmQgZm9yIHRoZSBlbmQgY29k
+ZSAodGhvdWdoIGl0J3Mgbm90IHRlc3RlZCB5ZXQuLi4pDQo+IA0KPiAgICAgRHJvcCBrdm1feDg2
+X2NoZWNrX3Byb2Nlc3Nvcl9jb21wYXRpYmlsaXR5KCkncyBXQVJOIHRoYXQgSVJRcyBhcmUNCj4g
+ICAgIGRpc2FibGVkLCBhcyB0aGUgT05MSU5FIHNlY3Rpb24gcnVucyB3aXRoIElSUXMgZGlzYWJs
+ZWQuICBUaGUgV0FSTiB3YXNuJ3QNCgkJCQkJCSAgICAgXg0KCQkJCQkJICAgICBlbmFibGVkLg0K
+DQo+ICAgICBpbnRlbmRlZCB0byBiZSBhIHJlcXVpcmVtZW50LCBlLmcuIGRpc2FibGluZyBwcmVl
+bXB0aW9uIGlzIHN1ZmZpY2llbnQsDQo+ICAgICB0aGUgSVJRIHRoaW5nIHdhcyBwdXJlbHkgYW4g
+YWdncmVzc2l2ZSBzYW5pdHkgY2hlY2sgc2luY2UgdGhlIGhlbHBlciB3YXMNCj4gICAgIG9ubHkg
+ZXZlciBpbnZva2VkIHZpYSBTTVAgZnVuY3Rpb24gY2FsbC4NCj4gDQo+IA0KPiBzdGF0aWMgaW50
+IGt2bV94ODZfY2hlY2tfcHJvY2Vzc29yX2NvbXBhdGliaWxpdHkodm9pZCkNCj4gew0KPiAgICAg
+ICAgIGludCBjcHUgPSBzbXBfcHJvY2Vzc29yX2lkKCk7DQo+ICAgICAgICAgc3RydWN0IGNwdWlu
+Zm9feDg2ICpjID0gJmNwdV9kYXRhKGNwdSk7DQo+IA0KPiAgICAgICAgIC8qDQo+ICAgICAgICAg
+ICogQ29tcGF0aWJpbGl0eSBjaGVja3MgYXJlIGRvbmUgd2hlbiBsb2FkaW5nIEtWTSBhbmQgd2hl
+biBlbmFibGluZw0KPiAgICAgICAgICAqIGhhcmR3YXJlLCBlLmcuIGR1cmluZyBDUFUgaG90cGx1
+ZywgdG8gZW5zdXJlIGFsbCBvbmxpbmUgQ1BVcyBhcmUNCj4gICAgICAgICAgKiBjb21wYXRpYmxl
+LCBpLmUuIEtWTSBzaG91bGQgbmV2ZXIgcGVyZm9ybSBhIGNvbXBhdGliaWxpdHkgY2hlY2sgb24N
+Cj4gICAgICAgICAgKiBhbiBvZmZsaW5lIENQVS4NCj4gICAgICAgICAgKi8NCj4gICAgICAgICBX
+QVJOX09OKCFjcHVfb25saW5lKGNwdSkpOw0KDQpMb29rcyBnb29kIHRvIG1lLiAgUGVyaGFwcyB0
+aGlzIGFsc28gY2FuIGJlIHJlbW92ZWQsIHRob3VnaC4NCg0KQW5kIElNSE8gdGhlIHJlbW92aW5n
+IG9mIFdBUk5fT04oIWlycV9kaXNhYmxlZCgpKSBzaG91bGQgYmUgZm9sZGVkIHRvIHRoZSBwYXRj
+aA0KIltQQVRDSCAzNy80NF0gS1ZNOiBSZW5hbWUgYW5kIG1vdmUgQ1BVSFBfQVBfS1ZNX1NUQVJU
+SU5HIHRvIE9OTElORSBzZWN0aW9uIi4gDQpCZWNhdXNlIG1vdmluZyBmcm9tIFNUQVJUSU5HIHNl
+Y3Rpb24gdG8gT05MSU5FIHNlY3Rpb24gY2hhbmdlcyB0aGUgSVJRIHN0YXR1cw0Kd2hlbiB0aGUg
+Y29tcGF0aWJpbGl0eSBjaGVjayBpcyBjYWxsZWQuDQoNCj4gDQo+ICAgICAgICAgaWYgKF9fY3I0
+X3Jlc2VydmVkX2JpdHMoY3B1X2hhcywgYykgIT0NCj4gICAgICAgICAgICAgX19jcjRfcmVzZXJ2
+ZWRfYml0cyhjcHVfaGFzLCAmYm9vdF9jcHVfZGF0YSkpDQo+ICAgICAgICAgICAgICAgICByZXR1
+cm4gLUVJTzsNCj4gDQo+ICAgICAgICAgcmV0dXJuIHN0YXRpY19jYWxsKGt2bV94ODZfY2hlY2tf
+cHJvY2Vzc29yX2NvbXBhdGliaWxpdHkpKCk7DQo+IH0NCj4gDQo+IA0KPiBpbnQga3ZtX2FyY2hf
+aGFyZHdhcmVfZW5hYmxlKHZvaWQpDQo+IHsNCj4gICAgICAgICBzdHJ1Y3Qga3ZtICprdm07DQo+
+ICAgICAgICAgc3RydWN0IGt2bV92Y3B1ICp2Y3B1Ow0KPiAgICAgICAgIHVuc2lnbmVkIGxvbmcg
+aTsNCj4gICAgICAgICBpbnQgcmV0Ow0KPiAgICAgICAgIHU2NCBsb2NhbF90c2M7DQo+ICAgICAg
+ICAgdTY0IG1heF90c2MgPSAwOw0KPiAgICAgICAgIGJvb2wgc3RhYmxlLCBiYWNrd2FyZHNfdHNj
+ID0gZmFsc2U7DQo+IA0KPiAgICAgICAgIGt2bV91c2VyX3JldHVybl9tc3JfY3B1X29ubGluZSgp
+Ow0KPiANCj4gICAgICAgICByZXQgPSBrdm1feDg2X2NoZWNrX3Byb2Nlc3Nvcl9jb21wYXRpYmls
+aXR5KCk7DQo+ICAgICAgICAgaWYgKHJldCkNCj4gICAgICAgICAgICAgICAgIHJldHVybiByZXQ7
+DQo+IA0KPiAgICAgICAgIHJldCA9IHN0YXRpY19jYWxsKGt2bV94ODZfaGFyZHdhcmVfZW5hYmxl
+KSgpOw0KPiAgICAgICAgIGlmIChyZXQgIT0gMCkNCj4gICAgICAgICAgICAgICAgIHJldHVybiBy
+ZXQ7DQo+IA0KPiANCj4gCS4uLi4NCj4gfQ0KDQo=
