@@ -2,140 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE6A162DF89
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 16:21:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9319462E014
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 16:39:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234693AbiKQPVH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 10:21:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38174 "EHLO
+        id S239737AbiKQPjD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 10:39:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240517AbiKQPUM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 10:20:12 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0391FAE58
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 07:16:20 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id k2-20020a17090a4c8200b002187cce2f92so481826pjh.2
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 07:16:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Geqy1MGLbG4CNNhTg6ig5gMw4IRIu2ApDkqg8kUu6fE=;
-        b=im3ECY8irru0d2J3PmRkK1oS6XMYGDmkKrSKiLpQr6kggh65U519LacoANhp99/wDs
-         yHeOZt/b6IK2ihlol7f0Ba2me3bs0cr3TxYhTcQThAifpYqs8dB3p/8NK2dEXBDay90O
-         bW6pXrP7B14I1MNWa+NfggtZKbyTz1rnHhMsVYBCQiIPWqcakktYyuja6CoTLxQtkpfs
-         JsqTKBMeEN72FgBWe/ihbCXP9h1x9TEb9ulziUgPn3ZIyNK23YQtGzg65j8/As9Xyk7K
-         3+HVs34s1miAiKC8ZfgoVMv73WwF3DJWJcQDYskZpYkejUuTFt6cPMAw/xSDBCQyvpM1
-         B6Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Geqy1MGLbG4CNNhTg6ig5gMw4IRIu2ApDkqg8kUu6fE=;
-        b=p3+iLdhgy1oyZiPdiLwyOsRa+kse7zURhYGbR524fsEDrqnIogewlYErjGVRjJ/UPh
-         6UN/UCuIlvhm0FCUsYXTg5SqhpPl6olUCbJX8CYMxlakCYtva3E4Er5BE10GHTAp4htm
-         n2unx0rJFKUqg6RuFbUyvkVVB2vR0HgncOh0f1daeIU8CGk+Co3CjD/IA9C+rSQv+fTL
-         5HM4UjTqkdKTDP3AviIAY6iDDB7ylUN72Jbg8Fp5T8X+Zb7wTjW7X2xxpUuSRuZSMGIs
-         Eajv0BDtSk95J3lsIjjWNY5WgBVha3J5agzPdZhjBYxTe4d8cSE8RKtHj+Dxs3kYPwTo
-         15WA==
-X-Gm-Message-State: ANoB5plU3WMpdrYuzHknmIIWqH4EokZ5s99MOHwxV9sRX2xvhcJ1jL7A
-        pKEI+psU0iWNPmW4pg7S1g+MFw==
-X-Google-Smtp-Source: AA0mqf5Drbj5GGUy8zNXmPljMG8UuEFTPTHf+YuwVXyWlSocFeljs1OjIQ+Ab7mWXZMNXetmsxdGbQ==
-X-Received: by 2002:a17:90a:6b84:b0:20a:cbb0:3c9b with SMTP id w4-20020a17090a6b8400b0020acbb03c9bmr3280802pjj.81.1668698179289;
-        Thu, 17 Nov 2022 07:16:19 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id r12-20020a63e50c000000b00476dc914262sm1135777pgh.1.2022.11.17.07.16.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Nov 2022 07:16:18 -0800 (PST)
-Date:   Thu, 17 Nov 2022 15:16:15 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "Yao, Yuan" <yuan.yao@intel.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-        "farosas@linux.ibm.com" <farosas@linux.ibm.com>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "palmer@dabbelt.com" <palmer@dabbelt.com>,
-        "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-        "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "anup@brainfault.org" <anup@brainfault.org>,
-        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
-        "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
-        "james.morse@arm.com" <james.morse@arm.com>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "atishp@atishpatra.org" <atishp@atishpatra.org>,
-        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
-        "Gao, Chao" <chao.gao@intel.com>
-Subject: Re: [PATCH 38/44] KVM: Disable CPU hotplug during hardware enabling
-Message-ID: <Y3ZQP3C1f8pk199t@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-39-seanjc@google.com>
- <88e920944de70e7d69a98f74005b49c59b5aaa3b.camel@intel.com>
- <b198fe971cecd301f0c7c66028cfd71dd7ba7e62.camel@intel.com>
- <Y3PzhANShVlTXVg1@google.com>
- <95ca433349eca601bdd2b16d70f59ba8e56d8e3f.camel@intel.com>
- <Y3UZtoIidMyE8qVz@google.com>
- <7fb66c497b6c41049167b05c63267cbc301b1c20.camel@intel.com>
+        with ESMTP id S239734AbiKQPif (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 10:38:35 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E010D6D
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 07:38:30 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AHDiNjE003452;
+        Thu, 17 Nov 2022 15:38:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=dcBMfT02/fhemNoSV9+WXoatCkSif082BaKQDc7l+Sg=;
+ b=Dvt2g0sdtTJ0//LpuMZcK4c5c8b5MGC08eVmD1X3IVUM4pnPbCEpDUPBHnbqaHPt2GzH
+ /WhTGc5obGq0J+BaNBDw2BgqAuyVPERuJacVvk0mGQrcLfYPnys62prMQX6Ti8p8ubct
+ i3xqfPGQnnpeun9smdZ6MqDPkQV43nBSbXRnMBBLjVcp4JTH+g6coRQGWUDkvoFA8Spq
+ oYfIb2p0Egsu0xkfwV0/7Wy11T6g/zkHwawWk7NsWOeHUnuAf6Ze1wmEQ+GQV+v0RopM
+ iC/nHubHQLNddUeXeFs+YgSiwZlbZ6xYQ42brYtdM8vCcxMEUBtFcE65GwNCzzAcDm+q Aw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kwmjtp08w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Nov 2022 15:38:22 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AHE3s1T023968;
+        Thu, 17 Nov 2022 15:38:22 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kwmjtp08a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Nov 2022 15:38:22 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AHFadNk032721;
+        Thu, 17 Nov 2022 15:38:20 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 3kt2rjfr3q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Nov 2022 15:38:20 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AHFcH3f65405332
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Nov 2022 15:38:18 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E122EAE04D;
+        Thu, 17 Nov 2022 15:38:17 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 907A3AE045;
+        Thu, 17 Nov 2022 15:38:17 +0000 (GMT)
+Received: from [9.171.13.174] (unknown [9.171.13.174])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 17 Nov 2022 15:38:17 +0000 (GMT)
+Message-ID: <92123fcd-32c3-4e68-a7a6-234588f6a661@de.ibm.com>
+Date:   Thu, 17 Nov 2022 16:38:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7fb66c497b6c41049167b05c63267cbc301b1c20.camel@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [RFC PATCH 1/3] KVM: Cap vcpu->halt_poll_ns before halting rather
+ than after
+Content-Language: en-US
+To:     David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jon Cargille <jcargill@google.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Yanan Wang <wangyanan55@huawei.com>
+References: <20221117001657.1067231-1-dmatlack@google.com>
+ <20221117001657.1067231-2-dmatlack@google.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+In-Reply-To: <20221117001657.1067231-2-dmatlack@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: dzmcwKc9IHN0YfUHtRJbhevWGWfk7m3S
+X-Proofpoint-ORIG-GUID: e74_DRMraw3t7A7zA6-u2N1UQ_5i8okz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-17_06,2022-11-17_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 adultscore=0 phishscore=0 malwarescore=0 spamscore=0
+ mlxscore=0 mlxlogscore=624 bulkscore=0 clxscore=1011 lowpriorityscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211170116
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 17, 2022, Huang, Kai wrote:
-> On Wed, 2022-11-16 at 17:11 +0000, Sean Christopherson wrote:
-> > static int kvm_x86_check_processor_compatibility(void)
-> > {
-> >         int cpu = smp_processor_id();
-> >         struct cpuinfo_x86 *c = &cpu_data(cpu);
-> > 
-> >         /*
-> >          * Compatibility checks are done when loading KVM and when enabling
-> >          * hardware, e.g. during CPU hotplug, to ensure all online CPUs are
-> >          * compatible, i.e. KVM should never perform a compatibility check on
-> >          * an offline CPU.
-> >          */
-> >         WARN_ON(!cpu_online(cpu));
+Am 17.11.22 um 01:16 schrieb David Matlack:
+> Cap vcpu->halt_poll_ns based on the max halt polling time just before
+> halting, rather than after the last halt. This arguably provides better
+> accuracy if an admin disables halt polling in between halts, although
+> the improvement is nominal.
 > 
-> Looks good to me.  Perhaps this also can be removed, though.
+> A side-effect of this change is that grow_halt_poll_ns() no longer needs
+> to access vcpu->kvm->max_halt_poll_ns, which will be useful in a future
+> commit where the max halt polling time can come from the module parameter
+> halt_poll_ns instead.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
 
-Hmm, it's a bit superfluous, but I think it could fire if KVM messed up CPU
-hotplug again, e.g. if the for_each_online_cpu() => IPI raced with CPU unplug.
+Looks sane
 
-> And IMHO the removing of WARN_ON(!irq_disabled()) should be folded to the patch
-> "[PATCH 37/44] KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section". 
-> Because moving from STARTING section to ONLINE section changes the IRQ status
-> when the compatibility check is called.
+Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
-Yep, that's what I have coded up, just smushed it all together here.
+
+> ---
+>   virt/kvm/kvm_main.c | 10 ++++++----
+>   1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 43bbe4fde078..4b868f33c45d 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3385,9 +3385,6 @@ static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
+>   	if (val < grow_start)
+>   		val = grow_start;
+>   
+> -	if (val > vcpu->kvm->max_halt_poll_ns)
+> -		val = vcpu->kvm->max_halt_poll_ns;
+> -
+>   	vcpu->halt_poll_ns = val;
+>   out:
+>   	trace_kvm_halt_poll_ns_grow(vcpu->vcpu_id, val, old);
+> @@ -3500,11 +3497,16 @@ static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
+>   void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+>   {
+>   	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
+> -	bool do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
+>   	ktime_t start, cur, poll_end;
+>   	bool waited = false;
+> +	bool do_halt_poll;
+>   	u64 halt_ns;
+>   
+> +	if (vcpu->halt_poll_ns > vcpu->kvm->max_halt_poll_ns)
+> +		vcpu->halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
+> +
+> +	do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
+> +
+>   	start = cur = poll_end = ktime_get();
+>   	if (do_halt_poll) {
+>   		ktime_t stop = ktime_add_ns(start, vcpu->halt_poll_ns);
