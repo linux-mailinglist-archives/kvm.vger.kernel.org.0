@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BC4362D69E
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 10:23:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD2FB62D6A0
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 10:23:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239971AbiKQJXY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 04:23:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48768 "EHLO
+        id S234798AbiKQJXd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 04:23:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239912AbiKQJWx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 04:22:53 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131927614C
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:22:39 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id e37-20020a635025000000b00476bfca5d31so951627pgb.21
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:22:39 -0800 (PST)
+        with ESMTP id S239945AbiKQJXC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 04:23:02 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAE80697F0
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:22:44 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id j132-20020a25238a000000b006da635e2073so1040599ybj.2
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:22:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GrrZGiotVhRjWWirtVvn7p8LmDKLbrClix/SOg5WUhU=;
-        b=oKYBD52w73jt/aZKMMaztodItBHZbvVHV26NKZW/NPOvBFIyEqrsligt5KXOA88E0T
-         nFgde70JIPJWcTEFnkg3xhCUJdubHIzKKtOgu5sJAAjqXFVI9q6EmFJOTn9IIt1y4KEN
-         2rY6HDGVq87y0Uud7n45gpuOX8sqqmYfvoZqOR+unm/cxhGQoZ83vVDfvvQqHeWMDCc9
-         S4lxqnMzN6+BCWem9PO2pTCoe7e8/UMVlNJzs4YWg/wnkn3Wo63U6SEGF7tCqG0NIwdA
-         Qv5jyCxpNlbbUaL9qenGbDNdQd4EXcDFBPZTNSzQ2VlYfPGUkf+Q3tFUosPd93Mxwpab
-         TmGw==
+        bh=PcwQW8WRnXIVgyeAnk+CfQlzD+bSI2L6ZxsXX1vyfjM=;
+        b=ozlDUreH/uvYEcqh9NmARiO4zNZUMjZQxMzXjpgpk5K5RDr34jBSz5ygVuhLyD9ZpU
+         uP3xkmDSPpQ9k63FuBsAvdmACPeb8tryup/DVLDEnIbPNxaw6m2fTe4QUh8b1Aa0iDZW
+         u7VCXb7B+MP8Vf69aWpbyKuDYDlY3Q8Jl6jHTm5uvT55DD9R/IBVhdDTPkhL1ZuRbhzc
+         DVzYJpUHuxsKZKB0LGEyUAa4UYUB5fVhZU8vyao8GcW4Xt+gvC96uVL+RaCuIWOcCdB8
+         fwHYMlVs6OtyDop2VXzZIpPHKHLQU412apUveErK2trURQfAh/4LTXt9PEhXrbi7UtKn
+         x8vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GrrZGiotVhRjWWirtVvn7p8LmDKLbrClix/SOg5WUhU=;
-        b=RRvAhUF3mtYBFjkn+bALCcsJeEM/HXa+Zc5oCEKP0kZJmGz68OQHQ+uNW4Ywq5E0v7
-         V/Fyuth1yeLtb4J/I5VP9ozJ8M4Iot7v5+N2aknaCLXsR38meacZLRZHpG7e33pMW3Ut
-         Kc2uI8Jz4QFqolSfvIUxJxfL5fjBaAayT6DBsjqKstcz8/J4jZQzhq+9YZXjXyrkiXnv
-         hrE/sJWBa00PWma7prqHieLZ/YTH8uQAPs5ElFslmFEP9Kj8TvvqeWGruw7GDJOYMhPS
-         WUJT57O6jFQvFqUoeKlvJ0WD2EIELT6nF2HSG8T+wb7OUDhjCtR2Aui1nnvLuUqsPT7b
-         5VIQ==
-X-Gm-Message-State: ANoB5pmQBzlsnc+ScJMPtioR89Fm0Gq09T3OzgSeSP1wiUSR1RSeiRKt
-        UlNL1uHRw50BTTIhBf2pReTSa0H1IgBgDw==
-X-Google-Smtp-Source: AA0mqf4eJqZEhhyx9/1+9o14sI0kBot/eKEAexUgxu3Hobf/XrH2MHfa0u3QbvDUy0xTSvyE6ieNOEDOneV/ng==
+        bh=PcwQW8WRnXIVgyeAnk+CfQlzD+bSI2L6ZxsXX1vyfjM=;
+        b=0hbL+Lxe1aXQBIx9ygEkyabd/N1+BTql0DsfTkVt1Kr7aVZHGG9NLIhQ1KzG7AHccz
+         2NLyBIhhZVjqb3agLpm9AWL7yHtjcObjrXKM0LTepJBM3H0cwCiyx1XrgzYlaxhlTbCF
+         MSsYTCXPD3I/Qirstjn34KCyfqS/MHHfRJhZ9v9dRO0++Xqu5M/Cl64CdaqDuGORJUtp
+         H1GIoxvKy909a38lUOGYP+EyKv6qTPQ61NScI/SiHzNrh7jN4NhyWsoOk04NoO+dKU7w
+         //FcxKt+u+d0GVsAp/0Oicx7cIqisLU469/nNTuRWorN5y2Bb26tTQNbVpDjnbFSLmOP
+         tJtg==
+X-Gm-Message-State: ANoB5pmtMqF20HbkbVhjHm3yGeb/cgCk4cc4JQFOug71R1UdUWL/RShh
+        L6hst/NrB8V1+EDQRFPeT/dbfnPGYEefRQ==
+X-Google-Smtp-Source: AA0mqf4sxIGeboHNaBg++13cvHvCWDpgDCzlEd2VKNemqTAwUQvHWhkomOKecpoxMsMp6FVg7DD/zQ278v6aOw==
 X-Received: from suleiman1.tok.corp.google.com ([2401:fa00:8f:203:416e:f3c7:7f1d:6e])
- (user=suleiman job=sendgmr) by 2002:a17:902:6b08:b0:187:4467:7aba with SMTP
- id o8-20020a1709026b0800b0018744677abamr1928482plk.61.1668676959451; Thu, 17
- Nov 2022 01:22:39 -0800 (PST)
-Date:   Thu, 17 Nov 2022 18:19:51 +0900
+ (user=suleiman job=sendgmr) by 2002:a25:3c82:0:b0:6e7:39db:aeb5 with SMTP id
+ j124-20020a253c82000000b006e739dbaeb5mr1078739yba.304.1668676964071; Thu, 17
+ Nov 2022 01:22:44 -0800 (PST)
+Date:   Thu, 17 Nov 2022 18:19:52 +0900
 In-Reply-To: <20221117091952.1940850-1-suleiman@google.com>
-Message-Id: <20221117091952.1940850-34-suleiman@google.com>
+Message-Id: <20221117091952.1940850-35-suleiman@google.com>
 Mime-Version: 1.0
 References: <20221117091952.1940850-1-suleiman@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Subject: [PATCH 4.19 33/34] x86/bugs: Warn when "ibrs" mitigation is selected
- on Enhanced IBRS parts
+Subject: [PATCH 4.19 34/34] x86/speculation: Add RSB VM Exit protections
 From:   Suleiman Souhlal <suleiman@google.com>
 To:     stable@vger.kernel.org
 Cc:     x86@kernel.org, kvm@vger.kernel.org, bp@alien8.de,
@@ -70,51 +69,403 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+From: Daniel Sneddon <daniel.sneddon@linux.intel.com>
 
-commit eb23b5ef9131e6d65011de349a4d25ef1b3d4314 upstream.
+commit 2b1299322016731d56807aa49254a5ea3080b6b3 upstream.
 
-IBRS mitigation for spectre_v2 forces write to MSR_IA32_SPEC_CTRL at
-every kernel entry/exit. On Enhanced IBRS parts setting
-MSR_IA32_SPEC_CTRL[IBRS] only once at boot is sufficient. MSR writes at
-every kernel entry/exit incur unnecessary performance loss.
+tl;dr: The Enhanced IBRS mitigation for Spectre v2 does not work as
+documented for RET instructions after VM exits. Mitigate it with a new
+one-entry RSB stuffing mechanism and a new LFENCE.
 
-When Enhanced IBRS feature is present, print a warning about this
-unnecessary performance loss.
+== Background ==
 
+Indirect Branch Restricted Speculation (IBRS) was designed to help
+mitigate Branch Target Injection and Speculative Store Bypass, i.e.
+Spectre, attacks. IBRS prevents software run in less privileged modes
+from affecting branch prediction in more privileged modes. IBRS requires
+the MSR to be written on every privilege level change.
+
+To overcome some of the performance issues of IBRS, Enhanced IBRS was
+introduced.  eIBRS is an "always on" IBRS, in other words, just turn
+it on once instead of writing the MSR on every privilege level change.
+When eIBRS is enabled, more privileged modes should be protected from
+less privileged modes, including protecting VMMs from guests.
+
+== Problem ==
+
+Here's a simplification of how guests are run on Linux' KVM:
+
+void run_kvm_guest(void)
+{
+	// Prepare to run guest
+	VMRESUME();
+	// Clean up after guest runs
+}
+
+The execution flow for that would look something like this to the
+processor:
+
+1. Host-side: call run_kvm_guest()
+2. Host-side: VMRESUME
+3. Guest runs, does "CALL guest_function"
+4. VM exit, host runs again
+5. Host might make some "cleanup" function calls
+6. Host-side: RET from run_kvm_guest()
+
+Now, when back on the host, there are a couple of possible scenarios of
+post-guest activity the host needs to do before executing host code:
+
+* on pre-eIBRS hardware (legacy IBRS, or nothing at all), the RSB is not
+touched and Linux has to do a 32-entry stuffing.
+
+* on eIBRS hardware, VM exit with IBRS enabled, or restoring the host
+IBRS=1 shortly after VM exit, has a documented side effect of flushing
+the RSB except in this PBRSB situation where the software needs to stuff
+the last RSB entry "by hand".
+
+IOW, with eIBRS supported, host RET instructions should no longer be
+influenced by guest behavior after the host retires a single CALL
+instruction.
+
+However, if the RET instructions are "unbalanced" with CALLs after a VM
+exit as is the RET in #6, it might speculatively use the address for the
+instruction after the CALL in #3 as an RSB prediction. This is a problem
+since the (untrusted) guest controls this address.
+
+Balanced CALL/RET instruction pairs such as in step #5 are not affected.
+
+== Solution ==
+
+The PBRSB issue affects a wide variety of Intel processors which
+support eIBRS. But not all of them need mitigation. Today,
+X86_FEATURE_RSB_VMEXIT triggers an RSB filling sequence that mitigates
+PBRSB. Systems setting RSB_VMEXIT need no further mitigation - i.e.,
+eIBRS systems which enable legacy IBRS explicitly.
+
+However, such systems (X86_FEATURE_IBRS_ENHANCED) do not set RSB_VMEXIT
+and most of them need a new mitigation.
+
+Therefore, introduce a new feature flag X86_FEATURE_RSB_VMEXIT_LITE
+which triggers a lighter-weight PBRSB mitigation versus RSB_VMEXIT.
+
+The lighter-weight mitigation performs a CALL instruction which is
+immediately followed by a speculative execution barrier (INT3). This
+steers speculative execution to the barrier -- just like a retpoline
+-- which ensures that speculation can never reach an unbalanced RET.
+Then, ensure this CALL is retired before continuing execution with an
+LFENCE.
+
+In other words, the window of exposure is opened at VM exit where RET
+behavior is troublesome. While the window is open, force RSB predictions
+sampling for RET targets to a dead end at the INT3. Close the window
+with the LFENCE.
+
+There is a subset of eIBRS systems which are not vulnerable to PBRSB.
+Add these systems to the cpu_vuln_whitelist[] as NO_EIBRS_PBRSB.
+Future systems that aren't vulnerable will set ARCH_CAP_PBRSB_NO.
+
+  [ bp: Massage, incorporate review comments from Andy Cooper. ]
+
+Signed-off-by: Daniel Sneddon <daniel.sneddon@linux.intel.com>
+Co-developed-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Reviewed-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-Cc: stable@vger.kernel.org
-Link: https://lore.kernel.org/r/2a5eaf54583c2bfe0edc4fea64006656256cca17.1657814857.git.pawan.kumar.gupta@linux.intel.com
-Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+Signed-off-by: Borislav Petkov <bp@suse.de>
+[ bp: Adjust patch to account for kvm entry being in c ]
+Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Signed-off-by: Suleiman Souhlal <suleiman@google.com>
 ---
- arch/x86/kernel/cpu/bugs.c | 3 +++
- 1 file changed, 3 insertions(+)
+ Documentation/admin-guide/hw-vuln/spectre.rst |  8 ++
+ arch/x86/include/asm/cpufeatures.h            |  2 +
+ arch/x86/include/asm/msr-index.h              |  4 +
+ arch/x86/include/asm/nospec-branch.h          | 15 +++-
+ arch/x86/kernel/cpu/bugs.c                    | 87 ++++++++++++++-----
+ arch/x86/kernel/cpu/common.c                  | 12 ++-
+ arch/x86/kvm/vmx.c                            |  4 +-
+ tools/arch/x86/include/asm/cpufeatures.h      |  1 +
+ 8 files changed, 103 insertions(+), 30 deletions(-)
 
+diff --git a/Documentation/admin-guide/hw-vuln/spectre.rst b/Documentation/admin-guide/hw-vuln/spectre.rst
+index 6bd97cd50d62..7e061ed449aa 100644
+--- a/Documentation/admin-guide/hw-vuln/spectre.rst
++++ b/Documentation/admin-guide/hw-vuln/spectre.rst
+@@ -422,6 +422,14 @@ The possible values in this file are:
+   'RSB filling'   Protection of RSB on context switch enabled
+   =============   ===========================================
+ 
++  - EIBRS Post-barrier Return Stack Buffer (PBRSB) protection status:
++
++  ===========================  =======================================================
++  'PBRSB-eIBRS: SW sequence'   CPU is affected and protection of RSB on VMEXIT enabled
++  'PBRSB-eIBRS: Vulnerable'    CPU is vulnerable
++  'PBRSB-eIBRS: Not affected'  CPU is not affected by PBRSB
++  ===========================  =======================================================
++
+ Full mitigation might require a microcode update from the CPU
+ vendor. When the necessary microcode is not available, the kernel will
+ report vulnerability.
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 145eef3e5363..caaab0a20e26 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -291,6 +291,7 @@
+ #define X86_FEATURE_RRSBA_CTRL		(11*32+11) /* "" RET prediction control */
+ #define X86_FEATURE_RETPOLINE		(11*32+12) /* "" Generic Retpoline mitigation for Spectre variant 2 */
+ #define X86_FEATURE_RETPOLINE_LFENCE	(11*32+13) /* "" Use LFENCE for Spectre variant 2 */
++#define X86_FEATURE_RSB_VMEXIT_LITE	(11*32+17) /* "" Fill RSB on VM exit when EIBRS is enabled */
+ 
+ /* AMD-defined CPU features, CPUID level 0x80000008 (EBX), word 13 */
+ #define X86_FEATURE_CLZERO		(13*32+ 0) /* CLZERO instruction */
+@@ -406,5 +407,6 @@
+ #define X86_BUG_MMIO_STALE_DATA		X86_BUG(25) /* CPU is affected by Processor MMIO Stale Data vulnerabilities */
+ #define X86_BUG_MMIO_UNKNOWN		X86_BUG(26) /* CPU is too old and its MMIO Stale Data status is unknown */
+ #define X86_BUG_RETBLEED		X86_BUG(27) /* CPU is affected by RETBleed */
++#define X86_BUG_EIBRS_PBRSB		X86_BUG(28) /* EIBRS is vulnerable to Post Barrier RSB Predictions */
+ 
+ #endif /* _ASM_X86_CPUFEATURES_H */
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index ec46d4af741c..dbe98e8ed164 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -130,6 +130,10 @@
+ 						 * are restricted to targets in
+ 						 * kernel.
+ 						 */
++#define ARCH_CAP_PBRSB_NO		BIT(24)	/*
++						 * Not susceptible to Post-Barrier
++						 * Return Stack Buffer Predictions.
++						 */
+ 
+ #define MSR_IA32_FLUSH_CMD		0x0000010b
+ #define L1D_FLUSH			BIT(0)	/*
+diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+index 0a34d5dd4364..64b086c47b4a 100644
+--- a/arch/x86/include/asm/nospec-branch.h
++++ b/arch/x86/include/asm/nospec-branch.h
+@@ -73,6 +73,13 @@
+ 	add	$(BITS_PER_LONG/8) * nr, sp;
+ #endif
+ 
++#define ISSUE_UNBALANCED_RET_GUARD(sp)		\
++	call 992f;				\
++	int3;					\
++992:						\
++	add $(BITS_PER_LONG/8), sp;		\
++	lfence;
++
+ #ifdef __ASSEMBLY__
+ 
+ /*
+@@ -278,9 +285,11 @@ static __always_inline void vmexit_fill_RSB(void)
+ 	unsigned long loops;
+ 
+ 	asm volatile (ANNOTATE_NOSPEC_ALTERNATIVE
+-		      ALTERNATIVE("jmp 910f",
+-				  __stringify(__FILL_RETURN_BUFFER(%0, RSB_CLEAR_LOOPS, %1)),
+-				  X86_FEATURE_RSB_VMEXIT)
++		      ALTERNATIVE_2("jmp 910f", "", X86_FEATURE_RSB_VMEXIT,
++				    "jmp 911f", X86_FEATURE_RSB_VMEXIT_LITE)
++		      __stringify(__FILL_RETURN_BUFFER(%0, RSB_CLEAR_LOOPS, %1))
++		      "911:"
++		      __stringify(ISSUE_UNBALANCED_RET_GUARD(%1))
+ 		      "910:"
+ 		      : "=r" (loops), ASM_CALL_CONSTRAINT
+ 		      : : "memory" );
 diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index a4684b224b59..351551fdd198 100644
+index 351551fdd198..6668f92f4321 100644
 --- a/arch/x86/kernel/cpu/bugs.c
 +++ b/arch/x86/kernel/cpu/bugs.c
-@@ -851,6 +851,7 @@ static inline const char *spectre_v2_module_string(void) { return ""; }
- #define SPECTRE_V2_LFENCE_MSG "WARNING: LFENCE mitigation is not recommended for this CPU, data leaks possible!\n"
- #define SPECTRE_V2_EIBRS_EBPF_MSG "WARNING: Unprivileged eBPF is enabled with eIBRS on, data leaks possible via Spectre v2 BHB attacks!\n"
- #define SPECTRE_V2_EIBRS_LFENCE_EBPF_SMT_MSG "WARNING: Unprivileged eBPF is enabled with eIBRS+LFENCE mitigation and SMT, data leaks possible via Spectre v2 BHB attacks!\n"
-+#define SPECTRE_V2_IBRS_PERF_MSG "WARNING: IBRS mitigation selected on Enhanced IBRS CPU, this may cause unnecessary performance loss\n"
+@@ -1198,6 +1198,54 @@ static void __init spec_ctrl_disable_kernel_rrsba(void)
+ 	}
+ }
  
- #ifdef CONFIG_BPF_SYSCALL
- void unpriv_ebpf_notify(int new_state)
-@@ -1277,6 +1278,8 @@ static void __init spectre_v2_select_mitigation(void)
++static void __init spectre_v2_determine_rsb_fill_type_at_vmexit(enum spectre_v2_mitigation mode)
++{
++	/*
++	 * Similar to context switches, there are two types of RSB attacks
++	 * after VM exit:
++	 *
++	 * 1) RSB underflow
++	 *
++	 * 2) Poisoned RSB entry
++	 *
++	 * When retpoline is enabled, both are mitigated by filling/clearing
++	 * the RSB.
++	 *
++	 * When IBRS is enabled, while #1 would be mitigated by the IBRS branch
++	 * prediction isolation protections, RSB still needs to be cleared
++	 * because of #2.  Note that SMEP provides no protection here, unlike
++	 * user-space-poisoned RSB entries.
++	 *
++	 * eIBRS should protect against RSB poisoning, but if the EIBRS_PBRSB
++	 * bug is present then a LITE version of RSB protection is required,
++	 * just a single call needs to retire before a RET is executed.
++	 */
++	switch (mode) {
++	case SPECTRE_V2_NONE:
++		return;
++
++	case SPECTRE_V2_EIBRS_LFENCE:
++	case SPECTRE_V2_EIBRS:
++		if (boot_cpu_has_bug(X86_BUG_EIBRS_PBRSB) &&
++		    (boot_cpu_data.x86_vendor == X86_VENDOR_INTEL)) {
++			setup_force_cpu_cap(X86_FEATURE_RSB_VMEXIT_LITE);
++			pr_info("Spectre v2 / PBRSB-eIBRS: Retire a single CALL on VMEXIT\n");
++		}
++		return;
++
++	case SPECTRE_V2_EIBRS_RETPOLINE:
++	case SPECTRE_V2_RETPOLINE:
++	case SPECTRE_V2_LFENCE:
++	case SPECTRE_V2_IBRS:
++		setup_force_cpu_cap(X86_FEATURE_RSB_VMEXIT);
++		pr_info("Spectre v2 / SpectreRSB : Filling RSB on VMEXIT\n");
++		return;
++	}
++
++	pr_warn_once("Unknown Spectre v2 mode, disabling RSB mitigation at VM exit");
++	dump_stack();
++}
++
+ static void __init spectre_v2_select_mitigation(void)
+ {
+ 	enum spectre_v2_mitigation_cmd cmd = spectre_v2_parse_cmdline();
+@@ -1347,28 +1395,7 @@ static void __init spectre_v2_select_mitigation(void)
+ 	setup_force_cpu_cap(X86_FEATURE_RSB_CTXSW);
+ 	pr_info("Spectre v2 / SpectreRSB mitigation: Filling RSB on context switch\n");
  
- 	case SPECTRE_V2_IBRS:
- 		setup_force_cpu_cap(X86_FEATURE_KERNEL_IBRS);
-+		if (boot_cpu_has(X86_FEATURE_IBRS_ENHANCED))
-+			pr_warn(SPECTRE_V2_IBRS_PERF_MSG);
- 		break;
+-	/*
+-	 * Similar to context switches, there are two types of RSB attacks
+-	 * after vmexit:
+-	 *
+-	 * 1) RSB underflow
+-	 *
+-	 * 2) Poisoned RSB entry
+-	 *
+-	 * When retpoline is enabled, both are mitigated by filling/clearing
+-	 * the RSB.
+-	 *
+-	 * When IBRS is enabled, while #1 would be mitigated by the IBRS branch
+-	 * prediction isolation protections, RSB still needs to be cleared
+-	 * because of #2.  Note that SMEP provides no protection here, unlike
+-	 * user-space-poisoned RSB entries.
+-	 *
+-	 * eIBRS, on the other hand, has RSB-poisoning protections, so it
+-	 * doesn't need RSB clearing after vmexit.
+-	 */
+-	if (boot_cpu_has(X86_FEATURE_RETPOLINE) ||
+-	    boot_cpu_has(X86_FEATURE_KERNEL_IBRS))
+-		setup_force_cpu_cap(X86_FEATURE_RSB_VMEXIT);
++	spectre_v2_determine_rsb_fill_type_at_vmexit(mode);
  
- 	case SPECTRE_V2_LFENCE:
+ 	/*
+ 	 * Retpoline protects the kernel, but doesn't protect firmware.  IBRS
+@@ -2096,6 +2123,19 @@ static char *ibpb_state(void)
+ 	return "";
+ }
+ 
++static char *pbrsb_eibrs_state(void)
++{
++	if (boot_cpu_has_bug(X86_BUG_EIBRS_PBRSB)) {
++		if (boot_cpu_has(X86_FEATURE_RSB_VMEXIT_LITE) ||
++		    boot_cpu_has(X86_FEATURE_RSB_VMEXIT))
++			return ", PBRSB-eIBRS: SW sequence";
++		else
++			return ", PBRSB-eIBRS: Vulnerable";
++	} else {
++		return ", PBRSB-eIBRS: Not affected";
++	}
++}
++
+ static ssize_t spectre_v2_show_state(char *buf)
+ {
+ 	if (spectre_v2_enabled == SPECTRE_V2_LFENCE)
+@@ -2108,12 +2148,13 @@ static ssize_t spectre_v2_show_state(char *buf)
+ 	    spectre_v2_enabled == SPECTRE_V2_EIBRS_LFENCE)
+ 		return sprintf(buf, "Vulnerable: eIBRS+LFENCE with unprivileged eBPF and SMT\n");
+ 
+-	return sprintf(buf, "%s%s%s%s%s%s\n",
++	return sprintf(buf, "%s%s%s%s%s%s%s\n",
+ 		       spectre_v2_strings[spectre_v2_enabled],
+ 		       ibpb_state(),
+ 		       boot_cpu_has(X86_FEATURE_USE_IBRS_FW) ? ", IBRS_FW" : "",
+ 		       stibp_state(),
+ 		       boot_cpu_has(X86_FEATURE_RSB_CTXSW) ? ", RSB filling" : "",
++		       pbrsb_eibrs_state(),
+ 		       spectre_v2_module_string());
+ }
+ 
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index da3819a43418..55293e5dcbff 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -955,6 +955,7 @@ static void identify_cpu_without_cpuid(struct cpuinfo_x86 *c)
+ #define NO_SWAPGS		BIT(6)
+ #define NO_ITLB_MULTIHIT	BIT(7)
+ #define NO_MMIO			BIT(8)
++#define NO_EIBRS_PBRSB		BIT(9)
+ 
+ #define VULNWL(_vendor, _family, _model, _whitelist)	\
+ 	{ X86_VENDOR_##_vendor, _family, _model, X86_FEATURE_ANY, _whitelist }
+@@ -996,7 +997,7 @@ static const __initconst struct x86_cpu_id cpu_vuln_whitelist[] = {
+ 
+ 	VULNWL_INTEL(ATOM_GOLDMONT,		NO_MDS | NO_L1TF | NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO),
+ 	VULNWL_INTEL(ATOM_GOLDMONT_X,		NO_MDS | NO_L1TF | NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO),
+-	VULNWL_INTEL(ATOM_GOLDMONT_PLUS,	NO_MDS | NO_L1TF | NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO),
++	VULNWL_INTEL(ATOM_GOLDMONT_PLUS,	NO_MDS | NO_L1TF | NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_EIBRS_PBRSB),
+ 
+ 	/*
+ 	 * Technically, swapgs isn't serializing on AMD (despite it previously
+@@ -1006,7 +1007,9 @@ static const __initconst struct x86_cpu_id cpu_vuln_whitelist[] = {
+ 	 * good enough for our purposes.
+ 	 */
+ 
+-	VULNWL_INTEL(ATOM_TREMONT_X,		NO_ITLB_MULTIHIT),
++	VULNWL_INTEL(ATOM_TREMONT,		NO_EIBRS_PBRSB),
++	VULNWL_INTEL(ATOM_TREMONT_L,		NO_EIBRS_PBRSB),
++	VULNWL_INTEL(ATOM_TREMONT_X,		NO_ITLB_MULTIHIT | NO_EIBRS_PBRSB),
+ 
+ 	/* AMD Family 0xf - 0x12 */
+ 	VULNWL_AMD(0x0f,	NO_MELTDOWN | NO_SSB | NO_L1TF | NO_MDS | NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO),
+@@ -1178,6 +1181,11 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
+ 			setup_force_cpu_bug(X86_BUG_RETBLEED);
+ 	}
+ 
++	if (cpu_has(c, X86_FEATURE_IBRS_ENHANCED) &&
++	    !cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB) &&
++	    !(ia32_cap & ARCH_CAP_PBRSB_NO))
++		setup_force_cpu_bug(X86_BUG_EIBRS_PBRSB);
++
+ 	if (cpu_matches(cpu_vuln_whitelist, NO_MELTDOWN))
+ 		return;
+ 
+diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
+index 30f0d55c8b2d..9bb696d7300c 100644
+--- a/arch/x86/kvm/vmx.c
++++ b/arch/x86/kvm/vmx.c
+@@ -11022,8 +11022,8 @@ static void __noclone vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	 * entries and (in some cases) RSB underflow.
+ 	 *
+ 	 * eIBRS has its own protection against poisoned RSB, so it doesn't
+-	 * need the RSB filling sequence.  But it does need to be enabled
+-	 * before the first unbalanced RET.
++	 * need the RSB filling sequence.  But it does need to be enabled, and a
++	 * single call to retire, before the first unbalanced RET.
+ 	 *
+ 	 * So no RETs before vmx_spec_ctrl_restore_host() below.
+ 	 */
+diff --git a/tools/arch/x86/include/asm/cpufeatures.h b/tools/arch/x86/include/asm/cpufeatures.h
+index beab4d4e4a35..5882ff3e7094 100644
+--- a/tools/arch/x86/include/asm/cpufeatures.h
++++ b/tools/arch/x86/include/asm/cpufeatures.h
+@@ -271,6 +271,7 @@
+ 
+ /* Intel-defined CPU QoS Sub-leaf, CPUID level 0x0000000F:0 (EDX), word 11 */
+ #define X86_FEATURE_CQM_LLC		(11*32+ 1) /* LLC QoS if 1 */
++#define X86_FEATURE_RSB_VMEXIT_LITE	(11*32+17) /* "" Fill RSB on VM-Exit when EIBRS is enabled */
+ 
+ /* Intel-defined CPU QoS Sub-leaf, CPUID level 0x0000000F:1 (EDX), word 12 */
+ #define X86_FEATURE_CQM_OCCUP_LLC	(12*32+ 0) /* LLC occupancy monitoring */
 -- 
 2.38.1.431.g37b22c650d-goog
 
