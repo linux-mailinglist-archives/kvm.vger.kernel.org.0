@@ -2,139 +2,366 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EBB0062E531
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 20:25:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2F2262E537
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 20:26:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240412AbiKQTZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 14:25:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36430 "EHLO
+        id S240432AbiKQT0n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 14:26:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240024AbiKQTZV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 14:25:21 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1DE5716FF;
-        Thu, 17 Nov 2022 11:25:20 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id 6so2890880pgm.6;
-        Thu, 17 Nov 2022 11:25:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9BbiMwqmTAJ3D3PlFYxcNLvKRHhmP8V9s6Y91GUa+uU=;
-        b=UTk4paU86RhKfSq6l9FT46qZ2+bU8y1qfcolsDC4UEG70V+wapMsqd370h03I/1RxE
-         aatF+MJZo8e/1lLJ8/Sxn0YsBOiiqYRHLnV7OWfSp+JVjawzaVjx+qaLdxWrzV8bWPQ3
-         IyRjRAYCuQzEDBANx1IOT/GiSy8B5OqXI56DEKRdvGyr4YVWquMbXT7qUW8zyuaWNtr7
-         bstXDohWVs3S4wvqcxAj8kQDVFvZvd1gHZF2+3rAaX0xCpxzZ20LV19hEDvL+2qCceY8
-         EcmfUDWm6sNHWuktTEfQUUCv85wYHuR9f2QMGdfb/NdZNUvUUEw0UaiPpM0eHDhfrq+0
-         LqxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9BbiMwqmTAJ3D3PlFYxcNLvKRHhmP8V9s6Y91GUa+uU=;
-        b=0Xw7GsXeEeDcXu5gmZJp+3/79QRjosYuJJo19E3B5TuIaNHiu6/4uael9ATd/SL2CJ
-         yWN5S4IDZtvWiVVX7FLbYE1Llzf9H9bmmX7xkGLyLuPvLhfqtX8TDP4GrpIRMfdHu95M
-         re2uHKZFeSggK2LE3PPMMGsJRa2u2V0zMaBlKPotrXTRfPkl7OlkTx9yuhabBsLAxuz5
-         O6dUDyCs2LLHw8Y6yxEVBTsuYCashcfTQa/V8Amb/6YHLL7MS3rZt4cD/TaLcg+cTk/9
-         aR5ZBfREm/acgr20twd8iHeIGamGtn9ROwi+nblYQlEYq31lUvr07HIY1w0B78ei4g1m
-         HuuA==
-X-Gm-Message-State: ANoB5pmSnq94qJtNdiA2eoug3P8TwXUWQFBLnyt+LB9caHyo49j/yF3q
-        b0JlKwqCahNy/+CBBY67wOA=
-X-Google-Smtp-Source: AA0mqf4JN6PrHt5GcHLASAoZYSaX5RcxCGq6zvB6+7FIHWz3eV5IKn9pMMbljnZZxo1x6l+OolVWCg==
-X-Received: by 2002:a63:4e0e:0:b0:46e:bfec:d611 with SMTP id c14-20020a634e0e000000b0046ebfecd611mr3333428pgb.281.1668713120213;
-        Thu, 17 Nov 2022 11:25:20 -0800 (PST)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id w8-20020a1709026f0800b001780a528540sm1771287plk.93.2022.11.17.11.25.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Nov 2022 11:25:19 -0800 (PST)
-Date:   Thu, 17 Nov 2022 11:25:18 -0800
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "Aktas, Erdem" <erdemaktas@google.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "dmatlack@google.com" <dmatlack@google.com>
-Subject: Re: [PATCH v10 045/108] KVM: x86/mmu: Add a private pointer to
- struct kvm_mmu_page
-Message-ID: <20221117192518.GL2350331@ls.amr.corp.intel.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <f2e0790612bb86bf1ebc2d5f5d94d72cc28dd1fd.1667110240.git.isaku.yamahata@intel.com>
- <00fc2a80784f9e007cffa9790c3dbd3109c3bec6.camel@intel.com>
- <19527bcd4dcd4667cc863bea1647b5a4a824e216.camel@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <19527bcd4dcd4667cc863bea1647b5a4a824e216.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S234974AbiKQT0l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 14:26:41 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66B5F7FF2B
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 11:26:39 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EEAAFB82101
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 19:26:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B53FC433C1;
+        Thu, 17 Nov 2022 19:26:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668713196;
+        bh=k73owm1lHgbe/ShMhKsEQ7VBVphF+y8m3MwXAZGrCQI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Rma8Zg6/8U1p1CxE/iR1cyb0zF1lEYPHaBXhWFQvaofqGQ3yno6fItLSCREpk0ESf
+         2ZD5T0a1QQAZoXENwcaYFvfxV2b2Lgpm5mjYnHXiMsrZmTTdgMSxBxNwIK+3RAILrM
+         nFpClgVAAM9hAGJKYSDal5fIfDyXIcQh9C5+YJnaslS2kzYB0QG9sndPmqmva2eaqc
+         ot9RpMQDwMvn34lKZkDwD3yvT+SmtMvXxeh8qHFtRcPChxaeDykWyttGrzTkD6LfYx
+         88exUYZCKjwkp8I3sBlJxuFRwhLulNpNMFCYaspC3SxahPsoXyJQSIZTXniHCUI60Y
+         HUWtlsQ8Zu8YQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ovkWw-006ojX-4r;
+        Thu, 17 Nov 2022 19:26:34 +0000
+Date:   Thu, 17 Nov 2022 19:26:33 +0000
+Message-ID: <86zgcpo00m.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com,
+        borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v7 1/4] KVM: Implement dirty quota-based throttling of vcpus
+In-Reply-To: <20221113170507.208810-2-shivam.kumar1@nutanix.com>
+References: <20221113170507.208810-1-shivam.kumar1@nutanix.com>
+        <20221113170507.208810-2-shivam.kumar1@nutanix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: shivam.kumar1@nutanix.com, pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org, shaju.abraham@nutanix.com, manish.mishra@nutanix.com, anurag.madnawat@nutanix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 16, 2022 at 11:53:47AM +0000,
-"Huang, Kai" <kai.huang@intel.com> wrote:
+On Sun, 13 Nov 2022 17:05:06 +0000,
+Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
+> 
+> Define variables to track and throttle memory dirtying for every vcpu.
+> 
+> dirty_count:    Number of pages the vcpu has dirtied since its creation,
+>                 while dirty logging is enabled.
+> dirty_quota:    Number of pages the vcpu is allowed to dirty. To dirty
+>                 more, it needs to request more quota by exiting to
+>                 userspace.
+> 
+> Implement the flow for throttling based on dirty quota.
+> 
+> i) Increment dirty_count for the vcpu whenever it dirties a page.
+> ii) Exit to userspace whenever the dirty quota is exhausted (i.e. dirty
+> count equals/exceeds dirty quota) to request more dirty quota.
+> 
+> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
+> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
+> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 35 ++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/Kconfig           |  1 +
+>  include/linux/kvm_host.h       |  5 ++++-
+>  include/linux/kvm_types.h      |  1 +
+>  include/uapi/linux/kvm.h       | 13 +++++++++++++
+>  tools/include/uapi/linux/kvm.h |  1 +
+>  virt/kvm/Kconfig               |  4 ++++
+>  virt/kvm/kvm_main.c            | 25 +++++++++++++++++++++---
+>  8 files changed, 81 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index eee9f857a986..4568faa33c6d 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6513,6 +6513,26 @@ array field represents return values. The userspace should update the return
+>  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+>  spec refer, https://github.com/riscv/riscv-sbi-doc.
+>  
+> +::
+> +
+> +		/* KVM_EXIT_DIRTY_QUOTA_EXHAUSTED */
+> +		struct {
+> +			__u64 count;
+> +			__u64 quota;
+> +		} dirty_quota_exit;
+> +
+> +If exit reason is KVM_EXIT_DIRTY_QUOTA_EXHAUSTED, it indicates that the VCPU has
+> +exhausted its dirty quota. The 'dirty_quota_exit' member of kvm_run structure
+> +makes the following information available to the userspace:
+> +    count: the current count of pages dirtied by the VCPU, can be
+> +    skewed based on the size of the pages accessed by each vCPU.
 
-> On Wed, 2022-11-16 at 10:32 +0000, Huang, Kai wrote:
-> > > +
-> > > +static inline void kvm_mmu_alloc_private_spt(struct kvm_vcpu *vcpu,
-> > > +					     struct kvm_mmu_memory_cache
-> > > *private_spt_cache,
-> > > +					     struct kvm_mmu_page *sp)
-> > 
-> > This function is very weird in the context of this patch.  _Only_ a new vcpu-
-> > scope 'mmu_private_spte_cache' is added in this patch, but here you allow
-> > caller
-> > to pass an additional argument of private_spt_cache.  So there must be another
-> > cache which is not introduced in this patch?
-> > 
-> > > +{
-> > > +	/*
-> > > +	 * vcpu == NULL means non-root SPT:
-> > > +	 * vcpu == NULL is used to split a large SPT into smaller SPT. 
-> > > Root SPT
-> > > +	 * is not a large SPT.
-> > 
-> > I am guessing this "vcpu == NULL" case is for "Eager Splitting"?
-> > 
-> > If so, why not adding a global MMU cache for private_spt allocation, and make
-> > vcpu->arch.mmu_private_spt_cache point to the global cache?  In this case, in
-> > the context where you only have 'kvm', you can use the global cache directly. 
-> > And in the context where you have a 'vcpu', you just use vcpu's cache.
-> 
-> So I went through all MMU related patches in this series, but I cannot find a
-> place where this function is called with 'vcpu == NULL' and a valid cache is
-> passed in, if I am reading correctly.
-> 
-> Also checked that "Eager Splitting" uses a kvm-scope cache for legacy MMU, but
-> just uses __get_free_page() for TDP MMU.  And in later patch "KVM: x86/tdp_mmu:
-> Support TDX private mapping for TDP MMU", __get_free_page() is also used to
-> allocate the private_spt (which is consistent with existing eager splitting
-> code).
-> 
-> So IIUC only legacy MMU code will call this function with 'vcpu == NULL' and a
-> valid cache.  In this case, please remove the 'private_spt_cache' argument for
-> now, and make the function always allocate from the vcpu-
-> >arch.mmu_private_spt_cache.  
-> 
-> You can add the additional argument when TDX gets legacy MMU support.
-> 
-> Also, I think you need to move eager splitting support part (whether that
-> handling is correct is another story) from the later patch to this patch. 
-> Otherwise this patch is not complete.
+How can userspace make a decision on the amount of dirtying this
+represent if this doesn't represent a number of base pages? Or are you
+saying that this only counts the number of permission faults that have
+dirtied pages?
 
-Yes, you're right. Somehow legacy mmu part is crept in. I'll remove those from
-this patch series.
+> +    quota: the observed dirty quota just before the exit to
+> userspace.
+
+You are defining the quota in terms of quota. -ENOCLUE.
+
+> +
+> +The userspace can design a strategy to allocate the overall scope of dirtying
+> +for the VM among the vcpus. Based on the strategy and the current state of dirty
+> +quota throttling, the userspace can make a decision to either update (increase)
+> +the quota or to put the VCPU to sleep for some time.
+
+This looks like something out of 1984 (Newspeak anyone)? Can't you
+just say that userspace is responsible for allocating the quota and
+manage the resulting throttling effect?
+
+> +
+>  ::
+>  
+>      /* KVM_EXIT_NOTIFY */
+> @@ -6567,6 +6587,21 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+>  
+>  ::
+>  
+> +	/*
+> +	 * Number of pages the vCPU is allowed to have dirtied over its entire
+> +	 * lifetime.  KVM_RUN exits with KVM_EXIT_DIRTY_QUOTA_EXHAUSTED if the quota
+> +	 * is reached/exceeded.
+> +	 */
+> +	__u64 dirty_quota;
+
+How are dirty_quota and dirty_quota_exit.quota related?
+
+> +
+> +Please note that enforcing the quota is best effort, as the guest may dirty
+> +multiple pages before KVM can recheck the quota.  However, unless KVM is using
+> +a hardware-based dirty ring buffer, e.g. Intel's Page Modification Logging,
+> +KVM will detect quota exhaustion within a handful of dirtied pages.  If a
+> +hardware ring buffer is used, the overrun is bounded by the size of the buffer
+> +(512 entries for PML).
+> +
+> +::
+>    };
+>  
+>  
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 67be7f217e37..bdbd36321d52 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -48,6 +48,7 @@ config KVM
+>  	select KVM_VFIO
+>  	select SRCU
+>  	select INTERVAL_TREE
+> +	select HAVE_KVM_DIRTY_QUOTA
+
+Why isn't this part of the x86 patch?
+
+>  	select HAVE_KVM_PM_NOTIFIER if PM
+>  	help
+>  	  Support hosting fully virtualized guest machines using hardware
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 18592bdf4c1b..0b9b5c251a04 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -151,11 +151,12 @@ static inline bool is_error_page(struct page *page)
+>  #define KVM_REQUEST_NO_ACTION      BIT(10)
+>  /*
+>   * Architecture-independent vcpu->requests bit members
+> - * Bits 3-7 are reserved for more arch-independent bits.
+> + * Bits 5-7 are reserved for more arch-independent bits.
+>   */
+>  #define KVM_REQ_TLB_FLUSH         (0 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_VM_DEAD           (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_UNBLOCK           2
+> +#define KVM_REQ_DIRTY_QUOTA_EXIT  4
+
+Where is 3? Why reserve two bits when only one is used?
+
+>  #define KVM_REQUEST_ARCH_BASE     8
+>  
+>  /*
+> @@ -379,6 +380,8 @@ struct kvm_vcpu {
+>  	 */
+>  	struct kvm_memory_slot *last_used_slot;
+>  	u64 last_used_slot_gen;
+> +
+> +	u64 dirty_quota;
+>  };
+>  
+>  /*
+> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> index 3ca3db020e0e..263a588f3cd3 100644
+> --- a/include/linux/kvm_types.h
+> +++ b/include/linux/kvm_types.h
+> @@ -118,6 +118,7 @@ struct kvm_vcpu_stat_generic {
+>  	u64 halt_poll_fail_hist[HALT_POLL_HIST_COUNT];
+>  	u64 halt_wait_hist[HALT_POLL_HIST_COUNT];
+>  	u64 blocking;
+> +	u64 pages_dirtied;
+>  };
+>  
+>  #define KVM_STATS_NAME_SIZE	48
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 0d5d4419139a..5acb8991f872 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -272,6 +272,7 @@ struct kvm_xen_exit {
+>  #define KVM_EXIT_RISCV_SBI        35
+>  #define KVM_EXIT_RISCV_CSR        36
+>  #define KVM_EXIT_NOTIFY           37
+> +#define KVM_EXIT_DIRTY_QUOTA_EXHAUSTED 38
+>  
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -510,6 +511,11 @@ struct kvm_run {
+>  #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
+>  			__u32 flags;
+>  		} notify;
+> +		/* KVM_EXIT_DIRTY_QUOTA_EXHAUSTED */
+> +		struct {
+> +			__u64 count;
+> +			__u64 quota;
+> +		} dirty_quota_exit;
+>  		/* Fix the size of the union. */
+>  		char padding[256];
+>  	};
+> @@ -531,6 +537,12 @@ struct kvm_run {
+>  		struct kvm_sync_regs regs;
+>  		char padding[SYNC_REGS_SIZE_BYTES];
+>  	} s;
+> +	/*
+> +	 * Number of pages the vCPU is allowed to have dirtied over its entire
+> +	 * lifetime.  KVM_RUN exits with KVM_EXIT_DIRTY_QUOTA_EXHAUSTED if the
+> +	 * quota is reached/exceeded.
+> +	 */
+> +	__u64 dirty_quota;
+>  };
+>  
+>  /* for KVM_REGISTER_COALESCED_MMIO / KVM_UNREGISTER_COALESCED_MMIO */
+> @@ -1178,6 +1190,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_S390_ZPCI_OP 221
+>  #define KVM_CAP_S390_CPU_TOPOLOGY 222
+>  #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
+> +#define KVM_CAP_DIRTY_QUOTA 224
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+> index 0d5d4419139a..c8f811572670 100644
+> --- a/tools/include/uapi/linux/kvm.h
+> +++ b/tools/include/uapi/linux/kvm.h
+> @@ -1178,6 +1178,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_S390_ZPCI_OP 221
+>  #define KVM_CAP_S390_CPU_TOPOLOGY 222
+>  #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
+> +#define KVM_CAP_DIRTY_QUOTA 224
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 800f9470e36b..b6418a578c0a 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -19,6 +19,9 @@ config HAVE_KVM_IRQ_ROUTING
+>  config HAVE_KVM_DIRTY_RING
+>         bool
+>  
+> +config HAVE_KVM_DIRTY_QUOTA
+> +       bool
+> +
+>  # Only strongly ordered architectures can select this, as it doesn't
+>  # put any explicit constraint on userspace ordering. They can also
+>  # select the _ACQ_REL version.
+> @@ -86,3 +89,4 @@ config KVM_XFER_TO_GUEST_WORK
+>  
+>  config HAVE_KVM_PM_NOTIFIER
+>         bool
+> +
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 25d7872b29c1..7a54438b4d49 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3298,18 +3298,32 @@ int kvm_clear_guest(struct kvm *kvm, gpa_t gpa, unsigned long len)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_clear_guest);
+>  
+> +static bool kvm_vcpu_is_dirty_quota_exhausted(struct kvm_vcpu *vcpu)
+> +{
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> +	u64 dirty_quota = READ_ONCE(vcpu->run->dirty_quota);
+> +
+> +	return dirty_quota && (vcpu->stat.generic.pages_dirtied >= dirty_quota);
+> +#else
+> +	return false;
+> +#endif
+
+If you introduce additional #ifdefery here, why are the additional
+fields in the vcpu structure unconditional?
+
+> +}
+> +
+>  void mark_page_dirty_in_slot(struct kvm *kvm,
+>  			     const struct kvm_memory_slot *memslot,
+>  		 	     gfn_t gfn)
+>  {
+>  	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+>  
+> -#ifdef CONFIG_HAVE_KVM_DIRTY_RING
+>  	if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
+>  		return;
+> -#endif
+>  
+> -	if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
+> +	if (!memslot)
+> +		return;
+> +
+> +	WARN_ON_ONCE(!vcpu->stat.generic.pages_dirtied++);
+> +
+> +	if (kvm_slot_dirty_track_enabled(memslot)) {
+>  		unsigned long rel_gfn = gfn - memslot->base_gfn;
+>  		u32 slot = (memslot->as_id << 16) | memslot->id;
+>  
+> @@ -3318,6 +3332,9 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>  					    slot, rel_gfn);
+>  		else
+>  			set_bit_le(rel_gfn, memslot->dirty_bitmap);
+> +
+> +		if (kvm_vcpu_is_dirty_quota_exhausted(vcpu))
+> +			kvm_make_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu);
+
+This is broken in the light of new dirty-tracking code queued for
+6.2. Specifically, you absolutely can end-up here *without* a vcpu on
+arm64. You just have to snapshot the ITS state to observe the fireworks.
+
+	M.
+
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Without deviation from the norm, progress is not possible.
