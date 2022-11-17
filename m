@@ -2,116 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C457B62D577
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 09:50:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B337962D657
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 10:20:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239401AbiKQIuW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 03:50:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50532 "EHLO
+        id S239816AbiKQJUB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 04:20:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239162AbiKQIuV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 03:50:21 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF42E25D5;
-        Thu, 17 Nov 2022 00:50:20 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AH8j2FI026832;
-        Thu, 17 Nov 2022 08:50:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : to :
- subject : cc : from : message-id : date; s=pp1;
- bh=vmQXI57gHIQ9CSzeNYfVDBiCH73tb2dcHnpplp4XpZk=;
- b=O1RGWY/x7UNzEZ4X1zBOWPPqT2NMBx+MaXCeWgZCFU66cWiY/JPK3672IqO8pqrflzIE
- uwsyZz/qZRjodM1KINYjxThQFCEIUhvGEtawnXRdBFgTQ/eS0eapYu1PiN2iRV+Fl0PH
- GfB7j5iN/n234FaHfAUKU/0s8ulgOQfafBbo97nVPI3ip0GjUPLJkg83aA0UR3AenS4I
- qw5A7147R0BfYpMq56bVzqY0wlrkLL0MatBUBZ5ZkgDg4r4oLTaSDBwtqYJKQ3uWQCRT
- uLx9Ku0yFO66WHl3g6G1VdGxtQ7Azq8dMmxvJG8XoEzb5eF+rMBB8ZHP+KRPp8JwehEN zQ== 
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kwhqjr3d7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Nov 2022 08:50:20 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AH8oIld005917;
-        Thu, 17 Nov 2022 08:50:18 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma01fra.de.ibm.com with ESMTP id 3ktbd9n4j0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Nov 2022 08:50:17 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AH8oEXI31523450
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 17 Nov 2022 08:50:14 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AADDA11C054;
-        Thu, 17 Nov 2022 08:50:14 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 83D2311C04C;
-        Thu, 17 Nov 2022 08:50:14 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.65.30])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 17 Nov 2022 08:50:14 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <659501fc-0ddc-2db6-cdcb-4990d5c46817@linux.ibm.com>
-References: <20221108152610.735205-1-nrb@linux.ibm.com> <659501fc-0ddc-2db6-cdcb-4990d5c46817@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, akrowiak@linux.ibm.com,
-        jjherne@linux.ibm.com, pasic@linux.ibm.com
-Subject: Re: [PATCH v1] s390/vfio-ap: GISA: sort out physical vs virtual pointers usage
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        borntraeger@linux.ibm.com, imbrenda@linux.ibm.com
-From:   Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <166867501356.12564.3855578681315731621@t14-nrb.local>
-User-Agent: alot/0.8.1
-Date:   Thu, 17 Nov 2022 09:50:14 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: oIFPGSO8tr3kOyzo4fz4Zdpt2MRVmpsN
-X-Proofpoint-GUID: oIFPGSO8tr3kOyzo4fz4Zdpt2MRVmpsN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-17_04,2022-11-16_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
- lowpriorityscore=0 mlxscore=0 spamscore=0 mlxlogscore=999 suspectscore=0
- impostorscore=0 priorityscore=1501 clxscore=1015 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211170064
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S239815AbiKQJT7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 04:19:59 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4048AF0B0
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:19:57 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-391842a55d6so5625987b3.0
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:19:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ACYDPcuAUxUGlMNofZDyVmunW6qXPunSo4acvIqCYtg=;
+        b=iW3mvCX5nq7+oa3xMp0QpEHPi4xWRWMH+u4pu7cFAcdgonhPnHDBiGQ8deYhRy8bza
+         wZfhLna3K1ZOyk0JCiy16dfyjKd3fZVBAo9q7LdYHLmW+Lz1wCZ9wHvf4dwXDDj0Ig8D
+         KT9gLcPxvcc7coyTMlj2pjhuLEctbrMU/O3KqypK4htpNoE4r6QaP7WD9kfRFx9qzz11
+         h2dZdcymbVsfaAnq1xw9OmaiHYaVCw+QTnjF3C7BVLgdY47A30KvTveYaFqBitlpyrVj
+         RYR7KBwGFOJBH9kBjBquzWdpQSPCQ0jNHWq192AesOoknXss4MVMcnlFBLZ6W7e3QbPH
+         OfJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ACYDPcuAUxUGlMNofZDyVmunW6qXPunSo4acvIqCYtg=;
+        b=tjtC4qE0ooadf4TxL6fW60w0wQnI58P6sMBR6zgEL0iEgmacKfhInonK9wHDoBmY/0
+         YM9PwsOTEdPNKq2PqxpOVro9oZ8tiIHudjKq1QPO9P4pi+OdjVf/m6Of0qaxr9DMbh1u
+         WquMH7bFIBAdnm+no/YWPh1d7P19HlcwPs0T8ogiNPPkua/tnK9eaxQ9kahMZS1btJmX
+         p7M1Rwbg46us7WYwOyDcAZE9n71jszWjEX04U5bITKgJLZVhNdAxwjJCL/CbQvNGCoWi
+         Whx2Qd+G1PTbGDYLxlqGmaVG0lEzngtWDWX8kC4mkdi6mMTacvmmAPt3z7G3+r8XVYhf
+         FfWg==
+X-Gm-Message-State: ANoB5pmSnmuAFWwkLzoEx5kLIe8JIHzGxUQG7CZo3u/pIukogi9xTUcy
+        JY7VSCeNFlJlZHSENUgC4JaO450cFwbgqw==
+X-Google-Smtp-Source: AA0mqf6wTCJbKpovoDP1hLRmgpkF4nOH/oNEcSfcLZ462mhRJedDGEQSPaLDVxjGeg0bUuldcegXWZbmkcNA5A==
+X-Received: from suleiman1.tok.corp.google.com ([2401:fa00:8f:203:416e:f3c7:7f1d:6e])
+ (user=suleiman job=sendgmr) by 2002:a5b:2c6:0:b0:6be:99e7:c5f0 with SMTP id
+ h6-20020a5b02c6000000b006be99e7c5f0mr1310537ybp.248.1668676797009; Thu, 17
+ Nov 2022 01:19:57 -0800 (PST)
+Date:   Thu, 17 Nov 2022 18:19:18 +0900
+Message-Id: <20221117091952.1940850-1-suleiman@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
+Subject: [PATCH 4.19 00/34] Intel RETBleed mitigations for 4.19.
+From:   Suleiman Souhlal <suleiman@google.com>
+To:     stable@vger.kernel.org
+Cc:     x86@kernel.org, kvm@vger.kernel.org, bp@alien8.de,
+        pbonzini@redhat.com, peterz@infradead.org, jpoimboe@kernel.org,
+        cascardo@canonical.com, surajjs@amazon.com, ssouhlal@FreeBSD.org,
+        suleiman@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2022-11-15 09:56:52)
-> On 11/8/22 16:26, Nico Boehr wrote:
-> > Fix virtual vs physical address confusion (which currently are the same)
-> > for the GISA when enabling the IRQ.
-> >=20
-> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> > ---
-> >   drivers/s390/crypto/vfio_ap_ops.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vf=
-io_ap_ops.c
-> > index 0b4cc8c597ae..20859cabbced 100644
-> > --- a/drivers/s390/crypto/vfio_ap_ops.c
-> > +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> > @@ -429,7 +429,7 @@ static struct ap_queue_status vfio_ap_irq_enable(st=
-ruct vfio_ap_queue *q,
-> >  =20
-> >       aqic_gisa.isc =3D nisc;
-> >       aqic_gisa.ir =3D 1;
-> > -     aqic_gisa.gisa =3D (uint64_t)gisa >> 4;
-> > +     aqic_gisa.gisa =3D (uint64_t)virt_to_phys(gisa) >> 4;
->=20
-> I'd suggest doing s/uint64_t/u64/ or s/uint64_t/unsigned long/ but I'm=20
-> wondering if (u32)(u64) would be more appropriate anyway.
+This series backports the mitigations for RETBleed for Intel CPUs to
+the 4.19 kernel.
 
-The gisa origin is a unsigned int, hence you are right, uint64_t is odd. Bu=
-t since virt_to_phys() returns unsigned long, the cast to uint64_t is now u=
-seless.
+It's based on the 5.4 [1] and 4.14 [2] backports.
 
-My suggestion is to remove the cast alltogether.
+Tested on Skylake Chromebook.
+
+[1] https://lore.kernel.org/stable/20221003131038.12645-1-cascardo@canonical.com/
+[2] https://lore.kernel.org/kvm/20221027204801.13146-1-surajjs@amazon.com/
+
+Alexandre Chartre (2):
+  x86/bugs: Report AMD retbleed vulnerability
+  x86/bugs: Add AMD retbleed= boot parameter
+
+Andrew Cooper (1):
+  x86/cpu/amd: Enumerate BTC_NO
+
+Daniel Sneddon (1):
+  x86/speculation: Add RSB VM Exit protections
+
+Ingo Molnar (1):
+  x86/cpufeature: Fix various quality problems in the
+    <asm/cpu_device_hd.h> header
+
+Josh Poimboeuf (8):
+  x86/speculation: Fix RSB filling with CONFIG_RETPOLINE=n
+  x86/speculation: Fix firmware entry SPEC_CTRL handling
+  x86/speculation: Fix SPEC_CTRL write on SMT state change
+  x86/speculation: Use cached host SPEC_CTRL value for guest entry/exit
+  x86/speculation: Remove x86_spec_ctrl_mask
+  KVM: VMX: Prevent guest RSB poisoning attacks with eIBRS
+  KVM: VMX: Fix IBRS handling after vmexit
+  x86/speculation: Fill RSB on vmexit for IBRS
+
+Kan Liang (1):
+  x86/cpufeature: Add facility to check for min microcode revisions
+
+Mark Gross (1):
+  x86/cpu: Add a steppings field to struct x86_cpu_id
+
+Nathan Chancellor (1):
+  x86/speculation: Use DECLARE_PER_CPU for x86_spec_ctrl_current
+
+Pawan Gupta (4):
+  x86/speculation: Add spectre_v2=ibrs option to support Kernel IBRS
+  x86/bugs: Add Cannon lake to RETBleed affected CPU list
+  x86/speculation: Disable RRSBA behavior
+  x86/bugs: Warn when "ibrs" mitigation is selected on Enhanced IBRS
+    parts
+
+Peter Zijlstra (10):
+  x86/cpufeatures: Move RETPOLINE flags to word 11
+  x86/bugs: Keep a per-CPU IA32_SPEC_CTRL value
+  x86/entry: Remove skip_r11rcx
+  x86/entry: Add kernel IBRS implementation
+  x86/bugs: Optimize SPEC_CTRL MSR writes
+  x86/bugs: Split spectre_v2_select_mitigation() and
+    spectre_v2_user_select_mitigation()
+  x86/bugs: Report Intel retbleed vulnerability
+  intel_idle: Disable IBRS during long idle
+  x86/speculation: Change FILL_RETURN_BUFFER to work with objtool
+  x86/common: Stamp out the stepping madness
+
+Suleiman Souhlal (2):
+  Revert "x86/speculation: Add RSB VM Exit protections"
+  Revert "x86/cpu: Add a steppings field to struct x86_cpu_id"
+
+Thomas Gleixner (2):
+  x86/devicetable: Move x86 specific macro out of generic code
+  x86/cpu: Add consistent CPU match macros
+
+ .../admin-guide/kernel-parameters.txt         |  13 +
+ arch/x86/entry/calling.h                      |  68 +++-
+ arch/x86/entry/entry_32.S                     |   2 -
+ arch/x86/entry/entry_64.S                     |  34 +-
+ arch/x86/entry/entry_64_compat.S              |  11 +-
+ arch/x86/include/asm/cpu_device_id.h          | 168 +++++++-
+ arch/x86/include/asm/cpufeatures.h            |  18 +-
+ arch/x86/include/asm/intel-family.h           |   6 +
+ arch/x86/include/asm/msr-index.h              |  10 +
+ arch/x86/include/asm/nospec-branch.h          |  53 ++-
+ arch/x86/kernel/cpu/amd.c                     |  21 +-
+ arch/x86/kernel/cpu/bugs.c                    | 368 ++++++++++++++----
+ arch/x86/kernel/cpu/common.c                  |  60 +--
+ arch/x86/kernel/cpu/match.c                   |  44 ++-
+ arch/x86/kernel/cpu/scattered.c               |   1 +
+ arch/x86/kernel/process.c                     |   2 +-
+ arch/x86/kvm/svm.c                            |   1 +
+ arch/x86/kvm/vmx.c                            |  53 ++-
+ arch/x86/kvm/x86.c                            |   4 +-
+ drivers/base/cpu.c                            |   8 +
+ drivers/cpufreq/acpi-cpufreq.c                |   1 +
+ drivers/cpufreq/amd_freq_sensitivity.c        |   1 +
+ drivers/idle/intel_idle.c                     |  43 +-
+ include/linux/cpu.h                           |   2 +
+ include/linux/kvm_host.h                      |   2 +-
+ include/linux/mod_devicetable.h               |   4 +-
+ tools/arch/x86/include/asm/cpufeatures.h      |   1 +
+ 27 files changed, 813 insertions(+), 186 deletions(-)
+
+-- 
+2.38.1.431.g37b22c650d-goog
+
