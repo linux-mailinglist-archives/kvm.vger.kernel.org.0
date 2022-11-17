@@ -2,117 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BD0D62E392
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 18:55:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A4B7362E396
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 18:56:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240032AbiKQRz4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 12:55:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39824 "EHLO
+        id S240059AbiKQR4V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 12:56:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240291AbiKQRzs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 12:55:48 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D6EF7FF2E;
-        Thu, 17 Nov 2022 09:55:48 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id h193so2615344pgc.10;
-        Thu, 17 Nov 2022 09:55:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1GKnYydXCYqxqW9dR7aXjYaf7V42K6rqe1svrcwQLNA=;
-        b=SsPhA+/zwr2soeEEaWB0iEXVlj2pRXy3T+5MRNkg3gA5bYnDEY76LeiMkjnH6Gtuek
-         VQBK8qn5HlwgpU7JZk31s67cl0oqPFk3/+E+STN+mOv1n0rSuGKwz4ufNl96yyvb+ehm
-         aR16ZhBgByLcqtxYalWYt3DhzqpWD1xk7B/ERhHy5UROjXSA2O4WT484NF1gnxYt2zLo
-         VhlagvXdWvqrnTC1Vpr/nXSDV94IDRsmmPKjuIzbKfxVwlbZ700ttpYm5thGIaufzUrk
-         HWDdterCqcq4ySav4311fVhhOLzfuYpSaYvQzNRfmNvAt+J1fYmNxyHxf+meEu+3PzVd
-         YRFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1GKnYydXCYqxqW9dR7aXjYaf7V42K6rqe1svrcwQLNA=;
-        b=TkOn/q0TYypgvcItYVwdYw9qRENVqNoMzOyCXJV/l1sjxWsfcAhYbafpwg3gwEyEuX
-         I94sNPdmxKAJQ8P0+6ww9LuTpeJ+o0mzwOOpmmF4pIql8cjSEYYkbSYUWVuK0iT9x3A+
-         dtFSAgArJE6z8YtbuG0C6n45vmrv7m2Et/fbjI5/8GIMoDLp5jFgv6aaCAMQHysevL8I
-         5gnVxqD5t0hEWjSUCXnPdOVyfxjsKtSaOBJC33ZIzgAXbfALIFYF76k8F6bo09ynwqw5
-         fwbUo3jJ5/HdNVkV9MA8SEqCOjTj6P2aJJWfjyN+zZ5P+cjKGnuTyMN8+dGKZu4Ty0xU
-         X71g==
-X-Gm-Message-State: ANoB5pmldrGwdlerUPJA8ojU7sBUF+DxMpT1LwYQkhxoDiTsVxMIhWTA
-        feqrtWaqwKTsF9uzONXaZBVVoN4Tsy4=
-X-Google-Smtp-Source: AA0mqf6iXN48y71fjRlt9NKrGMiWHTqJP3NlCcBrojVNFQ5F8Uz85fLyhe10Tsd6646K6iiHVBVGYw==
-X-Received: by 2002:a63:165d:0:b0:473:f7cd:6603 with SMTP id 29-20020a63165d000000b00473f7cd6603mr3055977pgw.336.1668707747710;
-        Thu, 17 Nov 2022 09:55:47 -0800 (PST)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id h4-20020a170902680400b001870dc3b4c0sm1705264plk.74.2022.11.17.09.55.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Nov 2022 09:55:47 -0800 (PST)
-Date:   Thu, 17 Nov 2022 09:55:46 -0800
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "Aktas, Erdem" <erdemaktas@google.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "dmatlack@google.com" <dmatlack@google.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Subject: Re: [PATCH v10 032/108] KVM: x86/mmu: Make sync_page not use
- hard-coded 0 as the initial SPTE value
-Message-ID: <20221117175546.GH2350331@ls.amr.corp.intel.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <adcc3484605cb460a0c00ee5673c83f32a88e6ca.1667110240.git.isaku.yamahata@intel.com>
- <3f805b540780494c4a5b068287c37e40d71d7ba4.camel@intel.com>
+        with ESMTP id S240329AbiKQR4K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 12:56:10 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0119D82203;
+        Thu, 17 Nov 2022 09:56:08 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AHHKhJQ020659;
+        Thu, 17 Nov 2022 17:56:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=9hO88NdYDKs7FuUbkEqfKzDgmaeOXCOSpvoEOiM7LRs=;
+ b=mXcrW83Bb/CYKSAogDrnLaJ43Lhoe1XrQsC4lRNWL9LWDdJ7cBv6s2r46YkMmvytObtJ
+ Sbwik8XhkuS5Eb0voQ7P7hT6kZ7ehN4scOR2ZDf3XX5hcHVnMyKqFjALk85jX7DnBkmJ
+ gMQvymUxOydQnmOoBVkYMEO9dtRtzzQ2tdgiSx0mLDD9Xe5vzhz1IuaeipVptbNmXvk7
+ HnAT53D8lUi7H8Urd4Pn8UGEJqz62tUKNQfivrZqk404exnA8u8f7vWNX2lIutEFtm0e
+ aatazz6fidTHnTEWCjzbcLJQD458dsfnGtwM76FFJ8k1nU5OaeX35k3cEwd8wQ5NLwyZ Pw== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kwqguv32p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Nov 2022 17:56:07 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AHHp9B5029507;
+        Thu, 17 Nov 2022 17:56:05 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3kt348yw29-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Nov 2022 17:56:05 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AHHu2Hx32309788
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Nov 2022 17:56:02 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A315C52052;
+        Thu, 17 Nov 2022 17:56:02 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.145.29.204])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 17C1E5204F;
+        Thu, 17 Nov 2022 17:56:02 +0000 (GMT)
+Date:   Thu, 17 Nov 2022 18:55:57 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Nico Boehr <nrb@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, akrowiak@linux.ibm.com,
+        jjherne@linux.ibm.com, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, borntraeger@linux.ibm.com,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH v1] s390/vfio-ap: GISA: sort out physical vs virtual
+ pointers usage
+Message-ID: <20221117185557.40932450.pasic@linux.ibm.com>
+In-Reply-To: <20221117110143.6892e7e8@p-imbrenda>
+References: <20221108152610.735205-1-nrb@linux.ibm.com>
+        <659501fc-0ddc-2db6-cdcb-4990d5c46817@linux.ibm.com>
+        <166867501356.12564.3855578681315731621@t14-nrb.local>
+        <20221117110143.6892e7e8@p-imbrenda>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3f805b540780494c4a5b068287c37e40d71d7ba4.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: OeIFd2GkmSaA0joDuFafhx29U_AyhW1s
+X-Proofpoint-ORIG-GUID: OeIFd2GkmSaA0joDuFafhx29U_AyhW1s
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-17_06,2022-11-17_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ clxscore=1011 impostorscore=0 bulkscore=0 spamscore=0 phishscore=0
+ suspectscore=0 mlxlogscore=999 adultscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211170127
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 09, 2022 at 11:24:44AM +0000,
-"Huang, Kai" <kai.huang@intel.com> wrote:
+On Thu, 17 Nov 2022 11:01:43 +0100
+Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
 
-> On Sat, 2022-10-29 at 23:22 -0700, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > FNAME(sync_page) in arch/x86/kvm/mmu/paging_tmpl.h assumes that the initial
-> > shadow page table entry (SPTE) is zero.  Remove the assumption by using
-> > SHADOW_NONPRESENT_VALUE that will be updated from 0 to non-zero value.
-> > 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >  arch/x86/kvm/mmu/paging_tmpl.h | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> > index 5ab5f94dcb6f..6db3f2b5563a 100644
-> > --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> > +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> > @@ -1036,7 +1036,8 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
-> >  		gpa_t pte_gpa;
-> >  		gfn_t gfn;
-> >  
-> > -		if (!sp->spt[i])
-> > +		/* spt[i] has initial value of shadow page table allocation */
-> > +		if (sp->spt[i] == SHADOW_NONPRESENT_VALUE)
-> >  			continue;
-> >  
-> >  		pte_gpa = first_pte_gpa + i * sizeof(pt_element_t);
+> On Thu, 17 Nov 2022 09:50:14 +0100
+> Nico Boehr <nrb@linux.ibm.com> wrote:
 > 
-> I think this patch can be merged to previous one?  Looks there's no good reason
-> to keep it as standalone.
+> > Quoting Janosch Frank (2022-11-15 09:56:52)  
+> > > On 11/8/22 16:26, Nico Boehr wrote:    
+> > > > Fix virtual vs physical address confusion (which currently are the same)
+> > > > for the GISA when enabling the IRQ.
+> > > > 
+> > > > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> > > > ---
+> > > >   drivers/s390/crypto/vfio_ap_ops.c | 2 +-
+> > > >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> > > > index 0b4cc8c597ae..20859cabbced 100644
+> > > > --- a/drivers/s390/crypto/vfio_ap_ops.c
+> > > > +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> > > > @@ -429,7 +429,7 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
+> > > >   
+> > > >       aqic_gisa.isc = nisc;
+> > > >       aqic_gisa.ir = 1;
+> > > > -     aqic_gisa.gisa = (uint64_t)gisa >> 4;
+> > > > +     aqic_gisa.gisa = (uint64_t)virt_to_phys(gisa) >> 4;    
+> > > 
+> > > I'd suggest doing s/uint64_t/u64/ or s/uint64_t/unsigned long/ but I'm 
+> > > wondering if (u32)(u64) would be more appropriate anyway.    
+> > 
+> > The gisa origin is a unsigned int, hence you are right, uint64_t is odd.
 
-Yes, will squash it.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+The reason for the cast was that gisa is a pointer, but we needed to do
+integer arithmetic on the address of the object pointed to by the
+pointer. It happens so that the pointer must point to a piece of memory
+that is 31 bit addressable in host real address space, but for getting
+the address from a pointer, casting to the unsigned integral type
+with-wise corresponds to the pointer is IMHO sensible regardless of
+that information.
+
+>But since virt_to_phys() returns unsigned long, the cast to uint64_t is
+> now useless.
+> > 
+> > My suggestion is to remove the cast alltogether.  
+> 
+> I agree to remove it
+
+Right: that cast makes no sense any more. And with that change:
+
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+
