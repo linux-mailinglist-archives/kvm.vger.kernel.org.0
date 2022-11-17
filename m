@@ -2,61 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6CB262E3EF
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 19:17:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4017162E3FE
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 19:21:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240440AbiKQSRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 13:17:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54714 "EHLO
+        id S240377AbiKQSVp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 13:21:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239785AbiKQSQ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 13:16:58 -0500
-Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D43564551
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 10:16:58 -0800 (PST)
-Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-369426664f9so26575137b3.12
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 10:16:58 -0800 (PST)
+        with ESMTP id S234940AbiKQSVn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 13:21:43 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 193225130B
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 10:21:43 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id io19so2382832plb.8
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 10:21:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=JAtqCREdjsvfQ/TLF/cHIfQmrDX+CtXnIqlulDNOPX8=;
-        b=ru06SzHh49Zy5U/2XSX7IpGPvMuoRC5xz+MTxx7J6GxaoOSYk8zyLr7tyThz2gmkF4
-         e0O3C2jMPZCopCE9azD/SoqJyBhn9d9CRGvIFzb/ul7bbybihkdy+2tc5pUdc2ZFseUS
-         f7HrVtRVV/EbVCjlug6U0HPrcf0tJZPX6ZZtcPiYxX8l4B+PXFnFgxgyDKVJpoKI5K3T
-         0Y7wLb0YF/iSRhBrFx5pAUkgANtjRQ0mbiGmW7sQYjRM6uAZMMi0XfmuUqlZy8iC/MN+
-         8vbpgfU3J4dTM/RIH7Lw8L43y2+Ghd7VPTyy0plzImDF+e9IoxaGb+qApwYRAQT1IoH4
-         /7JQ==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lr78Yau/0ZuciclKD/43OciuX+84fm0DnfS4/ZC/c4g=;
+        b=rwaeeJv+REvrzu7YQOJHP/Jgm2kagbxlHbxA1RNjHOwWOa4z/pMRJiQU+oYDpWp1vZ
+         Wyn+VRj9wHdsl+80FEin+j+CqflwHsXmjL3XnFpkGFEvJniERReiPH5xB/tO0sf4fjUw
+         EiziwfL+XagvxGAT+7BoKZru64lJiQSiaD+DSDGZfmi21Dk7oYzH/7GNwXZshgJmuBWb
+         13AD3PWY4MOkWB94I9YNxSuG9Q1zGtEiWZtZD+e2Ia4uK7HIAs9sbW2y5PQ2Qob0zLbA
+         hIC9e9XXwBa6PaWrzdr+EfKp6sHMbM/5gFnGB0SKLI/4LRB426oGxYmgjfZpDxY9HkHE
+         k+ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JAtqCREdjsvfQ/TLF/cHIfQmrDX+CtXnIqlulDNOPX8=;
-        b=ok5A62CFbVA49EZQd6wMp0Ggvj5dg3WiH1VLAPM3jE0YRqfssBBfe9BprPSfllAX8M
-         A+MFluKK6vMqbPfxIQ22CYXc5QhLmrUp8/NuWQJnbUjAclfgJ3r+G5sPxW4yYh5EqRql
-         T3++jPiWvNdWIlygyU37WeskcuUpgetWcp6PO1Wk5w5ooCpBQT/8CKMTJ6Wx4kGFC+ds
-         dtwX6z3ZfhX1MW9yvmNMOYTFwz9R+RjW6vhZEBjeEglm4VnaFQsB9IamPIT0KTzXvWDF
-         hAu9muQ9rZsORbwvFKbiqXP1yzJqJd8R8TqAKsl4Q4HWoUpQeyQWNO8scbzTgT+DCI0A
-         LipQ==
-X-Gm-Message-State: ANoB5pkJbdB4lJ1PgV6fovf6Icf7pQR/bRNZYLwo1mduJ0lbDol55w2T
-        /qZGhRoXI5C26dxdaP9UDhrW563jc4AIkwPEUgLKtw==
-X-Google-Smtp-Source: AA0mqf6ULha0ubfw+LYNzikBwkkjVj7QQh1CuuNLGXhTKb2vypNvcV1j5oFQxZfRBA0izZh5HV6XA/1V2T0LxfN559M=
-X-Received: by 2002:a81:25d8:0:b0:373:4467:e0c6 with SMTP id
- l207-20020a8125d8000000b003734467e0c6mr3149831ywl.340.1668709017257; Thu, 17
- Nov 2022 10:16:57 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lr78Yau/0ZuciclKD/43OciuX+84fm0DnfS4/ZC/c4g=;
+        b=qVNlxrr7sVvun+ckD4wtYDx7hWMbB3YE2ACjKeXRGebi2M7mp3rupXBc4yB5VchX9X
+         hhK6bKvXJKJV17riNmZOU7IukaPPV6LMPWgPPc105/f1g//I6pFKPvtk1eTru320l8cr
+         am690GS4cyoL+5FzKB5WQu8Nlh6Qw9TbDr88fhgKMdX39GrNvIlqxJenFfOy1NFOnrw/
+         zDV8TtN/wOcBvOS4Bv4JCPgikUVA76tlGTfh3xYVHtcmG+1T8+pCJAowU3jCVxO+kG2U
+         oCO2/Z8u7dp24T6E6AoSC52Kfg4bqJJ56QbPGzJNYjxyZkeQrjn52KYaloRVr+Gmt1XC
+         iaQA==
+X-Gm-Message-State: ANoB5pmTHZVFCk08HS+cBI9puHv5s4pAM5mTroSwSOLY1WqbhkVS+a6Z
+        zuJLtlLUSvr5GUVLsjT3xY6Ip9Ef6N2uDA==
+X-Google-Smtp-Source: AA0mqf7cDSanTtq4Yh/w4RJLWRS/t+yEgzpSP16QAMWCntRgJR/xadL5skrX0bzvJp3Dco0KVfw3DA==
+X-Received: by 2002:a17:902:b414:b0:186:7fda:4d4a with SMTP id x20-20020a170902b41400b001867fda4d4amr3994779plr.66.1668709302378;
+        Thu, 17 Nov 2022 10:21:42 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id y65-20020a626444000000b0056d73ef41fdsm1481643pfb.75.2022.11.17.10.21.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Nov 2022 10:21:42 -0800 (PST)
+Date:   Thu, 17 Nov 2022 18:21:38 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sandipan Das <sandipan.das@amd.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Jing Liu <jing2.liu@intel.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Wyes Karny <wyes.karny@amd.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Babu Moger <babu.moger@amd.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org
+Subject: Re: [PATCH 09/13] KVM: SVM: allow NMI window with vNMI
+Message-ID: <Y3Z7sq42Ao/qRn0u@google.com>
+References: <20221117143242.102721-1-mlevitsk@redhat.com>
+ <20221117143242.102721-10-mlevitsk@redhat.com>
 MIME-Version: 1.0
-References: <20221117173109.3126912-1-pbonzini@redhat.com>
-In-Reply-To: <20221117173109.3126912-1-pbonzini@redhat.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 17 Nov 2022 10:16:30 -0800
-Message-ID: <CALzav=ewv2rVp+2HL8-648C1d3_5bCLv1N6SkDWJFU8X7nqJBg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: avoid memslot check in NX hugepage recovery if
- it cannot be true
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221117143242.102721-10-mlevitsk@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -68,112 +86,181 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 9:31 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> Since gfn_to_memslot() is relatively expensive, it helps to
-> skip it if it the memslot cannot possibly have dirty logging
-> enabled.  In order to do this, add to struct kvm a counter
-> of the number of log-page memslots.  While the correct value
-> can only be read with slots_lock taken, the NX recovery thread
-> is content with using an approximate value.  Therefore, the
-> counter is an atomic_t.
-
-Oo, good idea to use the counter to skip gfn_to_memslot() in the steady state.
-
-FYI I sent an earlier patch to add an equivalent counter in case
-you want to use that and apply the change to
-kvm_recover_nx_huge_pages() as a separate patch.
-
-https://lore.kernel.org/kvm/20221027200316.2221027-2-dmatlack@google.com/
-
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Thu, Nov 17, 2022, Maxim Levitsky wrote:
+> When the vNMI is enabled, the only case when the KVM will use an NMI
+> window is when the vNMI injection is pending.
+> 
+> In this case on next IRET/RSM/STGI, the injection has to be complete
+> and a new NMI can be injected.
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c   | 22 +++++++++++++++++++---
->  include/linux/kvm_host.h |  5 +++++
->  virt/kvm/kvm_main.c      |  5 +++++
->  3 files changed, 29 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index cfff74685a25..d4ec9491d468 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -6878,16 +6878,32 @@ static void kvm_recover_nx_huge_pages(struct kvm *kvm)
->                 WARN_ON_ONCE(!sp->nx_huge_page_disallowed);
->                 WARN_ON_ONCE(!sp->role.direct);
->
-> -               slot = gfn_to_memslot(kvm, sp->gfn);
-> -               WARN_ON_ONCE(!slot);
+>  arch/x86/kvm/svm/svm.c | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index cfec4c98bb589b..eaa30f8ace518d 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -2477,7 +2477,10 @@ static int iret_interception(struct kvm_vcpu *vcpu)
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+>  	++vcpu->stat.nmi_window_exits;
+> -	vcpu->arch.hflags |= HF_IRET_MASK;
+> +
+> +	if (!is_vnmi_enabled(svm))
+> +		vcpu->arch.hflags |= HF_IRET_MASK;
+
+Ugh, HF_IRET_MASK is such a terrible name/flag.  Given that it lives with GIF
+and NMI, one would naturally think that it means "IRET is intercepted", but it
+really means "KVM just intercepted an IRET and is waiting for NMIs to become
+unblocked".
+
+And on a related topic, why on earth are GIF, NMI, and IRET tracked in hflags?
+They are 100% SVM concepts.  IMO, this code would be much easier to follow if
+by making them bools in vcpu_svm with more descriptive names.
+
+> +
+>  	if (!sev_es_guest(vcpu->kvm)) {
+>  		svm_clr_intercept(svm, INTERCEPT_IRET);
+>  		svm->nmi_iret_rip = kvm_rip_read(vcpu);
+
+The vNMI interaction with this logic is confusing, as nmi_iret_rip doesn't need
+to be captured for the vNMI case.  SEV-ES actually has unrelated reasons for not
+reading RIP vs. not intercepting IRET, they just got bundled together here for
+convenience.
+
+This is also an opportunity to clean up the SEV-ES interaction with IRET interception,
+which is splattered all over the place and isn't documented anywhere.
+
+E.g. (with an HF_IRET_MASK => awaiting_iret_completion change)
+
+/*
+ * For SEV-ES guests, KVM must not rely on IRET to detect NMI unblocking as
+ * #VC->IRET in the guest will result in KVM thinking NMIs are unblocked before
+ * the guest is ready for a new NMI.  Architecturally, KVM is 100% correct to
+ * treat NMIs as unblocked on IRET, but the guest-host ABI for SEV-ES guests is
+ * that KVM must wait for an explicit "NMI Complete" from the guest.
+ */
+static void svm_disable_iret_interception(struct vcpu_svm *svm)
+{
+	if (!sev_es_guest(svm->vcpu.kvm))
+		svm_clr_intercept(svm, INTERCEPT_IRET);
+}
+
+static void svm_enable_iret_interception(struct vcpu_svm *svm)
+{
+	if (!sev_es_guest(svm->vcpu.kvm))
+		svm_set_intercept(svm, INTERCEPT_IRET);
+}
+
+static int iret_interception(struct kvm_vcpu *vcpu)
+{
+	struct vcpu_svm *svm = to_svm(vcpu);
+
+	++vcpu->stat.nmi_window_exits;
+
+	/*
+	 * No need to wait for the IRET to complete if vNMIs are enabled as
+	 * hardware will automatically process the pending NMI when NMIs are
+	 * unblocked from the guest's perspective.
+	 */
+	if (!is_vnmi_enabled(svm)) {
+		svm->awaiting_iret_completion = true;
+
+		/*
+		 * The guest's RIP is inaccessible for SEV-ES guests, just
+		 * assume forward progress was made on the next VM-Exit.
+		 */
+		if (!sev_es_guest(vcpu->kvm))
+			svm->nmi_iret_rip = kvm_rip_read(vcpu);
+	}
+
+	svm_disable_iret_interception(svm);
+
+	kvm_make_request(KVM_REQ_EVENT, vcpu);
+	return 1;
+}
+
+> @@ -3735,9 +3738,6 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+> -	if (is_vnmi_enabled(svm))
+> -		return;
 > -
->                 /*
->                  * Unaccount and do not attempt to recover any NX Huge Pages
->                  * that are being dirty tracked, as they would just be faulted
->                  * back in as 4KiB pages. The NX Huge Pages in this slot will be
->                  * recovered, along with all the other huge pages in the slot,
->                  * when dirty logging is disabled.
-> +                *
-> +                * Since gfn_to_memslot() is relatively expensive, it helps to
-> +                * skip it if it the test cannot possibly return true.  On the
-> +                * other hand, if any memslot has logging enabled, chances are
-> +                * good that all of them do, in which case unaccount_nx_huge_page()
-> +                * is much cheaper than zapping the page.
-> +                *
-> +                * If a memslot update is in progress, reading an incorrect value
-> +                * of kvm->nr_logpage_memslots is not a problem: if it is becoming
-> +                * zero, gfn_to_memslot() will be done unnecessarily; if it is
-> +                * becoming nonzero, the page will be zapped unnecessarily.
-> +                * Either way, this only affects efficiency in racy situations,
-> +                * and not correctness.
->                  */
-> +               slot = NULL;
-> +               if (atomic_read(&kvm->nr_logpage_memslots)) {
-> +                       slot = gfn_to_memslot(kvm, sp->gfn);
-> +                       WARN_ON_ONCE(!slot);
-> +               }
+>  	if ((vcpu->arch.hflags & (HF_NMI_MASK | HF_IRET_MASK)) == HF_NMI_MASK)
+>  		return; /* IRET will cause a vm exit */
+
+As much as I like incremental patches, in this case I'm having a hell of a time
+reviewing the code as the vNMI logic ends up being split across four patches.
+E.g. in this particular case, the above requires knowing that svm_inject_nmi()
+never sets HF_NMI_MASK when vNMI is enabled.
+
+In the next version, any objection to squashing patches 7-10 into a single "Add
+non-nested vNMI support" patch?
+
+As for this code, IMO some pre-work to change the flow would help with the vNMI
+case.  The GIF=0 logic overrides legacy NMI blocking, and so can be handled first.
+And I vote to explicitly set INTERCEPT_IRET in the above case instead of relying
+on INTERCEPT_IRET to already be set by svm_inject_nmi().
+
+That would yield this as a final result:
+
+static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+{
+	struct vcpu_svm *svm = to_svm(vcpu);
+
+	/*
+	 * GIF=0 blocks NMIs irrespective of legacy NMI blocking.  No need to
+	 * intercept or single-step IRET if GIF=0, just intercept STGI.
+	 */
+	if (!gif_set(svm)) {
+		if (vgif)
+			svm_set_intercept(svm, INTERCEPT_STGI);
+		return;
+	}
+
+	/*
+	 * NMI is blocked, either because an NMI is in service or because KVM
+	 * just injected an NMI.  If KVM is waiting for an intercepted IRET to
+	 * complete, single-step the IRET to wait for NMIs to become unblocked.
+	 * Otherwise, intercept the guest's next IRET.
+	 */
+	if (svm->awaiting_iret_completion) {
+		svm->nmi_singlestep_guest_rflags = svm_get_rflags(vcpu);
+		svm->nmi_singlestep = true;
+		svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
+	} else {
+		svm_set_intercept(svm, INTERCEPT_IRET);
+	}
+}
+
+>  
+> @@ -3751,9 +3751,14 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+>  	 * Something prevents NMI from been injected. Single step over possible
+>  	 * problem (IRET or exception injection or interrupt shadow)
+>  	 */
+> -	svm->nmi_singlestep_guest_rflags = svm_get_rflags(vcpu);
+> -	svm->nmi_singlestep = true;
+> -	svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
 > +
->                 if (slot && kvm_slot_dirty_track_enabled(slot))
->                         unaccount_nx_huge_page(kvm, sp);
->                 else if (is_tdp_mmu_page(sp))
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index e6e66c5e56f2..b3c2b975e737 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -722,6 +722,11 @@ struct kvm {
->         /* The current active memslot set for each address space */
->         struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
->         struct xarray vcpu_array;
-> +       /*
-> +        * Protected by slots_lock, but can be read outside if an
-> +        * incorrect answer is acceptable.
-> +        */
-> +       atomic_t nr_logpage_memslots;
+> +	if (is_vnmi_enabled(svm)) {
+> +		svm_set_intercept(svm, INTERCEPT_IRET);
 
-Can also be int + READ_ONCE(), but I do like that atomic_t forces the
-reader to use atomic_read().
+This will break SEV-ES.  Per commit 4444dfe4050b ("KVM: SVM: Add NMI support for
+an SEV-ES guest"), the hypervisor must not rely on IRET interception to detect
+NMI unblocking for SEV-ES guests.  As above, I think we should provide helpers to
+toggle NMI interception to reduce the probability of breaking SEV-ES.
 
->
->         /* Used to wait for completion of MMU notifiers.  */
->         spinlock_t mn_invalidate_lock;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 43bbe4fde078..7670ebd29bcf 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1627,6 +1627,11 @@ static int kvm_prepare_memory_region(struct kvm *kvm,
->                 }
->         }
->
-> +       atomic_set(&kvm->nr_logpage_memslots,
-> +                  atomic_read(&kvm->nr_logpage_memslots)
-> +                  + !!(new->flags & KVM_MEM_LOG_DIRTY_PAGES)
-> +                  - !!(old->flags & KVM_MEM_LOG_DIRTY_PAGES));
-
-@new and @old can be NULL here if creating or destroying a memslot.
-
-
-> +
->         r = kvm_arch_prepare_memory_region(kvm, old, new, change);
->
->         /* Free the bitmap on failure if it was allocated above. */
-> --
-> 2.31.1
->
+> +	} else {
+> +		svm->nmi_singlestep_guest_rflags = svm_get_rflags(vcpu);
+> +		svm->nmi_singlestep = true;
+> +		svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
+> +	}
+>  }
+>  
+>  static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
+> -- 
+> 2.34.3
+> 
