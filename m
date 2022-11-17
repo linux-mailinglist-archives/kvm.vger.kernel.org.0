@@ -2,76 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69A7862E320
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 18:33:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0D5062E328
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 18:35:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240059AbiKQRdK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 12:33:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54214 "EHLO
+        id S235023AbiKQRe7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 12:34:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232427AbiKQRdG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 12:33:06 -0500
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 411BB79E16;
-        Thu, 17 Nov 2022 09:33:06 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id d192so2479465pfd.0;
-        Thu, 17 Nov 2022 09:33:06 -0800 (PST)
+        with ESMTP id S230383AbiKQRe6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 12:34:58 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AA04532EB;
+        Thu, 17 Nov 2022 09:34:57 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id k22so2452450pfd.3;
+        Thu, 17 Nov 2022 09:34:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=irBTpzdt3UKRDSaNb8P0V0IX9do/eaeR5wsA7XkY2ZM=;
-        b=he3HAFo1vLSohQ1GDMkdmyEQuAtzCtKtgHDZ9rpSjs/rlQYgBG2tiS79xmS9Or1e8X
-         C2uBPXlyMuubFKL8UqsXYX0n27S5LwIYGhWJkkZe5qXRkrrRjpIezlltEoyKSIR166Rn
-         dZ5HCa8vzD4epku1LfsNmvU8CLXTd/fKYF6ELgR8SE6XfL/ZRhDihUj3KpmndifWM4ur
-         cj/o4R9gxWPfMwfmofXWxUFeJDhlw70mq2cV6+5ZEm7VszZOWHjadrcz5wM0iviLwCTH
-         Y34E6E0Xlxc9S8nLc4UiwngYQINpmL8DdA0PhP6qHlz900Nfsb5unfx2oSKJR/JJwbak
-         MugA==
+        bh=GpTmGyle5XHjW7gvyvHxuCwQpZoXDUrLr0aG4rFAVf8=;
+        b=Z2kCiadhuB3UXfJf81kDm8ji1v9Db3bAW+nVpWQopH+ASUM3NfA2hLMB/YGHkEZdkj
+         +g+o3hYtU9dUSCMVdnRK+oHtUwfCPt6kFPzXPDvsIUCw8qHXHnHXhnBN/VkZ69BukmPT
+         nb7+YZGkny0COiexyK2R25oFBkSkp3kvGVibjiDBEuDU9bUwhfhkjp5jLglRb3ehdrw1
+         /Vs3oTvkjusQ6BxYV3Ylybh5tNCzw3hXVmV4qZrcCPOzAi0+3mp9GCWhD6lACAXJ4WH0
+         zTK0YJiTYXWOp2I/zdR/00DEEm4lzl2HM7vIyqNvRKKCtySsgVjIMRbrITvnqsXkrlBe
+         vnoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=irBTpzdt3UKRDSaNb8P0V0IX9do/eaeR5wsA7XkY2ZM=;
-        b=bLAaxue1bEXUh5Zl/0FKUOFS1FvKvL4ue+tMjepImAfxlGhu/O2DhOKAuFihTbSLwQ
-         IKNDlfg8/Nmw9fer4zdt8fQphAH2TcE7vDNbxVQmBDW+PG77/m6zuseR0e7It3sRKl9c
-         6/AjjzSOd9iUeok/lziR5dz+PL1TsiWoWQH5wv4yFH4mAy5QrpB+PIHWSFnnaH0QTpnk
-         nU8SdpRlZ5i5yHsTgUf1IBmstl1y+xUwKdwtff/aUWKP6O2qg+BwmZVAQtrr23Yu3m0t
-         vk0//iFI4kgnFd2ASY/6DlHEBrJxJNi0DXvFbuB3e7YZfE453gEhrLn7g80pSQruUPFq
-         Thcw==
-X-Gm-Message-State: ANoB5pnHhOpXIT7OZt2QSPAuSCZ9ldGtxXYPP1y/DGLTgW3zz49ZsFqr
-        Thsg924szY8OnIE1vZiENAey+5sotUo=
-X-Google-Smtp-Source: AA0mqf5uJqta9XJjikgXOcN3zPD0sje1CAgXFsnL+Bp0lgoCql9d0jjeN9rKmGWuTl37VIGedFZ3KQ==
-X-Received: by 2002:a63:171e:0:b0:476:9983:b395 with SMTP id x30-20020a63171e000000b004769983b395mr2972617pgl.355.1668706385524;
-        Thu, 17 Nov 2022 09:33:05 -0800 (PST)
+        bh=GpTmGyle5XHjW7gvyvHxuCwQpZoXDUrLr0aG4rFAVf8=;
+        b=0XgZwGUi0aAuBp9/+BLeKPnmx4roEcB+xFEUrPp2tDT8pCM6JouMOA4+yD2M0YGzgl
+         9cwPFiJISPx7QtYKJ15NhGQaJSnVzl4oApLf/36Lqj4pxWMtc0GBAL5OejdIzKloO783
+         fraxBpaIT6XiPKXavwxvGFBuZPiWUqJct+g07gSScS4CfL+qYRSeUOY8UFC4rsj1I8iE
+         bQOXYfHvSVorgQ4+XpNf5KJr2a0ZyLuDW4RpR0YQ9g9YO9Q148j09LdZkjTko1fmfCvS
+         Qpl6JrN5vR/AQA34boY3ypj9s1ZKEdblfvND4coS8sL0iFGzQ3bsjxy8DBY6pfJgvjdX
+         dLHw==
+X-Gm-Message-State: ANoB5pmIYZST8ORoYw8zJJz/aGGvRXyx6DHbKuKCF0OdYp0wB0/8TKi1
+        cIp1zJ9ATddu01SL1TpXaeg=
+X-Google-Smtp-Source: AA0mqf4mDGFMkETNV6xTkG2tIql5IjvogN6f5ZCJXhrC9IFX+o4zoBBKUshmOBUicaEJ5PV0JbcmBQ==
+X-Received: by 2002:a65:6a55:0:b0:470:2c92:13da with SMTP id o21-20020a656a55000000b004702c9213damr3005461pgu.298.1668706496897;
+        Thu, 17 Nov 2022 09:34:56 -0800 (PST)
 Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id 34-20020a631362000000b004597e92f99dsm1220728pgt.66.2022.11.17.09.33.04
+        by smtp.gmail.com with ESMTPSA id t15-20020a170902b20f00b00188ef2314b0sm1667673plr.39.2022.11.17.09.34.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Nov 2022 09:33:04 -0800 (PST)
-Date:   Thu, 17 Nov 2022 09:33:03 -0800
+        Thu, 17 Nov 2022 09:34:56 -0800 (PST)
+Date:   Thu, 17 Nov 2022 09:34:55 -0800
 From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Erdem Aktas <erdemaktas@google.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "Yamahata, Isaku" <isaku.yamahata@intel.com>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "Shahar, Sagi" <sagis@google.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
         "dmatlack@google.com" <dmatlack@google.com>,
         "Christopherson,, Sean" <seanjc@google.com>
-Subject: Re: [PATCH v10 005/108] KVM: TDX: Initialize the TDX module when
- loading the KVM intel kernel module
-Message-ID: <20221117173303.GB2350331@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v10 015/108] x86/cpu: Add helper functions to
+ allocate/free TDX private host key id
+Message-ID: <20221117173455.GC2350331@ls.amr.corp.intel.com>
 References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <99e5fcf2a7127347816982355fd4141ee1038a54.1667110240.git.isaku.yamahata@intel.com>
- <0feaa13fa5bf45258f2ebb8407eaefadf5c48976.camel@intel.com>
- <20221114231835.GA2350331@ls.amr.corp.intel.com>
- <CAAYXXYzM4=X5euL_cMx=YnPR7=8k9V_VY2ZyLs-RKz76DB2DcA@mail.gmail.com>
+ <5ee7c6dc4ba03b5d5166e015c148ef534ee53f8e.1667110240.git.isaku.yamahata@intel.com>
+ <b145dc3fcf5b2fd29241f4c8b5286b71402c7d7e.camel@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAAYXXYzM4=X5euL_cMx=YnPR7=8k9V_VY2ZyLs-RKz76DB2DcA@mail.gmail.com>
+In-Reply-To: <b145dc3fcf5b2fd29241f4c8b5286b71402c7d7e.camel@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -82,39 +80,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 15, 2022 at 04:22:13AM -0800,
-Erdem Aktas <erdemaktas@google.com> wrote:
+On Tue, Nov 08, 2022 at 09:16:57AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-> On Mon, Nov 14, 2022 at 3:18 PM Isaku Yamahata <isaku.yamahata@gmail.com> wrote:
-> > > I think you should explain why MOVDIR64B is required, otherwise this just comes
-> > > out of blue.
-> > >
-> > > Btw, is this absolutely required?  TDX also supports Li-mode, which doesn't have
-> > > integrity check.  So theoretically with Li-mode, normal zeroing is also OK but
-> > > doesn't need to use MOVDIR64B.
-> > >
-> > > That being said, do we have a way to tell whether TDX works in Ci or Li mode?
-> >
-> > As long as I don't know.  When clearing page, we can use
-> > if (featuremovdir64b) movdir64b else memset(0).
+> On Sat, 2022-10-29 at 23:22 -0700, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > TDX private host key id is assigned to guest TD.  The memory controller
+> > encrypts guest TD memory with the assigned TDX private host key id (HIKD).
+> 								     ^
+> 								     HKID.
 > 
-> -- sorry for resending the same email, for some reason my previous
-> email was not in plain text mode--
-> As far as I know, Li mode and Ci mode both are working very similarly
-> and require movdir64b to clear any poison bit previously set. Why
-> would movdir64b is not supported in a tdx capable cpu?
+> And since you already mentioned in the first sentence, you can put (HKID) part
+> there.  And I think you can just use HKID in the rest places to save some typing
+> as this is the purpose of using (HKID) I suppose.
+> 
+> [...]
+> 
+> >  
+> > +/* TDX KeyID pool */
+> > +static DEFINE_IDA(tdx_keyid_pool);
+> > +
+> > +int tdx_keyid_alloc(void)
+> > +{
+> > +	if (WARN_ON_ONCE(!tdx_keyid_start || !tdx_keyid_num))
+> > +		return -EINVAL;
+> > +
+> > +	/* The first keyID is reserved for the global key. */
+> > +	return ida_alloc_range(&tdx_keyid_pool, tdx_keyid_start + 1,
+> > +			       tdx_keyid_start + tdx_keyid_num - 1,
+> > +			       GFP_KERNEL);
+> > +}
+> > +EXPORT_SYMBOL_GPL(tdx_keyid_alloc);
+> > +
+> > +void tdx_keyid_free(int keyid)
+> > +{
+> > +	/* keyid = 0 is reserved. */
+> > +	if (!keyid || keyid <= 0)
+> > +		return;
+> 
+> Double check of keyid == 0.
+> 
+> I think you can just use:
+> 
+> 	if (keyid <= tdx_keyid_start)
+> 		return;
+> 
+> And/or add a WARN() as it's a bug if above happens.
 
-In practice, movdir64b can be safely assumed to be supported, I think.  Strictly
-it's not guaranteed by SDM.
-There are two options.
-
-1. Assume modir64b. If it's not supported, KVM refuses to enable TDX.
-   + Don't care CI-mode or Li-mode
-   - not strictly conforming to SDM. In practice, it won't matter.
-2. Don't assume movdir64b.  If movdir64b not supported, use memset(0).
-   + strictly conforming to SDM
-   - needs to care Ci-mode or Li-mode.
-
-So I'll choose option 1.
+Ok. Will fix it with WARN().
 -- 
 Isaku Yamahata <isaku.yamahata@gmail.com>
