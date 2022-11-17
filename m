@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8229962D65F
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 10:20:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 320C962D661
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 10:20:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239840AbiKQJUU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 04:20:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44750 "EHLO
+        id S239859AbiKQJUc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 04:20:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239478AbiKQJUR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 04:20:17 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4690697C8
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:20:16 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id r126-20020a632b84000000b004393806c06eso974674pgr.4
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:20:16 -0800 (PST)
+        with ESMTP id S239848AbiKQJUW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 04:20:22 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DD4D697CF
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:20:21 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id c207-20020a624ed8000000b0056e3714b62cso862864pfb.23
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:20:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OEx+CtOxCtFheca0DI/d6/tJ93MBH7oPBlG+gTxiGA4=;
-        b=ENCG4/PPyCTTlvAP8/VyEdFS80a8xiXXguEJ7wHCnyRlMxTM8phDEWgT++FSJpxysA
-         sN3LmSWFj6lCQH78NHqSyRgOutMSV8omm3Q1x9RdHr56D6VNwXBl4cE+TA1lTgrQDg6D
-         aEGPTHOOXqOAhcAUAegi031fbcF4VRgPwyVxeCTw+DgqpAhlpz3a+8yUANx/qU5qGB4u
-         te21Gq8YzYKdb2hPwSdsa8YWU2I5Zlww6SboDUzeL2YiX7OxmdSfGHPHB3CXEwORcGCc
-         Ea9UC7sIwbzJjFyRVeg2BP7Nj3aA0SGPlzLjaWpsD6COfohnu9+IXAA8qUf+zQAMkzrN
-         I43w==
+        bh=i9ZosGBX4Bq8wQCRpvB185DV6OPq8cyeohibbBGrcrE=;
+        b=ToMHYFkPuOYNXp9IQAewYgR+fgFvLYE4KAwDJiDAyN2Z2yytZa5DQq7/Xuo1r+zSh9
+         j5YtQjoC49nwEBl23zIO8okYpLi17MFd0FLqbAYV+4aksn7z38cb/0BXdssvVynkqK8U
+         g7wUGqG2A/eqNPjjqRWFOCc7vu63vnkisbhzr1S3khr8gR7WkHxktmIbTe+uiNHlx0tZ
+         WN+y9iPrH3SNm7e2BMNLSoPytHLTVho3b4lceWakJ2rJcuP5R9KGUN/AHaLZroCE36di
+         zt1l3erCRw7392gVOJnwhUglECZbLizcI/IopV668ImmodOXE1Pk8eR6l/Qu2QPj3zkj
+         G+MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OEx+CtOxCtFheca0DI/d6/tJ93MBH7oPBlG+gTxiGA4=;
-        b=TVIlzUqVLyhD4g/YNolv1EzCmVVs+zMFPajpjU2tsi6OtevIpUsBXjCmUgUX7ZPQTb
-         jQ4ZuB1s5Jq8o4/v1L0HwNbYUcUpBc3ru+eoYJlF7uUH7iHQ4EUPwSGjIer+hZnchH1i
-         Wou6zn6W709Fa2zLqMG8PRGZE5boQHWX8NqvYyrOQugpw/uMtpBclwST+Bg7iD33TbzX
-         n5uypTdylTWrlBh16u1nmEdkPvdu8bW0pPga31sYaF+IKwfCHn17RWP5puxmXlr0da/O
-         PTzQNyEWcmkMd9ZAnw9iuLnEDBnlg2QndVcKB04MWXMQPa+TIWgrwUH8StmGNfxZXf3E
-         j4mg==
-X-Gm-Message-State: ANoB5pkeSjMEbSqHuc1LgxXviUUdSCw+zWkToUa+w+pJ9s1EeA9RtY4R
-        lIEtF2Bh0V4y54zS6tDkglQpFdZD6FGlLg==
-X-Google-Smtp-Source: AA0mqf4oKQpzv5V9BsRFY4Sy+mT84cxEiqYkBnBUagxZydB6+8JlVo3jEw02xIpFF2PVVjgOGfzVdiF7VEDjqg==
+        bh=i9ZosGBX4Bq8wQCRpvB185DV6OPq8cyeohibbBGrcrE=;
+        b=c/f6xa8vq53XCmVvmVgMqegN/m1bHmVv/A0zSCXvzP1rT4xNiUHcepiSdLOYT0VVb/
+         kPRXBu41oEKorx+Xoy2Qv1XLiPRuSV45iwbaoQJy9nIzAixCAyeAhWSgXdo3w3pVloXC
+         0Aep4qCJq57+1f+k6+QgDOX/7rca2qK9oig8VBhsWwCUwBAHdb95VC8Dfgb80gfqjbx2
+         vPtlP/8sIL2sf7Kxvn4D1Dg6L6YOVk+lSb6sFVIPdr41du6CvxpK5ZuSrupCXG9eZvSe
+         wqxzOK0WsMs1GkX3pIjNiyLAxM4kuqMHqO9m5mk6/H8I3MvowUfb0uQT8V6N9brQSaVj
+         0XvQ==
+X-Gm-Message-State: ANoB5plnE+obf/6yYw6/jmnfYxZ4wQiNHW/ovx26GQTvqJiWRJxUeSDa
+        74wCrUqOFxQ/y8Wter69PwaHDksZkdKKvA==
+X-Google-Smtp-Source: AA0mqf4YbSx4bAbBEyvSzygJfHvBIQnKGb20BztsV0Djbrhspk7H3djXZTm399Z7C7RyNhM7+i/wg/1E0Mk2ag==
 X-Received: from suleiman1.tok.corp.google.com ([2401:fa00:8f:203:416e:f3c7:7f1d:6e])
- (user=suleiman job=sendgmr) by 2002:a17:902:eb92:b0:186:5f86:da41 with SMTP
- id q18-20020a170902eb9200b001865f86da41mr1944674plg.73.1668676816121; Thu, 17
- Nov 2022 01:20:16 -0800 (PST)
-Date:   Thu, 17 Nov 2022 18:19:22 +0900
+ (user=suleiman job=sendgmr) by 2002:a63:4c63:0:b0:477:103:d1c4 with SMTP id
+ m35-20020a634c63000000b004770103d1c4mr1240692pgl.369.1668676821007; Thu, 17
+ Nov 2022 01:20:21 -0800 (PST)
+Date:   Thu, 17 Nov 2022 18:19:23 +0900
 In-Reply-To: <20221117091952.1940850-1-suleiman@google.com>
-Message-Id: <20221117091952.1940850-5-suleiman@google.com>
+Message-Id: <20221117091952.1940850-6-suleiman@google.com>
 Mime-Version: 1.0
 References: <20221117091952.1940850-1-suleiman@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Subject: [PATCH 4.19 04/34] x86/cpufeature: Fix various quality problems in
- the <asm/cpu_device_hd.h> header
+Subject: [PATCH 4.19 05/34] x86/devicetable: Move x86 specific macro out of
+ generic code
 From:   Suleiman Souhlal <suleiman@google.com>
 To:     stable@vger.kernel.org
 Cc:     x86@kernel.org, kvm@vger.kernel.org, bp@alien8.de,
@@ -62,7 +62,7 @@ Cc:     x86@kernel.org, kvm@vger.kernel.org, bp@alien8.de,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,109 +70,119 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ingo Molnar <mingo@kernel.org>
+From: Thomas Gleixner <tglx@linutronix.de>
 
-Thomas noticed that the new arch/x86/include/asm/cpu_device_id.h header is
-a train-wreck that didn't incorporate review feedback like not using __u8
-in kernel-only headers.
+commit ba5bade4cc0d2013cdf5634dae554693c968a090 upstream.
 
-While at it also fix all the *other* problems this header has:
+There is no reason that this gunk is in a generic header file. The wildcard
+defines need to stay as they are required by file2alias.
 
- - Use canonical names for the header guards. It's inexplicable why a non-standard
-   guard was used.
-
- - Don't define the header guard to 1. Plus annotate the closing #endif as done
-   absolutely every other header. Again, an inexplicable source of noise.
-
- - Move the kernel API calls provided by this header next to each other, there's
-   absolutely no reason to have them spread apart in the header.
-
- - Align the INTEL_CPU_DESC() macro initializations vertically, this is easier to
-   read and it's also the canonical style.
-
- - Actually name the macro arguments properly: instead of 'mod, step, rev',
-   spell out 'model, stepping, revision' - it's not like we have a lack of
-   characters in this header.
-
- - Actually make arguments macro-safe - again it's inexplicable why it wasn't
-   done properly to begin with.
-
-Quite amazing how many problems a 41 lines header can contain.
-
-This kind of code quality is unacceptable, and it slipped through the
-review net of 2 developers and 2 maintainers, including myself, until
-Thomas noticed it. :-/
-
-Reported-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Andi Kleen <ak@linux.intel.com>
-Cc: Kan Liang <kan.liang@linux.intel.com>
-Cc: Peter Zijlstra (Intel) <peterz@infradead.org>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Ingo Molnar <mingo@kernel.org>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Link: https://lkml.kernel.org/r/20200320131508.736205164@linutronix.de
+Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+[suleiman: vmx.c moved]
 Signed-off-by: Suleiman Souhlal <suleiman@google.com>
 ---
- arch/x86/include/asm/cpu_device_id.h | 31 ++++++++++++++--------------
- 1 file changed, 15 insertions(+), 16 deletions(-)
+ arch/x86/include/asm/cpu_device_id.h   | 13 ++++++++++++-
+ arch/x86/kvm/svm.c                     |  1 +
+ arch/x86/kvm/vmx.c                     |  1 +
+ drivers/cpufreq/acpi-cpufreq.c         |  1 +
+ drivers/cpufreq/amd_freq_sensitivity.c |  1 +
+ include/linux/mod_devicetable.h        |  4 +---
+ 6 files changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/include/asm/cpu_device_id.h b/arch/x86/include/asm/cpu_device_id.h
-index 3417110574c1..31c379c1da41 100644
+index 31c379c1da41..a28dc6ba5be1 100644
 --- a/arch/x86/include/asm/cpu_device_id.h
 +++ b/arch/x86/include/asm/cpu_device_id.h
-@@ -1,6 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--#ifndef _CPU_DEVICE_ID
--#define _CPU_DEVICE_ID 1
-+#ifndef _ASM_X86_CPU_DEVICE_ID
-+#define _ASM_X86_CPU_DEVICE_ID
- 
- /*
+@@ -6,9 +6,20 @@
   * Declare drivers belonging to specific x86 CPUs
-@@ -9,8 +9,6 @@
- 
+  * Similar in spirit to pci_device_id and related PCI functions
+  */
+-
  #include <linux/mod_devicetable.h>
  
--extern const struct x86_cpu_id *x86_match_cpu(const struct x86_cpu_id *match);
--
++/*
++ * The wildcard initializers are in mod_devicetable.h because
++ * file2alias needs them. Sigh.
++ */
++
++#define X86_FEATURE_MATCH(x) {			\
++	.vendor		= X86_VENDOR_ANY,	\
++	.family		= X86_FAMILY_ANY,	\
++	.model		= X86_MODEL_ANY,	\
++	.feature	= x,			\
++}
++
  /*
   * Match specific microcode revisions.
   *
-@@ -22,21 +20,22 @@ extern const struct x86_cpu_id *x86_match_cpu(const struct x86_cpu_id *match);
-  */
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index e1492a67e988..5b68ec68fc13 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -50,6 +50,7 @@
+ #include <asm/kvm_para.h>
+ #include <asm/irq_remapping.h>
+ #include <asm/spec-ctrl.h>
++#include <asm/cpu_device_id.h>
  
- struct x86_cpu_desc {
--	__u8	x86_family;
--	__u8	x86_vendor;
--	__u8	x86_model;
--	__u8	x86_stepping;
--	__u32	x86_microcode_rev;
-+	u8	x86_family;
-+	u8	x86_vendor;
-+	u8	x86_model;
-+	u8	x86_stepping;
-+	u32	x86_microcode_rev;
+ #include <asm/virtext.h>
+ #include "trace.h"
+diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
+index c0ea3b82ff00..88c2027d9305 100644
+--- a/arch/x86/kvm/vmx.c
++++ b/arch/x86/kvm/vmx.c
+@@ -41,6 +41,7 @@
+ 
+ #include <asm/asm.h>
+ #include <asm/cpu.h>
++#include <asm/cpu_device_id.h>
+ #include <asm/io.h>
+ #include <asm/desc.h>
+ #include <asm/vmx.h>
+diff --git a/drivers/cpufreq/acpi-cpufreq.c b/drivers/cpufreq/acpi-cpufreq.c
+index 9e86404a361f..40c969432f45 100644
+--- a/drivers/cpufreq/acpi-cpufreq.c
++++ b/drivers/cpufreq/acpi-cpufreq.c
+@@ -47,6 +47,7 @@
+ #include <asm/msr.h>
+ #include <asm/processor.h>
+ #include <asm/cpufeature.h>
++#include <asm/cpu_device_id.h>
+ 
+ MODULE_AUTHOR("Paul Diefenbaugh, Dominik Brodowski");
+ MODULE_DESCRIPTION("ACPI Processor P-States Driver");
+diff --git a/drivers/cpufreq/amd_freq_sensitivity.c b/drivers/cpufreq/amd_freq_sensitivity.c
+index be926d9a66e5..4b4f128c3488 100644
+--- a/drivers/cpufreq/amd_freq_sensitivity.c
++++ b/drivers/cpufreq/amd_freq_sensitivity.c
+@@ -21,6 +21,7 @@
+ 
+ #include <asm/msr.h>
+ #include <asm/cpufeature.h>
++#include <asm/cpu_device_id.h>
+ 
+ #include "cpufreq_ondemand.h"
+ 
+diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
+index c30839a15f50..c3c4037f001f 100644
+--- a/include/linux/mod_devicetable.h
++++ b/include/linux/mod_devicetable.h
+@@ -631,9 +631,7 @@ struct x86_cpu_id {
+ 	kernel_ulong_t driver_data;
  };
  
--#define INTEL_CPU_DESC(mod, step, rev) {			\
--	.x86_family = 6,					\
--	.x86_vendor = X86_VENDOR_INTEL,				\
--	.x86_model = mod,					\
--	.x86_stepping = step,					\
--	.x86_microcode_rev = rev,				\
-+#define INTEL_CPU_DESC(model, stepping, revision) {		\
-+	.x86_family		= 6,				\
-+	.x86_vendor		= X86_VENDOR_INTEL,		\
-+	.x86_model		= (model),			\
-+	.x86_stepping		= (stepping),			\
-+	.x86_microcode_rev	= (revision),			\
- }
- 
-+extern const struct x86_cpu_id *x86_match_cpu(const struct x86_cpu_id *match);
- extern bool x86_cpu_has_min_microcode_rev(const struct x86_cpu_desc *table);
- 
--#endif
-+#endif /* _ASM_X86_CPU_DEVICE_ID */
+-#define X86_FEATURE_MATCH(x) \
+-	{ X86_VENDOR_ANY, X86_FAMILY_ANY, X86_MODEL_ANY, x }
+-
++/* Wild cards for x86_cpu_id::vendor, family, model and feature */
+ #define X86_VENDOR_ANY 0xffff
+ #define X86_FAMILY_ANY 0
+ #define X86_MODEL_ANY  0
 -- 
 2.38.1.431.g37b22c650d-goog
 
