@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40E4262DE5B
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 15:36:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 14C8262DE5D
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 15:36:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240548AbiKQOgF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 09:36:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59502 "EHLO
+        id S240552AbiKQOgH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 09:36:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240408AbiKQOew (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 09:34:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46D6C3206A
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 06:33:39 -0800 (PST)
+        with ESMTP id S240492AbiKQOfA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 09:35:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E43E5DB97
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 06:33:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668695618;
+        s=mimecast20190719; t=1668695621;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1k8xZrOm8P1dLuASAaP3xDdrnCi2/FFVUPRDCzjye6I=;
-        b=DIX1vbNm3ZtsxBSyJk4CNmVUfFVA76v9zfPz4xMF7oSmFczaWxFK5RfAty2/U8EXNy055N
-        HE/mWQSqj46UoP3D7b2H3W5MeK4KkTHcWl8OAKQZMsfFphFd7rg4EhrWnpfrcumbr2u5G3
-        UMF83f7MdS02SRWihH4OtBgy8zRXsno=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=l5d3UROtrmIXOlx4UW5lVsYBe3iueIG6WmdS7Aa6h3c=;
+        b=EAaxQmRgck8FHFUP7jvMMusGHe1buonHZKZNi66R/UIMII71lMSi4ELeJWr97+EJLPlOCf
+        Sh6yw91yGV0U5pEaG5SsTMmVSYdyWrSjC2K53KKb0lWmBu1TizRmVViBBTWWNzsP7H3g47
+        RNUJx2GTK0SpNqGGQzAyzJnurKlAeV8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-42-qx5GWSDkPoGBYLKq62dSJQ-1; Thu, 17 Nov 2022 09:33:33 -0500
-X-MC-Unique: qx5GWSDkPoGBYLKq62dSJQ-1
+ us-mta-501-Ol7uoAMDP2C3N8X_GQ_pGg-1; Thu, 17 Nov 2022 09:33:37 -0500
+X-MC-Unique: Ol7uoAMDP2C3N8X_GQ_pGg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4E32788F452;
-        Thu, 17 Nov 2022 14:33:32 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 26FC01C08975;
+        Thu, 17 Nov 2022 14:33:36 +0000 (UTC)
 Received: from amdlaptop.tlv.redhat.com (dhcp-4-238.tlv.redhat.com [10.35.4.238])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C6B0D2166B29;
-        Thu, 17 Nov 2022 14:33:28 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 98BC32166B29;
+        Thu, 17 Nov 2022 14:33:32 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -58,9 +58,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>, x86@kernel.org,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Santosh Shukla <santosh.shukla@amd.com>
-Subject: [PATCH 12/13] KVM: nSVM: emulate VMEXIT_INVALID case for nested VNMI
-Date:   Thu, 17 Nov 2022 16:32:41 +0200
-Message-Id: <20221117143242.102721-13-mlevitsk@redhat.com>
+Subject: [PATCH 13/13] KVM: SVM: Enable VNMI feature
+Date:   Thu, 17 Nov 2022 16:32:42 +0200
+Message-Id: <20221117143242.102721-14-mlevitsk@redhat.com>
 In-Reply-To: <20221117143242.102721-1-mlevitsk@redhat.com>
 References: <20221117143242.102721-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -78,35 +78,29 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Santosh Shukla <santosh.shukla@amd.com>
 
-If NMI virtualization enabled and NMI_INTERCEPT is unset then next vm
-entry will exit with #INVALID exit reason.
-
-In order to emulate above (VMEXIT(#INVALID)) scenario for nested
-environment, extending check for V_NMI_ENABLE, NMI_INTERCEPT bit in func
-__nested_vmcb_check_controls.
+Enable the NMI virtualization (V_NMI_ENABLE) in the VMCB interrupt
+control when the vnmi module parameter is set.
 
 Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/x86/kvm/svm/svm.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index c9fcdd691bb5a1..3ef7e1971a4709 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -275,6 +275,11 @@ static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
- 	if (CC(!nested_svm_check_tlb_ctl(vcpu, control->tlb_ctl)))
- 		return false;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index c9190a8ee03273..5b61d89c644da6 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1307,6 +1307,9 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 	if (kvm_vcpu_apicv_active(vcpu))
+ 		avic_init_vmcb(svm, vmcb);
  
-+	if (CC((control->int_ctl & V_NMI_ENABLE) &&
-+		!vmcb12_is_intercept(control, INTERCEPT_NMI))) {
-+		return false;
-+	}
++	if (vnmi)
++		svm->vmcb->control.int_ctl |= V_NMI_ENABLE;
 +
- 	return true;
- }
- 
+ 	if (vgif) {
+ 		svm_clr_intercept(svm, INTERCEPT_STGI);
+ 		svm_clr_intercept(svm, INTERCEPT_CLGI);
 -- 
 2.34.3
 
