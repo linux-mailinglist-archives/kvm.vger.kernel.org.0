@@ -2,166 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5789E62E14D
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 17:16:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E50A062E159
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 17:17:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240335AbiKQQQQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 11:16:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51092 "EHLO
+        id S239685AbiKQQRm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 11:17:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235038AbiKQQPy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 11:15:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BFF079E3C
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 08:14:57 -0800 (PST)
+        with ESMTP id S238685AbiKQQRi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 11:17:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43ED078D76
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 08:16:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668701696;
+        s=mimecast20190719; t=1668701798;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=jgeHGWCI+pvVYt1W/flqhT0b6uT1opHUz8BI1fRXQBk=;
-        b=MbuLJ565qNMrRTNvclHFiJGiEzRYYzjhxMPPuEY/88pqX/15x1Pg5XewBE3+OgUrKSaVLO
-        LR4MqVd0f2G398UJQ67vNMlUWf0HXLiSE9eVbPsdXSg3vFui7Duq0r4JYf43lrBcblASrA
-        8eOL2QXbSXcoKD9Wg8GfJBtPOVck2SE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-561-_kF_-fSCMuuZZh-HTI1sZQ-1; Thu, 17 Nov 2022 11:14:51 -0500
-X-MC-Unique: _kF_-fSCMuuZZh-HTI1sZQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8991A38123A8;
-        Thu, 17 Nov 2022 16:14:50 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5EF592024CC8;
-        Thu, 17 Nov 2022 16:14:50 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     dmatlack@google.com, seanjc@google.com,
-        Robert Hoo <robert.hu@linux.intel.com>
-Subject: [PATCH] KVM: x86/mmu: simplify kvm_tdp_mmu_map flow when guest has to retry
-Date:   Thu, 17 Nov 2022 11:14:49 -0500
-Message-Id: <20221117161449.114086-1-pbonzini@redhat.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=u3PWRpS+bffTLYuv/Qxx9GsRiKqhW7HNhUb6XRLSH4M=;
+        b=H3bTz4/Qde3lCJt7HD3He0/ZmO6zYMnAgube6nju061qRn4ElHxZPRQ2hvb+v3UuVpPoQk
+        ZxbxUpr9tMN5qh1QYdbb3F5+Fq+pVhFL0xitdt67YnPA9UrvqBuRUa4ubV/w+XwdwjDxoC
+        E8LvsptgizAVwmqrkjO5bkEajkH2b+Q=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-288-Ty5rg3ZvNnSUX70ZlpV54w-1; Thu, 17 Nov 2022 11:16:36 -0500
+X-MC-Unique: Ty5rg3ZvNnSUX70ZlpV54w-1
+Received: by mail-ed1-f72.google.com with SMTP id f20-20020a0564021e9400b00461ea0ce17cso1525238edf.16
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 08:16:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u3PWRpS+bffTLYuv/Qxx9GsRiKqhW7HNhUb6XRLSH4M=;
+        b=1qfdhz4VgkB3twCxNUYdj2Za7jgV3ppRmVRdcFSmuz8QxK5x81fIZAQZy/kr7JNXKu
+         i8udPxbnG7G4eZtFStHA5oXd83l+VtOzwcbLwezcNNDY50VbsvV3v8IoWzOqkhcC5XSd
+         xn/CvBdZ7fh4vvUd/TLzEPfQ9rFosgWOIswBP9Ui4Rlwzg3vzqP40D4qryOaLi4AlqWD
+         GZ88V2zjmr9QPU2e1lQQZRbrAXXITOS9tevv6zUVO0dOrdJogCGWeIOljHGyG2yV9y7g
+         bn7wwCUlfL2S1doGN46bRQF/VEfcRVLYfRaCX1qwk01Tm98oBFzxAXrejV0t96/Z6rGT
+         5www==
+X-Gm-Message-State: ANoB5pmOkgbBUu2FEPs+EsdaenXiE9YrGwthPzbiKBBp7PaN7AFiryib
+        3bXOsEPg+Ihvl2Ajkgz4lFtZfqIlT3D4EJzNfYDGgDIZ88fAD/xNSaENqFED2Qrug11paf/7/dZ
+        wFifHYwvj+kH3
+X-Received: by 2002:a05:6402:399a:b0:468:fdf2:477f with SMTP id fk26-20020a056402399a00b00468fdf2477fmr572902edb.329.1668701795548;
+        Thu, 17 Nov 2022 08:16:35 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5BebFRdEI64VE5TiIPR970/txnWP2TLCSmBzu5qu5cuhFtPIOf+DVszVQe760Cp6h1pMK2Eg==
+X-Received: by 2002:a05:6402:399a:b0:468:fdf2:477f with SMTP id fk26-20020a056402399a00b00468fdf2477fmr572884edb.329.1668701795302;
+        Thu, 17 Nov 2022 08:16:35 -0800 (PST)
+Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
+        by smtp.googlemail.com with ESMTPSA id p13-20020a17090653cd00b007ade5cc6e7asm557007ejo.39.2022.11.17.08.16.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Nov 2022 08:16:34 -0800 (PST)
+Message-ID: <4f0153bc-d565-f5b1-064d-4f881c56c232@redhat.com>
+Date:   Thu, 17 Nov 2022 17:16:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH v3 2/2] KVM: x86/mmu: Split huge pages mapped by the TDP
+ MMU on fault
+Content-Language: en-US
+To:     Robert Hoo <robert.hu@linux.intel.com>,
+        David Matlack <dmatlack@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
+        Mingwei Zhang <mizhang@google.com>
+References: <20221109185905.486172-1-dmatlack@google.com>
+ <20221109185905.486172-3-dmatlack@google.com>
+ <3f5459350a091e13093691584fd974d2ab86b844.camel@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <3f5459350a091e13093691584fd974d2ab86b844.camel@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A removed SPTE is never present, hence the "if" in kvm_tdp_mmu_map
-only fails in the exact same conditions that the earlier loop
-tested in order to issue a  "break". So, instead of checking twice the
-condition (upper level SPTEs could not be created or was frozen), just
-exit the loop with a goto---the usual poor-man C replacement for RAII
-early returns.
+On 11/17/22 01:59, Robert Hoo wrote:
+> After break out, it immediately checks is_removed_spte(iter.old_spte)
+> and return, why not return here directly to avoid duplicated check and
+> another branch prediction?
+> 
+> 	/*
+> 	 * Force the guest to retry the access if the upper level SPTEs
+> aren't
+> 	 * in place, or if the target leaf SPTE is frozen by another
+> CPU.
+> 	 */
+> 	if (iter.level != fault->goal_level ||
+> is_removed_spte(iter.old_spte)) {
+> 		rcu_read_unlock();
+> 		return RET_PF_RETRY;
+> 	}
 
-While at it, do not use the "ret" variable for return values of
-functions that do not return a RET_PF_* enum.  This is clearer
-and also makes it possible to initialize ret to RET_PF_RETRY.
+Good idea, more for readability than for efficiency.  Another small 
+issue in David's patch is that
 
-Suggested-by: Robert Hoo <robert.hu@linux.intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu/tdp_mmu.c | 40 ++++++++++++++++++--------------------
- 1 file changed, 19 insertions(+), 21 deletions(-)
+> +		if (is_shadow_present_pte(iter.old_spte))
+> +			ret = tdp_mmu_split_huge_page(kvm, &iter, sp, true);
+> +		else
+> +			ret = tdp_mmu_link_sp(kvm, &iter, sp, true);
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index e08596775427..771210ce5181 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1159,7 +1159,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	struct kvm *kvm = vcpu->kvm;
- 	struct tdp_iter iter;
- 	struct kvm_mmu_page *sp;
--	int ret;
-+	int ret = RET_PF_RETRY;
- 
- 	kvm_mmu_hugepage_adjust(vcpu, fault);
- 
-@@ -1168,23 +1168,25 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	rcu_read_lock();
- 
- 	tdp_mmu_for_each_pte(iter, mmu, fault->gfn, fault->gfn + 1) {
-+		int r;
-+
- 		if (fault->nx_huge_page_workaround_enabled)
- 			disallowed_hugepage_adjust(fault, iter.old_spte, iter.level);
- 
- 		if (iter.level == fault->goal_level)
- 			break;
- 
--		/* Step down into the lower level page table if it exists. */
--		if (is_shadow_present_pte(iter.old_spte) &&
--		    !is_large_pte(iter.old_spte))
--			continue;
--
- 		/*
- 		 * If SPTE has been frozen by another thread, just give up and
- 		 * retry, avoiding unnecessary page table allocation and free.
- 		 */
- 		if (is_removed_spte(iter.old_spte))
--			break;
-+			goto retry;
-+
-+		/* Step down into the lower level page table if it exists. */
-+		if (is_shadow_present_pte(iter.old_spte) &&
-+		    !is_large_pte(iter.old_spte))
-+			continue;
- 
- 		/*
- 		 * The SPTE is either non-present or points to a huge page that
-@@ -1196,13 +1198,17 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
- 
- 		if (is_shadow_present_pte(iter.old_spte))
--			ret = tdp_mmu_split_huge_page(kvm, &iter, sp, true);
-+			r = tdp_mmu_split_huge_page(kvm, &iter, sp, true);
- 		else
--			ret = tdp_mmu_link_sp(kvm, &iter, sp, true);
-+			r = tdp_mmu_link_sp(kvm, &iter, sp, true);
- 
--		if (ret) {
-+		/*
-+		 * Also force the guest to retry the access if the upper level SPTEs
-+		 * aren't in place.
-+		 */
-+		if (r) {
- 			tdp_mmu_free_sp(sp);
--			break;
-+			goto retry;
- 		}
- 
- 		if (fault->huge_page_disallowed &&
-@@ -1213,18 +1219,10 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		}
- 	}
- 
--	/*
--	 * Force the guest to retry the access if the upper level SPTEs aren't
--	 * in place, or if the target leaf SPTE is frozen by another CPU.
--	 */
--	if (iter.level != fault->goal_level || is_removed_spte(iter.old_spte)) {
--		rcu_read_unlock();
--		return RET_PF_RETRY;
--	}
--
- 	ret = tdp_mmu_map_handle_target_level(vcpu, fault, &iter);
--	rcu_read_unlock();
- 
-+retry:
-+	rcu_read_unlock();
- 	return ret;
- }
- 
--- 
-2.31.1
+is assigning a 0/-EBUSY return value to ret, rather than RET_PF_* that 
+is assigned everywhere else in the function.
+
+I sent a small patch to rectify both.
+
+Paolo
 
