@@ -2,74 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84AD162E5C7
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 21:24:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B98862E5CA
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 21:28:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233962AbiKQUYc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 15:24:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59572 "EHLO
+        id S234884AbiKQU2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 15:28:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230287AbiKQUYa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 15:24:30 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA489140DC;
-        Thu, 17 Nov 2022 12:24:29 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id y10so1495790plp.3;
-        Thu, 17 Nov 2022 12:24:29 -0800 (PST)
+        with ESMTP id S234174AbiKQU2H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 15:28:07 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33DAA697E3
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 12:28:04 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id 140so2878458pfz.6
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 12:28:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kSpu5sc5U8jHoWQxjZChOPhUIMdGYPDGSrrgGj2BtkA=;
-        b=IIO4tJm0jxiNKt2ynxLjMXbPNAEbxyL3w7pgZ17A0UgiCUhEmRQ65tShIODeOioXsG
-         1KwxkZY+du560KcmS+fOsQfpk+TBGw/pn8QKPuZNlp4IScwVILAIDITku4tDylE34zEI
-         aM26sjinYaZekaSCx9pNl6rmyKqijAZo+WAECj4BBxyvFprY3Obk8p76qC5RKAIwVS/Z
-         hLz+2TQHeD5OIvBDabXnlASQdbQYJTka1ksMEzQKi6+79QmCNgS9Cw16307Cd2nw6dze
-         I4l42NbYiQoYaidFVPnqwwXYFB7a8rk8kVe358zXbNxSjGPf6OYHRGbr+d3Xd0iCNwPS
-         ErzQ==
+        bh=qjPvhUtx2vpq21G6yppeUkSS2gj9D+uNetGzarYUrGk=;
+        b=HOUcxMgkGsrLHQg9cgfl2AGgr+gBpBVzZsKBIMmL0NWLOpU16yxxBrKvjr3dAAHVk3
+         ShvcqhvIHigUkfSoUbhib8KYcJ3kBJzNDcvN6Fr+yvjVIn0KXdmuPM/7oZkHMalQvK4i
+         JX9OBUGpDIho/I3FKJBR4Tgw1KB+p+SbrKiIHYCLXCuZk9unlCObWDSpkYt75kRhWWEZ
+         1Z3hAvoiMNrQwLfeSQnZvA2Kwdvfoh2BMy75LExHyMX2oRDkkBkvRAvCvqoeF0gSgHuw
+         HJp2JUcbJT5BUTJuBIBv7+9e5BuvJxF6s0l2HVTIF/a5GXv4Yti4WFjPIqVRa3MhrJd3
+         C/8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kSpu5sc5U8jHoWQxjZChOPhUIMdGYPDGSrrgGj2BtkA=;
-        b=438x51/4MR5/M+tf9sEYxiUbMKg61LX1TUvlZ5kpyC3vk6chGn7cTfdSZU0J49OYkU
-         NlMi4QF3pMBKnZXIV7yot9QvavUUDCdukbYPjeelRVJJDseRE26PZacyOCLa4yvMgXsk
-         cBU5NA4eMo5MoJXq31heJsLv+VCDMZ1yFUQqt2obxTcDAS1aPS/PETfh4q6HDqijp/4Q
-         l0/H2FtH1GJxxbC8J/6nwL/yP4ynLl8Tv4+qIutSc9BnFfbtcXTX11Ho+8L+ve47sd7x
-         /FuLZgRN/ZVmL60E5Ih9K6ZQn1fiEoRbiNflfuXeqHXxV+5QHHIuHXfhzpeZ9/yXjjmP
-         QZMA==
-X-Gm-Message-State: ANoB5plSx8pchJTmaroFl3N7t79J6NzG1kLm0PH4X8YPSH7XzHSh+RpE
-        xEGKzWmPdZ/fPMa7lfusuvmv6fcorh0=
-X-Google-Smtp-Source: AA0mqf5foWhdwXWOmAt9rpLN5hvmsqBo2cUGVi/8M999BsCRjATexZQpuc3btyTtOCtEBDmP+17qEg==
-X-Received: by 2002:a17:902:c652:b0:186:9890:97d1 with SMTP id s18-20020a170902c65200b00186989097d1mr4429506pls.114.1668716669056;
-        Thu, 17 Nov 2022 12:24:29 -0800 (PST)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id ie4-20020a17090b400400b0020af2bab83fsm1310182pjb.23.2022.11.17.12.24.28
+        bh=qjPvhUtx2vpq21G6yppeUkSS2gj9D+uNetGzarYUrGk=;
+        b=RRJTd3ectc2SOcaBnS7mZ0SJ4MygUCwzgI+z/uSatDQOp/WrDrkk6SHcwyU51ZG6v5
+         XUYMZ3YNvTt9jaebecHZjKG4LZPgqTdiCvdll1a4vjLc1qK/ayDbMQWFuNvFU6v6vik/
+         pcMBlcMitl9qboz8Hbpujz1pFJnLST+WsjbHp/OWyeMPymwU1SUKLpL8uBrhl7Dd4o/I
+         a4GAEZOApHU3n44HjG9ua4r152wbi6OKgQKvzkmUWY21XwwhYZlGZsLlOkaSExn3nztd
+         OYCt2uoCjPGiwOrj/x99PuIsRywu3zcJznSU6dJl8rhwt8u8zgA63BIAyOWvDS+bSjYE
+         oDGQ==
+X-Gm-Message-State: ANoB5pkMGHY3LF+fkPJ2j7oFFOejl2KYauBwDYiSr9gxIXdPolgc/YXC
+        iAGjPdRbs3doUoeY+yK6+i12ZA==
+X-Google-Smtp-Source: AA0mqf6QEuP6PFMMMMFXf39ThqjNyEzo0xFa9vySIpJbOAvYdrHdkQVXA6QS+NHZXqqTMJ7fYppzNw==
+X-Received: by 2002:a65:5541:0:b0:476:759b:7952 with SMTP id t1-20020a655541000000b00476759b7952mr3658694pgr.316.1668716883589;
+        Thu, 17 Nov 2022 12:28:03 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id f8-20020a170902684800b00186e34524e3sm1797697pln.136.2022.11.17.12.28.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Nov 2022 12:24:28 -0800 (PST)
-Date:   Thu, 17 Nov 2022 12:24:27 -0800
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v10 076/108] KVM: TDX: handle vcpu migration over logical
- processor
-Message-ID: <20221117202427.GC2751024@ls.amr.corp.intel.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <782f74f7d5375a36b2857be59262c1c4c4cf16a7.1667110240.git.isaku.yamahata@intel.com>
- <b6276f58-8ff5-9a3c-e6c7-c38f2ddb682a@linux.intel.com>
+        Thu, 17 Nov 2022 12:28:03 -0800 (PST)
+Date:   Thu, 17 Nov 2022 20:27:59 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sandipan Das <sandipan.das@amd.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Jing Liu <jing2.liu@intel.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Wyes Karny <wyes.karny@amd.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Babu Moger <babu.moger@amd.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org,
+        Santosh Shukla <santosh.shukla@amd.com>
+Subject: Re: [PATCH 06/13] KVM: SVM: Add VNMI bit definition
+Message-ID: <Y3aZTyqc9ZafQSfG@google.com>
+References: <20221117143242.102721-1-mlevitsk@redhat.com>
+ <20221117143242.102721-7-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b6276f58-8ff5-9a3c-e6c7-c38f2ddb682a@linux.intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+In-Reply-To: <20221117143242.102721-7-mlevitsk@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,67 +87,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 15, 2022 at 10:28:20AM +0800,
-Binbin Wu <binbin.wu@linux.intel.com> wrote:
+On Thu, Nov 17, 2022, Maxim Levitsky wrote:
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 03acbe8ff34edb..08a7b2a0a29f3a 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -230,6 +230,8 @@ module_param(dump_invalid_vmcb, bool, 0644);
+>  bool intercept_smi = true;
+>  module_param(intercept_smi, bool, 0444);
+>  
+> +bool vnmi = true;
 
-> 
-> On 10/30/2022 2:23 PM, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > For vcpu migration, in the case of VMX, VCMS
-> 
-> typo, VMCS
-> 
-> 
-> >   is flushed on the source pcpu,
-> > and load it on the target pcpu.  There are corresponding TDX SEAMCALL APIs,
-> > call them on vcpu migration.  The logic is mostly same as VMX except the
-> > TDX SEAMCALLs are used.
-> > 
-> > When shutting down the machine, (VMX or TDX) vcpus needs to be shutdown on
-> > each pcpu.  Do the similar for TDX with TDX SEAMCALL APIs.
-> > 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >   arch/x86/kvm/vmx/main.c    |  43 +++++++++++--
-> >   arch/x86/kvm/vmx/tdx.c     | 121 +++++++++++++++++++++++++++++++++++++
-> >   arch/x86/kvm/vmx/tdx.h     |   2 +
-> >   arch/x86/kvm/vmx/x86_ops.h |   6 ++
-> >   4 files changed, 168 insertions(+), 4 deletions(-)
-> > 
-> > 
-> > @@ -176,6 +214,41 @@ static void tdx_reclaim_td_page(struct tdx_td_page *page)
-> >   	}
-> >   }
-> > +static void tdx_flush_vp(void *arg)
-> > +{
-> > +	struct kvm_vcpu *vcpu = arg;
-> > +	u64 err;
-> > +
-> > +	lockdep_assert_irqs_disabled();
-> > +
-> > +	/* Task migration can race with CPU offlining. */
-> > +	if (vcpu->cpu != raw_smp_processor_id())
-> > +		return;
-> > +
-> > +	/*
-> > +	 * No need to do TDH_VP_FLUSH if the vCPU hasn't been initialized.  The
-> > +	 * list tracking still needs to be updated so that it's correct if/when
-> > +	 * the vCPU does get initialized.
-> > +	 */
-> > +	if (is_td_vcpu_created(to_tdx(vcpu))) {
-> > +		err = tdh_vp_flush(to_tdx(vcpu)->tdvpr.pa);
-> 
-> Need to retry here if tdh.vp.flush fails due to tdx operand busy?
-> 
-> If such failure occurs, the next vp enter will fail after the vCPU migrated
-> to another LP, how is it hanlded?
+This can be __ro_after_init, e.g. see
+https://lore.kernel.org/all/20221110013003.1421895-4-seanjc@google.com
 
+> +module_param(vnmi, bool, 0444);
 
-No need to retry.  TDX Resources needed for TDH.VP.FLUSH are, TDVPR as exclusive,
-TDR as shared, and TDCS as shared.
+The exposure of "vnmi" to userspace belongs in the last patch.  E.g. this patch
+should only stub in vnmi:
 
-This vp flush function is called when destructing vcpu/TD or vcpu migration.  No
-other thread uses TDVPR in those cases.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+  bool __ro_after_init vnmi;
+
+and then the last patch that actually enables it can default it to true and expose
+the param to users.
+
+It obviously doesn't matter in the end, but it technically makes this series
+broken, e.g. nested_sync_int_ctl_from_vmcb02() pivots on "vnmi" without the extra
+V_NMI_ENABLE check, and advertising the vnmi is enabled when it actually isn't is
+wrong/misleading.
