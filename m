@@ -2,66 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BF8662E22A
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 17:40:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C30D62E22C
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 17:43:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240497AbiKQQkZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 11:40:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50432 "EHLO
+        id S235038AbiKQQnF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 11:43:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240574AbiKQQkF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 11:40:05 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F1DA6277
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 08:39:46 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id y13so2287914pfp.7
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 08:39:46 -0800 (PST)
+        with ESMTP id S231377AbiKQQnC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 11:43:02 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A34B12BDE
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 08:43:01 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id v3-20020a17090ac90300b00218441ac0f6so6305593pjt.0
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 08:43:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H9ws/VoANOQ+fPSn5rwf5FxpcOUa4clnxCqjB4jQHRk=;
-        b=rkmo6VLfA7ZdFlFYhci1eHa8YuAnNI7OCzahqFlLSSgWBhldvSblGwM0x4Ph5VSzWL
-         wxQZv55hGZPoy52j6/mWI9ors9jeYz6ewrstfFNZX0SlEY2j55aRTOjVNifOqruC+GU9
-         SC+xz1Pu/ZD5tUpuOajkCW2ZkXDx0T33SZcgsNYzU5vBzFQigzdFtrpnyctEO/k9Lcc/
-         Qx998qMUFq2FMQ1KjrSB+UadktrgmNujLZYVp2ldw7uDQF7X0n9W/v/jReBYtiLAJcN7
-         bSR7Jo6x9NDFwoO+6I8JKUVnU8SBKeyZ2zYV0jpzoosBXIya7r1tZP59YoL6uua/LeqX
-         1BeQ==
+        bh=q+1xJSL3VM8iSFTsp03QupIowEq4+8/ya2A9qqSsvoI=;
+        b=RQyoXwTi902pRB4zDgavW/fhzJf70JgPPHS5RHfnZffDn3tZsxaP9tb3KxFiW2hC1D
+         TSiIYihwc16AKuWEr8Yo8b3BpXg4Zefk0kebJgvzLtHfyp4UJKVQFEhy+5qJZo1omqNO
+         S6wcDbNeeZkFHQZaXONwy89UqGHKV+vvfqrwiDex7x/saTBaGRfc5MWnrwL3vXhJPMvC
+         lGk6BXVG96Z1LAowso8GNgUcsddSAS1SyLUsN2SJTe4kpgaayGgKMGeSPqht1Mgh/DpT
+         OGYb5Cw7PmFK2S7+Fmz1c8Lxf1uCmBR/8l1Aiym65U9dOKf03+QEkWVFcD9XG5GvMnGK
+         SWmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=H9ws/VoANOQ+fPSn5rwf5FxpcOUa4clnxCqjB4jQHRk=;
-        b=a20jxuN3/3aEE3/s3dxmj1dhsmuT+Wrp8w+ualTLKLM1Ghrh7co0h3H+yU4/eHIukS
-         ZmUcRpD17Yl8hqg5QtQhpReM/JCaAhmnwoNOfhmAc5Zh96IrnHjXI42+TkF8ZMHxGHo5
-         S8nc5tihC8NTI4nIIa0bNX7XKJ1Sbf8V0l0TB5z6nh5Lw6iHgy2uSERP2OrsRuIs2fOw
-         YgwqD7/hKivTfk5MuE+dU6At+XPX6TfDx1sPtilkjTFCltu1VtZp6b1TPuMUSs9oVXQT
-         42ozt6cSKBsKxq9LVp7NvsZqt+/L6FjU37UaQe4Wd7as926H7G1GtyB6YARgUm8fgTKj
-         jhaA==
-X-Gm-Message-State: ANoB5pnW4KMNZmkEDhETseRdD9HtBFlaqkgXHt8Fz6JFrszT6mC2eLPa
-        MbkH3dBIQN7OkuWh7kocO3QELUelcVDA/Q==
-X-Google-Smtp-Source: AA0mqf6fzW9qRwwqPD9MopcDpVcg8k/LRSPgQMy3+TDj5emGCtMVyTxrDINepW4yBPCQrROWlOdO9A==
-X-Received: by 2002:a05:6a00:21c1:b0:562:86a3:12fc with SMTP id t1-20020a056a0021c100b0056286a312fcmr3853688pfj.8.1668703185541;
-        Thu, 17 Nov 2022 08:39:45 -0800 (PST)
+        bh=q+1xJSL3VM8iSFTsp03QupIowEq4+8/ya2A9qqSsvoI=;
+        b=JQJj8Yoo0JPQ5+diiVesaYsV39saNL4IB+v6zRfNFTBt7vnJtV2/mK9TGnNAYRcmu3
+         9RZLcnCVQRkDyEoJycpnBglHTSquSY8puoD9VwztCgyRvMr5trd8btD9cl7pIsW0eAUE
+         40I7Xo5lDQ9ubulraoBpilI9WHDsfOYskWRqkGOw0k4QiOCS+M7TWLUX/0kuXAjR4WJI
+         5YbEHQALkNo7ScHvQkrPhFlxRg3zH5/Q1fx8ILtZ0HmAOKMGR0z2LqUQ6cpXiPKKgCHk
+         uH6jGz8IORjBBp4KUra3yk96GuULSzfdiht4uarZpzry5A0hZnKGlFrhimtK+q6HiD6d
+         bizg==
+X-Gm-Message-State: ANoB5plBxpPmezwj9F3pGKceqfRZ37W+TXSLvNcXhaYOb00eN0e4YCN1
+        k0caKnreZxU65l5zfXlqfxChCQ==
+X-Google-Smtp-Source: AA0mqf4t3hfAZ/TWSOP6Gbe5YhlkNCqNAX1pjA/9HjdBlrbr7wiIDRtgkwwefkdOaviZiP+5DvH/hQ==
+X-Received: by 2002:a17:902:8ecb:b0:186:fe2d:f3cb with SMTP id x11-20020a1709028ecb00b00186fe2df3cbmr3401553plo.132.1668703381052;
+        Thu, 17 Nov 2022 08:43:01 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id p10-20020a17090a4f0a00b001fe39bda429sm1094934pjh.38.2022.11.17.08.39.45
+        by smtp.gmail.com with ESMTPSA id y65-20020a626444000000b0056ee0d0985asm1372731pfb.82.2022.11.17.08.43.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Nov 2022 08:39:45 -0800 (PST)
-Date:   Thu, 17 Nov 2022 16:39:41 +0000
+        Thu, 17 Nov 2022 08:43:00 -0800 (PST)
+Date:   Thu, 17 Nov 2022 16:42:57 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     David Matlack <dmatlack@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: x86/mmu: Do not recover dirty-tracked NX Huge
- Pages
-Message-ID: <Y3ZjzZdI6Ej6XwW4@google.com>
-References: <20221103204421.1146958-1-dmatlack@google.com>
- <Y2l247/1GzVm4mJH@google.com>
- <d636e626-ae33-0119-545d-a0b60cbe0ff7@redhat.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sandipan Das <sandipan.das@amd.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Jing Liu <jing2.liu@intel.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Wyes Karny <wyes.karny@amd.com>,
+        Babu Moger <babu.moger@amd.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org,
+        Santosh Shukla <santosh.shukla@amd.com>
+Subject: Re: [PATCH 06/13] KVM: SVM: Add VNMI bit definition
+Message-ID: <Y3Zkkc1edwYtpk+N@google.com>
+References: <20221117143242.102721-1-mlevitsk@redhat.com>
+ <20221117143242.102721-7-mlevitsk@redhat.com>
+ <Y3ZHKVq8enyxJmVu@zn.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d636e626-ae33-0119-545d-a0b60cbe0ff7@redhat.com>
+In-Reply-To: <Y3ZHKVq8enyxJmVu@zn.tnic>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,30 +88,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 17, 2022, Paolo Bonzini wrote:
-> On 11/7/22 22:21, Sean Christopherson wrote:
-> > 
-> > Hmm, and the memslot heuristic doesn't address the recovery worker holding mmu_lock
-> > for write.  On a non-preemptible kernel, rwlock_needbreak() is always false, e.g.
-> > the worker won't yield to vCPUs that are trying to handle non-fast page faults.
-> > The worker should eventually reach steady state by unaccounting everything, but
-> > that might take a while.
+On Thu, Nov 17, 2022, Borislav Petkov wrote:
+> On Thu, Nov 17, 2022 at 04:32:35PM +0200, Maxim Levitsky wrote:
+> > @@ -5029,6 +5031,10 @@ static __init int svm_hardware_setup(void)
+> >  		svm_x86_ops.vcpu_get_apicv_inhibit_reasons = NULL;
+> >  	}
+> >  
+> > +	vnmi = vnmi && boot_cpu_has(X86_FEATURE_AMD_VNMI);
 > 
-> I'm not sure what you mean here?  The recovery worker will still decrease
-> to_zap by 1 on every unaccounted NX hugepage, and go to sleep after it
-> reaches 0.
+> s/boot_cpu_has/cpu_feature_enabled/
 
-Right, what I'm saying is that this approach is still sub-optimal because it does
-all that work will holding mmu_lock for write.  
+Why?  This is rarely run code, won't cpu_feature_enabled() unnecessarily require
+patching?
 
-> Also, David's test used a 10-second halving time for the recovery thread.
-> With the 1 hour time the effect would Perhaps the 1 hour time used by
-> default by KVM is overly conservative, but 1% over 10 seconds is certainly a
-> lot larger an effect, than 1% over 1 hour.
-
-It's not the CPU usage I'm thinking of, it's the unnecessary blockage of MMU
-operations on other tasks/vCPUs.  Given that this is related to dirty logging,
-odds are very good that there will be a variety of operations in flight, e.g.
-KVM_GET_DIRTY_LOG.  If the recovery ratio is aggressive, and/or there are a lot
-of pages to recover, the recovery thread could hold mmu_lock until a reched is
-needed.
+And while we're on the topic... https://lore.kernel.org/all/Y22IzA9DN%2FxYWgWN@google.com
