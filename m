@@ -2,217 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EEE862E21F
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 17:39:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BF8662E22A
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 17:40:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235002AbiKQQjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 11:39:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49000 "EHLO
+        id S240497AbiKQQkZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 11:40:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240665AbiKQQix (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 11:38:53 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B3D2DE7
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 08:38:33 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AHGarHH024533;
-        Thu, 17 Nov 2022 16:38:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=EJ8Q71Cqj9/GimTIc4PuBQRDAXN8o7k2d3gD3eHxlEE=;
- b=UA7WpHdtG+ZXNQPEF7T8JVDCmWz44UaykKPMtZM71U2VHLdjsAiqG4hviUf8tVlj5VmC
- jzedsIi095Bsjz8Vimi5a54BnP8JkwhEaryFt9xsPvaeSZ0tUUCDOB29NC5JPdDW1Z5s
- EnNOlmRwil4Fe0ja+Kc2PW/DCx5NhuiTHUBIXZMGqr61w4IsbmP+1nW9uDkTQspZuUA8
- jnddsmBBvzdsn/csptnFeS4gtnKuq+yAUMglgSQPs5kpAKZ71znoT25xfKNoCyOsdxzz
- g4NfFBMSreDYHTbzIAeqDUNdvjNq3wf8M0hla9ZEK3jV/LXcppSa2tHMPDfxKK6Rmj5z Dg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kwq2eb5ap-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Nov 2022 16:38:26 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AHG65D1020057;
-        Thu, 17 Nov 2022 16:38:26 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kwq2eb59s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Nov 2022 16:38:25 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AHGZSE9030918;
-        Thu, 17 Nov 2022 16:38:23 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04fra.de.ibm.com with ESMTP id 3kt349dv95-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 17 Nov 2022 16:38:22 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AHGcJdN3146262
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 17 Nov 2022 16:38:19 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D0C1F5204F;
-        Thu, 17 Nov 2022 16:38:19 +0000 (GMT)
-Received: from [9.171.46.61] (unknown [9.171.46.61])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id F28365204E;
-        Thu, 17 Nov 2022 16:38:18 +0000 (GMT)
-Message-ID: <9e8d4c74-7405-5e1f-6c95-3c0c99c43eb9@linux.ibm.com>
-Date:   Thu, 17 Nov 2022 17:38:18 +0100
+        with ESMTP id S240574AbiKQQkF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 11:40:05 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F1DA6277
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 08:39:46 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id y13so2287914pfp.7
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 08:39:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=H9ws/VoANOQ+fPSn5rwf5FxpcOUa4clnxCqjB4jQHRk=;
+        b=rkmo6VLfA7ZdFlFYhci1eHa8YuAnNI7OCzahqFlLSSgWBhldvSblGwM0x4Ph5VSzWL
+         wxQZv55hGZPoy52j6/mWI9ors9jeYz6ewrstfFNZX0SlEY2j55aRTOjVNifOqruC+GU9
+         SC+xz1Pu/ZD5tUpuOajkCW2ZkXDx0T33SZcgsNYzU5vBzFQigzdFtrpnyctEO/k9Lcc/
+         Qx998qMUFq2FMQ1KjrSB+UadktrgmNujLZYVp2ldw7uDQF7X0n9W/v/jReBYtiLAJcN7
+         bSR7Jo6x9NDFwoO+6I8JKUVnU8SBKeyZ2zYV0jpzoosBXIya7r1tZP59YoL6uua/LeqX
+         1BeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H9ws/VoANOQ+fPSn5rwf5FxpcOUa4clnxCqjB4jQHRk=;
+        b=a20jxuN3/3aEE3/s3dxmj1dhsmuT+Wrp8w+ualTLKLM1Ghrh7co0h3H+yU4/eHIukS
+         ZmUcRpD17Yl8hqg5QtQhpReM/JCaAhmnwoNOfhmAc5Zh96IrnHjXI42+TkF8ZMHxGHo5
+         S8nc5tihC8NTI4nIIa0bNX7XKJ1Sbf8V0l0TB5z6nh5Lw6iHgy2uSERP2OrsRuIs2fOw
+         YgwqD7/hKivTfk5MuE+dU6At+XPX6TfDx1sPtilkjTFCltu1VtZp6b1TPuMUSs9oVXQT
+         42ozt6cSKBsKxq9LVp7NvsZqt+/L6FjU37UaQe4Wd7as926H7G1GtyB6YARgUm8fgTKj
+         jhaA==
+X-Gm-Message-State: ANoB5pnW4KMNZmkEDhETseRdD9HtBFlaqkgXHt8Fz6JFrszT6mC2eLPa
+        MbkH3dBIQN7OkuWh7kocO3QELUelcVDA/Q==
+X-Google-Smtp-Source: AA0mqf6fzW9qRwwqPD9MopcDpVcg8k/LRSPgQMy3+TDj5emGCtMVyTxrDINepW4yBPCQrROWlOdO9A==
+X-Received: by 2002:a05:6a00:21c1:b0:562:86a3:12fc with SMTP id t1-20020a056a0021c100b0056286a312fcmr3853688pfj.8.1668703185541;
+        Thu, 17 Nov 2022 08:39:45 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id p10-20020a17090a4f0a00b001fe39bda429sm1094934pjh.38.2022.11.17.08.39.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Nov 2022 08:39:45 -0800 (PST)
+Date:   Thu, 17 Nov 2022 16:39:41 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Matlack <dmatlack@google.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: x86/mmu: Do not recover dirty-tracked NX Huge
+ Pages
+Message-ID: <Y3ZjzZdI6Ej6XwW4@google.com>
+References: <20221103204421.1146958-1-dmatlack@google.com>
+ <Y2l247/1GzVm4mJH@google.com>
+ <d636e626-ae33-0119-545d-a0b60cbe0ff7@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH v9 00/10] s390x: CPU Topology
-Content-Language: en-US
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-References: <20220902075531.188916-1-pmorel@linux.ibm.com>
- <a2ddbba2-9e52-8ed8-fdbc-a587b8286576@de.ibm.com>
- <1fe0b036-19e7-a8a4-63aa-9bbcaed48187@linux.ibm.com>
-In-Reply-To: <1fe0b036-19e7-a8a4-63aa-9bbcaed48187@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 2aYYKbWNWahZ9MuH66zZpUtBk1Hw4106
-X-Proofpoint-ORIG-GUID: YsF9G5rZ8vfe9ZACFG2_4lpa0qQm7r2C
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-17_06,2022-11-17_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- phishscore=0 mlxlogscore=999 clxscore=1015 adultscore=0 spamscore=0
- lowpriorityscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211170122
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d636e626-ae33-0119-545d-a0b60cbe0ff7@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 11/17/22 10:31, Pierre Morel wrote:
+On Thu, Nov 17, 2022, Paolo Bonzini wrote:
+> On 11/7/22 22:21, Sean Christopherson wrote:
+> > 
+> > Hmm, and the memslot heuristic doesn't address the recovery worker holding mmu_lock
+> > for write.  On a non-preemptible kernel, rwlock_needbreak() is always false, e.g.
+> > the worker won't yield to vCPUs that are trying to handle non-fast page faults.
+> > The worker should eventually reach steady state by unaccounting everything, but
+> > that might take a while.
 > 
-> 
-> On 11/16/22 17:51, Christian Borntraeger wrote:
->> Am 02.09.22 um 09:55 schrieb Pierre Morel:
->>> Hi,
->>>
->>> The implementation of the CPU Topology in QEMU has been drastically
->>> modified since the last patch series and the number of LOCs has been
->>> greatly reduced.
->>>
->>> Unnecessary objects have been removed, only a single S390Topology object
->>> is created to support migration and reset.
->>>
->>> Also a documentation has been added to the series.
->>>
->>>
->>> To use these patches, you will need Linux V6-rc1 or newer.
->>>
->>> Mainline patches needed are:
->>>
->>> f5ecfee94493 2022-07-20 KVM: s390: resetting the Topology-Change-Report
->>> 24fe0195bc19 2022-07-20 KVM: s390: guest support for topology function
->>> 0130337ec45b 2022-07-20 KVM: s390: Cleanup ipte lock access and SIIF 
->>> fac..
->>>
->>> Currently this code is for KVM only, I have no idea if it is interesting
->>> to provide a TCG patch. If ever it will be done in another series.
->>>
->>> To have a better understanding of the S390x CPU Topology and its
->>> implementation in QEMU you can have a look at the documentation in the
->>> last patch.
->>>
->>> New in this series
->>> ==================
->>>
->>>    s390x/cpus: Make absence of multithreading clear
->>>
->>> This patch makes clear that CPU-multithreading is not supported in
->>> the guest.
->>>
->>>    s390x/cpu topology: core_id sets s390x CPU topology
->>>
->>> This patch uses the core_id to build the container topology
->>> and the placement of the CPU inside the container.
->>>
->>>    s390x/cpu topology: reporting the CPU topology to the guest
->>>
->>> This patch is based on the fact that the CPU type for guests
->>> is always IFL, CPUs are always dedicated and the polarity is
->>> always horizontal.
->>> This may change in the future.
->>>
->>>    hw/core: introducing drawer and books for s390x
->>>    s390x/cpu: reporting drawers and books topology to the guest
->>>
->>> These two patches extend the topology handling to add two
->>> new containers levels above sockets: books and drawers.
->>>
->>> The subject of the last patches is clear enough (I hope).
->>>
->>> Regards,
->>> Pierre
->>>
->>> Pierre Morel (10):
->>>    s390x/cpus: Make absence of multithreading clear
->>>    s390x/cpu topology: core_id sets s390x CPU topology
->>>    s390x/cpu topology: reporting the CPU topology to the guest
->>>    hw/core: introducing drawer and books for s390x
->>>    s390x/cpu: reporting drawers and books topology to the guest
->>>    s390x/cpu_topology: resetting the Topology-Change-Report
->>>    s390x/cpu_topology: CPU topology migration
->>>    target/s390x: interception of PTF instruction
->>>    s390x/cpu_topology: activating CPU topology
->>
->>
->> Do we really need a machine property? As far as I can see, old QEMU
->> cannot  activate the ctop facility with old and new kernel unless it
->> enables CAP_S390_CPU_TOPOLOGY. I do get
->> oldqemu .... -cpu z14,ctop=on
->> qemu-system-s390x: Some features requested in the CPU model are not 
->> available in the configuration: ctop
->>
->> With the newer QEMU we can. So maybe we can simply have a topology (and
->> then a cpu model feature) in new QEMUs and non in old. the cpu model
->> would then also fence migration from enabled to disabled.
-> 
-> OK, I can check this.
-> In this case migration with topology will be if I understand correctly:
-> 
-> NEW_QEMU/old_machine <-> NEW_QEMU/old_machine OK
-> While
-> OLD_QEMU/old_machine <-> NEW_QEMU/old_machine KO
-> NEW_QEMU/old_machine <-> OLD_QEMU/old_machine KO
+> I'm not sure what you mean here?  The recovery worker will still decrease
+> to_zap by 1 on every unaccounted NX hugepage, and go to sleep after it
+> reaches 0.
 
-I forgot to say that I mean in the examples above without using a flag.
+Right, what I'm saying is that this approach is still sub-optimal because it does
+all that work will holding mmu_lock for write.  
 
-Of course using a flag like -ctop=off in NEW_QEMU/new_machine allows
-to migrate from and to old_machines in an old QEMU.
+> Also, David's test used a 10-second halving time for the recovery thread.
+> With the 1 hour time the effect would Perhaps the 1 hour time used by
+> default by KVM is overly conservative, but 1% over 10 seconds is certainly a
+> lot larger an effect, than 1% over 1 hour.
 
-Also I had the same behavior already in V9 by having a VMState without 
-the creation of a machine property, a new cpu feature and a new cpu flag.
-
-
-
-
-
-
-> 
-> Is this something we can accept?
-> 
-> regards,
-> Pierre
-> 
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+It's not the CPU usage I'm thinking of, it's the unnecessary blockage of MMU
+operations on other tasks/vCPUs.  Given that this is related to dirty logging,
+odds are very good that there will be a variety of operations in flight, e.g.
+KVM_GET_DIRTY_LOG.  If the recovery ratio is aggressive, and/or there are a lot
+of pages to recover, the recovery thread could hold mmu_lock until a reched is
+needed.
