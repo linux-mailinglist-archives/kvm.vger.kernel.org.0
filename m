@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 95F2162CF61
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 01:17:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E754862CF62
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 01:17:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233963AbiKQARX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Nov 2022 19:17:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52514 "EHLO
+        id S233981AbiKQARY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Nov 2022 19:17:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232846AbiKQARV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Nov 2022 19:17:21 -0500
+        with ESMTP id S230287AbiKQARW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Nov 2022 19:17:22 -0500
 Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B90B2F3AE
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 16:17:20 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-38e82825a64so3188447b3.20
-        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 16:17:20 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6E4031FB3
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 16:17:21 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-386bb660154so3197967b3.18
+        for <kvm@vger.kernel.org>; Wed, 16 Nov 2022 16:17:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U3IZKsuc9ltcu/+mzZPVDH2wCFVrb8m8TbR4/5Q4IxQ=;
-        b=e2V4cbt4u5l2kNBLhooZVsqCFE5v27Z6ryzHyE+M91aNsWiuaElXPm7WioBQtC1Vh7
-         mPqyYcevdiSyjJMXWuLugDRibJATiyj08fes9IoxtHGh59+Vmtuyo1ocAmI/qhLZMUnB
-         v02Fh9hUjGrulCiC2J7Zt87EnPT7ngftCq01aTaNUsACRjEeqaDJBKeZ6HDCTl6fGtex
-         lgmIY84qMojRjDQjkL9lPx1JGIPUJgHIv1fs6gI47E0T5S82mQ8RGvoJlEeqISWxor5/
-         HXJQuYGduqI3rxDNA3fWuwKkG4y3VvVGLAIzqsmKbbQqamNE67rH+uBEj8L0DYykkzfz
-         quzQ==
+        bh=/2DmMdwiRBUsLE5SjUjPAC9NBnBP9UxCQTwqSFTfX5E=;
+        b=CMnvzFpdejbVSi1OAAn0w8leDh5jUN3qiVPchNeCENWNn5PE62/3fbuVgqVi0hLqWb
+         ltrex3AeYFAmqCd/c8Lq6zrhunIKU89WHjxmWFZyEB3SVXposVn4463+Zzh62fGxWZt/
+         t0vucoj3p3gXwZlygVXSAlbRbiIXilaw1Q6uU9qSA+FQ3dXxe/nNB5okATHm6R4MUC1p
+         0eH2mGA0TTnOm6VLz+vKo9hB//d2g6elAcsMIp25QaRiDOglwusniRhSyzb6aI4TXtld
+         oLJXAXgTgv9R5fmIMDxvgkRSKGcEA1776dhF28eKSoO46v0apMVKjbz40xFi4OSbL0D/
+         AugA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U3IZKsuc9ltcu/+mzZPVDH2wCFVrb8m8TbR4/5Q4IxQ=;
-        b=r1LG5HICEHHc01++xUOPs/T4avV7WsHZ4uB+t3XSUBr6cH4H7613MDh0JyBfflFoZq
-         AOvZktve0Hhj4ETzkS5eMR45tnHUZSbY9MAfY3AksAuLavlj5+xjc+DxrdmW+9XwQ266
-         LIz4gr+jBuDda/EZ8ERDOohMgKwx9gMnpiUELT3gYrV3PyY5/ScXZ7lpYDdLxFAUrfYu
-         UadUae0OCPlHHgjzQfzRXqIjyENmHmMkCbpMW4jOU5au03FCYm4ObOxirAOhMm7n7u5r
-         4Uk2jqPaQERVrrIes5kvtXJFYZrY+iEnkrV4OdXzLM016FBV9QyuFmV+5WRDnk6vLyWd
-         jOfQ==
-X-Gm-Message-State: ANoB5pnFPCaZOBuUnkd8eLKCKvLxfcLIEbxuRc7AzhIscLQLMTTThSZf
-        2R50G6CKDVbjUwrtqUQAspqS5bSzEYsuZw==
-X-Google-Smtp-Source: AA0mqf6WMSuYmOr8jFkt8gMx2bE+5LbrR0NtVlbmjlhMcSBTdQs4tqaWrQ/Sl4mljDdytvI5WLVAS2tjLyPUGw==
+        bh=/2DmMdwiRBUsLE5SjUjPAC9NBnBP9UxCQTwqSFTfX5E=;
+        b=zijCCikGz7Cu2/29sTyafvUT6VYdg5MZkjKqwv5CpalnAXXfN7NXa3RKKCf+pbe5sy
+         5LHcjrsE7usdUQ9E1/uvdHI6uWLcZAF+CgJfc5KccLGoHjd0KCYAl5DoFWAxfTc0WRbC
+         T9RX9pxw35YURI/xLHL35wye1x6qWnJJz++bI4+P2ovw6teU2fH4UrGxujk+AiywfjV9
+         0uLwP5eeUNIwV5PUFkQZWL1e83S2FGwfN41CSl732pULPQo4M0p1uwA0v1409KcJvSSX
+         biTKN1utlYpfkUGaNDExLc+va73Npn4UnHk3gtUlXmXW4NaSHH+ysIFFfr+f8TTLBDJS
+         VEoQ==
+X-Gm-Message-State: ANoB5pn5jkJ8d0l+wEjEhzseciRXkgAszhZ+yi86uccloJuEx1yc47dx
+        GHSNiyzJbDg1NawlB15oHtipg1PdH5NtfQ==
+X-Google-Smtp-Source: AA0mqf6YJFVLQnnn1nTWX4F8U1bhLpUWx1CH79OfqlssyQxDfMIxl78cAUkmirIYZ2/ByqGYbD80xfOxNeNAxg==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:bb90:0:b0:6da:633f:20a with SMTP id
- y16-20020a25bb90000000b006da633f020amr106642ybg.363.1668644239483; Wed, 16
- Nov 2022 16:17:19 -0800 (PST)
-Date:   Wed, 16 Nov 2022 16:16:56 -0800
+ (user=dmatlack job=sendgmr) by 2002:a25:aba9:0:b0:6dc:786f:86d8 with SMTP id
+ v38-20020a25aba9000000b006dc786f86d8mr64452ybi.597.1668644241104; Wed, 16 Nov
+ 2022 16:17:21 -0800 (PST)
+Date:   Wed, 16 Nov 2022 16:16:57 -0800
 In-Reply-To: <20221117001657.1067231-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221117001657.1067231-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221117001657.1067231-3-dmatlack@google.com>
-Subject: [RFC PATCH 2/3] KVM: Avoid re-reading kvm->max_halt_poll_ns during halt-polling
+Message-ID: <20221117001657.1067231-4-dmatlack@google.com>
+Subject: [RFC PATCH 3/3] KVM: Obey kvm.halt_poll_ns in VMs not using KVM_CAP_HALT_POLL
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Jon Cargille <jcargill@google.com>,
@@ -70,82 +70,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Avoid re-reading kvm->max_halt_poll_ns multiple times during
-halt-polling except when it is explicitly useful, e.g. to check if the
-max time changed across a halt. kvm->max_halt_poll_ns can be changed at
-any time by userspace via KVM_CAP_HALT_POLL.
+Obey kvm.halt_poll_ns in VMs not using KVM_CAP_HALT_POLL on every halt,
+rather than just sampling the module parameter when the VM is first
+created. This restore the original behavior of kvm.halt_poll_ns for VMs
+that have not opted into KVM_CAP_HALT_POLL.
 
-This bug is unlikely to cause any serious side-effects. In the worst
-case one halt polls for shorter or longer than it should, and then is
-fixed up on the next halt. Furthmore, this is still possible since
-kvm->max_halt_poll_ns are not synchronized with halts.
+Notably, this change restores the ability for admins to disable or
+change the maximum halt-polling time system wide for VMs not using
+KVM_CAP_HALT_POLL.
 
+Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Fixes: acd05785e48c ("kvm: add capability for halt polling")
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- virt/kvm/kvm_main.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+ include/linux/kvm_host.h |  1 +
+ virt/kvm/kvm_main.c      | 27 ++++++++++++++++++++++++---
+ 2 files changed, 25 insertions(+), 3 deletions(-)
 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index e6e66c5e56f2..253ad055b6ad 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -788,6 +788,7 @@ struct kvm {
+ 	struct srcu_struct srcu;
+ 	struct srcu_struct irq_srcu;
+ 	pid_t userspace_pid;
++	bool override_halt_poll_ns;
+ 	unsigned int max_halt_poll_ns;
+ 	u32 dirty_ring_size;
+ 	bool vm_bugged;
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 4b868f33c45d..78caf19608eb 100644
+index 78caf19608eb..7f73ce99bd0e 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -3488,6 +3488,11 @@ static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
+@@ -1198,8 +1198,6 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+ 			goto out_err_no_arch_destroy_vm;
  	}
+ 
+-	kvm->max_halt_poll_ns = halt_poll_ns;
+-
+ 	r = kvm_arch_init_vm(kvm, type);
+ 	if (r)
+ 		goto out_err_no_arch_destroy_vm;
+@@ -3490,7 +3488,20 @@ static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
+ 
+ static unsigned int kvm_vcpu_max_halt_poll_ns(struct kvm_vcpu *vcpu)
+ {
+-	return READ_ONCE(vcpu->kvm->max_halt_poll_ns);
++	struct kvm *kvm = vcpu->kvm;
++
++	if (kvm->override_halt_poll_ns) {
++		/*
++		 * Ensure kvm->max_halt_poll_ns is not read before
++		 * kvm->override_halt_poll_ns.
++		 *
++		 * Pairs with the smp_wmb() when enabling KVM_CAP_HALT_POLL.
++		 */
++		smp_rmb();
++		return READ_ONCE(kvm->max_halt_poll_ns);
++	}
++
++	return READ_ONCE(halt_poll_ns);
  }
  
-+static unsigned int kvm_vcpu_max_halt_poll_ns(struct kvm_vcpu *vcpu)
-+{
-+	return READ_ONCE(vcpu->kvm->max_halt_poll_ns);
-+}
-+
  /*
-  * Emulate a vCPU halt condition, e.g. HLT on x86, WFI on arm, etc...  If halt
-  * polling is enabled, busy wait for a short time before blocking to avoid the
-@@ -3496,14 +3501,15 @@ static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
-  */
- void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
- {
-+	unsigned int max_halt_poll_ns = kvm_vcpu_max_halt_poll_ns(vcpu);
- 	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
- 	ktime_t start, cur, poll_end;
- 	bool waited = false;
- 	bool do_halt_poll;
- 	u64 halt_ns;
+@@ -4600,6 +4611,16 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+ 			return -EINVAL;
  
--	if (vcpu->halt_poll_ns > vcpu->kvm->max_halt_poll_ns)
--		vcpu->halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
-+	if (vcpu->halt_poll_ns > max_halt_poll_ns)
-+		vcpu->halt_poll_ns = max_halt_poll_ns;
- 
- 	do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
- 
-@@ -3545,18 +3551,21 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
- 		update_halt_poll_stats(vcpu, start, poll_end, !waited);
- 
- 	if (halt_poll_allowed) {
-+		/* Recompute the max halt poll time in case it changed. */
-+		max_halt_poll_ns = kvm_vcpu_max_halt_poll_ns(vcpu);
+ 		kvm->max_halt_poll_ns = cap->args[0];
 +
- 		if (!vcpu_valid_wakeup(vcpu)) {
- 			shrink_halt_poll_ns(vcpu);
--		} else if (vcpu->kvm->max_halt_poll_ns) {
-+		} else if (max_halt_poll_ns) {
- 			if (halt_ns <= vcpu->halt_poll_ns)
- 				;
- 			/* we had a long block, shrink polling */
- 			else if (vcpu->halt_poll_ns &&
--				 halt_ns > vcpu->kvm->max_halt_poll_ns)
-+				 halt_ns > max_halt_poll_ns)
- 				shrink_halt_poll_ns(vcpu);
- 			/* we had a short halt and our poll time is too small */
--			else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
--				 halt_ns < vcpu->kvm->max_halt_poll_ns)
-+			else if (vcpu->halt_poll_ns < max_halt_poll_ns &&
-+				 halt_ns < max_halt_poll_ns)
- 				grow_halt_poll_ns(vcpu);
- 		} else {
- 			vcpu->halt_poll_ns = 0;
++		/*
++		 * Ensure kvm->override_halt_poll_ns does not become visible
++		 * before kvm->max_halt_poll_ns.
++		 *
++		 * Pairs with the smp_rmb() in kvm_vcpu_max_halt_poll_ns().
++		 */
++		smp_wmb();
++		kvm->override_halt_poll_ns = true;
++
+ 		return 0;
+ 	}
+ 	case KVM_CAP_DIRTY_LOG_RING:
 -- 
 2.38.1.431.g37b22c650d-goog
 
