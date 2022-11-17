@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 96FE662D679
-	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 10:21:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FFA062D67C
+	for <lists+kvm@lfdr.de>; Thu, 17 Nov 2022 10:21:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239904AbiKQJVf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 04:21:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46168 "EHLO
+        id S239860AbiKQJVp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 04:21:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239291AbiKQJVa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 04:21:30 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC753697C2
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:21:21 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id e189-20020a25e7c6000000b006e37f21e689so1035487ybh.10
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:21:21 -0800 (PST)
+        with ESMTP id S239895AbiKQJVe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 04:21:34 -0500
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2964697CC
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:21:25 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-36810cfa61fso13857277b3.6
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 01:21:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=d/RXx9wXTdzXPwApBbCAYqFaROqhIuNaPO6b59yAqxM=;
-        b=jWQaeFYp3+g9jpA82uXaAtNuTv9vqhneAyLLYCWBvmqqflmbQwJHRzhN0WLps8NmCh
-         N/ohZkVbq6mc55ggTTvZ7Zkn91lsrgy3OHuNi2pMzOpdPPl8nipaMCSYqta8krKFLFKB
-         4CpJAVpSiZcGtUnJiSWJJznj8bXWmI/pyA/mnbs546UtPQFMXGWRgNXTxKv09f3EDh4n
-         bU8u8a4+jYHUZiCPygd0iC1cez8FLeWCHTBZ+n5icSn4UcJSfsm9AylHqTVNe2k1TBxm
-         Oq2QNyfgEB5ufZAk4nDeEzalBH08rw3TIMqgEGV0gdyRZeITxGVaYJRCZeC0fxU6xtIE
-         CfFQ==
+        bh=K9Ae8YptpjIFLt+1WhGpIuKV36hqZRLrgMOTRnegM/o=;
+        b=k+ecxoUDGl6beWbepCuLxfhUxUeYc2nm6udzLdUReRrgpO+qc560Wh+7zFcGrMIzwQ
+         Q+p7plb3pG/0+Xe+r85q0c60PsokagN0ilv9lu6/XSfI8szC0xaFcNcVoY1q7iPxv1tu
+         I1++eJ7b24/73O+qQXEUKYor7Md5vkXJcA92mHnpI+ESXQw6UCDzuD6bOp68QgzB1fdg
+         vNTM2mBuLckJqEYoBMrum7RHl5gHjWV8G4nqlEZoDgjW1pQnpdhBK5AxcBuWwUekrbIQ
+         4FA3e5AAoZktIhCox/5flWxUnV18vNckBUwEL9uYD81EOK7hI+UCPPvKGqAhCsj8Nvf4
+         OCIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=d/RXx9wXTdzXPwApBbCAYqFaROqhIuNaPO6b59yAqxM=;
-        b=p74LuzDif4IwJVPndmOEm/GVJM0QBi32wboa0mMTMSukadH4Ei9qXfDrU3BDgZXyWP
-         QuoP8NjJGJTwNZyLJ9dRGPTpZ6Y/Tt41uWINZ3JUyfnQz+DcY97rK0VSXpRe6DGqN7sr
-         umLOrikj0S+zOB456rHWh0/tnDjRGtOUu3tkR8gy1gS1MXx5mp8O+RAG1jazf/vGgDAL
-         rDFbdFpH3EA6/St4fPiIVqT4KbxMVuE+WKuQdO+jQjCJRC82c/UU853IOMtQ8jah3QDx
-         iXrvu3hFe9W84dLdQR/E75tEeULA+7kjbmT8OtGWvX9RPCJ8kXGqvBL1QoicdlC2QKjO
-         C0Kg==
-X-Gm-Message-State: ANoB5pkoWGFHk6/EMp1mxk5VoLteHSzl1AkS4K5EiW/JmMoGOfYMefim
-        CLHzq9i9EhXNBLYMoZVDO6wgAU6DaKOBEQ==
-X-Google-Smtp-Source: AA0mqf5ISpkGpO5xnSR879HMXiw0GegQ8sspgqBtpEYeloq5BGuxW3sIewVFxcLDBWt1LpvPki+celi8NJ5JCQ==
+        bh=K9Ae8YptpjIFLt+1WhGpIuKV36hqZRLrgMOTRnegM/o=;
+        b=MYpVtTPqzsWhA+5m+TF3lGLAgPqFIS+Jc9nKwCsNRNM0cZbQzRz7hXopfjpXAJIzoH
+         581Jcwgwh4t/bynjpLEBnPqJ15iz4S2yRz80vJTtM9nR6cNjf1oDX5COz8Ck4se82d7n
+         UPXj7M3bXBj1zlMtNqHS2ARPFIUwhedM2Dp105P+hPKVrYassG8GNUAiOXq681i38uQA
+         yHFKn4YqgPN6o2plGwA5ITd9YEy8aC2Vz89+NiTGG/nw+AYv6JOK4gEto4smGNkAN1Zp
+         wIKXhkYxrupoMygATcnprPAKStP0LLN2H/AnqMyg1USYzk63Sn/0RoliBJGSkEmrrVjq
+         QPmQ==
+X-Gm-Message-State: ANoB5pntTY7i2cCLExFx00cdpZ2wUDN8CA6bCWHq4FBwsBs6FwlkWWje
+        Sypqwy82LXFYoL+FWdQSKFNfypqUrKpDpQ==
+X-Google-Smtp-Source: AA0mqf7M52p+Uab/sfpbZCekPMbDre4Hl4WcfPGNv/Fl0vgvV1zgr+A1O/uIekNtnXPGzKAnUU1sKisRIw+dUQ==
 X-Received: from suleiman1.tok.corp.google.com ([2401:fa00:8f:203:416e:f3c7:7f1d:6e])
- (user=suleiman job=sendgmr) by 2002:a05:690c:881:b0:373:3558:47be with SMTP
- id cd1-20020a05690c088100b00373355847bemr1290128ywb.121.1668676881050; Thu,
- 17 Nov 2022 01:21:21 -0800 (PST)
-Date:   Thu, 17 Nov 2022 18:19:35 +0900
+ (user=suleiman job=sendgmr) by 2002:a25:5f05:0:b0:6bc:c982:acc4 with SMTP id
+ t5-20020a255f05000000b006bcc982acc4mr1352958ybb.76.1668676885293; Thu, 17 Nov
+ 2022 01:21:25 -0800 (PST)
+Date:   Thu, 17 Nov 2022 18:19:36 +0900
 In-Reply-To: <20221117091952.1940850-1-suleiman@google.com>
-Message-Id: <20221117091952.1940850-18-suleiman@google.com>
+Message-Id: <20221117091952.1940850-19-suleiman@google.com>
 Mime-Version: 1.0
 References: <20221117091952.1940850-1-suleiman@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Subject: [PATCH 4.19 17/34] x86/bugs: Report Intel retbleed vulnerability
+Subject: [PATCH 4.19 18/34] intel_idle: Disable IBRS during long idle
 From:   Suleiman Souhlal <suleiman@google.com>
 To:     stable@vger.kernel.org
 Cc:     x86@kernel.org, kvm@vger.kernel.org, bp@alien8.de,
@@ -71,174 +71,191 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Peter Zijlstra <peterz@infradead.org>
 
-commit 6ad0ad2bf8a67e27d1f9d006a1dabb0e1c360cc3 upstream.
+commit bf5835bcdb9635c97f85120dba9bfa21e111130f upstream.
 
-Skylake suffers from RSB underflow speculation issues; report this
-vulnerability and it's mitigation (spectre_v2=ibrs).
+Having IBRS enabled while the SMT sibling is idle unnecessarily slows
+down the running sibling. OTOH, disabling IBRS around idle takes two
+MSR writes, which will increase the idle latency.
 
-  [jpoimboe: cleanups, eibrs]
+Therefore, only disable IBRS around deeper idle states. Shallow idle
+states are bounded by the tick in duration, since NOHZ is not allowed
+for them by virtue of their short target residency.
 
+Only do this for mwait-driven idle, since that keeps interrupts disabled
+across idle, which makes disabling IBRS vs IRQ-entry a non-issue.
+
+Note: C6 is a random threshold, most importantly C1 probably shouldn't
+disable IBRS, benchmarking needed.
+
+Suggested-by: Tim Chen <tim.c.chen@linux.intel.com>
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 Signed-off-by: Borislav Petkov <bp@suse.de>
 Reviewed-by: Josh Poimboeuf <jpoimboe@kernel.org>
 Signed-off-by: Borislav Petkov <bp@suse.de>
+[cascardo: no CPUIDLE_FLAG_IRQ_ENABLE]
 Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-[suleiman: different processor names]
+[cascardo: context adjustments]
+Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Signed-off-by: Suleiman Souhlal <suleiman@google.com>
 ---
- arch/x86/include/asm/msr-index.h |  1 +
- arch/x86/kernel/cpu/bugs.c       | 36 +++++++++++++++++++++++++++-----
- arch/x86/kernel/cpu/common.c     | 24 ++++++++++-----------
- 3 files changed, 44 insertions(+), 17 deletions(-)
+ arch/x86/include/asm/nospec-branch.h |  1 +
+ arch/x86/kernel/cpu/bugs.c           |  6 ++++
+ drivers/idle/intel_idle.c            | 43 ++++++++++++++++++++++++----
+ 3 files changed, 44 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 586be095ed08..9233da260341 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -73,6 +73,7 @@
- #define MSR_IA32_ARCH_CAPABILITIES	0x0000010a
- #define ARCH_CAP_RDCL_NO		BIT(0)	/* Not susceptible to Meltdown */
- #define ARCH_CAP_IBRS_ALL		BIT(1)	/* Enhanced IBRS support */
-+#define ARCH_CAP_RSBA			BIT(2)	/* RET may use alternative branch predictors */
- #define ARCH_CAP_SKIP_VMENTRY_L1DFLUSH	BIT(3)	/* Skip L1D flush on vmentry */
- #define ARCH_CAP_SSB_NO			BIT(4)	/*
- 						 * Not susceptible to Speculative Store Bypass
+diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+index 43a1c7d69dbe..9311f0f9c392 100644
+--- a/arch/x86/include/asm/nospec-branch.h
++++ b/arch/x86/include/asm/nospec-branch.h
+@@ -309,6 +309,7 @@ static inline void indirect_branch_prediction_barrier(void)
+ /* The Intel SPEC CTRL MSR base value cache */
+ extern u64 x86_spec_ctrl_base;
+ extern void write_spec_ctrl_current(u64 val, bool force);
++extern u64 spec_ctrl_current(void);
+ 
+ /*
+  * With retpoline, we must use IBRS to restrict branch prediction
 diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index ba60b61f0ee1..63a59dbda780 100644
+index 63a59dbda780..0734f35d1af1 100644
 --- a/arch/x86/kernel/cpu/bugs.c
 +++ b/arch/x86/kernel/cpu/bugs.c
-@@ -743,11 +743,16 @@ static int __init nospectre_v1_cmdline(char *str)
+@@ -77,6 +77,12 @@ void write_spec_ctrl_current(u64 val, bool force)
+ 		wrmsrl(MSR_IA32_SPEC_CTRL, val);
  }
- early_param("nospectre_v1", nospectre_v1_cmdline);
  
-+static enum spectre_v2_mitigation spectre_v2_enabled __ro_after_init =
-+	SPECTRE_V2_NONE;
++u64 spec_ctrl_current(void)
++{
++	return this_cpu_read(x86_spec_ctrl_current);
++}
++EXPORT_SYMBOL_GPL(spec_ctrl_current);
 +
- #undef pr_fmt
- #define pr_fmt(fmt)     "RETBleed: " fmt
+ /*
+  * The vendor and possibly platform specific bits which can be modified in
+  * x86_spec_ctrl_base.
+diff --git a/drivers/idle/intel_idle.c b/drivers/idle/intel_idle.c
+index c4bb67ed8da3..6360c045e3d0 100644
+--- a/drivers/idle/intel_idle.c
++++ b/drivers/idle/intel_idle.c
+@@ -58,11 +58,13 @@
+ #include <linux/tick.h>
+ #include <trace/events/power.h>
+ #include <linux/sched.h>
++#include <linux/sched/smt.h>
+ #include <linux/notifier.h>
+ #include <linux/cpu.h>
+ #include <linux/moduleparam.h>
+ #include <asm/cpu_device_id.h>
+ #include <asm/intel-family.h>
++#include <asm/nospec-branch.h>
+ #include <asm/mwait.h>
+ #include <asm/msr.h>
  
- enum retbleed_mitigation {
- 	RETBLEED_MITIGATION_NONE,
-+	RETBLEED_MITIGATION_IBRS,
-+	RETBLEED_MITIGATION_EIBRS,
- };
+@@ -109,6 +111,12 @@ static struct cpuidle_state *cpuidle_state_table;
+  */
+ #define CPUIDLE_FLAG_TLB_FLUSHED	0x10000
  
- enum retbleed_mitigation_cmd {
-@@ -757,6 +762,8 @@ enum retbleed_mitigation_cmd {
++/*
++ * Disable IBRS across idle (when KERNEL_IBRS), is exclusive vs IRQ_ENABLE
++ * above.
++ */
++#define CPUIDLE_FLAG_IBRS		BIT(16)
++
+ /*
+  * MWAIT takes an 8-bit "hint" in EAX "suggesting"
+  * the C-state (top nibble) and sub-state (bottom nibble)
+@@ -119,6 +127,24 @@ static struct cpuidle_state *cpuidle_state_table;
+ #define flg2MWAIT(flags) (((flags) >> 24) & 0xFF)
+ #define MWAIT2flg(eax) ((eax & 0xFF) << 24)
  
- const char * const retbleed_strings[] = {
- 	[RETBLEED_MITIGATION_NONE]	= "Vulnerable",
-+	[RETBLEED_MITIGATION_IBRS]	= "Mitigation: IBRS",
-+	[RETBLEED_MITIGATION_EIBRS]	= "Mitigation: Enhanced IBRS",
- };
++static __cpuidle int intel_idle_ibrs(struct cpuidle_device *dev,
++				     struct cpuidle_driver *drv, int index)
++{
++	bool smt_active = sched_smt_active();
++	u64 spec_ctrl = spec_ctrl_current();
++	int ret;
++
++	if (smt_active)
++		wrmsrl(MSR_IA32_SPEC_CTRL, 0);
++
++	ret = intel_idle(dev, drv, index);
++
++	if (smt_active)
++		wrmsrl(MSR_IA32_SPEC_CTRL, spec_ctrl);
++
++	return ret;
++}
++
+ /*
+  * States are indexed by the cstate number,
+  * which is also the index into the MWAIT hint array.
+@@ -617,7 +643,7 @@ static struct cpuidle_state skl_cstates[] = {
+ 	{
+ 		.name = "C6",
+ 		.desc = "MWAIT 0x20",
+-		.flags = MWAIT2flg(0x20) | CPUIDLE_FLAG_TLB_FLUSHED,
++		.flags = MWAIT2flg(0x20) | CPUIDLE_FLAG_TLB_FLUSHED | CPUIDLE_FLAG_IBRS,
+ 		.exit_latency = 85,
+ 		.target_residency = 200,
+ 		.enter = &intel_idle,
+@@ -625,7 +651,7 @@ static struct cpuidle_state skl_cstates[] = {
+ 	{
+ 		.name = "C7s",
+ 		.desc = "MWAIT 0x33",
+-		.flags = MWAIT2flg(0x33) | CPUIDLE_FLAG_TLB_FLUSHED,
++		.flags = MWAIT2flg(0x33) | CPUIDLE_FLAG_TLB_FLUSHED | CPUIDLE_FLAG_IBRS,
+ 		.exit_latency = 124,
+ 		.target_residency = 800,
+ 		.enter = &intel_idle,
+@@ -633,7 +659,7 @@ static struct cpuidle_state skl_cstates[] = {
+ 	{
+ 		.name = "C8",
+ 		.desc = "MWAIT 0x40",
+-		.flags = MWAIT2flg(0x40) | CPUIDLE_FLAG_TLB_FLUSHED,
++		.flags = MWAIT2flg(0x40) | CPUIDLE_FLAG_TLB_FLUSHED | CPUIDLE_FLAG_IBRS,
+ 		.exit_latency = 200,
+ 		.target_residency = 800,
+ 		.enter = &intel_idle,
+@@ -641,7 +667,7 @@ static struct cpuidle_state skl_cstates[] = {
+ 	{
+ 		.name = "C9",
+ 		.desc = "MWAIT 0x50",
+-		.flags = MWAIT2flg(0x50) | CPUIDLE_FLAG_TLB_FLUSHED,
++		.flags = MWAIT2flg(0x50) | CPUIDLE_FLAG_TLB_FLUSHED | CPUIDLE_FLAG_IBRS,
+ 		.exit_latency = 480,
+ 		.target_residency = 5000,
+ 		.enter = &intel_idle,
+@@ -649,7 +675,7 @@ static struct cpuidle_state skl_cstates[] = {
+ 	{
+ 		.name = "C10",
+ 		.desc = "MWAIT 0x60",
+-		.flags = MWAIT2flg(0x60) | CPUIDLE_FLAG_TLB_FLUSHED,
++		.flags = MWAIT2flg(0x60) | CPUIDLE_FLAG_TLB_FLUSHED | CPUIDLE_FLAG_IBRS,
+ 		.exit_latency = 890,
+ 		.target_residency = 5000,
+ 		.enter = &intel_idle,
+@@ -678,7 +704,7 @@ static struct cpuidle_state skx_cstates[] = {
+ 	{
+ 		.name = "C6",
+ 		.desc = "MWAIT 0x20",
+-		.flags = MWAIT2flg(0x20) | CPUIDLE_FLAG_TLB_FLUSHED,
++		.flags = MWAIT2flg(0x20) | CPUIDLE_FLAG_TLB_FLUSHED | CPUIDLE_FLAG_IBRS,
+ 		.exit_latency = 133,
+ 		.target_residency = 600,
+ 		.enter = &intel_idle,
+@@ -1384,6 +1410,11 @@ static void __init intel_idle_cpuidle_driver_init(void)
+ 		drv->states[drv->state_count] =	/* structure copy */
+ 			cpuidle_state_table[cstate];
  
- static enum retbleed_mitigation retbleed_mitigation __ro_after_init =
-@@ -782,6 +789,7 @@ early_param("retbleed", retbleed_parse_cmdline);
- 
- #define RETBLEED_UNTRAIN_MSG "WARNING: BTB untrained return thunk mitigation is only effective on AMD/Hygon!\n"
- #define RETBLEED_COMPILER_MSG "WARNING: kernel not compiled with RETPOLINE or -mfunction-return capable compiler!\n"
-+#define RETBLEED_INTEL_MSG "WARNING: Spectre v2 mitigation leaves CPU vulnerable to RETBleed attacks, data leaks possible!\n"
- 
- static void __init retbleed_select_mitigation(void)
- {
-@@ -794,8 +802,10 @@ static void __init retbleed_select_mitigation(void)
- 
- 	case RETBLEED_CMD_AUTO:
- 	default:
--		if (!boot_cpu_has_bug(X86_BUG_RETBLEED))
--			break;
-+		/*
-+		 * The Intel mitigation (IBRS) was already selected in
-+		 * spectre_v2_select_mitigation().
-+		 */
- 
- 		break;
- 	}
-@@ -805,15 +815,31 @@ static void __init retbleed_select_mitigation(void)
- 		break;
- 	}
- 
-+	/*
-+	 * Let IBRS trump all on Intel without affecting the effects of the
-+	 * retbleed= cmdline option.
-+	 */
-+	if (boot_cpu_data.x86_vendor == X86_VENDOR_INTEL) {
-+		switch (spectre_v2_enabled) {
-+		case SPECTRE_V2_IBRS:
-+			retbleed_mitigation = RETBLEED_MITIGATION_IBRS;
-+			break;
-+		case SPECTRE_V2_EIBRS:
-+		case SPECTRE_V2_EIBRS_RETPOLINE:
-+		case SPECTRE_V2_EIBRS_LFENCE:
-+			retbleed_mitigation = RETBLEED_MITIGATION_EIBRS;
-+			break;
-+		default:
-+			pr_err(RETBLEED_INTEL_MSG);
++		if (cpu_feature_enabled(X86_FEATURE_KERNEL_IBRS) &&
++		    cpuidle_state_table[cstate].flags & CPUIDLE_FLAG_IBRS) {
++			drv->states[drv->state_count].enter = intel_idle_ibrs;
 +		}
-+	}
 +
- 	pr_info("%s\n", retbleed_strings[retbleed_mitigation]);
- }
- 
- #undef pr_fmt
- #define pr_fmt(fmt)     "Spectre V2 : " fmt
- 
--static enum spectre_v2_mitigation spectre_v2_enabled __ro_after_init =
--	SPECTRE_V2_NONE;
--
- static enum spectre_v2_user_mitigation spectre_v2_user_stibp __ro_after_init =
- 	SPECTRE_V2_USER_NONE;
- static enum spectre_v2_user_mitigation spectre_v2_user_ibpb __ro_after_init =
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index bc9c0739c9c3..f184c4149327 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -1048,24 +1048,24 @@ static const struct x86_cpu_id cpu_vuln_blacklist[] __initconst = {
- 	VULNBL_INTEL_STEPPINGS(BROADWELL_GT3E,	X86_STEPPING_ANY,		SRBDS),
- 	VULNBL_INTEL_STEPPINGS(BROADWELL_X,	X86_STEPPING_ANY,		MMIO),
- 	VULNBL_INTEL_STEPPINGS(BROADWELL_CORE,	X86_STEPPING_ANY,		SRBDS),
--	VULNBL_INTEL_STEPPINGS(SKYLAKE_MOBILE,	X86_STEPPINGS(0x3, 0x3),	SRBDS | MMIO),
-+	VULNBL_INTEL_STEPPINGS(SKYLAKE_MOBILE,	X86_STEPPINGS(0x3, 0x3),	SRBDS | MMIO | RETBLEED),
- 	VULNBL_INTEL_STEPPINGS(SKYLAKE_MOBILE,	X86_STEPPING_ANY,		SRBDS),
- 	VULNBL_INTEL_STEPPINGS(SKYLAKE_X,	BIT(3) | BIT(4) | BIT(6) |
--						BIT(7) | BIT(0xB),              MMIO),
--	VULNBL_INTEL_STEPPINGS(SKYLAKE_DESKTOP,	X86_STEPPINGS(0x3, 0x3),	SRBDS | MMIO),
-+						BIT(7) | BIT(0xB),              MMIO | RETBLEED),
-+	VULNBL_INTEL_STEPPINGS(SKYLAKE_DESKTOP,	X86_STEPPINGS(0x3, 0x3),	SRBDS | MMIO | RETBLEED),
- 	VULNBL_INTEL_STEPPINGS(SKYLAKE_DESKTOP,	X86_STEPPING_ANY,		SRBDS),
--	VULNBL_INTEL_STEPPINGS(KABYLAKE_MOBILE,	X86_STEPPINGS(0x9, 0xC),	SRBDS | MMIO),
-+	VULNBL_INTEL_STEPPINGS(KABYLAKE_MOBILE,	X86_STEPPINGS(0x9, 0xC),	SRBDS | MMIO | RETBLEED),
- 	VULNBL_INTEL_STEPPINGS(KABYLAKE_MOBILE,	X86_STEPPINGS(0x0, 0x8),	SRBDS),
--	VULNBL_INTEL_STEPPINGS(KABYLAKE_DESKTOP,X86_STEPPINGS(0x9, 0xD),	SRBDS | MMIO),
-+	VULNBL_INTEL_STEPPINGS(KABYLAKE_DESKTOP,X86_STEPPINGS(0x9, 0xD),	SRBDS | MMIO | RETBLEED),
- 	VULNBL_INTEL_STEPPINGS(KABYLAKE_DESKTOP,X86_STEPPINGS(0x0, 0x8),	SRBDS),
--	VULNBL_INTEL_STEPPINGS(ICELAKE_MOBILE,	X86_STEPPINGS(0x5, 0x5),	MMIO | MMIO_SBDS),
-+	VULNBL_INTEL_STEPPINGS(ICELAKE_MOBILE,	X86_STEPPINGS(0x5, 0x5),	MMIO | MMIO_SBDS | RETBLEED),
- 	VULNBL_INTEL_STEPPINGS(ICELAKE_XEON_D,	X86_STEPPINGS(0x1, 0x1),	MMIO),
- 	VULNBL_INTEL_STEPPINGS(ICELAKE_X,	X86_STEPPINGS(0x4, 0x6),	MMIO),
--	VULNBL_INTEL_STEPPINGS(COMETLAKE,	BIT(2) | BIT(3) | BIT(5),	MMIO | MMIO_SBDS),
--	VULNBL_INTEL_STEPPINGS(COMETLAKE_L,	X86_STEPPINGS(0x1, 0x1),	MMIO | MMIO_SBDS),
--	VULNBL_INTEL_STEPPINGS(COMETLAKE_L,	X86_STEPPINGS(0x0, 0x0),	MMIO),
--	VULNBL_INTEL_STEPPINGS(LAKEFIELD,	X86_STEPPINGS(0x1, 0x1),	MMIO | MMIO_SBDS),
--	VULNBL_INTEL_STEPPINGS(ROCKETLAKE,	X86_STEPPINGS(0x1, 0x1),	MMIO),
-+	VULNBL_INTEL_STEPPINGS(COMETLAKE,	BIT(2) | BIT(3) | BIT(5),	MMIO | MMIO_SBDS | RETBLEED),
-+	VULNBL_INTEL_STEPPINGS(COMETLAKE_L,	X86_STEPPINGS(0x1, 0x1),	MMIO | MMIO_SBDS | RETBLEED),
-+	VULNBL_INTEL_STEPPINGS(COMETLAKE_L,	X86_STEPPINGS(0x0, 0x0),	MMIO | RETBLEED),
-+	VULNBL_INTEL_STEPPINGS(LAKEFIELD,	X86_STEPPINGS(0x1, 0x1),	MMIO | MMIO_SBDS | RETBLEED),
-+	VULNBL_INTEL_STEPPINGS(ROCKETLAKE,	X86_STEPPINGS(0x1, 0x1),	MMIO | RETBLEED),
- 	VULNBL_INTEL_STEPPINGS(ATOM_TREMONT,	X86_STEPPINGS(0x1, 0x1),	MMIO | MMIO_SBDS),
- 	VULNBL_INTEL_STEPPINGS(ATOM_TREMONT_X,	X86_STEPPING_ANY,		MMIO),
- 	VULNBL_INTEL_STEPPINGS(ATOM_TREMONT_L,	X86_STEPPINGS(0x0, 0x0),	MMIO | MMIO_SBDS),
-@@ -1178,7 +1178,7 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
- 			setup_force_cpu_bug(X86_BUG_MMIO_UNKNOWN);
+ 		drv->state_count += 1;
  	}
  
--	if (cpu_matches(cpu_vuln_blacklist, RETBLEED))
-+	if ((cpu_matches(cpu_vuln_blacklist, RETBLEED) || (ia32_cap & ARCH_CAP_RSBA)))
- 		setup_force_cpu_bug(X86_BUG_RETBLEED);
- 
- 	if (cpu_matches(cpu_vuln_whitelist, NO_MELTDOWN))
 -- 
 2.38.1.431.g37b22c650d-goog
 
