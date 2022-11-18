@@ -2,119 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 700C762F2D0
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 11:43:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18F2362F476
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 13:20:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241615AbiKRKni (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Nov 2022 05:43:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33134 "EHLO
+        id S241676AbiKRMUG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Nov 2022 07:20:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241614AbiKRKnZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Nov 2022 05:43:25 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 301769708D;
-        Fri, 18 Nov 2022 02:43:24 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AI8I1MR018332;
-        Fri, 18 Nov 2022 10:43:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=HHQzg5NjDFV8RZEfHK+gQgAu7fWEh8nE4zoa8Xwjlzk=;
- b=VelkNprgwXXKyz3pSBHO7JbgIz57VIaQSHyGOhJ25WnwNb8CFvUo+tN6X4wR2Nk8MfuZ
- pNKI03VNIKitDrsp/pzUyvl8xpf+2MzN67D2fk2JUVFb3fqfeIj4HVHw/j3+dh17s73k
- DUJ7CAo9gi1stVmZ0WGsYWYYOxDjyDW994E4DEIxzm1D6Kg/dtW+3wQGkQ9YpHaLhPXE
- 60L2oq+Rop/M8hmj05kvNEim8Qa+YJa7Y/aQ/d0QCY09u07ZDxD8pkF/BbCvFBIwQECf
- n9l05UykyMqVYrRgxkJcqw8KP3CGItOnhHouM/mmIDmdO+GVMzg0SJj1vQWu5cJrK4Mq iw== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kx6dwu83m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Nov 2022 10:43:23 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AIAaCZJ028141;
-        Fri, 18 Nov 2022 10:43:21 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 3kwthe0ufd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Nov 2022 10:43:21 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AIAhHXl64029108
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Nov 2022 10:43:18 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DB7454203F;
-        Fri, 18 Nov 2022 10:43:17 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3119C42042;
-        Fri, 18 Nov 2022 10:43:17 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.43.4])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Fri, 18 Nov 2022 10:43:17 +0000 (GMT)
-Date:   Fri, 18 Nov 2022 11:43:15 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     pasic@linux.ibm.com, akrowiak@linux.ibm.com, jjherne@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com
-Subject: Re: [PATCH v2] s390/vfio-ap: GISA: sort out physical vs virtual
- pointers usage
-Message-ID: <20221118114315.57bc2ad6@p-imbrenda>
-In-Reply-To: <20221118100429.70453-1-nrb@linux.ibm.com>
-References: <20221118100429.70453-1-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S241577AbiKRMT6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Nov 2022 07:19:58 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 652E09735B;
+        Fri, 18 Nov 2022 04:19:57 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BBEF862474;
+        Fri, 18 Nov 2022 12:19:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5FD0C433C1;
+        Fri, 18 Nov 2022 12:19:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668773996;
+        bh=4JxZQz18/grkc1FqZWiq5Dfac3rhr+RHKptMtajtmCU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=cmOF3PFW7xBBeFULSHg5Gp+fc3p4MViAOAqdlA/ug0xCIRdSMOJtUoHGsX+QL2mpS
+         bTPOQLjhB86Sys7VFp08puWia/RHlVlLM0wT4B8Z3pbW6tO4Fz3TMvX+G/EVVFOktA
+         /p8qOYNZGe9OhaGAFpw2qLDgDVZBnxxjh/VFwonn2jMINr6L4q9z2m4yxiurj1gV84
+         TN/Sdu7nrtBuQ+iAYXICRRY29b+eTQAyfmYsaA6wKhDK3CVuaU+64QLN3FHpRquzez
+         i4wfrwiA/0x+zSp0NHZWziFGoRsP74OpUmgM2rG6XleEn2/bX78qeeKP5JFaZrL5Yr
+         f4BTl7ZBDC+BQ==
+Date:   Fri, 18 Nov 2022 12:19:50 +0000
+From:   Will Deacon <will@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] KVM: arm64: Don't acquire RCU read lock for
+ exclusive table walks
+Message-ID: <20221118121949.GA3697@willie-the-truck>
+References: <20221116165655.2649475-1-oliver.upton@linux.dev>
+ <20221116165655.2649475-3-oliver.upton@linux.dev>
+ <20221117174951.GA2916@willie-the-truck>
+ <Y3Z8G3aCuRzzoq5e@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Zi29z_4anAkzMoLMoylNqEi3hG5ovT6B
-X-Proofpoint-ORIG-GUID: Zi29z_4anAkzMoLMoylNqEi3hG5ovT6B
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-17_06,2022-11-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 malwarescore=0 spamscore=0 suspectscore=0 mlxscore=0
- impostorscore=0 mlxlogscore=999 adultscore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211180063
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y3Z8G3aCuRzzoq5e@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 18 Nov 2022 11:04:29 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
-
-> Fix virtual vs physical address confusion (which currently are the same)
-> for the GISA when enabling the IRQ.
+On Thu, Nov 17, 2022 at 06:23:23PM +0000, Oliver Upton wrote:
+> On Thu, Nov 17, 2022 at 05:49:52PM +0000, Will Deacon wrote:
+> > On Wed, Nov 16, 2022 at 04:56:55PM +0000, Oliver Upton wrote:
 > 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> ---
-> v1->v2:
-> * remove useless cast
+> [...]
 > 
->  drivers/s390/crypto/vfio_ap_ops.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > -static inline void kvm_pgtable_walk_begin(void) {}
+> > > -static inline void kvm_pgtable_walk_end(void) {}
+> > > +static inline void kvm_pgtable_walk_begin(struct kvm_pgtable_walker *walker)
+> > > +{
+> > > +	/*
+> > > +	 * Due to the lack of RCU (or a similar protection scheme), only
+> > > +	 * non-shared table walkers are allowed in the hypervisor.
+> > > +	 */
+> > > +	WARN_ON(walker->flags & KVM_PGTABLE_WALK_SHARED);
+> > > +}
+> > 
+> > I think it would be better to propagate the error to the caller rather
+> > than WARN here.
 > 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 0b4cc8c597ae..205a00105858 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -429,7 +429,7 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
->  
->  	aqic_gisa.isc = nisc;
->  	aqic_gisa.ir = 1;
-> -	aqic_gisa.gisa = (uint64_t)gisa >> 4;
-> +	aqic_gisa.gisa = virt_to_phys(gisa) >> 4;
->  
->  	status = ap_aqic(q->apqn, aqic_gisa, h_nib);
->  	switch (status.response_code) {
+> I'd really like to warn somewhere though since we're rather fscked at
+> this point. Keeping that WARN close to the exceptional condition would
+> help w/ debugging.
+> 
+> Were you envisioning bubbling the error all the way back up (i.e. early
+> return from kvm_pgtable_walk())?
 
+Yes, that's what I had in mind. WARN is fatal at EL2, so I think it's
+better to fail the pgtable operation rather than bring down the entire
+machine by default. Now, it _might_ be fatal anyway (e.g. if we were
+handling a host stage-2 fault w/ pKVM), but the caller is in a better
+position to decide the severity.
+
+> I had really only intended these to indirect lock acquisition/release,
+> so the error handling on the caller side feels weird:
+> 
+>   static inline int kvm_pgtable_walk_begin(struct kvm_pgtable_walker *walker)
+>   {
+>   	if (WARN_ON(walker->flags & KVM_PGTABLE_WALK_SHARED))
+> 		return -EPERM;
+> 
+> 	return 0;
+>   }
+> 
+>   r = kvm_pgtable_walk_begin()
+>   if (r)
+>   	return r;
+> 
+>   r = _kvm_pgtable_walk();
+>   kvm_pgtable_walk_end();
+
+This doesn't look particularly weird to me (modulo dropping the WARN, or
+moving it to _end()), but maybe I've lost my sense of taste.
+
+> > Since you're rejigging things anyway, can you have this
+> > function return int?
+> 
+> If having this is a strong motivator I can do a v4.
+
+It's a really minor point, so I'll leave it up to you guys.
+
+WIll
