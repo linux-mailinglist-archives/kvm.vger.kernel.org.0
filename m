@@ -2,109 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 804D662EE7B
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 08:34:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 383C362EE7C
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 08:35:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241117AbiKRHei (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Nov 2022 02:34:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50974 "EHLO
+        id S241138AbiKRHfW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Nov 2022 02:35:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241089AbiKRHeh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Nov 2022 02:34:37 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 564A6725C3
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 23:34:35 -0800 (PST)
-Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.54])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ND7ns3rxFz15Mlc;
-        Fri, 18 Nov 2022 15:34:09 +0800 (CST)
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 18 Nov 2022 15:34:33 +0800
-Subject: Re: [RFC PATCH 1/3] KVM: Cap vcpu->halt_poll_ns before halting rather
- than after
-To:     David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-CC:     Jon Cargille <jcargill@google.com>,
-        Jim Mattson <jmattson@google.com>, <kvm@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-        <wangyuan38@huawei.com>
-References: <20221117001657.1067231-1-dmatlack@google.com>
- <20221117001657.1067231-2-dmatlack@google.com>
-From:   "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <53b4d650-ac00-59df-4dee-7f4f7b6656ad@huawei.com>
-Date:   Fri, 18 Nov 2022 15:34:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        with ESMTP id S232532AbiKRHfU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Nov 2022 02:35:20 -0500
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E230487A4D
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 23:35:18 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id a14so7972120wru.5
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 23:35:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9x3aw57bHpLrIFGYlxPif4AzwsedVQK1l7WqxqYWzf0=;
+        b=c3Xh0yhfutBq8FhwHo52bvKs4vLtLVegFeCcVLkQcE2VedRn3USvn6Y021aZi50g4Q
+         nfLU/8i2ljYyB17Vd99ymZkwkvYcXKL3/5BZ6btUV12TjwyF7jUQptlhXM1u2q0QUT4g
+         HA4SeCzCgae199TOIkMR5IeBIqb0aapr+3IofbU5hubI8gKkgsGzem0QZ/8kyOQ8Urca
+         rBDmP1YzR5mKn/yb+Yf2HX2t1WsG9K16UVnyRrUuOtgtfBS2C7tr+ba0Lk9CEAxURhiR
+         rB2dy6tzMam8pCXNT6oaLhooupnccvhwCEEpHJ9ZulglFyLpQUiczEpvf9ekMmBTpuub
+         Pwsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9x3aw57bHpLrIFGYlxPif4AzwsedVQK1l7WqxqYWzf0=;
+        b=hMJnNZCVs/vPIEAUXncGk/iUOkWoT70BXXEtnC1PtU6r49m+6yPhlqpRbmP6nHuDTE
+         ClLr5RWna64DzIGOrUWAsY0rUcGVAf/bucFevx+O6vfZKqeyqcvWOQn6eBVThgVIpuCd
+         GRg2saS7rXw51VIVMLdjvOJmZd+kmp/uU6SiGmBSEwaCOHmTrpIqZbnNwoF406oCiVfY
+         M2/oK5+ECVnCio6PDFN2UM63rf4BQhobKwbtQgJBhlLE5/DhuBaXZOvblm1MMdfhl/md
+         RQHYJqgnLvdlrVZqGejENipRBpK84vtWS7WCj8/Xuyn7eF5vcSLy+ir1RvxXEwRrdDR9
+         M74Q==
+X-Gm-Message-State: ANoB5plm71B61dEGTez5klhx+4sFga0kUfz0FwOfv7+n2wiwgX0xah+y
+        vomXM3CYxsMqTnvday5zShcgCA==
+X-Google-Smtp-Source: AA0mqf5BN/I4sgAkWdBkFzHzJodRSF2Z6F6KZRc3XDvC/o+A90sAabzAD/nVw0c7KZSZfldGJkdVeA==
+X-Received: by 2002:adf:efd2:0:b0:236:e5a2:4f66 with SMTP id i18-20020adfefd2000000b00236e5a24f66mr3684011wrp.357.1668756917503;
+        Thu, 17 Nov 2022 23:35:17 -0800 (PST)
+Received: from [192.168.230.175] (34.red-88-29-175.dynamicip.rima-tde.net. [88.29.175.34])
+        by smtp.gmail.com with ESMTPSA id c18-20020adffb12000000b002365730eae8sm2803212wrr.55.2022.11.17.23.35.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Nov 2022 23:35:16 -0800 (PST)
+Message-ID: <6febdfbb-1d13-bbfc-1dc5-4f8fa788fc48@linaro.org>
+Date:   Fri, 18 Nov 2022 08:35:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <20221117001657.1067231-2-dmatlack@google.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.4.2
+Subject: Re: [PATCH v3 1/3] accel: introduce accelerator blocker API
 Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Yanan Wang <wangyanan55@huawei.com>, kvm@vger.kernel.org
+References: <20221111154758.1372674-1-eesposit@redhat.com>
+ <20221111154758.1372674-2-eesposit@redhat.com>
+ <e8e6fce8-9912-7684-d4c3-c30d731bfcd7@linaro.org>
+In-Reply-To: <e8e6fce8-9912-7684-d4c3-c30d731bfcd7@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 18/11/22 08:32, Philippe Mathieu-Daudé wrote:
+> On 11/11/22 16:47, Emanuele Giuseppe Esposito wrote:
+>> This API allows the accelerators to prevent vcpus from issuing
+>> new ioctls while execting a critical section marked with the
 
-On 2022/11/17 8:16, David Matlack wrote:
-> Cap vcpu->halt_poll_ns based on the max halt polling time just before
-> halting, rather than after the last halt. This arguably provides better
-> accuracy if an admin disables halt polling in between halts, although
-> the improvement is nominal.
->
-> A side-effect of this change is that grow_halt_poll_ns() no longer needs
-> to access vcpu->kvm->max_halt_poll_ns, which will be useful in a future
-> commit where the max halt polling time can come from the module parameter
-> halt_poll_ns instead.
->
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->   virt/kvm/kvm_main.c | 10 ++++++----
->   1 file changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 43bbe4fde078..4b868f33c45d 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3385,9 +3385,6 @@ static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
->   	if (val < grow_start)
->   		val = grow_start;
->   
-> -	if (val > vcpu->kvm->max_halt_poll_ns)
-> -		val = vcpu->kvm->max_halt_poll_ns;
-> -
->   	vcpu->halt_poll_ns = val;
->   out:
->   	trace_kvm_halt_poll_ns_grow(vcpu->vcpu_id, val, old);
-> @@ -3500,11 +3497,16 @@ static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
->   void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
->   {
->   	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
-> -	bool do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
->   	ktime_t start, cur, poll_end;
->   	bool waited = false;
-> +	bool do_halt_poll;
->   	u64 halt_ns;
->   
-> +	if (vcpu->halt_poll_ns > vcpu->kvm->max_halt_poll_ns)
-> +		vcpu->halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
-> +
-> +	do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
-> +
->   	start = cur = poll_end = ktime_get();
->   	if (do_halt_poll) {
->   		ktime_t stop = ktime_add_ns(start, vcpu->halt_poll_ns);
-Reviewed-by: Yanan Wang <wangyanan55@huawei.com>
+Typo "executing".
 
-Thanks,
-Yanan
+>> accel_ioctl_inhibit_begin/end functions.
+>>
+>> Note that all functions submitting ioctls must mark where the
+>> ioctl is being called with accel_{cpu_}ioctl_begin/end().
+>>
+>> This API requires the caller to always hold the BQL.
+>> API documentation is in sysemu/accel-blocker.h
+>>
+>> Internally, it uses a QemuLockCnt together with a per-CPU QemuLockCnt
+>> (to minimize cache line bouncing) to keep avoid that new ioctls
+>> run when the critical section starts, and a QemuEvent to wait
+>> that all running ioctls finish.
+>>
+>> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+>> ---
+>>   accel/accel-blocker.c          | 154 +++++++++++++++++++++++++++++++++
+>>   accel/meson.build              |   2 +-
+>>   hw/core/cpu-common.c           |   2 +
+>>   include/hw/core/cpu.h          |   3 +
+>>   include/sysemu/accel-blocker.h |  56 ++++++++++++
+>>   5 files changed, 216 insertions(+), 1 deletion(-)
+>>   create mode 100644 accel/accel-blocker.c
+>>   create mode 100644 include/sysemu/accel-blocker.h
+> 
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> 
+
