@@ -2,151 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ACE962EF52
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 09:29:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3D3262EF68
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 09:29:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241369AbiKRI3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Nov 2022 03:29:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48102 "EHLO
+        id S241277AbiKRI3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Nov 2022 03:29:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241408AbiKRI2d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Nov 2022 03:28:33 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6887A942C6
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 00:28:23 -0800 (PST)
-Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ND8vv6hsdzqSXk;
-        Fri, 18 Nov 2022 16:24:27 +0800 (CST)
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 18 Nov 2022 16:28:17 +0800
-Subject: Re: [RFC PATCH 3/3] KVM: Obey kvm.halt_poll_ns in VMs not using
- KVM_CAP_HALT_POLL
-To:     David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-CC:     Jon Cargille <jcargill@google.com>,
-        Jim Mattson <jmattson@google.com>, <kvm@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-        <wangyuan38@huawei.com>
-References: <20221117001657.1067231-1-dmatlack@google.com>
- <20221117001657.1067231-4-dmatlack@google.com>
-From:   "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <97ccc949-254e-879d-9206-613b328c271d@huawei.com>
-Date:   Fri, 18 Nov 2022 16:28:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-MIME-Version: 1.0
-In-Reply-To: <20221117001657.1067231-4-dmatlack@google.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+        with ESMTP id S241510AbiKRI2y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Nov 2022 03:28:54 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B243456D42;
+        Fri, 18 Nov 2022 00:28:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668760125; x=1700296125;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=pj4icQo/3SDwLzMdLGGF/AiqY6uFNaqQhgY/3+LxkaU=;
+  b=hPHWrcaldjfcCkTcJX6Om1WYctwbWdBuP4YsK5tcZdjWaPQhGpnPUKPr
+   TqfW6zLmUpHThJU4gV+V2cS4za6QfBPk8pUju+qlbitT39jSQHoJzfJYw
+   1hwqNvJNhaRbXwyiw2gYesFVnFKkoBBfAAVxSd/4ayh2zqYKRMJ5aYJpe
+   pfZFygwNYRLZ4LpL0ZeP+Cm5owDRR32dDbONQR6tmi2xDOrJaRkjyF5pa
+   IkVg2tRuRfxhva7dTSyls2bRAPmNLm74YImu81jK3XLQG7i9L6q5RSZ5n
+   AeEzwt5cgQOnhVmK7lrtua8pFjGxNrbkld9E+khVrFxku2CQHIyqVuufo
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10534"; a="313098984"
+X-IronPort-AV: E=Sophos;i="5.96,173,1665471600"; 
+   d="scan'208";a="313098984"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2022 00:28:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10534"; a="640133346"
+X-IronPort-AV: E=Sophos;i="5.96,173,1665471600"; 
+   d="scan'208";a="640133346"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by orsmga002.jf.intel.com with ESMTP; 18 Nov 2022 00:28:42 -0800
+Message-ID: <1f3522327e604e05b3e0d109cdbfded29db0244e.camel@linux.intel.com>
+Subject: Re: [PATCH] KVM: x86/mmu: simplify kvm_tdp_mmu_map flow when guest
+ has to retry
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, seanjc@google.com
+Date:   Fri, 18 Nov 2022 16:28:41 +0800
+In-Reply-To: <CALzav=dEmxV1wuNjuN2rzKsNunvwbdZWqr5K6KFZruEW=oYZSQ@mail.gmail.com>
+References: <20221117161449.114086-1-pbonzini@redhat.com>
+         <2b18a49dbe946bcbea29be13f5e0f03eacf75cdc.camel@linux.intel.com>
+         <CALzav=dEmxV1wuNjuN2rzKsNunvwbdZWqr5K6KFZruEW=oYZSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David,
+On Thu, 2022-11-17 at 20:00 -0800, David Matlack wrote:
+> On Thu, Nov 17, 2022 at 5:35 PM Robert Hoo <robert.hu@linux.intel.com
+> > wrote:
+> > 
+> > On Thu, 2022-11-17 at 11:14 -0500, Paolo Bonzini wrote:
+> > > +
+> > >               if (fault->nx_huge_page_workaround_enabled)
+> > >                       disallowed_hugepage_adjust(fault,
+> > > iter.old_spte, iter.level);
+> > > 
+> > 
+> > And here can also be improved, I think.
+> > 
+> >         tdp_mmu_for_each_pte(iter, mmu, fault->gfn, fault->gfn + 1)
+> > {
+> > -               if (fault->nx_huge_page_workaround_enabled)
+> > +               if (fault->huge_page_disallowed)
+> > 
+> > in the case of !fault->exec && fault-
+> > >nx_huge_page_workaround_enabled,
+> > huge page should be still allowed, shouldn't it?
+> > 
+> > If you agree, I can send out a patch for this. I've roughly tested
+> > this, with an ordinary guest boot, works normally.
+> 
+> This check handles the case where a read or write fault occurs within
+> a region that has already been split due to an NX huge page. 
 
-On 2022/11/17 8:16, David Matlack wrote:
-> Obey kvm.halt_poll_ns in VMs not using KVM_CAP_HALT_POLL on every halt,
-> rather than just sampling the module parameter when the VM is first
-s/first/firstly
-> created. This restore the original behavior of kvm.halt_poll_ns for VMs
-s/restore/restores
-> that have not opted into KVM_CAP_HALT_POLL.
->
-> Notably, this change restores the ability for admins to disable or
-> change the maximum halt-polling time system wide for VMs not using
-> KVM_CAP_HALT_POLL.
-Should we add more detailed comments about relationship
-between KVM_CAP_HALT_POLL and kvm.halt_poll_ns in
-Documentation/virt/kvm/api.rst? Something like:
-"once KVM_CAP_HALT_POLL is used for a target VM, it will
-completely ignores any future changes to kvm.halt_poll_ns..."
-> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Fixes: acd05785e48c ("kvm: add capability for halt polling")
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->   include/linux/kvm_host.h |  1 +
->   virt/kvm/kvm_main.c      | 27 ++++++++++++++++++++++++---
->   2 files changed, 25 insertions(+), 3 deletions(-)
->
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index e6e66c5e56f2..253ad055b6ad 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -788,6 +788,7 @@ struct kvm {
->   	struct srcu_struct srcu;
->   	struct srcu_struct irq_srcu;
->   	pid_t userspace_pid;
-> +	bool override_halt_poll_ns;
->   	unsigned int max_halt_poll_ns;
->   	u32 dirty_ring_size;
->   	bool vm_bugged;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 78caf19608eb..7f73ce99bd0e 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1198,8 +1198,6 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
->   			goto out_err_no_arch_destroy_vm;
->   	}
->   
-> -	kvm->max_halt_poll_ns = halt_poll_ns;
-> -
->   	r = kvm_arch_init_vm(kvm, type);
->   	if (r)
->   		goto out_err_no_arch_destroy_vm;
-> @@ -3490,7 +3488,20 @@ static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
->   
->   static unsigned int kvm_vcpu_max_halt_poll_ns(struct kvm_vcpu *vcpu)
->   {
-> -	return READ_ONCE(vcpu->kvm->max_halt_poll_ns);
-> +	struct kvm *kvm = vcpu->kvm;
-> +
-> +	if (kvm->override_halt_poll_ns) {
-> +		/*
-> +		 * Ensure kvm->max_halt_poll_ns is not read before
-> +		 * kvm->override_halt_poll_ns.
-> +		 *
-> +		 * Pairs with the smp_wmb() when enabling KVM_CAP_HALT_POLL.
-> +		 */
-> +		smp_rmb();
-> +		return READ_ONCE(kvm->max_halt_poll_ns);
-> +	}
-> +
-> +	return READ_ONCE(halt_poll_ns);
->   }
->   
->   /*
-> @@ -4600,6 +4611,16 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
->   			return -EINVAL;
->   
->   		kvm->max_halt_poll_ns = cap->args[0];
-> +
-> +		/*
-> +		 * Ensure kvm->override_halt_poll_ns does not become visible
-> +		 * before kvm->max_halt_poll_ns.
-> +		 *
-> +		 * Pairs with the smp_rmb() in kvm_vcpu_max_halt_poll_ns().
-> +		 */
-> +		smp_wmb();
-> +		kvm->override_halt_poll_ns = true;
-> +
->   		return 0;
->   	}
->   	case KVM_CAP_DIRTY_LOG_RING:
-Looks good to me:
-Reviewed-by: Yanan Wang <wangyanan55@huawei.com>
+By NX huge page split, the sub-sptes are installed, if my understanding
+is right. So no fault should happen when next r/w access.
 
-Thanks,
-Yanan
+> If we
+> recovered the NX Huge Page on such faults, the guest could end up
+> continuously faulting on the same huge page (e.g. if writing to one
+> page and executing from another within a GPA region backed by a huge
+> page). So instead, NX Huge Page recovery is done periodically by a
+> background thread.
+
+Do you mean the kvm_nx_huge_page_recovery_worker() kthread? My
+understanding is that it recycles SPs that was created by NX huge page
+split. This would cause above fault happened, I guess, i.e. the
+previously installed spte is zapped by the child SP recycled.
+
+OK, understand you point now, if let r/w access fault of your mentioned
+type skip disallowed_hugepage_adjust(), then it will break out and huge
+page will be installed. Then next exec access will cause the huge page
+split; then next r/w access fault will install a huge page again ... 
+> 
+> That being said, I'm not surprised you didn't encounter any issues
+> when testing. Now that the TDP MMU fully splits NX Huge Pages on
+> fault, such faults should be rare at best. Perhaps even impossible?
+
+Possible, and not rare, I added debug info in
+disallowed_hugepage_adjust() and showed hits.
+
+> Hm, can we can drop the call to disallowed_hugepage_adjust()
+> entirely?
+
+I guess not, keep it as is. Though rare, even impossible, what if
+is_nx_huge_page_enabled() changed during the run time? e.g. NX huge
+page enabled --> disabled, give it a chance to restore huge page
+mapping?
+
