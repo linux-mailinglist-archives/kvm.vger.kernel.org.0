@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D7D862EC78
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 04:49:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08CE562EC99
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 05:00:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240483AbiKRDtk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 22:49:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46278 "EHLO
+        id S240076AbiKREAn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 23:00:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232004AbiKRDti (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 22:49:38 -0500
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38DC88F3F1
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 19:49:38 -0800 (PST)
-Received: by mail-yb1-xb34.google.com with SMTP id 7so4257442ybp.13
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 19:49:38 -0800 (PST)
+        with ESMTP id S234695AbiKREAk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 23:00:40 -0500
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FE8B9058F
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 20:00:39 -0800 (PST)
+Received: by mail-yb1-xb2c.google.com with SMTP id 205so4296002ybe.7
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 20:00:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=CgJUQemp/f+PlGTIq0YX+TmFg52HbYStJmaJzWE+VoY=;
-        b=SUp6YqzgYosJg+/9xNr+ggz5uHPqyABf5MdSAdKEofxZMLjOt8dv0Jcuovgcob651q
-         CehG6KAzs2YhjA+aySdFOf7G93Ve+A5GupCsUFU/1HrODmB0uDS2+c79Jxbb4qIZdhv3
-         /HbU3RnOZSNzwVe5rOZ3REc9NGP81flOV2TZsVNvoAtLEJbVHWLrZspdbPbwBs20ELjV
-         IRw9+DZ+TAj3hMy3tYemVZ8p1521IzydCHJLXlKiBypchCNaVWP1zFTv9v4D3qK0/ln7
-         8pEoNRP+MKFZMTghx0dTL4sEPo7b+HkChabyinzS8m8JSn2LTvK+PFLwRIeOzjjbWA4H
-         gwBw==
+        bh=sw09fBPFw1UV1I+CtkLweBcLiaK4DJnS4ZZX7Njrxc4=;
+        b=NRhezJEB08sZ+d64qVBVZU2W9mD7KYwFiUZ1/hIFe54G0DWeiO5gDAMZJTm2q6zjdC
+         1C3kauwzT/+KczXkl0/oGYwVcGoIeLDPFfEEN3L2VPrh2bsAHIM7eZ7pAwt+vyE/0l2p
+         OikggEPFxje4PBzLq6mas2CkYAdeZL3GqS3HalsRAKNlQa33JaZGXue6IxKCvWYiyH8+
+         8bkYYvhbpkJa9Ix4aBpmyGiuK+4PilNQKyzE56Ty8yIAABnLiZJo78dA4MzR9HmUX+5U
+         J+i16ONn/Exp2yPHFUmChOx8Q7yBR4q2Nvd0oPURg+XfC/K5UQnrbqDKpb4B17nWBLim
+         odEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=CgJUQemp/f+PlGTIq0YX+TmFg52HbYStJmaJzWE+VoY=;
-        b=4NGjbbYDqq6I3BApbRBFrP6dozG/aoC0LzTDSZFzfPVDfGLuFMe1eAfWdnU/jCtc8q
-         dLl0vX0crnnJcMGTT8L73h0PDIL7ovicc2IwP62cv0MzEJRx2gTmbcAqVl0Q41jGYSq4
-         t6K3Eh5tSq2Md9INJtDw3+itu1dzu/KLXkECVAR9uU0gQBHqXzoBv7tPoExzEUq5PsMY
-         uLZKOa+fLJw/5zxf024WyT9Rgt7QJSG2XtvTjEVW8GCWFJQ7ByONDwi0ULydegtwrgDq
-         AsvluokIkSLBsLcZgn4QRH8jfJt9fgUmdl3pvgfDfyapDCJ7hqo1t1pkPFEPvz28NMpy
-         OvFA==
-X-Gm-Message-State: ANoB5pmxepIPT+KyC0S38UdWbHhDz5tojqO3vC7X4XVkP23kDcFFdMmQ
-        ntKRDCrEQCbNsSRLfztqPmhUcrG9P0GbWVkd8myPeA==
-X-Google-Smtp-Source: AA0mqf6YTz+llOBvFtjHWCaxDT4oMdJda9zlD5qYJemlriRUfYxP+aGAKHadIvtDUdSb4BIPdGE9enBVtoS8udDjN2c=
-X-Received: by 2002:a25:ae12:0:b0:6d0:704:f19f with SMTP id
- a18-20020a25ae12000000b006d00704f19fmr5330087ybj.191.1668743377371; Thu, 17
- Nov 2022 19:49:37 -0800 (PST)
+        bh=sw09fBPFw1UV1I+CtkLweBcLiaK4DJnS4ZZX7Njrxc4=;
+        b=J6vDfQH9IMbTLcnvVWihrmj5D8N/W9KCEBm2BzINo00FByVn7JjfA5iDxZd2ZWvfy1
+         fWtskrtfF7deu7ljIK53PZMIMPvQUPN0rxo0xV5Y774mpfCPFjYGS5czzzN2/7Dnbfy+
+         3qwi31CXDiBCeDfl/cceX+rX8mzJog/GwBmjHW0TrJ30JmA17c0lLYtkQr1rL0+nJqxB
+         UsuKqhw2mmtc9ksIaATJ9ngHJhfB1loUKFRxMGPEFIPOlzuhI+G11L3uvwGNrD5UUoqV
+         zzcfJBJIohN8ZhRDR52SE0Pmn238hFXmNcgl3Np6UFg2lY9xzRnMQDiayOuXKPkc4ujc
+         s7Lw==
+X-Gm-Message-State: ANoB5pnfRk3ZeJk78TLtf+SxJC9G7wF/ywXBBfwAlhD9vRopQ/yTKIVk
+        gYyBLXxVHhaQSO7m0963RWKN3cSAnCVx1hs6cVgB+g==
+X-Google-Smtp-Source: AA0mqf7+aPyT8X7ugfwo6RaysMU54y4B01QrOVfBDPCqYmEENTcYdBpA99AqrglKRSWFGgxB/fPeeWPs5+TIPrmStP0=
+X-Received: by 2002:a25:ad14:0:b0:6de:8ec8:7342 with SMTP id
+ y20-20020a25ad14000000b006de8ec87342mr4626366ybi.607.1668744038312; Thu, 17
+ Nov 2022 20:00:38 -0800 (PST)
 MIME-Version: 1.0
-References: <20221117161449.114086-1-pbonzini@redhat.com> <CALzav=cxtgaVV2tORqDo93AuUW+5BSLdjsah=YASQdPMwnf2iA@mail.gmail.com>
- <11f5e652ca2c2a4507316c3426b25d0d5cd66120.camel@linux.intel.com>
-In-Reply-To: <11f5e652ca2c2a4507316c3426b25d0d5cd66120.camel@linux.intel.com>
+References: <20221117161449.114086-1-pbonzini@redhat.com> <2b18a49dbe946bcbea29be13f5e0f03eacf75cdc.camel@linux.intel.com>
+In-Reply-To: <2b18a49dbe946bcbea29be13f5e0f03eacf75cdc.camel@linux.intel.com>
 From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 17 Nov 2022 19:49:11 -0800
-Message-ID: <CALzav=eeVJAOwUbg1QRnkWhhzn5WT8jgjWo2b-tu9uBJJKdG8A@mail.gmail.com>
+Date:   Thu, 17 Nov 2022 20:00:12 -0800
+Message-ID: <CALzav=dEmxV1wuNjuN2rzKsNunvwbdZWqr5K6KFZruEW=oYZSQ@mail.gmail.com>
 Subject: Re: [PATCH] KVM: x86/mmu: simplify kvm_tdp_mmu_map flow when guest
  has to retry
 To:     Robert Hoo <robert.hu@linux.intel.com>
@@ -69,34 +68,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 6:01 PM Robert Hoo <robert.hu@linux.intel.com> wrote:
+On Thu, Nov 17, 2022 at 5:35 PM Robert Hoo <robert.hu@linux.intel.com> wrote:
 >
-> On Thu, 2022-11-17 at 10:43 -0800, David Matlack wrote:
-> > On Thu, Nov 17, 2022 at 8:14 AM Paolo Bonzini <pbonzini@redhat.com>
-> > wrote:
-> > >                 if (is_shadow_present_pte(iter.old_spte))
-> > > -                       ret = tdp_mmu_split_huge_page(kvm, &iter,
-> > > sp, true);
-> > > +                       r = tdp_mmu_split_huge_page(kvm, &iter, sp,
-> > > true);
-> > >                 else
-> > > -                       ret = tdp_mmu_link_sp(kvm, &iter, sp,
-> > > true);
-> > > +                       r = tdp_mmu_link_sp(kvm, &iter, sp, true);
+> On Thu, 2022-11-17 at 11:14 -0500, Paolo Bonzini wrote:
+> > +
+> >               if (fault->nx_huge_page_workaround_enabled)
+> >                       disallowed_hugepage_adjust(fault,
+> > iter.old_spte, iter.level);
 > >
-> > Can this fix be squashed into [1]? It seems like a serious enough
-> > bug.
-> > If 2 threads race to update the same PTE, KVM will return -EBUSY out
-> > to userspace from KVM_RUN, I think. I'm not sure about QEMU, but that
-> > would be fatal for the VM in Vanadium.
-> >
-> > [1]
-> > https://lore.kernel.org/kvm/20221109185905.486172-3-dmatlack@google.com/
-> >
-> I think in you patch it's all right, since then before
-> kvm_tdp_mmu_map() returns, it must go through
-> tdp_mmu_map_handle_target_level(), it returns RET_PF_* enum.
+> And here can also be improved, I think.
+>
+>         tdp_mmu_for_each_pte(iter, mmu, fault->gfn, fault->gfn + 1) {
+> -               if (fault->nx_huge_page_workaround_enabled)
+> +               if (fault->huge_page_disallowed)
+>
+> in the case of !fault->exec && fault->nx_huge_page_workaround_enabled,
+> huge page should be still allowed, shouldn't it?
+>
+> If you agree, I can send out a patch for this. I've roughly tested
+> this, with an ordinary guest boot, works normally.
 
-Ah that's right. kvm_tdp_mmu_map() won't actually return 0/-EBUSY,
-because it either returns RET_PF_RETRY or goes through
-tdp_mmu_map_handle_target_level().
+This check handles the case where a read or write fault occurs within
+a region that has already been split due to an NX huge page. If we
+recovered the NX Huge Page on such faults, the guest could end up
+continuously faulting on the same huge page (e.g. if writing to one
+page and executing from another within a GPA region backed by a huge
+page). So instead, NX Huge Page recovery is done periodically by a
+background thread.
+
+That being said, I'm not surprised you didn't encounter any issues
+when testing. Now that the TDP MMU fully splits NX Huge Pages on
+fault, such faults should be rare at best. Perhaps even impossible?
+Hm, can we can drop the call to disallowed_hugepage_adjust() entirely?
