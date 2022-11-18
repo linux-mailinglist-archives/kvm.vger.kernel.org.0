@@ -2,67 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6314062EA26
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 01:21:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B14BA62EA67
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 01:37:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240611AbiKRAVH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 19:21:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36190 "EHLO
+        id S238946AbiKRAhX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 19:37:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235099AbiKRAU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 19:20:59 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AE67697CA
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 16:20:54 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id w23so3124110ply.12
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 16:20:54 -0800 (PST)
+        with ESMTP id S233266AbiKRAhU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 19:37:20 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FB8E7D527
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 16:37:20 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id 62so3578930pgb.13
+        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 16:37:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=F+McP8D/0SjXb58auK1GbMTzUTBSyxcFhDKrgcY8D1w=;
-        b=hk4a32ijZFO5lQs6sn1ncFanPXFOkOJztOA4YErcIQjVBw+jw22lXMwxGzbcwxUiP+
-         ZN/sjziVqOiJfLaj+B+idBcMR9RF0wt6INu2ajneAMdZl4vydkprrmPsK5SOZtZsysgf
-         sTOjSb59GGfDr8Fjnk4XNQDAUQuJKQ+J1jNK2/60ce8H37Zy9f9htF3fFPwo/mC3Dwut
-         kuY4InnOsnwj3H25PlLdvkUUGfLsSfMKD6HTOmgjFShFl+pNaOdanINHyxnDkVJvQi2t
-         8plvFbVKA0Xou3QORSUgFjx/RsY6yQXUmkmoaFASJsk8fOWDPhoNBx3+hpltDX6TjdTK
-         fMkQ==
+        bh=kEdI6Pefgjdm+EKzofsS1dkV8ASnDhMDZc0vg3AoaOk=;
+        b=mpgCnkF+5w2+/AujiObw8Mqy6X7d1iuTYnxLCp6HL6YfGduKPhj42N7MHYAkG8qwb2
+         mLlB81pCP/nyVIfWWWM/nTIY2EqAjoqRextyWToJy4O9KP7z7/U5OR3cCqT5fEk+jzhV
+         HRVM3212zxnk7hU8uMpho9eL+/bTkhSkXYEQaMNCIcqHp6yJcsBJkHaQMCbFREv6+WIR
+         QLNVGXqwsIwWsxN0FfMq6n1R+Byak77CKre5n7N3eWYEDiFVqx06189l0ybO7ju3qwxX
+         wf1iYunf2IAwpwnumyGQV7IHqNtpAEF/vIuDkC5ZuBbhhiBdVURP29I+B4ahY7Cj5aia
+         132A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=F+McP8D/0SjXb58auK1GbMTzUTBSyxcFhDKrgcY8D1w=;
-        b=bsM8elnfF6kECxL+sHSEeoMZyANtGEFhH8Zmbs7NIlhwu4L/IgS0Lw0c/HWJWWDTvD
-         QXO1E265n2mK7YzN11QNxWvbBlso4Ho51O4YN/9QKgoc7k5guEKuHnUQ9kPGkWZaIzGH
-         hcR6u7PfYGK4b55VezHb8YfO0TScEN8quFJj/PS/yjmtUKsjtZKg5t1ibQRTUsKGVHq/
-         HiezbTZwr+lmmRGBqMIWgokM7n0hdxT6aFuF7f45MTWFzNHf6i2CqN4+6BITUr073m9o
-         0gE3E66/XM4AIhqt8QJCzVOuGFNJpckllYukWULB1+dR0uNFrdKFswixpSmmcN3e8swZ
-         3igA==
-X-Gm-Message-State: ANoB5pk9SOoVJU2eZEucIW2IIBDJ1HfMWGxTiT++0HAlLaXMcczAQcUT
-        ZZAkrFNFfJJK+cKEAesRY1SP5w==
-X-Google-Smtp-Source: AA0mqf48QOtx/abOdCcb9asZFk8M64cAwKKqMvd16XdNnfracMJIIQs/iFkkLuHGPg+4Z1wdg7ZJ+Q==
-X-Received: by 2002:a17:90a:ae0f:b0:20d:b124:33b1 with SMTP id t15-20020a17090aae0f00b0020db12433b1mr5015527pjq.202.1668730853703;
-        Thu, 17 Nov 2022 16:20:53 -0800 (PST)
+        bh=kEdI6Pefgjdm+EKzofsS1dkV8ASnDhMDZc0vg3AoaOk=;
+        b=TLo/JF/Cm0dNHleQe8LpLK9F6Ja8vH7/9WqT97y5bmsZg7dl4tNRDhKbd9WWXQ3J+H
+         UKpZidD4DsgtOpOMff6S8A1+a8p+ZGMbHE3bihr0WlwvTu75itJqrH28F5MR+skhinol
+         1ctTNUftUal3WwVFFZeqofi/ut4gxf8I3r2ewHOz+XDJ4X3/x5JUg0GdBnJX/AzduwbJ
+         e3P4OpmiW8k5GEfjrXIn8IQ3Ck2/VmGgD1Bomh1sUe8nUntTK64BLSv1Mj5ypq5/O/d5
+         +FmYVjZJBjp8UF0Ghr6vxhs9JxSOIrD4uMQq1awUeQFxopFHlJdBjCGcPOfwWX96vdA+
+         TVlw==
+X-Gm-Message-State: ANoB5pmAbERLUDKxMtzmy5DT1xnRYRGoJrSPWZxGiZEsUpKP66cVRyTF
+        dFpObuLxYLN+uydSuwsm76s3KA==
+X-Google-Smtp-Source: AA0mqf45/scTNkT3/7wF/3cL82iaVbqBOprfXBPSjDQhA5Vf1PJDWzW1ny9LGtDqJPp51v/zIeJ2Tw==
+X-Received: by 2002:a05:6a00:2444:b0:558:991a:6671 with SMTP id d4-20020a056a00244400b00558991a6671mr5432059pfj.58.1668731839598;
+        Thu, 17 Nov 2022 16:37:19 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id ik28-20020a170902ab1c00b00186c41bd213sm1993193plb.177.2022.11.17.16.20.53
+        by smtp.gmail.com with ESMTPSA id c65-20020a621c44000000b0056bcd7e1e04sm1760270pfc.124.2022.11.17.16.37.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Nov 2022 16:20:53 -0800 (PST)
-Date:   Fri, 18 Nov 2022 00:20:49 +0000
+        Thu, 17 Nov 2022 16:37:18 -0800 (PST)
+Date:   Fri, 18 Nov 2022 00:37:15 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Alexey Dobriyan <adobriyan@gmail.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
-Subject: Re: [PATCH] vmx: use mov instead of lea in __vmx_vcpu_run()
-Message-ID: <Y3bP4U0X3MZvr0zc@google.com>
-References: <Y3abPTOAxbLOpnVN@p183>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        dmatlack@google.com
+Subject: Re: [PATCH] KVM: x86: avoid memslot check in NX hugepage recovery if
+ it cannot be true
+Message-ID: <Y3bTu4/nUfpX+Enm@google.com>
+References: <20221117173109.3126912-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y3abPTOAxbLOpnVN@p183>
+In-Reply-To: <20221117173109.3126912-1-pbonzini@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,34 +72,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM: VMX: for the shortlog please.
+On Thu, Nov 17, 2022, Paolo Bonzini wrote:
+> +		if (atomic_read(&kvm->nr_logpage_memslots)) {
 
-On Thu, Nov 17, 2022, Alexey Dobriyan wrote:
-> "mov rsi, rsp" is equivalent to "lea rsi, [rsp]" but 1 byte shorter.
+Can we use something like nr_dirty_logged_memslots?  logpage doesn't precisely
+capture the "dirty log" aspect, e.g. for a (very brief) second I though this was
+log(nr_memslot_pages).
 
-Eww, Intel syntax ;-)
-
-> Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
-> ---
-> 
->  arch/x86/kvm/vmx/vmenter.S | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> --- a/arch/x86/kvm/vmx/vmenter.S
-> +++ b/arch/x86/kvm/vmx/vmenter.S
-> @@ -72,7 +72,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
->  	/* Copy @flags to BL, _ASM_ARG3 is volatile. */
->  	mov %_ASM_ARG3B, %bl
+> +			slot = gfn_to_memslot(kvm, sp->gfn);
+> +			WARN_ON_ONCE(!slot);
+> +		}
+> +
+>  		if (slot && kvm_slot_dirty_track_enabled(slot))
+>  			unaccount_nx_huge_page(kvm, sp);
+>  		else if (is_tdp_mmu_page(sp))
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index e6e66c5e56f2..b3c2b975e737 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -722,6 +722,11 @@ struct kvm {
+>  	/* The current active memslot set for each address space */
+>  	struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
+>  	struct xarray vcpu_array;
+> +	/*
+> +	 * Protected by slots_lock, but can be read outside if an
+> +	 * incorrect answer is acceptable.
+> +	 */
+> +	atomic_t nr_logpage_memslots;
 >  
-> -	lea (%_ASM_SP), %_ASM_ARG2
-> +	mov %_ASM_SP, %_ASM_ARG2
+>  	/* Used to wait for completion of MMU notifiers.  */
+>  	spinlock_t mn_invalidate_lock;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 43bbe4fde078..7670ebd29bcf 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1627,6 +1627,11 @@ static int kvm_prepare_memory_region(struct kvm *kvm,
 
-I don't have a strong preference.  It's probably worth converting, e.g. move
-elimination on modern CPUs might shave a whole uop.
+This needs to be done in the commit stage, e.g. if kvm_arch_prepare_memory_region()
+fails the count will be all kinds of wrong.  Even better, since this seems to be
+x86-centric, put it in kvm_mmu_slot_apply_flags() under the
 
-I'm pretty sure LEA is a holdover from when this code pre-calculated RSP before
-a series of pushes.
+	if ((old_flags ^ new_flags) & KVM_MEM_LOG_DIRTY_PAGES)
 
->  	call vmx_update_host_rsp
+to avoid atomic operations if dirty logging isn't being toggled.  That would also
+deal with the NULL pointer issues David pointed out.
+
+>  		}
+>  	}
 >  
->  	ALTERNATIVE "jmp .Lspec_ctrl_done", "", X86_FEATURE_MSR_SPEC_CTRL
+> +	atomic_set(&kvm->nr_logpage_memslots,
+> +		   atomic_read(&kvm->nr_logpage_memslots)
+> +		   + !!(new->flags & KVM_MEM_LOG_DIRTY_PAGES)
+> +		   - !!(old->flags & KVM_MEM_LOG_DIRTY_PAGES));
+
+I belive this can be:
+
+	atomic_add(+ !!(new_flags & KVM_MEM_LOG_DIRTY_PAGES)
+		   - !!(old_flags & KVM_MEM_LOG_DIRTY_PAGES), ...);
+
+or less weirdly...
+
+	if ((old_flags ^ new_flags) & KVM_MEM_LOG_DIRTY_PAGES) {
+		...
+
+		if (new_flags & KVM_MEM_LOG_DIRTY_PAGES)
+			atomic_inc(...);
+		else
+			atomic_dec(...);
+	}
