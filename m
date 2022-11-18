@@ -2,123 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4BAD62FB1E
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 18:05:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE25962FB21
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 18:06:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242365AbiKRRFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Nov 2022 12:05:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43082 "EHLO
+        id S242449AbiKRRFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Nov 2022 12:05:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242224AbiKRREu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Nov 2022 12:04:50 -0500
-Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C806810FD2;
-        Fri, 18 Nov 2022 09:04:48 -0800 (PST)
-Date:   Fri, 18 Nov 2022 17:04:42 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1668791087;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TT9WIDG2PcC0Y0VIGysC67t4tuJ3IbUzD2E14K7Mj+U=;
-        b=LGYC1eBuUtn8jOWDiDcXMIJ1YnhdPWLXut1ZBEcavASub+m8ULYW0AASixs5J/vq/3BhV1
-        mVS8burSTjm3iAAFWmAcG5ZCDTMyuAxBv3B0ihS0N/cgR1xxf7HIwJlJWJnK35X8d7ijLp
-        fU7waACJ//jWMMIY9avT7eDUsKoxS+A=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Will Deacon <will@kernel.org>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 2/3] KVM: arm64: Allow userspace to trap SMCCC
- sub-ranges
-Message-ID: <Y3e7KqJKz6nHjFSu@google.com>
-References: <20221110015327.3389351-1-oliver.upton@linux.dev>
- <20221110015327.3389351-3-oliver.upton@linux.dev>
- <20221118145637.GC4624@willie-the-truck>
+        with ESMTP id S242463AbiKRRF0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Nov 2022 12:05:26 -0500
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C95C2790E
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 09:05:25 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id l14so10244857wrw.2
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 09:05:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4g8TO6/gTLAxbkZZi5J7J9G1gfe/iTz5WXtpYLp8DIc=;
+        b=V135qEwn7/XU9SCJzjZQ5L7Pa1ZxVDUE4HXxsI9/UZHJMEgcTlvc9bdgpocvtc01D3
+         hKNKBfnCu02ombjhMBuraqyymxfDIIr+V2e+gOxJrh18g2uGpuXyBojQl/KJTfvFcFWc
+         i7ZH1Maia90vj90bjUQmAAwdc/p7jPQzL3zKkz4oFQ/cENecZp/WgScrTyN5zNEDW4zT
+         aktoY10AH+cMcEo3PIYM/j5DCHFWEzXSeVei9sxsrbBQ7fFsKOLUjr0vvKmpNclo0h9E
+         4btLQeKMrdAcXXO2xJ6gA6pFtUx2/GecXuNA3yCaN/QamZSSXQDNFQLv+VNwgqiqFN4H
+         yM7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4g8TO6/gTLAxbkZZi5J7J9G1gfe/iTz5WXtpYLp8DIc=;
+        b=yY/eiisKxjsNaUSglTUQONvnUQjJsxK2JlJmJgz99pNQ233tH2fXYBD8gDWCVg1tS3
+         65CrJhyI2lPChQcbuhpQxaR/GhBULDJPutUkfZV247n6u+Qex08m6HwX3ps+KAz4mTeQ
+         w6XM1TuXSTM0Ky3jSzrkV3924dBVxelJjx+0CJxvD4FP+ohc+1VM092MKMWE8oHI+F/2
+         g4muJ3yudvSYaKcg3t0wtxFuwKif07Wo3st2OjsLJQa60ElHVrV5bpJjtgiiDfT2qkbm
+         kaCLwtCF+EYJ84oYxm1fH+1lE7ciDTojN1zJz5lnKesms7sk+ukHz2Ya5re1/xQRaCDk
+         HvrQ==
+X-Gm-Message-State: ANoB5pku1GH50sfh9aYnGTkIEj2dIhmlAH+vKusFnScw5GJeDS4/y/V9
+        7By2MQDgyMFjliolqfcSL/58zs+4zw==
+X-Google-Smtp-Source: AA0mqf5Wu7bg4+yp3a65d588H5ONeuWYJSU2t8sOXwORHtuV4/Vfu1GSHwnyPAbtO7tzAGMInHGcHg==
+X-Received: by 2002:adf:e4c3:0:b0:236:55fd:600a with SMTP id v3-20020adfe4c3000000b0023655fd600amr4642616wrm.109.1668791124019;
+        Fri, 18 Nov 2022 09:05:24 -0800 (PST)
+Received: from p183 ([46.53.249.242])
+        by smtp.gmail.com with ESMTPSA id j20-20020a5d6e54000000b002416f0f1e96sm4096504wrz.43.2022.11.18.09.05.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Nov 2022 09:05:23 -0800 (PST)
+Date:   Fri, 18 Nov 2022 20:05:21 +0300
+From:   Alexey Dobriyan <adobriyan@gmail.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org
+Subject: [PATCH] kvm, vmx: don't use "unsigned long" in vmx_vcpu_enter_exit()
+Message-ID: <Y3e7UW0WNV2AZmsZ@p183>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221118145637.GC4624@willie-the-truck>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 18, 2022 at 02:56:38PM +0000, Will Deacon wrote:
-> On Thu, Nov 10, 2022 at 01:53:26AM +0000, Oliver Upton wrote:
-> > As the SMCCC (and related specifications) march towards an
-> > 'everything and the kitchen sink' interface for interacting with a
-> > system, it is less likely that KVM will implement every supported
-> > feature.
-> > 
-> > Add a capability that allows userspace to trap hypercall ranges,
-> > allowing the VMM to mix-and-match between calls handled in userspace vs.
-> > KVM.
-> > 
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  5 ++++
-> >  arch/arm64/include/uapi/asm/kvm.h | 15 ++++++++++
-> >  arch/arm64/kvm/arm.c              | 10 +++++++
-> >  arch/arm64/kvm/hypercalls.c       | 48 +++++++++++++++++++++++++++++++
-> >  include/uapi/linux/kvm.h          |  1 +
-> >  5 files changed, 79 insertions(+)
-> 
-> [...]
-> 
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 6f0b56e7f8c7..6e8a222fc295 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -100,6 +100,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> >  		r = 0;
-> >  		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
-> >  		break;
-> > +	case KVM_CAP_ARM_USER_HYPERCALLS:
-> > +		if (cap->args[0] & ~KVM_ARM_USER_HYPERCALL_FLAGS)
-> > +			return -EINVAL;
-> 
-> Why not use KVM_CAP_EXIT_HYPERCALL for this?
+__vmx_vcpu_run_flags() returns "unsigned int" and uses only 2 bits of it
+so using "unsigned long" is very much pointless.
 
-Err... I hilariously hijacked its UAPI for the exit but added a new cap
-for it :)
+Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+---
 
-I think the direction going forward will be to provide userspace with a
-range-based filter such that (to a degree) we can arbitrarily forward
-hypercalls to userspace, allowing for a mix-and-match approach.
+ arch/x86/kvm/vmx/vmx.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> At some point during pKVM
-> development, we used that to notify the VMM about memory being shared
-> back from the guest but we eventually dropped it as the notification to
-> userspace ended up not being needed:
-> 
-> https://android-kvm.googlesource.com/linux/+/dbd2861832dfc4c8a3103214b3c212ee7ace1c44%5E%21/
-> https://android-kvm.googlesource.com/linux/+/2a3afc6da99c0e0cb62be1687153ee572903aa80%5E%21/
-> 
-> I'm not saying that what we did was necessarily better, but it seems a bit
-> simpler and I figured it might be useful to point you to it.
-
-Yeah, this is certainly a lot cleaner than what I've proposed here. And
-frankly, for my immediate interest (forwarding vendor hypercalls to
-userspace), this would fit the bill. OTOH, I was hoping that something
-a bit more flexible could move the onus of implementing every darn spec
-onto userspace (where possible).
-
-I know you said pKVM has no need for userspace notifications at this
-moment, but could user hypercalls be useful again going forward?
-
---
-Thanks,
-Oliver
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7067,7 +7067,7 @@ static fastpath_t vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
+ 
+ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+ 					struct vcpu_vmx *vmx,
+-					unsigned long flags)
++					unsigned int flags)
+ {
+ 	guest_state_enter_irqoff();
+ 
