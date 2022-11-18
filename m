@@ -2,152 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F5B962F589
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 14:07:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4D5662F5FC
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 14:29:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235306AbiKRNHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Nov 2022 08:07:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36346 "EHLO
+        id S242045AbiKRN3B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Nov 2022 08:29:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235248AbiKRNHP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Nov 2022 08:07:15 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2078.outbound.protection.outlook.com [40.107.94.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5287978186
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 05:07:14 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AQvgY4SeeUIcAdBSDf+jiZKqSumPQEgVQtiomOr6KqwuoN623k+QXsC0cv5Y6wBsFskrQnI0repGS2uGg0q2b7iRArbM6UrvPqxPPo69MJPzkmGcTSEoidHtQLlKoIw7EPfWTsdjziHQhtO2d5wOdkja0wXVmgcYd083yBTYey9pycTz0PPpxVepG7d43Pi9GOrXkFArPUyjspm2Gs0JWInJu/hizpzHhdqfxTwEVHBe1FNtPxxit00Sq6rzrWE3CmW5KckrsGD+TyeqBOiH2r854qXOfEBIoluu3nryunzpqlIfDPeerM18A19UWvWo4gimk/abqGR+2uYh9LGjSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UlbVOb4LwoYbckR3eQPE0o/XbByq9XLhd6QVOcynSJU=;
- b=JMMpFq6WxRgODlThF9aU3Cr5HjGf86Tdknqx5OkKjYfqu+QdJ4iWxI4ojnOJZgCJWKF9VmMpX86kXT2xsrE5/UpPAUJP5bOaKev20izERv3CN+sYRBQfbVexinfcTwCAvb77RhQ+CRPpslE/qkjADrdYNTGZ0ZP7ewywU4N9q6mws3hS2/w+vFBQQ/WimkmVk0GaT/1uAXRWOGyQRRxgHBdRn9GofchnXqZTQksTlPjCO4MAutRDBhRfUxT4UWzGm/Xq/Rf5omZOk4PVoP4XmrBg4pAGkxqiWSPOAH/+O7AuJsGP2IxXYJMu5k719axe183ArIEX253GTedrRo3toA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UlbVOb4LwoYbckR3eQPE0o/XbByq9XLhd6QVOcynSJU=;
- b=L5WdFWPi+V9pm0HA8O2uKgJ3KMy/dt6sCsI3QdZmNR9EkfPXEb5KGnK13vLQSxFhFPYguhw/bHyqT/gNHApq8T80mGSwgd62UrW5sTwuA+fBAeywxtYy9/vrmRva0i23hILUmoIfgyID0hiaS76cSQikEKILTS7+k8u4coNkixD3WPyVa0BlfibfEVTiKYeomdR6L9mft8U5c4MbaOn08QzHgvzBis5d5p/iRXzU+XeJUtNQcBm+R4Wc6cB48fIstazDJ2wLY/U2idnBxjk2iIcey2Czgc4UH95EYmkjrOB9Uf8BBCmXS/7wjoWGjXFjfRuriKXGm9cui8bZxjG1pA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BN9PR12MB5098.namprd12.prod.outlook.com (2603:10b6:408:137::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.20; Fri, 18 Nov
- 2022 13:07:13 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%7]) with mapi id 15.20.5813.017; Fri, 18 Nov 2022
- 13:07:12 +0000
-Date:   Fri, 18 Nov 2022 09:07:11 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Lixiao Yang <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Yi Liu <yi.l.liu@intel.com>, Yu He <yu.he@intel.com>
-Subject: Re: [PATCH v3 11/11] iommufd: Allow iommufd to supply /dev/vfio/vfio
-Message-ID: <Y3eDfwamDjhIDmZ7@nvidia.com>
-References: <0-v3-50561e12d92b+313-vfio_iommufd_jgg@nvidia.com>
- <11-v3-50561e12d92b+313-vfio_iommufd_jgg@nvidia.com>
- <20221117133417.2636e23a.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221117133417.2636e23a.alex.williamson@redhat.com>
-X-ClientProxiedBy: BLAPR03CA0084.namprd03.prod.outlook.com
- (2603:10b6:208:329::29) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S241940AbiKRN2q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Nov 2022 08:28:46 -0500
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39EBE70A03
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 05:28:43 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id d9so9222353wrm.13
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 05:28:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jFuAN0qalS8PXGclZBpJGpqKwSse98B1zaIXuj/qhsM=;
+        b=X/gqqsl/WLpKtb9vOD4WiP4Oi7fWHjwjntx8mX7OxhsG5wzq+ZEu37/nMAgR/K0NTa
+         w3qxyDj/5ysz05YJVpUs55kmmloX1IkC2zB1+/KzU94RHSvVV8QJIGUQUlri/5EUyK2r
+         mGh3S7znVf5hxcm2FIq10hXZNhSXHhkk0XSUejjdU6tvjBJaDulCkhJ1yHJ5qUwTLhSd
+         MoeZaDkThsztpF4G73yNPcJGkFAhdKPv1GGINAnUYMuW1RHIMFNHAh629fNId0Ygj6h4
+         QlGc8/i2b3sseFW3mxLr72CnhypCMQDx+K68Ypw8eLM56TGZBoLoX2zeC77yyHo3GfeR
+         z9tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
+         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jFuAN0qalS8PXGclZBpJGpqKwSse98B1zaIXuj/qhsM=;
+        b=VcgJGIUixCSAek9valrOENtDGd93FW7DiCceNkMrLm9kuTOvQiYRrD/HZYr5DOWGNp
+         mpi0GEkNIcqWDgBleWE7aQORJA+1+BehDTpHnxA0bpMq3vR1vLXEku8IQ9fMHd8l4dIm
+         KzpPnwWfUa7biqF8e+0/iVz7MQ5alhXFDuo/sKSYTSUKtIaIbNj/nStFOgXmXqFc5sj4
+         Ixo38JOhOgI3xS3IuW+N+qs6SUw5dBAlRisB8sugD1kj3UEg4U/ZTcGdcfuz4QRuGI81
+         zoXMJUQwr+ReFxBmksfbT92AbRwUilGhnCR/8mLD7MCIuFpMdcJV9u3WgNBq4vhFCmPr
+         7n3w==
+X-Gm-Message-State: ANoB5pnDy8HPjpRPl8Dr1lVAn62BEpOBjffnEkkkYwX+vEJM/5IeS6oo
+        nNRdAMahuiHAzb2KpCg7yk/oCw==
+X-Google-Smtp-Source: AA0mqf6tYbIf5kiwBxBEeJpBK3Zoi0R3hbVIR4uxKZjI5EAk4XwJowCkhnyQfuyrbXxeKsj5OY9J7w==
+X-Received: by 2002:adf:aa91:0:b0:241:b2b2:a71d with SMTP id h17-20020adfaa91000000b00241b2b2a71dmr4389646wrc.326.1668778121454;
+        Fri, 18 Nov 2022 05:28:41 -0800 (PST)
+Received: from zen.linaroharston ([185.81.254.11])
+        by smtp.gmail.com with ESMTPSA id y10-20020adfe6ca000000b00236860e7e9esm3459102wrm.98.2022.11.18.05.28.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Nov 2022 05:28:40 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 11C631FFB7;
+        Fri, 18 Nov 2022 13:28:40 +0000 (GMT)
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <20221025151344.3784230-4-chao.p.peng@linux.intel.com>
+ <87cz9o9mr8.fsf@linaro.org> <20221116031441.GA364614@chaop.bj.intel.com>
+ <87mt8q90rw.fsf@linaro.org> <20221117134520.GD422408@chaop.bj.intel.com>
+ <87a64p8vof.fsf@linaro.org> <20221118013201.GA456562@chaop.bj.intel.com>
+User-agent: mu4e 1.9.2; emacs 28.2.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v9 3/8] KVM: Add KVM_EXIT_MEMORY_FAULT exit
+Date:   Fri, 18 Nov 2022 13:23:51 +0000
+In-reply-to: <20221118013201.GA456562@chaop.bj.intel.com>
+Message-ID: <87o7t475o7.fsf@linaro.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BN9PR12MB5098:EE_
-X-MS-Office365-Filtering-Correlation-Id: 78982f02-5198-41a2-e4eb-08dac965ceed
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JCIwldGf49hSrJJe36pTEni/Js+J+lX5uSMmNrahqTm3qcVh/OinqgKMhiDD3CAcdywi+XVvbEg+WeXhJOUz6Dgz0YLXrJDnunSxRgX609x/qv2amMQZjNfvncujTIX5TmHT1CVr0C+scq16HmVgNU6tKdedWpSgC/ecKYAjskVX90xqF5yxm6y76vmXS33FjylVmcxMaJMlqP6+6mhID7cTttipJxX0j5kEsMsrBf4OpptjFj6ajEnjcopGUHoIgKgN1pIZKnvhGlzBo4wvfj8S/5VKH/PEdOrgkaJQxeGQSI+ulinQEn+3mfExYzOJIDsESOHMfqOrb/YpJmiPnlUn5cX2RIAbXzA4P1pv8ES+85rAFQNCTeS4QBZfWC0qeFlHJuD/oesuCmP3J9R9pq5PcZiW8J4we+94EDgyvY3bDIWwzMzMIK+s0QCA/OSJtTn0384Hwqhx5Qew36GTPBv+uXBcS9Z+tDRCMxzJh+U36JMMt7I7P2IPlZhCGgcPR2mrHidAqcxHSKgwnb5tfgY+fxfP2zzWMNRBfo5gB+NTmlO2cgdHxKtDaWD5R77z9RL8bfKbUOS1AGOMZu7wYcnXM8lEJNGngoC06hN+TopCgpi0VL3mG6N5VOXukKP0Bf5SprGhS0XYqusqC0xbgQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(376002)(396003)(136003)(39860400002)(346002)(451199015)(478600001)(6486002)(26005)(4326008)(66556008)(8936002)(36756003)(66946007)(66476007)(8676002)(6512007)(5660300002)(186003)(7416002)(54906003)(6506007)(6916009)(316002)(2616005)(2906002)(86362001)(41300700001)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SAdTxMKLQa+uGJsi3quB4qMMd+mZSNCxCuwc3/8TFWjXWBiVbZO/sa5C6gtC?=
- =?us-ascii?Q?7DrE1xgNJkNJARzyWhA79Kf9kdyZsNIoIb+pNkkqYjGos1XmoZzzCguzjw7v?=
- =?us-ascii?Q?Vtgfmrv0ClwF1uoHTXQnJhL9oko4jXPJvYUJKKzb8ceL3770cD6EEqX0+5kp?=
- =?us-ascii?Q?MJ4Hu0K2aZ3Kuc1TDj4vAwcnApebFyqmAshIz9ssgnzWtnGKMa/4prLx1W2A?=
- =?us-ascii?Q?S4M3oFRu/uLMg3B+FHNrSkYn3tNL2xWMZsO7lcHrTgazJgNiDHpesI8EdNCL?=
- =?us-ascii?Q?Z473ZD6gR7/ZXXWSoViJf4dR7/Ko3POqqpbduzuHozsfw14P5aDWbpDc+LKm?=
- =?us-ascii?Q?4nNc1AUMrO6k81ca2KAzEsbj9OvTGpJXPSVw51udY0VAop7ajgmwphrjAlwS?=
- =?us-ascii?Q?7YDEHuTl/MQ0pLPffxi4pGSJihTvQI7ZX42PxvIGz38kXG177P5zKvZGrWLj?=
- =?us-ascii?Q?6ToSNJL0rO+I+pgvFwdIIsegfiivTnJFE7PFiVm4t+WWPe5snuAsfFV3MbJd?=
- =?us-ascii?Q?0mOdC3R5UX2RO+/i5YnFdDjuFGwpAbmn5nwBl24fLeh2dJpROxrr7N5uw+Ia?=
- =?us-ascii?Q?0wE6yp65bmhbiHXPXAakaxIoqEru5ZuwRGb1us0AWpwdKgBOsv/r24XVUgmn?=
- =?us-ascii?Q?oLVmpL21s/J9fuokjXOSC5TOYWaLuBDu1DFT+VXKPTIZPKMuf3Wg3UTtv3Cv?=
- =?us-ascii?Q?7/Mvmxb6lIxWxdRA85nV2V4S15nWqNdVrkDU3rEfOe9hE6h/3xaslOmkvyyy?=
- =?us-ascii?Q?YmMkztt0Z1WQmC4rKeG9YSvV+YoDP71NBFSTQctpvMwcP8pwrNF41i2bb0mF?=
- =?us-ascii?Q?hUPGgJ98ASk+SEoX+KVCtVGHyptNGwKxAxAe9jnZviFD/N5p5EzeJg0LXKPa?=
- =?us-ascii?Q?vRjsT4RMoDXq2Dl2CmFOobQbS2C1Y0a244rMB37lpBMFMlO7WkpTkqLpx0uj?=
- =?us-ascii?Q?KCUoLOKy+R2zVtvfeB/Bp6Fh6ryXWyDQZ5uv79fUxy3KR/JsqLj+iYFT46yG?=
- =?us-ascii?Q?uvUfokGfqvXVGFRu0chdAi/hGuEPNBraKexTZgbCj0XPJWQ8UrvkiFpiVRnE?=
- =?us-ascii?Q?uFe/nd88WqP63sgXsaO/r53aIfh0pN3eY/frxqYq9dxZiwYPvIf4olwRU0ce?=
- =?us-ascii?Q?4mBenkmDUbf8t/QAn0UvGSg97oVua9vf4Cl/XnufvE88jS42QHAEohEA3BoF?=
- =?us-ascii?Q?YFzmHSyNJPJjVkFjnaCtSDgI4Se+SZB7XoJJ8oJkFp+JLyEdYt8lcCBDmJQs?=
- =?us-ascii?Q?DwEduPbq+OHncpjlbTg0q11FrUKYUOIcAEnLOJ2ID1K9I1kRTeimWkg8lwqb?=
- =?us-ascii?Q?HOkBJJnSUWdYXNdGTGaxEDsmas7I3MvoIQmtvi9ZeVMSQd6wN8bOXVrUyDpG?=
- =?us-ascii?Q?MqYk9UE+8cu/58GQjs3wI6pQDHQPD02GmndBL3EnfCB8AYyY6aXeBt3h/NpU?=
- =?us-ascii?Q?NFVLiEyZREAGB1fhHb7GXif3m+j0JvrblRfseDx96DHa0/EDpdBiKbgKCM1+?=
- =?us-ascii?Q?nSLI2dMggAal4tkui4F8EF3O9+D+Q6l29oUsKaC2sUO7ThwgwY4zjZFdHXWs?=
- =?us-ascii?Q?PlZeih3I+QdRt5yqjys=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 78982f02-5198-41a2-e4eb-08dac965ceed
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2022 13:07:12.8329
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OR9LFKRaiYgF+5WDgnDurP9xgwX+iYmsJii9fgwOxn4xHqlW0Ku2orjQVmtM+Rj2
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5098
-X-Spam-Status: No, score=1.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_PASS,
-        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: *
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 01:34:17PM -0700, Alex Williamson wrote:
-> > +config IOMMUFD_VFIO_CONTAINER
-> > +	bool "IOMMUFD provides the VFIO container /dev/vfio/vfio"
-> > +	depends on VFIO && !VFIO_CONTAINER
-> > +	default VFIO && !VFIO_CONTAINER
-> > +	help
-> > +	  IOMMUFD will provide /dev/vfio/vfio instead of VFIO. This relies on
-> > +	  IOMMUFD providing compatibility emulation to give the same ioctls.
-> > +	  It provides an option to build a kernel with legacy VFIO components
-> > +	  removed.
-> > +
-> > +	  Unless testing IOMMUFD say N here.
-> > +
-> 
-> "Unless testing..." alone is a bit more subtle that I thought we were
-> discussing.  I was expecting something more like:
-> 
->   IOMMUFD VFIO container emulation is known to lack certain features of
->   the native VFIO container, such as no-IOMMU support, peer-to-peer DMA
->   mapping, PPC IOMMU support, as well as other potentially undiscovered
->   gaps.  This option is currently intended for the purpose of testing
->   IOMMUFD with unmodified userspace supporting VFIO and making use of
->   the Type1 VFIO IOMMU backend.  General purpose enabling of this
->   option is currently discouraged.
-> 
->   Unless testing IOMMUFD, say N here.
 
-Done, thanks
+Chao Peng <chao.p.peng@linux.intel.com> writes:
 
-Jason
+> On Thu, Nov 17, 2022 at 03:08:17PM +0000, Alex Benn=C3=A9e wrote:
+>>=20
+<snip>
+>> >> >> > +
+>> >> >> > +		/* KVM_EXIT_MEMORY_FAULT */
+>> >> >> > +		struct {
+>> >> >> > +  #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1 << 0)
+>> >> >> > +			__u32 flags;
+>> >> >> > +			__u32 padding;
+>> >> >> > +			__u64 gpa;
+>> >> >> > +			__u64 size;
+>> >> >> > +		} memory;
+>> >> >> > +
+>> >> >> > +If exit reason is KVM_EXIT_MEMORY_FAULT then it indicates that =
+the VCPU has
+>> >> >> > +encountered a memory error which is not handled by KVM kernel m=
+odule and
+>> >> >> > +userspace may choose to handle it. The 'flags' field indicates =
+the memory
+>> >> >> > +properties of the exit.
+>> >> >> > +
+>> >> >> > + - KVM_MEMORY_EXIT_FLAG_PRIVATE - indicates the memory error is=
+ caused by
+>> >> >> > +   private memory access when the bit is set. Otherwise the mem=
+ory error is
+>> >> >> > +   caused by shared memory access when the bit is clear.
+>> >> >>=20
+>> >> >> What does a shared memory access failure entail?
+>> >> >
+>> >> > In the context of confidential computing usages, guest can issue a
+>> >> > shared memory access while the memory is actually private from the =
+host
+>> >> > point of view. This exit with bit 0 cleared gives userspace a chanc=
+e to
+>> >> > convert the private memory to shared memory on host.
+>> >>=20
+>> >> I think this should be explicit rather than implied by the absence of
+>> >> another flag. Sean suggested you might want flags for RWX failures so
+>> >> maybe something like:
+>> >>=20
+>> >> 	KVM_MEMORY_EXIT_SHARED_FLAG_READ	(1 << 0)
+>> >> 	KVM_MEMORY_EXIT_SHARED_FLAG_WRITE	(1 << 1)
+>> >> 	KVM_MEMORY_EXIT_SHARED_FLAG_EXECUTE	(1 << 2)
+>> >>         KVM_MEMORY_EXIT_FLAG_PRIVATE            (1 << 3)
+>> >
+>> > Yes, but I would not add 'SHARED' to RWX, they are not share memory
+>> > specific, private memory can also set them once introduced.
+>>=20
+>> OK so how about:
+>>=20
+>>  	KVM_MEMORY_EXIT_FLAG_READ	(1 << 0)
+>>  	KVM_MEMORY_EXIT_FLAG_WRITE	(1 << 1)
+>>  	KVM_MEMORY_EXIT_FLAG_EXECUTE	(1 << 2)
+>>         KVM_MEMORY_EXIT_FLAG_SHARED     (1 << 3)
+>>         KVM_MEMORY_EXIT_FLAG_PRIVATE    (1 << 4)
+>
+> We don't actually need a new bit, the opposite side of private is
+> shared, i.e. flags with KVM_MEMORY_EXIT_FLAG_PRIVATE cleared expresses
+> 'shared'.
+
+If that is always true and we never expect a 3rd type of memory that is
+fine. But given we are leaving room for expansion having an explicit bit
+allows for that as well as making cases of forgetting to set the flags
+more obvious.
+
+--=20
+Alex Benn=C3=A9e
