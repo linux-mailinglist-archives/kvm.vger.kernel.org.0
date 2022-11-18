@@ -2,143 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9451162F7EF
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 15:41:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D25362F898
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 16:00:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242519AbiKROln (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Nov 2022 09:41:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41476 "EHLO
+        id S242266AbiKRPAG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Nov 2022 10:00:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241721AbiKROlP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Nov 2022 09:41:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AF2A970AF
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 06:37:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668782250;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UPk972akfZfuwBephZFAJS92+OaEvfxCgvAwmUwC+Mw=;
-        b=YUtvkGSgPPfgA7l0qfbnCJ9GvL5fr/n+069bmlGWeMryG2A2RBNICl2IdYqxE1SyuoiiQ1
-        KltbpZiq6E2tmipxCagAbNmWkTRN54N4ulxCGZfN1A5VBBxErnOwdXlQ4+NuRWZ8CTD/cH
-        z1eP+kaj+iZMeRkcfYFjv5zrmV4DWfs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-62-BlzoUhxeOVOSza3-2EAeqA-1; Fri, 18 Nov 2022 09:37:29 -0500
-X-MC-Unique: BlzoUhxeOVOSza3-2EAeqA-1
-Received: by mail-wm1-f69.google.com with SMTP id m34-20020a05600c3b2200b003cf549cb32bso4567825wms.1
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 06:37:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UPk972akfZfuwBephZFAJS92+OaEvfxCgvAwmUwC+Mw=;
-        b=ST0MblOIFV1bZckHono3MKn/YuBENwUhLlnTIhn1STyNerZgxRmw9yj6G9LIBI4BUT
-         qX4cb5OFuE5ugDmnAZld6xUgk0z2LMC9ZLtICCa0pd1vwtjLMpS07b+s5I3jOfxDXbE3
-         CCyLufCDVI2XfKO/sR5Am3LayJzsOjQwH4l6OPDlNDgg9SWkSKZBjLfcjucPOzF/2v7H
-         d28zGdbkUDQq82etQlIEE9yNic6vcZ7Wx9yujGMgmKyasiManMWFSeUIhTpft3POVc6Y
-         eb7+TBbmcg5nvwDLq9GUtk8pPhj0UmlDszNfiaeIkXz/KI13SVBIMKhPL0zmsPTLloRw
-         svjg==
-X-Gm-Message-State: ANoB5pkCs78xi22owm1KHAeXeu2i6O47naCv8/VeIZCjsmhcATyJiri7
-        1ZMp1CHAOydSEsTUsn3f7WtQt7GYmA9Qjg/s3af9ynDnKDlM9ifSDPo3g0+TqA0Re1WaNW5j1+r
-        rNPw/k/LHvG4s
-X-Received: by 2002:a5d:4c8c:0:b0:241:c222:e27e with SMTP id z12-20020a5d4c8c000000b00241c222e27emr357999wrs.236.1668782248585;
-        Fri, 18 Nov 2022 06:37:28 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7PlKqWjn8KTrQXB14vUIs9jaDWsY5UxLsFjeau3btWbKZTTI09DoC0fRcoqZTqg7scz4TrfQ==
-X-Received: by 2002:a5d:4c8c:0:b0:241:c222:e27e with SMTP id z12-20020a5d4c8c000000b00241c222e27emr357982wrs.236.1668782248374;
-        Fri, 18 Nov 2022 06:37:28 -0800 (PST)
-Received: from [192.168.0.5] (ip-109-43-177-78.web.vodafone.de. [109.43.177.78])
-        by smtp.gmail.com with ESMTPSA id he5-20020a05600c540500b003cfd4e6400csm4824578wmb.19.2022.11.18.06.37.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Nov 2022 06:37:27 -0800 (PST)
-Message-ID: <90f07edc-238f-b3d0-80d2-f4b4573f12ad@redhat.com>
-Date:   Fri, 18 Nov 2022 15:37:26 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v3 1/9] KVM: s390: Extend MEM_OP ioctl by storage key
- checked cmpxchg
-Content-Language: en-US
-To:     Heiko Carstens <hca@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        with ESMTP id S242211AbiKRO7t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Nov 2022 09:59:49 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A60B9ACAE;
+        Fri, 18 Nov 2022 06:56:47 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 053D7B822F6;
+        Fri, 18 Nov 2022 14:56:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49A0CC433C1;
+        Fri, 18 Nov 2022 14:56:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668783404;
+        bh=kQqNwIRTX/hMdAUkbPpnbCbz6J1Qz8mIuBGg79EWriQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YAcGcNO717vxcqR6gw7hPCPkskQj2wFxDzeuW9mROwlkdTfHvsj313IATnooRiuH7
+         tggG//xkOzUdbhHJi9RH5nUHr7JyjuEL8To04GZkGxQ+NqDdJYuK0xU8yvqQm2SnY5
+         Gv9xoQAQQwMXscRow5tS3mEG0waNLDXKKDfLUaCfkyCYxD/MDglLWUCFLE8+3Dp8iv
+         0mSr5zAFkl6F8Wv3JRf0R4kjtOsD7JHBNfgBGcKygeKngjWkZ4TPuc+YarzIdVBPqn
+         55sMg9/gLjLP2+8k17o7zmujzTy38yupQVAQHhdgtLRalXIq0dYP63UmSdSl8lUPu9
+         OZ4b8PrPzo3Mg==
+Date:   Fri, 18 Nov 2022 14:56:38 +0000
+From:   Will Deacon <will@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-References: <20221117221758.66326-1-scgl@linux.ibm.com>
- <20221117221758.66326-2-scgl@linux.ibm.com> <Y3dalbP5yb2gflA9@osiris>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <Y3dalbP5yb2gflA9@osiris>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        Raghavendra Rao Ananta <rananta@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 2/3] KVM: arm64: Allow userspace to trap SMCCC
+ sub-ranges
+Message-ID: <20221118145637.GC4624@willie-the-truck>
+References: <20221110015327.3389351-1-oliver.upton@linux.dev>
+ <20221110015327.3389351-3-oliver.upton@linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221110015327.3389351-3-oliver.upton@linux.dev>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/11/2022 11.12, Heiko Carstens wrote:
-> On Thu, Nov 17, 2022 at 11:17:50PM +0100, Janis Schoetterl-Glausch wrote:
->> User space can use the MEM_OP ioctl to make storage key checked reads
->> and writes to the guest, however, it has no way of performing atomic,
->> key checked, accesses to the guest.
->> Extend the MEM_OP ioctl in order to allow for this, by adding a cmpxchg
->> mode. For now, support this mode for absolute accesses only.
->>
->> This mode can be use, for example, to set the device-state-change
->> indicator and the adapter-local-summary indicator atomically.
->>
->> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->> ---
->>   include/uapi/linux/kvm.h |   5 ++
->>   arch/s390/kvm/gaccess.h  |   3 ++
->>   arch/s390/kvm/gaccess.c  | 101 +++++++++++++++++++++++++++++++++++++++
->>   arch/s390/kvm/kvm-s390.c |  35 +++++++++++++-
->>   4 files changed, 142 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 0d5d4419139a..1f36be5493e6 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -588,6 +588,8 @@ struct kvm_s390_mem_op {
->>   		struct {
->>   			__u8 ar;	/* the access register number */
->>   			__u8 key;	/* access key, ignored if flag unset */
->> +			__u8 pad1[6];	/* ignored */
->> +			__u64 old_p;	/* ignored if flag unset */
+Hey Oliver,
+
+On Thu, Nov 10, 2022 at 01:53:26AM +0000, Oliver Upton wrote:
+> As the SMCCC (and related specifications) march towards an
+> 'everything and the kitchen sink' interface for interacting with a
+> system, it is less likely that KVM will implement every supported
+> feature.
 > 
-> Just one comment: the suffix "_p" for pointer is quite unusual within
-> the kernel. This also would be the first of its kind within kvm.h.
-> Usually there is either no suffix or "_addr".
-> So for consistency reasons I would suggest to change this to one of
-> the common variants.
+> Add a capability that allows userspace to trap hypercall ranges,
+> allowing the VMM to mix-and-match between calls handled in userspace vs.
+> KVM.
 > 
-> The code itself looks good from my point of view, even though for the
-> sake of simplicity I would have put the complete sign/zero extended
-> 128 bit old value into the structure, instead of having a pointer to
-> the value.
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  5 ++++
+>  arch/arm64/include/uapi/asm/kvm.h | 15 ++++++++++
+>  arch/arm64/kvm/arm.c              | 10 +++++++
+>  arch/arm64/kvm/hypercalls.c       | 48 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h          |  1 +
+>  5 files changed, 79 insertions(+)
 
-See 
-https://lore.kernel.org/kvm/37197cfe-d109-332f-089b-266d7e8e23f8@redhat.com/ 
-... it would break the "IOW" definition of the ioctl. It can be done, but 
-that confuses tools like valgrind, as far as I know. So I think the idea 
-with the pointer is better in this case.
+[...]
 
-  Thomas
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 6f0b56e7f8c7..6e8a222fc295 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -100,6 +100,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		r = 0;
+>  		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
+>  		break;
+> +	case KVM_CAP_ARM_USER_HYPERCALLS:
+> +		if (cap->args[0] & ~KVM_ARM_USER_HYPERCALL_FLAGS)
+> +			return -EINVAL;
 
+Why not use KVM_CAP_EXIT_HYPERCALL for this? At some point during pKVM
+development, we used that to notify the VMM about memory being shared
+back from the guest but we eventually dropped it as the notification to
+userspace ended up not being needed:
+
+https://android-kvm.googlesource.com/linux/+/dbd2861832dfc4c8a3103214b3c212ee7ace1c44%5E%21/
+https://android-kvm.googlesource.com/linux/+/2a3afc6da99c0e0cb62be1687153ee572903aa80%5E%21/
+
+I'm not saying that what we did was necessarily better, but it seems a bit
+simpler and I figured it might be useful to point you to it.
+
+Will
