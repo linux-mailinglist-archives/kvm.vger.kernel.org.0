@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F66862F092
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 10:09:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E3FDD62F09A
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 10:10:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241625AbiKRJJd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Nov 2022 04:09:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56626 "EHLO
+        id S241759AbiKRJK3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Nov 2022 04:10:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230523AbiKRJJb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Nov 2022 04:09:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8883E140DB
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 01:08:31 -0800 (PST)
+        with ESMTP id S241755AbiKRJK2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Nov 2022 04:10:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 313D8140DB
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 01:09:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1668762510;
+        s=mimecast20190719; t=1668762572;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=EXM84DaBN5AZrX/vJHAzXbI0N4xm2A1YhPGzhtFicxY=;
-        b=JmdBDLW2QIUeEOVKSTiHh0jRiEhKF8OehhROyFqTU3lhPjzUTsGQpyyBMWXdeAzc2HLL4e
-        RVYlwqEiQz2rSCmPiv69bMbq+qY/vM1PH5DopkGN53gjMCQGchIBOljEpnxQxjIEgpJo9w
-        G2gkakpyPGeg7plrcELnBJKvng+ZI8Q=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=xeXTZcuI1CLep2o2KomhSyxmx0lROJCn0LGc6rXRQUg=;
+        b=a9ggwPHCMc6NIaabB4Okt2j+I6+Wx6Mk1vrRQMELI6IjtLRYRdDj+yKKYKF9JbtFXDqhTt
+        4vnEtnDv25Rp/8nG8h1C8ki3Q4Cd3d9hCSl2D8pPl95gqpGMnTxmIVY69HZHnsS/96D0Fn
+        Nfnsq7oWK3lRo/5vpgoGCApqEF9HEPg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-17-GYWIBdhXP2qiUrom5qUDxg-1; Fri, 18 Nov 2022 04:08:29 -0500
-X-MC-Unique: GYWIBdhXP2qiUrom5qUDxg-1
-Received: by mail-wr1-f72.google.com with SMTP id v14-20020adf8b4e000000b0024174021277so1342051wra.13
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 01:08:29 -0800 (PST)
+ us-mta-550-b3BjAAmqMlaBskbH3quRrw-1; Fri, 18 Nov 2022 04:09:30 -0500
+X-MC-Unique: b3BjAAmqMlaBskbH3quRrw-1
+Received: by mail-wm1-f72.google.com with SMTP id m34-20020a05600c3b2200b003cf549cb32bso4185686wms.1
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 01:09:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EXM84DaBN5AZrX/vJHAzXbI0N4xm2A1YhPGzhtFicxY=;
-        b=QY6+bDgJjTHtdrKN7qFKNqyO+7V3Qox44wFwBMBWKP6H9NA0xTg+vgjAzdlYdsjSZp
-         VVEjGGVE7+NPBUkh4rNck85W3dZYnXlK9qSwSZELpMi+LuJkj7gUg/uf+8BvI+r/GjKY
-         6vDZQGKA6CxmmeB7qkQblRDK3faMstu/ls2YldMNZH1mph6qfUIOpH5H3nx/aAO12FEc
-         8wCq1yLqvN+v8PZ+nWL1dyb0MinXIcqcedvg6NY+CP0qHzjt1BbaSEnogQSispo5RkJ4
-         ndTIdq5t27y/L24Tc2dNzjow7SEjemeQbccz5RVeG2IlXAPNRDRloTdFw1lSZO81t8qI
-         Y2rA==
-X-Gm-Message-State: ANoB5pl7ZhqPmmvpCdot2R0NN9E0daGwNMnyQpoEVV8gVNMevUsGW//R
-        ewdMEP2BWLTf9xV5pZaYCJ6AaciFKiM9ZFkUkTKVZ1UbjzlfFIO7oO8dnW3FJAi1zMaxFO0VfJi
-        rTHCYRD1pA5Pu
-X-Received: by 2002:a5d:4c4d:0:b0:235:25b7:5084 with SMTP id n13-20020a5d4c4d000000b0023525b75084mr3687563wrt.135.1668762508170;
-        Fri, 18 Nov 2022 01:08:28 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7S2ZztXQpu74tY6qMZ8bGYs0jf9hhJcId6BWRRAo3bBJp7imdNVYU/FaWEHzD9sFXAJBwi3Q==
-X-Received: by 2002:a5d:4c4d:0:b0:235:25b7:5084 with SMTP id n13-20020a5d4c4d000000b0023525b75084mr3687521wrt.135.1668762507845;
-        Fri, 18 Nov 2022 01:08:27 -0800 (PST)
+        bh=xeXTZcuI1CLep2o2KomhSyxmx0lROJCn0LGc6rXRQUg=;
+        b=H2McMzr89OVNP1C4s/GnLjsOP6I0UG3UBPi8wCdp63QIgDNmEHyoxYPDStPqef8gMA
+         BWjaVsI5p1jW4bXqy4z+LayVaGiCEWGKM+px+hACljUij52Zu7BX7F6LGwg5SsJY4OBS
+         AiQeWknwgaLhU8Ko6N3/Zq0/AWXvTy49H4QMU3nAdgt7rk2Pttscb8hkUWEA9aQ1afMs
+         yJWLOcBRwNEJppHmAyDMAoiRx/KB8kbfQKjNwfq73xEK8E3rckd5XRHyHfZt9ncfgb3x
+         xcETGcywMxUghMpkAqFzM184j0cd/bpvqtunfMyyTk2yMhEqtSX8Z0Gluj+gsR7UHmmC
+         O/6g==
+X-Gm-Message-State: ANoB5plVVWsXufNbgExUgdVW2NO5EkmPPJ6V8+QXCo5mKOLMjK3E9cg7
+        48w/QAo/ng9rC93ii1czY82Wm90MF+PPk3E4uK8PlO9qrZ1vzdvLhtAVQqSjaZmxs+1/Uwl2c6j
+        h6hTOeJAhDGSR
+X-Received: by 2002:a05:600c:1e1a:b0:3cf:7959:d8be with SMTP id ay26-20020a05600c1e1a00b003cf7959d8bemr4452102wmb.85.1668762569745;
+        Fri, 18 Nov 2022 01:09:29 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7jsIC1kyZP02uLsDpFgwzo/jh+9BTiREaq3zKB0f5w8O4mQu6CokrtkacAoWZxpUfLgP9J7g==
+X-Received: by 2002:a05:600c:1e1a:b0:3cf:7959:d8be with SMTP id ay26-20020a05600c1e1a00b003cf7959d8bemr4452051wmb.85.1668762569479;
+        Fri, 18 Nov 2022 01:09:29 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id r10-20020adfce8a000000b00241b371d73esm3107407wrn.77.2022.11.18.01.08.25
+        by smtp.gmail.com with ESMTPSA id p6-20020a5d48c6000000b00241a8a5bc11sm2955443wrs.80.2022.11.18.01.09.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Nov 2022 01:08:27 -0800 (PST)
-Message-ID: <ab66bcf6-43ff-3676-7b7d-c8afa00ad0b0@redhat.com>
-Date:   Fri, 18 Nov 2022 10:08:24 +0100
+        Fri, 18 Nov 2022 01:09:28 -0800 (PST)
+Message-ID: <569b4eeb-792a-9ad6-d52e-555f987bc7f7@redhat.com>
+Date:   Fri, 18 Nov 2022 10:09:26 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.3.1
@@ -109,14 +109,14 @@ Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
+Hi Jason,
 
 On 11/16/22 22:00, Jason Gunthorpe wrote:
 > Following the pattern of io_uring, perf, skb, and bpf iommfd will use
