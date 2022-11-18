@@ -2,135 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C643462FBE2
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 18:44:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DEAF62FC4B
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 19:17:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235386AbiKRRom (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Nov 2022 12:44:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40796 "EHLO
+        id S242561AbiKRSRd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Nov 2022 13:17:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234711AbiKRRok (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Nov 2022 12:44:40 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D83DA30F59
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 09:44:39 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id b29so5514935pfp.13
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 09:44:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nArehU+M3JvjBQMdLR3MkhWwl9kcg6nFoz5gcIdq8kE=;
-        b=AJca8AstvwdRRkP1srRFlRaPBpzypHw8skgW7f8bNMatvp8svOlFc5rCnpPMyeFAu+
-         1/rvqCTFynexUfBUicBJcJOC6H1CZDeuWNiPY8kzV1WSlZFBRjcMErop2+JrLAtvg1DF
-         aKG5zdmUfzjjLZbj0g18wlANBPod7aT5N/RF6f4FW98GrUzU7icRn5Sz/7yzmJ2raR27
-         yrJsXHI+rDfM1Ry2minZqoQs85Is74E+PADC3+rx+tkkrtXIXjalfKx+fvKTsEdWtgbq
-         4oV3qRJonSGXNPO+QrVxhnInnqt0BmuMec0nhqlL4F5qwORlQ9L/CaPiz/pU5tfk8xu9
-         xdYg==
+        with ESMTP id S242557AbiKRSRc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Nov 2022 13:17:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3595287552
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 10:16:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668795395;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=He7KaN/D9HK9g87/+Mt/xAsVhTgokNO4h0yf9aoy/GY=;
+        b=Y5CltPQk2w0EyDmerQqsDSjhPAKnPqErbn5ooqP7q/al0I6qU0Gh5B7EqKZPzJGqyMn/gC
+        In63KP0c3IK+E0qygsFhM0zpUQft6L3Jaa2oMIgz96lCP/YU3Nn8lnkB9s19DkchlPzVxe
+        00S2lty3U8/OHj7HBMZm14gMBElujlA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-663-OLwzk0-TNx6Qu7GC41DOAQ-1; Fri, 18 Nov 2022 13:16:34 -0500
+X-MC-Unique: OLwzk0-TNx6Qu7GC41DOAQ-1
+Received: by mail-wm1-f72.google.com with SMTP id z15-20020a1c4c0f000000b003cf6f80007cso1346365wmf.3
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 10:16:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nArehU+M3JvjBQMdLR3MkhWwl9kcg6nFoz5gcIdq8kE=;
-        b=RorwNkGkuAKlUc0H6FzunXPR6MhPeIYrI5gnOciPAA7bZtJ+YaPHkeyJmbuuwmGy8E
-         g7fAuR+xWQKM1/ZP7kMBDs8lLErUBT4tcyurl/3uLKkR/9SGgj6FGxVimM61ZFp2GK0H
-         X8amYuSk1wvZZUamgLSZKrMQ5FiM0+kNn7zsXwXMagLLQhNEcAjeUpJPYKXE4855Bw9g
-         X/VvntMjDXw1+h1qZd26IUVqZhKRH03fn9jBsVoHN5uuGGuWZ2jwtAmsbg2Lrypjc/R/
-         lHk+B5hiRN0p6mYR12fS7c2+RyXCXTI7WYeTP2A2e9NRMpd2g48JKIH+5crAw6l53Aj7
-         Y02g==
-X-Gm-Message-State: ANoB5pkuiGt1wfH6tWpSrdjgs+OCY8gHG3dveclpQYLQr146lL/jYlGq
-        hdFM02Sj1PlgNn7DC6czhV8zvg==
-X-Google-Smtp-Source: AA0mqf7gyEVm/lIvuTjTM0XanOw0gnpUP2EsrJLFSLzMo9IOee6S/iHkyQ0EtRQ8Unb8HSLYW0d9kQ==
-X-Received: by 2002:a63:4d0d:0:b0:477:14ea:cee6 with SMTP id a13-20020a634d0d000000b0047714eacee6mr6045535pgb.303.1668793479252;
-        Fri, 18 Nov 2022 09:44:39 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id g8-20020aa79f08000000b0056bc5ad4862sm3456021pfr.28.2022.11.18.09.44.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Nov 2022 09:44:38 -0800 (PST)
-Date:   Fri, 18 Nov 2022 17:44:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alexey Dobriyan <adobriyan@gmail.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
-Subject: Re: [PATCH] kvm, vmx: don't use "unsigned long" in
- vmx_vcpu_enter_exit()
-Message-ID: <Y3fEg/0PcgJi7mWd@google.com>
-References: <Y3e7UW0WNV2AZmsZ@p183>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=He7KaN/D9HK9g87/+Mt/xAsVhTgokNO4h0yf9aoy/GY=;
+        b=QOqTIAzhC31O39Yz6ILUBl7hnUBA9jQ1mQ6+V7tCK8AbgQ8nJtuTrKtbYyiPUIzG7j
+         WVgn2L2a5Jhxm0bb5H/dkWDhTM70xYfGI+yo1g1Tf/kpN62yFAdMCDPeVYpSkFW0T94n
+         egXL/Rm91txBoxDOqIRnqGF91x66+L0cXXol/JGcK2vnhFoouFNwUHNupkCXnknYjSbb
+         Bq7tG51fkJWkR/S0yLL3yhU8cDN+f5F7jkBAtZh6OCjnehZwOdRDBa21bRwplUxkzqZf
+         lb2gUmwgNBzXtLB3F91guXbI71R0IurynJR0hBVD3peqgaDEuCMvZwbZMpN3AnGJzZeV
+         UoMA==
+X-Gm-Message-State: ANoB5pn22GJ+7OGgagCBXm+7aAp4LUn04gkuvUBIW5mgVy32Hk9Zq18O
+        5opnNXotW/yfAbQRt9NAg9gZl7WEsvDHDW5zwFcEqHeICKodLS0JWvk9k4HktVGStJ8c7pyggDT
+        U6y6nGtcDNQRV
+X-Received: by 2002:a5d:4f85:0:b0:22e:35f4:9182 with SMTP id d5-20020a5d4f85000000b0022e35f49182mr4868365wru.121.1668795392880;
+        Fri, 18 Nov 2022 10:16:32 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7OA1XS2f6Trqui/9ejpEZL5kbR8dXUyqmf/ItYLlQ7PW8vFgiBB9/csUaH3GBlOF/v81qpBQ==
+X-Received: by 2002:a5d:4f85:0:b0:22e:35f4:9182 with SMTP id d5-20020a5d4f85000000b0022e35f49182mr4868356wru.121.1668795392648;
+        Fri, 18 Nov 2022 10:16:32 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id v1-20020a5d6101000000b002365cd93d05sm3984823wrt.102.2022.11.18.10.16.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Nov 2022 10:16:31 -0800 (PST)
+Message-ID: <01da30b6-4716-c346-70d2-9557bf4b09d5@redhat.com>
+Date:   Fri, 18 Nov 2022 19:16:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y3e7UW0WNV2AZmsZ@p183>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH v13 00/48] KVM: x86: hyper-v: Fine-grained TLB flush + L2
+ TLB flush features
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20221101145426.251680-1-vkuznets@redhat.com>
+ <Y2E5chB/9pZcRWi6@google.com> <878rkuskoj.fsf@ovpn-194-149.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <878rkuskoj.fsf@ovpn-194-149.brq.redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Nit (because I really suck at case-insensitive searches), please capitalize
-"KVM: VMX:" in the shortlog.
+On 11/1/22 17:29, Vitaly Kuznetsov wrote:
+>> Applies cleanly to e18d6152ff0f ("Merge tag 'kvm-riscv-6.1-1' of
+>> https://github.com/kvm-riscv/linux  into HEAD") and then rebases to kvm/queue without
+>> needing human assistance.
+> The miracle of git 😄
 
-On Fri, Nov 18, 2022, Alexey Dobriyan wrote:
-> __vmx_vcpu_run_flags() returns "unsigned int" and uses only 2 bits of it
-> so using "unsigned long" is very much pointless.
+Some more work was needed to apply these, but that at least forced me to 
+go through them. :)
 
-And __vmx_vcpu_run() and vmx_spec_ctrl_restore_host() take an "unsigned int" as
-well, i.e. actually relying on an "unsigned long" value won't actually work.
+I'll push them shortly to queue.
 
-On a related topic, this code in __vmx_vcpu_run() is unnecessarily fragile as it
-relies on VMX_RUN_VMRESUME being in bits 0-7.
+Paolo
 
-	/* Copy @flags to BL, _ASM_ARG3 is volatile. */
-	mov %_ASM_ARG3, %bl
-
-	...
-
-	/* Check if vmlaunch or vmresume is needed */
-	testb $VMX_RUN_VMRESUME, %bl
-
-The "byte" logic is another holdover, from when "flags" was just "launched" and
-was passed in as a boolean.  I'll send a proper patch to do:
-
-diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-index 0b5db4de4d09..5bd39f63497d 100644
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -69,8 +69,8 @@ SYM_FUNC_START(__vmx_vcpu_run)
-         */
-        push %_ASM_ARG2
- 
--       /* Copy @flags to BL, _ASM_ARG3 is volatile. */
--       mov %_ASM_ARG3B, %bl
-+       /* Copy @flags to EBX, _ASM_ARG3 is volatile. */
-+       mov %_ASM_ARG3L, %ebx
- 
-        lea (%_ASM_SP), %_ASM_ARG2
-        call vmx_update_host_rsp
-@@ -106,7 +106,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
-        mov (%_ASM_SP), %_ASM_AX
- 
-        /* Check if vmlaunch or vmresume is needed */
--       testb $VMX_RUN_VMRESUME, %bl
-+       test $VMX_RUN_VMRESUME, %ebx
- 
-        /* Load guest registers.  Don't clobber flags. */
-        mov VCPU_RCX(%_ASM_AX), %_ASM_CX
-@@ -128,7 +128,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
-        /* Load guest RAX.  This kills the @regs pointer! */
-        mov VCPU_RAX(%_ASM_AX), %_ASM_AX
- 
--       /* Check EFLAGS.ZF from 'testb' above */
-+       /* Check EFLAGS.ZF from 'test VMX_RUN_VMRESUME' above */
-        jz .Lvmlaunch
- 
-        /*
-
-
-> Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
-> ---
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
