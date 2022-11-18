@@ -2,181 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 440C362EBEB
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 03:27:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BD8062EBEE
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 03:29:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240495AbiKRC1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Nov 2022 21:27:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49754 "EHLO
+        id S240635AbiKRC3s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Nov 2022 21:29:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232004AbiKRC1d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Nov 2022 21:27:33 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2052.outbound.protection.outlook.com [40.107.244.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D8F117880;
-        Thu, 17 Nov 2022 18:27:32 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=X/drKptvTOZbVtO/vxSelr2ZnF5rjG83TA6MdVAKOsuFRPS5rUAk4MBU1RYVNWPHekN5ADf+DKy0VzEW9LxV+JLYoPJDOxyeTh9iv2mfsjSg0VT3+C9+93VUGIX3QpOxEUaMn3mGBH681hpOP+2vCSGQMsrx1RT8PzFouaK0+Odj7Mnr35te6WcPidq8OLL+jYV/netTTdwHAGT45dWk6gRXcedXtX1Z8XzkEssck//W87QN/v50ZQ7F6WZ86neRQ1DEAbGgm4iTOuPX8KJKStzulNBbk1b55oNAd8XjCiU3ZprSqUpVxv61X2qgJwfUS+II+XYMOCt8f87tEMi2dQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EJW501ICwp2dyy69+ccuWDN4HZ4lium1y7bfZVpwBnE=;
- b=XuqtrK/hHPBzRK4fZ9mVaS8KC0Y4gybFdc6d0AN1jSqKvp0Qj3J9nTIVE/PKfM8SlhF7/1LJt2sPTzccVAvDEJXFqHdNtSHSN0BcIHgLFm6z7XsETtgj7EBdIsxRt1+hDd9hy+ILT7StZ83DKL18h8QEnKMfT4Dy9lYXlOeRjAlzTc1r0N5Rjg6B1NH+1pWXC5oLVJN07TLGeGh0y18r6Vwmq2Fs0b6CNvjmzID3cQTYlLU1F7elVJyW8uTWKbCBx1y6yjskgyrNJZN5hVzqi0aijufWqe/bRJ+6C5GsfIpkHvNyHZGAapemLMhpas1QmQNjT6fMHcFjLnPtpsV2HQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EJW501ICwp2dyy69+ccuWDN4HZ4lium1y7bfZVpwBnE=;
- b=jB9gTUrwdun/i8SrSGT5y9We3vdnPSSRL4s582wrNpTM0x3yl5C+tRBLXxdF1CSGkb4adO79fSD7UoRJb2SFjD87X/+1RtYCvEJOAykxhCjf9DicxXDVo23OeDVJGb6YS0K5L3+LcbdPtGGoSQIRyJm6vZ/aPWydZhhXPKu5ES1Z+PTEUOz8pIeAkV8VFXUszBjAv+WjtvA95ClBo4tviat1z/SARoaYxaHKLmykx2wdWjJXntm95f1bCzZVgPe/CTvO4F5qm4igviDksPdWsBxX+2Vu8ct7kjFMH/b68CuT3Gc2eAV/3n2D+cZSb73a5Srgg2J8lssSqpCdbF2kCQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM6PR12MB4910.namprd12.prod.outlook.com (2603:10b6:5:1bb::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.20; Fri, 18 Nov
- 2022 02:27:30 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%7]) with mapi id 15.20.5813.017; Fri, 18 Nov 2022
- 02:27:30 +0000
-Date:   Thu, 17 Nov 2022 22:27:28 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Anthony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        with ESMTP id S232004AbiKRC3q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Nov 2022 21:29:46 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213974AF03;
+        Thu, 17 Nov 2022 18:29:44 -0800 (PST)
+Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ND126472Wz15Mbg;
+        Fri, 18 Nov 2022 10:29:18 +0800 (CST)
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 18 Nov 2022 10:29:41 +0800
+Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
+ Halt-polling fixes, cleanups and a new stat)
+To:     David Matlack <dmatlack@google.com>
+CC:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>, kvm <kvm@vger.kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        KVM ARM <kvmarm@lists.cs.columbia.edu>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Jon Cargille <jcargill@google.com>,
+        kvm-ppc <kvm-ppc@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Jim Mattson <jmattson@google.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Yang, Lixiao" <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v5 08/19] iommufd: PFN handling for iopt_pages
-Message-ID: <Y3btkI9kvCLDK0ul@nvidia.com>
-References: <0-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com>
- <8-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com>
- <BN9PR11MB527690223B13E5B57AC6636C8C099@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527690223B13E5B57AC6636C8C099@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR20CA0063.namprd20.prod.outlook.com
- (2603:10b6:208:235::32) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+        <wangyuan38@huawei.com>
+References: <20210925005528.1145584-1-seanjc@google.com>
+ <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
+ <YVHcY6y1GmvGJnMg@google.com>
+ <f37ab68c-61ce-b6fb-7a49-831bacfc7424@redhat.com>
+ <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
+ <CABgObfYtS6wiQe=BhF3t5usr7J6q4PWE4=rwZMMukfC9wT_6fA@mail.gmail.com>
+ <YVIAdVxc+q2UWB+J@google.com>
+ <32810c89-44c6-6780-9d05-e49f6b897b6e@huawei.com>
+ <Y3UboELxugwDJkIG@google.com>
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <e124456c-0691-460b-c471-00ac1d7b0254@huawei.com>
+Date:   Fri, 18 Nov 2022 10:29:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM6PR12MB4910:EE_
-X-MS-Office365-Filtering-Correlation-Id: 97babe43-699c-49de-1cf2-08dac90c7153
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: R6bQeRhGZsFqPyQWyD8RDrwGs+MS8vXp9UGYqm+UWOlmny2n06jZoVv0hoH8jvVwzhtO6HMBlKjxhEZt++HLj5aAAjkbB98+SziXpO+PqxdJQnPYVyvlhAbzlYQFzTYiCMcUv720PJm5jVAFWue5Fd3tKlXvFOwAoPVyYDZap2fYoUYHSabm/qY4MH5ywlH4u4qjUEwEdB4iO0t53mg3x8GwdL/UAdrScRY180wGlBXfJVovEslyF6T9gTumfJMnzdb6ohKx32zXm4HKZamQWT60kyMqM5DXdVU6MHmGtw2U/b7L7bkf8rjvUaSWZdNUovDZ/4FG5iXNRKSTNHwu3XtcYmIHNPewvYtcPWM5VaOJrS/o8AvG+uxmi1yar1zKzqV9VRpZV7Xo57iJiONVon2EK6Lp/fwfFpdb/kCRzD+c/VuXlqGBIS0Zg30Mnbrd78BwuHiA9AuA8tgEj1rYWvd3ISSdMjLapkrNhE15Tjg1m41WM4rQcEhv43Xl8EnwZDUET+57Oi7AKG5N3qLSIZ/eN1Fqd4K64b+Pr/DjRDcm+F6KZBDaAYeqU9JnUfoezH5CbpZHRU6RLXhl05O3wMiNpPLeTHkkdvmQ4YcCewjm5Ogg0xehFdWhz6ESFyP0
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(396003)(136003)(39860400002)(376002)(366004)(451199015)(36756003)(38100700002)(66946007)(7416002)(2906002)(4744005)(7406005)(4326008)(8936002)(86362001)(8676002)(316002)(54906003)(186003)(2616005)(6486002)(478600001)(66556008)(66476007)(26005)(5660300002)(41300700001)(6916009)(6506007)(6512007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9IwcaOu/RTmrpldGNljJwbzcTen3RzG1yYnM25cYn/t2N1i1MgxzQdfqZ9hI?=
- =?us-ascii?Q?FXsImiKlYUmbAhwCSUPtsPoj7piYnLDnRcVUUPe9uRg/pf4M/3oNaPZWRiJP?=
- =?us-ascii?Q?Yj7QzQQKvYWagv8QZj78B8N4GSGtZJNMvz8IiyY8JtGAPiz1DhJ4ayKD8FeJ?=
- =?us-ascii?Q?2Z4asNur63oufvlMADu1wX7Xdly6Q9cx/Hx7maEKUTENaPIbhWFrXmCuviir?=
- =?us-ascii?Q?aqgr/EPsrgpJ34ZlUp5XOcISrgOYBIgIXbQgkoQwSpNpFfzT8OX4WVaWxns9?=
- =?us-ascii?Q?C5LYmlVz60gGTZfAQA4oQq5V5D1ZpSt/IJ75Qf+z2gQy9galb0xDVi9QruVB?=
- =?us-ascii?Q?9x7tNeIoA4h891o9Vys2KSYfVoBSeoHwrL/nxHEC5SEG1AnzjmBydd4+MSXQ?=
- =?us-ascii?Q?FjnF9R60+SBTlrnTQdCm4ddD18+7ampumAbC0rcG7fDYPtmMUL+T0fr90y6W?=
- =?us-ascii?Q?pJ0UBKaPduXdjdwm2aLuA4mcDOZxh8lUMdb/B3DVw/mU/Mi7Kn0gloDz7Eb9?=
- =?us-ascii?Q?nHmmuuDO4d8Mx0DZ5pWZIFfPtBzI1djXoOM9/xqyoUbfKvY+mwXzRLJCYOgd?=
- =?us-ascii?Q?Zl6cCrltKU5qR7gooS4Kv0biUshJRZTa+9qnud1VJ/xdIB5OuTkZSCq5OqBf?=
- =?us-ascii?Q?hSJqnErYKHk91hQ4y//v064Yjyw+oMGDvTq5y4gxzo7bwDiARKFm2ht0iFMQ?=
- =?us-ascii?Q?3MBXZu0pEqkwh2GMS3uxbrvBxH64xq5s7NfZdJZAdffn7k/HEharwDvGwjX/?=
- =?us-ascii?Q?A9vOBDyUaW+1QHqIj7EABpujr+wLRxnGZJq31/ydG/1yg3JfRFTQAvrHqlMM?=
- =?us-ascii?Q?0SEPJRIBxEG77YP+HYDuQIqwFPp+KmCnGClINYU5izVc00DSqW4z8syoIFkI?=
- =?us-ascii?Q?Elk0U3IkgJ0F1smntwFhQspxgmc2hkHZPQyammR0uFsrM55nkIrIueXMs/QR?=
- =?us-ascii?Q?uMgXWd/ESnZ2zdt9GLEOCRIwdzUa4RFUIP9x0/zPs2DFnmyIgqukjoxVZvcl?=
- =?us-ascii?Q?WUZI6HmF+0qkb7Il1IcRQmWY/wH/q/xEmSQvTf5rmwvusDzgCI8VOS6pGNQX?=
- =?us-ascii?Q?eSXBZy0th30UhxA/7eBpjysB9tAlwQZVtjhU/PNgoZuQX2CskEbuQ8W8ztkE?=
- =?us-ascii?Q?5L0txfxsL+e/kk0hx4fXQc+iEYSG1xRi6i5SUx01IEqED0Z7Q4VZh1ixVdrO?=
- =?us-ascii?Q?4wCqMHchNdbj12RcmT2rNI7uT2oVni1RN2H0mGMO5RIfHUQ4PVVowhIUe7q1?=
- =?us-ascii?Q?tTVYTSVgiQrtMjqsQ6fuO5lGYACfj8fS+c1XUcyVFAjNrtab5aK1hqoTWFW2?=
- =?us-ascii?Q?PKYRBUeUeDi9vNaCBd/OrijhYQQ4rIYtrudUf+3UVDWRoPCJcV9udAutyMzp?=
- =?us-ascii?Q?oHe9+6Fa+FfGLuiurRl24lOODsmaCGeyBNwwYiAdxKtpTVdeg1RU+H8PYmII?=
- =?us-ascii?Q?pXRqa+tqaPvdUkCQR6UPr9fjG0u3+Tf4DW5NFa1C1plSBuSBoISyOdkNC1Od?=
- =?us-ascii?Q?jJrV2gDGnqYaJ+kBnUEyHgTqpAx9775rEQytz582DLiUJnk99/fPZelgAVXQ?=
- =?us-ascii?Q?Z9m7N6kDCC+YpD1yzfc=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 97babe43-699c-49de-1cf2-08dac90c7153
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2022 02:27:30.6127
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xS1yBG/kYC+jPHIIx4uD6W8MWACyvJG3IAXKDtXNkYWVpYTyHu9q/M7tLgIxxxNq
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4910
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <Y3UboELxugwDJkIG@google.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500023.china.huawei.com (7.185.36.83)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,URI_DOTEDU autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 18, 2022 at 02:24:23AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Thursday, November 17, 2022 5:01 AM
-> > +static void batch_skip_carry(struct pfn_batch *batch, unsigned int skip_pfns)
-> > +{
-> > +	if (!batch->total_pfns)
-> > +		return;
-> > +	skip_pfns = min(batch->total_pfns, skip_pfns);
-> > +	batch->pfns[0] += skip_pfns;
-> > +	batch->npfns[0] -= skip_pfns;
-> > +	batch->total_pfns -= skip_pfns;
-> > +}
-> 
-> You forgot to add the assertion which you replied to v4:
-> 
-> @@ -239,6 +239,8 @@ static void batch_skip_carry(struct pfn_batch *batch, unsigned int skip_pfns)
->  {
->         if (!batch->total_pfns)
->                 return;
-> +       if (IS_ENABLED(CONFIG_IOMMUFD_TEST))
-> +               WARN_ON(batch->total_pfns != batch->npfns[0]);
->         skip_pfns = min(batch->total_pfns, skip_pfns);
+
+
+On 2022/11/17 1:19, David Matlack wrote:
+> On Tue, Nov 15, 2022 at 11:28:56AM +0800, wangyanan (Y) wrote:
+>> Hi Sean, Paolo,
+>>
+>> I recently also notice the behavior change of param halt_poll_ns.
+>> Now it loses the ability to:
+>> 1) dynamically disable halt polling for all the running VMs
+>> by `echo 0 > /sys`
+>> 2) dynamically adjust the halt polling interval for all the
+>> running VMs by `echo * > /sys`
+>>
+>> While in our cases, we usually use above two abilities, and
+>> KVM_CAP_HALT_POLL is not used yet.
+> I think the right path forward is to make KVM_CAP_HALT_POLL a pure
+> override of halt_poll_ns, and restore the pre-existing behavior of
+> halt_poll_ns whenever KVM_CAP_HALT_POLL is not used. e.g. see the patch
+> below.
+Agree with this.
+kvm.halt_poll_ns serves like a legacy method to control halt polling
+globally. Once KVM_CAP_HALT_POLL is used for a VM, it should
+hold 100% responsibility to control on the VM, including disabling
+the polling. This strategy helps to keep the two mechanisms
+decoupled.
+> That will fix issues (1) and (2) above for any VM not using
+> KVM_CAP_HALT_POLL. If a VM is using KVM_CAP_HALT_POLL, it will ignore
+> all changes to halt_poll_ns. If we truly need a mechanism for admins to
+> disable halt-polling on VMs using KVM_CAP_HALT_POLL, we can introduce a
+> separate module parameter for that. But IMO, any setup that is
+> sophisticated enough to use KVM_CAP_HALT_POLL should also be able to use
+> KVM_CAP_HALT_POLL to disable halt polling.
 >
+> If everyone is happy with this approach I can test and send a real patch
+> to the mailing list.
+>
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index e6e66c5e56f2..253ad055b6ad 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -788,6 +788,7 @@ struct kvm {
+>   	struct srcu_struct srcu;
+>   	struct srcu_struct irq_srcu;
+>   	pid_t userspace_pid;
+> +	bool override_halt_poll_ns;
+>   	unsigned int max_halt_poll_ns;
+>   	u32 dirty_ring_size;
+>   	bool vm_bugged;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 43bbe4fde078..479d0d0da0b5 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1198,8 +1198,6 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+>   			goto out_err_no_arch_destroy_vm;
+>   	}
+>   
+> -	kvm->max_halt_poll_ns = halt_poll_ns;
+> -
+>   	r = kvm_arch_init_vm(kvm, type);
+>   	if (r)
+>   		goto out_err_no_arch_destroy_vm;
+> @@ -3371,7 +3369,7 @@ void kvm_sigset_deactivate(struct kvm_vcpu *vcpu)
+>   	sigemptyset(&current->real_blocked);
+>   }
+>   
+> -static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
+> +static void grow_halt_poll_ns(struct kvm_vcpu *vcpu, unsigned int max)
+>   {
+>   	unsigned int old, val, grow, grow_start;
+>   
+> @@ -3385,8 +3383,8 @@ static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
+>   	if (val < grow_start)
+>   		val = grow_start;
+>   
+> -	if (val > vcpu->kvm->max_halt_poll_ns)
+> -		val = vcpu->kvm->max_halt_poll_ns;
+> +	if (val > max)
+> +		val = max;
+>   
+>   	vcpu->halt_poll_ns = val;
+>   out:
+> @@ -3501,10 +3499,17 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+>   {
+>   	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
+>   	bool do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
+> +	unsigned int max_halt_poll_ns;
+>   	ktime_t start, cur, poll_end;
+> +	struct kvm *kvm = vcpu->kvm;
+>   	bool waited = false;
+>   	u64 halt_ns;
+>   
+> +	if (kvm->override_halt_poll_ns)
+> +		max_halt_poll_ns = kvm->max_halt_poll_ns;
+> +	else
+> +		max_halt_poll_ns = READ_ONCE(halt_poll_ns);
+> +
+>   	start = cur = poll_end = ktime_get();
+>   	if (do_halt_poll) {
+>   		ktime_t stop = ktime_add_ns(start, vcpu->halt_poll_ns);
+> @@ -3545,17 +3550,16 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+>   	if (halt_poll_allowed) {
+>   		if (!vcpu_valid_wakeup(vcpu)) {
+>   			shrink_halt_poll_ns(vcpu);
+> -		} else if (vcpu->kvm->max_halt_poll_ns) {
+> +		} else if (max_halt_poll_ns) {
+>   			if (halt_ns <= vcpu->halt_poll_ns)
+>   				;
+>   			/* we had a long block, shrink polling */
+> -			else if (vcpu->halt_poll_ns &&
+> -				 halt_ns > vcpu->kvm->max_halt_poll_ns)
+> +			else if (vcpu->halt_poll_ns && halt_ns > max_halt_poll_ns)
+>   				shrink_halt_poll_ns(vcpu);
+>   			/* we had a short halt and our poll time is too small */
+> -			else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
+> -				 halt_ns < vcpu->kvm->max_halt_poll_ns)
+> -				grow_halt_poll_ns(vcpu);
+> +			else if (vcpu->halt_poll_ns < max_halt_poll_ns &&
+> +				 halt_ns < max_halt_poll_ns)
+> +				grow_halt_poll_ns(vcpu, max_halt_poll_ns);
+>   		} else {
+>   			vcpu->halt_poll_ns = 0;
+>   		}
+> @@ -4588,6 +4592,7 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>   		if (cap->flags || cap->args[0] != (unsigned int)cap->args[0])
+>   			return -EINVAL;
+>   
+> +		kvm->override_halt_poll_ns = true;
+>   		kvm->max_halt_poll_ns = cap->args[0];
+>   		return 0;
+>   	}
+Looks sensible to me overall.
+I will look at the RFC series, thanks for your quick response.
 
-All the IS_ENABLED assertions are together in a later patch
+Yanan
+.
+>> On 2021/9/28 1:33, Sean Christopherson wrote:
+>>> On Mon, Sep 27, 2021, Paolo Bonzini wrote:
+>>>> On Mon, Sep 27, 2021 at 5:17 PM Christian Borntraeger
+>>>> <borntraeger@de.ibm.com> wrote:
+>>>>>> So I think there are two possibilities that makes sense:
+>>>>>>
+>>>>>> * track what is using KVM_CAP_HALT_POLL, and make writes to halt_poll_ns follow that
+>>>>> what about using halt_poll_ns for those VMs that did not uses KVM_CAP_HALT_POLL and the private number for those that did.
+>>>> Yes, that's what I meant.  David pointed out that doesn't allow you to
+>>>> disable halt polling altogether, but for that you can always ask each
+>>>> VM's userspace one by one, or just not use KVM_CAP_HALT_POLL. (Also, I
+>>>> don't know about Google's usecase, but mine was actually more about
+>>>> using KVM_CAP_HALT_POLL to *disable* halt polling on some VMs!).
+>>> I kinda like the idea if special-casing halt_poll_ns=0, e.g. for testing or
+>>> in-the-field mitigation if halt-polling is broken.  It'd be trivial to support, e.g.
+>> Do we have any plan to repost the diff as a fix?
+>> I would be very nice that this issue can be solved.
+>>
+>> Besides, I think we may need some Doc for users to describe
+>> how halt_poll_ns works with KVM_CAP_HALT_POLL, like
+>> "Documentation/virt/guest-halt-polling.rst".
+>>> @@ -3304,19 +3304,23 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+>>>                   update_halt_poll_stats(vcpu, start, poll_end, !waited);
+>>>
+>>>           if (halt_poll_allowed) {
+>>> +               max_halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
+>>> +               if (!max_halt_poll_ns || !halt_poll_ns)  <------ squish the max if halt_poll_ns==0
+>>> +                       max_halt_poll_ns = halt_poll_ns;
+>>> +
+>> Does this mean that KVM_CAP_HALT_POLL will not be able to
+>> disable halt polling for a VM individually when halt_poll_ns !=0?
+>>>                   if (!vcpu_valid_wakeup(vcpu)) {
+>>>                           shrink_halt_poll_ns(vcpu);
+>>> -               } else if (vcpu->kvm->max_halt_poll_ns) {
+>>> +               } else if (max_halt_poll_ns) {
+>>>                           if (halt_ns <= vcpu->halt_poll_ns)
+>>>                                   ;
+>>>                           /* we had a long block, shrink polling */
+>>>                           else if (vcpu->halt_poll_ns &&
+>>> -                                halt_ns > vcpu->kvm->max_halt_poll_ns)
+>>> +                                halt_ns > max_halt_poll_ns)
+>>>                                   shrink_halt_poll_ns(vcpu);
+>>>                           /* we had a short halt and our poll time is too small */
+>>> -                       else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
+>>> -                                halt_ns < vcpu->kvm->max_halt_poll_ns)
+>>> -                               grow_halt_poll_ns(vcpu);
+>>> +                       else if (vcpu->halt_poll_ns < max_halt_poll_ns &&
+>>> +                                halt_ns < max_halt_poll_ns)
+>>> +                               grow_halt_poll_ns(vcpu, max_halt_poll_ns);
+>>>                   } else {
+>>>                           vcpu->halt_poll_ns = 0;
+>>>                   }
+>>> _______________________________________________
+>>> kvmarm mailing list
+>>> kvmarm@lists.cs.columbia.edu
+>>> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>>> .
+>> Thanks,
+>> Yanan
+> .
 
-Thanks,
-Jason
