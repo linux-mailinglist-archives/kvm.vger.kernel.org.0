@@ -2,199 +2,378 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1637562F03C
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 09:57:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D1FA762F083
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 10:07:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241356AbiKRI5P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Nov 2022 03:57:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48284 "EHLO
+        id S241707AbiKRJHs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Nov 2022 04:07:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241544AbiKRI5D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Nov 2022 03:57:03 -0500
-Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8822360359
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 00:57:02 -0800 (PST)
-Received: from pps.filterd (m0127843.ppops.net [127.0.0.1])
-        by mx0b-002c1b01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AI1k9m4007006;
-        Fri, 18 Nov 2022 00:56:52 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=proofpoint20171006;
- bh=I8JUFT69+OWmsT+HxExPfmOIQL6yz3SGvHoU24fXkgQ=;
- b=O6nmqXfkKRJX31Gb1qldC7IdOGW93Gioj30Ym+Sp+ba+Bm0OzNVAZ9K07vYOvrIb212A
- CQ+x5VPXBKMe4AsgeHxtK5LF/fyDhYvt61zCsEhKkUleApUrR8Hm8gG5+RVWow+0sFVx
- /g1RQg2SyeVScsrhYPVWtaMxjUrjb2oj97T1btNa50iIc9sRBjqhx6MMpUT9ziUO7VyX
- 8Ww3rLwostOW20L4Qc1mnDZIJE8PPmR3019w7pE6vAL2UTIg6woDbmPE27FqKqSfsXmw
- XIcXAl1N67kjFBVuNp38lPR5pFvzwxmgVPM1XzYEBJ6RBsbqlRlImkC0Vkei98vjNRWX sw== 
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2169.outbound.protection.outlook.com [104.47.55.169])
-        by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 3kx0p5gn79-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Nov 2022 00:56:52 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n0fPYXzAbt1Gd81GdL/LyjXi89amfmoedou23u/1Pc94XwFC76fRC4P1ySAW4bXkXECy41TVldm9er15w9o/f7bVEvP+Y5pP/13WuS4AOd7Ty7e/n+ZOge3N7rYWDeQotaYWplr87KyuuM5lWtrygfw+8vFELfo2j23TNiSs9y9u8JenZ6my6MmxX5k5GQbm9WzqQaUCu/1xn+4iKy9rMywsLw3//wOclgJiQgoIqKfrFhpASRzyuBEA5YsZ97+W7RjNfB4wNquvgMeuYJ385gru2WfKfe50EwD328I2rcaRdDM0KWNuNYZ+3MsuDv0IOgPN5Sizds/U1O6GqExoWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I8JUFT69+OWmsT+HxExPfmOIQL6yz3SGvHoU24fXkgQ=;
- b=I1Su7ecxYWSMiW4MFMVG3NsCaWl9nqgXw5JT7y4D9vGAYyfnKbpTCzRPTG5ukdNBV8aaMABe+WZCjahIdtE0HYzzqO1ZqUJ8wSqpeGgzeUZ2RofcxvxShjYyVrI36Sb4gQcF0CO59jchENoRMl2vOtxBNNnYgNMO8Jj46F7zvqE42gLkI5KWQ+emA0mIcbd6QqCbRBzysmPqbYJBlbFbwa+5etaM08DwJzFZRFC6blwTP+flcfBD6ev69Dsww7eIpqTjSvn8WDxkfuRK/EFDWFSCU02NdfRW1FpOE4Er4JJgyechcuxrwMta/6Mj50KhX9m8Wn3aj9Oy7f4axv1W7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I8JUFT69+OWmsT+HxExPfmOIQL6yz3SGvHoU24fXkgQ=;
- b=UmpP7psQwIhdB+sjk6EuuhGI1aRA6bVzUXE1znAVMD5VEsCHWJhP1GP3O9KqXfcRZfvHxLY7RRD61z/0zG9v2Pye8G96JluZp8XR+qDpPQWpLXk32bMDX9c6srEtzH8LFzQxwKtiMm+/CNBSbh4vU4s7fWdJQf8xa8lN2nQbkd8bRjm4o6DsTzPA+F9ABx/hsKer4RKzoNBf+ROfiCM5gSYFPDgeOjpM3zLTIwMo7jz1xEPzGCG68bvgeNEy9S53DRVf7Hbi7Ml3CoJuhIAIlEPO9nHv4jbeSu0Z2KZmqdvze0KdCi2tk/kCiSMWfEvkW1Alt/7S39BJSDghD2Ls7Q==
-Received: from CO6PR02MB7555.namprd02.prod.outlook.com (2603:10b6:303:b3::20)
- by CO6PR02MB7811.namprd02.prod.outlook.com (2603:10b6:303:a4::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.9; Fri, 18 Nov
- 2022 08:56:51 +0000
-Received: from CO6PR02MB7555.namprd02.prod.outlook.com
- ([fe80::8779:9a4f:69d6:a301]) by CO6PR02MB7555.namprd02.prod.outlook.com
- ([fe80::8779:9a4f:69d6:a301%6]) with mapi id 15.20.5813.019; Fri, 18 Nov 2022
- 08:56:51 +0000
-Message-ID: <3f22abb6-ba6a-cf3c-b3b1-f7dfb172670c@nutanix.com>
-Date:   Fri, 18 Nov 2022 14:26:37 +0530
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.4.1
-Subject: Re: [PATCH v7 3/4] KVM: arm64: Dirty quota-based throttling of vcpus
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com,
-        borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org,
-        Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-References: <20221113170507.208810-1-shivam.kumar1@nutanix.com>
- <20221113170507.208810-4-shivam.kumar1@nutanix.com>
- <86v8ndnwep.wl-maz@kernel.org>
-From:   Shivam Kumar <shivam.kumar1@nutanix.com>
-In-Reply-To: <86v8ndnwep.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0192.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:e8::17) To CO6PR02MB7555.namprd02.prod.outlook.com
- (2603:10b6:303:b3::20)
+        with ESMTP id S241176AbiKRJHr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Nov 2022 04:07:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 297EA86A5C
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 01:06:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668762405;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Hr5QQVNLV+xo6djdb5pphhYxpRsXQdhsRF7Y9pLIjMM=;
+        b=dSieaRrwPlWIBA2fpsL3HSN2uf3n/4XoaXfpOOIBDj6d/tJur/LRoJX9yq/XgxWL76HOu4
+        v1KhXrW0FDYfUR4znbfJsmncgKfbWFuru8gHMmHHykGn6HuVdGj0PzkIhnXiYwLLaP6NHm
+        EgxpO3aSppJVKdhMSjB75GE/urwg1ec=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-511-Dy74fiASPZa9_BJEGxiSig-1; Fri, 18 Nov 2022 04:06:43 -0500
+X-MC-Unique: Dy74fiASPZa9_BJEGxiSig-1
+Received: by mail-wm1-f72.google.com with SMTP id 84-20020a1c0257000000b003cfe9e8e3f9so2000621wmc.0
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 01:06:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Hr5QQVNLV+xo6djdb5pphhYxpRsXQdhsRF7Y9pLIjMM=;
+        b=sJhxMQ6igbMBuX/Up7B2AlOSasUEFMrpreljZN0LlS07/zKasXESVamSh4BlPQKb15
+         I0o0u/V3RLSIYZ7NA8xECnbSelCiVIVIE7jXv+5wIxkIgaIsW3ECjYcA6N9IhEv4aHHK
+         bxIXvADppdAvfI0lYf1hic86VlBiF60evw/uAJqkKMNfU2cnR4AuLFnG3jo3jytGgGiH
+         M2IZ8vZO/6PR3XVwR/MLeNU07RYVn/4ic7CjelCYP209tmcysnHATcSg+Fv8FsEoY0CJ
+         RHY2+MWhiTLbEaMYPh68yxUb6I3aA1bdrRhP76AhgIZAM2zojdjAN8qaA0spp3MAWkuV
+         BUhg==
+X-Gm-Message-State: ANoB5pl1iHw2wNbB5/CktcQjqmc7nG3OEp+r2Pic9SdCdHPRNT+aKz2S
+        rjwkado2ILecIBR140Xf8aEg13wH61n0dRLsRkMx1opnP8YnHFWM5pXW5+pprHAgbs0y7zb+58N
+        0hYBY1SbIfX0J
+X-Received: by 2002:a1c:7504:0:b0:3cf:6b10:ca8d with SMTP id o4-20020a1c7504000000b003cf6b10ca8dmr7991892wmc.44.1668762402654;
+        Fri, 18 Nov 2022 01:06:42 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6B6EnEPNsZRf7I2/qtD7VrCjGl51ZV8jjJP1nI8NNjHgJIqCNkjvZEW/4Sq3PavDJqrHTsnA==
+X-Received: by 2002:a1c:7504:0:b0:3cf:6b10:ca8d with SMTP id o4-20020a1c7504000000b003cf6b10ca8dmr7991864wmc.44.1668762402285;
+        Fri, 18 Nov 2022 01:06:42 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id r5-20020a5d6945000000b00241bfce14e9sm1361829wrw.107.2022.11.18.01.06.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Nov 2022 01:06:41 -0800 (PST)
+Message-ID: <5ba04a92-d2c7-4e5f-2bfc-5cea4a08cea2@redhat.com>
+Date:   Fri, 18 Nov 2022 10:06:38 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO6PR02MB7555:EE_|CO6PR02MB7811:EE_
-X-MS-Office365-Filtering-Correlation-Id: 64f8a309-0b34-4e97-5523-08dac942d364
-x-proofpoint-crosstenant: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dWPgatwUxfLIXmCSa3T3LdlK/v2cejELE5d+ox7CcxwejIGWGRf4todv6r/oZpvIz6bcrzfwOruPAZw49KoAScWxpcn7x3h9E1g1RggBcYazyYXJbZ/usFZ+g43V+jDU0lXbGGezqO927VxE+upGFQEdplBMMa28KBCQwMwbgXWs9PeldQBchjqDjoIRTBDcqOFoAOF/zzFd3dMCx7QQDfYQZZcz7yaR6FXMPxveXql9C68IyyHPI5GIPgP50Zyb05P9rfFbQ0Gln8CD8Mcqt+kdQCwpTq3d4u5WjDcdGavcpI/7k3n6D9wvYh/RYzq+D9Pany82s8CmaUrmJERUWbdVtpVJexKXu2Tsw4sWMGV8dIjDaozwhw3Nt/BH/HH9XTpJUgfgwPKP1tpmbe2SSMNYzd/nqVqExGoagi25OvGWU0704XvyCuCS3uLtBn4JxeCIaOxmz3MNAa4F34y9oZMtq4/GTDvo/mwdOObHX9QH8uShXw7XSuk/CyQU6dM62EWwOg/dgcFGCo0dOsR23HIXDhlU+TcjQzlCRDT9cH+x90oUOssZ1KwkKhalEOLleXUR2/8lB8GlE5OpoidDeZ5LWpGXjHAnoUpyhijyX0LS9v7n3+FlazzUHj87SozPi11tjmsHz2kGntkHzwZPt2cejh8eCyAQJtKKVpkszRVEHFVRJCvELZutl4Qxrz8IobsAJdchmQvNZudKrhOpCDLFsqpvo+iiWR3n0BZl0HITdVJdCOR5haoEZF+8c4jJ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR02MB7555.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(396003)(346002)(376002)(366004)(39860400002)(451199015)(36756003)(31696002)(86362001)(38100700002)(6506007)(53546011)(54906003)(31686004)(6916009)(316002)(6486002)(478600001)(6666004)(107886003)(5660300002)(186003)(8936002)(83380400001)(15650500001)(2906002)(2616005)(6512007)(41300700001)(8676002)(66946007)(66556008)(66476007)(4326008)(14143004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UFF3NXJ5anFodFd2NnA5TmIyS25RcU44aDJlaDBNOTc1K2NFeHVRWWN5TkV5?=
- =?utf-8?B?R1pRWWtjazBTeDBGaFVwZzg0ZVdTVEd3OVRjVlI1RHFWSkcwdVFnNVhJVzAz?=
- =?utf-8?B?S2dTWDdRY1FsaTlWQjNzSk9uMVZkN2lHQ3FpQno5Um1CamJxdUkvbjNDN1Z3?=
- =?utf-8?B?aC96UlF3R1hSM04vSjJPZmhOR1UxMko3TTFpaVJSbUlsblFqMUd5VnlaNkI4?=
- =?utf-8?B?TTR2WmFucllBZ2ZFL21vdTgzVHlzbHRvREhsaURadjAxU3ZNT2FVL0doSUxN?=
- =?utf-8?B?cSsyRi8ySXZXQ0ZLMFdIY2k3SzJaaHplYWRHWGhaem9FZjZCWkRSQ1ZjLzZx?=
- =?utf-8?B?eTJNbTdaMXg2blVqdmt3cTRhM0o0K3dYaE54TytiQmZqeUducUhPRmd3a2J4?=
- =?utf-8?B?dEtaMHJMVDdndmNNUm9NSFVIM2lQR0dQS2lJTUdFMXh4NFd3MVlJUnFvK2lV?=
- =?utf-8?B?dmZmbFNMTlcxWmFtelBOU3ZIT1ZyNlBCZW84bHB6TTQ3aEREaTFVTDNRNENN?=
- =?utf-8?B?Yy9YNGJUb0MrdEI4M2ozZGhpL05paVZ0WmpWT2lqVmpRdkQ0Qm15RXYzR1JX?=
- =?utf-8?B?djE0OGVoV0cyNWhtTDA0SGpUc01PQU1uSnVqcEhVUnZua3BUNnhvUDdSWTI2?=
- =?utf-8?B?emY4djhMeTJlWnVtODBEYWNXMS81OVMxTjd3eEtpN2wzSHROanEwUW5waU1k?=
- =?utf-8?B?ZjRYNGUzS0U3S014aHVKaFlpVWt5WjhUdzFvYUgycU1wUnM3UldjLzlkVjZG?=
- =?utf-8?B?NUZjMkdISHRZTDhFOHA0TlF4elRNaEpJN1hFc0UwZWgvb3h0ZFVpV093WUN4?=
- =?utf-8?B?Zmloem1xQzJ0TjRSMzUzQnBQSTdOejgzUGViYUFlL2kzWEFzUlJrUktlWjUv?=
- =?utf-8?B?ZG1LOXJ2R1E5bUthaDI3NitoTlJ4UkZJUGJnaHVBV1g4UHRyamZQWEdVQk1B?=
- =?utf-8?B?Y3NmbFdxa2duekxmay9RNkMzb2dkSklWYnpkSnQrbmx4SzI2dGpxT282bUtP?=
- =?utf-8?B?ZVF1MWpvRytVd3JyOThzNFVYeDdFWTNKV1J1enVJd2ZuS25hUDE4ZHY0aDAv?=
- =?utf-8?B?dkNQSk1sOXNUaXluc3U4Qk16YUZXMFdGWGg1UmxRNiszUm9uNkZtcnVlcU9n?=
- =?utf-8?B?dG9xSjMvZlh3YUpUUGxwVU43bjNpT0JDSXh1eEpsM0QzYkI4VGw2OFBrYWdI?=
- =?utf-8?B?Y0ZwWG1jWVNja2tIaEgrTFUvQ1M5Tnk4bUpEMVhkaUoyQm5KM1FzU2dvNVFI?=
- =?utf-8?B?Nk5icnJLSnRNWDhUUHIzQUVkVm5VWEh1VzZNYmVwdmhqTjlxVWZCWUpWemcy?=
- =?utf-8?B?QmJRd202cVFJRVljakFxQkFBeGJKUVk4NUpocEZCQ2l0bTR2MEJDVy9sczRI?=
- =?utf-8?B?ZUZQMmwzaWh2ZGZzZ0ZkZTVzcHl1MG11TGEvWU1LWTJXMjRTTmQ2eFdYcWhl?=
- =?utf-8?B?SnZnV2gwUUZ1UUtIZ3BoUXhzVkhuVHl6ejY3c0hUQ3NIZHRRSm5aSnZpUGts?=
- =?utf-8?B?Myt6NkMxbllGam05eUw0V3RvT0duVVB0NzhmcVpqSTl3V2M5UFlKM2Z0UHVt?=
- =?utf-8?B?UnVtM3pTVURoZUIrbEZJMDFQVVRRdDJ0OHEvVHphdTVxNFhPRjBOb1ROUVNz?=
- =?utf-8?B?VXk2NmcwR05BWkVWR08xNTZnM0I5OURPYURMMEZOY3ZaUmNFamsrLzlVZFNI?=
- =?utf-8?B?QkVGV2tTUXRDT015d2xabm40QlMwVVN4NlN2WHgweU1lRTZDdkpoTUY0SXRN?=
- =?utf-8?B?WU5qWDNpM2dCZnRULzBEQWpxRG9qQUJjQkFMUGV2T0dSTjVKVGtsZnVqTnpL?=
- =?utf-8?B?QWNOR2c0cjBKZzJ5U3FlZzFvbHExd25IUFZGWVc5SGZUSm53WHhSb08rbFMw?=
- =?utf-8?B?WXJPNmZEejhsV3BrazdVZGFFbllXNFBiMlRkbUF1VnV5YUlLK0dwODdCL2NL?=
- =?utf-8?B?d3plR2xnVHNBUDhuZFQrcnFjR1pqVjBtSytVeVM3QUJWT0Q5dHZ5RzQ3RVNq?=
- =?utf-8?B?NzBvOFI4dk51MU1UZjdiTUVBMUk5dElYU2Y3S1FUT3VqUHU4aUgvVGJKREk4?=
- =?utf-8?B?ZnlYQkFZSFlLV3pNRFc3ODNRRzJwUGd5WXVGdS9OSWdZcHdOOTZWbVB1M1hm?=
- =?utf-8?B?OEQzazltSXU0dzBoYWhpaWRNc3dzakIyUDVGeWhkNEw5TG9NUEFuY1BDcnB2?=
- =?utf-8?B?MUJVemJCOFYwZVB5UmticjFIMzNqY1ZXYXhOdzFnUTFYSWdmd2tEQ2RnRndY?=
- =?utf-8?B?ZXZaWHRoemR1ZFpkVjlrdnpqcmRBPT0=?=
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 64f8a309-0b34-4e97-5523-08dac942d364
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR02MB7555.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2022 08:56:51.0279
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2Rtdal86kKx5swwLDx32RYcoW6m61mF49CY9/3dKjBnyr3K+IioIHdSPQoWlZP5EDlog+Y645YxxsSHrly/GGNXNR+qxlavFMY3nAyzRMS4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR02MB7811
-X-Proofpoint-GUID: 1FP6Y89lUXuMVOdvcmtPw8LNcZUjhzvz
-X-Proofpoint-ORIG-GUID: 1FP6Y89lUXuMVOdvcmtPw8LNcZUjhzvz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-17_06,2022-11-17_01,2022-06-22_01
-X-Proofpoint-Spam-Reason: safe
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v5 05/19] iommufd: Document overview of iommufd
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>, bpf@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>
+Cc:     Anthony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Lixiao Yang <lixiao.yang@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+References: <5-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <5-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
+On 11/16/22 22:00, Jason Gunthorpe wrote:
+> From: Kevin Tian <kevin.tian@intel.com>
+>
+> Add iommufd into the documentation tree, and supply initial documentation.
+> Much of this is linked from code comments by kdoc.
+>
+> Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> Signed-off-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  Documentation/userspace-api/index.rst   |   1 +
+>  Documentation/userspace-api/iommufd.rst | 223 ++++++++++++++++++++++++
+>  2 files changed, 224 insertions(+)
+>  create mode 100644 Documentation/userspace-api/iommufd.rst
+>
+> diff --git a/Documentation/userspace-api/index.rst b/Documentation/userspace-api/index.rst
+> index c78da9ce0ec44e..f16337bdb8520f 100644
+> --- a/Documentation/userspace-api/index.rst
+> +++ b/Documentation/userspace-api/index.rst
+> @@ -25,6 +25,7 @@ place where this information is gathered.
+>     ebpf/index
+>     ioctl/index
+>     iommu
+> +   iommufd
+>     media/index
+>     netlink/index
+>     sysfs-platform_profile
+> diff --git a/Documentation/userspace-api/iommufd.rst b/Documentation/userspace-api/iommufd.rst
+> new file mode 100644
+> index 00000000000000..8b1392fd2e3487
+> --- /dev/null
+> +++ b/Documentation/userspace-api/iommufd.rst
+> @@ -0,0 +1,223 @@
+> +.. SPDX-License-Identifier: GPL-2.0+
+> +
+> +=======
+> +IOMMUFD
+> +=======
+> +
+> +:Author: Jason Gunthorpe
+> +:Author: Kevin Tian
+> +
+> +Overview
+> +========
+> +
+> +IOMMUFD is the user API to control the IOMMU subsystem as it relates to managing
+> +IO page tables from userspace using file descriptors. It intends to be general
+> +and consumable by any driver that wants to expose DMA to userspace. These
+> +drivers are eventually expected to deprecate any internal IOMMU logic
+> +they may already/historically implement (e.g. vfio_iommu_type1.c).
+> +
+> +At minimum iommufd provides universal support of managing I/O address spaces and
+> +I/O page tables for all IOMMUs, with room in the design to add non-generic
+> +features to cater to specific hardware functionality.
+> +
+> +In this context the capital letter (IOMMUFD) refers to the subsystem while the
+> +small letter (iommufd) refers to the file descriptors created via /dev/iommu for
+> +use by userspace.
+> +
+> +Key Concepts
+> +============
+> +
+> +User Visible Objects
+> +--------------------
+> +
+> +Following IOMMUFD objects are exposed to userspace:
+> +
+> +- IOMMUFD_OBJ_IOAS, representing an I/O address space (IOAS), allowing map/unmap
+> +  of user space memory into ranges of I/O Virtual Address (IOVA).
+> +
+> +  The IOAS is a functional replacement for the VFIO container, and like the VFIO
+> +  container it copies an IOVA map to a list of iommu_domains held within it.
+> +
+> +- IOMMUFD_OBJ_DEVICE, representing a device that is bound to iommufd by an
+> +  external driver.
+> +
+> +- IOMMUFD_OBJ_HW_PAGETABLE, representing an actual hardware I/O page table
+> +  (i.e. a single struct iommu_domain) managed by the iommu driver.
+> +
+> +  The IOAS has a list of HW_PAGETABLES that share the same IOVA mapping and
+> +  it will synchronize its mapping with each member HW_PAGETABLE.
+> +
+> +All user-visible objects are destroyed via the IOMMU_DESTROY uAPI.
+> +
+> +The diagram below shows relationship between user-visible objects and kernel
+> +datastructures (external to iommufd), with numbers referred to operations
+> +creating the objects and links::
+> +
+> +  _________________________________________________________
+> + |                         iommufd                         |
+> + |       [1]                                               |
+> + |  _________________                                      |
+> + | |                 |                                     |
+> + | |                 |                                     |
+> + | |                 |                                     |
+> + | |                 |                                     |
+> + | |                 |                                     |
+> + | |                 |                                     |
+> + | |                 |        [3]                 [2]      |
+> + | |                 |    ____________         __________  |
+> + | |      IOAS       |<--|            |<------|          | |
+> + | |                 |   |HW_PAGETABLE|       |  DEVICE  | |
+> + | |                 |   |____________|       |__________| |
+> + | |                 |         |                   |       |
+> + | |                 |         |                   |       |
+> + | |                 |         |                   |       |
+> + | |                 |         |                   |       |
+> + | |                 |         |                   |       |
+> + | |_________________|         |                   |       |
+> + |         |                   |                   |       |
+> + |_________|___________________|___________________|_______|
+> +           |                   |                   |
+> +           |              _____v______      _______v_____
+> +           | PFN storage |            |    |             |
+> +           |------------>|iommu_domain|    |struct device|
+> +                         |____________|    |_____________|
+> +
+> +1. IOMMUFD_OBJ_IOAS is created via the IOMMU_IOAS_ALLOC uAPI. An iommufd can
+> +   hold multiple IOAS objects. IOAS is the most generic object and does not
+> +   expose interfaces that are specific to single IOMMU drivers. All operations
+> +   on the IOAS must operate equally on each of the iommu_domains inside of it.
+> +
+> +2. IOMMUFD_OBJ_DEVICE is created when an external driver calls the IOMMUFD kAPI
+> +   to bind a device to an iommufd. The driver is expected to implement a set of
+> +   ioctls to allow userspace to initiate the binding operation. Successful
+> +   completion of this operation establishes the desired DMA ownership over the
+> +   device. The driver must also set the driver_managed_dma flag and must not
+> +   touch the device until this operation succeeds.
+> +
+> +3. IOMMUFD_OBJ_HW_PAGETABLE is created when an external driver calls the IOMMUFD
+> +   kAPI to attach a bound device to an IOAS. Similarly the external driver uAPI
+> +   allows userspace to initiate the attaching operation. If a compatible
+> +   pagetable already exists then it is reused for the attachment. Otherwise a
+> +   new pagetable object and iommu_domain is created. Successful completion of
+> +   this operation sets up the linkages among IOAS, device and iommu_domain. Once
+> +   this completes the device could do DMA.
+> +
+> +   Every iommu_domain inside the IOAS is also represented to userspace as a
+> +   HW_PAGETABLE object.
+> +
+> +   .. note::
+> +
+> +      Future IOMMUFD updates will provide an API to create and manipulate the
+> +      HW_PAGETABLE directly.
+> +
+> +A device can only bind to an iommufd due to DMA ownership claim and attach to at
+> +most one IOAS object (no support of PASID yet).
+> +
+> +Kernel Datastructure
+> +--------------------
+> +
+> +User visible objects are backed by following datastructures:
+> +
+> +- iommufd_ioas for IOMMUFD_OBJ_IOAS.
+> +- iommufd_device for IOMMUFD_OBJ_DEVICE.
+> +- iommufd_hw_pagetable for IOMMUFD_OBJ_HW_PAGETABLE.
+> +
+> +Several terminologies when looking at these datastructures:
+> +
+> +- Automatic domain - refers to an iommu domain created automatically when
+> +  attaching a device to an IOAS object. This is compatible to the semantics of
+> +  VFIO type1.
+> +
+> +- Manual domain - refers to an iommu domain designated by the user as the
+> +  target pagetable to be attached to by a device. Though currently there are
+> +  no uAPIs to directly create such domain, the datastructure and algorithms
+> +  are ready for handling that use case.
+> +
+> +- In-kernel user - refers to something like a VFIO mdev that is using the
+> +  IOMMUFD access interface to access the IOAS. This starts by creating an
+> +  iommufd_access object that is similar to the domain binding a physical device
+> +  would do. The access object will then allow converting IOVA ranges into struct
+> +  page * lists, or doing direct read/write to an IOVA.
+> +
+> +iommufd_ioas serves as the metadata datastructure to manage how IOVA ranges are
+> +mapped to memory pages, composed of:
+> +
+> +- struct io_pagetable holding the IOVA map
+> +- struct iopt_areas representing populated portions of IOVA
+> +- struct iopt_pages representing the storage of PFNs
+> +- struct iommu_domain representing the IO page table in the IOMMU
+> +- struct iopt_pages_access representing in-kernel users of PFNs
+> +- struct xarray pinned_pfns holding a list of pages pinned by in-kernel users
+> +
+> +Each iopt_pages represents a logical linear array of full PFNs. The PFNs are
+> +ultimately derived from userspave VAs via an mm_struct. Once they have been
+> +pinned the PFNs are stored in IOPTEs of an iommu_domain or inside the pinned_pages
+> +xarray if they have been pinned through an iommufd_access.
+> +
+> +PFN have to be copied between all combinations of storage locations, depending
+> +on what domains are present and what kinds of in-kernel "software access" users
+> +exists. The mechanism ensures that a page is pinned only once.
+> +
+> +An io_pagetable is composed of iopt_areas pointing at iopt_pages, along with a
+> +list of iommu_domains that mirror the IOVA to PFN map.
+> +
+> +Multiple io_pagetable-s, through their iopt_area-s, can share a single
+> +iopt_pages which avoids multi-pinning and double accounting of page
+> +consumption.
+> +
+> +iommufd_ioas is sharable between subsystems, e.g. VFIO and VDPA, as long as
+> +devices managed by different subsystems are bound to a same iommufd.
+> +
+> +IOMMUFD User API
+> +================
+> +
+> +.. kernel-doc:: include/uapi/linux/iommufd.h
+> +
+> +IOMMUFD Kernel API
+> +==================
+> +
+> +The IOMMUFD kAPI is device-centric with group-related tricks managed behind the
+> +scene. This allows the external drivers calling such kAPI to implement a simple
+> +device-centric uAPI for connecting its device to an iommufd, instead of
+> +explicitly imposing the group semantics in its uAPI as VFIO does.
+> +
+> +.. kernel-doc:: drivers/iommu/iommufd/device.c
+> +   :export:
+> +
+> +.. kernel-doc:: drivers/iommu/iommufd/main.c
+> +   :export:
+> +
+> +VFIO and IOMMUFD
+> +----------------
+> +
+> +Connecting a VFIO device to iommufd can be done in two ways.
+> +
+> +First is a VFIO compatible way by directly implementing the /dev/vfio/vfio
+> +container IOCTLs by mapping them into io_pagetable operations. Doing so allows
+> +the use of iommufd in legacy VFIO applications by symlinking /dev/vfio/vfio to
+> +/dev/iommufd or extending VFIO to SET_CONTAINER using an iommufd instead of a
+> +container fd.
+> +
+> +The second approach directly extends VFIO to support a new set of device-centric
+> +user API based on aforementioned IOMMUFD kernel API. It requires userspace
+> +change but better matches the IOMMUFD API semantics and easier to support new
+> +iommufd features when comparing it to the first approach.
+> +
+> +Currently both approaches are still work-in-progress.
+> +
+> +There are still a few gaps to be resolved to catch up with VFIO type1, as
+> +documented in iommufd_vfio_check_extension().
+> +
+> +Future TODOs
+> +============
+> +
+> +Currently IOMMUFD supports only kernel-managed I/O page table, similar to VFIO
+> +type1. New features on the radar include:
+> +
+> + - Binding iommu_domain's to PASID/SSID
+> + - Userspace page tables, for ARM, x86 and S390
+> + - Kernel bypass'd invalidation of user page tables
+> + - Re-use of the KVM page table in the IOMMU
+> + - Dirty page tracking in the IOMMU
+> + - Runtime Increase/Decrease of IOPTE size
+> + - PRI support with faults resolved in userspace
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-On 18/11/22 2:14 am, Marc Zyngier wrote:
-> On Sun, 13 Nov 2022 17:05:10 +0000,
-> Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
->>
->> Exit to userspace whenever the dirty quota is exhausted (i.e. dirty count
->> equals/exceeds dirty quota) to request more dirty quota.
->>
->> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
->> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
->> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
->> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
->> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
->> ---
->>   arch/arm64/kvm/arm.c | 9 +++++++++
->>   1 file changed, 9 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 94d33e296e10..850024982dd9 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -746,6 +746,15 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
->>   
->>   		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
->>   			return kvm_vcpu_suspend(vcpu);
->> +
->> +		if (kvm_check_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu)) {
->> +			struct kvm_run *run = vcpu->run;
->> +
->> +			run->exit_reason = KVM_EXIT_DIRTY_QUOTA_EXHAUSTED;
->> +			run->dirty_quota_exit.count = vcpu->stat.generic.pages_dirtied;
->> +			run->dirty_quota_exit.quota = vcpu->dirty_quota;
->> +			return 0;
->> +		}
->>   	}
->>   
->>   	return 1;
-> 
-> As pointed out by others, this should be common code. This would
-> definitely avoid the difference in behaviour between architectures.
-> 
-> 	M.
-> 
-Ack.
+Eric
 
-Thanks,
-Shivam
