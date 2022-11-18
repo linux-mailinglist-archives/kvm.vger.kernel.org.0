@@ -2,70 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7864C62EE9C
-	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 08:45:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D70B62EECF
+	for <lists+kvm@lfdr.de>; Fri, 18 Nov 2022 09:00:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241240AbiKRHpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Nov 2022 02:45:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55398 "EHLO
+        id S241191AbiKRIAV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Nov 2022 03:00:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230042AbiKRHpl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Nov 2022 02:45:41 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59E488B103
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 23:45:40 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id g62so4139443pfb.10
-        for <kvm@vger.kernel.org>; Thu, 17 Nov 2022 23:45:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gdi9Y0gA2RIvhSzWh83jBN+VndNjkNvj2Yl5/Jq0Qwc=;
-        b=Ixr/QfKKvVCY/z813TIOr2kixg8g7Q2tYoA9hXcbYVMP7l60PiwC2W1YE+i9vo4igC
-         0CNk3c/yZvjtdnx4JxEGIg5eCNPr8EZ2LzHN8wtYoQ0RDrldnlwqsZ9fsZuT0sXD+KAZ
-         MpRwp/AqLjIitmtJtFiTYwszhdw813n7uPfd6nA/Qvecp5C6+KwHJ2JX9hf9flTg4LdS
-         Qmpu2P9BqWLb7X9m6N246pZXLBY3Eu0Gxd9JZbWKKOyZ3MMJgUQlTxVogDBWNE8+IL9h
-         z/17pZe47npvmxk3P1/pXsnE/TVlDDb9H8tslmpdYGIs3vVyNnKBUcP/9haUGtaQeJ5n
-         HNZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Gdi9Y0gA2RIvhSzWh83jBN+VndNjkNvj2Yl5/Jq0Qwc=;
-        b=6kfpbq9lasnhgCvPRPTD1eWU0WVDBzA8bMS38Qo005mM/DAUNQkiYK8e2+tTbOZMUl
-         dmYMC1tOsLnncsjnR0BbSD+xslhW+bu35OqmtD+o9XzgFhRsp5bHbRH5NRlh2Xl8KGoP
-         Af3TvyoOigy176vQzF2nd7aA/tTA/RREYxVff+I5tnu3Af67w/f6j8V0YEaL21bCUPss
-         Xq4izlYdvC1FHM9PULUtXDn2lYyp6TZPiKq4O8YLYhEtl3CCVH7TRGZ2FqMBqEPfIs1n
-         aUedp0/wyljHtPJM8p1o0TIwG0K1CM5SDRrn+FA43hUbDfU3YF7Y2M0T/fNBE7EGXF0z
-         tL3A==
-X-Gm-Message-State: ANoB5pnYLFuqL+G0Q3mnrFV0D/MfiWY2weH2rphreg7GdwioKt9m5kdn
-        0Rv+jYr6gpVV0AQFjkpN3fR6Ir0WMHBzroy2ftQB/w==
-X-Google-Smtp-Source: AA0mqf5+Kmp2LJTTHcEFtRf3v9oCJzsEHfPTrRYloeoM4dpAxHCbuDwGxEccdUkQgFawYVyPt2I5kRsljmJH0+N9Z6Y=
-X-Received: by 2002:a63:e509:0:b0:474:4380:cca6 with SMTP id
- r9-20020a63e509000000b004744380cca6mr5598521pgh.229.1668757539573; Thu, 17
- Nov 2022 23:45:39 -0800 (PST)
+        with ESMTP id S241034AbiKRIAM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Nov 2022 03:00:12 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95CAF12AA0
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 00:00:10 -0800 (PST)
+Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ND8MQ4WrPzRpPb;
+        Fri, 18 Nov 2022 15:59:46 +0800 (CST)
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 18 Nov 2022 16:00:08 +0800
+Subject: Re: [RFC PATCH 2/3] KVM: Avoid re-reading kvm->max_halt_poll_ns
+ during halt-polling
+To:     David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+CC:     Jon Cargille <jcargill@google.com>,
+        Jim Mattson <jmattson@google.com>, <kvm@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+        <wangyuan38@huawei.com>
+References: <20221117001657.1067231-1-dmatlack@google.com>
+ <20221117001657.1067231-3-dmatlack@google.com>
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <116d140b-61a9-c5d3-b28a-b32f89ed05a2@huawei.com>
+Date:   Fri, 18 Nov 2022 16:00:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-References: <20221113163832.3154370-1-maz@kernel.org> <20221113163832.3154370-10-maz@kernel.org>
-In-Reply-To: <20221113163832.3154370-10-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Thu, 17 Nov 2022 23:45:23 -0800
-Message-ID: <CAAeT=FzvGPs04N8=y2pjBxv_HTgQHwRN8hEsyheu0bi+WJzRQQ@mail.gmail.com>
-Subject: Re: [PATCH v4 09/16] KVM: arm64: PMU: Do not let AArch32 change the
- counters' top 32 bits
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+In-Reply-To: <20221117001657.1067231-3-dmatlack@google.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500023.china.huawei.com (7.185.36.83)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,96 +55,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On Sun, Nov 13, 2022 at 8:38 AM Marc Zyngier <maz@kernel.org> wrote:
+On 2022/11/17 8:16, David Matlack wrote:
+> Avoid re-reading kvm->max_halt_poll_ns multiple times during
+> halt-polling except when it is explicitly useful, e.g. to check if the
+> max time changed across a halt. kvm->max_halt_poll_ns can be changed at
+> any time by userspace via KVM_CAP_HALT_POLL.
 >
-> Even when using PMUv3p5 (which implies 64bit counters), there is
-> no way for AArch32 to write to the top 32 bits of the counters.
-> The only way to influence these bits (other than by counting
-> events) is by writing PMCR.P==1.
+> This bug is unlikely to cause any serious side-effects. In the worst
+> case one halt polls for shorter or longer than it should, and then is
+> fixed up on the next halt. Furthmore, this is still possible since
+s/Furthmore/Furthermore
+> kvm->max_halt_poll_ns are not synchronized with halts.
 >
-> Make sure we obey the architecture and preserve the top 32 bits
-> on a counter update.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Fixes: acd05785e48c ("kvm: add capability for halt polling")
+> Signed-off-by: David Matlack <dmatlack@google.com>
 > ---
->  arch/arm64/kvm/pmu-emul.c | 35 +++++++++++++++++++++++++++--------
->  1 file changed, 27 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index ea0c8411641f..419e5e0a13d0 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -119,13 +119,8 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
->         return counter;
->  }
->
-> -/**
-> - * kvm_pmu_set_counter_value - set PMU counter value
-> - * @vcpu: The vcpu pointer
-> - * @select_idx: The counter index
-> - * @val: The counter value
-> - */
-> -void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
-> +static void kvm_pmu_set_counter(struct kvm_vcpu *vcpu, u64 select_idx, u64 val,
-> +                               bool force)
->  {
->         u64 reg;
->
-> @@ -135,12 +130,36 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
->         kvm_pmu_release_perf_event(&vcpu->arch.pmu.pmc[select_idx]);
->
->         reg = counter_index_to_reg(select_idx);
-> +
-> +       if (vcpu_mode_is_32bit(vcpu) && select_idx != ARMV8_PMU_CYCLE_IDX &&
-> +           !force) {
-> +               /*
-> +                * Even with PMUv3p5, AArch32 cannot write to the top
-> +                * 32bit of the counters. The only possible course of
-> +                * action is to use PMCR.P, which will reset them to
-> +                * 0 (the only use of the 'force' parameter).
-> +                */
-> +               val  = lower_32_bits(val);
-> +               val |= upper_32_bits(__vcpu_sys_reg(vcpu, reg));
+>   virt/kvm/kvm_main.c | 21 +++++++++++++++------
+>   1 file changed, 15 insertions(+), 6 deletions(-)
+Looks good to me:
+Reviewed-by: Yanan Wang <wangyanan55@huawei.com>
 
-Shouldn't the result of upper_32_bits() be shifted 32bits left
-before ORing (to maintain the upper 32bits of the current value) ?
-
-Thank you,
-Reiji
-
-> +       }
-> +
->         __vcpu_sys_reg(vcpu, reg) = val;
->
->         /* Recreate the perf event to reflect the updated sample_period */
->         kvm_pmu_create_perf_event(vcpu, select_idx);
->  }
->
-> +/**
-> + * kvm_pmu_set_counter_value - set PMU counter value
-> + * @vcpu: The vcpu pointer
-> + * @select_idx: The counter index
-> + * @val: The counter value
-> + */
-> +void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+Thanks,
+Yanan
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 4b868f33c45d..78caf19608eb 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3488,6 +3488,11 @@ static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
+>   	}
+>   }
+>   
+> +static unsigned int kvm_vcpu_max_halt_poll_ns(struct kvm_vcpu *vcpu)
 > +{
-> +       kvm_pmu_set_counter(vcpu, select_idx, val, false);
+> +	return READ_ONCE(vcpu->kvm->max_halt_poll_ns);
 > +}
 > +
->  /**
->   * kvm_pmu_release_perf_event - remove the perf event
->   * @pmc: The PMU counter pointer
-> @@ -533,7 +552,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
->                 unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
->                 mask &= ~BIT(ARMV8_PMU_CYCLE_IDX);
->                 for_each_set_bit(i, &mask, 32)
-> -                       kvm_pmu_set_counter_value(vcpu, i, 0);
-> +                       kvm_pmu_set_counter(vcpu, i, 0, true);
->         }
->  }
->
-> --
-> 2.34.1
->
+>   /*
+>    * Emulate a vCPU halt condition, e.g. HLT on x86, WFI on arm, etc...  If halt
+>    * polling is enabled, busy wait for a short time before blocking to avoid the
+> @@ -3496,14 +3501,15 @@ static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
+>    */
+>   void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+>   {
+> +	unsigned int max_halt_poll_ns = kvm_vcpu_max_halt_poll_ns(vcpu);
+>   	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
+>   	ktime_t start, cur, poll_end;
+>   	bool waited = false;
+>   	bool do_halt_poll;
+>   	u64 halt_ns;
+>   
+> -	if (vcpu->halt_poll_ns > vcpu->kvm->max_halt_poll_ns)
+> -		vcpu->halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
+> +	if (vcpu->halt_poll_ns > max_halt_poll_ns)
+> +		vcpu->halt_poll_ns = max_halt_poll_ns;
+>   
+>   	do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
+>   
+> @@ -3545,18 +3551,21 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+>   		update_halt_poll_stats(vcpu, start, poll_end, !waited);
+>   
+>   	if (halt_poll_allowed) {
+> +		/* Recompute the max halt poll time in case it changed. */
+> +		max_halt_poll_ns = kvm_vcpu_max_halt_poll_ns(vcpu);
+> +
+>   		if (!vcpu_valid_wakeup(vcpu)) {
+>   			shrink_halt_poll_ns(vcpu);
+> -		} else if (vcpu->kvm->max_halt_poll_ns) {
+> +		} else if (max_halt_poll_ns) {
+>   			if (halt_ns <= vcpu->halt_poll_ns)
+>   				;
+>   			/* we had a long block, shrink polling */
+>   			else if (vcpu->halt_poll_ns &&
+> -				 halt_ns > vcpu->kvm->max_halt_poll_ns)
+> +				 halt_ns > max_halt_poll_ns)
+>   				shrink_halt_poll_ns(vcpu);
+>   			/* we had a short halt and our poll time is too small */
+> -			else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
+> -				 halt_ns < vcpu->kvm->max_halt_poll_ns)
+> +			else if (vcpu->halt_poll_ns < max_halt_poll_ns &&
+> +				 halt_ns < max_halt_poll_ns)
+>   				grow_halt_poll_ns(vcpu);
+>   		} else {
+>   			vcpu->halt_poll_ns = 0;
+
