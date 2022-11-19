@@ -2,118 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F2DD630879
-	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 02:33:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DBF26308A1
+	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 02:45:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232124AbiKSBdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Nov 2022 20:33:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34682 "EHLO
+        id S231305AbiKSBpe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Nov 2022 20:45:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232024AbiKSBdV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Nov 2022 20:33:21 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E517C15BB12
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 16:37:49 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id n12-20020a170902e54c00b00188515e81a6so4977081plf.23
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 16:37:49 -0800 (PST)
+        with ESMTP id S231272AbiKSBpF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Nov 2022 20:45:05 -0500
+Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89EB3C75BB
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 17:06:14 -0800 (PST)
+Received: by mail-vk1-xa33.google.com with SMTP id f68so3220249vkc.8
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 17:06:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qXGFKO/EkpuIeqVDphBNVjuhQ/zqYCH5ABXNmG1D7zQ=;
-        b=jsKeef8KYLqC5oBCrTT2cPmdPYbyBgcZWYsC8Tjtf9Vil5QubiQoihVm/PBx+ruzR7
-         QwVuNwUGHTkeKsiG+Y4hkOmRTHJhzK4jISwRnOysFoWcOXeZD6153GkTo7VLDkCiMD9z
-         g5U6Wutc69WUe05MvhbcYon/90cX1HO3xxkeekLBjZGqQGebpI504/Bn/FoJ3yZYXW9T
-         3xjkz1beKaeYcXWSA/WEefdEz8zxDl0hPPOKYqmeyjmFAfm3KKRMf99QFtdFf42zN6lO
-         MeOvWsHHpba+S0EV+zIvejO3/mBh2Cb6j2LFa/N0bHha6nt1Hbomi+0KlVrK+it73JvX
-         3GXQ==
+        bh=Nf/cPq9d8ohAFT7XuHjdBUKX+6aG0Yaxe06dsk7wY4g=;
+        b=AzqmezRqoTe/kIl3u/bvcMovHJJE9hR1hKmqmMttBp6fXO3YBcbd19CNAvLPZma0aV
+         9yYKwPmQSvxFzHw8G9PjV664JhOr84kKoPjEYdSd2LfgRQxsoCi2OzkEOlci7O+4RCcu
+         dScdYi6zgsbyfZxHK9gpCd7g3RxYIbnzEapduJ9wnbPXY8XNjWNtnUoaEuCu2PXDgot8
+         kyNWNo9hgAqiV1B/MJ1C3W3AsZ+M9LXy8sw//3jUBRfPTkm1w3geY8mj0A1AmycTDnjW
+         3LIbR8stGJZTgT4koqOld+0kSMBSyHG8n+NWtE/qy8GGl0FQaeJCSP6tRyrbzY6ljyaV
+         +dzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+        h=to:subject:message-id:date:from:reply-to:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qXGFKO/EkpuIeqVDphBNVjuhQ/zqYCH5ABXNmG1D7zQ=;
-        b=PdRkQ2BY+z83r0kcuHUzOJkD7SDmg86LpOZMyDaYAKCLWvC/z1QfFxjJnoZc92zrws
-         G9q8S0QUVPCTPa11Zv6lbzerse/BwATxOW/m5lHwREPa+jfs75HtAIAI3PI7cZchVVPd
-         xSN/Wroxlqb15iMZxSK1DLfP6HGMKFccktkZmi7uqDV+1E+7OGouE2wMp7rJ0VYaL4v7
-         bsdsxPt/5QqXYP4nSXocZu3MXavwK836FDiXk82P1vjzNc5sSIWiJSL9jFdSMAsmZJcr
-         OJV5JzaF/FX3AvFM/0+8ek11Jyc/aialI1fNWcPH0J0RXpqqKbKU3w9L/vLRRhCM83Gk
-         /sJA==
-X-Gm-Message-State: ANoB5pne5zTmk1prcyBqHEwoC5eCxObQ36ft+bQBeilP4UGx+40nrl59
-        iGHrj21hplI27JR3EHq0jQskX0KiyIY=
-X-Google-Smtp-Source: AA0mqf7IxIMf2B9LDq5ip8bGacxM5fpViFwU5IxlL6NRcOx+wOegVERvKTCXqg6eFFjl9iFqS9H3NsVVqx8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:1cd4:0:b0:56b:deea:72e9 with SMTP id
- c203-20020a621cd4000000b0056bdeea72e9mr10102088pfc.47.1668818269339; Fri, 18
- Nov 2022 16:37:49 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 19 Nov 2022 00:37:47 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221119003747.2615229-1-seanjc@google.com>
-Subject: [PATCH] KVM: VMX: Access @flags as a 32-bit value in __vmx_vcpu_run()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alexey Dobriyan <adobriyan@gmail.com>
+        bh=Nf/cPq9d8ohAFT7XuHjdBUKX+6aG0Yaxe06dsk7wY4g=;
+        b=tbcV4S0incg4/zaI7fAL06EJsK1DkJJFlPo2SXU2QAg18l++ei1/cM00FNdmwaNr1/
+         XkLcFg/zbq8NGgd726cZfs6MIQN+Mo4opHVd4wC98fwAjXwZD6EhefbgGw7dCqqjW24H
+         OTtZdurvGK7G8L6AzbBt6iIYYzqkbcMMnoOwlCPOzYbL5G67ZZ903+JWe00/sdR1A8mJ
+         UlHRd5L8eDEJBhBkCWgnWs4zw1YMkU+XPufTO8rTCwrA4BLjMdj813t3NnsU4+16VBzc
+         I+IEdCF+Jir8KxB84VHBj4iW6RnQkR3jyy7d3m4UW9GmVYVxT7ifpN0g8dd2zOqGwQST
+         ZYxg==
+X-Gm-Message-State: ANoB5pk0Pqnv9/B0LoTO32Xt+6SY6yCxJASeilm3Mbaow7OqMJVjvbt5
+        XAItpAR1nN8dVNs2TFJBhgQTPzhJVWD14o/3rYA=
+X-Google-Smtp-Source: AA0mqf640TtU+0sdCbfG3Ct3ZeS24HXqZKzBTkop0EdR/4ChQjEKx62OeMNyMQlT9LwesSkplrtLcCcFIrcljSnGxBQ=
+X-Received: by 2002:a05:6122:d87:b0:3b5:e89c:9351 with SMTP id
+ bc7-20020a0561220d8700b003b5e89c9351mr5780964vkb.25.1668819973665; Fri, 18
+ Nov 2022 17:06:13 -0800 (PST)
+MIME-Version: 1.0
+Received: by 2002:a59:dd04:0:b0:318:7b7:675 with HTTP; Fri, 18 Nov 2022
+ 17:06:13 -0800 (PST)
+Reply-To: thajxoa@gmail.com
+From:   Thaj Xoa <houseinemoustapha@gmail.com>
+Date:   Sat, 19 Nov 2022 01:06:13 +0000
+Message-ID: <CACb7pkA5JkK2wfGT5WBwUKwgzQ3NFJmc8zidFdvnu03_DthjVw@mail.gmail.com>
+Subject: 
+To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+X-Spam-Status: No, score=4.5 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLYTO,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM autolearn=no
         autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Access @flags using 32-bit operands when saving and testing @flags for
-VMX_RUN_VMRESUME, as using 8-bit operands is unnecessarily fragile due
-to relying on VMX_RUN_VMRESUME being in bits 0-7.  The behavior of
-treating @flags a single byte is a holdover from when the param was
-"bool launched", i.e. is not deliberate.
-
-Cc: Alexey Dobriyan <adobriyan@gmail.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/vmenter.S | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-index 0b5db4de4d09..5bd39f63497d 100644
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -69,8 +69,8 @@ SYM_FUNC_START(__vmx_vcpu_run)
- 	 */
- 	push %_ASM_ARG2
- 
--	/* Copy @flags to BL, _ASM_ARG3 is volatile. */
--	mov %_ASM_ARG3B, %bl
-+	/* Copy @flags to EBX, _ASM_ARG3 is volatile. */
-+	mov %_ASM_ARG3L, %ebx
- 
- 	lea (%_ASM_SP), %_ASM_ARG2
- 	call vmx_update_host_rsp
-@@ -106,7 +106,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
- 	mov (%_ASM_SP), %_ASM_AX
- 
- 	/* Check if vmlaunch or vmresume is needed */
--	testb $VMX_RUN_VMRESUME, %bl
-+	test $VMX_RUN_VMRESUME, %ebx
- 
- 	/* Load guest registers.  Don't clobber flags. */
- 	mov VCPU_RCX(%_ASM_AX), %_ASM_CX
-@@ -128,7 +128,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
- 	/* Load guest RAX.  This kills the @regs pointer! */
- 	mov VCPU_RAX(%_ASM_AX), %_ASM_AX
- 
--	/* Check EFLAGS.ZF from 'testb' above */
-+	/* Check EFLAGS.ZF from 'test VMX_RUN_VMRESUME' above */
- 	jz .Lvmlaunch
- 
- 	/*
-
-base-commit: d663b8a285986072428a6a145e5994bc275df994
 -- 
-2.38.1.584.g0f3c55d4c2-goog
+Hello,
 
+You have an important message get back to me for more information.
+
+Sincerely,
+
+Mr Thaj Xoa
