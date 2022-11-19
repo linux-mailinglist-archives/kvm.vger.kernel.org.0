@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34592630E7D
-	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 12:40:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1F7B630E7F
+	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 12:43:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230244AbiKSLkR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Nov 2022 06:40:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34244 "EHLO
+        id S230466AbiKSLm6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Nov 2022 06:42:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbiKSLkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 19 Nov 2022 06:40:16 -0500
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6B975B86D
-        for <kvm@vger.kernel.org>; Sat, 19 Nov 2022 03:40:15 -0800 (PST)
+        with ESMTP id S229592AbiKSLm4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 19 Nov 2022 06:42:56 -0500
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9A49970A8
+        for <kvm@vger.kernel.org>; Sat, 19 Nov 2022 03:42:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1668858014; x=1700394014;
+  s=amazon201209; t=1668858176; x=1700394176;
   h=from:to:cc:date:message-id:references:in-reply-to:
    content-transfer-encoding:mime-version:subject;
-  bh=hXyayVo5HH4IzLfQ/wSFlZTu3kqsv9FQxeKqm28QxTA=;
-  b=CB76OlolmPAsRKijKT6eOrrT/bU5yIwOtRctjjyUFiWGExvH4KEr44kx
-   nKhqxtdy46iGaKkj9KLLEMgAerlYdeqcxtNuSZHQVl9ctofbgyNKqc6Xd
-   oWqeQHVgC7CUItUL4+T42l3UuPy5zZXj6Y38MYINsjw8cIxQATIb1VM3G
+  bh=YcD2QFpbUfSP7m809u20APAk8iJ7h7fiGjAllgRMbZc=;
+  b=VL2iRjxxCh5vlETMLDGa2h+r/krwoalDIYa43kiUXQCN35hKK7T/lXso
+   rJg0fci6XIylRofQk68B2oxYtc5j0B4tJ94onS2Uo2dFY7zkM3oSL6KZx
+   9lr9qAXmbkxzxXejURTzInrHLrNZLXYUtNEyjbpkgtaGGX5ZKvaqUfaH2
    c=;
 X-IronPort-AV: E=Sophos;i="5.96,176,1665446400"; 
-   d="scan'208";a="268517093"
-Subject: RE: [PATCH 3/4] KVM: Update gfn_to_pfn_cache khva when it moves within the
- same page
-Thread-Topic: [PATCH 3/4] KVM: Update gfn_to_pfn_cache khva when it moves within the same
- page
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-5eae960a.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2022 11:40:10 +0000
-Received: from EX13D41EUC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2c-m6i4x-5eae960a.us-west-2.amazon.com (Postfix) with ESMTPS id 068714191C;
-        Sat, 19 Nov 2022 11:40:10 +0000 (UTC)
-Received: from EX19D032EUC001.ant.amazon.com (10.252.61.222) by
- EX13D41EUC002.ant.amazon.com (10.43.164.230) with Microsoft SMTP Server (TLS)
- id 15.0.1497.42; Sat, 19 Nov 2022 11:40:09 +0000
+   d="scan'208";a="152589310"
+Subject: RE: [PATCH 4/4] KVM: x86/xen: Add runstate tests for 32-bit mode and
+ crossing page boundary
+Thread-Topic: [PATCH 4/4] KVM: x86/xen: Add runstate tests for 32-bit mode and crossing
+ page boundary
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2022 11:42:53 +0000
+Received: from EX13D30EUC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com (Postfix) with ESMTPS id 493504166F;
+        Sat, 19 Nov 2022 11:42:51 +0000 (UTC)
 Received: from EX19D032EUC002.ant.amazon.com (10.252.61.185) by
- EX19D032EUC001.ant.amazon.com (10.252.61.222) with Microsoft SMTP Server
+ EX13D30EUC001.ant.amazon.com (10.43.164.171) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.42; Sat, 19 Nov 2022 11:42:50 +0000
+Received: from EX19D032EUC002.ant.amazon.com (10.252.61.185) by
+ EX19D032EUC002.ant.amazon.com (10.252.61.185) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.20; Sat, 19 Nov 2022 11:40:09 +0000
+ 15.2.1118.20; Sat, 19 Nov 2022 11:42:50 +0000
 Received: from EX19D032EUC002.ant.amazon.com ([fe80::e696:121c:a227:174]) by
  EX19D032EUC002.ant.amazon.com ([fe80::e696:121c:a227:174%3]) with mapi id
- 15.02.1118.020; Sat, 19 Nov 2022 11:40:09 +0000
+ 15.02.1118.020; Sat, 19 Nov 2022 11:42:50 +0000
 From:   "Durrant, Paul" <pdurrant@amazon.co.uk>
 To:     David Woodhouse <dwmw2@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
 CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "mhal@rbox.co" <mhal@rbox.co>
-Thread-Index: AQHY+/v4LNSX1SK8G0CP0NFHKXkva65GHyeQ
-Date:   Sat, 19 Nov 2022 11:40:09 +0000
-Message-ID: <681cf1b4edf04563bba651efb854e77f@amazon.co.uk>
+Thread-Index: AQHY+/v2ErL6DQJ4hkaWmtuTNB8Hqq5GH/0w
+Date:   Sat, 19 Nov 2022 11:42:50 +0000
+Message-ID: <78e8cca3acfb443c8635a5f99ab9d845@amazon.co.uk>
 References: <20221119094659.11868-1-dwmw2@infradead.org>
- <20221119094659.11868-3-dwmw2@infradead.org>
-In-Reply-To: <20221119094659.11868-3-dwmw2@infradead.org>
+ <20221119094659.11868-4-dwmw2@infradead.org>
+In-Reply-To: <20221119094659.11868-4-dwmw2@infradead.org>
 Accept-Language: en-GB, en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.252.51.69]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-Spam-Status: No, score=-11.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
@@ -75,20 +75,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBEYXZpZCBXb29kaG91c2UgPGR3
-bXcyQGluZnJhZGVhZC5vcmc+DQo+IFNlbnQ6IDE5IE5vdmVtYmVyIDIwMjIgMDk6NDcNCj4gVG86
-IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+OyBTZWFuIENocmlzdG9waGVyc29u
-DQo+IDxzZWFuamNAZ29vZ2xlLmNvbT4NCj4gQ2M6IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IG1oYWxA
-cmJveC5jbw0KPiBTdWJqZWN0OiBbRVhURVJOQUxdIFtQQVRDSCAzLzRdIEtWTTogVXBkYXRlIGdm
-bl90b19wZm5fY2FjaGUga2h2YSB3aGVuIGl0DQo+IG1vdmVzIHdpdGhpbiB0aGUgc2FtZSBwYWdl
-DQo+IA0KPiBDQVVUSU9OOiBUaGlzIGVtYWlsIG9yaWdpbmF0ZWQgZnJvbSBvdXRzaWRlIG9mIHRo
-ZSBvcmdhbml6YXRpb24uIERvIG5vdA0KPiBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRz
-IHVubGVzcyB5b3UgY2FuIGNvbmZpcm0gdGhlIHNlbmRlciBhbmQga25vdw0KPiB0aGUgY29udGVu
-dCBpcyBzYWZlLg0KPiANCj4gDQo+IA0KPiBGcm9tOiBEYXZpZCBXb29kaG91c2UgPGR3bXdAYW1h
-em9uLmNvLnVrPg0KPiANCj4gSW4gdGhlIGNhc2Ugd2hlcmUgYSBHUEMgaXMgcmVmcmVzaGVkIHRv
-IGEgZGlmZmVyZW50IGxvY2F0aW9uIHdpdGhpbiB0aGUNCj4gc2FtZSBwYWdlLCB3ZSBkaWRuJ3Qg
-Ym90aGVyIHRvIHVwZGF0ZSBpdC4gTW9zdGx5IHdlIGRvbid0IG5lZWQgdG8sIGJ1dA0KPiBzaW5j
-ZSB0aGUgLT5raHZhIGZpZWxkIGFsc28gaW5jbHVkZXMgdGhlIG9mZnNldCB3aXRoaW4gdGhlIHBh
-Z2UsIHRoYXQgZG9lcw0KPiBoYXZlIHRvIGJlIHVwZGF0ZWQuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5
-OiBEYXZpZCBXb29kaG91c2UgPGR3bXdAYW1hem9uLmNvLnVrPg0KDQpSZXZpZXdlZC1ieTogPHBh
-dWxAeGVuLm9yZz4NCg==
+> -----Original Message-----
+> From: David Woodhouse <dwmw2@infradead.org>
+> Sent: 19 November 2022 09:47
+> To: Paolo Bonzini <pbonzini@redhat.com>; Sean Christopherson
+> <seanjc@google.com>
+> Cc: kvm@vger.kernel.org; mhal@rbox.co
+> Subject: [EXTERNAL] [PATCH 4/4] KVM: x86/xen: Add runstate tests for 32-
+> bit mode and crossing page boundary
+>=20
+> CAUTION: This email originated from outside of the organization. Do not
+> click links or open attachments unless you can confirm the sender and kno=
+w
+> the content is safe.
+>=20
+>=20
+>=20
+> From: David Woodhouse <dwmw@amazon.co.uk>
+>=20
+> Torture test the cases where the runstate crosses a page boundary, and an=
+d
+> especially the case where it's configured in 32-bit mode and doesn't, but
+> then switching to 64-bit mode makes it go onto the second page.
+>=20
+> To simplify this, make the KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST ioctl
+> also update the guest runstate area. It already did so if the actual
+> runstate changed, as a side-effect of kvm_xen_update_runstate(). So doing
+> it in the plain adjustment case is making it more consistent, as well as
+> giving us a nice way to trigger the update without actually running the
+> vCPU again and changing the values.
+>=20
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+
+Reviewed-by: Paul Durrant <paul@xen.org>
