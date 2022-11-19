@@ -2,225 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28D34630DE5
-	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 10:47:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C379F630E7C
+	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 12:38:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233903AbiKSJrL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Nov 2022 04:47:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59494 "EHLO
+        id S229802AbiKSLip (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Nov 2022 06:38:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230424AbiKSJrJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 19 Nov 2022 04:47:09 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54722A8C17
-        for <kvm@vger.kernel.org>; Sat, 19 Nov 2022 01:47:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Rygr6uyOPlrDnMmK7Se6ONCtNZIVfB+UvwZcwGtTHqY=; b=aDSUktBOT+1geBJADUeMWae66A
-        RIYafyunV9EmbqsE0cIrv17KiEY9ToithzQysuxS0zieonhmscDcPthmg4GWZnJV5iZYdLkq48Xo7
-        S5g4b37Ba857DyFIWieDjF47uafaOQkKKeIXJI/qi/Fqc/8BXrR8NZtjvzQd2ZZkKDRRsZD/S8FuV
-        zPm+iXJ8c18zeJRG4zomjJ0DNGzFaRfaSuJVBrp4DQVRSQ7nZ3oLvghVmI7cDNGMGzh5cAW1Hmnl4
-        xcTg0o3W6fjrAdgJXpdAw0ptoTNsZdRP2EPkYuoILmwQaawW9zXZKhzWMttlHsdBnt3Df8gQLiSJC
-        mhuMXHBg==;
-Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1owKR9-002Hui-WA; Sat, 19 Nov 2022 09:47:01 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1owKR9-00035q-Nm; Sat, 19 Nov 2022 09:46:59 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S229506AbiKSLin (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 19 Nov 2022 06:38:43 -0500
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67A3C2D742
+        for <kvm@vger.kernel.org>; Sat, 19 Nov 2022 03:38:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1668857922; x=1700393922;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=isZ8CJ2UQ5BZV7QrJOy/USDNm6XdgIkC2WyhmxPQJog=;
+  b=W0U1Kao+cp6g34DUpZdq1YW/+mu7cEvCTxdV4NHGRGN05WG4t1rgjbN4
+   9j+IgAfWWCXjvNkUtvUjmEoMh74GNTtykxUEacrspi1a3zyfiIDbq6zvm
+   yvl5tk/YD7KQbXbhT9JfeSLTiz3krFYdSxM4Pi0IZz0N2xB2OWeeo4RRV
+   w=;
+X-IronPort-AV: E=Sophos;i="5.96,176,1665446400"; 
+   d="scan'208";a="281808778"
+Subject: RE: [PATCH 2/4] KVM: x86/xen: Compatibility fixes for shared runstate area
+Thread-Topic: [PATCH 2/4] KVM: x86/xen: Compatibility fixes for shared runstate area
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2022 11:38:37 +0000
+Received: from EX13D41EUC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com (Postfix) with ESMTPS id C738161C66;
+        Sat, 19 Nov 2022 11:38:34 +0000 (UTC)
+Received: from EX19D032EUC003.ant.amazon.com (10.252.61.137) by
+ EX13D41EUC001.ant.amazon.com (10.43.164.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.42; Sat, 19 Nov 2022 11:38:33 +0000
+Received: from EX19D032EUC002.ant.amazon.com (10.252.61.185) by
+ EX19D032EUC003.ant.amazon.com (10.252.61.137) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.20; Sat, 19 Nov 2022 11:38:33 +0000
+Received: from EX19D032EUC002.ant.amazon.com ([fe80::e696:121c:a227:174]) by
+ EX19D032EUC002.ant.amazon.com ([fe80::e696:121c:a227:174%3]) with mapi id
+ 15.02.1118.020; Sat, 19 Nov 2022 11:38:33 +0000
+From:   "Durrant, Paul" <pdurrant@amazon.co.uk>
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, mhal@rbox.co
-Subject: [PATCH 4/4] KVM: x86/xen: Add runstate tests for 32-bit mode and crossing page boundary
-Date:   Sat, 19 Nov 2022 09:46:59 +0000
-Message-Id: <20221119094659.11868-4-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20221119094659.11868-1-dwmw2@infradead.org>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mhal@rbox.co" <mhal@rbox.co>
+Thread-Index: AQHY+/v3HL3RrYUvIkWG1WBpLeIZNq5GHMNA
+Date:   Sat, 19 Nov 2022 11:38:33 +0000
+Message-ID: <6fc5a86690fb49fd965e23dd411634f2@amazon.co.uk>
 References: <20221119094659.11868-1-dwmw2@infradead.org>
+ <20221119094659.11868-2-dwmw2@infradead.org>
+In-Reply-To: <20221119094659.11868-2-dwmw2@infradead.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.252.51.69]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-14.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw@amazon.co.uk>
-
-Torture test the cases where the runstate crosses a page boundary, and
-and especially the case where it's configured in 32-bit mode and doesn't,
-but then switching to 64-bit mode makes it go onto the second page.
-
-To simplify this, make the KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST ioctl
-also update the guest runstate area. It already did so if the actual
-runstate changed, as a side-effect of kvm_xen_update_runstate(). So
-doing it in the plain adjustment case is making it more consistent, as
-well as giving us a nice way to trigger the update without actually
-running the vCPU again and changing the values.
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/x86/kvm/xen.c                            |   2 +
- .../selftests/kvm/x86_64/xen_shinfo_test.c    | 115 +++++++++++++++---
- 2 files changed, 97 insertions(+), 20 deletions(-)
-
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 8aa953b1f0e0..747dc347c70e 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -848,6 +848,8 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 
- 		if (data->u.runstate.state <= RUNSTATE_offline)
- 			kvm_xen_update_runstate(vcpu, data->u.runstate.state);
-+		else if (vcpu->arch.xen.runstate_cache.active)
-+			kvm_xen_update_runstate_guest(vcpu, false);
- 		r = 0;
- 		break;
- 
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-index 7f39815f1772..1f4fd97db959 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -88,14 +88,20 @@ struct pvclock_wall_clock {
- } __attribute__((__packed__));
- 
- struct vcpu_runstate_info {
--    uint32_t state;
--    uint64_t state_entry_time;
--    uint64_t time[4];
-+	uint32_t state;
-+	uint64_t state_entry_time;
-+	uint64_t time[5]; /* Extra field for overrun check */
- };
- 
-+struct compat_vcpu_runstate_info {
-+	uint32_t state;
-+	uint64_t state_entry_time;
-+	uint64_t time[5];
-+} __attribute__((__packed__));;
-+
- struct arch_vcpu_info {
--    unsigned long cr2;
--    unsigned long pad; /* sizeof(vcpu_info_t) == 64 */
-+	unsigned long cr2;
-+	unsigned long pad; /* sizeof(vcpu_info_t) == 64 */
- };
- 
- struct vcpu_info {
-@@ -999,22 +1005,91 @@ int main(int argc, char *argv[])
- 				       runstate_names[i], rs->time[i]);
- 			}
- 		}
--		TEST_ASSERT(rs->state == rst.u.runstate.state, "Runstate mismatch");
--		TEST_ASSERT(rs->state_entry_time == rst.u.runstate.state_entry_time,
--			    "State entry time mismatch");
--		TEST_ASSERT(rs->time[RUNSTATE_running] == rst.u.runstate.time_running,
--			    "Running time mismatch");
--		TEST_ASSERT(rs->time[RUNSTATE_runnable] == rst.u.runstate.time_runnable,
--			    "Runnable time mismatch");
--		TEST_ASSERT(rs->time[RUNSTATE_blocked] == rst.u.runstate.time_blocked,
--			    "Blocked time mismatch");
--		TEST_ASSERT(rs->time[RUNSTATE_offline] == rst.u.runstate.time_offline,
--			    "Offline time mismatch");
--
--		TEST_ASSERT(rs->state_entry_time == rs->time[0] +
--			    rs->time[1] + rs->time[2] + rs->time[3],
--			    "runstate times don't add up");
-+
-+		/*
-+		 * Exercise runstate info at all points across the page boundary, in
-+		 * 32-bit and 64-bit mode. In particular, test the case where it is
-+		 * configured in 32-bit mode and then switched to 64-bit mode while
-+		 * active, which takes it onto the second page.
-+		 */
-+		unsigned long runstate_addr;
-+		struct compat_vcpu_runstate_info *crs;
-+		for (runstate_addr = SHINFO_REGION_GPA + PAGE_SIZE + PAGE_SIZE - sizeof(*rs) - 4;
-+		     runstate_addr < SHINFO_REGION_GPA + PAGE_SIZE + PAGE_SIZE + 4; runstate_addr++) {
-+
-+			rs = addr_gpa2hva(vm, runstate_addr);
-+			crs = (void *)rs;
-+
-+			memset(rs, 0xa5, sizeof(*rs));
-+
-+			/* Set to compatibility mode */
-+			lm.u.long_mode = 0;
-+			vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &lm);
-+
-+			/* Set runstate to new address (kernel will write it) */
-+			struct kvm_xen_vcpu_attr st = {
-+				.type = KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADDR,
-+				.u.gpa = runstate_addr,
-+			};
-+			vcpu_ioctl(vcpu, KVM_XEN_VCPU_SET_ATTR, &st);
-+
-+			if (verbose)
-+				printf("Compatibility runstate at %08lx\n", runstate_addr);
-+
-+			TEST_ASSERT(crs->state == rst.u.runstate.state, "Runstate mismatch");
-+			TEST_ASSERT(crs->state_entry_time == rst.u.runstate.state_entry_time,
-+				    "State entry time mismatch");
-+			TEST_ASSERT(crs->time[RUNSTATE_running] == rst.u.runstate.time_running,
-+				    "Running time mismatch");
-+			TEST_ASSERT(crs->time[RUNSTATE_runnable] == rst.u.runstate.time_runnable,
-+				    "Runnable time mismatch");
-+			TEST_ASSERT(crs->time[RUNSTATE_blocked] == rst.u.runstate.time_blocked,
-+				    "Blocked time mismatch");
-+			TEST_ASSERT(crs->time[RUNSTATE_offline] == rst.u.runstate.time_offline,
-+				    "Offline time mismatch");
-+			TEST_ASSERT(crs->time[RUNSTATE_offline + 1] == 0xa5a5a5a5a5a5a5a5ULL,
-+				    "Structure overrun");
-+			TEST_ASSERT(crs->state_entry_time == crs->time[0] +
-+				    crs->time[1] + crs->time[2] + crs->time[3],
-+				    "runstate times don't add up");
-+
-+
-+			/* Now switch to 64-bit mode */
-+			lm.u.long_mode = 1;
-+			vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &lm);
-+
-+			memset(rs, 0xa5, sizeof(*rs));
-+
-+			/* Don't change the address, just trigger a write */
-+			struct kvm_xen_vcpu_attr adj = {
-+				.type = KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST,
-+				.u.runstate.state = (uint64_t)-1
-+			};
-+			vcpu_ioctl(vcpu, KVM_XEN_VCPU_SET_ATTR, &adj);
-+
-+			if (verbose)
-+				printf("64-bit runstate at %08lx\n", runstate_addr);
-+
-+			TEST_ASSERT(rs->state == rst.u.runstate.state, "Runstate mismatch");
-+			TEST_ASSERT(rs->state_entry_time == rst.u.runstate.state_entry_time,
-+				    "State entry time mismatch");
-+			TEST_ASSERT(rs->time[RUNSTATE_running] == rst.u.runstate.time_running,
-+				    "Running time mismatch");
-+			TEST_ASSERT(rs->time[RUNSTATE_runnable] == rst.u.runstate.time_runnable,
-+				    "Runnable time mismatch");
-+			TEST_ASSERT(rs->time[RUNSTATE_blocked] == rst.u.runstate.time_blocked,
-+				    "Blocked time mismatch");
-+			TEST_ASSERT(rs->time[RUNSTATE_offline] == rst.u.runstate.time_offline,
-+				    "Offline time mismatch");
-+			TEST_ASSERT(rs->time[RUNSTATE_offline + 1] == 0xa5a5a5a5a5a5a5a5ULL,
-+				    "Structure overrun");
-+
-+			TEST_ASSERT(rs->state_entry_time == rs->time[0] +
-+				    rs->time[1] + rs->time[2] + rs->time[3],
-+				    "runstate times don't add up");
-+		}
- 	}
-+
- 	kvm_vm_free(vm);
- 	return 0;
- }
--- 
-2.35.3
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBEYXZpZCBXb29kaG91c2UgPGR3
+bXcyQGluZnJhZGVhZC5vcmc+DQo+IFNlbnQ6IDE5IE5vdmVtYmVyIDIwMjIgMDk6NDcNCj4gVG86
+IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+OyBTZWFuIENocmlzdG9waGVyc29u
+DQo+IDxzZWFuamNAZ29vZ2xlLmNvbT4NCj4gQ2M6IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IG1oYWxA
+cmJveC5jbw0KPiBTdWJqZWN0OiBbRVhURVJOQUxdIFtQQVRDSCAyLzRdIEtWTTogeDg2L3hlbjog
+Q29tcGF0aWJpbGl0eSBmaXhlcyBmb3INCj4gc2hhcmVkIHJ1bnN0YXRlIGFyZWENCj4gDQo+IENB
+VVRJT046IFRoaXMgZW1haWwgb3JpZ2luYXRlZCBmcm9tIG91dHNpZGUgb2YgdGhlIG9yZ2FuaXph
+dGlvbi4gRG8gbm90DQo+IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMgdW5sZXNzIHlv
+dSBjYW4gY29uZmlybSB0aGUgc2VuZGVyIGFuZCBrbm93DQo+IHRoZSBjb250ZW50IGlzIHNhZmUu
+DQo+IA0KPiANCj4gDQo+IEZyb206IERhdmlkIFdvb2Rob3VzZSA8ZHdtd0BhbWF6b24uY28udWs+
+DQo+IA0KPiBUaGUgZ3Vlc3QgcnVuc3RhdGUgYXJlYSBjYW4gYmUgYXJiaXRyYXJpbHkgYnl0ZS1h
+bGlnbmVkLiBJbiBmYWN0LCBldmVuDQo+IHdoZW4gYSBzYW5lIDMyLWJpdCBndWVzdCBhbGlnbnMg
+dGhlIG92ZXJhbGwgc3RydWN0dXJlIG5pY2VseSwgdGhlIDY0LWJpdA0KPiBmaWVsZHMgaW4gdGhl
+IHN0cnVjdHVyZSBlbmQgdXAgYmVpbmcgdW5hbGlnbmVkIGR1ZSB0byB0aGUgZmFjdCB0aGF0IHRo
+ZQ0KPiAzMi1iaXQgQUJJIG9ubHkgYWxpZ25zIHRoZW0gdG8gMzIgYml0cy4NCj4gDQo+IFNvIHNl
+dHRpbmcgdGhlIC0+c3RhdGVfZW50cnlfdGltZSBmaWVsZCB0byBzb21ldGhpbmd8WEVOX1JVTlNU
+QVRFX1VQREFURQ0KPiBpcyBidWdneSwgYmVjYXVzZSBpZiBpdCdzIHVuYWxpZ25lZCB0aGVuIHdl
+IGNhbid0IHVwZGF0ZSB0aGUgd2hvbGUgZmllbGQNCj4gYXRvbWljYWxseTsgdGhlIGxvdyBieXRl
+cyBtaWdodCBiZSBvYnNlcnZhYmxlIGJlZm9yZSB0aGUgX1VQREFURSBiaXQgaXMuDQo+IFhlbiBh
+Y3R1YWxseSB1cGRhdGVzIHRoZSAqYnl0ZSogY29udGFpbmluZyB0aGF0IHRvcCBiaXQsIG9uIGl0
+cyBvd24uIEtWTQ0KPiBzaG91bGQgZG8gdGhlIHNhbWUuDQo+IA0KPiBJbiBhZGRpdGlvbiwgd2Ug
+Y2Fubm90IGFzc3VtZSB0aGF0IHRoZSBydW5zdGF0ZSBhcmVhIGZpdHMgd2l0aGluIGEgc2luZ2xl
+DQo+IHBhZ2UuIE9uZSBvcHRpb24gbWlnaHQgYmUgdG8gbWFrZSB0aGUgZ2ZuX3RvX3BmbiBjYWNo
+ZSBjb3BlIHdpdGggcmVnaW9ucw0KPiB0aGF0IGNyb3NzIGEgcGFnZSDigJQgYnV0IGdldHRpbmcg
+YSBjb250aWd1b3VzIHZpcnR1YWwga2VybmVsIG1hcHBpbmcgb2YgYQ0KPiBkaXNjb250aWd1b3Vz
+IHNldCBvZiBJT01FTSBwYWdlcyBpcyBhIGRpc3RpbmN0bHkgbm9uLXRyaXZpYWwgZXhlcmNpc2Us
+IGFuZA0KPiBpdCBzZWVtcyB0aGlzIGlzIHRoZSAqb25seSogY3VycmVudCB1c2UgY2FzZSBmb3Ig
+dGhlIEdQQyB3aGljaCB3b3VsZA0KPiBiZW5lZml0IGZyb20gaXQuDQo+IA0KPiBBbiBlYXJsaWVy
+IHZlcnNpb24gb2YgdGhlIHJ1bnN0YXRlIGNvZGUgZGlkIHVzZSBhIGdmbl90b19odmEgY2FjaGUg
+Zm9yDQo+IHRoaXMgcHVycG9zZSwgYnV0IGl0IHN0aWxsIGhhZCB0aGUgc2luZ2xlLXBhZ2UgcmVz
+dHJpY3Rpb24gYmVjYXVzZSBpdCB1c2VkDQo+IHRoZSB1aHZhIGRpcmVjdGx5IOKAlCBiZWNhdXNl
+IGl0IG5lZWRzIHRvIGJlIGFibGUgdG8gZG8gc28gYXRvbWljYWxseSB3aGVuDQo+IHRoZSB2Q1BV
+IGlzIGJlaW5nIHNjaGVkdWxlZCBvdXQsIHNvIGl0IHVzZWQgcGFnZWZhdWx0X2Rpc2FibGUoKSBh
+cm91bmQgdGhlDQo+IGFjY2Vzc2VzIGFuZCBkaWRuJ3QganVzdCB1c2Uga3ZtX3dyaXRlX2d1ZXN0
+X2NhY2hlZCgpIHdoaWNoIGhhcyBhIGZhbGxiYWNrDQo+IHBhdGguDQo+IA0KPiBTby4uLiB1c2Ug
+YSBwYWlyIG9mIEdQQ3MgZm9yIHRoZSBmaXJzdCBhbmQgcG90ZW50aWFsIHNlY29uZCBwYWdlIGNv
+dmVyaW5nDQo+IHRoZSBydW5zdGF0ZSBhcmVhLiBXZSBjYW4gZ2V0IGF3YXkgd2l0aCBsb2NraW5n
+IGJvdGggYXQgb25jZSBiZWNhdXNlDQo+IG5vdGhpbmcgZWxzZSB0YWtlcyBtb3JlIHRoYW4gb25l
+IEdQQyBsb2NrIGF0IGEgdGltZSBzbyB3ZSBjYW4gaW52ZW50IGENCj4gdHJpdmlhbCBvcmRlcmlu
+ZyBydWxlLg0KPiANCj4gS2VlcCB0aGUgdHJpdmlhbCBmYXN0IHBhdGggZm9yIHRoZSBjb21tb24g
+Y2FzZSB3aGVyZSBpdCdzIGFsbCBpbiB0aGUgc2FtZQ0KPiBwYWdlLCBidXQgZml4ZWQgdG8gdXNl
+IGEgYnl0ZSBhY2Nlc3MgZm9yIHRoZSBYRU5fUlVOU1RBVEVfVVBEQVRFIGJpdC4gQW5kDQo+IGlu
+IHRoZSBjcm9zcy1wYWdlIGNhc2UsIGJ1aWxkIHRoZSBzdHJ1Y3R1cmUgbG9jYWxseSBvbiB0aGUg
+c3RhY2sgYW5kIHRoZW4NCj4gY29weSBpdCBvdmVyIHdpdGggdHdvIG1lbWNweSgpIGNhbGxzLCBh
+Z2FpbiBoYW5kbGluZyB0aGUNCj4gWEVOX1JVTlNUQVRFX1VQREFURSBiaXQgdGhyb3VnaCBhIHNp
+bmdsZSBieXRlIGFjY2Vzcy4NCj4gDQo+IEZpbmFsbHksIFhlbiBhbHNvIGRvZXMgd3JpdGUgdGhl
+IHJ1bnN0YXRlIGFyZWEgaW1tZWRpYXRlbHkgd2hlbiBpdCdzDQo+IGNvbmZpZ3VyZWQuIEZsaXAg
+dGhlIGt2bV94ZW5fdXBkYXRlX3J1bnN0YXRlKCkgYW5kIOKApl9ndWVzdCgpIGZ1bmN0aW9ucyBh
+bmQNCj4gY2FsbCB0aGUgbGF0dGVyIGRpcmVjdGx5IHdoZW4gdGhlIHJ1bnN0YXRlIGFyZWEgaXMg
+c2V0LiBUaGlzIG1lYW5zIHRoYXQNCj4gb3RoZXIgaW9jdGxzIHdoaWNoIG1vZGlmeSB0aGUgcnVu
+c3RhdGUgYWxzbyB3cml0ZSBpdCBpbW1lZGlhdGVseSB0byB0aGUNCj4gZ3Vlc3Qgd2hlbiB0aGV5
+IGRvIHNvLCB3aGljaCBpcyBhbHNvIGludGVuZGVkLg0KPiANCj4gVXBkYXRlIHRoZSB4ZW5fc2hp
+bmZvX3Rlc3QgdG8gZXhlcmNpc2UgdGhlIHBhdGhvbG9naWNhbCBjYXNlIHdoZXJlIHRoZQ0KPiBY
+RU5fUlVOU1RBVEVfVVBEQVRFIGZsYWcgaW4gdGhlIHRvcCBieXRlIG9mIHRoZSBzdGF0ZV9lbnRy
+eV90aW1lIGlzDQo+IGFjdHVhbGx5IGluIGEgZGlmZmVyZW50IHBhZ2UgdG8gdGhlIHJlc3Qgb2Yg
+dGhlIDY0LWJpdCB3b3JkLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogRGF2aWQgV29vZGhvdXNlIDxk
+d213QGFtYXpvbi5jby51az4NCj4gLS0tDQo+ICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9z
+dC5oICAgICAgICAgICAgICAgfCAgIDEgKw0KPiAgYXJjaC94ODYva3ZtL3hlbi5jICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIHwgMzY3ICsrKysrKysrKysrKystLS0tLQ0KPiAgYXJjaC94ODYv
+a3ZtL3hlbi5oICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA2ICstDQo+ICAuLi4vc2Vs
+ZnRlc3RzL2t2bS94ODZfNjQveGVuX3NoaW5mb190ZXN0LmMgICAgfCAgMTIgKy0NCj4gIDQgZmls
+ZXMgY2hhbmdlZCwgMjcyIGluc2VydGlvbnMoKyksIDExNCBkZWxldGlvbnMoLSkNCj4gDQo+IGRp
+ZmYgLS1naXQgYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oDQo+IGIvYXJjaC94ODYv
+aW5jbHVkZS9hc20va3ZtX2hvc3QuaCBpbmRleCBkMTAxM2M0ZjY3M2MuLjcwYWY3MjQwYTFkNSAx
+MDA2NDQNCj4gLS0tIGEvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaA0KPiArKysgYi9h
+cmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oDQo+IEBAIC02ODYsNiArNjg2LDcgQEAgc3Ry
+dWN0IGt2bV92Y3B1X3hlbiB7DQo+ICAgICAgICAgc3RydWN0IGdmbl90b19wZm5fY2FjaGUgdmNw
+dV9pbmZvX2NhY2hlOw0KPiAgICAgICAgIHN0cnVjdCBnZm5fdG9fcGZuX2NhY2hlIHZjcHVfdGlt
+ZV9pbmZvX2NhY2hlOw0KPiAgICAgICAgIHN0cnVjdCBnZm5fdG9fcGZuX2NhY2hlIHJ1bnN0YXRl
+X2NhY2hlOw0KPiArICAgICAgIHN0cnVjdCBnZm5fdG9fcGZuX2NhY2hlIHJ1bnN0YXRlMl9jYWNo
+ZTsNCj4gICAgICAgICB1NjQgbGFzdF9zdGVhbDsNCj4gICAgICAgICB1NjQgcnVuc3RhdGVfZW50
+cnlfdGltZTsNCj4gICAgICAgICB1NjQgcnVuc3RhdGVfdGltZXNbNF07DQo+IGRpZmYgLS1naXQg
+YS9hcmNoL3g4Ni9rdm0veGVuLmMgYi9hcmNoL3g4Ni9rdm0veGVuLmMgaW5kZXgNCj4gNGI4ZTk2
+MjhmYmY1Li44YWE5NTNiMWYwZTAgMTAwNjQ0DQo+IC0tLSBhL2FyY2gveDg2L2t2bS94ZW4uYw0K
+PiArKysgYi9hcmNoL3g4Ni9rdm0veGVuLmMNCj4gQEAgLTE3MCwxNDggKzE3MCwyNjkgQEAgc3Rh
+dGljIHZvaWQga3ZtX3hlbl9pbml0X3RpbWVyKHN0cnVjdCBrdm1fdmNwdQ0KPiAqdmNwdSkNCj4g
+ICAgICAgICB2Y3B1LT5hcmNoLnhlbi50aW1lci5mdW5jdGlvbiA9IHhlbl90aW1lcl9jYWxsYmFj
+azsgIH0NCj4gDQo+IC1zdGF0aWMgdm9pZCBrdm1feGVuX3VwZGF0ZV9ydW5zdGF0ZShzdHJ1Y3Qg
+a3ZtX3ZjcHUgKnYsIGludCBzdGF0ZSkNCj4gK3N0YXRpYyB2b2lkIGt2bV94ZW5fdXBkYXRlX3J1
+bnN0YXRlX2d1ZXN0KHN0cnVjdCBrdm1fdmNwdSAqdiwgYm9vbA0KPiArYXRvbWljKQ0KPiAgew0K
+PiAgICAgICAgIHN0cnVjdCBrdm1fdmNwdV94ZW4gKnZ4ID0gJnYtPmFyY2gueGVuOw0KPiAtICAg
+ICAgIHU2NCBub3cgPSBnZXRfa3ZtY2xvY2tfbnModi0+a3ZtKTsNCj4gLSAgICAgICB1NjQgZGVs
+dGFfbnMgPSBub3cgLSB2eC0+cnVuc3RhdGVfZW50cnlfdGltZTsNCj4gLSAgICAgICB1NjQgcnVu
+X2RlbGF5ID0gY3VycmVudC0+c2NoZWRfaW5mby5ydW5fZGVsYXk7DQo+ICsgICAgICAgc3RydWN0
+IGdmbl90b19wZm5fY2FjaGUgKmdwYzEgPSAmdngtPnJ1bnN0YXRlX2NhY2hlOw0KPiArICAgICAg
+IHN0cnVjdCBnZm5fdG9fcGZuX2NhY2hlICpncGMyID0gJnZ4LT5ydW5zdGF0ZTJfY2FjaGU7DQo+
+ICsgICAgICAgc2l6ZV90IHVzZXJfbGVuLCB1c2VyX2xlbjEsIHVzZXJfbGVuMjsNCg0KSSB0aGlu
+ayBpdCBtaWdodCBtYWtlIHRoZSBjb2RlIG1hcmdpbmFsbHkgbmVhdGVyIHRvIHVzZSB0d28tZWxl
+bWVudCBhcnJheXMuLi4gYnV0IG9ubHkgbWFyZ2luYWxseS4NCg0KPiArICAgICAgIHN0cnVjdCB2
+Y3B1X3J1bnN0YXRlX2luZm8gcnM7DQo+ICsgICAgICAgaW50ICpyc19zdGF0ZSA9ICZycy5zdGF0
+ZTsNCj4gKyAgICAgICB1bnNpZ25lZCBsb25nIGZsYWdzOw0KPiArICAgICAgIHNpemVfdCB0aW1l
+c19vZnM7DQo+ICsgICAgICAgdTggKnVwZGF0ZV9iaXQ7DQo+IA0KPiAtICAgICAgIGlmICh1bmxp
+a2VseSghdngtPnJ1bnN0YXRlX2VudHJ5X3RpbWUpKQ0KPiAtICAgICAgICAgICAgICAgdngtPmN1
+cnJlbnRfcnVuc3RhdGUgPSBSVU5TVEFURV9vZmZsaW5lOw0KPiArICAgICAgIC8qDQo+ICsgICAg
+ICAgICogVGhlIG9ubHkgZGlmZmVyZW5jZSBiZXR3ZWVuIDMyLWJpdCBhbmQgNjQtYml0IHZlcnNp
+b25zIG9mIHRoZQ0KPiArICAgICAgICAqIHJ1bnN0YXRlIHN0cnVjdCB1cyB0aGUgYWxpZ25tZW50
+IG9mIHVpbnQ2NF90IGluIDMyLWJpdCwgd2hpY2gNCj4gKyAgICAgICAgKiBtZWFucyB0aGF0IHRo
+ZSA2NC1iaXQgdmVyc2lvbiBoYXMgYW4gYWRkaXRpb25hbCA0IGJ5dGVzIG9mDQo+ICsgICAgICAg
+ICogcGFkZGluZyBhZnRlciB0aGUgZmlyc3QgZmllbGQgJ3N0YXRlJy4NCj4gKyAgICAgICAgKi8N
+Cj4gKyAgICAgICBCVUlMRF9CVUdfT04ob2Zmc2V0b2Yoc3RydWN0IHZjcHVfcnVuc3RhdGVfaW5m
+bywgc3RhdGUpICE9IDApOw0KPiArICAgICAgIEJVSUxEX0JVR19PTihvZmZzZXRvZihzdHJ1Y3Qg
+Y29tcGF0X3ZjcHVfcnVuc3RhdGVfaW5mbywgc3RhdGUpICE9DQo+IDApOw0KPiArICAgICAgIEJV
+SUxEX0JVR19PTihzaXplb2Yoc3RydWN0IGNvbXBhdF92Y3B1X3J1bnN0YXRlX2luZm8pICE9IDB4
+MmMpOw0KPiArI2lmZGVmIENPTkZJR19YODZfNjQNCj4gKyAgICAgICBCVUlMRF9CVUdfT04ob2Zm
+c2V0b2Yoc3RydWN0IHZjcHVfcnVuc3RhdGVfaW5mbywgc3RhdGVfZW50cnlfdGltZSkNCj4gIT0N
+Cj4gKyAgICAgICAgICAgICAgICAgICAgb2Zmc2V0b2Yoc3RydWN0IGNvbXBhdF92Y3B1X3J1bnN0
+YXRlX2luZm8sDQo+IHN0YXRlX2VudHJ5X3RpbWUpICsgNCk7DQo+ICsgICAgICAgQlVJTERfQlVH
+X09OKG9mZnNldG9mKHN0cnVjdCB2Y3B1X3J1bnN0YXRlX2luZm8sIHRpbWUpICE9DQo+ICsgICAg
+ICAgICAgICAgICAgICAgIG9mZnNldG9mKHN0cnVjdCBjb21wYXRfdmNwdV9ydW5zdGF0ZV9pbmZv
+LCB0aW1lKSArDQo+ICs0KTsgI2VuZGlmDQo+ICsNCj4gKyAgICAgICBpZiAoSVNfRU5BQkxFRChD
+T05GSUdfNjRCSVQpICYmIHYtPmt2bS0+YXJjaC54ZW4ubG9uZ19tb2RlKSB7DQo+ICsgICAgICAg
+ICAgICAgICB1c2VyX2xlbiA9IHNpemVvZihzdHJ1Y3QgdmNwdV9ydW5zdGF0ZV9pbmZvKTsNCj4g
+KyAgICAgICAgICAgICAgIHRpbWVzX29mcyA9IG9mZnNldG9mKHN0cnVjdCB2Y3B1X3J1bnN0YXRl
+X2luZm8sDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdGF0ZV9lbnRy
+eV90aW1lKTsNCj4gKyAgICAgICB9IGVsc2Ugew0KPiArICAgICAgICAgICAgICAgdXNlcl9sZW4g
+PSBzaXplb2Yoc3RydWN0IGNvbXBhdF92Y3B1X3J1bnN0YXRlX2luZm8pOw0KPiArICAgICAgICAg
+ICAgICAgdGltZXNfb2ZzID0gb2Zmc2V0b2Yoc3RydWN0IGNvbXBhdF92Y3B1X3J1bnN0YXRlX2lu
+Zm8sDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdGF0ZV9lbnRyeV90
+aW1lKTsNCj4gKyAgICAgICAgICAgICAgIHJzX3N0YXRlKys7DQo+ICsgICAgICAgfQ0KPiANCj4g
+ICAgICAgICAvKg0KPiAtICAgICAgICAqIFRpbWUgd2FpdGluZyBmb3IgdGhlIHNjaGVkdWxlciBp
+c24ndCAic3RvbGVuIiBpZiB0aGUNCj4gLSAgICAgICAgKiB2Q1BVIHdhc24ndCBydW5uaW5nIGFu
+eXdheS4NCj4gKyAgICAgICAgKiBUaGVyZSBhcmUgYmFzaWNhbGx5IG5vIGFsaWdubWVudCBjb25z
+dHJhaW50cy4gVGhlIGd1ZXN0IGNhbiBzZXQNCj4gaXQNCj4gKyAgICAgICAgKiB1cCBzbyBpdCBj
+cm9zc2VzIGZyb20gb25lIHBhZ2UgdG8gdGhlIG5leHQsIGFuZCBhdCBhcmJpdHJhcnkNCj4gYnl0
+ZQ0KPiArICAgICAgICAqIGFsaWdubWVudCAoYW5kIHRoZSAzMi1iaXQgQUJJIGRvZXNuJ3QgYWxp
+Z24gdGhlIDY0LWJpdCBpbnRlZ2Vycw0KPiArICAgICAgICAqIGFueXdheSwgZXZlbiBpZiB0aGUg
+b3ZlcmFsbCBzdHJ1Y3QgaGFkIGJlZW4gNjQtYml0IGFsaWduZWQpLg0KPiAgICAgICAgICAqLw0K
+PiAtICAgICAgIGlmICh2eC0+Y3VycmVudF9ydW5zdGF0ZSA9PSBSVU5TVEFURV9ydW5uaW5nKSB7
+DQo+IC0gICAgICAgICAgICAgICB1NjQgc3RlYWxfbnMgPSBydW5fZGVsYXkgLSB2eC0+bGFzdF9z
+dGVhbDsNCj4gKyAgICAgICBpZiAoKGdwYzEtPmdwYSAmIH5QQUdFX01BU0spICsgdXNlcl9sZW4g
+Pj0gUEFHRV9TSVpFKSB7DQo+ICsgICAgICAgICAgICAgICB1c2VyX2xlbjEgPSBQQUdFX1NJWkUg
+LSAoZ3BjMS0+Z3BhICYgflBBR0VfTUFTSyk7DQo+ICsgICAgICAgICAgICAgICB1c2VyX2xlbjIg
+PSB1c2VyX2xlbiAtIHVzZXJfbGVuMTsNCj4gKyAgICAgICB9IGVsc2Ugew0KPiArICAgICAgICAg
+ICAgICAgdXNlcl9sZW4xID0gdXNlcl9sZW47DQo+ICsgICAgICAgICAgICAgICB1c2VyX2xlbjIg
+PSAwOw0KPiArICAgICAgIH0NCj4gKyAgICAgICBCVUdfT04odXNlcl9sZW4xICsgdXNlcl9sZW4y
+ICE9IHVzZXJfbGVuKTsNCj4gDQo+IC0gICAgICAgICAgICAgICBkZWx0YV9ucyAtPSBzdGVhbF9u
+czsNCj4gKyByZXRyeToNCj4gKyAgICAgICAvKg0KPiArICAgICAgICAqIEF0dGVtcHQgdG8gb2J0
+YWluIHRoZSBHUEMgbG9jayBvbiAqYm90aCogKGlmIHRoZXJlIGFyZSB0d28pDQo+ICsgICAgICAg
+ICogZ2ZuX3RvX3BmbiBjYWNoZXMgdGhhdCBjb3ZlciB0aGUgcmVnaW9uLg0KPiArICAgICAgICAq
+Lw0KPiArICAgICAgIHJlYWRfbG9ja19pcnFzYXZlKCZncGMxLT5sb2NrLCBmbGFncyk7DQo+ICsg
+ICAgICAgd2hpbGUgKCFrdm1fZ2ZuX3RvX3Bmbl9jYWNoZV9jaGVjayh2LT5rdm0sIGdwYzEsIGdw
+YzEtPmdwYSwNCj4gdXNlcl9sZW4xKSkgew0KPiArICAgICAgICAgICAgICAgcmVhZF91bmxvY2tf
+aXJxcmVzdG9yZSgmZ3BjMS0+bG9jaywgZmxhZ3MpOw0KPiANCj4gLSAgICAgICAgICAgICAgIHZ4
+LT5ydW5zdGF0ZV90aW1lc1tSVU5TVEFURV9ydW5uYWJsZV0gKz0gc3RlYWxfbnM7DQo+ICsgICAg
+ICAgICAgICAgICAvKiBXaGVuIGludm9rZWQgZnJvbSBrdm1fc2NoZWRfb3V0KCkgd2UgY2Fubm90
+IHNsZWVwICovDQo+ICsgICAgICAgICAgICAgICBpZiAoYXRvbWljKQ0KPiArICAgICAgICAgICAg
+ICAgICAgICAgICByZXR1cm47DQo+ICsNCj4gKyAgICAgICAgICAgICAgIGlmIChrdm1fZ2ZuX3Rv
+X3Bmbl9jYWNoZV9yZWZyZXNoKHYtPmt2bSwgZ3BjMSwgZ3BjMS0+Z3BhLA0KPiB1c2VyX2xlbjEp
+KQ0KPiArICAgICAgICAgICAgICAgICAgICAgICByZXR1cm47DQo+ICsNCj4gKyAgICAgICAgICAg
+ICAgIHJlYWRfbG9ja19pcnFzYXZlKCZncGMxLT5sb2NrLCBmbGFncyk7DQoNClRoaXMgaXMgYSBy
+ZXBlYXRlZCBwYXR0ZXJuIG5vdywgc28gaG93IGFib3V0IGEgaGVscGVyIGZ1bmN0aW9uPw0KDQog
+IFBhdWwNCg==
