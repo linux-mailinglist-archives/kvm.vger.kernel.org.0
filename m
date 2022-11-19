@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C3446308DD
-	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 02:54:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B4BC6308D9
+	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 02:54:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230306AbiKSBxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Nov 2022 20:53:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52884 "EHLO
+        id S233016AbiKSBxk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Nov 2022 20:53:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231645AbiKSBwr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Nov 2022 20:52:47 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66FADC5B6D
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 17:35:05 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id p7-20020a631e47000000b0047691854a86so3954013pgm.16
-        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 17:35:05 -0800 (PST)
+        with ESMTP id S231947AbiKSBws (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Nov 2022 20:52:48 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA7EAC4C01
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 17:35:06 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id x8-20020aa79568000000b0056dd717e051so3990738pfq.11
+        for <kvm@vger.kernel.org>; Fri, 18 Nov 2022 17:35:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=tD2ZlexlcX0KfmQHE0mJ5LR6ZJYKnXIf8Otqhyd2XwU=;
-        b=MB9MhSdwME1l5f01zL+yqUNJf3WE7Wu0+w8g0OhQMoRgcdFNMiEl2Posb3nwOUuTuD
-         +tDRTwe89VCBh4TUUBZYFwPkQegSk7I3pM8hr0OWMKYHJXHnIW5iyWHzAp1baiIvkL+M
-         xvWAhhFwW2Yf1Gj5279lBpactxhKOCQ0IEInrZiBKCsvP5jjloBw2bf5pvCQbaP/a02E
-         HctMjGFpVqM0zObrPX67hF9ozKCMkdYoLheziBuZphT1nqQ1b2UPE5GWbP6p2+JrfcJy
-         4NPgcWYf4DFDp2d5yS3j2Vy/fKpDMxIRtkJbIs7JiWbVyohddhm+ah4g1/MDsxL6xsfT
-         dFHQ==
+        bh=qzw3IRf6ZKe9LngiNeoq0Xsow8qMnOMLe6mysjx7GEY=;
+        b=WWS9khtEqbOMUnGtkkRMFWvzWDeu4ayjWFRQDGu0iXtOVJDbGSrq/gFRGxrZKKJlGY
+         5URd5JYCZgwjvnTNl+Ti4rcPQweserrYFuLxS4+F3t/CDOTOr8AEBOZfx3Z2J7idO5c3
+         IDrXNJR03kAw8HpcOlPfCE2+OuJJLGuPU94IZVw40YREPb5/vCeSYvPEvia9tHwTfU1C
+         3eBObmpTzOi0i9sxvSozcBhsXpCtw6mLFCvyTAoFKa+x82RFPn06o73N3tlHftgOtE6+
+         Xi5hjcYeXjmsl23MApz3bUysNrg7rYzS/9ickjvQa7GqFIN4rdzGd0NiV/GRPNAISoz2
+         56jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tD2ZlexlcX0KfmQHE0mJ5LR6ZJYKnXIf8Otqhyd2XwU=;
-        b=upGeRKXu1UqAXY9LGeVnne3cCRXVYA4WV7GN3gfdmGbRV8FCtjTvdSt8sDSz7YVSYk
-         feBesya8vIxl07QFT/Cth1y3AH3GBjDoIq4GM0knQbrLxt8ekFDu5RWDcgueJ5Cxbgt3
-         aC1CHOtPvwS8Xq9TqQ/YgvrrA06X6FQdNkzGeObcMFa6TWVhxTNT3q5q50VRtJ4q01Pg
-         lsvRF5PzSa8974TZAoZkgjYkl6Tyf4ifAKFOy6JQF/64UJxEqq1v7MiqoC3J2w3sZT+l
-         lmsre+oHCPyV3bZbqnMmI/huz92KsP+JXdEoNfKWU37+C19IqG0RGPYQilogJhf40Xfg
-         TR9w==
-X-Gm-Message-State: ANoB5pk7SoK72TUNVrONsS0Rn8Hh92Q1JrLjOh/lTXmT0c9Sb3XhAVUq
-        kFtC6fsDGWcB6p3AwtB45CUC9PDqXeY=
-X-Google-Smtp-Source: AA0mqf4s6WDEnZBoY+6XZCe4HZOEbOD1f6H/JunJuats/BV6uCd/5C6MD5Uo30NfHWTAU95c5mftoaNq5KY=
+        bh=qzw3IRf6ZKe9LngiNeoq0Xsow8qMnOMLe6mysjx7GEY=;
+        b=CEiiQx5DF/c+GK9JbOVA1aydalTJg+WOIPZ4iQQhCaZYtgjNo/Ga/YNLWP/ZMW9zO4
+         5vaH7TI7w9o8e2GR/8+zKyYivEWnjdG14IZxhgP3fFxldW49qUm43nOmwMQCrPEwg6m/
+         jHvjkgA/ilJBPJ/abXC+SsAfoyd2GkOdsWqF1LaN/iHoPzv9YRnGPII4KxYyK7Guq5fY
+         iFXXfN/0zFU5gyGyOZ9oWiPHMMkjoK8uSzDx52KPxC5RfmO0+mTnBpNxJi4eozy2V/Rf
+         HWgYCYpmBXU70VhG8FWcavujZi99Rb9E9c6/XvQV+eBVRqP2vRWa7omWnFy5/muf6Tzm
+         4F8w==
+X-Gm-Message-State: ANoB5plIBv+gkyhy0/7uL0EG/7s6EE/rOO8lLjA8Wp7l+gszflFlol71
+        UUQrNtwZdcTXpeV/nARgqkrl7ixcxNM=
+X-Google-Smtp-Source: AA0mqf7p4CLtuFVtgdl7Bc/NuOg5CLDSNQp6GUYPt/V6N4R/KHWFFrAEPbFAt9/8yfYfs5xqa5KFvyBu1UA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:16d4:0:b0:572:6b5f:bdc2 with SMTP id
- 203-20020a6216d4000000b005726b5fbdc2mr10383566pfw.36.1668821704620; Fri, 18
- Nov 2022 17:35:04 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a63:ce09:0:b0:470:537b:9d23 with SMTP id
+ y9-20020a63ce09000000b00470537b9d23mr8701437pgf.185.1668821706323; Fri, 18
+ Nov 2022 17:35:06 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 19 Nov 2022 01:34:48 +0000
+Date:   Sat, 19 Nov 2022 01:34:49 +0000
 In-Reply-To: <20221119013450.2643007-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221119013450.2643007-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221119013450.2643007-8-seanjc@google.com>
-Subject: [PATCH 7/9] tools: Drop conflicting non-atomic test_and_{clear,set}_bit()
- helpers
+Message-ID: <20221119013450.2643007-9-seanjc@google.com>
+Subject: [PATCH 8/9] tools: Drop "atomic_" prefix from atomic test_and_set_bit()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Yury Norov <yury.norov@gmail.com>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -79,7 +78,7 @@ Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,60 +86,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop tools' non-atomic test_and_set_bit() and test_and_clear_bit() helpers
-now that all users are gone.  The names will be claimed in the future for
-atomic versions.
+Drop the "atomic_" prefix from tools' atomic_test_and_set_bit() to
+match the kernel nomenclature where test_and_set_bit() is atomic,
+and __test_and_set_bit() provides the non-atomic variant.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/include/linux/bitmap.h | 34 ----------------------------------
- 1 file changed, 34 deletions(-)
+ tools/arch/x86/include/asm/atomic.h            | 3 +--
+ tools/include/asm-generic/atomic-gcc.h         | 2 +-
+ tools/testing/selftests/kvm/lib/ucall_common.c | 2 +-
+ 3 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/tools/include/linux/bitmap.h b/tools/include/linux/bitmap.h
-index 65d0747c5205..f3566ea0f932 100644
---- a/tools/include/linux/bitmap.h
-+++ b/tools/include/linux/bitmap.h
-@@ -77,40 +77,6 @@ static inline void bitmap_or(unsigned long *dst, const unsigned long *src1,
- 		__bitmap_or(dst, src1, src2, nbits);
+diff --git a/tools/arch/x86/include/asm/atomic.h b/tools/arch/x86/include/asm/atomic.h
+index 01cc27ec4520..a42733af7d51 100644
+--- a/tools/arch/x86/include/asm/atomic.h
++++ b/tools/arch/x86/include/asm/atomic.h
+@@ -71,10 +71,9 @@ static __always_inline int atomic_cmpxchg(atomic_t *v, int old, int new)
+ 	return cmpxchg(&v->counter, old, new);
  }
  
--/**
-- * test_and_set_bit - Set a bit and return its old value
-- * @nr: Bit to set
-- * @addr: Address to count from
-- */
--static inline int test_and_set_bit(int nr, unsigned long *addr)
--{
--	unsigned long mask = BIT_MASK(nr);
--	unsigned long *p = ((unsigned long *)addr) + BIT_WORD(nr);
--	unsigned long old;
+-static inline int atomic_test_and_set_bit(long nr, unsigned long *addr)
++static inline int test_and_set_bit(long nr, unsigned long *addr)
+ {
+ 	GEN_BINARY_RMWcc(LOCK_PREFIX __ASM_SIZE(bts), *addr, "Ir", nr, "%0", "c");
 -
--	old = *p;
--	*p = old | mask;
--
--	return (old & mask) != 0;
--}
--
--/**
-- * test_and_clear_bit - Clear a bit and return its old value
-- * @nr: Bit to clear
-- * @addr: Address to count from
-- */
--static inline int test_and_clear_bit(int nr, unsigned long *addr)
--{
--	unsigned long mask = BIT_MASK(nr);
--	unsigned long *p = ((unsigned long *)addr) + BIT_WORD(nr);
--	unsigned long old;
--
--	old = *p;
--	*p = old & ~mask;
--
--	return (old & mask) != 0;
--}
--
- /**
-  * bitmap_zalloc - Allocate bitmap
-  * @nbits: Number of bits
+ }
+ 
+ #endif /* _TOOLS_LINUX_ASM_X86_ATOMIC_H */
+diff --git a/tools/include/asm-generic/atomic-gcc.h b/tools/include/asm-generic/atomic-gcc.h
+index 6daa68bf5b9e..37ef522aaac4 100644
+--- a/tools/include/asm-generic/atomic-gcc.h
++++ b/tools/include/asm-generic/atomic-gcc.h
+@@ -70,7 +70,7 @@ static inline int atomic_cmpxchg(atomic_t *v, int oldval, int newval)
+ 	return cmpxchg(&(v)->counter, oldval, newval);
+ }
+ 
+-static inline int atomic_test_and_set_bit(long nr, unsigned long *addr)
++static inline int test_and_set_bit(long nr, unsigned long *addr)
+ {
+ 	unsigned long mask = BIT_MASK(nr);
+ 	long old;
+diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+index fcae96461e46..820ce6c82829 100644
+--- a/tools/testing/selftests/kvm/lib/ucall_common.c
++++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+@@ -44,7 +44,7 @@ static struct ucall *ucall_alloc(void)
+ 	GUEST_ASSERT(ucall_pool);
+ 
+ 	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+-		if (!atomic_test_and_set_bit(i, ucall_pool->in_use)) {
++		if (!test_and_set_bit(i, ucall_pool->in_use)) {
+ 			uc = &ucall_pool->ucalls[i];
+ 			memset(uc->args, 0, sizeof(uc->args));
+ 			return uc;
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
