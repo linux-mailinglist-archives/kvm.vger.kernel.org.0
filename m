@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 122C3630EB1
-	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 13:30:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BAA58630EB0
+	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 13:30:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232799AbiKSMaV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Nov 2022 07:30:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33962 "EHLO
+        id S233386AbiKSMa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Nov 2022 07:30:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229592AbiKSMaS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 19 Nov 2022 07:30:18 -0500
+        with ESMTP id S229592AbiKSMaY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 19 Nov 2022 07:30:24 -0500
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63CED240B4
-        for <kvm@vger.kernel.org>; Sat, 19 Nov 2022 04:30:17 -0800 (PST)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AJCP2HJ025394;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722BE2B27A
+        for <kvm@vger.kernel.org>; Sat, 19 Nov 2022 04:30:23 -0800 (PST)
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AJC5kI5023884;
         Sat, 19 Nov 2022 12:29:17 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : content-transfer-encoding : content-type :
- mime-version; s=corp-2022-7-12;
- bh=5nAq210glcspJMzuimImYlKqNANwK4iKBnAOxZ1+7y0=;
- b=G6L9iGVm+AaESpUPAdF70cupb6A9r7QIM/n3BKNVkFn5uL0L3ziAEP5AVnxyCzELx8Fb
- lHzVD1m1JcDa66aOjtc5Fo/SWQnLBHto6wu2/BAVwk/gt00LOKodvH7RGhnwtNi/pTdt
- lKD063aV2/7nijoUF+IMQLrXXx15t4aR6JWetQWN/xVinkN5yENreFaCWFwsFkKiTDEf
- p2efHwU5vFyNUKczctiDZafK2HCjVHgP3iRoOTJut6w7ExUnt+ptJkJMYJf6jlsBBy8A
- p4v3kdD73SaTHTJ/mPG/VZ6Ob+OFmfTD+9HwRuZpZGUa7eS6fA8wTXx8UQRPmcBd/qbZ rA== 
+ subject : date : message-id : in-reply-to : references :
+ content-transfer-encoding : content-type : mime-version; s=corp-2022-7-12;
+ bh=BbFb2D9GAotJgJW7YAXjMx4kHDQpHLj+ta4h1/gt5Gc=;
+ b=b1IszUqzlQIZS8Qt02EiomNoy9Wxt7e8L/qVHOc6nNNWqnMX/DjPSSG7E8U+kQPhrC0R
+ ELLCOa9T2VMmGHUcUQkLh5iXtaTwdqjb272r5zb2sJJNdLacWG40JFpVUQCcwklZKVhn
+ Vt4LA0DGypIeVFIBuW4CZcsLCf6CWzO/jHq0FC1sXKM7rdEPQZEcQ3JxTYAyhLRMdCvJ
+ ylr8V5E6cguO49KuvTKsKo+YahvYxKxc8uYDwi8sNGW7HN2+BNCA2blpiD4ewSGDdG1h
+ HXRdWymxerqekuN9IiS/G4bQGH6qBD+sKt9oJ44T/LymUZHdeMaetDPwrty3hU3kROAV CA== 
 Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3kxy4e003f-1
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3kxs57gewv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 19 Nov 2022 12:29:16 +0000
+        Sat, 19 Nov 2022 12:29:17 +0000
 Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2AJ8N6E2028055;
-        Sat, 19 Nov 2022 12:29:15 GMT
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2AJ8N6E3028055;
+        Sat, 19 Nov 2022 12:29:16 GMT
 Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2176.outbound.protection.outlook.com [104.47.57.176])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3kxnk7mefq-1
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3kxnk7mefq-2
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Sat, 19 Nov 2022 12:29:15 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bE0eyZw1kuKPfUU969L2HGL7tr8yV7Zj+pAhMs8tOrZxwGKBn0flFa7UTJjW1KAf6KjWdgjT43vpnzHW73UprXS78yRSXv8+9x4lWew4DNQuPebtvIDE73dKf66LboEV++p7s2gCd1OwObzv2UphE97kMnQrODQv6JQJElqdMfrblimvvvTSZfNbJnW0p2c6hdIS7GhuzgoysUrFDLKZzIXW1PB8kvXmZhDeZ0pkE/HQ1f3+hRNgQQDQ8aOF02JHrkR4UJeazylUA6KFKt3/Q1ymG9ODpexrsWqWAk5pnYtDukpApSDPWa9DI94fWAqGWEOIZlEnH2GA5FeD2g6Gdw==
+ b=XU68mMn1mtscrWXKvX2a7Dt+xJHCbNo7NWmZykaWFjccDSeAsI1S0OXzLc7iZotH+buuvpgP9z+eoiNZj4rsuX5wn6/QsVLhx8xGMJPCnnLZxf2z/5pKUX5SW5mVrdb1oTKX5v8IaWj2coazunB31Q9P/e5DdtZg5UH7gw5JOlZhGzGA6uO2T1nfFaSAzskYQxq/gA7a+XNjRW2C0BoLhQGlOh2keVi1tSH5impuLcsrq0vNuGRMb3H2rbFIqdd22yizP+r189SiXqXaRRGBfnBMQ5dZ2vyo7QyMrx3iy9I9MJC9unwJe2CY9RWkOma4jvTVwmSYna3hEWTM/+/Q9A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5nAq210glcspJMzuimImYlKqNANwK4iKBnAOxZ1+7y0=;
- b=Xxxos7MT24AaN1cznZMt5VOcfZljyxaH/9TrpE3YItkdGmRrMaj4ovzc69rAFlxaAjrVs7gJFlOvskBykmktkqDG+wF6xfO4++SbTE+Qe3h8UyOro+NHsXdA4FUfsi+zxwlxiSYtsbaQ4damniL5FHIHB5qYJzOEs8s51SLHc7s7EJwdu7uHbKEA5v7v/RvxR++zdlzlcKfiS3aT3u0HqdW0MOTRJBKsQ3MOORpu7aOwDYrqP5W+fP0M/hG3QMGMBMj7ONDIc46WVcXJ56oYlkTnTlanf8m7wvYqM1/4I6hYy992AwbtLlTwoJeMBwP7Gp1Aoya8MdirYMvUpQnEmw==
+ bh=BbFb2D9GAotJgJW7YAXjMx4kHDQpHLj+ta4h1/gt5Gc=;
+ b=hBcNrPypu7opZ1r+neiAcl6Ma4NM9cPw/diV0sHe/UgudDr6fzIyX6lgeSZkVYZxKX1DysOd45T6nB4MRB1KiLZBSvxcpedNlNzUNHycBYVFSknXQUhRKWKYUbThdIB2kRkgJOlgitkyxb3W8qUz3FZw6XCOhGtWGpW/G9hM8MIOmeUPvCYodaJhQaBaBjExcUMD3RnoNRVqTlcYZXFZ2HHLGkkWKi3L48B0uc5vb1yhYqAwJ4c0XXXlcjP6zMkE0s5IxtEn/QVRxf12i9bOPNXbM+B/meE/gM8J6L5OX7yMN3s5zJ6CdGrwTH6Hx+mTrkzClNSaO9IpTF+oNka3dA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5nAq210glcspJMzuimImYlKqNANwK4iKBnAOxZ1+7y0=;
- b=JRF/0QEKSkPqW0ELPOuSKZy7Hde0FK0f881jfnL9HZKHtiH23XAx9FXF9zqcn11iHfdAMnMkk12elTGD+6EEHal+7tkG4xhIH9zg92XkiPybOlingN/lWRYEaH/psMXIUtnBr+AfhrqYofYNJVOvlBiHzMYFEhLPH+572M25/Uo=
+ bh=BbFb2D9GAotJgJW7YAXjMx4kHDQpHLj+ta4h1/gt5Gc=;
+ b=sCrXpTSjDVscq9GqaG02GfiyNdiNV0DdM0hUyocuApAN+4nJhxuVJcBBZmxMfCwVsHZAL9TRxZZImcBiGCWcWUpY/6VXOI7xZlce/CayyixW8MbyEHzXQ6cBoRl8vBbLNU6ggIed1B4ydRqo2vCyhS5CDavJRXBSVVftsRUhG94=
 Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
  by CY8PR10MB6443.namprd10.prod.outlook.com (2603:10b6:930:61::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.9; Sat, 19 Nov
- 2022 12:29:12 +0000
+ 2022 12:29:14 +0000
 Received: from BYAPR10MB2663.namprd10.prod.outlook.com
  ([fe80::cf3b:2176:14e5:d04d]) by BYAPR10MB2663.namprd10.prod.outlook.com
  ([fe80::cf3b:2176:14e5:d04d%4]) with mapi id 15.20.5834.009; Sat, 19 Nov 2022
- 12:29:12 +0000
+ 12:29:14 +0000
 From:   Dongli Zhang <dongli.zhang@oracle.com>
 To:     kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
         qemu-ppc@nongnu.org, qemu-riscv@nongnu.org, qemu-s390x@nongnu.org
@@ -73,101 +73,103 @@ Cc:     pbonzini@redhat.com, peter.maydell@linaro.org, mtosatti@redhat.com,
         borntraeger@linux.ibm.com, richard.henderson@linaro.org,
         david@redhat.com, iii@linux.ibm.com, thuth@redhat.com,
         joe.jin@oracle.com, likexu@tencent.com
-Subject: [PATCH 0/3] kvm: fix two svm pmu virtualization bugs
-Date:   Sat, 19 Nov 2022 04:28:58 -0800
-Message-Id: <20221119122901.2469-1-dongli.zhang@oracle.com>
+Subject: [PATCH 1/3] kvm: introduce a helper before creating the 1st vcpu
+Date:   Sat, 19 Nov 2022 04:28:59 -0800
+Message-Id: <20221119122901.2469-2-dongli.zhang@oracle.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221119122901.2469-1-dongli.zhang@oracle.com>
+References: <20221119122901.2469-1-dongli.zhang@oracle.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0335.namprd03.prod.outlook.com
- (2603:10b6:a03:39c::10) To BYAPR10MB2663.namprd10.prod.outlook.com
+X-ClientProxiedBy: BYAPR06CA0042.namprd06.prod.outlook.com
+ (2603:10b6:a03:14b::19) To BYAPR10MB2663.namprd10.prod.outlook.com
  (2603:10b6:a02:a9::20)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: BYAPR10MB2663:EE_|CY8PR10MB6443:EE_
-X-MS-Office365-Filtering-Correlation-Id: df3fdc51-e440-4222-9d02-08daca29a9c9
+X-MS-Office365-Filtering-Correlation-Id: 5b4d73cd-d715-46c9-414b-08daca29aa94
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4qc3I9xRiXwnX+8K9I5WnFIjaMqLcE66Bba0dPt9AAmdZYTd7XA9YL3Xmk9ip8CvgFXKqQttp2kobUYpXmpdM0AHYw8Tg3ELGax5mV1w+aH9Xl9xzExKxjK9MB5z8TWyozEemfQts3XFUOeNbp1aYs0ghIsCcVdziuVk4sj6Ae3EU2NcfYimhI8pSkY89D4SMMwPHJIKVCUiSUopDlV7MxaErfzLAvfNsZYROSMOmqaZhkbkNLuk1DGEpMeifLXpFJIPXT1cNt/n1gGXFhH3T9Us1DpV3QKP45lXYm6s3Loe709kMQrHIiaSVyumCOqlcsvsn4vnqUwcDe5EBdFBiNImtmPPEjLP9FB/XIb36C0W6vYkH8daAIs6O4lSqf7HvrynfzVNk0HL8AxXlMvKnehdLuQ0K7fmWL9/PDB3HWLZvZ5z93983DEINGKoNYVUQ/1TgMjbUDb84kteNaSh39lo7l0sWAReCzuOntLY/e2zDHoE8gKh0SzHQB35781+kLlrHL+y4e+DUE/BM7ykG/hOpudq3Iydnb9CfmdsrjBjIWJR5TSy4QO2EX4sSh2VfAMMVh0DXFkNG4efjXDQeEOM1falZTXr92r2+tjQDahNpF2eFb8GTWlXqc3NdrGs91hzQmdqJbjJnUP+4CHnbxSZNsxeWodS5/VTQ74mmws=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(366004)(396003)(39860400002)(136003)(346002)(451199015)(36756003)(38100700002)(2906002)(44832011)(8676002)(7416002)(4326008)(8936002)(83380400001)(86362001)(316002)(1076003)(2616005)(186003)(6486002)(966005)(478600001)(66556008)(66946007)(66476007)(5660300002)(41300700001)(6506007)(6512007)(6666004)(26005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: SA4watO3zqsizUKiOScAvQbWRk43sq3SHj0EgbClLL13TZSKPsu1jAfbfl3R93qWQTJezMg7MKgIS+MncUBlrxsG/9/YB2ZrfQ2JfGNcKKpfZ3/W/0HPj5PfSFtfkQFNkmIs9WESE89jgFt2rHEudrdWT9wNB7JOpTnB1y+UOgucHhxaK3Ux1eHIaOJYF+C1x4NmmvFrIFyKUx//vEnwMbEx7Uc8tYiVnykIHwGLI4JhN//u+kz3kZrTfZPxI0Wl0UkZbOBuGYBC90E4ROqlDgMoxHVCbDFYjpJRwQkHeja196giCls6xzLtXA2dl3aLPD9lvD3r6JaAr/ZZIcnHAwmX/Aro0k6cOlihP7yZUJ6yhop4C/pVZ6NXcoT/IPwuv8JrgxDB8ON7epvvxmstpYKrEwEexqLQjiskyYvjDetv0M9a0gaZwFMbxQE+DbykxQ1WbNJyoqyQNxjIgqL26WtdIerLvvbKj6QwdnUjq2+pMGf9Psnkvb1yZo8/UbJRF5QDhYHkByx2rnGE7VNOfq2mH6OYf9cDyzfR3e9uS3/6EFyPVo3NYMRg2WF5D7EwDGq0Nz56GqzHkDJFsPeTgp/BSFPmrA12Ipzkidj6/SwylEAZY4vkj1bQ5uKhtYmLl1hzH81+jkAAT/61jbTvzA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(366004)(396003)(39860400002)(136003)(346002)(451199015)(36756003)(66899015)(38100700002)(2906002)(44832011)(8676002)(7416002)(4326008)(8936002)(83380400001)(86362001)(316002)(1076003)(2616005)(186003)(6486002)(478600001)(66556008)(66946007)(66476007)(5660300002)(41300700001)(6506007)(6512007)(6666004)(26005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?IetVamL/7IAUlAk38CbGnjX+yteLJzGlm+WaIwXfly9BHJZdOBcY4ZYFPSZV?=
- =?us-ascii?Q?/vHw7HHBjvcHMCoziyewxG88BHSkp5ty2JaMDAEkzCa5JLg3VvcPi8eIjl9S?=
- =?us-ascii?Q?TvrfytiCpJSiOHUYeK3t678hCUMM+P1HdHImvYfNwjl1PIHRgt+yeWJIejVZ?=
- =?us-ascii?Q?8wrvKfOhjdOSfNUi5ka6LPZnzdPSZPY945oy5milsVmuDkCgDzOOWE9jJfeM?=
- =?us-ascii?Q?V0Ny6UUW9vnVkXkj0AyMlLfnNCCMEVsp0S7k3jKoxdzOeJAANQNw7kO6pIdI?=
- =?us-ascii?Q?HpGjjsjNA1hZeF9SFNCZiehzMT55U/JjVAkDIYKSyv44Egqf0r6xk+w87Loh?=
- =?us-ascii?Q?BdGtHeJ/LQeUyo7jmGOezAxaeGJ0N8NR9LUHIUXvbFTOs5OSrHxncRpXMY4q?=
- =?us-ascii?Q?VnW3wtJAUhzTjqL8QSny/5IuvzVYMSOxrtOFkO+4iRM0gE7+C9cDpfSZKvUO?=
- =?us-ascii?Q?o2dCc6uDoIRLjW+SUixVXgHuWvaRP3Na4O2Jwj/evvvqUnaaO3wFyHJD4BBd?=
- =?us-ascii?Q?tSdN5Bms4g9JfencP3Po/82rsBkYXlD/deayZgojnjx0s0xgcIymoj7Whpnk?=
- =?us-ascii?Q?yy1USgfUpFTPmDGLhOxt3NYGxthgZrQP00mu4DHs79WbIbtiAYWTDm9CYIJ/?=
- =?us-ascii?Q?fNyfopqvwGyAfn5QgTWjeECVtPXq2RzIwxJPJZFx7FpEZf/ZhRJf7cbK513m?=
- =?us-ascii?Q?eet9aHXSpDYbAYXf93NGvGDDTE2f9Ohs7biZ6bQs7Jg5hTzdUl7No5czwehq?=
- =?us-ascii?Q?1lffYvSIb+Gzala7EryeiaKtCfv5Kks49zkr2Rl4ypjtfLA1VS4OEMokwvkk?=
- =?us-ascii?Q?wrL246uQAwMndBwh1dA9P4C7ITVk/aV6gCX5e7yGyhnvcjn3DJULml2u+FUS?=
- =?us-ascii?Q?H6M7+OtU/20wDPHm7u63+tX61Vtlly1i4yNPJEtT/zZwgYyj7mhZhPGQFdsj?=
- =?us-ascii?Q?mbck8catAfwsP14xULEj4b3j1ZcGjfBJWYtgCBodseki3W0mtqDU5xvREC3S?=
- =?us-ascii?Q?UztQOZ357XM0uccXqh0VeeeXLvrmdbmnlAyZ8ILkPEjQynwdl0YkML16uzCJ?=
- =?us-ascii?Q?sBtvyXrthHtxvtNbE0VIMb6jGqPe7nq2oZvtM3Tx5rY7kLzzza+m5R9mHAsC?=
- =?us-ascii?Q?q63TKMvnNcOCUgjeaaxRfBfQT94Zeg8N5JrTGOvBjyLCLG/Q1M1bgv+fYscd?=
- =?us-ascii?Q?us4Nv3PXmcnrKuRZEnR3+01IZgmqrQqz/RP9RHE1s8ueZiTybOGmA5m3q+v8?=
- =?us-ascii?Q?+/pGT/XIUD4APkGF9KKbZFTbl9OKzUl6wgWDlz+LlpKfhq6/N8bcYmhSRrJz?=
- =?us-ascii?Q?A5J0MpCKnDryyLj/IyB6RW4yTXQGB2CHcjHQaodahxxV+kBp97wIgWlXG6q1?=
- =?us-ascii?Q?Sc7bAV6H9zuEx+okp+yD2sOHBJtlcVirwiJ8/SnssiGzXFh199I0LwllrZ7t?=
- =?us-ascii?Q?kQcFO1CDcdnLcZKyutJiTqr0mrE/4KahVm3fJ2v3A8ASaGh5dmdSeozHt05l?=
- =?us-ascii?Q?ukR0Hy7Kt9U3RiFcQTKaztZ2yxueMn+Pu2qXeY3FXe0dwEk3Pql9NVBVu60R?=
- =?us-ascii?Q?hvXi8xOF1tq9XpJc+OFMe5DrpvMIpak8kTrUD36h?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?d11O4qMH0TKtdwoRT8wI2VgsvTLs00y2j9gcw/Xl+hpUY+EzRlM6Fk6E9en9?=
+ =?us-ascii?Q?OCHeWCEfhiPCL77QH3NYATrdHDL/7Ki+f+iqeThLFW2GWKlG3tboQ1f5WUxY?=
+ =?us-ascii?Q?mmGqgCvKlDysVffeQ4C+1qH3/MmJ0VTTL8Uz7cJQFh7pTEE/we2AoibWhLQT?=
+ =?us-ascii?Q?lB/3YIYJA/qEX5Xtyf4CcySYPQ4ZEd3P1tAk1QYVgIVQrTSkVfs8hSdBPboc?=
+ =?us-ascii?Q?z/aWyVPCo/FdW4Jkzjdd1h9a1Gn5KxaeoXNyDYrL7CdTu/USkaxtdp7fA4gX?=
+ =?us-ascii?Q?q+e2l2UdRsxRsV0l8DXzlCwwxxiuXa50j6gWU1Q6NcjtVaPHppFiV+Y1ynO8?=
+ =?us-ascii?Q?7tKmXJ1nuQ8DXFqN07dqM3iJY0sXOefShYo7+d3KYiGGpalVb8oaEm3WFAdV?=
+ =?us-ascii?Q?ZiTgLhZV0SxA2hQx4XJ7lY5+Y+oNmCXJt1+0Ks8Oc8KC6Wen/VTqGrP2EOiD?=
+ =?us-ascii?Q?yYcfpEanMxZh+tv8HpxROrtRAE78znzqTJv40/8IHaWhfKT/jND1vVsodVvN?=
+ =?us-ascii?Q?VF7fDLs3pE/t5wIG9HpNPXN1/277omzG5/P+7Y0FbgHeAPQ4FCll+KwjSTsd?=
+ =?us-ascii?Q?T6Io9ZHDrLs/CMCCzLIfT18/Q6AVYygpKOW03WM+o1kBNY4lkgRrDgBMvybI?=
+ =?us-ascii?Q?d76o4mcM6y6ZmguWd+sK7sy8wzC+Fp0JIayhT2NSrbyT4ArBpuZXcOzwOMUG?=
+ =?us-ascii?Q?/Hz/RxPYIAtNasIEYN0wDLHKjhCg3eCcgbfJPtI6HOuN++Sb2oyl0YXed+sz?=
+ =?us-ascii?Q?qeNEGFtMgSGwGMlqjed7aTJKnbYM77+DOJLTlzccEiwQvPLddK7XFXk8H9PD?=
+ =?us-ascii?Q?GSHJW7REFJmzj2yD2iTdLbFKq8f2BV/CUUGCLb4nCcWNJj8d2pTqC76FQbdU?=
+ =?us-ascii?Q?0EdE0F424dEjDPVwxDhEzuo9sK/URZrqcZmJTY0y0z2mA2ITRMF+XcNLFKCQ?=
+ =?us-ascii?Q?cAMz0cMJppSBR+I1pIP8OUYzHSBnokrdIrBPAYHTLswLntrBvAbNFlEMZ0FD?=
+ =?us-ascii?Q?Qo+XsxdBpeiUl7ymsM/XvKXEar+XVG8JDLuMKY3rR56BrKJgSt8nftcegnCw?=
+ =?us-ascii?Q?+8dnx2GEG2zh9uSIvHpdL78AjSd6K2uSojGjC8cKclZaEWMLXWdtJJ8j37sr?=
+ =?us-ascii?Q?BIjdh267LrnsoTXJ7r7YK+2dRBwrH2HNRwG23QFTCGQLS65VbccWwE1o668R?=
+ =?us-ascii?Q?o7f7mpneXUw4jSlEFowWwKJ7YBq/aE2mEgIJ1/jqns662txIJjRmiwOaK0V4?=
+ =?us-ascii?Q?T4DDL7JJpHyfP3wfHrPyHVhj7MUWCIdh3nacmQTCm/jadq9QVSEdCovqrOCA?=
+ =?us-ascii?Q?XFEpBYGs/T2YSpLO/bLum/ErzmhiNQpe5i8arNUiwLzuJgdF0LelqecMLkwL?=
+ =?us-ascii?Q?j929ugzt09TrU6Dlpq2OqLUTOo5/kmuvy6L2fNitbpopiZG4+qvq9nUj/CBw?=
+ =?us-ascii?Q?5R4g0+qH0vtN48e9Gt4mAsZ2HHs9jJeKHYjTtkMqXdVdFeVgOAssRUN7Qu/N?=
+ =?us-ascii?Q?UELJJd/X1EQ5/Xl3sKHk4DJWU1DYMntAssGcyJ3Y2tuNZ8+B2YKTJIiIJ54p?=
+ =?us-ascii?Q?T+P7pw9paxC73pSVWwcjveozqmu+XCDjT44N9oi1?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?i8covhIWM8M4i+Ve/LQcKM1fBrWmylSw13OnGmILSgJKKTiXjGvFvQ702FSX?=
- =?us-ascii?Q?QfrRPBjf9yFVkUMvPr4rTLY2tOkL7p7iQbS1A3Ti+kvstLZwe9OpkxUvaepj?=
- =?us-ascii?Q?NpI7fXRRe2D2UVjiMdPzT57+mLdsxwXgdLLzzx6OKnlPCWrZXKDyTqCrh48G?=
- =?us-ascii?Q?Z+iEOCL976jp0bwtOqx/lS5IlNo+wwgd7s208Y5s5h5Tu+Lr5V+6+vS36T1g?=
- =?us-ascii?Q?bP2bjS8kCMsN+gYNB+VHK2VutwFHK8l7G1Vz2eDM81EZTYQ2I4qXXviqaBPp?=
- =?us-ascii?Q?BWwAQ9R781w2+6RNuiQtwRSZEhb8vJ8ByD3vMTRTP72BnwmxxUyf1JTCQk2U?=
- =?us-ascii?Q?AtsGlO4ypiKQcp2WDG+xvpHuXXj7BdFq8CdK/XQ0fTLd7/07e4ujhy9uCw6u?=
- =?us-ascii?Q?oQeIwewzsUDoxsOuX9xz76MzycBKnpARLCq5/LGgWcjiUVnNC3FlyhmKP99E?=
- =?us-ascii?Q?Y28ScR2/R3/12T2wusn4y4OTGWy4maTlz5xrTYe9RjVWmDML/R7ZEk7yMonS?=
- =?us-ascii?Q?KuQav3RoXqNVxm006Jx/M6xAFDz0z/2X8P/1kN/TN0YHSSgON0yufbRbLIMw?=
- =?us-ascii?Q?twi54qFVp4CV9umzqqLFbJWuYPS09bsHyZxQuW5C8yQyhDDOez6UDVBeiGLW?=
- =?us-ascii?Q?LptW356uaD+QozzbcjY1YaXQ2czFokkit2qz3n2xfVqmXx5VDxae1v0G5oPW?=
- =?us-ascii?Q?/lQVrQd9l4sxo9eO7zGhRktPdvd/X599Nt3xAYBILCEFrpmwAD4OlvMtf1YG?=
- =?us-ascii?Q?ubs/eWR6IsKqGCFLCKWiuaeDFzXIG85uePr83xBO6kgKINxGDj4SdC7vAWJY?=
- =?us-ascii?Q?HlSv6X3mNUsXvkEziml5I69pO+hXtLhtbaa3RW3bhARtIDKPtuqn3F+u9Jks?=
- =?us-ascii?Q?hE9BRCqd3fHV3QVUtfABGFoWw1gJdd6FMApi9bqG6W0BCH+J7/VV5UAIwmZ8?=
- =?us-ascii?Q?mwVvP22s2bq7S0y2KmRqDUu31Aw0V+nWTz4ycS8oX757n8lmdPP5HLp83FGh?=
- =?us-ascii?Q?BCn/WSd4q/BKdRHo7FHMuC/ZyZcdogp4xeolVUdTX34vJI5NNF92bpUU3UDA?=
- =?us-ascii?Q?rbAXJkv2KFtISn21CM2DDmEAkI0cG/ECbEah/PXqMwjNNm5f0W391yP0eJL1?=
- =?us-ascii?Q?7amDy3bcjlWHw3lpkmZDWCUWXurmRS9cZ+uRrh327jzFZ6oTccsW8H6ZXEZw?=
- =?us-ascii?Q?+l89RU42bJeUYSv6DPnuJ/cQxdvmR+FyKAGnTKWirrIRAmXFHTto0+fU/fet?=
- =?us-ascii?Q?sLbeep2/jUhwoVVmYVv1+e8SGbOHBJZRCZnsTa+Edka1b0dFbEMjggi9oDco?=
- =?us-ascii?Q?6aL5NWuay95FVlDQ3WvMuq92PRopizpEbuxKqp08E9GjF2hajKExEuskeI97?=
- =?us-ascii?Q?DxNGFN3RYK7Rvnm/NfB7SY0mN0J5BNdpK4cZc8JsKxQLvYESczQTRSwEnMGi?=
- =?us-ascii?Q?o7z4b2cP0nZCNuf1XAOsqjgA0L5qjwhfNE8jk2JuP4mecV24T2Kz/79b56kd?=
- =?us-ascii?Q?3GVYhm5Vh0y78wkir0x9i/0R1IrbZGgFXqtC/P201UviAJaSgDv9fU9oBjGD?=
- =?us-ascii?Q?ErT1XFLRWsb4i9YkLTZnUkZ/u6XLnLFhwcSNtQGFiDpV9XIce6KcCYZ8Vpsl?=
- =?us-ascii?Q?ig=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?UNFXGtjQ9dnB90Jny2wKxkQ58qk0Ifq49zE+OTSm2KYvmJ/P8mm71iCV2bdl?=
+ =?us-ascii?Q?6u8FY+9x+xRBy9eCs3nue37gBn5bsAuuOZNLYYOCaqdhX4omd38trj10r6zE?=
+ =?us-ascii?Q?g64RZCcD+vor9eBZleL8JeAsDuA0JnUVDsR/oslCvYlldFbXHGy8jGJ4aKI/?=
+ =?us-ascii?Q?MzM/r86cijCyq8j0wHtBRfQP8gTMXG0B3eam2OhCd5Je0bFNUtEmCGImxCdN?=
+ =?us-ascii?Q?IrOvBf993lyJ/w8ZPm+BW0g0mqGRVXLt3KltZx35m7wO1Z6fUqIiHLL17R+x?=
+ =?us-ascii?Q?60pNxhdn9iLTH29g7o8wljqr139p5AgB1W1yXCRJ7XnVAhOlxT3SF8a2VO1w?=
+ =?us-ascii?Q?U/Wr1PFYmRxvDQjfyr4QQQoECXCV3icXChotgburpBsrwiWM7ZveOWTUWN8d?=
+ =?us-ascii?Q?J5mB5ygy8QGAWtVuPGXrOk/wXrIKBqdwpWuEk3KyynCCKpZfGuZsdBFrL9a4?=
+ =?us-ascii?Q?mAYh2L3Yz8B3Hlj+yuiwxIPD/Vh1zUHX1OcrjioFY1XnMlquQkAGwwsd2ybG?=
+ =?us-ascii?Q?VBr2AwJE5riR/0m1ypd4JY79BYYh8Abk5vnRJBzBakllpDC82JXCNhAFfc4O?=
+ =?us-ascii?Q?qI2S9pe0UZCgocm6QlSLPxapKYUvec86JR5JmzZrvno69x7695hPXRYHgZ/S?=
+ =?us-ascii?Q?7ny8Ryq5Mpss3BWHMvjjc1gEiDf4J6g7SFZTPOstbby8lazy+TgBMCkxT3fG?=
+ =?us-ascii?Q?+8N7L3lW2OdrBmUr49ipT2wcTWxHrB+jb0eOKEzp518XmBLNIy18vSInmFaL?=
+ =?us-ascii?Q?X4rj5Bjh+zXeV4fjZhBYI34zEXS178ooZ5rIFDuU+AKhb1qfuzhrtEsVibBM?=
+ =?us-ascii?Q?JuRlWVyBr13+JkYN+LQvu3BVF98j4lBmFpMG15uqxgCLAwrSRChgbCzwobeB?=
+ =?us-ascii?Q?ioqRCmHLhadJOf2rD045yZ2Ublkx7mQgK9kPpLFF26kF1/Wd+yglYAYsgVRv?=
+ =?us-ascii?Q?vInXgEw3CtCcCS2lXATflAiL9QXNars4eEUlgoqRgcd4zBvq0BhOXLwFagkV?=
+ =?us-ascii?Q?kGsp4hAsKji9+gf5d3VWbDB9ToZNjgoLC7UVJBQNgVIu/7Nk8hqtmB1n/bXk?=
+ =?us-ascii?Q?qYEWyiObUy9B2EAjAGm3m8yGe2F9kQLAwdvTjD132pTKu0tWauE9FRm5FjIZ?=
+ =?us-ascii?Q?21EFaoNLUo4YpxsVTihdSfSEEYunEbNeHEXdLwwPs4hmQrQjLuAYp7/7M/tz?=
+ =?us-ascii?Q?1VnMl8rbJQNSIS6tvBLHVttDLDmcwG1sR4mZxbpoprRGrExjWKYNO/0VHgo1?=
+ =?us-ascii?Q?fhhOGOvk3z3BUDg1wZsxUSCI+szX7pFlVfBzj/+Y9mEKvWRwa/E3CU+MRP5K?=
+ =?us-ascii?Q?Lzi5eGrbOzQ4FFVzQ67m53s+CUUPYuFm/pMq1uqCoKoa5vODS68493WvfqRO?=
+ =?us-ascii?Q?gn60hG8Ig+92Sh25JxRvxigO7ZL6H6nlg8g5Y+rqXdRVASeOQZRfwGNyPQPi?=
+ =?us-ascii?Q?pf3hU/UT6hxN2HAtj7rXvbB88kCDdi4y+KPsJkbNNYQtzYAXMemBl+yyF0sP?=
+ =?us-ascii?Q?c/CnLCNs82ADmjdoWoQX30EMHRhnrCLA7R74vI+1/oepGA0kdR18CXI2MJGE?=
+ =?us-ascii?Q?xYFsSj0Ziz57JxvXfsJ6Q0R6uVBxsHyWaXnfKRsPQ5HdwgwUEcYC/K4f/3bL?=
+ =?us-ascii?Q?UQ=3D=3D?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: df3fdc51-e440-4222-9d02-08daca29a9c9
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5b4d73cd-d715-46c9-414b-08daca29aa94
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2022 12:29:11.9722
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2022 12:29:13.9408
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZfAfRSS2M78bxmGZZeD7BjB5ldp4jgo1nUSNio4yKd175y+ivoc1Zayj0xwX2t3anH8YyHLP5PcsNNbXC3VNaQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: EER7XxQAVRQtDFWKF0yDX5LS/lEEMVfxtEd7oRJbgRBeA/ws1BjirnVkWpyBoOyUWAgGZsSvev4h5jfWaJEUJQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR10MB6443
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-11-18_08,2022-11-18_01,2022-06-22_01
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
- adultscore=0 suspectscore=0 spamscore=0 mlxlogscore=938 mlxscore=0
+ adultscore=0 suspectscore=0 spamscore=0 mlxlogscore=999 mlxscore=0
  bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2210170000 definitions=main-2211190092
-X-Proofpoint-GUID: WKy90SXqG4PVQDzqwshzgelY_GTkZK_H
-X-Proofpoint-ORIG-GUID: WKy90SXqG4PVQDzqwshzgelY_GTkZK_H
+X-Proofpoint-ORIG-GUID: V7yPqHxo3Zz-xmJQqdDIuaQVTL5hXgMa
+X-Proofpoint-GUID: V7yPqHxo3Zz-xmJQqdDIuaQVTL5hXgMa
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -178,82 +180,169 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patchset is to fix two svm pmu virtualization bugs.
+Some per-VM kvm caps (e.g., KVM_CAP_PMU_CAPABILITY) can only be
+enabled/disabled before creating the 1st vcpu, that is, when
+(!kvm->created_vcpus) at the KVM side.
 
-1. The 1st bug is that "-cpu,-pmu" cannot disable svm pmu virtualization.
+Unfortunately, some properties are still not set during kvm_arch_init().
+The values of those properties are obtained during the init of each vcpu.
 
-To use "-cpu EPYC" or "-cpu host,-pmu" cannot disable the pmu
-virtualization. There is still below at the VM linux side ...
+This is to add a new helper to provide the last chance before creating the
+1st vcpu, in order for the QEMU to set kvm caps based on the per-vcpu
+properties (e.g., "pmu").
 
-[    0.510611] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
+In the future patch, we may disable KVM_CAP_PMU_CAPABILITY in the helper
+if the "-pmu" is set for the vcpu.
 
-... although we expect something like below.
+Cc: Joe Jin <joe.jin@oracle.com>
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+---
+ accel/kvm/kvm-all.c    | 7 +++++--
+ include/sysemu/kvm.h   | 2 ++
+ target/arm/kvm64.c     | 4 ++++
+ target/i386/kvm/kvm.c  | 4 ++++
+ target/mips/kvm.c      | 4 ++++
+ target/ppc/kvm.c       | 4 ++++
+ target/riscv/kvm.c     | 4 ++++
+ target/s390x/kvm/kvm.c | 4 ++++
+ 8 files changed, 31 insertions(+), 2 deletions(-)
 
-[    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
-[    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
-
-The patch 1-2 is to disable the pmu virtualization via KVM_PMU_CAP_DISABLE
-if the per-vcpu "pmu" property is disabled.
-
-I considered 'KVM_X86_SET_MSR_FILTER' initially.
-Since both KVM_X86_SET_MSR_FILTER and KVM_PMU_CAP_DISABLE are VM ioctl. I
-finally used the latter because it is easier to use.
-
-
-2. The 2nd bug is that un-reclaimed perf events (after QEMU system_reset)
-at the KVM side may inject random unwanted/unknown NMIs to the VM.
-
-The svm pmu registers are not reset during QEMU system_reset.
-
-(1). The VM resets (e.g., via QEMU system_reset or VM kdump/kexec) while it
-is running "perf top". The pmu registers are not disabled gracefully.
-
-(2). Although the x86_cpu_reset() resets many registers to zero, the
-kvm_put_msrs() does not puts AMD pmu registers to KVM side. As a result,
-some pmu events are still enabled at the KVM side.
-
-(3). The KVM pmc_speculative_in_use() always returns true so that the events
-will not be reclaimed. The kvm_pmc->perf_event is still active.
-
-(4). After the reboot, the VM kernel reports below error:
-
-[    0.092011] Performance Events: Fam17h+ core perfctr, Broken BIOS detected, complain to your hardware vendor.
-[    0.092023] [Firmware Bug]: the BIOS has corrupted hw-PMU resources (MSR c0010200 is 530076)
-
-(5). In a worse case, the active kvm_pmc->perf_event is still able to
-inject unknown NMIs randomly to the VM kernel.
-
-[...] Uhhuh. NMI received for unknown reason 30 on CPU 0.
-
-The patch 3 is to fix the issue by resetting AMD pmu registers as well as
-Intel registers.
-
-
-This patchset does cover does not cover PerfMonV2, until the below patchset
-is merged into the KVM side.
-
-[PATCH v3 0/8] KVM: x86: Add AMD Guest PerfMonV2 PMU support
-https://lore.kernel.org/all/20221111102645.82001-1-likexu@tencent.com/
-
-
-Dongli Zhang (3):
-      kvm: introduce a helper before creating the 1st vcpu
-      i386: kvm: disable KVM_CAP_PMU_CAPABILITY if "pmu" is disabled
-      target/i386/kvm: get and put AMD pmu registers
-
- accel/kvm/kvm-all.c    |   7 ++-
- include/sysemu/kvm.h   |   2 +
- target/arm/kvm64.c     |   4 ++
- target/i386/cpu.h      |   5 +++
- target/i386/kvm/kvm.c  | 104 +++++++++++++++++++++++++++++++++++++++++++-
- target/mips/kvm.c      |   4 ++
- target/ppc/kvm.c       |   4 ++
- target/riscv/kvm.c     |   4 ++
- target/s390x/kvm/kvm.c |   4 ++
- 9 files changed, 134 insertions(+), 4 deletions(-)
-
-Thank you very much!
-
-Dongli Zhang
-
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index f99b0becd8..335ff6ce4d 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -367,8 +367,9 @@ void kvm_destroy_vcpu(CPUState *cpu)
+     }
+ }
+ 
+-static int kvm_get_vcpu(KVMState *s, unsigned long vcpu_id)
++static int kvm_get_vcpu(KVMState *s, CPUState *cs)
+ {
++    unsigned long vcpu_id = kvm_arch_vcpu_id(cs);
+     struct KVMParkedVcpu *cpu;
+ 
+     QLIST_FOREACH(cpu, &s->kvm_parked_vcpus, node) {
+@@ -382,6 +383,8 @@ static int kvm_get_vcpu(KVMState *s, unsigned long vcpu_id)
+         }
+     }
+ 
++    kvm_arch_pre_create_vcpu(cs);
++
+     return kvm_vm_ioctl(s, KVM_CREATE_VCPU, (void *)vcpu_id);
+ }
+ 
+@@ -393,7 +396,7 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
+ 
+     trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
+ 
+-    ret = kvm_get_vcpu(s, kvm_arch_vcpu_id(cpu));
++    ret = kvm_get_vcpu(s, cpu);
+     if (ret < 0) {
+         error_setg_errno(errp, -ret, "kvm_init_vcpu: kvm_get_vcpu failed (%lu)",
+                          kvm_arch_vcpu_id(cpu));
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index e9a97eda8c..9a2e2ba012 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -371,6 +371,8 @@ int kvm_arch_put_registers(CPUState *cpu, int level);
+ 
+ int kvm_arch_init(MachineState *ms, KVMState *s);
+ 
++void kvm_arch_pre_create_vcpu(CPUState *cs);
++
+ int kvm_arch_init_vcpu(CPUState *cpu);
+ int kvm_arch_destroy_vcpu(CPUState *cpu);
+ 
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 1197253d12..da4317ad06 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -834,6 +834,10 @@ static int kvm_arm_sve_set_vls(CPUState *cs)
+     return kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+ }
+ 
++void kvm_arch_pre_create_vcpu(CPUState *cs)
++{
++}
++
+ #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
+ 
+ int kvm_arch_init_vcpu(CPUState *cs)
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index a213209379..8fec0bc5b5 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -1723,6 +1723,10 @@ static void kvm_init_nested_state(CPUX86State *env)
+     }
+ }
+ 
++void kvm_arch_pre_create_vcpu(CPUState *cs)
++{
++}
++
+ int kvm_arch_init_vcpu(CPUState *cs)
+ {
+     struct {
+diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+index bcb8e06b2c..1be1695b6b 100644
+--- a/target/mips/kvm.c
++++ b/target/mips/kvm.c
+@@ -61,6 +61,10 @@ int kvm_arch_irqchip_create(KVMState *s)
+     return 0;
+ }
+ 
++void kvm_arch_pre_create_vcpu(CPUState *cs)
++{
++}
++
+ int kvm_arch_init_vcpu(CPUState *cs)
+ {
+     MIPSCPU *cpu = MIPS_CPU(cs);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 7c25348b7b..9049c6eb5e 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -462,6 +462,10 @@ static void kvmppc_hw_debug_points_init(CPUPPCState *cenv)
+     }
+ }
+ 
++void kvm_arch_pre_create_vcpu(CPUState *cs)
++{
++}
++
+ int kvm_arch_init_vcpu(CPUState *cs)
+ {
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
+index 30f21453d6..811f65d4f6 100644
+--- a/target/riscv/kvm.c
++++ b/target/riscv/kvm.c
+@@ -394,6 +394,10 @@ void kvm_arch_init_irq_routing(KVMState *s)
+ {
+ }
+ 
++void kvm_arch_pre_create_vcpu(CPUState *cs)
++{
++}
++
+ int kvm_arch_init_vcpu(CPUState *cs)
+ {
+     int ret = 0;
+diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+index 3ac7ec9acf..65f701894e 100644
+--- a/target/s390x/kvm/kvm.c
++++ b/target/s390x/kvm/kvm.c
+@@ -404,6 +404,10 @@ unsigned long kvm_arch_vcpu_id(CPUState *cpu)
+     return cpu->cpu_index;
+ }
+ 
++void kvm_arch_pre_create_vcpu(CPUState *cs)
++{
++}
++
+ int kvm_arch_init_vcpu(CPUState *cs)
+ {
+     unsigned int max_cpus = MACHINE(qdev_get_machine())->smp.max_cpus;
+-- 
+2.34.1
 
