@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BAA58630EB0
-	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 13:30:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C12B0630EAD
+	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 13:30:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233386AbiKSMa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Nov 2022 07:30:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34010 "EHLO
+        id S233485AbiKSMa3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Nov 2022 07:30:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229592AbiKSMaY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233122AbiKSMaY (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sat, 19 Nov 2022 07:30:24 -0500
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722BE2B27A
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD9FD2CDC2
         for <kvm@vger.kernel.org>; Sat, 19 Nov 2022 04:30:23 -0800 (PST)
 Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AJC5kI5023884;
-        Sat, 19 Nov 2022 12:29:17 GMT
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AJC5ktU023869;
+        Sat, 19 Nov 2022 12:29:18 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references :
  content-transfer-encoding : content-type : mime-version; s=corp-2022-7-12;
- bh=BbFb2D9GAotJgJW7YAXjMx4kHDQpHLj+ta4h1/gt5Gc=;
- b=b1IszUqzlQIZS8Qt02EiomNoy9Wxt7e8L/qVHOc6nNNWqnMX/DjPSSG7E8U+kQPhrC0R
- ELLCOa9T2VMmGHUcUQkLh5iXtaTwdqjb272r5zb2sJJNdLacWG40JFpVUQCcwklZKVhn
- Vt4LA0DGypIeVFIBuW4CZcsLCf6CWzO/jHq0FC1sXKM7rdEPQZEcQ3JxTYAyhLRMdCvJ
- ylr8V5E6cguO49KuvTKsKo+YahvYxKxc8uYDwi8sNGW7HN2+BNCA2blpiD4ewSGDdG1h
- HXRdWymxerqekuN9IiS/G4bQGH6qBD+sKt9oJ44T/LymUZHdeMaetDPwrty3hU3kROAV CA== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3kxs57gewv-1
+ bh=6pheb86MaVGWRtjTs02g7r6tWkNjgZ8somyUJZmhfGk=;
+ b=XM9rjmc4XwlAYaHS47HJa1tpC1Sj3+3AT+YocGC53gDf8a+vz1dYdprgj0qHNUDzpFon
+ jVYw1fAR/tRdYGg2FZWjeL2p9NZeYOL7NV5hCCdBPV0qlfI3ab0WU0JPqgwBVJVL/7gx
+ 0A2yz0BUMA6YsLRg6LsLYOZ9B+Izrwlvmfi23FtgyYgTIDpijV1g0juYQVbid26FhGCr
+ y75dBkTMzRdFoFCzadmwJKzDvFwX92b2YvnxtrrXlM1N2KDlI5yXDPge8wbgt4S3+kP3
+ hKUSCSXwXBCfzHxb8TLm8kdfzIWfe/u/s3fYhXGxWx5qWWDpRiYLs9hh2uT+7O4UspZf 8w== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3kxs57geww-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 19 Nov 2022 12:29:18 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2AJ9j6Pw035352;
+        Sat, 19 Nov 2022 12:29:17 GMT
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2168.outbound.protection.outlook.com [104.47.57.168])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3kxnk1cc54-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Sat, 19 Nov 2022 12:29:17 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2AJ8N6E3028055;
-        Sat, 19 Nov 2022 12:29:16 GMT
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2176.outbound.protection.outlook.com [104.47.57.176])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3kxnk7mefq-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 19 Nov 2022 12:29:15 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XU68mMn1mtscrWXKvX2a7Dt+xJHCbNo7NWmZykaWFjccDSeAsI1S0OXzLc7iZotH+buuvpgP9z+eoiNZj4rsuX5wn6/QsVLhx8xGMJPCnnLZxf2z/5pKUX5SW5mVrdb1oTKX5v8IaWj2coazunB31Q9P/e5DdtZg5UH7gw5JOlZhGzGA6uO2T1nfFaSAzskYQxq/gA7a+XNjRW2C0BoLhQGlOh2keVi1tSH5impuLcsrq0vNuGRMb3H2rbFIqdd22yizP+r189SiXqXaRRGBfnBMQ5dZ2vyo7QyMrx3iy9I9MJC9unwJe2CY9RWkOma4jvTVwmSYna3hEWTM/+/Q9A==
+ b=n8i+pxB1tB8JezBNvBEyzBCtNipmGVX0Sy0kLPH0XZKsOzB465+oZ26jbGs/eDqcJK2U+IzUTqKNroFLhle3T2SlRuAvkXZ9c+Nv4CXioMnnZz9ZIM+R47/vzppov2vdIOtZ7Z37cPKPsLPlJpshbAiKO6bGMYFQEqiy6zm0jvdeEDq1jZHRH2kbqr88qIhhEy7PvK58JeyBZ+oWIqo23lZ157CxYK1AY28SC3FZpiucm0bMUopVN7RllX+AbLHiEF5bO/v1jsWcb66cjYWRuMPxdEuVObH5szM0UJzzDWFayYn4ceFUOFtoiqy6d0E9YiDRyc+Wy5KYNotrakIeAA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BbFb2D9GAotJgJW7YAXjMx4kHDQpHLj+ta4h1/gt5Gc=;
- b=hBcNrPypu7opZ1r+neiAcl6Ma4NM9cPw/diV0sHe/UgudDr6fzIyX6lgeSZkVYZxKX1DysOd45T6nB4MRB1KiLZBSvxcpedNlNzUNHycBYVFSknXQUhRKWKYUbThdIB2kRkgJOlgitkyxb3W8qUz3FZw6XCOhGtWGpW/G9hM8MIOmeUPvCYodaJhQaBaBjExcUMD3RnoNRVqTlcYZXFZ2HHLGkkWKi3L48B0uc5vb1yhYqAwJ4c0XXXlcjP6zMkE0s5IxtEn/QVRxf12i9bOPNXbM+B/meE/gM8J6L5OX7yMN3s5zJ6CdGrwTH6Hx+mTrkzClNSaO9IpTF+oNka3dA==
+ bh=6pheb86MaVGWRtjTs02g7r6tWkNjgZ8somyUJZmhfGk=;
+ b=LMd8h4hTYp3tjyPz/vrnJGQLY9r7k3dg5Hj2uClVY2AmPCOkOfUCBH6ZA6gvmpyZ3k08ouZxALVCBbSMtutU7HnB5cKlfTYxVO+Pq4YzklzSs5nadH9brbZQUZJ9iEHBx2vcIrsgKnzVJJBuFYHccT+s7olvdGQYXy8kq0kRCssE9/XFVRF5Mm4a1YwN9taowRq4d4SrfUqKVX0F5e8EVByqcpvNLnwFtB3jQSyMGec1ngR21dt2gHIPrqPy6mUGQW0b9NAevDFisHaKjZXX0FDOw62B/v4Yi8dI/AxS+MdbQUdx/TF30iNRa4iREhn2Y6fDVHOXqO2BgtsFrZxxkw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BbFb2D9GAotJgJW7YAXjMx4kHDQpHLj+ta4h1/gt5Gc=;
- b=sCrXpTSjDVscq9GqaG02GfiyNdiNV0DdM0hUyocuApAN+4nJhxuVJcBBZmxMfCwVsHZAL9TRxZZImcBiGCWcWUpY/6VXOI7xZlce/CayyixW8MbyEHzXQ6cBoRl8vBbLNU6ggIed1B4ydRqo2vCyhS5CDavJRXBSVVftsRUhG94=
+ bh=6pheb86MaVGWRtjTs02g7r6tWkNjgZ8somyUJZmhfGk=;
+ b=DhDJMxqLQ0zNXvEuZAGA8E50FCZwou3XB+chOzBvwFjteisUW1rGB1Ao7giPzb4rsxkyJLe1cRdNw3XPJrt0faIg/EfPEuZcSQk/GXMfQs1JMiLhre2svTPmppbD7M18RfgHSyiXsMpXNC7lOX2NwtSWv87Oa1Yc/YKivuMOqjM=
 Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
  by CY8PR10MB6443.namprd10.prod.outlook.com (2603:10b6:930:61::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.9; Sat, 19 Nov
- 2022 12:29:14 +0000
+ 2022 12:29:15 +0000
 Received: from BYAPR10MB2663.namprd10.prod.outlook.com
  ([fe80::cf3b:2176:14e5:d04d]) by BYAPR10MB2663.namprd10.prod.outlook.com
  ([fe80::cf3b:2176:14e5:d04d%4]) with mapi id 15.20.5834.009; Sat, 19 Nov 2022
- 12:29:14 +0000
+ 12:29:15 +0000
 From:   Dongli Zhang <dongli.zhang@oracle.com>
 To:     kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
         qemu-ppc@nongnu.org, qemu-riscv@nongnu.org, qemu-s390x@nongnu.org
@@ -73,103 +73,103 @@ Cc:     pbonzini@redhat.com, peter.maydell@linaro.org, mtosatti@redhat.com,
         borntraeger@linux.ibm.com, richard.henderson@linaro.org,
         david@redhat.com, iii@linux.ibm.com, thuth@redhat.com,
         joe.jin@oracle.com, likexu@tencent.com
-Subject: [PATCH 1/3] kvm: introduce a helper before creating the 1st vcpu
-Date:   Sat, 19 Nov 2022 04:28:59 -0800
-Message-Id: <20221119122901.2469-2-dongli.zhang@oracle.com>
+Subject: [PATCH 2/3] i386: kvm: disable KVM_CAP_PMU_CAPABILITY if "pmu" is disabled
+Date:   Sat, 19 Nov 2022 04:29:00 -0800
+Message-Id: <20221119122901.2469-3-dongli.zhang@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221119122901.2469-1-dongli.zhang@oracle.com>
 References: <20221119122901.2469-1-dongli.zhang@oracle.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BYAPR06CA0042.namprd06.prod.outlook.com
- (2603:10b6:a03:14b::19) To BYAPR10MB2663.namprd10.prod.outlook.com
+X-ClientProxiedBy: SJ0PR03CA0343.namprd03.prod.outlook.com
+ (2603:10b6:a03:39c::18) To BYAPR10MB2663.namprd10.prod.outlook.com
  (2603:10b6:a02:a9::20)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: BYAPR10MB2663:EE_|CY8PR10MB6443:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5b4d73cd-d715-46c9-414b-08daca29aa94
+X-MS-Office365-Filtering-Correlation-Id: 45d63191-9a00-4b94-0296-08daca29ac01
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: SA4watO3zqsizUKiOScAvQbWRk43sq3SHj0EgbClLL13TZSKPsu1jAfbfl3R93qWQTJezMg7MKgIS+MncUBlrxsG/9/YB2ZrfQ2JfGNcKKpfZ3/W/0HPj5PfSFtfkQFNkmIs9WESE89jgFt2rHEudrdWT9wNB7JOpTnB1y+UOgucHhxaK3Ux1eHIaOJYF+C1x4NmmvFrIFyKUx//vEnwMbEx7Uc8tYiVnykIHwGLI4JhN//u+kz3kZrTfZPxI0Wl0UkZbOBuGYBC90E4ROqlDgMoxHVCbDFYjpJRwQkHeja196giCls6xzLtXA2dl3aLPD9lvD3r6JaAr/ZZIcnHAwmX/Aro0k6cOlihP7yZUJ6yhop4C/pVZ6NXcoT/IPwuv8JrgxDB8ON7epvvxmstpYKrEwEexqLQjiskyYvjDetv0M9a0gaZwFMbxQE+DbykxQ1WbNJyoqyQNxjIgqL26WtdIerLvvbKj6QwdnUjq2+pMGf9Psnkvb1yZo8/UbJRF5QDhYHkByx2rnGE7VNOfq2mH6OYf9cDyzfR3e9uS3/6EFyPVo3NYMRg2WF5D7EwDGq0Nz56GqzHkDJFsPeTgp/BSFPmrA12Ipzkidj6/SwylEAZY4vkj1bQ5uKhtYmLl1hzH81+jkAAT/61jbTvzA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(366004)(396003)(39860400002)(136003)(346002)(451199015)(36756003)(66899015)(38100700002)(2906002)(44832011)(8676002)(7416002)(4326008)(8936002)(83380400001)(86362001)(316002)(1076003)(2616005)(186003)(6486002)(478600001)(66556008)(66946007)(66476007)(5660300002)(41300700001)(6506007)(6512007)(6666004)(26005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: SeHvgPm8T13QOURDGmRoZJuTw0mK56GOYUHssB6Te2k1D1S1n4R0+z2RfSvS5iema6JXqJI6E7tus4VXDNow68lZDV1LI3fPt9qBKGtfe5gY6rppFoDJ+H+zwzaYFZv4IJsOs6eyawgGiUQhV5iNBhGIRl/RLFUxtiCY5pTwz0iZT1RKwtdRZSH1vD5QuYWMjBxXmE5FO9y6pM6VvROQn6XGYE6WmaBs/9LnfRyzEVR3hnDUt8y8mTGu8qNM4f+dtJZ4U6y3XZx9j6MrdpoeWftsvgOJe8FClg7QzhjSkLKhsyZtuq6R3Jn2z7ACoSZNCy10afaSe/l8E7CM1InJAIlB9NP8Vhny12Ijsky+FB6EveEPpFsgEYAlcWn60bmOq9FLT3AJSHOJDDnSOskoXJWNgo4EtqIAtQk7efr9zupGOZ3bYBGGbP+ofLwJ1Q76aup0zUXsQ6cWkOGft+9JZmHmsXE8a5seuDRULi8wbU7s7EeXnSL0yBPVuHM8/1ltaYLmddNGNqwmUoUaL+kMiUjZovEIPDkqmfhgQK0WO+rbpvUjmYZwORhVe/IAohr0rioTXncBRcI64kmZRW9WGXoeEApHmqjh07LAOy+Zw9znna7Ow6rrRwBBjE8qKa20KAYo/K8WCVp+ol97soN/Sg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(366004)(396003)(39860400002)(136003)(346002)(451199015)(36756003)(38100700002)(2906002)(44832011)(8676002)(7416002)(4326008)(8936002)(83380400001)(86362001)(316002)(1076003)(2616005)(186003)(6486002)(478600001)(66556008)(66946007)(66476007)(5660300002)(41300700001)(6506007)(6512007)(6666004)(26005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?d11O4qMH0TKtdwoRT8wI2VgsvTLs00y2j9gcw/Xl+hpUY+EzRlM6Fk6E9en9?=
- =?us-ascii?Q?OCHeWCEfhiPCL77QH3NYATrdHDL/7Ki+f+iqeThLFW2GWKlG3tboQ1f5WUxY?=
- =?us-ascii?Q?mmGqgCvKlDysVffeQ4C+1qH3/MmJ0VTTL8Uz7cJQFh7pTEE/we2AoibWhLQT?=
- =?us-ascii?Q?lB/3YIYJA/qEX5Xtyf4CcySYPQ4ZEd3P1tAk1QYVgIVQrTSkVfs8hSdBPboc?=
- =?us-ascii?Q?z/aWyVPCo/FdW4Jkzjdd1h9a1Gn5KxaeoXNyDYrL7CdTu/USkaxtdp7fA4gX?=
- =?us-ascii?Q?q+e2l2UdRsxRsV0l8DXzlCwwxxiuXa50j6gWU1Q6NcjtVaPHppFiV+Y1ynO8?=
- =?us-ascii?Q?7tKmXJ1nuQ8DXFqN07dqM3iJY0sXOefShYo7+d3KYiGGpalVb8oaEm3WFAdV?=
- =?us-ascii?Q?ZiTgLhZV0SxA2hQx4XJ7lY5+Y+oNmCXJt1+0Ks8Oc8KC6Wen/VTqGrP2EOiD?=
- =?us-ascii?Q?yYcfpEanMxZh+tv8HpxROrtRAE78znzqTJv40/8IHaWhfKT/jND1vVsodVvN?=
- =?us-ascii?Q?VF7fDLs3pE/t5wIG9HpNPXN1/277omzG5/P+7Y0FbgHeAPQ4FCll+KwjSTsd?=
- =?us-ascii?Q?T6Io9ZHDrLs/CMCCzLIfT18/Q6AVYygpKOW03WM+o1kBNY4lkgRrDgBMvybI?=
- =?us-ascii?Q?d76o4mcM6y6ZmguWd+sK7sy8wzC+Fp0JIayhT2NSrbyT4ArBpuZXcOzwOMUG?=
- =?us-ascii?Q?/Hz/RxPYIAtNasIEYN0wDLHKjhCg3eCcgbfJPtI6HOuN++Sb2oyl0YXed+sz?=
- =?us-ascii?Q?qeNEGFtMgSGwGMlqjed7aTJKnbYM77+DOJLTlzccEiwQvPLddK7XFXk8H9PD?=
- =?us-ascii?Q?GSHJW7REFJmzj2yD2iTdLbFKq8f2BV/CUUGCLb4nCcWNJj8d2pTqC76FQbdU?=
- =?us-ascii?Q?0EdE0F424dEjDPVwxDhEzuo9sK/URZrqcZmJTY0y0z2mA2ITRMF+XcNLFKCQ?=
- =?us-ascii?Q?cAMz0cMJppSBR+I1pIP8OUYzHSBnokrdIrBPAYHTLswLntrBvAbNFlEMZ0FD?=
- =?us-ascii?Q?Qo+XsxdBpeiUl7ymsM/XvKXEar+XVG8JDLuMKY3rR56BrKJgSt8nftcegnCw?=
- =?us-ascii?Q?+8dnx2GEG2zh9uSIvHpdL78AjSd6K2uSojGjC8cKclZaEWMLXWdtJJ8j37sr?=
- =?us-ascii?Q?BIjdh267LrnsoTXJ7r7YK+2dRBwrH2HNRwG23QFTCGQLS65VbccWwE1o668R?=
- =?us-ascii?Q?o7f7mpneXUw4jSlEFowWwKJ7YBq/aE2mEgIJ1/jqns662txIJjRmiwOaK0V4?=
- =?us-ascii?Q?T4DDL7JJpHyfP3wfHrPyHVhj7MUWCIdh3nacmQTCm/jadq9QVSEdCovqrOCA?=
- =?us-ascii?Q?XFEpBYGs/T2YSpLO/bLum/ErzmhiNQpe5i8arNUiwLzuJgdF0LelqecMLkwL?=
- =?us-ascii?Q?j929ugzt09TrU6Dlpq2OqLUTOo5/kmuvy6L2fNitbpopiZG4+qvq9nUj/CBw?=
- =?us-ascii?Q?5R4g0+qH0vtN48e9Gt4mAsZ2HHs9jJeKHYjTtkMqXdVdFeVgOAssRUN7Qu/N?=
- =?us-ascii?Q?UELJJd/X1EQ5/Xl3sKHk4DJWU1DYMntAssGcyJ3Y2tuNZ8+B2YKTJIiIJ54p?=
- =?us-ascii?Q?T+P7pw9paxC73pSVWwcjveozqmu+XCDjT44N9oi1?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Ktwx5OJGyHqllBy/80HE8TOVWpW6g1cLSWmFVqCmNyaG3BV/gFAekAnZMHfO?=
+ =?us-ascii?Q?W0yXYBNhrwxRgC6L87iQlpTzDL/fYmcpZo74a7b2Ey7YCQh/z+XpKWXADwuY?=
+ =?us-ascii?Q?xb93Gip3svFLcoZqtYbxnGO9kj7at0LzExU/ZjtbyF6CpavJD6G90duHWLS9?=
+ =?us-ascii?Q?kvzfNiuV68rHG5NSjtlMV79JPvhmp2ja2v1eLCXixV8WnTlXWCBeqwVykAnD?=
+ =?us-ascii?Q?+9VcKd1Erb/sE4RKpuBE3/C/Ku/CeopD8Jzvewgm13JNAJ8au9jehlfTmy66?=
+ =?us-ascii?Q?gvF3hKAOcMGS0uTnRUaEWCZ/xTBjpca0gitibpzm39HtoCAXUdY2fU/AGhYZ?=
+ =?us-ascii?Q?sbss6VKZOdFZeZQwUB5a8hqqCBWD306KAcErRG1v3hERS4Fi6nXX5ZfMaH3l?=
+ =?us-ascii?Q?dwifKsQ60+1PB3mpJuCqCSvWwFVHfSJffzzaLt+SQjQzTYdwpnVo4Hf3Gy5f?=
+ =?us-ascii?Q?zNJWoxJpq5KHBtq3kO8YSuETk+YmZBa8kQdvmoN9eLQKC+E+ayPOOC+FveH1?=
+ =?us-ascii?Q?DV6OdB2/uFPB4PUIFHNxF+ML9wF8Chw5mH+x8jNHNxDAEXNu5HCCk7zgfawS?=
+ =?us-ascii?Q?aSYdc1fBEcwOXrBEQN2gatRCr3XiqGf5PHd56lFhwbX6SI8jazbWFkzQBP0Y?=
+ =?us-ascii?Q?t4Fwn8CsMYwY0Fd1t6iPVWEdCMkiWE0cR3LYRO/KLVfn8ymSYXBhA1E9SZUo?=
+ =?us-ascii?Q?Edu2btZgYsKr8CgUDZVz5a0wTFXSQcNJi1dSsZhcif19/tXwoO7E9lZr56ve?=
+ =?us-ascii?Q?ePpDYOMhp0C1Jawg09cdNQeG8gbXeg+eV35Rm7ft5c9ZZH7cNJnA11GzjNtK?=
+ =?us-ascii?Q?m58V8OJ3+iXh5itv1JopyGrfw77CkHuqOaq5vofCP/vmc29uegWolRMCDitn?=
+ =?us-ascii?Q?ksfpVGMNDSV77A0jgsG8JU5vxMiG0TZYkZvAr+hhWNjHJ5/ZCRzgxOfi+tJZ?=
+ =?us-ascii?Q?yl8bj4PxcyYiBle7vsRkF2F2VqW+ueJh/YRAspm5xK3QTjv6W2SbPJHXl1PU?=
+ =?us-ascii?Q?/G/EZ800CvVlL9qJcYY2IQ+DeVpMPpnQs5i+RfRE1ea6PekOCFSjDmiNJU0N?=
+ =?us-ascii?Q?bzXl+IJCjgudy7fobD1sdgckZJAruElT4lU/PB2PQK1/SCyiW+qmPFMvHbk1?=
+ =?us-ascii?Q?JKFaTzWrPXquvI/rbjtfx1WTa+gyyGMFiv3fvf+KtP8lCKdSYec3bjcDw1Qa?=
+ =?us-ascii?Q?UnuVvZbyEbjtcV+8JGGmJJ1vk6uQ88144gj0lZPGkCRnu1lFVj+OIytXnL10?=
+ =?us-ascii?Q?oq81z6b6HYwhEr6ECFWmHUU9b0ubPoS44ePsfY1UhZBbqit2JyWj++nERNsL?=
+ =?us-ascii?Q?6vkkFcCjqIL654aTRRLoskUzLO2R8fdXiJR4t5yX2goyFbJBTIzOMiQJCHeu?=
+ =?us-ascii?Q?04FTpBII2cPF8bJCFSdYzdw1uJ3/oAbXkdinnxgJWdMhLmw3+UZCi8ne1pXp?=
+ =?us-ascii?Q?gvAZB+dS7Ma0SDLaX375F8qbZFiAug7At6qBiqiC8tjw0C5y1RbeAORksEVZ?=
+ =?us-ascii?Q?rNdMC6J9cVFKvC4LT+sF47wdmXTVlllZO42WTL7Wnzf3WiK3aemrB73BXJnC?=
+ =?us-ascii?Q?kCa5/QLP6PZK4pxqDW1FDWQBLUAXb+c5l6AQWvwC?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?UNFXGtjQ9dnB90Jny2wKxkQ58qk0Ifq49zE+OTSm2KYvmJ/P8mm71iCV2bdl?=
- =?us-ascii?Q?6u8FY+9x+xRBy9eCs3nue37gBn5bsAuuOZNLYYOCaqdhX4omd38trj10r6zE?=
- =?us-ascii?Q?g64RZCcD+vor9eBZleL8JeAsDuA0JnUVDsR/oslCvYlldFbXHGy8jGJ4aKI/?=
- =?us-ascii?Q?MzM/r86cijCyq8j0wHtBRfQP8gTMXG0B3eam2OhCd5Je0bFNUtEmCGImxCdN?=
- =?us-ascii?Q?IrOvBf993lyJ/w8ZPm+BW0g0mqGRVXLt3KltZx35m7wO1Z6fUqIiHLL17R+x?=
- =?us-ascii?Q?60pNxhdn9iLTH29g7o8wljqr139p5AgB1W1yXCRJ7XnVAhOlxT3SF8a2VO1w?=
- =?us-ascii?Q?U/Wr1PFYmRxvDQjfyr4QQQoECXCV3icXChotgburpBsrwiWM7ZveOWTUWN8d?=
- =?us-ascii?Q?J5mB5ygy8QGAWtVuPGXrOk/wXrIKBqdwpWuEk3KyynCCKpZfGuZsdBFrL9a4?=
- =?us-ascii?Q?mAYh2L3Yz8B3Hlj+yuiwxIPD/Vh1zUHX1OcrjioFY1XnMlquQkAGwwsd2ybG?=
- =?us-ascii?Q?VBr2AwJE5riR/0m1ypd4JY79BYYh8Abk5vnRJBzBakllpDC82JXCNhAFfc4O?=
- =?us-ascii?Q?qI2S9pe0UZCgocm6QlSLPxapKYUvec86JR5JmzZrvno69x7695hPXRYHgZ/S?=
- =?us-ascii?Q?7ny8Ryq5Mpss3BWHMvjjc1gEiDf4J6g7SFZTPOstbby8lazy+TgBMCkxT3fG?=
- =?us-ascii?Q?+8N7L3lW2OdrBmUr49ipT2wcTWxHrB+jb0eOKEzp518XmBLNIy18vSInmFaL?=
- =?us-ascii?Q?X4rj5Bjh+zXeV4fjZhBYI34zEXS178ooZ5rIFDuU+AKhb1qfuzhrtEsVibBM?=
- =?us-ascii?Q?JuRlWVyBr13+JkYN+LQvu3BVF98j4lBmFpMG15uqxgCLAwrSRChgbCzwobeB?=
- =?us-ascii?Q?ioqRCmHLhadJOf2rD045yZ2Ublkx7mQgK9kPpLFF26kF1/Wd+yglYAYsgVRv?=
- =?us-ascii?Q?vInXgEw3CtCcCS2lXATflAiL9QXNars4eEUlgoqRgcd4zBvq0BhOXLwFagkV?=
- =?us-ascii?Q?kGsp4hAsKji9+gf5d3VWbDB9ToZNjgoLC7UVJBQNgVIu/7Nk8hqtmB1n/bXk?=
- =?us-ascii?Q?qYEWyiObUy9B2EAjAGm3m8yGe2F9kQLAwdvTjD132pTKu0tWauE9FRm5FjIZ?=
- =?us-ascii?Q?21EFaoNLUo4YpxsVTihdSfSEEYunEbNeHEXdLwwPs4hmQrQjLuAYp7/7M/tz?=
- =?us-ascii?Q?1VnMl8rbJQNSIS6tvBLHVttDLDmcwG1sR4mZxbpoprRGrExjWKYNO/0VHgo1?=
- =?us-ascii?Q?fhhOGOvk3z3BUDg1wZsxUSCI+szX7pFlVfBzj/+Y9mEKvWRwa/E3CU+MRP5K?=
- =?us-ascii?Q?Lzi5eGrbOzQ4FFVzQ67m53s+CUUPYuFm/pMq1uqCoKoa5vODS68493WvfqRO?=
- =?us-ascii?Q?gn60hG8Ig+92Sh25JxRvxigO7ZL6H6nlg8g5Y+rqXdRVASeOQZRfwGNyPQPi?=
- =?us-ascii?Q?pf3hU/UT6hxN2HAtj7rXvbB88kCDdi4y+KPsJkbNNYQtzYAXMemBl+yyF0sP?=
- =?us-ascii?Q?c/CnLCNs82ADmjdoWoQX30EMHRhnrCLA7R74vI+1/oepGA0kdR18CXI2MJGE?=
- =?us-ascii?Q?xYFsSj0Ziz57JxvXfsJ6Q0R6uVBxsHyWaXnfKRsPQ5HdwgwUEcYC/K4f/3bL?=
- =?us-ascii?Q?UQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?Z24+vN2cCvmV8Jv/eJL4x+AMy3NKmHde84cV/7mQqMxXiPjlwrJYT/y1YIb7?=
+ =?us-ascii?Q?ioyGB85uTGxHdZSOg1lCqQ25pDBj08S6RbWA/1l7DzwfpGhOYoKp9w58NIMe?=
+ =?us-ascii?Q?Rr6GSE0+bOCIWrAKFLheF3sff+J3QWtSnjFVB5Eb95u8j8xwiyM7aVhEjFbO?=
+ =?us-ascii?Q?GJS1Bbtxu+ygOKerwFLBvOd315YISFLanW9FUQ00vzRThaN4Ds1jv2UPNDAP?=
+ =?us-ascii?Q?5CSQRk6SCkUYLpBcCDNcDsPoZiUu8eCBQlKlbq20xRZLBbOB4ODxdwp9TVX6?=
+ =?us-ascii?Q?gorV6zaPbx8FG/OuSf+L6ZSr7fSlDO5vYme+P0KcjfKYHWcZf9+MP5C4Yk5K?=
+ =?us-ascii?Q?qK0WXYlqMicQ/P1LpTExF5VAvwi2DPaw4qTHZDYC/zET2KkPk2HTQ7fd18AZ?=
+ =?us-ascii?Q?E5FEg/5EFKYRhI8LFmkXZ3G1YrbxGfqyPB8E8vjLGxVUvTx/pp/CvoyY4PsW?=
+ =?us-ascii?Q?H8ampcVR9qIU4DMiHhLlyjVIwrRV4TLi4UcYXYdo6JCPTqEjwUo13RJuuHxK?=
+ =?us-ascii?Q?mNZvCVFIhhgFzw5Pzwji9zFkPt88gHMJNFYM8NF10FqTyI0opTO/8YwA3s4g?=
+ =?us-ascii?Q?D72idzk+GgwrKnY9tEya6PPQ4eKNOpaQoZYrAVGyHJ3nraQLpb1NFNfAEX1n?=
+ =?us-ascii?Q?sJCgXdxCY68B8Ap9S0DC/MqUIBqtuIBjNullHAu36aB+V1lJGXxyE1IEBYY9?=
+ =?us-ascii?Q?hH/fB4UvvtlKJHWDyXOlc/fwC/Sra+C821a8T/dhooi9XQLoqnR3Np8DAkIs?=
+ =?us-ascii?Q?714U9NCCfWH2UaQIRv0CzumyFHdHR/CXKbygOQfSdRe0e2rU7UtD+M+BSd/1?=
+ =?us-ascii?Q?egTg4dsz+CxGtqqcJE9vh0zXnLyl8esxxJAmZX42Ko2mnGubM6gmw48OHaUj?=
+ =?us-ascii?Q?ZMcmC4mnNLsxEvxSauLLWlsRGxp08EGtnK6lf4kfJwGo/Dxh2KNTBpyO+j/7?=
+ =?us-ascii?Q?8Ozt4eYNIEMNGuuLTeijOZhzkxHgNdquyRqcTNZ+MdgOnuzfCu+9s4sEh61J?=
+ =?us-ascii?Q?2h4SsaAsbcXak87oE9zowsMFacVO7GqC5/rpbhL2d7eZJQ97h6aGEakUa1R0?=
+ =?us-ascii?Q?0XCQ66bjGRPZlvsxRA7DmdtzQzWQqpWhjv+VtuoGqShIirArbk5LbgZQkZpS?=
+ =?us-ascii?Q?xQ9k6FNj/H7SlaOmjycfOd/YhStRyBHxxKhSfIw9JI0oaY1MBFWFYb9kDawF?=
+ =?us-ascii?Q?bU4gOzOX9eUj2eBA3bAw4HvQ0YonpfzMqSex8jfYC/dX1ybydOvrYGZZ42Fm?=
+ =?us-ascii?Q?x1TBw3OjfZuD8Qxsml97bj66fusY18jRJjniI2XphKiBV9BepcqXKaYtjv+m?=
+ =?us-ascii?Q?KiezcJNRn5z8FJHGyssSRq3bTewaHL/Zv4KrXUbwznMyIvgtE+jGWOzGYT0w?=
+ =?us-ascii?Q?hbzf7Kd5nvDYWyE5hYfALstQYN5JTUvcG/uAEcTzNoW0GB9+VPOz16VycNQr?=
+ =?us-ascii?Q?MlBiVdbhHlnF7wpmJ6d23Ge9RU/8lERFDVMneKKm86l7pqegKCUxgwfua3Jn?=
+ =?us-ascii?Q?910Lb1/hgPzNXiJbhItWT7cJ8+LzXdmxMU25gguKJbNRET6QOF45hbt4hOG+?=
+ =?us-ascii?Q?haA+6Q1rvgPnnYydtEBFus9+IPsGbygmrEP0vl23Lq14ZCXy1C5B+EgwUfTH?=
+ =?us-ascii?Q?0Q=3D=3D?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5b4d73cd-d715-46c9-414b-08daca29aa94
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45d63191-9a00-4b94-0296-08daca29ac01
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2022 12:29:13.9408
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2022 12:29:15.6282
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EER7XxQAVRQtDFWKF0yDX5LS/lEEMVfxtEd7oRJbgRBeA/ws1BjirnVkWpyBoOyUWAgGZsSvev4h5jfWaJEUJQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6V/hsYFd+AURwnu6u5eqwAofRzspWuDgd+s0DGRWH9B0IixpecUvowc97f85RJfA/Ee7mQJ08IUFJ8R92TTVPg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR10MB6443
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-11-18_08,2022-11-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
- adultscore=0 suspectscore=0 spamscore=0 mlxlogscore=999 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
+ suspectscore=0 bulkscore=0 mlxscore=0 spamscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2210170000 definitions=main-2211190092
-X-Proofpoint-ORIG-GUID: V7yPqHxo3Zz-xmJQqdDIuaQVTL5hXgMa
-X-Proofpoint-GUID: V7yPqHxo3Zz-xmJQqdDIuaQVTL5hXgMa
+X-Proofpoint-ORIG-GUID: zABPYiSP8cs7IRP2--OSUoT9Z-T7q7Ow
+X-Proofpoint-GUID: zABPYiSP8cs7IRP2--OSUoT9Z-T7q7Ow
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -180,169 +180,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some per-VM kvm caps (e.g., KVM_CAP_PMU_CAPABILITY) can only be
-enabled/disabled before creating the 1st vcpu, that is, when
-(!kvm->created_vcpus) at the KVM side.
+The "perf stat" at the VM side still works even we set "-cpu host,-pmu" in
+the QEMU command line. That is, neither "-cpu host,-pmu" nor "-cpu EPYC"
+could disable the pmu virtualization in an AMD environment.
 
-Unfortunately, some properties are still not set during kvm_arch_init().
-The values of those properties are obtained during the init of each vcpu.
+We still see below at VM kernel side ...
 
-This is to add a new helper to provide the last chance before creating the
-1st vcpu, in order for the QEMU to set kvm caps based on the per-vcpu
-properties (e.g., "pmu").
+[    0.510611] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
 
-In the future patch, we may disable KVM_CAP_PMU_CAPABILITY in the helper
-if the "-pmu" is set for the vcpu.
+... although we expect something like below.
+
+[    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
+[    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
+
+This is because the AMD pmu (v1) does not rely on cpuid to decide if the
+pmu virtualization is supported.
+
+We disable KVM_CAP_PMU_CAPABILITY if the 'pmu' is disabled in the vcpu
+properties.
 
 Cc: Joe Jin <joe.jin@oracle.com>
 Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 ---
- accel/kvm/kvm-all.c    | 7 +++++--
- include/sysemu/kvm.h   | 2 ++
- target/arm/kvm64.c     | 4 ++++
- target/i386/kvm/kvm.c  | 4 ++++
- target/mips/kvm.c      | 4 ++++
- target/ppc/kvm.c       | 4 ++++
- target/riscv/kvm.c     | 4 ++++
- target/s390x/kvm/kvm.c | 4 ++++
- 8 files changed, 31 insertions(+), 2 deletions(-)
+ target/i386/kvm/kvm.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f99b0becd8..335ff6ce4d 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -367,8 +367,9 @@ void kvm_destroy_vcpu(CPUState *cpu)
-     }
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 8fec0bc5b5..0b1226ff7f 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -137,6 +137,8 @@ static int has_triple_fault_event;
+ 
+ static bool has_msr_mcg_ext_ctl;
+ 
++static int has_pmu_cap;
++
+ static struct kvm_cpuid2 *cpuid_cache;
+ static struct kvm_cpuid2 *hv_cpuid_cache;
+ static struct kvm_msr_list *kvm_feature_msrs;
+@@ -1725,6 +1727,19 @@ static void kvm_init_nested_state(CPUX86State *env)
+ 
+ void kvm_arch_pre_create_vcpu(CPUState *cs)
+ {
++    X86CPU *cpu = X86_CPU(cs);
++    int ret;
++
++    if (has_pmu_cap && !cpu->enable_pmu) {
++        ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PMU_CAPABILITY, 0,
++                                KVM_PMU_CAP_DISABLE);
++        if (ret < 0) {
++            error_report("kvm: Failed to disable pmu cap: %s",
++                         strerror(-ret));
++        }
++
++        has_pmu_cap = 0;
++    }
  }
  
--static int kvm_get_vcpu(KVMState *s, unsigned long vcpu_id)
-+static int kvm_get_vcpu(KVMState *s, CPUState *cs)
- {
-+    unsigned long vcpu_id = kvm_arch_vcpu_id(cs);
-     struct KVMParkedVcpu *cpu;
- 
-     QLIST_FOREACH(cpu, &s->kvm_parked_vcpus, node) {
-@@ -382,6 +383,8 @@ static int kvm_get_vcpu(KVMState *s, unsigned long vcpu_id)
+ int kvm_arch_init_vcpu(CPUState *cs)
+@@ -2517,6 +2532,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
          }
      }
  
-+    kvm_arch_pre_create_vcpu(cs);
++    has_pmu_cap = kvm_check_extension(s, KVM_CAP_PMU_CAPABILITY);
 +
-     return kvm_vm_ioctl(s, KVM_CREATE_VCPU, (void *)vcpu_id);
- }
- 
-@@ -393,7 +396,7 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
- 
-     trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
- 
--    ret = kvm_get_vcpu(s, kvm_arch_vcpu_id(cpu));
-+    ret = kvm_get_vcpu(s, cpu);
+     ret = kvm_get_supported_msrs(s);
      if (ret < 0) {
-         error_setg_errno(errp, -ret, "kvm_init_vcpu: kvm_get_vcpu failed (%lu)",
-                          kvm_arch_vcpu_id(cpu));
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index e9a97eda8c..9a2e2ba012 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -371,6 +371,8 @@ int kvm_arch_put_registers(CPUState *cpu, int level);
- 
- int kvm_arch_init(MachineState *ms, KVMState *s);
- 
-+void kvm_arch_pre_create_vcpu(CPUState *cs);
-+
- int kvm_arch_init_vcpu(CPUState *cpu);
- int kvm_arch_destroy_vcpu(CPUState *cpu);
- 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 1197253d12..da4317ad06 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -834,6 +834,10 @@ static int kvm_arm_sve_set_vls(CPUState *cs)
-     return kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
- }
- 
-+void kvm_arch_pre_create_vcpu(CPUState *cs)
-+{
-+}
-+
- #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
- 
- int kvm_arch_init_vcpu(CPUState *cs)
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index a213209379..8fec0bc5b5 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -1723,6 +1723,10 @@ static void kvm_init_nested_state(CPUX86State *env)
-     }
- }
- 
-+void kvm_arch_pre_create_vcpu(CPUState *cs)
-+{
-+}
-+
- int kvm_arch_init_vcpu(CPUState *cs)
- {
-     struct {
-diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-index bcb8e06b2c..1be1695b6b 100644
---- a/target/mips/kvm.c
-+++ b/target/mips/kvm.c
-@@ -61,6 +61,10 @@ int kvm_arch_irqchip_create(KVMState *s)
-     return 0;
- }
- 
-+void kvm_arch_pre_create_vcpu(CPUState *cs)
-+{
-+}
-+
- int kvm_arch_init_vcpu(CPUState *cs)
- {
-     MIPSCPU *cpu = MIPS_CPU(cs);
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 7c25348b7b..9049c6eb5e 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -462,6 +462,10 @@ static void kvmppc_hw_debug_points_init(CPUPPCState *cenv)
-     }
- }
- 
-+void kvm_arch_pre_create_vcpu(CPUState *cs)
-+{
-+}
-+
- int kvm_arch_init_vcpu(CPUState *cs)
- {
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-index 30f21453d6..811f65d4f6 100644
---- a/target/riscv/kvm.c
-+++ b/target/riscv/kvm.c
-@@ -394,6 +394,10 @@ void kvm_arch_init_irq_routing(KVMState *s)
- {
- }
- 
-+void kvm_arch_pre_create_vcpu(CPUState *cs)
-+{
-+}
-+
- int kvm_arch_init_vcpu(CPUState *cs)
- {
-     int ret = 0;
-diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-index 3ac7ec9acf..65f701894e 100644
---- a/target/s390x/kvm/kvm.c
-+++ b/target/s390x/kvm/kvm.c
-@@ -404,6 +404,10 @@ unsigned long kvm_arch_vcpu_id(CPUState *cpu)
-     return cpu->cpu_index;
- }
- 
-+void kvm_arch_pre_create_vcpu(CPUState *cs)
-+{
-+}
-+
- int kvm_arch_init_vcpu(CPUState *cs)
- {
-     unsigned int max_cpus = MACHINE(qdev_get_machine())->smp.max_cpus;
+         return ret;
 -- 
 2.34.1
 
