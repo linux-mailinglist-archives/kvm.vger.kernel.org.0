@@ -2,95 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AECF0631043
-	for <lists+kvm@lfdr.de>; Sat, 19 Nov 2022 19:25:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D4B46314BC
+	for <lists+kvm@lfdr.de>; Sun, 20 Nov 2022 16:01:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234606AbiKSSZz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Nov 2022 13:25:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44722 "EHLO
+        id S229669AbiKTPBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Nov 2022 10:01:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234305AbiKSSZx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 19 Nov 2022 13:25:53 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DAC2AE43;
-        Sat, 19 Nov 2022 10:25:52 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id EF1491F383;
-        Sat, 19 Nov 2022 18:25:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1668882350; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Hygy7F65S609NQFcqg6vDNh07pkYe/unIVrwGkaPmX4=;
-        b=E/JTQKcEyvySP/5ZvZlinvaVsNdHs1wUZOvqj9/DofqDN+1KaT3NkccHONqqtR40XMjr/y
-        nPxUstvWsvIERHsTOBFtm/qY5IohnAZNXUNYXi4Gc54mgOcqYdB+GogwBjbuwTljYIHAGd
-        /2E7/4NJgXO2rpLFM4YaWzB6KtSIja4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1668882350;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Hygy7F65S609NQFcqg6vDNh07pkYe/unIVrwGkaPmX4=;
-        b=yPTfHdWj1uogn8KFqbBRDkDMDZ3ZW3hDWUWFzDs5i8Vud5oMV/5b/yRHwTpAlwVkr+rIWZ
-        BvnQqfXonn0ps6BA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E295A1377F;
-        Sat, 19 Nov 2022 18:25:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id u6E8N64feWMyXwAAMHmgww
-        (envelope-from <bp@suse.de>); Sat, 19 Nov 2022 18:25:50 +0000
-Date:   Sat, 19 Nov 2022 19:25:50 +0100
-From:   Borislav Petkov <bp@suse.de>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Haowen Bai <baihaowen@meizu.com>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>, stable@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH V5] virt: sev: Prevent IV reuse in SNP guest driver
-Message-ID: <Y3kfrivSHY8m9ihv@zn.tnic>
-References: <20221116175558.2373112-1-pgonda@google.com>
- <3e50c258-8732-088c-d9d8-dfaae82213f0@amd.com>
- <CAMkAt6ppvVUHRCyOjba=_HmYPp_cZaQB1J=HLvFf8yRD1dXPPQ@mail.gmail.com>
+        with ESMTP id S229489AbiKTPBN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Nov 2022 10:01:13 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2ACB25292;
+        Sun, 20 Nov 2022 07:01:12 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id io19so8466413plb.8;
+        Sun, 20 Nov 2022 07:01:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MCLrwQhM0Vs6pVwurxrEwA9amBoFAvwidCNyO7UlwYA=;
+        b=NI4+LX0CymQcB55vKxhWbUoYJlGz9m8X5APHdqNNzthbBoso0dAOJBaJPMiEm9puSp
+         4zoBtQ5Nwuiri9sWzBik1Y+59EylyGX74RPIg+v9/sUEymaUB5ROwUPAwveXO1vDokiX
+         jzSuU0HEZopqndRbelJ7ku4clvVb0JkSzlW+6EuiVllxfqcNbBQZjmlgJDIJE2nhkpOl
+         pDgFtb2+JS3txjK8989i9tGAOVPWW19Uwp1CjLwL2SkLMSvvRLfDL7mk/DRdlXlHvFp8
+         bVdouMBma3GWGN90UXe4q9hc3czC1tJK4Qd18CBxUyCFH/3rXVif9vjlz31opSB9Zp+n
+         g7Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MCLrwQhM0Vs6pVwurxrEwA9amBoFAvwidCNyO7UlwYA=;
+        b=sptcJyqPF3PfIRkwvIkb5ydkYxiOMAu98RUjVfubJuzXlwnCVEF5KiEPfcLpmF9a5y
+         Pz6S8RcS4M/qNiy3NRaDuPHyvgKOAlQxJWrUmAc5i5OffSrvA+aNmvblzaM9J+8Zu2Bv
+         F1PpTRTR+9NgxrYPbRdxK5v52Ph6rTaA/UOHZAP2ud9Q8m5XVg/YNf9QQawIDFr0oZIy
+         IuDyZCfM0hAYZCjgdQPn215wb/jdCpv2BRtRbnk6DTgO1Lkn5wvFBPlrDMTeTzRjJDum
+         FIdQM/GUZYnl7KlMJ44yAxGnUXQ15i8/RRR6RKVK7n+wR59pJojbM0rx6KVVLEh37wJX
+         NjFg==
+X-Gm-Message-State: ANoB5pmLWJreHfnoj3itllSbkcrdpPosz636/LEYX11mWEoEcUmylCbt
+        hNOi7V+L+6TS+I/2wqg0eOPOcGikXiYgnA==
+X-Google-Smtp-Source: AA0mqf7/b7wZMXPyTA7iZx+4+biCvLKIXvBRwXpeMLNBn6Mj5UuDULuKvytNsGrszJHWQpk6NNbXzw==
+X-Received: by 2002:a17:902:f813:b0:187:30f0:b16b with SMTP id ix19-20020a170902f81300b0018730f0b16bmr640520plb.14.1668956472488;
+        Sun, 20 Nov 2022 07:01:12 -0800 (PST)
+Received: from localhost.localdomain ([122.50.209.51])
+        by smtp.gmail.com with ESMTPSA id 3-20020a630903000000b004761e544ec6sm238167pgj.89.2022.11.20.07.01.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 20 Nov 2022 07:01:12 -0800 (PST)
+From:   Mukesh Kumar Chaurasiya <mchauras.linux@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Mukesh Kumar Chaurasiya <mchauras.linux@gmail.com>
+Subject: [PATCH] KVM: Using __weak instead of __attribute__((weak)).
+Date:   Sun, 20 Nov 2022 20:31:02 +0530
+Message-Id: <20221120150102.138956-1-mchauras.linux@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMkAt6ppvVUHRCyOjba=_HmYPp_cZaQB1J=HLvFf8yRD1dXPPQ@mail.gmail.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 07:19:17AM -0700, Peter Gonda wrote:
-> Thanks Tom. I'll update with all the feedback after Boris chimes in.
+Adhere to linux coding style.
 
-No need - it looks pretty good to me. I'll queue it next week with Tom's
-comments incorporated.
+Reported by checkpatch:
 
-Thx.
+WARNING: Prefer __weak over __attribute__((weak))
 
+Signed-off-by: Mukesh Kumar Chaurasiya <mchauras.linux@gmail.com>
+---
+ virt/kvm/irqchip.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+index 58e4f88b2b9f..cf2e9a3fec04 100644
+--- a/virt/kvm/irqchip.c
++++ b/virt/kvm/irqchip.c
+@@ -157,7 +157,7 @@ static int setup_routing_entry(struct kvm *kvm,
+ 	return 0;
+ }
+ 
+-void __attribute__((weak)) kvm_arch_irq_routing_update(struct kvm *kvm)
++void __weak kvm_arch_irq_routing_update(struct kvm *kvm)
+ {
+ }
+ 
 -- 
-Regards/Gruss,
-    Boris.
+2.25.1
 
-SUSE Software Solutions Germany GmbH
-GF: Ivo Totev, Andrew Myers, Andrew McDonald, Martje Boudien Moerman
-(HRB 36809, AG Nürnberg)
