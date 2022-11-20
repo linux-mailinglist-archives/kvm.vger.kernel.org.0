@@ -2,96 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D4B46314BC
-	for <lists+kvm@lfdr.de>; Sun, 20 Nov 2022 16:01:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 679F163166F
+	for <lists+kvm@lfdr.de>; Sun, 20 Nov 2022 21:51:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229669AbiKTPBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Nov 2022 10:01:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41166 "EHLO
+        id S229664AbiKTUvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Nov 2022 15:51:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiKTPBN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Nov 2022 10:01:13 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2ACB25292;
-        Sun, 20 Nov 2022 07:01:12 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id io19so8466413plb.8;
-        Sun, 20 Nov 2022 07:01:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MCLrwQhM0Vs6pVwurxrEwA9amBoFAvwidCNyO7UlwYA=;
-        b=NI4+LX0CymQcB55vKxhWbUoYJlGz9m8X5APHdqNNzthbBoso0dAOJBaJPMiEm9puSp
-         4zoBtQ5Nwuiri9sWzBik1Y+59EylyGX74RPIg+v9/sUEymaUB5ROwUPAwveXO1vDokiX
-         jzSuU0HEZopqndRbelJ7ku4clvVb0JkSzlW+6EuiVllxfqcNbBQZjmlgJDIJE2nhkpOl
-         pDgFtb2+JS3txjK8989i9tGAOVPWW19Uwp1CjLwL2SkLMSvvRLfDL7mk/DRdlXlHvFp8
-         bVdouMBma3GWGN90UXe4q9hc3czC1tJK4Qd18CBxUyCFH/3rXVif9vjlz31opSB9Zp+n
-         g7Bg==
+        with ESMTP id S229598AbiKTUvU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Nov 2022 15:51:20 -0500
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06B762B1A3
+        for <kvm@vger.kernel.org>; Sun, 20 Nov 2022 12:51:20 -0800 (PST)
+Received: by mail-il1-f197.google.com with SMTP id j7-20020a056e02154700b003025b3c0ea3so7441701ilu.10
+        for <kvm@vger.kernel.org>; Sun, 20 Nov 2022 12:51:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MCLrwQhM0Vs6pVwurxrEwA9amBoFAvwidCNyO7UlwYA=;
-        b=sptcJyqPF3PfIRkwvIkb5ydkYxiOMAu98RUjVfubJuzXlwnCVEF5KiEPfcLpmF9a5y
-         Pz6S8RcS4M/qNiy3NRaDuPHyvgKOAlQxJWrUmAc5i5OffSrvA+aNmvblzaM9J+8Zu2Bv
-         F1PpTRTR+9NgxrYPbRdxK5v52Ph6rTaA/UOHZAP2ud9Q8m5XVg/YNf9QQawIDFr0oZIy
-         IuDyZCfM0hAYZCjgdQPn215wb/jdCpv2BRtRbnk6DTgO1Lkn5wvFBPlrDMTeTzRjJDum
-         FIdQM/GUZYnl7KlMJ44yAxGnUXQ15i8/RRR6RKVK7n+wR59pJojbM0rx6KVVLEh37wJX
-         NjFg==
-X-Gm-Message-State: ANoB5pmLWJreHfnoj3itllSbkcrdpPosz636/LEYX11mWEoEcUmylCbt
-        hNOi7V+L+6TS+I/2wqg0eOPOcGikXiYgnA==
-X-Google-Smtp-Source: AA0mqf7/b7wZMXPyTA7iZx+4+biCvLKIXvBRwXpeMLNBn6Mj5UuDULuKvytNsGrszJHWQpk6NNbXzw==
-X-Received: by 2002:a17:902:f813:b0:187:30f0:b16b with SMTP id ix19-20020a170902f81300b0018730f0b16bmr640520plb.14.1668956472488;
-        Sun, 20 Nov 2022 07:01:12 -0800 (PST)
-Received: from localhost.localdomain ([122.50.209.51])
-        by smtp.gmail.com with ESMTPSA id 3-20020a630903000000b004761e544ec6sm238167pgj.89.2022.11.20.07.01.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Nov 2022 07:01:12 -0800 (PST)
-From:   Mukesh Kumar Chaurasiya <mchauras.linux@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Mukesh Kumar Chaurasiya <mchauras.linux@gmail.com>
-Subject: [PATCH] KVM: Using __weak instead of __attribute__((weak)).
-Date:   Sun, 20 Nov 2022 20:31:02 +0530
-Message-Id: <20221120150102.138956-1-mchauras.linux@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oDLcfZl+txYsJtzeVXqCYMCFgcOLb6wRGnlPi43ilE8=;
+        b=YWjOkBZpGDV01hsv4R0Tf0cgz75Q6h4Ujoc+SfR6y6Jmel/6PHrAPRMbGlxcHT8pzg
+         W0ElyP/q9NgCAb9xZWWcC4jBgafmEdbFpfACKrL/i9tyqR9jwucy6jikyW/uvVH+u8/W
+         hNwk1MJy7pgzYKP3TJJvksFjgaZbzonPBMqCHy1CGytI0Jv2MJ3p+2CytuPxJeQeFC4G
+         Dqqm9THHPQs6ZAxT6IkAOrOq8BMwOGtDtEHbaEL3ZMhd/ic51M/auObc/nQz3nNihIOE
+         cJZ+ptmbgO2P8qrIcixmzTwoKSVasUoSlqWvyMhKAsNY8CHCuBo4xUSVrr0rpgJFLNR3
+         OgeQ==
+X-Gm-Message-State: ANoB5plQi/Qlghy5nHvxrmiVBnNJcFIxDF6QywpRUSz6grAtaJovsyW7
+        IGFGcyX82+9VayIEGhMctQXrgelY5qJ2cndWDpFTQsXxE3nL
+X-Google-Smtp-Source: AA0mqf5CBYmEqRFQYqm1UpoVHrdbq/uYkStlCRHWaDTVvlLNGxzh0dMVaQAZBLUykBc00JqAz74S8DO7Ridn5eA4tsjxMLFw/LVU
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Received: by 2002:a92:c64c:0:b0:2fa:de7:7c09 with SMTP id
+ 12-20020a92c64c000000b002fa0de77c09mr6888485ill.94.1668977479370; Sun, 20 Nov
+ 2022 12:51:19 -0800 (PST)
+Date:   Sun, 20 Nov 2022 12:51:19 -0800
+In-Reply-To: <00000000000021719805d692e035@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000cbce8405eded1951@google.com>
+Subject: Re: [syzbot] inconsistent lock state in sync_info_debugfs_show
+From:   syzbot <syzbot+007bfe0f3330f6e1e7d1@syzkaller.appspotmail.com>
+To:     bp@alien8.de, christian.koenig@amd.com,
+        dri-devel@lists.freedesktop.org, gustavo@padovan.org,
+        hdanton@sina.com, hpa@zytor.com, jmattson@google.com,
+        joro@8bytes.org, kvm@vger.kernel.org,
+        linaro-mm-sig-bounces@lists.linaro.org,
+        linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
+        linux-media@vger.kernel.org, mark.rutland@arm.com,
+        mingo@redhat.com, pbonzini@redhat.com, peterz@infradead.org,
+        seanjc@google.com, sumit.semwal@linaro.org,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, will@kernel.org,
+        x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adhere to linux coding style.
+syzbot has bisected this issue to:
 
-Reported by checkpatch:
+commit 997acaf6b4b59c6a9c259740312a69ea549cc684
+Author: Mark Rutland <mark.rutland@arm.com>
+Date:   Mon Jan 11 15:37:07 2021 +0000
 
-WARNING: Prefer __weak over __attribute__((weak))
+    lockdep: report broken irq restoration
 
-Signed-off-by: Mukesh Kumar Chaurasiya <mchauras.linux@gmail.com>
----
- virt/kvm/irqchip.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=115b350d880000
+start commit:   84368d882b96 Merge tag 'soc-fixes-6.1-3' of git://git.kern..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=135b350d880000
+console output: https://syzkaller.appspot.com/x/log.txt?x=155b350d880000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6f4e5e9899396248
+dashboard link: https://syzkaller.appspot.com/bug?extid=007bfe0f3330f6e1e7d1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=164376f9880000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16cf0965880000
 
-diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-index 58e4f88b2b9f..cf2e9a3fec04 100644
---- a/virt/kvm/irqchip.c
-+++ b/virt/kvm/irqchip.c
-@@ -157,7 +157,7 @@ static int setup_routing_entry(struct kvm *kvm,
- 	return 0;
- }
- 
--void __attribute__((weak)) kvm_arch_irq_routing_update(struct kvm *kvm)
-+void __weak kvm_arch_irq_routing_update(struct kvm *kvm)
- {
- }
- 
--- 
-2.25.1
+Reported-by: syzbot+007bfe0f3330f6e1e7d1@syzkaller.appspotmail.com
+Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
 
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
