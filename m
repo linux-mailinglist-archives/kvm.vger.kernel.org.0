@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D0E3631FFF
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 12:13:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0EDE632025
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 12:16:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230458AbiKULNY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 06:13:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39960 "EHLO
+        id S230480AbiKULQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 06:16:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230469AbiKULNC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 06:13:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3635FB962F
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 03:08:11 -0800 (PST)
+        with ESMTP id S230527AbiKULQS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 06:16:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E040FC1F47
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 03:11:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669028864;
+        s=mimecast20190719; t=1669029011;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xNuyVgSMX/ajeMNmF/4b1DUvMDeMPy/4E3AU3e3kKQU=;
-        b=Umn8//K3nYL4KXuX8y8STDk+2f1kbQS6GOSMWekPKhgtWHE3+aF/CFjnkcIBblC+/jySR3
-        FTvfeTuoc5biJyhaiQjaisSAuHGVcW2worj+8PGz38AkPO0Q97FZWfbFr2T5Hm4Y5Z2DNL
-        mvcthJrRzZW2/s2JYmjP5AGzMixR2QQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=6HFE5ckJ+/PkEEqbEDcxeM6P1Mra4LAFsLM3EpugvmI=;
+        b=EMLCOBkxKS6v25xXjAdge+Br8hPYZtath284xFs7yuod9WiH8RVTF1Ic+W7o2XkHu+7hPs
+        0RXnqqN9HzSIDt34fTUsmbCNliMEjbGfyL3802sP/+kN4OkZwd7Qv60QwXMFqXQm6UN1M/
+        sdpVVEH1M+yZFp/HwNmul0ksAIYwcHk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-126-eSj-xaqyPUqPpu4m6eCf-g-1; Mon, 21 Nov 2022 06:07:42 -0500
-X-MC-Unique: eSj-xaqyPUqPpu4m6eCf-g-1
-Received: by mail-wm1-f72.google.com with SMTP id c187-20020a1c35c4000000b003cfee3c91cdso6328767wma.6
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 03:07:42 -0800 (PST)
+ us-mta-265-RieP3r-fNYaAbe37F2Ysqw-1; Mon, 21 Nov 2022 06:10:10 -0500
+X-MC-Unique: RieP3r-fNYaAbe37F2Ysqw-1
+Received: by mail-wm1-f70.google.com with SMTP id v125-20020a1cac83000000b003cfa148576dso6342538wme.3
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 03:10:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=xNuyVgSMX/ajeMNmF/4b1DUvMDeMPy/4E3AU3e3kKQU=;
-        b=mBUD55DK763xnxTnEkNapzlUDZRxQ+Q+1cCoueTJLJn8/Yop3Mryx+q7TpZME/IO+x
-         ttcCq3XuC52pC0ohHsqbnbL7fYPqRY5GYveTdh7GP4tqQPMWI1huwb+oAOWwx1zpg5KB
-         RyNGFAvueYyduSIRMHu8wh09s40U7Vl/BAdDP7/GmA1+sxXvdQjCDF1QERB4Uk7Gq12J
-         imqG8hqfB9ZbzW8SIwphkscokxHoSJ8+PQf2fyTWq9n+rKVobaJoqchu0sOtpunAnhDg
-         hU4x5wqj84cT4MKMWe4C2ImgvzSFU1zqjAmbhoXDVJleH7blUfD8kuq8VP/6PRXcXImz
-         5ujA==
-X-Gm-Message-State: ANoB5pmEd/a40nofJ4eC/r5kZH4XR/B6uETh0V4ZrkL9YdT1A96/mdw7
-        WIxdER33GPGUYbS1FmhTu5jf9cc3dRT9r5WhFKYg1pwXTtc75gW3/vmRBH0auUqguxyuYw2Kkzv
-        9JDbccFkDPP+n
-X-Received: by 2002:adf:fb12:0:b0:236:60e8:3cca with SMTP id c18-20020adffb12000000b0023660e83ccamr4505601wrr.471.1669028861413;
-        Mon, 21 Nov 2022 03:07:41 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5Tx2y2Y1smXnHRhOhJ81J74U3+HhoNnCAbQfBkdFVjvc7NuYnBWQPVlTYlY79K73/EmsGh9Q==
-X-Received: by 2002:adf:fb12:0:b0:236:60e8:3cca with SMTP id c18-20020adffb12000000b0023660e83ccamr4505590wrr.471.1669028861101;
-        Mon, 21 Nov 2022 03:07:41 -0800 (PST)
+        bh=6HFE5ckJ+/PkEEqbEDcxeM6P1Mra4LAFsLM3EpugvmI=;
+        b=zUypVp52GbhI8mu/hycF7TI2GGotC7xkLKV5poZomlHPyTKQpdPkcbA37iSEGKKG3I
+         nOv1JGSrFIAXxryHSPnx4zghaDk+wDiBlNj3soPZPhtudpyNAGhakzeZU4Uy/wO/dYE6
+         cFGnX2Mw3oW92fkaCmeKggsvl48pQi5hBpiyfOYFOZt0w0xAq/l5Wzxhol3jtuH9mpur
+         iAF00HaChLDiOC1aASS/CyovPqWWkC4BbtKKY6YYNuoH5MVMUBHkRa8flXukBiSvuO51
+         f0Rg7lV8gRm5fcflOHYrpKSeLVrWP7g+q5Z27yJtle6/pRkTYy8xgWXeXbX4UPO76CwI
+         Iv9w==
+X-Gm-Message-State: ANoB5plU3u1RonGOPuzxS6bmRupvBlQYE/wzRkb6XlqBM9TfGg8QSnpJ
+        +sVaUfoi2c/vVgUYtY8ql2y+DcPZEwNYXN8z8wQ5ELqPAnLndcTWuqZVzbJFFe0Ov7xDXc8C8R0
+        gU31HdM1fVJoG
+X-Received: by 2002:a05:600c:3587:b0:3cf:a9c2:2b04 with SMTP id p7-20020a05600c358700b003cfa9c22b04mr12126017wmq.152.1669029008898;
+        Mon, 21 Nov 2022 03:10:08 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6qmkAtqZngrYlpX3LaYVMHNRMoKYxTdVMdo3Sx7bg+dmQB/Sga7GdUCdrPFwBUtw6/peox+w==
+X-Received: by 2002:a05:600c:3587:b0:3cf:a9c2:2b04 with SMTP id p7-20020a05600c358700b003cfa9c22b04mr12125983wmq.152.1669029008603;
+        Mon, 21 Nov 2022 03:10:08 -0800 (PST)
 Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id a13-20020a5d53cd000000b002383edcde09sm10878550wrw.59.2022.11.21.03.07.39
+        by smtp.gmail.com with ESMTPSA id z11-20020a05600c0a0b00b003c6f1732f65sm19940702wmp.38.2022.11.21.03.10.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Nov 2022 03:07:40 -0800 (PST)
-Message-ID: <3829b20beeeed8ec2480eada30b2639b07bc579e.camel@redhat.com>
-Subject: Re: [PATCH 02/13] KVM: nSVM: don't call
- nested_sync_control_from_vmcb02 on each VM exit
+        Mon, 21 Nov 2022 03:10:08 -0800 (PST)
+Message-ID: <2ead7655dbb90d15b883c5d31f582ed87d4e8737.camel@redhat.com>
+Subject: Re: [PATCH 04/13] KVM: nSVM: clean up copying of int_ctl fields
+ back to vmcb01/vmcb12
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -76,10 +76,10 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Babu Moger <babu.moger@amd.com>,
         Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Jim Mattson <jmattson@google.com>, x86@kernel.org
-Date:   Mon, 21 Nov 2022 13:07:38 +0200
-In-Reply-To: <Y3aT5qBgOuwsOeS/@google.com>
+Date:   Mon, 21 Nov 2022 13:10:06 +0200
+In-Reply-To: <Y3aWZJo8M2li/7BB@google.com>
 References: <20221117143242.102721-1-mlevitsk@redhat.com>
-         <20221117143242.102721-3-mlevitsk@redhat.com> <Y3aT5qBgOuwsOeS/@google.com>
+         <20221117143242.102721-5-mlevitsk@redhat.com> <Y3aWZJo8M2li/7BB@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
@@ -94,59 +94,146 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-11-17 at 20:04 +0000, Sean Christopherson wrote:
+On Thu, 2022-11-17 at 20:15 +0000, Sean Christopherson wrote:
 > On Thu, Nov 17, 2022, Maxim Levitsky wrote:
-> > Calling nested_sync_control_from_vmcb02 on each VM exit (nested or not),
-> > was an attempt to keep the int_ctl field in the vmcb12 cache
-> > up to date on each VM exit.
+> > Clean up the nested_sync_int_ctl_from_vmcb02:
+> > 
+> > 1. The comment about preservation of V_IRQ is wrong: when the L2 doesn't
+> >    use virtual interrupt masking, then the field just doesn't exist in
+> >    vmcb12 thus it should not be touched at all.
+> >    Since it is unused in this case, touching it doesn't matter that much,
+> >    so the bug is theoretical.
+> > 
+> > 2. When the L2 doesn't use virtual interrupt masking, then in the *theory*
+> >    if KVM uses the feature, it should copy the changes to V_IRQ* bits from
+> >    vmcb02 to vmcb01.
+> > 
+> >    In practise, KVM only uses it for detection of the interrupt window,
+> >    and it happens to re-open it on each nested VM exit because
+> >    kvm_set_rflags happens to raise the KVM_REQ_EVENT.
+> >    Do this explicitly.
+> > 
+> > 3. Add comment on why we don't need to copy V_GIF from vmcb02 to vmcb01
+> >    when nested guest doesn't use nested V_GIF (and thus L1's GIF is in
+> >    vmcb02 while nested), even though it can in theory affect L1's GIF.
+> > 
+> > 4. Add support code to also copy some bits of int_ctl from
+> >    vmcb02 to vmcb01.
+> >    Currently there are none.
 > 
-> This doesn't mesh with the reasoning in commit 2d8a42be0e2b ("KVM: nSVM: synchronize
-> VMCB controls updated by the processor on every vmexit"), which states that the
-> goal is to keep svm->nested.ctl.* synchronized, not vmcb12.  Or is nested.ctl the
-> cache you are referring to?
+> Unless it's impossible for whatever reason, this patch should be split into
+> multiple patches.  IIUC, there are at least 2 different functional changes being
+> made, they just happen to not have any actual impact on things.
 
-Thanks for digging that commit out.
-
-My reasoning was that cache contains both control and 'save' fields, and
-we don't update 'save' fields on each VM exit.
-
-For control it indeed looks like int_ctl and eventinj are the only fields
-that are updated by the CPU, although IMHO they don't *need* to be updated
-until we do a nested VM exit, because the VM isn't supposed to look at vmcb while it
-is in use by the CPU, its state is undefined.
-
-For migration though, this does look like a problem. It can be fixed during
-reading the nested state but it is a hack as well.
-
-My idea was as you had seen in the patches it to unify int_ctl handling,
-since some bits might need to be copied to vmcb12 but some to vmcb01,
-and we happened to have none of these so far, and it "happened" to work.
-
-Do you have an idea on how to do this cleanly? I can just leave this as is
-and only sync the bits of int_ctl from vmcb02 to vmcb01 on nested VM exit.
-Ugly but would work.
-
-
-
+No objection to this.
 
 > 
-> > However all other fields in the vmcb12 cache are not kept up to  date,
+> > No (visible) functional change is intended.
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  arch/x86/kvm/svm/nested.c | 47 ++++++++++++++++++++++++++-------------
+> >  1 file changed, 32 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index 54eb152e2b60b6..1f2b8492c8782f 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -410,28 +410,45 @@ void nested_copy_vmcb_save_to_cache(struct vcpu_svm *svm,
+> >  static void nested_sync_int_ctl_from_vmcb02(struct vcpu_svm *svm,
+> >                                             struct vmcb *vmcb12)
+> >  {
+> > -       u32 mask;
+> > +       struct vmcb *vmcb02 = svm->nested.vmcb02.ptr;
+> > +       struct vmcb *vmcb01 = svm->vmcb01.ptr;
+> > +
+> > +       /* bitmask of bits of int_ctl that we copy from vmcb02 to vmcb12*/
+> > +       u32 l2_to_l1_mask = 0;
+> > +       /* bitmask of bits of int_ctl that we copy from vmcb02 to vmcb01*/
+> > +       u32 l2_to_l0_mask = 0;
+> >  
+> > -       /* Only a few fields of int_ctl are written by the processor.  */
 > 
-> IIUC, this isn't technically true.  They are up-to-date because they're never
-> modified by hardware.
+> Can this comment be kept in some form?  I found it super useful when reading this
+> code just now.
 
-In both save and control cache. In control cache indeed looks like the
-fields are kept up to date.
+No problem.
+
+> 
+> > -       mask = V_IRQ_MASK | V_TPR_MASK;
+> > -       if (!(svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK) &&
+> > -           svm_is_intercept(svm, INTERCEPT_VINTR)) {
+> > +       if (svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK)
+> > +               l2_to_l1_mask |= V_IRQ_MASK | V_TPR_MASK;
+> > +       else {
+> >                 /*
+> > -                * In order to request an interrupt window, L0 is usurping
+> > -                * svm->vmcb->control.int_ctl and possibly setting V_IRQ
+> > -                * even if it was clear in L1's VMCB.  Restoring it would be
+> > -                * wrong.  However, in this case V_IRQ will remain true until
+> > -                * interrupt_window_interception calls svm_clear_vintr and
+> > -                * restores int_ctl.  We can just leave it aside.
+> > +                * If IRQ window was opened while in L2, it must be reopened
+> > +                * after the VM exit
+> > +                *
+> > +                * vTPR value doesn't need to be copied from vmcb02 to vmcb01
+> > +                * because it is synced from/to apic registers on each VM exit
+> >                  */
+> > -               mask &= ~V_IRQ_MASK;
+> > +               if (vmcb02->control.int_ctl & V_IRQ_MASK)
+> > +                       kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+> >         }
+> >  
+> >         if (nested_vgif_enabled(svm))
+> > -               mask |= V_GIF_MASK;
+> > +               l2_to_l1_mask |= V_GIF_MASK;
+> > +       else
+> > +               /* There is no need to sync V_GIF from vmcb02 to vmcb01
+> > +                * because GIF is cleared on VMexit, thus even though
+> > +                * nested guest can control host's GIF, on VM exit
+> > +                * its set value is lost
+> > +                */
+> > +               ;
+> 
+> The "else ... ;" is unnecessary, just throw the block comment above the nested
+> vGIF if-statment, e.g. if I'm understanding everything, this?
+Yes.
+
+> 
+>         /*
+>          * If nested vGIF is not enabled, L2 has access to L1's "real" GIF.  In
+>          * this case, there's no need to sync V_GIF from vmcb02 to vmcb01
+>          * because GIF is cleared on VM-Exit, thus any changes made by L2 are
+>          * overwritten on VM-Exit to L1.
+>          */
+>         if (nested_vgif_enabled(svm))
+>                 l2_to_l1_mask |= V_GIF_MASK;
+> 
+> > +
+> > +       vmcb12->control.int_ctl =
+> > +               (svm->nested.ctl.int_ctl & ~l2_to_l1_mask) |
+> > +               (vmcb02->control.int_ctl & l2_to_l1_mask);
+> >  
+> > -       vmcb12->control.int_ctl        &= ~mask;
+> > -       vmcb12->control.int_ctl        |= svm->vmcb->control.int_ctl & mask;
+> > +       vmcb01->control.int_ctl =
+> > +               (vmcb01->control.int_ctl & ~l2_to_l0_mask) |
+> > +               (vmcb02->control.int_ctl & l2_to_l0_mask);
+> 
+> No need for wrapping immediately after the "=", these all fit under the soft limit:
+> 
+>         vmcb12->control.int_ctl = (svm->nested.ctl.int_ctl & ~l2_to_l1_mask) |
+>                                   (vmcb02->control.int_ctl & l2_to_l1_mask);
+> 
+>         vmcb01->control.int_ctl = (vmcb01->control.int_ctl & ~l2_to_l0_mask) |
+>                                   (vmcb02->control.int_ctl & l2_to_l0_mask);
+
+OK.
+
 
 Best regards,
 	Maxim Levitsky
 
-> 
-> > therefore for consistency it is better to do this on a nested VM exit only.
-> 
-> Again, IIUC, this actually introduces an inconsistency because it leaves stale
-> state in svm->nested.ctl, whereas the existing code ensures all state in
-> svm->nested.ctl is fresh immediately after non-nested VM-Exit.
 > 
 
 
