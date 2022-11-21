@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07E4A6330C2
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 00:40:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3752F6330C6
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 00:40:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231747AbiKUXkc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 18:40:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47060 "EHLO
+        id S231772AbiKUXkf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 18:40:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231671AbiKUXka (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 18:40:30 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEE91B8FB6
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 15:40:29 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id r126-20020a632b84000000b004393806c06eso7589237pgr.4
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 15:40:29 -0800 (PST)
+        with ESMTP id S231742AbiKUXkc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 18:40:32 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EC5CB8FB6
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 15:40:31 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id b2-20020a170902d50200b001871a3c51afso10209104plg.8
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 15:40:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=zFCg8eQyxJ3YiwHQJTueCjvpRWd24CEedZt1FgDbs2A=;
-        b=c3e7dEfzyHyyb2tymFn9lfTQ7lWoHc+TnQZBFgbp6eHBJ/M9ppJj1ZVo0YqrNdnsgg
-         ioCId1IFXcAJJJHKX7CVtomhNqR071qP367AZjRFHxlSnGtENoI6znHuhT+AgIpRPdDJ
-         Qxt/GW5+d0cPRh1nlhM6opcCifMSoAVLIBUWoydKUAeqsKUUXItmNxuk2W1NmReVP9yT
-         ajekZU0yAt5c2Iffh3jq+ftXKOzKqBcWCNQ+d5FqAjEs6tZTwXl2aaKCFAZjRwxsaq5S
-         8hfzg98BUZrT5TFaHuo3cXz8DK1Y9COBbhYa2cv4IXd4CFs+6mN4LM/pqBd49qAhbWEn
-         55BQ==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6DjKtLBmHY6xPnTRB5DGDH5ojMJ0nrj5B/ttXckGAR4=;
+        b=A2iqCnDP0HJsAWFSUNpLaJfQ9OUNUJ+mkh9mJPNM5a6n+SBJJjGeOquSwMtAWG3ZLg
+         B77KJltzqiBkJskv7OW+R1BiGQ+lJ7F+K9bImXUqfr7BggSIUVc2dkbyH9LkF6vlYL8x
+         dPynbRutmgLuRAEkRkwuu+wo69CiAGssVA41xWd1Z+9Un4vaaBrqkpg1jKofv7pEJglj
+         xES2bJpM3m1FKDzmhC61XZWRPGaD1IP0RtbSmu5lBxJh2wcRLjMdTlesMKnkgd9KkxUC
+         VtKWWcE4LD4DZqdYZ4HsY2f2SxZ9ZKTilPmG52zxaylbcB2lXU2XFHRlS6HQ6HoxWxYR
+         lgjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zFCg8eQyxJ3YiwHQJTueCjvpRWd24CEedZt1FgDbs2A=;
-        b=U5DKXxByYHtC6MM2NUxY9ConkoBlJ1EkDrSD9jgr0G3u7To/ScZ0lsQTvwyt9dTIuC
-         JdoZ+SgjCaf4JjdyiNeKDxygLeYP25wbs5G5x/1NPdiU/nnwtNbbrcuMXP4c3dcC/Qxc
-         ZLfbagFGUyK7Jp/5z8dDd5kwpXIGJKNzSrT5Nuyq3Mdq2txlJK4+fE4IWcF+dorU1qJ/
-         aMxgMscOgHATMv/HHvmBP5CCvGFt1INSXZH5V747tJ/NYgO92M/UnbIxIFlnoRZSjvJD
-         Ixle4pe7SB6hiKSv0z1yude7VGslJR4PYa0+/AZoCdvb3HFlstTFJ+gqhWsCGXBCQO76
-         DWfQ==
-X-Gm-Message-State: ANoB5pnv8MnnOz3Z9uWe2I2WVtOaTDWqCpveltY0BHoeinmXEynNDsha
-        DvOE9E0Fedi0htePVFwn2/cWfpa1dr3k
-X-Google-Smtp-Source: AA0mqf43ZnvPS3T3OgvIZVEV8SrAehRfExGRAijdCF4ppQi8XcXG2CrGAAiXoX2EIOpResh4wRnE+KtSrf85
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6DjKtLBmHY6xPnTRB5DGDH5ojMJ0nrj5B/ttXckGAR4=;
+        b=x3LzuaDuD8Sj8eSfbUJTkQ1E3sftIKXoloxjTovXVWiyK62lIsdghLGCbLHMulnTzf
+         MySEza5fhpqxa7MCkvB11m1i9rAjs1LsyQZ1TD0esqAofJ3DXoSsL5L0oRILp+dEjzRC
+         nNG4C2+cBqN5a3CWcfU/r5iwE4dDyFHm9nuIxqyPR4x4oA7vJzTMavF+3CX9qhG/FA21
+         ZXbEN90QxP1G5jBK005P/gde3gKHlb7E2CJfXSwB/2ppNVKVu3Fef52QYUEF9CJdSQ/j
+         vc3RqP00ecmgtsKp35lcZ4PWcJa99RNJo/bgL74MVLz29KVBCJvf1osz3Eyl33MQcr7+
+         zGWg==
+X-Gm-Message-State: ANoB5pmzuSL4ptn6o8iQ2cC6zFAYukK+Ck/D+NKX0pCx7vUjZKMyexC/
+        sy7rVgV03D8QUPOaKRYFLb3vz+iwM00s
+X-Google-Smtp-Source: AA0mqf6u92G9wm2XcDLGCu1gxU+otIgNIkiwSVUw8zDxgajD08NomkE1N+OxA6Zt6JOZxiAICr/ecNH1mhn1
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a17:90a:460b:b0:218:8a84:aeca with SMTP id
- w11-20020a17090a460b00b002188a84aecamr16961664pjg.63.1669074029391; Mon, 21
- Nov 2022 15:40:29 -0800 (PST)
-Date:   Mon, 21 Nov 2022 15:40:20 -0800
+ (user=vipinsh job=sendgmr) by 2002:a63:696:0:b0:476:7bc4:5b6d with SMTP id
+ 144-20020a630696000000b004767bc45b6dmr19636628pgg.220.1669074031147; Mon, 21
+ Nov 2022 15:40:31 -0800 (PST)
+Date:   Mon, 21 Nov 2022 15:40:21 -0800
+In-Reply-To: <20221121234026.3037083-1-vipinsh@google.com>
 Mime-Version: 1.0
+References: <20221121234026.3037083-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221121234026.3037083-1-vipinsh@google.com>
-Subject: [PATCH v2 0/6] Add Hyper-v extended hypercall support in KVM
+Message-ID: <20221121234026.3037083-2-vipinsh@google.com>
+Subject: [PATCH v2 1/6] KVM: x86: hyper-v: Use common code for hypercall
+ userspace exit
 From:   Vipin Sharma <vipinsh@google.com>
 To:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
         dmatlack@google.com
@@ -58,7 +61,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,83 +69,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch series adds Hyper-V extended hypercall support. All
-hypercalls will exit to userspace if CPUID.0x40000003.EBX BIT(20) is
-set.
+Remove duplicate code to exit to userspace for hyper-v hypercalls and
+use a common place to exit.
 
-v2:
-- Intorduced ASSERT_EXIT_REASON macro and replaced all occurences of
-  TEST_ASSERT for vcpu exit reason.
-- Skip hyperv_extended_hypercalls test if extended hypercalls are not
-  supported by the kernel.
-- Rebased with latest KVM queue.
-- Addressed all of the comments in patch 6 of v1.
+Signed-off-by: Vipin Sharma <vipinsh@google.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/hyperv.c | 27 +++++++++++----------------
+ 1 file changed, 11 insertions(+), 16 deletions(-)
 
-v1: https://lore.kernel.org/lkml/20221105045704.2315186-1-vipinsh@google.com/
-
-RFC: https://lore.kernel.org/lkml/20221021185916.1494314-1-vipinsh@google.com/
-
-Vipin Sharma (6):
-  KVM: x86: hyper-v: Use common code for hypercall userspace exit
-  KVM: x86: hyper-v: Add extended hypercall support in Hyper-v
-  KVM: selftests: Test Hyper-V extended hypercall enablement
-  KVM: selftests: Replace hardcoded Linux OS id with HYPERV_LINUX_OS_ID
-  KVM: selftests: Make vCPU exit reason test assertion common.
-  KVM: selftests: Test Hyper-V extended hypercall exit to userspace
-
- arch/x86/kvm/hyperv.c                         | 43 +++++----
- tools/testing/selftests/kvm/.gitignore        |  1 +
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../testing/selftests/kvm/aarch64/psci_test.c |  4 +-
- .../testing/selftests/kvm/include/test_util.h | 10 ++
- .../selftests/kvm/include/x86_64/hyperv.h     |  4 +
- .../selftests/kvm/include/x86_64/processor.h  |  3 +
- .../kvm/lib/s390x/diag318_test_handler.c      |  3 +-
- .../selftests/kvm/s390x/sync_regs_test.c      | 15 +--
- .../selftests/kvm/set_memory_region_test.c    |  6 +-
- tools/testing/selftests/kvm/x86_64/amx_test.c |  8 +-
- .../kvm/x86_64/cr4_cpuid_sync_test.c          |  8 +-
- .../testing/selftests/kvm/x86_64/debug_regs.c |  2 +-
- .../selftests/kvm/x86_64/flds_emulation.h     |  5 +-
- .../selftests/kvm/x86_64/hyperv_clock.c       |  9 +-
- .../selftests/kvm/x86_64/hyperv_evmcs.c       |  8 +-
- .../kvm/x86_64/hyperv_extended_hypercalls.c   | 94 +++++++++++++++++++
- .../selftests/kvm/x86_64/hyperv_features.c    | 23 +++--
- .../testing/selftests/kvm/x86_64/hyperv_ipi.c |  6 +-
- .../selftests/kvm/x86_64/hyperv_svm_test.c    |  7 +-
- .../selftests/kvm/x86_64/hyperv_tlb_flush.c   | 14 +--
- .../selftests/kvm/x86_64/kvm_clock_test.c     |  5 +-
- .../selftests/kvm/x86_64/kvm_pv_test.c        |  5 +-
- .../selftests/kvm/x86_64/monitor_mwait_test.c |  9 +-
- .../kvm/x86_64/nested_exceptions_test.c       |  5 +-
- .../selftests/kvm/x86_64/platform_info_test.c | 14 +--
- .../kvm/x86_64/pmu_event_filter_test.c        |  6 +-
- tools/testing/selftests/kvm/x86_64/smm_test.c |  9 +-
- .../testing/selftests/kvm/x86_64/state_test.c |  8 +-
- .../selftests/kvm/x86_64/svm_int_ctl_test.c   |  8 +-
- .../kvm/x86_64/svm_nested_shutdown_test.c     |  7 +-
- .../kvm/x86_64/svm_nested_soft_inject_test.c  |  6 +-
- .../selftests/kvm/x86_64/svm_vmcall_test.c    |  6 +-
- .../selftests/kvm/x86_64/sync_regs_test.c     | 25 +----
- .../kvm/x86_64/triple_fault_event_test.c      |  9 +-
- .../selftests/kvm/x86_64/tsc_scaling_sync.c   |  6 +-
- .../kvm/x86_64/ucna_injection_test.c          | 22 +----
- .../selftests/kvm/x86_64/userspace_io_test.c  |  6 +-
- .../kvm/x86_64/userspace_msr_exit_test.c      | 22 +----
- .../kvm/x86_64/vmx_apic_access_test.c         | 11 +--
- .../kvm/x86_64/vmx_close_while_nested_test.c  |  5 +-
- .../selftests/kvm/x86_64/vmx_dirty_log_test.c |  7 +-
- .../vmx_exception_with_invalid_guest_state.c  |  4 +-
- .../x86_64/vmx_invalid_nested_guest_state.c   |  4 +-
- .../kvm/x86_64/vmx_nested_tsc_scaling_test.c  |  6 +-
- .../kvm/x86_64/vmx_preemption_timer_test.c    |  8 +-
- .../kvm/x86_64/vmx_tsc_adjust_test.c          |  6 +-
- .../selftests/kvm/x86_64/xapic_ipi_test.c     |  6 +-
- .../selftests/kvm/x86_64/xen_shinfo_test.c    |  7 +-
- .../selftests/kvm/x86_64/xen_vmcall_test.c    |  5 +-
- 50 files changed, 211 insertions(+), 310 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 2c7f2a26421e..0b6964ed2e66 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -2503,14 +2503,7 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+ 			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+ 			break;
+ 		}
+-		vcpu->run->exit_reason = KVM_EXIT_HYPERV;
+-		vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
+-		vcpu->run->hyperv.u.hcall.input = hc.param;
+-		vcpu->run->hyperv.u.hcall.params[0] = hc.ingpa;
+-		vcpu->run->hyperv.u.hcall.params[1] = hc.outgpa;
+-		vcpu->arch.complete_userspace_io =
+-				kvm_hv_hypercall_complete_userspace;
+-		return 0;
++		goto hypercall_userspace_exit;
+ 	case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST:
+ 		if (unlikely(hc.var_cnt)) {
+ 			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+@@ -2569,14 +2562,7 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+ 			ret = HV_STATUS_OPERATION_DENIED;
+ 			break;
+ 		}
+-		vcpu->run->exit_reason = KVM_EXIT_HYPERV;
+-		vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
+-		vcpu->run->hyperv.u.hcall.input = hc.param;
+-		vcpu->run->hyperv.u.hcall.params[0] = hc.ingpa;
+-		vcpu->run->hyperv.u.hcall.params[1] = hc.outgpa;
+-		vcpu->arch.complete_userspace_io =
+-				kvm_hv_hypercall_complete_userspace;
+-		return 0;
++		goto hypercall_userspace_exit;
+ 	}
+ 	default:
+ 		ret = HV_STATUS_INVALID_HYPERCALL_CODE;
+@@ -2585,6 +2571,15 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+ 
+ hypercall_complete:
+ 	return kvm_hv_hypercall_complete(vcpu, ret);
++
++hypercall_userspace_exit:
++	vcpu->run->exit_reason = KVM_EXIT_HYPERV;
++	vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
++	vcpu->run->hyperv.u.hcall.input = hc.param;
++	vcpu->run->hyperv.u.hcall.params[0] = hc.ingpa;
++	vcpu->run->hyperv.u.hcall.params[1] = hc.outgpa;
++	vcpu->arch.complete_userspace_io = kvm_hv_hypercall_complete_userspace;
++	return 0;
+ }
+ 
+ void kvm_hv_init_vm(struct kvm *kvm)
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
