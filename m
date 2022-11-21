@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E2795632F17
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 22:42:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10CCA632F1D
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 22:42:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232029AbiKUVmG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 16:42:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59404 "EHLO
+        id S230468AbiKUVmV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 16:42:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230152AbiKUVld (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 16:41:33 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C121DB846;
+        with ESMTP id S231634AbiKUVli (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 16:41:38 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98058DB876;
         Mon, 21 Nov 2022 13:41:08 -0800 (PST)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ALLRYLP023110;
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ALLLYmr003915;
         Mon, 21 Nov 2022 21:41:07 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=RWTEinkUOfGwVfNLy0j9eVeGAVK8WwXgacwNMdfi9iE=;
- b=ssWFy0fRwSxnzlj92z7aaKpoxxB4zwksPdzZSwYKknam+YAOJtU3sk0yKnTUl+LnzYdW
- fz1F7IVmq8O8AUzbB//llzd1nNrp6KjEpLUMIL8/hWXMwo81GlgPIlJUVYXIaejVdol2
- h4uXZQeCxsBWszK+Zd9bSo1edV6LtdOQbnhevtsLeaER9/aG/mTH0nHkbR5JWyRWXRjC
- Ad8OOXSFxds/xQrxAs+kTKSd1fcT839394HqayKLGjfYi9uijSrHMyZSy3yAMFzJbViJ
- w82VVg9R8WaCRemVe3ZH6tnC+biCICWycuQ6iQqDqwkngb9xeBWwhfCKPfaTZrE8/CPQ zg== 
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0h910c87-1
+ bh=kN3Dkxy6fN9jTRkiIbybticlbZ22gn/WkCFZcZpeXe8=;
+ b=OccvBHcNcxoSVZPfBLLLX+tnV46JuHte7Bm/TH6nReyp1CvNKn2y4otD4EIwwd4oIeZd
+ 9xMq5/9TPf2+sSlnyBKb8dO+wu4yGg7fnV52JmEbhT4ZfkrImVs36/xD0B4bLLJO/F3s
+ JkoAFecUhftQKbqZc2TKM3e7RQBuSy64f5hf3lJl7R8wnslJsQq6SpscNwnkfdqbTDAL
+ SCJb/zeI1ImoCSfiww64N36+Nvcr8iOhJtpkH8vYDPfyoz0yko/9h4mELhdz1RyxoKsa
+ Xq1a7jcVq+veJnXFXSPDhBn+1a6KfeiCwXoi5hPq6NvJ9Tn2QoklF4UMfMB7GSDcKaC5 Qw== 
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0cnxyav5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 21 Nov 2022 21:41:07 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ALLZefe011671;
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ALLaYBW014937;
         Mon, 21 Nov 2022 21:41:05 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma05fra.de.ibm.com with ESMTP id 3kxps8jchv-1
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma01fra.de.ibm.com with ESMTP id 3kxps92cr4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 21 Nov 2022 21:41:05 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ALLf25n48103876
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ALLf2W366453840
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Mon, 21 Nov 2022 21:41:02 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0C65142045;
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A29F4C050;
         Mon, 21 Nov 2022 21:41:02 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EDCAE42041;
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EC5D14C046;
         Mon, 21 Nov 2022 21:41:01 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
         Mon, 21 Nov 2022 21:41:01 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 798AAE0818; Mon, 21 Nov 2022 22:41:01 +0100 (CET)
+        id 7C9C5E081E; Mon, 21 Nov 2022 22:41:01 +0100 (CET)
 From:   Eric Farman <farman@linux.ibm.com>
 To:     Matthew Rosato <mjrosato@linux.ibm.com>,
         Halil Pasic <pasic@linux.ibm.com>
@@ -64,25 +64,25 @@ Cc:     Heiko Carstens <hca@linux.ibm.com>,
         Peter Oberparleiter <oberpar@linux.ibm.com>,
         linux-s390@vger.kernel.org, kvm@vger.kernel.org,
         Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v1 07/16] vfio/ccw: remove unnecessary malloc alignment
-Date:   Mon, 21 Nov 2022 22:40:47 +0100
-Message-Id: <20221121214056.1187700-8-farman@linux.ibm.com>
+Subject: [PATCH v1 08/16] vfio/ccw: pass page count to page_array struct
+Date:   Mon, 21 Nov 2022 22:40:48 +0100
+Message-Id: <20221121214056.1187700-9-farman@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221121214056.1187700-1-farman@linux.ibm.com>
 References: <20221121214056.1187700-1-farman@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qV1tXyCd_NLGbFKPlymbIcMrLTo5GG_O
-X-Proofpoint-ORIG-GUID: qV1tXyCd_NLGbFKPlymbIcMrLTo5GG_O
+X-Proofpoint-ORIG-GUID: MINkycb_cqL0eINQIW3C-aJcTvubJZeC
+X-Proofpoint-GUID: MINkycb_cqL0eINQIW3C-aJcTvubJZeC
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-11-21_17,2022-11-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=850 mlxscore=0 adultscore=0 bulkscore=0 malwarescore=0
- clxscore=1015 spamscore=0 suspectscore=0 phishscore=0 priorityscore=1501
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211210158
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ lowpriorityscore=0 spamscore=0 suspectscore=0 bulkscore=0 malwarescore=0
+ adultscore=0 clxscore=1015 mlxscore=0 priorityscore=1501 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2211210158
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
@@ -92,109 +92,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Everything about this allocation is harder than necessary,
-since the memory allocation is already aligned to our needs.
-Break them apart for readability, instead of doing the
-funky artithmetic.
+The allocation of our page_array struct calculates the number
+of 4K pages that would be needed to hold a certain number of
+bytes. But, since the number of pages that will be pinned is
+also calculated by the length of the IDAL, this logic is
+unnecessary. Let's pass that information in directly, and
+avoid the math within the allocator.
 
-Of the structures that are involved, only ch_ccw needs the
-GFP_DMA flag, so the others can be allocated without it.
+Also, let's make this two allocations instead of one,
+to make it apparent what's happening within here.
 
 Signed-off-by: Eric Farman <farman@linux.ibm.com>
 ---
- drivers/s390/cio/vfio_ccw_cp.c | 39 ++++++++++++++++++----------------
- 1 file changed, 21 insertions(+), 18 deletions(-)
+ drivers/s390/cio/vfio_ccw_cp.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-index d41d94cecdf8..4b6b5f9dc92d 100644
+index 4b6b5f9dc92d..66e890441163 100644
 --- a/drivers/s390/cio/vfio_ccw_cp.c
 +++ b/drivers/s390/cio/vfio_ccw_cp.c
-@@ -311,40 +311,41 @@ static inline int is_tic_within_range(struct ccw1 *ccw, u32 head, int len)
- static struct ccwchain *ccwchain_alloc(struct channel_program *cp, int len)
- {
- 	struct ccwchain *chain;
--	void *data;
--	size_t size;
--
--	/* Make ccw address aligned to 8. */
--	size = ((sizeof(*chain) + 7L) & -8L) +
--		sizeof(*chain->ch_ccw) * len +
--		sizeof(*chain->ch_pa) * len;
--	chain = kzalloc(size, GFP_DMA | GFP_KERNEL);
+@@ -43,7 +43,7 @@ struct ccwchain {
+  * page_array_alloc() - alloc memory for page array
+  * @pa: page_array on which to perform the operation
+  * @iova: target guest physical address
+- * @len: number of bytes that should be pinned from @iova
++ * @len: number of pages that should be pinned from @iova
+  *
+  * Attempt to allocate memory for page array.
+  *
+@@ -63,18 +63,20 @@ static int page_array_alloc(struct page_array *pa, u64 iova, unsigned int len)
+ 	if (pa->pa_nr || pa->pa_iova)
+ 		return -EINVAL;
+ 
+-	pa->pa_nr = ((iova & ~PAGE_MASK) + len + (PAGE_SIZE - 1)) >> PAGE_SHIFT;
+-	if (!pa->pa_nr)
++	if (!len)
+ 		return -EINVAL;
+ 
+-	pa->pa_iova = kcalloc(pa->pa_nr,
+-			      sizeof(*pa->pa_iova) + sizeof(*pa->pa_page),
+-			      GFP_KERNEL);
+-	if (unlikely(!pa->pa_iova)) {
+-		pa->pa_nr = 0;
++	pa->pa_nr = len;
 +
-+	chain = kzalloc(sizeof(*chain), GFP_KERNEL);
- 	if (!chain)
- 		return NULL;
- 
--	data = (u8 *)chain + ((sizeof(*chain) + 7L) & -8L);
--	chain->ch_ccw = (struct ccw1 *)data;
--
--	data = (u8 *)(chain->ch_ccw) + sizeof(*chain->ch_ccw) * len;
--	chain->ch_pa = (struct page_array *)data;
-+	chain->ch_ccw = kcalloc(len, sizeof(*chain->ch_ccw), GFP_DMA | GFP_KERNEL);
-+	if (!chain->ch_ccw)
-+		goto out_err;
- 
--	chain->ch_len = len;
-+	chain->ch_pa = kcalloc(len, sizeof(*chain->ch_pa), GFP_KERNEL);
-+	if (!chain->ch_pa)
-+		goto out_err;
- 
- 	list_add_tail(&chain->next, &cp->ccwchain_list);
- 
- 	return chain;
++	pa->pa_iova = kcalloc(len, sizeof(*pa->pa_iova), GFP_KERNEL);
++	if (!pa->pa_iova)
++		return -ENOMEM;
 +
-+out_err:
-+	kfree(chain->ch_ccw);
-+	kfree(chain);
-+	return NULL;
- }
- 
- static void ccwchain_free(struct ccwchain *chain)
- {
- 	list_del(&chain->next);
-+	kfree(chain->ch_pa);
-+	kfree(chain->ch_ccw);
- 	kfree(chain);
- }
- 
- /* Free resource for a ccw that allocated memory for its cda. */
- static void ccwchain_cda_free(struct ccwchain *chain, int idx)
- {
--	struct ccw1 *ccw = chain->ch_ccw + idx;
-+	struct ccw1 *ccw = &chain->ch_ccw[idx];
- 
- 	if (ccw_is_tic(ccw))
- 		return;
-@@ -443,6 +444,8 @@ static int ccwchain_handle_ccw(u32 cda, struct channel_program *cp)
- 	chain = ccwchain_alloc(cp, len);
- 	if (!chain)
++	pa->pa_page = kcalloc(len, sizeof(*pa->pa_page), GFP_KERNEL);
++	if (!pa->pa_page) {
++		kfree(pa->pa_iova);
  		return -ENOMEM;
-+
-+	chain->ch_len = len;
- 	chain->ch_iova = cda;
+ 	}
+-	pa->pa_page = (struct page **)&pa->pa_iova[pa->pa_nr];
  
- 	/* Copy the actual CCWs into the new chain */
-@@ -464,7 +467,7 @@ static int ccwchain_loop_tic(struct ccwchain *chain, struct channel_program *cp)
- 	int i, ret;
+ 	pa->pa_iova[0] = iova;
+ 	pa->pa_page[0] = NULL;
+@@ -167,6 +169,7 @@ static int page_array_pin(struct page_array *pa, struct vfio_device *vdev)
+ static void page_array_unpin_free(struct page_array *pa, struct vfio_device *vdev)
+ {
+ 	page_array_unpin(pa, vdev, pa->pa_nr);
++	kfree(pa->pa_page);
+ 	kfree(pa->pa_iova);
+ }
  
- 	for (i = 0; i < chain->ch_len; i++) {
--		tic = chain->ch_ccw + i;
-+		tic = &chain->ch_ccw[i];
+@@ -545,7 +548,7 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
+ 	 * required for the data transfer, since we only only support
+ 	 * 4K IDAWs today.
+ 	 */
+-	ret = page_array_alloc(pa, iova, bytes);
++	ret = page_array_alloc(pa, iova, idaw_nr);
+ 	if (ret < 0)
+ 		goto out_free_idaws;
  
- 		if (!ccw_is_tic(tic))
- 			continue;
-@@ -739,8 +742,8 @@ int cp_prefetch(struct channel_program *cp)
- 	list_for_each_entry(chain, &cp->ccwchain_list, next) {
- 		len = chain->ch_len;
- 		for (idx = 0; idx < len; idx++) {
--			ccw = chain->ch_ccw + idx;
--			pa = chain->ch_pa + idx;
-+			ccw = &chain->ch_ccw[idx];
-+			pa = &chain->ch_pa[idx];
- 
- 			ret = ccwchain_fetch_one(ccw, pa, cp);
- 			if (ret)
 -- 
 2.34.1
 
