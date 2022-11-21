@@ -2,124 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D876A63271E
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 15:58:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C71D76327BC
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 16:21:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231497AbiKUO5u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 09:57:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50508 "EHLO
+        id S231883AbiKUPVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 10:21:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231908AbiKUO4V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 09:56:21 -0500
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DD43D14D7;
-        Mon, 21 Nov 2022 06:46:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669042009; x=1700578009;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=9W9R6jj2B8mlqU0oXc8ufbjgICy2DcEoaRvZ9VRKl7Q=;
-  b=B57G2qcoTH359KQ7kFQUSu1jsqYx2pt8AmuGgY6mJnEvRgwd4UQNF04b
-   28GBAGUkQ8ndJe4PD1t+CTa6xXloiwk63aVv0PBB7p1gGv8xZ4BjWe9m8
-   l8JdRodMDxIc5HTPW649HWirIG3WarN0MlBMSDE+l2ricwBz5wrciaUna
-   m31YrvLCeVRlEDUso6aSazvkEyixhuNy20SFSbKSLXO+eHbnOp6wr3jP9
-   SoG2KAQcIHEnHZ4sqXYb814qI3d5cBDgoUuYdjD715o3gQKaZrl32xp3z
-   4/yaI0kWyrMUEj1nmx09lvVaK3eDQRTWLmwM4vodqLFYwfZKEqQtQPyC7
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="293961838"
-X-IronPort-AV: E=Sophos;i="5.96,181,1665471600"; 
-   d="scan'208";a="293961838"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 06:46:41 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="709829545"
-X-IronPort-AV: E=Sophos;i="5.96,181,1665471600"; 
-   d="scan'208";a="709829545"
-Received: from jiaxiche-mobl.ccr.corp.intel.com (HELO [10.254.209.33]) ([10.254.209.33])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 06:46:36 -0800
-Message-ID: <66ac6be5-9b2b-fb9e-3ccd-0a56ec2851c4@linux.intel.com>
-Date:   Mon, 21 Nov 2022 22:46:35 +0800
+        with ESMTP id S232254AbiKUPUl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 10:20:41 -0500
+X-Greylist: delayed 8406 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 21 Nov 2022 07:18:34 PST
+Received: from 8.mo548.mail-out.ovh.net (8.mo548.mail-out.ovh.net [46.105.45.231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB528C67C4
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 07:18:33 -0800 (PST)
+Received: from mxplan5.mail.ovh.net (unknown [10.108.1.6])
+        by mo548.mail-out.ovh.net (Postfix) with ESMTPS id C440423070;
+        Mon, 21 Nov 2022 11:03:13 +0000 (UTC)
+Received: from kaod.org (37.59.142.98) by DAG8EX2.mxp5.local (172.16.2.72)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Mon, 21 Nov
+ 2022 12:03:12 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-98R002374dfbf7-e072-4805-b686-6b2b08b22e5e,
+                    DDADA6E0A258960EA2C3EFDC8F36B73C7D77DF4E) smtp.auth=groug@kaod.org
+X-OVh-ClientIp: 78.197.208.248
+Date:   Mon, 21 Nov 2022 12:03:11 +0100
+From:   Greg Kurz <groug@kaod.org>
+To:     Dongli Zhang <dongli.zhang@oracle.com>
+CC:     <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>, <qemu-ppc@nongnu.org>,
+        <qemu-riscv@nongnu.org>, <qemu-s390x@nongnu.org>,
+        <pbonzini@redhat.com>, <peter.maydell@linaro.org>,
+        <mtosatti@redhat.com>, <chenhuacai@kernel.org>,
+        <philmd@linaro.org>, <aurelien@aurel32.net>,
+        <jiaxun.yang@flygoat.com>, <aleksandar.rikalo@syrmia.com>,
+        <danielhb413@gmail.com>, <clg@kaod.org>,
+        <david@gibson.dropbear.id.au>, <palmer@dabbelt.com>,
+        <alistair.francis@wdc.com>, <bin.meng@windriver.com>,
+        <pasic@linux.ibm.com>, <borntraeger@linux.ibm.com>,
+        <richard.henderson@linaro.org>, <david@redhat.com>,
+        <iii@linux.ibm.com>, <thuth@redhat.com>, <joe.jin@oracle.com>,
+        <likexu@tencent.com>
+Subject: Re: [PATCH 2/3] i386: kvm: disable KVM_CAP_PMU_CAPABILITY if "pmu"
+ is disabled
+Message-ID: <20221121120311.2731a912@bahia>
+In-Reply-To: <20221119122901.2469-3-dongli.zhang@oracle.com>
+References: <20221119122901.2469-1-dongli.zhang@oracle.com>
+        <20221119122901.2469-3-dongli.zhang@oracle.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v4 3/6] x86: KVM: Advertise AVX-IFMA CPUID to user space
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, pbonzini@redhat.com, ndesaulniers@google.com,
-        alexandre.belloni@bootlin.com, peterz@infradead.org,
-        jpoimboe@kernel.org, chang.seok.bae@intel.com,
-        pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
-        jmattson@google.com, sandipan.das@amd.com, tony.luck@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
-        keescook@chromium.org, nathan@kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20221118141509.489359-1-jiaxi.chen@linux.intel.com>
- <20221118141509.489359-4-jiaxi.chen@linux.intel.com>
- <Y3et+VpYh+L7N8SL@google.com>
-From:   Jiaxi Chen <jiaxi.chen@linux.intel.com>
-In-Reply-To: <Y3et+VpYh+L7N8SL@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [37.59.142.98]
+X-ClientProxiedBy: DAG3EX1.mxp5.local (172.16.2.21) To DAG8EX2.mxp5.local
+ (172.16.2.72)
+X-Ovh-Tracer-GUID: 23266189-71d4-438d-a62b-bfc5ce6d4539
+X-Ovh-Tracer-Id: 6553018936605383147
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvgedrheeigddvvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeegkeejtdevgeekieelffdvtedvvdegtdduudeigffhhffgvdfhgeejteekheefkeenucfkphepuddvjedrtddrtddruddpfeejrdehledrudegvddrleeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepuddvjedrtddrtddruddpmhgrihhlfhhrohhmpeeoghhrohhugheskhgrohgurdhorhhgqedpnhgspghrtghpthhtohepuddprhgtphhtthhopeguohhnghhlihdriihhrghnghesohhrrggtlhgvrdgtohhmpdhthhhuthhhsehrvgguhhgrthdrtghomhdpihhiiheslhhinhhugidrihgsmhdrtghomhdpuggrvhhiugesrhgvughhrghtrdgtohhmpdhrihgthhgrrhgurdhhvghnuggvrhhsohhnsehlihhnrghrohdrohhrghdpsghorhhnthhrrggvghgvrheslhhinhhugidrihgsmhdrtghomhdpphgrshhitgeslhhinhhugidrihgsmhdrtghomhdpsghinhdrmhgvnhhgseifihhnughrihhvvghrrdgtohhmpdgrlhhishhtrghirhdrfhhrrg
+ hntghishesfigutgdrtghomhdpphgrlhhmvghrsegurggssggvlhhtrdgtohhmpdgurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghupdgurghnihgvlhhhsgegudefsehgmhgrihhlrdgtohhmpdhjohgvrdhjihhnsehorhgrtghlvgdrtghomhdprghlvghkshgrnhgurghrrdhrihhkrghlohesshihrhhmihgrrdgtohhmpdgruhhrvghlihgvnhesrghurhgvlhefvddrnhgvthdpphhhihhlmhgusehlihhnrghrohdrohhrghdptghhvghnhhhurggtrghisehkvghrnhgvlhdrohhrghdpmhhtohhsrghtthhisehrvgguhhgrthdrtghomhdpphgvthgvrhdrmhgrhiguvghllheslhhinhgrrhhordhorhhgpdhpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdhqvghmuhdqshefledtgiesnhhonhhgnhhurdhorhhgpdhqvghmuhdqrhhishgtvhesnhhonhhgnhhurdhorhhgpdhqvghmuhdqphhptgesnhhonhhgnhhurdhorhhgpdhqvghmuhdqrghrmhesnhhonhhgnhhurdhorhhgpdhqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgpdhkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhmpdhlihhkvgiguhesthgvnhgtvghnthdrtghomhdptghlgheskhgrohgurdhorhhgpdfovfetjfhoshhtpehmohehgeekpdhmohguvgepshhmthhpohhuth
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, 19 Nov 2022 04:29:00 -0800
+Dongli Zhang <dongli.zhang@oracle.com> wrote:
 
-
-On 11/19/2022 12:08 AM, Sean Christopherson wrote:
-> On Fri, Nov 18, 2022, Jiaxi Chen wrote:
->> AVX-IFMA is a new instruction in the latest Intel platform Sierra
->> Forest. This instruction packed multiplies unsigned 52-bit integers and
->> adds the low/high 52-bit products to Qword Accumulators.
->>
->> The bit definition:
->> CPUID.(EAX=7,ECX=1):EAX[bit 23]
->>
->> This CPUID is exposed to user space. Besides, there is no other VMX
->> control for this instruction.
->>
->> Signed-off-by: Jiaxi Chen <jiaxi.chen@linux.intel.com>
->> ---
->>  arch/x86/include/asm/cpufeatures.h | 1 +
->>  arch/x86/kvm/cpuid.c               | 4 ++--
->>  2 files changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
->> index df4a7f7505a9..159f8b9898bf 100644
->> --- a/arch/x86/include/asm/cpufeatures.h
->> +++ b/arch/x86/include/asm/cpufeatures.h
->> @@ -310,6 +310,7 @@
->>  #define X86_FEATURE_AVX512_BF16		(12*32+ 5) /* AVX512 BFLOAT16 instructions */
->>  #define X86_FEATURE_CMPCCXADD           (12*32+ 7) /* CMPccXADD instructions */
->>  #define X86_FEATURE_AMX_FP16		(12*32+21) /* AMX fp16 Support */
->> +#define X86_FEATURE_AVX_IFMA            (12*32+23) /* Support for VPMADD52[H,L]UQ */
->>  
->>  /* AMD-defined CPU features, CPUID level 0x80000008 (EBX), word 13 */
->>  #define X86_FEATURE_CLZERO		(13*32+ 0) /* CLZERO instruction */
->> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->> index 2a334d4cd04e..5726afb2d14c 100644
->> --- a/arch/x86/kvm/cpuid.c
->> +++ b/arch/x86/kvm/cpuid.c
->> @@ -657,8 +657,8 @@ void kvm_set_cpu_caps(void)
->>  		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL_SSBD);
->>  
->>  	kvm_cpu_cap_mask(CPUID_7_1_EAX,
->> -		F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) | F(AMX_FP16)
->> -	);
->> +		F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) | F(AMX_FP16) |
->> +		F(AVX_IFMA));
+> The "perf stat" at the VM side still works even we set "-cpu host,-pmu" in
+> the QEMU command line. That is, neither "-cpu host,-pmu" nor "-cpu EPYC"
+> could disable the pmu virtualization in an AMD environment.
 > 
-> Please keep the terminating paranthesis+semicolon on a separate line.  KVM isn't
-> 100% consistent (as usual), but I would rather "fix" the cases that don't put
-> the terminators on their own line. 
+> We still see below at VM kernel side ...
+> 
+> [    0.510611] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
+> 
+> ... although we expect something like below.
+> 
+> [    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
+> [    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
+> 
+> This is because the AMD pmu (v1) does not rely on cpuid to decide if the
+> pmu virtualization is supported.
+> 
+> We disable KVM_CAP_PMU_CAPABILITY if the 'pmu' is disabled in the vcpu
+> properties.
+> 
+> Cc: Joe Jin <joe.jin@oracle.com>
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> ---
+>  target/i386/kvm/kvm.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index 8fec0bc5b5..0b1226ff7f 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -137,6 +137,8 @@ static int has_triple_fault_event;
+>  
+>  static bool has_msr_mcg_ext_ctl;
+>  
+> +static int has_pmu_cap;
+> +
+>  static struct kvm_cpuid2 *cpuid_cache;
+>  static struct kvm_cpuid2 *hv_cpuid_cache;
+>  static struct kvm_msr_list *kvm_feature_msrs;
+> @@ -1725,6 +1727,19 @@ static void kvm_init_nested_state(CPUX86State *env)
+>  
+>  void kvm_arch_pre_create_vcpu(CPUState *cs)
+>  {
+> +    X86CPU *cpu = X86_CPU(cs);
+> +    int ret;
+> +
+> +    if (has_pmu_cap && !cpu->enable_pmu) {
+> +        ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PMU_CAPABILITY, 0,
+> +                                KVM_PMU_CAP_DISABLE);
 
-That's very careful. Thank you~
--- 
-Regards,
-Jiaxi
+It doesn't seem conceptually correct to configure VM level stuff out of
+a vCPU property, which could theoretically be different for each vCPU,
+even if this isn't the case with the current code base.
+
+Maybe consider controlling PMU with a machine property and this
+could be done in kvm_arch_init() like other VM level stuff ?
+
+> +        if (ret < 0) {
+> +            error_report("kvm: Failed to disable pmu cap: %s",
+> +                         strerror(-ret));
+> +        }
+> +
+> +        has_pmu_cap = 0;
+> +    }
+>  }
+>  
+>  int kvm_arch_init_vcpu(CPUState *cs)
+> @@ -2517,6 +2532,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>          }
+>      }
+>  
+> +    has_pmu_cap = kvm_check_extension(s, KVM_CAP_PMU_CAPABILITY);
+> +
+>      ret = kvm_get_supported_msrs(s);
+>      if (ret < 0) {
+>          return ret;
+
