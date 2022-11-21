@@ -2,78 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB6F5632BBD
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 19:09:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A4F7632BD0
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 19:14:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230155AbiKUSJO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 13:09:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56044 "EHLO
+        id S230497AbiKUSOm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 13:14:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbiKUSJL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 13:09:11 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4930093CF0
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 10:09:10 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id F12BDB81283
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 18:09:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11659C433C1;
-        Mon, 21 Nov 2022 18:09:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669054147;
-        bh=/7KHXu25uYdxptbYApPiI4X6tmxB+JZaBclz27zxScA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=s/GpyKDjXOFYp5ugSCAdXo1NhlB2IPARJM3jRaplMsXTLpV8lxciaQnUUyxQquulK
-         KzEe49FCFaD8LuZy5w40TIz8akrFGG53YphhnwI5jTjvzL+/8C9YHEIelrPhT2xilp
-         CFcT+oCqfydITYFEx1ZK3OI+iuL03YCEyIygLd19LEeKPQQ8m2HuC9LebUr+2cA4i0
-         /MoOm0DInv0d9t1r/8qvWSt0x+gJwsPr+mi9mVlqj1ORRgENAhZmHOZfClgfcbHTBE
-         XmnydxyEqRfCurqpHdYQZDorzFQqvAhcZmuPCp/ecd0IWnHVtsC41IQui39XQPk8/f
-         yyvZa3qp0B0/g==
-Date:   Mon, 21 Nov 2022 18:09:02 +0000
-From:   Will Deacon <will@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 0/3] KVM: arm64: Fixes for parallel faults series
-Message-ID: <20221121180901.GC7645@willie-the-truck>
-References: <20221118182222.3932898-1-oliver.upton@linux.dev>
+        with ESMTP id S229482AbiKUSOk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 13:14:40 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9723BBE863;
+        Mon, 21 Nov 2022 10:14:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669054479; x=1700590479;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=GAVtFtjbl2NQuREt3KtkaZtzB7KUOF9ZPwGqcocelO4=;
+  b=EAgOPFt8t05ZlEHHa5tuOdSGWUeVASsITU8utQV0iVmAWHkRwQ1fD71D
+   djh9/k9CLHK5hJkNjYgYPNUoAGJYRc2bbjXytKF/NBUbjFlHrUh/9Y0GL
+   a7Bef3pLNtyg9a3t0eLikjPm96qAYU0yNT4zODQOIvHY8dukWsGkN2n1h
+   UEhVSezz6uqkP27AM87usc10Gjtz8wZ2qUEbmjDaIlYzvXS9PJcWqddHy
+   KTXtPHw45LHuj2pZ/Y9ms2fc9aXqjFUYcWTg9s8+5BEBhlom2vz9NRhpy
+   xvBya5IRToB58Ecm0WapAP1xYGSWfDH87yVSyaVarYrGa0DKNi48XK4om
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="313658028"
+X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
+   d="scan'208";a="313658028"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 10:12:55 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="709904648"
+X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
+   d="scan'208";a="709904648"
+Received: from ticela-or-327.amr.corp.intel.com (HELO [10.209.6.63]) ([10.209.6.63])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 10:12:54 -0800
+Message-ID: <805fb0fb-84e2-41ac-ed02-3470fd8c63fe@intel.com>
+Date:   Mon, 21 Nov 2022 10:12:53 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221118182222.3932898-1-oliver.upton@linux.dev>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v7 01/20] x86/tdx: Define TDX supported page sizes as
+ macros
+Content-Language: en-US
+To:     Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
+        kirill.shutemov@linux.intel.com, ying.huang@intel.com,
+        reinette.chatre@intel.com, len.brown@intel.com,
+        tony.luck@intel.com, peterz@infradead.org, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+References: <cover.1668988357.git.kai.huang@intel.com>
+ <d6c6e664c445e9ccf1528625f0e21bbb8471d35f.1668988357.git.kai.huang@intel.com>
+ <2eedfcff-e8c1-79af-63f4-c852af7b7e77@linux.intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <2eedfcff-e8c1-79af-63f4-c852af7b7e77@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 18, 2022 at 06:22:19PM +0000, Oliver Upton wrote:
-> Small set of fixes for the parallel faults series. Most importantly,
-> stop taking the RCU read lock for walking hyp stage-1. For the sake of
-> consistency, take a pointer to kvm_pgtable_walker in
-> kvm_dereference_pteref() as well.
-> 
-> Tested on an Ampere Altra system with kvm-arm.mode={nvhe,protected} and
-> lockdep. Applies on top of the parallel faults series picked up last
-> week.
-> 
-> v3: https://lore.kernel.org/kvmarm/20221116165655.2649475-1-oliver.upton@linux.dev/
-> 
-> v3 -> v4:
->  - Return an error instead of WARN() in hyp for shared walks (Will)
+On 11/20/22 18:52, Sathyanarayanan Kuppuswamy wrote:
+> On 11/20/22 4:26 PM, Kai Huang wrote:
+>> +/*
+>> + * TDX supported page sizes (4K/2M/1G).
+>> + *
+>> + * Those values are part of the TDX module ABI.  Do not change them.
+> It would be better if you include specification version and section
+> title.
 
-For the series:
+I actually think TDX code, in general, spends way too much time quoting
+and referring to the spec.
 
-Acked-by: Will Deacon <will@kernel.org>
+Also, why quote the version?  Do we quote the SDM version when we add
+new SDM-defined architecture?
 
-Thanks!
-
-Will
+It's just busywork that bloats the kernel and adds noise.  Please focus
+on adding value to the comments that came from your brain and not just
+pasting boilerplate gunk over and over.
