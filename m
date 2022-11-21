@@ -2,224 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FA0D6330CD
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 00:41:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 110536330D0
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 00:41:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231960AbiKUXlB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 18:41:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47744 "EHLO
+        id S232029AbiKUXli (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 18:41:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231899AbiKUXkz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 18:40:55 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2637FD907E
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 15:40:40 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id cj8-20020a056a00298800b0056cee8a0cf8so8192957pfb.9
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 15:40:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GAeRFu+8abl63zRshHZY/osN79y92OB7KXuZi61y3XQ=;
-        b=MLLv1idCPh9KyvRsqZPzhtPOss6do+1xiHmS52+acVjQPMZEPQ0ei9P3p46cgu7lfh
-         wEcUYPZLXdqBiuj9VreHa26cWIdt7LmMmHqrdXdOb/KNhCLF/h5cL2ptNfW/qXZXIpRK
-         nHZpwbMK3nWaQQQeQ71VD+fTEXvUeXsDjykMCIUT0+Sp5h2Sa/1FW3ftbIN23RHlS+sa
-         jH65fakZ6oActmvY/RwB+fly5zz61tIH8DsGYnBDTZSusLUPr6sFDDfDZ8BHEaPtqaUz
-         b4UH7gxEStuasTy9MTmDpIUXjXje0Rfp2ajm2jhaSFO+l/WYSm7EFyrtnAjBO962sg8J
-         /3IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GAeRFu+8abl63zRshHZY/osN79y92OB7KXuZi61y3XQ=;
-        b=h+lPHtuXaci+j+q944PC5rmjjtsCdwHpbBarI6TFCHp6x8e/w7SG/W8loJU/h/xK16
-         97/5vXkpngX/37/K1L7DN9XI1a6Qkw4fnm7vOx/Gwfay00hZ53fH0QP0xXhJrEEGrqpu
-         sjpfTi0v2FC2tt8kRcClOFgVJqwuoXQLZdkDPowlQRPvu4CItlHFQTEvVa/NbPB/5g5Y
-         Kij/C+TVKU9TdbIPNrcelBwkrJmMzY1vke2u2k9e+nQUsUMNpp6uH4Ks+hvMRyoNNx1V
-         3CPe4xcZfsWvUAkubVy9WqWaYe+wJMx20auxLDq5jLk5Fabd6ASmSXJjr5POi3mBCmaL
-         P/IA==
-X-Gm-Message-State: ANoB5pm7V0fF7RcOgzemu9+GSRxfYzDPfnMGToF5WIwwsU+AFgwhLkqi
-        4gomTJQRxF153g7lqSO0sIcYCwteClJi
-X-Google-Smtp-Source: AA0mqf6p0wPxvV2MjXukDs/xfE0bd5v+GCJUQ+8uoISaecgSAJoVQ6Cm7nsdMxPGt8jbBZZl/I4qddffHuwN
-X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a62:1812:0:b0:56c:afe:e8bf with SMTP id
- 18-20020a621812000000b0056c0afee8bfmr1171889pfy.51.1669074039695; Mon, 21 Nov
- 2022 15:40:39 -0800 (PST)
-Date:   Mon, 21 Nov 2022 15:40:26 -0800
-In-Reply-To: <20221121234026.3037083-1-vipinsh@google.com>
-Mime-Version: 1.0
-References: <20221121234026.3037083-1-vipinsh@google.com>
-X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221121234026.3037083-7-vipinsh@google.com>
-Subject: [PATCH v2 6/6] KVM: selftests: Test Hyper-V extended hypercall exit
- to userspace
-From:   Vipin Sharma <vipinsh@google.com>
-To:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
-        dmatlack@google.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232026AbiKUXlV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 18:41:21 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C460DEACE;
+        Mon, 21 Nov 2022 15:40:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669074049; x=1700610049;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=fwD9fkd5DZ9MK6CqhZri9E2wDoP0K29Z/5lTjPXLS7s=;
+  b=c5VMmWniVoZHNvB39lIJH5PL5oAqTqylxdIpIbTjMBUlYjcitgmzjin8
+   4/6d9dzjgF6BPKI/buuWgJaDIDXEEt7Di6mu131OViAqNC6s9lLKN0st8
+   +uqxeqZruqRAeQ+MrehyC5YdQZulXtK9PQulPQstqaVzAT8BPM3CuOhZS
+   MQQ/0EIUzBm8/0ii+cRNWeQO6jNRVfbwauiN6OOMex9LFSNgDPEJW78Xl
+   FBsu3i/kIQhmkrhHkSarqEaW6M/5rinaszBwKKXtBREEM4CizYcz2MImo
+   aF11IsKj57QD14hTgEgJl3VpT1Y76LDQUmNRRbskUmGhuMyS3E8KKaVVs
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="377945951"
+X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
+   d="scan'208";a="377945951"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 15:40:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="709989122"
+X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
+   d="scan'208";a="709989122"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga004.fm.intel.com with ESMTP; 21 Nov 2022 15:40:47 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 21 Nov 2022 15:40:45 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 21 Nov 2022 15:40:45 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Mon, 21 Nov 2022 15:40:45 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.42) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Mon, 21 Nov 2022 15:40:44 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iZQ0BAah6EJ4cEDmDIM/Qj2xCMn8rBlwaQljcYGnJtW8KTAyZ4OyQRMoTy0bMaVMYg1pge0m9g+TLm1VsDSLU46dmFo3W+Zl9l5cUYHNWPO0R1kjGbVbXir2/Hs9JtSFwXYWtEycg+mtqeRNjtQUdtHUhEOE6faFgEsRmWiyuHs03dVd3mt79+kqEjRKvPHK/WxtdZb3t2IIGuW7+6OYw+E1u4U+0nPm+HgtqMUfsaJBZFt+zOZtANCOHAvq77NWkgXzFMN/yqTSMN0ek0lWTxucJ8IVz4mwjZLUnzC6RJSX3bEXPo/GgSH6S02D9MB6LqxVZCuJyy1f6JxexKYh+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fwD9fkd5DZ9MK6CqhZri9E2wDoP0K29Z/5lTjPXLS7s=;
+ b=Wl2UmO05otunMHnc3PvoaEVU6y3VLl0v/FA8ihk6X7QkEzRaKH2UvB2/MTeFkoiQS7d9RM3qI3GGolTYcpN9OJ17ywN+1MzK14oWWF8yr1FKSZykseeb3uF8zEauYqdNr08MtejfNDHQq6Fys0jvHcejp6Ipnt19DC0u4aTbGlkGEbjYLA5qBhPdM2E8NrdK8LQTMBD7fOqGSw+EZn4R8qUWMN8qChrohPxLgy1neXT6Zw7yloZyJEJSTuNkZ+wSagc6ODvhjyZ3GYiJcqEyGkySuwayUAAtkZFziY9VqwPQM8eraK79q8T3DYlvBppOdk861i4SbCX7hgSNURCDUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by MW4PR11MB5774.namprd11.prod.outlook.com (2603:10b6:303:182::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.9; Mon, 21 Nov
+ 2022 23:40:40 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e%8]) with mapi id 15.20.5834.015; Mon, 21 Nov 2022
+ 23:40:40 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "Hansen, Dave" <dave.hansen@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v7 03/20] x86/virt/tdx: Disable TDX if X2APIC is not
+ enabled
+Thread-Topic: [PATCH v7 03/20] x86/virt/tdx: Disable TDX if X2APIC is not
+ enabled
+Thread-Index: AQHY/T2/qiNrCEbeGka7t7fkot0Cyq5IvpmAgABiqQCAAM2GAIAAHAqA
+Date:   Mon, 21 Nov 2022 23:40:40 +0000
+Message-ID: <2b8f18d0fa9f996430e9f92d9350a454dc6b8d78.camel@intel.com>
+References: <cover.1668988357.git.kai.huang@intel.com>
+         <c5f484c1a87ee052597fd5f539cf021f158755b9.1668988357.git.kai.huang@intel.com>
+         <62c67ed3-e4d1-082f-800a-b0837c9432a9@linux.intel.com>
+         <31cb1df3cf21889fb33a7c675aa1bf5fa2078cad.camel@intel.com>
+         <cb64427e-31a2-eac0-a7f6-546571ac2724@linux.intel.com>
+In-Reply-To: <cb64427e-31a2-eac0-a7f6-546571ac2724@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|MW4PR11MB5774:EE_
+x-ms-office365-filtering-correlation-id: 38c409ff-923e-4f62-c547-08dacc19cc96
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: JjkrCZWdPdqtSAR0+PeKZXuGsfT+GS3DpcSa+qBvCznDMYV0HApGtARc4RPVn+Bn+KyD1+nupjOaR6jOqVpZLmxt67XjzGf5JApBcaSP/T0t+kMxLn755LjbUWxv7sn484f2nG3CPrVFtIzvucIcbdBRt2HrXuzI8Tb0FWaW8AKE6ZjnmYDNYZ4IARoR2bu4ChpRxuyoduoJdO6GKoIM9X8xVx4doQ44LXg9J7JHK4mQi/NNspg0MExXQwobT5uIOrdE4MocIK5iKDHZjithOndjOS0l0w/xKgDT+HJmXmXSe2fZT4Z0p3C/78zxGPwh3NUxegRa+kJs3V1i7qH5vj/z4AnRE5jKqyXXnrOszpkiJRM0cnvHUhjmRXgfVbnY7MizuUvKkoj01hVv8VJTNMkgD8MffPLj4IYjJreWtBxfgCCNNC576bBGFDXu4mAkWph0xFZsIY2ZQ6j4FuIGlM/xIze60JRBnpYFNCdYk8WNwC6QHFdVKrMlKMfpfU19kjr/srGKJg7WsgzflyFxHGLU85t0Iv3PHezk+XpciLK0G7AtDEWKSLRug7MBe2xJOo5gDyOWPm9SmLeUIX1FDbNp0BxP5g0Q0I0+DSpKJ1eQmVPnLt9/ZMAHMAooOsGCi+kX4wBji943I9nQL5/16EqMVcXaQd6XkkBR+xP62FD/j/f+yncg9sdP16xPb5U0HhIxvPxOUvoF3idWF4mI2Q==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(376002)(136003)(39860400002)(366004)(396003)(451199015)(66446008)(86362001)(36756003)(6512007)(5660300002)(8936002)(7416002)(186003)(4744005)(2906002)(26005)(38100700002)(122000001)(82960400001)(38070700005)(4001150100001)(91956017)(54906003)(41300700001)(71200400001)(2616005)(316002)(66946007)(6506007)(76116006)(4326008)(66556008)(66476007)(478600001)(110136005)(6486002)(8676002)(64756008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WXZlUWpoL2s4ZGJUR3dQeUIxcFBoZFVDTnFGM0RWVTJmbjlrMHF1NlRtUGNi?=
+ =?utf-8?B?TTJ5K1NWUlh6VEw0TEdzMjl1bnJHTEZuYngxRTJMZW9yYWtCbjRRZWJVOUhC?=
+ =?utf-8?B?Tmp4YU50dStzQmNBWTNNVEJvVnBrOWJhdFpmaFcxTHVKOGtvSng3MkFIMkNq?=
+ =?utf-8?B?bHA1czV3aWpvVGtrRzNMaVpNSFJRRGdNcmpsM1ZpN3M0WlMvbWFCeVZhWCtz?=
+ =?utf-8?B?cjJhcDRlcE54OElBbURWR1lBR1hmb3Z0T2dhQzlraWZyYzErU3RJcTdPbmxM?=
+ =?utf-8?B?QUhwZitwRWdZM3EwODhvaWdnVnBoTlg3M1NRUFc5MXJMVVNGWGE3dWZ5MGtu?=
+ =?utf-8?B?V3FmSFVycERtbWZaVnJ4Z3pOdHlML1lUMjU2SzB5dE0vRUNKdE5yWkxKVDhw?=
+ =?utf-8?B?TFM4K2lZUVVtdkE4eER5MGhDNi9WMUxuVjlqQUZ3Nzl3RE4vRC9mSVlrN2to?=
+ =?utf-8?B?SmFJU0FpN2VuR2NzRDhFVmE2SEpPamNSaXgvU0NGL2V2NkJqWk9taStxZ3hu?=
+ =?utf-8?B?dVk5UnBER2o4MHdGMnM3WlRvMHhxa3Y3OEZrNmNyQzFwSlFyU2ZkdGRkYXZE?=
+ =?utf-8?B?K3ZwTWEwamcrN0Q3MXNJZnFhK05iK2NZMnk5aERsVENrRThTT2JvN0VRbjEv?=
+ =?utf-8?B?UUZBanQ4WHNrNVlxMmxlYTcvdWc3ZTNBY3VLUjZOVDdFZXBzaHdsV0VSNDZt?=
+ =?utf-8?B?Snlabk1XbzJua2FYbkIwZjJXNnE2NkRwTTFkTnpjbjhLKzZ3MkF1dFBIMWYz?=
+ =?utf-8?B?eDZMdzdLK1JaeGdDeVhJWWwwTjNaNzAyeHZqZ3dJNTIydjlNdW56SUlGQUNj?=
+ =?utf-8?B?MkplSEVQY1JSSzFPaW5kdjRtV1Yra3FiL1hNbTRTVTlFblU2aURYL040S0Zm?=
+ =?utf-8?B?cVUwaCt0U0lWU2pGRXk4V3p4NW9RdEFlTWliMjVwckZ2R0dycVVuWk95UnNw?=
+ =?utf-8?B?VHkydG0zVDZqeHpkdE90Tlp4a2pHaFJXUTZ5dHRxSFh2SDYyYmREQUsySzdI?=
+ =?utf-8?B?dmRYbnBlMk5NR1czekZlSkI3OXluNUZhbVJUY1k3VmRycnAzcjRnQkUwejRZ?=
+ =?utf-8?B?c1p1b1NYdGU0SkdYTU1STVVKZHJqMFVpYXVIMlJuVXhDY2tFd1hnWk9iN3Jq?=
+ =?utf-8?B?b2U5NnNwZTREN2ZFWVhoVmRKNnFKY3NLZ2wyYzc0OFZ1OFZoTS8rZk5JdW85?=
+ =?utf-8?B?Z1JsK2J4Sks1UnZXMnZpSEVSZDA0aE9GdXMrZW5PdHJ6K2k4N1hUYmJKaW9L?=
+ =?utf-8?B?STZMRlp6SnV4SXVobGo3dTJSVlQzMjRtcUtjM1ZpTnR2V1M5dmxBR2lDemI0?=
+ =?utf-8?B?MmttUUtzMWNXajgvSnNQVEtUNW5lTWhHanl0UGFtVEtuSFp1ajEvenhPMXVO?=
+ =?utf-8?B?NytMSTZNQ3ltdDBLenQwZElyRGRqcy90Zk5vL0VTNzRHdzl0SDB3RXdWMHB2?=
+ =?utf-8?B?TElhR2hlL1V6S2dJYS9qS3h3TXdhYjArYzMyazVSazcwbnNhZWlvMVFxMlZ2?=
+ =?utf-8?B?R2RKTnVxZkdVbTg0ZjlwVzhaZlV1TDdBd0lzbkFIVVhhYkhmVTF5eGtNelV0?=
+ =?utf-8?B?dm1mN3U1VU9iYXdSMWdsL3ZkZG9pQ1lNdUpBMVFZbGUzSXduZURMVStWRnZt?=
+ =?utf-8?B?KzRxWkl4bEpkS3M1QWxFdUlXTWNWZjVHQmpCMzB3azJtdiszZzhoN0ErOXRB?=
+ =?utf-8?B?VEYxRnZHYVZhVDhyZEViTUg4eEZ3MlZJelVlMU5uZ0x1QnJ6cEREK1RTaTQx?=
+ =?utf-8?B?UDFmbGUrK0xvMTZQeE8xU2lrWFFOaWJ2bEtUMzZYc2tGQm5vQ2VQUmFkSTVK?=
+ =?utf-8?B?d3FPSjlubnhvMkd1UkxLS2tXNjhFYUU4STE2bmtsdFUyLzc3UHN4MjcxRnNV?=
+ =?utf-8?B?RkZ4dm1EUDBOWUg4OUYrSWNFMnJldG1tOHU1SkNQeEEyUDRoV1ZVK1FJQ1Ey?=
+ =?utf-8?B?bHlOeS9XSjdJNWllQWg0VlNWZjN6QVlDZkNDZFhrSXN4ZGI0a3BKemFBL1M0?=
+ =?utf-8?B?QlR3elJmcGZ5dGVZbVVEU3V0TjVVZkMrV1Jwa0E5NlFDRGpGSTNHSVVUSVdo?=
+ =?utf-8?B?TjlVSGRHWlJxYTN1b3VucklEVzVGdmo2RFUvRnRYbWIxa1l6U09mUyszUTg1?=
+ =?utf-8?B?bFEzcEFwR3A5WUIzSTlSazhXNGU5ci9SUmlwdHZYaUdmekNQdEY1Nld2TWFo?=
+ =?utf-8?B?UHc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DE33AAE58A76A04D816AA4BADD0F95FC@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 38c409ff-923e-4f62-c547-08dacc19cc96
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Nov 2022 23:40:40.4715
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9OrJnj5WpeczX6jHlTP73bwgLpJFsgLtpjkcZVlF8LoKekh6r3+ORIlNESgG80dqle9ct9OOyGIk8gARRTTxNQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB5774
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hyper-V extended hypercalls by default exit to userspace. Verify
-userspace gets the call, update the result and then verify in guest
-correct result is received.
-
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |  1 +
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../selftests/kvm/include/x86_64/processor.h  |  3 +
- .../kvm/x86_64/hyperv_extended_hypercalls.c   | 94 +++++++++++++++++++
- 4 files changed, 99 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 082855d94c72..b17874697d74 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -24,6 +24,7 @@
- /x86_64/hyperv_clock
- /x86_64/hyperv_cpuid
- /x86_64/hyperv_evmcs
-+/x86_64/hyperv_extended_hypercalls
- /x86_64/hyperv_features
- /x86_64/hyperv_ipi
- /x86_64/hyperv_svm_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 2275ba861e0e..a0e12f5d9835 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -87,6 +87,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_evmcs
-+TEST_GEN_PROGS_x86_64 += x86_64/hyperv_extended_hypercalls
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_ipi
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_svm_test
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 5d310abe6c3f..f167396b887b 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -168,6 +168,9 @@ struct kvm_x86_cpu_feature {
- #define X86_FEATURE_KVM_HC_MAP_GPA_RANGE	KVM_X86_CPU_FEATURE(0x40000001, 0, EAX, 16)
- #define X86_FEATURE_KVM_MIGRATION_CONTROL	KVM_X86_CPU_FEATURE(0x40000001, 0, EAX, 17)
- 
-+/* Hyper-V defined paravirt features */
-+#define X86_FEATURE_HYPERV_EXTENDED_HYPERCALLS	KVM_X86_CPU_FEATURE(0x40000003, 0, EBX, 20)
-+
- /*
-  * Same idea as X86_FEATURE_XXX, but X86_PROPERTY_XXX retrieves a multi-bit
-  * value/property as opposed to a single-bit feature.  Again, pack the info
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-new file mode 100644
-index 000000000000..13c1b03294a4
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-@@ -0,0 +1,94 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Test Hyper-V extended hypercall, HV_EXT_CALL_QUERY_CAPABILITIES (0x8001),
-+ * exit to userspace and receive result in guest.
-+ *
-+ * Negative tests are present in hyperv_features.c
-+ *
-+ * Copyright 2022 Google LLC
-+ * Author: Vipin Sharma <vipinsh@google.com>
-+ */
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "hyperv.h"
-+
-+/* Any value is fine */
-+#define EXT_CAPABILITIES 0xbull
-+
-+static void guest_code(vm_vaddr_t in_pg_gpa, vm_vaddr_t out_pg_gpa,
-+		       vm_vaddr_t out_pg_gva)
-+{
-+	uint64_t *output_gva;
-+
-+	wrmsr(HV_X64_MSR_GUEST_OS_ID, HYPERV_LINUX_OS_ID);
-+	wrmsr(HV_X64_MSR_HYPERCALL, in_pg_gpa);
-+
-+	output_gva = (uint64_t *)out_pg_gva;
-+
-+	hyperv_hypercall(HV_EXT_CALL_QUERY_CAPABILITIES, in_pg_gpa, out_pg_gpa);
-+
-+	/* TLFS states output will be a uint64_t value */
-+	GUEST_ASSERT_EQ(*output_gva, EXT_CAPABILITIES);
-+
-+	GUEST_DONE();
-+}
-+
-+int main(void)
-+{
-+	vm_vaddr_t hcall_out_page;
-+	vm_vaddr_t hcall_in_page;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_run *run;
-+	struct kvm_vm *vm;
-+	uint64_t *outval;
-+	struct ucall uc;
-+
-+	/* Verify if extended hypercalls are supported */
-+	if (!kvm_cpuid_has(kvm_get_supported_hv_cpuid(),
-+			   X86_FEATURE_HYPERV_EXTENDED_HYPERCALLS)) {
-+		print_skip("Extended calls not supported by the kernel");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+	run = vcpu->run;
-+	vcpu_enable_cap(vcpu, KVM_CAP_HYPERV_ENFORCE_CPUID, 1);
-+	vcpu_set_hv_cpuid(vcpu);
-+
-+	/* Hypercall input */
-+	hcall_in_page = vm_vaddr_alloc_pages(vm, 1);
-+	memset(addr_gva2hva(vm, hcall_in_page), 0x0, vm->page_size);
-+
-+	/* Hypercall output */
-+	hcall_out_page = vm_vaddr_alloc_pages(vm, 1);
-+	memset(addr_gva2hva(vm, hcall_out_page), 0x0, vm->page_size);
-+
-+	vcpu_args_set(vcpu, 3, addr_gva2gpa(vm, hcall_in_page),
-+		      addr_gva2gpa(vm, hcall_out_page), hcall_out_page);
-+
-+	vcpu_run(vcpu);
-+
-+	ASSERT_EXIT_REASON(vcpu, KVM_EXIT_HYPERV);
-+
-+	outval = addr_gpa2hva(vm, run->hyperv.u.hcall.params[1]);
-+	*outval = EXT_CAPABILITIES;
-+	run->hyperv.u.hcall.result = HV_STATUS_SUCCESS;
-+
-+	vcpu_run(vcpu);
-+
-+	ASSERT_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT_2(uc, "arg1 = %ld, arg2 = %ld");
-+		break;
-+	case UCALL_DONE:
-+		break;
-+	default:
-+		TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
-+	}
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.38.1.584.g0f3c55d4c2-goog
-
+T24gTW9uLCAyMDIyLTExLTIxIGF0IDE0OjAwIC0wODAwLCBTYXRoeWFuYXJheWFuYW4gS3VwcHVz
+d2FteSB3cm90ZToNCj4gPiA+ID4gwqAgDQo+ID4gPiA+ICsJLyoNCj4gPiA+ID4gKwkgKiBURFgg
+cmVxdWlyZXMgWDJBUElDIGJlaW5nIGVuYWJsZWQgdG8gcHJldmVudCBwb3RlbnRpYWwgZGF0YQ0K
+PiA+ID4gPiArCSAqIGxlYWsgdmlhIEFQSUMgTU1JTyByZWdpc3RlcnMuwqAgSnVzdCBkaXNhYmxl
+IFREWCBpZiBub3QgdXNpbmcNCj4gPiA+ID4gKwkgKiBYMkFQSUMuDQo+ID4gPiANCj4gPiA+IFJl
+bW92ZSB0aGUgZG91YmxlIHNwYWNlLg0KPiA+IA0KPiA+IFNvcnJ5IHdoaWNoICJkb3VibGUgc3Bh
+Y2UiPw0KPiANCj4gQmVmb3JlIEp1c3QgZGlzYWJsZS4gSXQgbG9va2VkIGxpa2UgZG91YmxlIHNw
+YWNlLiBJcyBpdCBub3Q/DQoNClRoZXJlIGFyZSBidW5jaCBvZiBleGFtcGxlcyBpbiB0aGUgdXBz
+dHJlYW0ga2VybmVsIHVzaW5nICJkb3VibGUgc3BhY2UiIGJvdGggaW4NCmNoYW5nZWxvZyBhbmQg
+Y29tbWVudC4NCg==
