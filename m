@@ -2,89 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45F3A632F1C
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 22:42:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 455FE632F73
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 23:00:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231841AbiKUVmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 16:42:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59026 "EHLO
+        id S231145AbiKUWAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 17:00:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231726AbiKUVli (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 16:41:38 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E2A1DB85E;
-        Mon, 21 Nov 2022 13:41:08 -0800 (PST)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ALLRY0N023134;
-        Mon, 21 Nov 2022 21:41:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=yLjvMIxS6ztk/SZxNph4GGZktVfD7uEXPWM9MM2KKh8=;
- b=lGhleW57+uKMz7qfV6xfyY9reiy77GbACxNL82PXQKLLYR/e6Rdq5lcL6z/KpK3VClwh
- kxXxS4mP+HYYNrR8Yxy97+jcn7xw9w6i+Jb7eZ68ivdgge6B2Szd4sDgIvyt1IP4YJ+F
- zUyT2Vvo4upAl22fWMj7KfEZHILQHuRs8H51Nbuf+2B+kWjzhsoSS4LUoDDlofIn8nEq
- T3Fk5VsfA4jHGSN5eUstDieDwNPBoPmzawUci6K2PNqccLH6j95m0N0b2iwUlZPgfaNc
- ViVsl4Eh1OEHs1wQOtYxVwadL1mNV44SaUOsLRdDUJ2rj56IdKea2cpfmz0fgGCZoOae wA== 
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0h910c85-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Nov 2022 21:41:07 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ALLZuEx020785;
-        Mon, 21 Nov 2022 21:41:05 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06fra.de.ibm.com with ESMTP id 3kxpdj2d8r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Nov 2022 21:41:05 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ALLf2eW55771614
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 21 Nov 2022 21:41:02 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4B022AE04D;
-        Mon, 21 Nov 2022 21:41:02 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 39288AE045;
-        Mon, 21 Nov 2022 21:41:02 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 21 Nov 2022 21:41:02 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 956F3E08E3; Mon, 21 Nov 2022 22:41:01 +0100 (CET)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v1 16/16] vfio/ccw: remove old IDA format restrictions
-Date:   Mon, 21 Nov 2022 22:40:56 +0100
-Message-Id: <20221121214056.1187700-17-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221121214056.1187700-1-farman@linux.ibm.com>
-References: <20221121214056.1187700-1-farman@linux.ibm.com>
+        with ESMTP id S229695AbiKUWAV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 17:00:21 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D8BDBF832;
+        Mon, 21 Nov 2022 14:00:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669068020; x=1700604020;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+ma0WakvZrX/QeghPHE60d1tluXLn7n6TDwbT58Zem4=;
+  b=TKNP3wfM08EXlQKOE75RHLtphaklaHzj9jUm7AVes2JvylUQkBfvsj1L
+   RRuaQWCqUFT5qOIMvHMfWe3bgt3x9C/F5XGpF52OTORBKnd2TWGG8RRMs
+   S+TCQHO046vJEQtbRdXbY1MXu975pfvGLrhz5kcbJlyxdnQTdrTAByKW2
+   wMcmEf2DiQSoxXqNUskBEzfkP815houvYJNM0yX8lP8YYxwI64mfA40aE
+   g3Pmx1349oNrPIkvf7Ku7Pgr5lVGW9LT+rEfpr2exGlmOR8XGcFqMiJMT
+   O+tl/T6/fNeSo0oGkRxomrzsCleoW2/SsNn8KHD9sbku9jNGa7eird93g
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="301218039"
+X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
+   d="scan'208";a="301218039"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 14:00:19 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="886277273"
+X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
+   d="scan'208";a="886277273"
+Received: from dylanhol-mobl.amr.corp.intel.com (HELO [10.212.242.103]) ([10.212.242.103])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 14:00:16 -0800
+Message-ID: <cb64427e-31a2-eac0-a7f6-546571ac2724@linux.intel.com>
+Date:   Mon, 21 Nov 2022 14:00:14 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CmYICqLT7l4aIQp3HrNK_ZEsAs9DncxO
-X-Proofpoint-ORIG-GUID: CmYICqLT7l4aIQp3HrNK_ZEsAs9DncxO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-21_17,2022-11-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 mlxscore=0 adultscore=0 bulkscore=0 malwarescore=0
- clxscore=1015 spamscore=0 suspectscore=0 phishscore=0 priorityscore=1501
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211210158
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.4.2
+Subject: Re: [PATCH v7 03/20] x86/virt/tdx: Disable TDX if X2APIC is not
+ enabled
+Content-Language: en-US
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     "Hansen, Dave" <dave.hansen@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+References: <cover.1668988357.git.kai.huang@intel.com>
+ <c5f484c1a87ee052597fd5f539cf021f158755b9.1668988357.git.kai.huang@intel.com>
+ <62c67ed3-e4d1-082f-800a-b0837c9432a9@linux.intel.com>
+ <31cb1df3cf21889fb33a7c675aa1bf5fa2078cad.camel@intel.com>
+From:   Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+In-Reply-To: <31cb1df3cf21889fb33a7c675aa1bf5fa2078cad.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -92,51 +85,125 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-By this point, all the pieces are in place to properly support
-a 2K Format-2 IDAL, and to convert a guest Format-1 IDAL to
-the 2K Format-2 variety. Let's remove the fence that prohibits
-them, and allow a guest to submit them if desired.
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- Documentation/s390/vfio-ccw.rst | 4 ++--
- drivers/s390/cio/vfio_ccw_cp.c  | 8 --------
- 2 files changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/s390/vfio-ccw.rst b/Documentation/s390/vfio-ccw.rst
-index ea928a3806f4..53375dc86213 100644
---- a/Documentation/s390/vfio-ccw.rst
-+++ b/Documentation/s390/vfio-ccw.rst
-@@ -219,8 +219,8 @@ values may occur:
-   The operation was successful.
- 
- ``-EOPNOTSUPP``
--  The orb specified transport mode or an unidentified IDAW format, or the
--  scsw specified a function other than the start function.
-+  The ORB specified transport mode, or the
-+  SCSW specified a function other than the start function.
- 
- ``-EIO``
-   A request was issued while the device was not in a state ready to accept
-diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-index 3829c346583c..60e972042979 100644
---- a/drivers/s390/cio/vfio_ccw_cp.c
-+++ b/drivers/s390/cio/vfio_ccw_cp.c
-@@ -372,14 +372,6 @@ static int ccwchain_calc_length(u64 iova, struct channel_program *cp)
- 	do {
- 		cnt++;
- 
--		/*
--		 * As we don't want to fail direct addressing even if the
--		 * orb specified one of the unsupported formats, we defer
--		 * checking for IDAWs in unsupported formats to here.
--		 */
--		if ((!cp->orb.cmd.c64 || cp->orb.cmd.i2k) && ccw_is_idal(ccw))
--			return -EOPNOTSUPP;
--
- 		/*
- 		 * We want to keep counting if the current CCW has the
- 		 * command-chaining flag enabled, or if it is a TIC CCW
+On 11/21/22 1:44 AM, Huang, Kai wrote:
+> On Sun, 2022-11-20 at 19:51 -0800, Sathyanarayanan Kuppuswamy wrote:
+>>
+>> On 11/20/22 4:26 PM, Kai Huang wrote:
+>>> The MMIO/xAPIC interface has some problems, most notably the APIC LEAK
+>>
+>> "some problems" looks more generic. May be we can be specific here. Like
+>> it has security issues?
+> 
+> It was quoted from below upstream commit id (I only kept the one that I quoted
+> to save space):
+
+Ok.
+
+> 
+> commit b8d1d163604bd1e600b062fb00de5dc42baa355f (tag: x86_apic_for_v6.1_rc1,
+> tip/x86/apic)
+> Author: Daniel Sneddon <daniel.sneddon@linux.intel.com>
+> Date:   Tue Aug 16 16:19:42 2022 -0700
+> 
+>     x86/apic: Don't disable x2APIC if locked
+>     
+>     ....
+>     
+>     The MMIO/xAPIC interface has some problems, most notably the APIC LEAK
+>     [1].  This bug allows an attacker to use the APIC MMIO interface to
+>     extract data from the SGX enclave.
+>     
+>     ....
+>     
+>     [1]: https://aepicleak.com/aepicleak.pdf
+>     
+>     Signed-off-by: Daniel Sneddon <daniel.sneddon@linux.intel.com>
+>     Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+>     Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+>     Tested-by: Neelima Krishnan <neelima.krishnan@intel.com>
+>     Link:
+> https://lkml.kernel.org/r/20220816231943.1152579-1-daniel.sneddon@linux.intel.com
+> 
+> 
+>>
+>>> [1].  This bug allows an attacker to use the APIC MMIO interface to
+>>> extract data from the SGX enclave.
+>>>
+>>> TDX is not immune from this either.  Early check X2APIC and disable TDX
+>>> if X2APIC is not enabled, and make INTEL_TDX_HOST depend on X86_X2APIC.
+>>>
+>>> [1]: https://aepicleak.com/aepicleak.pdf
+>>>
+>>> Link: https://lore.kernel.org/lkml/d6ffb489-7024-ff74-bd2f-d1e06573bb82@intel.com/
+>>> Link: https://lore.kernel.org/lkml/ba80b303-31bf-d44a-b05d-5c0f83038798@intel.com/
+>>> Signed-off-by: Kai Huang <kai.huang@intel.com>
+>>> ---
+>>>
+>>> v6 -> v7:
+>>>  - Changed to use "Link" for the two lore links to get rid of checkpatch
+>>>    warning.
+>>>
+>>> ---
+>>>  arch/x86/Kconfig            |  1 +
+>>>  arch/x86/virt/vmx/tdx/tdx.c | 11 +++++++++++
+>>>  2 files changed, 12 insertions(+)
+>>>
+>>> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+>>> index cced4ef3bfb2..dd333b46fafb 100644
+>>> --- a/arch/x86/Kconfig
+>>> +++ b/arch/x86/Kconfig
+>>> @@ -1958,6 +1958,7 @@ config INTEL_TDX_HOST
+>>>  	depends on CPU_SUP_INTEL
+>>>  	depends on X86_64
+>>>  	depends on KVM_INTEL
+>>> +	depends on X86_X2APIC
+>>>  	help
+>>>  	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
+>>>  	  host and certain physical attacks.  This option enables necessary TDX
+>>> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+>>> index 982d9c453b6b..8d943bdc8335 100644
+>>> --- a/arch/x86/virt/vmx/tdx/tdx.c
+>>> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+>>> @@ -12,6 +12,7 @@
+>>>  #include <linux/printk.h>
+>>>  #include <asm/msr-index.h>
+>>>  #include <asm/msr.h>
+>>> +#include <asm/apic.h>
+>>>  #include <asm/tdx.h>
+>>>  #include "tdx.h"
+>>>  
+>>> @@ -81,6 +82,16 @@ static int __init tdx_init(void)
+>>>  		goto no_tdx;
+>>>  	}
+>>>  
+>>> +	/*
+>>> +	 * TDX requires X2APIC being enabled to prevent potential data
+>>> +	 * leak via APIC MMIO registers.  Just disable TDX if not using
+>>> +	 * X2APIC.
+>>
+>> Remove the double space.
+> 
+> Sorry which "double space"?
+
+Before Just disable. It looked like double space. Is it not?
+
+> 
+>>
+>>> +	 */
+>>> +	if (!x2apic_enabled()) {
+>>> +		pr_info("Disable TDX as X2APIC is not enabled.\n");
+>>
+>> pr_warn()?
+> 
+> Why?
+
+Since it is a failure case, I thought pr_warn would be better. It is up
+to you.
+
+> 
+
 -- 
-2.34.1
-
+Sathyanarayanan Kuppuswamy
+Linux Kernel Developer
