@@ -2,223 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 754636320D3
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 12:38:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A28CD632198
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 13:08:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231276AbiKULih (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 06:38:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38340 "EHLO
+        id S231276AbiKUMII (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 07:08:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231269AbiKULiR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 06:38:17 -0500
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E4B1B9621
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 03:35:40 -0800 (PST)
-Received: by mail-wr1-x436.google.com with SMTP id cl5so19415724wrb.9
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 03:35:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ByHtPoB+P7/uH1wr4e3X4UYeEScZOfqXPAiucxdATp8=;
-        b=sjSzqdWLBtvQ6hiwR1lRYNWjaJmOBMN5l6v1pjNeyiMKF7fJeEiz344kH2iLfvrqiR
-         qemR1hhqRr/uTXkArjaieC/bcfhySa1VYXblfJnONr7LluVbyBmq7oLT20zOj8gayMuE
-         n7DDq0J9xCSn6oEorgxlMCOQTse1UFROUgcimIMth1W8xku1mp7cs6gT6cWQI97XoUU7
-         ZSBxJRQdOxknG9Ji2tmKZpabqOKzQpDv0Y8xImvzMbplsZnNnxBPH9CNeLoAlJ+omXZT
-         42YvuFeXiDOrNR6EcSaEfrRiGK5xl/qm3T5HtRB2i4Vpig+d1sREDdhsqPhUtwGJLhq9
-         9TKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ByHtPoB+P7/uH1wr4e3X4UYeEScZOfqXPAiucxdATp8=;
-        b=5pNKQPwM2/5xUdE5eOOuwZY+Up5G6t7CgagkVWOjFO+xcigyLM8dFEc0BAMUwtjOra
-         8PX7zR0pjJoKf4m3CwZdgkCwlKIiypMstrKGqaNnxLf8I5a407BE79WcMJNSO1fSIVTA
-         IzYmXUZO8PpaCnkQFPjaKYfGmQq1chYrrLBZ8MWSA2O2x4labTuZMgkBlHTqHnU/jnID
-         f6zB1Dh2na7ML1v6tJGvNQfKp6DoDeYsgjd5FTz6dOe7KDOghPF9ATc+Z93JWRasZTZF
-         rPlNslriUXfB4T7gbhQ3jxhkLa9LcjtINIz3DxAE3wQGNl38O5hS66qibkMfVsIay8yJ
-         2CfA==
-X-Gm-Message-State: ANoB5pnbciTG3Np545Kd0Rnm5NJzMcsWLFgadVEinKK2IjRiiysXionW
-        x0cYKdzeLDA5tFZ9mpyKnvt5q6iPm3xQSA==
-X-Google-Smtp-Source: AA0mqf7R8C9DC55+7v6/DaLR9OdftSxbDDkOMkIs3KW9sDZxZ63nyWBXpQHGR4EY4DA83rt4qXWY9w==
-X-Received: by 2002:adf:dd81:0:b0:236:88a2:f072 with SMTP id x1-20020adfdd81000000b0023688a2f072mr10848719wrl.516.1669030538622;
-        Mon, 21 Nov 2022 03:35:38 -0800 (PST)
-Received: from [192.168.1.115] ([185.126.107.38])
-        by smtp.gmail.com with ESMTPSA id n10-20020a5d67ca000000b002302dc43d77sm1909488wrw.115.2022.11.21.03.35.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Nov 2022 03:35:37 -0800 (PST)
-Message-ID: <dcaf828f-5959-e49e-a854-632814772cc1@linaro.org>
-Date:   Mon, 21 Nov 2022 12:35:36 +0100
+        with ESMTP id S231234AbiKUMIF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 07:08:05 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 803582035A;
+        Mon, 21 Nov 2022 04:07:59 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ALACSXO011886;
+        Mon, 21 Nov 2022 12:07:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=iYdZtxyIcVkOs+W7JFZZMD2g9Q8yK4JWy0ciE3X934k=;
+ b=CQnPyRrYLcEhcRbvHycqHePQrwvpcEjI9t5Kvpik1InJwXkRh6tNW8MGsMsR57bvr5TS
+ NAn21Iacsbwb3vXal9mlhwsLNFL2TBvZO+xWDeuVXoUeOwIexTx23Q4X4bEgIUiIuAVJ
+ CYJ5aevvy4lKytUcurnmgDf4Ea0Lj3uWQgEGsMccK/ytSRDqH3OKGw4cjnUmy5d56CNB
+ w3eOResKYkHGy1ZAEn92uuV1peqTpd4LgTrdLsbIv+oKAbdcT+8EVD+HQbzL7we6wfaQ
+ BfbJI8twqbKomm0zc73EQiR/Bew77v8LS+ZHbHLpYhJaiDGL65h1EXBZ11AENleHQ+0j Wg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ky8qtggrx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Nov 2022 12:07:58 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ALApEwm015122;
+        Mon, 21 Nov 2022 12:07:57 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ky8qtggra-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Nov 2022 12:07:57 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ALC6VnT012969;
+        Mon, 21 Nov 2022 12:07:56 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06fra.de.ibm.com with ESMTP id 3kxpdj1y8h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Nov 2022 12:07:55 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ALC7qd849807700
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 21 Nov 2022 12:07:52 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6E6134C044;
+        Mon, 21 Nov 2022 12:07:52 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 13F9F4C040;
+        Mon, 21 Nov 2022 12:07:52 +0000 (GMT)
+Received: from [9.171.81.97] (unknown [9.171.81.97])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 21 Nov 2022 12:07:52 +0000 (GMT)
+Message-ID: <d8f54fc3-c99f-32b7-acd3-7f687fb8ee40@linux.ibm.com>
+Date:   Mon, 21 Nov 2022 13:07:51 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.4.2
-Subject: Re: [RFC PATCH 1/1] Dirty quota-based throttling of vcpus
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH] KVM: s390: remove unused gisa_clear_ipm_gisc() function
 Content-Language: en-US
-To:     Shivam Kumar <shivam.kumar1@nutanix.com>, qemu-devel@nongnu.org
-Cc:     pbonzini@redhat.com, peterx@redhat.com, david@redhat.com,
-        quintela@redhat.com, dgilbert@redhat.com, kvm@vger.kernel.org,
-        Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-References: <20221120225458.144802-1-shivam.kumar1@nutanix.com>
- <20221120225458.144802-2-shivam.kumar1@nutanix.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20221120225458.144802-2-shivam.kumar1@nutanix.com>
+To:     Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20221118151133.2974602-1-hca@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20221118151133.2974602-1-hca@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: xo31VfLVhR2pvIpkF52u-z4WwKID0wS8
+X-Proofpoint-GUID: VmEF9-pXkJuhloqiITYevMoLdE7HRw7K
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-21_12,2022-11-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=875 bulkscore=0 spamscore=0 adultscore=0 suspectscore=0
+ lowpriorityscore=0 mlxscore=0 malwarescore=0 priorityscore=1501
+ clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211210087
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
 
-On 20/11/22 23:54, Shivam Kumar wrote:
-> Introduces a (new) throttling scheme where QEMU defines a limit on the dirty
-> rate of each vcpu of the VM. This limit is enfored on the vcpus in small
-> intervals (dirty quota intervals) by allowing the vcpus to dirty only as many
-> pages in these intervals as to maintain a dirty rate below the set limit.
+
+Am 18.11.22 um 16:11 schrieb Heiko Carstens:
+> clang warns about an unused function:
+> arch/s390/kvm/interrupt.c:317:20:
+>    error: unused function 'gisa_clear_ipm_gisc' [-Werror,-Wunused-function]
+> static inline void gisa_clear_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
 > 
-> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
-> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
-> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
+> Remove gisa_clear_ipm_gisc(), since it is unused and get rid of this
+> warning.
+> 
+> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+
+Thanks, queued.
+
 > ---
->   accel/kvm/kvm-all.c       | 91 +++++++++++++++++++++++++++++++++++++++
->   include/exec/memory.h     |  3 ++
->   include/hw/core/cpu.h     |  5 +++
->   include/sysemu/kvm_int.h  |  1 +
->   linux-headers/linux/kvm.h |  9 ++++
->   migration/migration.c     | 22 ++++++++++
->   migration/migration.h     | 31 +++++++++++++
->   softmmu/memory.c          | 64 +++++++++++++++++++++++++++
->   8 files changed, 226 insertions(+)
-
-
->   void migrate_set_state(int *state, int old_state, int new_state);
-> diff --git a/softmmu/memory.c b/softmmu/memory.c
-> index bc0be3f62c..8f725a9b89 100644
-> --- a/softmmu/memory.c
-> +++ b/softmmu/memory.c
-> @@ -12,6 +12,7 @@
->    * Contributions after 2012-01-13 are licensed under the terms of the
->    * GNU GPL, version 2 or (at your option) any later version.
->    */
-> +#include <linux/kvm.h>
->   
->   #include "qemu/osdep.h"
->   #include "qemu/log.h"
-> @@ -34,6 +35,10 @@
->   #include "hw/boards.h"
->   #include "migration/vmstate.h"
->   #include "exec/address-spaces.h"
-> +#include "hw/core/cpu.h"
-> +#include "exec/target_page.h"
-> +#include "migration/migration.h"
-> +#include "sysemu/kvm_int.h"
->   
->   //#define DEBUG_UNASSIGNED
->   
-> @@ -2869,6 +2874,46 @@ static unsigned int postponed_stop_flags;
->   static VMChangeStateEntry *vmstate_change;
->   static void memory_global_dirty_log_stop_postponed_run(void);
->   
-> +static void init_vcpu_dirty_quota(CPUState *cpu, run_on_cpu_data arg)
-> +{
-> +    uint64_t current_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-> +    cpu->kvm_run->dirty_quota = 1;
-> +    cpu->dirty_quota_expiry_time = current_time;
-> +}
-> +
-> +void dirty_quota_migration_start(void)
-> +{
-> +    if (!kvm_state->dirty_quota_supported) {
-
-You are accessing an accelerator-specific variable in an 
-accelerator-agnostic file, this doesn't sound correct.
-
-You might introduce some hooks in AccelClass and implement them in
-accel/kvm/. See for example gdbstub_supported_sstep_flags() and
-kvm_gdbstub_sstep_flags().
-
-> +        return;
-> +    }
-> +
-> +    MigrationState *s = migrate_get_current();
-> +    /* Assuming initial bandwidth to be 128 MBps. */
-> +    double pages_per_second = (((double) 1e9) / 8.0) /
-> +                                    (double) qemu_target_page_size();
-> +    uint32_t nr_cpus;
-> +    CPUState *cpu;
-> +
-> +    CPU_FOREACH(cpu) {
-> +        nr_cpus++;
-> +    }
-> +    /*
-> +     * Currently we are hardcoding this to 2. There are plans to allow the user
-> +     * to manually select this ratio.
-> +     */
-> +    s->dirty_quota_throttle_ratio = 2;
-> +    qatomic_set(&s->per_vcpu_dirty_rate_limit,
-> +                pages_per_second / s->dirty_quota_throttle_ratio / nr_cpus);
-> +
-> +    qemu_spin_lock(&s->common_dirty_quota_lock);
-> +    s->common_dirty_quota = 0;
-> +    qemu_spin_unlock(&s->common_dirty_quota_lock);
-> +
-> +    CPU_FOREACH(cpu) {
-> +        run_on_cpu(cpu, init_vcpu_dirty_quota, RUN_ON_CPU_NULL);
-> +    }
-> +}
-> +
->   void memory_global_dirty_log_start(unsigned int flags)
->   {
->       unsigned int old_flags;
-> @@ -2891,6 +2936,7 @@ void memory_global_dirty_log_start(unsigned int flags)
->       trace_global_dirty_changed(global_dirty_tracking);
->   
->       if (!old_flags) {
-> +        dirty_quota_migration_start();
->           MEMORY_LISTENER_CALL_GLOBAL(log_global_start, Forward);
->           memory_region_transaction_begin();
->           memory_region_update_pending = true;
-> @@ -2898,6 +2944,23 @@ void memory_global_dirty_log_start(unsigned int flags)
->       }
+>   arch/s390/kvm/interrupt.c | 5 -----
+>   1 file changed, 5 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index ab569faf0df2..1dae78deddf2 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -314,11 +314,6 @@ static inline u8 gisa_get_ipm(struct kvm_s390_gisa *gisa)
+>   	return READ_ONCE(gisa->ipm);
 >   }
 >   
-> +static void reset_vcpu_dirty_quota(CPUState *cpu, run_on_cpu_data arg)
-> +{
-> +    cpu->kvm_run->dirty_quota = 0;
-> +}
-> +
-> +void dirty_quota_migration_stop(void)
-> +{
-> +    if (!kvm_state->dirty_quota_supported) {
-> +        return;
-> +    }
-> +
-> +    CPUState *cpu;
-> +    CPU_FOREACH(cpu) {
-> +        run_on_cpu(cpu, reset_vcpu_dirty_quota, RUN_ON_CPU_NULL);
-> +    }
-> +}
-> +
->   static void memory_global_dirty_log_do_stop(unsigned int flags)
+> -static inline void gisa_clear_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
+> -{
+> -	clear_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long *) gisa);
+> -}
+> -
+>   static inline int gisa_tac_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
 >   {
->       assert(flags && !(flags & (~GLOBAL_DIRTY_MASK)));
-> @@ -2907,6 +2970,7 @@ static void memory_global_dirty_log_do_stop(unsigned int flags)
->       trace_global_dirty_changed(global_dirty_tracking);
->   
->       if (!global_dirty_tracking) {
-> +        dirty_quota_migration_stop();
->           memory_region_transaction_begin();
->           memory_region_update_pending = true;
->           memory_region_transaction_commit();
-
+>   	return test_and_clear_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long *) gisa);
