@@ -2,109 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4097A632AF5
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 18:28:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 17729632B41
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 18:42:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229874AbiKUR2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 12:28:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51694 "EHLO
+        id S229985AbiKURmQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 12:42:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229797AbiKUR2o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 12:28:44 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95978C6572
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 09:28:43 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id l22-20020a17090a3f1600b00212fbbcfb78so14884224pjc.3
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 09:28:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H/15K+95NBWbCjjmQ8Nvp96hEF0xLGBnksOcJAJ5xWQ=;
-        b=oJG0huKuKEtjSji5UpmkNl3iToHas8gCbgJK1W8uHOPWtxNQYlVOapUG6/NnaEmiSB
-         /yMrbTDnvYzoAFufqfX+LE7ZU5v+txrhgnuuVU9+FAm2KK0zsFIPT5QVpIFFkz6vp19E
-         ON3zsBMmjVhxEjmb1rZtXdFNCJtG1FYbzdysBwkVfGAf011ASTFWSgel5760ZotW399f
-         buvlosR5jQLriWRKACwfAcbd9y/CMTZmQxd9FvHy98nEPWbF+tWn34ADwiRcCwqqPm9H
-         Kt+ScfCzuZzlwOm0GchoxQp6or6mNc/xuDA9d+9C+3Y+CaaK349ro+NaLNHNYIXr5I8i
-         hTGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H/15K+95NBWbCjjmQ8Nvp96hEF0xLGBnksOcJAJ5xWQ=;
-        b=GEpOLkTrNeenf1sRUeM1f7wmxicBRsvgBbgsCThCJFoDNvFtFtmLv0xw9t4Tnt7mYo
-         XFCz+dFAag8bXYf9vc7H8CDNmu5aKH+UxU45+VJYh/Euch4uSVwFS09B/v6BUUE+ISoT
-         9myaB52xrSoBT5cAexBcPATnET2bMJA8MaPoyy0GBDhzQWwev1QnDVsB7bO8CUV6ovgQ
-         +dBeCmlmC6qzNfCFqAReSIM4hQGmg2a4OGlZfKb0G015DuwBNTHP/98s+ClB0DoZTa+Z
-         MqStgYYQYhIxqnCjrlgFjwShsHTD6f6RWtjoj5YWHwTlNz1zJkDX7PMiLLrbjHb0xL4S
-         l9ig==
-X-Gm-Message-State: ANoB5pmaN5MqrjPwgK/SMHlOoupIoWhvzWx/oN2NW7DXOkJkeoDYzina
-        GqroH61oCnYnuVv+cDO3F3Y2DA==
-X-Google-Smtp-Source: AA0mqf6JCllJw8i7hRLnW42jQvepHElp3sOokcxj6BWpE9KATUkK8nSOYEY1JkNTA2w/GRPzUM1szQ==
-X-Received: by 2002:a17:90a:8406:b0:205:d3f8:5241 with SMTP id j6-20020a17090a840600b00205d3f85241mr26615262pjn.188.1669051722898;
-        Mon, 21 Nov 2022 09:28:42 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id h9-20020a170902f54900b00176a2d23d1asm10222350plf.56.2022.11.21.09.28.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Nov 2022 09:28:42 -0800 (PST)
-Date:   Mon, 21 Nov 2022 17:28:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>, kvm@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
-        ndesaulniers@google.com, alexandre.belloni@bootlin.com,
-        peterz@infradead.org, jpoimboe@kernel.org,
-        chang.seok.bae@intel.com, pawan.kumar.gupta@linux.intel.com,
-        babu.moger@amd.com, jmattson@google.com, sandipan.das@amd.com,
-        tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        fenghua.yu@intel.com, keescook@chromium.org, nathan@kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/6] x86: KVM: Advertise CMPccXADD CPUID to user space
-Message-ID: <Y3u1Rx/kFjE5/FFR@google.com>
-References: <20221118141509.489359-1-jiaxi.chen@linux.intel.com>
- <20221118141509.489359-2-jiaxi.chen@linux.intel.com>
- <efb55727-f8bd-815c-ddfc-a8432ae5af4e@intel.com>
- <f04c2e74-87e4-5d50-579a-0a60554b83d3@linux.intel.com>
- <6d7fae50-ef3c-dc1e-336c-691095007117@intel.com>
- <Y3udtm6oC7k41kaR@google.com>
- <Y3ue4PoJD7EGC5dV@zn.tnic>
+        with ESMTP id S229932AbiKURmK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 12:42:10 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62838D28B1;
+        Mon, 21 Nov 2022 09:42:08 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ALGRk4V009093;
+        Mon, 21 Nov 2022 17:42:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=yty/7DiPlJ4v2j4gvgeSX7Mya9x2N/OMpJm8yIe9JO0=;
+ b=IscGch+I0rww/6u5zkNSiki3DY0BP4IIdodchGKr8w4Okr1XKABovJNgv5DuWk7VEjPW
+ z2GWbAhfhS3ZPJBAFxC4uh8O3VtIWIw+kGl/6sJAnP38hpxAFEnLCbEIGC8iXOu8y+02
+ S1B4g1XyWoNxkvfv6fi0dg3RdrJ+nsRhiwo2nkt9QiOeBAmTj2s4VTy94z47v3TZochQ
+ +3tde1b1cTM0id2P5EK5PjxSKNWscxZAVwqxrHCpsQVb6ihxCUs6c9U/esWQnQds8Nuh
+ CijZCJ5Fpcko6Z4H/69VXjXahki0FqGkJZq1vJlAxBOGq5YZJZpABg6HAFk1JjSaXPf9 ww== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0cvg1qdf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Nov 2022 17:42:02 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ALHg2Lf017277;
+        Mon, 21 Nov 2022 17:42:02 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0cvg1qcq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Nov 2022 17:42:02 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ALHbE1h001980;
+        Mon, 21 Nov 2022 17:42:00 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 3kxpdhu1e4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Nov 2022 17:42:00 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ALHfvsc51118506
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 21 Nov 2022 17:41:57 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5896D5204E;
+        Mon, 21 Nov 2022 17:41:57 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.52.183])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id AD65A52050;
+        Mon, 21 Nov 2022 17:41:56 +0000 (GMT)
+Message-ID: <2bee338bddf828a735a7c66473679fd388840851.camel@linux.ibm.com>
+Subject: Re: [PATCH v3 1/9] KVM: s390: Extend MEM_OP ioctl by storage key
+ checked cmpxchg
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Heiko Carstens <hca@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>
+Date:   Mon, 21 Nov 2022 18:41:56 +0100
+In-Reply-To: <Y3dalbP5yb2gflA9@osiris>
+References: <20221117221758.66326-1-scgl@linux.ibm.com>
+         <20221117221758.66326-2-scgl@linux.ibm.com> <Y3dalbP5yb2gflA9@osiris>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y3ue4PoJD7EGC5dV@zn.tnic>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 2aXbb6tfkp0FHum4hPbro6_tFPL2-4f-
+X-Proofpoint-ORIG-GUID: ef1HfGmyCDiEJjkutdZsunQv77TtVL-a
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-21_14,2022-11-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 phishscore=0 malwarescore=0 impostorscore=0 mlxscore=0
+ clxscore=1015 priorityscore=1501 suspectscore=0 spamscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2210170000 definitions=main-2211210132
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 21, 2022, Borislav Petkov wrote:
-> On Mon, Nov 21, 2022 at 03:48:06PM +0000, Sean Christopherson wrote:
-> > Actually, for these features that don't require additional KVM enabling, KVM isn't
-> > making the feature avaiable to the guest.  KVM is just advertising to userspace
-> > that KVM "supports" these features.  Userspace ultimately controls guest CPUID;
-> > outside of a few special cases, KVM neither rejects nor filters unsupported bits
-> > in CPUID.
+On Fri, 2022-11-18 at 11:12 +0100, Heiko Carstens wrote:
+> On Thu, Nov 17, 2022 at 11:17:50PM +0100, Janis Schoetterl-Glausch wrote:
+> > User space can use the MEM_OP ioctl to make storage key checked reads
+> > and writes to the guest, however, it has no way of performing atomic,
+> > key checked, accesses to the guest.
+> > Extend the MEM_OP ioctl in order to allow for this, by adding a cmpxchg
+> > mode. For now, support this mode for absolute accesses only.
+> > 
+> > This mode can be use, for example, to set the device-state-change
+> > indicator and the adapter-local-summary indicator atomically.
+> > 
+> > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> > ---
+> >  include/uapi/linux/kvm.h |   5 ++
+> >  arch/s390/kvm/gaccess.h  |   3 ++
+> >  arch/s390/kvm/gaccess.c  | 101 +++++++++++++++++++++++++++++++++++++++
+> >  arch/s390/kvm/kvm-s390.c |  35 +++++++++++++-
+> >  4 files changed, 142 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index 0d5d4419139a..1f36be5493e6 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -588,6 +588,8 @@ struct kvm_s390_mem_op {
+> >  		struct {
+> >  			__u8 ar;	/* the access register number */
+> >  			__u8 key;	/* access key, ignored if flag unset */
+> > +			__u8 pad1[6];	/* ignored */
+> > +			__u64 old_p;	/* ignored if flag unset */
 > 
-> So is there any point to those "enable it in KVM" patches streaming constantly?
+> Just one comment: the suffix "_p" for pointer is quite unusual within
+> the kernel. This also would be the first of its kind within kvm.h.
+> Usually there is either no suffix or "_addr".
+> So for consistency reasons I would suggest to change this to one of
+> the common variants.
+> 
+Thanks, good point.
 
-Yes.  Most userspace VMMs sanitize their CPUID models based on KVM_GET_SUPPORTED_CPUID,
-e.g. by default, QEMU will refuse to enable features in guest CPUID that aren't
-reported as supported by KVM.
-
-Another use case is for userspace to blindly use the result of KVM_GET_SUPPORTED_CPUID
-as the guest's CPUID model, e.g. for using KVM to isolate code as opposed to standing
-up a traditional virtual machine.  For that use case, userspace again relies on KVM to
-enumerate support.
-
-What I was trying to call out in the above is that the KVM "enabling" technically
-doesn't expose the feature to the guest.  E.g. a clever guest could ignore CPUID
-and probe the relevant instructions manually by seeing whether or not they #UD.
+[...]
