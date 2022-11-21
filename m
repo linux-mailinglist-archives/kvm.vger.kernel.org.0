@@ -2,64 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DFB46449C4
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 17:55:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6807644A09
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 18:13:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235453AbiLFQzM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 11:55:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37612 "EHLO
+        id S235549AbiLFRNV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 12:13:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231990AbiLFQzK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 11:55:10 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B9991FCC5;
-        Tue,  6 Dec 2022 08:55:09 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id B56DF68B05; Tue,  6 Dec 2022 17:55:03 +0100 (CET)
-Date:   Tue, 6 Dec 2022 17:55:03 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Christoph Hellwig <hch@lst.de>, Lei Rao <lei.rao@intel.com>,
-        kbusch@kernel.org, axboe@fb.com, kch@nvidia.com, sagi@grimberg.me,
-        alex.williamson@redhat.com, cohuck@redhat.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        mjrosato@linux.ibm.com, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, kvm@vger.kernel.org,
-        eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
-        Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com
-Subject: Re: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to
- issue admin commands for VF driver.
-Message-ID: <20221206165503.GA8677@lst.de>
-References: <20221206055816.292304-1-lei.rao@intel.com> <20221206055816.292304-2-lei.rao@intel.com> <20221206061940.GA6595@lst.de> <Y49HKHP9NrId39iH@ziepe.ca> <20221206135810.GA27689@lst.de> <Y49eObpI7QoSnugu@ziepe.ca> <20221206153811.GB2266@lst.de> <Y49k++D3i8DfLOLL@ziepe.ca>
+        with ESMTP id S235523AbiLFRNT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 12:13:19 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67922272E;
+        Tue,  6 Dec 2022 09:13:18 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id w4-20020a17090ac98400b002186f5d7a4cso18671320pjt.0;
+        Tue, 06 Dec 2022 09:13:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MNTmn4Ppp22XNGK2CIb4/9yQLF2i0XM6RqxIH3zvJQc=;
+        b=SvdgCisjFp/nziYy9m+QZ+pn8qZRGnLTVAkKzitorYutPwQLt6+ipo8IsJrizeEtq1
+         Ls/fbizT+P25x3BQMlmNbQ6LbeN2NiSNKhb6ILvXLD11IctDzo7ozrHJAFULOJkz//KP
+         BHU9HVSm0bU58l748mY2viuvFdzXZT1ta5M+r14WElKfq0ZH726xw0tC/AMUUyEH1RIy
+         pKyAXKTXXqaRxYFqb5R5uezgTqi4hMZ9LEAQ1gzQ/fTpa17YCV34tvbm/mIBaT6+SahD
+         oYmzaXmk6ByKtzYYLOeQCAV9uwBdbMrW4oYkN2r749frt+m9TWFbUKxrG+fhqsz1ZkqC
+         iAOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MNTmn4Ppp22XNGK2CIb4/9yQLF2i0XM6RqxIH3zvJQc=;
+        b=Ury/hoamZeVS7fjiH6SU5maqcIkjtEcxiHdiTDYLeLc5F75f+sySf7M97KdmDSpeqY
+         V9UumVee0TRBrTeit/GzYeXVuhe+7RPlSH7WAQarJS7s61jZFq9OVQcdUWt3sEqAPotN
+         MJCbvkQYg5GZ/h39VMJbLilcbWeUjMYp0Fqi8hEnFeVr//FDSeOnLQJ0nvaEH8Vy2x1L
+         FHqLE1PtXUP3ieH8xsPypBkeBk45pP3LGBmOoQVJEsJnI3oH1CKcv1SjHoHDc5hG/hLy
+         cO1BbPaOVw31b9jBF/goIztCzITgNforGAS0SjfBMmJ1GJt8ttZH1HCST6TkAaqHwCTR
+         Kj+g==
+X-Gm-Message-State: ANoB5pnsMntivWOLkahnvKw3gU4UgP859t0GoalFPTlJTlxtFbRWNvKy
+        bIHXfH4Bq+3eMNxsuQs5j44=
+X-Google-Smtp-Source: AA0mqf7qytCU0cuB63i3d9xtAkcgDKJgc/IXkjlQg5k+IzGKNzyl6P3OQwWJVW5PrzeB2vPKS23QdA==
+X-Received: by 2002:a17:902:c104:b0:189:a931:c8a1 with SMTP id 4-20020a170902c10400b00189a931c8a1mr32927272pli.112.1670346797784;
+        Tue, 06 Dec 2022 09:13:17 -0800 (PST)
+Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
+        by smtp.gmail.com with ESMTPSA id i20-20020a170902e49400b00168dadc7354sm12875922ple.78.2022.12.06.09.13.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Dec 2022 09:13:17 -0800 (PST)
+Date:   Mon, 21 Nov 2022 11:02:54 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     Stefano Garzarella <sgarzare@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5] virtio/vsock: replace virtio_vsock_pkt with sk_buff
+Message-ID: <Y3ta3hGkygJFNZTo@bullseye>
+References: <20221202173520.10428-1-bobby.eshleman@bytedance.com>
+ <20221205122214.bky3oxipck4hsqqe@sgarzare-redhat>
+ <20221205173735.6123b941@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y49k++D3i8DfLOLL@ziepe.ca>
-User-Agent: Mutt/1.5.17 (2007-11-01)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221205173735.6123b941@kernel.org>
+X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 06, 2022 at 11:51:23AM -0400, Jason Gunthorpe wrote:
-> That is a big deviation from where VFIO is right now, the controlled
-> function is the one with the VFIO driver, it should be the one that
-> drives the migration uAPI components.
+On Mon, Dec 05, 2022 at 05:37:35PM -0800, Jakub Kicinski wrote:
+> On Mon, 5 Dec 2022 13:22:14 +0100 Stefano Garzarella wrote:
+> > As pointed out in v4, this is net-next material, so you should use the 
+> > net-next tag and base the patch on the net-next tree:
+> > https://www.kernel.org/doc/html/v6.0/process/maintainer-netdev.html#netdev-faq
+> 
+> Thanks, yes, please try to do that, makes it much less likely that 
+> the patch will be mishandled or lost.
+> 
+> > I locally applied the patch on net-next and everything is fine, so maybe 
+> > the maintainers can apply it, otherwise you should resend it with the 
+> > right tag.
+> 
+> FWIW looks like all the automated guessing kicked in correctly here,
+> so no need to repost just for the subject tag (this time).
+> 
+> > Ah, in that case I suggest you send it before the next merge window 
+> > opens (I guess next week), because net-next closes and you'll have to 
+> > wait for the next cycle.
+> 
+> +1, we'll try to take a closer look & apply tomorrow unless someone
+> speaks up.
 
-Well, that is one way to see it, but I think the more natural
-way to deal with it is to drive everyting from the controlling
-function, because that is by definition much more in control.
-
-More importantly any sane design will have easy ways to list and
-manipulate all the controlled functions from the controlling
-functions, while getting from the controlled function to the
-controlling one is extremely awkward, as anything that can be
-used for that is by definition and information leak.  It seems
-mlx5 just gets away with that by saying controlled functions are
-always VFs, and the controlling function is a PF, but that will
-break down very easily, especially once you want to nest the
-controlling scheme (and yes, I'm not making this up, as the
-nesting scheme is being proposed for nvme privately).
+Thanks all, I'll be sure to do that in the future.
