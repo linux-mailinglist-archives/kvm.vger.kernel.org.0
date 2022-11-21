@@ -2,91 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A28CD632198
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 13:08:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5278D6321EC
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 13:27:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231276AbiKUMII (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 07:08:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36150 "EHLO
+        id S230503AbiKUM1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 07:27:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231234AbiKUMIF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 07:08:05 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 803582035A;
-        Mon, 21 Nov 2022 04:07:59 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ALACSXO011886;
-        Mon, 21 Nov 2022 12:07:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=iYdZtxyIcVkOs+W7JFZZMD2g9Q8yK4JWy0ciE3X934k=;
- b=CQnPyRrYLcEhcRbvHycqHePQrwvpcEjI9t5Kvpik1InJwXkRh6tNW8MGsMsR57bvr5TS
- NAn21Iacsbwb3vXal9mlhwsLNFL2TBvZO+xWDeuVXoUeOwIexTx23Q4X4bEgIUiIuAVJ
- CYJ5aevvy4lKytUcurnmgDf4Ea0Lj3uWQgEGsMccK/ytSRDqH3OKGw4cjnUmy5d56CNB
- w3eOResKYkHGy1ZAEn92uuV1peqTpd4LgTrdLsbIv+oKAbdcT+8EVD+HQbzL7we6wfaQ
- BfbJI8twqbKomm0zc73EQiR/Bew77v8LS+ZHbHLpYhJaiDGL65h1EXBZ11AENleHQ+0j Wg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ky8qtggrx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Nov 2022 12:07:58 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ALApEwm015122;
-        Mon, 21 Nov 2022 12:07:57 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ky8qtggra-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Nov 2022 12:07:57 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ALC6VnT012969;
-        Mon, 21 Nov 2022 12:07:56 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06fra.de.ibm.com with ESMTP id 3kxpdj1y8h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Nov 2022 12:07:55 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ALC7qd849807700
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 21 Nov 2022 12:07:52 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6E6134C044;
-        Mon, 21 Nov 2022 12:07:52 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 13F9F4C040;
-        Mon, 21 Nov 2022 12:07:52 +0000 (GMT)
-Received: from [9.171.81.97] (unknown [9.171.81.97])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 21 Nov 2022 12:07:52 +0000 (GMT)
-Message-ID: <d8f54fc3-c99f-32b7-acd3-7f687fb8ee40@linux.ibm.com>
-Date:   Mon, 21 Nov 2022 13:07:51 +0100
+        with ESMTP id S230254AbiKUM1m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 07:27:42 -0500
+Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00859B1D0;
+        Mon, 21 Nov 2022 04:27:38 -0800 (PST)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 2EBE5580362;
+        Mon, 21 Nov 2022 07:27:34 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Mon, 21 Nov 2022 07:27:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to; s=fm1; t=1669033654; x=1669040854; bh=pzZVroo9kC
+        ULUynpvnhsv4sPpCFIbmKL5clPSiXkhnA=; b=UXbdLjpHs6z9sbZPniHn6npcxr
+        Fam/LfQQG8m1Ay3aVdCr2i1azAJpE+ErW+nQsuxLcPoL4LX77droh89JGM+3lY3Z
+        5ftiCvLdASY5939dT5WQ7/9ZPAjGGTuNNg+8xUhwwiSIHphl/I9vsdnz46BLvXE8
+        AQF5vHpeVBIqCcPvy+C3KZh5jocJ5LFeZ2WLC2zjOHAkqBOwlP4Xk1HsXkEgRq5T
+        l369T5MF32e76BFu+B1itbctUY4g1jp+MencST2TJ3mOQuEGIt50Yh61hA/eHpGl
+        Km9E6TySLEqpZ9SB2Tr1d5y652gjSLJ/guHMbVjpBygyk/yYC4DivmacQ4Ag==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; t=1669033654; x=1669040854; bh=pzZVroo9kCULUynpvnhsv4sPpCFI
+        bmKL5clPSiXkhnA=; b=Z6PxC3s5tt+JSv2lKV810BUcfvpnxil/bxpsGLpFxNzO
+        rtxd3pR//q5o/QpNK7k5pQHDlIN8cwfmF5NPC52wtz7U62If7bJ81pSbcxPOUvGt
+        yCuNAMzjW74MSE3rfCCobzCdRuOa56LdGbMOp/o+BvmPKuf+zethA48x/6hVfp5A
+        VellZZciPoOwrIJCGIXs6SzPEDhMgP5ovyyW6nnkE8GgvRDtUzVJLDYdTwfQZwTw
+        MgIR2F/PUeK/5/NOXcxtEtHl54cWSLRPj0C2CBqAfChOR3qgfdBvspC0hGHthBVO
+        l+q1vnheKdfHy2GkFdyVpZ4nAzEP67wjYev9uPLShg==
+X-ME-Sender: <xms:tW57Y7TKAKegDJ1UYbWF2fBRZizCIGfqkEhlxQBhkKwAMbK3Jf1E1Q>
+    <xme:tW57Y8wiWg_CKwKK6MWVGKBdHghIIRfXHBXstJPzDJ2GHmgJuKe4HZzbuGFfOpPQz
+    ZKdDlY380FEdA>
+X-ME-Received: <xmr:tW57Yw1xFHhmuZWcaP1qJts5qhMfz9UchbKNWCweAEx3xaDysaUDLOf8DG4A67avNzKVkLWrUEuXL4-u0INasefraDIytWMl>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrheeigdeflecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
+    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeehgedvve
+    dvleejuefgtdduudfhkeeltdeihfevjeekjeeuhfdtueefhffgheekteenucevlhhushht
+    vghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhh
+    drtghomh
+X-ME-Proxy: <xmx:tW57Y7A8JUGboemCFo57NP2R02Nw2IKx08deL-cCRdLly20h6XH-wQ>
+    <xmx:tW57Y0i75P_UUoflh1-8C_FJDBuYnP-ydVV7D6w4PvHOouhzAsWx9w>
+    <xmx:tW57Y_oJ7Qvx0h2gD4_Q6qYBZb48KXK13Sr0KEfPIwyUJusQPLNRbw>
+    <xmx:tm57Y_gCrxcjkVghOLGR0hZpWWmQYjqDXb5NCCROV9ghAUIFQ6ZHCA>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 21 Nov 2022 07:27:33 -0500 (EST)
+Date:   Mon, 21 Nov 2022 13:26:23 +0100
+From:   Greg KH <greg@kroah.com>
+To:     Suleiman Souhlal <suleiman@google.com>
+Cc:     stable@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        bp@alien8.de, pbonzini@redhat.com, peterz@infradead.org,
+        jpoimboe@kernel.org, cascardo@canonical.com, surajjs@amazon.com,
+        ssouhlal@freebsd.org
+Subject: Re: [PATCH 4.19 00/34] Intel RETBleed mitigations for 4.19.
+Message-ID: <Y3tub/ldt7gwLczO@kroah.com>
+References: <20221117091952.1940850-1-suleiman@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH] KVM: s390: remove unused gisa_clear_ipm_gisc() function
-Content-Language: en-US
-To:     Heiko Carstens <hca@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20221118151133.2974602-1-hca@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20221118151133.2974602-1-hca@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: xo31VfLVhR2pvIpkF52u-z4WwKID0wS8
-X-Proofpoint-GUID: VmEF9-pXkJuhloqiITYevMoLdE7HRw7K
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-21_12,2022-11-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- mlxlogscore=875 bulkscore=0 spamscore=0 adultscore=0 suspectscore=0
- lowpriorityscore=0 mlxscore=0 malwarescore=0 priorityscore=1501
- clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211210087
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221117091952.1940850-1-suleiman@google.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
         SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,38 +83,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-Am 18.11.22 um 16:11 schrieb Heiko Carstens:
-> clang warns about an unused function:
-> arch/s390/kvm/interrupt.c:317:20:
->    error: unused function 'gisa_clear_ipm_gisc' [-Werror,-Wunused-function]
-> static inline void gisa_clear_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
+On Thu, Nov 17, 2022 at 06:19:18PM +0900, Suleiman Souhlal wrote:
+> This series backports the mitigations for RETBleed for Intel CPUs to
+> the 4.19 kernel.
 > 
-> Remove gisa_clear_ipm_gisc(), since it is unused and get rid of this
-> warning.
+> It's based on the 5.4 [1] and 4.14 [2] backports.
 > 
-> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+> Tested on Skylake Chromebook.
 
-Thanks, queued.
+Very nice, thank you!
 
-> ---
->   arch/s390/kvm/interrupt.c | 5 -----
->   1 file changed, 5 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index ab569faf0df2..1dae78deddf2 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -314,11 +314,6 @@ static inline u8 gisa_get_ipm(struct kvm_s390_gisa *gisa)
->   	return READ_ONCE(gisa->ipm);
->   }
->   
-> -static inline void gisa_clear_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
-> -{
-> -	clear_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long *) gisa);
-> -}
-> -
->   static inline int gisa_tac_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
->   {
->   	return test_and_clear_bit_inv(IPM_BIT_OFFSET + gisc, (unsigned long *) gisa);
+All now queued up.
+
+greg k-h
