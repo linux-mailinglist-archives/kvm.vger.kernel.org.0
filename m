@@ -2,208 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 455FE632F73
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 23:00:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 07E4A6330C2
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 00:40:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231145AbiKUWAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 17:00:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48006 "EHLO
+        id S231747AbiKUXkc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 18:40:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229695AbiKUWAV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 17:00:21 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D8BDBF832;
-        Mon, 21 Nov 2022 14:00:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669068020; x=1700604020;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+ma0WakvZrX/QeghPHE60d1tluXLn7n6TDwbT58Zem4=;
-  b=TKNP3wfM08EXlQKOE75RHLtphaklaHzj9jUm7AVes2JvylUQkBfvsj1L
-   RRuaQWCqUFT5qOIMvHMfWe3bgt3x9C/F5XGpF52OTORBKnd2TWGG8RRMs
-   S+TCQHO046vJEQtbRdXbY1MXu975pfvGLrhz5kcbJlyxdnQTdrTAByKW2
-   wMcmEf2DiQSoxXqNUskBEzfkP815houvYJNM0yX8lP8YYxwI64mfA40aE
-   g3Pmx1349oNrPIkvf7Ku7Pgr5lVGW9LT+rEfpr2exGlmOR8XGcFqMiJMT
-   O+tl/T6/fNeSo0oGkRxomrzsCleoW2/SsNn8KHD9sbku9jNGa7eird93g
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="301218039"
-X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
-   d="scan'208";a="301218039"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 14:00:19 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="886277273"
-X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
-   d="scan'208";a="886277273"
-Received: from dylanhol-mobl.amr.corp.intel.com (HELO [10.212.242.103]) ([10.212.242.103])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 14:00:16 -0800
-Message-ID: <cb64427e-31a2-eac0-a7f6-546571ac2724@linux.intel.com>
-Date:   Mon, 21 Nov 2022 14:00:14 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.4.2
-Subject: Re: [PATCH v7 03/20] x86/virt/tdx: Disable TDX if X2APIC is not
- enabled
-Content-Language: en-US
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc:     "Hansen, Dave" <dave.hansen@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-References: <cover.1668988357.git.kai.huang@intel.com>
- <c5f484c1a87ee052597fd5f539cf021f158755b9.1668988357.git.kai.huang@intel.com>
- <62c67ed3-e4d1-082f-800a-b0837c9432a9@linux.intel.com>
- <31cb1df3cf21889fb33a7c675aa1bf5fa2078cad.camel@intel.com>
-From:   Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-In-Reply-To: <31cb1df3cf21889fb33a7c675aa1bf5fa2078cad.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231671AbiKUXka (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 18:40:30 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEE91B8FB6
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 15:40:29 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id r126-20020a632b84000000b004393806c06eso7589237pgr.4
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 15:40:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zFCg8eQyxJ3YiwHQJTueCjvpRWd24CEedZt1FgDbs2A=;
+        b=c3e7dEfzyHyyb2tymFn9lfTQ7lWoHc+TnQZBFgbp6eHBJ/M9ppJj1ZVo0YqrNdnsgg
+         ioCId1IFXcAJJJHKX7CVtomhNqR071qP367AZjRFHxlSnGtENoI6znHuhT+AgIpRPdDJ
+         Qxt/GW5+d0cPRh1nlhM6opcCifMSoAVLIBUWoydKUAeqsKUUXItmNxuk2W1NmReVP9yT
+         ajekZU0yAt5c2Iffh3jq+ftXKOzKqBcWCNQ+d5FqAjEs6tZTwXl2aaKCFAZjRwxsaq5S
+         8hfzg98BUZrT5TFaHuo3cXz8DK1Y9COBbhYa2cv4IXd4CFs+6mN4LM/pqBd49qAhbWEn
+         55BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zFCg8eQyxJ3YiwHQJTueCjvpRWd24CEedZt1FgDbs2A=;
+        b=U5DKXxByYHtC6MM2NUxY9ConkoBlJ1EkDrSD9jgr0G3u7To/ScZ0lsQTvwyt9dTIuC
+         JdoZ+SgjCaf4JjdyiNeKDxygLeYP25wbs5G5x/1NPdiU/nnwtNbbrcuMXP4c3dcC/Qxc
+         ZLfbagFGUyK7Jp/5z8dDd5kwpXIGJKNzSrT5Nuyq3Mdq2txlJK4+fE4IWcF+dorU1qJ/
+         aMxgMscOgHATMv/HHvmBP5CCvGFt1INSXZH5V747tJ/NYgO92M/UnbIxIFlnoRZSjvJD
+         Ixle4pe7SB6hiKSv0z1yude7VGslJR4PYa0+/AZoCdvb3HFlstTFJ+gqhWsCGXBCQO76
+         DWfQ==
+X-Gm-Message-State: ANoB5pnv8MnnOz3Z9uWe2I2WVtOaTDWqCpveltY0BHoeinmXEynNDsha
+        DvOE9E0Fedi0htePVFwn2/cWfpa1dr3k
+X-Google-Smtp-Source: AA0mqf43ZnvPS3T3OgvIZVEV8SrAehRfExGRAijdCF4ppQi8XcXG2CrGAAiXoX2EIOpResh4wRnE+KtSrf85
+X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
+ (user=vipinsh job=sendgmr) by 2002:a17:90a:460b:b0:218:8a84:aeca with SMTP id
+ w11-20020a17090a460b00b002188a84aecamr16961664pjg.63.1669074029391; Mon, 21
+ Nov 2022 15:40:29 -0800 (PST)
+Date:   Mon, 21 Nov 2022 15:40:20 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
+Message-ID: <20221121234026.3037083-1-vipinsh@google.com>
+Subject: [PATCH v2 0/6] Add Hyper-v extended hypercall support in KVM
+From:   Vipin Sharma <vipinsh@google.com>
+To:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
+        dmatlack@google.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This patch series adds Hyper-V extended hypercall support. All
+hypercalls will exit to userspace if CPUID.0x40000003.EBX BIT(20) is
+set.
 
+v2:
+- Intorduced ASSERT_EXIT_REASON macro and replaced all occurences of
+  TEST_ASSERT for vcpu exit reason.
+- Skip hyperv_extended_hypercalls test if extended hypercalls are not
+  supported by the kernel.
+- Rebased with latest KVM queue.
+- Addressed all of the comments in patch 6 of v1.
 
-On 11/21/22 1:44 AM, Huang, Kai wrote:
-> On Sun, 2022-11-20 at 19:51 -0800, Sathyanarayanan Kuppuswamy wrote:
->>
->> On 11/20/22 4:26 PM, Kai Huang wrote:
->>> The MMIO/xAPIC interface has some problems, most notably the APIC LEAK
->>
->> "some problems" looks more generic. May be we can be specific here. Like
->> it has security issues?
-> 
-> It was quoted from below upstream commit id (I only kept the one that I quoted
-> to save space):
+v1: https://lore.kernel.org/lkml/20221105045704.2315186-1-vipinsh@google.com/
 
-Ok.
+RFC: https://lore.kernel.org/lkml/20221021185916.1494314-1-vipinsh@google.com/
 
-> 
-> commit b8d1d163604bd1e600b062fb00de5dc42baa355f (tag: x86_apic_for_v6.1_rc1,
-> tip/x86/apic)
-> Author: Daniel Sneddon <daniel.sneddon@linux.intel.com>
-> Date:   Tue Aug 16 16:19:42 2022 -0700
-> 
->     x86/apic: Don't disable x2APIC if locked
->     
->     ....
->     
->     The MMIO/xAPIC interface has some problems, most notably the APIC LEAK
->     [1].  This bug allows an attacker to use the APIC MMIO interface to
->     extract data from the SGX enclave.
->     
->     ....
->     
->     [1]: https://aepicleak.com/aepicleak.pdf
->     
->     Signed-off-by: Daniel Sneddon <daniel.sneddon@linux.intel.com>
->     Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
->     Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
->     Tested-by: Neelima Krishnan <neelima.krishnan@intel.com>
->     Link:
-> https://lkml.kernel.org/r/20220816231943.1152579-1-daniel.sneddon@linux.intel.com
-> 
-> 
->>
->>> [1].  This bug allows an attacker to use the APIC MMIO interface to
->>> extract data from the SGX enclave.
->>>
->>> TDX is not immune from this either.  Early check X2APIC and disable TDX
->>> if X2APIC is not enabled, and make INTEL_TDX_HOST depend on X86_X2APIC.
->>>
->>> [1]: https://aepicleak.com/aepicleak.pdf
->>>
->>> Link: https://lore.kernel.org/lkml/d6ffb489-7024-ff74-bd2f-d1e06573bb82@intel.com/
->>> Link: https://lore.kernel.org/lkml/ba80b303-31bf-d44a-b05d-5c0f83038798@intel.com/
->>> Signed-off-by: Kai Huang <kai.huang@intel.com>
->>> ---
->>>
->>> v6 -> v7:
->>>  - Changed to use "Link" for the two lore links to get rid of checkpatch
->>>    warning.
->>>
->>> ---
->>>  arch/x86/Kconfig            |  1 +
->>>  arch/x86/virt/vmx/tdx/tdx.c | 11 +++++++++++
->>>  2 files changed, 12 insertions(+)
->>>
->>> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
->>> index cced4ef3bfb2..dd333b46fafb 100644
->>> --- a/arch/x86/Kconfig
->>> +++ b/arch/x86/Kconfig
->>> @@ -1958,6 +1958,7 @@ config INTEL_TDX_HOST
->>>  	depends on CPU_SUP_INTEL
->>>  	depends on X86_64
->>>  	depends on KVM_INTEL
->>> +	depends on X86_X2APIC
->>>  	help
->>>  	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
->>>  	  host and certain physical attacks.  This option enables necessary TDX
->>> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
->>> index 982d9c453b6b..8d943bdc8335 100644
->>> --- a/arch/x86/virt/vmx/tdx/tdx.c
->>> +++ b/arch/x86/virt/vmx/tdx/tdx.c
->>> @@ -12,6 +12,7 @@
->>>  #include <linux/printk.h>
->>>  #include <asm/msr-index.h>
->>>  #include <asm/msr.h>
->>> +#include <asm/apic.h>
->>>  #include <asm/tdx.h>
->>>  #include "tdx.h"
->>>  
->>> @@ -81,6 +82,16 @@ static int __init tdx_init(void)
->>>  		goto no_tdx;
->>>  	}
->>>  
->>> +	/*
->>> +	 * TDX requires X2APIC being enabled to prevent potential data
->>> +	 * leak via APIC MMIO registers.  Just disable TDX if not using
->>> +	 * X2APIC.
->>
->> Remove the double space.
-> 
-> Sorry which "double space"?
+Vipin Sharma (6):
+  KVM: x86: hyper-v: Use common code for hypercall userspace exit
+  KVM: x86: hyper-v: Add extended hypercall support in Hyper-v
+  KVM: selftests: Test Hyper-V extended hypercall enablement
+  KVM: selftests: Replace hardcoded Linux OS id with HYPERV_LINUX_OS_ID
+  KVM: selftests: Make vCPU exit reason test assertion common.
+  KVM: selftests: Test Hyper-V extended hypercall exit to userspace
 
-Before Just disable. It looked like double space. Is it not?
-
-> 
->>
->>> +	 */
->>> +	if (!x2apic_enabled()) {
->>> +		pr_info("Disable TDX as X2APIC is not enabled.\n");
->>
->> pr_warn()?
-> 
-> Why?
-
-Since it is a failure case, I thought pr_warn would be better. It is up
-to you.
-
-> 
+ arch/x86/kvm/hyperv.c                         | 43 +++++----
+ tools/testing/selftests/kvm/.gitignore        |  1 +
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../testing/selftests/kvm/aarch64/psci_test.c |  4 +-
+ .../testing/selftests/kvm/include/test_util.h | 10 ++
+ .../selftests/kvm/include/x86_64/hyperv.h     |  4 +
+ .../selftests/kvm/include/x86_64/processor.h  |  3 +
+ .../kvm/lib/s390x/diag318_test_handler.c      |  3 +-
+ .../selftests/kvm/s390x/sync_regs_test.c      | 15 +--
+ .../selftests/kvm/set_memory_region_test.c    |  6 +-
+ tools/testing/selftests/kvm/x86_64/amx_test.c |  8 +-
+ .../kvm/x86_64/cr4_cpuid_sync_test.c          |  8 +-
+ .../testing/selftests/kvm/x86_64/debug_regs.c |  2 +-
+ .../selftests/kvm/x86_64/flds_emulation.h     |  5 +-
+ .../selftests/kvm/x86_64/hyperv_clock.c       |  9 +-
+ .../selftests/kvm/x86_64/hyperv_evmcs.c       |  8 +-
+ .../kvm/x86_64/hyperv_extended_hypercalls.c   | 94 +++++++++++++++++++
+ .../selftests/kvm/x86_64/hyperv_features.c    | 23 +++--
+ .../testing/selftests/kvm/x86_64/hyperv_ipi.c |  6 +-
+ .../selftests/kvm/x86_64/hyperv_svm_test.c    |  7 +-
+ .../selftests/kvm/x86_64/hyperv_tlb_flush.c   | 14 +--
+ .../selftests/kvm/x86_64/kvm_clock_test.c     |  5 +-
+ .../selftests/kvm/x86_64/kvm_pv_test.c        |  5 +-
+ .../selftests/kvm/x86_64/monitor_mwait_test.c |  9 +-
+ .../kvm/x86_64/nested_exceptions_test.c       |  5 +-
+ .../selftests/kvm/x86_64/platform_info_test.c | 14 +--
+ .../kvm/x86_64/pmu_event_filter_test.c        |  6 +-
+ tools/testing/selftests/kvm/x86_64/smm_test.c |  9 +-
+ .../testing/selftests/kvm/x86_64/state_test.c |  8 +-
+ .../selftests/kvm/x86_64/svm_int_ctl_test.c   |  8 +-
+ .../kvm/x86_64/svm_nested_shutdown_test.c     |  7 +-
+ .../kvm/x86_64/svm_nested_soft_inject_test.c  |  6 +-
+ .../selftests/kvm/x86_64/svm_vmcall_test.c    |  6 +-
+ .../selftests/kvm/x86_64/sync_regs_test.c     | 25 +----
+ .../kvm/x86_64/triple_fault_event_test.c      |  9 +-
+ .../selftests/kvm/x86_64/tsc_scaling_sync.c   |  6 +-
+ .../kvm/x86_64/ucna_injection_test.c          | 22 +----
+ .../selftests/kvm/x86_64/userspace_io_test.c  |  6 +-
+ .../kvm/x86_64/userspace_msr_exit_test.c      | 22 +----
+ .../kvm/x86_64/vmx_apic_access_test.c         | 11 +--
+ .../kvm/x86_64/vmx_close_while_nested_test.c  |  5 +-
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c |  7 +-
+ .../vmx_exception_with_invalid_guest_state.c  |  4 +-
+ .../x86_64/vmx_invalid_nested_guest_state.c   |  4 +-
+ .../kvm/x86_64/vmx_nested_tsc_scaling_test.c  |  6 +-
+ .../kvm/x86_64/vmx_preemption_timer_test.c    |  8 +-
+ .../kvm/x86_64/vmx_tsc_adjust_test.c          |  6 +-
+ .../selftests/kvm/x86_64/xapic_ipi_test.c     |  6 +-
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    |  7 +-
+ .../selftests/kvm/x86_64/xen_vmcall_test.c    |  5 +-
+ 50 files changed, 211 insertions(+), 310 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
 
 -- 
-Sathyanarayanan Kuppuswamy
-Linux Kernel Developer
+2.38.1.584.g0f3c55d4c2-goog
+
