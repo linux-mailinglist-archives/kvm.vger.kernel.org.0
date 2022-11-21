@@ -2,88 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 477A56330F6
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 00:48:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 214336330F8
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 00:50:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231936AbiKUXsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 18:48:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53480 "EHLO
+        id S231909AbiKUXuw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 18:50:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231991AbiKUXsc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 18:48:32 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53A762E2;
-        Mon, 21 Nov 2022 15:48:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669074498; x=1700610498;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=3QFhYCGVIFGfzM0P2JRBlzSrAHp6vmlTph1ySfJVank=;
-  b=MZf/0dZzLa/x0luX+z1YUY2W9qnTQtUPQ1cjbBuD39IpJcCyWSrdeMzr
-   3e2Z0Eu9VHnfwD6Jp/b9s7FNtjktJhv7SfN5DsdKYzX4Vms/88QKArQeC
-   ClKYnLZUyBKUzQAsTuKgeLYL3SJr7EzNQZp27H5xOPMMYYe/9YLgkaNJQ
-   lkBanKPR1Vcd0MkmdGLwCvKmJU6WTuN6CtsHd/Ku9QAyQ0SvVLPkzoMVl
-   mh46HB421z0AofApVhNv3uJ1Kol/lPWrlYo4Uz43UUyUOSK2oeaNPPqP/
-   ntmfKCltp1mh6smkam1GUQ+V/gsEBLfoWHyLeGs+v4HedYMoYQZKXGfUm
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="301236422"
-X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
-   d="scan'208";a="301236422"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 15:48:12 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="747109675"
-X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
-   d="scan'208";a="747109675"
-Received: from ticela-or-327.amr.corp.intel.com (HELO [10.209.6.63]) ([10.209.6.63])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 15:48:10 -0800
-Message-ID: <6260c853-3c6c-7302-677e-1910918c69b7@intel.com>
-Date:   Mon, 21 Nov 2022 15:48:09 -0800
+        with ESMTP id S231322AbiKUXuu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 18:50:50 -0500
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F47ED59
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 15:50:49 -0800 (PST)
+Received: by mail-ot1-x32c.google.com with SMTP id cn2-20020a056830658200b0066c74617e3dso8329602otb.2
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 15:50:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atishpatra.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9qJGSmI/PVM4rhm2z0vPY9+1OW24z6YeaOBoyxuNZ2Y=;
+        b=pZeRXuaDR4YUAfk9pdiqFA9TNENllOMQJLmkdrsc2MdWnAAdd30cd7c7ROFGKUDQf6
+         +ZNNNZ6KQrQS7mXrU5dtHljL+yC4zTULQH3K6B1tf9UZpkaXG5sbD0ytAKxL8yhOTF1I
+         veCJvHxCJEFLT1214Au5yOvydOw7ieR3Csaxo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9qJGSmI/PVM4rhm2z0vPY9+1OW24z6YeaOBoyxuNZ2Y=;
+        b=nxNmiUw60Q457i42vnskpsHjRWz3/hiK9+VSSW3hqCXd6Vt5LRisM/K2OEriLvPSxQ
+         dPj273kE1fd86kItb44IvRNmxnwrUAhmJvsZ63+eK6zABNHueq6DT6JKf2Itt/mJvMiT
+         xecyce5922qi/59XFjieWe1xTDxi1DEFCM3CyW9JufPM54aclWjHJAq+0etaJ/sfYsVP
+         Hzznh2bK2pe4vd5atE+zFhTu1avM7+MxoK95Yy/vBBnANy9r0qrcE6bEaczL+uRmGytU
+         ltVlHGsd1AjUHFxbOgd7ZNCHrbVv3jf5J8AunNDIM62lDAZBMZNvNFBXLvjsF9M9HHe5
+         C0Hg==
+X-Gm-Message-State: ANoB5pnkdu9sb0a55Y+/Gvxp7OOwPInXo1HSbTFUmkQAwGM537xq3rQk
+        6qCo+zaCk4NFQUgMS2gSLbN4u86mcbkd2Qbp5eqL
+X-Google-Smtp-Source: AA0mqf7kgYx54Yys6ETxvNQky+UEeKJ5p7LWh6nQdHq65TGyGvoY5M23v26YV+tFfDLtE9o9NFgqlU+8tlQQZEuniNM=
+X-Received: by 2002:a05:6830:22f2:b0:669:3797:c1b4 with SMTP id
+ t18-20020a05683022f200b006693797c1b4mr10436192otc.293.1669074648514; Mon, 21
+ Nov 2022 15:50:48 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v7 01/20] x86/tdx: Define TDX supported page sizes as
- macros
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
-        kirill.shutemov@linux.intel.com, ying.huang@intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com,
-        tony.luck@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        isaku.yamahata@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com
-References: <cover.1668988357.git.kai.huang@intel.com>
- <d6c6e664c445e9ccf1528625f0e21bbb8471d35f.1668988357.git.kai.huang@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <d6c6e664c445e9ccf1528625f0e21bbb8471d35f.1668988357.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220718170205.2972215-1-atishp@rivosinc.com> <20220718170205.2972215-2-atishp@rivosinc.com>
+ <20221101123008.e3bwen6f2yxi3whi@kamzik>
+In-Reply-To: <20221101123008.e3bwen6f2yxi3whi@kamzik>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Mon, 21 Nov 2022 15:50:37 -0800
+Message-ID: <CAOnJCU+wf=CR12GONjBougZGs+ZQV1MoDAK-w+ALQatEECoFBQ@mail.gmail.com>
+Subject: Re: [RFC 1/9] RISC-V: Define a helper function to probe number of
+ hardware counters
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>, Guo Ren <guoren@kernel.org>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Will Deacon <will@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/20/22 16:26, Kai Huang wrote:
-> +/*
-> + * TDX supported page sizes (4K/2M/1G).
-> + *
-> + * Those values are part of the TDX module ABI.  Do not change them.
-> + */
-> +#define TDX_PS_4K	0
-> +#define TDX_PS_2M	1
-> +#define TDX_PS_1G	2
+On Tue, Nov 1, 2022 at 5:30 AM Andrew Jones <ajones@ventanamicro.com> wrote:
+>
+> On Mon, Jul 18, 2022 at 10:01:57AM -0700, Atish Patra wrote:
+> > KVM module needs to know how many hardware counters the platform supports.
+> > Otherwise, it will not be able to show optimal value of virtual
+>                                         ^ the
+> > counters to the guest.
+> >
+> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> > ---
+> >  drivers/perf/riscv_pmu_sbi.c   | 23 +++++++++++++++++------
+> >  include/linux/perf/riscv_pmu.h |  4 ++++
+> >  2 files changed, 21 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
+> > index 24124546844c..1723af68ffa1 100644
+> > --- a/drivers/perf/riscv_pmu_sbi.c
+> > +++ b/drivers/perf/riscv_pmu_sbi.c
+> > @@ -27,6 +27,7 @@
+> >   */
+> >  static union sbi_pmu_ctr_info *pmu_ctr_list;
+> >  static unsigned int riscv_pmu_irq;
+> > +static struct riscv_pmu *rvpmu;
+>
+> Do we really need rvpmu? From a quick scan of the series it's only used
+> for num_hw_counters, which has to be added to struct riscv_pmu, and
+> num_counters. How about instead creating a static global for num_counters
 
-That comment can just be:
+Yes. I added rvpmu just for future usage if any.
 
-/* TDX supported page sizes from the TDX module ABI. */
+> and then getting num_hw_counters by iterating pmu_ctr_list. If we want
 
-I think folks understand that the kernel can't willy nilly change ABI
-values.
+iteration is fine as we are doing that for hpm_width anyways.
+
+> riscv_pmu_sbi_get_num_hw_ctrs() to be faster, then we can cache the value
+> in a static variable in the function.
+>
+
+We have cmask now which can be cached in a static variable. We need to
+retrieve the
+counter width and the hardware counters for kvm. I have combined PATCH
+1 & PATCH 2
+to return both the values in one function.
+
+> Thanks,
+> drew
+
+
+
+-- 
+Regards,
+Atish
