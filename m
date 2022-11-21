@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A1056317AD
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 01:28:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DDC46317AB
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 01:28:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230006AbiKUA2O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Nov 2022 19:28:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57614 "EHLO
+        id S229842AbiKUA2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Nov 2022 19:28:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229841AbiKUA1b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229845AbiKUA1b (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 20 Nov 2022 19:27:31 -0500
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D6D612B;
-        Sun, 20 Nov 2022 16:27:25 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D37B0B63;
+        Sun, 20 Nov 2022 16:27:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668990445; x=1700526445;
+  t=1668990449; x=1700526449;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KhP8T6MQSf6upYtvCFaMabziPVPSa54uAPjTpE/5J6U=;
-  b=mjejGvAfYHGUuXM1+JRE7TbQbsl/23UP1L68UOtB5ACr70Batjb0tLVN
-   9k42Ii9qSCffjiJVgoPOmgSeBXHg8AmY1fdqtIGbQ3+WO+8tQRlppZTj9
-   fV5pji0I48imGZE4U/dZQEs/yIZOQ6XSJY7uvR0DV1aO/k2eT9vEXSDSF
-   BSjonsPdJGbyqQ/pj71Y/evYkEa9LYqLECN7KMaakkxCIqkiAZw6HXWgz
-   C5aheeTjY9lUonds1Oyzb8wjDenL4lcro4H8Sa1yNSNnAL+QtryT6bTSk
-   mbDnE7Ag1akAYPs50Nzy6jSpiIsmWBEk3NnFC13+77rwwNzS15cpcerzi
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10537"; a="399732311"
+  bh=gOZ0T77u1owzOZnOoSrcaq1f36vBbh2UkFPGd0zudQU=;
+  b=fshP4RzAcPivCZj9voHBLtObrFqIdBHHUw6YCKJkzpzrfb70Yrw2mXjE
+   GRC4x/1V1l3HBSczukuhLob81yms3MdDjLnOBta40Jm9mIEmGC3WFsixG
+   gaBWVH18haj7xzbaoLGuoroMNq3P1wfngG4XHZhgkmMhkM5YUhrkE6SUk
+   8Phd6FJ4CWaIuuQWBnkSdCXL+1CYhqGEG9l3Pab1Aq2pWvdS3LaeCLK/h
+   OhVJSZyEiNhVKv/JMvwiuDQI1fSSMpgbvkfIm+7gdriBlxT7R0FuiXcf+
+   qd6nh8tF4LjhwxleTUe99zV16JyPrn8KNtqpdZh7h1ofJpwV7A9U4miJ9
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10537"; a="399732315"
 X-IronPort-AV: E=Sophos;i="5.96,180,1665471600"; 
-   d="scan'208";a="399732311"
+   d="scan'208";a="399732315"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2022 16:27:25 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10537"; a="729825287"
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2022 16:27:29 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10537"; a="729825319"
 X-IronPort-AV: E=Sophos;i="5.96,180,1665471600"; 
-   d="scan'208";a="729825287"
+   d="scan'208";a="729825319"
 Received: from tomnavar-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.176.15])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2022 16:27:21 -0800
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2022 16:27:25 -0800
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
@@ -47,9 +47,9 @@ Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
         ak@linux.intel.com, isaku.yamahata@intel.com, chao.gao@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
         sagis@google.com, imammedo@redhat.com, kai.huang@intel.com
-Subject: [PATCH v7 07/20] x86/virt/tdx: Do TDX module global initialization
-Date:   Mon, 21 Nov 2022 13:26:29 +1300
-Message-Id: <40824ec3e3dc759705dcfa1cb2929d18c12b417a.1668988357.git.kai.huang@intel.com>
+Subject: [PATCH v7 08/20] x86/virt/tdx: Do logical-cpu scope TDX module initialization
+Date:   Mon, 21 Nov 2022 13:26:30 +1300
+Message-Id: <083f32ce0721611b7fc9297641cc8f5f222b937e.1668988357.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <cover.1668988357.git.kai.huang@intel.com>
 References: <cover.1668988357.git.kai.huang@intel.com>
@@ -64,63 +64,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The first step of initializing the module is to call TDH.SYS.INIT once
-on any logical cpu to do module global initialization.  Do the module
-global initialization.
+After the global module initialization, the next step is logical-cpu
+scope module initialization.  Logical-cpu initialization requires
+calling TDH.SYS.LP.INIT on all BIOS-enabled CPUs.  This SEAMCALL can run
+concurrently on all CPUs.
 
-It also detects the TDX module, as seamcall() returns -ENODEV when the
-module is not loaded.
+Use the helper introduced for shutting down the module to do logical-cpu
+scope initialization.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
-
-v6 -> v7:
- - Improved changelog.
-
----
- arch/x86/virt/vmx/tdx/tdx.c | 19 +++++++++++++++++--
+ arch/x86/virt/vmx/tdx/tdx.c | 14 ++++++++++++++
  arch/x86/virt/vmx/tdx/tdx.h |  1 +
- 2 files changed, 18 insertions(+), 2 deletions(-)
+ 2 files changed, 15 insertions(+)
 
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 5db1a05cb4bd..f292292313bd 100644
+index f292292313bd..2cf7090667aa 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -208,8 +208,23 @@ static void seamcall_on_each_cpu(struct seamcall_ctx *sc)
-  */
- static int init_tdx_module(void)
- {
--	/* The TDX module hasn't been detected */
--	return -ENODEV;
-+	int ret;
+@@ -199,6 +199,15 @@ static void seamcall_on_each_cpu(struct seamcall_ctx *sc)
+ 	on_each_cpu(seamcall_smp_call_function, sc, true);
+ }
+ 
++static int tdx_module_init_cpus(void)
++{
++	struct seamcall_ctx sc = { .fn = TDH_SYS_LP_INIT };
 +
-+	/*
-+	 * Call TDH.SYS.INIT to do the global initialization of
-+	 * the TDX module.  It also detects the module.
-+	 */
-+	ret = seamcall(TDH_SYS_INIT, 0, 0, 0, 0, NULL, NULL);
++	seamcall_on_each_cpu(&sc);
++
++	return atomic_read(&sc.err);
++}
++
+ /*
+  * Detect and initialize the TDX module.
+  *
+@@ -218,6 +227,11 @@ static int init_tdx_module(void)
+ 	if (ret)
+ 		goto out;
+ 
++	/* Logical-cpu scope initialization */
++	ret = tdx_module_init_cpus();
 +	if (ret)
 +		goto out;
 +
-+	/*
-+	 * Return -EINVAL until all steps of TDX module initialization
-+	 * process are done.
-+	 */
-+	ret = -EINVAL;
-+out:
-+	return ret;
- }
- 
- static void shutdown_tdx_module(void)
+ 	/*
+ 	 * Return -EINVAL until all steps of TDX module initialization
+ 	 * process are done.
 diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 215cc1065d78..0b415805c921 100644
+index 0b415805c921..9ba11808bd45 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.h
 +++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -15,6 +15,7 @@
- /*
+@@ -16,6 +16,7 @@
   * TDX module SEAMCALL leaf functions
   */
-+#define TDH_SYS_INIT		33
+ #define TDH_SYS_INIT		33
++#define TDH_SYS_LP_INIT		35
  #define TDH_SYS_LP_SHUTDOWN	44
  
  /*
