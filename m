@@ -2,92 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D92A063282A
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 16:30:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 664E7632861
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 16:38:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232448AbiKUPaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 10:30:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57966 "EHLO
+        id S230474AbiKUPif (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 10:38:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232445AbiKUP3y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 10:29:54 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13938DF80;
-        Mon, 21 Nov 2022 07:29:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669044547; x=1700580547;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=0ocp0OORCesdWMSJVXSnmGTZ9TeQKI/Q0W1c3l/hfEc=;
-  b=RB44sEk/538mMBQfzjhVtI1ojIeGhQxQ4OQlMuEhOSbNIG6BolrypVxl
-   4Q9AB42NSNFOauk0smPNG1ADTBH6FnCPZ6fBvi5oBTlOWnApOdIr+UWbQ
-   ggfcmwtVD5id1OVsjBUVT93qHjnhqBpZG/MrS7nTetZuusAmj385581q9
-   4QdbMp/LbVjUae5Zgh9b6c41Jiq6LdzEQaqeisEICIPQ+ytER1nMacSj7
-   SYqjOc2cZq9rwjLYMW3YgnZCu5KdyiT3Dvk8+pvOvDzpBIz3Hg75PpKJK
-   Zv2+JMYfc+bsLFRjNhYzVdg5FP2PtIYTbzaNtf046/HCubKkG9YeWzbiy
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="377843943"
-X-IronPort-AV: E=Sophos;i="5.96,181,1665471600"; 
-   d="scan'208";a="377843943"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 07:29:06 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="730043155"
-X-IronPort-AV: E=Sophos;i="5.96,181,1665471600"; 
-   d="scan'208";a="730043155"
-Received: from ticela-or-327.amr.corp.intel.com (HELO [10.209.6.63]) ([10.209.6.63])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 07:29:04 -0800
-Message-ID: <6d7fae50-ef3c-dc1e-336c-691095007117@intel.com>
-Date:   Mon, 21 Nov 2022 07:29:04 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v4 1/6] x86: KVM: Advertise CMPccXADD CPUID to user space
-Content-Language: en-US
+        with ESMTP id S229646AbiKUPie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 10:38:34 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C8BF40925;
+        Mon, 21 Nov 2022 07:38:33 -0800 (PST)
+Received: from zn.tnic (p200300ea9733e725329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e725:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F2ED01EC072C;
+        Mon, 21 Nov 2022 16:38:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1669045112;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=iLuRMy/62CUEHTNt/F9/ZvwQL03sX1N2sn3qd4sdI8Q=;
+        b=SRXqV6J/FYYJp+re6243eL13bJ0LYx44DFigzyzwUref0NJhB2p56MTMQmY3hlM2p53dMk
+        qpGmrh3vzmWVe42VOSQsnlA9CBQTpVn2SdvWdJAXZZhV+cFEmJfYr3lirkdOT8sjvJcIsu
+        OT28wy4Me1fxasz0TTZiY+FJMxv+cQc=
+Date:   Mon, 21 Nov 2022 16:38:27 +0100
+From:   Borislav Petkov <bp@alien8.de>
 To:     Jiaxi Chen <jiaxi.chen@linux.intel.com>
-Cc:     kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-        ndesaulniers@google.com, alexandre.belloni@bootlin.com,
-        peterz@infradead.org, jpoimboe@kernel.org,
-        chang.seok.bae@intel.com, pawan.kumar.gupta@linux.intel.com,
-        babu.moger@amd.com, jmattson@google.com, sandipan.das@amd.com,
-        tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        fenghua.yu@intel.com, keescook@chromium.org, nathan@kernel.org,
+Cc:     Dave Hansen <dave.hansen@intel.com>, kvm@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+        pbonzini@redhat.com, ndesaulniers@google.com,
+        alexandre.belloni@bootlin.com, peterz@infradead.org,
+        jpoimboe@kernel.org, chang.seok.bae@intel.com,
+        pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
+        jmattson@google.com, sandipan.das@amd.com, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
+        keescook@chromium.org, nathan@kernel.org,
         linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 1/6] x86: KVM: Advertise CMPccXADD CPUID to user space
+Message-ID: <Y3ubcwLlEdkj0/zK@zn.tnic>
 References: <20221118141509.489359-1-jiaxi.chen@linux.intel.com>
  <20221118141509.489359-2-jiaxi.chen@linux.intel.com>
  <efb55727-f8bd-815c-ddfc-a8432ae5af4e@intel.com>
  <f04c2e74-87e4-5d50-579a-0a60554b83d3@linux.intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 In-Reply-To: <f04c2e74-87e4-5d50-579a-0a60554b83d3@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/21/22 06:46, Jiaxi Chen wrote:
+On Mon, Nov 21, 2022 at 10:46:21PM +0800, Jiaxi Chen wrote:
 > Features which has been enabled in kernel usually should be added to
 > /proc/cpuinfo.
 
-Features that the kernel *itself* is actually using always get in there.
- Things like "smep".
+No, pls read this first: Documentation/x86/cpuinfo.rst
 
-But, things that the kernel "enables" but that only get used by
-userspace don't generally show up in /proc/cpuinfo.
+If something's not clear, we will extend it so that it is.
 
-KVM is kinda a weird case.  The kernel is making the feature available
-to guests, but it's not _using_ it in any meaningful way.  To me, this
-seems much more akin to the features that are just available to
-userspace than something that the kernel is truly using.
+/proc/cpuinfo - a user ABI - is not a dumping ground for CPUID bits.
 
-Also, these feature names are just long and ugly, and the "flags" line
-is already a human-*un*readable mess.  I think we should just leave them
-out.
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
