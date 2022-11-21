@@ -2,110 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 48388631CBB
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 10:21:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1419D631CBF
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 10:22:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230020AbiKUJVP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 04:21:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37224 "EHLO
+        id S230213AbiKUJWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 04:22:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbiKUJVN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 04:21:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 658F331DFC
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 01:20:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669022409;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jdgJ5y84un0dxE16l6OGDGeAUqGk2IR8t+PQvnMvyk8=;
-        b=gXhvzKkWrHVtPcn4XhTavEvPQhw7pqvG2jwAeDZlulDmlrbyf7n0Ica8Gbu3/NvDPQPdpn
-        bn7KatW0vp25AVcuCINMZaiASpV+ISuSlx1oF7U4yJOFqGfy7Gqa2zO8Gy7X4Wo62JaMZI
-        KRJ/OI0XENHJgmEdi2LU1TRwfaliIO4=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-258-HbM35D7VNkq7uOQqRfgmHA-1; Mon, 21 Nov 2022 04:20:07 -0500
-X-MC-Unique: HbM35D7VNkq7uOQqRfgmHA-1
-Received: by mail-ej1-f70.google.com with SMTP id hr21-20020a1709073f9500b007b29ccd1228so6243821ejc.16
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 01:20:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jdgJ5y84un0dxE16l6OGDGeAUqGk2IR8t+PQvnMvyk8=;
-        b=E+lBcY9xkVVsB7ItDxJoH99sqNGNHBcZsWK+OjMvR7ElM8m3wLbJCqE8RZj+vGo4Yr
-         XE6XrbSmz6IF+fIEB6UPv3i2RRENRkYqxhZgJToFcDjH9c593FLR75Sd1McHozgLp0Tx
-         kspbeNQW1m1xRZ495UqwGGF2QTJPljRA382LPEVAYmMlHU5/4uAd9FTJdZMgHxouitFM
-         ODX7OgJpxjo9GexMG6sVYYVm4isgpUf1U+qY+tUjNSeHp1ITOCzMOGLrNrBYCB63D9Kh
-         FGp6X9xHWQyf7Lr15r84jEWrjY8T1evnvqPB0KIqlObGKj6ru4ANXJLRAZSU/+2b5rXt
-         TidA==
-X-Gm-Message-State: ANoB5pl8p7VPEaKcopEnhbOEs5JNjBHSt06DqOjeFQy0XTTCTwjITseR
-        VTSbCzntMgEP1eTqSOK/rERiX4TK6d2W62OZnF6tw3ZDo0FnB2RlB5lTqpVsQnDYfJnQGnXN+1T
-        hIgkXuTGfYqGY
-X-Received: by 2002:a17:906:5db2:b0:7ae:d58b:30f8 with SMTP id n18-20020a1709065db200b007aed58b30f8mr13990195ejv.564.1669022406155;
-        Mon, 21 Nov 2022 01:20:06 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf61iiGXfcqgJKHipQflCYjzAMqWdvWLfMLKk4Usv9Wnz0qvc5vyCuQYyHAHiOaJtDP3HU22rA==
-X-Received: by 2002:a17:906:5db2:b0:7ae:d58b:30f8 with SMTP id n18-20020a1709065db200b007aed58b30f8mr13990183ejv.564.1669022405979;
-        Mon, 21 Nov 2022 01:20:05 -0800 (PST)
-Received: from ovpn-194-185.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id o11-20020a170906860b00b007ad4a555499sm4776979ejx.204.2022.11.21.01.20.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Nov 2022 01:20:05 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v13 00/48] KVM: x86: hyper-v: Fine-grained TLB flush +
- L2 TLB flush features
-In-Reply-To: <01da30b6-4716-c346-70d2-9557bf4b09d5@redhat.com>
-References: <20221101145426.251680-1-vkuznets@redhat.com>
- <Y2E5chB/9pZcRWi6@google.com> <878rkuskoj.fsf@ovpn-194-149.brq.redhat.com>
- <01da30b6-4716-c346-70d2-9557bf4b09d5@redhat.com>
-Date:   Mon, 21 Nov 2022 10:20:03 +0100
-Message-ID: <87edtwmzp8.fsf@ovpn-194-185.brq.redhat.com>
+        with ESMTP id S230148AbiKUJWL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 04:22:11 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C37031DFC
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 01:22:10 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AL7KEWr004975;
+        Mon, 21 Nov 2022 09:22:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=P3gDgFbVdBhrzTB4X9Hmm53gXt/UmmbSptPObkyfukA=;
+ b=g9OrKIBxgsFwcF0mq+5Uc/43/xNEU43/j1DV7D9HsbEp5y8U9IQc/7HayWSwX5LcziKG
+ jhbyKuyEBymHc/XtYFWzWLwhqea7B11V7fpK0A7BJTyef6dY7mQdi02ETcPZ3uesvPIB
+ 10b/2T+Bfv3Bn1fwpfWrmhcvGAGiMPt6GiU8r8e+aDrRgYNzw5Sfm2W6qcLTeE3RTr6y
+ LkOcA3LNZ73AoMfDcfzhTfbwCplsG/1LvrulQhSHqdFgNMosdwxNy7sE1UKP4CyG8Yeo
+ WU7duo55Y3CDJnlZ/KkF9tIcDZHemDdyBoMv7EgWeVAysz04VkURsrXGuLpjg62k7VW9 UQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ky931caau-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Nov 2022 09:22:05 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AL7vr4E011994;
+        Mon, 21 Nov 2022 09:22:05 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ky931caac-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Nov 2022 09:22:05 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AL9LQqx005945;
+        Mon, 21 Nov 2022 09:22:03 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma02fra.de.ibm.com with ESMTP id 3kxps8ssuk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Nov 2022 09:22:03 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AL9FpcW46465288
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 21 Nov 2022 09:15:51 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4F689AE051;
+        Mon, 21 Nov 2022 09:22:01 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 06265AE04D;
+        Mon, 21 Nov 2022 09:22:01 +0000 (GMT)
+Received: from [9.171.18.226] (unknown [9.171.18.226])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 21 Nov 2022 09:22:00 +0000 (GMT)
+Message-ID: <64be9403-b46f-3805-35cc-d1b6656709da@linux.ibm.com>
+Date:   Mon, 21 Nov 2022 10:22:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [RFC PATCH 3/3] KVM: Obey kvm.halt_poll_ns in VMs not using
+ KVM_CAP_HALT_POLL
+Content-Language: en-US
+To:     David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jon Cargille <jcargill@google.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Yanan Wang <wangyanan55@huawei.com>
+References: <20221117001657.1067231-1-dmatlack@google.com>
+ <20221117001657.1067231-4-dmatlack@google.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20221117001657.1067231-4-dmatlack@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -5BgcuXxnosLLFaM8P_5pZs8o03imVPm
+X-Proofpoint-ORIG-GUID: JHZTwM7s_pqVX9X5oWodneS-OgYfVgKi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-21_05,2022-11-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ impostorscore=0 mlxlogscore=999 lowpriorityscore=0 malwarescore=0
+ adultscore=0 clxscore=1015 bulkscore=0 suspectscore=0 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211210071
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Am 17.11.22 um 01:16 schrieb David Matlack:
+> Obey kvm.halt_poll_ns in VMs not using KVM_CAP_HALT_POLL on every halt,
+> rather than just sampling the module parameter when the VM is first
+> created. This restore the original behavior of kvm.halt_poll_ns for VMs
+> that have not opted into KVM_CAP_HALT_POLL.
+> 
+> Notably, this change restores the ability for admins to disable or
+> change the maximum halt-polling time system wide for VMs not using
+> KVM_CAP_HALT_POLL.
+> 
+> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Fixes: acd05785e48c ("kvm: add capability for halt polling")
+> Signed-off-by: David Matlack <dmatlack@google.com>
 
-> On 11/1/22 17:29, Vitaly Kuznetsov wrote:
->>> Applies cleanly to e18d6152ff0f ("Merge tag 'kvm-riscv-6.1-1' of
->>> https://github.com/kvm-riscv/linux  into HEAD") and then rebases to kvm=
-/queue without
->>> needing human assistance.
->> The miracle of git =F0=9F=98=84
->
-> Some more work was needed to apply these, but that at least forced me to=
-=20
-> go through them. :)
->
-> I'll push them shortly to queue.
+Tested-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
-The eagle has landed! I'll give it a try to verify that nothing got
-broken along the way.
+One thing. This does not apply without the other 2 patches. Not sure
+if we want to redo this somehow to allow for stable backports?
 
-Thanks!
 
---=20
-Vitaly
-
+> ---
+>   include/linux/kvm_host.h |  1 +
+>   virt/kvm/kvm_main.c      | 27 ++++++++++++++++++++++++---
+>   2 files changed, 25 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index e6e66c5e56f2..253ad055b6ad 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -788,6 +788,7 @@ struct kvm {
+>   	struct srcu_struct srcu;
+>   	struct srcu_struct irq_srcu;
+>   	pid_t userspace_pid;
+> +	bool override_halt_poll_ns;
+>   	unsigned int max_halt_poll_ns;
+>   	u32 dirty_ring_size;
+>   	bool vm_bugged;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 78caf19608eb..7f73ce99bd0e 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1198,8 +1198,6 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+>   			goto out_err_no_arch_destroy_vm;
+>   	}
+>   
+> -	kvm->max_halt_poll_ns = halt_poll_ns;
+> -
+>   	r = kvm_arch_init_vm(kvm, type);
+>   	if (r)
+>   		goto out_err_no_arch_destroy_vm;
+> @@ -3490,7 +3488,20 @@ static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
+>   
+>   static unsigned int kvm_vcpu_max_halt_poll_ns(struct kvm_vcpu *vcpu)
+>   {
+> -	return READ_ONCE(vcpu->kvm->max_halt_poll_ns);
+> +	struct kvm *kvm = vcpu->kvm;
+> +
+> +	if (kvm->override_halt_poll_ns) {
+> +		/*
+> +		 * Ensure kvm->max_halt_poll_ns is not read before
+> +		 * kvm->override_halt_poll_ns.
+> +		 *
+> +		 * Pairs with the smp_wmb() when enabling KVM_CAP_HALT_POLL.
+> +		 */
+> +		smp_rmb();
+> +		return READ_ONCE(kvm->max_halt_poll_ns);
+> +	}
+> +
+> +	return READ_ONCE(halt_poll_ns);
+>   }
+>   
+>   /*
+> @@ -4600,6 +4611,16 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>   			return -EINVAL;
+>   
+>   		kvm->max_halt_poll_ns = cap->args[0];
+> +
+> +		/*
+> +		 * Ensure kvm->override_halt_poll_ns does not become visible
+> +		 * before kvm->max_halt_poll_ns.
+> +		 *
+> +		 * Pairs with the smp_rmb() in kvm_vcpu_max_halt_poll_ns().
+> +		 */
+> +		smp_wmb();
+> +		kvm->override_halt_poll_ns = true;
+> +
+>   		return 0;
+>   	}
+>   	case KVM_CAP_DIRTY_LOG_RING:
