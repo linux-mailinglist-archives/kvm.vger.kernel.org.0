@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58A546317A8
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 01:27:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A1056317AD
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 01:28:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229987AbiKUA1z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Nov 2022 19:27:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57440 "EHLO
+        id S230006AbiKUA2O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Nov 2022 19:28:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229762AbiKUA1V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Nov 2022 19:27:21 -0500
+        with ESMTP id S229841AbiKUA1b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Nov 2022 19:27:31 -0500
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E7352DAA1;
-        Sun, 20 Nov 2022 16:27:21 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D6D612B;
+        Sun, 20 Nov 2022 16:27:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668990441; x=1700526441;
+  t=1668990445; x=1700526445;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hwCT3RUBvAvk7hoIlEmR+DbUGKtOmJbWdTENnqoyMek=;
-  b=Zrudpnn80cZTcD+rAl188EsY3CbVD3b7z66ufsiUGtmrtXbnvKGc84r+
-   DzwmxPQ4PQd0Q0TJcger+qUuh3g1p46hG8eDjOg3/GLIljC4dxtqkqz3w
-   HP+qAA4rOxg073fWCjcAjRbjqsmtXe/Gf0ERTf5Pz2Ak7A/woeDGXod3J
-   kb3qBTTuNMPtaaw38lClHcmWpwpo9UMIsxkWuaJkVGc+hJFSi172Ww7Zn
-   Colvi7qW+Zha+cjTUKwagPelAFBxbl9gAVKj6oTU8WNAXQqEokIp2q+3y
-   uV6EEMb/uKvbQQV7/fUL5DpnbZzpV2XGNGSzIotjn/e2dCjzZw7yA9OrC
+  bh=KhP8T6MQSf6upYtvCFaMabziPVPSa54uAPjTpE/5J6U=;
+  b=mjejGvAfYHGUuXM1+JRE7TbQbsl/23UP1L68UOtB5ACr70Batjb0tLVN
+   9k42Ii9qSCffjiJVgoPOmgSeBXHg8AmY1fdqtIGbQ3+WO+8tQRlppZTj9
+   fV5pji0I48imGZE4U/dZQEs/yIZOQ6XSJY7uvR0DV1aO/k2eT9vEXSDSF
+   BSjonsPdJGbyqQ/pj71Y/evYkEa9LYqLECN7KMaakkxCIqkiAZw6HXWgz
+   C5aheeTjY9lUonds1Oyzb8wjDenL4lcro4H8Sa1yNSNnAL+QtryT6bTSk
+   mbDnE7Ag1akAYPs50Nzy6jSpiIsmWBEk3NnFC13+77rwwNzS15cpcerzi
    g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10537"; a="399732300"
+X-IronPort-AV: E=McAfee;i="6500,9779,10537"; a="399732311"
 X-IronPort-AV: E=Sophos;i="5.96,180,1665471600"; 
-   d="scan'208";a="399732300"
+   d="scan'208";a="399732311"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2022 16:27:21 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10537"; a="729825266"
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2022 16:27:25 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10537"; a="729825287"
 X-IronPort-AV: E=Sophos;i="5.96,180,1665471600"; 
-   d="scan'208";a="729825266"
+   d="scan'208";a="729825287"
 Received: from tomnavar-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.176.15])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2022 16:27:16 -0800
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2022 16:27:21 -0800
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
@@ -47,9 +47,9 @@ Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
         ak@linux.intel.com, isaku.yamahata@intel.com, chao.gao@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
         sagis@google.com, imammedo@redhat.com, kai.huang@intel.com
-Subject: [PATCH v7 06/20] x86/virt/tdx: Shut down TDX module in case of error
-Date:   Mon, 21 Nov 2022 13:26:28 +1300
-Message-Id: <48505089b645019a734d85c2c29f3c8ae2dbd6bd.1668988357.git.kai.huang@intel.com>
+Subject: [PATCH v7 07/20] x86/virt/tdx: Do TDX module global initialization
+Date:   Mon, 21 Nov 2022 13:26:29 +1300
+Message-Id: <40824ec3e3dc759705dcfa1cb2929d18c12b417a.1668988357.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <cover.1668988357.git.kai.huang@intel.com>
 References: <cover.1668988357.git.kai.huang@intel.com>
@@ -64,140 +64,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TDX supports shutting down the TDX module at any time during its
-lifetime.  After the module is shut down, no further TDX module SEAMCALL
-leaf functions can be made to the module on any logical cpu.
+The first step of initializing the module is to call TDH.SYS.INIT once
+on any logical cpu to do module global initialization.  Do the module
+global initialization.
 
-Shut down the TDX module in case of any error during the initialization
-process.  It's pointless to leave the TDX module in some middle state.
+It also detects the TDX module, as seamcall() returns -ENODEV when the
+module is not loaded.
 
-Shutting down the TDX module requires calling TDH.SYS.LP.SHUTDOWN on all
-BIOS-enabled CPUs, and the SEMACALL can run concurrently on different
-CPUs.  Implement a mechanism to run SEAMCALL concurrently on all online
-CPUs and use it to shut down the module.  Later logical-cpu scope module
-initialization will use it too.
-
-Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
 
 v6 -> v7:
- - No change.
-
-v5 -> v6:
- - Removed the seamcall() wrapper to previous patch (Dave).
-
-- v3 -> v5 (no feedback on v4):
- - Added a wrapper of __seamcall() to print error code if SEAMCALL fails.
- - Made the seamcall_on_each_cpu() void.
- - Removed 'seamcall_ret' and 'tdx_module_out' from
-   'struct seamcall_ctx', as they must be local variable.
- - Added the comments to tdx_init() and one paragraph to changelog to
-   explain the caller should handle VMXON.
- - Called out after shut down, no "TDX module" SEAMCALL can be made.
+ - Improved changelog.
 
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 43 +++++++++++++++++++++++++++++++++----
- arch/x86/virt/vmx/tdx/tdx.h |  5 +++++
- 2 files changed, 44 insertions(+), 4 deletions(-)
+ arch/x86/virt/vmx/tdx/tdx.c | 19 +++++++++++++++++--
+ arch/x86/virt/vmx/tdx/tdx.h |  1 +
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index b06c1a2bc9cb..5db1a05cb4bd 100644
+index 5db1a05cb4bd..f292292313bd 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -13,6 +13,8 @@
- #include <linux/mutex.h>
- #include <linux/cpu.h>
- #include <linux/cpumask.h>
-+#include <linux/smp.h>
-+#include <linux/atomic.h>
- #include <asm/msr-index.h>
- #include <asm/msr.h>
- #include <asm/apic.h>
-@@ -124,15 +126,27 @@ bool platform_tdx_enabled(void)
- 	return !!tdx_keyid_num;
- }
- 
-+/*
-+ * Data structure to make SEAMCALL on multiple CPUs concurrently.
-+ * @err is set to -EFAULT when SEAMCALL fails on any cpu.
-+ */
-+struct seamcall_ctx {
-+	u64 fn;
-+	u64 rcx;
-+	u64 rdx;
-+	u64 r8;
-+	u64 r9;
-+	atomic_t err;
-+};
-+
- /*
-  * Wrapper of __seamcall() to convert SEAMCALL leaf function error code
-  * to kernel error code.  @seamcall_ret and @out contain the SEAMCALL
-  * leaf function return code and the additional output respectively if
-  * not NULL.
+@@ -208,8 +208,23 @@ static void seamcall_on_each_cpu(struct seamcall_ctx *sc)
   */
--static int __always_unused seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
--				    u64 *seamcall_ret,
--				    struct tdx_module_output *out)
-+static int seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
-+		    u64 *seamcall_ret, struct tdx_module_output *out)
+ static int init_tdx_module(void)
  {
- 	u64 sret;
- 
-@@ -166,6 +180,25 @@ static int __always_unused seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
- 	}
- }
- 
-+static void seamcall_smp_call_function(void *data)
-+{
-+	struct seamcall_ctx *sc = data;
+-	/* The TDX module hasn't been detected */
+-	return -ENODEV;
 +	int ret;
 +
-+	ret = seamcall(sc->fn, sc->rcx, sc->rdx, sc->r8, sc->r9, NULL, NULL);
++	/*
++	 * Call TDH.SYS.INIT to do the global initialization of
++	 * the TDX module.  It also detects the module.
++	 */
++	ret = seamcall(TDH_SYS_INIT, 0, 0, 0, 0, NULL, NULL);
 +	if (ret)
-+		atomic_set(&sc->err, -EFAULT);
-+}
++		goto out;
 +
-+/*
-+ * Call the SEAMCALL on all online CPUs concurrently.  Caller to check
-+ * @sc->err to determine whether any SEAMCALL failed on any cpu.
-+ */
-+static void seamcall_on_each_cpu(struct seamcall_ctx *sc)
-+{
-+	on_each_cpu(seamcall_smp_call_function, sc, true);
-+}
-+
- /*
-  * Detect and initialize the TDX module.
-  *
-@@ -181,7 +214,9 @@ static int init_tdx_module(void)
- 
- static void shutdown_tdx_module(void)
- {
--	/* TODO: Shut down the TDX module */
-+	struct seamcall_ctx sc = { .fn = TDH_SYS_LP_SHUTDOWN };
-+
-+	seamcall_on_each_cpu(&sc);
++	/*
++	 * Return -EINVAL until all steps of TDX module initialization
++	 * process are done.
++	 */
++	ret = -EINVAL;
++out:
++	return ret;
  }
  
- static int __tdx_enable(void)
+ static void shutdown_tdx_module(void)
 diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 92a8de957dc7..215cc1065d78 100644
+index 215cc1065d78..0b415805c921 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.h
 +++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -12,6 +12,11 @@
- /* MSR to report KeyID partitioning between MKTME and TDX */
- #define MSR_IA32_MKTME_KEYID_PARTITIONING	0x00000087
- 
-+/*
-+ * TDX module SEAMCALL leaf functions
-+ */
-+#define TDH_SYS_LP_SHUTDOWN	44
-+
+@@ -15,6 +15,7 @@
  /*
-  * Do not put any hardware-defined TDX structure representations below
-  * this comment!
+  * TDX module SEAMCALL leaf functions
+  */
++#define TDH_SYS_INIT		33
+ #define TDH_SYS_LP_SHUTDOWN	44
+ 
+ /*
 -- 
 2.38.1
 
