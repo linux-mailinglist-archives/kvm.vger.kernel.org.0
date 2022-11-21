@@ -2,238 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B0EDE632025
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 12:16:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 754636320D3
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 12:38:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230480AbiKULQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 06:16:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39996 "EHLO
+        id S231276AbiKULih (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 06:38:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230527AbiKULQS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 06:16:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E040FC1F47
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 03:11:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669029011;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6HFE5ckJ+/PkEEqbEDcxeM6P1Mra4LAFsLM3EpugvmI=;
-        b=EMLCOBkxKS6v25xXjAdge+Br8hPYZtath284xFs7yuod9WiH8RVTF1Ic+W7o2XkHu+7hPs
-        0RXnqqN9HzSIDt34fTUsmbCNliMEjbGfyL3802sP/+kN4OkZwd7Qv60QwXMFqXQm6UN1M/
-        sdpVVEH1M+yZFp/HwNmul0ksAIYwcHk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-265-RieP3r-fNYaAbe37F2Ysqw-1; Mon, 21 Nov 2022 06:10:10 -0500
-X-MC-Unique: RieP3r-fNYaAbe37F2Ysqw-1
-Received: by mail-wm1-f70.google.com with SMTP id v125-20020a1cac83000000b003cfa148576dso6342538wme.3
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 03:10:09 -0800 (PST)
+        with ESMTP id S231269AbiKULiR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 06:38:17 -0500
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E4B1B9621
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 03:35:40 -0800 (PST)
+Received: by mail-wr1-x436.google.com with SMTP id cl5so19415724wrb.9
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 03:35:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ByHtPoB+P7/uH1wr4e3X4UYeEScZOfqXPAiucxdATp8=;
+        b=sjSzqdWLBtvQ6hiwR1lRYNWjaJmOBMN5l6v1pjNeyiMKF7fJeEiz344kH2iLfvrqiR
+         qemR1hhqRr/uTXkArjaieC/bcfhySa1VYXblfJnONr7LluVbyBmq7oLT20zOj8gayMuE
+         n7DDq0J9xCSn6oEorgxlMCOQTse1UFROUgcimIMth1W8xku1mp7cs6gT6cWQI97XoUU7
+         ZSBxJRQdOxknG9Ji2tmKZpabqOKzQpDv0Y8xImvzMbplsZnNnxBPH9CNeLoAlJ+omXZT
+         42YvuFeXiDOrNR6EcSaEfrRiGK5xl/qm3T5HtRB2i4Vpig+d1sREDdhsqPhUtwGJLhq9
+         9TKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6HFE5ckJ+/PkEEqbEDcxeM6P1Mra4LAFsLM3EpugvmI=;
-        b=zUypVp52GbhI8mu/hycF7TI2GGotC7xkLKV5poZomlHPyTKQpdPkcbA37iSEGKKG3I
-         nOv1JGSrFIAXxryHSPnx4zghaDk+wDiBlNj3soPZPhtudpyNAGhakzeZU4Uy/wO/dYE6
-         cFGnX2Mw3oW92fkaCmeKggsvl48pQi5hBpiyfOYFOZt0w0xAq/l5Wzxhol3jtuH9mpur
-         iAF00HaChLDiOC1aASS/CyovPqWWkC4BbtKKY6YYNuoH5MVMUBHkRa8flXukBiSvuO51
-         f0Rg7lV8gRm5fcflOHYrpKSeLVrWP7g+q5Z27yJtle6/pRkTYy8xgWXeXbX4UPO76CwI
-         Iv9w==
-X-Gm-Message-State: ANoB5plU3u1RonGOPuzxS6bmRupvBlQYE/wzRkb6XlqBM9TfGg8QSnpJ
-        +sVaUfoi2c/vVgUYtY8ql2y+DcPZEwNYXN8z8wQ5ELqPAnLndcTWuqZVzbJFFe0Ov7xDXc8C8R0
-        gU31HdM1fVJoG
-X-Received: by 2002:a05:600c:3587:b0:3cf:a9c2:2b04 with SMTP id p7-20020a05600c358700b003cfa9c22b04mr12126017wmq.152.1669029008898;
-        Mon, 21 Nov 2022 03:10:08 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6qmkAtqZngrYlpX3LaYVMHNRMoKYxTdVMdo3Sx7bg+dmQB/Sga7GdUCdrPFwBUtw6/peox+w==
-X-Received: by 2002:a05:600c:3587:b0:3cf:a9c2:2b04 with SMTP id p7-20020a05600c358700b003cfa9c22b04mr12125983wmq.152.1669029008603;
-        Mon, 21 Nov 2022 03:10:08 -0800 (PST)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id z11-20020a05600c0a0b00b003c6f1732f65sm19940702wmp.38.2022.11.21.03.10.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Nov 2022 03:10:08 -0800 (PST)
-Message-ID: <2ead7655dbb90d15b883c5d31f582ed87d4e8737.camel@redhat.com>
-Subject: Re: [PATCH 04/13] KVM: nSVM: clean up copying of int_ctl fields
- back to vmcb01/vmcb12
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sandipan Das <sandipan.das@amd.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        Jing Liu <jing2.liu@intel.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Wyes Karny <wyes.karny@amd.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Babu Moger <babu.moger@amd.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org
-Date:   Mon, 21 Nov 2022 13:10:06 +0200
-In-Reply-To: <Y3aWZJo8M2li/7BB@google.com>
-References: <20221117143242.102721-1-mlevitsk@redhat.com>
-         <20221117143242.102721-5-mlevitsk@redhat.com> <Y3aWZJo8M2li/7BB@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ByHtPoB+P7/uH1wr4e3X4UYeEScZOfqXPAiucxdATp8=;
+        b=5pNKQPwM2/5xUdE5eOOuwZY+Up5G6t7CgagkVWOjFO+xcigyLM8dFEc0BAMUwtjOra
+         8PX7zR0pjJoKf4m3CwZdgkCwlKIiypMstrKGqaNnxLf8I5a407BE79WcMJNSO1fSIVTA
+         IzYmXUZO8PpaCnkQFPjaKYfGmQq1chYrrLBZ8MWSA2O2x4labTuZMgkBlHTqHnU/jnID
+         f6zB1Dh2na7ML1v6tJGvNQfKp6DoDeYsgjd5FTz6dOe7KDOghPF9ATc+Z93JWRasZTZF
+         rPlNslriUXfB4T7gbhQ3jxhkLa9LcjtINIz3DxAE3wQGNl38O5hS66qibkMfVsIay8yJ
+         2CfA==
+X-Gm-Message-State: ANoB5pnbciTG3Np545Kd0Rnm5NJzMcsWLFgadVEinKK2IjRiiysXionW
+        x0cYKdzeLDA5tFZ9mpyKnvt5q6iPm3xQSA==
+X-Google-Smtp-Source: AA0mqf7R8C9DC55+7v6/DaLR9OdftSxbDDkOMkIs3KW9sDZxZ63nyWBXpQHGR4EY4DA83rt4qXWY9w==
+X-Received: by 2002:adf:dd81:0:b0:236:88a2:f072 with SMTP id x1-20020adfdd81000000b0023688a2f072mr10848719wrl.516.1669030538622;
+        Mon, 21 Nov 2022 03:35:38 -0800 (PST)
+Received: from [192.168.1.115] ([185.126.107.38])
+        by smtp.gmail.com with ESMTPSA id n10-20020a5d67ca000000b002302dc43d77sm1909488wrw.115.2022.11.21.03.35.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Nov 2022 03:35:37 -0800 (PST)
+Message-ID: <dcaf828f-5959-e49e-a854-632814772cc1@linaro.org>
+Date:   Mon, 21 Nov 2022 12:35:36 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.4.2
+Subject: Re: [RFC PATCH 1/1] Dirty quota-based throttling of vcpus
+Content-Language: en-US
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>, qemu-devel@nongnu.org
+Cc:     pbonzini@redhat.com, peterx@redhat.com, david@redhat.com,
+        quintela@redhat.com, dgilbert@redhat.com, kvm@vger.kernel.org,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+References: <20221120225458.144802-1-shivam.kumar1@nutanix.com>
+ <20221120225458.144802-2-shivam.kumar1@nutanix.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <20221120225458.144802-2-shivam.kumar1@nutanix.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-11-17 at 20:15 +0000, Sean Christopherson wrote:
-> On Thu, Nov 17, 2022, Maxim Levitsky wrote:
-> > Clean up the nested_sync_int_ctl_from_vmcb02:
-> > 
-> > 1. The comment about preservation of V_IRQ is wrong: when the L2 doesn't
-> >    use virtual interrupt masking, then the field just doesn't exist in
-> >    vmcb12 thus it should not be touched at all.
-> >    Since it is unused in this case, touching it doesn't matter that much,
-> >    so the bug is theoretical.
-> > 
-> > 2. When the L2 doesn't use virtual interrupt masking, then in the *theory*
-> >    if KVM uses the feature, it should copy the changes to V_IRQ* bits from
-> >    vmcb02 to vmcb01.
-> > 
-> >    In practise, KVM only uses it for detection of the interrupt window,
-> >    and it happens to re-open it on each nested VM exit because
-> >    kvm_set_rflags happens to raise the KVM_REQ_EVENT.
-> >    Do this explicitly.
-> > 
-> > 3. Add comment on why we don't need to copy V_GIF from vmcb02 to vmcb01
-> >    when nested guest doesn't use nested V_GIF (and thus L1's GIF is in
-> >    vmcb02 while nested), even though it can in theory affect L1's GIF.
-> > 
-> > 4. Add support code to also copy some bits of int_ctl from
-> >    vmcb02 to vmcb01.
-> >    Currently there are none.
-> 
-> Unless it's impossible for whatever reason, this patch should be split into
-> multiple patches.  IIUC, there are at least 2 different functional changes being
-> made, they just happen to not have any actual impact on things.
+Hi,
 
-No objection to this.
-
+On 20/11/22 23:54, Shivam Kumar wrote:
+> Introduces a (new) throttling scheme where QEMU defines a limit on the dirty
+> rate of each vcpu of the VM. This limit is enfored on the vcpus in small
+> intervals (dirty quota intervals) by allowing the vcpus to dirty only as many
+> pages in these intervals as to maintain a dirty rate below the set limit.
 > 
-> > No (visible) functional change is intended.
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  arch/x86/kvm/svm/nested.c | 47 ++++++++++++++++++++++++++-------------
-> >  1 file changed, 32 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index 54eb152e2b60b6..1f2b8492c8782f 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -410,28 +410,45 @@ void nested_copy_vmcb_save_to_cache(struct vcpu_svm *svm,
-> >  static void nested_sync_int_ctl_from_vmcb02(struct vcpu_svm *svm,
-> >                                             struct vmcb *vmcb12)
-> >  {
-> > -       u32 mask;
-> > +       struct vmcb *vmcb02 = svm->nested.vmcb02.ptr;
-> > +       struct vmcb *vmcb01 = svm->vmcb01.ptr;
-> > +
-> > +       /* bitmask of bits of int_ctl that we copy from vmcb02 to vmcb12*/
-> > +       u32 l2_to_l1_mask = 0;
-> > +       /* bitmask of bits of int_ctl that we copy from vmcb02 to vmcb01*/
-> > +       u32 l2_to_l0_mask = 0;
-> >  
-> > -       /* Only a few fields of int_ctl are written by the processor.  */
-> 
-> Can this comment be kept in some form?  I found it super useful when reading this
-> code just now.
-
-No problem.
-
-> 
-> > -       mask = V_IRQ_MASK | V_TPR_MASK;
-> > -       if (!(svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK) &&
-> > -           svm_is_intercept(svm, INTERCEPT_VINTR)) {
-> > +       if (svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK)
-> > +               l2_to_l1_mask |= V_IRQ_MASK | V_TPR_MASK;
-> > +       else {
-> >                 /*
-> > -                * In order to request an interrupt window, L0 is usurping
-> > -                * svm->vmcb->control.int_ctl and possibly setting V_IRQ
-> > -                * even if it was clear in L1's VMCB.  Restoring it would be
-> > -                * wrong.  However, in this case V_IRQ will remain true until
-> > -                * interrupt_window_interception calls svm_clear_vintr and
-> > -                * restores int_ctl.  We can just leave it aside.
-> > +                * If IRQ window was opened while in L2, it must be reopened
-> > +                * after the VM exit
-> > +                *
-> > +                * vTPR value doesn't need to be copied from vmcb02 to vmcb01
-> > +                * because it is synced from/to apic registers on each VM exit
-> >                  */
-> > -               mask &= ~V_IRQ_MASK;
-> > +               if (vmcb02->control.int_ctl & V_IRQ_MASK)
-> > +                       kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
-> >         }
-> >  
-> >         if (nested_vgif_enabled(svm))
-> > -               mask |= V_GIF_MASK;
-> > +               l2_to_l1_mask |= V_GIF_MASK;
-> > +       else
-> > +               /* There is no need to sync V_GIF from vmcb02 to vmcb01
-> > +                * because GIF is cleared on VMexit, thus even though
-> > +                * nested guest can control host's GIF, on VM exit
-> > +                * its set value is lost
-> > +                */
-> > +               ;
-> 
-> The "else ... ;" is unnecessary, just throw the block comment above the nested
-> vGIF if-statment, e.g. if I'm understanding everything, this?
-Yes.
-
-> 
->         /*
->          * If nested vGIF is not enabled, L2 has access to L1's "real" GIF.  In
->          * this case, there's no need to sync V_GIF from vmcb02 to vmcb01
->          * because GIF is cleared on VM-Exit, thus any changes made by L2 are
->          * overwritten on VM-Exit to L1.
->          */
->         if (nested_vgif_enabled(svm))
->                 l2_to_l1_mask |= V_GIF_MASK;
-> 
-> > +
-> > +       vmcb12->control.int_ctl =
-> > +               (svm->nested.ctl.int_ctl & ~l2_to_l1_mask) |
-> > +               (vmcb02->control.int_ctl & l2_to_l1_mask);
-> >  
-> > -       vmcb12->control.int_ctl        &= ~mask;
-> > -       vmcb12->control.int_ctl        |= svm->vmcb->control.int_ctl & mask;
-> > +       vmcb01->control.int_ctl =
-> > +               (vmcb01->control.int_ctl & ~l2_to_l0_mask) |
-> > +               (vmcb02->control.int_ctl & l2_to_l0_mask);
-> 
-> No need for wrapping immediately after the "=", these all fit under the soft limit:
-> 
->         vmcb12->control.int_ctl = (svm->nested.ctl.int_ctl & ~l2_to_l1_mask) |
->                                   (vmcb02->control.int_ctl & l2_to_l1_mask);
-> 
->         vmcb01->control.int_ctl = (vmcb01->control.int_ctl & ~l2_to_l0_mask) |
->                                   (vmcb02->control.int_ctl & l2_to_l0_mask);
-
-OK.
+> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
+> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
+> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
+> ---
+>   accel/kvm/kvm-all.c       | 91 +++++++++++++++++++++++++++++++++++++++
+>   include/exec/memory.h     |  3 ++
+>   include/hw/core/cpu.h     |  5 +++
+>   include/sysemu/kvm_int.h  |  1 +
+>   linux-headers/linux/kvm.h |  9 ++++
+>   migration/migration.c     | 22 ++++++++++
+>   migration/migration.h     | 31 +++++++++++++
+>   softmmu/memory.c          | 64 +++++++++++++++++++++++++++
+>   8 files changed, 226 insertions(+)
 
 
-Best regards,
-	Maxim Levitsky
+>   void migrate_set_state(int *state, int old_state, int new_state);
+> diff --git a/softmmu/memory.c b/softmmu/memory.c
+> index bc0be3f62c..8f725a9b89 100644
+> --- a/softmmu/memory.c
+> +++ b/softmmu/memory.c
+> @@ -12,6 +12,7 @@
+>    * Contributions after 2012-01-13 are licensed under the terms of the
+>    * GNU GPL, version 2 or (at your option) any later version.
+>    */
+> +#include <linux/kvm.h>
+>   
+>   #include "qemu/osdep.h"
+>   #include "qemu/log.h"
+> @@ -34,6 +35,10 @@
+>   #include "hw/boards.h"
+>   #include "migration/vmstate.h"
+>   #include "exec/address-spaces.h"
+> +#include "hw/core/cpu.h"
+> +#include "exec/target_page.h"
+> +#include "migration/migration.h"
+> +#include "sysemu/kvm_int.h"
+>   
+>   //#define DEBUG_UNASSIGNED
+>   
+> @@ -2869,6 +2874,46 @@ static unsigned int postponed_stop_flags;
+>   static VMChangeStateEntry *vmstate_change;
+>   static void memory_global_dirty_log_stop_postponed_run(void);
+>   
+> +static void init_vcpu_dirty_quota(CPUState *cpu, run_on_cpu_data arg)
+> +{
+> +    uint64_t current_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> +    cpu->kvm_run->dirty_quota = 1;
+> +    cpu->dirty_quota_expiry_time = current_time;
+> +}
+> +
+> +void dirty_quota_migration_start(void)
+> +{
+> +    if (!kvm_state->dirty_quota_supported) {
 
-> 
+You are accessing an accelerator-specific variable in an 
+accelerator-agnostic file, this doesn't sound correct.
 
+You might introduce some hooks in AccelClass and implement them in
+accel/kvm/. See for example gdbstub_supported_sstep_flags() and
+kvm_gdbstub_sstep_flags().
+
+> +        return;
+> +    }
+> +
+> +    MigrationState *s = migrate_get_current();
+> +    /* Assuming initial bandwidth to be 128 MBps. */
+> +    double pages_per_second = (((double) 1e9) / 8.0) /
+> +                                    (double) qemu_target_page_size();
+> +    uint32_t nr_cpus;
+> +    CPUState *cpu;
+> +
+> +    CPU_FOREACH(cpu) {
+> +        nr_cpus++;
+> +    }
+> +    /*
+> +     * Currently we are hardcoding this to 2. There are plans to allow the user
+> +     * to manually select this ratio.
+> +     */
+> +    s->dirty_quota_throttle_ratio = 2;
+> +    qatomic_set(&s->per_vcpu_dirty_rate_limit,
+> +                pages_per_second / s->dirty_quota_throttle_ratio / nr_cpus);
+> +
+> +    qemu_spin_lock(&s->common_dirty_quota_lock);
+> +    s->common_dirty_quota = 0;
+> +    qemu_spin_unlock(&s->common_dirty_quota_lock);
+> +
+> +    CPU_FOREACH(cpu) {
+> +        run_on_cpu(cpu, init_vcpu_dirty_quota, RUN_ON_CPU_NULL);
+> +    }
+> +}
+> +
+>   void memory_global_dirty_log_start(unsigned int flags)
+>   {
+>       unsigned int old_flags;
+> @@ -2891,6 +2936,7 @@ void memory_global_dirty_log_start(unsigned int flags)
+>       trace_global_dirty_changed(global_dirty_tracking);
+>   
+>       if (!old_flags) {
+> +        dirty_quota_migration_start();
+>           MEMORY_LISTENER_CALL_GLOBAL(log_global_start, Forward);
+>           memory_region_transaction_begin();
+>           memory_region_update_pending = true;
+> @@ -2898,6 +2944,23 @@ void memory_global_dirty_log_start(unsigned int flags)
+>       }
+>   }
+>   
+> +static void reset_vcpu_dirty_quota(CPUState *cpu, run_on_cpu_data arg)
+> +{
+> +    cpu->kvm_run->dirty_quota = 0;
+> +}
+> +
+> +void dirty_quota_migration_stop(void)
+> +{
+> +    if (!kvm_state->dirty_quota_supported) {
+> +        return;
+> +    }
+> +
+> +    CPUState *cpu;
+> +    CPU_FOREACH(cpu) {
+> +        run_on_cpu(cpu, reset_vcpu_dirty_quota, RUN_ON_CPU_NULL);
+> +    }
+> +}
+> +
+>   static void memory_global_dirty_log_do_stop(unsigned int flags)
+>   {
+>       assert(flags && !(flags & (~GLOBAL_DIRTY_MASK)));
+> @@ -2907,6 +2970,7 @@ static void memory_global_dirty_log_do_stop(unsigned int flags)
+>       trace_global_dirty_changed(global_dirty_tracking);
+>   
+>       if (!global_dirty_tracking) {
+> +        dirty_quota_migration_stop();
+>           memory_region_transaction_begin();
+>           memory_region_update_pending = true;
+>           memory_region_transaction_commit();
 
