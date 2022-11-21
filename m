@@ -2,72 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB53B631B8B
-	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 09:36:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B185C631C92
+	for <lists+kvm@lfdr.de>; Mon, 21 Nov 2022 10:14:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229892AbiKUIgI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 03:36:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60436 "EHLO
+        id S230079AbiKUJOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 04:14:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229732AbiKUIgG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 03:36:06 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 075231D32E;
-        Mon, 21 Nov 2022 00:36:06 -0800 (PST)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1ox2Hc-0007DG-GH; Mon, 21 Nov 2022 09:36:04 +0100
-Message-ID: <c993c91a-a839-3072-2339-d2613ef548f8@leemhuis.info>
-Date:   Mon, 21 Nov 2022 09:36:04 +0100
+        with ESMTP id S229787AbiKUJOd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 04:14:33 -0500
+X-Greylist: delayed 507 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 21 Nov 2022 01:14:32 PST
+Received: from mail.dufert24.com (mail.dufert24.com [38.242.205.183])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EFE72EF77
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 01:14:32 -0800 (PST)
+Received: by mail.dufert24.com (Postfix, from userid 1001)
+        id 56AC341557; Mon, 21 Nov 2022 10:05:56 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=dufert24.com; s=mail;
+        t=1669021564; bh=oIICWKo9u1D1jW6PXE1Xkws2aZgemRr9S/HRdzov8s4=;
+        h=Date:From:To:Subject:From;
+        b=iWebvwrZigppLL0MwBWBSN7iAmFKx+J02UTF4QQ3QrJDacWy7esxcfFkxtA0nW43J
+         q12D/n9JfNbrcKo7nQbtcGLiEdfuRzIk7pUiqUr1KODeKYeP7HF20UcdNa7nTdzRFN
+         zEfJ35/Mef6imhCTjFQTCszp1PtmHq8nMFCPgZxZvdDMJNjkGMAIBrk297AApouOYJ
+         yRBlMlumNOy3ijz1IUJXBsWoWBNyRcNZe2xDQ3ZGpZKOuSeH0uYUDQq5ffG56i1VQO
+         w42BZh7yugBH2ceO+kAsgZv0OLcBgRst/qttLhai9ddTrfRe723hWPARzp/SWEM3Xo
+         uX4rV5xm4pWVQ==
+Received: by mail.dufert24.com for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 09:05:47 GMT
+Message-ID: <20221121084500-0.1.b.hbo.0.nt76bh74aq@dufert24.com>
+Date:   Mon, 21 Nov 2022 09:05:47 GMT
+From:   "Nikolaus Mazal" <nikolaus.mazal@dufert24.com>
+To:     <kvm@vger.kernel.org>
+Subject: Prodej rolet - dropshipping
+X-Mailer: mail.dufert24.com
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH] x86/fpu: Allow PKRU to be (once again) written by ptrace.
- #forregzbot
-Content-Language: en-US, de-DE
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-To:     "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20220731050342.56513-1-khuey@kylehuey.com>
- <1197176f-3508-0405-fad8-3645c81f474e@leemhuis.info>
-In-Reply-To: <1197176f-3508-0405-fad8-3645c81f474e@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1669019766;9fe28f17;
-X-HE-SMSGID: 1ox2Hc-0007DG-GH
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=3.2 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,LOTS_OF_MONEY,MIXED_ES,
+        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[Note: this mail is primarily send for documentation purposes and/or for
-regzbot, my Linux kernel regression tracking bot. That's why I removed
-most or all folks from the list of recipients, but left any that looked
-like a mailing lists. These mails usually contain '#forregzbot' in the
-subject, to make them easy to spot and filter out.]
+Dobr=C3=A9 r=C3=A1no,
 
-On 09.11.22 11:23, Thorsten Leemhuis wrote:
+Prost=C5=99ednictv=C3=ADm syst=C3=A9mu dropshippingov=C3=A9ho prodeje pod=
+porujeme podnikatele ji=C5=BE 20 let.
 
-> On 31.07.22 07:03, Kyle Huey wrote:
->> From: Kyle Huey <me@kylehuey.com>
->>
->> When management of the PKRU register was moved away from XSTATE, emulation
->> of PKRU's existence in XSTATE was added for APIs that read XSTATE, but not
->> for APIs that write XSTATE. This can be seen by running gdb and executing
->> `p $pkru`, `set $pkru = 42`, and `p $pkru`. On affected kernels (5.14+) the
->> write to the PKRU register (which gdb performs through ptrace) is ignored.
-> 
-> Seem I missed this one, but apparently it needs tracking.
-> 
-> #regzbot ^introduced e84ba47e313dbc
-> #regzbot title x86/fpu: emulation of PKRU's existence in XSTATE missing
-> for APIs that write XSTATE
-> #regzbot ignore-activity
-> #regzbot monitor
-> https://lore.kernel.org/all/20221107063807.81774-1-khuey@kylehuey.com/
+Hled=C3=A1me partnery pro spolupr=C3=A1ci zam=C4=9B=C5=99enou na konkr=C3=
+=A9tn=C3=AD zisky z prodeje modern=C3=ADch produkt=C5=AF na platform=C4=9B=
+ Amazon nebo jin=C3=A9m tr=C5=BEi=C5=A1ti =E2=80=93 bez nutnosti m=C3=ADt=
+ sklad, nakupovat zbo=C5=BE=C3=AD na sklad a p=C5=99ipravovat z=C3=A1silk=
+y pro z=C3=A1kazn=C3=ADky.
+=20
+Vyr=C3=A1b=C3=ADme na zak=C3=A1zku rolety, obrazy, tapety a dal=C5=A1=C3=AD=
+ ti=C5=A1t=C4=9Bn=C3=A9 dekora=C4=8Dn=C3=AD prvky, kter=C3=A9 jsou mezi o=
+bdarovan=C3=BDmi velmi obl=C3=ADben=C3=A9. Za pouh=C3=BD m=C4=9Bs=C3=ADc =
+=C4=8Dinil prodej rolet na n=C4=9Bmeck=C3=A9m trhu Amazon 12 500 000 EUR.
 
-#regzbot fixed-by: 4a804c4f83
+Poskytujeme produkty nejvy=C5=A1=C5=A1=C3=AD kvality, neomezen=C3=A9 skla=
+dov=C3=A9 z=C3=A1soby, spr=C3=A1vn=C4=9B organizovanou logistiku po cel=C3=
+=A9 Evrop=C4=9B, prodejn=C3=AD materi=C3=A1ly a podporu supervizora p=C5=99=
+i spolupr=C3=A1ci.
+
+M=C3=A1te z=C3=A1jem diskutovat o mo=C5=BEnosti nav=C3=A1z=C3=A1n=C3=AD s=
+polupr=C3=A1ce?
+
+
+Pozdravy
+Nikolaus Mazal
