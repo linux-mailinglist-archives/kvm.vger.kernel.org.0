@@ -2,101 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65ADD633897
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 10:34:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D7EE633919
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 10:55:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232889AbiKVJeR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 04:34:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37328 "EHLO
+        id S233422AbiKVJzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 04:55:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231923AbiKVJeP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 04:34:15 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C92C6644C;
-        Tue, 22 Nov 2022 01:34:14 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AM8d916028851;
-        Tue, 22 Nov 2022 09:34:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=waIgJpgjNqSFfMmI93mxxF++m/jo6IpqkSlWNClHgSI=;
- b=J5AwhQNsQb2eid9FLXbarvCI7GIrmGZVFvU1tm6IHAGMYdHTIxBRjLH7SrfyWf2lvBi4
- V/N4Wula+o25rreYd+AKYmaBzKVBHcTT7UnaQK7S20DG6IA2IwoR83n9t65zhIkaez7n
- BHe9QKynsxh9NTZI/3TKA1QTfVIJzHVOvM7URNkfic+TL2j0VgH1uxU1+OAVi+Yw/nQ+
- XDnG00DZM6avfhCoDSqVjSpr9qm0YEQdP9MgqoaX4Kd7DTq1ubmDQ5AZjQ0QolhWQBPP
- Oe20NfXNWCbIFK8nVX8h+Mc6quao+WF7dlW54WMP0eYHdRJj0oTgkQ3P/BfOe+FTqhMf rA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0rhdcwem-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Nov 2022 09:34:09 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AM7mVF9009259;
-        Tue, 22 Nov 2022 09:34:09 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0rhdcwdt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Nov 2022 09:34:08 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AM9LU7R031077;
-        Tue, 22 Nov 2022 09:34:07 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03fra.de.ibm.com with ESMTP id 3kxps92vuj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Nov 2022 09:34:06 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AM9Y3tq6423140
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Nov 2022 09:34:03 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7BE30A4059;
-        Tue, 22 Nov 2022 09:34:03 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C97D3A4051;
-        Tue, 22 Nov 2022 09:34:02 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.44.213])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 22 Nov 2022 09:34:02 +0000 (GMT)
-Message-ID: <71d10db8151c3b78d84a252a688e2892448eaa95.camel@linux.ibm.com>
-Subject: Re: [PATCH v3 5/9] KVM: s390: selftest: memop: Move testlist into
- main
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        with ESMTP id S232621AbiKVJy5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 04:54:57 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46AAE183AC;
+        Tue, 22 Nov 2022 01:54:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669110896; x=1700646896;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=rJIOCd9N5PvCN1hTjd1er2T0b67rVXxGjK1ymZuckrA=;
+  b=b7vNNj68/Ax6Wu+zUkZ0SXMQh1/D6weUFJgdYBLzCTERYsopZyfn5lCS
+   AC5ecYKuoLjRaZJZIaCJyMYgtoLp+2hrSPIat/rojvvpMC4JUxNDKZvHs
+   eap8QuRh1CaW9CPTvZZXcUarJiOCcg++ZFyjPQcJtrQGojRB2+DkqJdLd
+   F47Tqt43uU6ADr8efBIq8G/OXHLz905oPtZ2kiJ6v4cWM4S04SVTi15D9
+   7Z5ZsqycGoIBpky9UGhIirnF4SffdLXYY34xzc7v6Qm8Hi3CpYd4P0vHX
+   10Kfn/yMCEM1UgspnjZAYFYYaXzhbEu16Wo3B0QiRxglJWxOqaKKGjwyZ
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="314927693"
+X-IronPort-AV: E=Sophos;i="5.96,183,1665471600"; 
+   d="scan'208";a="314927693"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 01:54:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="635489296"
+X-IronPort-AV: E=Sophos;i="5.96,183,1665471600"; 
+   d="scan'208";a="635489296"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by orsmga007.jf.intel.com with ESMTP; 22 Nov 2022 01:54:45 -0800
+Date:   Tue, 22 Nov 2022 17:50:22 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Alex =?utf-8?B?QmVubu+/vWU=?= <alex.bennee@linaro.org>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-Date:   Tue, 22 Nov 2022 10:34:02 +0100
-In-Reply-To: <c801611e-61db-73d2-2ff1-cd06350215b2@redhat.com>
-References: <20221117221758.66326-1-scgl@linux.ibm.com>
-         <20221117221758.66326-6-scgl@linux.ibm.com>
-         <c801611e-61db-73d2-2ff1-cd06350215b2@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v9 3/8] KVM: Add KVM_EXIT_MEMORY_FAULT exit
+Message-ID: <20221122095022.GA617784@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <20221025151344.3784230-4-chao.p.peng@linux.intel.com>
+ <87cz9o9mr8.fsf@linaro.org>
+ <20221116031441.GA364614@chaop.bj.intel.com>
+ <87mt8q90rw.fsf@linaro.org>
+ <20221117134520.GD422408@chaop.bj.intel.com>
+ <87a64p8vof.fsf@linaro.org>
+ <20221118013201.GA456562@chaop.bj.intel.com>
+ <87o7t475o7.fsf@linaro.org>
+ <Y3er0M5Rpf1X97W/@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: TE8dwqfOiCUvqpW2CEZMTngHlClnv3fj
-X-Proofpoint-GUID: ZUply-oT0HlAwhb8_mCmPxmc8BeHrB4S
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-22_04,2022-11-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 impostorscore=0 mlxscore=0 priorityscore=1501
- mlxlogscore=999 clxscore=1015 adultscore=0 phishscore=0 spamscore=0
- bulkscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211220070
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y3er0M5Rpf1X97W/@google.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -104,91 +99,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-11-22 at 08:52 +0100, Thomas Huth wrote:
-> On 17/11/2022 23.17, Janis Schoetterl-Glausch wrote:
-> > This allows checking if the necessary requirements for a test case are
-> > met via an arbitrary expression. In particular, it is easy to check if
-> > certain bits are set in the memop extension capability.
+On Fri, Nov 18, 2022 at 03:59:12PM +0000, Sean Christopherson wrote:
+> On Fri, Nov 18, 2022, Alex Benn?e wrote:
 > > 
-> > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> > ---
-> >   tools/testing/selftests/kvm/s390x/memop.c | 132 +++++++++++-----------
-> >   1 file changed, 66 insertions(+), 66 deletions(-)
+> > Chao Peng <chao.p.peng@linux.intel.com> writes:
 > > 
-> > diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-> > index 286185a59238..10f34c629cac 100644
-> > --- a/tools/testing/selftests/kvm/s390x/memop.c
-> > +++ b/tools/testing/selftests/kvm/s390x/memop.c
-> > @@ -690,87 +690,87 @@ static void test_errors(void)
-> >   	kvm_vm_free(t.kvm_vm);
-> >   }
-> >   
-[...]
+> > > On Thu, Nov 17, 2022 at 03:08:17PM +0000, Alex Benn?e wrote:
+> > >> >> I think this should be explicit rather than implied by the absence of
+> > >> >> another flag. Sean suggested you might want flags for RWX failures so
+> > >> >> maybe something like:
+> > >> >> 
+> > >> >> 	KVM_MEMORY_EXIT_SHARED_FLAG_READ	(1 << 0)
+> > >> >> 	KVM_MEMORY_EXIT_SHARED_FLAG_WRITE	(1 << 1)
+> > >> >> 	KVM_MEMORY_EXIT_SHARED_FLAG_EXECUTE	(1 << 2)
+> > >> >>         KVM_MEMORY_EXIT_FLAG_PRIVATE            (1 << 3)
+> > >> >
+> > >> > Yes, but I would not add 'SHARED' to RWX, they are not share memory
+> > >> > specific, private memory can also set them once introduced.
+> > >> 
+> > >> OK so how about:
+> > >> 
+> > >>  	KVM_MEMORY_EXIT_FLAG_READ	(1 << 0)
+> > >>  	KVM_MEMORY_EXIT_FLAG_WRITE	(1 << 1)
+> > >>  	KVM_MEMORY_EXIT_FLAG_EXECUTE	(1 << 2)
+> > >>         KVM_MEMORY_EXIT_FLAG_SHARED     (1 << 3)
+> > >>         KVM_MEMORY_EXIT_FLAG_PRIVATE    (1 << 4)
+> > >
+> > > We don't actually need a new bit, the opposite side of private is
+> > > shared, i.e. flags with KVM_MEMORY_EXIT_FLAG_PRIVATE cleared expresses
+> > > 'shared'.
 > > 
-> > +	} testlist[] = {
-> > +		{
-> > +			.name = "simple copy",
-> > +			.test = test_copy,
-> > +			.requirements_met = true,
-> > +		},
-> > +		{
-> > +			.name = "generic error checks",
-> > +			.test = test_errors,
-> > +			.requirements_met = true,
-> > +		},
-> > +		{
-> > +			.name = "copy with storage keys",
-> > +			.test = test_copy_key,
-> > +			.requirements_met = extension_cap > 0,
-> > +		},
-> > +		{
-> > +			.name = "copy with key storage protection override",
-> > +			.test = test_copy_key_storage_prot_override,
-> > +			.requirements_met = extension_cap > 0,
-> > +		},
-> > +		{
-> > +			.name = "copy with key fetch protection",
-> > +			.test = test_copy_key_fetch_prot,
-> > +			.requirements_met = extension_cap > 0,
-> > +		},
-> > +		{
-> > +			.name = "copy with key fetch protection override",
-> > +			.test = test_copy_key_fetch_prot_override,
-> > +			.requirements_met = extension_cap > 0,
-> > +		},
-> > +		{
-> > +			.name = "error checks with key",
-> > +			.test = test_errors_key,
-> > +			.requirements_met = extension_cap > 0,
-> > +		},
-> > +		{
-> > +			.name = "termination",
-> > +			.test = test_termination,
-> > +			.requirements_met = extension_cap > 0,
-> > +		},
-> > +		{
-> > +			.name = "error checks with key storage protection override",
-> > +			.test = test_errors_key_storage_prot_override,
-> > +			.requirements_met = extension_cap > 0,
-> > +		},
-> > +		{
-> > +			.name = "error checks without key fetch prot override",
-> > +			.test = test_errors_key_fetch_prot_override_not_enabled,
-> > +			.requirements_met = extension_cap > 0,
-> > +		},
-> > +		{
-> > +			.name = "error checks with key fetch prot override",
-> > +			.test = test_errors_key_fetch_prot_override_enabled,
-> > +			.requirements_met = extension_cap > 0,
+> > If that is always true and we never expect a 3rd type of memory that is
+> > fine. But given we are leaving room for expansion having an explicit bit
+> > allows for that as well as making cases of forgetting to set the flags
+> > more obvious.
 > 
-> I wonder whether it would rather make sense to check for "extension_cap & 1" 
-> instead of "extension_cap > 0" ?
+> Hrm, I'm on the fence.
+> 
+> A dedicated flag isn't strictly needed, e.g. even if we end up with 3+ types in
+> this category, the baseline could always be "private".
 
-The cap should always have been a bitmap, but unfortunately I didn't initially
-define it as one, the storage key extension must be supported if the cap > 0.
-So the test reflects that and may catch an error in the future.
+The baseline for the current code is actually "shared".
+
 > 
-> Anyway:
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> I do like being explicit, and adding a PRIVATE flag costs KVM practically nothing
+> to implement and maintain, but evetually we'll up with flags that are paired with
+> an implicit state, e.g. see the many #PF error codes in x86.  In other words,
+> inevitably KVM will need to define the default/base state of the access, at which
+> point the base state for SHARED vs. PRIVATE is "undefined".  
+
+Current memory conversion for confidential usage is bi-directional so we
+already need both private and shared states and if we use one bit for
+both "shared" and "private" then we will have to define the default
+state, e.g, currently the default state is "shared" when we define
+
+	KVM_MEMORY_EXIT_FLAG_PRIVATE	(1 << 0)
+
 > 
-Thanks!
+> The RWX bits are in the same boat, e.g. the READ flag isn't strictly necessary.
+> I was thinking more of the KVM_SET_MEMORY_ATTRIBUTES ioctl(), which does need
+> the full RWX gamut, when I typed out that response.
+
+For KVM_SET_MEMORY_ATTRIBUTES it's reasonable to add RWX bits and match
+that to the permission bits definition in EPT entry.
+
+> 
+> So I would say if we add an explicit READ flag, then we might as well add an explicit
+> PRIVATE flag too.  But if we omit PRIVATE, then we should omit READ too.
+
+Since we assume the default state is shared, so we actually only need a
+PRIVATE flag, e.g. there is no SHARED flag and will ignore the RWX for now.
+
+Chao
