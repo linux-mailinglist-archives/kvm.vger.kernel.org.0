@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 682A863412C
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 17:15:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 419C6634128
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 17:15:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234312AbiKVQPZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 11:15:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43018 "EHLO
+        id S234225AbiKVQPO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 11:15:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234243AbiKVQOp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 11:14:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C154C79926
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:12:24 -0800 (PST)
+        with ESMTP id S232661AbiKVQOm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 11:14:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6F9F74CCD
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:12:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669133543;
+        s=mimecast20190719; t=1669133541;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aVtYY7KmEzrvZLR2lTZaYaKEOP1XpFAW1GamivF5f80=;
-        b=KI2tCMmB/tXu8TTOVKRWi/i4V0mBBOphM3HG1YsGATyDuMTuS2Hyk9KBs5S9mRZa0MfYvb
-        YYWNUCbvtqM9+q+ZBLZFFDB04WkQpzzODrKFZVJ1tbyBVTDBokvW8ZECc+YyTGQhy0d0RZ
-        MNaPkLwiJjIoGI1nt0dxcy9N1u6FJY8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=rB6S9dfR5qeXPPDbFn2FE10FK+2JQ16Y39yd3U0tLtA=;
+        b=aRo03ndxy/mmUOR2N0aqZzgHlnnP401ym7+LhtlQoG7YWLt2aWYoqxwMFEaQHZrJVb+Bi+
+        5Hqsj+u7V1egvYrbriG1+V1CXROGqk6Xxvwxjk8VxlLSuPJ9luNEAZZ8C+GelA1GahkeGx
+        p5dHzMXe79d0rp/LaVMG06KLa6tIDM4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-606-4nZ0xdtRPP6Td1kCoWFJ0g-1; Tue, 22 Nov 2022 11:12:15 -0500
-X-MC-Unique: 4nZ0xdtRPP6Td1kCoWFJ0g-1
+ us-mta-209-pR0VY8cCNGGu-x_TrRwk8g-1; Tue, 22 Nov 2022 11:12:17 -0500
+X-MC-Unique: pR0VY8cCNGGu-x_TrRwk8g-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 206221C08972;
-        Tue, 22 Nov 2022 16:12:14 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 65464800186;
+        Tue, 22 Nov 2022 16:12:16 +0000 (UTC)
 Received: from amdlaptop.tlv.redhat.com (dhcp-4-238.tlv.redhat.com [10.35.4.238])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 260EF1121314;
-        Tue, 22 Nov 2022 16:12:12 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 691541121314;
+        Tue, 22 Nov 2022 16:12:14 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Andrew Jones <drjones@redhat.com>,
@@ -49,9 +49,9 @@ Cc:     Andrew Jones <drjones@redhat.com>,
         Nico Boehr <nrb@linux.ibm.com>,
         Cathy Avery <cavery@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>
-Subject: [kvm-unit-tests PATCH v3 08/27] x86: Add a simple test for SYSENTER instruction.
-Date:   Tue, 22 Nov 2022 18:11:33 +0200
-Message-Id: <20221122161152.293072-9-mlevitsk@redhat.com>
+Subject: [kvm-unit-tests PATCH v3 09/27] svm: add simple nested shutdown test.
+Date:   Tue, 22 Nov 2022 18:11:34 +0200
+Message-Id: <20221122161152.293072-10-mlevitsk@redhat.com>
 In-Reply-To: <20221122161152.293072-1-mlevitsk@redhat.com>
 References: <20221122161152.293072-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -67,259 +67,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Run the test with Intel's vendor ID and in the long mode,
-to test the emulation of this instruction on AMD.
+Add a simple test that a shutdown in L2 is intercepted
+correctly by the L1.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- x86/Makefile.x86_64 |   2 +
- x86/sysenter.c      | 203 ++++++++++++++++++++++++++++++++++++++++++++
- x86/unittests.cfg   |   5 ++
- 3 files changed, 210 insertions(+)
- create mode 100644 x86/sysenter.c
+ x86/svm_tests.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index 5d66b201..f76ff18a 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -34,6 +34,7 @@ tests += $(TEST_DIR)/rdpru.$(exe)
- tests += $(TEST_DIR)/pks.$(exe)
- tests += $(TEST_DIR)/pmu_lbr.$(exe)
- tests += $(TEST_DIR)/pmu_pebs.$(exe)
-+tests += $(TEST_DIR)/sysenter.$(exe)
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index a7641fb8..7a67132a 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -11,6 +11,7 @@
+ #include "apic.h"
+ #include "delay.h"
+ #include "x86/usermode.h"
++#include "vmalloc.h"
  
+ #define SVM_EXIT_MAX_DR_INTERCEPT 0x3f
  
- ifeq ($(CONFIG_EFI),y)
-@@ -61,3 +62,4 @@ $(TEST_DIR)/hyperv_clock.$(bin): $(TEST_DIR)/hyperv_clock.o
- $(TEST_DIR)/vmx.$(bin): $(TEST_DIR)/vmx_tests.o
- $(TEST_DIR)/svm.$(bin): $(TEST_DIR)/svm_tests.o
- $(TEST_DIR)/svm_npt.$(bin): $(TEST_DIR)/svm_npt.o
-+$(TEST_DIR)/sysenter.o: CFLAGS += -Wa,-mintel64
-diff --git a/x86/sysenter.c b/x86/sysenter.c
-new file mode 100644
-index 00000000..1cc76219
---- /dev/null
-+++ b/x86/sysenter.c
-@@ -0,0 +1,203 @@
-+#include "alloc.h"
-+#include "libcflat.h"
-+#include "processor.h"
-+#include "msr.h"
-+#include "desc.h"
-+
-+// define this to test SYSENTER/SYSEXIT in 64 bit mode
-+//#define TEST_64_BIT
-+
-+static void test_comp32(void)
+@@ -3238,6 +3239,21 @@ static void svm_exception_test(void)
+ 	}
+ }
+ 
++static void shutdown_intercept_test_guest(struct svm_test *test)
 +{
-+	ulong rax = 0xDEAD;
++	asm volatile ("ud2");
++	report_fail("should not reach here\n");
 +
-+	extern void sysenter_target_32(void);
-+
-+	wrmsr(MSR_IA32_SYSENTER_EIP, (uint64_t)sysenter_target_32);
-+
-+	asm volatile (
-+		"# switch to comp32, mode prior to running the test\n"
-+		"ljmpl *1f\n"
-+		"1:\n"
-+		".long 1f\n"
-+		".long " xstr(KERNEL_CS32) "\n"
-+		"1:\n"
-+		".code32\n"
-+
-+		"#+++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-+		"# user code (comp32)\n"
-+		"#+++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-+
-+		"# use sysenter to enter 64 bit system code\n"
-+		"mov %%esp, %%ecx #stash rsp value\n"
-+		"mov $1, %%ebx\n"
-+		"sysenter\n"
-+		"ud2\n"
-+
-+		"#+++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-+		"# 64 bit cpl=0 code\n"
-+		"#+++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-+
-+		".code64\n"
-+		"sysenter_target_32:\n"
-+		"test %%rbx, %%rbx # check if we are here for second time\n"
-+		"jne 1f\n"
-+		"movq %%rcx, %%rsp # restore stack pointer manually\n"
-+		"jmp test_done_32\n"
-+		"1:\n"
-+
-+		"# test that MSR_IA32_SYSENTER_ESP is correct\n"
-+		"movq $0xAAFFFFFFFF, %%rbx\n"
-+		"movq $0xDEAD, %%rax\n"
-+		"cmpq %%rsp, %%rbx\n"
-+		"jne 1f\n"
-+		"movq $0xACED, %%rax\n"
-+
-+		"# use sysexit to exit back\n"
-+		"1:\n"
-+		"leaq sysexit_target, %%rdx\n"
-+		"sysexit\n"
-+
-+		"sysexit_target:\n"
-+
-+		"#+++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-+		"# exit back to 64 bit mode using a second sysenter\n"
-+		"# due to rbx == 0, the sysenter handler will jump back to\n"
-+		"# here without sysexit due to ebx=0\n"
-+		"#+++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-+
-+		".code32\n"
-+		"mov $0, %%ebx\n"
-+		"sysenter\n"
-+
-+		".code64\n"
-+		"test_done_32:\n"
-+		"nop\n"
-+
-+		: /*outputs*/
-+		"=a" (rax)
-+		: /* inputs*/
-+		: /*clobbers*/
-+		"rbx",  /* action flag for sysenter_target */
-+		"rcx",  /* saved RSP */
-+		"rdx",  /* used for SYSEXIT*/
-+		"flags"
-+	);
-+
-+	report(rax == 0xACED, "MSR_IA32_SYSENTER_ESP has correct value");
++}
++static void svm_shutdown_intercept_test(void)
++{
++	test_set_guest(shutdown_intercept_test_guest);
++	vmcb->save.idtr.base = (u64)alloc_vpage();
++	vmcb->control.intercept |= (1ULL << INTERCEPT_SHUTDOWN);
++	svm_vmrun();
++	report(vmcb->control.exit_code == SVM_EXIT_SHUTDOWN, "shutdown test passed");
 +}
 +
-+#ifdef TEST_64_BIT
-+static void test_64_bit(void)
-+{
-+	extern void test_done_64(void);
-+	extern void sysenter_target_64(void);
-+
-+	ulong rax = 0xDEAD;
-+	u8 *sysexit_thunk = (u8 *)malloc(50);
-+	u8 *tmp = sysexit_thunk;
-+
-+	/* Allocate SYSEXIT thunk, whose purpose is to be at > 32 bit address,
-+	 * to test that SYSEXIT can jump to these addresses
-+	 *
-+	 * TODO: malloc seems to return addresses from the top of the
-+	 * virtual address space, but it is better to use a dedicated API
-+	 */
-+	printf("SYSEXIT Thunk at 0x%lx\n", (u64)sysexit_thunk);
-+
-+	/* movabs test_done, %rdx*/
-+	*tmp++ = 0x48; *tmp++ = 0xBA;
-+	*(u64 *)tmp = (uint64_t)test_done_64; tmp += 8;
-+	/* jmp %%rdx*/
-+	*tmp++ = 0xFF; *tmp++ = 0xe2;
-+
-+	wrmsr(MSR_IA32_SYSENTER_EIP, (uint64_t)sysenter_target_64);
-+
-+	asm volatile (
-+		"#+++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-+		"# user code (64 bit)\n"
-+		"#+++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-+
-+		"# store the 64 bit thunk address to rdx\n"
-+		"mov %[sysexit_thunk], %%rdx\n"
-+		"# use sysenter to enter 64 bit system code\n"
-+		"mov %%esp, %%ecx #stash rsp value\n"
-+		"mov $1, %%ebx\n"
-+		"sysenter\n"
-+		"ud2\n"
-+
-+		"#+++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-+		"# 64 bit cpl=0 code\n"
-+		"#+++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-+
-+		".code64\n"
-+		"sysenter_target_64:\n"
-+		"# test that MSR_IA32_SYSENTER_ESP is correct\n"
-+		"movq $0xAAFFFFFFFF, %%rbx\n"
-+		"movq $0xDEAD, %%rax\n"
-+		"cmpq %%rsp, %%rbx\n"
-+		"jne 1f\n"
-+		"movq $0xACED, %%rax\n"
-+
-+		"# use sysexit to exit back\n"
-+		"1:\n"
-+
-+		"# this will go through thunk to test_done_64, which tests\n"
-+		"# that we can sysexit to a high address\n"
-+		".byte 0x48\n"
-+		"sysexit\n"
-+		"ud2\n"
-+
-+		".code64\n"
-+		"test_done_64:\n"
-+		"nop\n"
-+
-+		: /*outputs*/
-+		"=a" (rax)
-+		: /* inputs*/
-+		[sysexit_thunk] "r" (sysexit_thunk)
-+		: /*clobbers*/
-+		"rbx",  /* action flag for sysenter_target */
-+		"rcx",  /* saved RSP */
-+		"rdx",  /* used for SYSEXIT*/
-+		"flags"
-+	);
-+	report(rax == 0xACED, "MSR_IA32_SYSENTER_ESP has correct value");
-+}
-+#endif
-+
-+int main(int ac, char **av)
-+{
-+	setup_vm();
-+
-+	int gdt_index = 0x50 >> 3;
-+
-+	/* init the sysenter GDT block */
-+	gdt[gdt_index+0] = gdt[KERNEL_CS >> 3];
-+	gdt[gdt_index+1] = gdt[KERNEL_DS >> 3];
-+	gdt[gdt_index+2] = gdt[USER_CS >> 3];
-+	gdt[gdt_index+3] = gdt[USER_DS >> 3];
-+
-+	/* init the sysenter msrs*/
-+	wrmsr(MSR_IA32_SYSENTER_CS, gdt_index << 3);
-+	wrmsr(MSR_IA32_SYSENTER_ESP, 0xAAFFFFFFFF);
-+	test_comp32();
-+
-+	/*
-+	 * on AMD, the SYSENTER/SYSEXIT instruction is not supported in
-+	 * both 64 bit and comp32 modes
-+	 *
-+	 * However the KVM emulates it in COMP32 mode to support migration,
-+	 * iff guest cpu model is intel,
-+	 *
-+	 * but it doesn't emulate it in 64 bit mode because there is no good
-+	 * reason to use this instruction in 64 bit mode anyway.
-+	 */
-+
-+#ifdef TEST_64_BIT
-+	test_64_bit();
-+#endif
-+	return report_summary();
-+}
-+
-+
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index e803ba03..df248dff 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -245,6 +245,11 @@ file = syscall.flat
- arch = x86_64
- extra_params = -cpu Opteron_G1,vendor=AuthenticAMD
+ struct svm_test svm_tests[] = {
+ 	{ "null", default_supported, default_prepare,
+ 	  default_prepare_gif_clear, null_test,
+@@ -3349,6 +3365,7 @@ struct svm_test svm_tests[] = {
+ 	TEST(svm_intr_intercept_mix_smi),
+ 	TEST(svm_tsc_scale_test),
+ 	TEST(pause_filter_test),
++	TEST(svm_shutdown_intercept_test),
+ 	{ NULL, NULL, NULL, NULL, NULL, NULL, NULL }
+ };
  
-+[sysenter]
-+file = sysenter.flat
-+arch = x86_64
-+extra_params = -cpu host,vendor=GenuineIntel
-+
- [tsc]
- file = tsc.flat
- extra_params = -cpu kvm64,+rdtscp
 -- 
 2.34.3
 
