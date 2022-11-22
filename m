@@ -2,100 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19A166339B0
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 11:18:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49928633A38
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 11:35:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233539AbiKVKSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 05:18:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43572 "EHLO
+        id S233595AbiKVKfY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 05:35:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233092AbiKVKRf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 05:17:35 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C21E03B;
-        Tue, 22 Nov 2022 02:17:33 -0800 (PST)
-Received: from zn.tnic (p200300ea9733e79b329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e79b:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BD30A1EC05B0;
-        Tue, 22 Nov 2022 11:17:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1669112251;
+        with ESMTP id S233562AbiKVKeO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 05:34:14 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AAA99FEF;
+        Tue, 22 Nov 2022 02:31:06 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1669113063;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=XW4KmeE1lzqUbSDQgw0OBkM1KYWQdDzwu91w2ZjF5TE=;
-        b=DuntGKBHRGyMI+yzTr/TwqOwnXXDvqJwm7SvqoGXUYJE2lj3j59lFGw4qmF1O/GolhkxaD
-        znTMJZE0D+1CNoNoXmaS8NoRZqyVqGPCi+dEqhpgxF1zpSS8HjfKxbF+sGYlPJQ0JAISRH
-        NfC5xXH13XU7o0cbQWyhEwSOCcWVIZ4=
-Date:   Tue, 22 Nov 2022 11:17:26 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-Message-ID: <Y3yhthJTIWqjjAPK@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
- <Y0grhk1sq2tf/tUl@zn.tnic>
- <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
- <b712bc81-4446-9be4-fd59-d08981d13475@amd.com>
- <Y3qdTuZQoDZxUgbw@zn.tnic>
- <cffed3c2-55a9-bdd3-3b8a-82b2050a64af@amd.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=hyIj3LmVhEYLX36wfujnCfZwEDiB/P1zQlL73AIEtTc=;
+        b=cpDQmqTRoiW4zJJjcEKCD9XuuGn+BRfmpEaX42L8Z0yJQsrtlsRLSMj4W9phuRsIDed2VG
+        9gFtP8CbKovyrFODpX+j8mfEcVvEg3+ROgz2qWRpqkf6hODFZQnExjbuyetqlfwYvdx+Yz
+        FeQ+wDf3MGhLhA/q34a84itezufzgFDhEzUGYoZQXfYPdhxjpHR1Z2EvjPznhttVolg6H0
+        +Dxa90UvxxW3hJ/8WZemPpbEuvCN/AZ2Et/UIUqwUgWNYtckfEkQAMEd85iycIUu+Bzffu
+        uLnARxlfknoXvOMXFrtO87NsRC/atGDyq0QFqT8mnKPEDlfqrhAGEQhlBha0AA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1669113063;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hyIj3LmVhEYLX36wfujnCfZwEDiB/P1zQlL73AIEtTc=;
+        b=v3qfWM+1iFsEhZ6c4Ia+vQVM01NXRwxlYDhbENglPpQJ/FJIqF5Je0Mi/8IJ30DWOcnwy+
+        dsN+LcrA2cuLuMAg==
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Kai Huang <kai.huang@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
+        dave.hansen@intel.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
+        ying.huang@intel.com, reinette.chatre@intel.com,
+        len.brown@intel.com, tony.luck@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+Subject: Re: [PATCH v7 04/20] x86/virt/tdx: Add skeleton to initialize TDX
+ on demand
+In-Reply-To: <Y3yQKDZFC8+oCyqK@hirez.programming.kicks-ass.net>
+References: <cover.1668988357.git.kai.huang@intel.com>
+ <d26254af8e5b3dcca8a070703c5d6d04f48d47a9.1668988357.git.kai.huang@intel.com>
+ <Y3yQKDZFC8+oCyqK@hirez.programming.kicks-ass.net>
+Date:   Tue, 22 Nov 2022 11:31:02 +0100
+Message-ID: <87edtvgu1l.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cffed3c2-55a9-bdd3-3b8a-82b2050a64af@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 21, 2022 at 06:37:18PM -0600, Kalra, Ashish wrote:
-> I agree, but these pages are not in the right state to be released back to
+On Tue, Nov 22 2022 at 10:02, Peter Zijlstra wrote:
+> On Mon, Nov 21, 2022 at 01:26:26PM +1300, Kai Huang wrote:
+>> +	cpus_read_unlock();
+>> +
+>> +	return ret;
+>> +}
+>
+> Uhm.. so if we've offlined all the SMT siblings because of some
+> speculation fail or other, this TDX thing will fail to initialize?
+>
+> Because as I understand it; this TDX initialization happens some random
+> time after boot, when the first (TDX using) KVM instance gets created,
+> long after the speculation mitigations are enforced.
 
-Which pages exactly?
+Correct. Aside of that it's completely unclear from the changelog why
+TDX needs to run the seamcall on _all_ present CPUs and why it cannot
+handle CPU being hotplugged later.
 
-Some pages' state has really changed underneath or you've given the
-wrong range?
+It's pretty much obvious that a TDX guest can only run on CPUs where
+the seam module has been initialized, but where does the requirement
+come from that _ALL_ CPUs must be initialized and _ALL_ CPUs must be
+able to run TDX guests?
 
-> It might be a user/sev-guest error, but these pages are now unsafe to use.
-> So is a kernel panic justified here, instead of not releasing the pages back
-> to host and logging errors for the same.
+I just went and read through the documentation again.
 
-Ok, there are two cases:
+  "1. After loading the Intel TDX module, the host VMM should call the
+      TDH.SYS.INIT function to globally initialize the module.
 
-* kernel error: I guess a big fat warning is the least we can issue
-here. Not sure about panic considering this should almost never happen
-and a warning would allow for people to catch dumps and debug the issue.
+   2. The host VMM should then call the TDH.SYS.LP.INIT function on each
+      logical processor. TDH.SYS.LP.INIT is intended to initialize the
+      module within the scope of the Logical Processor (LP)."
 
-* firmware error: I don't think you can know that that is really
-the case on a production system without additional fw debugging
-capabilities. Dumping a warning would be the least we can do here too,
-to signal that something's out of the ordinary and so people can look
-into it further.
+This clearly tells me, that:
 
-So yeah, a big fat warning is a good start. And then you don't need any
-memory poisoning etc gunk.
+  1) TDX must be globally initialized (once)
 
--- 
-Regards/Gruss,
-    Boris.
+  2) TDX must be initialized on each logical processor on which TDX
+     root/non-root operation should be executed
 
-https://people.kernel.org/tglx/notes-about-netiquette
+But it does not define any requirement for doing this on all logical
+processors and for preventing physical hotplug (Neither for CPUs nor for
+memory).
+
+Nothing in the TDX specs and docs mentions physical hotplug or a
+requirement for invoking seamcall on the world.
+
+Thanks,
+
+        tglx
+
+
