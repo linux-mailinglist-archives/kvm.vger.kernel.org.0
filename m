@@ -2,208 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 97929634145
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 17:16:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFECD63412B
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 17:15:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234389AbiKVQQr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 11:16:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43454 "EHLO
+        id S234287AbiKVQPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 11:15:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232661AbiKVQQK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 11:16:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D610E742DB
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:13:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669133581;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=L7xXz0pgiyypcdQlzVuBrm4STd5l21ZBFq9WyQkYrCY=;
-        b=TLLoc5TlmlgL2Ij5PekT8veNaVaWOnsdrgtMfWPkFYbJASjxh7p6su3ZN4nwB8h2tAfy+X
-        wbATphOnKp2KLXhan3HNJtiS+AwbSL8njWo33sdQnWbrSMhU6ntPG+4u9+06nECb+Cl8tt
-        AAtfj5ZudQ36PI0yxr8cCHyWbw9VvKw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-214-W1BTiL87N0WsGAayXJZxqQ-1; Tue, 22 Nov 2022 11:12:58 -0500
-X-MC-Unique: W1BTiL87N0WsGAayXJZxqQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 064A7185A794;
-        Tue, 22 Nov 2022 16:12:58 +0000 (UTC)
-Received: from amdlaptop.tlv.redhat.com (dhcp-4-238.tlv.redhat.com [10.35.4.238])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0A3611121314;
-        Tue, 22 Nov 2022 16:12:55 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
+        with ESMTP id S234247AbiKVQOq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 11:14:46 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8BEB5803C
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:12:51 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AMG04Kt005812
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 16:12:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=tdys4BjeTRkU3YwswFFH5WxjVF8kxEAtvj0EgpsVh8s=;
+ b=ksi7c3VslpnjojHq3smyKFKrW1OGV2hnq4zMrtFfiHDlTOUTJYJgi8DKZ5v3q2CBP14Y
+ W6WUtnRzZ4pVmhN0NFXRiM2vJe9tNcgMfWwKlR0+KQz6DfZO/iZgbeQHBa+CLIVd5FVY
+ 1I6OCz43stPIrALGKRG+RlocU7wo9N0poMoDsqQwWekNQ3FdhgeNoYhWz5T3s/pRY+4R
+ hxObGIdd7mmWzSp3yN+vB14YQEK/0ng9Trl/ZfnzWRIinO5SbW7y98nnMldXDrKolNzZ
+ YbjM8oXtfEpjr7hdKiHpP0+98iRdI+cG65szwJRBh3uLUygtwVK5xROM6NyVMky5as3n QA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0ytabphe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 16:12:50 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AMFfk4g010120
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 16:12:49 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0ytabpgx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Nov 2022 16:12:49 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AMG6O92007461;
+        Tue, 22 Nov 2022 16:12:47 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma01fra.de.ibm.com with ESMTP id 3kxps939wk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Nov 2022 16:12:47 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AMGCi2d6292054
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Nov 2022 16:12:44 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6D2954C046;
+        Tue, 22 Nov 2022 16:12:44 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2E7A14C040;
+        Tue, 22 Nov 2022 16:12:44 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 22 Nov 2022 16:12:44 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
 To:     kvm@vger.kernel.org
-Cc:     Andrew Jones <drjones@redhat.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Cathy Avery <cavery@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Subject: [kvm-unit-tests PATCH v3 27/27] x86: ipi_stress: add optional SVM support
-Date:   Tue, 22 Nov 2022 18:11:52 +0200
-Message-Id: <20221122161152.293072-28-mlevitsk@redhat.com>
-In-Reply-To: <20221122161152.293072-1-mlevitsk@redhat.com>
-References: <20221122161152.293072-1-mlevitsk@redhat.com>
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v1 0/2] s390x: test CMM during migration
+Date:   Tue, 22 Nov 2022 17:12:41 +0100
+Message-Id: <20221122161243.214814-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: VjuxAkvfE7dVg4Nn8Ao2bj9H5gjbWG9H
+X-Proofpoint-GUID: XVRC76EurwtO4Ef-DesLVKY5KRMSD6vk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-22_09,2022-11-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ impostorscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=658 adultscore=0
+ clxscore=1015 malwarescore=0 spamscore=0 priorityscore=1501 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2211220117
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allow some vCPUs to be in SVM nested mode while waiting for
-an interrupt.
+Add a test which changes CMM page states while VM is being migrated.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- x86/ipi_stress.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 78 insertions(+), 1 deletion(-)
+Nico Boehr (2):
+  s390x: add a library for CMM-related functions
+  s390x: add CMM test during migration
 
-diff --git a/x86/ipi_stress.c b/x86/ipi_stress.c
-index dea3e605..1a4c5510 100644
---- a/x86/ipi_stress.c
-+++ b/x86/ipi_stress.c
-@@ -12,10 +12,12 @@
- #include "types.h"
- #include "alloc_page.h"
- #include "vmalloc.h"
-+#include "svm_lib.h"
- #include "random.h"
- 
- u64 num_iterations = 100000;
- float hlt_prob = 0.1;
-+bool use_svm;
- volatile bool end_test;
- 
- #define APIC_TIMER_PERIOD (1000*1000*1000)
-@@ -25,6 +27,7 @@ struct cpu_test_state {
- 	u64 last_isr_count;
- 	struct random_state random;
- 	int smp_id;
-+	struct svm_vcpu vcpu;
- } *cpu_states;
- 
- 
-@@ -71,6 +74,62 @@ static void wait_for_ipi(struct cpu_test_state *state)
- 	assert(state->isr_count == old_count + 1);
- }
- 
-+#ifdef __x86_64__
-+static void l2_guest_wait_for_ipi(struct cpu_test_state *state)
-+{
-+	wait_for_ipi(state);
-+	asm volatile("vmmcall");
-+}
-+
-+static void l2_guest_dummy(void)
-+{
-+	while (true)
-+		asm volatile("vmmcall");
-+}
-+
-+static void wait_for_ipi_in_l2(struct cpu_test_state *state)
-+{
-+	u64 old_count = state->isr_count;
-+	struct svm_vcpu *vcpu = &state->vcpu;
-+	bool poll_in_the_guest;
-+
-+	/*
-+	 * if poll_in_the_guest is true, then the guest will run
-+	 * with interrupts disabled and it will enable them for one instruction
-+	 * (sometimes together with halting) until it receives an interrupts
-+	 *
-+	 * if poll_in_the_guest is false, the guest will always have
-+	 * interrupts enabled and will usually receive the interrupt
-+	 * right away, but in case it didn't we will run the guest again
-+	 * until it does.
-+	 *
-+	 */
-+	poll_in_the_guest = random_decision(&state->random, 50);
-+
-+	vcpu->regs.rdi = (u64)state;
-+	vcpu->regs.rsp = (ulong)vcpu->stack;
-+
-+	vcpu->vmcb->save.rip = poll_in_the_guest ?
-+			(ulong)l2_guest_wait_for_ipi :
-+			(ulong)l2_guest_dummy;
-+
-+	if (!poll_in_the_guest)
-+		vcpu->vmcb->save.rflags |= X86_EFLAGS_IF;
-+	else
-+		vcpu->vmcb->save.rflags &= ~X86_EFLAGS_IF;
-+
-+	do {
-+		asm volatile("clgi;sti");
-+		SVM_VMRUN(vcpu);
-+		asm volatile("cli;stgi");
-+		assert(vcpu->vmcb->control.exit_code == SVM_EXIT_VMMCALL);
-+
-+		if (poll_in_the_guest)
-+			assert(old_count < state->isr_count);
-+
-+	} while (old_count == state->isr_count);
-+}
-+#endif
- 
- static void vcpu_init(void *)
- {
-@@ -85,6 +144,11 @@ static void vcpu_init(void *)
- 	state->random = get_prng();
- 	state->isr_count = 0;
- 	state->smp_id = smp_id();
-+
-+#ifdef __x86_64__
-+	if (use_svm)
-+		svm_vcpu_init(&state->vcpu);
-+#endif
- }
- 
- static void vcpu_code(void *)
-@@ -111,7 +175,12 @@ static void vcpu_code(void *)
- 			break;
- 
- 		// wait for the IPI interrupt chain to come back to us
--		wait_for_ipi(state);
-+#if __x86_64__
-+		if (use_svm && random_decision(&state->random, 20))
-+			wait_for_ipi_in_l2(state);
-+		else
-+#endif
-+			wait_for_ipi(state);
- 	}
- }
- 
-@@ -137,6 +206,14 @@ int main(int argc, void **argv)
- 	setup_vm();
- 	init_prng();
- 
-+#ifdef __x86_64__
-+	if (this_cpu_has(X86_FEATURE_SVM)) {
-+		use_svm = true;
-+		if (!setup_svm())
-+			use_svm = false;
-+	}
-+#endif
-+
- 	cpu_states = calloc(ncpus, sizeof(cpu_states[0]));
- 
- 	printf("found %d cpus\n", ncpus);
+ lib/s390x/cmm.c              |  83 ++++++++++++++++++++++++++
+ lib/s390x/cmm.h              |  29 +++++++++
+ s390x/Makefile               |   2 +
+ s390x/migration-cmm.c        |  36 ++++--------
+ s390x/migration-during-cmm.c | 111 +++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg          |   5 ++
+ 6 files changed, 240 insertions(+), 26 deletions(-)
+ create mode 100644 lib/s390x/cmm.c
+ create mode 100644 lib/s390x/cmm.h
+ create mode 100644 s390x/migration-during-cmm.c
+
 -- 
-2.34.3
+2.36.1
 
