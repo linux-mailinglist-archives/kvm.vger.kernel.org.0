@@ -2,141 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 159916342A7
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 18:41:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3489F6342FA
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 18:49:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234209AbiKVRlc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 12:41:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55350 "EHLO
+        id S234611AbiKVRti (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 12:49:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232660AbiKVRla (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 12:41:30 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2073.outbound.protection.outlook.com [40.107.244.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 164647990D
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 09:41:29 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lJv3BMpagXqQtyqhyv4cdJNI25z9MJcNwrBtR0/8l5M5Gxu2PvOgnGat7iPuOw/mLSc+c6MmGG6xuCpbhRHbd+iwBnPzxvfZyCnyqxKximshjAZCCVZYq19S77LI3Mxh2EqifPGjb7G00rlybUi542a/dciuaYrou2b2dhObeB2mFGxZYSIuhy+2MBLX78MCbcxx4JCofdN/seBsjgVf3Q1NHhuT1dnzTi9cB73cTA+xBYBfyYcuoNtrMUs9htHERstGHXviWhHWeJqtgAyFEVrCY7Z5oHkHysGVLmqfUOigKWDha8JqbIA0uBa1T4dRtY4ZHN32nEJWbQ+tCXn5mQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qaBI9x3FNPhNDo2avcNj0+r369W4q6MhyT9r/M0SGjA=;
- b=XkFmbH70h5O3qm9K8u4aEIEc9oHFMWSf+FeQGmhOUQ4eX+uao1V0L/ODvQZD9R+GdcCL98x6I+GMb8WBFbT2jPGwwiZXR0P2Xru7SBnWk4lpAj8fwcVFlnFjEsW4PWFhYW6rvEe8KPAFEjiC+TXb3TOXg+rkCuPimcLVhZx1gl5yGgUiB5yNWN6+HO4QVhr73JXWcw+/wIZiQ0GWvo7e4x1tJ9CBq/vn5z2I19lmHe4k53pej0/HT74l1Hf0wX/6BNfSRJza0Ttyr1xFQP5y3Y+ZQYJi3Vd0o8PYFvZBRqYF+ga6e13m49hz0x9+zz2vNGdJRzfkIJDqZRLz0QwfOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qaBI9x3FNPhNDo2avcNj0+r369W4q6MhyT9r/M0SGjA=;
- b=rlTERKQIy+jM7oLaYh0sGYzGBDTRbelbsCYx+0DtbFn2p0EMZaOEUovMWpq3k8hfMtq3cmh5QU3bmh8zL5FRY3HLMPMe6sACp4AQKCVODioPtmS0NZKrV4+f1nONlrOXbsyQTmDA5IZEMPdqyyo+LHxuAfgAR7jTTK9MRt4IBJ0Kk5w3qtZdqisFM9DEhpJlnDoiKbX5Wg8VIMPS/Cpu0PyQ2yeBkLzSfjrur5QVC4RxS0BIvLE2fZiCWFXV820U4Zv6Ujn6rQzlJec83lmWzZyOubms4qd0+r1k/58+c6xCGAcw2ooqdAqAreh4GdrFTGUB93Hhy/ezt0iKC0CjDA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BL1PR12MB5254.namprd12.prod.outlook.com (2603:10b6:208:31e::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.15; Tue, 22 Nov
- 2022 17:41:26 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5834.015; Tue, 22 Nov 2022
- 17:41:26 +0000
-Date:   Tue, 22 Nov 2022 13:41:25 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Lixiao Yang <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Yi Liu <yi.l.liu@intel.com>, Yu He <yu.he@intel.com>
-Subject: Re: [PATCH v3 04/11] vfio: Move storage of allow_unsafe_interrupts
- to vfio_main.c
-Message-ID: <Y30JxWOvo1oa2Y3y@nvidia.com>
-References: <0-v3-50561e12d92b+313-vfio_iommufd_jgg@nvidia.com>
- <4-v3-50561e12d92b+313-vfio_iommufd_jgg@nvidia.com>
- <20221117131451.7d884cdc.alex.williamson@redhat.com>
- <Y3embh+09Fqu26wJ@nvidia.com>
- <20221118133646.7c6421e7.alex.williamson@redhat.com>
- <Y3wtAPTqKJLxBRBg@nvidia.com>
- <20221122103456.7a97ac9b.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221122103456.7a97ac9b.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL1PR13CA0253.namprd13.prod.outlook.com
- (2603:10b6:208:2ba::18) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5254:EE_
-X-MS-Office365-Filtering-Correlation-Id: 82caa9b7-d10a-4730-a83c-08daccb0c7c7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GcFJAydRW75oBRTIbgUa7K2JUwzVeYupilygULSM7aiH/54u2zdwG/L7sQDqp+o/YEM+K0j3Mbnkbzt66aJbGw8zadRVXkMkuj4zzuRbDK7vrPu4EVmMGpy9mwN7tYRXN8f+KOy7SWNQXYclAmLBgjhVDPHUfFl0Uzctd8S9WZjtVPblmzM7qPE8Q08zpHYM2umlydgq+Bgq/UGANDcM93IiH27pqFO7bD9sVaXEyqclXlUxtAtDfmBb4nOvBYnJUlGBm37RLs6FDOVIFTB/OiH0llWAhjTT4sEdLQXEHGIEOg/wJtVFHWyoco2V6BEskFbwwKzZnb79h/MQUcW+CYwZsvRq79QokbEeQ/UoKCeUyMdJREqYIXQRSW6Md1AC1bkyNLJlDL7tSuef5LKdfg6vGavyVhdKyNuMonm0UeOSXtQmJMBAar5WGfQXtcghtM9l0hP+WOrJJM1oZg7qQaSkQXtZFNWgLZyFMXM74WkoD4w+EGJKC0iQa+Sefyq+QN0V5uyZeqZFqFBTGupCDlX2fhQCUr3a8e7Wd2rPc471Nb+wxGE9hFPX+uzP3TnWb1zq9S2xVt8DVA7RyqAY0HMSidtqKJBiViw7zBnRrUcJbJqECU0CxVurVG6GyQfQ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(136003)(396003)(376002)(366004)(346002)(451199015)(36756003)(5660300002)(4744005)(7416002)(2906002)(66946007)(66476007)(4326008)(66556008)(8676002)(8936002)(6506007)(54906003)(6916009)(86362001)(316002)(26005)(41300700001)(2616005)(6512007)(186003)(478600001)(6486002)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?8c3Ts/WnqRkDFKUIaojRcCgCeF0edk+bziTdVBt5ZrT22rIrgJbtS9bXFUgd?=
- =?us-ascii?Q?/SX+x1l2Xs3h9Ov+AJoWoPK/XOB4dz5iVvCRgCkD6j6qPfOkFWPoNJ06sBzp?=
- =?us-ascii?Q?Pm8bY+YXPvtM3pUBD2SreJUB5AJaDuzkqBxnsQsAWy1VENVcxs6d4cu0X3LS?=
- =?us-ascii?Q?1HQJkFlJI480thvs5Jh/yX2On5UlllmOU1CROHfFRkRyTy1K6+EU1OJG6gxl?=
- =?us-ascii?Q?7wJ719+O2FRDL4bjlC+8BI96vVSxcy5MqpGUNVe1oHF+4+jqoRf+aGwEeYog?=
- =?us-ascii?Q?wwATjOKzE780WHhwdIEVzILTwMI+wCM11O3PTKGm7bBZU/UUS67AiAdTzXUG?=
- =?us-ascii?Q?LgrV7AILQdrEK4vVw+qRgFl5gM48nE4gWVUd9fnSwi/QWW4BxRFoiWjUIGQE?=
- =?us-ascii?Q?7bJ0gSiKBBLb6Zj2mgepKPix2yfU320xpY10FHBwZrDLXiDG+LK8a2VxWQch?=
- =?us-ascii?Q?zLnUd7RAWboJl5qYrd8lJpackYzvVAQ2RUl5JSMbJJFSVpce/gw80krOvkX3?=
- =?us-ascii?Q?CGLe27+NTAZfvNWltdj2z44UqKE791WRcgp0+7Z4IL3VjaYp6/mbtgJNR6Ww?=
- =?us-ascii?Q?RqmGTiT/Wf7FfIveTSip2sA8B1RoGhtbpVMFV8RxipIaF9eoiVjr8IQIOsah?=
- =?us-ascii?Q?uf47PdA23Xn36pTlf4wgr7AmwYshOC+NSFf7D2aSK4qkrGCODI4LW3n43sn5?=
- =?us-ascii?Q?JcFZ5+ljnkZ/8BV0GXjEzs9d4t3D+EFjtwN+FLgkgB+A1NGtCpcQPGyeC7Dm?=
- =?us-ascii?Q?4C3OAP49G0vs401FGhlE/LvJEP5np/dH5IIz33Gl8JVLpGApqnDW80gC/Acq?=
- =?us-ascii?Q?+ozVlgiCZ2cDObXp4okcyuq1ToHDPsDd91uGzejikTmMUnro10nbAhr5Vgwz?=
- =?us-ascii?Q?ak4JEBJG6WZlpSB5X44Y2nR5SRaUKFq5w6hpcUtQzLCy69owEYSIdRHFpz0L?=
- =?us-ascii?Q?vGrLW82Z4zj8ZWq9P9EE+8I8KOT2epHZsoC0ToP8rM1CeU7yUFN8W7zUTBie?=
- =?us-ascii?Q?wtW5lSA5yC+u5gW3R55o7JqI6cmkrjc9VtSHaTzUuGJSxN/rPA2b0fF64187?=
- =?us-ascii?Q?ofBHlQPYiiSZhAyD2sdYRzJNmnl/PnyjD2KKBQeyqxiRzNlWWFOGCvCy/fiS?=
- =?us-ascii?Q?JXS7HlFAW+8qN5eqKfX11O5BtJ10XgxRrB8JbTFJXVHfPbRj9DJ1cmkyP309?=
- =?us-ascii?Q?TjDBkh0IIVtUr4gsvF5zQZkEmoGdaQhXG10SmUCCeX1g4KoMSdM2j7guq1ty?=
- =?us-ascii?Q?otfO1YaBRC2+GsptYX1stihO8NC0L83dZ+V2Bccn8x4zuNp5iC1MrB3EF0Os?=
- =?us-ascii?Q?EqkQHabiZfE22PwEyLDXqE/rZW6VX1aklrMvQytTBGRADZNPl2cXDBLK8+be?=
- =?us-ascii?Q?UYt8t0tLt7zq0mp0Be9gM4J4uaKKVGYO3TIVqiuhvB2fG7PtFtw97diRRNbk?=
- =?us-ascii?Q?HHOfxX+K5dYqh9NrKI2htykT/xFaFUXhHU5TY9ryH3Smr0iX6SGrEENwDWaj?=
- =?us-ascii?Q?1PVfAkIoD51S710502C96qgx3gOKACo3yPAzPNMCrkO+IpX4nZsdR32q0tt7?=
- =?us-ascii?Q?U8rmPXdCxF4Z9rmQwHU=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82caa9b7-d10a-4730-a83c-08daccb0c7c7
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2022 17:41:26.5490
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8PRUXWDSztuFrQe7k1VPUSWEyZM0cO62x/nm+KrcTKfyr5wjGRWfYIozcGkG4sEB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5254
-X-Spam-Status: No, score=1.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_PASS,
-        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: *
+        with ESMTP id S234598AbiKVRtT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 12:49:19 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D3538D4A2
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 09:46:16 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D16DBB81A02
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 17:46:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A046C433D6;
+        Tue, 22 Nov 2022 17:46:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669139167;
+        bh=tHyqkyfG/C4O7vnotzmDJkmwWcmPmlpR0fsfpfEOwBg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=tLzsqjiUaNfL/2YtdPMRk/tsvSq++WEX1mdRuYzO35rleu5XCIkO8wtR8Q3wyxwZN
+         U+mYJ3QDF9jDn2TQwP0COjEipGvlYQxa5DoJ8LgpUEElQ4c4zR+gZehI9KMJDNFHGf
+         0ByUaT/9qRmvVa0gO5wdLdl2qDprpRsgsfelZ5F7PzVFOt0DPvg3fUoW9XjDjlfARU
+         mLfrTQNfPngB6bOLSh4jA1qfG/PU3YLyF1zrL+LjYePDm0gQV7eQfD+Um+99qht8v7
+         vHmcC0bbB5xbqcR/4etzcGkjPuvWdX81bAp8VvLcQvzKIq2nAVZP5CvKdXillJW2hP
+         yGu4ov6BqBykA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oxXLR-007vgG-8r;
+        Tue, 22 Nov 2022 17:46:05 +0000
+Date:   Tue, 22 Nov 2022 17:46:04 +0000
+Message-ID: <86mt8iopb7.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com,
+        borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v7 1/4] KVM: Implement dirty quota-based throttling of vcpus
+In-Reply-To: <18b66b42-0bb4-4b32-e92c-3dce61d8e6a4@nutanix.com>
+References: <20221113170507.208810-1-shivam.kumar1@nutanix.com>
+        <20221113170507.208810-2-shivam.kumar1@nutanix.com>
+        <86zgcpo00m.wl-maz@kernel.org>
+        <18b66b42-0bb4-4b32-e92c-3dce61d8e6a4@nutanix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: shivam.kumar1@nutanix.com, pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org, shaju.abraham@nutanix.com, manish.mishra@nutanix.com, anurag.madnawat@nutanix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> BTW, what is the actual expected use case of passing an iommufd as a
-> vfio container?  I have doubts that it'd make sense to have QEMU look
-> for an iommufd in place of a vfio container for anything beyond yet
-> another means for early testing of iommufd.  Thanks,
+On Fri, 18 Nov 2022 09:47:50 +0000,
+Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
+> 
+> 
+> 
+> On 18/11/22 12:56 am, Marc Zyngier wrote:
+> > On Sun, 13 Nov 2022 17:05:06 +0000,
+> > Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
+> >> 
+> >> +    count: the current count of pages dirtied by the VCPU, can be
+> >> +    skewed based on the size of the pages accessed by each vCPU.
+> > 
+> > How can userspace make a decision on the amount of dirtying this
+> > represent if this doesn't represent a number of base pages? Or are you
+> > saying that this only counts the number of permission faults that have
+> > dirtied pages?
+> 
+> Yes, this only counts the number of permission faults that have
+> dirtied pages.
 
-I don't think there is one in production for qemu.
+So how can userspace consistently set a quota of dirtied memory? This
+has to account for the size that has been faulted, because that's all
+userspace can reason about. Remember that at least on arm64, we're
+dealing with 3 different base page sizes, and many more large page
+sizes.
 
-For something like DPDK I can imagine replacing the open logic to use
-vfio device cdevs and iommufd, but keeping the rest of the logic the
-same so the FD looks and feels like a VFIO container. There is little
-value in replacing the VFIO map/unmap/etc ioctls with the IOMMUFD
-equivalents.
+> 
+> > 
+> >> +    quota: the observed dirty quota just before the exit to
+> >> userspace.
+> > 
+> > You are defining the quota in terms of quota. -ENOCLUE.
+> 
+> I am defining the "quota" member of the dirty_quota_exit struct in
+> terms of "dirty quota" which is already defined in the commit
+> message.
 
-Jason
+Which nobody will see. This is supposed to be a self contained
+documentation.
+
+> 
+> > 
+> >> +
+> >> +The userspace can design a strategy to allocate the overall scope of dirtying
+> >> +for the VM among the vcpus. Based on the strategy and the current state of dirty
+> >> +quota throttling, the userspace can make a decision to either update (increase)
+> >> +the quota or to put the VCPU to sleep for some time.
+> > 
+> > This looks like something out of 1984 (Newspeak anyone)? Can't you
+> > just say that userspace is responsible for allocating the quota and
+> > manage the resulting throttling effect?
+> 
+> We didn't intend to sound like the Party or the Big Brother. We
+> started working on the linux and QEMU patches at the same time and got
+> tempted into exposing the details of how we were using this feature in
+> QEMU for throttling. I can get rid of the details if it helps.
+
+I think the details are meaningless, and this should stick to the API,
+not the way the API could be used.
+
+> 
+> >> +	/*
+> >> +	 * Number of pages the vCPU is allowed to have dirtied over its entire
+> >> +	 * lifetime.  KVM_RUN exits with KVM_EXIT_DIRTY_QUOTA_EXHAUSTED if the quota
+> >> +	 * is reached/exceeded.
+> >> +	 */
+> >> +	__u64 dirty_quota;
+> > 
+> > How are dirty_quota and dirty_quota_exit.quota related?
+> > 
+> 
+> dirty_quota_exit.quota is the dirty quota at the time of the exit. We
+> are capturing it for userspace's reference because dirty quota can be
+> updated anytime.
+
+Shouldn't that be described here?
+
+> 
+> >> @@ -48,6 +48,7 @@ config KVM
+> >>   	select KVM_VFIO
+> >>   	select SRCU
+> >>   	select INTERVAL_TREE
+> >> +	select HAVE_KVM_DIRTY_QUOTA
+> > 
+> > Why isn't this part of the x86 patch?
+> 
+> Ack. Thanks.
+> 
+> >>    * Architecture-independent vcpu->requests bit members
+> >> - * Bits 3-7 are reserved for more arch-independent bits.
+> >> + * Bits 5-7 are reserved for more arch-independent bits.
+> >>    */
+> >>   #define KVM_REQ_TLB_FLUSH         (0 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> >>   #define KVM_REQ_VM_DEAD           (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> >>   #define KVM_REQ_UNBLOCK           2
+> >> +#define KVM_REQ_DIRTY_QUOTA_EXIT  4
+> > 
+> > Where is 3? Why reserve two bits when only one is used?
+> 
+> Ack. 3 was in use when I was working on the patchset. Missed this in
+> my last code walkthrough before sending the patchset. Thanks.
+> 
+> >>   +static bool kvm_vcpu_is_dirty_quota_exhausted(struct kvm_vcpu
+> >> *vcpu)
+> >> +{
+> >> +#ifdef CONFIG_HAVE_KVM_DIRTY_QUOTA
+> >> +	u64 dirty_quota = READ_ONCE(vcpu->run->dirty_quota);
+> >> +
+> >> +	return dirty_quota && (vcpu->stat.generic.pages_dirtied >= dirty_quota);
+> >> +#else
+> >> +	return false;
+> >> +#endif
+> > 
+> > If you introduce additional #ifdefery here, why are the additional
+> > fields in the vcpu structure unconditional?
+> 
+> pages_dirtied can be a useful information even if dirty quota
+> throttling is not used. So, I kept it unconditional based on
+> feedback.
+
+Useful for whom? This creates an ABI for all architectures, and this
+needs buy-in from everyone. Personally, I think it is a pretty useless
+stat.
+
+And while we're talking about pages_dirtied, I really dislike the
+WARN_ON in mark_page_dirty_in_slot(). A counter has rolled over?
+Shock, horror...
+
+> 
+> CC: Sean
+> 
+> I can add #ifdefery in the vcpu run struct for dirty_quota.
+> 
+> >>   		else
+> >>   			set_bit_le(rel_gfn, memslot->dirty_bitmap);
+> >> +
+> >> +		if (kvm_vcpu_is_dirty_quota_exhausted(vcpu))
+> >> +			kvm_make_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu);
+> > 
+> > This is broken in the light of new dirty-tracking code queued for
+> > 6.2. Specifically, you absolutely can end-up here *without* a vcpu on
+> > arm64. You just have to snapshot the ITS state to observe the fireworks.
+> 
+> Could you please point me to the patchset which is in queue?
+
+The patches are in -next, and you can look at the branch here[1].
+Please also refer to the discussion on the list, as a lot of what was
+discussed there does apply here.
+
+Thanks,
+
+	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/dirty-ring
+
+-- 
+Without deviation from the norm, progress is not possible.
