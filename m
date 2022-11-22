@@ -2,62 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F11B5634296
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 18:36:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 159916342A7
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 18:41:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233996AbiKVRgF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 12:36:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51366 "EHLO
+        id S234209AbiKVRlc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 12:41:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232723AbiKVRgD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 12:36:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAA3626F7
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 09:35:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669138502;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YODSWn+5JxpH+sbAx2dpm5qkS38gFi2Q3q/NzXm77VE=;
-        b=A8C4cBc8dS3l387teNTgZUSYIHlW2vOKngj3f9h6IuNSCLPa13VePmNU7zUVbQgIov/ayF
-        kIOf+T3By+n8VA7Q5xZV1P4gLM+i91s8CpfiHCgOhXQ8F7gGh8CX4FqUOF702+Io28Lwej
-        pqj+do3879sCUYBR5mb+JbSc0WU4Hq4=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-313-ptrfsydVOb6tkv1cOPp-ZQ-1; Tue, 22 Nov 2022 12:35:00 -0500
-X-MC-Unique: ptrfsydVOb6tkv1cOPp-ZQ-1
-Received: by mail-il1-f197.google.com with SMTP id i26-20020a056e021d1a00b003025434c04eso11049834ila.13
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 09:35:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YODSWn+5JxpH+sbAx2dpm5qkS38gFi2Q3q/NzXm77VE=;
-        b=OD8C+K2FEd7S7OWyIezQmwdFmLuf7WDtZQmwUTuBz0DWyOQz02l7SikmfSGV6IEtJ3
-         J63jI0kdllcepRBe5dF1zVrF4K1pohFZqhVohSuSQZV9i5P8HtGzTwSTFTvJopsN3HEH
-         urF7AR90Fz44lCNy+MvOlBP/hhPk6+VPK8reuYyr5e8yfvf0+BJz+BKz+X7n/tvEkATS
-         PpsCWUC7FIGMbhkm5yOvzO3BXjhfjbItghik2jXirTQBijIkEhFNqSUtAGkIwGASxrB9
-         zUBBFvl61iKgLHM7OvMY91WhFjnazsHoxXV9k/kMszEXGKDZRl3YDfXce3q1/cz2rJEz
-         iaSg==
-X-Gm-Message-State: ANoB5pm57fIry/ksNGhoqHgPIszPCJwJ+M25cOSKWuausZdSDyv7NkPx
-        O2JEJpnkTXYqcHBDU48ZDe7X5QD40ap3HUaCYhK6R2obvjJjfY3OlcyvjGJmofTf3lnt+a1Biki
-        6J9iZgzyvlasH
-X-Received: by 2002:a02:c723:0:b0:363:b95b:78eb with SMTP id h3-20020a02c723000000b00363b95b78ebmr4648000jao.61.1669138500006;
-        Tue, 22 Nov 2022 09:35:00 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf464yCXJHLA8r+u5yBZTRKqrUYkVjcUFbDV06k0PEpXgNU1UGQkO9QE9uf3ESKyo7a11mc0QQ==
-X-Received: by 2002:a02:c723:0:b0:363:b95b:78eb with SMTP id h3-20020a02c723000000b00363b95b78ebmr4647982jao.61.1669138499728;
-        Tue, 22 Nov 2022 09:34:59 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id i1-20020a02a0c1000000b00369a91d1bd4sm5350675jah.138.2022.11.22.09.34.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Nov 2022 09:34:59 -0800 (PST)
-Date:   Tue, 22 Nov 2022 10:34:56 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
+        with ESMTP id S232660AbiKVRla (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 12:41:30 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2073.outbound.protection.outlook.com [40.107.244.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 164647990D
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 09:41:29 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lJv3BMpagXqQtyqhyv4cdJNI25z9MJcNwrBtR0/8l5M5Gxu2PvOgnGat7iPuOw/mLSc+c6MmGG6xuCpbhRHbd+iwBnPzxvfZyCnyqxKximshjAZCCVZYq19S77LI3Mxh2EqifPGjb7G00rlybUi542a/dciuaYrou2b2dhObeB2mFGxZYSIuhy+2MBLX78MCbcxx4JCofdN/seBsjgVf3Q1NHhuT1dnzTi9cB73cTA+xBYBfyYcuoNtrMUs9htHERstGHXviWhHWeJqtgAyFEVrCY7Z5oHkHysGVLmqfUOigKWDha8JqbIA0uBa1T4dRtY4ZHN32nEJWbQ+tCXn5mQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qaBI9x3FNPhNDo2avcNj0+r369W4q6MhyT9r/M0SGjA=;
+ b=XkFmbH70h5O3qm9K8u4aEIEc9oHFMWSf+FeQGmhOUQ4eX+uao1V0L/ODvQZD9R+GdcCL98x6I+GMb8WBFbT2jPGwwiZXR0P2Xru7SBnWk4lpAj8fwcVFlnFjEsW4PWFhYW6rvEe8KPAFEjiC+TXb3TOXg+rkCuPimcLVhZx1gl5yGgUiB5yNWN6+HO4QVhr73JXWcw+/wIZiQ0GWvo7e4x1tJ9CBq/vn5z2I19lmHe4k53pej0/HT74l1Hf0wX/6BNfSRJza0Ttyr1xFQP5y3Y+ZQYJi3Vd0o8PYFvZBRqYF+ga6e13m49hz0x9+zz2vNGdJRzfkIJDqZRLz0QwfOA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qaBI9x3FNPhNDo2avcNj0+r369W4q6MhyT9r/M0SGjA=;
+ b=rlTERKQIy+jM7oLaYh0sGYzGBDTRbelbsCYx+0DtbFn2p0EMZaOEUovMWpq3k8hfMtq3cmh5QU3bmh8zL5FRY3HLMPMe6sACp4AQKCVODioPtmS0NZKrV4+f1nONlrOXbsyQTmDA5IZEMPdqyyo+LHxuAfgAR7jTTK9MRt4IBJ0Kk5w3qtZdqisFM9DEhpJlnDoiKbX5Wg8VIMPS/Cpu0PyQ2yeBkLzSfjrur5QVC4RxS0BIvLE2fZiCWFXV820U4Zv6Ujn6rQzlJec83lmWzZyOubms4qd0+r1k/58+c6xCGAcw2ooqdAqAreh4GdrFTGUB93Hhy/ezt0iKC0CjDA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BL1PR12MB5254.namprd12.prod.outlook.com (2603:10b6:208:31e::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.15; Tue, 22 Nov
+ 2022 17:41:26 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5834.015; Tue, 22 Nov 2022
+ 17:41:26 +0000
+Date:   Tue, 22 Nov 2022 13:41:25 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
 Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Eric Auger <eric.auger@redhat.com>,
@@ -68,124 +53,90 @@ Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
         Yi Liu <yi.l.liu@intel.com>, Yu He <yu.he@intel.com>
 Subject: Re: [PATCH v3 04/11] vfio: Move storage of allow_unsafe_interrupts
  to vfio_main.c
-Message-ID: <20221122103456.7a97ac9b.alex.williamson@redhat.com>
-In-Reply-To: <Y3wtAPTqKJLxBRBg@nvidia.com>
+Message-ID: <Y30JxWOvo1oa2Y3y@nvidia.com>
 References: <0-v3-50561e12d92b+313-vfio_iommufd_jgg@nvidia.com>
-        <4-v3-50561e12d92b+313-vfio_iommufd_jgg@nvidia.com>
-        <20221117131451.7d884cdc.alex.williamson@redhat.com>
-        <Y3embh+09Fqu26wJ@nvidia.com>
-        <20221118133646.7c6421e7.alex.williamson@redhat.com>
-        <Y3wtAPTqKJLxBRBg@nvidia.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+ <4-v3-50561e12d92b+313-vfio_iommufd_jgg@nvidia.com>
+ <20221117131451.7d884cdc.alex.williamson@redhat.com>
+ <Y3embh+09Fqu26wJ@nvidia.com>
+ <20221118133646.7c6421e7.alex.williamson@redhat.com>
+ <Y3wtAPTqKJLxBRBg@nvidia.com>
+ <20221122103456.7a97ac9b.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221122103456.7a97ac9b.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL1PR13CA0253.namprd13.prod.outlook.com
+ (2603:10b6:208:2ba::18) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5254:EE_
+X-MS-Office365-Filtering-Correlation-Id: 82caa9b7-d10a-4730-a83c-08daccb0c7c7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GcFJAydRW75oBRTIbgUa7K2JUwzVeYupilygULSM7aiH/54u2zdwG/L7sQDqp+o/YEM+K0j3Mbnkbzt66aJbGw8zadRVXkMkuj4zzuRbDK7vrPu4EVmMGpy9mwN7tYRXN8f+KOy7SWNQXYclAmLBgjhVDPHUfFl0Uzctd8S9WZjtVPblmzM7qPE8Q08zpHYM2umlydgq+Bgq/UGANDcM93IiH27pqFO7bD9sVaXEyqclXlUxtAtDfmBb4nOvBYnJUlGBm37RLs6FDOVIFTB/OiH0llWAhjTT4sEdLQXEHGIEOg/wJtVFHWyoco2V6BEskFbwwKzZnb79h/MQUcW+CYwZsvRq79QokbEeQ/UoKCeUyMdJREqYIXQRSW6Md1AC1bkyNLJlDL7tSuef5LKdfg6vGavyVhdKyNuMonm0UeOSXtQmJMBAar5WGfQXtcghtM9l0hP+WOrJJM1oZg7qQaSkQXtZFNWgLZyFMXM74WkoD4w+EGJKC0iQa+Sefyq+QN0V5uyZeqZFqFBTGupCDlX2fhQCUr3a8e7Wd2rPc471Nb+wxGE9hFPX+uzP3TnWb1zq9S2xVt8DVA7RyqAY0HMSidtqKJBiViw7zBnRrUcJbJqECU0CxVurVG6GyQfQ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(136003)(396003)(376002)(366004)(346002)(451199015)(36756003)(5660300002)(4744005)(7416002)(2906002)(66946007)(66476007)(4326008)(66556008)(8676002)(8936002)(6506007)(54906003)(6916009)(86362001)(316002)(26005)(41300700001)(2616005)(6512007)(186003)(478600001)(6486002)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?8c3Ts/WnqRkDFKUIaojRcCgCeF0edk+bziTdVBt5ZrT22rIrgJbtS9bXFUgd?=
+ =?us-ascii?Q?/SX+x1l2Xs3h9Ov+AJoWoPK/XOB4dz5iVvCRgCkD6j6qPfOkFWPoNJ06sBzp?=
+ =?us-ascii?Q?Pm8bY+YXPvtM3pUBD2SreJUB5AJaDuzkqBxnsQsAWy1VENVcxs6d4cu0X3LS?=
+ =?us-ascii?Q?1HQJkFlJI480thvs5Jh/yX2On5UlllmOU1CROHfFRkRyTy1K6+EU1OJG6gxl?=
+ =?us-ascii?Q?7wJ719+O2FRDL4bjlC+8BI96vVSxcy5MqpGUNVe1oHF+4+jqoRf+aGwEeYog?=
+ =?us-ascii?Q?wwATjOKzE780WHhwdIEVzILTwMI+wCM11O3PTKGm7bBZU/UUS67AiAdTzXUG?=
+ =?us-ascii?Q?LgrV7AILQdrEK4vVw+qRgFl5gM48nE4gWVUd9fnSwi/QWW4BxRFoiWjUIGQE?=
+ =?us-ascii?Q?7bJ0gSiKBBLb6Zj2mgepKPix2yfU320xpY10FHBwZrDLXiDG+LK8a2VxWQch?=
+ =?us-ascii?Q?zLnUd7RAWboJl5qYrd8lJpackYzvVAQ2RUl5JSMbJJFSVpce/gw80krOvkX3?=
+ =?us-ascii?Q?CGLe27+NTAZfvNWltdj2z44UqKE791WRcgp0+7Z4IL3VjaYp6/mbtgJNR6Ww?=
+ =?us-ascii?Q?RqmGTiT/Wf7FfIveTSip2sA8B1RoGhtbpVMFV8RxipIaF9eoiVjr8IQIOsah?=
+ =?us-ascii?Q?uf47PdA23Xn36pTlf4wgr7AmwYshOC+NSFf7D2aSK4qkrGCODI4LW3n43sn5?=
+ =?us-ascii?Q?JcFZ5+ljnkZ/8BV0GXjEzs9d4t3D+EFjtwN+FLgkgB+A1NGtCpcQPGyeC7Dm?=
+ =?us-ascii?Q?4C3OAP49G0vs401FGhlE/LvJEP5np/dH5IIz33Gl8JVLpGApqnDW80gC/Acq?=
+ =?us-ascii?Q?+ozVlgiCZ2cDObXp4okcyuq1ToHDPsDd91uGzejikTmMUnro10nbAhr5Vgwz?=
+ =?us-ascii?Q?ak4JEBJG6WZlpSB5X44Y2nR5SRaUKFq5w6hpcUtQzLCy69owEYSIdRHFpz0L?=
+ =?us-ascii?Q?vGrLW82Z4zj8ZWq9P9EE+8I8KOT2epHZsoC0ToP8rM1CeU7yUFN8W7zUTBie?=
+ =?us-ascii?Q?wtW5lSA5yC+u5gW3R55o7JqI6cmkrjc9VtSHaTzUuGJSxN/rPA2b0fF64187?=
+ =?us-ascii?Q?ofBHlQPYiiSZhAyD2sdYRzJNmnl/PnyjD2KKBQeyqxiRzNlWWFOGCvCy/fiS?=
+ =?us-ascii?Q?JXS7HlFAW+8qN5eqKfX11O5BtJ10XgxRrB8JbTFJXVHfPbRj9DJ1cmkyP309?=
+ =?us-ascii?Q?TjDBkh0IIVtUr4gsvF5zQZkEmoGdaQhXG10SmUCCeX1g4KoMSdM2j7guq1ty?=
+ =?us-ascii?Q?otfO1YaBRC2+GsptYX1stihO8NC0L83dZ+V2Bccn8x4zuNp5iC1MrB3EF0Os?=
+ =?us-ascii?Q?EqkQHabiZfE22PwEyLDXqE/rZW6VX1aklrMvQytTBGRADZNPl2cXDBLK8+be?=
+ =?us-ascii?Q?UYt8t0tLt7zq0mp0Be9gM4J4uaKKVGYO3TIVqiuhvB2fG7PtFtw97diRRNbk?=
+ =?us-ascii?Q?HHOfxX+K5dYqh9NrKI2htykT/xFaFUXhHU5TY9ryH3Smr0iX6SGrEENwDWaj?=
+ =?us-ascii?Q?1PVfAkIoD51S710502C96qgx3gOKACo3yPAzPNMCrkO+IpX4nZsdR32q0tt7?=
+ =?us-ascii?Q?U8rmPXdCxF4Z9rmQwHU=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82caa9b7-d10a-4730-a83c-08daccb0c7c7
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2022 17:41:26.5490
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8PRUXWDSztuFrQe7k1VPUSWEyZM0cO62x/nm+KrcTKfyr5wjGRWfYIozcGkG4sEB
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5254
+X-Spam-Status: No, score=1.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_PASS,
+        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 21 Nov 2022 21:59:28 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+> BTW, what is the actual expected use case of passing an iommufd as a
+> vfio container?  I have doubts that it'd make sense to have QEMU look
+> for an iommufd in place of a vfio container for anything beyond yet
+> another means for early testing of iommufd.  Thanks,
 
-> On Fri, Nov 18, 2022 at 01:36:46PM -0700, Alex Williamson wrote:
-> > On Fri, 18 Nov 2022 11:36:14 -0400
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Thu, Nov 17, 2022 at 01:14:51PM -0700, Alex Williamson wrote:  
-> > > > On Wed, 16 Nov 2022 17:05:29 -0400
-> > > > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > > >     
-> > > > > This legacy module knob has become uAPI, when set on the vfio_iommu_type1
-> > > > > it disables some security protections in the iommu drivers. Move the
-> > > > > storage for this knob to vfio_main.c so that iommufd can access it too.
-> > > > > 
-> > > > > The may need enhancing as we learn more about how necessary
-> > > > > allow_unsafe_interrupts is in the current state of the world. If vfio
-> > > > > container is disabled then this option will not be available to the user.
-> > > > > 
-> > > > > Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-> > > > > Tested-by: Yi Liu <yi.l.liu@intel.com>
-> > > > > Tested-by: Lixiao Yang <lixiao.yang@intel.com>
-> > > > > Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> > > > > Tested-by: Yu He <yu.he@intel.com>
-> > > > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > > > > ---
-> > > > >  drivers/vfio/vfio.h             | 2 ++
-> > > > >  drivers/vfio/vfio_iommu_type1.c | 5 ++---
-> > > > >  drivers/vfio/vfio_main.c        | 3 +++
-> > > > >  3 files changed, 7 insertions(+), 3 deletions(-)    
-> > > > 
-> > > > It's really quite trivial to convert to a vfio_iommu.ko module to host
-> > > > a separate option for this.  Half of the patch below is undoing what's
-> > > > done here.  Is your only concern with this approach that we use a few
-> > > > KB more memory for the separate module?    
-> > > 
-> > > My main dislike is that it just seems arbitary to shunt iommufd
-> > > support to a module when it is always required by vfio.ko. In general
-> > > if you have a module that is only ever used by 1 other module, you
-> > > should probably just combine them. It saves memory and simplifies
-> > > operation (eg you don't have to unload a zoo of modules during
-> > > development testing)  
-> > 
-> > These are all great reasons for why iommufd should host this option, as
-> > it's fundamentally part of the DMA isolation of the device, which vfio
-> > relies on iommufd to provide in this case.   
-> 
-> Fine, lets do that.
-> 
-> > > Except this, I think we still should have iommufd compat with the
-> > > current module ABI, so this should still get moved into vfio.ko and
-> > > both vfio_iommu_type1.ko and vfio_iommufd.ko should jointly manipulate
-> > > the same memory with their module options.  
-> > 
-> > Modules implicitly interacting in this way is exactly what I find so
-> > terrible in the original proposal.  The idea of a stub type1 module to
-> > preserve that uAPI was only proposed as a known terrible solution to the
-> > problem.  
-> 
-> And I take it you prefer we remove this compat code as well and just
-> leave the module option on vfio_type1 non-working?
+I don't think there is one in production for qemu.
 
-In the case where userspace provides an iommufd for the container, yes,
-the type1 module then isn't involved.
- 
-> > think it's fair to require a re-opt-in by the user.  In the latter
-> > case, userspace is intentionally choosing to use a highly compatible
-> > uAPI, but nonetheless, it's still a different uAPI.  
-> 
-> Well, the later case is likely going to be a choice made by the
-> distribution, eg I would expect that libvirt will start automatically
-> favoring iommufd if it is available.
-> 
-> So, instructions someone might find saying to tweak the module option
-> and then use libvirt are going to stop working at some point.
+For something like DPDK I can imagine replacing the open logic to use
+vfio device cdevs and iommufd, but keeping the rest of the logic the
+same so the FD looks and feels like a VFIO container. There is little
+value in replacing the VFIO map/unmap/etc ioctls with the IOMMUFD
+equivalents.
 
-libvirt doesn't currently pass any file descriptors for vfio devices in
-QEMU, so we're looking a ways down the road here.  Once QEMU gains
-native iommufd support, libvirt will launch QEMU in a way that
-explicitly enables this iommufd support.  I'd expect libvirt might
-implement this by creating a "vfio-legacy" vs "vfio-iommufd" driver
-option, where "vfio" becomes an alias to one of those.  That allows both
-a staged transition and a fallback for issues.  I'd expect a first
-debugging step would be to fallback to legacy support.  But ultimately,
-yes, in the rare case that this option is actually necessary, the admin
-would need to re-opt-in, and hopefully a dmesg log from iommufd would
-make it apparent this is the problem.
-
-I just can't wrap my head around shared module options and stub drivers
-being a sane solution simply to make this potentially rare condition
-more transparent w/o reminding user's their setup has a vulnerability.
-
-BTW, what is the actual expected use case of passing an iommufd as a
-vfio container?  I have doubts that it'd make sense to have QEMU look
-for an iommufd in place of a vfio container for anything beyond yet
-another means for early testing of iommufd.  Thanks,
-
-Alex
-
+Jason
