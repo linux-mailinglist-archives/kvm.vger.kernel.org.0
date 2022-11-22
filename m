@@ -2,95 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1007633D3B
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 14:12:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E675C633E06
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 14:46:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232755AbiKVNLt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 08:11:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40728 "EHLO
+        id S231773AbiKVNqa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 08:46:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232828AbiKVNLZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 08:11:25 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 487D1627FC
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 05:11:24 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D54BF616F2
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 13:11:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32261C433C1;
-        Tue, 22 Nov 2022 13:11:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669122683;
-        bh=GZf60zaEOFSzAKJZHykfex+a5j/lCDpj8qT2YA+uWRg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=dgF3z/VWKUADfWrfbCT71fZ/RsAkF3uEgIbQn9uby0wG868IaAZ/M2RzdwBD7wo5R
-         lV/U7lmlWOoF1NzQGTqYfe+Z4u9ykknQSuBS8q6AsZqpoVG0ZAwphrl6xEW2FJpyPa
-         K6fZn6MJhSzXwrAaqihhoP7Zh0u/+0HogJZThjkH5i2zW1oAZA0bpZ8xCykW4eyfYx
-         MLXD8qgJdxX//a4RVkPmEoOgSJ3XLzdtyvyDkqXKg3IhAh99pr7+6hk2LB1hBllXL2
-         j78MFLZtanZiIV4UBMJAp+rQe8i5hbfCq6g+tIRNPxgZfkBnLCW9ILJViOiz2qvm4J
-         Es9h7VGLMedGg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oxT3Y-007rhv-QS;
-        Tue, 22 Nov 2022 13:11:21 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.linux.dev, Gavin Shan <gshan@redhat.com>
-Cc:     andrew.jones@linux.dev, kvmarm@lists.cs.columbia.edu,
-        bgardon@google.com, dmatlack@google.com, shan.gavin@gmail.com,
-        zhenyzha@redhat.com, catalin.marinas@arm.com,
-        ajones@ventanamicro.com, kvm@vger.kernel.org, will@kernel.org,
-        shuah@kernel.org, pbonzini@redhat.com
-Subject: Re: [PATCH for-next] KVM: Push dirty information unconditionally to backup bitmap
-Date:   Tue, 22 Nov 2022 13:11:17 +0000
-Message-Id: <166912262441.898230.966116891061492784.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221112094322.21911-1-gshan@redhat.com>
-References: <20221112094322.21911-1-gshan@redhat.com>
+        with ESMTP id S233589AbiKVNq2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 08:46:28 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C9D85E3EA;
+        Tue, 22 Nov 2022 05:46:27 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id b11so13305251pjp.2;
+        Tue, 22 Nov 2022 05:46:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uVTM4A73qJGSSEloWNLoqvF5MY8jd3iZQoKxxU2Mn44=;
+        b=n1uPwGarX993N3niKUyWMplrgd30jCR09b8RxbKnmLZHi26Z6w5oRDEodA/jhkNWmu
+         kRtNWvzxuLPpp6UWErGjbIcwTVG5xegoqyCH5ArX0TV8XJzaYGlyfsY0XmNGfwfayT/L
+         h4NXCXOkV1kivV8DUtUCW2X0vIBH7yHaKnqr8K5AfEksDfHySFcTPz7A/NSQTSr5kJNW
+         JOBtKM4IHPRJxf8U7xdBjQw2013as9wB3JZfIuaIQMZoRroTVG2oD047GwYJrOBE69xp
+         e94ZCusqpC8lUDK2oYYancD1JRAFE8/HY1fJjVIi7P3YMfYl1lqF06zFUmcmAUI/H9CV
+         e53w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uVTM4A73qJGSSEloWNLoqvF5MY8jd3iZQoKxxU2Mn44=;
+        b=4J6fgmNrElsrRMlQ5kzQeTvb3CLUHejbk9oH58EFiaw48wKhewn3mDMXddrkm3x4ZK
+         eGN3Cexqd0x4H0ePWpsDy23AErz+mCeBi42SvFgUPtg1ComnuQspfKZeQXrR1J26spVZ
+         7R3OQnr0U7M9R3a0T3YABmhNrZQuAc+PhstXxrHSP0NQWaZceo2jy9WLwXaR2GkAJa8Q
+         4EFiH4r1wvmsQKwAA81Kljj/aColY5M6BqR47vzoyKQ3+3T4gAEnPA7cBwQlZIuL3i/e
+         fqIoLkcAw4T2l4SRM7ZoXoipE/UQScpXkrWHoNRMDdElTAVYDHI+ERHTdkqTZ1xM4QZC
+         7Ivg==
+X-Gm-Message-State: ANoB5pmo8s5chGeSvqYN3uPGcpKKxLq78gABFtZGtqnlgWzhXqNqLAuq
+        m+KlTaOee6hbZQdrTb23w6CSpJi1KjcOXib/
+X-Google-Smtp-Source: AA0mqf6mBuVBnHthUDZGJp4gDXN9r+8/41ANiXXoYROa2Ht1Ikc9yTyJpUdZx6kFEKWWVOZBOGVSaA==
+X-Received: by 2002:a17:902:b40b:b0:188:75bb:36d4 with SMTP id x11-20020a170902b40b00b0018875bb36d4mr4724061plr.55.1669124786804;
+        Tue, 22 Nov 2022 05:46:26 -0800 (PST)
+Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:18:efec::75b])
+        by smtp.gmail.com with ESMTPSA id t8-20020a1709027fc800b00186c37270f6sm11921165plb.24.2022.11.22.05.46.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Nov 2022 05:46:25 -0800 (PST)
+Message-ID: <2f3c100f-355d-e4f2-ff42-2cb076e8aa86@gmail.com>
+Date:   Tue, 22 Nov 2022 21:46:14 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [RFC PATCH V2 16/18] x86/sev: Initialize #HV doorbell and handle
+ interrupt requests
+To:     "Kalra, Ashish" <ashish.kalra@amd.com>, luto@kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
+        tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, peterz@infradead.org,
+        srutherford@google.com, akpm@linux-foundation.org,
+        anshuman.khandual@arm.com, pawan.kumar.gupta@linux.intel.com,
+        adrian.hunter@intel.com, daniel.sneddon@linux.intel.com,
+        alexander.shishkin@linux.intel.com, sandipan.das@amd.com,
+        ray.huang@amd.com, brijesh.singh@amd.com, michael.roth@amd.com,
+        thomas.lendacky@amd.com, venu.busireddy@oracle.com,
+        sterritt@google.com, tony.luck@intel.com, samitolvanen@google.com,
+        fenghua.yu@intel.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
+References: <20221119034633.1728632-1-ltykernel@gmail.com>
+ <20221119034633.1728632-17-ltykernel@gmail.com>
+ <116799e9-8b14-66d6-d494-66272faec9e9@amd.com>
+Content-Language: en-US
+From:   Tianyu Lan <ltykernel@gmail.com>
+In-Reply-To: <116799e9-8b14-66d6-d494-66272faec9e9@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, gshan@redhat.com, andrew.jones@linux.dev, kvmarm@lists.cs.columbia.edu, bgardon@google.com, dmatlack@google.com, shan.gavin@gmail.com, zhenyzha@redhat.com, catalin.marinas@arm.com, ajones@ventanamicro.com, kvm@vger.kernel.org, will@kernel.org, shuah@kernel.org, pbonzini@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 12 Nov 2022 17:43:22 +0800, Gavin Shan wrote:
-> In mark_page_dirty_in_slot(), we bail out when no running vcpu exists
-> and a running vcpu context is strictly required by architecture. It may
-> cause backwards compatible issue. Currently, saving vgic/its tables is
-> the only known case where no running vcpu context is expected. We may
-> have other unknown cases where no running vcpu context exists and it's
-> reported by the warning message and we bail out without pushing the
-> dirty information to the backup bitmap. For this, the application is
-> going to enable the backup bitmap for the unknown cases. However, the
-> dirty information can't be pushed to the backup bitmap even though the
-> backup bitmap is enabled for those unknown cases in the application,
-> until the unknown cases are added to the allowed list of non-running
-> vcpu context with extra code changes to the host kernel.
+On 11/21/2022 11:05 PM, Kalra, Ashish wrote:
+>> +static void do_exc_hv(struct pt_regs *regs)
+>> +{
+>> +    union hv_pending_events pending_events;
+>> +    u8 vector;
+>> +
+>> +    while (sev_hv_pending()) {
+>> +        asm volatile("cli" : : : "memory");
+>> +
 > 
-> [...]
+> Do we really need to disable interrupts here, #HV exception will be 
+> dispatched via an interrupt gate in the IDT, so interrupts should be 
+> implicitly disabled, right ?
+>>    panic("Unexpected vector %d\n", vector);
+>> +                unreachable();
+>> +            }
+>> +        } else {
+>> +            common_interrupt(regs, pending_events.vector);
+>> +        }
+>> +
+>> +        asm volatile("sti" : : : "memory");
+> 
+> Again, why do we need to re-enable interrupts here (in this loop), 
+> interrupts will get re-enabled in the irqentry_exit() code path ?
 
-Applied to next, thanks!
-
-[1/1] KVM: Push dirty information unconditionally to backup bitmap
-      commit c57351a75d013c30e4a726aef1ad441676a99da4
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+Hi Ashish:
+	Thanks for your review.	check_hv_pending() is also called in the
+native_irq_enable() to handle some pending interrupt requests after re
+-enabling interrupt. For such case, disables irq when handle exception
+or interrupt event.
 
 
