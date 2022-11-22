@@ -2,73 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2B5A634187
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 17:30:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DE376341E0
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 17:49:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233389AbiKVQaM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 11:30:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34568 "EHLO
+        id S233774AbiKVQtm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 11:49:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbiKVQaK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 11:30:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD1C458BF7
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:29:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669134551;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HwdtA1PmkbyrWPv/XQHsML3IHO6+jEzCfmDUOfk9OE4=;
-        b=ioAB29vRIn6MutYJgKaxNNEfjTHUYMLulMUacT/J/yhQBJP3Uiink7ksLIRSuaRVODsFA5
-        G3VinupL3lzEzsJ8Dh3OXWXkUYmN9cLGczBgGLuNUqjy3E7mW6ofzxeVrA09rcxPla+Mm3
-        a5ow/a0hOrFR9Q144VkYqcPXq2llmG8=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-592-Oy7ni1Y9MhuCeYyrRbWQiA-1; Tue, 22 Nov 2022 11:29:10 -0500
-X-MC-Unique: Oy7ni1Y9MhuCeYyrRbWQiA-1
-Received: by mail-ej1-f69.google.com with SMTP id sd31-20020a1709076e1f00b007ae63b8d66aso8457893ejc.3
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:29:10 -0800 (PST)
+        with ESMTP id S232355AbiKVQtk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 11:49:40 -0500
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE286D494
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:49:39 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id s5so8421276wru.1
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:49:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WYdwvHIi6DqjXCDAORbhbwu4G8zzO6vRrPEDwC0sCPE=;
+        b=kNJg8I+unKo2QwPHf/4lQ1ohU2IwJZ6VbzuvuJ6xz3CgDuReNWeyoZwA2q4whLzM5K
+         L7lRo1DwcHIPy9D2q6RUtuJDKpPYsgTW1q9xsRkTmA/lEjHp1fD1bN1oeALm11tQXoGf
+         KE+jNQoRRLjqc1eQGVpwBn2EuNLfp3A1hmraLXSCGIfYMk2la3C+xWHTvqEtpPnaRNad
+         mnRPUHz0SFGCzWqMP8LwM4Y1xtJNpx7KyCeiN2lPY7NSdWD2eILK54CFg83ex9L+PWve
+         Qh7HkyDmtnssa84y75DL4XcM+6UnQ157JGSulnQ6RjMHIydCfw68cWikFisARlWHo99k
+         3hdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HwdtA1PmkbyrWPv/XQHsML3IHO6+jEzCfmDUOfk9OE4=;
-        b=43kDmC4cj4KcVAs5xMbhz+DQqkHntJBmHS1nPl1Qjm9ZhpfTe8prxgq6D1Vc0P4Nno
-         TQOAQ48gXch7O6lV5tyyIO3L+HNzoWIhcunuepkQ/g5fKGG8dzvg+szc8RHP2n3KZimy
-         QfDbM/g5XHDfGwMYT5C+WdFSTWQKH4bJI1tBG56A2S3hNSZBVuhzqrwWBa7P2d/ywtMv
-         r+gWc6HNMi7ALXawCsb2JjJccG6sE5GE7+5zBi5rxoAJNQAPWUWD6CD0ccyOwX4TEh+Q
-         ZZA2pP6XEoPU+UuxDyYSuY91xKwnCos7PVv6awk0tZgnhfkJuBOzhEceUFCzzuGTnqJ0
-         mk3Q==
-X-Gm-Message-State: ANoB5plDo/o/027/IksBPVcZneG5tW13EiXYB0gyqufbo6CyooPXra/b
-        ZcdZVwpaghcuJWeY8HQgoOkPzp54O8tDvDc3yxnCvxFcntBHShPLSAeiSrGBEkka9GXxFEQ8RIX
-        mlTkVi4sNamY/
-X-Received: by 2002:a05:6402:530c:b0:462:df63:5ec5 with SMTP id eo12-20020a056402530c00b00462df635ec5mr21841239edb.147.1669134549306;
-        Tue, 22 Nov 2022 08:29:09 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6DhNXIJEzGUQ6AzqU6LNTuQ8anzitncMbY+mVQLlez5XJW7coOYbHoy0je1vgcf6eBXxZuWA==
-X-Received: by 2002:a05:6402:530c:b0:462:df63:5ec5 with SMTP id eo12-20020a056402530c00b00462df635ec5mr21841219edb.147.1669134549055;
-        Tue, 22 Nov 2022 08:29:09 -0800 (PST)
-Received: from ovpn-194-185.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id p17-20020a17090653d100b007ae9c7b3c45sm6273617ejo.99.2022.11.22.08.29.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Nov 2022 08:29:07 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com
-Subject: Re: [PATCH v2 2/6] KVM: x86: hyper-v: Add extended hypercall
- support in Hyper-v
-In-Reply-To: <20221121234026.3037083-3-vipinsh@google.com>
-References: <20221121234026.3037083-1-vipinsh@google.com>
- <20221121234026.3037083-3-vipinsh@google.com>
-Date:   Tue, 22 Nov 2022 17:29:06 +0100
-Message-ID: <87bkozosvh.fsf@ovpn-194-185.brq.redhat.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WYdwvHIi6DqjXCDAORbhbwu4G8zzO6vRrPEDwC0sCPE=;
+        b=Wy3tJgOaf9hxvg3dgCZMY3+Jp9bbnsG2wm6nL11Y1UDDU681s7/guk5RzG/VBS18tY
+         fGwoWQ77t06b1vSoDNG8AAjJ7IE449+E0qMfqj5sltABlGmmFgPeFxmZVEGB9NULWz/j
+         rc/TlzsR5fqiPXtzX60EWomNdnxoSTM4WSvJKgOeWWErdIUDR8gNyeiIAhJCpFQy+DcJ
+         g0sxBQohOEjynW4pFhiiCCwnWkGTDX4PZB/Cg+GnAwhzL4hOmBJwzcfpjUL8kkd5S5C9
+         1f0ZTqPH/xUDN48IpwSIo0gtHdedPuOdDkrhcZEAPiNK/UvqWZB3vhWiQJVRkxd6kszw
+         sT/A==
+X-Gm-Message-State: ANoB5pnQC+kQFbWHf0o3ch3AihqE9CyqsC11meLRd2ETSgpbr+dCwE9q
+        f1KwQlBWYrumb+FgXnLak88=
+X-Google-Smtp-Source: AA0mqf4VgjxBWl9MpFhuBLDKpovDEfLPL2S+egq4EUh6DbQYoBpADh8PhFw6Uumgwz4P+7LUyjC0Nw==
+X-Received: by 2002:adf:ea81:0:b0:241:bcc1:7643 with SMTP id s1-20020adfea81000000b00241bcc17643mr3239264wrm.673.1669135778170;
+        Tue, 22 Nov 2022 08:49:38 -0800 (PST)
+Received: from [192.168.6.138] (54-240-197-238.amazon.com. [54.240.197.238])
+        by smtp.gmail.com with ESMTPSA id c9-20020a5d5289000000b00236545edc91sm14392514wrv.76.2022.11.22.08.49.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Nov 2022 08:49:37 -0800 (PST)
+Message-ID: <d7ae4bab-e826-ad0f-7248-81574a5f2b5c@gmail.com>
+Date:   Tue, 22 Nov 2022 16:49:36 +0000
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH 3/4] KVM: Update gfn_to_pfn_cache khva when it moves
+ within the same page
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        "Durrant, Paul" <pdurrant@amazon.co.uk>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mhal@rbox.co" <mhal@rbox.co>
+References: <20221119094659.11868-1-dwmw2@infradead.org>
+ <20221119094659.11868-3-dwmw2@infradead.org>
+ <681cf1b4edf04563bba651efb854e77f@amazon.co.uk> <Y3z3ZVoXXGWusfyj@google.com>
+From:   Paul Durrant <xadimgnik@gmail.com>
+In-Reply-To: <Y3z3ZVoXXGWusfyj@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,101 +80,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vipin Sharma <vipinsh@google.com> writes:
+On 22/11/2022 16:23, Sean Christopherson wrote:
+> On Sat, Nov 19, 2022, Durrant, Paul wrote:
+>>> -----Original Message-----
+>>> From: David Woodhouse <dwmw2@infradead.org>
+>>> Sent: 19 November 2022 09:47
+>>> To: Paolo Bonzini <pbonzini@redhat.com>; Sean Christopherson
+>>> <seanjc@google.com>
+>>> Cc: kvm@vger.kernel.org; mhal@rbox.co
+>>> Subject: [EXTERNAL] [PATCH 3/4] KVM: Update gfn_to_pfn_cache khva when it
+>>> moves within the same page
+> 
+> Please use a mail client that doesn't include the header gunk in the reply.
+> 
 
-> Add support for extended hypercall in Hyper-v. Hyper-v TLFS 6.0b
-> describes hypercalls above call code 0x8000 as extended hypercalls.
->
-> A Hyper-v hypervisor's guest VM finds availability of extended
-> hypercalls via CPUID.0x40000003.EBX BIT(20). If the bit is set then the
-> guest can call extended hypercalls.
->
-> All extended hypercalls will exit to userspace by default. This allows
-> for easy support of future hypercalls without being dependent on KVM
-> releases.
->
-> If there will be need to process the hypercall in KVM instead of
-> userspace then KVM can create a capability which userspace can query to
-> know which hypercalls can be handled by the KVM and enable handling
-> of those hypercalls.
->
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  arch/x86/kvm/hyperv.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
->
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 0b6964ed2e66..8551ef495cc9 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -43,6 +43,12 @@
->  
->  #define KVM_HV_MAX_SPARSE_VCPU_SET_BITS DIV_ROUND_UP(KVM_MAX_VCPUS, HV_VCPUS_PER_SPARSE_BANK)
->  
-> +/*
-> + * The TLFS carves out 64 possible extended hypercalls, numbered sequentially
-> + * after the base capabilities extended hypercall.
-> + */
-> +#define HV_EXT_CALL_MAX (HV_EXT_CALL_QUERY_CAPABILITIES + 64)
-> +
+Sorry about that; it's not just a change of client unfortunately but I 
+should be avoiding the problem now...
 
-First, I thought there's an off-by-one here (and should be '63') but
-then I checked with TLFS and figured out that the limit comes from
-HvExtCallQueryCapabilities's response which doesn't include itself
-(0x8001) in the mask, this means it can encode
+>>> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+>>
+>> Reviewed-by: <paul@xen.org>
+> 
+> Tags need your real name, not just your email address, i.e. this should be:
+> 
+>    Reviewed-by: Paul Durrant <paul@xen.org>
 
-0x8002 == bit0
-0x8003 == bit1
-..
-0x8041 == bit63
+Yes indeed it should. Don't know how I managed to screw that up... It's 
+not like haven't type that properly hundreds of times on Xen patch reviews.
 
-so indeed, the last one supported is 0x8041 == 0x8001 + 64
-
-maybe it's worth extending the commont on where '64' comes from.
-
->  static void stimer_mark_pending(struct kvm_vcpu_hv_stimer *stimer,
->  				bool vcpu_kick);
->  
-> @@ -2411,6 +2417,9 @@ static bool hv_check_hypercall_access(struct kvm_vcpu_hv *hv_vcpu, u16 code)
->  	case HVCALL_SEND_IPI:
->  		return hv_vcpu->cpuid_cache.enlightenments_eax &
->  			HV_X64_CLUSTER_IPI_RECOMMENDED;
-> +	case HV_EXT_CALL_QUERY_CAPABILITIES ... HV_EXT_CALL_MAX:
-> +		return hv_vcpu->cpuid_cache.features_ebx &
-> +				HV_ENABLE_EXTENDED_HYPERCALLS;
->  	default:
->  		break;
->  	}
-> @@ -2564,6 +2573,12 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
->  		}
->  		goto hypercall_userspace_exit;
->  	}
-> +	case HV_EXT_CALL_QUERY_CAPABILITIES ... HV_EXT_CALL_MAX:
-> +		if (unlikely(hc.fast)) {
-> +			ret = HV_STATUS_INVALID_PARAMETER;
-
-I wasn't able to find any statement in TLFS stating whether extended
-hypercalls can be 'fast', I can imagine e.g. MemoryHeatHintAsync using
-it. Unfortunatelly, our userspace exit will have to be modified to
-handle such stuff. This can stay for the time being I guess..
-
-> +			break;
-> +		}
-> +		goto hypercall_userspace_exit;
->  	default:
->  		ret = HV_STATUS_INVALID_HYPERCALL_CODE;
->  		break;
-> @@ -2722,6 +2737,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
->  
->  			ent->ebx |= HV_POST_MESSAGES;
->  			ent->ebx |= HV_SIGNAL_EVENTS;
-> +			ent->ebx |= HV_ENABLE_EXTENDED_HYPERCALLS;
->  
->  			ent->edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
->  			ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
+   Paul
 
