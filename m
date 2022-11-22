@@ -2,197 +2,259 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29DC5633BB5
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 12:46:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C1B4633D07
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 14:01:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232891AbiKVLqB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 06:46:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59898 "EHLO
+        id S233587AbiKVNBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 08:01:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233463AbiKVLp2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 06:45:28 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2073.outbound.protection.outlook.com [40.107.220.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02701A18E;
-        Tue, 22 Nov 2022 03:44:56 -0800 (PST)
+        with ESMTP id S233291AbiKVNBL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 08:01:11 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAC5E62394;
+        Tue, 22 Nov 2022 05:01:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669122064; x=1700658064;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=YY8Oqdv0nFRkpyjHtsYCodiN4/mDabpGF8GEpJL2Vo0=;
+  b=lXDZBfvdQeKdB9dYyQ7O5dwnB7smNUdP5DjQJcT0ipy+KL6gI1bC+Q5b
+   ZdrMbGXF6hlFt85HUXgGs9CnAJ1nXSd2ZbWJp2vM5E4CLphS8d02sDjeS
+   j05qbPGxZABCCWi5S8AIDltHanEc1g9J3voKy7J/vba3WKY25+AwRmF99
+   Nw1tf0RE6V+/KbJ/G6GK+W8MGsE0EZICn780hYUVwdJQ22Ks5d+/ws0dy
+   N970pm1YoBPIQ5guaFt1ElD4ddQ1McQ6lSlddR0YJQSHamPAwrGCEKjo8
+   Rv6wwcm1NlNnDXGKX7PccNQMVD4Yn0C8lcRMWNLgLfG+Wm3rUXg0MO9GT
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="294198202"
+X-IronPort-AV: E=Sophos;i="5.96,184,1665471600"; 
+   d="scan'208";a="294198202"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 05:01:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="619204012"
+X-IronPort-AV: E=Sophos;i="5.96,184,1665471600"; 
+   d="scan'208";a="619204012"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga006.jf.intel.com with ESMTP; 22 Nov 2022 05:01:03 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 22 Nov 2022 05:01:02 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Tue, 22 Nov 2022 05:01:02 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Tue, 22 Nov 2022 05:01:02 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UjicyD66hv2PArgQOpi5hZnkRR6qpyDUhlLwv5EZwrLE0POZGTZK+lM+vxsp3FV1oqFA9CPn3O5/hpx6JYTeF08rn3XsdHgFenkg/wJ3HYkMkuB9MbeGIAG0k/ANfR79dmXA+wZ9szFIn9HhSM24Ra2gelTpia+O8toiLq335QO3ks/1YPL5XGlAiKLnB+iOYFzezzPEU016djyETYIYlwkn4xYCFDstev6hsSNIGxFqM9Kzp1KPygSUL4887+gX/YpV5hnlC7acLIIrdba3Wdmhr9efHMIBU471slLfy8OwQ9MHDeRW8Y4OQTCIlnFOdcrIknEUOZ4FfTlKKEDMKg==
+ b=W9KVlAh2CsqwQPZevSVTkk3Dup453EHGsj+plkskb3sLHRqy7sYAV0udvFZfYLo6KUMcVxzMrnwFd0oYg7FeiRHfsWIdjo/q/OJzXdgFVWolx2Qs6gJHDDlJd2McnrCl7mqgX5NERaYNjlyls5dqffIW3VKhYBLa/LvyiiHPWT0FVwDOocj0rqvs8WNQcsFSS+Rs9o0BPI19NEq7jV7QdvFBufAr+VaB4X5fngA5RoU7VAbzhgCD3B/Y9JUQlA2ea31J/V/hdEjj5J5XS/R9vC+JjFkztPucDtqr3Vk7/Y2V38Gcr1SmJvmlLVccB4uyVIBFrDJ6xxJZu/RUqDQdhA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rG+O8qA/JznHKTL5SGNnu1EcRxWH3x1nsy2WGSwLrEE=;
- b=XsbR3ksUZfKOmVefg6quEt7VAL71RxgBh46IB4nytDWk6rjk9B4437wW2Eym/xA2q6kkDtRshLjtCtMwLS+N0GTVxhr1SIqRRAAKaQXqQAUm+4Xxge2WCnKM1zwKiYq0fy92jfP6J0SVbIPXwhaPgttkJ6YUSz39VOIpKMW+XkzyvGlviSLiRQtvMZDYw5/12F7lDXSW0IjpOPPasSAXCq3kNg4+OngmkvxM/M1xlc1kbqu2qpiQ/x8qZk9Yygouy6LWbHlhqVM9c2DeJt/DHZz4sgQPp2SMceejNhXWiQuhXu1P4/8IuVOH01NMhtaceBPF7grQbDEKy+jbRRhZdg==
+ bh=kxAdoEuEuuhA8BJSVEBH6tLsGhKU5dI+n6k1cYaXms8=;
+ b=DZboQMsfpvM1DnFlxhRuB830Ic4YXvWglLVvW2nRNINSO+bEGXzwl5djrod6nDOKDOxaWxnngQwzWLkLQ1QWIq689bZLWkCDavhuHDnXN3Ei+oBDSRH5x4NtvodT+65l70iBr78sLxiQivNFpcUv3+TLwcCBq1bC5vUhdsiD2xJjidiX8PEfKPZZlXbr2QB+1GnOlrLnCguJ9LH5gXydzxCOD/zzj8PmbgeJT3MkcmsHNAWTrgVTq4Smg5vwJ75y1wAlyaQG0XCPRIAnMkPxsw6rllq84iBljouE0fnwuAdq0XBawK9QmOEF4yygT2AacnxLcjuVCctJm51WBDOfYw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rG+O8qA/JznHKTL5SGNnu1EcRxWH3x1nsy2WGSwLrEE=;
- b=uHrRsq5ZoLL293LGBOVfVSHFKLT6M9LVqpsTO0Bca115UGxpcodGdbsRetHR6dp1YKqZyGuCPaP/e51fm/BB9OPYyBO/4p9vancAu2BzW0pWDo5IGssC5hEr1/sg0BKypRdVRKlb31rX5s0UKZXpE6BLRMmKMVP9O9N+Um+qGFU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SA1PR12MB7342.namprd12.prod.outlook.com (2603:10b6:806:2b3::9) with
- Microsoft SMTP Server (version=TLS1_2,
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN6PR1101MB2161.namprd11.prod.outlook.com
+ (2603:10b6:405:52::15) by CH0PR11MB5412.namprd11.prod.outlook.com
+ (2603:10b6:610:d3::10) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.15; Tue, 22 Nov
- 2022 11:44:53 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::395:21e6:abfd:7894]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::395:21e6:abfd:7894%6]) with mapi id 15.20.5834.015; Tue, 22 Nov 2022
- 11:44:53 +0000
-Message-ID: <13bd73b6-592c-66c4-cd42-0913380da745@amd.com>
-Date:   Tue, 22 Nov 2022 05:44:47 -0600
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
+ 2022 13:00:58 +0000
+Received: from BN6PR1101MB2161.namprd11.prod.outlook.com
+ ([fe80::40a1:5197:e1df:bb6c]) by BN6PR1101MB2161.namprd11.prod.outlook.com
+ ([fe80::40a1:5197:e1df:bb6c%11]) with mapi id 15.20.5834.015; Tue, 22 Nov
+ 2022 13:00:58 +0000
+From:   "Li, Xin3" <xin3.li@intel.com>
+To:     "Li, Xin3" <xin3.li@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Peter Zijlstra <peterz@infradead.org>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: RE: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
+ for NMI/IRQ reinjection
+Thread-Topic: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
+ for NMI/IRQ reinjection
+Thread-Index: AQHY9M9YytlyKV7ob0GK/oJbeBhPY6433PwAgACmfxCAAO8aAIAAL0qAgAAENoCAAAgUAIAAGnuAgAA1qHCAACERAIADuBAAgABQYICAAXpoEIAAGnIAgAK/reCAANL/AIAAhVlggAcl+kA=
+Date:   Tue, 22 Nov 2022 13:00:57 +0000
+Message-ID: <BN6PR1101MB2161FCA1989E3C6499192028A80D9@BN6PR1101MB2161.namprd11.prod.outlook.com>
+References: <Y24908NWCdzUNqI0@hirez.programming.kicks-ass.net>
+ <6fd26a70-3774-6ae7-73ea-4653aee106f0@redhat.com>
+ <Y25a0Z2tOMWYZs4j@hirez.programming.kicks-ass.net>
+ <BN6PR1101MB216141A21353AB84CEA541DFA8009@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y26jkHfK9INwU7Yy@hirez.programming.kicks-ass.net>
+ <BN6PR1101MB2161E8217F50D18C56E5864EA8059@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y3IFo9NrAcYalBzM@hirez.programming.kicks-ass.net>
+ <BN6PR1101MB2161299749E12D484DE9302BA8049@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y3NZQBJugRt07udw@hirez.programming.kicks-ass.net>
+ <DM5PR1101MB2172D7D7BC49255DB3752802A8069@DM5PR1101MB2172.namprd11.prod.outlook.com>
+ <Y3ZYiKbJacmejY3K@google.com>
+ <BN6PR1101MB21611347D37CF40403B974EDA8099@BN6PR1101MB2161.namprd11.prod.outlook.com>
+In-Reply-To: <BN6PR1101MB21611347D37CF40403B974EDA8099@BN6PR1101MB2161.namprd11.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
- <Y0grhk1sq2tf/tUl@zn.tnic> <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
- <b712bc81-4446-9be4-fd59-d08981d13475@amd.com> <Y3qdTuZQoDZxUgbw@zn.tnic>
- <cffed3c2-55a9-bdd3-3b8a-82b2050a64af@amd.com> <Y3yhthJTIWqjjAPK@zn.tnic>
- <d85bf488-9050-13d6-a23b-1440a4df4c81@amd.com> <Y3yoB015qCpbnUzl@zn.tnic>
-From:   "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <Y3yoB015qCpbnUzl@zn.tnic>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL1P221CA0003.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:208:2c5::9) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN6PR1101MB2161:EE_|CH0PR11MB5412:EE_
+x-ms-office365-filtering-correlation-id: 31182a29-8e78-4d0e-5bac-08dacc89994d
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: kxxy58Zlr2tisl+23/kCZvdFTbipPoOVy+Xv0nxKjGqHCceZhCCyOMp67KMjX24GQjkh2PLHLCykEVUnLz8gGQkoj6fMb3cpiObOdGiNBd6PzEzNCvAabf2qn18HjIUpVd/G6OAXRCitrN/jtDbnmk5rwI0H5Vs19jqGGRmoUMr0bfAKmFYr4CpGkx1ZiMpHniQIjsGiXzOb6Wc6kgwZTmdQaZ4Sz8uSpCRxhx5xgfCtkYHcaHJizmMQks/NnOVPDJiX6zWiM52+0Mlwg+X2L7TX4XbZzmgWDeIH+kF4CZ5Ghnjlc7/MAlZPnjc8HvbaebfCi7EQQzr5EyZQ66kMaYnaWuVC4C0A25IU1DfiAORRPTwPBOPsa40Hz4/fbLo+pCejAqiEXDoydRNWaqYLJNE9qNfHYp98bOZ5IEd+OM84jQo4aFl306FnEO2yiYf/luKfImMwlJE6lRaXhHcFzvHDmdmJwXLcXn8KCHHdfYuoIgl1Q2BmsDXJ/ZKM1gcMoMMj5QCQCOo1W2SOeCICgog5UBuL5Lpr3CK8ZIaWHS8hg/iVaZj5haeuUCZ5kg41D+bMOWUkosZDrnUIYOpMbP5AslwzsHwspkz4WWQsDT/MaaqdScWhGQ0vu9rs3EP4xBv8a/2/bCqhJe3SckZJvlD2V8yjb98Ixp2qS/Csgwl6aLH2tPqXxp8DsuWNMrLsSlBrZNaxe6PAfvh5FQIrcQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN6PR1101MB2161.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(39860400002)(136003)(366004)(396003)(376002)(451199015)(5660300002)(7416002)(54906003)(7696005)(83380400001)(6506007)(82960400001)(316002)(66476007)(33656002)(76116006)(8676002)(64756008)(9686003)(110136005)(41300700001)(4326008)(26005)(66446008)(66946007)(66556008)(52536014)(8936002)(186003)(122000001)(38070700005)(38100700002)(2906002)(55016003)(86362001)(71200400001)(66899015)(478600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?oaWuIiY9AaOhyYtyLzgKls9oa/z9wo/3N3ZPsSazodDLX5GWEO9kTK7/3JHy?=
+ =?us-ascii?Q?qrpXDcL9HbynDnlk7bTDHz7w1EIIXTUEl/ZS8EbZpp7ZmUCjOxxisCaaSjuQ?=
+ =?us-ascii?Q?Elv8B0HsPgRLhr1PYJMPQGA1HM4RDfOuAyUPwAy5jMXD0x0Bo387vsgaM2jT?=
+ =?us-ascii?Q?Fbrx6JUY7A6cZjBacgEW6BdDLAkuzfyk+7kuwkpLELsqX/w3Vgl9dIG6XapO?=
+ =?us-ascii?Q?DsoDJSOFT8IYjmxt0GtBYOUJNU3fB+vgPdpGXwOBQChWcRXEayA+JWreasRE?=
+ =?us-ascii?Q?TIXgaek4ECqzAezqh0UhBEhufh9LlATyxYSgtSQ/6PKjEbS536u8ljNv+kFA?=
+ =?us-ascii?Q?PTbgRwAYdZiRdC+Jgejzb3uF69FB47gJ3VuwLzjsyl3HzbIXek+p2m35zAvs?=
+ =?us-ascii?Q?8jJYEEKeTHiDt7xrdVgYYeStLFDO8vCWKhMBc9UT7fJ+sMxJnJe5qE+T8VFH?=
+ =?us-ascii?Q?OTEnkdzDxG/nzPPuqCexkNu1ojyTaGcP3goDhwTvmry8G4/o3LGfRjPtFxyh?=
+ =?us-ascii?Q?VoKKto/znUNhYDC5t34Cu8HOxqs3thUsMC19s5ti9M9vctjyMDQuoR8YRBfv?=
+ =?us-ascii?Q?1HIqdaSNXiqgIh7Iw5T30nKVqFz5GV9z7Omzx4ZnrXXMILgQbMDo6X1I9lEX?=
+ =?us-ascii?Q?jkQ/vVYZJ2D9MByzZemHGqphXtZjN9paRrGi2Ue4o7v/HU8yuifq4SmmjbnQ?=
+ =?us-ascii?Q?qq5MirI07iNRnItZgZ1tTaWqXB4Q74E+HcHR9aJKJLgAybuI/Jgpknzf3L2P?=
+ =?us-ascii?Q?Dpa0qa/PMZzqNgFCboMO73c8qqzasn4sx8p7uTKxjfz/nJd3xI8ngfXImUYh?=
+ =?us-ascii?Q?7FizNvYsb8gs0aeE+rOMewrjOVZunP6G0Zdh+GOWdcYHTPWvccI4lqIaWQuK?=
+ =?us-ascii?Q?Az+snhYhE/iz7oSjEImrmP/yR1W46ZRuMXCEYpGH4IbnawyvfIH2M5WwQnek?=
+ =?us-ascii?Q?0g4rlJEHJiXbUO7taLM6K1KqRk/MNF/WtO82NwuVFq5oNFdnw7ColTfP/jq0?=
+ =?us-ascii?Q?KZ7RFQopRiKSMbepgVToOqA2Vi1s6FxrSmwPBWTZNAAY3ual1zOEZtYEz0nL?=
+ =?us-ascii?Q?UW5yZZIX/yfRXQ55kPU22P1Y30qbp9jGzx23JdEwKiyTWX4YuKdRrozsymmt?=
+ =?us-ascii?Q?bIcuPKT732BygLZBaTfCkGNlre6wlCoJ/NBp6XOrSEkyl8LUHIhv246eVqNX?=
+ =?us-ascii?Q?dq278ZQbudM8sTzJ+WhaN+wrZq1GpU3/MbcEiV0D4vCSC0yarTUpC4D7rmHR?=
+ =?us-ascii?Q?s/oFcWEVD86LYyQ1jCK2hXMOvzWbIPQ54G/tDRhe2Nz1LQbHJujjrT9YGIAr?=
+ =?us-ascii?Q?gMJwfLB0KIUQ2ZRET1BTJIinLVRGPp/vQI3XZCwzyG9dq5QH3rny4lzX17xe?=
+ =?us-ascii?Q?NRA5x/j5d0oryyJbciltEQSIXS2NSWZeB79xAlrQJ434cI+24XZWjEZFB522?=
+ =?us-ascii?Q?jD/blqCGYqHbR96qKKhj/vrjj7XnhyHYLbqTxMm0HQwGDBkKx0KaQ7vZ0ZcQ?=
+ =?us-ascii?Q?LwenOpxRJ7mXq2hK5neSt6hxV2kgtg9wD2xi7olEav2BsskJ2K2NMXAZ6WFG?=
+ =?us-ascii?Q?qFavl/ja5EmoxJWa7UM=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|SA1PR12MB7342:EE_
-X-MS-Office365-Filtering-Correlation-Id: 16151a4c-db62-411b-3389-08dacc7ef82b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Jb4LkdwiZOYPkoFdboI5cKlRXy5j0dKozDs+eVVS0+Eu0nTj56PI9qQI+34vov6arZHF3Re6Q/u8eIE0so8cwwlODUyQUH4effKQMCLeE3fqm86AUU4vWp+O0wYHpqGAZP9I4cjVdbjBsEIeGLxe77WB9Mj066OXS1nxQvBJKQ8FgpCoPBz7rJecoxFawcj/j7qSXzG+HP4dY7PcSeboSvb9R3QjaQTdAIJ8b+H0sm1Zw7nhlRGw1pAtLweJvtOkS9QOjT09SourjiaERmJ/LZ9cvNDzcGK7sj4SjDkfxcOFJJZjn3cYBglmJ+YbHtcddeBTi9b0w31QjSPzDpNlD5Otk2mUVsdqufmnLcFEcQqvkqUAmTsP3vsU7ZYdkzfs2X1C+jhmbTF2ZhzB2XOVNV9uLJP3XVdmOEhmZlA3QVeEHRfpho4dWJof5c3wRt4lj1rb3k8F9ZdcXhpID8uJRPYWLAGbp7uUGsi4FSX9b1EPwlmHa54eNf6U39cyTBwFwDpF1QaP/Ih4W1E8b2JlM1ljly6IqMZY0YSPuYm5dunIswI8v1fIyCoQBQIUhkiwyxTTfu4yOk8Vw5loOwn5lBA9+2e51yF/ifgL/8QG0aM+yNbpjcWibGHmGDF8iIQYxXMw3WbhIuvbb7uyIDToZmu8qN0dx7FMHbhX6IiPjNLH4SQQoCD2WzHTVmSa6RGc0YzMaXhXpxiyRG0SgsLx6fw/Olf2c0nbxO5Kf/mr2co=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(39860400002)(366004)(396003)(376002)(136003)(451199015)(38100700002)(5660300002)(86362001)(7406005)(31696002)(31686004)(7416002)(8936002)(41300700001)(66946007)(8676002)(66556008)(4326008)(2906002)(66476007)(316002)(6916009)(36756003)(6666004)(478600001)(6512007)(6506007)(6486002)(26005)(53546011)(186003)(2616005)(83380400001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aFp6bWtXb2kxZjFmTlJPYWhzVmFMVmFmb290cW5OTno0eXVrUjZaOWdIV1dz?=
- =?utf-8?B?dmx1Vkx6TjA5SUxzVnFtcE9iN3A4R0YrdGJoU2F3SkkzRVpxajZ5V2FoWGx0?=
- =?utf-8?B?SEprWjNrbWhid2g1bXA1ejJLampxRXd2cHhvUnNoU0tMWC9Xemt2VXZuRjhw?=
- =?utf-8?B?anVmdXJMYlBTcVhrNTNwT21RVXBoRFpXNzFjNjdBWUJIY1BlNnl1VXVpZXVG?=
- =?utf-8?B?aExCcng4RmxUTVpuaVV0NVZIbm8vTXg3VzZLYWMzWXViTHRETmRLUkxib0tX?=
- =?utf-8?B?aFBFM0NtaWNOMUFsbFJhdmZEdFpKVS9JUjZPeDZnaHVGNGVKU0VTTzAzYm9D?=
- =?utf-8?B?ZU5NM3ZCRXFkaG1IOTIweHV6STQxTzlRdHNNNm9hZmRTb3RoR1NodWpQaXll?=
- =?utf-8?B?QzhWaitscUkwdGVTK2QwT2o2YW1yNzFXaGhTQk9BdS9Nc0w3L0NCRWJlYzE0?=
- =?utf-8?B?R3NwdUQxUWtHZ1hWVXNMUlV6a01LbC9WRElBMVVvMDlxa2c2a29ydHVwakZq?=
- =?utf-8?B?OGpIcVROMis0bC9Ga3BjUldOcERFaVAvM3pTeFVDS3dFd21SZmVIenJTL0s5?=
- =?utf-8?B?RUdoZWJZSU5ZRmMvNDRmYmNNUFF1WFBmSlEwSVVlbVRsTmpYTW5GNFFST29o?=
- =?utf-8?B?ekZvaXpQUTRhTHFNdnhFVTVtQWg5dTRIakJGMHZBa1h4Q0hPNElUb1h2WHB6?=
- =?utf-8?B?WTk4REhJcWM5dWdRMEdsT0FJMWZYMkZIaS9qVWdZcnhScmNmQUdxV3cwWTMv?=
- =?utf-8?B?QzY4MHV6UjRRZ2NnZUUvY0xpbGxCd0RUdkpVSWVleXNSSmQ4dmJCRmZUSEMz?=
- =?utf-8?B?dVVXVnV3dmFQNFJVbGttY0t1SUNIRk5BUkpKL3RubDdVcmdFbnZPS1BGSUI1?=
- =?utf-8?B?bTVCcGJGaS9EQTR3WjlTZlNoZVY4S3RzY2FvaVUwSUVLRVMzQkw2TE81a05n?=
- =?utf-8?B?ODdMOEJVVFU2ZTJwdGttdkY1K0RXdXVDVzR3SGxoM01OMVhDU2g2dGsyeVdF?=
- =?utf-8?B?ZmlJRWNUeDlLbGlLYitjaDhUZ01lQnp1dDl3QVh2ZTZ5aXF3TE0zeDRyWUlX?=
- =?utf-8?B?TUVYNnpjakpON2ZyNEhRb2JLZlhMNlNNc1VRcU96cU1oMU80RkNXTlpsUDJv?=
- =?utf-8?B?eUpTaDA4KzVMQXVxcUtwcEJ0Ti81LzJFdFBCbjZPaStBL3NXMnZZa0FuT1Fr?=
- =?utf-8?B?TEJaYVFvck5BR29YRDBsNjlndTM3SllVK0VHeUhTMEt6NVhTSFo2WnlNWUhn?=
- =?utf-8?B?dVhTbmVWM24yTENQeVpPVExHOEZ4OElQTXRCbGNueWRIKzV2VThhRmxUb0pT?=
- =?utf-8?B?Y2VLZXVZTVFVUkFtcEp3UkM0YWdSYnFTN3VGTGFJd2hubXdDYlowTzQ0R1JF?=
- =?utf-8?B?bFR2bHRhSm5TcUtCN0FSV2paZm8rbDFRRlhBRi90L1A1TXBIcHFza2Z4Rjhj?=
- =?utf-8?B?YS9weTAyWGthTkVxdkg5UFRGaldPRTEwM25JYmJWZy8zck9vNWMzV0NuTFYw?=
- =?utf-8?B?QW5FZldRNXdmSUduZEpVamlrSnh5VWxhYUYxOWU5NzdBdWlOQXZFSmcwbnJr?=
- =?utf-8?B?eFdKY0NtMVpEaU84MWlJN3l1MzVmdFJLeHFKcndleWZoclhUNG95dEg3dWtP?=
- =?utf-8?B?RzRzd3JlVnlIa0MwYkttajd3eXpPQU1UeDJCeUsyVzM5OTZJbjh4UjZZd08z?=
- =?utf-8?B?STIrWk50VHJabXBTbEdEYWJWWS9aWW96T2crRDBQNTl3cWtETzUwa1hGQUVP?=
- =?utf-8?B?RXhWdllQdXNMM0dYckh3eGZqaWhFTFlick5McmV6ekxvUlRFZjF3YlY1L2Fj?=
- =?utf-8?B?THFOL2Vsc1VRUHEwUDI1YlNYRlNkTTdwNmdvR3FVajliMTAzQ05vZ0M3SFdW?=
- =?utf-8?B?Mjg2MVAvSXFVMk1kWm8vQi9NdG5ZalVkUEdNMTNOaWhwYzZTdkM2RFBKamlR?=
- =?utf-8?B?NTh0Q2ZXNldVM3Rqc0xLaThudFdNYUFuN3orUTZDNjJJQzgwa0JQZ1BmWVlN?=
- =?utf-8?B?bmxtSmhXUDNTdWhyeXkwZnJXbzk0cjI3cGFNSWFZUHF1TS9WSHNWeUdSYmRX?=
- =?utf-8?B?dGlnd2thTlZtYzJHbUszdUVDNkFlSVZJWGUrb1Yxb1pnWE9tWG93RDFCbVVx?=
- =?utf-8?Q?/RLfPj5BUlcXtA2qBiEXgsIQz?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 16151a4c-db62-411b-3389-08dacc7ef82b
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2022 11:44:53.0060
+X-MS-Exchange-CrossTenant-AuthSource: BN6PR1101MB2161.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 31182a29-8e78-4d0e-5bac-08dacc89994d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Nov 2022 13:00:58.0291
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: s0zjVbYzUy9TDmVng4gUOTT/wjD9eoVEA98FDx5qQylxGkDSnHX0NOMV4r6q1f4rRwO9XEoXabJuJ7Wb8S86bQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7342
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cMD774aVm1/FhcSH/qV6tkIlwdFGzqOEaqSGxCz6lOVD3Xzjj4D/unpCg//9Ja0vLlLa4shrSqzc8GrqzmenuQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5412
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/22/2022 4:44 AM, Borislav Petkov wrote:
-> On Tue, Nov 22, 2022 at 04:32:18AM -0600, Kalra, Ashish wrote:
->> Please note that in both cases, these non-reclaimed pages cannot be
->> freed/returned back to the page allocator.
-> 
-> You keep repeating "these pages". Which pages?
+> > > > > > And yes, the current code appears to suffer the same defect.
+> >
+> > That defect isn't going to be fixed simply by changing how KVM
+> > forwards NMIs though.  IIUC, _everything_ between VM-Exit and the
+> > invocation of the NMI handler needs to be noinstr.  On VM-Exit due to
+> > NMI, NMIs are blocked.  If a #BP/#DB/#PF occurs before KVM gets to
+> > kvm_x86_handle_exit_irqoff(), the subsequent IRET will unblock NMIs
+> > before the original NMI is serviced, i.e. a second NMI could come in
+> > at anytime regardless of how KVM forwards the NMI to the kernel.
+> >
+> > Is there any way to solve this without tagging everything noinstr?
+> > There is a metric shit ton of code between VM-Exit and the handling of
+> > NMIs, and much of that code is common helpers.  It might be possible
+> > to hoist NMI handler much earlier, though we'd need to do a super
+> > thorough audit to ensure all necessary host state is restored.
+>=20
+> As NMI is the only vector with this potential issue, it sounds a good ide=
+a to only
+> promote its handling.
+>=20
 
-The pages which have been allocated for firmware use (such as for 
-SNP_INIT command, TMR memory for SEV-ES usage, etc), command buffers 
-used for SEV legacy commands when SNP is enabled.
+Hi Peter/Sean,
 
-Here is a detailed description of the SEV legacy command handling when 
-SNP is enabled:
-The behavior of the SEV-legacy commands is altered when the SNP firmware
-is in the INIT state. When SNP is in INIT state, all the SEV-legacy
-commands that cause the firmware to write to memory must be in the
-firmware state before issuing the command. A command buffer may contain 
-a system physical address that the firmware may write to. In case the 
-command buffer contains a system physical address points to a guest 
-memory, we need to change the page state to the firmware in the RMP
-table before issuing the command and restore the state to shared after 
-the command completes.
+I prefer to move _everything_ between VM-Exit and the invocation of the NMI
+handler into the noinstr section in the next patch set, how do you think?
 
-Then there are host buffers allocated for SNP platform status command, 
-SNP launch update and SNP launch update vmsa command.
+Xin
 
-The other pages which can be user or guest provided are SNP guest 
-requests and SNP guest debug helpers.
-
-It is important to note that if invalid address/len are supplied, the 
-failure will happen at the initial stage itself of transitioning these 
-pages to firmware state.
-
-But if the above pages have been successfully transitioned to firmware 
-state and passed on to the SNP firmware, then after return, they need to 
-be restored to shared state. If this restoration/reclamation fails, then 
-accessing these pages will cause the kernel to panic.
-
-> 
-> What if you specify the wrong, innocent pages because the kernel is
-> wrong?
-> 
-
-In such a case the kernel panic is justifiable, but again if incorrect 
-addresses are supplied, the failure will happen at the initial stage of 
-transitioning these pages to firmware state and there is no need to 
-reclaim.
-
-Or, otherwise dump a warning and let the pages not be freed/returned 
-back to the page allocator.
-
-It is either innocent pages or kernel panic or an innocent host process 
-crash (these are the choices to make).
-
-Thanks,
-Ashish
+>=20
+> > > > > With FRED, ERETS/ERETU replace IRET, and use bit 28 of the
+> > > > > popped CS field to control whether to unblock NMI. If bit 28 of
+> > > > > the field (above the selector) is 1, ERETS/ERETU unblocks NMIs.
+> >
+> > Side topic, there's a bug in the ISE docs.  Section "9.4.2 NMI
+> > Blocking" states that bit 16 holds the "unblock NMI" magic, which I'm
+> > guessing is a holdover from an earlier revision of FRED.
+>=20
+> Good catch, the latest 3.0 draft spec changed it to bit 28, but section 9=
+.4.2
+> didn't get a proper update.
+>=20
+> >
+> >   As specified in Section 6.1.3 and Section 6.2.3, ERETS and ERETU
+> > each unblocks NMIs
+> >   if bit 16 of the popped CS field is 1. The following items detail
+> > how this behavior may be
+> >   changed in VMX non-root operation, depending on the settings of
+> > certain VM- execution
+> >   controls:
+> >
+> > > > Yes, I know that. It is one of the many improvements FRED brings.
+> > > > Ideally the IBT WAIT-FOR-ENDBR state also gets squirreled away in
+> > > > the hardware exception frame, but that's still up in the air I
+> > > > believe :/
+> > > >
+> > > > Anyway.. given there is interrupt priority and NMI is pretty much
+> > > > on top of everything else the reinject crap *should* run NMI first.
+> > > > That way NMI runs with the latch disabled and whatever other
+> > > > pending
+> > interrupts will run later.
+> > > >
+> > > > But that all is still broken because afaict the current code also
+> > > > leaves noinstr -- and once you leave noinstr (or use a static_key,
+> > > > static_call or anything else that
+> > > > *can* change at runtime) you can't guarantee nothing.
+> > >
+> > > For NMI, HPA asked me to use "int $2", as it switches to the NMI IST
+> > > stack to execute the NMI handler, essentially like how HW deals with
+> > > a NMI in host. and I tested it with NMI watchdog, it looks working fi=
+ne.
+> >
+> > Heh, well yeah, because that's how KVM used to handle NMIs back before
+> > I reworked NMI handling to use the direct call method.  Ironically,
+> > that original change was done in part to try and make it _easier_ to
+> > deal with FRED (back before FRED was publicly disclosed).
+> >
+> > If KVM reverts to INTn, the fix to route KVM=3D>NMI through the non-IST
+> > entry can be reverted too.
+> >
+> >   a217a6593cec ("KVM/VMX: Invoke NMI non-IST entry instead of IST entry=
+")
+> >   1a5488ef0dcf ("KVM: VMX: Invoke NMI handler via indirect call
+> > instead of
+> > INTn")
+>=20
+> Sure, I'm just thinking to put asm("int $2") in a new function exc_raise_=
+nmi()
+> defined in arch/x86/kernel/traps.c. Thus we will need to change it only
+> whenever we have any better facility, and no KVM VMX change required.
