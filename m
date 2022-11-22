@@ -2,71 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 80F8863447B
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 20:24:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68D2263449D
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 20:32:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234743AbiKVTY5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 14:24:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49708 "EHLO
+        id S234869AbiKVTcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 14:32:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234426AbiKVTYz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 14:24:55 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A88E7FF21;
-        Tue, 22 Nov 2022 11:24:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669145094; x=1700681094;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=OKm7UJo5SyFqT5YmYkDdQ5nt3mpnIZkSEfunTTVs3qE=;
-  b=UKpm2Bq0PtKiHN2VGC8sSV3IwF8v5Qmu+080Zfb9h3+clw2zNJ1aT6ff
-   rP0oNdIPDKJSGJfoVrAKypuZN63BkyIy9fgETxz1lJaYEOyWsNFLt+pO9
-   X+K6/D9TfduQF82hOVxNfw1NiwruJi/xfAa0aQGlwH4bdeUX9VjHtzqMn
-   2lKzqjmhPRjsOI925lwY3r7v6DdAKRaeadNbSQg/F9irQvXfSjb9gujHT
-   l12bfP8vGsK2SbA1nE85KvDJv3MxhQgNyJAIB9lA+/P0vdUFH+upnIwzG
-   liMiqmuf3TQxGKIlVi789IhuYz4LmAQSUTU7JphQC3yyfBhPGyBqgE26K
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="400187018"
-X-IronPort-AV: E=Sophos;i="5.96,184,1665471600"; 
-   d="scan'208";a="400187018"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 11:24:53 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="641525771"
-X-IronPort-AV: E=Sophos;i="5.96,184,1665471600"; 
-   d="scan'208";a="641525771"
-Received: from coltsavx-mobl1.amr.corp.intel.com (HELO [10.255.0.114]) ([10.255.0.114])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 11:24:47 -0800
-Message-ID: <b3938f3a-e4f8-675a-0c0e-4b4618019145@intel.com>
-Date:   Tue, 22 Nov 2022 11:24:48 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v7 06/20] x86/virt/tdx: Shut down TDX module in case of
- error
-Content-Language: en-US
+        with ESMTP id S234871AbiKVTcY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 14:32:24 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3BC29DBA6
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 11:31:49 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id v3so14903736pgh.4
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 11:31:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=siXftGv8ycXrMRraGh3XeU6UKcxAd+GukaGf1635NmA=;
+        b=GASSlv0OoBHyhUZ3KS/fwCsfs7Jig2vXCU1qaEKmESBDmEIt1VtkDZ9AAC5dGybsAX
+         LQ9Vvf2KkUpnEtoH6/6g320s0QsDrkjOa0pSGCpyy6Qu2qPyVvs45HeBmvPoibRnusaU
+         tgyJEA4JkyC6uFROTJ2sSabgEOuSfYRUnn1Ky97/AV+Yo7TEJapcEghis5cmDGiNR/QA
+         PR0MHcFFKA/LOJYGNoh72+ZPUzPoL8SzZNi9T1akV11xop1A9LbCrD7S1cvL12K5Aeff
+         pOZ/JfyChc1IDiDEy/SVrf2j2zTsXskVuD9Juqhzk+1vYSxO8jg9/ni/A9ASsuX7WAx+
+         7TCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=siXftGv8ycXrMRraGh3XeU6UKcxAd+GukaGf1635NmA=;
+        b=Q/O1BF7CcfwagYvevN2f3FDDm+ysxHAuLsEvelJ63gMwuKXyey69Dy9eYhVs0BsESc
+         iBpe84rvDAMKiP2IKeL2vnD0DfFBBM7nw+SAWN1wXn98/u/N0oNsKXEycgl1YxHYEenM
+         bvSEHB7qOTTPY5+YbeV1w71RGLY/XY2qGJeXDbE1al0lj6on/JQto6WVrS1mpm/EtHIF
+         d22gDKcDrGbeLRaX5a6Z/mRQ2/woKoC3tL/wCDhPtHrQR62tvwY8lncYD0/ZKaLHcIV0
+         rRT+twEFZ/wfnk8SVKW7fasGtQpegoj1E58wg765ZVwUMav2veJVa4y1cWcnSpB2LdQH
+         pTUQ==
+X-Gm-Message-State: ANoB5pmszvrIGtnifDtCHTI6NbBM4jB6dSIlGyUq96V8irE85dRzCvZX
+        dB5zEK6u/GqOJjXJSaGbf/aLEA==
+X-Google-Smtp-Source: AA0mqf7ksi6xnXTmcjIJCDhYhx70OWpjNJdfDF1pfmrBdIFzUVxRoF/w+K9uQSCTT8eYiFfpB+3BZg==
+X-Received: by 2002:aa7:9057:0:b0:573:1d31:2b78 with SMTP id n23-20020aa79057000000b005731d312b78mr7551599pfo.61.1669145500962;
+        Tue, 22 Nov 2022 11:31:40 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id o14-20020a170902d4ce00b00186acb14c4asm12529380plg.67.2022.11.22.11.31.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Nov 2022 11:31:40 -0800 (PST)
+Date:   Tue, 22 Nov 2022 19:31:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
 To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org, seanjc@google.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com,
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com,
+        dave.hansen@intel.com, dan.j.williams@intel.com,
         rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
         ying.huang@intel.com, reinette.chatre@intel.com,
         len.brown@intel.com, tony.luck@intel.com, ak@linux.intel.com,
         isaku.yamahata@intel.com, chao.gao@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
         sagis@google.com, imammedo@redhat.com
+Subject: Re: [PATCH v7 06/20] x86/virt/tdx: Shut down TDX module in case of
+ error
+Message-ID: <Y30jmKOOsvtzt6UT@google.com>
 References: <cover.1668988357.git.kai.huang@intel.com>
  <48505089b645019a734d85c2c29f3c8ae2dbd6bd.1668988357.git.kai.huang@intel.com>
- <Y3ySxEr64HkUaEDq@hirez.programming.kicks-ass.net>
- <52b2be9b-defd-63ce-4cb2-96cd624a95a6@intel.com>
- <Y30fUS5/JClpBHVc@hirez.programming.kicks-ass.net>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <Y30fUS5/JClpBHVc@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+ <Y3yUdcJjrY2LhUWJ@hirez.programming.kicks-ass.net>
+ <87bkozgham.ffs@tglx>
+ <Y30dujuXC8wlLwoQ@hirez.programming.kicks-ass.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y30dujuXC8wlLwoQ@hirez.programming.kicks-ass.net>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,78 +84,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/22/22 11:13, Peter Zijlstra wrote:
-> On Tue, Nov 22, 2022 at 07:14:14AM -0800, Dave Hansen wrote:
->> On 11/22/22 01:13, Peter Zijlstra wrote:
->>> On Mon, Nov 21, 2022 at 01:26:28PM +1300, Kai Huang wrote:
->>>> +/*
->>>> + * Call the SEAMCALL on all online CPUs concurrently.  Caller to check
->>>> + * @sc->err to determine whether any SEAMCALL failed on any cpu.
->>>> + */
->>>> +static void seamcall_on_each_cpu(struct seamcall_ctx *sc)
->>>> +{
->>>> +	on_each_cpu(seamcall_smp_call_function, sc, true);
->>>> +}
->>>
->>> Suppose the user has NOHZ_FULL configured, and is already running
->>> userspace that will terminate on interrupt (this is desired feature for
->>> NOHZ_FULL), guess how happy they'll be if someone, on another parition,
->>> manages to tickle this TDX gunk?
->>
->> Yeah, they'll be none too happy.
->>
->> But, what do we do?
+On Tue, Nov 22, 2022, Peter Zijlstra wrote:
+> On Tue, Nov 22, 2022 at 04:06:25PM +0100, Thomas Gleixner wrote:
+> > On Tue, Nov 22 2022 at 10:20, Peter Zijlstra wrote:
+> > 
+> > > On Mon, Nov 21, 2022 at 01:26:28PM +1300, Kai Huang wrote:
+> > >
+> > >> Shutting down the TDX module requires calling TDH.SYS.LP.SHUTDOWN on all
+> > >> BIOS-enabled CPUs, and the SEMACALL can run concurrently on different
+> > >> CPUs.  Implement a mechanism to run SEAMCALL concurrently on all online
+> > >> CPUs and use it to shut down the module.  Later logical-cpu scope module
+> > >> initialization will use it too.
+> > >
+> > > Uhh, those requirements ^ are not met by this:
+> > 
+> >   Can run concurrently != Must run concurrently
+> >  
+> > The documentation clearly says "can run concurrently" as quoted above.
 > 
-> Not intialize TDX on busy NOHZ_FULL cpus and hard-limit the cpumask of
-> all TDX using tasks.
-
-I don't think that works.  As I mentioned to Thomas elsewhere, you don't
-just need to initialize TDX on the CPUs where it is used.  Before the
-module will start working you need to initialize it on *all* the CPUs it
-knows about.  The module itself has a little counter where it tracks
-this and will refuse to start being useful until it gets called
-thoroughly enough.
-
->> There are technical solutions like detecting if NOHZ_FULL is in play and
->> refusing to initialize TDX.  There are also non-technical solutions like
->> telling folks in the documentation that they better modprobe kvm early
->> if they want to do TDX, or their NOHZ_FULL apps will pay.
+> The next sentense says: "Implement a mechanism to run SEAMCALL
+> concurrently" -- it does not.
 > 
-> Surely modprobe kvm isn't the point where TDX gets loaded? Because
-> that's on boot for everybody due to all the auto-probing nonsense.
-> 
-> I was expecting TDX to not get initialized until the first TDX using KVM
-> instance is created. Am I wrong?
+> Anyway, since we're all in agreement there is no such requirement at
+> all, a schedule_on_each_cpu() might be more appropriate, there is no
+> reason to use IPIs and spin-waiting for any of this.
 
-I went looking for it in this series to prove you wrong.  I failed.  :)
+Backing up a bit, what's the reason for _any_ of this?  The changelog says
 
-tdx_enable() is buried in here somewhere:
+  It's pointless to leave the TDX module in some middle state.
 
-> https://lore.kernel.org/lkml/CAAhR5DFrwP+5K8MOxz5YK7jYShhaK4A+2h1Pi31U_9+Z+cz-0A@mail.gmail.com/T/
+but IMO it's just as pointless to do a shutdown unless the kernel benefits in
+some meaningful way.  And IIUC, TDH.SYS.LP.SHUTDOWN does nothing more than change
+the SEAM VMCS.HOST_RIP to point to an error trampoline.  E.g. it's not like doing
+a shutdown lets the kernel reclaim memory that was gifted to the TDX module.
 
-I don't have the patience to dig it out today, so I guess we'll have Kai
-tell us.
-
->> We could also force the TDX module to be loaded early in boot before
->> NOHZ_FULL is in play, but that would waste memory on TDX metadata even
->> if TDX is never used.
-> 
-> I'm thikning it makes sense to have a tdx={off,on-demand,force} toggle
-> anyway.
-
-Yep, that makes total sense.  Kai had one in an earlier version but I
-made him throw it out because it wasn't *strictly* required and this set
-is fat enough.
-
->> How do NOHZ_FULL folks deal with late microcode updates, for example?
->> Those are roughly equally disruptive to all CPUs.
-> 
-> I imagine they don't do that -- in fact I would recommend we make the
-> whole late loading thing mutually exclusive with nohz_full; can't have
-> both.
-
-So, if we just use schedule_on_cpu() for now and have the TDX code wait,
-will a NOHZ_FULL task just block the schedule_on_cpu() indefinitely?
-
-That doesn't seem like _horrible_ behavior to start off with for a
-minimal series.
+In other words, this is just a really expensive way of changing a function pointer,
+and the only way it would ever benefit the kernel is if there is a kernel bug that
+leads to trying to use TDX after a fatal error.  And even then, the only difference
+seems to be that subsequent bogus SEAMCALLs would get a more unique error message.
