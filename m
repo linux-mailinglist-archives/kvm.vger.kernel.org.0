@@ -2,93 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7B6D633987
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 11:16:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 19A166339B0
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 11:18:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232638AbiKVKQb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 05:16:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42888 "EHLO
+        id S233539AbiKVKSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 05:18:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232154AbiKVKQ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 05:16:29 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D309C40459
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 02:16:28 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S233092AbiKVKRf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 05:17:35 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C21E03B;
+        Tue, 22 Nov 2022 02:17:33 -0800 (PST)
+Received: from zn.tnic (p200300ea9733e79b329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e79b:329c:23ff:fea6:a903])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7CC9461629
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 10:16:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E4ADFC43146
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 10:16:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669112187;
-        bh=svnVl0+e7yKCwj6aqZYjxagK8UJKJQrYLa9BN+EiIos=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=dhpHjg52cQrsrBdbA8kCACAAK60zctNmjlQxFD/cL/ltd9BoMeYieI60Q2XSYtJYV
-         jxKi6803RnXHsvsUIc5D9LIoor/DwYGhrEHz329SF0MAN0g3uyB7zMIJqekIwF/hpc
-         iwhq8jiuFjiWwSfQDiyZTmFCamXu+bv6/qp5WP9lZT+sTmPkjQcVdYnwmmTiMuVacY
-         SUcTy3qWq5GgjsP2iRhXa7AUfn+rXxLnoIt5okP8uYESMtZDc1JeqVcxrobTIDw/c4
-         2VU06OGkTSPlZmFAilDfCVsmkT9byKn7uIcSPjyWrXq1OuBeH2SiA3STtS0VIWYSAA
-         ByMNKM1GT/bOw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id CCB33C433EA; Tue, 22 Nov 2022 10:16:27 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216725] VMXON with CR0 bit 5 cleared should #GP, got '6'
-Date:   Tue, 22 Nov 2022 10:16:27 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: yu.c.zhang@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-216725-28872-Y8P9rEOWFK@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216725-28872@https.bugzilla.kernel.org/>
-References: <bug-216725-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BD30A1EC05B0;
+        Tue, 22 Nov 2022 11:17:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1669112251;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=XW4KmeE1lzqUbSDQgw0OBkM1KYWQdDzwu91w2ZjF5TE=;
+        b=DuntGKBHRGyMI+yzTr/TwqOwnXXDvqJwm7SvqoGXUYJE2lj3j59lFGw4qmF1O/GolhkxaD
+        znTMJZE0D+1CNoNoXmaS8NoRZqyVqGPCi+dEqhpgxF1zpSS8HjfKxbF+sGYlPJQ0JAISRH
+        NfC5xXH13XU7o0cbQWyhEwSOCcWVIZ4=
+Date:   Tue, 22 Nov 2022 11:17:26 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
+Message-ID: <Y3yhthJTIWqjjAPK@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
+ <Y0grhk1sq2tf/tUl@zn.tnic>
+ <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
+ <b712bc81-4446-9be4-fd59-d08981d13475@amd.com>
+ <Y3qdTuZQoDZxUgbw@zn.tnic>
+ <cffed3c2-55a9-bdd3-3b8a-82b2050a64af@amd.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cffed3c2-55a9-bdd3-3b8a-82b2050a64af@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216725
+On Mon, Nov 21, 2022 at 06:37:18PM -0600, Kalra, Ashish wrote:
+> I agree, but these pages are not in the right state to be released back to
 
-Yu Zhang (yu.c.zhang@intel.com) changed:
+Which pages exactly?
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |yu.c.zhang@intel.com
+Some pages' state has really changed underneath or you've given the
+wrong range?
 
---- Comment #1 from Yu Zhang (yu.c.zhang@intel.com) ---
-Well, IIUC, the case was added by Sean
-(https://lore.kernel.org/all/20220608235238.3881916-1-seanjc@google.com/), =
-to
-test his fix for nVMX
-(https://lore.kernel.org/lkml/Yz7zB7Lxt2DHa4nT@google.com/T/).=20
+> It might be a user/sev-guest error, but these pages are now unsafe to use.
+> So is a kernel panic justified here, instead of not releasing the pages back
+> to host and logging errors for the same.
 
-But the KVM patch has not been queued in next branch yet. Maybe we can just
-wait...
+Ok, there are two cases:
 
---=20
-You may reply to this email to add a comment.
+* kernel error: I guess a big fat warning is the least we can issue
+here. Not sure about panic considering this should almost never happen
+and a warning would allow for people to catch dumps and debug the issue.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+* firmware error: I don't think you can know that that is really
+the case on a production system without additional fw debugging
+capabilities. Dumping a warning would be the least we can do here too,
+to signal that something's out of the ordinary and so people can look
+into it further.
+
+So yeah, a big fat warning is a good start. And then you don't need any
+memory poisoning etc gunk.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
