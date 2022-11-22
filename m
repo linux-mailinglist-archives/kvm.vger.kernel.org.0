@@ -2,77 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DE376341E0
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 17:49:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCF106341E1
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 17:50:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233774AbiKVQtm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 11:49:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50296 "EHLO
+        id S232685AbiKVQum (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 11:50:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232355AbiKVQtk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 11:49:40 -0500
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE286D494
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:49:39 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id s5so8421276wru.1
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:49:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WYdwvHIi6DqjXCDAORbhbwu4G8zzO6vRrPEDwC0sCPE=;
-        b=kNJg8I+unKo2QwPHf/4lQ1ohU2IwJZ6VbzuvuJ6xz3CgDuReNWeyoZwA2q4whLzM5K
-         L7lRo1DwcHIPy9D2q6RUtuJDKpPYsgTW1q9xsRkTmA/lEjHp1fD1bN1oeALm11tQXoGf
-         KE+jNQoRRLjqc1eQGVpwBn2EuNLfp3A1hmraLXSCGIfYMk2la3C+xWHTvqEtpPnaRNad
-         mnRPUHz0SFGCzWqMP8LwM4Y1xtJNpx7KyCeiN2lPY7NSdWD2eILK54CFg83ex9L+PWve
-         Qh7HkyDmtnssa84y75DL4XcM+6UnQ157JGSulnQ6RjMHIydCfw68cWikFisARlWHo99k
-         3hdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WYdwvHIi6DqjXCDAORbhbwu4G8zzO6vRrPEDwC0sCPE=;
-        b=Wy3tJgOaf9hxvg3dgCZMY3+Jp9bbnsG2wm6nL11Y1UDDU681s7/guk5RzG/VBS18tY
-         fGwoWQ77t06b1vSoDNG8AAjJ7IE449+E0qMfqj5sltABlGmmFgPeFxmZVEGB9NULWz/j
-         rc/TlzsR5fqiPXtzX60EWomNdnxoSTM4WSvJKgOeWWErdIUDR8gNyeiIAhJCpFQy+DcJ
-         g0sxBQohOEjynW4pFhiiCCwnWkGTDX4PZB/Cg+GnAwhzL4hOmBJwzcfpjUL8kkd5S5C9
-         1f0ZTqPH/xUDN48IpwSIo0gtHdedPuOdDkrhcZEAPiNK/UvqWZB3vhWiQJVRkxd6kszw
-         sT/A==
-X-Gm-Message-State: ANoB5pnQC+kQFbWHf0o3ch3AihqE9CyqsC11meLRd2ETSgpbr+dCwE9q
-        f1KwQlBWYrumb+FgXnLak88=
-X-Google-Smtp-Source: AA0mqf4VgjxBWl9MpFhuBLDKpovDEfLPL2S+egq4EUh6DbQYoBpADh8PhFw6Uumgwz4P+7LUyjC0Nw==
-X-Received: by 2002:adf:ea81:0:b0:241:bcc1:7643 with SMTP id s1-20020adfea81000000b00241bcc17643mr3239264wrm.673.1669135778170;
-        Tue, 22 Nov 2022 08:49:38 -0800 (PST)
-Received: from [192.168.6.138] (54-240-197-238.amazon.com. [54.240.197.238])
-        by smtp.gmail.com with ESMTPSA id c9-20020a5d5289000000b00236545edc91sm14392514wrv.76.2022.11.22.08.49.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Nov 2022 08:49:37 -0800 (PST)
-Message-ID: <d7ae4bab-e826-ad0f-7248-81574a5f2b5c@gmail.com>
-Date:   Tue, 22 Nov 2022 16:49:36 +0000
+        with ESMTP id S232355AbiKVQuk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 11:50:40 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48BE76C729;
+        Tue, 22 Nov 2022 08:50:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669135839; x=1700671839;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=puqtoUPvntcrMHUyIfxv2XTasYKx66NRxAdTJ/YKsJo=;
+  b=B0RO81aP0AKXo6JdOrrYUo70nZJTQ/JsyOuUN3q11s3vvUvevukKQLvs
+   bWWB57NQKaAb1M8lLhNQtyHBLs9FsuFmoft0fRqXgfjZhXGmXAzgH9Cy9
+   SQcHvR9XR//yIl3KMmFPdTLjz1LEw98GEc7zg2Krg2wYOG/AxvGdsDPmq
+   eggR792mCyzNYo5QPQxDAjkDrY45N+6/F7zNRB/geK0ltUAQqki3BdZFV
+   rX14B66tOI0F0rtQNxTFCTYGRrtZjR2aKD1VfbQ8rHuvI4b7oCu5/Mp0/
+   m9u86vEg17sBHrZ9BevQyISd9dnNeKCLQppwdSDK2IKcJNfmkTX56qahA
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="315680098"
+X-IronPort-AV: E=Sophos;i="5.96,184,1665471600"; 
+   d="scan'208";a="315680098"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 08:50:25 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="592201627"
+X-IronPort-AV: E=Sophos;i="5.96,184,1665471600"; 
+   d="scan'208";a="592201627"
+Received: from lcano-mobl1.amr.corp.intel.com (HELO [10.255.231.75]) ([10.255.231.75])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 08:50:23 -0800
+Message-ID: <f743a4df-f285-3f07-02ef-b908020e0c93@intel.com>
+Date:   Tue, 22 Nov 2022 08:50:23 -0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH 3/4] KVM: Update gfn_to_pfn_cache khva when it moves
- within the same page
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v7 02/20] x86/virt/tdx: Detect TDX during kernel boot
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        "Durrant, Paul" <pdurrant@amazon.co.uk>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     "Huang, Kai" <kai.huang@intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mhal@rbox.co" <mhal@rbox.co>
-References: <20221119094659.11868-1-dwmw2@infradead.org>
- <20221119094659.11868-3-dwmw2@infradead.org>
- <681cf1b4edf04563bba651efb854e77f@amazon.co.uk> <Y3z3ZVoXXGWusfyj@google.com>
-From:   Paul Durrant <xadimgnik@gmail.com>
-In-Reply-To: <Y3z3ZVoXXGWusfyj@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+References: <cover.1668988357.git.kai.huang@intel.com>
+ <aaee2d5332a97c840ad401ba935842a998a877ec.1668988357.git.kai.huang@intel.com>
+ <e758572a-5bb1-092a-10f6-591fb4526997@intel.com>
+ <9db9599fba11490cebbe59cbb7c145e9c119ab0f.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <9db9599fba11490cebbe59cbb7c145e9c119ab0f.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,33 +84,125 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/11/2022 16:23, Sean Christopherson wrote:
-> On Sat, Nov 19, 2022, Durrant, Paul wrote:
->>> -----Original Message-----
->>> From: David Woodhouse <dwmw2@infradead.org>
->>> Sent: 19 November 2022 09:47
->>> To: Paolo Bonzini <pbonzini@redhat.com>; Sean Christopherson
->>> <seanjc@google.com>
->>> Cc: kvm@vger.kernel.org; mhal@rbox.co
->>> Subject: [EXTERNAL] [PATCH 3/4] KVM: Update gfn_to_pfn_cache khva when it
->>> moves within the same page
-> 
-> Please use a mail client that doesn't include the header gunk in the reply.
-> 
-
-Sorry about that; it's not just a change of client unfortunately but I 
-should be avoiding the problem now...
-
->>> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+On 11/22/22 03:28, Huang, Kai wrote:
+>>> +	/*
+>>> +	 * KeyID 0 is for TME.  MKTME KeyIDs start from 1.  TDX private
+>>> +	 * KeyIDs start after the last MKTME KeyID.
+>>> +	 */
 >>
->> Reviewed-by: <paul@xen.org>
+>> Is the TME key a "MKTME KeyID"?
 > 
-> Tags need your real name, not just your email address, i.e. this should be:
+> I don't think so.  Hardware handles TME KeyID 0 differently from non-0 MKTME
+> KeyIDs.  And PCONFIG only accept non-0 KeyIDs.
+
+Let's say we have 4 MKTME hardware bits, we'd have:
+
+   0: TME Key
+1->3: MKTME Keys
+4->7: TDX Private Keys
+
+First, the MSR values:
+
+> +        * IA32_MKTME_KEYID_PARTIONING:
+> +        *   Bit [31:0]:        Number of MKTME KeyIDs.
+> +        *   Bit [63:32]:       Number of TDX private KeyIDs.
+
+These would be:
+
+	Bit [ 31:0] = 3
+	Bit [63:22] = 4
+
+And in the end the variables:
+
+	tdx_keyid_start would be 4 and tdx_keyid_num would be 4.
+
+Right?
+
+That's a bit wonky for my brain because I guess I know too much about
+the internal implementation and how the key space is split up.  I guess
+I (wrongly) expected Bit[31:0]==Bit[63:22].
+
+
+
+>>> +static void __init clear_tdx(void)
+>>> +{
+>>> +	tdx_keyid_start = tdx_keyid_num = 0;
+>>> +}
+>>
+>> This is where a comment is needed and can actually help.
+>>
+>> /*
+>>  * tdx_keyid_start/num indicate that TDX is uninitialized.  This
+>>  * is used in TDX initialization error paths to take it from
+>>  * initialized -> uninitialized.
+>>  */
 > 
->    Reviewed-by: Paul Durrant <paul@xen.org>
+> Just want to point out after removing the !x2apic_enabled() check, the only
+> thing need to do here is to detect/record the TDX KeyIDs.
+> 
+> And the purpose of this TDX boot-time initialization code is to provide
+> platform_tdx_enabled() function so that kexec() can use.
+> 
+> To distinguish boot-time TDX initialization from runtime TDX module
+> initialization, how about change the comment to below?
+> 
+> static void __init clear_tdx(void)
+> {
+>         /*
+>          * tdx_keyid_start and nr_tdx_keyids indicate that TDX is not
+>          * enabled by the BIOS.  This is used in TDX boot-time
+>          * initializatiton error paths to take it from enabled to not
+>          * enabled.
+>          */
+>         tdx_keyid_start = nr_tdx_keyids = 0;
+> }
+> 
+> [...]
 
-Yes indeed it should. Don't know how I managed to screw that up... It's 
-not like haven't type that properly hundreds of times on Xen patch reviews.
+I honestly have no idea what "boot-time TDX initialization" is versus
+"runtime TDX module initialization".  This doesn't hel.
 
-   Paul
+> And below is the updated patch.  How does it look to you?
+
+Let's see...
+
+...
+> +static u32 tdx_keyid_start __ro_after_init;
+> +static u32 nr_tdx_keyids __ro_after_init;
+> +
+> +static int __init record_keyid_partitioning(void)
+> +{
+> +       u32 nr_mktme_keyids;
+> +       int ret;
+> +
+> +       /*
+> +        * IA32_MKTME_KEYID_PARTIONING:
+> +        *   Bit [31:0]:        Number of MKTME KeyIDs.
+> +        *   Bit [63:32]:       Number of TDX private KeyIDs.
+> +        */
+> +       ret = rdmsr_safe(MSR_IA32_MKTME_KEYID_PARTITIONING, &nr_mktme_keyids,
+> +                       &nr_tdx_keyids);
+> +       if (ret)
+> +               return -ENODEV;
+> +
+> +       if (!nr_tdx_keyids)
+> +               return -ENODEV;
+> +
+> +       /* TDX KeyIDs start after the last MKTME KeyID. */
+> +       tdx_keyid_start++;
+
+tdx_keyid_start is uniniitalized here.  So, it'd be 0, then ++'d.
+
+Kai, please take a moment and slow down.  This isn't a race.  I offered
+some replacement code here, which you've discarded, missed or ignored
+and in the process broken this code.
+
+This approach just wastes reviewer time.  It's not working for me.
+
+I'm going to make a suggestion (aka. a demand): You can post these
+patches at most once a week.  You get a whole week to (carefully)
+incorporate reviewer feedback, make the patch better, and post a new
+version.  Need more time?  Go ahead and take it.  Take as much time as
+you want.
+
 
