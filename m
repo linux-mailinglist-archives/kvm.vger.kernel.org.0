@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC042634127
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 17:15:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D3F0634130
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 17:15:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234304AbiKVQPM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 11:15:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42398 "EHLO
+        id S234046AbiKVQPd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 11:15:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234206AbiKVQOk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 11:14:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A11479914
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:12:24 -0800 (PST)
+        with ESMTP id S233602AbiKVQOt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 11:14:49 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AB5BBF9
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:12:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669133543;
+        s=mimecast20190719; t=1669133545;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=GdF4iA89slSabFHBvp0G6JXHx+KX7fh+rsl20EPvLAM=;
-        b=DslTDZjlTx4aZEmK85uAC7QnzXEn4t/051YD31YB/4SmH/eLaRv1r9q8p8k9Bw/nIeLJXY
-        V4O8LNCM3TKY5pWNpnMUXy5uC3TAIksNGbQgMG6FtE6VVdU844+GUpSSFQ30+WidHRv7sR
-        swKUJPTJA0zPe+BCBqrEHDLCKepKI6M=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=7Jm8RLdpkzcmeCFjb0mSwCuqevaDduEVFcyskhZpg+I=;
+        b=cxMR4XW1c0sOMyYDVh24ZuvvtuZoyn05dQWod3xZLp1n0OnQDKPGtwQ/IVXwiKhO1lJVOG
+        TwmwHFbaIBTNFAp9TS9G3CSdCFF5LqRkBQqGpy6Mh3qGci6RjTeITnVOTr4ETLnCgSfl/n
+        OrABbWeSkp59t/Gv2VzJRROmyYDRdJI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-257-Yjhi2ah5NqCLmzkJWBrKdw-1; Tue, 22 Nov 2022 11:12:19 -0500
-X-MC-Unique: Yjhi2ah5NqCLmzkJWBrKdw-1
+ us-mta-158--VTLsWe3N1KK0AtUwBJWDw-1; Tue, 22 Nov 2022 11:12:22 -0500
+X-MC-Unique: -VTLsWe3N1KK0AtUwBJWDw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A93ED29AB418;
-        Tue, 22 Nov 2022 16:12:18 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ED3A2802532;
+        Tue, 22 Nov 2022 16:12:20 +0000 (UTC)
 Received: from amdlaptop.tlv.redhat.com (dhcp-4-238.tlv.redhat.com [10.35.4.238])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AE35B1121314;
-        Tue, 22 Nov 2022 16:12:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F1C3C112132D;
+        Tue, 22 Nov 2022 16:12:18 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Andrew Jones <drjones@redhat.com>,
@@ -49,9 +49,9 @@ Cc:     Andrew Jones <drjones@redhat.com>,
         Nico Boehr <nrb@linux.ibm.com>,
         Cathy Avery <cavery@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>
-Subject: [kvm-unit-tests PATCH v3 10/27] SVM: add two tests for exitintinto on exception
-Date:   Tue, 22 Nov 2022 18:11:35 +0200
-Message-Id: <20221122161152.293072-11-mlevitsk@redhat.com>
+Subject: [kvm-unit-tests PATCH v3 11/27] lib: Add random number generator
+Date:   Tue, 22 Nov 2022 18:11:36 +0200
+Message-Id: <20221122161152.293072-12-mlevitsk@redhat.com>
 In-Reply-To: <20221122161152.293072-1-mlevitsk@redhat.com>
 References: <20221122161152.293072-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -67,187 +67,218 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test that exitintinfo is set correctly when
-exception happens during exception/interrupt delivery
-and that exception is intercepted.
+Add a simple pseudo random number generator which can be used
+in the tests to add randomeness in a controlled manner.
 
-Note that those tests currently fail, due to few bugs in KVM.
-
-Also note that those bugs are in KVM's common x86 code,
-thus the issue exists on VMX as well and unit tests
-that reproduce those on VMX will be written as well.
+For x86 add a wrapper which initializes the PRNG with RDRAND,
+unless RANDOM_SEED env variable is set, in which case it is used
+instead.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- x86/svm_tests.c | 148 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 148 insertions(+)
+ Makefile              |  3 ++-
+ README.md             |  1 +
+ lib/prng.c            | 41 +++++++++++++++++++++++++++++++++++++++++
+ lib/prng.h            | 23 +++++++++++++++++++++++
+ lib/x86/random.c      | 33 +++++++++++++++++++++++++++++++++
+ lib/x86/random.h      | 17 +++++++++++++++++
+ scripts/arch-run.bash |  2 +-
+ x86/Makefile.common   |  1 +
+ 8 files changed, 119 insertions(+), 2 deletions(-)
+ create mode 100644 lib/prng.c
+ create mode 100644 lib/prng.h
+ create mode 100644 lib/x86/random.c
+ create mode 100644 lib/x86/random.h
 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 7a67132a..202e9271 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -3254,6 +3254,145 @@ static void svm_shutdown_intercept_test(void)
- 	report(vmcb->control.exit_code == SVM_EXIT_SHUTDOWN, "shutdown test passed");
+diff --git a/Makefile b/Makefile
+index 6ed5deac..384b5acf 100644
+--- a/Makefile
++++ b/Makefile
+@@ -29,7 +29,8 @@ cflatobjs := \
+ 	lib/string.o \
+ 	lib/abort.o \
+ 	lib/report.o \
+-	lib/stack.o
++	lib/stack.o \
++	lib/prng.o
+ 
+ # libfdt paths
+ LIBFDT_objdir = lib/libfdt
+diff --git a/README.md b/README.md
+index 6e82dc22..5a677a03 100644
+--- a/README.md
++++ b/README.md
+@@ -91,6 +91,7 @@ the framework.  The list of reserved environment variables is below
+     QEMU_ACCEL                   either kvm, hvf or tcg
+     QEMU_VERSION_STRING          string of the form `qemu -h | head -1`
+     KERNEL_VERSION_STRING        string of the form `uname -r`
++    TEST_SEED                    integer to force a fixed seed for the prng
+ 
+ Additionally these self-explanatory variables are reserved
+ 
+diff --git a/lib/prng.c b/lib/prng.c
+new file mode 100644
+index 00000000..d9342eb3
+--- /dev/null
++++ b/lib/prng.c
+@@ -0,0 +1,41 @@
++
++/*
++ * Random number generator that is usable from guest code. This is the
++ * Park-Miller LCG using standard constants.
++ */
++
++#include "libcflat.h"
++#include "prng.h"
++
++struct random_state new_random_state(uint32_t seed)
++{
++	struct random_state s = {.seed = seed};
++	return s;
++}
++
++uint32_t random_u32(struct random_state *state)
++{
++	state->seed = (uint64_t)state->seed * 48271 % ((uint32_t)(1 << 31) - 1);
++	return state->seed;
++}
++
++
++uint32_t random_range(struct random_state *state, uint32_t min, uint32_t max)
++{
++	uint32_t val = random_u32(state);
++
++	return val % (max - min + 1) + min;
++}
++
++/*
++ * Returns true randomly in 'percent_true' cases (e.g if percent_true = 70.0,
++ * it will return true in 70.0% of cases)
++ */
++bool random_decision(struct random_state *state, float percent_true)
++{
++	if (percent_true == 0)
++		return 0;
++	if (percent_true == 100)
++		return 1;
++	return random_range(state, 1, 10000) < (uint32_t)(percent_true * 100);
++}
+diff --git a/lib/prng.h b/lib/prng.h
+new file mode 100644
+index 00000000..61d3a48b
+--- /dev/null
++++ b/lib/prng.h
+@@ -0,0 +1,23 @@
++
++#ifndef SRC_LIB_PRNG_H_
++#define SRC_LIB_PRNG_H_
++
++struct random_state {
++	uint32_t seed;
++};
++
++struct random_state new_random_state(uint32_t seed);
++uint32_t random_u32(struct random_state *state);
++
++/*
++ * return a random number from min to max (included)
++ */
++uint32_t random_range(struct random_state *state, uint32_t min, uint32_t max);
++
++/*
++ * Returns true randomly in 'percent_true' cases (e.g if percent_true = 70.0,
++ * it will return true in 70.0% of cases)
++ */
++bool random_decision(struct random_state *state, float percent_true);
++
++#endif /* SRC_LIB_PRNG_H_ */
+diff --git a/lib/x86/random.c b/lib/x86/random.c
+new file mode 100644
+index 00000000..fcdd5fe8
+--- /dev/null
++++ b/lib/x86/random.c
+@@ -0,0 +1,33 @@
++
++#include "libcflat.h"
++#include "processor.h"
++#include "prng.h"
++#include "smp.h"
++#include "asm/spinlock.h"
++#include "random.h"
++
++static u32 test_seed;
++static bool initialized;
++
++void init_prng(void)
++{
++	char *test_seed_str = getenv("TEST_SEED");
++
++	if (test_seed_str && strlen(test_seed_str))
++		test_seed = atol(test_seed_str);
++	else
++#ifdef __x86_64__
++		test_seed =  (u32)rdrand();
++#else
++		test_seed = (u32)(rdtsc() << 4);
++#endif
++	initialized = true;
++
++	printf("Test seed: %u\n", (unsigned int)test_seed);
++}
++
++struct random_state get_prng(void)
++{
++	assert(initialized);
++	return new_random_state(test_seed + this_cpu_read_smp_id());
++}
+diff --git a/lib/x86/random.h b/lib/x86/random.h
+new file mode 100644
+index 00000000..795b450b
+--- /dev/null
++++ b/lib/x86/random.h
+@@ -0,0 +1,17 @@
++/*
++ * prng.h
++ *
++ *  Created on: Nov 9, 2022
++ *      Author: mlevitsk
++ */
++
++#ifndef SRC_LIB_X86_RANDOM_H_
++#define SRC_LIB_X86_RANDOM_H_
++
++#include "libcflat.h"
++#include "prng.h"
++
++void init_prng(void);
++struct random_state get_prng(void);
++
++#endif /* SRC_LIB_X86_RANDOM_H_ */
+diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+index 51e4b97b..238d19f8 100644
+--- a/scripts/arch-run.bash
++++ b/scripts/arch-run.bash
+@@ -298,7 +298,7 @@ env_params ()
+ 	KERNEL_EXTRAVERSION=${KERNEL_EXTRAVERSION%%[!0-9]*}
+ 	! [[ $KERNEL_SUBLEVEL =~ ^[0-9]+$ ]] && unset $KERNEL_SUBLEVEL
+ 	! [[ $KERNEL_EXTRAVERSION =~ ^[0-9]+$ ]] && unset $KERNEL_EXTRAVERSION
+-	env_add_params KERNEL_VERSION_STRING KERNEL_VERSION KERNEL_PATCHLEVEL KERNEL_SUBLEVEL KERNEL_EXTRAVERSION
++	env_add_params KERNEL_VERSION_STRING KERNEL_VERSION KERNEL_PATCHLEVEL KERNEL_SUBLEVEL KERNEL_EXTRAVERSION TEST_SEED
  }
  
-+/*
-+ * Test that nested exceptions are delivered correctly
-+ * when parent exception is intercepted
-+ */
-+
-+static void exception_merging_prepare(struct svm_test *test)
-+{
-+	vmcb->control.intercept_exceptions |= (1ULL << GP_VECTOR);
-+
-+	/* break UD vector idt entry to get #GP*/
-+	boot_idt[UD_VECTOR].type = 1;
-+}
-+
-+static void exception_merging_test(struct svm_test *test)
-+{
-+	asm volatile ("ud2");
-+}
-+
-+static bool exception_merging_finished(struct svm_test *test)
-+{
-+	u32 vec = vmcb->control.exit_int_info & SVM_EXITINTINFO_VEC_MASK;
-+	u32 type = vmcb->control.exit_int_info & SVM_EXITINTINFO_TYPE_MASK;
-+
-+	if (vmcb->control.exit_code != SVM_EXIT_EXCP_BASE + GP_VECTOR) {
-+		report(false, "unexpected VM exit");
-+		goto out;
-+	}
-+
-+	if (!(vmcb->control.exit_int_info & SVM_EXITINTINFO_VALID)) {
-+		report(false, "EXITINTINFO not valid");
-+		goto out;
-+	}
-+
-+	if (type != SVM_EXITINTINFO_TYPE_EXEPT) {
-+		report(false, "Incorrect event type in EXITINTINFO");
-+		goto out;
-+	}
-+
-+	if (vec != UD_VECTOR) {
-+		report(false, "Incorrect vector in EXITINTINFO");
-+		goto out;
-+	}
-+
-+	set_test_stage(test, 1);
-+out:
-+	boot_idt[UD_VECTOR].type = 14;
-+	return true;
-+}
-+
-+static bool exception_merging_check(struct svm_test *test)
-+{
-+	return get_test_stage(test) == 1;
-+}
-+
-+
-+/*
-+ * Test that if exception is raised during interrupt delivery,
-+ * and that exception is intercepted, the interrupt is preserved
-+ * in EXITINTINFO of the exception
-+ */
-+
-+static void interrupt_merging_prepare(struct svm_test *test)
-+{
-+	/* intercept #GP */
-+	vmcb->control.intercept_exceptions |= (1ULL << GP_VECTOR);
-+
-+	/* set local APIC to inject external interrupts */
-+	apic_setup_timer(TIMER_VECTOR, APIC_LVT_TIMER_PERIODIC);
-+	apic_start_timer(100000);
-+}
-+
-+#define INTERRUPT_MERGING_DELAY 100000000ULL
-+
-+static void interrupt_merging_test(struct svm_test *test)
-+{
-+	handle_irq(TIMER_VECTOR, timer_isr);
-+	/* break timer vector IDT entry to get #GP on interrupt delivery */
-+	boot_idt[TIMER_VECTOR].type = 1;
-+
-+	sti();
-+	delay(INTERRUPT_MERGING_DELAY);
-+}
-+
-+static bool interrupt_merging_finished(struct svm_test *test)
-+{
-+
-+	u32 vec = vmcb->control.exit_int_info & SVM_EXITINTINFO_VEC_MASK;
-+	u32 type = vmcb->control.exit_int_info & SVM_EXITINTINFO_TYPE_MASK;
-+	u32 error_code = vmcb->control.exit_info_1;
-+
-+	/* exit on external interrupts is disabled, thus timer interrupt
-+	 * should be attempted to be delivered, but due to incorrect IDT entry
-+	 * an #GP should be raised
-+	 */
-+	if (vmcb->control.exit_code != SVM_EXIT_EXCP_BASE + GP_VECTOR) {
-+		report(false, "unexpected VM exit");
-+		goto cleanup;
-+	}
-+
-+	/* GP error code should be about an IDT entry, and due to external event */
-+	if (error_code != (TIMER_VECTOR << 3 | 3)) {
-+		report(false, "Incorrect error code of the GP exception");
-+		goto cleanup;
-+	}
-+
-+	/* Original interrupt should be preserved in EXITINTINFO */
-+	if (!(vmcb->control.exit_int_info & SVM_EXITINTINFO_VALID)) {
-+		report(false, "EXITINTINFO not valid");
-+		goto cleanup;
-+	}
-+
-+	if (type != SVM_EXITINTINFO_TYPE_INTR) {
-+		report(false, "Incorrect event type in EXITINTINFO");
-+		goto cleanup;
-+	}
-+
-+	if (vec != TIMER_VECTOR) {
-+		report(false, "Incorrect vector in EXITINTINFO");
-+		goto cleanup;
-+	}
-+
-+	set_test_stage(test, 1);
-+
-+cleanup:
-+	// restore the IDT gate
-+	boot_idt[TIMER_VECTOR].type = 14;
-+	wmb();
-+	// eoi the interrupt we got #GP for
-+	eoi();
-+	apic_cleanup_timer();
-+	return true;
-+}
-+
-+static bool interrupt_merging_check(struct svm_test *test)
-+{
-+	return get_test_stage(test) == 1;
-+}
-+
-+
- struct svm_test svm_tests[] = {
- 	{ "null", default_supported, default_prepare,
- 	  default_prepare_gif_clear, null_test,
-@@ -3346,6 +3485,15 @@ struct svm_test svm_tests[] = {
- 	{ "vgif", vgif_supported, prepare_vgif_enabled,
- 	  default_prepare_gif_clear, test_vgif, vgif_finished,
- 	  vgif_check },
-+	{ "exception_merging", default_supported,
-+	  exception_merging_prepare, default_prepare_gif_clear,
-+	  exception_merging_test,  exception_merging_finished,
-+	  exception_merging_check },
-+	{ "interrupt_merging", default_supported,
-+	  interrupt_merging_prepare, default_prepare_gif_clear,
-+	  interrupt_merging_test,  interrupt_merging_finished,
-+	  interrupt_merging_check },
-+
- 	TEST(svm_cr4_osxsave_test),
- 	TEST(svm_guest_state_test),
- 	TEST(svm_vmrun_errata_test),
+ env_file ()
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index 698a48ab..fa0a50e6 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -23,6 +23,7 @@ cflatobjs += lib/x86/stack.o
+ cflatobjs += lib/x86/fault_test.o
+ cflatobjs += lib/x86/delay.o
+ cflatobjs += lib/x86/pmu.o
++cflatobjs += lib/x86/random.o
+ ifeq ($(CONFIG_EFI),y)
+ cflatobjs += lib/x86/amd_sev.o
+ cflatobjs += lib/efi.o
 -- 
 2.34.3
 
