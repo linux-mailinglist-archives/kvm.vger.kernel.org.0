@@ -2,172 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D7EE633919
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 10:55:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E7BA633971
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 11:12:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233422AbiKVJzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 04:55:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54798 "EHLO
+        id S233351AbiKVKMF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 05:12:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232621AbiKVJy5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 04:54:57 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46AAE183AC;
-        Tue, 22 Nov 2022 01:54:56 -0800 (PST)
+        with ESMTP id S232645AbiKVKLr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 05:11:47 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D918954B3C;
+        Tue, 22 Nov 2022 02:11:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669110896; x=1700646896;
+  t=1669111904; x=1700647904;
   h=date:from:to:cc:subject:message-id:reply-to:references:
    mime-version:in-reply-to;
-  bh=rJIOCd9N5PvCN1hTjd1er2T0b67rVXxGjK1ymZuckrA=;
-  b=b7vNNj68/Ax6Wu+zUkZ0SXMQh1/D6weUFJgdYBLzCTERYsopZyfn5lCS
-   AC5ecYKuoLjRaZJZIaCJyMYgtoLp+2hrSPIat/rojvvpMC4JUxNDKZvHs
-   eap8QuRh1CaW9CPTvZZXcUarJiOCcg++ZFyjPQcJtrQGojRB2+DkqJdLd
-   F47Tqt43uU6ADr8efBIq8G/OXHLz905oPtZ2kiJ6v4cWM4S04SVTi15D9
-   7Z5ZsqycGoIBpky9UGhIirnF4SffdLXYY34xzc7v6Qm8Hi3CpYd4P0vHX
-   10Kfn/yMCEM1UgspnjZAYFYYaXzhbEu16Wo3B0QiRxglJWxOqaKKGjwyZ
+  bh=usjdVgC5nTrsMPk+N8fokwP8pD99HC8BUV8bc4gHSuA=;
+  b=HfctUD3QggyPX6zsCVtLICrnp+4l6+zBAxUgUW+joSiPYur6A/8YyUfA
+   LbkyemKdOvF6fezsw1CdCzRm4V4wxqxKEG+o8OxCyPjQXWkvBpUp//CLn
+   tAAe8Yuujo1pXALer2qrYmWbgSNwNzy9prgeigUgNhOxOZ90uExSDWF/0
+   hCYGlxcZmhvy+6T8Q3lgUOEB2jwAyC/NqILlLsfWIE9B/8gEdfQhvBmWW
+   nWlops7Wyoc9NQFW7FiAbgLd1I4rjHBkeLN7tX1Mi2ak6ztGss4bysTof
+   APsf1PZSb4sLGTl9WrXUlrhht7SqDvkchaHna8t0ixC1lOP4vKh3jcfRk
    g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="314927693"
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="400071024"
 X-IronPort-AV: E=Sophos;i="5.96,183,1665471600"; 
-   d="scan'208";a="314927693"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 01:54:55 -0800
+   d="scan'208";a="400071024"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 02:11:38 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="635489296"
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="704914294"
 X-IronPort-AV: E=Sophos;i="5.96,183,1665471600"; 
-   d="scan'208";a="635489296"
+   d="scan'208";a="704914294"
 Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga007.jf.intel.com with ESMTP; 22 Nov 2022 01:54:45 -0800
-Date:   Tue, 22 Nov 2022 17:50:22 +0800
+  by fmsmga008.fm.intel.com with ESMTP; 22 Nov 2022 02:11:28 -0800
+Date:   Tue, 22 Nov 2022 18:07:05 +0800
 From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Alex =?utf-8?B?QmVubu+/vWU=?= <alex.bennee@linaro.org>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v9 3/8] KVM: Add KVM_EXIT_MEMORY_FAULT exit
-Message-ID: <20221122095022.GA617784@chaop.bj.intel.com>
+To:     Vishal Annapurve <vannapurve@google.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        shuah@kernel.org, yang.zhong@intel.com, ricarkol@google.com,
+        aaronlewis@google.com, wei.w.wang@intel.com,
+        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
+        jlayton@kernel.org, bfields@fieldses.org,
+        akpm@linux-foundation.org, yu.c.zhang@linux.intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com,
+        michael.roth@amd.com, qperret@google.com, steven.price@arm.com,
+        ak@linux.intel.com, david@redhat.com, luto@kernel.org,
+        vbabka@suse.cz, marcorr@google.com, erdemaktas@google.com,
+        pgonda@google.com, nikunj@amd.com, seanjc@google.com,
+        diviness@google.com, maz@kernel.org, dmatlack@google.com,
+        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
+        mizhang@google.com, bgardon@google.com, ackerleytng@google.com
+Subject: Re: [V1 PATCH 1/6] KVM: x86: Add support for testing private memory
+Message-ID: <20221122100705.GA619277@chaop.bj.intel.com>
 Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <20221025151344.3784230-4-chao.p.peng@linux.intel.com>
- <87cz9o9mr8.fsf@linaro.org>
- <20221116031441.GA364614@chaop.bj.intel.com>
- <87mt8q90rw.fsf@linaro.org>
- <20221117134520.GD422408@chaop.bj.intel.com>
- <87a64p8vof.fsf@linaro.org>
- <20221118013201.GA456562@chaop.bj.intel.com>
- <87o7t475o7.fsf@linaro.org>
- <Y3er0M5Rpf1X97W/@google.com>
+References: <20221111014244.1714148-1-vannapurve@google.com>
+ <20221111014244.1714148-2-vannapurve@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y3er0M5Rpf1X97W/@google.com>
+In-Reply-To: <20221111014244.1714148-2-vannapurve@google.com>
 X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 18, 2022 at 03:59:12PM +0000, Sean Christopherson wrote:
-> On Fri, Nov 18, 2022, Alex Benn?e wrote:
-> > 
-> > Chao Peng <chao.p.peng@linux.intel.com> writes:
-> > 
-> > > On Thu, Nov 17, 2022 at 03:08:17PM +0000, Alex Benn?e wrote:
-> > >> >> I think this should be explicit rather than implied by the absence of
-> > >> >> another flag. Sean suggested you might want flags for RWX failures so
-> > >> >> maybe something like:
-> > >> >> 
-> > >> >> 	KVM_MEMORY_EXIT_SHARED_FLAG_READ	(1 << 0)
-> > >> >> 	KVM_MEMORY_EXIT_SHARED_FLAG_WRITE	(1 << 1)
-> > >> >> 	KVM_MEMORY_EXIT_SHARED_FLAG_EXECUTE	(1 << 2)
-> > >> >>         KVM_MEMORY_EXIT_FLAG_PRIVATE            (1 << 3)
-> > >> >
-> > >> > Yes, but I would not add 'SHARED' to RWX, they are not share memory
-> > >> > specific, private memory can also set them once introduced.
-> > >> 
-> > >> OK so how about:
-> > >> 
-> > >>  	KVM_MEMORY_EXIT_FLAG_READ	(1 << 0)
-> > >>  	KVM_MEMORY_EXIT_FLAG_WRITE	(1 << 1)
-> > >>  	KVM_MEMORY_EXIT_FLAG_EXECUTE	(1 << 2)
-> > >>         KVM_MEMORY_EXIT_FLAG_SHARED     (1 << 3)
-> > >>         KVM_MEMORY_EXIT_FLAG_PRIVATE    (1 << 4)
-> > >
-> > > We don't actually need a new bit, the opposite side of private is
-> > > shared, i.e. flags with KVM_MEMORY_EXIT_FLAG_PRIVATE cleared expresses
-> > > 'shared'.
-> > 
-> > If that is always true and we never expect a 3rd type of memory that is
-> > fine. But given we are leaving room for expansion having an explicit bit
-> > allows for that as well as making cases of forgetting to set the flags
-> > more obvious.
+On Fri, Nov 11, 2022 at 01:42:39AM +0000, Vishal Annapurve wrote:
+> Introduce HAVE_KVM_PRIVATE_MEM_TESTING config to be able to test fd based
+> approach to support private memory with non-confidential selftest VMs.
+> To support this testing few important aspects need to be considered from
+> the perspective of selftests -
+> * KVM needs to know whether the access from guest VM is private or shared.
+> Confidential VMs (SNP/TDX) carry a dedicated bit in gpa that can be used by
+> KVM to deduce the nature of the access.
+> Non-confidential VMs don't have mechanism to carry/convey such an
+> information to KVM. So KVM just relies on what attributes are set by
+> userspace VMM keeping the userspace VMM in the TCB for the testing
+> purposes.
+> * arch_private_mem_supported is updated to allow private memory logic to
+> work with non-confidential vm selftests.
 > 
-> Hrm, I'm on the fence.
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c          | 4 ++++
+>  arch/x86/kvm/mmu/mmu_internal.h | 4 +++-
+>  virt/kvm/Kconfig                | 4 ++++
+>  virt/kvm/kvm_main.c             | 2 +-
+>  4 files changed, 12 insertions(+), 2 deletions(-)
 > 
-> A dedicated flag isn't strictly needed, e.g. even if we end up with 3+ types in
-> this category, the baseline could always be "private".
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 10017a9f26ee..b3118d00b284 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4280,6 +4280,10 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  
+>  	fault->gfn = fault->addr >> PAGE_SHIFT;
+>  	fault->slot = kvm_vcpu_gfn_to_memslot(vcpu, fault->gfn);
+> +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING
+> +	fault->is_private = kvm_slot_can_be_private(fault->slot) &&
+> +			kvm_mem_is_private(vcpu->kvm, fault->gfn);
+> +#endif
+>  
+>  	if (page_fault_handle_page_track(vcpu, fault))
+>  		return RET_PF_EMULATE;
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index 5cdff5ca546c..2e759f39c2c5 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -188,7 +188,6 @@ struct kvm_page_fault {
+>  
+>  	/* Derived from mmu and global state.  */
+>  	const bool is_tdp;
+> -	const bool is_private;
+>  	const bool nx_huge_page_workaround_enabled;
+>  
+>  	/*
+> @@ -221,6 +220,9 @@ struct kvm_page_fault {
+>  	/* The memslot containing gfn. May be NULL. */
+>  	struct kvm_memory_slot *slot;
+>  
+> +	/* Derived from encryption bits of the faulting GPA for CVMs. */
+> +	bool is_private;
 
-The baseline for the current code is actually "shared".
-
-> 
-> I do like being explicit, and adding a PRIVATE flag costs KVM practically nothing
-> to implement and maintain, but evetually we'll up with flags that are paired with
-> an implicit state, e.g. see the many #PF error codes in x86.  In other words,
-> inevitably KVM will need to define the default/base state of the access, at which
-> point the base state for SHARED vs. PRIVATE is "undefined".  
-
-Current memory conversion for confidential usage is bi-directional so we
-already need both private and shared states and if we use one bit for
-both "shared" and "private" then we will have to define the default
-state, e.g, currently the default state is "shared" when we define
-
-	KVM_MEMORY_EXIT_FLAG_PRIVATE	(1 << 0)
-
-> 
-> The RWX bits are in the same boat, e.g. the READ flag isn't strictly necessary.
-> I was thinking more of the KVM_SET_MEMORY_ATTRIBUTES ioctl(), which does need
-> the full RWX gamut, when I typed out that response.
-
-For KVM_SET_MEMORY_ATTRIBUTES it's reasonable to add RWX bits and match
-that to the permission bits definition in EPT entry.
-
-> 
-> So I would say if we add an explicit READ flag, then we might as well add an explicit
-> PRIVATE flag too.  But if we omit PRIVATE, then we should omit READ too.
-
-Since we assume the default state is shared, so we actually only need a
-PRIVATE flag, e.g. there is no SHARED flag and will ignore the RWX for now.
+Either we can wrap it with the CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING or if
+it looks ugly I can remove the "const" in my code.
 
 Chao
+> +
+>  	/* Outputs of kvm_faultin_pfn.  */
+>  	kvm_pfn_t pfn;
+>  	hva_t hva;
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 69ca59e82149..300876afb0ca 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -93,3 +93,7 @@ config HAVE_KVM_RESTRICTED_MEM
+>  config KVM_GENERIC_PRIVATE_MEM
+>         bool
+>         depends on HAVE_KVM_RESTRICTED_MEM
+> +
+> +config HAVE_KVM_PRIVATE_MEM_TESTING
+> +       bool
+> +       depends on KVM_GENERIC_PRIVATE_MEM
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index dae6a2c196ad..54e57b7f1c15 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1750,7 +1750,7 @@ static void kvm_replace_memslot(struct kvm *kvm,
+>  
+>  bool __weak kvm_arch_has_private_mem(struct kvm *kvm)
+>  {
+> -	return false;
+> +	return IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING);
+>  }
+>  
+>  static int check_memory_region_flags(struct kvm *kvm,
+> -- 
+> 2.38.1.431.g37b22c650d-goog
