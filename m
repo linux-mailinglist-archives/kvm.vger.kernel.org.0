@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C874E63412A
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 17:15:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EAFB9634129
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 17:15:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232565AbiKVQPU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 11:15:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43510 "EHLO
+        id S234272AbiKVQPR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 11:15:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234189AbiKVQOe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S234202AbiKVQOe (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 22 Nov 2022 11:14:34 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAE2673B8A
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:12:06 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADFCA78D51
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 08:12:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669133526;
+        s=mimecast20190719; t=1669133528;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5Ty0ykKCINpxLikA5IoLsCdzdm1Owy75wCUWVVvYrmk=;
-        b=YsyYmBZLCNoul5rc/ieABJdEv/44CSGqJAYsyQoQ1RFMyoU/lJ3eXMl9DZMhCtkt8nAz+C
-        pf91lRkZmZ5fBMqzcdhd6ip025nX+Ny/oPn3ntADzQAgrAnBPskvM+nzAGW1dQSfIhyBXe
-        we8OQ/o7Ho904f5kXiBYyRcCEECfd70=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=1Q8696iQnLEf/n5hLfcv6u+aW8uDnGU1lD812U05I3A=;
+        b=WBD6YGUL3lfkBtLrgLPYwwIfaVkAJ6YVpxThv8SJfsPUB9P0EH3nRJMxti2QZ0zh7lfqhk
+        c+bAlbS47MybZJGua6yUzPXFsqXdvfupzC6IPPfFcenCQoJLjhA9l3suiMAd+LaDogpnUE
+        aonwT90JnzpymEAFu5JbsxuDe0C7k00=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-547-u3THUi5dPjWVlhDqaSxg9w-1; Tue, 22 Nov 2022 11:12:04 -0500
-X-MC-Unique: u3THUi5dPjWVlhDqaSxg9w-1
+ us-mta-655-0RxWxZilMK-laeDB0No7UA-1; Tue, 22 Nov 2022 11:12:05 -0500
+X-MC-Unique: 0RxWxZilMK-laeDB0No7UA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B1F403C0DDD4;
-        Tue, 22 Nov 2022 16:12:02 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 01E2D833A22;
+        Tue, 22 Nov 2022 16:12:05 +0000 (UTC)
 Received: from amdlaptop.tlv.redhat.com (dhcp-4-238.tlv.redhat.com [10.35.4.238])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B75FF1121333;
-        Tue, 22 Nov 2022 16:12:00 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 078901121314;
+        Tue, 22 Nov 2022 16:12:02 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Andrew Jones <drjones@redhat.com>,
@@ -49,9 +49,9 @@ Cc:     Andrew Jones <drjones@redhat.com>,
         Nico Boehr <nrb@linux.ibm.com>,
         Cathy Avery <cavery@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>
-Subject: [kvm-unit-tests PATCH v3 03/27] x86: add few helper functions for apic local timer
-Date:   Tue, 22 Nov 2022 18:11:28 +0200
-Message-Id: <20221122161152.293072-4-mlevitsk@redhat.com>
+Subject: [kvm-unit-tests PATCH v3 04/27] svm: remove nop after stgi/clgi
+Date:   Tue, 22 Nov 2022 18:11:29 +0200
+Message-Id: <20221122161152.293072-5-mlevitsk@redhat.com>
 In-Reply-To: <20221122161152.293072-1-mlevitsk@redhat.com>
 References: <20221122161152.293072-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -67,78 +67,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a few functions to apic.c to make it easier to enable and disable
-the local apic timer.
+Remove pointless nop after stgi/clgi - these instructions don't have an
+interrupt window.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- lib/x86/apic.c | 38 ++++++++++++++++++++++++++++++++++++++
- lib/x86/apic.h |  6 ++++++
- 2 files changed, 44 insertions(+)
+ x86/svm_tests.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/lib/x86/apic.c b/lib/x86/apic.c
-index 5131525a..174a8c28 100644
---- a/lib/x86/apic.c
-+++ b/lib/x86/apic.c
-@@ -256,3 +256,41 @@ void init_apic_map(void)
- 			id_map[j++] = i;
- 	}
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 02583236..88393fcf 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -3026,7 +3026,7 @@ static void svm_intr_intercept_mix_run_guest(volatile int *counter, int expected
  }
-+
-+void apic_setup_timer(int vector, u32 mode)
-+{
-+	apic_cleanup_timer();
-+
-+	assert((mode & APIC_LVT_TIMER_MASK) == mode);
-+
-+	apic_write(APIC_TDCR, APIC_TDR_DIV_1);
-+	apic_write(APIC_LVTT, vector | mode);
-+}
-+
-+void apic_start_timer(u32 value)
-+{
-+	/*
-+	 * APIC timer runs with 'core crystal clock',
-+	 * divided by value in APIC_TDCR
-+	 */
-+	apic_write(APIC_TMICT, value);
-+}
-+
-+void apic_stop_timer(void)
-+{
-+	apic_write(APIC_TMICT, 0);
-+}
-+
-+void apic_cleanup_timer(void)
-+{
-+	u32 lvtt = apic_read(APIC_LVTT);
-+
-+	// stop the counter
-+	apic_stop_timer();
-+
-+	// mask the timer interrupt
-+	apic_write(APIC_LVTT, lvtt | APIC_LVT_MASKED);
-+
-+	// enable interrupts for one cycle to ensure that a pending timer is serviced
-+	sti_nop_cli();
-+}
-diff --git a/lib/x86/apic.h b/lib/x86/apic.h
-index 6d27f047..7c539071 100644
---- a/lib/x86/apic.h
-+++ b/lib/x86/apic.h
-@@ -58,6 +58,12 @@ void disable_apic(void);
- void reset_apic(void);
- void init_apic_map(void);
  
-+void apic_cleanup_timer(void);
-+void apic_setup_timer(int vector, u32 mode);
-+
-+void apic_start_timer(u32 counter);
-+void apic_stop_timer(void);
-+
- /* Converts byte-addressable APIC register offset to 4-byte offset. */
- static inline u32 apic_reg_index(u32 reg)
+ 
+-// subtest: test that enabling EFLAGS.IF is enought to trigger an interrupt
++// subtest: test that enabling EFLAGS.IF is enough to trigger an interrupt
+ static void svm_intr_intercept_mix_if_guest(struct svm_test *test)
  {
+ 	asm volatile("nop;nop;nop;nop");
+@@ -3065,7 +3065,6 @@ static void svm_intr_intercept_mix_gif_guest(struct svm_test *test)
+ 	report(!dummy_isr_recevied, "No interrupt expected");
+ 
+ 	stgi();
+-	asm volatile("nop");
+ 	report(0, "must not reach here");
+ }
+ 
+@@ -3095,7 +3094,6 @@ static void svm_intr_intercept_mix_gif_guest2(struct svm_test *test)
+ 	report(!dummy_isr_recevied, "No interrupt expected");
+ 
+ 	stgi();
+-	asm volatile("nop");
+ 	report(0, "must not reach here");
+ }
+ 
+@@ -3120,13 +3118,11 @@ static void svm_intr_intercept_mix_nmi_guest(struct svm_test *test)
+ 	cli(); // should have no effect
+ 
+ 	clgi();
+-	asm volatile("nop");
+ 	apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_NMI, 0);
+ 	sti_nop(); // should have no effect
+ 	report(!nmi_recevied, "No NMI expected");
+ 
+ 	stgi();
+-	asm volatile("nop");
+ 	report(0, "must not reach here");
+ }
+ 
+@@ -3150,11 +3146,9 @@ static void svm_intr_intercept_mix_smi_guest(struct svm_test *test)
+ 	asm volatile("nop;nop;nop;nop");
+ 
+ 	clgi();
+-	asm volatile("nop");
+ 	apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_SMI, 0);
+ 	sti_nop(); // should have no effect
+ 	stgi();
+-	asm volatile("nop");
+ 	report(0, "must not reach here");
+ }
+ 
 -- 
 2.34.3
 
