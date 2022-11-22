@@ -2,247 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8976F63365F
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 08:53:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D56C16337D1
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 10:02:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231947AbiKVHxu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 02:53:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34516 "EHLO
+        id S233029AbiKVJC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 04:02:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232611AbiKVHxo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 02:53:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C85FBF5C
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 23:52:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669103564;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Rifkp7obcWWXPx9xWSCjpQuWQ7gvbRTBtiWo8m0gkU0=;
-        b=Jm21awnX4dzz7gWFAblruH4ez1kou6VMVhaAro5k+difkiJ6yvImiIzQ365RUqoNlbXSI6
-        Xkv390ccHrG/+rBOepDXyp2nDI9st7B+KqS1t9WtfWXDeEzfTPW/AMxnHrlrt5JFGYKQ7m
-        AMQBPGVNC+Lnoy1ZKBsLSh0axVSK16A=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-587-Mp-GT5_nNcaGRgAmJ7JZfg-1; Tue, 22 Nov 2022 02:52:42 -0500
-X-MC-Unique: Mp-GT5_nNcaGRgAmJ7JZfg-1
-Received: by mail-wm1-f69.google.com with SMTP id o5-20020a05600c510500b003cfca1a327fso7682494wms.8
-        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 23:52:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rifkp7obcWWXPx9xWSCjpQuWQ7gvbRTBtiWo8m0gkU0=;
-        b=kJgbAV0o9Ib3Xhq37duKm85340qp9SCnfDamD+dwZ19vEPrfLCwRBwRCKs/kXys5bB
-         AbLUq72hHuT5JHZ0Oz8vz/9y+fipeqdH8E0+Z8y8QP3e88V1YRSLU96bWJ2ak53v8+WU
-         FLnu0KUVB9JiD07WyJJet5QzEMkt6N240UqpxYvrmZbgchxcB1lsNUtT6Galkg/vX+dR
-         W6Q3NI6fjgbmFMY5tEXJVpYJ6jZAulKU5kfC0iIIxuMfxs7p28PmB0LGBfdbmqY30XBX
-         CtbQAcxshyOdfeXzGNh2ruoyCvi7Kxfnm23Q0Jf9V/vQsYyqiXXd5UrAfw/GleZEYH0O
-         9drw==
-X-Gm-Message-State: ANoB5pmxm3ocvcGPpnGBKhpBLzT7ROMk2pDSjBsSPyAqZXP57yNUgZXu
-        otgTZQNTwFWUfWORE9diFdOcU+VgVkiTvo8C2bHc0H7+/JDb+Fr4wIyNkL1vOgJTSvZ0yxqpb4b
-        XQXAdza0f4Wxu
-X-Received: by 2002:adf:fb46:0:b0:22e:2d49:7d3d with SMTP id c6-20020adffb46000000b0022e2d497d3dmr2580798wrs.505.1669103561384;
-        Mon, 21 Nov 2022 23:52:41 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6dCyiCr/pA3VX12HcFTwn/lzvVTWMeppWH7T0RHoLOGqWKUNNg5K+8qhkBYZB35FlJdUiQ9w==
-X-Received: by 2002:adf:fb46:0:b0:22e:2d49:7d3d with SMTP id c6-20020adffb46000000b0022e2d497d3dmr2580781wrs.505.1669103561123;
-        Mon, 21 Nov 2022 23:52:41 -0800 (PST)
-Received: from [192.168.0.5] (ip-109-43-176-72.web.vodafone.de. [109.43.176.72])
-        by smtp.gmail.com with ESMTPSA id b14-20020a5d4d8e000000b0022cbf4cda62sm15603451wru.27.2022.11.21.23.52.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Nov 2022 23:52:40 -0800 (PST)
-Message-ID: <c801611e-61db-73d2-2ff1-cd06350215b2@redhat.com>
-Date:   Tue, 22 Nov 2022 08:52:38 +0100
+        with ESMTP id S233009AbiKVJCt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 04:02:49 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 895B910BA;
+        Tue, 22 Nov 2022 01:02:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=I3JtwSpkdP77vSyM0WIL4jCtx94jec1H7+Vd7VeGsXg=; b=drj2W2DsQ3QoPR70ZVUerQCLR9
+        iwwS44zR/5xnF1e083im4QvkIwq09JUSe+ZPZq1PhvvcH/B7GNJIqgM5j/ItZ8ZDVgGWHbCx8WWZe
+        /TRhG6IIP58JaLdPZR/hlgi+ryIJWJRKw2j+Dl+nYNl6ZkVaZ4SFsd7AhLfybs3CLvW7gzsQe1bhq
+        EAon/0pXQGx3Enjkb2fiWkV14PFxmCC/DKz5Ynew2L1dtnVK38zOvMYwDiNm5OljEKvGNxMz1hUoC
+        80yTqq3/Jwe4mGRLMUm6t1Xi/sCrBeVHADkqdRM9Rc9hQHunPzOddSh5bcyJB2yZMzUTrNtmN/W35
+        zr0sDenQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oxPAu-0068jT-W7; Tue, 22 Nov 2022 09:02:41 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 5E8E0300244;
+        Tue, 22 Nov 2022 10:02:32 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 4353F2D65BCDB; Tue, 22 Nov 2022 10:02:32 +0100 (CET)
+Date:   Tue, 22 Nov 2022 10:02:32 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
+        dave.hansen@intel.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
+        ying.huang@intel.com, reinette.chatre@intel.com,
+        len.brown@intel.com, tony.luck@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+Subject: Re: [PATCH v7 04/20] x86/virt/tdx: Add skeleton to initialize TDX on
+ demand
+Message-ID: <Y3yQKDZFC8+oCyqK@hirez.programming.kicks-ass.net>
+References: <cover.1668988357.git.kai.huang@intel.com>
+ <d26254af8e5b3dcca8a070703c5d6d04f48d47a9.1668988357.git.kai.huang@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v3 5/9] KVM: s390: selftest: memop: Move testlist into
- main
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-References: <20221117221758.66326-1-scgl@linux.ibm.com>
- <20221117221758.66326-6-scgl@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20221117221758.66326-6-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d26254af8e5b3dcca8a070703c5d6d04f48d47a9.1668988357.git.kai.huang@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/11/2022 23.17, Janis Schoetterl-Glausch wrote:
-> This allows checking if the necessary requirements for a test case are
-> met via an arbitrary expression. In particular, it is easy to check if
-> certain bits are set in the memop extension capability.
-> 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
->   tools/testing/selftests/kvm/s390x/memop.c | 132 +++++++++++-----------
->   1 file changed, 66 insertions(+), 66 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-> index 286185a59238..10f34c629cac 100644
-> --- a/tools/testing/selftests/kvm/s390x/memop.c
-> +++ b/tools/testing/selftests/kvm/s390x/memop.c
-> @@ -690,87 +690,87 @@ static void test_errors(void)
->   	kvm_vm_free(t.kvm_vm);
->   }
->   
-> -struct testdef {
-> -	const char *name;
-> -	void (*test)(void);
-> -	int extension;
-> -} testlist[] = {
-> -	{
-> -		.name = "simple copy",
-> -		.test = test_copy,
-> -	},
-> -	{
-> -		.name = "generic error checks",
-> -		.test = test_errors,
-> -	},
-> -	{
-> -		.name = "copy with storage keys",
-> -		.test = test_copy_key,
-> -		.extension = 1,
-> -	},
-> -	{
-> -		.name = "copy with key storage protection override",
-> -		.test = test_copy_key_storage_prot_override,
-> -		.extension = 1,
-> -	},
-> -	{
-> -		.name = "copy with key fetch protection",
-> -		.test = test_copy_key_fetch_prot,
-> -		.extension = 1,
-> -	},
-> -	{
-> -		.name = "copy with key fetch protection override",
-> -		.test = test_copy_key_fetch_prot_override,
-> -		.extension = 1,
-> -	},
-> -	{
-> -		.name = "error checks with key",
-> -		.test = test_errors_key,
-> -		.extension = 1,
-> -	},
-> -	{
-> -		.name = "termination",
-> -		.test = test_termination,
-> -		.extension = 1,
-> -	},
-> -	{
-> -		.name = "error checks with key storage protection override",
-> -		.test = test_errors_key_storage_prot_override,
-> -		.extension = 1,
-> -	},
-> -	{
-> -		.name = "error checks without key fetch prot override",
-> -		.test = test_errors_key_fetch_prot_override_not_enabled,
-> -		.extension = 1,
-> -	},
-> -	{
-> -		.name = "error checks with key fetch prot override",
-> -		.test = test_errors_key_fetch_prot_override_enabled,
-> -		.extension = 1,
-> -	},
-> -};
->   
->   int main(int argc, char *argv[])
->   {
->   	int extension_cap, idx;
->   
-> +	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
->   	TEST_REQUIRE(kvm_has_cap(KVM_CAP_S390_MEM_OP));
-> +	extension_cap = kvm_check_cap(KVM_CAP_S390_MEM_OP_EXTENSION);
->   
-> -	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
-> +	struct testdef {
-> +		const char *name;
-> +		void (*test)(void);
-> +		bool requirements_met;
-> +	} testlist[] = {
-> +		{
-> +			.name = "simple copy",
-> +			.test = test_copy,
-> +			.requirements_met = true,
-> +		},
-> +		{
-> +			.name = "generic error checks",
-> +			.test = test_errors,
-> +			.requirements_met = true,
-> +		},
-> +		{
-> +			.name = "copy with storage keys",
-> +			.test = test_copy_key,
-> +			.requirements_met = extension_cap > 0,
-> +		},
-> +		{
-> +			.name = "copy with key storage protection override",
-> +			.test = test_copy_key_storage_prot_override,
-> +			.requirements_met = extension_cap > 0,
-> +		},
-> +		{
-> +			.name = "copy with key fetch protection",
-> +			.test = test_copy_key_fetch_prot,
-> +			.requirements_met = extension_cap > 0,
-> +		},
-> +		{
-> +			.name = "copy with key fetch protection override",
-> +			.test = test_copy_key_fetch_prot_override,
-> +			.requirements_met = extension_cap > 0,
-> +		},
-> +		{
-> +			.name = "error checks with key",
-> +			.test = test_errors_key,
-> +			.requirements_met = extension_cap > 0,
-> +		},
-> +		{
-> +			.name = "termination",
-> +			.test = test_termination,
-> +			.requirements_met = extension_cap > 0,
-> +		},
-> +		{
-> +			.name = "error checks with key storage protection override",
-> +			.test = test_errors_key_storage_prot_override,
-> +			.requirements_met = extension_cap > 0,
-> +		},
-> +		{
-> +			.name = "error checks without key fetch prot override",
-> +			.test = test_errors_key_fetch_prot_override_not_enabled,
-> +			.requirements_met = extension_cap > 0,
-> +		},
-> +		{
-> +			.name = "error checks with key fetch prot override",
-> +			.test = test_errors_key_fetch_prot_override_enabled,
-> +			.requirements_met = extension_cap > 0,
+On Mon, Nov 21, 2022 at 01:26:26PM +1300, Kai Huang wrote:
+> +static int __tdx_enable(void)
+> +{
+> +	int ret;
+> +
+> +	/*
+> +	 * Initializing the TDX module requires doing SEAMCALL on all
+> +	 * boot-time present CPUs.  For simplicity temporarily disable
+> +	 * CPU hotplug to prevent any CPU from going offline during
+> +	 * the initialization.
+> +	 */
+> +	cpus_read_lock();
+> +
+> +	/*
+> +	 * Check whether all boot-time present CPUs are online and
+> +	 * return early with a message so the user can be aware.
+> +	 *
+> +	 * Note a non-buggy BIOS should never support physical (ACPI)
+> +	 * CPU hotplug when TDX is enabled, and all boot-time present
+> +	 * CPU should be enabled in MADT, so there should be no
+> +	 * disabled_cpus and num_processors won't change at runtime
+> +	 * either.
+> +	 */
+> +	if (disabled_cpus || num_online_cpus() != num_processors) {
+> +		pr_err("Unable to initialize the TDX module when there's offline CPU(s).\n");
+> +		ret = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	ret = init_tdx_module();
+> +	if (ret == -ENODEV) {
+> +		pr_info("TDX module is not loaded.\n");
+> +		tdx_module_status = TDX_MODULE_NONE;
+> +		goto out;
+> +	}
+> +
+> +	/*
+> +	 * Shut down the TDX module in case of any error during the
+> +	 * initialization process.  It's meaningless to leave the TDX
+> +	 * module in any middle state of the initialization process.
+> +	 *
+> +	 * Shutting down the module also requires doing SEAMCALL on all
+> +	 * MADT-enabled CPUs.  Do it while CPU hotplug is disabled.
+> +	 *
+> +	 * Return all errors during the initialization as -EFAULT as the
+> +	 * module is always shut down.
+> +	 */
+> +	if (ret) {
+> +		pr_info("Failed to initialize TDX module. Shut it down.\n");
+> +		shutdown_tdx_module();
+> +		tdx_module_status = TDX_MODULE_SHUTDOWN;
+> +		ret = -EFAULT;
+> +		goto out;
+> +	}
+> +
+> +	pr_info("TDX module initialized.\n");
+> +	tdx_module_status = TDX_MODULE_INITIALIZED;
+> +out:
+> +	cpus_read_unlock();
+> +
+> +	return ret;
+> +}
 
-I wonder whether it would rather make sense to check for "extension_cap & 1" 
-instead of "extension_cap > 0" ?
+Uhm.. so if we've offlined all the SMT siblings because of some
+speculation fail or other, this TDX thing will fail to initialize?
 
-Anyway:
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
+Because as I understand it; this TDX initialization happens some random
+time after boot, when the first (TDX using) KVM instance gets created,
+long after the speculation mitigations are enforced.
