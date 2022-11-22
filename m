@@ -2,186 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67AFF633214
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 02:18:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D90963322D
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 02:33:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231689AbiKVBS4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Nov 2022 20:18:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59190 "EHLO
+        id S232246AbiKVBdU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Nov 2022 20:33:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229488AbiKVBSx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Nov 2022 20:18:53 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 220B49B383;
-        Mon, 21 Nov 2022 17:18:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669079932; x=1700615932;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=X5/Oky70qNR5nNt+0jfc4GhFsXkTGaXChMNraZKSIoE=;
-  b=Kr0JgPjh1fI3Cwz2AIPpnf1u4QF/INMKdAzbNf4JmuZSGLAtaaban4ma
-   cu9W4csSGh40MpeABcRVfk3Hnx6B34boQSkXLkRvmMqhlktIF1L2lcsOu
-   s3GrbYj/3MAWTtPetzHLxiaYZ+0WtHhj0szDh0eJS54Yu689UDiQhH5zR
-   eh/RIXmEmv0SUXQQJZqc4vZvraIA0dBJLM1FEOvYaBn7Z+pmEESkBb5Cg
-   dPbFm4qIX3j2W8+BKReHrh+nHkge3aJIUMyd5XHe6+XTkgkNRJV8SurNm
-   OxpXoF2Cauq+pxbgz/15Qo926wjIxfX6Qk4J4Q0MyyFkmgrQyEAKRbwEp
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="313730979"
-X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
-   d="scan'208";a="313730979"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 17:18:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="815915993"
-X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
-   d="scan'208";a="815915993"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga005.jf.intel.com with ESMTP; 21 Nov 2022 17:18:51 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 21 Nov 2022 17:18:51 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 21 Nov 2022 17:18:50 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Mon, 21 Nov 2022 17:18:50 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Mon, 21 Nov 2022 17:18:50 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lsbmA3nZdly/lf0+AIZexXQezLBjFIs2Xmw+rXt7aUW9yVDl+JBUXAZhhe/Y44vH4fyauXX+1ij+gER0mlFaOrLtVI2YkkR3adbgsWWV+uHi2m9m4q87L8mUW1yzec1/y3v+4xjXV7TnY+pgHCMLOJOi3Z1qr4ZBpTLvhvQA8EXCLoBULCPa8FiyYj3lPChnpjC6rYwV016ADNUmuLo5RiLbQ0KloBWUjDJeiGzhWit7tTxhZfbd0ugrBEig07lXSqm3aUkaFQTkridgjkVPOHuqYHvH5tZ4E5Bggla0WKC/gz0l6Vl+nUlT3Nl0Zp1lz3hSx5rsJn5I57zAm+QC6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X5/Oky70qNR5nNt+0jfc4GhFsXkTGaXChMNraZKSIoE=;
- b=Mg+O1opILw2pAoNc2fgcMiabMdB7iGvXxU1RHzMqLwZ1ti4hcHkBvCxSPNSwoNEXOfyLjUW/xUyBV+asVt1HpdRHuR6p+i5/O+w7i4T1foO/tJOyq19x88lTad57hfWSebo5D2dhBpQhnynty1gd8lvwzHekRJ2aRxrAI7Tx1SJR7hKDtfBKrUU4fru27PEu9eCLtnmyCx4C6uqNMe3tWusCkhUVQlM2u4E/XXkXID3MZby1IgcOWFv61QNJa8wUzHM9q50BpsbwlE6ZBAwxBZheyNCzWBf+k87c3C3pBpCdhKPNnL2HeWKkw9EqK8HtLaPPEKypBQERArh22m5Y0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by DM4PR11MB6477.namprd11.prod.outlook.com (2603:10b6:8:88::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.15; Tue, 22 Nov
- 2022 01:18:48 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::2fb7:be18:a20d:9b6e]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::2fb7:be18:a20d:9b6e%8]) with mapi id 15.20.5834.015; Tue, 22 Nov 2022
- 01:18:48 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>
-CC:     "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "Aktas, Erdem" <erdemaktas@google.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "dmatlack@google.com" <dmatlack@google.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Subject: Re: [PATCH v10 105/108] KVM: TDX: Add methods to ignore accesses to
- CPU state
-Thread-Topic: [PATCH v10 105/108] KVM: TDX: Add methods to ignore accesses to
- CPU state
-Thread-Index: AQHY7Ckvrt4ExdXw0UaZ9PPNheleja5KSGaA
-Date:   Tue, 22 Nov 2022 01:18:48 +0000
-Message-ID: <75c655620a6ab8e5cfdbb89148cfc27480a8cd56.camel@intel.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
-         <282dd5a8edbee0aa87cdf035088ecd8558b0b999.1667110240.git.isaku.yamahata@intel.com>
-In-Reply-To: <282dd5a8edbee0aa87cdf035088ecd8558b0b999.1667110240.git.isaku.yamahata@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|DM4PR11MB6477:EE_
-x-ms-office365-filtering-correlation-id: 2d6bcf54-5a9c-4f89-995b-08dacc2781f1
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: YIfq59aJaHqzeGuXieq7VceKu0nw/8ukf1l0Rz+Zl4IZmaWvIAdCVUt03l+GH7fkjcgTqo0Yaku89vUVay90/Ehox9C0/HHhS6P2EfuduwvM7AtJ0Ct4tmQUG1AMQNnrK1fAojzNVuYNJwZoYstZc1wgXDCiz2B/Yvl43CwTfAdc3MluVLJ1UNkcBfNfxS0+Her/+chtPvv8hAlBm9Cy/Kow4gSeQK/KhQcwxKx0KMmTNUxcCiiKb1cAhlWkAxlqJk6zOzq2CEJvWR15sXoomkkaNcyCKlQ2ooLUwODWRujbYw6vAJ7TDKV8YIOfURij8bgJTHsShOi6XqOiAHaBy+XnUHHlJ41LOrCKgp2ty7tQ81hybTl1xYjvjxoWh56F1aJjB8VAF1yPG/zrUazLqyabdXl2NC8uOO44+gjxPSbJ/J9moQESXei3N3IDUKw/7CeJjQugDp48x74U0Pzv+7dLdPunnOKzSV39g6rTkNn1T/aqg3nUyfS3kQE367YgeOb7PO22t7tXnEMhqTcl9xnJRdhpjgTXTYED/E/04RXBTozDr0UXlVuIg7+Dp03zgOGv0154txWyEjExwIl4vggqHLHHLxzi/JlmKlD9YMGfJeF+SyMyx8vc99FKA+lx0UYDq/MUg2bhaEhlh4OPZlhFVdfz/Cexy+1gvFsnmFg3MinbVn3VVj5jCO10y5/khgM3nrHfSQrJBVjKgWsLhg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(366004)(396003)(346002)(39860400002)(136003)(376002)(451199015)(2906002)(6486002)(41300700001)(4326008)(478600001)(5660300002)(36756003)(6512007)(6506007)(26005)(4001150100001)(8936002)(76116006)(66946007)(8676002)(64756008)(66446008)(66476007)(66556008)(6636002)(316002)(91956017)(71200400001)(4744005)(54906003)(110136005)(86362001)(122000001)(38100700002)(2616005)(82960400001)(83380400001)(38070700005)(186003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bzd5UDVrU0xpL0NYalBBaVljVnJVTFg1RmNiSDJsNHhRazlFM3VJMFcxSFFW?=
- =?utf-8?B?bWs1MnZsK1FmOG1jYlplc3AycG1qK0hXYUhsekRXLzhzajhOUzUzYUg0ZnBK?=
- =?utf-8?B?bDdlZGZmc3Y3MS9FaXBxVTdmUFNVTEdwUWNjZDZadEkzSDJOMEd5R1Nndks4?=
- =?utf-8?B?MmpwSFJjQmg3cEE4Vk00SCsxQlpiZjNxTUFXaGRML2hrSG9UcmsvdGFQMjZu?=
- =?utf-8?B?emwyamVubW1JOHJzcVVlQ0RFZm91bnlDT0xoQnIyMTBJc2M4MlFySDJiWnd1?=
- =?utf-8?B?TDk0RVF1RXZoNUNzeWRPZVRZNlozaFdYelNiMXJOZ1lpYXlJM0xkSFllOFpQ?=
- =?utf-8?B?SWdZYnBYWmlGMnNoMXd5dTRCU3NiNnRxYW56T3pRN0o1NGFVYnBLOWdOa1Y5?=
- =?utf-8?B?ZENEa2VTSmNQT0xlL2EvOXhvcDBVRVAyUDlGL3hwZ01CUENNdjRWUlV1Qk41?=
- =?utf-8?B?QVBJOUdGWFV5QzloUTNuQVJmYm5mSUxUbU1sRWlGeDFVUVhkbnh6dXI0bjBi?=
- =?utf-8?B?VjNrcDNRSWJBd1psYkJuWjMvUlJQN2NqMG15bFlScGZUZ3REL0VjL3lqZEov?=
- =?utf-8?B?bWc4dHNpaHMxcmVwN1MyNVdYbDM2cGwra203T041cU9HZ2E3U3VFajE5bi9q?=
- =?utf-8?B?ZzM2MTJ2dFFXZStVU2NjWHRBUVNkWERUS2ppemQyUmZWVERGYVk5ZjBTejVs?=
- =?utf-8?B?Q1lnY3A3cFRYaG1HRjRLc0Y5NGJtcVdTU1VuRGtrSm02WEcza09Ma1gwSThS?=
- =?utf-8?B?b1pHeVJoaS9mdFZFSXhkSlVOQklOVDdYc1pyRjhzaHFTZGorVVNDMUxTSHU1?=
- =?utf-8?B?eGl6cTVLcjdLSis1VWJ5ZDM4dmM2bVFoeGgrcWxFUnFGRWp1ZkI3OHVVVWRl?=
- =?utf-8?B?Myt3eldlRTVQZkpTRWRnSEpwaWgzQ1ZxSkRsYWhTa1VHWTZNaTdEY3ZHZmVy?=
- =?utf-8?B?cXkvaXhXUExodTZHKzRxcjcwZUxmeXJJaHVuSlVnQ3J3Wld3d1k3NEFZL1JP?=
- =?utf-8?B?NHEyR1Q4QWdvcDN5c1lKOFNENTJySis4eFk3djFVK2I0R3NTVTlwb3N4WlNV?=
- =?utf-8?B?d0pHZTAxaHJhNGxZM1hQWThqYytMdC9RM0pPN2tlL1JtbjlFVllwcWJRcnN5?=
- =?utf-8?B?R2RTQjJMKzdpVmJTc1hOckR6R2NWVFNUcXAwVUlmV2pRemxxRDU2TUExYU9l?=
- =?utf-8?B?dHpQSGFCdjFkMTRXKzlXa3FiT2JlRXJLV04zb3R1OXN1U2JYU3NBVElkVkZ2?=
- =?utf-8?B?dTJVUzROUVB5TmJXV042b0NXSnZjeFFJd1RaeklvS1h2ZzhzQ0ZDa1J4cU1K?=
- =?utf-8?B?ME80YVo5Zkx1ZUFMWE9sMHhrTUxDb1kyZmsxV21PMHhGcXpKRmdLSDM5N0Np?=
- =?utf-8?B?M2JSd0FjdzVDR2ZjTkhiaWxHTmVHa1Z5U0Z5ZVZKNkdkS0JyVXV1RUg2ellx?=
- =?utf-8?B?aUN3NHArSXhpZmJuSnVoWGNKYjEwSlR4M05WKzFiZ0s1bWVhc2VwbUFqRTJh?=
- =?utf-8?B?WDhtVU9KUEs4OU05Si91YkhRQXRLNWVWOFJYYmRNVWhrclc2ODBKenJZMzJH?=
- =?utf-8?B?N1dWTThmc1hsRHdkZ0pjbGp0VWd3UWhDckV0bXRZUnhRTHJLWVNDTEtYV1h0?=
- =?utf-8?B?ODI5bnBub1NUcVBsQ1haTGl1Q3VRU1VpSXpuTXNqSHVqbDI0UU9qMXY5Zncz?=
- =?utf-8?B?bnVBcmZ2Mk9TM1k3RncvSS81Sy8rUklIdnpBaFFNZWdRbFB6bllkdGVJMnFp?=
- =?utf-8?B?SUtva0JoN1ppR0t1UG52UGxRVlIyYXV1V3k3Vkkwc0Q0akJ6RXU2NkYxdzhv?=
- =?utf-8?B?RTdYUkszUXZXNllBcWRRWFhUdjZYZnhWbHM0SGN1WS9Vbm9QbUxvSlpyUHpn?=
- =?utf-8?B?S3hJNGRlbFhkeHdFUXA0dEw4UTE2cEdaZXJVbzUwN1BvQldCanA2dDZERUg4?=
- =?utf-8?B?Ny9HaXZqTFdsT3pEU3JadDhSN0srdjNLb1ltRWJxQ3R0KzJJd3JaNk1VMW85?=
- =?utf-8?B?akR1NjEvY1RKbS9zM1lmSHFlcEFENmV1eCtGbVFwaFhYNmI3RHlDMnV4eUE3?=
- =?utf-8?B?QjMvOUQ0TlhwUW1MZXhYdCtWMmxVRE1NSFhnVXFwSEFid1R5MkdvRXVLSnV6?=
- =?utf-8?B?WFB0S2ExMlRod3VyMWFIbnJnSjRXSzc0QlVLNm56enFhT0pKZy8vSUpTZVdH?=
- =?utf-8?B?b0E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0C0B60270EEB5F498406F03D6B4CB6B7@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d6bcf54-5a9c-4f89-995b-08dacc2781f1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Nov 2022 01:18:48.2075
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: U2CeQv+QfSNNXMOWa2HXE3c79nEQG/3cDv5OWwWb5hKtfD+yFPlOuHbCy2HXPLGJC3BhRQtfpWRw9ndH7/49VQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6477
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232241AbiKVBdN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Nov 2022 20:33:13 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C08DB94AB
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 17:33:12 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id n9-20020a17090a2bc900b0021010dca313so6752627pje.7
+        for <kvm@vger.kernel.org>; Mon, 21 Nov 2022 17:33:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Jw+pa4Hghc6DNqT2ZjHPvBrmIDFJee53B5N07cXK5TA=;
+        b=VQiF6B2AiWPxuDaU543wmXQ9fJI73usRCS2tEaUARqzdNYWpa0vkycXr2Q3TCD8DT+
+         qEV3F9EJqmNGYVgf/FeGkZW4qpTYvYdLuSJh5nI1sjK7Gkj3BvzbOPBsRtPDBKBdBfrS
+         RPmLWdrKBMvio8ukGXoClhqdFtRISRID8Vz43PLr2UDvMLKysBWO/ddPOnNDqMAbLbMk
+         aaVUuSovyMALqMoaCFXuGE8w58N8DbKYrPQKHhsfERzQYv5rBBxn2+RClCYIs4bKVY3l
+         rlBU9J+8hFpSP/pO5M4DmnlowkAMx1dXoieVn4gjokqbQhgY4o0IAUUU0Y7PJ29r7O/P
+         rDUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Jw+pa4Hghc6DNqT2ZjHPvBrmIDFJee53B5N07cXK5TA=;
+        b=pb3N2ahgpWwI6+XWJA5MR+MW8SpPInWlcgY9JNs6tXXjPRaU5RHzbs+6QeXSiMBQ+Y
+         bbsylAwj6ZqAPN+P/wVXMtfc+x93OB/WrwxZi20q9C5PQMzxCXH5z3pLa9G5WCvzw2Vc
+         FaHm/ih4GltKKmHMtXzN7asq2BrKTSdWI6eBPXOEiNUV3kBdmgz0GABkj9ZcRcphKZSc
+         MFi9ZibiNLvpBkaQwfcFEj2QZ+MxNmHd5wtgRGaCHToy1sdObUEGy72zEcry//ODxvME
+         pW4aOWIElgV6a/xkcJBvYYXwIGlDgj8sKK6dsZC0nMmisGBfMxX5PoNIHpddwotEA/ET
+         0FhA==
+X-Gm-Message-State: ANoB5plJ79q69ciqWBwpx1cY75kAT3Rj98XH1lIPMi6SE+jC9cszpiCI
+        AtDUqtnWKcdJiRF/534f0BRjTCREfOA=
+X-Google-Smtp-Source: AA0mqf5IUv74w5o2HIig6Dio77QDCV1b85+y917UKkiYu9TTQzt1AZFzYf0mg5S3BiZmCmqlB7GCfjezLro=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a62:54c2:0:b0:56b:fb4f:3d7c with SMTP id
+ i185-20020a6254c2000000b0056bfb4f3d7cmr23246950pfb.54.1669080791735; Mon, 21
+ Nov 2022 17:33:11 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 22 Nov 2022 01:33:09 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
+Message-ID: <20221122013309.1872347-1-seanjc@google.com>
+Subject: [PATCH] KVM: selftests: Define and use a custom static assert in lib headers
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gU2F0LCAyMDIyLTEwLTI5IGF0IDIzOjIzIC0wNzAwLCBpc2FrdS55YW1haGF0YUBpbnRlbC5j
-b20gd3JvdGU6DQo+IEZyb206IFNlYW4gQ2hyaXN0b3BoZXJzb24gPHNlYW4uai5jaHJpc3RvcGhl
-cnNvbkBpbnRlbC5jb20+DQo+IA0KPiBURFggcHJvdGVjdHMgVERYIGd1ZXN0IHN0YXRlIGZyb20g
-Vk1NLiAgSW1wbGVtZW50cyB0byBhY2Nlc3MgbWV0aG9kcyBmb3INCj4gVERYIGd1ZXN0IHN0YXRl
-IHRvIGlnbm9yZSB0aGVtIG9yIHJldHVybiB6ZXJvLg0KDQpJTUhPIHRoaXMgcGF0Y2ggaXNuJ3Qg
-cmV2aWV3YWJsZSAtLSB0b28gbWFueSB0aGluZ3MgbWl4ZWQgdG9nZXRoZXIuICBBbmQgdGhlDQps
-b2dpYyBvZiB3aGV0aGVyIHRvIHVzZSBXQVJOKCkvS1ZNX0JVR19PTigpIGFnYWluc3QgVEQgaXMg
-aGFyZCB0byB0ZWxsIGFzIHRoZXkNCmRlcGVuZHMgb24gY29tbW9uIHg4NiBjb2RlIGxvZ2ljLiAg
-VGhlIHJlbGF0aXZlIHBhcnRzIChpLmUuIGludGVycnVwdCByZWxhdGVkDQpwYXJ0cykgc2hvdWxk
-IGJlIHB1dCB0b2dldGhlciBhcyBzZXBhcmF0ZSBwYXRjaGVzIHRvIG1ha2UgdGhlIHdob2xlIHRo
-aW5nDQpyZXZpZXdhYmxlLg0KDQpIaSBTZWFuLCBkbyB5b3UgaGF2ZSBhbnkgY29tbWVudHM/DQoN
-Cg==
+Define and use kvm_static_assert() in the common KVM selftests headers to
+provide deterministic behavior, and to allow creating static asserts
+without dummy messages.
+
+The kernel's static_assert() makes the message param optional, and on the
+surface, tools/include/linux/build_bug.h appears to follow suit.  However,
+glibc may override static_assert() and redefine it as a direct alias of
+_Static_assert(), which makes the message parameter mandatory.  This leads
+to non-deterministic behavior as KVM selftests code that utilizes
+static_assert() without a custom message may or not compile depending on
+the order of includes.  E.g. recently added asserts in
+x86_64/processor.h fail on some systems with errors like
+
+  In file included from lib/memstress.c:11:0:
+  include/x86_64/processor.h: In function =E2=80=98this_cpu_has_p=E2=80=99:
+  include/x86_64/processor.h:193:34: error: expected =E2=80=98,=E2=80=99 be=
+fore =E2=80=98)=E2=80=99 token
+    static_assert(low_bit < high_bit);     \
+                                    ^
+due to _Static_assert() expecting a comma before a message.  The "message
+optional" version of static_assert() uses macro magic to strip away the
+comma when presented with empty an __VA_ARGS__
+
+  #ifndef static_assert
+  #define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #ex=
+pr)
+  #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+  #endif // static_assert
+
+and effectively generates "_Static_assert(expr, #expr)".
+
+The incompatible version of static_assert() gets defined by this snippet
+in /usr/include/assert.h:
+
+  #if defined __USE_ISOC11 && !defined __cplusplus
+  # undef static_assert
+  # define static_assert _Static_assert
+  #endif
+
+which yields "_Static_assert(expr)" and thus fails as above.
+
+KVM selftests don't actually care about using C11, but __USE_ISOC11 gets
+defined because of _GNU_SOURCE, which many tests do #define.  _GNU_SOURCE
+triggers a massive pile of defines in /usr/include/features.h, including
+_ISOC11_SOURCE:
+
+  /* If _GNU_SOURCE was defined by the user, turn on all the other features=
+.  */
+  #ifdef _GNU_SOURCE
+  # undef  _ISOC95_SOURCE
+  # define _ISOC95_SOURCE 1
+  # undef  _ISOC99_SOURCE
+  # define _ISOC99_SOURCE 1
+  # undef  _ISOC11_SOURCE
+  # define _ISOC11_SOURCE 1
+  # undef  _POSIX_SOURCE
+  # define _POSIX_SOURCE  1
+  # undef  _POSIX_C_SOURCE
+  # define _POSIX_C_SOURCE        200809L
+  # undef  _XOPEN_SOURCE
+  # define _XOPEN_SOURCE  700
+  # undef  _XOPEN_SOURCE_EXTENDED
+  # define _XOPEN_SOURCE_EXTENDED 1
+  # undef  _LARGEFILE64_SOURCE
+  # define _LARGEFILE64_SOURCE    1
+  # undef  _DEFAULT_SOURCE
+  # define _DEFAULT_SOURCE        1
+  # undef  _ATFILE_SOURCE
+  # define _ATFILE_SOURCE 1
+  #endif
+
+which further down in /usr/include/features.h leads to:
+
+  /* This is to enable the ISO C11 extension.  */
+  #if (defined _ISOC11_SOURCE \
+       || (defined __STDC_VERSION__ && __STDC_VERSION__ >=3D 201112L))
+  # define __USE_ISOC11   1
+  #endif
+
+To make matters worse, /usr/include/assert.h doesn't guard against
+multiple inclusion by turning itself into a nop, but instead #undefs a
+few macros and continues on.  As a result, it's all but impossible to
+ensure the "message optional" version of static_assert() will actually be
+used, e.g. explicitly including assert.h and #undef'ing static_assert()
+doesn't work as a later inclusion of assert.h will again redefine its
+version.
+
+  #ifdef  _ASSERT_H
+
+  # undef _ASSERT_H
+  # undef assert
+  # undef __ASSERT_VOID_CAST
+
+  # ifdef __USE_GNU
+  #  undef assert_perror
+  # endif
+
+  #endif /* assert.h      */
+
+  #define _ASSERT_H       1
+  #include <features.h>
+
+Fixes: fcba483e8246 ("KVM: selftests: Sanity check input to ioctls() at bui=
+ld time")
+Fixes: ee3795536664 ("KVM: selftests: Refactor X86_FEATURE_* framework to p=
+rep for X86_PROPERTY_*")
+Fixes: 53a7dc0f215e ("KVM: selftests: Add X86_PROPERTY_* framework to retri=
+eve CPUID values")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ .../selftests/kvm/include/kvm_util_base.h     | 14 +++++++++++-
+ .../selftests/kvm/include/x86_64/processor.h  | 22 +++++++++----------
+ 2 files changed, 24 insertions(+), 12 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/te=
+sting/selftests/kvm/include/kvm_util_base.h
+index c7685c7038ff..9fa0d340f291 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -22,6 +22,18 @@
+=20
+ #include "sparsebit.h"
+=20
++/*
++ * Provide a version of static_assert() that is guaranteed to have an opti=
+onal
++ * message param.  If _ISOC11_SOURCE is defined, glibc (/usr/include/asser=
+t.h)
++ * #undefs and #defines static_assert() as a direct alias to _Static_asser=
+t(),
++ * i.e. effectively makes the message mandatory.  Many KVM selftests #defi=
+ne
++ * _GNU_SOURCE for various reasons, and _GNU_SOURCE implies _ISOC11_SOURCE=
+.  As
++ * a result, static_assert() behavior is non-deterministic and may or may =
+not
++ * require a message depending on #include order.
++ */
++#define __kvm_static_assert(expr, msg, ...) _Static_assert(expr, msg)
++#define kvm_static_assert(expr, ...) __kvm_static_assert(expr, ##__VA_ARGS=
+__, #expr)
++
+ #define KVM_DEV_PATH "/dev/kvm"
+ #define KVM_MAX_VCPUS 512
+=20
+@@ -196,7 +208,7 @@ static inline bool kvm_has_cap(long cap)
+=20
+ #define kvm_do_ioctl(fd, cmd, arg)						\
+ ({										\
+-	static_assert(!_IOC_SIZE(cmd) || sizeof(*arg) =3D=3D _IOC_SIZE(cmd), "");=
+	\
++	kvm_static_assert(!_IOC_SIZE(cmd) || sizeof(*arg) =3D=3D _IOC_SIZE(cmd));=
+	\
+ 	ioctl(fd, cmd, arg);							\
+ })
+=20
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools=
+/testing/selftests/kvm/include/x86_64/processor.h
+index 5d310abe6c3f..c65717142fda 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -72,11 +72,11 @@ struct kvm_x86_cpu_feature {
+ 		.bit =3D __bit,							\
+ 	};									\
+ 										\
+-	static_assert((fn & 0xc0000000) =3D=3D 0 ||					\
+-		      (fn & 0xc0000000) =3D=3D 0x40000000 ||			\
+-		      (fn & 0xc0000000) =3D=3D 0x80000000 ||			\
+-		      (fn & 0xc0000000) =3D=3D 0xc0000000);				\
+-	static_assert(idx < BIT(sizeof(feature.index) * BITS_PER_BYTE));	\
++	kvm_static_assert((fn & 0xc0000000) =3D=3D 0 ||				\
++			  (fn & 0xc0000000) =3D=3D 0x40000000 ||			\
++			  (fn & 0xc0000000) =3D=3D 0x80000000 ||			\
++			  (fn & 0xc0000000) =3D=3D 0xc0000000);			\
++	kvm_static_assert(idx < BIT(sizeof(feature.index) * BITS_PER_BYTE));	\
+ 	feature;								\
+ })
+=20
+@@ -190,12 +190,12 @@ struct kvm_x86_cpu_property {
+ 		.hi_bit =3D high_bit,						\
+ 	};									\
+ 										\
+-	static_assert(low_bit < high_bit);					\
+-	static_assert((fn & 0xc0000000) =3D=3D 0 ||					\
+-		      (fn & 0xc0000000) =3D=3D 0x40000000 ||			\
+-		      (fn & 0xc0000000) =3D=3D 0x80000000 ||			\
+-		      (fn & 0xc0000000) =3D=3D 0xc0000000);				\
+-	static_assert(idx < BIT(sizeof(property.index) * BITS_PER_BYTE));	\
++	kvm_static_assert(low_bit < high_bit);					\
++	kvm_static_assert((fn & 0xc0000000) =3D=3D 0 ||				\
++			  (fn & 0xc0000000) =3D=3D 0x40000000 ||			\
++			  (fn & 0xc0000000) =3D=3D 0x80000000 ||			\
++			  (fn & 0xc0000000) =3D=3D 0xc0000000);			\
++	kvm_static_assert(idx < BIT(sizeof(property.index) * BITS_PER_BYTE));	\
+ 	property;								\
+ })
+=20
+
+base-commit: 0fa32dad1e78629cb42999dacd82489503fdf4c2
+--=20
+2.38.1.584.g0f3c55d4c2-goog
+
