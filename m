@@ -2,70 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4ABA2634836
-	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 21:31:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 775DA6348C3
+	for <lists+kvm@lfdr.de>; Tue, 22 Nov 2022 21:53:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234839AbiKVUbb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 15:31:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41722 "EHLO
+        id S234684AbiKVUws (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 15:52:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232554AbiKVUb3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 15:31:29 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91EBC14D07
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 12:31:28 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id y4so14777847plb.2
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 12:31:28 -0800 (PST)
+        with ESMTP id S234164AbiKVUwm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 15:52:42 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 842941AF04
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 12:52:39 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id a22-20020a17090a6d9600b0021896eb5554so9371pjk.1
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 12:52:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=69rSZ63M6bvdurO6ReZqna5Eg4302HwbxHNt+kII3Jg=;
-        b=Q46NNpk9InqyUfydIxb2dyrqakqUN+EABqgVTzVreHp/y0i2APHTc6Fd9cLwvxuJX4
-         FLSTqubR0OZfdDG58bZ/JjTA8RdOKeIL1lxCEpLRwcEb36JQrRnhwgG95x05jFUNDUQs
-         NFJhaq1JEgM3smykDYSzo7XglWel2ub0iIl9wdKXk0Lb+pIQN8z6uQwndjYSDvsTmS2v
-         QlujGx67zCoCUb5WKK9ebvyOcog8oFhWp15MLMOKU/CCU8ZYjAr1g+g+RsA3tf98LXA3
-         Yly+p/1zNgadfkq42iKAJoxridIXYm+hdt75qm+qlhW621A74qRuDcu6XeW46R48aG4W
-         Hdaw==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xe5lv1QsTYxiW+46jd84oLWYNOjdtqx5LsHPiQT+CbY=;
+        b=jHr87EqrXczQan3cj3wKvuAcmEXgUT0owrBovzhrjOOZz83aqN2FXomVGU4sO8TKl9
+         RIIVJ4g4bh3i9/d99KPEbeIjhBp+ON/N+0xqVAjlfXbk85E4NhQstANHw2EQxSeiWTEI
+         k9vHnM9uP0PHr3VJB8THPKjYsb9whCcCn6WMRpulIMvZIgPHS7vd6oIMxwlWwrEJWBdM
+         C0RP4zEifu27siBCoe9LLdLbGe8aVnoTEMTkyNdISSQX7lapnos11FatL5D5jnzVS65B
+         1PmU5qm3JVPdVjAsE9w6kH/IvzZ8UKnx5TOC8wnUP28CR3xP4bG94DpfMVof93F8dZCi
+         Q1NA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=69rSZ63M6bvdurO6ReZqna5Eg4302HwbxHNt+kII3Jg=;
-        b=zzmVU79Mc5dX+IT3zIyj7HamWm6KWnwnrT5ngemipGpv7l7NDR/OM6KvZS4awO+r9E
-         5d+/j63jwfjUoLwaJdW25soMtzMLv7A2YHiXYqqyKpiAF+Y8mdl5ECFlWzeckjqn2jLr
-         EnTPJSa9wZWPkj0LxiKu1ruJOe98YvurvD3ZMukCKG4uGnRbu1i6A2w71DXfwov47vO4
-         C8L2fVl1vzRCE0MhMdr2mNxSus7OzM1HxRZ7X4QNwWAueH/PwHJLatXe9+t1mzrGzN/z
-         Xf50nSzh6ZEpy/4ajYWrn5jR2m2PAK9CquHxmFWNFWqm8QNkKqOHfFLQ+jVsGmArm1y2
-         4ubA==
-X-Gm-Message-State: ANoB5pmhXSK7fFCQMmEi5+tfceHwdX66CqkggE7VzdiYcxfzChtZNabH
-        JDEo7DiUZxPV3+LA9KumknOolQ==
-X-Google-Smtp-Source: AA0mqf4EQkMFOdr46C/mIx2/Hbs45Mm/rJgGsIENZl9WFeYvbhsXQdTg/E28lb4oH0cQbV7YTTqnzg==
-X-Received: by 2002:a17:90b:8d:b0:218:c14b:4e6e with SMTP id bb13-20020a17090b008d00b00218c14b4e6emr8536348pjb.171.1669149087938;
-        Tue, 22 Nov 2022 12:31:27 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Xe5lv1QsTYxiW+46jd84oLWYNOjdtqx5LsHPiQT+CbY=;
+        b=dImUmrwURghuXQR0CrazxlbXv203VQ/wM7UGhRI/6OsX0NN12XPhcKdBO/C1zb9EAl
+         4IcWjRYFmvDIvfEPajtzVe+qomQrZNJB6oD9AEmnlq80VPC5bUtkFXRsTwPgH9EGI8lL
+         rlRgKze3WegPYNtGYxcWAF4S+K/IYOIo0aTDX7RhMwy3giJ+SoT7vsqGR7hh/sTQw5ku
+         0XqoSknl4zfX4QqKX/TAvoMqjyqo2nItA3lrQep0VI5sbVe0tTxzYmOBbTiEBeQTzhaW
+         XpgB6W0wrQ7wbyeuiFfZgMiV9PmUA007EGFPOVdgA14brlTYTJbnQ0ph/V+j0wU0nPuX
+         sCvg==
+X-Gm-Message-State: ANoB5pnM8BRBtdOfcIiUq5/Mcr6CI2ozyflGHKqaLr4L9PXcMQ0XMxU+
+        k9RidQNdt8/9eZvPmENy6QeVylg06FIKWg==
+X-Google-Smtp-Source: AA0mqf4pAi46wp7LU6CBDjGxihAVeR6mOkIyT4rbAVPEqXby41bwTlpEfGplJ03ZvrSKZArwx/0Frw==
+X-Received: by 2002:a17:902:d349:b0:189:324:27cc with SMTP id l9-20020a170902d34900b00189032427ccmr5653079plk.70.1669150358926;
+        Tue, 22 Nov 2022 12:52:38 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id d12-20020a170902654c00b00168dadc7354sm7874449pln.78.2022.11.22.12.31.27
+        by smtp.gmail.com with ESMTPSA id f19-20020a17090a9b1300b0020d9306e735sm9950352pjp.20.2022.11.22.12.52.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Nov 2022 12:31:27 -0800 (PST)
-Date:   Tue, 22 Nov 2022 20:31:23 +0000
+        Tue, 22 Nov 2022 12:52:38 -0800 (PST)
+Date:   Tue, 22 Nov 2022 20:52:35 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paul Durrant <paul@xen.org>
-Subject: Re: [PATCH] KVM: x86/xen: Make number of event channels defines less
- magical
-Message-ID: <Y30xm/y2CKPchObi@google.com>
-References: <20221114181632.3279119-1-seanjc@google.com>
- <629d6d90ce95b9db74f0101a4428be1119c4bfc7.camel@infradead.org>
- <Y3KZVUCCH+YQDbqu@google.com>
- <fde14caa0cf774b2b46f1124644a3b326a0a8f09.camel@infradead.org>
+To:     "Li, Xin3" <xin3.li@intel.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
+ for NMI/IRQ reinjection
+Message-ID: <Y302kxLEhcp20d65@google.com>
+References: <BN6PR1101MB216141A21353AB84CEA541DFA8009@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y26jkHfK9INwU7Yy@hirez.programming.kicks-ass.net>
+ <BN6PR1101MB2161E8217F50D18C56E5864EA8059@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y3IFo9NrAcYalBzM@hirez.programming.kicks-ass.net>
+ <BN6PR1101MB2161299749E12D484DE9302BA8049@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y3NZQBJugRt07udw@hirez.programming.kicks-ass.net>
+ <DM5PR1101MB2172D7D7BC49255DB3752802A8069@DM5PR1101MB2172.namprd11.prod.outlook.com>
+ <Y3ZYiKbJacmejY3K@google.com>
+ <BN6PR1101MB21611347D37CF40403B974EDA8099@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <BN6PR1101MB2161FCA1989E3C6499192028A80D9@BN6PR1101MB2161.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fde14caa0cf774b2b46f1124644a3b326a0a8f09.camel@infradead.org>
+In-Reply-To: <BN6PR1101MB2161FCA1989E3C6499192028A80D9@BN6PR1101MB2161.namprd11.prod.outlook.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,84 +90,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-EVTCHN_2L_NR_CHANNELSOn Mon, Nov 14, 2022, David Woodhouse wrote:
-> On Mon, 2022-11-14 at 19:39 +0000, Sean Christopherson wrote:
-> > Ugh.  I worried that might be the case.  An alternative approach to help document
-> > things from a KVM perspective would be something like:
+On Tue, Nov 22, 2022, Li, Xin3 wrote:
+> > > > > > > And yes, the current code appears to suffer the same defect.
+> > >
+> > > That defect isn't going to be fixed simply by changing how KVM
+> > > forwards NMIs though.  IIUC, _everything_ between VM-Exit and the
+> > > invocation of the NMI handler needs to be noinstr.  On VM-Exit due to
+> > > NMI, NMIs are blocked.  If a #BP/#DB/#PF occurs before KVM gets to
+> > > kvm_x86_handle_exit_irqoff(), the subsequent IRET will unblock NMIs
+> > > before the original NMI is serviced, i.e. a second NMI could come in
+> > > at anytime regardless of how KVM forwards the NMI to the kernel.
+> > >
+> > > Is there any way to solve this without tagging everything noinstr?
+> > > There is a metric shit ton of code between VM-Exit and the handling of
+> > > NMIs, and much of that code is common helpers.  It might be possible
+> > > to hoist NMI handler much earlier, though we'd need to do a super
+> > > thorough audit to ensure all necessary host state is restored.
 > > 
-> > diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> > index 93c628d3e3a9..7769f3b98af0 100644
-> > --- a/arch/x86/kvm/xen.c
-> > +++ b/arch/x86/kvm/xen.c
-> > @@ -1300,6 +1300,9 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
-> >  
-> >  static inline int max_evtchn_port(struct kvm *kvm)
-> >  {
-> > +       BUILD_BUG_ON(EVTCHN_2L_NR_CHANNELS !=
-> > +                    (sizeof_field(struct shared_info, evtchn_pending) * BITS_PER_BYTE));
-> > +
-> >         if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode)
-> >                 return EVTCHN_2L_NR_CHANNELS;
-> >         else
+> > As NMI is the only vector with this potential issue, it sounds a good idea to only
+> > promote its handling.
+> > 
 > 
-> Not really sure I see the point of that.
+> Hi Peter/Sean,
 > 
-> There are two main reasons for that kind of BUILD_BUG_ON(). I've added
-> a few of them asserting that the size of the structure and its compat
-> variant are identical, and thus documenting *why* the code lacks compat
-> handling. For example...
-> 
-> 	/*
-> 	 * Next, write the new runstate. This is in the *same* place
-> 	 * for 32-bit and 64-bit guests, asserted here for paranoia.
-> 	 */
-> 	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, state) !=
-> 		     offsetof(struct compat_vcpu_runstate_info, state));
-> 
-> The second reason is to prevent accidental screwups where our local
-> definition of a structure varies from the official ABI. Like these:
-> 
-> 	/* Paranoia checks on the 32-bit struct layout */
-> 	BUILD_BUG_ON(offsetof(struct compat_shared_info, wc) != 0x900);
-> 	BUILD_BUG_ON(offsetof(struct compat_shared_info, arch.wc_sec_hi) != 0x924);
-> 	BUILD_BUG_ON(offsetof(struct pvclock_vcpu_time_info, version) != 0);
-> 
-> I don't really see the above fulfilling either of those use cases.
->
-> Given that the definition of the evtchn_pending field is:
-> 
->         xen_ulong_t evtchn_pending[sizeof(xen_ulong_t) * 8];
-> 
-> It's fairly tautological that the number of event channels supported is
-> BITS_PER_ULONG * BITS_PER_ULONG. Which is sizeof(xen_ulong_t)² * 64 as
-> defined in the official Xen headers.
-> 
-> I don't know that we really need to add our own sanity check on the
-> headers we imported from Xen. It doesn't seem to add much.
+> I prefer to move _everything_ between VM-Exit and the invocation of the NMI
+> handler into the noinstr section in the next patch set, how do you think?
 
-The goal isn't to add a sanity check, it's to document what EVTCHN_2L_NR_CHANNELS
-actually represents.  My frustration with 
+That's likely going to be beyond painful and will have a _lot_ of collateral
+damage in the sense that other paths will end up calling noinstr function just
+because of VMX.  E.g. hw_breakpoint_restore(), fpu_sync_guest_vmexit_xfd_state(),
+kvm_get_apic_mode(), multiple static calls in KVM... the list goes on and on and on.
 
-  sizeof(xen_ulong_t) * sizeof(xen_ulong_t) * 64
+The ongoing maintenance for that would also be quite painful.
 
-is that there's nothing there that connects it back to evtchn_pending or evtchn_mask.
+Actually, SVM already enables NMIs far earlier, which means the probability of
+breaking something by moving NMI handling earlier is lower.  Not zero, as I don't
+trust that SVM gets all the corner right, but definitely low.
 
-E.g. ideally the code would be something like
+E.g. this should be doable
 
-  #define COMPAT_EVTCHN_2L_NR_CHANNELS	256
-
-  #ifdef CONFIG_X86_64
-  #define EVTCHN_2L_NR_CHANNELS		512
-  #else
-  #define EVTCHN_2L_NR_CHANNELS		COMPAT_EVTCHN_2L_NR_CHANNELS
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index cea8c07f5229..2fec93f38960 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7249,6 +7249,8 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+        if (unlikely(vmx->exit_reason.failed_vmentry))
+                return EXIT_FASTPATH_NONE;
+ 
++       <handle NMIs here>
++
+        vmx->loaded_vmcs->launched = 1;
+ 
+        vmx_recover_nmi_blocking(vmx);
 
 
-  DECLARE_BITMAP(evtchn_pending, EVTCHN_2L_NR_CHANNELS);
-  DECLARE_BITMAP(evtchn_mask, EVTCHN_2L_NR_CHANNELS);
+thouh we'd like want a fair bit of refactoring so that all of vmx_vcpu_run() and
+svm_vcpu_run() don't need to be noinstr.
 
-which is much more self-documenting and doesn't require the reader to do math to
-grok the basics.
-
-Anyways, we can drop this patch, it was written mostly out of frustration with
-how long it took me to understand what is actually a very simple concept that's
-written in an unnecessarily obscure way.
+Another wart that needs to be addressed is trace_kvm_exit().  IIRC, tracepoints
+must be outside of noinstr, though maybe I'm misremembering that.  And conversely,
+SVM doesn't trace exits that are handled in the fastpath.  Best option is probably
+to move VMX's trace_kvm_exit() call to vmx_handle_exit(), and then figure out a
+common way to trace exits that are handled in the fastpath (which can reside outside
+of the noinstr section).
