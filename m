@@ -2,71 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 59C00635081
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 07:33:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E02F0635145
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 08:47:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236036AbiKWGdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 01:33:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37872 "EHLO
+        id S235952AbiKWHrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 02:47:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234531AbiKWGdv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 01:33:51 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 870E5EA138;
-        Tue, 22 Nov 2022 22:33:50 -0800 (PST)
+        with ESMTP id S235411AbiKWHrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 02:47:19 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 895D4F8864;
+        Tue, 22 Nov 2022 23:47:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669185230; x=1700721230;
+  t=1669189638; x=1700725638;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=27L+f2UUfa+f7KW/A/rdUyhJdUZDtfiEtjWnXwlvi1A=;
-  b=UCQ00pT3nIaQuAk0UpdFMW/hzVH2hh3oDE8TwVgd2BE+Ju4pi90elDRH
-   VSShPn7K+AxZdiehoP2P2ufLV5Fnj10Wb2vzVc+eMXWYTIIe+CCXqUGm7
-   KR0wHfzdzHJ44CbWm9lKmakCegjcGrOqbpnV3xY5YjOgww1ZU9RKvFPMS
-   uUtb/tXuTt18KQ8J3cptAOX/bSHAmwh230rdGEHkHSdf1CJt6m1NwsLS7
-   VIC2napiGt6lC6vlE9kUD9b1LaZkYlsuvH+touxJUk8+D4Z8aGGuCCJHV
-   3dKS9jRWpscBd31qQwjabHMqH9xeX6+MLIpSTePt/fJCPYgTaI7py6hfC
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="340870395"
+  bh=VaHG5HHnXNhrmj47fPmtSxSofcO5/Z8rZp/3ZUNa69o=;
+  b=faGkb5plFC0CYvinlY51NwRQNjDT7g6lgyg5GxELcF3tozhqpor7j5kb
+   r/eunKWDz0EqQRsjyGRbW8jdPYKfeenkr+qjFEoZZ1rSax800hIMlk21z
+   uR2Op/Lu9bT9igi0kYzNpEaaxZlfPzqIx9EC0sr8JLzbvqD0Om6Cbaqj9
+   jGAto3ZENTUBFp7gOFSw2bIvJYswBEDdIs/b6CxudJDIAqCApCd5v8hEA
+   Kq9jcjs19QzDvKiH2xLTILFZutJqFnzghtNejkr5pSTz8pHp1gCvo7O3H
+   SHeoX1JFsOzDPm0Q/3xRBcWqZuf05O/ih4RmKUevKjG3z3gJEjXNGMAqP
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="315826957"
 X-IronPort-AV: E=Sophos;i="5.96,186,1665471600"; 
-   d="scan'208";a="340870395"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 22:33:50 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="643995920"
+   d="scan'208";a="315826957"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 23:47:18 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="674629012"
 X-IronPort-AV: E=Sophos;i="5.96,186,1665471600"; 
-   d="scan'208";a="643995920"
+   d="scan'208";a="674629012"
 Received: from jiaxiche-mobl.ccr.corp.intel.com (HELO [10.254.210.241]) ([10.254.210.241])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 22:33:37 -0800
-Message-ID: <f2cf136e-bf38-54ce-a0dc-31b0192d1dd6@linux.intel.com>
-Date:   Wed, 23 Nov 2022 14:33:32 +0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 23:47:02 -0800
+Message-ID: <ffc31149-8780-5499-7d25-08b871399bde@linux.intel.com>
+Date:   Wed, 23 Nov 2022 15:46:57 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
 Subject: Re: [PATCH v4 1/6] x86: KVM: Advertise CMPccXADD CPUID to user space
-To:     Dave Hansen <dave.hansen@intel.com>
+To:     Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@intel.com>
 Cc:     kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-        ndesaulniers@google.com, alexandre.belloni@bootlin.com,
-        peterz@infradead.org, jpoimboe@kernel.org,
-        chang.seok.bae@intel.com, pawan.kumar.gupta@linux.intel.com,
-        babu.moger@amd.com, jmattson@google.com, sandipan.das@amd.com,
-        tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        fenghua.yu@intel.com, keescook@chromium.org, nathan@kernel.org,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, ndesaulniers@google.com,
+        alexandre.belloni@bootlin.com, peterz@infradead.org,
+        jpoimboe@kernel.org, chang.seok.bae@intel.com,
+        pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
+        jmattson@google.com, sandipan.das@amd.com, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
+        keescook@chromium.org, nathan@kernel.org,
         linux-kernel@vger.kernel.org
 References: <20221118141509.489359-1-jiaxi.chen@linux.intel.com>
  <20221118141509.489359-2-jiaxi.chen@linux.intel.com>
  <efb55727-f8bd-815c-ddfc-a8432ae5af4e@intel.com>
  <f04c2e74-87e4-5d50-579a-0a60554b83d3@linux.intel.com>
- <6d7fae50-ef3c-dc1e-336c-691095007117@intel.com>
+ <Y3ubcwLlEdkj0/zK@zn.tnic>
 From:   Jiaxi Chen <jiaxi.chen@linux.intel.com>
-In-Reply-To: <6d7fae50-ef3c-dc1e-336c-691095007117@intel.com>
+In-Reply-To: <Y3ubcwLlEdkj0/zK@zn.tnic>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -75,29 +74,43 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 11/21/2022 11:29 PM, Dave Hansen wrote:
-> On 11/21/22 06:46, Jiaxi Chen wrote:
+On 11/21/2022 11:38 PM, Borislav Petkov wrote:
+> On Mon, Nov 21, 2022 at 10:46:21PM +0800, Jiaxi Chen wrote:
 >> Features which has been enabled in kernel usually should be added to
 >> /proc/cpuinfo.
 > 
-> Features that the kernel *itself* is actually using always get in there.
->  Things like "smep".
+> No, pls read this first: Documentation/x86/cpuinfo.rst
 > 
-> But, things that the kernel "enables" but that only get used by
-> userspace don't generally show up in /proc/cpuinfo.
+> If something's not clear, we will extend it so that it is.
 > 
-> KVM is kinda a weird case.  The kernel is making the feature available
-> to guests, but it's not _using_ it in any meaningful way.  To me, this
-> seems much more akin to the features that are just available to
-> userspace than something that the kernel is truly using.
+> /proc/cpuinfo - a user ABI - is not a dumping ground for CPUID bits.
 > 
-> Also, these feature names are just long and ugly, and the "flags" line
-> is already a human-*un*readable mess.  I think we should just leave them
-> out.
 
-True and agree. As for these cpuids are not truly used by kernel except
-for advertising to kvm userspace, we can hide them in /proc/cpuinfo by
-overriding their name with "".
+Thanks. Sorry for the miss understanding.
+
+For those feature bits who have truly kernel usage, their flags should
+appear in /proc/cpuinfo. For others, they are not generally show up
+here, it depends.
+
+As for features in this patch series:
+
+The first-way defined bits are on an expected-dense cpuid leaf[1] and
+some of their siblings have kernel usages[2]. Given that, define them
+like X86_FEATURE_* in arch/x86/include/asm/cpufeatures.h. But due to
+their complicated and unreadable feature name[3], prefer to hide them in
+/proc/cpuinfo.
+
+The second-way defined bits are on a new and sparse cpuid leaf. Besides,
+these bits have no turly kernel use case. Therefore, move these new bits
+to kvm-only leaves to achieve the purpose for advertising these bits to
+kvm userspace[4]. Then of course they will not show up in /proc/cpuinfo.
+
+[1] https://lore.kernel.org/all/Y3O7UYWfOLfJkwM%2F@zn.tnic/
+[2]
+https://lore.kernel.org/all/f8607d23-afaa-2670-dd03-2ae8ec1e79a0@intel.com/
+[3]
+https://lore.kernel.org/all/6d7fae50-ef3c-dc1e-336c-691095007117@intel.com/
+[4] https://lore.kernel.org/all/Y1ATKF2xjERFbspn@google.com/
 
 -- 
 Regards,
