@@ -2,47 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 082F0634B6B
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 01:03:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C1FE634B9E
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 01:22:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234684AbiKWADk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 19:03:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35668 "EHLO
+        id S235215AbiKWAUj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 19:20:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229728AbiKWADi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 19:03:38 -0500
+        with ESMTP id S234512AbiKWAUh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 19:20:37 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3418DCB9D7
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 16:03:37 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFEA1D5A0D
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 16:20:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=GKMNHfoDsJUd4ADWNSew+nOiOiHWxXk6X+NZnsH1D6I=; b=ohIA+71i7CkrRPjs1TR82vbCoP
-        UWg9iEnKTYspRtBCYtnc3VCuRXZ0EoGIQHIYrmsoWSS1dIioVp9/UWpVTDeuMZ/XaCtNcAtg1aJMK
-        XByl5J6xCBdtoIBMVaStawbyUpUNSKRtoJ6PJ0ytIKXqIeOVG/J70cFn5hzfYQc5m8B+fmsh74dAy
-        1OlwsUpy+PrE969uLIBMmSUPG+nDKPjPaJU6tNo119nHat/JFraAsRge83ovTFA/onlSJq1vrb/Ix
-        xf2iTtR21Gg0JNRjyhmZqC1GpvRtRlEaRb/DqPfUQbVkuqR3eAeBoCqqFVWVNSU6AnGTaW1aYm6jb
-        PhPxoS7w==;
-Received: from [2001:8b0:10b:5:e11d:803:4f3f:5f70] (helo=u3832b3a9db3152.ant.amazon.com)
+        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=mlp8veIal+exzXXUNMI9ARhDb1z9qQxsAhW32IRDmcY=; b=hfMXAvofT6pLU/7jE3YKFuSizs
+        YApfrt8JRwrTPromb0Ek+h46oPYQDTfQ+aehtfj4F+2k5mE22i2F2M5llHRtTnaOOVGtzVboLmy8+
+        QJA5gC5xnY7OClkQ+pqjlRf98MTy4hkLak+UNAXKhLyJf3p3N16poenFr5TSW+0hJbZ+Y44SMljka
+        QkJH4WQAFZsrtRWikyTkB9OYQ+BG1Gcj8mnxMcBQwiXNldL1+UHeHFSZBLr7aAzqHBIjbu7KH7hfh
+        GokPKu0MiYiggFk76nwMh+6fKzIPZtE6hDHgaJimxLpF/4XYQqzrsvc/jbWDbVHsaqMZisqY+9iET
+        ay0jcTgQ==;
+Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oxdEn-006tZ6-PO; Wed, 23 Nov 2022 00:03:37 +0000
-Message-ID: <f06e88a42cf6dd99649b7ae15afabb4be361b8e8.camel@infradead.org>
-Subject: Re: [PATCH 2/4] KVM: x86/xen: Compatibility fixes for shared
- runstate area
+        id 1oxdVF-006uLD-Jo; Wed, 23 Nov 2022 00:20:37 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oxdV8-000O7e-Gr; Wed, 23 Nov 2022 00:20:30 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Michal Luczaj <mhal@rbox.co>, Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-Date:   Wed, 23 Nov 2022 00:03:29 +0000
-In-Reply-To: <9d5762e7-e325-2f5d-d91f-bbc60fd4d584@rbox.co>
-References: <20221119094659.11868-1-dwmw2@infradead.org>
-         <20221119094659.11868-2-dwmw2@infradead.org>
-         <9d5762e7-e325-2f5d-d91f-bbc60fd4d584@rbox.co>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-0WZFAPdNI5jZPn53NfZp"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+Cc:     Michal Luczaj <mhal@rbox.co>, kvm@vger.kernel.org
+Subject: [PATCH 1/3] KVM: x86/xen: Validate port number in SCHEDOP_poll
+Date:   Wed, 23 Nov 2022 00:20:28 +0000
+Message-Id: <20221123002030.92716-1-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Sender: David Woodhouse <dwmw2@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
@@ -53,136 +50,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: David Woodhouse <dwmw@amazon.co.uk>
 
---=-0WZFAPdNI5jZPn53NfZp
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+We shouldn't allow guests to poll on arbitrary port numbers off the end
+of the event channel table.
 
-On Wed, 2022-11-23 at 00:46 +0100, Michal Luczaj wrote:
->=20
-> > +             /* Either map the second page, or deactivate the second G=
-PC */
-> > +             if (sz1 > sz) {
->=20
-> Out of curiosity: is there a reason behind potentially
-> kvm_gpc_activate()ing a "len=3D0" cache? (sz1=3D=3Dsz leads to sz2=3D0)
-> I feel I may be missing something, but shouldn't the comparison be >=3D?
+Fixes: 1a65105a5aba ("KVM: x86/xen: handle PV spinlocks slowpath")
+[dwmw2: my bug though; the original version did check the validity as a
+ side-effect of an idr_find() which I ripped out in refactoring.]
+Reported-by: Michal Luczaj <mhal@rbox.co>
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Cc: stable@kernel.org
+---
+ arch/x86/kvm/xen.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-No good reason. Fixed in my tree; thanks.
-
-
-
---=-0WZFAPdNI5jZPn53NfZp
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTIzMDAwMzI5WjAvBgkqhkiG9w0BCQQxIgQggZLFdw6R
-tEKpxC+OuwQ2CThD2cC4KalbhvsbBQbBghQwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCZ/BZyy+E4/xuWoserszSX4wfq/9LmwWJC
-wbq0pIInPJDzIwjBfa1LHZOzlK13TuNMUTvgCa6k+0yoVIw5HI7sHq+C7RGQHx7fiHraCtTDhuyp
-0kxvVJ/EXsWnORBSfnWDyN3nF42cAgdDYfI5M8xz9DDp29dv49XV4/4aWPprrd/cv4d5mF3SQFrx
-/s715rruoq2YBRSzxIW2dZHKAhH6vYEY4kJCK1nVwUrJwA8pZEWQxAYNp8llw3yVaQBRBg0+a3Q6
-cXrihTRMv/1VCdQK92qb1EpxDxPOyFAZtiid8u/dwpNaWxH1+ETcGL6izVj8SvMBYKB9eIuzjl2c
-ebL8rvIgQskFPWarrwBIDzEMBKs9huOmOZjSMAU5M6JAZNgrculHCZpuz1lS9BbWL6snSHV7hf9h
-ldbd6J8HJVmclh112TIoAhfCCJkvMUayiUkYbK68+UKBsqM+gdJCT9nBnczTlNuBvwkJ1tPTcS82
-RKQ/WxNMroO1q4a86AE39deqGi3zj6gXIjIk/LeOjbAXRwwIgGXBLXZTKmsIm9XASyiTm7ZpUmbl
-htbBwHt8fkv4keeZiE5zWhGZ7z7SYJReaYM7JZTYUdJS1NxrzbYWwYSzTy/Ivv7G1Q69iTPcRdpr
-Xm4X8OO6HsPNcopNfwHT4DRXEBdNoVwE17kD+8TTWAAAAAAAAA==
-
-
---=-0WZFAPdNI5jZPn53NfZp--
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 2dae413bd62a..dc2f304f2e69 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -954,6 +954,14 @@ static int kvm_xen_hypercall_complete_userspace(struct kvm_vcpu *vcpu)
+ 	return kvm_xen_hypercall_set_result(vcpu, run->xen.u.hcall.result);
+ }
+ 
++static inline int max_evtchn_port(struct kvm *kvm)
++{
++	if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode)
++		return EVTCHN_2L_NR_CHANNELS;
++	else
++		return COMPAT_EVTCHN_2L_NR_CHANNELS;
++}
++
+ static bool wait_pending_event(struct kvm_vcpu *vcpu, int nr_ports,
+ 			       evtchn_port_t *ports)
+ {
+@@ -1042,6 +1050,10 @@ static bool kvm_xen_schedop_poll(struct kvm_vcpu *vcpu, bool longmode,
+ 			*r = -EFAULT;
+ 			goto out;
+ 		}
++		if (ports[i] >= max_evtchn_port(vcpu->kvm)) {
++			*r = -EINVAL;
++			goto out;
++		}
+ 	}
+ 
+ 	if (sched_poll.nr_ports == 1)
+@@ -1297,14 +1309,6 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+ 
+-static inline int max_evtchn_port(struct kvm *kvm)
+-{
+-	if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode)
+-		return EVTCHN_2L_NR_CHANNELS;
+-	else
+-		return COMPAT_EVTCHN_2L_NR_CHANNELS;
+-}
+-
+ static void kvm_xen_check_poller(struct kvm_vcpu *vcpu, int port)
+ {
+ 	int poll_evtchn = vcpu->arch.xen.poll_evtchn;
+-- 
+2.35.3
 
