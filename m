@@ -2,98 +2,293 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44BD0635AFE
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 12:07:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 406BF635B59
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 12:14:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237646AbiKWLGr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 06:06:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39482 "EHLO
+        id S236526AbiKWLOa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 06:14:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237261AbiKWLGO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 06:06:14 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8575A452;
-        Wed, 23 Nov 2022 03:05:34 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AN8piZc010125;
-        Wed, 23 Nov 2022 11:05:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : to :
- cc : from : subject : message-id : date; s=pp1;
- bh=Ovz0e0d2ZQhEPCB6ZGhl052KXYXZxWbDJZVG1txikLk=;
- b=VlhNMxiBT+ei1tStZlTbdOoEY76Sp1DjgQgywrun1Yy8fI3xIwrWioj4dPTIwpuLF2TC
- p7jc6TgJ/+mbzk7/fZNqnvuNAPkOYFDVxc2M+h8waBdUMPTi529xqrZsLXmb483X81N1
- yigxoC1GCMvCYxDphu7CoMA3V/XMj4K4wcjSUnqSh6IHls5/Bq0vMpRVUys0sHGOdO0A
- FGLTuSgWQCx6khbiavudwKqQ+/r5XITAvt1EtIdLagjy/+DiAl46XL9JotljuJO6fnhz
- Ph+a+xWFX6izZYyllVxhmQXKf5+m4/x5mTxs6Vd6pKTYE6aHNWOuQ7xzGdiLfG7sPhOk OA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m10bma4x8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 11:05:34 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ANB1Bcq015949;
-        Wed, 23 Nov 2022 11:05:33 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m10bma4w0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 11:05:33 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ANAoX3B030829;
-        Wed, 23 Nov 2022 11:05:31 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma01fra.de.ibm.com with ESMTP id 3kxps9432c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 11:05:31 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ANB5S6c39453258
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Nov 2022 11:05:28 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 03204AE087;
-        Wed, 23 Nov 2022 11:05:28 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DB4A7AE08B;
-        Wed, 23 Nov 2022 11:05:27 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.46.182])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Nov 2022 11:05:27 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+        with ESMTP id S236515AbiKWLOF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 06:14:05 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17EE511DA09
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 03:11:08 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A069FB81F02
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 11:11:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D365C433D7;
+        Wed, 23 Nov 2022 11:11:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669201865;
+        bh=x4KaZbDoH1MuZ2K5sO4iYbMKMLrznQlP44Sem7CFhwY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=U2UkebtvC/If47HOuif31QOIrwKQfONUoKxCsT37kiPM1YLzkZberf/6WykVnYQf2
+         Xl8eC/MrNFK49bp+yorQ78u4I34E6ZqHb4f46XM+mDX+iB56XlGYzoWkuAxNWesjl/
+         Pfol3vfGscydOFXd5zWbEyVk2/D+Ct//7vaXumkVG+rUdZqYEYfHw9ujH8MqS2uCAX
+         eF5huN2RK/i3Zk4Vrc0HLm6mUzWMN2aZ0gfBBHLZn0sPoLvc9/uoN+DtLcFXfciR0W
+         BclfGyM81/4dcDLGtfqC7IVb/FpnJJeqe5P4P+WPv8Txj77/6hSkzADbOeC/8HtvFJ
+         8o63ncYRhhFrA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oxneg-0085wY-L3;
+        Wed, 23 Nov 2022 11:11:02 +0000
+Date:   Wed, 23 Nov 2022 11:11:02 +0000
+Message-ID: <86leo2ncxl.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v4 13/16] KVM: arm64: PMU: Implement PMUv3p5 long counter support
+In-Reply-To: <CAAeT=Fx=8g2-Z8nzqUit5owtoxbenXnAFA5Mu6AfgZJFN4CfVw@mail.gmail.com>
+References: <20221113163832.3154370-1-maz@kernel.org>
+        <20221113163832.3154370-14-maz@kernel.org>
+        <CAAeT=Fx=8g2-Z8nzqUit5owtoxbenXnAFA5Mu6AfgZJFN4CfVw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20221123084656.19864-5-frankja@linux.ibm.com>
-References: <20221123084656.19864-1-frankja@linux.ibm.com> <20221123084656.19864-5-frankja@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, seiden@linux.ibm.com
-From:   Nico Boehr <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 4/5] s390x: Clear first stack frame and end backtrace early
-Message-ID: <166920152649.14080.16975145154131817069@t14-nrb.local>
-User-Agent: alot/0.8.1
-Date:   Wed, 23 Nov 2022 12:05:27 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: K5Tvps2at9dsv0zqjzKEk39C-zQ9oY3c
-X-Proofpoint-GUID: lnc3NsMINAOnzmu9LFLcFQMeXZ1MBzB5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-23_06,2022-11-23_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 impostorscore=0 suspectscore=0 clxscore=1015
- lowpriorityscore=0 malwarescore=0 phishscore=0 spamscore=0 mlxscore=0
- adultscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2210170000 definitions=main-2211230083
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2022-11-23 09:46:55)
-> When setting the first stack frame to 0, we can check for a 0
-> backchain pointer when doing backtraces to know when to stop.
+On Wed, 23 Nov 2022 05:58:17 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
 >=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Hi Marc,
+>=20
+> On Sun, Nov 13, 2022 at 8:46 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > PMUv3p5 (which is mandatory with ARMv8.5) comes with some extra
+> > features:
+> >
+> > - All counters are 64bit
+> >
+> > - The overflow point is controlled by the PMCR_EL0.LP bit
+> >
+> > Add the required checks in the helpers that control counter
+> > width and overflow, as well as the sysreg handling for the LP
+> > bit. A new kvm_pmu_is_3p5() helper makes it easy to spot the
+> > PMUv3p5 specific handling.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/pmu-emul.c | 8 +++++---
+> >  arch/arm64/kvm/sys_regs.c | 4 ++++
+> >  include/kvm/arm_pmu.h     | 7 +++++++
+> >  3 files changed, 16 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index 4320c389fa7f..c37cc67ff1d7 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
+> > @@ -52,13 +52,15 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
+> >   */
+> >  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
+> >  {
+> > -       return (select_idx =3D=3D ARMV8_PMU_CYCLE_IDX);
+> > +       return (select_idx =3D=3D ARMV8_PMU_CYCLE_IDX || kvm_pmu_is_3p5=
+(vcpu));
+> >  }
+> >
+> >  static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 =
+select_idx)
+> >  {
+> > -       return (select_idx =3D=3D ARMV8_PMU_CYCLE_IDX &&
+> > -               __vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
+> > +       u64 val =3D __vcpu_sys_reg(vcpu, PMCR_EL0);
+> > +
+> > +       return (select_idx < ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PM=
+CR_LP)) ||
+> > +              (select_idx =3D=3D ARMV8_PMU_CYCLE_IDX && (val & ARMV8_P=
+MU_PMCR_LC));
+>=20
+> Since the vCPU's PMCR_EL0 value is not always in sync with
+> kvm->arch.dfr0_pmuver.imp, shouldn't kvm_pmu_idx_has_64bit_overflow()
+> check kvm_pmu_is_3p5() ?
+> (e.g. when the host supports PMUv3p5, PMCR.LP will be set by reset_pmcr()
+> initially. Then, even if userspace sets ID_AA64DFR0_EL1.PMUVER to
+> PMUVer_V3P1, PMCR.LP will stay the same (still set) unless PMCR is
+> written.  So, kvm_pmu_idx_has_64bit_overflow() might return true
+> even though the guest's PMU version is lower than PMUVer_V3P5.)
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+I can see two ways to address this: either we spray PMUv3p5 checks
+every time we evaluate PMCR, or we sanitise PMCR after each userspace
+write to ID_AA64DFR0_EL1.
+
+I'd like to be able to take what is stored in the register file at
+face value, so I'm angling towards the second possibility. It also
+makes some sense from a 'HW' perspective: you change the HW
+dynamically by selecting a new version, the HW comes up with its reset
+configuration (i.e don't expect PMCR to stick after you write to
+DFR0 with a different PMUVer).
+
+>
+>=20
+> >  }
+> >
+> >  static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index dc201a0557c0..615cb148e22a 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -654,6 +654,8 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const=
+ struct sys_reg_desc *r)
+> >                | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR=
+_E);
+> >         if (!kvm_supports_32bit_el0())
+> >                 val |=3D ARMV8_PMU_PMCR_LC;
+> > +       if (!kvm_pmu_is_3p5(vcpu))
+> > +               val &=3D ~ARMV8_PMU_PMCR_LP;
+> >         __vcpu_sys_reg(vcpu, r->reg) =3D val;
+> >  }
+> >
+> > @@ -703,6 +705,8 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, stru=
+ct sys_reg_params *p,
+> >                 val |=3D p->regval & ARMV8_PMU_PMCR_MASK;
+> >                 if (!kvm_supports_32bit_el0())
+> >                         val |=3D ARMV8_PMU_PMCR_LC;
+> > +               if (!kvm_pmu_is_3p5(vcpu))
+> > +                       val &=3D ~ARMV8_PMU_PMCR_LP;
+> >                 __vcpu_sys_reg(vcpu, PMCR_EL0) =3D val;
+> >                 kvm_pmu_handle_pmcr(vcpu, val);
+> >                 kvm_vcpu_pmu_restore_guest(vcpu);
+>=20
+> For the read case of access_pmcr() (the code below),
+> since PMCR.LP is RES0 when FEAT_PMUv3p5 is not implemented,
+> shouldn't it clear PMCR.LP if kvm_pmu_is_3p5(vcpu) is false ?
+> (Similar issue to kvm_pmu_idx_has_64bit_overflow())
+>=20
+>         } else {
+>                 /* PMCR.P & PMCR.C are RAZ */
+>                 val =3D __vcpu_sys_reg(vcpu, PMCR_EL0)
+>                       & ~(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C);
+>                 p->regval =3D val;
+>         }
+
+I think the above would address it. I've tentatively queued the
+following patch, please let me know if this looks OK to you.
+
+Thanks,
+
+	M.
+
+=46rom d90ec0e8768ce5f7ae11403b29db76260dfaa3f2 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Wed, 23 Nov 2022 11:03:07 +0000
+Subject: [PATCH] KVM: arm64: PMU: Reset PMCR_EL0 on PMU version change
+
+Changing the version of the PMU emulation may result in stale
+bits still being present in the PMCR_EL0 register, leading to
+unexpected results.
+
+Address it by forcing PMCR_EL0 to its reset value when the value
+of ID_AA64DFR0.PMUVer (or ID_DFR0.Perfmon) changes.
+
+Reported-by: Reiji Watanabe <reijiw@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/sys_regs.c | 32 ++++++++++++++++++++++----------
+ 1 file changed, 22 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 67eac0f747be..12a873d94aaf 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -637,15 +637,10 @@ static void reset_pmselr(struct kvm_vcpu *vcpu, const=
+ struct sys_reg_desc *r)
+ 	__vcpu_sys_reg(vcpu, r->reg) &=3D ARMV8_PMU_COUNTER_MASK;
+ }
+=20
+-static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++static void __reset_pmcr(struct kvm_vcpu *vcpu, u64 pmcr)
+ {
+-	u64 pmcr, val;
+-
+-	/* No PMU available, PMCR_EL0 may UNDEF... */
+-	if (!kvm_arm_support_pmu_v3())
+-		return;
++	u64 val;
+=20
+-	pmcr =3D read_sysreg(pmcr_el0);
+ 	/*
+ 	 * Writable bits of PMCR_EL0 (ARMV8_PMU_PMCR_MASK) are reset to UNKNOWN
+ 	 * except PMCR.E resetting to zero.
+@@ -656,7 +651,16 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const st=
+ruct sys_reg_desc *r)
+ 		val |=3D ARMV8_PMU_PMCR_LC;
+ 	if (!kvm_pmu_is_3p5(vcpu))
+ 		val &=3D ~ARMV8_PMU_PMCR_LP;
+-	__vcpu_sys_reg(vcpu, r->reg) =3D val;
++	__vcpu_sys_reg(vcpu, PMCR_EL0) =3D val;
++}
++
++static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	/* No PMU available, PMCR_EL0 may UNDEF... */
++	if (!kvm_arm_support_pmu_v3())
++		return;
++
++	__reset_pmcr(vcpu, read_sysreg(pmcr_el0));
+ }
+=20
+ static bool check_pmu_access_disabled(struct kvm_vcpu *vcpu, u64 flags)
+@@ -1259,6 +1263,14 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+=20
++static void update_dfr0_pmuver(struct kvm_vcpu *vcpu, u8 pmuver)
++{
++	if (vcpu->kvm->arch.dfr0_pmuver.imp !=3D pmuver) {
++		vcpu->kvm->arch.dfr0_pmuver.imp =3D pmuver;
++		__reset_pmcr(vcpu, __vcpu_sys_reg(vcpu, PMCR_EL0));
++	}
++}
++
+ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 			       const struct sys_reg_desc *rd,
+ 			       u64 val)
+@@ -1291,7 +1303,7 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+=20
+ 	if (valid_pmu)
+-		vcpu->kvm->arch.dfr0_pmuver.imp =3D pmuver;
++		update_dfr0_pmuver(vcpu, pmuver);
+ 	else
+ 		vcpu->kvm->arch.dfr0_pmuver.unimp =3D pmuver;
+=20
+@@ -1331,7 +1343,7 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+=20
+ 	if (valid_pmu)
+-		vcpu->kvm->arch.dfr0_pmuver.imp =3D perfmon_to_pmuver(perfmon);
++		update_dfr0_pmuver(vcpu, perfmon_to_pmuver(perfmon));
+ 	else
+ 		vcpu->kvm->arch.dfr0_pmuver.unimp =3D perfmon_to_pmuver(perfmon);
+=20
+--=20
+2.34.1
+
+
+--=20
+Without deviation from the norm, progress is not possible.
