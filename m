@@ -2,62 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33455636241
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 15:48:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F42F63629B
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 16:01:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236773AbiKWOsF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 09:48:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48398 "EHLO
+        id S236497AbiKWPBm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 10:01:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237215AbiKWOr7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 09:47:59 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8BFB64563;
-        Wed, 23 Nov 2022 06:47:58 -0800 (PST)
+        with ESMTP id S235568AbiKWPBl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 10:01:41 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C2E823168
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 07:01:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669214878; x=1700750878;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=a+8IwRRWnlMenj05niCZLxI+GsQk8uB7E1I3p8nlM2A=;
-  b=XuzY5LWo8gvjvvN8sC0BcdXyj+7hCB+OcMPmIPYxCs6aixedUyI6t5wy
-   JAbe+hscn4M8T3nqx99WuM+rfaTdVzXpgaI2jPnPHtUjeUgw0Rx0xSZqU
-   hMFt7Fvj1qpNTkGqi0pWbumS28ZnvPnGiQ3ktXJ0tcP6XtcLFx14afMo7
-   1ekLNb817ksOzEzqb55F8yEksKpdr3Q8es/YFsSflOvYbEGyWWYP0aAVl
-   wpgF24cPpt2o0noTHjuqg1BDVHuFbIS284GKj1v13cQU+Dw3+oxFjofkk
-   XvxOYlodTivbnolU4augWefPW3fuVe5EZKUpr0isF8MbCf3LuzXqccVAR
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="340959168"
+  t=1669215700; x=1700751700;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=HkIDfH3RKQ54da5+X7Hpc3mnnrwNy+00lUsc9A6vla0=;
+  b=Aw3oQd4V4jfeTkmDpP7jtu9vhbz0jkoiizMkhFx1BarjpJJdzCAXeKyY
+   LyX7fSAVKHXJT9dX9kdzXauSfcCx3fuEf7Ia5GWsW1F4zUGzei93qB5ED
+   I2FFC/oUHw3ZeTr6zM4L0+boDBnmktIOCn9oWkLN0bR68t5YSBL5YBtDq
+   FpjhxG5UaMMLZ+15M+0n2BqUVbFkdMM1PgrVEVOICS7FNHC2nhtfz5uIT
+   bi92+xck8ZcNigCPHCCJ1HGOmxBvKFiFwCMvRbbLVgdbwc5mHVpY/Xhie
+   KCUAvOqioPBW/h0ritZ+nE95oIAbRH/CWWa+4Ycj+Sm/UVzaKaBWn1ZOU
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="301642911"
 X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
-   d="scan'208";a="340959168"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 06:47:58 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="730803960"
+   d="scan'208";a="301642911"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 07:01:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="674750866"
 X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
-   d="scan'208";a="730803960"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.249.168.208]) ([10.249.168.208])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 06:47:56 -0800
-Message-ID: <731bcbc7-67dd-44d1-4e19-2ae165f16beb@linux.intel.com>
-Date:   Wed, 23 Nov 2022 22:47:54 +0800
+   d="scan'208";a="674750866"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga001.jf.intel.com with ESMTP; 23 Nov 2022 07:01:15 -0800
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, jgg@nvidia.com
+Cc:     kevin.tian@intel.com, eric.auger@redhat.com, cohuck@redhat.com,
+        nicolinc@nvidia.com, yi.y.sun@linux.intel.com,
+        chao.p.peng@linux.intel.com, mjrosato@linux.ibm.com,
+        kvm@vger.kernel.org, yi.l.liu@intel.com
+Subject: [RFC 00/10]  Move group specific code into group.c
+Date:   Wed, 23 Nov 2022 07:01:03 -0800
+Message-Id: <20221123150113.670399-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v10 100/108] KVM: TDX: Handle TDX PV report fatal error
- hypercall
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <82671e3e811ab5ad423e125186c050f46621dd86.1667110240.git.isaku.yamahata@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <82671e3e811ab5ad423e125186c050f46621dd86.1667110240.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -66,77 +60,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+With the introduction of iommufd[1], VFIO is towarding to provide device
+centric uAPI after adapting to iommufd. With this trend, existing VFIO
+group infrastructure is optional once VFIO converted to device centric.
 
-On 10/30/2022 2:23 PM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> Wire up TDX PV report fatal error hypercall to KVM_SYSTEM_EVENT_CRASH KVM
-> exit event.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/kvm/vmx/tdx.c   | 20 ++++++++++++++++++++
->   include/uapi/linux/kvm.h |  1 +
->   2 files changed, 21 insertions(+)
->
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index e3062c245e70..16f168f4f21a 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -1068,6 +1068,24 @@ static int tdx_emulate_wrmsr(struct kvm_vcpu *vcpu)
->   	return 1;
->   }
->   
-> +static int tdx_report_fatal_error(struct kvm_vcpu *vcpu)
-> +{
-> +	/*
-> +	 * Exit to userspace device model for teardown.
-> +	 * Because guest TD is already panicing
+This series moves the group specific code out of vfio_main.c, prepares
+for compiling group infrastructure out after adding vfio device cdev[2]
 
-panicking
+Complete code in below branch:
 
+https://github.com/yiliu1765/iommufd/commits/vfio_group_split_rfcv1
 
-> , returning an error to guerst
+This is based on Jason's "Connect VFIO to IOMMUFD"[3] and my "Make mdev driver
+dma_unmap callback tolerant to unmaps come before device open"[4]
 
-typo, guest
+[1] https://lore.kernel.org/all/0-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com/
+[2] https://github.com/yiliu1765/iommufd/tree/wip/vfio_device_cdev
+[3] https://lore.kernel.org/kvm/063990c3-c244-1f7f-4e01-348023832066@intel.com/T/#t
+[4] https://lore.kernel.org/kvm/20221123134832.429589-1-yi.l.liu@intel.com/T/#t
 
+Regards,
+	Yi Liu
 
+Jason Gunthorpe (2):
+  vfio: Simplify vfio_create_group()
+  vfio: Move the sanity check of the group to vfio_create_group()
 
->   TD
-> +	 * doesn't make sense.  No argument check is done.
-> +	 */
-> +
-> +	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
-> +	vcpu->run->system_event.type = KVM_SYSTEM_EVENT_TDX;
-> +	vcpu->run->system_event.ndata = 3;
-> +	vcpu->run->system_event.data[0] = TDG_VP_VMCALL_REPORT_FATAL_ERROR;
-> +	vcpu->run->system_event.data[1] = tdvmcall_a0_read(vcpu);
-> +	vcpu->run->system_event.data[2] = tdvmcall_a1_read(vcpu);
-> +
-> +	return 0;
-> +}
-> +
->   static int handle_tdvmcall(struct kvm_vcpu *vcpu)
->   {
->   	if (tdvmcall_exit_type(vcpu))
-> @@ -1086,6 +1104,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
->   		return tdx_emulate_rdmsr(vcpu);
->   	case EXIT_REASON_MSR_WRITE:
->   		return tdx_emulate_wrmsr(vcpu);
-> +	case TDG_VP_VMCALL_REPORT_FATAL_ERROR:
-> +		return tdx_report_fatal_error(vcpu);
->   	default:
->   		break;
->   	}
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 49386e4de8b8..504a8f73284b 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -478,6 +478,7 @@ struct kvm_run {
->   #define KVM_SYSTEM_EVENT_WAKEUP         4
->   #define KVM_SYSTEM_EVENT_SUSPEND        5
->   #define KVM_SYSTEM_EVENT_SEV_TERM       6
-> +#define KVM_SYSTEM_EVENT_TDX            7
->   			__u32 type;
->   			__u32 ndata;
->   			union {
+Yi Liu (8):
+  vfio: Wrap group codes to be helpers for __vfio_register_dev() and
+    unregister
+  vfio: Make vfio_device_open() group agnostic
+  vfio: Move device open/close code to be helpfers
+  vfio: Swap order of vfio_device_container_register() and open_device()
+  vfio: Refactor vfio_device_first_open() and _last_close()
+  vfio: Wrap vfio group module init/clean code into helpers
+  vfio: Refactor dma APIs for emulated devices
+  vfio: Move vfio group specific code into group.c
+
+ drivers/vfio/Makefile    |   1 +
+ drivers/vfio/container.c |  20 +-
+ drivers/vfio/group.c     | 834 +++++++++++++++++++++++++++++++++++++
+ drivers/vfio/vfio.h      |  52 ++-
+ drivers/vfio/vfio_main.c | 863 +++------------------------------------
+ 5 files changed, 942 insertions(+), 828 deletions(-)
+ create mode 100644 drivers/vfio/group.c
+
+-- 
+2.34.1
+
