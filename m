@@ -2,142 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 110F3636574
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 17:10:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39609636582
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 17:13:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238918AbiKWQKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 11:10:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37458 "EHLO
+        id S239005AbiKWQNF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 11:13:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238964AbiKWQKO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 11:10:14 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90876C8CAF
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 08:10:10 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id 6so17136720pgm.6
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 08:10:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=E1eI9brWjhX1/u8k57pO+IlEktaaWD7yWOq6SlDlLa0=;
-        b=M4xCLGz/AgJ8qWpUQR3tTMs5C4GVoOOpZYfdefEfPEmWLUjGe5WxOfXqKdJuysyQL1
-         Vond/Y3UbXCheqThAZKCn/6RPlBbiTyEJmvEZK1qRBtkTM84Ko6KobXE02BNeB/BdqDn
-         HbEvoDrfv25iu2FsWah1p2yjXD8eytPxn3LYyPkAzr6o49NpPhlPc/AO77ZOJxU2rbk7
-         tB4aWbBbuTfuiYxsah1SqVaQd1LjG2oh/HYtWxx0h0vMdD2ilbIbypOYhOrft2ReMMu0
-         ou+bwxHYauqoFjKwJzHKy3lZmbXYo3gUW27NcCmhWc552GYv7+9O8/EgH1c+cYojRctc
-         WL0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E1eI9brWjhX1/u8k57pO+IlEktaaWD7yWOq6SlDlLa0=;
-        b=Y72GKk8hlAw+DbtGJZspQnjKP0UXpk6kJrghgZLufgk8tb7ZyGeuVx8r3stAIDolzG
-         WprmK/W1bj71/soOn6bp0qISpm0ZYCAxqJJlcZ5acxlCTjxLKvM3MVqyU1X1/hYwSIX3
-         KLFyPOCV+qvRg9VwnZDeLclGIO6pB2fC7phkp50NAvJgFPtfn6pvKuUoFnn02G7mdMi3
-         ZTIcg12ZF1kpWcTkQ0wOIJLNuO27UcYzhYDyME5CUCjRlMkx8KibRaj+Pqr6QFFGFXzB
-         eKmFTzTb28U6+RV3uCMldJ1hY8xUGod2N9ccauWVk8TC7gfrv8cPC0PZRqGqQWm/NWGD
-         c2xQ==
-X-Gm-Message-State: ANoB5pnz6loIlVHBRNMXUpvAuYoiVkAPQ/bu+bM+7Xt3qWbkpSmlinPI
-        +mzuP7xQWJ2R5sTc90Tx+oMDMWsblrc97g==
-X-Google-Smtp-Source: AA0mqf7NjVc0qj+jRskVmjGyQFeUcRm3cT4v1RPHALqZGXfP0n5ksiShgQ1mcFW++YWZl3WELPXf/A==
-X-Received: by 2002:a63:1f21:0:b0:46b:2bd4:f298 with SMTP id f33-20020a631f21000000b0046b2bd4f298mr10534858pgf.135.1669219809836;
-        Wed, 23 Nov 2022 08:10:09 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id t21-20020a17090ae51500b0021894e92f82sm1596297pjy.36.2022.11.23.08.10.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Nov 2022 08:10:09 -0800 (PST)
-Date:   Wed, 23 Nov 2022 16:10:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Michal Luczaj <mhal@rbox.co>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 3/3] KVM: Update gfn_to_pfn_cache khva when it moves
- within the same page
-Message-ID: <Y35F3avCeh4mfP/F@google.com>
-References: <20221123002030.92716-1-dwmw2@infradead.org>
- <20221123002030.92716-3-dwmw2@infradead.org>
- <199eac0011241e68d7c42b713652861e924c4472.camel@infradead.org>
+        with ESMTP id S238875AbiKWQND (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 11:13:03 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C2BD72113
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 08:12:59 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ANG6SvA030673
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 16:12:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : to :
+ cc : from : subject : message-id : date; s=pp1;
+ bh=7rVFMK0MBVVEqIQEsLP/peVxSi0VOsf3s0lfnSyTkBI=;
+ b=lQs/rUyAwKzOfCFXX4fsh5IH+E+AeY5KcdWAPvAzlrN1hG2KuTUgvCsOkmGyQLnZVMsF
+ hW+LleCgG4Mi2+lJ/u2rBUfeiWf1A/O/FUbQoTGV/AqmGZ7XSPUAfQBrH+g2V3jMf2po
+ z1R+8aNXHTlLdt6fSzlXEar0fZOTsalqCxdDOTUmo+DoG7cSofSgrPaCMmoOELpv9XQH
+ XUQHHUBY5v40Wm6BV9/x/zrrtF13dQEgoFeS9wBykF2BirOVKxWBVBjvvcutV4eYGkQz
+ 2qEFKkP5+qDgltannGlY1EJPTHe2y3QesEzYPx75w8oaxTvEBhc+6eGg/7EagbVtu0Tj mQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0x80yd9e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 16:12:58 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ANFnaOs002641
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 16:12:58 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0x80yd8g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Nov 2022 16:12:57 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ANG7Nr2004149;
+        Wed, 23 Nov 2022 16:12:56 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma02fra.de.ibm.com with ESMTP id 3kxps8vu7r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Nov 2022 16:12:56 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ANGCqW749742292
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Nov 2022 16:12:52 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D14DDA405B;
+        Wed, 23 Nov 2022 16:12:52 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AB162A405F;
+        Wed, 23 Nov 2022 16:12:52 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.53.251])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 23 Nov 2022 16:12:52 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <199eac0011241e68d7c42b713652861e924c4472.camel@infradead.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20221123131338.7c091974@p-imbrenda>
+References: <20221122161243.214814-1-nrb@linux.ibm.com> <20221122161243.214814-2-nrb@linux.ibm.com> <20221123131338.7c091974@p-imbrenda>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+From:   Nico Boehr <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v1 1/2] s390x: add a library for CMM-related functions
+Message-ID: <166921997196.14080.2103781613814018050@t14-nrb.local>
+User-Agent: alot/0.8.1
+Date:   Wed, 23 Nov 2022 17:12:52 +0100
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: qbWmz9PTA9VTUONsItiv8UALU0KdfisJ
+X-Proofpoint-ORIG-GUID: yBuFUMA2ottFmdUVCcSz8--RX9U1hgFL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-23_08,2022-11-23_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ malwarescore=0 mlxscore=0 mlxlogscore=999 spamscore=0 phishscore=0
+ bulkscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211230119
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 23, 2022, David Woodhouse wrote:
-> On Wed, 2022-11-23 at 00:20 +0000, David Woodhouse wrote:
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> > 
-> > In the case where a GPC is refreshed to a different location within the
-> > same page, we didn't bother to update it. Mostly we don't need to, but
-> > since the ->khva field also includes the offset within the page, that
-> > does have to be updated.
-> > 
-> > Fixes: 982ed0de4753 ("KVM: Reinstate gfn_to_pfn_cache with invalidation support")
-> 
-> Hm, wait. That commit wasn't actually broken because at that point the
-> page offset was included in the uhva too, so the uhva *did* change and
-> we'd (gratuitously) take the slower path through hva_to_pfn_retry()
-> when the GPA moved within the same page.
-> 
-> So I think this should actually be:
-> 
-> Fixes: 3ba2c95ea180 ("KVM: Do not incorporate page offset into gfn=>pfn cache user address")
+Quoting Claudio Imbrenda (2022-11-23 13:13:38)
+> > diff --git a/lib/s390x/cmm.c b/lib/s390x/cmm.c
+> > new file mode 100644
+> > index 000000000000..9609cea68950
+[...]
+> > +static inline unsigned long get_page_addr(uint8_t *pagebuf, int page_i=
+dx)
+>=20
+> I don't like the name of this function, but maybe you can just get rid
+> of it (see below)
 
-Ya.
+Didn't like repeating the cast with the address calculation every time, but=
+ your solution with the cast first is good too. Done.
 
-> Which means it's only relevant back to v6.0 stable, not all the way
-> back to v5.17.
+[...]
+> > +/*
+> > + * Verify CMM page states on pagebuf.
+> > + * Page states must have been set by cmm_set_page_states on pagebuf be=
+fore.
+> > + * page_count must be a multiple of 4.
+> > + *
+> > + * If page states match the expected result,
+> > + * will return true and result will be untouched. When a mismatch occu=
+rs, will
+> > + * return false and result will be filled with details on the first mi=
+smatch.
+> > + */
+> > +bool cmm_verify_page_states(uint8_t *pagebuf, int page_count, struct c=
+mm_verify_result *result)
+> > +{
+> > +     int i, state_mask, actual_state;
+>=20
+> I think "expected_mask" would be a better name, and maybe call the
+> other one "actual_mask"
 
-Probably a moot point in the long run since that commit was tagged for stable@
-too, in order to simplify the fixes that followed.
+Yes, makes perfect sense. Done.
 
-> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> > Reviewed-by: Paul Durrant <paul@xen.org>
-> > Cc: stable@kernel.org
-> > 
-> > ---
+> > +
+> > +     assert(page_count % 4 =3D=3D 0);
+> > +
+> > +     for (i =3D 0; i < page_count; i++) {
+> > +             actual_state =3D essa(ESSA_GET_STATE, get_page_addr(pageb=
+uf, i));
+>=20
+> addr + i * PAGE_SIZE (if we get rid of get_page_addr)
+>=20
+> > +             /* extract the usage state in bits 60 and 61 */
+> > +             actual_state =3D (actual_state >> 2) & 0x3;
+>=20
+> actual_mask =3D BIT((actual_mask >> 2) & 3);
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Yes makes sense, I will also adjust the comment a bit.
 
-> >  virt/kvm/pfncache.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-> > index bd4a46aee384..5f83321bfd2a 100644
-> > --- a/virt/kvm/pfncache.c
-> > +++ b/virt/kvm/pfncache.c
-> > @@ -297,7 +297,12 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
-> >  	if (!gpc->valid || old_uhva != gpc->uhva) {
-> >  		ret = hva_to_pfn_retry(kvm, gpc);
-> >  	} else {
-> > -		/* If the HVA→PFN mapping was already valid, don't unmap it. */
-> > +		/*
-> > +		 * If the HVA→PFN mapping was already valid, don't unmap it.
-> > +		 * But do update gpc->khva because the offset within the page
-> > +		 * may have changed.
-> > +		 */
-> > +		gpc->khva = old_khva + page_offset;
+[...]
+> > +void cmm_report_verify_fail(struct cmm_verify_result const *result)
+> > +{
+> > +     report_fail("page state mismatch: first page =3D %d, expected_mas=
+k =3D 0x%x, actual_mask =3D 0x%x", result->page_mismatch, result->expected_=
+mask, result->actual_mask);
+>=20
+> it would be a good idea to also print the actual address where the
+> mismatch was found (with %p and (pagebuf + result->page_mismatch))
 
-If/when we rework the APIs, another possible approach would be to store only the
-the page aligned address, e.g. force the user to pass in offset+len by doing
-something like:
+pagebuf is not available here, I want to avoid adding another argument, so =
+I'll add a new field for the address in cmm_verify_result.
 
+> > diff --git a/lib/s390x/cmm.h b/lib/s390x/cmm.h
+> > new file mode 100644
+> > index 000000000000..56e188c78704
+[...]
+> > +struct cmm_verify_result {
+> > +     int page_mismatch;
+> > +     int expected_mask;
+> > +     int actual_mask;
+> > +};
+>=20
+> I'm not too fond of this, I wonder if it's possible to just return the
+> struct (maybe make the masks chars, since they will be small)
 
-	r = kvm_gpc_lock(...);
-	if (r)
-		return r;
+No real reason to optimize for size, but also no reason not to, so I just c=
+hanged it.
 
-	my_struct = kvm_gpc_kmap(..., offset, len);
+> but I am not sure if the code will actually look better in the end
+
+I am not a fan of returning structs, but none of my arguments against it ap=
+ply
+here, so I changed it. Will add a field verify_failed to cmm_verify_result.=
+=20
+
+This has the nice side effect that I don't have to do=20
+  if(cmm_verify_page_states())=20
+    report_pass()
+  else
+    cmm_report_verify_fail()
+in every caller, but can just move this whole logic to a function.
