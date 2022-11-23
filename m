@@ -2,76 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC774636882
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 19:18:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 699ED636895
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 19:20:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239644AbiKWSSI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 13:18:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43782 "EHLO
+        id S239424AbiKWSTG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 13:19:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239582AbiKWSRt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 13:17:49 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CDF810FC7
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 10:16:26 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id a1-20020a17090abe0100b00218a7df7789so2822806pjs.5
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 10:16:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tPtG6fZZhKtGLftjAJCGFWjxf1W8gNx6BzHO8wa+RDY=;
-        b=n+sWxH04gAVH9IaWSdVXB27EzzqDQRv8kExFSiEKcT/FrhFpF50phN8ImDhmJjB4Uv
-         kLVYklIplhJ3RCJF7H8no9ZuJVCwTld3OhYEX4hs0wfgSNV/MP4XRBJ+9PhSC4R/6qZW
-         PFSNjcyPB37Ptq4ag1XKo7AGQfOtow9z//E56zdRBaXkhnCag1TONnxCPjoXwW2l6SPv
-         uf55CgnmFO2WsWyC7X4DUjUIZ3duz/52XwqlR1mINLUkK08KOjUZf3ruyQIZOWHPG+Qs
-         cx2jA/vp+oFdP8dzoQdaa1GoTM+IIkTy85vbEFTYIvqBa928XvNCwe1zZzTGvY16kHmb
-         0WpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tPtG6fZZhKtGLftjAJCGFWjxf1W8gNx6BzHO8wa+RDY=;
-        b=u68kinL3IpDeleEnKnW7ml2CJxG7/0VzcLjMn7DmzzonC5/6y5jez1mbrYFKePo0XM
-         U0AhZKRr5R0ezUwtZ6qp0/6ovMlzf8ksCop8XLFOrYrE06VLhlNLtRqY2vu7RETdvX8I
-         5/Is76Llqch4EN66VRgqttzCr80f1NF/wM/bxh0ST7nSyUm5+VQOVzTDdUOWPm6Q4GbN
-         xzFDCe8nFxZ8vNgGuF+/7G9JcCm+3E0coNWWJHR+vjZrYODVEMZNNd7dtwcPWi3tqsdN
-         ZTu30kIU87apdvHEOV7FoYeCu7T05KM/3N/PFc1J/It7NMClFBITmJrZYMRUnQ6pLpPP
-         +WiA==
-X-Gm-Message-State: ANoB5pltfA1mFdb8h/0/0F2euab0lEMeq5LIoISeHkFL3Ml3cpGmpjEG
-        33LDxxycKTBriZiKsl2WBuUqww+oZdo1VQ==
-X-Google-Smtp-Source: AA0mqf6Jkkz3t5x4GuMqI9rJ34J/1T1JWKCv1jVDMNDLXHs8MC687fBC20R4tLNWisJ8eXlpfFFfJA==
-X-Received: by 2002:a17:90a:cb11:b0:218:d772:ec60 with SMTP id z17-20020a17090acb1100b00218d772ec60mr6982300pjt.143.1669227385878;
-        Wed, 23 Nov 2022 10:16:25 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id p10-20020a170902780a00b0017ec1b1bf9fsm8845536pll.217.2022.11.23.10.16.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Nov 2022 10:16:25 -0800 (PST)
-Date:   Wed, 23 Nov 2022 18:16:21 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        mhal@rbox.co
-Subject: Re: [PATCH 2/4] KVM: x86/xen: Compatibility fixes for shared
- runstate area
-Message-ID: <Y35jdRxK27o96r//@google.com>
-References: <20221119094659.11868-1-dwmw2@infradead.org>
- <20221119094659.11868-2-dwmw2@infradead.org>
- <Y30XVDXmkAIlRX4N@google.com>
- <a12c8e6123cf702bc882988f9da3be7bd096a2e3.camel@infradead.org>
- <Y35VxflJBVjzloaj@google.com>
- <ff2c3f2ea7286e78bb2cfb1fdb218401e87cef1e.camel@infradead.org>
+        with ESMTP id S239637AbiKWSSs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 13:18:48 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BF1711A0F;
+        Wed, 23 Nov 2022 10:18:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669227527; x=1700763527;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=E89CZqbaoYjUKLoTevrvJoCvfEz61O1bB0tNgiHnTvA=;
+  b=ih6tOimMX0Pm8MMJOQndqTCFsJ96W3582sK4vUi3UCEWpOtxdgi775lD
+   7NFKcxByfHrOiwkngDSO6mTPdHUpJnB5JR+jleZDKzQJkUPLJDX/U0SCo
+   epTX3uXQNVPHPvm45Ur3rSXH0ypR9SIGiKP5yvN9vkfFNZNXUZfsMt+X1
+   7mqJOv91VajbGTxg32SMNwJ1+SutDKBJAI+osyeJBmCBWrq4huOBChPaW
+   rai9sfoaSuxMem2HqBbU8YTChqQDR9xImENGZEJaqLs7waopMvdvx4OF7
+   gbsm0hL48PGTJyqn3/bbqleWVg90ilbzqmGwhlJtaGQn2p697nv4sw49h
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="294519300"
+X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
+   d="scan'208";a="294519300"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 10:18:46 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="672965938"
+X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
+   d="scan'208";a="672965938"
+Received: from vcbudden-mobl3.amr.corp.intel.com (HELO [10.212.129.67]) ([10.212.129.67])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 10:18:45 -0800
+Message-ID: <2d99f823-09bb-ff51-0e71-f254cc6ad28b@intel.com>
+Date:   Wed, 23 Nov 2022 10:18:45 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ff2c3f2ea7286e78bb2cfb1fdb218401e87cef1e.camel@infradead.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v7 06/20] x86/virt/tdx: Shut down TDX module in case of
+ error
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     "Huang, Kai" <kai.huang@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+References: <48505089b645019a734d85c2c29f3c8ae2dbd6bd.1668988357.git.kai.huang@intel.com>
+ <Y3ySxEr64HkUaEDq@hirez.programming.kicks-ass.net>
+ <52b2be9b-defd-63ce-4cb2-96cd624a95a6@intel.com>
+ <Y30fUS5/JClpBHVc@hirez.programming.kicks-ass.net>
+ <b3938f3a-e4f8-675a-0c0e-4b4618019145@intel.com>
+ <da7ae78c2d9fed125f160744af5be75f34b1b1d7.camel@intel.com>
+ <791bf9a2-a079-3cd6-90a3-42dbb332a38c@intel.com>
+ <9f1ea2639839305dd8b82694b3d8c697803f43a1.camel@intel.com>
+ <Y35IW/PnbxinKHOL@google.com>
+ <168ca2b3-ffac-31c4-0b83-2d0ee75f34a5@intel.com>
+ <Y35aXX5b2Ed4vc6y@google.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <Y35aXX5b2Ed4vc6y@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,19 +92,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 23, 2022, David Woodhouse wrote:
-> On Wed, 2022-11-23 at 17:17 +0000, Sean Christopherson wrote:
-> And with or without that cache, we can *still* end up doing a partial
-> update if the page goes away. The byte with the XEN_RUNSTATE_UPDATE bit
-> might still be accessible, but bets are off about what state the rest
-> of the structure is in — and those runtimes are supposed to add up, or
-> the guest is going to get unhappy.
+On 11/23/22 09:37, Sean Christopherson wrote:
+> On Wed, Nov 23, 2022, Dave Hansen wrote:
+>> There's no way we can guarantee _that_.  For one, the PAMT* allocations
+>> can always fail.  I guess we could ask sysadmins to fire up a guest to
+>> "prime" things, but that seems a little silly.  Maybe that would work as
+>> the initial implementation that we merge, but I suspect our users will
+>> demand more determinism, maybe a boot or module parameter.
+> Oh, you mean all of TDX initialization?  I thought "initialization" here mean just
+> doing tdx_enable().
 
-Ugh.  What a terrible ABI.  
+Yes, but the first call to tdx_enable() does TDH_SYS_INIT and all the
+subsequent work to get the module going.
 
-> I'm actually OK with locking two GPCs. It wasn't my first choice, but
-> it's reasonable enough IMO given that none of the alternatives jump out
-> as being particularly attractive either.
+> Yeah, that's not going to be a viable option.  Aside from lacking determinisim,
+> it would be all too easy to end up on a system with fragmented memory that can't
+> allocate the PAMTs post-boot.
 
-I detest the two GPCs, but since KVM apparently needs to provide "all or nothing"
-updates, I don't see a better option.
+For now, the post-boot runtime PAMT allocations are the one any only way
+that TDX can be initialized.  I pushed for it to be done this way.
+Here's why:
+
+Doing tdx_enable() is relatively slow and it eats up a non-zero amount
+of physically contiguous RAM for metadata (~1/256th or ~0.4% of RAM).
+Systems that support TDX but will never run TDX guests should not pay
+that cost.
+
+That means that we either make folks opt-in at boot-time or we try to
+make a best effort at runtime to do the metadata allocations.
+
+From my perspective, the best-effort stuff is absolutely needed.  Users
+are going to forget the command-line opt in and there's no harm in
+_trying_ the big allocations even if they fail.
+
+Second, in reality, the "real" systems that can run TDX guests are
+probably not going to sit around fragmenting memory for a month before
+they run their first guest.  They're going to run one shortly after they
+boot when memory isn't fragmented and the best-effort allocation will
+work really well.
+
+Third, if anyone *REALLY* cared to make it reliable *and* wanted to sit
+around fragmenting memory for a month, they could just start a TDX guest
+and kill it to get TDX initialized.  This isn't ideal.  But, to me, it
+beats defining some new, separate ABI (or boot/module option) to do it.
+
+So, let's have those discussions.  Long-term, what *is* the most
+reliable way to get the TDX module loaded with 100% determinism?  What
+new ABI or interfaces are needed?  Also, is that 100% determinism
+required the moment this series is merged?  Or, can we work up to it?
+
+I think it can wait until this particular series is farther along.
