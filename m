@@ -2,66 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF4EB6366BB
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 18:12:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B37556366D2
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 18:18:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239293AbiKWRMR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 12:12:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34030 "EHLO
+        id S237539AbiKWRSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 12:18:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239181AbiKWRMA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 12:12:00 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2066B2653
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:11:59 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id j10-20020a17090aeb0a00b00218dfce36e5so2119810pjz.1
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:11:59 -0800 (PST)
+        with ESMTP id S239221AbiKWRSF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 12:18:05 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7B16490BD
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:18:02 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id n17so17293371pgh.9
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:18:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DXmfMcAbqneNQh2BtbA2SOdfF55FaoyuXPVThWrMQPk=;
-        b=j+Nr879GxcF8uDjTcxy+dn4iKWz5OWWQy3XOLhQrnfEq+xl71RP17kOYq0+DIPKQBv
-         0/9fJGAZxhXAr5GkcPOtUud1ftzRmmTzMfBCx0vX+g/7MiztpxiDyOBEVpL6oItu9Hgd
-         Oe+yA11XN1+GEn77sX+S8/XDnzvc3NTmgyAN/thYDEorOBi7JHprGhoRtSHxwzlRmVwx
-         toRh5rXQUT3jaWbPXmdBcgEQ0lraUv9k9a8RyHebHODyACac1OwO2/iJQGxZJ2/ODc5Q
-         IObCJ2Q5RzNfshLGAsZ1P4ULI+hg2uMhkKYR+WupzjjpKi4+CZjKJbdpRtamClXRjaTB
-         AScA==
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=wrS07cTC5K5Tj39aOQ2pHWaQp/nnwsNDHjx9FaHsOZw=;
+        b=hKlCMfoNbebyaz0GGzRhHybmF6QIFeHL8ypqHOA7H6Qu3U3+67CjMYRiCpvMZQj2iU
+         UldfcZ77FGWYA0tbPU17LtXHlHC/16+lOUJtKYU0MxXlE0+uaJlph2jtIch1d0yCCiFk
+         bJ6FTNxHvLyxmxWeMlOeI2OPXO5QepiHfZGGTzGMErdK6B7zrbaKhertNIjZ4TGfNfrl
+         623Kf+4oiQs12tLhvUhwXFygPjCOBLcGkPBESqAR4c3A9jJ+N90VmbY/YnSsnoQfO9em
+         dcWD5MsbKEQKIT1Kgy6K+CX2dGLTHmRfXdw2/Hlp2TvF1u0ujiYkyd1ky9jl+SrzAOGY
+         LAZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DXmfMcAbqneNQh2BtbA2SOdfF55FaoyuXPVThWrMQPk=;
-        b=UTjkorhEVim2uLBbpr75yKqzIMnpRnA+QvK6jVplepmLKEGfbhgcm0up3vfOl8zIH9
-         fxrwFEeS7ElKnfu6u4OHGn1Y5yUJzE/5JPFexvpxs2d9iiKyI7j22ES3STGfTENIk+nS
-         LYYjG+phkR7d5FID0o7tf8ijQnlmm3aTXjWiEiSyoKbwYciRJnfxU1/yUZKtAnyQAr2A
-         8xt18Y8xuQYHme+YURfiosP/e67Ak2KTGsXTvDctOQ0P2lxV1WL+OiO6nuyYHXPpkBrV
-         xxAuzJSZYQrINXFm4TxIUgoYvqlVga/YyhtJp0JYe7Y8KHSVXrMJnEGZpli7Auddr4Kd
-         5Sig==
-X-Gm-Message-State: ANoB5pkNNoQiP0lHQkJMZa7Dh/F5M+yOR5t+meiOUF31gBsB7sl7Inqa
-        IZ5DyRf+q5Ndm6eXBSnEy28c52D85PqJAjbimXtqog==
-X-Google-Smtp-Source: AA0mqf5FjXv5JHq3QrDuqdHG6FlinCfWMMIXQ/XsjXPJVdIf2BSIxAtgpvd8UuPeJlnhoLHUXy+x91cmFNMS0f1smlg=
-X-Received: by 2002:a17:902:cacb:b0:188:5e78:be0 with SMTP id
- y11-20020a170902cacb00b001885e780be0mr9976545pld.18.1669223518357; Wed, 23
- Nov 2022 09:11:58 -0800 (PST)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wrS07cTC5K5Tj39aOQ2pHWaQp/nnwsNDHjx9FaHsOZw=;
+        b=qbxYWR5yzbOkL+dst/lBEVXnAZO/vPrYFUdCqEvOxoq3Afx+DvWFdoQ2OJCv2Oo0JJ
+         ssIMHEAfy9PH7GcrejwqVHkqd1Bsybf/Hrax9G9msxhH6BUClXxSbSCYVeMaZcsIcvq/
+         aeNhbL/EAXnFJQ25+0k0bIne9YkvZldC2a1779L6WU7E0QbekY4MIIAs96mPIHQ6dulV
+         AkViz0yXqDhVApCARx4mONKTCeqKvpD8QQcT6tLWv1DWCYWxHUc7vJ0pTOcj9wFS7HBr
+         M8A+ii2DBxV0tUcT5qOIspVmXk2ocCjkfc/bzf2I4KjXxk1zXueclOqtHAATt6rvRXfE
+         Qk+g==
+X-Gm-Message-State: ANoB5pmrLdNtBTSrTOnzHscoApIBSnm3bh5CaQdzaG78ZfCY3ZwZd8RN
+        AHH0RTpu4hYnNbJJ5/LQdU4S7A==
+X-Google-Smtp-Source: AA0mqf5NHQuFjEK1f1dMpwRtz5Fe72kx+Dmi96MPegsu5xq9WODjpbMEGJeg5dmaj/0E09k5vBEadA==
+X-Received: by 2002:a65:4948:0:b0:46e:be03:d9b5 with SMTP id q8-20020a654948000000b0046ebe03d9b5mr8014187pgs.495.1669223882291;
+        Wed, 23 Nov 2022 09:18:02 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id i29-20020a63131d000000b00460ea630c1bsm10936999pgl.46.2022.11.23.09.18.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Nov 2022 09:18:01 -0800 (PST)
+Date:   Wed, 23 Nov 2022 17:17:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        mhal@rbox.co
+Subject: Re: [PATCH 2/4] KVM: x86/xen: Compatibility fixes for shared
+ runstate area
+Message-ID: <Y35VxflJBVjzloaj@google.com>
+References: <20221119094659.11868-1-dwmw2@infradead.org>
+ <20221119094659.11868-2-dwmw2@infradead.org>
+ <Y30XVDXmkAIlRX4N@google.com>
+ <a12c8e6123cf702bc882988f9da3be7bd096a2e3.camel@infradead.org>
 MIME-Version: 1.0
-References: <20221113163832.3154370-1-maz@kernel.org> <20221113163832.3154370-14-maz@kernel.org>
- <CAAeT=Fx=8g2-Z8nzqUit5owtoxbenXnAFA5Mu6AfgZJFN4CfVw@mail.gmail.com> <86leo2ncxl.wl-maz@kernel.org>
-In-Reply-To: <86leo2ncxl.wl-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Wed, 23 Nov 2022 09:11:41 -0800
-Message-ID: <CAAeT=Fyy6ViW+f4w-GWjQp3tdjyzhMaRd3pbkys9iS4gxsAY_Q@mail.gmail.com>
-Subject: Re: [PATCH v4 13/16] KVM: arm64: PMU: Implement PMUv3p5 long counter support
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a12c8e6123cf702bc882988f9da3be7bd096a2e3.camel@infradead.org>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,248 +77,131 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Tue, Nov 22, 2022, David Woodhouse wrote:
+> On Tue, 2022-11-22 at 18:39 +0000, Sean Christopherson wrote:
+> > On Sat, Nov 19, 2022, David Woodhouse wrote:
+> > > From: David Woodhouse <
+> > > dwmw@amazon.co.uk
+> > > >
+> > > 
+> > > The guest runstate area can be arbitrarily byte-aligned. In fact, even
+> > > when a sane 32-bit guest aligns the overall structure nicely, the 64-bit
+> > > fields in the structure end up being unaligned due to the fact that the
+> > > 32-bit ABI only aligns them to 32 bits.
+> > > 
+> > > So setting the ->state_entry_time field to something|XEN_RUNSTATE_UPDATE
+> > > is buggy, because if it's unaligned then we can't update the whole field
+> > > atomically; the low bytes might be observable before the _UPDATE bit is.
+> > > Xen actually updates the *byte* containing that top bit, on its own. KVM
+> > > should do the same.
+> > 
+> > I think we're using the wrong APIs to update the runstate.  The VMCS/VMCB pages
+> > _need_ the host pfn, i.e. need to use a gpc (eventually).  The Xen PV stuff on the
+> > other hand most definitely doesn't need to know the pfn.
+> > 
+> > The event channel code would be difficult to convert due to lack of uaccess
+> > primitives, but I don't see anything in the runstate code that prevents KVM from
+> > using a gfn_to_hva_cache.  That will naturally handle page splits by sending them
+> > down a slow path and would yield far simpler code.
+> > 
+> > If taking the slow path is an issue, then the guest really should be fixed to not
+> > split pages.  And if that's not an acceptable answer, the gfn_to_hva_cache code
+> > could be updated to use the fast path if the region is contiguous in the host
+> > virtual address space.
+> > 
+> 
+> Yeah, that's tempting. Going back to gfn_to_hva_cache was the first
+> thing I tried. There are a handful of complexifying factors, none of
+> which are insurmountable if we try hard enough.
+> 
+>  • Even if we fix the gfn_to_hva_cache to still use the fast path for
+>    more than the first page, it's still possible for the runstate to
+>    cross from one memslot to an adjacent one. We probably still need
+>    two of them, which is a large part of the ugliness of this patch.
 
-On Wed, Nov 23, 2022 at 3:11 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Wed, 23 Nov 2022 05:58:17 +0000,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Sun, Nov 13, 2022 at 8:46 AM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > PMUv3p5 (which is mandatory with ARMv8.5) comes with some extra
-> > > features:
-> > >
-> > > - All counters are 64bit
-> > >
-> > > - The overflow point is controlled by the PMCR_EL0.LP bit
-> > >
-> > > Add the required checks in the helpers that control counter
-> > > width and overflow, as well as the sysreg handling for the LP
-> > > bit. A new kvm_pmu_is_3p5() helper makes it easy to spot the
-> > > PMUv3p5 specific handling.
-> > >
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/pmu-emul.c | 8 +++++---
-> > >  arch/arm64/kvm/sys_regs.c | 4 ++++
-> > >  include/kvm/arm_pmu.h     | 7 +++++++
-> > >  3 files changed, 16 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > > index 4320c389fa7f..c37cc67ff1d7 100644
-> > > --- a/arch/arm64/kvm/pmu-emul.c
-> > > +++ b/arch/arm64/kvm/pmu-emul.c
-> > > @@ -52,13 +52,15 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
-> > >   */
-> > >  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
-> > >  {
-> > > -       return (select_idx == ARMV8_PMU_CYCLE_IDX);
-> > > +       return (select_idx == ARMV8_PMU_CYCLE_IDX || kvm_pmu_is_3p5(vcpu));
-> > >  }
-> > >
-> > >  static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
-> > >  {
-> > > -       return (select_idx == ARMV8_PMU_CYCLE_IDX &&
-> > > -               __vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
-> > > +       u64 val = __vcpu_sys_reg(vcpu, PMCR_EL0);
-> > > +
-> > > +       return (select_idx < ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LP)) ||
-> > > +              (select_idx == ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LC));
-> >
-> > Since the vCPU's PMCR_EL0 value is not always in sync with
-> > kvm->arch.dfr0_pmuver.imp, shouldn't kvm_pmu_idx_has_64bit_overflow()
-> > check kvm_pmu_is_3p5() ?
-> > (e.g. when the host supports PMUv3p5, PMCR.LP will be set by reset_pmcr()
-> > initially. Then, even if userspace sets ID_AA64DFR0_EL1.PMUVER to
-> > PMUVer_V3P1, PMCR.LP will stay the same (still set) unless PMCR is
-> > written.  So, kvm_pmu_idx_has_64bit_overflow() might return true
-> > even though the guest's PMU version is lower than PMUVer_V3P5.)
->
-> I can see two ways to address this: either we spray PMUv3p5 checks
-> every time we evaluate PMCR, or we sanitise PMCR after each userspace
-> write to ID_AA64DFR0_EL1.
->
-> I'd like to be able to take what is stored in the register file at
-> face value, so I'm angling towards the second possibility. It also
+Hrm.  What if KVM requires that the runstate be contiguous in host virtual address
+space?  That wouldn't violate Xen's ABI since it's a KVM restriction, and it can't
+break backwards compatibility since KVM doesn't even handle page splits, let alone
+memslot splits.  AFAIK, most (all?) userspace VMMs make guest RAM virtually
+contiguous anyways.
 
-I thought about that too.  What makes it a bit tricky is that
-given that kvm->arch.dfr0_pmuver.imp is shared among all vCPUs
-for the guest, updating the PMCR should be done for all the vCPUs.
+Probably a moot point since I don't see a way around the "page got swapped out"
+issue.
 
-> +static void update_dfr0_pmuver(struct kvm_vcpu *vcpu, u8 pmuver)
-> +{
-> +       if (vcpu->kvm->arch.dfr0_pmuver.imp != pmuver) {
-> +               vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
-> +               __reset_pmcr(vcpu, __vcpu_sys_reg(vcpu, PMCR_EL0));
-> +       }
-> +}
+>  • Accessing it via the userspace HVA requires coping with the case
+>    where the vCPU is being scheduled out, and it can't sleep. The
+>    previous code before commit 34d41d19e dealt with that by using 
+>    pagefault_disable() and depending on the GHC fast path. But even
+>    so...
+> 
+>  • We also could end up having to touch page B, page A then page B
+>    again, potentially having to abort and leave the runstate with
+>    the XEN_RUNSTATE_UPDATE bit still set. I do kind of prefer the
+>    version which checks that both pages are present before it starts
+>    writing anything to the guest.
 
-Or if userspace is expected to set ID_AA64DFR0_EL1 (PMUVER) for
-each vCPU, update_dfr0_pmuver() should update PMCR even when
-'kvm->arch.dfr0_pmuver.imp' is the same as the given 'pmuver'.
-(as PMCR for the vCPU might have not been updated yet)
+Ugh, and because of the in-atomic case, there's nothing KVM can do to remedy page B
+getting swapped out.  Actually, it doesn't even require a B=>A=>B pattern.  Even
+without a page split, the backing page could get swapped out between setting and
+clearing.
 
-> makes some sense from a 'HW' perspective: you change the HW
-> dynamically by selecting a new version, the HW comes up with its reset
-> configuration (i.e don't expect PMCR to stick after you write to
-> DFR0 with a different PMUVer).
+> As I said, they're not insurmountable but that's why I ended up with
+> the patch you see, after first attempting to use a gfn_to_hva_cache
+> again. Happy to entertain suggestions.
 
-Yes, it makes some sense.
-But, with that, for live migration, PMCR should be restored only
-after ID_AA64DFR0_EL1/ID_DFR0_EL1 is restored (to avoid PMCR
-being reset after PMCR is restored), which I would think might
-affect live migration.
-(Or am I misunderstanding something ?)
+What if we use a gfn_to_pfn_cache for the page containing XEN_RUNSTATE_UPDATE,
+and then use kvm_vcpu_write_guest_atomic() if there's a page split?  That would
+avoid needing to acquire mutliple gpc locks, and the update could use a single
+code flow by always constructing an on-stack representation.  E.g. very roughly:
 
-Thank you,
-Reiji
+	*update_bit = (vx->runstate_entry_time | XEN_RUNSTATE_UPDATE) >> 56;
+	smp_wmb();
 
+	if (khva)
+		memcpy(khva, rs_state, user_len);
+	else
+		kvm_vcpu_write_guest_in_atomic(vcpu, gpa, rs_state, user_len);
+	smp_wmb();
 
->
-> >
-> >
-> > >  }
-> > >
-> > >  static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
-> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > index dc201a0557c0..615cb148e22a 100644
-> > > --- a/arch/arm64/kvm/sys_regs.c
-> > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > @@ -654,6 +654,8 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> > >                | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
-> > >         if (!kvm_supports_32bit_el0())
-> > >                 val |= ARMV8_PMU_PMCR_LC;
-> > > +       if (!kvm_pmu_is_3p5(vcpu))
-> > > +               val &= ~ARMV8_PMU_PMCR_LP;
-> > >         __vcpu_sys_reg(vcpu, r->reg) = val;
-> > >  }
-> > >
-> > > @@ -703,6 +705,8 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> > >                 val |= p->regval & ARMV8_PMU_PMCR_MASK;
-> > >                 if (!kvm_supports_32bit_el0())
-> > >                         val |= ARMV8_PMU_PMCR_LC;
-> > > +               if (!kvm_pmu_is_3p5(vcpu))
-> > > +                       val &= ~ARMV8_PMU_PMCR_LP;
-> > >                 __vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-> > >                 kvm_pmu_handle_pmcr(vcpu, val);
-> > >                 kvm_vcpu_pmu_restore_guest(vcpu);
-> >
-> > For the read case of access_pmcr() (the code below),
-> > since PMCR.LP is RES0 when FEAT_PMUv3p5 is not implemented,
-> > shouldn't it clear PMCR.LP if kvm_pmu_is_3p5(vcpu) is false ?
-> > (Similar issue to kvm_pmu_idx_has_64bit_overflow())
-> >
-> >         } else {
-> >                 /* PMCR.P & PMCR.C are RAZ */
-> >                 val = __vcpu_sys_reg(vcpu, PMCR_EL0)
-> >                       & ~(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C);
-> >                 p->regval = val;
-> >         }
->
-> I think the above would address it. I've tentatively queued the
-> following patch, please let me know if this looks OK to you.
->
-> Thanks,
->
->         M.
->
-> From d90ec0e8768ce5f7ae11403b29db76260dfaa3f2 Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Wed, 23 Nov 2022 11:03:07 +0000
-> Subject: [PATCH] KVM: arm64: PMU: Reset PMCR_EL0 on PMU version change
->
-> Changing the version of the PMU emulation may result in stale
-> bits still being present in the PMCR_EL0 register, leading to
-> unexpected results.
->
-> Address it by forcing PMCR_EL0 to its reset value when the value
-> of ID_AA64DFR0.PMUVer (or ID_DFR0.Perfmon) changes.
->
-> Reported-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 32 ++++++++++++++++++++++----------
->  1 file changed, 22 insertions(+), 10 deletions(-)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 67eac0f747be..12a873d94aaf 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -637,15 +637,10 @@ static void reset_pmselr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->         __vcpu_sys_reg(vcpu, r->reg) &= ARMV8_PMU_COUNTER_MASK;
->  }
->
-> -static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> +static void __reset_pmcr(struct kvm_vcpu *vcpu, u64 pmcr)
->  {
-> -       u64 pmcr, val;
-> -
-> -       /* No PMU available, PMCR_EL0 may UNDEF... */
-> -       if (!kvm_arm_support_pmu_v3())
-> -               return;
-> +       u64 val;
->
-> -       pmcr = read_sysreg(pmcr_el0);
->         /*
->          * Writable bits of PMCR_EL0 (ARMV8_PMU_PMCR_MASK) are reset to UNKNOWN
->          * except PMCR.E resetting to zero.
-> @@ -656,7 +651,16 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->                 val |= ARMV8_PMU_PMCR_LC;
->         if (!kvm_pmu_is_3p5(vcpu))
->                 val &= ~ARMV8_PMU_PMCR_LP;
-> -       __vcpu_sys_reg(vcpu, r->reg) = val;
-> +       __vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-> +}
-> +
-> +static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> +{
-> +       /* No PMU available, PMCR_EL0 may UNDEF... */
-> +       if (!kvm_arm_support_pmu_v3())
-> +               return;
-> +
-> +       __reset_pmcr(vcpu, read_sysreg(pmcr_el0));
->  }
->
->  static bool check_pmu_access_disabled(struct kvm_vcpu *vcpu, u64 flags)
-> @@ -1259,6 +1263,14 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->         return 0;
->  }
->
-> +static void update_dfr0_pmuver(struct kvm_vcpu *vcpu, u8 pmuver)
-> +{
-> +       if (vcpu->kvm->arch.dfr0_pmuver.imp != pmuver) {
-> +               vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
-> +               __reset_pmcr(vcpu, __vcpu_sys_reg(vcpu, PMCR_EL0));
-> +       }
-> +}
-> +
->  static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->                                const struct sys_reg_desc *rd,
->                                u64 val)
-> @@ -1291,7 +1303,7 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->                 return -EINVAL;
->
->         if (valid_pmu)
-> -               vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
-> +               update_dfr0_pmuver(vcpu, pmuver);
->         else
->                 vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
->
-> @@ -1331,7 +1343,7 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
->                 return -EINVAL;
->
->         if (valid_pmu)
-> -               vcpu->kvm->arch.dfr0_pmuver.imp = perfmon_to_pmuver(perfmon);
-> +               update_dfr0_pmuver(vcpu, perfmon_to_pmuver(perfmon));
->         else
->                 vcpu->kvm->arch.dfr0_pmuver.unimp = perfmon_to_pmuver(perfmon);
->
-> --
-> 2.34.1
->
->
-> --
-> Without deviation from the norm, progress is not possible.
+	*update_bit = vx->runstate_entry_time >> 56;
+	smp_wmb();
+
+where "khva" is NULL if there's a page split.
+
+> I note we have a kvm_read_guest_atomic() and briefly pondered adding a
+> 'write' version of same... but that doesn't seem to cope with crossing
+> memslots either; it also assumes its caller only uses it to access
+> within a single page.
+
+We should fix the lack of page split handling.  There are no bugs because KVM
+only uses the helper for cases where the accesses are naturally aligned, but that's
+bound to bite someone eventually.  That would be an oppurtunity to dedup the code
+that handles "segments" (ugh), e.g. instead of
+
+	gfn_t gfn = gpa >> PAGE_SHIFT;
+	int seg;
+	int offset = offset_in_page(gpa);
+	int ret;
+
+	while ((seg = next_segment(len, offset)) != 0) {
+		ret = kvm_vcpu_read_guest_page(vcpu, gfn, data, offset, seg);
+		if (ret < 0)
+			return ret;
+		offset = 0;
+		len -= seg;
+		data += seg;
+		++gfn;
+	}
+	return 0;
+
+provide a macro that allows
+
+	kvm_for_each_chunk(...)
+		ret = kvm_vcpu_read_guest_page(vcpu, gfn, data, offset, seg);
+		if (ret)
+			return ret;
+	}
+	
+I also think we should rename the "atomic" helpers to be "in_atomic" (or inatomic
+if we want to follow the kernel's terrible nomenclature, which I always read as
+"not atomic").  I always think read_guest_atomic() means an "atomic read".
