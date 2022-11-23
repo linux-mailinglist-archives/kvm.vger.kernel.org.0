@@ -2,127 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D6B96352F7
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 09:42:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C950635317
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 09:47:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236650AbiKWImM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 03:42:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46240 "EHLO
+        id S236675AbiKWIrS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 03:47:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235904AbiKWImL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 03:42:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D6C5FDD91
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 00:41:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669192874;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HHQQmYIEEBZ9VkfBzqKM+BIdC+GLpfqg7qXfPAGQGqc=;
-        b=Mdez4BCKqTNu6nwu9ZUnueDjP4TrNPYhid1uq+ZnvwGeKuz85PiJ+8d0jpx2vuboWOIQyU
-        e6QMPxdFbe0JIOw4XOJy6mR07DvVgTPHCw/iuFl4acbyH1VeiS5u+J6kgI0LRghwBL+yWJ
-        JfNjNcyCYF2ShBMS5bsHAO8rqkmGldc=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-81-QEMmRI0cNLSfW6ug3f4y0g-1; Wed, 23 Nov 2022 03:41:10 -0500
-X-MC-Unique: QEMmRI0cNLSfW6ug3f4y0g-1
-Received: by mail-qk1-f198.google.com with SMTP id bk30-20020a05620a1a1e00b006fb2378c857so21747908qkb.18
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 00:41:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HHQQmYIEEBZ9VkfBzqKM+BIdC+GLpfqg7qXfPAGQGqc=;
-        b=wXitcztMxN60tZ2iU6lageIfMvWazLcKnbj/fAkVbjEEkEW+XMN5rpRbHKM1Uyf7Rn
-         RF11XRO8hQj++93Iy3dINYyd/ykcY5HDdnFFtg9AGPmUJiMJ19HYLxzymUiX3hGzmgdZ
-         yqqe9G1VjxJXKaZ9nBzFRt2UtNegbFoVX6t7yv7Z4lQ2AUea1KNxfFx9zpMMQvUcTxvM
-         kJ0Mr+waRg+ZRPK/hEsZJty4U0qBn1wSaUQjhtXGil56YkdYtTPN8YrLRuCC+8sG1QvP
-         FumO63rvbhCRuAXFxyifkG2av/LgRduRJBXt6ANPzEQewTFPe08dQa5SIFKXPB52EDs4
-         GEnQ==
-X-Gm-Message-State: ANoB5pkYfJQao2U/Rnjr+M4UDN8u3fFInxjCJOLXQ1RTksYmeUWUT1A2
-        hdUFHvziutFSIWLvQ3m2AlreUOdA0QHPH6ATfzjkGz5rnvLyEVY3ssSMggEio1dFRB51oGUR0l3
-        wYq7afZuDTXa5
-X-Received: by 2002:ac8:1182:0:b0:35a:7084:23b8 with SMTP id d2-20020ac81182000000b0035a708423b8mr25333616qtj.135.1669192870481;
-        Wed, 23 Nov 2022 00:41:10 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5Y0qBYKMl1SoRA3ubAQywr0BMQO7sZ5iQggmcJKCTt7PBjQ1vVRH6b2wzwuZzrWtChYBQhDQ==
-X-Received: by 2002:ac8:1182:0:b0:35a:7084:23b8 with SMTP id d2-20020ac81182000000b0035a708423b8mr25333605qtj.135.1669192870258;
-        Wed, 23 Nov 2022 00:41:10 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id o16-20020a05620a2a1000b006fab68c7e87sm12102348qkp.70.2022.11.23.00.41.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Nov 2022 00:41:08 -0800 (PST)
-Message-ID: <762b7c68-5ae3-b27e-1018-b930de61b99e@redhat.com>
-Date:   Wed, 23 Nov 2022 09:41:06 +0100
+        with ESMTP id S236378AbiKWIrR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 03:47:17 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88AE832BA3;
+        Wed, 23 Nov 2022 00:47:16 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AN73YMN029626;
+        Wed, 23 Nov 2022 08:47:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=lvAu0qQITZS7YGSI88/im/srfSVK9ZZRRA1sDeDUD9E=;
+ b=bAvXinH0a0xnFZuJeLbw4pMg8e6v++sH+8dCj9ah8LeFyBLoIiNZNmzYSRmILxQcq0QL
+ 24sb8LWdLGF1P3IvZl74hnhDjrYhK0DHVEIvljnQe1CzRyRJYbnH3d1H3xAiq6EZNvTY
+ h84RNXSRKebLX0bDSX7+DHTnHo1G1qWBMIPklKe5e5NAC+/Ksg/RNdI3dIKR8RAiC9s0
+ SZUdrLnnXm/AhTF3vmGeZmM9jhRUvVhBxh6m/5sJdoqI+mz0d7FhnXiviKk1unhhlDLH
+ L+R9UVCKB3QoY1oYEzDPscm1E40NwiFjSRW4oud8sf4KZ6EDuUDRbLWMQGcl6nehm7/n 2A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m100sqmyk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Nov 2022 08:47:15 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AN8k3EC021148;
+        Wed, 23 Nov 2022 08:47:15 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m100sqmxu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Nov 2022 08:47:14 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AN8ZM8Z021561;
+        Wed, 23 Nov 2022 08:47:13 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 3kxps8uxbh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Nov 2022 08:47:13 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AN8l9a965143102
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Nov 2022 08:47:09 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B97EE11C04A;
+        Wed, 23 Nov 2022 08:47:09 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EC0C011C054;
+        Wed, 23 Nov 2022 08:47:08 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 23 Nov 2022 08:47:08 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, seiden@linux.ibm.com,
+        nrb@linux.ibm.com
+Subject: [kvm-unit-tests PATCH 0/5] s390x: Snippet fixes
+Date:   Wed, 23 Nov 2022 08:46:51 +0000
+Message-Id: <20221123084656.19864-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH] vfio/platform: Remove the ACPI buffer memory to fix
- memory leak
-Content-Language: en-US
-To:     Hanjun Guo <guohanjun@huawei.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sinan Kaya <okaya@codeaurora.org>
-References: <1669116598-25761-1-git-send-email-guohanjun@huawei.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <1669116598-25761-1-git-send-email-guohanjun@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: U7eWxK6QtOYIgrCbMeWmfiVGrqx4_VZT
+X-Proofpoint-ORIG-GUID: D0uZQ0pw4I04yMVMMiAS3fDXj1gZ4ZJe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-23_04,2022-11-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ mlxlogscore=803 adultscore=0 lowpriorityscore=0 priorityscore=1501
+ impostorscore=0 spamscore=0 clxscore=1015 bulkscore=0 malwarescore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211230064
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+A small set of fixes mostly related to the snippet support and error
+management.
 
-On 11/22/22 12:29, Hanjun Guo wrote:
-> The ACPI buffer memory (buffer.pointer) returned by acpi_evaluate_object()
-> is not used after the call of _RST method, so it leads to memory leak.
->
-> For the calling of ACPI _RST method, we don't need to pass a buffer
-> for acpi_evaluate_object(), we can just pass NULL and remove the ACPI
-> buffer memory in vfio_platform_acpi_call_reset(), then we don't need to
-> free the memory and no memory leak.
->
-> Fixes: d30daa33ec1d ("vfio: platform: call _RST method when using ACPI")
-> Signed-off-by: Hanjun Guo <guohanjun@huawei.com>
-> ---
->  drivers/vfio/platform/vfio_platform_common.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-> index 55dc4f4..1a0a238 100644
-> --- a/drivers/vfio/platform/vfio_platform_common.c
-> +++ b/drivers/vfio/platform/vfio_platform_common.c
-> @@ -72,12 +72,11 @@ static int vfio_platform_acpi_call_reset(struct vfio_platform_device *vdev,
->  				  const char **extra_dbg)
->  {
->  #ifdef CONFIG_ACPI
-> -	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
->  	struct device *dev = vdev->device;
->  	acpi_handle handle = ACPI_HANDLE(dev);
->  	acpi_status acpi_ret;
->  
-> -	acpi_ret = acpi_evaluate_object(handle, "_RST", NULL, &buffer);
-> +	acpi_ret = acpi_evaluate_object(handle, "_RST", NULL, NULL);
->  	if (ACPI_FAILURE(acpi_ret)) {
->  		if (extra_dbg)
->  			*extra_dbg = acpi_format_exception(acpi_ret);
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Janosch Frank (5):
+  s390x: Add a linker script to assembly snippets
+  s390x: snippets: Fix SET_PSW_NEW_ADDR macro
+  lib: s390x: sie: Set guest memory pointer
+  s390x: Clear first stack frame and end backtrace early
+  lib: s390x: Handle debug prints for SIE exceptions correctly
 
-Thank you for the fix!
+ lib/s390x/interrupt.c       | 46 +++++++++++++++++++++++++++++++++----
+ lib/s390x/sie.c             |  1 +
+ lib/s390x/sie.h             |  2 ++
+ lib/s390x/snippet.h         |  3 +--
+ lib/s390x/stack.c           |  2 ++
+ s390x/Makefile              |  5 ++--
+ s390x/cpu.S                 |  6 +++--
+ s390x/cstart64.S            |  2 ++
+ s390x/mvpg-sie.c            |  2 +-
+ s390x/pv-diags.c            |  6 ++---
+ s390x/snippets/asm/flat.lds | 43 ++++++++++++++++++++++++++++++++++
+ s390x/snippets/asm/macros.S |  2 +-
+ 12 files changed, 104 insertions(+), 16 deletions(-)
+ create mode 100644 s390x/snippets/asm/flat.lds
 
-Eric
+-- 
+2.34.1
 
