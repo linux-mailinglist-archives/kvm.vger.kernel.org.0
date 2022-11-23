@@ -2,65 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 740C3634DD4
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 03:27:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D58BD634DFE
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 03:43:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235553AbiKWC1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 21:27:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42744 "EHLO
+        id S235593AbiKWCnm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 21:43:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235548AbiKWC07 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 21:26:59 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 158B3DAD14;
-        Tue, 22 Nov 2022 18:26:58 -0800 (PST)
+        with ESMTP id S233239AbiKWCnk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 21:43:40 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF55778D78
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 18:43:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669170418; x=1700706418;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=8nd3ujAlM1sOL0NbL4+FOKaQgAUWEqXW1PRj4z6f9WA=;
-  b=nYyUa7j5yD5U9SxqoIHFdzGYn3CtN6Wofm2S4VuEd9PpYjNcFAccHhCv
-   fQN6+V/nyR+Dzqv3iu9s151KPL5juraScTT9J51c1Klq+Eh4pnq/KzxYR
-   CyQ8n2kPhgdVIVLKVaqPlXIcA39MMh+5JJSXYn5FfZsmVKs0iNk9o4943
-   d0wBBjD+DmzQgnY/IFKtLvxf4kDKlyaOu7h3G4SEVu6BzwDaueuM/vTLT
-   lopaaOoZPyYxZJN8HOw83pfokG0ytU68LvwvRlr/wzkpT9pofLq978A3H
-   fX0UIer2V6RjqjvQbiGC5mtiNDGUrp0kLZ2WOrwTtfZsDXc1JYLs+sNdO
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="311591323"
+  t=1669171418; x=1700707418;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ueZdbb9YmUMpme4ZPOPDxOI6sTMdLxdkcOi+pzNTlWk=;
+  b=SRR/zOsiSXXDY3kPdRVBvNLL738ZzC/hQ+lb+Jk0Vc4iBzSxjHEOPRLe
+   /dsDq06L/eUdpBp57SY97XV59DD6bxSh64Ru3geglDTTBgeWHq0w2JUDO
+   LGr4T6T7S9IU+6mnW4Sd3FJruUK6rKZj2LHSPru8Q5KhKg9tGJ5gHnzNQ
+   t50VBYtOYozKOj1Wg/WYAUwy3mT7blaSgOhfRYEGHnAbpJeC7+UAavvZQ
+   fA9+WftiXSfKvdAlHFYbzl8IY+9urJAf/5hybZ6SCS7FqCfC4Nn8/rf7O
+   e8qe/6b+oI9fB09bk1jG6aZ/LYwLTiyOtfYi4yDuDC2L8Q/6QcV7Opa8f
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="293673159"
 X-IronPort-AV: E=Sophos;i="5.96,186,1665471600"; 
-   d="scan'208";a="311591323"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 18:26:57 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="766548419"
+   d="scan'208";a="293673159"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 18:43:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="970697512"
 X-IronPort-AV: E=Sophos;i="5.96,186,1665471600"; 
-   d="scan'208";a="766548419"
-Received: from leiwang7-mobl.ccr.corp.intel.com (HELO [10.238.5.72]) ([10.238.5.72])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 18:26:45 -0800
-Message-ID: <e6fdcfeb-bd78-6906-f2b2-94c765be7902@intel.com>
-Date:   Wed, 23 Nov 2022 10:26:42 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.4.1
-Subject: Re: [PATCH v2 036/144] KVM: selftest: Add proper helpers for
- x86-specific save/restore ioctls
+   d="scan'208";a="970697512"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga005.fm.intel.com with ESMTP; 22 Nov 2022 18:43:38 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.13; Tue, 22 Nov 2022 18:43:37 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Tue, 22 Nov 2022 18:43:37 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.108)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Tue, 22 Nov 2022 18:43:37 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iBPehlm2BBx8XRJIT0Bl73wCZg7QLlzFl+Wm2Hz4hWD+K76QmAP9HEoyjCMYC3QEIjQeZKYgnB3BHp6BwwbYD3eLyDEkNXsOL1nG4RsY18ZziOFFEUXw0FEviDli4srPf2mivITzQXQ59P4JzbIYjr58GUokftjioyD5FKduNr5fJqat6mHJhAGq13emTiEMqkNj9IlEVpMuCbnfeDjt/QJGjR6CYEEmkaFdUzMF1OHOh+LemjrfAWYweroapoDwKFBgKnAFbW14CYwm/VkCO28dctRWSJES2pssP5Py4J8ct16nTurn8Dsmqf6vA8qnz6tv8Fz2xRolbbyu4PFg3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/YUofw3RiTxIxYcwDD1d/61UPbp2aCitWJCZMMpU58g=;
+ b=eq6VmU32nP5/Gcz+/XJXat88Qc30gfNAuuG6ZZUv/N4aS0Xj3QR/+vKhI+Pfp9P8Ddlv3yJaofOzrE6Ov58Q8N7zDgvNQysQ1wBBXQ+rbk+nr6ixIx4SScIyZWd85VXOoqYwwnohfKk/g1cKA1HgAOUCzSUrG1yuR7yA2tC/DhpGbJEg2JdAZDFwsIk9YgG+O7T03M3eSmcJn7my/EACICdGbF2fGo9Va/aHpHt6yx9Stq6rcnHGNAf0KjQ+jQ5uMO2wP32dYgX1HKApZb6iEGAwNu+7qlajRK1UIla7pTetWJx+KuGP6vwDR/hDOYMpE3LWZpoU1mujABh/AbX5xg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by CO1PR11MB4881.namprd11.prod.outlook.com (2603:10b6:303:91::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.15; Wed, 23 Nov
+ 2022 02:43:35 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::61c3:c221:e785:ce13]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::61c3:c221:e785:ce13%6]) with mapi id 15.20.5834.015; Wed, 23 Nov 2022
+ 02:43:34 +0000
+Message-ID: <b35d92c9-c10e-11c0-6cb2-df66f117c13f@intel.com>
+Date:   Wed, 23 Nov 2022 10:44:12 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.11.0
+Subject: Re: [PATCH v3 00/11] Connect VFIO to IOMMUFD
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org
-References: <20220603004331.1523888-1-seanjc@google.com>
- <20220603004331.1523888-37-seanjc@google.com>
-From:   "Wang, Lei" <lei4.wang@intel.com>
-In-Reply-To: <20220603004331.1523888-37-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
+        Lixiao Yang <lixiao.yang@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Nicolin Chen <nicolinc@nvidia.com>, Yu He <yu.he@intel.com>
+References: <0-v3-50561e12d92b+313-vfio_iommufd_jgg@nvidia.com>
+From:   Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <0-v3-50561e12d92b+313-vfio_iommufd_jgg@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-ClientProxiedBy: SGBP274CA0009.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::21)
+ To DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|CO1PR11MB4881:EE_
+X-MS-Office365-Filtering-Correlation-Id: d4daa25b-c0dc-4b4b-e86c-08daccfc83f9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JWFJPx4sK3E1kt1bC5i9zeZge1tduAET+7Ext2L379CvOm/d8J9Qp5PmOsL+sTE2hRYRNjElpX4237O+Pnpar3JJy3s+0vtVxLLTKn0MzrFzJqBNyF7Rad3P+7GW+gVZZUB6vLSI/zj2JhWwgUlN8ytrl4uBqnc9r9RkmIhqH2mvRsrAQv8gFUoVNIGMJQS4xlDf9Cb+/lv20jFQFT7prG/Gn9eRFEN8J6QAGQU27VPAQMVdP1jsuH1r6R2gdaeV5pWD167J1wQZAggPmMNsGMibLA2XQlHn53zCWt4bg3ZDgY19aP6bsAlpNnEepvoEO2Yy7itftvXZ4UubM3csi7qsQJsc5FlBCyj6g+nZ+s3eIkKN8XnenOhukZbby25KD2fOcyxNasRmTr9XUfsTGeJvcNGCIhXGGftEKwwF4XcCnr7WkplIUEwsZ4YI4+Nmo+gE1PRLqFt+RgV344atut5+oS3AvnY6EMqKWm1S6i5H8Qj3CQfFecWV5obWkmf7rM41YVuv3qWysOrAJuiGcV9mCi8JMyQ/twazZu6J+pkcraTO4OIZPtzKtD17LZmfFMr0rKRiHKkNU9omFcqAedGJtcfeYNCb+tCRMr6UtoUzTLsvaS07+MEmYtM0I1ft2rT6IWo7jRSBB3tw7Gin7kg0nQG2BNXDlCI4WeBBzq3MAOBaMKvkA6u7LJnQ1IaH6z8YCUYHQdFL7QwlnJi+0157Omp4mi7gkuPBUI4JBi6Aqkyex1mTD4DWwFYKHWCfOpxTlNA/v4yvWHyxjFLvN650frDRyaEoVZGoTgrtGBg=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(136003)(366004)(39860400002)(396003)(346002)(451199015)(36756003)(31686004)(31696002)(86362001)(5660300002)(186003)(38100700002)(2906002)(2616005)(6512007)(82960400001)(83380400001)(53546011)(26005)(54906003)(6486002)(66556008)(6916009)(966005)(66476007)(6506007)(4326008)(41300700001)(478600001)(8936002)(6666004)(8676002)(66946007)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?czg2ZUdRUFNFRUZoTDRsTm5LRCtWM2ExL00xVTFQUW9HN1R6RC96VFVmT2wv?=
+ =?utf-8?B?RUxvVGZqNTNZTlV1UzUyTUVPRHFMb0hJUC9JT0l0TGFwMjNWdk03S2FiRWlS?=
+ =?utf-8?B?UzhXa20rbHpXZlhYOFgwRnlaWm5hTlJsS2lFYlR0TVE4dUJtRlQ3Y2w3NjNR?=
+ =?utf-8?B?M1dqL3ZmSXVyTjVLWHlkcmY1U1p5TFNhRTdwZElLZDZFVWRrM3Q0bXdYZm9Y?=
+ =?utf-8?B?SmxuNnVMSWVYQUdhc0ZqT3k2QjQ3S3FwNUZDZWNBRFNVdGJYeXF5TGU5TnB0?=
+ =?utf-8?B?WDd1azQ1MCtkakduMFpIdnZUTnlEWEFFS2hFVW14bUJwYnkybzJ3T1BISS9B?=
+ =?utf-8?B?dkQ1eDB0U2dlSSs1VUczMURGQ3BIYnA2cFV0dzc2WUE5eUJHOFUyV1VKeUxr?=
+ =?utf-8?B?MGJOTk5KaWswT3A5TlN6aHNOdUsxeHV3aHI5aWgvcjM3bCt5UldscUhXRmpE?=
+ =?utf-8?B?ZDZ4SXQ4Nk5jYXJUVndwSkl3T0pJV3pEaWhqL2cxeENIVlMyai9xWTdIaEhs?=
+ =?utf-8?B?NXEzbzBBajlzeVBRLy9BUWUxWUhCekpFT3FXcmlieUZZczZEdG1pTlQrMVVi?=
+ =?utf-8?B?OU1pVmZnLysvRndQbWF6cHRIL2xsSERlUlpRY21oUmIxeWFtcEluYk1wUzli?=
+ =?utf-8?B?SW50eXo2QjlUOU1ITG80enZGS0wvM2lVbzYxR1RwTGEySkxOZzFzVnNPanFs?=
+ =?utf-8?B?QkNyNTlhNjRab2VTV3lPNTBoWEVHUWIrcTlVNGhvalU5N2hWWW9pN0pBdmwx?=
+ =?utf-8?B?K0t0YXFxOXhTeEkwNjNaMUJrWWZYOUJuYXRZM0R2c3hIMzJlVmhiZlBjcnRi?=
+ =?utf-8?B?OW9KODQ5emVleHgyTGhEdmliSFduS3czR2hmbCtIdTZwdzBORFJheDEvbHlS?=
+ =?utf-8?B?SlI1dnlzSUtyRWRtS3RqaXh5b2UybjJmOGNJbGNMYmFVMlRZSG5EYncxQ2pi?=
+ =?utf-8?B?Znp6TndJTzZqVXVMenJPbVA2RU12b2JjUWlkUUFueGF3eU9wZEJYR25CNytD?=
+ =?utf-8?B?TTgxVWZiZk5ORVdHRkw1QnZCbEdZcnZmdkZMNUZVd3Q4ZUFzWHBaUXlMdXVD?=
+ =?utf-8?B?UXBwN05LWWx5YjUyMUZsL3ZQWmNpWWovTFd5aHdiS25YSmZxOGNBSFhTUU1D?=
+ =?utf-8?B?R3E4RHZEc0VpRTZsWWVrZHNYekwwNU1iUEFHOURaRkVXcWx1bjZqR01UN2JS?=
+ =?utf-8?B?RUlVQUxISWNYSDFJUm4yV0hJaDZNNncvSk4zalpzK0UvdC9VeHd2QVdLZnRq?=
+ =?utf-8?B?YjY0YWNTdnFtTGlPbkNWUmtoRERVT2R5KzVFTW03cElnVHN1SlJRc2xkUlV6?=
+ =?utf-8?B?UWhMOHRyODcydFR6czJOdmxJK1czb1lNamtDWFp3enNzcCtNeVI4eUJEZERD?=
+ =?utf-8?B?dzM4ODlNZ0FkRXlXdjl2ZzhseFh2NUV6N0w0SVI0c2wvUlgvR1RRUVhrSk9W?=
+ =?utf-8?B?QWRJZG90SXczNlE3TEFQRkRsOWEwaG5NUDhLY3lTUW1tNEdydi9WSWl0cWpi?=
+ =?utf-8?B?em1KNExIeENUWTJUemkraWJRRTNkUkhBNGl5VzdQVnlRckszWGR3bkt6d2RY?=
+ =?utf-8?B?UGg0Y1Q0bUlJL2Y2cFRlYndocTlwcXF6Rzd0elo2UjR5aStrOHFFSnhoR3NH?=
+ =?utf-8?B?bnc0YkczV1FIeGJVV3hQYVZPZmdlV3lab1FjTmxIakdwcTFwaDM5c1YvZlAr?=
+ =?utf-8?B?QlFVcnFGaU9QUUdlWFVDQ0NWMG5zUGJtY3VZcDJBRGlpeDNGOWJvQ2dUcENr?=
+ =?utf-8?B?UVViWmQ5ZU5BUnV2bFZxbXdTZkJtSjkrdlU4aXJjakd4cmFDQ3FJNXZPZERZ?=
+ =?utf-8?B?aU45bDNvOVFDU3BMbW51RUY2SlVvdGJVSG13K3ZOSmlMZ1NLdGs1a1BHaVdW?=
+ =?utf-8?B?VnJ3c1E3cEk1ZUhkUCt4S1JnaFpYenE2ZmlxOVI1U0R3ZUhPUTFlTHRpSkdW?=
+ =?utf-8?B?dmt5bklTRXQxaWNHTjVDNXlXWTJWVzB2aEJnSjFBazM5ZVRaazJaUG93aHNI?=
+ =?utf-8?B?VUdvTmhpUjY0MTRxZ3d1MWd5MHVzYzBWdHFtdFhTSWdKN01NR1RuRVh1L0E5?=
+ =?utf-8?B?MFp3amsxdnQ0anRlNFdQQkVZdGdKRndwV2hFenhQTk9RallzWHFveHBLR2JG?=
+ =?utf-8?Q?BuqB2jjeTp0oEXriOnjUr2MwV?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4daa25b-c0dc-4b4b-e86c-08daccfc83f9
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Nov 2022 02:43:34.7500
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vKUgtrks3MyZh6YMTx13qKBtOMdsZiBlx+bKqtetO2gFK2Pg5O+dH7pjQvSnA7MtFgSm4WA5fECd9Xjs0MyfVg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4881
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,270 +160,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Jason,
 
-On 6/3/2022 8:41 AM, Sean Christopherson wrote:
-> Add helpers for the various one-off helpers used by x86's vCPU state
-> save/restore helpers, and convert the other open coded ioctl()s to use
-> existing helpers.
+On 2022/11/17 05:05, Jason Gunthorpe wrote:
+> This series provides an alternative container layer for VFIO implemented
+> using iommufd. This is optional, if CONFIG_IOMMUFD is not set then it will
+> not be compiled in.
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  .../selftests/kvm/include/x86_64/processor.h  |  54 ++++++++
->  .../selftests/kvm/lib/x86_64/processor.c      | 126 +++++-------------
->  2 files changed, 91 insertions(+), 89 deletions(-)
+> At this point iommufd can be injected by passing in a iommfd FD to
+> VFIO_GROUP_SET_CONTAINER which will use the VFIO compat layer in iommufd
+> to obtain the compat IOAS and then connect up all the VFIO drivers as
+> appropriate.
 > 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index e4268432cfe8..1d46d60bb480 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -432,6 +432,60 @@ const struct kvm_msr_list *kvm_get_feature_msr_index_list(void);
->  bool kvm_msr_is_in_save_restore_list(uint32_t msr_index);
->  uint64_t kvm_get_feature_msr(uint64_t msr_index);
->  
-> +static inline void vcpu_msrs_get(struct kvm_vm *vm, uint32_t vcpuid,
-> +				 struct kvm_msrs *msrs)
-> +{
-> +	int r = __vcpu_ioctl(vm, vcpuid, KVM_GET_MSRS, msrs);
-> +
-> +	TEST_ASSERT(r == msrs->nmsrs,
-> +		    "KVM_GET_MSRS failed, r: %i (failed on MSR %x)",
-> +		    r, r < 0 || r >= msrs->nmsrs ? -1 : msrs->entries[r].index);
-> +}
-> +static inline void vcpu_msrs_set(struct kvm_vm *vm, uint32_t vcpuid,
-> +				 struct kvm_msrs *msrs)
-> +{
-> +	int r = __vcpu_ioctl(vm, vcpuid, KVM_SET_MSRS, msrs);
-> +
-> +	TEST_ASSERT(r == msrs->nmsrs,
-> +		    "KVM_GET_MSRS failed, r: %i (failed on MSR %x)",
+> This is temporary stopping point, a following series will provide a way to
+> directly open a VFIO device FD and directly connect it to IOMMUFD using
+> native ioctls that can expose the IOMMUFD features like hwpt, future
+> vPASID and dynamic attachment.
+> 
+> This series, in compat mode, has passed all the qemu tests we have
+> available, including the test suites for the Intel GVT mdev. Aside from
+> the temporary limitation with P2P memory this is belived to be fully
+> compatible with VFIO.
+> 
+> This is on github: https://github.com/jgunthorpe/linux/commits/vfio_iommufd
+> 
+> It requires the iommufd series:
+> 
+> https://lore.kernel.org/r/0-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com
 
-Hi, Sean, this should be the "KVM_SET_MSRS failed", right?
+gvtg test encountered broken display with below commit in your for-next
+branch.
 
-> +		    r, r < 0 || r >= msrs->nmsrs ? -1 : msrs->entries[r].index);
-> +}
-> +static inline void vcpu_debugregs_get(struct kvm_vm *vm, uint32_t vcpuid,
-> +				      struct kvm_debugregs *debugregs)
-> +{
-> +	vcpu_ioctl(vm, vcpuid, KVM_GET_DEBUGREGS, debugregs);
-> +}
-> +static inline void vcpu_debugregs_set(struct kvm_vm *vm, uint32_t vcpuid,
-> +				      struct kvm_debugregs *debugregs)
-> +{
-> +	vcpu_ioctl(vm, vcpuid, KVM_SET_DEBUGREGS, debugregs);
-> +}
-> +static inline void vcpu_xsave_get(struct kvm_vm *vm, uint32_t vcpuid,
-> +				  struct kvm_xsave *xsave)
-> +{
-> +	vcpu_ioctl(vm, vcpuid, KVM_GET_XSAVE, xsave);
-> +}
-> +static inline void vcpu_xsave2_get(struct kvm_vm *vm, uint32_t vcpuid,
-> +				   struct kvm_xsave *xsave)
-> +{
-> +	vcpu_ioctl(vm, vcpuid, KVM_GET_XSAVE2, xsave);
-> +}
-> +static inline void vcpu_xsave_set(struct kvm_vm *vm, uint32_t vcpuid,
-> +				  struct kvm_xsave *xsave)
-> +{
-> +	vcpu_ioctl(vm, vcpuid, KVM_SET_XSAVE, xsave);
-> +}
-> +static inline void vcpu_xcrs_get(struct kvm_vm *vm, uint32_t vcpuid,
-> +				 struct kvm_xcrs *xcrs)
-> +{
-> +	vcpu_ioctl(vm, vcpuid, KVM_GET_XCRS, xcrs);
-> +}
-> +static inline void vcpu_xcrs_set(struct kvm_vm *vm, uint32_t vcpuid,
-> +				 struct kvm_xcrs *xcrs)
-> +{
-> +	vcpu_ioctl(vm, vcpuid, KVM_SET_XCRS, xcrs);
-> +}
-> +
->  struct kvm_cpuid2 *kvm_get_supported_cpuid(void);
->  struct kvm_cpuid2 *vcpu_get_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
->  
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 9268537f9bd7..5c92e96300c5 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -815,13 +815,11 @@ uint64_t vcpu_get_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index)
->  		struct kvm_msrs header;
->  		struct kvm_msr_entry entry;
->  	} buffer = {};
-> -	int r;
->  
->  	buffer.header.nmsrs = 1;
->  	buffer.entry.index = msr_index;
->  
-> -	r = __vcpu_ioctl(vm, vcpuid, KVM_GET_MSRS, &buffer.header);
-> -	TEST_ASSERT(r == 1, KVM_IOCTL_ERROR(KVM_GET_MSRS, r));
-> +	vcpu_msrs_get(vm, vcpuid, &buffer.header);
->  
->  	return buffer.entry.data;
->  }
-> @@ -958,28 +956,26 @@ bool kvm_msr_is_in_save_restore_list(uint32_t msr_index)
->  	return false;
->  }
->  
-> -static int vcpu_save_xsave_state(struct kvm_vm *vm, struct vcpu *vcpu,
-> -				 struct kvm_x86_state *state)
-> +static void vcpu_save_xsave_state(struct kvm_vm *vm, uint32_t vcpuid,
-> +				  struct kvm_x86_state *state)
->  {
-> -	int size;
-> +	int size = vm_check_cap(vm, KVM_CAP_XSAVE2);
->  
-> -	size = vm_check_cap(vm, KVM_CAP_XSAVE2);
-> -	if (!size)
-> -		size = sizeof(struct kvm_xsave);
-> -
-> -	state->xsave = malloc(size);
-> -	if (size == sizeof(struct kvm_xsave))
-> -		return ioctl(vcpu->fd, KVM_GET_XSAVE, state->xsave);
-> -	else
-> -		return ioctl(vcpu->fd, KVM_GET_XSAVE2, state->xsave);
-> +	if (size) {
-> +		state->xsave = malloc(size);
-> +		vcpu_xsave2_get(vm, vcpuid, state->xsave);
-> +	} else {
-> +		state->xsave = malloc(sizeof(struct kvm_xsave));
-> +		vcpu_xsave_get(vm, vcpuid, state->xsave);
-> +	}
->  }
->  
->  struct kvm_x86_state *vcpu_save_state(struct kvm_vm *vm, uint32_t vcpuid)
->  {
->  	const struct kvm_msr_list *msr_list = kvm_get_msr_index_list();
-> -	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
->  	struct kvm_x86_state *state;
-> -	int r, i;
-> +	int i;
-> +
->  	static int nested_size = -1;
->  
->  	if (nested_size == -1) {
-> @@ -998,102 +994,54 @@ struct kvm_x86_state *vcpu_save_state(struct kvm_vm *vm, uint32_t vcpuid)
->  	vcpu_run_complete_io(vm, vcpuid);
->  
->  	state = malloc(sizeof(*state) + msr_list->nmsrs * sizeof(state->msrs.entries[0]));
-> -	r = ioctl(vcpu->fd, KVM_GET_VCPU_EVENTS, &state->events);
-> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_VCPU_EVENTS, r: %i",
-> -		    r);
->  
-> -	r = ioctl(vcpu->fd, KVM_GET_MP_STATE, &state->mp_state);
-> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_MP_STATE, r: %i",
-> -		    r);
-> +	vcpu_events_get(vm, vcpuid, &state->events);
-> +	vcpu_mp_state_get(vm, vcpuid, &state->mp_state);
-> +	vcpu_regs_get(vm, vcpuid, &state->regs);
-> +	vcpu_save_xsave_state(vm, vcpuid, state);
->  
-> -	r = ioctl(vcpu->fd, KVM_GET_REGS, &state->regs);
-> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_REGS, r: %i",
-> -		    r);
-> +	if (kvm_check_cap(KVM_CAP_XCRS))
-> +		vcpu_xcrs_get(vm, vcpuid, &state->xcrs);
->  
-> -	r = vcpu_save_xsave_state(vm, vcpu, state);
-> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_XSAVE, r: %i",
-> -		    r);
-> -
-> -	if (kvm_check_cap(KVM_CAP_XCRS)) {
-> -		r = ioctl(vcpu->fd, KVM_GET_XCRS, &state->xcrs);
-> -		TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_XCRS, r: %i",
-> -			    r);
-> -	}
-> -
-> -	r = ioctl(vcpu->fd, KVM_GET_SREGS, &state->sregs);
-> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_SREGS, r: %i",
-> -		    r);
-> +	vcpu_sregs_get(vm, vcpuid, &state->sregs);
->  
->  	if (nested_size) {
->  		state->nested.size = sizeof(state->nested_);
-> -		r = ioctl(vcpu->fd, KVM_GET_NESTED_STATE, &state->nested);
-> -		TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_NESTED_STATE, r: %i",
-> -			    r);
-> +
-> +		vcpu_nested_state_get(vm, vcpuid, &state->nested);
->  		TEST_ASSERT(state->nested.size <= nested_size,
->  			    "Nested state size too big, %i (KVM_CHECK_CAP gave %i)",
->  			    state->nested.size, nested_size);
-> -	} else
-> +	} else {
->  		state->nested.size = 0;
-> +	}
->  
->  	state->msrs.nmsrs = msr_list->nmsrs;
->  	for (i = 0; i < msr_list->nmsrs; i++)
->  		state->msrs.entries[i].index = msr_list->indices[i];
-> -	r = ioctl(vcpu->fd, KVM_GET_MSRS, &state->msrs);
-> -	TEST_ASSERT(r == msr_list->nmsrs, "Unexpected result from KVM_GET_MSRS, r: %i (failed MSR was 0x%x)",
-> -		    r, r == msr_list->nmsrs ? -1 : msr_list->indices[r]);
-> +	vcpu_msrs_get(vm, vcpuid, &state->msrs);
->  
-> -	r = ioctl(vcpu->fd, KVM_GET_DEBUGREGS, &state->debugregs);
-> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_DEBUGREGS, r: %i",
-> -		    r);
-> +	vcpu_debugregs_get(vm, vcpuid, &state->debugregs);
->  
->  	return state;
->  }
->  
->  void vcpu_load_state(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_x86_state *state)
->  {
-> -	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
-> -	int r;
-> +	vcpu_sregs_set(vm, vcpuid, &state->sregs);
-> +	vcpu_msrs_set(vm, vcpuid, &state->msrs);
->  
-> -	r = ioctl(vcpu->fd, KVM_SET_SREGS, &state->sregs);
-> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_SREGS, r: %i",
-> -		    r);
-> +	if (kvm_check_cap(KVM_CAP_XCRS))
-> +		vcpu_xcrs_set(vm, vcpuid, &state->xcrs);
->  
-> -	r = ioctl(vcpu->fd, KVM_SET_MSRS, &state->msrs);
-> -	TEST_ASSERT(r == state->msrs.nmsrs,
-> -		"Unexpected result from KVM_SET_MSRS, r: %i (failed at %x)",
-> -		r, r == state->msrs.nmsrs ? -1 : state->msrs.entries[r].index);
-> +	vcpu_xsave_set(vm, vcpuid,  state->xsave);
-> +	vcpu_events_set(vm, vcpuid, &state->events);
-> +	vcpu_mp_state_set(vm, vcpuid, &state->mp_state);
-> +	vcpu_debugregs_set(vm, vcpuid, &state->debugregs);
-> +	vcpu_regs_set(vm, vcpuid, &state->regs);
->  
-> -	if (kvm_check_cap(KVM_CAP_XCRS)) {
-> -		r = ioctl(vcpu->fd, KVM_SET_XCRS, &state->xcrs);
-> -		TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_XCRS, r: %i",
-> -			    r);
-> -	}
-> -
-> -	r = ioctl(vcpu->fd, KVM_SET_XSAVE, state->xsave);
-> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_XSAVE, r: %i",
-> -		    r);
-> -
-> -	r = ioctl(vcpu->fd, KVM_SET_VCPU_EVENTS, &state->events);
-> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_VCPU_EVENTS, r: %i",
-> -		    r);
-> -
-> -	r = ioctl(vcpu->fd, KVM_SET_MP_STATE, &state->mp_state);
-> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_MP_STATE, r: %i",
-> -		    r);
-> -
-> -	r = ioctl(vcpu->fd, KVM_SET_DEBUGREGS, &state->debugregs);
-> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_DEBUGREGS, r: %i",
-> -		    r);
-> -
-> -	r = ioctl(vcpu->fd, KVM_SET_REGS, &state->regs);
-> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_REGS, r: %i",
-> -		    r);
-> -
-> -	if (state->nested.size) {
-> -		r = ioctl(vcpu->fd, KVM_SET_NESTED_STATE, &state->nested);
-> -		TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_NESTED_STATE, r: %i",
-> -			    r);
-> -	}
-> +	if (state->nested.size)
-> +		vcpu_nested_state_set(vm, vcpuid, &state->nested);
->  }
->  
->  void kvm_x86_state_cleanup(struct kvm_x86_state *state)
+https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/commit/?h=for-next&id=57f62422b6f0477afaddd2fc77a4bb9b94275f42
+
+I noticed there are diffs in drivers/vfio/ and drivers/iommu/iommufd/
+between this commit and the last tested commit (37c9e6e44d77a). Seems
+to have regression due to the diffs.
+
+> v3:
+>   - Fix iommufd_attached to be only used in the vfio_iommufd_physical_*
+>     funcs
+>   - Always check for iommufd before invoking a iommufd function
+>   - Fix mismatch between vfio_pin_pages and iommufd_access when the IOVA
+>     is not aligned. Resolves problems on S390
+> v2: https://lore.kernel.org/r/0-v2-65016290f146+33e-vfio_iommufd_jgg@nvidia.com
+>   - Rebase to v6.1-rc3, v4 iommufd series
+>   - Fixup comments and commit messages from list remarks
+>   - Fix leaking of the iommufd for mdevs
+>   - New patch to fix vfio modaliases when vfio container is disabled
+>   - Add a dmesg once when the iommufd provided /dev/vfio/vfio is opened
+>     to signal that iommufd is providing this
+> v1: https://lore.kernel.org/r/0-v1-4991695894d8+211-vfio_iommufd_jgg@nvidia.com
+> 
+> Jason Gunthorpe (11):
+>    vfio: Move vfio_device driver open/close code to a function
+>    vfio: Move vfio_device_assign_container() into
+>      vfio_device_first_open()
+>    vfio: Rename vfio_device_assign/unassign_container()
+>    vfio: Move storage of allow_unsafe_interrupts to vfio_main.c
+>    vfio: Use IOMMU_CAP_ENFORCE_CACHE_COHERENCY for
+>      vfio_file_enforced_coherent()
+>    vfio-iommufd: Allow iommufd to be used in place of a container fd
+>    vfio-iommufd: Support iommufd for physical VFIO devices
+>    vfio-iommufd: Support iommufd for emulated VFIO devices
+>    vfio: Move container related MODULE_ALIAS statements into container.c
+>    vfio: Make vfio_container optionally compiled
+>    iommufd: Allow iommufd to supply /dev/vfio/vfio
+> 
+>   drivers/gpu/drm/i915/gvt/kvmgt.c              |   3 +
+>   drivers/iommu/iommufd/Kconfig                 |  12 +
+>   drivers/iommu/iommufd/main.c                  |  36 ++
+>   drivers/s390/cio/vfio_ccw_ops.c               |   3 +
+>   drivers/s390/crypto/vfio_ap_ops.c             |   3 +
+>   drivers/vfio/Kconfig                          |  36 +-
+>   drivers/vfio/Makefile                         |   5 +-
+>   drivers/vfio/container.c                      | 141 ++-----
+>   drivers/vfio/fsl-mc/vfio_fsl_mc.c             |   3 +
+>   drivers/vfio/iommufd.c                        | 161 ++++++++
+>   .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |   6 +
+>   drivers/vfio/pci/mlx5/main.c                  |   3 +
+>   drivers/vfio/pci/vfio_pci.c                   |   3 +
+>   drivers/vfio/platform/vfio_amba.c             |   3 +
+>   drivers/vfio/platform/vfio_platform.c         |   3 +
+>   drivers/vfio/vfio.h                           | 100 ++++-
+>   drivers/vfio/vfio_iommu_type1.c               |   5 +-
+>   drivers/vfio/vfio_main.c                      | 348 ++++++++++++++----
+>   include/linux/vfio.h                          |  39 ++
+>   19 files changed, 714 insertions(+), 199 deletions(-)
+>   create mode 100644 drivers/vfio/iommufd.c
+> 
+> 
+> base-commit: 9d367dc905dd278614aaf601afb28e511b82fb3b
+
+-- 
+Regards,
+Yi Liu
