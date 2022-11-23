@@ -2,87 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D8E36365BA
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 17:26:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 389A46365E7
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 17:34:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238344AbiKWQ03 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 11:26:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51106 "EHLO
+        id S238191AbiKWQed (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 11:34:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236495AbiKWQ0Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 11:26:25 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24EDD8FB0D
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 08:26:24 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id w4so8314192plp.1
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 08:26:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=weyg/EsKhyy4CBiAAMLILYT5ImKwyjrbSu91tLtYZGk=;
-        b=ZIJDN0/RCy4xGDYXdthL66Dy9XyzdXzsHB7zbQaiwzyDrljgv/uaiI4EiwDZSc5uX0
-         ql8XHIPm3enKzNlvf/UGDt3XCIaZFTmm36Vh5AlOsxKfr+viFVDUbZc3LU9jhdvcdv2S
-         RkWstd2BmsYe4pTy12Vw3VyGKlkLaS5ywCG4FvQ6JyeJv2GkwuSUS9l2rhZa+rw6xVaM
-         o8mqDb/tcg0T0YfoROaTDJaGo/sDUXx5pBUEskv4+ANvOLtGseoj/vC9+52UVXaKuPXH
-         NeI0ys96xZz+obSgd5zDnhmt1RqgRx5Fjnd3mQpcACFRoBDzgpeJ9JOAgCwY+sUIDkbb
-         RmAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=weyg/EsKhyy4CBiAAMLILYT5ImKwyjrbSu91tLtYZGk=;
-        b=RTqdbEuZ7EYvrorenIqp+hj56/X1O7z3tFEXxVjak6uyTdE9lzfcAk0tIBW3SgdLyV
-         B7Q3p8bnVnSLFHjZz1AsbodEjmZeT5zNpdnk3xI6fDRd6Kaw8OIbf/VWYmSipK4rHGU9
-         v8S+ck8tyTn6UHaXmsT1x5OHXAT6nFNzH6GugCG47eC8q23bhWLUQ/QXCF+uczMCXh69
-         VodEtJqPDlfg/MaHJNUEagB/tTZLjE1zZoJi6bG98sJQEcsbk9PY7krbXSyUbunWC0OZ
-         x+WqBklqqWEGFoA/zCL9jAaiQyLbr0tVqGmIHjmjVE8yh2Ta3b5hF9Nl8pjIv5rD2xyx
-         bdOQ==
-X-Gm-Message-State: ANoB5pmzMLcy3D8HX1TPc2SmONcib1Ke4MEo2lTwzYkzFjk3w5TLaE0n
-        7QaOt5iTF3zBYCL+aQHyekRjKZlQB4tq6Q==
-X-Google-Smtp-Source: AA0mqf5rWYnouBMjh9anhTPkkA+4m52PkLk68/3APCKrN+ZA8E3mcjEk1jmCHwh4unPLj92M6OnlpA==
-X-Received: by 2002:a17:903:1106:b0:189:528b:7a14 with SMTP id n6-20020a170903110600b00189528b7a14mr1444621plh.62.1669220783542;
-        Wed, 23 Nov 2022 08:26:23 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x7-20020a170902820700b00186b3c3e2dasm14432484pln.155.2022.11.23.08.26.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Nov 2022 08:26:22 -0800 (PST)
-Date:   Wed, 23 Nov 2022 16:26:19 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Michal Luczaj <mhal@rbox.co>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 2/3] KVM: x86/xen: Only do in-kernel acceleration of
- hypercalls for guest CPL0
-Message-ID: <Y35Jq5lYROhGM8MZ@google.com>
-References: <20221123002030.92716-1-dwmw2@infradead.org>
- <20221123002030.92716-2-dwmw2@infradead.org>
+        with ESMTP id S235641AbiKWQe3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 11:34:29 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A7CF23BD7
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 08:34:25 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ANGEcQs007378
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 16:34:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=1nFydNPxAUxuoi8nXW9HQxvXCVdeEEwsWNrpw8v5lXE=;
+ b=aeQ86lyzZrHODaOYuQh3L9onCbRm8mrGPZJ+nhJXy4yrYALjLXaTNiGfe5rMV0IaJpVv
+ 8kL15YM7oSxVj0vOqPPlJQFpZJZDHXtrSeYwY/+FZygIthjMcZiSSV9ka2myNOI7egFX
+ E27+stcdDaAKIdxWo9ytK07FfXpFNXwBr79g5/lyq4CU+5PE1l1UUIUd/ku1gxVBiR56
+ 2BVavLWVby/VaNqxXcWzxVkLV3B2Pt783lzPqdwz9WL7kOUSqbVRqMHUXj2RILPVpQXu
+ x4IZRjIJqB2BxAxmsZdj6GKYQgU1ByOzkjzj3Fvdzdn+z2yQfxo8uSH5yu2JOKmfCuSD Lg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m1n2vksc6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 16:34:24 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ANGRvM0018186
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 16:34:24 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m1n2vksb1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Nov 2022 16:34:23 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ANGKh3Z013422;
+        Wed, 23 Nov 2022 16:34:21 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma05fra.de.ibm.com with ESMTP id 3kxps8mv4j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Nov 2022 16:34:21 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ANGYxoc6357314
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Nov 2022 16:34:59 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A241AE04D;
+        Wed, 23 Nov 2022 16:34:18 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CFC71AE045;
+        Wed, 23 Nov 2022 16:34:17 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 23 Nov 2022 16:34:17 +0000 (GMT)
+Date:   Wed, 23 Nov 2022 17:34:15 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/2] s390x: add a library for
+ CMM-related functions
+Message-ID: <20221123173415.4454641e@p-imbrenda>
+In-Reply-To: <166921997196.14080.2103781613814018050@t14-nrb.local>
+References: <20221122161243.214814-1-nrb@linux.ibm.com>
+        <20221122161243.214814-2-nrb@linux.ibm.com>
+        <20221123131338.7c091974@p-imbrenda>
+        <166921997196.14080.2103781613814018050@t14-nrb.local>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221123002030.92716-2-dwmw2@infradead.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: BFWCLy5xSgZmMjBQ0aBFiq_Hx4I6mqVI
+X-Proofpoint-GUID: GPK7Vpq8ua36Ql5XuVkO0AvF19ZqsfoT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-23_09,2022-11-23_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ adultscore=0 suspectscore=0 spamscore=0 mlxscore=0 bulkscore=0
+ phishscore=0 malwarescore=0 mlxlogscore=999 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211230119
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 23, 2022, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> There are almost no hypercalls which are valid from CPL > 0, and definitely
-> none which are handled by the kernel.
-> 
-> Fixes: 2fd6df2f2b47 ("KVM: x86/xen: intercept EVTCHNOP_send from guests")
-> Reported-by: Michal Luczaj <mhal@rbox.co>
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> Cc: stable@kernel.org
-> ---
+On Wed, 23 Nov 2022 17:12:52 +0100
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+> Quoting Claudio Imbrenda (2022-11-23 13:13:38)
+> > > diff --git a/lib/s390x/cmm.c b/lib/s390x/cmm.c
+> > > new file mode 100644
+> > > index 000000000000..9609cea68950  
+> [...]
+> > > +static inline unsigned long get_page_addr(uint8_t *pagebuf, int page_idx)  
+> > 
+> > I don't like the name of this function, but maybe you can just get rid
+> > of it (see below)  
+> 
+> Didn't like repeating the cast with the address calculation every time, but your solution with the cast first is good too. Done.
+> 
+> [...]
+> > > +/*
+> > > + * Verify CMM page states on pagebuf.
+> > > + * Page states must have been set by cmm_set_page_states on pagebuf before.
+> > > + * page_count must be a multiple of 4.
+> > > + *
+> > > + * If page states match the expected result,
+> > > + * will return true and result will be untouched. When a mismatch occurs, will
+> > > + * return false and result will be filled with details on the first mismatch.
+> > > + */
+> > > +bool cmm_verify_page_states(uint8_t *pagebuf, int page_count, struct cmm_verify_result *result)
+> > > +{
+> > > +     int i, state_mask, actual_state;  
+> > 
+> > I think "expected_mask" would be a better name, and maybe call the
+> > other one "actual_mask"  
+> 
+> Yes, makes perfect sense. Done.
+> 
+> > > +
+> > > +     assert(page_count % 4 == 0);
+> > > +
+> > > +     for (i = 0; i < page_count; i++) {
+> > > +             actual_state = essa(ESSA_GET_STATE, get_page_addr(pagebuf, i));  
+> > 
+> > addr + i * PAGE_SIZE (if we get rid of get_page_addr)
+> >   
+> > > +             /* extract the usage state in bits 60 and 61 */
+> > > +             actual_state = (actual_state >> 2) & 0x3;  
+> > 
+> > actual_mask = BIT((actual_mask >> 2) & 3);  
+> 
+> Yes makes sense, I will also adjust the comment a bit.
+> 
+> [...]
+> > > +void cmm_report_verify_fail(struct cmm_verify_result const *result)
+> > > +{
+> > > +     report_fail("page state mismatch: first page = %d, expected_mask = 0x%x, actual_mask = 0x%x", result->page_mismatch, result->expected_mask, result->actual_mask);  
+> > 
+> > it would be a good idea to also print the actual address where the
+> > mismatch was found (with %p and (pagebuf + result->page_mismatch))  
+> 
+> pagebuf is not available here, I want to avoid adding another argument, so I'll add a new field for the address in cmm_verify_result.
+> 
+> > > diff --git a/lib/s390x/cmm.h b/lib/s390x/cmm.h
+> > > new file mode 100644
+> > > index 000000000000..56e188c78704  
+> [...]
+> > > +struct cmm_verify_result {
+> > > +     int page_mismatch;
+> > > +     int expected_mask;
+> > > +     int actual_mask;
+> > > +};  
+> > 
+> > I'm not too fond of this, I wonder if it's possible to just return the
+> > struct (maybe make the masks chars, since they will be small)  
+> 
+> No real reason to optimize for size, but also no reason not to, so I just changed it.
+> 
+> > but I am not sure if the code will actually look better in the end  
+> 
+> I am not a fan of returning structs, but none of my arguments against it apply
+> here, so I changed it. Will add a field verify_failed to cmm_verify_result. 
+
+I'm not sure I follow, but I guess I'll see it in v2
+
+just make sure the code is not uglier, otherwise it's pointless :)
+
+> 
+> This has the nice side effect that I don't have to do 
+>   if(cmm_verify_page_states()) 
+>     report_pass()
+>   else
+>     cmm_report_verify_fail()
+> in every caller, but can just move this whole logic to a function.
+
