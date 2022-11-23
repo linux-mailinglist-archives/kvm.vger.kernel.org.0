@@ -2,205 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCA3B634F61
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 06:11:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EB497634FE4
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 06:58:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235724AbiKWFKx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 00:10:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44878 "EHLO
+        id S235765AbiKWF6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 00:58:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235720AbiKWFKl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 00:10:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DADCEC0B7
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 21:09:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669180180;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mZgnPlNWNq3l/Qs/HWfUXLGHWqkY+nW1pHVMoxofEqg=;
-        b=iKtEy7VJiI/1HdzuVowPKAMO2emlJOqjCABjUMrK675wgASVbQvBcKZtomDfq1vzZx7F3T
-        lsUQzbhrkiVMq8E5HQb8ZKoQRUYFWDq0Z7A33IhioYKvToM59oZGiY3Dqbgc2N3/aLUlpt
-        kTKoTMV9V/3v9kfD5A42zL6wJTGr9o8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-255-Hsj-VEcjNFmFj9zR4UvhZQ-1; Wed, 23 Nov 2022 00:09:35 -0500
-X-MC-Unique: Hsj-VEcjNFmFj9zR4UvhZQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 71040101A528;
-        Wed, 23 Nov 2022 05:09:34 +0000 (UTC)
-Received: from [10.64.54.62] (vpn2-54-62.bne.redhat.com [10.64.54.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CCEE1C15E76;
-        Wed, 23 Nov 2022 05:09:29 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v2 1/2] KVM: selftests: Have perf_test_util signal when to
- stop vCPUs
-To:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        Sean Christopherson <seanjc@google.com>,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20221118211503.4049023-1-oliver.upton@linux.dev>
- <20221118211503.4049023-2-oliver.upton@linux.dev>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <f45ef739-fe22-1f02-a3c0-fcc3eef2db6d@redhat.com>
-Date:   Wed, 23 Nov 2022 13:09:27 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S235611AbiKWF6h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 00:58:37 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ADC0D2372
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 21:58:35 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id b29so16401302pfp.13
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 21:58:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=1CLrxGHIryllbmQSGlgVdnSjWrEt46BNto6MWNDpJ/w=;
+        b=QJP/DeqNLgu5BsGuGj3lQQO7TWZSEyZBCLjCsZ0Qh3Bh+h2X2TzepaUPMiA1uEhsS8
+         j8LnTgqxk9UWCub2wf3ch4lRUyNyI53tLZFh9wdYw1nfKn8RFFpGj2ZTq3pvVMskPV0L
+         jAMsNd1lj1JzH0IAtTPJ/ZBwVQHf/7mFBP9mszx13lOa/KuWdi7ymtILHlPnZMwZ+wgN
+         8IAA6jRUNjSznBFXhDZJ8i/v95sgrfufd+2zSTk0O6kGOTvJPwp8Q0Lx/lrvQRaJifhR
+         UE/jsEtrcKKRpLqXXeYkOVVdxZVtD2zu1B51d/Xon/dzDl9f1oXLoGNhdT35DAXeKAOJ
+         3plQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1CLrxGHIryllbmQSGlgVdnSjWrEt46BNto6MWNDpJ/w=;
+        b=KtI7vOe800WVMoe6tbC4b1Uh9KoILUYf5qgkzlcNkovE53tGp/wxT0e2RRZqRPfGL/
+         os+u38W7aD+NAFW1+BhdzuOAFl4C/ijSG1j/F9mbiLnsvM+QnHfa/1VygnpfBrQ1/GRh
+         dECYk7cqVMPI3XuNYIovVns0jAVvkixniz6BSe6+3qIDo2WmxXxrn2EUWyKOoVoWVO8c
+         s9wZNCpKcs8XLE5OI6mFpG2qbEXhKL+oH6ak7Urdqi2FA0AGEVKO0ediWyaNwlBZUXiU
+         sQNYWhR08Ithpq4pzBfXePc2988d7xHW5zZPavx03z0TVN8RlDcjOdo5mxsUwzk5sd3J
+         x5cg==
+X-Gm-Message-State: ANoB5pmjspCR+NFOIL7OLK8PkulSshwX4wNnsucPRMuIfMxVy5BBNs7R
+        dFTG5OIl4Zo0ZXyivtNTChXo0vmwC083PtI7e9DZjA==
+X-Google-Smtp-Source: AA0mqf5rcwSn/rDasVmz9NwN4rEesvQhcO7YEY2dJI9TMGCtzF5J3JarHfmU6aKvPVk6NYeUD56jm9Wf3vRxgbqxFw0=
+X-Received: by 2002:a05:6a00:27ab:b0:56c:71a4:efe with SMTP id
+ bd43-20020a056a0027ab00b0056c71a40efemr11831681pfb.84.1669183114564; Tue, 22
+ Nov 2022 21:58:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20221118211503.4049023-2-oliver.upton@linux.dev>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20221113163832.3154370-1-maz@kernel.org> <20221113163832.3154370-14-maz@kernel.org>
+In-Reply-To: <20221113163832.3154370-14-maz@kernel.org>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Tue, 22 Nov 2022 21:58:17 -0800
+Message-ID: <CAAeT=Fx=8g2-Z8nzqUit5owtoxbenXnAFA5Mu6AfgZJFN4CfVw@mail.gmail.com>
+Subject: Re: [PATCH v4 13/16] KVM: arm64: PMU: Implement PMUv3p5 long counter support
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/19/22 5:15 AM, Oliver Upton wrote:
-> Signal that a test run is complete through perf_test_args instead of
-> having tests open code a similar solution. Ensure that the field resets
-> to false at the beginning of a test run as the structure is reused
-> between test runs, eliminating a couple of bugs:
-> 
-> access_tracking_perf_test hangs indefinitely on a subsequent test run,
-> as 'done' remains true. The bug doesn't amount to much right now, as x86
-> supports a single guest mode. However, this is a precondition of
-> enabling the test for other architectures with >1 guest mode, like
-> arm64.
-> 
-> memslot_modification_stress_test has the exact opposite problem, where
-> subsequent test runs complete immediately as 'run_vcpus' remains false.
-> 
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> [oliver: added commit message, preserve spin_wait_for_next_iteration()]
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Hi Marc,
+
+On Sun, Nov 13, 2022 at 8:46 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> PMUv3p5 (which is mandatory with ARMv8.5) comes with some extra
+> features:
+>
+> - All counters are 64bit
+>
+> - The overflow point is controlled by the PMCR_EL0.LP bit
+>
+> Add the required checks in the helpers that control counter
+> width and overflow, as well as the sysreg handling for the LP
+> bit. A new kvm_pmu_is_3p5() helper makes it easy to spot the
+> PMUv3p5 specific handling.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->   tools/testing/selftests/kvm/access_tracking_perf_test.c   | 8 +-------
->   tools/testing/selftests/kvm/include/perf_test_util.h      | 3 +++
->   tools/testing/selftests/kvm/lib/perf_test_util.c          | 3 +++
->   .../selftests/kvm/memslot_modification_stress_test.c      | 6 +-----
->   4 files changed, 8 insertions(+), 12 deletions(-)
-> 
-
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-> diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> index 76c583a07ea2..942370d57392 100644
-> --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> @@ -58,9 +58,6 @@ static enum {
->   	ITERATION_MARK_IDLE,
->   } iteration_work;
->   
-> -/* Set to true when vCPU threads should exit. */
-> -static bool done;
-> -
->   /* The iteration that was last completed by each vCPU. */
->   static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
->   
-> @@ -211,7 +208,7 @@ static bool spin_wait_for_next_iteration(int *current_iteration)
->   	int last_iteration = *current_iteration;
->   
->   	do {
-> -		if (READ_ONCE(done))
-> +		if (READ_ONCE(perf_test_args.stop_vcpus))
->   			return false;
->   
->   		*current_iteration = READ_ONCE(iteration);
-> @@ -321,9 +318,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   	mark_memory_idle(vm, nr_vcpus);
->   	access_memory(vm, nr_vcpus, ACCESS_READ, "Reading from idle memory");
->   
-> -	/* Set done to signal the vCPU threads to exit */
-> -	done = true;
-> -
->   	perf_test_join_vcpu_threads(nr_vcpus);
->   	perf_test_destroy_vm(vm);
->   }
-> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-> index eaa88df0555a..536d7c3c3f14 100644
-> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
-> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-> @@ -40,6 +40,9 @@ struct perf_test_args {
->   	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
->   	bool nested;
->   
-> +	/* Test is done, stop running vCPUs. */
-> +	bool stop_vcpus;
+>  arch/arm64/kvm/pmu-emul.c | 8 +++++---
+>  arch/arm64/kvm/sys_regs.c | 4 ++++
+>  include/kvm/arm_pmu.h     | 7 +++++++
+>  3 files changed, 16 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 4320c389fa7f..c37cc67ff1d7 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -52,13 +52,15 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
+>   */
+>  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
+>  {
+> -       return (select_idx == ARMV8_PMU_CYCLE_IDX);
+> +       return (select_idx == ARMV8_PMU_CYCLE_IDX || kvm_pmu_is_3p5(vcpu));
+>  }
+>
+>  static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
+>  {
+> -       return (select_idx == ARMV8_PMU_CYCLE_IDX &&
+> -               __vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
+> +       u64 val = __vcpu_sys_reg(vcpu, PMCR_EL0);
 > +
->   	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
->   };
->   
-> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> index 9618b37c66f7..ee3f499ccbd2 100644
-> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> @@ -267,6 +267,7 @@ void perf_test_start_vcpu_threads(int nr_vcpus,
->   
->   	vcpu_thread_fn = vcpu_fn;
->   	WRITE_ONCE(all_vcpu_threads_running, false);
-> +	WRITE_ONCE(perf_test_args.stop_vcpus, false);
->   
->   	for (i = 0; i < nr_vcpus; i++) {
->   		struct vcpu_thread *vcpu = &vcpu_threads[i];
-> @@ -289,6 +290,8 @@ void perf_test_join_vcpu_threads(int nr_vcpus)
->   {
->   	int i;
->   
-> +	WRITE_ONCE(perf_test_args.stop_vcpus, true);
-> +
->   	for (i = 0; i < nr_vcpus; i++)
->   		pthread_join(vcpu_threads[i].thread, NULL);
->   }
-> diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> index bb1d17a1171b..3a5e4518307c 100644
-> --- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> +++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> @@ -34,8 +34,6 @@
->   static int nr_vcpus = 1;
->   static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
->   
-> -static bool run_vcpus = true;
-> -
->   static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
->   {
->   	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
-> @@ -45,7 +43,7 @@ static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
->   	run = vcpu->run;
->   
->   	/* Let the guest access its memory until a stop signal is received */
-> -	while (READ_ONCE(run_vcpus)) {
-> +	while (!READ_ONCE(perf_test_args.stop_vcpus)) {
->   		ret = _vcpu_run(vcpu);
->   		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
->   
-> @@ -110,8 +108,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   	add_remove_memslot(vm, p->memslot_modification_delay,
->   			   p->nr_memslot_modifications);
->   
-> -	run_vcpus = false;
-> -
->   	perf_test_join_vcpu_threads(nr_vcpus);
->   	pr_info("All vCPU threads joined\n");
->   
-> 
+> +       return (select_idx < ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LP)) ||
+> +              (select_idx == ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LC));
 
+Since the vCPU's PMCR_EL0 value is not always in sync with
+kvm->arch.dfr0_pmuver.imp, shouldn't kvm_pmu_idx_has_64bit_overflow()
+check kvm_pmu_is_3p5() ?
+(e.g. when the host supports PMUv3p5, PMCR.LP will be set by reset_pmcr()
+initially. Then, even if userspace sets ID_AA64DFR0_EL1.PMUVER to
+PMUVer_V3P1, PMCR.LP will stay the same (still set) unless PMCR is
+written.  So, kvm_pmu_idx_has_64bit_overflow() might return true
+even though the guest's PMU version is lower than PMUVer_V3P5.)
+
+
+>  }
+>
+>  static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index dc201a0557c0..615cb148e22a 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -654,6 +654,8 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>                | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
+>         if (!kvm_supports_32bit_el0())
+>                 val |= ARMV8_PMU_PMCR_LC;
+> +       if (!kvm_pmu_is_3p5(vcpu))
+> +               val &= ~ARMV8_PMU_PMCR_LP;
+>         __vcpu_sys_reg(vcpu, r->reg) = val;
+>  }
+>
+> @@ -703,6 +705,8 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>                 val |= p->regval & ARMV8_PMU_PMCR_MASK;
+>                 if (!kvm_supports_32bit_el0())
+>                         val |= ARMV8_PMU_PMCR_LC;
+> +               if (!kvm_pmu_is_3p5(vcpu))
+> +                       val &= ~ARMV8_PMU_PMCR_LP;
+>                 __vcpu_sys_reg(vcpu, PMCR_EL0) = val;
+>                 kvm_pmu_handle_pmcr(vcpu, val);
+>                 kvm_vcpu_pmu_restore_guest(vcpu);
+
+For the read case of access_pmcr() (the code below),
+since PMCR.LP is RES0 when FEAT_PMUv3p5 is not implemented,
+shouldn't it clear PMCR.LP if kvm_pmu_is_3p5(vcpu) is false ?
+(Similar issue to kvm_pmu_idx_has_64bit_overflow())
+
+        } else {
+                /* PMCR.P & PMCR.C are RAZ */
+                val = __vcpu_sys_reg(vcpu, PMCR_EL0)
+                      & ~(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C);
+                p->regval = val;
+        }
+
+Thank you,
+Reiji
+
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 812f729c9108..628775334d5e 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -89,6 +89,12 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+>                         vcpu->arch.pmu.events = *kvm_get_pmu_events();  \
+>         } while (0)
+>
+> +/*
+> + * Evaluates as true when emulating PMUv3p5, and false otherwise.
+> + */
+> +#define kvm_pmu_is_3p5(vcpu)                                           \
+> +       (vcpu->kvm->arch.dfr0_pmuver.imp >= ID_AA64DFR0_EL1_PMUVer_V3P5)
+> +
+>  u8 kvm_arm_pmu_get_pmuver_limit(void);
+>
+>  #else
+> @@ -153,6 +159,7 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+>  }
+>
+>  #define kvm_vcpu_has_pmu(vcpu)         ({ false; })
+> +#define kvm_pmu_is_3p5(vcpu)           ({ false; })
+>  static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
+> --
+> 2.34.1
+>
