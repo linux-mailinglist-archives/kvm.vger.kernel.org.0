@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E98B463677F
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 18:44:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C7D0F636782
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 18:45:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237815AbiKWRo1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 12:44:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36128 "EHLO
+        id S238286AbiKWRpa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 12:45:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236541AbiKWRoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 12:44:25 -0500
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3051D8CBBC
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:44:24 -0800 (PST)
-Received: by mail-lj1-x229.google.com with SMTP id l8so22175494ljh.13
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:44:24 -0800 (PST)
+        with ESMTP id S236647AbiKWRp2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 12:45:28 -0500
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8488CF24
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:45:26 -0800 (PST)
+Received: by mail-lj1-x233.google.com with SMTP id a7so1408252ljq.12
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:45:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=u1xkewih3/RfIoNkoMopgJDb13M3oVFzr/bToZLrQIw=;
-        b=cGHMJ+9h9xdjFiwn7bM8dnjCph/pcc2c2reICFyUSB9bQM1hn8QvQn/qYmqxDIY4Js
-         FRcXHZOzwMRUNPVeuHhZpCs6SECFpwg3XcleCmqYcoicq+Rgc7EbtJ97zXSJ+KRogiYY
-         SWxyJCkIRKULl4FTq4pD7xhn6Sl5vnokrZs+xqkS/6gAtUVTV099XbrtOqj+0l5rfqse
-         o5w7CX6D2alR+6U98zk19C75tyfA5M1B7GrnW8S/7Lke8pzQLAysPiie2dF9jh9dR4UA
-         BIHin4ZIsqks0Dd7AHHBHxgshERWIHfeYLXjtLdK5q+AH1+/jQzrQTPLYuZyDVDuuy1/
-         rZOw==
+        bh=KErMMccYd6jPvKTmqg8bFwxAfMLrEXW806w61xqDHSc=;
+        b=RWVJZZ85CRLUhESqyZwTpfBmJZMDopBado1fjzLl0cwMUHYXjhR3Z6Zey0jfp77vWd
+         LQdVrUQ8D16dVrt5BzLeMAPDc48yN/QGNlmqwLmySS855V7a/dZuggV0LJZXrnoq5jSE
+         6xyxGoED7SmW9S9mdD+afNQt0OVcsSLjb+kVL3RsZb3m/bLcQPwVYnUYEzk0xBF/m0zO
+         stciwlBa/fVG+2VrAHpfDmTPHMtWDSzxM6jUvE1D/jZaJWSXskX5iU+41TpctNlJQ9Pe
+         cUwj1dZ8UZ9HBcEQY7Rkg1yMUFfplzAn7URTDQhNo0xIOjLAD91IEeymXDbgJ9Z+Ttrr
+         LY2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=u1xkewih3/RfIoNkoMopgJDb13M3oVFzr/bToZLrQIw=;
-        b=NUnupsSQc+NI5MOWDl7yGAs4R3uVShWrB6rPyjsELbnDFnA6oiHRzWjV++rC10q3Pl
-         NDxmkNjYLndRrxpCbG0FD3DRbA4Fh1ZYgFROolKwThfdQuJbJrZJSc3rCI0QrVuez2BM
-         5gMAkkPcniEYP69Uh8/YEgmzt1gv33I9NTSN/Nb8kQN5YImTlH93CUVOi+cehaCWG7UV
-         9CcL16kRAMe/8bUQEYhTmosSd1Mg7hZxTRvtgwWL/VriB2MvLHzesuD0EE9C/JuPLCJc
-         qxSBncVjg1XHflFZSR0BuB3jsxNE1IU4Mm1CQQE8KGWCKLyN6aFUUgGrdpeohYMSKNJB
-         6ANQ==
-X-Gm-Message-State: ANoB5pnubvJxqBXkosWBMvAQEsVvwLWhaEJWLCBzDNG37JpVEdKUxBjE
-        RN8kZ7ZoAiE93hQtEYz3M51tUHoUxjqYYVkU9OozJg==
-X-Google-Smtp-Source: AA0mqf439CreUnpaeWwBjF5hB8UZGECQqTvVfpzTMLQ4+KpxuACkd1Dw99kXAOqepPOD2nsGP9lQAP45vgETI9r0JTU=
-X-Received: by 2002:a2e:bf17:0:b0:277:394:34e with SMTP id c23-20020a2ebf17000000b002770394034emr3204506ljr.18.1669225462333;
- Wed, 23 Nov 2022 09:44:22 -0800 (PST)
+        bh=KErMMccYd6jPvKTmqg8bFwxAfMLrEXW806w61xqDHSc=;
+        b=SoKoqehOGIKz0dsqq0wJ1c3RFuJLhQ6+5Jh27suNFLkmBEWQUK3EUfXirOPwTjxlVo
+         ToVuxhbYUHweks2QOjD5JGslaQTRvsbupmHl9b2CC5EKXobfp8A8vBlWkTWtwm7l0Dgc
+         Zq4IRrkoMigrWgzmWAFIkOzqI/uPIvFKEywGnoKIZAOOzmCy4Kw+FkPxTO2nbtEkw+Z9
+         8yBn8YD5JsC29nOrnKAx4qvd7beQqzTpXUxr9G1MP5hi2+tV0Aw/RJyFPK873JZzCzNs
+         m3j60o/7b2kcZIrJeRInDFT5igPaZNrtfFWhq1I+s2Ilo1zBaYRlKToE96iN6QSS/lNl
+         giBA==
+X-Gm-Message-State: ANoB5pnqzW3QLhPmUg/EX+jZHSlRHtrjAvvKP1/z5lqbrOs4Olipn/Nh
+        k9uyBwz7NlHnDG88eA++SFu1VwsO8/StpdC/q6bfpw==
+X-Google-Smtp-Source: AA0mqf5iXVWX2bwVrReDgDoOu533hycA5a7wqzgQ45ML+wWl+qML3769oSJyS8ZVNwVXHuYpN2jXiGXSGvIW/68zYxY=
+X-Received: by 2002:a2e:a544:0:b0:278:f5b8:82c8 with SMTP id
+ e4-20020a2ea544000000b00278f5b882c8mr5820670ljn.228.1669225524334; Wed, 23
+ Nov 2022 09:45:24 -0800 (PST)
 MIME-Version: 1.0
-References: <20221115111549.2784927-1-tabba@google.com> <20221115111549.2784927-2-tabba@google.com>
- <Y35FdsVXdZf62tLO@monolith.localdoman>
-In-Reply-To: <Y35FdsVXdZf62tLO@monolith.localdoman>
+References: <20221115111549.2784927-1-tabba@google.com> <20221115111549.2784927-4-tabba@google.com>
+ <Y35M4W46JjeU88e/@monolith.localdoman>
+In-Reply-To: <Y35M4W46JjeU88e/@monolith.localdoman>
 From:   Fuad Tabba <tabba@google.com>
-Date:   Wed, 23 Nov 2022 17:43:45 +0000
-Message-ID: <CA+EHjTx_nD_BqRvNkkPtPyrsC+gH8NvyzreLJHWBqmo1ZA5cLg@mail.gmail.com>
-Subject: Re: [PATCH kvmtool v1 01/17] Initialize the return value in kvm__for_each_mem_bank()
+Date:   Wed, 23 Nov 2022 17:44:47 +0000
+Message-ID: <CA+EHjTzr87z_kQQGfXS0EpHqTLdTD4JU_Y9Z9=MJ2wWuLGPs4Q@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v1 03/17] Rename parameter in mmap_anon_or_hugetlbfs()
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
         andre.przywara@arm.com, will@kernel.org
@@ -69,54 +70,55 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi,
 
-On Wed, Nov 23, 2022 at 4:08 PM Alexandru Elisei
+On Wed, Nov 23, 2022 at 4:40 PM Alexandru Elisei
 <alexandru.elisei@arm.com> wrote:
 >
 > Hi,
 >
-> On Tue, Nov 15, 2022 at 11:15:33AM +0000, Fuad Tabba wrote:
-> > If none of the bank types match, the function would return an
-> > uninitialized value.
+> On Tue, Nov 15, 2022 at 11:15:35AM +0000, Fuad Tabba wrote:
+> > For consistency with other similar functions in the same file and
+> > for brevity.
+> >
+> > No functional change intended.
 > >
 > > Signed-off-by: Fuad Tabba <tabba@google.com>
 > > ---
-> >  kvm.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >  include/kvm/util.h | 2 +-
+> >  util/util.c        | 6 +++---
+> >  2 files changed, 4 insertions(+), 4 deletions(-)
 > >
-> > diff --git a/kvm.c b/kvm.c
-> > index 42b8812..78bc0d8 100644
-> > --- a/kvm.c
-> > +++ b/kvm.c
-> > @@ -387,7 +387,7 @@ int kvm__for_each_mem_bank(struct kvm *kvm, enum kvm_mem_type type,
-> >                          int (*fun)(struct kvm *kvm, struct kvm_mem_bank *bank, void *data),
-> >                          void *data)
-> >  {
-> > -     int ret;
-> > +     int ret = 0;
->
-> Would you consider moving the variable declaration after the 'bank'
-> variable?
-
-Will do.
-
-> >       struct kvm_mem_bank *bank;
+> > diff --git a/include/kvm/util.h b/include/kvm/util.h
+> > index b0c3684..61a205b 100644
+> > --- a/include/kvm/util.h
+> > +++ b/include/kvm/util.h
+> > @@ -140,6 +140,6 @@ static inline int pow2_size(unsigned long x)
+> >  }
 > >
-> >       list_for_each_entry(bank, &kvm->mem_banks, list) {
+> >  struct kvm;
+> > -void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size);
+> > +void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
+> >
+> >  #endif /* KVM__UTIL_H */
+> > diff --git a/util/util.c b/util/util.c
+> > index 093bd3b..22b64b6 100644
+> > --- a/util/util.c
+> > +++ b/util/util.c
+> > @@ -118,14 +118,14 @@ static void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+> >  }
+> >
+> >  /* This function wraps the decision between hugetlbfs map (if requested) or normal mmap */
+> > -void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size)
+> > +void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
 >
-> Shouldn't the function return an error if no memory banks matched the type
-> specified (initialize ret to -EINVAL instead of 0)? I'm thinking that if
-> the caller expects a certain type of memory bank to be present, but that
-> memory type is not present, then somehwere an error occured and the caller
-> should be made aware of it.
->
-> Case in point, kvm__for_each_mem_bank() is used vfio/core.c for
-> KVM_MEM_TYPE_RAM. If RAM hasn't been created by that point, then
-> VFIO_IOMMU_MAP_DMA will not be called for guest memory and the assigned
-> device will not work.
+> All the functions that deal with hugetlbfs have "hugetlbfs" in the name,
+> and the kvm_config field is called hugetlbfs_path. Wouldn't it make more
+> sense to rename the htlbfs_path parameter to hugetlbs_path instead of the
+> other way around?
 
-I was following the behavior specified in the comment. That said, I
-agree with you that returning an error should be the correct behavior.
-I'll fix that and adjust the comment to reflect that.
+I was going for brevity, but changing it the other way around is more
+consistent, as you said.
+
+I'll do that when I respin this.
 
 Cheers,
 /fuad
@@ -124,6 +126,18 @@ Cheers,
 > Thanks,
 > Alex
 >
+> >  {
+> > -     if (hugetlbfs_path)
+> > +     if (htlbfs_path)
+> >               /*
+> >                * We don't /need/ to map guest RAM from hugetlbfs, but we do so
+> >                * if the user specifies a hugetlbfs path.
+> >                */
+> > -             return mmap_hugetlbfs(kvm, hugetlbfs_path, size);
+> > +             return mmap_hugetlbfs(kvm, htlbfs_path, size);
+> >       else {
+> >               kvm->ram_pagesize = getpagesize();
+> >               return mmap(NULL, size, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
 > > --
 > > 2.38.1.431.g37b22c650d-goog
 > >
