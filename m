@@ -2,70 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CCE86369E7
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 20:32:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EC7A6369EC
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 20:34:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235553AbiKWTcT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 14:32:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57228 "EHLO
+        id S238557AbiKWTed (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 14:34:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233908AbiKWTcR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 14:32:17 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0981697D2
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 11:32:16 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id y10so16346955plp.3
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 11:32:16 -0800 (PST)
+        with ESMTP id S238248AbiKWTeb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 14:34:31 -0500
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A0115A6F7
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 11:34:30 -0800 (PST)
+Received: by mail-wr1-x432.google.com with SMTP id d1so18849789wrs.12
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 11:34:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=/JSYRp45nEjV0NpaIaBwCx/OzBxrQGFLwnOyHJ2KQsQ=;
-        b=s8OfvgPnZeFlN+MKcsaJ4BQ1A78/CHe6DTwXwlFxd+cq3CEOOGmHWj54k67D2pQSVI
-         HcvSaZ8EnlJ8Sl6m9Y8l2m6MShw74CVri65DN+DA3T6Pw3h2XDxAzARxJeqS2MBDzoTV
-         x632/5JQs36CtojvSNKJ0j8pis5Ym+cT9BMo1fsTG/6+CR3R/B825RSnB3+MiC1ALDlE
-         2FnuXlev9RoqKHV4umiuccgSsGaaZvNz/cwVnaMAzCX/H+Q3LtjbdOMNo0VP+XdOfybg
-         nNEbSf4TKiudylxLf/N1ihA+8LiK53kAA3eIWDZpaHgVbquWBCCbkKEDdFYwuLwFVRxJ
-         2RAg==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=54gwlBZl2Mf+sd8h4nHSOZMRH+Engb2ZuOzenuumqrU=;
+        b=r/jDHxwUcpE0J33YIxMPzCAbn66zIkY7Q08m9fJKufH0T+rFcLNb+uOZx7Pr9zIYYj
+         6XAEu1scb2/xoBcdIQ/25G1AfU1KMT6VVF7EdwY4RK9ykdimufhV/dIBwl8ni8Wcq0Iy
+         OdUJ9eD/ERrqemK69RdjVDUZKRPBr6n6fGQq/vgK8LSRj/IywofXkUz7g1n41S3X2iVo
+         amNeKtwRj1fwa6XIA2hEdIlTJNuXgJVsCqhvxLFmB0XAMZmIJQvdJIZRwGjd73BIayee
+         XoZxS/O0vNvWQ2UwX+Iu787Em+M5eleVGF51cH/RSbnCR3Pox7ojor6llQFMlkbi9UGd
+         Qfow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/JSYRp45nEjV0NpaIaBwCx/OzBxrQGFLwnOyHJ2KQsQ=;
-        b=NLaB25iMzurdTsTqh+892QAWr5s3890DGh5R/FyQ2o9Eu2dl6hntRL3tT6w7jwWgI1
-         HwRUYeJCHijLwng8Cf7J3rQdEdRhtGdy6fxZsz9+EyaF6/4tivfUJEkf7Zv8ZK5Mmc3q
-         Oaln7MyykT5pnwU91jxQr/IJ5wNIZYJyA+5KMy2qVSwn5c+Lug1de19AgTub+Gu1Zz1s
-         0YmC7holGBwzxdyPIyqrQHXzzOJ0vogdONhriuIOhflger4nAA5c45PPtGS59achxwYr
-         M5XFrW4nCsmWH95JNliEJ4Hc8+dUwvJIuXk9BTgBRj30QMH9kSHqCL27dvbYY6hmAtWy
-         DDJw==
-X-Gm-Message-State: ANoB5pk0QhpA6yuAlF6uGH+9sRpkOLTfiJFIMzfcma2G0mjsS7NRIr2m
-        8YWFvhPsPLlkDmTVqPQSm8gOsHc5tmjxGg==
-X-Google-Smtp-Source: AA0mqf6Grqi04ifea8b0dB4vvujuaUTtSQ3QcrIP3SYU9fWDTG1AEwnICzMdxnCcDKVJ/1ncPkFnxQ==
-X-Received: by 2002:a17:903:234e:b0:188:cfc6:8543 with SMTP id c14-20020a170903234e00b00188cfc68543mr19569090plh.95.1669231935944;
-        Wed, 23 Nov 2022 11:32:15 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id v4-20020aa799c4000000b005745481a61dsm1970313pfi.80.2022.11.23.11.32.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Nov 2022 11:32:14 -0800 (PST)
-Date:   Wed, 23 Nov 2022 19:32:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        mhal@rbox.co
-Subject: Re: [PATCH 2/4] KVM: x86/xen: Compatibility fixes for shared
- runstate area
-Message-ID: <Y351Oz8mrGcaAUMg@google.com>
-References: <20221119094659.11868-1-dwmw2@infradead.org>
- <20221119094659.11868-2-dwmw2@infradead.org>
- <Y35kwZeS1pXGLNFg@google.com>
- <176c0c26fda9481a4e04c99289bb240a9b3c1ccd.camel@infradead.org>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=54gwlBZl2Mf+sd8h4nHSOZMRH+Engb2ZuOzenuumqrU=;
+        b=uAm7eID2TKhSRUYMk4OBhr+8SC2Fv+1u4gi92iOMGpiAuwpOn77U6Dt7/v7lODIZKh
+         znUhCLl+OnmGPenEeX5PPVedbgJLMF0RFhnqBss4+CetURBmBixQ40fbSPtMx1HNr18c
+         YBhIwRmCaKhfEwv3dJEbmEi77P1J/AZjHEdid3dBgCpELjM64E7MoCqzkGq+JX7Oc6UM
+         HXMscrOU63ifuka0gdKO+pAYyojbiDOqB9OcQSSqRNG9PMt1GRpy9LaJlnOC/56L5awq
+         ZdHRYTSQD4E93k41QSV+wAGssAWNuGB3TZL0AIwAjhHUxAeYgWiqkTuxjSThr765Qojv
+         ZFJA==
+X-Gm-Message-State: ANoB5pnr8cN6LkCPTnhXJO/rXXhHXsORIl6lS2TfuDGTOj4gFGF/YOaq
+        ie9h/oQpM0WkN/VmdCq5+16nscOAZWBhFiNPrpoohQ==
+X-Google-Smtp-Source: AA0mqf7K/+5nkPCwqrpkV1q/a9sC32bxcEA8Ux5+uxQ+MxbdQfVj3zItbtfIknPXxhAUOL2/sHq5/OnBKMxLMel1sXY=
+X-Received: by 2002:a5d:5d0f:0:b0:236:6f6f:8dd7 with SMTP id
+ ch15-20020a5d5d0f000000b002366f6f8dd7mr7794554wrb.4.1669232068839; Wed, 23
+ Nov 2022 11:34:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <176c0c26fda9481a4e04c99289bb240a9b3c1ccd.camel@infradead.org>
+References: <20221121234026.3037083-1-vipinsh@google.com> <20221121234026.3037083-7-vipinsh@google.com>
+ <87mt8jouc0.fsf@ovpn-194-185.brq.redhat.com>
+In-Reply-To: <87mt8jouc0.fsf@ovpn-194-185.brq.redhat.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Wed, 23 Nov 2022 11:33:52 -0800
+Message-ID: <CAHVum0cpR7=yk-8s5yx8em7vCMxPWemqxYD2ULm+L7_CWpA7Ag@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] KVM: selftests: Test Hyper-V extended hypercall
+ exit to userspace
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,63 +69,164 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 23, 2022, David Woodhouse wrote:
-> On Wed, 2022-11-23 at 18:21 +0000, Sean Christopherson wrote:
-> > On Sat, Nov 19, 2022, David Woodhouse wrote:
-> ...
-> 		/* When invoked from kvm_sched_out() we cannot sleep */
-> 		if (atomic)
-> 			return;
-> ...
-> > > +		/*
-> > > +		 * Use kvm_gpc_activate() here because if the runstate
-> > > +		 * area was configured in 32-bit mode and only extends
-> > > +		 * to the second page now because the guest changed to
-> > > +		 * 64-bit mode, the second GPC won't have been set up.
-> > > +		 */
-> > > +		if (kvm_gpc_activate(v->kvm, gpc2, NULL, KVM_HOST_USES_PFN,
-> > > +				     gpc1->gpa + user_len1, user_len2))
-> > 
-> > I believe kvm_gpc_activate() needs to be converted from write_lock_irq() to
-> > write_lock_irqsave() for this to be safe.
-> 
-> Hm, not sure I concur. You're only permitted to call kvm_gpc_activate()
-> in a context where you can sleep. Interrupts had better not be disabled
-> already, and it had better not need write_lock_irqsave().
-> 
-> In this particular context, we do drop all locks before calling
-> kvm_gpc_activate(), and we don't call it at all in the scheduling-out
-> case when we aren't permitted to sleep.
+On Tue, Nov 22, 2022 at 7:57 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Vipin Sharma <vipinsh@google.com> writes:
+>
+> > index 082855d94c72..b17874697d74 100644
+> > --- a/tools/testing/selftests/kvm/.gitignore
+> > +++ b/tools/testing/selftests/kvm/.gitignore
+> > @@ -24,6 +24,7 @@
+> >  /x86_64/hyperv_clock
+> >  /x86_64/hyperv_cpuid
+> >  /x86_64/hyperv_evmcs
+> > +/x86_64/hyperv_extended_hypercalls
+>
+> My personal preference would be to shorten the name to something like
+> "hyperv_ext_hcalls", doesn't seem to be ambiguos. No strong preference
+> though, feel free to keep the long version.
+>
 
-Oh, duh, there's an "if (atomic)" check right above this.
+I will keep the long one, in v1 David was suggesting it will be easier
+for non Hyperv developers to read and understand.
 
-> > Side topic, why do all of these flows disable IRQs?
-> 
-> The gpc->lock is permitted to be taken in IRQ context by the users of
-> the GPC. For example we do this for the shared_info and vcpu_info when
-> passing interrupts directly through to the guest via
-> kvm_arch_set_irq_inatomic() → kvm_xen_set_evtchn_fast().
-> 
-> The code path is fairly convoluted but I do believe we get there
-> directly from the VFIO IRQ handler, via the custom wakeup handler on
-> the irqfd's waitqueue (irqfd_wakeup).
+> > +/* Hyper-V defined paravirt features */
+> > +#define X86_FEATURE_HYPERV_EXTENDED_HYPERCALLS       KVM_X86_CPU_FEATURE(0x40000003, 0, EBX, 20)
+> > +
+>
+> I completely forgot about my other series where I've converted the whole
+> hyperv_features test to using KVM_X86_CPU_FEATURE():
+> https://lore.kernel.org/kvm/20221013095849.705943-6-vkuznets@redhat.com/
+>
+> but your define reminded me of it, thanks! Hope the whole thing will get
+> queued soon.
+>
 
-Yeah, I remember finding that flow.
+Your patches are always one step ahead of me :D
 
-> Now, perhaps a GPC user which knows that *it* is not going to use its
-> GPC from IRQ context, could refrain from bothering to disable
-> interrupts when taking its own gpc->lock. And that's probably true for
-> the runstate area.
+If your series doesn't show up in the KVM queue soon, I will rebase my
+patch series on top of your series
 
-This is effectively what I was asking about.
+> As for your change, I think it is better suited for
+> include/x86_64/hyperv.h instead of include/x86_64/processor.h anyway,
+> I'm trying to keep all Hyper-V related stuff separate as Hyper-V CPUID
+> leaves intersect with KVM's, e.g. 0x40000001.
+>
 
-> The generic GPC code still needs to disable interrupts when taking a
-> gpc->lock though, unless we want to add yet another flag to control
-> that behaviour.
+Sounds good.
 
-Right.  Might be worth adding a comment at some point to call out that disabling
-IRQs may not be strictly required for all users, but it's done for simplicity.
-Ah, if/when we add kvm_gpc_lock(), that would be the perfect place to document
-the behavior.
+> >  /*
+> >   * Same idea as X86_FEATURE_XXX, but X86_PROPERTY_XXX retrieves a multi-bit
+> >   * value/property as opposed to a single-bit feature.  Again, pack the info
+> > diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+> > new file mode 100644
+> > index 000000000000..13c1b03294a4
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+> > @@ -0,0 +1,94 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Test Hyper-V extended hypercall, HV_EXT_CALL_QUERY_CAPABILITIES (0x8001),
+> > + * exit to userspace and receive result in guest.
+> > + *
+> > + * Negative tests are present in hyperv_features.c
+> > + *
+> > + * Copyright 2022 Google LLC
+> > + * Author: Vipin Sharma <vipinsh@google.com>
+> > + */
+> > +
+> > +#include "kvm_util.h"
+> > +#include "processor.h"
+> > +#include "hyperv.h"
+> > +
+> > +/* Any value is fine */
+> > +#define EXT_CAPABILITIES 0xbull
+> > +
+> > +static void guest_code(vm_vaddr_t in_pg_gpa, vm_vaddr_t out_pg_gpa,
+> > +                    vm_vaddr_t out_pg_gva)
+> > +{
+> > +     uint64_t *output_gva;
+> > +
+> > +     wrmsr(HV_X64_MSR_GUEST_OS_ID, HYPERV_LINUX_OS_ID);
+> > +     wrmsr(HV_X64_MSR_HYPERCALL, in_pg_gpa);
+> > +
+> > +     output_gva = (uint64_t *)out_pg_gva;
+> > +
+> > +     hyperv_hypercall(HV_EXT_CALL_QUERY_CAPABILITIES, in_pg_gpa, out_pg_gpa);
+> > +
+> > +     /* TLFS states output will be a uint64_t value */
+> > +     GUEST_ASSERT_EQ(*output_gva, EXT_CAPABILITIES);
+> > +
+> > +     GUEST_DONE();
+> > +}
+> > +
+> > +int main(void)
+> > +{
+> > +     vm_vaddr_t hcall_out_page;
+> > +     vm_vaddr_t hcall_in_page;
+> > +     struct kvm_vcpu *vcpu;
+> > +     struct kvm_run *run;
+> > +     struct kvm_vm *vm;
+> > +     uint64_t *outval;
+> > +     struct ucall uc;
+> > +
+> > +     /* Verify if extended hypercalls are supported */
+> > +     if (!kvm_cpuid_has(kvm_get_supported_hv_cpuid(),
+> > +                        X86_FEATURE_HYPERV_EXTENDED_HYPERCALLS)) {
+> > +             print_skip("Extended calls not supported by the kernel");
+> > +             exit(KSFT_SKIP);
+> > +     }
+> > +
+> > +     vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> > +     run = vcpu->run;
+> > +     vcpu_enable_cap(vcpu, KVM_CAP_HYPERV_ENFORCE_CPUID, 1);
+>
+> Do we need this enforcement assuming we have no plans to add 'negative'
+> tests here (hyperv_features does it just fine)? vcpu_set_hv_cpuid()
+> enables everything anyway...
+>
 
-Thanks!
+We do not. I will remove it.
+
+> > +     vcpu_set_hv_cpuid(vcpu);
+> > +
+> > +     /* Hypercall input */
+> > +     hcall_in_page = vm_vaddr_alloc_pages(vm, 1);
+> > +     memset(addr_gva2hva(vm, hcall_in_page), 0x0, vm->page_size);
+> > +
+> > +     /* Hypercall output */
+> > +     hcall_out_page = vm_vaddr_alloc_pages(vm, 1);
+> > +     memset(addr_gva2hva(vm, hcall_out_page), 0x0, vm->page_size);
+> > +
+> > +     vcpu_args_set(vcpu, 3, addr_gva2gpa(vm, hcall_in_page),
+> > +                   addr_gva2gpa(vm, hcall_out_page), hcall_out_page);
+> > +
+> > +     vcpu_run(vcpu);
+> > +
+> > +     ASSERT_EXIT_REASON(vcpu, KVM_EXIT_HYPERV);
+> > +
+> > +     outval = addr_gpa2hva(vm, run->hyperv.u.hcall.params[1]);
+> > +     *outval = EXT_CAPABILITIES;
+> > +     run->hyperv.u.hcall.result = HV_STATUS_SUCCESS;
+> > +
+> > +     vcpu_run(vcpu);
+> > +
+> > +     ASSERT_EXIT_REASON(vcpu, KVM_EXIT_IO);
+> > +
+> > +     switch (get_ucall(vcpu, &uc)) {
+> > +     case UCALL_ABORT:
+> > +             REPORT_GUEST_ASSERT_2(uc, "arg1 = %ld, arg2 = %ld");
+> > +             break;
+> > +     case UCALL_DONE:
+> > +             break;
+> > +     default:
+> > +             TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
+> > +     }
+> > +
+> > +     kvm_vm_free(vm);
+> > +     return 0;
+> > +}
+>
+> --
+> Vitaly
+>
