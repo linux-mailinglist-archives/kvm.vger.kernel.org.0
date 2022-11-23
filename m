@@ -2,228 +2,271 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 283BD635CE3
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 13:29:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7012B635CDB
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 13:29:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237107AbiKWM1v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 07:27:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33048 "EHLO
+        id S237595AbiKWM22 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 07:28:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237628AbiKWM1W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 07:27:22 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C93654F7
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 04:26:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=hLY5jReT1PITobjGOWtNOdzSjS5VAeGNGzvApm5DV1I=; b=qB95mUlcCzIojPyDi6NnbDedst
-        0TYuOin9Nyh+HlLA789CN4T/yhYeCTZ3UuZ5MtWS2DGQlFEcLeyDix2oeoWJa/Yf1iOKhPviJJY1v
-        khhTZ50sr+UE96knVArtshURJ128+LggmXWLiMPP/8Uov1stD4JaifV7jEVvoF9HWY+cGaleZaMOj
-        uod4ffK7IGTMIISfG3KuvimBucCpIBhO/vaqPYxKFeOmIifJicDNQy4bSc8Ff/pHVfVNR9AxU5mVp
-        pfdqmXZTNGzG5f3yzYlCeKnamM3BvnLRqOijwXn467Tffbeod4AGzaLZBhEI4Hr25qsGFPRg44mIh
-        fmVotxJA==;
-Received: from [2001:8b0:10b:5:e11d:803:4f3f:5f70] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oxopH-007YMR-3J; Wed, 23 Nov 2022 12:26:03 +0000
-Message-ID: <199eac0011241e68d7c42b713652861e924c4472.camel@infradead.org>
-Subject: Re: [PATCH 3/3] KVM: Update gfn_to_pfn_cache khva when it moves
- within the same page
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Michal Luczaj <mhal@rbox.co>, kvm@vger.kernel.org
-Date:   Wed, 23 Nov 2022 12:25:55 +0000
-In-Reply-To: <20221123002030.92716-3-dwmw2@infradead.org>
-References: <20221123002030.92716-1-dwmw2@infradead.org>
-         <20221123002030.92716-3-dwmw2@infradead.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-vt+aLkTxcEK+fowVyvGg"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S237686AbiKWM1h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 07:27:37 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DA2265840
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 04:26:09 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ANCLSNK010121
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 12:26:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=NMGNzR7a1ZGRO/Cn31xyp/l4ZUXXVekDqBc5a549v7c=;
+ b=kMIkRL6rcGxNDXUXdXxlX2Y8pziYWuaElTOkUyy4V1+uBNqMGWAqi6WxgFJm7mI6Efec
+ 5nFBNueiAaxZuPi2vq/z0Vc5MZHg5OzXG45QMuUket8vWJLH8FNGywNrSaV11qKe94Ed
+ +lfaFl5SsmWkwWO5iZmzLJKFM9vzpm5YYH241hJcmhNvBXZNadVvZqgi6PPQI9/RGZ+7
+ m/ATSs+RZT5U0s3S0Q8Dmwqb+AYwMgv1yYzzxNk0IiPVZIPiDD6Bob45Jj0zabNO4iNc
+ 7HGvRg31rTLnS1FUl5OrkoVKyccLH9abo+g7DLOxAeFqhqnMFGYVL3vtP4L8e8JNSOTx 6A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m10w5ttwb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 12:26:09 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ANBJAp2014305
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 12:26:08 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m10w5ttvg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Nov 2022 12:26:08 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ANCKMeD016388;
+        Wed, 23 Nov 2022 12:26:06 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3kxps9459t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Nov 2022 12:26:06 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ANCQ36R6750792
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Nov 2022 12:26:03 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 73A1D4C04E;
+        Wed, 23 Nov 2022 12:26:03 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 46DC74C04A;
+        Wed, 23 Nov 2022 12:26:03 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 23 Nov 2022 12:26:03 +0000 (GMT)
+Date:   Wed, 23 Nov 2022 13:25:55 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: add CMM test during
+ migration
+Message-ID: <20221123132555.38e68669@p-imbrenda>
+In-Reply-To: <20221122161243.214814-3-nrb@linux.ibm.com>
+References: <20221122161243.214814-1-nrb@linux.ibm.com>
+        <20221122161243.214814-3-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: WWz6A7eBuT_oeIDhs86-hlI_iFcxfrk-
+X-Proofpoint-ORIG-GUID: bOZq-3VcKczYe7PVjXGMuzF7-d22yce3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-23_06,2022-11-23_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ bulkscore=0 adultscore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 priorityscore=1501 spamscore=0 phishscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211230090
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 22 Nov 2022 17:12:43 +0100
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
---=-vt+aLkTxcEK+fowVyvGg
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, 2022-11-23 at 00:20 +0000, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
->=20
-> In the case where a GPC is refreshed to a different location within the
-> same page, we didn't bother to update it. Mostly we don't need to, but
-> since the ->khva field also includes the offset within the page, that
-> does have to be updated.
->=20
-> Fixes: 982ed0de4753 ("KVM: Reinstate gfn_to_pfn_cache with invalidation s=
-upport")
-
-Hm, wait. That commit wasn't actually broken because at that point the
-page offset was included in the uhva too, so the uhva *did* change and
-we'd (gratuitously) take the slower path through hva_to_pfn_retry()
-when the GPA moved within the same page.
-
-So I think this should actually be:
-
-Fixes: 3ba2c95ea180 ("KVM: Do not incorporate page offset into gfn=3D>pfn c=
-ache user address")
-
-Which means it's only relevant back to v6.0 stable, not all the way
-back to v5.17.
-
-
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> Reviewed-by: Paul Durrant <paul@xen.org>
-> Cc: stable@kernel.org
->=20
+> Add a test which modifies CMM page states while migration is in
+> progress.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 > ---
->  virt/kvm/pfncache.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->=20
-> diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-> index bd4a46aee384..5f83321bfd2a 100644
-> --- a/virt/kvm/pfncache.c
-> +++ b/virt/kvm/pfncache.c
-> @@ -297,7 +297,12 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, st=
-ruct gfn_to_pfn_cache *gpc,
->  	if (!gpc->valid || old_uhva !=3D gpc->uhva) {
->  		ret =3D hva_to_pfn_retry(kvm, gpc);
->  	} else {
-> -		/* If the HVA=E2=86=92PFN mapping was already valid, don't unmap it. *=
-/
-> +		/*
-> +		 * If the HVA=E2=86=92PFN mapping was already valid, don't unmap it.
-> +		 * But do update gpc->khva because the offset within the page
-> +		 * may have changed.
-> +		 */
-> +		gpc->khva =3D old_khva + page_offset;
->  		old_pfn =3D KVM_PFN_ERR_FAULT;
->  		old_khva =3D NULL;
->  		ret =3D 0;
->=20
+>  s390x/Makefile               |   1 +
+>  s390x/migration-during-cmm.c | 111 +++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg          |   5 ++
+>  3 files changed, 117 insertions(+)
+>  create mode 100644 s390x/migration-during-cmm.c
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 401cb6371cee..64c7c04409ae 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -39,6 +39,7 @@ tests += $(TEST_DIR)/panic-loop-extint.elf
+>  tests += $(TEST_DIR)/panic-loop-pgm.elf
+>  tests += $(TEST_DIR)/migration-sck.elf
+>  tests += $(TEST_DIR)/exittime.elf
+> +tests += $(TEST_DIR)/migration-during-cmm.elf
+>  
+>  pv-tests += $(TEST_DIR)/pv-diags.elf
+>  
+> diff --git a/s390x/migration-during-cmm.c b/s390x/migration-during-cmm.c
+> new file mode 100644
+> index 000000000000..3c96283d7b00
+> --- /dev/null
+> +++ b/s390x/migration-during-cmm.c
+> @@ -0,0 +1,111 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Perform CMMA actions while migrating.
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <smp.h>
+> +#include <asm-generic/barrier.h>
+> +
+> +#include "cmm.h"
+> +
+> +#define NUM_PAGES 128
 
+is 128 enough to allow multiple iterations of the thread?
 
---=-vt+aLkTxcEK+fowVyvGg
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+> +
+> +static uint8_t pagebuf[NUM_PAGES * PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+> +
+> +static int thread_iters;
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTIzMTIyNTU1WjAvBgkqhkiG9w0BCQQxIgQgUR/l2oJh
-S0/W5MFi/Xamai4hWALhETmSGWDB4DS3Dnswgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgChYd3ibJOfjPWwjlbyoX6+p9UhGt10ABWt
-bX+1Fy45odNI3Gl1X/HVfzo+4NBWnZA3n2bHq329lTdKGV8Ej1mj8V+t3jemOSiFzubytBBIk8pd
-pwnvyXdCsTxL7j4pWmhjjBms32SVxbRR4KZjMREpizEwBg4magKpQe012FHHnVQpkfLukm7i5GYW
-i6sJPFEikxlGMXn7sM9gHpCSeWmA99BfhH9rDJJ1PkF1ZfYH33ZUaJc9Rtl+PKVHJQ7/YUnDbRJG
-O4fDnAZ1sGrG5+Aj0fQM5ycTGqc9VZM90AGqyVMNE6g/8pqwIXto1UnLlXE/gPCRiOfk9/2KTipm
-Tbo4Ej+riVZ9T5ISZclTlWLV7Iz8U6BmNSxetTinutVPOY1zQMsg774sPkqy99RDZWlLGPxaJisU
-sQ1aRSJyJqehYpzHboCBDWPwSEtb4MZsP0U46qBhzGw6D+VWPvdZ/T+nm6fey5FFGC0sknk51giz
-nrVhzQd8tyePS6Il36M/gxoLemPgJ6ZmIiHxIjlqbl5FkYyigqHcMkZ4JvJMYk8p4tii4596jt/w
-nUw3YslErDSqprlb6Vt3l2cvUeX3yJAi/IidLpcWZzhPPWbnGNLZAgxzxTrv2E9Z2/VBFOlIxlwX
-zJ0OIWEb7Zj/a3fWNdXWx3j5YVEOsQtRBVaBxmxcKAAAAAAAAA==
+please make all ints unsigned unless you really need them signed
 
+> +static int thread_should_exit;
+> +static int thread_exited;
 
---=-vt+aLkTxcEK+fowVyvGg--
+(these are fine as is, since they are only used as flags)
+
+> +static bool verification_failure_occured;
+> +struct cmm_verify_result result;
+> +
+> +static void test_cmm_during_migration(void)
+> +{
+> +	/*
+> +	 * The second CPU must not print on the console, otherwise it will race with
+> +	 * the primary CPU on the SCLP buffer.
+> +	 */
+> +	while (!thread_should_exit) {
+> +		cmm_set_page_states(pagebuf, NUM_PAGES);
+
+I would do (pagebuf + (thread_iters % 4) * PAGE_SIZE
+
+this way you will actually change the values for each page at each
+iteration (will need a bigger buffer)
+
+> +		if (!cmm_verify_page_states(pagebuf, NUM_PAGES, &result)) {
+> +			verification_failure_occured = true;
+> +			goto out;
+> +		}
+> +		thread_iters++;
+> +	}
+> +
+> +out:
+> +	thread_exited = 1;
+> +}
+> +
+> +int main(void)
+> +{
+> +	bool has_essa = check_essa_available();
+> +	struct psw psw;
+> +
+> +	report_prefix_push("migration-during-cmm");
+> +	if (!has_essa) {
+> +		report_skip("ESSA is not available");
+> +		goto error;
+> +	}
+> +
+> +	if (smp_query_num_cpus() == 1) {
+> +		report_skip("need at least 2 cpus for this test");
+> +		goto error;
+> +	}
+> +
+> +	psw.mask = extract_psw_mask();
+> +	psw.addr = (unsigned long)test_cmm_during_migration;
+> +	smp_cpu_setup(1, psw);
+> +
+> +	puts("Please migrate me, then press return\n");
+> +	(void)getchar();
+> +
+> +	thread_should_exit = 1;
+
+I would use WRITE_ONCE, otherwise you probably need a mb() here
+
+> +
+> +	while (!thread_exited)
+> +		mb();
+> +
+> +	report_info("thread completed %d iterations", thread_iters);
+> +
+> +	report_prefix_push("during migration");
+> +	if (verification_failure_occured)
+> +		cmm_report_verify_fail(&result);
+> +	else
+> +		report_pass("page states matched");
+> +	report_prefix_pop();
+> +
+> +	/*
+> +	 * Verification of page states occurs on the thread. We don't know if we
+> +	 * were still migrating during the verification.
+> +	 * To be sure, make another verification round after the migration
+> +	 * finished to catch page states which might not have been migrated
+> +	 * correctly.
+> +	 */
+> +	report_prefix_push("after migration");
+> +	if (!cmm_verify_page_states(pagebuf, NUM_PAGES, &result))
+
+pagebuf + ((thread_iters - 1) % 4) * PAGE_SIZE
+
+> +		cmm_report_verify_fail(&result);
+> +	else
+> +		report_pass("page states matched");
+> +	report_prefix_pop();
+> +
+> +	goto done;
+> +
+> +error:
+> +	/*
+> +	 * If we just exit and don't ask migrate_cmd to migrate us, it
+> +	 * will just hang forever. Hence, also ask for migration when we
+> +	 * skip this test alltogether.
+> +	 */
+> +	puts("Please migrate me, then press return\n");
+> +	(void)getchar();
+> +
+> +done:
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 3caf81eda396..f6889bd4da01 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -208,3 +208,8 @@ groups = migration
+>  [exittime]
+>  file = exittime.elf
+>  smp = 2
+> +
+> +[migration-during-cmm]
+> +file = migration-during-cmm.elf
+> +groups = migration
+> +smp = 2
 
