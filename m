@@ -2,93 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 738B5636755
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 18:37:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E98B463677F
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 18:44:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238761AbiKWRhm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 12:37:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56748 "EHLO
+        id S237815AbiKWRo1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 12:44:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237359AbiKWRhk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 12:37:40 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD1D413CCD
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:37:38 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id y14-20020a17090a2b4e00b002189a1b84d4so2469417pjc.2
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:37:38 -0800 (PST)
+        with ESMTP id S236541AbiKWRoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 12:44:25 -0500
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3051D8CBBC
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:44:24 -0800 (PST)
+Received: by mail-lj1-x229.google.com with SMTP id l8so22175494ljh.13
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:44:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BTJPrqrqSEwhgHq/Fq7SqerFqPYBOzBQre48SjGb0AQ=;
-        b=AXeIwTvPHhsokCd+EErazsQ8K+lGrncHyEuqRtdoyXhSyIF6UVoIlnqPmu2VPCED60
-         mHOMk9yvQi+Gkq2gElaHXoFKHK98cKz3dh0r+qnBWB8mkJErZXQtp2n65JXr0nQZLPTv
-         l+uls76z3THb1hzYMsRVgcWtdRMNwMFmxSUgM7S+eDqYs+GCbQPXKxO2yJVTGAP/ciN3
-         k52M91Nm7cY14fq1v5NDox/uaxslvzh9LZZ0HZ4tYPTwqi75XfG+zmcNIOM4Ob0iU4rM
-         HFJzp8uu18XWOkqNscJmULjVMC+GNteFWjyVJ1aG8Kq6QsGiFl+6ZGWuHQ1zer8WnHrS
-         z7WA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=u1xkewih3/RfIoNkoMopgJDb13M3oVFzr/bToZLrQIw=;
+        b=cGHMJ+9h9xdjFiwn7bM8dnjCph/pcc2c2reICFyUSB9bQM1hn8QvQn/qYmqxDIY4Js
+         FRcXHZOzwMRUNPVeuHhZpCs6SECFpwg3XcleCmqYcoicq+Rgc7EbtJ97zXSJ+KRogiYY
+         SWxyJCkIRKULl4FTq4pD7xhn6Sl5vnokrZs+xqkS/6gAtUVTV099XbrtOqj+0l5rfqse
+         o5w7CX6D2alR+6U98zk19C75tyfA5M1B7GrnW8S/7Lke8pzQLAysPiie2dF9jh9dR4UA
+         BIHin4ZIsqks0Dd7AHHBHxgshERWIHfeYLXjtLdK5q+AH1+/jQzrQTPLYuZyDVDuuy1/
+         rZOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BTJPrqrqSEwhgHq/Fq7SqerFqPYBOzBQre48SjGb0AQ=;
-        b=CZlNrxEzqQ8CMkg8r0n9TGmbh4CdX9RtGVD5sV4s3gKJtXMCz/TQmRn2TcolEY/Ztn
-         fOFGdBXpjzfP1msuhDV5xDROyYudOecbWj84swbPo/6pN1p/SRYd2mJS/qy5tqnC+GXk
-         W5DII5Aq7oUT9uoiop8FTpwlQTwyAgNpYmh6bOIiIscDIlkW+jzaWM5pEVIDXEUUyXGV
-         AtMrjWtLTh3lSbDG64kuLZOaHz4X0HR6KRdYUaoVC2R29TKhp8igTglbX1uQAUbG4S4V
-         ublwbyliD1hUT4t7aWaAKx87srQ/bju8Kl9DtI/JYVmXVraamfkoqscSuRRD4yOutloe
-         S0Aw==
-X-Gm-Message-State: ANoB5pmJnmCZCMrxyzRsRW+s1egkmSx7AUwlWs3GuUTKvoiTDwW7dqW8
-        yrjI95vcLLx+9+GH5qNq0VRTYg==
-X-Google-Smtp-Source: AA0mqf7xphM5oz2jsApOp1Egc3rjQzspTFKB7OyQetps+UBwK7ZlkxAJ3k6ifjL4pknC+ROvb0Qnuw==
-X-Received: by 2002:a17:903:1250:b0:188:6ccd:f2c5 with SMTP id u16-20020a170903125000b001886ccdf2c5mr10331527plh.6.1669225058240;
-        Wed, 23 Nov 2022 09:37:38 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id j11-20020a170902da8b00b00188f7ad561asm1163747plx.249.2022.11.23.09.37.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Nov 2022 09:37:37 -0800 (PST)
-Date:   Wed, 23 Nov 2022 17:37:33 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     "Huang, Kai" <kai.huang@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-Subject: Re: [PATCH v7 06/20] x86/virt/tdx: Shut down TDX module in case of
- error
-Message-ID: <Y35aXX5b2Ed4vc6y@google.com>
-References: <48505089b645019a734d85c2c29f3c8ae2dbd6bd.1668988357.git.kai.huang@intel.com>
- <Y3ySxEr64HkUaEDq@hirez.programming.kicks-ass.net>
- <52b2be9b-defd-63ce-4cb2-96cd624a95a6@intel.com>
- <Y30fUS5/JClpBHVc@hirez.programming.kicks-ass.net>
- <b3938f3a-e4f8-675a-0c0e-4b4618019145@intel.com>
- <da7ae78c2d9fed125f160744af5be75f34b1b1d7.camel@intel.com>
- <791bf9a2-a079-3cd6-90a3-42dbb332a38c@intel.com>
- <9f1ea2639839305dd8b82694b3d8c697803f43a1.camel@intel.com>
- <Y35IW/PnbxinKHOL@google.com>
- <168ca2b3-ffac-31c4-0b83-2d0ee75f34a5@intel.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=u1xkewih3/RfIoNkoMopgJDb13M3oVFzr/bToZLrQIw=;
+        b=NUnupsSQc+NI5MOWDl7yGAs4R3uVShWrB6rPyjsELbnDFnA6oiHRzWjV++rC10q3Pl
+         NDxmkNjYLndRrxpCbG0FD3DRbA4Fh1ZYgFROolKwThfdQuJbJrZJSc3rCI0QrVuez2BM
+         5gMAkkPcniEYP69Uh8/YEgmzt1gv33I9NTSN/Nb8kQN5YImTlH93CUVOi+cehaCWG7UV
+         9CcL16kRAMe/8bUQEYhTmosSd1Mg7hZxTRvtgwWL/VriB2MvLHzesuD0EE9C/JuPLCJc
+         qxSBncVjg1XHflFZSR0BuB3jsxNE1IU4Mm1CQQE8KGWCKLyN6aFUUgGrdpeohYMSKNJB
+         6ANQ==
+X-Gm-Message-State: ANoB5pnubvJxqBXkosWBMvAQEsVvwLWhaEJWLCBzDNG37JpVEdKUxBjE
+        RN8kZ7ZoAiE93hQtEYz3M51tUHoUxjqYYVkU9OozJg==
+X-Google-Smtp-Source: AA0mqf439CreUnpaeWwBjF5hB8UZGECQqTvVfpzTMLQ4+KpxuACkd1Dw99kXAOqepPOD2nsGP9lQAP45vgETI9r0JTU=
+X-Received: by 2002:a2e:bf17:0:b0:277:394:34e with SMTP id c23-20020a2ebf17000000b002770394034emr3204506ljr.18.1669225462333;
+ Wed, 23 Nov 2022 09:44:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <168ca2b3-ffac-31c4-0b83-2d0ee75f34a5@intel.com>
+References: <20221115111549.2784927-1-tabba@google.com> <20221115111549.2784927-2-tabba@google.com>
+ <Y35FdsVXdZf62tLO@monolith.localdoman>
+In-Reply-To: <Y35FdsVXdZf62tLO@monolith.localdoman>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Wed, 23 Nov 2022 17:43:45 +0000
+Message-ID: <CA+EHjTx_nD_BqRvNkkPtPyrsC+gH8NvyzreLJHWBqmo1ZA5cLg@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v1 01/17] Initialize the return value in kvm__for_each_mem_bank()
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
+        andre.przywara@arm.com, will@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -100,31 +67,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 23, 2022, Dave Hansen wrote:
-> On 11/23/22 08:20, Sean Christopherson wrote:
-> >>> Why is it done that way?
-> >>>
-> >>> Can it be changed to delay TDX initialization until the first TDX guest
-> >>> needs to run?
-> >>>
-> >> Sean suggested.
-> >>
-> >> Hi Sean, could you commenet?
-> > Waiting until the first TDX guest is created would result in false advertising,
-> > as KVM wouldn't know whether or not TDX is actually supported until that first
-> > VM is created.  If we can guarantee that TDH.SYS.INIT will fail if and only if
-> > there is a kernel bug, then I would be ok deferring the "enabling" until the
-> > first VM is created.
-> 
-> There's no way we can guarantee _that_.  For one, the PAMT* allocations
-> can always fail.  I guess we could ask sysadmins to fire up a guest to
-> "prime" things, but that seems a little silly.  Maybe that would work as
-> the initial implementation that we merge, but I suspect our users will
-> demand more determinism, maybe a boot or module parameter.
+Hi,
 
-Oh, you mean all of TDX initialization?  I thought "initialization" here mean just
-doing tdx_enable().
+On Wed, Nov 23, 2022 at 4:08 PM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+> On Tue, Nov 15, 2022 at 11:15:33AM +0000, Fuad Tabba wrote:
+> > If none of the bank types match, the function would return an
+> > uninitialized value.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  kvm.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/kvm.c b/kvm.c
+> > index 42b8812..78bc0d8 100644
+> > --- a/kvm.c
+> > +++ b/kvm.c
+> > @@ -387,7 +387,7 @@ int kvm__for_each_mem_bank(struct kvm *kvm, enum kvm_mem_type type,
+> >                          int (*fun)(struct kvm *kvm, struct kvm_mem_bank *bank, void *data),
+> >                          void *data)
+> >  {
+> > -     int ret;
+> > +     int ret = 0;
+>
+> Would you consider moving the variable declaration after the 'bank'
+> variable?
 
-Yeah, that's not going to be a viable option.  Aside from lacking determinisim,
-it would be all too easy to end up on a system with fragmented memory that can't
-allocate the PAMTs post-boot.
+Will do.
+
+> >       struct kvm_mem_bank *bank;
+> >
+> >       list_for_each_entry(bank, &kvm->mem_banks, list) {
+>
+> Shouldn't the function return an error if no memory banks matched the type
+> specified (initialize ret to -EINVAL instead of 0)? I'm thinking that if
+> the caller expects a certain type of memory bank to be present, but that
+> memory type is not present, then somehwere an error occured and the caller
+> should be made aware of it.
+>
+> Case in point, kvm__for_each_mem_bank() is used vfio/core.c for
+> KVM_MEM_TYPE_RAM. If RAM hasn't been created by that point, then
+> VFIO_IOMMU_MAP_DMA will not be called for guest memory and the assigned
+> device will not work.
+
+I was following the behavior specified in the comment. That said, I
+agree with you that returning an error should be the correct behavior.
+I'll fix that and adjust the comment to reflect that.
+
+Cheers,
+/fuad
+
+> Thanks,
+> Alex
+>
+> > --
+> > 2.38.1.431.g37b22c650d-goog
+> >
