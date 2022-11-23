@@ -2,266 +2,254 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37A65636616
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 17:44:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92E7663662E
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 17:51:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239115AbiKWQoq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 11:44:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39824 "EHLO
+        id S239170AbiKWQva (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 11:51:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239092AbiKWQok (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 11:44:40 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E749898E8;
-        Wed, 23 Nov 2022 08:44:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669221879; x=1700757879;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=tBVb3AQU+EbT/tlKc5ko5OHSw/tp5VQYVepPcuic5yQ=;
-  b=ZRw2pVlLDhjNbFAI5nowPl0PgrW5MhlrKwguGjx4ZATZ02lTmKu4Wj6s
-   XkPd9LL+aFZZZbyAr888gCw9y7nGFWDfnGdctVSNJqOYADzje9t5x/UC+
-   MFcDNgakFB/w5C9e7CiWvun7iN1TpFpSDSkxSxx1kCpTOj3GOxdTDDqSX
-   1iMRdKJH67wKCDtmTxMJdVAF9Tfqxm8r3bvm2Dat9FhYzp90+bGrmRu17
-   hJv1cvsQ64f54ztPw2vRB/KkO6lC0vNDzLjnCgWvEvjr47M+8KK9hjN8W
-   ViJ6wCVc3OJOqeKd287RSapyOTToKAKmz8RZjWqc/mQ8pbTqoPtZM68gn
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="297468949"
-X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
-   d="scan'208";a="297468949"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 08:44:33 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="705422680"
-X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
-   d="scan'208";a="705422680"
-Received: from vcbudden-mobl3.amr.corp.intel.com (HELO [10.212.129.67]) ([10.212.129.67])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 08:44:32 -0800
-Message-ID: <1c6580f7-3abb-03ba-dd98-367ddb9bf23b@intel.com>
-Date:   Wed, 23 Nov 2022 08:44:32 -0800
+        with ESMTP id S235632AbiKWQv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 11:51:28 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2042.outbound.protection.outlook.com [40.107.243.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBCC251324
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 08:51:27 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XFQw/QbqzjsGHuS+NYcshhvEwDYY1altGElRX2aH4a5Efu4bsFaVUYrdZXu+zKEf/beMA2judLHIuV2FDgN9utl6QvLHJJhs0zDUxvb0TUlbBOdvbX6gmvphA53UXSZSVXdDrA1ap1hx/stN1N0D7z+5HJVDZl+aEW/7MoQXs+jcx0DghK1Uo/YdAB8kV/meELR8Q8bHL/zRPUJENysd3SBLodZB9Y3hUppEwB0Zrw27Sjp4VwTnRoyZXcIvVgRBcdnfYV5Es6zuwnaHyNR9oE6u9KvH8dM+CwSnBLLHWrcbhqo90mX/1PgucRLotAZXV4T1seaAMgE2ozcHXcShRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W8d5i+kxijJjIsYKqfKG1nE7jpiKpNYdKj3rh/SuH2k=;
+ b=PXe36am4I1s3zhiFXEKOVE26NlG5vgIqF92aIREfim0rfj1bBuDyqCjZvgrMfKfM/2JaD3r++BEtH2W/I8gJlTiGmpUmndHpH/ej4OAB25Scz51FTYiaRijKcTAWjmgmvVa3H0F56lnxpEQkH1Wn4EGKy2gNB+tN5O+WQSIWjLT28yOZ36mdaCuTlx2oUT34Q5PEVSQaywzA2NVDKdBWFQ4SQ2SRATvKgMbpusL7MIPFCtpyWEipItGAbLxsWYtawx8x97arnQpDaVGkXF4Qcu9AgtcmMVRN+xg4xaf0ngFzPusJyYVTPsdJIOVahbFCsML0vGwCexLNjZo5hPvTgg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W8d5i+kxijJjIsYKqfKG1nE7jpiKpNYdKj3rh/SuH2k=;
+ b=pDRHXby9bYPMt1igrTKm3bdMf3+bfB27DR0C+HTsdtIIdNz3eFT6JrTCS09XqPaMV34r4DYEWz/22SZQCsAZQAZnsuyU/xd89Kh4rF/BELOXcL/EHLL5TMOLEnofv2iI6s/lxfSrmRkhw0N/LpLWgcJHd84dGmcQI16/py8ezmDQZRrVR0qBer3I/B26Uebvw+n3/erTwah0/MmkTfLYD+eRWribfXYAGqqkWWwpg5huV2oFXOWgywBRUwgExX/oC5vBmUJdG+e0gZkWe55BiymydvtJ4vZq0DzNagwaAEFxMZWSffClyq7n8lXTVfizocGnkl8BcML4NyUDZms07w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM4PR12MB5890.namprd12.prod.outlook.com (2603:10b6:8:66::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.15; Wed, 23 Nov
+ 2022 16:51:26 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5834.015; Wed, 23 Nov 2022
+ 16:51:26 +0000
+Date:   Wed, 23 Nov 2022 12:51:25 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     alex.williamson@redhat.com, kevin.tian@intel.com,
+        eric.auger@redhat.com, cohuck@redhat.com, nicolinc@nvidia.com,
+        yi.y.sun@linux.intel.com, chao.p.peng@linux.intel.com,
+        mjrosato@linux.ibm.com, kvm@vger.kernel.org
+Subject: Re: [RFC 09/10] vfio: Refactor dma APIs for emulated devices
+Message-ID: <Y35PjWQbzRy+oMi7@nvidia.com>
+References: <20221123150113.670399-1-yi.l.liu@intel.com>
+ <20221123150113.670399-10-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221123150113.670399-10-yi.l.liu@intel.com>
+X-ClientProxiedBy: MN2PR17CA0036.namprd17.prod.outlook.com
+ (2603:10b6:208:15e::49) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v7 09/20] x86/virt/tdx: Get information about TDX module
- and TDX-capable memory
-Content-Language: en-US
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc:     "Luck, Tony" <tony.luck@intel.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-References: <cover.1668988357.git.kai.huang@intel.com>
- <cd23a9583edcfa85e11612d94ecfd2d5e862c1d5.1668988357.git.kai.huang@intel.com>
- <850e0899-d54e-6a49-851e-56f4d353905c@intel.com>
- <57af0b96f8a827828b1d64031774962972bfb060.camel@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <57af0b96f8a827828b1d64031774962972bfb060.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5890:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0bb966d9-03f1-44ea-1daf-08dacd72f5c3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ixB8q6sZQhCesf/l4B+/8sY0D+iNN0Je1oNmG7MQDiJonuRhggTo4Dbix+enuWVB1AGjAirPmjbzgHt0z8gtHwF6OVUeCd4WHqk2uVP1PgM+H0LXdg5EsGulfRZ4WEKmoPRXqKeDn2UU4VPjwcxHXW5r+LJimQxaaU6OEWHkwfI+QNuHpCh6gBre4Ss1AFQ9e0sL8nz/tTntaJLUOpbkVe5FCoLzdNLKLC609z+1FTBOYUuFCwvvx7hTRriINmVl8LlTp43C/S9z8hO40tjrC6e6J5hrUqAMD058vEzyTVeirRWrg3qeqP4WXWAlpgG5RyOthw1ow9pvhKrXiWQ+GZJx95nxqYi3J8pqgiOu0DL0PwR0QbzqbEuqRr4cFe7+ZmpWwiSYnGGz/IWIsZ7CVTHB8hdnFyJ/zUxRQwpkyU1XejdHWiomjEycOyLhn0FuzMEEYhf2wCkWILJHYyfh8VW3t3IZG53uSc7dvCdZvl/hgG6nQPwZxExXzuKiuKekqBWjp+vC23naV4swUdyg9QxRBFens4ZWGl1UqgZhLLuOz2KFthBgB0B6/qY/UExg8zDHvaAKNJt4HA0oT9FybqiJ2FD32c32EGAfDnSn6XdKu2EU5cDDeWYtRie33gG3jg8mynxNLWHFo4M4IvQ6RWH3yRKOC2DqYWebdo70nKGuKAQj796TLkSF6IqHfh5J
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(396003)(39860400002)(136003)(366004)(346002)(451199015)(478600001)(6506007)(6512007)(6486002)(26005)(83380400001)(6916009)(86362001)(38100700002)(8936002)(36756003)(316002)(2616005)(186003)(5660300002)(41300700001)(2906002)(66946007)(4326008)(66476007)(66556008)(8676002)(67856001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tUPWt3/mypF0DpoZzWuk4pwGXsCn6VPAo1CDkfS1YkVZ9FROkexImJRwqNfX?=
+ =?us-ascii?Q?8kQZFQmkXDFMK+yvW9kgJ/r6lqe93jXENQMHlnjpuR0/tFFUdIT7avLRoUB+?=
+ =?us-ascii?Q?ObGrOW4QgqE/tKTDwFUE9oHCK6Zre9cD/ZSe63N7bQJg0Cp7ZRCNagAHP5UM?=
+ =?us-ascii?Q?aiTaafGaq1VurMo0Eb9mLUfdCZWi5qGoUgA7xz5MdhFNQSmChzjNPVCeH43K?=
+ =?us-ascii?Q?1EI8OQykWBKCUSkkt9FJ/JqmXgTtoSLRYPNSpbrFj9xoGBl9UU2y4sT3lnl/?=
+ =?us-ascii?Q?hus56NLCSG4Mcu9tUF6QmthD7sv3sMys8eAmcaykuqK86PQawZgdB/Pb6yOX?=
+ =?us-ascii?Q?GtWJyL3DQhhPOdmwg0Irxmt7deXhapZOuOHR1UxXdAQHLgH8msAXJaiTWy2h?=
+ =?us-ascii?Q?AuQ/46Hk3eELMAtxsL8NWym3W4X98t7IbyYB3FIdADxHYWsVPGdcBiU+a20d?=
+ =?us-ascii?Q?tayg0+CTZLqgpGy4LE2nLWNoxbU6P7TPhgBrnv/gknmOA6i5/DjKpbsJi9Wq?=
+ =?us-ascii?Q?xS0kOLC21ecMYfYHIaK9BkLqUyP6Gqo5EWlrbT0Rv6V0K/hkRWOEeZPdUCKc?=
+ =?us-ascii?Q?ZEaYzHsAO1rtpOdHO5nVs6/SJl0tnjFQ6tSYvgYOx8pIymD+X6mzQRFz1jUS?=
+ =?us-ascii?Q?z0cU7GeQhX1yNyI6ULQrFIZLB33HW8XfbvCbW/j/KdeyLeejMqmk1qKuCwVf?=
+ =?us-ascii?Q?5TmwEgOBRnQJCSw0zD5P3y3LgrpwceRqlA7YSI/gfYvYQAztT3Fosqn9SSM/?=
+ =?us-ascii?Q?vnRj7lud6Gok9+XBzSM94g1hK1ce6q3bTW58r8aId0H7W3kwsxQtK352FqJ0?=
+ =?us-ascii?Q?Dac5S0UpaKgRq6ygyLlajf5AzkoCUA0Jb0GuwEjTkhTP5mBbDWsSY0RP3V6U?=
+ =?us-ascii?Q?BeTutziol03v9NMxobEyHD7Qff+I6mtP5O1f1DoqGOyz22sBNUgqL1+mno+U?=
+ =?us-ascii?Q?WcV9GP9wl/FJjztcWrpABcesuhgDwilc0TSvJ1aZElnmj3jkeU9lphnWW2eM?=
+ =?us-ascii?Q?9SOU+FeVLDtgQgWwdrSbCRvWRfuG/OhOZjh5hFVRcZk9CfNS0MLguZFRHK4t?=
+ =?us-ascii?Q?o4+Aj/X9sQh1+DXv2uLXEaXcvaE7d4GNoA/RL2aUxjrkNCrS9OLtw4VJuEhA?=
+ =?us-ascii?Q?IvcUeq2xTR5WtcFPJ+be4ZuBnUJKjZcxJnJyahDud3kwmKhf3LPbQZEIBuXQ?=
+ =?us-ascii?Q?tNQFRJgqFpG0IcptPV+m/25cSUmLXMPpysXVeEJFQRROzA4QdFqXUUVhE9x+?=
+ =?us-ascii?Q?9SBU3/A60br3+NOejbXxZaJyvqV3X1DB8YMKEyTBWGN69iQ+0LoxlVVByGUZ?=
+ =?us-ascii?Q?j4N0BtJrqtynhTyes4T2QeBaAw0AZFlmhJEg+zAVLIE9q/8ffco5fGO8SvLb?=
+ =?us-ascii?Q?HMA0GtWhCzF9MQkiqUklxztm/PDr9/fcM8GMTru1kBQ/mZUjE6A6E5rBs7sM?=
+ =?us-ascii?Q?rGrxEVKtkZGt+0xU4VXThznvDKzpVMkEtiDzdqry8XkBiohj8HDc9+IrPNlX?=
+ =?us-ascii?Q?8EgyPN4POdlLHlRxqoe7RHyUJhjGWsMH3z/mEbqoK3XVMPHwlz3lm2Z4QaFR?=
+ =?us-ascii?Q?/QBmwTWLx8ZJjRYnV78=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0bb966d9-03f1-44ea-1daf-08dacd72f5c3
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Nov 2022 16:51:26.0454
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9tifa6hS+2o9lh2XNkaV0l7z9dVvyNqGuqugpk/bK5kePeSpwoS1EXSKBa2qfydt
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5890
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/23/22 03:40, Huang, Kai wrote:
-> On Tue, 2022-11-22 at 15:39 -0800, Dave Hansen wrote:
->> That last sentece is kinda goofy.  I think there's a way to distill this
->> whole thing down more effecively.
->>
->>       CMRs tell the kernel which memory is TDX compatible.  The kernel
->>       takes CMRs and constructs  "TD Memory Regions" (TDMRs).  TDMRs
->>       let the kernel grant TDX protections to some or all of the CMR
->>       areas.
+On Wed, Nov 23, 2022 at 07:01:12AM -0800, Yi Liu wrote:
+> To use group helpers instead of opening group related code in the
+> API. This prepares moving group specific code out of vfio_main.c.
 > 
-> Will do.
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> ---
+>  drivers/vfio/container.c | 20 +++++++++++++-------
+>  drivers/vfio/vfio.h      | 32 ++++++++++++++++----------------
+>  drivers/vfio/vfio_main.c | 26 +++++++++++++++-----------
+>  3 files changed, 44 insertions(+), 34 deletions(-)
 > 
-> But it seems we should still mention "Constructing TDMRs requires information of
-> both the TDX module (TDSYSINFO_STRUCT) and the CMRs"?  The reason is to justify
-> "use static to avoid having to pass them as function arguments when constructing
-> TDMRs" below.
+> diff --git a/drivers/vfio/container.c b/drivers/vfio/container.c
+> index 6b362d97d682..e0d11ab7229a 100644
+> --- a/drivers/vfio/container.c
+> +++ b/drivers/vfio/container.c
+> @@ -540,11 +540,13 @@ void vfio_group_unuse_container(struct vfio_group *group)
+>  	fput(group->opened_file);
+>  }
+>  
+> -int vfio_container_pin_pages(struct vfio_container *container,
+> -			     struct iommu_group *iommu_group, dma_addr_t iova,
+> -			     int npage, int prot, struct page **pages)
+> +int vfio_group_container_pin_pages(struct vfio_group *group,
+> +				   dma_addr_t iova, int npage,
+> +				   int prot, struct page **pages)
+>  {
+> +	struct vfio_container *container = group->container;
+>  	struct vfio_iommu_driver *driver = container->iommu_driver;
+> +	struct iommu_group *iommu_group = group->iommu_group;
+>  
+>  	if (npage > VFIO_PIN_PAGES_MAX_ENTRIES)
+>  		return -E2BIG;
+> @@ -555,9 +557,11 @@ int vfio_container_pin_pages(struct vfio_container *container,
+>  				      npage, prot, pages);
+>  }
+>  
+> -void vfio_container_unpin_pages(struct vfio_container *container,
+> -				dma_addr_t iova, int npage)
+> +void vfio_group_container_unpin_pages(struct vfio_group *group,
+> +				      dma_addr_t iova, int npage)
+>  {
+> +	struct vfio_container *container = group->container;
+> +
+>  	if (WARN_ON(npage <= 0 || npage > VFIO_PIN_PAGES_MAX_ENTRIES))
+>  		return;
+>  
+> @@ -565,9 +569,11 @@ void vfio_container_unpin_pages(struct vfio_container *container,
+>  						  npage);
+>  }
+>  
+> -int vfio_container_dma_rw(struct vfio_container *container, dma_addr_t iova,
+> -			  void *data, size_t len, bool write)
+> +int vfio_group_container_dma_rw(struct vfio_group *group,
+> +				dma_addr_t iova, void *data,
+> +				size_t len, bool write)
+>  {
+> +	struct vfio_container *container = group->container;
+>  	struct vfio_iommu_driver *driver = container->iommu_driver;
+>  
+>  	if (unlikely(!driver || !driver->ops->dma_rw))
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index 3378714a7462..d6b6bc20406b 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -122,13 +122,14 @@ int vfio_container_attach_group(struct vfio_container *container,
+>  void vfio_group_detach_container(struct vfio_group *group);
+>  void vfio_device_container_register(struct vfio_device *device);
+>  void vfio_device_container_unregister(struct vfio_device *device);
+> -int vfio_container_pin_pages(struct vfio_container *container,
+> -			     struct iommu_group *iommu_group, dma_addr_t iova,
+> -			     int npage, int prot, struct page **pages);
+> -void vfio_container_unpin_pages(struct vfio_container *container,
+> -				dma_addr_t iova, int npage);
+> -int vfio_container_dma_rw(struct vfio_container *container, dma_addr_t iova,
+> -			  void *data, size_t len, bool write);
+> +int vfio_group_container_pin_pages(struct vfio_group *group,
+> +				   dma_addr_t iova, int npage,
+> +				   int prot, struct page **pages);
+> +void vfio_group_container_unpin_pages(struct vfio_group *group,
+> +				      dma_addr_t iova, int npage);
+> +int vfio_group_container_dma_rw(struct vfio_group *group,
+> +				dma_addr_t iova, void *data,
+> +				size_t len, bool write);
+>  
+>  int __init vfio_container_init(void);
+>  void vfio_container_cleanup(void);
+> @@ -166,22 +167,21 @@ static inline void vfio_device_container_unregister(struct vfio_device *device)
+>  {
+>  }
+>  
+> -static inline int vfio_container_pin_pages(struct vfio_container *container,
+> -					   struct iommu_group *iommu_group,
+> -					   dma_addr_t iova, int npage, int prot,
+> -					   struct page **pages)
+> +static inline int vfio_group_container_pin_pages(struct vfio_group *group,
+> +						 dma_addr_t iova, int npage,
+> +						 int prot, struct page **pages)
+>  {
+>  	return -EOPNOTSUPP;
+>  }
+>  
+> -static inline void vfio_container_unpin_pages(struct vfio_container *container,
+> -					      dma_addr_t iova, int npage)
+> +static inline void vfio_group_container_unpin_pages(struct vfio_group *group,
+> +						    dma_addr_t iova, int npage)
+>  {
+>  }
+>  
+> -static inline int vfio_container_dma_rw(struct vfio_container *container,
+> -					dma_addr_t iova, void *data, size_t len,
+> -					bool write)
+> +static inline int vfio_group_container_dma_rw(struct vfio_group *group,
+> +					      dma_addr_t iova, void *data,
+> +					      size_t len, bool write)
+>  {
+>  	return -EOPNOTSUPP;
+>  }
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index cde258f4ea17..b6d3cb35a523 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -1925,6 +1925,11 @@ int vfio_set_irqs_validate_and_prepare(struct vfio_irq_set *hdr, int num_irqs,
+>  }
+>  EXPORT_SYMBOL(vfio_set_irqs_validate_and_prepare);
+>  
+> +static bool vfio_group_has_container(struct vfio_group *group)
+> +{
+> +	return group->container;
+> +}
 
-In a changelog, no.  You do *NOT* use super technical language in
-changelogs if not super necessary.  Mentioning "TDSYSINFO_STRUCT" here
-is useless.  The *MOST* you would do for a good changelog is:
+This should probably be
+ 
+  vfio_device_has_container(struct vfio_device  *device)
 
-	The kernel takes CMRs (plus a little more metadata) and
-	constructs "TD Memory Regions" (TDMRs).
+And it just returns false if the group code is compiled out
 
-You just need to talk about things at a high level in mostly
-non-technical language so that folks know the structure of the code
-below.  It's not a replacement for the code, the comments, *OR* the TDX
-module specification.
-
-I'm also not quite sure that this justifies the static variables anyway.
- They could be dynamically allocated and passed around, for instance.
-
->>> Use static variables for both TDSYSINFO_STRUCT and CMR array to avoid
->>
->> I find it very useful to be precise when referring to code.  Your code
->> says 'tdsysinfo_struct', yet this says 'TDSYSINFO_STRUCT'.  Why the
->> difference?
-> 
-> Here I actually didn't intend to refer to any code.  In the above paragraph
-> (that is going to be replaced with yours), I mentioned "TDSYSINFO_STRUCT" to
-> explain what does "information of the TDX module" actually refer to, since
-> TDSYSINFO_STRUCT is used in the spec.
-> 
-> What's your preference?
-
-Kill all mentions to TDSYSINFO_STRUCT whatsoever in the changelog.
-Write comprehensible English.
-
->>> having to pass them as function arguments when constructing the TDMR
->>> array.  And they are too big to be put to the stack anyway.  Also, KVM
->>> needs to use the TDSYSINFO_STRUCT to create TDX guests.
->>
->> This is also a great place to mention that the tdsysinfo_struct contains
->> a *lot* of gunk which will not be used for a bit or that may never get
->> used.
-> 
-> Perhaps below?
-> 
-> "Note many members in tdsysinfo_struct' are not used by the kernel".
-> 
-> Btw, may I ask why does it matter?
-
-Because you're adding a massive structure with all kinds of fields.
-Those fields mostly aren't used.  That could be from an error in this
-series, or because they will be used later or because they will *never*
-be used.
-
->>> +   cmr = &cmr_array[0];
->>> +   /* There must be at least one valid CMR */
->>> +   if (WARN_ON_ONCE(is_cmr_empty(cmr) || !is_cmr_ok(cmr)))
->>> +           goto err;
->>> +
->>> +   cmr_num = *actual_cmr_num;
->>> +   for (i = 1; i < cmr_num; i++) {
->>> +           struct cmr_info *cmr = &cmr_array[i];
->>> +           struct cmr_info *prev_cmr = NULL;
->>> +
->>> +           /* Skip further empty CMRs */
->>> +           if (is_cmr_empty(cmr))
->>> +                   break;
->>> +
->>> +           /*
->>> +            * Do sanity check anyway to make sure CMRs:
->>> +            *  - are 4K aligned
->>> +            *  - don't overlap
->>> +            *  - are in address ascending order.
->>> +            */
->>> +           if (WARN_ON_ONCE(!is_cmr_ok(cmr)))
->>> +                   goto err;
->>
->> Why does cmr_array[0] get a pass on the empty and sanity checks?
-> 
-> TDX MCHECK verifies CMRs before enabling TDX, so there must be at least one
-> valid CMR.
-> 
-> And cmr_array[0] is checked before this loop.
-
-I think you're confusing two separate things.  MCHECK ensures that there
-is convertible memory.  The CMRs that this code looks at are software
-(TD module) defined and created structures that the OS and the module share.
-
-This cmr_array[] structure is not created by MCHECK.
-
-Go look at your code.  Consider what will happen if cmr_array[0] is
-empty or !is_cmr_ok().  Then consider what will happen if cmr_array[1]
-has the same happen.
-
-Does that end result really justify having separate code for
-cmr_array[0] and cmr_array[>0]?
-
->>> +           prev_cmr = &cmr_array[i - 1];
->>> +           if (WARN_ON_ONCE((prev_cmr->base + prev_cmr->size) >
->>> +                                   cmr->base))
->>> +                   goto err;
->>> +   }
->>> +
->>> +   /* Update the actual number of CMRs */
->>> +   *actual_cmr_num = i;
->>
->> That comment is not helpful.  Yes, this is literally updating the number
->> of CMRs.  Literally.  That's the "what".  But, the "why" is important.
->> Why is it doing this?
-> 
-> When building the list of "TDX-usable" memory regions, the kernel verifies those
-> regions against CMRs to see whether they are truly convertible memory.
-> 
-> How about adding a comment like below:
-> 
->         /*
->          * When the kernel builds the TDX-usable memory regions, it verifies
->          * they are truly convertible memory by checking them against CMRs.
->          * Update the actual number of CMRs to skip those empty CMRs.
->          */
-> 
-> Also, I think printing CMRs in the dmesg is helpful.  Printing empty (zero) CMRs
-> will put meaningless log to the dmesg.
-
-So it's just about printing them?
-
-Then put a dang switch to the print function that says "print them all"
-or not.
-
-...
->> Also, I saw the loop above check 'cmr_num' CMRs for is_cmr_ok().  Now,
->> it'll print an 'actual_cmr_num=1' number of CMRs as being
->> "kernel-checked".  Why?  That makes zero sense.
-> 
-> The loop quits when it sees an empty CMR.  I think there's no need to check
-> further CMRs as they must be empty (TDX MCHECK verifies CMRs).
-
-OK, so you're going to get some more homework here.  Please explain to
-me how MCHECK and the CMR array that comes out of the TDX module are
-related.  How does the output from MCHECK get turned into the in-memory
-cmr_array[], step by step?
-
-At this point, I fear that you're offering up MCHECK like it's a bag of
-magic beans rather than really truly thinking about the cmr_array[] data
-structure.  How it is generated?  How might it be broken? Who might
-break it?   If so, what the kernel should do about it?
-
-
->>> +
->>> +   /*
->>> +    * trim_empty_cmrs() updates the actual number of CMRs by
->>> +    * dropping all tail empty CMRs.
->>> +    */
->>> +   return trim_empty_cmrs(tdx_cmr_array, &tdx_cmr_num);
->>> +}
->>
->> Why does this both need to respect the "tdx_cmr_num = out.r9" value
->> *and* trim the empty ones?  Couldn't it just ignore the "tdx_cmr_num =
->> out.r9" value and just trim the empty ones either way?  It's not like
->> there is a billion of them.  It would simplify the code for sure.
-> 
-> OK.  Since spec says MAX_CMRs is 32, so I can use 32 instead of reading out from
-> R9.
-
-But then you still have the "trimming" code.  Why not just trust "r9"
-and then axe all the trimming code?  Heck, and most of the sanity checks.
-
-This code could be a *lot* smaller.
+Jason
