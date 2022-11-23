@@ -2,229 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC7E163531E
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 09:47:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1CCA635349
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 09:54:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236694AbiKWIr0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 03:47:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49986 "EHLO
+        id S236286AbiKWIxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 03:53:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236684AbiKWIrW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 03:47:22 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BCEC32BA3;
-        Wed, 23 Nov 2022 00:47:21 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AN8LNUa014558;
-        Wed, 23 Nov 2022 08:47:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=N6KQpyCIRLGVNI2BKxfLkWTQQxU4f9VG2jydRh65aag=;
- b=Ec4cIW/rVyN60oIpCtr70ksemEydK1oYK93q4TEaGL9uNBeASwLkinbJ5cjmRjSfHO7o
- 94veJ9rmooajGqrj7g8+haw8ku+kIqW+sBJfuNS9D0XXkuqdWjxBiGA5F4FW5Te9adpG
- aGbjMOojweGELjoymdr808Z4PsDGbQbVA8cx/cabR1QVIM/GitSxH4bF9gHjfcFdyHhw
- lB+q5OTcGXdP5vooMxQHDWFLaSIOrPff+cf3ChFUwZRskxokljNsj+qMRiLZTnK8/us4
- NkR1oCGbGxcmAUXMuomfaTgttl/cjt5XIBx+Yd1+rN3GiEfSnWC3MUTmodL0zqe86Dj0 IA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m10pfxka8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 08:47:20 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AN8astc018667;
-        Wed, 23 Nov 2022 08:47:20 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m10pfxk9f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 08:47:20 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AN8ZeUR022807;
-        Wed, 23 Nov 2022 08:47:17 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3kxpdhwcvg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 08:47:17 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AN8lEIG6423090
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Nov 2022 08:47:14 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5D81D11C04C;
-        Wed, 23 Nov 2022 08:47:14 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9B66311C04A;
-        Wed, 23 Nov 2022 08:47:13 +0000 (GMT)
-Received: from linux6.. (unknown [9.114.12.104])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Nov 2022 08:47:13 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, seiden@linux.ibm.com,
-        nrb@linux.ibm.com
-Subject: [kvm-unit-tests PATCH 5/5] lib: s390x: Handle debug prints for SIE exceptions correctly
-Date:   Wed, 23 Nov 2022 08:46:56 +0000
-Message-Id: <20221123084656.19864-6-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221123084656.19864-1-frankja@linux.ibm.com>
-References: <20221123084656.19864-1-frankja@linux.ibm.com>
+        with ESMTP id S236260AbiKWIxk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 03:53:40 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F817E9317;
+        Wed, 23 Nov 2022 00:53:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669193617; x=1700729617;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=92GMYwruPq1euQyDFnuhanx8gnB+ExNc1Pwljt6ssbw=;
+  b=dLxzfGVFlPv17S31rTpYbs3ppEek6cCnd3WP0tjwxrq8J/fxs1dqznoP
+   bGBaHnQjbEfiJNiE3Ic2DAeyNQufY+WlRk3EfWySAVPWw4woSAtzNeV3m
+   fahTiPxCrr/HDHYiLLk0Qsagl2IPKtAuye4936QcF6YGpKHLokmVAKVGj
+   eB9MqbcNHuRCXqxQu0PwrW4t+1eB75pGEbWYXHx9quSSBF0Don8i0K8aI
+   fx0hPRIfFl5bDplzowbvGMPGd26rGSObNVAzH0GIbdf29PAFcwpqIH9dh
+   nthL9FZr1SHBgzcSD2SMNImYEUarrZD0bfIMKtOet8uJi6H3DpJRSNJ3X
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="378274596"
+X-IronPort-AV: E=Sophos;i="5.96,186,1665471600"; 
+   d="scan'208";a="378274596"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 00:53:36 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="592445856"
+X-IronPort-AV: E=Sophos;i="5.96,186,1665471600"; 
+   d="scan'208";a="592445856"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga003.jf.intel.com with ESMTP; 23 Nov 2022 00:53:36 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 23 Nov 2022 00:53:36 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Wed, 23 Nov 2022 00:53:36 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.171)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Wed, 23 Nov 2022 00:53:35 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=buipUy+TdPs1BrDVBJkJR0sSGV2l869fdTALb5Q9527Nl8+b10DqTUSPhSaCjNFVKqHiN6H3T2KhHN2V69e6cNKoTF9oP4QTdxMCBauWRTN/us9VXiMQhjKhkJqMPZxG9xKG0jUQeKzMbI2PuuXzRKX4ukEkYQeyWajZXeygpJ+Yg4H5omEUrbM9uvVsF/cSWDWLeW2sT5r3Sud78Zsvh744j8WTYfSYO/9ct6q9OAwWp9BgQ0nti8igR2snlMtdkaoVhnUzzS4G0bZKAPFZ5YaYt5EOt1aScYwoEgbBLg+ohDRWkA2Cd5YwzsU7CEFyoBhHLPuE3SJdGL/ckiz6GA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=92GMYwruPq1euQyDFnuhanx8gnB+ExNc1Pwljt6ssbw=;
+ b=MRc0wL0eyJpsVPNEDYFsu7vXu77EKiyrXNHvwEzSF6vrRyviQ6lONaBAvK62Ce7VyB8DyLuf1pBsg8WclIXZs0GOUCa6wardbHBe9bnN+Xw3GFLjHDkQnKD10ytQdg8VG5qhaRBZv/Wuh6YvZT43/SLJum5ufe7eJUqGxviy3oQwQoXyWMjZPingDSBjSI354id7RLL7bhD4qLd6Q/9/rsqoGnk4MsMmNx1VEc+d1RCGwTWtkKKqoc0P9xmxyjH0bebmxuFGbBB8C9Ys2jhXjzEp/bydYaj3uB31lpe4iQqIhn6tXk2a852uOmOzejps/b6A2hmDz8nm+xDKEl4m2Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by BL1PR11MB5304.namprd11.prod.outlook.com (2603:10b6:208:316::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.18; Wed, 23 Nov
+ 2022 08:53:30 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e%8]) with mapi id 15.20.5834.015; Wed, 23 Nov 2022
+ 08:53:30 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "peterz@infradead.org" <peterz@infradead.org>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v7 05/20] x86/virt/tdx: Implement functions to make
+ SEAMCALL
+Thread-Topic: [PATCH v7 05/20] x86/virt/tdx: Implement functions to make
+ SEAMCALL
+Thread-Index: AQHY/T3A+/0sXXuTQkqld4kSQb8mzK5KqPiAgAGOqAA=
+Date:   Wed, 23 Nov 2022 08:53:30 +0000
+Message-ID: <526f79da588734cc9d83764b36be87e4b0f4fcb2.camel@intel.com>
+References: <cover.1668988357.git.kai.huang@intel.com>
+         <5977ec3c2e682e6927ce1c33e7fcac7fcfe2d346.1668988357.git.kai.huang@intel.com>
+         <Y3yRHf982s/tNlvC@hirez.programming.kicks-ass.net>
+In-Reply-To: <Y3yRHf982s/tNlvC@hirez.programming.kicks-ass.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|BL1PR11MB5304:EE_
+x-ms-office365-filtering-correlation-id: 881f249a-cd71-4ec1-af87-08dacd303201
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: mGdPFtl+d97iHN2MCGgh2EEtvFxv/itc+JfM6EDb8mJJON6idTXOW3VoHmjO+urmqPZSWQD+9VFH1pvZGvdtQI4a+qH9kpdki2bmmG/aSCl94iR0ZS8p6wwWDjG57RogKwJyYdEjn9tc6ZFe61EMEm67BiQCQM8m0RbR3FWQr+z73PVv1U/cMLXmu2wvYvQQcHCMFdvi/IhuizXXeQiVBnVSNXLoQENq8P5Q/pF1M3bp3mFTiEtww4k/0SVNlAcvcY5V4z4UHUZy7M39gSYUmWTQvjbJmGmrytTCN3hYhalTlh8B6VTRriq608va9Mii9wDOoOVma0mr22zysp5tApTev5IgLbsmcbU+TuQ7Djqw1Jg+eob5TWxQaDE6gnqbxnLy04l5PETWBYl4liypWwXOHjZTtZxl5jejh7VBA+hJSo5fxRITkWjOJQEUJI5PWOt7ElWEfhl+kh+RQgjaIhWqQ3DYerymqkOpx1/l8fjbGQYpitd/gU0pSgmsBAc3AWvmldggNFgH2huc50W7Rq6M8mmM5gKxfjm+s5MzyKE3tIQiPw84RM5yYhV44nuZCx0Gx2uD4+rRXRDqDTVmYnipc/0LbAY1RDQ6klhajDDkZ/z8MHrohQvSGR2iBbpOa50e/NtleIiKAo6IhTpBJWYHEETHiiu7QhdDj7BaL+l5/qiRYlGChfhh7JSEQeQfQIkvYXTC+Ay/g1/s2amPg0uFSVcGBYHk4bw8H1v89C4=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(396003)(366004)(346002)(376002)(39860400002)(451199015)(36756003)(86362001)(5660300002)(7416002)(4001150100001)(2906002)(2616005)(186003)(26005)(6512007)(83380400001)(38070700005)(82960400001)(38100700002)(122000001)(91956017)(478600001)(6486002)(71200400001)(966005)(8936002)(41300700001)(76116006)(6916009)(54906003)(316002)(4326008)(6506007)(66946007)(66556008)(66476007)(64756008)(8676002)(66446008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WWVSUjlvTWU1YkExN1paR042OW5ndG9Bbm9tRU1IZURxcEt5WitKNEV2bGFh?=
+ =?utf-8?B?c1ZrUSs2UFhYWjYvbUQ5dlV3N3BCZE13VGR4QkF6YUtidzllSThaek9RWFBu?=
+ =?utf-8?B?R2RTNTUrY1lJWDRhdnY3MHVGeDBMZ1ZaNVkrVjl5eFM5MTcxdVpGMzMrVDlu?=
+ =?utf-8?B?WFlya3R2ak1Gc3NIYlVYRUJBWFBKWkcrVkhBVGw0emwvWnBTUWdVSlpXeGE3?=
+ =?utf-8?B?ei9OZFNaV2s0dllLdkFYOGd3eUFKVHR4Q2RReFROTldELzkyZG40ZTZ3a0Zw?=
+ =?utf-8?B?ZUZzdUVlTERSZjA5OG40c25IWW1UT0hlOFRxY0xpSEhoaGJGRzV0NzV5Wks5?=
+ =?utf-8?B?ZE5nN29QMVNvNkQ2NmF2azc1d3l0blFxM0hReVlGSUZXYlN6YXZTd2lzM2Nu?=
+ =?utf-8?B?TDdTWFFaNmZZbjRjK0d6QUdWQXMwcEhkMkFSWW5GWjh1OU9KODdFWnNFempV?=
+ =?utf-8?B?bHZXdkd1Q1hXZ3d4emtIWEJhMWRoRmk3YktCMUNBbmo5TWRxTElRMk1BcGd6?=
+ =?utf-8?B?aDhpNEZ2NVlXTFN4TDl6TjNqdEVvcUtPeFRKSEIzYU5iVWRrZGoxbE5CMnZr?=
+ =?utf-8?B?OEVubGV2akdOZWQzUVFlS3JIQk1pNVRoc0p2R1dCamNFTGNiMGFTaUgrWkNv?=
+ =?utf-8?B?aWtNMDdSM29uNFF2dnpORXFIdXRoZjJvK01lVWZ5NkhUeEUrdWpvOUs3QU5t?=
+ =?utf-8?B?UDJtYnRMbEh6dlgralBuOU5CM0FEZzlqYzBSRUhTZDJNME5iRk02a2IyYjNO?=
+ =?utf-8?B?cGV0ZTFTNWFQazBDczNzNEQvVHFyVnRMSTlDcjZoT1ZjeVJqZy8yS002QW5j?=
+ =?utf-8?B?dzJQRkVzR0R6Vm5rSWZyTFVHUGFkTVdUcnlnWGRCMjViNjhTbWlDWWdQdndr?=
+ =?utf-8?B?R0N0QW1Td2kzbDBKVXVhZGhaWGQ4dlNlZ24zcE0zZ2lLWXppRHBtSzZOTlli?=
+ =?utf-8?B?NVFCMkhIWERxaEdCcVgrYXhpUkpkL2Z1bzRJb2gwM1d2cTdWc1JadVB5WFJa?=
+ =?utf-8?B?eGpOMmJRYnNRV29JYTZZcE5laEl3cFg2eVN1SmExWlI2S2ZiZDVFa252SFBH?=
+ =?utf-8?B?c3NXWmlvTXdJdUE3Ym0xSjJLZTZTaVA5anh3VnE2RHQxaE95R1B2MmQ3amQ0?=
+ =?utf-8?B?eXF0QkQ2bHhTTlJ4emp4dllWdjdnb2JoK3RzaGZYR1FkbTBIeWljWUYzNHVz?=
+ =?utf-8?B?TUJUNVRMSnNaNUlHZlYvcDRkZHlqZEpnTjA4MVptT2Y5ME42Yzdab1drOTA2?=
+ =?utf-8?B?TzhDaFBld21INDlUUy8vTDNUQkN1OW5MNlJuaWIxcHgxSlY2TTc0MCtOTXdm?=
+ =?utf-8?B?K2kxSzRzekVlQ2YrQmExM1pMbm9HRk9XN3BFOFl5dlN1ZDBmNjF5d05KMExU?=
+ =?utf-8?B?U0RQMjNqMWFqZElpblUyN1FJeVpsakRSa05HN2dhcUZkd3Zrb0NtWUczVDJp?=
+ =?utf-8?B?NnZGdElNZ2RBNkRZdGtOQ1dwNGJ5RzJZRDRzdVBpSlhCSmF2QmNFemtoSThQ?=
+ =?utf-8?B?SHNncWFPLzRhd0w0YXJsWU5EdWN2Rm5tYTcyOUVkR1RjcmRQYitVV0ZzYW54?=
+ =?utf-8?B?Y2FvUEpjQm1YeUJrUkNhMzMzQ3NBbno3V2ZrbWVkMUp5c3BBM005UHkrakha?=
+ =?utf-8?B?cW5XU3NBVGkzeUpBajE4WHpUM0ErdkJvcEZxOVRRUDZMWEkyK3c5RCtjMTdo?=
+ =?utf-8?B?QVNQc2lGclJtNityMitweXRkTHQxdzVmcDVoa0FPQ3Y2ZHdNQWJKK1BkYmtm?=
+ =?utf-8?B?dC8rNHhnYitFbUl3V2ZSNGlTNWlGMTZCSGJUK3JsM28raTZsWlc5NzJFT0k0?=
+ =?utf-8?B?TmFtajZMQ0x0b1d6NlltWlF4SXFoc2FUWElyc0FMQVNuL25sUE1Hdi9EcGJr?=
+ =?utf-8?B?VXM5SkxqRHdPTFU1YldZMlA2RFBXMWFZSHV0Tlp0bXl4WGtMRUVJQnUvSGZO?=
+ =?utf-8?B?ZTFEV2NVNEhaeGNSRFdobjd1UjVUVlJFdDJIeWlObUQvR1lPbjhnejBJQVhE?=
+ =?utf-8?B?ek4rRFhjRGlFNTdnSFdKZ0xrWDZ4Q0xPblAxSUwrTzA4MjNOSTgreU5JYU9V?=
+ =?utf-8?B?dFM4RGxVU2d3RExJNjJlUHlKRUlLNlVhdmxDT1VXY2dYdFVqVmZIMG1wMFdY?=
+ =?utf-8?B?OVEvYUU4RFVQRDNncjF2TjFhVFN1OTdWUTJiUlVnZ1BpUWMyWGo1TWRGU0RU?=
+ =?utf-8?B?dGc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EFCCB215AE9FE4409F4BE7224395CAA4@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: saKs2rWI3ENc4AIXd2OnRJddwu64qPxg
-X-Proofpoint-GUID: PGSzQMdilxOOJ1VzxdGb1J-w1OE4zZ9E
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-23_04,2022-11-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 adultscore=0 spamscore=0 phishscore=0 mlxscore=0
- lowpriorityscore=0 bulkscore=0 malwarescore=0 clxscore=1015
- impostorscore=0 mlxlogscore=919 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2210170000 definitions=main-2211230064
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 881f249a-cd71-4ec1-af87-08dacd303201
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Nov 2022 08:53:30.7129
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ATWFNRhcQae4KZBOvoar7drij88lHtkY8Q3xib2x7/+mkur6ERWuEARM++fZz1+R8rGJdpLmq0xycDTm13jmvQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5304
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When we leave SIE due to an exception, we'll still have guest values
-in registers 0 - 13 and that's not clearly portraied in our debug
-prints. So let's fix that.
-
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- lib/s390x/interrupt.c | 46 ++++++++++++++++++++++++++++++++++++++-----
- lib/s390x/sie.h       |  2 ++
- s390x/cpu.S           |  6 ++++--
- 3 files changed, 47 insertions(+), 7 deletions(-)
-
-diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-index dadb7415..ff47c2c2 100644
---- a/lib/s390x/interrupt.c
-+++ b/lib/s390x/interrupt.c
-@@ -9,6 +9,7 @@
-  */
- #include <libcflat.h>
- #include <asm/barrier.h>
-+#include <asm/asm-offsets.h>
- #include <sclp.h>
- #include <interrupt.h>
- #include <sie.h>
-@@ -188,9 +189,12 @@ static void print_storage_exception_information(void)
- 	}
- }
- 
--static void print_int_regs(struct stack_frame_int *stack)
-+static void print_int_regs(struct stack_frame_int *stack, bool sie)
- {
-+	struct kvm_s390_sie_block *sblk;
-+
- 	printf("\n");
-+	printf("%s\n", sie ? "Guest registers:" : "Host registers:");
- 	printf("GPRS:\n");
- 	printf("%016lx %016lx %016lx %016lx\n",
- 	       stack->grs1[0], stack->grs1[1], stack->grs0[0], stack->grs0[1]);
-@@ -198,24 +202,56 @@ static void print_int_regs(struct stack_frame_int *stack)
- 	       stack->grs0[2], stack->grs0[3], stack->grs0[4], stack->grs0[5]);
- 	printf("%016lx %016lx %016lx %016lx\n",
- 	       stack->grs0[6], stack->grs0[7], stack->grs0[8], stack->grs0[9]);
--	printf("%016lx %016lx %016lx %016lx\n",
--	       stack->grs0[10], stack->grs0[11], stack->grs0[12], stack->grs0[13]);
-+
-+	if (sie) {
-+		sblk = (struct kvm_s390_sie_block *)stack->grs0[12];
-+		printf("%016lx %016lx %016lx %016lx\n",
-+		       stack->grs0[10], stack->grs0[11], sblk->gg14, sblk->gg15);
-+	} else {
-+		printf("%016lx %016lx %016lx %016lx\n",
-+		       stack->grs0[10], stack->grs0[11], stack->grs0[12], stack->grs0[13]);
-+	}
-+
- 	printf("\n");
- }
- 
- static void print_pgm_info(struct stack_frame_int *stack)
- 
- {
--	bool in_sie;
-+	bool in_sie, in_sie_gregs;
-+	struct vm_save_area *vregs;
- 
- 	in_sie = (lowcore.pgm_old_psw.addr >= (uintptr_t)sie_entry &&
- 		  lowcore.pgm_old_psw.addr <= (uintptr_t)sie_exit);
-+	in_sie_gregs = (lowcore.pgm_old_psw.addr >= (uintptr_t)sie_entry_gregs &&
-+			lowcore.pgm_old_psw.addr <= (uintptr_t)sie_exit_gregs);
- 
- 	printf("\n");
- 	printf("Unexpected program interrupt %s: %#x on cpu %d at %#lx, ilen %d\n",
- 	       in_sie ? "in SIE" : "",
- 	       lowcore.pgm_int_code, stap(), lowcore.pgm_old_psw.addr, lowcore.pgm_int_id);
--	print_int_regs(stack);
-+
-+	/*
-+	 * If we fall out of SIE before loading the host registers,
-+	 * then we need to do it here so we print the host registers
-+	 * and not the guest registers.
-+	 *
-+	 * Back tracing is actually not a problem since SIE restores gr15.
-+	 */
-+	if (in_sie_gregs) {
-+		print_int_regs(stack, true);
-+		vregs = *((struct vm_save_area **)(stack->grs0[13] + __SF_SIE_SAVEAREA));
-+
-+		/*
-+		 * The grs are not linear on the interrupt stack frame.
-+		 * We copy 0 and 1 here and 2 - 15 with the memcopy below.
-+		 */
-+		stack->grs1[0] = vregs->host.grs[0];
-+		stack->grs1[1] = vregs->host.grs[1];
-+		/*  2 - 15 */
-+		memcpy(stack->grs0, &vregs->host.grs[2], sizeof(stack->grs0) - 8);
-+	}
-+	print_int_regs(stack, false);
- 	dump_stack();
- 
- 	/* Dump stack doesn't end with a \n so we add it here instead */
-diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
-index a27a8401..147cb0f2 100644
---- a/lib/s390x/sie.h
-+++ b/lib/s390x/sie.h
-@@ -273,6 +273,8 @@ struct vm {
- 
- extern void sie_entry(void);
- extern void sie_exit(void);
-+extern void sie_entry_gregs(void);
-+extern void sie_exit_gregs(void);
- extern void sie64a(struct kvm_s390_sie_block *sblk, struct vm_save_area *save_area);
- void sie(struct vm *vm);
- void sie_expect_validity(struct vm *vm);
-diff --git a/s390x/cpu.S b/s390x/cpu.S
-index 45bd551a..9155b044 100644
---- a/s390x/cpu.S
-+++ b/s390x/cpu.S
-@@ -82,7 +82,8 @@ sie64a:
- 	# Store scb and save_area pointer into stack frame
- 	stg	%r2,__SF_SIE_CONTROL(%r15)	# save control block pointer
- 	stg	%r3,__SF_SIE_SAVEAREA(%r15)	# save guest register save area
--
-+.globl sie_entry_gregs
-+sie_entry_gregs:
- 	# Load guest's gprs, fprs and fpc
- 	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
- 	ld	\i, \i * 8 + SIE_SAVEAREA_GUEST_FPRS(%r3)
-@@ -121,7 +122,8 @@ sie_exit:
- 	.endr
- 	lfpc	SIE_SAVEAREA_HOST_FPC(%r14)
- 	lmg	%r0,%r14,SIE_SAVEAREA_HOST_GRS(%r14)	# restore kernel registers
--
-+.globl sie_exit_gregs
-+sie_exit_gregs:
- 	br	%r14
- 
- 	.align	8
--- 
-2.34.1
-
+T24gVHVlLCAyMDIyLTExLTIyIGF0IDEwOjA2ICswMTAwLCBQZXRlciBaaWpsc3RyYSB3cm90ZToN
+Cj4gT24gTW9uLCBOb3YgMjEsIDIwMjIgYXQgMDE6MjY6MjdQTSArMTMwMCwgS2FpIEh1YW5nIHdy
+b3RlOg0KPiA+ICsvKg0KPiA+ICsgKiBXcmFwcGVyIG9mIF9fc2VhbWNhbGwoKSB0byBjb252ZXJ0
+IFNFQU1DQUxMIGxlYWYgZnVuY3Rpb24gZXJyb3IgY29kZQ0KPiA+ICsgKiB0byBrZXJuZWwgZXJy
+b3IgY29kZS4gIEBzZWFtY2FsbF9yZXQgYW5kIEBvdXQgY29udGFpbiB0aGUgU0VBTUNBTEwNCj4g
+PiArICogbGVhZiBmdW5jdGlvbiByZXR1cm4gY29kZSBhbmQgdGhlIGFkZGl0aW9uYWwgb3V0cHV0
+IHJlc3BlY3RpdmVseSBpZg0KPiA+ICsgKiBub3QgTlVMTC4NCj4gPiArICovDQo+ID4gK3N0YXRp
+YyBpbnQgX19hbHdheXNfdW51c2VkIHNlYW1jYWxsKHU2NCBmbiwgdTY0IHJjeCwgdTY0IHJkeCwg
+dTY0IHI4LCB1NjQgcjksDQo+ID4gKwkJCQkgICAgdTY0ICpzZWFtY2FsbF9yZXQsDQo+ID4gKwkJ
+CQkgICAgc3RydWN0IHRkeF9tb2R1bGVfb3V0cHV0ICpvdXQpDQo+ID4gK3sNCj4gDQo+IFdoYXQn
+cyB0aGUgcG9pbnQgb2YgYSAnc3RhdGljIF9fYWx3YXlzX3VudXNlZCcgZnVuY3Rpb24gYWdhaW4/
+IE90aGVyDQo+IHRoYW4gdG8gdGVzdCB0aGUgRENFIHBhc3Mgb2YgYSBsaW5rZXIsIHRoYXQgaXM/
+DQo+IA0KDQpJdCBpcyB1c2VkIHRvIGF2b2lkIHRoZSBjb21waWxlIHdhcm5pbmcgYXMgc28gZmFy
+IHdpdGggdGhpcyBwYXRjaCBpdCBkb2Vzbid0DQpoYXZlIGFueSBjYWxsZXIuICBXaXRob3V0IHRo
+ZSBfX2Fsd2F5c191bnVzZWQsIHRoZSBjb21waWxlciB3aWxsIGNvbXBsYWluLg0KDQpPcmlnaW5h
+bGx5IGl0IHdhcyBpbiB0aGUgcGF0Y2ggIlNodXQgZG93biBURFggbW9kdWxlIGluIGNhc2Ugb2Yg
+ZXJyb3IiIHdoZXJlIGl0DQp3YXMgZmlyc3RseSBjYWxsZWQuICBEYXZlIHN1Z2dlc3RlZCB0byBt
+b3ZlIGl0IG91dDoNCg0KaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvYWxsLzZlZDI3NDZkLWY0NGMt
+NDUxMS03MzczLTU3MDZkZDdjM2YwZkBpbnRlbC5jb20vDQo=
