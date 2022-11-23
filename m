@@ -2,536 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 59C73635CC5
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 13:26:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 749D8635CE4
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 13:29:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236920AbiKWMZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 07:25:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60758 "EHLO
+        id S237488AbiKWM2X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 07:28:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236890AbiKWMZl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 07:25:41 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32CEF5E3C0;
-        Wed, 23 Nov 2022 04:25:40 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id ABBF9B81F2B;
-        Wed, 23 Nov 2022 12:25:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B355C433C1;
-        Wed, 23 Nov 2022 12:25:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1669206337;
-        bh=vX90mk67saZPcle6Cg4swhPypgBu1ruT4d+AsZhYWVQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YzHwrAzpi6Mlm7VSFwQeObtZ5GHNyY5UPoQ9uhqzgPlyuN3h9LzFIfshxqlrXtQkM
-         U2DseqZzrspOwrhOpW4ehWC6KIYswzEnQzR5df/NzP+AbNLVIjVDqAg180cudrfkFx
-         Z4QP2k96A5niygkQRC6hsDh5lOKrvGLenvl7FLDc=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        Jens Axboe <axboe@kernel.dk>,
-        Justin Sanders <justin@coraid.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-        Liam Mark <lmark@codeaurora.org>,
-        Laura Abbott <labbott@redhat.com>,
-        Brian Starkey <Brian.Starkey@arm.com>,
-        John Stultz <jstultz@google.com>,
-        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Sean Young <sean@mess.org>,
-        Frank Haverkamp <haver@linux.ibm.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Anton Vorontsov <anton@enomsg.org>,
-        Colin Cross <ccross@android.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>,
-        Hans Verkuil <hverkuil-cisco@xs4all.nl>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Gautam Dawar <gautam.dawar@xilinx.com>,
-        Dan Carpenter <error27@gmail.com>, Eli Cohen <elic@nvidia.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Maxime Coquelin <maxime.coquelin@redhat.com>,
-        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
-        kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-        linux-block@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: [PATCH 2/5] driver core: make struct class.devnode() take a const *
-Date:   Wed, 23 Nov 2022 13:25:20 +0100
-Message-Id: <20221123122523.1332370-2-gregkh@linuxfoundation.org>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
-References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=16514; i=gregkh@linuxfoundation.org; h=from:subject; bh=vX90mk67saZPcle6Cg4swhPypgBu1ruT4d+AsZhYWVQ=; b=owGbwMvMwCRo6H6F97bub03G02pJDMl1gsaX2G1fi0ze8WsKL89+jYOhm3aZpRevE/LnVXhnaz3T KDikI5aFQZCJQVZMkeXLNp6j+ysOKXoZ2p6GmcPKBDKEgYtTACZSb8cwV6CLr1I+lS+A/eitsHff+y dXttrNY5inpGNxYvN5CVYLXRdj5sZrzH0reX0A
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S237676AbiKWM1g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 07:27:36 -0500
+Received: from mr85p00im-zteg06021601.me.com (mr85p00im-zteg06021601.me.com [17.58.23.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA2D3657E9
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 04:26:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ynddal.dk; s=sig1;
+        t=1669206367; bh=lJVg3ZxnRm681egfIyRW+IsGtQn9gz8w4LBHD7jLcPE=;
+        h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To;
+        b=F2bJXTHsWBHn0Iec7wZADHHqmhzwKVu2p29dOV0HvnPhY8jijHhlAMoNfIc4Vqzs2
+         6CGa/E3Vj8XjEdkyEX11X0traT7QqtPg6HLzuoKhqWWAlS3d1D+rl8QLffipkIy88j
+         UrrL1NPXmvPtqXAR5dGOenngoNNpQk6vAGp9KzQ190NpdcYabYPD/v1V4b22GoQctq
+         HiF9z0yAjSDSX0CqWWz7e7VWKgWVtrb/2hvrzioG7r09/N+E8ZYCC0nkpTMrawjD3M
+         R/Ue5jezhcPz06bHGd+OovJhE6aX36oCVfqzubT5Ajj9brlx3Pp8QCuviRsWYoHYDs
+         /5mp9ArktwwWA==
+Received: from smtpclient.apple (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
+        by mr85p00im-zteg06021601.me.com (Postfix) with ESMTPSA id 42F0A404DD;
+        Wed, 23 Nov 2022 12:26:05 +0000 (UTC)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.200.110.1.12\))
+Subject: Re: [PATCH] gdbstub: move update guest debug to accel ops
+From:   Mads Ynddal <mads@ynddal.dk>
+In-Reply-To: <20221123121712.72817-1-mads@ynddal.dk>
+Date:   Wed, 23 Nov 2022 13:25:53 +0100
+Cc:     "open list:Overall KVM CPUs" <kvm@vger.kernel.org>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Mads Ynddal <mads@ynddal.dk>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <030ED145-9BC0-4B16-A0FD-A7F5E0F4EA85@ynddal.dk>
+References: <20221123121712.72817-1-mads@ynddal.dk>
+To:     qemu-devel@nongnu.org
+X-Mailer: Apple Mail (2.3731.200.110.1.12)
+X-Proofpoint-ORIG-GUID: SJMrlgdhjI1cJwv3jZxliVHc5Am-SPPQ
+X-Proofpoint-GUID: SJMrlgdhjI1cJwv3jZxliVHc5Am-SPPQ
+X-Proofpoint-Virus-Version: =?UTF-8?Q?vendor=3Dfsecure_engine=3D1.1.170-22c6f66c430a71ce266a39bfe25bc?=
+ =?UTF-8?Q?2903e8d5c8f:6.0.425,18.0.572,17.0.605.474.0000000_definitions?=
+ =?UTF-8?Q?=3D2022-01-14=5F01:2022-01-14=5F01,2020-02-14=5F11,2020-01-23?=
+ =?UTF-8?Q?=5F02_signatures=3D0?=
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 clxscore=1030 spamscore=0
+ suspectscore=0 bulkscore=0 mlxlogscore=878 mlxscore=0 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2211230092
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The devnode() in struct class should not be modifying the device that is
-passed into it, so mark it as a const * and propagate the function
-signature changes out into all relevant subsystems that use this
-callback.
 
-Cc: Fenghua Yu <fenghua.yu@intel.com>
-Cc: Reinette Chatre <reinette.chatre@intel.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: x86@kernel.org
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Justin Sanders <justin@coraid.com>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Sumit Semwal <sumit.semwal@linaro.org>
-Cc: Benjamin Gaignard <benjamin.gaignard@collabora.com>
-Cc: Liam Mark <lmark@codeaurora.org>
-Cc: Laura Abbott <labbott@redhat.com>
-Cc: Brian Starkey <Brian.Starkey@arm.com>
-Cc: John Stultz <jstultz@google.com>
-Cc: "Christian König" <christian.koenig@amd.com>
-Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-Cc: Maxime Ripard <mripard@kernel.org>
-Cc: Thomas Zimmermann <tzimmermann@suse.de>
-Cc: David Airlie <airlied@gmail.com>
-Cc: Daniel Vetter <daniel@ffwll.ch>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Leon Romanovsky <leon@kernel.org>
-Cc: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-Cc: Sean Young <sean@mess.org>
-Cc: Frank Haverkamp <haver@linux.ibm.com>
-Cc: Jiri Slaby <jirislaby@kernel.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Anton Vorontsov <anton@enomsg.org>
-Cc: Colin Cross <ccross@android.com>
-Cc: Tony Luck <tony.luck@intel.com>
-Cc: Jaroslav Kysela <perex@perex.cz>
-Cc: Takashi Iwai <tiwai@suse.com>
-Cc: Hans Verkuil <hverkuil-cisco@xs4all.nl>
-Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Xie Yongji <xieyongji@bytedance.com>
-Cc: Gautam Dawar <gautam.dawar@xilinx.com>
-Cc: Dan Carpenter <error27@gmail.com>
-Cc: Eli Cohen <elic@nvidia.com>
-Cc: Parav Pandit <parav@nvidia.com>
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: alsa-devel@alsa-project.org
-Cc: dri-devel@lists.freedesktop.org
-Cc: kvm@vger.kernel.org
-Cc: linaro-mm-sig@lists.linaro.org
-Cc: linux-block@vger.kernel.org
-Cc: linux-input@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-media@vger.kernel.org
-Cc: linux-rdma@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org
-Cc: linux-usb@vger.kernel.org
-Cc: virtualization@lists.linux-foundation.org
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- arch/x86/kernel/cpu/resctrl/pseudo_lock.c  | 4 ++--
- arch/x86/kernel/cpuid.c                    | 2 +-
- arch/x86/kernel/msr.c                      | 2 +-
- block/bsg.c                                | 2 +-
- drivers/block/aoe/aoechr.c                 | 2 +-
- drivers/char/mem.c                         | 2 +-
- drivers/char/misc.c                        | 4 ++--
- drivers/dma-buf/dma-heap.c                 | 2 +-
- drivers/gpu/drm/drm_sysfs.c                | 2 +-
- drivers/infiniband/core/user_mad.c         | 2 +-
- drivers/infiniband/core/uverbs_main.c      | 2 +-
- drivers/infiniband/hw/hfi1/device.c        | 4 ++--
- drivers/input/input.c                      | 2 +-
- drivers/media/dvb-core/dvbdev.c            | 4 ++--
- drivers/media/pci/ddbridge/ddbridge-core.c | 4 ++--
- drivers/media/rc/rc-main.c                 | 2 +-
- drivers/misc/genwqe/card_base.c            | 2 +-
- drivers/tty/tty_io.c                       | 2 +-
- drivers/usb/core/file.c                    | 2 +-
- drivers/vdpa/vdpa_user/vduse_dev.c         | 2 +-
- drivers/vfio/vfio_main.c                   | 2 +-
- fs/pstore/pmsg.c                           | 2 +-
- include/linux/device/class.h               | 2 +-
- sound/sound_core.c                         | 2 +-
- 24 files changed, 29 insertions(+), 29 deletions(-)
+> On 23 Nov 2022, at 13.17, Mads Ynddal <mads@ynddal.dk> wrote:
+>=20
+> From: Mads Ynddal <m.ynddal@samsung.com>
+>=20
+> Continuing the refactor of a48e7d9e52 (gdbstub: move guest debug =
+support
+> check to ops) by removing hardcoded kvm_enabled() from generic cpu.c
+> code, and replace it with a property of AccelOpsClass.
+>=20
+> Signed-off-by: Mads Ynddal <m.ynddal@samsung.com>
+> ---
+> accel/kvm/kvm-accel-ops.c  |  1 +
+> cpu.c                      | 10 +++++++---
+> include/sysemu/accel-ops.h |  1 +
+> 3 files changed, 9 insertions(+), 3 deletions(-)
+>=20
 
-diff --git a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
-index d961ae3ed96e..4e4231a58f38 100644
---- a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
-+++ b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
-@@ -1560,9 +1560,9 @@ static const struct file_operations pseudo_lock_dev_fops = {
- 	.mmap =		pseudo_lock_dev_mmap,
- };
- 
--static char *pseudo_lock_devnode(struct device *dev, umode_t *mode)
-+static char *pseudo_lock_devnode(const struct device *dev, umode_t *mode)
- {
--	struct rdtgroup *rdtgrp;
-+	const struct rdtgroup *rdtgrp;
- 
- 	rdtgrp = dev_get_drvdata(dev);
- 	if (mode)
-diff --git a/arch/x86/kernel/cpuid.c b/arch/x86/kernel/cpuid.c
-index 6f7b8cc1bc9f..621ba9c0f17a 100644
---- a/arch/x86/kernel/cpuid.c
-+++ b/arch/x86/kernel/cpuid.c
-@@ -139,7 +139,7 @@ static int cpuid_device_destroy(unsigned int cpu)
- 	return 0;
- }
- 
--static char *cpuid_devnode(struct device *dev, umode_t *mode)
-+static char *cpuid_devnode(const struct device *dev, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "cpu/%u/cpuid", MINOR(dev->devt));
- }
-diff --git a/arch/x86/kernel/msr.c b/arch/x86/kernel/msr.c
-index ed8ac6bcbafb..708751311786 100644
---- a/arch/x86/kernel/msr.c
-+++ b/arch/x86/kernel/msr.c
-@@ -250,7 +250,7 @@ static int msr_device_destroy(unsigned int cpu)
- 	return 0;
- }
- 
--static char *msr_devnode(struct device *dev, umode_t *mode)
-+static char *msr_devnode(const struct device *dev, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "cpu/%u/msr", MINOR(dev->devt));
- }
-diff --git a/block/bsg.c b/block/bsg.c
-index 2ab1351eb082..08046bd9207d 100644
---- a/block/bsg.c
-+++ b/block/bsg.c
-@@ -232,7 +232,7 @@ struct bsg_device *bsg_register_queue(struct request_queue *q,
- }
- EXPORT_SYMBOL_GPL(bsg_register_queue);
- 
--static char *bsg_devnode(struct device *dev, umode_t *mode)
-+static char *bsg_devnode(const struct device *dev, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "bsg/%s", dev_name(dev));
- }
-diff --git a/drivers/block/aoe/aoechr.c b/drivers/block/aoe/aoechr.c
-index 8eea2529da20..7a368c90467d 100644
---- a/drivers/block/aoe/aoechr.c
-+++ b/drivers/block/aoe/aoechr.c
-@@ -273,7 +273,7 @@ static const struct file_operations aoe_fops = {
- 	.llseek = noop_llseek,
- };
- 
--static char *aoe_devnode(struct device *dev, umode_t *mode)
-+static char *aoe_devnode(const struct device *dev, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "etherd/%s", dev_name(dev));
- }
-diff --git a/drivers/char/mem.c b/drivers/char/mem.c
-index 5611d127363e..83bf2a4dcb57 100644
---- a/drivers/char/mem.c
-+++ b/drivers/char/mem.c
-@@ -746,7 +746,7 @@ static const struct file_operations memory_fops = {
- 	.llseek = noop_llseek,
- };
- 
--static char *mem_devnode(struct device *dev, umode_t *mode)
-+static char *mem_devnode(const struct device *dev, umode_t *mode)
- {
- 	if (mode && devlist[MINOR(dev->devt)].mode)
- 		*mode = devlist[MINOR(dev->devt)].mode;
-diff --git a/drivers/char/misc.c b/drivers/char/misc.c
-index cba19bfdc44d..88c6995b9a3d 100644
---- a/drivers/char/misc.c
-+++ b/drivers/char/misc.c
-@@ -254,9 +254,9 @@ void misc_deregister(struct miscdevice *misc)
- }
- EXPORT_SYMBOL(misc_deregister);
- 
--static char *misc_devnode(struct device *dev, umode_t *mode)
-+static char *misc_devnode(const struct device *dev, umode_t *mode)
- {
--	struct miscdevice *c = dev_get_drvdata(dev);
-+	const struct miscdevice *c = dev_get_drvdata(dev);
- 
- 	if (mode && c->mode)
- 		*mode = c->mode;
-diff --git a/drivers/dma-buf/dma-heap.c b/drivers/dma-buf/dma-heap.c
-index 8f5848aa144f..4d7150791315 100644
---- a/drivers/dma-buf/dma-heap.c
-+++ b/drivers/dma-buf/dma-heap.c
-@@ -299,7 +299,7 @@ struct dma_heap *dma_heap_add(const struct dma_heap_export_info *exp_info)
- 	return err_ret;
- }
- 
--static char *dma_heap_devnode(struct device *dev, umode_t *mode)
-+static char *dma_heap_devnode(const struct device *dev, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "dma_heap/%s", dev_name(dev));
- }
-diff --git a/drivers/gpu/drm/drm_sysfs.c b/drivers/gpu/drm/drm_sysfs.c
-index 430e00b16eec..14bf156b3f1b 100644
---- a/drivers/gpu/drm/drm_sysfs.c
-+++ b/drivers/gpu/drm/drm_sysfs.c
-@@ -90,7 +90,7 @@ static void drm_sysfs_acpi_register(void) { }
- static void drm_sysfs_acpi_unregister(void) { }
- #endif
- 
--static char *drm_devnode(struct device *dev, umode_t *mode)
-+static char *drm_devnode(const struct device *dev, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "dri/%s", dev_name(dev));
- }
-diff --git a/drivers/infiniband/core/user_mad.c b/drivers/infiniband/core/user_mad.c
-index 98cb594cd9a6..f83954180a33 100644
---- a/drivers/infiniband/core/user_mad.c
-+++ b/drivers/infiniband/core/user_mad.c
-@@ -1224,7 +1224,7 @@ static struct attribute *umad_class_dev_attrs[] = {
- };
- ATTRIBUTE_GROUPS(umad_class_dev);
- 
--static char *umad_devnode(struct device *dev, umode_t *mode)
-+static char *umad_devnode(const struct device *dev, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "infiniband/%s", dev_name(dev));
- }
-diff --git a/drivers/infiniband/core/uverbs_main.c b/drivers/infiniband/core/uverbs_main.c
-index d54434088727..bdb179a09d77 100644
---- a/drivers/infiniband/core/uverbs_main.c
-+++ b/drivers/infiniband/core/uverbs_main.c
-@@ -1237,7 +1237,7 @@ static void ib_uverbs_remove_one(struct ib_device *device, void *client_data)
- 	put_device(&uverbs_dev->dev);
- }
- 
--static char *uverbs_devnode(struct device *dev, umode_t *mode)
-+static char *uverbs_devnode(const struct device *dev, umode_t *mode)
- {
- 	if (mode)
- 		*mode = 0666;
-diff --git a/drivers/infiniband/hw/hfi1/device.c b/drivers/infiniband/hw/hfi1/device.c
-index 8ceff7141baf..1f4496032170 100644
---- a/drivers/infiniband/hw/hfi1/device.c
-+++ b/drivers/infiniband/hw/hfi1/device.c
-@@ -72,7 +72,7 @@ const char *class_name(void)
- 	return hfi1_class_name;
- }
- 
--static char *hfi1_devnode(struct device *dev, umode_t *mode)
-+static char *hfi1_devnode(const struct device *dev, umode_t *mode)
- {
- 	if (mode)
- 		*mode = 0600;
-@@ -85,7 +85,7 @@ static const char *class_name_user(void)
- 	return hfi1_class_name_user;
- }
- 
--static char *hfi1_user_devnode(struct device *dev, umode_t *mode)
-+static char *hfi1_user_devnode(const struct device *dev, umode_t *mode)
- {
- 	if (mode)
- 		*mode = 0666;
-diff --git a/drivers/input/input.c b/drivers/input/input.c
-index ebb2b7f0f8ff..50597165dc54 100644
---- a/drivers/input/input.c
-+++ b/drivers/input/input.c
-@@ -1913,7 +1913,7 @@ static const struct device_type input_dev_type = {
- #endif
- };
- 
--static char *input_devnode(struct device *dev, umode_t *mode)
-+static char *input_devnode(const struct device *dev, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "input/%s", dev_name(dev));
- }
-diff --git a/drivers/media/dvb-core/dvbdev.c b/drivers/media/dvb-core/dvbdev.c
-index 6ef18bab9648..e73f5240cc2c 100644
---- a/drivers/media/dvb-core/dvbdev.c
-+++ b/drivers/media/dvb-core/dvbdev.c
-@@ -1018,9 +1018,9 @@ static int dvb_uevent(const struct device *dev, struct kobj_uevent_env *env)
- 	return 0;
- }
- 
--static char *dvb_devnode(struct device *dev, umode_t *mode)
-+static char *dvb_devnode(const struct device *dev, umode_t *mode)
- {
--	struct dvb_device *dvbdev = dev_get_drvdata(dev);
-+	const struct dvb_device *dvbdev = dev_get_drvdata(dev);
- 
- 	return kasprintf(GFP_KERNEL, "dvb/adapter%d/%s%d",
- 		dvbdev->adapter->num, dnames[dvbdev->type], dvbdev->id);
-diff --git a/drivers/media/pci/ddbridge/ddbridge-core.c b/drivers/media/pci/ddbridge/ddbridge-core.c
-index fe833f39698a..ee8087f29b2c 100644
---- a/drivers/media/pci/ddbridge/ddbridge-core.c
-+++ b/drivers/media/pci/ddbridge/ddbridge-core.c
-@@ -2716,9 +2716,9 @@ static const struct file_operations ddb_fops = {
- 	.release        = ddb_release,
- };
- 
--static char *ddb_devnode(struct device *device, umode_t *mode)
-+static char *ddb_devnode(const struct device *device, umode_t *mode)
- {
--	struct ddb *dev = dev_get_drvdata(device);
-+	const struct ddb *dev = dev_get_drvdata(device);
- 
- 	return kasprintf(GFP_KERNEL, "ddbridge/card%d", dev->nr);
- }
-diff --git a/drivers/media/rc/rc-main.c b/drivers/media/rc/rc-main.c
-index eba0cd30e314..527d9324742b 100644
---- a/drivers/media/rc/rc-main.c
-+++ b/drivers/media/rc/rc-main.c
-@@ -1017,7 +1017,7 @@ static void ir_close(struct input_dev *idev)
- }
- 
- /* class for /sys/class/rc */
--static char *rc_devnode(struct device *dev, umode_t *mode)
-+static char *rc_devnode(const struct device *dev, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "rc/%s", dev_name(dev));
- }
-diff --git a/drivers/misc/genwqe/card_base.c b/drivers/misc/genwqe/card_base.c
-index 693981891870..0f00687f72d4 100644
---- a/drivers/misc/genwqe/card_base.c
-+++ b/drivers/misc/genwqe/card_base.c
-@@ -1349,7 +1349,7 @@ static struct pci_driver genwqe_driver = {
-  * Default mode should be rw for everybody. Do not change default
-  * device name.
-  */
--static char *genwqe_devnode(struct device *dev, umode_t *mode)
-+static char *genwqe_devnode(const struct device *dev, umode_t *mode)
- {
- 	if (mode)
- 		*mode = 0666;
-diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-index de06c3c2ff70..aad8171f6c21 100644
---- a/drivers/tty/tty_io.c
-+++ b/drivers/tty/tty_io.c
-@@ -3494,7 +3494,7 @@ void tty_default_fops(struct file_operations *fops)
- 	*fops = tty_fops;
- }
- 
--static char *tty_devnode(struct device *dev, umode_t *mode)
-+static char *tty_devnode(const struct device *dev, umode_t *mode)
- {
- 	if (!mode)
- 		return NULL;
-diff --git a/drivers/usb/core/file.c b/drivers/usb/core/file.c
-index 558890ada0e5..da7d88e069e6 100644
---- a/drivers/usb/core/file.c
-+++ b/drivers/usb/core/file.c
-@@ -62,7 +62,7 @@ static struct usb_class {
- 	struct class *class;
- } *usb_class;
- 
--static char *usb_devnode(struct device *dev, umode_t *mode)
-+static char *usb_devnode(const struct device *dev, umode_t *mode)
- {
- 	struct usb_class_driver *drv;
- 
-diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
-index 35dceee3ed56..0dd3c1f291da 100644
---- a/drivers/vdpa/vdpa_user/vduse_dev.c
-+++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-@@ -1656,7 +1656,7 @@ static const struct file_operations vduse_ctrl_fops = {
- 	.llseek		= noop_llseek,
- };
- 
--static char *vduse_devnode(struct device *dev, umode_t *mode)
-+static char *vduse_devnode(const struct device *dev, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "vduse/%s", dev_name(dev));
- }
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 6e8804fe0095..5bf4b3454918 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -1812,7 +1812,7 @@ EXPORT_SYMBOL(vfio_set_irqs_validate_and_prepare);
- /*
-  * Module/class support
-  */
--static char *vfio_devnode(struct device *dev, umode_t *mode)
-+static char *vfio_devnode(const struct device *dev, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "vfio/%s", dev_name(dev));
- }
-diff --git a/fs/pstore/pmsg.c b/fs/pstore/pmsg.c
-index d8542ec2f38c..b31c9c72d90b 100644
---- a/fs/pstore/pmsg.c
-+++ b/fs/pstore/pmsg.c
-@@ -46,7 +46,7 @@ static int pmsg_major;
- #undef pr_fmt
- #define pr_fmt(fmt) PMSG_NAME ": " fmt
- 
--static char *pmsg_devnode(struct device *dev, umode_t *mode)
-+static char *pmsg_devnode(const struct device *dev, umode_t *mode)
- {
- 	if (mode)
- 		*mode = 0220;
-diff --git a/include/linux/device/class.h b/include/linux/device/class.h
-index 94b1107258e5..42cc3fb44a84 100644
---- a/include/linux/device/class.h
-+++ b/include/linux/device/class.h
-@@ -60,7 +60,7 @@ struct class {
- 	struct kobject			*dev_kobj;
- 
- 	int (*dev_uevent)(const struct device *dev, struct kobj_uevent_env *env);
--	char *(*devnode)(struct device *dev, umode_t *mode);
-+	char *(*devnode)(const struct device *dev, umode_t *mode);
- 
- 	void (*class_release)(struct class *class);
- 	void (*dev_release)(struct device *dev);
-diff --git a/sound/sound_core.c b/sound/sound_core.c
-index 3332fe321737..3e7dd6fcb7cf 100644
---- a/sound/sound_core.c
-+++ b/sound/sound_core.c
-@@ -30,7 +30,7 @@ MODULE_DESCRIPTION("Core sound module");
- MODULE_AUTHOR("Alan Cox");
- MODULE_LICENSE("GPL");
- 
--static char *sound_devnode(struct device *dev, umode_t *mode)
-+static char *sound_devnode(const struct device *dev, umode_t *mode)
- {
- 	if (MAJOR(dev->devt) == SOUND_MAJOR)
- 		return NULL;
--- 
-2.38.1
-
++CC Alex Benn=C3=A9e=
