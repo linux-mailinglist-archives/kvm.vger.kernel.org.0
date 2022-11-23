@@ -2,236 +2,336 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0583634C8E
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 02:13:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 740C3634DD4
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 03:27:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235580AbiKWBNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 20:13:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51936 "EHLO
+        id S235553AbiKWC1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 21:27:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235566AbiKWBND (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 20:13:03 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53A2AE2B60
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 17:11:51 -0800 (PST)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NH2zv1c38zqScm;
-        Wed, 23 Nov 2022 09:07:55 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.58) by
- kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Wed, 23 Nov 2022 09:11:49 +0800
-From:   chenxiang <chenxiang66@hisilicon.com>
-To:     <alex.williamson@redhat.com>, <maz@kernel.org>
-CC:     <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <linuxarm@huawei.com>, Xiang Chen <chenxiang66@hisilicon.com>
-Subject: [PATCH v2] vfio/pci: Verify each MSI vector to avoid invalid MSI vectors
-Date:   Wed, 23 Nov 2022 09:42:36 +0800
-Message-ID: <1669167756-196788-1-git-send-email-chenxiang66@hisilicon.com>
-X-Mailer: git-send-email 2.8.1
+        with ESMTP id S235548AbiKWC07 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 21:26:59 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 158B3DAD14;
+        Tue, 22 Nov 2022 18:26:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669170418; x=1700706418;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=8nd3ujAlM1sOL0NbL4+FOKaQgAUWEqXW1PRj4z6f9WA=;
+  b=nYyUa7j5yD5U9SxqoIHFdzGYn3CtN6Wofm2S4VuEd9PpYjNcFAccHhCv
+   fQN6+V/nyR+Dzqv3iu9s151KPL5juraScTT9J51c1Klq+Eh4pnq/KzxYR
+   CyQ8n2kPhgdVIVLKVaqPlXIcA39MMh+5JJSXYn5FfZsmVKs0iNk9o4943
+   d0wBBjD+DmzQgnY/IFKtLvxf4kDKlyaOu7h3G4SEVu6BzwDaueuM/vTLT
+   lopaaOoZPyYxZJN8HOw83pfokG0ytU68LvwvRlr/wzkpT9pofLq978A3H
+   fX0UIer2V6RjqjvQbiGC5mtiNDGUrp0kLZ2WOrwTtfZsDXc1JYLs+sNdO
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="311591323"
+X-IronPort-AV: E=Sophos;i="5.96,186,1665471600"; 
+   d="scan'208";a="311591323"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 18:26:57 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="766548419"
+X-IronPort-AV: E=Sophos;i="5.96,186,1665471600"; 
+   d="scan'208";a="766548419"
+Received: from leiwang7-mobl.ccr.corp.intel.com (HELO [10.238.5.72]) ([10.238.5.72])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 18:26:45 -0800
+Message-ID: <e6fdcfeb-bd78-6906-f2b2-94c765be7902@intel.com>
+Date:   Wed, 23 Nov 2022 10:26:42 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemi500016.china.huawei.com (7.221.188.220)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.4.1
+Subject: Re: [PATCH v2 036/144] KVM: selftest: Add proper helpers for
+ x86-specific save/restore ioctls
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org
+References: <20220603004331.1523888-1-seanjc@google.com>
+ <20220603004331.1523888-37-seanjc@google.com>
+From:   "Wang, Lei" <lei4.wang@intel.com>
+In-Reply-To: <20220603004331.1523888-37-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Xiang Chen <chenxiang66@hisilicon.com>
 
-Currently the number of MSI vectors comes from register PCI_MSI_FLAGS
-which should be power-of-2 in qemu, in some scenaries it is not the same as
-the number that driver requires in guest, for example, a PCI driver wants
-to allocate 6 MSI vecotrs in guest, but as the limitation, it will allocate
-8 MSI vectors. So it requires 8 MSI vectors in qemu while the driver in
-guest only wants to allocate 6 MSI vectors.
+On 6/3/2022 8:41 AM, Sean Christopherson wrote:
+> Add helpers for the various one-off helpers used by x86's vCPU state
+> save/restore helpers, and convert the other open coded ioctl()s to use
+> existing helpers.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  .../selftests/kvm/include/x86_64/processor.h  |  54 ++++++++
+>  .../selftests/kvm/lib/x86_64/processor.c      | 126 +++++-------------
+>  2 files changed, 91 insertions(+), 89 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index e4268432cfe8..1d46d60bb480 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -432,6 +432,60 @@ const struct kvm_msr_list *kvm_get_feature_msr_index_list(void);
+>  bool kvm_msr_is_in_save_restore_list(uint32_t msr_index);
+>  uint64_t kvm_get_feature_msr(uint64_t msr_index);
+>  
+> +static inline void vcpu_msrs_get(struct kvm_vm *vm, uint32_t vcpuid,
+> +				 struct kvm_msrs *msrs)
+> +{
+> +	int r = __vcpu_ioctl(vm, vcpuid, KVM_GET_MSRS, msrs);
+> +
+> +	TEST_ASSERT(r == msrs->nmsrs,
+> +		    "KVM_GET_MSRS failed, r: %i (failed on MSR %x)",
+> +		    r, r < 0 || r >= msrs->nmsrs ? -1 : msrs->entries[r].index);
+> +}
+> +static inline void vcpu_msrs_set(struct kvm_vm *vm, uint32_t vcpuid,
+> +				 struct kvm_msrs *msrs)
+> +{
+> +	int r = __vcpu_ioctl(vm, vcpuid, KVM_SET_MSRS, msrs);
+> +
+> +	TEST_ASSERT(r == msrs->nmsrs,
+> +		    "KVM_GET_MSRS failed, r: %i (failed on MSR %x)",
 
-When GICv4.1 is enabled, it iterates over all possible MSIs and enable the
-forwarding while the guest has only created some of mappings in the virtual
-ITS, so some calls fail. The exception print is as following:
-vfio-pci 0000:3a:00.1: irq bypass producer (token 000000008f08224d) registration
-fails:66311
+Hi, Sean, this should be the "KVM_SET_MSRS failed", right?
 
-To avoid the issue, verify each MSI vector, skip some operations such as
-request_irq() and irq_bypass_register_producer() for those invalid MSI vectors.
-
-Signed-off-by: Xiang Chen <chenxiang66@hisilicon.com>
----
-I reported the issue at the link:
-https://lkml.kernel.org/lkml/87cze9lcut.wl-maz@kernel.org/T/
-
-Change Log:
-v1 -> v2:
-Verify each MSI vector in kernel instead of adding systemcall according to
-Mar's suggestion
----
- arch/arm64/kvm/vgic/vgic-irqfd.c  | 13 +++++++++++++
- arch/arm64/kvm/vgic/vgic-its.c    | 36 ++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic.h        |  1 +
- drivers/vfio/pci/vfio_pci_intrs.c | 33 +++++++++++++++++++++++++++++++++
- include/linux/kvm_host.h          |  2 ++
- 5 files changed, 85 insertions(+)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
-index 475059b..71f6af57 100644
---- a/arch/arm64/kvm/vgic/vgic-irqfd.c
-+++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-@@ -98,6 +98,19 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
- 	return vgic_its_inject_msi(kvm, &msi);
- }
- 
-+int kvm_verify_msi(struct kvm *kvm,
-+		   struct kvm_kernel_irq_routing_entry *irq_entry)
-+{
-+	struct kvm_msi msi;
-+
-+	if (!vgic_has_its(kvm))
-+		return -ENODEV;
-+
-+	kvm_populate_msi(irq_entry, &msi);
-+
-+	return vgic_its_verify_msi(kvm, &msi);
-+}
-+
- /**
-  * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
-  */
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 94a666d..8312a4a 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -767,6 +767,42 @@ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
- 	return 0;
- }
- 
-+int vgic_its_verify_msi(struct kvm *kvm, struct kvm_msi *msi)
-+{
-+	struct vgic_its *its;
-+	struct its_ite *ite;
-+	struct kvm_vcpu *vcpu;
-+	int ret = 0;
-+
-+	if (!irqchip_in_kernel(kvm) || (msi->flags & ~KVM_MSI_VALID_DEVID))
-+		return -EINVAL;
-+
-+	if (!vgic_has_its(kvm))
-+		return -ENODEV;
-+
-+	its = vgic_msi_to_its(kvm, msi);
-+	if (IS_ERR(its))
-+		return PTR_ERR(its);
-+
-+	mutex_lock(&its->its_lock);
-+	if (!its->enabled) {
-+		ret = -EBUSY;
-+		goto unlock;
-+	}
-+	ite = find_ite(its, msi->devid, msi->data);
-+	if (!ite || !its_is_collection_mapped(ite->collection)) {
-+		ret = E_ITS_INT_UNMAPPED_INTERRUPT;
-+		goto unlock;
-+	}
-+
-+	vcpu = kvm_get_vcpu(kvm, ite->collection->target_addr);
-+	if (!vcpu)
-+		ret = E_ITS_INT_UNMAPPED_INTERRUPT;
-+unlock:
-+	mutex_unlock(&its->its_lock);
-+	return ret;
-+}
-+
- /*
-  * Queries the KVM IO bus framework to get the ITS pointer from the given
-  * doorbell address.
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 0c8da72..d452150 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -240,6 +240,7 @@ int kvm_vgic_register_its_device(void);
- void vgic_enable_lpis(struct kvm_vcpu *vcpu);
- void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu);
- int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
-+int vgic_its_verify_msi(struct kvm *kvm, struct kvm_msi *msi);
- int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
- int vgic_v3_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 			 int offset, u32 *val);
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 40c3d7c..3027805 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -19,6 +19,7 @@
- #include <linux/vfio.h>
- #include <linux/wait.h>
- #include <linux/slab.h>
-+#include <linux/kvm_irqfd.h>
- 
- #include "vfio_pci_priv.h"
- 
-@@ -315,6 +316,28 @@ static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec, bool msi
- 	return 0;
- }
- 
-+static int vfio_pci_verify_msi_entry(struct vfio_pci_core_device *vdev,
-+		struct eventfd_ctx *trigger)
-+{
-+	struct kvm *kvm = vdev->vdev.kvm;
-+	struct kvm_kernel_irqfd *tmp;
-+	struct kvm_kernel_irq_routing_entry irq_entry;
-+	int ret = -ENODEV;
-+
-+	spin_lock_irq(&kvm->irqfds.lock);
-+	list_for_each_entry(tmp, &kvm->irqfds.items, list) {
-+		if (trigger == tmp->eventfd) {
-+			ret = 0;
-+			break;
-+		}
-+	}
-+	spin_unlock_irq(&kvm->irqfds.lock);
-+	if (ret)
-+		return ret;
-+	irq_entry = tmp->irq_entry;
-+	return kvm_verify_msi(kvm, &irq_entry);
-+}
-+
- static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
- 				      int vector, int fd, bool msix)
- {
-@@ -355,6 +378,16 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
- 		return PTR_ERR(trigger);
- 	}
- 
-+	if (!msix) {
-+		ret = vfio_pci_verify_msi_entry(vdev, trigger);
-+		if (ret) {
-+			kfree(vdev->ctx[vector].name);
-+			eventfd_ctx_put(trigger);
-+			if (ret > 0)
-+				ret = 0;
-+			return ret;
-+		}
-+	}
- 	/*
- 	 * The MSIx vector table resides in device memory which may be cleared
- 	 * via backdoor resets. We don't allow direct access to the vector
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 1cd9a22..3c8f22a 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1611,6 +1611,8 @@ void kvm_unregister_irq_ack_notifier(struct kvm *kvm,
- int kvm_request_irq_source_id(struct kvm *kvm);
- void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id);
- bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
-+int kvm_verify_msi(struct kvm *kvm,
-+		   struct kvm_kernel_irq_routing_entry *irq_entry);
- 
- /*
-  * Returns a pointer to the memslot if it contains gfn.
--- 
-2.8.1
-
+> +		    r, r < 0 || r >= msrs->nmsrs ? -1 : msrs->entries[r].index);
+> +}
+> +static inline void vcpu_debugregs_get(struct kvm_vm *vm, uint32_t vcpuid,
+> +				      struct kvm_debugregs *debugregs)
+> +{
+> +	vcpu_ioctl(vm, vcpuid, KVM_GET_DEBUGREGS, debugregs);
+> +}
+> +static inline void vcpu_debugregs_set(struct kvm_vm *vm, uint32_t vcpuid,
+> +				      struct kvm_debugregs *debugregs)
+> +{
+> +	vcpu_ioctl(vm, vcpuid, KVM_SET_DEBUGREGS, debugregs);
+> +}
+> +static inline void vcpu_xsave_get(struct kvm_vm *vm, uint32_t vcpuid,
+> +				  struct kvm_xsave *xsave)
+> +{
+> +	vcpu_ioctl(vm, vcpuid, KVM_GET_XSAVE, xsave);
+> +}
+> +static inline void vcpu_xsave2_get(struct kvm_vm *vm, uint32_t vcpuid,
+> +				   struct kvm_xsave *xsave)
+> +{
+> +	vcpu_ioctl(vm, vcpuid, KVM_GET_XSAVE2, xsave);
+> +}
+> +static inline void vcpu_xsave_set(struct kvm_vm *vm, uint32_t vcpuid,
+> +				  struct kvm_xsave *xsave)
+> +{
+> +	vcpu_ioctl(vm, vcpuid, KVM_SET_XSAVE, xsave);
+> +}
+> +static inline void vcpu_xcrs_get(struct kvm_vm *vm, uint32_t vcpuid,
+> +				 struct kvm_xcrs *xcrs)
+> +{
+> +	vcpu_ioctl(vm, vcpuid, KVM_GET_XCRS, xcrs);
+> +}
+> +static inline void vcpu_xcrs_set(struct kvm_vm *vm, uint32_t vcpuid,
+> +				 struct kvm_xcrs *xcrs)
+> +{
+> +	vcpu_ioctl(vm, vcpuid, KVM_SET_XCRS, xcrs);
+> +}
+> +
+>  struct kvm_cpuid2 *kvm_get_supported_cpuid(void);
+>  struct kvm_cpuid2 *vcpu_get_cpuid(struct kvm_vm *vm, uint32_t vcpuid);
+>  
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 9268537f9bd7..5c92e96300c5 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -815,13 +815,11 @@ uint64_t vcpu_get_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index)
+>  		struct kvm_msrs header;
+>  		struct kvm_msr_entry entry;
+>  	} buffer = {};
+> -	int r;
+>  
+>  	buffer.header.nmsrs = 1;
+>  	buffer.entry.index = msr_index;
+>  
+> -	r = __vcpu_ioctl(vm, vcpuid, KVM_GET_MSRS, &buffer.header);
+> -	TEST_ASSERT(r == 1, KVM_IOCTL_ERROR(KVM_GET_MSRS, r));
+> +	vcpu_msrs_get(vm, vcpuid, &buffer.header);
+>  
+>  	return buffer.entry.data;
+>  }
+> @@ -958,28 +956,26 @@ bool kvm_msr_is_in_save_restore_list(uint32_t msr_index)
+>  	return false;
+>  }
+>  
+> -static int vcpu_save_xsave_state(struct kvm_vm *vm, struct vcpu *vcpu,
+> -				 struct kvm_x86_state *state)
+> +static void vcpu_save_xsave_state(struct kvm_vm *vm, uint32_t vcpuid,
+> +				  struct kvm_x86_state *state)
+>  {
+> -	int size;
+> +	int size = vm_check_cap(vm, KVM_CAP_XSAVE2);
+>  
+> -	size = vm_check_cap(vm, KVM_CAP_XSAVE2);
+> -	if (!size)
+> -		size = sizeof(struct kvm_xsave);
+> -
+> -	state->xsave = malloc(size);
+> -	if (size == sizeof(struct kvm_xsave))
+> -		return ioctl(vcpu->fd, KVM_GET_XSAVE, state->xsave);
+> -	else
+> -		return ioctl(vcpu->fd, KVM_GET_XSAVE2, state->xsave);
+> +	if (size) {
+> +		state->xsave = malloc(size);
+> +		vcpu_xsave2_get(vm, vcpuid, state->xsave);
+> +	} else {
+> +		state->xsave = malloc(sizeof(struct kvm_xsave));
+> +		vcpu_xsave_get(vm, vcpuid, state->xsave);
+> +	}
+>  }
+>  
+>  struct kvm_x86_state *vcpu_save_state(struct kvm_vm *vm, uint32_t vcpuid)
+>  {
+>  	const struct kvm_msr_list *msr_list = kvm_get_msr_index_list();
+> -	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
+>  	struct kvm_x86_state *state;
+> -	int r, i;
+> +	int i;
+> +
+>  	static int nested_size = -1;
+>  
+>  	if (nested_size == -1) {
+> @@ -998,102 +994,54 @@ struct kvm_x86_state *vcpu_save_state(struct kvm_vm *vm, uint32_t vcpuid)
+>  	vcpu_run_complete_io(vm, vcpuid);
+>  
+>  	state = malloc(sizeof(*state) + msr_list->nmsrs * sizeof(state->msrs.entries[0]));
+> -	r = ioctl(vcpu->fd, KVM_GET_VCPU_EVENTS, &state->events);
+> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_VCPU_EVENTS, r: %i",
+> -		    r);
+>  
+> -	r = ioctl(vcpu->fd, KVM_GET_MP_STATE, &state->mp_state);
+> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_MP_STATE, r: %i",
+> -		    r);
+> +	vcpu_events_get(vm, vcpuid, &state->events);
+> +	vcpu_mp_state_get(vm, vcpuid, &state->mp_state);
+> +	vcpu_regs_get(vm, vcpuid, &state->regs);
+> +	vcpu_save_xsave_state(vm, vcpuid, state);
+>  
+> -	r = ioctl(vcpu->fd, KVM_GET_REGS, &state->regs);
+> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_REGS, r: %i",
+> -		    r);
+> +	if (kvm_check_cap(KVM_CAP_XCRS))
+> +		vcpu_xcrs_get(vm, vcpuid, &state->xcrs);
+>  
+> -	r = vcpu_save_xsave_state(vm, vcpu, state);
+> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_XSAVE, r: %i",
+> -		    r);
+> -
+> -	if (kvm_check_cap(KVM_CAP_XCRS)) {
+> -		r = ioctl(vcpu->fd, KVM_GET_XCRS, &state->xcrs);
+> -		TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_XCRS, r: %i",
+> -			    r);
+> -	}
+> -
+> -	r = ioctl(vcpu->fd, KVM_GET_SREGS, &state->sregs);
+> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_SREGS, r: %i",
+> -		    r);
+> +	vcpu_sregs_get(vm, vcpuid, &state->sregs);
+>  
+>  	if (nested_size) {
+>  		state->nested.size = sizeof(state->nested_);
+> -		r = ioctl(vcpu->fd, KVM_GET_NESTED_STATE, &state->nested);
+> -		TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_NESTED_STATE, r: %i",
+> -			    r);
+> +
+> +		vcpu_nested_state_get(vm, vcpuid, &state->nested);
+>  		TEST_ASSERT(state->nested.size <= nested_size,
+>  			    "Nested state size too big, %i (KVM_CHECK_CAP gave %i)",
+>  			    state->nested.size, nested_size);
+> -	} else
+> +	} else {
+>  		state->nested.size = 0;
+> +	}
+>  
+>  	state->msrs.nmsrs = msr_list->nmsrs;
+>  	for (i = 0; i < msr_list->nmsrs; i++)
+>  		state->msrs.entries[i].index = msr_list->indices[i];
+> -	r = ioctl(vcpu->fd, KVM_GET_MSRS, &state->msrs);
+> -	TEST_ASSERT(r == msr_list->nmsrs, "Unexpected result from KVM_GET_MSRS, r: %i (failed MSR was 0x%x)",
+> -		    r, r == msr_list->nmsrs ? -1 : msr_list->indices[r]);
+> +	vcpu_msrs_get(vm, vcpuid, &state->msrs);
+>  
+> -	r = ioctl(vcpu->fd, KVM_GET_DEBUGREGS, &state->debugregs);
+> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_DEBUGREGS, r: %i",
+> -		    r);
+> +	vcpu_debugregs_get(vm, vcpuid, &state->debugregs);
+>  
+>  	return state;
+>  }
+>  
+>  void vcpu_load_state(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_x86_state *state)
+>  {
+> -	struct vcpu *vcpu = vcpu_get(vm, vcpuid);
+> -	int r;
+> +	vcpu_sregs_set(vm, vcpuid, &state->sregs);
+> +	vcpu_msrs_set(vm, vcpuid, &state->msrs);
+>  
+> -	r = ioctl(vcpu->fd, KVM_SET_SREGS, &state->sregs);
+> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_SREGS, r: %i",
+> -		    r);
+> +	if (kvm_check_cap(KVM_CAP_XCRS))
+> +		vcpu_xcrs_set(vm, vcpuid, &state->xcrs);
+>  
+> -	r = ioctl(vcpu->fd, KVM_SET_MSRS, &state->msrs);
+> -	TEST_ASSERT(r == state->msrs.nmsrs,
+> -		"Unexpected result from KVM_SET_MSRS, r: %i (failed at %x)",
+> -		r, r == state->msrs.nmsrs ? -1 : state->msrs.entries[r].index);
+> +	vcpu_xsave_set(vm, vcpuid,  state->xsave);
+> +	vcpu_events_set(vm, vcpuid, &state->events);
+> +	vcpu_mp_state_set(vm, vcpuid, &state->mp_state);
+> +	vcpu_debugregs_set(vm, vcpuid, &state->debugregs);
+> +	vcpu_regs_set(vm, vcpuid, &state->regs);
+>  
+> -	if (kvm_check_cap(KVM_CAP_XCRS)) {
+> -		r = ioctl(vcpu->fd, KVM_SET_XCRS, &state->xcrs);
+> -		TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_XCRS, r: %i",
+> -			    r);
+> -	}
+> -
+> -	r = ioctl(vcpu->fd, KVM_SET_XSAVE, state->xsave);
+> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_XSAVE, r: %i",
+> -		    r);
+> -
+> -	r = ioctl(vcpu->fd, KVM_SET_VCPU_EVENTS, &state->events);
+> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_VCPU_EVENTS, r: %i",
+> -		    r);
+> -
+> -	r = ioctl(vcpu->fd, KVM_SET_MP_STATE, &state->mp_state);
+> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_MP_STATE, r: %i",
+> -		    r);
+> -
+> -	r = ioctl(vcpu->fd, KVM_SET_DEBUGREGS, &state->debugregs);
+> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_DEBUGREGS, r: %i",
+> -		    r);
+> -
+> -	r = ioctl(vcpu->fd, KVM_SET_REGS, &state->regs);
+> -	TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_REGS, r: %i",
+> -		    r);
+> -
+> -	if (state->nested.size) {
+> -		r = ioctl(vcpu->fd, KVM_SET_NESTED_STATE, &state->nested);
+> -		TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_NESTED_STATE, r: %i",
+> -			    r);
+> -	}
+> +	if (state->nested.size)
+> +		vcpu_nested_state_set(vm, vcpuid, &state->nested);
+>  }
+>  
+>  void kvm_x86_state_cleanup(struct kvm_x86_state *state)
