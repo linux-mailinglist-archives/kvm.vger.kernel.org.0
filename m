@@ -2,80 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1323D635F8E
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 14:28:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FE4F635F95
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 14:29:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236687AbiKWN2v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 08:28:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39280 "EHLO
+        id S237438AbiKWN3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 08:29:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237087AbiKWN2P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 08:28:15 -0500
+        with ESMTP id S236070AbiKWN2c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 08:28:32 -0500
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59993BE27;
-        Wed, 23 Nov 2022 05:07:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1E6915713;
+        Wed, 23 Nov 2022 05:07:48 -0800 (PST)
 Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AND2HNq034037;
-        Wed, 23 Nov 2022 13:07:42 GMT
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ANBo0SB035921;
+        Wed, 23 Nov 2022 13:07:47 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=dpzs+D9sp2IPvqiFiyCNfqHgrhQ8nIlbGtoIbOkojJI=;
- b=efcvpbcXVvvHIyjr24qUWh+oAo7ZFJnQ7csz24PqQZ9OwX3CCa+OnVltloVgIfA+nXMd
- 6Vb9Vlx0oM7kVx/3c6gRVLRImQyJtrXI40jFNE+I5OlGRdTgYMRZc4IH+g2j0kN3U777
- 00IaGTpfuo/u3295cLZbdY6erN7hApXfbglh7SIK4uLYGZvQ3Xrn9BnGGknPTFe3NLDB
- ZETyQx3h2KIfDKUeF7gdJ+6j60xMkVnT1X7ygIGkXMsMVweSrRvE5G0tFTz+L7CKiRI9
- u1nEkd1FCpcsRW8v1rqRHXFNghKHxJmNtP+OZH93zDYABLFDP3ncvj0x9UsjaSp09NbU RQ== 
+ bh=b6qT2Vv3sbVzGrxLYwjWoau0u1TuIlIR0E1NVCe+GZ8=;
+ b=nHCJfzP2ENww5kXUjVWilJ4Z85lH8UJ6pX4LJkh+AwUU8pCC1c0nGZBQKQNnIXxzU8UB
+ isNDxnc9r5Qu/axSZxChPvOrc7bKbgLQWbomzBvuQ7kBANKNcQQb/FK/E7rT2E2RNA6V
+ 6yuOL03x1opMxxUY4/Rn9DzbVlAIGeOTcgCYUXSqcOsDN1w09wjt+NpRz+/dbh166p3i
+ i/VZhr9OATLMWhyG0j9ZLATJrnluEctxAB4I8Dfrb1VbJZmGiqUomPUKOLsj3bBkVtoL
+ ApqXvK6z6GvlY7oe3kEdiWtlcdQWF9QvylxvfYEH3XOnH2zjonZ0V/oReMxeKjIHh3p+ oQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0x1da3fx-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0x1da3k5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 13:07:42 +0000
+        Wed, 23 Nov 2022 13:07:47 +0000
 Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ANCBQdR037010;
-        Wed, 23 Nov 2022 13:07:42 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0x1da3f5-1
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AND7khb016117;
+        Wed, 23 Nov 2022 13:07:46 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0x1da3hy-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 13:07:41 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AND4pML024068;
-        Wed, 23 Nov 2022 13:07:40 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 3kxps8wrev-1
+        Wed, 23 Nov 2022 13:07:46 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AND5QYU001260;
+        Wed, 23 Nov 2022 13:07:45 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma02fra.de.ibm.com with ESMTP id 3kxps8v6nr-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 13:07:40 +0000
+        Wed, 23 Nov 2022 13:07:44 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AND7ajL61604328
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AND1Rb049217992
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Nov 2022 13:07:36 GMT
+        Wed, 23 Nov 2022 13:01:27 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BE303A405C;
-        Wed, 23 Nov 2022 13:07:36 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id AD1D6A405B;
+        Wed, 23 Nov 2022 13:07:41 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7D14CA4054;
-        Wed, 23 Nov 2022 13:07:36 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 6C7A2A4054;
+        Wed, 23 Nov 2022 13:07:41 +0000 (GMT)
 Received: from p-imbrenda (unknown [9.152.224.56])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Nov 2022 13:07:36 +0000 (GMT)
-Date:   Wed, 23 Nov 2022 13:46:30 +0100
+        Wed, 23 Nov 2022 13:07:41 +0000 (GMT)
+Date:   Wed, 23 Nov 2022 13:47:48 +0100
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     Janosch Frank <frankja@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
         thuth@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 3/5] lib: s390x: sie: Set guest memory
- pointer
-Message-ID: <20221123134630.0f67da2d@p-imbrenda>
-In-Reply-To: <20221123084656.19864-4-frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 4/5] s390x: Clear first stack frame and
+ end backtrace early
+Message-ID: <20221123134748.13f6c4c1@p-imbrenda>
+In-Reply-To: <20221123084656.19864-5-frankja@linux.ibm.com>
 References: <20221123084656.19864-1-frankja@linux.ibm.com>
-        <20221123084656.19864-4-frankja@linux.ibm.com>
+        <20221123084656.19864-5-frankja@linux.ibm.com>
 Organization: IBM
 X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: sX9e5eifb51jJqdlQOFnc4xe8TizbP9P
-X-Proofpoint-ORIG-GUID: P8dkmnYYfoDnyBHdsZynxkbPARVkritU
+X-Proofpoint-GUID: P5zWB8ie_YnSuUfp264TWIjwEkeGp2jL
+X-Proofpoint-ORIG-GUID: IQU6YUH9DskPg0B0hG8LD7vbvPPQsLC5
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-11-23_06,2022-11-23_01,2022-06-22_01
@@ -93,30 +93,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Nov 2022 08:46:54 +0000
+On Wed, 23 Nov 2022 08:46:55 +0000
 Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> Seems like it was introduced but never set. It's nicer to have a
-> pointer than to cast the MSO of a VM.
+> When setting the first stack frame to 0, we can check for a 0
+> backchain pointer when doing backtraces to know when to stop.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 
 Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
 > ---
->  lib/s390x/sie.c | 1 +
->  1 file changed, 1 insertion(+)
+>  lib/s390x/stack.c | 2 ++
+>  s390x/cstart64.S  | 2 ++
+>  2 files changed, 4 insertions(+)
 > 
-> diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
-> index a71985b6..9241b4b4 100644
-> --- a/lib/s390x/sie.c
-> +++ b/lib/s390x/sie.c
-> @@ -93,6 +93,7 @@ void sie_guest_create(struct vm *vm, uint64_t guest_mem, uint64_t guest_mem_len)
+> diff --git a/lib/s390x/stack.c b/lib/s390x/stack.c
+> index e714e07c..9f234a12 100644
+> --- a/lib/s390x/stack.c
+> +++ b/lib/s390x/stack.c
+> @@ -22,6 +22,8 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+>  	for (depth = 0; stack && depth < max_depth; depth++) {
+>  		return_addrs[depth] = (void *)stack->grs[8];
+>  		stack = stack->back_chain;
+> +		if (!stack)
+> +			break;
+>  	}
 >  
->  	/* Guest memory chunks are always 1MB */
->  	assert(!(guest_mem_len & ~HPAGE_MASK));
-> +	vm->guest_mem = (uint8_t *)guest_mem;
->  	/* For non-PV guests we re-use the host's ASCE for ease of use */
->  	vm->save_area.guest.asce = stctg(1);
->  	/* Currently MSO/MSL is the easiest option */
+>  	return depth;
+> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+> index 666a9567..6f83da2a 100644
+> --- a/s390x/cstart64.S
+> +++ b/s390x/cstart64.S
+> @@ -37,6 +37,8 @@ start:
+>  	sam64				# Set addressing mode to 64 bit
+>  	/* setup stack */
+>  	larl	%r15, stackptr
+> +	/* Clear first stack frame */
+> +	xc      0(160,%r15), 0(%r15)
+>  	/* setup initial PSW mask + control registers*/
+>  	larl	%r1, initial_psw
+>  	lpswe	0(%r1)
 
