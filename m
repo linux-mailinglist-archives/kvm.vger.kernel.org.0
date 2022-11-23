@@ -2,530 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1313D634BCB
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 01:46:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7207634BDC
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 01:58:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235333AbiKWAqa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 19:46:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58670 "EHLO
+        id S234988AbiKWA6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 19:58:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235317AbiKWAq2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 19:46:28 -0500
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE3C8DA4D7
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 16:46:25 -0800 (PST)
-Received: by mail-ot1-x329.google.com with SMTP id a7-20020a056830008700b0066c82848060so10366196oto.4
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 16:46:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=atishpatra.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=u1W+ts6Qp6IYqic7lQhH5TEgO/rK0l3BseEk5inmup4=;
-        b=Fc1O5NHVCP6nq/kq1IcJ+P9iYi3rC+JXZn6Vutzx1sIRickzK1fM1Ox7ILPNB4MLJ2
-         frohev/P83pXV2LEdjSB2G0cFZAwrW391+nfzWBruirOg+SKzAYgH9Py+w6jMAtgWytm
-         J89BgBvRerH5AldFlxb4qGaIlKpPT/dO4mnFc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=u1W+ts6Qp6IYqic7lQhH5TEgO/rK0l3BseEk5inmup4=;
-        b=gM2HWq2XwH8WAKB4BH2AXxwzfpk8YAYHDTqEFZo/y+UozW2PDohddH7SfKGGx62Uqh
-         yXY8/xIFzAbsaGQY0ZfZB9HymHTqr7kHEJYdnSxlv2Hdr1uEDRL4q5S2WVCSJA0AasPf
-         LmEHU7vDfuM3pSRvQH9EUIvV5iHsxIAYLWszY2+GqZ9nT0t/OE6Tvyo19iU55ncgxvF1
-         YJpJDRMYa1gznla+gRUR4kvmOnzUhKV7KtW9PMpMHqfl6cOl6Dbg0bz5knt9xeKt7PoU
-         34JnxqF9vI7R+pvs8cXQpdV8wP/3Xe9b7BfWeX0BptiJWRYq6AdbVWkIaIgb1IzuPZ3Q
-         aYSQ==
-X-Gm-Message-State: ANoB5plrtbFb0Uz2x2awD4THr19j7Qv9w/xNiDgEAwcLImWcppNZWiYy
-        StPFeXxmDL5q6QDWnQAZN/lM4SE+eMZ/bGSfIfYp
-X-Google-Smtp-Source: AA0mqf6wjYvSuXmfkihC7DSEUxp9oQvr5xQiUI0clKTyXa3ecV4R2vghF6moTBuU7PrLcvn1ajBajb2Zi2RN8Cvhj4o=
-X-Received: by 2002:a05:6830:22f2:b0:669:3797:c1b4 with SMTP id
- t18-20020a05683022f200b006693797c1b4mr12868212otc.293.1669164385081; Tue, 22
- Nov 2022 16:46:25 -0800 (PST)
+        with ESMTP id S234684AbiKWA6w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 19:58:52 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23E13C759B;
+        Tue, 22 Nov 2022 16:58:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669165132; x=1700701132;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=pbhlLH/fHuq4ETL/akQ8QEeCxMWiyCqa76H1RRN91i8=;
+  b=l/aNq2DDn5r2vnXsD3S86qAupQB1PzA2rXJ4LD5TGWgkCXgpI93DvgiX
+   6FqrtjP0iFZ50mbnVPqRjX2vPgwUtP/LUr/GTzMC1VAjiczMltfeR/iK5
+   KuMnYtmVXlNVCShLHIfa0IGu5KY7O0eLCWRjeUHr9+WGzQRweR2lRumMg
+   moQ/QWxCpxv29S4ibj1O2Ng16AoBHohGclonB5uJNmJwRZRTGFBi8D8xG
+   56Vr56iSlWoPXWwOOvhiVg1eswmqP3nnBHW1EzVwdFicwYVKko+57Pk6k
+   25CD2GpEcHu65Wys/RLi348CJypdjV9MvazfW203gl3gCb3QBnHYTPneo
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="294340424"
+X-IronPort-AV: E=Sophos;i="5.96,185,1665471600"; 
+   d="scan'208";a="294340424"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 16:58:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="705167767"
+X-IronPort-AV: E=Sophos;i="5.96,185,1665471600"; 
+   d="scan'208";a="705167767"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga008.fm.intel.com with ESMTP; 22 Nov 2022 16:58:51 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 22 Nov 2022 16:58:51 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Tue, 22 Nov 2022 16:58:51 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.176)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Tue, 22 Nov 2022 16:58:50 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=S9kLeqCDeGzTsZCMK4+zvsMsTYQTZmHT3QfVT+vpcYdF4AzDtv9fSxqJaCi09uA75Qs26XM8lpG7Ar3RBmQbfUEy02CM20F8a3cccS+jCaXsXNH5/2kLMq9rMghSfqbDYHY+1SrxGg/0IMgEsKq9aKEF9exD9N1j/NS6fd2sa1mdr1Jk213z/tHz2Vq4aqPkcQ9hq1aa6q/4PFmQ8KW6Tf9I1Ik3XiNhvc0L/RRfotL09vszqyHP4rVGb/5FP48AGWnfobah+BwEeW8zDwV953+8/6AUCGJzc0cZF766ACKSdY60RjgvVarf941aZxRuIiUo9CgMuDSRD3YXpja/YA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pbhlLH/fHuq4ETL/akQ8QEeCxMWiyCqa76H1RRN91i8=;
+ b=AhYOBngjG0HZ1CWg9pLHCY21hKFoQBVmE1NvdYRdiYAk4Aqq5AHhdsEzWaw1+QLq//vSGA+Z95f85DLWxd/3ygy2RCjLofJccTNd7+ZpDy1H4qLMbFimpX7yOr5YUTsw2dp84Rj0lQEVYNqmzBROp5Yw6mhzHD2mlFWJrUAIpy0CD0oITz6VMrw8KT3eHck//GEWOl8+9IiwPivPqIBj8Kg9hsHSFRsQDbGKDci7KFWzwJ4TnSadxRY0o7Tg27cmqvi3HQ+8lJq/57Z92+zH+isU4KPFPbA1rGAUAx3+ocbH/6P5Bic6HVSAYoCIfprkho6RMsNXxoeMPIuc0m7W+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by MN2PR11MB4630.namprd11.prod.outlook.com (2603:10b6:208:24e::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.15; Wed, 23 Nov
+ 2022 00:58:40 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e%8]) with mapi id 15.20.5834.015; Wed, 23 Nov 2022
+ 00:58:40 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "peterz@infradead.org" <peterz@infradead.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v7 06/20] x86/virt/tdx: Shut down TDX module in case of
+ error
+Thread-Topic: [PATCH v7 06/20] x86/virt/tdx: Shut down TDX module in case of
+ error
+Thread-Index: AQHY/T2+AlEdwutNGkW7IAmyyjQDW65KqvAAgABkvgCAAELPgIAAAzIAgABdRgA=
+Date:   Wed, 23 Nov 2022 00:58:40 +0000
+Message-ID: <da7ae78c2d9fed125f160744af5be75f34b1b1d7.camel@intel.com>
+References: <cover.1668988357.git.kai.huang@intel.com>
+         <48505089b645019a734d85c2c29f3c8ae2dbd6bd.1668988357.git.kai.huang@intel.com>
+         <Y3ySxEr64HkUaEDq@hirez.programming.kicks-ass.net>
+         <52b2be9b-defd-63ce-4cb2-96cd624a95a6@intel.com>
+         <Y30fUS5/JClpBHVc@hirez.programming.kicks-ass.net>
+         <b3938f3a-e4f8-675a-0c0e-4b4618019145@intel.com>
+In-Reply-To: <b3938f3a-e4f8-675a-0c0e-4b4618019145@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|MN2PR11MB4630:EE_
+x-ms-office365-filtering-correlation-id: 0ae315d7-b6b1-4156-39dc-08dacceddc7e
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: VLheYcbD33jDXnD08IfD9Ylbf5yQYgB9hnzHK/46uGBLhCJMQ+c0eEnW4guRn7JjOwexEmL3ADnC4BuASAliAMdnGfqBOg9Nm+lgtDwdceu4f3RTb+wFoNnkVAqnlXF36LjeJXl6J9rR+3+D8JkZajOJroDwAAavIl37dmlSrirRXA/nVXkq+bDmnYXlPTI1i6ciepiOlTgWxnA7WeE7i6Pw6MDWCbC+Sa8Sy3Q5tY2KohNH8VM+ml5LyvTBPM36c+jknSvChY162eMTm08J+9eFqo/8IVfG+cqDN/lGv03KUqCzSKTSqj2ytVOt3aTQ4ko3c5QYGNYxUetgaxOkiSCNNOxKGFhVueDRsW+JUttSzhT0D3TSqOUK4ZuyAmL1S6y0H5tkgPfu2N46n4V1hOMkp8xgpBLkS2rKEW7EhnHCVdNOucc50mhhJUe3RrooK2S9pYNsVoHRP6dfOYiVd6OtT9ldl2bQHKPsjAFHiaHQcp9iiGUe1+bh62h3cNJMnMaGjioaI/hokNv+8fdtJnArt4RSnrnvYsV5DY2F6D7HI4UxJjHOvxTU1mt34/tIB/Ua0y+frAWLkwd8LZuQHyOntc8FucBuSq7huWZWxLnVtr7KiR7Lhf1V/LX6TLtczoz2qOTNXMSArhpL+TsUocPBV0xhTHkquG8Q0Aj/KDRdl4CcoLk2T12lARjM0DkZ51/Al7a4cr+u6ttWIoZeF1b2JfSpeFVb7y2Sh+3Qg4M=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(136003)(366004)(376002)(396003)(346002)(451199015)(36756003)(86362001)(186003)(7416002)(5660300002)(4744005)(4001150100001)(2616005)(26005)(6512007)(2906002)(82960400001)(38100700002)(122000001)(91956017)(38070700005)(76116006)(966005)(6486002)(6506007)(71200400001)(66476007)(54906003)(66946007)(66556008)(41300700001)(316002)(8936002)(6636002)(478600001)(4326008)(66446008)(110136005)(8676002)(64756008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WmpYSk1NKzgrVnJacXBVN0RPSVJKUzZuVUx5MUhqcWhFcjdqZ3RxRG85N0M5?=
+ =?utf-8?B?R2NVSVhFY2pkNkpWbW1EQVZWMXFDNFRXSzQxTWpJd0UreitwVy94U0dQd3ZU?=
+ =?utf-8?B?YVk0MFRaMjF0S1V6dFV2VWkwb2FLdTZhWjgwUTlzUE9GRExjY3c5cmZqZWc3?=
+ =?utf-8?B?V3crUHdwemczcjBueEpsZm80M0I3SnVvZ2V6dDBtVVp0LzBkemI3R01DSEl5?=
+ =?utf-8?B?bkc0RzhZZXlibys3TTBXdlExaTd3T3Zad0NaWExQNWhYa3p6T3NOTHBSOTJ3?=
+ =?utf-8?B?MHVsSllteTg1aUV0enhkeTVGNlZKSy9wTmRJVWxHcU5BUG1JMVBNbFB0cnRS?=
+ =?utf-8?B?d0JnRE5vSVUzU2NMYzduM2pLN1B1akQ1NFF2Zk41SEhIVXM3eXl0ZG9pem5m?=
+ =?utf-8?B?Qll3ejVUZ1lEeXROTVhXMVl6Zk53MjF6ZlkwYTFhdnlqNnVqQjh1U3EvNFJ0?=
+ =?utf-8?B?RHRJOVBIOXk3OFN6Q0R6OUNBZXd2VXArb2I1czVJMG1DVEtKNVByeWhQV2lu?=
+ =?utf-8?B?OFBMVnU4MWNmWkVBTU9KQmlsQ25FSG5uRnQxd0ExdHUycVkwUjJaV054eU1Q?=
+ =?utf-8?B?M09EaERZNDMzZ0piYTZFM2dhL1pWaW5KdzdNdWlVVWk5OTh1Y2xLbHJGcnlJ?=
+ =?utf-8?B?bjdxNEpsVWl6MVByc1l4eGgxS2x3MGJYL2ZSeFh3Zkp0TW1DVWtaSGdFSWNt?=
+ =?utf-8?B?OEU1S1lPbVdBVjBjN1JhRzc1bitYdjFiNGViSWJTQ3VkaHVIbytZejhINVpl?=
+ =?utf-8?B?UXdlQm5iVUMxYVRQNytqWFBRS1J1K2l5MW1RMTNFZFAxRWVScnhZWHBBZW1K?=
+ =?utf-8?B?K1ZaQllhVHE5Qk1RcUYxUDBMTGp6TnNPeHoyb1NzV1Jzc3M4RVNqZG1BNjRN?=
+ =?utf-8?B?U0hGa1Bhdm42VUZ2dVQ3b24vdlRQRVBLcjYwSVVyMVpiU0ZObjNpb2xtdzVC?=
+ =?utf-8?B?OHNlY1RnM0d0VjRqZ25WRnVUbWVSVnkxb1V5K3hKcHB4dFByUENMaVhaL2FB?=
+ =?utf-8?B?a2VsT2tCeXh0elQ3VnU3MGQzMUFEemJLV1VJbWRlZkFuWE1FSkdydDJkUHFQ?=
+ =?utf-8?B?UzF0bEFablpxT2xzeHZxSTk3eDlNbW5RSlBxY21pd3hsSnlnR0tRSXRpZUk5?=
+ =?utf-8?B?NkZxNW1oYklla3ZlazV2bUwrdjF2SFgwbHFmQ2d2L1NrUGl4R0orNHBvWklB?=
+ =?utf-8?B?UmxIVkNUTzFlOHhiQU94dURDbmVYUTUzZjFmYXFPWjlsU2ErSXNHd1p0akFn?=
+ =?utf-8?B?WnkrTXVTNWRXT2dRKzZCb3A3cTJ5WGR3LzNWbDU0UXN1THVGaVZYNFliUTZV?=
+ =?utf-8?B?NGFqNDExcUUyVWVWU1RyQ3dBUXJOdnQ0MTlqclo5N0xvWHVzNkpXMWhVRFJG?=
+ =?utf-8?B?Y0FQd1NtOXJsT0Z2TVUxNnk4QnRZTERyb29ld3Q3R3NoVVd6alV6dlNFeGMx?=
+ =?utf-8?B?ZkZqNTQ2ZldUR3RHWFdqWndsbk9Qa3E1bTIwQVdhTjhEWEJMbjNRVWtVVkxO?=
+ =?utf-8?B?d3lsWkhVQzE1Y2xZOUNGMndBNlFaMy8vbnRTaHdVS0pFcGtINkZqQWFkTjVI?=
+ =?utf-8?B?TWRTdks5N21uNGQ5ZFBPQy94ZmhUOG44dUxRd3NuaGZwaXErbjBHcXczTVlT?=
+ =?utf-8?B?Y2RORERDTm94N2g1T2t6aGFsNGViOGZ6WTNxU1V6ZmcwWm51OGZsdHAyTzQ4?=
+ =?utf-8?B?UVJVQmdncEhSQjB2QytoVUwyaFpPZ003NTg4eTNIODNvejhqZWlDMEg2cksx?=
+ =?utf-8?B?L1VXV3lWeDBwYW9XZGpMbExnRWVLd0YvUzVLMEMyZk5xWjhZcFBaT1NoL3lk?=
+ =?utf-8?B?ZkpxU2VzZWM0RWVkQlo5L0xKN1lUWFd2T2dCQTc5Qm9HcVNNamJqay9GaE0x?=
+ =?utf-8?B?QURlV3ZCSk1oOWhjeWJTM1JDUElWZWE3aFg0d1FLRG11V0hEVEhSRXN5RGlp?=
+ =?utf-8?B?Y3U2bjJvQSt2MmI2K0YvUXBTajhVa3Ivc0tzQkdQT3hIZWkvaVk4VDhTMCtI?=
+ =?utf-8?B?c1lwL2lXMFdGc1dhSDRmMmxQeTRoMmprVU05U3U5VzRVRGRjb2d4VFNIcE4r?=
+ =?utf-8?B?OXV4eWJLRC9ySm5zRzNhUHFxcWtJMU1uV1BNRkNBd0JoczI5UlFLcXM2enk1?=
+ =?utf-8?B?RURsZklyT0R1Y0NhNGxZTVNNQ3g1THEzZzRRRUNhRG5qaHhTL1RuTDAySWg4?=
+ =?utf-8?B?MkE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9DA382CE86BCEF44A7C601E44F4A6267@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20220718170205.2972215-1-atishp@rivosinc.com> <20220718170205.2972215-6-atishp@rivosinc.com>
- <20221101141329.j4qtvjf6kmqixt2r@kamzik>
-In-Reply-To: <20221101141329.j4qtvjf6kmqixt2r@kamzik>
-From:   Atish Patra <atishp@atishpatra.org>
-Date:   Tue, 22 Nov 2022 16:46:14 -0800
-Message-ID: <CAOnJCULMbTp6WhVRWHxzFnUgCJJV01hcyukQxSEih-sYt5TJWg@mail.gmail.com>
-Subject: Re: [RFC 5/9] RISC-V: KVM: Add skeleton support for perf
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>, Guo Ren <guoren@kernel.org>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ae315d7-b6b1-4156-39dc-08dacceddc7e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Nov 2022 00:58:40.4765
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: H87ZbWy97LouOPrR42K2mjJQyoQfbjKgfvDUzpp3BC70i8nIoB9geTyLuFAoNIRKF/vqoWGlZyUPmKs+acitFQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4630
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
- at runtime.
-
-On Tue, Nov 1, 2022 at 7:13 AM Andrew Jones <ajones@ventanamicro.com> wrote:
->
-> On Mon, Jul 18, 2022 at 10:02:01AM -0700, Atish Patra wrote:
-> > This patch only adds barebore structure of perf implementation. Most of
->                        a bare bones         ^ the
->
-> > the function returns zero at this point and will be implemented
->       functions
->
-> > fully in the future.
->
-> s/the future/later patches/
->
-
-Done.
-
-> >
-> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> > ---
-> >  arch/riscv/include/asm/kvm_host.h     |   3 +
-> >  arch/riscv/include/asm/kvm_vcpu_pmu.h |  70 +++++++++++++
-> >  arch/riscv/kvm/Makefile               |   1 +
-> >  arch/riscv/kvm/main.c                 |   3 +-
-> >  arch/riscv/kvm/vcpu.c                 |   5 +
-> >  arch/riscv/kvm/vcpu_insn.c            |   3 +-
-> >  arch/riscv/kvm/vcpu_pmu.c             | 136 ++++++++++++++++++++++++++
-> >  7 files changed, 219 insertions(+), 2 deletions(-)
-> >  create mode 100644 arch/riscv/include/asm/kvm_vcpu_pmu.h
-> >  create mode 100644 arch/riscv/kvm/vcpu_pmu.c
-> >
-> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> > index 59a0cf2ca7b9..5d2312828bb2 100644
-> > --- a/arch/riscv/include/asm/kvm_host.h
-> > +++ b/arch/riscv/include/asm/kvm_host.h
-> > @@ -18,6 +18,7 @@
-> >  #include <asm/kvm_vcpu_fp.h>
-> >  #include <asm/kvm_vcpu_insn.h>
-> >  #include <asm/kvm_vcpu_timer.h>
-> > +#include <asm/kvm_vcpu_pmu.h>
-> >
-> >  #define KVM_MAX_VCPUS                        1024
-> >
-> > @@ -226,6 +227,8 @@ struct kvm_vcpu_arch {
-> >
-> >       /* Don't run the VCPU (blocked) */
-> >       bool pause;
-> > +
-> > +     struct kvm_pmu pmu;
-> >  };
-> >
-> >  static inline void kvm_arch_hardware_unsetup(void) {}
-> > diff --git a/arch/riscv/include/asm/kvm_vcpu_pmu.h b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> > new file mode 100644
-> > index 000000000000..bffee052f2ae
-> > --- /dev/null
-> > +++ b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> > @@ -0,0 +1,70 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/*
-> > + * Copyright (c) 2022 Rivos Inc
-> > + *
-> > + * Authors:
-> > + *     Atish Patra <atishp@rivosinc.com>
-> > + */
-> > +
-> > +#ifndef _KVM_VCPU_RISCV_PMU_H
-> > +#define _KVM_VCPU_RISCV_PMU_H
->
-> The convention seems to be to leading underscores for these types of
-> defines, i.e. __KVM_VCPU_RISCV_PMU_H
->
-
-Yes. It was a typo. Fixed.
-
-> > +
-> > +#include <linux/perf/riscv_pmu.h>
-> > +#include <asm/sbi.h>
-> > +
-> > +#ifdef CONFIG_RISCV_PMU_SBI
-> > +#define RISCV_KVM_MAX_FW_CTRS 32
-> > +
-> > +/* Per virtual pmu counter data */
-> > +struct kvm_pmc {
-> > +     u8 idx;
-> > +     struct kvm_vcpu *vcpu;
->
-> I'm not sure we need a vcpu pointer here. If it's just to implement
-> pmc_to_pmu(), then we can instead implement a pmc_to_vcpu(), like
-> arm64's kvm_pmc_to_vcpu(). x86 might be able to do that too, since
-> it appears the conversion macros below originated there.
->
-
-Yes. We can implement arm64 as well instead of x86.
-I just thought the x86 approach keeping a reference to vcpu is a bit
-simpler than computing
-the parent offset using container_of multiple times. This will be
-invoked once per overflow in the counter overflow path.
-
-If you feel strongly about it arm64 way, we can follow that. I have
-removed from this series for now.
-Depending on the conclusion, I will add it back in kvm sscofpmf
-support series if required.
-
-> > +     struct perf_event *perf_event;
-> > +     uint64_t counter_val;
-> > +     union sbi_pmu_ctr_info cinfo;
-> > +};
-> > +
-> > +/* PMU data structure per vcpu */
-> > +struct kvm_pmu {
-> > +     struct kvm_pmc pmc[RISCV_MAX_COUNTERS];
-> > +     /* Number of the virtual firmware counters available */
-> > +     int num_fw_ctrs;
-> > +     /* Number of the virtual hardware counters available */
-> > +     int num_hw_ctrs;
-> > +     /* Bit map of all the virtual counter used */
->                                       counters
->
-> > +     DECLARE_BITMAP(used_pmc, RISCV_MAX_COUNTERS);
->
-> How about naming this pmc_in_use like x86?
->
-
-Done.
-
-> > +};
-> > +
-> > +#define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu)
-> > +#define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu))
-> > +#define pmc_to_pmu(pmc)   (&(pmc)->vcpu->arch.pmu)
-> > +
-> > +int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, unsigned long *out_val);
-> > +int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
-> > +                             unsigned long *ctr_info);
-> > +
->
-> nit: no need for this blank line
-
-Fixed.
-
->
-> > +int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > +                              unsigned long ctr_mask, unsigned long flag, uint64_t ival);
-> > +int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > +                              unsigned long ctr_mask, unsigned long flag);
-> > +int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > +                                  unsigned long ctr_mask, unsigned long flag,
-> > +                                  unsigned long eidx, uint64_t edata);
-> > +int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
-> > +                             unsigned long *out_val);
-> > +int kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu);
-> > +void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu);
-> > +void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu);
-> > +
-> > +#else
-> > +struct kvm_pmu {
-> > +};
-> > +
-> > +static inline int kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
-> > +{
-> > +     return 0;
-> > +}
-> > +static inline void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu) {}
-> > +static inline void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu) {}
-> > +#endif
-> > +#endif
-> > diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
-> > index 019df9208bdd..342d7199e89d 100644
-> > --- a/arch/riscv/kvm/Makefile
-> > +++ b/arch/riscv/kvm/Makefile
-> > @@ -25,3 +25,4 @@ kvm-y += vcpu_sbi_base.o
-> >  kvm-y += vcpu_sbi_replace.o
-> >  kvm-y += vcpu_sbi_hsm.o
-> >  kvm-y += vcpu_timer.o
-> > +kvm-$(CONFIG_RISCV_PMU_SBI) += vcpu_sbi_pmu.o vcpu_pmu.o
-> > diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-> > index 1549205fe5fe..d41ab6d1987d 100644
-> > --- a/arch/riscv/kvm/main.c
-> > +++ b/arch/riscv/kvm/main.c
-> > @@ -49,7 +49,8 @@ int kvm_arch_hardware_enable(void)
-> >       hideleg |= (1UL << IRQ_VS_EXT);
-> >       csr_write(CSR_HIDELEG, hideleg);
-> >
-> > -     csr_write(CSR_HCOUNTEREN, -1UL);
-> > +     /* VS should access only TM bit. Everything else should trap */
-> > +     csr_write(CSR_HCOUNTEREN, 0x02);
->
-> This looks like something that should be broken out into a separate patch
-> with a description of what happens now when guests try to access the newly
-> trapping counter registers. We should probably also create a TM define.
->
-
-Done.
-
-> >
-> >       csr_write(CSR_HVIP, 0);
-> >
-> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > index 3c95924d38c7..4cc964aaf2ad 100644
-> > --- a/arch/riscv/kvm/vcpu.c
-> > +++ b/arch/riscv/kvm/vcpu.c
-> > @@ -122,6 +122,7 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
-> >
-> >       WRITE_ONCE(vcpu->arch.irqs_pending, 0);
-> >       WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
-> > +     kvm_riscv_vcpu_pmu_reset(vcpu);
-> >
-> >       vcpu->arch.hfence_head = 0;
-> >       vcpu->arch.hfence_tail = 0;
-> > @@ -174,6 +175,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >       /* Setup VCPU timer */
-> >       kvm_riscv_vcpu_timer_init(vcpu);
-> >
-> > +     /* setup performance monitoring */
-> > +     kvm_riscv_vcpu_pmu_init(vcpu);
-> > +
-> >       /* Reset VCPU */
-> >       kvm_riscv_reset_vcpu(vcpu);
-> >
-> > @@ -196,6 +200,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
-> >       /* Cleanup VCPU timer */
-> >       kvm_riscv_vcpu_timer_deinit(vcpu);
-> >
-> > +     kvm_riscv_vcpu_pmu_deinit(vcpu);
-> >       /* Free unused pages pre-allocated for G-stage page table mappings */
-> >       kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-> >  }
-> > diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
-> > index 7eb90a47b571..0aa334f853c8 100644
-> > --- a/arch/riscv/kvm/vcpu_insn.c
-> > +++ b/arch/riscv/kvm/vcpu_insn.c
-> > @@ -214,7 +214,8 @@ struct csr_func {
-> >                   unsigned long wr_mask);
-> >  };
-> >
-> > -static const struct csr_func csr_funcs[] = { };
-> > +static const struct csr_func csr_funcs[] = {
-> > +};
->
-> stray change
->
-
-Fixed
-
-> >
-> >  /**
-> >   * kvm_riscv_vcpu_csr_return -- Handle CSR read/write after user space
-> > diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-> > new file mode 100644
-> > index 000000000000..3168ed740bdd
-> > --- /dev/null
-> > +++ b/arch/riscv/kvm/vcpu_pmu.c
-> > @@ -0,0 +1,136 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Copyright (c) 2022 Rivos Inc
-> > + *
-> > + * Authors:
-> > + *     Atish Patra <atishp@rivosinc.com>
-> > + */
-> > +
-> > +#include <linux/errno.h>
-> > +#include <linux/err.h>
-> > +#include <linux/kvm_host.h>
-> > +#include <linux/perf/riscv_pmu.h>
-> > +#include <asm/csr.h>
-> > +#include <asm/kvm_vcpu_pmu.h>
-> > +#include <linux/kvm_host.h>
-> > +
-> > +int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, unsigned long *out_val)
-> > +{
-> > +     struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-> > +
-> > +     if (!kvpmu)
-> > +             return -EINVAL;
->
-> kvpmu can never be null because arch.pmu isn't a pointer. We probably
-> shouldn't be making calls to kvm_riscv_vcpu_pmu_num_ctrs() without knowing
-> we have an initialized pmu anyway, though.
->
-
-Yes. I have added an init_done flag to do that sanity check.
-I can change it based on the conclusion on PATCH 6.
-
-> > +
-> > +     *out_val = kvpmu->num_fw_ctrs + kvpmu->num_hw_ctrs;
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
-> > +                             unsigned long *ctr_info)
-> > +{
-> > +     struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-> > +
-> > +     if (!kvpmu || (cidx > RISCV_MAX_COUNTERS) || (cidx == 1))
->
-> nit: unnecessary ()
->
-> > +             return -EINVAL;
-> > +
-> > +     *ctr_info = kvpmu->pmc[cidx].cinfo.value;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > +                              unsigned long ctr_mask, unsigned long flag, uint64_t ival)
-> > +{
-> > +     /* TODO */
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > +                              unsigned long ctr_mask, unsigned long flag)
-> > +{
-> > +     /* TODO */
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > +                                  unsigned long ctr_mask, unsigned long flag,
-> > +                                  unsigned long eidx, uint64_t edata)
-> > +{
-> > +     /* TODO */
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
-> > +                             unsigned long *out_val)
-> > +{
-> > +     /* TODO */
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
-> > +{
-> > +     int i = 0, num_hw_ctrs, num_fw_ctrs, hpm_width;
-> > +     struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-> > +
-> > +     if (!kvpmu)
-> > +             return -EINVAL;
-> > +
-> > +     num_hw_ctrs = riscv_pmu_sbi_get_num_hw_ctrs();
-> > +     if ((num_hw_ctrs + RISCV_KVM_MAX_FW_CTRS) > RISCV_MAX_COUNTERS)
-> > +             num_fw_ctrs = RISCV_MAX_COUNTERS - num_hw_ctrs;
-> > +     else
-> > +             num_fw_ctrs = RISCV_KVM_MAX_FW_CTRS;
->
-> Why do we need RISCV_KVM_MAX_FW_CTRS? Can't we just always get the number
-> with RISCV_MAX_COUNTERS - num_hw_ctrs ?
->
-We can. But we have to allocate fw_event at runtime. As most platforms
-don't implement
-more than all 29 hpmcounters, you end up having more firmware counters
-than needed.
-Current, SBI spec only define 21 firmware counter anyways.
-
-Thus I felt it is unnecessary to do runtime allocation. But it's just
-few bytes. So I don't feel
-strongly about it.
-
-> > +
-> > +     hpm_width = riscv_pmu_sbi_hpmc_width();
-> > +     if (hpm_width <= 0) {
-> > +             pr_err("Can not initialize PMU for vcpu as hpmcounter width is not available\n");
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     kvpmu->num_hw_ctrs = num_hw_ctrs;
-> > +     kvpmu->num_fw_ctrs = num_fw_ctrs;
->
-> Maybe it's coming later, but we need to give KVM userspace control over
-> the number of counters to allow it to migrate to a larger set of hosts.
-> Also, a previous patch said the virtual width must be the same as the
-> host width for the hw counters, so we need userspace to know what that
-> is in order to determine to which hosts it can migrate a guest.
->
-
-Yes. The entire user space access control needs to be sketched out.
-We probably need another one reg interface to set/get the number of
-counters/width.
-
-However, Is it a common to migrate a guest between different hosts
-with different PMU capabilities ?
-
-> > +     /*
-> > +      * There is no corelation betwen the logical hardware counter and virtual counters.
-> > +      * However, we need to encode a hpmcounter CSR in the counter info field so that
-> > +      * KVM can trap n emulate the read. This works well in the migraiton usecase as well
->
-> s/well//
->
-> > +      * KVM doesn't care if the actual hpmcounter is available in the hardware or not.
-> > +      */
-> > +     for (i = 0; i < num_hw_ctrs + num_fw_ctrs; i++) {
->
-> Maybe we need a helper macro like
->
->  #define kvm_pmu_num_counters(pmu) ((pmu)->num_hw_ctrs + (pmu)->num_fw_ctrs)
->
-> if we're going to loop over all counters frequently.
->
-
-Done.
-
-
-> > +             /* TIME CSR shouldn't be read from perf interface */
-> > +             if (i == 1)
-> > +                     continue;
-> > +             kvpmu->pmc[i].idx = i;
-> > +             kvpmu->pmc[i].vcpu = vcpu;
-> > +             if (i < kvpmu->num_hw_ctrs) {
-> > +                     kvpmu->pmc[i].cinfo.type = SBI_PMU_CTR_TYPE_HW;
-> > +                     if (i < 3)
-> > +                             /* CY, IR counters */
-> > +                             kvpmu->pmc[i].cinfo.width = 63;
-> > +                     else
-> > +                             kvpmu->pmc[i].cinfo.width = hpm_width;
-> > +                     /*
-> > +                      * The CSR number doesn't have any relation with the logical
-> > +                      * hardware counters. The CSR numbers are encoded sequentially
-> > +                      * to avoid maintaining a map between the virtual counter
-> > +                      * and CSR number.
-> > +                      */
-> > +                     kvpmu->pmc[i].cinfo.csr = CSR_CYCLE + i;
-> > +             } else {
-> > +                     kvpmu->pmc[i].cinfo.type = SBI_PMU_CTR_TYPE_FW;
-> > +                     kvpmu->pmc[i].cinfo.width = BITS_PER_LONG - 1;
-> > +             }
-> > +     }
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu)
-> > +{
-> > +     /* TODO */
-> > +}
-> > +
-> > +void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu)
-> > +{
-> > +     /* TODO */
-> > +}
-> > +
-> > --
-> > 2.25.1
-> >
->
-> Thanks,
-> drew
-
-
-
---
-Regards,
-Atish
+T24gVHVlLCAyMDIyLTExLTIyIGF0IDExOjI0IC0wODAwLCBEYXZlIEhhbnNlbiB3cm90ZToNCj4g
+PiBJIHdhcyBleHBlY3RpbmcgVERYIHRvIG5vdCBnZXQgaW5pdGlhbGl6ZWQgdW50aWwgdGhlIGZp
+cnN0IFREWCB1c2luZyBLVk0NCj4gPiBpbnN0YW5jZSBpcyBjcmVhdGVkLiBBbSBJIHdyb25nPw0K
+PiANCj4gSSB3ZW50IGxvb2tpbmcgZm9yIGl0IGluIHRoaXMgc2VyaWVzIHRvIHByb3ZlIHlvdSB3
+cm9uZy7CoCBJIGZhaWxlZC7CoCA6KQ0KPiANCj4gdGR4X2VuYWJsZSgpIGlzIGJ1cmllZCBpbiBo
+ZXJlIHNvbWV3aGVyZToNCj4gDQo+ID4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGttbC9DQUFo
+UjVERnJ3UCs1SzhNT3h6NVlLN2pZU2hoYUs0QSsyaDFQaTMxVV85K1orY3otMEFAbWFpbC5nbWFp
+bC5jb20vVC8NCj4gDQo+IEkgZG9uJ3QgaGF2ZSB0aGUgcGF0aWVuY2UgdG8gZGlnIGl0IG91dCB0
+b2RheSwgc28gSSBndWVzcyB3ZSdsbCBoYXZlIEthaQ0KPiB0ZWxsIHVzLg0KDQpJdCB3aWxsIGJl
+IGRvbmUgd2hlbiBLVk0gbW9kdWxlIGlzIGxvYWRlZCwgYnV0IG5vdCB3aGVuIHRoZSBmaXJzdCBU
+RFggZ3Vlc3QgaXMNCmNyZWF0ZWQuDQo=
