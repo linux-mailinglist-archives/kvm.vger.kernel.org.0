@@ -2,52 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4E7F63608D
+	by mail.lfdr.de (Postfix) with ESMTP id 7EC2363608C
 	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 14:55:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236131AbiKWNy4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 08:54:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42500 "EHLO
+        id S236489AbiKWNy6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 08:54:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236175AbiKWNyc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 08:54:32 -0500
+        with ESMTP id S237676AbiKWNyd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 08:54:33 -0500
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A46E10B77
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 05:48:36 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EE5B7D528
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 05:48:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669211316; x=1700747316;
+  t=1669211318; x=1700747318;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=0HsnLLEZBZhW1ooYBiHC02VGBykxQBOghgIdYJ9vSpc=;
-  b=HxIK8ifVF+gD8VTuTbuc27BHwPniFDt3oFENRNgu3hgHZLcmBVsT/z6o
-   aYyGsyDduPK+Udykk3dY2DjpvjFIC1+WRVMvkG1302t6B6wOhS1tI9eR+
-   0dBFAak1kBvxXabRhxBiRfBM2JNzFO4IPOXymzKd3E/7YgkeYeYzlqwMm
-   RvhHA/SPo/onx0nT4+b0aH6JW/m/tTM8xR9F6+2VtPyflTTyBf76K1s3R
-   XwfybO34HHcvkeiUwTq+oKejNGwlTV8unR9RMk7AnTea5vMc2vWRYMolW
-   qNu2tkvKj3RwexGj6TBuG1hMAYYw54Y+jhlt3AA6/BeRZj35IN7rRBIHX
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="293776007"
+  bh=vFuQjLLkuzb4mFfpRJMXUNfnSiPLk99bPY8GXndbOis=;
+  b=nz7KmezJdWLmpq8dnLJc3X41Ze7bDdjpP/YalWDxUGk0tE1/L0QIxMSE
+   bwM/RXZtyVChZisk0KtWa7i+eYQtbvOxcMY+YIcvETYnzxDB/GJR53abC
+   vF+6hoMsp4CySdLt5iC3gW5gl9gAxXgDLoj5qUt9J96oeBqk7EkuGOCNj
+   btXEknHpQ8fafMqiq3q+FHf6noHjA8R9SSxwY+WevGNMC0mtSDCYpeFvR
+   mKMbL5IDKrxrpT4W8l5yn/KGmuWjpxp+8mB+DJDMM6ocEWZC3VRX5Bwb8
+   /UQhwMcfLRoDzcusPbuJIHBvbQZa/dXmd8903U82HtIpwxGsnqSVkBIz6
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="293776014"
 X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
-   d="scan'208";a="293776007"
+   d="scan'208";a="293776014"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 05:48:35 -0800
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 05:48:38 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="619619637"
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="619619649"
 X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
-   d="scan'208";a="619619637"
+   d="scan'208";a="619619649"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by orsmga006.jf.intel.com with ESMTP; 23 Nov 2022 05:48:35 -0800
+  by orsmga006.jf.intel.com with ESMTP; 23 Nov 2022 05:48:37 -0800
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     jgg@nvidia.com
 Cc:     alex.williamson@redhat.com, kevin.tian@intel.com,
         yi.l.liu@intel.com, chao.p.peng@linux.intel.com,
         kvm@vger.kernel.org, yi.y.sun@linux.intel.com,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Subject: [iommufd 1/2] i915/gvt: Move kvmgt_protect_table_init() and gvt_cache_init() into init
-Date:   Wed, 23 Nov 2022 05:48:31 -0800
-Message-Id: <20221123134832.429589-2-yi.l.liu@intel.com>
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>
+Subject: [iommufd 2/2] vfio/ap: validate iova during dma_unmap and trigger irq disable
+Date:   Wed, 23 Nov 2022 05:48:32 -0800
+Message-Id: <20221123134832.429589-3-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221123134832.429589-1-yi.l.liu@intel.com>
 References: <20221123134832.429589-1-yi.l.liu@intel.com>
@@ -62,81 +64,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+
 vfio_iommufd_bind() creates an access which has an unmap callback, which
 can be called immediately. So dma_unmap() callback should tolerate the
 unmaps that come before the emulated device is opened.
 
-To achieve above, move the protect_table_init and gvt_cache_init into the
-init op which is supposed to be triggered prior to the open_device() op.
+To achieve above, vfio_ap_mdev_dma_unmap() needs to validate that unmap
+request matches with one or more of these stashed values before
+attempting unpins.
 
-Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-Cc: Zhi Wang <zhi.a.wang@intel.com>
-Cc: Kevin Tian <kevin.tian@intel.com>
+Currently, each mapped iova is stashed in its associated vfio_ap_queue;
+Each stashed iova represents IRQ that was enabled for a queue. Therefore,
+if a match is found, trigger IRQ disable for this queue to ensure that
+underlying firmware will no longer try to use the associated pfn after
+the page is unpinned. IRQ disable will also handle the associated unpin.
+
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>
+Cc: Jason Herne <jjherne@linux.ibm.com>
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/gpu/drm/i915/gvt/gvt.h   | 2 ++
- drivers/gpu/drm/i915/gvt/kvmgt.c | 7 ++-----
- drivers/gpu/drm/i915/gvt/vgpu.c  | 2 ++
- 3 files changed, 6 insertions(+), 5 deletions(-)
+ drivers/s390/crypto/vfio_ap_ops.c | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
-index dbf8d7470b2c..a3a7e16078ba 100644
---- a/drivers/gpu/drm/i915/gvt/gvt.h
-+++ b/drivers/gpu/drm/i915/gvt/gvt.h
-@@ -754,6 +754,8 @@ void intel_gvt_debugfs_remove_vgpu(struct intel_vgpu *vgpu);
- void intel_gvt_debugfs_init(struct intel_gvt *gvt);
- void intel_gvt_debugfs_clean(struct intel_gvt *gvt);
- 
-+void gvt_cache_init(struct intel_vgpu *vgpu);
-+void kvmgt_protect_table_init(struct intel_vgpu *info);
- int intel_gvt_page_track_add(struct intel_vgpu *info, u64 gfn);
- int intel_gvt_page_track_remove(struct intel_vgpu *info, u64 gfn);
- int intel_gvt_dma_pin_guest_page(struct intel_vgpu *vgpu, dma_addr_t dma_addr);
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index 579b230a0f58..cb21b1ba4162 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -322,7 +322,7 @@ static void gvt_cache_destroy(struct intel_vgpu *vgpu)
- 	}
- }
- 
--static void gvt_cache_init(struct intel_vgpu *vgpu)
-+void gvt_cache_init(struct intel_vgpu *vgpu)
- {
- 	vgpu->gfn_cache = RB_ROOT;
- 	vgpu->dma_addr_cache = RB_ROOT;
-@@ -330,7 +330,7 @@ static void gvt_cache_init(struct intel_vgpu *vgpu)
- 	mutex_init(&vgpu->cache_lock);
- }
- 
--static void kvmgt_protect_table_init(struct intel_vgpu *info)
-+void kvmgt_protect_table_init(struct intel_vgpu *info)
- {
- 	hash_init(info->ptable);
- }
-@@ -671,9 +671,6 @@ static int intel_vgpu_open_device(struct vfio_device *vfio_dev)
- 
- 	vgpu->attached = true;
- 
--	kvmgt_protect_table_init(vgpu);
--	gvt_cache_init(vgpu);
--
- 	vgpu->track_node.track_write = kvmgt_page_track_write;
- 	vgpu->track_node.track_flush_slot = kvmgt_page_track_flush_slot;
- 	kvm_page_track_register_notifier(vgpu->vfio_device.kvm,
-diff --git a/drivers/gpu/drm/i915/gvt/vgpu.c b/drivers/gpu/drm/i915/gvt/vgpu.c
-index 56c71474008a..036e1a72a26b 100644
---- a/drivers/gpu/drm/i915/gvt/vgpu.c
-+++ b/drivers/gpu/drm/i915/gvt/vgpu.c
-@@ -382,6 +382,8 @@ int intel_gvt_create_vgpu(struct intel_vgpu *vgpu,
- 
- 	intel_gvt_update_reg_whitelist(vgpu);
- 	mutex_unlock(&gvt->lock);
-+	kvmgt_protect_table_init(vgpu);
-+	gvt_cache_init(vgpu);
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index bb7776d20792..62bfca2bbe6d 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -1535,13 +1535,35 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
  	return 0;
+ }
  
- out_clean_sched_policy:
++static void unmap_iova(struct ap_matrix_mdev *matrix_mdev, u64 iova, u64 length)
++{
++	struct ap_queue_table *qtable = &matrix_mdev->qtable;
++	u64 iova_pfn_end = (iova + length - 1) >> PAGE_SHIFT;
++	u64 iova_pfn_start = iova >> PAGE_SHIFT;
++	struct vfio_ap_queue *q;
++	int loop_cursor;
++	u64 pfn;
++
++	hash_for_each(qtable->queues, loop_cursor, q, mdev_qnode) {
++		pfn = q->saved_iova >> PAGE_SHIFT;
++		if (pfn >= iova_pfn_start && pfn <= iova_pfn_end) {
++			vfio_ap_irq_disable(q);
++			break;
++		}
++	}
++}
++
+ static void vfio_ap_mdev_dma_unmap(struct vfio_device *vdev, u64 iova,
+ 				   u64 length)
+ {
+ 	struct ap_matrix_mdev *matrix_mdev =
+ 		container_of(vdev, struct ap_matrix_mdev, vdev);
+ 
+-	vfio_unpin_pages(&matrix_mdev->vdev, iova, 1);
++	mutex_lock(&matrix_dev->mdevs_lock);
++
++	unmap_iova(matrix_mdev, iova, length);
++
++	mutex_unlock(&matrix_dev->mdevs_lock);
+ }
+ 
+ /**
 -- 
 2.34.1
 
