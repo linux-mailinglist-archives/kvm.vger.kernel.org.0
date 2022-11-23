@@ -2,474 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E46BA634B9D
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 01:22:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4FC3634BB1
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 01:31:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234723AbiKWAWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 19:22:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45558 "EHLO
+        id S235278AbiKWAbJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 19:31:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235243AbiKWAV6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 19:21:58 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58DBC657C7;
-        Tue, 22 Nov 2022 16:21:57 -0800 (PST)
+        with ESMTP id S234373AbiKWAbF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 19:31:05 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D216EC6567;
+        Tue, 22 Nov 2022 16:31:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669162917; x=1700698917;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=6HaaNro/fOK4kdlUDg57K0J3XI/rWP0uFyGdLLRKjcg=;
-  b=koyMDDgS67UC2QcBwa3HWAjTStttqNFH0i0RdiImcBg9vKWB6WKwHfJ0
-   zJ3EAhPZoRHN5qKLwMDtmIz8GA1DmxhnqOrBd5MoRxHovikTe6r8yQaEo
-   Cq0Rx11lhbDtMSoj3ig69C6bubKqsTEIUosYoUVS+b7ssMffNENZGcEQl
-   kElLNgBr1b3Pq6P5H3amJSY8Ygh+wueAKcPRk5ELPKywOQsqzYfpw+HSX
-   uh9CxkXMEwZgwxzYOSyUk42GlINQssNVWVtjwaOHq6UsIMVimBWIWxQv3
-   EviWKJof9SJMQMdiOMVCz0KTuOrBAA9YwqENaZc5Z8BJdPFtcVwEmZHGy
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="400237379"
+  t=1669163464; x=1700699464;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=hCtDwL9m+P+nX6Fp/auhOaBc8RomBoLhIHt/3UFPLXU=;
+  b=Iehig3OuF2mhFEk0K92BI11DYp8g3iFFruRa4UdC0m1VM+FvnsTvw8FB
+   hZj4fAGSo9vseGvdGmnjXKCLYbGLBPOL7NZpyX9CeXP4djQfW2OYcgkgx
+   izu9XxaSM/ksp9LwUu46Br43DVMtytpvBSOdAYcHzd0Zf5nvAIsN4RSyn
+   n+m+wJ8cWwLFGrXEXbOmrmUW6FeGuqP0BNwoC7IbLgHHcatz1AiPLvLhs
+   lisjPt49+cbwO9Hmrv4IAeHuIy/LHhjRW4/rHEfNzDuFyUsbL3fJzoIAm
+   cd2OetouiypecejJMVGzpZSCh8qouhoIEu4TXdcGgHP+mWrXRH7mO0NiZ
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="315099852"
 X-IronPort-AV: E=Sophos;i="5.96,185,1665471600"; 
-   d="scan'208";a="400237379"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 16:21:43 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="970666461"
+   d="scan'208";a="315099852"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 16:31:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="766522183"
 X-IronPort-AV: E=Sophos;i="5.96,185,1665471600"; 
-   d="scan'208";a="970666461"
-Received: from coltsavx-mobl1.amr.corp.intel.com (HELO [10.255.0.114]) ([10.255.0.114])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 16:21:40 -0800
-Message-ID: <eb8d0f69-7ada-a358-46ea-da15a3aeac93@intel.com>
-Date:   Tue, 22 Nov 2022 16:21:38 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v7 10/20] x86/virt/tdx: Use all system memory when
- initializing TDX module as TDX memory
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
-        kirill.shutemov@linux.intel.com, ying.huang@intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com,
-        tony.luck@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        isaku.yamahata@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com
+   d="scan'208";a="766522183"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga004.jf.intel.com with ESMTP; 22 Nov 2022 16:31:04 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 22 Nov 2022 16:31:03 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 22 Nov 2022 16:31:03 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Tue, 22 Nov 2022 16:31:03 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Tue, 22 Nov 2022 16:31:03 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NVTA8jScmea0trY+QgvHFmsDDlHjzPQDMXZieVOEYqXEPrdYNUPIxreQx0rGkL3CAzjHt7iOb9+Jv1ih8SM/AHM8OhW1vIna4MklVAZGoyn+6mqDy0+3kgPwdIzOszrPzibTbj6AW0c0uF7o+zp4M8SmHJUsv3C1WtE911APpXcjrGyp51j+VaszQDzXmi43aeawVcJVsaDmuwRORwJHCr01/aPtU5F++8TYnIIQ3gGtw/ubIRp4G+NahB2jV3nBYtjMciYzF9sVPvoG2dElUlaqo6RxvAEbX7c63IAYg3bUeO/QVI9dODraKV0OcJseotpt83H2RbRlTrd+StYJeg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hCtDwL9m+P+nX6Fp/auhOaBc8RomBoLhIHt/3UFPLXU=;
+ b=QMzSb7HYukpRO2EvctDqV3mUE2Z+lT9Nff8z4vsy5FSRjNYh7rDUpLpKSEmSyjCy0JiGDxowDS27bZbe6kWcZkchGiSZAZLNiXDaYA+IT/qJ/j6vAvNKPI7o8AZjDtW/I3MB2VF0NQ4UlyxgrDCs+VS8D8FLFzSohCWZbHvfeD/foUx8olb7lZGEDiAO4pzG/lCTxW3NBlJ+GiaFYjXCFVYZiK41dE6MUa3lJSsqF7FzE2u7cd71SroffvLhR7d4K++AgGNIMhfPUDdQsq84nRZEPt8dl0rzuXm9Q+jVwveUF5xkGkQRawz0SENc0cmAFq7mYpHe2Z0OmumKb6MHXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by SJ1PR11MB6108.namprd11.prod.outlook.com (2603:10b6:a03:489::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.15; Wed, 23 Nov
+ 2022 00:30:59 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e%8]) with mapi id 15.20.5834.015; Wed, 23 Nov 2022
+ 00:30:59 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "tglx@linutronix.de" <tglx@linutronix.de>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v7 04/20] x86/virt/tdx: Add skeleton to initialize TDX on
+ demand
+Thread-Topic: [PATCH v7 04/20] x86/virt/tdx: Add skeleton to initialize TDX on
+ demand
+Thread-Index: AQHY/T29USV2IuUHCEyPQthCEbaZH65Kp9QAgAAYugCAAFUUgIAASuaAgABKsYA=
+Date:   Wed, 23 Nov 2022 00:30:58 +0000
+Message-ID: <246a4eaac29855c522bd26627b03418cb7ead66f.camel@intel.com>
 References: <cover.1668988357.git.kai.huang@intel.com>
- <9b545148275b14a8c7edef1157f8ec44dc8116ee.1668988357.git.kai.huang@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <9b545148275b14a8c7edef1157f8ec44dc8116ee.1668988357.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+         <d26254af8e5b3dcca8a070703c5d6d04f48d47a9.1668988357.git.kai.huang@intel.com>
+         <Y3yQKDZFC8+oCyqK@hirez.programming.kicks-ass.net> <87edtvgu1l.ffs@tglx>
+         <19d93ff0-df0d-dc9d-654b-a9ca6f7be1d0@intel.com> <87mt8ig3ja.ffs@tglx>
+In-Reply-To: <87mt8ig3ja.ffs@tglx>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SJ1PR11MB6108:EE_
+x-ms-office365-filtering-correlation-id: b08a178f-cb81-489e-66b8-08dacce9fe19
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: SpxV8LjbJBigcLzcZIDrB6oUJfUFsJ8YhjLsyRyqJefTOkceNcFXD6LiW+ExhBRl2drx/sSOE7e8AwaLPz+8G9VWuwm9N4mJsX+CWs2QtW+3SOZwExPM8HuMG26hCx/dAoLXbW7+AIvumlnSXMO1l0XMIIMyrDEfw/VzeNK/g8GDwgmZ5dPvg/fWzA9KAxtMgv5TMaA63xXUYPinMamgjfLzrBuNibrxZEOU/HNWLWyWjVzVBGUB1c8m3SEHiYy3q3sc9gKhHfLtS7tOBosjC/jH0mDlx2KJ1L15uVdq9Emu5rph9HIevkWgTOnPdIMoT0fS9O7oF1UnUX4I+Oq1R1acHxRtZRqMOaHuCMyyOJOg3br3NDnVjV8z7rjzu9n4lEqHJpyYo6TpiMg1JebzWg0RQ36ZjhBq4ZeqwGlUInK82sklEHPyKFfHMesdkXLbjugOtSw1qNgb6nkXak1lQd9u0KjwIfPWo+pdIi9955lhZdbV5RHWLbMKunXdiKpqBH2c0jHOOKRrscTWPD2z2pxTlIqLngT8eNxBYuszr6K3YnU4aRv2r4STt5DF48wLjgzjNsKhP5skkyeDozRKIbAsVhH5QqoTE7tl0zFYPitonsyPZD7CRXcy4NO4KEiKdu4W4NyM0fAwXxA2CUGqUgV+na2W+NDrBSx3Paif1VDwKoRCcfVTobs2d7rsNQ4dHRFLfGYu+zIgl77VB8FYhQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(396003)(39860400002)(376002)(136003)(366004)(451199015)(6512007)(2616005)(83380400001)(82960400001)(122000001)(76116006)(64756008)(2906002)(186003)(26005)(38100700002)(4001150100001)(7416002)(5660300002)(71200400001)(6506007)(66556008)(54906003)(6486002)(41300700001)(8676002)(316002)(66946007)(478600001)(66446008)(8936002)(4326008)(66476007)(6636002)(110136005)(91956017)(36756003)(38070700005)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NVlvVFFYQktZOHVYd09KY1ZUd3dVMk55Y2ZaaUNKMjhVOHJlOW5KWGpiN01G?=
+ =?utf-8?B?L1ZOekxjQll3THNGc2o0QWVKWWl4Nk5pYlFCNVNRc1djeFRIZFIyMHVycmVo?=
+ =?utf-8?B?SkNEUERWRDRtUVVRamVhZE53eUM2blVYb3VwTVJnYUpNR2J2UU5McHNFcFFV?=
+ =?utf-8?B?Zmp4dnRsTE84ZExxWWpYV2dxL3BRMG8rcUZQVCs1MWN6dWI0eFg0dTBKcVZo?=
+ =?utf-8?B?T1hsWnFNTVdpdmUyaXFVdFRsaGphdnFkUEpOM3hVNkovNlZ4R1ROclRhNTFI?=
+ =?utf-8?B?UTl3NERXY2h6Z1pOdDV6bWllTHgvN0o3M21XR2d5TTF5R3d1N2w3Uks2Z0cz?=
+ =?utf-8?B?WHZJUmthODFiZUlaZ1hvS3VQbHFma3pLdjVCQS94eE02OW13dks3TW9USVBD?=
+ =?utf-8?B?WHQrSGZDYzFudXVrYVBpeGYxSTZjdFlFcmdBMk41SkhPUHVVUldNYVdsVEx5?=
+ =?utf-8?B?eVVIQ1o0dms5Zjg5YW5TOTRWakFsT080V0pYMW1ZbXFyNnh2TXp3OHV2MnBu?=
+ =?utf-8?B?NkJ2RFdqZmNPbEpwbG9meEM3NjZDQy9zdG9hTXMyZU5qYkl1U2VxaFV4Ry80?=
+ =?utf-8?B?Yks3Q1NsdnMweE1zbEFMYk92ZmdtVVdhUW9yWUY2dFhmcEtpbHA5K2ttc2tH?=
+ =?utf-8?B?MVNWaFdIRUwrOFJOT0x0S0VUZFo2RDE4OWVjTGU5N1V6aHBzbkpHejNxa011?=
+ =?utf-8?B?N00vL2ZkeG9Jbk1ob0Zya2R0MWticFJvOXRSRkRwOFNUbDBVT0l1K3V2alQ4?=
+ =?utf-8?B?SFE1YzNFd3BsdTFyUkNXM2lxVDdiNVV1eXJDSzJrQVZacnowZGo0WnpDNWp5?=
+ =?utf-8?B?NHNRMllkK2ZlOGczaElXK1R6RVN5NVNRWnltYVVhc0lMWWp1UzkwWGtMOCtP?=
+ =?utf-8?B?d2Mzc3lRSmVDUG1qa0dmVFhwZnNKdTYvSHIzOTMraXVrT2lUMHZpdHU1UlZR?=
+ =?utf-8?B?clBLa2VKaHN3amcxWTF1TnhaNStnQk9UNFRLbjJUdGVoVmlrZmJLTkU1ZklP?=
+ =?utf-8?B?M2cyZEl2d1N5cUhxU1AvRUVWcWJQdE9aL3NOMU5GTGlXZEZVUy9Zd2JpdzRJ?=
+ =?utf-8?B?SVpobzM3R1ljWDI0ZFJVVjRQT08wUHAyMUlPT25Lc2ZsYVBWWkl0VmoxWEZt?=
+ =?utf-8?B?R2hoQWpQYmp4bWgwNWllZE9Rbnh6ZlZ2OTZHRVF5TEtYYU1nU0JzMzJXY2w3?=
+ =?utf-8?B?UlVpUUl6eStMZ2U4MGFLOVg2N2ZvREFic1BQTWgwRW55WGFnRmtMY0IxYVR5?=
+ =?utf-8?B?aUZlVXNzKzdoeWUweWpnZ2Z1NkphWGVkNUhTakRXYWw2cHB2eHMwcVdneXZX?=
+ =?utf-8?B?T0MzWnBNTU1BMmk5Qm9lL01JR1dDNFh3MW1YMHlaOEYrOGxXeGQ3Z2FBSFlT?=
+ =?utf-8?B?YU1VblJsQk52a0ZnM0IwR1RjbFE4am5MTzNrem4wVXhWWjZIb2pTVzdncVZD?=
+ =?utf-8?B?MWFxb3N5Y1poZUtKaFRpTWlIeTFwN2xJbE1uVlNjMzAyWnhJNHNqS0RteGlB?=
+ =?utf-8?B?Tm5TWnA4dGtiRStMK3M2Wk9qNkgybFNMS2hWTlpzbXJXeXU4T25pb1A4SHpx?=
+ =?utf-8?B?b0lEV1B2aU55cUNRNmpTZXNJOTJxNlcwWTRTdXA0WnFRdHJhclhvb2paTmth?=
+ =?utf-8?B?Y0pkUHkvNEdMMm1vZDJiQ2pvNXc0VXNDV0ZhcGlSZW5CUVFsT3VORFpMMVY3?=
+ =?utf-8?B?b3BnYWljNlVSek1qMmdaRkNNSkJROHErYUFKa2hheno0ajM5ZnpNSTFIaUlk?=
+ =?utf-8?B?blZmUFNDRXc0eGlDVHFTUko4Zm4vMitpNmNpV0gweDI0MVM5VDdaUXRtZzhi?=
+ =?utf-8?B?ZVl5dlhnWmx5aG02S1QxYUhqTjhOeVhoWWUxKzkyaS95SS9WMk5vMlVtUXEr?=
+ =?utf-8?B?V0hlZDk3a0RPYU5RTEorN3FHdGI1bFZTT3lQNEo3Zk1WR29vQWREempXM0pF?=
+ =?utf-8?B?NDJMK1oxa1UyUU9kSnBUYXdRVXpsYkVBZjVIL2RzNEpPcStuRXJ6VEF3cWM3?=
+ =?utf-8?B?M1ljSjR3cGxzR2l6bEE1QnMzTWhvRTBXR0EwbktqclFYZGN0anVpSG1ES1BM?=
+ =?utf-8?B?VUdpVnlpdUhmWkFPeUFJMnI3aHNZRTRnQW8wUEJjV2pjQUhnbHFnaDIzMWxx?=
+ =?utf-8?B?b1QvKzRTT2RRNUxwM0xHL3BFRmRzWFZ6S3d1MnpJV3RvRGllcUJVWUpxMU9q?=
+ =?utf-8?B?bmc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4C5FCDB32EC81741987C1A481E156E12@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b08a178f-cb81-489e-66b8-08dacce9fe19
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Nov 2022 00:30:58.8714
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: OrwNUpA4IZBJA9KFfocr1z7qU5/Pf100KmCQ2ImC0/Er0PLk3328cbYjV5PtkJELZnq89s+JFJx/coloDO5gVA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6108
+X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/20/22 16:26, Kai Huang wrote:
-> TDX reports a list of "Convertible Memory Region" (CMR) to indicate all
-> memory regions that can possibly be used by the TDX module, but they are
-> not automatically usable to the TDX module.  As a step of initializing
-> the TDX module, the kernel needs to choose a list of memory regions (out
-> from convertible memory regions) that the TDX module can use and pass
-> those regions to the TDX module.  Once this is done, those "TDX-usable"
-> memory regions are fixed during module's lifetime.  No more TDX-usable
-> memory can be added to the TDX module after that.
-> 
-> The initial support of TDX guests will only allocate TDX guest memory
-> from the global page allocator.  To keep things simple, this initial
-> implementation simply guarantees all pages in the page allocator are TDX
-> memory.  To achieve this, use all system memory in the core-mm at the
-> time of initializing the TDX module as TDX memory, and at the meantime,
-> refuse to add any non-TDX-memory in the memory hotplug.
-> 
-> Specifically, walk through all memory regions managed by memblock and
-> add them to a global list of "TDX-usable" memory regions, which is a
-> fixed list after the module initialization (or empty if initialization
-> fails).  To reject non-TDX-memory in memory hotplug, add an additional
-> check in arch_add_memory() to check whether the new region is covered by
-> any region in the "TDX-usable" memory region list.
-> 
-> Note this requires all memory regions in memblock are TDX convertible
-> memory when initializing the TDX module.  This is true in practice if no
-> new memory has been hot-added before initializing the TDX module, since
-> in practice all boot-time present DIMM is TDX convertible memory.  If
-> any new memory has been hot-added, then initializing the TDX module will
-> fail due to that memory region is not covered by CMR.
-> 
-> This can be enhanced in the future, i.e. by allowing adding non-TDX
-> memory to a separate NUMA node.  In this case, the "TDX-capable" nodes
-> and the "non-TDX-capable" nodes can co-exist, but the kernel/userspace
-> needs to guarantee memory pages for TDX guests are always allocated from
-> the "TDX-capable" nodes.
-> 
-> Note TDX assumes convertible memory is always physically present during
-> machine's runtime.  A non-buggy BIOS should never support hot-removal of
-> any convertible memory.  This implementation doesn't handle ACPI memory
-> removal but depends on the BIOS to behave correctly.
-
-My eyes glazed over about halfway through that.  Can you try to trim it
-down a bit, or at least try to summarize it better up front?
-
-> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> index dd333b46fafb..b36129183035 100644
-> --- a/arch/x86/Kconfig
-> +++ b/arch/x86/Kconfig
-> @@ -1959,6 +1959,7 @@ config INTEL_TDX_HOST
->  	depends on X86_64
->  	depends on KVM_INTEL
->  	depends on X86_X2APIC
-> +	select ARCH_KEEP_MEMBLOCK
->  	help
->  	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
->  	  host and certain physical attacks.  This option enables necessary TDX
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index d688228f3151..71169ecefabf 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -111,9 +111,12 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
->  #ifdef CONFIG_INTEL_TDX_HOST
->  bool platform_tdx_enabled(void);
->  int tdx_enable(void);
-> +bool tdx_cc_memory_compatible(unsigned long start_pfn, unsigned long end_pfn);
->  #else	/* !CONFIG_INTEL_TDX_HOST */
->  static inline bool platform_tdx_enabled(void) { return false; }
->  static inline int tdx_enable(void)  { return -ENODEV; }
-> +static inline bool tdx_cc_memory_compatible(unsigned long start_pfn,
-> +		unsigned long end_pfn) { return true; }
->  #endif	/* CONFIG_INTEL_TDX_HOST */
->  
->  #endif /* !__ASSEMBLY__ */
-> diff --git a/arch/x86/mm/init_64.c b/arch/x86/mm/init_64.c
-> index 3f040c6e5d13..900341333d7e 100644
-> --- a/arch/x86/mm/init_64.c
-> +++ b/arch/x86/mm/init_64.c
-> @@ -55,6 +55,7 @@
->  #include <asm/uv/uv.h>
->  #include <asm/setup.h>
->  #include <asm/ftrace.h>
-> +#include <asm/tdx.h>
->  
->  #include "mm_internal.h"
->  
-> @@ -968,6 +969,15 @@ int arch_add_memory(int nid, u64 start, u64 size,
->  	unsigned long start_pfn = start >> PAGE_SHIFT;
->  	unsigned long nr_pages = size >> PAGE_SHIFT;
->  
-> +	/*
-> +	 * For now if TDX is enabled, all pages in the page allocator
-
-s/For now//
-
-> +	 * must be TDX memory, which is a fixed set of memory regions
-> +	 * that are passed to the TDX module.  Reject the new region
-> +	 * if it is not TDX memory to guarantee above is true.
-> +	 */
-> +	if (!tdx_cc_memory_compatible(start_pfn, start_pfn + nr_pages))
-> +		return -EINVAL;
-
-There's a real art to making a right-size comment.  I don't think this
-needs to be any more than:
-
-	/*
-	 * Not all memory is compatible with TDX.  Reject
-	 * the addition of any incomatible memory.
-	 */
-
-If you want to write a treatise, do it in Documentation or at the
-tdx_cc_memory_compatible() definition.
-
->  	init_memory_mapping(start, start + size, params->pgprot);
->  
->  	return add_pages(nid, start_pfn, nr_pages, params);
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 43227af25e44..32af86e31c47 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -16,6 +16,11 @@
->  #include <linux/smp.h>
->  #include <linux/atomic.h>
->  #include <linux/align.h>
-> +#include <linux/list.h>
-> +#include <linux/slab.h>
-> +#include <linux/memblock.h>
-> +#include <linux/minmax.h>
-> +#include <linux/sizes.h>
->  #include <asm/msr-index.h>
->  #include <asm/msr.h>
->  #include <asm/apic.h>
-> @@ -34,6 +39,13 @@ enum tdx_module_status_t {
->  	TDX_MODULE_SHUTDOWN,
->  };
->  
-> +struct tdx_memblock {
-> +	struct list_head list;
-> +	unsigned long start_pfn;
-> +	unsigned long end_pfn;
-> +	int nid;
-> +};
-
-Why does the nid matter?
-
->  static u32 tdx_keyid_start __ro_after_init;
->  static u32 tdx_keyid_num __ro_after_init;
->  
-> @@ -46,6 +58,9 @@ static struct tdsysinfo_struct tdx_sysinfo;
->  static struct cmr_info tdx_cmr_array[MAX_CMRS] __aligned(CMR_INFO_ARRAY_ALIGNMENT);
->  static int tdx_cmr_num;
->  
-> +/* All TDX-usable memory regions */
-> +static LIST_HEAD(tdx_memlist);
-> +
->  /*
->   * Detect TDX private KeyIDs to see whether TDX has been enabled by the
->   * BIOS.  Both initializing the TDX module and running TDX guest require
-> @@ -329,6 +344,107 @@ static int tdx_get_sysinfo(void)
->  	return trim_empty_cmrs(tdx_cmr_array, &tdx_cmr_num);
->  }
->  
-> +/* Check whether the given pfn range is covered by any CMR or not. */
-> +static bool pfn_range_covered_by_cmr(unsigned long start_pfn,
-> +				     unsigned long end_pfn)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < tdx_cmr_num; i++) {
-> +		struct cmr_info *cmr = &tdx_cmr_array[i];
-> +		unsigned long cmr_start_pfn;
-> +		unsigned long cmr_end_pfn;
-> +
-> +		cmr_start_pfn = cmr->base >> PAGE_SHIFT;
-> +		cmr_end_pfn = (cmr->base + cmr->size) >> PAGE_SHIFT;
-> +
-> +		if (start_pfn >= cmr_start_pfn && end_pfn <= cmr_end_pfn)
-> +			return true;
-> +	}
-
-What if the pfn range overlaps two CMRs?  It will never pass any
-individual overlap test and will return false.
-
-> +	return false;
-> +}
-> +
-> +/*
-> + * Add a memory region on a given node as a TDX memory block.  The caller
-> + * to make sure all memory regions are added in address ascending order
-
-s/to/must/
-
-> + * and don't overlap.
-> + */
-> +static int add_tdx_memblock(unsigned long start_pfn, unsigned long end_pfn,
-> +			    int nid)
-> +{
-> +	struct tdx_memblock *tmb;
-> +
-> +	tmb = kmalloc(sizeof(*tmb), GFP_KERNEL);
-> +	if (!tmb)
-> +		return -ENOMEM;
-> +
-> +	INIT_LIST_HEAD(&tmb->list);
-> +	tmb->start_pfn = start_pfn;
-> +	tmb->end_pfn = end_pfn;
-> +	tmb->nid = nid;
-> +
-> +	list_add_tail(&tmb->list, &tdx_memlist);
-> +	return 0;
-> +}
-> +
-> +static void free_tdx_memory(void)
-
-This is named a bit too generically.  How about free_tdx_memlist() or
-something?
-
-> +{
-> +	while (!list_empty(&tdx_memlist)) {
-> +		struct tdx_memblock *tmb = list_first_entry(&tdx_memlist,
-> +				struct tdx_memblock, list);
-> +
-> +		list_del(&tmb->list);
-> +		kfree(tmb);
-> +	}
-> +}
-> +
-> +/*
-> + * Add all memblock memory regions to the @tdx_memlist as TDX memory.
-> + * Must be called when get_online_mems() is called by the caller.
-> + */
-
-Again, this explains the "what", but not the "why".
-
-/*
- * Ensure that all memblock memory regions are convertible to TDX
- * memory.  Once this has been established, stash the memblock
- * ranges off in a secondary structure because $REASONS.
- */
-
-Which makes me wonder: Why do you even need a secondary structure here?
-What's wrong with the memblocks themselves?
-
-> +static int build_tdx_memory(void)
-> +{
-> +	unsigned long start_pfn, end_pfn;
-> +	int i, nid, ret;
-> +
-> +	for_each_mem_pfn_range(i, MAX_NUMNODES, &start_pfn, &end_pfn, &nid) {
-> +		/*
-> +		 * The first 1MB may not be reported as TDX convertible
-> +		 * memory.  Manually exclude them as TDX memory.
-
-I don't like the "may not" here very much.
-
-> +		 * This is fine as the first 1MB is already reserved in
-> +		 * reserve_real_mode() and won't end up to ZONE_DMA as
-> +		 * free page anyway.
-
-			 ^ free pages
-
-> +		 */
-
-This way too wishy washy.  The TDX module may or may not...  Then, it
-doesn't matter since reserve_real_mode() does it anyway...
-
-Then it goes and adds code to skip it!
-
-> +		start_pfn = max(start_pfn, (unsigned long)SZ_1M >> PAGE_SHIFT);
-> +		if (start_pfn >= end_pfn)
-> +			continue;
-
-
-Please just put a dang stake in the ground.  If the other code deals
-with this, then explain *why* more is needed here.
-
-> +		/* Verify memory is truly TDX convertible memory */
-> +		if (!pfn_range_covered_by_cmr(start_pfn, end_pfn)) {
-> +			pr_info("Memory region [0x%lx, 0x%lx) is not TDX convertible memorry.\n",
-> +					start_pfn << PAGE_SHIFT,
-> +					end_pfn << PAGE_SHIFT);
-> +			return -EINVAL;
-
-... no 'goto err'?  This leaks all the previous add_tdx_memblock()
-structures, right?
-
-> +		}
-> +
-> +		/*
-> +		 * Add the memory regions as TDX memory.  The regions in
-> +		 * memblock has already guaranteed they are in address
-> +		 * ascending order and don't overlap.
-> +		 */
-> +		ret = add_tdx_memblock(start_pfn, end_pfn, nid);
-> +		if (ret)
-> +			goto err;
-> +	}
-> +
-> +	return 0;
-> +err:
-> +	free_tdx_memory();
-> +	return ret;
-> +}
-> +
->  /*
->   * Detect and initialize the TDX module.
->   *
-> @@ -357,12 +473,56 @@ static int init_tdx_module(void)
->  	if (ret)
->  		goto out;
->  
-> +	/*
-> +	 * All memory regions that can be used by the TDX module must be
-> +	 * passed to the TDX module during the module initialization.
-> +	 * Once this is done, all "TDX-usable" memory regions are fixed
-> +	 * during module's runtime.
-> +	 *
-> +	 * The initial support of TDX guests only allocates memory from
-> +	 * the global page allocator.  To keep things simple, for now
-> +	 * just make sure all pages in the page allocator are TDX memory.
-> +	 *
-> +	 * To achieve this, use all system memory in the core-mm at the
-> +	 * time of initializing the TDX module as TDX memory, and at the
-> +	 * meantime, reject any new memory in memory hot-add.
-> +	 *
-> +	 * This works as in practice, all boot-time present DIMM is TDX
-> +	 * convertible memory.  However if any new memory is hot-added
-> +	 * before initializing the TDX module, the initialization will
-> +	 * fail due to that memory is not covered by CMR.
-> +	 *
-> +	 * This can be enhanced in the future, i.e. by allowing adding or
-> +	 * onlining non-TDX memory to a separate node, in which case the
-> +	 * "TDX-capable" nodes and the "non-TDX-capable" nodes can exist
-> +	 * together -- the userspace/kernel just needs to make sure pages
-> +	 * for TDX guests must come from those "TDX-capable" nodes.
-> +	 *
-> +	 * Build the list of TDX memory regions as mentioned above so
-> +	 * they can be passed to the TDX module later.
-> +	 */
-
-This is msotly Documentation/, not a code comment.  Please clean it up.
-
-> +	get_online_mems();
-> +
-> +	ret = build_tdx_memory();
-> +	if (ret)
-> +		goto out;
->  	/*
->  	 * Return -EINVAL until all steps of TDX module initialization
->  	 * process are done.
->  	 */
->  	ret = -EINVAL;
->  out:
-> +	/*
-> +	 * Memory hotplug checks the hot-added memory region against the
-> +	 * @tdx_memlist to see if the region is TDX memory.
-> +	 *
-> +	 * Do put_online_mems() here to make sure any modification to
-> +	 * @tdx_memlist is done while holding the memory hotplug read
-> +	 * lock, so that the memory hotplug path can just check the
-> +	 * @tdx_memlist w/o holding the @tdx_module_lock which may cause
-> +	 * deadlock.
-> +	 */
-
-I'm honestly not following any of that.
-
-> +	put_online_mems();
->  	return ret;
->  }
->  
-> @@ -485,3 +645,26 @@ int tdx_enable(void)
->  	return ret;
->  }
->  EXPORT_SYMBOL_GPL(tdx_enable);
-> +
-> +/*
-> + * Check whether the given range is TDX memory.  Must be called between
-> + * mem_hotplug_begin()/mem_hotplug_done().
-> + */
-> +bool tdx_cc_memory_compatible(unsigned long start_pfn, unsigned long end_pfn)
-> +{
-> +	struct tdx_memblock *tmb;
-> +
-> +	/* Empty list means TDX isn't enabled successfully */
-> +	if (list_empty(&tdx_memlist))
-> +		return true;
-> +
-> +	list_for_each_entry(tmb, &tdx_memlist, list) {
-> +		/*
-> +		 * The new range is TDX memory if it is fully covered
-> +		 * by any TDX memory block.
-> +		 */
-> +		if (start_pfn >= tmb->start_pfn && end_pfn <= tmb->end_pfn)
-> +			return true;
-
-Same bug.  What if the start/end_pfn range is covered by more than one
-tdx_memblock?
-
-> +	}
-> +	return false;
-> +}
-
+T24gVHVlLCAyMDIyLTExLTIyIGF0IDIxOjAzICswMTAwLCBUaG9tYXMgR2xlaXhuZXIgd3JvdGU6
+DQo+ID4gPiDCoMKgwqDCoCBpZiAodGR4X2dsb2JhbF9kYXRhX3B0ci0+bnVtX29mX2luaXRfbHBz
+IDwgdGR4X2dsb2JhbF9kYXRhX3B0ci0NCj4gPiA+ID5udW1fb2ZfbHBzKQ0KPiA+ID4gwqDCoMKg
+wqAgew0KPiA+ID4gwqDCoMKgwqDCoMKgwqDCoCBURFhfRVJST1IoIk51bSBvZiBpbml0aWFsaXpl
+ZCBscHMgJWQgaXMgc21hbGxlciB0aGFuIHRvdGFsIG51bSBvZg0KPiA+ID4gbHBzICVkXG4iLA0K
+PiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB0ZHhfZ2xvYmFs
+X2RhdGFfcHRyLT5udW1fb2ZfaW5pdF9scHMsDQo+ID4gPiB0ZHhfZ2xvYmFsX2RhdGFfcHRyLT5u
+dW1fb2ZfbHBzKTsNCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqAgcmV0dmFsID0gVERYX1NZU19DT05G
+SUdfTk9UX1BFTkRJTkc7DQo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgIGdvdG8gRVhJVDsNCj4gPiA+
+IMKgwqDCoMKgIH0NCj4gPiANCj4gPiB0ZHhfZ2xvYmFsX2RhdGFfcHRyLT5udW1fb2ZfaW5pdF9s
+cHMgaXMgaW5jcmVtZW50ZWQgYXQgVERILlNZUy5JTklUDQo+ID4gdGltZS7CoCBUaGF0IGlmKCkg
+aXMgY2FsbGVkIGF0IFRESC5TWVMuQ09ORklHIHRpbWUgdG8gaGVscCBicmluZyB0aGUNCj4gPiBt
+b2R1bGUgdXAuDQo+ID4gDQo+ID4gU28sIEkgdGhpbmsgeW91J3JlIHJpZ2h0LsKgIEkgZG9uJ3Qg
+c2VlIHRoZSBkb2NzIHRoYXQgYWN0dWFsbHkgKmV4cGxhaW4qDQo+ID4gdGhpcyAieW91IG11c3Qg
+c2VhbWNhbGwgYWxsIHRoZSB0aGluZ3MiIHJlcXVpcmVtZW50Lg0KPiANCj4gVGhlIGNvZGUgYWN0
+dWFsbHkgZW5mb3JjZXMgdGhpcy4NCj4gDQo+IEF0IFRESC5TWVMuSU5JVCB3aGljaCBpcyB0aGUg
+Zmlyc3Qgb3BlcmF0aW9uIGl0IGdldHMgdGhlIHRvdGFsIG51bWJlcg0KPiBvZiBMUHMgZnJvbSB0
+aGUgc3lzaW5mbyB0YWJsZToNCj4gDQo+IHNyYy92bW1fZGlzcGF0Y2hlci9hcGlfY2FsbHMvdGRo
+X3N5c19pbml0LmM6DQo+IA0KPiDCoMKgwqAgdGR4X2dsb2JhbF9kYXRhX3B0ci0+bnVtX29mX2xw
+cyA9IHN5c2luZm9fdGFibGVfcHRyLQ0KPiA+bWNoZWNrX2ZpZWxkcy50b3RfbnVtX2xwczsNCj4g
+DQo+IFRoZW4gVERILlNZUy5MUC5JTklUIGluY3JlbWVudHMgdGhlIGNvdW50IG9mIGluaXRpYWxp
+emVkIExQcy4NCj4gDQo+IHNyYy92bW1fZGlzcGF0Y2hlci9hcGlfY2FsbHMvdGRoX3N5c19scF9p
+bml0LmM6DQo+IA0KPiDCoMKgwqAgaW5jcmVtZW50X251bV9vZl9scHModGR4X2dsb2JhbF9kYXRh
+X3B0cikNCj4gwqDCoMKgwqDCoMKgIF9sb2NrX3hhZGRfMzJiKCZ0ZHhfZ2xvYmFsX2RhdGFfcHRy
+LT5udW1fb2ZfaW5pdF9scHMsIDEpOw0KPiANCj4gRmluYWxseSBUREguU1lTLkNPTkZJRyBjaGVj
+a3Mgd2hldGhlciBfQUxMXyBMUHMgaGF2ZSBiZWVuIGluaXRpYWxpemVkLg0KPiANCj4gc3JjL3Zt
+bV9kaXNwYXRjaGVyL2FwaV9jYWxscy90ZGhfc3lzX2NvbmZpZy5jOg0KPiANCj4gwqDCoMKgIGlm
+ICh0ZHhfZ2xvYmFsX2RhdGFfcHRyLT5udW1fb2ZfaW5pdF9scHMgPCB0ZHhfZ2xvYmFsX2RhdGFf
+cHRyLQ0KPiA+bnVtX29mX2xwcykNCj4gDQo+IENsZWFybHkgdGhhdCdzIG5vd2hlcmUgc3BlbGxl
+ZCBvdXQgaW4gdGhlIGRvY3VtZW50YXRpb24sIGJ1dCBJIGRvbid0DQo+IGJ1eSB0aGUgJ2FyY2hp
+dGVjdHVyYWx5IHJlcXVpcmVkJyBhcmd1bWVudCBub3QgYXQgYWxsLiBJdCdzIGFuDQo+IGltcGxl
+bWVudGF0aW9uIGRldGFpbCBvZiB0aGUgVERYIG1vZHVsZS4NCg0KSGkgVGhvbWFzLA0KDQpUaGFu
+a3MgZm9yIHJldmlldyENCg0KSSBhZ3JlZSBvbiBoYXJkd2FyZSBsZXZlbCB0aGVyZSBzaG91bGRu
+J3QgYmUgc3VjaCByZXF1aXJlbWVudCAobm90IDEwMCUgc3VyZQ0KdGhvdWdoKSwgYnV0IEkgZ3Vl
+c3MgZnJvbSBrZXJuZWwncyBwZXJzcGVjdGl2ZSwgInRoZSBpbXBsZW1lbnRhdGlvbiBkZXRhaWwg
+b2YNCnRoZSBURFggbW9kdWxlIiBpcyBzb3J0IG9mICJhcmNoaXRlY3R1cmFsIHJlcXVpcmVtZW50
+IiAtLSBhdCBsZWFzdCBJbnRlbCBhcmNoDQpndXlzIHRoaW5rIHNvIEkgZ3Vlc3MuDQoNCj4gDQo+
+IFRlY2huaWNhbGx5IHRoZXJlIGlzIElNTyBaRVJPIHJlcXVpcmVtZW50IHRvIGRvIHNvLg0KPiAN
+Cj4gwqAxKSBUaGUgVERYIG1vZHVsZSBpcyBnbG9iYWwNCj4gDQo+IMKgMikgU2VhbS1yb290IGFu
+ZCBTZWFtLW5vbi1yb290IG9wZXJhdGlvbiBhcmUgc3RyaWN0bHkgYSBMUCBwcm9wZXJ0eS4NCj4g
+DQo+IMKgwqDCoCBUaGUgb25seSBhcmNoaXRlY3R1cmFsIHByZXJlcXVpc2l0ZSBmb3IgdXNpbmcg
+U2VhbSBvbiBhIExQIGlzIHRoYXQNCj4gwqDCoMKgIG9idmlvdXNseSB0aGUgZW5jcnlwdGlvbi9k
+ZWNyeXB0aW9uIG1lY2hhbmljcyBoYXZlIGJlZW4gaW5pdGlhbGl6ZWQNCj4gwqDCoMKgIG9uIHRo
+ZSBwYWNrYWdlIHRvIHdoaWNoIHRoZSBMUCBiZWxvbmdzLg0KPiANCj4gSSBjYW4gc2VlIHdoeSBp
+dCBtaWdodCBiZSBjb21wbGljYXRlZCB0byBhZGQvcmVtb3ZlIGFuIExQIGFmdGVyDQo+IGluaXRp
+YWxpemF0aW9uIGZhY3QsIGJ1dCB0ZWNobmljYWxseSBpdCBzaG91bGQgYmUgcG9zc2libGUuDQoN
+CiJrZXJuZWwgc29mdCBvZmZsaW5lIiBhY3R1YWxseSBpc24ndCBhbiBpc3N1ZS4gIFdlIGNhbiBi
+cmluZyBkb3duIGEgbG9naWNhbCBjcHUNCmFmdGVyIGl0IGdldHMgaW5pdGlhbGl6ZWQgYW5kIHRo
+ZW4gYnJpbmcgaXQgdXAgYWdhaW4uDQoNCk9ubHkgYWRkL3JlbW92YWwgb2YgcGh5c2ljYWwgY3B1
+IHdpbGwgY2F1c2UgcHJvYmxlbTrCoA0KDQpURFggTUNIRUNLIHZlcmlmaWVzIGFsbCBib290LXRp
+bWUgcHJlc2VudCBjcHVzIHRvIG1ha2Ugc3VyZSB0aGV5IGFyZSBURFgtDQpjb21wYXRpYmxlIGJl
+Zm9yZSBpdCBlbmFibGVzIFREWCBpbiBoYXJkd2FyZS4gIE1DSEVDSyBjYW5ub3QgcnVuIG9uIGhv
+dC1hZGRlZA0KQ1BVLCBzbyBURFggY2Fubm90IHN1cHBvcnQgcGh5c2ljYWwgQ1BVIGhvdHBsdWcu
+DQoNCldlIHRyaWVkIHRvIGdldCBpdCBjbGFyaWZpZWQgaW4gdGhlIHNwZWNpZmljYXRpb24sIGFu
+ZCBiZWxvdyBpcyB3aGF0IFREWC9tb2R1bGUNCmFyY2ggZ3V5cyBhZ3JlZWQgdG8gcHV0IHRvIHRo
+ZSBURFggbW9kdWxlIHNwZWMgKGp1c3QgY2hlY2tlZCBpdCdzIG5vdCBpbiBsYXRlc3QNCnB1Ymxp
+YyBzcGVjIHlldCwgYnV0IHRoZXkgc2FpZCBpdCB3aWxsIGJlIGluIG5leHQgcmVsZWFzZSk6DQoN
+CiINCjQuMS4zLjIuICBDUFUgQ29uZmlndXJhdGlvbg0KDQpEdXJpbmcgcGxhdGZvcm0gYm9vdCwg
+TUNIRUNLIHZlcmlmaWVzIGFsbCBsb2dpY2FsIENQVXMgdG8gZW5zdXJlIHRoZXkgbWVldCBURFji
+gJlzDQpzZWN1cml0eSBhbmQgY2VydGFpbiBmdW5jdGlvbmFsaXR5IHJlcXVpcmVtZW50cywgYW5k
+IE1DSEVDSyBwYXNzZXMgdGhlIGZvbGxvd2luZw0KQ1BVIGNvbmZpZ3VyYXRpb24gaW5mb3JtYXRp
+b24gdG8gdGhlIE5QLVNFQU1MRFIsIFAtU0VBTUxEUiBhbmQgdGhlIFREWCBNb2R1bGU6DQoNCsK3
+ICAgICAgICAgVG90YWwgbnVtYmVyIG9mIGxvZ2ljYWwgcHJvY2Vzc29ycyBpbiB0aGUgcGxhdGZv
+cm0uDQrCtyAgICAgICAgIFRvdGFsIG51bWJlciBvZiBpbnN0YWxsZWQgcGFja2FnZXMgaW4gdGhl
+IHBsYXRmb3JtLg0KwrcgICAgICAgICBBIHRhYmxlIG9mIHBlci1wYWNrYWdlIENQVSBmYW1pbHks
+IG1vZGVsIGFuZCBzdGVwcGluZyBldGMuDQppZGVudGlmaWNhdGlvbiwgYXMgZW51bWVyYXRlZCBi
+eSBDUFVJRCgxKS5FQVguDQpUaGUgYWJvdmUgaW5mb3JtYXRpb24gaXMgc3RhdGljIGFuZCBkb2Vz
+IG5vdCBjaGFuZ2UgYWZ0ZXIgcGxhdGZvcm0gYm9vdCBhbmQNCk1DSEVDSyBydW4uDQoNCk5vdGU6
+ICAgICBURFggZG9lc27igJl0IHN1cHBvcnQgYWRkaW5nIG9yIHJlbW92aW5nIENQVXMgZnJvbSBU
+RFggc2VjdXJpdHkNCnBlcmltZXRlciwgYXMgY2hlY2tlZCBteSBNQ0hFQ0suICBCSU9TIHNob3Vs
+ZCBwcmV2ZW50IENQVXMgZnJvbSBiZWluZyBob3QtYWRkZWQNCm9yIGhvdC1yZW1vdmVkIGFmdGVy
+IHBsYXRmb3JtIGJvb3RzLg0KDQpUaGUgVERYIG1vZHVsZSBwZXJmb3JtcyBhZGRpdGlvbmFsIGNo
+ZWNrcyBvZiB0aGUgQ1BV4oCZcyBjb25maWd1cmF0aW9uIGFuZA0Kc3VwcG9ydGVkIGZlYXR1cmVz
+LCBieSByZWFkaW5nIE1TUnMgYW5kIENQVUlEIGluZm9ybWF0aW9uIGFzIGRlc2NyaWJlZCBpbiB0
+aGUNCmZvbGxvd2luZyBzZWN0aW9ucy4NCiINCg0KPiANCj4gVERYL1NlYW0gaXMgbm90IHRoYXQg
+c3BlY2lhbC4NCj4gDQo+IEJ1dCB3aGF0J3MgYWJzb2x1dGVseSBhbm5veWluZyBpcyB0aGF0IHRo
+ZSBkb2N1bWVudGF0aW9uIGxhY2tzIGFueQ0KPiBpbmZvcm1hdGlvbiBhYm91dCB0aGUgY2hvaWNl
+IG9mIGVuZm9yY2VtZW50IHdoaWNoIGhhcyBiZWVuIGhhcmRjb2RlZA0KPiBpbnRvIHRoZSBTZWFt
+IG1vZHVsZSBmb3Igd2hhdGV2ZXIgcmVhc29ucy4NCj4gDQo+IE1heWJlIEkgb3Zlcmxvb2tlZCBp
+dCwgYnV0IHRoZW4gaXQncyBkZWZpbml0ZWx5IHdlbGwgaGlkZGVuLg0KDQpJdCBkZXBlbmRzIG9u
+IHRoZSBURFggTW9kdWxlIGltcGxlbWVudGF0aW9uLCB3aGljaCBURFggYXJjaCBndXlzIHRoaW5r
+IHNob3VsZCBiZQ0KImFyY2hpdGVjdHVyYWwiIEkgdGhpbmsuDQoNCg0K
