@@ -2,70 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B37556366D2
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 18:18:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 738B5636755
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 18:37:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237539AbiKWRSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 12:18:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39042 "EHLO
+        id S238761AbiKWRhm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 12:37:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239221AbiKWRSF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 12:18:05 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7B16490BD
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:18:02 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id n17so17293371pgh.9
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:18:02 -0800 (PST)
+        with ESMTP id S237359AbiKWRhk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 12:37:40 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD1D413CCD
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:37:38 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id y14-20020a17090a2b4e00b002189a1b84d4so2469417pjc.2
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 09:37:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=wrS07cTC5K5Tj39aOQ2pHWaQp/nnwsNDHjx9FaHsOZw=;
-        b=hKlCMfoNbebyaz0GGzRhHybmF6QIFeHL8ypqHOA7H6Qu3U3+67CjMYRiCpvMZQj2iU
-         UldfcZ77FGWYA0tbPU17LtXHlHC/16+lOUJtKYU0MxXlE0+uaJlph2jtIch1d0yCCiFk
-         bJ6FTNxHvLyxmxWeMlOeI2OPXO5QepiHfZGGTzGMErdK6B7zrbaKhertNIjZ4TGfNfrl
-         623Kf+4oiQs12tLhvUhwXFygPjCOBLcGkPBESqAR4c3A9jJ+N90VmbY/YnSsnoQfO9em
-         dcWD5MsbKEQKIT1Kgy6K+CX2dGLTHmRfXdw2/Hlp2TvF1u0ujiYkyd1ky9jl+SrzAOGY
-         LAZw==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BTJPrqrqSEwhgHq/Fq7SqerFqPYBOzBQre48SjGb0AQ=;
+        b=AXeIwTvPHhsokCd+EErazsQ8K+lGrncHyEuqRtdoyXhSyIF6UVoIlnqPmu2VPCED60
+         mHOMk9yvQi+Gkq2gElaHXoFKHK98cKz3dh0r+qnBWB8mkJErZXQtp2n65JXr0nQZLPTv
+         l+uls76z3THb1hzYMsRVgcWtdRMNwMFmxSUgM7S+eDqYs+GCbQPXKxO2yJVTGAP/ciN3
+         k52M91Nm7cY14fq1v5NDox/uaxslvzh9LZZ0HZ4tYPTwqi75XfG+zmcNIOM4Ob0iU4rM
+         HFJzp8uu18XWOkqNscJmULjVMC+GNteFWjyVJ1aG8Kq6QsGiFl+6ZGWuHQ1zer8WnHrS
+         z7WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wrS07cTC5K5Tj39aOQ2pHWaQp/nnwsNDHjx9FaHsOZw=;
-        b=qbxYWR5yzbOkL+dst/lBEVXnAZO/vPrYFUdCqEvOxoq3Afx+DvWFdoQ2OJCv2Oo0JJ
-         ssIMHEAfy9PH7GcrejwqVHkqd1Bsybf/Hrax9G9msxhH6BUClXxSbSCYVeMaZcsIcvq/
-         aeNhbL/EAXnFJQ25+0k0bIne9YkvZldC2a1779L6WU7E0QbekY4MIIAs96mPIHQ6dulV
-         AkViz0yXqDhVApCARx4mONKTCeqKvpD8QQcT6tLWv1DWCYWxHUc7vJ0pTOcj9wFS7HBr
-         M8A+ii2DBxV0tUcT5qOIspVmXk2ocCjkfc/bzf2I4KjXxk1zXueclOqtHAATt6rvRXfE
-         Qk+g==
-X-Gm-Message-State: ANoB5pmrLdNtBTSrTOnzHscoApIBSnm3bh5CaQdzaG78ZfCY3ZwZd8RN
-        AHH0RTpu4hYnNbJJ5/LQdU4S7A==
-X-Google-Smtp-Source: AA0mqf5NHQuFjEK1f1dMpwRtz5Fe72kx+Dmi96MPegsu5xq9WODjpbMEGJeg5dmaj/0E09k5vBEadA==
-X-Received: by 2002:a65:4948:0:b0:46e:be03:d9b5 with SMTP id q8-20020a654948000000b0046ebe03d9b5mr8014187pgs.495.1669223882291;
-        Wed, 23 Nov 2022 09:18:02 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BTJPrqrqSEwhgHq/Fq7SqerFqPYBOzBQre48SjGb0AQ=;
+        b=CZlNrxEzqQ8CMkg8r0n9TGmbh4CdX9RtGVD5sV4s3gKJtXMCz/TQmRn2TcolEY/Ztn
+         fOFGdBXpjzfP1msuhDV5xDROyYudOecbWj84swbPo/6pN1p/SRYd2mJS/qy5tqnC+GXk
+         W5DII5Aq7oUT9uoiop8FTpwlQTwyAgNpYmh6bOIiIscDIlkW+jzaWM5pEVIDXEUUyXGV
+         AtMrjWtLTh3lSbDG64kuLZOaHz4X0HR6KRdYUaoVC2R29TKhp8igTglbX1uQAUbG4S4V
+         ublwbyliD1hUT4t7aWaAKx87srQ/bju8Kl9DtI/JYVmXVraamfkoqscSuRRD4yOutloe
+         S0Aw==
+X-Gm-Message-State: ANoB5pmJnmCZCMrxyzRsRW+s1egkmSx7AUwlWs3GuUTKvoiTDwW7dqW8
+        yrjI95vcLLx+9+GH5qNq0VRTYg==
+X-Google-Smtp-Source: AA0mqf7xphM5oz2jsApOp1Egc3rjQzspTFKB7OyQetps+UBwK7ZlkxAJ3k6ifjL4pknC+ROvb0Qnuw==
+X-Received: by 2002:a17:903:1250:b0:188:6ccd:f2c5 with SMTP id u16-20020a170903125000b001886ccdf2c5mr10331527plh.6.1669225058240;
+        Wed, 23 Nov 2022 09:37:38 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id i29-20020a63131d000000b00460ea630c1bsm10936999pgl.46.2022.11.23.09.18.01
+        by smtp.gmail.com with ESMTPSA id j11-20020a170902da8b00b00188f7ad561asm1163747plx.249.2022.11.23.09.37.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Nov 2022 09:18:01 -0800 (PST)
-Date:   Wed, 23 Nov 2022 17:17:57 +0000
+        Wed, 23 Nov 2022 09:37:37 -0800 (PST)
+Date:   Wed, 23 Nov 2022 17:37:33 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        mhal@rbox.co
-Subject: Re: [PATCH 2/4] KVM: x86/xen: Compatibility fixes for shared
- runstate area
-Message-ID: <Y35VxflJBVjzloaj@google.com>
-References: <20221119094659.11868-1-dwmw2@infradead.org>
- <20221119094659.11868-2-dwmw2@infradead.org>
- <Y30XVDXmkAIlRX4N@google.com>
- <a12c8e6123cf702bc882988f9da3be7bd096a2e3.camel@infradead.org>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     "Huang, Kai" <kai.huang@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v7 06/20] x86/virt/tdx: Shut down TDX module in case of
+ error
+Message-ID: <Y35aXX5b2Ed4vc6y@google.com>
+References: <48505089b645019a734d85c2c29f3c8ae2dbd6bd.1668988357.git.kai.huang@intel.com>
+ <Y3ySxEr64HkUaEDq@hirez.programming.kicks-ass.net>
+ <52b2be9b-defd-63ce-4cb2-96cd624a95a6@intel.com>
+ <Y30fUS5/JClpBHVc@hirez.programming.kicks-ass.net>
+ <b3938f3a-e4f8-675a-0c0e-4b4618019145@intel.com>
+ <da7ae78c2d9fed125f160744af5be75f34b1b1d7.camel@intel.com>
+ <791bf9a2-a079-3cd6-90a3-42dbb332a38c@intel.com>
+ <9f1ea2639839305dd8b82694b3d8c697803f43a1.camel@intel.com>
+ <Y35IW/PnbxinKHOL@google.com>
+ <168ca2b3-ffac-31c4-0b83-2d0ee75f34a5@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a12c8e6123cf702bc882988f9da3be7bd096a2e3.camel@infradead.org>
+In-Reply-To: <168ca2b3-ffac-31c4-0b83-2d0ee75f34a5@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,131 +100,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 22, 2022, David Woodhouse wrote:
-> On Tue, 2022-11-22 at 18:39 +0000, Sean Christopherson wrote:
-> > On Sat, Nov 19, 2022, David Woodhouse wrote:
-> > > From: David Woodhouse <
-> > > dwmw@amazon.co.uk
-> > > >
-> > > 
-> > > The guest runstate area can be arbitrarily byte-aligned. In fact, even
-> > > when a sane 32-bit guest aligns the overall structure nicely, the 64-bit
-> > > fields in the structure end up being unaligned due to the fact that the
-> > > 32-bit ABI only aligns them to 32 bits.
-> > > 
-> > > So setting the ->state_entry_time field to something|XEN_RUNSTATE_UPDATE
-> > > is buggy, because if it's unaligned then we can't update the whole field
-> > > atomically; the low bytes might be observable before the _UPDATE bit is.
-> > > Xen actually updates the *byte* containing that top bit, on its own. KVM
-> > > should do the same.
-> > 
-> > I think we're using the wrong APIs to update the runstate.  The VMCS/VMCB pages
-> > _need_ the host pfn, i.e. need to use a gpc (eventually).  The Xen PV stuff on the
-> > other hand most definitely doesn't need to know the pfn.
-> > 
-> > The event channel code would be difficult to convert due to lack of uaccess
-> > primitives, but I don't see anything in the runstate code that prevents KVM from
-> > using a gfn_to_hva_cache.  That will naturally handle page splits by sending them
-> > down a slow path and would yield far simpler code.
-> > 
-> > If taking the slow path is an issue, then the guest really should be fixed to not
-> > split pages.  And if that's not an acceptable answer, the gfn_to_hva_cache code
-> > could be updated to use the fast path if the region is contiguous in the host
-> > virtual address space.
-> > 
+On Wed, Nov 23, 2022, Dave Hansen wrote:
+> On 11/23/22 08:20, Sean Christopherson wrote:
+> >>> Why is it done that way?
+> >>>
+> >>> Can it be changed to delay TDX initialization until the first TDX guest
+> >>> needs to run?
+> >>>
+> >> Sean suggested.
+> >>
+> >> Hi Sean, could you commenet?
+> > Waiting until the first TDX guest is created would result in false advertising,
+> > as KVM wouldn't know whether or not TDX is actually supported until that first
+> > VM is created.  If we can guarantee that TDH.SYS.INIT will fail if and only if
+> > there is a kernel bug, then I would be ok deferring the "enabling" until the
+> > first VM is created.
 > 
-> Yeah, that's tempting. Going back to gfn_to_hva_cache was the first
-> thing I tried. There are a handful of complexifying factors, none of
-> which are insurmountable if we try hard enough.
-> 
->  • Even if we fix the gfn_to_hva_cache to still use the fast path for
->    more than the first page, it's still possible for the runstate to
->    cross from one memslot to an adjacent one. We probably still need
->    two of them, which is a large part of the ugliness of this patch.
+> There's no way we can guarantee _that_.  For one, the PAMT* allocations
+> can always fail.  I guess we could ask sysadmins to fire up a guest to
+> "prime" things, but that seems a little silly.  Maybe that would work as
+> the initial implementation that we merge, but I suspect our users will
+> demand more determinism, maybe a boot or module parameter.
 
-Hrm.  What if KVM requires that the runstate be contiguous in host virtual address
-space?  That wouldn't violate Xen's ABI since it's a KVM restriction, and it can't
-break backwards compatibility since KVM doesn't even handle page splits, let alone
-memslot splits.  AFAIK, most (all?) userspace VMMs make guest RAM virtually
-contiguous anyways.
+Oh, you mean all of TDX initialization?  I thought "initialization" here mean just
+doing tdx_enable().
 
-Probably a moot point since I don't see a way around the "page got swapped out"
-issue.
-
->  • Accessing it via the userspace HVA requires coping with the case
->    where the vCPU is being scheduled out, and it can't sleep. The
->    previous code before commit 34d41d19e dealt with that by using 
->    pagefault_disable() and depending on the GHC fast path. But even
->    so...
-> 
->  • We also could end up having to touch page B, page A then page B
->    again, potentially having to abort and leave the runstate with
->    the XEN_RUNSTATE_UPDATE bit still set. I do kind of prefer the
->    version which checks that both pages are present before it starts
->    writing anything to the guest.
-
-Ugh, and because of the in-atomic case, there's nothing KVM can do to remedy page B
-getting swapped out.  Actually, it doesn't even require a B=>A=>B pattern.  Even
-without a page split, the backing page could get swapped out between setting and
-clearing.
-
-> As I said, they're not insurmountable but that's why I ended up with
-> the patch you see, after first attempting to use a gfn_to_hva_cache
-> again. Happy to entertain suggestions.
-
-What if we use a gfn_to_pfn_cache for the page containing XEN_RUNSTATE_UPDATE,
-and then use kvm_vcpu_write_guest_atomic() if there's a page split?  That would
-avoid needing to acquire mutliple gpc locks, and the update could use a single
-code flow by always constructing an on-stack representation.  E.g. very roughly:
-
-	*update_bit = (vx->runstate_entry_time | XEN_RUNSTATE_UPDATE) >> 56;
-	smp_wmb();
-
-	if (khva)
-		memcpy(khva, rs_state, user_len);
-	else
-		kvm_vcpu_write_guest_in_atomic(vcpu, gpa, rs_state, user_len);
-	smp_wmb();
-
-	*update_bit = vx->runstate_entry_time >> 56;
-	smp_wmb();
-
-where "khva" is NULL if there's a page split.
-
-> I note we have a kvm_read_guest_atomic() and briefly pondered adding a
-> 'write' version of same... but that doesn't seem to cope with crossing
-> memslots either; it also assumes its caller only uses it to access
-> within a single page.
-
-We should fix the lack of page split handling.  There are no bugs because KVM
-only uses the helper for cases where the accesses are naturally aligned, but that's
-bound to bite someone eventually.  That would be an oppurtunity to dedup the code
-that handles "segments" (ugh), e.g. instead of
-
-	gfn_t gfn = gpa >> PAGE_SHIFT;
-	int seg;
-	int offset = offset_in_page(gpa);
-	int ret;
-
-	while ((seg = next_segment(len, offset)) != 0) {
-		ret = kvm_vcpu_read_guest_page(vcpu, gfn, data, offset, seg);
-		if (ret < 0)
-			return ret;
-		offset = 0;
-		len -= seg;
-		data += seg;
-		++gfn;
-	}
-	return 0;
-
-provide a macro that allows
-
-	kvm_for_each_chunk(...)
-		ret = kvm_vcpu_read_guest_page(vcpu, gfn, data, offset, seg);
-		if (ret)
-			return ret;
-	}
-	
-I also think we should rename the "atomic" helpers to be "in_atomic" (or inatomic
-if we want to follow the kernel's terrible nomenclature, which I always read as
-"not atomic").  I always think read_guest_atomic() means an "atomic read".
+Yeah, that's not going to be a viable option.  Aside from lacking determinisim,
+it would be all too easy to end up on a system with fragmented memory that can't
+allocate the PAMTs post-boot.
