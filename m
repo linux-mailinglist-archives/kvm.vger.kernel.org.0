@@ -2,67 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53F05634D0F
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 02:35:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D0583634C8E
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 02:13:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235378AbiKWBfH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 20:35:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41436 "EHLO
+        id S235580AbiKWBNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 20:13:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233436AbiKWBfE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 20:35:04 -0500
-Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D6E7992C
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 17:35:02 -0800 (PST)
-Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-1431386d5bbso3302475fac.10
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 17:35:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=atishpatra.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YMJRx/zZ5WnISbLs6Fa7QvOCWkQbYGJkNtRAWOOuOCk=;
-        b=ZXrTeZwQYtvYCNsZQ/iVt6bG6llCKokUrmI8rGhXAhXMlcQ1HtSMvmntVREyiASRFH
-         2DkwzWJIfYzOp4lhK88X+kgd9wIPa8GUbUE+nlNGE7LlryMNH5ATnLcw8UsDsGF1/FRL
-         tkuFldblgWtxLOZL2pGtZVMQjy/H36qbMuaYI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YMJRx/zZ5WnISbLs6Fa7QvOCWkQbYGJkNtRAWOOuOCk=;
-        b=vawAGH06k02QeO+u3IPTnb2+DsrFnGx6NU7yeEPzMuMB/6loCJ/TaRnyrBddWeZ2AI
-         9fFr/fwiv/41UzVvUpqp0Ae7bbBcfev2+S0hOBUmSJXlf4AaJZuGvq5ysgEpxoMK2t8l
-         tN5cCuiQ2KWQvso+7WQpVyubmcf18lukMpzFFJXmprVIVQF2fml60FAn2AK+3XWhsg33
-         1U5ch5zvQmqbPQgcin4idOeIqI+iY1PxN4vMCQnSRspBlF8uJ3sGUNemNPu4FZ4vvSX9
-         HYxmyrrBg1FeZ+Xfz9Fq0oFw8h/jkQECx1QXvSr4oOc2CFPi4NB0P6qdImn2aeHzVSFN
-         rYkg==
-X-Gm-Message-State: ANoB5pnLB3b7jxqgae2GGX3g4renx2xs65jR+LvImp++c/G/hJfNIWJ2
-        NMkTq1mZBzx8JkdlieaDop1//MM19T6hAOroGUEJ
-X-Google-Smtp-Source: AA0mqf6eAPRW79AJs41qHnsaCnnAFoUGqvt6xkgFAOMo2TlQVJuvm2Ozz9Kx3jrHG0WjdcUcXXioQ/T6/5ldtguVQho=
-X-Received: by 2002:a05:6870:60a4:b0:132:79b1:f85 with SMTP id
- t36-20020a05687060a400b0013279b10f85mr5923565oae.274.1669167301795; Tue, 22
- Nov 2022 17:35:01 -0800 (PST)
+        with ESMTP id S235566AbiKWBND (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 20:13:03 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53A2AE2B60
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 17:11:51 -0800 (PST)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NH2zv1c38zqScm;
+        Wed, 23 Nov 2022 09:07:55 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.58) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 23 Nov 2022 09:11:49 +0800
+From:   chenxiang <chenxiang66@hisilicon.com>
+To:     <alex.williamson@redhat.com>, <maz@kernel.org>
+CC:     <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <linuxarm@huawei.com>, Xiang Chen <chenxiang66@hisilicon.com>
+Subject: [PATCH v2] vfio/pci: Verify each MSI vector to avoid invalid MSI vectors
+Date:   Wed, 23 Nov 2022 09:42:36 +0800
+Message-ID: <1669167756-196788-1-git-send-email-chenxiang66@hisilicon.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-References: <20220718170205.2972215-1-atishp@rivosinc.com> <20220718170205.2972215-6-atishp@rivosinc.com>
- <20221101141329.j4qtvjf6kmqixt2r@kamzik> <CAOnJCULMbTp6WhVRWHxzFnUgCJJV01hcyukQxSEih-sYt5TJWg@mail.gmail.com>
-In-Reply-To: <CAOnJCULMbTp6WhVRWHxzFnUgCJJV01hcyukQxSEih-sYt5TJWg@mail.gmail.com>
-From:   Atish Patra <atishp@atishpatra.org>
-Date:   Tue, 22 Nov 2022 17:34:50 -0800
-Message-ID: <CAOnJCUKpdV3u8X6BSC+-rhV0Q8q2tdsa8r_KTH5FWCh2LV2q8Q@mail.gmail.com>
-Subject: Re: [RFC 5/9] RISC-V: KVM: Add skeleton support for perf
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>, Guo Ren <guoren@kernel.org>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.58]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,477 +43,195 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 22, 2022 at 4:46 PM Atish Patra <atishp@atishpatra.org> wrote:
->
->  at runtime.
->
-> On Tue, Nov 1, 2022 at 7:13 AM Andrew Jones <ajones@ventanamicro.com> wrote:
-> >
-> > On Mon, Jul 18, 2022 at 10:02:01AM -0700, Atish Patra wrote:
-> > > This patch only adds barebore structure of perf implementation. Most of
-> >                        a bare bones         ^ the
-> >
-> > > the function returns zero at this point and will be implemented
-> >       functions
-> >
-> > > fully in the future.
-> >
-> > s/the future/later patches/
-> >
->
-> Done.
->
-> > >
-> > > Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> > > ---
-> > >  arch/riscv/include/asm/kvm_host.h     |   3 +
-> > >  arch/riscv/include/asm/kvm_vcpu_pmu.h |  70 +++++++++++++
-> > >  arch/riscv/kvm/Makefile               |   1 +
-> > >  arch/riscv/kvm/main.c                 |   3 +-
-> > >  arch/riscv/kvm/vcpu.c                 |   5 +
-> > >  arch/riscv/kvm/vcpu_insn.c            |   3 +-
-> > >  arch/riscv/kvm/vcpu_pmu.c             | 136 ++++++++++++++++++++++++++
-> > >  7 files changed, 219 insertions(+), 2 deletions(-)
-> > >  create mode 100644 arch/riscv/include/asm/kvm_vcpu_pmu.h
-> > >  create mode 100644 arch/riscv/kvm/vcpu_pmu.c
-> > >
-> > > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> > > index 59a0cf2ca7b9..5d2312828bb2 100644
-> > > --- a/arch/riscv/include/asm/kvm_host.h
-> > > +++ b/arch/riscv/include/asm/kvm_host.h
-> > > @@ -18,6 +18,7 @@
-> > >  #include <asm/kvm_vcpu_fp.h>
-> > >  #include <asm/kvm_vcpu_insn.h>
-> > >  #include <asm/kvm_vcpu_timer.h>
-> > > +#include <asm/kvm_vcpu_pmu.h>
-> > >
-> > >  #define KVM_MAX_VCPUS                        1024
-> > >
-> > > @@ -226,6 +227,8 @@ struct kvm_vcpu_arch {
-> > >
-> > >       /* Don't run the VCPU (blocked) */
-> > >       bool pause;
-> > > +
-> > > +     struct kvm_pmu pmu;
-> > >  };
-> > >
-> > >  static inline void kvm_arch_hardware_unsetup(void) {}
-> > > diff --git a/arch/riscv/include/asm/kvm_vcpu_pmu.h b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> > > new file mode 100644
-> > > index 000000000000..bffee052f2ae
-> > > --- /dev/null
-> > > +++ b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> > > @@ -0,0 +1,70 @@
-> > > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > > +/*
-> > > + * Copyright (c) 2022 Rivos Inc
-> > > + *
-> > > + * Authors:
-> > > + *     Atish Patra <atishp@rivosinc.com>
-> > > + */
-> > > +
-> > > +#ifndef _KVM_VCPU_RISCV_PMU_H
-> > > +#define _KVM_VCPU_RISCV_PMU_H
-> >
-> > The convention seems to be to leading underscores for these types of
-> > defines, i.e. __KVM_VCPU_RISCV_PMU_H
-> >
->
-> Yes. It was a typo. Fixed.
->
-> > > +
-> > > +#include <linux/perf/riscv_pmu.h>
-> > > +#include <asm/sbi.h>
-> > > +
-> > > +#ifdef CONFIG_RISCV_PMU_SBI
-> > > +#define RISCV_KVM_MAX_FW_CTRS 32
-> > > +
-> > > +/* Per virtual pmu counter data */
-> > > +struct kvm_pmc {
-> > > +     u8 idx;
-> > > +     struct kvm_vcpu *vcpu;
-> >
-> > I'm not sure we need a vcpu pointer here. If it's just to implement
-> > pmc_to_pmu(), then we can instead implement a pmc_to_vcpu(), like
-> > arm64's kvm_pmc_to_vcpu(). x86 might be able to do that too, since
-> > it appears the conversion macros below originated there.
-> >
->
-> Yes. We can implement arm64 as well instead of x86.
-> I just thought the x86 approach keeping a reference to vcpu is a bit
-> simpler than computing
-> the parent offset using container_of multiple times. This will be
-> invoked once per overflow in the counter overflow path.
->
-> If you feel strongly about it arm64 way, we can follow that. I have
-> removed from this series for now.
-> Depending on the conclusion, I will add it back in kvm sscofpmf
-> support series if required.
->
-> > > +     struct perf_event *perf_event;
-> > > +     uint64_t counter_val;
-> > > +     union sbi_pmu_ctr_info cinfo;
-> > > +};
-> > > +
-> > > +/* PMU data structure per vcpu */
-> > > +struct kvm_pmu {
-> > > +     struct kvm_pmc pmc[RISCV_MAX_COUNTERS];
-> > > +     /* Number of the virtual firmware counters available */
-> > > +     int num_fw_ctrs;
-> > > +     /* Number of the virtual hardware counters available */
-> > > +     int num_hw_ctrs;
-> > > +     /* Bit map of all the virtual counter used */
-> >                                       counters
-> >
-> > > +     DECLARE_BITMAP(used_pmc, RISCV_MAX_COUNTERS);
-> >
-> > How about naming this pmc_in_use like x86?
-> >
->
-> Done.
->
-> > > +};
-> > > +
-> > > +#define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu)
-> > > +#define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu))
-> > > +#define pmc_to_pmu(pmc)   (&(pmc)->vcpu->arch.pmu)
-> > > +
-> > > +int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, unsigned long *out_val);
-> > > +int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
-> > > +                             unsigned long *ctr_info);
-> > > +
-> >
-> > nit: no need for this blank line
->
-> Fixed.
->
-> >
-> > > +int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > > +                              unsigned long ctr_mask, unsigned long flag, uint64_t ival);
-> > > +int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > > +                              unsigned long ctr_mask, unsigned long flag);
-> > > +int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > > +                                  unsigned long ctr_mask, unsigned long flag,
-> > > +                                  unsigned long eidx, uint64_t edata);
-> > > +int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
-> > > +                             unsigned long *out_val);
-> > > +int kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu);
-> > > +void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu);
-> > > +void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu);
-> > > +
-> > > +#else
-> > > +struct kvm_pmu {
-> > > +};
-> > > +
-> > > +static inline int kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +     return 0;
-> > > +}
-> > > +static inline void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu) {}
-> > > +static inline void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu) {}
-> > > +#endif
-> > > +#endif
-> > > diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
-> > > index 019df9208bdd..342d7199e89d 100644
-> > > --- a/arch/riscv/kvm/Makefile
-> > > +++ b/arch/riscv/kvm/Makefile
-> > > @@ -25,3 +25,4 @@ kvm-y += vcpu_sbi_base.o
-> > >  kvm-y += vcpu_sbi_replace.o
-> > >  kvm-y += vcpu_sbi_hsm.o
-> > >  kvm-y += vcpu_timer.o
-> > > +kvm-$(CONFIG_RISCV_PMU_SBI) += vcpu_sbi_pmu.o vcpu_pmu.o
-> > > diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-> > > index 1549205fe5fe..d41ab6d1987d 100644
-> > > --- a/arch/riscv/kvm/main.c
-> > > +++ b/arch/riscv/kvm/main.c
-> > > @@ -49,7 +49,8 @@ int kvm_arch_hardware_enable(void)
-> > >       hideleg |= (1UL << IRQ_VS_EXT);
-> > >       csr_write(CSR_HIDELEG, hideleg);
-> > >
-> > > -     csr_write(CSR_HCOUNTEREN, -1UL);
-> > > +     /* VS should access only TM bit. Everything else should trap */
-> > > +     csr_write(CSR_HCOUNTEREN, 0x02);
-> >
-> > This looks like something that should be broken out into a separate patch
-> > with a description of what happens now when guests try to access the newly
-> > trapping counter registers. We should probably also create a TM define.
-> >
->
-> Done.
->
+From: Xiang Chen <chenxiang66@hisilicon.com>
 
-As we allow cycles & instret for host user space now [1], should we do the same
-for guests as well ? I would prefer not to but same user space
-software will start to break
-they will run inside a guest.
+Currently the number of MSI vectors comes from register PCI_MSI_FLAGS
+which should be power-of-2 in qemu, in some scenaries it is not the same as
+the number that driver requires in guest, for example, a PCI driver wants
+to allocate 6 MSI vecotrs in guest, but as the limitation, it will allocate
+8 MSI vectors. So it requires 8 MSI vectors in qemu while the driver in
+guest only wants to allocate 6 MSI vectors.
 
-https://lore.kernel.org/all/20220928131807.30386-1-palmer@rivosinc.com/
+When GICv4.1 is enabled, it iterates over all possible MSIs and enable the
+forwarding while the guest has only created some of mappings in the virtual
+ITS, so some calls fail. The exception print is as following:
+vfio-pci 0000:3a:00.1: irq bypass producer (token 000000008f08224d) registration
+fails:66311
 
-> > >
-> > >       csr_write(CSR_HVIP, 0);
-> > >
-> > > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > > index 3c95924d38c7..4cc964aaf2ad 100644
-> > > --- a/arch/riscv/kvm/vcpu.c
-> > > +++ b/arch/riscv/kvm/vcpu.c
-> > > @@ -122,6 +122,7 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
-> > >
-> > >       WRITE_ONCE(vcpu->arch.irqs_pending, 0);
-> > >       WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
-> > > +     kvm_riscv_vcpu_pmu_reset(vcpu);
-> > >
-> > >       vcpu->arch.hfence_head = 0;
-> > >       vcpu->arch.hfence_tail = 0;
-> > > @@ -174,6 +175,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> > >       /* Setup VCPU timer */
-> > >       kvm_riscv_vcpu_timer_init(vcpu);
-> > >
-> > > +     /* setup performance monitoring */
-> > > +     kvm_riscv_vcpu_pmu_init(vcpu);
-> > > +
-> > >       /* Reset VCPU */
-> > >       kvm_riscv_reset_vcpu(vcpu);
-> > >
-> > > @@ -196,6 +200,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
-> > >       /* Cleanup VCPU timer */
-> > >       kvm_riscv_vcpu_timer_deinit(vcpu);
-> > >
-> > > +     kvm_riscv_vcpu_pmu_deinit(vcpu);
-> > >       /* Free unused pages pre-allocated for G-stage page table mappings */
-> > >       kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-> > >  }
-> > > diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
-> > > index 7eb90a47b571..0aa334f853c8 100644
-> > > --- a/arch/riscv/kvm/vcpu_insn.c
-> > > +++ b/arch/riscv/kvm/vcpu_insn.c
-> > > @@ -214,7 +214,8 @@ struct csr_func {
-> > >                   unsigned long wr_mask);
-> > >  };
-> > >
-> > > -static const struct csr_func csr_funcs[] = { };
-> > > +static const struct csr_func csr_funcs[] = {
-> > > +};
-> >
-> > stray change
-> >
->
-> Fixed
->
-> > >
-> > >  /**
-> > >   * kvm_riscv_vcpu_csr_return -- Handle CSR read/write after user space
-> > > diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-> > > new file mode 100644
-> > > index 000000000000..3168ed740bdd
-> > > --- /dev/null
-> > > +++ b/arch/riscv/kvm/vcpu_pmu.c
-> > > @@ -0,0 +1,136 @@
-> > > +// SPDX-License-Identifier: GPL-2.0
-> > > +/*
-> > > + * Copyright (c) 2022 Rivos Inc
-> > > + *
-> > > + * Authors:
-> > > + *     Atish Patra <atishp@rivosinc.com>
-> > > + */
-> > > +
-> > > +#include <linux/errno.h>
-> > > +#include <linux/err.h>
-> > > +#include <linux/kvm_host.h>
-> > > +#include <linux/perf/riscv_pmu.h>
-> > > +#include <asm/csr.h>
-> > > +#include <asm/kvm_vcpu_pmu.h>
-> > > +#include <linux/kvm_host.h>
-> > > +
-> > > +int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, unsigned long *out_val)
-> > > +{
-> > > +     struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-> > > +
-> > > +     if (!kvpmu)
-> > > +             return -EINVAL;
-> >
-> > kvpmu can never be null because arch.pmu isn't a pointer. We probably
-> > shouldn't be making calls to kvm_riscv_vcpu_pmu_num_ctrs() without knowing
-> > we have an initialized pmu anyway, though.
-> >
->
-> Yes. I have added an init_done flag to do that sanity check.
-> I can change it based on the conclusion on PATCH 6.
->
-> > > +
-> > > +     *out_val = kvpmu->num_fw_ctrs + kvpmu->num_hw_ctrs;
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
-> > > +                             unsigned long *ctr_info)
-> > > +{
-> > > +     struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-> > > +
-> > > +     if (!kvpmu || (cidx > RISCV_MAX_COUNTERS) || (cidx == 1))
-> >
-> > nit: unnecessary ()
-> >
-> > > +             return -EINVAL;
-> > > +
-> > > +     *ctr_info = kvpmu->pmc[cidx].cinfo.value;
-> > > +
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > > +                              unsigned long ctr_mask, unsigned long flag, uint64_t ival)
-> > > +{
-> > > +     /* TODO */
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > > +                              unsigned long ctr_mask, unsigned long flag)
-> > > +{
-> > > +     /* TODO */
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_base,
-> > > +                                  unsigned long ctr_mask, unsigned long flag,
-> > > +                                  unsigned long eidx, uint64_t edata)
-> > > +{
-> > > +     /* TODO */
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
-> > > +                             unsigned long *out_val)
-> > > +{
-> > > +     /* TODO */
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +int kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +     int i = 0, num_hw_ctrs, num_fw_ctrs, hpm_width;
-> > > +     struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-> > > +
-> > > +     if (!kvpmu)
-> > > +             return -EINVAL;
-> > > +
-> > > +     num_hw_ctrs = riscv_pmu_sbi_get_num_hw_ctrs();
-> > > +     if ((num_hw_ctrs + RISCV_KVM_MAX_FW_CTRS) > RISCV_MAX_COUNTERS)
-> > > +             num_fw_ctrs = RISCV_MAX_COUNTERS - num_hw_ctrs;
-> > > +     else
-> > > +             num_fw_ctrs = RISCV_KVM_MAX_FW_CTRS;
-> >
-> > Why do we need RISCV_KVM_MAX_FW_CTRS? Can't we just always get the number
-> > with RISCV_MAX_COUNTERS - num_hw_ctrs ?
-> >
-> We can. But we have to allocate fw_event at runtime. As most platforms
-> don't implement
-> more than all 29 hpmcounters, you end up having more firmware counters
-> than needed.
-> Current, SBI spec only define 21 firmware counter anyways.
->
-> Thus I felt it is unnecessary to do runtime allocation. But it's just
-> few bytes. So I don't feel
-> strongly about it.
->
-> > > +
-> > > +     hpm_width = riscv_pmu_sbi_hpmc_width();
-> > > +     if (hpm_width <= 0) {
-> > > +             pr_err("Can not initialize PMU for vcpu as hpmcounter width is not available\n");
-> > > +             return -EINVAL;
-> > > +     }
-> > > +
-> > > +     kvpmu->num_hw_ctrs = num_hw_ctrs;
-> > > +     kvpmu->num_fw_ctrs = num_fw_ctrs;
-> >
-> > Maybe it's coming later, but we need to give KVM userspace control over
-> > the number of counters to allow it to migrate to a larger set of hosts.
-> > Also, a previous patch said the virtual width must be the same as the
-> > host width for the hw counters, so we need userspace to know what that
-> > is in order to determine to which hosts it can migrate a guest.
-> >
->
-> Yes. The entire user space access control needs to be sketched out.
-> We probably need another one reg interface to set/get the number of
-> counters/width.
->
-> However, Is it a common to migrate a guest between different hosts
-> with different PMU capabilities ?
->
-> > > +     /*
-> > > +      * There is no corelation betwen the logical hardware counter and virtual counters.
-> > > +      * However, we need to encode a hpmcounter CSR in the counter info field so that
-> > > +      * KVM can trap n emulate the read. This works well in the migraiton usecase as well
-> >
-> > s/well//
-> >
-> > > +      * KVM doesn't care if the actual hpmcounter is available in the hardware or not.
-> > > +      */
-> > > +     for (i = 0; i < num_hw_ctrs + num_fw_ctrs; i++) {
-> >
-> > Maybe we need a helper macro like
-> >
-> >  #define kvm_pmu_num_counters(pmu) ((pmu)->num_hw_ctrs + (pmu)->num_fw_ctrs)
-> >
-> > if we're going to loop over all counters frequently.
-> >
->
-> Done.
->
->
-> > > +             /* TIME CSR shouldn't be read from perf interface */
-> > > +             if (i == 1)
-> > > +                     continue;
-> > > +             kvpmu->pmc[i].idx = i;
-> > > +             kvpmu->pmc[i].vcpu = vcpu;
-> > > +             if (i < kvpmu->num_hw_ctrs) {
-> > > +                     kvpmu->pmc[i].cinfo.type = SBI_PMU_CTR_TYPE_HW;
-> > > +                     if (i < 3)
-> > > +                             /* CY, IR counters */
-> > > +                             kvpmu->pmc[i].cinfo.width = 63;
-> > > +                     else
-> > > +                             kvpmu->pmc[i].cinfo.width = hpm_width;
-> > > +                     /*
-> > > +                      * The CSR number doesn't have any relation with the logical
-> > > +                      * hardware counters. The CSR numbers are encoded sequentially
-> > > +                      * to avoid maintaining a map between the virtual counter
-> > > +                      * and CSR number.
-> > > +                      */
-> > > +                     kvpmu->pmc[i].cinfo.csr = CSR_CYCLE + i;
-> > > +             } else {
-> > > +                     kvpmu->pmc[i].cinfo.type = SBI_PMU_CTR_TYPE_FW;
-> > > +                     kvpmu->pmc[i].cinfo.width = BITS_PER_LONG - 1;
-> > > +             }
-> > > +     }
-> > > +
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +     /* TODO */
-> > > +}
-> > > +
-> > > +void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +     /* TODO */
-> > > +}
-> > > +
-> > > --
-> > > 2.25.1
-> > >
-> >
-> > Thanks,
-> > drew
->
->
->
-> --
-> Regards,
-> Atish
+To avoid the issue, verify each MSI vector, skip some operations such as
+request_irq() and irq_bypass_register_producer() for those invalid MSI vectors.
 
+Signed-off-by: Xiang Chen <chenxiang66@hisilicon.com>
+---
+I reported the issue at the link:
+https://lkml.kernel.org/lkml/87cze9lcut.wl-maz@kernel.org/T/
 
+Change Log:
+v1 -> v2:
+Verify each MSI vector in kernel instead of adding systemcall according to
+Mar's suggestion
+---
+ arch/arm64/kvm/vgic/vgic-irqfd.c  | 13 +++++++++++++
+ arch/arm64/kvm/vgic/vgic-its.c    | 36 ++++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic.h        |  1 +
+ drivers/vfio/pci/vfio_pci_intrs.c | 33 +++++++++++++++++++++++++++++++++
+ include/linux/kvm_host.h          |  2 ++
+ 5 files changed, 85 insertions(+)
 
+diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
+index 475059b..71f6af57 100644
+--- a/arch/arm64/kvm/vgic/vgic-irqfd.c
++++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
+@@ -98,6 +98,19 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+ 	return vgic_its_inject_msi(kvm, &msi);
+ }
+ 
++int kvm_verify_msi(struct kvm *kvm,
++		   struct kvm_kernel_irq_routing_entry *irq_entry)
++{
++	struct kvm_msi msi;
++
++	if (!vgic_has_its(kvm))
++		return -ENODEV;
++
++	kvm_populate_msi(irq_entry, &msi);
++
++	return vgic_its_verify_msi(kvm, &msi);
++}
++
+ /**
+  * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
+  */
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 94a666d..8312a4a 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -767,6 +767,42 @@ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
+ 	return 0;
+ }
+ 
++int vgic_its_verify_msi(struct kvm *kvm, struct kvm_msi *msi)
++{
++	struct vgic_its *its;
++	struct its_ite *ite;
++	struct kvm_vcpu *vcpu;
++	int ret = 0;
++
++	if (!irqchip_in_kernel(kvm) || (msi->flags & ~KVM_MSI_VALID_DEVID))
++		return -EINVAL;
++
++	if (!vgic_has_its(kvm))
++		return -ENODEV;
++
++	its = vgic_msi_to_its(kvm, msi);
++	if (IS_ERR(its))
++		return PTR_ERR(its);
++
++	mutex_lock(&its->its_lock);
++	if (!its->enabled) {
++		ret = -EBUSY;
++		goto unlock;
++	}
++	ite = find_ite(its, msi->devid, msi->data);
++	if (!ite || !its_is_collection_mapped(ite->collection)) {
++		ret = E_ITS_INT_UNMAPPED_INTERRUPT;
++		goto unlock;
++	}
++
++	vcpu = kvm_get_vcpu(kvm, ite->collection->target_addr);
++	if (!vcpu)
++		ret = E_ITS_INT_UNMAPPED_INTERRUPT;
++unlock:
++	mutex_unlock(&its->its_lock);
++	return ret;
++}
++
+ /*
+  * Queries the KVM IO bus framework to get the ITS pointer from the given
+  * doorbell address.
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index 0c8da72..d452150 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -240,6 +240,7 @@ int kvm_vgic_register_its_device(void);
+ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+ void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu);
+ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
++int vgic_its_verify_msi(struct kvm *kvm, struct kvm_msi *msi);
+ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
+ int vgic_v3_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 			 int offset, u32 *val);
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 40c3d7c..3027805 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -19,6 +19,7 @@
+ #include <linux/vfio.h>
+ #include <linux/wait.h>
+ #include <linux/slab.h>
++#include <linux/kvm_irqfd.h>
+ 
+ #include "vfio_pci_priv.h"
+ 
+@@ -315,6 +316,28 @@ static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec, bool msi
+ 	return 0;
+ }
+ 
++static int vfio_pci_verify_msi_entry(struct vfio_pci_core_device *vdev,
++		struct eventfd_ctx *trigger)
++{
++	struct kvm *kvm = vdev->vdev.kvm;
++	struct kvm_kernel_irqfd *tmp;
++	struct kvm_kernel_irq_routing_entry irq_entry;
++	int ret = -ENODEV;
++
++	spin_lock_irq(&kvm->irqfds.lock);
++	list_for_each_entry(tmp, &kvm->irqfds.items, list) {
++		if (trigger == tmp->eventfd) {
++			ret = 0;
++			break;
++		}
++	}
++	spin_unlock_irq(&kvm->irqfds.lock);
++	if (ret)
++		return ret;
++	irq_entry = tmp->irq_entry;
++	return kvm_verify_msi(kvm, &irq_entry);
++}
++
+ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+ 				      int vector, int fd, bool msix)
+ {
+@@ -355,6 +378,16 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+ 		return PTR_ERR(trigger);
+ 	}
+ 
++	if (!msix) {
++		ret = vfio_pci_verify_msi_entry(vdev, trigger);
++		if (ret) {
++			kfree(vdev->ctx[vector].name);
++			eventfd_ctx_put(trigger);
++			if (ret > 0)
++				ret = 0;
++			return ret;
++		}
++	}
+ 	/*
+ 	 * The MSIx vector table resides in device memory which may be cleared
+ 	 * via backdoor resets. We don't allow direct access to the vector
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 1cd9a22..3c8f22a 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1611,6 +1611,8 @@ void kvm_unregister_irq_ack_notifier(struct kvm *kvm,
+ int kvm_request_irq_source_id(struct kvm *kvm);
+ void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id);
+ bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
++int kvm_verify_msi(struct kvm *kvm,
++		   struct kvm_kernel_irq_routing_entry *irq_entry);
+ 
+ /*
+  * Returns a pointer to the memslot if it contains gfn.
 -- 
-Regards,
-Atish
+2.8.1
+
