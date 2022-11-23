@@ -2,87 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 583D0634DEC
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 03:34:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DB26634BFE
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 02:04:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235436AbiKWCeM convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 22 Nov 2022 21:34:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47966 "EHLO
+        id S235400AbiKWBEb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 20:04:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235426AbiKWCeH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 21:34:07 -0500
-X-Greylist: delayed 18906 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Nov 2022 18:34:06 PST
-Received: from correos.bolipuertos.gob.ve.bolipuertos.gob.ve (correo.bolipuertos.gob.ve [190.202.28.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1DF3725FE
-        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 18:34:06 -0800 (PST)
-Received: from correo.bolipuertos.gob.ve ([10.50.23.160])
-        by correos.bolipuertos.gob.ve.bolipuertos.gob.ve  with ESMTP id 2AMG7wC9026535-2AMG7wCB026535
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-        Tue, 22 Nov 2022 12:07:58 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by correo.bolipuertos.gob.ve (Postfix) with ESMTP id 4FF9EAC146E;
-        Tue, 22 Nov 2022 12:07:58 -0400 (-04)
-Received: from correo.bolipuertos.gob.ve ([127.0.0.1])
-        by localhost (correo.bolipuertos.gob.ve [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id r61ARr-f6hbN; Tue, 22 Nov 2022 12:07:58 -0400 (-04)
-Received: from localhost (localhost [127.0.0.1])
-        by correo.bolipuertos.gob.ve (Postfix) with ESMTP id 06032AC179D;
-        Tue, 22 Nov 2022 12:07:58 -0400 (-04)
-X-Virus-Scanned: amavisd-new at bolipuertos.gob.ve
-Received: from correo.bolipuertos.gob.ve ([127.0.0.1])
-        by localhost (correo.bolipuertos.gob.ve [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 7chQ8MywVmJl; Tue, 22 Nov 2022 12:07:57 -0400 (-04)
-Received: from [103.125.190.179] (unknown [103.125.190.179])
-        by correo.bolipuertos.gob.ve (Postfix) with ESMTPSA id B9559AC146E;
-        Tue, 22 Nov 2022 12:07:50 -0400 (-04)
-Content-Type: text/plain; charset="iso-8859-1"
+        with ESMTP id S235382AbiKWBEa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 20:04:30 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A793D59176;
+        Tue, 22 Nov 2022 17:04:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669165469; x=1700701469;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xIkQj2jeU/8NPzjK+TPyInzQOmljcCdXkpyBV4P2W8Y=;
+  b=Ywz/kTK8EEqg32c1KFzfSnPriSnVP79vVZjU3iC6iRs0hfGVZ9kkBkQd
+   7OloZ84gMkGXsEoWHS7DVcZsgXXxLIn2wp4NJVg9sh/l/k0kuuCj8ilkv
+   BEiAm4707Edf3izatOnKbwY3hVOVomS4HZphwytraiURmDt+sOqhihYLt
+   85rFlUnxfkWqV+xUmILVyTR3iwnL3vYWH2Pd9RzBAHvk75cFYEExxTybB
+   bC1WgFQaYPkXK3gNMK2r56+kKOE6tJxKFo5xX1Mw7ll8WneN5USVy4aBB
+   bXv+9goz7z3qKD2A9f2kkfaK4lsXkX1SOzL598v5+/Mz6T4KjjPkzDo5C
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="315773032"
+X-IronPort-AV: E=Sophos;i="5.96,185,1665471600"; 
+   d="scan'208";a="315773032"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 17:04:29 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="643923109"
+X-IronPort-AV: E=Sophos;i="5.96,185,1665471600"; 
+   d="scan'208";a="643923109"
+Received: from coltsavx-mobl1.amr.corp.intel.com (HELO [10.255.0.114]) ([10.255.0.114])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 17:04:26 -0800
+Message-ID: <791bf9a2-a079-3cd6-90a3-42dbb332a38c@intel.com>
+Date:   Tue, 22 Nov 2022 17:04:25 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: Strategic plan on(ROI)
-To:     Recipients <cindy@cgracephoto.com>
-From:   "Mr.IgorS. Lvovich" <cindy@cgracephoto.com>
-Date:   Tue, 22 Nov 2022 08:07:44 -0800
-Reply-To: richad.tang@yahoo.com.hk
-Message-Id: <20221122160750.B9559AC146E@correo.bolipuertos.gob.ve>
-X-FE-Last-Public-Client-IP: 103.125.190.179
-X-FE-Policy-ID: 1:1:2:SYSTEM
-X-Spam-Status: Yes, score=6.7 required=5.0 tests=BAYES_50,
-        FREEMAIL_FORGED_REPLYTO,HK_NAME_MR_MRS,KHOP_HELO_FCRDNS,
-        RCVD_IN_BL_SPAMCOP_NET,RCVD_IN_MSPIKE_H2,RCVD_IN_SBL,
-        RCVD_IN_VALIDITY_RPBL,SPF_FAIL,SPF_HELO_NONE,TO_EQ_FM_DOM_SPF_FAIL,
-        TO_EQ_FM_SPF_FAIL autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: *  1.3 RCVD_IN_BL_SPAMCOP_NET RBL: Received via a relay in
-        *      bl.spamcop.net
-        *      [Blocked - see <https://www.spamcop.net/bl.shtml?103.125.190.179>]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5021]
-        *  0.1 RCVD_IN_SBL RBL: Received via a relay in Spamhaus SBL
-        *      [103.125.190.179 listed in zen.spamhaus.org]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.0 SPF_FAIL SPF: sender does not match SPF record (fail)
-        *      [SPF failed: Please see http://www.openspf.org/Why?s=mfrom;id=cindy%40cgracephoto.com;ip=190.202.28.106;r=lindbergh.monkeyblade.net]
-        *  1.3 RCVD_IN_VALIDITY_RPBL RBL: Relay in Validity RPBL,
-        *      https://senderscore.org/blocklistlookup/
-        *      [190.202.28.106 listed in bl.score.senderscore.com]
-        * -0.0 RCVD_IN_MSPIKE_H2 RBL: Average reputation (+2)
-        *      [190.202.28.106 listed in wl.mailspike.net]
-        *  1.0 HK_NAME_MR_MRS No description available.
-        *  2.1 FREEMAIL_FORGED_REPLYTO Freemail in Reply-To, but not From
-        *  0.0 TO_EQ_FM_SPF_FAIL To == From and external SPF failed
-        *  0.0 TO_EQ_FM_DOM_SPF_FAIL To domain == From domain and external SPF
-        *       failed
-        *  0.0 KHOP_HELO_FCRDNS Relay HELO differs from its IP's reverse DNS
-X-Spam-Level: ******
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v7 06/20] x86/virt/tdx: Shut down TDX module in case of
+ error
+Content-Language: en-US
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+References: <cover.1668988357.git.kai.huang@intel.com>
+ <48505089b645019a734d85c2c29f3c8ae2dbd6bd.1668988357.git.kai.huang@intel.com>
+ <Y3ySxEr64HkUaEDq@hirez.programming.kicks-ass.net>
+ <52b2be9b-defd-63ce-4cb2-96cd624a95a6@intel.com>
+ <Y30fUS5/JClpBHVc@hirez.programming.kicks-ass.net>
+ <b3938f3a-e4f8-675a-0c0e-4b4618019145@intel.com>
+ <da7ae78c2d9fed125f160744af5be75f34b1b1d7.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <da7ae78c2d9fed125f160744af5be75f34b1b1d7.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello
-I will like to use the liberty of this medium to inform you as a consultant,that my principal is interested in investing his bond/funds as a silent business partner in your company.Taking into proper
-consideration the Return on Investment(ROI) based on a ten (10) year strategic plan.
-I shall give you details when you reply.
+On 11/22/22 16:58, Huang, Kai wrote:
+> On Tue, 2022-11-22 at 11:24 -0800, Dave Hansen wrote:
+>>> I was expecting TDX to not get initialized until the first TDX using KVM
+>>> instance is created. Am I wrong?
+>> I went looking for it in this series to prove you wrong.  I failed.  😄
+>>
+>> tdx_enable() is buried in here somewhere:
+>>
+>>> https://lore.kernel.org/lkml/CAAhR5DFrwP+5K8MOxz5YK7jYShhaK4A+2h1Pi31U_9+Z+cz-0A@mail.gmail.com/T/
+>> I don't have the patience to dig it out today, so I guess we'll have Kai
+>> tell us.
+> It will be done when KVM module is loaded, but not when the first TDX guest is
+> created.
 
-Regards,
+Why is it done that way?
+
+Can it be changed to delay TDX initialization until the first TDX guest
+needs to run?
