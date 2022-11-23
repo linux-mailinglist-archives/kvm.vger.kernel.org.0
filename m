@@ -2,237 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D9B23635F91
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 14:28:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03DF2635F4D
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 14:23:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237184AbiKWN25 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 08:28:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32798 "EHLO
+        id S238411AbiKWNXl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 08:23:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236200AbiKWN2P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 08:28:15 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D87BFE098;
-        Wed, 23 Nov 2022 05:07:44 -0800 (PST)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ANBDWM9029481;
-        Wed, 23 Nov 2022 13:07:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=UpeM83Nyfeedx92a9CK9WQeo+2YuYhwIHLCyxc/JTko=;
- b=r8M/J8N4T5VIC8CnvOP8KES9L9m/GvelE4CZt886kOiXWWAyqDd928pYbLBga/RSq3w9
- aLqeRvrqW18DE7WzwKLNTN+gLbJ1j1TB8Q25nQVQRbmnRtLIgVRsd978SWCA9L67VmPf
- myEru7b/No7ntr0MZbc12uLwljrWePiFQGn+aCbc1eWN2OH+eIgEj+6TuRZkIhwFl2LI
- N5ohRJ+kgyIN7H/Xz7+ru9j8rhCXkk7PH+/oI0wm2PXO2fXFSXdvkUQzcSlhwqCvIBYa
- KWYax73Lq7XIaqEkDts5eBrapgcXKXvhJj3wXfiwx1yvpFy5tS68XV5p8VbrTb8INMpm zQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m100sx6xd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 13:07:43 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ANBo7Ul025441;
-        Wed, 23 Nov 2022 13:07:43 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m100sx6wk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 13:07:43 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AND5H7W009565;
-        Wed, 23 Nov 2022 13:07:41 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3kxpdhwrtc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 13:07:41 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AND7c3b35521270
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Nov 2022 13:07:38 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6C621A405F;
-        Wed, 23 Nov 2022 13:07:38 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2A718A405B;
-        Wed, 23 Nov 2022 13:07:38 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Nov 2022 13:07:38 +0000 (GMT)
-Date:   Wed, 23 Nov 2022 14:01:18 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 5/5] lib: s390x: Handle debug prints for
- SIE exceptions correctly
-Message-ID: <20221123140118.25114940@p-imbrenda>
-In-Reply-To: <20221123084656.19864-6-frankja@linux.ibm.com>
-References: <20221123084656.19864-1-frankja@linux.ibm.com>
-        <20221123084656.19864-6-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S238395AbiKWNXT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 08:23:19 -0500
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2067.outbound.protection.outlook.com [40.107.102.67])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64EEE4733D;
+        Wed, 23 Nov 2022 05:03:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CV/Tpwujk+32u4athLMf1lpfjw1phLZd4zIT2fL9aRDtNIVnYMG/ZTuSDbV8tlRn/mzeXYVE/Zsl3zk+UWR2AnLeFWttt5wLnH0wVQ5F4J3V/XpfdelnA2jzQMioRPvT/TIM0xAf7CLm2nC0TVjKu3inMpmo3tBYHxvEBNCD5AqkXpLttsMEQN7gdzsOXv+GoWtHBrkWZz5gO92lkWkHsNehoMVA63y5t0AcmHS0vSajWt35ZBGpKg5wso8EqPewBvEP8+8UQkL9zVyP0ixr45+qhz5I0h02B//qe+s687c+7q++siFbVEY41dCbz5aeoQOS8xG8GACdDlLxke5j1w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iPPVb1Z/5lQGck2N/JEfzyRg1bfeLV6ckiNRSpSgnl8=;
+ b=jmbuHZUtaibEvFj2FUrUJA3j6SW+HFnZX/aO/f5tzxUSSowRrtQLUb0apwZQOL9VEgSeb+RgnhIt0Q8lbWTFihwcTqtdFeD5K2cGYJjeuK/B9qceJfkCz7YyqaBlKKwPg9FqWe92ZOyrQjeEvCYETVh365csi3aMSSOFuKVO9nULA0Z+GCGjvuQoQcuDT5sK3pNkqXO25wAdP+bLWJVFoYdj6NFpgRj8BJLOok3lmyCz4uH74fvS5ksj/EdY5KctToYTa/emBCngjY/Pk3yazxwLICKuntO9TuM+WbkxrUFJJ5EXeYRXH62Zuy7/DKS9z7uuY4wPf6jxabNElwN78w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iPPVb1Z/5lQGck2N/JEfzyRg1bfeLV6ckiNRSpSgnl8=;
+ b=as2yB3xFBdKf8s6RCL2czCTJAuzPcu1bKY8OHpl7B+pTnydnfcWTKx0pX0PzQYy1OkMp1x75t9pN/bMlb441af+SH/Sl9BhSJmRXhOsJhpQmnUVdrTmZaLx4S+ZaadU1cAHXVGx24lUkASoVy3RUFOvSqImW2w5Vzdi8vmmVEpIaFp3eHHioVCpbmZSfvvDGI1UXd4g48p3l1vOsmaqijouV1EhZ9XREXKga/ufuPHudUciG/22OgQevRLk8hDExpOLM9UmE91R9gwjqKpvtTH775++bGU0MBxfsjW1sxKFCzNk1lUbmMTY5y1S7s3dpmN5h2dSCBuS0DiKSpkO9OA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BL1PR12MB5318.namprd12.prod.outlook.com (2603:10b6:208:31d::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.15; Wed, 23 Nov
+ 2022 13:03:12 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5834.015; Wed, 23 Nov 2022
+ 13:03:12 +0000
+Date:   Wed, 23 Nov 2022 09:03:11 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Joerg Roedel <joro@8bytes.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Anthony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Yang, Lixiao" <lixiao.yang@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v5 15/19] iommufd: vfio container FD ioctl compatibility
+Message-ID: <Y34aD4TheDlxTGbt@nvidia.com>
+References: <0-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com>
+ <15-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com>
+ <BN9PR11MB5276B0219008568A30F5A4738C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y3ejMSTWvJuELQ7K@nvidia.com>
+ <BN9PR11MB5276939555C1460EFBFD15A68C0C9@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB5276939555C1460EFBFD15A68C0C9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL1PR13CA0073.namprd13.prod.outlook.com
+ (2603:10b6:208:2b8::18) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Ka7sFnv4pWgyM00-IxyK6p_TG9Gp0xPe
-X-Proofpoint-ORIG-GUID: 0E2yiOZXOfbiDzBZzj0jfRBbQzh-u_Hl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-23_06,2022-11-23_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- mlxlogscore=971 adultscore=0 lowpriorityscore=0 priorityscore=1501
- impostorscore=0 spamscore=0 clxscore=1015 bulkscore=0 malwarescore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211230097
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5318:EE_
+X-MS-Office365-Filtering-Correlation-Id: e4ee93a2-e996-43ac-2fe9-08dacd5313db
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: MFH4AnygVw5yE/Io7Dnr4TBJvziIgYJfMz+iujpfZrhsi+D2jP9QuPVidkxDnLAWtDSOhEpZfXb0+MFKvkVcKELBx4SxorPhj8q77LdIpJ4ADi4SH4IpZ9zHGbTSMNHKEidpOowHLpSvYzzP6USOPsFAO/Cp3tc3qIB0sdggnTb1V9Ku6COafqlXe4dnld1fM4eHwo58Z9IQbiVNa0HeZf52O5C5ZRKD2KztI0N8mLLI9mFqefTyMvJq4f1zDZSYsa61cqs8Frnv/SPPIKvJniTYPRa796Cp5zQ27G3G/X50FdYqX8fw8K5eaqaramc8YdiKFp4PooDDAxv+CsueqTIegpyZM85nn2WWBkLW8SD6Xkh08UuFVtBZwA3zogwbnGy9hNM2jZi8gmdoNpho9+Yd64+RXsRnRSLrOtL9ZkO3QClJim8HIJIxBgSpPAu/+IMhVKOclddVGShiFCtpoNeHUhILGrMOOgDPCb+bvxxdKnw332nyPbrHZgCs7ZSoG2TypTgpL+kUt30bBqhzN5YCMsff42TnJemeUrRYW2Z22yiP89xdV3F5sgBvFrHdFubNbDPTfhfmJkZplVmtXeG/7+IdK9CWxIRyqMClhEDg4N30Sr2XuKri8rczeciCQcVQujNHyT40oZ6pJTfg5rgjxVp80kXPetVtHVs8SHf3F6SAlD2eBhWYD9lDP9HD
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(376002)(366004)(346002)(396003)(39860400002)(451199015)(8936002)(5660300002)(4326008)(66476007)(7416002)(66946007)(66556008)(7406005)(86362001)(41300700001)(8676002)(54906003)(6916009)(26005)(2616005)(2906002)(6486002)(186003)(36756003)(38100700002)(478600001)(6512007)(6506007)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Dr9jLZyfCfytEXDf60LaFBBsUzad0cKB+hS5KWNxnoWzmCtfiJmGgOe2sS3z?=
+ =?us-ascii?Q?jgwDqxCeL+gtPaWGQK414z/N4pMkHCs8LQKsSezNkgcuLb4swkpMI7wGjd51?=
+ =?us-ascii?Q?M0aTJOUeJ/eNFJ0e9J7Mf563ORZh6wnNXn5vf6+qj0EfXznhbqc84XXl2pWU?=
+ =?us-ascii?Q?CqYq0rjKEgV8+hfWQAauOFB/I9PaOTSKgyEY+WSShv5FjuIEVEXQYGcZlcAG?=
+ =?us-ascii?Q?0WZuF5P/lP50+zTsjlnj4wtb0gk5XTsTHlIEPiMsuS+NNSGCxn0m83PBjKg4?=
+ =?us-ascii?Q?fHl2Vd4ye77OkCRNupUC6k+UgVSqINOykD0MkcHm0U5iKggQirthawcVau9y?=
+ =?us-ascii?Q?8eKBnhyGQfd5zm0pd5W6P53CyKZUromxx9PSaaGnMOBfLvx6SgTjl5sWo6Cy?=
+ =?us-ascii?Q?fXTuHs7l0P28SAyvWdE7vdVZkIWVjOz+pYiQ58PdyYjZmrPGILUg6tUH37dh?=
+ =?us-ascii?Q?T67qKfHbQD2ely+ennPRT1M4vIGJxklmBKvOKAw07IEtErxN7k2YTNv/HAR9?=
+ =?us-ascii?Q?MHlKDoQQbd2Mcnd7bt9Zi82khnCX9Aq9UQvTvoswvFFKDJAIK32c0w1MUu1c?=
+ =?us-ascii?Q?GCWem+GTrAGKaby6c3ulT4ORsIa68y0wfNKNrn/7sALIlCiRt3jmY31uWab+?=
+ =?us-ascii?Q?SauQbk3qy5U+kqa3K6dhbkPIQwtIAqHr/F0MvF3Xa86lXOwWC3+9ZQeuj+Bd?=
+ =?us-ascii?Q?a5MN/TMBan8H/IP09fjpoDMVvNvCno/7GqG2GBnckeDAF5LCOH6jupoSioVA?=
+ =?us-ascii?Q?jlQyt19BN64WHJGE7wdO3rLFuwZVY6cRzROrBLPOzM8oNV5oGNV0bVGGiiaf?=
+ =?us-ascii?Q?pzDDniEWdMmpnb+G9MnTTh8LDx8lxyISmjSbcXVRhGh6wv/+4HQsfTK0NHXk?=
+ =?us-ascii?Q?7KPacHb8FTUngn5zveGI3BpccpoV2qm9lu1Zx2bwNl4zPk7Rl2ZRKsz7TtQA?=
+ =?us-ascii?Q?PcVYuw1unxv/6LDnrEelDoJpaZ8ntaehFcKWXuSDKoi8U/oEyE8+PcN1CTRP?=
+ =?us-ascii?Q?cXekM3yX8O1u40mdzoU92nS/goUNOUKqYmJfKtELZvDA0hd/hrH0gYpArCn6?=
+ =?us-ascii?Q?GLYmXrPhy8+2aZ67/72BxLjeAt8j0PKSlctm7PkQvsIYc3uIMwHPjgqqLT0o?=
+ =?us-ascii?Q?K4j6sAd0baOlRHMoLUpL9lF+OJUJ8IC+UEoUA0PjXgcut8k2hmLBhx1RuOkn?=
+ =?us-ascii?Q?f0Y84SjUuA2E9ZGqa8f33CCwbGOmu4S+EKoQaNAUsP+UMGlcP6F4XSHyjVWM?=
+ =?us-ascii?Q?Sx9jTRvkkdROBNzvTpzJ20GSpoeItJIAcKEo6A0qeHVFPM38ohCoJnPmxS8S?=
+ =?us-ascii?Q?+2Y7K6/fb3CBNet9vSnu4xQtOryVJdcbMbYfRroQ8JUsLIdUyomwAwxGwl60?=
+ =?us-ascii?Q?+pPxKaCad+Dlxd0pM25+BievpvVT2WlrCoYoY7dX957yQaZ4dgZ83NsWCFPT?=
+ =?us-ascii?Q?xSTrvg2vYySOwD66bvEEB8xVVgyWH8y02xfE2RdSwyNgcNvLsLksP64lnlnP?=
+ =?us-ascii?Q?qF0Vb4qHLGMC9UR9jKLmKjykbtsckIWjw7PHzWK54f9hH++Q2HBf3gp+OtPY?=
+ =?us-ascii?Q?dSt/1+7dUuJCmrpjEnI=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e4ee93a2-e996-43ac-2fe9-08dacd5313db
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Nov 2022 13:03:12.7488
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WG6MA2rPfh3hY2c1yHCUcSq9pmHouf7RtgsXolU3coKFj9vFY+Z/FlUHeQ0eOJWq
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5318
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Nov 2022 08:46:56 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> When we leave SIE due to an exception, we'll still have guest values
-> in registers 0 - 13 and that's not clearly portraied in our debug
-> prints. So let's fix that.
-
-wouldn't it be cleaner to restore the registers in the interrupt
-handler? (I thought we were already doing it)
-
+On Wed, Nov 23, 2022 at 01:33:22AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Friday, November 18, 2022 11:22 PM
+> > 
+> > On Fri, Nov 18, 2022 at 02:58:49AM +0000, Tian, Kevin wrote:
+> > > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > > Sent: Thursday, November 17, 2022 5:01 AM
+> > > > index ca28a135b9675f..2fdff04000b326 100644
+> > > > --- a/drivers/iommu/iommufd/Makefile
+> > > > +++ b/drivers/iommu/iommufd/Makefile
+> > > > @@ -5,6 +5,7 @@ iommufd-y := \
+> > > >  	io_pagetable.o \
+> > > >  	ioas.o \
+> > > >  	main.o \
+> > > > -	pages.o
+> > > > +	pages.o \
+> > > > +	vfio_compat.o
+> > > >
+> > >
+> > > move vfio_compat out of core? it's not required if VFIO
+> > > is not configured.
+> > 
+> > We can, but I don't know if we should. Compat ioctls are part of
+> > /dev/iommu, and technically have nothing to do with VFIO. A native
+> > iommufd application using VDPA could use them, if it wanted, for
+> > instance.
+> > 
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  lib/s390x/interrupt.c | 46 ++++++++++++++++++++++++++++++++++++++-----
->  lib/s390x/sie.h       |  2 ++
->  s390x/cpu.S           |  6 ++++--
->  3 files changed, 47 insertions(+), 7 deletions(-)
-> 
-> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-> index dadb7415..ff47c2c2 100644
-> --- a/lib/s390x/interrupt.c
-> +++ b/lib/s390x/interrupt.c
-> @@ -9,6 +9,7 @@
->   */
->  #include <libcflat.h>
->  #include <asm/barrier.h>
-> +#include <asm/asm-offsets.h>
->  #include <sclp.h>
->  #include <interrupt.h>
->  #include <sie.h>
-> @@ -188,9 +189,12 @@ static void print_storage_exception_information(void)
->  	}
->  }
->  
-> -static void print_int_regs(struct stack_frame_int *stack)
-> +static void print_int_regs(struct stack_frame_int *stack, bool sie)
->  {
-> +	struct kvm_s390_sie_block *sblk;
-> +
->  	printf("\n");
-> +	printf("%s\n", sie ? "Guest registers:" : "Host registers:");
->  	printf("GPRS:\n");
->  	printf("%016lx %016lx %016lx %016lx\n",
->  	       stack->grs1[0], stack->grs1[1], stack->grs0[0], stack->grs0[1]);
-> @@ -198,24 +202,56 @@ static void print_int_regs(struct stack_frame_int *stack)
->  	       stack->grs0[2], stack->grs0[3], stack->grs0[4], stack->grs0[5]);
->  	printf("%016lx %016lx %016lx %016lx\n",
->  	       stack->grs0[6], stack->grs0[7], stack->grs0[8], stack->grs0[9]);
-> -	printf("%016lx %016lx %016lx %016lx\n",
-> -	       stack->grs0[10], stack->grs0[11], stack->grs0[12], stack->grs0[13]);
-> +
-> +	if (sie) {
-> +		sblk = (struct kvm_s390_sie_block *)stack->grs0[12];
-> +		printf("%016lx %016lx %016lx %016lx\n",
-> +		       stack->grs0[10], stack->grs0[11], sblk->gg14, sblk->gg15);
-> +	} else {
-> +		printf("%016lx %016lx %016lx %016lx\n",
-> +		       stack->grs0[10], stack->grs0[11], stack->grs0[12], stack->grs0[13]);
-> +	}
-> +
->  	printf("\n");
->  }
->  
->  static void print_pgm_info(struct stack_frame_int *stack)
->  
->  {
-> -	bool in_sie;
-> +	bool in_sie, in_sie_gregs;
-> +	struct vm_save_area *vregs;
->  
->  	in_sie = (lowcore.pgm_old_psw.addr >= (uintptr_t)sie_entry &&
->  		  lowcore.pgm_old_psw.addr <= (uintptr_t)sie_exit);
-> +	in_sie_gregs = (lowcore.pgm_old_psw.addr >= (uintptr_t)sie_entry_gregs &&
-> +			lowcore.pgm_old_psw.addr <= (uintptr_t)sie_exit_gregs);
->  
->  	printf("\n");
->  	printf("Unexpected program interrupt %s: %#x on cpu %d at %#lx, ilen %d\n",
->  	       in_sie ? "in SIE" : "",
->  	       lowcore.pgm_int_code, stap(), lowcore.pgm_old_psw.addr, lowcore.pgm_int_id);
-> -	print_int_regs(stack);
-> +
-> +	/*
-> +	 * If we fall out of SIE before loading the host registers,
-> +	 * then we need to do it here so we print the host registers
-> +	 * and not the guest registers.
-> +	 *
-> +	 * Back tracing is actually not a problem since SIE restores gr15.
-> +	 */
-> +	if (in_sie_gregs) {
-> +		print_int_regs(stack, true);
-> +		vregs = *((struct vm_save_area **)(stack->grs0[13] + __SF_SIE_SAVEAREA));
-> +
-> +		/*
-> +		 * The grs are not linear on the interrupt stack frame.
-> +		 * We copy 0 and 1 here and 2 - 15 with the memcopy below.
-> +		 */
-> +		stack->grs1[0] = vregs->host.grs[0];
-> +		stack->grs1[1] = vregs->host.grs[1];
-> +		/*  2 - 15 */
-> +		memcpy(stack->grs0, &vregs->host.grs[2], sizeof(stack->grs0) - 8);
-> +	}
-> +	print_int_regs(stack, false);
->  	dump_stack();
->  
->  	/* Dump stack doesn't end with a \n so we add it here instead */
-> diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
-> index a27a8401..147cb0f2 100644
-> --- a/lib/s390x/sie.h
-> +++ b/lib/s390x/sie.h
-> @@ -273,6 +273,8 @@ struct vm {
->  
->  extern void sie_entry(void);
->  extern void sie_exit(void);
-> +extern void sie_entry_gregs(void);
-> +extern void sie_exit_gregs(void);
->  extern void sie64a(struct kvm_s390_sie_block *sblk, struct vm_save_area *save_area);
->  void sie(struct vm *vm);
->  void sie_expect_validity(struct vm *vm);
-> diff --git a/s390x/cpu.S b/s390x/cpu.S
-> index 45bd551a..9155b044 100644
-> --- a/s390x/cpu.S
-> +++ b/s390x/cpu.S
-> @@ -82,7 +82,8 @@ sie64a:
->  	# Store scb and save_area pointer into stack frame
->  	stg	%r2,__SF_SIE_CONTROL(%r15)	# save control block pointer
->  	stg	%r3,__SF_SIE_SAVEAREA(%r15)	# save guest register save area
-> -
-> +.globl sie_entry_gregs
-> +sie_entry_gregs:
->  	# Load guest's gprs, fprs and fpc
->  	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
->  	ld	\i, \i * 8 + SIE_SAVEAREA_GUEST_FPRS(%r3)
-> @@ -121,7 +122,8 @@ sie_exit:
->  	.endr
->  	lfpc	SIE_SAVEAREA_HOST_FPC(%r14)
->  	lmg	%r0,%r14,SIE_SAVEAREA_HOST_GRS(%r14)	# restore kernel registers
-> -
-> +.globl sie_exit_gregs
-> +sie_exit_gregs:
->  	br	%r14
->  
->  	.align	8
+> I'm not sure whether that requires further VDPA support. Be safe
+> I'd like VDPA to explicitly select vfio_compact when that new
+> mixed scheme is supported. 
 
+It doesn't make any sense. The ioctls provided by the "vfio container"
+FD are entirely up to IOMMUFD, it doesn't matter what the consuming
+subsystem is. Just think of them as alternatives to the existing
+map/unmap iommfd provides in its native mode.
+
+If you want to disable them is a decision that is driven more by
+eliminating the code from the kernel because you know your userspace
+doesn't use those ioctls - which has nothing to do if vfio is compiled
+in or not.
+
+Jason
