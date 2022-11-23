@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4CB7636E8E
-	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 00:49:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28041636E9F
+	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 00:57:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230024AbiKWXtD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 18:49:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51010 "EHLO
+        id S230046AbiKWX47 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 18:56:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229705AbiKWXtC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 18:49:02 -0500
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C80FB8C087
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 15:49:01 -0800 (PST)
-Received: by mail-il1-x132.google.com with SMTP id z9so130307ilu.10
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 15:49:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=7JFW255EPBk3XgoKAwrFF/RCi7p1HqnpoL0o2suN9TM=;
-        b=UXpz66Offu6F+6lvEB6xZs7G1T+pM1GkvWQ7Pz8qEyodOVUDfUUQgOsD8zfT1OpjNm
-         q2414zaZglwJCKHWEc+YkndFvyVbboZKmJk5rqLc6bwbP6LN9Tz6s2y5XMfvIvfcjFZB
-         z9rBoPggoL2O40DTrYhxRXIgUe0wZ9zclCPAmRkQwLLzq3LG511/EQ2Vk2jATygUMhxo
-         Z1Zhvgp1D6cybzF9vUxgOsQPwgptha48KZAaZeSq1AkPxvWH4TAKIz0hB5zSNvo/1/0s
-         v4d6vZJVYnp83I8x1tPj6DtKCFcoHupd4mxBae6EHLhG3SETvvDIvgJuGM/fIy+jw9/D
-         VK+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7JFW255EPBk3XgoKAwrFF/RCi7p1HqnpoL0o2suN9TM=;
-        b=60apTgH+vHaluMD+OtFx6d+FcBfvBHOmg9sUasyQ2HQ8VHRTBvdT9js1+S7zcDxBGK
-         L72bMo0Q5td3lMN2I4PUPdu0QguVFq7ZIdMVqXpJ+ZSMtz4ZblghnnOcLzR0DktE/Dwq
-         MbywgFafkcRYrW+flfU2OOdR7JHhNoBFzMhuZs8Hg60H1d8IfSD4GMHS8SkevK4VGHpO
-         GxUBRdyhuHO1cFJ+AJNOFKP5R7DPXdpqIEU0F9NXf+Nj7P5+bgQVL/eNo0PpcyO3QEkW
-         0NGOgUAn3QrZEuNtlRhfZZ9Aj3WhmFjbI4XZwcWMomyCbH9F8uCIPuWmphyWkkMgKQk2
-         QD4w==
-X-Gm-Message-State: ANoB5plDZaq6853DcrhQbHhUVd4etRhaYwktjUi5eYg5Zhh0tdiSCvao
-        g3ZC2Rozb93YXwhcZL0qYgy9CodEA0hL13Im8LgIXw==
-X-Google-Smtp-Source: AA0mqf4H5Hu6MoVtZ/9VryRm/tLmXKgMiDvJ6XVLoYBHd30pzB9UGhSvKBHQfn7j21NS8opxa42dABr+hsZT6b+k6cw=
-X-Received: by 2002:a92:dc8b:0:b0:302:4c01:2d2b with SMTP id
- c11-20020a92dc8b000000b003024c012d2bmr4364530iln.2.1669247341082; Wed, 23 Nov
- 2022 15:49:01 -0800 (PST)
+        with ESMTP id S229531AbiKWX46 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 18:56:58 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F276E0DD1;
+        Wed, 23 Nov 2022 15:56:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669247817; x=1700783817;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=CFET33j4BltTpLTUFtSwfx+NssCIekeUgbWNJ9vumtw=;
+  b=E8ehgS6Wjk0PpCjkLwru++CM/f3fulhEm5nFKTa+0Cg/GPG3D7rW5cVt
+   2efZgejOp4L44ACKLRFFyNOtm2lbvToGdfwc1B1lRQAO6wUKouvhtLcSF
+   EimtuLDdXNdIJc2FiX2gG+/uiI0bw0/rDfZidXPaXLZJ7ktwBAcceljgV
+   N3Gk6F6/xYnqdQIrnoqOmWCilxYaVC9XVLRoT+l3WaydLf3VP9ZbLl9/I
+   nc6LpT8HcLfNUvxHqR6sABO23LTticXbzKoVIIcMOGm9Hdv3/O8dL4yiv
+   rsZ7FeBm8A7FpnYTUxghX1otGY/qsouOrZUPL3SkSjx0y+STNUgT44hI4
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="314216023"
+X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
+   d="scan'208";a="314216023"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 15:56:57 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="747991633"
+X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
+   d="scan'208";a="747991633"
+Received: from vcbudden-mobl3.amr.corp.intel.com (HELO [10.212.129.67]) ([10.212.129.67])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 15:56:55 -0800
+Message-ID: <301184ce-05e5-871c-7a6c-4298a0cbd1ae@intel.com>
+Date:   Wed, 23 Nov 2022 15:56:54 -0800
 MIME-Version: 1.0
-References: <20221123231206.274392-1-mizhang@google.com> <Y36qNDBxlOslo7no@google.com>
-In-Reply-To: <Y36qNDBxlOslo7no@google.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Wed, 23 Nov 2022 15:48:50 -0800
-Message-ID: <CAL715WKymGc60gLHT9_g+RDs3TgSBCZqdZJD0D3Z=ZrCgH05nA@mail.gmail.com>
-Subject: Re: [RFC PATCH] KVM: x86/mmu: replace BUG() with KVM_BUG() in shadow mmu
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Nagareddy Reddy <nspreddy@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v7 16/20] x86/virt/tdx: Configure TDX module with TDMRs
+ and global KeyID
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
+        kirill.shutemov@linux.intel.com, ying.huang@intel.com,
+        reinette.chatre@intel.com, len.brown@intel.com,
+        tony.luck@intel.com, peterz@infradead.org, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+References: <cover.1668988357.git.kai.huang@intel.com>
+ <344234642a5eb9dc1aa34410f641f596ec428ea5.1668988357.git.kai.huang@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <344234642a5eb9dc1aa34410f641f596ec428ea5.1668988357.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,25 +71,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 3:18 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Nov 23, 2022, Mingwei Zhang wrote:
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 4736d7849c60..075d31b0db9c 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -955,12 +955,12 @@ static void pte_list_remove(u64 *spte, struct kvm_rmap_head *rmap_head)
-> >
-> >       if (!rmap_head->val) {
-> >               pr_err("%s: %p 0->BUG\n", __func__, spte);
-> > -             BUG();
-> > +             KVM_BUG();
->
-> This won't compile.  KVM_BUG() isn't a direct replacement for BUG(), it's more
-> akin to WARN().
->
-> And that's why I suggested this be RFC: @kvm needs to be plumbed down here in order
-> to use KVM_BUG().  I don't mind that too much, it's just a little unfortunate.
+On 11/20/22 16:26, Kai Huang wrote:
+> After the TDX-usable memory regions are constructed in an array of TDMRs
+> and the global KeyID is reserved, configure them to the TDX module using
+> TDH.SYS.CONFIG SEAMCALL.  TDH.SYS.CONFIG can only be called once and can
+> be done on any logical cpu.
+> 
+> Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+>  arch/x86/virt/vmx/tdx/tdx.c | 37 +++++++++++++++++++++++++++++++++++++
+>  arch/x86/virt/vmx/tdx/tdx.h |  2 ++
+>  2 files changed, 39 insertions(+)
+> 
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index e2cbeeb7f0dc..3a032930e58a 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -979,6 +979,37 @@ static int construct_tdmrs(struct tdmr_info *tdmr_array, int *tdmr_num)
+>  	return ret;
+>  }
+>  
+> +static int config_tdx_module(struct tdmr_info *tdmr_array, int tdmr_num,
+> +			     u64 global_keyid)
+> +{
+> +	u64 *tdmr_pa_array;
+> +	int i, array_sz;
+> +	u64 ret;
+> +
+> +	/*
+> +	 * TDMR_INFO entries are configured to the TDX module via an
+> +	 * array of the physical address of each TDMR_INFO.  TDX module
+> +	 * requires the array itself to be 512-byte aligned.  Round up
+> +	 * the array size to 512-byte aligned so the buffer allocated
+> +	 * by kzalloc() will meet the alignment requirement.
+> +	 */
 
-I wonder if using kvm_get_running_vcpu()->kvm is safe here? Assuming
-we can, then @kvm plumbing shouldn't be a problem.
+Aagh.  Return of (a different) 512-byte aligned structure.
+
+> +	array_sz = ALIGN(tdmr_num * sizeof(u64), TDMR_INFO_PA_ARRAY_ALIGNMENT);
+> +	tdmr_pa_array = kzalloc(array_sz, GFP_KERNEL);
+
+Just to be clear, all that chatter about alignment is because the
+*START* of the array has to be aligned.  Right?  I see alignment for
+'array_sz', but that's not the start of the array.
+
+tdmr_pa_array is the start of the array.  Where is *THAT* aligned?
+
+How does rounding up the size make kzalloc() magically know how to align
+the *START* of the allocation?
+
+Because I'm actually questioning my own sanity at this point, I went and
+double-checked the docs (Documentation/core-api/memory-allocation.rst):
+
+> The address of a chunk allocated with `kmalloc` is aligned to at least
+> ARCH_KMALLOC_MINALIGN bytes.  For sizes which are a power of two, the
+> alignment is also guaranteed to be at least the respective size.
+
+Hint #1: ARCH_KMALLOC_MINALIGN is way less than 512.
+Hint #2: tdmr_num is not guaranteed to be a power of two.
+Hint #3: Comments don't actually affect the allocation
+
+<snip>
