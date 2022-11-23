@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 544CD63629D
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 16:01:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA10863629E
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 16:01:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236147AbiKWPBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 10:01:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35294 "EHLO
+        id S237136AbiKWPBp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 10:01:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236424AbiKWPBm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S236736AbiKWPBm (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 23 Nov 2022 10:01:42 -0500
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6209927DD5
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 07:01:41 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B18E23168
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 07:01:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669215701; x=1700751701;
+  t=1669215702; x=1700751702;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=HLSmZ52KFOm/uxYU2tK2+8QrtyaMvwoRAe/xLc44es4=;
-  b=BlerCjyIQAY1x0zVOYp6iCADg0QiIZWOF0E/zBBcSsdRrvzmuBb6ChzE
-   UpBUB5pYo6Z3BUzauY3kabEeVVQP9Bhwy/BQINn3DGVIY8wyIZNIbVYiR
-   RRY8j5n2cRBvAU0KA0lZzTzOdj1FaU+NLmBYt9C7pPTAybsCZlRXhfFvZ
-   Oijf7BkDJdZE2oi2oKEF/72MKItVfN6kfNxgyNGLQkL8/4uXDOOiOq0yq
-   xGXCJDYipN6X9rE50PM3tzuRSNVLoM9fhnDJ7fSHIBsZ3kbLCJigs2EtH
-   raMHhWbE98IBLLtLYTh/xYYwSjXEkovGnEkH8hiU8MhfH3H0EbsIntRjq
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="301642929"
+  bh=/4NqrCmiQnItIOE9y3mIIwqfr6MTi/GnS27F2G38uAc=;
+  b=edBhqesLZ4Sb9jamRAJCnXEyzuNYJJyfaMSkBTPJwr2/0tBj8E67Se/Q
+   6Res5nRxkkLTUyT5wQVjQ/JyV9zfHTP3jUYKzQ+GNMUEx0b9K2Bfh5iAG
+   LqPAEKDdm8OwQrZgYwzDSeLFGHkRJ0Rr0G0gGpkKqzprbkUATeapWvvjg
+   eenVXBw0AA0FDphf7SxywgLDqM8ECPIQTrNcS6kRwTCfKztQn9Mddu4eE
+   hFEZwVLMAvKEMeZ+NWcAN7mXFJBMZeW8TD4kMRUdTwjWW4PCZKEcEXX8/
+   FEq7ELJLsYyze8sGW9tZiPbSV7cbZKq88xvTVTsCAzcLTGuJ/X3W5ec5x
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="301642939"
 X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
-   d="scan'208";a="301642929"
+   d="scan'208";a="301642939"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 07:01:17 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 07:01:18 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="674750880"
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="674750886"
 X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
-   d="scan'208";a="674750880"
+   d="scan'208";a="674750886"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by orsmga001.jf.intel.com with ESMTP; 23 Nov 2022 07:01:17 -0800
+  by orsmga001.jf.intel.com with ESMTP; 23 Nov 2022 07:01:18 -0800
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com
 Cc:     kevin.tian@intel.com, eric.auger@redhat.com, cohuck@redhat.com,
         nicolinc@nvidia.com, yi.y.sun@linux.intel.com,
         chao.p.peng@linux.intel.com, mjrosato@linux.ibm.com,
         kvm@vger.kernel.org, yi.l.liu@intel.com
-Subject: [RFC 02/10] vfio: Move the sanity check of the group to vfio_create_group()
-Date:   Wed, 23 Nov 2022 07:01:05 -0800
-Message-Id: <20221123150113.670399-3-yi.l.liu@intel.com>
+Subject: [RFC 03/10] vfio: Wrap group codes to be helpers for __vfio_register_dev() and unregister
+Date:   Wed, 23 Nov 2022 07:01:06 -0800
+Message-Id: <20221123150113.670399-4-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221123150113.670399-1-yi.l.liu@intel.com>
 References: <20221123150113.670399-1-yi.l.liu@intel.com>
@@ -62,142 +62,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jason Gunthorpe <jgg@nvidia.com>
+This avoids to decode group fields in the common functions used by
+vfio_device registration, and prepares for further moving vfio group
+specific code into separate file.
 
-This avoids opening group specific code in __vfio_register_dev() for the
-sanity check if an (existing) group is not corrupted by having two copies
-of the same struct device in it. It also simplifies the error unwind for
-this sanity check since the failure can be detected in the group allocation.
-
-This also prepares for moving the group specific code into separate group.c.
-
-Grabbed from:
-https://lore.kernel.org/kvm/20220922152338.2a2238fe.alex.williamson@redhat.com/
-
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/vfio/vfio_main.c | 62 ++++++++++++++++------------------------
- 1 file changed, 25 insertions(+), 37 deletions(-)
+ drivers/vfio/vfio_main.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 02f344441ddf..bd45b8907311 100644
+index bd45b8907311..f4af3afcb26f 100644
 --- a/drivers/vfio/vfio_main.c
 +++ b/drivers/vfio/vfio_main.c
-@@ -146,7 +146,7 @@ EXPORT_SYMBOL_GPL(vfio_device_set_open_count);
-  * Group objects - create, release, get, put, search
-  */
- static struct vfio_group *
--vfio_group_get_from_iommu(struct iommu_group *iommu_group)
-+vfio_group_find_from_iommu(struct iommu_group *iommu_group)
- {
- 	struct vfio_group *group;
- 
-@@ -157,10 +157,8 @@ vfio_group_get_from_iommu(struct iommu_group *iommu_group)
- 	 * under the vfio.group_lock.
- 	 */
- 	list_for_each_entry(group, &vfio.group_list, vfio_next) {
--		if (group->iommu_group == iommu_group) {
--			refcount_inc(&group->drivers);
-+		if (group->iommu_group == iommu_group)
- 			return group;
--		}
- 	}
- 	return NULL;
- }
-@@ -310,23 +308,6 @@ static bool vfio_device_try_get_registration(struct vfio_device *device)
- 	return refcount_inc_not_zero(&device->refcount);
+@@ -517,6 +517,20 @@ static struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
+ 	return group;
  }
  
--static struct vfio_device *vfio_group_get_device(struct vfio_group *group,
--						 struct device *dev)
--{
--	struct vfio_device *device;
--
--	mutex_lock(&group->device_lock);
--	list_for_each_entry(device, &group->device_list, group_next) {
--		if (device->dev == dev &&
--		    vfio_device_try_get_registration(device)) {
--			mutex_unlock(&group->device_lock);
--			return device;
--		}
--	}
--	mutex_unlock(&group->device_lock);
--	return NULL;
--}
--
- /*
-  * VFIO driver API
-  */
-@@ -470,6 +451,21 @@ static struct vfio_group *vfio_noiommu_group_alloc(struct device *dev,
- 	return ERR_PTR(ret);
- }
- 
-+static bool vfio_group_has_device(struct vfio_group *group, struct device *dev)
++static void vfio_device_group_register(struct vfio_device *device)
 +{
-+	struct vfio_device *device;
-+
-+	mutex_lock(&group->device_lock);
-+	list_for_each_entry(device, &group->device_list, group_next) {
-+		if (device->dev == dev) {
-+			mutex_unlock(&group->device_lock);
-+			return true;
-+		}
-+	}
-+	mutex_unlock(&group->device_lock);
-+	return false;
++	mutex_lock(&device->group->device_lock);
++	list_add(&device->group_next, &device->group->device_list);
++	mutex_unlock(&device->group->device_lock);
 +}
 +
- static struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
- {
- 	struct iommu_group *iommu_group;
-@@ -505,9 +501,15 @@ static struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
- 	}
- 
- 	mutex_lock(&vfio.group_lock);
--	group = vfio_group_get_from_iommu(iommu_group);
--	if (!group)
-+	group = vfio_group_find_from_iommu(iommu_group);
-+	if (group) {
-+		if (WARN_ON(vfio_group_has_device(group, dev)))
-+			group = ERR_PTR(-EINVAL);
-+		else
-+			refcount_inc(&group->drivers);
-+	} else {
- 		group = vfio_create_group(iommu_group, VFIO_IOMMU);
-+	}
- 	mutex_unlock(&vfio.group_lock);
- 
- 	/* The vfio_group holds a reference to the iommu_group */
-@@ -518,7 +520,6 @@ static struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
++static void vfio_device_group_unregister(struct vfio_device *device)
++{
++	mutex_lock(&device->group->device_lock);
++	list_del(&device->group_next);
++	mutex_unlock(&device->group->device_lock);
++}
++
  static int __vfio_register_dev(struct vfio_device *device,
  		struct vfio_group *group)
  {
--	struct vfio_device *existing_device;
- 	int ret;
+@@ -555,9 +569,7 @@ static int __vfio_register_dev(struct vfio_device *device,
+ 	/* Refcounting can't start until the driver calls register */
+ 	refcount_set(&device->refcount, 1);
  
- 	/*
-@@ -540,19 +541,6 @@ static int __vfio_register_dev(struct vfio_device *device,
- 	if (!device->dev_set)
- 		vfio_assign_device_set(device, device);
+-	mutex_lock(&group->device_lock);
+-	list_add(&device->group_next, &group->device_list);
+-	mutex_unlock(&group->device_lock);
++	vfio_device_group_register(device);
  
--	existing_device = vfio_group_get_device(group, device->dev);
--	if (existing_device) {
--		/*
--		 * group->iommu_group is non-NULL because we hold the drivers
--		 * refcount.
--		 */
--		dev_WARN(device->dev, "Device already exists on group %d\n",
--			 iommu_group_id(group->iommu_group));
--		vfio_device_put_registration(existing_device);
--		ret = -EBUSY;
--		goto err_out;
--	}
--
- 	/* Our reference on group is moved to the device */
- 	device->group = group;
+ 	return 0;
+ err_out:
+@@ -617,7 +629,6 @@ static struct vfio_device *vfio_device_get_from_name(struct vfio_group *group,
+  * removed.  Open file descriptors for the device... */
+ void vfio_unregister_group_dev(struct vfio_device *device)
+ {
+-	struct vfio_group *group = device->group;
+ 	unsigned int i = 0;
+ 	bool interrupted = false;
+ 	long rc;
+@@ -645,9 +656,7 @@ void vfio_unregister_group_dev(struct vfio_device *device)
+ 		}
+ 	}
  
+-	mutex_lock(&group->device_lock);
+-	list_del(&device->group_next);
+-	mutex_unlock(&group->device_lock);
++	vfio_device_group_unregister(device);
+ 
+ 	/* Balances device_add in register path */
+ 	device_del(&device->device);
 -- 
 2.34.1
 
