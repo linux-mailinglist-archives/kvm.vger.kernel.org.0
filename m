@@ -2,107 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DB26634BFE
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 02:04:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 75F9E634C04
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 02:07:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235400AbiKWBEb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Nov 2022 20:04:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40844 "EHLO
+        id S235393AbiKWBHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Nov 2022 20:07:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235382AbiKWBEa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Nov 2022 20:04:30 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A793D59176;
-        Tue, 22 Nov 2022 17:04:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669165469; x=1700701469;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=xIkQj2jeU/8NPzjK+TPyInzQOmljcCdXkpyBV4P2W8Y=;
-  b=Ywz/kTK8EEqg32c1KFzfSnPriSnVP79vVZjU3iC6iRs0hfGVZ9kkBkQd
-   7OloZ84gMkGXsEoWHS7DVcZsgXXxLIn2wp4NJVg9sh/l/k0kuuCj8ilkv
-   BEiAm4707Edf3izatOnKbwY3hVOVomS4HZphwytraiURmDt+sOqhihYLt
-   85rFlUnxfkWqV+xUmILVyTR3iwnL3vYWH2Pd9RzBAHvk75cFYEExxTybB
-   bC1WgFQaYPkXK3gNMK2r56+kKOE6tJxKFo5xX1Mw7ll8WneN5USVy4aBB
-   bXv+9goz7z3qKD2A9f2kkfaK4lsXkX1SOzL598v5+/Mz6T4KjjPkzDo5C
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="315773032"
-X-IronPort-AV: E=Sophos;i="5.96,185,1665471600"; 
-   d="scan'208";a="315773032"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 17:04:29 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="643923109"
-X-IronPort-AV: E=Sophos;i="5.96,185,1665471600"; 
-   d="scan'208";a="643923109"
-Received: from coltsavx-mobl1.amr.corp.intel.com (HELO [10.255.0.114]) ([10.255.0.114])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 17:04:26 -0800
-Message-ID: <791bf9a2-a079-3cd6-90a3-42dbb332a38c@intel.com>
-Date:   Tue, 22 Nov 2022 17:04:25 -0800
+        with ESMTP id S234076AbiKWBHV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Nov 2022 20:07:21 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B864DDA4D1
+        for <kvm@vger.kernel.org>; Tue, 22 Nov 2022 17:07:20 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 64691B81E4F
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 01:07:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 16C33C43147
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 01:07:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669165638;
+        bh=DCHo34lFwUJXd1HxDSXq2mLcBoc8T6ukKV//uHO9Qbo=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=tHgtcCFbmN4x7PPAEWz+/shEOlJ/D3DprDtNpCMJM+8kT0vL/p9a7cNRvF3ptYHa3
+         f1wKgH1sY06e5vMP5Uhdg8XJXc5fG/l8ba7Hmp6jZ7EBcyo2wKOzYN05cFRHP0SND9
+         zE5cp8M5FTAndoYlNQhqMnNnkMLlQijyQwMDFKRga33ATZytcw4c1nc7sts8qSy7SJ
+         c1N4C4k8DSWH2dMlRnMNlyBBsZk8FlRFtgSU9s4Um7yQJi/5DlyXaF10OFGNg4jJfY
+         CI7GhBJlYaE5sdc9xkfXBf/vJMgHiP+tdMjsBKo2B7PJ3EIu/whokhuB77+SN9DHO9
+         Gx7PzGJEDRvEA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 009BDC072A6; Wed, 23 Nov 2022 01:07:17 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216725] VMXON with CR0 bit 5 cleared should #GP, got '6'
+Date:   Wed, 23 Nov 2022 01:07:17 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: lixiao.yang@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216725-28872-AVR9SEqHUw@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216725-28872@https.bugzilla.kernel.org/>
+References: <bug-216725-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v7 06/20] x86/virt/tdx: Shut down TDX module in case of
- error
-Content-Language: en-US
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-References: <cover.1668988357.git.kai.huang@intel.com>
- <48505089b645019a734d85c2c29f3c8ae2dbd6bd.1668988357.git.kai.huang@intel.com>
- <Y3ySxEr64HkUaEDq@hirez.programming.kicks-ass.net>
- <52b2be9b-defd-63ce-4cb2-96cd624a95a6@intel.com>
- <Y30fUS5/JClpBHVc@hirez.programming.kicks-ass.net>
- <b3938f3a-e4f8-675a-0c0e-4b4618019145@intel.com>
- <da7ae78c2d9fed125f160744af5be75f34b1b1d7.camel@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <da7ae78c2d9fed125f160744af5be75f34b1b1d7.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/22/22 16:58, Huang, Kai wrote:
-> On Tue, 2022-11-22 at 11:24 -0800, Dave Hansen wrote:
->>> I was expecting TDX to not get initialized until the first TDX using KVM
->>> instance is created. Am I wrong?
->> I went looking for it in this series to prove you wrong.  I failed.  😄
->>
->> tdx_enable() is buried in here somewhere:
->>
->>> https://lore.kernel.org/lkml/CAAhR5DFrwP+5K8MOxz5YK7jYShhaK4A+2h1Pi31U_9+Z+cz-0A@mail.gmail.com/T/
->> I don't have the patience to dig it out today, so I guess we'll have Kai
->> tell us.
-> It will be done when KVM module is loaded, but not when the first TDX guest is
-> created.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216725
 
-Why is it done that way?
+--- Comment #2 from Yang Lixiao (lixiao.yang@intel.com) ---
+(In reply to Yu Zhang from comment #1)
+> Well, IIUC, the case was added by Sean
+> (https://lore.kernel.org/all/20220608235238.3881916-1-seanjc@google.com/),
+> to test his fix for nVMX
+> (https://lore.kernel.org/lkml/Yz7zB7Lxt2DHa4nT@google.com/T/).=20
+>=20
+> But the KVM patch has not been queued in next branch yet. Maybe we can ju=
+st
+> wait...
 
-Can it be changed to delay TDX initialization until the first TDX guest
-needs to run?
+Sure. Thanks for your notice!
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
