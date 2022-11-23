@@ -2,213 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22D8E63693A
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 19:48:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 547E7636979
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 20:04:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239466AbiKWSsV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 13:48:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50318 "EHLO
+        id S239122AbiKWTDU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 14:03:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239425AbiKWSsS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 13:48:18 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51EF37DC9A
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 10:48:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=dSR+uTuLWSvzjlnN/hOFolncWnc/nvADrzbn4JfTDyk=; b=aGOdaCmrJ4N422Rd8FoSa359ZE
-        UKyEaGM84PH5pqSbVi5Cn6GBDeqJLHsArKk3M2e/ickvMZlbeGpd/923w2sBLTxwrViCltZCiokPL
-        BXwHLeAiD/zJoAoLuePvZT1gCmTv517UiafDRn8XPrOS4MYcRqyzYDtxel4FMFW7SnrtK5g1+oT99
-        5+wBXgi63jaEqmyqKzImC3q6XWe+njwW0rN9LpZfDBKjUpSKr/+wFNmKxJA+qxWv9XUllpBiHjmmu
-        f9vqPiJ0G3G4qZJUkbQAZ+DBQV6eWeh55KmogSRLlsBhXsStYTr5nMS/H85iJvjP2rNog+Dt1k+Zy
-        Ho6p5lXQ==;
-Received: from [2001:8b0:10b:5:e35e:4295:9d62:caa0] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oxunE-007vkm-R0; Wed, 23 Nov 2022 18:48:20 +0000
-Message-ID: <baefca59c2b3ea7e69502f673d64ae6a814a8200.camel@infradead.org>
-Subject: Re: [PATCH 2/4] KVM: x86/xen: Compatibility fixes for shared
- runstate area
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        mhal@rbox.co
-Date:   Wed, 23 Nov 2022 18:48:13 +0000
-In-Reply-To: <Y35jdRxK27o96r//@google.com>
-References: <20221119094659.11868-1-dwmw2@infradead.org>
-         <20221119094659.11868-2-dwmw2@infradead.org> <Y30XVDXmkAIlRX4N@google.com>
-         <a12c8e6123cf702bc882988f9da3be7bd096a2e3.camel@infradead.org>
-         <Y35VxflJBVjzloaj@google.com>
-         <ff2c3f2ea7286e78bb2cfb1fdb218401e87cef1e.camel@infradead.org>
-         <Y35jdRxK27o96r//@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-v+DRdOC4Dd1IPsWsYF4E"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S235978AbiKWTDR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 14:03:17 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 545E512081
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 11:03:16 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id 4so17504640pli.0
+        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 11:03:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LYJ67wF71BcvO8uwmwy3ELqCWCBu6XNQ28q/rdgvWwE=;
+        b=kBJIv846/kULBsOC5L9jGrNLZS3fxfPXvIpSe6V8KKjwhAkFe3/VeU1d/ouT9MadTV
+         VjDbPgjJLE6oqgcuzU5VUl64diSXtWgY8VdY93piOsVtuk1rSnZxxH7H8NWwoDkgLzFF
+         pkHhI7NXHh6IYAIVPS+FJ0NB4D8yKJd0dRK+oRH4nI7jqkIOV4X1fDlGtTmvTD7ttqj0
+         HkqE+xFqgfA61AEAC7QYVGk1cTAMbaJ3FZLdpoN3GZ2M+nngfbQdyXYBGL5N3QP+XK0h
+         jVdHv/9jIznrIxuOdqAFm5hX+F5Zsji+Vr3VVof4WbE/vCxH5TDqDsQdDXSvXoyLkfNh
+         3r8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LYJ67wF71BcvO8uwmwy3ELqCWCBu6XNQ28q/rdgvWwE=;
+        b=4S9xWSufrm54ZSCjShLndTkLzzvnqGKiAkzYJFJEO6YXj7deu5j/u+Y3uO9KGm99nb
+         4mN43gStW0Cit64lqgS2ITAtLgs6tialrJe1HjsJ+oY9i7VySaJfrQj5VI3v8pzvp7pD
+         7FtR5dINM8C5xYFKcNT6M8t+gejH3a7mEBYOVY0yj72EzKmKZSu0OTUL+kRzJAhf4/ox
+         KElF1AOVrnuoRbwmRYaOspuwezl39gSmNdttcrgBy82mBdK4LwbEHzo/uWszyGbqkyKo
+         sWJIybUvj8hrURB+w+URGOyP0ba5NGSR7WrbeoFWggLkhBOlQVG4fy0AGhronqwIhCko
+         UYGQ==
+X-Gm-Message-State: ANoB5pkolWLMqYW1dlySV/ONTajeW8w4isTQTAYFbYSEe97CiSZ+RSVC
+        amfLJ4JU/iWt2z/jYh6M6Tbs7w==
+X-Google-Smtp-Source: AA0mqf43KIjDGaGB0pVG3YdJhNXRRLbEvrskIfFRe6WjPffa9ZDsSSfHhzpMw/UYkiwwF3z8aHFfTg==
+X-Received: by 2002:a17:90a:4892:b0:216:92a9:fd50 with SMTP id b18-20020a17090a489200b0021692a9fd50mr31657292pjh.126.1669230195636;
+        Wed, 23 Nov 2022 11:03:15 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id e190-20020a621ec7000000b00561dcfa700asm13062762pfe.107.2022.11.23.11.03.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Nov 2022 11:03:15 -0800 (PST)
+Date:   Wed, 23 Nov 2022 19:03:11 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     "Huang, Kai" <kai.huang@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v7 06/20] x86/virt/tdx: Shut down TDX module in case of
+ error
+Message-ID: <Y35ub4MnbcwcgVNp@google.com>
+References: <52b2be9b-defd-63ce-4cb2-96cd624a95a6@intel.com>
+ <Y30fUS5/JClpBHVc@hirez.programming.kicks-ass.net>
+ <b3938f3a-e4f8-675a-0c0e-4b4618019145@intel.com>
+ <da7ae78c2d9fed125f160744af5be75f34b1b1d7.camel@intel.com>
+ <791bf9a2-a079-3cd6-90a3-42dbb332a38c@intel.com>
+ <9f1ea2639839305dd8b82694b3d8c697803f43a1.camel@intel.com>
+ <Y35IW/PnbxinKHOL@google.com>
+ <168ca2b3-ffac-31c4-0b83-2d0ee75f34a5@intel.com>
+ <Y35aXX5b2Ed4vc6y@google.com>
+ <2d99f823-09bb-ff51-0e71-f254cc6ad28b@intel.com>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2d99f823-09bb-ff51-0e71-f254cc6ad28b@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Nov 23, 2022, Dave Hansen wrote:
+> On 11/23/22 09:37, Sean Christopherson wrote:
+> > On Wed, Nov 23, 2022, Dave Hansen wrote:
+> >> There's no way we can guarantee _that_.  For one, the PAMT* allocations
+> >> can always fail.  I guess we could ask sysadmins to fire up a guest to
+> >> "prime" things, but that seems a little silly.  Maybe that would work as
+> >> the initial implementation that we merge, but I suspect our users will
+> >> demand more determinism, maybe a boot or module parameter.
+> > Oh, you mean all of TDX initialization?  I thought "initialization" here mean just
+> > doing tdx_enable().
+> 
+> Yes, but the first call to tdx_enable() does TDH_SYS_INIT and all the
+> subsequent work to get the module going.
 
---=-v+DRdOC4Dd1IPsWsYF4E
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Ah, sorry, I misread the diff.  Actually applied the patches this time...
 
-On Wed, 2022-11-23 at 18:16 +0000, Sean Christopherson wrote:
-> On Wed, Nov 23, 2022, David Woodhouse wrote:
-> > On Wed, 2022-11-23 at 17:17 +0000, Sean Christopherson wrote:
-> > And with or without that cache, we can *still* end up doing a partial
-> > update if the page goes away. The byte with the XEN_RUNSTATE_UPDATE bit
-> > might still be accessible, but bets are off about what state the rest
-> > of the structure is in =E2=80=94 and those runtimes are supposed to add=
- up, or
-> > the guest is going to get unhappy.
->=20
-> Ugh.  What a terrible ABI. =20
->=20
-> > I'm actually OK with locking two GPCs. It wasn't my first choice, but
-> > it's reasonable enough IMO given that none of the alternatives jump out
-> > as being particularly attractive either.
->=20
-> I detest the two GPCs, but since KVM apparently needs to provide "all or =
-nothing"
-> updates, I don't see a better option.
+> > Yeah, that's not going to be a viable option.  Aside from lacking determinisim,
+> > it would be all too easy to end up on a system with fragmented memory that can't
+> > allocate the PAMTs post-boot.
+> 
+> For now, the post-boot runtime PAMT allocations are the one any only way
+> that TDX can be initialized.  I pushed for it to be done this way.
+> Here's why:
+> 
+> Doing tdx_enable() is relatively slow and it eats up a non-zero amount
+> of physically contiguous RAM for metadata (~1/256th or ~0.4% of RAM).
+> Systems that support TDX but will never run TDX guests should not pay
+> that cost.
+> 
+> That means that we either make folks opt-in at boot-time or we try to
+> make a best effort at runtime to do the metadata allocations.
+> 
+> From my perspective, the best-effort stuff is absolutely needed.  Users
+> are going to forget the command-line opt in
 
-Actually I think it might be not be so awful to do a contiguous virtual
-(kernel) mapping of multiple discontiguous IOMEM PFNs. A kind of
-memremapv().
+Eh, any sufficiently robust deployment should be able to ensure that its kernels
+boot with "required" command-line options.
 
-We can open-code something like ioremap_prot(), doing a single call to
-get_vm_area_caller() for the whole virtual size, then individually
-calling ioremap_page_range() for each page.
+> and there's no harm in _trying_ the big allocations even if they fail.
 
-So we *could* fix the GPC to cope with ranges which cross more than a
-single page. But if the runstate area is the only user for that, as
-seems to be the case so far, then it might be a bit too much additional
-complexity in an area which is fun enough already.
+No, but there is "harm" if a host can't provide the functionality the control
+plane thinks it supports.
 
-I'll propose that we go ahead with the two-GPCs model for now, and if
-we ever need to do that *again*, then we look harder at making the GPC
-support multiple pages?=20
+> Second, in reality, the "real" systems that can run TDX guests are
+> probably not going to sit around fragmenting memory for a month before
+> they run their first guest.  They're going to run one shortly after they
+> boot when memory isn't fragmented and the best-effort allocation will
+> work really well.
 
---=-v+DRdOC4Dd1IPsWsYF4E
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+I don't think this will hold true.  Long term, we (Google) want to have a common
+pool for non-TDX and TDX VMs.  Forcing TDX VMs to use a dedicated pool of hosts
+makes it much more difficult to react to demand, e.g. if we carve out N hosts for
+TDX, but only use 10% of those hosts, then that's a lot of wasted capacity/money.
+IIRC, people have discussed dynamically reconfiguring hosts so that systems could
+be moved in/out of a dedicated pool, but that's still suboptimal, e.g. would
+require emptying a host to reboot+reconfigure..
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTIzMTg0ODEzWjAvBgkqhkiG9w0BCQQxIgQghSHoiHbi
-SJjZFNwJ0Yn4g2GLe5ls8gRetp5pW74IaR4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCBjjrHUrlCvAZyXNszH74y2lmHRlPz3H1n
-n+6PRGvzDrq388D0UHERQCaZbu73+NfxfufCRj3f5S1SRbdhhvYEAf0A8tHN7anNV1EkUpdqbOYN
-dzr3RQUIKzwKC3ID9BZ6Nxk+7OfTVoR9VvvHkYQEPYP23ayyaFyPvhWbo+rm+z6/CYiqWCOubxmj
-ZYEp5CerBcH94qFvBBlmglyROkHU0yTF75V0qMCXMS2Bfr2rG5NxQEAGjxeplJB6okGZVBj+y8GN
-fALl8LFJOhG+tRkVpyyj9+8uCdPUnd95c7JOzkv5/j6Z3lr1xtpFZZ8nYotETP3r/nlzr8JmXAzD
-1bt7Ycf4NlI3jCGlOLNdxyNvlUtwjZIYU9ZUX1uxDYHZZCHLWt0wYpIfomkJu5urFng8QkwZGU4R
-SIw/5x4NwpP/kfPFtsvybDhhgRQEjNXN9jMv37Fon8R/UFoGjynNN9yb5KjINBKfNqvVFSmVWhr2
-7HiBgGBFZzn4afO3BfIjEkmBscU5B3iFZM5Na4D7UKsrWPwZ0+sU3ynmWNeSWCC7UoGU9fDaSr/S
-3197WfyPACyTwcdhWQ6TF0UqqVHe751aXcepRz0FnDt3pikvRm+zbv60VyI3smw5dl4hZoeiq4PP
-gFxkVZfj/euxVSu9NBfdom+HL7zNDVk7cXPe0IHSbwAAAAAAAA==
+If/when we end up with a common pool, then it's very likely that we could have a
+TDX-capable host go weeks/months before launching its first TDX VM.
 
+> Third, if anyone *REALLY* cared to make it reliable *and* wanted to sit
+> around fragmenting memory for a month, they could just start a TDX guest
+> and kill it to get TDX initialized.  This isn't ideal.  But, to me, it
+> beats defining some new, separate ABI (or boot/module option) to do it.
 
---=-v+DRdOC4Dd1IPsWsYF4E--
+That's a hack.  I have no objection to waiting until KVM is _loaded_ to initialize
+TDX, but waiting until KVM_CREATE_VM is not acceptable.  Use cases aside, KVM's ABI
+would be a mess, e.g. KVM couldn't use KVM_CHECK_EXTENSION or any other /dev/kvm
+ioctl() to enumerate TDX support.
 
+> So, let's have those discussions.  Long-term, what *is* the most
+> reliable way to get the TDX module loaded with 100% determinism?  What
+> new ABI or interfaces are needed?  Also, is that 100% determinism
+> required the moment this series is merged?  Or, can we work up to it?
+
+I don't think we (Google again) strictly need 100% determinism with respect to
+enabling TDX, what's most important is that if a host says it's TDX-capable, then
+it really is TDX-capable.  I'm sure we'll treat "failure to load" as an error,
+but it doesn't necessarily need to be a fatal error as the host can still run in
+a degraded state (no idea if we'll actually do that though).
+
+> I think it can wait until this particular series is farther along.
+
+For an opt-in kernel param, agreed.  That can be added later, e.g. if it turns
+out that the PAMT allocation failure rate is too high.
