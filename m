@@ -2,98 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E711D635AF5
-	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 12:05:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92D06635B05
+	for <lists+kvm@lfdr.de>; Wed, 23 Nov 2022 12:07:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237387AbiKWLFA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 06:05:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39946 "EHLO
+        id S237622AbiKWLGT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 06:06:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237358AbiKWLE2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 06:04:28 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E31F8FFAB;
-        Wed, 23 Nov 2022 03:01:37 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AN93MVo005932;
-        Wed, 23 Nov 2022 11:01:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : to :
- cc : from : subject : message-id : date; s=pp1;
- bh=QAxtEWP8/9vqjPmceNNVYkvlRSchfGc80BRqGuBi23s=;
- b=UNKSgXVDgYA/y4ImCKleX4olyIkbrR0VrqqpDVnM9WFd/0FNc+BngBW/1zmWaGsivOB1
- dDHbtmH6lHAomskmEQt2aqAWIDREferr4eX1sNjPn29FN85x2sz2r+HYnggLTx41AjHd
- nyIn7O3hTLwptRGPo15Yuq67v8MMuFEJ30pY0TnnjeaTIeS5muPzGSPsw2XO8G5dfca5
- qQMdU5bdBj+/vfBLvyPaumXcSKSk05DAToeqy23Fogskel9CAJZkPZzZq3Xw5qTZyUfI
- idJqJw1cFGEiDxBOWbuA+jLMvzaFzxdPPrIEhXZMWd5umZOAJa9QnPiPRg97j18MCwyS FQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0ytb31r2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 11:01:36 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ANAqmjZ016857;
-        Wed, 23 Nov 2022 11:01:36 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m0ytb31qk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 11:01:35 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ANApDAU013188;
-        Wed, 23 Nov 2022 11:01:34 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3kxps8wjqs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Nov 2022 11:01:34 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ANB1V6V197178
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Nov 2022 11:01:31 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 02FD4AE055;
-        Wed, 23 Nov 2022 11:01:31 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DAF84AE045;
-        Wed, 23 Nov 2022 11:01:30 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.46.182])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Nov 2022 11:01:30 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S236457AbiKWLGB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 06:06:01 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 329F6203;
+        Wed, 23 Nov 2022 03:05:07 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1669201505;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OcER3N8cDEa5ruwNLbalLB6FHysI8rQ3znaigQw23Ow=;
+        b=imY/83YtWewMzLLlfKCCCRgpd5s+66myNvNvZXrlB3ED6kcLt1pfIHRxLeG0PA5WpUhhWl
+        ERGih1yCSpcA28yhf8n8JJR5kbFxdeEVV+0EQPncRn8HRDQZdOInb86qx6LTajvXsIdF/5
+        TDP9BvgUnU6ZTC0prCHQLGBiBF6J3o2Q+HFfm5U/HcQOlSCaIo3zHxNKi1VSYMf77f2j0E
+        mLvEDZgW4uqAtowxkKKVH3EryhE4ct8dqyq8RWfhWQ59XSmzJgqQKdtewurTbnPLkePrZ7
+        Zy5sgvt+1K0AsnpENxt8nO1xOZo9G+qMhQi8iMkTK7RhKFM2cUhfynDusVANiQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1669201505;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OcER3N8cDEa5ruwNLbalLB6FHysI8rQ3znaigQw23Ow=;
+        b=ZAonvxhebaeZPjcPDItSb+9XL7EVzHztxRm0ZREcKWPjUpAYk2HtgbtA5uLBIBf8ggy1ak
+        IjOVoXfMpu/gJqAQ==
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v7 04/20] x86/virt/tdx: Add skeleton to initialize TDX
+ on demand
+In-Reply-To: <246a4eaac29855c522bd26627b03418cb7ead66f.camel@intel.com>
+References: <cover.1668988357.git.kai.huang@intel.com>
+ <d26254af8e5b3dcca8a070703c5d6d04f48d47a9.1668988357.git.kai.huang@intel.com>
+ <Y3yQKDZFC8+oCyqK@hirez.programming.kicks-ass.net> <87edtvgu1l.ffs@tglx>
+ <19d93ff0-df0d-dc9d-654b-a9ca6f7be1d0@intel.com> <87mt8ig3ja.ffs@tglx>
+ <246a4eaac29855c522bd26627b03418cb7ead66f.camel@intel.com>
+Date:   Wed, 23 Nov 2022 12:05:04 +0100
+Message-ID: <87bkoyexsv.ffs@tglx>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20221123084656.19864-4-frankja@linux.ibm.com>
-References: <20221123084656.19864-1-frankja@linux.ibm.com> <20221123084656.19864-4-frankja@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, seiden@linux.ibm.com
-From:   Nico Boehr <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 3/5] lib: s390x: sie: Set guest memory pointer
-Message-ID: <166920128931.14080.7429175566289667614@t14-nrb.local>
-User-Agent: alot/0.8.1
-Date:   Wed, 23 Nov 2022 12:01:30 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: kgOcW3eJElaPZgGTNOW5RNxq4nDeSd6u
-X-Proofpoint-GUID: ROxx0uZmdDx5mj41sJsMnjl_O26YOpgO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-23_05,2022-11-23_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- impostorscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999 adultscore=0
- clxscore=1015 malwarescore=0 spamscore=0 priorityscore=1501 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2211230079
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2022-11-23 09:46:54)
-> Seems like it was introduced but never set. It's nicer to have a
-> pointer than to cast the MSO of a VM.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Kai!
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+On Wed, Nov 23 2022 at 00:30, Kai Huang wrote:
+> On Tue, 2022-11-22 at 21:03 +0100, Thomas Gleixner wrote:
+>> Clearly that's nowhere spelled out in the documentation, but I don't
+>> buy the 'architecturaly required' argument not at all. It's an
+>> implementation detail of the TDX module.
+>
+> I agree on hardware level there shouldn't be such requirement (not 100% s=
+ure
+> though), but I guess from kernel's perspective, "the implementation detai=
+l of
+> the TDX module" is sort of "architectural requirement"
+
+Sure, but then it needs to be clearly documented so.
+
+> -- at least Intel arch guys think so I guess.
+
+Intel "arch" guys? You might look up the meanings of "arch" in a
+dictionary. LKML is not twatter.
+
+>> Technically there is IMO ZERO requirement to do so.
+>>=20
+>> =C2=A01) The TDX module is global
+>>=20
+>> =C2=A02) Seam-root and Seam-non-root operation are strictly a LP propert=
+y.
+>>=20
+>> =C2=A0=C2=A0=C2=A0 The only architectural prerequisite for using Seam on=
+ a LP is that
+>> =C2=A0=C2=A0=C2=A0 obviously the encryption/decryption mechanics have be=
+en initialized
+>> =C2=A0=C2=A0=C2=A0 on the package to which the LP belongs.
+>>=20
+>> I can see why it might be complicated to add/remove an LP after
+>> initialization fact, but technically it should be possible.
+>
+> "kernel soft offline" actually isn't an issue.  We can bring down a logic=
+al cpu
+> after it gets initialized and then bring it up again.
+
+That's the whole point where this discussion started: _AFTER_ it gets
+initialized.
+
+Which means that, e.g. adding "nosmt" to the kernel command line will
+make TDX fail hard because at the point where TDX is initialized the
+hyperthreads are not 'soft' online and cannot respond to anything, but
+the BIOS already accounted them.
+
+This is just wrong as we all know that "nosmt" is sadly one of the
+obvious counter measures for the never ending flood of speculation
+issues.
+
+> Only add/removal of physical cpu will cause problem:=C2=A0
+
+You wish.=20
+
+> TDX MCHECK verifies all boot-time present cpus to make sure they are TDX-
+> compatible before it enables TDX in hardware.  MCHECK cannot run on hot-a=
+dded
+> CPU, so TDX cannot support physical CPU hotplug.
+
+TDX can rightfully impose the limitation that it only executes on CPUs,
+which are known at boot/initialization time, and only utilizes "known"
+memory. That's it, but that does not enforce to prevent physical hotplug
+in general.
+
+> We tried to get it clarified in the specification, and below is what TDX/=
+module
+> arch guys agreed to put to the TDX module spec (just checked it's not in =
+latest
+> public spec yet, but they said it will be in next release):
+>
+> "
+> 4.1.3.2.  CPU Configuration
+>
+> During platform boot, MCHECK verifies all logical CPUs to ensure they
+> meet TDX=E2=80=99s
+
+That MCHECK falls into the category of security voodoo.
+
+It needs to verify _ALL_ logical CPUs to ensure that Intel did not put
+different models and steppings into a package or what?
+
+> security and certain functionality requirements, and MCHECK passes the fo=
+llowing
+> CPU configuration information to the NP-SEAMLDR, P-SEAMLDR and the TDX Mo=
+dule:
+>
+> =C2=B7         Total number of logical processors in the platform.
+
+You surely need MCHECK for this
+
+> =C2=B7         Total number of installed packages in the platform.
+
+and for this...
+
+> =C2=B7         A table of per-package CPU family, model and stepping etc.
+> identification, as enumerated by CPUID(1).EAX.
+> The above information is static and does not change after platform boot a=
+nd
+> MCHECK run.
+>
+> Note:     TDX doesn=E2=80=99t support adding or removing CPUs from TDX se=
+curity
+> perimeter, as checked my MCHECK.
+
+More security voodoo. The TDX security perimeter has nothing to do with
+adding or removing CPUs on a system. If that'd be true then TDX is a
+complete fail.
+
+> BIOS should prevent CPUs from being hot-added or hot-removed after
+> platform boots.
+
+If the BIOS does not prevent it, then TDX and the Seam module will not
+even notice unless the OS tries to invoke seamcall() on a newly plugged
+CPU.
+
+A newly added CPU and newly added memory should not have any impact on
+the TDX integrity of the already running system. If they have then
+again, TDX is broken by design.
+
+> The TDX module performs additional checks of the CPU=E2=80=99s configurat=
+ion and
+> supported features, by reading MSRs and CPUID information as described in=
+ the
+> following sections.
+
+to ensure that the MCHECK generated table is still valid at the point
+where TDX is initialized?=20
+
+That said, this documentation is at least better than the existing void,
+but that does not make it technically correct.
+
+Thanks,
+
+        tglx
