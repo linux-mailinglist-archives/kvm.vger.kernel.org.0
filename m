@@ -2,130 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C2E1637977
-	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 13:58:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 88BDD637982
+	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 13:59:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229911AbiKXM6I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Nov 2022 07:58:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47688 "EHLO
+        id S229903AbiKXM7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Nov 2022 07:59:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229696AbiKXM6G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Nov 2022 07:58:06 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28CB82EF43;
-        Thu, 24 Nov 2022 04:57:59 -0800 (PST)
-Received: from zn.tnic (p200300ea9733e75b329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e75b:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A7FA01EC0495;
-        Thu, 24 Nov 2022 13:57:57 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1669294677;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=XS1Zj+fDTSMukHO6d5oREAO1GUpF937b38YW4uIlrPA=;
-        b=eujz4I/2hdVKKFYVtLJwqYg8iDfZDv2AvM+cA0Tw+bL86B0iQPrTvM5B6H65Z7+YylM7YL
-        ubDUL3l9D1eMe64NUMJOE6cwZGS6d4s4/VgZxAtwbC3PSit2fs5QawUq4Z13kM8+bQBnNf
-        fmWxy//AJzEcOSnS/BggzWnBR+HOB+8=
-Date:   Thu, 24 Nov 2022 13:57:54 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Kim Phillips <kim.phillips@amd.com>
-Cc:     x86@kernel.org, Babu Moger <Babu.Moger@amd.com>,
-        Borislav Petkov <bp@suse.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] x86/cpu, kvm: Use CPU capabilities for
- CPUID[0x80000021].EAX
-Message-ID: <Y39qUnlRx05eaGeb@zn.tnic>
-References: <20221124000449.79014-1-kim.phillips@amd.com>
- <20221124000449.79014-2-kim.phillips@amd.com>
+        with ESMTP id S229581AbiKXM7Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Nov 2022 07:59:16 -0500
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B30F9950CE
+        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 04:59:15 -0800 (PST)
+Received: by mail-oi1-x230.google.com with SMTP id e205so1471564oif.11
+        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 04:59:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=jWhjZ8Ik6udAxmU7OrnkH0fp8I0zGCvkX7BlR9Epea8=;
+        b=IC3tTQJtWUJQyjZrGL6F6TYNH5H29hlmfBUQkgCMCV/wz5PfN4ovrgjSXVW62CedRi
+         QARU0pDSP2eRrKKPXeyJVL5Iuo2p7Zgxd0GtDE4j3fmQPMr/6YYTg+O0YkBYsab8T/tQ
+         pdrDU0ljJOb85kDxDoU/GNjcYFxJO1APG9R/aaVJCCRqNw0NUld3q0P/3gDEugJqw80c
+         1zYvWHi2PK9FyJt+tN8GjidSP+kggtDWAnklLwAyHXuXhK5SarF7ki1tYcWBkMXe6zFa
+         pp+4OsdhAzd2LNEfaXIYcD5Tu5tx4Xx0y8u3fEBmG6CsIi6hg8GmIRZO5kqq6DeG7Xcy
+         FJMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jWhjZ8Ik6udAxmU7OrnkH0fp8I0zGCvkX7BlR9Epea8=;
+        b=wPdYlY5bYif+eiLhRY2zqavpjntRehYZXRlCJRpdxlETzYfJd8hq53Yqlm60yVO3J0
+         uUp50ZxyCyDfNmyhLeAejTx7L1ZlZcJQ6pHQNcZDEJMD4iuB8rGmB860i7TPH70QJrZm
+         sobsCEAPQ1HyiXcXQ52m7QcrUUdxDDB2xyZa86qoyARDh28RFpJmZVjg5Tge4yeWyM6Y
+         33mtSrlaARCMS3uOLgu0TVe0aYZplTpsWet03wKnPaCcWM/codRmduH3+UxUU0kBVjLi
+         7z0qF+BLvVmUAY9OqtDy0l+39yknMGa8KHErotCKGeR0vUpEq9HdGfjGceGzthvSwtPG
+         LP4g==
+X-Gm-Message-State: ANoB5pnw/ajEc6lxAGKWGrpmZxaoU+7eRhHio1PbhMw1kQxG9/oH6q/3
+        StQquZZu1DshcIkfbh/ewWXz/xDfzrB3rowpmmcW/g==
+X-Google-Smtp-Source: AA0mqf58ktcA3pHdBUjrxW6zFt+WYodi0RAr78fTSZX+SH39xGLFckk74X32aAuTirPTsS6SUqgoUXYBSEubV3jo5Ec=
+X-Received: by 2002:a05:6808:2102:b0:359:ac8d:4227 with SMTP id
+ r2-20020a056808210200b00359ac8d4227mr6186334oiw.17.1669294754893; Thu, 24 Nov
+ 2022 04:59:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20221124000449.79014-2-kim.phillips@amd.com>
+References: <20220718170205.2972215-1-atishp@rivosinc.com> <20220718170205.2972215-7-atishp@rivosinc.com>
+ <20221101142631.du54p4kyhlgf54cr@kamzik> <CAOnJCUJfakcoiWh4vFk5_BcTKfoSDbx+wtmh7MW4cPYog7q4BQ@mail.gmail.com>
+ <20221123135842.uyw46kbybgb7unm2@kamzik> <CAOnJCUKZV+0Xts6C4QY7X+Wak0ZR_f8wPtEAtH4PEmh2-_AcWw@mail.gmail.com>
+ <20221124105051.hbsavj3bgf4mvlzb@kamzik>
+In-Reply-To: <20221124105051.hbsavj3bgf4mvlzb@kamzik>
+From:   Anup Patel <apatel@ventanamicro.com>
+Date:   Thu, 24 Nov 2022 18:29:04 +0530
+Message-ID: <CAK9=C2XifUiOdA4cTFbQq7SNVJn+1Xup_giw4jo_z6bRdng4hQ@mail.gmail.com>
+Subject: Re: [RFC 6/9] RISC-V: KVM: Add SBI PMU extension support
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Atish Patra <atishp@atishpatra.org>,
+        Atish Patra <atishp@rivosinc.com>,
+        linux-kernel@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>, Guo Ren <guoren@kernel.org>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Will Deacon <will@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 06:04:48PM -0600, Kim Phillips wrote:
-> The AMD Zen4 Automatic IBRS feature bit resides in the 0x80000021 leaf,
-> for which there is already support for exposing Zen3 bits to the guest.
-> 
-> Add AMD AutoIBRS feature bit support, including for the other bits,
-> using scattered/synthetic bits.
-> 
-> Add the corresponding word to KVM's feature machinery so that AutoIBRS
-> gets advertized into the guest too.
-> 
-> Co-developed-by: Babu Moger <Babu.Moger@amd.com>
+On Thu, Nov 24, 2022 at 4:21 PM Andrew Jones <ajones@ventanamicro.com> wrote:
+>
+> On Thu, Nov 24, 2022 at 02:18:26AM -0800, Atish Patra wrote:
+> > On Wed, Nov 23, 2022 at 5:58 AM Andrew Jones <ajones@ventanamicro.com> wrote:
+> > >
+> > > On Tue, Nov 22, 2022 at 03:08:34PM -0800, Atish Patra wrote:
+> ...
+> > > > Currently, ARM64 enables pmu from user space using device control APIs
+> > > > on vcpu fd.
+> > > > Are you suggesting we should do something like that ?
+> > >
+> > > Yes. Although choosing which KVM API should be used could probably be
+> > > thought-out again. x86 uses VM ioctls.
+> > >
+> >
+> > How does it handle hetergenous systems in per VM ioctls ?
+>
+> I don't think it does, but neither does arm64. Afaik, the only way to run
+> KVM VMs on heterogeneous systems is to pin the VM to one set of the CPUs,
+> i.e. make sure the system it runs on is homogeneous.
+>
+> I agree we shouldn't paint ourselves into a homogeneous-only corner for
+> riscv, though, so if it's possible to use VCPU APIs, then I guess we
+> should. Although, one thing to keep in mind is that if the same ioctl
+> needs to be run on each VCPU, then, when we start building VMs with
+> hundreds of VCPUs, we'll see slow VM starts.
+>
+> >
+> > > >
+> > > > If PMU needs to have device control APIs (either via vcpu fd or its
+> > > > own), we can retrieve
+> > > > the hpmcounter width and count from there as well.
+> > >
+> > > Right. We need to decide how the VM/VCPU + PMU user interface should look.
+> > > A separate PMU device, like arm64 has, sounds good, but the ioctl
+> > > sequences for initialization may get more tricky.
+> > >
+> >
+> > Do we really need a per VM interface ? I was thinking we can just
+> > continue to use
+> > one reg interface for PMU as well. We probably need two of them.
+> >
+> > 1. To enable/disable SBI extension
+> >     -- The probe function will depend on this
+> > 2. PMU specific get/set
+> >     -- Number of hpmcounters
+> >     -- hpmcounter width
+> >     -- enable PMU
+>
+> ONE_REG is good for registers and virtual registers, which means the
+> number of hpmcounters and the hpmcounter width are probably good
+> candidates, but I'm not sure we should use it for enable/init types of
+> purposes.
 
-verify_tags: WARNING: Co-developed-by Babu Moger <Babu.Moger@amd.com> hasn't signed off on the patch!
+We are already using ONE_REG interface to enable/disable
+ISA extensions so we should follow the same pattern and have
+ONE_REG interface to enable/disable SBI extensions as well.
 
-> Co-developed-by: Borislav Petkov <bp@suse.de>
-> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
-
-...
-
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index c92c49a0b35b..61cd33a848cc 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -730,6 +730,25 @@ void kvm_set_cpu_caps(void)
->  		0 /* SME */ | F(SEV) | 0 /* VM_PAGE_FLUSH */ | F(SEV_ES) |
->  		F(SME_COHERENT));
->  
-> +	/*
-> +	 * Pass down these bits:
-> +	 *    EAX      0      NNDBP, Processor ignores nested data breakpoints
-> +	 *    EAX      2      LAS, LFENCE always serializing
-> +	 *    EAX      6      NSCB, Null selector clear base
-> +	 *    EAX      8      Automatic IBRS
-> +	 *
-> +	 * Other defined bits are for MSRs that KVM does not expose:
-> +	 *   EAX      3      SPCL, SMM page configuration lock
-> +	 *   EAX      13     PCMSR, Prefetch control MSR
-> +	 */
-> +	kvm_cpu_cap_init_scattered(CPUID_8000_0021_EAX,
-> +				   SF(NO_NESTED_DATA_BP) | SF(LFENCE_RDTSC) |
-> +				   SF(NULL_SEL_CLR_BASE) | SF(AUTOIBRS));
-> +	if (static_cpu_has(X86_FEATURE_LFENCE_RDTSC))
-> +		kvm_cpu_cap_set(X86_FEATURE_LFENCE_RDTSC);
-> +	if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
-> +		kvm_cpu_cap_set(X86_FEATURE_NULL_SEL_CLR_BASE);
-
-So this looks backwards:
-
-if X86_FEATURE_NULL_SEL_CLR_BASE is set, then X86_BUG_NULL_SEG should
-not be.
-
-Which means, you'd have to update check_null_seg_clears_base() too.
-
-Which means, you should make the X86_FEATURE_NULL_SEL_CLR_BASE bit
-addition a separate patch because this one is clearly doing too many
-things at once.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Regards,
+Anup
