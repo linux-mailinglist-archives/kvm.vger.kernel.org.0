@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F13946376D1
-	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 11:51:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED7B16376DE
+	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 11:55:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229746AbiKXKvB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Nov 2022 05:51:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42118 "EHLO
+        id S229786AbiKXKzQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Nov 2022 05:55:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229733AbiKXKu5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Nov 2022 05:50:57 -0500
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 973C5179A8D
-        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 02:50:54 -0800 (PST)
-Received: by mail-ej1-x632.google.com with SMTP id vp12so1985348ejc.8
-        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 02:50:54 -0800 (PST)
+        with ESMTP id S229642AbiKXKzO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Nov 2022 05:55:14 -0500
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B76E179AA4
+        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 02:55:13 -0800 (PST)
+Received: by mail-ed1-x531.google.com with SMTP id z18so2011846edb.9
+        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 02:55:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ventanamicro.com; s=google;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7EpHqZSb89Ze6YQ2yo72O8+0pB4IQzPJGKW2B32FbcY=;
-        b=Pk8qWjYgThmkUH55ahwT7r++QkroUX2mKPPGCB42y6xGyBk7NGPZEyJyTGUbo2V93l
-         JTvGPrRRG29bpeUV8227yH/wQ++vwqMTyYmcg0atcAcfp9+0aaC4W9a3uV9b1FAMan1c
-         PNG72cPrt8etKQ8upv4zZu9f+apnL3mx1jbIiK6Dy0yVm4HQaz2jY8vfWzgmJWF+OvNu
-         5lbhAP6N0mcfXspdTYpvMrdcCNe5Sk6ka7+E9lW+0Q8Uh9xpYOoBEemceeDJEPasWqpg
-         eApbOaHuKFvcXXqFCC1lCuwGuKcMa4MZ/6fYlycda8Nh7S0gpX1LP6TkCsxAfzl/4497
-         GMWQ==
+        bh=cDjZkRfpYrY5I/MR6Qn4PLWFtgP7s/Bq564G/WDROg8=;
+        b=QO7D86gaGFb5ZRyhP30L+tC9SacJbP+BnjiLVrXG1Hp1YNn8JYwTlPi5lxcrIDPR+a
+         dnPFJq1vznqQ8DZIYdMjtsTvyr6fy+fBcUwdKOZA5MOZ5EHTRGfcCK8b150A8FCivC2l
+         /xTKmQi1XygjlmKoT3qKOmrwHR+KDqrBvYfq3BMC/SfAV5Tye7wieU17VkZO08MCIh2u
+         r7W0oOo4lwfhlVeMoeiKznszaFzh4unoLaPEcwyT5s7/rELHPpC5uIlZsRRONGgs9aF0
+         6atYfxlJSfwUXrZXo4kSH9QxNUwE3yOArldb/1+BjRqS56mPUocvI5YnZlCn67l4bOCl
+         Jh6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7EpHqZSb89Ze6YQ2yo72O8+0pB4IQzPJGKW2B32FbcY=;
-        b=K3TF8b5j3FEPTeNEvu58GU/DTTbm06BJ6roFO/iwffwMUDne9xrxAToNPo4+m3xoON
-         KnW7fZ+98iOqNG4kBRZ2JhhNyInjW45feJkjVGMnn4pKIE9n9HkG40AOa4F3PwYFQfJR
-         UbW4FGKajsWybDo3WHVJ/B5iSZZO8v4Cphgx1DIkrqyIxboHebmJRUSSZwyqMzng78Nx
-         4wbrISKlmuYkJ6YWRKmL9DCyy1p/ziahk2bWPItpK4DY/Ep+rTikb9EKZVsQXh0xRn9T
-         N8J23RJMOukbFJL6yOumySl4L3DsYsj3q9fgLaP3CMMrZZXTcM0S1ogd9p+4fUn01ibF
-         Sjzg==
-X-Gm-Message-State: ANoB5pmse8UJvY6uRcfih9uGSPteWNroPmxrJCCHdZKYswuzrMjGSr7K
-        2+90R3SzS74N+oj5DRabSdDQ8w==
-X-Google-Smtp-Source: AA0mqf4C7a8msWcEL+e4aUXZWxwRSJFXJSxQmq0StXpEkqceLuWKrbz0d7MQc7OQXqOX4aChnNPp6w==
-X-Received: by 2002:a17:907:c20d:b0:7b8:882d:43fc with SMTP id ti13-20020a170907c20d00b007b8882d43fcmr10034499ejc.0.1669287053134;
-        Thu, 24 Nov 2022 02:50:53 -0800 (PST)
+        bh=cDjZkRfpYrY5I/MR6Qn4PLWFtgP7s/Bq564G/WDROg8=;
+        b=K4Lr/glSd+yMMRdx04kMG4+Rpm/MHxg2LKmGQC+3tao5yIhPVVtlHqbQrw8z2W9Fyc
+         Vo0YOtQp8nUr+65v2a+RpvuAdoCpvLjhsrOg5utdWQpguAdsd7gZAi21euq1B8Sbfbzd
+         mfsdez6NUkHr0jTrZ+EO7dSuehMJe9L42cUv1BG1K7idUp5ta72U7BAI+3zPeNHwXJxh
+         tut+YRtkjXsldpSHus0+FK6zIG6w1aUO1HaNEHjjFUp2oxuhokSVLJdf82ZLD7jiNhAx
+         xYyV+HxbhSCwjKKcZyR6ih1H6O7WaHX3BcvVIJhNVmlkXafE3TNYIj3o07mQI7vk8QSs
+         0M9g==
+X-Gm-Message-State: ANoB5pmcOIx4hVm/DKWNZK7mn16gSta/RdJEv6cpE+CyBG/9eCpQffN0
+        fb8w070FPn6RvaqMSpq26nqdMQ==
+X-Google-Smtp-Source: AA0mqf6K3vDrC0uZkJNyI9i4bspr18Xc3wQ9f3KL4neh3mJKaDF3CSz4f3mCXc4rH7HQpdqr59HPug==
+X-Received: by 2002:aa7:c9d0:0:b0:458:ed79:ed5 with SMTP id i16-20020aa7c9d0000000b00458ed790ed5mr13691602edt.374.1669287311864;
+        Thu, 24 Nov 2022 02:55:11 -0800 (PST)
 Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id f15-20020a50fc8f000000b00462e1d8e914sm365978edq.68.2022.11.24.02.50.52
+        by smtp.gmail.com with ESMTPSA id x22-20020a1709064bd600b0078d3f96d293sm306881ejv.30.2022.11.24.02.55.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Nov 2022 02:50:52 -0800 (PST)
-Date:   Thu, 24 Nov 2022 11:50:51 +0100
+        Thu, 24 Nov 2022 02:55:11 -0800 (PST)
+Date:   Thu, 24 Nov 2022 11:55:09 +0100
 From:   Andrew Jones <ajones@ventanamicro.com>
 To:     Atish Patra <atishp@atishpatra.org>
 Cc:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org,
@@ -60,79 +60,73 @@ Cc:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Will Deacon <will@kernel.org>
-Subject: Re: [RFC 6/9] RISC-V: KVM: Add SBI PMU extension support
-Message-ID: <20221124105051.hbsavj3bgf4mvlzb@kamzik>
+Subject: Re: [RFC 5/9] RISC-V: KVM: Add skeleton support for perf
+Message-ID: <20221124105509.3kwnardcxvbbkf67@kamzik>
 References: <20220718170205.2972215-1-atishp@rivosinc.com>
- <20220718170205.2972215-7-atishp@rivosinc.com>
- <20221101142631.du54p4kyhlgf54cr@kamzik>
- <CAOnJCUJfakcoiWh4vFk5_BcTKfoSDbx+wtmh7MW4cPYog7q4BQ@mail.gmail.com>
- <20221123135842.uyw46kbybgb7unm2@kamzik>
- <CAOnJCUKZV+0Xts6C4QY7X+Wak0ZR_f8wPtEAtH4PEmh2-_AcWw@mail.gmail.com>
+ <20220718170205.2972215-6-atishp@rivosinc.com>
+ <20221101141329.j4qtvjf6kmqixt2r@kamzik>
+ <CAOnJCULMbTp6WhVRWHxzFnUgCJJV01hcyukQxSEih-sYt5TJWg@mail.gmail.com>
+ <CAOnJCUKpdV3u8X6BSC+-rhV0Q8q2tdsa8r_KTH5FWCh2LV2q8Q@mail.gmail.com>
+ <20221123133636.gke3626aolfrnevy@kamzik>
+ <CAOnJCULUH09HPZL6Ks-xUsiDLQPR6xOv2g+ic9Gd3uwea6hCyQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAOnJCUKZV+0Xts6C4QY7X+Wak0ZR_f8wPtEAtH4PEmh2-_AcWw@mail.gmail.com>
+In-Reply-To: <CAOnJCULUH09HPZL6Ks-xUsiDLQPR6xOv2g+ic9Gd3uwea6hCyQ@mail.gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 24, 2022 at 02:18:26AM -0800, Atish Patra wrote:
-> On Wed, Nov 23, 2022 at 5:58 AM Andrew Jones <ajones@ventanamicro.com> wrote:
+On Thu, Nov 24, 2022 at 01:04:15AM -0800, Atish Patra wrote:
+> On Wed, Nov 23, 2022 at 5:36 AM Andrew Jones <ajones@ventanamicro.com> wrote:
 > >
-> > On Tue, Nov 22, 2022 at 03:08:34PM -0800, Atish Patra wrote:
-...
-> > > Currently, ARM64 enables pmu from user space using device control APIs
-> > > on vcpu fd.
-> > > Are you suggesting we should do something like that ?
-> >
-> > Yes. Although choosing which KVM API should be used could probably be
-> > thought-out again. x86 uses VM ioctls.
-> >
-> 
-> How does it handle hetergenous systems in per VM ioctls ?
-
-I don't think it does, but neither does arm64. Afaik, the only way to run
-KVM VMs on heterogeneous systems is to pin the VM to one set of the CPUs,
-i.e. make sure the system it runs on is homogeneous.
-
-I agree we shouldn't paint ourselves into a homogeneous-only corner for
-riscv, though, so if it's possible to use VCPU APIs, then I guess we
-should. Although, one thing to keep in mind is that if the same ioctl
-needs to be run on each VCPU, then, when we start building VMs with
-hundreds of VCPUs, we'll see slow VM starts.
-
-> 
+> > ...
+> > > > > > -     csr_write(CSR_HCOUNTEREN, -1UL);
+> > > > > > +     /* VS should access only TM bit. Everything else should trap */
+> > > > > > +     csr_write(CSR_HCOUNTEREN, 0x02);
+> > > > >
+> > > > > This looks like something that should be broken out into a separate patch
+> > > > > with a description of what happens now when guests try to access the newly
+> > > > > trapping counter registers. We should probably also create a TM define.
+> > > > >
+> > > >
+> > > > Done.
+> > > >
 > > >
-> > > If PMU needs to have device control APIs (either via vcpu fd or its
-> > > own), we can retrieve
-> > > the hpmcounter width and count from there as well.
+> > > As we allow cycles & instret for host user space now [1], should we do the same
+> > > for guests as well ? I would prefer not to but same user space
+> > > software will start to break
+> > > they will run inside a guest.
+> > >
+> > > https://lore.kernel.org/all/20220928131807.30386-1-palmer@rivosinc.com/
+> > >
 > >
-> > Right. We need to decide how the VM/VCPU + PMU user interface should look.
-> > A separate PMU device, like arm64 has, sounds good, but the ioctl
-> > sequences for initialization may get more tricky.
+> > Yeah, it seems like we should either forbid access to unprivileged users
+> > or ensure the numbers include some random noise. For guests, a privileged
+> > KVM userspace should need to explicitly request access for them, ensuring
+> > that the creation of privileged guests is done by conscious choice.
 > >
 > 
-> Do we really need a per VM interface ? I was thinking we can just
-> continue to use
-> one reg interface for PMU as well. We probably need two of them.
-> 
-> 1. To enable/disable SBI extension
->     -- The probe function will depend on this
-> 2. PMU specific get/set
->     -- Number of hpmcounters
->     -- hpmcounter width
->     -- enable PMU
+> If I understand you correctly, you are suggesting we only enable TM
+> bit in hcounteren ?
 
-ONE_REG is good for registers and virtual registers, which means the
-number of hpmcounters and the hpmcounter width are probably good
-candidates, but I'm not sure we should use it for enable/init types of
-purposes.
+Yeah, and also that I think it'd be nice to revisit this for userspace.
+
+> We also need a mechanism to enable the hcounteren bits from KVM guest userspace.
+> 
+> I can think of the following approaches.
+> 
+> 1. The CYCLE, INSTRET enabling can also be via one reg interface.
+> 2. We can enable it during first virtual instruction trap if these
+> bits in guest scounteren
+> are enabled.
+
+Those sound good to me.
 
 Thanks,
 drew
