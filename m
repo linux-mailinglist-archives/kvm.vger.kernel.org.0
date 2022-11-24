@@ -2,274 +2,352 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3FD4637D58
-	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 16:53:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F11AA637E15
+	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 18:14:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229898AbiKXPx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Nov 2022 10:53:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39714 "EHLO
+        id S229678AbiKXROk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Nov 2022 12:14:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229863AbiKXPxv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Nov 2022 10:53:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D8A6442EA
-        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 07:52:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669305169;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2skwpC+eVA6yYC2x/mr1Nxhuj4mB+d6nCE7s2zzx13A=;
-        b=WJI8sNlbcPkvAXKoYsRXoMRyKTVdf5Wi6Qbor7tyuyjTv5X3GE/ekrHUHgMtn6Wn+Xm9nc
-        WAyMs1SXcsrk1p1dr/dQAtr5Yt/LT526lX2/h8+4UfVIcQZnopBp5xd+jVKNTsTvsSH5C5
-        PWmw5gp4o984jsKezuTWVxfReWn0jJw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-532-pv3OueikMXSiQWcWzl7bxw-1; Thu, 24 Nov 2022 10:52:47 -0500
-X-MC-Unique: pv3OueikMXSiQWcWzl7bxw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C4C2A800186;
-        Thu, 24 Nov 2022 15:52:46 +0000 (UTC)
-Received: from eperezma.remote.csb (unknown [10.39.192.169])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B136F111E3F8;
-        Thu, 24 Nov 2022 15:52:43 +0000 (UTC)
-From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Eli Cohen <eli@mellanox.com>, Jason Wang <jasowang@redhat.com>,
-        Cindy Lu <lulu@redhat.com>, Parav Pandit <parav@mellanox.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Gautam Dawar <gdawar@xilinx.com>,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH for 8.0 v8 12/12] vdpa: always start CVQ in SVQ mode if possible
-Date:   Thu, 24 Nov 2022 16:51:58 +0100
-Message-Id: <20221124155158.2109884-13-eperezma@redhat.com>
-In-Reply-To: <20221124155158.2109884-1-eperezma@redhat.com>
-References: <20221124155158.2109884-1-eperezma@redhat.com>
+        with ESMTP id S229472AbiKXROj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Nov 2022 12:14:39 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ECE4012F41C
+        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 09:14:36 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3E38E23A;
+        Thu, 24 Nov 2022 09:14:43 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B3E9D3F587;
+        Thu, 24 Nov 2022 09:14:35 -0800 (PST)
+Date:   Thu, 24 Nov 2022 17:14:33 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
+        andre.przywara@arm.com, will@kernel.org
+Subject: Re: [PATCH kvmtool v1 08/17] Use memfd for all guest ram allocations
+Message-ID: <Y3+meXHu5MRYuHou@monolith.localdoman>
+References: <20221115111549.2784927-1-tabba@google.com>
+ <20221115111549.2784927-9-tabba@google.com>
+ <Y39PCG0ZRHf/2d5E@monolith.localdoman>
+ <CA+EHjTx6JRODjncxMz6pBO43S2gAFZt4vDibG=Zwbr7TkbiFeQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <CA+EHjTx6JRODjncxMz6pBO43S2gAFZt4vDibG=Zwbr7TkbiFeQ@mail.gmail.com>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Isolate control virtqueue in its own group, allowing to intercept control
-commands but letting dataplane run totally passthrough to the guest.
+Hi,
 
-Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
----
-v8:
-* Do not allocate iova_tree on net_init_vhost_vdpa if only CVQ is
-  shadowed. Move the iova_tree handling in this case to
-  vhost_vdpa_net_cvq_start and vhost_vdpa_net_cvq_stop.
+On Thu, Nov 24, 2022 at 03:19:34PM +0000, Fuad Tabba wrote:
+> Hi,
+> 
+> On Thu, Nov 24, 2022 at 11:01 AM Alexandru Elisei
+> <alexandru.elisei@arm.com> wrote:
+> >
+> > Hi,
+> >
+> > On Tue, Nov 15, 2022 at 11:15:40AM +0000, Fuad Tabba wrote:
+> > > Allocate all guest ram backed by memfd/ftruncate instead of
+> > > anonymous mmap. This will make it easier to use kvm with fd-based
+> > > kvm guest memory proposals [*]. It also would make it easier to
+> > > use ipc memory sharing should that be needed in the future.
+> >
+> > Today, there are two memory allocation paths:
+> >
+> > - One using hugetlbfs when --hugetlbfs is specified on the command line, which
+> >   creates a file.
+> >
+> > - One using mmap, when --hugetlbfs is not specified.
+> >
+> > How would support in kvmtool for the secret memfd look like? I assume there
+> > would need to be some kind of command line parameter to kvmtool to instruct it
+> > to use the secret memfd, right? What I'm trying to figure out is why is
+> > necessary to make everything a memfd file instead of adding a third memory
+> > allocation path just for that particular usecase (or merging the hugetlbfs path
+> > if they are similar enough). Right now, the anonymous memory path is a
+> > mmap(MAP_ANONYMOUS) call, simple and straightforward, and I would like some more
+> > convincing that this change is needed.
+> 
+> This isn't about secret mem, but about the unified proposal for guest
+> private memory [1].  This proposal requires the use of a file
+> descriptor (fd) as the canonical reference to guest memory in the host
+> (i.e., VMM) and does not provide an alternative using a
+> straightforward anonymous mmap(). The idea is that guest memory
+> shouldn’t have mapping in the host by default, but unless explicitly
+> shared and needed.
 
-v7:
-* Never ask for number of address spaces, just react if isolation is not
-  possible.
-* Return ASID ioctl errors instead of masking them as if the device has
-  no asid.
-* Simplify net_init_vhost_vdpa logic
-* Add "if possible" suffix
+I think you misunderstood me. I wasn't asking why kvmtool should get
+support for guest private memory, I was asking why kvmtool should allocate
+**all types of memory** using memfd. Your series allocates **all** memory
+using memfd. I never said that kvmtool should or should not get support for
+private memory.
 
-v6:
-* Disable control SVQ if the device does not support it because of
-features.
+> 
+> Moreover, using an fd would be more generic and flexible, which allows
+> for other use cases (such as IPC), or to map that memory in userspace
+> when appropriate. It also allows us to use the same interface for
+> hugetlb. Considering that other VMMs (e.g., qemu [2], crosvm [3])
+> already back guest memory with memfd, and looking at how private
+> memory would work [4], it seemed to me that the best way to unify all
+> of these needs is to have the backend of guest memory be fd-based.
+> 
+> It would be possible to have that as a separate kvmtool option, where
+> fd-backed memory would be only for guests that use the new private
+> memory extensions. However, that would mean more code to maintain that
+> is essentially doing the same thing (allocating and mapping memory).
+> 
+> I thought that it would be worth having these patches in kvmtool now
+> rather than wait until the guest private memory has made it into kvm.
+> These patches simplify the code as an end result, make it easier to
 
-v5:
-* Fixing the not adding cvq buffers when x-svq=on is specified.
-* Move vring state in vhost_vdpa_get_vring_group instead of using a
-  parameter.
-* Rename VHOST_VDPA_NET_CVQ_PASSTHROUGH to VHOST_VDPA_NET_DATA_ASID
+In the non-hugetlbfs case, before:
 
-v4:
-* Squash vhost_vdpa_cvq_group_is_independent.
-* Rebased on last CVQ start series, that allocated CVQ cmd bufs at load
-* Do not check for cvq index on vhost_vdpa_net_prepare, we only have one
-  that callback registered in that NetClientInfo.
+        kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
+        kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm, kvm->cfg.hugetlbfs_path, kvm->arch.ram_alloc_size);
 
-v3:
-* Make asid related queries print a warning instead of returning an
-  error and stop the start of qemu.
----
- hw/virtio/vhost-vdpa.c |   3 +-
- net/vhost-vdpa.c       | 106 ++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 107 insertions(+), 2 deletions(-)
+	/*
+	 * mmap_anon_or_hugetlbfs expands to:
+	 * getpagesize()
+	 * mmap()
+	 */
 
-diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-index 8e54c5c0fc..45bb72d359 100644
---- a/hw/virtio/vhost-vdpa.c
-+++ b/hw/virtio/vhost-vdpa.c
-@@ -652,7 +652,8 @@ static int vhost_vdpa_set_backend_cap(struct vhost_dev *dev)
- {
-     uint64_t features;
-     uint64_t f = 0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2 |
--        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH;
-+        0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH |
-+        0x1ULL << VHOST_BACKEND_F_IOTLB_ASID;
-     int r;
- 
-     if (vhost_vdpa_call(dev, VHOST_GET_BACKEND_FEATURES, &features)) {
-diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-index a1f1e29b7c..bce57fa724 100644
---- a/net/vhost-vdpa.c
-+++ b/net/vhost-vdpa.c
-@@ -102,6 +102,8 @@ static const uint64_t vdpa_svq_device_features =
-     BIT_ULL(VIRTIO_NET_F_RSC_EXT) |
-     BIT_ULL(VIRTIO_NET_F_STANDBY);
- 
-+#define VHOST_VDPA_NET_CVQ_ASID 1
-+
- VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
- {
-     VhostVDPAState *s = DO_UPCAST(VhostVDPAState, nc, nc);
-@@ -259,6 +261,40 @@ static VhostIOVATree *vhost_vdpa_svq_allocate_iova_tree(int vdpa_device_fd)
-     return vhost_iova_tree_new(iova_range.first, iova_range.last);
- }
- 
-+static int64_t vhost_vdpa_get_vring_group(int device_fd, unsigned vq_index)
-+{
-+    struct vhost_vring_state state = {
-+        .index = vq_index,
-+    };
-+    int r = ioctl(device_fd, VHOST_VDPA_GET_VRING_GROUP, &state);
-+
-+    if (unlikely(r < 0)) {
-+        error_report("Cannot get VQ %u group: %s", vq_index,
-+                     g_strerror(errno));
-+        return r;
-+    }
-+
-+    return state.num;
-+}
-+
-+static int vhost_vdpa_set_address_space_id(struct vhost_vdpa *v,
-+                                           unsigned vq_group,
-+                                           unsigned asid_num)
-+{
-+    struct vhost_vring_state asid = {
-+        .index = vq_group,
-+        .num = asid_num,
-+    };
-+    int r;
-+
-+    r = ioctl(v->device_fd, VHOST_VDPA_SET_GROUP_ASID, &asid);
-+    if (unlikely(r < 0)) {
-+        error_report("Can't set vq group %u asid %u, errno=%d (%s)",
-+                     asid.index, asid.num, errno, g_strerror(errno));
-+    }
-+    return r;
-+}
-+
- static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *addr)
- {
-     VhostIOVATree *tree = v->iova_tree;
-@@ -333,11 +369,71 @@ dma_map_err:
- static int vhost_vdpa_net_cvq_start(NetClientState *nc)
- {
-     VhostVDPAState *s;
--    int r;
-+    struct vhost_vdpa *v;
-+    uint64_t backend_features;
-+    int64_t cvq_group;
-+    int cvq_index, r;
- 
-     assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA);
- 
-     s = DO_UPCAST(VhostVDPAState, nc, nc);
-+    v = &s->vhost_vdpa;
-+
-+    v->shadow_data = s->always_svq;
-+    v->shadow_vqs_enabled = s->always_svq;
-+    s->vhost_vdpa.address_space_id = VHOST_VDPA_GUEST_PA_ASID;
-+
-+    if (s->always_svq) {
-+        /* SVQ is already configured for all virtqueues */
-+        goto out;
-+    }
-+
-+    /* Backend features are not available in v->dev yet. */
-+    r = ioctl(v->device_fd, VHOST_GET_BACKEND_FEATURES, &backend_features);
-+    if (unlikely(r < 0)) {
-+        error_report("Cannot get vdpa backend_features: %s(%d)",
-+            g_strerror(errno), errno);
-+        return -1;
-+    }
-+    if (!(backend_features & VHOST_BACKEND_F_IOTLB_ASID) ||
-+        !vhost_vdpa_net_valid_svq_features(v->dev->features, NULL)) {
-+        return 0;
-+    }
-+
-+    /**
-+     * Check if all the virtqueues of the virtio device are in a different vq
-+     * than the last vq. VQ group of last group passed in cvq_group.
-+     */
-+    cvq_index = v->dev->vq_index_end - 1;
-+    cvq_group = vhost_vdpa_get_vring_group(v->device_fd, cvq_index);
-+    if (unlikely(cvq_group < 0)) {
-+        return cvq_group;
-+    }
-+    for (int i = 0; i < cvq_index; ++i) {
-+        int64_t group = vhost_vdpa_get_vring_group(v->device_fd, i);
-+
-+        if (unlikely(group < 0)) {
-+            return group;
-+        }
-+
-+        if (unlikely(group == cvq_group)) {
-+            warn_report(
-+                "CVQ %"PRId64" group is the same as VQ %d one (%"PRId64")",
-+                cvq_group, i, group);
-+            return 0;
-+        }
-+    }
-+
-+    r = vhost_vdpa_set_address_space_id(v, cvq_group, VHOST_VDPA_NET_CVQ_ASID);
-+    if (unlikely(r < 0)) {
-+        return r;
-+    }
-+
-+    v->iova_tree = vhost_vdpa_svq_allocate_iova_tree(v->device_fd);
-+    v->shadow_vqs_enabled = true;
-+    s->vhost_vdpa.address_space_id = VHOST_VDPA_NET_CVQ_ASID;
-+
-+out:
-     if (!s->vhost_vdpa.shadow_vqs_enabled) {
-         return 0;
-     }
-@@ -366,6 +462,14 @@ static void vhost_vdpa_net_cvq_stop(NetClientState *nc)
-     if (s->vhost_vdpa.shadow_vqs_enabled) {
-         vhost_vdpa_cvq_unmap_buf(&s->vhost_vdpa, s->cvq_cmd_out_buffer);
-         vhost_vdpa_cvq_unmap_buf(&s->vhost_vdpa, s->status);
-+        if (!s->always_svq) {
-+            /*
-+             * If only the CVQ is shadowed we can delete this safely.
-+             * If all the VQs are shadows this will be needed by the time the
-+             * device is started again to register SVQ vrings and similar.
-+             */
-+            g_clear_pointer(&s->vhost_vdpa.iova_tree, vhost_iova_tree_delete);
-+        }
-     }
- }
- 
--- 
-2.31.1
+        kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start, SZ_2M);
 
+After:
+	/* mmap_anon_or_hugetlbfs: */
+	getpagesize();
+	mmap(NULL, total_map, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	memfd_alloc(size, htlbfs_path, blk_size);
+
+	/*
+	 * memfd_alloc() expands to:
+	 * memfd_create()
+	 * ftruncate
+	 */
+
+	addr_align = (void *)ALIGN((u64)addr_map, align_sz);
+	mmap(addr_align, size, PROT_RW, MAP_PRIVATE | MAP_FIXED, fd, 0);
+
+I'm counting one extra mmap(), one memfd_create() and one ftruncate() that
+this series adds (not to mention all the boiler plate code to check for
+errors).
+
+Let's use another metric, let's count the number of lines of code. Before:
+9 lines of code, after: -3 lines removed from arm/kvm.c and 86 lines of
+code for memfd_alloc() and mmap_anon_or_hugetlbfs_align().
+
+I'm struggling to find a metric by which the resulting code is simpler, as
+you suggest.
+
+
+> allocate and map aligned memory without overallocating, and bring
+
+If your goal is to remove the overallocting of memory, you can just munmap
+the extra memory after alignment is performed. To do that you don't need to
+allocate everything using a memfd.
+
+> kvmtool closer to a more consistent way of allocating guest memory, in
+> a similar manner to other VMMs.
+
+I would really appreciate pointing me to where qemu allocates memory using
+memfd when invoked with -m <size>. I was able to follow the hostmem-ram
+backend allocation function until g_malloc0(), but I couldn't find the
+implementation for that.
+
+> 
+> Moreover, with the private memory proposal [1], whether the fd-based
+> support available can be queried by a KVM capability. If it's
+> available kvmtool would use the fd, if it's not available, it would
+> use the host-mapped address. Therefore, there isn’t a need for a
+> command line option, unless for testing.
+
+Why would anyone want to use private memory by default for a
+non-confidential VM?
+
+> 
+> I have implemented this all the way to support the private memory
+> proposal in kvmtool [5], but I haven’t posted these since the private
+> memory proposal itself is still in flux. If you’re interested you
+
+Are you saying that you are not really sure how the userspace API will end
+up looking? If that's the case, wouldn't it make more sense to wait for the
+API to stabilize and then send support for it as one nice series?
+
+Thanks,
+Alex
+
+> could have a look on how I would go ahead building on these patches
+> for full support of private memory backed by an fd.
+> 
+> > Regarding IPC memory sharing, is mmap'ing an memfd file enough to enable
+> > that? If more work is needed for it, then wouldn't it make more sense to do
+> > all the changes at once? This change might look sensible right now, but it
+> > might turn out that it was the wrong way to go about it when someone
+> > actually starts implementing memory sharing.
+> 
+> I don’t plan on supporting IPC memory sharing. I just mentioned that
+> as yet another use case that would benefit from guest memory being
+> fd-based, should kvmtool decide to support it in the future.
+> 
+> Cheers,
+> /fuad
+> 
+> [1] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.intel.com/
+> [2] https://github.com/qemu/qemu
+> [3] https://chromium.googlesource.com/chromiumos/platform/crosvm/
+> [4] https://github.com/chao-p/qemu/tree/privmem-v9
+> [5] https://android-kvm.googlesource.com/kvmtool/+/refs/heads/tabba/fdmem-v9-core
+> 
+> 
+> 
+> >
+> > Regarding IPC memory sharing, is mmap'ing an memfd file enough to enable
+> > that? If more work is needed for it, then wouldn't it make more sense to do
+> > all the changes at once? This change might look sensible right now, but it
+> > might turn out that it was the wrong way to go about it when someone
+> > actually starts implementing memory sharing.
+> >
+> > Thanks,
+> > Alex
+> >
+> > >
+> > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > >
+> > > [*] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.intel.com/
+> > > ---
+> > >  include/kvm/kvm.h  |  1 +
+> > >  include/kvm/util.h |  3 +++
+> > >  kvm.c              |  4 ++++
+> > >  util/util.c        | 33 ++++++++++++++++++++-------------
+> > >  4 files changed, 28 insertions(+), 13 deletions(-)
+> > >
+> > > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> > > index 3872dc6..d0d519b 100644
+> > > --- a/include/kvm/kvm.h
+> > > +++ b/include/kvm/kvm.h
+> > > @@ -87,6 +87,7 @@ struct kvm {
+> > >       struct kvm_config       cfg;
+> > >       int                     sys_fd;         /* For system ioctls(), i.e. /dev/kvm */
+> > >       int                     vm_fd;          /* For VM ioctls() */
+> > > +     int                     ram_fd;         /* For guest memory. */
+> > >       timer_t                 timerid;        /* Posix timer for interrupts */
+> > >
+> > >       int                     nrcpus;         /* Number of cpus to run */
+> > > diff --git a/include/kvm/util.h b/include/kvm/util.h
+> > > index 61a205b..369603b 100644
+> > > --- a/include/kvm/util.h
+> > > +++ b/include/kvm/util.h
+> > > @@ -140,6 +140,9 @@ static inline int pow2_size(unsigned long x)
+> > >  }
+> > >
+> > >  struct kvm;
+> > > +int memfd_alloc(u64 size, bool hugetlb, u64 blk_size);
+> > > +void *mmap_anon_or_hugetlbfs_align(struct kvm *kvm, const char *htlbfs_path,
+> > > +                                u64 size, u64 align);
+> > >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
+> > >
+> > >  #endif /* KVM__UTIL_H */
+> > > diff --git a/kvm.c b/kvm.c
+> > > index 78bc0d8..ed29d68 100644
+> > > --- a/kvm.c
+> > > +++ b/kvm.c
+> > > @@ -160,6 +160,7 @@ struct kvm *kvm__new(void)
+> > >       mutex_init(&kvm->mem_banks_lock);
+> > >       kvm->sys_fd = -1;
+> > >       kvm->vm_fd = -1;
+> > > +     kvm->ram_fd = -1;
+> > >
+> > >  #ifdef KVM_BRLOCK_DEBUG
+> > >       kvm->brlock_sem = (pthread_rwlock_t) PTHREAD_RWLOCK_INITIALIZER;
+> > > @@ -174,6 +175,9 @@ int kvm__exit(struct kvm *kvm)
+> > >
+> > >       kvm__arch_delete_ram(kvm);
+> > >
+> > > +     if (kvm->ram_fd >= 0)
+> > > +             close(kvm->ram_fd);
+> > > +
+> > >       list_for_each_entry_safe(bank, tmp, &kvm->mem_banks, list) {
+> > >               list_del(&bank->list);
+> > >               free(bank);
+> > > diff --git a/util/util.c b/util/util.c
+> > > index d3483d8..278bcc2 100644
+> > > --- a/util/util.c
+> > > +++ b/util/util.c
+> > > @@ -102,36 +102,38 @@ static u64 get_hugepage_blk_size(const char *htlbfs_path)
+> > >       return sfs.f_bsize;
+> > >  }
+> > >
+> > > -static void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size, u64 blk_size)
+> > > +int memfd_alloc(u64 size, bool hugetlb, u64 blk_size)
+> > >  {
+> > >       const char *name = "kvmtool";
+> > >       unsigned int flags = 0;
+> > >       int fd;
+> > > -     void *addr;
+> > > -     int htsize = __builtin_ctzl(blk_size);
+> > >
+> > > -     if ((1ULL << htsize) != blk_size)
+> > > -             die("Hugepage size must be a power of 2.\n");
+> > > +     if (hugetlb) {
+> > > +             int htsize = __builtin_ctzl(blk_size);
+> > >
+> > > -     flags |= MFD_HUGETLB;
+> > > -     flags |= htsize << MFD_HUGE_SHIFT;
+> > > +             if ((1ULL << htsize) != blk_size)
+> > > +                     die("Hugepage size must be a power of 2.\n");
+> > > +
+> > > +             flags |= MFD_HUGETLB;
+> > > +             flags |= htsize << MFD_HUGE_SHIFT;
+> > > +     }
+> > >
+> > >       fd = memfd_create(name, flags);
+> > >       if (fd < 0)
+> > > -             die("Can't memfd_create for hugetlbfs map\n");
+> > > +             die("Can't memfd_create for memory map\n");
+> > > +
+> > >       if (ftruncate(fd, size) < 0)
+> > >               die("Can't ftruncate for mem mapping size %lld\n",
+> > >                       (unsigned long long)size);
+> > > -     addr = mmap(NULL, size, PROT_RW, MAP_PRIVATE, fd, 0);
+> > > -     close(fd);
+> > >
+> > > -     return addr;
+> > > +     return fd;
+> > >  }
+> > >
+> > >  /* This function wraps the decision between hugetlbfs map (if requested) or normal mmap */
+> > >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+> > >  {
+> > >       u64 blk_size = 0;
+> > > +     int fd;
+> > >
+> > >       /*
+> > >        * We don't /need/ to map guest RAM from hugetlbfs, but we do so
+> > > @@ -146,9 +148,14 @@ void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+> > >               }
+> > >
+> > >               kvm->ram_pagesize = blk_size;
+> > > -             return mmap_hugetlbfs(kvm, htlbfs_path, size, blk_size);
+> > >       } else {
+> > >               kvm->ram_pagesize = getpagesize();
+> > > -             return mmap(NULL, size, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
+> > >       }
+> > > +
+> > > +     fd = memfd_alloc(size, htlbfs_path, blk_size);
+> > > +     if (fd < 0)
+> > > +             return MAP_FAILED;
+> > > +
+> > > +     kvm->ram_fd = fd;
+> > > +     return mmap(NULL, size, PROT_RW, MAP_PRIVATE, kvm->ram_fd, 0);
+> > >  }
+> > > --
+> > > 2.38.1.431.g37b22c650d-goog
+> > >
