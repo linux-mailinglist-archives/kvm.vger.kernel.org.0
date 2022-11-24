@@ -2,81 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72D9F637A91
-	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 14:55:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF97A637B07
+	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 15:04:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229902AbiKXNze (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Nov 2022 08:55:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48636 "EHLO
+        id S230176AbiKXOEE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Nov 2022 09:04:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbiKXNzc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Nov 2022 08:55:32 -0500
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D75DE3D3B
-        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 05:55:30 -0800 (PST)
-Received: by mail-wm1-x335.google.com with SMTP id ay14-20020a05600c1e0e00b003cf6ab34b61so4001559wmb.2
-        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 05:55:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pN+fMTXIbwkvTVCL6teMynvLqCQ1zb8psy5cG5agjcI=;
-        b=o29ZVKlW0hg+wTr5SNdc59ZTn7GtkgIjvdfNuhfZ9Go5RYF0bUJQaqw5oksOVSlXKZ
-         gcP9TNLHnjIxApSzZCFmyVSHsnHp5d8nqgupDXaf2I2GRs9KooJHuWeafVn03RAPJtr/
-         0qkPSxuCTWSkaFU8OuSG1Uq66QpY8nhn69mWWtcNAOe2IaA095kW57glzfzcSggluPjv
-         gM2S+9x9+HeAxzpzkyPXaxArRwLN7K37FBGUiotrf5SRPQRRIGyY0GrWM/F6EFK1MOFE
-         SuMysdzefbRAZ6CgZjQ+ih+yQp1V+6yCvXoo5pkoW/Kg6aWhZ65xv+8aFUSMN8tbrBJG
-         aQPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pN+fMTXIbwkvTVCL6teMynvLqCQ1zb8psy5cG5agjcI=;
-        b=HE2+k58psFGsJiCtZTZsalOQALkD8LR92CWkiuJPiivD4QUupjCN0xbX01gUHDsHJs
-         po3Jcpio/JCMzPSi7lOIXAzXwz0uilK2YhV94BuWzYF5r9TmYAQimgmjI1ALxiFGBUqU
-         dOCQSMpv6VUv9pLMgK1/x3fIIjUUw36/V3IAje0MmrJlvfXEqD5K9mu0RYkmPJ3HffKI
-         6wcD/a1jTsxkPMShn9LMuM7CGcSiWVIVEJkWEwy6J4po9VJC9P3N+qXgop1WV1HDsoO3
-         5Qz7plRzpDcsxgOIvzAIIcRTYX4J/2taoJxiR/iZkPSonxTqrQ2lOCZWt4OsJ7wnaGmR
-         mgRA==
-X-Gm-Message-State: ANoB5pkVZyINOtwZWxvNPBKVQyFe9y2020OYJKg5RRvKPC83SBHz47Ey
-        jmQ+sQYEjDOfFjFhNLhq9l4++Q==
-X-Google-Smtp-Source: AA0mqf7LmgqnY5TT62nL6QBBImocwCh9tlDp2Ug4ekB8tl5kFgZ55ulOqFa7jWHsk4HR1gTXeY+Y4A==
-X-Received: by 2002:a1c:a381:0:b0:3cf:4d14:5705 with SMTP id m123-20020a1ca381000000b003cf4d145705mr12126137wme.35.1669298128503;
-        Thu, 24 Nov 2022 05:55:28 -0800 (PST)
-Received: from ?IPV6:2a02:6b6a:b4d7:0:f0b8:522f:5d6e:d788? ([2a02:6b6a:b4d7:0:f0b8:522f:5d6e:d788])
-        by smtp.gmail.com with ESMTPSA id h20-20020a05600c351400b003b4935f04a4sm2479548wmq.5.2022.11.24.05.55.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Nov 2022 05:55:28 -0800 (PST)
-Message-ID: <95efd030-27f6-5668-a25e-9fbf210bfa1c@bytedance.com>
-Date:   Thu, 24 Nov 2022 13:55:27 +0000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [External] Re: [v2 0/6] KVM: arm64: implement vcpu_is_preempted
- check
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
-        yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-        steven.price@arm.com, mark.rutland@arm.com, bagasdotme@gmail.com,
-        fam.zheng@bytedance.com, liangma@liangbit.com,
-        punit.agrawal@bytedance.com
-References: <20221104062105.4119003-1-usama.arif@bytedance.com>
- <87k048f3cm.wl-maz@kernel.org>
- <180b91af-a2aa-2cfd-eb7f-b2825c4e3dbe@bytedance.com>
- <86r0y1nmep.wl-maz@kernel.org>
-From:   Usama Arif <usama.arif@bytedance.com>
-In-Reply-To: <86r0y1nmep.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S230144AbiKXODj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Nov 2022 09:03:39 -0500
+Received: from mr85p00im-ztdg06021701.me.com (mr85p00im-ztdg06021701.me.com [17.58.23.196])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FB3B1255C2
+        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 06:01:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ynddal.dk; s=sig1;
+        t=1669298483; bh=AoIel4w+JRQ/jK7hEzDTo1ooQVDioZn5F3sPHAbOF2A=;
+        h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To;
+        b=HGLSjv4XAZXEUAzlcPKwjVSMLz9CbaPQp8/UDeelhjp6s5xWVXtZyoWOwNKa+ypYG
+         dfIizEuop1U1/OuUmC615QYlZqQH1z3+X/6dtIaSUKQ5HY24MYKLAfh6QlkVrQ7sHQ
+         NZwobpl1mB3e3pg8GWGYo6YzNGQX1mQNdYr2YdeX3VLJFVBExKlJKNyedNnb3fnVQI
+         66JHtol68sHXAHGacCKgbEHKfdB0mvFVcamOIuOFBAHkngXCCFWZlGOh0q3yxyCvGq
+         y8BVQJ6v1TwnoS993uFHw1hVjCwHgDKZgIEm9FZmQFL+wie5NqfH+nwEFgJXxxOATy
+         2C3KqMaLtrIWA==
+Received: from smtpclient.apple (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
+        by mr85p00im-ztdg06021701.me.com (Postfix) with ESMTPSA id DA5309A0549;
+        Thu, 24 Nov 2022 14:01:19 +0000 (UTC)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.200.110.1.12\))
+Subject: Re: [PATCH] gdbstub: move update guest debug to accel ops
+From:   Mads Ynddal <mads@ynddal.dk>
+In-Reply-To: <af92080f-e708-f593-7ff5-81b7b264d587@linaro.org>
+Date:   Thu, 24 Nov 2022 14:59:52 +0100
+Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C8BC6E24-F98D-428D-80F8-98BDA40C7B15@ynddal.dk>
+References: <20221123121712.72817-1-mads@ynddal.dk>
+ <af92080f-e708-f593-7ff5-81b7b264d587@linaro.org>
+To:     =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+X-Mailer: Apple Mail (2.3731.200.110.1.12)
+X-Proofpoint-ORIG-GUID: DWzLgZrbfIE4SuGNGfuepdxL-rqKcJSM
+X-Proofpoint-GUID: DWzLgZrbfIE4SuGNGfuepdxL-rqKcJSM
+X-Proofpoint-Virus-Version: =?UTF-8?Q?vendor=3Dfsecure_engine=3D1.1.170-22c6f66c430a71ce266a39bfe25bc?=
+ =?UTF-8?Q?2903e8d5c8f:6.0.138,18.0.572,17.0.605.474.0000000_definitions?=
+ =?UTF-8?Q?=3D2020-02-14=5F11:2020-02-14=5F02,2020-02-14=5F11,2020-01-23?=
+ =?UTF-8?Q?=5F02_signatures=3D0?=
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0
+ clxscore=1030 phishscore=0 malwarescore=0 spamscore=0 adultscore=0
+ suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2211240106
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_INVALID,
+        DKIM_SIGNED,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        T_SPF_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -84,101 +66,80 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+> Isn't this '0' flag here accelerator-specific? ...
 
-On 18/11/2022 00:20, Marc Zyngier wrote:
-> On Mon, 07 Nov 2022 12:00:44 +0000,
-> Usama Arif <usama.arif@bytedance.com> wrote:
->>
->>
->>
->> On 06/11/2022 16:35, Marc Zyngier wrote:
->>> On Fri, 04 Nov 2022 06:20:59 +0000,
->>> Usama Arif <usama.arif@bytedance.com> wrote:
->>>>
->>>> This patchset adds support for vcpu_is_preempted in arm64, which
->>>> allows the guest to check if a vcpu was scheduled out, which is
->>>> useful to know incase it was holding a lock. vcpu_is_preempted can
->>>> be used to improve performance in locking (see owner_on_cpu usage in
->>>> mutex_spin_on_owner, mutex_can_spin_on_owner, rtmutex_spin_on_owner
->>>> and osq_lock) and scheduling (see available_idle_cpu which is used
->>>> in several places in kernel/sched/fair.c for e.g. in wake_affine to
->>>> determine which CPU can run soonest):
->>>
->>> [...]
->>>
->>>> pvcy shows a smaller overall improvement (50%) compared to
->>>> vcpu_is_preempted (277%).  Host side flamegraph analysis shows that
->>>> ~60% of the host time when using pvcy is spent in kvm_handle_wfx,
->>>> compared with ~1.5% when using vcpu_is_preempted, hence
->>>> vcpu_is_preempted shows a larger improvement.
->>>
->>> And have you worked out *why* we spend so much time handling WFE?
->>>
->>> 	M.
->>
->> Its from the following change in pvcy patchset:
->>
->> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->> index e778eefcf214..915644816a85 100644
->> --- a/arch/arm64/kvm/handle_exit.c
->> +++ b/arch/arm64/kvm/handle_exit.c
->> @@ -118,7 +118,12 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
->>          }
->>
->>          if (esr & ESR_ELx_WFx_ISS_WFE) {
->> -               kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
->> +               int state;
->> +               while ((state = kvm_pvcy_check_state(vcpu)) == 0)
->> +                       schedule();
->> +
->> +               if (state == -1)
->> +                       kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
->>          } else {
->>                  if (esr & ESR_ELx_WFx_ISS_WFxT)
->>                          vcpu_set_flag(vcpu, IN_WFIT);
->>
->>
->> If my understanding is correct of the pvcy changes, whenever pvcy
->> returns an unchanged vcpu state, we would schedule to another
->> vcpu. And its the constant scheduling where the time is spent. I guess
->> the affects are much higher when the lock contention is very
->> high. This can be seem from the pvcy host side flamegraph as well with
->> (~67% of the time spent in the schedule() call in kvm_handle_wfx), For
->> reference, I have put the graph at:
->> https://uarif1.github.io/pvlock/perf_host_pvcy_nmi.svg
-> 
-> The real issue here is that we don't try to pick the right vcpu to
-> run, and strictly rely on schedule() to eventually pick something that
-> can run.
-> 
-> An interesting to do would be to try and fit the directed yield
-> mechanism there. It would be a lot more interesting than the one-off
-> vcpu_is_preempted hack, as it gives us a low-level primitive on which
-> to construct things (pvcy is effectively a mwait-like primitive).
+> ... if so the prototype should be:
+>=20
+>       int (*update_guest_debug)(CPUState *cpu);
+>=20
+> and the '0' value set within kvm-accel-ops.c handler implementation.
+>=20
 
-We could use kvm_vcpu_yield_to to yield to a specific vcpu, but how 
-would we determine which vcpu to yield to?
+You're right, we can avoid the additional variable. We'll then have to =
+wrap
+`kvm_update_guest_debug`. Would the following be ok?
 
-IMO vcpu_is_preempted is very well integrated in a lot of core kernel 
-code, i.e. mutex, rtmutex, rwsem and osq_lock. It is also used in 
-scheduler to determine better which vCPU we can run on soonest, select 
-idle core, etc. I am not sure if all of these cases will be optimized by 
-pvcy? Also, with vcpu_is_preempted, some of the lock heavy benchmarks 
-come down from spending around 50% of the time in lock to less than 1% 
-(so not sure how much more room is there for improvement).
+diff --git a/accel/kvm/kvm-accel-ops.c b/accel/kvm/kvm-accel-ops.c
+index 6ebf9a644f..5e0fb42408 100644
+--- a/accel/kvm/kvm-accel-ops.c
++++ b/accel/kvm/kvm-accel-ops.c
+@@ -86,6 +86,10 @@ static bool kvm_cpus_are_resettable(void)
+     return !kvm_enabled() || kvm_cpu_check_are_resettable();
+ }
+=20
++static int kvm_update_guest_debug_ops(CPUState *cpu) {
++    return kvm_update_guest_debug(cpu, 0);
++}
++
+ static void kvm_accel_ops_class_init(ObjectClass *oc, void *data)
+ {
+     AccelOpsClass *ops =3D ACCEL_OPS_CLASS(oc);
+@@ -99,7 +103,7 @@ static void kvm_accel_ops_class_init(ObjectClass *oc, =
+void *data)
+     ops->synchronize_pre_loadvm =3D kvm_cpu_synchronize_pre_loadvm;
+=20
+ #ifdef KVM_CAP_SET_GUEST_DEBUG
+-    ops->update_guest_debug =3D kvm_update_guest_debug;
++    ops->update_guest_debug =3D kvm_update_guest_debug_ops;
+     ops->supports_guest_debug =3D kvm_supports_guest_debug;
+     ops->insert_breakpoint =3D kvm_insert_breakpoint;
+     ops->remove_breakpoint =3D kvm_remove_breakpoint;
+diff --git a/cpu.c b/cpu.c
+index ef433a79e3..b2ade96caa 100644
+--- a/cpu.c
++++ b/cpu.c
+@@ -383,7 +383,7 @@ void cpu_single_step(CPUState *cpu, int enabled)
+         cpu->singlestep_enabled =3D enabled;
+=20
+         if (ops->update_guest_debug) {
+-            ops->update_guest_debug(cpu, 0);
++            ops->update_guest_debug(cpu);
+         }
+=20
+         trace_breakpoint_singlestep(cpu->cpu_index, enabled);
+diff --git a/include/sysemu/accel-ops.h b/include/sysemu/accel-ops.h
+index 0a47a2f00c..cd6a4ef7a5 100644
+--- a/include/sysemu/accel-ops.h
++++ b/include/sysemu/accel-ops.h
+@@ -48,7 +48,7 @@ struct AccelOpsClass {
+=20
+     /* gdbstub hooks */
+     bool (*supports_guest_debug)(void);
+-    int (*update_guest_debug)(CPUState *cpu, unsigned long flags);
++    int (*update_guest_debug)(CPUState *cpu);
+     int (*insert_breakpoint)(CPUState *cpu, int type, hwaddr addr, =
+hwaddr len);
+     int (*remove_breakpoint)(CPUState *cpu, int type, hwaddr addr, =
+hwaddr len);
+     void (*remove_all_breakpoints)(CPUState *cpu);
 
-We could also use vcpu_is_preempted to optimize IPI performance (along 
-with directed yield to target IPI vCPU) similar to how its done in x86 
-(https://lore.kernel.org/all/1560255830-8656-2-git-send-email-wanpengli@tencent.com/). 
-This case definitely wont be covered by pvcy.
 
-Considering all the above, i.e. the core kernel integration already 
-present and possible future usecases of vcpu_is_preempted, maybe its 
-worth making vcpu_is_preempted work on arm independently of pvcy?
+If you have a better name for `kvm_update_guest_debug_ops`, I'm open for
+suggestions.
 
-Thanks,
-Usama
-
-> 
-> 	M.
-> 
+On a side note. When compiling for an arch that isn't the same as the =
+system
+(i.e. aarch64 on x86_64), I'm getting a linker-error for cpu.c that
+`cpus_get_accel` isn't defined. Do I need to move `cpus_get_accel` or =
+somehow
+#ifdef its use?=
