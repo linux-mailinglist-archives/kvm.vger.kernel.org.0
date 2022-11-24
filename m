@@ -2,135 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A2D1637E80
-	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 18:41:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C8CE4637EBD
+	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 19:00:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229682AbiKXRlU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Nov 2022 12:41:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34054 "EHLO
+        id S229840AbiKXSAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Nov 2022 13:00:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229633AbiKXRlL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Nov 2022 12:41:11 -0500
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2040.outbound.protection.outlook.com [40.107.101.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8152C13C710
-        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 09:41:10 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lfSqh2T8ZtM3Q+pg1KDMcCzA96VHNuOiku7QJTmVWfh79Vd6siVCa2gEA/XDlFNYI7bERIFw/r+Q0hBVjFFVRdWyh6Q99ILuoS/tKxW4AAfp0xzvgPlhL17/hxlxAlgm84MSZHd37+l8Apj4k3oSQBWDzsCP00HfwsdPizmbzhPEBe22hFJI/mJ88yuozNbCI7HLT3IWywqIiynabIqZQ/6yUu8Yv8NhNs40l7v/xsn/YNDOMaXH6iVoqxjZYjD0EpiSyySjtAcCNLyGIh3MSe3zVMKLwSQ9aZbdqRnBH0BcSRurb0gmSWGV6DSp8rB4yJgo/QXLiLq5vpT1T9chEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oeicPMB1a5ZmCLJ9SaKk7KlezHuZMdGanA64A0nPhcE=;
- b=MS3GQ37+g6GlYwajrTUMHEORPGyJXMQaG2Jq4TSfgBnfRIgHcrXMQrmeIDeMEoEzTGnctZh01TTH+POTokoLSW/hjRJ3Dl7ov3R4Qcc+Tyntl0AH0hYFxyDc3TWikkfw9RidxHi7gpCqG3q0QBCF27yNMFOy5UZt2DmDFykmxW8jFAU1IAKIBKUDSy7URozfXdqCQ8KbWh/sRcBQRV6kq0WaxFxS4yASl37phV8tLN/ewXdsAfPb7PvxAcTpnxvRrRq+HsBq2B+iFblZDo1zYEzdMRAhjKhJGfhHSNxcUT0IbJJm3BeUPoB/J8OihmRT1U783zg9VNvheQ014Ter3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oeicPMB1a5ZmCLJ9SaKk7KlezHuZMdGanA64A0nPhcE=;
- b=bHoKFyEKNEKPhaSB7Fg/hEqDSmwvKX59BWb+WD/Ew1klYSVZXEq9W7r1vexuwzf2eNCQOw8LWgBPic6Ci5G/0OEFlaHskI/gxaTHBDNzQWJwyuPHpBlBWAdy4qQXbGITbzGzSMngUd/JfJKjpIcaA5GAU9DNnMQyGQShjQKM1PeTU/4+IqRGkK/y+/fFYd9U/osQJHT4LlNUPxEscjkO0ZhUp6EYxyuxiwN/nX1wjtFuWjjTk/nfOEWT9CDYQovLNEBzWg/BqYsye1Ewonq7qn1QKZp+d2lMG8SfqYQobg8pfN0inkCGhd62cvlJKUfQRK9KYQjZRkDIZh6SV59rpw==
-Received: from DS7PR03CA0269.namprd03.prod.outlook.com (2603:10b6:5:3b3::34)
- by DM6PR12MB4297.namprd12.prod.outlook.com (2603:10b6:5:211::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.19; Thu, 24 Nov
- 2022 17:41:08 +0000
-Received: from DM6NAM11FT113.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3b3:cafe::a9) by DS7PR03CA0269.outlook.office365.com
- (2603:10b6:5:3b3::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.19 via Frontend
- Transport; Thu, 24 Nov 2022 17:41:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- DM6NAM11FT113.mail.protection.outlook.com (10.13.173.5) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5857.17 via Frontend Transport; Thu, 24 Nov 2022 17:41:08 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 24 Nov
- 2022 09:41:07 -0800
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.36; Thu, 24 Nov 2022 09:41:06 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.986.36 via Frontend
- Transport; Thu, 24 Nov 2022 09:41:03 -0800
-From:   Yishai Hadas <yishaih@nvidia.com>
-To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>
-CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
-        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
-        <shayd@nvidia.com>, <yishaih@nvidia.com>, <maorg@nvidia.com>,
-        <avihaih@nvidia.com>, <cohuck@redhat.com>
-Subject: [PATCH V1 vfio 14/14] vfio/mlx5: Enable MIGRATION_PRE_COPY flag
-Date:   Thu, 24 Nov 2022 19:39:32 +0200
-Message-ID: <20221124173932.194654-15-yishaih@nvidia.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20221124173932.194654-1-yishaih@nvidia.com>
-References: <20221124173932.194654-1-yishaih@nvidia.com>
+        with ESMTP id S229832AbiKXSAs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Nov 2022 13:00:48 -0500
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A70269AB6
+        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 10:00:47 -0800 (PST)
+Received: by mail-qv1-xf2e.google.com with SMTP id n12so1330899qvr.11
+        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 10:00:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vR6T1WWc3XpWCUQ2N8sVBEgP3FzOAv7MN1ehO7+huGU=;
+        b=D7LsK4acFJ49jpYVEYKFSg3MHiaBtGzrWFuScsC4O+6HJ3TdKzB/j6B6WQg1Ih5cr9
+         95sxRCnTnksUeoCLzn5L2O5RtUmzg8gAtYsxn7KamEhRMsHbrFs2ahJfn1skyEj9ulKL
+         ZcjQE9bqJUsQWwH/jcFAu6MMMYyU5XEY9lN16Yf/sy1Zlc7CKpWqtt5o5VFWxph6kiBd
+         Weh2wZaquSUfHwJAe0EgOPyExSiMltaHSaWhip9bo7v0EjODxirdbRMgM9ytYuAbAHRT
+         e4CXnKSEl5NE5Gl8NdohMxUpc399b8543wMIhma1NQ7H+q/Fnj4Msi9+nJ/+/UFlKbB+
+         hb1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vR6T1WWc3XpWCUQ2N8sVBEgP3FzOAv7MN1ehO7+huGU=;
+        b=QRPQkHdKK9kKFz5nLYHXxjTYN2KoPd3LTQ8IcRExkNLE1eXvFVkWEM+1m8GzlpBFkx
+         XhkvsQI4CQC3ESCQsEsGSUOdS6mbu4MR8kToRxEfx6kXyh5bo614A4ITLY3L2jJz3f9o
+         aOJNwXgfulF/6Y7VRhge+WSJJQrtMMHeXD5ldHExkw7xRMTKw0mkZxmV6wSQ0sLxCjcg
+         ejzhbfPHZbTzYEMzVqfObNmLIHqA3gqPD98W8cBmKc0P31XMSRt+a9JzR8kWskT4t08Q
+         Vo93Zdcu2Rmbpu66EdIYrMCaW4Op5++8xaalliDEC8U0J/jgQ6zDOAIGOnh+ESnaql8d
+         sceA==
+X-Gm-Message-State: ANoB5pm9Ws+ySjqmaro084PlNEao+ORZsvC3dy5QPS1K9SBGWMJ9R1AL
+        uSfukyjvGKudtDzVGKU70g+0jQ==
+X-Google-Smtp-Source: AA0mqf4wypyeB304r429FtI4J+qSzL+Fdag5hFRpLI6tfvk5NFbqP2z9vWEmzynU76/MBi6x3l9N2g==
+X-Received: by 2002:a0c:e70d:0:b0:496:6092:9f0f with SMTP id d13-20020a0ce70d000000b0049660929f0fmr13465607qvn.32.1669312846495;
+        Thu, 24 Nov 2022 10:00:46 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
+        by smtp.gmail.com with ESMTPSA id k23-20020ac86057000000b00399b73d06f0sm895955qtm.38.2022.11.24.10.00.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Nov 2022 10:00:45 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1oyGWi-00CKo4-EL;
+        Thu, 24 Nov 2022 14:00:44 -0400
+Date:   Thu, 24 Nov 2022 14:00:44 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     chenxiang <chenxiang66@hisilicon.com>
+Cc:     alex.williamson@redhat.com, maz@kernel.org, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, linuxarm@huawei.com
+Subject: Re: [PATCH v2] vfio/pci: Verify each MSI vector to avoid invalid MSI
+ vectors
+Message-ID: <Y3+xTLC0io6wvPpf@ziepe.ca>
+References: <1669167756-196788-1-git-send-email-chenxiang66@hisilicon.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT113:EE_|DM6PR12MB4297:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf02945a-76d0-40d1-2bbf-08dace4311dd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8APvwMpxYkkVnrIe/lKl76SPVAPeSarFWOZK07IrprCMs9RWe4UjkRrg3tulW9opW/NdKAuAVlewC2bE9H6+0fWOmnJwC6bBBFde+RQRTohyZSjw0zm6Vn1PUWmjaNoExKa4C50lNgJds1eFB4gQuCr8ox48zjw79P5i2GagWb0EFMDOWhuGphBmf86nYVQDIg0Qap+bPy+OlzS6Y8wudg0Sa8hAaP/mtdAL1jLGpGIUw+u4/8GFgLhYvverkvFBCBQkabC3/b+U08TzGFgxFbeDZsgb59+4VPVgbpwBe2bzKosYKKsg3oHHuCaMMrqpE2n5K7J3eHs0NuMk6EI4bdEb344jATHlIohMguwpQVG47H+n69rbrepNKmPHbyhIGqMTkNTIS+589VyBmf2YQTpMPzAbRokzxJoCIhIQ6Ebs3x+0T0q99Vx3A4dltAqoieQwu4F5PEbbIViHuNd5SBxZiSWBAFJZf1S1SCG3a6JzTwcEiUcGCg7IKywE4glq4wtEVxFek83i5asyh4FTum/zUQmhTu8rJ207ozJfE7QZMzy6EMHRFo6O+1n38EPH2FBslfe6R9BqGQz45A8YdhpK9My7nYJ/Ql11O/qPBbebxY7HgoBHEG1lHzq8nxvPaPqrNN5G/SAuCN7GKjK0WxKvpTRT+YIBFfijPk6h+h1ABzyPt2KOUtkboLhoiV0MSJuJJskWE8U07EAJ8fdFzw==
-X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(376002)(39860400002)(346002)(136003)(396003)(451199015)(46966006)(40470700004)(36840700001)(186003)(2616005)(1076003)(426003)(336012)(47076005)(82310400005)(36756003)(5660300002)(41300700001)(4744005)(6666004)(7696005)(8936002)(26005)(86362001)(316002)(54906003)(110136005)(6636002)(8676002)(4326008)(40460700003)(478600001)(70586007)(36860700001)(70206006)(2906002)(82740400003)(40480700001)(356005)(7636003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2022 17:41:08.2778
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf02945a-76d0-40d1-2bbf-08dace4311dd
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT113.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4297
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1669167756-196788-1-git-send-email-chenxiang66@hisilicon.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Shay Drory <shayd@nvidia.com>
+On Wed, Nov 23, 2022 at 09:42:36AM +0800, chenxiang via wrote:
+> From: Xiang Chen <chenxiang66@hisilicon.com>
+> 
+> Currently the number of MSI vectors comes from register PCI_MSI_FLAGS
+> which should be power-of-2 in qemu, in some scenaries it is not the same as
+> the number that driver requires in guest, for example, a PCI driver wants
+> to allocate 6 MSI vecotrs in guest, but as the limitation, it will allocate
+> 8 MSI vectors. So it requires 8 MSI vectors in qemu while the driver in
+> guest only wants to allocate 6 MSI vectors.
+> 
+> When GICv4.1 is enabled, it iterates over all possible MSIs and enable the
+> forwarding while the guest has only created some of mappings in the virtual
+> ITS, so some calls fail. The exception print is as following:
+> vfio-pci 0000:3a:00.1: irq bypass producer (token 000000008f08224d) registration
+> fails:66311
 
-Now that everything has been set up for MIGRATION_PRE_COPY, enable it.
+With Thomas's series to make MSI more dynamic this could spell future
+problems, as future kernels might have different ordering.
 
-Signed-off-by: Shay Drory <shayd@nvidia.com>
-Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
----
- drivers/vfio/pci/mlx5/cmd.c | 5 +++++
- 1 file changed, 5 insertions(+)
+It is just architecturally wrong to tie the MSI programming at the PCI
+level with the current state of the guest's virtual interrupt
+controller.
 
-diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
-index a1dca065b977..019011b8710e 100644
---- a/drivers/vfio/pci/mlx5/cmd.c
-+++ b/drivers/vfio/pci/mlx5/cmd.c
-@@ -221,6 +221,11 @@ void mlx5vf_cmd_set_migratable(struct mlx5vf_pci_core_device *mvdev,
- 	if (MLX5_CAP_GEN(mvdev->mdev, adv_virtualization))
- 		mvdev->core_device.vdev.log_ops = log_ops;
- 
-+	if (MLX5_CAP_GEN_2(mvdev->mdev, migration_multi_load) &&
-+	    MLX5_CAP_GEN_2(mvdev->mdev, migration_tracking_state))
-+		mvdev->core_device.vdev.migration_flags |=
-+			VFIO_MIGRATION_PRE_COPY;
-+
- end:
- 	mlx5_vf_put_core_dev(mvdev->mdev);
- }
--- 
-2.18.1
+Physical hardware doesn't do this, virtual emulation shouldn't either.
 
+People are taking too many liberties with trapping the PCI MSI
+registers through VFIO. :(
+
+Jason
