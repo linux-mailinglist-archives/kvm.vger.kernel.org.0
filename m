@@ -2,114 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2740363765A
-	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 11:27:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6419D6376A1
+	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 11:39:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbiKXK1d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Nov 2022 05:27:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45238 "EHLO
+        id S229726AbiKXKjR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Nov 2022 05:39:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229704AbiKXK1b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Nov 2022 05:27:31 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3AFB60E1;
-        Thu, 24 Nov 2022 02:27:27 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AOA4Nnb010307;
-        Thu, 24 Nov 2022 10:27:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=bZmt9F2QFPDg9RfOcLRTpMW9cZG31Npju4rqsm0z3Nc=;
- b=Hb1tzQwuybeDfMU7qhlvC/W+oF4pRmCKcwRp4kYbZYNX/XPbDLjxJqQoAEHAT4UllTuz
- srnEua8SLe2Y4BYc6JctwWrRHzgoWvOJoWnTEfi94toOBXBMGKMW+RyHRcx7x7drJllM
- e/LCNfUTHCJSmq74BzQVWv+KbxAKqahR2cb9RmstOW1lET0qqHQdQ9Nv76acv1NXcsyr
- ooREK2S9jS1XrOydS7jl0aYJyVFKzIOTiHDMFjD6XgIkPXtF5qWCqlgDa+oTECSi66M4
- yZNvL25Dk20yh3xySAACZ/k42IrmPa6HdQ2tmaAMmmmtQyQmp9mquguDHAgaTbj/Rs6f zA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m1n2w7jbw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Nov 2022 10:27:27 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AOA4OnA010427;
-        Thu, 24 Nov 2022 10:27:26 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m1n2w7jb8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Nov 2022 10:27:26 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AOAKxkQ018760;
-        Thu, 24 Nov 2022 10:27:24 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma05fra.de.ibm.com with ESMTP id 3kxps8ns2f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Nov 2022 10:27:24 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AOARLnq59310542
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Nov 2022 10:27:21 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3DC4652054;
-        Thu, 24 Nov 2022 10:27:21 +0000 (GMT)
-Received: from [9.152.224.253] (unknown [9.152.224.253])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id EF50C52050;
-        Thu, 24 Nov 2022 10:27:20 +0000 (GMT)
-Message-ID: <4d46020f-f33a-474c-b791-be11c2ce2aa6@linux.ibm.com>
-Date:   Thu, 24 Nov 2022 11:27:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH] KVM: s390: vsie: Fix the initialization of the epoch
- extension (epdx) field
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        "Collin L. Walling" <walling@linux.ibm.com>,
-        Jason J Herne <jjherne@linux.ibm.com>
-References: <20221123090833.292938-1-thuth@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20221123090833.292938-1-thuth@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MsngLNbAC4-9Xn2BmNnR1dCcJ9mp15pq
-X-Proofpoint-GUID: hazaGeK5oRVNANFYWbyRBS4ILxLi7g9k
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
-MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-24_07,2022-11-24_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- adultscore=0 suspectscore=0 spamscore=0 mlxscore=0 bulkscore=0
- phishscore=0 malwarescore=0 mlxlogscore=866 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211240079
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229704AbiKXKjP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Nov 2022 05:39:15 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 749B214D86E
+        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 02:39:13 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0F500620A1
+        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 10:39:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 531F3C433C1;
+        Thu, 24 Nov 2022 10:39:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669286352;
+        bh=L1+jBgistF0AFANuNIFVPs/iK+/oLopvwHGSP0X0ATQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=jJqBTlJKSqMBMarfbumGPWbm5RAFoYbgOYpXbaMrbhhXCfvbmCoXnGpivtFpeZwjJ
+         paJN86JEL53PgITILBqempYlp77s6xcao2H+IgVbvWt8ynBxXve0WO7WJMZZbw3vXu
+         jZhcf7BQZVV/jhynfB8n6TA/FYb/aoAXWKWQXhN+NnC3RstRmFaPoOlP/FHKnZ9TC6
+         eCaHxLU5TN2axuBcwQYGwOXLu9dgPEzKppV9yuSpUEt4C1NVjCFwB0HXSwwpGM3KfD
+         PCOcTdolEMfynHrQm5VDM8dT8IyfdgUvN/5vK5sAT1k5m/FAgEs5k4N9qsKRcFzMBl
+         OEHk3OuPNs6Jg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oy9dO-008LQm-31;
+        Thu, 24 Nov 2022 10:39:10 +0000
+Date:   Thu, 24 Nov 2022 10:39:09 +0000
+Message-ID: <86a64gocvm.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Peter Collingbourne <pcc@google.com>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        Cornelia Huck <cohuck@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
+        Steven Price <steven.price@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>
+Subject: Re: [PATCH v5 0/8] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
+In-Reply-To: <CAMn1gO62ugtyL9-0hE=DCn=EJ6JY+=Li3QTKPeNULdUhZdnM7w@mail.gmail.com>
+References: <20221104011041.290951-1-pcc@google.com>
+        <86a656r8nh.wl-maz@kernel.org>
+        <CAMn1gO62ugtyL9-0hE=DCn=EJ6JY+=Li3QTKPeNULdUhZdnM7w@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pcc@google.com, linux-mm@kvack.org, akpm@linux-foundation.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, cohuck@redhat.com, catalin.marinas@arm.com, will@kernel.org, eugenis@google.com, kvm@vger.kernel.org, steven.price@arm.com, vincenzo.frascino@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/23/22 10:08, Thomas Huth wrote:
-> We recently experienced some weird huge time jumps in nested guests when
-> rebooting them in certain cases. After adding some debug code to the epoch
-> handling in vsie.c (thanks to David Hildenbrand for the idea!), it was
-> obvious that the "epdx" field (the multi-epoch extension) did not get set
-> to 0xff in case the "epoch" field was negative.
-> Seems like the code misses to copy the value from the epdx field from
-> the guest to the shadow control block. By doing so, the weird time
-> jumps are gone in our scenarios.
+On Fri, 04 Nov 2022 17:42:27 +0000,
+Peter Collingbourne <pcc@google.com> wrote:
 > 
-> Link: https://bugzilla.redhat.com/show_bug.cgi?id=2140899
-> Fixes: 8fa1696ea781 ("KVM: s390: Multiple Epoch Facility support")
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> On Fri, Nov 4, 2022 at 9:23 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Fri, 04 Nov 2022 01:10:33 +0000,
+> > Peter Collingbourne <pcc@google.com> wrote:
+> > >
+> > > Hi,
+> > >
+> > > This patch series allows VMMs to use shared mappings in MTE enabled
+> > > guests. The first five patches were taken from Catalin's tree [1] which
+> > > addressed some review feedback from when they were previously sent out
+> > > as v3 of this series. The first patch from Catalin's tree makes room
+> > > for an additional PG_arch_3 flag by making the newer PG_arch_* flags
+> > > arch-dependent. The next four patches are based on a series that
+> > > Catalin sent out prior to v3, whose cover letter [2] I quote from below:
+> > >
+> > > > This series aims to fix the races between initialising the tags on a
+> > > > page and setting the PG_mte_tagged flag. Currently the flag is set
+> > > > either before or after that tag initialisation and this can lead to CoW
+> > > > copying stale tags. The first patch moves the flag setting after the
+> > > > tags have been initialised, solving the CoW issue. However, concurrent
+> > > > mprotect() on a shared mapping may (very rarely) lead to valid tags
+> > > > being zeroed.
+> > > >
+> > > > The second skips the sanitise_mte_tags() call in kvm_set_spte_gfn(),
+> > > > deferring it to user_mem_abort(). The outcome is that no
+> > > > sanitise_mte_tags() can be simplified to skip the pfn_to_online_page()
+> > > > check and only rely on VM_MTE_ALLOWED vma flag that can be checked in
+> > > > user_mem_abort().
+> > > >
+> > > > The third and fourth patches use PG_arch_3 as a lock for page tagging,
+> > > > based on Peter Collingbourne's idea of a two-bit lock.
+> > > >
+> > > > I think the first patch can be queued but the rest needs some in depth
+> > > > review and test. With this series (if correct) we could allos MAP_SHARED
+> > > > on KVM guest memory but this is to be discussed separately as there are
+> > > > some KVM ABI implications.
+> > >
+> > > In this v5 I rebased Catalin's tree onto -next again. Please double check
+> >
+> > Please don't do use -next as a base. In-flight series should be based
+> > on a *stable* tag, either 6.0 or one of the early -RCs. If there is a
+> > known conflict with -next, do mention it in the cover letter and
+> > provide a resolution.
+> 
+> Okay, I will keep that in mind.
+> 
+> > > my rebase, which resolved the conflict with commit a8e5e5146ad0 ("arm64:
+> > > mte: Avoid setting PG_mte_tagged if no tags cleared or restored").
+> >
+> > This commit seems part of -rc1, so I guess the patches directly apply
+> > on top of that tag?
+> 
+> Yes, sorry, this also applies cleanly to -rc1.
+> 
+> > > I now have Reviewed-by for all patches except for the last one, which adds
+> > > the documentation. Thanks for the reviews so far, and please take a look!
+> >
+> > I'd really like the MM folks (list now cc'd) to look at the relevant
+> > patches (1 and 5) and ack them before I take this.
+> 
+> Okay, here are the lore links for the convenience of the MM folks:
+> https://lore.kernel.org/all/20221104011041.290951-2-pcc@google.com/
+> https://lore.kernel.org/all/20221104011041.290951-6-pcc@google.com/
 
-Could you please add a test for this to the KVM unit tests?
-I'd guess you might already have some code for it from your debugging 
-sessions.
+I have not seen any Ack from the MM folks so far, and we're really
+running out of runway for this merge window.
 
+Short of someone shouting now, I'll take the series into the kvmarm
+tree early next week.
+
+Thanks,
+
+
+-- 
+Without deviation from the norm, progress is not possible.
