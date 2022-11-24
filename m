@@ -2,178 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19ABC6374B3
-	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 10:04:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D01B6374B6
+	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 10:04:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229969AbiKXJEG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Nov 2022 04:04:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38008 "EHLO
+        id S229892AbiKXJEp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Nov 2022 04:04:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229746AbiKXJED (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Nov 2022 04:04:03 -0500
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78A2D10EA2D
-        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 01:04:02 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id v124-20020a1cac82000000b003cf7a4ea2caso3419063wme.5
-        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 01:04:02 -0800 (PST)
+        with ESMTP id S230123AbiKXJE3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Nov 2022 04:04:29 -0500
+Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDC09110913
+        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 01:04:26 -0800 (PST)
+Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-13bd2aea61bso1377961fac.0
+        for <kvm@vger.kernel.org>; Thu, 24 Nov 2022 01:04:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=atishpatra.org; s=google;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=eSHkE7V37eRRB+OmAQ0+m49WziMhPUEY6R34db9KS7g=;
-        b=LYeXwgcLWttOK+PTUktaFMrFBa3suPjmv61D7Mt4V1wBx0WHj3M/BrOrlmmMnwoUhY
-         0y6yMjEdu60ceVb/+E9euPcn9cedsz6AUGhQorRP1Zq4qu+/fcYlxFbof6M/Mn1r7ix6
-         BwAvWjBPdbl1qF9nWLbFL64A6A13E3MKWeQYlI+Gme5RYfMaWff/r/8Yjq5u4pe6r7QH
-         D6lWtvxoRcDOO1ce2l8S864c7nUBs/khNMND/HMDUXQeFj84WzY2KFxI9tDR2WByaTk+
-         Z7Yd64/GTmLkJHheav3I1dPQ+o2i4yTvWE/EvnhflODTshEWOij4ANS5FAlpA1UXKPQU
-         BqmA==
+        bh=GskdefzDhpEJdGPupN73trBGgVe2XcooqSs6tZjZg+E=;
+        b=clwCIfMJqaJ0fQEwDkADVQu6BE0lfReVFb9n6+9d/WHIJrWK8pmsDFzcHSNh+q5FL5
+         iKMqTRrVgT6nmZgmVV5KZe1LTGExe3COTBFaCFVkThZC3MzR6gY8ibDhMstZoLLjE1+j
+         CXZ9MEW17ik+wp8O823aI2Z2hERUesuhNOmSg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=eSHkE7V37eRRB+OmAQ0+m49WziMhPUEY6R34db9KS7g=;
-        b=crzzw2qYbnGVmNsgdJf+5Z4Cm3Gv6X/JEYUNT7YL5sUg8rXRXFlPWQv25RwKR/8ZXh
-         aAHow+FcALm7aeWe783n9AQ3F5GZnAC7ZzMA4Qr42mb2HgWt55kUOeeKwlnjknvYeThx
-         P1OBw7WRsDoRsNPF67I+n5rJkrpvsyhIWqd4q4oMc96T2lsOv1kbPkA51c8tnvXjSBVl
-         0K2o2/ep7cfNLfAyj0pQ0xRxSWzmxH65bRJuPBLkJfk8Owtha7bYZ+VD9ex++GVLycSY
-         DGjMA0dtxJmkzQVU+jIVP47IPenjHx1VtcrqEp6X3F0TGz1ymmkES7ZEZVOlUE5QMZwS
-         CelA==
-X-Gm-Message-State: ANoB5pmBS6U38aKjSilCEIif0l69vaxjOzkUSpoQ4YnuK6fMLwzmwDUS
-        AGKQXQGXu5sXh2/ztaBXX0ZlJ/7VcLbU7SKQuO9Jmw==
-X-Google-Smtp-Source: AA0mqf6x/ExsicSzIsXDel57lNri4Nr6Rn5qOOTdUHWDHAIoH+gIEH9T7LCfz9Epl6npOtEKL/DyWoeDA2/2pjnVpVk=
-X-Received: by 2002:a05:600c:2108:b0:3cf:aae0:802a with SMTP id
- u8-20020a05600c210800b003cfaae0802amr13202014wml.112.1669280640770; Thu, 24
- Nov 2022 01:04:00 -0800 (PST)
+        bh=GskdefzDhpEJdGPupN73trBGgVe2XcooqSs6tZjZg+E=;
+        b=3ImfvyrFvA0Wm0ceL7FxDNOyyD08soV3DyTDPTOSXOnZ372bCDkpwmwi+GfOvLIR/R
+         vH/Tp+oWUJ4kFjkSKhsze+btPm3q6i7G9J961lTEyTHZX6oOvdHdZmwXCgsJ0s+LT8nw
+         Sgcq+Y7x4ZNjsMBgq9BIKOGR8q7DRK9H1BjoqtvYrRhYXF8miTH9AQb0pOcsUbPqtfwW
+         6Xsv77LAIf97/5wyg8st5XFZy3FdQPxgG2MlURdHj5bACpHDclYeOj7bhA2LY1OlFIJR
+         K+CW9B6bcOjT5bLBundqut9TOFcCOAyBzavKa1CEklblwL2rJ1vHMdbjSGFKsM7trFv5
+         20gA==
+X-Gm-Message-State: ANoB5pnB8+O5ITqTEzHQeRe2eJisvxpTYmfzXQHcaroPmNeA5Nytard2
+        QsQZXeiVf5/774AbVU4xr0udjUBpJAha1g308zeQ
+X-Google-Smtp-Source: AA0mqf48nDcZ5pOw8inOJMr+cmGIXfYN/bZRBYRNG8WluVWZ7S+k4L2pJQZvJLssjgZFGEwvT+XVs+wM4BU4BUdqbpM=
+X-Received: by 2002:a05:6870:c18a:b0:142:870e:bd06 with SMTP id
+ h10-20020a056870c18a00b00142870ebd06mr15305401oad.181.1669280666095; Thu, 24
+ Nov 2022 01:04:26 -0800 (PST)
 MIME-Version: 1.0
-References: <20221121234026.3037083-1-vipinsh@google.com> <20221121234026.3037083-3-vipinsh@google.com>
- <87bkozosvh.fsf@ovpn-194-185.brq.redhat.com> <CAHVum0eW4WMHe1vNsWn-2xbMxgckFwu_pOQR7hs0NbFj3sM8Tg@mail.gmail.com>
- <87wn7koik7.fsf@ovpn-192-146.brq.redhat.com>
-In-Reply-To: <87wn7koik7.fsf@ovpn-192-146.brq.redhat.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Thu, 24 Nov 2022 01:03:24 -0800
-Message-ID: <CAHVum0fZZwsCEL-bMM2phfiukSF0_M_-DiTEhYg562FYSnf6_g@mail.gmail.com>
-Subject: Re: [PATCH v2 2/6] KVM: x86: hyper-v: Add extended hypercall support
- in Hyper-v
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com
+References: <20220718170205.2972215-1-atishp@rivosinc.com> <20220718170205.2972215-6-atishp@rivosinc.com>
+ <20221101141329.j4qtvjf6kmqixt2r@kamzik> <CAOnJCULMbTp6WhVRWHxzFnUgCJJV01hcyukQxSEih-sYt5TJWg@mail.gmail.com>
+ <CAOnJCUKpdV3u8X6BSC+-rhV0Q8q2tdsa8r_KTH5FWCh2LV2q8Q@mail.gmail.com> <20221123133636.gke3626aolfrnevy@kamzik>
+In-Reply-To: <20221123133636.gke3626aolfrnevy@kamzik>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Thu, 24 Nov 2022 01:04:15 -0800
+Message-ID: <CAOnJCULUH09HPZL6Ks-xUsiDLQPR6xOv2g+ic9Gd3uwea6hCyQ@mail.gmail.com>
+Subject: Re: [RFC 5/9] RISC-V: KVM: Add skeleton support for perf
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>, Guo Ren <guoren@kernel.org>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Will Deacon <will@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 24, 2022 at 12:36 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+On Wed, Nov 23, 2022 at 5:36 AM Andrew Jones <ajones@ventanamicro.com> wrote:
 >
-> Vipin Sharma <vipinsh@google.com> writes:
+> ...
+> > > > > -     csr_write(CSR_HCOUNTEREN, -1UL);
+> > > > > +     /* VS should access only TM bit. Everything else should trap */
+> > > > > +     csr_write(CSR_HCOUNTEREN, 0x02);
+> > > >
+> > > > This looks like something that should be broken out into a separate patch
+> > > > with a description of what happens now when guests try to access the newly
+> > > > trapping counter registers. We should probably also create a TM define.
+> > > >
+> > >
+> > > Done.
+> > >
+> >
+> > As we allow cycles & instret for host user space now [1], should we do the same
+> > for guests as well ? I would prefer not to but same user space
+> > software will start to break
+> > they will run inside a guest.
+> >
+> > https://lore.kernel.org/all/20220928131807.30386-1-palmer@rivosinc.com/
+> >
 >
-> > On Tue, Nov 22, 2022 at 8:29 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> >>
-> >> Vipin Sharma <vipinsh@google.com> writes:
-> >>
-> >> > +/*
-> >> > + * The TLFS carves out 64 possible extended hypercalls, numbered sequentially
-> >> > + * after the base capabilities extended hypercall.
-> >> > + */
-> >> > +#define HV_EXT_CALL_MAX (HV_EXT_CALL_QUERY_CAPABILITIES + 64)
-> >> > +
-> >>
-> >> First, I thought there's an off-by-one here (and should be '63') but
-> >> then I checked with TLFS and figured out that the limit comes from
-> >> HvExtCallQueryCapabilities's response which doesn't include itself
-> >> (0x8001) in the mask, this means it can encode
-> >>
-> >> 0x8002 == bit0
-> >> 0x8003 == bit1
-> >> ..
-> >> 0x8041 == bit63
-> >>
-> >> so indeed, the last one supported is 0x8041 == 0x8001 + 64
-> >>
-> >> maybe it's worth extending the commont on where '64' comes from.
-> >>
-> >
-> > Yeah, I will expand comments.
-> >
-> >> >  static void stimer_mark_pending(struct kvm_vcpu_hv_stimer *stimer,
-> >> >                               bool vcpu_kick);
-> >> >
-> >> > @@ -2411,6 +2417,9 @@ static bool hv_check_hypercall_access(struct kvm_vcpu_hv *hv_vcpu, u16 code)
-> >> >       case HVCALL_SEND_IPI:
-> >> >               return hv_vcpu->cpuid_cache.enlightenments_eax &
-> >> >                       HV_X64_CLUSTER_IPI_RECOMMENDED;
-> >> > +     case HV_EXT_CALL_QUERY_CAPABILITIES ... HV_EXT_CALL_MAX:
-> >> > +             return hv_vcpu->cpuid_cache.features_ebx &
-> >> > +                             HV_ENABLE_EXTENDED_HYPERCALLS;
-> >> >       default:
-> >> >               break;
-> >> >       }
-> >> > @@ -2564,6 +2573,12 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
-> >> >               }
-> >> >               goto hypercall_userspace_exit;
-> >> >       }
-> >> > +     case HV_EXT_CALL_QUERY_CAPABILITIES ... HV_EXT_CALL_MAX:
-> >> > +             if (unlikely(hc.fast)) {
-> >> > +                     ret = HV_STATUS_INVALID_PARAMETER;
-> >>
-> >> I wasn't able to find any statement in TLFS stating whether extended
-> >> hypercalls can be 'fast', I can imagine e.g. MemoryHeatHintAsync using
-> >> it. Unfortunatelly, our userspace exit will have to be modified to
-> >> handle such stuff. This can stay for the time being I guess..
-> >>
-> >
-> > I agree TLFS doesn't state anything about "fast" extended hypercall
-> > but nothing stops in future for some call to be "fast". I think this
-> > condition should also be handled by userspace as it is handling
-> > everything else.
-> >
-> > I will remove it in the next version of the patch. I don't see any
-> > value in verification here.
->
-> The problem is that we don't currently pass 'fast' flag to userspace,
-> let alone XMM registers. This means that it won't be able to handle fast
-> hypercalls anyway, I guess it's better to keep your check but add a
-> comment saying that it's an implementation shortcoming and not a TLFS
-> requirement.
+> Yeah, it seems like we should either forbid access to unprivileged users
+> or ensure the numbers include some random noise. For guests, a privileged
+> KVM userspace should need to explicitly request access for them, ensuring
+> that the creation of privileged guests is done by conscious choice.
 >
 
-I think "fast" flag gets passed to the userspace via:
-  vcpu->run->hyperv.u.hcall.input = hc.param;
+If I understand you correctly, you are suggesting we only enable TM
+bit in hcounteren ?
+We also need a mechanism to enable the hcounteren bits from KVM guest userspace.
 
-Yeah, XMM registers won't be passed, that will require userspace API change.
-I will keep the check and explain in the comments.
+I can think of the following approaches.
 
->
-> >
-> >> > +                     break;
-> >> > +             }
-> >> > +             goto hypercall_userspace_exit;
-> >> >       default:
-> >> >               ret = HV_STATUS_INVALID_HYPERCALL_CODE;
-> >> >               break;
-> >> > @@ -2722,6 +2737,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
-> >> >
-> >> >                       ent->ebx |= HV_POST_MESSAGES;
-> >> >                       ent->ebx |= HV_SIGNAL_EVENTS;
-> >> > +                     ent->ebx |= HV_ENABLE_EXTENDED_HYPERCALLS;
-> >> >
-> >> >                       ent->edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
-> >> >                       ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
-> >>
-> >> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >>
-> >> --
-> >> Vitaly
-> >>
-> >
->
-> --
-> Vitaly
->
+1. The CYCLE, INSTRET enabling can also be via one reg interface.
+2. We can enable it during first virtual instruction trap if these
+bits in guest scounteren
+are enabled.
+
+> Thanks,
+> drew
+
+
+
+-- 
+Regards,
+Atish
