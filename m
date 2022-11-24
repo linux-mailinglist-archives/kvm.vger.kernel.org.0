@@ -2,209 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D626F636F0E
-	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 01:45:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27E42636F3B
+	for <lists+kvm@lfdr.de>; Thu, 24 Nov 2022 01:48:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229452AbiKXApp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Nov 2022 19:45:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41360 "EHLO
+        id S229740AbiKXAsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Nov 2022 19:48:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiKXApi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Nov 2022 19:45:38 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3963CED703
-        for <kvm@vger.kernel.org>; Wed, 23 Nov 2022 16:45:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=CuY3wDGHShd0OrYtE0KW6T5D1w1utR8W1M4oAWWg3Ro=; b=oheuHMdGBVJ36X6e2gkrUuXxmk
-        TMIMfhqgpI1J+hnYkhdiweLUzRIoLVU6FlV9I9pvCm31OWXnm0AeNXEu/JCVrzh7kJN3SX6vSu0o1
-        hRsET3fVJjJwxZCypiuTlol9xtKKsSp0UWB6nD0cR9PVYEGLBFpFZRlLD0xiw1bljvgKcFxX9vV9y
-        rNxTxCvvS+UuNfVMb72pjTZB33dJ+qKAd3DhILccrrv+xCSkQJynIJDiapqJCKPUesNx2onGT4m3N
-        CwcmskmJEjBAGc8nOYBiAoyZ7kyxRdtLu/5B4UmR3mjsZ8bGUa8KgcWp4JuIfUY2QBVAHUxPP+xms
-        XYY0JRvw==;
-Received: from [2001:8b0:10b:5:e35e:4295:9d62:caa0] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oy0N0-008EHm-RL; Thu, 24 Nov 2022 00:45:38 +0000
-Message-ID: <3cf91a0055875a226a73c2b701e98cd4e40f9b07.camel@infradead.org>
-Subject: Re: [PATCH 3/4] KVM: Update gfn_to_pfn_cache khva when it moves
- within the same page
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Paul Durrant <xadimgnik@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Durrant, Paul" <pdurrant@amazon.co.uk>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mhal@rbox.co" <mhal@rbox.co>
-Date:   Thu, 24 Nov 2022 00:45:31 +0000
-In-Reply-To: <CABgObfY=jePpPmZJVLdA7nyuPut7B7qCYA64UVwGFxPsmvAVqg@mail.gmail.com>
-References: <20221119094659.11868-1-dwmw2@infradead.org>
-         <20221119094659.11868-3-dwmw2@infradead.org>
-         <681cf1b4edf04563bba651efb854e77f@amazon.co.uk>
-         <Y3z3ZVoXXGWusfyj@google.com>
-         <d7ae4bab-e826-ad0f-7248-81574a5f2b5c@gmail.com>
-         <c552b55c926d8e284ba24773a02ea7da028787f5.camel@infradead.org>
-         <CABgObfY=jePpPmZJVLdA7nyuPut7B7qCYA64UVwGFxPsmvAVqg@mail.gmail.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-2j6DCkhez9MRuz2V0zME"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S229676AbiKXAs3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Nov 2022 19:48:29 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56C70ED723;
+        Wed, 23 Nov 2022 16:48:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669250896; x=1700786896;
+  h=from:to:cc:subject:references:date:in-reply-to:
+   message-id:mime-version;
+  bh=aTDswLwxnrT1m4Bb2RWu3He8hrN2rQUrmQl5QgIYb3c=;
+  b=iKJvu7fLirYeMGa5TtlgVuOTLcV4M7muj9TK0i22nuHTcHEPlqu56yJ9
+   u4582E2Wxt036y7+5ae4JiA5q0EHfPab8eV5m2VC8LIuz5i23Q/X6qcif
+   3aEoE3pzLegAnLS0VBT2JRyBvv07B8IFBt02R/NuYvjxYcwDnI/+1AGvK
+   raRoBTv3nrmZRm1u02fwNVqfWMaKcd3+2mkcUv+FADP6YtYK6MkA8zWGh
+   h4//lw3RdXS3WjRvYACG1Ke1CzP45CfL/B70Satxy9/kq36+4KwrpCwGW
+   wGa3POT9KcvlCH6Hhk/dMIvVG/H8nylanoNGSJ+7JxwkHL2MxT3b8TIZV
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="293892611"
+X-IronPort-AV: E=Sophos;i="5.96,189,1665471600"; 
+   d="scan'208";a="293892611"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 16:48:16 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10540"; a="673057198"
+X-IronPort-AV: E=Sophos;i="5.96,189,1665471600"; 
+   d="scan'208";a="673057198"
+Received: from yhuang6-desk2.sh.intel.com (HELO yhuang6-desk2.ccr.corp.intel.com) ([10.238.208.55])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 16:48:11 -0800
+From:   "Huang, Ying" <ying.huang@intel.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v7 10/20] x86/virt/tdx: Use all system memory when
+ initializing TDX module as TDX memory
+References: <cover.1668988357.git.kai.huang@intel.com>
+        <9b545148275b14a8c7edef1157f8ec44dc8116ee.1668988357.git.kai.huang@intel.com>
+        <87cz9gvpej.fsf@yhuang6-desk2.ccr.corp.intel.com>
+        <a6ecf5f1a1202f428961a5f8422d5fff61ce1d9a.camel@intel.com>
+        <87sfibpxda.fsf@yhuang6-desk2.ccr.corp.intel.com>
+        <973ca04b3323d28a31dbc1cfeb52bd10bd9d9bf3.camel@intel.com>
+Date:   Thu, 24 Nov 2022 08:47:07 +0800
+In-Reply-To: <973ca04b3323d28a31dbc1cfeb52bd10bd9d9bf3.camel@intel.com> (Kai
+        Huang's message of "Tue, 22 Nov 2022 17:16:11 +0800")
+Message-ID: <87o7sxp4ac.fsf@yhuang6-desk2.ccr.corp.intel.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=ascii
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+"Huang, Kai" <kai.huang@intel.com> writes:
 
---=-2j6DCkhez9MRuz2V0zME
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+>> > > > +/*
+>> > > > + * Add all memblock memory regions to the @tdx_memlist as TDX memory.
+>> > > > + * Must be called when get_online_mems() is called by the caller.
+>> > > > + */
+>> > > > +static int build_tdx_memory(void)
+>> > > > +{
+>> > > > +   unsigned long start_pfn, end_pfn;
+>> > > > +   int i, nid, ret;
+>> > > > +
+>> > > > +   for_each_mem_pfn_range(i, MAX_NUMNODES, &start_pfn, &end_pfn, &nid) {
+>> > > > +           /*
+>> > > > +            * The first 1MB may not be reported as TDX convertible
+>> > > > +            * memory.  Manually exclude them as TDX memory.
+>> > > > +            *
+>> > > > +            * This is fine as the first 1MB is already reserved in
+>> > > > +            * reserve_real_mode() and won't end up to ZONE_DMA as
+>> > > > +            * free page anyway.
+>> > > > +            */
+>> > > > +           start_pfn = max(start_pfn, (unsigned long)SZ_1M >> PAGE_SHIFT);
+>> > > > +           if (start_pfn >= end_pfn)
+>> > > > +                   continue;
+>> > >
+>> > > How about check whether first 1MB is reserved instead of depending on
+>> > > the corresponding code isn't changed?  Via for_each_reserved_mem_range()?
+>> >
+>> > IIUC, some reserved memory can be freed to page allocator directly, i.e. kernel
+>> > init code/data.  I feel it's not safe to just treat reserved memory will never
+>> > be in page allocator.  Otherwise we have for_each_free_mem_range() can use.
+>>
+>> Yes.  memblock reverse information isn't perfect.  But I still think
+>> that it is still better than just assumption to check whether the frist
+>> 1MB is reserved in memblock.  Or, we can check whether the pages of the
+>> first 1MB is reversed via checking struct page directly?
+>>
+>
+> Sorry I am a little bit confused what you want to achieve here.  Do you want to
+> make some sanity check to make sure the first 1MB is indeed not in the page
+> allocator?
+>
+> IIUC, it is indeed true.  Please see the comment of calling reserve_real_mode()
+> in setup_arch().  Also please see efi_free_boot_services(), which doesn't free
+> the boot service if it is below 1MB.
+>
+> Also, my understanding is kernel's intention is to always reserve the first 1MB:
+>
+>                 /*
+>                  * Don't free memory under 1M for two reasons:
+>                  * - BIOS might clobber it
+>                  * - Crash kernel needs it to be reserved
+>                  */
+>
+> So if any page in first 1MB ended up to the page allocator, it should be the
+> kernel bug which is not related to TDX, correct?
 
-On Thu, 2022-11-24 at 01:31 +0100, Paolo Bonzini wrote:
-> I have picked them into both kvm/master and kvm/queue.
+I suggest to add some code to verify this.  It's possible for the code
+to be changed in the future (although possibility is low).  And TDX may
+not be changed at the same time.  Then the verifying code here can catch
+that.  So, we can make change accordingly.
 
-Thanks.
-
-> The gpc series probably will be left for 6.3. I had already removed
-> Sean's bits for the gpc and will rebase on top of your runstate
-> compatibility fixes, which I'm cherry-picking into kvm/queue.
->=20
-> But wow, is that runstate compatibility patch ugly.  Is it really
-> worth it having the two separate update paths, one which is ugly
-> because of BUILD_BUG_ON assertions and one which is ugly because of
-> the two-page stuff?
-
-The BUILD_BUG_ON() assertions could move. I quite liked having them
-there as documentation for compat handling, but I'm happy to move them.
-There's plenty of *actual* comments on the compat handling too ;)
-
-I do think it's worth the separate paths because the *common* case
-doesn't have to bounce it through the kernel stack at all, and it's a
-relatively fast path because it happens on each schedule in/out.
-
-The fast path isn't the part I hate. Removing *that* doesn't really
-make things much nicer.
-
-If you want to move the BUILD_BUG_ONs into the slow path and then we
-can concentrate our hate on that part and leave the fast path even
-nicer, that's fine though ;)
-
---=-2j6DCkhez9MRuz2V0zME
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTI0MDA0NTMxWjAvBgkqhkiG9w0BCQQxIgQgu77iDPSJ
-HjrVsEeCTEdb5nknZ+LtODzRaZqZYFY/cYswgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBsPJJXeSOT1FyEc/yvXBHVb+meqqsy+Kr5
-GRzBAZpwOSiRoZj76KlWiLyDuT+utcqkdl5M1W4kJqWNqa9J3P07haqr/ISxaLYKVl0wAjvhIVwZ
-Em5mZGBVii6nEgXCqXnRjlea4+CmFnGq2y+cpOS9mjzwMSMAFKr1bsgNFQVJDPP7jZl1w2ydNJ0z
-p/BCdGR5P7NLhQIhwqYk+F8JuuTny0QU0dO8kYHRd+TV8Eab2aZIu0v+QG5Qn3dC596gYsw5JoX0
-wKGTElEqrGUJl+ZznltJaDb0x6acrsZ5KVN54O2FsZ+zjHG0DFOuhy7or8Sd2O7a2GQYJ+5mV0/i
-KfL4BuUUILCtGNWEapo0xCFf9C57CSq/y1LpRyG1vyHyq1iz5dYeiR/EWImir1Mj0U5caH7C7F3g
-ls7IQ+gJKJsOHIJTY6YI/SUn45HoU5KrJov4P7bVR4MOrjCav95OLmtoQGLUe3wSQyKujscH0GY6
-VJszpOMpnpAop9LfStg4myQvTZ3+d4+md8Q2BJfV4STY8Oln30RZXiIJmd6uVee3BYM3XvzgUO+P
-iJ9/xmaM/yF3RH7eJs/MfD/UiuBzKRCszJu0/NdSwUk4NY7rKgw+QuJ5rJNtMW0+bg9N03zd2tAy
-KbdeGvPNBSOLfAXSP9OtuMQlmsxT+ikdkSCoinTxbAAAAAAAAA==
-
-
---=-2j6DCkhez9MRuz2V0zME--
-
+Best Regards,
+Huang, Ying
