@@ -2,159 +2,422 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98BDF63880E
-	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 12:00:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F72A6388C6
+	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 12:31:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230317AbiKYLAG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Nov 2022 06:00:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54920 "EHLO
+        id S229813AbiKYLbT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Nov 2022 06:31:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbiKYLAF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Nov 2022 06:00:05 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5557E46653;
-        Fri, 25 Nov 2022 03:00:04 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id 9so3829316pfx.11;
-        Fri, 25 Nov 2022 03:00:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ajZYs/klHZaufNSQQiKDb2NboGQQHvlmx4QqmQd/jgY=;
-        b=QRzOSJco9J4vzPLtjp9JEYUGeDnUcpeOW0LK3h1z7KkMiOAWTGzb5sZx+5H7seSgcE
-         PdlvUHJcItcxSC4a4InFbO6ADdUceIG1i60A/wAiul7kxf2/RwOiJ690fKtL822WK2Nu
-         APYdwlHuK5Fr4FvIFLGCxxrsfU+nfGliSDZUrNvVS86CjOCPmdnhEh2YBH5SEZytKva8
-         rtu8IgSju2Oa2L0bCtYS85NGEQLwqiAK9CZpHwxHIF1OlXNNVogHczLCecwItJ45rKa3
-         pRUN9ckGSCWI0SfvRpmFRIGMCAsGFMKZyd/Xoch1Na9vKrsykefMtgMilSv7hwoZAtgJ
-         My3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ajZYs/klHZaufNSQQiKDb2NboGQQHvlmx4QqmQd/jgY=;
-        b=qGUm5bvv9BoU/+Bvs9iV+kg0U5/dgwc1odRtaSxO4vGDJbhPtLr9umQ3Ty5KTSIGfX
-         QX1R7TzFYKoP8tyg5nJIqwwQdo9FYl0RSc8kuOjgd8lHZR67uHu71LwDYLDNczqmn+L9
-         VY1AKr/RysjzN2qXwoPztVkRqccXsm2nJS0YQqupN8rL3LwdOO2LI3+NLms+KjvLxUbB
-         iXpF3n1Lq453qJ/CcAbm5VWKdLQIgdR41ZQhvnoQcV8C9FeAF2rYxgth46n58f7cUDd1
-         vHLGB7KMVanYWMK3PjjcNHNu+kZZbz5nL/+fGIJdj6kCMv3uuQFHZ/x+VfvA/HQE8MeX
-         eH8w==
-X-Gm-Message-State: ANoB5pl4nwofQ8tZIihZVI4YxqoVlXywUTNHvMbByRKw1PPk+J4xbmyP
-        +V9dj2yrT5lpJG03rmcsQ3/pqL0uPLxfDg==
-X-Google-Smtp-Source: AA0mqf65er91QWQrviT+XJo9yluj0AZX3H0kHtfGJ9bSSFbKYXnQsMYGrQGaocOqP6z6pENOiTEGUg==
-X-Received: by 2002:aa7:85c8:0:b0:574:5789:b8a4 with SMTP id z8-20020aa785c8000000b005745789b8a4mr11823894pfn.47.1669374003700;
-        Fri, 25 Nov 2022 03:00:03 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id d18-20020a170903231200b001780e4e6b65sm3122894plh.114.2022.11.25.03.00.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Nov 2022 03:00:02 -0800 (PST)
-Message-ID: <a07db01a-5aa4-3a77-187e-e69171fb9fe1@gmail.com>
-Date:   Fri, 25 Nov 2022 18:59:54 +0800
+        with ESMTP id S229541AbiKYLbR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Nov 2022 06:31:17 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7F28918E0A
+        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 03:31:15 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B174D2B;
+        Fri, 25 Nov 2022 03:31:21 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2EDB33F73D;
+        Fri, 25 Nov 2022 03:31:14 -0800 (PST)
+Date:   Fri, 25 Nov 2022 11:31:11 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
+        andre.przywara@arm.com, will@kernel.org
+Subject: Re: [PATCH kvmtool v1 08/17] Use memfd for all guest ram allocations
+Message-ID: <Y4CnPcHyt5IPAoF/@monolith.localdoman>
+References: <20221115111549.2784927-1-tabba@google.com>
+ <20221115111549.2784927-9-tabba@google.com>
+ <Y39PCG0ZRHf/2d5E@monolith.localdoman>
+ <CA+EHjTx6JRODjncxMz6pBO43S2gAFZt4vDibG=Zwbr7TkbiFeQ@mail.gmail.com>
+ <Y3+meXHu5MRYuHou@monolith.localdoman>
+ <CA+EHjTwgg+Cu=A3msmWLNEHmkJhOn-8+MeJULOHzF6V99iHk1A@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.5.0
-Subject: Re: [PATCH v3 1/3] KVM: x86/pmu: Disable guest PEBS on hybird cpu due
- to heterogeneity
-To:     Kunkun Jiang <jiangkunkun@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20221109082802.27543-1-likexu@tencent.com>
- <20221109082802.27543-2-likexu@tencent.com>
- <16bb2874-c8c8-fb4e-c793-28605f36712b@huawei.com>
-Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <16bb2874-c8c8-fb4e-c793-28605f36712b@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <CA+EHjTwgg+Cu=A3msmWLNEHmkJhOn-8+MeJULOHzF6V99iHk1A@mail.gmail.com>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/11/2022 6:18 pm, Kunkun Jiang wrote:
-> Hi Like,
+Hi,
+
+On Fri, Nov 25, 2022 at 10:44:39AM +0000, Fuad Tabba wrote:
+> Hi,
 > 
-> There is a question I would like to ask. As far as I know, Alder Lake uses
-> a hybrid architecture and the kernel presents two types of PMUs.Can the
-> events created on the VCPU still count normally if the VCPU thread gets
-> migrate across different CPUs?
+> On Thu, Nov 24, 2022 at 5:14 PM Alexandru Elisei
+> <alexandru.elisei@arm.com> wrote:
+> >
+> > Hi,
+> >
+> > On Thu, Nov 24, 2022 at 03:19:34PM +0000, Fuad Tabba wrote:
+> > > Hi,
+> > >
+> > > On Thu, Nov 24, 2022 at 11:01 AM Alexandru Elisei
+> > > <alexandru.elisei@arm.com> wrote:
+> > > >
+> > > > Hi,
+> > > >
+> > > > On Tue, Nov 15, 2022 at 11:15:40AM +0000, Fuad Tabba wrote:
+> > > > > Allocate all guest ram backed by memfd/ftruncate instead of
+> > > > > anonymous mmap. This will make it easier to use kvm with fd-based
+> > > > > kvm guest memory proposals [*]. It also would make it easier to
+> > > > > use ipc memory sharing should that be needed in the future.
+> > > >
+> > > > Today, there are two memory allocation paths:
+> > > >
+> > > > - One using hugetlbfs when --hugetlbfs is specified on the command line, which
+> > > >   creates a file.
+> > > >
+> > > > - One using mmap, when --hugetlbfs is not specified.
+> > > >
+> > > > How would support in kvmtool for the secret memfd look like? I assume there
+> > > > would need to be some kind of command line parameter to kvmtool to instruct it
+> > > > to use the secret memfd, right? What I'm trying to figure out is why is
+> > > > necessary to make everything a memfd file instead of adding a third memory
+> > > > allocation path just for that particular usecase (or merging the hugetlbfs path
+> > > > if they are similar enough). Right now, the anonymous memory path is a
+> > > > mmap(MAP_ANONYMOUS) call, simple and straightforward, and I would like some more
+> > > > convincing that this change is needed.
+> > >
+> > > This isn't about secret mem, but about the unified proposal for guest
+> > > private memory [1].  This proposal requires the use of a file
+> > > descriptor (fd) as the canonical reference to guest memory in the host
+> > > (i.e., VMM) and does not provide an alternative using a
+> > > straightforward anonymous mmap(). The idea is that guest memory
+> > > shouldn’t have mapping in the host by default, but unless explicitly
+> > > shared and needed.
+> >
+> > I think you misunderstood me. I wasn't asking why kvmtool should get
+> > support for guest private memory, I was asking why kvmtool should allocate
+> > **all types of memory** using memfd. Your series allocates **all** memory
+> > using memfd. I never said that kvmtool should or should not get support for
+> > private memory.
+> 
+> My reasoning for allocating all memory with memfd is that it's one
+> ring to rule them all :) By that I mean, with memfd, we can allocate
+> normal memory, hugetlb memory, in the future guest private memory, and
+> easily expand it to support things like IPC memory sharing in the
+> future.
 
-The best answer is the test results as no one sponsored me a hybrid x86 box.
+Allocating anonymous memory is more complex now. And I could argue than the
+hugetlbfs case is also more complex because there are now two branches that
+do different things based whether it's hugetlbfs or not, instead of one.
 
-According to my understanding, when a performance event (e.g. instructions)
-is supported on both types of pmu (even with different event codes), perf_event
-will remain enabled after the cpu migration (just changing the per-cpu context
-based on migrated pmu, and allocating another available hardware counter).
-
-Otherwise, the kernel will or should create and enable the perf_event based on
-current pmu type and disable the event of the previous cpu type. For the guest,
-KVM will or should recognize the migrated pmu type and enable the currently
-available perf_event for guest vPMC.
-
-But on hybrid x86, pmu capabilities are heterogeneous (even though the ISA is
-the same), and incompatible migrations can result in previous pmu capabilities
-(such as PEBS in this case) not being implemented on the new pmu, which breaks
-the expectation of the guest pmu driver.
-
-Making the guest aware of the differences in pmu types requires more fundamental
-KVM changes (for example, presenting multiple types of cpu model for the guest),
-and perhaps the simple and safe approach is to provide the guest with only the
-capabilities that are available to both pmu types.
-
-If things don't happen the way you expect them to, work it out w/ or w/o my help.
+As I stands right now, my opinion is that using memfd for anonymous RAM
+only adds complexity for zero benefits.
 
 > 
-> As far as I know, ARM64 big.LITTLE is not working properly, according to
-> this set of patches.
-> [PATCH v4 0/6] KVM: arm64: Improve PMU support on heterogeneous systems
-> https://lore.kernel.org/all/20220127161759.53553-1-alexandru.elisei@arm.com/
+> 
+> > >
+> > > Moreover, using an fd would be more generic and flexible, which allows
+> > > for other use cases (such as IPC), or to map that memory in userspace
+> > > when appropriate. It also allows us to use the same interface for
+> > > hugetlb. Considering that other VMMs (e.g., qemu [2], crosvm [3])
+> > > already back guest memory with memfd, and looking at how private
+> > > memory would work [4], it seemed to me that the best way to unify all
+> > > of these needs is to have the backend of guest memory be fd-based.
+> > >
+> > > It would be possible to have that as a separate kvmtool option, where
+> > > fd-backed memory would be only for guests that use the new private
+> > > memory extensions. However, that would mean more code to maintain that
+> > > is essentially doing the same thing (allocating and mapping memory).
+> > >
+> > > I thought that it would be worth having these patches in kvmtool now
+> > > rather than wait until the guest private memory has made it into kvm.
+> > > These patches simplify the code as an end result, make it easier to
+> >
+> > In the non-hugetlbfs case, before:
+> >
+> >         kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
+> >         kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm, kvm->cfg.hugetlbfs_path, kvm->arch.ram_alloc_size);
+> >
+> >         /*
+> >          * mmap_anon_or_hugetlbfs expands to:
+> >          * getpagesize()
+> >          * mmap()
+> >          */
+> >
+> >         kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start, SZ_2M);
+> >
+> > After:
+> >         /* mmap_anon_or_hugetlbfs: */
+> >         getpagesize();
+> >         mmap(NULL, total_map, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+> >         memfd_alloc(size, htlbfs_path, blk_size);
+> >
+> >         /*
+> >          * memfd_alloc() expands to:
+> >          * memfd_create()
+> >          * ftruncate
+> >          */
+> >
+> >         addr_align = (void *)ALIGN((u64)addr_map, align_sz);
+> >         mmap(addr_align, size, PROT_RW, MAP_PRIVATE | MAP_FIXED, fd, 0);
+> >
+> > I'm counting one extra mmap(), one memfd_create() and one ftruncate() that
+> > this series adds (not to mention all the boiler plate code to check for
+> > errors).
+> >
+> > Let's use another metric, let's count the number of lines of code. Before:
+> > 9 lines of code, after: -3 lines removed from arm/kvm.c and 86 lines of
+> > code for memfd_alloc() and mmap_anon_or_hugetlbfs_align().
+> >
+> > I'm struggling to find a metric by which the resulting code is simpler, as
+> > you suggest.
+> 
+> With simpler I didn't mean fewer lines of code, rather that it's
+> easier to reason about, more shared code. With this series, hugetlb
 
-The arm64 will have more cpu types (especially in terms of power management),
-but the difference in pmu capabilities will also depend on the design of IP vendors.
+How is all of the code that has been added easier to reason about than one
+single mmap call?
+
+> and normal memory creation follow the same path, and with the
+> refactoring a lot of arch-specific code is gone.
+
+Can you point me to the arch-specific code that this series removes? As far
+as I can tell, the only arch specfic change is replacing
+kvm_arch_delete_ram with kvm_delete_ram, which can be done independently of
+this series. If it's only that function, I wouldn't call that "a lot" of
+arch-specific code.
 
 > 
-> Thanks，
-> Kunkun Jiang
+> >
+> > > allocate and map aligned memory without overallocating, and bring
+> >
+> > If your goal is to remove the overallocting of memory, you can just munmap
+> > the extra memory after alignment is performed. To do that you don't need to
+> > allocate everything using a memfd.
+> >
+> > > kvmtool closer to a more consistent way of allocating guest memory, in
+> > > a similar manner to other VMMs.
+> >
+> > I would really appreciate pointing me to where qemu allocates memory using
+> > memfd when invoked with -m <size>. I was able to follow the hostmem-ram
+> > backend allocation function until g_malloc0(), but I couldn't find the
+> > implementation for that.
 > 
-> On 2022/11/9 16:28, Like Xu wrote:
->> From: Like Xu <likexu@tencent.com>
->>
->> >From vPMU enabling perspective, KVM does not have proper support for
->> hybird x86 core. The reported perf_capabilities value (e.g. the format
->> of pebs record) depends on the type of cpu the kvm-intel module is init.
->> When a vcpu of one pebs format migrates to a vcpu of another pebs format,
->> the incorrect parsing of pebs records by guest can make profiling data
->> analysis extremely problematic.
->>
->> The safe way to fix this is to disable this part of the support until the
->> guest recognizes that it is running on the hybird cpu, which is appropriate
->> at the moment given that x86 hybrid architectures are not heavily touted
->> in the data center market.
->>
->> Signed-off-by: Like Xu <likexu@tencent.com>
->> ---
->>   arch/x86/kvm/vmx/capabilities.h | 4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
->> index cd2ac9536c99..ea0498684048 100644
->> --- a/arch/x86/kvm/vmx/capabilities.h
->> +++ b/arch/x86/kvm/vmx/capabilities.h
->> @@ -392,7 +392,9 @@ static inline bool vmx_pt_mode_is_host_guest(void)
->>   static inline bool vmx_pebs_supported(void)
->>   {
->> -    return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_ept;
->> +    return boot_cpu_has(X86_FEATURE_PEBS) &&
->> +           !boot_cpu_has(X86_FEATURE_HYBRID_CPU) &&
->> +           kvm_pmu_cap.pebs_ept;
->>   }
->>   static inline bool cpu_has_notify_vmexit(void)
+> You're right. I thought that the memfd backend was the default, but
+> looking again it's not.
+> 
+> > >
+> > > Moreover, with the private memory proposal [1], whether the fd-based
+> > > support available can be queried by a KVM capability. If it's
+> > > available kvmtool would use the fd, if it's not available, it would
+> > > use the host-mapped address. Therefore, there isn’t a need for a
+> > > command line option, unless for testing.
+> >
+> > Why would anyone want to use private memory by default for a
+> > non-confidential VM?
+> 
+> The idea is that, at least when pKVM is enabled, we would use the
+> proposed extensions for all guests, i.e., memory via a file
+> descriptor, regardless whether the guest is protected (thus the memory
+> would be private), or not.
+
+kvmtool can be used to run virtual machines when pKVM is not enabled. In
+fact, it has been used that way for way longer than pKVM has existed. What
+about those users?
+
+> 
+> 
+> > >
+> > > I have implemented this all the way to support the private memory
+> > > proposal in kvmtool [5], but I haven’t posted these since the private
+> > > memory proposal itself is still in flux. If you’re interested you
+> >
+> > Are you saying that you are not really sure how the userspace API will end
+> > up looking? If that's the case, wouldn't it make more sense to wait for the
+> > API to stabilize and then send support for it as one nice series?
+> 
+> Yes, I'm not sure how it will end up looking. We know that it will be
+> fd-based though, which is why I thought it might be good to start with
+> that.
+
+If you're not sure how it will end up looking, then why change kvmtool now?
+
+Thanks,
+Alex
+
+> 
+> Cheers,
+> /fuad
+> 
+> 
+> 
+> > Thanks,
+> > Alex
+> >
+> > > could have a look on how I would go ahead building on these patches
+> > > for full support of private memory backed by an fd.
+> > >
+> > > > Regarding IPC memory sharing, is mmap'ing an memfd file enough to enable
+> > > > that? If more work is needed for it, then wouldn't it make more sense to do
+> > > > all the changes at once? This change might look sensible right now, but it
+> > > > might turn out that it was the wrong way to go about it when someone
+> > > > actually starts implementing memory sharing.
+> > >
+> > > I don’t plan on supporting IPC memory sharing. I just mentioned that
+> > > as yet another use case that would benefit from guest memory being
+> > > fd-based, should kvmtool decide to support it in the future.
+> > >
+> > > Cheers,
+> > > /fuad
+> > >
+> > > [1] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.intel.com/
+> > > [2] https://github.com/qemu/qemu
+> > > [3] https://chromium.googlesource.com/chromiumos/platform/crosvm/
+> > > [4] https://github.com/chao-p/qemu/tree/privmem-v9
+> > > [5] https://android-kvm.googlesource.com/kvmtool/+/refs/heads/tabba/fdmem-v9-core
+> > >
+> > >
+> > >
+> > > >
+> > > > Regarding IPC memory sharing, is mmap'ing an memfd file enough to enable
+> > > > that? If more work is needed for it, then wouldn't it make more sense to do
+> > > > all the changes at once? This change might look sensible right now, but it
+> > > > might turn out that it was the wrong way to go about it when someone
+> > > > actually starts implementing memory sharing.
+> > > >
+> > > > Thanks,
+> > > > Alex
+> > > >
+> > > > >
+> > > > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > > >
+> > > > > [*] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.intel.com/
+> > > > > ---
+> > > > >  include/kvm/kvm.h  |  1 +
+> > > > >  include/kvm/util.h |  3 +++
+> > > > >  kvm.c              |  4 ++++
+> > > > >  util/util.c        | 33 ++++++++++++++++++++-------------
+> > > > >  4 files changed, 28 insertions(+), 13 deletions(-)
+> > > > >
+> > > > > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> > > > > index 3872dc6..d0d519b 100644
+> > > > > --- a/include/kvm/kvm.h
+> > > > > +++ b/include/kvm/kvm.h
+> > > > > @@ -87,6 +87,7 @@ struct kvm {
+> > > > >       struct kvm_config       cfg;
+> > > > >       int                     sys_fd;         /* For system ioctls(), i.e. /dev/kvm */
+> > > > >       int                     vm_fd;          /* For VM ioctls() */
+> > > > > +     int                     ram_fd;         /* For guest memory. */
+> > > > >       timer_t                 timerid;        /* Posix timer for interrupts */
+> > > > >
+> > > > >       int                     nrcpus;         /* Number of cpus to run */
+> > > > > diff --git a/include/kvm/util.h b/include/kvm/util.h
+> > > > > index 61a205b..369603b 100644
+> > > > > --- a/include/kvm/util.h
+> > > > > +++ b/include/kvm/util.h
+> > > > > @@ -140,6 +140,9 @@ static inline int pow2_size(unsigned long x)
+> > > > >  }
+> > > > >
+> > > > >  struct kvm;
+> > > > > +int memfd_alloc(u64 size, bool hugetlb, u64 blk_size);
+> > > > > +void *mmap_anon_or_hugetlbfs_align(struct kvm *kvm, const char *htlbfs_path,
+> > > > > +                                u64 size, u64 align);
+> > > > >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
+> > > > >
+> > > > >  #endif /* KVM__UTIL_H */
+> > > > > diff --git a/kvm.c b/kvm.c
+> > > > > index 78bc0d8..ed29d68 100644
+> > > > > --- a/kvm.c
+> > > > > +++ b/kvm.c
+> > > > > @@ -160,6 +160,7 @@ struct kvm *kvm__new(void)
+> > > > >       mutex_init(&kvm->mem_banks_lock);
+> > > > >       kvm->sys_fd = -1;
+> > > > >       kvm->vm_fd = -1;
+> > > > > +     kvm->ram_fd = -1;
+> > > > >
+> > > > >  #ifdef KVM_BRLOCK_DEBUG
+> > > > >       kvm->brlock_sem = (pthread_rwlock_t) PTHREAD_RWLOCK_INITIALIZER;
+> > > > > @@ -174,6 +175,9 @@ int kvm__exit(struct kvm *kvm)
+> > > > >
+> > > > >       kvm__arch_delete_ram(kvm);
+> > > > >
+> > > > > +     if (kvm->ram_fd >= 0)
+> > > > > +             close(kvm->ram_fd);
+> > > > > +
+> > > > >       list_for_each_entry_safe(bank, tmp, &kvm->mem_banks, list) {
+> > > > >               list_del(&bank->list);
+> > > > >               free(bank);
+> > > > > diff --git a/util/util.c b/util/util.c
+> > > > > index d3483d8..278bcc2 100644
+> > > > > --- a/util/util.c
+> > > > > +++ b/util/util.c
+> > > > > @@ -102,36 +102,38 @@ static u64 get_hugepage_blk_size(const char *htlbfs_path)
+> > > > >       return sfs.f_bsize;
+> > > > >  }
+> > > > >
+> > > > > -static void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size, u64 blk_size)
+> > > > > +int memfd_alloc(u64 size, bool hugetlb, u64 blk_size)
+> > > > >  {
+> > > > >       const char *name = "kvmtool";
+> > > > >       unsigned int flags = 0;
+> > > > >       int fd;
+> > > > > -     void *addr;
+> > > > > -     int htsize = __builtin_ctzl(blk_size);
+> > > > >
+> > > > > -     if ((1ULL << htsize) != blk_size)
+> > > > > -             die("Hugepage size must be a power of 2.\n");
+> > > > > +     if (hugetlb) {
+> > > > > +             int htsize = __builtin_ctzl(blk_size);
+> > > > >
+> > > > > -     flags |= MFD_HUGETLB;
+> > > > > -     flags |= htsize << MFD_HUGE_SHIFT;
+> > > > > +             if ((1ULL << htsize) != blk_size)
+> > > > > +                     die("Hugepage size must be a power of 2.\n");
+> > > > > +
+> > > > > +             flags |= MFD_HUGETLB;
+> > > > > +             flags |= htsize << MFD_HUGE_SHIFT;
+> > > > > +     }
+> > > > >
+> > > > >       fd = memfd_create(name, flags);
+> > > > >       if (fd < 0)
+> > > > > -             die("Can't memfd_create for hugetlbfs map\n");
+> > > > > +             die("Can't memfd_create for memory map\n");
+> > > > > +
+> > > > >       if (ftruncate(fd, size) < 0)
+> > > > >               die("Can't ftruncate for mem mapping size %lld\n",
+> > > > >                       (unsigned long long)size);
+> > > > > -     addr = mmap(NULL, size, PROT_RW, MAP_PRIVATE, fd, 0);
+> > > > > -     close(fd);
+> > > > >
+> > > > > -     return addr;
+> > > > > +     return fd;
+> > > > >  }
+> > > > >
+> > > > >  /* This function wraps the decision between hugetlbfs map (if requested) or normal mmap */
+> > > > >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+> > > > >  {
+> > > > >       u64 blk_size = 0;
+> > > > > +     int fd;
+> > > > >
+> > > > >       /*
+> > > > >        * We don't /need/ to map guest RAM from hugetlbfs, but we do so
+> > > > > @@ -146,9 +148,14 @@ void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+> > > > >               }
+> > > > >
+> > > > >               kvm->ram_pagesize = blk_size;
+> > > > > -             return mmap_hugetlbfs(kvm, htlbfs_path, size, blk_size);
+> > > > >       } else {
+> > > > >               kvm->ram_pagesize = getpagesize();
+> > > > > -             return mmap(NULL, size, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
+> > > > >       }
+> > > > > +
+> > > > > +     fd = memfd_alloc(size, htlbfs_path, blk_size);
+> > > > > +     if (fd < 0)
+> > > > > +             return MAP_FAILED;
+> > > > > +
+> > > > > +     kvm->ram_fd = fd;
+> > > > > +     return mmap(NULL, size, PROT_RW, MAP_PRIVATE, kvm->ram_fd, 0);
+> > > > >  }
+> > > > > --
+> > > > > 2.38.1.431.g37b22c650d-goog
+> > > > >
