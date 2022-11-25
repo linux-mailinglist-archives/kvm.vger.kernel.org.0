@@ -2,50 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA6A0638CE6
-	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 16:06:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B85F638CE8
+	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 16:06:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229774AbiKYPGY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Nov 2022 10:06:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59086 "EHLO
+        id S229947AbiKYPG1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Nov 2022 10:06:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiKYPGX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Nov 2022 10:06:23 -0500
+        with ESMTP id S229891AbiKYPGZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Nov 2022 10:06:25 -0500
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C47572D1C2
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 07:06:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1331F2D1C2;
+        Fri, 25 Nov 2022 07:06:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669388782; x=1700924782;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=PUaEm/rUny2eMarZqMlMmRul7K0V7EvUBPsD7CJuyYU=;
-  b=dbidGUH91xm8r5A4YfITC4wRj8F/TEUp/HsD0HffjCcwkNxWICJFpyq4
-   O86fVaStTjP+khQ3iS0mGGuZbSP7CDb9s+mxbgvYxZDWGr3+9kdb9PZNG
-   3BCuTUo2gXui78oWls2iQ8a4Iq2ajRY4sbYDFHMWbGu/pwCXzgfOlM1RC
-   nrtjAqLvm8eUSBqydR17Q5VUsaM8lu4ven+1k/hlv9As4X5frO/8F7wFv
-   dwAaO9gPnlSF+b8h/FLRJ5oMVn9COoMLBUeWprO/mbPBluBgJljAJvfzB
-   UY9iGLx6Pc+wCX2X97Zx0HIl42Yh8iC6/rt9jA41aAyvEWMXH9Y+9mSxD
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10542"; a="302069130"
+  t=1669388785; x=1700924785;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Uv8WuEazzgbSx4/bAjBoWshididqsR5SPzHsqjDyIts=;
+  b=COJt46Yaq/Zp47Pnois1o6iv2jTrOxIQ2XoQjsrEpSxzIM4aC4G2ZAhc
+   OXy4B/hUUvFdWgwKsW5tiiTVKvAEh8Tvu2MqFJx5/sWR9RMtCBOquTPlC
+   xl7GbV37kci3VPN2bjyqvFx+ENfJL+j+CvJB76GsZr2zzcP2621mkBFp0
+   YW5iANo0VIO1Xzp6CpP1r1wxmcZJnCVCRCqTCuHx0d/Jc7bqmlsSpaxtG
+   1fQVfznhhKqt+aWxe2Il+Xkk5XMcT+4mYIqfHwzM8vsVodJMri+XjsYGc
+   af9t9RhuAcALhwtc+d7d2lCNaboF7q3wicqzA0Jgo13d1IXIix1uYDQZE
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10542"; a="302069142"
 X-IronPort-AV: E=Sophos;i="5.96,193,1665471600"; 
-   d="scan'208";a="302069130"
+   d="scan'208";a="302069142"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2022 07:06:22 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10542"; a="593240191"
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2022 07:06:24 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10542"; a="593240204"
 X-IronPort-AV: E=Sophos;i="5.96,193,1665471600"; 
-   d="scan'208";a="593240191"
+   d="scan'208";a="593240204"
 Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.73])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2022 07:06:20 -0800
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2022 07:06:22 -0800
 From:   Zhu Lingshan <lingshan.zhu@intel.com>
 To:     jasowang@redhat.com, mst@redhat.com
 Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         hang.yuan@intel.com, piotr.uminski@intel.com,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V2 00/12] ifcvf/vDPA implement features provisioning
-Date:   Fri, 25 Nov 2022 22:57:12 +0800
-Message-Id: <20221125145724.1129962-1-lingshan.zhu@intel.com>
+        Zhu Lingshan <lingshan.zhu@intel.com>, stable@vger.kernel.org
+Subject: [PATCH V2 01/12] vDPA/ifcvf: decouple hw features manipulators from the adapter
+Date:   Fri, 25 Nov 2022 22:57:13 +0800
+Message-Id: <20221125145724.1129962-2-lingshan.zhu@intel.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20221125145724.1129962-1-lingshan.zhu@intel.com>
+References: <20221125145724.1129962-1-lingshan.zhu@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -58,59 +60,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series implements features provisioning for ifcvf.
-By applying this series, we allow userspace to create
-a vDPA device with selected (management device supported)
-feature bits and mask out others.
+This commit gets rid of ifcvf_adapter in hw features related
+functions in ifcvf_base. Then these functions are more rubust
+and de-coupling from the ifcvf_adapter layer. So these
+functions could be invoded once the device is probed, even
+before the adapter is allocaed.
 
-Examples:
-a)The management device supported features:
-$ vdpa mgmtdev show pci/0000:01:00.5
-pci/0000:01:00.5:
-  supported_classes net
-  max_supported_vqs 9
-  dev_features MTU MAC MRG_RXBUF CTRL_VQ MQ ANY_LAYOUT VERSION_1 ACCESS_PLATFORM
+Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/vdpa/ifcvf/ifcvf_base.c | 9 ++-------
+ drivers/vdpa/ifcvf/ifcvf_base.h | 1 +
+ drivers/vdpa/ifcvf/ifcvf_main.c | 1 +
+ 3 files changed, 4 insertions(+), 7 deletions(-)
 
-b)Provision a vDPA device with all supported features:
-$ vdpa dev add name vdpa0 mgmtdev pci/0000:01:00.5
-$ vdpa/vdpa dev config show vdpa0
-vdpa0: mac 00:e8:ca:11:be:05 link up link_announce false max_vq_pairs 4 mtu 1500
-  negotiated_features MRG_RXBUF CTRL_VQ MQ VERSION_1 ACCESS_PLATFORM
-
-c)Provision a vDPA device with a subset of the supported features:
-$ vdpa dev add name vdpa0 mgmtdev pci/0000:01:00.5 device_features 0x300020020
-$ vdpa dev config show vdpa0
-mac 00:e8:ca:11:be:05 link up link_announce false
-  negotiated_features CTRL_VQ VERSION_1 ACCESS_PLATFORM
-
-Please help review
-
-Thanks
-
-Changes from V1:
-split original patch 1 ~ patch 3 to small patches that are less
-than 100 lines, so they can be applied to stalbe kernel(Jason)
-
-Zhu Lingshan (12):
-  vDPA/ifcvf: decouple hw features manipulators from the adapter
-  vDPA/ifcvf: decouple config space ops from the adapter
-  vDPA/ifcvf: alloc the mgmt_dev before the adapter
-  vDPA/ifcvf: decouple vq IRQ releasers from the adapter
-  vDPA/ifcvf: decouple config IRQ releaser from the adapter
-  vDPA/ifcvf: decouple vq irq requester from the adapter
-  vDPA/ifcvf: decouple config/dev IRQ requester and vectors allocator
-    from the adapter
-  vDPA/ifcvf: ifcvf_request_irq works on ifcvf_hw
-  vDPA/ifcvf: manage ifcvf_hw in the mgmt_dev
-  vDPA/ifcvf: allocate the adapter in dev_add()
-  vDPA/ifcvf: retire ifcvf_private_to_vf
-  vDPA/ifcvf: implement features provisioning
-
- drivers/vdpa/ifcvf/ifcvf_base.c |  32 ++-----
- drivers/vdpa/ifcvf/ifcvf_base.h |  10 +-
- drivers/vdpa/ifcvf/ifcvf_main.c | 162 +++++++++++++++-----------------
- 3 files changed, 91 insertions(+), 113 deletions(-)
-
+diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf_base.c
+index 3e4486bfa0b7..7a7e6ba66f88 100644
+--- a/drivers/vdpa/ifcvf/ifcvf_base.c
++++ b/drivers/vdpa/ifcvf/ifcvf_base.c
+@@ -220,10 +220,8 @@ u64 ifcvf_get_features(struct ifcvf_hw *hw)
+ 
+ int ifcvf_verify_min_features(struct ifcvf_hw *hw, u64 features)
+ {
+-	struct ifcvf_adapter *ifcvf = vf_to_adapter(hw);
+-
+ 	if (!(features & BIT_ULL(VIRTIO_F_ACCESS_PLATFORM)) && features) {
+-		IFCVF_ERR(ifcvf->pdev, "VIRTIO_F_ACCESS_PLATFORM is not negotiated\n");
++		IFCVF_ERR(hw->pdev, "VIRTIO_F_ACCESS_PLATFORM is not negotiated\n");
+ 		return -EINVAL;
+ 	}
+ 
+@@ -301,14 +299,11 @@ static void ifcvf_set_features(struct ifcvf_hw *hw, u64 features)
+ 
+ static int ifcvf_config_features(struct ifcvf_hw *hw)
+ {
+-	struct ifcvf_adapter *ifcvf;
+-
+-	ifcvf = vf_to_adapter(hw);
+ 	ifcvf_set_features(hw, hw->req_features);
+ 	ifcvf_add_status(hw, VIRTIO_CONFIG_S_FEATURES_OK);
+ 
+ 	if (!(ifcvf_get_status(hw) & VIRTIO_CONFIG_S_FEATURES_OK)) {
+-		IFCVF_ERR(ifcvf->pdev, "Failed to set FEATURES_OK status\n");
++		IFCVF_ERR(hw->pdev, "Failed to set FEATURES_OK status\n");
+ 		return -EIO;
+ 	}
+ 
+diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
+index f5563f665cc6..e1fe947d61b7 100644
+--- a/drivers/vdpa/ifcvf/ifcvf_base.h
++++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+@@ -89,6 +89,7 @@ struct ifcvf_hw {
+ 	u16 nr_vring;
+ 	/* VIRTIO_PCI_CAP_DEVICE_CFG size */
+ 	u32 cap_dev_config_size;
++	struct pci_dev *pdev;
+ };
+ 
+ struct ifcvf_adapter {
+diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+index f9c0044c6442..28c82d796c90 100644
+--- a/drivers/vdpa/ifcvf/ifcvf_main.c
++++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+@@ -842,6 +842,7 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	vf = &adapter->vf;
+ 	vf->dev_type = get_dev_type(pdev);
+ 	vf->base = pcim_iomap_table(pdev);
++	vf->pdev = pdev;
+ 
+ 	adapter->pdev = pdev;
+ 	adapter->vdpa.dma_dev = &pdev->dev;
 -- 
 2.31.1
 
