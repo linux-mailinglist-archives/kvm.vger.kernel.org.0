@@ -2,78 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64A33638BBA
-	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 14:59:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 262AD638CA9
+	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 15:47:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229911AbiKYN7i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Nov 2022 08:59:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55370 "EHLO
+        id S230019AbiKYOrM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Nov 2022 09:47:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbiKYN7h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Nov 2022 08:59:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F2E1A38B
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 05:58:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669384719;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Aw1P2Ri0mqwmUcaXAnyPkNOEMZ9IWbfSbhEHVlaLRfk=;
-        b=Kumwv4hjTyBc2OcFl88PdNR4ZZsVdc7+9qFByzxe4QDx2RK2oHwSS2h5mqUcCeE8pNGFbm
-        CvQJoEFRAqFu4RfMc98XlFUpb0uz+8Dl27dPITfMuFBxo8dKWqudMh231vAKTCxu3zyiUG
-        HlEI/TV/7U6sPuVSQ5HRK/W1+I1HVx4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-331-m61ZX-HCMXCQMmWtX6A3Cw-1; Fri, 25 Nov 2022 08:58:38 -0500
-X-MC-Unique: m61ZX-HCMXCQMmWtX6A3Cw-1
-Received: by mail-wm1-f71.google.com with SMTP id f1-20020a1cc901000000b003cf703a4f08so1849775wmb.2
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 05:58:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Aw1P2Ri0mqwmUcaXAnyPkNOEMZ9IWbfSbhEHVlaLRfk=;
-        b=vMSIlgQE8Dj+GZPsk0Pd3Ra2ypqJ8sYcWrLZ11f8/1EKmv98B00r4uALiZfwa0qrYL
-         B/gjv14NRh6IJzsMhAU4POkA1lUNu9EfDXk2bhTcb7utDvjMmO66GmtY8f47KqY1BBHP
-         rJOAx/v5ssA63785d6Phsl58pC/9LUI1PfoPt36O0QGFr+63KVBVTTBQL/A1f0OTaF2W
-         BHXgSdwGf7XCi9YxDAtPFwYcge3c9NzKHtgVop0FFH68VXrErAqwK1HffI8HoJsPPUcx
-         S59wFULSU0zpiZHmim12Z74YebQIZ3QVhs37DxEZNeACjZHMFO9lxDGL4k9UnyEhjUv5
-         +erA==
-X-Gm-Message-State: ANoB5pljtBiDGWarJ0wvDY2wwrWnVGOHzvte9TU1KAoHQw3T5hUMycdL
-        UguFMUA+fFhl/hQgHhNKKZrEMDTqibqNlZB6iG6s3g1ThJ/9gm2HXQf2VQZFJKmzudGuG7LhUXD
-        V6ihthRf+lW8u
-X-Received: by 2002:a05:600c:54cd:b0:3cf:67ae:3a4a with SMTP id iw13-20020a05600c54cd00b003cf67ae3a4amr14294911wmb.22.1669384717176;
-        Fri, 25 Nov 2022 05:58:37 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7YuQDJIHBaNiEZImP1BKHYmyF6hi1io9i8XM/278ZlkAASwIifrXd58Wv8FtjYzrCb+bGRCA==
-X-Received: by 2002:a05:600c:54cd:b0:3cf:67ae:3a4a with SMTP id iw13-20020a05600c54cd00b003cf67ae3a4amr14294903wmb.22.1669384716958;
-        Fri, 25 Nov 2022 05:58:36 -0800 (PST)
-Received: from [192.168.0.5] (ip-109-43-176-41.web.vodafone.de. [109.43.176.41])
-        by smtp.gmail.com with ESMTPSA id s11-20020a5d69cb000000b002366f9bd717sm4601153wrw.45.2022.11.25.05.58.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Nov 2022 05:58:36 -0800 (PST)
-Message-ID: <8829c1f2-46cd-12b7-5939-48a1866ed001@redhat.com>
-Date:   Fri, 25 Nov 2022 14:58:35 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
+        with ESMTP id S230228AbiKYOrC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Nov 2022 09:47:02 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C78CDDA
+        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 06:47:01 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2APEU9rS039444
+        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 14:47:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=2yGRQlkYe35bJAZmzXIefkTVVZ3m6giyBfpSqBf1pNE=;
+ b=YFEiB4OdfIGaB7eRIfhncdND6sZ8Pdkxm9fsJg6gXmPTy5EVc3+oOUS4230zHcCikzj9
+ Y5mFOBzZ01VcrqgQ8dhqBGIA/L02vTOVNhQOotWRNR9PV863INJlfSLQHTmsbIQKBjDI
+ XklawOaSMN2wQPvnWFeACjuYH019SZ0f+EEjh8t5MdTexyVUnU3XXRvN/vEMFv6TgLxj
+ ufKRqHanFm3Ib36fvIb9aJeztxKbaFQ5UWQIRucwzWUbaTG9TrUyaY1pPad94XzYv78y
+ vTeXd5MNYRcghrjLUPvat2tiY2993i63najPlvZhxdUqlUtKMsjBpOWtKmtpUG6ndddi 2w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m2yhc0bjq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 14:47:00 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2APEbLfg025300
+        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 14:47:00 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m2yhc0bj6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Nov 2022 14:47:00 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2APEZbJC025095;
+        Fri, 25 Nov 2022 14:46:58 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 3kxpdj1rh5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Nov 2022 14:46:58 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2APEksqA46596522
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Nov 2022 14:46:54 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B360EA405F;
+        Fri, 25 Nov 2022 14:46:54 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B9E27A405C;
+        Fri, 25 Nov 2022 14:46:53 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.171.0.125])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Fri, 25 Nov 2022 14:46:53 +0000 (GMT)
+Date:   Fri, 25 Nov 2022 15:03:48 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 1/2] s390x: add a library for
+ CMM-related functions
+Message-ID: <20221125150348.55676f0c@p-imbrenda>
+In-Reply-To: <20221124134429.612467-2-nrb@linux.ibm.com>
 References: <20221124134429.612467-1-nrb@linux.ibm.com>
- <20221124134429.612467-3-nrb@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: add CMM test during
- migration
-In-Reply-To: <20221124134429.612467-3-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        <20221124134429.612467-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Du7Ta1W67SeLVgP6ZMAWkK9GgsZam6A7
+X-Proofpoint-ORIG-GUID: VGK4CxiOtFtSODRPCz_dAJbFY0UwpJRV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-25_06,2022-11-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ impostorscore=0 suspectscore=0 clxscore=1015 phishscore=0
+ lowpriorityscore=0 priorityscore=1501 mlxscore=0 spamscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2210170000 definitions=main-2211250114
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,183 +92,236 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/11/2022 14.44, Nico Boehr wrote:
-> Add a test which modifies CMM page states while migration is in
-> progress.
+On Thu, 24 Nov 2022 14:44:28 +0100
+Nico Boehr <nrb@linux.ibm.com> wrote:
+
+> Upcoming changes will add a test which is very similar to the existing
+> CMM migration test. To reduce code duplication, move the common function
+> to a library which can be re-used by both tests.
 > 
 > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 > ---
->   s390x/Makefile               |   1 +
->   s390x/migration-during-cmm.c | 121 +++++++++++++++++++++++++++++++++++
->   s390x/unittests.cfg          |   5 ++
->   3 files changed, 127 insertions(+)
->   create mode 100644 s390x/migration-during-cmm.c
+>  lib/s390x/cmm.c       | 90 +++++++++++++++++++++++++++++++++++++++++++
+>  lib/s390x/cmm.h       | 31 +++++++++++++++
+>  s390x/Makefile        |  1 +
+>  s390x/migration-cmm.c | 34 ++++------------
+>  4 files changed, 130 insertions(+), 26 deletions(-)
+>  create mode 100644 lib/s390x/cmm.c
+>  create mode 100644 lib/s390x/cmm.h
 > 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 401cb6371cee..64c7c04409ae 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -39,6 +39,7 @@ tests += $(TEST_DIR)/panic-loop-extint.elf
->   tests += $(TEST_DIR)/panic-loop-pgm.elf
->   tests += $(TEST_DIR)/migration-sck.elf
->   tests += $(TEST_DIR)/exittime.elf
-> +tests += $(TEST_DIR)/migration-during-cmm.elf
->   
->   pv-tests += $(TEST_DIR)/pv-diags.elf
->   
-> diff --git a/s390x/migration-during-cmm.c b/s390x/migration-during-cmm.c
+> diff --git a/lib/s390x/cmm.c b/lib/s390x/cmm.c
 > new file mode 100644
-> index 000000000000..afe1f73605ba
+> index 000000000000..5da02fe628f9
 > --- /dev/null
-> +++ b/s390x/migration-during-cmm.c
-> @@ -0,0 +1,121 @@
+> +++ b/lib/s390x/cmm.c
+> @@ -0,0 +1,90 @@
 > +/* SPDX-License-Identifier: GPL-2.0-only */
 > +/*
-> + * Perform CMMA actions while migrating.
+> + * CMM test library
 > + *
 > + * Copyright IBM Corp. 2022
 > + *
 > + * Authors:
 > + *  Nico Boehr <nrb@linux.ibm.com>
 > + */
-> +
 > +#include <libcflat.h>
-> +#include <smp.h>
-> +#include <asm-generic/barrier.h>
-> +
+> +#include <bitops.h>
 > +#include "cmm.h"
 > +
-> +#define NUM_PAGES 128
+> +/*
+> + * Maps ESSA actions to states the page is allowed to be in after the
+> + * respective action was executed.
+> + */
+> +const int allowed_essa_state_masks[4] = {
+> +	BIT(ESSA_USAGE_STABLE),					/* ESSA_SET_STABLE */
+> +	BIT(ESSA_USAGE_UNUSED),					/* ESSA_SET_UNUSED */
+> +	BIT(ESSA_USAGE_VOLATILE),				/* ESSA_SET_VOLATILE */
+> +	BIT(ESSA_USAGE_VOLATILE) | BIT(ESSA_USAGE_POT_VOLATILE) /* ESSA_SET_POT_VOLATILE */
+> +};
 > +
 > +/*
-> + * Allocate 3 pages more than we need so we can start at different offsets. This ensures page states
-
-I'd suggest to break the line after "offsets.", that's better to read.
-
-> + * change on every loop iteration.
+> + * Set CMM page states on pagebuf.
+> + * pagebuf must point to page_count consecutive pages.
+> + * page_count must be a multiple of 4.
 > + */
-> +static uint8_t pagebuf[(NUM_PAGES + 3) * PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
-> +
-> +static unsigned int thread_iters;
-> +static int thread_should_exit;
-> +static int thread_exited;
-> +struct cmm_verify_result result;
-> +
-> +static void test_cmm_during_migration(void)
+> +void cmm_set_page_states(uint8_t *pagebuf, int page_count)
+
+this could be an unsigned int (but maybe unsigned long would be better)
+
 > +{
-> +	uint8_t *pagebuf_start;
-> +	/*
-> +	 * The second CPU must not print on the console, otherwise it will race with
-
-"print to the console" ? ... no clue, I'm not a native speaker ;-)
-
-> +	 * the primary CPU on the SCLP buffer.
-> +	 */
-> +	while (!thread_should_exit) {
-> +		/*
-> +		 * Start on a offset different from the last iteration so page states change with
-> +		 * every iteration. This is why pagebuf has 3 extra pages.
-> +		 */
-> +		pagebuf_start = pagebuf + (thread_iters % 4) * PAGE_SIZE;
-> +		cmm_set_page_states(pagebuf_start, NUM_PAGES);
+> +	unsigned long addr = (unsigned long)pagebuf;
+> +	int i;
 > +
-> +		/*
-> +		 * Always increment even if the verify fails. This ensures primary CPU knows where
-> +		 * we left off and can do an additional verify round after migration finished.
-> +		 */
-> +		thread_iters++;
-> +
-> +		result = cmm_verify_page_states(pagebuf_start, NUM_PAGES);
-> +		if (result.verify_failed)
-> +			goto out;
-
-A "break" would be nicer than a goto.
-
+> +	assert(page_count % 4 == 0);
+> +	for (i = 0; i < page_count; i += 4) {
+> +		essa(ESSA_SET_STABLE, addr + i * PAGE_SIZE);
+> +		essa(ESSA_SET_UNUSED, addr + (i + 1) * PAGE_SIZE);
+> +		essa(ESSA_SET_VOLATILE, addr + (i + 2) * PAGE_SIZE);
+> +		essa(ESSA_SET_POT_VOLATILE, addr + (i + 3) * PAGE_SIZE);
 > +	}
-> +
-> +out:
-> +	WRITE_ONCE(thread_exited, 1);
 > +}
 > +
-> +int main(void)
+> +/*
+> + * Verify CMM page states on pagebuf.
+> + * Page states must have been set by cmm_set_page_states on pagebuf before.
+> + * page_count must be a multiple of 4.
+> + *
+> + * If page states match the expected result, will return a cmm_verify_result
+> + * with verify_failed false. All other fields are then invalid.
+> + * If there is a mismatch, the returned struct will have verify_failed true
+> + * and will be filled with details on the first mismatch encountered.
+> + */
+> +struct cmm_verify_result cmm_verify_page_states(uint8_t *pagebuf, int page_count)
+
+same here
+
 > +{
-> +	bool has_essa = check_essa_available();
-> +	struct psw psw;
+> +	struct cmm_verify_result result = {
+> +		.verify_failed = true
+> +	};
+> +	int i, expected_mask, actual_mask;
+> +	unsigned long addr;
 > +
-> +	report_prefix_push("migration-during-cmm");
-> +	if (!has_essa) {
-> +		report_skip("ESSA is not available");
-> +		goto error;
+> +	assert(page_count % 4 == 0);
+> +
+> +	for (i = 0; i < page_count; i++) {
+> +		addr = (unsigned long)(pagebuf + i * PAGE_SIZE);
+> +		actual_mask = essa(ESSA_GET_STATE, addr);
+> +		/* usage state in bits 60 and 61 */
+> +		actual_mask = BIT((actual_mask >> 2) & 0x3);
+> +		expected_mask = allowed_essa_state_masks[i % ARRAY_SIZE(allowed_essa_state_masks)];
+> +		if (!(actual_mask & expected_mask)) {
+> +			result.page_mismatch_idx = i;
+> +			result.page_mismatch_addr = addr;
+> +			result.expected_mask = expected_mask;
+> +			result.actual_mask = actual_mask;
+> +			result.verify_failed = true;
+
+it's already true, you don't need to set it again
+
+> +			return result;
+> +		}
 > +	}
 > +
-> +	if (smp_query_num_cpus() == 1) {
-> +		report_skip("need at least 2 cpus for this test");
-> +		goto error;
-> +	}
-> +
-> +	psw.mask = extract_psw_mask();
-> +	psw.addr = (unsigned long)test_cmm_during_migration;
-> +	smp_cpu_setup(1, psw);
-> +
-> +	puts("Please migrate me, then press return\n");
-> +	(void)getchar();
-> +
-> +	WRITE_ONCE(thread_should_exit, 1);
-> +
-> +	while (!thread_exited)
-> +		mb();
-> +
-> +	report_info("thread completed %u iterations", thread_iters);
-> +
-> +	report_prefix_push("during migration");
-> +	cmm_report_verify(&result);
-> +	report_prefix_pop();
-> +
-> +	/*
-> +	 * Verification of page states occurs on the thread. We don't know if we
-> +	 * were still migrating during the verification.
-> +	 * To be sure, make another verification round after the migration
-> +	 * finished to catch page states which might not have been migrated
-> +	 * correctly.
-> +	 */
-> +	report_prefix_push("after migration");
-> +	assert(thread_iters > 0);
-> +	result = cmm_verify_page_states(pagebuf + ((thread_iters - 1) % 4) * PAGE_SIZE, NUM_PAGES);
-> +	cmm_report_verify(&result);
-> +	report_prefix_pop();
-> +
-> +	goto done;
-> +
-> +error:
-> +	/*
-> +	 * If we just exit and don't ask migrate_cmd to migrate us, it
-> +	 * will just hang forever. Hence, also ask for migration when we
-> +	 * skip this test alltogether.
-
-s/alltogether/all together/
-
-> +	 */
-> +	puts("Please migrate me, then press return\n");
-> +	(void)getchar();
-> +
-> +done:
-> +	report_prefix_pop();
-> +	return report_summary();
+> +	result.verify_failed = false;
+> +	return result;
 > +}
-> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> index 3caf81eda396..f6889bd4da01 100644
-> --- a/s390x/unittests.cfg
-> +++ b/s390x/unittests.cfg
-> @@ -208,3 +208,8 @@ groups = migration
->   [exittime]
->   file = exittime.elf
->   smp = 2
 > +
-> +[migration-during-cmm]
-> +file = migration-during-cmm.elf
-> +groups = migration
-> +smp = 2
+> +void cmm_report_verify(struct cmm_verify_result const *result)
+> +{
+> +	if (result->verify_failed)
+> +		report_fail("page state mismatch: first page idx = %d, addr = %lx, expected_mask = 0x%x, actual_mask = 0x%x", result->page_mismatch_idx, result->page_mismatch_addr, result->expected_mask, result->actual_mask);
 
-With the nits fixed:
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+this line looks longer than 120 columns
+
+> +	else
+> +		report_pass("page states match");
+> +}
+> diff --git a/lib/s390x/cmm.h b/lib/s390x/cmm.h
+> new file mode 100644
+> index 000000000000..41dcc2f953fd
+> --- /dev/null
+> +++ b/lib/s390x/cmm.h
+> @@ -0,0 +1,31 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * CMM test library
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +#ifndef S390X_CMM_H
+> +#define S390X_CMM_H
+> +
+> +#include <libcflat.h>
+> +#include <asm/page.h>
+> +#include <asm/cmm.h>
+> +
+> +struct cmm_verify_result {
+> +	bool verify_failed;
+> +	char expected_mask;
+> +	char actual_mask;
+> +	int page_mismatch_idx;
+
+maybe also unsigned long to be consistent with
+cmm_set_page_states
+
+> +	unsigned long page_mismatch_addr;
+> +};
+> +
+> +void cmm_set_page_states(uint8_t *pagebuf, int page_count);
+> +
+> +struct cmm_verify_result cmm_verify_page_states(uint8_t *pagebuf, int page_count);
+> +
+> +void cmm_report_verify(struct cmm_verify_result const *result);
+> +
+> +#endif /* S390X_CMM_H */
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index bf1504f9d58c..401cb6371cee 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -99,6 +99,7 @@ cflatobjs += lib/s390x/malloc_io.o
+>  cflatobjs += lib/s390x/uv.o
+>  cflatobjs += lib/s390x/sie.o
+>  cflatobjs += lib/s390x/fault.o
+> +cflatobjs += lib/s390x/cmm.o
+>  
+>  OBJDIRS += lib/s390x
+>  
+> diff --git a/s390x/migration-cmm.c b/s390x/migration-cmm.c
+> index aa7910ca76bf..720ef9fb9799 100644
+> --- a/s390x/migration-cmm.c
+> +++ b/s390x/migration-cmm.c
+> @@ -14,41 +14,23 @@
+>  #include <asm/cmm.h>
+>  #include <bitops.h>
+>  
+> +#include "cmm.h"
+> +
+>  #define NUM_PAGES 128
+> -static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+> +
+> +static uint8_t pagebuf[NUM_PAGES * PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+>  
+>  static void test_migration(void)
+>  {
+> -	int i, state_mask, actual_state;
+> -	/*
+> -	 * Maps ESSA actions to states the page is allowed to be in after the
+> -	 * respective action was executed.
+> -	 */
+> -	int allowed_essa_state_masks[4] = {
+> -		BIT(ESSA_USAGE_STABLE),					/* ESSA_SET_STABLE */
+> -		BIT(ESSA_USAGE_UNUSED),					/* ESSA_SET_UNUSED */
+> -		BIT(ESSA_USAGE_VOLATILE),				/* ESSA_SET_VOLATILE */
+> -		BIT(ESSA_USAGE_VOLATILE) | BIT(ESSA_USAGE_POT_VOLATILE) /* ESSA_SET_POT_VOLATILE */
+> -	};
+> +	struct cmm_verify_result result;
+>  
+> -	assert(NUM_PAGES % 4 == 0);
+> -	for (i = 0; i < NUM_PAGES; i += 4) {
+> -		essa(ESSA_SET_STABLE, (unsigned long)pagebuf[i]);
+> -		essa(ESSA_SET_UNUSED, (unsigned long)pagebuf[i + 1]);
+> -		essa(ESSA_SET_VOLATILE, (unsigned long)pagebuf[i + 2]);
+> -		essa(ESSA_SET_POT_VOLATILE, (unsigned long)pagebuf[i + 3]);
+> -	}
+> +	cmm_set_page_states(pagebuf, NUM_PAGES);
+>  
+>  	puts("Please migrate me, then press return\n");
+>  	(void)getchar();
+>  
+> -	for (i = 0; i < NUM_PAGES; i++) {
+> -		actual_state = essa(ESSA_GET_STATE, (unsigned long)pagebuf[i]);
+> -		/* extract the usage state in bits 60 and 61 */
+> -		actual_state = (actual_state >> 2) & 0x3;
+> -		state_mask = allowed_essa_state_masks[i % ARRAY_SIZE(allowed_essa_state_masks)];
+> -		report(BIT(actual_state) & state_mask, "page %d state: expected_mask=0x%x actual_mask=0x%lx", i, state_mask, BIT(actual_state));
+> -	}
+> +	result = cmm_verify_page_states(pagebuf, NUM_PAGES);
+> +	cmm_report_verify(&result);
+>  }
+>  
+>  int main(void)
 
