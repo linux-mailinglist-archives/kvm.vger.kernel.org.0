@@ -2,48 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD364638CD9
-	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 16:01:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF6DD638D50
+	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 16:13:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229661AbiKYPBG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Nov 2022 10:01:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55518 "EHLO
+        id S230393AbiKYPNQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Nov 2022 10:13:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230187AbiKYPBC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Nov 2022 10:01:02 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 190ED3F06F
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 07:00:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:Date:Cc:To:
-        From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=s5lTAnmV6Oixr6aiKcS+jqwXYiVtQVSiL/a5K1RvDzA=; b=bnZz8BSKcFrrZisS9mHIvk+/6e
-        t1WbY2tRkFCik2i2sCvF/Gwt/Rifl2Mz+sp0yURLr6QCGkjDda6IfgU3g03TKuZ2VwlSepxzZY9k+
-        QcJ+IjAAbWUy7127TH9v+4EVn0SzCMJ1OdEXRotLzlkoO8wJ9VkEuE1U6MtYk7PPSbGVD2qBVw8vL
-        KAtevzXfXIh/YC6YoeMAu5VuufxZKYvBh4o5JtpFaNWLklj0U6kMjYYpdJsUAD9ApYjPiV1DEr2/v
-        6FWlRKEgL5txumLJ1HaGiINTfaqSRze2/TsaIPXqusL8dp+kyMLC+SDCWMz0aXrAvhTi1p3JVlCko
-        VqV6mgsQ==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oyaCG-009fKo-NF; Fri, 25 Nov 2022 15:00:56 +0000
-Message-ID: <1fd9826b2319cc9e58aecf6e11348acd63fdb81c.camel@infradead.org>
-Subject: [PATCH v3] KVM: x86/xen: add support for 32-bit guests in
- SCHEDOP_poll
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm <kvm@vger.kernel.org>, "Kaya, Metin" <metikaya@amazon.com>,
-        Paul Durrant <paul@xen.org>
-Date:   Fri, 25 Nov 2022 15:00:49 +0000
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-7lJT8gsNZzqqMZqf8Uti"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S230389AbiKYPNC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Nov 2022 10:13:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1E944909C
+        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 07:11:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669389105;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0umtC4MfgS1x7nfa252nsVL6T4vQ9S+hnM0ed4G85tw=;
+        b=MwoWwURMTyaSbO89V9Q5FVBvlcTiSOqID1Fax/sUUWMVW4kV8FJFeXANTAMZiNWecf5EGM
+        dji6p0BE8CUKVxVgkJipDA/6r8SgQE4N9XktKxAwZNhVmnCecqfvB+OAIHn5lOsYomNJsC
+        1pTfREKz04B30kwBOlihjdt8Kvj0lhw=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-613-vEws9ExEPB-jeAgKMmfu0w-1; Fri, 25 Nov 2022 10:11:42 -0500
+X-MC-Unique: vEws9ExEPB-jeAgKMmfu0w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4D41E29AB3E0;
+        Fri, 25 Nov 2022 15:11:40 +0000 (UTC)
+Received: from ptitbras (unknown [10.39.193.103])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 150561121330;
+        Fri, 25 Nov 2022 15:11:33 +0000 (UTC)
+References: <20221119034633.1728632-1-ltykernel@gmail.com>
+ <20221119034633.1728632-17-ltykernel@gmail.com>
+User-agent: mu4e 1.8.0; emacs 28.2
+From:   Christophe de Dinechin <dinechin@redhat.com>
+To:     Tianyu Lan <ltykernel@gmail.com>
+Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
+        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, peterz@infradead.org,
+        ashish.kalra@amd.com, srutherford@google.com,
+        akpm@linux-foundation.org, anshuman.khandual@arm.com,
+        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
+        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
+        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
+        michael.roth@amd.com, thomas.lendacky@amd.com,
+        venu.busireddy@oracle.com, sterritt@google.com,
+        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
+Subject: Re: [RFC PATCH V2 16/18] x86/sev: Initialize #HV doorbell and
+ handle interrupt requests
+Date:   Fri, 25 Nov 2022 12:49:33 +0100
+In-reply-to: <20221119034633.1728632-17-ltykernel@gmail.com>
+Message-ID: <m2ilj3kr19.fsf@redhat.com>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -51,220 +75,663 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-7lJT8gsNZzqqMZqf8Uti
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 2022-11-18 at 22:46 -05, Tianyu Lan <ltykernel@gmail.com> wrote...
+> From: Tianyu Lan <tiala@microsoft.com>
+>
+> Enable #HV exception to handle interrupt requests from hypervisor.
+>
+> Co-developed-by: Lendacky Thomas <thomas.lendacky@amd.com>
+> Co-developed-by: Kalra Ashish <ashish.kalra@amd.com>
+> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
+> ---
+>  arch/x86/entry/entry_64.S          |  18 ++
+>  arch/x86/include/asm/irqflags.h    |  19 ++
+>  arch/x86/include/asm/mem_encrypt.h |   2 +
+>  arch/x86/include/asm/msr-index.h   |   6 +
+>  arch/x86/include/uapi/asm/svm.h    |   4 +
+>  arch/x86/kernel/sev.c              | 354 ++++++++++++++++++++++++-----
+>  arch/x86/kernel/traps.c            |  50 ++++
+>  7 files changed, 400 insertions(+), 53 deletions(-)
+>
+> diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+> index b2059df43c57..fe460cf44ab5 100644
+> --- a/arch/x86/entry/entry_64.S
+> +++ b/arch/x86/entry/entry_64.S
+> @@ -1058,6 +1058,15 @@ SYM_CODE_END(paranoid_entry)
+>   * R15 - old SPEC_CTRL
+>   */
+>  SYM_CODE_START_LOCAL(paranoid_exit)
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +	/*
+> +	 * If a #HV was delivered during execution and interrupts were
+> +	 * disabled, then check if it can be handled before the iret
+> +	 * (which may re-enable interrupts).
+> +	 */
+> +	mov     %rsp, %rdi
+> +	call    check_hv_pending
+> +#endif
+>  	UNWIND_HINT_REGS
+>
+>  	/*
+> @@ -1183,6 +1192,15 @@ SYM_CODE_START_LOCAL(error_entry)
+>  SYM_CODE_END(error_entry)
+>
+>  SYM_CODE_START_LOCAL(error_return)
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +	/*
+> +	 * If a #HV was delivered during execution and interrupts were
+> +	 * disabled, then check if it can be handled before the iret
+> +	 * (which may re-enable interrupts).
+> +	 */
+> +	mov     %rsp, %rdi
+> +	call    check_hv_pending
+> +#endif
+>  	UNWIND_HINT_REGS
+>  	DEBUG_ENTRY_ASSERT_IRQS_OFF
+>  	testb	$3, CS(%rsp)
+> diff --git a/arch/x86/include/asm/irqflags.h b/arch/x86/include/asm/irqflags.h
+> index 7793e52d6237..e0730d8bc0ac 100644
+> --- a/arch/x86/include/asm/irqflags.h
+> +++ b/arch/x86/include/asm/irqflags.h
+> @@ -14,6 +14,9 @@
+>  /*
+>   * Interrupt control:
+>   */
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +void check_hv_pending(struct pt_regs *regs);
+> +#endif
+>
+>  /* Declaration required for gcc < 4.9 to prevent -Werror=missing-prototypes */
+>  extern inline unsigned long native_save_fl(void);
+> @@ -35,6 +38,19 @@ extern __always_inline unsigned long native_save_fl(void)
+>  	return flags;
+>  }
+>
+> +extern inline void native_restore_fl(unsigned long flags)
+> +{
+> +	asm volatile("push %0 ; popf"
+> +		     : /* no output */
+> +		     : "g" (flags)
+> +		     : "memory", "cc");
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +	if ((flags & X86_EFLAGS_IF)) {
+> +		check_hv_pending(NULL);
+> +	}
+> +#endif
+> +}
+> +
+>  static __always_inline void native_irq_disable(void)
+>  {
+>  	asm volatile("cli": : :"memory");
+> @@ -43,6 +59,9 @@ static __always_inline void native_irq_disable(void)
+>  static __always_inline void native_irq_enable(void)
+>  {
+>  	asm volatile("sti": : :"memory");
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +	check_hv_pending(NULL);
+> +#endif
+>  }
+>
+>  static inline __cpuidle void native_safe_halt(void)
+> diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/mem_encrypt.h
+> index 72ca90552b6a..7264ca5f5b2d 100644
+> --- a/arch/x86/include/asm/mem_encrypt.h
+> +++ b/arch/x86/include/asm/mem_encrypt.h
+> @@ -50,6 +50,7 @@ void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages,
+>  void __init mem_encrypt_free_decrypted_mem(void);
+>
+>  void __init sev_es_init_vc_handling(void);
+> +void __init sev_snp_init_hv_handling(void);
+>
+>  #define __bss_decrypted __section(".bss..decrypted")
+>
+> @@ -72,6 +73,7 @@ static inline void __init sme_encrypt_kernel(struct boot_params *bp) { }
+>  static inline void __init sme_enable(struct boot_params *bp) { }
+>
+>  static inline void sev_es_init_vc_handling(void) { }
+> +static inline void sev_snp_init_hv_handling(void) { }
+>
+>  static inline int __init
+>  early_set_memory_decrypted(unsigned long vaddr, unsigned long size) { return 0; }
+> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+> index 10ac52705892..6fe25a6e325f 100644
+> --- a/arch/x86/include/asm/msr-index.h
+> +++ b/arch/x86/include/asm/msr-index.h
+> @@ -562,10 +562,16 @@
+>  #define MSR_AMD64_SEV_ENABLED_BIT	0
+>  #define MSR_AMD64_SEV_ES_ENABLED_BIT	1
+>  #define MSR_AMD64_SEV_SNP_ENABLED_BIT	2
+> +#define MSR_AMD64_SEV_REFLECTVC_ENABLED_BIT		4
+> +#define MSR_AMD64_SEV_RESTRICTED_INJECTION_ENABLED_BIT	5
+> +#define MSR_AMD64_SEV_ALTERNATE_INJECTION_ENABLED_BIT	6
+>  #define MSR_AMD64_SEV_ENABLED		BIT_ULL(MSR_AMD64_SEV_ENABLED_BIT)
+>  #define MSR_AMD64_SEV_ES_ENABLED	BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
+>  #define MSR_AMD64_SEV_SNP_ENABLED	BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
+>
+> +#define MSR_AMD64_SEV_REFLECTVC_ENABLED			BIT_ULL(MSR_AMD64_SEV_REFLECTVC_ENABLED_BIT)
+> +#define MSR_AMD64_SEV_RESTRICTED_INJECTION_ENABLED	BIT_ULL(MSR_AMD64_SEV_RESTRICTED_INJECTION_ENABLED_BIT)
+> +#define MSR_AMD64_SEV_ALTERNATE_INJECTION_ENABLED	BIT_ULL(MSR_AMD64_SEV_ALTERNATE_INJECTION_ENABLED_BIT)
+>  #define MSR_AMD64_VIRT_SPEC_CTRL	0xc001011f
+>
+>  /* AMD Collaborative Processor Performance Control MSRs */
+> diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
+> index f69c168391aa..85d6882262e7 100644
+> --- a/arch/x86/include/uapi/asm/svm.h
+> +++ b/arch/x86/include/uapi/asm/svm.h
+> @@ -115,6 +115,10 @@
+>  #define SVM_VMGEXIT_AP_CREATE_ON_INIT		0
+>  #define SVM_VMGEXIT_AP_CREATE			1
+>  #define SVM_VMGEXIT_AP_DESTROY			2
+> +#define SVM_VMGEXIT_HV_DOORBELL_PAGE		0x80000014
+> +#define SVM_VMGEXIT_GET_PREFERRED_HV_DOORBELL_PAGE	0
+> +#define SVM_VMGEXIT_SET_HV_DOORBELL_PAGE		1
+> +#define SVM_VMGEXIT_QUERY_HV_DOORBELL_PAGE		2
+>  #define SVM_VMGEXIT_HV_FEATURES			0x8000fffd
+>  #define SVM_VMGEXIT_UNSUPPORTED_EVENT		0x8000ffff
+>
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index b54ee3ba37b0..23cd025f97dc 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -104,6 +104,12 @@ struct sev_es_runtime_data {
+>  	 * is currently unsupported in SEV-ES guests.
+>  	 */
+>  	unsigned long dr7;
+> +	/*
+> +	 * SEV-SNP requires that the GHCB must be registered before using it.
+> +	 * The flag below will indicate whether the GHCB is registered, if its
+> +	 * not registered then sev_es_get_ghcb() will perform the registration.
+> +	 */
+> +	bool ghcb_registered;
+>  };
+>
+>  struct ghcb_state {
+> @@ -122,6 +128,183 @@ struct sev_config {
+>
+>  static struct sev_config sev_cfg __read_mostly;
+>
+> +static noinstr struct ghcb *__sev_get_ghcb(struct ghcb_state *state);
+> +static noinstr void __sev_put_ghcb(struct ghcb_state *state);
+> +static int vmgexit_hv_doorbell_page(struct ghcb *ghcb, u64 op, u64 pa);
+> +static void sev_snp_setup_hv_doorbell_page(struct ghcb *ghcb);
+> +
+> +union hv_pending_events {
+> +	u16 events;
+> +	struct {
+> +		u8 vector;
+> +		u8 nmi : 1;
+> +		u8 mc : 1;
+> +		u8 reserved1 : 5;
+> +		u8 no_further_signal : 1;
+> +	};
+> +};
+> +
+> +struct sev_hv_doorbell_page {
+> +	union hv_pending_events pending_events;
+> +	u8 no_eoi_required;
+> +	u8 reserved2[61];
+> +	u8 padding[4032];
+> +};
+> +
+> +struct sev_snp_runtime_data {
+> +	struct sev_hv_doorbell_page hv_doorbell_page;
+> +};
+> +
+> +static DEFINE_PER_CPU(struct sev_snp_runtime_data*, snp_runtime_data);
+> +
+> +static inline u64 sev_es_rd_ghcb_msr(void)
+> +{
+> +	return __rdmsr(MSR_AMD64_SEV_ES_GHCB);
+> +}
+> +
+> +static __always_inline void sev_es_wr_ghcb_msr(u64 val)
+> +{
+> +	u32 low, high;
+> +
+> +	low  = (u32)(val);
+> +	high = (u32)(val >> 32);
+> +
+> +	native_wrmsr(MSR_AMD64_SEV_ES_GHCB, low, high);
+> +}
+> +
+> +struct sev_hv_doorbell_page *sev_snp_current_doorbell_page(void)
+> +{
+> +	return &this_cpu_read(snp_runtime_data)->hv_doorbell_page;
+> +}
+> +
+> +static u8 sev_hv_pending(void)
+> +{
+> +	return sev_snp_current_doorbell_page()->pending_events.events;
+> +}
+> +
+> +static void hv_doorbell_apic_eoi_write(u32 reg, u32 val)
+> +{
+> +	if (xchg(&sev_snp_current_doorbell_page()->no_eoi_required, 0) & 0x1)
+> +		return;
+> +
+> +	BUG_ON(reg != APIC_EOI);
+> +	apic->write(reg, val);
+> +}
+> +
+> +static void do_exc_hv(struct pt_regs *regs)
+> +{
+> +	union hv_pending_events pending_events;
+> +	u8 vector;
+> +
+> +	while (sev_hv_pending()) {
+> +		asm volatile("cli" : : : "memory");
+> +
+> +		pending_events.events = xchg(
+> +			&sev_snp_current_doorbell_page()->pending_events.events,
+> +			0);
+> +
+> +		if (pending_events.nmi)
+> +			exc_nmi(regs);
+> +
+> +#ifdef CONFIG_X86_MCE
+> +		if (pending_events.mc)
+> +			exc_machine_check(regs);
+> +#endif
+> +
+> +		if (!pending_events.vector)
+> +			return;
+> +
+> +		if (pending_events.vector < FIRST_EXTERNAL_VECTOR) {
+> +			/* Exception vectors */
+> +			WARN(1, "exception shouldn't happen\n");
+> +		} else if (pending_events.vector == FIRST_EXTERNAL_VECTOR) {
+> +			sysvec_irq_move_cleanup(regs);
+> +		} else if (pending_events.vector == IA32_SYSCALL_VECTOR) {
+> +			WARN(1, "syscall shouldn't happen\n");
+> +		} else if (pending_events.vector >= FIRST_SYSTEM_VECTOR) {
+> +			switch (pending_events.vector) {
+> +#if IS_ENABLED(CONFIG_HYPERV)
+> +			case HYPERV_STIMER0_VECTOR:
+> +				sysvec_hyperv_stimer0(regs);
+> +				break;
+> +			case HYPERVISOR_CALLBACK_VECTOR:
+> +				sysvec_hyperv_callback(regs);
+> +				break;
+> +#endif
+> +#ifdef CONFIG_SMP
+> +			case RESCHEDULE_VECTOR:
+> +				sysvec_reschedule_ipi(regs);
+> +				break;
+> +			case IRQ_MOVE_CLEANUP_VECTOR:
+> +				sysvec_irq_move_cleanup(regs);
+> +				break;
+> +			case REBOOT_VECTOR:
+> +				sysvec_reboot(regs);
+> +				break;
+> +			case CALL_FUNCTION_SINGLE_VECTOR:
+> +				sysvec_call_function_single(regs);
+> +				break;
+> +			case CALL_FUNCTION_VECTOR:
+> +				sysvec_call_function(regs);
+> +				break;
+> +#endif
+> +#ifdef CONFIG_X86_LOCAL_APIC
+> +			case ERROR_APIC_VECTOR:
+> +				sysvec_error_interrupt(regs);
+> +				break;
+> +			case SPURIOUS_APIC_VECTOR:
+> +				sysvec_spurious_apic_interrupt(regs);
+> +				break;
+> +			case LOCAL_TIMER_VECTOR:
+> +				sysvec_apic_timer_interrupt(regs);
+> +				break;
+> +			case X86_PLATFORM_IPI_VECTOR:
+> +				sysvec_x86_platform_ipi(regs);
+> +				break;
+> +#endif
+> +			case 0x0:
+> +				break;
+> +			default:
+> +				panic("Unexpected vector %d\n", vector);
+> +				unreachable();
+> +			}
+> +		} else {
+> +			common_interrupt(regs, pending_events.vector);
+> +		}
+> +
+> +		asm volatile("sti" : : : "memory");
+> +	}
+> +}
+> +
+> +void check_hv_pending(struct pt_regs *regs)
 
-From: Metin Kaya <metikaya@amazon.com>
+This looks like two functions, one with regs == NULL and one with regs,
+different internal logic, different call sites. Would you consider splitting
+into two?
 
-This patch introduces compat version of struct sched_poll for
-SCHEDOP_poll sub-operation of sched_op hypercall, reads correct amount
-of data (16 bytes in 32-bit case, 24 bytes otherwise) by using new
-compat_sched_poll struct, copies it to sched_poll properly, and lets
-rest of the code run as is.
-
-Signed-off-by: Metin Kaya <metikaya@amazon.com>
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
-v2 (Metin): Updated a comment and added a new one.
-v3 (dwmw2): Take the simple path on 32-bit host, minor cosmetics.
-
-I would have liked a self-test, but that requires actually invoking the
-hypercall from 32-bit mode and AFAICT the KVM self-tests don't support
-that, so it's probably not reasonable to demand that Metin implement it
-just to test this relatively simple case.
-
- arch/x86/kvm/xen.c | 33 +++++++++++++++++++++++++++++----
- arch/x86/kvm/xen.h |  7 +++++++
- 2 files changed, 36 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index c3180fe9d918..f1f6d849ed50 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -1157,20 +1157,45 @@ static bool kvm_xen_schedop_poll(struct kvm_vcpu *v=
-cpu, bool longmode,
- 	evtchn_port_t port, *ports;
- 	gpa_t gpa;
-=20
--	if (!longmode || !lapic_in_kernel(vcpu) ||
-+	if (!lapic_in_kernel(vcpu) ||
- 	    !(vcpu->kvm->arch.xen_hvm_config.flags & KVM_XEN_HVM_CONFIG_EVTCHN_SE=
-ND))
- 		return false;
-=20
- 	idx =3D srcu_read_lock(&vcpu->kvm->srcu);
- 	gpa =3D kvm_mmu_gva_to_gpa_system(vcpu, param, NULL);
- 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
--
--	if (!gpa || kvm_vcpu_read_guest(vcpu, gpa, &sched_poll,
--					sizeof(sched_poll))) {
-+	if (!gpa) {
- 		*r =3D -EFAULT;
- 		return true;
- 	}
-=20
-+	if (IS_ENABLED(CONFIG_64BIT) && !longmode) {
-+		struct compat_sched_poll sp32;
-+
-+		/* Sanity check that the compat struct definition is correct */
-+		BUILD_BUG_ON(sizeof(sp32) !=3D 16);
-+
-+		if (kvm_vcpu_read_guest(vcpu, gpa, &sp32, sizeof(sp32))) {
-+			*r =3D -EFAULT;
-+			return true;
-+		}
-+
-+		/*
-+		 * This is a 32-bit pointer to an array of evtchn_port_t which
-+		 * are uint32_t, so once it's converted no further compat
-+		 * handling is needed.
-+		 */
-+		sched_poll.ports =3D (void *)(unsigned long)(sp32.ports);
-+		sched_poll.nr_ports =3D sp32.nr_ports;
-+		sched_poll.timeout =3D sp32.timeout;
-+	} else {
-+		if (kvm_vcpu_read_guest(vcpu, gpa, &sched_poll,
-+					sizeof(sched_poll))) {
-+			*r =3D -EFAULT;
-+			return true;
-+		}
-+	}
-+
- 	if (unlikely(sched_poll.nr_ports > 1)) {
- 		/* Xen (unofficially) limits number of pollers to 128 */
- 		if (sched_poll.nr_ports > 128) {
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index 8503d2c6891e..ea33d80a0c51 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -207,4 +207,11 @@ struct compat_vcpu_runstate_info {
-     uint64_t time[4];
- } __attribute__((packed));
-=20
-+struct compat_sched_poll {
-+	/* This is actually a guest virtual address which points to ports. */
-+	uint32_t ports;
-+	unsigned int nr_ports;
-+	uint64_t timeout;
-+};
-+
- #endif /* __ARCH_X86_KVM_XEN_H__ */
---=20
-2.35.3
+> +{
+> +	struct pt_regs local_regs;
+> +
+> +	if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
+> +		return;
 
 
---=-7lJT8gsNZzqqMZqf8Uti
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+> +
+> +	if (regs) {
+> +		if ((regs->flags & X86_EFLAGS_IF) == 0)
+> +			return;
+> +
+> +		if (!sev_hv_pending())
+> +			return;
+> +
+> +		do_exc_hv(regs);
+> +	} else {
+> +		if (sev_hv_pending()) {
+> +			memset(&local_regs, 0, sizeof(struct pt_regs));
+> +			regs = &local_regs;
+> +			asm volatile("movl %%cs, %%eax;" : "=a" (regs->cs));
+> +			asm volatile("movl %%ss, %%eax;" : "=a" (regs->ss));
+> +			regs->orig_ax = 0xffffffff;
+> +			regs->flags = native_save_fl();
+> +			do_exc_hv(regs);
+> +		}
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(check_hv_pending);
+> +
+>  static __always_inline bool on_vc_stack(struct pt_regs *regs)
+>  {
+>  	unsigned long sp = regs->sp;
+> @@ -193,68 +376,35 @@ void noinstr __sev_es_ist_exit(void)
+>  	this_cpu_write(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC], *(unsigned long *)ist);
+>  }
+>
+> -/*
+> - * Nothing shall interrupt this code path while holding the per-CPU
+> - * GHCB. The backup GHCB is only for NMIs interrupting this path.
+> - *
+> - * Callers must disable local interrupts around it.
+> - */
+> -static noinstr struct ghcb *__sev_get_ghcb(struct ghcb_state *state)
+> +static bool sev_restricted_injection_enabled(void)
+>  {
+> -	struct sev_es_runtime_data *data;
+> +	return sev_status & MSR_AMD64_SEV_RESTRICTED_INJECTION_ENABLED;
+> +}
+> +
+> +void __init sev_snp_init_hv_handling(void)
+> +{
+> +	struct sev_snp_runtime_data *snp_data;
+> +	struct ghcb_state state;
+>  	struct ghcb *ghcb;
+> +	unsigned long flags;
+> +	int cpu;
+> +	int err;
+>
+>  	WARN_ON(!irqs_disabled());
+> +	if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP) || !sev_restricted_injection_enabled())
+> +		return;
+>
+> -	data = this_cpu_read(runtime_data);
+> -	ghcb = &data->ghcb_page;
+> -
+> -	if (unlikely(data->ghcb_active)) {
+> -		/* GHCB is already in use - save its contents */
+> -
+> -		if (unlikely(data->backup_ghcb_active)) {
+> -			/*
+> -			 * Backup-GHCB is also already in use. There is no way
+> -			 * to continue here so just kill the machine. To make
+> -			 * panic() work, mark GHCBs inactive so that messages
+> -			 * can be printed out.
+> -			 */
+> -			data->ghcb_active        = false;
+> -			data->backup_ghcb_active = false;
+> -
+> -			instrumentation_begin();
+> -			panic("Unable to handle #VC exception! GHCB and Backup GHCB are already in use");
+> -			instrumentation_end();
+> -		}
+> -
+> -		/* Mark backup_ghcb active before writing to it */
+> -		data->backup_ghcb_active = true;
+> -
+> -		state->ghcb = &data->backup_ghcb;
+> -
+> -		/* Backup GHCB content */
+> -		*state->ghcb = *ghcb;
+> -	} else {
+> -		state->ghcb = NULL;
+> -		data->ghcb_active = true;
+> -	}
+> +	local_irq_save(flags);
+>
+> -	return ghcb;
+> -}
+> +	ghcb = __sev_get_ghcb(&state);
+>
+> -static inline u64 sev_es_rd_ghcb_msr(void)
+> -{
+> -	return __rdmsr(MSR_AMD64_SEV_ES_GHCB);
+> -}
+> +	sev_snp_setup_hv_doorbell_page(ghcb);
+>
+> -static __always_inline void sev_es_wr_ghcb_msr(u64 val)
+> -{
+> -	u32 low, high;
+> +	__sev_put_ghcb(&state);
+>
+> -	low  = (u32)(val);
+> -	high = (u32)(val >> 32);
+> +	apic_set_eoi_write(hv_doorbell_apic_eoi_write);
+>
+> -	native_wrmsr(MSR_AMD64_SEV_ES_GHCB, low, high);
+> +	local_irq_restore(flags);
+>  }
+>
+>  static int vc_fetch_insn_kernel(struct es_em_ctxt *ctxt,
+> @@ -515,6 +665,79 @@ static enum es_result vc_slow_virt_to_phys(struct ghcb *ghcb, struct es_em_ctxt
+>  /* Include code shared with pre-decompression boot stage */
+>  #include "sev-shared.c"
+>
+> +/*
+> + * Nothing shall interrupt this code path while holding the per-CPU
+> + * GHCB. The backup GHCB is only for NMIs interrupting this path.
+> + *
+> + * Callers must disable local interrupts around it.
+> + */
+> +static noinstr struct ghcb *__sev_get_ghcb(struct ghcb_state *state)
+> +{
+> +	struct sev_es_runtime_data *data;
+> +	struct ghcb *ghcb;
+> +
+> +	WARN_ON(!irqs_disabled());
+> +
+> +	data = this_cpu_read(runtime_data);
+> +	ghcb = &data->ghcb_page;
+> +
+> +	if (unlikely(data->ghcb_active)) {
+> +		/* GHCB is already in use - save its contents */
+> +
+> +		if (unlikely(data->backup_ghcb_active)) {
+> +			/*
+> +			 * Backup-GHCB is also already in use. There is no way
+> +			 * to continue here so just kill the machine. To make
+> +			 * panic() work, mark GHCBs inactive so that messages
+> +			 * can be printed out.
+> +			 */
+> +			data->ghcb_active        = false;
+> +			data->backup_ghcb_active = false;
+> +
+> +			instrumentation_begin();
+> +			panic("Unable to handle #VC exception! GHCB and Backup GHCB are already in use");
+> +			instrumentation_end();
+> +		}
+> +
+> +		/* Mark backup_ghcb active before writing to it */
+> +		data->backup_ghcb_active = true;
+> +
+> +		state->ghcb = &data->backup_ghcb;
+> +
+> +		/* Backup GHCB content */
+> +		*state->ghcb = *ghcb;
+> +	} else {
+> +		state->ghcb = NULL;
+> +		data->ghcb_active = true;
+> +	}
+> +
+> +	/* SEV-SNP guest requires that GHCB must be registered before using it. */
+> +	if (!data->ghcb_registered) {
+> +		if (cc_platform_has(CC_ATTR_GUEST_SEV_SNP)) {
+> +			snp_register_ghcb_early(__pa(ghcb));
+> +			sev_snp_setup_hv_doorbell_page(ghcb);
+> +		} else {
+> +			sev_es_wr_ghcb_msr(__pa(ghcb));
+> +		}
+> +		data->ghcb_registered = true;
+> +	}
+> +
+> +	return ghcb;
+> +}
+> +
+> +static void sev_snp_setup_hv_doorbell_page(struct ghcb *ghcb)
+> +{
+> +	u64 pa;
+> +	enum es_result ret;
+> +
+> +	pa = __pa(sev_snp_current_doorbell_page());
+> +	vc_ghcb_invalidate(ghcb);
+> +	ret = vmgexit_hv_doorbell_page(ghcb,
+> +			SVM_VMGEXIT_SET_HV_DOORBELL_PAGE, pa);
+> +	if (ret != ES_OK)
+> +		panic("SEV-SNP: failed to set up #HV doorbell page");
+> +}
+> +
+>  static noinstr void __sev_put_ghcb(struct ghcb_state *state)
+>  {
+>  	struct sev_es_runtime_data *data;
+> @@ -1282,6 +1505,11 @@ void setup_ghcb(void)
+>  		snp_register_ghcb_early(__pa(&boot_ghcb_page));
+>  }
+>
+> +int vmgexit_hv_doorbell_page(struct ghcb *ghcb, u64 op, u64 pa)
+> +{
+> +	return sev_es_ghcb_hv_call(ghcb, NULL, SVM_VMGEXIT_HV_DOORBELL_PAGE, op, pa);
+> +}
+> +
+>  #ifdef CONFIG_HOTPLUG_CPU
+>  static void sev_es_ap_hlt_loop(void)
+>  {
+> @@ -1355,6 +1583,7 @@ static void __init alloc_runtime_data(int cpu)
+>  static void __init init_ghcb(int cpu)
+>  {
+>  	struct sev_es_runtime_data *data;
+> +	struct sev_snp_runtime_data *snp_data;
+>  	int err;
+>
+>  	data = per_cpu(runtime_data, cpu);
+> @@ -1366,8 +1595,22 @@ static void __init init_ghcb(int cpu)
+>
+>  	memset(&data->ghcb_page, 0, sizeof(data->ghcb_page));
+>
+> +	snp_data = memblock_alloc(sizeof(*snp_data), PAGE_SIZE);
+> +	if (!snp_data)
+> +		panic("Can't allocate SEV-SNP runtime data");
+> +
+> +	err = early_set_memory_decrypted((unsigned long)&snp_data->hv_doorbell_page,
+> +					 sizeof(snp_data->hv_doorbell_page));
+> +	if (err)
+> +		panic("Can't map #HV doorbell pages unencrypted");
+> +
+> +	memset(&snp_data->hv_doorbell_page, 0, sizeof(snp_data->hv_doorbell_page));
+> +
+> +	per_cpu(snp_runtime_data, cpu) = snp_data;
+> +
+>  	data->ghcb_active = false;
+>  	data->backup_ghcb_active = false;
+> +	data->ghcb_registered = false;
+>  }
+>
+>  void __init sev_es_init_vc_handling(void)
+> @@ -2006,7 +2249,12 @@ DEFINE_IDTENTRY_VC_USER(exc_vmm_communication)
+>
+>  static bool hv_raw_handle_exception(struct pt_regs *regs)
+>  {
+> -	return false;
+> +	/* Clear the no_further_signal bit */
+> +	sev_snp_current_doorbell_page()->pending_events.events &= 0x7fff;
+> +
+> +	check_hv_pending(regs);
+> +
+> +	return true;
+>  }
+>
+>  static __always_inline bool on_hv_fallback_stack(struct pt_regs *regs)
+> diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
+> index 178015a820f0..af97e6610fbb 100644
+> --- a/arch/x86/kernel/traps.c
+> +++ b/arch/x86/kernel/traps.c
+> @@ -898,6 +898,53 @@ asmlinkage __visible noinstr struct pt_regs *vc_switch_off_ist(struct pt_regs *r
+>
+>  	return regs_ret;
+>  }
+> +
+> +asmlinkage __visible noinstr struct pt_regs *hv_switch_off_ist(struct pt_regs *regs)
+> +{
+> +	unsigned long sp, *stack;
+> +	struct stack_info info;
+> +	struct pt_regs *regs_ret;
+> +
+> +	/*
+> +	 * A malicious hypervisor can inject 2 HVs in a row, which will corrupt
+> +	 * the trap frame on our IST stack.  We add a defensive check here to
+> +	 * catch such behavior.
+> +	 */
+> +	BUG_ON(regs->sp >= __this_cpu_ist_bottom_va(HV) && regs->sp < __this_cpu_ist_top_va(HV));
+> +
+> +	/*
+> +	 * In the SYSCALL entry path the RSP value comes from user-space - don't
+> +	 * trust it and switch to the current kernel stack
+> +	 */
+> +	if (ip_within_syscall_gap(regs)) {
+> +		sp = this_cpu_read(cpu_current_top_of_stack);
+> +		goto sync;
+> +	}
+> +
+> +	/*
+> +	 * From here on the RSP value is trusted. Now check whether entry
+> +	 * happened from a safe stack. Not safe are the entry or unknown stacks,
+> +	 * use the fall-back stack instead in this case.
+> +	 */
+> +	sp    = regs->sp;
+> +	stack = (unsigned long *)sp;
+> +
+> +	if (!get_stack_info_noinstr(stack, current, &info) || info.type == STACK_TYPE_ENTRY ||
+> +	    info.type > STACK_TYPE_EXCEPTION_LAST)
+> +		sp = __this_cpu_ist_top_va(HV2);
+> +sync:
+> +	/*
+> +	 * Found a safe stack - switch to it as if the entry didn't happen via
+> +	 * IST stack. The code below only copies pt_regs, the real switch happens
+> +	 * in assembly code.
+> +	 */
+> +	sp = ALIGN_DOWN(sp, 8) - sizeof(*regs_ret);
+> +
+> +	regs_ret = (struct pt_regs *)sp;
+> +	*regs_ret = *regs;
+> +
+> +	return regs_ret;
+> +}
+>  #endif
+>
+>  asmlinkage __visible noinstr struct pt_regs *fixup_bad_iret(struct pt_regs *bad_regs)
+> @@ -1457,4 +1504,7 @@ void __init trap_init(void)
+>  	/* Setup traps as cpu_init() might #GP */
+>  	idt_setup_traps();
+>  	cpu_init();
+> +
+> +	/* Init #HV doorbell pages when running as an SEV-SNP guest */
+> +	sev_snp_init_hv_handling();
+>  }
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTI1MTUwMDQ5WjAvBgkqhkiG9w0BCQQxIgQg4A0DwBJo
-hjL/rfFihavl6khpJeAAkpYDPV9ayBZz7SEwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgA4lX42ZhvauRHezXuWdtjo+K6GvdKbbpil
-lf7VHVUVRI4CLFi4483taz28uDHiDOMROQjuaHeqjQb8mKWTl4wA7JozFvrVZh8muwjrPGsTlxIL
-vS65OXRHLs285Ved5EjW93ayh05zHAaFLqEPqw/wj9BMheulr97MNBUz4DnIJRrmcWm7ArjU6xxD
-9IcCm+hP1k6vAgbPLt1iPRr/JTSSsVwdrHC570XeqXiFUssAjrHdc8cqElhy1adH/zKzxPkeDQbd
-hjAiHaASNLf4xAu8Lk6WvdgbSXw8/hOA0GzzpTg+yWaNQ2C5q3nv6Hg2vwQh7knCJkrtViYXgT1K
-8MDxf/z/SLT9u1OVQjoSi89WPLexL8eL6280qos9iONY3Xe9ZmV1DB0INsHrMrMTppVQEmv7FH08
-rLsOaXzic1fcqlxhlQYNDg0+aBK9KeIftjACDWZPNcExe7ubUMYkZfDxNVc6xY9DzeiquW4N22GW
-Onzx6Av+bccudKAXGHBMuY0Iljw6ndpH+rd+enw5i72EaqNYw/dGDM26CAY0rlEa4B7WtYtsR2ld
-bxrPvW2e4Byw52k4BrjphTZzvd79L8abDbvTUs767bafoMmm1uTUw4GDTF4D6d+UxdWEfh4b+odZ
-MuHjuEjybytE9IHFFQ9KXRsuxDAJZHpRSSYJlIJSUAAAAAAAAA==
 
-
---=-7lJT8gsNZzqqMZqf8Uti--
+--
+Cheers,
+Christophe de Dinechin (https://c3d.github.io)
+Theory of Incomplete Measurements (https://c3d.github.io/TIM)
 
