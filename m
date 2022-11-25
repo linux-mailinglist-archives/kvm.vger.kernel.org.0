@@ -2,256 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88737638574
-	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 09:44:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E8545638576
+	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 09:45:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229635AbiKYIoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Nov 2022 03:44:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58000 "EHLO
+        id S229688AbiKYIpy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Nov 2022 03:45:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229732AbiKYIoW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Nov 2022 03:44:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED5C20F6F
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 00:43:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669365800;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sRZVtfy7jHF/otBGu/mU+bfgNu+7SQC3SDiG+Mz/0SA=;
-        b=aNZr3bZXJiN+Y215pyrYstjyWWm8HG3X+fEGg3J65qi3X5SgG62Ur+qpl4f4zsTdlmLoMT
-        aq+1DzjC1E78SoCxPJYBlEKk4LS/sLkmDGjQgRkSZGOnCY6YX9ESKZQ6EeHe0xyr5MSR75
-        Mn+fgfQ5xiK9un7mPrKjNFOzvPLE4tA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-571-lBU-tAUAMLKagxdktH8Ejg-1; Fri, 25 Nov 2022 03:43:08 -0500
-X-MC-Unique: lBU-tAUAMLKagxdktH8Ejg-1
-Received: by mail-wr1-f70.google.com with SMTP id m17-20020adfa3d1000000b00241cbfd296eso693168wrb.15
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 00:43:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sRZVtfy7jHF/otBGu/mU+bfgNu+7SQC3SDiG+Mz/0SA=;
-        b=OanAEE7kz8CewaLzSDxhflqbHSW2BR8DKNERwhcCsyqUX01gu5zC+f7+bzTLU8hGp1
-         mJR/m56hiYVQ70C37oWzTGPVsOiweWVScZVTGiUug2bFNeiUfLdACoZKXg72kR44AzOv
-         JZ7dI6PsLA5SnsspasZw2uZuduzhyJXK83zUElMsjOpp3AbH62SagSe8JTqcvtfj6WmR
-         Kg936b4S7Nw6/fN2T5Dpo11TdWjZZ3Oczt7odtlIOl/QGrJiwUa2sVWdb2gF++19NegG
-         ECVgChzlyNKfiS/voaTzUXQfAPsiz1ceUx3hWGrx8WZCPG1ksrLtfnPk49rqsp+D1vhM
-         X72g==
-X-Gm-Message-State: ANoB5pkk6OQsxYcVcbq5h6xUt3N/4YF2xdfCBVp8s7S9I8/o8CNqLqz8
-        PWPWZeCzHzMddYqqJAg8KsfkqDRHTsSBiFmsGXj0Rl+hHDYDQc9a7B+eNQDDDn9u6Dg5tDE6uD1
-        bXlXaSkB5z30z
-X-Received: by 2002:adf:e412:0:b0:242:2cd:259 with SMTP id g18-20020adfe412000000b0024202cd0259mr2490692wrm.718.1669365787162;
-        Fri, 25 Nov 2022 00:43:07 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7NpneEPbu/BenchhBdj5/LhryjdAFoI4Kz3tEVBfEXrlPcu+cT/QmX7tIEwuOh5Vr44rV30Q==
-X-Received: by 2002:adf:e412:0:b0:242:2cd:259 with SMTP id g18-20020adfe412000000b0024202cd0259mr2490662wrm.718.1669365786878;
-        Fri, 25 Nov 2022 00:43:06 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id bt7-20020a056000080700b00236705daefesm3295974wrb.39.2022.11.25.00.43.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Nov 2022 00:43:05 -0800 (PST)
-Message-ID: <85ac616c-ef5e-eab6-4b0b-06c946a324ff@redhat.com>
-Date:   Fri, 25 Nov 2022 09:43:02 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v5 06/19] iommufd: File descriptor, context, kconfig and
- makefiles
+        with ESMTP id S229599AbiKYIpw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Nov 2022 03:45:52 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCCC221242
+        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 00:45:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669365951; x=1700901951;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Ur+fihbkI1Kg80oKLmC3P3CL+mfTtv1nyLIagDImOmE=;
+  b=PgDCNhWq37sSgIwTRhqhti7kjE6Sl1ZYQaA1rHbvY76cR0SgcxzGVwHZ
+   6vR2Zc0/ZxgVF8cnO85cqG5y9ADbdr6zh0i75Un3QyuVIOMgkCy3qWHMt
+   vgLA8bssecvIgsCT1C/KZbNkc1iPS+VUD0ml3TwBqyceqxoH6jodYC3TA
+   xwryeFE1HpJFzCst9WdhPGyfH6GpEqvcvPuz/aNZgjYInF6OkhzIk/+wO
+   +mwSLewzlDXz6rCkXBxv256rz/FKpQSI5M1nWoVANDaeXDR4ebwtBdgvD
+   yXwuec7sSuBjchMXT8nepYfBqWT4YeOLzWXudOlbBpSwDrVTMtnv9TygB
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10541"; a="378698283"
+X-IronPort-AV: E=Sophos;i="5.96,192,1665471600"; 
+   d="scan'208";a="378698283"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2022 00:45:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10541"; a="711211006"
+X-IronPort-AV: E=Sophos;i="5.96,192,1665471600"; 
+   d="scan'208";a="711211006"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga004.fm.intel.com with ESMTP; 25 Nov 2022 00:44:33 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Fri, 25 Nov 2022 00:44:32 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 25 Nov 2022 00:44:32 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Fri, 25 Nov 2022 00:44:32 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.48) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Fri, 25 Nov 2022 00:44:32 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cnHhvDwY+tubMri78RwXwdeqS5Bj+K3djKhVYPrrmMHqqcirM5iW5cnxedab6U8hKfGpxXqeMSiz1czfMp8DzoefUKrx5GwYLaHkrROcXgVFBNpKZUi9AZot2lTfwq8ooXagfvqEyEl4OqfrHDdx6Rnd2OkOh+eU+mIwkQxKCKfnarMJfoWZADMXMN+BtRD90F799wv3Mxxh792psaSTparialc2+Wqj/sSDyjrcuwt7WQb3Y2x0qdJ+qwikiURRRnN+SqNZUIQgKdvp7l3gEfdAuhvRGVYGmDPIEQyDA0cnMnd27vyOZ9d317APGwY0hQGmBD8sAZoTw+7MhHbOZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=75kwFCIUTVZxDchvxZAY63Of+oDXkk8YJwTDlJEmNRI=;
+ b=A8mEmeT+T3YEjMJD05mHjymhwILYatJ3ltBR8ClGNoWKQw2XfhqidZhqdLCq+KsOKWOGjTqHmuP9NIP43Pk/w3+z5zKXosK/aF4gWDp3P2haW9kO5SUSkwsvhK3qjOIIE9tsKv+qauhIwDo0dn4Yt/lMX4z7rd1jQtkmgLuMCowaC2A6KTaMmD45csZmrhDWopOXAu5vSrQSJ5F/SCGPO+DQ9uM/AzqNbAMBlA/FBui7saZuWT8rDof4Y4+gMaIkbfqjjwtIzw7M0rWIO0oyJyvkP6v0vg9GDAnODey6z4s5SQRRmUIHn8pWI/71DHOTDUFpYEEldqG2RTG+lAd6Dw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by IA1PR11MB7318.namprd11.prod.outlook.com (2603:10b6:208:426::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.19; Fri, 25 Nov
+ 2022 08:44:31 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::61c3:c221:e785:ce13]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::61c3:c221:e785:ce13%7]) with mapi id 15.20.5857.020; Fri, 25 Nov 2022
+ 08:44:30 +0000
+Message-ID: <e4f8c00f-809c-01d8-c104-06bf84041116@intel.com>
+Date:   Fri, 25 Nov 2022 16:45:07 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.11.0
+Subject: Re: [RFC v2 11/11] vfio: Move vfio group specific code into group.c
 Content-Language: en-US
 To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     bpf@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Anthony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        Lixiao Yang <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-References: <6-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com>
- <0c6ba292-4e65-9a9f-b498-2409482a06b8@redhat.com>
- <Y3fppPM9mCm6xIz6@nvidia.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <Y3fppPM9mCm6xIz6@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
+CC:     <alex.williamson@redhat.com>, <kevin.tian@intel.com>,
+        <eric.auger@redhat.com>, <cohuck@redhat.com>,
+        <nicolinc@nvidia.com>, <yi.y.sun@linux.intel.com>,
+        <chao.p.peng@linux.intel.com>, <mjrosato@linux.ibm.com>,
+        <kvm@vger.kernel.org>
+References: <20221124122702.26507-1-yi.l.liu@intel.com>
+ <20221124122702.26507-12-yi.l.liu@intel.com> <Y3+BXHd7dEL7FYqz@nvidia.com>
+From:   Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <Y3+BXHd7dEL7FYqz@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-ClientProxiedBy: SI2PR01CA0023.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:192::17) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|IA1PR11MB7318:EE_
+X-MS-Office365-Filtering-Correlation-Id: 98e334bc-ba40-4b00-dfa4-08dacec14445
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: XZaszDfQ5muvMB5xE9MjOrj9dFfX20HPjF8NxJT9kTyLdWsrOnSncOAY1DTWgv1rdtTX6FV4UnUAtqfJTwiuLcyelMFycJ/NkYM4idTynQRPfNFwLe4T7fWLpyykzx7TO/wGyMyLGSvYwXX7U0m+HxKJD9q75Muky7hvINHPFrGhJYDPqG11IqTcZ0iESoNiMMJ8b0K+M7wQmAMc7/fKb8zYENPJISTWYXfJ7QxBFm7Hs9WbA/PpARtAi7LCA3cOBrv4zLLMId3jP0avdHektLawXqg2RLEG8Ds7vA94xIunQnVCSWEy5yW+74hZppvDTuM11jCWeK1i0IAmIYOKGafCa/rqq9KaArsxtct2lgWbM9tV6xLsd47OuQ/Sz5iI9BgXHljMBJvItJlAInIXmZgADAKtQWDO+2+DDYGA4Jn0mNCs6BZWY0pHM9q0RG+Fo4u14wSzZMVF0UV1XsuUCkvvva6VQcypie8uuK+VlG3R+yw2C5Y8DpMq0aF3gqfw6Nv+qltg+/2bvGBjCS+yV8fjlMiZz75YJDqDSAuw5b5NfMaQLfSwmzbvYZmnp1CXthCcXXtkmrSn0hOuteP3sVKP0vZPumNe04BtNP3awmVLqmWTZ5P9T3RcGjD0SAov5YNiZS5boMXAW1LUNL0O7HBys1TnNPLj5mU9jhhNfSbfsym5hILbUQjqKiX/rYkX4bxp9BgBadUqKhIlw3EC/4SKOJIAKAhUGt++z7I5o8g=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(346002)(136003)(366004)(39860400002)(396003)(451199015)(6512007)(26005)(83380400001)(186003)(82960400001)(38100700002)(2906002)(2616005)(4744005)(5660300002)(8936002)(41300700001)(6486002)(478600001)(316002)(6506007)(6916009)(8676002)(66946007)(6666004)(66556008)(66476007)(4326008)(53546011)(86362001)(31696002)(31686004)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S1M3aVRxYWZPMUtNVkc0VkRsaXZ3UkZ0aUwwcUJmRTFvRzZOZVIrcHNoWGwv?=
+ =?utf-8?B?Q2VMVXM0VThqb0xZRDBxdXVJVGIyZ3V3U1RsZ3pOelZhYlluMDJqUVk1bFV3?=
+ =?utf-8?B?MkM5aDk5YTVSa244UGhXWkZCcys5NDYraXd5bG1DZk1xcDlyN3ZITi9YWFdU?=
+ =?utf-8?B?eWdMVzVFV0FRMXE3V2hyOFVOc2I2QWR3RTYzZU9XdGwrUlZ2dXlJTUtTUHJ0?=
+ =?utf-8?B?aWp1ZW96TWVLOHFFU0h1eEVoMVVNSUtHM1hUSTgzSExNTlFsTVlFRmthL2RC?=
+ =?utf-8?B?K2FTWlJxZU5rMUlDWFJWM1IxNEplMGc5WjRSMW5qamlXT3Nwc1NaRkZxa1lU?=
+ =?utf-8?B?dGErOW1heGpGaHRvbWdFN09EWlJkZWovazJJVDlyemN1c3NMekdhS1B5K3Jn?=
+ =?utf-8?B?ay94YXE4K0NpYTJwM0tKQkQ0Y0lPdG5FVVNrQXJUQ0ZNUUdsUHRpVURMOG5q?=
+ =?utf-8?B?TmdCdzZoTWhhOXFFTWdyeWJiNWREWjBSejhadE4rYlp2UDlSbmVTem5oOVo1?=
+ =?utf-8?B?eGZRT2dNWnhsRnFmemVPRXBHS21SOHUxRWpScThtWEFXbnVZaTVRYzYyM0Na?=
+ =?utf-8?B?WE1nMjF2ZStOb3AyQXJBOGhDZW1wZFh3dFk4aEx0dXdBRURFRmo4U2F6cysy?=
+ =?utf-8?B?K0w2amZUNG5TY3huZkpHSTNHeWRKV2tMSFB0eXV6TGxwR2F1MXl6S3BWUFN2?=
+ =?utf-8?B?Zkl6cU9BTkZDbm9VMkozWi9MOFpYZFM3YkZKbEV6NWNBaW8rdmMzYUZIY0to?=
+ =?utf-8?B?SDBxbTU3NFMxMXphWlpNVTc2VVRxUExOTDMvZko4eHk4ZE9GYm1xSlVmM0xt?=
+ =?utf-8?B?TVZ6UjhKZzlWSjRNbmZhQjEwdThlME1XbUdJK0piUHhnWHNkK0ZZUk9sM1oz?=
+ =?utf-8?B?anpzNVdUSng0dG5BaWRhRm9PYVpoSktUeG5WQnFNa2U0S01NV0Qzb0ZNZ244?=
+ =?utf-8?B?WnJwa3Rxa2N3dk1pWEljT1c2Y2MvZnhqSlZqejRRR2grZzVQRWZCN24xNFhi?=
+ =?utf-8?B?VkpmRkpTaVFEdi81QXB0NFdycjU2c2hObExGMVRvZTRyUnMrQXN5bFNsdEpU?=
+ =?utf-8?B?bGo4TVp5OGcvamNaTjM0aWdMTGdQZVRtKzJ2ekJUTDFDR0gvSEg4cUlTdHds?=
+ =?utf-8?B?M0ZmOHdYaStNa2NrWGFDVFVoQmd3ZTVWVDM5YVVYcy9QY2hKVGxqQTVidTdv?=
+ =?utf-8?B?WFNSbjg1QzN6Z1J1VVRUd212WUptNElZK2VNb3FRRWpHTzU4M0JGSHR3OFFU?=
+ =?utf-8?B?K3pxTW81Mk5hRW5mRkFVWkx2blVQd2JjMTVRUGpKYzlJQ0xNek0rUjVkc0Fi?=
+ =?utf-8?B?OCt4eGJacElYcEU5U1ZQbWQ4eUJqRnUzK21yc3NJY1BjNHVqN2o2NThrRFdZ?=
+ =?utf-8?B?b3hsdmZZZ2R2TWx3Ri91dzdwTmUwRitLYXNxODM5YytDdVAxemRsb2JSYndY?=
+ =?utf-8?B?TVJaQ0NjM2l1a1l3Q2ZPNTVhZFFnWURTVTY4WWxGTHpDZTBaWGJacUJZczB3?=
+ =?utf-8?B?MTU3R05aK3JudGJGS1U5a1prUWJSN0dEZEUwMW1WVmlPbEoxNTkxUFFyRTZI?=
+ =?utf-8?B?WHlrRHdjZWZaRlZuTkNiUm1NdVp0TCtsdFFERmdXZzkvRFRabktpNVRDTE10?=
+ =?utf-8?B?bXVTZzhCWEE1TXBYanBLZ3JlV204RnNMWTMzYjFDY1p1ZVNJb2Z1ekp0NDQ0?=
+ =?utf-8?B?UXBIbzRKR0YzaFN2cWZjNkxSNlVidW5IVGw4eW9FY3VsNWlONHJKRlkzWERL?=
+ =?utf-8?B?aUFJLzdsdzV4dG9uRkJyL2dZU01rVmsxYXMrTnRJdjdSU1NNWFBCZ2Fqcnd6?=
+ =?utf-8?B?QW5lcW9McHB2K1g0VjNQWHNPcmxNRlI4NU80YWFYN21XSDlKamVQazhpWFZa?=
+ =?utf-8?B?YkRET1ZVTG9DWmdLdlBwRXMyUFh6RGxFWTlOdVZRNWpkUEYxYXpiZEF3MVF0?=
+ =?utf-8?B?ZnNwaXhCRE13U1VlQUZGK2tuYmxDVllkTDAxNnk2NGtQMHpxUFRYNWJQMkxE?=
+ =?utf-8?B?V0xTa3pXU256WllZMVpidVo4bGYvQXFsdnVQeHV4Zk5nRi9uemxCNi90SFlm?=
+ =?utf-8?B?VDNMaDZBdnJiZm9SODJVZWN0ZzRseUROZU9xNWVVZ1ZodGJKbDZkNG5Ybm53?=
+ =?utf-8?Q?Ps9eoinYlsY/uB6UO5RsYQvCg?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 98e334bc-ba40-4b00-dfa4-08dacec14445
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2022 08:44:30.8609
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4QRcur1ImXkRD5e80dyYjn5dXGeY+ZIuwF1VowC8pyftlDYOFjUfNW334x8hZtgG5SVITRQq7a+IZHvdeNAeGA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7318
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
+On 2022/11/24 22:36, Jason Gunthorpe wrote:
+> On Thu, Nov 24, 2022 at 04:27:02AM -0800, Yi Liu wrote:
+>> This prepares for compiling out vfio group after vfio device cdev is
+>> added. No vfio_group decode code should be in vfio_main.c.
+>>
+>> No functional change is intended.
+>>
+>> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+>> ---
+>>   drivers/vfio/Makefile    |   1 +
+>>   drivers/vfio/group.c     | 842 +++++++++++++++++++++++++++++++++++++++
+>>   drivers/vfio/vfio.h      |  17 +
+>>   drivers/vfio/vfio_main.c | 830 +-------------------------------------
+>>   4 files changed, 863 insertions(+), 827 deletions(-)
+>>   create mode 100644 drivers/vfio/group.c
+> 
+> vfio_device_open_file() should be moved into group.c as well and
+> export vfio_device_open/close() instead
 
-On 11/18/22 21:23, Jason Gunthorpe wrote:
-> On Fri, Nov 18, 2022 at 05:27:35PM +0100, Eric Auger wrote:
->>> +config IOMMUFD
->>> +	tristate "IOMMU Userspace API"
->>> +	select INTERVAL_TREE
->>> +	select INTERVAL_TREE_SPAN_ITER
->>> +	select IOMMU_API
->>> +	default n
->>> +	help
->>> +	  Provides /dev/iommu the user API to control the IOMMU subsystem as
->>> +	  it relates to managing IO page tables that point at user space memory.
->> nit: missing ',' after /dev/iommu or Provides /dev/iommu user API
-> Done
->
->>> +/**
->>> + * iommufd_ref_to_users() - Switch from destroy_rwsem to users refcount
->>> + *        protection
->>> + * @obj - Object to release
->>> + *
->>> + * Objects have two refcount protections (destroy_rwsem and the refcount_t
->>> + * users). Holding either of these will prevent the object from being destroyed.
->>> + *
->>> + * Depending on the use case, one protection or the other is appropriate.  In
->>> + * most cases references are being protected by the destroy_rwsem. This allows
->>> + * orderly destruction of the object because iommufd_object_destroy_user() will
->>> + * wait for it to become unlocked. However, as a rwsem, it cannot be held across
->>> + * a system call return. So cases that have longer term needs must switch
->>> + * to the weaker users refcount_t.
->>> + *
->>> + * With users protection iommufd_object_destroy_user() will return -EBUSY to
->> iommufd_object_destroy_user() returns false and iommufd_destroy
->>  retruns -EBUSY.
-> ""
->  * With users protection iommufd_object_destroy_user() will return false,
->  * refusing to destroy the object, causing -EBUSY to userspace.
->  */
-> ""
->
->>> + * userspace and refuse to destroy the object.
->>> + */
->>> +static inline void iommufd_ref_to_users(struct iommufd_object *obj)
->>> +{
->>> +	up_read(&obj->destroy_rwsem);
->>> +	/* iommufd_lock_obj() obtains users as well */
->> Do you have a way to check that put() is done in accordance, ie. we are
->> not going to try up_read() the rwsem if this latter is not used anymore?
-> If put becomes unbalanced then fd closure will WARN_ON
->
-> If someone misuses the rwsem (eg double up_reading it) then lockdep
-> will fire
+also need export vfio_device_ops as well:-)
 
-OK
->
->>> +static int iommufd_fops_release(struct inode *inode, struct file *filp)
->>> +{
->>> +	struct iommufd_ctx *ictx = filp->private_data;
->>> +	struct iommufd_object *obj;
->>> +
->>> +	/* Destroy the graph from depth first */
->> I would suggest: destroy the leaf objects first thanks to the
->> hierarchical user ref counting? or something alike
-> "depth first" is a technical term when working with graphs..
-OK. I ignored that.
->
-> How about replacing both comments with this:
->
-> 	/*
-> 	 * The objects in the xarray form a graph of "users" counts, and we have
-> 	 * to destroy them in a depth first manner. Leaf objects will reduce the
-> 	 * users count of interior objects when they are destroyed.
-> 	 *
-> 	 * Repeatedly destroying all the "1 users" leaf objects will progress
-> 	 * until the entire list is destroyed. If this can't progress then there
-> 	 * is some bug related to object refcounting.
-> 	 */
-Yes that looks much clearer to me. Thanks!
->
->>> +	while (!xa_empty(&ictx->objects)) {
->>> +		unsigned int destroyed = 0;
->>> +		unsigned long index;
->>> +
->>> +		xa_for_each(&ictx->objects, index, obj) {
->>> +			/*
->>> +			 * Since we are in release elevated users must come from
->>> +			 * other objects holding the users. We will eventually
->> the sentense sounds a bit cryptic to me.
->>> +			 * destroy the object that holds this one and the next
->>> +			 * pass will progress it.
->>> +			 */
->>> +			if (!refcount_dec_if_one(&obj->users))
->>> +				continue;
->>> +			destroyed++;
->>> +			xa_erase(&ictx->objects, index);
->>> +			iommufd_object_ops[obj->type].destroy(obj);
->>> +			kfree(obj);
->> Use iommufd_object_abort_and_destroy(obj) instead of the above 3 lines?
-> Ah, they are not quite the same things, the order is different and
-> abort has a protective assertion that the xa_array hasn't been messed
-> with. It would be messy to merge them
->
-> It is also very similar to iommufd_object_destroy_user() except we
-> shortcut some unncessary locking.
-OK
->>> +/**
->>> + * DOC: General ioctl format
->>> + *
->>> + * The ioctl interface follows a general format to allow for extensibility. Each
->>> + * ioctl is passed in a structure pointer as the argument providing the size of
->>> + * the structure in the first u32. The kernel checks that any structure space
->>> + * beyond what it understands is 0. This allows userspace to use the backward
->>> + * compatible portion while consistently using the newer, larger, structures.
->>> + *
->>> + * ioctls use a standard meaning for common errnos:
->>> + *
->>> + *  - ENOTTY: The IOCTL number itself is not supported at all
->>> + *  - E2BIG: The IOCTL number is supported, but the provided structure has
->>> + *    non-zero in a part the kernel does not understand.
->>> + *  - EOPNOTSUPP: The IOCTL number is supported, and the structure is
->>> + *    understood, however a known field has a value the kernel does not
->>> + *    understand or support.
->>> + *  - EINVAL: Everything about the IOCTL was understood, but a field is not
->>> + *    correct.
->>> + *  - ENOENT: An ID or IOVA provided does not exist.
->>> + *  - ENOMEM: Out of memory.
->>> + *  - EOVERFLOW: Mathematics oveflowed.
->> overflowed
-> Done
->
-> Thanks,
-> Jason
->
-Thanks
-
-Eric
-
+-- 
+Regards,
+Yi Liu
