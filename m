@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 46A1A638AA2
-	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 13:58:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18D8F638AA4
+	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 13:58:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbiKYM6k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Nov 2022 07:58:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56074 "EHLO
+        id S229646AbiKYM6r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Nov 2022 07:58:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbiKYM6i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Nov 2022 07:58:38 -0500
+        with ESMTP id S229618AbiKYM6n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Nov 2022 07:58:43 -0500
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7D127903;
-        Fri, 25 Nov 2022 04:58:37 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76DC227DF7;
+        Fri, 25 Nov 2022 04:58:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669381117; x=1700917117;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xP1nfhyQ8FOkPUPmd5LvYYecrF3SJgmtl4GzeuHjbw8=;
-  b=K7rmQtJ+UFh8Oq49zTHoeazt5MgGdXhwM3ss1q1fhbTq0Eus9RBIIzF7
-   iEDC/RkRz/jB+ytnad6Q7Rdq+csKrrCphO5m5Ij+FhU9QX/oiBk0UWB3g
-   1FI1MYAvEOV2VCxRz1pV8bEmcDvBW2m/TrPNhAKGK88rDCdZFbCBHAPfv
-   83LFerGesxLEmfCFVVtNGpQPOerVLFVdxZW+BsI3UGw7a/z1FYyYMyL13
-   Tq365YB1lSB4hM4U4IteDNixWDv2D57ij13XWqP7wb7oLH29VJDeuMzfQ
-   E3hJEg1U95c1D6zCZ4EseEdo3pfQlDSWGUmC5ukl05JK/DMLB1CYp/Lg/
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10541"; a="314513166"
+  t=1669381122; x=1700917122;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=q5uru/FJg753cngn4X04rdHO32+oaebGg6gCaJzWBcU=;
+  b=BkzJ2uiD9EKbYtRXxHpve8wq4lfvvfe55mpiJ4gRbh1jWk8JV+MlGsbi
+   4vzd1SKrfvN2O7DwYnDzBS67x8oeQuqVozo/0cO2c61thQ+h1EWgDXTPP
+   EJWwpC6TW/acPoWjRRq+F19Kiu6u41Cl6JNcLd7rFRC3yIV9pxD/qqZL7
+   0iM0PDsMfuprV4pe7X71BYa2ugYtEJSH/ybcHOO04mKCbbf120goxq9ca
+   vYgNbkKlAD0vFvq1JGSDGWNGyAfbkvl3+qVJIFu4PjqnAxqFtcIUt36Oy
+   3PlnioqajmTo59xAgIdIYngdwgxtfWFPg1DEH4pc/oosXiQurrmI8dZIe
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10541"; a="314513176"
 X-IronPort-AV: E=Sophos;i="5.96,193,1665471600"; 
-   d="scan'208";a="314513166"
+   d="scan'208";a="314513176"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2022 04:58:37 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2022 04:58:42 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10541"; a="706061194"
+X-IronPort-AV: E=McAfee;i="6500,9779,10541"; a="706061216"
 X-IronPort-AV: E=Sophos;i="5.96,193,1665471600"; 
-   d="scan'208";a="706061194"
+   d="scan'208";a="706061216"
 Received: from jiaxichen-precision-3650-tower.sh.intel.com ([10.239.159.75])
-  by fmsmga008.fm.intel.com with ESMTP; 25 Nov 2022 04:58:32 -0800
+  by fmsmga008.fm.intel.com with ESMTP; 25 Nov 2022 04:58:37 -0800
 From:   Jiaxi Chen <jiaxi.chen@linux.intel.com>
 To:     kvm@vger.kernel.org
 Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
@@ -50,10 +50,12 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
         keescook@chromium.org, nathan@kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v5 0/8] x86: KVM: Advertise CPUID of new Intel platform instructions to user space
-Date:   Fri, 25 Nov 2022 20:58:37 +0800
-Message-Id: <20221125125845.1182922-1-jiaxi.chen@linux.intel.com>
+Subject: [PATCH v5 1/8] KVM: x86: Add BUILD_BUG_ON() to detect bad usage of "scattered" flags
+Date:   Fri, 25 Nov 2022 20:58:38 +0800
+Message-Id: <20221125125845.1182922-2-jiaxi.chen@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221125125845.1182922-1-jiaxi.chen@linux.intel.com>
+References: <20221125125845.1182922-1-jiaxi.chen@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -65,84 +67,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Latest Intel platform Granite Rapids/Sierra Forest has introduced below
-new instructions and CPUIDs:
+From: Sean Christopherson <seanjc@google.com>
 
- - CMPccXADD CPUID.(EAX=7,ECX=1):EAX[bit 7]
- - AMX-FP16 CPUID.(EAX=7,ECX=1):EAX[bit 21]
- - AVX-IFMA CPUID.(EAX=7,ECX=1):EAX[bit 23]
- - AVX-VNNI-INT8 CPUID.(EAX=7,ECX=1):EDX[bit 4]
- - AVX-NE-CONVERT CPUID.(EAX=7,ECX=1):EDX[bit 5]
- - PREFETCHITI CPUID.(EAX=7,ECX=1):EDX[bit 14]
+Add a compile-time assert in the SF() macro to detect improper usage,
+i.e. to detect passing in an X86_FEATURE_* flag that isn't actually
+scattered by the kernel.  Upcoming feature flags will be 100% KVM-only
+and will have X86_FEATURE_* macros that point at a kvm_only_cpuid_leafs
+word, not a kernel-defined word.  Using SF() and thus boot_cpu_has() for
+such feature flags would access memory beyond x86_capability[NCAPINTS]
+and at best incorrectly hide a feature, and at worst leak kernel state to
+userspace.
 
-Details can be found in recent Intel ISE (Instruction Set
-Extensions)[1].
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/cpuid.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-These features bits are on two CPUID leafs: CPUID_7_1_EAX and
-CPUID_7_1_EDX. CPUID_7_1_EAX is an expected-dense leaf and some of its
-bits have kernel usages, therefore give bits on this leaf an X86_FEATURE
-definition in kernel. However, CPUID_7_1_EDX is dense and none of its
-bits have truly kernel usages for the moment. Given that, move
-CPUID_7_1_EDX to be a KVM-only leaf and plus an x86_FEATURE definition
-for bits on this leaf to direct them to the KVM entry.
-
-This patch series advertises KVM support of these CPUIDs to host
-userspace. For all of these features, there are no new VMX controls or
-additional host enabling required for guests to use them.
-
-[1] Intel ISE: https://cdrdv2.intel.com/v1/dl/getContent/671368
-
-v5:
- - Modify some inaccurate descriptions in the changelogs.
- - Address some naming-confusing problems for adding KVM-only leaves,
-   including renaming function and adding comments. 
-
-v4:
-https://lore.kernel.org/kvm/20221118141509.489359-1-jiaxi.chen@linux.intel.com/
- - Put CPUID_7_1_EAX back to cpuid_leaf[], considering more bits will be
-   defined in the future for this leaf.
-
-v3:
-https://lore.kernel.org/kvm/20221110015252.202566-1-jiaxi.chen@linux.intel.com/
- - Remain CPUID_8000_001F_EAX in the last leaf of cpuid_leaf[]
- - Replace CPUID_7_1_EAX with CPUID_LNX_5, waiting for future new CPUIDs
-
-v2:
-https://lore.kernel.org/kvm/20221103025030.78371-1-jiaxi.chen@linux.intel.com/
- - Remove vague descriptions in the changelogs, including pronouns and
-   "this patch" kind of things.
- - Move the two CPUIDs of cpuid_leaf[12] CPUID_7_1_EAX to KVM-only
-   subleaves.
- - Replace cpuid_leaf[12] CPUID_7_1_EAX with the last leaf
-   CPUID_8000_001F_EAX to shorten array length.
- - Change the newly-added CPUID leaf [CPUID_7_1_EDX] in v1 into KVM-only
-   subleaves. 
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 62bc7a01cecc..65b103874139 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -65,7 +65,13 @@ u32 xstate_required_size(u64 xstate_bv, bool compacted)
+ #define KVM_X86_FEATURE_PSFD		(13*32+28) /* Predictive Store Forwarding Disable */
  
-v1:
-https://lore.kernel.org/kvm/20221019084734.3590760-1-jiaxi.chen@linux.intel.com/
-
-Chang S. Bae (1):
-  x86: KVM: Advertise AMX-FP16 CPUID to user space
-
-Jiaxi Chen (5):
-  x86: KVM: Advertise CMPccXADD CPUID to user space
-  x86: KVM: Advertise AVX-IFMA CPUID to user space
-  KVM: x86: Advertise AVX-VNNI-INT8 CPUID to user space
-  KVM: x86: Advertise AVX-NE-CONVERT CPUID to user space
-  KVM: x86: Advertise PREFETCHIT0/1 CPUID to user space
-
-Sean Christopherson (2):
-  KVM: x86: Add BUILD_BUG_ON() to detect bad usage of "scattered" flags
-  KVM: x86: Update KVM-only leaf handling to allow for 100% KVM-only
-    leafs
-
- arch/x86/include/asm/cpufeatures.h |  3 +++
- arch/x86/kvm/cpuid.c               | 25 ++++++++++++++++++-------
- arch/x86/kvm/reverse_cpuid.h       | 25 ++++++++++++++++++++++---
- 3 files changed, 43 insertions(+), 10 deletions(-)
-
-
-base-commit: 094226ad94f471a9f19e8f8e7140a09c2625abaa
+ #define F feature_bit
+-#define SF(name) (boot_cpu_has(X86_FEATURE_##name) ? F(name) : 0)
++
++/* Scattered Flag - For features that are scattered by cpufeatures.h. */
++#define SF(name)						\
++({								\
++	BUILD_BUG_ON(X86_FEATURE_##name >= MAX_CPU_FEATURES);	\
++	(boot_cpu_has(X86_FEATURE_##name) ? F(name) : 0);	\
++})
+ 
+ /*
+  * Magic value used by KVM when querying userspace-provided CPUID entries and
 -- 
 2.27.0
 
