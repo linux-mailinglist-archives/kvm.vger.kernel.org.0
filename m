@@ -2,422 +2,555 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F72A6388C6
-	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 12:31:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C12D638935
+	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 12:55:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229813AbiKYLbT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Nov 2022 06:31:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58944 "EHLO
+        id S230021AbiKYLzx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Nov 2022 06:55:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbiKYLbR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Nov 2022 06:31:17 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7F28918E0A
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 03:31:15 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B174D2B;
-        Fri, 25 Nov 2022 03:31:21 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2EDB33F73D;
-        Fri, 25 Nov 2022 03:31:14 -0800 (PST)
-Date:   Fri, 25 Nov 2022 11:31:11 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Fuad Tabba <tabba@google.com>
-Cc:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
-        andre.przywara@arm.com, will@kernel.org
-Subject: Re: [PATCH kvmtool v1 08/17] Use memfd for all guest ram allocations
-Message-ID: <Y4CnPcHyt5IPAoF/@monolith.localdoman>
-References: <20221115111549.2784927-1-tabba@google.com>
- <20221115111549.2784927-9-tabba@google.com>
- <Y39PCG0ZRHf/2d5E@monolith.localdoman>
- <CA+EHjTx6JRODjncxMz6pBO43S2gAFZt4vDibG=Zwbr7TkbiFeQ@mail.gmail.com>
- <Y3+meXHu5MRYuHou@monolith.localdoman>
- <CA+EHjTwgg+Cu=A3msmWLNEHmkJhOn-8+MeJULOHzF6V99iHk1A@mail.gmail.com>
+        with ESMTP id S229646AbiKYLzv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Nov 2022 06:55:51 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 775322EF30;
+        Fri, 25 Nov 2022 03:55:49 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D69FFB82A88;
+        Fri, 25 Nov 2022 11:55:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 479F7C433C1;
+        Fri, 25 Nov 2022 11:55:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669377346;
+        bh=1w7DlFxD3WCX2blZmMM059sDBEdCeLcVaS46TaDQB2k=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=h3uPBlKcpDiYp9ziolAxWVZdUguFj5hvAwv74KIXFQy6vksbPTdUmi8viJGNuP5wm
+         LcjzdwO7traA0ZjPUDk1wvjh9j3H/M91Ck6g6IAbLUbaTjAblkZPQztsppsCx/HX+n
+         ndVblE0PSz9rHBQw3ou59l8thvFk8P/o7yamtjmA3EDfpwMtvK1AV7a541iG/wnVUg
+         PMpgkuv7zSQZVQAN07VsH3zeWiBeoO2wPbRrAL3L35DbSunM9X5JUNxLW3hvJKypKj
+         kNO4K/jWzEyNouVUP2uCnDdv97ImxYhNg+K4JCF3vBLYVa2/RbWK4KqKAGdnEFsJnK
+         pPcLXwb1y+4EQ==
+Date:   Fri, 25 Nov 2022 11:55:29 +0000
+From:   Mauro Carvalho Chehab <mchehab@kernel.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-kernel@vger.kernel.org, Fenghua Yu <fenghua.yu@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
+        Jens Axboe <axboe@kernel.dk>,
+        Justin Sanders <justin@coraid.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Benjamin Gaignard <benjamin.gaignard@collabora.com>,
+        Liam Mark <lmark@codeaurora.org>,
+        Laura Abbott <labbott@redhat.com>,
+        Brian Starkey <Brian.Starkey@arm.com>,
+        John Stultz <jstultz@google.com>,
+        Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@gmail.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Leon Romanovsky <leon@kernel.org>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Sean Young <sean@mess.org>,
+        Frank Haverkamp <haver@linux.ibm.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Anton Vorontsov <anton@enomsg.org>,
+        Colin Cross <ccross@android.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        Hans Verkuil <hverkuil-cisco@xs4all.nl>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Gautam Dawar <gautam.dawar@xilinx.com>,
+        Dan Carpenter <error27@gmail.com>, Eli Cohen <elic@nvidia.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Maxime Coquelin <maxime.coquelin@redhat.com>,
+        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
+        kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+        linux-block@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH 2/5] driver core: make struct class.devnode() take a
+ const *
+Message-ID: <20221125115529.05af1513@sal.lan>
+In-Reply-To: <20221123122523.1332370-2-gregkh@linuxfoundation.org>
+References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
+        <20221123122523.1332370-2-gregkh@linuxfoundation.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+EHjTwgg+Cu=A3msmWLNEHmkJhOn-8+MeJULOHzF6V99iHk1A@mail.gmail.com>
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Em Wed, 23 Nov 2022 13:25:20 +0100
+Greg Kroah-Hartman <gregkh@linuxfoundation.org> escreveu:
 
-On Fri, Nov 25, 2022 at 10:44:39AM +0000, Fuad Tabba wrote:
-> Hi,
-> 
-> On Thu, Nov 24, 2022 at 5:14 PM Alexandru Elisei
-> <alexandru.elisei@arm.com> wrote:
-> >
-> > Hi,
-> >
-> > On Thu, Nov 24, 2022 at 03:19:34PM +0000, Fuad Tabba wrote:
-> > > Hi,
-> > >
-> > > On Thu, Nov 24, 2022 at 11:01 AM Alexandru Elisei
-> > > <alexandru.elisei@arm.com> wrote:
-> > > >
-> > > > Hi,
-> > > >
-> > > > On Tue, Nov 15, 2022 at 11:15:40AM +0000, Fuad Tabba wrote:
-> > > > > Allocate all guest ram backed by memfd/ftruncate instead of
-> > > > > anonymous mmap. This will make it easier to use kvm with fd-based
-> > > > > kvm guest memory proposals [*]. It also would make it easier to
-> > > > > use ipc memory sharing should that be needed in the future.
-> > > >
-> > > > Today, there are two memory allocation paths:
-> > > >
-> > > > - One using hugetlbfs when --hugetlbfs is specified on the command line, which
-> > > >   creates a file.
-> > > >
-> > > > - One using mmap, when --hugetlbfs is not specified.
-> > > >
-> > > > How would support in kvmtool for the secret memfd look like? I assume there
-> > > > would need to be some kind of command line parameter to kvmtool to instruct it
-> > > > to use the secret memfd, right? What I'm trying to figure out is why is
-> > > > necessary to make everything a memfd file instead of adding a third memory
-> > > > allocation path just for that particular usecase (or merging the hugetlbfs path
-> > > > if they are similar enough). Right now, the anonymous memory path is a
-> > > > mmap(MAP_ANONYMOUS) call, simple and straightforward, and I would like some more
-> > > > convincing that this change is needed.
-> > >
-> > > This isn't about secret mem, but about the unified proposal for guest
-> > > private memory [1].  This proposal requires the use of a file
-> > > descriptor (fd) as the canonical reference to guest memory in the host
-> > > (i.e., VMM) and does not provide an alternative using a
-> > > straightforward anonymous mmap(). The idea is that guest memory
-> > > shouldn’t have mapping in the host by default, but unless explicitly
-> > > shared and needed.
-> >
-> > I think you misunderstood me. I wasn't asking why kvmtool should get
-> > support for guest private memory, I was asking why kvmtool should allocate
-> > **all types of memory** using memfd. Your series allocates **all** memory
-> > using memfd. I never said that kvmtool should or should not get support for
-> > private memory.
-> 
-> My reasoning for allocating all memory with memfd is that it's one
-> ring to rule them all :) By that I mean, with memfd, we can allocate
-> normal memory, hugetlb memory, in the future guest private memory, and
-> easily expand it to support things like IPC memory sharing in the
-> future.
+> The devnode() in struct class should not be modifying the device that is
+> passed into it, so mark it as a const * and propagate the function
+> signature changes out into all relevant subsystems that use this
+> callback.
 
-Allocating anonymous memory is more complex now. And I could argue than the
-hugetlbfs case is also more complex because there are now two branches that
-do different things based whether it's hugetlbfs or not, instead of one.
-
-As I stands right now, my opinion is that using memfd for anonymous RAM
-only adds complexity for zero benefits.
-
-> 
-> 
-> > >
-> > > Moreover, using an fd would be more generic and flexible, which allows
-> > > for other use cases (such as IPC), or to map that memory in userspace
-> > > when appropriate. It also allows us to use the same interface for
-> > > hugetlb. Considering that other VMMs (e.g., qemu [2], crosvm [3])
-> > > already back guest memory with memfd, and looking at how private
-> > > memory would work [4], it seemed to me that the best way to unify all
-> > > of these needs is to have the backend of guest memory be fd-based.
-> > >
-> > > It would be possible to have that as a separate kvmtool option, where
-> > > fd-backed memory would be only for guests that use the new private
-> > > memory extensions. However, that would mean more code to maintain that
-> > > is essentially doing the same thing (allocating and mapping memory).
-> > >
-> > > I thought that it would be worth having these patches in kvmtool now
-> > > rather than wait until the guest private memory has made it into kvm.
-> > > These patches simplify the code as an end result, make it easier to
-> >
-> > In the non-hugetlbfs case, before:
-> >
-> >         kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
-> >         kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm, kvm->cfg.hugetlbfs_path, kvm->arch.ram_alloc_size);
-> >
-> >         /*
-> >          * mmap_anon_or_hugetlbfs expands to:
-> >          * getpagesize()
-> >          * mmap()
-> >          */
-> >
-> >         kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start, SZ_2M);
-> >
-> > After:
-> >         /* mmap_anon_or_hugetlbfs: */
-> >         getpagesize();
-> >         mmap(NULL, total_map, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-> >         memfd_alloc(size, htlbfs_path, blk_size);
-> >
-> >         /*
-> >          * memfd_alloc() expands to:
-> >          * memfd_create()
-> >          * ftruncate
-> >          */
-> >
-> >         addr_align = (void *)ALIGN((u64)addr_map, align_sz);
-> >         mmap(addr_align, size, PROT_RW, MAP_PRIVATE | MAP_FIXED, fd, 0);
-> >
-> > I'm counting one extra mmap(), one memfd_create() and one ftruncate() that
-> > this series adds (not to mention all the boiler plate code to check for
-> > errors).
-> >
-> > Let's use another metric, let's count the number of lines of code. Before:
-> > 9 lines of code, after: -3 lines removed from arm/kvm.c and 86 lines of
-> > code for memfd_alloc() and mmap_anon_or_hugetlbfs_align().
-> >
-> > I'm struggling to find a metric by which the resulting code is simpler, as
-> > you suggest.
-> 
-> With simpler I didn't mean fewer lines of code, rather that it's
-> easier to reason about, more shared code. With this series, hugetlb
-
-How is all of the code that has been added easier to reason about than one
-single mmap call?
-
-> and normal memory creation follow the same path, and with the
-> refactoring a lot of arch-specific code is gone.
-
-Can you point me to the arch-specific code that this series removes? As far
-as I can tell, the only arch specfic change is replacing
-kvm_arch_delete_ram with kvm_delete_ram, which can be done independently of
-this series. If it's only that function, I wouldn't call that "a lot" of
-arch-specific code.
-
-> 
-> >
-> > > allocate and map aligned memory without overallocating, and bring
-> >
-> > If your goal is to remove the overallocting of memory, you can just munmap
-> > the extra memory after alignment is performed. To do that you don't need to
-> > allocate everything using a memfd.
-> >
-> > > kvmtool closer to a more consistent way of allocating guest memory, in
-> > > a similar manner to other VMMs.
-> >
-> > I would really appreciate pointing me to where qemu allocates memory using
-> > memfd when invoked with -m <size>. I was able to follow the hostmem-ram
-> > backend allocation function until g_malloc0(), but I couldn't find the
-> > implementation for that.
-> 
-> You're right. I thought that the memfd backend was the default, but
-> looking again it's not.
-> 
-> > >
-> > > Moreover, with the private memory proposal [1], whether the fd-based
-> > > support available can be queried by a KVM capability. If it's
-> > > available kvmtool would use the fd, if it's not available, it would
-> > > use the host-mapped address. Therefore, there isn’t a need for a
-> > > command line option, unless for testing.
-> >
-> > Why would anyone want to use private memory by default for a
-> > non-confidential VM?
-> 
-> The idea is that, at least when pKVM is enabled, we would use the
-> proposed extensions for all guests, i.e., memory via a file
-> descriptor, regardless whether the guest is protected (thus the memory
-> would be private), or not.
-
-kvmtool can be used to run virtual machines when pKVM is not enabled. In
-fact, it has been used that way for way longer than pKVM has existed. What
-about those users?
-
-> 
-> 
-> > >
-> > > I have implemented this all the way to support the private memory
-> > > proposal in kvmtool [5], but I haven’t posted these since the private
-> > > memory proposal itself is still in flux. If you’re interested you
-> >
-> > Are you saying that you are not really sure how the userspace API will end
-> > up looking? If that's the case, wouldn't it make more sense to wait for the
-> > API to stabilize and then send support for it as one nice series?
-> 
-> Yes, I'm not sure how it will end up looking. We know that it will be
-> fd-based though, which is why I thought it might be good to start with
-> that.
-
-If you're not sure how it will end up looking, then why change kvmtool now?
-
-Thanks,
-Alex
-
-> 
-> Cheers,
-> /fuad
-> 
-> 
-> 
-> > Thanks,
-> > Alex
-> >
-> > > could have a look on how I would go ahead building on these patches
-> > > for full support of private memory backed by an fd.
-> > >
-> > > > Regarding IPC memory sharing, is mmap'ing an memfd file enough to enable
-> > > > that? If more work is needed for it, then wouldn't it make more sense to do
-> > > > all the changes at once? This change might look sensible right now, but it
-> > > > might turn out that it was the wrong way to go about it when someone
-> > > > actually starts implementing memory sharing.
-> > >
-> > > I don’t plan on supporting IPC memory sharing. I just mentioned that
-> > > as yet another use case that would benefit from guest memory being
-> > > fd-based, should kvmtool decide to support it in the future.
-> > >
-> > > Cheers,
-> > > /fuad
-> > >
-> > > [1] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.intel.com/
-> > > [2] https://github.com/qemu/qemu
-> > > [3] https://chromium.googlesource.com/chromiumos/platform/crosvm/
-> > > [4] https://github.com/chao-p/qemu/tree/privmem-v9
-> > > [5] https://android-kvm.googlesource.com/kvmtool/+/refs/heads/tabba/fdmem-v9-core
-> > >
-> > >
-> > >
-> > > >
-> > > > Regarding IPC memory sharing, is mmap'ing an memfd file enough to enable
-> > > > that? If more work is needed for it, then wouldn't it make more sense to do
-> > > > all the changes at once? This change might look sensible right now, but it
-> > > > might turn out that it was the wrong way to go about it when someone
-> > > > actually starts implementing memory sharing.
-> > > >
-> > > > Thanks,
-> > > > Alex
-> > > >
-> > > > >
-> > > > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > > >
-> > > > > [*] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.intel.com/
-> > > > > ---
-> > > > >  include/kvm/kvm.h  |  1 +
-> > > > >  include/kvm/util.h |  3 +++
-> > > > >  kvm.c              |  4 ++++
-> > > > >  util/util.c        | 33 ++++++++++++++++++++-------------
-> > > > >  4 files changed, 28 insertions(+), 13 deletions(-)
-> > > > >
-> > > > > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> > > > > index 3872dc6..d0d519b 100644
-> > > > > --- a/include/kvm/kvm.h
-> > > > > +++ b/include/kvm/kvm.h
-> > > > > @@ -87,6 +87,7 @@ struct kvm {
-> > > > >       struct kvm_config       cfg;
-> > > > >       int                     sys_fd;         /* For system ioctls(), i.e. /dev/kvm */
-> > > > >       int                     vm_fd;          /* For VM ioctls() */
-> > > > > +     int                     ram_fd;         /* For guest memory. */
-> > > > >       timer_t                 timerid;        /* Posix timer for interrupts */
-> > > > >
-> > > > >       int                     nrcpus;         /* Number of cpus to run */
-> > > > > diff --git a/include/kvm/util.h b/include/kvm/util.h
-> > > > > index 61a205b..369603b 100644
-> > > > > --- a/include/kvm/util.h
-> > > > > +++ b/include/kvm/util.h
-> > > > > @@ -140,6 +140,9 @@ static inline int pow2_size(unsigned long x)
-> > > > >  }
-> > > > >
-> > > > >  struct kvm;
-> > > > > +int memfd_alloc(u64 size, bool hugetlb, u64 blk_size);
-> > > > > +void *mmap_anon_or_hugetlbfs_align(struct kvm *kvm, const char *htlbfs_path,
-> > > > > +                                u64 size, u64 align);
-> > > > >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
-> > > > >
-> > > > >  #endif /* KVM__UTIL_H */
-> > > > > diff --git a/kvm.c b/kvm.c
-> > > > > index 78bc0d8..ed29d68 100644
-> > > > > --- a/kvm.c
-> > > > > +++ b/kvm.c
-> > > > > @@ -160,6 +160,7 @@ struct kvm *kvm__new(void)
-> > > > >       mutex_init(&kvm->mem_banks_lock);
-> > > > >       kvm->sys_fd = -1;
-> > > > >       kvm->vm_fd = -1;
-> > > > > +     kvm->ram_fd = -1;
-> > > > >
-> > > > >  #ifdef KVM_BRLOCK_DEBUG
-> > > > >       kvm->brlock_sem = (pthread_rwlock_t) PTHREAD_RWLOCK_INITIALIZER;
-> > > > > @@ -174,6 +175,9 @@ int kvm__exit(struct kvm *kvm)
-> > > > >
-> > > > >       kvm__arch_delete_ram(kvm);
-> > > > >
-> > > > > +     if (kvm->ram_fd >= 0)
-> > > > > +             close(kvm->ram_fd);
-> > > > > +
-> > > > >       list_for_each_entry_safe(bank, tmp, &kvm->mem_banks, list) {
-> > > > >               list_del(&bank->list);
-> > > > >               free(bank);
-> > > > > diff --git a/util/util.c b/util/util.c
-> > > > > index d3483d8..278bcc2 100644
-> > > > > --- a/util/util.c
-> > > > > +++ b/util/util.c
-> > > > > @@ -102,36 +102,38 @@ static u64 get_hugepage_blk_size(const char *htlbfs_path)
-> > > > >       return sfs.f_bsize;
-> > > > >  }
-> > > > >
-> > > > > -static void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size, u64 blk_size)
-> > > > > +int memfd_alloc(u64 size, bool hugetlb, u64 blk_size)
-> > > > >  {
-> > > > >       const char *name = "kvmtool";
-> > > > >       unsigned int flags = 0;
-> > > > >       int fd;
-> > > > > -     void *addr;
-> > > > > -     int htsize = __builtin_ctzl(blk_size);
-> > > > >
-> > > > > -     if ((1ULL << htsize) != blk_size)
-> > > > > -             die("Hugepage size must be a power of 2.\n");
-> > > > > +     if (hugetlb) {
-> > > > > +             int htsize = __builtin_ctzl(blk_size);
-> > > > >
-> > > > > -     flags |= MFD_HUGETLB;
-> > > > > -     flags |= htsize << MFD_HUGE_SHIFT;
-> > > > > +             if ((1ULL << htsize) != blk_size)
-> > > > > +                     die("Hugepage size must be a power of 2.\n");
-> > > > > +
-> > > > > +             flags |= MFD_HUGETLB;
-> > > > > +             flags |= htsize << MFD_HUGE_SHIFT;
-> > > > > +     }
-> > > > >
-> > > > >       fd = memfd_create(name, flags);
-> > > > >       if (fd < 0)
-> > > > > -             die("Can't memfd_create for hugetlbfs map\n");
-> > > > > +             die("Can't memfd_create for memory map\n");
-> > > > > +
-> > > > >       if (ftruncate(fd, size) < 0)
-> > > > >               die("Can't ftruncate for mem mapping size %lld\n",
-> > > > >                       (unsigned long long)size);
-> > > > > -     addr = mmap(NULL, size, PROT_RW, MAP_PRIVATE, fd, 0);
-> > > > > -     close(fd);
-> > > > >
-> > > > > -     return addr;
-> > > > > +     return fd;
-> > > > >  }
-> > > > >
-> > > > >  /* This function wraps the decision between hugetlbfs map (if requested) or normal mmap */
-> > > > >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
-> > > > >  {
-> > > > >       u64 blk_size = 0;
-> > > > > +     int fd;
-> > > > >
-> > > > >       /*
-> > > > >        * We don't /need/ to map guest RAM from hugetlbfs, but we do so
-> > > > > @@ -146,9 +148,14 @@ void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
-> > > > >               }
-> > > > >
-> > > > >               kvm->ram_pagesize = blk_size;
-> > > > > -             return mmap_hugetlbfs(kvm, htlbfs_path, size, blk_size);
-> > > > >       } else {
-> > > > >               kvm->ram_pagesize = getpagesize();
-> > > > > -             return mmap(NULL, size, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
-> > > > >       }
-> > > > > +
-> > > > > +     fd = memfd_alloc(size, htlbfs_path, blk_size);
-> > > > > +     if (fd < 0)
-> > > > > +             return MAP_FAILED;
-> > > > > +
-> > > > > +     kvm->ram_fd = fd;
-> > > > > +     return mmap(NULL, size, PROT_RW, MAP_PRIVATE, kvm->ram_fd, 0);
-> > > > >  }
-> > > > > --
-> > > > > 2.38.1.431.g37b22c650d-goog
-> > > > >
+Acked-by: Mauro Carvalho Chehab <mchehab@kernel.org>
+>=20
+> Cc: Fenghua Yu <fenghua.yu@intel.com>
+> Cc: Reinette Chatre <reinette.chatre@intel.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: x86@kernel.org
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Justin Sanders <justin@coraid.com>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Sumit Semwal <sumit.semwal@linaro.org>
+> Cc: Benjamin Gaignard <benjamin.gaignard@collabora.com>
+> Cc: Liam Mark <lmark@codeaurora.org>
+> Cc: Laura Abbott <labbott@redhat.com>
+> Cc: Brian Starkey <Brian.Starkey@arm.com>
+> Cc: John Stultz <jstultz@google.com>
+> Cc: "Christian K=C3=B6nig" <christian.koenig@amd.com>
+> Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+> Cc: Maxime Ripard <mripard@kernel.org>
+> Cc: Thomas Zimmermann <tzimmermann@suse.de>
+> Cc: David Airlie <airlied@gmail.com>
+> Cc: Daniel Vetter <daniel@ffwll.ch>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>
+> Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+> Cc: Sean Young <sean@mess.org>
+> Cc: Frank Haverkamp <haver@linux.ibm.com>
+> Cc: Jiri Slaby <jirislaby@kernel.org>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Anton Vorontsov <anton@enomsg.org>
+> Cc: Colin Cross <ccross@android.com>
+> Cc: Tony Luck <tony.luck@intel.com>
+> Cc: Jaroslav Kysela <perex@perex.cz>
+> Cc: Takashi Iwai <tiwai@suse.com>
+> Cc: Hans Verkuil <hverkuil-cisco@xs4all.nl>
+> Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Cc: Xie Yongji <xieyongji@bytedance.com>
+> Cc: Gautam Dawar <gautam.dawar@xilinx.com>
+> Cc: Dan Carpenter <error27@gmail.com>
+> Cc: Eli Cohen <elic@nvidia.com>
+> Cc: Parav Pandit <parav@nvidia.com>
+> Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
+> Cc: alsa-devel@alsa-project.org
+> Cc: dri-devel@lists.freedesktop.org
+> Cc: kvm@vger.kernel.org
+> Cc: linaro-mm-sig@lists.linaro.org
+> Cc: linux-block@vger.kernel.org
+> Cc: linux-input@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-media@vger.kernel.org
+> Cc: linux-rdma@vger.kernel.org
+> Cc: linux-scsi@vger.kernel.org
+> Cc: linux-usb@vger.kernel.org
+> Cc: virtualization@lists.linux-foundation.org
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> ---
+>  arch/x86/kernel/cpu/resctrl/pseudo_lock.c  | 4 ++--
+>  arch/x86/kernel/cpuid.c                    | 2 +-
+>  arch/x86/kernel/msr.c                      | 2 +-
+>  block/bsg.c                                | 2 +-
+>  drivers/block/aoe/aoechr.c                 | 2 +-
+>  drivers/char/mem.c                         | 2 +-
+>  drivers/char/misc.c                        | 4 ++--
+>  drivers/dma-buf/dma-heap.c                 | 2 +-
+>  drivers/gpu/drm/drm_sysfs.c                | 2 +-
+>  drivers/infiniband/core/user_mad.c         | 2 +-
+>  drivers/infiniband/core/uverbs_main.c      | 2 +-
+>  drivers/infiniband/hw/hfi1/device.c        | 4 ++--
+>  drivers/input/input.c                      | 2 +-
+>  drivers/media/dvb-core/dvbdev.c            | 4 ++--
+>  drivers/media/pci/ddbridge/ddbridge-core.c | 4 ++--
+>  drivers/media/rc/rc-main.c                 | 2 +-
+>  drivers/misc/genwqe/card_base.c            | 2 +-
+>  drivers/tty/tty_io.c                       | 2 +-
+>  drivers/usb/core/file.c                    | 2 +-
+>  drivers/vdpa/vdpa_user/vduse_dev.c         | 2 +-
+>  drivers/vfio/vfio_main.c                   | 2 +-
+>  fs/pstore/pmsg.c                           | 2 +-
+>  include/linux/device/class.h               | 2 +-
+>  sound/sound_core.c                         | 2 +-
+>  24 files changed, 29 insertions(+), 29 deletions(-)
+>=20
+> diff --git a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c b/arch/x86/kernel/=
+cpu/resctrl/pseudo_lock.c
+> index d961ae3ed96e..4e4231a58f38 100644
+> --- a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
+> +++ b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
+> @@ -1560,9 +1560,9 @@ static const struct file_operations pseudo_lock_dev=
+_fops =3D {
+>  	.mmap =3D		pseudo_lock_dev_mmap,
+>  };
+> =20
+> -static char *pseudo_lock_devnode(struct device *dev, umode_t *mode)
+> +static char *pseudo_lock_devnode(const struct device *dev, umode_t *mode)
+>  {
+> -	struct rdtgroup *rdtgrp;
+> +	const struct rdtgroup *rdtgrp;
+> =20
+>  	rdtgrp =3D dev_get_drvdata(dev);
+>  	if (mode)
+> diff --git a/arch/x86/kernel/cpuid.c b/arch/x86/kernel/cpuid.c
+> index 6f7b8cc1bc9f..621ba9c0f17a 100644
+> --- a/arch/x86/kernel/cpuid.c
+> +++ b/arch/x86/kernel/cpuid.c
+> @@ -139,7 +139,7 @@ static int cpuid_device_destroy(unsigned int cpu)
+>  	return 0;
+>  }
+> =20
+> -static char *cpuid_devnode(struct device *dev, umode_t *mode)
+> +static char *cpuid_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	return kasprintf(GFP_KERNEL, "cpu/%u/cpuid", MINOR(dev->devt));
+>  }
+> diff --git a/arch/x86/kernel/msr.c b/arch/x86/kernel/msr.c
+> index ed8ac6bcbafb..708751311786 100644
+> --- a/arch/x86/kernel/msr.c
+> +++ b/arch/x86/kernel/msr.c
+> @@ -250,7 +250,7 @@ static int msr_device_destroy(unsigned int cpu)
+>  	return 0;
+>  }
+> =20
+> -static char *msr_devnode(struct device *dev, umode_t *mode)
+> +static char *msr_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	return kasprintf(GFP_KERNEL, "cpu/%u/msr", MINOR(dev->devt));
+>  }
+> diff --git a/block/bsg.c b/block/bsg.c
+> index 2ab1351eb082..08046bd9207d 100644
+> --- a/block/bsg.c
+> +++ b/block/bsg.c
+> @@ -232,7 +232,7 @@ struct bsg_device *bsg_register_queue(struct request_=
+queue *q,
+>  }
+>  EXPORT_SYMBOL_GPL(bsg_register_queue);
+> =20
+> -static char *bsg_devnode(struct device *dev, umode_t *mode)
+> +static char *bsg_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	return kasprintf(GFP_KERNEL, "bsg/%s", dev_name(dev));
+>  }
+> diff --git a/drivers/block/aoe/aoechr.c b/drivers/block/aoe/aoechr.c
+> index 8eea2529da20..7a368c90467d 100644
+> --- a/drivers/block/aoe/aoechr.c
+> +++ b/drivers/block/aoe/aoechr.c
+> @@ -273,7 +273,7 @@ static const struct file_operations aoe_fops =3D {
+>  	.llseek =3D noop_llseek,
+>  };
+> =20
+> -static char *aoe_devnode(struct device *dev, umode_t *mode)
+> +static char *aoe_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	return kasprintf(GFP_KERNEL, "etherd/%s", dev_name(dev));
+>  }
+> diff --git a/drivers/char/mem.c b/drivers/char/mem.c
+> index 5611d127363e..83bf2a4dcb57 100644
+> --- a/drivers/char/mem.c
+> +++ b/drivers/char/mem.c
+> @@ -746,7 +746,7 @@ static const struct file_operations memory_fops =3D {
+>  	.llseek =3D noop_llseek,
+>  };
+> =20
+> -static char *mem_devnode(struct device *dev, umode_t *mode)
+> +static char *mem_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	if (mode && devlist[MINOR(dev->devt)].mode)
+>  		*mode =3D devlist[MINOR(dev->devt)].mode;
+> diff --git a/drivers/char/misc.c b/drivers/char/misc.c
+> index cba19bfdc44d..88c6995b9a3d 100644
+> --- a/drivers/char/misc.c
+> +++ b/drivers/char/misc.c
+> @@ -254,9 +254,9 @@ void misc_deregister(struct miscdevice *misc)
+>  }
+>  EXPORT_SYMBOL(misc_deregister);
+> =20
+> -static char *misc_devnode(struct device *dev, umode_t *mode)
+> +static char *misc_devnode(const struct device *dev, umode_t *mode)
+>  {
+> -	struct miscdevice *c =3D dev_get_drvdata(dev);
+> +	const struct miscdevice *c =3D dev_get_drvdata(dev);
+> =20
+>  	if (mode && c->mode)
+>  		*mode =3D c->mode;
+> diff --git a/drivers/dma-buf/dma-heap.c b/drivers/dma-buf/dma-heap.c
+> index 8f5848aa144f..4d7150791315 100644
+> --- a/drivers/dma-buf/dma-heap.c
+> +++ b/drivers/dma-buf/dma-heap.c
+> @@ -299,7 +299,7 @@ struct dma_heap *dma_heap_add(const struct dma_heap_e=
+xport_info *exp_info)
+>  	return err_ret;
+>  }
+> =20
+> -static char *dma_heap_devnode(struct device *dev, umode_t *mode)
+> +static char *dma_heap_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	return kasprintf(GFP_KERNEL, "dma_heap/%s", dev_name(dev));
+>  }
+> diff --git a/drivers/gpu/drm/drm_sysfs.c b/drivers/gpu/drm/drm_sysfs.c
+> index 430e00b16eec..14bf156b3f1b 100644
+> --- a/drivers/gpu/drm/drm_sysfs.c
+> +++ b/drivers/gpu/drm/drm_sysfs.c
+> @@ -90,7 +90,7 @@ static void drm_sysfs_acpi_register(void) { }
+>  static void drm_sysfs_acpi_unregister(void) { }
+>  #endif
+> =20
+> -static char *drm_devnode(struct device *dev, umode_t *mode)
+> +static char *drm_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	return kasprintf(GFP_KERNEL, "dri/%s", dev_name(dev));
+>  }
+> diff --git a/drivers/infiniband/core/user_mad.c b/drivers/infiniband/core=
+/user_mad.c
+> index 98cb594cd9a6..f83954180a33 100644
+> --- a/drivers/infiniband/core/user_mad.c
+> +++ b/drivers/infiniband/core/user_mad.c
+> @@ -1224,7 +1224,7 @@ static struct attribute *umad_class_dev_attrs[] =3D=
+ {
+>  };
+>  ATTRIBUTE_GROUPS(umad_class_dev);
+> =20
+> -static char *umad_devnode(struct device *dev, umode_t *mode)
+> +static char *umad_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	return kasprintf(GFP_KERNEL, "infiniband/%s", dev_name(dev));
+>  }
+> diff --git a/drivers/infiniband/core/uverbs_main.c b/drivers/infiniband/c=
+ore/uverbs_main.c
+> index d54434088727..bdb179a09d77 100644
+> --- a/drivers/infiniband/core/uverbs_main.c
+> +++ b/drivers/infiniband/core/uverbs_main.c
+> @@ -1237,7 +1237,7 @@ static void ib_uverbs_remove_one(struct ib_device *=
+device, void *client_data)
+>  	put_device(&uverbs_dev->dev);
+>  }
+> =20
+> -static char *uverbs_devnode(struct device *dev, umode_t *mode)
+> +static char *uverbs_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	if (mode)
+>  		*mode =3D 0666;
+> diff --git a/drivers/infiniband/hw/hfi1/device.c b/drivers/infiniband/hw/=
+hfi1/device.c
+> index 8ceff7141baf..1f4496032170 100644
+> --- a/drivers/infiniband/hw/hfi1/device.c
+> +++ b/drivers/infiniband/hw/hfi1/device.c
+> @@ -72,7 +72,7 @@ const char *class_name(void)
+>  	return hfi1_class_name;
+>  }
+> =20
+> -static char *hfi1_devnode(struct device *dev, umode_t *mode)
+> +static char *hfi1_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	if (mode)
+>  		*mode =3D 0600;
+> @@ -85,7 +85,7 @@ static const char *class_name_user(void)
+>  	return hfi1_class_name_user;
+>  }
+> =20
+> -static char *hfi1_user_devnode(struct device *dev, umode_t *mode)
+> +static char *hfi1_user_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	if (mode)
+>  		*mode =3D 0666;
+> diff --git a/drivers/input/input.c b/drivers/input/input.c
+> index ebb2b7f0f8ff..50597165dc54 100644
+> --- a/drivers/input/input.c
+> +++ b/drivers/input/input.c
+> @@ -1913,7 +1913,7 @@ static const struct device_type input_dev_type =3D {
+>  #endif
+>  };
+> =20
+> -static char *input_devnode(struct device *dev, umode_t *mode)
+> +static char *input_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	return kasprintf(GFP_KERNEL, "input/%s", dev_name(dev));
+>  }
+> diff --git a/drivers/media/dvb-core/dvbdev.c b/drivers/media/dvb-core/dvb=
+dev.c
+> index 6ef18bab9648..e73f5240cc2c 100644
+> --- a/drivers/media/dvb-core/dvbdev.c
+> +++ b/drivers/media/dvb-core/dvbdev.c
+> @@ -1018,9 +1018,9 @@ static int dvb_uevent(const struct device *dev, str=
+uct kobj_uevent_env *env)
+>  	return 0;
+>  }
+> =20
+> -static char *dvb_devnode(struct device *dev, umode_t *mode)
+> +static char *dvb_devnode(const struct device *dev, umode_t *mode)
+>  {
+> -	struct dvb_device *dvbdev =3D dev_get_drvdata(dev);
+> +	const struct dvb_device *dvbdev =3D dev_get_drvdata(dev);
+> =20
+>  	return kasprintf(GFP_KERNEL, "dvb/adapter%d/%s%d",
+>  		dvbdev->adapter->num, dnames[dvbdev->type], dvbdev->id);
+> diff --git a/drivers/media/pci/ddbridge/ddbridge-core.c b/drivers/media/p=
+ci/ddbridge/ddbridge-core.c
+> index fe833f39698a..ee8087f29b2c 100644
+> --- a/drivers/media/pci/ddbridge/ddbridge-core.c
+> +++ b/drivers/media/pci/ddbridge/ddbridge-core.c
+> @@ -2716,9 +2716,9 @@ static const struct file_operations ddb_fops =3D {
+>  	.release        =3D ddb_release,
+>  };
+> =20
+> -static char *ddb_devnode(struct device *device, umode_t *mode)
+> +static char *ddb_devnode(const struct device *device, umode_t *mode)
+>  {
+> -	struct ddb *dev =3D dev_get_drvdata(device);
+> +	const struct ddb *dev =3D dev_get_drvdata(device);
+> =20
+>  	return kasprintf(GFP_KERNEL, "ddbridge/card%d", dev->nr);
+>  }
+> diff --git a/drivers/media/rc/rc-main.c b/drivers/media/rc/rc-main.c
+> index eba0cd30e314..527d9324742b 100644
+> --- a/drivers/media/rc/rc-main.c
+> +++ b/drivers/media/rc/rc-main.c
+> @@ -1017,7 +1017,7 @@ static void ir_close(struct input_dev *idev)
+>  }
+> =20
+>  /* class for /sys/class/rc */
+> -static char *rc_devnode(struct device *dev, umode_t *mode)
+> +static char *rc_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	return kasprintf(GFP_KERNEL, "rc/%s", dev_name(dev));
+>  }
+> diff --git a/drivers/misc/genwqe/card_base.c b/drivers/misc/genwqe/card_b=
+ase.c
+> index 693981891870..0f00687f72d4 100644
+> --- a/drivers/misc/genwqe/card_base.c
+> +++ b/drivers/misc/genwqe/card_base.c
+> @@ -1349,7 +1349,7 @@ static struct pci_driver genwqe_driver =3D {
+>   * Default mode should be rw for everybody. Do not change default
+>   * device name.
+>   */
+> -static char *genwqe_devnode(struct device *dev, umode_t *mode)
+> +static char *genwqe_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	if (mode)
+>  		*mode =3D 0666;
+> diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
+> index de06c3c2ff70..aad8171f6c21 100644
+> --- a/drivers/tty/tty_io.c
+> +++ b/drivers/tty/tty_io.c
+> @@ -3494,7 +3494,7 @@ void tty_default_fops(struct file_operations *fops)
+>  	*fops =3D tty_fops;
+>  }
+> =20
+> -static char *tty_devnode(struct device *dev, umode_t *mode)
+> +static char *tty_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	if (!mode)
+>  		return NULL;
+> diff --git a/drivers/usb/core/file.c b/drivers/usb/core/file.c
+> index 558890ada0e5..da7d88e069e6 100644
+> --- a/drivers/usb/core/file.c
+> +++ b/drivers/usb/core/file.c
+> @@ -62,7 +62,7 @@ static struct usb_class {
+>  	struct class *class;
+>  } *usb_class;
+> =20
+> -static char *usb_devnode(struct device *dev, umode_t *mode)
+> +static char *usb_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	struct usb_class_driver *drv;
+> =20
+> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/=
+vduse_dev.c
+> index 35dceee3ed56..0dd3c1f291da 100644
+> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+> @@ -1656,7 +1656,7 @@ static const struct file_operations vduse_ctrl_fops=
+ =3D {
+>  	.llseek		=3D noop_llseek,
+>  };
+> =20
+> -static char *vduse_devnode(struct device *dev, umode_t *mode)
+> +static char *vduse_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	return kasprintf(GFP_KERNEL, "vduse/%s", dev_name(dev));
+>  }
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 6e8804fe0095..5bf4b3454918 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -1812,7 +1812,7 @@ EXPORT_SYMBOL(vfio_set_irqs_validate_and_prepare);
+>  /*
+>   * Module/class support
+>   */
+> -static char *vfio_devnode(struct device *dev, umode_t *mode)
+> +static char *vfio_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	return kasprintf(GFP_KERNEL, "vfio/%s", dev_name(dev));
+>  }
+> diff --git a/fs/pstore/pmsg.c b/fs/pstore/pmsg.c
+> index d8542ec2f38c..b31c9c72d90b 100644
+> --- a/fs/pstore/pmsg.c
+> +++ b/fs/pstore/pmsg.c
+> @@ -46,7 +46,7 @@ static int pmsg_major;
+>  #undef pr_fmt
+>  #define pr_fmt(fmt) PMSG_NAME ": " fmt
+> =20
+> -static char *pmsg_devnode(struct device *dev, umode_t *mode)
+> +static char *pmsg_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	if (mode)
+>  		*mode =3D 0220;
+> diff --git a/include/linux/device/class.h b/include/linux/device/class.h
+> index 94b1107258e5..42cc3fb44a84 100644
+> --- a/include/linux/device/class.h
+> +++ b/include/linux/device/class.h
+> @@ -60,7 +60,7 @@ struct class {
+>  	struct kobject			*dev_kobj;
+> =20
+>  	int (*dev_uevent)(const struct device *dev, struct kobj_uevent_env *env=
+);
+> -	char *(*devnode)(struct device *dev, umode_t *mode);
+> +	char *(*devnode)(const struct device *dev, umode_t *mode);
+> =20
+>  	void (*class_release)(struct class *class);
+>  	void (*dev_release)(struct device *dev);
+> diff --git a/sound/sound_core.c b/sound/sound_core.c
+> index 3332fe321737..3e7dd6fcb7cf 100644
+> --- a/sound/sound_core.c
+> +++ b/sound/sound_core.c
+> @@ -30,7 +30,7 @@ MODULE_DESCRIPTION("Core sound module");
+>  MODULE_AUTHOR("Alan Cox");
+>  MODULE_LICENSE("GPL");
+> =20
+> -static char *sound_devnode(struct device *dev, umode_t *mode)
+> +static char *sound_devnode(const struct device *dev, umode_t *mode)
+>  {
+>  	if (MAJOR(dev->devt) =3D=3D SOUND_MAJOR)
+>  		return NULL;
