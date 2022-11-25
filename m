@@ -2,598 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E95F638A50
-	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 13:41:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 479F9638A5C
+	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 13:42:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230195AbiKYMlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Nov 2022 07:41:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33616 "EHLO
+        id S230166AbiKYMmP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Nov 2022 07:42:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230121AbiKYMkn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Nov 2022 07:40:43 -0500
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C53D62E0
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 04:40:21 -0800 (PST)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-3abc71aafcaso40416437b3.3
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 04:40:21 -0800 (PST)
+        with ESMTP id S230105AbiKYMmO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Nov 2022 07:42:14 -0500
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F7091086
+        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 04:42:12 -0800 (PST)
+Received: by mail-qk1-x735.google.com with SMTP id p18so2559672qkg.2
+        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 04:42:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LJvvaRVnW9ZgCdHIVKF2PrQVDqoqC87Jwai48Lir2hs=;
-        b=O2TrOcSoMSPPNFrvlY93xaeJbIgs/oQ9H/+Gb7jZBIWNMmgJiDe0/Lj3gZID0IIOzA
-         SnuSB80yT9Uh9zjHp1xTAuj8lj9pj+UvQOZTA3ULws0gHmOsMiFYjBQzTXQlyBx/Mfn2
-         gw927LDXJhNTC4UH8QsmmJqyeUP4Gu1tQ0ShFI30ekR3VyWGXkKBdOzRClBf8wOyUsY6
-         O4C9ywDZCaHhrsfG1P8VPx0U9g2sF6nWT+koRQkdFRLQOvCHyjhj60UauuXJE2nibkA1
-         hfysOZN85vAkRRiV79XxuC7lksRPQldOhXY9Lc1iLWcbqwgjskx5OFIWQJTYXyMh9KCM
-         PRRA==
+        d=ziepe.ca; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AXnQVTJbjL0K8bweNYfJIDhmo5mKhRKv6UCn43ckNoA=;
+        b=hFA5mhB4gYkZ6dvymO+yCPpHJr4wYTRpVwdug8QvW7UnFNDL6rM0WQidk6U/8qnTmS
+         rui6AG08HaVf6nQmnTnBdlEE9Z1O0PNZ5Zf4hPjr7y7FUZbubqO+E1MYLLblaUSPcf+u
+         WgAZKKDew/hQed/WOMYr/z57cAUZ7E7xyousQrLXF5xvNJTBeIl6pqcNeGz3aI2GAfms
+         uyXHDGwBFg9vDswitm+ryD8XHSdIWIfsOJS+h7VsGtYRKk+x38imYZVeiOsQgZ6Rggyh
+         EmU5kc3SXe4hExSA0Pcs1Eu4bdDXbeKHwoR91q37q0Xbl1gqIVgOrmv9BA8rOAc6DDl4
+         H+eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LJvvaRVnW9ZgCdHIVKF2PrQVDqoqC87Jwai48Lir2hs=;
-        b=1PaOaeBLNWkPLZYf0E6pUgKpStZRFMRs0wA18Des6vImQ++19Z0ScIen4SctsbPXbt
-         fqqaRQkKJVv3YJMD6dokiM+SZT2yfel3R3f8RaLcv1nU8HuvZPFr5oZ7TDqi8qh3CpWD
-         1LRkwmrWKlEjc5gE4yLvpT0V6AlcgYT0nUXsXbQY0u9KYVnDDuJW3DIZAb+nD8X6Bv6o
-         hDzHyGNFvhqqVIQBvJK6egu3Gb0UK2HYbpjd7Gu0LoDcUkv7J7Ha3mt0TILwEZe+iJ5u
-         slWjgz4j2XR1UIB8RCZpnz/zQHBJU4i6eXZIf7d9PZmYEP0YDPHDb+WIDN2xvMiDtlpo
-         N3yA==
-X-Gm-Message-State: ANoB5pkKxYfW937jlq7eA+2QumD/wQDaE5RkfGvNf0wYHNuVj67n4aFz
-        QQwWxZAN0vRsO6Q5wd4PVuzgzPX8b1IDODMvbFrnGA==
-X-Google-Smtp-Source: AA0mqf6wqlrhFuxCJsFnMqo1XalNys4dk7skiW0xrMU30Zsm37eAFw1t09Kpc0OW/Yg848bZ5UL7IVLAuiNWTZI9ayU=
-X-Received: by 2002:a81:92c1:0:b0:3bc:d289:f4b6 with SMTP id
- j184-20020a8192c1000000b003bcd289f4b6mr865960ywg.417.1669380020560; Fri, 25
- Nov 2022 04:40:20 -0800 (PST)
-MIME-Version: 1.0
-References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
- <20221123122523.1332370-2-gregkh@linuxfoundation.org> <20221125115529.05af1513@sal.lan>
-In-Reply-To: <20221125115529.05af1513@sal.lan>
-From:   Sumit Semwal <sumit.semwal@linaro.org>
-Date:   Fri, 25 Nov 2022 18:10:09 +0530
-Message-ID: <CAO_48GGrxs9=BUu3FH5FcgSkbJnrFaLn=TC+54W76DxePfD7iA@mail.gmail.com>
-Subject: Re: [PATCH 2/5] driver core: make struct class.devnode() take a const *
-To:     Mauro Carvalho Chehab <mchehab@kernel.org>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org, Fenghua Yu <fenghua.yu@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        Jens Axboe <axboe@kernel.dk>,
-        Justin Sanders <justin@coraid.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-        Liam Mark <lmark@codeaurora.org>,
-        Laura Abbott <labbott@redhat.com>,
-        Brian Starkey <Brian.Starkey@arm.com>,
-        John Stultz <jstultz@google.com>,
-        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Sean Young <sean@mess.org>,
-        Frank Haverkamp <haver@linux.ibm.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AXnQVTJbjL0K8bweNYfJIDhmo5mKhRKv6UCn43ckNoA=;
+        b=3bUpnr6I7/TJSZpLAW1vNCrf4gIVTgCg6j1q8TK1m+ID18DHq+k94Ph62paxtVOEjn
+         T3q23G0log1ggB9GMpmAhc4jF3pq5KsNVvi76dKsLdPI7Shhi6cl+WKiccuUpl9FaoNI
+         0JIXH2M2TdfVx2NDljJnZIFRIihCbV4k/A02tmYkPlFKv/nAZU18DPPPMmHGx8C8QBxr
+         zn4KtbEAUbx/T/0efQRuaHfo384Q5V219DkGhCbtc4SCkfKCtQ2f87HSYnI8jgf/QwOS
+         y8GehM//7B62VgmKOjVCGASYSx6L0CpXiZ+txk8hkyZrDp/qvc6myytcfbV4a4ud2Gjq
+         aNPw==
+X-Gm-Message-State: ANoB5plAxb6BI8QIUnP1CLZReHvP07s6f9AmEA2N/IfD77cIWd7bWNFA
+        R3s56wcIbFa9Sbm3rNRjAdixcQ==
+X-Google-Smtp-Source: AA0mqf7H2Z6S0Nl+QLspuujn/xhlSfOTbB1s2HR1GB3WNdjaKzOBGpuvEhnFpKyZCppyd1c8z5EM2w==
+X-Received: by 2002:ae9:f404:0:b0:6fa:22a2:6d80 with SMTP id y4-20020ae9f404000000b006fa22a26d80mr32718830qkl.210.1669380131577;
+        Fri, 25 Nov 2022 04:42:11 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
+        by smtp.gmail.com with ESMTPSA id l4-20020ac84a84000000b003a57a317c17sm2162966qtq.74.2022.11.25.04.42.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Nov 2022 04:42:10 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1oyY1x-00DRrF-O5;
+        Fri, 25 Nov 2022 08:42:09 -0400
+Date:   Fri, 25 Nov 2022 08:42:09 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Anton Vorontsov <anton@enomsg.org>,
-        Colin Cross <ccross@android.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>,
-        Hans Verkuil <hverkuil-cisco@xs4all.nl>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Gautam Dawar <gautam.dawar@xilinx.com>,
-        Dan Carpenter <error27@gmail.com>, Eli Cohen <elic@nvidia.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Maxime Coquelin <maxime.coquelin@redhat.com>,
-        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
-        kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-        linux-block@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Avihai Horon <avihaih@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH v1 2/2] vfio/iova_bitmap: Fix PAGE_SIZE unaligned bitmaps
+Message-ID: <Y4C4ITz7oCFBmjWi@ziepe.ca>
+References: <20221025193114.58695-1-joao.m.martins@oracle.com>
+ <20221025193114.58695-3-joao.m.martins@oracle.com>
+ <Y3+1/a25zcxNT3He@ziepe.ca>
+ <8914ef49-aad4-1461-1176-6d46190d5cd8@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8914ef49-aad4-1461-1176-6d46190d5cd8@oracle.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Greg,
+On Fri, Nov 25, 2022 at 10:37:39AM +0000, Joao Martins wrote:
 
-On Fri, 25 Nov 2022 at 17:25, Mauro Carvalho Chehab <mchehab@kernel.org> wr=
-ote:
+> > Yes, when we move this to iommufd the test suite should be included,
+> > either as integrated using the mock domain and the selftests or
+> > otherwise.
 >
-> Em Wed, 23 Nov 2022 13:25:20 +0100
-> Greg Kroah-Hartman <gregkh@linuxfoundation.org> escreveu:
->
-> > The devnode() in struct class should not be modifying the device that i=
-s
-> > passed into it, so mark it as a const * and propagate the function
-> > signature changes out into all relevant subsystems that use this
-> > callback.
->
-> Acked-by: Mauro Carvalho Chehab <mchehab@kernel.org>
-> >
-Please feel free to add my
-Acked-by: Sumit Semwal <sumit.semwal@linaro.org>
-for the dma-buf portion.
+> So in iommufd counterpart I have already tests which exercise this. But not as
+> extensive.
 
-Best,
-Sumit.
-> > Cc: Fenghua Yu <fenghua.yu@intel.com>
-> > Cc: Reinette Chatre <reinette.chatre@intel.com>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Ingo Molnar <mingo@redhat.com>
-> > Cc: Borislav Petkov <bp@alien8.de>
-> > Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> > Cc: x86@kernel.org
-> > Cc: "H. Peter Anvin" <hpa@zytor.com>
-> > Cc: FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>
-> > Cc: Jens Axboe <axboe@kernel.dk>
-> > Cc: Justin Sanders <justin@coraid.com>
-> > Cc: Arnd Bergmann <arnd@arndb.de>
-> > Cc: Sumit Semwal <sumit.semwal@linaro.org>
-> > Cc: Benjamin Gaignard <benjamin.gaignard@collabora.com>
-> > Cc: Liam Mark <lmark@codeaurora.org>
-> > Cc: Laura Abbott <labbott@redhat.com>
-> > Cc: Brian Starkey <Brian.Starkey@arm.com>
-> > Cc: John Stultz <jstultz@google.com>
-> > Cc: "Christian K=C3=B6nig" <christian.koenig@amd.com>
-> > Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-> > Cc: Maxime Ripard <mripard@kernel.org>
-> > Cc: Thomas Zimmermann <tzimmermann@suse.de>
-> > Cc: David Airlie <airlied@gmail.com>
-> > Cc: Daniel Vetter <daniel@ffwll.ch>
-> > Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> > Cc: Leon Romanovsky <leon@kernel.org>
-> > Cc: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>
-> > Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> > Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> > Cc: Sean Young <sean@mess.org>
-> > Cc: Frank Haverkamp <haver@linux.ibm.com>
-> > Cc: Jiri Slaby <jirislaby@kernel.org>
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > Cc: Jason Wang <jasowang@redhat.com>
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Cornelia Huck <cohuck@redhat.com>
-> > Cc: Kees Cook <keescook@chromium.org>
-> > Cc: Anton Vorontsov <anton@enomsg.org>
-> > Cc: Colin Cross <ccross@android.com>
-> > Cc: Tony Luck <tony.luck@intel.com>
-> > Cc: Jaroslav Kysela <perex@perex.cz>
-> > Cc: Takashi Iwai <tiwai@suse.com>
-> > Cc: Hans Verkuil <hverkuil-cisco@xs4all.nl>
-> > Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> > Cc: Xie Yongji <xieyongji@bytedance.com>
-> > Cc: Gautam Dawar <gautam.dawar@xilinx.com>
-> > Cc: Dan Carpenter <error27@gmail.com>
-> > Cc: Eli Cohen <elic@nvidia.com>
-> > Cc: Parav Pandit <parav@nvidia.com>
-> > Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
-> > Cc: alsa-devel@alsa-project.org
-> > Cc: dri-devel@lists.freedesktop.org
-> > Cc: kvm@vger.kernel.org
-> > Cc: linaro-mm-sig@lists.linaro.org
-> > Cc: linux-block@vger.kernel.org
-> > Cc: linux-input@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > Cc: linux-media@vger.kernel.org
-> > Cc: linux-rdma@vger.kernel.org
-> > Cc: linux-scsi@vger.kernel.org
-> > Cc: linux-usb@vger.kernel.org
-> > Cc: virtualization@lists.linux-foundation.org
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > ---
-> >  arch/x86/kernel/cpu/resctrl/pseudo_lock.c  | 4 ++--
-> >  arch/x86/kernel/cpuid.c                    | 2 +-
-> >  arch/x86/kernel/msr.c                      | 2 +-
-> >  block/bsg.c                                | 2 +-
-> >  drivers/block/aoe/aoechr.c                 | 2 +-
-> >  drivers/char/mem.c                         | 2 +-
-> >  drivers/char/misc.c                        | 4 ++--
-> >  drivers/dma-buf/dma-heap.c                 | 2 +-
-> >  drivers/gpu/drm/drm_sysfs.c                | 2 +-
-> >  drivers/infiniband/core/user_mad.c         | 2 +-
-> >  drivers/infiniband/core/uverbs_main.c      | 2 +-
-> >  drivers/infiniband/hw/hfi1/device.c        | 4 ++--
-> >  drivers/input/input.c                      | 2 +-
-> >  drivers/media/dvb-core/dvbdev.c            | 4 ++--
-> >  drivers/media/pci/ddbridge/ddbridge-core.c | 4 ++--
-> >  drivers/media/rc/rc-main.c                 | 2 +-
-> >  drivers/misc/genwqe/card_base.c            | 2 +-
-> >  drivers/tty/tty_io.c                       | 2 +-
-> >  drivers/usb/core/file.c                    | 2 +-
-> >  drivers/vdpa/vdpa_user/vduse_dev.c         | 2 +-
-> >  drivers/vfio/vfio_main.c                   | 2 +-
-> >  fs/pstore/pmsg.c                           | 2 +-
-> >  include/linux/device/class.h               | 2 +-
-> >  sound/sound_core.c                         | 2 +-
-> >  24 files changed, 29 insertions(+), 29 deletions(-)
-> >
-> > diff --git a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c b/arch/x86/kerne=
-l/cpu/resctrl/pseudo_lock.c
-> > index d961ae3ed96e..4e4231a58f38 100644
-> > --- a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
-> > +++ b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
-> > @@ -1560,9 +1560,9 @@ static const struct file_operations pseudo_lock_d=
-ev_fops =3D {
-> >       .mmap =3D         pseudo_lock_dev_mmap,
-> >  };
-> >
-> > -static char *pseudo_lock_devnode(struct device *dev, umode_t *mode)
-> > +static char *pseudo_lock_devnode(const struct device *dev, umode_t *mo=
-de)
-> >  {
-> > -     struct rdtgroup *rdtgrp;
-> > +     const struct rdtgroup *rdtgrp;
-> >
-> >       rdtgrp =3D dev_get_drvdata(dev);
-> >       if (mode)
-> > diff --git a/arch/x86/kernel/cpuid.c b/arch/x86/kernel/cpuid.c
-> > index 6f7b8cc1bc9f..621ba9c0f17a 100644
-> > --- a/arch/x86/kernel/cpuid.c
-> > +++ b/arch/x86/kernel/cpuid.c
-> > @@ -139,7 +139,7 @@ static int cpuid_device_destroy(unsigned int cpu)
-> >       return 0;
-> >  }
-> >
-> > -static char *cpuid_devnode(struct device *dev, umode_t *mode)
-> > +static char *cpuid_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       return kasprintf(GFP_KERNEL, "cpu/%u/cpuid", MINOR(dev->devt));
-> >  }
-> > diff --git a/arch/x86/kernel/msr.c b/arch/x86/kernel/msr.c
-> > index ed8ac6bcbafb..708751311786 100644
-> > --- a/arch/x86/kernel/msr.c
-> > +++ b/arch/x86/kernel/msr.c
-> > @@ -250,7 +250,7 @@ static int msr_device_destroy(unsigned int cpu)
-> >       return 0;
-> >  }
-> >
-> > -static char *msr_devnode(struct device *dev, umode_t *mode)
-> > +static char *msr_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       return kasprintf(GFP_KERNEL, "cpu/%u/msr", MINOR(dev->devt));
-> >  }
-> > diff --git a/block/bsg.c b/block/bsg.c
-> > index 2ab1351eb082..08046bd9207d 100644
-> > --- a/block/bsg.c
-> > +++ b/block/bsg.c
-> > @@ -232,7 +232,7 @@ struct bsg_device *bsg_register_queue(struct reques=
-t_queue *q,
-> >  }
-> >  EXPORT_SYMBOL_GPL(bsg_register_queue);
-> >
-> > -static char *bsg_devnode(struct device *dev, umode_t *mode)
-> > +static char *bsg_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       return kasprintf(GFP_KERNEL, "bsg/%s", dev_name(dev));
-> >  }
-> > diff --git a/drivers/block/aoe/aoechr.c b/drivers/block/aoe/aoechr.c
-> > index 8eea2529da20..7a368c90467d 100644
-> > --- a/drivers/block/aoe/aoechr.c
-> > +++ b/drivers/block/aoe/aoechr.c
-> > @@ -273,7 +273,7 @@ static const struct file_operations aoe_fops =3D {
-> >       .llseek =3D noop_llseek,
-> >  };
-> >
-> > -static char *aoe_devnode(struct device *dev, umode_t *mode)
-> > +static char *aoe_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       return kasprintf(GFP_KERNEL, "etherd/%s", dev_name(dev));
-> >  }
-> > diff --git a/drivers/char/mem.c b/drivers/char/mem.c
-> > index 5611d127363e..83bf2a4dcb57 100644
-> > --- a/drivers/char/mem.c
-> > +++ b/drivers/char/mem.c
-> > @@ -746,7 +746,7 @@ static const struct file_operations memory_fops =3D=
- {
-> >       .llseek =3D noop_llseek,
-> >  };
-> >
-> > -static char *mem_devnode(struct device *dev, umode_t *mode)
-> > +static char *mem_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       if (mode && devlist[MINOR(dev->devt)].mode)
-> >               *mode =3D devlist[MINOR(dev->devt)].mode;
-> > diff --git a/drivers/char/misc.c b/drivers/char/misc.c
-> > index cba19bfdc44d..88c6995b9a3d 100644
-> > --- a/drivers/char/misc.c
-> > +++ b/drivers/char/misc.c
-> > @@ -254,9 +254,9 @@ void misc_deregister(struct miscdevice *misc)
-> >  }
-> >  EXPORT_SYMBOL(misc_deregister);
-> >
-> > -static char *misc_devnode(struct device *dev, umode_t *mode)
-> > +static char *misc_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> > -     struct miscdevice *c =3D dev_get_drvdata(dev);
-> > +     const struct miscdevice *c =3D dev_get_drvdata(dev);
-> >
-> >       if (mode && c->mode)
-> >               *mode =3D c->mode;
-> > diff --git a/drivers/dma-buf/dma-heap.c b/drivers/dma-buf/dma-heap.c
-> > index 8f5848aa144f..4d7150791315 100644
-> > --- a/drivers/dma-buf/dma-heap.c
-> > +++ b/drivers/dma-buf/dma-heap.c
-> > @@ -299,7 +299,7 @@ struct dma_heap *dma_heap_add(const struct dma_heap=
-_export_info *exp_info)
-> >       return err_ret;
-> >  }
-> >
-> > -static char *dma_heap_devnode(struct device *dev, umode_t *mode)
-> > +static char *dma_heap_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       return kasprintf(GFP_KERNEL, "dma_heap/%s", dev_name(dev));
-> >  }
-> > diff --git a/drivers/gpu/drm/drm_sysfs.c b/drivers/gpu/drm/drm_sysfs.c
-> > index 430e00b16eec..14bf156b3f1b 100644
-> > --- a/drivers/gpu/drm/drm_sysfs.c
-> > +++ b/drivers/gpu/drm/drm_sysfs.c
-> > @@ -90,7 +90,7 @@ static void drm_sysfs_acpi_register(void) { }
-> >  static void drm_sysfs_acpi_unregister(void) { }
-> >  #endif
-> >
-> > -static char *drm_devnode(struct device *dev, umode_t *mode)
-> > +static char *drm_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       return kasprintf(GFP_KERNEL, "dri/%s", dev_name(dev));
-> >  }
-> > diff --git a/drivers/infiniband/core/user_mad.c b/drivers/infiniband/co=
-re/user_mad.c
-> > index 98cb594cd9a6..f83954180a33 100644
-> > --- a/drivers/infiniband/core/user_mad.c
-> > +++ b/drivers/infiniband/core/user_mad.c
-> > @@ -1224,7 +1224,7 @@ static struct attribute *umad_class_dev_attrs[] =
-=3D {
-> >  };
-> >  ATTRIBUTE_GROUPS(umad_class_dev);
-> >
-> > -static char *umad_devnode(struct device *dev, umode_t *mode)
-> > +static char *umad_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       return kasprintf(GFP_KERNEL, "infiniband/%s", dev_name(dev));
-> >  }
-> > diff --git a/drivers/infiniband/core/uverbs_main.c b/drivers/infiniband=
-/core/uverbs_main.c
-> > index d54434088727..bdb179a09d77 100644
-> > --- a/drivers/infiniband/core/uverbs_main.c
-> > +++ b/drivers/infiniband/core/uverbs_main.c
-> > @@ -1237,7 +1237,7 @@ static void ib_uverbs_remove_one(struct ib_device=
- *device, void *client_data)
-> >       put_device(&uverbs_dev->dev);
-> >  }
-> >
-> > -static char *uverbs_devnode(struct device *dev, umode_t *mode)
-> > +static char *uverbs_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       if (mode)
-> >               *mode =3D 0666;
-> > diff --git a/drivers/infiniband/hw/hfi1/device.c b/drivers/infiniband/h=
-w/hfi1/device.c
-> > index 8ceff7141baf..1f4496032170 100644
-> > --- a/drivers/infiniband/hw/hfi1/device.c
-> > +++ b/drivers/infiniband/hw/hfi1/device.c
-> > @@ -72,7 +72,7 @@ const char *class_name(void)
-> >       return hfi1_class_name;
-> >  }
-> >
-> > -static char *hfi1_devnode(struct device *dev, umode_t *mode)
-> > +static char *hfi1_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       if (mode)
-> >               *mode =3D 0600;
-> > @@ -85,7 +85,7 @@ static const char *class_name_user(void)
-> >       return hfi1_class_name_user;
-> >  }
-> >
-> > -static char *hfi1_user_devnode(struct device *dev, umode_t *mode)
-> > +static char *hfi1_user_devnode(const struct device *dev, umode_t *mode=
-)
-> >  {
-> >       if (mode)
-> >               *mode =3D 0666;
-> > diff --git a/drivers/input/input.c b/drivers/input/input.c
-> > index ebb2b7f0f8ff..50597165dc54 100644
-> > --- a/drivers/input/input.c
-> > +++ b/drivers/input/input.c
-> > @@ -1913,7 +1913,7 @@ static const struct device_type input_dev_type =
-=3D {
-> >  #endif
-> >  };
-> >
-> > -static char *input_devnode(struct device *dev, umode_t *mode)
-> > +static char *input_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       return kasprintf(GFP_KERNEL, "input/%s", dev_name(dev));
-> >  }
-> > diff --git a/drivers/media/dvb-core/dvbdev.c b/drivers/media/dvb-core/d=
-vbdev.c
-> > index 6ef18bab9648..e73f5240cc2c 100644
-> > --- a/drivers/media/dvb-core/dvbdev.c
-> > +++ b/drivers/media/dvb-core/dvbdev.c
-> > @@ -1018,9 +1018,9 @@ static int dvb_uevent(const struct device *dev, s=
-truct kobj_uevent_env *env)
-> >       return 0;
-> >  }
-> >
-> > -static char *dvb_devnode(struct device *dev, umode_t *mode)
-> > +static char *dvb_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> > -     struct dvb_device *dvbdev =3D dev_get_drvdata(dev);
-> > +     const struct dvb_device *dvbdev =3D dev_get_drvdata(dev);
-> >
-> >       return kasprintf(GFP_KERNEL, "dvb/adapter%d/%s%d",
-> >               dvbdev->adapter->num, dnames[dvbdev->type], dvbdev->id);
-> > diff --git a/drivers/media/pci/ddbridge/ddbridge-core.c b/drivers/media=
-/pci/ddbridge/ddbridge-core.c
-> > index fe833f39698a..ee8087f29b2c 100644
-> > --- a/drivers/media/pci/ddbridge/ddbridge-core.c
-> > +++ b/drivers/media/pci/ddbridge/ddbridge-core.c
-> > @@ -2716,9 +2716,9 @@ static const struct file_operations ddb_fops =3D =
-{
-> >       .release        =3D ddb_release,
-> >  };
-> >
-> > -static char *ddb_devnode(struct device *device, umode_t *mode)
-> > +static char *ddb_devnode(const struct device *device, umode_t *mode)
-> >  {
-> > -     struct ddb *dev =3D dev_get_drvdata(device);
-> > +     const struct ddb *dev =3D dev_get_drvdata(device);
-> >
-> >       return kasprintf(GFP_KERNEL, "ddbridge/card%d", dev->nr);
-> >  }
-> > diff --git a/drivers/media/rc/rc-main.c b/drivers/media/rc/rc-main.c
-> > index eba0cd30e314..527d9324742b 100644
-> > --- a/drivers/media/rc/rc-main.c
-> > +++ b/drivers/media/rc/rc-main.c
-> > @@ -1017,7 +1017,7 @@ static void ir_close(struct input_dev *idev)
-> >  }
-> >
-> >  /* class for /sys/class/rc */
-> > -static char *rc_devnode(struct device *dev, umode_t *mode)
-> > +static char *rc_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       return kasprintf(GFP_KERNEL, "rc/%s", dev_name(dev));
-> >  }
-> > diff --git a/drivers/misc/genwqe/card_base.c b/drivers/misc/genwqe/card=
-_base.c
-> > index 693981891870..0f00687f72d4 100644
-> > --- a/drivers/misc/genwqe/card_base.c
-> > +++ b/drivers/misc/genwqe/card_base.c
-> > @@ -1349,7 +1349,7 @@ static struct pci_driver genwqe_driver =3D {
-> >   * Default mode should be rw for everybody. Do not change default
-> >   * device name.
-> >   */
-> > -static char *genwqe_devnode(struct device *dev, umode_t *mode)
-> > +static char *genwqe_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       if (mode)
-> >               *mode =3D 0666;
-> > diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-> > index de06c3c2ff70..aad8171f6c21 100644
-> > --- a/drivers/tty/tty_io.c
-> > +++ b/drivers/tty/tty_io.c
-> > @@ -3494,7 +3494,7 @@ void tty_default_fops(struct file_operations *fop=
-s)
-> >       *fops =3D tty_fops;
-> >  }
-> >
-> > -static char *tty_devnode(struct device *dev, umode_t *mode)
-> > +static char *tty_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       if (!mode)
-> >               return NULL;
-> > diff --git a/drivers/usb/core/file.c b/drivers/usb/core/file.c
-> > index 558890ada0e5..da7d88e069e6 100644
-> > --- a/drivers/usb/core/file.c
-> > +++ b/drivers/usb/core/file.c
-> > @@ -62,7 +62,7 @@ static struct usb_class {
-> >       struct class *class;
-> >  } *usb_class;
-> >
-> > -static char *usb_devnode(struct device *dev, umode_t *mode)
-> > +static char *usb_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       struct usb_class_driver *drv;
-> >
-> > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_use=
-r/vduse_dev.c
-> > index 35dceee3ed56..0dd3c1f291da 100644
-> > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> > @@ -1656,7 +1656,7 @@ static const struct file_operations vduse_ctrl_fo=
-ps =3D {
-> >       .llseek         =3D noop_llseek,
-> >  };
-> >
-> > -static char *vduse_devnode(struct device *dev, umode_t *mode)
-> > +static char *vduse_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       return kasprintf(GFP_KERNEL, "vduse/%s", dev_name(dev));
-> >  }
-> > diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> > index 6e8804fe0095..5bf4b3454918 100644
-> > --- a/drivers/vfio/vfio_main.c
-> > +++ b/drivers/vfio/vfio_main.c
-> > @@ -1812,7 +1812,7 @@ EXPORT_SYMBOL(vfio_set_irqs_validate_and_prepare)=
-;
-> >  /*
-> >   * Module/class support
-> >   */
-> > -static char *vfio_devnode(struct device *dev, umode_t *mode)
-> > +static char *vfio_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       return kasprintf(GFP_KERNEL, "vfio/%s", dev_name(dev));
-> >  }
-> > diff --git a/fs/pstore/pmsg.c b/fs/pstore/pmsg.c
-> > index d8542ec2f38c..b31c9c72d90b 100644
-> > --- a/fs/pstore/pmsg.c
-> > +++ b/fs/pstore/pmsg.c
-> > @@ -46,7 +46,7 @@ static int pmsg_major;
-> >  #undef pr_fmt
-> >  #define pr_fmt(fmt) PMSG_NAME ": " fmt
-> >
-> > -static char *pmsg_devnode(struct device *dev, umode_t *mode)
-> > +static char *pmsg_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       if (mode)
-> >               *mode =3D 0220;
-> > diff --git a/include/linux/device/class.h b/include/linux/device/class.=
-h
-> > index 94b1107258e5..42cc3fb44a84 100644
-> > --- a/include/linux/device/class.h
-> > +++ b/include/linux/device/class.h
-> > @@ -60,7 +60,7 @@ struct class {
-> >       struct kobject                  *dev_kobj;
-> >
-> >       int (*dev_uevent)(const struct device *dev, struct kobj_uevent_en=
-v *env);
-> > -     char *(*devnode)(struct device *dev, umode_t *mode);
-> > +     char *(*devnode)(const struct device *dev, umode_t *mode);
-> >
-> >       void (*class_release)(struct class *class);
-> >       void (*dev_release)(struct device *dev);
-> > diff --git a/sound/sound_core.c b/sound/sound_core.c
-> > index 3332fe321737..3e7dd6fcb7cf 100644
-> > --- a/sound/sound_core.c
-> > +++ b/sound/sound_core.c
-> > @@ -30,7 +30,7 @@ MODULE_DESCRIPTION("Core sound module");
-> >  MODULE_AUTHOR("Alan Cox");
-> >  MODULE_LICENSE("GPL");
-> >
-> > -static char *sound_devnode(struct device *dev, umode_t *mode)
-> > +static char *sound_devnode(const struct device *dev, umode_t *mode)
-> >  {
-> >       if (MAJOR(dev->devt) =3D=3D SOUND_MAJOR)
-> >               return NULL;
+We are getting to the point where we should start posting the iommufd
+dirty tracking stuff. Do you have time to work on it for the next
+cycle? Meaning get it largely sorted out in the next 3 weeks for review?
 
+> > void iova_bitmap_set(struct iova_bitmap *bitmap,
+> > 		     unsigned long iova, size_t length)
+> > {
+> > 	struct iova_bitmap_map *mapped = &bitmap->mapped;
+> > 	unsigned cur_bit =
+> > 		((iova - mapped->iova) >> mapped->pgshift) + mapped->pgoff * 8;
+> > 	unsigned long last_bit =
+> > 		(((iova + length - 1) - mapped->iova) >> mapped->pgshift) +
+> > 		mapped->pgoff * 8;
+> > 
+> > 	do {
+> > 		unsigned int page_idx = cur_bit / BITS_PER_PAGE;
+> > 		unsigned int nbits =
+> > 			min(BITS_PER_PAGE - cur_bit, last_bit - cur_bit + 1);
 
+min(BITS_PER_PAGE - (cur_bit % BITS_PER_PAGE), ...)
 
---=20
-Thanks and regards,
+> Not sure if the vfio tree is a rebasing tree (or not?) and can just send a new
+> version, 
 
-Sumit Semwal (he / him)
-Tech Lead - LCG, Vertical Technologies
-Linaro.org =E2=94=82 Open source software for ARM SoCs
+It isn't, you should just post a new patch on top of Alex's current
+tree "rework iova_bitmap_et to handle all page crossings" and along
+the way revert the first bit
+
+Jason
