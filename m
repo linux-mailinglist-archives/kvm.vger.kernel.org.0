@@ -2,117 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 479F9638A5C
-	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 13:42:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 46A1A638AA2
+	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 13:58:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230166AbiKYMmP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Nov 2022 07:42:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42178 "EHLO
+        id S229548AbiKYM6k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Nov 2022 07:58:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230105AbiKYMmO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Nov 2022 07:42:14 -0500
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F7091086
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 04:42:12 -0800 (PST)
-Received: by mail-qk1-x735.google.com with SMTP id p18so2559672qkg.2
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 04:42:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AXnQVTJbjL0K8bweNYfJIDhmo5mKhRKv6UCn43ckNoA=;
-        b=hFA5mhB4gYkZ6dvymO+yCPpHJr4wYTRpVwdug8QvW7UnFNDL6rM0WQidk6U/8qnTmS
-         rui6AG08HaVf6nQmnTnBdlEE9Z1O0PNZ5Zf4hPjr7y7FUZbubqO+E1MYLLblaUSPcf+u
-         WgAZKKDew/hQed/WOMYr/z57cAUZ7E7xyousQrLXF5xvNJTBeIl6pqcNeGz3aI2GAfms
-         uyXHDGwBFg9vDswitm+ryD8XHSdIWIfsOJS+h7VsGtYRKk+x38imYZVeiOsQgZ6Rggyh
-         EmU5kc3SXe4hExSA0Pcs1Eu4bdDXbeKHwoR91q37q0Xbl1gqIVgOrmv9BA8rOAc6DDl4
-         H+eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AXnQVTJbjL0K8bweNYfJIDhmo5mKhRKv6UCn43ckNoA=;
-        b=3bUpnr6I7/TJSZpLAW1vNCrf4gIVTgCg6j1q8TK1m+ID18DHq+k94Ph62paxtVOEjn
-         T3q23G0log1ggB9GMpmAhc4jF3pq5KsNVvi76dKsLdPI7Shhi6cl+WKiccuUpl9FaoNI
-         0JIXH2M2TdfVx2NDljJnZIFRIihCbV4k/A02tmYkPlFKv/nAZU18DPPPMmHGx8C8QBxr
-         zn4KtbEAUbx/T/0efQRuaHfo384Q5V219DkGhCbtc4SCkfKCtQ2f87HSYnI8jgf/QwOS
-         y8GehM//7B62VgmKOjVCGASYSx6L0CpXiZ+txk8hkyZrDp/qvc6myytcfbV4a4ud2Gjq
-         aNPw==
-X-Gm-Message-State: ANoB5plAxb6BI8QIUnP1CLZReHvP07s6f9AmEA2N/IfD77cIWd7bWNFA
-        R3s56wcIbFa9Sbm3rNRjAdixcQ==
-X-Google-Smtp-Source: AA0mqf7H2Z6S0Nl+QLspuujn/xhlSfOTbB1s2HR1GB3WNdjaKzOBGpuvEhnFpKyZCppyd1c8z5EM2w==
-X-Received: by 2002:ae9:f404:0:b0:6fa:22a2:6d80 with SMTP id y4-20020ae9f404000000b006fa22a26d80mr32718830qkl.210.1669380131577;
-        Fri, 25 Nov 2022 04:42:11 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
-        by smtp.gmail.com with ESMTPSA id l4-20020ac84a84000000b003a57a317c17sm2162966qtq.74.2022.11.25.04.42.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Nov 2022 04:42:10 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1oyY1x-00DRrF-O5;
-        Fri, 25 Nov 2022 08:42:09 -0400
-Date:   Fri, 25 Nov 2022 08:42:09 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Avihai Horon <avihaih@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH v1 2/2] vfio/iova_bitmap: Fix PAGE_SIZE unaligned bitmaps
-Message-ID: <Y4C4ITz7oCFBmjWi@ziepe.ca>
-References: <20221025193114.58695-1-joao.m.martins@oracle.com>
- <20221025193114.58695-3-joao.m.martins@oracle.com>
- <Y3+1/a25zcxNT3He@ziepe.ca>
- <8914ef49-aad4-1461-1176-6d46190d5cd8@oracle.com>
+        with ESMTP id S229463AbiKYM6i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Nov 2022 07:58:38 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7D127903;
+        Fri, 25 Nov 2022 04:58:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669381117; x=1700917117;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xP1nfhyQ8FOkPUPmd5LvYYecrF3SJgmtl4GzeuHjbw8=;
+  b=K7rmQtJ+UFh8Oq49zTHoeazt5MgGdXhwM3ss1q1fhbTq0Eus9RBIIzF7
+   iEDC/RkRz/jB+ytnad6Q7Rdq+csKrrCphO5m5Ij+FhU9QX/oiBk0UWB3g
+   1FI1MYAvEOV2VCxRz1pV8bEmcDvBW2m/TrPNhAKGK88rDCdZFbCBHAPfv
+   83LFerGesxLEmfCFVVtNGpQPOerVLFVdxZW+BsI3UGw7a/z1FYyYMyL13
+   Tq365YB1lSB4hM4U4IteDNixWDv2D57ij13XWqP7wb7oLH29VJDeuMzfQ
+   E3hJEg1U95c1D6zCZ4EseEdo3pfQlDSWGUmC5ukl05JK/DMLB1CYp/Lg/
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10541"; a="314513166"
+X-IronPort-AV: E=Sophos;i="5.96,193,1665471600"; 
+   d="scan'208";a="314513166"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2022 04:58:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10541"; a="706061194"
+X-IronPort-AV: E=Sophos;i="5.96,193,1665471600"; 
+   d="scan'208";a="706061194"
+Received: from jiaxichen-precision-3650-tower.sh.intel.com ([10.239.159.75])
+  by fmsmga008.fm.intel.com with ESMTP; 25 Nov 2022 04:58:32 -0800
+From:   Jiaxi Chen <jiaxi.chen@linux.intel.com>
+To:     kvm@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, ndesaulniers@google.com,
+        alexandre.belloni@bootlin.com, peterz@infradead.org,
+        jpoimboe@kernel.org, chang.seok.bae@intel.com,
+        pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
+        jmattson@google.com, sandipan.das@amd.com, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
+        keescook@chromium.org, nathan@kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v5 0/8] x86: KVM: Advertise CPUID of new Intel platform instructions to user space
+Date:   Fri, 25 Nov 2022 20:58:37 +0800
+Message-Id: <20221125125845.1182922-1-jiaxi.chen@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8914ef49-aad4-1461-1176-6d46190d5cd8@oracle.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 25, 2022 at 10:37:39AM +0000, Joao Martins wrote:
+Latest Intel platform Granite Rapids/Sierra Forest has introduced below
+new instructions and CPUIDs:
 
-> > Yes, when we move this to iommufd the test suite should be included,
-> > either as integrated using the mock domain and the selftests or
-> > otherwise.
->
-> So in iommufd counterpart I have already tests which exercise this. But not as
-> extensive.
+ - CMPccXADD CPUID.(EAX=7,ECX=1):EAX[bit 7]
+ - AMX-FP16 CPUID.(EAX=7,ECX=1):EAX[bit 21]
+ - AVX-IFMA CPUID.(EAX=7,ECX=1):EAX[bit 23]
+ - AVX-VNNI-INT8 CPUID.(EAX=7,ECX=1):EDX[bit 4]
+ - AVX-NE-CONVERT CPUID.(EAX=7,ECX=1):EDX[bit 5]
+ - PREFETCHITI CPUID.(EAX=7,ECX=1):EDX[bit 14]
 
-We are getting to the point where we should start posting the iommufd
-dirty tracking stuff. Do you have time to work on it for the next
-cycle? Meaning get it largely sorted out in the next 3 weeks for review?
+Details can be found in recent Intel ISE (Instruction Set
+Extensions)[1].
 
-> > void iova_bitmap_set(struct iova_bitmap *bitmap,
-> > 		     unsigned long iova, size_t length)
-> > {
-> > 	struct iova_bitmap_map *mapped = &bitmap->mapped;
-> > 	unsigned cur_bit =
-> > 		((iova - mapped->iova) >> mapped->pgshift) + mapped->pgoff * 8;
-> > 	unsigned long last_bit =
-> > 		(((iova + length - 1) - mapped->iova) >> mapped->pgshift) +
-> > 		mapped->pgoff * 8;
-> > 
-> > 	do {
-> > 		unsigned int page_idx = cur_bit / BITS_PER_PAGE;
-> > 		unsigned int nbits =
-> > 			min(BITS_PER_PAGE - cur_bit, last_bit - cur_bit + 1);
+These features bits are on two CPUID leafs: CPUID_7_1_EAX and
+CPUID_7_1_EDX. CPUID_7_1_EAX is an expected-dense leaf and some of its
+bits have kernel usages, therefore give bits on this leaf an X86_FEATURE
+definition in kernel. However, CPUID_7_1_EDX is dense and none of its
+bits have truly kernel usages for the moment. Given that, move
+CPUID_7_1_EDX to be a KVM-only leaf and plus an x86_FEATURE definition
+for bits on this leaf to direct them to the KVM entry.
 
-min(BITS_PER_PAGE - (cur_bit % BITS_PER_PAGE), ...)
+This patch series advertises KVM support of these CPUIDs to host
+userspace. For all of these features, there are no new VMX controls or
+additional host enabling required for guests to use them.
 
-> Not sure if the vfio tree is a rebasing tree (or not?) and can just send a new
-> version, 
+[1] Intel ISE: https://cdrdv2.intel.com/v1/dl/getContent/671368
 
-It isn't, you should just post a new patch on top of Alex's current
-tree "rework iova_bitmap_et to handle all page crossings" and along
-the way revert the first bit
+v5:
+ - Modify some inaccurate descriptions in the changelogs.
+ - Address some naming-confusing problems for adding KVM-only leaves,
+   including renaming function and adding comments. 
 
-Jason
+v4:
+https://lore.kernel.org/kvm/20221118141509.489359-1-jiaxi.chen@linux.intel.com/
+ - Put CPUID_7_1_EAX back to cpuid_leaf[], considering more bits will be
+   defined in the future for this leaf.
+
+v3:
+https://lore.kernel.org/kvm/20221110015252.202566-1-jiaxi.chen@linux.intel.com/
+ - Remain CPUID_8000_001F_EAX in the last leaf of cpuid_leaf[]
+ - Replace CPUID_7_1_EAX with CPUID_LNX_5, waiting for future new CPUIDs
+
+v2:
+https://lore.kernel.org/kvm/20221103025030.78371-1-jiaxi.chen@linux.intel.com/
+ - Remove vague descriptions in the changelogs, including pronouns and
+   "this patch" kind of things.
+ - Move the two CPUIDs of cpuid_leaf[12] CPUID_7_1_EAX to KVM-only
+   subleaves.
+ - Replace cpuid_leaf[12] CPUID_7_1_EAX with the last leaf
+   CPUID_8000_001F_EAX to shorten array length.
+ - Change the newly-added CPUID leaf [CPUID_7_1_EDX] in v1 into KVM-only
+   subleaves. 
+ 
+v1:
+https://lore.kernel.org/kvm/20221019084734.3590760-1-jiaxi.chen@linux.intel.com/
+
+Chang S. Bae (1):
+  x86: KVM: Advertise AMX-FP16 CPUID to user space
+
+Jiaxi Chen (5):
+  x86: KVM: Advertise CMPccXADD CPUID to user space
+  x86: KVM: Advertise AVX-IFMA CPUID to user space
+  KVM: x86: Advertise AVX-VNNI-INT8 CPUID to user space
+  KVM: x86: Advertise AVX-NE-CONVERT CPUID to user space
+  KVM: x86: Advertise PREFETCHIT0/1 CPUID to user space
+
+Sean Christopherson (2):
+  KVM: x86: Add BUILD_BUG_ON() to detect bad usage of "scattered" flags
+  KVM: x86: Update KVM-only leaf handling to allow for 100% KVM-only
+    leafs
+
+ arch/x86/include/asm/cpufeatures.h |  3 +++
+ arch/x86/kvm/cpuid.c               | 25 ++++++++++++++++++-------
+ arch/x86/kvm/reverse_cpuid.h       | 25 ++++++++++++++++++++++---
+ 3 files changed, 43 insertions(+), 10 deletions(-)
+
+
+base-commit: 094226ad94f471a9f19e8f8e7140a09c2625abaa
+-- 
+2.27.0
+
