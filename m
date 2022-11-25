@@ -2,555 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C12D638935
-	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 12:55:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2B5F6389DC
+	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 13:34:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230021AbiKYLzx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Nov 2022 06:55:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52658 "EHLO
+        id S229970AbiKYMec (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Nov 2022 07:34:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbiKYLzv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Nov 2022 06:55:51 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 775322EF30;
-        Fri, 25 Nov 2022 03:55:49 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D69FFB82A88;
-        Fri, 25 Nov 2022 11:55:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 479F7C433C1;
-        Fri, 25 Nov 2022 11:55:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669377346;
-        bh=1w7DlFxD3WCX2blZmMM059sDBEdCeLcVaS46TaDQB2k=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=h3uPBlKcpDiYp9ziolAxWVZdUguFj5hvAwv74KIXFQy6vksbPTdUmi8viJGNuP5wm
-         LcjzdwO7traA0ZjPUDk1wvjh9j3H/M91Ck6g6IAbLUbaTjAblkZPQztsppsCx/HX+n
-         ndVblE0PSz9rHBQw3ou59l8thvFk8P/o7yamtjmA3EDfpwMtvK1AV7a541iG/wnVUg
-         PMpgkuv7zSQZVQAN07VsH3zeWiBeoO2wPbRrAL3L35DbSunM9X5JUNxLW3hvJKypKj
-         kNO4K/jWzEyNouVUP2uCnDdv97ImxYhNg+K4JCF3vBLYVa2/RbWK4KqKAGdnEFsJnK
-         pPcLXwb1y+4EQ==
-Date:   Fri, 25 Nov 2022 11:55:29 +0000
-From:   Mauro Carvalho Chehab <mchehab@kernel.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-kernel@vger.kernel.org, Fenghua Yu <fenghua.yu@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        Jens Axboe <axboe@kernel.dk>,
-        Justin Sanders <justin@coraid.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-        Liam Mark <lmark@codeaurora.org>,
-        Laura Abbott <labbott@redhat.com>,
-        Brian Starkey <Brian.Starkey@arm.com>,
-        John Stultz <jstultz@google.com>,
-        Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Sean Young <sean@mess.org>,
-        Frank Haverkamp <haver@linux.ibm.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Anton Vorontsov <anton@enomsg.org>,
-        Colin Cross <ccross@android.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>,
-        Hans Verkuil <hverkuil-cisco@xs4all.nl>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Gautam Dawar <gautam.dawar@xilinx.com>,
-        Dan Carpenter <error27@gmail.com>, Eli Cohen <elic@nvidia.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Maxime Coquelin <maxime.coquelin@redhat.com>,
-        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
-        kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-        linux-block@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH 2/5] driver core: make struct class.devnode() take a
- const *
-Message-ID: <20221125115529.05af1513@sal.lan>
-In-Reply-To: <20221123122523.1332370-2-gregkh@linuxfoundation.org>
-References: <20221123122523.1332370-1-gregkh@linuxfoundation.org>
-        <20221123122523.1332370-2-gregkh@linuxfoundation.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S229949AbiKYMe3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Nov 2022 07:34:29 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EC331ADBD;
+        Fri, 25 Nov 2022 04:34:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=sFT+GfO1F5bItAMLrXRbZRq8y+SnQhmcuiZ5NiJSBPY=; b=VsGqIls27azE9N+s+Aqru6zp99
+        ujG5wfDJ12MGYXvxxXu+ZzduwCOpIYx9nR3+IFlknbxGhHmCfwajNV3PYIzQ23KscGGP8DInq/FSI
+        a3fx2R7sABRIw8Gv2aZfrUqghnJNG0ZM75kPKUV9+QUvLtJ/V2bbaPy+ca5MrGQ572yqpW7wo8onN
+        s64x6O6GpLIlytN32cxTlVJI5EjIH50uoCqe2+ptTZul7qR1f+ghKqaJajQhGcQ5c4yoimuUJsLTt
+        ThBqia7YmGAoLOl8vKthhe8IoiP5f7CVD2pZhA7ChietEEcMt8TllkxkUpRhRv39knjV7WfNvPjRv
+        kCEzEa7g==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oyXuW-009ZlC-D6; Fri, 25 Nov 2022 12:34:28 +0000
+Message-ID: <a3a13c21817d75f64dedaed8c658ddd7636ce50a.camel@infradead.org>
+Subject: Re: [PATCH v2 1/1] KVM: x86/xen: add support for 32-bit guests in
+ SCHEDOP_poll
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     "Kaya, Metin" <metikaya@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "Durrant, Paul" <pdurrant@amazon.co.uk>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>
+Date:   Fri, 25 Nov 2022 12:34:21 +0000
+In-Reply-To: <7a19d6c2c86ffd09ecd86ea00375ef48302b7084.camel@infradead.org>
+References: <1647881191688.60603@amazon.com>
+         ,<1647882914508.15309@amazon.com> <1647883644964.29736@amazon.com>
+         <7a19d6c2c86ffd09ecd86ea00375ef48302b7084.camel@infradead.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-s9HhKLkZpWABJ5cdIO4S"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Em Wed, 23 Nov 2022 13:25:20 +0100
-Greg Kroah-Hartman <gregkh@linuxfoundation.org> escreveu:
 
-> The devnode() in struct class should not be modifying the device that is
-> passed into it, so mark it as a const * and propagate the function
-> signature changes out into all relevant subsystems that use this
-> callback.
+--=-s9HhKLkZpWABJ5cdIO4S
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Mauro Carvalho Chehab <mchehab@kernel.org>
->=20
-> Cc: Fenghua Yu <fenghua.yu@intel.com>
-> Cc: Reinette Chatre <reinette.chatre@intel.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> Cc: x86@kernel.org
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Justin Sanders <justin@coraid.com>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Sumit Semwal <sumit.semwal@linaro.org>
-> Cc: Benjamin Gaignard <benjamin.gaignard@collabora.com>
-> Cc: Liam Mark <lmark@codeaurora.org>
-> Cc: Laura Abbott <labbott@redhat.com>
-> Cc: Brian Starkey <Brian.Starkey@arm.com>
-> Cc: John Stultz <jstultz@google.com>
-> Cc: "Christian K=C3=B6nig" <christian.koenig@amd.com>
-> Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-> Cc: Maxime Ripard <mripard@kernel.org>
-> Cc: Thomas Zimmermann <tzimmermann@suse.de>
-> Cc: David Airlie <airlied@gmail.com>
-> Cc: Daniel Vetter <daniel@ffwll.ch>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Leon Romanovsky <leon@kernel.org>
-> Cc: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>
-> Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> Cc: Sean Young <sean@mess.org>
-> Cc: Frank Haverkamp <haver@linux.ibm.com>
-> Cc: Jiri Slaby <jirislaby@kernel.org>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Anton Vorontsov <anton@enomsg.org>
-> Cc: Colin Cross <ccross@android.com>
-> Cc: Tony Luck <tony.luck@intel.com>
-> Cc: Jaroslav Kysela <perex@perex.cz>
-> Cc: Takashi Iwai <tiwai@suse.com>
-> Cc: Hans Verkuil <hverkuil-cisco@xs4all.nl>
-> Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> Cc: Xie Yongji <xieyongji@bytedance.com>
-> Cc: Gautam Dawar <gautam.dawar@xilinx.com>
-> Cc: Dan Carpenter <error27@gmail.com>
-> Cc: Eli Cohen <elic@nvidia.com>
-> Cc: Parav Pandit <parav@nvidia.com>
-> Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
-> Cc: alsa-devel@alsa-project.org
-> Cc: dri-devel@lists.freedesktop.org
-> Cc: kvm@vger.kernel.org
-> Cc: linaro-mm-sig@lists.linaro.org
-> Cc: linux-block@vger.kernel.org
-> Cc: linux-input@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-media@vger.kernel.org
-> Cc: linux-rdma@vger.kernel.org
-> Cc: linux-scsi@vger.kernel.org
-> Cc: linux-usb@vger.kernel.org
-> Cc: virtualization@lists.linux-foundation.org
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> ---
->  arch/x86/kernel/cpu/resctrl/pseudo_lock.c  | 4 ++--
->  arch/x86/kernel/cpuid.c                    | 2 +-
->  arch/x86/kernel/msr.c                      | 2 +-
->  block/bsg.c                                | 2 +-
->  drivers/block/aoe/aoechr.c                 | 2 +-
->  drivers/char/mem.c                         | 2 +-
->  drivers/char/misc.c                        | 4 ++--
->  drivers/dma-buf/dma-heap.c                 | 2 +-
->  drivers/gpu/drm/drm_sysfs.c                | 2 +-
->  drivers/infiniband/core/user_mad.c         | 2 +-
->  drivers/infiniband/core/uverbs_main.c      | 2 +-
->  drivers/infiniband/hw/hfi1/device.c        | 4 ++--
->  drivers/input/input.c                      | 2 +-
->  drivers/media/dvb-core/dvbdev.c            | 4 ++--
->  drivers/media/pci/ddbridge/ddbridge-core.c | 4 ++--
->  drivers/media/rc/rc-main.c                 | 2 +-
->  drivers/misc/genwqe/card_base.c            | 2 +-
->  drivers/tty/tty_io.c                       | 2 +-
->  drivers/usb/core/file.c                    | 2 +-
->  drivers/vdpa/vdpa_user/vduse_dev.c         | 2 +-
->  drivers/vfio/vfio_main.c                   | 2 +-
->  fs/pstore/pmsg.c                           | 2 +-
->  include/linux/device/class.h               | 2 +-
->  sound/sound_core.c                         | 2 +-
->  24 files changed, 29 insertions(+), 29 deletions(-)
->=20
-> diff --git a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c b/arch/x86/kernel/=
-cpu/resctrl/pseudo_lock.c
-> index d961ae3ed96e..4e4231a58f38 100644
-> --- a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
-> +++ b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
-> @@ -1560,9 +1560,9 @@ static const struct file_operations pseudo_lock_dev=
-_fops =3D {
->  	.mmap =3D		pseudo_lock_dev_mmap,
->  };
-> =20
-> -static char *pseudo_lock_devnode(struct device *dev, umode_t *mode)
-> +static char *pseudo_lock_devnode(const struct device *dev, umode_t *mode)
->  {
-> -	struct rdtgroup *rdtgrp;
-> +	const struct rdtgroup *rdtgrp;
-> =20
->  	rdtgrp =3D dev_get_drvdata(dev);
->  	if (mode)
-> diff --git a/arch/x86/kernel/cpuid.c b/arch/x86/kernel/cpuid.c
-> index 6f7b8cc1bc9f..621ba9c0f17a 100644
-> --- a/arch/x86/kernel/cpuid.c
-> +++ b/arch/x86/kernel/cpuid.c
-> @@ -139,7 +139,7 @@ static int cpuid_device_destroy(unsigned int cpu)
->  	return 0;
->  }
-> =20
-> -static char *cpuid_devnode(struct device *dev, umode_t *mode)
-> +static char *cpuid_devnode(const struct device *dev, umode_t *mode)
->  {
->  	return kasprintf(GFP_KERNEL, "cpu/%u/cpuid", MINOR(dev->devt));
->  }
-> diff --git a/arch/x86/kernel/msr.c b/arch/x86/kernel/msr.c
-> index ed8ac6bcbafb..708751311786 100644
-> --- a/arch/x86/kernel/msr.c
-> +++ b/arch/x86/kernel/msr.c
-> @@ -250,7 +250,7 @@ static int msr_device_destroy(unsigned int cpu)
->  	return 0;
->  }
-> =20
-> -static char *msr_devnode(struct device *dev, umode_t *mode)
-> +static char *msr_devnode(const struct device *dev, umode_t *mode)
->  {
->  	return kasprintf(GFP_KERNEL, "cpu/%u/msr", MINOR(dev->devt));
->  }
-> diff --git a/block/bsg.c b/block/bsg.c
-> index 2ab1351eb082..08046bd9207d 100644
-> --- a/block/bsg.c
-> +++ b/block/bsg.c
-> @@ -232,7 +232,7 @@ struct bsg_device *bsg_register_queue(struct request_=
-queue *q,
->  }
->  EXPORT_SYMBOL_GPL(bsg_register_queue);
-> =20
-> -static char *bsg_devnode(struct device *dev, umode_t *mode)
-> +static char *bsg_devnode(const struct device *dev, umode_t *mode)
->  {
->  	return kasprintf(GFP_KERNEL, "bsg/%s", dev_name(dev));
->  }
-> diff --git a/drivers/block/aoe/aoechr.c b/drivers/block/aoe/aoechr.c
-> index 8eea2529da20..7a368c90467d 100644
-> --- a/drivers/block/aoe/aoechr.c
-> +++ b/drivers/block/aoe/aoechr.c
-> @@ -273,7 +273,7 @@ static const struct file_operations aoe_fops =3D {
->  	.llseek =3D noop_llseek,
->  };
-> =20
-> -static char *aoe_devnode(struct device *dev, umode_t *mode)
-> +static char *aoe_devnode(const struct device *dev, umode_t *mode)
->  {
->  	return kasprintf(GFP_KERNEL, "etherd/%s", dev_name(dev));
->  }
-> diff --git a/drivers/char/mem.c b/drivers/char/mem.c
-> index 5611d127363e..83bf2a4dcb57 100644
-> --- a/drivers/char/mem.c
-> +++ b/drivers/char/mem.c
-> @@ -746,7 +746,7 @@ static const struct file_operations memory_fops =3D {
->  	.llseek =3D noop_llseek,
->  };
-> =20
-> -static char *mem_devnode(struct device *dev, umode_t *mode)
-> +static char *mem_devnode(const struct device *dev, umode_t *mode)
->  {
->  	if (mode && devlist[MINOR(dev->devt)].mode)
->  		*mode =3D devlist[MINOR(dev->devt)].mode;
-> diff --git a/drivers/char/misc.c b/drivers/char/misc.c
-> index cba19bfdc44d..88c6995b9a3d 100644
-> --- a/drivers/char/misc.c
-> +++ b/drivers/char/misc.c
-> @@ -254,9 +254,9 @@ void misc_deregister(struct miscdevice *misc)
->  }
->  EXPORT_SYMBOL(misc_deregister);
-> =20
-> -static char *misc_devnode(struct device *dev, umode_t *mode)
-> +static char *misc_devnode(const struct device *dev, umode_t *mode)
->  {
-> -	struct miscdevice *c =3D dev_get_drvdata(dev);
-> +	const struct miscdevice *c =3D dev_get_drvdata(dev);
-> =20
->  	if (mode && c->mode)
->  		*mode =3D c->mode;
-> diff --git a/drivers/dma-buf/dma-heap.c b/drivers/dma-buf/dma-heap.c
-> index 8f5848aa144f..4d7150791315 100644
-> --- a/drivers/dma-buf/dma-heap.c
-> +++ b/drivers/dma-buf/dma-heap.c
-> @@ -299,7 +299,7 @@ struct dma_heap *dma_heap_add(const struct dma_heap_e=
-xport_info *exp_info)
->  	return err_ret;
->  }
-> =20
-> -static char *dma_heap_devnode(struct device *dev, umode_t *mode)
-> +static char *dma_heap_devnode(const struct device *dev, umode_t *mode)
->  {
->  	return kasprintf(GFP_KERNEL, "dma_heap/%s", dev_name(dev));
->  }
-> diff --git a/drivers/gpu/drm/drm_sysfs.c b/drivers/gpu/drm/drm_sysfs.c
-> index 430e00b16eec..14bf156b3f1b 100644
-> --- a/drivers/gpu/drm/drm_sysfs.c
-> +++ b/drivers/gpu/drm/drm_sysfs.c
-> @@ -90,7 +90,7 @@ static void drm_sysfs_acpi_register(void) { }
->  static void drm_sysfs_acpi_unregister(void) { }
->  #endif
-> =20
-> -static char *drm_devnode(struct device *dev, umode_t *mode)
-> +static char *drm_devnode(const struct device *dev, umode_t *mode)
->  {
->  	return kasprintf(GFP_KERNEL, "dri/%s", dev_name(dev));
->  }
-> diff --git a/drivers/infiniband/core/user_mad.c b/drivers/infiniband/core=
-/user_mad.c
-> index 98cb594cd9a6..f83954180a33 100644
-> --- a/drivers/infiniband/core/user_mad.c
-> +++ b/drivers/infiniband/core/user_mad.c
-> @@ -1224,7 +1224,7 @@ static struct attribute *umad_class_dev_attrs[] =3D=
- {
->  };
->  ATTRIBUTE_GROUPS(umad_class_dev);
-> =20
-> -static char *umad_devnode(struct device *dev, umode_t *mode)
-> +static char *umad_devnode(const struct device *dev, umode_t *mode)
->  {
->  	return kasprintf(GFP_KERNEL, "infiniband/%s", dev_name(dev));
->  }
-> diff --git a/drivers/infiniband/core/uverbs_main.c b/drivers/infiniband/c=
-ore/uverbs_main.c
-> index d54434088727..bdb179a09d77 100644
-> --- a/drivers/infiniband/core/uverbs_main.c
-> +++ b/drivers/infiniband/core/uverbs_main.c
-> @@ -1237,7 +1237,7 @@ static void ib_uverbs_remove_one(struct ib_device *=
-device, void *client_data)
->  	put_device(&uverbs_dev->dev);
->  }
-> =20
-> -static char *uverbs_devnode(struct device *dev, umode_t *mode)
-> +static char *uverbs_devnode(const struct device *dev, umode_t *mode)
->  {
->  	if (mode)
->  		*mode =3D 0666;
-> diff --git a/drivers/infiniband/hw/hfi1/device.c b/drivers/infiniband/hw/=
-hfi1/device.c
-> index 8ceff7141baf..1f4496032170 100644
-> --- a/drivers/infiniband/hw/hfi1/device.c
-> +++ b/drivers/infiniband/hw/hfi1/device.c
-> @@ -72,7 +72,7 @@ const char *class_name(void)
->  	return hfi1_class_name;
->  }
-> =20
-> -static char *hfi1_devnode(struct device *dev, umode_t *mode)
-> +static char *hfi1_devnode(const struct device *dev, umode_t *mode)
->  {
->  	if (mode)
->  		*mode =3D 0600;
-> @@ -85,7 +85,7 @@ static const char *class_name_user(void)
->  	return hfi1_class_name_user;
->  }
-> =20
-> -static char *hfi1_user_devnode(struct device *dev, umode_t *mode)
-> +static char *hfi1_user_devnode(const struct device *dev, umode_t *mode)
->  {
->  	if (mode)
->  		*mode =3D 0666;
-> diff --git a/drivers/input/input.c b/drivers/input/input.c
-> index ebb2b7f0f8ff..50597165dc54 100644
-> --- a/drivers/input/input.c
-> +++ b/drivers/input/input.c
-> @@ -1913,7 +1913,7 @@ static const struct device_type input_dev_type =3D {
->  #endif
->  };
-> =20
-> -static char *input_devnode(struct device *dev, umode_t *mode)
-> +static char *input_devnode(const struct device *dev, umode_t *mode)
->  {
->  	return kasprintf(GFP_KERNEL, "input/%s", dev_name(dev));
->  }
-> diff --git a/drivers/media/dvb-core/dvbdev.c b/drivers/media/dvb-core/dvb=
-dev.c
-> index 6ef18bab9648..e73f5240cc2c 100644
-> --- a/drivers/media/dvb-core/dvbdev.c
-> +++ b/drivers/media/dvb-core/dvbdev.c
-> @@ -1018,9 +1018,9 @@ static int dvb_uevent(const struct device *dev, str=
-uct kobj_uevent_env *env)
->  	return 0;
->  }
-> =20
-> -static char *dvb_devnode(struct device *dev, umode_t *mode)
-> +static char *dvb_devnode(const struct device *dev, umode_t *mode)
->  {
-> -	struct dvb_device *dvbdev =3D dev_get_drvdata(dev);
-> +	const struct dvb_device *dvbdev =3D dev_get_drvdata(dev);
-> =20
->  	return kasprintf(GFP_KERNEL, "dvb/adapter%d/%s%d",
->  		dvbdev->adapter->num, dnames[dvbdev->type], dvbdev->id);
-> diff --git a/drivers/media/pci/ddbridge/ddbridge-core.c b/drivers/media/p=
-ci/ddbridge/ddbridge-core.c
-> index fe833f39698a..ee8087f29b2c 100644
-> --- a/drivers/media/pci/ddbridge/ddbridge-core.c
-> +++ b/drivers/media/pci/ddbridge/ddbridge-core.c
-> @@ -2716,9 +2716,9 @@ static const struct file_operations ddb_fops =3D {
->  	.release        =3D ddb_release,
->  };
-> =20
-> -static char *ddb_devnode(struct device *device, umode_t *mode)
-> +static char *ddb_devnode(const struct device *device, umode_t *mode)
->  {
-> -	struct ddb *dev =3D dev_get_drvdata(device);
-> +	const struct ddb *dev =3D dev_get_drvdata(device);
-> =20
->  	return kasprintf(GFP_KERNEL, "ddbridge/card%d", dev->nr);
->  }
-> diff --git a/drivers/media/rc/rc-main.c b/drivers/media/rc/rc-main.c
-> index eba0cd30e314..527d9324742b 100644
-> --- a/drivers/media/rc/rc-main.c
-> +++ b/drivers/media/rc/rc-main.c
-> @@ -1017,7 +1017,7 @@ static void ir_close(struct input_dev *idev)
->  }
-> =20
->  /* class for /sys/class/rc */
-> -static char *rc_devnode(struct device *dev, umode_t *mode)
-> +static char *rc_devnode(const struct device *dev, umode_t *mode)
->  {
->  	return kasprintf(GFP_KERNEL, "rc/%s", dev_name(dev));
->  }
-> diff --git a/drivers/misc/genwqe/card_base.c b/drivers/misc/genwqe/card_b=
-ase.c
-> index 693981891870..0f00687f72d4 100644
-> --- a/drivers/misc/genwqe/card_base.c
-> +++ b/drivers/misc/genwqe/card_base.c
-> @@ -1349,7 +1349,7 @@ static struct pci_driver genwqe_driver =3D {
->   * Default mode should be rw for everybody. Do not change default
->   * device name.
->   */
-> -static char *genwqe_devnode(struct device *dev, umode_t *mode)
-> +static char *genwqe_devnode(const struct device *dev, umode_t *mode)
->  {
->  	if (mode)
->  		*mode =3D 0666;
-> diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-> index de06c3c2ff70..aad8171f6c21 100644
-> --- a/drivers/tty/tty_io.c
-> +++ b/drivers/tty/tty_io.c
-> @@ -3494,7 +3494,7 @@ void tty_default_fops(struct file_operations *fops)
->  	*fops =3D tty_fops;
->  }
-> =20
-> -static char *tty_devnode(struct device *dev, umode_t *mode)
-> +static char *tty_devnode(const struct device *dev, umode_t *mode)
->  {
->  	if (!mode)
->  		return NULL;
-> diff --git a/drivers/usb/core/file.c b/drivers/usb/core/file.c
-> index 558890ada0e5..da7d88e069e6 100644
-> --- a/drivers/usb/core/file.c
-> +++ b/drivers/usb/core/file.c
-> @@ -62,7 +62,7 @@ static struct usb_class {
->  	struct class *class;
->  } *usb_class;
-> =20
-> -static char *usb_devnode(struct device *dev, umode_t *mode)
-> +static char *usb_devnode(const struct device *dev, umode_t *mode)
->  {
->  	struct usb_class_driver *drv;
-> =20
-> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/=
-vduse_dev.c
-> index 35dceee3ed56..0dd3c1f291da 100644
-> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> @@ -1656,7 +1656,7 @@ static const struct file_operations vduse_ctrl_fops=
- =3D {
->  	.llseek		=3D noop_llseek,
->  };
-> =20
-> -static char *vduse_devnode(struct device *dev, umode_t *mode)
-> +static char *vduse_devnode(const struct device *dev, umode_t *mode)
->  {
->  	return kasprintf(GFP_KERNEL, "vduse/%s", dev_name(dev));
->  }
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 6e8804fe0095..5bf4b3454918 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -1812,7 +1812,7 @@ EXPORT_SYMBOL(vfio_set_irqs_validate_and_prepare);
->  /*
->   * Module/class support
->   */
-> -static char *vfio_devnode(struct device *dev, umode_t *mode)
-> +static char *vfio_devnode(const struct device *dev, umode_t *mode)
->  {
->  	return kasprintf(GFP_KERNEL, "vfio/%s", dev_name(dev));
->  }
-> diff --git a/fs/pstore/pmsg.c b/fs/pstore/pmsg.c
-> index d8542ec2f38c..b31c9c72d90b 100644
-> --- a/fs/pstore/pmsg.c
-> +++ b/fs/pstore/pmsg.c
-> @@ -46,7 +46,7 @@ static int pmsg_major;
->  #undef pr_fmt
->  #define pr_fmt(fmt) PMSG_NAME ": " fmt
-> =20
-> -static char *pmsg_devnode(struct device *dev, umode_t *mode)
-> +static char *pmsg_devnode(const struct device *dev, umode_t *mode)
->  {
->  	if (mode)
->  		*mode =3D 0220;
-> diff --git a/include/linux/device/class.h b/include/linux/device/class.h
-> index 94b1107258e5..42cc3fb44a84 100644
-> --- a/include/linux/device/class.h
-> +++ b/include/linux/device/class.h
-> @@ -60,7 +60,7 @@ struct class {
->  	struct kobject			*dev_kobj;
-> =20
->  	int (*dev_uevent)(const struct device *dev, struct kobj_uevent_env *env=
-);
-> -	char *(*devnode)(struct device *dev, umode_t *mode);
-> +	char *(*devnode)(const struct device *dev, umode_t *mode);
-> =20
->  	void (*class_release)(struct class *class);
->  	void (*dev_release)(struct device *dev);
-> diff --git a/sound/sound_core.c b/sound/sound_core.c
-> index 3332fe321737..3e7dd6fcb7cf 100644
-> --- a/sound/sound_core.c
-> +++ b/sound/sound_core.c
-> @@ -30,7 +30,7 @@ MODULE_DESCRIPTION("Core sound module");
->  MODULE_AUTHOR("Alan Cox");
->  MODULE_LICENSE("GPL");
-> =20
-> -static char *sound_devnode(struct device *dev, umode_t *mode)
-> +static char *sound_devnode(const struct device *dev, umode_t *mode)
->  {
->  	if (MAJOR(dev->devt) =3D=3D SOUND_MAJOR)
->  		return NULL;
+On Thu, 2022-11-24 at 00:33 +0000, David Woodhouse wrote:
+> Could do with a test case. It's fairly simple to flip the 'longmode'
+> config even when the guest is actually in 64-bit mode, so it should be
+> fairly easy to add this in the xen_shinfo_test.
+
+Hm, not so. This doesn't depend on the 'longmode' flag; that's only for
+the structs in shared memory. For an actual hypercall, the compat
+behaviour depends more sensibly on the actual CPU mode in which the
+hypercall was made.
+
+I'm not sure I see how to use 32-bit guest mode from the KVM self
+tests. Even KVM_HC_SEND_IPI doesn't seem to have a 32-bit test... or a
+positive test at all, in fact. All we seem to do is test that it
+returns -ENOSYS when *disabled*.
+
+
+--=-s9HhKLkZpWABJ5cdIO4S
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTI1MTIzNDIxWjAvBgkqhkiG9w0BCQQxIgQg7kyH1FUv
++ZAKnhX4AaC0T3/StWLdKq8byMbcHpeJ3Y0wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBhVThBylh1aL9RZdS28qQynTWmTn/mGa9A
+K4D9LiUbCORH8U+iI+iRPNyfG3jOqCAT4ngkpG0V2B8vwbM7tnLQ++Z4fyEb1FtgJi6Aees76nix
+8du6srnegf8S35sgluG/DFEu8rTAD6obREw1ICfO+LLlqlXah9Z/6QW5RRRj0v4i+gdMprA/KhcR
+pUoKsUyDskvMW0PIZ5HXdQxe5Kr261M/P4crlnx9AuqZh+ZxRlrMsc2AtliGHJm/8uCHv4gpKCky
+n3+pxzG6JpBD+H4fh/0h6ZXdOmKIRPsk2rRtLPz/9Dq9lg3/uvH82YajxxWBNXZH07wZZB/a0cNt
+lJJ9NydQExzxvRv1lhVApwH0hQvUkG9kqyPmHlMQXkypcjV+G7VzACtADq32lpWKKspUHz9ZFaK5
+yaS5DpiHdE+mTvBQj/F8az6lDVnNVIsIBgl1bfTIP0n+pRzmoXAtookN/BwbVImGrloh4POUoDrd
+c4ROIGTuTGgh/kK3KlrG+Z6cC5iql1DEj1QUAOlirwCCHr2MVhGLSppdk0MHaP67J8kdMK2HX5Kp
+hH0cJtazUlZC4+IJlYiutcMg51QIK68TztfYLtH4/NHbIbF7ZFW87s/61mCE8sDyDJvH/LyXcuKq
+/VTc3jwVQjIhz7j2by45akNftiqxQiiwIUcnBDiclgAAAAAAAA==
+
+
+--=-s9HhKLkZpWABJ5cdIO4S--
+
