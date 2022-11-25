@@ -2,164 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B6DBB638A41
-	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 13:38:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E49FE638A5E
+	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 13:43:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230148AbiKYMiH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Nov 2022 07:38:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33620 "EHLO
+        id S229788AbiKYMnF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Nov 2022 07:43:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230344AbiKYMhm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Nov 2022 07:37:42 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2076.outbound.protection.outlook.com [40.107.244.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D8794F18B
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 04:37:12 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NYb0jwa5LKhthNEtsECqKPfm2t+Cp4vEOWWA+MTMm91D7SGW540+R6NF5Q8/kxfLfCbRyQfDkQFqhh1WSXf/c6+CUgR51dd8OVUS9/Qxo8GNOysaSjUrZ5GnBsrpQulu/aNghvpH4hSxlfnXnjIkfgFYwsj5uF4YTHfOPRsNNqyCEvt2PhKE73kHBJBaOLtVL388iNMagiIrKxtqK0211xUF0zQ98AhGKgvrww9NHWdh40MGk/0cSw1IWKiWPSmYoxPgUNYZ4g1ySrtwK2RNYaEu7FqeODOfnsiycQT5Tix1JPX/aoD8g4F4bvIlLtxT8ta87w1rlOcL8t0orYCPUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xizMNSwZPZqgerFFQeE2Mb/LDkHYt+b4sl3MDemoAyQ=;
- b=Agj6w1JN+giS0mgcmUKXgZygmbAbewuRmXWSpa+Cji1UAmGBPvI6zqZupBVI5x+8J45C2PS8hxiH0jPEJF03Hy6g6q76sDFtDE4LN/t/oV25rVQYItQ5fteJTmsMWRlheSCJJPjaSOGAbUHcZi72jm1yVzJbtpa4kgCYpxV0SD/XInXTCG1h7WMbi7autrtoqTYLUnphUTzbBtXrSkgIBufMZp5vm7V/jBvduUlFxzNtj13eMUPaSqk+lhl13u0Th/wSZzsZWvDJadM3IFZHvD+KHlAlFmvWa7Yg1GS9P686Zilbq49bMY4zFhdSt3mfv0O62sErlSR3bN+KqDbdPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xizMNSwZPZqgerFFQeE2Mb/LDkHYt+b4sl3MDemoAyQ=;
- b=hzUbTk/wTto67bjXEhOE6hY8rMSaN22WU2lAROO13DDfbCG94xSEa7jkMOcRcydIDraMKN4BnWv4MeJU4kP0lNObH2WW0bwUJBBQyfsxlnUvSdjgdL95yH8xEz4PpahCPAEggcUOngkE3UEgnDts63rSGGH9n/IsG3ruZnAmxUn7gWXUAqvmoG9PcKsY6imxVv8dn49jlU56d+V03Ls9VtjBv3Cu0dcvG/le55z/pJk00N2ai2sQnKitqyzWXEg4bK0zcd74hQFglNANNl3WsR8xcdwDMJXJJZiTHg0Y4P7abMZzACcMXup0uGX44wlualya87Z97gQu08J5typihA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS0PR12MB7629.namprd12.prod.outlook.com (2603:10b6:8:13e::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.19; Fri, 25 Nov
- 2022 12:37:07 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5834.015; Fri, 25 Nov 2022
- 12:37:07 +0000
-Date:   Fri, 25 Nov 2022 08:37:06 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, kevin.tian@intel.com,
-        eric.auger@redhat.com, cohuck@redhat.com, nicolinc@nvidia.com,
-        yi.y.sun@linux.intel.com, chao.p.peng@linux.intel.com,
-        mjrosato@linux.ibm.com, kvm@vger.kernel.org
-Subject: Re: [RFC v2 08/11] vfio: Refactor vfio_device_first_open() and
- _last_close()
-Message-ID: <Y4C28lraaKU1v8NE@nvidia.com>
-References: <20221124122702.26507-1-yi.l.liu@intel.com>
- <20221124122702.26507-9-yi.l.liu@intel.com>
- <Y3+GHbf4EkvyqukE@nvidia.com>
- <955100c9-970a-71a0-8b80-c24d7dbb35f2@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <955100c9-970a-71a0-8b80-c24d7dbb35f2@intel.com>
-X-ClientProxiedBy: MN2PR19CA0019.namprd19.prod.outlook.com
- (2603:10b6:208:178::32) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229657AbiKYMnD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Nov 2022 07:43:03 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DFE21AD82;
+        Fri, 25 Nov 2022 04:43:01 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2APBRNgC018753;
+        Fri, 25 Nov 2022 12:43:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=hMrJCLxRNG0jiaX9N7pTPXY/37kSTvQDSsFgyPGtUXU=;
+ b=pPdot0R/tBhHtjICiaOyWh6RiDN88z2nDJyOPoq58Tihc1OlsWQ92XDwxOVHdwqNKIIN
+ HVgxBDwHVE0g/IzRwF715eBvMeVWVuYBqhfCwOb2mGBXhB8gB/6uoZdXjgiFyMUxHL36
+ YdDV7hKNK9leRVrYnX1UmIxZhXRLbSpDu+yLAdUC4Nxpn6oe47r2B/+vFjM44jttDAMH
+ Vj/EMgbO5lAnZvGUpiuZziGJ0U5y23aexMvSK9kv++v0ORJ9TEkOpsIFa8p+gUOWLYob
+ 6h16WTTdaZzNdn6siSFKm80wg8xIj/bj0gTOK5eCyCB5yQ9YQfNmKnEexOwlMUA1Chvg tQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m2vum1jus-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Nov 2022 12:43:01 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2APBlsOo027781;
+        Fri, 25 Nov 2022 12:43:00 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m2vum1ju0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Nov 2022 12:43:00 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2APCZcHP016123;
+        Fri, 25 Nov 2022 12:42:59 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 3kxps91jxs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Nov 2022 12:42:58 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2APCgtOZ34472646
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Nov 2022 12:42:55 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D416F4C044;
+        Fri, 25 Nov 2022 12:42:55 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7175B4C04E;
+        Fri, 25 Nov 2022 12:42:55 +0000 (GMT)
+Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.ibm.com.com (unknown [9.171.63.115])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 25 Nov 2022 12:42:55 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
+Subject: [GIT PULL 00/15] KVM: s390: Updates for 6.2
+Date:   Fri, 25 Nov 2022 13:39:32 +0100
+Message-Id: <20221125123947.31047-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.38.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: sukBRkqv7d0-nY3NhL0cYmqJngvSyq6Y
+X-Proofpoint-GUID: V22A4_DQ5pHXPFYcemVTOieFLXaKHowe
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS0PR12MB7629:EE_
-X-MS-Office365-Filtering-Correlation-Id: e018babc-72dd-498c-2a96-08dacee1c3c7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: q7eRu36mqqW26oEAbRw1EM4Ra1K1TaK5HVl/gvJLX6wNjZfNA8gAP+A0EAHPc1yeGr+VkUjkBrjkzsYykYJe7VQmUfeRy26zqW1lISijnhO8DvQoyqRfoELQaBpPw+i4VtklqpB0CsiJcZhi/Ss3+l3GyW9AgRLqV4Yevk6oTeKxH9Vb/5uM0Amrov/vQeE2WY7WWES3TqQjhZVSQLlAibaIz2BuAuUmV/CGub1mgeLAGoTUciAioS+06RJRdaWT35DB55gP9mBtCqC6OoWjTCVY7y83we9YflhDkeN20eXUh5kKnST/RW3OOCkaKABnz9IexNMAdatYO5pBmPBX+m6pV64aC47C9ZBWxxRGQanczHUrkpm6ArdXfeP/q6OKrq53m6cCMQWoOFBJo9P6PPkeW2MS1w/eTo/wywhlLp/x2Un7R+ujFZZjH+mMRWgBYDUafwFjKc5F7+ZjJjByn6lXD8RTF2bho902iGdw20JrqOTZF/wmWNcu4ouMu/Wz652RvxdHZ5/9VrpP/03fZO06TVE2SEpcojGOXP+vzkeDow8cNbi7UPNXlyct1DaGX1V0yymo3d9+Q5g0bbZrZxCiZyVNQPvOIAX5umW4eVnDC57Tf31k3KZILGtHzey3WIxoObBNEaw6RgEi8jXSsQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(346002)(39860400002)(376002)(366004)(451199015)(5660300002)(2906002)(66946007)(83380400001)(36756003)(66556008)(8676002)(4326008)(66476007)(86362001)(316002)(6916009)(41300700001)(8936002)(6486002)(478600001)(26005)(6506007)(6512007)(2616005)(186003)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9tSqx4/+VFen0xWKWXjPvV0fqCQmFrxSe3mMyEMpLbVlzHEeq8PH/cY8isur?=
- =?us-ascii?Q?jGxw635kelWcoVQThFVkg+Sn6Pq/lr5NYvk9jFSN+khRFzKXySv+FBud3Clq?=
- =?us-ascii?Q?IiVj2MEw6X/n88eYWqMtDyHVZOIK7y4dv4F0ZjjpafvBvu9xO49js58BG8ph?=
- =?us-ascii?Q?KO6I6zab2+1o34PF8LJnBXyKmoPr58a7wnPn1CVGoOytey6VWz6AWOaGB3WP?=
- =?us-ascii?Q?9mNAs6hVQRnd5ft+1kRqE+i+l87StWvZ8x1WBD3ZuPBeV58aG5WGEXS4qB28?=
- =?us-ascii?Q?RFizOAlKD7p/vbIIRId2hSBDBPxMr5qcvFt3d95esN2vTOltJLDJ9mFEyG4U?=
- =?us-ascii?Q?Ykjcga8tIv56yDiDLTvrMy3gV5clbTFI0ZnEuHBmCbze4BNWTl0lzqIuvoGU?=
- =?us-ascii?Q?edtnYZiwXSi4jOhunxSOzQSirnMCgoMU7fKVX56SG7JBEkIvSa4EuSWsG/xY?=
- =?us-ascii?Q?YdBbeKmrnUgeKXPVmcksJodms9DfypRZSV4tlHp0CoVTa66WTAjtwqD/q2q4?=
- =?us-ascii?Q?tR6VMGu4EqbhWENtWrmukoWgX98Cmw0fn0gHs2fFUifgA/TyyHMP7WlAJvht?=
- =?us-ascii?Q?7dx8AvKofLaT9212ydSqWTrIjo+fXBRerJ/Ml1sfGwZ8VWYcmNnIlbyHvYXj?=
- =?us-ascii?Q?xIAQXTb7BDOCH/e4A0RvfxPHfxPFUwcvJKRW3FpXxHNdo5MxVHajZ626FP/B?=
- =?us-ascii?Q?O2qkVr2S2Mjt08Zi23s3rpU91B052k2drKBts33mZWuOfo7cNoFEmfeenmtr?=
- =?us-ascii?Q?iEBXkxaXgA+ST3OtO6H0zndpcfI6xDdkJWWYZ7R8HeOMXMDXGz995dsHdLrM?=
- =?us-ascii?Q?7rfwV2xCSrZwC4au+QEmFpIPoyeqtJ2St0xmfT4TBS+oV4lTODiegV+9FDwW?=
- =?us-ascii?Q?MoN6HTJ+5DrLYIoHsbg9TN+SlxrpwIqM4nx5fYjkRvguKamUwOFo9XY2Zp5e?=
- =?us-ascii?Q?Li+AOOX7+HHPbHKGiYpNARrfIVxwJ2lk7Pp7yZynCf5mef4dv4Dyaq0iEc7U?=
- =?us-ascii?Q?joVorKbAFb/FVXD34mzqHbiRvfznBtVWJSlXYPK3kH+Ny1Gbhy2r0Fl/Mf2R?=
- =?us-ascii?Q?ITkkiNqnh8+bydG4zsjaU1wiEd2VerpS1K+pW0VLDlIGcIT5bKna/3ktg5hZ?=
- =?us-ascii?Q?BhSixrkxhsRhydLkcdVZYS9EBsMzJ4w0BW20SYdUJOaVUXCW+Mgo3mone06q?=
- =?us-ascii?Q?MSd7ib8sNBfmA5Tx9IeTvCszvqoeyJ3gWZhZWNNUUb3+gly8bhTS1fR2L5vw?=
- =?us-ascii?Q?sNMT51lA3DbHT1+6sDudTPTsZQ5CPIWcetHogsLwAjVjX+tSOt/h2l3k5B8E?=
- =?us-ascii?Q?FmTYJpIhBoakZjND2Hktbt0vJKb/hakwmGXyif1SAfLyhHA2qccz7EjOGlY5?=
- =?us-ascii?Q?326MJCYJvvB2ZE3dRYU7bboqD17lli0Vu187X9+AWKFDU+8Xh+9cQPyEHREL?=
- =?us-ascii?Q?t5AYKzzmGDZ4VdTNJNaJklnDnQ7uDwkvcPAK4tta7LLJfY6yxKumLpXUpWqd?=
- =?us-ascii?Q?9VoGilcW4vp/GB0dC7edxeJrnaL++gG53/Lj47mpmjXDgetSpQ4+1NP6QqlF?=
- =?us-ascii?Q?teDliAhinLsDVB0kCgU=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e018babc-72dd-498c-2a96-08dacee1c3c7
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2022 12:37:07.5507
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eYI/kAPcB4gNKz5EQNKec73f3uN/Cs9LQ33KC/BQwxm/VtU/i2cvL48xII827+2P
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7629
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-25_04,2022-11-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ adultscore=0 priorityscore=1501 lowpriorityscore=0 bulkscore=0
+ mlxlogscore=999 spamscore=0 impostorscore=0 clxscore=1015 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211250098
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 25, 2022 at 04:57:27PM +0800, Yi Liu wrote:
+please pull the following changes for 6.2:
+- Second batch of the lazy destroy patches
+- First batch of KVM changes for kernel virtual != physical address support
+- Removal of a unused function
 
-> > +static int vfio_device_group_open(struct vfio_device *device)
-> > +{
-> > +	int ret;
-> > +
-> > +	mutex_lock(&device->group->group_lock);
-> 
-> now the group path holds group_lock first, and then device_set->lock.
-> this is different with existing code. is it acceptable? I had a quick
-> check with this change, basic test is good. no a-b-b-a locking issue.
+Notice:
+There was a merge conflict in next with the kvm arm tree because of
+capability numbers.
 
-I looked for a while and couldn't find a reason why it wouldn't be OK
- 
-> > +	if (!vfio_group_has_iommu(device->group)) {
-> > +		ret = -EINVAL;
-> > +		goto out_unlock;
-> > +	}
-> > +
-> > +	/*
-> > +	 * Here we pass the KVM pointer with the group under the lock.  If the
-> > +	 * device driver will use it, it must obtain a reference and release it
-> > +	 * during close_device.
-> > +	 */
-> > +	ret = vfio_device_open(device, device->group->iommufd,
-> > +			       device->group->kvm);
-> > +
-> > +out_unlock:
-> > +	mutex_unlock(&device->group->group_lock);
-> > +	return ret;
-> > +}
-> > +
-> > +void vfio_device_close_group(struct vfio_device *device)
-> > +{
-> > +	mutex_lock(&device->group->group_lock);
-> > +	vfio_device_close(device, device->group->iommufd);
-> > +	mutex_unlock(&device->group->group_lock);
-> > +}
-> > +
-> 
-> above two functions should be put in group.c.
+Please only pull the tag, there's a vfio-ap patch on top that
+Christian needs for getting debug data only which shouldn't go
+upstream.
 
-Yes
+The following changes since commit 247f34f7b80357943234f93f247a1ae6b6c3a740:
 
-Jason
+  Linux 6.1-rc2 (2022-10-23 15:27:33 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-next-6.2-1
+
+for you to fetch changes up to 99b63f55dc514a357c2ecf25e9aab149879329f0:
+
+  KVM: s390: remove unused gisa_clear_ipm_gisc() function (2022-11-23 09:06:50 +0000)
+
+----------------------------------------------------------------
+
+Claudio Imbrenda (6):
+  KVM: s390: pv: asynchronous destroy for reboot
+  KVM: s390: pv: api documentation for asynchronous destroy
+  KVM: s390: pv: add KVM_CAP_S390_PROTECTED_ASYNC_DISABLE
+  KVM: s390: pv: avoid export before import if possible
+  KVM: s390: pv: support for Destroy fast UVC
+  KVM: s390: pv: module parameter to fence asynchronous destroy
+
+Heiko Carstens (1):
+  KVM: s390: remove unused gisa_clear_ipm_gisc() function
+
+Nico Boehr (8):
+  s390/mm: gmap: sort out physical vs virtual pointers usage
+  s390/entry: sort out physical vs virtual pointers usage in sie64a
+  KVM: s390: sort out physical vs virtual pointers usage
+  KVM: s390: sida: sort out physical vs virtual pointers usage
+  KVM: s390: pv: sort out physical vs virtual pointers usage
+  KVM: s390: VSIE: sort out virtual/physical address in pin_guest_page
+  s390/mm: fix virtual-physical address confusion for swiotlb
+  s390/vfio-ap: GISA: sort out physical vs virtual pointers usage
+
+ Documentation/virt/kvm/api.rst      |  41 +++-
+ arch/s390/include/asm/kvm_host.h    |  14 +-
+ arch/s390/include/asm/mem_encrypt.h |   4 +-
+ arch/s390/include/asm/stacktrace.h  |   1 +
+ arch/s390/include/asm/uv.h          |  10 +
+ arch/s390/kernel/asm-offsets.c      |   1 +
+ arch/s390/kernel/entry.S            |  26 +-
+ arch/s390/kernel/uv.c               |   7 +
+ arch/s390/kvm/intercept.c           |   9 +-
+ arch/s390/kvm/interrupt.c           |   5 -
+ arch/s390/kvm/kvm-s390.c            | 111 ++++++---
+ arch/s390/kvm/kvm-s390.h            |   8 +-
+ arch/s390/kvm/priv.c                |   3 +-
+ arch/s390/kvm/pv.c                  | 359 ++++++++++++++++++++++++++--
+ arch/s390/kvm/vsie.c                |   4 +-
+ arch/s390/mm/gmap.c                 | 147 ++++++------
+ arch/s390/mm/init.c                 |  12 +-
+ drivers/s390/crypto/vfio_ap_ops.c   |   2 +-
+ include/uapi/linux/kvm.h            |   3 +
+ 19 files changed, 604 insertions(+), 163 deletions(-)
+
+-- 
+2.38.1
+
