@@ -2,167 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E63F8638D0A
-	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 16:07:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60B57638F0B
+	for <lists+kvm@lfdr.de>; Fri, 25 Nov 2022 18:30:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230226AbiKYPHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Nov 2022 10:07:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59586 "EHLO
+        id S229489AbiKYRaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Nov 2022 12:30:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230271AbiKYPHM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Nov 2022 10:07:12 -0500
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF4FB31DC6
-        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 07:07:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669388830; x=1700924830;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=L7+kRJxim+tXndxTiW57BfxqYjmCXRG7PwELl1gNbb4=;
-  b=bu4W9MtPzisblU0b3H98lrzU/xo4ZLslvXRRTMyjUPtkJJU1zkSGAgty
-   xTgu3ZX5Hlmzeor13n7e+0kZJdkNofIpPJsmBBh28jfZjeZB9QX4yA121
-   mrNZFlPy1PKgLLxhtWcv3FY8pLAIjMXV7MIJssGnCZPNFK1eWsKDtUN3j
-   X7sGobQHmciP2CEPWrb3bovUo5Y+C3UOQLWZPlEmo1iXqZ/4rw42qxQiq
-   y6Xj2lbv8rHikxjOT0ez0D+bAekb7nXNZtrkIS/TnrEHziAY9a9vYayVy
-   ApWSK6K+gnB2yjXG3UEfVcJoy6OTrhwVV7yoHd5J4DhT9O90QpgvhJRKm
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10542"; a="294881077"
-X-IronPort-AV: E=Sophos;i="5.96,193,1665471600"; 
-   d="scan'208";a="294881077"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2022 07:06:53 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10542"; a="593240306"
-X-IronPort-AV: E=Sophos;i="5.96,193,1665471600"; 
-   d="scan'208";a="593240306"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.73])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2022 07:06:51 -0800
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     jasowang@redhat.com, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        hang.yuan@intel.com, piotr.uminski@intel.com,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V2 12/12] vDPA/ifcvf: implement features provisioning
-Date:   Fri, 25 Nov 2022 22:57:24 +0800
-Message-Id: <20221125145724.1129962-13-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221125145724.1129962-1-lingshan.zhu@intel.com>
-References: <20221125145724.1129962-1-lingshan.zhu@intel.com>
+        with ESMTP id S229450AbiKYRaP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Nov 2022 12:30:15 -0500
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4296840479
+        for <kvm@vger.kernel.org>; Fri, 25 Nov 2022 09:30:13 -0800 (PST)
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2APHHDeI020312;
+        Fri, 25 Nov 2022 17:30:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2022-7-12; bh=13ooEBS/q7rDoITIiPrgqzWzFgBdCjXVx3YHaEDbqEg=;
+ b=Upif6r7ml+rgvwozftp294rFHZ1j3GNsnC+znpqu18c92B2mFwasRIlt+tCJ42uR5yUr
+ s4sm1mpWZJxv35mnEDJLfU108P6SlpAasYC3Ug+d/dTMHC8c517wmRLBwE7I3y6eGBVV
+ XI+pVwM2wBSu+ARm5hcfeRKzOLHtl1+dlmlq+XOsUb6hFv3e8jf/VSYqVKFdhUcEFz3s
+ rUwik2RQsH8bZ6Q1GO61QxlWXhAz0p5fVNOy2MZnK0nHcIh9xRYsTB+ouxHkHV/yFiAv
+ ZSNv8AIZT3rRAt6bvF2V7UCIIxmdmuHmavZJDAURcNrxj+k0OYMq0XQ/fVCcop2Nkhzu SQ== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3m1nd8d5fa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Nov 2022 17:30:09 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2APF0tPG011252;
+        Fri, 25 Nov 2022 17:30:09 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3kxnkghn9j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Nov 2022 17:30:09 +0000
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2APHU80p006230;
+        Fri, 25 Nov 2022 17:30:08 GMT
+Received: from joaomart-mac.uk.oracle.com (dhcp-10-175-172-130.vpn.oracle.com [10.175.172.130])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3kxnkghn3w-1;
+        Fri, 25 Nov 2022 17:30:08 +0000
+From:   Joao Martins <joao.m.martins@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Avihai Horon <avihaih@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+Subject: [PATCH] vfio/iova_bitmap: refactor iova_bitmap_set() to better handle page boundaries
+Date:   Fri, 25 Nov 2022 17:29:56 +0000
+Message-Id: <20221125172956.19975-1-joao.m.martins@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-25_09,2022-11-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0
+ mlxlogscore=999 malwarescore=0 spamscore=0 mlxscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211250136
+X-Proofpoint-GUID: eSx3PBd5ZEhslA_VrMv_2LXRRBwmqIWq
+X-Proofpoint-ORIG-GUID: eSx3PBd5ZEhslA_VrMv_2LXRRBwmqIWq
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit implements features provisioning for ifcvf, that means:
-1)checkk whether the provisioned features are supported by
-the management device
-2)vDPA device only presents selected feature bits
+Commit f38044e5ef58 ("vfio/iova_bitmap: Fix PAGE_SIZE unaligned bitmaps")
+had fixed the unaligned bitmaps by capping the remaining iterable set at
+the start of the bitmap. Although, that mistakenly worked around
+iova_bitmap_set() incorrectly setting bits across page boundary.
 
-Examples:
-a)The management device supported features:
-$ vdpa mgmtdev show pci/0000:01:00.5
-pci/0000:01:00.5:
-  supported_classes net
-  max_supported_vqs 9
-  dev_features MTU MAC MRG_RXBUF CTRL_VQ MQ ANY_LAYOUT VERSION_1 ACCESS_PLATFORM
+Fix this by reworking the loop inside iova_bitmap_set() to iterate over a
+range of bits to set (cur_bit .. last_bit) which may span different pinned
+pages, thus updating @page_idx and @offset as it sets the bits. The
+previous cap to the first page is now adjusted to be always accounted
+rather than when there's only a non-zero pgoff.
 
-b)Provision a vDPA device with all supported features:
-$ vdpa dev add name vdpa0 mgmtdev pci/0000:01:00.5
-$ vdpa/vdpa dev config show vdpa0
-vdpa0: mac 00:e8:ca:11:be:05 link up link_announce false max_vq_pairs 4 mtu 1500
-  negotiated_features MRG_RXBUF CTRL_VQ MQ VERSION_1 ACCESS_PLATFORM
+While at it, make @page_idx , @offset and @nbits to be unsigned int given
+that it won't be more than 512 and 4096 respectively (even a bigger
+PAGE_SIZE or a smaller struct page size won't make this bigger than the
+above 32-bit max). Also, delete the stale kdoc on Return type.
 
-c)Provision a vDPA device with a subset of the supported features:
-$ vdpa dev add name vdpa0 mgmtdev pci/0000:01:00.5 device_features 0x300020020
-$ vdpa dev config show vdpa0
-mac 00:e8:ca:11:be:05 link up link_announce false
-  negotiated_features CTRL_VQ VERSION_1 ACCESS_PLATFORM
-
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+Cc: Avihai Horon <avihaih@nvidia.com>
+Co-developed-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
 ---
- drivers/vdpa/ifcvf/ifcvf_base.c |  2 +-
- drivers/vdpa/ifcvf/ifcvf_base.h |  3 +++
- drivers/vdpa/ifcvf/ifcvf_main.c | 13 +++++++++++++
- 3 files changed, 17 insertions(+), 1 deletion(-)
+It passes my tests but to be extra sure: Avihai could you take this
+patch a spin in your rig/tests as well? Thanks!
+---
+ drivers/vfio/iova_bitmap.c | 30 +++++++++++++-----------------
+ 1 file changed, 13 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf_base.c
-index 3ec5ca3aefe1..5563b3a773c7 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.c
-@@ -206,7 +206,7 @@ u64 ifcvf_get_hw_features(struct ifcvf_hw *hw)
- 
- u64 ifcvf_get_features(struct ifcvf_hw *hw)
+diff --git a/drivers/vfio/iova_bitmap.c b/drivers/vfio/iova_bitmap.c
+index de6d6ea5c496..0848f920efb7 100644
+--- a/drivers/vfio/iova_bitmap.c
++++ b/drivers/vfio/iova_bitmap.c
+@@ -298,9 +298,7 @@ static unsigned long iova_bitmap_mapped_remaining(struct iova_bitmap *bitmap)
  {
--	return hw->hw_features;
-+	return hw->dev_features;
+ 	unsigned long remaining, bytes;
+ 
+-	/* Cap to one page in the first iteration, if PAGE_SIZE unaligned. */
+-	bytes = !bitmap->mapped.pgoff ? bitmap->mapped.npages << PAGE_SHIFT :
+-					PAGE_SIZE - bitmap->mapped.pgoff;
++	bytes = (bitmap->mapped.npages << PAGE_SHIFT) - bitmap->mapped.pgoff;
+ 
+ 	remaining = bitmap->mapped_total_index - bitmap->mapped_base_index;
+ 	remaining = min_t(unsigned long, remaining,
+@@ -399,29 +397,27 @@ int iova_bitmap_for_each(struct iova_bitmap *bitmap, void *opaque,
+  * Set the bits corresponding to the range [iova .. iova+length-1] in
+  * the user bitmap.
+  *
+- * Return: The number of bits set.
+  */
+ void iova_bitmap_set(struct iova_bitmap *bitmap,
+ 		     unsigned long iova, size_t length)
+ {
+ 	struct iova_bitmap_map *mapped = &bitmap->mapped;
+-	unsigned long offset = (iova - mapped->iova) >> mapped->pgshift;
+-	unsigned long nbits = max_t(unsigned long, 1, length >> mapped->pgshift);
+-	unsigned long page_idx = offset / BITS_PER_PAGE;
+-	unsigned long page_offset = mapped->pgoff;
+-	void *kaddr;
+-
+-	offset = offset % BITS_PER_PAGE;
++	unsigned long cur_bit = ((iova - mapped->iova) >>
++			mapped->pgshift) + mapped->pgoff * BITS_PER_BYTE;
++	unsigned long last_bit = (((iova + length - 1) - mapped->iova) >>
++			mapped->pgshift) + mapped->pgoff * BITS_PER_BYTE;
+ 
+ 	do {
+-		unsigned long size = min(BITS_PER_PAGE - offset, nbits);
++		unsigned int page_idx = cur_bit / BITS_PER_PAGE;
++		unsigned int offset = cur_bit % BITS_PER_PAGE;
++		unsigned int nbits = min(BITS_PER_PAGE - offset,
++					 last_bit - cur_bit + 1);
++		void *kaddr;
+ 
+ 		kaddr = kmap_local_page(mapped->pages[page_idx]);
+-		bitmap_set(kaddr + page_offset, offset, size);
++		bitmap_set(kaddr, offset, nbits);
+ 		kunmap_local(kaddr);
+-		page_offset = offset = 0;
+-		nbits -= size;
+-		page_idx++;
+-	} while (nbits > 0);
++		cur_bit += nbits;
++	} while (cur_bit <= last_bit);
  }
- 
- int ifcvf_verify_min_features(struct ifcvf_hw *hw, u64 features)
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-index d41e255c581b..c20d1c40214e 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.h
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-@@ -19,6 +19,7 @@
- #include <uapi/linux/virtio_blk.h>
- #include <uapi/linux/virtio_config.h>
- #include <uapi/linux/virtio_pci.h>
-+#include <uapi/linux/vdpa.h>
- 
- #define N3000_DEVICE_ID		0x1041
- #define N3000_SUBSYS_DEVICE_ID	0x001A
-@@ -75,6 +76,8 @@ struct ifcvf_hw {
- 	u32 dev_type;
- 	u64 req_features;
- 	u64 hw_features;
-+	/* provisioned device features */
-+	u64 dev_features;
- 	struct virtio_pci_common_cfg __iomem *common_cfg;
- 	void __iomem *dev_cfg;
- 	struct vring_info vring[IFCVF_MAX_QUEUES];
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index 5fb3580594d5..cc826bfd3866 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -743,6 +743,7 @@ static int ifcvf_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
- 	struct vdpa_device *vdpa_dev;
- 	struct pci_dev *pdev;
- 	struct ifcvf_hw *vf;
-+	u64 device_features;
- 	int ret;
- 
- 	ifcvf_mgmt_dev = container_of(mdev, struct ifcvf_vdpa_mgmt_dev, mdev);
-@@ -762,6 +763,17 @@ static int ifcvf_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
- 	adapter->vf = vf;
- 	vdpa_dev = &adapter->vdpa;
- 
-+	device_features = vf->hw_features;
-+	if (config->mask & BIT_ULL(VDPA_ATTR_DEV_FEATURES)) {
-+		if (config->device_features & ~device_features) {
-+			IFCVF_ERR(pdev, "The provisioned features 0x%llx are not supported by this device with features 0x%llx\n",
-+				  config->device_features, device_features);
-+			return -EINVAL;
-+		}
-+		device_features &= config->device_features;
-+	}
-+	vf->dev_features = device_features;
-+
- 	if (name)
- 		ret = dev_set_name(&vdpa_dev->dev, "%s", name);
- 	else
-@@ -866,6 +878,7 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	ifcvf_mgmt_dev->mdev.device = dev;
- 	ifcvf_mgmt_dev->mdev.max_supported_vqs = vf->nr_vring;
- 	ifcvf_mgmt_dev->mdev.supported_features = vf->hw_features;
-+	ifcvf_mgmt_dev->mdev.config_attr_mask = (1 << VDPA_ATTR_DEV_FEATURES);
- 
- 	ret = vdpa_mgmtdev_register(&ifcvf_mgmt_dev->mdev);
- 	if (ret) {
+ EXPORT_SYMBOL_GPL(iova_bitmap_set);
 -- 
-2.31.1
+2.17.2
 
