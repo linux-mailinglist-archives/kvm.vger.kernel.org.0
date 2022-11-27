@@ -2,99 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7001639D86
-	for <lists+kvm@lfdr.de>; Sun, 27 Nov 2022 23:13:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C7782639E45
+	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 00:48:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229640AbiK0WNB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Nov 2022 17:13:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47150 "EHLO
+        id S229616AbiK0XsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Nov 2022 18:48:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbiK0WM7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Nov 2022 17:12:59 -0500
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16E0BDF00;
-        Sun, 27 Nov 2022 14:12:58 -0800 (PST)
-Received: by mail-wr1-f47.google.com with SMTP id w15so917322wrl.9;
-        Sun, 27 Nov 2022 14:12:58 -0800 (PST)
+        with ESMTP id S229510AbiK0XsK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Nov 2022 18:48:10 -0500
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5AB72BF9
+        for <kvm@vger.kernel.org>; Sun, 27 Nov 2022 15:48:08 -0800 (PST)
+Received: by mail-io1-xd32.google.com with SMTP id q21so6529753iod.4
+        for <kvm@vger.kernel.org>; Sun, 27 Nov 2022 15:48:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fx2NDaAEXNAUQ6X3OF+HlDwRPMVGMq2q4DWYkOynsK0=;
+        b=kKpH4F+fBEPb28DdSNlIzAygMBB+2JBfMa1S6oz0L5lIDFlTIHhd/bR7SKihyP21cX
+         kD7RnW1HLO0kLaruY/fQSDd7EsAX/UFo4sFQnoDCKvTz1RKvSC+MGXWOkdx1JxMSp1DK
+         Xwi6ONNK8hmBRSRskXz3CHXpk5Lr/gisWszztg7afTW3lizSKS3VUeCaVnsCDMIdHMQ1
+         p9KyrqlmzbyCCqr4BFSGCN7NCEnVClpY5qnyatxFXq1kne3ufttDy7s7OHh/M1EajNsB
+         7ZLeWCwpmPiCNsfffFbMVnFyIS41GT+XLREQPbSzf8hzYTEb+7a2keSbuJsZ+zhjzRcc
+         LLCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=H93P/+btHMmnUHfAxiUxxWr+DgQtxwEFifMZUFb22Lo=;
-        b=lVayMRecf2VR+UhFlsGcD8Z1eVqCI4RexZRzJ0tSxSfuI09yi1s6Llh330SCaGkDWR
-         xQY2WdVHa3f3Fv6vmgohqXugBu4ghOT20gcoPHwS6BbaftOVzbGTku3PPhS4p9FfIGkE
-         E1sDq5VCl2klUpEXCtJVLUBlY0Fat8Z375gg7jld8jN+P79p7T049Opka+axjvaGsi69
-         3rpyJVJ4Nc4FUfC8HxQu4ejeEup55KAo04mdmizUAnC/FqNxsRId3ZNnjugCeqnG7MWZ
-         yQSzqxZ6k/qnvssaoU47J83CoeCoQfdlOfd9ZmFmI8BYbgxmwHd1bq2S6Vsm34R/trrz
-         wibw==
-X-Gm-Message-State: ANoB5ploOPPpe4U2rli0TP662rxvgi+WrqlR+PGq9tUwbgDieK8hZAey
-        H3bMG1wUER+KsdelPKC3syDb1WpMgaM=
-X-Google-Smtp-Source: AA0mqf74qn8YSCcOe6m+lWpMmTSFR6gKv3nG+XEOP5Pz1jn9MTTUXrZzRbQ/o3+7BRATarbJGSYUIA==
-X-Received: by 2002:a05:6000:783:b0:241:bc34:3149 with SMTP id bu3-20020a056000078300b00241bc343149mr23821253wrb.351.1669587176312;
-        Sun, 27 Nov 2022 14:12:56 -0800 (PST)
-Received: from liuwe-devbox-debian-v2.j3c5onc20sse1dnehy4noqpfcg.zx.internal.cloudapp.net ([51.145.34.42])
-        by smtp.gmail.com with ESMTPSA id m16-20020a05600c3b1000b003cfd0bd8c0asm14232298wms.30.2022.11.27.14.12.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Nov 2022 14:12:55 -0800 (PST)
-From:   Wei Liu <wei.liu@kernel.org>
-To:     kvm@vger.kernel.org
-Cc:     Wei Liu <wei.liu@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
-        64-BIT))
-Subject: [PATCH] KVM: x86/mmu: fix an incorrect comment in kvm_mmu_new_pgd
-Date:   Sun, 27 Nov 2022 22:12:45 +0000
-Message-Id: <20221127221245.204208-1-wei.liu@kernel.org>
-X-Mailer: git-send-email 2.35.1
+        bh=Fx2NDaAEXNAUQ6X3OF+HlDwRPMVGMq2q4DWYkOynsK0=;
+        b=hMCOK1XDvZoMSONy245f38E6jY/IcpXIVFRcVb8/+38Zzldq2ECe1/qGpu6S1GMBGH
+         tqIK8wLrTpQzr+oWSyub3RpuFU1RWQ7yihTUgEin+MOdIEF/I2xGpAxHYnt1X352rnJB
+         3+zDO0qGsQJonC5fVAFgLjyaU4utIhjWVRddXdN2+SFtBhclzo9fPgxwrTTHmqArVr+x
+         SI/ac2KPp5EhJHwUqk27jg/JhXGQ2tngPaofvQJI/32pfgRnPyhrJFq+tgxTvEXPWJgJ
+         VEM07qLiQRr0XbLdlcLhGs2y7LUGbrL4QRfxw+CAMJs8B3MC90GLDVxxis8WbcNdQAdt
+         nEaA==
+X-Gm-Message-State: ANoB5pm5bpwU3yqDeQmQygBnEIYZvKq4K8b2MlGSwSKT3NiynqHHXUbW
+        aO8oFTobucqLM2Z3v76ZaS42oLlfeR1x2rtepBMmJpSumqU=
+X-Google-Smtp-Source: AA0mqf5+h2VMLuOKliEIFUxnjb4b8A+nnbEWmXC7DXBTw5Fd5mRn17SKamuEgkCT4sp5dQFzG5gI8JC3GyhwLwVmAyg=
+X-Received: by 2002:a02:7a06:0:b0:374:c658:2141 with SMTP id
+ a6-20020a027a06000000b00374c6582141mr20924671jac.210.1669592888076; Sun, 27
+ Nov 2022 15:48:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=no autolearn_force=no version=3.4.6
+References: <20221124003505.424617-1-mizhang@google.com> <CABgObfYpn98X2NFhoWNAPuyu_NtmovKD5MHoon0gtVP08Su0eA@mail.gmail.com>
+In-Reply-To: <CABgObfYpn98X2NFhoWNAPuyu_NtmovKD5MHoon0gtVP08Su0eA@mail.gmail.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Sun, 27 Nov 2022 15:47:57 -0800
+Message-ID: <CAL715W+QrvkhWgxQ5h_=fadJGO_Epqg_fdojnEpNuEz2dcFKpQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2] KVM: x86/mmu: replace BUG() with KVM_BUG() in
+ shadow mmu
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Nagareddy Reddy <nspreddy@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is no function named kvm_mmu_ensure_valid_pgd.
+On Wed, Nov 23, 2022 at 5:17 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> > v1 -> v2:
+> >  - compile test the code.
+> >  - fill KVM_BUG() with kvm_get_running_vcpu()->kvm
+>
+> Nope, the zapping code paths will run often with no running vCPU, for
+> example drop_parent_pte <- kvm_mmu_unlink_parents <-
+> __kvm_mmu_prepare_zap_page <- kvm_zap_obsolete_pages <-
+> kvm_mmu_zap_all_fast <- kvm_mmu_invalidate_zap_pages_in_memslot <-
+> kvm_page_track_flush_slot <- kvm_arch_flush_shadow_memslot <-
+> kvm_invalidate_memslot <- ioctl(KVM_SET_USER_MEMORY_REGION).
+>
+> Paolo
 
-Fix the comment and remove the pair of braces to conform to Linux kernel
-coding style.
-
-Signed-off-by: Wei Liu <wei.liu@kernel.org>
----
- arch/x86/kvm/mmu/mmu.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b6f96d47e596..361574124fbe 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4452,10 +4452,12 @@ void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd)
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
- 	union kvm_mmu_page_role new_role = mmu->root_role;
- 
--	if (!fast_pgd_switch(vcpu->kvm, mmu, new_pgd, new_role)) {
--		/* kvm_mmu_ensure_valid_pgd will set up a new root.  */
-+	/*
-+	 * Return immediately if no usable root is found. A new root will be
-+	 * set up in vcpu_enter_guest prior to the next vmenter.
-+	 */
-+	if (!fast_pgd_switch(vcpu->kvm, mmu, new_pgd, new_role))
- 		return;
--	}
- 
- 	/*
- 	 * It's possible that the cached previous root page is obsolete because
--- 
-2.35.1
-
+Make sense. Will plumb through the kvm parameter in the next version.
