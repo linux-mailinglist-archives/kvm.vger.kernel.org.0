@@ -2,98 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A98B66399F5
-	for <lists+kvm@lfdr.de>; Sun, 27 Nov 2022 11:47:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C8066399F8
+	for <lists+kvm@lfdr.de>; Sun, 27 Nov 2022 11:51:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229587AbiK0KrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Nov 2022 05:47:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54774 "EHLO
+        id S229610AbiK0KvM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Nov 2022 05:51:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbiK0KrM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Nov 2022 05:47:12 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EE13DEBD
-        for <kvm@vger.kernel.org>; Sun, 27 Nov 2022 02:47:10 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AR6SqBj011532;
-        Sun, 27 Nov 2022 10:46:51 GMT
+        with ESMTP id S229502AbiK0KvK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Nov 2022 05:51:10 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A83110FDB
+        for <kvm@vger.kernel.org>; Sun, 27 Nov 2022 02:51:09 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AR6WHXN025681;
+        Sun, 27 Nov 2022 10:51:05 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : from : to : cc : references : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=CJO8gkfgnP46VNO/hbXonKbJsDMbjZ4ZUiMXFh6jvsA=;
- b=lKpE5P1zfmYMXdcOZUddv6dTkfkd2zvKuUS2lUs/0Uy8knAn9MYcY7Yivli/c+v4wI0i
- Xr57qJF9sCIQzTCGnEuh996DRqno2v6VdALBcYhKOvgDBna2g4OzuYXxeoZIRLb0UmgU
- EBAi52Xiw3ijItdjmAJbWhKZ31FPeIE4ydvGHfI/vQ1i+yfKidF1+SKavdPMhgAnLYbY
- 3fuzg/KGKQL/IFiNUvOK4HL7dpq40B77BZfleIXhE1t5q7SY0YPN1Mz0jhK/94kRFEQE
- mEdNvafA+ESe4BxedzT5gAmdkHA9/CZ6/zo7gd7TE4lfKxUmRJPqJPTNScyCUvmKg49X Eg== 
+ bh=w9IIrYH3RxiWV3AeGphmBZdyDjeY4EK3twKzorL6qK0=;
+ b=Ik6CW8IZ1V0qNo8S4Omb2BG8mDxwc2JiLXHg/WvUAnhEWw0ua+u40LOtaQSTKi8qC1BG
+ 2bXxuJghThy+zOvghKOeRLFGNGLmaBJgPqrLsCd+rQmvpgDjCPdss+1qbYiD31M68B0R
+ IIkQqpN42gMQWSHfwy0K45WZ9CmgaIbJIjqiTauLGeyLz8YJEXIAvyu4YijvEOeZoAoC
+ 3SapCyEKT3nxrAAUvwDH8Qn4IUP/fW44hPTcm8m7zVIigxcdEXeFGkatPcr01T4ROvkZ
+ 3JkMc3QXsRMBoVn67HwJ89iWgCKvCwNCTbR5A2UWeoxQmclnI4Q+7T9TjrJHy9Xjesnd yA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3v8hr7ht-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3vcr80a7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 27 Nov 2022 10:46:50 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ARAkoe4017044;
-        Sun, 27 Nov 2022 10:46:50 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3v8hr7h9-1
+        Sun, 27 Nov 2022 10:51:05 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ARAp4Rx023795;
+        Sun, 27 Nov 2022 10:51:04 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3vcr809h-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 27 Nov 2022 10:46:50 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ARAZCtE030191;
-        Sun, 27 Nov 2022 10:46:47 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 3m3ae997bk-1
+        Sun, 27 Nov 2022 10:51:04 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ARAoNSX016354;
+        Sun, 27 Nov 2022 10:51:02 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3m3a2hs7p4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 27 Nov 2022 10:46:47 +0000
+        Sun, 27 Nov 2022 10:51:02 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ARAkiuJ524984
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ARApfd91245826
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 27 Nov 2022 10:46:44 GMT
+        Sun, 27 Nov 2022 10:51:41 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 450CE4C044;
-        Sun, 27 Nov 2022 10:46:44 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 2A3094C044;
+        Sun, 27 Nov 2022 10:50:59 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4B9384C040;
-        Sun, 27 Nov 2022 10:46:43 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 3D9344C040;
+        Sun, 27 Nov 2022 10:50:58 +0000 (GMT)
 Received: from [9.171.55.247] (unknown [9.171.55.247])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Sun, 27 Nov 2022 10:46:43 +0000 (GMT)
-Message-ID: <2e377924-b738-1b02-e7d5-381d4bcebaa8@linux.ibm.com>
-Date:   Sun, 27 Nov 2022 11:46:43 +0100
+        Sun, 27 Nov 2022 10:50:58 +0000 (GMT)
+Message-ID: <bb9f8b8e-6acc-845a-e7a8-ba532644f83a@linux.ibm.com>
+Date:   Sun, 27 Nov 2022 11:50:57 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH v11 04/11] s390x/cpu topology: reporting the CPU topology
- to the guest
+Subject: Re: [PATCH v9 00/10] s390x: CPU Topology
+Content-Language: en-US
 From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+Cc:     qemu-devel@nongnu.org, pasic@linux.ibm.com,
         richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
         cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
         kvm@vger.kernel.org, ehabkost@redhat.com,
         marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
-        frankja@linux.ibm.com, berrange@redhat.com
-References: <20221103170150.20789-1-pmorel@linux.ibm.com>
- <20221103170150.20789-5-pmorel@linux.ibm.com>
- <1888d31f-227f-7edf-4cc8-dd88a9b19435@kaod.org>
- <34caa4c4-0b94-1729-fe88-77d9b4240f04@linux.ibm.com>
- <8b29a416-8190-243f-c414-e9e77efae918@kaod.org>
- <d82db5c8-171b-1570-e000-25e381843e8d@linux.ibm.com>
-Content-Language: en-US
-In-Reply-To: <d82db5c8-171b-1570-e000-25e381843e8d@linux.ibm.com>
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>
+References: <20220902075531.188916-1-pmorel@linux.ibm.com>
+ <a2ddbba2-9e52-8ed8-fdbc-a587b8286576@de.ibm.com>
+ <1fe0b036-19e7-a8a4-63aa-9bbcaed48187@linux.ibm.com>
+ <9e8d4c74-7405-5e1f-6c95-3c0c99c43eb9@linux.ibm.com>
+ <ccb73052-43e5-e072-b201-e983df876e6a@linux.ibm.com>
+In-Reply-To: <ccb73052-43e5-e072-b201-e983df876e6a@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: n4UkPdsWqtU801Bh_GG2Vecm558xg-Oc
-X-Proofpoint-ORIG-GUID: ahBeNFUK5QdRUP2Dns7tc5YgCw0t66qL
+X-Proofpoint-GUID: 2tqucUzsuLom9z_I6iKGj13VGcvDc4HE
+X-Proofpoint-ORIG-GUID: Kj33jca8ET0Crakx_epjr3sLcFcouG9O
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-11-27_02,2022-11-25_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 impostorscore=0 mlxlogscore=999 malwarescore=0
- priorityscore=1501 spamscore=0 suspectscore=0 adultscore=0 clxscore=1015
- mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 priorityscore=1501 mlxscore=0 spamscore=0 adultscore=0
+ suspectscore=0 mlxlogscore=999 lowpriorityscore=0 phishscore=0 bulkscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2210170000 definitions=main-2211270087
 X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
@@ -106,90 +104,139 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 11/22/22 10:05, Pierre Morel wrote:
+On 11/24/22 10:25, Pierre Morel wrote:
 > 
+> Gentle ping.
 > 
-> On 11/21/22 15:13, Cédric Le Goater wrote:
->>>>> +static char *s390_top_set_level2(S390Topology *topo, char *p)
->>>>> +{
->>>>> +    int i, origin;
->>>>> +
->>>>> +    for (i = 0; i < topo->nr_sockets; i++) {
->>>>> +        if (!topo->socket[i].active_count) {
->>>>> +            continue;
->>>>> +        }
->>>>> +        p = fill_container(p, 1, i);
->>>>> +        for (origin = 0; origin < S390_TOPOLOGY_MAX_ORIGIN; 
->>>>> origin++) {
->>>>> +            uint64_t mask = 0L;
->>>>> +
->>>>> +            mask = topo->socket[i].mask[origin];
->>>>> +            if (mask) {
->>>>> +                p = fill_tle_cpu(p, mask, origin);
->>>>> +            }
->>>>> +        }
->>>>> +    }
->>>>> +    return p;
->>>>> +}
->>>>
->>>> Why is it not possible to compute this topo information at "runtime",
->>>> when stsi is called, without maintaining state in an extra S390Topology
->>>> object ? Couldn't we loop on the CPU list to gather the topology bits
->>>> for the same result ?
->>>>
->>>> It would greatly simplify the feature.
->>>>
->>>> C.
->>>>
->>>
->>> The vCPU are not stored in order of creation in the CPU list and not 
->>> in a topology order.
->>> To be able to build the SYSIB we need an intermediate structure to 
->>> reorder the CPUs per container.
->>>
->>> We can do this re-ordering during the STSI interception but the idea 
->>> was to keep this instruction as fast as possible.> The second reason 
->>> is to have a structure ready for the QEMU migration when we introduce 
->>> vCPU migration from a socket to another socket, having then a 
->>> different internal representation of the topology.
->>>
->>>
->>> However, if as discussed yesterday we use a new cpu flag we would not 
->>> need any special migration structure in the current series.
->>>
->>> So it only stays the first reason to do the re-ordering preparation 
->>> during the plugging of a vCPU, to optimize the STSI instruction.
->>>
->>> If we think the optimization is not worth it or do not bring enough 
->>> to be consider, we can do everything during the STSI interception.
->>
->> Is it called on a hot code path ? AFAICT, it is only called once
->> per cpu when started. insert_stsi_3_2_2 is also a guest exit andit 
->> queries the machine definition in a very similar way.
+> Did I understand the problem or am I wrong?
 > 
-> 
-> It is not fully exact, stsi(15) is called at several moments, not only 
-> on CPU creation, but each time the core calls rebuild_sched_domains() 
-> that is for s390 on:
-> - change in the host topology
-> - changes in CPUSET: for allowed CPU or load balancing
-> 
-> Regards,
-> Pierre
 
-These are no good reasons to not make as you propose.
-This allows to use the s390_has_feature() and use the cpu feature as 
-proposed Christian.
-What I can not do with the early topology initialization.
+I guess I was wrong, so I send a new series next week.
 
 Regards,
 Pierre
 
 > 
+> On 11/17/22 17:38, Pierre Morel wrote:
 >>
->> Thanks,
 >>
->> C.
+>> On 11/17/22 10:31, Pierre Morel wrote:
+>>>
+>>>
+>>> On 11/16/22 17:51, Christian Borntraeger wrote:
+>>>> Am 02.09.22 um 09:55 schrieb Pierre Morel:
+>>>>> Hi,
+>>>>>
+>>>>> The implementation of the CPU Topology in QEMU has been drastically
+>>>>> modified since the last patch series and the number of LOCs has been
+>>>>> greatly reduced.
+>>>>>
+>>>>> Unnecessary objects have been removed, only a single S390Topology 
+>>>>> object
+>>>>> is created to support migration and reset.
+>>>>>
+>>>>> Also a documentation has been added to the series.
+>>>>>
+>>>>>
+>>>>> To use these patches, you will need Linux V6-rc1 or newer.
+>>>>>
+>>>>> Mainline patches needed are:
+>>>>>
+>>>>> f5ecfee94493 2022-07-20 KVM: s390: resetting the 
+>>>>> Topology-Change-Report
+>>>>> 24fe0195bc19 2022-07-20 KVM: s390: guest support for topology function
+>>>>> 0130337ec45b 2022-07-20 KVM: s390: Cleanup ipte lock access and 
+>>>>> SIIF fac..
+>>>>>
+>>>>> Currently this code is for KVM only, I have no idea if it is 
+>>>>> interesting
+>>>>> to provide a TCG patch. If ever it will be done in another series.
+>>>>>
+>>>>> To have a better understanding of the S390x CPU Topology and its
+>>>>> implementation in QEMU you can have a look at the documentation in the
+>>>>> last patch.
+>>>>>
+>>>>> New in this series
+>>>>> ==================
+>>>>>
+>>>>>    s390x/cpus: Make absence of multithreading clear
+>>>>>
+>>>>> This patch makes clear that CPU-multithreading is not supported in
+>>>>> the guest.
+>>>>>
+>>>>>    s390x/cpu topology: core_id sets s390x CPU topology
+>>>>>
+>>>>> This patch uses the core_id to build the container topology
+>>>>> and the placement of the CPU inside the container.
+>>>>>
+>>>>>    s390x/cpu topology: reporting the CPU topology to the guest
+>>>>>
+>>>>> This patch is based on the fact that the CPU type for guests
+>>>>> is always IFL, CPUs are always dedicated and the polarity is
+>>>>> always horizontal.
+>>>>> This may change in the future.
+>>>>>
+>>>>>    hw/core: introducing drawer and books for s390x
+>>>>>    s390x/cpu: reporting drawers and books topology to the guest
+>>>>>
+>>>>> These two patches extend the topology handling to add two
+>>>>> new containers levels above sockets: books and drawers.
+>>>>>
+>>>>> The subject of the last patches is clear enough (I hope).
+>>>>>
+>>>>> Regards,
+>>>>> Pierre
+>>>>>
+>>>>> Pierre Morel (10):
+>>>>>    s390x/cpus: Make absence of multithreading clear
+>>>>>    s390x/cpu topology: core_id sets s390x CPU topology
+>>>>>    s390x/cpu topology: reporting the CPU topology to the guest
+>>>>>    hw/core: introducing drawer and books for s390x
+>>>>>    s390x/cpu: reporting drawers and books topology to the guest
+>>>>>    s390x/cpu_topology: resetting the Topology-Change-Report
+>>>>>    s390x/cpu_topology: CPU topology migration
+>>>>>    target/s390x: interception of PTF instruction
+>>>>>    s390x/cpu_topology: activating CPU topology
+>>>>
+>>>>
+>>>> Do we really need a machine property? As far as I can see, old QEMU
+>>>> cannot  activate the ctop facility with old and new kernel unless it
+>>>> enables CAP_S390_CPU_TOPOLOGY. I do get
+>>>> oldqemu .... -cpu z14,ctop=on
+>>>> qemu-system-s390x: Some features requested in the CPU model are not 
+>>>> available in the configuration: ctop
+>>>>
+>>>> With the newer QEMU we can. So maybe we can simply have a topology (and
+>>>> then a cpu model feature) in new QEMUs and non in old. the cpu model
+>>>> would then also fence migration from enabled to disabled.
+>>>
+>>> OK, I can check this.
+>>> In this case migration with topology will be if I understand correctly:
+>>>
+>>> NEW_QEMU/old_machine <-> NEW_QEMU/old_machine OK
+>>> While
+>>> OLD_QEMU/old_machine <-> NEW_QEMU/old_machine KO
+>>> NEW_QEMU/old_machine <-> OLD_QEMU/old_machine KO
+>>
+>> I forgot to say that I mean in the examples above without using a flag.
+>>
+>> Of course using a flag like -ctop=off in NEW_QEMU/new_machine allows
+>> to migrate from and to old_machines in an old QEMU.
+>>
+>> Also I had the same behavior already in V9 by having a VMState without 
+>> the creation of a machine property, a new cpu feature and a new cpu flag.
+>>
+>>
+>>
+>>
+>>
+>>
+>>>
+>>> Is this something we can accept?
+>>>
+>>> regards,
+>>> Pierre
+>>>
 >>
 > 
 
