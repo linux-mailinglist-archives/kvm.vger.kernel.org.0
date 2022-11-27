@@ -2,139 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E30616399C5
-	for <lists+kvm@lfdr.de>; Sun, 27 Nov 2022 09:54:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A98B66399F5
+	for <lists+kvm@lfdr.de>; Sun, 27 Nov 2022 11:47:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229536AbiK0IyL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Nov 2022 03:54:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59898 "EHLO
+        id S229587AbiK0KrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Nov 2022 05:47:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbiK0IyK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Nov 2022 03:54:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F377CBC1C
-        for <kvm@vger.kernel.org>; Sun, 27 Nov 2022 00:53:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669539198;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Br4Rln7XCqJbOUw1KscJEXa06iK1vrBwPHJNVfCnrC8=;
-        b=B0jgQ9MGSbowF5SA1hT6G0Luyp7oiyxW4cUu+bUVWNCFhellb17axbJbtIu2Cv7pADzMNk
-        vSYNltSBPVBXPqQAGFsFZHBe2HPa6OR4UGUYep8t9CXijNsyBlQt9EWMXIi8wp4811EZ7B
-        Gxny4GXEjDCQbIQzGRsoLpySZwodgs4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-149-zDqUkPI3MrGTDPCqFSKIvQ-1; Sun, 27 Nov 2022 03:53:17 -0500
-X-MC-Unique: zDqUkPI3MrGTDPCqFSKIvQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A9F1D8339B4;
-        Sun, 27 Nov 2022 08:53:16 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8D455492B05;
-        Sun, 27 Nov 2022 08:53:16 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 6.1-rc7
-Date:   Sun, 27 Nov 2022 03:53:16 -0500
-Message-Id: <20221127085316.452610-1-pbonzini@redhat.com>
+        with ESMTP id S229601AbiK0KrM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Nov 2022 05:47:12 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EE13DEBD
+        for <kvm@vger.kernel.org>; Sun, 27 Nov 2022 02:47:10 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AR6SqBj011532;
+        Sun, 27 Nov 2022 10:46:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=CJO8gkfgnP46VNO/hbXonKbJsDMbjZ4ZUiMXFh6jvsA=;
+ b=lKpE5P1zfmYMXdcOZUddv6dTkfkd2zvKuUS2lUs/0Uy8knAn9MYcY7Yivli/c+v4wI0i
+ Xr57qJF9sCIQzTCGnEuh996DRqno2v6VdALBcYhKOvgDBna2g4OzuYXxeoZIRLb0UmgU
+ EBAi52Xiw3ijItdjmAJbWhKZ31FPeIE4ydvGHfI/vQ1i+yfKidF1+SKavdPMhgAnLYbY
+ 3fuzg/KGKQL/IFiNUvOK4HL7dpq40B77BZfleIXhE1t5q7SY0YPN1Mz0jhK/94kRFEQE
+ mEdNvafA+ESe4BxedzT5gAmdkHA9/CZ6/zo7gd7TE4lfKxUmRJPqJPTNScyCUvmKg49X Eg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3v8hr7ht-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 27 Nov 2022 10:46:50 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ARAkoe4017044;
+        Sun, 27 Nov 2022 10:46:50 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3v8hr7h9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 27 Nov 2022 10:46:50 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ARAZCtE030191;
+        Sun, 27 Nov 2022 10:46:47 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3m3ae997bk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 27 Nov 2022 10:46:47 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ARAkiuJ524984
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 27 Nov 2022 10:46:44 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 450CE4C044;
+        Sun, 27 Nov 2022 10:46:44 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4B9384C040;
+        Sun, 27 Nov 2022 10:46:43 +0000 (GMT)
+Received: from [9.171.55.247] (unknown [9.171.55.247])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Sun, 27 Nov 2022 10:46:43 +0000 (GMT)
+Message-ID: <2e377924-b738-1b02-e7d5-381d4bcebaa8@linux.ibm.com>
+Date:   Sun, 27 Nov 2022 11:46:43 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v11 04/11] s390x/cpu topology: reporting the CPU topology
+ to the guest
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com
+References: <20221103170150.20789-1-pmorel@linux.ibm.com>
+ <20221103170150.20789-5-pmorel@linux.ibm.com>
+ <1888d31f-227f-7edf-4cc8-dd88a9b19435@kaod.org>
+ <34caa4c4-0b94-1729-fe88-77d9b4240f04@linux.ibm.com>
+ <8b29a416-8190-243f-c414-e9e77efae918@kaod.org>
+ <d82db5c8-171b-1570-e000-25e381843e8d@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <d82db5c8-171b-1570-e000-25e381843e8d@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: n4UkPdsWqtU801Bh_GG2Vecm558xg-Oc
+X-Proofpoint-ORIG-GUID: ahBeNFUK5QdRUP2Dns7tc5YgCw0t66qL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-27_02,2022-11-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 impostorscore=0 mlxlogscore=999 malwarescore=0
+ priorityscore=1501 spamscore=0 suspectscore=0 adultscore=0 clxscore=1015
+ mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211270087
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
 
-The following changes since commit 6d3085e4d89ad7e6c7f1c6cf929d903393565861:
 
-  KVM: x86/mmu: Block all page faults during kvm_zap_gfn_range() (2022-11-11 07:19:46 -0500)
+On 11/22/22 10:05, Pierre Morel wrote:
+> 
+> 
+> On 11/21/22 15:13, Cédric Le Goater wrote:
+>>>>> +static char *s390_top_set_level2(S390Topology *topo, char *p)
+>>>>> +{
+>>>>> +    int i, origin;
+>>>>> +
+>>>>> +    for (i = 0; i < topo->nr_sockets; i++) {
+>>>>> +        if (!topo->socket[i].active_count) {
+>>>>> +            continue;
+>>>>> +        }
+>>>>> +        p = fill_container(p, 1, i);
+>>>>> +        for (origin = 0; origin < S390_TOPOLOGY_MAX_ORIGIN; 
+>>>>> origin++) {
+>>>>> +            uint64_t mask = 0L;
+>>>>> +
+>>>>> +            mask = topo->socket[i].mask[origin];
+>>>>> +            if (mask) {
+>>>>> +                p = fill_tle_cpu(p, mask, origin);
+>>>>> +            }
+>>>>> +        }
+>>>>> +    }
+>>>>> +    return p;
+>>>>> +}
+>>>>
+>>>> Why is it not possible to compute this topo information at "runtime",
+>>>> when stsi is called, without maintaining state in an extra S390Topology
+>>>> object ? Couldn't we loop on the CPU list to gather the topology bits
+>>>> for the same result ?
+>>>>
+>>>> It would greatly simplify the feature.
+>>>>
+>>>> C.
+>>>>
+>>>
+>>> The vCPU are not stored in order of creation in the CPU list and not 
+>>> in a topology order.
+>>> To be able to build the SYSIB we need an intermediate structure to 
+>>> reorder the CPUs per container.
+>>>
+>>> We can do this re-ordering during the STSI interception but the idea 
+>>> was to keep this instruction as fast as possible.> The second reason 
+>>> is to have a structure ready for the QEMU migration when we introduce 
+>>> vCPU migration from a socket to another socket, having then a 
+>>> different internal representation of the topology.
+>>>
+>>>
+>>> However, if as discussed yesterday we use a new cpu flag we would not 
+>>> need any special migration structure in the current series.
+>>>
+>>> So it only stays the first reason to do the re-ordering preparation 
+>>> during the plugging of a vCPU, to optimize the STSI instruction.
+>>>
+>>> If we think the optimization is not worth it or do not bring enough 
+>>> to be consider, we can do everything during the STSI interception.
+>>
+>> Is it called on a hot code path ? AFAICT, it is only called once
+>> per cpu when started. insert_stsi_3_2_2 is also a guest exit andit 
+>> queries the machine definition in a very similar way.
+> 
+> 
+> It is not fully exact, stsi(15) is called at several moments, not only 
+> on CPU creation, but each time the core calls rebuild_sched_domains() 
+> that is for s390 on:
+> - change in the host topology
+> - changes in CPUSET: for allowed CPU or load balancing
+> 
+> Regards,
+> Pierre
 
-are available in the Git repository at:
+These are no good reasons to not make as you propose.
+This allows to use the s390_has_feature() and use the cpu feature as 
+proposed Christian.
+What I can not do with the early topology initialization.
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+Regards,
+Pierre
 
-for you to fetch changes up to fe08e36be9ecbf6b38714a77c97b1d25b7a6e4b0:
+> 
+>>
+>> Thanks,
+>>
+>> C.
+>>
+> 
 
-  Merge branch 'kvm-dwmw2-fixes' into HEAD (2022-11-23 18:59:45 -0500)
-
-----------------------------------------------------------------
-x86:
-
-* Fixes for Xen emulation.  While nobody should be enabling it in
-  the kernel (the only public users of the feature are the selftests),
-  the bug effectively allows userspace to read arbitrary memory.
-
-* Correctness fixes for nested hypervisors that do not intercept INIT
-  or SHUTDOWN on AMD; the subsequent CPU reset can cause a use-after-free
-  when it disables virtualization extensions.  While downgrading the panic
-  to a WARN is quite easy, the full fix is a bit more laborious; there
-  are also tests.  This is the bulk of the pull request.
-
-* Fix race condition due to incorrect mmu_lock use around
-  make_mmu_pages_available().
-
-Generic:
-
-* Obey changes to the kvm.halt_poll_ns module parameter in VMs
-  not using KVM_CAP_HALT_POLL, restoring behavior from before
-  the introduction of the capability
-
-----------------------------------------------------------------
-David Matlack (3):
-      KVM: Cap vcpu->halt_poll_ns before halting rather than after
-      KVM: Avoid re-reading kvm->max_halt_poll_ns during halt-polling
-      KVM: Obey kvm.halt_poll_ns in VMs not using KVM_CAP_HALT_POLL
-
-David Woodhouse (3):
-      KVM: x86/xen: Validate port number in SCHEDOP_poll
-      KVM: x86/xen: Only do in-kernel acceleration of hypercalls for guest CPL0
-      KVM: Update gfn_to_pfn_cache khva when it moves within the same page
-
-Kazuki Takiguchi (1):
-      KVM: x86/mmu: Fix race condition in direct_page_fault
-
-Maxim Levitsky (9):
-      KVM: x86: nSVM: leave nested mode on vCPU free
-      KVM: x86: nSVM: harden svm_free_nested against freeing vmcb02 while still in use
-      KVM: x86: add kvm_leave_nested
-      KVM: x86: forcibly leave nested mode on vCPU reset
-      KVM: selftests: move idt_entry to header
-      kvm: selftests: add svm nested shutdown test
-      KVM: x86: allow L1 to not intercept triple fault
-      KVM: selftests: add svm part to triple_fault_test
-      KVM: x86: remove exit_int_info warning in svm_handle_exit
-
-Paolo Bonzini (2):
-      Merge branch 'kvm-svm-harden' into HEAD
-      Merge branch 'kvm-dwmw2-fixes' into HEAD
-
- arch/x86/kvm/mmu/mmu.c                             | 13 ++--
- arch/x86/kvm/svm/nested.c                          | 12 +++-
- arch/x86/kvm/svm/svm.c                             | 16 +----
- arch/x86/kvm/vmx/nested.c                          |  4 +-
- arch/x86/kvm/x86.c                                 | 29 +++++++--
- arch/x86/kvm/xen.c                                 | 32 +++++++---
- include/linux/kvm_host.h                           |  1 +
- tools/testing/selftests/kvm/.gitignore             |  1 +
- tools/testing/selftests/kvm/Makefile               |  1 +
- .../selftests/kvm/include/x86_64/processor.h       | 13 ++++
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 13 ----
- .../kvm/x86_64/svm_nested_shutdown_test.c          | 67 ++++++++++++++++++++
- .../selftests/kvm/x86_64/triple_fault_event_test.c | 73 +++++++++++++++++-----
- virt/kvm/kvm_main.c                                | 52 ++++++++++++---
- virt/kvm/pfncache.c                                |  7 ++-
- 15 files changed, 251 insertions(+), 83 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/svm_nested_shutdown_test.c
-
+-- 
+Pierre Morel
+IBM Lab Boeblingen
