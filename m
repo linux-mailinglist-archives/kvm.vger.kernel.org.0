@@ -2,119 +2,333 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 888FD639A8C
-	for <lists+kvm@lfdr.de>; Sun, 27 Nov 2022 13:37:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F1E7639B80
+	for <lists+kvm@lfdr.de>; Sun, 27 Nov 2022 16:13:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229605AbiK0Mhh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Nov 2022 07:37:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35980 "EHLO
+        id S229569AbiK0PNW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Nov 2022 10:13:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbiK0Mhg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Nov 2022 07:37:36 -0500
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFEDEE43
-        for <kvm@vger.kernel.org>; Sun, 27 Nov 2022 04:37:30 -0800 (PST)
-Received: by mail-ej1-x632.google.com with SMTP id gu23so1582846ejb.10
-        for <kvm@vger.kernel.org>; Sun, 27 Nov 2022 04:37:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4/jGKMCRGMK21dJ1aCsortAFYXlCDfIKm1QYzbvgS2c=;
-        b=NXW07i+fE98DmbrjPPH7Em35P9hSzgrdqGIspcOhXrHkH45LeFM4Ma9uzZyAwqM4nf
-         kyHZcHVZQ1ODY5HvfgpH4tf0q9xmXaYsadXiJ2GiCNZJc6afvbPIBI2MpVA3erqHSLHh
-         avQgmwPVPhy4KbRq8MyOqZgeDlD0go2IT9WzVsg6H0KLZvi28SmzjLXYSgGXQc56bPxf
-         QbY9ctnOfmjk+u3nn0U62MaQYdOCmmXRjY8Ry+Wt6D7WJgvoS+AnDPIUF72yvcNaWI9v
-         4rMQrMMoaClwCzyhv/QQ/ZRUTma6IYKY06rC0CLInBNvwAxwASr84tfas+Z+J1NvjEQZ
-         PCUQ==
+        with ESMTP id S229495AbiK0PNV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Nov 2022 10:13:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EDF6A193
+        for <kvm@vger.kernel.org>; Sun, 27 Nov 2022 07:12:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669561942;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=J0wiRNFjSfwxayhwReKk2HhCdJf+ke5EttJUm2mT+i4=;
+        b=VW/WJw6+Nipc771fV16QNU01W0foYCL8HsnLJ7ieyTO28W5FO1EAQU7M5jKUi+vvz+ugQ0
+        DFa1UsCjNaziiBRrh7RJTjK/iFvc8abFu8nBTDZq89ebzhnWNejvX8LR3SfmO6tDUx1tIR
+        +sJCOPCOyk1bd+rO/1MBpXI3HnrzksI=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-644-RLMJNwgZOUqVuIMbK9r8KA-1; Sun, 27 Nov 2022 10:12:20 -0500
+X-MC-Unique: RLMJNwgZOUqVuIMbK9r8KA-1
+Received: by mail-qk1-f199.google.com with SMTP id bp10-20020a05620a458a00b006fa29f253dcso14305169qkb.11
+        for <kvm@vger.kernel.org>; Sun, 27 Nov 2022 07:12:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=4/jGKMCRGMK21dJ1aCsortAFYXlCDfIKm1QYzbvgS2c=;
-        b=cNzC4h2dbOss7GXWxy5TEOOmKJf+ZqudyA54C7b8uqfEKmggcgXT1m3FVbrf0dkVLF
-         3x8eMOPUf95lK0lNhEXLQ8lC88/dyfXupMpg6mntKdZUEwOMCUZfCxAuY0nMfmhbpLcA
-         WxtKBp0CAofna7C+eyNalQbdEGHPDrbmKNesEgj5aVFCWrmEPiMD+Wjvt6O7AbNJPhLQ
-         o3xG4moEwg1FvaIghFM7TjVzStf2Hj4XLpkTfKsFkQaMJvHT2qaNsPQXrlKyiM/JLG/z
-         /POZW+YuNUoDQw6O0bbbkLojxhNvkj4p3PQecVZy290qOpzUhz955N797CX5XaSNKqyu
-         EZog==
-X-Gm-Message-State: ANoB5pnrHqYd1SDMrHzYoqQ+VgQbM4BkL5mtH1voYNAKM8NGKTcDt21Z
-        wm1rw5yr1bsK1iH3QxgEfZbq0049MXHlQQigXk/pPg==
-X-Google-Smtp-Source: AA0mqf5TLdtOn1SM7fZHuK8d3xbApVAEEoYMbYRU6OCiFSk08wOADH6h3JlS7ZP3Y0sl9LqAOTiR03Ho+7xq3BMoelQ=
-X-Received: by 2002:a17:906:6dd5:b0:78d:a633:b55 with SMTP id
- j21-20020a1709066dd500b0078da6330b55mr41141442ejt.106.1669552649306; Sun, 27
- Nov 2022 04:37:29 -0800 (PST)
+        bh=J0wiRNFjSfwxayhwReKk2HhCdJf+ke5EttJUm2mT+i4=;
+        b=IoZ5sle6r19TiPhrcOI77C9IdnUv2yiNgEzV1E6YVOnH8yLJebGnDGGzLn07m0bq1j
+         ca8ENKxBbL0xmDAsieqhgaiAfue2WjqzmGzWZQABekUH2jNENU8zLPQvhHDhZ49CH5+i
+         BLctcUb6J/j491Ujknu1E71h1iXG1rXpE5CiyQnYA4V0189fga0crEF/kQZ92JOCn+Qs
+         Q0ICJQJi8t6cXzUwfHWYHQDkYCSXiH9AoktRyyXemP2sJy8xQjvE3+Az6MYalLA/x8SB
+         IQWgzuua+yVuq049hwFFeP1M5emeqi9VBRkrOC2C2TYk4xTXALtDPT+c9plprefOwo+7
+         cktg==
+X-Gm-Message-State: ANoB5pnOWfBG8kLAc0IdwdHD6zdTiCAFKiCfIlKt9+3b/rGfYPpvoxXK
+        2kLubdJK+Ns7h0/4AmuJliVlKas/NM8gaJbNg73ATsoUL/piDrqcz7TLv1Y04F6aM2Mxd3GVz/B
+        XykfOQxWe935W
+X-Received: by 2002:ac8:41ca:0:b0:3a5:6d50:7f39 with SMTP id o10-20020ac841ca000000b003a56d507f39mr43685462qtm.520.1669561940398;
+        Sun, 27 Nov 2022 07:12:20 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5FIGBQMs4mdaEfvQ4YaXsydmwTyqPu/CYEBG9rDFeez+Q924zAUFLRipm1jW/U1yXVCME7aQ==
+X-Received: by 2002:ac8:41ca:0:b0:3a5:6d50:7f39 with SMTP id o10-20020ac841ca000000b003a56d507f39mr43685406qtm.520.1669561940087;
+        Sun, 27 Nov 2022 07:12:20 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id w30-20020a05620a0e9e00b006faaf6dc55asm6458946qkm.22.2022.11.27.07.12.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 27 Nov 2022 07:12:18 -0800 (PST)
+Message-ID: <84c2c942-055b-b500-f209-5f8839113ef0@redhat.com>
+Date:   Sun, 27 Nov 2022 16:12:11 +0100
 MIME-Version: 1.0
-References: <c5e918630ba37273d7b0f4e4dbb6f90d4c2f321d.1668347565.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: <c5e918630ba37273d7b0f4e4dbb6f90d4c2f321d.1668347565.git.christophe.jaillet@wanadoo.fr>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Sun, 27 Nov 2022 18:07:17 +0530
-Message-ID: <CAAhSdy1JPKwknR7HrNXkcBxL3QoVDAAzFthDS6nCocnzJor0XA@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: Simplify kvm_arch_prepare_memory_region()
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v5 12/19] iommufd: Add a HW pagetable object
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>, bpf@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>
+Cc:     Anthony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Lixiao Yang <lixiao.yang@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+References: <12-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <12-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Nov 13, 2022 at 7:22 PM Christophe JAILLET
-<christophe.jaillet@wanadoo.fr> wrote:
+Hi Jason,
+
+On 11/16/22 22:00, Jason Gunthorpe wrote:
+> The hw_pagetable object exposes the internal struct iommu_domain's to
+> userspace. An iommu_domain is required when any DMA device attaches to an
+> IOAS to control the io page table through the iommu driver.
 >
-> In kvm_arch_prepare_memory_region(), if no error occurs, a spin_lock()/
-> spin_unlock() call can be avoided.
+> For compatibility with VFIO the hw_pagetable is automatically created when
+> a DMA device is attached to the IOAS. If a compatible iommu_domain already
+> exists then the hw_pagetable associated with it is used for the
+> attachment.
 >
-> Switch to kvm_riscv_gstage_iounmap() that is the same as the current code,
-> but with a better semantic.
-> It also embeds the locking logic. So it is avoided if ret == 0.
+> In the initial series there is no iommufd uAPI for the hw_pagetable
+> object. The next patch provides driver facing APIs for IO page table
+> attachment that allows drivers to accept either an IOAS or a hw_pagetable
+> ID and for the driver to return the hw_pagetable ID that was auto-selected
+> from an IOAS. The expectation is the driver will provide uAPI through its
+> own FD for attaching its device to iommufd. This allows userspace to learn
+> the mapping of devices to iommu_domains and to override the automatic
+> attachment.
 >
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-
-Looks good to me.
-
-Reviewed-by: Anup Patel <anup@brainfault.org>
-
-I have tested this on QEMU virt machine for RV64.
-
-Queued this patch for Linux-6.2
-
-Thanks,
-Anup
-
+> The future HW specific interface will allow userspace to create
+> hw_pagetable objects using iommu_domains with IOMMU driver specific
+> parameters. This infrastructure will allow linking those domains to IOAS's
+> and devices.
+>
+> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+> Tested-by: Yi Liu <yi.l.liu@intel.com>
+> Tested-by: Lixiao Yang <lixiao.yang@intel.com>
+> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
-> I don't use cross-compiler, so this patch is NOT even compile tested.
-> ---
->  arch/riscv/kvm/mmu.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+>  drivers/iommu/iommufd/Makefile          |  1 +
+>  drivers/iommu/iommufd/hw_pagetable.c    | 57 +++++++++++++++++++++++++
+>  drivers/iommu/iommufd/ioas.c            |  3 ++
+>  drivers/iommu/iommufd/iommufd_private.h | 33 ++++++++++++++
+>  drivers/iommu/iommufd/main.c            |  3 ++
+>  5 files changed, 97 insertions(+)
+>  create mode 100644 drivers/iommu/iommufd/hw_pagetable.c
 >
-> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> index 3620ecac2fa1..c8834e463763 100644
-> --- a/arch/riscv/kvm/mmu.c
-> +++ b/arch/riscv/kvm/mmu.c
-> @@ -537,10 +537,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->         if (change == KVM_MR_FLAGS_ONLY)
->                 goto out;
->
-> -       spin_lock(&kvm->mmu_lock);
->         if (ret)
-> -               gstage_unmap_range(kvm, base_gpa, size, false);
-> -       spin_unlock(&kvm->mmu_lock);
-> +               kvm_riscv_gstage_iounmap(kvm, base_gpa, size);
->
->  out:
->         mmap_read_unlock(current->mm);
-> --
-> 2.34.1
->
+> diff --git a/drivers/iommu/iommufd/Makefile b/drivers/iommu/iommufd/Makefile
+> index 2b4f36f1b72f9d..e13e971aa28c60 100644
+> --- a/drivers/iommu/iommufd/Makefile
+> +++ b/drivers/iommu/iommufd/Makefile
+> @@ -1,5 +1,6 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+>  iommufd-y := \
+> +	hw_pagetable.o \
+>  	io_pagetable.o \
+>  	ioas.o \
+>  	main.o \
+> diff --git a/drivers/iommu/iommufd/hw_pagetable.c b/drivers/iommu/iommufd/hw_pagetable.c
+> new file mode 100644
+> index 00000000000000..43d473989a0667
+> --- /dev/null
+> +++ b/drivers/iommu/iommufd/hw_pagetable.c
+> @@ -0,0 +1,57 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
+> + */
+> +#include <linux/iommu.h>
+> +
+> +#include "iommufd_private.h"
+> +
+> +void iommufd_hw_pagetable_destroy(struct iommufd_object *obj)
+> +{
+> +	struct iommufd_hw_pagetable *hwpt =
+> +		container_of(obj, struct iommufd_hw_pagetable, obj);
+> +
+> +	WARN_ON(!list_empty(&hwpt->devices));
+> +
+> +	iommu_domain_free(hwpt->domain);
+> +	refcount_dec(&hwpt->ioas->obj.users);
+> +	mutex_destroy(&hwpt->devices_lock);
+> +}
+> +
+> +/**
+> + * iommufd_hw_pagetable_alloc() - Get an iommu_domain for a device
+> + * @ictx: iommufd context
+> + * @ioas: IOAS to associate the domain with
+> + * @dev: Device to get an iommu_domain for
+> + *
+> + * Allocate a new iommu_domain and return it as a hw_pagetable.
+> + */
+> +struct iommufd_hw_pagetable *
+> +iommufd_hw_pagetable_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
+> +			   struct device *dev)
+> +{
+> +	struct iommufd_hw_pagetable *hwpt;
+> +	int rc;
+> +
+> +	hwpt = iommufd_object_alloc(ictx, hwpt, IOMMUFD_OBJ_HW_PAGETABLE);
+> +	if (IS_ERR(hwpt))
+> +		return hwpt;
+> +
+> +	hwpt->domain = iommu_domain_alloc(dev->bus);
+> +	if (!hwpt->domain) {
+> +		rc = -ENOMEM;
+> +		goto out_abort;
+> +	}
+> +
+> +	INIT_LIST_HEAD(&hwpt->devices);
+> +	INIT_LIST_HEAD(&hwpt->hwpt_item);
+> +	mutex_init(&hwpt->devices_lock);
+> +	/* Pairs with iommufd_hw_pagetable_destroy() */
+> +	refcount_inc(&ioas->obj.users);
+> +	hwpt->ioas = ioas;
+> +	return hwpt;
+> +
+> +out_abort:
+> +	iommufd_object_abort(ictx, &hwpt->obj);
+> +	return ERR_PTR(rc);
+> +}
+> diff --git a/drivers/iommu/iommufd/ioas.c b/drivers/iommu/iommufd/ioas.c
+> index 7671456e86413a..64e6d0f73e39aa 100644
+> --- a/drivers/iommu/iommufd/ioas.c
+> +++ b/drivers/iommu/iommufd/ioas.c
+> @@ -17,6 +17,7 @@ void iommufd_ioas_destroy(struct iommufd_object *obj)
+>  	rc = iopt_unmap_all(&ioas->iopt, NULL);
+>  	WARN_ON(rc && rc != -ENOENT);
+>  	iopt_destroy_table(&ioas->iopt);
+> +	mutex_destroy(&ioas->mutex);
+>  }
+>  
+>  struct iommufd_ioas *iommufd_ioas_alloc(struct iommufd_ctx *ictx)
+> @@ -28,6 +29,8 @@ struct iommufd_ioas *iommufd_ioas_alloc(struct iommufd_ctx *ictx)
+>  		return ioas;
+>  
+>  	iopt_init_table(&ioas->iopt);
+> +	INIT_LIST_HEAD(&ioas->hwpt_list);
+> +	mutex_init(&ioas->mutex);
+>  	return ioas;
+>  }
+>  
+> diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
+> index 6721332dbbba03..bb5cbd8f4e5991 100644
+> --- a/drivers/iommu/iommufd/iommufd_private.h
+> +++ b/drivers/iommu/iommufd/iommufd_private.h
+> @@ -103,6 +103,7 @@ static inline int iommufd_ucmd_respond(struct iommufd_ucmd *ucmd,
+>  enum iommufd_object_type {
+>  	IOMMUFD_OBJ_NONE,
+>  	IOMMUFD_OBJ_ANY = IOMMUFD_OBJ_NONE,
+> +	IOMMUFD_OBJ_HW_PAGETABLE,
+>  	IOMMUFD_OBJ_IOAS,
+>  };
+>  
+> @@ -181,10 +182,20 @@ struct iommufd_object *_iommufd_object_alloc(struct iommufd_ctx *ictx,
+>   * io_pagetable object. It is a user controlled mapping of IOVA -> PFNs. The
+>   * mapping is copied into all of the associated domains and made available to
+>   * in-kernel users.
+> + *
+> + * Every iommu_domain that is created is wrapped in a iommufd_hw_pagetable
+> + * object. When we go to attach a device to an IOAS we need to get an
+> + * iommu_domain and wrapping iommufd_hw_pagetable for it.
+> + *
+> + * An iommu_domain & iommfd_hw_pagetable will be automatically selected
+> + * for a device based on the hwpt_list. If no suitable iommu_domain
+> + * is found a new iommu_domain will be created.
+>   */
+>  struct iommufd_ioas {
+>  	struct iommufd_object obj;
+>  	struct io_pagetable iopt;
+> +	struct mutex mutex;+	struct list_head hwpt_list;
+>  };
+>  
+>  static inline struct iommufd_ioas *iommufd_get_ioas(struct iommufd_ucmd *ucmd,
+> @@ -207,6 +218,28 @@ int iommufd_ioas_option(struct iommufd_ucmd *ucmd);
+>  int iommufd_option_rlimit_mode(struct iommu_option *cmd,
+>  			       struct iommufd_ctx *ictx);
+>  
+> +/*
+> + * A HW pagetable is called an iommu_domain inside the kernel. This user object
+> + * allows directly creating and inspecting the domains. Domains that have kernel
+> + * owned page tables will be associated with an iommufd_ioas that provides the
+> + * IOVA to PFN map.
+> + */
+> +struct iommufd_hw_pagetable {
+> +	struct iommufd_object obj;
+> +	struct iommufd_ioas *ioas;
+> +	struct iommu_domain *domain;
+> +	bool auto_domain : 1;
+> +	/* Head at iommufd_ioas::hwpt_list */
+> +	struct list_head hwpt_item;
+> +	struct mutex devices_lock;
+> +	struct list_head devices;
+> +};
+> +
+> +struct iommufd_hw_pagetable *
+> +iommufd_hw_pagetable_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
+> +			   struct device *dev);
+> +void iommufd_hw_pagetable_destroy(struct iommufd_object *obj);
+> +
+>  struct iommufd_access {
+>  	unsigned long iova_alignment;
+>  	u32 iopt_access_list_id;
+> diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
+> index 266109045537ed..3eab714b8e12a3 100644
+> --- a/drivers/iommu/iommufd/main.c
+> +++ b/drivers/iommu/iommufd/main.c
+> @@ -355,6 +355,9 @@ static const struct iommufd_object_ops iommufd_object_ops[] = {
+>  	[IOMMUFD_OBJ_IOAS] = {
+>  		.destroy = iommufd_ioas_destroy,
+>  	},
+> +	[IOMMUFD_OBJ_HW_PAGETABLE] = {
+> +		.destroy = iommufd_hw_pagetable_destroy,
+> +	},
+>  };
+>  
+>  static struct miscdevice iommu_misc_dev = {
+
+
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Eric
+
