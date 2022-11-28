@@ -2,90 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4614663AD8D
-	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 17:21:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D276863ADA1
+	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 17:28:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232592AbiK1QVm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Nov 2022 11:21:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51772 "EHLO
+        id S232676AbiK1Q2S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Nov 2022 11:28:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232558AbiK1QVk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Nov 2022 11:21:40 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 836F41EED3
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 08:21:38 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id z17so6164625pff.1
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 08:21:38 -0800 (PST)
+        with ESMTP id S232397AbiK1Q2N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Nov 2022 11:28:13 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4713220D8
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 08:28:12 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id y4so10660145plb.2
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 08:28:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3SPTNDjDD7p4251KmVbwYpNYSw/fK88RKLG3Fou2M/8=;
-        b=NuoweXsJXULm6RYVG3ZIGJHN55oghx6QaI8q8AURyEnv34ek4WgY41IOyDfkZPpnZC
-         nBaJGSJ8qmZrEuNTB0W7C4Vq80YpPPYPwpqdW5ttDkr4v7ZVRbxkQMBleEsCl2nQpwOo
-         pR8KvmuWKBQCj3jRzTpXxPhCAOuIL3kxXShpCU33UaUEtFzjNAMyF4C+aQsn9m/EAybu
-         HLgFFYN7ui+qzaSQuzUP4hPCrET6t+pAUSG4R3GW+jBVFlif8y5KOzQl4DGFr328/Jxw
-         RdAwPXhBA2ECEq+0G9mzSv/DFbhio03EXsEwvDnyY4JqNVUqTtnEWuHuQKf81Is8GcDd
-         A31Q==
+        bh=Z490q3+4OBgGpP4ghV2GyQxr+yapVjAEH0weCGz/rew=;
+        b=g4/JV+5AWieJycDXis2BS4N3wmKNQsJ/KNpv5tNUJ7bYf7rIi5c6ZaaBKkHz/bt2ds
+         NVz1nDCNfg0Gvfj59pCRuZnyo34rIXD5ZSqLXCEY3KRO6/0+gAckzIMtyN+jGGEHc1LZ
+         fc8V8VVQPLEKTbb0k2l/Y0nzsa1NvtgKYzNydgnY35ub6CZbpuUKfzyDWtzTNa8u2S43
+         Rc6+U9WQb1R1XNDtXj2X0abf3a3VLUTgErJgNOb0NQ1HdQE+GVbcZntRU5XLuQL7Nyr3
+         En9IRHHNEXJ5km/umpqJRqRfuuhN8VUXjEz6i9JeMmMlZtCvtN8lVb4xVk2+abtzmgCe
+         +FYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3SPTNDjDD7p4251KmVbwYpNYSw/fK88RKLG3Fou2M/8=;
-        b=W0FPsM6YcutZDn/E+dRkY19INyP8hSk6fVURi64OPXAnTdJCcH4XUCcpjhm2vFfcGQ
-         u7dQNQwlGVnwfX0HEYcQ/X9X7kARA3h0CQvt3gjq4vdyPXTPyVilsDbrPJqhsjymq8NY
-         C9y2kyQlfPL9Uvg/xHCcCk+C3XDZ8bEid7Vp54B3FPAXOA/VehwIlSq5bKoiy+WkoqVx
-         YdT3tJSv6kBpqkMCmC4KmYxTJ7tM21U6WSFOFIi6oS8qrbgr+Yp69jUChCea9H39wb1Q
-         6LI4vZmgd9QP6g6GMrNQnNsa8DHonoldkDNNSYsqFK/IxP5O1PDUoo7xKpDJzZsC2rPu
-         ofQA==
-X-Gm-Message-State: ANoB5pmUSebnD1GsdgV/ucIjt7rUO5+9HTJhlTQKiAmDwraLvmtMTzmC
-        QqGpOlk4W2TTrMspDahbaRBohQ==
-X-Google-Smtp-Source: AA0mqf5zzbD9A5lmapC2GGKQC+5jCoq1JklIaLBaA9YEUu7UbREHdvJi565q51PnekGCOUfMQIwUFw==
-X-Received: by 2002:a62:ab11:0:b0:574:cea8:4480 with SMTP id p17-20020a62ab11000000b00574cea84480mr15301526pff.72.1669652497815;
-        Mon, 28 Nov 2022 08:21:37 -0800 (PST)
+        bh=Z490q3+4OBgGpP4ghV2GyQxr+yapVjAEH0weCGz/rew=;
+        b=lgwSI3+H6UHiitJcGseNwucjummA2J0SnvR3biTRFVjzNa6mEllPjdzPYfZiMJoorQ
+         bva2hyW6iYSZQyPciNo1cPTlsnl85SvSAucr5zV9zS9h3l+bNJD0DnRR7J5DJPiMeyLU
+         EIHOgbcs7J+1qBKCPUDO2UxiGUXADi/Zdjpsbfdf4IKlo7gXYMlWnDD3wlgRMbmIJUdE
+         Skri9ABHtidf5XQHSxoKbvIrKAfdctgfoetyMzEL0DsT7whWaKDfGPUyP1Ymoi8Kd+dC
+         WDBs80m6bHRoiwdl88uMOYMz6kFGRtk1m52sylV5JDbEQzSx5VYX7jRH9o06BPMjBT1a
+         SLqA==
+X-Gm-Message-State: ANoB5plut+aWY1Ih0eL+HqPSFO9S+lFmDN2GSg2KOC8oTNilS/F4ToNI
+        VOtvxR2kHHF1FP6dj6vG2dcM1g==
+X-Google-Smtp-Source: AA0mqf6UA3M1F5X0CTUJ+Mhdl/2KTcvWkRaZ4HMfCTo8WNM0NYUMyetHeVBhXTbruSHZQhCtQ4C/tA==
+X-Received: by 2002:a17:902:7793:b0:189:24b3:c86 with SMTP id o19-20020a170902779300b0018924b30c86mr33048176pll.84.1669652765355;
+        Mon, 28 Nov 2022 08:26:05 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id w8-20020a17090a1b8800b001f94d25bfabsm9799780pjc.28.2022.11.28.08.21.37
+        by smtp.gmail.com with ESMTPSA id a14-20020a170902ecce00b00186b1bfbe79sm8546264plh.66.2022.11.28.08.26.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Nov 2022 08:21:37 -0800 (PST)
-Date:   Mon, 28 Nov 2022 16:21:33 +0000
+        Mon, 28 Nov 2022 08:26:04 -0800 (PST)
+Date:   Mon, 28 Nov 2022 16:26:01 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Orr <marcorr@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        shuah@kernel.org, yang.zhong@intel.com, ricarkol@google.com,
-        aaronlewis@google.com, wei.w.wang@intel.com,
-        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
-        jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, yu.c.zhang@linux.intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com,
-        michael.roth@amd.com, qperret@google.com, steven.price@arm.com,
-        ak@linux.intel.com, david@redhat.com, luto@kernel.org,
-        vbabka@suse.cz, erdemaktas@google.com, pgonda@google.com,
-        nikunj@amd.com, diviness@google.com, maz@kernel.org,
-        dmatlack@google.com, axelrasmussen@google.com,
-        maciej.szmigiero@oracle.com, mizhang@google.com,
-        bgardon@google.com, ackerleytng@google.com
-Subject: Re: [V1 PATCH 1/6] KVM: x86: Add support for testing private memory
-Message-ID: <Y4TgDZPTXnnoTitB@google.com>
-References: <20221111014244.1714148-1-vannapurve@google.com>
- <20221111014244.1714148-2-vannapurve@google.com>
- <20221122100705.GA619277@chaop.bj.intel.com>
- <Y30rqWwDRbH7nQaQ@google.com>
- <CAA03e5EXU-TpZP2tyjEjfAAr9aNNcgmgOX6Rqv7ng+4Xc9H5AQ@mail.gmail.com>
+To:     "Li, Xin3" <xin3.li@intel.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
+ for NMI/IRQ reinjection
+Message-ID: <Y4ThGWP4qNuCDPgh@google.com>
+References: <BN6PR1101MB2161299749E12D484DE9302BA8049@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y3NZQBJugRt07udw@hirez.programming.kicks-ass.net>
+ <DM5PR1101MB2172D7D7BC49255DB3752802A8069@DM5PR1101MB2172.namprd11.prod.outlook.com>
+ <Y3ZYiKbJacmejY3K@google.com>
+ <BN6PR1101MB21611347D37CF40403B974EDA8099@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <BN6PR1101MB2161FCA1989E3C6499192028A80D9@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y302kxLEhcp20d65@google.com>
+ <BN6PR1101MB216162F44664713802201FAFA80C9@BN6PR1101MB2161.namprd11.prod.outlook.com>
+ <Y36Fy/OYO5u0AzEG@google.com>
+ <BN6PR1101MB2161E9BB4D4F05DF9F244CF7A80F9@BN6PR1101MB2161.namprd11.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAA03e5EXU-TpZP2tyjEjfAAr9aNNcgmgOX6Rqv7ng+4Xc9H5AQ@mail.gmail.com>
+In-Reply-To: <BN6PR1101MB2161E9BB4D4F05DF9F244CF7A80F9@BN6PR1101MB2161.namprd11.prod.outlook.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -93,44 +90,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 23, 2022, Marc Orr wrote:
-> On Tue, Nov 22, 2022 at 12:06 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > > @@ -221,6 +220,9 @@ struct kvm_page_fault {
-> > > >     /* The memslot containing gfn. May be NULL. */
-> > > >     struct kvm_memory_slot *slot;
-> > > >
-> > > > +   /* Derived from encryption bits of the faulting GPA for CVMs. */
-> > > > +   bool is_private;
-> > >
-> > > Either we can wrap it with the CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING or if
-> > > it looks ugly I can remove the "const" in my code.
+On Thu, Nov 24, 2022, Li, Xin3 wrote:
+> > > > thouh we'd like want a fair bit of refactoring so that all of
+> > > > vmx_vcpu_run() and
+> > > > svm_vcpu_run() don't need to be noinstr.
+> > 
+> > For the record, svm_vcpu_run() is fine, at least as far as NMIs are concerned.
+> > 
+> > > This sounds reasonable to me, however from
+> > > Documentation/core-api/entry.rst, we do need it.
+> > 
+> > Why do you say that?
 > >
-> > Hmm, I think we can keep the const.  Similar to the bug in kvm_faultin_pfn()[*],
-> > the kvm_slot_can_be_private() is bogus.  A fault should be considered private if
-> > it's marked as private, whether or not userspace has configured the slot to be
-> > private is irrelevant.  I.e. the xarray is the single source of truth, memslots
-> > are just plumbing.
 > 
-> If we incorporate Sean's suggestion and use xarray as the single
-> source of truth, then can we get rid of the
-> HAVE_KVM_PRIVATE_MEM_TESTING config?
+> Copy/Paste from Documentation/core-api/entry.rst:
 
-No, we still want the opt-in config.  
-
-> Specifically, the self test can call the KVM_MEMORY_ENCRYPT_REG_REGION
-> ioctl which will set the bits for the private FD within KVM's xarray.
-
-Yes, but that should be disallowed for regular VMs without HAVE_KVM_PRIVATE_MEM_TESTING=y.
-
-> (Maybe this was part of the point that Sean was making; but his
-> feedback seemed focused on the discussion about keeping `is_private`
-> const, whereas I've been staring at this trying to figure out if we
-> can run the UPM selftests on a non-TDX/SNP VM WITHOUT a special
-> test-only config. And Sean's idea seems to eliminate the need for the
-> awkward CONFIG.)
-
-"need" was always relative.  It's obviously possible to enable any code without a
-Kconfig, the question is whether or not it's a good idea to do so.  In this case,
-the answer is "no", because allowing private memory opens up a number a of code
-paths and thus potential bugs.  And we need something for kvm_arch_has_private_mem()
-because returning "true" unconditionally is not correct for regular VMs.
+I'm very confused.  What do you mean by "we do need it".  What is "it"?  And what
+does "it" have to do with the below documentation?  The documentation does nothing
+more than explain how KVM handles task work.
+ 
+> KVM
+> ---
+> 
+> Entering or exiting guest mode is very similar to syscalls. From the host
+> kernel point of view the CPU goes off into user space when entering the
+> guest and returns to the kernel on exit.
+> 
+> kvm_guest_enter_irqoff() is a KVM-specific variant of exit_to_user_mode()
+> and kvm_guest_exit_irqoff() is the KVM variant of enter_from_user_mode().
+> The state operations have the same ordering.
+> 
+> Task work handling is done separately for guest at the boundary of the
+> vcpu_run() loop via xfer_to_guest_mode_handle_work() which is a subset of
+> the work handled on return to user space.
+> 
+> Do not nest KVM entry/exit transitions because doing so is nonsensical.
