@@ -2,99 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 019D263A0D8
-	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 06:47:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 94E3C63A10C
+	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 07:07:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229658AbiK1FrQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Nov 2022 00:47:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48380 "EHLO
+        id S229752AbiK1GHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Nov 2022 01:07:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229503AbiK1FrP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Nov 2022 00:47:15 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5693F65BA;
-        Sun, 27 Nov 2022 21:47:14 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id 130so9424975pfu.8;
-        Sun, 27 Nov 2022 21:47:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=clF2yN6A6iGTuwA3DES6a8mecm0VV0tg9cwaWgrqg4Y=;
-        b=dE6HmyOP0M5nVfXXS24HyNDQ+y26F7nAFaBGZ9e2Mtvr2qwotgdHiYWpLAOzAEri+t
-         NLpORagnXvw930gYpb2fTmkAV+f51DEpPPHD7QPk/sZxY5Tk/ClQj637DKK08qggIDLW
-         dIuyVv0zLoXbGsumsr1CfdmiprN8sKSTxmFO/c1oRZXhN2pSYzZx5cmC+0402OtV48Em
-         bR4roYRvsKc6hruGl9LCAKfRCAC609uamf+eCybtl5HkC1wTUIA2fIx9kMEsNEc8trIr
-         cGbcP5d8OjWMIlIsv+npch1XkGGkycuUVrDefYHhauh84MwJ77lbbIIy7+DgyV4hmXPb
-         QXNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=clF2yN6A6iGTuwA3DES6a8mecm0VV0tg9cwaWgrqg4Y=;
-        b=e+fDNT39uGGX8ouhelbcnjY0dxKAQXqt2dZGgAbeLNYIRrvdUZJIJH6KLQSgjEZD1b
-         vexxYHqSpnT2/7hq8YpynNGiLsvLDmZf2vw21WexPm+RNDGnx80iG4nY776uQWtGohvj
-         VbDHHQYxepDdYaKS2o4DRcfXE6i/UWFbb2NYk36L1qWeOES3Cpv5MzJyeUGLOPitvt3z
-         LE7p642JKnsCTkqOk5Vzih0MV/s+t71wvWrG2IdC8TA1YN6FaQzjnXbAw8M4Dj8rCvN+
-         O5DJEYgJHVSy8Kpp8kVE8N6qZkvD3r8aL5tAjfq0I2NQF2QQNQvlr47gEf+/xdjdhtKu
-         4Fgw==
-X-Gm-Message-State: ANoB5pl9k1PeV6hrwiB/8+5YQBKpQ5/+xh6spahfj+jb9gFcTCowzC6M
-        ZyXydRDm6gZulnAWpszJ2Hc=
-X-Google-Smtp-Source: AA0mqf67ZMWERK2VwdcyNZwgNvK2LUVZ/GRAWUyruH0SAA/dcYbftyaPvpTc8uYdy1HcWJymWUh5/w==
-X-Received: by 2002:a63:d04f:0:b0:46e:c41c:e4bf with SMTP id s15-20020a63d04f000000b0046ec41ce4bfmr26257003pgi.123.1669614433613;
-        Sun, 27 Nov 2022 21:47:13 -0800 (PST)
-Received: from ?IPV6:2404:f801:10:463:955f:7dcb:f571:942c? ([2404:f801:9000:1a:9b8:7dcb:f571:942c])
-        by smtp.gmail.com with ESMTPSA id y16-20020a17090322d000b00186e34524e3sm7806256plg.136.2022.11.27.21.47.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 27 Nov 2022 21:47:12 -0800 (PST)
-Message-ID: <0d928bdf-769f-8eca-2e3e-5d6e438ef048@gmail.com>
-Date:   Mon, 28 Nov 2022 13:47:02 +0800
+        with ESMTP id S229735AbiK1GHh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Nov 2022 01:07:37 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C3A0307;
+        Sun, 27 Nov 2022 22:07:32 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AS2CQOa025596;
+        Mon, 28 Nov 2022 06:07:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=PjT+MfJJ3/eFkYXjY/kO+PmNcQCtw/hZMgnEnTpWVUE=;
+ b=rVoKjTHNvMUd9wAIEHCBlfezLg4cZ+/3trV53cItcanTZvQtTOCg74DMaAn/QiwUGuTN
+ FyeDH40Qn6gYFhn/rt2sydNwln95q4cq7Jkr2Ix8XIlcS91oFspQVivNMErBqtB+/X4n
+ jAyXf43eXihjfu5H//104pImWPpXs33kAvKiNAG3yy+oFpQUe6VF8OlHYcBRc/OIAxL7
+ 7DT0NahkY2MMG5mMA+uKy9Vo5dlvC7LzcUdhr7MqL+fMR2cvkeG4mLTX3XwAClXvDFuE
+ pf2ilMn74miCalpP2HwfpQqG5jxeTr1jXBcnKmcT3O2oFnPyJXw3sZsIjDv9W9vO1bA9 VQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3vnnxuv9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Nov 2022 06:07:27 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AS5jegh001876;
+        Mon, 28 Nov 2022 06:07:27 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3vnnxuus-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Nov 2022 06:07:27 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AS67PGj024064;
+        Mon, 28 Nov 2022 06:07:25 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3m3ae9a0pf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Nov 2022 06:07:25 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AS60vDe3408466
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 28 Nov 2022 06:00:57 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5B4BD4203F;
+        Mon, 28 Nov 2022 06:07:22 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DFB3142042;
+        Mon, 28 Nov 2022 06:07:21 +0000 (GMT)
+Received: from li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com (unknown [9.145.84.206])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 28 Nov 2022 06:07:21 +0000 (GMT)
+Date:   Mon, 28 Nov 2022 07:07:20 +0100
+From:   Alexander Gordeev <agordeev@linux.ibm.com>
+To:     Anshuman Khandual <anshuman.khandual@arm.com>
+Cc:     linux-mm@kvack.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] s390/mm: Use pmd_pgtable_page() helper in
+ __gmap_segment_gaddr()
+Message-ID: <Y4IvaRNLmASfRJiZ@li-4a3a4a4c-28e5-11b2-a85c-a8d192c6f089.ibm.com>
+References: <20221125034502.1559986-1-anshuman.khandual@arm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [RFC PATCH V2 16/18] x86/sev: Initialize #HV doorbell and handle
- interrupt requests
-Content-Language: en-US
-To:     Christophe de Dinechin <dinechin@redhat.com>
-Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
-References: <20221119034633.1728632-1-ltykernel@gmail.com>
- <20221119034633.1728632-17-ltykernel@gmail.com> <m2ilj3kr19.fsf@redhat.com>
-From:   Tianyu Lan <ltykernel@gmail.com>
-In-Reply-To: <m2ilj3kr19.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221125034502.1559986-1-anshuman.khandual@arm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: H_ZeDN8WWMpM6hhRfHv3uOHEfKUsSV0l
+X-Proofpoint-GUID: YLYRH3nZvkEDWY5MrgI78-BPk0TOQjqi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-28_04,2022-11-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 bulkscore=0 spamscore=0 phishscore=0 suspectscore=0
+ adultscore=0 lowpriorityscore=0 mlxscore=0 impostorscore=0 clxscore=1011
+ mlxlogscore=745 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211280043
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/25/2022 7:49 PM, Christophe de Dinechin wrote:
->> +void check_hv_pending(struct pt_regs *regs)
-> This looks like two functions, one with regs == NULL and one with regs,
-> different internal logic, different call sites. Would you consider splitting
-> into two?
->
+On Fri, Nov 25, 2022 at 09:15:02AM +0530, Anshuman Khandual wrote:
 
-Good suggestion. Will update in the next version.
+Hi Anshuman,
 
+> In __gmap_segment_gaddr() pmd level page table page is being extracted from
+> the pmd pointer, similar to pmd_pgtable_page() implementation. This reduces
+> some redundancy by directly using pmd_pgtable_page() instead,  though first
+> making it available.
+
+[...]
+
+> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+> index 02d15c8dc92e..8947451ae021 100644
+> --- a/arch/s390/mm/gmap.c
+> +++ b/arch/s390/mm/gmap.c
+> @@ -336,12 +336,11 @@ static int gmap_alloc_table(struct gmap *gmap, unsigned long *table,
+>  static unsigned long __gmap_segment_gaddr(unsigned long *entry)
+>  {
+>  	struct page *page;
+> -	unsigned long offset, mask;
+> +	unsigned long offset;
+>  
+>  	offset = (unsigned long) entry / sizeof(unsigned long);
+>  	offset = (offset & (PTRS_PER_PMD - 1)) * PMD_SIZE;
+> -	mask = ~(PTRS_PER_PMD * sizeof(pmd_t) - 1);
+> -	page = virt_to_page((void *)((unsigned long) entry & mask));
+> +	page = pmd_pgtable_page((pmd_t *) entry);
+>  	return page->index + offset;
+>  }
+
+Looks okay to me.
+
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index e9e387caffac..5ead9e997510 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -2403,7 +2403,7 @@ static inline void pgtable_pte_page_dtor(struct page *page)
+>  
+>  #if USE_SPLIT_PMD_PTLOCKS
+>  
+> -static struct page *pmd_pgtable_page(pmd_t *pmd)
+> +static inline struct page *pmd_pgtable_page(pmd_t *pmd)
+>  {
+>  	unsigned long mask = ~(PTRS_PER_PMD * sizeof(pmd_t) - 1);
+>  	return virt_to_page((void *)((unsigned long) pmd & mask));
+
+This chunk does not appear to belong to this patch.
+
+Thanks!
