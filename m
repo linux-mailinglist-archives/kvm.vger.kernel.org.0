@@ -2,111 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9270363A74F
-	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 12:44:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91D8063A804
+	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 13:17:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230505AbiK1LoJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Nov 2022 06:44:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53458 "EHLO
+        id S231691AbiK1MRi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Nov 2022 07:17:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230364AbiK1LoI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Nov 2022 06:44:08 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76EED130
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 03:44:07 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ASBa22D008405
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 11:44:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : from
- : cc : to : subject : message-id : date; s=pp1;
- bh=N8wMsG3baAUxYesLiN7ZhRN6xQTV7S7ag1hz/AIEZQY=;
- b=BXxvKWfklQehSVa9qqBEg9B640tslhBDeG1wdPAKT69NarQtIjbRlIwl2SYe55/1fac+
- /zfFJyC+yTvThbwTkd0f9RlnRQZUNQdwdUBPewnNdiXdUehOY+Y4cnY2kE5D6pGrhWNR
- XEngdlbOaYy9qubiEbEIJiPmKqxrxxoGcQYToW7VCNxb8DEbUOE6LXOgcOuzcfl8RAun
- O1L5dLT57xjGZNOcHQyRbfdwFsYmgxBtmoNjew8bCdzTvI9Ch6ZMGVh5TCahAZnRqwwi
- Zf60L9GBJS/yqKK8Hr5FDSAxS9ME8U5WMpfQxuZikf4dDLPUW8K9e0sfEj6+RM/j3bA0 Ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3vfjp4dr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 11:44:06 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ASAoOOt028546
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 11:44:06 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3vfjp4d5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Nov 2022 11:44:06 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ASBb2HT021901;
-        Mon, 28 Nov 2022 11:44:04 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06fra.de.ibm.com with ESMTP id 3m3a2hsrqn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Nov 2022 11:44:04 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ASBbZWJ64356802
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 28 Nov 2022 11:37:35 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0A1664C046;
-        Mon, 28 Nov 2022 11:44:01 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DFF404C044;
-        Mon, 28 Nov 2022 11:44:00 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.62.74])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 28 Nov 2022 11:44:00 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <2cc74b33-1b29-c77f-960f-e1c3b35ae47f@redhat.com>
-References: <20221124134429.612467-1-nrb@linux.ibm.com> <20221124134429.612467-2-nrb@linux.ibm.com> <2cc74b33-1b29-c77f-960f-e1c3b35ae47f@redhat.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 1/2] s390x: add a library for CMM-related functions
-Message-ID: <166963584015.7765.15181610555192773681@t14-nrb.local>
-User-Agent: alot/0.8.1
-Date:   Mon, 28 Nov 2022 12:44:00 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 8KoAZwCiIsXNRlCJM2wIXIwwxR0-uvvJ
-X-Proofpoint-GUID: fyekpDhAmX3aAlIGstl5qYQYFtRwMhqG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-28_09,2022-11-28_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- mlxscore=0 malwarescore=0 bulkscore=0 adultscore=0 spamscore=0
- priorityscore=1501 lowpriorityscore=0 mlxlogscore=999 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211280089
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230291AbiK1MRP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Nov 2022 07:17:15 -0500
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [58.251.27.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 661DF1D65D;
+        Mon, 28 Nov 2022 04:08:23 -0800 (PST)
+Received: from mxde.zte.com.cn (unknown [10.35.20.121])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mxct.zte.com.cn (FangMail) with ESMTPS id 4NLPPd1lCrz1DxY;
+        Mon, 28 Nov 2022 20:08:21 +0800 (CST)
+Received: from mxus.zte.com.cn (unknown [10.207.168.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mxde.zte.com.cn (FangMail) with ESMTPS id 4NLPPL6dmRz9vSnv;
+        Mon, 28 Nov 2022 20:08:06 +0800 (CST)
+Received: from mxhk.zte.com.cn (unknown [192.168.250.138])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mxus.zte.com.cn (FangMail) with ESMTPS id 4NLPP52dXsz9tyD8;
+        Mon, 28 Nov 2022 20:07:53 +0800 (CST)
+Received: from mxct.zte.com.cn (unknown [192.168.251.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4NLPLr3vXtz5BNS0;
+        Mon, 28 Nov 2022 20:05:56 +0800 (CST)
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mxct.zte.com.cn (FangMail) with ESMTPS id 4NLPJs1MyVz4y0vQ;
+        Mon, 28 Nov 2022 20:04:13 +0800 (CST)
+Received: from xaxapp01.zte.com.cn ([10.88.40.50])
+        by mse-fl2.zte.com.cn with SMTP id 2ASC3aJB077098;
+        Mon, 28 Nov 2022 20:03:36 +0800 (+08)
+        (envelope-from zhang.songyi@zte.com.cn)
+Received: from mapi (xaxapp02[null])
+        by mapi (Zmail) with MAPI id mid31;
+        Mon, 28 Nov 2022 20:03:38 +0800 (CST)
+Date:   Mon, 28 Nov 2022 20:03:38 +0800 (CST)
+X-Zmail-TransId: 2afa6384a39affffffffe970c9cc
+X-Mailer: Zmail v1.0
+Message-ID: <202211282003389362484@zte.com.cn>
+Mime-Version: 1.0
+From:   <zhang.songyi@zte.com.cn>
+To:     <seanjc@google.com>
+Cc:     <pbonzini@redhat.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
+        <bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+        <hpa@zytor.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIEtWTTogU1ZNOiByZW1vdmUgcmVkdW5kYW50IHJldCB2YXJpYWJsZQ==?=
+Content-Type: text/plain;
+        charset="UTF-8"
+X-MAIL: mse-fl2.zte.com.cn 2ASC3aJB077098
+X-Fangmail-Gw-Spam-Type: 0
+X-FangMail-Miltered: at cgslv5.04-192.168.251.14.novalocal with ID 6384A4B4.000 by FangMail milter!
+X-FangMail-Envelope: 1669637301/4NLPPd1lCrz1DxY/6384A4B4.000/10.35.20.121/[10.35.20.121]/mxde.zte.com.cn/<zhang.songyi@zte.com.cn>
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6384A4B4.000/4NLPPd1lCrz1DxY
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Thomas Huth (2022-11-25 14:45:53)
-> On 24/11/2022 14.44, Nico Boehr wrote:
-[...]
-> > diff --git a/lib/s390x/cmm.c b/lib/s390x/cmm.c
-> > new file mode 100644
-> > index 000000000000..5da02fe628f9
-[...]
-> > +/*
-> > + * Maps ESSA actions to states the page is allowed to be in after the
-> > + * respective action was executed.
-> > + */
-> > +const int allowed_essa_state_masks[4] =3D {
->=20
-> Could be declared as "static const int ...", I guess?
+From: zhang songyi <zhang.songyi@zte.com.cn>
 
-Yes, done.
+Return value from svm_nmi_blocked() directly instead of taking
+this in another redundant variable.
 
-> Apart from that nit:
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: zhang songyi <zhang.songyi@zte.com.cn>
+---
+ arch/x86/kvm/svm/svm.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Thanks.
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index ce362e88a567..416812f971f2 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3572,7 +3572,6 @@ bool svm_nmi_blocked(struct kvm_vcpu *vcpu)
+ {
+        struct vcpu_svm *svm = to_svm(vcpu);
+        struct vmcb *vmcb = svm->vmcb;
+-       bool ret;
+
+        if (!gif_set(svm))
+                return true;
+@@ -3580,10 +3579,8 @@ bool svm_nmi_blocked(struct kvm_vcpu *vcpu)
+        if (is_guest_mode(vcpu) && nested_exit_on_nmi(svm))
+                return false;
+
+-       ret = (vmcb->control.int_state & SVM_INTERRUPT_SHADOW_MASK) ||
+-             (vcpu->arch.hflags & HF_NMI_MASK);
+-
+-       return ret;
++       return (vmcb->control.int_state & SVM_INTERRUPT_SHADOW_MASK) ||
++              (vcpu->arch.hflags & HF_NMI_MASK);
+ }
+
+ static int svm_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+--
+2.15.2
