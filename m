@@ -2,304 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 516CE63A675
-	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 11:56:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CC1963A8A5
+	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 13:44:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229612AbiK1K4s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Nov 2022 05:56:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49432 "EHLO
+        id S229846AbiK1MoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Nov 2022 07:44:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229695AbiK1K4q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Nov 2022 05:56:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 547A9175B8
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 02:55:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669632953;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QhYdHOX1qbSelyQF1n2caoyOhYaSnNc+Zc/+zPUkQ+s=;
-        b=XsDY6+Dd+4bC4ZLPRa6HpO4w+vI1fVpdNiT7o+B3k2KoeBE70m3qLnQ3S2wplo+0qQhvC0
-        H5FFtvZSWDG65idN5IFHR17NsBLXIFm8SAo+8kx6pyK7xCxS5hxX9jA/krQdpSyRqjSiUt
-        8xxH7iS3dNAsI0htnh4TEAS/NAugHR4=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-437-i-qtiGbgM9Wuh-N1HrI44Q-1; Mon, 28 Nov 2022 05:55:51 -0500
-X-MC-Unique: i-qtiGbgM9Wuh-N1HrI44Q-1
-Received: by mail-qt1-f200.google.com with SMTP id y8-20020ac87088000000b003a528a5b844so14227443qto.18
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 02:55:50 -0800 (PST)
+        with ESMTP id S229827AbiK1MoU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Nov 2022 07:44:20 -0500
+Received: from mail-yb1-xb44.google.com (mail-yb1-xb44.google.com [IPv6:2607:f8b0:4864:20::b44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ABC56461
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 04:44:20 -0800 (PST)
+Received: by mail-yb1-xb44.google.com with SMTP id 1so13102689ybl.7
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 04:44:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:to:subject:message-id:date:from:reply-to
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=I7MxYSVo2j2ZE5Wh++x/F1OVW4FaYUp3c+xE+poUGY0=;
+        b=UUufyMJgo484AKgxOF0Cx/PxyMW/qr5tUE2NbPOu+j3Er+ZZKgMtY/g3JoSd04Fb41
+         UIfHduid1k/046z9nzVB+ViyW603XDdbnkjl3+1p1ewmjKSqKSpoj3DAUl8Yz5/qj2Hb
+         wOeTUun8+xIgG5uVUyATQ47aKcOycVHKK9ZVyRDN9g1w9vl8YwYyJoFTLrInQbN8bePi
+         NJq/0ezM/iFCr4CXvACIA2kKnO7TNcqWKZCqh5p/oCr1YuYWj15J9YpR8hpQUdKNrwBt
+         LlYxiaAeziIwYAWwuFGrAnLKe9TcnydXJ57LJHTQxhPg3vAGnZMtt4kFK/gxbgu0cy8S
+         YSiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:to:subject:message-id:date:from:reply-to
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=QhYdHOX1qbSelyQF1n2caoyOhYaSnNc+Zc/+zPUkQ+s=;
-        b=KGqKCqFdfOyUbMryT8zyDpqAOZY/mknGisF/7Cezhj4fOwgRm5icNsKX1HgNLcWsCJ
-         uzbLSJucnFV+hN6PPeUz7ZiSDTmk6dxaDTi+3r5igplhB7cW+QYZuNeRyciUbtgxCu9r
-         Tg1P1VLgjs8J9mV1+2+z0j+tAyoYH58r0BIxWned+aQq7gRPnR2ppJdYwx/x+9pB5bAt
-         kO8WotjWI6knq08Xr7DwOmPG6l7wm4Vn7uBvcQ6edn5iGdrHGV9Y14w/PBeXsgwwuumf
-         YSRY6MPxxqZPKIfdpgSE4hCizvIY1UK03wsGCwiG8Vl92tNaFmhsleDDwRPPvTGs6fbR
-         1V/Q==
-X-Gm-Message-State: ANoB5pkYSINy8qOLwQF6KKCUGWBNuUqYwrVVLi6XVt9hbv7nVz06xlcQ
-        rZ92fDVFanXfA5n/JCdHhdqSmufxvGUxVsX3HjeelWJ0lRNah+ZIV6r0gJWGSHTkusOKefhWhKk
-        0Y4dx9KLeM3kc
-X-Received: by 2002:a05:6214:5504:b0:4c6:9399:9335 with SMTP id mb4-20020a056214550400b004c693999335mr41468323qvb.12.1669632950430;
-        Mon, 28 Nov 2022 02:55:50 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6R1JyULPFe65HEgSq/X9lfxRMMZgXu5jvkRqbYJFnB6yxrk1GeFdc2izLM+ws6kfHPBGer7g==
-X-Received: by 2002:a05:6214:5504:b0:4c6:9399:9335 with SMTP id mb4-20020a056214550400b004c693999335mr41468274qvb.12.1669632950103;
-        Mon, 28 Nov 2022 02:55:50 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id z1-20020ac84541000000b003a530a32f67sm6703684qtn.65.2022.11.28.02.55.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Nov 2022 02:55:49 -0800 (PST)
-Message-ID: <94e6034a-c4c1-be0a-ea8c-f5934dbadd4c@redhat.com>
-Date:   Mon, 28 Nov 2022 11:55:41 +0100
+        bh=I7MxYSVo2j2ZE5Wh++x/F1OVW4FaYUp3c+xE+poUGY0=;
+        b=6uB7kdWrtMsYcEtX/vkSQPJE/7WKRZgAArSyws4rCbGi4lZnhdio0pqlhhGPJSBWMi
+         QEyDckY2RZeoNmK68nbX1Qhi3UkfMinmycQs8gn8PZzCfpsO4L0gxC+cBfzlf3uSCg0W
+         jkjQTKTboa4qUfTxDntgSQbjAH5ua+tzdBvmFcF1ckK4YqzkyG9ENtnjxIO4UwqYQyAr
+         osULpjEzojea/lM+XKYvauJ7ytBl11ei53QzsoThdcI3m+HjgoIsEAotBh6CVRHQ3o/t
+         Ac445BdcJH59NMmrJa6oH9ZzyCqxtis4kbxO6E1qeTpRYnOaqArJA7lXEMeVIl1XT5SR
+         mBAg==
+X-Gm-Message-State: ANoB5pm4usEd51LEa9FUOscYoXD2d3TB9SvZi0qYpSB/D7FX47VWZcrw
+        vn1YdsJ/SAgPmKGu4MpRHaXhFEoKE1NIRYNFU5PbLp5zlCw=
+X-Google-Smtp-Source: AA0mqf6aygkSJduHGseFDaQkhJrQNZZF/86yBtmLoxXD17G/w+DvaLhMNnvtw9+xJwN09Bg6d5M/wYRa2PtJ137hoYY=
+X-Received: by 2002:a25:840d:0:b0:6e6:ddab:97c8 with SMTP id
+ u13-20020a25840d000000b006e6ddab97c8mr36675526ybk.230.1669633711978; Mon, 28
+ Nov 2022 03:08:31 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v5 13/19] iommufd: Add kAPI toward external drivers for
- physical devices
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     bpf@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Anthony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        Lixiao Yang <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-References: <13-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com>
- <4c429c36-146e-e2b2-0cb4-d256ca659280@redhat.com>
- <Y4P9VzpCv/DyHeaD@nvidia.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <Y4P9VzpCv/DyHeaD@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Received: by 2002:a05:6919:2e88:b0:ef:e5c2:4f99 with HTTP; Mon, 28 Nov 2022
+ 03:08:31 -0800 (PST)
+Reply-To: susanklatten0411@gmail.com
+From:   Susanne Klatten <musikoyomariciana55@gmail.com>
+Date:   Mon, 28 Nov 2022 03:08:31 -0800
+Message-ID: <CAPPqpA-Ws958_e3KDbYU6VOMOjhk_eTj=ufS2mNQvnVEz0N+TA@mail.gmail.com>
+Subject: Kredit ?
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=4.9 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
+--=20
+Hallo
 
-On 11/28/22 01:14, Jason Gunthorpe wrote:
-> On Sun, Nov 27, 2022 at 10:13:55PM +0100, Eric Auger wrote:
->>> +static int iommufd_device_setup_msi(struct iommufd_device *idev,
->>> +				    struct iommufd_hw_pagetable *hwpt,
->>> +				    phys_addr_t sw_msi_start,
->>> +				    unsigned int flags)
->>> +{
->>> +	int rc;
->>> +
->>> +	/*
->>> +	 * IOMMU_CAP_INTR_REMAP means that the platform is isolating MSI, and it
->> rather means that the *IOMMU* implements IRQ remapping.
-> Not really. The name is a mess, but as it is implemented, it means the
-> platform is implementing MSI security. How exactly that is done is not
-> really defined, and it doesn't really belong as an iommu property.
-> However the security is being created is done in a way that is
-> transparent to the iommu_domain user.
-Some 'ARM platforms' implement what you call MSI security but they do
-not advertise IOMMU_CAP_INTR_REMAP
+Ich bin Susanne Klatten und komme aus Deutschland, ich kann Ihre
+finanziellen Probleme ohne R=C3=BCckgriff auf Banken im Bereich Kreditgeld
+in den Griff bekommen. Wir bieten Privatkredite und Gesch=C3=A4ftskredite
+an, ich bin ein zugelassener und zertifizierter Kreditgeber mit
+jahrelanger Erfahrung in der Kreditvergabe und wir vergeben besicherte
+und unbesicherte Kreditbetr=C3=A4ge von 10.000,00 =E2=82=AC ($) bis maximal
+500.000.000,00 =E2=82=AC mit einem festen Zinssatz von 3 % j=C3=A4hrlich. B=
+rauchen
+Sie einen Kredit?
 
-Besides refering to include/linux/iommu.h:
-IOMMU_CAP_INTR_REMAP,           /* IOMMU supports interrupt isolation */
+Um mehr zu lesen, klicken Sie auf den Link unten.
 
->
-> MSI security means that the originating device (eg the RID for PCI) is
-> validated when the MSI is processed. RIDs can only use MSIs they are
-> authorized to use.
-agreed this is what I described below.
->
-> It doesn't matter how it is done, if it remapping HW, fancy
-> iommu_domain tricks, or built into the MSI controller. Set this flag
-> if the platform is secure and doesn't need the code triggered by
-> irq_domain_check_msi_remap().
-this is not what is implemented as of now. If the IOMMU does support
-interrupt isolation, it advertises IOMMU_CAP_INTR_REMAP. On ARM this
-feature is implemented by the ITS MSI controller instead and the only
-way to retrieve the info whether the device MSIs are directed to that
-kind of MSI controller is to use irq_domain_check_msi_remap().
->
->> irq_domain_check_msi_remap() instead means the MSI controller
->> implements that functionality (a given device id is able to trigger
-> Not quite, it means that MSI isolation is available, however it is not
-> transparent and the iommu_domain user must do the little dance that
-> follows.
-No I do not agree on that point. The 'little dance' is needed because
-the SMMU does not bypass MSI writes as done on Intel. And someone must
-take care of the MSI transaction mapping. This is the role of the MSI
-cookie stuff. To me this is independent on the above discussion whether
-MSI isolation is implemented.
->
-> It does not mean the MSI controller implements the security
-> functionality because it is not set on x86.
->
-> Logically on x86 we should consider the remapping logic as part of the
-> MSI controller even if x86 makes them separated for historical
-> reasons.
->
->> MSI #n and this #n gets translated into actual MSI #m) So what you
->> want is to prevent an assigned device from being able to DMA into an
->> MSI doorbell that is not protected by either the IOMMU or the MSI
->> controller. If this happens this means the DMA can generate any kind
->> of MSI traffic that can jeopardize the host or other VMs
-> I don't know of any real systems that work like this. ARM standard GIC
-> uses a shared ITS page, the IOMMU does nothing to provide MSI
-> security. MSI security is built into the GIC because it validates the
-> device ID as part of processing the MSI. The IOMMU is only involved
-> to grant access to the shared ITS page.
+https://en.wikipedia.org/wiki/Susanne_Klatten
+https://www.forbes.com/profile/susanne-klatten
 
-?? Yeah that's what I said. The SMMU does nothing about MSI security.
-The ITS does.
->
-> Intel is similar, it provides security through the MSI controller's
-> remapping logic, the only difference is that on Intel the MSI window
-> is always present in every iommu_domain (becuase it occures before the
-> IOMMU), and in ARM you have to do the little dance.
-On Intel the MSI window [FEE0_0000h - FEF0_000h] is bypassed by the
-IOMMU. On ARM MSI transactions are translated except in case of HW MSI
-RESV regions (I think).
->
-> Even if the iommu is to be involved it is all hidden from this layer.
->
->> and afterwards resv_msi is checked to see if we need to create the
->> so-called msi cookie.  This msi cookie tells the MSI writes are
->> translated by the IOMMU and somebody must create a mapping for those
->> transactions.
-> The cookie is always necessary if we are going to use the
-> non-transparent mode. That is what makes it the non transparent
-> mode. We have to supply the reserved IOVA range from one part of the
-> iommu driver to another part.
->
->>> +	 * creates the MSI window by default in the iommu domain. Nothing
->>> +	 * further to do.
->>> +	 */
->>> +	if (device_iommu_capable(idev->dev, IOMMU_CAP_INTR_REMAP))
->>> +		return 0;
->>> +
->>> +	/*
->>> +	 * On ARM systems that set the global IRQ_DOMAIN_FLAG_MSI_REMAP every
->>> +	 * allocated iommu_domain will block interrupts by default and this
->> It sounds there is a confusion between IRQ remapping and the fact MSI
->> writes are not bypassed by the IOMMU.
-> I don't think I'm confused :)
-As soon as there is an SW MSI_RESV region and only in that case you need
-to put in place the msi cookie (because it indicates the IOMMU
-translates MSI transactions).
-
-The fact the platform provides MSI security (through IOMMU or MSI
-controller) looks orthogonal to me.
->
->>> +static int iommufd_device_do_attach(struct iommufd_device *idev,
->>> +				    struct iommufd_hw_pagetable *hwpt,
->>> +				    unsigned int flags)
->>> +{
->>> +	phys_addr_t sw_msi_start = 0;
->>> +	int rc;
->>> +
->>> +	mutex_lock(&hwpt->devices_lock);
->>> +
->>> +	/*
->>> +	 * Try to upgrade the domain we have, it is an iommu driver bug to
->>> +	 * report IOMMU_CAP_ENFORCE_CACHE_COHERENCY but fail
->>> +	 * enforce_cache_coherency when there are no devices attached to the
->>> +	 * domain.
->>> +	 */
->>> +	if (idev->enforce_cache_coherency && !hwpt->enforce_cache_coherency) {
->>> +		if (hwpt->domain->ops->enforce_cache_coherency)
->>> +			hwpt->enforce_cache_coherency =
->>> +				hwpt->domain->ops->enforce_cache_coherency(
->>> +					hwpt->domain);
->>> +		if (!hwpt->enforce_cache_coherency) {
->>> +			WARN_ON(list_empty(&hwpt->devices));
->>> +			rc = -EINVAL;
->>> +			goto out_unlock;
->>> +		}
->>> +	}
->>> +
->>> +	rc = iopt_table_enforce_group_resv_regions(&hwpt->ioas->iopt, idev->dev,
->>> +						   idev->group, &sw_msi_start);
->>> +	if (rc)
->>> +		goto out_unlock;
->>> +
->> so in the case of any IOMMU_RESV_MSI, iommufd_device_setup_msi() will be
->> called with *sw_msi_start = 0 which will return -EPERM?
->> I don't think this is what we want. In that case I think we want the
->> RESV_MSI region to be taken into account as a RESV region but we don't
->> need the MSI cookie.
-> This was sort of sloppy copied from VFIO - we should just delete
-> it. The is no driver that sets both, and once the platform asserts
-> irq_domain_check_msi_remap() it is going down the non-transparent path
-> anyhow and must set a cookie to work. [again the names doesn't make
-> any sense for the functionality]
->
-> Failing with EPERM is probably not so bad since the platform is using
-> an invalid configuration. I'm kind of inclined to leave this for right
-I don't understand why it is invalid? HW MSI RESV region is a valid
-config and not sure you tested with that kind of setup, did you?
-> now since it has all be tested and I don't want to make a
-> regression. But I can try to send a patch to tidy it a bit more, maybe
-> add an appropriate WARN_ON.
->
-> The whole thing is actually backwards. The IOMMU_CAP_INTR_REMAP should
-> have been some global irq_has_secure_msi() and everything with
-> interrupt remapping, and ARM should set it.
-You are revisiting this IOMMU_CAP_INTR_REMAP definition ... this is not
-what is documented in the header file.
-
->
-> Then the domain should have had a domain cap
-> IOMUU_CAP_REQUIRE_MSI_WINDOW_SETUP to do the little dance ARM drivers
-> need.
->
-> And even better would have been to not have the little dance in the
-> first place, as we don't really need the iommu_domain user to convey
-> the fixed MSI window from one part of the iommu driver to another.
->
-> We may try to fix this up when we get to doing nesting on ARM, or
-> maybe just leave the confusing sort of working thing as-is. I don't
-> know.
->
-> Jason
->
-Eric
-
+Unterschrift,
+Vorstandsvorsitzender
+Susanne Klatten.
