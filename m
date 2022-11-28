@@ -2,141 +2,316 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2AEA63AE5B
-	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 18:04:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8769763AEF6
+	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 18:31:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232755AbiK1REs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Nov 2022 12:04:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49320 "EHLO
+        id S231969AbiK1RbX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Nov 2022 12:31:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232731AbiK1REW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Nov 2022 12:04:22 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE77D26AEA
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 09:04:00 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id q12so7007567pfn.10
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 09:04:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R+xYVkIg3Eex/OftXposXwIE2BJ8dq2LKPQf7NrW3/o=;
-        b=QKgSl8Nq+emnld5BL9+4mcXMoKLE69igTsm/xJJ2Sv7sIiBng7zrxARxxoi4/eoToJ
-         JmmvHyiXCsi3tERPdiTIj1INUNArjTTxgdiFSJ+gr61afi1ua4S0SwlTCDM0ntIJHUKc
-         hw6TY1QoMvOd+L4u6kmYV28AmeK8XuwuqMPprFsQcoWsU6r/DSPOOXFOfOqPkb2AaNeK
-         khhwr3xT49APZnM6Kzo3b9sly372SbehWeEFOotGlcaRAn8mGDBoS9heC+PTg7cuf8FJ
-         TQRECUw1ltaWme7Xj7ScBVUvWedidvZwnECreQ+Y4k8943vm0vrKVPQmgCNLQr2+GhBj
-         Id0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R+xYVkIg3Eex/OftXposXwIE2BJ8dq2LKPQf7NrW3/o=;
-        b=I2LAzfXMtJ4XbSPAV3aOxvL8Cz7sst2wO+nIABaNxpWErlPdLyH5E3FeXdqi0vKyvX
-         UbC8M2tCQI3YRFq7g7yr1Efv9+ECx4BS+CHmqkPg7hgP2OT4RSen6vEEkEKWXZg6od4u
-         XW8WBHErzh2CdqCEYmfN3mckOSNMN/4pCrgp0k4wfKtkEOm8+L1HV7SmcrebRkM9Mcpv
-         oX23TgtLD5D054xX+M1AxU8mMDKVEpTsLf09/E7yvPf21jkwdNEaXfTaJecSConCqlDi
-         LX8lmYitGewkUhUVmiKYwzaGX+/8EETE4xDUY/25PP7SPBVO5OGoY8d72EqKp8fCE2dH
-         e5Ig==
-X-Gm-Message-State: ANoB5pkecFvMMinUbTmdiQY4r4Ji8JFJWksyiQQcdAwBY6k1/KQ5CQHl
-        tTgFucaJHbHQ2vzaRDaQ/E59SQ==
-X-Google-Smtp-Source: AA0mqf45srP3cBcQ7tTPaca2nygNlKt5sM2ZPFLPPrgLm65+eg5whMYSoqzxgBriP1pHqPZ2d/jGLA==
-X-Received: by 2002:a63:5920:0:b0:43f:88cc:473 with SMTP id n32-20020a635920000000b0043f88cc0473mr31324344pgb.491.1669655033066;
-        Mon, 28 Nov 2022 09:03:53 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id jc21-20020a17090325d500b00176d347e9a7sm9063406plb.233.2022.11.28.09.03.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Nov 2022 09:03:52 -0800 (PST)
-Date:   Mon, 28 Nov 2022 17:03:49 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Wang, Lei" <lei4.wang@intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        yang.zhong@linux.intel.com
-Subject: Re: [PATCH] KVM: selftest: Move XFD CPUID checking out of
- __vm_xsave_require_permission()
-Message-ID: <Y4Tp9YO0vgsaJeyd@google.com>
-References: <20221125023839.315207-1-lei4.wang@intel.com>
+        with ESMTP id S230367AbiK1RbW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Nov 2022 12:31:22 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14E13270A
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 09:31:21 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ASHO1fO002513
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 17:31:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=tb8EBn4K4AJxtsXQxZOrD8AxAxVO55DIHlkb6i6upew=;
+ b=AJeXcfdziElaVxWdPClJ/n8ZFeCchq4XFMewzNC6zmlaxfIRPQRtqX9gG6u+Svdy+Ioj
+ 4Lnhv5fMAgzxGl7925iffLtYKppNWlunz5juxip6sP34qLyrozOYuxAgBxhtumf3YLL2
+ duFW7LI5v0q4d63CAvagSfdJzk5sXc5NbOthm+EIETEXgn3jfpfZtHQOnVzGqgMBXqK9
+ Lx4idKS9ar5ocbNz4yMkmPUGPCdw8jmh40B+aeskpHFLv7RN5pfsBi24BbgXeeujBS0x
+ EzkdkhaD2p/JM0kwd8awcZQDFTIt1wsxQO/2HEQ052TXsih+Zm4POyTvY9+tFYRDZ9H9 rA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3vpm45uy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 17:31:20 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ASHOAJQ003575
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 17:31:19 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3vpm45tb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Nov 2022 17:31:19 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ASHK5XI015801;
+        Mon, 28 Nov 2022 17:31:15 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 3m3a2htx0w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Nov 2022 17:31:15 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ASHVCiq2884246
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 28 Nov 2022 17:31:12 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 031C342049;
+        Mon, 28 Nov 2022 17:31:12 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C592F42047;
+        Mon, 28 Nov 2022 17:31:11 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 28 Nov 2022 17:31:11 +0000 (GMT)
+Date:   Mon, 28 Nov 2022 18:27:28 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v3 1/2] s390x: add a library for
+ CMM-related functions
+Message-ID: <20221128182728.05967c8c@p-imbrenda>
+In-Reply-To: <20221128132323.1964532-2-nrb@linux.ibm.com>
+References: <20221128132323.1964532-1-nrb@linux.ibm.com>
+        <20221128132323.1964532-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221125023839.315207-1-lei4.wang@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: XgxiB01DFsGzQjCdJcdmLd248mGdSDn6
+X-Proofpoint-GUID: IWbUFIUfiaaI1WBrP0gc5k8MeTV1iYKK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-28_15,2022-11-28_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ impostorscore=0 mlxscore=0 malwarescore=0 adultscore=0 spamscore=0
+ lowpriorityscore=0 phishscore=0 suspectscore=0 priorityscore=1501
+ clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211280126
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 24, 2022, Wang, Lei wrote:
-> kvm_cpu_has(X86_FEATURE_XFD) will call kvm_get_supported_cpuid() which will
-> cache the cpuid information when it is firstly called. Move this line out
-> of __vm_xsave_require_permission() and check it afterwards so that the
-> CPUID change will not be veiled by the cached CPUID information.
+On Mon, 28 Nov 2022 14:23:22 +0100
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-Please call out exactly what CPUID change is being referred to.  Someone that
-doesn't already know about ARCH_REQ_XCOMP_GUEST_PERM and it's interaction with
-KVM_GET_SUPPORTED_CPUID will have zero clue what this fixes.
-
-E.g.
-
-Move the kvm_cpu_has() check on X86_FEATURE_XFD out of the helper to
-enable off-by-default XSAVE-managed features and into the one test that
-currenty requires XFD (XFeature Disable) support.   kvm_cpu_has() uses
-kvm_get_supported_cpuid() and thus caches KVM_GET_SUPPORTED_CPUID, and so
-using kvm_cpu_has() before ARCH_REQ_XCOMP_GUEST_PERM effectively results
-in the test caching stale values, e.g. subsequent checks on AMX_TILE will
-get false negatives.
-
-Although off-by-default features are nonsensical without XFD, checking
-for XFD virtualization prior to enabling such features isn't strictly
-required.
-
-Fixes: 7fbb653e01fd ("KVM: selftests: Check KVM's supported CPUID, not host CPUID, for XFD")
-
-> Signed-off-by: Wang, Lei <lei4.wang@intel.com>
-> ---
->  tools/testing/selftests/kvm/lib/x86_64/processor.c | 2 --
->  tools/testing/selftests/kvm/x86_64/amx_test.c      | 1 +
->  2 files changed, 1 insertion(+), 2 deletions(-)
+> Upcoming changes will add a test which is very similar to the existing
+> CMM migration test. To reduce code duplication, move the common function
+> to a library which can be re-used by both tests.
 > 
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 39c4409ef56a..5686eacd4700 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -616,8 +616,6 @@ void __vm_xsave_require_permission(int bit, const char *name)
->  		.addr = (unsigned long) &bitmask
->  	};
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  lib/s390x/cmm.c       | 92 +++++++++++++++++++++++++++++++++++++++++++
+>  lib/s390x/cmm.h       | 31 +++++++++++++++
+>  s390x/Makefile        |  1 +
+>  s390x/migration-cmm.c | 34 ++++------------
+>  4 files changed, 132 insertions(+), 26 deletions(-)
+>  create mode 100644 lib/s390x/cmm.c
+>  create mode 100644 lib/s390x/cmm.h
+> 
+> diff --git a/lib/s390x/cmm.c b/lib/s390x/cmm.c
+> new file mode 100644
+> index 000000000000..d1399a7445c1
+> --- /dev/null
+> +++ b/lib/s390x/cmm.c
+> @@ -0,0 +1,92 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * CMM test library
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +#include <libcflat.h>
+> +#include <bitops.h>
+> +#include "cmm.h"
+> +
+> +/*
+> + * Maps ESSA actions to states the page is allowed to be in after the
+> + * respective action was executed.
+> + */
+> +static const unsigned long allowed_essa_state_masks[4] = {
+> +	BIT(ESSA_USAGE_STABLE),					/* ESSA_SET_STABLE */
+> +	BIT(ESSA_USAGE_UNUSED),					/* ESSA_SET_UNUSED */
+> +	BIT(ESSA_USAGE_VOLATILE),				/* ESSA_SET_VOLATILE */
+> +	BIT(ESSA_USAGE_VOLATILE) | BIT(ESSA_USAGE_POT_VOLATILE) /* ESSA_SET_POT_VOLATILE */
+> +};
+> +
+> +/*
+> + * Set CMM page states on pagebuf.
+> + * pagebuf must point to page_count consecutive pages.
+> + * page_count must be a multiple of 4.
+> + */
+> +void cmm_set_page_states(uint8_t *pagebuf, unsigned long page_count)
+> +{
+> +	unsigned long addr = (unsigned long)pagebuf;
+> +	unsigned long i;
+> +
+> +	assert(page_count % 4 == 0);
+> +	for (i = 0; i < page_count; i += 4) {
+> +		essa(ESSA_SET_STABLE, addr + i * PAGE_SIZE);
+> +		essa(ESSA_SET_UNUSED, addr + (i + 1) * PAGE_SIZE);
+> +		essa(ESSA_SET_VOLATILE, addr + (i + 2) * PAGE_SIZE);
+> +		essa(ESSA_SET_POT_VOLATILE, addr + (i + 3) * PAGE_SIZE);
+> +	}
+> +}
+> +
+> +/*
+> + * Verify CMM page states on pagebuf.
+> + * Page states must have been set by cmm_set_page_states on pagebuf before.
+> + * page_count must be a multiple of 4.
+> + *
+> + * If page states match the expected result, will return a cmm_verify_result
+> + * with verify_failed false. All other fields are then invalid.
+> + * If there is a mismatch, the returned struct will have verify_failed true
+> + * and will be filled with details on the first mismatch encountered.
+> + */
+> +struct cmm_verify_result cmm_verify_page_states(uint8_t *pagebuf, unsigned long page_count)
+> +{
+> +	struct cmm_verify_result result = {
+> +		.verify_failed = true
+> +	};
+> +	unsigned long expected_mask, actual_mask;
+> +	unsigned long addr, i;
+> +
+> +	assert(page_count % 4 == 0);
+> +
+> +	for (i = 0; i < page_count; i++) {
+> +		addr = (unsigned long)(pagebuf + i * PAGE_SIZE);
+> +		actual_mask = essa(ESSA_GET_STATE, addr);
+> +		/* usage state in bits 60 and 61 */
+> +		actual_mask = BIT((actual_mask >> 2) & 0x3);
+> +		expected_mask = allowed_essa_state_masks[i % ARRAY_SIZE(allowed_essa_state_masks)];
+> +		if (!(actual_mask & expected_mask)) {
+> +			result.page_mismatch_idx = i;
+> +			result.page_mismatch_addr = addr;
+> +			result.expected_mask = expected_mask;
+> +			result.actual_mask = actual_mask;
+> +			return result;
+> +		}
+> +	}
+> +
+> +	result.verify_failed = false;
+> +	return result;
+> +}
+> +
+> +void cmm_report_verify(struct cmm_verify_result const *result)
+> +{
+> +	if (result->verify_failed)
+> +		report_fail("page state mismatch: first page idx = %lu, addr = %lx, "
+> +			"expected_mask = 0x%x, actual_mask = 0x%x",
+> +			result->page_mismatch_idx, result->page_mismatch_addr,
+> +			result->expected_mask, result->actual_mask);
+> +	else
+> +		report_pass("page states match");
+> +}
+> diff --git a/lib/s390x/cmm.h b/lib/s390x/cmm.h
+> new file mode 100644
+> index 000000000000..9794e091517e
+> --- /dev/null
+> +++ b/lib/s390x/cmm.h
+> @@ -0,0 +1,31 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * CMM test library
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +#ifndef S390X_CMM_H
+> +#define S390X_CMM_H
+> +
+> +#include <libcflat.h>
+> +#include <asm/page.h>
+> +#include <asm/cmm.h>
+> +
+> +struct cmm_verify_result {
+> +	bool verify_failed;
+> +	char expected_mask;
+> +	char actual_mask;
+> +	unsigned long page_mismatch_idx;
+> +	unsigned long page_mismatch_addr;
+> +};
+> +
+> +void cmm_set_page_states(uint8_t *pagebuf, unsigned long page_count);
+> +
+> +struct cmm_verify_result cmm_verify_page_states(uint8_t *pagebuf, unsigned long page_count);
+> +
+> +void cmm_report_verify(struct cmm_verify_result const *result);
+> +
+> +#endif /* S390X_CMM_H */
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index bf1504f9d58c..401cb6371cee 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -99,6 +99,7 @@ cflatobjs += lib/s390x/malloc_io.o
+>  cflatobjs += lib/s390x/uv.o
+>  cflatobjs += lib/s390x/sie.o
+>  cflatobjs += lib/s390x/fault.o
+> +cflatobjs += lib/s390x/cmm.o
 >  
-> -	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_XFD));
-> -
->  	kvm_fd = open_kvm_dev_path_or_exit();
->  	rc = __kvm_ioctl(kvm_fd, KVM_GET_DEVICE_ATTR, &attr);
->  	close(kvm_fd);
-> diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-> index dadcbad10a1d..1e3457ff304b 100644
-> --- a/tools/testing/selftests/kvm/x86_64/amx_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-> @@ -312,6 +312,7 @@ int main(int argc, char *argv[])
->  	/* Create VM */
->  	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+>  OBJDIRS += lib/s390x
 >  
-> +	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_XFD));
+> diff --git a/s390x/migration-cmm.c b/s390x/migration-cmm.c
+> index aa7910ca76bf..720ef9fb9799 100644
+> --- a/s390x/migration-cmm.c
+> +++ b/s390x/migration-cmm.c
+> @@ -14,41 +14,23 @@
+>  #include <asm/cmm.h>
+>  #include <bitops.h>
+>  
+> +#include "cmm.h"
+> +
+>  #define NUM_PAGES 128
+> -static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+> +
+> +static uint8_t pagebuf[NUM_PAGES * PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+>  
+>  static void test_migration(void)
+>  {
+> -	int i, state_mask, actual_state;
+> -	/*
+> -	 * Maps ESSA actions to states the page is allowed to be in after the
+> -	 * respective action was executed.
+> -	 */
+> -	int allowed_essa_state_masks[4] = {
+> -		BIT(ESSA_USAGE_STABLE),					/* ESSA_SET_STABLE */
+> -		BIT(ESSA_USAGE_UNUSED),					/* ESSA_SET_UNUSED */
+> -		BIT(ESSA_USAGE_VOLATILE),				/* ESSA_SET_VOLATILE */
+> -		BIT(ESSA_USAGE_VOLATILE) | BIT(ESSA_USAGE_POT_VOLATILE) /* ESSA_SET_POT_VOLATILE */
+> -	};
+> +	struct cmm_verify_result result;
+>  
+> -	assert(NUM_PAGES % 4 == 0);
+> -	for (i = 0; i < NUM_PAGES; i += 4) {
+> -		essa(ESSA_SET_STABLE, (unsigned long)pagebuf[i]);
+> -		essa(ESSA_SET_UNUSED, (unsigned long)pagebuf[i + 1]);
+> -		essa(ESSA_SET_VOLATILE, (unsigned long)pagebuf[i + 2]);
+> -		essa(ESSA_SET_POT_VOLATILE, (unsigned long)pagebuf[i + 3]);
+> -	}
+> +	cmm_set_page_states(pagebuf, NUM_PAGES);
+>  
+>  	puts("Please migrate me, then press return\n");
+>  	(void)getchar();
+>  
+> -	for (i = 0; i < NUM_PAGES; i++) {
+> -		actual_state = essa(ESSA_GET_STATE, (unsigned long)pagebuf[i]);
+> -		/* extract the usage state in bits 60 and 61 */
+> -		actual_state = (actual_state >> 2) & 0x3;
+> -		state_mask = allowed_essa_state_masks[i % ARRAY_SIZE(allowed_essa_state_masks)];
+> -		report(BIT(actual_state) & state_mask, "page %d state: expected_mask=0x%x actual_mask=0x%lx", i, state_mask, BIT(actual_state));
+> -	}
+> +	result = cmm_verify_page_states(pagebuf, NUM_PAGES);
+> +	cmm_report_verify(&result);
+>  }
+>  
+>  int main(void)
 
-I think we should disallow kvm_get_supported_cpuid() before
-__vm_xsave_require_permission(), otherwise we'll reintroduce a similar bug in the
-future.
- 
->  	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_XSAVE));
->  	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_AMX_TILE));
->  	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_XTILECFG));
-
-And then as a follow-up, we should move these above vm_create_with_one_vcpu(),
-checking them after vm_create_with_one_vcpu() is odd.
-
-I'll send a v2 with the reworded changelog and additional patches to assert that
-__vm_xsave_require_permission() isn't used after kvm_get_supported_cpuid().
