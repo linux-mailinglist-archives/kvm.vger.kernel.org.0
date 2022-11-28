@@ -2,126 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D276863ADA1
-	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 17:28:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1652563ADF0
+	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 17:39:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232676AbiK1Q2S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Nov 2022 11:28:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56744 "EHLO
+        id S232802AbiK1Qj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Nov 2022 11:39:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232397AbiK1Q2N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Nov 2022 11:28:13 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4713220D8
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 08:28:12 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id y4so10660145plb.2
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 08:28:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z490q3+4OBgGpP4ghV2GyQxr+yapVjAEH0weCGz/rew=;
-        b=g4/JV+5AWieJycDXis2BS4N3wmKNQsJ/KNpv5tNUJ7bYf7rIi5c6ZaaBKkHz/bt2ds
-         NVz1nDCNfg0Gvfj59pCRuZnyo34rIXD5ZSqLXCEY3KRO6/0+gAckzIMtyN+jGGEHc1LZ
-         fc8V8VVQPLEKTbb0k2l/Y0nzsa1NvtgKYzNydgnY35ub6CZbpuUKfzyDWtzTNa8u2S43
-         Rc6+U9WQb1R1XNDtXj2X0abf3a3VLUTgErJgNOb0NQ1HdQE+GVbcZntRU5XLuQL7Nyr3
-         En9IRHHNEXJ5km/umpqJRqRfuuhN8VUXjEz6i9JeMmMlZtCvtN8lVb4xVk2+abtzmgCe
-         +FYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z490q3+4OBgGpP4ghV2GyQxr+yapVjAEH0weCGz/rew=;
-        b=lgwSI3+H6UHiitJcGseNwucjummA2J0SnvR3biTRFVjzNa6mEllPjdzPYfZiMJoorQ
-         bva2hyW6iYSZQyPciNo1cPTlsnl85SvSAucr5zV9zS9h3l+bNJD0DnRR7J5DJPiMeyLU
-         EIHOgbcs7J+1qBKCPUDO2UxiGUXADi/Zdjpsbfdf4IKlo7gXYMlWnDD3wlgRMbmIJUdE
-         Skri9ABHtidf5XQHSxoKbvIrKAfdctgfoetyMzEL0DsT7whWaKDfGPUyP1Ymoi8Kd+dC
-         WDBs80m6bHRoiwdl88uMOYMz6kFGRtk1m52sylV5JDbEQzSx5VYX7jRH9o06BPMjBT1a
-         SLqA==
-X-Gm-Message-State: ANoB5plut+aWY1Ih0eL+HqPSFO9S+lFmDN2GSg2KOC8oTNilS/F4ToNI
-        VOtvxR2kHHF1FP6dj6vG2dcM1g==
-X-Google-Smtp-Source: AA0mqf6UA3M1F5X0CTUJ+Mhdl/2KTcvWkRaZ4HMfCTo8WNM0NYUMyetHeVBhXTbruSHZQhCtQ4C/tA==
-X-Received: by 2002:a17:902:7793:b0:189:24b3:c86 with SMTP id o19-20020a170902779300b0018924b30c86mr33048176pll.84.1669652765355;
-        Mon, 28 Nov 2022 08:26:05 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a14-20020a170902ecce00b00186b1bfbe79sm8546264plh.66.2022.11.28.08.26.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Nov 2022 08:26:04 -0800 (PST)
-Date:   Mon, 28 Nov 2022 16:26:01 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Li, Xin3" <xin3.li@intel.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: Re: [RESEND PATCH 5/6] KVM: x86/VMX: add kvm_vmx_reinject_nmi_irq()
- for NMI/IRQ reinjection
-Message-ID: <Y4ThGWP4qNuCDPgh@google.com>
-References: <BN6PR1101MB2161299749E12D484DE9302BA8049@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <Y3NZQBJugRt07udw@hirez.programming.kicks-ass.net>
- <DM5PR1101MB2172D7D7BC49255DB3752802A8069@DM5PR1101MB2172.namprd11.prod.outlook.com>
- <Y3ZYiKbJacmejY3K@google.com>
- <BN6PR1101MB21611347D37CF40403B974EDA8099@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <BN6PR1101MB2161FCA1989E3C6499192028A80D9@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <Y302kxLEhcp20d65@google.com>
- <BN6PR1101MB216162F44664713802201FAFA80C9@BN6PR1101MB2161.namprd11.prod.outlook.com>
- <Y36Fy/OYO5u0AzEG@google.com>
- <BN6PR1101MB2161E9BB4D4F05DF9F244CF7A80F9@BN6PR1101MB2161.namprd11.prod.outlook.com>
+        with ESMTP id S232757AbiK1QjW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Nov 2022 11:39:22 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C486924F33;
+        Mon, 28 Nov 2022 08:39:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669653560; x=1701189560;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=GolNk7mcHs/DhuFZg0xkFTIE8isAPO9WLsuqkpSXlnk=;
+  b=h5C31Ec3dH2rreyR96ZeIN2Rsn5+6l3Q7iKHL9F/+I40pmP/vYWOzQgF
+   glsy0hgw+PwKa/QorecGr4jSLyBeT2UqoF9S/Y9X/8/vndiO3IYxlq0Qr
+   J2hGlYix/ckUwWfVEREMnUcjvGcelp/zznAicHa9diNSdfq8JIxRFFH8y
+   OLecLhPsnxbkK5mTiN0kPGEfEaLFIsj/K2mGafeAnjGHQYmfdWMLC++Ga
+   AkKzqQPBd3onsrecMpWh9+L4MnGkotuDGGPKgj/bALDVLVHj/z7E2h1oj
+   h7D/8ZAPT4Srm9LBhJi3pKCK4EpNIlbfGsD/8GwlQ34FiRUBFcUGNyfbY
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10545"; a="341795217"
+X-IronPort-AV: E=Sophos;i="5.96,200,1665471600"; 
+   d="scan'208";a="341795217"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2022 08:39:20 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10545"; a="706855535"
+X-IronPort-AV: E=Sophos;i="5.96,200,1665471600"; 
+   d="scan'208";a="706855535"
+Received: from nroy-mobl1.amr.corp.intel.com (HELO [10.212.209.4]) ([10.212.209.4])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2022 08:39:19 -0800
+Message-ID: <1e45748f-0de1-39aa-7e0f-7596ff813302@intel.com>
+Date:   Mon, 28 Nov 2022 08:39:19 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN6PR1101MB2161E9BB4D4F05DF9F244CF7A80F9@BN6PR1101MB2161.namprd11.prod.outlook.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v7 13/20] x86/virt/tdx: Allocate and set up PAMTs for
+ TDMRs
+Content-Language: en-US
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+References: <cover.1668988357.git.kai.huang@intel.com>
+ <ef6cdab2c371b9f068f2b4bf493b1dd0c9bb3c99.1668988357.git.kai.huang@intel.com>
+ <74723e2b-3094-d04b-aed7-2789268b00ab@intel.com>
+ <cceee7b0476437fb18f90a272e2852bdbb2636cc.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <cceee7b0476437fb18f90a272e2852bdbb2636cc.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 24, 2022, Li, Xin3 wrote:
-> > > > thouh we'd like want a fair bit of refactoring so that all of
-> > > > vmx_vcpu_run() and
-> > > > svm_vcpu_run() don't need to be noinstr.
-> > 
-> > For the record, svm_vcpu_run() is fine, at least as far as NMIs are concerned.
-> > 
-> > > This sounds reasonable to me, however from
-> > > Documentation/core-api/entry.rst, we do need it.
-> > 
-> > Why do you say that?
-> >
+On 11/24/22 03:46, Huang, Kai wrote:
+> On Wed, 2022-11-23 at 14:57 -0800, Dave Hansen wrote:
+>> On 11/20/22 16:26, Kai Huang wrote:
+>>> Use alloc_contig_pages() since PAMT must be a physically contiguous area
+>>> and it may be potentially large (~1/256th of the size of the given TDMR).
+>>> The downside is alloc_contig_pages() may fail at runtime.  One (bad)
+>>> mitigation is to launch a TD guest early during system boot to get those
+>>> PAMTs allocated at early time, but the only way to fix is to add a boot
+>>> option to allocate or reserve PAMTs during kernel boot.
+>>
+>> FWIW, we all agree that this is a bad permanent way to leave things.
+>> You can call me out here as proposing that this wart be left in place
+>> while this series is merged and is a detail we can work on afterword
+>> with new module params, boot options, Kconfig or whatever.
 > 
-> Copy/Paste from Documentation/core-api/entry.rst:
+> Sorry do you mean to call out in the cover letter, or in this changelog?
 
-I'm very confused.  What do you mean by "we do need it".  What is "it"?  And what
-does "it" have to do with the below documentation?  The documentation does nothing
-more than explain how KVM handles task work.
- 
-> KVM
-> ---
+Cover letter would be best.  But, a note in the changelog that it is
+imperfect and will be improved on later would also be nice.
+
+>>> +   /*
+>>> +    * Fall back to allocating the TDMR's metadata from node 0 when
+>>> +    * no TDX memory block can be found.  This should never happen
+>>> +    * since TDMRs originate from TDX memory blocks.
+>>> +    */
+>>> +   WARN_ON_ONCE(1);
+>>
+>> That's probably better a pr_warn() or something.  A backtrace and all
+>> that jazz seems a bit overly dramatic for this.
 > 
-> Entering or exiting guest mode is very similar to syscalls. From the host
-> kernel point of view the CPU goes off into user space when entering the
-> guest and returns to the kernel on exit.
+> How about below?
 > 
-> kvm_guest_enter_irqoff() is a KVM-specific variant of exit_to_user_mode()
-> and kvm_guest_exit_irqoff() is the KVM variant of enter_from_user_mode().
-> The state operations have the same ordering.
-> 
-> Task work handling is done separately for guest at the boundary of the
-> vcpu_run() loop via xfer_to_guest_mode_handle_work() which is a subset of
-> the work handled on return to user space.
-> 
-> Do not nest KVM entry/exit transitions because doing so is nonsensical.
+> pr_warn("TDMR [0x%llx, 0x%llx): unable to find local NUMA node for PAMT
+> allocation, fallback to use node 0.\n");
+
+I actually try to make these somewhat mirror the code.  For instance, if
+you are searching using *just* the start TDMR address, then the message
+should only talk about the start address.  Also, it's not trying to find
+a *node* per se.  It's trying to find a 'tmb'.  So, if someone wanted to
+debug this problem, they would actually want to dump out the tmbs.
+
+But, back to the loop that this message describes:
+
+> +	/* Find the first memory region covered by the TDMR */
+> +	list_for_each_entry(tmb, &tdx_memlist, list) {
+> +		if (tmb->end_pfn > (tdmr_start(tdmr) >> PAGE_SHIFT))
+> +			return tmb->nid;
+> +	}
+
+That loop is funky.  It's not obvious at *all* why it even works.
+
+1. A 'tmb' describes "real" memory.  It never covers holes.
+2. This code is trying to find *a* 'tmb' to place a structure in.  It
+   needs real memory to place this, of course.
+3. A 'tdmr' may include holes and may not have a 'tmb' at either its
+   start or end address
+4. A 'tdmr' is expected to cover one or more 'tmb's.  If there were no
+   'tmb's, then the TDMR is going to be marked as all reserved and is
+   effectively being wasted.
+5. A 'tdmr' may cover more than one NUMA node.  If this happens, it is
+   ok to get memory from any of those nodes for that tdmr's PAMT.
+
+I'd include this comment on the loop:
+
+	A TDMR must cover at least part of one TMB.  That TMB will end
+	after the TDMR begins.  But, that TMB may have started before
+	the TDMR.  Find the next 'tmb' that _ends_ after this TDMR
+	begins.  Ignore 'tmb' start addresses.  They are irrelevant.
+
+Maybe even a little ASCII diagram about the different tmb configurations
+that this can find:
+
+| TDMR1 | TDMR2 |
+   |---tmb---|
+          |tmb|
+          |------tmb-------|
+   |------tmb-------|
+
+I'd also include this on the function:
+
+/*
+ * Locate a NUMA node which should hold the allocation of the @tdmr
+ * PAMT.  This node will have some memory covered by the TDMR.  The
+ * relative amount of memory covered is not considered.
+ */
+
+
