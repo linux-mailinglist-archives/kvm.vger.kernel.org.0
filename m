@@ -2,187 +2,507 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2641963A351
-	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 09:44:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F78863A371
+	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 09:50:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229835AbiK1IoG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Nov 2022 03:44:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53078 "EHLO
+        id S229866AbiK1IuL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Nov 2022 03:50:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229795AbiK1IoF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Nov 2022 03:44:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA7B1788A
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 00:43:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669624990;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=u3Z+f4VZMDJxUPd/+Sf3TcgkW0sRdaW9hPXh2uZaLNU=;
-        b=WZMIITUdrYzI7M9kJw9C9e/tAhKpu4e3kfjXE/cmOP7UuC4LuLyWIUbrIS8N/5FGZUJTB/
-        9SJCl0J1bd6tTnmvfLGxmZZbnMX9oSWDi2CnOQAdgOaWSHIDQdXMwRt91idMXBTgS36DiA
-        ZNOL4U32z721tDd7sj00b/cdtr0tOmc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-175-83-jUvIGPU2y4qvxTbxv1A-1; Mon, 28 Nov 2022 03:43:08 -0500
-X-MC-Unique: 83-jUvIGPU2y4qvxTbxv1A-1
-Received: by mail-wm1-f72.google.com with SMTP id ay19-20020a05600c1e1300b003cf758f1617so8303558wmb.5
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 00:43:08 -0800 (PST)
+        with ESMTP id S230074AbiK1IuK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Nov 2022 03:50:10 -0500
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4202E13D6A
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 00:50:08 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id z24so12313686ljn.4
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 00:50:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d8cFrTuqpybHjcLlJGVLVIXpcVGudopruUC7moy2owk=;
+        b=VcVymauxkDfiJWVo4bvxaS0Dh7MPVxYWDuA9JGgSqFnZjnq5RDt2F7lg6vsqJvNE4L
+         p9HNlIRksuaGBxmFFbgkA6/a6+b1xHQUYbO2RwSJbfSGYtfNDfQ8h4EVm0xnPVw+rMq1
+         YvBp9PAbPCXWhHct9uk10KA1lWh/yfUgUTBJVAIZEnasVtUBjFPnyCCo/NDeMD70ZT3s
+         IzbZxS7pKfpgzzJNfFAqoLVI0bLQVUNd0yVUGs4hwh7lwUUBuy5DHRjLWkNwKM5XrdgM
+         0HS0a88Kd71QsNGso9aJti7Xt3mv7dVyLb0c9DSOkgDp5IVGfIq48APVy8dn9TBiO5D0
+         XJdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=u3Z+f4VZMDJxUPd/+Sf3TcgkW0sRdaW9hPXh2uZaLNU=;
-        b=M/jxcKbBS9P3Qi87/EVSMXPqA3hgxHR/oti1M+RCT74IPLTOTyoQU1kvkkA7Eamm7/
-         nx7mjNak4vEuSAaQFrUN2eolqdAKypSEGTm4ZwxJj5creHV+6MMr91nWO3rz1P5Qc4Ye
-         DzzDYIkPwXqqv1UC8BDOIBK7erFa+5Z+WwDeqEDtpHuziNH316jgSLjhPJujXjl3xlur
-         e6pS47KvcacAzXUsZ1rzGTb/GH9VluaWG0A4IrIDcnD+hbwF/elBmGwiIn71MEE8jPZW
-         aRF+pXw9lOKJPwkVjR2V8J6K9KuQ3N3r95EmqQa5JgLaffREohIkTJIbHldwYG8pzl7z
-         AAdg==
-X-Gm-Message-State: ANoB5plossd5OWEiKJt4APCeR4zlAKvOO6BNnf7LMhTZLNsMKBWAcCwX
-        mR0hueOvKz+Wl5Um6wqw4WPTOJi9FXkOTtzBSHZNnQ/F6zmfXPUsNaIKQvm1q8nkB9G/vBqqvze
-        a5Kn8fbNXphzL
-X-Received: by 2002:adf:f650:0:b0:241:f0c6:11bb with SMTP id x16-20020adff650000000b00241f0c611bbmr14591293wrp.389.1669624987256;
-        Mon, 28 Nov 2022 00:43:07 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7tYyRPHGtVQ1+TZNLDaZiRIq2vii8ri7zjcAuldMIqwe9YPM1WwXwe8PDxctzR9eiFdQ8vew==
-X-Received: by 2002:adf:f650:0:b0:241:f0c6:11bb with SMTP id x16-20020adff650000000b00241f0c611bbmr14591257wrp.389.1669624986924;
-        Mon, 28 Nov 2022 00:43:06 -0800 (PST)
-Received: from ?IPV6:2003:cb:c702:9000:3d6:e434:f8b4:80cf? (p200300cbc702900003d6e434f8b480cf.dip0.t-ipconnect.de. [2003:cb:c702:9000:3d6:e434:f8b4:80cf])
-        by smtp.gmail.com with ESMTPSA id y8-20020adffa48000000b00241f029e672sm10037075wrr.107.2022.11.28.00.43.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Nov 2022 00:43:06 -0800 (PST)
-Message-ID: <49ab9f26-9e23-25ab-71b4-e666c70ff77e@redhat.com>
-Date:   Mon, 28 Nov 2022 09:43:04 +0100
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=d8cFrTuqpybHjcLlJGVLVIXpcVGudopruUC7moy2owk=;
+        b=gz8f028uTTPjHU6r5glm7GbArExbpEAotT+4saLFg/tAllh+JO20HuYWd4mBli4U6g
+         w2p/FkkXuMEYObNVhRBjEtgq0mLlPy4HP5e9bYIRr9cKb1dRYaPO9YOoKuVjhxt/qIYv
+         /SWHAQW1vDcRJ4BdY2dfhGHpxMAqJ0GanHS0SR6ywOaV43SWYhFFQiNo0iWj/Y57rXF6
+         t0+ayR8DDSl0UWckcmExCMqkJn94MQ/2LcKwImGiOBfom4BKs/gfLCP4kzLMqEXOwvT2
+         s4TNXgc5XVCCC5DKjsqK4qKcRCHkRN+6OF1X7HLyQnNlU00VKoc2XeY9JcZKISdouxRQ
+         F7gw==
+X-Gm-Message-State: ANoB5plZc0b3CxABFDdLxUrGhOlMUCOVh2OUsACjBkbcyw4Bcer09NXP
+        nTqUmRZM7Q+T13ufw9PzT7GMVTyi5XIpWCA4GyH1nM9+zili8w==
+X-Google-Smtp-Source: AA0mqf7O18BYIa1LIB6rc5pui0vCBkBx6NoG330HDmgY3hcyee09aTJW1rrwRJ42PZpqx2uqkLkE7yjBklRCxNu8Dw8=
+X-Received: by 2002:a2e:9256:0:b0:279:823d:77c7 with SMTP id
+ v22-20020a2e9256000000b00279823d77c7mr6100733ljg.92.1669625406300; Mon, 28
+ Nov 2022 00:50:06 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH v7 10/20] x86/virt/tdx: Use all system memory when
- initializing TDX module as TDX memory
-Content-Language: en-US
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc:     "Hansen, Dave" <dave.hansen@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>
-References: <cover.1668988357.git.kai.huang@intel.com>
- <9b545148275b14a8c7edef1157f8ec44dc8116ee.1668988357.git.kai.huang@intel.com>
- <637ecded7b0f9_160eb329418@dwillia2-xfh.jf.intel.com.notmuch>
- <8e8f72ad5d7a3d09be32bee54e4ebb9c280610a2.camel@intel.com>
- <361875cb-e4b3-a46f-b275-6d87a98ce966@redhat.com>
- <397ebe70bf9cede731f2f8bbd05e0df518fd3a22.camel@intel.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <397ebe70bf9cede731f2f8bbd05e0df518fd3a22.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221115111549.2784927-1-tabba@google.com> <20221115111549.2784927-9-tabba@google.com>
+ <Y39PCG0ZRHf/2d5E@monolith.localdoman> <CA+EHjTx6JRODjncxMz6pBO43S2gAFZt4vDibG=Zwbr7TkbiFeQ@mail.gmail.com>
+ <Y3+meXHu5MRYuHou@monolith.localdoman> <CA+EHjTwgg+Cu=A3msmWLNEHmkJhOn-8+MeJULOHzF6V99iHk1A@mail.gmail.com>
+ <Y4CnPcHyt5IPAoF/@monolith.localdoman>
+In-Reply-To: <Y4CnPcHyt5IPAoF/@monolith.localdoman>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Mon, 28 Nov 2022 08:49:29 +0000
+Message-ID: <CA+EHjTzf5-Rsi9-hzfMiYPUB8_C9UmkJuJiZpD8VSe9CNt2_aw@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v1 08/17] Use memfd for all guest ram allocations
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
+        andre.przywara@arm.com, will@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28.11.22 09:38, Huang, Kai wrote:
-> On Fri, 2022-11-25 at 10:28 +0100, David Hildenbrand wrote:
->> On 24.11.22 10:06, Huang, Kai wrote:
->>> On Wed, 2022-11-23 at 17:50 -0800, Dan Williams wrote:
->>>>>     
->>>>> @@ -968,6 +969,15 @@ int arch_add_memory(int nid, u64 start, u64 size,
->>>>>     	unsigned long start_pfn = start >> PAGE_SHIFT;
->>>>>     	unsigned long nr_pages = size >> PAGE_SHIFT;
->>>>>     
->>>>> +	/*
->>>>> +	 * For now if TDX is enabled, all pages in the page allocator
->>>>> +	 * must be TDX memory, which is a fixed set of memory regions
->>>>> +	 * that are passed to the TDX module.  Reject the new region
->>>>> +	 * if it is not TDX memory to guarantee above is true.
->>>>> +	 */
->>>>> +	if (!tdx_cc_memory_compatible(start_pfn, start_pfn + nr_pages))
->>>>> +		return -EINVAL;
->>>>
->>>> arch_add_memory() does not add memory to the page allocator.  For
->>>> example, memremap_pages() uses arch_add_memory() and explicitly does not
->>>> release the memory to the page allocator.
->>>
->>> Indeed.  Sorry I missed this.
->>>
->>>> This check belongs in
->>>> add_memory_resource() to prevent new memory that violates TDX from being
->>>> onlined.
->>>
->>> This would require adding another 'arch_cc_memory_compatible()' to the common
->>> add_memory_resource() (I actually long time ago had such patch to work with the
->>> memremap_pages() you mentioned above).
->>>
->>> How about adding a memory_notifier to the TDX code, and reject online of TDX
->>> incompatible memory (something like below)?  The benefit is this is TDX code
->>> self contained and won't pollute the common mm code:
->>>
->>> +static int tdx_memory_notifier(struct notifier_block *nb,
->>> +                              unsigned long action, void *v)
->>> +{
->>> +       struct memory_notify *mn = v;
->>> +
->>> +       if (action != MEM_GOING_ONLINE)
->>> +               return NOTIFY_OK;
->>> +
->>> +       /*
->>> +        * Not all memory is compatible with TDX.  Reject
->>> +        * online of any incompatible memory.
->>> +        */
->>> +       return tdx_cc_memory_compatible(mn->start_pfn,
->>> +                       mn->start_pfn + mn->nr_pages) ? NOTIFY_OK : NOTIFY_BAD;
->>> +}
->>> +
->>> +static struct notifier_block tdx_memory_nb = {
->>> +       .notifier_call = tdx_memory_notifier,
->>> +};
->>
->> With mhp_memmap_on_memory() some memory might already be touched during
->> add_memory() (because part of the hotplug memory is used for holding the
->> memmap), not when actually onlining memory. So in that case, this would
->> be too late.
-> 
-> Hi David,
-> 
-> Thanks for the review!
-> 
-> Right. The memmap pages are added to the zone before online_pages(), but IIUC
-> those memmap pages will never be free pages thus won't be allocated by the page
-> allocator, correct?  Therefore in practice there won't be problem even they are
-> not TDX compatible memory.
+Hi,
 
-But that memory will be read/written. Isn't that an issue, for example, 
-if memory doesn't get accepted etc?
+First I want to mention that I really appreciate your feedback, which
+has already been quite helpful. I would like you to please consider
+this to be an RFC, and let's use these patches as a basis for
+discussion and how they can be improved when I respin them, even if
+that means waiting until the kvm fd-based proposal is finalized.
 
--- 
-Thanks,
+Now to answer your question...
 
-David / dhildenb
+<snip>
 
+> > My reasoning for allocating all memory with memfd is that it's one
+> > ring to rule them all :) By that I mean, with memfd, we can allocate
+> > normal memory, hugetlb memory, in the future guest private memory, and
+> > easily expand it to support things like IPC memory sharing in the
+> > future.
+>
+> Allocating anonymous memory is more complex now. And I could argue than t=
+he
+> hugetlbfs case is also more complex because there are now two branches th=
+at
+> do different things based whether it's hugetlbfs or not, instead of one.
+
+The additional complexity now comes not from using memfd, but from
+unmapping and aligning code, which I think does benefit kvmtool in
+general.
+
+Hugetlbfd already had a different path before, now at least the other
+path it has just has to do with setting flags for memfd_create(),
+rather than allocating memory differently.
+
+
+> As I stands right now, my opinion is that using memfd for anonymous RAM
+> only adds complexity for zero benefits.
+> >
+> >
+> > > >
+> > > > Moreover, using an fd would be more generic and flexible, which all=
+ows
+> > > > for other use cases (such as IPC), or to map that memory in userspa=
+ce
+> > > > when appropriate. It also allows us to use the same interface for
+> > > > hugetlb. Considering that other VMMs (e.g., qemu [2], crosvm [3])
+> > > > already back guest memory with memfd, and looking at how private
+> > > > memory would work [4], it seemed to me that the best way to unify a=
+ll
+> > > > of these needs is to have the backend of guest memory be fd-based.
+> > > >
+> > > > It would be possible to have that as a separate kvmtool option, whe=
+re
+> > > > fd-backed memory would be only for guests that use the new private
+> > > > memory extensions. However, that would mean more code to maintain t=
+hat
+> > > > is essentially doing the same thing (allocating and mapping memory)=
+.
+> > > >
+> > > > I thought that it would be worth having these patches in kvmtool no=
+w
+> > > > rather than wait until the guest private memory has made it into kv=
+m.
+> > > > These patches simplify the code as an end result, make it easier to
+> > >
+> > > In the non-hugetlbfs case, before:
+> > >
+> > >         kvm->arch.ram_alloc_size =3D kvm->ram_size + SZ_2M;
+> > >         kvm->arch.ram_alloc_start =3D mmap_anon_or_hugetlbfs(kvm, kvm=
+->cfg.hugetlbfs_path, kvm->arch.ram_alloc_size);
+> > >
+> > >         /*
+> > >          * mmap_anon_or_hugetlbfs expands to:
+> > >          * getpagesize()
+> > >          * mmap()
+> > >          */
+> > >
+> > >         kvm->ram_start =3D (void *)ALIGN((unsigned long)kvm->arch.ram=
+_alloc_start, SZ_2M);
+> > >
+> > > After:
+> > >         /* mmap_anon_or_hugetlbfs: */
+> > >         getpagesize();
+> > >         mmap(NULL, total_map, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS,=
+ -1, 0);
+> > >         memfd_alloc(size, htlbfs_path, blk_size);
+> > >
+> > >         /*
+> > >          * memfd_alloc() expands to:
+> > >          * memfd_create()
+> > >          * ftruncate
+> > >          */
+> > >
+> > >         addr_align =3D (void *)ALIGN((u64)addr_map, align_sz);
+> > >         mmap(addr_align, size, PROT_RW, MAP_PRIVATE | MAP_FIXED, fd, =
+0);
+> > >
+> > > I'm counting one extra mmap(), one memfd_create() and one ftruncate()=
+ that
+> > > this series adds (not to mention all the boiler plate code to check f=
+or
+> > > errors).
+> > >
+> > > Let's use another metric, let's count the number of lines of code. Be=
+fore:
+> > > 9 lines of code, after: -3 lines removed from arm/kvm.c and 86 lines =
+of
+> > > code for memfd_alloc() and mmap_anon_or_hugetlbfs_align().
+> > >
+> > > I'm struggling to find a metric by which the resulting code is simple=
+r, as
+> > > you suggest.
+> >
+> > With simpler I didn't mean fewer lines of code, rather that it's
+> > easier to reason about, more shared code. With this series, hugetlb
+>
+> How is all of the code that has been added easier to reason about than on=
+e
+> single mmap call?
+>
+> > and normal memory creation follow the same path, and with the
+> > refactoring a lot of arch-specific code is gone.
+>
+> Can you point me to the arch-specific code that this series removes? As f=
+ar
+> as I can tell, the only arch specfic change is replacing
+> kvm_arch_delete_ram with kvm_delete_ram, which can be done independently =
+of
+> this series. If it's only that function, I wouldn't call that "a lot" of
+> arch-specific code.
+
+kvmtool is an old and well established project. So I think that being
+able to remove the memory-alignment code from the arm and riscv kvm.c,
+two fields from the arm and riscv struct kvm_arch, as well as
+kvm__arch_delete_ram from all architectures, is not that little for a
+mature project such as this one. I agree that this could have been
+done without using memfd, but at least for me, as a person who has
+just posted their first contribution to kvmtool, it was easier to make
+these changes when the tracking of the memory is based on an fd rather
+than a userspace address (makes alignment and unmapping unused memory
+much easier).
+
+>
+> >
+> > >
+> > > > allocate and map aligned memory without overallocating, and bring
+> > >
+> > > If your goal is to remove the overallocting of memory, you can just m=
+unmap
+> > > the extra memory after alignment is performed. To do that you don't n=
+eed to
+> > > allocate everything using a memfd.
+> > >
+> > > > kvmtool closer to a more consistent way of allocating guest memory,=
+ in
+> > > > a similar manner to other VMMs.
+> > >
+> > > I would really appreciate pointing me to where qemu allocates memory =
+using
+> > > memfd when invoked with -m <size>. I was able to follow the hostmem-r=
+am
+> > > backend allocation function until g_malloc0(), but I couldn't find th=
+e
+> > > implementation for that.
+> >
+> > You're right. I thought that the memfd backend was the default, but
+> > looking again it's not.
+> >
+> > > >
+> > > > Moreover, with the private memory proposal [1], whether the fd-base=
+d
+> > > > support available can be queried by a KVM capability. If it's
+> > > > available kvmtool would use the fd, if it's not available, it would
+> > > > use the host-mapped address. Therefore, there isn=E2=80=99t a need =
+for a
+> > > > command line option, unless for testing.
+> > >
+> > > Why would anyone want to use private memory by default for a
+> > > non-confidential VM?
+> >
+> > The idea is that, at least when pKVM is enabled, we would use the
+> > proposed extensions for all guests, i.e., memory via a file
+> > descriptor, regardless whether the guest is protected (thus the memory
+> > would be private), or not.
+>
+> kvmtool can be used to run virtual machines when pKVM is not enabled. In
+> fact, it has been used that way for way longer than pKVM has existed. Wha=
+t
+> about those users?
+
+This does not affect these users, which is the point of these patches.
+This allows new uses as well as maintaining the existing one, and
+enables potentially new ones in the future.
+
+> >
+> >
+> > > >
+> > > > I have implemented this all the way to support the private memory
+> > > > proposal in kvmtool [5], but I haven=E2=80=99t posted these since t=
+he private
+> > > > memory proposal itself is still in flux. If you=E2=80=99re interest=
+ed you
+> > >
+> > > Are you saying that you are not really sure how the userspace API wil=
+l end
+> > > up looking? If that's the case, wouldn't it make more sense to wait f=
+or the
+> > > API to stabilize and then send support for it as one nice series?
+> >
+> > Yes, I'm not sure how it will end up looking. We know that it will be
+> > fd-based though, which is why I thought it might be good to start with
+> > that.
+>
+> If you're not sure how it will end up looking, then why change kvmtool no=
+w?
+
+Because we are sure that it will be fd-based, and because I thought
+that getting a head start to set the scene would be helpful. The part
+that is uncertain is the kvm capabilities, flags, and names of the new
+memory region extensions, none of which I address in these patches.
+
+Cheers,
+/fuad
+
+> Thanks,
+> Alex
+>
+> >
+> > Cheers,
+> > /fuad
+> >
+> >
+> >
+> > > Thanks,
+> > > Alex
+> > >
+> > > > could have a look on how I would go ahead building on these patches
+> > > > for full support of private memory backed by an fd.
+> > > >
+> > > > > Regarding IPC memory sharing, is mmap'ing an memfd file enough to=
+ enable
+> > > > > that? If more work is needed for it, then wouldn't it make more s=
+ense to do
+> > > > > all the changes at once? This change might look sensible right no=
+w, but it
+> > > > > might turn out that it was the wrong way to go about it when some=
+one
+> > > > > actually starts implementing memory sharing.
+> > > >
+> > > > I don=E2=80=99t plan on supporting IPC memory sharing. I just menti=
+oned that
+> > > > as yet another use case that would benefit from guest memory being
+> > > > fd-based, should kvmtool decide to support it in the future.
+> > > >
+> > > > Cheers,
+> > > > /fuad
+> > > >
+> > > > [1] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.pen=
+g@linux.intel.com/
+> > > > [2] https://github.com/qemu/qemu
+> > > > [3] https://chromium.googlesource.com/chromiumos/platform/crosvm/
+> > > > [4] https://github.com/chao-p/qemu/tree/privmem-v9
+> > > > [5] https://android-kvm.googlesource.com/kvmtool/+/refs/heads/tabba=
+/fdmem-v9-core
+> > > >
+> > > >
+> > > >
+> > > > >
+> > > > > Regarding IPC memory sharing, is mmap'ing an memfd file enough to=
+ enable
+> > > > > that? If more work is needed for it, then wouldn't it make more s=
+ense to do
+> > > > > all the changes at once? This change might look sensible right no=
+w, but it
+> > > > > might turn out that it was the wrong way to go about it when some=
+one
+> > > > > actually starts implementing memory sharing.
+> > > > >
+> > > > > Thanks,
+> > > > > Alex
+> > > > >
+> > > > > >
+> > > > > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > > > >
+> > > > > > [*] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p=
+.peng@linux.intel.com/
+> > > > > > ---
+> > > > > >  include/kvm/kvm.h  |  1 +
+> > > > > >  include/kvm/util.h |  3 +++
+> > > > > >  kvm.c              |  4 ++++
+> > > > > >  util/util.c        | 33 ++++++++++++++++++++-------------
+> > > > > >  4 files changed, 28 insertions(+), 13 deletions(-)
+> > > > > >
+> > > > > > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> > > > > > index 3872dc6..d0d519b 100644
+> > > > > > --- a/include/kvm/kvm.h
+> > > > > > +++ b/include/kvm/kvm.h
+> > > > > > @@ -87,6 +87,7 @@ struct kvm {
+> > > > > >       struct kvm_config       cfg;
+> > > > > >       int                     sys_fd;         /* For system ioc=
+tls(), i.e. /dev/kvm */
+> > > > > >       int                     vm_fd;          /* For VM ioctls(=
+) */
+> > > > > > +     int                     ram_fd;         /* For guest memo=
+ry. */
+> > > > > >       timer_t                 timerid;        /* Posix timer fo=
+r interrupts */
+> > > > > >
+> > > > > >       int                     nrcpus;         /* Number of cpus=
+ to run */
+> > > > > > diff --git a/include/kvm/util.h b/include/kvm/util.h
+> > > > > > index 61a205b..369603b 100644
+> > > > > > --- a/include/kvm/util.h
+> > > > > > +++ b/include/kvm/util.h
+> > > > > > @@ -140,6 +140,9 @@ static inline int pow2_size(unsigned long x=
+)
+> > > > > >  }
+> > > > > >
+> > > > > >  struct kvm;
+> > > > > > +int memfd_alloc(u64 size, bool hugetlb, u64 blk_size);
+> > > > > > +void *mmap_anon_or_hugetlbfs_align(struct kvm *kvm, const char=
+ *htlbfs_path,
+> > > > > > +                                u64 size, u64 align);
+> > > > > >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlb=
+fs_path, u64 size);
+> > > > > >
+> > > > > >  #endif /* KVM__UTIL_H */
+> > > > > > diff --git a/kvm.c b/kvm.c
+> > > > > > index 78bc0d8..ed29d68 100644
+> > > > > > --- a/kvm.c
+> > > > > > +++ b/kvm.c
+> > > > > > @@ -160,6 +160,7 @@ struct kvm *kvm__new(void)
+> > > > > >       mutex_init(&kvm->mem_banks_lock);
+> > > > > >       kvm->sys_fd =3D -1;
+> > > > > >       kvm->vm_fd =3D -1;
+> > > > > > +     kvm->ram_fd =3D -1;
+> > > > > >
+> > > > > >  #ifdef KVM_BRLOCK_DEBUG
+> > > > > >       kvm->brlock_sem =3D (pthread_rwlock_t) PTHREAD_RWLOCK_INI=
+TIALIZER;
+> > > > > > @@ -174,6 +175,9 @@ int kvm__exit(struct kvm *kvm)
+> > > > > >
+> > > > > >       kvm__arch_delete_ram(kvm);
+> > > > > >
+> > > > > > +     if (kvm->ram_fd >=3D 0)
+> > > > > > +             close(kvm->ram_fd);
+> > > > > > +
+> > > > > >       list_for_each_entry_safe(bank, tmp, &kvm->mem_banks, list=
+) {
+> > > > > >               list_del(&bank->list);
+> > > > > >               free(bank);
+> > > > > > diff --git a/util/util.c b/util/util.c
+> > > > > > index d3483d8..278bcc2 100644
+> > > > > > --- a/util/util.c
+> > > > > > +++ b/util/util.c
+> > > > > > @@ -102,36 +102,38 @@ static u64 get_hugepage_blk_size(const ch=
+ar *htlbfs_path)
+> > > > > >       return sfs.f_bsize;
+> > > > > >  }
+> > > > > >
+> > > > > > -static void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbf=
+s_path, u64 size, u64 blk_size)
+> > > > > > +int memfd_alloc(u64 size, bool hugetlb, u64 blk_size)
+> > > > > >  {
+> > > > > >       const char *name =3D "kvmtool";
+> > > > > >       unsigned int flags =3D 0;
+> > > > > >       int fd;
+> > > > > > -     void *addr;
+> > > > > > -     int htsize =3D __builtin_ctzl(blk_size);
+> > > > > >
+> > > > > > -     if ((1ULL << htsize) !=3D blk_size)
+> > > > > > -             die("Hugepage size must be a power of 2.\n");
+> > > > > > +     if (hugetlb) {
+> > > > > > +             int htsize =3D __builtin_ctzl(blk_size);
+> > > > > >
+> > > > > > -     flags |=3D MFD_HUGETLB;
+> > > > > > -     flags |=3D htsize << MFD_HUGE_SHIFT;
+> > > > > > +             if ((1ULL << htsize) !=3D blk_size)
+> > > > > > +                     die("Hugepage size must be a power of 2.\=
+n");
+> > > > > > +
+> > > > > > +             flags |=3D MFD_HUGETLB;
+> > > > > > +             flags |=3D htsize << MFD_HUGE_SHIFT;
+> > > > > > +     }
+> > > > > >
+> > > > > >       fd =3D memfd_create(name, flags);
+> > > > > >       if (fd < 0)
+> > > > > > -             die("Can't memfd_create for hugetlbfs map\n");
+> > > > > > +             die("Can't memfd_create for memory map\n");
+> > > > > > +
+> > > > > >       if (ftruncate(fd, size) < 0)
+> > > > > >               die("Can't ftruncate for mem mapping size %lld\n"=
+,
+> > > > > >                       (unsigned long long)size);
+> > > > > > -     addr =3D mmap(NULL, size, PROT_RW, MAP_PRIVATE, fd, 0);
+> > > > > > -     close(fd);
+> > > > > >
+> > > > > > -     return addr;
+> > > > > > +     return fd;
+> > > > > >  }
+> > > > > >
+> > > > > >  /* This function wraps the decision between hugetlbfs map (if =
+requested) or normal mmap */
+> > > > > >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlb=
+fs_path, u64 size)
+> > > > > >  {
+> > > > > >       u64 blk_size =3D 0;
+> > > > > > +     int fd;
+> > > > > >
+> > > > > >       /*
+> > > > > >        * We don't /need/ to map guest RAM from hugetlbfs, but w=
+e do so
+> > > > > > @@ -146,9 +148,14 @@ void *mmap_anon_or_hugetlbfs(struct kvm *k=
+vm, const char *htlbfs_path, u64 size)
+> > > > > >               }
+> > > > > >
+> > > > > >               kvm->ram_pagesize =3D blk_size;
+> > > > > > -             return mmap_hugetlbfs(kvm, htlbfs_path, size, blk=
+_size);
+> > > > > >       } else {
+> > > > > >               kvm->ram_pagesize =3D getpagesize();
+> > > > > > -             return mmap(NULL, size, PROT_RW, MAP_ANON_NORESER=
+VE, -1, 0);
+> > > > > >       }
+> > > > > > +
+> > > > > > +     fd =3D memfd_alloc(size, htlbfs_path, blk_size);
+> > > > > > +     if (fd < 0)
+> > > > > > +             return MAP_FAILED;
+> > > > > > +
+> > > > > > +     kvm->ram_fd =3D fd;
+> > > > > > +     return mmap(NULL, size, PROT_RW, MAP_PRIVATE, kvm->ram_fd=
+, 0);
+> > > > > >  }
+> > > > > > --
+> > > > > > 2.38.1.431.g37b22c650d-goog
+> > > > > >
