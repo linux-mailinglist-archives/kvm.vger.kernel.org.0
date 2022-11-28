@@ -2,229 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB7D663A605
-	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 11:22:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90C8563A657
+	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 11:48:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229568AbiK1KW2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Nov 2022 05:22:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56640 "EHLO
+        id S230359AbiK1Ksj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Nov 2022 05:48:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230042AbiK1KW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Nov 2022 05:22:26 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0F91A3BE
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 02:22:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669630945; x=1701166945;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=h/xQ5CX40rrGJ6fLirVuULVGw2iIKcm9EohY4upz9Js=;
-  b=bBbEtJdjRfSEMZu41NGsOYM6VyXib7f2o+hbhGwgZETtXUGvc+mkZLBE
-   efCnUTCQIzjbMXJjkVxux5QT7Ru+CL4itjdaaXCGyA2T0XZz6gQcXwQTp
-   7+xYpAVLtiWCf4etGpDxAbYS2EE5j+NtUFUesUnLDpzW9l/pX52BogXhf
-   dLC8Wxs/ilVjdaa9ktki5hjONRFM4aRrMn6oWR4Q5PPJoK+h99dNvIwCL
-   K1QzZjm/PWi13YI4r03SCl5EHKsdHlgPMDc1Ny4WwF+A5T1CqV4XxY1Mk
-   36shzezkoJ8jdrCRfxUjZX0hKyCkXeLiK2icpGFQprP/H5XID+0dR/rWz
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10544"; a="298154493"
-X-IronPort-AV: E=Sophos;i="5.96,200,1665471600"; 
-   d="scan'208";a="298154493"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2022 02:22:20 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10544"; a="620997535"
-X-IronPort-AV: E=Sophos;i="5.96,200,1665471600"; 
-   d="scan'208";a="620997535"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga006.jf.intel.com with ESMTP; 28 Nov 2022 02:22:20 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Mon, 28 Nov 2022 02:22:19 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Mon, 28 Nov 2022 02:22:19 -0800
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.48) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Mon, 28 Nov 2022 02:22:18 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HtUtrzznsCLrVdozE1mj27Tfa8qjlGoJyYrqMXI04eric+2jzaTCnAPwOvmMVIGX1bwHQ9Av16fV8UYIp+4m9mJMpBOVegwjWvWS06v6V8TNx9vMtN6v8uKZrQ41GfWitbFNVBuikuvs2J8d7keZD13RAZpzx8ObS3mM02NQKoP1W0+1gM/MHxBxBr8WcXp1K8vZOBSMKQ1J+tS32e9jaBMUjgY2MOeXbK56CaxIhl0Z2DLmyYVRF/EzMWDaNbry6s41odY8IFCTcGGmvFs5Jul8gfSrKe+TlqYn+w74j6GYz23E/Y0IQcr9Eo5MltVZbHCDifNK3hIGZ/vFNSKqIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h/xQ5CX40rrGJ6fLirVuULVGw2iIKcm9EohY4upz9Js=;
- b=SUZqusoiLow41eqgTmClHZaEW1Qtwos2pH6C5B7khXRF1TQSp9D8sQiLASRRomDUWEFC1XHSY6ZpqP0zC3imz2EFqaeSGp3wIq78EamuK2TbJPkA8ahhhBAbaPiVRpgVkRN/1qwyhubzUzWDKNCKxPGtb48UflGdg0LHnJ8g8n6RTJh2+OVMjSbjO+3fLmCpiU+VonEoequR/3K+5DrNiY5O5gAXChzHQFjFwndTPg7TdnUC4wnJw0OVPUZROIyzvHY/AlSUaqdh/ZOI2juwABa4FGQen5ahJJUGLk/5nxrzr0ackoMkVM2Gv6BB91U1JJfDtIJ6YwYlRxnEUdSp1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM4PR11MB5549.namprd11.prod.outlook.com (2603:10b6:5:388::7) by
- SJ0PR11MB4782.namprd11.prod.outlook.com (2603:10b6:a03:2df::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Mon, 28 Nov
- 2022 10:22:17 +0000
-Received: from DM4PR11MB5549.namprd11.prod.outlook.com
- ([fe80::4cb1:2965:376:8bda]) by DM4PR11MB5549.namprd11.prod.outlook.com
- ([fe80::4cb1:2965:376:8bda%7]) with mapi id 15.20.5857.023; Mon, 28 Nov 2022
- 10:22:17 +0000
-From:   "Wang, Zhi A" <zhi.a.wang@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>, "jgg@nvidia.com" <jgg@nvidia.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>
-Subject: Re: [iommufd 1/2] i915/gvt: Move kvmgt_protect_table_init() and
- gvt_cache_init() into init
-Thread-Topic: [iommufd 1/2] i915/gvt: Move kvmgt_protect_table_init() and
- gvt_cache_init() into init
-Thread-Index: AQHY/0JMNGwP1j7DQEC1JUkosyakIq5UKA4A
-Date:   Mon, 28 Nov 2022 10:22:17 +0000
-Message-ID: <9634490f-d100-5a08-013f-439218a4232a@intel.com>
-References: <20221123134832.429589-1-yi.l.liu@intel.com>
- <20221123134832.429589-2-yi.l.liu@intel.com>
-In-Reply-To: <20221123134832.429589-2-yi.l.liu@intel.com>
-Accept-Language: en-FI, en-US
-Content-Language: aa
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR11MB5549:EE_|SJ0PR11MB4782:EE_
-x-ms-office365-filtering-correlation-id: 1f70fc33-8f78-4733-1192-08dad12a6cef
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Nzl7QFTMCssh9TgcV1C1nVdhHta1saBZjlwj1Di1LjiDyUtysYbXsXM1o+I2Fz+iiAB2tFYU5g2iCkzAlhXfulx3aRZdd41CA1kPnatyBL2lQha1UNc6BO+26nRflmEE5MMgj/uuw3aQ+/+QRB0CGzOZyYcYZuYjsb9ArzprLuCZdh8GeYNRKahTAkUc1PRAcPQtE4WKhzRjT7EC8ONQoUk49WP4XEnmJnEw0FT76yqTMGN879IjcPNydhZXdZXVZrsvn60JXqAXCIHCQ7GKPYs3IG4lwFfkFmAvVA11lmFFCo65PMtvuJ/ARIB5z07S7Vu9yubTaQC5AvyixvUhiaJ/JBQh4Z2w21NeZa8aAghMG2RJsnMiCo0RoaJ8sKcEMkSXRtXE94eJH37SBNMHW9Cq3WscFoyJNBqB2kFLH1lF5EAAHq5iOJvWoKc6V+jgYzK9+rQJTmWK2o+JVqJLGJks0R4tdxoX9pdKC7MpKw40LaJTurbo+B31aQmUobc4kPZHF+gyg14uFk0JnQ8HOWzO76o/80/Qdl52bpDw3jCkEtGP0gd3VwnPVijaPdopgwQyHRAI7ftdbIfIs0i71tmZmbSJWF3M/+UhQM9FRlSVcKj/tbnF6QNkXwpQzClU1OPs2K7hsaPsJekInTACTkD5zWyOdqjJAY41IGw58XzsmZMnK/V4coKjvM8+Jll/8y0Hp9Qaw1QKEI7QjTnP4vkftD0Jrtk57le9MWa0fRdmCF0I7/Yl7/15uZFRV4dX
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5549.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(136003)(366004)(39860400002)(346002)(396003)(451199015)(66446008)(64756008)(38100700002)(6486002)(91956017)(82960400001)(66946007)(66476007)(76116006)(66556008)(41300700001)(4326008)(36756003)(478600001)(71200400001)(122000001)(8676002)(54906003)(316002)(2906002)(38070700005)(5660300002)(8936002)(110136005)(86362001)(31696002)(31686004)(2616005)(83380400001)(186003)(6512007)(26005)(53546011)(6506007)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VEwrbWhwbFNmakkvekxKUzlmUjFLMitUR0tNVzg5QUtMSWc2Z0pXaXpoRysz?=
- =?utf-8?B?VWdVOU0vQVZ4anNtVEtNT2FyQnZDVTErblZ3ZnFpWmZMdENLOU9WaXpvWlJZ?=
- =?utf-8?B?cVpmbGtWVTY5eCtzL3czVVFEKzFDR2ZMbTIxWnRMUnNTU2hrRk00OTNuWEdC?=
- =?utf-8?B?Y05YS2xJZnloZjQ1VXhkTTNHYXBEcHlTWUVoa2VRdFl6bUVEeVV3S1hWQzNR?=
- =?utf-8?B?L3VNVGZNcFQ5REcrVDAxeWwreU9JalpsU3VnS2ZqUWtyZmdTRy92T05ScnhW?=
- =?utf-8?B?UHIzQXdvclN2blVuU25nRElqa2RXTUpkRG1vY0dzMThnN3hIek1WRjhBODZW?=
- =?utf-8?B?WnFrWHlEOVkvbHIzNk0rVmJNbWR3MDZVRjNQcnlaR0xCSTRLL2xMZ25ITVVl?=
- =?utf-8?B?TThJd2VRVkU5Q0VnMGhJSkpEOTdRc1VBZDNUalN0QkoxckZkR3F6R3QvdXBX?=
- =?utf-8?B?SUNmSnNwSnZtb2ZDbHBjRk9hekVTVzMwNUcweG5SbHJhSStwOWgvaTBjOW4y?=
- =?utf-8?B?U3dyMTU2SXBUYjE5TnNrVVl0VUs5c0pTblY5NWVuUHVqdGIyTGxsVG1DRUs4?=
- =?utf-8?B?Z2VMc1VkRjM3US80d1h5eXg1bk1XMi9mcjRIcTBzZkZmOS9lY0JYWERpTEVV?=
- =?utf-8?B?dzkyenErSHFHM0UrL3hkcG4rdzN3YnQ4MFFCRHNoREVCZWJCNlNMczJ3dUdC?=
- =?utf-8?B?aDhpSkFmem9lL0tCSmoxWlZSOEpHc2xUaU54QUJRY1VzMHFiam1RZHg0czVa?=
- =?utf-8?B?aGdLam01VFQwRGJmbFRnS3h4TXpvZnkwM000WHRON3lqZ3h6KzM3aFZNYW9n?=
- =?utf-8?B?K01TUkUvdUlxdjN4TWdqZXF6M3NuQWdURTZEWjZnbFhlL0ZxOEt1QS94REJx?=
- =?utf-8?B?QmpmWnFsL0V2Sno0MHlrRzZpUS9vMjkrMzRpZWNwT3FpUmc1eDdaZEROTndv?=
- =?utf-8?B?VmN4TmpHSUc4OGNQSDQwZFJONTE1ajRzWG5aRzVERkZXYzF5bXpqSWFUUzFT?=
- =?utf-8?B?dnZzckx2U211S3BGdUdhczREQWdYV0lhRWFPRmg0bngyN3lGakc5amwzZVJz?=
- =?utf-8?B?R0VwM3MvUFA4cVJPS1Rwc1UwMG9HUmRHbHAxeWhWYUl5RFNTY2RXeGtWb09N?=
- =?utf-8?B?bmd6aERvTS9iWmJwL042QjNnc2Vjb2QxdEtzTjBPbnk5ZFN4VnlEY094Ykhh?=
- =?utf-8?B?bEtObTJDVjdTZ3AzYi9QN2FMVGg1VjEvTGMwS0pMQXR3REw5TWlwOW1tRUx3?=
- =?utf-8?B?V0pUUTdKNE1iWEJFeXRmZlczSGhJWk56SmhjSEg0NVM4TGtxMUp3VWlYMEZa?=
- =?utf-8?B?WjE2WjlISHdBQkZaTURzMm81NW91a1BDdmtzc2RGckRhaWN3UTlWNjJ4WktB?=
- =?utf-8?B?REVLZHNYRkpCUWYyWHo5RU51Sk1HMXdVWlFSQlNKajR1SnUzc1l3anZiVnZE?=
- =?utf-8?B?cEpPa1ZXZUdZNUpKMWxweDB6K0J2OW1aQ0V5cTBUc2NSNlZOVHd2U0I4MEhY?=
- =?utf-8?B?OUxhUUVURUJqWWREcTZQZzJJcVJWd0U2dVNkVEtDVVpiR3NTd0FRL0ZmR3hM?=
- =?utf-8?B?Wkp3eVNaY0xDNkVCdnphWkZ3QU52UXdIaDlGeXp2eU5IckhyRXFiN3RpeVVr?=
- =?utf-8?B?MnB4YXJiemFLUGhtWmpydXpFSG5peitLR0pmRkhESHJ1a1J6WHRNLzJZd0gw?=
- =?utf-8?B?WnZtOWNYamlEVEN2UVYwVzRmYkRkNUxBYmpLdmVuZFlQbG50ZjlETUNvU2V3?=
- =?utf-8?B?cW1MS0JLY2ZIb1ZzNVZBdHFYYzM2QzJpRVIwMk9TVkNZeWFGLy9ZZkJSeHJ6?=
- =?utf-8?B?Mi9LN1FhclFUQVVNUndsVFB6MFRQM3ptbUJrcnZ1VFkyRlVYcHI4T2dwN3Jx?=
- =?utf-8?B?TFFmL1V3Y2hNOVRseVdFOGFxWnNuWXJRdVhOOTloNFduaEJCVWF6NDM5YkhC?=
- =?utf-8?B?M2dMSUtvYXlnWjdnbnQwOHdJdHhFZ2tQc3VhRGNVV25BdTFCZkpsbDQ1Tmg2?=
- =?utf-8?B?U1FPZDY2V211OW9HWWRrNEVPMkZhL3hyOC9jdjMvMnp5VklVek04RHNjelJL?=
- =?utf-8?B?QUlueTNZYUVCZHFTd1hnSXNTdFRvTDQ4bndvdVAwKzN3eDlKbkxkTnJZQnhi?=
- =?utf-8?Q?pNPFcbwjHU4tkeH7Q8o5/qdOk?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <ED5665FAB363444B8DE05792BDE22E6A@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S230349AbiK1Ksh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Nov 2022 05:48:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 997B6E95
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 02:47:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669632461;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=cS8myjO3Qx4B0wnXMirQSBOMzDu+QNBoBdPAnQnrxLs=;
+        b=F0+j4ia4PO3XSK5jmxd9zS3F4SJDLfFv+XXH7tx85MRps7YoeTD/j6W93yIm/cQDo09aIG
+        NGEd7btKHimPfhl5E5L+04mLvNE+N/19O/cFrwHOf63KW1levYI0WQD6VVDRnJH3G7QvM9
+        cm192oPo5xJLBArRUOAdJ9rxzOS+nN4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-375-eMOK6NXAOEW7kh0UZP1qQQ-1; Mon, 28 Nov 2022 05:47:40 -0500
+X-MC-Unique: eMOK6NXAOEW7kh0UZP1qQQ-1
+Received: by mail-wr1-f69.google.com with SMTP id j30-20020adfa55e000000b00241b49be1a3so1749429wrb.4
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 02:47:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cS8myjO3Qx4B0wnXMirQSBOMzDu+QNBoBdPAnQnrxLs=;
+        b=drLWzRJKOr9royOQ9lAx5Ed3fbkbfNyto6EeTVT5pLDdVX02ZX7R1L7Ohlk6B7P8AQ
+         nk2w24Sq7o+pxPunmLiYWKypqNq6jBjvXeV2xRHdEHnbVXAQ457hrFcc+M8LZil3s5hp
+         9/8spzlKVNgr57J23VekyiSqi6MORQWnVYlJ8iiAA5ArEnShqDyHYXke4nSIEupVp1QR
+         /vGVbuHo9S//l8r1CktVQv/Rwt/MLufRFQd+d2GGqwvTGpDKEYlWPBC7InPUSAMOEy0W
+         VY2/LbmU6gWwhyMg+0Hx4PP8Y1Jf0P1qp+OQDAaAy6Z4UoKjk0asSq3A9yxQM8quA869
+         MYDQ==
+X-Gm-Message-State: ANoB5pkMyAdKyi1dtxS+su3t1AeOSh3ZFfhQVjQKD7ipiso66AUK+KgD
+        Pxd+9nx5vPZxP47SplNfTxZccCU+sVPw+zL7TBY9qxgcR820w0b3ic2PDmqRSF+8N5AiO1EEP7R
+        NGsPTYLV0GMP+
+X-Received: by 2002:a5d:5f04:0:b0:241:e9a6:fb3 with SMTP id cl4-20020a5d5f04000000b00241e9a60fb3mr15849625wrb.462.1669632457563;
+        Mon, 28 Nov 2022 02:47:37 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6Uw75GgmZfAJrCZl1x3MbiuyHCdl4XOGtfUzuURjcUCzIxRCl9LYisU8M4TEltPVhmHNqRIw==
+X-Received: by 2002:a5d:5f04:0:b0:241:e9a6:fb3 with SMTP id cl4-20020a5d5f04000000b00241e9a60fb3mr15849610wrb.462.1669632457346;
+        Mon, 28 Nov 2022 02:47:37 -0800 (PST)
+Received: from sgarzare-redhat (host-82-53-134-234.retail.telecomitalia.it. [82.53.134.234])
+        by smtp.gmail.com with ESMTPSA id h9-20020adffd49000000b002383fc96509sm10468040wrs.47.2022.11.28.02.47.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Nov 2022 02:47:36 -0800 (PST)
+Date:   Mon, 28 Nov 2022 11:47:30 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Cindy Lu <lulu@redhat.com>
+Cc:     jasowang@redhat.com, mst@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH v2] vhost_vdpa: fix the crash in unmap a large memory
+Message-ID: <20221128104730.6igmyh6jz7voymdp@sgarzare-redhat>
+References: <20221125022317.2157263-1-lulu@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5549.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1f70fc33-8f78-4733-1192-08dad12a6cef
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Nov 2022 10:22:17.2472
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ngRn8rLIPnwqC6OBCBAArA6VPrrvX/usLMNJvulDM3W6kExpOoudNYJxEd6z/kY9hy2Tvc9pFwdNB5ofeEvqsg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4782
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20221125022317.2157263-1-lulu@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMTEvMjMvMjIgMTM6NDgsIExpdSwgWWkgTCB3cm90ZToNCj4gdmZpb19pb21tdWZkX2JpbmQo
-KSBjcmVhdGVzIGFuIGFjY2VzcyB3aGljaCBoYXMgYW4gdW5tYXAgY2FsbGJhY2ssIHdoaWNoDQo+
-IGNhbiBiZSBjYWxsZWQgaW1tZWRpYXRlbHkuIFNvIGRtYV91bm1hcCgpIGNhbGxiYWNrIHNob3Vs
-ZCB0b2xlcmF0ZSB0aGUNCj4gdW5tYXBzIHRoYXQgY29tZSBiZWZvcmUgdGhlIGVtdWxhdGVkIGRl
-dmljZSBpcyBvcGVuZWQuDQoNCkFmdGVyIHJlYWRpbmcgY29kZSBvbiBKYXNvbidzIHRyZWUsIEkg
-dGhpbmsgaXQgd291bGQgYmUgbmljZSB0byBkb2N1bWVudA0KDQp0aGUgcmVxdWlyZW1lbnRzIGZv
-ciBhIHZmaW8gZHJpdmVyIHNvbWV3aGVyZSwgbGlrZSB3aGF0IHRoZXkgbXVzdCBkbyBhbmQNCg0K
-bXVzdCBub3QgZG8gaW4gdGhlIGNhbGxiYWNrcyBvZiB2ZmlvX2RldmljZV9vcHMuIG1heWJlIGlu
-IGluY2x1ZGUvbGludXgvdmZpby5oPw0KDQo+IFRvIGFjaGlldmUgYWJvdmUsIG1vdmUgdGhlIHBy
-b3RlY3RfdGFibGVfaW5pdCBhbmQgZ3Z0X2NhY2hlX2luaXQgaW50byB0aGUNCj4gaW5pdCBvcCB3
-aGljaCBpcyBzdXBwb3NlZCB0byBiZSB0cmlnZ2VyZWQgcHJpb3IgdG8gdGhlIG9wZW5fZGV2aWNl
-KCkgb3AuDQo+DQo+IENjOiBaaGVueXUgV2FuZyA8emhlbnl1d0BsaW51eC5pbnRlbC5jb20+DQo+
-IENjOiBaaGkgV2FuZyA8emhpLmEud2FuZ0BpbnRlbC5jb20+DQo+IENjOiBLZXZpbiBUaWFuIDxr
-ZXZpbi50aWFuQGludGVsLmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogWWkgTGl1IDx5aS5sLmxpdUBp
-bnRlbC5jb20+DQo+IC0tLQ0KPiAgZHJpdmVycy9ncHUvZHJtL2k5MTUvZ3Z0L2d2dC5oICAgfCAy
-ICsrDQo+ICBkcml2ZXJzL2dwdS9kcm0vaTkxNS9ndnQva3ZtZ3QuYyB8IDcgKystLS0tLQ0KPiAg
-ZHJpdmVycy9ncHUvZHJtL2k5MTUvZ3Z0L3ZncHUuYyAgfCAyICsrDQo+ICAzIGZpbGVzIGNoYW5n
-ZWQsIDYgaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMoLSkNCj4NCj4gZGlmZiAtLWdpdCBhL2Ry
-aXZlcnMvZ3B1L2RybS9pOTE1L2d2dC9ndnQuaCBiL2RyaXZlcnMvZ3B1L2RybS9pOTE1L2d2dC9n
-dnQuaA0KPiBpbmRleCBkYmY4ZDc0NzBiMmMuLmEzYTdlMTYwNzhiYSAxMDA2NDQNCj4gLS0tIGEv
-ZHJpdmVycy9ncHUvZHJtL2k5MTUvZ3Z0L2d2dC5oDQo+ICsrKyBiL2RyaXZlcnMvZ3B1L2RybS9p
-OTE1L2d2dC9ndnQuaA0KPiBAQCAtNzU0LDYgKzc1NCw4IEBAIHZvaWQgaW50ZWxfZ3Z0X2RlYnVn
-ZnNfcmVtb3ZlX3ZncHUoc3RydWN0IGludGVsX3ZncHUgKnZncHUpOw0KPiAgdm9pZCBpbnRlbF9n
-dnRfZGVidWdmc19pbml0KHN0cnVjdCBpbnRlbF9ndnQgKmd2dCk7DQo+ICB2b2lkIGludGVsX2d2
-dF9kZWJ1Z2ZzX2NsZWFuKHN0cnVjdCBpbnRlbF9ndnQgKmd2dCk7DQo+ICANCj4gK3ZvaWQgZ3Z0
-X2NhY2hlX2luaXQoc3RydWN0IGludGVsX3ZncHUgKnZncHUpOw0KPiArdm9pZCBrdm1ndF9wcm90
-ZWN0X3RhYmxlX2luaXQoc3RydWN0IGludGVsX3ZncHUgKmluZm8pOw0KPiAgaW50IGludGVsX2d2
-dF9wYWdlX3RyYWNrX2FkZChzdHJ1Y3QgaW50ZWxfdmdwdSAqaW5mbywgdTY0IGdmbik7DQo+ICBp
-bnQgaW50ZWxfZ3Z0X3BhZ2VfdHJhY2tfcmVtb3ZlKHN0cnVjdCBpbnRlbF92Z3B1ICppbmZvLCB1
-NjQgZ2ZuKTsNCj4gIGludCBpbnRlbF9ndnRfZG1hX3Bpbl9ndWVzdF9wYWdlKHN0cnVjdCBpbnRl
-bF92Z3B1ICp2Z3B1LCBkbWFfYWRkcl90IGRtYV9hZGRyKTsNCj4gZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvZ3B1L2RybS9pOTE1L2d2dC9rdm1ndC5jIGIvZHJpdmVycy9ncHUvZHJtL2k5MTUvZ3Z0L2t2
-bWd0LmMNCj4gaW5kZXggNTc5YjIzMGEwZjU4Li5jYjIxYjFiYTQxNjIgMTAwNjQ0DQo+IC0tLSBh
-L2RyaXZlcnMvZ3B1L2RybS9pOTE1L2d2dC9rdm1ndC5jDQo+ICsrKyBiL2RyaXZlcnMvZ3B1L2Ry
-bS9pOTE1L2d2dC9rdm1ndC5jDQo+IEBAIC0zMjIsNyArMzIyLDcgQEAgc3RhdGljIHZvaWQgZ3Z0
-X2NhY2hlX2Rlc3Ryb3koc3RydWN0IGludGVsX3ZncHUgKnZncHUpDQo+ICAJfQ0KPiAgfQ0KPiAg
-DQo+IC1zdGF0aWMgdm9pZCBndnRfY2FjaGVfaW5pdChzdHJ1Y3QgaW50ZWxfdmdwdSAqdmdwdSkN
-Cj4gK3ZvaWQgZ3Z0X2NhY2hlX2luaXQoc3RydWN0IGludGVsX3ZncHUgKnZncHUpDQo+ICB7DQo+
-ICAJdmdwdS0+Z2ZuX2NhY2hlID0gUkJfUk9PVDsNCj4gIAl2Z3B1LT5kbWFfYWRkcl9jYWNoZSA9
-IFJCX1JPT1Q7DQo+IEBAIC0zMzAsNyArMzMwLDcgQEAgc3RhdGljIHZvaWQgZ3Z0X2NhY2hlX2lu
-aXQoc3RydWN0IGludGVsX3ZncHUgKnZncHUpDQo+ICAJbXV0ZXhfaW5pdCgmdmdwdS0+Y2FjaGVf
-bG9jayk7DQo+ICB9DQo+ICANCj4gLXN0YXRpYyB2b2lkIGt2bWd0X3Byb3RlY3RfdGFibGVfaW5p
-dChzdHJ1Y3QgaW50ZWxfdmdwdSAqaW5mbykNCj4gK3ZvaWQga3ZtZ3RfcHJvdGVjdF90YWJsZV9p
-bml0KHN0cnVjdCBpbnRlbF92Z3B1ICppbmZvKQ0KPiAgew0KPiAgCWhhc2hfaW5pdChpbmZvLT5w
-dGFibGUpOw0KPiAgfQ0KPiBAQCAtNjcxLDkgKzY3MSw2IEBAIHN0YXRpYyBpbnQgaW50ZWxfdmdw
-dV9vcGVuX2RldmljZShzdHJ1Y3QgdmZpb19kZXZpY2UgKnZmaW9fZGV2KQ0KPiAgDQo+ICAJdmdw
-dS0+YXR0YWNoZWQgPSB0cnVlOw0KPiAgDQo+IC0Ja3ZtZ3RfcHJvdGVjdF90YWJsZV9pbml0KHZn
-cHUpOw0KPiAtCWd2dF9jYWNoZV9pbml0KHZncHUpOw0KPiAtDQo+ICAJdmdwdS0+dHJhY2tfbm9k
-ZS50cmFja193cml0ZSA9IGt2bWd0X3BhZ2VfdHJhY2tfd3JpdGU7DQo+ICAJdmdwdS0+dHJhY2tf
-bm9kZS50cmFja19mbHVzaF9zbG90ID0ga3ZtZ3RfcGFnZV90cmFja19mbHVzaF9zbG90Ow0KPiAg
-CWt2bV9wYWdlX3RyYWNrX3JlZ2lzdGVyX25vdGlmaWVyKHZncHUtPnZmaW9fZGV2aWNlLmt2bSwN
-Cj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvZ3B1L2RybS9pOTE1L2d2dC92Z3B1LmMgYi9kcml2ZXJz
-L2dwdS9kcm0vaTkxNS9ndnQvdmdwdS5jDQo+IGluZGV4IDU2YzcxNDc0MDA4YS4uMDM2ZTFhNzJh
-MjZiIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL2dwdS9kcm0vaTkxNS9ndnQvdmdwdS5jDQo+ICsr
-KyBiL2RyaXZlcnMvZ3B1L2RybS9pOTE1L2d2dC92Z3B1LmMNCj4gQEAgLTM4Miw2ICszODIsOCBA
-QCBpbnQgaW50ZWxfZ3Z0X2NyZWF0ZV92Z3B1KHN0cnVjdCBpbnRlbF92Z3B1ICp2Z3B1LA0KPiAg
-DQo+ICAJaW50ZWxfZ3Z0X3VwZGF0ZV9yZWdfd2hpdGVsaXN0KHZncHUpOw0KPiAgCW11dGV4X3Vu
-bG9jaygmZ3Z0LT5sb2NrKTsNCj4gKwlrdm1ndF9wcm90ZWN0X3RhYmxlX2luaXQodmdwdSk7DQo+
-ICsJZ3Z0X2NhY2hlX2luaXQodmdwdSk7DQoNCkl0IHdvdWxkIGJlIG5pY2UgdGhhdCB5b3UgY2Fu
-IHN0aWxsIGtlZXAgdGhlIGluaXRpYWxpemF0aW9uIGluIHRoZSBrdm1ndC5jIGFzIHRoZXkgYXJl
-DQoNCmt2bWd0IHJlbGF0ZWQuDQoNCldpdGggdGhlIGNoYW5nZXMgYWJvdmU6IFJldmlld2VkLWJ5
-OiBaaGkgV2FuZyA8emhpLmEud2FuZ0BpbnRlbC5jb20+DQoNCj4gIAlyZXR1cm4gMDsNCj4gIA0K
-PiAgb3V0X2NsZWFuX3NjaGVkX3BvbGljeToNCg==
+On Fri, Nov 25, 2022 at 10:23:17AM +0800, Cindy Lu wrote:
+>While testing in vIOMMU, sometimes guest will unmap very large memory,
+>which will cause the crash. To fix this,Move the iommu_unmap to
+>vhost_vdpa_pa_unmap/vhost_vdpa_va_unmap and only unmap the memory
+>that saved in iotlb.
+>
+>Call Trace:
+>[  647.820144] ------------[ cut here ]------------
+>[  647.820848] kernel BUG at drivers/iommu/intel/iommu.c:1174!
+>[  647.821486] invalid opcode: 0000 [#1] PREEMPT SMP PTI
+>[  647.822082] CPU: 10 PID: 1181 Comm: qemu-system-x86 Not tainted 6.0.0-rc1home_lulu_2452_lulu7_vhost+ #62
+>[  647.823139] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.15.0-29-g6a62e0cb0dfe-prebuilt.qem4
+>[  647.824365] RIP: 0010:domain_unmap+0x48/0x110
+>[  647.825424] Code: 48 89 fb 8d 4c f6 1e 39 c1 0f 4f c8 83 e9 0c 83 f9 3f 7f 18 48 89 e8 48 d3 e8 48 85 c0 75 59
+>[  647.828064] RSP: 0018:ffffae5340c0bbf0 EFLAGS: 00010202
+>[  647.828973] RAX: 0000000000000001 RBX: ffff921793d10540 RCX: 000000000000001b
+>[  647.830083] RDX: 00000000080000ff RSI: 0000000000000001 RDI: ffff921793d10540
+>[  647.831214] RBP: 0000000007fc0100 R08: ffffae5340c0bcd0 R09: 0000000000000003
+>[  647.832388] R10: 0000007fc0100000 R11: 0000000000100000 R12: 00000000080000ff
+>[  647.833668] R13: ffffae5340c0bcd0 R14: ffff921793d10590 R15: 0000008000100000
+>[  647.834782] FS:  00007f772ec90640(0000) GS:ffff921ce7a80000(0000) knlGS:0000000000000000
+>[  647.836004] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>[  647.836990] CR2: 00007f02c27a3a20 CR3: 0000000101b0c006 CR4: 0000000000372ee0
+>[  647.838107] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>[  647.839283] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>[  647.840666] Call Trace:
+>[  647.841437]  <TASK>
+>[  647.842107]  intel_iommu_unmap_pages+0x93/0x140
+>[  647.843112]  __iommu_unmap+0x91/0x1b0
+>[  647.844003]  iommu_unmap+0x6a/0x95
+>[  647.844885]  vhost_vdpa_unmap+0x1de/0x1f0 [vhost_vdpa]
+>[  647.845985]  vhost_vdpa_process_iotlb_msg+0xf0/0x90b [vhost_vdpa]
+>[  647.847235]  ? _raw_spin_unlock+0x15/0x30
+>[  647.848181]  ? _copy_from_iter+0x8c/0x580
+>[  647.849137]  vhost_chr_write_iter+0xb3/0x430 [vhost]
+>[  647.850126]  vfs_write+0x1e4/0x3a0
+>[  647.850897]  ksys_write+0x53/0xd0
+>[  647.851688]  do_syscall_64+0x3a/0x90
+>[  647.852508]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>[  647.853457] RIP: 0033:0x7f7734ef9f4f
+>[  647.854408] Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 29 76 f8 ff 48 8b 54 24 18 48 8b 74 24 10 41 89 c8
+>[  647.857217] RSP: 002b:00007f772ec8f040 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+>[  647.858486] RAX: ffffffffffffffda RBX: 00000000fef00000 RCX: 00007f7734ef9f4f
+>[  647.859713] RDX: 0000000000000048 RSI: 00007f772ec8f090 RDI: 0000000000000010
+>[  647.860942] RBP: 00007f772ec8f1a0 R08: 0000000000000000 R09: 0000000000000000
+>[  647.862206] R10: 0000000000000001 R11: 0000000000000293 R12: 0000000000000010
+>[  647.863446] R13: 0000000000000002 R14: 0000000000000000 R15: ffffffff01100000
+>[  647.864692]  </TASK>
+>[  647.865458] Modules linked in: rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd grace fscache netfs v]
+>[  647.874688] ---[ end trace 0000000000000000 ]---
+
+I think you can remove the part below this line.
+
+ From here:
+
+>[  647.876013] RIP: 0010:domain_unmap+0x48/0x110
+>[  647.878306] Code: 48 89 fb 8d 4c f6 1e 39 c1 0f 4f c8 83 e9 0c 83 f9 3f 7f 18 48 89 e8 48 d3 e8 48 85 c0 75 59
+>[  647.884581] RSP: 0018:ffffae5340c0bbf0 EFLAGS: 00010202
+>[  647.886308] RAX: 0000000000000001 RBX: ffff921793d10540 RCX: 000000000000001b
+>[  647.888775] RDX: 00000000080000ff RSI: 0000000000000001 RDI: ffff921793d10540
+>[  647.890295] RBP: 0000000007fc0100 R08: ffffae5340c0bcd0 R09: 0000000000000003
+>[  647.891660] R10: 0000007fc0100000 R11: 0000000000100000 R12: 00000000080000ff
+>[  647.893019] R13: ffffae5340c0bcd0 R14: ffff921793d10590 R15: 0000008000100000
+>[  647.894506] FS:  00007f772ec90640(0000) GS:ffff921ce7a80000(0000) knlGS:0000000000000000
+>[  647.895963] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>[  647.897348] CR2: 00007f02c27a3a20 CR3: 0000000101b0c006 CR4: 0000000000372ee0
+>[  647.898719] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+
+To here.
+
+And maybe I would also remove the timestamps; in the end they are not 
+useful for this fix and they crowd this trace.
+
+>
+>Fixes: 4c8cf31885f6 ("vhost: introduce vDPA-based backend")
+>Signed-off-by: Cindy Lu <lulu@redhat.com>
+>---
+> drivers/vhost/vdpa.c | 10 ++++++++--
+> 1 file changed, 8 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+>index 166044642fd5..e5a07751bf45 100644
+>--- a/drivers/vhost/vdpa.c
+>+++ b/drivers/vhost/vdpa.c
+>@@ -692,6 +692,8 @@ static void vhost_vdpa_pa_unmap(struct vhost_vdpa *v,
+> 	struct vhost_iotlb_map *map;
+> 	struct page *page;
+> 	unsigned long pfn, pinned;
+>+	struct vdpa_device *vdpa = v->vdpa;
+>+	const struct vdpa_config_ops *ops = vdpa->config;
+>
+> 	while ((map = vhost_iotlb_itree_first(iotlb, start, last)) != NULL) {
+> 		pinned = PFN_DOWN(map->size);
+>@@ -703,6 +705,8 @@ static void vhost_vdpa_pa_unmap(struct vhost_vdpa *v,
+> 			unpin_user_page(page);
+> 		}
+> 		atomic64_sub(PFN_DOWN(map->size), &dev->mm->pinned_vm);
+>+		if ((ops->dma_map == NULL) && (ops->set_map == NULL))
+>+			iommu_unmap(v->domain, map->start, map->size);
+> 		vhost_iotlb_map_free(iotlb, map);
+> 	}
+> }
+>@@ -713,11 +717,15 @@ static void vhost_vdpa_va_unmap(struct vhost_vdpa *v,
+> {
+> 	struct vhost_iotlb_map *map;
+> 	struct vdpa_map_file *map_file;
+>+	struct vdpa_device *vdpa = v->vdpa;
+>+	const struct vdpa_config_ops *ops = vdpa->config;
+>
+> 	while ((map = vhost_iotlb_itree_first(iotlb, start, last)) != NULL) {
+> 		map_file = (struct vdpa_map_file *)map->opaque;
+> 		fput(map_file->file);
+> 		kfree(map_file);
+>+		if (ops->set_map == NULL)
+
+Should we check that `dma_map` is also NULL as in the previous hunk?
+
+Thanks,
+Stefano
+
+>+			iommu_unmap(v->domain, map->start, map->size);
+> 		vhost_iotlb_map_free(iotlb, map);
+> 	}
+> }
+>@@ -805,8 +813,6 @@ static void vhost_vdpa_unmap(struct vhost_vdpa *v,
+> 	} else if (ops->set_map) {
+> 		if (!v->in_batch)
+> 			ops->set_map(vdpa, asid, iotlb);
+>-	} else {
+>-		iommu_unmap(v->domain, iova, size);
+> 	}
+>
+> 	/* If we are in the middle of batch processing, delay the free
+>-- 
+>2.34.3
+>
+
