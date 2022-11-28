@@ -2,214 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9C3263AAB5
-	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 15:18:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AEAA63ABFC
+	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 16:10:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232406AbiK1OSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Nov 2022 09:18:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44212 "EHLO
+        id S231386AbiK1PKs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Nov 2022 10:10:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231503AbiK1OS3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Nov 2022 09:18:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 373E2222B4
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 06:17:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669645040;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jCazpTTy+F7fa4dxFepBnOElkUnDE1h7gUS6HgFedPY=;
-        b=OCkxvK7L1zjcU8P6bg4pxXbUXT7vXz0NTRsLKl5bzpooGH1KFL9no+RI+YNHxWcoMa88ed
-        y8u0Z42Y7fOCdcwmc2z5bw1nkMwHZg4LoOQvRZPfMkeNrL8Ap65sgMrGZs9+IFKSQIzUdG
-        4yN1+xiV3I/ZQ4UD/EWa7hHUteywV3U=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-297-cJGxeA1pMWWIJbOfhWXhLg-1; Mon, 28 Nov 2022 09:17:19 -0500
-X-MC-Unique: cJGxeA1pMWWIJbOfhWXhLg-1
-Received: by mail-qk1-f197.google.com with SMTP id o13-20020a05620a2a0d00b006cf9085682dso20245279qkp.7
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 06:17:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jCazpTTy+F7fa4dxFepBnOElkUnDE1h7gUS6HgFedPY=;
-        b=Dhc4tW72Xot9aJLLJwiQDhWPC9k181KUYmhKhgdhLVHTpTrkdJg79HaRt6vI5gT5rT
-         isV0FEpS1bSJutZ9BOPlpHY7v5pFgp79/0YoacoEwabCAD21H90leNATxLgOytXzx3hv
-         3Jf/YBrPFQM3VGrGv9h8QJNuKW+yA9UlB/aVeObcVNPeaBZLmgkydgBtdX9+7VT/97mq
-         X1jpJjnetA9kdh6HyHpcMPxY3ZR+yG87nGQhEWkdaHHe00E6TFKeszrTH8G/gbo0oySr
-         klmBcDkPJNoVys29nUfHSfMnqrILQGolRfW5FoEoV/kUz9N/B4M5mEQXtMGIMHmptvqu
-         fwkg==
-X-Gm-Message-State: ANoB5pkgej7klbyRtIakvyLGyAqjFz776drdkernbQTzNeZPkCAhabMc
-        XSWmWjadASms+dF+MOx6Ba1czC/MBUY750Ukv+a9wcpAUKfq1Xcfzgr3/gsTe52DkxT7C1MwCIB
-        QClTXVrgSt2SR
-X-Received: by 2002:a05:620a:15f4:b0:6fc:5e75:8452 with SMTP id p20-20020a05620a15f400b006fc5e758452mr12348105qkm.565.1669645038414;
-        Mon, 28 Nov 2022 06:17:18 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7v1fq7/cmmRa8boL0KEKgHvn1ntFy91sfTcqo+21QKxMb9e0oyQ5n2B68KMni02H2rUIIZ6Q==
-X-Received: by 2002:a05:620a:15f4:b0:6fc:5e75:8452 with SMTP id p20-20020a05620a15f400b006fc5e758452mr12348062qkm.565.1669645038027;
-        Mon, 28 Nov 2022 06:17:18 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id s6-20020a05620a254600b006cbc6e1478csm8423957qko.57.2022.11.28.06.17.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Nov 2022 06:17:17 -0800 (PST)
-Message-ID: <722b8767-daf9-f5b8-8ad7-0d9cb22d4b7d@redhat.com>
-Date:   Mon, 28 Nov 2022 15:17:09 +0100
+        with ESMTP id S231598AbiK1PKl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Nov 2022 10:10:41 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A122122BE5
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 07:10:39 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ASDeULR031083
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 15:10:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=kWbIyMoVTQVX2FasDfS8T6yHLZ9VeLXUg3qusfXX6uo=;
+ b=mNiaxlb9gDVg0t5txLMzPfT6ub649h+S9oRf67IB72A4v8Z49H1xYhQeYiiedAxLdVuW
+ SSlRXM0vZjXV871pMH8WkvWE7yVEn2rQKOlotbM4GwCfXJVn96N3FWGG2CT8/05LV6eo
+ Ewxr1SAtiWy/mq+7kJsJZvxQI1LAL5c6RKIJxUePMgVcPZSBubpeag3LnE0+ybaYdz+r
+ 9kct1PzweFRJVpuEg7yJXv01G2OiddiezFx4ixZc3e8fsUSDrSYXNkpAajRBOvwryx6e
+ 92WUrFP8H4iOBy9ZOmVrrVvaXnShE2bpngJR8vGLoeq79m8bj0gG/GKlQPE6l+QHiAya 5A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3vmrkaq3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 15:10:39 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ASEfwpH028995
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 15:10:38 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m3vmrkanw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Nov 2022 15:10:38 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ASF5Hv2026464;
+        Mon, 28 Nov 2022 15:10:36 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 3m3ae9ar7p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Nov 2022 15:10:36 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ASFAXWb10814206
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 28 Nov 2022 15:10:33 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2690AA405B;
+        Mon, 28 Nov 2022 15:10:33 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C847EA4054;
+        Mon, 28 Nov 2022 15:10:32 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.179.31.174])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 28 Nov 2022 15:10:32 +0000 (GMT)
+Message-ID: <80691035f83c3ceb1b0e576086c4a60689a32e99.camel@linux.ibm.com>
+Subject: Re: [PATCH v1 1/1] lib: s390x: add smp_cpu_setup_cur_psw_mask
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, nrb@linux.ibm.com, seiden@linux.ibm.com,
+        thuth@redhat.com
+Date:   Mon, 28 Nov 2022 16:10:32 +0100
+In-Reply-To: <20221128123834.21252-1-imbrenda@linux.ibm.com>
+References: <20221128123834.21252-1-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.1 (3.46.1-1.fc37) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v5 13/19] iommufd: Add kAPI toward external drivers for
- physical devices
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     bpf@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Anthony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        Lixiao Yang <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-References: <13-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com>
- <4c429c36-146e-e2b2-0cb4-d256ca659280@redhat.com>
- <Y4P9VzpCv/DyHeaD@nvidia.com>
- <94e6034a-c4c1-be0a-ea8c-f5934dbadd4c@redhat.com>
- <Y4S1hYFm9HaP0KdR@nvidia.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <Y4S1hYFm9HaP0KdR@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: aqNnSKXQQor27idOtq-Yau_-tanupjEf
+X-Proofpoint-ORIG-GUID: 2oGzf6CXWJ2TwBJjeZAapLT2LsATuVnz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-28_13,2022-11-28_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ priorityscore=1501 mlxlogscore=999 impostorscore=0 mlxscore=0 bulkscore=0
+ phishscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2211280112
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 2022-11-28 at 13:38 +0100, Claudio Imbrenda wrote:
+> Since a lot of code starts new CPUs using the current PSW mask, add a
+> wrapper to streamline the operation and hopefully make the code of the
+> tests more readable.
+>=20
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  lib/s390x/smp.h | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>=20
+> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+> index f4ae973d..0bcb1999 100644
+> --- a/lib/s390x/smp.h
+> +++ b/lib/s390x/smp.h
+> @@ -47,4 +47,13 @@ void smp_setup(void);
+>  int smp_sigp(uint16_t idx, uint8_t order, unsigned long parm, uint32_t *=
+status);
+>  struct lowcore *smp_get_lowcore(uint16_t idx);
+> =20
+> +static inline void smp_cpu_setup_cur_psw_mask(uint16_t idx, void *addr)
+> +{
+> +	struct psw psw =3D {
+> +		.mask =3D extract_psw_mask(),
+> +		.addr =3D (unsigned long)addr,
+> +	};
+> +	smp_cpu_setup(idx, psw);
+> +}
+> +
+>  #endif
 
+Reviewed-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 
-On 11/28/22 14:20, Jason Gunthorpe wrote:
-> On Mon, Nov 28, 2022 at 11:55:41AM +0100, Eric Auger wrote:
->
->>> Not really. The name is a mess, but as it is implemented, it means the
->>> platform is implementing MSI security. How exactly that is done is not
->>> really defined, and it doesn't really belong as an iommu property.
->>> However the security is being created is done in a way that is
->>> transparent to the iommu_domain user.
->> Some 'ARM platforms' implement what you call MSI security but they do
->> not advertise IOMMU_CAP_INTR_REMAP
-> Sounds like a bug.
->  
->> Besides refering to include/linux/iommu.h:
->> IOMMU_CAP_INTR_REMAP,           /* IOMMU supports interrupt isolation */
-> Documentation doesn't match code.
->
->>> It doesn't matter how it is done, if it remapping HW, fancy
->>> iommu_domain tricks, or built into the MSI controller. Set this flag
->>> if the platform is secure and doesn't need the code triggered by
->>> irq_domain_check_msi_remap().
->> this is not what is implemented as of now. If the IOMMU does support
->> interrupt isolation, it advertises IOMMU_CAP_INTR_REMAP. On ARM this
->> feature is implemented by the ITS MSI controller instead and the only
->> way to retrieve the info whether the device MSIs are directed to that
->> kind of MSI controller is to use irq_domain_check_msi_remap().
-> It is important to keep the Linux design seperated from what the
-> architecture papers describes. In Linux the IOMMU is represented by
-> the iommu_domain and the iommu_ops. On x86 neither of these objects
-> play any role in interrupt delivery. Yes, the x86 architecture papers
-> place some of the interrupt logic inside what they consider the iommu
-> block, but that is just some historical stuff and shouldn't impact the
-> SW design.
->
-> If we had put the IRTE bits inside the irqchip layer instead of in the
-> iommu driver, it would have made a lot more sense.
->
-> The fact that ARM was allowed to be different (or rather the x86 mess
-> wasn't cleaned up before the ARM mess was overlayed on top) is why
-> this is so confusing. They are doing the same things, just in
-> unnecessarily different ways.
+Although I would have expected you to also use the function.
 
-fair enough. But that's a separate discussion that needs to happen with
-iommu and irqchip maintainers I think. At the moment things are
-implemented that way.
->
->>>> irq_domain_check_msi_remap() instead means the MSI controller
->>>> implements that functionality (a given device id is able to trigger
->>> Not quite, it means that MSI isolation is available, however it is not
->>> transparent and the iommu_domain user must do the little dance that
->>> follows.
->> No I do not agree on that point. The 'little dance' is needed because
->> the SMMU does not bypass MSI writes as done on Intel. And someone must
->> take care of the MSI transaction mapping. This is the role of the MSI
->> cookie stuff. To me this is independent on the above discussion whether
->> MSI isolation is implemented.
-> OK, so you are worried about someone who sets
-> allow_unsafe_interrupts=1 they will not get the iommu_get_msi_cookie()
-> call done even though they still need it? That does seem wrong.
-yes
->
->>> This was sort of sloppy copied from VFIO - we should just delete
->>> it. The is no driver that sets both, and once the platform asserts
->>> irq_domain_check_msi_remap() it is going down the non-transparent path
->>> anyhow and must set a cookie to work. [again the names doesn't make
->>> any sense for the functionality]
->>>
->>> Failing with EPERM is probably not so bad since the platform is using
->>> an invalid configuration. I'm kind of inclined to leave this for
->>> right
->> I don't understand why it is invalid? HW MSI RESV region is a valid
->> config and not sure you tested with that kind of setup, did you?
-> Why would it be a valid config? No driver sets both..
->
-> HW MSI RESV should set IOMMU_CAP_INTR_REMAP like Intel does.
->
-> irq_domain_check_msi_remap() is only for SW MSI RESV regions.
-In theory no. Nothing prevents from having an MSI isolation capable
-controller (such as the ITS) with an IOMMU HW which wouldn't translate
-MSIs. In the past there has been such kind of problematic I think for
-HiSilicon HW
-https://lore.kernel.org/all/20171006140450.89652-1-shameerali.kolothum.thodi@huawei.com/
-This was eventually addressed differently but Shameer may precise ... 
+I'm wondering if just improving the ergonomics of creating a psw would suff=
+ice
+#define PSW(m, a) ((struct psw){ .mask =3D (uint64_t)m, .addr =3D (uint64_t=
+)a })
 
-Eric
+Then it would look like
 
->
-> This is what the code implements, and yes it makes no sense.
->
-> Jason
->
+smp_cpu_setup(idx, PSW(extract_psw_mask(), addr))
 
+and the macro might come in handy in other situations, too, but I haven't s=
+urveyed the code.
