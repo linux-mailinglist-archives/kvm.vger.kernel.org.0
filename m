@@ -2,244 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DB5463B3B8
-	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 21:55:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2701F63B3D0
+	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 22:01:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234347AbiK1Uz2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Nov 2022 15:55:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33816 "EHLO
+        id S234068AbiK1VB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Nov 2022 16:01:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233300AbiK1Uz0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Nov 2022 15:55:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE2002BB25
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 12:54:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669668867;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mk+d/rFoCYdetXFV05zVEMLzTOsjcYxe9wmFRI7Nhmk=;
-        b=atI6k6iDz0MObPILQ+0s1r8d8RbwB5U2i+8jnSccMxT3+xTG4HwadR8dm3G9XUIFgUkAKK
-        zsO+cB4ArrqndAamRGzMqDqiZwbJ8CPLxcT4f6ptMz9qYJDTxoDwgEPoYSSiIPJQdXjDIB
-        JAmSiptn9E4uloQf6BDLKplmmhPePIY=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-526-N_0fOo50NYOxCCEDB4-Rjg-1; Mon, 28 Nov 2022 15:54:25 -0500
-X-MC-Unique: N_0fOo50NYOxCCEDB4-Rjg-1
-Received: by mail-qv1-f71.google.com with SMTP id ns11-20020a056214380b00b004c64784249eso15407724qvb.7
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 12:54:25 -0800 (PST)
+        with ESMTP id S233965AbiK1VBK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Nov 2022 16:01:10 -0500
+Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7220F252A2
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 13:01:02 -0800 (PST)
+Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-142b72a728fso14574859fac.9
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 13:01:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atishpatra.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=C0LXIJI7Jwrp9irbYPVuZ/zATeld30E9BF4kDpuOTMY=;
+        b=sychVsIuyCs1J6sBN39fZaWelxUucVukYj9mRGoF1TcGNnYpdd/Yeb/uvh6XlBjUWD
+         +XvcyKtqpdr9+WPiouT7bCvHKPAfcsqUB8ouoz8ATXbrAmLyWmW+IATIRgfOCUamzen4
+         A3AERg4lfY92/gZfNXiNubTPsFjR4uDuhDyZs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mk+d/rFoCYdetXFV05zVEMLzTOsjcYxe9wmFRI7Nhmk=;
-        b=Ucu6oB+G9XLr3oNzpoeeoImXAbWu4wU8n/BTjRIT525375O+9jDPinqmWTiQ8H0C+l
-         M7WI75I7r9KSvnkY4L1J97vlaIFG0oQgyY8k3TCPLUdgRH38OzgmcYDQjSp6y8eXaD0q
-         hC9m+rZQuMcPWWUMcj/ZpNvRiZOIhXZjweBOZ601IW3voNCZ9m9tpeRlDgoeDpWZb83b
-         skUY5Tufvc5bI6hspeC1EBmn84ha2/mQ63U7fyyuAC7gW78CqhjSy7o+mIqQYAe3wBL5
-         A8uKNvlNZSQNIbKqG19L0VpFkio1gPq1qM0+mZs7DSmg69sxDuNDtk26sJLd0fVuuqWI
-         dzPw==
-X-Gm-Message-State: ANoB5pnT9fNwk6y6XZpPSninK03Ewte3zO489qmlywJGa2hJvI2KeHIo
-        K8iNusSNzLvhTtJ9VWZsjc1rjzIRNx+PBcIIb+2FlXGAws08y7TifWjFLtX5OiH+ZW/QA7fEiqU
-        wk1fkuiijUaTF
-X-Received: by 2002:a05:6214:80c:b0:4c6:c6b5:1188 with SMTP id df12-20020a056214080c00b004c6c6b51188mr25489136qvb.13.1669668865284;
-        Mon, 28 Nov 2022 12:54:25 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6adcRSfyKR21I2fxnpGfrzzGKRaVH1wA0cwJsYkdX3ndgETdx+KZHJZih2LovlXvvfBOZy0g==
-X-Received: by 2002:a05:6214:80c:b0:4c6:c6b5:1188 with SMTP id df12-20020a056214080c00b004c6c6b51188mr25489104qvb.13.1669668865045;
-        Mon, 28 Nov 2022 12:54:25 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ay39-20020a05620a17a700b006f7ee901674sm9247466qkb.2.2022.11.28.12.54.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Nov 2022 12:54:23 -0800 (PST)
-Message-ID: <2a0a70e7-be3b-6c7d-2649-d24d06be9855@redhat.com>
-Date:   Mon, 28 Nov 2022 21:54:16 +0100
+        bh=C0LXIJI7Jwrp9irbYPVuZ/zATeld30E9BF4kDpuOTMY=;
+        b=gvlq785XwQqUEEekSTBm+FyGQ4PCgfUx1kPHk+2rlyuks3pJp2tQNdUMZomPHWuYKx
+         +YkIkcO96oOQOb4KiZUazLY4570b/Yn/y/frUnQynKj9IEvGxmaSIhjE7kck0NoJmMG9
+         8J38H8HMkGNuQvF/LdCrZR82qT80sgNV8KoL+jUdC/q/sOmLrk/5yHmd6Av2EgiDmE1v
+         SPuv627oIsvlXxzha2e+xsA6qvyYI7UsD+SN0Ak9Ap/HPRYwGDt5OoxBG6fu05nWmfYG
+         AV/VbyGN4lh1CrPtMambYloeMTsaYIUomD4epd3JIlMUAXjkWpD9YD9SNodoT+UI6VJL
+         yJDw==
+X-Gm-Message-State: ANoB5pnQi1DrVRPFY5QJE5aZBE0ziJ1AXIjJPT9b8xPvI5lvp407Kl5A
+        0732rgSIkKMN8ZJOMANmbl+zNyd+HHrwnQv+lRM6GhdDDQ==
+X-Google-Smtp-Source: AA0mqf5V4JXvrkWngJfl026KheDUhSJ3FXXcX5xGXvT8T4Cp3XBlpcG+E3IH/EnL11AB0oCM+6HqccSMUkRa7wiMuuE=
+X-Received: by 2002:a05:6870:c18a:b0:142:870e:bd06 with SMTP id
+ h10-20020a056870c18a00b00142870ebd06mr26790617oad.181.1669669261652; Mon, 28
+ Nov 2022 13:01:01 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v5 15/19] iommufd: vfio container FD ioctl compatibility
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     bpf@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Anthony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        Lixiao Yang <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-References: <15-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com>
- <81f898b6-e40f-be72-78d4-b5d836981d8f@redhat.com>
- <Y4UN4qVpNqTP/JEF@nvidia.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <Y4UN4qVpNqTP/JEF@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20220718170205.2972215-1-atishp@rivosinc.com> <20220718170205.2972215-7-atishp@rivosinc.com>
+ <20221101142631.du54p4kyhlgf54cr@kamzik> <CAOnJCUJfakcoiWh4vFk5_BcTKfoSDbx+wtmh7MW4cPYog7q4BQ@mail.gmail.com>
+ <20221123135842.uyw46kbybgb7unm2@kamzik> <CAOnJCUKZV+0Xts6C4QY7X+Wak0ZR_f8wPtEAtH4PEmh2-_AcWw@mail.gmail.com>
+ <20221124105051.hbsavj3bgf4mvlzb@kamzik> <CAK9=C2XifUiOdA4cTFbQq7SNVJn+1Xup_giw4jo_z6bRdng4hQ@mail.gmail.com>
+In-Reply-To: <CAK9=C2XifUiOdA4cTFbQq7SNVJn+1Xup_giw4jo_z6bRdng4hQ@mail.gmail.com>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Mon, 28 Nov 2022 13:00:50 -0800
+Message-ID: <CAOnJCU+fxyLbLMEPbo+FA_DK+R872rJTeXrEeZGXwzxh6LyR0A@mail.gmail.com>
+Subject: Re: [RFC 6/9] RISC-V: KVM: Add SBI PMU extension support
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Andrew Jones <ajones@ventanamicro.com>,
+        Atish Patra <atishp@rivosinc.com>,
+        linux-kernel@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>, Guo Ren <guoren@kernel.org>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Will Deacon <will@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 11/28/22 20:37, Jason Gunthorpe wrote:
-> On Mon, Nov 28, 2022 at 06:53:12PM +0100, Eric Auger wrote:
+On Thu, Nov 24, 2022 at 4:59 AM Anup Patel <apatel@ventanamicro.com> wrote:
 >
->>> +static int iommufd_vfio_map_dma(struct iommufd_ctx *ictx, unsigned int cmd,
->>> +				void __user *arg)
->>> +{
->>> +	u32 supported_flags = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE;
->>> +	size_t minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
->>> +	struct vfio_iommu_type1_dma_map map;
->>> +	int iommu_prot = IOMMU_CACHE;
->>> +	struct iommufd_ioas *ioas;
->>> +	unsigned long iova;
->>> +	int rc;
->>> +
->>> +	if (copy_from_user(&map, arg, minsz))
->>> +		return -EFAULT;
->>> +
->>> +	if (map.argsz < minsz || map.flags & ~supported_flags)
->>> +		return -EINVAL;
->>> +
->>> +	if (map.flags & VFIO_DMA_MAP_FLAG_READ)
->>> +		iommu_prot |= IOMMU_READ;
->>> +	if (map.flags & VFIO_DMA_MAP_FLAG_WRITE)
->>> +		iommu_prot |= IOMMU_WRITE;
->>> +
->>> +	ioas = get_compat_ioas(ictx);
->>> +	if (IS_ERR(ioas))
->>> +		return PTR_ERR(ioas);
->>> +
->>> +	/*
->>> +	 * Maps created through the legacy interface always use VFIO compatible
->>> +	 * rlimit accounting. If the user wishes to use the faster user based
->>> +	 * rlimit accounting then they must use the new interface.
->> s/they/he
-> "they" has become a common neutral singular pronoun in English.
-
-Oh OK.
+> On Thu, Nov 24, 2022 at 4:21 PM Andrew Jones <ajones@ventanamicro.com> wrote:
+> >
+> > On Thu, Nov 24, 2022 at 02:18:26AM -0800, Atish Patra wrote:
+> > > On Wed, Nov 23, 2022 at 5:58 AM Andrew Jones <ajones@ventanamicro.com> wrote:
+> > > >
+> > > > On Tue, Nov 22, 2022 at 03:08:34PM -0800, Atish Patra wrote:
+> > ...
+> > > > > Currently, ARM64 enables pmu from user space using device control APIs
+> > > > > on vcpu fd.
+> > > > > Are you suggesting we should do something like that ?
+> > > >
+> > > > Yes. Although choosing which KVM API should be used could probably be
+> > > > thought-out again. x86 uses VM ioctls.
+> > > >
+> > >
+> > > How does it handle hetergenous systems in per VM ioctls ?
+> >
+> > I don't think it does, but neither does arm64. Afaik, the only way to run
+> > KVM VMs on heterogeneous systems is to pin the VM to one set of the CPUs,
+> > i.e. make sure the system it runs on is homogeneous.
+> >
+> > I agree we shouldn't paint ourselves into a homogeneous-only corner for
+> > riscv, though, so if it's possible to use VCPU APIs, then I guess we
+> > should. Although, one thing to keep in mind is that if the same ioctl
+> > needs to be run on each VCPU, then, when we start building VMs with
+> > hundreds of VCPUs, we'll see slow VM starts.
+> >
+> > >
+> > > > >
+> > > > > If PMU needs to have device control APIs (either via vcpu fd or its
+> > > > > own), we can retrieve
+> > > > > the hpmcounter width and count from there as well.
+> > > >
+> > > > Right. We need to decide how the VM/VCPU + PMU user interface should look.
+> > > > A separate PMU device, like arm64 has, sounds good, but the ioctl
+> > > > sequences for initialization may get more tricky.
+> > > >
+> > >
+> > > Do we really need a per VM interface ? I was thinking we can just
+> > > continue to use
+> > > one reg interface for PMU as well. We probably need two of them.
+> > >
+> > > 1. To enable/disable SBI extension
+> > >     -- The probe function will depend on this
+> > > 2. PMU specific get/set
+> > >     -- Number of hpmcounters
+> > >     -- hpmcounter width
+> > >     -- enable PMU
+> >
+> > ONE_REG is good for registers and virtual registers, which means the
+> > number of hpmcounters and the hpmcounter width are probably good
+> > candidates, but I'm not sure we should use it for enable/init types of
+> > purposes.
 >
->>> +static int iommufd_vfio_unmap_dma(struct iommufd_ctx *ictx, unsigned int cmd,
->>> +				  void __user *arg)
->>> +{
->>> +	size_t minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
->>> +	/*
->>> +	 * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP is obsoleted by the new
->>> +	 * dirty tracking direction:
->>> +	 *  https://lore.kernel.org/kvm/20220731125503.142683-1-yishaih@nvidia.com/
->>> +	 *  https://lore.kernel.org/kvm/20220428210933.3583-1-joao.m.martins@oracle.com/
->>> +	 */
->>> +	u32 supported_flags = VFIO_DMA_UNMAP_FLAG_ALL;
->>> +	struct vfio_iommu_type1_dma_unmap unmap;
->>> +	unsigned long unmapped = 0;
->>> +	struct iommufd_ioas *ioas;
->>> +	int rc;
->>> +
->>> +	if (copy_from_user(&unmap, arg, minsz))
->>> +		return -EFAULT;
->>> +
->>> +	if (unmap.argsz < minsz || unmap.flags & ~supported_flags)
->>> +		return -EINVAL;
->>> +
->>> +	ioas = get_compat_ioas(ictx);
->>> +	if (IS_ERR(ioas))
->>> +		return PTR_ERR(ioas);
->>> +
->>> +	if (unmap.flags & VFIO_DMA_UNMAP_FLAG_ALL) {
->>> +		if (unmap.iova != 0 || unmap.size != 0) {
->>> +			rc = -EINVAL;
->>> +			goto err_put;
->>> +		}
->>> +		rc = iopt_unmap_all(&ioas->iopt, &unmapped);
->>> +	} else {
->>> +		if (READ_ONCE(ioas->iopt.disable_large_pages)) {
->>> +			unsigned long iovas[] = { unmap.iova + unmap.size - 1,
->>> +						  unmap.iova - 1 };
->>> +
->>> +			rc = iopt_cut_iova(&ioas->iopt, iovas,
->>> +					   unmap.iova ? 2 : 1);
->> please can you add a comment to explain what this is supposed to do?
-> iova -1 when iova == 0 will underflow and becomes garbage
->
-> 			/*
-> 			 * Create cuts at the start and last of the requested
-> 			 * range. If the start IOVA is 0 then it doesn't need to
-> 			 * be cut.
-> 			 */
-
-OK thanks
->
->>> +static int iommufd_vfio_set_iommu(struct iommufd_ctx *ictx, unsigned long type)
->>> +{
->>> +	struct iommufd_ioas *ioas = NULL;
->>> +	int rc = 0;
->>> +
->>> +	if (type != VFIO_TYPE1_IOMMU && type != VFIO_TYPE1v2_IOMMU)
->>> +		return -EINVAL;
->>> +
->>> +	/* VFIO fails the set_iommu if there is no group */
->>> +	ioas = get_compat_ioas(ictx);
->>> +	if (IS_ERR(ioas))
->>> +		return PTR_ERR(ioas);
->>> +	if (type == VFIO_TYPE1_IOMMU)
->>> +		rc = iopt_disable_large_pages(&ioas->iopt);
->> please can you document/explain this setting?
-> 	/*
-> 	 * The difference between TYPE1 and TYPE1v2 is the ability to unmap in
-> 	 * the middle of mapped ranges. This is complicated by huge page support
-> 	 * which creates single large IOPTEs that cannot be split by the iommu
-> 	 * driver. TYPE1 is very old at this point and likely nothing uses it,
-> 	 * however it is simple enough to emulate by simply disabling the
-> 	 * problematic large IOPTEs. Then we can safely unmap within any range.
-OK makes sense. That's helpful
-
-with those additions,
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
-
-
-> 	 */
->
-> Thanks,
-> Jason
+> We are already using ONE_REG interface to enable/disable
+> ISA extensions so we should follow the same pattern and have
+> ONE_REG interface to enable/disable SBI extensions as well.
 >
 
+Thinking about it more, it may end up in vcpus with heterogeneous
+capabilities (different SBI extension).
+Most likely, it will be a bug and incorrect configuration from VMM but
+it's a possibility.
+For example: There will be two different scenarios for PMU extension
+
+1. Boot vcpu disabled PMU extension - probably okay as guest queries
+the PMU extension on boot cpu only.
+The PMU extension won't be available for any other vcpu.
+
+2. Boot vcpu has PMU extension enabled but others have it disabled.
+The run time SBI PMU calls will
+fail with EOPNOTSUPP and the user gets confused.
+
+There will be similar cases for HSM extension as well.
+
+As the entire extension won't be available to the guest if the SBI
+extension is disabled for the boot cpu only.
+There is also a slow VM start issue Andrew pointed about earlier.
+
+This makes me think if a VM ioctl to disable/enable the SBI extension
+for all vcpus makes more sense in this case.
+
+
+> Regards,
+> Anup
+
+
+
+-- 
+Regards,
+Atish
