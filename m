@@ -2,150 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F092063B3FA
-	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 22:09:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5776763B44E
+	for <lists+kvm@lfdr.de>; Mon, 28 Nov 2022 22:40:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233067AbiK1VJq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Nov 2022 16:09:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41318 "EHLO
+        id S234310AbiK1VkY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Nov 2022 16:40:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234497AbiK1VJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Nov 2022 16:09:27 -0500
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72F8B2F3B5
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 13:09:25 -0800 (PST)
-Received: by mail-oi1-x229.google.com with SMTP id r76so13017326oie.13
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 13:09:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=atishpatra.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ilVgGC8TOxHzgJU/67Xu5FjqKUjFndYhRBD1pSBbUXQ=;
-        b=lMZqt+KmgNbP1xC1+0PEw1zG7OaHp+6QccMIYADd+TiGioedQISw+Bf0QI6CqLDEqu
-         nh9IlSILqfeP5yROj2or137eOdwz0TtEf0hKQzW0cHr7UAlBi6eZE5jjT5Ht38Cb0K1s
-         MgDKQVhDFeRzba2/3FDM1BmzLnnYbQxqGs2f4=
+        with ESMTP id S234276AbiK1VkD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Nov 2022 16:40:03 -0500
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 636772B615;
+        Mon, 28 Nov 2022 13:40:02 -0800 (PST)
+Received: by mail-wm1-f50.google.com with SMTP id 83-20020a1c0256000000b003d03017c6efso12125652wmc.4;
+        Mon, 28 Nov 2022 13:40:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ilVgGC8TOxHzgJU/67Xu5FjqKUjFndYhRBD1pSBbUXQ=;
-        b=ja6JuOJ24XqB5UZzzDaqJ3Odx7lIdbG7NVV/5W+cLRjNH2pocFwxk1vKUIqz8XL0mz
-         +UJiQSazqoakrdeMt1y7D7HZNZv1V0/ITRZq1qJFME2Tay/JlSaGnV647wPxK7Luo8et
-         j6QjlIYLRWcD1bB5NzquJ9wvWSXUpTxuhRrQ4MmlYfMs2uv7cenXENoXvJnkO7/iFCOW
-         pnItVacIPEztdPOggtIeV/pz9v66lfXsYYz8Js/pQxiAbFaNo3kcDzBY6nQlEco+XU1W
-         RObBGjNvGmPgZWoGCkxrLSxVQX2qDM+oDqYljF671L5oOMD9/76z9DvJRhiWtqUjx9yh
-         KG6w==
-X-Gm-Message-State: ANoB5pk8s/L4J2r92eHCaiG/NKvrIZ6GKTD1B8kydUq+cQVFBW6dr95z
-        th4oWDOYoEHOf3xgLFPFLSAYtcwBnC3CmsAcZjBE
-X-Google-Smtp-Source: AA0mqf4VPR4z8hBPap7MOUP+bfI/yUr6Hc/zRJpKRmEImo2WSYflhgiYPEGYjq1l59c2HcOT2pepYwYUt4fDHY55jMk=
-X-Received: by 2002:a05:6808:51:b0:359:f091:104 with SMTP id
- v17-20020a056808005100b00359f0910104mr29358704oic.274.1669669764575; Mon, 28
- Nov 2022 13:09:24 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PuADqb5ObhzEay83Rgmmr1DjvxatfIL6idtDUz9yxI4=;
+        b=C6xpSCTW3Z/VKrA8D6cruFuz5UfhIHi6yVPyt/AgaKPj5gjYRJrXnDw1+Wm5fpmeGE
+         1HZ9FCKOSQWiZy8PHs/dxK7GXE0Y4vEhvrLm7qOpTIZz+T7uDBnM6bhJWzkLNxhfTrt5
+         G22oI6ox2js94+/wHp9XlIf67yK09Sv9ftmjdjzIszYziOGn0El8bznDcuGY1LPk9jcv
+         48ZoJny5J0Op7ocjXj5Nja5ByWMh25wSU1UBW9Dzr3cwI+Vd8zz6LRwbQcHaonDCHFSy
+         cW1p42UrvzqIXbfgDZowdwdD6bYJTyBOxa6EilJjITIWqo7kZfvBcSlnWOR5GBRBxigX
+         MlhA==
+X-Gm-Message-State: ANoB5pk3KDLS450cOTK1Qf5T55LlNSJBzf3Pg1AR8sPQxVphcAa5nqKe
+        cKybZGj5tESLANxaEtUIeYk=
+X-Google-Smtp-Source: AA0mqf4jl/SNFyThnBoPGJGYxLKgxzanGCNlLcmlaw2dWgCUMSZ38ex9VgfvPd0+RTIeLoijC35l/Q==
+X-Received: by 2002:a05:600c:5388:b0:3cf:37b1:e581 with SMTP id hg8-20020a05600c538800b003cf37b1e581mr37853395wmb.96.1669671600900;
+        Mon, 28 Nov 2022 13:40:00 -0800 (PST)
+Received: from liuwe-devbox-debian-v2 ([51.145.34.42])
+        by smtp.gmail.com with ESMTPSA id i11-20020a5d438b000000b00241b5af8697sm11614853wrq.85.2022.11.28.13.39.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Nov 2022 13:40:00 -0800 (PST)
+Date:   Mon, 28 Nov 2022 21:39:58 +0000
+From:   Wei Liu <wei.liu@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Wei Liu <wei.liu@kernel.org>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KVM: x86/mmu: fix an incorrect comment in kvm_mmu_new_pgd
+Message-ID: <Y4Uqrs7SBDCKISll@liuwe-devbox-debian-v2>
+References: <20221127221245.204208-1-wei.liu@kernel.org>
+ <Y4T3xsxszDShKqK0@google.com>
 MIME-Version: 1.0
-References: <20221128161424.608889-1-apatel@ventanamicro.com> <20221128161424.608889-9-apatel@ventanamicro.com>
-In-Reply-To: <20221128161424.608889-9-apatel@ventanamicro.com>
-From:   Atish Patra <atishp@atishpatra.org>
-Date:   Mon, 28 Nov 2022 13:09:13 -0800
-Message-ID: <CAOnJCULA77d+S37aPuC_kJAi769beasdgsK+WfkZe623SsYEow@mail.gmail.com>
-Subject: Re: [PATCH 8/9] RISC-V: KVM: Add ONE_REG interface for mvendorid,
- marchid, and mimpid
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y4T3xsxszDShKqK0@google.com>
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
+        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 28, 2022 at 8:15 AM Anup Patel <apatel@ventanamicro.com> wrote:
->
-> We add ONE_REG interface for VCPU mvendorid, marchid, and mimpid
-> so that KVM user-space can change this details to support migration
-> across heterogeneous hosts.
->
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  arch/riscv/include/uapi/asm/kvm.h |  3 +++
->  arch/riscv/kvm/vcpu.c             | 27 +++++++++++++++++++++++++++
->  2 files changed, 30 insertions(+)
->
-> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-> index 8985ff234c01..92af6f3f057c 100644
-> --- a/arch/riscv/include/uapi/asm/kvm.h
-> +++ b/arch/riscv/include/uapi/asm/kvm.h
-> @@ -49,6 +49,9 @@ struct kvm_sregs {
->  struct kvm_riscv_config {
->         unsigned long isa;
->         unsigned long zicbom_block_size;
-> +       unsigned long mvendorid;
-> +       unsigned long marchid;
-> +       unsigned long mimpid;
->  };
->
->  /* CORE registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 312a8a926867..7c08567097f0 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -276,6 +276,15 @@ static int kvm_riscv_vcpu_get_reg_config(struct kvm_vcpu *vcpu,
->                         return -EINVAL;
->                 reg_val = riscv_cbom_block_size;
->                 break;
-> +       case KVM_REG_RISCV_CONFIG_REG(mvendorid):
-> +               reg_val = vcpu->arch.mvendorid;
-> +               break;
-> +       case KVM_REG_RISCV_CONFIG_REG(marchid):
-> +               reg_val = vcpu->arch.marchid;
-> +               break;
-> +       case KVM_REG_RISCV_CONFIG_REG(mimpid):
-> +               reg_val = vcpu->arch.mimpid;
-> +               break;
->         default:
->                 return -EINVAL;
->         }
-> @@ -338,6 +347,24 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
->                 break;
->         case KVM_REG_RISCV_CONFIG_REG(zicbom_block_size):
->                 return -EOPNOTSUPP;
-> +       case KVM_REG_RISCV_CONFIG_REG(mvendorid):
-> +               if (!vcpu->arch.ran_atleast_once)
-> +                       vcpu->arch.mvendorid = reg_val;
-> +               else
-> +                       return -EBUSY;
-> +               break;
-> +       case KVM_REG_RISCV_CONFIG_REG(marchid):
-> +               if (!vcpu->arch.ran_atleast_once)
-> +                       vcpu->arch.marchid = reg_val;
-> +               else
-> +                       return -EBUSY;
-> +               break;
-> +       case KVM_REG_RISCV_CONFIG_REG(mimpid):
-> +               if (!vcpu->arch.ran_atleast_once)
-> +                       vcpu->arch.mimpid = reg_val;
-> +               else
-> +                       return -EBUSY;
-> +               break;
->         default:
->                 return -EINVAL;
->         }
-> --
-> 2.34.1
->
+On Mon, Nov 28, 2022 at 06:02:46PM +0000, Sean Christopherson wrote:
+> On Sun, Nov 27, 2022, Wei Liu wrote:
+> > There is no function named kvm_mmu_ensure_valid_pgd.
+> 
+> () when referecing functions, here and in the comment.
+> 
+> > Fix the comment and remove the pair of braces to conform to Linux kernel
+> > coding style.
+> > 
+> > Signed-off-by: Wei Liu <wei.liu@kernel.org>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 8 +++++---
+> >  1 file changed, 5 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index b6f96d47e596..361574124fbe 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -4452,10 +4452,12 @@ void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd)
+> >  	struct kvm_mmu *mmu = vcpu->arch.mmu;
+> >  	union kvm_mmu_page_role new_role = mmu->root_role;
+> >  
+> > -	if (!fast_pgd_switch(vcpu->kvm, mmu, new_pgd, new_role)) {
+> > -		/* kvm_mmu_ensure_valid_pgd will set up a new root.  */
+> > +	/*
+> > +	 * Return immediately if no usable root is found. A new root will be
+> 
+> s/is/was
+> 
+> And technically, it may not be a "new" root, e.g. if a different vCPU creates a
+> usable root between now and kvm_mmu_reload().
+> 
+> > +	 * set up in vcpu_enter_guest prior to the next vmenter.
+> 
+> s/vmenter/VM-Enter
+> 
+> Pointing a reader at vcpu_enter_guest() isn't very helpful since that's a massive
+> function; kvm_mmu_reload() is where the real magic happens.  I generally prefer to
+> avoid referencing functions in comments unless doing so is absolutely "necessary"
+> because such comments always seem to become stale, but in this case I think it's
+> worthwhile.
+> 
+> 	/*
+> 	 * Return immediately if no usable was found, kvm_mmu_reload() will
+> 	 * establish a valid root prior to the next VM-Enter.
+> 	 */
+> 
 
-Reviewed-by: Atish Patra <atishp@rivosinc.com>
+Thanks for the feedback. v2 coming shortly.
 
--- 
-Regards,
-Atish
+Thanks,
+Wei.
