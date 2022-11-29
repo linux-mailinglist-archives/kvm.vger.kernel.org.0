@@ -2,117 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AC8863CA8F
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 22:41:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5EFC63CAE8
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 23:02:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236641AbiK2VlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 16:41:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59048 "EHLO
+        id S236610AbiK2WCk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 17:02:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233312AbiK2VlL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 16:41:11 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E37F36153D;
-        Tue, 29 Nov 2022 13:41:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669758069; x=1701294069;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=H6tFVx8YFjtrsgdtfWkCGSXF6RRdlIaHy4IaUji1afk=;
-  b=HmiGvt1gimf6ExTwmEFjFmBYmeAkNnUMelYukCxCCT1odTfHQHWkdh+1
-   iq9VZn5UvpKZ3ItRwe2Mg2KtnbIDQHMjxPKcBk7zGlAe8ZcMU2vuoPfdA
-   JO6r/SVLoA1PnLiaN380kxu/mBjYo36XNWegtvkNmx1lkxviys3JDKvW+
-   oATSNjk+ayk1rAY/S/b58W8bCg238m1KZcCMaYzhAUDNaGI/l+hbQVCce
-   RTos1vI7fNgL1k2GIamdDRlcJeXs3GHE9K3Ro/aNFmG4Wu/sQMwFEV4ME
-   +UxrG85Yxtk4GHpoDilSQ/EV85qu1f/ocjDuhuGpHpncRXGJhrtPmXVNh
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10546"; a="379521175"
-X-IronPort-AV: E=Sophos;i="5.96,204,1665471600"; 
-   d="scan'208";a="379521175"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2022 13:40:56 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10546"; a="637757920"
-X-IronPort-AV: E=Sophos;i="5.96,204,1665471600"; 
-   d="scan'208";a="637757920"
-Received: from wteng-mobl1.gar.corp.intel.com (HELO [10.209.83.194]) ([10.209.83.194])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2022 13:40:56 -0800
-Message-ID: <f3826824-3ce6-4317-bc43-e327da2d4417@intel.com>
-Date:   Tue, 29 Nov 2022 13:40:55 -0800
+        with ESMTP id S236298AbiK2WCh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 17:02:37 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97F232AD5;
+        Tue, 29 Nov 2022 14:02:34 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ATLo9So011304;
+        Tue, 29 Nov 2022 22:02:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Lcetb9RicIcWglNgifjgHubk9ZhIypVPUet+BElnXMA=;
+ b=sXtEemQR0Qv/A7TEgG2UhLXWTWwwzwZIEmAAzjZNJGhuW+6q1FZEnnFaH//Yfqy3su+C
+ gPOiQFSD5jhJjNIZCRhZ4CtdmRBuGLSWXcD2xSBWf+r+In80pbYVa5a0FUGe82kjokIr
+ RJ7hSmvETKKxNeS4vGZlTA3FPrgvldcpMGSWVKcJ56Ys6frp6ixgTcopPPwwhVybYhMf
+ eUwOkzyIGQJBS3rLOq3lHfauh5QwaAwFSSOc+c2AaWMeWDxxD1NZw/TqP9yoozyy/0QP
+ NljpUgAPrH5mmyTB3QsDXmf3NDw2lC3oVSXQvZ7wPXfHYRrTM4D9lFeuOMdy1zPD/S/T 6Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m5qr1v7ds-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 29 Nov 2022 22:02:27 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ATLrILs022914;
+        Tue, 29 Nov 2022 22:02:26 GMT
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m5qr1v7dj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 29 Nov 2022 22:02:26 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ATLpMvp008691;
+        Tue, 29 Nov 2022 22:02:26 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma05wdc.us.ibm.com with ESMTP id 3m3t71kpnv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 29 Nov 2022 22:02:26 +0000
+Received: from smtpav06.dal12v.mail.ibm.com ([9.208.128.130])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ATM2LR554657332
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 29 Nov 2022 22:02:21 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 89B265805F;
+        Tue, 29 Nov 2022 22:02:24 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AE63E58055;
+        Tue, 29 Nov 2022 22:02:23 +0000 (GMT)
+Received: from [9.65.217.194] (unknown [9.65.217.194])
+        by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 29 Nov 2022 22:02:23 +0000 (GMT)
+Message-ID: <69fd3f57-4589-2d9e-3aa1-7959cc1711e6@linux.ibm.com>
+Date:   Tue, 29 Nov 2022 17:02:23 -0500
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v7 06/20] x86/virt/tdx: Shut down TDX module in case of
- error
+ Thunderbird/102.4.0
+Subject: Re: [[RESEND] iommufd PATCH v2 2/2] vfio/ap: validate iova during
+ dma_unmap and trigger irq disable
+To:     Yi Liu <yi.l.liu@intel.com>, jgg@nvidia.com
+Cc:     alex.williamson@redhat.com, kevin.tian@intel.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        intel-gvt-dev@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>
+References: <20221129105831.466954-1-yi.l.liu@intel.com>
+ <20221129105831.466954-3-yi.l.liu@intel.com>
 Content-Language: en-US
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org, seanjc@google.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
-        ying.huang@intel.com, reinette.chatre@intel.com,
-        len.brown@intel.com, tony.luck@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com
-References: <cover.1668988357.git.kai.huang@intel.com>
- <48505089b645019a734d85c2c29f3c8ae2dbd6bd.1668988357.git.kai.huang@intel.com>
- <Y3ySxEr64HkUaEDq@hirez.programming.kicks-ass.net>
- <52b2be9b-defd-63ce-4cb2-96cd624a95a6@intel.com>
- <Y30fUS5/JClpBHVc@hirez.programming.kicks-ass.net>
- <b3938f3a-e4f8-675a-0c0e-4b4618019145@intel.com>
- <Y30j/EJ9Y1/gWcXo@hirez.programming.kicks-ass.net>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <Y30j/EJ9Y1/gWcXo@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20221129105831.466954-3-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: plbhbYOf4vNN-hd8idCHfl5ZOPcO-zZ6
+X-Proofpoint-ORIG-GUID: T-dzPpbJb3dB6B702_08VyItjyj50BjP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-29_13,2022-11-29_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ malwarescore=0 bulkscore=0 mlxlogscore=999 spamscore=0 adultscore=0
+ clxscore=1011 priorityscore=1501 mlxscore=0 lowpriorityscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211290127
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/22/22 11:33, Peter Zijlstra wrote:
-> On Tue, Nov 22, 2022 at 11:24:48AM -0800, Dave Hansen wrote:
->>> Not intialize TDX on busy NOHZ_FULL cpus and hard-limit the cpumask of
->>> all TDX using tasks.
->> I don't think that works.  As I mentioned to Thomas elsewhere, you don't
->> just need to initialize TDX on the CPUs where it is used.  Before the
->> module will start working you need to initialize it on *all* the CPUs it
->> knows about.  The module itself has a little counter where it tracks
->> this and will refuse to start being useful until it gets called
->> thoroughly enough.
-> That's bloody terrible, that is. How are we going to make that work with
-> the SMT mitigation crud that forces the SMT sibilng offline?
-> 
-> Then the counters don't match and TDX won't work.
-> 
-> Can we get this limitiation removed and simply let the module throw a
-> wobbly (error) when someone tries and use TDX without that logical CPU
-> having been properly initialized?
+LGTM:
 
-It sounds like we can at least punt the limitation away from the OS's
-purview.
+Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
 
-There's actually a multi-step process to get a "real" TDX module loaded.
- There's a fancy ACM (Authenticated Code Module) that's invoked via
-GETSEC[ENTERACCS] and an intermediate module loader.  That dance used to
-be done in the kernel, but we talked the BIOS guys into doing it instead.
-
-I believe these per-logical-CPU checks _can_ also be punted out of the
-TDX module itself and delegated to one of these earlier module loading
-phases that the BIOS drives.
-
-I'm still a _bit_ skeptical that the checks are needed in the first
-place.  But, as long as they're hidden from the OS, I don't see a need
-to be too cranky about it.
-
-In the end, we could just plain stop doing the TDH.SYS.LP.INIT code in
-the kernel.
-
-Unless someone screams, I'll ask the BIOS and TDX module folks to look
-into this.
+On 11/29/22 5:58 AM, Yi Liu wrote:
+> From: Matthew Rosato <mjrosato@linux.ibm.com>
+>
+> Currently, each mapped iova is stashed in its associated vfio_ap_queue;
+> when we get an unmap request, validate that it matches with one or more
+> of these stashed values before attempting unpins.
+>
+> Each stashed iova represents IRQ that was enabled for a queue.  Therefore,
+> if a match is found, trigger IRQ disable for this queue to ensure that
+> underlying firmware will no longer try to use the associated pfn after
+> the page is unpinned. IRQ disable will also handle the associated unpin.
+>
+> Cc: Tony Krowiak <akrowiak@linux.ibm.com>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Jason Herne <jjherne@linux.ibm.com>
+> Cc: linux-s390@vger.kernel.org
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>   drivers/s390/crypto/vfio_ap_ops.c | 18 +++++++++++++++++-
+>   1 file changed, 17 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 0b4cc8c597ae..8bf353d46820 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -1535,13 +1535,29 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+>   	return 0;
+>   }
+>   
+> +static void unmap_iova(struct ap_matrix_mdev *matrix_mdev, u64 iova, u64 length)
+> +{
+> +	struct ap_queue_table *qtable = &matrix_mdev->qtable;
+> +	struct vfio_ap_queue *q;
+> +	int loop_cursor;
+> +
+> +	hash_for_each(qtable->queues, loop_cursor, q, mdev_qnode) {
+> +		if (q->saved_iova >= iova && q->saved_iova < iova + length)
+> +			vfio_ap_irq_disable(q);
+> +	}
+> +}
+> +
+>   static void vfio_ap_mdev_dma_unmap(struct vfio_device *vdev, u64 iova,
+>   				   u64 length)
+>   {
+>   	struct ap_matrix_mdev *matrix_mdev =
+>   		container_of(vdev, struct ap_matrix_mdev, vdev);
+>   
+> -	vfio_unpin_pages(&matrix_mdev->vdev, iova, 1);
+> +	mutex_lock(&matrix_dev->mdevs_lock);
+> +
+> +	unmap_iova(matrix_mdev, iova, length);
+> +
+> +	mutex_unlock(&matrix_dev->mdevs_lock);
+>   }
+>   
+>   /**
