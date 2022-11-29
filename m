@@ -2,37 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D30363C82B
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 20:21:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E909A63C82C
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 20:21:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236768AbiK2TVP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 14:21:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57256 "EHLO
+        id S236879AbiK2TVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 14:21:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236766AbiK2TUa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 14:20:30 -0500
+        with ESMTP id S236812AbiK2TUv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 14:20:51 -0500
 Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A0AE6CA0E
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 11:19:55 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3DAC6D48F;
+        Tue, 29 Nov 2022 11:19:58 -0800 (PST)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1669749594;
+        t=1669749597;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=m0zZd4zUCb269/4WV/qmecpcPiXCIRgs1aacjO8LrGw=;
-        b=pTlOrQHeV71gskFasm8wtT0s3vuYrWAs+URI7fzmgoko+UIiq4S4zJWYjZfDakZdKkZElj
-        yyw5IKaB9OxuLLZktZ7xNwOu3DrtQdoo8xaftF8FXMCt9KrdFvc1Rj0BGTzMsSUDQRLUvn
-        A/6zW4QHCMlhCcGwKnVVDL/0DAM5k6U=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LAtIXRb0PxV3UcO4TbJwOQlCaH/bLzgHLa5c6EYoqNs=;
+        b=trhLlHeGTz/PmAoiA09w30q8K6SNnj0CmzpDhmRBg7tUGjLWpYvph7djOsZrwFb0DDpZjd
+        GrOFF+Vpj2I+jmVU2b6vUUyiz1X6AdNx+RwQRy7Iq+wVnC/7WYjaBLfaifsaWR/fs8UaFo
+        jU/Xs8zsAjfPx3e1g4ONEZ1v11gRIP4=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 0/4] KVM: arm64: Parallel access faults
-Date:   Tue, 29 Nov 2022 19:19:42 +0000
-Message-Id: <20221129191946.1735662-1-oliver.upton@linux.dev>
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/4] KVM: arm64: Use KVM's pte type/helpers in handle_access_fault()
+Date:   Tue, 29 Nov 2022 19:19:43 +0000
+Message-Id: <20221129191946.1735662-2-oliver.upton@linux.dev>
+In-Reply-To: <20221129191946.1735662-1-oliver.upton@linux.dev>
+References: <20221129191946.1735662-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
@@ -45,41 +52,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When I implemented the parallel faults series I was mostly focused on
-improving the performance of 8.1+ implementations which bring us
-FEAT_HAFDBS. In so doing, I failed to put access faults on the read side
-of the MMU lock.
+Consistently use KVM's own pte types and helpers in
+handle_access_fault().
 
-Anyhow, this small series adds support for handling access faults in
-parallel, piling on top of the infrastructure from the first parallel
-faults series. As most large systems I'm aware of are 8.1+ anyway, I
-don't expect this series to provide significant uplift beyond some
-oddball machines Marc has lying around. Don't get me wrong, I'd love to
-have a D05 to play with too...
+No functional change intended.
 
-Patches 1-3 are the significant portion of the series, and patch 4 was
-used to test on an Ampere Altra system by guarding VTCR_EL2.HA with the
-kernel's Kconfig option for FEAT_HAFDBS. I've included it as I find it
-helpful for testing on newer hardware. Having said that, I won't throw a
-fit if it gets dropped either.
-
-Applies to kvmarm/next due to the dependency on the larger parallel
-faults series. Tested on Ampere Altra w/ VTCR_EL2.HA=0 as well as a
-Raspberry Pi 4.
-
-Oliver Upton (4):
-  KVM: arm64: Use KVM's pte type/helpers in handle_access_fault()
-  KVM: arm64: Don't serialize if the access flag isn't set
-  KVM: arm64: Handle access faults behind the read lock
-  KVM: arm64: Condition HW AF updates on config option
-
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
  arch/arm64/include/asm/kvm_pgtable.h |  5 +++++
- arch/arm64/kvm/hyp/pgtable.c         | 12 +++++++++---
- arch/arm64/kvm/mmu.c                 | 14 ++++++--------
- 3 files changed, 20 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/mmu.c                 | 10 ++++------
+ 2 files changed, 9 insertions(+), 6 deletions(-)
 
-
-base-commit: 456ce3545dd06700df7fe82173a06b369288bcef
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 63f81b27a4e3..192f33b88dc1 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -71,6 +71,11 @@ static inline kvm_pte_t kvm_phys_to_pte(u64 pa)
+ 	return pte;
+ }
+ 
++static inline kvm_pfn_t kvm_pte_to_pfn(kvm_pte_t pte)
++{
++	return __phys_to_pfn(kvm_pte_to_phys(pte));
++}
++
+ static inline u64 kvm_granule_shift(u32 level)
+ {
+ 	/* Assumes KVM_PGTABLE_MAX_LEVELS is 4 */
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index a3c71b5172cd..886ad5ee767a 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1399,20 +1399,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ /* Resolve the access fault by making the page young again. */
+ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ {
+-	pte_t pte;
+-	kvm_pte_t kpte;
++	kvm_pte_t pte;
+ 	struct kvm_s2_mmu *mmu;
+ 
+ 	trace_kvm_access_fault(fault_ipa);
+ 
+ 	write_lock(&vcpu->kvm->mmu_lock);
+ 	mmu = vcpu->arch.hw_mmu;
+-	kpte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
++	pte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
+ 	write_unlock(&vcpu->kvm->mmu_lock);
+ 
+-	pte = __pte(kpte);
+-	if (pte_valid(pte))
+-		kvm_set_pfn_accessed(pte_pfn(pte));
++	if (kvm_pte_valid(pte))
++		kvm_set_pfn_accessed(kvm_pte_to_pfn(pte));
+ }
+ 
+ /**
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
