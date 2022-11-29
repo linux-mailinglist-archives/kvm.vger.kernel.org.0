@@ -2,61 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCFDC63C39B
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 16:23:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7935063C42B
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 16:50:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235906AbiK2PW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 10:22:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50794 "EHLO
+        id S235978AbiK2Pur (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 10:50:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235383AbiK2PWe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 10:22:34 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BEDF1031;
-        Tue, 29 Nov 2022 07:22:33 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        with ESMTP id S235974AbiK2Pud (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 10:50:33 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE672AE1C;
+        Tue, 29 Nov 2022 07:50:30 -0800 (PST)
+Received: from zn.tnic (p200300ea9733e724329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e724:329c:23ff:fea6:a903])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8E8A51EC04AD;
-        Tue, 29 Nov 2022 16:22:31 +0100 (CET)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D1AD01EC06D0;
+        Tue, 29 Nov 2022 16:50:28 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1669735351;
+        t=1669737028;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=LujzV/tLtq9Iu7+knxQAJu5JqCU1GbpY29Rl6FN1clw=;
-        b=hWnlw+QvI0934jj1dZydvMzk8MdEobqfSccw8KPjtnurrHDTHMqO7x9hfND1W6yDjmyE8q
-        cGMH2TANtBQP2+Ob/pfSHto8caOciyQV7tnABhIp30/x3mMui1gjDo32rnU8q/9DRN0bpo
-        rv13PgzRaDL73tBO4LW/2bWZh4txdLE=
-Date:   Tue, 29 Nov 2022 16:22:31 +0100
+        bh=j5TXiePmxL91SlMInx0lOFxR9R7xf7CDOnkMDEo8NOo=;
+        b=Ug7/ioDiJ/T09VA+AtfybQkW2YwL9YgxTYELmnFF8r+jaBqrkU+AQFPeTLo8qVJBWcp6gs
+        aHItuRxbIdJ6etimD4uwbRIS2BEJfu3QTJM5RELq/MNqpYIVcvLbzVks3WKlUZMp1NBjvF
+        UP+Pzmf4O5YrrB38kp4rtCeJUx9xl3E=
+Date:   Tue, 29 Nov 2022 16:50:24 +0100
 From:   Borislav Petkov <bp@alien8.de>
-To:     Tianyu Lan <ltykernel@gmail.com>
-Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
-        tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
-Subject: Re: [RFC PATCH V2 01/18] x86/sev: Pvalidate memory gab for
- decompressing kernel
-Message-ID: <Y4Yjt0rOzsSoosEj@zn.tnic>
-References: <20221119034633.1728632-1-ltykernel@gmail.com>
- <20221119034633.1728632-2-ltykernel@gmail.com>
- <Y4YBfk3lyUJie4bR@zn.tnic>
- <6b3bdbbd-d381-3e52-57ec-729c8ab2d042@gmail.com>
+To:     Kim Phillips <kim.phillips@amd.com>
+Cc:     x86@kernel.org, Babu Moger <Babu.Moger@amd.com>,
+        Borislav Petkov <bp@suse.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Juergen Gross <jgross@suse.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] x86/cpu, kvm: Use CPU capabilities for
+ CPUID[0x80000021].EAX
+Message-ID: <Y4YqQO/gGwAmn7jI@zn.tnic>
+References: <20221124000449.79014-1-kim.phillips@amd.com>
+ <20221124000449.79014-2-kim.phillips@amd.com>
+ <Y39qUnlRx05eaGeb@zn.tnic>
+ <849464c8-476a-9a14-afdb-cb8793dd6064@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <6b3bdbbd-d381-3e52-57ec-729c8ab2d042@gmail.com>
+In-Reply-To: <849464c8-476a-9a14-afdb-cb8793dd6064@amd.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
@@ -66,23 +69,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 29, 2022 at 10:42:48PM +0800, Tianyu Lan wrote:
-> Thanks for your review. sev_snp_enabled() is used after sev_status
-> was initialized in sev_enable() while pvalidate_for_startup_ 64() is
-> called before sev_enable().
+On Mon, Nov 28, 2022 at 05:00:43PM -0600, Kim Phillips wrote:
+> > verify_tags: WARNING: Co-developed-by Babu Moger <Babu.Moger@amd.com> hasn't signed off on the patch!
+> 
+> OK, I'll add his signed-off-by.
 
-Then you're going to have to change the code so that sev_status is
-initialized before you need it. And not break others in the process.
+You can't just add his SOB - he needs to give it himself.
 
-And lemme save you some time - I won't accept sloppy code. You need to
-integrate the functionality you need in the code paths properly - not
-bolt it on in complete disregard of the flow just because it is easier.
+"Certificate of Origin" in Documentation/process/submitting-patches.rst
+needs brushing up on, it seems.
 
-> This is for Linux direct boot mode and so it needs to do such check
-> here.
+> Not sure I follow.  That code (originally from commit f144c49e8c39
+> ("KVM: x86: synthesize CPUID leaf 0x80000021h if useful") doesn't
+> negate that: the code is saying that if we don't have the bug, then
+> set the feature bit that says we don't have the bug.
 
-I don't know what "Linux direct boot mode" is so until you define it
-properly and explain everything in detail, this is not going anywhere.
+I was thinking of the case described here:
+
+415de4407664 ("x86/cpu: Fix migration safety with X86_BUG_NULL_SEL")
+
+but I guess we can do that on the host.
+
+> > Which means, you'd have to update check_null_seg_clears_base() too.
+> 
+> Like this?:
+> 
+> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+> index 73cc546e024d..bbe96d71ff5e 100644
+> --- a/arch/x86/kernel/cpu/common.c
+> +++ b/arch/x86/kernel/cpu/common.c
+> @@ -1682,11 +1682,6 @@ void check_null_seg_clears_base(struct cpuinfo_x86 *c)
+>         if (!IS_ENABLED(CONFIG_X86_64))
+>                 return;
+> 
+> -       /* Zen3 CPUs advertise Null Selector Clears Base in CPUID. */
+> -       if (c->extended_cpuid_level >= 0x80000021 &&
+> -           cpuid_eax(0x80000021) & BIT(6))
+> -               return;
+> -
+
+No, not like this. The above you've removed needs to be
+
+	if (cpu_has(c, X86_FEATURE_NULL_SEL_CLR_BASE))
+		return;
+
+so that you exit early.
 
 Thx.
 
