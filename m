@@ -2,74 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 768D663C9F6
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 22:00:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 99FEA63CA2E
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 22:12:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236638AbiK2VAx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 16:00:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59634 "EHLO
+        id S237041AbiK2VML (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 16:12:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236294AbiK2VAw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 16:00:52 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4744752171
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 13:00:49 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id w37so9025487pga.5
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 13:00:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cv7bP6Ykoos9p/GSChQ3hTQpD+T90m2BXvicS8ztKkY=;
-        b=LjZa0NyucvKgdFLDZuq/BMDOGwBjA+nS/RFT6FpAkCYZ7VfBn0Zxee9PeRD82I1fN8
-         E1bQmWmUQrYGjJni2jrPozVvZT6FDGsqjfy66v3/QQydBYikDmMXH+ULHSk0nfg5QSgP
-         h2iuulqYQXz4Su5XKM7uealW6p3CrNk550WHCTnvyoaxLQ2nrEZ/yq8ti7QR4HBj3SgA
-         e2RMNQY1NIW38zpdVC5XjX/JXKOVp5mVsxFXRDDscvhzdzCyA92Vs9g2XJUGfFl2xb2C
-         kMb9AoRdkWS7O20ZHucbwBET0m1JZX9LwgAZUQyQ6um1Fl+numP+ifFobdYTGf4+VA8/
-         rP2w==
+        with ESMTP id S237054AbiK2VL4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 16:11:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 497206CA3D
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 13:10:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669756236;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=k698xTv8b1qqm1dRRZgevYpv3znOLNXUsBrj1mzERPk=;
+        b=Ye6yI4mEPBEOfA7lLww9Iqqv9RZaFZAslJdbmvQOVMfz8s81ah/1lD1SHngRbkmJ29XGCj
+        QFJb1xdrxi5sMJQoDtBOoTq1B6tURf3LJQxC6LDjl2NheQ+Zk7WV6zOFBI/7GG7D6TOMNy
+        qC8BBSaRmkF3slyiQkc6iHRRP9N+yKw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-454-7UdCrHpgMlKuIBOrlfKDXQ-1; Tue, 29 Nov 2022 16:10:32 -0500
+X-MC-Unique: 7UdCrHpgMlKuIBOrlfKDXQ-1
+Received: by mail-wm1-f70.google.com with SMTP id m34-20020a05600c3b2200b003cf549cb32bso10803847wms.1
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 13:10:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Cv7bP6Ykoos9p/GSChQ3hTQpD+T90m2BXvicS8ztKkY=;
-        b=Dlobmk2iEb4/dGzHS+IasOr3FOZ6uf8sampVY+m2UpBokmjCqNIQfq53raJGd00hKp
-         IfHcCZ1dyN6Z8HCjcagpfYil9QVTNqPgJuGs+j+zIDZ9894hoY7d1JtLQS90BrPvJ86X
-         fbaQvlEzCb3e2+hs43Wxh7s68MwXhLXxP1wdd5jGXknhKzcUznx7Nu6g9bd5advUz+PG
-         T5jt1mmdxpIzSQ/fMVFoG2t4a7HG8Nz2OGqUecZDDcl/xHDrAoNatXQoz5jVYNlG9ZG9
-         O0rLvqWz50bUeuttQZZ6uWYh/WxeVwuQeqOI6yZFt2h/PHmnsYyYw3ibkx9u4g+mnGux
-         zgMQ==
-X-Gm-Message-State: ANoB5pkU6pA/AK8P46dbCJ7AVgt35xvg46v0ofw/HSkMOtaEJo45vFUf
-        yDtC6+OdPvs04cwlu3E9es5oxQ==
-X-Google-Smtp-Source: AA0mqf6LGlNdkJlLDcwfP4oo7asFABbkB+ZP9oQrvqjFFePdLkCPII5mdqk5RqRXD5AGhShcjzDHXg==
-X-Received: by 2002:a63:5a62:0:b0:476:ed2a:6215 with SMTP id k34-20020a635a62000000b00476ed2a6215mr34342882pgm.559.1669755648622;
-        Tue, 29 Nov 2022 13:00:48 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id f14-20020a170902ce8e00b0018957322953sm11407727plg.45.2022.11.29.13.00.48
+        bh=k698xTv8b1qqm1dRRZgevYpv3znOLNXUsBrj1mzERPk=;
+        b=0rjMXvHsBmak73N8sqQb7sncmQPxbTQM+IFc2zx5r8ZpTpo9j5ooRB4zwPx53b9CEU
+         EBIwTpUDgaZcrvlxIkf/gkxtRYwRdigGXKvXhla3tuCkTfPQvrSng1ESaXqvesyBaOVu
+         GYwzoJ45FBx/ArdTnrngi3u+1AcOfJsJ6Ohy7haWAB5qPwYk7daxsr32x+iN6qkqxcs4
+         rxDa86HfXIL5m27Xy1WehbxEX5IbShgO36E9WUkEjf5mvDKw2e1b6nZ8AHwBX/DiZ0QP
+         UOdJDfkdVZ6oXtCQEvpVAXUC/LAtMRr0PBZX7/h/nY2wt1iypvdFLuwH/vMWv/UyELhA
+         b9MA==
+X-Gm-Message-State: ANoB5pn5T3uytOjmu41/y/Br4zktZv69dAypSShoKUtA4QxYQm7rlAU0
+        wQKHUs09L3gol0XMYoGeWfsQw/08ek433r956cBOm/x+hUTolkNzMm31ijbACfUBxn5tx+/Cb6L
+        fTU6Q0DVRMlbu
+X-Received: by 2002:a5d:46d0:0:b0:242:91c:a12f with SMTP id g16-20020a5d46d0000000b00242091ca12fmr12901688wrs.524.1669756231199;
+        Tue, 29 Nov 2022 13:10:31 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6+iPW2bfSUBCiA/vEABdm4r2E99sY8GFRM5gUzIgdbDggVKb5d5xIs/N7xro3zHpnqh3uj+Q==
+X-Received: by 2002:a5d:46d0:0:b0:242:91c:a12f with SMTP id g16-20020a5d46d0000000b00242091ca12fmr12901684wrs.524.1669756230981;
+        Tue, 29 Nov 2022 13:10:30 -0800 (PST)
+Received: from redhat.com ([2.52.149.178])
+        by smtp.gmail.com with ESMTPSA id i28-20020a05600c4b1c00b003cfd4e6400csm3259683wmp.19.2022.11.29.13.10.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Nov 2022 13:00:48 -0800 (PST)
-Date:   Tue, 29 Nov 2022 13:00:44 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 3/4] KVM: arm64: Handle access faults behind the read lock
-Message-ID: <Y4Zy/MtIgeLyRGy9@google.com>
-References: <20221129191946.1735662-1-oliver.upton@linux.dev>
- <20221129191946.1735662-4-oliver.upton@linux.dev>
+        Tue, 29 Nov 2022 13:10:30 -0800 (PST)
+Date:   Tue, 29 Nov 2022 16:10:25 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Anthony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>, iommu@lists.linux.dev,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Lixiao Yang <lixiao.yang@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Yu He <yu.he@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v6 07/19] kernel/user: Allow user::locked_vm to be usable
+ for iommufd
+Message-ID: <20221129160444-mutt-send-email-mst@kernel.org>
+References: <0-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
+ <7-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
+ <20221129154048-mutt-send-email-mst@kernel.org>
+ <Y4ZwEJotH0U0Qzt7@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221129191946.1735662-4-oliver.upton@linux.dev>
-X-Spam-Status: No, score=-15.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        URI_DOTEDU,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=no
+In-Reply-To: <Y4ZwEJotH0U0Qzt7@nvidia.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,54 +103,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 29, 2022 at 07:19:45PM +0000, Oliver Upton wrote:
-> As the underlying software walkers are able to traverse and update
-> stage-2 in parallel there is no need to serialize access faults.
+On Tue, Nov 29, 2022 at 04:48:16PM -0400, Jason Gunthorpe wrote:
+> On Tue, Nov 29, 2022 at 03:42:23PM -0500, Michael S. Tsirkin wrote:
+> > On Tue, Nov 29, 2022 at 04:29:30PM -0400, Jason Gunthorpe wrote:
+> > > Following the pattern of io_uring, perf, skb, and bpf, iommfd will use
+> > > user->locked_vm for accounting pinned pages. Ensure the value is included
+> > > in the struct and export free_uid() as iommufd is modular.
+> > > 
+> > > user->locked_vm is the good accounting to use for ulimit because it is
+> > > per-user, and the security sandboxing of locked pages is not supposed to
+> > > be per-process. Other places (vfio, vdpa and infiniband) have used
+> > > mm->pinned_vm and/or mm->locked_vm for accounting pinned pages, but this
+> > > is only per-process and inconsistent with the new FOLL_LONGTERM users in
+> > > the kernel.
+> > > 
+> > > Concurrent work is underway to try to put this in a cgroup, so everything
+> > > can be consistent and the kernel can provide a FOLL_LONGTERM limit that
+> > > actually provides security.
+> > > 
+> > > Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+> > > Tested-by: Yi Liu <yi.l.liu@intel.com>
+> > > Tested-by: Lixiao Yang <lixiao.yang@intel.com>
+> > > Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> > > Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> > > Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > 
+> > Just curious: why does the subject say "user::locked_vm"? As opposed to
+> > user->locked_vm? Made me think it's somehow related to rust in kernel or
+> > whatever.
 > 
-> Only take the read lock when handling an access fault.
+> :: is the C++ way to say "member of a type", I suppose it is a typo
+> and should be user_struct::locked_vm
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/pgtable.c | 2 +-
->  arch/arm64/kvm/mmu.c         | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
+> The use of -> otherwise was to have some clarity about mm vs user
+> structs.
 > 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 9626f615d9b8..1a3dd9774707 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1097,7 +1097,7 @@ kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr)
->  	int ret;
->  
->  	ret = stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
-> -				       &pte, NULL, 0);
-> +				       &pte, NULL, KVM_PGTABLE_WALK_SHARED);
->  	if (!ret)
->  		dsb(ishst);
->  
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 886ad5ee767a..347985a56414 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1404,10 +1404,10 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->  
->  	trace_kvm_access_fault(fault_ipa);
->  
-> -	write_lock(&vcpu->kvm->mmu_lock);
-> +	read_lock(&vcpu->kvm->mmu_lock);
->  	mmu = vcpu->arch.hw_mmu;
->  	pte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
-> -	write_unlock(&vcpu->kvm->mmu_lock);
-> +	read_unlock(&vcpu->kvm->mmu_lock);
->  
->  	if (kvm_pte_valid(pte))
->  		kvm_set_pfn_accessed(kvm_pte_to_pfn(pte));
-> -- 
-> 2.38.1.584.g0f3c55d4c2-goog
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> Jason
 
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
+I note that commit log says user->locked_vm and that's clear enough
+IMHO, I'd leave C++ alone - IIRC yes you can write ptr->type::field but
+no one does so it's not idiomatic, :: is more commonly used with static
+members there. So this confuses more than it clarifies. But whatever,
+hardly a blocker. Feel free to ignore.
+
+-- 
+MST
+
