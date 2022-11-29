@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D259463C690
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 18:42:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7DAF63C691
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 18:42:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236677AbiK2Rml (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 12:42:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38752 "EHLO
+        id S236670AbiK2Rmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 12:42:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236670AbiK2Rme (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 12:42:34 -0500
+        with ESMTP id S236664AbiK2Rmg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 12:42:36 -0500
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B12AB1025
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 09:42:33 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ATGxFFI006316;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FFF2BF4
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 09:42:35 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ATGx8xL013084;
         Tue, 29 Nov 2022 17:42:22 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=x7y4rxkj5YRS87iryWPdRAEHHgsbdeZ1JK44KtLWH7I=;
- b=NaBWBQC0TVveHbmCrFvoFvmmZMgXXlcDCxWbNJS+H501PXTU/Ey4Vh4Npkg6nATZIacQ
- xNMvHQu3Gf/e3XeK9utINJt//cLcf92YautJuBromzTNfi/ZGDcPuPQFlUrut9Q8y2H9
- 18C9ad4j9ch71eZX6kwAg0MRnSXPApzGwQD7T6AC2obp4wGw+Yi8IX1Au9q/Jjs8zzwb
- jSdQ+z12NdUbszI4dhTtgLh96Cw4nu6ZBNxito1SMcmw+gpxCSNSZskyT2tw8Fxmdvm+
- STh5aRuLIBcYCt5VlDgSp9iKonsAOdLnYyVcxb/8tKqhPM+oTaTYfVqbZ1hjT8GozXmF Dg== 
+ bh=zRgxJwhdvMuf0/S6nTCkxTz5a4usYMPGRTMHVCwL9So=;
+ b=E6NOUSkEUs5yk1iBQGPREyXt31R5fGWZ4g8RZQQ+OfyQLr5zqdfvGkWwEIv1axczNwQE
+ F1TUfNSiCOfe/V14kNiOaGw7igClWraMTQ/vkRHwb3TNGye2oRvq3K5dmP1WOlnOJWvt
+ KJdxX+hs8LGOFkUQMRRyHRvjafbqsdbLd0IcOdk4HlWopig0QL6efN4kdB5+PfMKvswk
+ lsExxsoPqyurkFNpyz2dykVRGiDqA6OjQUaRcECIWGR2t2B1KG81h19zlUvALIknAoYU
+ VVsy54jdluVyt1Q3w+L2Ah81z4ocnVLULrbFc/+lDQPFBNHkhUoZfhbhLhGnI4C7ngWC YQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m5k6q7qxh-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m5kmv6nu7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 29 Nov 2022 17:42:22 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ATGx7XZ013054;
+        Tue, 29 Nov 2022 17:42:22 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m5kmv6ntc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 29 Nov 2022 17:42:21 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ATGxOZI007111;
-        Tue, 29 Nov 2022 17:42:21 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m5k6q7qwc-1
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ATHZN73019130;
+        Tue, 29 Nov 2022 17:42:19 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3m3ae9cfey-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Nov 2022 17:42:21 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ATHZicE018462;
-        Tue, 29 Nov 2022 17:42:18 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma05fra.de.ibm.com with ESMTP id 3m3ae9b830-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Nov 2022 17:42:18 +0000
+        Tue, 29 Nov 2022 17:42:19 +0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ATHgFe960883298
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ATHgxj464422286
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 29 Nov 2022 17:42:15 GMT
+        Tue, 29 Nov 2022 17:42:59 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5BDFEA4051;
+        by IMSVA (Postfix) with ESMTP id 6F4BEA404D;
+        Tue, 29 Nov 2022 17:42:16 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6F0F1A4040;
         Tue, 29 Nov 2022 17:42:15 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 60E97A4040;
-        Tue, 29 Nov 2022 17:42:14 +0000 (GMT)
 Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.89.107])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 29 Nov 2022 17:42:14 +0000 (GMT)
+        Tue, 29 Nov 2022 17:42:15 +0000 (GMT)
 From:   Pierre Morel <pmorel@linux.ibm.com>
 To:     qemu-s390x@nongnu.org
 Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
@@ -66,25 +66,25 @@ Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
         marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
         seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
         frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
-Subject: [PATCH v12 6/7] s390x/cpu_topology: activating CPU topology
-Date:   Tue, 29 Nov 2022 18:42:05 +0100
-Message-Id: <20221129174206.84882-7-pmorel@linux.ibm.com>
+Subject: [PATCH v12 7/7] docs/s390x: document s390x cpu topology
+Date:   Tue, 29 Nov 2022 18:42:06 +0100
+Message-Id: <20221129174206.84882-8-pmorel@linux.ibm.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20221129174206.84882-1-pmorel@linux.ibm.com>
 References: <20221129174206.84882-1-pmorel@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: aLHspoLo-lSy_wUwyPamrdf9kWNYkbuk
-X-Proofpoint-GUID: CTQjm1wELMKG4Ilg9m8xKiOaJSU80iSX
+X-Proofpoint-GUID: XsptuCgLKPfvCqgGefrwAoIZ-KrupQhD
+X-Proofpoint-ORIG-GUID: wVBJDpKjGPNYHQvzk1e33pRkioveiNM7
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-11-29_11,2022-11-29_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
- mlxlogscore=996 spamscore=0 mlxscore=0 lowpriorityscore=0 impostorscore=0
- priorityscore=1501 phishscore=0 malwarescore=0 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2211290097
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 suspectscore=0 adultscore=0
+ phishscore=0 clxscore=1015 mlxlogscore=999 bulkscore=0 spamscore=0
+ malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211290097
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
@@ -94,162 +94,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The KVM capability, KVM_CAP_S390_CPU_TOPOLOGY is used to
-activate the S390_FEAT_CONFIGURATION_TOPOLOGY feature and
-the topology facility for the guest in the case the topology
-is available in QEMU and in KVM.
-
-The feature is fenced for SE (secure execution).
-
-To allow smooth migration with old QEMU the feature is disabled by
-default using the CPU flag -disable-topology.
-
-Making the S390_FEAT_CONFIGURATION_TOPOLOGY belonging to the
-default features makes the -ctop CPU flag is no more necessary,
-turning the topology feature on is done with -disable-topology
-only.
+Add some basic examples for the definition of cpu topology
+in s390x.
 
 Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 ---
- include/hw/s390x/cpu-topology.h     |  5 +----
- target/s390x/cpu_features_def.h.inc |  1 +
- target/s390x/cpu_models.c           | 17 +++++++++++++++++
- target/s390x/cpu_topology.c         |  5 +++++
- target/s390x/gen-features.c         |  3 +++
- target/s390x/kvm/kvm.c              | 14 ++++++++++++++
- 6 files changed, 41 insertions(+), 4 deletions(-)
+ docs/system/s390x/cpu-topology.rst | 80 ++++++++++++++++++++++++++++++
+ 1 file changed, 80 insertions(+)
+ create mode 100644 docs/system/s390x/cpu-topology.rst
 
-diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
-index e88059ccec..b2fa24ba93 100644
---- a/include/hw/s390x/cpu-topology.h
-+++ b/include/hw/s390x/cpu-topology.h
-@@ -36,9 +36,6 @@ struct S390Topology {
- #define TYPE_S390_CPU_TOPOLOGY "s390-topology"
- OBJECT_DECLARE_SIMPLE_TYPE(S390Topology, S390_CPU_TOPOLOGY)
- 
--static inline bool s390_has_topology(void)
--{
--    return false;
--}
-+bool s390_has_topology(void);
- 
- #endif
-diff --git a/target/s390x/cpu_features_def.h.inc b/target/s390x/cpu_features_def.h.inc
-index e3cfe63735..016a720e38 100644
---- a/target/s390x/cpu_features_def.h.inc
-+++ b/target/s390x/cpu_features_def.h.inc
-@@ -147,6 +147,7 @@ DEF_FEAT(SIE_CEI, "cei", SCLP_CPU, 43, "SIE: Conditional-external-interception f
- DEF_FEAT(DAT_ENH_2, "dateh2", MISC, 0, "DAT-enhancement facility 2")
- DEF_FEAT(CMM, "cmm", MISC, 0, "Collaborative-memory-management facility")
- DEF_FEAT(AP, "ap", MISC, 0, "AP instructions installed")
-+DEF_FEAT(DISABLE_CPU_TOPOLOGY, "disable-topology", MISC, 0, "Disable CPU Topology")
- 
- /* Features exposed via the PLO instruction. */
- DEF_FEAT(PLO_CL, "plo-cl", PLO, 0, "PLO Compare and load (32 bit in general registers)")
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index c3a4f80633..1f5348d6a3 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -253,6 +253,7 @@ bool s390_has_feat(S390Feat feat)
-         case S390_FEAT_SIE_CMMA:
-         case S390_FEAT_SIE_PFMFI:
-         case S390_FEAT_SIE_IBS:
-+        case S390_FEAT_CONFIGURATION_TOPOLOGY:
-             return false;
-             break;
-         default:
-@@ -422,6 +423,21 @@ void s390_cpu_list(void)
-     }
- }
- 
-+static void check_incompatibility(S390CPUModel *model, Error **errp)
-+{
-+    static int dep[][2] = {
-+        { S390_FEAT_CONFIGURATION_TOPOLOGY, S390_FEAT_DISABLE_CPU_TOPOLOGY },
-+    };
-+    int i;
+diff --git a/docs/system/s390x/cpu-topology.rst b/docs/system/s390x/cpu-topology.rst
+new file mode 100644
+index 0000000000..2fad28453c
+--- /dev/null
++++ b/docs/system/s390x/cpu-topology.rst
+@@ -0,0 +1,80 @@
++CPU Topology on s390x
++=====================
 +
-+    for (i = 0; i < ARRAY_SIZE(dep); i++) {
-+        if (test_bit(dep[i][0], model->features) &&
-+            test_bit(dep[i][1], model->features)) {
-+            clear_bit(dep[i][0], model->features);
-+        }
-+    }
-+}
++CPU Topology on S390x provides up to 5 levels of topology containers:
++nodes, drawers, books, sockets and CPUs.
++While the higher level containers, Containers Topology List Entries,
++(Containers TLE) define a tree hierarchy, the lowest level of topology
++definition, the CPU Topology List Entry (CPU TLE), provides the placement
++of the CPUs inside the parent container.
 +
- static void check_consistency(const S390CPUModel *model)
- {
-     static int dep[][2] = {
-@@ -592,6 +608,7 @@ void s390_realize_cpu_model(CPUState *cs, Error **errp)
-     cpu->model->cpu_id_format = max_model->cpu_id_format;
-     cpu->model->cpu_ver = max_model->cpu_ver;
- 
-+    check_incompatibility(cpu->model, &err);
-     check_consistency(cpu->model);
-     check_compatibility(max_model, cpu->model, &err);
-     if (err) {
-diff --git a/target/s390x/cpu_topology.c b/target/s390x/cpu_topology.c
-index b81f016ba1..8123e6ddf0 100644
---- a/target/s390x/cpu_topology.c
-+++ b/target/s390x/cpu_topology.c
-@@ -15,6 +15,11 @@
- #include "hw/s390x/cpu-topology.h"
- #include "hw/s390x/sclp.h"
- 
-+bool s390_has_topology(void)
-+{
-+    return s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY);
-+}
++Currently QEMU CPU topology uses a single level of container: the sockets.
 +
- /*
-  * s390_topology_add_cpu:
-  * @topo: pointer to the topology
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 1e3b7c0dc9..f3acfdd9a5 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -488,6 +488,7 @@ static uint16_t full_GEN9_GA3[] = {
- static uint16_t full_GEN10_GA1[] = {
-     S390_FEAT_EDAT,
-     S390_FEAT_CONFIGURATION_TOPOLOGY,
-+    S390_FEAT_DISABLE_CPU_TOPOLOGY,
-     S390_FEAT_GROUP_MSA_EXT_2,
-     S390_FEAT_ESOP,
-     S390_FEAT_SIE_PFMFI,
-@@ -605,6 +606,8 @@ static uint16_t default_GEN9_GA1[] = {
- static uint16_t default_GEN10_GA1[] = {
-     S390_FEAT_EDAT,
-     S390_FEAT_GROUP_MSA_EXT_2,
-+    S390_FEAT_DISABLE_CPU_TOPOLOGY,
-+    S390_FEAT_CONFIGURATION_TOPOLOGY,
- };
- 
- #define default_GEN10_GA2 EmptyFeat
-diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-index a79fdf1c79..ec2c9fd8fa 100644
---- a/target/s390x/kvm/kvm.c
-+++ b/target/s390x/kvm/kvm.c
-@@ -2471,6 +2471,20 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
-         set_bit(S390_FEAT_UNPACK, model->features);
-     }
- 
-+    /*
-+     * If we have support for CPU Topology prevent overrule
-+     * S390_FEAT_CONFIGURATION_TOPOLOGY with S390_FEAT_DISABLE_CPU_TOPOLOGY
-+     * implemented in KVM, activate the CPU TOPOLOGY feature.
-+     */
-+    if (kvm_check_extension(kvm_state, KVM_CAP_S390_CPU_TOPOLOGY)) {
-+        if (kvm_vm_enable_cap(kvm_state, KVM_CAP_S390_CPU_TOPOLOGY, 0) < 0) {
-+            error_setg(errp, "KVM: Error enabling KVM_CAP_S390_CPU_TOPOLOGY");
-+            return;
-+        }
-+        set_bit(S390_FEAT_CONFIGURATION_TOPOLOGY, model->features);
-+        set_bit(S390_FEAT_DISABLE_CPU_TOPOLOGY, model->features);
-+    }
++For backward compatibility, threads can be declared on the ``-smp`` command
++line. They will be seen as CPUs by the guest as long as multithreading
++is not really supported by QEMU for S390.
 +
-     /* We emulate a zPCI bus and AEN, therefore we don't need HW support */
-     set_bit(S390_FEAT_ZPCI, model->features);
-     set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
++Prerequisites
++-------------
++
++To use CPU Topology a Linux QEMU/KVM machine providing the CPU Topology facility
++(STFLE bit 11) is required.
++
++However, since this facility has been enabled by default in an early version
++of QEMU, we use a capability, ``KVM_CAP_S390_CPU_TOPOLOGY``, to notify KVM
++QEMU use of the CPU Topology.
++
++Indicating the CPU topology to the Virtual Machine
++--------------------------------------------------
++
++The CPU Topology, can be specified on the QEMU command line
++with the ``-smp`` or the ``-device`` QEMU command arguments.
++
++Like in :
++
++.. code-block:: sh
++    -smp cpus=5,sockets=8,cores=2,threads=2,maxcpus=32
++    -device host-s390x-cpu,core-id=14
++
++New CPUs can be plugged using the device_add hmp command like in:
++
++.. code-block:: sh
++   (qemu) device_add host-s390x-cpu,core-id=9
++
++The core-id defines the placement of the core in the topology by
++starting with core 0 in socket 0 up to maxcpus.
++
++In the example above:
++
++* There are 5 CPUs provided to the guest with the ``-smp`` command line
++  They will take the core-ids 0,1,2,3,4
++  As we have 2 threads in 2 cores in a socket, we have 4 CPUs provided
++  to the guest in socket 0, with core-ids 0,1,2,3.
++  The last cpu, with core-id 4, will be on socket 1.
++
++* the core with ID 14 provided by the ``-device`` command line will
++  be placed in socket 3, with core-id 14
++
++* the core with ID 9 provided by the ``device_add`` qmp command will
++  be placed in socket 2, with core-id 9
++
++Note that the core ID is machine wide and the CPU TLE masks provided
++by the STSI instruction will be:
++
++* in socket 0: 0xf0000000 (core id 0,1,2,3)
++* in socket 1: 0x00400000 (core id 9)
++* in socket 1: 0x00020000 (core id 14)
++
++Enabling CPU topology
++---------------------
++
++Currently, CPU topology is disabled by default.
++
++Enabling CPU topology can be done by setting the feature flag
++``disable-topology`` to ``off`` like in:
++
++.. code-block:: sh
++   -cpu gen16b,disable-topology=off
++
++Having the topology disabled by default allows migration between
++old and new QEMU without adding new flags.
 -- 
 2.31.1
 
