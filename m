@@ -2,245 +2,252 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB85263C71A
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 19:23:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 57ADA63C7C7
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 20:07:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235697AbiK2SX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 13:23:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39710 "EHLO
+        id S236180AbiK2THV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 14:07:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231151AbiK2SXW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 13:23:22 -0500
-Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB805F85E;
-        Tue, 29 Nov 2022 10:23:21 -0800 (PST)
-Received: from pps.filterd (m0127844.ppops.net [127.0.0.1])
-        by mx0b-002c1b01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ATH78qr018390;
-        Tue, 29 Nov 2022 10:22:48 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=from : to : cc :
- subject : date : message-id : content-transfer-encoding : content-type :
- mime-version; s=proofpoint20171006;
- bh=uvRPPR7HWq2+gFtlVBakUAOCyM9VPC5Y9xZaCZN0gt4=;
- b=XIoSECDOFDXYPcUoOigPLNUB4KOX7QUXnyjPHy4xMxs/H5lvjcZskHrdVqsq9wXzfpqi
- ykPCbuV8mp4UZlVBJ2Hyfr8p2Dhf1BliUBuxcBKNN2bBNM8fGk+xZAew664HegomWGZO
- 2R6CTiZRx4gwl1rXkmYpS9CQ/G0PVG0K8IphBBHCoB7X1oRGNPjM7dXwyrQhikayxOQG
- dv6drHLNbpnsahn+PmioDXVCTOMzgGbkLO4MgntJvkPkhwL+ijur63kolTFpeFSm2yKc
- 3jBKK2Zor9fUU9Pfx6/yGbnw7nofbFfoGXD9f2TWhJsIgS9zUdx34VJIm419QbUvwqWg tw== 
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2045.outbound.protection.outlook.com [104.47.56.45])
-        by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 3m3k75yu3x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Nov 2022 10:22:47 -0800
+        with ESMTP id S235857AbiK2THT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 14:07:19 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2049.outbound.protection.outlook.com [40.107.244.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A95925F8;
+        Tue, 29 Nov 2022 11:07:18 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P8wH8zSqOmISKQU1AbDtt8/6Xjfxdye227rRRqhfeGSzQp9BH4aoCUmjYOWikYYqJMOq/bQmcWQqeq5cHmEcNlJvlBx2lVISt1CZHfSlURX4v/uvLgmka0arQFNU7WDJv2qAA69srWLPax1RdEqeFZB7JZVgvNPM8p8s/yG6qhiGwxNNyIwcolHj+ANafBOp3TbU4O03+tu3gLmrBlNMqkvEmB6c7ja4s1lVDZPpLklww/ssIgimbiHlWixagbzmANr7hvB9nqtkeTSbhmDteY3KdEu0/TGHzm9VL27w5ooNuTmLhCpSRcS2AIiAJNRPm+EBAQN94ePqBLPf1gJrpg==
+ b=NqmyOBWe1TnDdlflTgp+FIkZURp7HdzPCiPyUyuQQZMfdKUSFlq/lM7ZngnunvktGHYlfP+taNjszD1BJKxvmkiIiZDLk20XEHdFvjT4Gg61Wx3LlNT9WAXyg0yH6spflnN3Vg5D7bNrPS9A+j1NFS8jg/B1+AZUcqp3dEFrvStry66zqGhWHUoAOzynYmMUTzoK3iAzSHNrexNHILtcCanjdLWKXDfw7fGtJudwVCcWZJ53ioF5N1i67aLrVnSZVIPYs5smzKA4Ngsy4SaHiuyh+RxYQ7QOsazqBwumzCMr+mdY1+tciGw6yDJtfyoOIifa+sgVuElg1TPw3MxSIQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uvRPPR7HWq2+gFtlVBakUAOCyM9VPC5Y9xZaCZN0gt4=;
- b=QGLQRMmxeK0qPgipbE+Uq8w4tTv2D6M45+UVSMKRJFXqZ8bLNkOm4vA3hhFE5J+pCzZ2o2D9SNtm755hJqYidlJYP4nWyd1ixu7HhCkvS/UqLAkGfBog75upy9xESyR8+FTp7KDHaKp31tUsLgdt19cRdqqoaD/BXOB9hsirxC461JRjc5aUtChn8/S8MO2BSxX1W+qrns0eLqLr3wLDgNZK4jSvqpoxZWo7Xhy2WO6cA3XklCp2Q2hQ3DtH5Jf7hBls4Nb+sDJhuYQjqC0hw7T/ZAfeHPwee9KqnOheiUCDt55wfPBxixoQetFWiAfXx+JuG12eL6OUotF91EoAKA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- s=selector1;
+ bh=EyhsfZfDSnfHac33DvGjtVqqyJKCi1TX7dxHWWYx9sI=;
+ b=NRVLhRFV35/z2sNbIhjUN6pGa5bLdrW2xlwUMzdF7GBcGTD70fEkycsq+tbeQZD4ro5GOH+EoGo5pdtapBMJzkmaowaZJ0W2Y6HNkZb2UUHlVWkm7Ycd7N0ZTGOOe/vDHz68Y4l5cwiICMkHspxGWr1KP/xovnmSNWdnQf1+L1EBmMI0IFsMun3FIwjGTVmF8i8BDtWCL/aqVG/5+LD5SXlpB9IIDfECY96gRA/72swcc4x28ZVVz71MqCSqv7rLNIGlVYez4ensG+hWIZ+l+6hnTjFonSy+e11dV0daW9sYJK4cQ7fu1wrIvZDU39Y5tmEkKEW5viojXqdbjGdZrw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=linux.intel.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uvRPPR7HWq2+gFtlVBakUAOCyM9VPC5Y9xZaCZN0gt4=;
- b=MqZc3gUVyUSNxyY38p9J9hAwXpYYOmkSv2D6bg24Th08tC5EwIwUBEqqdZColsWsNrSFM6vuE2rSbIUIm/5q876Eh557cHQA97qxdV7Dr8oGpSaZSyyg9/ZnzgTV+yQJLbT9VbGm6C/EqsuC3oFy4k5YJI23SBxiPFxiS+4KpJYiq79R6ISQhhYObkTWl5hLQ1KoV1ODnmJp4rKdYqS4ScDNdvS/yaRgFPVBWoAU7L9Xdypoya6EknX3kopMvJK5OMLlMTAJQFxSY71m44quUZy+laxMxxk49TpLK2QT8k7Rj02FCZKZQ4A4F4I9HupGYVkk9ZaIq7rR88B00EOh8g==
-Received: from BL0PR02MB4579.namprd02.prod.outlook.com (2603:10b6:208:4b::10)
- by CO6PR02MB7810.namprd02.prod.outlook.com (2603:10b6:303:ae::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Tue, 29 Nov
- 2022 18:22:45 +0000
-Received: from BL0PR02MB4579.namprd02.prod.outlook.com
- ([fe80::ea4d:10a4:a7a4:9567]) by BL0PR02MB4579.namprd02.prod.outlook.com
- ([fe80::ea4d:10a4:a7a4:9567%6]) with mapi id 15.20.5857.023; Tue, 29 Nov 2022
- 18:22:45 +0000
-From:   Jon Kohler <jon@nutanix.com>
-To:     Sean Christopherson <seanjc@google.com>,
+ bh=EyhsfZfDSnfHac33DvGjtVqqyJKCi1TX7dxHWWYx9sI=;
+ b=IFlw9rIc3GenHnfhx+sN4TuaWNNSFxITX7CtyCKdNEd0k8kLxZCQCclCwxgUVhd8Pv2TdkGRt27miR04j+li5TQm6lgmZcXNvyV6L27gRK0VaukAVhD2FLTnqXs4sX/IjWOQ4/8FQkxeCsUqwI8KtKkJylqEMZYXt1rXA043dDc=
+Received: from DM6PR01CA0015.prod.exchangelabs.com (2603:10b6:5:296::20) by
+ DS0PR12MB6487.namprd12.prod.outlook.com (2603:10b6:8:c4::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5857.23; Tue, 29 Nov 2022 19:07:16 +0000
+Received: from DM6NAM11FT027.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:296:cafe::41) by DM6PR01CA0015.outlook.office365.com
+ (2603:10b6:5:296::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.18 via Frontend
+ Transport; Tue, 29 Nov 2022 19:07:16 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT027.mail.protection.outlook.com (10.13.172.205) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5857.18 via Frontend Transport; Tue, 29 Nov 2022 19:07:15 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Tue, 29 Nov
+ 2022 13:07:15 -0600
+Date:   Tue, 29 Nov 2022 13:06:58 -0600
+From:   Michael Roth <michael.roth@amd.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-mm@kvack.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-arch@vger.kernel.org>, <linux-api@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <qemu-devel@nongnu.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Jon Kohler <jon@nutanix.com>
-Subject: [PATCH] KVM: X86: set EXITING_GUEST_MODE as soon as vCPU exits
-Date:   Tue, 29 Nov 2022 13:22:25 -0500
-Message-Id: <20221129182226.82087-1-jon@nutanix.com>
-X-Mailer: git-send-email 2.30.1 (Apple Git-130)
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BY5PR16CA0031.namprd16.prod.outlook.com
- (2603:10b6:a03:1a0::44) To BL0PR02MB4579.namprd02.prod.outlook.com
- (2603:10b6:208:4b::10)
+        <x86@kernel.org>, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        <luto@kernel.org>, <jun.nakajima@intel.com>,
+        <dave.hansen@intel.com>, <ak@linux.intel.com>, <david@redhat.com>,
+        <aarcange@redhat.com>, <ddutile@redhat.com>, <dhildenb@redhat.com>,
+        Quentin Perret <qperret@google.com>, <tabba@google.com>,
+        <mhocko@suse.com>, Muchun Song <songmuchun@bytedance.com>,
+        <wei.w.wang@intel.com>
+Subject: Re: [PATCH v9 1/8] mm: Introduce memfd_restricted system call to
+ create restricted user memory
+Message-ID: <20221129190658.jefuep7nglp25ugt@amd.com>
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <20221025151344.3784230-2-chao.p.peng@linux.intel.com>
+ <20221129003725.l34qhx6n44mq2gtl@amd.com>
+ <20221129140615.GC902164@chaop.bj.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20221129140615.GC902164@chaop.bj.intel.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL0PR02MB4579:EE_|CO6PR02MB7810:EE_
-X-MS-Office365-Filtering-Correlation-Id: 76bdac8c-e460-4bf2-5cb4-08dad236b661
-x-proofpoint-crosstenant: true
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT027:EE_|DS0PR12MB6487:EE_
+X-MS-Office365-Filtering-Correlation-Id: 69789a1f-1946-480f-2466-08dad23cedfb
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vxBGq4nXdwYc1zVGows4L7QDpZJ5e+Al6L1WsNwvc/mN9q5+afXPgc0pz4vgvnVXuUS8BAz4nSvmOY8569jiLeehzIJRMGwX/tlZI0nMz6NNwTU4jZ3vQpXA7F82sU0ZhipB3K23uENAxQQ6eMVfmBn8CtwM1kCV2gyv9C11s9x2+xJst7S1SEdtGbYHTGZFoPDpbpkpMDPf2dkVvn19IpKbewgWSA8uLb7RRS4oEXl88g44aeFs7rm4K1788RnsWQwRkiD7rVo7Sk45+rbXJx62ZWgSjmPYKukWwgrSz65PmtCquIrfMA1UP33f7+ht1MesKYJkVUdsLPjE5zUZjC7d1KQ2jnkzsg2JkR/MS386iHtvrXQKAcfbH6fMHalqckFinhuMBVcG4r7zTkGAFn/XyADP7x43IBV55A9vamOOnvEWxmjp0aIC6b6Awv7KqKYWIcjwBTYfT+N90h4J1H6rPV54xxCi2uxHiKeLoNXOjLmuESXvzu+UX4QG60PaZ0v+qaf4mXeMWsEqK1f3O6F4R84flWtXIZpbEVUgu7xtn8+wBCkkCZs4nKfOd1m3JPWc9fw87T1/D1NamoWDUajkMLaUoo/nZ6jg7PTL2u5aDTSueuzncOYA/GB2xkZqS8ZaPTJlnnay/Q0EoulXuV5eXVsEMKiMx5jZEURaKrldkZFOz6ACvtvRTE9pqCDvAWyqLobzdBQdfb5UZaolHw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR02MB4579.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(366004)(396003)(346002)(39860400002)(136003)(376002)(451199015)(6506007)(478600001)(83380400001)(86362001)(107886003)(52116002)(6486002)(66899015)(6666004)(2616005)(316002)(6512007)(110136005)(8936002)(41300700001)(5660300002)(7416002)(921005)(2906002)(38100700002)(1076003)(66946007)(66556008)(66476007)(4326008)(8676002)(36756003)(186003)(46800400005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zhmO6h253dT4kIJaebDIkGM6YPu/2ypNVHOPaktn8ESOMIWBSOxfqEyGAj1o?=
- =?us-ascii?Q?zt/tI+DmJTL4l/gqkHzzaMyWellsLTNKb5FMME4TpfSY+3mdXqStMWV6xhOO?=
- =?us-ascii?Q?/ajp0dSuYT98/pxfWbbgYdaONY8tP45l7266fkgi22B0DGAhm6/NrVjf9/44?=
- =?us-ascii?Q?onFLBk2dpC7B+zvssLPnpT1KTVL1QHmDRhDyict+17aRfcOWCdcAmQa73tMg?=
- =?us-ascii?Q?rIk2NpVJ0sgScL/KhH/qdCek3wo5O2EWO33grUqJPOd0Vh+jsqWY7HwIQnZX?=
- =?us-ascii?Q?W81dqSgzogaomXFz8D5Hki9J1pLVXjYHjr4OkdsCfBCaP8C5JJcc2zzuJOS/?=
- =?us-ascii?Q?kp5mAi6P/5ljw0ADfCUWoMOAWv8/GusvVSZTNFl0vUE/kju96V2rqe4IyaP/?=
- =?us-ascii?Q?CCb4q8N1/uPSToj/q1sZJUEUcdRczHcGmnHallut7hjcGRjq3meZ3kGf6EVl?=
- =?us-ascii?Q?yveGkfe1hygM4y7wTVPAk05SuV6/8p4OPyqGjXuaXfDw0/YlX4ZYQ4VDvBQt?=
- =?us-ascii?Q?xohnhwiqVZxPh4NpiOT3EdEj1CuHfW1C/esErcXSVzFu3C7lT2KPklBujWbF?=
- =?us-ascii?Q?2mY8FuzYu+ZUJeYJ82QXl0P2JUS3AFx3wi6MLOzpPtINjRo45jA+5MTothYU?=
- =?us-ascii?Q?405O13O/UdHTMUR47I+jtliYilDIJFIV4nQw2Ly2uuW0k5zI73fAubaxCNl7?=
- =?us-ascii?Q?A1/tAwrS2GcqbqYM3HJ/fpRpjSg2z5Tx7sVe4QtBdf9gsORk02cmsR+Vj8h5?=
- =?us-ascii?Q?liePge5Mo+KQL31OWodkrtykgXPaEnsUddtsKIJHwFpZ5SrcM08P2F/oBQ73?=
- =?us-ascii?Q?r2re8FwkpyUri2rVnXj0eUtsRu5bfvGCzQw6r6hT3MlniZ/ndC+XmuvB4z6Q?=
- =?us-ascii?Q?RTJw7pjpxbJhaDIMiO4R7j4khFb/n6kZFwB1Wc9VAT15Lpy3LLfyijihHCS7?=
- =?us-ascii?Q?BxhERa7inVX7O6DdvULwRz5EjDquhC26nLPRro7Sf3DtSUACLzZKDEl+C5p/?=
- =?us-ascii?Q?bU5/7W/84FgH/ImvGHuhiCT1faYKJgjBy2ZDaAA3fGAik/Yee/EWaW6uM9kQ?=
- =?us-ascii?Q?UE/ke2WyNtJgJIyoEg93utb4SXTQ/aYrjujvnMB7ryspGsG8grfGOfxrRp7W?=
- =?us-ascii?Q?BW1siNAk4snmyn6weFILf3llAs2qk2LAynHa2PfuF5IewnIaf1dU5Iys+rZ0?=
- =?us-ascii?Q?zfUIcn0BqjbsUWChqmzdsqt6Bqh4oVgN39GkmU8sdpMDNApMHzcZzaHRf6fC?=
- =?us-ascii?Q?zNonndsDQ1a+sBJlkOn47KUv1Bv1f3FtHjKAeMtTWAPrc4I9xBTgJ95LF+iG?=
- =?us-ascii?Q?5SMEBY8oTg77+BMT2g3wnNY4/E3bfC+dNOjjhXB8xifnuRi9UOzfWZ3o9d8t?=
- =?us-ascii?Q?rx4GjCAlBzLxOKqbkDFMUTtCe3SRd3Nl7b59R6kPDbJ1BFORXciD6pj5pS//?=
- =?us-ascii?Q?7OlhM4DiEy/qdXZkeLWBARgSmCqsqvtnwUqTex/jCeZWBa1GYFKtptpbQZHr?=
- =?us-ascii?Q?jd3+f3wp3yQaRNodb7ohJarlUT28m79MngfVKjOEoxtGLvuctUMee2wi/hIR?=
- =?us-ascii?Q?8sfMDpWLa169exaawSY3rCniUZSO0D/wCzVeUx7GGoiujCn8M1HgIjs9JwBl?=
- =?us-ascii?Q?l24pKAcUw7xARrBC/8lo6TKhgZv7LYXRk/wBpMWfKT3r26l/tSGd9jLiPqtO?=
- =?us-ascii?Q?DBSe1w=3D=3D?=
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 76bdac8c-e460-4bf2-5cb4-08dad236b661
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR02MB4579.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2022 18:22:45.8122
+X-Microsoft-Antispam-Message-Info: UK+9yNabpw4Bhe9toh5F1gx0IR3BxAaFRau79xY1hpgUFoT8oghQW28MjB5fJ29QctPytR5jcMCIkgWGWc7IgClelH2QmLu0S/8vyE9N8BALfnMOrKzA0AdtFyGvoeGq9vInBhEtURkZinlPX+Q0X55PgNIDJyyYl6NnpDPN3ab2iS+9eI6FGqBNBurdJx5B220JKLEOtVppBga3hxosQ4xNNqZpW4Hswxl9K9BvJbc+58hQiDN/NvFJ7J9bIVtc0eVoUpG8uU7TDY67oVFS1Xwq267UjkDOIhGYYKrZZeyalrszj4b9ygmgkiegfsF1geY/Z8A8Mo/1ON2xG3qVIDZw8FGYVGPxSKebmInW4UODn8ioeOmyUy+g+Z0fDv+DELPUqGDFGzEsX51xaamEjsvXHMAIlSMtYPpMdSsX3Q2vYMzBgD6kf31Lkh4T1m6kQn6XRo4iJkCvaW8en6MFQLUlHCFpr2njK8K2xW7hbUC2ANfXJbWo253tvvaoVWsoGrGPWPW01ZHyt4jPD/nMCKpI4oMdxSkN0LlJtDw9uxd4vmdtnxLD1KLn/C0M4X2VzVpWYTqdtsmQB21qWbkG44cS6TuVsisUaZ/32i0kIxI5Kqf3zldK8nXtv33dIWcrg3ZOaxlW3Apg9CTZWSiw73tbqgR7Sqrh8lS8fD1Cj8Caxu4I1L/8qKjezSHjHTWzpQQLaawln1KNZ4hms1O6TcJ+0NtiGsc5/3/BpWmWf2MCPpZw5jLOZIfXTWAzzRNjKdPIe6/Yeq5gijP9gTmbrWP/BjxCZBfiQy6Ssm/cEr7dERZ6ZdXHW6Y/B+R1vdzk
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(396003)(39860400002)(136003)(346002)(376002)(451199015)(40470700004)(46966006)(36840700001)(83380400001)(36756003)(36860700001)(86362001)(6666004)(966005)(45080400002)(478600001)(70586007)(316002)(2616005)(1076003)(41300700001)(16526019)(8936002)(6916009)(70206006)(26005)(5660300002)(7406005)(426003)(7416002)(2906002)(40480700001)(47076005)(44832011)(356005)(81166007)(40460700003)(82740400003)(54906003)(186003)(8676002)(4326008)(336012)(82310400005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2022 19:07:15.7626
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PDFnyZyX6skKSG9HhhqFSweyP8S81eT08S6wuNjFijO1iYswvR9akJ1h+y+4lzICoXmRnLn+hIM0WH8Qvo+0H6dOjSzwf1Dy+zYR8A07UUM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR02MB7810
-X-Proofpoint-ORIG-GUID: pccMGLMFezRjx-wyZiMadVqRJ4l8fTEi
-X-Proofpoint-GUID: pccMGLMFezRjx-wyZiMadVqRJ4l8fTEi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-29_11,2022-11-29_01,2022-06-22_01
-X-Proofpoint-Spam-Reason: safe
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 69789a1f-1946-480f-2466-08dad23cedfb
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT027.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6487
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set vcpu->mode to EXITING_GUEST_MODE as soon vCPU exits to reflect
-that we are indeed exiting guest mode, but not quite out of guest
-mode yet. Note: This is done lazily without an explicit memory
-barrier so that we do not regress the cost in the critical path
-of going from the exit to the exit handler.
+On Tue, Nov 29, 2022 at 10:06:15PM +0800, Chao Peng wrote:
+> On Mon, Nov 28, 2022 at 06:37:25PM -0600, Michael Roth wrote:
+> > On Tue, Oct 25, 2022 at 11:13:37PM +0800, Chao Peng wrote:
+> ...
+> > > +static long restrictedmem_fallocate(struct file *file, int mode,
+> > > +				    loff_t offset, loff_t len)
+> > > +{
+> > > +	struct restrictedmem_data *data = file->f_mapping->private_data;
+> > > +	struct file *memfd = data->memfd;
+> > > +	int ret;
+> > > +
+> > > +	if (mode & FALLOC_FL_PUNCH_HOLE) {
+> > > +		if (!PAGE_ALIGNED(offset) || !PAGE_ALIGNED(len))
+> > > +			return -EINVAL;
+> > > +	}
+> > > +
+> > > +	restrictedmem_notifier_invalidate(data, offset, offset + len, true);
+> > 
+> > The KVM restrictedmem ops seem to expect pgoff_t, but here we pass
+> > loff_t. For SNP we've made this strange as part of the following patch
+> > and it seems to produce the expected behavior:
+> 
+> That's correct. Thanks.
+> 
+> > 
+> >   https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fmdroth%2Flinux%2Fcommit%2Fd669c7d3003ff7a7a47e73e8c3b4eeadbd2c4eb6&amp;data=05%7C01%7Cmichael.roth%40amd.com%7C99e80696067a40d42f6e08dad2138556%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638053278531323330%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=WDj4KxJjhcntBWJUGCjNmMPfZMGQkCSaAo6ElYrGgF0%3D&amp;reserved=0
+> > 
+> > > +	ret = memfd->f_op->fallocate(memfd, mode, offset, len);
+> > > +	restrictedmem_notifier_invalidate(data, offset, offset + len, false);
+> > > +	return ret;
+> > > +}
+> > > +
+> > 
+> > <snip>
+> > 
+> > > +int restrictedmem_get_page(struct file *file, pgoff_t offset,
+> > > +			   struct page **pagep, int *order)
+> > > +{
+> > > +	struct restrictedmem_data *data = file->f_mapping->private_data;
+> > > +	struct file *memfd = data->memfd;
+> > > +	struct page *page;
+> > > +	int ret;
+> > > +
+> > > +	ret = shmem_getpage(file_inode(memfd), offset, &page, SGP_WRITE);
+> > 
+> > This will result in KVM allocating pages that userspace hasn't necessary
+> > fallocate()'d. In the case of SNP we need to get the PFN so we can clean
+> > up the RMP entries when restrictedmem invalidations are issued for a GFN
+> > range.
+> 
+> Yes fallocate() is unnecessary unless someone wants to reserve some
+> space (e.g. for determination or performance purpose), this matches its
+> semantics perfectly at:
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.man7.org%2Flinux%2Fman-pages%2Fman2%2Ffallocate.2.html&amp;data=05%7C01%7Cmichael.roth%40amd.com%7C99e80696067a40d42f6e08dad2138556%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638053278531323330%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=67sdTY47cM1IBUG2eJCltYF5SyGOpd9%2FVxVlHUw02tU%3D&amp;reserved=0
+> 
+> > 
+> > If the guest supports lazy-acceptance however, these pages may not have
+> > been faulted in yet, and if the VMM defers actually fallocate()'ing space
+> > until the guest actually tries to issue a shared->private for that GFN
+> > (to support lazy-pinning), then there may never be a need to allocate
+> > pages for these backends.
+> > 
+> > However, the restrictedmem invalidations are for GFN ranges so there's
+> > no way to know inadvance whether it's been allocated yet or not. The
+> > xarray is one option but currently it defaults to 'private' so that
+> > doesn't help us here. It might if we introduced a 'uninitialized' state
+> > or something along that line instead of just the binary
+> > 'shared'/'private' though...
+> 
+> How about if we change the default to 'shared' as we discussed at
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2FY35gI0L8GMt9%2BOkK%40google.com%2F&amp;data=05%7C01%7Cmichael.roth%40amd.com%7C99e80696067a40d42f6e08dad2138556%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638053278531323330%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=qzWObDo7ZHW4YjuAjZ5%2B1wEwbqymgBiNM%2BYXiyUSBdI%3D&amp;reserved=0?
 
-Flip back to IN_GUEST_MODE for exits that use
-EXIT_FASTPATH_REENTER_GUEST, such that we are IN_GUEST_MODE upon
-reentry.
+Need to look at this a bit more, but I think that could work as well.
 
-Changing vcpu->mode away from IN_GUEST_MODE as early as possible
-gives IPI senders as much runway as possible to avoid ringing
-doorbell or sending posted interrupt IPI in AMD and Intel,
-respectively. Since this is done without an explicit memory
-barrier, the worst case is that the IPI sender sees IN_GUEST_MODE
-still and sends a spurious event, which is the behavior prior
-to this patch.
+> > 
+> > But for now we added a restrictedmem_get_page_noalloc() that uses
+> > SGP_NONE instead of SGP_WRITE to avoid accidentally allocating a bunch
+> > of memory as part of guest shutdown, and a
+> > kvm_restrictedmem_get_pfn_noalloc() variant to go along with that. But
+> > maybe a boolean param is better? Or maybe SGP_NOALLOC is the better
+> > default, and we just propagate an error to userspace if they didn't
+> > fallocate() in advance?
+> 
+> This (making fallocate() a hard requirement) not only complicates the
+> userspace but also forces the lazy-faulting going through a long path of
+> exiting to userspace. Unless we don't have other options I would not go
+> this way.
 
-Signed-off-by: Jon Kohler <jon@nutanix.com>
----
- arch/x86/kvm/svm/svm.c |  7 +++++++
- arch/x86/kvm/vmx/vmx.c | 23 +++++++++++++++++++++++
- arch/x86/kvm/x86.c     |  8 ++++++++
- 3 files changed, 38 insertions(+)
+Unless I'm missing something, it's already the case that userspace is
+responsible for handling all the shared->private transitions in response
+to KVM_EXIT_MEMORY_FAULT or (in our case) KVM_EXIT_VMGEXIT. So it only
+places the additional requirements on the VMM that if they *don't*
+preallocate, then they'll need to issue the fallocate() prior to issuing
+the KVM_MEM_ENCRYPT_REG_REGION ioctl in response to these events.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index ce362e88a567..5f0c118a3ffd 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3907,6 +3907,13 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu, bool spec_ctrl_in
- 	else
- 		__svm_vcpu_run(svm, spec_ctrl_intercepted);
- 
-+	/* Optimize IPI reduction by setting mode immediately after vmexit
-+	 * without a memmory barrier as this as not paired anywhere. vcpu->mode
-+	 * is will be set to OUTSIDE_GUEST_MODE in x86 common code with a memory
-+	 * barrier, after the host is done fully restoring various host states.
-+	 */
-+	vcpu->mode = EXITING_GUEST_MODE;
-+
- 	guest_state_exit_irqoff();
- }
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 63247c57c72c..243dcb87c727 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5878,6 +5878,17 @@ static fastpath_t handle_fastpath_preemption_timer(struct kvm_vcpu *vcpu)
- 
- 	if (!vmx->req_immediate_exit &&
- 	    !unlikely(vmx->loaded_vmcs->hv_timer_soft_disabled)) {
-+		/* Reset IN_GUEST_MODE since we're going to reenter
-+		 * guest as part of this fast path. This is done as
-+		 * an optimization without a memory barrier since
-+		 * EXITING_GUEST_MODE is also set without a memory
-+		 * barrier. This also needs to be reset prior to
-+		 * calling apic_timer_expired() so that
-+		 * kvm_use_posted_timer_interrupt() returns the proper
-+		 * value.
-+		 */
-+		if (vcpu->mode == EXITING_GUEST_MODE)
-+			vcpu->mode = IN_GUEST_MODE;
- 		kvm_lapic_expired_hv_timer(vcpu);
- 		return EXIT_FASTPATH_REENTER_GUEST;
- 	}
-@@ -7031,6 +7042,18 @@ void noinstr vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
- void noinstr vmx_spec_ctrl_restore_host(struct vcpu_vmx *vmx,
- 					unsigned int flags)
- {
-+	struct kvm_vcpu *vcpu = &vmx->vcpu;
-+
-+	/* Optimize IPI reduction by setting mode immediately after vmexit
-+	 * without a memmory barrier as this as not paired anywhere. vcpu->mode
-+	 * is will be set to OUTSIDE_GUEST_MODE in x86 common code with a memory
-+	 * barrier, after the host is done fully restoring various host states.
-+	 * Since the rdmsr and wrmsr below are expensive, this must be done
-+	 * first, so that the IPI suppression window covers the time dealing
-+	 * with fixing up SPEC_CTRL.
-+	 */
-+	vcpu->mode = EXITING_GUEST_MODE;
-+
- 	u64 hostval = this_cpu_read(x86_spec_ctrl_current);
- 
- 	if (!cpu_feature_enabled(X86_FEATURE_MSR_SPEC_CTRL))
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2835bd796639..0e0d228f3fa5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2160,6 +2160,14 @@ fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu)
- 		data = kvm_read_edx_eax(vcpu);
- 		if (!handle_fastpath_set_tscdeadline(vcpu, data)) {
- 			kvm_skip_emulated_instruction(vcpu);
-+			/* Reset IN_GUEST_MODE since we're going to reenter
-+			 * guest as part of this fast path. This is done as
-+			 * an optimization without a memory barrier since
-+			 * EXITING_GUEST_MODE is also set without a memory
-+			 * barrier.
-+			 */
-+			if (vcpu->mode == EXITING_GUEST_MODE)
-+				vcpu->mode = IN_GUEST_MODE;
- 			ret = EXIT_FASTPATH_REENTER_GUEST;
- 		}
- 		break;
--- 
-2.30.1 (Apple Git-130)
+QEMU for example already has a separate 'prealloc' option for cases
+where they want to prefault all the guest memory, so it makes sense to
+continue making that an optional thing with regard to UPM.
 
+-Mike
+
+> 
+> Chao
+> > 
+> > -Mike
+> > 
+> > > +	if (ret)
+> > > +		return ret;
+> > > +
+> > > +	*pagep = page;
+> > > +	if (order)
+> > > +		*order = thp_order(compound_head(page));
+> > > +
+> > > +	SetPageUptodate(page);
+> > > +	unlock_page(page);
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +EXPORT_SYMBOL_GPL(restrictedmem_get_page);
+> > > -- 
+> > > 2.25.1
+> > > 
