@@ -2,72 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DBD363B881
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 04:05:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFB9863B887
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 04:06:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235411AbiK2DFP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Nov 2022 22:05:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59094 "EHLO
+        id S235340AbiK2DG1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Nov 2022 22:06:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235434AbiK2DEz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Nov 2022 22:04:55 -0500
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ED9821884
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 19:03:47 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id a9so8963712pfr.0
-        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 19:03:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Kg/52ubAS7lYntifWjcdjceQK1BLohFjWF5i5H7C2g=;
-        b=LyJdXZU7uaKusi+kqxl9ZkEzuxwa9ulRA0IBmC9/g7rdNHvZtM4unGfA13yYbcNN8m
-         qt970BXRcaFFYibTs3IKCjGomYc8uU5f8pKT259zb+Ea7sAE7SW8Mav3yU1VlP0IL3C4
-         sieSLtCV0Es/shtTX4QKd2jHiF/Ay0EfFwGI6Jvp29f4sB0vVDA9K5XhYrYwXXXFtHTl
-         gyV4IECnqrY0nKOgRAvZlVD9C9RBkE5QXYYOS1aOchPuIn8y3BbmRWeECCDlFNUGp978
-         gCPhTUIJt3Xm//5TkFyEzxkl36E1JL5iJdtNUcBGV2ea5WdrNms6uD09NJJivULbIIBu
-         2eEA==
+        with ESMTP id S235192AbiK2DGY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Nov 2022 22:06:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50CE849B53
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 19:04:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669691057;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PJYR23KNh0UlxbGzPt0eSeyjNLVB/XO+AaILK784Ha8=;
+        b=Q9wg88W26g47kiyDKkUpHJAA5fC9CUqUN8Nn5/sLZQm9+odW23rENTDq9XYcREVpge4/JH
+        7hNVTDmnfbdrvh4/zHFkpaqB5jHRRJrJdaS33qqWQhNsivmdi6/7M1Fsuc5eOsTaRsy1kT
+        Y+iB/AwVNT8EflAxwT4apSjv6hlLW3Y=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-190-9UAOb8wUPNSETmyFx5YFmA-1; Mon, 28 Nov 2022 22:04:16 -0500
+X-MC-Unique: 9UAOb8wUPNSETmyFx5YFmA-1
+Received: by mail-ot1-f71.google.com with SMTP id ck9-20020a056830648900b0066c56ff7b33so5240008otb.20
+        for <kvm@vger.kernel.org>; Mon, 28 Nov 2022 19:04:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0Kg/52ubAS7lYntifWjcdjceQK1BLohFjWF5i5H7C2g=;
-        b=aWGWGIB+svE3/TzWWh1fq49ofceRXEfzv3gb/2PhkAFeiMj4usr1BKBpAhKUyfC406
-         RZ+JGh+hzFcK3S5mUtk5tdcMZqUWLs3T6F3mhAusrldo9qI3G7D1mvmdkSMuGGRsxIMg
-         YBVEvaUfd7/h50+iptfZ7sboWjP8EFQdE39CYz4Kbi6H4x2Te9PRVX9mJi0qYmFdzdU7
-         Z2VXJPtgHvYN9KqwgndShCmgYFvraFSjxgmu+lLk8WnHY2esKduiMrWlcDAOuSdumYrR
-         rp1en1lDVlgyLErCr3xMMTGDbjdT089pTGNTZyQs1rCuHiV231wBhFnPhVc365jFa02y
-         w1Jw==
-X-Gm-Message-State: ANoB5pllE+ITX2H/YwCP9aiUJ7bNqsRUF5mYlHaNZQQxY7r1zTeaLWQ1
-        2nZre2xdB41dnYqMGd7mnvEDuLG4TN7Qy4cl/KjQpg==
-X-Google-Smtp-Source: AA0mqf6n5gzQM9wxBIj6N5TzhMnt30g/6xc1YnQYzaFzjhuVxjUyQvCrS8wZ1QjJjyXSNyW/0KzpfM6BAWNQDRHV7Xg=
-X-Received: by 2002:a05:6a00:27ab:b0:56c:71a4:efe with SMTP id
- bd43-20020a056a0027ab00b0056c71a40efemr39636148pfb.84.1669691022323; Mon, 28
- Nov 2022 19:03:42 -0800 (PST)
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PJYR23KNh0UlxbGzPt0eSeyjNLVB/XO+AaILK784Ha8=;
+        b=VbmIWWYHG/VLN+2Nrl94TAR0oWoxgakx9L5k3OoiGY2ClBYjXknrZPBBHCB2pUsGJ/
+         VnwpSlme8VPWuLS3irj2u1vwiiwV87cokZfGa2ZyZihtjrGZVBczdwx4tVVFSBnubNoK
+         0H8+HVx9QOHMnF578xkl27+DWFl7rOTFYVGcubh5W4rYgELWxkICzPZ9WbAMcRGYGHlp
+         YZQgWQtYu6f51b12wX/94PJ0Bb/QkNb9OpwQBUkzKPLoTcbyK3nCx7/J4DYI3wsny68c
+         YpFLkwwdn6eSTBz0goN4MVz4sYQ/efkPny46eVOgRLRLhy6F3P8yCOwrPvE2wUd8BsAu
+         JSUQ==
+X-Gm-Message-State: ANoB5pkIijoKwiPXHoF8dBM3PN5rOidi75mzzHePrgxdeQyD65wVf8kf
+        6OdPtRUjVEcz5i4vN9XS+19qwJ+2QQyLgNfAGqrQZ4zTk1UZgYUXMdT7Ncv7EJ8rT917qZ/A/yg
+        E5lLr1j2jygYwSliiph3ueAGxoHUO
+X-Received: by 2002:a9d:4f07:0:b0:66c:64d6:1bb4 with SMTP id d7-20020a9d4f07000000b0066c64d61bb4mr27044586otl.201.1669691054456;
+        Mon, 28 Nov 2022 19:04:14 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf70Ry6OjGs+hy6g6ijoNxP3Znw2AU1BrK7TlBtYSMfr4tzUWxFvSjkwqKm+iZJVXZK3OiprWO47l/Op2eZkPdk=
+X-Received: by 2002:a9d:4f07:0:b0:66c:64d6:1bb4 with SMTP id
+ d7-20020a9d4f07000000b0066c64d61bb4mr27044576otl.201.1669691054181; Mon, 28
+ Nov 2022 19:04:14 -0800 (PST)
 MIME-Version: 1.0
-References: <20221113163832.3154370-1-maz@kernel.org> <20221113163832.3154370-14-maz@kernel.org>
- <CAAeT=Fx=8g2-Z8nzqUit5owtoxbenXnAFA5Mu6AfgZJFN4CfVw@mail.gmail.com>
- <86leo2ncxl.wl-maz@kernel.org> <CAAeT=Fyy6ViW+f4w-GWjQp3tdjyzhMaRd3pbkys9iS4gxsAY_Q@mail.gmail.com>
- <86bkowodwg.wl-maz@kernel.org>
-In-Reply-To: <86bkowodwg.wl-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 28 Nov 2022 19:03:25 -0800
-Message-ID: <CAAeT=FyogYsNbKQ5U0GnV0_M=vG+WNmKFfvaqwJi6b6hp_X1Ow@mail.gmail.com>
-Subject: Re: [PATCH v4 13/16] KVM: arm64: PMU: Implement PMUv3p5 long counter support
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Ricardo Koller <ricarkol@google.com>
+References: <20221125023045.2158413-1-lulu@redhat.com> <CACGkMEuPMYVamb9saZWX8E38Xu_Q5vS7BKweyUeOaS==uiVZqw@mail.gmail.com>
+ <CACLfguU6VZ7PPf7coj7Fe5ZPdqitekHkL9rfc3o4nWG2uFmonw@mail.gmail.com>
+In-Reply-To: <CACLfguU6VZ7PPf7coj7Fe5ZPdqitekHkL9rfc3o4nWG2uFmonw@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 29 Nov 2022 11:04:03 +0800
+Message-ID: <CACGkMEuxuk3nXK3SnXw1k39jcQr-QGTQMeF8-ZPszxHaBJ6f-w@mail.gmail.com>
+Subject: Re: [PATCH v3] vhost_vdpa: fix the crash in unmap a large memory
+To:     Cindy Lu <lulu@redhat.com>
+Cc:     mst@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,235 +76,200 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On Thu, Nov 24, 2022 at 2:17 AM Marc Zyngier <maz@kernel.org> wrote:
+On Fri, Nov 25, 2022 at 3:38 PM Cindy Lu <lulu@redhat.com> wrote:
 >
-> On Wed, 23 Nov 2022 17:11:41 +0000,
-> Reiji Watanabe <reijiw@google.com> wrote:
+> / and
+>
+>
+> On Fri, 25 Nov 2022 at 15:17, Jason Wang <jasowang@redhat.com> wrote:
 > >
-> > Hi Marc,
-> >
-> > On Wed, Nov 23, 2022 at 3:11 AM Marc Zyngier <maz@kernel.org> wrote:
+> > On Fri, Nov 25, 2022 at 10:31 AM Cindy Lu <lulu@redhat.com> wrote:
 > > >
-> > > On Wed, 23 Nov 2022 05:58:17 +0000,
-> > > Reiji Watanabe <reijiw@google.com> wrote:
-> > > >
-> > > > Hi Marc,
-> > > >
-> > > > On Sun, Nov 13, 2022 at 8:46 AM Marc Zyngier <maz@kernel.org> wrote:
-> > > > >
-> > > > > PMUv3p5 (which is mandatory with ARMv8.5) comes with some extra
-> > > > > features:
-> > > > >
-> > > > > - All counters are 64bit
-> > > > >
-> > > > > - The overflow point is controlled by the PMCR_EL0.LP bit
-> > > > >
-> > > > > Add the required checks in the helpers that control counter
-> > > > > width and overflow, as well as the sysreg handling for the LP
-> > > > > bit. A new kvm_pmu_is_3p5() helper makes it easy to spot the
-> > > > > PMUv3p5 specific handling.
-> > > > >
-> > > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > > ---
-> > > > >  arch/arm64/kvm/pmu-emul.c | 8 +++++---
-> > > > >  arch/arm64/kvm/sys_regs.c | 4 ++++
-> > > > >  include/kvm/arm_pmu.h     | 7 +++++++
-> > > > >  3 files changed, 16 insertions(+), 3 deletions(-)
-> > > > >
-> > > > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > > > > index 4320c389fa7f..c37cc67ff1d7 100644
-> > > > > --- a/arch/arm64/kvm/pmu-emul.c
-> > > > > +++ b/arch/arm64/kvm/pmu-emul.c
-> > > > > @@ -52,13 +52,15 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
-> > > > >   */
-> > > > >  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
-> > > > >  {
-> > > > > -       return (select_idx == ARMV8_PMU_CYCLE_IDX);
-> > > > > +       return (select_idx == ARMV8_PMU_CYCLE_IDX || kvm_pmu_is_3p5(vcpu));
-> > > > >  }
-> > > > >
-> > > > >  static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
-> > > > >  {
-> > > > > -       return (select_idx == ARMV8_PMU_CYCLE_IDX &&
-> > > > > -               __vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
-> > > > > +       u64 val = __vcpu_sys_reg(vcpu, PMCR_EL0);
-> > > > > +
-> > > > > +       return (select_idx < ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LP)) ||
-> > > > > +              (select_idx == ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LC));
-> > > >
-> > > > Since the vCPU's PMCR_EL0 value is not always in sync with
-> > > > kvm->arch.dfr0_pmuver.imp, shouldn't kvm_pmu_idx_has_64bit_overflow()
-> > > > check kvm_pmu_is_3p5() ?
-> > > > (e.g. when the host supports PMUv3p5, PMCR.LP will be set by reset_pmcr()
-> > > > initially. Then, even if userspace sets ID_AA64DFR0_EL1.PMUVER to
-> > > > PMUVer_V3P1, PMCR.LP will stay the same (still set) unless PMCR is
-> > > > written.  So, kvm_pmu_idx_has_64bit_overflow() might return true
-> > > > even though the guest's PMU version is lower than PMUVer_V3P5.)
->
-> I realised that reset_pmcr() cannot result in LP being set early, as
-> the default PMU version isn't PMUv3p5. But I'm starting to think that
-> we should stop playing random tricks with PMCR reset value, and make
-> the whole thing as straightforward as possible. TBH, the only
-> information we actually need from the host is PMCR_EL0.N, so we should
-> limit ourselves to that.
-
-I'm not sure what you meant by "the default PMU version isn't PMUv3p5".
-
-Anyway, the current default reset value, which is 0xdecafbad (for
-lower 8 bits), has been problematic prior to this series because
-it always sets the LP bit (bit 7 of 0xdecafbad is set) even without
-PMUv3p5 support (this series fixes this particular problem though).
-
-I like the idea of preserving only PMCR_EL0.N, and reset the rest
-to 0 (other than LC when no 32bit EL0 support) since it is obvious
-at glance which fields could be set at the vCPU reset unlike using
-0xdecafbad.
-
-
->
+> > > While testing in vIOMMU, sometimes guest will unmap very large memory=
+,
+> > > which will cause the crash. To fix this,Move the iommu_unmap to
+> > > vhost_vdpa_pa_unmap/vhost_vdpa_va_unmap and only unmap the memory
+> > > that saved in iotlb.
 > > >
-> > > I can see two ways to address this: either we spray PMUv3p5 checks
-> > > every time we evaluate PMCR, or we sanitise PMCR after each userspace
-> > > write to ID_AA64DFR0_EL1.
+> > > Call Trace:
+> > > [  647.820144] ------------[ cut here ]------------
+> > > [  647.820848] kernel BUG at drivers/iommu/intel/iommu.c:1174!
+> > > [  647.821486] invalid opcode: 0000 [#1] PREEMPT SMP PTI
+> > > [  647.822082] CPU: 10 PID: 1181 Comm: qemu-system-x86 Not tainted 6.=
+0.0-rc1home_lulu_2452_lulu7_vhost+ #62
+> > > [  647.823139] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BI=
+OS rel-1.15.0-29-g6a62e0cb0dfe-prebuilt.qem4
+> > > [  647.824365] RIP: 0010:domain_unmap+0x48/0x110
+> > > [  647.825424] Code: 48 89 fb 8d 4c f6 1e 39 c1 0f 4f c8 83 e9 0c 83 =
+f9 3f 7f 18 48 89 e8 48 d3 e8 48 85 c0 75 59
+> > > [  647.828064] RSP: 0018:ffffae5340c0bbf0 EFLAGS: 00010202
+> > > [  647.828973] RAX: 0000000000000001 RBX: ffff921793d10540 RCX: 00000=
+0000000001b
+> > > [  647.830083] RDX: 00000000080000ff RSI: 0000000000000001 RDI: ffff9=
+21793d10540
+> > > [  647.831214] RBP: 0000000007fc0100 R08: ffffae5340c0bcd0 R09: 00000=
+00000000003
+> > > [  647.832388] R10: 0000007fc0100000 R11: 0000000000100000 R12: 00000=
+000080000ff
+> > > [  647.833668] R13: ffffae5340c0bcd0 R14: ffff921793d10590 R15: 00000=
+08000100000
+> > > [  647.834782] FS:  00007f772ec90640(0000) GS:ffff921ce7a80000(0000) =
+knlGS:0000000000000000
+> > > [  647.836004] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > [  647.836990] CR2: 00007f02c27a3a20 CR3: 0000000101b0c006 CR4: 00000=
+00000372ee0
+> > > [  647.838107] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000=
+00000000000
+> > > [  647.839283] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000=
+00000000400
+> > > [  647.840666] Call Trace:
+> > > [  647.841437]  <TASK>
+> > > [  647.842107]  intel_iommu_unmap_pages+0x93/0x140
+> > > [  647.843112]  __iommu_unmap+0x91/0x1b0
+> > > [  647.844003]  iommu_unmap+0x6a/0x95
+> > > [  647.844885]  vhost_vdpa_unmap+0x1de/0x1f0 [vhost_vdpa]
+> > > [  647.845985]  vhost_vdpa_process_iotlb_msg+0xf0/0x90b [vhost_vdpa]
+> > > [  647.847235]  ? _raw_spin_unlock+0x15/0x30
+> > > [  647.848181]  ? _copy_from_iter+0x8c/0x580
+> > > [  647.849137]  vhost_chr_write_iter+0xb3/0x430 [vhost]
+> > > [  647.850126]  vfs_write+0x1e4/0x3a0
+> > > [  647.850897]  ksys_write+0x53/0xd0
+> > > [  647.851688]  do_syscall_64+0x3a/0x90
+> > > [  647.852508]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> > > [  647.853457] RIP: 0033:0x7f7734ef9f4f
+> > > [  647.854408] Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 29 76 =
+f8 ff 48 8b 54 24 18 48 8b 74 24 10 41 89 c8
+> > > [  647.857217] RSP: 002b:00007f772ec8f040 EFLAGS: 00000293 ORIG_RAX: =
+0000000000000001
+> > > [  647.858486] RAX: ffffffffffffffda RBX: 00000000fef00000 RCX: 00007=
+f7734ef9f4f
+> > > [  647.859713] RDX: 0000000000000048 RSI: 00007f772ec8f090 RDI: 00000=
+00000000010
+> > > [  647.860942] RBP: 00007f772ec8f1a0 R08: 0000000000000000 R09: 00000=
+00000000000
+> > > [  647.862206] R10: 0000000000000001 R11: 0000000000000293 R12: 00000=
+00000000010
+> > > [  647.863446] R13: 0000000000000002 R14: 0000000000000000 R15: fffff=
+fff01100000
+> > > [  647.864692]  </TASK>
+> > > [  647.865458] Modules linked in: rpcsec_gss_krb5 auth_rpcgss nfsv4 d=
+ns_resolver nfs lockd grace fscache netfs v]
+> > > [  647.874688] ---[ end trace 0000000000000000 ]---
+> > > [  647.876013] RIP: 0010:domain_unmap+0x48/0x110
+> > > [  647.878306] Code: 48 89 fb 8d 4c f6 1e 39 c1 0f 4f c8 83 e9 0c 83 =
+f9 3f 7f 18 48 89 e8 48 d3 e8 48 85 c0 75 59
+> > > [  647.884581] RSP: 0018:ffffae5340c0bbf0 EFLAGS: 00010202
+> > > [  647.886308] RAX: 0000000000000001 RBX: ffff921793d10540 RCX: 00000=
+0000000001b
+> > > [  647.888775] RDX: 00000000080000ff RSI: 0000000000000001 RDI: ffff9=
+21793d10540
+> > > [  647.890295] RBP: 0000000007fc0100 R08: ffffae5340c0bcd0 R09: 00000=
+00000000003
+> > > [  647.891660] R10: 0000007fc0100000 R11: 0000000000100000 R12: 00000=
+000080000ff
+> > > [  647.893019] R13: ffffae5340c0bcd0 R14: ffff921793d10590 R15: 00000=
+08000100000
+> > > [  647.894506] FS:  00007f772ec90640(0000) GS:ffff921ce7a80000(0000) =
+knlGS:0000000000000000
+> > > [  647.895963] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > [  647.897348] CR2: 00007f02c27a3a20 CR3: 0000000101b0c006 CR4: 00000=
+00000372ee0
+> > > [  647.898719] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000=
+00000000000
 > > >
-> > > I'd like to be able to take what is stored in the register file at
-> > > face value, so I'm angling towards the second possibility. It also
+> > > Cc: stable@vger.kernel.org
+> > > Fixes: 4c8cf31885f6 ("vhost: introduce vDPA-based backend")
+> > > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > > ---
+> > >  drivers/vhost/vdpa.c | 10 ++++++++--
+> > >  1 file changed, 8 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > index 166044642fd5..e5a07751bf45 100644
+> > > --- a/drivers/vhost/vdpa.c
+> > > +++ b/drivers/vhost/vdpa.c
+> > > @@ -692,6 +692,8 @@ static void vhost_vdpa_pa_unmap(struct vhost_vdpa=
+ *v,
+> > >         struct vhost_iotlb_map *map;
+> > >         struct page *page;
+> > >         unsigned long pfn, pinned;
+> > > +       struct vdpa_device *vdpa =3D v->vdpa;
+> > > +       const struct vdpa_config_ops *ops =3D vdpa->config;
+> > >
+> > >         while ((map =3D vhost_iotlb_itree_first(iotlb, start, last)) =
+!=3D NULL) {
+> > >                 pinned =3D PFN_DOWN(map->size);
+> > > @@ -703,6 +705,8 @@ static void vhost_vdpa_pa_unmap(struct vhost_vdpa=
+ *v,
+> > >                         unpin_user_page(page);
+> > >                 }
+> > >                 atomic64_sub(PFN_DOWN(map->size), &dev->mm->pinned_vm=
+);
+> > > +               if ((ops->dma_map =3D=3D NULL) && (ops->set_map =3D=
+=3D NULL))
+> > > +                       iommu_unmap(v->domain, map->start, map->size)=
+;
 > >
-> > I thought about that too.  What makes it a bit tricky is that
-> > given that kvm->arch.dfr0_pmuver.imp is shared among all vCPUs
-> > for the guest, updating the PMCR should be done for all the vCPUs.
->
-> Yeah, good point. This really is a mess.
->
-> > > +static void update_dfr0_pmuver(struct kvm_vcpu *vcpu, u8 pmuver)
-> > > +{
-> > > +       if (vcpu->kvm->arch.dfr0_pmuver.imp != pmuver) {
-> > > +               vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
-> > > +               __reset_pmcr(vcpu, __vcpu_sys_reg(vcpu, PMCR_EL0));
-> > > +       }
-> > > +}
+> > I think we'd better move the ops->dma_unmap() here as well as iommu_unm=
+ap()?
 > >
-> > Or if userspace is expected to set ID_AA64DFR0_EL1 (PMUVER) for
-> > each vCPU, update_dfr0_pmuver() should update PMCR even when
-> > 'kvm->arch.dfr0_pmuver.imp' is the same as the given 'pmuver'.
-> > (as PMCR for the vCPU might have not been updated yet)
+> > >                 vhost_iotlb_map_free(iotlb, map);
+> > >         }
+> > >  }
+> > > @@ -713,11 +717,15 @@ static void vhost_vdpa_va_unmap(struct vhost_vd=
+pa *v,
+> > >  {
+> > >         struct vhost_iotlb_map *map;
+> > >         struct vdpa_map_file *map_file;
+> > > +       struct vdpa_device *vdpa =3D v->vdpa;
+> > > +       const struct vdpa_config_ops *ops =3D vdpa->config;
+> > >
+> > >         while ((map =3D vhost_iotlb_itree_first(iotlb, start, last)) =
+!=3D NULL) {
+> > >                 map_file =3D (struct vdpa_map_file *)map->opaque;
+> > >                 fput(map_file->file);
+> > >                 kfree(map_file);
+> > > +               if (ops->set_map =3D=3D NULL)
+> > > +                       iommu_unmap(v->domain, map->start, map->size)=
+;
 > >
-> > > makes some sense from a 'HW' perspective: you change the HW
-> > > dynamically by selecting a new version, the HW comes up with its reset
-> > > configuration (i.e don't expect PMCR to stick after you write to
-> > > DFR0 with a different PMUVer).
+> > Need to check where we have dma_unmap() and call that if it exists?
 > >
-> > Yes, it makes some sense.
-> > But, with that, for live migration, PMCR should be restored only
-> > after ID_AA64DFR0_EL1/ID_DFR0_EL1 is restored (to avoid PMCR
-> > being reset after PMCR is restored), which I would think might
-> > affect live migration.
-> > (Or am I misunderstanding something ?)
->
-> You are correct. There is no way out of that anyway, as you need to
-> select PMUv3p5 early in order to be able to restore PMCR itself.
->
-> I *may* have a slightly better solution though, which is to piggy-back
-> on the call to kvm_pmu_handle_pmcr() that happens on the first run of
-> each vcpu. This would allow us to sanitise PMCR in the other direction
-> (set PMUv3p5, set PMCR, set PMUV3p1, need to fix the potential stale
-> PMCR_EL0.LP bit).
->
-> Something like this:
+> > Thanks
+> >
+> Hi Jason=EF=BC=8C
+> I think  these functions are called in vhost_vdpa_unmap,
+> Do you want to separate the function in vhost_vdpa_unmap
+> and move it to vhost_vdpa_va_unmap and vhost_vdpa_pa_unmap? I
 
-Yeah, I agree that it would be better.
-I don't see any problem with the new code below.
+I meant dma_map()/dma_unmap() should be functional equivalent to
+iommu_map/unmap(). That means we should unmap exactly what is mapped
+before (vDPA parent may call iommu_unmap in its own dma_unmap() if it
+needs). If we move the iommu_unmap() from vhost_vdpa_unmap() to
+vhost_vdpa_{pa|va}_umap, we should move dma_unmap() as well.
 
-Thank you,
-Reiji
+Thanks
 
+> thanks
+> cindy
+>
+> > >                 vhost_iotlb_map_free(iotlb, map);
+> > >         }
+> > >  }
+> > > @@ -805,8 +813,6 @@ static void vhost_vdpa_unmap(struct vhost_vdpa *v=
+,
+> > >         } else if (ops->set_map) {
+> > >                 if (!v->in_batch)
+> > >                         ops->set_map(vdpa, asid, iotlb);
+> > > -       } else {
+> > > -               iommu_unmap(v->domain, iova, size);
+> > >         }
+> > >
+> > >         /* If we are in the middle of batch processing, delay the fre=
+e
+> > > --
+> > > 2.34.3
+> > >
+> >
+>
 
->
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 3295dea34f4c..2d291a29d978 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -538,6 +538,12 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
->         if (!kvm_vcpu_has_pmu(vcpu))
->                 return;
->
-> +       /* Fixup PMCR_EL0 to reconcile the PMU version and the LP bit */
-> +       if (!kvm_pmu_is_3p5(vcpu))
-> +               val &= ~ARMV8_PMU_PMCR_LP;
-> +
-> +       __vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-> +
->         if (val & ARMV8_PMU_PMCR_E) {
->                 kvm_pmu_enable_counter_mask(vcpu,
->                        __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 12a873d94aaf..a5a340346749 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -703,15 +703,15 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->                 return false;
->
->         if (p->is_write) {
-> -               /* Only update writeable bits of PMCR */
-> +               /*
-> +                * Only update writeable bits of PMCR (continuing into
-> +                * kvm_pmu_handle_pmcr() as well)
-> +                */
->                 val = __vcpu_sys_reg(vcpu, PMCR_EL0);
->                 val &= ~ARMV8_PMU_PMCR_MASK;
->                 val |= p->regval & ARMV8_PMU_PMCR_MASK;
->                 if (!kvm_supports_32bit_el0())
->                         val |= ARMV8_PMU_PMCR_LC;
-> -               if (!kvm_pmu_is_3p5(vcpu))
-> -                       val &= ~ARMV8_PMU_PMCR_LP;
-> -               __vcpu_sys_reg(vcpu, PMCR_EL0) = val;
->                 kvm_pmu_handle_pmcr(vcpu, val);
->                 kvm_vcpu_pmu_restore_guest(vcpu);
->         } else {
->
-> And for the reset aspect, something like this:
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 67eac0f747be..528d253c571a 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -639,24 +639,18 @@ static void reset_pmselr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->
->  static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  {
-> -       u64 pmcr, val;
-> +       u64 pmcr;
->
->         /* No PMU available, PMCR_EL0 may UNDEF... */
->         if (!kvm_arm_support_pmu_v3())
->                 return;
->
-> -       pmcr = read_sysreg(pmcr_el0);
-> -       /*
-> -        * Writable bits of PMCR_EL0 (ARMV8_PMU_PMCR_MASK) are reset to UNKNOWN
-> -        * except PMCR.E resetting to zero.
-> -        */
-> -       val = ((pmcr & ~ARMV8_PMU_PMCR_MASK)
-> -              | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
-> +       /* Only preserve PMCR_EL0.N, and reset the rest to 0 */
-> +       pmcr = read_sysreg(pmcr_el0) & ARMV8_PMU_PMCR_N_MASK;
->         if (!kvm_supports_32bit_el0())
-> -               val |= ARMV8_PMU_PMCR_LC;
-> -       if (!kvm_pmu_is_3p5(vcpu))
-> -               val &= ~ARMV8_PMU_PMCR_LP;
-> -       __vcpu_sys_reg(vcpu, r->reg) = val;
-> +               pmcr |= ARMV8_PMU_PMCR_LC;
-> +
-> +       __vcpu_sys_reg(vcpu, r->reg) = pmcr;
->  }
->
->  static bool check_pmu_access_disabled(struct kvm_vcpu *vcpu, u64 flags)
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
