@@ -2,352 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CEBA63C079
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 13:57:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA74763C0C3
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 14:14:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229923AbiK2M47 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 07:56:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41494 "EHLO
+        id S233368AbiK2NOY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 08:14:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232523AbiK2M4m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 07:56:42 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5E6060E8C;
-        Tue, 29 Nov 2022 04:56:36 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9E7D91EC06C0;
-        Tue, 29 Nov 2022 13:56:34 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1669726594;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=AWsLPok7ViQ+W8W5j5jc7Ny6BIbEl/sE7BAZHJqUMoI=;
-        b=BHCPPnysS0HVPQeJjNsZqqi9hT9kJDMWYdvBpAKwXf3E3MlbzG9wCwtk8GYdtXxbUa5pCR
-        3iQdDNApBu2nlKJv+V0QyD/1M0sMFzy/B317BmWQ0+M3NKDdom0X2Nmm3+nApLH3Zj09hm
-        OMpDe5wMH6a++coXw66oVTSqI8xofM0=
-Date:   Tue, 29 Nov 2022 13:56:30 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Tianyu Lan <ltykernel@gmail.com>
-Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
-        tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
-Subject: Re: [RFC PATCH V2 01/18] x86/sev: Pvalidate memory gab for
- decompressing kernel
-Message-ID: <Y4YBfk3lyUJie4bR@zn.tnic>
-References: <20221119034633.1728632-1-ltykernel@gmail.com>
- <20221119034633.1728632-2-ltykernel@gmail.com>
+        with ESMTP id S232670AbiK2NNx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 08:13:53 -0500
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B07C5C762
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 05:12:59 -0800 (PST)
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ATAiYEQ005244;
+        Tue, 29 Nov 2022 13:12:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2022-7-12; bh=pc713x/1JkqKcZIP5oPRm+h2chqljhhqBQ3i+4uiCRw=;
+ b=XKMYEp/V8JAs0BRxiZiVfaRRwlrN+7kYUKfBsP32Nw7UmI63bLXP3jYOtf/bwOLUTtui
+ vB2mGCkcMBiOAgxEoMufr5KyUzUYf77Ai2XpmBl3LjDbXsGRtnrdGz/YOdwgX8XfNEPu
+ rAvt8vdNYhwRRGD345agYMv1x+5R/TQLpGseOLaK6tYW5Dp1Qpyan/nU6COzuGtxHGay
+ 8Jj+gdfXCHFoxDV5e1/1p/zg4gSRrGIOYwsJeBAeRntVGglbqtOySoa2Pv7JBs7E44Fl
+ S37Qp262nwWm/ccvJSkvmfhYjrQYstoaSXqFpcvX4T3uTPbmg9Vfh96h1+mRcRi/gGqH WQ== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3m39k2pq1d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 29 Nov 2022 13:12:55 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2ATCFTXQ027030;
+        Tue, 29 Nov 2022 13:12:55 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3m3c1v7p6n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 29 Nov 2022 13:12:55 +0000
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2ATDCswM016131;
+        Tue, 29 Nov 2022 13:12:54 GMT
+Received: from joaomart-mac.uk.oracle.com (dhcp-10-175-164-4.vpn.oracle.com [10.175.164.4])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3m3c1v7p5h-1;
+        Tue, 29 Nov 2022 13:12:54 +0000
+From:   Joao Martins <joao.m.martins@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Avihai Horon <avihaih@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+Subject: [PATCH v2] vfio/iova_bitmap: refactor iova_bitmap_set() to better handle page boundaries
+Date:   Tue, 29 Nov 2022 13:12:35 +0000
+Message-Id: <20221129131235.38880-1-joao.m.martins@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20221119034633.1728632-2-ltykernel@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-29_08,2022-11-29_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 phishscore=0 suspectscore=0
+ bulkscore=0 adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2211290077
+X-Proofpoint-GUID: K_LNDjBktNF1lmoPBilsW1eNTi9IugK1
+X-Proofpoint-ORIG-GUID: K_LNDjBktNF1lmoPBilsW1eNTi9IugK1
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 18, 2022 at 10:46:15PM -0500, Tianyu Lan wrote:
-> Subject: Re: [RFC PATCH V2 01/18] x86/sev: Pvalidate memory gab for decompressing kernel
+Commit f38044e5ef58 ("vfio/iova_bitmap: Fix PAGE_SIZE unaligned bitmaps")
+had fixed the unaligned bitmaps by capping the remaining iterable set at
+the start of the bitmap. Although, that mistakenly worked around
+iova_bitmap_set() incorrectly setting bits across page boundary.
 
-"gab"?
+Fix this by reworking the loop inside iova_bitmap_set() to iterate over a
+range of bits to set (cur_bit .. last_bit) which may span different pinned
+pages, thus updating @page_idx and @offset as it sets the bits. The
+previous cap to the first page is now adjusted to be always accounted
+rather than when there's only a non-zero pgoff.
 
-As in gabber? :-)
+While at it, make @page_idx , @offset and @nbits to be unsigned int given
+that it won't be more than 512 and 4096 respectively (even a bigger
+PAGE_SIZE or a smaller struct page size won't make this bigger than the
+above 32-bit max). Also, delete the stale kdoc on Return type.
 
-> From: Tianyu Lan <tiala@microsoft.com>
-> 
-> Pvalidate needed pages for decompressing kernel. The E820_TYPE_RAM
+Cc: Avihai Horon <avihaih@nvidia.com>
+Fixes: f38044e5ef58 ("vfio/iova_bitmap: Fix PAGE_SIZE unaligned bitmaps")
+Co-developed-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+---
+Changes since v1:
+ * Add Reviewed-by by Jason Gunthorpe
+ * Add Fixes tag (Alex Williamson)
 
-"Validate" - let's not start inventing new words. We're barely handling
-the existing ones. :)
+It passes my tests but to be extra sure: Avihai could you take this
+patch a spin in your rig/tests as well? Thanks!
+---
+ drivers/vfio/iova_bitmap.c | 30 +++++++++++++-----------------
+ 1 file changed, 13 insertions(+), 17 deletions(-)
 
-> entry includes only validated memory. The kernel expects that the
-> RAM entry's addr is fixed while the entry size is to be extended
-
-"addr"?
-
-Commit message needs to be english - not a code/english hybrid. Pls be
-more diligent here. Commit messages are not write-only.
-
-> to cover addresses to the start of next entry. This patch increases
-
-Avoid having "This patch" or "This commit" in the commit message. It is
-tautologically useless.
-
-Also, do
-
-$ git grep 'This patch' Documentation/process
-
-for more details.
-
-Pls check your whole set.
-
-Also, to the tone, from Documentation/process/submitting-patches.rst:
-
- "Describe your changes in imperative mood, e.g. "make xyzzy do frotz"
-  instead of "[This patch] makes xyzzy do frotz" or "[I] changed xyzzy
-  to do frotz", as if you are giving orders to the codebase to change
-  its behaviour."
-
-> the RAM entry size to cover all possilble memory addresses until
-
-Unknown word [possilble] in commit message.
-Suggestions: ['possible', 'possibly', 'passable', 'plausible', 'assailable', 'pliable', 'passably']
-
-Please introduce a spellchecker into your patch creation workflow.
-
-> init_size.
-
-This whole commit message doesn't tell me a whole lot. Please try
-structuring it this way:
-
-Problem is A.
-
-It happens because of B.
-
-Fix it by doing C.
-
-(Potentially do D).
-
-For more detailed info, see
-Documentation/process/submitting-patches.rst, Section "2) Describe your
-changes".
-
-> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
-> ---
->  arch/x86/boot/compressed/head_64.S |  8 +++
->  arch/x86/boot/compressed/sev.c     | 84 ++++++++++++++++++++++++++++++
->  2 files changed, 92 insertions(+)
-> 
-> diff --git a/arch/x86/boot/compressed/head_64.S b/arch/x86/boot/compressed/head_64.S
-> index d33f060900d2..818edaf5d0cf 100644
-> --- a/arch/x86/boot/compressed/head_64.S
-> +++ b/arch/x86/boot/compressed/head_64.S
-> @@ -348,6 +348,14 @@ SYM_CODE_START(startup_64)
->  	cld
->  	cli
->  
-> +#ifdef CONFIG_AMD_MEM_ENCRYPT
-> +	/* pvalidate memory on demand if SNP is enabled. */
-
-So this is going to be executed unconditionally on *every* SNP guest - not
-only Hyper-V ones.
-
-Why is that ok?
-
-> +	pushq	%rsi
-> +	movq    %rsi, %rdi
-> +	call 	pvalidate_for_startup_64
-> +	popq	%rsi
-> +#endif
-> +
->  	/* Setup data segments. */
->  	xorl	%eax, %eax
->  	movl	%eax, %ds
-> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
-> index 960968f8bf75..3a5a1ab16095 100644
-> --- a/arch/x86/boot/compressed/sev.c
-> +++ b/arch/x86/boot/compressed/sev.c
-> @@ -12,8 +12,10 @@
->   */
->  #include "misc.h"
->  
-> +#include <asm/msr-index.h>
->  #include <asm/pgtable_types.h>
->  #include <asm/sev.h>
-> +#include <asm/svm.h>
->  #include <asm/trapnr.h>
->  #include <asm/trap_pf.h>
->  #include <asm/msr-index.h>
-> @@ -21,6 +23,7 @@
->  #include <asm/ptrace.h>
->  #include <asm/svm.h>
->  #include <asm/cpuid.h>
-> +#include <asm/e820/types.h>
->  
->  #include "error.h"
->  #include "../msr.h"
-> @@ -117,6 +120,22 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
->  /* Include code for early handlers */
->  #include "../../kernel/sev-shared.c"
->  
-> +/* Check SEV-SNP via MSR */
-> +static bool sev_snp_runtime_check(void)
-
-Functions need to have a verb in the name.
-
-> +{
-> +	unsigned long low, high;
-> +	u64 val;
-> +
-> +	asm volatile("rdmsr\n" : "=a" (low), "=d" (high) :
-> +			"c" (MSR_AMD64_SEV));
-> +
-> +	val = (high << 32) | low;
-> +	if (val & MSR_AMD64_SEV_SNP_ENABLED)
-> +		return true;
-
-There already is a sev_snp_enabled() in that very same file. Did you not
-see it?
-
-Why are you even adding such a function?!
-
-> +	return false;
-> +}
-> +
->  static inline bool sev_snp_enabled(void)
->  {
->  	return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
-> @@ -456,3 +475,68 @@ void sev_prep_identity_maps(unsigned long top_level_pgt)
->  
->  	sev_verify_cbit(top_level_pgt);
->  }
-> +
-> +static void extend_e820_on_demand(struct boot_e820_entry *e820_entry,
-> +				  u64 needed_ram_end)
-> +{
-> +	u64 end, paddr;
-> +	unsigned long eflags;
-> +	int rc;
-> +
-> +	if (!e820_entry)
-> +		return;
-> +
-> +	/* Validated memory must be aligned by PAGE_SIZE. */
-> +	end = ALIGN(e820_entry->addr + e820_entry->size, PAGE_SIZE);
-> +	if (needed_ram_end > end && e820_entry->type == E820_TYPE_RAM) {
-> +		for (paddr = end; paddr < needed_ram_end; paddr += PAGE_SIZE) {
-> +			rc = pvalidate(paddr, RMP_PG_SIZE_4K, true);
-> +			if (rc) {
-> +				error("Failed to validate address.n");
-> +				return;
-> +			}
-> +		}
-> +		e820_entry->size = needed_ram_end - e820_entry->addr;
-> +	}
-> +}
-> +
-> +/*
-> + * Explicitly pvalidate needed pages for decompressing the kernel.
-> + * The E820_TYPE_RAM entry includes only validated memory. The kernel
-> + * expects that the RAM entry's addr is fixed while the entry size is to be
-> + * extended to cover addresses to the start of next entry.
-> + * The function increases the RAM entry size to cover all possible memory
-
-Similar issue as above: you don't need to say "this function" above this
-function. IOW, it should say:
-
-"Increase the RAM entry size..."
-
-I.e., imperative mood above.
-
-> + * addresses until init_size.
-> + * For example,  init_end = 0x4000000,
-> + * [RAM: 0x0 - 0x0],                       M[RAM: 0x0 - 0xa0000]
-> + * [RSVD: 0xa0000 - 0x10000]                [RSVD: 0xa0000 - 0x10000]
-> + * [ACPI: 0x10000 - 0x20000]      ==>       [ACPI: 0x10000 - 0x20000]
-> + * [RSVD: 0x800000 - 0x900000]              [RSVD: 0x800000 - 0x900000]
-> + * [RAM: 0x1000000 - 0x2000000]            M[RAM: 0x1000000 - 0x2001000]
-> + * [RAM: 0x2001000 - 0x2007000]            M[RAM: 0x2001000 - 0x4000000]
-
-What is this trying to tell me?
-
-That the end range 0x2007000 gets raised to 0x4000000?
-
-Why?
-
-This all sounds like there is some requirement somewhere but nothing
-says what that requirement is and why.
-
-> + * Other RAM memory after init_end is pvalidated by ms_hyperv_init_platform
-> + */
-> +__visible void pvalidate_for_startup_64(struct boot_params *boot_params)
-
-This doesn't do any validation. And yet it has "pvalidate" in the name.
-
-> +{
-> +	struct boot_e820_entry *e820_entry;
-> +	u64 init_end =
-> +		boot_params->hdr.pref_address + boot_params->hdr.init_size;
-
-Nope, we never break lines like that.
-
-> +	u8 i, nr_entries = boot_params->e820_entries;
-> +	u64 needed_end;
-
-The tip-tree preferred ordering of variable declarations at the
-beginning of a function is reverse fir tree order::
-
-	struct long_struct_name *descriptive_name;
-	unsigned long foo, bar;
-	unsigned int tmp;
-	int ret;
-
-The above is faster to parse than the reverse ordering::
-
-	int ret;
-	unsigned int tmp;
-	unsigned long foo, bar;
-	struct long_struct_name *descriptive_name;
-
-And even more so than random ordering::
-
-	unsigned long foo, bar;
-	int ret;
-	struct long_struct_name *descriptive_name;
-	unsigned int tmp;
-
-> +	if (!sev_snp_runtime_check())
-> +		return;
-> +
-> +	for (i = 0; i < nr_entries; ++i) {
-> +		/* Pvalidate memory holes in e820 RAM entries. */
-> +		e820_entry = &boot_params->e820_table[i];
-> +		if (i < nr_entries - 1) {
-> +			needed_end = boot_params->e820_table[i + 1].addr;
-> +			if (needed_end < e820_entry->addr)
-> +				error("e820 table is not sorted.\n");
-> +		} else {
-> +			needed_end = init_end;
-> +		}
-> +		extend_e820_on_demand(e820_entry, needed_end);
-
-Now *this* function does call pvalidate() and yet it doesn't have
-"pvalidate" in the name. This all looks real confused.
-
-So first of all, you need to explain *why* you're doing this.
-
-It looks like it is because the guest needs to do the memory validation
-by itself because nobody else does that.
-
-If so, this needs to be explained in detail in the commit message.
-
-Also, why is that ok for SNP guests on other hypervisors which get the
-memory validated by the boot loader or firmware?
-
-And so on and so on.
-
-Thx.
-
+diff --git a/drivers/vfio/iova_bitmap.c b/drivers/vfio/iova_bitmap.c
+index de6d6ea5c496..0848f920efb7 100644
+--- a/drivers/vfio/iova_bitmap.c
++++ b/drivers/vfio/iova_bitmap.c
+@@ -298,9 +298,7 @@ static unsigned long iova_bitmap_mapped_remaining(struct iova_bitmap *bitmap)
+ {
+ 	unsigned long remaining, bytes;
+ 
+-	/* Cap to one page in the first iteration, if PAGE_SIZE unaligned. */
+-	bytes = !bitmap->mapped.pgoff ? bitmap->mapped.npages << PAGE_SHIFT :
+-					PAGE_SIZE - bitmap->mapped.pgoff;
++	bytes = (bitmap->mapped.npages << PAGE_SHIFT) - bitmap->mapped.pgoff;
+ 
+ 	remaining = bitmap->mapped_total_index - bitmap->mapped_base_index;
+ 	remaining = min_t(unsigned long, remaining,
+@@ -399,29 +397,27 @@ int iova_bitmap_for_each(struct iova_bitmap *bitmap, void *opaque,
+  * Set the bits corresponding to the range [iova .. iova+length-1] in
+  * the user bitmap.
+  *
+- * Return: The number of bits set.
+  */
+ void iova_bitmap_set(struct iova_bitmap *bitmap,
+ 		     unsigned long iova, size_t length)
+ {
+ 	struct iova_bitmap_map *mapped = &bitmap->mapped;
+-	unsigned long offset = (iova - mapped->iova) >> mapped->pgshift;
+-	unsigned long nbits = max_t(unsigned long, 1, length >> mapped->pgshift);
+-	unsigned long page_idx = offset / BITS_PER_PAGE;
+-	unsigned long page_offset = mapped->pgoff;
+-	void *kaddr;
+-
+-	offset = offset % BITS_PER_PAGE;
++	unsigned long cur_bit = ((iova - mapped->iova) >>
++			mapped->pgshift) + mapped->pgoff * BITS_PER_BYTE;
++	unsigned long last_bit = (((iova + length - 1) - mapped->iova) >>
++			mapped->pgshift) + mapped->pgoff * BITS_PER_BYTE;
+ 
+ 	do {
+-		unsigned long size = min(BITS_PER_PAGE - offset, nbits);
++		unsigned int page_idx = cur_bit / BITS_PER_PAGE;
++		unsigned int offset = cur_bit % BITS_PER_PAGE;
++		unsigned int nbits = min(BITS_PER_PAGE - offset,
++					 last_bit - cur_bit + 1);
++		void *kaddr;
+ 
+ 		kaddr = kmap_local_page(mapped->pages[page_idx]);
+-		bitmap_set(kaddr + page_offset, offset, size);
++		bitmap_set(kaddr, offset, nbits);
+ 		kunmap_local(kaddr);
+-		page_offset = offset = 0;
+-		nbits -= size;
+-		page_idx++;
+-	} while (nbits > 0);
++		cur_bit += nbits;
++	} while (cur_bit <= last_bit);
+ }
+ EXPORT_SYMBOL_GPL(iova_bitmap_set);
 -- 
-Regards/Gruss,
-    Boris.
+2.17.2
 
-https://people.kernel.org/tglx/notes-about-netiquette
