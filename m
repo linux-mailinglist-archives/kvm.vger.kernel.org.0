@@ -2,74 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E2FE63C648
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 18:17:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F4D063C675
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 18:31:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236531AbiK2RRy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 12:17:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50512 "EHLO
+        id S236626AbiK2Rbz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 12:31:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236305AbiK2RRx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 12:17:53 -0500
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D185A1D307
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 09:17:51 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id w15so9994093wrl.9
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 09:17:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZKN9Q+eq0uc2V72eeYpmTHIZGYsEOhCOCy20hkaLTtc=;
-        b=TOnYs1ecs7ME6pLERhlGGIwNLRLNc5HzSwU1yMLg31p5hI+YtZrFqz5J7fDroQsrvT
-         +N0DGMtT+sJu9pV+t8DBDOZw5R7v1ruMbqI0lG9K0DhF+4IeTzKfGSy3dqxWWxwW0+gJ
-         LSCMhbVm9woQ+M0lShcVR1z7jvZyZeX7rcmpjYk9kACBBKj6dasIL6ICbUUtdkLkmlRA
-         5TCS1NumrfbQFwyeNPbWp4m3jXaEOAh19q3P/MV/09ocPsC4xvw+1+2/qHbT+xjLdon/
-         YLJnJL10aYs2nudxaC1VOyqUMp/WM8DHNNMwKLJIs1xMTdREcVi06yx3W1sd9O7tQrY9
-         +MXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:reply-to:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZKN9Q+eq0uc2V72eeYpmTHIZGYsEOhCOCy20hkaLTtc=;
-        b=ZdxiIN/kjUgaJ9Pgh+DPVvFXOOOkfm4irWdoX9sxF38bXkFpMfjr8s21dY5mmRtIT6
-         sOIkfxgGG+uYyLWbJIjG/lSNPnbkZu4acGXl+ONNaTWmMUryN2o909bMmkuYaUbU4jKt
-         JVkZukSb0mgp6aKf1KSM+C1FTY/9JxkbMvmIxMkTFmkMynvhXFeFQ8Sh3kkL46jOKnac
-         ReNpozY4P+QQedXI/op21QWryGC7Uev+7sBdIU4M1Tqp+IFuTxiL0F1Pzx0XUGd9/w4z
-         41ZClyn6ukLcQuVzE86Tyip4lGFu861m716u5eg7zTNZZmTsJTn8j217nG0URzQ5vt9W
-         CRTA==
-X-Gm-Message-State: ANoB5pn5ZQxgmsx240vkpS0lUqzhDrl76tPDnxtdnHQOC0a0o179m6uB
-        gI89Isg01SUF4liR8vh+4Ou9tFxu0FKGSOI9vf0=
-X-Google-Smtp-Source: AA0mqf6vBo5wiObH76uTvIylbPUCl9CVgT10F6x+9KcRy+P0gXOk1DRqm8BRxuKJZ0GcGscr8rmLgA9gh1e034d2+Po=
-X-Received: by 2002:a5d:6243:0:b0:236:6b05:a8be with SMTP id
- m3-20020a5d6243000000b002366b05a8bemr34343493wrv.346.1669742270339; Tue, 29
- Nov 2022 09:17:50 -0800 (PST)
+        with ESMTP id S236633AbiK2Rbx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 12:31:53 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0155D697CC
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 09:31:51 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A95FBB81894
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 17:31:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A4E1C433C1;
+        Tue, 29 Nov 2022 17:31:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669743109;
+        bh=UVinZvTim66u4bD8bc5xOZyCcQ1X8BETh6hP7fGDBAU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=jSGqNuRZSJi2DZAT5I2TcjbMZE/x9XmLA+z8A9P8IGRIuSYlKw9zJyOenjacAXnLz
+         tNBq75DZ1OC1Zy+G0JU2WKeBmQszUHVCZ5N6LqVK+DnWhXcE2i0kZJdmxaOLClZJe3
+         tYENqLz22d1Qx6iif/UjCs+BXDz6hvSDkETK3iARdvMHYpMC7/VHS4kU34eJgt+ooU
+         XeIC+ksbjEbmiZu8yjRwjy5NjyIWF19/uxwx24oPX1+McinLXUJAkY82saEXxncT/i
+         xNhEBocnLfBppcWb0dTPBa0fHKh7GuQcWYPDY5HDG0R3jKwLnWWUZRL4EeIYJ0Qebi
+         YRSkSoXm6Lpcw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p04SR-009PeW-37;
+        Tue, 29 Nov 2022 17:31:47 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 0/2] KVM: selftests: Enable access_tracking_perf_test for arm64
+Date:   Tue, 29 Nov 2022 17:31:44 +0000
+Message-Id: <166974309671.1909695.14457318687237410207.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221118211503.4049023-1-oliver.upton@linux.dev>
+References: <20221118211503.4049023-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-Received: by 2002:a05:600c:384c:0:0:0:0 with HTTP; Tue, 29 Nov 2022 09:17:49
- -0800 (PST)
-Reply-To: thajxoa@gmail.com
-From:   Thaj Xoa <banglebea@gmail.com>
-Date:   Tue, 29 Nov 2022 17:17:49 +0000
-Message-ID: <CADTJrWO1Fw6rJ-CaE7GsX7uDzdXvagZ1ds+x3cGtz8uW04SRJg@mail.gmail.com>
-Subject: 
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=4.4 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLYTO,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Level: ****
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, james.morse@arm.com, oliver.upton@linux.dev, seanjc@google.com, gshan@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 18 Nov 2022 21:15:01 +0000, Oliver Upton wrote:
+> Small series to add support for arm64 to access_tracking_perf_test and
+> correct a couple bugs along the way.
+> 
+> Tested on Ampere Altra w/ all supported guest modes.
+> 
+> v1 -> v2:
+>  - Have perf_test_util indicate when to stop vCPU threads (Sean)
+>  - Collect Gavin's R-b on the second patch. I left off Gavin's R-b on
+>    the first patch as it was retooled.
+> 
+> [...]
+
+Applied to next, thanks!
+
+[1/2] KVM: selftests: Have perf_test_util signal when to stop vCPUs
+      commit: 9ec1eb1bcceec735fb3c9255cdcdbcc2acf860a0
+[2/2] KVM: selftests: Build access_tracking_perf_test for arm64
+      commit: 4568180411e0fb5613e217da1c693466e39b9c27
+
+Cheers,
+
+	M.
 -- 
-Dear Friend,
+Without deviation from the norm, progress is not possible.
 
-I have an important message for you.
 
-Sincerely,
-
-Mrs thaj xoa
