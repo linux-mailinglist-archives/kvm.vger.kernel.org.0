@@ -2,471 +2,491 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DF4D63C6F6
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 19:01:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E25063C70C
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 19:10:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236149AbiK2SBt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 13:01:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56712 "EHLO
+        id S234542AbiK2SK1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 13:10:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235142AbiK2SBq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 13:01:46 -0500
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ECF56B38F
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 10:01:44 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id bn5so18199810ljb.2
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 10:01:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Y9kDjfM0bfOU8OoGeXwSUbeNm2vWGwm8EqG2M8pdrc=;
-        b=dUszTPjT+TNZ13ON3wb2yYIOv6E0K4AH5CpH+LUQ5GirP2giu5EfIx3bymjNS+jxLq
-         jjkLRwtcSilnyA7cqsuubl615XzSw4/CqmC/Sao7F2MaIqxkvoBKbVU2xSnGlwmnVWvO
-         B/+BtdxVS6MhxEAhqDpAVZDTHl3ZwjvMr2YTHhpAFKjzV+nLb8zJyViEBS1o7/dWZNiz
-         9+/IW59GT4iYWdzvAO8irDLcB4PlmZE1KSFMP63FvwBo0/ecWcPjftNZhEJ7t77zztQt
-         0a5YW4skjVMlTpj9qLk5zyGMFSQW6hcHPQaYvN7uQRU39x4aG33iGRs2CQeTx0tF0GYI
-         7V6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1Y9kDjfM0bfOU8OoGeXwSUbeNm2vWGwm8EqG2M8pdrc=;
-        b=h+YE22QeOcIPTffSNfv/N86BjKoW30ZMoCq191thlliPTgWzaE4X+YweFBEPk9pMDJ
-         LEioddLUvHKU1ckwajKwpP6yqmfsJdZeneFmbmw7j6LayA2TKoB1YN8wJYWnDSgAIKkS
-         /+IFtycTVkOCRlFU1Kp2wM3fOK17xgRWb2XxKdp7wYswbD+l9LQSRYSq6cd9FXMOHkYN
-         vYx29x9rS6JEI8krRBCFB5pilpgGsb8imrmSH5ikxPBku8yjWRiGOiyOyoPBA3P17qkp
-         WNRjztpKy68uZUn6PIf9GWUl6eWtrRksIWvO5IZlh8b4/fn9MaBC1WNMv2GhvBbENrIU
-         pxNg==
-X-Gm-Message-State: ANoB5pmoupyxadJRBdANuXX6fVNDQ2f6CCugB/4Z08J1RODeG+9Jd+u/
-        WSFRbj4gvzGT81XsR4q+xqT3ulSnmiyoOoKWyZTLbg==
-X-Google-Smtp-Source: AA0mqf5EOqASORhvmN5h7jvdYq+Ia0aLYfq+WeVHRezzJWqZFnnIEJPvcBmipT6BmHEcXBaDmu6U9+OIo+9507y6Pek=
-X-Received: by 2002:a05:651c:12c5:b0:279:a905:b547 with SMTP id
- 5-20020a05651c12c500b00279a905b547mr3224038lje.295.1669744901501; Tue, 29 Nov
- 2022 10:01:41 -0800 (PST)
+        with ESMTP id S234781AbiK2SKF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 13:10:05 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1CCF3663C9
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 10:10:03 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78A76D6E;
+        Tue, 29 Nov 2022 10:10:09 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 68EDF3F67D;
+        Tue, 29 Nov 2022 10:10:01 -0800 (PST)
+Date:   Tue, 29 Nov 2022 18:09:58 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
+        andre.przywara@arm.com, will@kernel.org
+Subject: Re: [PATCH kvmtool v1 08/17] Use memfd for all guest ram allocations
+Message-ID: <Y4ZK9sNbWDIOYe++@monolith.localdoman>
+References: <20221115111549.2784927-1-tabba@google.com>
+ <20221115111549.2784927-9-tabba@google.com>
+ <Y39PCG0ZRHf/2d5E@monolith.localdoman>
+ <CA+EHjTx6JRODjncxMz6pBO43S2gAFZt4vDibG=Zwbr7TkbiFeQ@mail.gmail.com>
+ <Y3+meXHu5MRYuHou@monolith.localdoman>
+ <CA+EHjTwgg+Cu=A3msmWLNEHmkJhOn-8+MeJULOHzF6V99iHk1A@mail.gmail.com>
+ <Y4CnPcHyt5IPAoF/@monolith.localdoman>
+ <CA+EHjTzf5-Rsi9-hzfMiYPUB8_C9UmkJuJiZpD8VSe9CNt2_aw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <20221025151344.3784230-2-chao.p.peng@linux.intel.com> <20221129003725.l34qhx6n44mq2gtl@amd.com>
-In-Reply-To: <20221129003725.l34qhx6n44mq2gtl@amd.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Tue, 29 Nov 2022 10:01:29 -0800
-Message-ID: <CAGtprH9Ecy_tBSuffX9SCBqoeDQEkWHO8ovaMGy4wx+jZoXT9w@mail.gmail.com>
-Subject: Re: [PATCH v9 1/8] mm: Introduce memfd_restricted system call to
- create restricted user memory
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        mhocko@suse.com, Muchun Song <songmuchun@bytedance.com>,
-        wei.w.wang@intel.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+EHjTzf5-Rsi9-hzfMiYPUB8_C9UmkJuJiZpD8VSe9CNt2_aw@mail.gmail.com>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 28, 2022 at 4:37 PM Michael Roth <michael.roth@amd.com> wrote:
->
-> On Tue, Oct 25, 2022 at 11:13:37PM +0800, Chao Peng wrote:
-> > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-> >
-> > Introduce 'memfd_restricted' system call with the ability to create
-> > memory areas that are restricted from userspace access through ordinary
-> > MMU operations (e.g. read/write/mmap). The memory content is expected to
-> > be used through a new in-kernel interface by a third kernel module.
-> >
-> > memfd_restricted() is useful for scenarios where a file descriptor(fd)
-> > can be used as an interface into mm but want to restrict userspace's
-> > ability on the fd. Initially it is designed to provide protections for
-> > KVM encrypted guest memory.
-> >
-> > Normally KVM uses memfd memory via mmapping the memfd into KVM userspace
-> > (e.g. QEMU) and then using the mmaped virtual address to setup the
-> > mapping in the KVM secondary page table (e.g. EPT). With confidential
-> > computing technologies like Intel TDX, the memfd memory may be encrypted
-> > with special key for special software domain (e.g. KVM guest) and is not
-> > expected to be directly accessed by userspace. Precisely, userspace
-> > access to such encrypted memory may lead to host crash so should be
-> > prevented.
-> >
-> > memfd_restricted() provides semantics required for KVM guest encrypted
-> > memory support that a fd created with memfd_restricted() is going to be
-> > used as the source of guest memory in confidential computing environment
-> > and KVM can directly interact with core-mm without the need to expose
-> > the memoy content into KVM userspace.
-> >
-> > KVM userspace is still in charge of the lifecycle of the fd. It should
-> > pass the created fd to KVM. KVM uses the new restrictedmem_get_page() to
-> > obtain the physical memory page and then uses it to populate the KVM
-> > secondary page table entries.
-> >
-> > The userspace restricted memfd can be fallocate-ed or hole-punched
-> > from userspace. When these operations happen, KVM can get notified
-> > through restrictedmem_notifier, it then gets chance to remove any
-> > mapped entries of the range in the secondary page tables.
-> >
-> > memfd_restricted() itself is implemented as a shim layer on top of real
-> > memory file systems (currently tmpfs). Pages in restrictedmem are marked
-> > as unmovable and unevictable, this is required for current confidential
-> > usage. But in future this might be changed.
-> >
-> > By default memfd_restricted() prevents userspace read, write and mmap.
-> > By defining new bit in the 'flags', it can be extended to support other
-> > restricted semantics in the future.
-> >
-> > The system call is currently wired up for x86 arch.
-> >
-> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > ---
-> >  arch/x86/entry/syscalls/syscall_32.tbl |   1 +
-> >  arch/x86/entry/syscalls/syscall_64.tbl |   1 +
-> >  include/linux/restrictedmem.h          |  62 ++++++
-> >  include/linux/syscalls.h               |   1 +
-> >  include/uapi/asm-generic/unistd.h      |   5 +-
-> >  include/uapi/linux/magic.h             |   1 +
-> >  kernel/sys_ni.c                        |   3 +
-> >  mm/Kconfig                             |   4 +
-> >  mm/Makefile                            |   1 +
-> >  mm/restrictedmem.c                     | 250 +++++++++++++++++++++++++
-> >  10 files changed, 328 insertions(+), 1 deletion(-)
-> >  create mode 100644 include/linux/restrictedmem.h
-> >  create mode 100644 mm/restrictedmem.c
-> >
-> > diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
-> > index 320480a8db4f..dc70ba90247e 100644
-> > --- a/arch/x86/entry/syscalls/syscall_32.tbl
-> > +++ b/arch/x86/entry/syscalls/syscall_32.tbl
-> > @@ -455,3 +455,4 @@
-> >  448  i386    process_mrelease        sys_process_mrelease
-> >  449  i386    futex_waitv             sys_futex_waitv
-> >  450  i386    set_mempolicy_home_node         sys_set_mempolicy_home_node
-> > +451  i386    memfd_restricted        sys_memfd_restricted
-> > diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
-> > index c84d12608cd2..06516abc8318 100644
-> > --- a/arch/x86/entry/syscalls/syscall_64.tbl
-> > +++ b/arch/x86/entry/syscalls/syscall_64.tbl
-> > @@ -372,6 +372,7 @@
-> >  448  common  process_mrelease        sys_process_mrelease
-> >  449  common  futex_waitv             sys_futex_waitv
-> >  450  common  set_mempolicy_home_node sys_set_mempolicy_home_node
-> > +451  common  memfd_restricted        sys_memfd_restricted
-> >
-> >  #
-> >  # Due to a historical design error, certain syscalls are numbered differently
-> > diff --git a/include/linux/restrictedmem.h b/include/linux/restrictedmem.h
-> > new file mode 100644
-> > index 000000000000..9c37c3ea3180
-> > --- /dev/null
-> > +++ b/include/linux/restrictedmem.h
-> > @@ -0,0 +1,62 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> > +#ifndef _LINUX_RESTRICTEDMEM_H
-> > +
-> > +#include <linux/file.h>
-> > +#include <linux/magic.h>
-> > +#include <linux/pfn_t.h>
-> > +
-> > +struct restrictedmem_notifier;
-> > +
-> > +struct restrictedmem_notifier_ops {
-> > +     void (*invalidate_start)(struct restrictedmem_notifier *notifier,
-> > +                              pgoff_t start, pgoff_t end);
-> > +     void (*invalidate_end)(struct restrictedmem_notifier *notifier,
-> > +                            pgoff_t start, pgoff_t end);
-> > +};
-> > +
-> > +struct restrictedmem_notifier {
-> > +     struct list_head list;
-> > +     const struct restrictedmem_notifier_ops *ops;
-> > +};
-> > +
-> > +#ifdef CONFIG_RESTRICTEDMEM
-> > +
-> > +void restrictedmem_register_notifier(struct file *file,
-> > +                                  struct restrictedmem_notifier *notifier);
-> > +void restrictedmem_unregister_notifier(struct file *file,
-> > +                                    struct restrictedmem_notifier *notifier);
-> > +
-> > +int restrictedmem_get_page(struct file *file, pgoff_t offset,
-> > +                        struct page **pagep, int *order);
-> > +
-> > +static inline bool file_is_restrictedmem(struct file *file)
-> > +{
-> > +     return file->f_inode->i_sb->s_magic == RESTRICTEDMEM_MAGIC;
-> > +}
-> > +
-> > +#else
-> > +
-> > +static inline void restrictedmem_register_notifier(struct file *file,
-> > +                                  struct restrictedmem_notifier *notifier)
-> > +{
-> > +}
-> > +
-> > +static inline void restrictedmem_unregister_notifier(struct file *file,
-> > +                                    struct restrictedmem_notifier *notifier)
-> > +{
-> > +}
-> > +
-> > +static inline int restrictedmem_get_page(struct file *file, pgoff_t offset,
-> > +                                      struct page **pagep, int *order)
-> > +{
-> > +     return -1;
-> > +}
-> > +
-> > +static inline bool file_is_restrictedmem(struct file *file)
-> > +{
-> > +     return false;
-> > +}
-> > +
-> > +#endif /* CONFIG_RESTRICTEDMEM */
-> > +
-> > +#endif /* _LINUX_RESTRICTEDMEM_H */
-> > diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-> > index a34b0f9a9972..f9e9e0c820c5 100644
-> > --- a/include/linux/syscalls.h
-> > +++ b/include/linux/syscalls.h
-> > @@ -1056,6 +1056,7 @@ asmlinkage long sys_memfd_secret(unsigned int flags);
-> >  asmlinkage long sys_set_mempolicy_home_node(unsigned long start, unsigned long len,
-> >                                           unsigned long home_node,
-> >                                           unsigned long flags);
-> > +asmlinkage long sys_memfd_restricted(unsigned int flags);
-> >
-> >  /*
-> >   * Architecture-specific system calls
-> > diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
-> > index 45fa180cc56a..e93cd35e46d0 100644
-> > --- a/include/uapi/asm-generic/unistd.h
-> > +++ b/include/uapi/asm-generic/unistd.h
-> > @@ -886,8 +886,11 @@ __SYSCALL(__NR_futex_waitv, sys_futex_waitv)
-> >  #define __NR_set_mempolicy_home_node 450
-> >  __SYSCALL(__NR_set_mempolicy_home_node, sys_set_mempolicy_home_node)
-> >
-> > +#define __NR_memfd_restricted 451
-> > +__SYSCALL(__NR_memfd_restricted, sys_memfd_restricted)
-> > +
-> >  #undef __NR_syscalls
-> > -#define __NR_syscalls 451
-> > +#define __NR_syscalls 452
-> >
-> >  /*
-> >   * 32 bit systems traditionally used different
-> > diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
-> > index 6325d1d0e90f..8aa38324b90a 100644
-> > --- a/include/uapi/linux/magic.h
-> > +++ b/include/uapi/linux/magic.h
-> > @@ -101,5 +101,6 @@
-> >  #define DMA_BUF_MAGIC                0x444d4142      /* "DMAB" */
-> >  #define DEVMEM_MAGIC         0x454d444d      /* "DMEM" */
-> >  #define SECRETMEM_MAGIC              0x5345434d      /* "SECM" */
-> > +#define RESTRICTEDMEM_MAGIC  0x5245534d      /* "RESM" */
-> >
-> >  #endif /* __LINUX_MAGIC_H__ */
-> > diff --git a/kernel/sys_ni.c b/kernel/sys_ni.c
-> > index 860b2dcf3ac4..7c4a32cbd2e7 100644
-> > --- a/kernel/sys_ni.c
-> > +++ b/kernel/sys_ni.c
-> > @@ -360,6 +360,9 @@ COND_SYSCALL(pkey_free);
-> >  /* memfd_secret */
-> >  COND_SYSCALL(memfd_secret);
-> >
-> > +/* memfd_restricted */
-> > +COND_SYSCALL(memfd_restricted);
-> > +
-> >  /*
-> >   * Architecture specific weak syscall entries.
-> >   */
-> > diff --git a/mm/Kconfig b/mm/Kconfig
-> > index 0331f1461f81..0177d53676c7 100644
-> > --- a/mm/Kconfig
-> > +++ b/mm/Kconfig
-> > @@ -1076,6 +1076,10 @@ config IO_MAPPING
-> >  config SECRETMEM
-> >       def_bool ARCH_HAS_SET_DIRECT_MAP && !EMBEDDED
-> >
-> > +config RESTRICTEDMEM
-> > +     bool
-> > +     depends on TMPFS
-> > +
-> >  config ANON_VMA_NAME
-> >       bool "Anonymous VMA name support"
-> >       depends on PROC_FS && ADVISE_SYSCALLS && MMU
-> > diff --git a/mm/Makefile b/mm/Makefile
-> > index 9a564f836403..6cb6403ffd40 100644
-> > --- a/mm/Makefile
-> > +++ b/mm/Makefile
-> > @@ -117,6 +117,7 @@ obj-$(CONFIG_PAGE_EXTENSION) += page_ext.o
-> >  obj-$(CONFIG_PAGE_TABLE_CHECK) += page_table_check.o
-> >  obj-$(CONFIG_CMA_DEBUGFS) += cma_debug.o
-> >  obj-$(CONFIG_SECRETMEM) += secretmem.o
-> > +obj-$(CONFIG_RESTRICTEDMEM) += restrictedmem.o
-> >  obj-$(CONFIG_CMA_SYSFS) += cma_sysfs.o
-> >  obj-$(CONFIG_USERFAULTFD) += userfaultfd.o
-> >  obj-$(CONFIG_IDLE_PAGE_TRACKING) += page_idle.o
-> > diff --git a/mm/restrictedmem.c b/mm/restrictedmem.c
-> > new file mode 100644
-> > index 000000000000..e5bf8907e0f8
-> > --- /dev/null
-> > +++ b/mm/restrictedmem.c
-> > @@ -0,0 +1,250 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +#include "linux/sbitmap.h"
-> > +#include <linux/pagemap.h>
-> > +#include <linux/pseudo_fs.h>
-> > +#include <linux/shmem_fs.h>
-> > +#include <linux/syscalls.h>
-> > +#include <uapi/linux/falloc.h>
-> > +#include <uapi/linux/magic.h>
-> > +#include <linux/restrictedmem.h>
-> > +
-> > +struct restrictedmem_data {
-> > +     struct mutex lock;
-> > +     struct file *memfd;
-> > +     struct list_head notifiers;
-> > +};
-> > +
-> > +static void restrictedmem_notifier_invalidate(struct restrictedmem_data *data,
-> > +                              pgoff_t start, pgoff_t end, bool notify_start)
-> > +{
-> > +     struct restrictedmem_notifier *notifier;
-> > +
-> > +     mutex_lock(&data->lock);
-> > +     list_for_each_entry(notifier, &data->notifiers, list) {
-> > +             if (notify_start)
-> > +                     notifier->ops->invalidate_start(notifier, start, end);
-> > +             else
-> > +                     notifier->ops->invalidate_end(notifier, start, end);
-> > +     }
-> > +     mutex_unlock(&data->lock);
-> > +}
-> > +
-> > +static int restrictedmem_release(struct inode *inode, struct file *file)
-> > +{
-> > +     struct restrictedmem_data *data = inode->i_mapping->private_data;
-> > +
-> > +     fput(data->memfd);
-> > +     kfree(data);
-> > +     return 0;
-> > +}
-> > +
-> > +static long restrictedmem_fallocate(struct file *file, int mode,
-> > +                                 loff_t offset, loff_t len)
-> > +{
-> > +     struct restrictedmem_data *data = file->f_mapping->private_data;
-> > +     struct file *memfd = data->memfd;
-> > +     int ret;
-> > +
-> > +     if (mode & FALLOC_FL_PUNCH_HOLE) {
-> > +             if (!PAGE_ALIGNED(offset) || !PAGE_ALIGNED(len))
-> > +                     return -EINVAL;
-> > +     }
-> > +
-> > +     restrictedmem_notifier_invalidate(data, offset, offset + len, true);
->
-> The KVM restrictedmem ops seem to expect pgoff_t, but here we pass
-> loff_t. For SNP we've made this strange as part of the following patch
-> and it seems to produce the expected behavior:
->
->   https://github.com/mdroth/linux/commit/d669c7d3003ff7a7a47e73e8c3b4eeadbd2c4eb6
->
-> > +     ret = memfd->f_op->fallocate(memfd, mode, offset, len);
-> > +     restrictedmem_notifier_invalidate(data, offset, offset + len, false);
-> > +     return ret;
-> > +}
-> > +
->
+Hi,
+
+On Mon, Nov 28, 2022 at 08:49:29AM +0000, Fuad Tabba wrote:
+> Hi,
+> 
+> First I want to mention that I really appreciate your feedback, which
+> has already been quite helpful. I would like you to please consider
+> this to be an RFC, and let's use these patches as a basis for
+> discussion and how they can be improved when I respin them, even if
+> that means waiting until the kvm fd-based proposal is finalized.
+
+For that it's probably best if you add RFC to the subject prefix. That's
+very helpful to let the reviewers know what to focus on, more on the
+approach than on the finer details.
+
+> 
+> Now to answer your question...
+> 
 > <snip>
->
-> > +int restrictedmem_get_page(struct file *file, pgoff_t offset,
-> > +                        struct page **pagep, int *order)
-> > +{
-> > +     struct restrictedmem_data *data = file->f_mapping->private_data;
-> > +     struct file *memfd = data->memfd;
-> > +     struct page *page;
-> > +     int ret;
-> > +
-> > +     ret = shmem_getpage(file_inode(memfd), offset, &page, SGP_WRITE);
->
-> This will result in KVM allocating pages that userspace hasn't necessary
-> fallocate()'d. In the case of SNP we need to get the PFN so we can clean
-> up the RMP entries when restrictedmem invalidations are issued for a GFN
-> range.
->
-> If the guest supports lazy-acceptance however, these pages may not have
-> been faulted in yet, and if the VMM defers actually fallocate()'ing space
-> until the guest actually tries to issue a shared->private for that GFN
-> (to support lazy-pinning), then there may never be a need to allocate
-> pages for these backends.
->
-> However, the restrictedmem invalidations are for GFN ranges so there's
-> no way to know inadvance whether it's been allocated yet or not. The
-> xarray is one option but currently it defaults to 'private' so that
-> doesn't help us here. It might if we introduced a 'uninitialized' state
-> or something along that line instead of just the binary
-> 'shared'/'private' though...
->
-> But for now we added a restrictedmem_get_page_noalloc() that uses
-> SGP_NONE instead of SGP_WRITE to avoid accidentally allocating a bunch
-> of memory as part of guest shutdown, and a
-> kvm_restrictedmem_get_pfn_noalloc() variant to go along with that. But
-> maybe a boolean param is better? Or maybe SGP_NOALLOC is the better
-> default, and we just propagate an error to userspace if they didn't
-> fallocate() in advance?
->
-
-One caveat with SGP_NOALLOC being default: For performance reasons (to
-avoid frequent userspace exits), VMM will have to always preallocate
-all the guest restricted memory. In general this will prevent VMM from
-overcommitting.
-
-
-> -Mike
->
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     *pagep = page;
-> > +     if (order)
-> > +             *order = thp_order(compound_head(page));
-> > +
-> > +     SetPageUptodate(page);
-> > +     unlock_page(page);
-> > +
-> > +     return 0;
-> > +}
-> > +EXPORT_SYMBOL_GPL(restrictedmem_get_page);
-> > --
-> > 2.25.1
+> 
+> > > My reasoning for allocating all memory with memfd is that it's one
+> > > ring to rule them all :) By that I mean, with memfd, we can allocate
+> > > normal memory, hugetlb memory, in the future guest private memory, and
+> > > easily expand it to support things like IPC memory sharing in the
+> > > future.
 > >
+> > Allocating anonymous memory is more complex now. And I could argue than the
+> > hugetlbfs case is also more complex because there are now two branches that
+> > do different things based whether it's hugetlbfs or not, instead of one.
+> 
+> The additional complexity now comes not from using memfd, but from
+> unmapping and aligning code, which I think does benefit kvmtool in
+> general.
+
+I wasn't referring to the unmapping/aligning part because that can be
+implemented without using memfd.
+
+> 
+> Hugetlbfd already had a different path before, now at least the other
+> path it has just has to do with setting flags for memfd_create(),
+> rather than allocating memory differently.
+
+Conceptually, both allocate memory the same way, by creating a temporary
+file. I do agree though that using memfd is easier than fidling with the
+temporary file name.
+
+> 
+> 
+> > As I stands right now, my opinion is that using memfd for anonymous RAM
+> > only adds complexity for zero benefits.
+> > >
+> > >
+> > > > >
+> > > > > Moreover, using an fd would be more generic and flexible, which allows
+> > > > > for other use cases (such as IPC), or to map that memory in userspace
+> > > > > when appropriate. It also allows us to use the same interface for
+> > > > > hugetlb. Considering that other VMMs (e.g., qemu [2], crosvm [3])
+> > > > > already back guest memory with memfd, and looking at how private
+> > > > > memory would work [4], it seemed to me that the best way to unify all
+> > > > > of these needs is to have the backend of guest memory be fd-based.
+> > > > >
+> > > > > It would be possible to have that as a separate kvmtool option, where
+> > > > > fd-backed memory would be only for guests that use the new private
+> > > > > memory extensions. However, that would mean more code to maintain that
+> > > > > is essentially doing the same thing (allocating and mapping memory).
+> > > > >
+> > > > > I thought that it would be worth having these patches in kvmtool now
+> > > > > rather than wait until the guest private memory has made it into kvm.
+> > > > > These patches simplify the code as an end result, make it easier to
+> > > >
+> > > > In the non-hugetlbfs case, before:
+> > > >
+> > > >         kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
+> > > >         kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm, kvm->cfg.hugetlbfs_path, kvm->arch.ram_alloc_size);
+> > > >
+> > > >         /*
+> > > >          * mmap_anon_or_hugetlbfs expands to:
+> > > >          * getpagesize()
+> > > >          * mmap()
+> > > >          */
+> > > >
+> > > >         kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start, SZ_2M);
+> > > >
+> > > > After:
+> > > >         /* mmap_anon_or_hugetlbfs: */
+> > > >         getpagesize();
+> > > >         mmap(NULL, total_map, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+> > > >         memfd_alloc(size, htlbfs_path, blk_size);
+> > > >
+> > > >         /*
+> > > >          * memfd_alloc() expands to:
+> > > >          * memfd_create()
+> > > >          * ftruncate
+> > > >          */
+> > > >
+> > > >         addr_align = (void *)ALIGN((u64)addr_map, align_sz);
+> > > >         mmap(addr_align, size, PROT_RW, MAP_PRIVATE | MAP_FIXED, fd, 0);
+> > > >
+> > > > I'm counting one extra mmap(), one memfd_create() and one ftruncate() that
+> > > > this series adds (not to mention all the boiler plate code to check for
+> > > > errors).
+> > > >
+> > > > Let's use another metric, let's count the number of lines of code. Before:
+> > > > 9 lines of code, after: -3 lines removed from arm/kvm.c and 86 lines of
+> > > > code for memfd_alloc() and mmap_anon_or_hugetlbfs_align().
+> > > >
+> > > > I'm struggling to find a metric by which the resulting code is simpler, as
+> > > > you suggest.
+> > >
+> > > With simpler I didn't mean fewer lines of code, rather that it's
+> > > easier to reason about, more shared code. With this series, hugetlb
+> >
+> > How is all of the code that has been added easier to reason about than one
+> > single mmap call?
+
+Would be nice if this would be answered.
+
+> >
+> > > and normal memory creation follow the same path, and with the
+> > > refactoring a lot of arch-specific code is gone.
+> >
+> > Can you point me to the arch-specific code that this series removes? As far
+> > as I can tell, the only arch specfic change is replacing
+> > kvm_arch_delete_ram with kvm_delete_ram, which can be done independently of
+> > this series. If it's only that function, I wouldn't call that "a lot" of
+> > arch-specific code.
+> 
+> kvmtool is an old and well established project. So I think that being
+> able to remove the memory-alignment code from the arm and riscv kvm.c,
+> two fields from the arm and riscv struct kvm_arch, as well as
+> kvm__arch_delete_ram from all architectures, is not that little for a
+> mature project such as this one. I agree that this could have been
+> done without using memfd, but at least for me, as a person who has
+  ^^^^^^^^^^^^^^^^^^^^^^^^
+Good to see we're in agreement.
+
+> just posted their first contribution to kvmtool, it was easier to make
+> these changes when the tracking of the memory is based on an fd rather
+> than a userspace address (makes alignment and unmapping unused memory
+> much easier).
+
+How does this look:
+
+diff --git a/arm/kvm.c b/arm/kvm.c
+index d51cc15d8b1c..13b0d10c9cd1 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -27,6 +27,7 @@ bool kvm__arch_cpu_supports_vm(void)
+ void kvm__init_ram(struct kvm *kvm)
+ {
+        u64 phys_start, phys_size;
++       unsigned long extra_memory;
+        void *host_mem;
+        int err;
+
+@@ -48,12 +49,16 @@ void kvm__init_ram(struct kvm *kvm)
+
+        kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
+                                        SZ_2M);
++       extra_memory = (unsigned long)kvm->ram_start - (unsigned long)kvm->arch.ram_alloc_start;
++       if (extra_memory) {
++               munmap(kvm->arch.ram_alloc_start,  extra_memory);
++               /* Only here for kvm__arch_delete_ram, the fields should be removed */
++               kvm->arch.ram_alloc_start = kvm->ram_start;
++               kvm->arch.ram_alloc_size = kvm->ram_size;
++       }
+
+-       madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+-               MADV_MERGEABLE);
+-
+-       madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+-               MADV_HUGEPAGE);
++       madvise(kvm->ram_start, kvm->ram_size, MADV_MERGEABLE);
++       madvise(kvm->ram_start, kvm->ram_size, MADV_HUGEPAGE);
+
+        phys_start      = kvm->cfg.ram_addr;
+        phys_size       = kvm->ram_size;
+
+Warning, untested code.
+
+Then you can fold this into mmap_anon_or_hugetlbfs_aligned(). You can do
+whatever you want with the code without giving me any credit.
+
+> 
+> >
+> > >
+> > > >
+> > > > > allocate and map aligned memory without overallocating, and bring
+> > > >
+> > > > If your goal is to remove the overallocting of memory, you can just munmap
+> > > > the extra memory after alignment is performed. To do that you don't need to
+> > > > allocate everything using a memfd.
+> > > >
+> > > > > kvmtool closer to a more consistent way of allocating guest memory, in
+> > > > > a similar manner to other VMMs.
+> > > >
+> > > > I would really appreciate pointing me to where qemu allocates memory using
+> > > > memfd when invoked with -m <size>. I was able to follow the hostmem-ram
+> > > > backend allocation function until g_malloc0(), but I couldn't find the
+> > > > implementation for that.
+> > >
+> > > You're right. I thought that the memfd backend was the default, but
+> > > looking again it's not.
+> > >
+> > > > >
+> > > > > Moreover, with the private memory proposal [1], whether the fd-based
+> > > > > support available can be queried by a KVM capability. If it's
+> > > > > available kvmtool would use the fd, if it's not available, it would
+> > > > > use the host-mapped address. Therefore, there isn’t a need for a
+> > > > > command line option, unless for testing.
+> > > >
+> > > > Why would anyone want to use private memory by default for a
+> > > > non-confidential VM?
+> > >
+> > > The idea is that, at least when pKVM is enabled, we would use the
+> > > proposed extensions for all guests, i.e., memory via a file
+> > > descriptor, regardless whether the guest is protected (thus the memory
+> > > would be private), or not.
+> >
+> > kvmtool can be used to run virtual machines when pKVM is not enabled. In
+> > fact, it has been used that way for way longer than pKVM has existed. What
+> > about those users?
+> 
+> This does not affect these users, which is the point of these patches.
+> This allows new uses as well as maintaining the existing one, and
+> enables potentially new ones in the future.
+
+On the contrary, this affects people that don't use pKVM, because you are
+changing how allocating anonymous memory works.
+
+> 
+> > >
+> > >
+> > > > >
+> > > > > I have implemented this all the way to support the private memory
+> > > > > proposal in kvmtool [5], but I haven’t posted these since the private
+> > > > > memory proposal itself is still in flux. If you’re interested you
+> > > >
+> > > > Are you saying that you are not really sure how the userspace API will end
+> > > > up looking? If that's the case, wouldn't it make more sense to wait for the
+> > > > API to stabilize and then send support for it as one nice series?
+> > >
+> > > Yes, I'm not sure how it will end up looking. We know that it will be
+> > > fd-based though, which is why I thought it might be good to start with
+> > > that.
+> >
+> > If you're not sure how it will end up looking, then why change kvmtool now?
+> 
+> Because we are sure that it will be fd-based, and because I thought
+> that getting a head start to set the scene would be helpful. The part
+> that is uncertain is the kvm capabilities, flags, and names of the new
+> memory region extensions, none of which I address in these patches.
+
+I see, that makes sense. My feedback so far is that you haven't provided a
+good reason why this change to anonymous memory makes sense right now.
+
+Thanks,
+Alex
+
+> 
+> Cheers,
+> /fuad
+> 
+> > Thanks,
+> > Alex
+> >
+> > >
+> > > Cheers,
+> > > /fuad
+> > >
+> > >
+> > >
+> > > > Thanks,
+> > > > Alex
+> > > >
+> > > > > could have a look on how I would go ahead building on these patches
+> > > > > for full support of private memory backed by an fd.
+> > > > >
+> > > > > > Regarding IPC memory sharing, is mmap'ing an memfd file enough to enable
+> > > > > > that? If more work is needed for it, then wouldn't it make more sense to do
+> > > > > > all the changes at once? This change might look sensible right now, but it
+> > > > > > might turn out that it was the wrong way to go about it when someone
+> > > > > > actually starts implementing memory sharing.
+> > > > >
+> > > > > I don’t plan on supporting IPC memory sharing. I just mentioned that
+> > > > > as yet another use case that would benefit from guest memory being
+> > > > > fd-based, should kvmtool decide to support it in the future.
+> > > > >
+> > > > > Cheers,
+> > > > > /fuad
+> > > > >
+> > > > > [1] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.intel.com/
+> > > > > [2] https://github.com/qemu/qemu
+> > > > > [3] https://chromium.googlesource.com/chromiumos/platform/crosvm/
+> > > > > [4] https://github.com/chao-p/qemu/tree/privmem-v9
+> > > > > [5] https://android-kvm.googlesource.com/kvmtool/+/refs/heads/tabba/fdmem-v9-core
+> > > > >
+> > > > >
+> > > > >
+> > > > > >
+> > > > > > Regarding IPC memory sharing, is mmap'ing an memfd file enough to enable
+> > > > > > that? If more work is needed for it, then wouldn't it make more sense to do
+> > > > > > all the changes at once? This change might look sensible right now, but it
+> > > > > > might turn out that it was the wrong way to go about it when someone
+> > > > > > actually starts implementing memory sharing.
+> > > > > >
+> > > > > > Thanks,
+> > > > > > Alex
+> > > > > >
+> > > > > > >
+> > > > > > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > > > > >
+> > > > > > > [*] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.intel.com/
+> > > > > > > ---
+> > > > > > >  include/kvm/kvm.h  |  1 +
+> > > > > > >  include/kvm/util.h |  3 +++
+> > > > > > >  kvm.c              |  4 ++++
+> > > > > > >  util/util.c        | 33 ++++++++++++++++++++-------------
+> > > > > > >  4 files changed, 28 insertions(+), 13 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> > > > > > > index 3872dc6..d0d519b 100644
+> > > > > > > --- a/include/kvm/kvm.h
+> > > > > > > +++ b/include/kvm/kvm.h
+> > > > > > > @@ -87,6 +87,7 @@ struct kvm {
+> > > > > > >       struct kvm_config       cfg;
+> > > > > > >       int                     sys_fd;         /* For system ioctls(), i.e. /dev/kvm */
+> > > > > > >       int                     vm_fd;          /* For VM ioctls() */
+> > > > > > > +     int                     ram_fd;         /* For guest memory. */
+> > > > > > >       timer_t                 timerid;        /* Posix timer for interrupts */
+> > > > > > >
+> > > > > > >       int                     nrcpus;         /* Number of cpus to run */
+> > > > > > > diff --git a/include/kvm/util.h b/include/kvm/util.h
+> > > > > > > index 61a205b..369603b 100644
+> > > > > > > --- a/include/kvm/util.h
+> > > > > > > +++ b/include/kvm/util.h
+> > > > > > > @@ -140,6 +140,9 @@ static inline int pow2_size(unsigned long x)
+> > > > > > >  }
+> > > > > > >
+> > > > > > >  struct kvm;
+> > > > > > > +int memfd_alloc(u64 size, bool hugetlb, u64 blk_size);
+> > > > > > > +void *mmap_anon_or_hugetlbfs_align(struct kvm *kvm, const char *htlbfs_path,
+> > > > > > > +                                u64 size, u64 align);
+> > > > > > >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
+> > > > > > >
+> > > > > > >  #endif /* KVM__UTIL_H */
+> > > > > > > diff --git a/kvm.c b/kvm.c
+> > > > > > > index 78bc0d8..ed29d68 100644
+> > > > > > > --- a/kvm.c
+> > > > > > > +++ b/kvm.c
+> > > > > > > @@ -160,6 +160,7 @@ struct kvm *kvm__new(void)
+> > > > > > >       mutex_init(&kvm->mem_banks_lock);
+> > > > > > >       kvm->sys_fd = -1;
+> > > > > > >       kvm->vm_fd = -1;
+> > > > > > > +     kvm->ram_fd = -1;
+> > > > > > >
+> > > > > > >  #ifdef KVM_BRLOCK_DEBUG
+> > > > > > >       kvm->brlock_sem = (pthread_rwlock_t) PTHREAD_RWLOCK_INITIALIZER;
+> > > > > > > @@ -174,6 +175,9 @@ int kvm__exit(struct kvm *kvm)
+> > > > > > >
+> > > > > > >       kvm__arch_delete_ram(kvm);
+> > > > > > >
+> > > > > > > +     if (kvm->ram_fd >= 0)
+> > > > > > > +             close(kvm->ram_fd);
+> > > > > > > +
+> > > > > > >       list_for_each_entry_safe(bank, tmp, &kvm->mem_banks, list) {
+> > > > > > >               list_del(&bank->list);
+> > > > > > >               free(bank);
+> > > > > > > diff --git a/util/util.c b/util/util.c
+> > > > > > > index d3483d8..278bcc2 100644
+> > > > > > > --- a/util/util.c
+> > > > > > > +++ b/util/util.c
+> > > > > > > @@ -102,36 +102,38 @@ static u64 get_hugepage_blk_size(const char *htlbfs_path)
+> > > > > > >       return sfs.f_bsize;
+> > > > > > >  }
+> > > > > > >
+> > > > > > > -static void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size, u64 blk_size)
+> > > > > > > +int memfd_alloc(u64 size, bool hugetlb, u64 blk_size)
+> > > > > > >  {
+> > > > > > >       const char *name = "kvmtool";
+> > > > > > >       unsigned int flags = 0;
+> > > > > > >       int fd;
+> > > > > > > -     void *addr;
+> > > > > > > -     int htsize = __builtin_ctzl(blk_size);
+> > > > > > >
+> > > > > > > -     if ((1ULL << htsize) != blk_size)
+> > > > > > > -             die("Hugepage size must be a power of 2.\n");
+> > > > > > > +     if (hugetlb) {
+> > > > > > > +             int htsize = __builtin_ctzl(blk_size);
+> > > > > > >
+> > > > > > > -     flags |= MFD_HUGETLB;
+> > > > > > > -     flags |= htsize << MFD_HUGE_SHIFT;
+> > > > > > > +             if ((1ULL << htsize) != blk_size)
+> > > > > > > +                     die("Hugepage size must be a power of 2.\n");
+> > > > > > > +
+> > > > > > > +             flags |= MFD_HUGETLB;
+> > > > > > > +             flags |= htsize << MFD_HUGE_SHIFT;
+> > > > > > > +     }
+> > > > > > >
+> > > > > > >       fd = memfd_create(name, flags);
+> > > > > > >       if (fd < 0)
+> > > > > > > -             die("Can't memfd_create for hugetlbfs map\n");
+> > > > > > > +             die("Can't memfd_create for memory map\n");
+> > > > > > > +
+> > > > > > >       if (ftruncate(fd, size) < 0)
+> > > > > > >               die("Can't ftruncate for mem mapping size %lld\n",
+> > > > > > >                       (unsigned long long)size);
+> > > > > > > -     addr = mmap(NULL, size, PROT_RW, MAP_PRIVATE, fd, 0);
+> > > > > > > -     close(fd);
+> > > > > > >
+> > > > > > > -     return addr;
+> > > > > > > +     return fd;
+> > > > > > >  }
+> > > > > > >
+> > > > > > >  /* This function wraps the decision between hugetlbfs map (if requested) or normal mmap */
+> > > > > > >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+> > > > > > >  {
+> > > > > > >       u64 blk_size = 0;
+> > > > > > > +     int fd;
+> > > > > > >
+> > > > > > >       /*
+> > > > > > >        * We don't /need/ to map guest RAM from hugetlbfs, but we do so
+> > > > > > > @@ -146,9 +148,14 @@ void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+> > > > > > >               }
+> > > > > > >
+> > > > > > >               kvm->ram_pagesize = blk_size;
+> > > > > > > -             return mmap_hugetlbfs(kvm, htlbfs_path, size, blk_size);
+> > > > > > >       } else {
+> > > > > > >               kvm->ram_pagesize = getpagesize();
+> > > > > > > -             return mmap(NULL, size, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
+> > > > > > >       }
+> > > > > > > +
+> > > > > > > +     fd = memfd_alloc(size, htlbfs_path, blk_size);
+> > > > > > > +     if (fd < 0)
+> > > > > > > +             return MAP_FAILED;
+> > > > > > > +
+> > > > > > > +     kvm->ram_fd = fd;
+> > > > > > > +     return mmap(NULL, size, PROT_RW, MAP_PRIVATE, kvm->ram_fd, 0);
+> > > > > > >  }
+> > > > > > > --
+> > > > > > > 2.38.1.431.g37b22c650d-goog
+> > > > > > >
