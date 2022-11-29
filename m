@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8139B63C8A8
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 20:41:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2992563C8AA
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 20:42:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237162AbiK2Tlv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 14:41:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48678 "EHLO
+        id S237174AbiK2Tlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 14:41:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236888AbiK2Tk4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 14:40:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4502E1ADB0
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 11:38:03 -0800 (PST)
+        with ESMTP id S237065AbiK2TlH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 14:41:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BFBB442EE
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 11:38:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669750682;
+        s=mimecast20190719; t=1669750686;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=W3C0J4b/Iq2TqSFgmT2zDR52z47EVntTEYZ6+rgtU/8=;
-        b=aG2l1cO/IgswxACI3gVfOgBUtg7an+dgwgHn7/XK4Il7kaHAWUCgBdAWfQBs5VGOk7IE2P
-        vU/aZ9dhR2aS0cH8u/dQl8aeQD6izDmG3AbFEQlyCoXywrJpgUcDgnog8+uJyzqSC69032
-        ls0k0gfJRPoP1yi8lge6U4KPRGffkBU=
+        bh=8DWsatb5cdHreCXzHDkIF/f3CHfD6y+ENtUisNkNx+I=;
+        b=QY6Jdkj0xFm0XbxytdEWw28FkwtPfcLdWL2GmQRR5uzsvFWKI6DpxHVnc5OG1ibGDyf+jK
+        0YH7eDFvePrzB/iT599kuS1cPqQm1J2wEWhuRijO+NhBPmbLnumb6igGo3X4cKqzoDW92C
+        O4SwZzzzkpq7tUGhcv1V2j2hO6jOzsQ=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-247-s4zjxzx_Nja3jk2eWklLvQ-1; Tue, 29 Nov 2022 14:37:57 -0500
-X-MC-Unique: s4zjxzx_Nja3jk2eWklLvQ-1
+ us-mta-76-r4lRUZj7OwCnv_6ASj17GA-1; Tue, 29 Nov 2022 14:38:01 -0500
+X-MC-Unique: r4lRUZj7OwCnv_6ASj17GA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F25E73817A62;
-        Tue, 29 Nov 2022 19:37:55 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9F84C1C06ED8;
+        Tue, 29 Nov 2022 19:38:00 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 00B312028CE4;
-        Tue, 29 Nov 2022 19:37:51 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4D7AE2028CE4;
+        Tue, 29 Nov 2022 19:37:56 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Sandipan Das <sandipan.das@amd.com>,
@@ -58,9 +58,9 @@ Cc:     Sandipan Das <sandipan.das@amd.com>,
         Sean Christopherson <seanjc@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Santosh Shukla <santosh.shukla@amd.com>
-Subject: [PATCH v2 08/11] x86/cpu: Add CPUID feature bit for VNMI
-Date:   Tue, 29 Nov 2022 21:37:14 +0200
-Message-Id: <20221129193717.513824-9-mlevitsk@redhat.com>
+Subject: [PATCH v2 09/11] KVM: SVM: Add VNMI bit definition
+Date:   Tue, 29 Nov 2022 21:37:15 +0200
+Message-Id: <20221129193717.513824-10-mlevitsk@redhat.com>
 In-Reply-To: <20221129193717.513824-1-mlevitsk@redhat.com>
 References: <20221129193717.513824-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -78,34 +78,46 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Santosh Shukla <santosh.shukla@amd.com>
 
-VNMI feature allows the hypervisor to inject NMI into the guest w/o
-using Event injection mechanism, The benefit of using VNMI over the
-event Injection that does not require tracking the Guest's NMI state and
-intercepting the IRET for the NMI completion. VNMI achieves that by
-exposing 3 capability bits in VMCB intr_cntrl which helps with
-virtualizing NMI injection and NMI_Masking.
+VNMI exposes 3 capability bits (V_NMI, V_NMI_MASK, and V_NMI_ENABLE) to
+virtualize NMI and NMI_MASK, Those capability bits are part of
+VMCB::intr_ctrl -
+V_NMI(11) - Indicates whether a virtual NMI is pending in the guest.
+V_NMI_MASK(12) - Indicates whether virtual NMI is masked in the guest.
+V_NMI_ENABLE(26) - Enables the NMI virtualization feature for the guest.
 
-The presence of this feature is indicated via the CPUID function
-0x8000000A_EDX[25].
+When Hypervisor wants to inject NMI, it will set V_NMI bit, Processor
+will clear the V_NMI bit and Set the V_NMI_MASK which means the Guest is
+handling NMI, After the guest handled the NMI, The processor will clear
+the V_NMI_MASK on the successful completion of IRET instruction Or if
+VMEXIT occurs while delivering the virtual NMI.
+
+To enable the VNMI capability, Hypervisor need to program
+V_NMI_ENABLE bit 1.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
 ---
- arch/x86/include/asm/cpufeatures.h | 1 +
- 1 file changed, 1 insertion(+)
+ arch/x86/include/asm/svm.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 1419c4e04d45f3..ed50f28bdf235b 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -359,6 +359,7 @@
- #define X86_FEATURE_VGIF		(15*32+16) /* Virtual GIF */
- #define X86_FEATURE_X2AVIC		(15*32+18) /* Virtual x2apic */
- #define X86_FEATURE_V_SPEC_CTRL		(15*32+20) /* Virtual SPEC_CTRL */
-+#define X86_FEATURE_AMD_VNMI		(15*32+25) /* Virtual NMI */
- #define X86_FEATURE_SVME_ADDR_CHK	(15*32+28) /* "" SVME addr check */
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index cb1ee53ad3b189..26d6f549ce2b46 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -203,6 +203,13 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define X2APIC_MODE_SHIFT 30
+ #define X2APIC_MODE_MASK (1 << X2APIC_MODE_SHIFT)
  
- /* Intel-defined CPU features, CPUID level 0x00000007:0 (ECX), word 16 */
++#define V_NMI_PENDING_SHIFT 11
++#define V_NMI_PENDING (1 << V_NMI_PENDING_SHIFT)
++#define V_NMI_MASK_SHIFT 12
++#define V_NMI_MASK (1 << V_NMI_MASK_SHIFT)
++#define V_NMI_ENABLE_SHIFT 26
++#define V_NMI_ENABLE (1 << V_NMI_ENABLE_SHIFT)
++
+ #define LBR_CTL_ENABLE_MASK BIT_ULL(0)
+ #define VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK BIT_ULL(1)
+ 
 -- 
 2.26.3
 
