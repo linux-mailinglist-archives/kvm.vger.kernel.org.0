@@ -2,118 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CBF263BD13
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 10:35:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5F8A63BD21
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 10:42:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230265AbiK2Jfx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 04:35:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38450 "EHLO
+        id S229935AbiK2JmA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 04:42:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231607AbiK2Jfp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 04:35:45 -0500
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93B255B5B1;
-        Tue, 29 Nov 2022 01:35:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669714544; x=1701250544;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=YKHhu/G9B2KaPVN3RAKV3BFoAD9eOLEH10z2Gkl2nBY=;
-  b=I2fsUD/o1Aa5+VmkDQeVqqzxMIutoy3g2aUhTlfnPiwFDYduYyNm5dYu
-   YsS5YWs5yu3xZk+nE23mZ8emZfjQEz3ynNDb6SVdqueGP6bzTi87v2DPw
-   1L7BhYrxPpXDWhgR6j4os4oWCA8/IVquyDryx1Nhu+E7xaqNYqzySGPxi
-   4tLwGqW0/UukUHaPHpqY1goxhkngZbWtweVnK8Jv/l7l+RYvXqWaQHKLR
-   wpLh9gSHVwDBJMiryUhUQ2m/iBnvXGVu88LOgFcy/UJz8ws7Vve5M5kFT
-   7sJNWb+kTGQdZQExhQMOiU+P2lVMosRXAI3EraZGIbVt4sCuoOMlyo3uI
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10545"; a="295442200"
-X-IronPort-AV: E=Sophos;i="5.96,202,1665471600"; 
-   d="scan'208";a="295442200"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2022 01:35:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10545"; a="818156895"
-X-IronPort-AV: E=Sophos;i="5.96,202,1665471600"; 
-   d="scan'208";a="818156895"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by orsmga005.jf.intel.com with ESMTP; 29 Nov 2022 01:35:40 -0800
-From:   Yi Liu <yi.l.liu@intel.com>
-To:     jgg@nvidia.com
-Cc:     alex.williamson@redhat.com, kevin.tian@intel.com,
-        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
-        yi.y.sun@linux.intel.com, intel-gvt-dev@lists.freedesktop.org,
-        linux-s390@vger.kernel.org
-Subject: [iommufd PATCH v2 2/2] vfio/ap: validate iova during dma_unmap and trigger irq disable
-Date:   Tue, 29 Nov 2022 01:35:35 -0800
-Message-Id: <20221129093535.359357-3-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221129093535.359357-1-yi.l.liu@intel.com>
-References: <20221129093535.359357-1-yi.l.liu@intel.com>
+        with ESMTP id S230021AbiK2Jlu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 04:41:50 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA38D5C0E2
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 01:41:49 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AT7IPdh006636
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 09:41:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=vRBLPQGax4KUVqw/MVCszbCyaoq/Gjyqs1F/Q78bd7k=;
+ b=jhC6mm3zWgAXtoIHFfq+J2F5bIaWb62fENAKunWLH8Q7ULO4vnyaSjWrUpjGuMSV/Nkm
+ xeSp/hwcLyIO3K2Rl4ox/iZD9mzHlVUJy+phkuCTot6lhgx6LBWTBORr0cFTQYZGmzNh
+ afuq5zsfmXE16Mi325RrDInH0ErDGyqCnFsT5mRXFAfeBSIuCRtjSn03gjuyiV7hQy5n
+ 6KhuCDZwdhO2uef0oDgJ93WwdXbYvv+YvAIJ9hRpl3Kiphxc/UrbAmMbnhiCGwCraeuM
+ KvIDY1JaZf6hnTeIQ7LGSWuKdTOEJ1grnKjq5XsU+9nqyxr7MzXP2B7WjQ9jruLTs9NY rw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m5djwk81y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 09:41:49 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AT9aSAZ016600
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 09:41:48 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m5djwk818-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 29 Nov 2022 09:41:48 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AT9ZFXo010999;
+        Tue, 29 Nov 2022 09:41:46 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma05fra.de.ibm.com with ESMTP id 3m3ae9arnv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 29 Nov 2022 09:41:46 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AT9fhvl27984630
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 29 Nov 2022 09:41:43 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6453342041;
+        Tue, 29 Nov 2022 09:41:43 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 22C0A4203F;
+        Tue, 29 Nov 2022 09:41:43 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.56])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 29 Nov 2022 09:41:43 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, nrb@linux.ibm.com, seiden@linux.ibm.com,
+        scgl@linux.ibm.com, thuth@redhat.com
+Subject: [PATCH v2 0/2] lib: s390x: add PSW and PSW_CUR_MASK macros
+Date:   Tue, 29 Nov 2022 10:41:40 +0100
+Message-Id: <20221129094142.10141-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: o1ge9XV_XilfpyXl-Ce52cMqRTT3XDNd
+X-Proofpoint-GUID: vZG9UVDjN62a6gZJvO3CoAl26gi8rb3G
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-29_06,2022-11-28_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ mlxscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=752 spamscore=0
+ clxscore=1015 lowpriorityscore=0 phishscore=0 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211290059
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Matthew Rosato <mjrosato@linux.ibm.com>
 
-Currently, each mapped iova is stashed in its associated vfio_ap_queue;
-when we get an unmap request, validate that it matches with one or more
-of these stashed values before attempting unpins.
+Since a lot of code starts new CPUs using the current PSW mask, add two
+macros to streamline the creation of generic PSWs and PSWs with the
+current program mask.
 
-Each stashed iova represents IRQ that was enabled for a queue.  Therefore,
-if a match is found, trigger IRQ disable for this queue to ensure that
-underlying firmware will no longer try to use the associated pfn after
-the page is unpinned. IRQ disable will also handle the associated unpin.
+Update the existing code to use the newly introduced macros.
 
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/s390/crypto/vfio_ap_ops.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 0b4cc8c597ae..8bf353d46820 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -1535,13 +1535,29 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
- 	return 0;
- }
- 
-+static void unmap_iova(struct ap_matrix_mdev *matrix_mdev, u64 iova, u64 length)
-+{
-+	struct ap_queue_table *qtable = &matrix_mdev->qtable;
-+	struct vfio_ap_queue *q;
-+	int loop_cursor;
-+
-+	hash_for_each(qtable->queues, loop_cursor, q, mdev_qnode) {
-+		if (q->saved_iova >= iova && q->saved_iova < iova + length)
-+			vfio_ap_irq_disable(q);
-+	}
-+}
-+
- static void vfio_ap_mdev_dma_unmap(struct vfio_device *vdev, u64 iova,
- 				   u64 length)
- {
- 	struct ap_matrix_mdev *matrix_mdev =
- 		container_of(vdev, struct ap_matrix_mdev, vdev);
- 
--	vfio_unpin_pages(&matrix_mdev->vdev, iova, 1);
-+	mutex_lock(&matrix_dev->mdevs_lock);
-+
-+	unmap_iova(matrix_mdev, iova, length);
-+
-+	mutex_unlock(&matrix_dev->mdevs_lock);
- }
- 
- /**
+Claudio Imbrenda (2):
+  lib: s390x: add PSW and PSW_CUR_MASK macros
+  s390x: use the new PSW and PSW_CUR_MASK macros
+
+ lib/s390x/asm/arch_def.h |  4 +++
+ s390x/adtl-status.c      | 24 +++---------------
+ s390x/firq.c             |  5 +---
+ s390x/migration.c        |  6 +----
+ s390x/skrf.c             |  7 +-----
+ s390x/smp.c              | 53 +++++++++-------------------------------
+ s390x/uv-host.c          |  5 +---
+ 7 files changed, 23 insertions(+), 81 deletions(-)
+
 -- 
-2.34.1
+2.38.1
 
