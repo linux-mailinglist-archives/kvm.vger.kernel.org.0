@@ -2,86 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD4A363C2E2
-	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 15:43:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 162C363C35C
+	for <lists+kvm@lfdr.de>; Tue, 29 Nov 2022 16:15:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235777AbiK2OnH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 09:43:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49610 "EHLO
+        id S233947AbiK2PPZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 10:15:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235752AbiK2OnB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 09:43:01 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B28C30F4A;
-        Tue, 29 Nov 2022 06:43:00 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id l22-20020a17090a3f1600b00212fbbcfb78so17539677pjc.3;
-        Tue, 29 Nov 2022 06:43:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G1K/S2qvXKDafV6DPA+7kDpqM5e0swHr/b4XJtu355Q=;
-        b=TSoCoyZDKUQMfWUNIh8atxgcwoWpTJd9pvvrBSWFspxefz2R+3Mg91AA/XywjuRY4x
-         d1OH5nY7uxtF/pO2o6C8nJ/145jU8/NVxX8vJk9pb23p7m5+GZgw91ooSTEqDOIaCjJb
-         hiy8MTsUlDSOEa5QuU6tT3Ck+TnykibUTLpH16Omr4tzNixFTYspEG9W0/QOmmcP6ZDf
-         oZJJnE/DrW/Y1VrxKJjVnKYWBNVZrtWt3oosJbPJ230tSDoDTnrxmg4hKihPlEhL5tjR
-         1TVpfuxMQfhUWvStqH1wwPHncdInkk85pj1+ScwdWrJBEV3sGlo9QJnKj5Z0bzPiX+/K
-         9/gQ==
+        with ESMTP id S233677AbiK2PPO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 10:15:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F82E2BB13
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 07:14:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669734862;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IeJbxQq4oKJJKxEz1iOkWhtpWVLyX6vpshVx4+Idd6k=;
+        b=JGE9DcvjwAsdNIc06qB5YmTAAtbeHSNQPqFM3mX9BKVdvdgZSZTScd09mdrbJj8psddbRI
+        FJpLTYQE1xzZBJQJEklg6kS6fc3Uzk8iCVXcExyt1tFWE98+pVbHuIcvhVEtzWHFq8YxkH
+        TdxLp7SMA2eX9gqe6Trz1i9cUf/dc1A=
+Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
+ [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-303-_B6B43aSOGyqGq01waezww-1; Tue, 29 Nov 2022 10:14:21 -0500
+X-MC-Unique: _B6B43aSOGyqGq01waezww-1
+Received: by mail-vs1-f71.google.com with SMTP id 190-20020a6719c7000000b003aa14ac75f5so5226313vsz.1
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 07:14:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G1K/S2qvXKDafV6DPA+7kDpqM5e0swHr/b4XJtu355Q=;
-        b=6tU+hH8OPtxTVmkK3pYOOVozpXS3sVklVevzPTvsf1h+fJU/YYbGIzEin02kaLrxxH
-         D15DubRjzoW+1ZyETpOfvyXHy03/+dbtbbf40cbmRa/t8Gts/R9HH9b4Y7FtdC1YZmAE
-         0CrTC3SULCYaXgQq5o9DoCvuSL4PsJhT+6qvzslrKutOcJGyDxKHmIYsukAPIsWcp07n
-         pxVKYafdwqTPsjdbMNEBTMVLzmi+88P91kLLwVJ/OweNUYGrH3ZnhTg7inIjA2I6XbmB
-         RfcVHCFmqA3Cm+cBcNXiCMvfT5n/AWOe82fLmC0kf0KcTkP4xSJ6rECFytFQO2VIjjsy
-         PmkA==
-X-Gm-Message-State: ANoB5pm6MqPUYg5/PqX5zYYiF+IorRrt0YQFWinAWdZckq8ggdBPlpJX
-        muBPoXCgLI258PZRUXZAIVI=
-X-Google-Smtp-Source: AA0mqf67r/XsFNm47qgLGsdoGzx47t44ia2XHmIj2DRTB1Uj5QUQZG1IB2BIF38XHdMX1YLdXCWEcw==
-X-Received: by 2002:a17:90a:2b44:b0:213:d66b:4973 with SMTP id y4-20020a17090a2b4400b00213d66b4973mr66442998pjc.85.1669732979573;
-        Tue, 29 Nov 2022 06:42:59 -0800 (PST)
-Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
-        by smtp.gmail.com with ESMTPSA id z7-20020aa79587000000b005625d5ae760sm10372710pfj.11.2022.11.29.06.42.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Nov 2022 06:42:58 -0800 (PST)
-Message-ID: <6b3bdbbd-d381-3e52-57ec-729c8ab2d042@gmail.com>
-Date:   Tue, 29 Nov 2022 22:42:48 +0800
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IeJbxQq4oKJJKxEz1iOkWhtpWVLyX6vpshVx4+Idd6k=;
+        b=AelEgvQznq/e7avVtYcpDmN9HEEILd3qI2QFJEpocNKGCPD2VOqgOeviaN7Mwqec0S
+         hvpJ9j/tV/ia+4r+jwGJXnloZ+1mCdsnPNQayHK4VdIijaDf7veuLOQuDsfr8uvgCZ0O
+         YvGace8zQGrg67uomzHixa1Sj0cLP9BB1rSWk6dymndANgI9OXLbbADcrGEsE7p5xkUF
+         OfntU29wySM+9WCrOokEb3z1fO+1Y4gXm/9qgAiQtJb+gDRVDTbb72SRDiY61Rt3Zdt1
+         z7yiJ3gZgPrBbqzaDXS48qjZsoklGQSX6X8YwEb/py+kn/LhN8LU7oycHZ33AhSMaKkJ
+         iplQ==
+X-Gm-Message-State: ANoB5pnCAzViJAu6NLV4ZhqJoZqclbMfo3hIJ8Mg70/GIjCQ5hwX75QT
+        QNRZ2n7Pdu6fL0Fu3lINWaA4mRBQ5m11BzCplbMNn4Q2dKNACvq+IExwnV3v07suvNbfK3lQcwV
+        I7cOmDLYBGoKsPKAg8/5DcLXZr3CI
+X-Received: by 2002:a05:6102:3fa1:b0:3a6:aae4:cab6 with SMTP id o33-20020a0561023fa100b003a6aae4cab6mr31965897vsv.27.1669734860673;
+        Tue, 29 Nov 2022 07:14:20 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4Eq4ktzAz6wk4yJ1feDHHcUBL7TWADnI4bM+SjL3EJOIZBy0IOhTulfF9sPIFDHQRStgSwqLNwSr+QFsdvzMU=
+X-Received: by 2002:a05:6102:3fa1:b0:3a6:aae4:cab6 with SMTP id
+ o33-20020a0561023fa100b003a6aae4cab6mr31965877vsv.27.1669734860366; Tue, 29
+ Nov 2022 07:14:20 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [RFC PATCH V2 01/18] x86/sev: Pvalidate memory gab for
- decompressing kernel
-Content-Language: en-US
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
-        tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
-References: <20221119034633.1728632-1-ltykernel@gmail.com>
- <20221119034633.1728632-2-ltykernel@gmail.com> <Y4YBfk3lyUJie4bR@zn.tnic>
-From:   Tianyu Lan <ltykernel@gmail.com>
-In-Reply-To: <Y4YBfk3lyUJie4bR@zn.tnic>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20221125085454.16673-1-frankja@linux.ibm.com>
+In-Reply-To: <20221125085454.16673-1-frankja@linux.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Tue, 29 Nov 2022 16:14:07 +0100
+Message-ID: <CABgObfb5oGOmaN8MOVrgXHeQfa-80dQnY2mCan2RA-ZnGXbrDA@mail.gmail.com>
+Subject: Re: [GIT PULL 0/1] s390 fixes for 6.1-rc7/8
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, david@redhat.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, linux-s390@vger.kernel.org,
+        imbrenda@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,161 +73,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/29/2022 8:56 PM, Borislav Petkov wrote:
->> +/* Check SEV-SNP via MSR */
->> +static bool sev_snp_runtime_check(void)
-> Functions need to have a verb in the name.
-> 
->> +{
->> +	unsigned long low, high;
->> +	u64 val;
->> +
->> +	asm volatile("rdmsr\n" : "=a" (low), "=d" (high) :
->> +			"c" (MSR_AMD64_SEV));
->> +
->> +	val = (high << 32) | low;
->> +	if (val & MSR_AMD64_SEV_SNP_ENABLED)
->> +		return true;
-> There already is a sev_snp_enabled() in that very same file. Did you not
-> see it?
-> 
-> Why are you even adding such a function?!
-Hi Boris:
-	Thanks for your review. sev_snp_enabled() is used after
-sev_status was initialized in sev_enable() while  pvalidate_for_startup_
-64() is called before sev_enable(). So add sev_snp_runtime_check() to 
-check sev snp capability before calling sev_enable().
+On Fri, Nov 25, 2022 at 9:55 AM Janosch Frank <frankja@linux.ibm.com> wrote:
+>
+> Dear Paolo,
+>
+> please pull Thomas' fix for VSIE.
+> We deem it to be low risk and it survived a day in our CI without any errors.
+> It's a bit late so let's see if it makes 6.1 or 6.2.
+>
+>
+> The following changes since commit eb7081409f94a9a8608593d0fb63a1aa3d6f95d8:
+>
+>   Linux 6.1-rc6 (2022-11-20 16:02:16 -0800)
+>
+> are available in the Git repository at:
+>
+>   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-master-6.1-2
+>
+> for you to fetch changes up to 0dd4cdccdab3d74bd86b868768a7dca216bcce7e:
+>
+>   KVM: s390: vsie: Fix the initialization of the epoch extension (epdx) field (2022-11-24 14:43:17 +0100)
 
-> 
->> +	return false;
->> +}
->> +
->>   static inline bool sev_snp_enabled(void)
->>   {
->>   	return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
->> @@ -456,3 +475,68 @@ void sev_prep_identity_maps(unsigned long top_level_pgt)
->>   
->>   	sev_verify_cbit(top_level_pgt);
->>   }
->> +
->> +static void extend_e820_on_demand(struct boot_e820_entry *e820_entry,
->> +				  u64 needed_ram_end)
->> +{
->> +	u64 end, paddr;
->> +	unsigned long eflags;
->> +	int rc;
->> +
->> +	if (!e820_entry)
->> +		return;
->> +
->> +	/* Validated memory must be aligned by PAGE_SIZE. */
->> +	end = ALIGN(e820_entry->addr + e820_entry->size, PAGE_SIZE);
->> +	if (needed_ram_end > end && e820_entry->type == E820_TYPE_RAM) {
->> +		for (paddr = end; paddr < needed_ram_end; paddr += PAGE_SIZE) {
->> +			rc = pvalidate(paddr, RMP_PG_SIZE_4K, true);
->> +			if (rc) {
->> +				error("Failed to validate address.n");
->> +				return;
->> +			}
->> +		}
->> +		e820_entry->size = needed_ram_end - e820_entry->addr;
->> +	}
->> +}
->> +
->> +/*
->> + * Explicitly pvalidate needed pages for decompressing the kernel.
->> + * The E820_TYPE_RAM entry includes only validated memory. The kernel
->> + * expects that the RAM entry's addr is fixed while the entry size is to be
->> + * extended to cover addresses to the start of next entry.
->> + * The function increases the RAM entry size to cover all possible memory
-> Similar issue as above: you don't need to say "this function" above this
-> function. IOW, it should say:
-> 
-> "Increase the RAM entry size..."
-> 
-> I.e., imperative mood above.
-> 
->> + * addresses until init_size.
->> + * For example,  init_end = 0x4000000,
->> + * [RAM: 0x0 - 0x0],                       M[RAM: 0x0 - 0xa0000]
->> + * [RSVD: 0xa0000 - 0x10000]                [RSVD: 0xa0000 - 0x10000]
->> + * [ACPI: 0x10000 - 0x20000]      ==>       [ACPI: 0x10000 - 0x20000]
->> + * [RSVD: 0x800000 - 0x900000]              [RSVD: 0x800000 - 0x900000]
->> + * [RAM: 0x1000000 - 0x2000000]            M[RAM: 0x1000000 - 0x2001000]
->> + * [RAM: 0x2001000 - 0x2007000]            M[RAM: 0x2001000 - 0x4000000]
-> What is this trying to tell me?
-> 
-> That the end range 0x2007000 gets raised to 0x4000000?
-> 
-> Why?
-> 
-> This all sounds like there is some requirement somewhere but nothing
-> says what that requirement is and why.
-> 
->> + * Other RAM memory after init_end is pvalidated by ms_hyperv_init_platform
->> + */
->> +__visible void pvalidate_for_startup_64(struct boot_params *boot_params)
-> This doesn't do any validation. And yet it has "pvalidate" in the name.
-> 
->> +{
->> +	struct boot_e820_entry *e820_entry;
->> +	u64 init_end =
->> +		boot_params->hdr.pref_address + boot_params->hdr.init_size;
-> Nope, we never break lines like that.
-> 
->> +	u8 i, nr_entries = boot_params->e820_entries;
->> +	u64 needed_end;
-> The tip-tree preferred ordering of variable declarations at the
-> beginning of a function is reverse fir tree order::
-> 
-> 	struct long_struct_name *descriptive_name;
-> 	unsigned long foo, bar;
-> 	unsigned int tmp;
-> 	int ret;
-> 
-> The above is faster to parse than the reverse ordering::
-> 
-> 	int ret;
-> 	unsigned int tmp;
-> 	unsigned long foo, bar;
-> 	struct long_struct_name *descriptive_name;
-> 
-> And even more so than random ordering::
-> 
-> 	unsigned long foo, bar;
-> 	int ret;
-> 	struct long_struct_name *descriptive_name;
-> 	unsigned int tmp;
-> 
->> +	if (!sev_snp_runtime_check())
->> +		return;
->> +
->> +	for (i = 0; i < nr_entries; ++i) {
->> +		/* Pvalidate memory holes in e820 RAM entries. */
->> +		e820_entry = &boot_params->e820_table[i];
->> +		if (i < nr_entries - 1) {
->> +			needed_end = boot_params->e820_table[i + 1].addr;
->> +			if (needed_end < e820_entry->addr)
->> +				error("e820 table is not sorted.\n");
->> +		} else {
->> +			needed_end = init_end;
->> +		}
->> +		extend_e820_on_demand(e820_entry, needed_end);
-> Now*this*  function does call pvalidate() and yet it doesn't have
-> "pvalidate" in the name. This all looks real confused.
-> 
-> So first of all, you need to explain*why*  you're doing this.
-> 
-> It looks like it is because the guest needs to do the memory validation
-> by itself because nobody else does that.
-> 
-> If so, this needs to be explained in detail in the commit message.
+Pulled, thanks.
 
-Yes, I will update in the next version. Thanks for suggestion.
+Paolo
 
-> 
-> Also, why is that ok for SNP guests on other hypervisors which get the
-> memory validated by the boot loader or firmware?
+>
+> ----------------------------------------------------------------
+> VSIE epdx shadowing fix
+>
+> ----------------------------------------------------------------
+> Thomas Huth (1):
+>       KVM: s390: vsie: Fix the initialization of the epoch extension (epdx) field
+>
+>  arch/s390/kvm/vsie.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> Thomas Huth (1):
+>   KVM: s390: vsie: Fix the initialization of the epoch extension (epdx)
+>     field
+>
+>  arch/s390/kvm/vsie.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> --
+> 2.38.1
+>
 
-This is for Linux direct boot mode and so it needs to do such check 
-here. Will fix this in the next version.
