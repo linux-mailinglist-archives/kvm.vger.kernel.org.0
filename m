@@ -2,69 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A0DED63D77C
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 15:04:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F19D63D78B
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 15:05:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229600AbiK3OEF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 09:04:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60078 "EHLO
+        id S229718AbiK3OFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 09:05:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229811AbiK3ODt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 09:03:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F36E6309
-        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 06:02:39 -0800 (PST)
+        with ESMTP id S229694AbiK3OFj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 09:05:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AE9D2D1F6
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 06:04:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669816958;
+        s=mimecast20190719; t=1669817078;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=T+BHiDu9zOw6vyhcov8wiiClcSogJ9A1zCWUJ+wUdOA=;
-        b=OVV76O4dg3VF5vJx3GJLi1RWf9V0hEuvx8IrNE+EfCmVY+bNBVWWmhZ41tFnzHRSNrpbFa
-        yT7EU1n/GHUTcP74iyXDb5rkKzjD7jDpck9ETm85NkvE+Zx1VSBJ+a3fS876xnyuwZD5vB
-        BkLe/Y6KWi/nnLe1l4hBYd5w73+19ZY=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=PmfmMEZia5mCRP+waDbfWMWwsnLOzBXqjNe8vi6GIVI=;
+        b=As/rg5MJiPWiW/f9JAL8R63sfC+1kf9W6fmeyS7dZrTZqZnz1GHrnNzLGiEbVhLWt1NJTc
+        RZjGMG4+Qwdj+5P0vjBRNZgLxvRJVj2nmBRGiBxAt8vNP+d4SSFlnV1bPbATdDJd2A6O4k
+        xs2PitNPuyq1uitAYKc1uI2wX2b1SXk=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-398-inmGE3UOOo-FM7jYSRvznw-1; Wed, 30 Nov 2022 09:02:37 -0500
-X-MC-Unique: inmGE3UOOo-FM7jYSRvznw-1
-Received: by mail-qk1-f199.google.com with SMTP id de43-20020a05620a372b00b006fae7e5117fso37923509qkb.6
-        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 06:02:37 -0800 (PST)
+ us-mta-57-2Uz8TM8_MhCBqmsGVwn_Iw-1; Wed, 30 Nov 2022 09:04:37 -0500
+X-MC-Unique: 2Uz8TM8_MhCBqmsGVwn_Iw-1
+Received: by mail-qk1-f198.google.com with SMTP id bq13-20020a05620a468d00b006fa5a75759aso39736231qkb.13
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 06:04:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=T+BHiDu9zOw6vyhcov8wiiClcSogJ9A1zCWUJ+wUdOA=;
-        b=N5xJlN5ylLZD5ReVYN2vaC38HnzxEGaWVZBXN+fvpcZdXiVFkSen6ZILd4RaQDxWYo
-         XwSFKo6sAY/Eq9rz2l87e+WFDHH/eLy8RQiCO2GIwl3v5l9z3rtCGmASrS6SgG+NyE+f
-         c/XeQxFdsINmwljBqUtyNhDXRTmxM0obbTtCdzIcvJ6SzG0SlNB4UxkFUhXdCRWeAurh
-         IjE1UCI87O+IUwBDFY5sM7zZ4rcGg6xMWidTGnmD9bFzHRMY6xlPbV5sRiN2Jlu9Gj7R
-         hHS4rEv3aiKpzNOYOaGuL+wf7Wm5+PQHHVd20NK2nJxDlmHiW4DRPnt8TkEO/jwIBIPh
-         tgzg==
-X-Gm-Message-State: ANoB5pmU6enjsNUlFuwzQKR3nMzYt8ERl33q2EY2VuEXAwi5UgfDoamD
-        WooXfWSEURX4PijOdu73aDwXpn9jdKofk0ZXuUeEVallzQ1DrkpIaf/6mQnTaUpf3WjxHm2mTs4
-        QqyxN6moa4A7X
-X-Received: by 2002:a05:620a:3197:b0:6fb:4d23:c462 with SMTP id bi23-20020a05620a319700b006fb4d23c462mr41532084qkb.417.1669816950934;
-        Wed, 30 Nov 2022 06:02:30 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7I1Z0DGg7flA/o1ZdXCN191Q9jL/3XJV/ziGubRq+xeK+ThhnYI0aeB8YhxeHxVxbd2jezyg==
-X-Received: by 2002:a05:620a:3197:b0:6fb:4d23:c462 with SMTP id bi23-20020a05620a319700b006fb4d23c462mr41532036qkb.417.1669816950505;
-        Wed, 30 Nov 2022 06:02:30 -0800 (PST)
+        bh=PmfmMEZia5mCRP+waDbfWMWwsnLOzBXqjNe8vi6GIVI=;
+        b=isfIi/gmnxcmoVrxkk9vomVXO2TshrPc0KZqMZZ96vBKBZvnN/mzzfZ1bTrnsN8mw4
+         phL5i57sdFm08QT0UGIV2+JtxqoGGLpXqvdsuV/psrRnzOBOSMncSETQPywc59A54+7b
+         Th/fIPAlrX6KE2TutU5sK4x4fUY1N4gBvMv5ixrng9PqvF+BWqIQsobSbqwU2JF9f9Ld
+         C8Z+E5hHxD/V4SsGFfNKZ3MDfwfYR2DWW+e83dzQaJS5Rsg/f88EMUmoulgQ5DFcYrGY
+         BBOMf6YnvSj8MxrqoBbJo9zx+62uhQ3el6MXMwiQUrwPgRdJGuJ+DekFA4m6rj8slkRf
+         FASw==
+X-Gm-Message-State: ANoB5pmT0ILvhWxg3QT+FwAYEqAaO9+3BabepxHiyJ5i3ke2WogHp/Zp
+        pau2YnxnwGcTuIuLLNocKTRWEa+2LGOIVNWxH2N/Ou8FCa2hmYuj7sR223TlCxP3JxZPwx0Luwv
+        Kk1LZjNOiFhG1
+X-Received: by 2002:a05:620a:16b5:b0:6fa:b796:18ad with SMTP id s21-20020a05620a16b500b006fab79618admr42594511qkj.634.1669817076408;
+        Wed, 30 Nov 2022 06:04:36 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7oUMNg/V1eMBCuU2wpGVxqSHqGWcDZM60DOpNFsIMgvyIXAFMRp/X/HuKuT8zfF6g86V5N/g==
+X-Received: by 2002:a05:620a:16b5:b0:6fa:b796:18ad with SMTP id s21-20020a05620a16b500b006fab79618admr42594446qkj.634.1669817075698;
+        Wed, 30 Nov 2022 06:04:35 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id z7-20020ac875c7000000b003a4f14378d1sm880649qtq.33.2022.11.30.06.02.25
+        by smtp.gmail.com with ESMTPSA id r14-20020ae9d60e000000b006fa4b111c76sm336535qkk.36.2022.11.30.06.04.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Nov 2022 06:02:29 -0800 (PST)
-Message-ID: <bc1901de-94e2-97a2-6824-5e44e876be23@redhat.com>
-Date:   Wed, 30 Nov 2022 15:02:23 +0100
+        Wed, 30 Nov 2022 06:04:34 -0800 (PST)
+Message-ID: <dc3f5ee7-a260-e22a-03a8-f5b6d9ff5ca9@redhat.com>
+Date:   Wed, 30 Nov 2022 15:04:28 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.3.1
 Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v6 06/19] iommufd: File descriptor, context, kconfig and
- makefiles
+Subject: Re: [PATCH v6 11/19] iommufd: IOCTLs for the io_pagetable
 Content-Language: en-US
 To:     Jason Gunthorpe <jgg@nvidia.com>
 Cc:     Anthony Krowiak <akrowiak@linux.ibm.com>,
@@ -92,14 +91,14 @@ Cc:     Anthony Krowiak <akrowiak@linux.ibm.com>,
         <shameerali.kolothum.thodi@huawei.com>,
         Yi Liu <yi.l.liu@intel.com>, Yu He <yu.he@intel.com>,
         Keqian Zhu <zhukeqian1@huawei.com>
-References: <6-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
+References: <11-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
 From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <6-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
+In-Reply-To: <11-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -110,704 +109,862 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 On 11/29/22 21:29, Jason Gunthorpe wrote:
-> This is the basic infrastructure of a new miscdevice to hold the iommufd
-> IOCTL API.
+> Connect the IOAS to its IOCTL interface. This exposes most of the
+> functionality in the io_pagetable to userspace.
 >
-> It provides:
->  - A miscdevice to create file descriptors to run the IOCTL interface over
+> This is intended to be the core of the generic interface that IOMMUFD will
+> provide. Every IOMMU driver should be able to implement an iommu_domain
+> that is compatible with this generic mechanism.
 >
->  - A table based ioctl dispatch and centralized extendable pre-validation
->    step
+> It is also designed to be easy to use for simple non virtual machine
+> monitor users, like DPDK:
+>  - Universal simple support for all IOMMUs (no PPC special path)
+>  - An IOVA allocator that considers the aperture and the allowed/reserved
+>    ranges
+>  - io_pagetable allows any number of iommu_domains to be connected to the
+>    IOAS
+>  - Automatic allocation and re-use of iommu_domains
 >
->  - An xarray mapping userspace ID's to kernel objects. The design has
->    multiple inter-related objects held within in a single IOMMUFD fd
+> Along with room in the design to add non-generic features to cater to
+> specific HW functionality.
 >
->  - A simple usage count to build a graph of object relations and protect
->    against hostile userspace racing ioctls
->
-> The only IOCTL provided in this patch is the generic 'destroy any object
-> by handle' operation.
->
-> Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 > Tested-by: Nicolin Chen <nicolinc@nvidia.com>
 > Tested-by: Yi Liu <yi.l.liu@intel.com>
 > Tested-by: Lixiao Yang <lixiao.yang@intel.com>
 > Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
 
 Eric
 > ---
->  .../userspace-api/ioctl/ioctl-number.rst      |   1 +
->  MAINTAINERS                                   |  12 +
->  drivers/iommu/Kconfig                         |   1 +
->  drivers/iommu/Makefile                        |   2 +-
->  drivers/iommu/iommufd/Kconfig                 |  12 +
->  drivers/iommu/iommufd/Makefile                |   5 +
->  drivers/iommu/iommufd/iommufd_private.h       | 109 ++++++
->  drivers/iommu/iommufd/main.c                  | 344 ++++++++++++++++++
->  include/linux/iommufd.h                       |  31 ++
->  include/uapi/linux/iommufd.h                  |  55 +++
->  10 files changed, 571 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/iommu/iommufd/Kconfig
->  create mode 100644 drivers/iommu/iommufd/Makefile
->  create mode 100644 drivers/iommu/iommufd/iommufd_private.h
->  create mode 100644 drivers/iommu/iommufd/main.c
->  create mode 100644 include/linux/iommufd.h
->  create mode 100644 include/uapi/linux/iommufd.h
+>  drivers/iommu/iommufd/Makefile          |   1 +
+>  drivers/iommu/iommufd/ioas.c            | 392 ++++++++++++++++++++++++
+>  drivers/iommu/iommufd/iommufd_private.h |  33 ++
+>  drivers/iommu/iommufd/main.c            |  48 +++
+>  include/uapi/linux/iommufd.h            | 256 +++++++++++++++-
+>  5 files changed, 729 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/iommu/iommufd/ioas.c
 >
-> diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
-> index 5f81e2a24a5c04..eb045fc495a4e3 100644
-> --- a/Documentation/userspace-api/ioctl/ioctl-number.rst
-> +++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
-> @@ -105,6 +105,7 @@ Code  Seq#    Include File                                           Comments
->  '8'   all                                                            SNP8023 advanced NIC card
->                                                                       <mailto:mcr@solidum.com>
->  ';'   64-7F  linux/vfio.h
-> +';'   80-FF  linux/iommufd.h
->  '='   00-3f  uapi/linux/ptp_clock.h                                  <mailto:richardcochran@gmail.com>
->  '@'   00-0F  linux/radeonfb.h                                        conflict!
->  '@'   00-0F  drivers/video/aty/aty128fb.c                            conflict!
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 379945f82a6438..c0a93779731d7e 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -10717,6 +10717,18 @@ F:	drivers/iommu/dma-iommu.h
->  F:	drivers/iommu/iova.c
->  F:	include/linux/iova.h
->  
-> +IOMMUFD
-> +M:	Jason Gunthorpe <jgg@nvidia.com>
-> +M:	Kevin Tian <kevin.tian@intel.com>
-> +L:	iommu@lists.linux.dev
-> +S:	Maintained
-> +T:	git git://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git
-> +F:	Documentation/userspace-api/iommufd.rst
-> +F:	drivers/iommu/iommufd/
-> +F:	include/linux/iommufd.h
-> +F:	include/uapi/linux/iommufd.h
-> +F:	tools/testing/selftests/iommu/
-> +
->  IOMMU SUBSYSTEM
->  M:	Joerg Roedel <joro@8bytes.org>
->  M:	Will Deacon <will@kernel.org>
-> diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
-> index dc5f7a156ff5ec..319966cde5cf6c 100644
-> --- a/drivers/iommu/Kconfig
-> +++ b/drivers/iommu/Kconfig
-> @@ -188,6 +188,7 @@ config MSM_IOMMU
->  
->  source "drivers/iommu/amd/Kconfig"
->  source "drivers/iommu/intel/Kconfig"
-> +source "drivers/iommu/iommufd/Kconfig"
->  
->  config IRQ_REMAP
->  	bool "Support for Interrupt Remapping"
-> diff --git a/drivers/iommu/Makefile b/drivers/iommu/Makefile
-> index 7fbf6a3376620e..f461d065138564 100644
-> --- a/drivers/iommu/Makefile
-> +++ b/drivers/iommu/Makefile
-> @@ -1,5 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0
-> -obj-y += amd/ intel/ arm/
-> +obj-y += amd/ intel/ arm/ iommufd/
->  obj-$(CONFIG_IOMMU_API) += iommu.o
->  obj-$(CONFIG_IOMMU_API) += iommu-traces.o
->  obj-$(CONFIG_IOMMU_API) += iommu-sysfs.o
-> diff --git a/drivers/iommu/iommufd/Kconfig b/drivers/iommu/iommufd/Kconfig
-> new file mode 100644
-> index 00000000000000..164812084a675b
-> --- /dev/null
-> +++ b/drivers/iommu/iommufd/Kconfig
-> @@ -0,0 +1,12 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +config IOMMUFD
-> +	tristate "IOMMU Userspace API"
-> +	select INTERVAL_TREE
-> +	select INTERVAL_TREE_SPAN_ITER
-> +	select IOMMU_API
-> +	default n
-> +	help
-> +	  Provides /dev/iommu, the user API to control the IOMMU subsystem as
-> +	  it relates to managing IO page tables that point at user space memory.
-> +
-> +	  If you don't know what to do here, say N.
 > diff --git a/drivers/iommu/iommufd/Makefile b/drivers/iommu/iommufd/Makefile
-> new file mode 100644
-> index 00000000000000..a07a8cffe937c6
-> --- /dev/null
+> index b66a8c47ff55ec..2b4f36f1b72f9d 100644
+> --- a/drivers/iommu/iommufd/Makefile
 > +++ b/drivers/iommu/iommufd/Makefile
-> @@ -0,0 +1,5 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +iommufd-y := \
-> +	main.o
-> +
-> +obj-$(CONFIG_IOMMUFD) += iommufd.o
-> diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
+> @@ -1,6 +1,7 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+>  iommufd-y := \
+>  	io_pagetable.o \
+> +	ioas.o \
+>  	main.o \
+>  	pages.o
+>  
+> diff --git a/drivers/iommu/iommufd/ioas.c b/drivers/iommu/iommufd/ioas.c
 > new file mode 100644
-> index 00000000000000..bb720bc113178d
+> index 00000000000000..6ff97dafc89134
 > --- /dev/null
-> +++ b/drivers/iommu/iommufd/iommufd_private.h
-> @@ -0,0 +1,109 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/* Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
+> +++ b/drivers/iommu/iommufd/ioas.c
+> @@ -0,0 +1,392 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
 > + */
-> +#ifndef __IOMMUFD_PRIVATE_H
-> +#define __IOMMUFD_PRIVATE_H
+> +#include <linux/interval_tree.h>
+> +#include <linux/iommufd.h>
+> +#include <linux/iommu.h>
+> +#include <uapi/linux/iommufd.h>
 > +
-> +#include <linux/rwsem.h>
-> +#include <linux/xarray.h>
-> +#include <linux/refcount.h>
-> +#include <linux/uaccess.h>
+> +#include "io_pagetable.h"
 > +
-> +struct iommufd_ctx {
-> +	struct file *file;
-> +	struct xarray objects;
-> +};
-> +
-> +struct iommufd_ucmd {
-> +	struct iommufd_ctx *ictx;
-> +	void __user *ubuffer;
-> +	u32 user_size;
-> +	void *cmd;
-> +};
-> +
-> +/* Copy the response in ucmd->cmd back to userspace. */
-> +static inline int iommufd_ucmd_respond(struct iommufd_ucmd *ucmd,
-> +				       size_t cmd_len)
+> +void iommufd_ioas_destroy(struct iommufd_object *obj)
 > +{
-> +	if (copy_to_user(ucmd->ubuffer, ucmd->cmd,
-> +			 min_t(size_t, ucmd->user_size, cmd_len)))
+> +	struct iommufd_ioas *ioas = container_of(obj, struct iommufd_ioas, obj);
+> +	int rc;
+> +
+> +	rc = iopt_unmap_all(&ioas->iopt, NULL);
+> +	WARN_ON(rc && rc != -ENOENT);
+> +	iopt_destroy_table(&ioas->iopt);
+> +}
+> +
+> +struct iommufd_ioas *iommufd_ioas_alloc(struct iommufd_ctx *ictx)
+> +{
+> +	struct iommufd_ioas *ioas;
+> +
+> +	ioas = iommufd_object_alloc(ictx, ioas, IOMMUFD_OBJ_IOAS);
+> +	if (IS_ERR(ioas))
+> +		return ioas;
+> +
+> +	iopt_init_table(&ioas->iopt);
+> +	return ioas;
+> +}
+> +
+> +int iommufd_ioas_alloc_ioctl(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_ioas_alloc *cmd = ucmd->cmd;
+> +	struct iommufd_ioas *ioas;
+> +	int rc;
+> +
+> +	if (cmd->flags)
+> +		return -EOPNOTSUPP;
+> +
+> +	ioas = iommufd_ioas_alloc(ucmd->ictx);
+> +	if (IS_ERR(ioas))
+> +		return PTR_ERR(ioas);
+> +
+> +	cmd->out_ioas_id = ioas->obj.id;
+> +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
+> +	if (rc)
+> +		goto out_table;
+> +	iommufd_object_finalize(ucmd->ictx, &ioas->obj);
+> +	return 0;
+> +
+> +out_table:
+> +	iommufd_object_abort_and_destroy(ucmd->ictx, &ioas->obj);
+> +	return rc;
+> +}
+> +
+> +int iommufd_ioas_iova_ranges(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_iova_range __user *ranges;
+> +	struct iommu_ioas_iova_ranges *cmd = ucmd->cmd;
+> +	struct iommufd_ioas *ioas;
+> +	struct interval_tree_span_iter span;
+> +	u32 max_iovas;
+> +	int rc;
+> +
+> +	if (cmd->__reserved)
+> +		return -EOPNOTSUPP;
+> +
+> +	ioas = iommufd_get_ioas(ucmd, cmd->ioas_id);
+> +	if (IS_ERR(ioas))
+> +		return PTR_ERR(ioas);
+> +
+> +	down_read(&ioas->iopt.iova_rwsem);
+> +	max_iovas = cmd->num_iovas;
+> +	ranges = u64_to_user_ptr(cmd->allowed_iovas);
+> +	cmd->num_iovas = 0;
+> +	cmd->out_iova_alignment = ioas->iopt.iova_alignment;
+> +	interval_tree_for_each_span(&span, &ioas->iopt.reserved_itree, 0,
+> +				    ULONG_MAX) {
+> +		if (!span.is_hole)
+> +			continue;
+> +		if (cmd->num_iovas < max_iovas) {
+> +			struct iommu_iova_range elm = {
+> +				.start = span.start_hole,
+> +				.last = span.last_hole,
+> +			};
+> +
+> +			if (copy_to_user(&ranges[cmd->num_iovas], &elm,
+> +					 sizeof(elm))) {
+> +				rc = -EFAULT;
+> +				goto out_put;
+> +			}
+> +		}
+> +		cmd->num_iovas++;
+> +	}
+> +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
+> +	if (rc)
+> +		goto out_put;
+> +	if (cmd->num_iovas > max_iovas)
+> +		rc = -EMSGSIZE;
+> +out_put:
+> +	up_read(&ioas->iopt.iova_rwsem);
+> +	iommufd_put_object(&ioas->obj);
+> +	return rc;
+> +}
+> +
+> +static int iommufd_ioas_load_iovas(struct rb_root_cached *itree,
+> +				   struct iommu_iova_range __user *ranges,
+> +				   u32 num)
+> +{
+> +	u32 i;
+> +
+> +	for (i = 0; i != num; i++) {
+> +		struct iommu_iova_range range;
+> +		struct iopt_allowed *allowed;
+> +
+> +		if (copy_from_user(&range, ranges + i, sizeof(range)))
+> +			return -EFAULT;
+> +
+> +		if (range.start >= range.last)
+> +			return -EINVAL;
+> +
+> +		if (interval_tree_iter_first(itree, range.start, range.last))
+> +			return -EINVAL;
+> +
+> +		allowed = kzalloc(sizeof(*allowed), GFP_KERNEL_ACCOUNT);
+> +		if (!allowed)
+> +			return -ENOMEM;
+> +		allowed->node.start = range.start;
+> +		allowed->node.last = range.last;
+> +
+> +		interval_tree_insert(&allowed->node, itree);
+> +	}
+> +	return 0;
+> +}
+> +
+> +int iommufd_ioas_allow_iovas(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_ioas_allow_iovas *cmd = ucmd->cmd;
+> +	struct rb_root_cached allowed_iova = RB_ROOT_CACHED;
+> +	struct interval_tree_node *node;
+> +	struct iommufd_ioas *ioas;
+> +	struct io_pagetable *iopt;
+> +	int rc = 0;
+> +
+> +	if (cmd->__reserved)
+> +		return -EOPNOTSUPP;
+> +
+> +	ioas = iommufd_get_ioas(ucmd, cmd->ioas_id);
+> +	if (IS_ERR(ioas))
+> +		return PTR_ERR(ioas);
+> +	iopt = &ioas->iopt;
+> +
+> +	rc = iommufd_ioas_load_iovas(&allowed_iova,
+> +				     u64_to_user_ptr(cmd->allowed_iovas),
+> +				     cmd->num_iovas);
+> +	if (rc)
+> +		goto out_free;
+> +
+> +	/*
+> +	 * We want the allowed tree update to be atomic, so we have to keep the
+> +	 * original nodes around, and keep track of the new nodes as we allocate
+> +	 * memory for them. The simplest solution is to have a new/old tree and
+> +	 * then swap new for old. On success we free the old tree, on failure we
+> +	 * free the new tree.
+> +	 */
+> +	rc = iopt_set_allow_iova(iopt, &allowed_iova);
+> +out_free:
+> +	while ((node = interval_tree_iter_first(&allowed_iova, 0, ULONG_MAX))) {
+> +		interval_tree_remove(node, &allowed_iova);
+> +		kfree(container_of(node, struct iopt_allowed, node));
+> +	}
+> +	iommufd_put_object(&ioas->obj);
+> +	return rc;
+> +}
+> +
+> +static int conv_iommu_prot(u32 map_flags)
+> +{
+> +	/*
+> +	 * We provide no manual cache coherency ioctls to userspace and most
+> +	 * architectures make the CPU ops for cache flushing privileged.
+> +	 * Therefore we require the underlying IOMMU to support CPU coherent
+> +	 * operation. Support for IOMMU_CACHE is enforced by the
+> +	 * IOMMU_CAP_CACHE_COHERENCY test during bind.
+> +	 */
+> +	int iommu_prot = IOMMU_CACHE;
+> +
+> +	if (map_flags & IOMMU_IOAS_MAP_WRITEABLE)
+> +		iommu_prot |= IOMMU_WRITE;
+> +	if (map_flags & IOMMU_IOAS_MAP_READABLE)
+> +		iommu_prot |= IOMMU_READ;
+> +	return iommu_prot;
+> +}
+> +
+> +int iommufd_ioas_map(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_ioas_map *cmd = ucmd->cmd;
+> +	unsigned long iova = cmd->iova;
+> +	struct iommufd_ioas *ioas;
+> +	unsigned int flags = 0;
+> +	int rc;
+> +
+> +	if ((cmd->flags &
+> +	     ~(IOMMU_IOAS_MAP_FIXED_IOVA | IOMMU_IOAS_MAP_WRITEABLE |
+> +	       IOMMU_IOAS_MAP_READABLE)) ||
+> +	    cmd->__reserved)
+> +		return -EOPNOTSUPP;
+> +	if (cmd->iova >= ULONG_MAX || cmd->length >= ULONG_MAX)
+> +		return -EOVERFLOW;
+> +
+> +	ioas = iommufd_get_ioas(ucmd, cmd->ioas_id);
+> +	if (IS_ERR(ioas))
+> +		return PTR_ERR(ioas);
+> +
+> +	if (!(cmd->flags & IOMMU_IOAS_MAP_FIXED_IOVA))
+> +		flags = IOPT_ALLOC_IOVA;
+> +	rc = iopt_map_user_pages(ucmd->ictx, &ioas->iopt, &iova,
+> +				 u64_to_user_ptr(cmd->user_va), cmd->length,
+> +				 conv_iommu_prot(cmd->flags), flags);
+> +	if (rc)
+> +		goto out_put;
+> +
+> +	cmd->iova = iova;
+> +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
+> +out_put:
+> +	iommufd_put_object(&ioas->obj);
+> +	return rc;
+> +}
+> +
+> +int iommufd_ioas_copy(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_ioas_copy *cmd = ucmd->cmd;
+> +	struct iommufd_ioas *src_ioas;
+> +	struct iommufd_ioas *dst_ioas;
+> +	unsigned int flags = 0;
+> +	LIST_HEAD(pages_list);
+> +	unsigned long iova;
+> +	int rc;
+> +
+> +	if ((cmd->flags &
+> +	     ~(IOMMU_IOAS_MAP_FIXED_IOVA | IOMMU_IOAS_MAP_WRITEABLE |
+> +	       IOMMU_IOAS_MAP_READABLE)))
+> +		return -EOPNOTSUPP;
+> +	if (cmd->length >= ULONG_MAX || cmd->src_iova >= ULONG_MAX ||
+> +	    cmd->dst_iova >= ULONG_MAX)
+> +		return -EOVERFLOW;
+> +
+> +	src_ioas = iommufd_get_ioas(ucmd, cmd->src_ioas_id);
+> +	if (IS_ERR(src_ioas))
+> +		return PTR_ERR(src_ioas);
+> +	rc = iopt_get_pages(&src_ioas->iopt, cmd->src_iova, cmd->length,
+> +			    &pages_list);
+> +	iommufd_put_object(&src_ioas->obj);
+> +	if (rc)
+> +		return rc;
+> +
+> +	dst_ioas = iommufd_get_ioas(ucmd, cmd->dst_ioas_id);
+> +	if (IS_ERR(dst_ioas)) {
+> +		rc = PTR_ERR(dst_ioas);
+> +		goto out_pages;
+> +	}
+> +
+> +	if (!(cmd->flags & IOMMU_IOAS_MAP_FIXED_IOVA))
+> +		flags = IOPT_ALLOC_IOVA;
+> +	iova = cmd->dst_iova;
+> +	rc = iopt_map_pages(&dst_ioas->iopt, &pages_list, cmd->length, &iova,
+> +			    conv_iommu_prot(cmd->flags), flags);
+> +	if (rc)
+> +		goto out_put_dst;
+> +
+> +	cmd->dst_iova = iova;
+> +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
+> +out_put_dst:
+> +	iommufd_put_object(&dst_ioas->obj);
+> +out_pages:
+> +	iopt_free_pages_list(&pages_list);
+> +	return rc;
+> +}
+> +
+> +int iommufd_ioas_unmap(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_ioas_unmap *cmd = ucmd->cmd;
+> +	struct iommufd_ioas *ioas;
+> +	unsigned long unmapped = 0;
+> +	int rc;
+> +
+> +	ioas = iommufd_get_ioas(ucmd, cmd->ioas_id);
+> +	if (IS_ERR(ioas))
+> +		return PTR_ERR(ioas);
+> +
+> +	if (cmd->iova == 0 && cmd->length == U64_MAX) {
+> +		rc = iopt_unmap_all(&ioas->iopt, &unmapped);
+> +		if (rc)
+> +			goto out_put;
+> +	} else {
+> +		if (cmd->iova >= ULONG_MAX || cmd->length >= ULONG_MAX) {
+> +			rc = -EOVERFLOW;
+> +			goto out_put;
+> +		}
+> +		rc = iopt_unmap_iova(&ioas->iopt, cmd->iova, cmd->length,
+> +				     &unmapped);
+> +		if (rc)
+> +			goto out_put;
+> +	}
+> +
+> +	cmd->length = unmapped;
+> +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
+> +
+> +out_put:
+> +	iommufd_put_object(&ioas->obj);
+> +	return rc;
+> +}
+> +
+> +int iommufd_option_rlimit_mode(struct iommu_option *cmd,
+> +			       struct iommufd_ctx *ictx)
+> +{
+> +	if (cmd->object_id)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (cmd->op == IOMMU_OPTION_OP_GET) {
+> +		cmd->val64 = ictx->account_mode == IOPT_PAGES_ACCOUNT_MM;
+> +		return 0;
+> +	}
+> +	if (cmd->op == IOMMU_OPTION_OP_SET) {
+> +		int rc = 0;
+> +
+> +		if (!capable(CAP_SYS_RESOURCE))
+> +			return -EPERM;
+> +
+> +		xa_lock(&ictx->objects);
+> +		if (!xa_empty(&ictx->objects)) {
+> +			rc = -EBUSY;
+> +		} else {
+> +			if (cmd->val64 == 0)
+> +				ictx->account_mode = IOPT_PAGES_ACCOUNT_USER;
+> +			else if (cmd->val64 == 1)
+> +				ictx->account_mode = IOPT_PAGES_ACCOUNT_MM;
+> +			else
+> +				rc = -EINVAL;
+> +		}
+> +		xa_unlock(&ictx->objects);
+> +
+> +		return rc;
+> +	}
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static int iommufd_ioas_option_huge_pages(struct iommu_option *cmd,
+> +					  struct iommufd_ioas *ioas)
+> +{
+> +	if (cmd->op == IOMMU_OPTION_OP_GET) {
+> +		cmd->val64 = !ioas->iopt.disable_large_pages;
+> +		return 0;
+> +	}
+> +	if (cmd->op == IOMMU_OPTION_OP_SET) {
+> +		if (cmd->val64 == 0)
+> +			return iopt_disable_large_pages(&ioas->iopt);
+> +		if (cmd->val64 == 1) {
+> +			iopt_enable_large_pages(&ioas->iopt);
+> +			return 0;
+> +		}
+> +		return -EINVAL;
+> +	}
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +int iommufd_ioas_option(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_option *cmd = ucmd->cmd;
+> +	struct iommufd_ioas *ioas;
+> +	int rc = 0;
+> +
+> +	if (cmd->__reserved)
+> +		return -EOPNOTSUPP;
+> +
+> +	ioas = iommufd_get_ioas(ucmd, cmd->object_id);
+> +	if (IS_ERR(ioas))
+> +		return PTR_ERR(ioas);
+> +
+> +	switch (cmd->option_id) {
+> +	case IOMMU_OPTION_HUGE_PAGES:
+> +		rc = iommufd_ioas_option_huge_pages(cmd, ioas);
+> +		break;
+> +	default:
+> +		rc = -EOPNOTSUPP;
+> +	}
+> +
+> +	iommufd_put_object(&ioas->obj);
+> +	return rc;
+> +}
+> diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
+> index f7ab6c6edafd13..1a13c54a8def86 100644
+> --- a/drivers/iommu/iommufd/iommufd_private.h
+> +++ b/drivers/iommu/iommufd/iommufd_private.h
+> @@ -11,6 +11,7 @@
+>  
+>  struct iommu_domain;
+>  struct iommu_group;
+> +struct iommu_option;
+>  
+>  struct iommufd_ctx {
+>  	struct file *file;
+> @@ -102,6 +103,7 @@ static inline int iommufd_ucmd_respond(struct iommufd_ucmd *ucmd,
+>  enum iommufd_object_type {
+>  	IOMMUFD_OBJ_NONE,
+>  	IOMMUFD_OBJ_ANY = IOMMUFD_OBJ_NONE,
+> +	IOMMUFD_OBJ_IOAS,
+>  };
+>  
+>  /* Base struct for all objects with a userspace ID handle. */
+> @@ -174,6 +176,37 @@ struct iommufd_object *_iommufd_object_alloc(struct iommufd_ctx *ictx,
+>  			     type),                                            \
+>  		     typeof(*(ptr)), obj)
+>  
+> +/*
+> + * The IO Address Space (IOAS) pagetable is a virtual page table backed by the
+> + * io_pagetable object. It is a user controlled mapping of IOVA -> PFNs. The
+> + * mapping is copied into all of the associated domains and made available to
+> + * in-kernel users.
+> + */
+> +struct iommufd_ioas {
+> +	struct iommufd_object obj;
+> +	struct io_pagetable iopt;
+> +};
+> +
+> +static inline struct iommufd_ioas *iommufd_get_ioas(struct iommufd_ucmd *ucmd,
+> +						    u32 id)
+> +{
+> +	return container_of(iommufd_get_object(ucmd->ictx, id,
+> +					       IOMMUFD_OBJ_IOAS),
+> +			    struct iommufd_ioas, obj);
+> +}
+> +
+> +struct iommufd_ioas *iommufd_ioas_alloc(struct iommufd_ctx *ictx);
+> +int iommufd_ioas_alloc_ioctl(struct iommufd_ucmd *ucmd);
+> +void iommufd_ioas_destroy(struct iommufd_object *obj);
+> +int iommufd_ioas_iova_ranges(struct iommufd_ucmd *ucmd);
+> +int iommufd_ioas_allow_iovas(struct iommufd_ucmd *ucmd);
+> +int iommufd_ioas_map(struct iommufd_ucmd *ucmd);
+> +int iommufd_ioas_copy(struct iommufd_ucmd *ucmd);
+> +int iommufd_ioas_unmap(struct iommufd_ucmd *ucmd);
+> +int iommufd_ioas_option(struct iommufd_ucmd *ucmd);
+> +int iommufd_option_rlimit_mode(struct iommu_option *cmd,
+> +			       struct iommufd_ctx *ictx);
+> +
+>  struct iommufd_access {
+>  	unsigned long iova_alignment;
+>  	u32 iopt_access_list_id;
+> diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
+> index dfbc68b97506d0..1c0a1f499378db 100644
+> --- a/drivers/iommu/iommufd/main.c
+> +++ b/drivers/iommu/iommufd/main.c
+> @@ -204,8 +204,39 @@ static int iommufd_fops_release(struct inode *inode, struct file *filp)
+>  	return 0;
+>  }
+>  
+> +static int iommufd_option(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_option *cmd = ucmd->cmd;
+> +	int rc;
+> +
+> +	if (cmd->__reserved)
+> +		return -EOPNOTSUPP;
+> +
+> +	switch (cmd->option_id) {
+> +	case IOMMU_OPTION_RLIMIT_MODE:
+> +		rc = iommufd_option_rlimit_mode(cmd, ucmd->ictx);
+> +		break;
+> +	case IOMMU_OPTION_HUGE_PAGES:
+> +		rc = iommufd_ioas_option(ucmd);
+> +		break;
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+> +	if (rc)
+> +		return rc;
+> +	if (copy_to_user(&((struct iommu_option __user *)ucmd->ubuffer)->val64,
+> +			 &cmd->val64, sizeof(cmd->val64)))
 > +		return -EFAULT;
 > +	return 0;
 > +}
 > +
-> +enum iommufd_object_type {
-> +	IOMMUFD_OBJ_NONE,
-> +	IOMMUFD_OBJ_ANY = IOMMUFD_OBJ_NONE,
-> +};
-> +
-> +/* Base struct for all objects with a userspace ID handle. */
-> +struct iommufd_object {
-> +	struct rw_semaphore destroy_rwsem;
-> +	refcount_t users;
-> +	enum iommufd_object_type type;
-> +	unsigned int id;
-> +};
-> +
-> +static inline bool iommufd_lock_obj(struct iommufd_object *obj)
-> +{
-> +	if (!down_read_trylock(&obj->destroy_rwsem))
-> +		return false;
-> +	if (!refcount_inc_not_zero(&obj->users)) {
-> +		up_read(&obj->destroy_rwsem);
-> +		return false;
-> +	}
-> +	return true;
-> +}
-> +
-> +struct iommufd_object *iommufd_get_object(struct iommufd_ctx *ictx, u32 id,
-> +					  enum iommufd_object_type type);
-> +static inline void iommufd_put_object(struct iommufd_object *obj)
-> +{
-> +	refcount_dec(&obj->users);
-> +	up_read(&obj->destroy_rwsem);
-> +}
-> +
-> +/**
-> + * iommufd_ref_to_users() - Switch from destroy_rwsem to users refcount
-> + *        protection
-> + * @obj - Object to release
-> + *
-> + * Objects have two refcount protections (destroy_rwsem and the refcount_t
-> + * users). Holding either of these will prevent the object from being destroyed.
-> + *
-> + * Depending on the use case, one protection or the other is appropriate.  In
-> + * most cases references are being protected by the destroy_rwsem. This allows
-> + * orderly destruction of the object because iommufd_object_destroy_user() will
-> + * wait for it to become unlocked. However, as a rwsem, it cannot be held across
-> + * a system call return. So cases that have longer term needs must switch
-> + * to the weaker users refcount_t.
-> + *
-> + * With users protection iommufd_object_destroy_user() will return false,
-> + * refusing to destroy the object, causing -EBUSY to userspace.
-> + */
-> +static inline void iommufd_ref_to_users(struct iommufd_object *obj)
-> +{
-> +	up_read(&obj->destroy_rwsem);
-> +	/* iommufd_lock_obj() obtains users as well */
-> +}
-> +void iommufd_object_abort(struct iommufd_ctx *ictx, struct iommufd_object *obj);
-> +void iommufd_object_abort_and_destroy(struct iommufd_ctx *ictx,
-> +				      struct iommufd_object *obj);
-> +void iommufd_object_finalize(struct iommufd_ctx *ictx,
-> +			     struct iommufd_object *obj);
-> +bool iommufd_object_destroy_user(struct iommufd_ctx *ictx,
-> +				 struct iommufd_object *obj);
-> +struct iommufd_object *_iommufd_object_alloc(struct iommufd_ctx *ictx,
-> +					     size_t size,
-> +					     enum iommufd_object_type type);
-> +
-> +#define iommufd_object_alloc(ictx, ptr, type)                                  \
-> +	container_of(_iommufd_object_alloc(                                    \
-> +			     ictx,                                             \
-> +			     sizeof(*(ptr)) + BUILD_BUG_ON_ZERO(               \
-> +						      offsetof(typeof(*(ptr)), \
-> +							       obj) != 0),     \
-> +			     type),                                            \
-> +		     typeof(*(ptr)), obj)
-> +
-> +#endif
-> diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
-> new file mode 100644
-> index 00000000000000..dfbc68b97506d0
-> --- /dev/null
-> +++ b/drivers/iommu/iommufd/main.c
-> @@ -0,0 +1,344 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/* Copyright (C) 2021 Intel Corporation
-> + * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
-> + *
-> + * iommufd provides control over the IOMMU HW objects created by IOMMU kernel
-> + * drivers. IOMMU HW objects revolve around IO page tables that map incoming DMA
-> + * addresses (IOVA) to CPU addresses.
-> + */
-> +#define pr_fmt(fmt) "iommufd: " fmt
-> +
-> +#include <linux/file.h>
-> +#include <linux/fs.h>
-> +#include <linux/module.h>
-> +#include <linux/slab.h>
-> +#include <linux/miscdevice.h>
-> +#include <linux/mutex.h>
-> +#include <linux/bug.h>
-> +#include <uapi/linux/iommufd.h>
-> +#include <linux/iommufd.h>
-> +
-> +#include "iommufd_private.h"
-> +
-> +struct iommufd_object_ops {
-> +	void (*destroy)(struct iommufd_object *obj);
-> +};
-> +static const struct iommufd_object_ops iommufd_object_ops[];
-> +
-> +struct iommufd_object *_iommufd_object_alloc(struct iommufd_ctx *ictx,
-> +					     size_t size,
-> +					     enum iommufd_object_type type)
-> +{
-> +	struct iommufd_object *obj;
-> +	int rc;
-> +
-> +	obj = kzalloc(size, GFP_KERNEL_ACCOUNT);
-> +	if (!obj)
-> +		return ERR_PTR(-ENOMEM);
-> +	obj->type = type;
-> +	init_rwsem(&obj->destroy_rwsem);
-> +	refcount_set(&obj->users, 1);
-> +
-> +	/*
-> +	 * Reserve an ID in the xarray but do not publish the pointer yet since
-> +	 * the caller hasn't initialized it yet. Once the pointer is published
-> +	 * in the xarray and visible to other threads we can't reliably destroy
-> +	 * it anymore, so the caller must complete all errorable operations
-> +	 * before calling iommufd_object_finalize().
-> +	 */
-> +	rc = xa_alloc(&ictx->objects, &obj->id, XA_ZERO_ENTRY,
-> +		      xa_limit_32b, GFP_KERNEL_ACCOUNT);
-> +	if (rc)
-> +		goto out_free;
-> +	return obj;
-> +out_free:
-> +	kfree(obj);
-> +	return ERR_PTR(rc);
-> +}
-> +
-> +/*
-> + * Allow concurrent access to the object.
-> + *
-> + * Once another thread can see the object pointer it can prevent object
-> + * destruction. Expect for special kernel-only objects there is no in-kernel way
-> + * to reliably destroy a single object. Thus all APIs that are creating objects
-> + * must use iommufd_object_abort() to handle their errors and only call
-> + * iommufd_object_finalize() once object creation cannot fail.
-> + */
-> +void iommufd_object_finalize(struct iommufd_ctx *ictx,
-> +			     struct iommufd_object *obj)
-> +{
-> +	void *old;
-> +
-> +	old = xa_store(&ictx->objects, obj->id, obj, GFP_KERNEL);
-> +	/* obj->id was returned from xa_alloc() so the xa_store() cannot fail */
-> +	WARN_ON(old);
-> +}
-> +
-> +/* Undo _iommufd_object_alloc() if iommufd_object_finalize() was not called */
-> +void iommufd_object_abort(struct iommufd_ctx *ictx, struct iommufd_object *obj)
-> +{
-> +	void *old;
-> +
-> +	old = xa_erase(&ictx->objects, obj->id);
-> +	WARN_ON(old);
-> +	kfree(obj);
-> +}
-> +
-> +/*
-> + * Abort an object that has been fully initialized and needs destroy, but has
-> + * not been finalized.
-> + */
-> +void iommufd_object_abort_and_destroy(struct iommufd_ctx *ictx,
-> +				      struct iommufd_object *obj)
-> +{
-> +	iommufd_object_ops[obj->type].destroy(obj);
-> +	iommufd_object_abort(ictx, obj);
-> +}
-> +
-> +struct iommufd_object *iommufd_get_object(struct iommufd_ctx *ictx, u32 id,
-> +					  enum iommufd_object_type type)
-> +{
-> +	struct iommufd_object *obj;
-> +
-> +	xa_lock(&ictx->objects);
-> +	obj = xa_load(&ictx->objects, id);
-> +	if (!obj || (type != IOMMUFD_OBJ_ANY && obj->type != type) ||
-> +	    !iommufd_lock_obj(obj))
-> +		obj = ERR_PTR(-ENOENT);
-> +	xa_unlock(&ictx->objects);
-> +	return obj;
-> +}
-> +
-> +/*
-> + * The caller holds a users refcount and wants to destroy the object. Returns
-> + * true if the object was destroyed. In all cases the caller no longer has a
-> + * reference on obj.
-> + */
-> +bool iommufd_object_destroy_user(struct iommufd_ctx *ictx,
-> +				 struct iommufd_object *obj)
-> +{
-> +	/*
-> +	 * The purpose of the destroy_rwsem is to ensure deterministic
-> +	 * destruction of objects used by external drivers and destroyed by this
-> +	 * function. Any temporary increment of the refcount must hold the read
-> +	 * side of this, such as during ioctl execution.
-> +	 */
-> +	down_write(&obj->destroy_rwsem);
-> +	xa_lock(&ictx->objects);
-> +	refcount_dec(&obj->users);
-> +	if (!refcount_dec_if_one(&obj->users)) {
-> +		xa_unlock(&ictx->objects);
-> +		up_write(&obj->destroy_rwsem);
-> +		return false;
-> +	}
-> +	__xa_erase(&ictx->objects, obj->id);
-> +	xa_unlock(&ictx->objects);
-> +	up_write(&obj->destroy_rwsem);
-> +
-> +	iommufd_object_ops[obj->type].destroy(obj);
-> +	kfree(obj);
-> +	return true;
-> +}
-> +
-> +static int iommufd_destroy(struct iommufd_ucmd *ucmd)
-> +{
-> +	struct iommu_destroy *cmd = ucmd->cmd;
-> +	struct iommufd_object *obj;
-> +
-> +	obj = iommufd_get_object(ucmd->ictx, cmd->id, IOMMUFD_OBJ_ANY);
-> +	if (IS_ERR(obj))
-> +		return PTR_ERR(obj);
-> +	iommufd_ref_to_users(obj);
-> +	/* See iommufd_ref_to_users() */
-> +	if (!iommufd_object_destroy_user(ucmd->ictx, obj))
-> +		return -EBUSY;
-> +	return 0;
-> +}
-> +
-> +static int iommufd_fops_open(struct inode *inode, struct file *filp)
-> +{
-> +	struct iommufd_ctx *ictx;
-> +
-> +	ictx = kzalloc(sizeof(*ictx), GFP_KERNEL_ACCOUNT);
-> +	if (!ictx)
-> +		return -ENOMEM;
-> +
-> +	xa_init_flags(&ictx->objects, XA_FLAGS_ALLOC1 | XA_FLAGS_ACCOUNT);
-> +	ictx->file = filp;
-> +	filp->private_data = ictx;
-> +	return 0;
-> +}
-> +
-> +static int iommufd_fops_release(struct inode *inode, struct file *filp)
-> +{
-> +	struct iommufd_ctx *ictx = filp->private_data;
-> +	struct iommufd_object *obj;
-> +
-> +	/*
-> +	 * The objects in the xarray form a graph of "users" counts, and we have
-> +	 * to destroy them in a depth first manner. Leaf objects will reduce the
-> +	 * users count of interior objects when they are destroyed.
-> +	 *
-> +	 * Repeatedly destroying all the "1 users" leaf objects will progress
-> +	 * until the entire list is destroyed. If this can't progress then there
-> +	 * is some bug related to object refcounting.
-> +	 */
-> +	while (!xa_empty(&ictx->objects)) {
-> +		unsigned int destroyed = 0;
-> +		unsigned long index;
-> +
-> +		xa_for_each(&ictx->objects, index, obj) {
-> +			if (!refcount_dec_if_one(&obj->users))
-> +				continue;
-> +			destroyed++;
-> +			xa_erase(&ictx->objects, index);
-> +			iommufd_object_ops[obj->type].destroy(obj);
-> +			kfree(obj);
-> +		}
-> +		/* Bug related to users refcount */
-> +		if (WARN_ON(!destroyed))
-> +			break;
-> +	}
-> +	kfree(ictx);
-> +	return 0;
-> +}
-> +
-> +union ucmd_buffer {
-> +	struct iommu_destroy destroy;
-> +};
-> +
-> +struct iommufd_ioctl_op {
-> +	unsigned int size;
-> +	unsigned int min_size;
-> +	unsigned int ioctl_num;
-> +	int (*execute)(struct iommufd_ucmd *ucmd);
-> +};
-> +
-> +#define IOCTL_OP(_ioctl, _fn, _struct, _last)                                  \
-> +	[_IOC_NR(_ioctl) - IOMMUFD_CMD_BASE] = {                               \
-> +		.size = sizeof(_struct) +                                      \
-> +			BUILD_BUG_ON_ZERO(sizeof(union ucmd_buffer) <          \
-> +					  sizeof(_struct)),                    \
-> +		.min_size = offsetofend(_struct, _last),                       \
-> +		.ioctl_num = _ioctl,                                           \
-> +		.execute = _fn,                                                \
-> +	}
-> +static const struct iommufd_ioctl_op iommufd_ioctl_ops[] = {
-> +	IOCTL_OP(IOMMU_DESTROY, iommufd_destroy, struct iommu_destroy, id),
-> +};
-> +
-> +static long iommufd_fops_ioctl(struct file *filp, unsigned int cmd,
-> +			       unsigned long arg)
-> +{
-> +	const struct iommufd_ioctl_op *op;
-> +	struct iommufd_ucmd ucmd = {};
-> +	union ucmd_buffer buf;
-> +	unsigned int nr;
-> +	int ret;
-> +
-> +	ucmd.ictx = filp->private_data;
-> +	ucmd.ubuffer = (void __user *)arg;
-> +	ret = get_user(ucmd.user_size, (u32 __user *)ucmd.ubuffer);
-> +	if (ret)
-> +		return ret;
-> +
-> +	nr = _IOC_NR(cmd);
-> +	if (nr < IOMMUFD_CMD_BASE ||
-> +	    (nr - IOMMUFD_CMD_BASE) >= ARRAY_SIZE(iommufd_ioctl_ops))
-> +		return -ENOIOCTLCMD;
-> +	op = &iommufd_ioctl_ops[nr - IOMMUFD_CMD_BASE];
-> +	if (op->ioctl_num != cmd)
-> +		return -ENOIOCTLCMD;
-> +	if (ucmd.user_size < op->min_size)
-> +		return -EINVAL;
-> +
-> +	ucmd.cmd = &buf;
-> +	ret = copy_struct_from_user(ucmd.cmd, op->size, ucmd.ubuffer,
-> +				    ucmd.user_size);
-> +	if (ret)
-> +		return ret;
-> +	ret = op->execute(&ucmd);
-> +	return ret;
-> +}
-> +
-> +static const struct file_operations iommufd_fops = {
-> +	.owner = THIS_MODULE,
-> +	.open = iommufd_fops_open,
-> +	.release = iommufd_fops_release,
-> +	.unlocked_ioctl = iommufd_fops_ioctl,
-> +};
-> +
-> +/**
-> + * iommufd_ctx_get - Get a context reference
-> + * @ictx: Context to get
-> + *
-> + * The caller must already hold a valid reference to ictx.
-> + */
-> +void iommufd_ctx_get(struct iommufd_ctx *ictx)
-> +{
-> +	get_file(ictx->file);
-> +}
-> +EXPORT_SYMBOL_NS_GPL(iommufd_ctx_get, IOMMUFD);
-> +
-> +/**
-> + * iommufd_ctx_from_file - Acquires a reference to the iommufd context
-> + * @file: File to obtain the reference from
-> + *
-> + * Returns a pointer to the iommufd_ctx, otherwise ERR_PTR. The struct file
-> + * remains owned by the caller and the caller must still do fput. On success
-> + * the caller is responsible to call iommufd_ctx_put().
-> + */
-> +struct iommufd_ctx *iommufd_ctx_from_file(struct file *file)
-> +{
-> +	struct iommufd_ctx *ictx;
-> +
-> +	if (file->f_op != &iommufd_fops)
-> +		return ERR_PTR(-EBADFD);
-> +	ictx = file->private_data;
-> +	iommufd_ctx_get(ictx);
-> +	return ictx;
-> +}
-> +EXPORT_SYMBOL_NS_GPL(iommufd_ctx_from_file, IOMMUFD);
-> +
-> +/**
-> + * iommufd_ctx_put - Put back a reference
-> + * @ictx: Context to put back
-> + */
-> +void iommufd_ctx_put(struct iommufd_ctx *ictx)
-> +{
-> +	fput(ictx->file);
-> +}
-> +EXPORT_SYMBOL_NS_GPL(iommufd_ctx_put, IOMMUFD);
-> +
-> +static const struct iommufd_object_ops iommufd_object_ops[] = {
-> +};
-> +
-> +static struct miscdevice iommu_misc_dev = {
-> +	.minor = MISC_DYNAMIC_MINOR,
-> +	.name = "iommu",
-> +	.fops = &iommufd_fops,
-> +	.nodename = "iommu",
-> +	.mode = 0660,
-> +};
-> +
-> +static int __init iommufd_init(void)
-> +{
-> +	int ret;
-> +
-> +	ret = misc_register(&iommu_misc_dev);
-> +	if (ret)
-> +		return ret;
-> +	return 0;
-> +}
-> +
-> +static void __exit iommufd_exit(void)
-> +{
-> +	misc_deregister(&iommu_misc_dev);
-> +}
-> +
-> +module_init(iommufd_init);
-> +module_exit(iommufd_exit);
-> +
-> +MODULE_DESCRIPTION("I/O Address Space Management for passthrough devices");
-> +MODULE_LICENSE("GPL");
-> diff --git a/include/linux/iommufd.h b/include/linux/iommufd.h
-> new file mode 100644
-> index 00000000000000..d1817472c27373
-> --- /dev/null
-> +++ b/include/linux/iommufd.h
-> @@ -0,0 +1,31 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2021 Intel Corporation
-> + * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
-> + */
-> +#ifndef __LINUX_IOMMUFD_H
-> +#define __LINUX_IOMMUFD_H
-> +
-> +#include <linux/types.h>
-> +#include <linux/errno.h>
-> +#include <linux/err.h>
-> +
-> +struct iommufd_ctx;
-> +struct file;
-> +
-> +void iommufd_ctx_get(struct iommufd_ctx *ictx);
-> +
-> +#if IS_ENABLED(CONFIG_IOMMUFD)
-> +struct iommufd_ctx *iommufd_ctx_from_file(struct file *file);
-> +void iommufd_ctx_put(struct iommufd_ctx *ictx);
-> +#else /* !CONFIG_IOMMUFD */
-> +static inline struct iommufd_ctx *iommufd_ctx_from_file(struct file *file)
-> +{
-> +	return ERR_PTR(-EOPNOTSUPP);
-> +}
-> +
-> +static inline void iommufd_ctx_put(struct iommufd_ctx *ictx)
-> +{
-> +}
-> +#endif /* CONFIG_IOMMUFD */
-> +#endif
+>  union ucmd_buffer {
+>  	struct iommu_destroy destroy;
+> +	struct iommu_ioas_alloc alloc;
+> +	struct iommu_ioas_allow_iovas allow_iovas;
+> +	struct iommu_ioas_iova_ranges iova_ranges;
+> +	struct iommu_ioas_map map;
+> +	struct iommu_ioas_unmap unmap;
+>  };
+>  
+>  struct iommufd_ioctl_op {
+> @@ -226,6 +257,20 @@ struct iommufd_ioctl_op {
+>  	}
+>  static const struct iommufd_ioctl_op iommufd_ioctl_ops[] = {
+>  	IOCTL_OP(IOMMU_DESTROY, iommufd_destroy, struct iommu_destroy, id),
+> +	IOCTL_OP(IOMMU_IOAS_ALLOC, iommufd_ioas_alloc_ioctl,
+> +		 struct iommu_ioas_alloc, out_ioas_id),
+> +	IOCTL_OP(IOMMU_IOAS_ALLOW_IOVAS, iommufd_ioas_allow_iovas,
+> +		 struct iommu_ioas_allow_iovas, allowed_iovas),
+> +	IOCTL_OP(IOMMU_IOAS_COPY, iommufd_ioas_copy, struct iommu_ioas_copy,
+> +		 src_iova),
+> +	IOCTL_OP(IOMMU_IOAS_IOVA_RANGES, iommufd_ioas_iova_ranges,
+> +		 struct iommu_ioas_iova_ranges, out_iova_alignment),
+> +	IOCTL_OP(IOMMU_IOAS_MAP, iommufd_ioas_map, struct iommu_ioas_map,
+> +		 iova),
+> +	IOCTL_OP(IOMMU_IOAS_UNMAP, iommufd_ioas_unmap, struct iommu_ioas_unmap,
+> +		 length),
+> +	IOCTL_OP(IOMMU_OPTION, iommufd_option, struct iommu_option,
+> +		 val64),
+>  };
+>  
+>  static long iommufd_fops_ioctl(struct file *filp, unsigned int cmd,
+> @@ -312,6 +357,9 @@ void iommufd_ctx_put(struct iommufd_ctx *ictx)
+>  EXPORT_SYMBOL_NS_GPL(iommufd_ctx_put, IOMMUFD);
+>  
+>  static const struct iommufd_object_ops iommufd_object_ops[] = {
+> +	[IOMMUFD_OBJ_IOAS] = {
+> +		.destroy = iommufd_ioas_destroy,
+> +	},
+>  };
+>  
+>  static struct miscdevice iommu_misc_dev = {
 > diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
-> new file mode 100644
-> index 00000000000000..37de92f0534b86
-> --- /dev/null
+> index 37de92f0534b86..855aa984b632d3 100644
+> --- a/include/uapi/linux/iommufd.h
 > +++ b/include/uapi/linux/iommufd.h
-> @@ -0,0 +1,55 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +/* Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES.
-> + */
-> +#ifndef _UAPI_IOMMUFD_H
-> +#define _UAPI_IOMMUFD_H
-> +
-> +#include <linux/types.h>
-> +#include <linux/ioctl.h>
-> +
-> +#define IOMMUFD_TYPE (';')
-> +
+> @@ -37,12 +37,19 @@
+>  enum {
+>  	IOMMUFD_CMD_BASE = 0x80,
+>  	IOMMUFD_CMD_DESTROY = IOMMUFD_CMD_BASE,
+> +	IOMMUFD_CMD_IOAS_ALLOC,
+> +	IOMMUFD_CMD_IOAS_ALLOW_IOVAS,
+> +	IOMMUFD_CMD_IOAS_COPY,
+> +	IOMMUFD_CMD_IOAS_IOVA_RANGES,
+> +	IOMMUFD_CMD_IOAS_MAP,
+> +	IOMMUFD_CMD_IOAS_UNMAP,
+> +	IOMMUFD_CMD_OPTION,
+>  };
+>  
+>  /**
+>   * struct iommu_destroy - ioctl(IOMMU_DESTROY)
+>   * @size: sizeof(struct iommu_destroy)
+> - * @id: iommufd object ID to destroy. Can by any destroyable object type.
+> + * @id: iommufd object ID to destroy. Can be any destroyable object type.
+>   *
+>   * Destroy any object held within iommufd.
+>   */
+> @@ -52,4 +59,251 @@ struct iommu_destroy {
+>  };
+>  #define IOMMU_DESTROY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_DESTROY)
+>  
 > +/**
-> + * DOC: General ioctl format
+> + * struct iommu_ioas_alloc - ioctl(IOMMU_IOAS_ALLOC)
+> + * @size: sizeof(struct iommu_ioas_alloc)
+> + * @flags: Must be 0
+> + * @out_ioas_id: Output IOAS ID for the allocated object
 > + *
-> + * The ioctl interface follows a general format to allow for extensibility. Each
-> + * ioctl is passed in a structure pointer as the argument providing the size of
-> + * the structure in the first u32. The kernel checks that any structure space
-> + * beyond what it understands is 0. This allows userspace to use the backward
-> + * compatible portion while consistently using the newer, larger, structures.
-> + *
-> + * ioctls use a standard meaning for common errnos:
-> + *
-> + *  - ENOTTY: The IOCTL number itself is not supported at all
-> + *  - E2BIG: The IOCTL number is supported, but the provided structure has
-> + *    non-zero in a part the kernel does not understand.
-> + *  - EOPNOTSUPP: The IOCTL number is supported, and the structure is
-> + *    understood, however a known field has a value the kernel does not
-> + *    understand or support.
-> + *  - EINVAL: Everything about the IOCTL was understood, but a field is not
-> + *    correct.
-> + *  - ENOENT: An ID or IOVA provided does not exist.
-> + *  - ENOMEM: Out of memory.
-> + *  - EOVERFLOW: Mathematics overflowed.
-> + *
-> + * As well as additional errnos, within specific ioctls.
+> + * Allocate an IO Address Space (IOAS) which holds an IO Virtual Address (IOVA)
+> + * to memory mapping.
 > + */
-> +enum {
-> +	IOMMUFD_CMD_BASE = 0x80,
-> +	IOMMUFD_CMD_DESTROY = IOMMUFD_CMD_BASE,
-> +};
-> +
-> +/**
-> + * struct iommu_destroy - ioctl(IOMMU_DESTROY)
-> + * @size: sizeof(struct iommu_destroy)
-> + * @id: iommufd object ID to destroy. Can by any destroyable object type.
-> + *
-> + * Destroy any object held within iommufd.
-> + */
-> +struct iommu_destroy {
+> +struct iommu_ioas_alloc {
 > +	__u32 size;
-> +	__u32 id;
+> +	__u32 flags;
+> +	__u32 out_ioas_id;
 > +};
-> +#define IOMMU_DESTROY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_DESTROY)
+> +#define IOMMU_IOAS_ALLOC _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_ALLOC)
 > +
-> +#endif
+> +/**
+> + * struct iommu_iova_range - ioctl(IOMMU_IOVA_RANGE)
+> + * @start: First IOVA
+> + * @last: Inclusive last IOVA
+> + *
+> + * An interval in IOVA space.
+> + */
+> +struct iommu_iova_range {
+> +	__aligned_u64 start;
+> +	__aligned_u64 last;
+> +};
+> +
+> +/**
+> + * struct iommu_ioas_iova_ranges - ioctl(IOMMU_IOAS_IOVA_RANGES)
+> + * @size: sizeof(struct iommu_ioas_iova_ranges)
+> + * @ioas_id: IOAS ID to read ranges from
+> + * @num_iovas: Input/Output total number of ranges in the IOAS
+> + * @__reserved: Must be 0
+> + * @allowed_iovas: Pointer to the output array of struct iommu_iova_range
+> + * @out_iova_alignment: Minimum alignment required for mapping IOVA
+> + *
+> + * Query an IOAS for ranges of allowed IOVAs. Mapping IOVA outside these ranges
+> + * is not allowed. num_iovas will be set to the total number of iovas and
+> + * the allowed_iovas[] will be filled in as space permits.
+> + *
+> + * The allowed ranges are dependent on the HW path the DMA operation takes, and
+> + * can change during the lifetime of the IOAS. A fresh empty IOAS will have a
+> + * full range, and each attached device will narrow the ranges based on that
+> + * device's HW restrictions. Detaching a device can widen the ranges. Userspace
+> + * should query ranges after every attach/detach to know what IOVAs are valid
+> + * for mapping.
+> + *
+> + * On input num_iovas is the length of the allowed_iovas array. On output it is
+> + * the total number of iovas filled in. The ioctl will return -EMSGSIZE and set
+> + * num_iovas to the required value if num_iovas is too small. In this case the
+> + * caller should allocate a larger output array and re-issue the ioctl.
+> + *
+> + * out_iova_alignment returns the minimum IOVA alignment that can be given
+> + * to IOMMU_IOAS_MAP/COPY. IOVA's must satisfy:
+> + *   starting_iova % out_iova_alignment == 0
+> + *   (starting_iova + length) % out_iova_alignment == 0
+> + * out_iova_alignment can be 1 indicating any IOVA is allowed. It cannot
+> + * be higher than the system PAGE_SIZE.
+> + */
+> +struct iommu_ioas_iova_ranges {
+> +	__u32 size;
+> +	__u32 ioas_id;
+> +	__u32 num_iovas;
+> +	__u32 __reserved;
+> +	__aligned_u64 allowed_iovas;
+> +	__aligned_u64 out_iova_alignment;
+> +};
+> +#define IOMMU_IOAS_IOVA_RANGES _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_IOVA_RANGES)
+> +
+> +/**
+> + * struct iommu_ioas_allow_iovas - ioctl(IOMMU_IOAS_ALLOW_IOVAS)
+> + * @size: sizeof(struct iommu_ioas_allow_iovas)
+> + * @ioas_id: IOAS ID to allow IOVAs from
+> + * @num_iovas: Input/Output total number of ranges in the IOAS
+> + * @__reserved: Must be 0
+> + * @allowed_iovas: Pointer to array of struct iommu_iova_range
+> + *
+> + * Ensure a range of IOVAs are always available for allocation. If this call
+> + * succeeds then IOMMU_IOAS_IOVA_RANGES will never return a list of IOVA ranges
+> + * that are narrower than the ranges provided here. This call will fail if
+> + * IOMMU_IOAS_IOVA_RANGES is currently narrower than the given ranges.
+> + *
+> + * When an IOAS is first created the IOVA_RANGES will be maximally sized, and as
+> + * devices are attached the IOVA will narrow based on the device restrictions.
+> + * When an allowed range is specified any narrowing will be refused, ie device
+> + * attachment can fail if the device requires limiting within the allowed range.
+> + *
+> + * Automatic IOVA allocation is also impacted by this call. MAP will only
+> + * allocate within the allowed IOVAs if they are present.
+> + *
+> + * This call replaces the entire allowed list with the given list.
+> + */
+> +struct iommu_ioas_allow_iovas {
+> +	__u32 size;
+> +	__u32 ioas_id;
+> +	__u32 num_iovas;
+> +	__u32 __reserved;
+> +	__aligned_u64 allowed_iovas;
+> +};
+> +#define IOMMU_IOAS_ALLOW_IOVAS _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_ALLOW_IOVAS)
+> +
+> +/**
+> + * enum iommufd_ioas_map_flags - Flags for map and copy
+> + * @IOMMU_IOAS_MAP_FIXED_IOVA: If clear the kernel will compute an appropriate
+> + *                             IOVA to place the mapping at
+> + * @IOMMU_IOAS_MAP_WRITEABLE: DMA is allowed to write to this mapping
+> + * @IOMMU_IOAS_MAP_READABLE: DMA is allowed to read from this mapping
+> + */
+> +enum iommufd_ioas_map_flags {
+> +	IOMMU_IOAS_MAP_FIXED_IOVA = 1 << 0,
+> +	IOMMU_IOAS_MAP_WRITEABLE = 1 << 1,
+> +	IOMMU_IOAS_MAP_READABLE = 1 << 2,
+> +};
+> +
+> +/**
+> + * struct iommu_ioas_map - ioctl(IOMMU_IOAS_MAP)
+> + * @size: sizeof(struct iommu_ioas_map)
+> + * @flags: Combination of enum iommufd_ioas_map_flags
+> + * @ioas_id: IOAS ID to change the mapping of
+> + * @__reserved: Must be 0
+> + * @user_va: Userspace pointer to start mapping from
+> + * @length: Number of bytes to map
+> + * @iova: IOVA the mapping was placed at. If IOMMU_IOAS_MAP_FIXED_IOVA is set
+> + *        then this must be provided as input.
+> + *
+> + * Set an IOVA mapping from a user pointer. If FIXED_IOVA is specified then the
+> + * mapping will be established at iova, otherwise a suitable location based on
+> + * the reserved and allowed lists will be automatically selected and returned in
+> + * iova.
+> + *
+> + * If IOMMU_IOAS_MAP_FIXED_IOVA is specified then the iova range must currently
+> + * be unused, existing IOVA cannot be replaced.
+> + */
+> +struct iommu_ioas_map {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 ioas_id;
+> +	__u32 __reserved;
+> +	__aligned_u64 user_va;
+> +	__aligned_u64 length;
+> +	__aligned_u64 iova;
+> +};
+> +#define IOMMU_IOAS_MAP _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_MAP)
+> +
+> +/**
+> + * struct iommu_ioas_copy - ioctl(IOMMU_IOAS_COPY)
+> + * @size: sizeof(struct iommu_ioas_copy)
+> + * @flags: Combination of enum iommufd_ioas_map_flags
+> + * @dst_ioas_id: IOAS ID to change the mapping of
+> + * @src_ioas_id: IOAS ID to copy from
+> + * @length: Number of bytes to copy and map
+> + * @dst_iova: IOVA the mapping was placed at. If IOMMU_IOAS_MAP_FIXED_IOVA is
+> + *            set then this must be provided as input.
+> + * @src_iova: IOVA to start the copy
+> + *
+> + * Copy an already existing mapping from src_ioas_id and establish it in
+> + * dst_ioas_id. The src iova/length must exactly match a range used with
+> + * IOMMU_IOAS_MAP.
+> + *
+> + * This may be used to efficiently clone a subset of an IOAS to another, or as a
+> + * kind of 'cache' to speed up mapping. Copy has an efficiency advantage over
+> + * establishing equivalent new mappings, as internal resources are shared, and
+> + * the kernel will pin the user memory only once.
+> + */
+> +struct iommu_ioas_copy {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 dst_ioas_id;
+> +	__u32 src_ioas_id;
+> +	__aligned_u64 length;
+> +	__aligned_u64 dst_iova;
+> +	__aligned_u64 src_iova;
+> +};
+> +#define IOMMU_IOAS_COPY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_COPY)
+> +
+> +/**
+> + * struct iommu_ioas_unmap - ioctl(IOMMU_IOAS_UNMAP)
+> + * @size: sizeof(struct iommu_ioas_unmap)
+> + * @ioas_id: IOAS ID to change the mapping of
+> + * @iova: IOVA to start the unmapping at
+> + * @length: Number of bytes to unmap, and return back the bytes unmapped
+> + *
+> + * Unmap an IOVA range. The iova/length must be a superset of a previously
+> + * mapped range used with IOMMU_IOAS_MAP or IOMMU_IOAS_COPY. Splitting or
+> + * truncating ranges is not allowed. The values 0 to U64_MAX will unmap
+> + * everything.
+> + */
+> +struct iommu_ioas_unmap {
+> +	__u32 size;
+> +	__u32 ioas_id;
+> +	__aligned_u64 iova;
+> +	__aligned_u64 length;
+> +};
+> +#define IOMMU_IOAS_UNMAP _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_UNMAP)
+> +
+> +/**
+> + * enum iommufd_option - ioctl(IOMMU_OPTION_RLIMIT_MODE) and
+> + *                       ioctl(IOMMU_OPTION_HUGE_PAGES)
+> + * @IOMMU_OPTION_RLIMIT_MODE:
+> + *    Change how RLIMIT_MEMLOCK accounting works. The caller must have privilege
+> + *    to invoke this. Value 0 (default) is user based accouting, 1 uses process
+> + *    based accounting. Global option, object_id must be 0
+> + * @IOMMU_OPTION_HUGE_PAGES:
+> + *    Value 1 (default) allows contiguous pages to be combined when generating
+> + *    iommu mappings. Value 0 disables combining, everything is mapped to
+> + *    PAGE_SIZE. This can be useful for benchmarking.  This is a per-IOAS
+> + *    option, the object_id must be the IOAS ID.
+> + */
+> +enum iommufd_option {
+> +	IOMMU_OPTION_RLIMIT_MODE = 0,
+> +	IOMMU_OPTION_HUGE_PAGES = 1,
+> +};
+> +
+> +/**
+> + * enum iommufd_option_ops - ioctl(IOMMU_OPTION_OP_SET) and
+> + *                           ioctl(IOMMU_OPTION_OP_GET)
+> + * @IOMMU_OPTION_OP_SET: Set the option's value
+> + * @IOMMU_OPTION_OP_GET: Get the option's value
+> + */
+> +enum iommufd_option_ops {
+> +	IOMMU_OPTION_OP_SET = 0,
+> +	IOMMU_OPTION_OP_GET = 1,
+> +};
+> +
+> +/**
+> + * struct iommu_option - iommu option multiplexer
+> + * @size: sizeof(struct iommu_option)
+> + * @option_id: One of enum iommufd_option
+> + * @op: One of enum iommufd_option_ops
+> + * @__reserved: Must be 0
+> + * @object_id: ID of the object if required
+> + * @val64: Option value to set or value returned on get
+> + *
+> + * Change a simple option value. This multiplexor allows controlling options
+> + * on objects. IOMMU_OPTION_OP_SET will load an option and IOMMU_OPTION_OP_GET
+> + * will return the current value.
+> + */
+> +struct iommu_option {
+> +	__u32 size;
+> +	__u32 option_id;
+> +	__u16 op;
+> +	__u16 __reserved;
+> +	__u32 object_id;
+> +	__aligned_u64 val64;
+> +};
+> +#define IOMMU_OPTION _IO(IOMMUFD_TYPE, IOMMUFD_CMD_OPTION)
+>  #endif
 
