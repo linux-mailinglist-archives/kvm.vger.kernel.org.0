@@ -2,95 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E580B63E239
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 21:37:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0797163E35F
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 23:23:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229612AbiK3UhF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 15:37:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50400 "EHLO
+        id S229674AbiK3WXq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 17:23:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbiK3Ugx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 15:36:53 -0500
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 648CC1D3;
-        Wed, 30 Nov 2022 12:36:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669840612; x=1701376612;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=r1FDXbnXDjUldZm7GrdgEZtQHBGflDxjpKsRBC7x164=;
-  b=g+PRrf0OCq3/nAYL7eotFFJNgtAt0jKI6mdn2jaWXFbYHI9Lt8pclxPT
-   LpeAwBNChfc3Dy/tyAzN45h1Rox3v2+0gDbYp3Rt05IEC/4oeTHnDrRRB
-   LcGYTQJa1f4vU/fEFooF/+nY8S7WzvJwqd6QApsEWXYyWeS4gjd8AH2E8
-   2MPjvwWyoJWD03W5GLBaDKu5PRSvmUUrLCZawtJIyDdp1YPDopV6AAgAg
-   6+p/SizVETWJX+X2SDeaM7xd2mZkwqz6JP4A8uR8iZGABXrEkMWPFSGcC
-   8fUctPZ0iIuEp3rJ4t9aK9Vqo+WiOjeuIwwg085O9CGCDO9he339rrTTC
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10547"; a="377671777"
-X-IronPort-AV: E=Sophos;i="5.96,207,1665471600"; 
-   d="scan'208";a="377671777"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2022 12:36:51 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10547"; a="644360640"
-X-IronPort-AV: E=Sophos;i="5.96,207,1665471600"; 
-   d="scan'208";a="644360640"
-Received: from subhadee-mobl.amr.corp.intel.com (HELO desk) ([10.251.3.232])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2022 12:36:51 -0800
-Date:   Wed, 30 Nov 2022 12:36:49 -0800
-From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To:     Kim Phillips <kim.phillips@amd.com>
-Cc:     x86@kernel.org, Babu Moger <Babu.Moger@amd.com>,
-        Borislav Petkov <bp@alien8.de>, Borislav Petkov <bp@suse.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 6/7] x86/cpu, kvm: Support AMD Automatic IBRS
-Message-ID: <20221130203649.gwhypmw35mfgwsxh@desk>
-References: <20221129235816.188737-1-kim.phillips@amd.com>
- <20221129235816.188737-7-kim.phillips@amd.com>
+        with ESMTP id S229461AbiK3WXn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 17:23:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B51301CB3D
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 14:22:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669846965;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CoHqhEveYiGg5lrInfMEIaWsbrZhjv9/kX2wJql8RsY=;
+        b=Vq2xS9sTyZ5OG3eT7jBXeeLdd+KKRqtsZy8yWE6PBHauYmToYD1dLVbc9Nvusgdzfulx2t
+        ik7Tjg5Iv68IIo2T/PJcaglTj0YV5vp7k/iefyP0BwOkLlRL1yP22dYiNENiaTrDIcztwc
+        37ronJHg2h+UoukcO0V+RyRlPDJciD8=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-138-zQzU9BSwPEi4qxwtHoqCzw-1; Wed, 30 Nov 2022 17:22:44 -0500
+X-MC-Unique: zQzU9BSwPEi4qxwtHoqCzw-1
+Received: by mail-il1-f199.google.com with SMTP id d2-20020a056e020be200b00300ecc7e0d4so529ilu.5
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 14:22:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CoHqhEveYiGg5lrInfMEIaWsbrZhjv9/kX2wJql8RsY=;
+        b=kunQ3Ns7q9atkuSXUXEGCiAycy43MubcszPmP9pMb+JXUDVgURqnI0UjLU50Br/rAI
+         nF6dX9B8hB0cQzbKlmM0YQeajbBcQYbvnBThWdctHubj253VjbMxz8w9QBB7bljJzPcI
+         SkQj1yPFQRVZvTjGCp/2po1RY0pUhvLI6u0OH/nqL0Fqe+tCyT0bH0nf3n/Cyqsi+YkA
+         wG0QPObfGkVsmZz8Is08o/pgSOBA91okbrqUYEMmPSaoLDQb0/aaDHtREZPcMr+bh8N0
+         7Mqf+RRDJrKD8wYnxKhlPIVQj6OKxNMHcvgVHonWuEPnuLewVzpM1w2GoiQCsrpFbvfW
+         c//A==
+X-Gm-Message-State: ANoB5pmfTBoGHs592gVIkNRvPSCwMvYudmPurq5/Vf9ax58WPJWxxeIN
+        GNJy9pgEroEjpE9rr9nxS89d2frPH83FNkVq956YCPn9IHLmWND6ZJ3QHfV704vG9UaLXnLOvs4
+        sFJiv9N2M7hnW
+X-Received: by 2002:a02:62cc:0:b0:375:49ce:39c9 with SMTP id d195-20020a0262cc000000b0037549ce39c9mr30277814jac.99.1669846963469;
+        Wed, 30 Nov 2022 14:22:43 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6jL4vx3YeKfxl1C6xcZ97g8WsVOPewM1bzYNCpii16KYB6sJRHryF/MeH5hIqIo1C3nbNg3w==
+X-Received: by 2002:a02:62cc:0:b0:375:49ce:39c9 with SMTP id d195-20020a0262cc000000b0037549ce39c9mr30277799jac.99.1669846963236;
+        Wed, 30 Nov 2022 14:22:43 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id e92-20020a028665000000b00389fe1c8d4csm991455jai.112.2022.11.30.14.22.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Nov 2022 14:22:42 -0800 (PST)
+Date:   Wed, 30 Nov 2022 15:22:40 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <jgg@nvidia.com>, <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
+        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
+        <shayd@nvidia.com>, <maorg@nvidia.com>, <avihaih@nvidia.com>,
+        <cohuck@redhat.com>, Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH V1 vfio 02/14] vfio: Extend the device migration
+ protocol with PRE_COPY
+Message-ID: <20221130152240.11a24c4d.alex.williamson@redhat.com>
+In-Reply-To: <20221124173932.194654-3-yishaih@nvidia.com>
+References: <20221124173932.194654-1-yishaih@nvidia.com>
+        <20221124173932.194654-3-yishaih@nvidia.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20221129235816.188737-7-kim.phillips@amd.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 29, 2022 at 05:58:15PM -0600, Kim Phillips wrote:
->--- a/arch/x86/kernel/cpu/common.c
->+++ b/arch/x86/kernel/cpu/common.c
->@@ -1406,6 +1406,14 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
-> 	    !(ia32_cap & ARCH_CAP_PBRSB_NO))
-> 		setup_force_cpu_bug(X86_BUG_EIBRS_PBRSB);
->
->+	/*
->+	 * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the Intel flag only
->+	 * after IBRS_ENHANCED bugs such as BUG_EIBRS_PBRSB above have been
->+	 * determined.
->+	 */
+On Thu, 24 Nov 2022 19:39:20 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
+> +/**
+> + * VFIO_MIG_GET_PRECOPY_INFO - _IO(VFIO_TYPE, VFIO_BASE + 21)
+> + *
+> + * This ioctl is used on the migration data FD in the precopy phase of the
+> + * migration data transfer. It returns an estimate of the current data sizes
+> + * remaining to be transferred. It allows the user to judge when it is
+> + * appropriate to leave PRE_COPY for STOP_COPY.
+> + *
+> + * This ioctl is valid only in PRE_COPY states and kernel driver should
+> + * return -EINVAL from any other migration state.
+> + *
+> + * The vfio_precopy_info data structure returned by this ioctl provides
+> + * estimates of data available from the device during the PRE_COPY states.
+> + * This estimate is split into two categories, initial_bytes and
+> + * dirty_bytes.
+> + *
+> + * The initial_bytes field indicates the amount of initial mandatory precopy
+> + * data available from the device. This field should have a non-zero initial
+> + * value and decrease as migration data is read from the device.
+> + * It is a must to leave PRE_COPY for STOP_COPY only after this field reach
+> + * zero.
 
-Minor comment, setting NO_EIBRS_PBRSB in cpu_vuln_whitelist for
-non-EIBRS CPUs also (AMD and others) can remove this order dependency.
 
->+	if (cpu_has(c, X86_FEATURE_AUTOIBRS))
->+		setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
+Is this actually a requirement that's compatible with current QEMU
+behavior?  It's my impression that a user can force the migration to
+move to STOP_COPY at any point in time.  Thanks,
+
+Alex
+
+> + *
+> + * The dirty_bytes field tracks device state changes relative to data
+> + * previously retrieved.  This field starts at zero and may increase as
+> + * the internal device state is modified or decrease as that modified
+> + * state is read from the device.
+> + *
+> + * Userspace may use the combination of these fields to estimate the
+> + * potential data size available during the PRE_COPY phases, as well as
+> + * trends relative to the rate the device is dirtying its internal
+> + * state, but these fields are not required to have any bearing relative
+> + * to the data size available during the STOP_COPY phase.
+> + *
+> + * Drivers have a lot of flexibility in when and what they transfer during the
+> + * PRE_COPY phase, and how they report this from VFIO_MIG_GET_PRECOPY_INFO.
+> + *
+> + * During pre-copy the migration data FD has a temporary "end of stream" that is
+> + * reached when both initial_bytes and dirty_byte are zero. For instance, this
+> + * may indicate that the device is idle and not currently dirtying any internal
+> + * state. When read() is done on this temporary end of stream the kernel driver
+> + * should return ENOMSG from read(). Userspace can wait for more data (which may
+> + * never come) by using poll.
+> + *
+> + * Once in STOP_COPY the migration data FD has a permanent end of stream
+> + * signaled in the usual way by read() always returning 0 and poll always
+> + * returning readable. ENOMSG may not be returned in STOP_COPY. Support
+> + * for this ioctl is optional.
+> + *
+> + * Return: 0 on success, -1 and errno set on failure.
+> + */
+> +struct vfio_precopy_info {
+> +	__u32 argsz;
+> +	__u32 flags;
+> +	__aligned_u64 initial_bytes;
+> +	__aligned_u64 dirty_bytes;
+>  };
+>  
+> +#define VFIO_MIG_GET_PRECOPY_INFO _IO(VFIO_TYPE, VFIO_BASE + 21)
+> +
+>  /*
+>   * Upon VFIO_DEVICE_FEATURE_SET, allow the device to be moved into a low power
+>   * state with the platform-based power management.  Device use of lower power
+
