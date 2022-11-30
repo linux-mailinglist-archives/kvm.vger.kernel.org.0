@@ -2,78 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EAE3B63CCC9
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 02:23:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E49A63CCF0
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 02:39:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230522AbiK3BX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 20:23:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40136 "EHLO
+        id S231607AbiK3Bjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 20:39:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbiK3BXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 20:23:25 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECE586460
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 17:23:24 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id g10so15167942plo.11
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 17:23:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ewUKpCuoaPzAR2fmrr+FD3H80AnrDry9LxbpWXLNvF4=;
-        b=fb6DDgCaO06aAL+G5/T2sy0zhAJSlkluomnYowvIHNfrJbn2iaW5lHshIKewz5bOza
-         ZaVgBpSB1cf2gMMANnU8K3AmjeUTIEKMNAbICy4G4jI4J2CpMNUvY/Js2ymp2Vkdcrpc
-         I/d8R9iBlPs25vU0P4/h91XTk5DY/HLFSeS9bfgUuz+/VqMoOnk6kDmp8yWPVrf6tnND
-         gTm4F2hpkbVA2broOTWoHcFoZM+TXUmFgKcJTGxHhtdYC50vDAMDfxB23yxt9I+Qq5xa
-         Efw8DrsJ1oUnwHKABaYjsxPhyqo6wl960Zc0CTDg/x5TzQW5EkrrtjjLH6tEdMXomJIo
-         QP7g==
+        with ESMTP id S231713AbiK3Bjj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 20:39:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E06D167ED
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 17:38:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669772321;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GowjTITXbXHhFLVXsn/J2IRPd19QkjVMTvNWNDRGo5c=;
+        b=Dc+1LxSP2mXuVzuSRpggsAQe9URFl2r7VRQ9V7PJ9kcBVRoZaSHV4C47kpoo6FgWxoxKd9
+        Q2RIYPDQCpeCpFiymbxzwtQ4RspV6iK0MNLl5pEsGndQUF6tFQKtFh+LSVVrQmbij+SOmJ
+        pti3ZLf8zLhgB0AymnlkEO9vvb56yMg=
+Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com
+ [209.85.221.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-192-QyQ903tdOwGMjpK6OynKLg-1; Tue, 29 Nov 2022 20:38:24 -0500
+X-MC-Unique: QyQ903tdOwGMjpK6OynKLg-1
+Received: by mail-vk1-f197.google.com with SMTP id u186-20020a1fabc3000000b003b80089c9e6so7167889vke.2
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 17:38:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ewUKpCuoaPzAR2fmrr+FD3H80AnrDry9LxbpWXLNvF4=;
-        b=2FJIFYRjr8JsHoZyIURlSICTeMbDYd5QjJwmORSj8N+aI4N9WyvIXtHPW+zzU3tDVl
-         ScszQucvfV/mCCbV3p7NIzTrzCmY/6IHF/K9pBTwX4DqP4F3i8q8MZOTiV4uKYcGB9g9
-         mDvYlichprR2538NrDxc1djovDURSb2o0V5NB7NGGSaeXTANH4h7Ts5ybHQhBCg+EoVC
-         3kidoKQIRszEdYmnaRJoz4ZLfP8qRFLVa+peX6UaAgiTCJeUTU9emi93dpF3IBLKtErN
-         hYpZ3EMTcdFx5kd50hQFnsAODDjwXMM/kSbdGXyq36MQ0qcjuAcoruRUgewXdGkN8nGw
-         hbxA==
-X-Gm-Message-State: ANoB5plCeM6vasYK1+4Dq9005p8w3SkkTvt+2KugSeWoYVOYloJiYlfs
-        15JM2Le//dFOUikcqtQuJJhUvb2JDUpYug==
-X-Google-Smtp-Source: AA0mqf7fkXBzPKsGf+r09kMkzskIdRv4AjvbWaWxjMbW/TRWAGLM3zhTZlBXjYYEDVoWL3AUhcc9xA==
-X-Received: by 2002:a17:902:db07:b0:189:9ee0:cca4 with SMTP id m7-20020a170902db0700b001899ee0cca4mr4412610plx.74.1669771404345;
-        Tue, 29 Nov 2022 17:23:24 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id z3-20020aa79903000000b0056da63c8515sm119230pff.91.2022.11.29.17.23.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Nov 2022 17:23:23 -0800 (PST)
-Date:   Tue, 29 Nov 2022 17:23:20 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/4] KVM: arm64: Don't serialize if the access flag isn't
- set
-Message-ID: <Y4awiKLuKORZmU2z@google.com>
-References: <20221129191946.1735662-1-oliver.upton@linux.dev>
- <20221129191946.1735662-3-oliver.upton@linux.dev>
- <Y4Zw/J3srTsZ57P7@google.com>
- <Y4Z2aWVEnluy+d3+@google.com>
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GowjTITXbXHhFLVXsn/J2IRPd19QkjVMTvNWNDRGo5c=;
+        b=vJAQR1FEHgNIVEq69zS0sT6ovEFGL0BHg+PgT9MNl9TNFizrL0wuGXlDfLt96FTR1G
+         EOKceX30ucw9tma3sn5DCBQbM7sGAYMeyVcDUb2GW8v8V8qXVT7BBTPPcXKUGnRHhe+W
+         I79/8wV7yfUDXu1ac2P2DyCIRD9KVv+ePQjzSKc5aY6FudlteRz4Z6Wm311zWIiL8Bja
+         tuKFACKlLPXG2xpQePAZtGzaAV//WYtiFwoNCoEQmLzsA8Go202oR3OnJdE2GjGeQ5HK
+         Mu4da2ep7MZRD6O9fbyLtVgj78CW6pasLybvocyypsCZUQiiMRd9Bivar1wxDiuWJmJS
+         1YSg==
+X-Gm-Message-State: ANoB5pmwNeZ6KS9aG9h4rMEdo89pySKLvsVy9KQfUpwV9ReGZWJDmVZY
+        FXAUF3fgW4UBXxjNgUocnW2RptPY377NHvAX0cAL2LOJeQZX6UoYuMe7oC/bTUO+n0rQGdUhXvB
+        Cii0WyHLW2luGyiA/oBQBP1RGLmCY
+X-Received: by 2002:a05:6102:579a:b0:3b0:620b:f642 with SMTP id dh26-20020a056102579a00b003b0620bf642mr23111116vsb.81.1669772303247;
+        Tue, 29 Nov 2022 17:38:23 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5fD5lWlo7herbb50TKeCbSU8MM9DoxfQ8arA9LJkn26oUTy+Ta8ED3+bbjF8tqqagZrHMtG1qUb8/lvrOZWTU=
+X-Received: by 2002:a05:6102:579a:b0:3b0:620b:f642 with SMTP id
+ dh26-20020a056102579a00b003b0620bf642mr23111106vsb.81.1669772302998; Tue, 29
+ Nov 2022 17:38:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y4Z2aWVEnluy+d3+@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+References: <20221125022317.2157263-1-lulu@redhat.com> <20221128104730.6igmyh6jz7voymdp@sgarzare-redhat>
+In-Reply-To: <20221128104730.6igmyh6jz7voymdp@sgarzare-redhat>
+From:   Cindy Lu <lulu@redhat.com>
+Date:   Wed, 30 Nov 2022 09:37:44 +0800
+Message-ID: <CACLfguW7BdPjjuk=YuhDiganwFO5QqSw3R2W6es4Zg8zixjLHA@mail.gmail.com>
+Subject: Re: [PATCH v2] vhost_vdpa: fix the crash in unmap a large memory
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     jasowang@redhat.com, mst@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,42 +76,181 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 29, 2022 at 09:15:21PM +0000, Oliver Upton wrote:
-> Hi Ricardo,
-> 
-> Thanks for having a look.
-> 
-> On Tue, Nov 29, 2022 at 12:52:12PM -0800, Ricardo Koller wrote:
-> > On Tue, Nov 29, 2022 at 07:19:44PM +0000, Oliver Upton wrote:
-> 
-> [...]
-> 
-> > > +	ret = stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
-> > > +				       &pte, NULL, 0);
-> > > +	if (!ret)
-> > > +		dsb(ishst);
-> > 
-> > At the moment, the only reason for stage2_update_leaf_attrs() to not
-> > update the PTE is if it's not valid:
-> > 
-> > 	if (!kvm_pte_valid(pte))
-> > 			return 0;
-> > 
-> > I guess you could check that as well:
-> > 
-> > +	if (!ret || kvm_pte_valid(pte))
-> > +		dsb(ishst);
-> 
-> Thanks for catching this.
-> 
-> Instead of pivoting on the returned PTE value, how about we return
-> -EAGAIN from the early return in stage2_attr_walker()? It would better
-> match the pattern used elsewhere in the pgtable code.
-
-That works, although I would use another return code (e.g., EINVAL)? as
-that's not exactly a "try again" type of error.
-
-> 
-> --
+On Mon, 28 Nov 2022 at 18:47, Stefano Garzarella <sgarzare@redhat.com> wrot=
+e:
+>
+> On Fri, Nov 25, 2022 at 10:23:17AM +0800, Cindy Lu wrote:
+> >While testing in vIOMMU, sometimes guest will unmap very large memory,
+> >which will cause the crash. To fix this,Move the iommu_unmap to
+> >vhost_vdpa_pa_unmap/vhost_vdpa_va_unmap and only unmap the memory
+> >that saved in iotlb.
+> >
+> >Call Trace:
+> >[  647.820144] ------------[ cut here ]------------
+> >[  647.820848] kernel BUG at drivers/iommu/intel/iommu.c:1174!
+> >[  647.821486] invalid opcode: 0000 [#1] PREEMPT SMP PTI
+> >[  647.822082] CPU: 10 PID: 1181 Comm: qemu-system-x86 Not tainted 6.0.0=
+-rc1home_lulu_2452_lulu7_vhost+ #62
+> >[  647.823139] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS =
+rel-1.15.0-29-g6a62e0cb0dfe-prebuilt.qem4
+> >[  647.824365] RIP: 0010:domain_unmap+0x48/0x110
+> >[  647.825424] Code: 48 89 fb 8d 4c f6 1e 39 c1 0f 4f c8 83 e9 0c 83 f9 =
+3f 7f 18 48 89 e8 48 d3 e8 48 85 c0 75 59
+> >[  647.828064] RSP: 0018:ffffae5340c0bbf0 EFLAGS: 00010202
+> >[  647.828973] RAX: 0000000000000001 RBX: ffff921793d10540 RCX: 00000000=
+0000001b
+> >[  647.830083] RDX: 00000000080000ff RSI: 0000000000000001 RDI: ffff9217=
+93d10540
+> >[  647.831214] RBP: 0000000007fc0100 R08: ffffae5340c0bcd0 R09: 00000000=
+00000003
+> >[  647.832388] R10: 0000007fc0100000 R11: 0000000000100000 R12: 00000000=
+080000ff
+> >[  647.833668] R13: ffffae5340c0bcd0 R14: ffff921793d10590 R15: 00000080=
+00100000
+> >[  647.834782] FS:  00007f772ec90640(0000) GS:ffff921ce7a80000(0000) knl=
+GS:0000000000000000
+> >[  647.836004] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> >[  647.836990] CR2: 00007f02c27a3a20 CR3: 0000000101b0c006 CR4: 00000000=
+00372ee0
+> >[  647.838107] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000=
+00000000
+> >[  647.839283] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000=
+00000400
+> >[  647.840666] Call Trace:
+> >[  647.841437]  <TASK>
+> >[  647.842107]  intel_iommu_unmap_pages+0x93/0x140
+> >[  647.843112]  __iommu_unmap+0x91/0x1b0
+> >[  647.844003]  iommu_unmap+0x6a/0x95
+> >[  647.844885]  vhost_vdpa_unmap+0x1de/0x1f0 [vhost_vdpa]
+> >[  647.845985]  vhost_vdpa_process_iotlb_msg+0xf0/0x90b [vhost_vdpa]
+> >[  647.847235]  ? _raw_spin_unlock+0x15/0x30
+> >[  647.848181]  ? _copy_from_iter+0x8c/0x580
+> >[  647.849137]  vhost_chr_write_iter+0xb3/0x430 [vhost]
+> >[  647.850126]  vfs_write+0x1e4/0x3a0
+> >[  647.850897]  ksys_write+0x53/0xd0
+> >[  647.851688]  do_syscall_64+0x3a/0x90
+> >[  647.852508]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> >[  647.853457] RIP: 0033:0x7f7734ef9f4f
+> >[  647.854408] Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 29 76 f8 =
+ff 48 8b 54 24 18 48 8b 74 24 10 41 89 c8
+> >[  647.857217] RSP: 002b:00007f772ec8f040 EFLAGS: 00000293 ORIG_RAX: 000=
+0000000000001
+> >[  647.858486] RAX: ffffffffffffffda RBX: 00000000fef00000 RCX: 00007f77=
+34ef9f4f
+> >[  647.859713] RDX: 0000000000000048 RSI: 00007f772ec8f090 RDI: 00000000=
+00000010
+> >[  647.860942] RBP: 00007f772ec8f1a0 R08: 0000000000000000 R09: 00000000=
+00000000
+> >[  647.862206] R10: 0000000000000001 R11: 0000000000000293 R12: 00000000=
+00000010
+> >[  647.863446] R13: 0000000000000002 R14: 0000000000000000 R15: ffffffff=
+01100000
+> >[  647.864692]  </TASK>
+> >[  647.865458] Modules linked in: rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_=
+resolver nfs lockd grace fscache netfs v]
+> >[  647.874688] ---[ end trace 0000000000000000 ]---
+>
+> I think you can remove the part below this line.
+>
+>  From here:
+>
+> >[  647.876013] RIP: 0010:domain_unmap+0x48/0x110
+> >[  647.878306] Code: 48 89 fb 8d 4c f6 1e 39 c1 0f 4f c8 83 e9 0c 83 f9 =
+3f 7f 18 48 89 e8 48 d3 e8 48 85 c0 75 59
+> >[  647.884581] RSP: 0018:ffffae5340c0bbf0 EFLAGS: 00010202
+> >[  647.886308] RAX: 0000000000000001 RBX: ffff921793d10540 RCX: 00000000=
+0000001b
+> >[  647.888775] RDX: 00000000080000ff RSI: 0000000000000001 RDI: ffff9217=
+93d10540
+> >[  647.890295] RBP: 0000000007fc0100 R08: ffffae5340c0bcd0 R09: 00000000=
+00000003
+> >[  647.891660] R10: 0000007fc0100000 R11: 0000000000100000 R12: 00000000=
+080000ff
+> >[  647.893019] R13: ffffae5340c0bcd0 R14: ffff921793d10590 R15: 00000080=
+00100000
+> >[  647.894506] FS:  00007f772ec90640(0000) GS:ffff921ce7a80000(0000) knl=
+GS:0000000000000000
+> >[  647.895963] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> >[  647.897348] CR2: 00007f02c27a3a20 CR3: 0000000101b0c006 CR4: 00000000=
+00372ee0
+> >[  647.898719] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000=
+00000000
+>
+> To here.
+>
+> And maybe I would also remove the timestamps; in the end they are not
+> useful for this fix and they crowd this trace.
+>
+thanks Stefano =EF=BC=8CI will fix this
+> >
+> >Fixes: 4c8cf31885f6 ("vhost: introduce vDPA-based backend")
+> >Signed-off-by: Cindy Lu <lulu@redhat.com>
+> >---
+> > drivers/vhost/vdpa.c | 10 ++++++++--
+> > 1 file changed, 8 insertions(+), 2 deletions(-)
+> >
+> >diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> >index 166044642fd5..e5a07751bf45 100644
+> >--- a/drivers/vhost/vdpa.c
+> >+++ b/drivers/vhost/vdpa.c
+> >@@ -692,6 +692,8 @@ static void vhost_vdpa_pa_unmap(struct vhost_vdpa *v=
+,
+> >       struct vhost_iotlb_map *map;
+> >       struct page *page;
+> >       unsigned long pfn, pinned;
+> >+      struct vdpa_device *vdpa =3D v->vdpa;
+> >+      const struct vdpa_config_ops *ops =3D vdpa->config;
+> >
+> >       while ((map =3D vhost_iotlb_itree_first(iotlb, start, last)) !=3D=
+ NULL) {
+> >               pinned =3D PFN_DOWN(map->size);
+> >@@ -703,6 +705,8 @@ static void vhost_vdpa_pa_unmap(struct vhost_vdpa *v=
+,
+> >                       unpin_user_page(page);
+> >               }
+> >               atomic64_sub(PFN_DOWN(map->size), &dev->mm->pinned_vm);
+> >+              if ((ops->dma_map =3D=3D NULL) && (ops->set_map =3D=3D NU=
+LL))
+> >+                      iommu_unmap(v->domain, map->start, map->size);
+> >               vhost_iotlb_map_free(iotlb, map);
+> >       }
+> > }
+> >@@ -713,11 +717,15 @@ static void vhost_vdpa_va_unmap(struct vhost_vdpa =
+*v,
+> > {
+> >       struct vhost_iotlb_map *map;
+> >       struct vdpa_map_file *map_file;
+> >+      struct vdpa_device *vdpa =3D v->vdpa;
+> >+      const struct vdpa_config_ops *ops =3D vdpa->config;
+> >
+> >       while ((map =3D vhost_iotlb_itree_first(iotlb, start, last)) !=3D=
+ NULL) {
+> >               map_file =3D (struct vdpa_map_file *)map->opaque;
+> >               fput(map_file->file);
+> >               kfree(map_file);
+> >+              if (ops->set_map =3D=3D NULL)
+>
+> Should we check that `dma_map` is also NULL as in the previous hunk?
+>
 > Thanks,
-> Oliver
+> Stefano
+>
+Thanks Stefano, I wIll rewrite this part
+> >+                      iommu_unmap(v->domain, map->start, map->size);
+> >               vhost_iotlb_map_free(iotlb, map);
+> >       }
+> > }
+> >@@ -805,8 +813,6 @@ static void vhost_vdpa_unmap(struct vhost_vdpa *v,
+> >       } else if (ops->set_map) {
+> >               if (!v->in_batch)
+> >                       ops->set_map(vdpa, asid, iotlb);
+> >-      } else {
+> >-              iommu_unmap(v->domain, iova, size);
+> >       }
+> >
+> >       /* If we are in the middle of batch processing, delay the free
+> >--
+> >2.34.3
+> >
+>
+
