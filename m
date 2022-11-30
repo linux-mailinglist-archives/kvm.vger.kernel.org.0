@@ -2,282 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3810363CCF2
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 02:41:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E5F963CDDF
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 04:36:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231515AbiK3BlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 20:41:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49330 "EHLO
+        id S232303AbiK3DgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 22:36:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230385AbiK3BlD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 20:41:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E91AF1EC46
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 17:40:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669772408;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rNO7g8bYXcgKYmsyunc7q9RriXvgw7+u6mtPM1gx+ic=;
-        b=hgRmulo5nJlQvZPkddVdLyW4XAbch94mayqaA79nyrZbL6zTTpxhCfCPf8jkfICfMqG3d/
-        15Qdly7EJssh3UMujHwYE8OgNLgMlJXqZGwKMnQtb3EkQPvUS+vjHvW7WGlDhg07jXVF8M
-        Q5KU47E23JoPeYEr/zvYm3HjPxzw9N8=
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
- [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-487-D5z5l16ZMDmecxmBb3JwZA-1; Tue, 29 Nov 2022 20:40:06 -0500
-X-MC-Unique: D5z5l16ZMDmecxmBb3JwZA-1
-Received: by mail-ua1-f70.google.com with SMTP id y40-20020a9f326b000000b0041919bac03fso5391631uad.13
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 17:40:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rNO7g8bYXcgKYmsyunc7q9RriXvgw7+u6mtPM1gx+ic=;
-        b=QoMyUNuNk7IEtqLfYpLSH7X6E3y8o3q8cFnJ/pwfIqOrGqIIWL9ECvtHRX1zDg8ou3
-         oadU+th0mq7C21dpP3jd/UfJYyWSaAf3Nw8ovVvRtpfece6woiq4yYp5KBkY2ggeZwr+
-         7GmEao2sENDpXE/sZOCIRzjuOqPqw1rZoYgm1v7/Wthe1lty5YFDrTjcYOEmJIHdvDWj
-         pTGUvzq9NSN7GuLn65TVx4YdM0N9dYD+WJDZYLMD2/yTuUJsg/EKD5ZgwW5prUh/R1vB
-         ujcqngpWdTWAdXpZcqzaE3tvS3zPmBKEHtrQSc93BnlkiBBMXd1s4+/V/gxI5PgQlE9Z
-         npFA==
-X-Gm-Message-State: ANoB5plpdwrRR18Ft9SKb0F0PAMLVfaoECzdoeME/o0ALmQ7A1h9JwiM
-        Ptze8RG0Toi4ybabI7ugdDDg6Gj+YSfzt70+WjMVEHQN/ZhIcVJ9tdvhDpBpCDch07TDfPwWzxZ
-        s8ZJ0Zybluuwe8ZPrzfuWPAgm5d2j
-X-Received: by 2002:a05:6102:3354:b0:3a9:8207:bb1a with SMTP id j20-20020a056102335400b003a98207bb1amr24634195vse.58.1669772405268;
-        Tue, 29 Nov 2022 17:40:05 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7j6L7GT+iLZduG+t5pmCEYt9a7U645cU+T+eAKT4xR/0GB7I+totc2AtxCOh8A9urWLIWyxPZad14aOGpOlME=
-X-Received: by 2002:a05:6102:3354:b0:3a9:8207:bb1a with SMTP id
- j20-20020a056102335400b003a98207bb1amr24634184vse.58.1669772404971; Tue, 29
- Nov 2022 17:40:04 -0800 (PST)
+        with ESMTP id S229448AbiK3DgB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 22:36:01 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3500E73416;
+        Tue, 29 Nov 2022 19:36:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669779360; x=1701315360;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=GZSxJkGgD4LF6xp690xtWUxvjYvqUHVb1du6FHsC7bo=;
+  b=IAd8tJTKmJJv2QftvTTcUPHGwe5gQN9CzyGEJx9iFOWW61s91hci123s
+   Jr3rMbUgbJRc0x0bHCpujNr7Mh8LsuxyAMly7rsVPqDqR6NAYzjyyUYif
+   M5kifXaSGMIxzWle320EeMPJWEpVRWDKaF2l3zoeF8ETFDYp56sUORtRC
+   v9+XHrouhoRAaW8bpZ+bdlLffJ+3D85nt9r3EM1tFxX+ZzoAsRQoMuAfE
+   aR8eItVUbUvw4NldgNJXvawrEHPfM0NQJfUXRwvTqMDQKVAwH6w/qUFnd
+   pkFlYoUd0b3SkXeY26eGN28VlQnbPhyPsZ2to9fQPp6wNJ6mE7TaTSvGO
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10546"; a="295658383"
+X-IronPort-AV: E=Sophos;i="5.96,205,1665471600"; 
+   d="scan'208";a="295658383"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2022 19:35:59 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10546"; a="594513331"
+X-IronPort-AV: E=Sophos;i="5.96,205,1665471600"; 
+   d="scan'208";a="594513331"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.249.171.33]) ([10.249.171.33])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2022 19:35:54 -0800
+Message-ID: <a537b97b-0bdc-5bcc-9ce7-470f8fc1245b@linux.intel.com>
+Date:   Wed, 30 Nov 2022 11:35:51 +0800
 MIME-Version: 1.0
-References: <20221125023045.2158413-1-lulu@redhat.com> <CACGkMEuPMYVamb9saZWX8E38Xu_Q5vS7BKweyUeOaS==uiVZqw@mail.gmail.com>
- <CACLfguU6VZ7PPf7coj7Fe5ZPdqitekHkL9rfc3o4nWG2uFmonw@mail.gmail.com> <CACGkMEuxuk3nXK3SnXw1k39jcQr-QGTQMeF8-ZPszxHaBJ6f-w@mail.gmail.com>
-In-Reply-To: <CACGkMEuxuk3nXK3SnXw1k39jcQr-QGTQMeF8-ZPszxHaBJ6f-w@mail.gmail.com>
-From:   Cindy Lu <lulu@redhat.com>
-Date:   Wed, 30 Nov 2022 09:39:27 +0800
-Message-ID: <CACLfguVJoe3oGM+NbECOaXZa7AkiJHjfK3-4cBLhLDvBpTf7CA@mail.gmail.com>
-Subject: Re: [PATCH v3] vhost_vdpa: fix the crash in unmap a large memory
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v7 17/20] x86/virt/tdx: Configure global KeyID on all
+ packages
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
+        dave.hansen@intel.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
+        ying.huang@intel.com, reinette.chatre@intel.com,
+        len.brown@intel.com, tony.luck@intel.com, peterz@infradead.org,
+        ak@linux.intel.com, isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+References: <cover.1668988357.git.kai.huang@intel.com>
+ <8d8285cc5efa6302cf42a3fe2c9153d1a9dbcdac.1668988357.git.kai.huang@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <8d8285cc5efa6302cf42a3fe2c9153d1a9dbcdac.1668988357.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 29 Nov 2022 at 11:04, Jason Wang <jasowang@redhat.com> wrote:
->
-> On Fri, Nov 25, 2022 at 3:38 PM Cindy Lu <lulu@redhat.com> wrote:
-> >
-> > / and
-> >
-> >
-> > On Fri, 25 Nov 2022 at 15:17, Jason Wang <jasowang@redhat.com> wrote:
-> > >
-> > > On Fri, Nov 25, 2022 at 10:31 AM Cindy Lu <lulu@redhat.com> wrote:
-> > > >
-> > > > While testing in vIOMMU, sometimes guest will unmap very large memo=
-ry,
-> > > > which will cause the crash. To fix this,Move the iommu_unmap to
-> > > > vhost_vdpa_pa_unmap/vhost_vdpa_va_unmap and only unmap the memory
-> > > > that saved in iotlb.
-> > > >
-> > > > Call Trace:
-> > > > [  647.820144] ------------[ cut here ]------------
-> > > > [  647.820848] kernel BUG at drivers/iommu/intel/iommu.c:1174!
-> > > > [  647.821486] invalid opcode: 0000 [#1] PREEMPT SMP PTI
-> > > > [  647.822082] CPU: 10 PID: 1181 Comm: qemu-system-x86 Not tainted =
-6.0.0-rc1home_lulu_2452_lulu7_vhost+ #62
-> > > > [  647.823139] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), =
-BIOS rel-1.15.0-29-g6a62e0cb0dfe-prebuilt.qem4
-> > > > [  647.824365] RIP: 0010:domain_unmap+0x48/0x110
-> > > > [  647.825424] Code: 48 89 fb 8d 4c f6 1e 39 c1 0f 4f c8 83 e9 0c 8=
-3 f9 3f 7f 18 48 89 e8 48 d3 e8 48 85 c0 75 59
-> > > > [  647.828064] RSP: 0018:ffffae5340c0bbf0 EFLAGS: 00010202
-> > > > [  647.828973] RAX: 0000000000000001 RBX: ffff921793d10540 RCX: 000=
-000000000001b
-> > > > [  647.830083] RDX: 00000000080000ff RSI: 0000000000000001 RDI: fff=
-f921793d10540
-> > > > [  647.831214] RBP: 0000000007fc0100 R08: ffffae5340c0bcd0 R09: 000=
-0000000000003
-> > > > [  647.832388] R10: 0000007fc0100000 R11: 0000000000100000 R12: 000=
-00000080000ff
-> > > > [  647.833668] R13: ffffae5340c0bcd0 R14: ffff921793d10590 R15: 000=
-0008000100000
-> > > > [  647.834782] FS:  00007f772ec90640(0000) GS:ffff921ce7a80000(0000=
-) knlGS:0000000000000000
-> > > > [  647.836004] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > [  647.836990] CR2: 00007f02c27a3a20 CR3: 0000000101b0c006 CR4: 000=
-0000000372ee0
-> > > > [  647.838107] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000=
-0000000000000
-> > > > [  647.839283] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000=
-0000000000400
-> > > > [  647.840666] Call Trace:
-> > > > [  647.841437]  <TASK>
-> > > > [  647.842107]  intel_iommu_unmap_pages+0x93/0x140
-> > > > [  647.843112]  __iommu_unmap+0x91/0x1b0
-> > > > [  647.844003]  iommu_unmap+0x6a/0x95
-> > > > [  647.844885]  vhost_vdpa_unmap+0x1de/0x1f0 [vhost_vdpa]
-> > > > [  647.845985]  vhost_vdpa_process_iotlb_msg+0xf0/0x90b [vhost_vdpa=
-]
-> > > > [  647.847235]  ? _raw_spin_unlock+0x15/0x30
-> > > > [  647.848181]  ? _copy_from_iter+0x8c/0x580
-> > > > [  647.849137]  vhost_chr_write_iter+0xb3/0x430 [vhost]
-> > > > [  647.850126]  vfs_write+0x1e4/0x3a0
-> > > > [  647.850897]  ksys_write+0x53/0xd0
-> > > > [  647.851688]  do_syscall_64+0x3a/0x90
-> > > > [  647.852508]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> > > > [  647.853457] RIP: 0033:0x7f7734ef9f4f
-> > > > [  647.854408] Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 29 7=
-6 f8 ff 48 8b 54 24 18 48 8b 74 24 10 41 89 c8
-> > > > [  647.857217] RSP: 002b:00007f772ec8f040 EFLAGS: 00000293 ORIG_RAX=
-: 0000000000000001
-> > > > [  647.858486] RAX: ffffffffffffffda RBX: 00000000fef00000 RCX: 000=
-07f7734ef9f4f
-> > > > [  647.859713] RDX: 0000000000000048 RSI: 00007f772ec8f090 RDI: 000=
-0000000000010
-> > > > [  647.860942] RBP: 00007f772ec8f1a0 R08: 0000000000000000 R09: 000=
-0000000000000
-> > > > [  647.862206] R10: 0000000000000001 R11: 0000000000000293 R12: 000=
-0000000000010
-> > > > [  647.863446] R13: 0000000000000002 R14: 0000000000000000 R15: fff=
-fffff01100000
-> > > > [  647.864692]  </TASK>
-> > > > [  647.865458] Modules linked in: rpcsec_gss_krb5 auth_rpcgss nfsv4=
- dns_resolver nfs lockd grace fscache netfs v]
-> > > > [  647.874688] ---[ end trace 0000000000000000 ]---
-> > > > [  647.876013] RIP: 0010:domain_unmap+0x48/0x110
-> > > > [  647.878306] Code: 48 89 fb 8d 4c f6 1e 39 c1 0f 4f c8 83 e9 0c 8=
-3 f9 3f 7f 18 48 89 e8 48 d3 e8 48 85 c0 75 59
-> > > > [  647.884581] RSP: 0018:ffffae5340c0bbf0 EFLAGS: 00010202
-> > > > [  647.886308] RAX: 0000000000000001 RBX: ffff921793d10540 RCX: 000=
-000000000001b
-> > > > [  647.888775] RDX: 00000000080000ff RSI: 0000000000000001 RDI: fff=
-f921793d10540
-> > > > [  647.890295] RBP: 0000000007fc0100 R08: ffffae5340c0bcd0 R09: 000=
-0000000000003
-> > > > [  647.891660] R10: 0000007fc0100000 R11: 0000000000100000 R12: 000=
-00000080000ff
-> > > > [  647.893019] R13: ffffae5340c0bcd0 R14: ffff921793d10590 R15: 000=
-0008000100000
-> > > > [  647.894506] FS:  00007f772ec90640(0000) GS:ffff921ce7a80000(0000=
-) knlGS:0000000000000000
-> > > > [  647.895963] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > [  647.897348] CR2: 00007f02c27a3a20 CR3: 0000000101b0c006 CR4: 000=
-0000000372ee0
-> > > > [  647.898719] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000=
-0000000000000
-> > > >
-> > > > Cc: stable@vger.kernel.org
-> > > > Fixes: 4c8cf31885f6 ("vhost: introduce vDPA-based backend")
-> > > > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > > > ---
-> > > >  drivers/vhost/vdpa.c | 10 ++++++++--
-> > > >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > > index 166044642fd5..e5a07751bf45 100644
-> > > > --- a/drivers/vhost/vdpa.c
-> > > > +++ b/drivers/vhost/vdpa.c
-> > > > @@ -692,6 +692,8 @@ static void vhost_vdpa_pa_unmap(struct vhost_vd=
-pa *v,
-> > > >         struct vhost_iotlb_map *map;
-> > > >         struct page *page;
-> > > >         unsigned long pfn, pinned;
-> > > > +       struct vdpa_device *vdpa =3D v->vdpa;
-> > > > +       const struct vdpa_config_ops *ops =3D vdpa->config;
-> > > >
-> > > >         while ((map =3D vhost_iotlb_itree_first(iotlb, start, last)=
-) !=3D NULL) {
-> > > >                 pinned =3D PFN_DOWN(map->size);
-> > > > @@ -703,6 +705,8 @@ static void vhost_vdpa_pa_unmap(struct vhost_vd=
-pa *v,
-> > > >                         unpin_user_page(page);
-> > > >                 }
-> > > >                 atomic64_sub(PFN_DOWN(map->size), &dev->mm->pinned_=
-vm);
-> > > > +               if ((ops->dma_map =3D=3D NULL) && (ops->set_map =3D=
-=3D NULL))
-> > > > +                       iommu_unmap(v->domain, map->start, map->siz=
-e);
-> > >
-> > > I think we'd better move the ops->dma_unmap() here as well as iommu_u=
-nmap()?
-> > >
-> > > >                 vhost_iotlb_map_free(iotlb, map);
-> > > >         }
-> > > >  }
-> > > > @@ -713,11 +717,15 @@ static void vhost_vdpa_va_unmap(struct vhost_=
-vdpa *v,
-> > > >  {
-> > > >         struct vhost_iotlb_map *map;
-> > > >         struct vdpa_map_file *map_file;
-> > > > +       struct vdpa_device *vdpa =3D v->vdpa;
-> > > > +       const struct vdpa_config_ops *ops =3D vdpa->config;
-> > > >
-> > > >         while ((map =3D vhost_iotlb_itree_first(iotlb, start, last)=
-) !=3D NULL) {
-> > > >                 map_file =3D (struct vdpa_map_file *)map->opaque;
-> > > >                 fput(map_file->file);
-> > > >                 kfree(map_file);
-> > > > +               if (ops->set_map =3D=3D NULL)
-> > > > +                       iommu_unmap(v->domain, map->start, map->siz=
-e);
-> > >
-> > > Need to check where we have dma_unmap() and call that if it exists?
-> > >
-> > > Thanks
-> > >
-> > Hi Jason=EF=BC=8C
-> > I think  these functions are called in vhost_vdpa_unmap,
-> > Do you want to separate the function in vhost_vdpa_unmap
-> > and move it to vhost_vdpa_va_unmap and vhost_vdpa_pa_unmap? I
->
-> I meant dma_map()/dma_unmap() should be functional equivalent to
-> iommu_map/unmap(). That means we should unmap exactly what is mapped
-> before (vDPA parent may call iommu_unmap in its own dma_unmap() if it
-> needs). If we move the iommu_unmap() from vhost_vdpa_unmap() to
-> vhost_vdpa_{pa|va}_umap, we should move dma_unmap() as well.
->
-> Thanks
->
-Got it.thanks Jason, I will change this part
-Thanks
-Cindy
 
-> > thanks
-> > cindy
-> >
-> > > >                 vhost_iotlb_map_free(iotlb, map);
-> > > >         }
-> > > >  }
-> > > > @@ -805,8 +813,6 @@ static void vhost_vdpa_unmap(struct vhost_vdpa =
-*v,
-> > > >         } else if (ops->set_map) {
-> > > >                 if (!v->in_batch)
-> > > >                         ops->set_map(vdpa, asid, iotlb);
-> > > > -       } else {
-> > > > -               iommu_unmap(v->domain, iova, size);
-> > > >         }
-> > > >
-> > > >         /* If we are in the middle of batch processing, delay the f=
-ree
-> > > > --
-> > > > 2.34.3
-> > > >
-> > >
-> >
+On 11/21/2022 8:26 AM, Kai Huang wrote:
+> After the array of TDMRs and the global KeyID are configured to the TDX
+> module, use TDH.SYS.KEY.CONFIG to configure the key of the global KeyID
+> on all packages.
 >
+> TDH.SYS.KEY.CONFIG must be done on one (any) cpu for each package.  And
+> it cannot run concurrently on different CPUs.  Implement a helper to
+> run SEAMCALL on one cpu for each package one by one, and use it to
+> configure the global KeyID on all packages.
+>
+> Intel hardware doesn't guarantee cache coherency across different
+> KeyIDs.  The kernel needs to flush PAMT's dirty cachelines (associated
+> with KeyID 0) before the TDX module uses the global KeyID to access the
+> PAMT.  Following the TDX module specification, flush cache before
+> configuring the global KeyID on all packages.
+>
+> Given the PAMT size can be large (~1/256th of system RAM), just use
+> WBINVD on all CPUs to flush.
+>
+> Note if any TDH.SYS.KEY.CONFIG fails, the TDX module may already have
+> used the global KeyID to write any PAMT.  Therefore, need to use WBINVD
+> to flush cache before freeing the PAMTs back to the kernel.  Note using
+> MOVDIR64B (which changes the page's associated KeyID from the old TDX
+> private KeyID back to KeyID 0, which is used by the kernel)
 
+It seems not accurate to say MOVDIR64B changes the page's associated KeyID.
+It just uses the current KeyID for memory operations.
+
+
+> to clear
+> PMATs isn't needed, as the KeyID 0 doesn't support integrity check.
+
+For integrity check, is KeyID 0 special or it just has the same behavior 
+as non-zero shared KeyID (if any)?
+
+By saying "KeyID 0 doesn't support integrity check", is it because of  
+the implementation of this patch set or hardware behavior?
+
+According to Architecure Specification 1.0 of TDX Module (344425-004US), 
+shared KeyID could also enable integrity check.
+
+
+>
+> Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+>
+> v6 -> v7:
+>   - Improved changelong and comment to explain why MOVDIR64B isn't used
+>     when returning PAMTs back to the kernel.
+>
+> ---
+>   arch/x86/virt/vmx/tdx/tdx.c | 89 ++++++++++++++++++++++++++++++++++++-
+>   arch/x86/virt/vmx/tdx/tdx.h |  1 +
+>   2 files changed, 88 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index 3a032930e58a..99d1be5941a7 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -224,6 +224,46 @@ static void seamcall_on_each_cpu(struct seamcall_ctx *sc)
+>   	on_each_cpu(seamcall_smp_call_function, sc, true);
+>   }
+>   
+> +/*
+> + * Call one SEAMCALL on one (any) cpu for each physical package in
+> + * serialized way.  Return immediately in case of any error if
+> + * SEAMCALL fails on any cpu.
+> + *
+> + * Note for serialized calls 'struct seamcall_ctx::err' doesn't have
+> + * to be atomic, but for simplicity just reuse it instead of adding
+> + * a new one.
+> + */
+> +static int seamcall_on_each_package_serialized(struct seamcall_ctx *sc)
+> +{
+> +	cpumask_var_t packages;
+> +	int cpu, ret = 0;
+> +
+> +	if (!zalloc_cpumask_var(&packages, GFP_KERNEL))
+> +		return -ENOMEM;
+> +
+> +	for_each_online_cpu(cpu) {
+> +		if (cpumask_test_and_set_cpu(topology_physical_package_id(cpu),
+> +					packages))
+> +			continue;
+> +
+> +		ret = smp_call_function_single(cpu, seamcall_smp_call_function,
+> +				sc, true);
+> +		if (ret)
+> +			break;
+> +
+> +		/*
+> +		 * Doesn't have to use atomic_read(), but it doesn't
+> +		 * hurt either.
+> +		 */
+> +		ret = atomic_read(&sc->err);
+> +		if (ret)
+> +			break;
+> +	}
+> +
+> +	free_cpumask_var(packages);
+> +	return ret;
+> +}
+> +
+>   static int tdx_module_init_cpus(void)
+>   {
+>   	struct seamcall_ctx sc = { .fn = TDH_SYS_LP_INIT };
+> @@ -1010,6 +1050,22 @@ static int config_tdx_module(struct tdmr_info *tdmr_array, int tdmr_num,
+>   	return ret;
+>   }
+>   
+> +static int config_global_keyid(void)
+> +{
+> +	struct seamcall_ctx sc = { .fn = TDH_SYS_KEY_CONFIG };
+> +
+> +	/*
+> +	 * Configure the key of the global KeyID on all packages by
+> +	 * calling TDH.SYS.KEY.CONFIG on all packages in a serialized
+> +	 * way as it cannot run concurrently on different CPUs.
+> +	 *
+> +	 * TDH.SYS.KEY.CONFIG may fail with entropy error (which is
+> +	 * a recoverable error).  Assume this is exceedingly rare and
+> +	 * just return error if encountered instead of retrying.
+> +	 */
+> +	return seamcall_on_each_package_serialized(&sc);
+> +}
+> +
+>   /*
+>    * Detect and initialize the TDX module.
+>    *
+> @@ -1098,15 +1154,44 @@ static int init_tdx_module(void)
+>   	if (ret)
+>   		goto out_free_pamts;
+>   
+> +	/*
+> +	 * Hardware doesn't guarantee cache coherency across different
+> +	 * KeyIDs.  The kernel needs to flush PAMT's dirty cachelines
+> +	 * (associated with KeyID 0) before the TDX module can use the
+> +	 * global KeyID to access the PAMT.  Given PAMTs are potentially
+> +	 * large (~1/256th of system RAM), just use WBINVD on all cpus
+> +	 * to flush the cache.
+> +	 *
+> +	 * Follow the TDX spec to flush cache before configuring the
+> +	 * global KeyID on all packages.
+> +	 */
+> +	wbinvd_on_all_cpus();
+> +
+> +	/* Config the key of global KeyID on all packages */
+> +	ret = config_global_keyid();
+> +	if (ret)
+> +		goto out_free_pamts;
+> +
+>   	/*
+>   	 * Return -EINVAL until all steps of TDX module initialization
+>   	 * process are done.
+>   	 */
+>   	ret = -EINVAL;
+>   out_free_pamts:
+> -	if (ret)
+> +	if (ret) {
+> +		/*
+> +		 * Part of PAMT may already have been initialized by
+> +		 * TDX module.  Flush cache before returning PAMT back
+> +		 * to the kernel.
+> +		 *
+> +		 * Note there's no need to do MOVDIR64B (which changes
+> +		 * the page's associated KeyID from the old TDX private
+> +		 * KeyID back to KeyID 0, which is used by the kernel),
+> +		 * as KeyID 0 doesn't support integrity check.
+> +		 */
+> +		wbinvd_on_all_cpus();
+>   		tdmrs_free_pamt_all(tdmr_array, tdmr_num);
+> -	else
+> +	} else
+>   		pr_info("%lu pages allocated for PAMT.\n",
+>   				tdmrs_count_pamt_pages(tdmr_array, tdmr_num));
+>   out_free_tdmrs:
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+> index c26bab2555ca..768d097412ab 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.h
+> +++ b/arch/x86/virt/vmx/tdx/tdx.h
+> @@ -15,6 +15,7 @@
+>   /*
+>    * TDX module SEAMCALL leaf functions
+>    */
+> +#define TDH_SYS_KEY_CONFIG	31
+>   #define TDH_SYS_INFO		32
+>   #define TDH_SYS_INIT		33
+>   #define TDH_SYS_LP_INIT		35
