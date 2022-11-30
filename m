@@ -2,188 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C1AD63CFC8
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 08:42:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B49863D050
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 09:21:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234138AbiK3Hls (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 02:41:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53216 "EHLO
+        id S234530AbiK3IVj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 03:21:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234098AbiK3Hln (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 02:41:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0176D4387F
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 23:40:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669794048;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fqsdq4+gbDbt6QLOdb+PUFxkECVhWTcDal9kfMorJH0=;
-        b=hVi4MMefJ0q+8DSOvMx822AtMTDnHuRYGSrD3TYs2hrUsCBQtyZ5x1BiLAVCe/4GoO39WO
-        h6Mt3zsjwhNur39vCgW1j5nyqEA6ipiurWWcHxzCMonro0N9TboLBYrRIB7VhdWovvRmUz
-        Dks1Nr+noH/ICGSOmW7Pr+zX54Oge5M=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-512-LnMO-jRhMOKdoyeau6RLfg-1; Wed, 30 Nov 2022 02:40:46 -0500
-X-MC-Unique: LnMO-jRhMOKdoyeau6RLfg-1
-Received: by mail-ed1-f69.google.com with SMTP id z3-20020a056402274300b0046b14f99390so4928871edd.9
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 23:40:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fqsdq4+gbDbt6QLOdb+PUFxkECVhWTcDal9kfMorJH0=;
-        b=Yrxo2zwuqcLYuSkHis19rk4y1P+DM5dv0CfGnn8F58NXNtJ/AZDIjLRMo8RRQdB1c7
-         jVC0v98k6eLNpJUPCUXw9rDx8IraziNiNMxZOJ9pAtH3l13v0QpN/boqKzHUu+IKQjxe
-         FXH4IKi13VURLoPPySxsF2fgzrEEqdyMfg20fUy9EZmm5Arh4UsMOmTPvcTSR0EGopAv
-         a95wcK2WB+5EOZJW2RLFd2LwlfVuA6HbNeMZzX7DcJHKL/FKNPnm7X/gDW3k9c+9aJIi
-         wSqOaQUuOFny/d0VQx71rkhe5D3Bn3hj7L6lb5VsGSX6s4eFKKcyPqXpYnDeSDfUe7Sf
-         WMfg==
-X-Gm-Message-State: ANoB5pk1CEg8DSs74gHFEweu1GAtW/OWnYCd/BvaH+J3mx0DZ/aZX7WU
-        RYaiGu3xLe2XbX3O1eImWFj4fEDsO68RCZGYWFkVl2s+Qy0v7MTavLsfWMZhfxSFKhxvFTduCDe
-        HV74vSjWS8xa5ReJQe+/JAFidSLZ/
-X-Received: by 2002:a05:6402:4284:b0:461:8156:e0ca with SMTP id g4-20020a056402428400b004618156e0camr357785edc.271.1669794045634;
-        Tue, 29 Nov 2022 23:40:45 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4Ax4pmTEP78aJ8j098xQBZ+I5N2Zza6C/OzSIo5c7paoOyBpi09BnoxT9VtU6GsL1yqGy5ri/VBFxje8vwiRA=
-X-Received: by 2002:a05:6402:4284:b0:461:8156:e0ca with SMTP id
- g4-20020a056402428400b004618156e0camr357776edc.271.1669794045408; Tue, 29 Nov
- 2022 23:40:45 -0800 (PST)
-MIME-Version: 1.0
-References: <20221124155158.2109884-1-eperezma@redhat.com> <20221124155158.2109884-7-eperezma@redhat.com>
- <CACGkMEubBA9NYR5ynT_2C=iMEk3fph2GEOBvcw73BOuqiFKzJg@mail.gmail.com>
-In-Reply-To: <CACGkMEubBA9NYR5ynT_2C=iMEk3fph2GEOBvcw73BOuqiFKzJg@mail.gmail.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Wed, 30 Nov 2022 08:40:07 +0100
-Message-ID: <CAJaqyWcR_3vdXLJ4=z+_uaoVN47gEXr7KHx3w6z8HtmqquK7zA@mail.gmail.com>
-Subject: Re: [PATCH for 8.0 v8 06/12] vdpa: extract vhost_vdpa_svq_allocate_iova_tree
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eli Cohen <eli@mellanox.com>, Cindy Lu <lulu@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Gautam Dawar <gdawar@xilinx.com>,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S234441AbiK3IVh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 03:21:37 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1797855CA0;
+        Wed, 30 Nov 2022 00:21:35 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A97EAB8199D;
+        Wed, 30 Nov 2022 08:21:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D5D6C433D6;
+        Wed, 30 Nov 2022 08:21:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669796492;
+        bh=YVwFW8ukFc+IWgIXWj/9MV56uKwQlCK2O51RttnjsSU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=XYccEQE2rG2H1YWBiPcP0nHSASIeJGHz3yVc3OT1lb/hZxxmiK7Z0783XIRtx+rLK
+         uqJ8E7Cu8+fNMFdCHqiFJfLLywmxTSC9sdTLxA1y9tFrrSHu7IIgWOSBxL3A/QFEXs
+         3VBkhbGnWuxNeyyLsJ4aga7pANlntiFNWyx/JhSs1YKTYWt0EozKM4h4ClP7Pz9udz
+         7lffzkqLx2NjLkqB7TQkJ3bXVvk7iYqEzKnKgqV+nja7GQZOrGjqXP0f8OwJU4L+Hv
+         EKIwgmYu8ngvdlKj1HvhnEWBgU6GY/B2w5SsgOc8fL2CdmgDpOfPnsx/9oIcSMSd72
+         S0EhDDZ31eF2A==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p0ILR-009X1T-Rc;
+        Wed, 30 Nov 2022 08:21:30 +0000
+Date:   Wed, 30 Nov 2022 08:21:17 +0000
+Message-ID: <87pmd4ua2q.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] KVM: arm64: Don't serialize if the access flag isn't set
+In-Reply-To: <Y4awiKLuKORZmU2z@google.com>
+References: <20221129191946.1735662-1-oliver.upton@linux.dev>
+        <20221129191946.1735662-3-oliver.upton@linux.dev>
+        <Y4Zw/J3srTsZ57P7@google.com>
+        <Y4Z2aWVEnluy+d3+@google.com>
+        <Y4awiKLuKORZmU2z@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: ricarkol@google.com, oliver.upton@linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 30, 2022 at 7:43 AM Jason Wang <jasowang@redhat.com> wrote:
->
-> On Thu, Nov 24, 2022 at 11:52 PM Eugenio P=C3=A9rez <eperezma@redhat.com>=
- wrote:
-> >
-> > It can be allocated either if all virtqueues must be shadowed or if
-> > vdpa-net detects it can shadow only cvq.
-> >
-> > Extract in its own function so we can reuse it.
-> >
-> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > ---
-> >  net/vhost-vdpa.c | 29 +++++++++++++++++------------
-> >  1 file changed, 17 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> > index 88e0eec5fa..9ee3bc4cd3 100644
-> > --- a/net/vhost-vdpa.c
-> > +++ b/net/vhost-vdpa.c
-> > @@ -240,6 +240,22 @@ static NetClientInfo net_vhost_vdpa_info =3D {
-> >          .check_peer_type =3D vhost_vdpa_check_peer_type,
-> >  };
-> >
-> > +static int vhost_vdpa_get_iova_range(int fd,
-> > +                                     struct vhost_vdpa_iova_range *iov=
-a_range)
-> > +{
-> > +    int ret =3D ioctl(fd, VHOST_VDPA_GET_IOVA_RANGE, iova_range);
-> > +
-> > +    return ret < 0 ? -errno : 0;
-> > +}
->
-> I don't get why this needs to be moved to net specific code.
->
+On Wed, 30 Nov 2022 01:23:20 +0000,
+Ricardo Koller <ricarkol@google.com> wrote:
+> 
+> On Tue, Nov 29, 2022 at 09:15:21PM +0000, Oliver Upton wrote:
+> > Hi Ricardo,
+> > 
+> > Thanks for having a look.
+> > 
+> > On Tue, Nov 29, 2022 at 12:52:12PM -0800, Ricardo Koller wrote:
+> > > On Tue, Nov 29, 2022 at 07:19:44PM +0000, Oliver Upton wrote:
+> > 
+> > [...]
+> > 
+> > > > +	ret = stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
+> > > > +				       &pte, NULL, 0);
+> > > > +	if (!ret)
+> > > > +		dsb(ishst);
+> > > 
+> > > At the moment, the only reason for stage2_update_leaf_attrs() to not
+> > > update the PTE is if it's not valid:
+> > > 
+> > > 	if (!kvm_pte_valid(pte))
+> > > 			return 0;
+> > > 
+> > > I guess you could check that as well:
+> > > 
+> > > +	if (!ret || kvm_pte_valid(pte))
+> > > +		dsb(ishst);
+> > 
+> > Thanks for catching this.
+> > 
+> > Instead of pivoting on the returned PTE value, how about we return
+> > -EAGAIN from the early return in stage2_attr_walker()? It would better
+> > match the pattern used elsewhere in the pgtable code.
+> 
+> That works, although I would use another return code (e.g., EINVAL)? as
+> that's not exactly a "try again" type of error.
 
-It was already in net, this code just extracted it in its own function.
+EINVAL usually is an indication of something that went horribly wrong.
 
-It's done in net because iova_tree must be the same for all queuepair
-vhost, so we need to allocate before them.
+But is that really a failure mode? Here, failing to update the PTE
+should not be considered a failure, but just a benign race: access
+fault being taken on a CPU and the page being evicted on another (not
+unlikely, as the page was marked old before).
 
-Thanks!
+And if I'm correct above, this is definitely a "try again" situation:
+you probably won't take the same type of fault the second time though.
 
-> Thanks
->
-> > +
-> > +static VhostIOVATree *vhost_vdpa_svq_allocate_iova_tree(int vdpa_devic=
-e_fd)
-> > +{
-> > +    struct vhost_vdpa_iova_range iova_range;
-> > +
-> > +    vhost_vdpa_get_iova_range(vdpa_device_fd, &iova_range);
-> > +    return vhost_iova_tree_new(iova_range.first, iova_range.last);
-> > +}
-> > +
-> >  static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *addr)
-> >  {
-> >      VhostIOVATree *tree =3D v->iova_tree;
-> > @@ -587,14 +603,6 @@ static NetClientState *net_vhost_vdpa_init(NetClie=
-ntState *peer,
-> >      return nc;
-> >  }
-> >
-> > -static int vhost_vdpa_get_iova_range(int fd,
-> > -                                     struct vhost_vdpa_iova_range *iov=
-a_range)
-> > -{
-> > -    int ret =3D ioctl(fd, VHOST_VDPA_GET_IOVA_RANGE, iova_range);
-> > -
-> > -    return ret < 0 ? -errno : 0;
-> > -}
-> > -
-> >  static int vhost_vdpa_get_features(int fd, uint64_t *features, Error *=
-*errp)
-> >  {
-> >      int ret =3D ioctl(fd, VHOST_GET_FEATURES, features);
-> > @@ -690,14 +698,11 @@ int net_init_vhost_vdpa(const Netdev *netdev, con=
-st char *name,
-> >      }
-> >
-> >      if (opts->x_svq) {
-> > -        struct vhost_vdpa_iova_range iova_range;
-> > -
-> >          if (!vhost_vdpa_net_valid_svq_features(features, errp)) {
-> >              goto err_svq;
-> >          }
-> >
-> > -        vhost_vdpa_get_iova_range(vdpa_device_fd, &iova_range);
-> > -        iova_tree =3D vhost_iova_tree_new(iova_range.first, iova_range=
-.last);
-> > +        iova_tree =3D vhost_vdpa_svq_allocate_iova_tree(vdpa_device_fd=
-);
-> >      }
-> >
-> >      ncs =3D g_malloc0(sizeof(*ncs) * queue_pairs);
-> > --
-> > 2.31.1
-> >
->
+Thanks,
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
