@@ -2,134 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C279F63CC28
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 01:05:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E210B63CC4E
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 01:10:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231250AbiK3AFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Nov 2022 19:05:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53912 "EHLO
+        id S229802AbiK3AKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Nov 2022 19:10:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229774AbiK3AFd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Nov 2022 19:05:33 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFA1D711B0
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 16:05:27 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id z17so10477867pff.1
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 16:05:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=78xkKmjZdcyJJX/EKydkrCgU4mT4d8eXN6PXwFhDQLo=;
-        b=KODgIpqJyt1Ud4fI+DS6czurLJ2VemQmXk7RbZDL+iUqI65PIa3EciFifTfHv/qTyD
-         dy55U+P5bZkaiQdnkx0xfwIzCCQjg4N/DtzbuYZzXYtY6Mv1qWDJ/MG1zwsYs6SNC0fU
-         tu0IYWFej3VY3GPYQmYhd1Ts6JjfnMBjzAnKZjFNb4XbhBiUncuxoy8HWjVWMTKyimPv
-         SotKeN8JI+UpTEtSWJ23Zhu+meSIAFJL2NG52t4KW3a/i7AXzMU99HLIadJ4fODoOWcJ
-         sq5jaYtobOA9KzfparlEoR3TwmrROzQ91ajJQL6zbpS34giRUA9VPDDSGiPOt85RAQ/+
-         DDWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=78xkKmjZdcyJJX/EKydkrCgU4mT4d8eXN6PXwFhDQLo=;
-        b=Zq3+9AbBYZ72tqmH7sRJEa170TMjIyMx4mNcWb882UrcFKgx1yP/OgIrTDCPWbmR47
-         Lhm4N4gJW8JVS9km3hTM9QQ0s9xl74fJOCI+I/0M16oa+5ltPwh7BI1+8oKX9VLtHynr
-         2lXhxZASYyU2Vwb8vzn7B7GPB1bfBcDfQixlCEiebldsCPkrmQws9XYNrztf0dv4kBWq
-         SzVZO4CVlOlgUpGx3qyAsousS2Ide4Xf3uvzma06e52jhs0fvw4f0u77UpS78tINX0V5
-         C68CU+n/dn+/NfF9c4Q17We6Y3Ll15TwdZnWjxi5jqSN618IfqJcmQ/aHmjt7zIhwSka
-         7jrw==
-X-Gm-Message-State: ANoB5pn2iWggztryl+cYs3nm9foM8UApH+xTdUeK/9PFkgueUvH6cXXG
-        6NPoLUEc00UZ99tglO7q3bKAsg==
-X-Google-Smtp-Source: AA0mqf5KWdC4uvoi15DjzFozbTNWpAR+P62QvcL1C1e/IzMkBVRINdThD0PS4d1bisH1+7NMOyP9RA==
-X-Received: by 2002:a63:4946:0:b0:477:7c87:1087 with SMTP id y6-20020a634946000000b004777c871087mr38965938pgk.452.1669766727210;
-        Tue, 29 Nov 2022 16:05:27 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id e4-20020aa79804000000b0056bb0357f5bsm38826pfl.192.2022.11.29.16.05.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Nov 2022 16:05:26 -0800 (PST)
-Date:   Wed, 30 Nov 2022 00:05:23 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kim Phillips <kim.phillips@amd.com>
-Cc:     x86@kernel.org, Babu Moger <Babu.Moger@amd.com>,
-        Borislav Petkov <bp@alien8.de>, Borislav Petkov <bp@suse.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/7] x86/cpu, kvm: Define a scattered No Nested Data
- Breakpoints feature bit
-Message-ID: <Y4aeQ5Qyu1Y3QtaJ@google.com>
-References: <20221129235816.188737-1-kim.phillips@amd.com>
- <20221129235816.188737-2-kim.phillips@amd.com>
+        with ESMTP id S229680AbiK3AKa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Nov 2022 19:10:30 -0500
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2046.outbound.protection.outlook.com [40.107.100.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E663A303C8
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 16:10:29 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JlB+aaQmJ06nA0Uvn8LqN5lguoXIxjN8ddGC6qJtOvd51Pyi5+eovzxnDse1BKDUOmcJ5FTRsn8fXlApAjtt/HxQBGVzmr3rbt5SHGJ020FbjTiMN4mDs1aGKxmukNy4wectAYYHFpiFTAUT/0Z+Nj54/Iqge2z8POPbvB6YPQvNHcvOdMCSZFxVd5ABprQL2O2a4F/XnPyw5PaiWNdfsC5bVBJHhGj7JsvXHMQG7E/KwV2rEs5s7C+9yeJFvUDgppyVUK1Y/Ch2zAl3IcFnCIJTSBEQcH3D/g4ZyMLKkT50Tp+ansS1LY2K1AFf+UC0qB8DCPcwJsGAiRYkFJWR7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/ulbPii82TZTO30IopSHaR5kxNLTGYjxk+DBiplYQYc=;
+ b=nqvhuOGtRFfF/H3cBUl4JxFqvjzFqseJkZbtJxDfImhipw1Mgd2DgbMHNayPOx/vzVAO3HIXROxcoYr2F/8yqnS0WktSJ4ioeHMJkjDHA9KcI/O08lIfZtGZSXcxlQtQ50RuC2LYYwNX2qMSGSwpQYLwRc9cpnLW5qwZvPfU269+NiLCKRS3B3MfrIUTxkBymDPq5ltUEB4Hn7AYp3zdqP+KwVCmZsf3Xjn0QK+IZpUxTUZY8FvekeTw0ssF3OvGox4q65bOO2kP8yifzrWXmVuu71458vxJoSdx9B7AZAuXWB18jwC0PZSFNN1PaMcTYlY3/gUeFgEtH5MjjPzH/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/ulbPii82TZTO30IopSHaR5kxNLTGYjxk+DBiplYQYc=;
+ b=jN+542bVrMRPxStzhTXAEB4QWAjJeLTgXJF20vPqaSLg/QARFju/+EI+OGjEeC4k437uLDgu28OxGX7xzxKLCjitLdDKwgJbVZbwZWcbo1cvj0sjXfATtI3UIQnPqDPiRjYRkCFW+D8MWwv8FmW1if89y1/ctwApqOs21QO4uewOPnAkuSjBqA91N7GwmRPxoXp4TU/tXasf6pCe7kko6voY86XeFeRrg6bCjbqsIAZCC2TjPEYsl/yiAtDXMemDglvWtCp1zhfozJHxnP2N0/2bFv4r6L1t+/4QdT1vIcwBb4MDTB43dZyMN1W3Jys6zPZKZTPvdJedykMLt+HByg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SA1PR12MB7411.namprd12.prod.outlook.com (2603:10b6:806:2b1::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Wed, 30 Nov
+ 2022 00:10:26 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%8]) with mapi id 15.20.5857.023; Wed, 30 Nov 2022
+ 00:10:26 +0000
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>,
+        =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH v4 0/5] Simplify the module and kconfig structure in vfio
+Date:   Tue, 29 Nov 2022 20:10:17 -0400
+Message-Id: <0-v4-7993c351e9dc+33a818-vfio_modules_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MN2PR01CA0046.prod.exchangelabs.com (2603:10b6:208:23f::15)
+ To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221129235816.188737-2-kim.phillips@amd.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB7411:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9f902212-aff9-48a3-e40f-08dad267478c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dMn95dBmM9f6Ge3tgTypffvXmLjtu58iWZ5EcTw2asqlWzfc3kTjfBXCeJiCWWtBZ2QZFhKg/wpMaa2uQVJ475lOHgivS+n7UO177iJ0ufOydQ9Jpv9B65DktYZwYfmU5V6IFCPmFqQ1rCpDe/YY1prOQx8APZtjs+XKCfRW5E8us8at2umZWFHMujuGDH2usVd8Qswvp0wwUmzUSZPbKEb+GaC41DpQNZf7OOdxOUsEr4Le60TrljtuyAAkqaIzVBPi08fcuSAeMcA5xa7iuJjZXm7b4lOswf0a/DGu1akkj/dw9/tvkcpfUZH+L8p56hZtkwBx8V8fFKSltI9rzVkTzBg7CLlwOO8l1j+8+tOnn+BZ9TvC8PyCCTnSIPTnTl4dLGWdJiQbA8zm+JbKgPXCWZj4kBJbeFdZJUmtab4jffE+zrGiV2+hpz19XWI6kwq3QhuYi4949T0lZcfA7GHpTR6XLG9JQ6IpiF2+NK92Ev7HAos5iyUWlnk1n6NVgo92WChYN3UpO3rkr/EgCDB44zkIVOtj6iuxJs/OPavHE2zYiX9ABF2qyU0nEVaVv3IdkPMPiOjOgXeys/OtZn7L+75GCtwHtv9VGzrM+A/uEbtPEzU5g+cdwe3xuf/lcqN2KNISirRHngSezC63HQtc+keVilzeuoay5ALU6A3GkPDK6a3dMWIFFHeHxRY4iy5IG1n+SC2vCSCiydGAvqJsIOCpI6HMKJGDJsDLD0Athn4f2r5kXts7lslKBKlr/4QPGbaJ6Pf+z/OiniO89v23CCwirKnkq4BWm6S/IOo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(396003)(376002)(366004)(39860400002)(136003)(451199015)(6506007)(110136005)(2616005)(316002)(54906003)(6512007)(478600001)(26005)(6486002)(966005)(36756003)(186003)(38100700002)(86362001)(6666004)(83380400001)(66946007)(4326008)(8676002)(5660300002)(66556008)(8936002)(66476007)(41300700001)(2906002)(4216001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SWYwOEZpdjQzd3BOMCtiaHAzcjhIdDVZZmNmaS9DUlVpdmZRazJ4ZXhvUkhQ?=
+ =?utf-8?B?NUZsMDRqdTROdXArS3dxczJrZENYVWVmKzF3MU5RWC9qbU1mY3BMOGdIZ0Rm?=
+ =?utf-8?B?VjgreURhVllmanRKUXFtVHpHZEp2VGlSQzJVUGM1dnlmUU1GNGNDU1JKTDh3?=
+ =?utf-8?B?TnVWRm9GMW91UjJpK1B6K0h0NjNjYXU5OHZpRXVxVUo2cXlNbGZiWFpOcG50?=
+ =?utf-8?B?ZDdCS1d5c2w2YUZnQlNMa0MrOTRiNml5aHd4dkpYMnZjcHVDVXNjbStVUG5C?=
+ =?utf-8?B?cTNsUXhDMjQzbW40K0dGUE1Hck9ta1djK0E1YW53L2U1UXY2Wm14M0pIM3d5?=
+ =?utf-8?B?TDNMa2xLRkhlUGFvRDNiRG0yZUh0RGhDeUx4Y21oYzdGbXcrb1dsbFB1MmJS?=
+ =?utf-8?B?MURnd0U2Z1JINE5kaEV4Q2VJSm5UVC90MWZ4Yk50cm14RlVNZXA0bmpIZVpW?=
+ =?utf-8?B?NlcxcVRNOWlRdlRjdGt1OU01ZGlsZDVaVEloemdSeVRpMGtjNXprZlc0TG12?=
+ =?utf-8?B?NXVjelFNLzJabFBRYWdldjc2ZDdSZ3VSUkNETy9IWit2Zlc1enFuTWhZM2tr?=
+ =?utf-8?B?clg0aDhYVU9DVThXSTVvNFM1ZmlPeU1BaDY5RkJieTRCQnlMaktBSU9zMmRq?=
+ =?utf-8?B?ZDhHL3A2a0sxZWN1bHpoL3QzTnorVXlXNklXTUp6OS9BdDlRMlN5QnJXNnQ3?=
+ =?utf-8?B?S2hVc2EvMmViY0hpM1Y5aEpxa09Bb1RwejdUVFRrZzM0QkR2bkhJOWtveVFD?=
+ =?utf-8?B?VGtSdEdKZ3NLR282L0JiOW1ZMllsaDhiYUNqaUR1SzI1NEV2TVZhd3VITWVB?=
+ =?utf-8?B?MEVIem9Oa09QUjhKamlmQ2hPR0R4QVRhMktlcUdHQkpueER2NVh2MHV1aHNY?=
+ =?utf-8?B?b1ZCb2tYSFhmQ21WcWtlRTJFMEpYdnhlNTR6VmQzRkZTVDhLUld1QXI5NEE0?=
+ =?utf-8?B?VUFvY0MrNHloYUkzbTUweDNCaUFWV0ovL1JsVTYyWEkwKzRCc0xMYWR2R2xN?=
+ =?utf-8?B?bzQ0SVZTcm5jWDdxMWtETWJRaHY0aEk3bkxJMDZSaC9TcnVPNG5BcUZIRGhi?=
+ =?utf-8?B?KzdHK0VDb1BrM091UXUzcWo4OFczek5XUDNDOFFkT3ZMaXg5ODVFY0tZdnow?=
+ =?utf-8?B?ZFlVcUg2SmhtYmlMcFFBVlpvTDg3eVNnY1dvNkIxblRDeWV1UEc3NE1NT09V?=
+ =?utf-8?B?WEFyVFEwRU1WUDk5R3EzZjVGNGpGNUQ5aFF5eEMwZzMxeERJYUdhM3ZIZ0Jv?=
+ =?utf-8?B?N1poejEwSHN2ZEFMTkhyMXpBOVo2UW41d2MzWWxWSlZTRjFyaEwwQitKc1Ny?=
+ =?utf-8?B?dWpwaVpHZWd3RnkxeHNwd20xVTN1Ry9hQ0JIMlBKQkhSL0RPKzhLb2ZiNS9W?=
+ =?utf-8?B?WVcxdkpDZFg4NGJ3RnArZk16dTFCbkczc1hKWVlzQ2lhZTUrQVlTcnhISGNi?=
+ =?utf-8?B?Tlh1Qlk2WTBidEhWV29LUkljVFl3WXJOQTI0T2JYNHQvd0VDWDBCcmdaOHps?=
+ =?utf-8?B?R1hIOHJhNmpnWW9VdlZ4Y2t4eDYxMXlSa0FvcGVidU1ub29EcHhHeGtkYmlk?=
+ =?utf-8?B?QS9UcStqejJoWkMwdWR4c0FtK1Z5NWZ1VXl3QzZGMWVqblp3V2pSZmJIN3Nr?=
+ =?utf-8?B?UkQ1UHJmNUpnSXdYZEhRamJrM0JMTkJlK1hlbGpiTWZrSjQ5aWw2SGlOb0ha?=
+ =?utf-8?B?WklQZXNteUg1R1U3V1FCQTBNazJrS09PZC9MN0hxZUFHL2x2OS9GMnZkRlZ1?=
+ =?utf-8?B?aWtIVHZyOTRucVlkNEFhU3ZSRGp5SU41dmxDdmpVVDBGOGcrUmp1N0RSN1Nt?=
+ =?utf-8?B?MjZsZzllQ1hhQTA5N2RwVjJxKzJSeEZ4YUZrTXVnL25FV0xqMytWN3R0dnpO?=
+ =?utf-8?B?YTlkVjZZM05sVDJpbkdORzhCOUpoZmZMdDJDSlBHTXZVdFIyancrNEhWR2ZO?=
+ =?utf-8?B?VzJ1amVMUVA2WVpodDNzdGJVdDIvdm02QTVHdC9JSEk5aHZhYzdKMk5hZk5H?=
+ =?utf-8?B?NGpmNDdMdDBHYko4dEJIekRoUy96L3lFbnZkL1FCSHBtRm5DbUFKN256KzlL?=
+ =?utf-8?B?V1BwMElaZUhtY2JHSDFVSmwyZUp3eVAycDI1K201NURuaXJWb2RXM2l4bXZr?=
+ =?utf-8?Q?psKk=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f902212-aff9-48a3-e40f-08dad267478c
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2022 00:10:25.1163
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Jft25LMlzl4WRgt67kd7BCqFkk+R/r+VQkOkcdH7RZxtLg+0VcTysHt7+A86w6AW
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7411
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-No need for "kvm" in the shortlog, this doesn't affect KVM behavior in any way,
-let alone touch KVM code.  Ditto for all the other patches that don't touch KVM.
+[Sigh, sorry, I've sent this now twice and I see it didn't pick up the mailing
+ list in to To headers/etc which explains the troubles. My mistake. This
+ version should work. ]
 
-On Tue, Nov 29, 2022, Kim Phillips wrote:
-> It's a part of the CPUID 0x80000021 leaf, and this allows us to
-> group this and other CPUID 0x80000021 EAX feature bits to being
-> propagated via kvm_set_cpu_caps instead of open-coding them in
-> __do_cpuid_func().
-> 
-> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h | 2 +-
->  arch/x86/kernel/cpu/scattered.c    | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index b6525491a41b..b16fdcedc2b5 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -306,8 +306,8 @@
->  #define X86_FEATURE_RSB_VMEXIT_LITE	(11*32+17) /* "" Fill RSB on VM exit when EIBRS is enabled */
->  #define X86_FEATURE_SGX_EDECCSSA	(11*32+18) /* "" SGX EDECCSSA user leaf function */
->  #define X86_FEATURE_CALL_DEPTH		(11*32+19) /* "" Call depth tracking for RSB stuffing */
-> -
->  #define X86_FEATURE_MSR_TSX_CTRL	(11*32+20) /* "" MSR IA32_TSX_CTRL (Intel) implemented */
-> +#define X86_FEATURE_NO_NESTED_DATA_BP	(11*32+21) /* "" AMD No Nested Data Breakpoints */
->  
->  /* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
->  #define X86_FEATURE_AVX_VNNI		(12*32+ 4) /* AVX VNNI instructions */
-> diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
-> index f53944fb8f7f..079e253e1049 100644
-> --- a/arch/x86/kernel/cpu/scattered.c
-> +++ b/arch/x86/kernel/cpu/scattered.c
-> @@ -45,6 +45,7 @@ static const struct cpuid_bit cpuid_bits[] = {
->  	{ X86_FEATURE_CPB,		CPUID_EDX,  9, 0x80000007, 0 },
->  	{ X86_FEATURE_PROC_FEEDBACK,    CPUID_EDX, 11, 0x80000007, 0 },
->  	{ X86_FEATURE_MBA,		CPUID_EBX,  6, 0x80000008, 0 },
-> +	{ X86_FEATURE_NO_NESTED_DATA_BP,CPUID_EAX,  0, 0x80000021, 0 },
->  	{ X86_FEATURE_PERFMON_V2,	CPUID_EAX,  0, 0x80000022, 0 },
->  	{ X86_FEATURE_AMD_LBR_V2,	CPUID_EAX,  1, 0x80000022, 0 },
->  	{ 0, 0, 0, 0, 0 }
-> -- 
-> 2.34.1
-> 
+This series does a little house cleaning to remove the SPAPR exported
+symbols, presence in the public header file, and reduce the number of
+modules that comprise VFIO.
+
+v4:
+ - Copy IBM copyright header to vfio_iommu_spapr_tce.c
+ - Use "return" not "ret = " in vfio_spapr_ioctl_eeh_pe_op()
+ - Use just "#if IS_ENABLED(CONFIG_EEH)"
+v3: https://lore.kernel.org/r/0-v3-8db96837cdf9+784-vfio_modules_jgg@nvidia.com
+ - New patch to fold SPAPR VFIO_CHECK_EXTENSION EEH code into the actual ioctl
+ - Remove the 'case VFIO_EEH_PE_OP' indenting level
+ - Just open code the calls and #ifdefs to eeh_dev_open()/release()
+   instead of using inline wrappers
+ - Rebase to v6.1-rc1
+v2: https://lore.kernel.org/r/0-v2-18daead6a41e+98-vfio_modules_jgg@nvidia.com
+ - Add stubs for vfio_virqfd_init()/vfio_virqfd_exit() so that linking
+   works even if vfio_pci/etc is not selected
+v1: https://lore.kernel.org/r/0-v1-10a2dba77915+c23-vfio_modules_jgg@nvidia.com
+
+Jason Gunthorpe (5):
+  vfio/pci: Move all the SPAPR PCI specific logic to vfio_pci_core.ko
+  vfio/spapr: Move VFIO_CHECK_EXTENSION into tce_iommu_ioctl()
+  vfio: Move vfio_spapr_iommu_eeh_ioctl into vfio_iommu_spapr_tce.c
+  vfio: Remove CONFIG_VFIO_SPAPR_EEH
+  vfio: Fold vfio_virqfd.ko into vfio.ko
+
+ drivers/vfio/Kconfig                |   7 +-
+ drivers/vfio/Makefile               |   5 +-
+ drivers/vfio/pci/vfio_pci_core.c    |  11 ++-
+ drivers/vfio/pci/vfio_pci_priv.h    |   1 -
+ drivers/vfio/vfio.h                 |  13 ++++
+ drivers/vfio/vfio_iommu_spapr_tce.c |  65 ++++++++++++++---
+ drivers/vfio/vfio_main.c            |   7 ++
+ drivers/vfio/vfio_spapr_eeh.c       | 107 ----------------------------
+ drivers/vfio/virqfd.c               |  17 +----
+ include/linux/vfio.h                |  23 ------
+ 10 files changed, 91 insertions(+), 165 deletions(-)
+ delete mode 100644 drivers/vfio/vfio_spapr_eeh.c
+
+
+base-commit: 9abf2313adc1ca1b6180c508c25f22f9395cc780
+-- 
+2.38.1
+
