@@ -2,236 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B335A63E109
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 20:52:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CA8B63E1A8
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 21:14:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbiK3TwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 14:52:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60192 "EHLO
+        id S230123AbiK3UOd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 15:14:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229834AbiK3Tv4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 14:51:56 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82C3C86588
-        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 11:51:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=/RM7Ft0/BE+eBdDvzgo63q66hCJu7X6YdtZkf1iIWhc=; b=Dg53XHH2Hw/em1NuMUB92Ub0Ag
-        RKhFbuwW61vN8kbnquNjWTn4tcIy5wkgMNrCh6yrSdPKwaBG00YOkzHLnWmzzHNpF0RGqCOYvkjoP
-        nTKDnWOKwWiwqjfy79FAFBMfBsNYgFm6QniP4/QF3wmezmZtX9IIZu1sXrH8eRJT3Qqqf0zoriiDn
-        s9XQYxWtlJZwg0K2UuSicCNyCuPvaYGNZ0oO3rXUwMLhfVd3lkp4VOQ2k9gLK3hIUUjqD5Cjg70Ov
-        Q2iQXNW05Czl9Zyxzl2RNXDow4x6IMe7ebFvoaC86q34Rb7NqljIbyLRbZOTnM5/4yqVYEDeyBP5K
-        glFEFnNQ==;
-Received: from [205.251.233.105] (helo=freeip.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p0T7S-00FFoh-R5; Wed, 30 Nov 2022 19:51:47 +0000
-Message-ID: <24408924dbe6041472f5e401f40c29311e1edd99.camel@infradead.org>
-Subject: Re: [PATCH v1 0/2] KVM: x86/xen: Runstate cleanups on top of
- kvm/queue
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Paul Durrant <paul@xen.org>, Michal Luczaj <mhal@rbox.co>,
-        kvm@vger.kernel.org
-Date:   Wed, 30 Nov 2022 11:51:35 -0800
-In-Reply-To: <cd107b6c-ae02-8fa6-50e0-d6cbca7d88bc@redhat.com>
-References: <20221127122210.248427-1-dwmw2@infradead.org>
-         <cd107b6c-ae02-8fa6-50e0-d6cbca7d88bc@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-rNfMI7tM8Nd++TwTB2eM"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S230076AbiK3UOP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 15:14:15 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DED4294567
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 12:11:23 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id r7so347601pfl.11
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 12:11:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DQo2PvCnu5Wc9S4lXOeBoFgv430bLe9pNyrVVyEzJ3g=;
+        b=lCO8gV4FPgu8WJ7Bt66GeachwfUe/lATfOyMkaUUdOQofO5V2sqcRAPBqHSBDHj8SJ
+         smxDKx0vNxE7lgDI14r+mfDteH/9wbWWOjzPo5od5A0CAhP1K5sTAfXkuXt0SxktvYLG
+         4XZ0esy4mCgf4DZEXxW3HchbYDjU0y3Yp69JgQ/1G+PzapjEXb7b9dI7SD2euve6+7DN
+         Mq60gcH85ByQ9h31riV5UunROxbSK/jPbDncSXdRLA8IqxY67y+8T7zAwnCFtVJmGq5U
+         1Pi3k5BdnfRLXbbZcKXl2XJH9tKHe4VOTDZKn+365MeYhQ58IQb42Kwcxns3syNGp/4q
+         3PkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DQo2PvCnu5Wc9S4lXOeBoFgv430bLe9pNyrVVyEzJ3g=;
+        b=b6MreVUaU0MybNuden2ww9T1bvuxyPHysQ2W9d87MRL/a4xdW9Sod46NoLh64NYQHy
+         +E7q5Lm+qEwohETBiVeAmksB80YH+xLG9vpmDiRqc9uX9tmncBEHNFmmdjUSHorPve5F
+         UjiUPR7B3k/zQcx63519Byjx1m35qR7PuVQWrJEanN7HYCUpIsTT753UmNl5BhSmKuTP
+         IZ1hH/mjchzjfMfNjnujTBI6UPoHWzUxyB8fURZj4NkojUenUUXJiNbleHMceOWwK1kn
+         fqKC/M65hqEjE6/jXNLvU5sJGHjN1FWt1JgikVF7S2XgfRMnvLxsj4k+EJbQ+KHWElK9
+         lI4Q==
+X-Gm-Message-State: ANoB5pnwtWoqHra5kmoIg+xX7JTdihYTrZMAGzDZRcG8HD9cR4uSyYSu
+        +fdNjb/Ex7JrFjPTnbv7cc7MvA==
+X-Google-Smtp-Source: AA0mqf5O4HcUod5UGDDd80bosaFI+41fh0Vv57D03K+qneRKX84tG+G5JTDyf3FL6nNt+En2xiuq8A==
+X-Received: by 2002:a62:fb11:0:b0:56b:dbab:5362 with SMTP id x17-20020a62fb11000000b0056bdbab5362mr64288489pfm.47.1669839082014;
+        Wed, 30 Nov 2022 12:11:22 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id o13-20020a170902778d00b00176ba091cd3sm1875384pll.196.2022.11.30.12.11.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Nov 2022 12:11:21 -0800 (PST)
+Date:   Wed, 30 Nov 2022 20:11:18 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, dmatlack@google.com, ricarkol@google.com
+Subject: Re: [PATCH v10 0/4] randomize memory access of dirty_log_perf_test
+Message-ID: <Y4e45hEzdW034SCP@google.com>
+References: <20221107182208.479157-1-coltonlewis@google.com>
+ <Y4eY/Yjj+FP+vf7Y@google.com>
+ <87mt88tiqe.wl-maz@kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87mt88tiqe.wl-maz@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Nov 30, 2022, Marc Zyngier wrote:
+> On Wed, 30 Nov 2022 17:55:09 +0000,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > On Mon, Nov 07, 2022 at 06:22:04PM +0000, Colton Lewis wrote:
+> > > Add the ability to randomize parts of dirty_log_perf_test,
+> > > specifically the order pages are accessed and whether pages are read
+> > > or written.
+> > > 
+> > > v10:
+> > > 
+> > > Move setting default random seed to argument parsing code.
+> > > 
+> > > Colton Lewis (4):
+> > >   KVM: selftests: implement random number generator for guest code
+> > >   KVM: selftests: create -r argument to specify random seed
+> > >   KVM: selftests: randomize which pages are written vs read
+> > >   KVM: selftests: randomize page access order
+> > 
+> > Does someone want to pick this up for 6.2? Also, what tree are we
+> > routing these architecture-generic selftests changes through, Paolo's?
+> 
+> That's the usual route, but I can also take them if that makes
+> someone's life easier. Just let me know.
 
---=-rNfMI7tM8Nd++TwTB2eM
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Doh, sorry.  This is already in kvm/queue, I sent Paolo a pull request[*] for 6.2
+for a bunch of the generic selftests updates a while back, but forgot to go back and
+respond to the individual series to spread the news.
 
-On Wed, 2022-11-30 at 17:03 +0100, Paolo Bonzini wrote:
-> On 11/27/22 13:22, David Woodhouse wrote:
-> > Clean the update code up a little bit by unifying the fast and slow
-> > paths as discussed, and make the update flag conditional to avoid
-> > confusing older guests that don't ask for it.
-> >=20
-> > On top of kvm/queue as of today at commit da5f28e10aa7d.
-> >=20
-> > (This is identical to what I sent a couple of minutes ago, except that
-> > this time I didn't forget to Cc the list)
-> >=20
-> >=20
->=20
-> Merged, thanks.
-
-Thanks. I've rebased the remaining GPC fixes on top and pushed them out
-(along with Metin's SCHEDOP_poll 32-bit compat support) to
-
-https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/gpc-fix=
-es
-
-Metin Kaya (1):
-      KVM: x86/xen: add support for 32-bit guests in SCHEDOP_poll
-
-Michal Luczaj (4):
-      KVM: Store immutable gfn_to_pfn_cache properties
-      KVM: Use gfn_to_pfn_cache's immutable "kvm" in kvm_gpc_check()
-      KVM: Clean up hva_to_pfn_retry()
-      KVM: Use gfn_to_pfn_cache's immutable "kvm" in kvm_gpc_refresh()
-
-Sean Christopherson (4):
-      KVM: Drop KVM's API to allow temporarily unmapping gfn=3D>pfn cache
-      KVM: Do not partially reinitialize gfn=3D>pfn cache during activation
-      KVM: Drop @gpa from exported gfn=3D>pfn cache check() and refresh() h=
-elpers
-      KVM: Skip unnecessary "unmap" if gpc is already valid during refresh
-
-I still haven't reinstated the last of those patches to make gpc->len
-immutable, although I think we concluded it's fine just to make the
-runstate code claim gpc->len=3D1 and manage its own destiny, right?
-
-In reviewing the merge/squash I spotted a minor cosmetic nit in my
-'Allow XEN_RUNSTATE_UPDATE flag behaviour to be configured' commit.
-It'd be slightly prettier like this, although the compiler really ought
-to emit identical code.
-
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 5208e05ca9a6..76b7fc6d543a 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -382,7 +382,7 @@ static void kvm_xen_update_runstate_guest(struct kvm_vc=
-pu *v, bool atomic)
- 	entry_time =3D vx->runstate_entry_time;
- 	if (update_bit) {
- 		entry_time |=3D XEN_RUNSTATE_UPDATE;
--		*update_bit =3D (vx->runstate_entry_time | XEN_RUNSTATE_UPDATE) >> 56;
-+		*update_bit =3D entry_time >> 56;
- 		smp_wmb();
- 	}
-=20
-
-
-
---=-rNfMI7tM8Nd++TwTB2eM
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMTMwMTk1MTM1WjAvBgkqhkiG9w0BCQQxIgQg2hfCsdnf
-Qyj1puRy43uY/hQ9d3jzEErwuOeruaZ47mowgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAbJhYE5iAB7SGvkUY4SKBpJW3ArwmEfMKH
-y68Mfjx5s4wxVgc8fTvJDedXUp3yTKjsUkA/lo9mLSsXUXMo7/1dAy7AH2j5sHabwBQ7+Alz7wW9
-HIumWdzO3H4Ns0Y27sSXDGqQSz9y/h623Iu0LbIFtYLfBcxQJX0jCTcR14b/4vWhFfdgjegI+0P7
-ukdNYjt78lA6dLkYxZYTvRBELKyM6AJ7lmRS7AkFbdjMgEZML6SDT7s9qAqGLjEk8aR6WcPfrGCJ
-6EhlwONqQC0FjsvBzvMLZnxkSmy2XqJp5pi3afwHHu8rmDOMlJ1ZX7PhldjkXv1q5OmmqJRwkDta
-AZRCfm8YSnqIXpPj0gOrCwYg8QY6p0vYVIfy5lu8yhrdGSOXgJ45TpsBmXx8YVW+wWGMDy3E+F29
-QRwJYJX2bZNWF+4f/rENJS5gaUq32SGU3WZ2PHFtr/Fa3nKKncCfws1OFrqevxmvyoENF+zbNE+c
-LmwnS5tsyVhtL5Lv4f2HzLVPd5Bjo1ylEPSuw9ywiTxRMVe0gVmAcphpsoppiHu7qmeygcZqhFzU
-rWXeR1R/qSKK7nt5Mq/R/DTLHZSWgTeK16tdnLjHMJLZcEPmQO2imWLTWnftPP3MbNpBzhHP1/Ld
-TFA4O85Xn08iWtcYne+20oFA0xPvzywMGEntrFQrsAAAAAAAAA==
-
-
---=-rNfMI7tM8Nd++TwTB2eM--
-
+[*] https://lore.kernel.org/all/Y3WKCRJbbvhnyDg1@google.com
