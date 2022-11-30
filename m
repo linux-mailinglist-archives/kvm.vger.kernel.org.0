@@ -2,73 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 440B763DB6E
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 18:04:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0379963DBCF
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 18:19:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231142AbiK3REW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 12:04:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54700 "EHLO
+        id S229629AbiK3RTt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 12:19:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230525AbiK3RDg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 12:03:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B28C3900ED
-        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 08:59:05 -0800 (PST)
+        with ESMTP id S229514AbiK3RTp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 12:19:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D199C
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 09:18:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669827540;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1669828723;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=m9a6wFc0RaDwZ5W3tObwtvd4DevYG79SiLdXsbs2flM=;
-        b=QBLAmvcAosw6RLQruAN7Iz3dA87ehx7doUMOMwEzZ/zspt/qOZL2fd3sreCcVDj5sBTIm4
-        P4FfHTZYPVAplGSFCWxznzBrijqf4PLQKOsIFqqEBMQ1fEBsQKm2sgJIqSJf2NKgZlJ8oq
-        +qsDx4XWlr0d9TUgaoq+8bbFUgZuyvo=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=7yqed071pAVP6WInKQJMIjJsrRbR4/XvmYMWkwCqNRs=;
+        b=MHEsJ+5J8wPuFvgZZTB4aM0TExELUAS6VScWprkZlrmiOqCFmTu5OauFcTaOXGXGY87rwT
+        xj9eUALyjeFJfuUmtqvtVmRMxVp5hlCXZ32RGf2t80TcDDHw4LpO0pZEKxGHnT6zsqIdfO
+        jV0y9w0Yvb+zltbOCl0RObxfN9UnIjU=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-596-vBDq0nslNbq8qyt8m45AdA-1; Wed, 30 Nov 2022 11:58:59 -0500
-X-MC-Unique: vBDq0nslNbq8qyt8m45AdA-1
-Received: by mail-ed1-f70.google.com with SMTP id q13-20020a056402518d00b00462b0599644so10254590edd.20
-        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 08:58:58 -0800 (PST)
+ us-mta-569-FGXCYRFQM2mD3IzMMjnxlg-1; Wed, 30 Nov 2022 12:18:42 -0500
+X-MC-Unique: FGXCYRFQM2mD3IzMMjnxlg-1
+Received: by mail-qv1-f69.google.com with SMTP id mi12-20020a056214558c00b004bb63393567so27592036qvb.21
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 09:18:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m9a6wFc0RaDwZ5W3tObwtvd4DevYG79SiLdXsbs2flM=;
-        b=gVHK/2MkH/RJ3IJikYGKeMTGEcBZCFs48cgIal8vqpyCP3QGl3hAC9D8tPbObrsfCZ
-         ZqAUAPi/vwXrDgBbpcD338uDj23B42eplcdQn25c8/ejzdI97HaKo3lm30HLstI60Rrg
-         vYA3I9zkHZlCeuJzPMJCejc7tVmzxCWwc6yfhLc3cbT/7qibAb8bwZzPM+6WLu/CbiLP
-         xhSaWZ8ryiEoeT8enDiL69kzmBqrThNrniUn2x3812sfUUxOmZATgVkoU/qKeE0GMJWR
-         pAtL5LUL9pajwVFYtDchkkIUlkv9ss1kfq5ZwsqmfU+HLSCiJsRC99O6CIern0qyV9e7
-         uRdg==
-X-Gm-Message-State: ANoB5pkCbIf4J6XmjIGwAtlDyKSMPTGTP23Tze0zQ8VEoZnvn5LLGG/U
-        aNf8Z79TfvAlazDXijJEXXjwo1nw2Do7lbBhwJ1TEYXF2KvTvo8Fc8lx01pngcglDeUsI+dwJZV
-        1L7p3T28hwRUk
-X-Received: by 2002:a17:907:7784:b0:7ad:9ad7:e882 with SMTP id ky4-20020a170907778400b007ad9ad7e882mr39488589ejc.520.1669827537828;
-        Wed, 30 Nov 2022 08:58:57 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf73qL1Jhq523BYbZhmApLx4RduRu+6qDZGDKtgYCMtGXyWkWoUIgRl5EweEwMB+7nAWZtnqqw==
-X-Received: by 2002:a17:907:7784:b0:7ad:9ad7:e882 with SMTP id ky4-20020a170907778400b007ad9ad7e882mr39488574ejc.520.1669827537573;
-        Wed, 30 Nov 2022 08:58:57 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:4783:a68:c1ee:15c5? ([2001:b07:6468:f312:4783:a68:c1ee:15c5])
-        by smtp.googlemail.com with ESMTPSA id gi20-20020a1709070c9400b0077d6f628e14sm847674ejc.83.2022.11.30.08.58.56
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7yqed071pAVP6WInKQJMIjJsrRbR4/XvmYMWkwCqNRs=;
+        b=EE+Y6fE4OYp5ObSxh+2vSFwiJJ6rqgHJjVmwm5e3m25dJQ6aaubjb5Xp1dqyNkMmI2
+         M7alQB2NHE5JTpqA/O3EZI2XIfvtT61ZRvwIV0rRVI8OHx6HE7rMeAHVTI8HizHHTTyC
+         VLsh3USoR1pB9NlaQA0hI2pboIJTg92ZyEdAmU+yu/NUgOCdZhpJ02kElp36q6PT3Z7A
+         /2GnYcrA0XhjBMFi3rVpWl7UwKcM3ycG1vPe9cjxm4EHrW1+dZCR37Mxwi2tcpuZwLgB
+         3zNwIbQ77KjsrdGcOIVUEiUTPykx7cM4IfHaTLRdZmnhqntnFRBKD3HrQVuzAzhu7dQe
+         TBMw==
+X-Gm-Message-State: ANoB5pmrQ7xOKBDqikKI37sj45upgv+oPrkB8xfeUXqdBI3zjHb+NoL2
+        26Dd9u8NRkQ1BxMe8Ve4tQeu4fcrncX9PbD/dTqgk9z977Tc97QUBGjYKeR5JTvglcr7IX+9TWx
+        J/NBMpc0FewPQ
+X-Received: by 2002:a05:6214:2b9e:b0:4c6:fadf:7b2c with SMTP id kr30-20020a0562142b9e00b004c6fadf7b2cmr17156929qvb.77.1669828721573;
+        Wed, 30 Nov 2022 09:18:41 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4zt5mmMEfHFozNLW9g2zKcAVTsYZDjrkdfzXQDS+o3p5ygCELbVIfinTFrJDyhD/JRr82p3g==
+X-Received: by 2002:a05:6214:2b9e:b0:4c6:fadf:7b2c with SMTP id kr30-20020a0562142b9e00b004c6fadf7b2cmr17156891qvb.77.1669828721349;
+        Wed, 30 Nov 2022 09:18:41 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id bs42-20020a05620a472a00b006b61b2cb1d2sm1588557qkb.46.2022.11.30.09.18.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Nov 2022 08:58:56 -0800 (PST)
-Message-ID: <e43ffb47-6526-6b2d-f7b3-0755f3c54a71@redhat.com>
-Date:   Wed, 30 Nov 2022 17:58:56 +0100
+        Wed, 30 Nov 2022 09:18:40 -0800 (PST)
+Message-ID: <00d43a82-3262-5248-a066-e71c608be0a9@redhat.com>
+Date:   Wed, 30 Nov 2022 18:18:34 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH] KVM: Deal with nested sleeps in kvm_vcpu_block()
+ Thunderbird/102.3.1
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v6 19/19] iommufd: Add a selftest
 Content-Language: en-US
-To:     Space Meyer <spm@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     kpsingh@kernel.org
-References: <20221130161946.3254953-1-spm@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221130161946.3254953-1-spm@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Jason Gunthorpe <jgg@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
+Cc:     Anthony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Farman <farman@linux.ibm.com>, iommu@lists.linux.dev,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Lixiao Yang <lixiao.yang@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>, Yu He <yu.he@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+References: <19-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
+ <48c89797-600b-48db-8df4-fc6674561417@intel.com>
+ <Y4dfxp19/OVreNoU@nvidia.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <Y4dfxp19/OVreNoU@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
@@ -80,30 +107,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/30/22 17:19, Space Meyer wrote:
->   bool kvm_vcpu_block(struct kvm_vcpu *vcpu)
->   {
-> +	DEFINE_WAIT_FUNC(vcpu_block_wait, woken_wake_function);
->   	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
->   	bool waited = false;
->   
-> @@ -3437,13 +3439,11 @@ bool kvm_vcpu_block(struct kvm_vcpu *vcpu)
->   	preempt_enable();
->   
->   	for (;;) {
-> -		set_current_state(TASK_INTERRUPTIBLE);
-> -
->   		if (kvm_vcpu_check_block(vcpu) < 0)
->   			break;
->   
->   		waited = true;
-> -		schedule();
-> +		wait_woken(&vcpu_block_wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
->   	}
+Hi Jason,
 
-Also, this does not work I think, because there is 
-add_wait_queue()/remove_wait_queue() pair.  Adding it is not easy 
-because KVM is using a struct rcuwait here instead of a wait_queue_t.
+On 11/30/22 14:51, Jason Gunthorpe wrote:
+> On Wed, Nov 30, 2022 at 03:14:32PM +0800, Yi Liu wrote:
+>> On 2022/11/30 04:29, Jason Gunthorpe wrote:
+>>> Cover the essential functionality of the iommufd with a directed test from
+>>> userspace. This aims to achieve reasonable functional coverage using the
+>>> in-kernel self test framework.
+>>>
+>>> A second test does a failure injection sweep of the success paths to study
+>>> error unwind behaviors.
+>>>
+>>> This allows achieving high coverage of the corner cases in pages.c.
+>>>
+>>> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+>>> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com> # s390
+>>> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+>>> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+>>> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+>> with sudo echo 4 > /proc/sys/vm/nr_hugepages
+>>
+>> Both "sudo ./iommufd" and "sudo ./iommufd_fail_nth" works on my
+>> side.
+> It is interesting that you need that, my VM doesn't, I wonder what the
+> difference is
 
-Paolo
+That's the same on my end, I need at least 2 hugepages to get all tests
+passing.
+Otherwise
+# FAILED: 113 / 121 tests passed.
+# Totals: pass:113 fail:8 xfail:0 xpass:0 skip:0 error:0
+
+I think you should add this in the commit msg + also the fact that
+CONFIG_IOMMUFD_TEST is required
+
+Besides, tested on ARM with both 4kB page and 64kB page size
+Feel free to add my Tested-by: Eric Auger <eric.auger@redhat.com> #aarch64
+
+Thanks
+
+Eric
+
+>
+> Thanks,
+> Jason
+>
 
