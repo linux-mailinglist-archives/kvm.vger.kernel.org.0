@@ -2,59 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2A8E63E4F5
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 00:14:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4511E63E4EF
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 00:14:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230081AbiK3XOF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 18:14:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47284 "EHLO
+        id S229817AbiK3XOC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 18:14:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229791AbiK3XNP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 18:13:15 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E23049C625
-        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 15:10:43 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-3cb1a789dabso125387b3.3
-        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 15:10:43 -0800 (PST)
+        with ESMTP id S229801AbiK3XNQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 18:13:16 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BDD89D836
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 15:10:44 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id 84-20020a630257000000b00477f88d334eso82481pgc.11
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 15:10:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ajf/v6plBmBpvMRb25eu7yZbuYHVVa1MLg3BBW1ApnM=;
-        b=Q7q/5TXzNDPohOMoxUDiD0nnqEk1FoSW4RF/EEt8HMYjM52gPxj46PgYF/68/eUC70
-         R52IpECaCvp222vr9xTL7j44GbL8VsDvPS5HArvcL4xJanWkN6UNBVlmOIcOzEnjqYoe
-         h8mvG1+Ri644iv9eVrF8AA62rM3of5sqQn2h8l1NJ4Hp9LBXQlFjVGfCJ0M8iuidAG/g
-         r3QoWBzS8+6cQpNc7qHKOescERK5wH+DxZ5oURQjRLgPy9Nq0G8eKIEZQN5DdxTswpJO
-         dO7YdMWEfCe6tuDQ8/4qvPOOW5vLDHcu9lY8BtQx5KXbThVrpdnPftQhmMi0Ij7DKBRT
-         iKQg==
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:reply-to:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oZ/AA3AN9yZfFS+Yz2Hj0GA1Db97x+XE1LjIfmdmS/w=;
+        b=luHLl3WdRQNdBhH/vZv/hfYOmt9Q6vwep+qjtUAST73H1MF3LqvzoF2Ukv7UaDUlgb
+         fXELwkqnEzgBN1h88nvzTImTYOnZGPEMito85bT2cMG/Dw2lvuyXP8zeBz8U2jGVs5tj
+         pSDhoig8xe+6jwKUzsQZ0HNL6W7uKODl2j0YOlmoXogdfyORLlX0GkBhzBuT5EaiKGr7
+         PCHzZt497tY3kEsEdxjbaw0LnCs8v3tH39skbarsReDUyuZOdzK6YVSLerydaPGb/0Z5
+         eHv7VqvGcSRs3JMgPsz9Bq5kCqCHy9eUbAeqCz5po17CqSrTsXQffsEYVsh38nZQAmal
+         lJaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ajf/v6plBmBpvMRb25eu7yZbuYHVVa1MLg3BBW1ApnM=;
-        b=3tX8XdKKr8yh717E328DPNUGCWSeshEGWue3m8V9n0Hx0C1IdfZm9BEKOe+S58Uk7E
-         GN4ynR9p9+S6vzJMGauSAoNyKV73WduerWtK49VTZqGDhKI5STNHzerpSqGfDtGdVe5e
-         0F9Z/rqQkrgkVVN6sIsBXsjygeLTo7x+h2sNWAw7i8e2thJu68nsycV+z9H20c4Utpxa
-         7T/0e94a0khfLKhRFaeUt3GJniCsh08qT0+GKZRZw/Bncy6Bnz2eguy48YlG2r3o22vy
-         ryzbNGdQtawuHqBxXc0JAM+XmwsSwemq+hWk3VcVhl340mnzn1TAhWcFiE+qOOUnkVB+
-         AFtg==
-X-Gm-Message-State: ANoB5pnahZi5zZdPkc/KJsMCR+eB4FTwx/q0tSAMbzBOIMUNY4ZXCQZ1
-        oL37CmjGYgW/p1jiLB4fpmAkwGIjGTg=
-X-Google-Smtp-Source: AA0mqf6Y4D7Qf+J2WKP5H4v6O2gU4VSt61bmL1SListQ4TvwmtEqTFXL/Zt8AS/4xR6esIpeSKRCzrkbQ9o=
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:reply-to:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=oZ/AA3AN9yZfFS+Yz2Hj0GA1Db97x+XE1LjIfmdmS/w=;
+        b=i0qW2eJaXjbbHa/cN/JbUjeVJdbBFKtjb8IGI9RVZ3g7IRIJhFum8cnsNqxzS5Xcw1
+         hdNSBpXeB/F1lYOpHZZMhfOFpbi7VIReAvEKvfHBnl/VNwY2JiCpuFOAvtIytGxqofjE
+         x2w/h60hpzrfpZ5k/BpucsDFEX4y0iBpaIVVIM7e0r563r5n4jHN8UzRgiM/ooxfb/iX
+         uRR1IIcIp2gp6225WQgSBNxZhKz1LiuI/eyKzwHlWtO+ixcIlvzcKAkvcuLKxChc9G6U
+         0B4KT9TE1FLMEaxvC1MiDaoMj9+9O9BizAkS4hcB2RAWrRvrYybd0pRSU+ut2TFGemIo
+         QTkg==
+X-Gm-Message-State: ANoB5pnD7zihy28xFI5MaL0eneaLrnQipAU5WUjbkBz9uIWvtkpdXRVo
+        GXBbdJUKpznO0fmpHawn8JhK2/bdaOo=
+X-Google-Smtp-Source: AA0mqf70Xm5b73dwbCTmumj9PiXG1e+aKYb1a7npTh2VM+OaIt1Kg/9NwT12H0mJEQDQr8PRUFC8axppjXM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:8401:0:b0:6f1:4590:92b9 with SMTP id
- u1-20020a258401000000b006f1459092b9mr33613349ybk.430.1669849822483; Wed, 30
- Nov 2022 15:10:22 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:f1c5:b0:189:39e4:c0ed with SMTP id
+ e5-20020a170902f1c500b0018939e4c0edmr41790703plc.108.1669849824265; Wed, 30
+ Nov 2022 15:10:24 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 30 Nov 2022 23:09:10 +0000
+Date:   Wed, 30 Nov 2022 23:09:11 +0000
 In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221130230934.1014142-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221130230934.1014142-27-seanjc@google.com>
-Subject: [PATCH v2 26/50] KVM: PPC: Move processor compatibility check to
- module init
+Message-ID: <20221130230934.1014142-28-seanjc@google.com>
+Subject: [PATCH v2 27/50] KVM: s390: Do s390 specific init without bouncing
+ through kvm_init()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Huacai Chen <chenhuacai@kernel.org>,
@@ -91,9 +92,10 @@ Cc:     James Morse <james.morse@arm.com>,
         Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -101,112 +103,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move KVM PPC's compatibility checks to their respective module_init()
-hooks, there's no need to wait until KVM's common compat check, nor is
-there a need to perform the check on every CPU (provided by common KVM's
-hook), as the compatibility checks operate on global data.
+Move the guts of kvm_arch_init() into a new helper, __kvm_s390_init(),
+and invoke the new helper directly from kvm_s390_init() instead of
+bouncing through kvm_init().  Invoking kvm_arch_init() is the very
+first action performed by kvm_init(), i.e. this is a glorified nop.
 
-  arch/powerpc/include/asm/cputable.h: extern struct cpu_spec *cur_cpu_spec;
-  arch/powerpc/kvm/book3s.c: return 0
-  arch/powerpc/kvm/e500.c: strcmp(cur_cpu_spec->cpu_name, "e500v2")
-  arch/powerpc/kvm/e500mc.c: strcmp(cur_cpu_spec->cpu_name, "e500mc")
-                             strcmp(cur_cpu_spec->cpu_name, "e5500")
-                             strcmp(cur_cpu_spec->cpu_name, "e6500")
+Moving setup to __kvm_s390_init() will allow tagging more functions as
+__init, and emptying kvm_arch_init() will allow dropping the hook
+entirely once all architecture implementations are nops.
 
-Cc: Fabiano Rosas <farosas@linux.ibm.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
+No functional change intended.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
 ---
- arch/powerpc/include/asm/kvm_ppc.h |  1 -
- arch/powerpc/kvm/book3s.c          | 10 ----------
- arch/powerpc/kvm/e500.c            |  4 ++--
- arch/powerpc/kvm/e500mc.c          |  4 ++++
- arch/powerpc/kvm/powerpc.c         |  2 +-
- 5 files changed, 7 insertions(+), 14 deletions(-)
+ arch/s390/kvm/kvm-s390.c | 29 +++++++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index bfacf12784dd..51a1824b0a16 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -118,7 +118,6 @@ extern int kvmppc_xlate(struct kvm_vcpu *vcpu, ulong eaddr,
- extern int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu);
- extern void kvmppc_core_vcpu_free(struct kvm_vcpu *vcpu);
- extern int kvmppc_core_vcpu_setup(struct kvm_vcpu *vcpu);
--extern int kvmppc_core_check_processor_compat(void);
- extern int kvmppc_core_vcpu_translate(struct kvm_vcpu *vcpu,
-                                       struct kvm_translation *tr);
- 
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index 6d525285dbe8..87283a0e33d8 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -999,16 +999,6 @@ int kvmppc_h_logical_ci_store(struct kvm_vcpu *vcpu)
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 829e6e046003..8c4fcaf2bd36 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -469,7 +469,7 @@ static void kvm_s390_cpu_feat_init(void)
+ 	 */
  }
- EXPORT_SYMBOL_GPL(kvmppc_h_logical_ci_store);
- 
--int kvmppc_core_check_processor_compat(void)
--{
--	/*
--	 * We always return 0 for book3s. We check
--	 * for compatibility while loading the HV
--	 * or PR module
--	 */
--	return 0;
--}
--
- int kvmppc_book3s_hcall_implemented(struct kvm *kvm, unsigned long hcall)
+=20
+-int kvm_arch_init(void *opaque)
++static int __kvm_s390_init(void)
  {
- 	return kvm->arch.kvm_ops->hcall_implemented(hcall);
-diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
-index c8b2b4478545..0ea61190ec04 100644
---- a/arch/powerpc/kvm/e500.c
-+++ b/arch/powerpc/kvm/e500.c
-@@ -314,7 +314,7 @@ static void kvmppc_core_vcpu_put_e500(struct kvm_vcpu *vcpu)
- 	kvmppc_booke_vcpu_put(vcpu);
+ 	int rc =3D -ENOMEM;
+=20
+@@ -527,7 +527,7 @@ int kvm_arch_init(void *opaque)
+ 	return rc;
  }
- 
--int kvmppc_core_check_processor_compat(void)
-+static int kvmppc_e500_check_processor_compat(void)
+=20
+-void kvm_arch_exit(void)
++static void __kvm_s390_exit(void)
  {
- 	int r;
- 
-@@ -507,7 +507,7 @@ static int __init kvmppc_e500_init(void)
- 	unsigned long handler_len;
- 	unsigned long max_ivor = 0;
- 
--	r = kvmppc_core_check_processor_compat();
-+	r = kvmppc_e500_check_processor_compat();
- 	if (r)
- 		goto err_out;
- 
-diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
-index 57e0ad6a2ca3..795667f7ebf0 100644
---- a/arch/powerpc/kvm/e500mc.c
-+++ b/arch/powerpc/kvm/e500mc.c
-@@ -388,6 +388,10 @@ static int __init kvmppc_e500mc_init(void)
- {
- 	int r;
- 
-+	r = kvmppc_e500mc_check_processor_compat();
-+	if (r)
-+		return kvmppc_e500mc;
+ 	gmap_unregister_pte_notifier(&gmap_notifier);
+ 	gmap_unregister_pte_notifier(&vsie_gmap_notifier);
+@@ -541,6 +541,16 @@ void kvm_arch_exit(void)
+ 	debug_unregister(kvm_s390_dbf_uv);
+ }
+=20
++int kvm_arch_init(void *opaque)
++{
++	return 0;
++}
 +
- 	r = kvmppc_booke_init();
- 	if (r)
- 		goto err_out;
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 5faf69421f13..d44b85ba8cef 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -442,7 +442,7 @@ int kvm_arch_hardware_enable(void)
- 
- int kvm_arch_check_processor_compat(void *opaque)
++void kvm_arch_exit(void)
++{
++
++}
++
+ /* Section: device related */
+ long kvm_arch_dev_ioctl(struct file *filp,
+ 			unsigned int ioctl, unsigned long arg)
+@@ -5696,7 +5706,7 @@ static inline unsigned long nonhyp_mask(int i)
+=20
+ static int __init kvm_s390_init(void)
  {
--	return kvmppc_core_check_processor_compat();
+-	int i;
++	int i, r;
+=20
+ 	if (!sclp.has_sief2) {
+ 		pr_info("SIE is not available\n");
+@@ -5712,12 +5722,23 @@ static int __init kvm_s390_init(void)
+ 		kvm_s390_fac_base[i] |=3D
+ 			stfle_fac_list[i] & nonhyp_mask(i);
+=20
+-	return kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
++	r =3D __kvm_s390_init();
++	if (r)
++		return r;
++
++	r =3D kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
++	if (r) {
++		__kvm_s390_exit();
++		return r;
++	}
 +	return 0;
  }
- 
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
--- 
+=20
+ static void __exit kvm_s390_exit(void)
+ {
+ 	kvm_exit();
++
++	__kvm_s390_exit();
+ }
+=20
+ module_init(kvm_s390_init);
+--=20
 2.38.1.584.g0f3c55d4c2-goog
 
