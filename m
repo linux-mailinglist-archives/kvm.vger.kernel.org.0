@@ -2,135 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CD1B63E237
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 21:36:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E580B63E239
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 21:37:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229636AbiK3Uf6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 15:35:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44456 "EHLO
+        id S229612AbiK3UhF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 15:37:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229612AbiK3Uf5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 15:35:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FDBF2195
-        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 12:35:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669840500;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yzSwQ2VF9Yg58ZHMWFIQ1DPJRP7ZPzwZYrK+uiP2B4w=;
-        b=EdXegCDE+pLqaCZzbsOj7IruzGYku+j35XUAlPQ/G1MZcBtmliT/aOvDonMj/u7uMYqReN
-        Eig5UWzcWJ+uDLf22hHz4+euLI/W04kGC93VcPRejkXoZNVXxh4ESNYFveWyJfy42hgU9u
-        /rwnVuKBjFOWnO1PKl/9PBBikQK5pRs=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-620-Oy_3dF8RMr-IWDcL2MfrWw-1; Wed, 30 Nov 2022 15:34:59 -0500
-X-MC-Unique: Oy_3dF8RMr-IWDcL2MfrWw-1
-Received: by mail-io1-f70.google.com with SMTP id o15-20020a6bf80f000000b006de313e5cfeso12099637ioh.6
-        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 12:34:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yzSwQ2VF9Yg58ZHMWFIQ1DPJRP7ZPzwZYrK+uiP2B4w=;
-        b=dx4nHFVr/YgjPV+dsdLdU2EptG1crtABWmAqxLq7wU5P31rzCVxqTEHO+50Y3Y/Jgr
-         OigEbkrw+Pw//e/0KKC1sr1UIB4RjsW1QWUh22hwvcERMP+Phh0MhCpYf7/Uq3wmbd8+
-         R4co6xHT5wcd9aINrlURtbroYqjPYXMuKPYDK/uvqd6GswUNQmATyeNtGAY3jm6uTXog
-         rg2CojmhO9b3gaz7rR0zi+AMMCGqpo49fJH4HadWJwzLGYvXFaMqt/Y9SZA1HLAoHmUN
-         tT3Com4K22trh/s7RobEKXHNk2C1uj0wnt3AN1CZuANq9JvaVODaNPLcBjnJtbdeo0lO
-         lRtw==
-X-Gm-Message-State: ANoB5pke8rnm3TJLUHmKyLpq/RwN7R445sWo/d1sA4oHHBOVkc6W/lAX
-        hEsUhHuZVWJQkVY2XYuWQLpkQ9ckNHwkZkYZiKgOFZdbcFavrYsxf1wE4OmkXDYXP37rLIcJtP9
-        As8YHzG25Zmcm
-X-Received: by 2002:a05:6e02:e11:b0:302:cff7:890 with SMTP id a17-20020a056e020e1100b00302cff70890mr20669577ilk.205.1669840498460;
-        Wed, 30 Nov 2022 12:34:58 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6zIRVaIxYu0jrWH1TDqGsriuSzwvLKEFFF9J3Vj8WHhEFtJCqf+j6nDPBPSv/XcsF49i5+mA==
-X-Received: by 2002:a05:6e02:e11:b0:302:cff7:890 with SMTP id a17-20020a056e020e1100b00302cff70890mr20669570ilk.205.1669840498234;
-        Wed, 30 Nov 2022 12:34:58 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id l15-20020a02664f000000b00383c144fbd7sm911383jaf.32.2022.11.30.12.34.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Nov 2022 12:34:57 -0800 (PST)
-Date:   Wed, 30 Nov 2022 13:34:55 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Lixiao Yang <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Yi Liu <yi.l.liu@intel.com>, Yu He <yu.he@intel.com>
-Subject: Re: [PATCH v4 00/10] Connect VFIO to IOMMUFD
-Message-ID: <20221130133455.3f8ef495.alex.williamson@redhat.com>
-In-Reply-To: <0-v4-42cd2eb0e3eb+335a-vfio_iommufd_jgg@nvidia.com>
-References: <0-v4-42cd2eb0e3eb+335a-vfio_iommufd_jgg@nvidia.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S229649AbiK3Ugx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 15:36:53 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 648CC1D3;
+        Wed, 30 Nov 2022 12:36:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669840612; x=1701376612;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=r1FDXbnXDjUldZm7GrdgEZtQHBGflDxjpKsRBC7x164=;
+  b=g+PRrf0OCq3/nAYL7eotFFJNgtAt0jKI6mdn2jaWXFbYHI9Lt8pclxPT
+   LpeAwBNChfc3Dy/tyAzN45h1Rox3v2+0gDbYp3Rt05IEC/4oeTHnDrRRB
+   LcGYTQJa1f4vU/fEFooF/+nY8S7WzvJwqd6QApsEWXYyWeS4gjd8AH2E8
+   2MPjvwWyoJWD03W5GLBaDKu5PRSvmUUrLCZawtJIyDdp1YPDopV6AAgAg
+   6+p/SizVETWJX+X2SDeaM7xd2mZkwqz6JP4A8uR8iZGABXrEkMWPFSGcC
+   8fUctPZ0iIuEp3rJ4t9aK9Vqo+WiOjeuIwwg085O9CGCDO9he339rrTTC
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10547"; a="377671777"
+X-IronPort-AV: E=Sophos;i="5.96,207,1665471600"; 
+   d="scan'208";a="377671777"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2022 12:36:51 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10547"; a="644360640"
+X-IronPort-AV: E=Sophos;i="5.96,207,1665471600"; 
+   d="scan'208";a="644360640"
+Received: from subhadee-mobl.amr.corp.intel.com (HELO desk) ([10.251.3.232])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2022 12:36:51 -0800
+Date:   Wed, 30 Nov 2022 12:36:49 -0800
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Kim Phillips <kim.phillips@amd.com>
+Cc:     x86@kernel.org, Babu Moger <Babu.Moger@amd.com>,
+        Borislav Petkov <bp@alien8.de>, Borislav Petkov <bp@suse.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Juergen Gross <jgross@suse.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 6/7] x86/cpu, kvm: Support AMD Automatic IBRS
+Message-ID: <20221130203649.gwhypmw35mfgwsxh@desk>
+References: <20221129235816.188737-1-kim.phillips@amd.com>
+ <20221129235816.188737-7-kim.phillips@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20221129235816.188737-7-kim.phillips@amd.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 29 Nov 2022 16:31:45 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Tue, Nov 29, 2022 at 05:58:15PM -0600, Kim Phillips wrote:
+>--- a/arch/x86/kernel/cpu/common.c
+>+++ b/arch/x86/kernel/cpu/common.c
+>@@ -1406,6 +1406,14 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
+> 	    !(ia32_cap & ARCH_CAP_PBRSB_NO))
+> 		setup_force_cpu_bug(X86_BUG_EIBRS_PBRSB);
+>
+>+	/*
+>+	 * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the Intel flag only
+>+	 * after IBRS_ENHANCED bugs such as BUG_EIBRS_PBRSB above have been
+>+	 * determined.
+>+	 */
 
-> [ As with the iommufd series, this will be the last posting unless
-> something major happens, futher fixes will be in new commits ]
-> 
-> This series provides an alternative container layer for VFIO implemented
-> using iommufd. This is optional, if CONFIG_IOMMUFD is not set then it will
-> not be compiled in.
-> 
-> At this point iommufd can be injected by passing in a iommfd FD to
-> VFIO_GROUP_SET_CONTAINER which will use the VFIO compat layer in iommufd
-> to obtain the compat IOAS and then connect up all the VFIO drivers as
-> appropriate.
-> 
-> This is temporary stopping point, a following series will provide a way to
-> directly open a VFIO device FD and directly connect it to IOMMUFD using
-> native ioctls that can expose the IOMMUFD features like hwpt, future
-> vPASID and dynamic attachment.
-> 
-> This series, in compat mode, has passed all the qemu tests we have
-> available, including the test suites for the Intel GVT mdev. Aside from
-> the temporary limitation with P2P memory this is belived to be fully
-> compatible with VFIO.
-> 
-> This is on github: https://github.com/jgunthorpe/linux/commits/vfio_iommufd
-> 
-> It requires the iommufd series:
-> 
-> https://lore.kernel.org/r/0-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com
-> 
-> v4:
->  - Change the assertion in vfio_group_has_iommu to be clearer
->  - Use vfio_group_has_iommu()
->  - Remove allow_unsafe_interrupts stuff
->  - Update IOMMUFD_VFIO_CONTAINER kconfig description
->  - Use DEBUG_KERNEL insted of RUNTIME_TESTING_MENU for IOMMUFD_TEST kconfig
+Minor comment, setting NO_EIBRS_PBRSB in cpu_vuln_whitelist for
+non-EIBRS CPUs also (AMD and others) can remove this order dependency.
 
-This looks ok to me and passes all my testing.  What's your merge plan?
-I'm guessing you'd like to send it along with the main IOMMUFD pull
-request, there are currently no conflicts with my next branch,
-therefore:
-
-Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
-Tested-by: Alex Williamson <alex.williamson@redhat.com>
-
-Otherwise, let's figure out the branch merge plan.  Thanks,
-
-Alex
-
+>+	if (cpu_has(c, X86_FEATURE_AUTOIBRS))
+>+		setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
