@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B60D63CF4F
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 07:42:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A2A0E63CF54
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 07:44:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232637AbiK3Gmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 01:42:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52510 "EHLO
+        id S233168AbiK3Goa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 01:44:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229800AbiK3Gml (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 01:42:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA17C24BFB
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 22:41:47 -0800 (PST)
+        with ESMTP id S232704AbiK3Go3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 01:44:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8E812A72F
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 22:43:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669790506;
+        s=mimecast20190719; t=1669790607;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IHsnUPgsAXHYQy/PElwkoAe59Hk4r6bXlAIKPglqcY0=;
-        b=LNKciMKSpFtfssdW5vypjXu8S9tcZkcYC0y/yEaGu/Fiz+DcktWHsHIcmvBASvje1BRj/Z
-        0455jKzTYarJRxnmNS4fkhKRCBTIlrLfIKXaGx32JT34YZs/2eo8ozL3HOmX/dZ9arwj/n
-        gjOxWEOsC7JnH+VK8EQ9KOaEHHuKt3Q=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=xjd/oMdsjidgORS4x4dIOgj/JjLdO4P/IMxpTdg96xA=;
+        b=HQeqM5vOAIateHtB9Wv0T+ooBVyoSoPH2vFdLFhtAfjHa0jKDbC7ATYvTHcsYUFgraKvXV
+        O2K2nFZcsbBITVuumkas3/I9TmP43IzO+2JD+g07/Ja6oqek1WE3DvDlwFEaH+Uh2gMqkb
+        oG4BiCqG1tEc/+3+hCsOT7V3jgvOQMs=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-671-0ru4rBjzNp2EQDFjy7T9EA-1; Wed, 30 Nov 2022 01:41:45 -0500
-X-MC-Unique: 0ru4rBjzNp2EQDFjy7T9EA-1
-Received: by mail-ot1-f72.google.com with SMTP id v17-20020a9d7d11000000b0066c33c3e0easo6687111otn.11
-        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 22:41:45 -0800 (PST)
+ us-mta-176-kMX8xXeFOvODAa_xh1lpCg-1; Wed, 30 Nov 2022 01:43:26 -0500
+X-MC-Unique: kMX8xXeFOvODAa_xh1lpCg-1
+Received: by mail-oo1-f70.google.com with SMTP id c8-20020a4a87c8000000b0049f149a83fdso4183307ooi.19
+        for <kvm@vger.kernel.org>; Tue, 29 Nov 2022 22:43:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IHsnUPgsAXHYQy/PElwkoAe59Hk4r6bXlAIKPglqcY0=;
-        b=oa3bv8C/nFqcCMpcjlEJRDpn5sV6KoCVqWy4kMsRlEwwDi8kCt/aU1hUc8idwegHVk
-         0UoQ6Zgs95RL4xqiK6TLJfQ7Gu6+LW068ohQQxdHDJbZs96owDteDwg39p7SWfO9uFdF
-         Zzd/5hhNbR2jPQIB1ai29bn+iefOkorE9/qBQ4xl0Ij8XWoeiosqtkjsScRNh1rKY9Dc
-         wxZ3odWREr9XKVCWgPXRY6IVHHCXhsSf811rB65+Y0oCg9JKJA9YtPU/DyXy6RN3/UY2
-         OYtgmNkl5OG6vgWpmZyZfHGSyV0c8CnAaaq91PS02yB41ZlLdR3Z1uuvks1b6qrWmd7p
-         7DKw==
-X-Gm-Message-State: ANoB5plzrdasDjmL6rhczmxFjTgw0KfMjt7oI3NOZo1UI9X3xUSqDpYA
-        qUYLHmsj0KP4UOlhY7OVWM3L4b+l1w1M7+eUlOBFnBdc2m7A3vsk5/uveTVxfnHJzaqbcRJRSIn
-        J03mhr9B2ZYvS0Xozc1tZWNOwMAuy
-X-Received: by 2002:aca:2103:0:b0:35b:9abf:5031 with SMTP id 3-20020aca2103000000b0035b9abf5031mr10600882oiz.280.1669790503017;
-        Tue, 29 Nov 2022 22:41:43 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5d4xDQb4e1F645YO2KQm0Mp+bvrkNm64BpAmQo7DMgdle3BEU29Odfyc3Bq60SM2d3syTn91xlnjtj6X1LD3w=
-X-Received: by 2002:aca:2103:0:b0:35b:9abf:5031 with SMTP id
- 3-20020aca2103000000b0035b9abf5031mr10600864oiz.280.1669790502807; Tue, 29
- Nov 2022 22:41:42 -0800 (PST)
+        bh=xjd/oMdsjidgORS4x4dIOgj/JjLdO4P/IMxpTdg96xA=;
+        b=HI6brszpx/uexccDPSKsB1ag20oGnubsPU7dOLAhzq+BsmoHb7SdcfvzW71LNDGL0h
+         y0v4k5A8t1pwDDxY15DmR8KdjPhw2DKl0Yynj7gTT4kPnbpDr3m8pjT1p67LaeyhPlC1
+         dFdSqC5blaeBvRAi36D1TFefkkLaeZgPKdvIFOZ9KsLWSuTETNi9HtU6C7VmrcQ7dvic
+         OWrP96sX6LzCU7Sh9HiP8yvEjJ6FTaVzFqY7LuXIiXFtJfYV6kleK2LrOfDCOtLbQWjT
+         Mvr8A6MRcSywEzgc85+v/ZhLThFx/CQWAxZ62MDGIvDTC1Hwm5IkP++hRikWppZxCpFI
+         kHog==
+X-Gm-Message-State: ANoB5pkMGEdVgVOf4esXElias9x9UKk2uf2D8m2CTS13cFfKkaB6g+7e
+        KTZbFRGz5MDkFLp6hT7DM+qEOkucFdQrHBBL/WWfnS1cR9jxieOA1+Ofsz3XksBBQtfnmjT0n0t
+        JDikEQ5MPPp2g61blscxTSW0uWTvu
+X-Received: by 2002:a05:6830:6505:b0:66c:fb5b:4904 with SMTP id cm5-20020a056830650500b0066cfb5b4904mr29927876otb.237.1669790605400;
+        Tue, 29 Nov 2022 22:43:25 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6wxcs63mFAcy1jH7J5665PFD1BMgM89Ro6tgAYoev6mcYR4Dp5tkh800k5JC3UQ6Ue4Y1PO6VvmGKxC626baE=
+X-Received: by 2002:a05:6830:6505:b0:66c:fb5b:4904 with SMTP id
+ cm5-20020a056830650500b0066cfb5b4904mr29927873otb.237.1669790605193; Tue, 29
+ Nov 2022 22:43:25 -0800 (PST)
 MIME-Version: 1.0
-References: <20221124155158.2109884-1-eperezma@redhat.com> <20221124155158.2109884-5-eperezma@redhat.com>
-In-Reply-To: <20221124155158.2109884-5-eperezma@redhat.com>
+References: <20221124155158.2109884-1-eperezma@redhat.com> <20221124155158.2109884-7-eperezma@redhat.com>
+In-Reply-To: <20221124155158.2109884-7-eperezma@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 30 Nov 2022 14:41:31 +0800
-Message-ID: <CACGkMEub1-n_54-10PcyZejPgGrZFhnGe-k1fQ-g0X663UH7vQ@mail.gmail.com>
-Subject: Re: [PATCH for 8.0 v8 04/12] vhost: move iova_tree set to vhost_svq_start
+Date:   Wed, 30 Nov 2022 14:43:14 +0800
+Message-ID: <CACGkMEubBA9NYR5ynT_2C=iMEk3fph2GEOBvcw73BOuqiFKzJg@mail.gmail.com>
+Subject: Re: [PATCH for 8.0 v8 06/12] vdpa: extract vhost_vdpa_svq_allocate_iova_tree
 To:     =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
 Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
         Cornelia Huck <cohuck@redhat.com>,
@@ -90,119 +90,86 @@ X-Mailing-List: kvm@vger.kernel.org
 On Thu, Nov 24, 2022 at 11:52 PM Eugenio P=C3=A9rez <eperezma@redhat.com> w=
 rote:
 >
-> Since we don't know if we will use SVQ at qemu initialization, let's
-> allocate iova_tree only if needed. To do so, accept it at SVQ start, not
-> at initialization.
+> It can be allocated either if all virtqueues must be shadowed or if
+> vdpa-net detects it can shadow only cvq.
 >
-> This will avoid to create it if the device does not support SVQ.
+> Extract in its own function so we can reuse it.
 >
 > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> ---
+>  net/vhost-vdpa.c | 29 +++++++++++++++++------------
+>  1 file changed, 17 insertions(+), 12 deletions(-)
+>
+> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> index 88e0eec5fa..9ee3bc4cd3 100644
+> --- a/net/vhost-vdpa.c
+> +++ b/net/vhost-vdpa.c
+> @@ -240,6 +240,22 @@ static NetClientInfo net_vhost_vdpa_info =3D {
+>          .check_peer_type =3D vhost_vdpa_check_peer_type,
+>  };
+>
+> +static int vhost_vdpa_get_iova_range(int fd,
+> +                                     struct vhost_vdpa_iova_range *iova_=
+range)
+> +{
+> +    int ret =3D ioctl(fd, VHOST_VDPA_GET_IOVA_RANGE, iova_range);
+> +
+> +    return ret < 0 ? -errno : 0;
+> +}
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+I don't get why this needs to be moved to net specific code.
 
 Thanks
 
-> ---
->  hw/virtio/vhost-shadow-virtqueue.h | 5 ++---
->  hw/virtio/vhost-shadow-virtqueue.c | 9 ++++-----
->  hw/virtio/vhost-vdpa.c             | 5 ++---
->  3 files changed, 8 insertions(+), 11 deletions(-)
->
-> diff --git a/hw/virtio/vhost-shadow-virtqueue.h b/hw/virtio/vhost-shadow-=
-virtqueue.h
-> index d04c34a589..926a4897b1 100644
-> --- a/hw/virtio/vhost-shadow-virtqueue.h
-> +++ b/hw/virtio/vhost-shadow-virtqueue.h
-> @@ -126,11 +126,10 @@ size_t vhost_svq_driver_area_size(const VhostShadow=
-Virtqueue *svq);
->  size_t vhost_svq_device_area_size(const VhostShadowVirtqueue *svq);
->
->  void vhost_svq_start(VhostShadowVirtqueue *svq, VirtIODevice *vdev,
-> -                     VirtQueue *vq);
-> +                     VirtQueue *vq, VhostIOVATree *iova_tree);
->  void vhost_svq_stop(VhostShadowVirtqueue *svq);
->
-> -VhostShadowVirtqueue *vhost_svq_new(VhostIOVATree *iova_tree,
-> -                                    const VhostShadowVirtqueueOps *ops,
-> +VhostShadowVirtqueue *vhost_svq_new(const VhostShadowVirtqueueOps *ops,
->                                      void *ops_opaque);
->
->  void vhost_svq_free(gpointer vq);
-> diff --git a/hw/virtio/vhost-shadow-virtqueue.c b/hw/virtio/vhost-shadow-=
-virtqueue.c
-> index 3b05bab44d..4307296358 100644
-> --- a/hw/virtio/vhost-shadow-virtqueue.c
-> +++ b/hw/virtio/vhost-shadow-virtqueue.c
-> @@ -642,9 +642,10 @@ void vhost_svq_set_svq_kick_fd(VhostShadowVirtqueue =
-*svq, int svq_kick_fd)
->   * @svq: Shadow Virtqueue
->   * @vdev: VirtIO device
->   * @vq: Virtqueue to shadow
-> + * @iova_tree: Tree to perform descriptors translations
->   */
->  void vhost_svq_start(VhostShadowVirtqueue *svq, VirtIODevice *vdev,
-> -                     VirtQueue *vq)
-> +                     VirtQueue *vq, VhostIOVATree *iova_tree)
+> +
+> +static VhostIOVATree *vhost_vdpa_svq_allocate_iova_tree(int vdpa_device_=
+fd)
+> +{
+> +    struct vhost_vdpa_iova_range iova_range;
+> +
+> +    vhost_vdpa_get_iova_range(vdpa_device_fd, &iova_range);
+> +    return vhost_iova_tree_new(iova_range.first, iova_range.last);
+> +}
+> +
+>  static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *addr)
 >  {
->      size_t desc_size, driver_size, device_size;
+>      VhostIOVATree *tree =3D v->iova_tree;
+> @@ -587,14 +603,6 @@ static NetClientState *net_vhost_vdpa_init(NetClient=
+State *peer,
+>      return nc;
+>  }
 >
-> @@ -655,6 +656,7 @@ void vhost_svq_start(VhostShadowVirtqueue *svq, VirtI=
-ODevice *vdev,
->      svq->last_used_idx =3D 0;
->      svq->vdev =3D vdev;
->      svq->vq =3D vq;
-> +    svq->iova_tree =3D iova_tree;
->
->      svq->vring.num =3D virtio_queue_get_num(vdev, virtio_get_queue_index=
-(vq));
->      driver_size =3D vhost_svq_driver_area_size(svq);
-> @@ -712,18 +714,15 @@ void vhost_svq_stop(VhostShadowVirtqueue *svq)
->   * Creates vhost shadow virtqueue, and instructs the vhost device to use=
- the
->   * shadow methods and file descriptors.
->   *
-> - * @iova_tree: Tree to perform descriptors translations
->   * @ops: SVQ owner callbacks
->   * @ops_opaque: ops opaque pointer
->   */
-> -VhostShadowVirtqueue *vhost_svq_new(VhostIOVATree *iova_tree,
-> -                                    const VhostShadowVirtqueueOps *ops,
-> +VhostShadowVirtqueue *vhost_svq_new(const VhostShadowVirtqueueOps *ops,
->                                      void *ops_opaque)
+> -static int vhost_vdpa_get_iova_range(int fd,
+> -                                     struct vhost_vdpa_iova_range *iova_=
+range)
+> -{
+> -    int ret =3D ioctl(fd, VHOST_VDPA_GET_IOVA_RANGE, iova_range);
+> -
+> -    return ret < 0 ? -errno : 0;
+> -}
+> -
+>  static int vhost_vdpa_get_features(int fd, uint64_t *features, Error **e=
+rrp)
 >  {
->      VhostShadowVirtqueue *svq =3D g_new0(VhostShadowVirtqueue, 1);
->
->      event_notifier_init_fd(&svq->svq_kick, VHOST_FILE_UNBIND);
-> -    svq->iova_tree =3D iova_tree;
->      svq->ops =3D ops;
->      svq->ops_opaque =3D ops_opaque;
->      return svq;
-> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-> index 3df2775760..691bcc811a 100644
-> --- a/hw/virtio/vhost-vdpa.c
-> +++ b/hw/virtio/vhost-vdpa.c
-> @@ -430,8 +430,7 @@ static int vhost_vdpa_init_svq(struct vhost_dev *hdev=
-, struct vhost_vdpa *v,
->      for (unsigned n =3D 0; n < hdev->nvqs; ++n) {
->          VhostShadowVirtqueue *svq;
->
-> -        svq =3D vhost_svq_new(v->iova_tree, v->shadow_vq_ops,
-> -                            v->shadow_vq_ops_opaque);
-> +        svq =3D vhost_svq_new(v->shadow_vq_ops, v->shadow_vq_ops_opaque)=
-;
->          g_ptr_array_add(shadow_vqs, svq);
+>      int ret =3D ioctl(fd, VHOST_GET_FEATURES, features);
+> @@ -690,14 +698,11 @@ int net_init_vhost_vdpa(const Netdev *netdev, const=
+ char *name,
 >      }
 >
-> @@ -1063,7 +1062,7 @@ static bool vhost_vdpa_svqs_start(struct vhost_dev =
-*dev)
->              goto err;
+>      if (opts->x_svq) {
+> -        struct vhost_vdpa_iova_range iova_range;
+> -
+>          if (!vhost_vdpa_net_valid_svq_features(features, errp)) {
+>              goto err_svq;
 >          }
 >
-> -        vhost_svq_start(svq, dev->vdev, vq);
-> +        vhost_svq_start(svq, dev->vdev, vq, v->iova_tree);
->          ok =3D vhost_vdpa_svq_map_rings(dev, svq, &addr, &err);
->          if (unlikely(!ok)) {
->              goto err_map;
+> -        vhost_vdpa_get_iova_range(vdpa_device_fd, &iova_range);
+> -        iova_tree =3D vhost_iova_tree_new(iova_range.first, iova_range.l=
+ast);
+> +        iova_tree =3D vhost_vdpa_svq_allocate_iova_tree(vdpa_device_fd);
+>      }
+>
+>      ncs =3D g_malloc0(sizeof(*ncs) * queue_pairs);
 > --
 > 2.31.1
 >
