@@ -2,126 +2,366 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 238B363DC1F
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 18:38:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98D0663DC7D
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 18:55:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229752AbiK3RiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 12:38:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34908 "EHLO
+        id S229850AbiK3Rzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 12:55:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229696AbiK3RiF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 12:38:05 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BBC330540;
-        Wed, 30 Nov 2022 09:38:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669829883; x=1701365883;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=jgk+/gRksD/zcs3SEL3Csm7ScRic4ED0irw6NfZJsSk=;
-  b=XCuC3EyiO1qXfsDqj7fsWtYf0ZG1KbHhDShofFVT1ccPRcFlmvLOXbNH
-   pVojtcZAwcfxS9TBPDjqCzKIQCrrt+tIUv3B+KJeOLgToyOPn/aus7v/A
-   jVQseH3pZzufK88f8XS8UIyoEKCJqKZkIzDWmikTlkK5GEfz2KbgOYOA1
-   7oPcci7+xTxXVTLbCm5AQMsQ5qk88+bdzO2XiHaduT2tQPJRxFIuZIdxO
-   XC+mqDXcA4qWgH7ck4fwruXQF0t3/qBSrGdI9rycTFPi79U8XNW/GkhdO
-   qQLuPyTxwOepiykYEPyumUj7zHOOM5U3r2suftI0hS0iw0mrAG7Rwhl4s
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10547"; a="298832519"
-X-IronPort-AV: E=Sophos;i="5.96,207,1665471600"; 
-   d="scan'208";a="298832519"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2022 09:38:02 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10547"; a="676903764"
-X-IronPort-AV: E=Sophos;i="5.96,207,1665471600"; 
-   d="scan'208";a="676903764"
-Received: from xwang-mobl1.amr.corp.intel.com (HELO [10.212.177.221]) ([10.212.177.221])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2022 09:38:01 -0800
-Message-ID: <c93a0fed-23d8-addd-b6ac-cd4076d0a528@intel.com>
-Date:   Wed, 30 Nov 2022 09:37:59 -0800
+        with ESMTP id S229497AbiK3Rzs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 12:55:48 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0EAB4A076
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 09:55:46 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id a19so6019870ljk.0
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 09:55:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OrjLymDPbqj8c6B8djKqePJ5ePQrTTHiop97PzH3pJ8=;
+        b=BjFwMdZxH4tLxGOiVgx5Gkpz9FySYzy6yTkJ/12R5uiggjmHCkflg8tXZXzairWdJv
+         6637l8gHptJedMw3WX/IfMM9cDUZCV9URMT2fmiixcG2pDbtmH+17ZYbPxdqrsailWXc
+         /uxhlcCjedziA/eOInMr3Y13xDU7lMP/5e3wXuuEtqHoJenbHto+9imwZaH+Zh5MCZ9I
+         g22XQjFaR/HeWvuUPhvATLRjJFGBy1xxJ7xC8vSDIPCwgT/gIN3V6kYMw/qy6FtyZSjO
+         mAYnJ1ONTxyqf9H3mT8xKDDtUTJgmdfG65i/tSkZpOk21xK6mJqej1ehfU8feowklhEk
+         is8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OrjLymDPbqj8c6B8djKqePJ5ePQrTTHiop97PzH3pJ8=;
+        b=0eb848oc7nU0gQ83TPmwdKk6FJqqUQdVZOSe0dzeeLE/k4DONkUIp+XrcLgr2ywHmu
+         ppdgQgGlRkxAUmbwvQ/kl2/5sPiNP4UGNcBXMERVgdG2/wcLanZoLLOGqaOD22J6Arft
+         fTKdASFt8s/TNx7z0KTsw1Jvp3OgU+7eQ9VvXNr+tjPIfQcu+QkSv0vbka9Tjal+19du
+         +MwMoQKSa+FuWK+otdcqcQLqDOV9U6z3/Kqyrs/LMMufZDAv80SS2TA3TGKYPdoe18nw
+         ArgV62cJ+mEKWyh0oXdMIvrC5Q8Ny3Sb12ksVkSj/jfOevz0JLFre9AqOOEqBHRQqg68
+         zjKg==
+X-Gm-Message-State: ANoB5pn60cv+WkmDTm/mcRWbVoM5kz81faZTctWVwqjvMP3d9OJVjyfd
+        t/x1kR/6HQF6Q/BeuDEidvd1SFU1jpcpaofYvHgGUg==
+X-Google-Smtp-Source: AA0mqf6rc19RMQWJvnpafzAVKxxzNkdUtPwlB61Nu/wIAsOhjPz+ik7m/Z/RxbjMB5XeD/CYy0uq1PlK8r4O41KtJy4=
+X-Received: by 2002:a05:651c:c99:b0:277:2b10:bf60 with SMTP id
+ bz25-20020a05651c0c9900b002772b10bf60mr21458780ljb.159.1669830944774; Wed, 30
+ Nov 2022 09:55:44 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v7 17/20] x86/virt/tdx: Configure global KeyID on all
- packages
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
-        kirill.shutemov@linux.intel.com, ying.huang@intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com,
-        tony.luck@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        isaku.yamahata@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com
-References: <cover.1668988357.git.kai.huang@intel.com>
- <8d8285cc5efa6302cf42a3fe2c9153d1a9dbcdac.1668988357.git.kai.huang@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <8d8285cc5efa6302cf42a3fe2c9153d1a9dbcdac.1668988357.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20221115111549.2784927-1-tabba@google.com> <20221115111549.2784927-9-tabba@google.com>
+ <Y39PCG0ZRHf/2d5E@monolith.localdoman> <CA+EHjTx6JRODjncxMz6pBO43S2gAFZt4vDibG=Zwbr7TkbiFeQ@mail.gmail.com>
+ <Y3+meXHu5MRYuHou@monolith.localdoman> <CA+EHjTwgg+Cu=A3msmWLNEHmkJhOn-8+MeJULOHzF6V99iHk1A@mail.gmail.com>
+ <Y4CnPcHyt5IPAoF/@monolith.localdoman> <CA+EHjTzf5-Rsi9-hzfMiYPUB8_C9UmkJuJiZpD8VSe9CNt2_aw@mail.gmail.com>
+ <Y4ZK9sNbWDIOYe++@monolith.localdoman>
+In-Reply-To: <Y4ZK9sNbWDIOYe++@monolith.localdoman>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Wed, 30 Nov 2022 17:54:00 +0000
+Message-ID: <CA+EHjTxb2mOOTE-CTFmfQFqkA0JrKuA9byaTxGgUiG0c7j7u=A@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v1 08/17] Use memfd for all guest ram allocations
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
+        andre.przywara@arm.com, will@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/20/22 16:26, Kai Huang wrote:
-> After the array of TDMRs and the global KeyID are configured to the TDX
-> module, use TDH.SYS.KEY.CONFIG to configure the key of the global KeyID
-> on all packages.
+Hi,
 
-I want to circle back to this because it potentially has the same class
-of issue that TDH.SYS.LP.INIT had.  So, here's some more background
-followed by the key question: is TDH.SYS.KEY.CONFIG too strict?  Should
-we explore relaxing it?
+On Tue, Nov 29, 2022 at 6:10 PM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+> On Mon, Nov 28, 2022 at 08:49:29AM +0000, Fuad Tabba wrote:
+> > Hi,
+> >
+> > First I want to mention that I really appreciate your feedback, which
+> > has already been quite helpful. I would like you to please consider
+> > this to be an RFC, and let's use these patches as a basis for
+> > discussion and how they can be improved when I respin them, even if
+> > that means waiting until the kvm fd-based proposal is finalized.
+>
+> For that it's probably best if you add RFC to the subject prefix. That's
+> very helpful to let the reviewers know what to focus on, more on the
+> approach than on the finer details.
 
-Here's the very long-winded way of asking the same thing:
+I will respin this as an RFC, and I will include the patches that I
+have that support the restricted memory proposal [*] for pKVM as it
+stands now. I hope that would help see where I was thinking this would
+be heading.
 
-This key is used to protect TDX module memory which is too large to fit
-into the limited range-register-protected (SMRR) areas that most of the
-module uses.  Right now, that metadata includes the Physical Address
-Metadata Tables (PAMT) and "TD Root" (TDR) pages.  Using this "global
-KeyID" provides stronger isolation and integrity protection for these
-structures than is provided by KeyID-0.
+[*] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.=
+intel.com/
 
-The "global KeyID" only strictly needs to be programmed into a memory
-controllers if a PAMT or TDR page is allocated in memory attached to
-that controller.  However, the TDX module currently requires that
-TDH.SYS.KEY.CONFIG be executed on one processor in each package.  This
-is true even if there is no TDX Memory Region (TDMR) attached to that
-package.
+<snip>
 
-This was likely done for simplicity in the TDX module.  It currently has
-no NUMA awareness (or even trusted NUMA metadata) and no ability to
-correlate processor packages with the memory attached to their memory
-controllers.
+> > > > With simpler I didn't mean fewer lines of code, rather that it's
+> > > > easier to reason about, more shared code. With this series, hugetlb
+> > >
+> > > How is all of the code that has been added easier to reason about tha=
+n one
+> > > single mmap call?
+>
+> Would be nice if this would be answered.
 
-The TDH.SYS.KEY.CONFIG design is actually pretty similar to Kirill's
-MKTME implementation[1].  Basically blast the KeyID configuration out to
-one processor in each package, regardless of whether the KeyID will ever
-get used on that package.
+As I said in a reply to a different comment, for me personally, as a first =
+time
+kvmtool contributor, it was easier for me to reason about the memory
+when the canonical reference to the memory is a file descriptor that
+would not change, rather than a userspace memory address which could
+change as it is aligned and trimmed.
 
-While this requirement from the TDX module is _slightly_ too strict, I'm
-not quite as worried about it as I was about the *super* strict
-TDH.SYS.LP.INIT requirements.  It's a lot harder and more rare to have
-an entire package of CPUs unavailable versus a single logical CPU.
-There is, for instance, no side-channel mitigation that disables an
-entire package worth of CPUs.  I'm not even sure if we allow an entire
-package worth of NOHZ_FULL-indisposed processors.
+I use the word simpler subjectively, that is, in my opinion.
 
-I'm happy to go run the same drill for TDH.SYS.KEY.CONFIG that we did
-for TDH.SYS.LP.INIT.  Basically, can we relax the too-strict
-restrictions?  But, I'm not sure anyone will ever reap a practical
-benefit from it.  I'm tempted to just leave it as-is.
+<snip>
 
-Does anyone feel differently?
+> >
+> > Because we are sure that it will be fd-based, and because I thought
+> > that getting a head start to set the scene would be helpful. The part
+> > that is uncertain is the kvm capabilities, flags, and names of the new
+> > memory region extensions, none of which I address in these patches.
+>
+> I see, that makes sense. My feedback so far is that you haven't provided =
+a
+> good reason why this change to anonymous memory makes sense right now.
 
-1.
-https://lore.kernel.org/lkml/20190508144422.13171-1-kirill.shutemov@linux.intel.com/T/#m936f260a345284687f8e929675f68f3d514725f5
+I appreciate your feedback, and I hope we can continue this discussion
+when I respin this as an RFC.
 
 
+
+Cheers,
+/fuad
+
+> Thanks,
+> Alex
+>
+> >
+> > Cheers,
+> > /fuad
+> >
+> > > Thanks,
+> > > Alex
+> > >
+> > > >
+> > > > Cheers,
+> > > > /fuad
+> > > >
+> > > >
+> > > >
+> > > > > Thanks,
+> > > > > Alex
+> > > > >
+> > > > > > could have a look on how I would go ahead building on these pat=
+ches
+> > > > > > for full support of private memory backed by an fd.
+> > > > > >
+> > > > > > > Regarding IPC memory sharing, is mmap'ing an memfd file enoug=
+h to enable
+> > > > > > > that? If more work is needed for it, then wouldn't it make mo=
+re sense to do
+> > > > > > > all the changes at once? This change might look sensible righ=
+t now, but it
+> > > > > > > might turn out that it was the wrong way to go about it when =
+someone
+> > > > > > > actually starts implementing memory sharing.
+> > > > > >
+> > > > > > I don=E2=80=99t plan on supporting IPC memory sharing. I just m=
+entioned that
+> > > > > > as yet another use case that would benefit from guest memory be=
+ing
+> > > > > > fd-based, should kvmtool decide to support it in the future.
+> > > > > >
+> > > > > > Cheers,
+> > > > > > /fuad
+> > > > > >
+> > > > > > [1] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p=
+.peng@linux.intel.com/
+> > > > > > [2] https://github.com/qemu/qemu
+> > > > > > [3] https://chromium.googlesource.com/chromiumos/platform/crosv=
+m/
+> > > > > > [4] https://github.com/chao-p/qemu/tree/privmem-v9
+> > > > > > [5] https://android-kvm.googlesource.com/kvmtool/+/refs/heads/t=
+abba/fdmem-v9-core
+> > > > > >
+> > > > > >
+> > > > > >
+> > > > > > >
+> > > > > > > Regarding IPC memory sharing, is mmap'ing an memfd file enoug=
+h to enable
+> > > > > > > that? If more work is needed for it, then wouldn't it make mo=
+re sense to do
+> > > > > > > all the changes at once? This change might look sensible righ=
+t now, but it
+> > > > > > > might turn out that it was the wrong way to go about it when =
+someone
+> > > > > > > actually starts implementing memory sharing.
+> > > > > > >
+> > > > > > > Thanks,
+> > > > > > > Alex
+> > > > > > >
+> > > > > > > >
+> > > > > > > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > > > > > >
+> > > > > > > > [*] https://lore.kernel.org/all/20221025151344.3784230-1-ch=
+ao.p.peng@linux.intel.com/
+> > > > > > > > ---
+> > > > > > > >  include/kvm/kvm.h  |  1 +
+> > > > > > > >  include/kvm/util.h |  3 +++
+> > > > > > > >  kvm.c              |  4 ++++
+> > > > > > > >  util/util.c        | 33 ++++++++++++++++++++-------------
+> > > > > > > >  4 files changed, 28 insertions(+), 13 deletions(-)
+> > > > > > > >
+> > > > > > > > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> > > > > > > > index 3872dc6..d0d519b 100644
+> > > > > > > > --- a/include/kvm/kvm.h
+> > > > > > > > +++ b/include/kvm/kvm.h
+> > > > > > > > @@ -87,6 +87,7 @@ struct kvm {
+> > > > > > > >       struct kvm_config       cfg;
+> > > > > > > >       int                     sys_fd;         /* For system=
+ ioctls(), i.e. /dev/kvm */
+> > > > > > > >       int                     vm_fd;          /* For VM ioc=
+tls() */
+> > > > > > > > +     int                     ram_fd;         /* For guest =
+memory. */
+> > > > > > > >       timer_t                 timerid;        /* Posix time=
+r for interrupts */
+> > > > > > > >
+> > > > > > > >       int                     nrcpus;         /* Number of =
+cpus to run */
+> > > > > > > > diff --git a/include/kvm/util.h b/include/kvm/util.h
+> > > > > > > > index 61a205b..369603b 100644
+> > > > > > > > --- a/include/kvm/util.h
+> > > > > > > > +++ b/include/kvm/util.h
+> > > > > > > > @@ -140,6 +140,9 @@ static inline int pow2_size(unsigned lo=
+ng x)
+> > > > > > > >  }
+> > > > > > > >
+> > > > > > > >  struct kvm;
+> > > > > > > > +int memfd_alloc(u64 size, bool hugetlb, u64 blk_size);
+> > > > > > > > +void *mmap_anon_or_hugetlbfs_align(struct kvm *kvm, const =
+char *htlbfs_path,
+> > > > > > > > +                                u64 size, u64 align);
+> > > > > > > >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *=
+htlbfs_path, u64 size);
+> > > > > > > >
+> > > > > > > >  #endif /* KVM__UTIL_H */
+> > > > > > > > diff --git a/kvm.c b/kvm.c
+> > > > > > > > index 78bc0d8..ed29d68 100644
+> > > > > > > > --- a/kvm.c
+> > > > > > > > +++ b/kvm.c
+> > > > > > > > @@ -160,6 +160,7 @@ struct kvm *kvm__new(void)
+> > > > > > > >       mutex_init(&kvm->mem_banks_lock);
+> > > > > > > >       kvm->sys_fd =3D -1;
+> > > > > > > >       kvm->vm_fd =3D -1;
+> > > > > > > > +     kvm->ram_fd =3D -1;
+> > > > > > > >
+> > > > > > > >  #ifdef KVM_BRLOCK_DEBUG
+> > > > > > > >       kvm->brlock_sem =3D (pthread_rwlock_t) PTHREAD_RWLOCK=
+_INITIALIZER;
+> > > > > > > > @@ -174,6 +175,9 @@ int kvm__exit(struct kvm *kvm)
+> > > > > > > >
+> > > > > > > >       kvm__arch_delete_ram(kvm);
+> > > > > > > >
+> > > > > > > > +     if (kvm->ram_fd >=3D 0)
+> > > > > > > > +             close(kvm->ram_fd);
+> > > > > > > > +
+> > > > > > > >       list_for_each_entry_safe(bank, tmp, &kvm->mem_banks, =
+list) {
+> > > > > > > >               list_del(&bank->list);
+> > > > > > > >               free(bank);
+> > > > > > > > diff --git a/util/util.c b/util/util.c
+> > > > > > > > index d3483d8..278bcc2 100644
+> > > > > > > > --- a/util/util.c
+> > > > > > > > +++ b/util/util.c
+> > > > > > > > @@ -102,36 +102,38 @@ static u64 get_hugepage_blk_size(cons=
+t char *htlbfs_path)
+> > > > > > > >       return sfs.f_bsize;
+> > > > > > > >  }
+> > > > > > > >
+> > > > > > > > -static void *mmap_hugetlbfs(struct kvm *kvm, const char *h=
+tlbfs_path, u64 size, u64 blk_size)
+> > > > > > > > +int memfd_alloc(u64 size, bool hugetlb, u64 blk_size)
+> > > > > > > >  {
+> > > > > > > >       const char *name =3D "kvmtool";
+> > > > > > > >       unsigned int flags =3D 0;
+> > > > > > > >       int fd;
+> > > > > > > > -     void *addr;
+> > > > > > > > -     int htsize =3D __builtin_ctzl(blk_size);
+> > > > > > > >
+> > > > > > > > -     if ((1ULL << htsize) !=3D blk_size)
+> > > > > > > > -             die("Hugepage size must be a power of 2.\n");
+> > > > > > > > +     if (hugetlb) {
+> > > > > > > > +             int htsize =3D __builtin_ctzl(blk_size);
+> > > > > > > >
+> > > > > > > > -     flags |=3D MFD_HUGETLB;
+> > > > > > > > -     flags |=3D htsize << MFD_HUGE_SHIFT;
+> > > > > > > > +             if ((1ULL << htsize) !=3D blk_size)
+> > > > > > > > +                     die("Hugepage size must be a power of=
+ 2.\n");
+> > > > > > > > +
+> > > > > > > > +             flags |=3D MFD_HUGETLB;
+> > > > > > > > +             flags |=3D htsize << MFD_HUGE_SHIFT;
+> > > > > > > > +     }
+> > > > > > > >
+> > > > > > > >       fd =3D memfd_create(name, flags);
+> > > > > > > >       if (fd < 0)
+> > > > > > > > -             die("Can't memfd_create for hugetlbfs map\n")=
+;
+> > > > > > > > +             die("Can't memfd_create for memory map\n");
+> > > > > > > > +
+> > > > > > > >       if (ftruncate(fd, size) < 0)
+> > > > > > > >               die("Can't ftruncate for mem mapping size %ll=
+d\n",
+> > > > > > > >                       (unsigned long long)size);
+> > > > > > > > -     addr =3D mmap(NULL, size, PROT_RW, MAP_PRIVATE, fd, 0=
+);
+> > > > > > > > -     close(fd);
+> > > > > > > >
+> > > > > > > > -     return addr;
+> > > > > > > > +     return fd;
+> > > > > > > >  }
+> > > > > > > >
+> > > > > > > >  /* This function wraps the decision between hugetlbfs map =
+(if requested) or normal mmap */
+> > > > > > > >  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *=
+htlbfs_path, u64 size)
+> > > > > > > >  {
+> > > > > > > >       u64 blk_size =3D 0;
+> > > > > > > > +     int fd;
+> > > > > > > >
+> > > > > > > >       /*
+> > > > > > > >        * We don't /need/ to map guest RAM from hugetlbfs, b=
+ut we do so
+> > > > > > > > @@ -146,9 +148,14 @@ void *mmap_anon_or_hugetlbfs(struct kv=
+m *kvm, const char *htlbfs_path, u64 size)
+> > > > > > > >               }
+> > > > > > > >
+> > > > > > > >               kvm->ram_pagesize =3D blk_size;
+> > > > > > > > -             return mmap_hugetlbfs(kvm, htlbfs_path, size,=
+ blk_size);
+> > > > > > > >       } else {
+> > > > > > > >               kvm->ram_pagesize =3D getpagesize();
+> > > > > > > > -             return mmap(NULL, size, PROT_RW, MAP_ANON_NOR=
+ESERVE, -1, 0);
+> > > > > > > >       }
+> > > > > > > > +
+> > > > > > > > +     fd =3D memfd_alloc(size, htlbfs_path, blk_size);
+> > > > > > > > +     if (fd < 0)
+> > > > > > > > +             return MAP_FAILED;
+> > > > > > > > +
+> > > > > > > > +     kvm->ram_fd =3D fd;
+> > > > > > > > +     return mmap(NULL, size, PROT_RW, MAP_PRIVATE, kvm->ra=
+m_fd, 0);
+> > > > > > > >  }
+> > > > > > > > --
+> > > > > > > > 2.38.1.431.g37b22c650d-goog
+> > > > > > > >
