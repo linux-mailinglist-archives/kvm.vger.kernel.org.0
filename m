@@ -2,125 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3132863D785
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 15:04:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A8E5463D788
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 15:05:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229693AbiK3OEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 09:04:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34360 "EHLO
+        id S229668AbiK3OFa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 09:05:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229695AbiK3OEt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 09:04:49 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22CC83E0BF;
-        Wed, 30 Nov 2022 06:04:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669817088; x=1701353088;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=L7Trwb2C5sPvmhlDk+PrNgcbJF8XVAhiKvoDPrIpHD8=;
-  b=gABft9/eSinBQo6SN9ssluA7Fxmrdu9KJS5ILWEgYH/nq0rooZPZR6Ld
-   pcsADcIB1+B7RHoyjwlM91lz4212CmH6823ohgYmjvgCxFtQXzIScDJgM
-   pUkUnPYfAwbPQszCbb64jPuS3+9QxHfvN5Zp6UETLB1gMTs2kHTUY/zO/
-   2qpDgnm8UU7EIv9d4N6V8UD9FH7Ke+Aqao0rUsfArX/zIhTvZLMCvaHRD
-   sCCVCWlIRcv6teXQuAVVDQY5ajmMRFlIBqklphIKExoQkSuGxrkQDnfEO
-   pe9czOiowkeQ7PIlreS6HSzTmmvhrimMFEeIyR2JeehDc5DpHnrJqs6XO
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10547"; a="303002798"
-X-IronPort-AV: E=Sophos;i="5.96,206,1665471600"; 
-   d="scan'208";a="303002798"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2022 06:04:36 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10547"; a="646339272"
-X-IronPort-AV: E=Sophos;i="5.96,206,1665471600"; 
-   d="scan'208";a="646339272"
-Received: from bkalluri-mobl.ger.corp.intel.com (HELO box.shutemov.name) ([10.252.35.191])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2022 06:04:31 -0800
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id 78574109A09; Wed, 30 Nov 2022 17:04:28 +0300 (+03)
-Date:   Wed, 30 Nov 2022 17:04:28 +0300
-From:   "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-Subject: Re: [PATCH v7 17/20] x86/virt/tdx: Configure global KeyID on all
- packages
-Message-ID: <20221130140428.pkejerx6u6alctyl@box.shutemov.name>
-References: <cover.1668988357.git.kai.huang@intel.com>
- <8d8285cc5efa6302cf42a3fe2c9153d1a9dbcdac.1668988357.git.kai.huang@intel.com>
- <a537b97b-0bdc-5bcc-9ce7-470f8fc1245b@linux.intel.com>
- <3d19683cdc13b7a3884f1e9e75743e922d4630f3.camel@intel.com>
+        with ESMTP id S229682AbiK3OF1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 09:05:27 -0500
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E82667CAAD
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 06:05:12 -0800 (PST)
+Received: by mail-wm1-x332.google.com with SMTP id v124-20020a1cac82000000b003cf7a4ea2caso1471705wme.5
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 06:05:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eNxxHpm2n+OH/EyW5l0fPtKv9Ooz5FbCEnr1nOb0dk8=;
+        b=coY1jm/+7O79YMkeilvP23+krEH/VdhR8yDqz3saTFVvTEHrN2Pd30n26aOG8IL3mc
+         kWXczAnERpGNcCY0uSJxaROyR6V87DcsSWwDctf2DFmR8Bic2TlI2NrkofzgcORYeHgU
+         Xi7Flglvg5JQYj5xLclcO+XUOn+riEzy1wLvNo5NPM6n5BuTshtJ1Cbl5T0UbAdl5oK/
+         4uwLO8AEkilp1gvUrqWzQVxztdO5Phi9nbY3GVDAoYX9+BwLhPK5Z4WrTDU2MIEp5AMn
+         uX0meUhf0UucTSN3svn7QuIxu6dBJOVDx3LCbrdXZS9XhN17EYrQSx3FB8e+xdnx7mrh
+         URQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eNxxHpm2n+OH/EyW5l0fPtKv9Ooz5FbCEnr1nOb0dk8=;
+        b=EB+71TXZR9H1lLn3mD2MrIGkHCgVovmUvXjFm6eWLBTgvcReUPRaWNdH3dUaQhJjh9
+         8D/5wG+cXRuY3Na2tdMNGO2INirxQtvRTDz0weyUHicuzr+hFZvzvyakfscnULQcnymP
+         +6sdy737gURyfUj3ui2Zy9WTRMsPdnQdxr08Zf31eUuSe5mk3pKPivTwCWIioC7UYXgq
+         xhbNQHiG+xBDjGNNNKgu2fKxAve4GSrCcmjX13KIuNdAKPSdoolIcr56Pg0U3KJbL0PX
+         XD6Mhstpp9X+Q6J731dQ91/RmaczbxPhaxoq54LCHMMaSySJf+vh9dk+35F/G01GwjiS
+         /OUA==
+X-Gm-Message-State: ANoB5pmOoFS24KZt24/cMGRuz9gxBxOovhTVSql/+ozEKbhTXTi3n+tO
+        eLzFK9+QH6YQImLJc5QTSc0=
+X-Google-Smtp-Source: AA0mqf6Bxi4JZf/Lzlq8HLnh96uLC9Gjzh34yQEYoBvcAKa87P27kgbA2ssR1Bw9oGYK1p0eptVbaw==
+X-Received: by 2002:a05:600c:1d08:b0:3cf:7556:a54f with SMTP id l8-20020a05600c1d0800b003cf7556a54fmr34530668wms.143.1669817110254;
+        Wed, 30 Nov 2022 06:05:10 -0800 (PST)
+Received: from [192.168.23.148] (54-240-197-233.amazon.com. [54.240.197.233])
+        by smtp.gmail.com with ESMTPSA id fn7-20020a05600c688700b003c6b70a4d69sm1998668wmb.42.2022.11.30.06.05.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Nov 2022 06:05:09 -0800 (PST)
+From:   Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <fe8c0bdb-1045-55cb-2628-58b96de3cb83@xen.org>
+Date:   Wed, 30 Nov 2022 14:05:09 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3d19683cdc13b7a3884f1e9e75743e922d4630f3.camel@intel.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v1 1/2] KVM: x86/xen: Reconcile fast and slow paths for
+ runstate update
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Michal Luczaj <mhal@rbox.co>, kvm@vger.kernel.org
+References: <20221127122210.248427-1-dwmw2@infradead.org>
+ <20221127122210.248427-2-dwmw2@infradead.org>
+Organization: Xen Project
+In-Reply-To: <20221127122210.248427-2-dwmw2@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 30, 2022 at 08:34:46AM +0000, Huang, Kai wrote:
-> On Wed, 2022-11-30 at 11:35 +0800, Binbin Wu wrote:
-> > On 11/21/2022 8:26 AM, Kai Huang wrote:
-> > > After the array of TDMRs and the global KeyID are configured to the TDX
-> > > module, use TDH.SYS.KEY.CONFIG to configure the key of the global KeyID
-> > > on all packages.
-> > > 
-> > > TDH.SYS.KEY.CONFIG must be done on one (any) cpu for each package.  And
-> > > it cannot run concurrently on different CPUs.  Implement a helper to
-> > > run SEAMCALL on one cpu for each package one by one, and use it to
-> > > configure the global KeyID on all packages.
-> > > 
-> > > Intel hardware doesn't guarantee cache coherency across different
-> > > KeyIDs.  The kernel needs to flush PAMT's dirty cachelines (associated
-> > > with KeyID 0) before the TDX module uses the global KeyID to access the
-> > > PAMT.  Following the TDX module specification, flush cache before
-> > > configuring the global KeyID on all packages.
-> > > 
-> > > Given the PAMT size can be large (~1/256th of system RAM), just use
-> > > WBINVD on all CPUs to flush.
-> > > 
-> > > Note if any TDH.SYS.KEY.CONFIG fails, the TDX module may already have
-> > > used the global KeyID to write any PAMT.  Therefore, need to use WBINVD
-> > > to flush cache before freeing the PAMTs back to the kernel.  Note using
-> > > MOVDIR64B (which changes the page's associated KeyID from the old TDX
-> > > private KeyID back to KeyID 0, which is used by the kernel)
-> > 
-> > It seems not accurate to say MOVDIR64B changes the page's associated KeyID.
-> > It just uses the current KeyID for memory operations.
+On 27/11/2022 12:22, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> The "write" to the memory changes the page's associated KeyID to the KeyID that
-> does the "write".  A more accurate expression perhaps should be MOVDIR64B +
-> MFENSE, but I think it doesn't matter in changelog.
+> Instead of having a completely separate fast path for the case where the
+> guest's runstate_info fits entirely in a page, recognise the similarity.
+> 
+> In both cases, the @update_bit pointer points to the byte containing the
+> XEN_RUNSTATE_UPDATE flag directly in the guest, via one of the GPCs.
+> 
+> In both cases, the actual guest structure (compat or not) is built up
+> from the fields in @vx, following preset pointers to the state and times
+> fields. The only difference is whether those pointers point to the kernel
+> stack (in the split case) or to guest memory directly via the GPC.
+> 
+> We can unify it by just setting the rs_state and rs_times pointers up
+> accordingly for each case. Then the only real difference is that dual
+> memcpy which can be made conditional, so the whole of that separate
+> fast path can go away, disappearing into the slow path without actually
+> doing the slow part.
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 
-MOVDIR64B KeyID for the cache line, not the page. Integrity tracked on
-per-cacheline basis.
+Reviewed-by: Paul Durrant <paul@xen.org>
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
