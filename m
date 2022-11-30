@@ -2,83 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E27063D8FD
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 16:13:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E609D63D98B
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 16:36:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229835AbiK3PN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 10:13:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38764 "EHLO
+        id S229730AbiK3Pgn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 10:36:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229769AbiK3PNY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 10:13:24 -0500
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A47C52F65F;
-        Wed, 30 Nov 2022 07:13:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669821203; x=1701357203;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=t0g+VAX2SuLcI7520dAKthU0OO4VL8H7Rn6/w+sOkno=;
-  b=FT9tDUKJfiM7NyOmarAFSAjxAF/cOFK9BBgv0Wam+6eU0521qH6eIoSz
-   brYSQiXoVqTnHFNBh/fVTJ4b5kXmeXZCkidmQdhdKotwwLSU0IEF9ZBQr
-   rqVhyo4fKyFZwQoOInl0omAOQnIwAvL3nCMQLk1Vc54OxvJp1InDLwgY+
-   2LCv5OSFLj3VG+HjEe2728HV7JxA3DGTCDPUdtoAVZrjwxqOEGUBx9lC9
-   moEiRwy89HWDBlCyEdVcPpwhFM5fxxSU/NWZltQyVviINfNQsvsakgksC
-   CgiMusfondnydi6sJI8Evm7lELp6asbox+FxLZTozO9idGv8gPjY7AnLh
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10547"; a="377578171"
-X-IronPort-AV: E=Sophos;i="5.96,206,1665471600"; 
-   d="scan'208";a="377578171"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2022 07:13:23 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10547"; a="712841768"
-X-IronPort-AV: E=Sophos;i="5.96,206,1665471600"; 
-   d="scan'208";a="712841768"
-Received: from avintux-mobl1.amr.corp.intel.com (HELO [10.212.242.146]) ([10.212.242.146])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2022 07:13:19 -0800
-Message-ID: <6b0980fc-74e7-3be5-c4a3-2583d6c26137@intel.com>
-Date:   Wed, 30 Nov 2022 07:13:18 -0800
+        with ESMTP id S229695AbiK3Pgi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 10:36:38 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C7B81C921
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 07:36:37 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id k5so16001366pjo.5
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 07:36:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oK8gN0YgVAu7NkEZH3khUXgKx/TyMqni0qECFdFyL/8=;
+        b=nehcrulzsv1SkJ5g/5jzmV1bbVDxkpK7YfJ8cc88N5b9GLOamaq9qvGcvUesp9Txvh
+         gPEiD4q5KY2nalKX+nz4ZiIACz6hY80lBxZ/VyUIRYNYIRJ4yhewj4gyvidWzOJMigM2
+         55mxDtK5kuvp7eSSI3H5yXYj3OO8f13d+jrL9L7+O6qAPCX5P2fVnT7HkQzsfymgHoiJ
+         TDUDlYGpdnBNoMMxh6GR056mnpzjmGlFULP1m/few/WO9dhsIagh//PyPSXuS5HxEqYM
+         4MOzF9IfP7YedRim+zxlp+l/YvU/6vVGLOxXSw+3TzYHrnvOe/kcHGStEK1sUNvcblCi
+         hZsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oK8gN0YgVAu7NkEZH3khUXgKx/TyMqni0qECFdFyL/8=;
+        b=OXnABXqY3qzp56n2cCnTxOf6JTDkkJnOWrmt/GrdJdFAcPVvXtu3wPnbPaUXmGTQte
+         F2Xqs1ctCB9Cu7+lVoUrzrWRsYuv9yomLIqGyNi4SWziNqJcM99mUx88d2Ph0wvhy12T
+         WQ2YBTj/DWrrXKtm05mtVBP0AcjmwWfdtDStydhr2g3ZC5xokfM76sVBMWurV2ir4UYE
+         6jRfXBAFct0xgZgMcbEwtDW01NesqVhiFMRsq3ppvQlAwtIoyPzAnqxTRq+PEdefemsD
+         N6RvchjS9+u8TeAyy6Br+d9Bd4DJxfvu/6F4L8R4InsH5GuubkgS15PanXyEo11i56mT
+         xnNw==
+X-Gm-Message-State: ANoB5plk/9nKCioHFWfnAQBoMd/CK4tNYbbM1zLN4EnEFV00i7KDHoyS
+        89JHJDcmj8utyaFMTRhiqjvZlA==
+X-Google-Smtp-Source: AA0mqf77p/L0ry35v6WlvSEwjJVAyD875zIFzALBwMusXtcWqIAnV1eH+XFkSONGVgPexXhfsWr6VA==
+X-Received: by 2002:a17:902:d550:b0:189:7bfe:1eb5 with SMTP id z16-20020a170902d55000b001897bfe1eb5mr20434854plf.9.1669822596615;
+        Wed, 30 Nov 2022 07:36:36 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id m8-20020a170902db0800b001895f7c8a71sm1656193plx.97.2022.11.30.07.36.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Nov 2022 07:36:36 -0800 (PST)
+Date:   Wed, 30 Nov 2022 15:36:33 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lei Wang <lei4.wang@intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH] KVM: Change non-existent ioctl comment
+ "KVM_CREATE_MEMORY_REGION" to "KVM_SET_MEMORY_REGION"
+Message-ID: <Y4d4gQd7cYDIjfWB@google.com>
+References: <20221130064325.386359-1-lei4.wang@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v7 17/20] x86/virt/tdx: Configure global KeyID on all
- packages
-Content-Language: en-US
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
-Cc:     "Luck, Tony" <tony.luck@intel.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-References: <cover.1668988357.git.kai.huang@intel.com>
- <8d8285cc5efa6302cf42a3fe2c9153d1a9dbcdac.1668988357.git.kai.huang@intel.com>
- <a537b97b-0bdc-5bcc-9ce7-470f8fc1245b@linux.intel.com>
- <3d19683cdc13b7a3884f1e9e75743e922d4630f3.camel@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <3d19683cdc13b7a3884f1e9e75743e922d4630f3.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221130064325.386359-1-lei4.wang@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,47 +71,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/30/22 00:34, Huang, Kai wrote:
-> On Wed, 2022-11-30 at 11:35 +0800, Binbin Wu wrote:
->> On 11/21/2022 8:26 AM, Kai Huang wrote:
->>> After the array of TDMRs and the global KeyID are configured to the TDX
->>> module, use TDH.SYS.KEY.CONFIG to configure the key of the global KeyID
->>> on all packages.
->>>
->>> TDH.SYS.KEY.CONFIG must be done on one (any) cpu for each package.  And
->>> it cannot run concurrently on different CPUs.  Implement a helper to
->>> run SEAMCALL on one cpu for each package one by one, and use it to
->>> configure the global KeyID on all packages.
->>>
->>> Intel hardware doesn't guarantee cache coherency across different
->>> KeyIDs.  The kernel needs to flush PAMT's dirty cachelines (associated
->>> with KeyID 0) before the TDX module uses the global KeyID to access the
->>> PAMT.  Following the TDX module specification, flush cache before
->>> configuring the global KeyID on all packages.
->>>
->>> Given the PAMT size can be large (~1/256th of system RAM), just use
->>> WBINVD on all CPUs to flush.
->>>
->>> Note if any TDH.SYS.KEY.CONFIG fails, the TDX module may already have
->>> used the global KeyID to write any PAMT.  Therefore, need to use WBINVD
->>> to flush cache before freeing the PAMTs back to the kernel.  Note using
->>> MOVDIR64B (which changes the page's associated KeyID from the old TDX
->>> private KeyID back to KeyID 0, which is used by the kernel)
->>
->> It seems not accurate to say MOVDIR64B changes the page's associated KeyID.
->> It just uses the current KeyID for memory operations.
-> 
-> The "write" to the memory changes the page's associated KeyID to the KeyID that
-> does the "write".  A more accurate expression perhaps should be MOVDIR64B +
-> MFENSE, but I think it doesn't matter in changelog.
+On Tue, Nov 29, 2022, Lei Wang wrote:
+> ioctl "KVM_CREATE_MEMORY_REGION" doesn't exist and should be
+> "KVM_SET_MEMORY_REGION", change the comment.
 
-Just delete it from the changelog.  It's a distraction.  I'm not even
-sure it's *necessary* to do any memory content conversion after the TDX
-module has written gunk.
+Heh, no need, KVM_SET_MEMORY_REGION will soon not exist either.
 
-There won't be any integrity issues because integrity errors don't do
-anything for KeyID-0 (no #MC).
-
-I _think_ the reads of the page using KeyID-0 will see abort page
-semantics.  That's *FINE*.
-
+https://lore.kernel.org/all/Y4T+SY9SZIRFBdBM@google.com
