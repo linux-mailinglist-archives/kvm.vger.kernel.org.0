@@ -2,104 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0379963DBCF
-	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 18:19:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C5C2963DC0F
+	for <lists+kvm@lfdr.de>; Wed, 30 Nov 2022 18:35:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229629AbiK3RTt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 12:19:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44462 "EHLO
+        id S229609AbiK3RfY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 12:35:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbiK3RTp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 12:19:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D199C
-        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 09:18:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669828723;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7yqed071pAVP6WInKQJMIjJsrRbR4/XvmYMWkwCqNRs=;
-        b=MHEsJ+5J8wPuFvgZZTB4aM0TExELUAS6VScWprkZlrmiOqCFmTu5OauFcTaOXGXGY87rwT
-        xj9eUALyjeFJfuUmtqvtVmRMxVp5hlCXZ32RGf2t80TcDDHw4LpO0pZEKxGHnT6zsqIdfO
-        jV0y9w0Yvb+zltbOCl0RObxfN9UnIjU=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-569-FGXCYRFQM2mD3IzMMjnxlg-1; Wed, 30 Nov 2022 12:18:42 -0500
-X-MC-Unique: FGXCYRFQM2mD3IzMMjnxlg-1
-Received: by mail-qv1-f69.google.com with SMTP id mi12-20020a056214558c00b004bb63393567so27592036qvb.21
-        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 09:18:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7yqed071pAVP6WInKQJMIjJsrRbR4/XvmYMWkwCqNRs=;
-        b=EE+Y6fE4OYp5ObSxh+2vSFwiJJ6rqgHJjVmwm5e3m25dJQ6aaubjb5Xp1dqyNkMmI2
-         M7alQB2NHE5JTpqA/O3EZI2XIfvtT61ZRvwIV0rRVI8OHx6HE7rMeAHVTI8HizHHTTyC
-         VLsh3USoR1pB9NlaQA0hI2pboIJTg92ZyEdAmU+yu/NUgOCdZhpJ02kElp36q6PT3Z7A
-         /2GnYcrA0XhjBMFi3rVpWl7UwKcM3ycG1vPe9cjxm4EHrW1+dZCR37Mxwi2tcpuZwLgB
-         3zNwIbQ77KjsrdGcOIVUEiUTPykx7cM4IfHaTLRdZmnhqntnFRBKD3HrQVuzAzhu7dQe
-         TBMw==
-X-Gm-Message-State: ANoB5pmrQ7xOKBDqikKI37sj45upgv+oPrkB8xfeUXqdBI3zjHb+NoL2
-        26Dd9u8NRkQ1BxMe8Ve4tQeu4fcrncX9PbD/dTqgk9z977Tc97QUBGjYKeR5JTvglcr7IX+9TWx
-        J/NBMpc0FewPQ
-X-Received: by 2002:a05:6214:2b9e:b0:4c6:fadf:7b2c with SMTP id kr30-20020a0562142b9e00b004c6fadf7b2cmr17156929qvb.77.1669828721573;
-        Wed, 30 Nov 2022 09:18:41 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4zt5mmMEfHFozNLW9g2zKcAVTsYZDjrkdfzXQDS+o3p5ygCELbVIfinTFrJDyhD/JRr82p3g==
-X-Received: by 2002:a05:6214:2b9e:b0:4c6:fadf:7b2c with SMTP id kr30-20020a0562142b9e00b004c6fadf7b2cmr17156891qvb.77.1669828721349;
-        Wed, 30 Nov 2022 09:18:41 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id bs42-20020a05620a472a00b006b61b2cb1d2sm1588557qkb.46.2022.11.30.09.18.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Nov 2022 09:18:40 -0800 (PST)
-Message-ID: <00d43a82-3262-5248-a066-e71c608be0a9@redhat.com>
-Date:   Wed, 30 Nov 2022 18:18:34 +0100
+        with ESMTP id S229516AbiK3RfX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 12:35:23 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 383CC22BFA
+        for <kvm@vger.kernel.org>; Wed, 30 Nov 2022 09:35:22 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AUHTTqV030432;
+        Wed, 30 Nov 2022 17:35:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=4erfAPecRBXB6FYRYG6vd4/JUg1Y5hrgIvJx5g6O4A8=;
+ b=H2JZQpOaogYscvaWCboN1bZUnLbCB9g4sY9GAq7nKnghCnZEH8rMJFMd6pTEys2CEAII
+ llfk9W1XDdmA6iwG+IbWVEgEVnHnwB74ys+ej6vWynO1qUTFu0gU6Lg8b+FrF9T/fFgu
+ ZNXQqlhcg8lE4p1R6hO8Kv9okknbMkYZxv+5z7H/75JNIxxE/FfpvlrnaMIAmv4m9olN
+ cO4mePeKS+p1YiQC+IVrI8r81VGVlmEOPM7ZXGPGlbVyspGKOX1bGK+tQgNO3BUT1tvh
+ cFYH6AYtKsToJ96vQuhF1kLs5C35BKsneJubMxXfC4VwciR4E1XRSZ1TdIiRbSTL4UCu bQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6bmd85ys-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Nov 2022 17:35:18 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2AUHVA9h008423;
+        Wed, 30 Nov 2022 17:35:18 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6bmd85x1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Nov 2022 17:35:18 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AUHKMwY024543;
+        Wed, 30 Nov 2022 17:35:15 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 3m3a2hx6y1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Nov 2022 17:35:15 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AUHZCoU9634486
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Nov 2022 17:35:12 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8AD1FA4040;
+        Wed, 30 Nov 2022 17:35:12 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E35CA404D;
+        Wed, 30 Nov 2022 17:35:12 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 30 Nov 2022 17:35:12 +0000 (GMT)
+Date:   Wed, 30 Nov 2022 18:30:06 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com,
+        pbonzini@redhat.com, andrew.jones@linux.dev, lvivier@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/4] lib: add function to request
+ migration
+Message-ID: <20221130183006.7cf99578@p-imbrenda>
+In-Reply-To: <20221130142249.3558647-2-nrb@linux.ibm.com>
+References: <20221130142249.3558647-1-nrb@linux.ibm.com>
+        <20221130142249.3558647-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v6 19/19] iommufd: Add a selftest
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
-Cc:     Anthony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Farman <farman@linux.ibm.com>, iommu@lists.linux.dev,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Lixiao Yang <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>, Yu He <yu.he@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-References: <19-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
- <48c89797-600b-48db-8df4-fc6674561417@intel.com>
- <Y4dfxp19/OVreNoU@nvidia.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <Y4dfxp19/OVreNoU@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: xSUm3_nQygn0oc5aS3f_Jq6Rd0KI0UE1
+X-Proofpoint-GUID: muoB-DooX0VkuMxiev7tZ1KFHT48ALrZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-30_04,2022-11-30_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 impostorscore=0 spamscore=0 malwarescore=0 phishscore=0
+ bulkscore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=999 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211300122
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -107,50 +93,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
+On Wed, 30 Nov 2022 15:22:46 +0100
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-On 11/30/22 14:51, Jason Gunthorpe wrote:
-> On Wed, Nov 30, 2022 at 03:14:32PM +0800, Yi Liu wrote:
->> On 2022/11/30 04:29, Jason Gunthorpe wrote:
->>> Cover the essential functionality of the iommufd with a directed test from
->>> userspace. This aims to achieve reasonable functional coverage using the
->>> in-kernel self test framework.
->>>
->>> A second test does a failure injection sweep of the success paths to study
->>> error unwind behaviors.
->>>
->>> This allows achieving high coverage of the corner cases in pages.c.
->>>
->>> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
->>> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com> # s390
->>> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
->>> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
->>> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
->> with sudo echo 4 > /proc/sys/vm/nr_hugepages
->>
->> Both "sudo ./iommufd" and "sudo ./iommufd_fail_nth" works on my
->> side.
-> It is interesting that you need that, my VM doesn't, I wonder what the
-> difference is
+> Migration tests can ask migrate_cmd to migrate them to a new QEMU
+> process. Requesting migration and waiting for completion is hence a
+> common pattern which is repeated all over the code base. Add a function
+> which does all of that to avoid repeating the same pattern.
+> 
+> Since migrate_cmd currently can only migrate exactly once, this function
+> is called migrate_once() and is a no-op when it has been called before.
+> This can simplify the control flow, especially when tests are skipped.
+> 
+> Suggested-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 
-That's the same on my end, I need at least 2 hugepages to get all tests
-passing.
-Otherwise
-# FAILED: 113 / 121 tests passed.
-# Totals: pass:113 fail:8 xfail:0 xpass:0 skip:0 error:0
+I like the code, I only have one concern
 
-I think you should add this in the commit msg + also the fact that
-CONFIG_IOMMUFD_TEST is required
+> ---
+>  lib/migrate.c | 34 ++++++++++++++++++++++++++++++++++
+>  lib/migrate.h |  9 +++++++++
+>  2 files changed, 43 insertions(+)
+>  create mode 100644 lib/migrate.c
+>  create mode 100644 lib/migrate.h
+> 
+> diff --git a/lib/migrate.c b/lib/migrate.c
+> new file mode 100644
+> index 000000000000..50e78fb08865
+> --- /dev/null
+> +++ b/lib/migrate.c
+> @@ -0,0 +1,34 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Migration-related functions
+> + *
+> + * Copyright IBM Corp. 2022
+> + * Author: Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +#include <libcflat.h>
+> +#include "migrate.h"
+> +
+> +/* static for now since we only support migrating exactly once per test. */
+> +static void migrate(void)
+> +{
+> +	puts("Please migrate me, then press return\n");
 
-Besides, tested on ARM with both 4kB page and 64kB page size
-Feel free to add my Tested-by: Eric Auger <eric.auger@redhat.com> #aarch64
+the other architectures use a slightly different message, maybe we
+should use that also on s390x?
 
-Thanks
+In the end it _should_ not matter, since the migrate_cmd looks for one
+specific keyword, but I still think we should try to minimize the
+impact of this series. And I know that changing the migration message
+will not break anything on s390x.
 
-Eric
-
->
-> Thanks,
-> Jason
->
+> +	(void)getchar();
+> +	report_info("Migration complete");
+> +}
+> +
+> +/*
+> + * Initiate migration and wait for it to complete.
+> + * If this function is called more than once, it is a no-op.
+> + * Since migrate_cmd can only migrate exactly once this function can
+> + * simplify the control flow, especially when skipping tests.
+> + */
+> +void migrate_once(void)
+> +{
+> +	static bool migrated;
+> +
+> +	if (migrated)
+> +		return;
+> +
+> +	migrated = true;
+> +	migrate();
+> +}
+> diff --git a/lib/migrate.h b/lib/migrate.h
+> new file mode 100644
+> index 000000000000..3c94e6af761c
+> --- /dev/null
+> +++ b/lib/migrate.h
+> @@ -0,0 +1,9 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Migration-related functions
+> + *
+> + * Copyright IBM Corp. 2022
+> + * Author: Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +
+> +void migrate_once(void);
 
