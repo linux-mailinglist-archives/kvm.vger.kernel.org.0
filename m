@@ -2,106 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CA9F63EF48
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 12:18:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45AF163EF59
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 12:22:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231374AbiLALSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 06:18:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58276 "EHLO
+        id S230488AbiLALWw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 06:22:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229722AbiLALRq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 06:17:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EA44AD98E
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 03:12:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669893125;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hSpcoi42VLcc/zf5D12uItqsofact4/D/isv3xkhS+A=;
-        b=dUhh03FXQtiJ5fPcddE0+LUUAMHFXzVyzLzAnc8GHB8Mnz+QOD8rxqLVnwO1gT9kcOGvY1
-        Nw1I4V42XSt0tG6UrsgjsRZ0R2kEHNK/174200HhqPzom7nbWAs3dYc5YEijUPWc+bNhXQ
-        EULeDmTVbgM/XIzBBSauq2WJOiymCd0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-619-hNqf8r-GNmmdPKfcqOf3SA-1; Thu, 01 Dec 2022 06:12:02 -0500
-X-MC-Unique: hNqf8r-GNmmdPKfcqOf3SA-1
-Received: by mail-wr1-f70.google.com with SMTP id a7-20020adfbc47000000b002421f817287so314307wrh.4
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 03:12:02 -0800 (PST)
+        with ESMTP id S229847AbiLALWc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 06:22:32 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A2A9A1C1E
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 03:19:45 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id k5so1544556pjo.5
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 03:19:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZCwPsFz1IkWwGG4R6t3UgktQUADEE2ekOmTBUSLj5QQ=;
+        b=cIxLUszB2z5bDm5O0CmRTHxEYzyWtweVN5He5qGbjii8sSu3MqEsmM2PaHrtS53AEv
+         HsJCakHaaMDd/oHj6+XqnYo+VZ3sc8SBDGDuSTPNs1oYP6Pjl+Vmb2MQ4U/56pakkxqc
+         QkdVAf2BbA7hY/nqKF1jyJ9y6RT4+V8cOxF+05Ic39r/mrvBfFoKwh/KkrL8eMqVYoMq
+         Z9bwAD/R7Tf86qqGpxqmZQ2ww7ZPxVS4pxNpSWn09ByMQkPYdJL0phA5qbBei79akHkE
+         hq6XS0sZN8Kls7DA+PoR+49kUZy0OcWyGVUO9pyx9d5CCRKAftcUvAJU//gxgeJlDQjN
+         91fA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hSpcoi42VLcc/zf5D12uItqsofact4/D/isv3xkhS+A=;
-        b=QjPi2d29/wDokAkMEda2jZSNaHPqtglw+rilJ64sQfMgbm5qHCBI/a5uDaTm9bgN9V
-         nlR1GTfpFwS9l+1r+0Bcyx6jokIJFoTAPs211o77SxweaR+C4mh3AXkrCwVrvAlrYr73
-         Ghc09Zoi2f3JJTZEFebOGlOxJoDl+LJxzx/r6K4bUAA0ZzJsKaAfVmYVsCJpMfa+zC9x
-         i1xIcGYwR/NDeKQKz7AHdz/Q10hyj6SHmkg6QZ3PAB0mwL8USAjhghcNQAoJ0LcEOpm/
-         fJmJarAdwqfUFXhshB1JVFQdP2CL3X9GKSAd/KyAV9ymOsfPxslPypqW1InsMG8XLcBm
-         oTAg==
-X-Gm-Message-State: ANoB5pmoh3OqgXCe3SMvqPxbKCpvgLY/fFUw/Jtd5KQ5qvYr+AML+X7B
-        OnS3PhyHdwIZRNR0JXFzO7YtIxjDzr8CuJ6uS95Dd6C8Bs+URaVXB37DAY6Yb1AAAgsmhP0QDHb
-        X2pH/sOpzelQB
-X-Received: by 2002:a5d:430e:0:b0:241:bfb6:c6da with SMTP id h14-20020a5d430e000000b00241bfb6c6damr29646831wrq.204.1669893121122;
-        Thu, 01 Dec 2022 03:12:01 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf75D43ftxl96kEFfG/CqGh57ZhqsLRUYWismk0mz5HWJ61yRM5mhJrzWvYKcwtXRSFWy2vHrQ==
-X-Received: by 2002:a5d:430e:0:b0:241:bfb6:c6da with SMTP id h14-20020a5d430e000000b00241bfb6c6damr29646818wrq.204.1669893120905;
-        Thu, 01 Dec 2022 03:12:00 -0800 (PST)
-Received: from [192.168.149.123] (58.254.164.109.static.wline.lns.sme.cust.swisscom.ch. [109.164.254.58])
-        by smtp.gmail.com with ESMTPSA id p33-20020a05600c1da100b003d070e45574sm5237751wms.11.2022.12.01.03.11.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Dec 2022 03:12:00 -0800 (PST)
-Message-ID: <2f13db3f-76bb-26c1-34e3-17c97106095c@redhat.com>
-Date:   Thu, 1 Dec 2022 12:11:59 +0100
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZCwPsFz1IkWwGG4R6t3UgktQUADEE2ekOmTBUSLj5QQ=;
+        b=QGGzKC7uTQn/JLYo5N+U9z4j4RdwezVGNrvXu3BdBcqg+4JoJCOuozoh/v+KnISbcn
+         fG0fmhLgySN6O4zN24XohYmf9BUwqpaS+zc8TXOzCikXp0vRNNzbRJKuNyLukoS2FeFx
+         DJLcINeta/VxZPNgacBnu6dRHP7jtEaMSry8yBkMB/Yz5OlfhJv0sRB+QmvIELBiEN2o
+         c7zkqrHIYbqmcuaAmG35jku7IRrbMxs0wdfU1w5p4EzyenFTutoTJcNatRJ4yhL+ya0q
+         rvbQr3NsLD6X9FAXkb7ucHP/5+kmp+K2RbUvUnoAerYI5njt6V+SfcSpPWwDQGAUB0UI
+         f32Q==
+X-Gm-Message-State: ANoB5pnsX+7h+uZ+Y/dTGxYhCvp760eq3r0wgqJASITlaV7YlcdAn3FU
+        295qbTVl5nKUOGDqmxiqbznqj2GscEQjF/52MZeFlg==
+X-Google-Smtp-Source: AA0mqf7UMy6ysGlQ3+/XD7dS8P2MxrsQY9kPgeIfvGB5PlatZrFd4JuP5EubBXDXR1GXCt0u4WNeR+tJxXUh4lA1gDM=
+X-Received: by 2002:a17:90a:460f:b0:218:c47f:ed9a with SMTP id
+ w15-20020a17090a460f00b00218c47fed9amr50445242pjg.19.1669893584580; Thu, 01
+ Dec 2022 03:19:44 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 0/2] KVM: selftests: Fixes for access tracking perf test
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
+References: <20221201102728.69751-1-akihiko.odaki@daynix.com>
+ <CAFEAcA_ORM9CpDCvPMs1XcZVhh_4fKE2wnaS_tp1s4DzZCHsXQ@mail.gmail.com> <a3cc1116-272d-a8e5-a131-7becf98115e0@daynix.com>
+In-Reply-To: <a3cc1116-272d-a8e5-a131-7becf98115e0@daynix.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Thu, 1 Dec 2022 11:19:32 +0000
+Message-ID: <CAFEAcA_ECpCV+6Z+jom-sP0PNQpoU0fFG_3L_70PrQEWrarH_g@mail.gmail.com>
+Subject: Re: [PATCH] accel/kvm/kvm-all: Handle register access errors
+To:     Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>
-References: <20221129175300.4052283-1-seanjc@google.com>
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-In-Reply-To: <20221129175300.4052283-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 1 Dec 2022 at 11:00, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>
+> On 2022/12/01 19:40, Peter Maydell wrote:
+> > On Thu, 1 Dec 2022 at 10:27, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> >>
+> >> A register access error typically means something seriously wrong
+> >> happened so that anything bad can happen after that and recovery is
+> >> impossible.
+> >> Even failing one register access is catastorophic as
+> >> architecture-specific code are not written so that it torelates such
+> >> failures.
+> >>
+> >> Make sure the VM stop and nothing worse happens if such an error occurs.
+> >>
+> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >
+> > In a similar vein there was also
+> > https://lore.kernel.org/all/20220617144857.34189-1-peterx@redhat.com/
+> > back in June, which on the one hand was less comprehensive but on
+> > the other does the plumbing to pass the error upwards rather than
+> > reporting it immediately at point of failure.
+> >
+> > I'm in principle in favour but suspect we'll run into some corner
+> > cases where we were happily ignoring not-very-important failures
+> > (eg if you're running Linux as the host OS on a Mac M1 and your
+> > host kernel doesn't have this fix:
+> > https://lore.kernel.org/all/YnHz6Cw5ONR2e+KA@google.com/T/
+> > then QEMU will go from "works by sheer luck" to "consistently
+> > hits this error check"). So we should aim to land this extra
+> > error checking early in the release cycle so we have plenty of
+> > time to deal with any bug reports we get about it.
 
+> Actually I found this problem when I tried to run QEMU with KVM on M2
+> MacBook Air and encountered a failure described and fixed at:
+> https://lore.kernel.org/all/20221201104914.28944-2-akihiko.odaki@daynix.com/
 
-Am 29/11/2022 um 18:52 schrieb Sean Christopherson:
-> Fix an inverted check in the access tracking perf test, and restore the
-> assert that there aren't too many dangling idle pages when running the
-> test on x86-64 bare metal.
-> 
-> Sean Christopherson (2):
->   KVM: selftests: Fix inverted "warning" in access tracking perf test
->   KVM: selftests: Restore assert for non-nested VMs in access tracking
->     test
-> 
->  .../selftests/kvm/access_tracking_perf_test.c | 22 ++++++++++++-------
->  .../selftests/kvm/include/x86_64/processor.h  |  1 +
->  2 files changed, 15 insertions(+), 8 deletions(-)
-> 
-> 
-> base-commit: 3e04435fe60590a1c79ec94d60e9897c3ff7d73b
-> 
+Ah, yeah, you're trying to run QEMU+KVM on a heterogenous cluster.
+You need to force all the vCPUs to run on only a single host
+CPU type. It's a shame the error-reporting for this situation
+is not very good, but there's not really any way to tell in
+advance, the best you get is an error at the point where a vCPU
+happens to migrate over to a different host CPU.
 
-Makes sense, apologies for inverting the check.
+> Although the affected register was not really important, QEMU couldn't
+> run the guest well enough because kvm_arch_put_registers for ARM64 is
+> written in a way that it fails early. I guess the situation is not so
+> different for other architectures as well.
 
-Reviewed-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+I think Arm is the only one that does this kind of "leave the
+handling of the system registers up to the host kernel and treat
+them as mostly black-box values to be passed around on migration"
+approach. Most other architectures have QEMU know about specific system
+registers in the vCPU and only ask the kernel about those, I think.
 
+-- PMM
