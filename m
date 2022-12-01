@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A164A63F5C5
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 17:58:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BCC063F63E
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 18:38:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229885AbiLAQ6R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 11:58:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48244 "EHLO
+        id S230127AbiLARiM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 12:38:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229854AbiLAQ6P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 11:58:15 -0500
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E681219C13
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 08:58:14 -0800 (PST)
-Received: by mail-pg1-x532.google.com with SMTP id q1so2155533pgl.11
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 08:58:14 -0800 (PST)
+        with ESMTP id S230034AbiLARiF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 12:38:05 -0500
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F10475447F
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 09:38:03 -0800 (PST)
+Received: by mail-pg1-x52e.google.com with SMTP id s196so2274530pgs.3
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 09:38:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CcbLtYfJOUPv9hfp+Y14KjDL6nnYgGwjjKw594bKLHA=;
-        b=M7Cy/EGD/LO/JhRD3VFjxVgnlzZBSlIpWZurKAOV4ywrSpW3BkU+d8f9iD0IT7hiOF
-         S8Sj5iB7vAGpqvxgcz3x7K+IYUatpvfwK19hR64X5gGXCtlhz3DpU7q3WkfgJBBRhXoU
-         M4QGPq9IPVAlmcWPmI1Brr1MoCz9OxLy4FbIjLVUhuueYlCAjXTFsG7WVC7rlYOTCY8Q
-         mjXtv3KBNnaPLEVvmY1W1rT4zlJnvwmI4yMHdV+G2oXOkEVM/qOd2TYDCNmqSYjweSk7
-         0zjdlIKCN+vOkRtSErgKZbL9FajfcaKblWDV2awqCIYbvyOe/6114Qt0Xmc8S0MeEgZf
-         QdMw==
+        bh=EyDI41t1NeKE15ENjmdGv+1pPjGUbXbxbMXr/dY47iA=;
+        b=dS5VRBwAuYPr2eDyWkXmcS6dfWU1551TdvN6H/39vN031g/pJMkAQ8miNg3B1IyBSl
+         8Lti12Uss12uSiroQr+DDwZdih3lE+RCdcFf8RP9oCmPKlLiDuxMhKxp2XVENKFF1SqO
+         Z7Q86pw892/xZToSeTV3WxalbYmFkTI/7A5Swt5bPNuGiPaRRpoJtqzMVO4/DEeZ7geW
+         pmFM8YX135AaG125EZJqfVoTfii1SZUvxNO7N5ZvmQeZoUBX12neJwlJmRAIbeN53qv0
+         jlcAWH6dvVe8OcSAYszPd5fUGziRK8GKJqa/e0uvGoFyoeAV/hY4B0FxMWEbJ+HUK9m6
+         MvAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CcbLtYfJOUPv9hfp+Y14KjDL6nnYgGwjjKw594bKLHA=;
-        b=U4Us9tDQzCX8d6yIL3eCAu+7/U8MBcDsMYN2hXwJtFXkfMOjRS5WKvJ7OmDLcC/Xlf
-         3/O5ez3B/roRAi3U4pNcRCcI9iJOO6+fNTAkvwqcMjt5SX58LT+IOofEeiMRRf+za9A3
-         dTBQF4fpOKHuBdS04g8mf+Th6Xaw8y+GcIELNJACiOC6dHy3aTE8JQQ9k1rZlLUAZ5ua
-         J3ouGQURhM6MMn/q55rTmY4S6qfSr5yNrtulYU6CZKTERF+Qr3ql0SE5NFf3NU7mZ+gR
-         9HRPDQsLLWXK1r+iVVZBdKhcfnw78rvbxAVVAbjWqLSOHEaOzVDFZb+1cniXa93BrHpU
-         if2A==
-X-Gm-Message-State: ANoB5pk2DJAHvhIL3a831NvI9UH4i11tQHUwSN+aCWJfz/rhFBsFv/QL
-        l/x8/8r1dinJwRHLjEnCBT9OqkFhAonubA==
-X-Google-Smtp-Source: AA0mqf4jVHKnm8+YROUPUEPkzh3iZM+56tYPVHv8rpwSyePE4ge2p7ShbFEX2c9J+9P9fcWJOqWuzg==
-X-Received: by 2002:a63:4c63:0:b0:477:103:d1c4 with SMTP id m35-20020a634c63000000b004770103d1c4mr40951530pgl.369.1669913894315;
-        Thu, 01 Dec 2022 08:58:14 -0800 (PST)
+        bh=EyDI41t1NeKE15ENjmdGv+1pPjGUbXbxbMXr/dY47iA=;
+        b=7J1QWujRVbm0DhdTvUlNZNI9u9YfF5eour0XM2Muda1eivpQLm4256nvGFrdksD5Fs
+         ID5iq4/xJFpEbctkoq5GudYmhQ5LCenjgONq8AP4jmzLbG8oa8Hvf9jvDI9f1qNJw4SX
+         7jHRgyJ1zHKl6YZ56+3cL7EDYBBMdOZLpxGGrIbNDiRtwwdWG4NTxgZmcJn60pVlKkys
+         E3BybrVOZl8GH0tTpyDQQbcEb7Z/UfujkMYztC7VKFG0SPZrRZdRnFkFyeKyKJkYu+Bj
+         jCmY5OgAXMupmc3+xJGxRLA3I3Ro9b68suBN6l4a17YfgWKvhaZRsyBLeg1kYx9tnNDS
+         3Nlw==
+X-Gm-Message-State: ANoB5pmncPn7nXvIcfEkJIbNShqG8wvpHCtSYwqaYMhji2p3zTMj4y82
+        mZFwv9tId9ySCzFvGNISNyXw7w==
+X-Google-Smtp-Source: AA0mqf5+KFQTRVp9TNpbIuvLhnybjPwtKZoMzF7hx5olscu9d9AaCTa1ZdwVFHguUG4P/2DdgzIDmA==
+X-Received: by 2002:a62:9409:0:b0:572:ccf6:e7c7 with SMTP id m9-20020a629409000000b00572ccf6e7c7mr50260671pfe.74.1669916283262;
+        Thu, 01 Dec 2022 09:38:03 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id iw1-20020a170903044100b0017f5ad327casm3850241plb.103.2022.12.01.08.58.13
+        by smtp.gmail.com with ESMTPSA id d1-20020a170903230100b0017f74cab9eesm3935349plh.128.2022.12.01.09.38.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Dec 2022 08:58:13 -0800 (PST)
-Date:   Thu, 1 Dec 2022 16:58:10 +0000
+        Thu, 01 Dec 2022 09:38:02 -0800 (PST)
+Date:   Thu, 1 Dec 2022 17:37:59 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Alexey Kardashevskiy <aik@amd.com>
 Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
@@ -69,15 +69,14 @@ Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
         Andrew Cooper <andrew.cooper3@citrix.com>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH kernel 1/3] x86/amd/dr_addr_mask: Cache values in percpu
- variables
-Message-ID: <Y4jdIl1elcnL8JUU@google.com>
+Subject: Re: [PATCH kernel 2/3] KVM: SEV: Enable DebugSwap
+Message-ID: <Y4jmd2mHRVOnoQ0+@google.com>
 References: <20221201021948.9259-1-aik@amd.com>
- <20221201021948.9259-2-aik@amd.com>
+ <20221201021948.9259-3-aik@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221201021948.9259-2-aik@amd.com>
+In-Reply-To: <20221201021948.9259-3-aik@amd.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -90,63 +89,174 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Dec 01, 2022, Alexey Kardashevskiy wrote:
-> Reading DR[0-3]_ADDR_MASK MSRs takes about 250 cycles which is going to
-> be noticeable when the AMD KVM SEV-ES's DebugSwap feature is enabled and
-> KVM needs to store these before switching to a guest; the DebugSwitch
-> hardware support restores them as type B swap.
->
-> This stores MSR values from set_dr_addr_mask() in percpu values and
-> returns them via new get_dr_addr_mask(). The gain here is about 10x.
->
+> AMD Milan introduces support for the swapping, as type 'B',
+
+Please make the changelog standalone, i.e. don't rely on the shortlog to provide
+context.  "the swapping" is inscrutable without the shortlog.
+
+> of DR[0-3] and DR[0-3]_ADDR_MASK registers. It requires that
+> SEV_FEATURES[5] be set in the VMSA.
+
+Avoid pronouns in shortlogs, changelogs, and comments, as pronouns tend to be
+ambiguous.  "Software can enable DebugSwap by setting SEV_FEATURE[5] in the VMSA."
+isn't much more effort to type.
+
+> 
+> This requires the KVM to eliminate the intercept of #DB. However,
+
+Same here, e.g. does "this" mean that the architecture requires DB interception
+to be disabled to enable DebugSwap?
+
+> because of the infinite #DB loop DoS that a malicious guest can do,
+> it can only be eliminated based if CPUID Fn80000021_EAX[0]
+
+And "it" here.
+
+> (NoNestedDataBp) is set in the host/HV.
+> 
+> This eliminates #DB intercept, DR7 intercept for SEV-ES/SEV-SNP guest.
+> This saves DR[0-3] / DR[0-3]_ADDR_MASK in the host save area before VMRUN.
+> This sets SEV_FEATURES[5] in VMSA.
+
+And all of these "this".  Assuming "this" means "this patch", rewrite these
+sentences to be commands that state what changes are being done.
+
 > Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
 > ---
->  arch/x86/include/asm/debugreg.h |  1 +
->  arch/x86/kernel/cpu/amd.c       | 32 ++++++++++++++++++++
->  2 files changed, 33 insertions(+)
+>  arch/x86/include/asm/svm.h |  1 +
+>  arch/x86/kvm/svm/svm.h     | 18 +++++++++++-----
+>  arch/x86/kvm/svm/sev.c     | 22 +++++++++++++++++++-
+>  arch/x86/kvm/svm/svm.c     |  6 ++++--
+>  4 files changed, 39 insertions(+), 8 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/debugreg.h b/arch/x86/include/asm/debugreg.h
-> index cfdf307ddc01..c4324d0205b5 100644
-> --- a/arch/x86/include/asm/debugreg.h
-> +++ b/arch/x86/include/asm/debugreg.h
-> @@ -127,6 +127,7 @@ static __always_inline void local_db_restore(unsigned long dr7)
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index 0361626841bc..373a0edda588 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -273,6 +273,7 @@ enum avic_ipi_failure_cause {
+>  #define AVIC_HPA_MASK	~((0xFFFULL << 52) | 0xFFF)
+>  #define VMCB_AVIC_APIC_BAR_MASK		0xFFFFFFFFFF000ULL
 >  
->  #ifdef CONFIG_CPU_SUP_AMD
->  extern void set_dr_addr_mask(unsigned long mask, int dr);
-> +extern unsigned long get_dr_addr_mask(int dr);
->  #else
->  static inline void set_dr_addr_mask(unsigned long mask, int dr) { }
-
-KVM_AMD doesn't depend on CPU_SUP_AMD, i.e. this needs a stub.  Or we need to add
-a dependency.
-
-> diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-> index c75d75b9f11a..ec7efcef4e14 100644
-> --- a/arch/x86/kernel/cpu/amd.c
-> +++ b/arch/x86/kernel/cpu/amd.c
-> @@ -1158,6 +1158,11 @@ static bool cpu_has_amd_erratum(struct cpuinfo_x86 *cpu, const int *erratum)
->  	return false;
+> +#define SVM_SEV_FEAT_DEBUG_SWAP                        BIT(5)
+>  
+>  struct vmcb_seg {
+>  	u16 selector;
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 199a2ecef1ce..4d75b14bffab 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -83,6 +83,7 @@ enum {
+>  struct kvm_sev_info {
+>  	bool active;		/* SEV enabled guest */
+>  	bool es_active;		/* SEV-ES enabled guest */
+> +	bool debug_swap;        /* SEV-ES Debug swap enabled */
+>  	unsigned int asid;	/* ASID used for this guest */
+>  	unsigned int handle;	/* SEV firmware handle */
+>  	int fd;			/* SEV device fd */
+> @@ -388,6 +389,7 @@ static inline bool vmcb12_is_intercept(struct vmcb_ctrl_area_cached *control, u3
+>  
+>  static inline void set_dr_intercepts(struct vcpu_svm *svm)
+>  {
+> +	struct kvm_sev_info *sev = &to_kvm_svm(svm->vcpu.kvm)->sev_info;
+>  	struct vmcb *vmcb = svm->vmcb01.ptr;
+>  
+>  	if (!sev_es_guest(svm->vcpu.kvm)) {
+> @@ -407,20 +409,26 @@ static inline void set_dr_intercepts(struct vcpu_svm *svm)
+>  		vmcb_set_intercept(&vmcb->control, INTERCEPT_DR6_WRITE);
+>  	}
+>  
+> -	vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_READ);
+> -	vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_WRITE);
+> +	if (!sev->debug_swap) {
+> +		vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_READ);
+> +		vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_WRITE);
+> +	}
+>  
+>  	recalc_intercepts(svm);
 >  }
 >  
-> +DEFINE_PER_CPU_READ_MOSTLY(unsigned long, dr0_addr_mask);
-> +DEFINE_PER_CPU_READ_MOSTLY(unsigned long, dr1_addr_mask);
-> +DEFINE_PER_CPU_READ_MOSTLY(unsigned long, dr2_addr_mask);
-> +DEFINE_PER_CPU_READ_MOSTLY(unsigned long, dr3_addr_mask);
-> +
->  void set_dr_addr_mask(unsigned long mask, int dr)
+>  static inline void clr_dr_intercepts(struct vcpu_svm *svm)
 >  {
->  	if (!boot_cpu_has(X86_FEATURE_BPEXT))
-> @@ -1166,17 +1171,44 @@ void set_dr_addr_mask(unsigned long mask, int dr)
->  	switch (dr) {
->  	case 0:
->  		wrmsr(MSR_F16H_DR0_ADDR_MASK, mask, 0);
+> +	struct kvm_sev_info *sev = &to_kvm_svm(svm->vcpu.kvm)->sev_info;
+>  	struct vmcb *vmcb = svm->vmcb01.ptr;
+>  
+>  	vmcb->control.intercepts[INTERCEPT_DR] = 0;
+>  
+> -	/* DR7 access must remain intercepted for an SEV-ES guest */
+> -	if (sev_es_guest(svm->vcpu.kvm)) {
+> +	/*
+> +	 * DR7 access must remain intercepted for an SEV-ES guest unless
+> +	 * the DebugSwap feature is set
 
-LOL, I'd love to hear how MSR_F16H_DR0_ADDR_MASK ended up with a completely
-different MSR index.
+Please explain _why_.  
 
-> +		per_cpu(dr0_addr_mask, smp_processor_id()) = mask;
+> +	 */
+> +	if (sev_es_guest(svm->vcpu.kvm) && !sev->debug_swap) {
+>  		vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_READ);
+>  		vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_WRITE);
+>  	}
+> @@ -677,7 +685,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu);
+>  int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
+>  void sev_es_vcpu_reset(struct vcpu_svm *svm);
+>  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+> -void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
+> +void sev_es_prepare_switch_to_guest(struct kvm_vcpu *vcpu, struct sev_es_save_area *hostsa);
+>  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+>  
+>  /* vmenter.S */
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index efaaef2b7ae1..fac8b48e3162 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -21,6 +21,7 @@
+>  #include <asm/pkru.h>
+>  #include <asm/trapnr.h>
+>  #include <asm/fpu/xcr.h>
+> +#include <asm/debugreg.h>
+>  
+>  #include "mmu.h"
+>  #include "x86.h"
+> @@ -253,6 +254,7 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	if (asid < 0)
+>  		goto e_no_asid;
+>  	sev->asid = asid;
+> +	sev->debug_swap = sev->es_active && 
 
-Use an array to avoid the copy+paste?  And if you're going to add a cache, might
-as well use it to avoid unnecessary writes.
+Enabling DebugSwap should be guarded with a module param so that the admin can
+disable the feature if necessary.  And then the per-vCPU variable goes away.
 
->  		break;
->  	case 1:
+> kvm_cpu_cap_get(KVM_X86_FEATURE_NO_NESTED_DATA_BP);
+
+kvm_cpu_cap_has().
+
+And use X86_FEATURE_* directly, which is the whole point of the __feature_translate()
+shenanigans.
+
+>  
+>  	ret = sev_platform_init(&argp->error);
+>  	if (ret)
+> @@ -564,6 +566,7 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+>  {
+>  	struct sev_es_save_area *save = svm->sev_es.vmsa;
+> +	struct kvm_sev_info *sev = &to_kvm_svm(svm->vcpu.kvm)->sev_info;
+>  
+>  	/* Check some debug related fields before encrypting the VMSA */
+>  	if (svm->vcpu.guest_debug || (svm->vmcb->save.dr7 & ~DR7_FIXED_1))
+> @@ -604,6 +607,9 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+>  	save->xss  = svm->vcpu.arch.ia32_xss;
+>  	save->dr6  = svm->vcpu.arch.dr6;
+>  
+> +	if (sev->debug_swap)
+> +		save->sev_features |= SVM_SEV_FEAT_DEBUG_SWAP;
+
+Resurrecting my objection to "AP Creation NAE event"[*], what happens if a hypervisor
+supports GHCB_HV_FT_SNP_AP_CREATION but not DebugSwap?  IIUC, a guest can corrupt
+host DRs by enabling DebugSwap in the VMSA of an AP vCPU, e.g. the CPU will load
+zeros on VM-Exit if the host hasn't stuffed the host save area fields.
+
+KVM can obviously just make sure to save its DRs if hardware supports DebugSwap,
+but what if DebugSwap is buggy and needs to be disabled?  And what about the next
+feature that can apparently be enabled by the guest?
+
+[*] https://lore.kernel.org/all/YWnbfCet84Vup6q9@google.com
