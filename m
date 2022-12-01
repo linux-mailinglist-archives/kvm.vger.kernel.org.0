@@ -2,122 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C72663ED6C
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 11:17:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F23A263EDB2
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 11:27:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229971AbiLAKQ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 05:16:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51504 "EHLO
+        id S230256AbiLAK1t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 05:27:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229866AbiLAKQ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 05:16:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 642FF4E42F
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 02:16:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669889761;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=e9qA4VHIN82/Ab8wC5piRWKy3zE/49XyOR+31yHpXyI=;
-        b=W/lewllybxZIY4uzuvAf3dZHhhiPFYPTF82EsrlvL86nRSzmleb/GSgnf02vCcKhB9QEOS
-        YffBff2I0tQgPu8aMzCMos1uyi87I0LDBsyYa7/KptwXw8xIDv6LzqcaFNXvk03x60HLQC
-        K/PlisXlDHR4eV9R49IbF3d9x8aU8cc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-315-tlQ9Sk_7NtWZMJrqqSjQVQ-1; Thu, 01 Dec 2022 05:15:58 -0500
-X-MC-Unique: tlQ9Sk_7NtWZMJrqqSjQVQ-1
-Received: by mail-wr1-f72.google.com with SMTP id h10-20020adfaa8a000000b0024208cf285eso268283wrc.22
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 02:15:57 -0800 (PST)
+        with ESMTP id S230334AbiLAK1h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 05:27:37 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A48402196
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 02:27:36 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id l22-20020a17090a3f1600b00212fbbcfb78so4778073pjc.3
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 02:27:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OxFUiqdAJq9zJUGdn0FVmVDZqtniT0uf+dPwrOJEVb0=;
+        b=SvwxgkT0mlR8TU2D7UkHvI5KTopI7d3Q7kuWkdTAATevpP+IT/E2Qp1SITch/sC4Oa
+         vKI+lEmfxEAA64pL/hJ4hddMKIOwdo3lmE6GWtKUt12KIdDAUUq0qj849+CuoKoOWR5i
+         Lw7uGyQy6a3YpV0/QC+YHohcRN/QBhsl8MOTKChIdOLeJxSA0q0P79wTL+xYWzEF1mQq
+         piDhXHsptpT26s/9IK2vKjQwcvORX8pOKYUAZRUHKe6jnCsvvjRsl4KvH+gc3bEqJvIS
+         3ELNkf1kkn/QdEhidPjZahEKR51ixoVXmlQY8HYnvsVIVF+tFurwB/r0YIApmOhdXzeH
+         3Y7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e9qA4VHIN82/Ab8wC5piRWKy3zE/49XyOR+31yHpXyI=;
-        b=5NF/t/PIXmIsuwKLYwO3J0Rcb7K8359uK9mHpSnIeLITtmjriI/J7tkbUYH7KEu8xG
-         3rU32xYqAkDjV4OQJzhZ0pQb3YXpOmYWGcRbOJqbj7KIjDIAktQcUnw/8QldXbEYH2Cy
-         oIdH6SAxGS+YH3EANDTqaolxVmABltHnRKY7wRcaekcXr5ZS3TfWaSFYL55kyjq1kq/6
-         quwfsVUTCfk/H49MMAE0Yay1Nk64V30zZV9qJEzLYynDa9p7PSuXFjGJNhsP2XdRff1C
-         8EzCeyVhV/rgsMxPF8xQrWqFlf4/dr/iQ2tG0Xyo4SkSmBbMSZDWSilePF2rnoRMcjGl
-         BDmw==
-X-Gm-Message-State: ANoB5pkxKW0it8oS7wgDPq7CaMOrwL1WlD4oWtglMVBUcY0uiJmaIh9l
-        xkVO/fpdn1n+mscvifx9nbwRsDUHHsea0G34qc0cFo1ZAOTODTGQGEK4P6IMFgcjsMBB1qnVw7/
-        UW1PaXXKUTfwQ
-X-Received: by 2002:a05:600c:34d3:b0:3cf:a7a8:b712 with SMTP id d19-20020a05600c34d300b003cfa7a8b712mr34056447wmq.124.1669889756953;
-        Thu, 01 Dec 2022 02:15:56 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5SlmLRPzdxlyszVN8pGU01bp/jRPMDL3XBjakBkWtVRvdrvZ6Zw9bnrQwCp62f8f56RICv0g==
-X-Received: by 2002:a05:600c:34d3:b0:3cf:a7a8:b712 with SMTP id d19-20020a05600c34d300b003cfa7a8b712mr34056432wmq.124.1669889756774;
-        Thu, 01 Dec 2022 02:15:56 -0800 (PST)
-Received: from [192.168.8.102] (tmo-073-221.customers.d1-online.com. [80.187.73.221])
-        by smtp.gmail.com with ESMTPSA id e4-20020adff344000000b00236488f62d6sm4183014wrp.79.2022.12.01.02.15.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Dec 2022 02:15:56 -0800 (PST)
-Message-ID: <fcedb98d-4333-9100-5366-8848727528f3@redhat.com>
-Date:   Thu, 1 Dec 2022 11:15:53 +0100
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OxFUiqdAJq9zJUGdn0FVmVDZqtniT0uf+dPwrOJEVb0=;
+        b=rs/ZyK8gZxarGUgwaAZUuP2YVkWX5jOz8EaEYRglTMCjE8HmuithB1bJrwTa9KEtog
+         DzXDs96I4Fe+OHsi279v4dewwAP5eApsFZNZDynK4yA8IuP+iQ2iv7EPBShIvlBL5fXY
+         N21ERs9ypgXoQXgUqfRPpVeiy3xowM93Exp7/r1Z84Ra5/M0fYs6BMFFK6TUo+UtMSgW
+         mT32CvC9PWaMa85kFjnwko371WXYyKVpqzcnxN71jgeOfPlduM1E7F1ZM6GrwPahBvJ9
+         GBpGSsX5mHKsY17OyvJZWIFUEiwcQRWIH0o3S81epSWyuSBJbDejw0XYHS8ahSzk2LUn
+         hHxw==
+X-Gm-Message-State: ANoB5plo53BKLWyGPVVOnbcFjICXmOoOLti6743KYgqH28uY4IxUDNDe
+        ALlEmTOihMz2QZjnFtVxgzUU+Q==
+X-Google-Smtp-Source: AA0mqf51XnulmYGgXDPa5v7SpGarx6NnyJ7v5ENHAFkG1WvupdG7YBhpo9GH2WDW/G86CKU6v6tRyA==
+X-Received: by 2002:a17:90a:4206:b0:213:2039:64c2 with SMTP id o6-20020a17090a420600b00213203964c2mr75959602pjg.165.1669890456205;
+        Thu, 01 Dec 2022 02:27:36 -0800 (PST)
+Received: from alarm.flets-east.jp ([2400:4050:c360:8200:7b99:f7c3:d084:f1e2])
+        by smtp.gmail.com with ESMTPSA id z1-20020a1709028f8100b00188fcc4fc00sm3245052plo.79.2022.12.01.02.27.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Dec 2022 02:27:35 -0800 (PST)
+From:   Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH] accel/kvm/kvm-all: Handle register access errors
+Date:   Thu,  1 Dec 2022 19:27:28 +0900
+Message-Id: <20221201102728.69751-1-akihiko.odaki@daynix.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20221129174206.84882-1-pmorel@linux.ibm.com>
- <20221129174206.84882-7-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v12 6/7] s390x/cpu_topology: activating CPU topology
-In-Reply-To: <20221129174206.84882-7-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/11/2022 18.42, Pierre Morel wrote:
-> The KVM capability, KVM_CAP_S390_CPU_TOPOLOGY is used to
-> activate the S390_FEAT_CONFIGURATION_TOPOLOGY feature and
-> the topology facility for the guest in the case the topology
-> is available in QEMU and in KVM.
-> 
-> The feature is fenced for SE (secure execution).
+A register access error typically means something seriously wrong
+happened so that anything bad can happen after that and recovery is
+impossible.
+Even failing one register access is catastorophic as
+architecture-specific code are not written so that it torelates such
+failures.
 
-Out of curiosity: Why does it not work yet?
+Make sure the VM stop and nothing worse happens if such an error occurs.
 
-> To allow smooth migration with old QEMU the feature is disabled by
-> default using the CPU flag -disable-topology.
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+---
+ accel/kvm/kvm-all.c | 32 ++++++++++++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 4 deletions(-)
 
-I stared at this code for a while now, but I have to admit that I don't 
-quite get it. Why do we need a new "disable" feature flag here? I think it 
-is pretty much impossible to set "ctop=on" with an older version of QEMU, 
-since it would require the QEMU to enable KVM_CAP_S390_CPU_TOPOLOGY in the 
-kernel for this feature bit - and older versions of QEMU don't set this 
-capability yet.
-
-Which scenario would fail without this disable-topology feature bit? What do 
-I miss?
-
-> Making the S390_FEAT_CONFIGURATION_TOPOLOGY belonging to the
-> default features makes the -ctop CPU flag is no more necessary,
-
-too many verbs in this sentence ;-)
-
-> turning the topology feature on is done with -disable-topology
-> only.
-...
-
-  Thomas
-
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index f99b0becd8..9e848f750e 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2709,7 +2709,13 @@ bool kvm_cpu_check_are_resettable(void)
+ static void do_kvm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
+ {
+     if (!cpu->vcpu_dirty) {
+-        kvm_arch_get_registers(cpu);
++        int ret = kvm_arch_get_registers(cpu);
++        if (ret) {
++            error_report("Failed to get registers: %s", strerror(-ret));
++            cpu_dump_state(cpu, stderr, CPU_DUMP_CODE);
++            vm_stop(RUN_STATE_INTERNAL_ERROR);
++        }
++
+         cpu->vcpu_dirty = true;
+     }
+ }
+@@ -2723,7 +2729,13 @@ void kvm_cpu_synchronize_state(CPUState *cpu)
+ 
+ static void do_kvm_cpu_synchronize_post_reset(CPUState *cpu, run_on_cpu_data arg)
+ {
+-    kvm_arch_put_registers(cpu, KVM_PUT_RESET_STATE);
++    int ret = kvm_arch_put_registers(cpu, KVM_PUT_RESET_STATE);
++    if (ret) {
++        error_report("Failed to put registers after reset: %s", strerror(-ret));
++        cpu_dump_state(cpu, stderr, CPU_DUMP_CODE);
++        vm_stop(RUN_STATE_INTERNAL_ERROR);
++    }
++
+     cpu->vcpu_dirty = false;
+ }
+ 
+@@ -2734,7 +2746,12 @@ void kvm_cpu_synchronize_post_reset(CPUState *cpu)
+ 
+ static void do_kvm_cpu_synchronize_post_init(CPUState *cpu, run_on_cpu_data arg)
+ {
+-    kvm_arch_put_registers(cpu, KVM_PUT_FULL_STATE);
++    int ret = kvm_arch_put_registers(cpu, KVM_PUT_FULL_STATE);
++    if (ret) {
++        error_report("Failed to put registers after init: %s", strerror(-ret));
++        exit(1);
++    }
++
+     cpu->vcpu_dirty = false;
+ }
+ 
+@@ -2827,7 +2844,14 @@ int kvm_cpu_exec(CPUState *cpu)
+         MemTxAttrs attrs;
+ 
+         if (cpu->vcpu_dirty) {
+-            kvm_arch_put_registers(cpu, KVM_PUT_RUNTIME_STATE);
++            ret = kvm_arch_put_registers(cpu, KVM_PUT_RUNTIME_STATE);
++            if (ret) {
++                error_report("Failed to put registers after init: %s",
++                             strerror(-ret));
++                ret = -1;
++                break;
++            }
++
+             cpu->vcpu_dirty = false;
+         }
+ 
+-- 
+2.38.1
 
