@@ -2,54 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF6B963F897
+	by mail.lfdr.de (Postfix) with ESMTP id 459AD63F896
 	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 20:52:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230378AbiLATw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 14:52:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49902 "EHLO
+        id S230420AbiLATw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 14:52:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230273AbiLATwz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230321AbiLATwz (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 1 Dec 2022 14:52:55 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6B293723F
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 11:52:52 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id 145-20020a621497000000b00574fab7294dso2838256pfu.13
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 11:52:52 -0800 (PST)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6298391DD
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 11:52:54 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-3b0af5bcbd3so26717097b3.0
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 11:52:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=T3Xw60Pix1cG4UBEcwKBNt+iW5FV3zwEkrNY5DVdltY=;
-        b=pXAlBzxEzjMopTL9MJOEkkxRstjTgv5E2youV/Zwc0kLGJw4Ipt1Ii1GklMXcyLezz
-         OmPzGhZ0xMjoR1gWmKbIfnXxcQYlF3kwZaxAJ3M4FBE6WeQqfDWQK9f3VQJVarGYwKBv
-         EouCQVMfmDtGoEBcLRJMD7N8fqRoQ57MO5U+MCyQvTfFy0MFGBxIE4TDgzuH+bAOP55i
-         zDKnzj5jSyQPlSLcCiGPhTq1xLZbUketh83WVjpenXNHLnaAT9oKgVFzJI5sGzhD+vCP
-         NLi8PeUO84WatdcnxJEK6ZYC36sfZYGvttpo+WVnxkXFgd6iwkAv168rBFJqec1IEp/K
-         Q7mQ==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=C5a0McCcpuNoh7+abFH/FyD//PHCPdcmVmgtIkm+rNg=;
+        b=dkOyk7aLowF4xnX8Rvbrx/SoT9LIgx3eq/miK+BC/MOrbzjqziJVt+kvCfast77x7+
+         uvrFhmY1eBP/6qKCUQ0hkSUvgCHIlRnDbjoYLR+x4IEXjmlUKZS441g5vvckbswFMYIK
+         v+YkqWk6RiKKOD4U8nKj8CYjVPlggHS+O4KUkcGRW7QqTiCIJriyvacDsy7LNO2i2WaV
+         D5AK/eMDyeNyaA69yWc4MBjDe33p/f/NeCFby0xx4zyqHI7vcVpa4QFiLwX2tWy3fcAV
+         vL6VCTb/IJWabhNmwy+QIIzvodPDDkL0u3Izx4lSQ5TaZkV4NpNO++Gyqp7XZFpDzB8z
+         IRSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=T3Xw60Pix1cG4UBEcwKBNt+iW5FV3zwEkrNY5DVdltY=;
-        b=CioNjEq2q17iEJnTqTpVA9yNWGNYJuTgV5bdA02bFMdOJ+U0SPCQawH+27UEHff9ha
-         aPHoHfA6OtKFpoN+fnuSs3BK3Z9eekdonwztfybHLKSsDXRRMTuU4jgVplPWJHYb9nm6
-         HqWT9ryBhYr8h8hdeT4rrFKGID+9BXeLr7s0AWObP8ihfxWgTv0XEP7kUMWvzhRL5Tfh
-         V6TUorKOZYs3UD8vBr6YfFTFi03U+p3R3f7I2iUNoGOKBHKrWtQTmBnKoehy8KVkliCG
-         5qKCTVdf3H45tLICKBIH9OUZJCMTtKI9w0KRZ4e2dhyE4E3Y05yaUwuE/FI9wY/8tgiJ
-         Yohg==
-X-Gm-Message-State: ANoB5pnkSkhXlaT9hMc1p3AIfj3qv7cIoXVpYl5thmkwZPUsoDpMYKp6
-        WZEbGPb8PWrDFH15id47hAP3MiXaiP11Wg==
-X-Google-Smtp-Source: AA0mqf5TxiZHFd6U4P6ZxINuqKr+rka5dcq5bdnEU/u8FPh5Z+9rOqdoCSs04fdwwy1prTsw4G68743LF0u5lg==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C5a0McCcpuNoh7+abFH/FyD//PHCPdcmVmgtIkm+rNg=;
+        b=x7cwWKi89oV6dcSIe8EO+MbNA2tIAXnbRYB1JLkr9RWVlK7GzbkDnC2msz/TUXUFDo
+         YxDLCSog/v8bBOd3rYdf8ibBWUuJAGN3fqNHjYZvMHeKcZnJBZsJYLK/AM8XfI7UMZrb
+         UM+FzYhf+C/jMrZj8HpOIiJxQAjlpvqalTQqJ7+zs5MMvW+f7Q/I1aXvkRJ0v/ALUPOf
+         een23ndVQGNXMOIAEscHWil9oTJOI7XWOjw7AkX6ARgB9m1Ri/WykDZnuVi6f2f4VeX7
+         1LZFEPgD9b6SNX0qtPVUVXUpvWPZu4kxl/VaFpHq4p9SnP5I8ovR7/xhEA/+xW3weu78
+         Y92A==
+X-Gm-Message-State: ANoB5pmnJA460gjVKgSRAPhPUvJLyl0sThofiU8CZQb/672OyL3p22Ag
+        FYoMPIPIiUO4cHNxomX3AdaK3sKYeeQdew==
+X-Google-Smtp-Source: AA0mqf5OJaDmzvLxYqIM8hv6il26qk4XpnSzjurHnRCDWgEU5qGaSFJo4i9u6HvvLp1XHxelOezUTOalVooRJw==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a17:90b:f04:b0:218:8ec2:a4e2 with SMTP id
- br4-20020a17090b0f0400b002188ec2a4e2mr64538756pjb.174.1669924372229; Thu, 01
- Dec 2022 11:52:52 -0800 (PST)
-Date:   Thu,  1 Dec 2022 11:52:47 -0800
+ (user=dmatlack job=sendgmr) by 2002:a25:adc1:0:b0:6f7:e78d:cae5 with SMTP id
+ d1-20020a25adc1000000b006f7e78dcae5mr18498179ybe.290.1669924373964; Thu, 01
+ Dec 2022 11:52:53 -0800 (PST)
+Date:   Thu,  1 Dec 2022 11:52:48 -0800
+In-Reply-To: <20221201195249.3369720-1-dmatlack@google.com>
 Mime-Version: 1.0
+References: <20221201195249.3369720-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221201195249.3369720-1-dmatlack@google.com>
-Subject: [PATCH 0/2] KVM: Halt-polling documentation cleanups
+Message-ID: <20221201195249.3369720-2-dmatlack@google.com>
+Subject: [PATCH 1/2] KVM: Move halt-polling documentation into common directory
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     David Matlack <dmatlack@google.com>,
@@ -68,31 +70,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series makes some small cleanups to the existing halt-polling
-documentation. Patch 1 moves halt-polling.rst out of the x86-specific
-directory, and patch 2 clarifies the interaction between
-KVM_CAP_HALT_POLL and kvm.halt_poll_ns, which was recently broken and a
-source of confusion [1].
+Move halt-polling.rst into the common KVM documentation directory and
+out of the x86-specific directory. Halt-polling is a common feature and
+the existing documentation is already written as such.
 
-[1] https://lore.kernel.org/kvm/03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com/
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ Documentation/virt/kvm/{x86 => }/halt-polling.rst | 0
+ Documentation/virt/kvm/index.rst                  | 1 +
+ Documentation/virt/kvm/x86/index.rst              | 1 -
+ 3 files changed, 1 insertion(+), 1 deletion(-)
+ rename Documentation/virt/kvm/{x86 => }/halt-polling.rst (100%)
 
-Cc: Yanan Wang <wangyanan55@huawei.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-
-David Matlack (2):
-  KVM: Move halt-polling documentation into common directory
-  KVM: Document the interaction between KVM_CAP_HALT_POLL and
-    halt_poll_ns
-
- Documentation/virt/kvm/api.rst                    | 15 +++++++--------
- Documentation/virt/kvm/{x86 => }/halt-polling.rst | 13 +++++++++++++
- Documentation/virt/kvm/index.rst                  |  1 +
- Documentation/virt/kvm/x86/index.rst              |  1 -
- 4 files changed, 21 insertions(+), 9 deletions(-)
- rename Documentation/virt/kvm/{x86 => }/halt-polling.rst (92%)
-
-
-base-commit: 7e3bba93f42e9d9abe81344bdba5ddc635b7c449
+diff --git a/Documentation/virt/kvm/x86/halt-polling.rst b/Documentation/virt/kvm/halt-polling.rst
+similarity index 100%
+rename from Documentation/virt/kvm/x86/halt-polling.rst
+rename to Documentation/virt/kvm/halt-polling.rst
+diff --git a/Documentation/virt/kvm/index.rst b/Documentation/virt/kvm/index.rst
+index e0a2c74e1043..ad13ec55ddfe 100644
+--- a/Documentation/virt/kvm/index.rst
++++ b/Documentation/virt/kvm/index.rst
+@@ -17,4 +17,5 @@ KVM
+ 
+    locking
+    vcpu-requests
++   halt-polling
+    review-checklist
+diff --git a/Documentation/virt/kvm/x86/index.rst b/Documentation/virt/kvm/x86/index.rst
+index 7ff588826b9f..9ece6b8dc817 100644
+--- a/Documentation/virt/kvm/x86/index.rst
++++ b/Documentation/virt/kvm/x86/index.rst
+@@ -10,7 +10,6 @@ KVM for x86 systems
+    amd-memory-encryption
+    cpuid
+    errata
+-   halt-polling
+    hypercalls
+    mmu
+    msr
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
 
