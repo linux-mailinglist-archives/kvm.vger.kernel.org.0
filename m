@@ -2,101 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7707F63F1F0
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 14:47:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2030963F204
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 14:50:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231618AbiLANrn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 08:47:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58246 "EHLO
+        id S231374AbiLANuT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 08:50:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231614AbiLANri (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 08:47:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1D07BF905
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 05:46:45 -0800 (PST)
+        with ESMTP id S230394AbiLANuQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 08:50:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F3B256D7F
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 05:49:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669902404;
+        s=mimecast20190719; t=1669902546;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7p+KL/F0J55e6WoMkxer5+URAf8GZ2IFvi3UFMd6VjI=;
-        b=C0ahN5TrbiK7xHEpeHY7FAuA/Zd0kZm/ayOqaPdp1bwkSjD77y4w1k49Trwnalf2bLPsuQ
-        F/Vj+PFaV5FJuyMEYm0AvrNqlgpvqA6HEIFNAu1AtbZVGbcZD28l+6SaqH/v8E+wA0Ex+F
-        3cvfVaNf3Zmduf4Ewoqth14Mk7A0D0Y=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-424-xnmnGHpWNW68QVt8p3KqWQ-1; Thu, 01 Dec 2022 08:46:43 -0500
-X-MC-Unique: xnmnGHpWNW68QVt8p3KqWQ-1
-Received: by mail-qv1-f71.google.com with SMTP id mi12-20020a056214558c00b004bb63393567so5007699qvb.21
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 05:46:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7p+KL/F0J55e6WoMkxer5+URAf8GZ2IFvi3UFMd6VjI=;
-        b=qHE7TSryENDYOG1L3SfdYiKlE1gJrxSiO0zdBkzYU8xbtGVCMKnQcfx7U7+upiXSv4
-         voBGDGQjIOO41GYNfQCO/nmWcv+tGvB4tmL1pgdpOdyA/PGlaqnXvt/kdu+aYntzsLw3
-         RG5KXrRSw00MdGXl3LFpvsgewqw3G7XmZhI6SP1YhkzEdTdeUG2K1G2tJqdhsaobIfu5
-         F611NA+cKkjmJcmYvOplqmOmbr7tCaqQBcw3z8Dqmy225bLbm6iY6xRGXxerUFmurp9E
-         I9kCMwSq9XnoNXvA5UCyFo4/D5RIQLogsmfeyZKTMQk4j5MUsd+Q5CreUFz8tC45mhkv
-         Wguw==
-X-Gm-Message-State: ANoB5pkjwp+vDpTdTDAX+2XK52QsZpZBtM1FPNTotXjugkdKcKvRcvaY
-        i644tVYBoTzXHoLIh9vwirZB+RZFlQJUuRa5tZaD1Wd/neRVBwnPVdGtNrKH/aM8V0SRhzZoj+a
-        Lo+KXiR9fQTDH
-X-Received: by 2002:a05:6214:4389:b0:4c6:d796:1b0a with SMTP id oh9-20020a056214438900b004c6d7961b0amr34979921qvb.128.1669902403335;
-        Thu, 01 Dec 2022 05:46:43 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7QfBWP5iCLBOFkNEC2xYQDpNdymkXukc2F7E4ZwAli/pyCXR896J7MUDwaCSAKjIpKpAnIAg==
-X-Received: by 2002:a05:6214:4389:b0:4c6:d796:1b0a with SMTP id oh9-20020a056214438900b004c6d7961b0amr34979904qvb.128.1669902403173;
-        Thu, 01 Dec 2022 05:46:43 -0800 (PST)
-Received: from [192.168.149.123] (58.254.164.109.static.wline.lns.sme.cust.swisscom.ch. [109.164.254.58])
-        by smtp.gmail.com with ESMTPSA id w25-20020a05620a129900b006fcaa1eab0esm610454qki.123.2022.12.01.05.46.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Dec 2022 05:46:42 -0800 (PST)
-Message-ID: <0df5f71c-4f32-5635-3334-b35b5a0a9891@redhat.com>
-Date:   Thu, 1 Dec 2022 14:46:40 +0100
+        bh=KGkTjaGqlhCrqVn247dB2WearCq0La6BjquyK9aBtH8=;
+        b=R1huVt7VHGpv/8SPeMQj/QODLcjEh6uf7cCDdLMakmHWmnzuHrIW0uQ5eTf+9PToh/bjv0
+        9VtlRutexE4+3BFOKp2xOD1eojvGjNWrFaT/FVfQLEc6dusIgHKPkvuLsFS0XZNfGB42I+
+        kpuZrjwk/gT5nYFHiEJleIVxHZwOjbQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-231-WCbJKulwMcuUesWW5CN5MA-1; Thu, 01 Dec 2022 08:49:00 -0500
+X-MC-Unique: WCbJKulwMcuUesWW5CN5MA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 84645101E14D;
+        Thu,  1 Dec 2022 13:49:00 +0000 (UTC)
+Received: from starship (unknown [10.35.206.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6A306111E3EC;
+        Thu,  1 Dec 2022 13:48:59 +0000 (UTC)
+Message-ID: <3e0678e3ce57f3972945d2523ca66b9bc1d1e720.camel@redhat.com>
+Subject: Re: [PATCH] KVM: selftests: restore special vmmcall code layout
+ needed by the harness
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Date:   Thu, 01 Dec 2022 15:48:58 +0200
+In-Reply-To: <87r0xjh3qk.fsf@ovpn-194-141.brq.redhat.com>
+References: <20221130181147.9911-1-pbonzini@redhat.com>
+         <Y4ffgC+HbftkPbaW@google.com> <87r0xjh3qk.fsf@ovpn-194-141.brq.redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [kvm-unit-tests PATCH v3 13/27] svm: remove get_npt_pte extern
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Andrew Jones <drjones@redhat.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Cathy Avery <cavery@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20221122161152.293072-1-mlevitsk@redhat.com>
- <20221122161152.293072-14-mlevitsk@redhat.com>
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-In-Reply-To: <20221122161152.293072-14-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-Am 22/11/2022 um 17:11 schrieb Maxim Levitsky:
-> get_npt_pte is unused
+On Thu, 2022-12-01 at 10:28 +0100, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 > 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  x86/svm.h | 1 -
->  1 file changed, 1 deletion(-)
+> > On Wed, Nov 30, 2022, Paolo Bonzini wrote:
+> > > Commit 8fda37cf3d41 ("KVM: selftests: Stuff RAX/RCX with 'safe' values
+> > > in vmmcall()/vmcall()", 2022-11-21) broke the svm_nested_soft_inject_test
+> > > because it placed a "pop rbp" instruction after vmmcall.  While this is
+> > > correct and mimics what is done in the VMX case, this particular test
+> > > expects a ud2 instruction right after the vmmcall, so that it can skip
+> > > over it in the L1 part of the test.
+> > > 
+> > > Inline a suitably-modified version of vmmcall() to restore the
+> > > functionality of the test.
+> > > 
+> > > Fixes: 8fda37cf3d41 ("KVM: selftests: Stuff RAX/RCX with 'safe' values in vmmcall()/vmcall()"
+> > > Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > ---
+> > 
+> > We really, really need to save/restore guest GPRs in L1 when handling exits from L2.
 > 
-Reviewed-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+> +1, the amount of stuff we do to workaround the shortcoming (and time
+> we waste debugging) is getting ridiculously high. 
+> 
+> > For now,
+> > 
+> > Reviewed-by: Sean Christopherson <seanjc@google.com>
+> > 
+> 
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> 
+
+I didn't notice this fix and also found this issue.
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
 
