@@ -2,151 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E0AC63E7C8
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 03:22:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D0A2463E850
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 04:26:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230042AbiLACWd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Nov 2022 21:22:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54740 "EHLO
+        id S229746AbiLAD0w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Nov 2022 22:26:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230039AbiLACWO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Nov 2022 21:22:14 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67C8D4D5ED;
-        Wed, 30 Nov 2022 18:22:04 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gLnLt1pH5PWaBN6Git3lZRX0UqB4teeux9K00ryBFaZypCEcFo3SFX2y2vR2JS2dJIuM9VaCovYKyZrLdFH/vHsOE05OYhm3bvor9Y3YCLKNtz0SToc4GPLDc1ZUZV4KmwINz7NlxUX7VZN/CpgWRkJtGJPkMb+62QzSseOIcalBBrfAmHJ5HdGhux+32MwFXPWinvMfWP8eWU7HLwfL5mf/oVbl5zXngOMV8eRxXb9yMrC5DNPAqPOjqn71sRHSqkvJGwtT2KrJhlE9ft15GAq1Wu1P9h3bUIEcrpbtHSC9fLjGIWy2WzH4DLy0L4Xpp5fUS7mqVkpbPU6/en3RvQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EQAjlAPKNRKc521/wzfFqzadKeyxrglYxiNICeUux10=;
- b=d47hrrRkkWduhOTxyA4rmMKFKLmUPOyAFtZKIFAHwYhss6OEIRwqL//q/qV+aPAfVK4jzz4zh/bBHnW8p7DlTkisDcTgzVgSJqZ8Cik122JJn6bN5YaaXqcYuybJdzj7VEWcexrT16fpwbudrHMgq0vatIGTizqueNdbPdjxk67vRkxnqy2dvB82r7vK0lIMDAYOmrxwJoqaiQuvpa7uP5uahcH8U4Nogq9URDxBYabo0MEr+LqM5Z5Lk0hqf34TrmV3Jgfl+3pr/mfN5RR3W5uqxVyuZRH6LEMxAYTTN0vb1ezlyraBN/MwZREZMoDcPt6oMKgpzx901oylpS4v+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EQAjlAPKNRKc521/wzfFqzadKeyxrglYxiNICeUux10=;
- b=wX5bzKRs6pqFsH9if6xZwOpWh7HwD859nKEGDdW66yhPAyOi6e3uc9gaxys0VNjy74TOgoeRWSp+/Y5pUPXCr8h8nk0OJfu0XHRYBAaI3fFLKNEBCKpRNNFBG6UA3cDfOkvwTCU0Yi0v8MeRreTY7T79l1t4z4Ju1BS4Im87Al8=
-Received: from DS7PR03CA0151.namprd03.prod.outlook.com (2603:10b6:5:3b2::6) by
- MW4PR12MB7214.namprd12.prod.outlook.com (2603:10b6:303:229::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5857.23; Thu, 1 Dec 2022 02:22:00 +0000
-Received: from DM6NAM11FT038.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3b2:cafe::5e) by DS7PR03CA0151.outlook.office365.com
- (2603:10b6:5:3b2::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.8 via Frontend
- Transport; Thu, 1 Dec 2022 02:22:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT038.mail.protection.outlook.com (10.13.173.137) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5857.21 via Frontend Transport; Thu, 1 Dec 2022 02:22:00 +0000
-Received: from aiemdeew.1.ozlabs.ru (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 30 Nov
- 2022 20:21:33 -0600
-From:   Alexey Kardashevskiy <aik@amd.com>
-To:     Alexey Kardashevskiy <aik@amd.com>
-CC:     <kvm@vger.kernel.org>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Venu Busireddy <venu.busireddy@oracle.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Michael Sterritt <sterritt@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Dave Hansen" <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "Andrew Cooper" <andrew.cooper3@citrix.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH kernel 3/3] x86/sev: Do not handle #VC for DR7 read/write
-Date:   Thu, 1 Dec 2022 13:19:48 +1100
-Message-ID: <20221201021948.9259-4-aik@amd.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221201021948.9259-1-aik@amd.com>
-References: <20221201021948.9259-1-aik@amd.com>
+        with ESMTP id S229515AbiLAD0v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Nov 2022 22:26:51 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 964EC8566C;
+        Wed, 30 Nov 2022 19:26:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669865210; x=1701401210;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=7nbjREN26b8BCZeWqHnldDfC158pG0LFAqEqHseJNco=;
+  b=VHrMLjRh6i2APUdEZvZSdGUduSSApXpT5g/zMua5o/4DNOboe+M7Aocx
+   tdD/7rNRwWJOVjvLYeABrjdbK9vzVD6e4cg0EQqOtJVQmmysjiXUUhng3
+   V7fNJ9EHUsu0n0ig62RGWYSoEbvNXYBQByk8wTSctseq43CeKgKOnJ5h/
+   GFLhXjszYuOtQb6gglF55wzxt7D9BwY1w5ukMm4ZilYhd/FfoLTHxJNr4
+   Q5ttADSAKznr85+FJsyzUf2MZKjupxbmqHH7XHCoS7Zk/wcWcS6zw5kr3
+   Bul48y/ycJdV4P9lWoXnPqZ5mDqZrZtp8rbI9hbotOV8BwaybE6VEMa+j
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10547"; a="342499514"
+X-IronPort-AV: E=Sophos;i="5.96,207,1665471600"; 
+   d="asc'?scan'208";a="342499514"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2022 19:26:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10547"; a="707902217"
+X-IronPort-AV: E=Sophos;i="5.96,207,1665471600"; 
+   d="asc'?scan'208";a="707902217"
+Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.159.108])
+  by fmsmga008.fm.intel.com with ESMTP; 30 Nov 2022 19:26:47 -0800
+Date:   Thu, 1 Dec 2022 11:25:31 +0800
+From:   Zhenyu Wang <zhenyuw@linux.intel.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, alex.williamson@redhat.com, kevin.tian@intel.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        intel-gvt-dev@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Subject: Re: [[RESEND] iommufd PATCH v2 1/2] i915/gvt: Move gvt mapping cache
+ initialization to intel_vgpu_init_dev()
+Message-ID: <20221201032531.GY30028@zhen-hp.sh.intel.com>
+Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
+References: <20221129105831.466954-1-yi.l.liu@intel.com>
+ <20221129105831.466954-2-yi.l.liu@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT038:EE_|MW4PR12MB7214:EE_
-X-MS-Office365-Filtering-Correlation-Id: c81b5452-bf0a-4fc0-3408-08dad342d409
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Zheap7xYOfCbmkLtVg9HUZdNaYmGapmYz7Cn9Rs1RK9fPbHGAjyQprLZItWGppGxGQFZT8dDxsOv7ykO8JdgOEg7TMncNxu6Bo6fd5byTH20alVgDWuB2gAG23NQppqRUkR7boqrUObmfq/XXNLhMNCnvisf/kLL87EEz7lf95bxUTHVjKGcbp+IGkNA7XpFtD2PVxAh/WdNofsoQ6Hu57QpPu5mAr1D7yI+dz5Ictw/Jwx5ozhkrhDgyFXYcy62U2h0Geb2MEUcxGxwJGX1pLiiBrcZ06/sXqWrw4Pb2gwsqWfj/o/EfcvfOBAFkiyX5Li1TeFFmUD5wS6qL3PW3unX61SdrcoElZgu+JKkFvbKiwAZejSoXdlH22Kxb6yH5hoo51ViTFz7w12L/em31bAu5OHVp4sa6ul8B6DqisoV9lsuAbZ19W2xoapE8mW+oAbkNc+wRzJE0D3BsLLEh23z0bQYXMVoaUSR/9xyi7+LmICVx4POSEXdYCdnB2/HqFvK25czYeOvQV5GzoCj0sv9n+INGUnxgp2rj8hYxY7/2qe45NemyQn2qKoo3T3aXov4viV7OZR1AoRr+vvX9VqmJn2AyBrYxzGxU2o8GyB4lecZZzc84XSGX9DvsJ+uFdBrSwy7kTkHA7N8vSyEQyuWmsd8aTCijyC3Pq/wIMjKdhUGhLYl0DlvBR6989+oQ7NvuuCWiJB1Jb4voND6wCe+88T/LpOYnjP/FeQVmFw=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(346002)(376002)(136003)(39860400002)(396003)(451199015)(46966006)(40470700004)(36840700001)(36860700001)(478600001)(2906002)(6200100001)(6666004)(37006003)(7416002)(356005)(54906003)(81166007)(82740400003)(5660300002)(4744005)(40460700003)(426003)(82310400005)(47076005)(36756003)(8936002)(41300700001)(7049001)(1076003)(6862004)(2616005)(8676002)(336012)(4326008)(26005)(40480700001)(316002)(16526019)(186003)(70586007)(70206006)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2022 02:22:00.4240
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c81b5452-bf0a-4fc0-3408-08dad342d409
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT038.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7214
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="3sseE1tnmEs+TkKq"
+Content-Disposition: inline
+In-Reply-To: <20221129105831.466954-2-yi.l.liu@intel.com>
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With SVM_SEV_FEAT_DEBUG_SWAP enabled, the VM should not get #VC events
-for DR7 read/write which it rather avoided.
 
-Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
----
- arch/x86/kernel/sev.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+--3sseE1tnmEs+TkKq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index a428c62330d3..4e91b9f8742c 100644
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -1618,6 +1618,9 @@ static enum es_result vc_handle_dr7_write(struct ghcb *ghcb,
- 	long val, *reg = vc_insn_get_rm(ctxt);
- 	enum es_result ret;
- 
-+	if ((sev_status >> 2) & SVM_SEV_FEAT_DEBUG_SWAP)
-+		return ES_VMM_ERROR;
-+
- 	if (!reg)
- 		return ES_DECODE_FAILED;
- 
-@@ -1655,6 +1658,9 @@ static enum es_result vc_handle_dr7_read(struct ghcb *ghcb,
- 	struct sev_es_runtime_data *data = this_cpu_read(runtime_data);
- 	long *reg = vc_insn_get_rm(ctxt);
- 
-+	if ((sev_status >> 2) & SVM_SEV_FEAT_DEBUG_SWAP)
-+		return ES_VMM_ERROR;
-+
- 	if (!reg)
- 		return ES_DECODE_FAILED;
- 
--- 
-2.38.1
+On 2022.11.29 02:58:30 -0800, Yi Liu wrote:
+> vfio container registers .dma_unmap() callback after the device is opened.
+> So it's fine for mdev drivers to initialize internal mapping cache in
+> .open_device(). See vfio_device_container_register().
+>=20
+> Now with iommufd an access ops with an unmap callback is registered
+> when the device is bound to iommufd which is before .open_device()
+> is called. This implies gvt's .dma_unmap() could be called before its
+> internal mapping cache is initialized.
+>=20
+> The fix is moving gvt mapping cache initialization to vGPU init. While
+> at it also move ptable initialization together.
+>=20
+> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Cc: Zhi Wang <zhi.a.wang@intel.com>
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: intel-gvt-dev@lists.freedesktop.org
+> Reviewed-by: Zhi Wang <zhi.a.wang@intel.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/gpu/drm/i915/gvt/kvmgt.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/=
+kvmgt.c
+> index 7a45e5360caf..f563e5dbe66f 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -671,9 +671,6 @@ static int intel_vgpu_open_device(struct vfio_device =
+*vfio_dev)
+> =20
+>  	vgpu->attached =3D true;
+> =20
+> -	kvmgt_protect_table_init(vgpu);
+> -	gvt_cache_init(vgpu);
+> -
+>  	vgpu->track_node.track_write =3D kvmgt_page_track_write;
+>  	vgpu->track_node.track_flush_slot =3D kvmgt_page_track_flush_slot;
+>  	kvm_page_track_register_notifier(vgpu->vfio_device.kvm,
+> @@ -1451,9 +1448,17 @@ static int intel_vgpu_init_dev(struct vfio_device =
+*vfio_dev)
+>  	struct intel_vgpu *vgpu =3D vfio_dev_to_vgpu(vfio_dev);
+>  	struct intel_vgpu_type *type =3D
+>  		container_of(mdev->type, struct intel_vgpu_type, type);
+> +	int ret;
+> =20
+>  	vgpu->gvt =3D kdev_to_i915(mdev->type->parent->dev)->gvt;
+> -	return intel_gvt_create_vgpu(vgpu, type->conf);
+> +	ret =3D intel_gvt_create_vgpu(vgpu, type->conf);
+> +	if (ret)
+> +		return ret;
+> +
+> +	kvmgt_protect_table_init(vgpu);
+> +	gvt_cache_init(vgpu);
+> +
+> +	return 0;
 
+I'm fine with this change, but could we add some sanity check at close
+time to ensure we clean up any internal cache? Btw, do we need to reset
+rbtree root pointer?
+
+>  }
+> =20
+>  static void intel_vgpu_release_dev(struct vfio_device *vfio_dev)
+> --=20
+> 2.34.1
+>=20
+
+--3sseE1tnmEs+TkKq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCY4gepQAKCRCxBBozTXgY
+J+mBAKCbwq9UB5XgOvbpJDgrbYqOsyjctACeKm5g3fFn7aTntBIDdUtyQ26LRmI=
+=/q3L
+-----END PGP SIGNATURE-----
+
+--3sseE1tnmEs+TkKq--
