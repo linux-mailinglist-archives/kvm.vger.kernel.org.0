@@ -2,265 +2,273 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DFA763F567
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 17:39:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AD9963F55F
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 17:38:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232265AbiLAQjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 11:39:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57008 "EHLO
+        id S231995AbiLAQia (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 11:38:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231851AbiLAQjK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 11:39:10 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12F299B78A;
-        Thu,  1 Dec 2022 08:39:09 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B1GP7Qk015109;
-        Thu, 1 Dec 2022 16:39:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Sa1LChvHQ2k7u2Yx/whdyqREDbJzHoqzZDKK/r++r6M=;
- b=iN9KU7yrTYPAJpsblV2lVRwKDQ6oJRqX4JOvikUOxPZJfqYnDuDaY2tXR7HsAN69zOVp
- 9/uG0F7uku/wZ4DJ8r+MYhiWpOUfqnpa4vmxJyUJDNs7/X7vVyMD35uoOHa0Fe/4F9tl
- 8NuXAPf/LbP+h9Lm4t7xrdpT9sBkWZzN5v6Ysr4IRUezQ0FcuF7bYDxcVl7f9VOmLWj+
- XG3UbGx54RxDSYUQcpBddV52emnfE+f68SXBjZty2jVGP+xMKZDQSJuM0qlIx8XKHVds
- 89Yki8ofnoOQbL61WbPl6sryCi3TiETr05Z1dqtI9j4bzUbwWR29YpDkUcXfr0Kc3hT6 qA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6ys7rbr0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Dec 2022 16:39:03 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B1GQ3rD021645;
-        Thu, 1 Dec 2022 16:39:03 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6ys7rbq5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Dec 2022 16:39:02 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B1GcYEC010804;
-        Thu, 1 Dec 2022 16:39:00 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03fra.de.ibm.com with ESMTP id 3m3ae8wjm3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Dec 2022 16:39:00 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B1GcvC97078614
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Dec 2022 16:38:57 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4EE41A405B;
-        Thu,  1 Dec 2022 16:38:57 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CB370A4054;
-        Thu,  1 Dec 2022 16:38:56 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  1 Dec 2022 16:38:56 +0000 (GMT)
-Date:   Thu, 1 Dec 2022 17:28:13 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        with ESMTP id S229631AbiLAQiZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 11:38:25 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D60655ADD9
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 08:38:23 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id k79so2362568pfd.7
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 08:38:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=wz5UjU3Ma0W7cBTZ/63jSNwcUzSf/RN7ETO0YflOK9Q=;
+        b=L5oONEpJeyYInhCN8kEGfJ8WS2VPlfmSQI0EIRyACnSb62Ho4uiLAZ+22FZ0LpKSBY
+         OanLGdeorUn/O6YHVn5BHqcWoMtKOfzbPKcz+4fsn48JXXYOuwBU81HsoXu4yIA+KxBs
+         oNf69ULLkYXBFawHATlUKtmTRlCCGuue7O3x4Uj20kNa312jwW6CLd6dDy2pzPGk3DaL
+         y4jm5SpqWS/wMH/C2TjT2ihvVuFcoRw2TnuuxPCYPfzDwkDLPEA8hE11/Idhqhxr7xt0
+         rj/FXhrQIb1ypgd2I2CBp8L/oyRKWO3NUq8Jq7LgrgnoUKAu1/kU3hKmcHIeaOcvmDNO
+         M6Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wz5UjU3Ma0W7cBTZ/63jSNwcUzSf/RN7ETO0YflOK9Q=;
+        b=HSJLAOVK1DNaxMGNZYzgUZehyHZ6A+R7St8KXD7nhuXmTmwqjPFdCUCH6+tFoD41IO
+         uB+gbDK2ud5QIff2YoxSZXQlX1JkWIoELtE9mOWAkeLeRbNeRQyq1y0Sldzw+yiSvoly
+         sJVlZuT6wsM/Xb0q7PwAApLhQl0C4AhrlpChgHCNVYOCHjDcoo0i38yPD7TINa4fXW7C
+         qbrxwtRHC08uCu/VsJd3hQS2fMevXuc0tHCHl85vGjotUqNn3qW1AZwVAyfQxk4Ia5Hg
+         qPXHzDMrrs4i/eNdKQlq3ZvX0xQ9wkDD+1ZPRxhYJPWfAyN0iQnQz5B+eozX4jFVRfIW
+         PniA==
+X-Gm-Message-State: ANoB5pnGbx5/vEOhclVMTf90LE4S5aYnXv7FGPaKpg39gZGaALC5ndul
+        qQowBq0GIw6gTAhlmIfa7YWzLQ==
+X-Google-Smtp-Source: AA0mqf7E8VTs9g+yA9GqMgTdFbO4YLYoa36a9KLdCj074cztIQB7gniXVzh1et27ldGMC17rtCxmqQ==
+X-Received: by 2002:aa7:8512:0:b0:575:65ff:8831 with SMTP id v18-20020aa78512000000b0057565ff8831mr16235817pfn.80.1669912703144;
+        Thu, 01 Dec 2022 08:38:23 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id l4-20020a17090a384400b00212c27abcaesm5118172pjf.17.2022.12.01.08.38.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Dec 2022 08:38:22 -0800 (PST)
+Date:   Thu, 1 Dec 2022 16:38:16 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: Re: [PATCH v3 4/9] KVM: s390: selftest: memop: Replace macros by
- functions
-Message-ID: <20221201172813.027bcd13@p-imbrenda>
-In-Reply-To: <20221117221758.66326-5-scgl@linux.ibm.com>
-References: <20221117221758.66326-1-scgl@linux.ibm.com>
-        <20221117221758.66326-5-scgl@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Paul Durrant <paul@xen.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Atish Patra <atishp@atishpatra.org>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Yuan Yao <yuan.yao@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH v2 26/50] KVM: PPC: Move processor compatibility check to
+ module init
+Message-ID: <Y4jXuh4P9Oibki6W@google.com>
+References: <20221130230934.1014142-1-seanjc@google.com>
+ <20221130230934.1014142-27-seanjc@google.com>
+ <87cz93snqc.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: NiGTT1eKJg8ec_Bwv0LYuMlzyV7tfXm3
-X-Proofpoint-ORIG-GUID: _3WG0nijUxGdbeeNL4jWPRdpe4MoqBM4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-01_11,2022-12-01_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- malwarescore=0 bulkscore=0 mlxlogscore=999 phishscore=0 lowpriorityscore=0
- spamscore=0 mlxscore=0 impostorscore=0 priorityscore=1501 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2212010118
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87cz93snqc.fsf@mpe.ellerman.id.au>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 17 Nov 2022 23:17:53 +0100
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
-
-> Replace the DEFAULT_* test helpers by functions, as they don't
-> need the exta flexibility.
+On Thu, Dec 01, 2022, Michael Ellerman wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> > Move KVM PPC's compatibility checks to their respective module_init()
+> > hooks, there's no need to wait until KVM's common compat check, nor is
+> > there a need to perform the check on every CPU (provided by common KVM's
+> > hook), as the compatibility checks operate on global data.
+> >
+> >   arch/powerpc/include/asm/cputable.h: extern struct cpu_spec *cur_cpu_spec;
+> >   arch/powerpc/kvm/book3s.c: return 0
+> >   arch/powerpc/kvm/e500.c: strcmp(cur_cpu_spec->cpu_name, "e500v2")
+> >   arch/powerpc/kvm/e500mc.c: strcmp(cur_cpu_spec->cpu_name, "e500mc")
+> >                              strcmp(cur_cpu_spec->cpu_name, "e5500")
+> >                              strcmp(cur_cpu_spec->cpu_name, "e6500")
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
->  tools/testing/selftests/kvm/s390x/memop.c | 82 +++++++++++------------
->  1 file changed, 39 insertions(+), 43 deletions(-)
+> I'm not sure that output is really useful in the change log unless you
+> explain more about what it is.
+
+Agreed, I got lazy.  I'll write a proper description.
+ 
+> > diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
+> > index 57e0ad6a2ca3..795667f7ebf0 100644
+> > --- a/arch/powerpc/kvm/e500mc.c
+> > +++ b/arch/powerpc/kvm/e500mc.c
+> > @@ -388,6 +388,10 @@ static int __init kvmppc_e500mc_init(void)
+> >  {
+> >  	int r;
+> >  
+> > +	r = kvmppc_e500mc_check_processor_compat();
+> > +	if (r)
+> > +		return kvmppc_e500mc;
+>  
+> This doesn't build:
 > 
-> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-> index 69869c7e2ab1..286185a59238 100644
-> --- a/tools/testing/selftests/kvm/s390x/memop.c
-> +++ b/tools/testing/selftests/kvm/s390x/memop.c
-> @@ -48,6 +48,8 @@ struct mop_desc {
->  	uint8_t key;
->  };
->  
-> +const uint8_t NO_KEY = 0xff;
-> +
->  static struct kvm_s390_mem_op ksmo_from_desc(const struct mop_desc *desc)
->  {
->  	struct kvm_s390_mem_op ksmo = {
-> @@ -85,7 +87,7 @@ static struct kvm_s390_mem_op ksmo_from_desc(const struct mop_desc *desc)
->  		ksmo.flags |= KVM_S390_MEMOP_F_INJECT_EXCEPTION;
->  	if (desc->_set_flags)
->  		ksmo.flags = desc->set_flags;
-> -	if (desc->f_key) {
-> +	if (desc->f_key && desc->key != NO_KEY) {
+> linux/arch/powerpc/kvm/e500mc.c: In function ‘kvmppc_e500mc_init’:
+> linux/arch/powerpc/kvm/e500mc.c:391:13: error: implicit declaration of function ‘kvmppc_e500mc_check_processor_compat’; did you mean ‘kvmppc_core_check_processor_compat’? [-Werror=implicit-function-declaration]
+>   391 |         r = kvmppc_e500mc_check_processor_compat();
+>       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>       |             kvmppc_core_check_processor_compat
+> linux/arch/powerpc/kvm/e500mc.c:393:24: error: ‘kvmppc_e500mc’ undeclared (first use in this function); did you mean ‘kvm_ops_e500mc’?
+>   393 |                 return kvmppc_e500mc;
+>       |                        ^~~~~~~~~~~~~
+>       |                        kvm_ops_e500mc
+> linux/arch/powerpc/kvm/e500mc.c:393:24: note: each undeclared identifier is reported only once for each function it appears in
 
-is this change going to affect the behaviour?
-if so, please document it in the patch description
+Huh, CONFIG_PPC_E500MC got unselected in the config I use to compile test this
+flavor.  I suspect I botched an oldconfig at some point.
+ 
+Anyways, fixed that and the bugs.
 
->  		ksmo.flags |= KVM_S390_MEMOP_F_SKEY_PROTECTION;
->  		ksmo.key = desc->key;
->  	}
-> @@ -268,34 +270,28 @@ static void prepare_mem12(void)
->  #define ASSERT_MEM_EQ(p1, p2, size) \
->  	TEST_ASSERT(!memcmp(p1, p2, size), "Memory contents do not match!")
->  
-> -#define DEFAULT_WRITE_READ(copy_cpu, mop_cpu, mop_target_p, size, ...)		\
-> -({										\
-> -	struct test_info __copy_cpu = (copy_cpu), __mop_cpu = (mop_cpu);	\
-> -	enum mop_target __target = (mop_target_p);				\
-> -	uint32_t __size = (size);						\
-> -										\
-> -	prepare_mem12();							\
-> -	CHECK_N_DO(MOP, __mop_cpu, __target, WRITE, mem1, __size,		\
-> -			GADDR_V(mem1), ##__VA_ARGS__);				\
-> -	HOST_SYNC(__copy_cpu, STAGE_COPIED);					\
-> -	CHECK_N_DO(MOP, __mop_cpu, __target, READ, mem2, __size,		\
-> -			GADDR_V(mem2), ##__VA_ARGS__);				\
-> -	ASSERT_MEM_EQ(mem1, mem2, __size);					\
-> -})
-> +static void default_write_read(struct test_info copy_cpu, struct test_info mop_cpu,
-> +			       enum mop_target mop_target, uint32_t size, uint8_t key)
-> +{
-> +	prepare_mem12();
-> +	CHECK_N_DO(MOP, mop_cpu, mop_target, WRITE, mem1, size,
-> +		   GADDR_V(mem1), KEY(key));
-> +	HOST_SYNC(copy_cpu, STAGE_COPIED);
-> +	CHECK_N_DO(MOP, mop_cpu, mop_target, READ, mem2, size,
-> +		   GADDR_V(mem2), KEY(key));
-> +	ASSERT_MEM_EQ(mem1, mem2, size);
-> +}
->  
-> -#define DEFAULT_READ(copy_cpu, mop_cpu, mop_target_p, size, ...)		\
-> -({										\
-> -	struct test_info __copy_cpu = (copy_cpu), __mop_cpu = (mop_cpu);	\
-> -	enum mop_target __target = (mop_target_p);				\
-> -	uint32_t __size = (size);						\
-> -										\
-> -	prepare_mem12();							\
-> -	CHECK_N_DO(MOP, __mop_cpu, __target, WRITE, mem1, __size,		\
-> -			GADDR_V(mem1));						\
-> -	HOST_SYNC(__copy_cpu, STAGE_COPIED);					\
-> -	CHECK_N_DO(MOP, __mop_cpu, __target, READ, mem2, __size, ##__VA_ARGS__);\
-> -	ASSERT_MEM_EQ(mem1, mem2, __size);					\
-> -})
-> +static void default_read(struct test_info copy_cpu, struct test_info mop_cpu,
-> +			 enum mop_target mop_target, uint32_t size, uint8_t key)
-> +{
-> +	prepare_mem12();
-> +	CHECK_N_DO(MOP, mop_cpu, mop_target, WRITE, mem1, size, GADDR_V(mem1));
-> +	HOST_SYNC(copy_cpu, STAGE_COPIED);
-> +	CHECK_N_DO(MOP, mop_cpu, mop_target, READ, mem2, size,
-> +		   GADDR_V(mem2), KEY(key));
-> +	ASSERT_MEM_EQ(mem1, mem2, size);
-> +}
->  
->  static void guest_copy(void)
->  {
-> @@ -310,7 +306,7 @@ static void test_copy(void)
->  
->  	HOST_SYNC(t.vcpu, STAGE_INITED);
->  
-> -	DEFAULT_WRITE_READ(t.vcpu, t.vcpu, LOGICAL, t.size);
-> +	default_write_read(t.vcpu, t.vcpu, LOGICAL, t.size, NO_KEY);
->  
->  	kvm_vm_free(t.kvm_vm);
->  }
-> @@ -357,26 +353,26 @@ static void test_copy_key(void)
->  	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
->  
->  	/* vm, no key */
-> -	DEFAULT_WRITE_READ(t.vcpu, t.vm, ABSOLUTE, t.size);
-> +	default_write_read(t.vcpu, t.vm, ABSOLUTE, t.size, NO_KEY);
->  
->  	/* vm/vcpu, machting key or key 0 */
-> -	DEFAULT_WRITE_READ(t.vcpu, t.vcpu, LOGICAL, t.size, KEY(0));
-> -	DEFAULT_WRITE_READ(t.vcpu, t.vcpu, LOGICAL, t.size, KEY(9));
-> -	DEFAULT_WRITE_READ(t.vcpu, t.vm, ABSOLUTE, t.size, KEY(0));
-> -	DEFAULT_WRITE_READ(t.vcpu, t.vm, ABSOLUTE, t.size, KEY(9));
-> +	default_write_read(t.vcpu, t.vcpu, LOGICAL, t.size, 0);
-> +	default_write_read(t.vcpu, t.vcpu, LOGICAL, t.size, 9);
-> +	default_write_read(t.vcpu, t.vm, ABSOLUTE, t.size, 0);
-> +	default_write_read(t.vcpu, t.vm, ABSOLUTE, t.size, 9);
->  	/*
->  	 * There used to be different code paths for key handling depending on
->  	 * if the region crossed a page boundary.
->  	 * There currently are not, but the more tests the merrier.
->  	 */
-> -	DEFAULT_WRITE_READ(t.vcpu, t.vcpu, LOGICAL, 1, KEY(0));
-> -	DEFAULT_WRITE_READ(t.vcpu, t.vcpu, LOGICAL, 1, KEY(9));
-> -	DEFAULT_WRITE_READ(t.vcpu, t.vm, ABSOLUTE, 1, KEY(0));
-> -	DEFAULT_WRITE_READ(t.vcpu, t.vm, ABSOLUTE, 1, KEY(9));
-> +	default_write_read(t.vcpu, t.vcpu, LOGICAL, 1, 0);
-> +	default_write_read(t.vcpu, t.vcpu, LOGICAL, 1, 9);
-> +	default_write_read(t.vcpu, t.vm, ABSOLUTE, 1, 0);
-> +	default_write_read(t.vcpu, t.vm, ABSOLUTE, 1, 9);
->  
->  	/* vm/vcpu, mismatching keys on read, but no fetch protection */
-> -	DEFAULT_READ(t.vcpu, t.vcpu, LOGICAL, t.size, GADDR_V(mem2), KEY(2));
-> -	DEFAULT_READ(t.vcpu, t.vm, ABSOLUTE, t.size, GADDR_V(mem1), KEY(2));
-> +	default_read(t.vcpu, t.vcpu, LOGICAL, t.size, 2);
-> +	default_read(t.vcpu, t.vm, ABSOLUTE, t.size, 2);
->  
->  	kvm_vm_free(t.kvm_vm);
->  }
-> @@ -409,7 +405,7 @@ static void test_copy_key_storage_prot_override(void)
->  	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
->  
->  	/* vcpu, mismatching keys, storage protection override in effect */
-> -	DEFAULT_WRITE_READ(t.vcpu, t.vcpu, LOGICAL, t.size, KEY(2));
-> +	default_write_read(t.vcpu, t.vcpu, LOGICAL, t.size, 2);
->  
->  	kvm_vm_free(t.kvm_vm);
->  }
-> @@ -422,8 +418,8 @@ static void test_copy_key_fetch_prot(void)
->  	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
->  
->  	/* vm/vcpu, matching key, fetch protection in effect */
-> -	DEFAULT_READ(t.vcpu, t.vcpu, LOGICAL, t.size, GADDR_V(mem2), KEY(9));
-> -	DEFAULT_READ(t.vcpu, t.vm, ABSOLUTE, t.size, GADDR_V(mem2), KEY(9));
-> +	default_read(t.vcpu, t.vcpu, LOGICAL, t.size, 9);
-> +	default_read(t.vcpu, t.vm, ABSOLUTE, t.size, 9);
->  
->  	kvm_vm_free(t.kvm_vm);
->  }
+Thanks much!
+
+--
+Subject: [PATCH] KVM: PPC: Move processor compatibility check to module init
+
+Move KVM PPC's compatibility checks to their respective module_init()
+hooks, there's no need to wait until KVM's common compat check, nor is
+there a need to perform the check on every CPU (provided by common KVM's
+hook).  The compatibility checks are either a nop (Book3S), or simply
+check the CPU name stored in the global CPU spec (e500 and e500mc).
+
+Cc: Fabiano Rosas <farosas@linux.ibm.com>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/powerpc/include/asm/kvm_ppc.h |  1 -
+ arch/powerpc/kvm/book3s.c          | 10 ----------
+ arch/powerpc/kvm/e500.c            |  4 ++--
+ arch/powerpc/kvm/e500mc.c          |  6 +++++-
+ arch/powerpc/kvm/powerpc.c         |  2 +-
+ 5 files changed, 8 insertions(+), 15 deletions(-)
+
+diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+index bfacf12784dd..51a1824b0a16 100644
+--- a/arch/powerpc/include/asm/kvm_ppc.h
++++ b/arch/powerpc/include/asm/kvm_ppc.h
+@@ -118,7 +118,6 @@ extern int kvmppc_xlate(struct kvm_vcpu *vcpu, ulong eaddr,
+ extern int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu);
+ extern void kvmppc_core_vcpu_free(struct kvm_vcpu *vcpu);
+ extern int kvmppc_core_vcpu_setup(struct kvm_vcpu *vcpu);
+-extern int kvmppc_core_check_processor_compat(void);
+ extern int kvmppc_core_vcpu_translate(struct kvm_vcpu *vcpu,
+                                       struct kvm_translation *tr);
+ 
+diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+index 6d525285dbe8..87283a0e33d8 100644
+--- a/arch/powerpc/kvm/book3s.c
++++ b/arch/powerpc/kvm/book3s.c
+@@ -999,16 +999,6 @@ int kvmppc_h_logical_ci_store(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvmppc_h_logical_ci_store);
+ 
+-int kvmppc_core_check_processor_compat(void)
+-{
+-	/*
+-	 * We always return 0 for book3s. We check
+-	 * for compatibility while loading the HV
+-	 * or PR module
+-	 */
+-	return 0;
+-}
+-
+ int kvmppc_book3s_hcall_implemented(struct kvm *kvm, unsigned long hcall)
+ {
+ 	return kvm->arch.kvm_ops->hcall_implemented(hcall);
+diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
+index c8b2b4478545..0ea61190ec04 100644
+--- a/arch/powerpc/kvm/e500.c
++++ b/arch/powerpc/kvm/e500.c
+@@ -314,7 +314,7 @@ static void kvmppc_core_vcpu_put_e500(struct kvm_vcpu *vcpu)
+ 	kvmppc_booke_vcpu_put(vcpu);
+ }
+ 
+-int kvmppc_core_check_processor_compat(void)
++static int kvmppc_e500_check_processor_compat(void)
+ {
+ 	int r;
+ 
+@@ -507,7 +507,7 @@ static int __init kvmppc_e500_init(void)
+ 	unsigned long handler_len;
+ 	unsigned long max_ivor = 0;
+ 
+-	r = kvmppc_core_check_processor_compat();
++	r = kvmppc_e500_check_processor_compat();
+ 	if (r)
+ 		goto err_out;
+ 
+diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
+index 57e0ad6a2ca3..4564aa27edcf 100644
+--- a/arch/powerpc/kvm/e500mc.c
++++ b/arch/powerpc/kvm/e500mc.c
+@@ -168,7 +168,7 @@ static void kvmppc_core_vcpu_put_e500mc(struct kvm_vcpu *vcpu)
+ 	kvmppc_booke_vcpu_put(vcpu);
+ }
+ 
+-int kvmppc_core_check_processor_compat(void)
++int kvmppc_e500mc_check_processor_compat(void)
+ {
+ 	int r;
+ 
+@@ -388,6 +388,10 @@ static int __init kvmppc_e500mc_init(void)
+ {
+ 	int r;
+ 
++	r = kvmppc_e500mc_check_processor_compat();
++	if (r)
++		goto err_out;
++
+ 	r = kvmppc_booke_init();
+ 	if (r)
+ 		goto err_out;
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 5faf69421f13..d44b85ba8cef 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -442,7 +442,7 @@ int kvm_arch_hardware_enable(void)
+ 
+ int kvm_arch_check_processor_compat(void *opaque)
+ {
+-	return kvmppc_core_check_processor_compat();
++	return 0;
+ }
+ 
+ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+
+base-commit: 00e4493db7c6163d48d5b45034d1a77e16a1c8dc
+-- 
 
