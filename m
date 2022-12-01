@@ -2,223 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C14563F477
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 16:47:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C417A63F490
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 16:55:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231975AbiLAPrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 10:47:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60158 "EHLO
+        id S232048AbiLAPz6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 10:55:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231929AbiLAPrA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 10:47:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD648AE52
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 07:46:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669909559;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zXP0UHbjB4gS30fO8iLIvs/Qipsj+EODVXd3Gmy47d0=;
-        b=Zw4a/pyUq8zeLD7dQsGB14/GaA/J4Z3uFGWdArRsYYPIJKXq7Hf64zNwkkY2nN7n43ukQC
-        100QDe4lo2BgBO43scEVeJk7ywQU9pDQi+lGfgllUCeJCu4tZESQxBej9oAFjmAr9c4elS
-        oruX40y+EMtDQRocmFm756etaRGf4wo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-161-BBEZ5xw_PuWZNkm-dt0ykQ-1; Thu, 01 Dec 2022 10:45:56 -0500
-X-MC-Unique: BBEZ5xw_PuWZNkm-dt0ykQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 074E4101A52A;
-        Thu,  1 Dec 2022 15:45:56 +0000 (UTC)
-Received: from starship (unknown [10.35.206.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 85DCB40C8459;
-        Thu,  1 Dec 2022 15:45:53 +0000 (UTC)
-Message-ID: <00a73e8046d4ce1597b2bc0e331e6bf668d8c98d.camel@redhat.com>
-Subject: Re: [PATCH] KVM: X86: set EXITING_GUEST_MODE as soon as vCPU exits
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Jon Kohler <jon@nutanix.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Date:   Thu, 01 Dec 2022 17:45:52 +0200
-In-Reply-To: <E3693FA8-7818-495B-9F40-42AEEE756142@nutanix.com>
-References: <20221129182226.82087-1-jon@nutanix.com>
-         <5162c4cbaaae8de01c77093ac005c2f5abc1d040.camel@redhat.com>
-         <E3693FA8-7818-495B-9F40-42AEEE756142@nutanix.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S231602AbiLAPzw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 10:55:52 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04852B3907
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 07:55:49 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B1FsukP029613
+        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 15:55:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : cc :
+ subject : from : to : message-id : date; s=pp1;
+ bh=J0k4iJ+zd3fcwJZ0bxH4A50UxCU4boLYDlTvPts4hQE=;
+ b=AsV8gK8Mwf7XrV5ZgqjpXCHX2Mm1gGyfLKCJjYprhp1UYJtWdWZyBXC5yyMIJu9aU3Rd
+ GWBmmSMcFhyXWvY9W+5UhAiReBxL2fUSas5jC5xjpCRfn47Ya329bQBR2I/vSJBCdO9C
+ bBzNsphTGVBEnsArBsJgjGJ8umnGsU37OdLP2rdD3GQeIYAs18Jg6qxlacjpN6+iN0Ec
+ +Vguz/tKVCDyNrkikkG3c9et9Y2GlHekgkfzVkb5RAYkHFvppht0AUObbsYhuwniYCJN
+ VRaoPGNXMZ/9ddrb/Sx2Ebf+bqzAAtDIw4Ez1nQqnRCb6664l9by711URK5jtXzZ1cng RQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6yayg0j0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 15:55:49 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B1FtD9f031235
+        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 15:55:48 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6yayg0hm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Dec 2022 15:55:48 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B1Fnwrm020562;
+        Thu, 1 Dec 2022 15:55:46 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 3m3ae9fkvc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Dec 2022 15:55:46 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B1FnBks7078544
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 1 Dec 2022 15:49:11 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5B4E442045;
+        Thu,  1 Dec 2022 15:55:43 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 36CFE4203F;
+        Thu,  1 Dec 2022 15:55:43 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.4.226])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  1 Dec 2022 15:55:43 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20221201141650.32cfe787@p-imbrenda>
+References: <20221201084642.3747014-1-nrb@linux.ibm.com> <20221201084642.3747014-2-nrb@linux.ibm.com> <20221201141650.32cfe787@p-imbrenda>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com,
+        pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/3] s390x: add library for skey-related functions
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Message-ID: <166991014258.186408.12012997417078839512@t14-nrb.local>
+User-Agent: alot/0.8.1
+Date:   Thu, 01 Dec 2022 16:55:42 +0100
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: vkvnKyL2PkbTOTVeqYYNvHnIUmyyjZJY
+X-Proofpoint-ORIG-GUID: d_3x4N1ttFIRwtbdCatRO1GciKURysnf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-01_11,2022-12-01_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ malwarescore=0 suspectscore=0 bulkscore=0 impostorscore=0
+ lowpriorityscore=0 adultscore=0 priorityscore=1501 spamscore=0
+ mlxlogscore=999 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2210170000 definitions=main-2212010113
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-11-29 at 19:56 +0000, Jon Kohler wrote:
-> > On Nov 29, 2022, at 2:47 PM, Maxim Levitsky <mlevitsk@redhat.com> wrote:
-> > 
-> > On Tue, 2022-11-29 at 13:22 -0500, Jon Kohler wrote:
-> > > Set vcpu->mode to EXITING_GUEST_MODE as soon vCPU exits to reflect
-> > > that we are indeed exiting guest mode, but not quite out of guest
-> > > mode yet. Note: This is done lazily without an explicit memory
-> > > barrier so that we do not regress the cost in the critical path
-> > > of going from the exit to the exit handler.
-> > > 
-> > > Flip back to IN_GUEST_MODE for exits that use
-> > > EXIT_FASTPATH_REENTER_GUEST, such that we are IN_GUEST_MODE upon
-> > > reentry.
-> > > 
-> > > Changing vcpu->mode away from IN_GUEST_MODE as early as possible
-> > > gives IPI senders as much runway as possible to avoid ringing
-> > > doorbell or sending posted interrupt IPI in AMD and Intel,
-> > > respectively. Since this is done without an explicit memory
-> > > barrier, the worst case is that the IPI sender sees IN_GUEST_MODE
-> > > still and sends a spurious event, which is the behavior prior
-> > > to this patch.
-> > 
-> > Beware that we had a king sized bug in regard to AVIC inhibition races
-> > vs guest entries, this this should be carefully checked for this.
-> 
-> Thanks, Maxim - any pointers on what we should be looking for here?
+Quoting Claudio Imbrenda (2022-12-01 14:16:50)
+> On Thu,  1 Dec 2022 09:46:40 +0100
+> Nico Boehr <nrb@linux.ibm.com> wrote:
+[...]
+> > diff --git a/lib/s390x/skey.c b/lib/s390x/skey.c
+> > new file mode 100644
+> > index 000000000000..100f0949a244
+[...]
+> > +/*
+> > + * Set storage keys on pagebuf.
+>=20
+> surely you should explain better what the function does (e.g. how are
+> you setting the keys and why)
 
-I need to swap the whole thing in to be able to comment on this one.
-I'll do this next week.
+Well there is the comment below which explains why the * 2 is needed, so wh=
+at
+about this paragraph (after merging the commits as discussed before):
 
-Overall the problem is that the target vCPU can inhibit its AVIC at any moment,
-which forces the senders to use normal KVM_REQ_EVENT + vcpu kick to deliver
-it the interrupt. It is very racy.
+    * Each page's storage key is generated by taking the page's index in pa=
+gebuf,
+    * XOR-ing that with the given seed and then multipling the result with =
+two.
 
-The only other pointer I can recall now is the code at 'svm_complete_interrupt_delivery'
+(But really that's also easy to see from the code below, so I am not sure if
+this really adds value.)
 
-Best regards,
-	Maxim Levitsky
+> > + * pagebuf must point to page_count consecutive pages.
+> > + */
+> > +void skey_set_keys(uint8_t *pagebuf, unsigned long page_count)
+>=20
+> this name does not make clear what the function is doing. at first one
+> would think that it sets the same key for all pages.
+>=20
+> maybe something like set_storage_keys_test_pattern or
+> skey_set_test_pattern or something like that
 
-> 
-> > Also, do you have any perf numbers to see if that actually improves performance?
-> > (I am just curious, I do think that this can improve performance).
-> > 
-> 
-> Yes indeed! Sorry I should have put that right in the commit msg as a note,
-> but using the kvm-unit-tests vmexit_ipi with -smp 20 on an Intel 8168 its
-> roughly ~3% better (~3325-ish vs ~3400-ish), though the test is a bit noisy
-> even with taskset to a single socket.
-> 
-> To help validate that we were even getting *any* benefit, in a local build
-> I added a log statement (rough code below) to IPI delivery path, and did see 
-> many, many IPIs getting suppressed that would have otherwise fired.
-> 
-> kvm_vcpu_trigger_posted_interrupt() {
-> ...
->     if (vcpu->mode == EXITING_GUEST_MODE) {
->         pr_warn_ratelimited("exiting suppression worked");
->     }
-> ...
-> }
-> 
-> > Best regards,
-> > 	Maxim Levitsky
-> > 
-> > 
-> > > Signed-off-by: Jon Kohler <jon@nutanix.com>
-> > > ---
-> > > arch/x86/kvm/svm/svm.c |  7 +++++++
-> > > arch/x86/kvm/vmx/vmx.c | 23 +++++++++++++++++++++++
-> > > arch/x86/kvm/x86.c     |  8 ++++++++
-> > > 3 files changed, 38 insertions(+)
-> > > 
-> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > > index ce362e88a567..5f0c118a3ffd 100644
-> > > --- a/arch/x86/kvm/svm/svm.c
-> > > +++ b/arch/x86/kvm/svm/svm.c
-> > > @@ -3907,6 +3907,13 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu, bool spec_ctrl_in
-> > > 	else
-> > > 		__svm_vcpu_run(svm, spec_ctrl_intercepted);
-> > > 
-> > > +	/* Optimize IPI reduction by setting mode immediately after vmexit
-> > > +	 * without a memmory barrier as this as not paired anywhere. vcpu->mode
-> > > +	 * is will be set to OUTSIDE_GUEST_MODE in x86 common code with a memory
-> > > +	 * barrier, after the host is done fully restoring various host states.
-> > > +	 */
-> > > +	vcpu->mode = EXITING_GUEST_MODE;
-> > > +
-> > > 	guest_state_exit_irqoff();
-> > > }
-> > > 
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index 63247c57c72c..243dcb87c727 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -5878,6 +5878,17 @@ static fastpath_t handle_fastpath_preemption_timer(struct kvm_vcpu *vcpu)
-> > > 
-> > > 	if (!vmx->req_immediate_exit &&
-> > > 	    !unlikely(vmx->loaded_vmcs->hv_timer_soft_disabled)) {
-> > > +		/* Reset IN_GUEST_MODE since we're going to reenter
-> > > +		 * guest as part of this fast path. This is done as
-> > > +		 * an optimization without a memory barrier since
-> > > +		 * EXITING_GUEST_MODE is also set without a memory
-> > > +		 * barrier. This also needs to be reset prior to
-> > > +		 * calling apic_timer_expired() so that
-> > > +		 * kvm_use_posted_timer_interrupt() returns the proper
-> > > +		 * value.
-> > > +		 */
-> > > +		if (vcpu->mode == EXITING_GUEST_MODE)
-> > > +			vcpu->mode = IN_GUEST_MODE;
-> > > 		kvm_lapic_expired_hv_timer(vcpu);
-> > > 		return EXIT_FASTPATH_REENTER_GUEST;
-> > > 	}
-> > > @@ -7031,6 +7042,18 @@ void noinstr vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
-> > > void noinstr vmx_spec_ctrl_restore_host(struct vcpu_vmx *vmx,
-> > > 					unsigned int flags)
-> > > {
-> > > +	struct kvm_vcpu *vcpu = &vmx->vcpu;
-> > > +
-> > > +	/* Optimize IPI reduction by setting mode immediately after vmexit
-> > > +	 * without a memmory barrier as this as not paired anywhere. vcpu->mode
-> > > +	 * is will be set to OUTSIDE_GUEST_MODE in x86 common code with a memory
-> > > +	 * barrier, after the host is done fully restoring various host states.
-> > > +	 * Since the rdmsr and wrmsr below are expensive, this must be done
-> > > +	 * first, so that the IPI suppression window covers the time dealing
-> > > +	 * with fixing up SPEC_CTRL.
-> > > +	 */
-> > > +	vcpu->mode = EXITING_GUEST_MODE;
-> > > +
-> > > 	u64 hostval = this_cpu_read(x86_spec_ctrl_current);
-> > > 
-> > > 	if (!cpu_feature_enabled(X86_FEATURE_MSR_SPEC_CTRL))
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index 2835bd796639..0e0d228f3fa5 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -2160,6 +2160,14 @@ fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu)
-> > > 		data = kvm_read_edx_eax(vcpu);
-> > > 		if (!handle_fastpath_set_tscdeadline(vcpu, data)) {
-> > > 			kvm_skip_emulated_instruction(vcpu);
-> > > +			/* Reset IN_GUEST_MODE since we're going to reenter
-> > > +			 * guest as part of this fast path. This is done as
-> > > +			 * an optimization without a memory barrier since
-> > > +			 * EXITING_GUEST_MODE is also set without a memory
-> > > +			 * barrier.
-> > > +			 */
-> > > +			if (vcpu->mode == EXITING_GUEST_MODE)
-> > > +				vcpu->mode = IN_GUEST_MODE;
-> > > 			ret = EXIT_FASTPATH_REENTER_GUEST;
-> > > 		}
-> > > 		break;
+Oh that's a nice suggestion, thanks.
 
+>=20
+> > +{
+> > +     unsigned char key_to_set;
+> > +     unsigned long i;
+> > +
+> > +     for (i =3D 0; i < page_count; i++) {
+> > +             /*
+> > +              * Storage keys are 7 bit, lowest bit is always returned =
+as zero
+> > +              * by iske.
+> > +              * This loop will set all 7 bits which means we set fetch
+> > +              * protection as well as reference and change indication =
+for
+> > +              * some keys.
+> > +              */
+> > +             key_to_set =3D i * 2;
+> > +             set_storage_key(pagebuf + i * PAGE_SIZE, key_to_set, 1);
+>=20
+> why not just i * 2 instead of using key_to_set ?
 
+Well you answered that yourself :)
+
+In patch 2, the key_to_set expression becomes a bit more complex, so the ex=
+tra
+variable makes sense to me.
