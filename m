@@ -2,324 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C59063F992
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 22:11:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5724863FA31
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 23:01:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230352AbiLAVLU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 16:11:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33168 "EHLO
+        id S230494AbiLAWAc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 17:00:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229967AbiLAVLS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 16:11:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D098BEE1C
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 13:10:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669929018;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8ZG3sGb+U+LRPySnTCOGhSvzYDNSfM2+mgL0KXCWRaI=;
-        b=FDX0TcJyUoNMBKTxRR5ZB+neCtUIBbG0etmoJItq6LtUF/KEk2CpRSCE+SrcpE99NNaxnp
-        6zwxI86bmFphP9FbIy+wo8CM+9nBtLW4Lv5vs4layhfj+iGoW2URu0FIM+s3iWGJHTSzM1
-        Pr2pxv53sT5GGCGnTGK36HwPE7fAReE=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-500-EWs0dOUzOAGvLTtM9Q5WjQ-1; Thu, 01 Dec 2022 16:10:17 -0500
-X-MC-Unique: EWs0dOUzOAGvLTtM9Q5WjQ-1
-Received: by mail-il1-f199.google.com with SMTP id n10-20020a056e02140a00b00302aa23f73fso3207618ilo.20
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 13:10:17 -0800 (PST)
+        with ESMTP id S230352AbiLAWAU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 17:00:20 -0500
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9288EC3FFD
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 14:00:18 -0800 (PST)
+Received: by mail-wm1-x32a.google.com with SMTP id h4-20020a1c2104000000b003d0760654d3so3683194wmh.4
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 14:00:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QIafPhFD9IJ7Ly0CwNSGH3i2Rs4yyu6nN9+ipEhZh0A=;
+        b=jjyByQFW3CViXa2XSpO0S5OezirA8iriSGyNq1Emb3eAjXPvAcs8h/qhWZvQRHrkM7
+         E4yO5aU5oCECenX1ChS/eFoKmPv0xbsgDyU0kSVTl00jl03ZBLNhtOgaVKcwhuzhfB8T
+         N7R+KHdaQ76bY3Z76ec67H1IKhJ28BX8clWmhefVQ98++dEoXnF5l49Qy+3a5Cak9CFt
+         EIL7cmRV6y+1rtO82GUIbFuUYJjyYdwwYbZEtJNme41VeTXnC4oIE2dnPOWtcMsSXZFG
+         q6jTLuz1FCKKC86LuPzjUTBAJLTqeyAPRmVpOXM4szcQvlKMGYRA5VkbQrYDVl2oy6Mj
+         mCEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8ZG3sGb+U+LRPySnTCOGhSvzYDNSfM2+mgL0KXCWRaI=;
-        b=0Hb7glq3ltN25NCQKxBHN1yhIqCjrtPNu0nRgirDeF+ysQepp8kmWVp+kcCtcC00Oq
-         HcHP8+vICFupw6xRGE07moiB32fjF4dQHGdTgM5ufeC6YsKh3bVylsDivi2lOZHjU2Qd
-         Hecs7RpxNZ/1SULOXsfwHQ4soRVgV60h6VN3Tg/2pkSV2+yfRZeYfJNSR2ekJ6MKePay
-         afY7N8IMn5y62uJgOGA4qhKguB2EqDWBIkWiX9Kno5vn5/lEfTpyOv1e5743EEC9Luvv
-         cWjKPO+r49HkVnRhDugXsxHlwRpSGydV7m/1v4Fm0IxEg4oNWZwonl1lVh8D7DRV8nW9
-         D13Q==
-X-Gm-Message-State: ANoB5plb/lgX7y9r7uUOXn04m/Vo4uhibxe8RBJQAyZPcwPjzwvVdwUA
-        8wdZWm5kWvHRREBPp9NDsGMR5HhQCwc2BKZdbVJpcV1lX5Y3z4u6vvPDbP/p5ek1duxJZfy6Ke7
-        MxDUp9EbbDva1
-X-Received: by 2002:a05:6638:164a:b0:389:d66d:c049 with SMTP id a10-20020a056638164a00b00389d66dc049mr13199708jat.195.1669929015968;
-        Thu, 01 Dec 2022 13:10:15 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4pKQqQjhRn0EcxfBEEp7y59Lnpk5P4WU8x8eOLVuwJfOHGMDoPHk+gJpm8IWwvfwF2WWMSjA==
-X-Received: by 2002:a05:6638:164a:b0:389:d66d:c049 with SMTP id a10-20020a056638164a00b00389d66dc049mr13199696jat.195.1669929015701;
-        Thu, 01 Dec 2022 13:10:15 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id g12-20020a056602072c00b006cab79c4214sm1963330iox.46.2022.12.01.13.10.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Dec 2022 13:10:14 -0800 (PST)
-Date:   Thu, 1 Dec 2022 14:10:13 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     ruanjinjie <ruanjinjie@huawei.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "kraxel@redhat.com" <kraxel@redhat.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>
-Subject: Re: [PATCH] vfio/mdev: fix possible memory leak in module init
- funcs
-Message-ID: <20221201141013.68d2b0cf.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB5276BC0B7E656465950E3A558C149@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20221118032827.3725190-1-ruanjinjie@huawei.com>
-        <20221130160622.0cf3e47d.alex.williamson@redhat.com>
-        <BN9PR11MB5276BC0B7E656465950E3A558C149@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QIafPhFD9IJ7Ly0CwNSGH3i2Rs4yyu6nN9+ipEhZh0A=;
+        b=C325KX0zjhL3st5LvNH/dYQWjxAkr8B4zWcCHy0xfFmfIsuHvA3Pd7ZacQ80rPghK3
+         8i45MG97u3kCcHXwvwQKkoEa6M55KsLhK4seQtX7iF/Q0+P6sWXOaekToBOlPmL9/5yI
+         gnS9FCojQnDV3gIj6pIsy+9KHaUEq96idvWy+FToFjQzxdsPjd5I7jWiVJ7YmmoswnOO
+         G1hiXbjkgY+lzHZI95cy+c65QxA+6i/zAPb1mizRDcxsVzF3v5v+9XtMzUkPGvHu5kFP
+         3236TqJUBraOCN/qPrvj9T3D7myvDmDtrVXSyzYoEywPZk9gyzWdSCeVeUlBmWSUFRNy
+         40sA==
+X-Gm-Message-State: ANoB5pnG+x6CRBLgkLniNh6xp50hVt/aIpItwCdt0u6AhAYQVecK2yR/
+        FhNe+Wy5PfbRe1jHOD2fpFNXuw==
+X-Google-Smtp-Source: AA0mqf6xx+vYTMkMQZD2sUVXTGHs5cp2mVsSPKIbRGdbGqnCPXkM+pX1knRmP86IOvF6J1/cipiL/g==
+X-Received: by 2002:a05:600c:3495:b0:3cf:ae53:918f with SMTP id a21-20020a05600c349500b003cfae53918fmr38954917wmq.131.1669932017038;
+        Thu, 01 Dec 2022 14:00:17 -0800 (PST)
+Received: from [192.168.1.115] ([185.126.107.38])
+        by smtp.gmail.com with ESMTPSA id k12-20020adfe8cc000000b00241b5af8697sm5556585wrn.85.2022.12.01.14.00.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Dec 2022 14:00:16 -0800 (PST)
+Message-ID: <beb697c2-dfad-780e-4638-76b229f28731@linaro.org>
+Date:   Thu, 1 Dec 2022 23:00:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.5.0
+Subject: Re: [PATCH v2 21/50] KVM: MIPS: Hardcode callbacks to hardware
+ virtualization extensions
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Paul Durrant <paul@xen.org>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Atish Patra <atishp@atishpatra.org>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Yuan Yao <yuan.yao@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20221130230934.1014142-1-seanjc@google.com>
+ <20221130230934.1014142-22-seanjc@google.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <20221130230934.1014142-22-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 1 Dec 2022 02:00:57 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On 1/12/22 00:09, Sean Christopherson wrote:
+> Now that KVM no longer supports trap-and-emulate (see commit 45c7e8af4a5e
+> "MIPS: Remove KVM_TE support"), hardcode the MIPS callbacks to the
+> virtualization callbacks.
+> 
+> Harcoding the callbacks eliminates the technically-unnecessary check on
+> non-NULL kvm_mips_callbacks in kvm_arch_init().  MIPS has never supported
+> multiple in-tree modules, i.e. barring an out-of-tree module, where
+> copying and renaming kvm.ko counts as "out-of-tree", KVM could never
+> encounter a non-NULL set of callbacks during module init.
+> 
+> The callback check is also subtly broken, as it is not thread safe,
+> i.e. if there were multiple modules, loading both concurrently would
+> create a race between checking and setting kvm_mips_callbacks.
+> 
+> Given that out-of-tree shenanigans are not the kernel's responsibility,
+> hardcode the callbacks to simplify the code.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/mips/include/asm/kvm_host.h |  2 +-
+>   arch/mips/kvm/Makefile           |  2 +-
+>   arch/mips/kvm/callback.c         | 14 --------------
+>   arch/mips/kvm/mips.c             |  9 ++-------
+>   arch/mips/kvm/vz.c               |  7 ++++---
+>   5 files changed, 8 insertions(+), 26 deletions(-)
+>   delete mode 100644 arch/mips/kvm/callback.c
+> 
+> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+> index 28f0ba97db71..2803c9c21ef9 100644
+> --- a/arch/mips/include/asm/kvm_host.h
+> +++ b/arch/mips/include/asm/kvm_host.h
+> @@ -758,7 +758,7 @@ struct kvm_mips_callbacks {
+>   	void (*vcpu_reenter)(struct kvm_vcpu *vcpu);
+>   };
+>   extern struct kvm_mips_callbacks *kvm_mips_callbacks;
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Thursday, December 1, 2022 7:06 AM
-> > 
-> > [Cc +vfio-ap, vfio-ccw]
-> > 
-> > On Fri, 18 Nov 2022 11:28:27 +0800
-> > ruanjinjie <ruanjinjie@huawei.com> wrote:
-> >   
-> > > Inject fault while probing module, if device_register() fails,
-> > > but the refcount of kobject is not decreased to 0, the name
-> > > allocated in dev_set_name() is leaked. Fix this by calling
-> > > put_device(), so that name can be freed in callback function
-> > > kobject_cleanup().  
-> 
-> It's not just about the name. The problem of kboject not being
-> released is a bigger one.
-> 
-> put_device() is always required no matter device_register()
-> succeeds or not:
-> 
-> * NOTE: _Never_ directly free @dev after calling this function, even
->  * if it returned an error! Always use put_device() to give up the
->  * reference initialized in this function instead.
->  */
-> int device_register(struct device *dev)
-> 
-> > > @@ -1430,8 +1430,10 @@ static int __init mbochs_dev_init(void)
-> > >  	dev_set_name(&mbochs_dev, "%s", MBOCHS_NAME);
-> > >
-> > >  	ret = device_register(&mbochs_dev);
-> > > -	if (ret)
-> > > +	if (ret) {
-> > > +		put_device(&mbochs_dev);
-> > >  		goto err_class;
-> > > +	}
-> > >
-> > >  	ret = mdev_register_parent(&mbochs_parent, &mbochs_dev,  
-> > &mbochs_driver,  
-> > >  				   mbochs_mdev_types,  
-> > 
-> > 
-> > vfio-ap has a similar unwind as the sample drivers, but actually makes
-> > an attempt to catch this ex:
-> > 
-> > 	...
-> >         ret = device_register(&matrix_dev->device);
-> >         if (ret)
-> >                 goto matrix_reg_err;
-> > 
-> >         ret = driver_register(&matrix_driver);
-> >         if (ret)
-> >                 goto matrix_drv_err;
-> > 
-> >         return 0;
-> > 
-> > matrix_drv_err:
-> >         device_unregister(&matrix_dev->device);
-> > matrix_reg_err:
-> >         put_device(&matrix_dev->device);
-> > 	...
-> > 
-> > So of the vfio drivers calling device_register(), vfio-ap is the only
-> > one that does a put_device() if device_register() fails, but it also
-> > seems sketchy to call both device_unregister() and put_device() in the
-> > case that we exit via matrix_drv_err.
-> > 
-> > I wonder if all of these shouldn't adopt a flow like:
-> > 
-> > 	ret = device_register(&dev);
-> > 	if (ret)
-> > 		goto err1;
-> > 
-> > 	....
-> > 
-> > 	return 0;
-> > 
-> > err2:
-> > 	device_del(&dev);
-> > err1:
-> > 	put_device(&dev);
-> >   
-> 
-> It's kind of a mixed model.
-> 
-> With above unwind it's clearer to use device_initialize() and device_add() instead.
+IIUC we could even constify this pointer.
 
-That would go against the comment for device_register() recommending
-that device_initialize() and device_add() should only be called
-separately if we have a clearly defined need.  I can only imagine a
-patch bot would quickly come along to rectify the situation if we
-simply open code device_register() for aesthetics.  I don't see that
-splitting device_unregister() for the purpose of having a common unwind
-path necessitates any changes relative to device_register().
+Anyway,
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-> Otherwise what this patch does looks better IMHO:
-> 
-> 	ret = device_register(&dev);
-> 	if (ret) {
-> 		put_device(&dev);
-> 		goto err1;
-> 	}
-> 
-> 	...
-> 
-> 	return 0;
-> 
-> err2:
-> 	device_unregister(&dev);
-> err1:
-> 	earlier_unwind();
-> 
-
-This is essentially what was originally proposed.  It could also be
-called a "mixed model", implementing part of the unwind in the error
-branch before jumping to the common unwind.  As demonstrated below,
-every current vfio driver calling device_register() follows a similar
-goto unwind stack as found in the sample drivers, which makes it
-trivially easy to split the device_unregister() call and add a goto
-target in between.
-
-Either way, they're equivalent and I'll take whichever version
-addresses all the vfio related use cases and gets acks from their
-maintainers.  Thanks,
-
-Alex
-
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index c2a65808605a..54aba7cceb33 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -199,8 +199,9 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
- 	return 0;
- 
- out_unreg:
--	device_unregister(&parent->dev);
-+	device_del(&parent->dev);
- out_free:
-+	put_device(&parent->dev);
- 	dev_set_drvdata(&sch->dev, NULL);
- 	return ret;
- }
-diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
-index f43cfeabd2cc..997b524bdd2b 100644
---- a/drivers/s390/crypto/vfio_ap_drv.c
-+++ b/drivers/s390/crypto/vfio_ap_drv.c
-@@ -122,7 +122,7 @@ static int vfio_ap_matrix_dev_create(void)
- 	return 0;
- 
- matrix_drv_err:
--	device_unregister(&matrix_dev->device);
-+	device_del(&matrix_dev->device);
- matrix_reg_err:
- 	put_device(&matrix_dev->device);
- matrix_alloc_err:
-diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-index 8b5a3a778a25..e54eb752e1ba 100644
---- a/samples/vfio-mdev/mbochs.c
-+++ b/samples/vfio-mdev/mbochs.c
-@@ -1430,7 +1430,7 @@ static int __init mbochs_dev_init(void)
- 
- 	ret = device_register(&mbochs_dev);
- 	if (ret)
--		goto err_class;
-+		goto err_put;
- 
- 	ret = mdev_register_parent(&mbochs_parent, &mbochs_dev, &mbochs_driver,
- 				   mbochs_mdev_types,
-@@ -1441,8 +1441,9 @@ static int __init mbochs_dev_init(void)
- 	return 0;
- 
- err_device:
--	device_unregister(&mbochs_dev);
--err_class:
-+	device_del(&mbochs_dev);
-+err_put:
-+	put_device(&mbochs_dev);
- 	class_destroy(mbochs_class);
- err_driver:
- 	mdev_unregister_driver(&mbochs_driver);
-diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
-index 721fb06c6413..e8400fdab71d 100644
---- a/samples/vfio-mdev/mdpy.c
-+++ b/samples/vfio-mdev/mdpy.c
-@@ -717,7 +717,7 @@ static int __init mdpy_dev_init(void)
- 
- 	ret = device_register(&mdpy_dev);
- 	if (ret)
--		goto err_class;
-+		goto err_put;
- 
- 	ret = mdev_register_parent(&mdpy_parent, &mdpy_dev, &mdpy_driver,
- 				   mdpy_mdev_types,
-@@ -728,8 +728,9 @@ static int __init mdpy_dev_init(void)
- 	return 0;
- 
- err_device:
--	device_unregister(&mdpy_dev);
--err_class:
-+	device_del(&mdpy_dev);
-+err_put:
-+	put_device(&mdpy_dev);
- 	class_destroy(mdpy_class);
- err_driver:
- 	mdev_unregister_driver(&mdpy_driver);
-diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
-index 3c2a421b9b69..e887de672c52 100644
---- a/samples/vfio-mdev/mtty.c
-+++ b/samples/vfio-mdev/mtty.c
-@@ -1330,7 +1330,7 @@ static int __init mtty_dev_init(void)
- 
- 	ret = device_register(&mtty_dev.dev);
- 	if (ret)
--		goto err_class;
-+		goto err_put;
- 
- 	ret = mdev_register_parent(&mtty_dev.parent, &mtty_dev.dev,
- 				   &mtty_driver, mtty_mdev_types,
-@@ -1340,8 +1340,9 @@ static int __init mtty_dev_init(void)
- 	return 0;
- 
- err_device:
--	device_unregister(&mtty_dev.dev);
--err_class:
-+	device_del(&mtty_dev.dev);
-+err_put:
-+	put_device(&mtty_dev.dev);
- 	class_destroy(mtty_dev.vd_class);
- err_driver:
- 	mdev_unregister_driver(&mtty_driver);
-
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index af29490d9740..f0a6c245d1ff 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -1012,17 +1012,12 @@ long kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>   
+>   int kvm_arch_init(void *opaque)
+>   {
+> -	if (kvm_mips_callbacks) {
+> -		kvm_err("kvm: module already exists\n");
+> -		return -EEXIST;
+> -	}
+> -
+> -	return kvm_mips_emulation_init(&kvm_mips_callbacks);
+> +	return kvm_mips_emulation_init();
+>   }
+>   
+>   void kvm_arch_exit(void)
+>   {
+> -	kvm_mips_callbacks = NULL;
+> +
+>   }
+>   
+>   int kvm_arch_vcpu_ioctl_get_sregs(struct kvm_vcpu *vcpu,
+> diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
+> index c706f5890a05..dafab003ea0d 100644
+> --- a/arch/mips/kvm/vz.c
+> +++ b/arch/mips/kvm/vz.c
+> @@ -3304,7 +3304,10 @@ static struct kvm_mips_callbacks kvm_vz_callbacks = {
+>   	.vcpu_reenter = kvm_vz_vcpu_reenter,
+>   };
+>   
+> -int kvm_mips_emulation_init(struct kvm_mips_callbacks **install_callbacks)
+> +/* FIXME: Get rid of the callbacks now that trap-and-emulate is gone. */
+> +struct kvm_mips_callbacks *kvm_mips_callbacks = &kvm_vz_callbacks;
