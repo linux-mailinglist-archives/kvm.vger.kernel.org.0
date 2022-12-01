@@ -2,213 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A2C063EB84
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 09:48:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36E5263EB87
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 09:48:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbiLAIsA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 03:48:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43696 "EHLO
+        id S229986AbiLAIsM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 03:48:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229741AbiLAIr2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 03:47:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC8461A07E
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 00:45:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669884319;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=W30ub+31ugHFrai3M+pIk2IMe4pwCCCPHsxniWlqoNA=;
-        b=HeAlwpV7++11vs9eWOZQ1I5lWkCo7wGN1W0SOU2yMnGgbGLptQWUYLwP1n0YY3EtaQtrsR
-        Emo8VEvrC48IUkGVc4wcK/5blzJcg0FHWRTDotMrJl+GoAboBd6bL8Wq1I3u6SWg65bi5E
-        VfZr3kw0MaGNs0DU5zNWmttP5/nqaDY=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-594-crNGBmYSOpePyhH3fa7LJg-1; Thu, 01 Dec 2022 03:45:18 -0500
-X-MC-Unique: crNGBmYSOpePyhH3fa7LJg-1
-Received: by mail-oi1-f199.google.com with SMTP id p133-20020acaf18b000000b0035b236c8554so780706oih.15
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 00:45:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W30ub+31ugHFrai3M+pIk2IMe4pwCCCPHsxniWlqoNA=;
-        b=7puovtHu9jDzeT8+XjHCwXCutb/xjrRsYErxmfS0jWC6nYUHBol8EMz82Gw21nOYYE
-         yRhxVINLBFHuH1GQPIPRv/PBDzqPmrEnTh3PDo0EKrLB82vZn0kDEYKVoDpV19SplSvF
-         JvoiNwRUCpUArLIfmgoFyZp4So6oLCdaIE7/3weegtyWVDz2YvxgQwiW2MB0VlIOwMy7
-         dX4RLjjJF24HOT5Z0KnbDoyaFJCukjf9Le70y/YtaEE5oiplLcdoq2PG7ZCVjWp+7t8/
-         ruy5DGYpk9UC4WZhxAlQ1z4lBeNznQeJQit9WEk0zKH40K1a3mbi0QmBrnd42cZiJZOu
-         jdVQ==
-X-Gm-Message-State: ANoB5pl9zoo+Ym0PnQsXb7WpnNYOI/RGvooHDj5vuKhStgqT8crLKvWg
-        L0edyqLaMtPP9+93EdHDwsiVHSVLN7SzKQunlZ46F7jFY4L5L5fRD3Orv+RZVbQ0/Ui+GsoBirR
-        bNFK7niGeK2V82eD1LqXLyr+fNMGy
-X-Received: by 2002:a9d:61ca:0:b0:66e:6d59:b2df with SMTP id h10-20020a9d61ca000000b0066e6d59b2dfmr2780190otk.201.1669884317495;
-        Thu, 01 Dec 2022 00:45:17 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf72xmd65QOUsfdxu+pwjZ4+Fr/69ptUR/h6mPkJMTebq5U3v8/IId5vnkEpyOCm6nZ0bdiixncWk1CeQpooN1c=
-X-Received: by 2002:a9d:61ca:0:b0:66e:6d59:b2df with SMTP id
- h10-20020a9d61ca000000b0066e6d59b2dfmr2780180otk.201.1669884317289; Thu, 01
- Dec 2022 00:45:17 -0800 (PST)
+        with ESMTP id S229895AbiLAIrg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 03:47:36 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11F3E88B58
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 00:46:50 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B18Bw0c031308
+        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 08:46:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=JxafbpRcHn6F0tOrm0JSCNZgdVGKekZuHIrbkY8/3BE=;
+ b=IXUAF8d5oqni5ilb30HOoninryE1w6HdWQogWr+1k2u7Y98xGtagZ9AhwSQD6QrV0Zru
+ 9PFoif4J1BEb4fwZn2jMTn26BEE0M+szmoUZ1Cd++ppof4B6a6rxPJVbpIVSNsAwFUjm
+ 0ES52Jo/CiAGIEWY0I0g0BgxC1LwsO5vCAR/ZFZYnnVvwNDbV3nKoWfNZjrmdbhAJkqs
+ Ks9yi+B2DtK2oZ9t4LWmJrIfAuFsg+96izhlvDaYs6pRAnOXMEzgGuegV23sFTuHvWnj
+ m/R822eLN2mN/d29uBUwqY9k3q9B0nReQJOLcO4OEWxawAQhNYhOPKR88EqneDLHwVml MA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6rhxgxhg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 08:46:49 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B18KIKT029199
+        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 08:46:49 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6rhxgxgg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Dec 2022 08:46:49 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B18ZqWm004378;
+        Thu, 1 Dec 2022 08:46:46 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma02fra.de.ibm.com with ESMTP id 3m3ae953py-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Dec 2022 08:46:46 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B18khuL9175774
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 1 Dec 2022 08:46:43 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 46412AE04D;
+        Thu,  1 Dec 2022 08:46:43 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 05697AE045;
+        Thu,  1 Dec 2022 08:46:43 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  1 Dec 2022 08:46:42 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
+        pbonzini@redhat.com
+Subject: [kvm-unit-tests PATCH v1 0/3] s390x: test storage keys during migration
+Date:   Thu,  1 Dec 2022 09:46:39 +0100
+Message-Id: <20221201084642.3747014-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-References: <20221124155158.2109884-1-eperezma@redhat.com> <20221124155158.2109884-7-eperezma@redhat.com>
- <CACGkMEubBA9NYR5ynT_2C=iMEk3fph2GEOBvcw73BOuqiFKzJg@mail.gmail.com> <CAJaqyWcR_3vdXLJ4=z+_uaoVN47gEXr7KHx3w6z8HtmqquK7zA@mail.gmail.com>
-In-Reply-To: <CAJaqyWcR_3vdXLJ4=z+_uaoVN47gEXr7KHx3w6z8HtmqquK7zA@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Thu, 1 Dec 2022 16:45:06 +0800
-Message-ID: <CACGkMEs3xfGsptV9H+P+O1yjVzo_vugGnS72EwpE8FLECkccpQ@mail.gmail.com>
-Subject: Re: [PATCH for 8.0 v8 06/12] vdpa: extract vhost_vdpa_svq_allocate_iova_tree
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eli Cohen <eli@mellanox.com>, Cindy Lu <lulu@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Gautam Dawar <gdawar@xilinx.com>,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 5xQd2Nhlrhq0HB8v9plZ082WWceXIPz2
+X-Proofpoint-GUID: HTBfjLG5TnDk6HOtp8raRLa4jeRq6CWi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-01_04,2022-11-30_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ bulkscore=0 impostorscore=0 malwarescore=0 clxscore=1015 suspectscore=0
+ mlxlogscore=740 priorityscore=1501 spamscore=0 lowpriorityscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2212010057
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 30, 2022 at 3:40 PM Eugenio Perez Martin
-<eperezma@redhat.com> wrote:
->
-> On Wed, Nov 30, 2022 at 7:43 AM Jason Wang <jasowang@redhat.com> wrote:
-> >
-> > On Thu, Nov 24, 2022 at 11:52 PM Eugenio P=C3=A9rez <eperezma@redhat.co=
-m> wrote:
-> > >
-> > > It can be allocated either if all virtqueues must be shadowed or if
-> > > vdpa-net detects it can shadow only cvq.
-> > >
-> > > Extract in its own function so we can reuse it.
-> > >
-> > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > > ---
-> > >  net/vhost-vdpa.c | 29 +++++++++++++++++------------
-> > >  1 file changed, 17 insertions(+), 12 deletions(-)
-> > >
-> > > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> > > index 88e0eec5fa..9ee3bc4cd3 100644
-> > > --- a/net/vhost-vdpa.c
-> > > +++ b/net/vhost-vdpa.c
-> > > @@ -240,6 +240,22 @@ static NetClientInfo net_vhost_vdpa_info =3D {
-> > >          .check_peer_type =3D vhost_vdpa_check_peer_type,
-> > >  };
-> > >
-> > > +static int vhost_vdpa_get_iova_range(int fd,
-> > > +                                     struct vhost_vdpa_iova_range *i=
-ova_range)
-> > > +{
-> > > +    int ret =3D ioctl(fd, VHOST_VDPA_GET_IOVA_RANGE, iova_range);
-> > > +
-> > > +    return ret < 0 ? -errno : 0;
-> > > +}
-> >
-> > I don't get why this needs to be moved to net specific code.
-> >
->
-> It was already in net, this code just extracted it in its own function.
+Add a test which changes storage keys while VM is being migrated.
 
-Ok, there's similar function that in vhost-vdpa.c:
+This series bases on Claudio's new PSW macros ("[PATCH v3 0/2] lib:
+s390x: add PSW and PSW_WITH_CUR_MASK macros").
 
-static void vhost_vdpa_get_iova_range(struct vhost_vdpa *v)
-{
-    int ret =3D vhost_vdpa_call(v->dev, VHOST_VDPA_GET_IOVA_RANGE,
-                              &v->iova_range);
-    if (ret !=3D 0) {
-        v->iova_range.first =3D 0;
-        v->iova_range.last =3D UINT64_MAX;
-    }
+Nico Boehr (3):
+  s390x: add library for skey-related functions
+  lib: s390x: skey: add seed value for storage keys
+  s390x: add storage key test during migration
 
-    trace_vhost_vdpa_get_iova_range(v->dev, v->iova_range.first,
-                                    v->iova_range.last);
-}
+ lib/s390x/skey.c              |  94 +++++++++++++++++++++++++++++++
+ lib/s390x/skey.h              |  42 ++++++++++++++
+ s390x/Makefile                |   2 +
+ s390x/migration-during-skey.c | 103 ++++++++++++++++++++++++++++++++++
+ s390x/migration-skey.c        |  44 ++-------------
+ s390x/unittests.cfg           |   5 ++
+ 6 files changed, 252 insertions(+), 38 deletions(-)
+ create mode 100644 lib/s390x/skey.c
+ create mode 100644 lib/s390x/skey.h
+ create mode 100644 s390x/migration-during-skey.c
 
-I think we can reuse that.
-
-Thanks
-
->
-> It's done in net because iova_tree must be the same for all queuepair
-> vhost, so we need to allocate before them.
->
-> Thanks!
->
-> > Thanks
-> >
-> > > +
-> > > +static VhostIOVATree *vhost_vdpa_svq_allocate_iova_tree(int vdpa_dev=
-ice_fd)
-> > > +{
-> > > +    struct vhost_vdpa_iova_range iova_range;
-> > > +
-> > > +    vhost_vdpa_get_iova_range(vdpa_device_fd, &iova_range);
-> > > +    return vhost_iova_tree_new(iova_range.first, iova_range.last);
-> > > +}
-> > > +
-> > >  static void vhost_vdpa_cvq_unmap_buf(struct vhost_vdpa *v, void *add=
-r)
-> > >  {
-> > >      VhostIOVATree *tree =3D v->iova_tree;
-> > > @@ -587,14 +603,6 @@ static NetClientState *net_vhost_vdpa_init(NetCl=
-ientState *peer,
-> > >      return nc;
-> > >  }
-> > >
-> > > -static int vhost_vdpa_get_iova_range(int fd,
-> > > -                                     struct vhost_vdpa_iova_range *i=
-ova_range)
-> > > -{
-> > > -    int ret =3D ioctl(fd, VHOST_VDPA_GET_IOVA_RANGE, iova_range);
-> > > -
-> > > -    return ret < 0 ? -errno : 0;
-> > > -}
-> > > -
-> > >  static int vhost_vdpa_get_features(int fd, uint64_t *features, Error=
- **errp)
-> > >  {
-> > >      int ret =3D ioctl(fd, VHOST_GET_FEATURES, features);
-> > > @@ -690,14 +698,11 @@ int net_init_vhost_vdpa(const Netdev *netdev, c=
-onst char *name,
-> > >      }
-> > >
-> > >      if (opts->x_svq) {
-> > > -        struct vhost_vdpa_iova_range iova_range;
-> > > -
-> > >          if (!vhost_vdpa_net_valid_svq_features(features, errp)) {
-> > >              goto err_svq;
-> > >          }
-> > >
-> > > -        vhost_vdpa_get_iova_range(vdpa_device_fd, &iova_range);
-> > > -        iova_tree =3D vhost_iova_tree_new(iova_range.first, iova_ran=
-ge.last);
-> > > +        iova_tree =3D vhost_vdpa_svq_allocate_iova_tree(vdpa_device_=
-fd);
-> > >      }
-> > >
-> > >      ncs =3D g_malloc0(sizeof(*ncs) * queue_pairs);
-> > > --
-> > > 2.31.1
-> > >
-> >
->
+-- 
+2.36.1
 
