@@ -2,145 +2,324 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 917DA63F944
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 21:39:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C59063F992
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 22:11:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229727AbiLAUjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 15:39:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37744 "EHLO
+        id S230352AbiLAVLU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 16:11:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229571AbiLAUjn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 15:39:43 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2061.outbound.protection.outlook.com [40.107.220.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 339BEA1C2A
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 12:39:42 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lSsYhcI+LqQ6J7VTEoiPCxIJlYqpq/AUyTHsdTsCP1d7rxObs6Xl+1fitodPH84JFsoPBiwSbDaYPtsaxawRq9uf5c6ko1gaofAKQkOnJqJc5H0O/zoXrhW54f5iebHaN8Qd0634Yd9kG3H0D2/mO7rIcrS2BTymdkY8U1SaOK/Pr4tF0Zyd1lV0in+8qiOyAtNY2oBKTbUhKLKFoTIdw62Nh4h/yuYNKDlG136YKHniQrhHMlPfFIXynYR/VlhOYCQUccMiLE3Et2BRsYipZhALorTPZhehssbv2ICIdMqTOsJXoF/1zcKfqXdb5ALIBUkU/JGYovdZBpgk5QCmBA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DRs69Y+0kPiwszI+AAAGQndrbq/ifuuJo0OWlEdzVyk=;
- b=YtZtUHGTrXYVRiqGbBW/R32ANQNZedSl1pUoQq1neOs2j7C1Dbpj3latwQd9MjNULWM3IvOjPWSVZnzKW+puyzzoCL4XUjETF14+JZufhIXG96M9i7B1rhQLBxH3Mbraw6ecqRV+mUveQjis+0sgV5y8gd7ONbRhT1QL31e3F+jbsXMMOnOkFeEjzc7VHfo1f13+rdIDC2jQBMD+cEa//RQVGFgqLkVGOyEG5XE80wrASe7j5KmJFGh9AMEd1U3HpQH7ZsVeTV5gMRWNQ2r41yQNjjOevPNWqKW2TYe/RXPNAY/25gq5PY+Aarc1vUqNj/+8rJMsPfrthnq2KnaVqw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DRs69Y+0kPiwszI+AAAGQndrbq/ifuuJo0OWlEdzVyk=;
- b=LUtOV/q8xQCaHGRLT82hDpR268ow3iKc1TDHfkAuAei7HQKCdKxSktgau0nRwtggS6ag4OsnkF71OGbOwElzl7rw+bLmppu90uKiDdtVtn/daLceEEYx47TB8RrPneStpC4QkWxncDIw25tA250ySdu95MDgkqSfQauXv973vOd3tUfehnERBKUKqHUcV1e2BJzjrAdtUPYe8dcow9NC3RhUqwJbG7JN7BujWWJAMOmNhGL8o6wfBv/B3nkyIpcm9OHNOlRZJ6HoZlqL8Xqk3imeBNYLFddq1BViFV3mOcWCo2qAQXSZwz9fjrB5Otr/RJswNLVdllBtZYRyARqsLA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA0PR12MB4384.namprd12.prod.outlook.com (2603:10b6:806:9f::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Thu, 1 Dec
- 2022 20:39:40 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%8]) with mapi id 15.20.5857.023; Thu, 1 Dec 2022
- 20:39:40 +0000
-Date:   Thu, 1 Dec 2022 16:39:39 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com
-Cc:     kevin.tian@intel.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com
-Subject: Re: [PATCH 00/10] Move group specific code into group.c
-Message-ID: <Y4kRC0SRD9kpKFWS@nvidia.com>
-References: <20221201145535.589687-1-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221201145535.589687-1-yi.l.liu@intel.com>
-X-ClientProxiedBy: MN2PR03CA0029.namprd03.prod.outlook.com
- (2603:10b6:208:23a::34) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229967AbiLAVLS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 16:11:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D098BEE1C
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 13:10:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669929018;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8ZG3sGb+U+LRPySnTCOGhSvzYDNSfM2+mgL0KXCWRaI=;
+        b=FDX0TcJyUoNMBKTxRR5ZB+neCtUIBbG0etmoJItq6LtUF/KEk2CpRSCE+SrcpE99NNaxnp
+        6zwxI86bmFphP9FbIy+wo8CM+9nBtLW4Lv5vs4layhfj+iGoW2URu0FIM+s3iWGJHTSzM1
+        Pr2pxv53sT5GGCGnTGK36HwPE7fAReE=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-500-EWs0dOUzOAGvLTtM9Q5WjQ-1; Thu, 01 Dec 2022 16:10:17 -0500
+X-MC-Unique: EWs0dOUzOAGvLTtM9Q5WjQ-1
+Received: by mail-il1-f199.google.com with SMTP id n10-20020a056e02140a00b00302aa23f73fso3207618ilo.20
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 13:10:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8ZG3sGb+U+LRPySnTCOGhSvzYDNSfM2+mgL0KXCWRaI=;
+        b=0Hb7glq3ltN25NCQKxBHN1yhIqCjrtPNu0nRgirDeF+ysQepp8kmWVp+kcCtcC00Oq
+         HcHP8+vICFupw6xRGE07moiB32fjF4dQHGdTgM5ufeC6YsKh3bVylsDivi2lOZHjU2Qd
+         Hecs7RpxNZ/1SULOXsfwHQ4soRVgV60h6VN3Tg/2pkSV2+yfRZeYfJNSR2ekJ6MKePay
+         afY7N8IMn5y62uJgOGA4qhKguB2EqDWBIkWiX9Kno5vn5/lEfTpyOv1e5743EEC9Luvv
+         cWjKPO+r49HkVnRhDugXsxHlwRpSGydV7m/1v4Fm0IxEg4oNWZwonl1lVh8D7DRV8nW9
+         D13Q==
+X-Gm-Message-State: ANoB5plb/lgX7y9r7uUOXn04m/Vo4uhibxe8RBJQAyZPcwPjzwvVdwUA
+        8wdZWm5kWvHRREBPp9NDsGMR5HhQCwc2BKZdbVJpcV1lX5Y3z4u6vvPDbP/p5ek1duxJZfy6Ke7
+        MxDUp9EbbDva1
+X-Received: by 2002:a05:6638:164a:b0:389:d66d:c049 with SMTP id a10-20020a056638164a00b00389d66dc049mr13199708jat.195.1669929015968;
+        Thu, 01 Dec 2022 13:10:15 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4pKQqQjhRn0EcxfBEEp7y59Lnpk5P4WU8x8eOLVuwJfOHGMDoPHk+gJpm8IWwvfwF2WWMSjA==
+X-Received: by 2002:a05:6638:164a:b0:389:d66d:c049 with SMTP id a10-20020a056638164a00b00389d66dc049mr13199696jat.195.1669929015701;
+        Thu, 01 Dec 2022 13:10:15 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id g12-20020a056602072c00b006cab79c4214sm1963330iox.46.2022.12.01.13.10.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Dec 2022 13:10:14 -0800 (PST)
+Date:   Thu, 1 Dec 2022 14:10:13 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     ruanjinjie <ruanjinjie@huawei.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "kraxel@redhat.com" <kraxel@redhat.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>
+Subject: Re: [PATCH] vfio/mdev: fix possible memory leak in module init
+ funcs
+Message-ID: <20221201141013.68d2b0cf.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276BC0B7E656465950E3A558C149@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20221118032827.3725190-1-ruanjinjie@huawei.com>
+        <20221130160622.0cf3e47d.alex.williamson@redhat.com>
+        <BN9PR11MB5276BC0B7E656465950E3A558C149@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA0PR12MB4384:EE_
-X-MS-Office365-Filtering-Correlation-Id: fb7b0bb7-0003-459b-a5b2-08dad3dc2bb8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DsdLtY3sP2Yme2vjU4WJ8qA9IG8yjLDczz681De8pCHzytEXoEHcHkS3PZaFUEkc/PfLPwwArWFf7mNNyFU0l6dzX2qhrVm0P+BYihTviSSnLJS97zIR11VmIxp/ZN6eu1jSLT/WXYppRRiZASI2Cv5zGS/EphXj8FCssyKwkrdSGFUNGhUOxGYdHYB9VUoYBRWF9TqxxUU8hHMZliZUl8OM9sBLEvzGMbYZXevyydW5kKbvBskCdGbG5QKDvJM5vUc4btOvt0ndYal9AT854Hch/FMe49ChjwV4RIzc6BgoE1Y8iUGBbjDnnsBjS0TWNqaPBVU6uQ33GnZ7C8AjgUars4/BLtTXI9mHZ9SNxMAfNShpRbxsVjX1sy29kL/wRYu2/nJDpAmqJ9MD/M0o2kTHs1blmhVSJxurFAccXziGHsDNszhlMEww+KqY8m/A0UEdb4tZWy3h0bLxr5JYvidYXmj0ANFwTFA4FRP72FHJVqREAqsZrRAyAIZ+kQnDtjo+lakhyK+yRJdyk5NPF5bjztfTENEd6aQtgqFI88hne6W4L5XGCnG9GA/dVQQkoAx1Oki3Re1nLhclUF/YnQH6B6khlYIkVSpquxu7SfcNp5D3LyoFSWRQLzY8VISsSA2aRRxVLONs9zGO+scDvlw6ZhfLqX9xe4oyjaOC6Bn6c011nRg0PKGPtjThb2NtHzsbFFvIfgQkEqCNY1pOESETjpKWacWsTQfgcs3yVE7VXv1O0//Rp1S5uMVEWQbI
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(366004)(346002)(376002)(136003)(451199015)(2616005)(2906002)(83380400001)(38100700002)(66946007)(66556008)(8676002)(6512007)(26005)(66476007)(966005)(6486002)(478600001)(36756003)(6506007)(186003)(8936002)(5660300002)(41300700001)(316002)(4326008)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ILn7pnSauURYW1xkE5XAiLil+qrDp8UKf0kJgxAelmNGylmWWVjC3Ez7mphT?=
- =?us-ascii?Q?Jm6s8Vok7QXeJTgKudSzsGV6ucF7ajs27JeJTGjkqQKxkPNukaDyE365V+GC?=
- =?us-ascii?Q?21qgvDe1EllnOdyrdyDKBNe7gVVWj83Lk1YN9+BEGmPfkPu9HSBzGHX61TJ7?=
- =?us-ascii?Q?dS8HcxBnOHylRWtauuKqmD1nmXEBi7eJlorRo6t7UAaTjNtDfCvla1O13CiT?=
- =?us-ascii?Q?hByqka1+m3vN9YCmh/gJTHAe8x0FcWCXVNsDAVmz+9JlUqb9U4d8CrOa84CL?=
- =?us-ascii?Q?/jOn2EM00/krr5HoYqlU4aSJmAJI+ohgfzv/Tq0DM3O3nKqkFrAMMcq7TvvX?=
- =?us-ascii?Q?ot8Ubq89jS+Fw+2oUIYH8RJvZcMeHekP1m+20pIEVYG/WdQd61dofLiXx8px?=
- =?us-ascii?Q?WyCd3Yf5KOUNZrNkmrMVSTIExVTs5NOmh7Ego+dd86MexiRVBnf3Wan0YH+V?=
- =?us-ascii?Q?/JLeKotVfGI3+iq7364MmItaPoeDA/enfTnvXXxJTXDwuh54AfYRtUa7EM1k?=
- =?us-ascii?Q?JnoRecz0Y0gOjSBvigqIwENhBtnQJYsX+8qvAiGXMXC+n+rwBGAnq7J683NO?=
- =?us-ascii?Q?3XLP0xqxv6+QiBvt5qMfiB6LsYOOr173+pO26nd9wgbAP+erkVY2sW0RxBRJ?=
- =?us-ascii?Q?HXEX4t3R8wMQhi9KjpU1hIDxV4cVmocowsbZRfXLhXC1x1xCrYHWaa50Et2P?=
- =?us-ascii?Q?nTFLuWpuWdflu7/3lR8fARQeArEIgrqBm+/VFaHdbiqcidjGf3DnNlcFlTKD?=
- =?us-ascii?Q?j0yTJ20JWGyLFhGTsyGu0FZnI+fDjXhNwlFfmruSyQcVf9ysQOz/Ex6SiKkP?=
- =?us-ascii?Q?cUtUKXpsiumReNa1oGQkF93+gBgiHYcmKBoWnTcQak+qW7nU71O3E6UJwKTc?=
- =?us-ascii?Q?DyAouMnAoUxpooKjViUxIz0Y34lHeMbsB18UW3F0NTl5U6Ti2CTasNEwTFgi?=
- =?us-ascii?Q?fDk0qcPxpYLGOtFCJB9donyMS7H6/+XpuiqnP1catOKVP69n45WcuW03bFdA?=
- =?us-ascii?Q?I9HhqVJiR2ibIDGrUCV4JblqZIaQNs4DZFvcXiygnHZBCv+zKSIXZ/Jtj5F5?=
- =?us-ascii?Q?bG1JGi6J1bwjmSS7WxXuk1ZNAEE1StzkVcMeHJtDlOCBfwYbPA3OrEU6sENf?=
- =?us-ascii?Q?NgClZPRihfq3hmuIkvlL/VtCSD20fJw9T/DML33F4net8SnSbKENQBAWCyu6?=
- =?us-ascii?Q?mJEtA/7/ia+q7+eg2UC+SKfiwlw+RiRcKoCKck59EivPeUZve/m72MKpYRmm?=
- =?us-ascii?Q?jTCyZ6AGpy4CeePUFKGt68gesYLJfGR7KP0jmo79jNeEJHAqlxlihdiqh36T?=
- =?us-ascii?Q?+aM4rsvQDsT418yi2rVPH5AJ1FEi6g0hW/qyAYYZwOg5yKbH5W3jZrDqGlLR?=
- =?us-ascii?Q?iTbrHyv+r+3IZoWu4BqcaqwgzE4Pe2a9qbZycDMbb5WtA/OcIqYaJQPbywVh?=
- =?us-ascii?Q?PhAfaFxCFcddhEb/RSSvR9hP6EW8cLqB8WDOLxdd+SuXhubkmVo44bnCqUyC?=
- =?us-ascii?Q?axwTlpAI9miQB8wE+yT+lTdcyRcJs5A1GF72ZBB4+XEQmAqkNydQ15D5DvVA?=
- =?us-ascii?Q?zziOhzQakvOsrri8LMg=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb7b0bb7-0003-459b-a5b2-08dad3dc2bb8
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2022 20:39:40.7539
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aHiMKG7hd6EVThu8nY3e6N+bnxlmZuYVPLdWpS7mYMqZ0mdmxrZWEG+rFWE0zpim
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4384
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 01, 2022 at 06:55:25AM -0800, Yi Liu wrote:
-> With the introduction of iommufd[1], VFIO is towarding to provide device
-> centric uAPI after adapting to iommufd. With this trend, existing VFIO
-> group infrastructure is optional once VFIO converted to device centric.
-> 
-> This series moves the group specific code out of vfio_main.c, prepares
-> for compiling group infrastructure out after adding vfio device cdev[2]
-> 
-> Complete code in below branch:
-> 
-> https://github.com/yiliu1765/iommufd/commits/vfio_group_split_v1
-> 
-> This is based on Jason's "Connect VFIO to IOMMUFD"[3] and my "Make mdev driver
-> dma_unmap callback tolerant to unmaps come before device open"[4]
-> 
-> [1] https://lore.kernel.org/all/0-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com/
-> [2] https://github.com/yiliu1765/iommufd/tree/wip/vfio_device_cdev
-> [3] https://lore.kernel.org/kvm/0-v4-42cd2eb0e3eb+335a-vfio_iommufd_jgg@nvidia.com/
-> [4] https://lore.kernel.org/kvm/20221129105831.466954-1-yi.l.liu@intel.com/
+On Thu, 1 Dec 2022 02:00:57 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-This looks good to me, and it applies OK to my branch here:
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Thursday, December 1, 2022 7:06 AM
+> > 
+> > [Cc +vfio-ap, vfio-ccw]
+> > 
+> > On Fri, 18 Nov 2022 11:28:27 +0800
+> > ruanjinjie <ruanjinjie@huawei.com> wrote:
+> >   
+> > > Inject fault while probing module, if device_register() fails,
+> > > but the refcount of kobject is not decreased to 0, the name
+> > > allocated in dev_set_name() is leaked. Fix this by calling
+> > > put_device(), so that name can be freed in callback function
+> > > kobject_cleanup().  
+> 
+> It's not just about the name. The problem of kboject not being
+> released is a bigger one.
+> 
+> put_device() is always required no matter device_register()
+> succeeds or not:
+> 
+> * NOTE: _Never_ directly free @dev after calling this function, even
+>  * if it returned an error! Always use put_device() to give up the
+>  * reference initialized in this function instead.
+>  */
+> int device_register(struct device *dev)
+> 
+> > > @@ -1430,8 +1430,10 @@ static int __init mbochs_dev_init(void)
+> > >  	dev_set_name(&mbochs_dev, "%s", MBOCHS_NAME);
+> > >
+> > >  	ret = device_register(&mbochs_dev);
+> > > -	if (ret)
+> > > +	if (ret) {
+> > > +		put_device(&mbochs_dev);
+> > >  		goto err_class;
+> > > +	}
+> > >
+> > >  	ret = mdev_register_parent(&mbochs_parent, &mbochs_dev,  
+> > &mbochs_driver,  
+> > >  				   mbochs_mdev_types,  
+> > 
+> > 
+> > vfio-ap has a similar unwind as the sample drivers, but actually makes
+> > an attempt to catch this ex:
+> > 
+> > 	...
+> >         ret = device_register(&matrix_dev->device);
+> >         if (ret)
+> >                 goto matrix_reg_err;
+> > 
+> >         ret = driver_register(&matrix_driver);
+> >         if (ret)
+> >                 goto matrix_drv_err;
+> > 
+> >         return 0;
+> > 
+> > matrix_drv_err:
+> >         device_unregister(&matrix_dev->device);
+> > matrix_reg_err:
+> >         put_device(&matrix_dev->device);
+> > 	...
+> > 
+> > So of the vfio drivers calling device_register(), vfio-ap is the only
+> > one that does a put_device() if device_register() fails, but it also
+> > seems sketchy to call both device_unregister() and put_device() in the
+> > case that we exit via matrix_drv_err.
+> > 
+> > I wonder if all of these shouldn't adopt a flow like:
+> > 
+> > 	ret = device_register(&dev);
+> > 	if (ret)
+> > 		goto err1;
+> > 
+> > 	....
+> > 
+> > 	return 0;
+> > 
+> > err2:
+> > 	device_del(&dev);
+> > err1:
+> > 	put_device(&dev);
+> >   
+> 
+> It's kind of a mixed model.
+> 
+> With above unwind it's clearer to use device_initialize() and device_add() instead.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/
+That would go against the comment for device_register() recommending
+that device_initialize() and device_add() should only be called
+separately if we have a clearly defined need.  I can only imagine a
+patch bot would quickly come along to rectify the situation if we
+simply open code device_register() for aesthetics.  I don't see that
+splitting device_unregister() for the purpose of having a common unwind
+path necessitates any changes relative to device_register().
 
-Alex, if you ack this in the next few days I can include it in the
-iommufd PR, otherwise it can go into the vfio tree in January
+> Otherwise what this patch does looks better IMHO:
+> 
+> 	ret = device_register(&dev);
+> 	if (ret) {
+> 		put_device(&dev);
+> 		goto err1;
+> 	}
+> 
+> 	...
+> 
+> 	return 0;
+> 
+> err2:
+> 	device_unregister(&dev);
+> err1:
+> 	earlier_unwind();
+> 
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+This is essentially what was originally proposed.  It could also be
+called a "mixed model", implementing part of the unwind in the error
+branch before jumping to the common unwind.  As demonstrated below,
+every current vfio driver calling device_register() follows a similar
+goto unwind stack as found in the sample drivers, which makes it
+trivially easy to split the device_unregister() call and add a goto
+target in between.
 
-Thanks,
-Jason
+Either way, they're equivalent and I'll take whichever version
+addresses all the vfio related use cases and gets acks from their
+maintainers.  Thanks,
+
+Alex
+
+diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+index c2a65808605a..54aba7cceb33 100644
+--- a/drivers/s390/cio/vfio_ccw_drv.c
++++ b/drivers/s390/cio/vfio_ccw_drv.c
+@@ -199,8 +199,9 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+ 	return 0;
+ 
+ out_unreg:
+-	device_unregister(&parent->dev);
++	device_del(&parent->dev);
+ out_free:
++	put_device(&parent->dev);
+ 	dev_set_drvdata(&sch->dev, NULL);
+ 	return ret;
+ }
+diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+index f43cfeabd2cc..997b524bdd2b 100644
+--- a/drivers/s390/crypto/vfio_ap_drv.c
++++ b/drivers/s390/crypto/vfio_ap_drv.c
+@@ -122,7 +122,7 @@ static int vfio_ap_matrix_dev_create(void)
+ 	return 0;
+ 
+ matrix_drv_err:
+-	device_unregister(&matrix_dev->device);
++	device_del(&matrix_dev->device);
+ matrix_reg_err:
+ 	put_device(&matrix_dev->device);
+ matrix_alloc_err:
+diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+index 8b5a3a778a25..e54eb752e1ba 100644
+--- a/samples/vfio-mdev/mbochs.c
++++ b/samples/vfio-mdev/mbochs.c
+@@ -1430,7 +1430,7 @@ static int __init mbochs_dev_init(void)
+ 
+ 	ret = device_register(&mbochs_dev);
+ 	if (ret)
+-		goto err_class;
++		goto err_put;
+ 
+ 	ret = mdev_register_parent(&mbochs_parent, &mbochs_dev, &mbochs_driver,
+ 				   mbochs_mdev_types,
+@@ -1441,8 +1441,9 @@ static int __init mbochs_dev_init(void)
+ 	return 0;
+ 
+ err_device:
+-	device_unregister(&mbochs_dev);
+-err_class:
++	device_del(&mbochs_dev);
++err_put:
++	put_device(&mbochs_dev);
+ 	class_destroy(mbochs_class);
+ err_driver:
+ 	mdev_unregister_driver(&mbochs_driver);
+diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+index 721fb06c6413..e8400fdab71d 100644
+--- a/samples/vfio-mdev/mdpy.c
++++ b/samples/vfio-mdev/mdpy.c
+@@ -717,7 +717,7 @@ static int __init mdpy_dev_init(void)
+ 
+ 	ret = device_register(&mdpy_dev);
+ 	if (ret)
+-		goto err_class;
++		goto err_put;
+ 
+ 	ret = mdev_register_parent(&mdpy_parent, &mdpy_dev, &mdpy_driver,
+ 				   mdpy_mdev_types,
+@@ -728,8 +728,9 @@ static int __init mdpy_dev_init(void)
+ 	return 0;
+ 
+ err_device:
+-	device_unregister(&mdpy_dev);
+-err_class:
++	device_del(&mdpy_dev);
++err_put:
++	put_device(&mdpy_dev);
+ 	class_destroy(mdpy_class);
+ err_driver:
+ 	mdev_unregister_driver(&mdpy_driver);
+diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+index 3c2a421b9b69..e887de672c52 100644
+--- a/samples/vfio-mdev/mtty.c
++++ b/samples/vfio-mdev/mtty.c
+@@ -1330,7 +1330,7 @@ static int __init mtty_dev_init(void)
+ 
+ 	ret = device_register(&mtty_dev.dev);
+ 	if (ret)
+-		goto err_class;
++		goto err_put;
+ 
+ 	ret = mdev_register_parent(&mtty_dev.parent, &mtty_dev.dev,
+ 				   &mtty_driver, mtty_mdev_types,
+@@ -1340,8 +1340,9 @@ static int __init mtty_dev_init(void)
+ 	return 0;
+ 
+ err_device:
+-	device_unregister(&mtty_dev.dev);
+-err_class:
++	device_del(&mtty_dev.dev);
++err_put:
++	put_device(&mtty_dev.dev);
+ 	class_destroy(mtty_dev.vd_class);
+ err_driver:
+ 	mdev_unregister_driver(&mtty_driver);
+
