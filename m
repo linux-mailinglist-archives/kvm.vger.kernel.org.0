@@ -2,99 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0908763F3F6
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 16:31:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3ED8E63F44D
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 16:40:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231881AbiLAPb0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 10:31:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39012 "EHLO
+        id S231911AbiLAPk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 10:40:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231872AbiLAPa6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 10:30:58 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2069.outbound.protection.outlook.com [40.107.94.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D49C0AD31F
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 07:30:56 -0800 (PST)
+        with ESMTP id S231970AbiLAPju (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 10:39:50 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2085.outbound.protection.outlook.com [40.107.237.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51EB4AA8F0
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 07:39:14 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KiGWaE2JUK8kGw2RGG0ILn8E9GUhMNdraQM1SPP1TXPcaC9SIB3wqu4bWptGZz+H/Xb+BEQkL0Me5cbGwq0ulJHL2Yp2v9nju+ZvJY3/wwWf/rRm5R+rZigm/FoUFphfy0vn5MsmHDFcMjFIXXAcqxlV7Gg3pewPOZO7QpAj3p/v+IRQdx75sQmB6yDVDiClVQ4GT2TjP5WMRzZ5S8KBTq02jZ49buPyBb/8TueiTUfermlePyWaqhDI/N1vbUw2ZcTt4vEsiUZWFrGoDeX2Q+gaVt2nz4/AMq2vm1VxGqF6sQiYM2emHpBMmTA7XhJt9W89ovo/IcKf8d9qUqOYpw==
+ b=d0FwtdAB7Vi+vUlV5VXY7oOkGsiANIHKxjGJQ+4ReNkOzf4DjXoWf4h7bE11q3NOi+uOspyqDwCKYtV4EltDEhx6veVYw25dHeETmXQ9g11jI2bv8iuJYzadcBhQTVQMwqgypb0+aeLI1WjfNGwAU3iwSj64Q42fBYIUX9N7iaUFJsgoZOUeGCmR396R31r6q+2MZ4AnPOdeordKRgK8UXHVJfO6sgQogek6/H03Q3RpCOCbnt/9gWApFhj+bCR+Qp2Gs27OpfFXTt16oO+HZCIAuUm5UX/fUatAL3xpgh3hZ0sfj+CONQVU3Lo+F6FRQhF6h8cgFiSwwbTT83sidA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tv4vz8/NSie+I1CUyuv5X9cZibCvVDSc8xTipAImjxg=;
- b=jIuIFumoLMQV0+v7Q1K1IsNe8tWv0AMmJNSuFhibx6lYX4db8xlsEtnf/07h0pKwYE3mf+29IC4mz2yQ6iHEgVG8zuBoYujzcoAesCDlnWyTUYOAVMc78JpX+f2tl8xPe+dZRQSjbg9h/wNrj/YFCAPe3g8eyKokXCSdzt523xcwPndXdW/o90z4KwKbs1wvTy0rXkMtEmCWQ/3mTzwYLD66Vo4b2JepH6OPq/myxMqjArEgh0F7+VHV9eNlAfbr61o6WFV6l1+2n8Yn4Qs3FQIYfyT+PTSr9HoeAi6GJRPgiV0PdSA1EgXZewBZwpIsAVXP8JiFGn17V7R0ikDjJQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
+ bh=TVj5ojgndr0FlH/z6Uvq1a79leow0rf+pgxyOBhidoQ=;
+ b=IAm6fxvZ30klGc3KrrCqC5bSvN9pfAidsbyKLiXiT3+EwyFwxTzM4rYlSuOb1gfRRn+tCS+KODRV8bkGLvIi9VETycOnXnfrMrYJb69HeKWNROpplxPh+zDJxHQBFUfDZSRae6zbN68yww/PjJd/1FJoG03HMfUy3OVccgXDIn1+WzWcbe2h+pQXfksE7aEb5IYmWsq/ryNEp6oFISIn74QEWQGfNf6CBOEUNVzqnx82RQ51HpY4Of2MiLE08h9ZF4W9K2GTB2GomFWMNYPpeveUsVPYWoQ47Y0HHLSOefEBuWJadwFjmNHcPn8ohVtz6f0/vMZYWpPs2VEqRZh17A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tv4vz8/NSie+I1CUyuv5X9cZibCvVDSc8xTipAImjxg=;
- b=VnLXtxb9T2K9I2evRCi9Q7QLKGynPxhwh18wH2rpngoPMxnTeIkLRuKhkelF2+GriGWgqsZxW0ztC0YKSg3d/aYvK1Xp/1Lx7Kqh/rTDzVbuewtBBUxTkct7Lpw83ptyr3AQLnFpFaiKJNYYkTxAzpXWYi8fghIvwnN5h7w8F+c+UvctqCL7yrlGsrvKfwa24NQTDUBVSB8Se3f5yIoEr3XVPwXZzv1c9gYqsH6kzTtASrSSJH8U7/MW2FyeReTYc6TIq3a2j1/AmbBySFXw7O1a3rV1HNWJucOgq8lVtpii2H76MWnGeRg1gDiY+NNMDQOGUfSAaiS/9zxRUSjnXw==
-Received: from DS7PR03CA0100.namprd03.prod.outlook.com (2603:10b6:5:3b7::15)
- by DM6PR12MB4233.namprd12.prod.outlook.com (2603:10b6:5:210::21) with
+ bh=TVj5ojgndr0FlH/z6Uvq1a79leow0rf+pgxyOBhidoQ=;
+ b=ZJGDsFxrtqGHiLssIABWIunb6BgdwMq0uT23gheOJ6AgSp86yyPgvsXTnC83dvn1Hdw0zBiCqeegyHyB89zSLgk9kmU5neyfrFv31qoglCH4yaVOWyzGApe1bEOjTaSa2wYVGQI7B4HfjHknojYzyfXwBjytpIF1iCb3dSLVrUTSCV7dt3exA0urirGLrz1DKOjtugulzLKOUNJroE/w1hBXzE8MmOjYKxGpW9UgwotEiPBxq6wsSd6BWzGm6F7BXBJ6yhS1RSSpBaQfBte5rewp96rapDLC3txiK9njKCxeqmhKen0QZRTo3UYarunwIG5dJTYjA1YnV2h/ZmuaLA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CY8PR12MB7362.namprd12.prod.outlook.com (2603:10b6:930:52::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Thu, 1 Dec
- 2022 15:30:55 +0000
-Received: from DS1PEPF0000E634.namprd02.prod.outlook.com
- (2603:10b6:5:3b7:cafe::ff) by DS7PR03CA0100.outlook.office365.com
- (2603:10b6:5:3b7::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.8 via Frontend
- Transport; Thu, 1 Dec 2022 15:30:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- DS1PEPF0000E634.mail.protection.outlook.com (10.167.17.138) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5880.8 via Frontend Transport; Thu, 1 Dec 2022 15:30:55 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 1 Dec 2022
- 07:30:44 -0800
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.36; Thu, 1 Dec 2022 07:30:43 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.986.36 via Frontend
- Transport; Thu, 1 Dec 2022 07:30:41 -0800
-From:   Yishai Hadas <yishaih@nvidia.com>
-To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>
-CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
-        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
-        <shayd@nvidia.com>, <yishaih@nvidia.com>, <maorg@nvidia.com>,
-        <avihaih@nvidia.com>, <cohuck@redhat.com>
-Subject: [PATCH V2 vfio 14/14] vfio/mlx5: Enable MIGRATION_PRE_COPY flag
-Date:   Thu, 1 Dec 2022 17:29:31 +0200
-Message-ID: <20221201152931.47913-15-yishaih@nvidia.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20221201152931.47913-1-yishaih@nvidia.com>
-References: <20221201152931.47913-1-yishaih@nvidia.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.8; Thu, 1 Dec
+ 2022 15:39:12 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%8]) with mapi id 15.20.5857.023; Thu, 1 Dec 2022
+ 15:39:11 +0000
+Date:   Thu, 1 Dec 2022 11:39:08 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: Re: [PATCH v4 5/5] vfio: Fold vfio_virqfd.ko into vfio.ko
+Message-ID: <Y4jKnBT7ZOkTG9O6@nvidia.com>
+References: <5-v4-7993c351e9dc+33a818-vfio_modules_jgg@nvidia.com>
+ <87ilivw3lk.fsf@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ilivw3lk.fsf@redhat.com>
+X-ClientProxiedBy: BYAPR08CA0071.namprd08.prod.outlook.com
+ (2603:10b6:a03:117::48) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0000E634:EE_|DM6PR12MB4233:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6d955fe2-15b4-4871-f428-08dad3b109d4
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB7362:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6320698a-00af-4dad-5ec8-08dad3b23139
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ERvp91Qoz3l31/5ty2Lc+zDcMivPI+jj5nNV+EL0S/UMF8KSLQ5qfm+PEZnSK68O36rYk45frPRfRad6JNur/Q2Jrh6r/pYJS1sNtarl1rjiLBB9uTTc3tlVubTiJy2GBkvk/pA22kOKyEsiziYOoj0QZuGyehW0HEqQD0BufrvbXvgmpKgRlmQVoLbV2J/5ptkG2McDzMtybjaxKeUYXZuU9XdPDx9sCVJmdf6viIixBh8IIM84o2lsOU+h1GUoG/JlY8t/2TOLgpu76P2Q61+vozFxoh2lIWcmM17Ivg45wCQ7JsYWutLQs/74PkxHgGjw7ph1AxjjqKKaWaDdNf8ki2ge9h2VjNcPRh/BFFZIxYb11cLGaEP7Uli2qtfdN7WGyViEVANoVMkIvAzCMTtOhGjPxsA2R3lFvdl0FOwA3kg9386PMafMG8Xi6bffUG9DYptBJC/sggd7wtpL58reRz8dXdbFcVo7GRKflxxXdyySuc8LlA9+aeS6GoIJTmINaZuXam/CtSni5w+/rfJVVRD9JtDJ+aHIp+mQn+x5z1sKJfPfK9MbDbcCkZnl5A+sDJpI0YW7X5gll2cbAVm3cvSLqX5fTDs90+D1b+ywFkKkelTsMmCmtLPJhaAdCeHnua7q1oC2v4OYeKDjtojrF1Y1kLhDCrCxC1JjHSrvBVvJXvZxxPhkHttJwOT8u9gadA+nJOmm2VB/7af/OA==
-X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(346002)(396003)(136003)(376002)(451199015)(40470700004)(36840700001)(46966006)(47076005)(426003)(336012)(6666004)(40460700003)(26005)(7696005)(110136005)(36756003)(356005)(40480700001)(7636003)(54906003)(82310400005)(186003)(36860700001)(82740400003)(86362001)(2616005)(1076003)(478600001)(2906002)(5660300002)(70586007)(6636002)(8936002)(4326008)(316002)(8676002)(4744005)(41300700001)(70206006);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: oFvD23eQHA43jF56ZiOYI3+Z2GEbrIDWItYCfM2Q0Myaw1mgk4a1cnhGHpRlinElgNy3t5rhQ0aicxFnVn3FIT3CQxZ61w+WkV23WAJDCx/Jh03BFgMBfdOD3vVHgBxIAjufrLXI6PEjwnv9PUbmPmkOEC7DNPC6g2E9AVtoYNnMiOJEDtCo8IZ+z8EZB0JVFBOOxcE5haO0hLEfLJZZMwkHbSvAt7QWYSEP1pOiONFjFAh+i3qK9KfxBi+HGsk0G7tlGnDkICThAeQx94LoJw0KId/VOlBuMGOuAyaMd82xlHsmah9t4LpDKnc4doImHBmP20a6ubH/qKuUjzQF9OEHHZ1dntr0WRoLCUgdscmf56dHWT/NK+ab0sRWyT34ZZjcLhN2iIG9qnPZQaLOKPwX0Odbusf+id1mg51pHP9z8ewFB2vEDgLVGKGN0taxzFqIz4F9N//PhTf6GU1y8v97p2NrgDW6Gl3jqzfsgkhdxKu6E/vleMCdzcBayFLYY4OQfnznHaru8XSfQehc/W0xFPTyWBIcrt8wNqbNhdkwkOjydQrlUOe3jXmLs4sgfme+dQqpELaXtqNwuuehGlrnGprlMAZUX0Oy2K9zVbPbyBZUWnB0i+MeSKSwdJMsZW71y3sVNDIM3eEgZ/hHiA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(39860400002)(366004)(396003)(136003)(376002)(451199015)(86362001)(36756003)(6916009)(54906003)(6486002)(316002)(478600001)(2906002)(4744005)(8676002)(66556008)(66476007)(4326008)(66946007)(8936002)(41300700001)(5660300002)(38100700002)(26005)(6512007)(6666004)(6506007)(2616005)(186003)(66899015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xiESJ0RGJFD0GpDWbF3KUv6x1os9zlqUCIvVayRNykGe7DcJs4/4vuRjug9k?=
+ =?us-ascii?Q?A+Zz93AEyXjb9DO6hvLCdbiHaRqX6W47gOjPe4K6N7pBXAml0HveWvTYllnr?=
+ =?us-ascii?Q?lZ9makLu34gviUqD8M8QV0qbohG3mtD5uxFplFhrtZeRHGUqerM47C/ay+O+?=
+ =?us-ascii?Q?D3vUD7EDV243l7BgHVjPqXhqyy6uVcIqL1IMPWNSbTcy5t8sj2w7HYk/3u7p?=
+ =?us-ascii?Q?ItjPebx/12v2Lzi3cnXoHnXtiuW7DXVLm2GrLbrb01kvtMRIzkuovNnsc8fw?=
+ =?us-ascii?Q?/v2+eLq+BqrPI1wGVajJMNQCzqUxY179qDGMFMbxczyxYIvFMnklhSr+/VdC?=
+ =?us-ascii?Q?XcLPi/k/Hbu9T83EGB/JwIsT+selMo+/nJQDrvMUSgGDHogTy5T0ibv9aM0y?=
+ =?us-ascii?Q?5xR7+TTf7X0UV6qhoHoaHKIzYYjuax3+y9U6qhwLMQbb4rVpeUkNmOa0ijga?=
+ =?us-ascii?Q?783VTpxYNpGDH6p7lPO5WKhWx7cbwThw0piMXQ3sRHMgjW9cRYxk+iL8l0Y0?=
+ =?us-ascii?Q?5ycdWbwESZOI1UWSAdb2HounBzbi4XLg3XzMSM7h6fk6aDgvpJMf6fvMUGto?=
+ =?us-ascii?Q?6K9rT5abx2HB+Ny9iOWKEy14Rz+ZI3jT7E/KDJDlWye4zhQYgVLaewRBv9KW?=
+ =?us-ascii?Q?gLvnXuYIkOniLi9Ws3DcmJt0avrZsvs5QsKciA4GDmPSuXIGmAjD1+XiZxXy?=
+ =?us-ascii?Q?xgdjP02+HFrWz/GYeklR2yDEagkC+54ddeMzGj+xoeOJJ1zr9HhZWNT0ppCW?=
+ =?us-ascii?Q?/d009vQtQ21BVvLTFrDFn70jMhyurcIafpsTk/JBkPOQUSV9fMry8wXRMfHb?=
+ =?us-ascii?Q?kx1GSxIo/cupxXK77/ndeTDS28K9Vs2eDafQYIQqY15A6CaB2jtYr+lnI0q1?=
+ =?us-ascii?Q?VYFrD+eFP1aFOeHI3y6G6RgBK6ZorLEIE73dha/AeASZaKLJYbJzvHTX3lVf?=
+ =?us-ascii?Q?/0D/6ljY1z4+gPoHCc2AzRpWKqLV2/LscC2p1MiNvoCYhtak+Th5X1jMA0RK?=
+ =?us-ascii?Q?L1Gum2QB3WywvH6cEj9+QpCS/iGGef0yAoDpjY9pOPQYlhUFn1Y5jyN6xvBo?=
+ =?us-ascii?Q?F4+D+6GvwrSe4s6oO9J5tMbdaiRoQrRNHWV5P+am3tNpMkXPNU83wQdvyKpp?=
+ =?us-ascii?Q?rjx6hSDqWbsb2GCWRLa+xVuNsjiqEJ6M6hcwSirUvk/+2M8gUXvwOKz1GNVe?=
+ =?us-ascii?Q?NwCdAOOekjk6Is4gnIqsT9T6kWu10D9Ow2sZSLcfHmAqGmGH5dpmek76Frg+?=
+ =?us-ascii?Q?Bd4V2cfX6gtu+89l3rTB57TK11oDPMXaNEfO+SRfjtccT2LJnGmX7MgW+Vrx?=
+ =?us-ascii?Q?RUiOInW6a6sT6ciIIbsH5hTgp4CBqpyzT5w7KytaXv/vDBSC+8mcRH/e7ZmN?=
+ =?us-ascii?Q?y8XYhvP94S0mIhkcwSTw5tNmc/mTQih4kSF1kMquBzC9GKwnRNcDMO8ZDSIo?=
+ =?us-ascii?Q?XELuqFdJrv+kA6GQxdY+K2L3oibbKXVPxtuk6bM0YzmWyk+mf8dCKsXjGP8i?=
+ =?us-ascii?Q?Pp/ZBIXMt5n8yfqZren/Hja+kVhrL4jE1iAFt1EVuBqVTNmlKCWl9460n7SD?=
+ =?us-ascii?Q?W3BKiNKXA2hczKJFXZg=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2022 15:30:55.2563
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6320698a-00af-4dad-5ec8-08dad3b23139
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2022 15:39:11.1404
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6d955fe2-15b4-4871-f428-08dad3b109d4
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E634.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4233
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: agnZ0pD7G1KZQkGWPcn27YVVoGfoh5UY49jQOtuVo0bwoT/TkSlGCcAlecjF+npv
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7362
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -105,32 +114,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Shay Drory <shayd@nvidia.com>
+On Thu, Dec 01, 2022 at 04:22:47PM +0100, Cornelia Huck wrote:
+> On Tue, Nov 29 2022, Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+> > This is only 1.8k, putting it in its own module is not really
+> > necessary. The kconfig infrastructure is still there to completely remove
+> > it for systems that are trying for small footprint.
+> >
+> > Put it in the main vfio.ko module now that kbuild can support multiple .c
+> > files.
+> 
+> The biggest difference is that we now always have the vfio-irqfd-cleanup
+> wq once the vfio module has been loaded, even if pci or platform have
+> not been loaded. I guess that only affects a minority of setups (s390x
+> without pci?), and probably doesn't really matter.
 
-Now that everything has been set up for MIGRATION_PRE_COPY, enable it.
+Modern wq's are just a little bit of memory, it isn't a big deal
 
-Signed-off-by: Shay Drory <shayd@nvidia.com>
-Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
----
- drivers/vfio/pci/mlx5/cmd.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
-index 01ef695e9441..64e68d13cb98 100644
---- a/drivers/vfio/pci/mlx5/cmd.c
-+++ b/drivers/vfio/pci/mlx5/cmd.c
-@@ -222,6 +222,11 @@ void mlx5vf_cmd_set_migratable(struct mlx5vf_pci_core_device *mvdev,
- 	if (MLX5_CAP_GEN(mvdev->mdev, adv_virtualization))
- 		mvdev->core_device.vdev.log_ops = log_ops;
- 
-+	if (MLX5_CAP_GEN_2(mvdev->mdev, migration_multi_load) &&
-+	    MLX5_CAP_GEN_2(mvdev->mdev, migration_tracking_state))
-+		mvdev->core_device.vdev.migration_flags |=
-+			VFIO_MIGRATION_PRE_COPY;
-+
- end:
- 	mlx5_vf_put_core_dev(mvdev->mdev);
- }
--- 
-2.18.1
-
+Thanks,
+Jason
