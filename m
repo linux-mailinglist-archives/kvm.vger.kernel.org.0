@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 459AD63F896
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 20:52:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 12CAC63F898
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 20:53:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230420AbiLATw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 14:52:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49942 "EHLO
+        id S230425AbiLATxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 14:53:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230321AbiLATwz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 14:52:55 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6298391DD
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 11:52:54 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-3b0af5bcbd3so26717097b3.0
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 11:52:54 -0800 (PST)
+        with ESMTP id S230394AbiLATw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 14:52:57 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20266275F6
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 11:52:56 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id u10-20020a17090a400a00b00215deac75b4so2970981pjc.3
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 11:52:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C5a0McCcpuNoh7+abFH/FyD//PHCPdcmVmgtIkm+rNg=;
-        b=dkOyk7aLowF4xnX8Rvbrx/SoT9LIgx3eq/miK+BC/MOrbzjqziJVt+kvCfast77x7+
-         uvrFhmY1eBP/6qKCUQ0hkSUvgCHIlRnDbjoYLR+x4IEXjmlUKZS441g5vvckbswFMYIK
-         v+YkqWk6RiKKOD4U8nKj8CYjVPlggHS+O4KUkcGRW7QqTiCIJriyvacDsy7LNO2i2WaV
-         D5AK/eMDyeNyaA69yWc4MBjDe33p/f/NeCFby0xx4zyqHI7vcVpa4QFiLwX2tWy3fcAV
-         vL6VCTb/IJWabhNmwy+QIIzvodPDDkL0u3Izx4lSQ5TaZkV4NpNO++Gyqp7XZFpDzB8z
-         IRSQ==
+        bh=BbXv6r/HFkUw2Q8SN/R2Yw4sxw4SDqaIbsUg2TQCSQk=;
+        b=oMYCnUSVTkEufD+qGGr/q89kXw8Fskasw/xETPbAvoU1KOSp8ivG8+KgudaIFcNPuS
+         F4J9O4BCnqebvQMCJGVmm0u5Z1r85Z9FTP64iGbJ+EUGgCAmGWw0S+N0qjTUiV++a5Yg
+         Z3HXe+exXPB7kt5fcJsrEhAL/zvkzUBgNHOyp9O+jg0vIBB+G3PPcxO6GCTyy557Qia6
+         zztHNLmLkl+IU7NLUhUF6GMLqwMxn9kP2bABMW56LkFCEcS3OwIIcHSoDgLwFsehqo3z
+         nPtZ5SLtQPeo0I+3N98oCp+oSTnTuejWXeCgX/KujnowAIKiNTLK6qgv+6HdVEIbzuD7
+         ad0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C5a0McCcpuNoh7+abFH/FyD//PHCPdcmVmgtIkm+rNg=;
-        b=x7cwWKi89oV6dcSIe8EO+MbNA2tIAXnbRYB1JLkr9RWVlK7GzbkDnC2msz/TUXUFDo
-         YxDLCSog/v8bBOd3rYdf8ibBWUuJAGN3fqNHjYZvMHeKcZnJBZsJYLK/AM8XfI7UMZrb
-         UM+FzYhf+C/jMrZj8HpOIiJxQAjlpvqalTQqJ7+zs5MMvW+f7Q/I1aXvkRJ0v/ALUPOf
-         een23ndVQGNXMOIAEscHWil9oTJOI7XWOjw7AkX6ARgB9m1Ri/WykDZnuVi6f2f4VeX7
-         1LZFEPgD9b6SNX0qtPVUVXUpvWPZu4kxl/VaFpHq4p9SnP5I8ovR7/xhEA/+xW3weu78
-         Y92A==
-X-Gm-Message-State: ANoB5pmnJA460gjVKgSRAPhPUvJLyl0sThofiU8CZQb/672OyL3p22Ag
-        FYoMPIPIiUO4cHNxomX3AdaK3sKYeeQdew==
-X-Google-Smtp-Source: AA0mqf5OJaDmzvLxYqIM8hv6il26qk4XpnSzjurHnRCDWgEU5qGaSFJo4i9u6HvvLp1XHxelOezUTOalVooRJw==
+        bh=BbXv6r/HFkUw2Q8SN/R2Yw4sxw4SDqaIbsUg2TQCSQk=;
+        b=tnf7qjp98FFgKYTJtuNqBbM1e5qP1j+txQ+OK7sTk9Yjw52zx9EuUkcsT50d4GA7k7
+         eTFK5eLnUfxVZ51Tq8oZfgweUcyGIUaIdCzv1+KDZhuSuBylFBFw+2c5bFEkzoA2fctP
+         m1dt4fQCz3FHbIwgeuSH3xiyE8Sg78DBk551E6YBdqsk/P+9PWuSe80HPuBRN0MmnGpz
+         vXNZqsJr/FcuZlS2CfXUazPF3GBk0nH/Md1dTVK/Wrh2nzz4460OW2mdnGEe3qaBibFj
+         RjTY6UiBofLXUFMkf/LGuRqaDo93jR4XgybHi4IQb3kqcD1HmBh3YB/31A0Dm+9o+3Qc
+         DVqg==
+X-Gm-Message-State: ANoB5pn57fip6khvNE4q0KbHrDQHGYFo1+oloc+iSDI4mq6J2Fd5ce7X
+        vklTxWiQ+BGrPd7VEDb9V8DCZ9rieX7h+w==
+X-Google-Smtp-Source: AA0mqf6L60+bnphYyvdfxaz030HyQ7FOsQEFqQgXctWIsuCiWwEwlNriaoNQ/NgqJWpHs4ZWwBszbOX1+TyqIw==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:adc1:0:b0:6f7:e78d:cae5 with SMTP id
- d1-20020a25adc1000000b006f7e78dcae5mr18498179ybe.290.1669924373964; Thu, 01
- Dec 2022 11:52:53 -0800 (PST)
-Date:   Thu,  1 Dec 2022 11:52:48 -0800
+ (user=dmatlack job=sendgmr) by 2002:aa7:9892:0:b0:576:4aef:f1e7 with SMTP id
+ r18-20020aa79892000000b005764aeff1e7mr1095161pfl.18.1669924375584; Thu, 01
+ Dec 2022 11:52:55 -0800 (PST)
+Date:   Thu,  1 Dec 2022 11:52:49 -0800
 In-Reply-To: <20221201195249.3369720-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221201195249.3369720-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221201195249.3369720-2-dmatlack@google.com>
-Subject: [PATCH 1/2] KVM: Move halt-polling documentation into common directory
+Message-ID: <20221201195249.3369720-3-dmatlack@google.com>
+Subject: [PATCH 2/2] KVM: Document the interaction between KVM_CAP_HALT_POLL
+ and halt_poll_ns
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     David Matlack <dmatlack@google.com>,
@@ -70,44 +71,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move halt-polling.rst into the common KVM documentation directory and
-out of the x86-specific directory. Halt-polling is a common feature and
-the existing documentation is already written as such.
+Clarify the existing documentation about how KVM_CAP_HALT_POLL and
+halt_poll_ns interact to make it clear that VMs using KVM_CAP_HALT_POLL
+ignore halt_poll_ns.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- Documentation/virt/kvm/{x86 => }/halt-polling.rst | 0
- Documentation/virt/kvm/index.rst                  | 1 +
- Documentation/virt/kvm/x86/index.rst              | 1 -
- 3 files changed, 1 insertion(+), 1 deletion(-)
- rename Documentation/virt/kvm/{x86 => }/halt-polling.rst (100%)
+ Documentation/virt/kvm/api.rst          | 15 +++++++--------
+ Documentation/virt/kvm/halt-polling.rst | 13 +++++++++++++
+ 2 files changed, 20 insertions(+), 8 deletions(-)
 
-diff --git a/Documentation/virt/kvm/x86/halt-polling.rst b/Documentation/virt/kvm/halt-polling.rst
-similarity index 100%
-rename from Documentation/virt/kvm/x86/halt-polling.rst
-rename to Documentation/virt/kvm/halt-polling.rst
-diff --git a/Documentation/virt/kvm/index.rst b/Documentation/virt/kvm/index.rst
-index e0a2c74e1043..ad13ec55ddfe 100644
---- a/Documentation/virt/kvm/index.rst
-+++ b/Documentation/virt/kvm/index.rst
-@@ -17,4 +17,5 @@ KVM
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index eee9f857a986..896914e3a847 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -7213,14 +7213,13 @@ veto the transition.
+ :Parameters: args[0] is the maximum poll time in nanoseconds
+ :Returns: 0 on success; -1 on error
  
-    locking
-    vcpu-requests
-+   halt-polling
-    review-checklist
-diff --git a/Documentation/virt/kvm/x86/index.rst b/Documentation/virt/kvm/x86/index.rst
-index 7ff588826b9f..9ece6b8dc817 100644
---- a/Documentation/virt/kvm/x86/index.rst
-+++ b/Documentation/virt/kvm/x86/index.rst
-@@ -10,7 +10,6 @@ KVM for x86 systems
-    amd-memory-encryption
-    cpuid
-    errata
--   halt-polling
-    hypercalls
-    mmu
-    msr
+-This capability overrides the kvm module parameter halt_poll_ns for the
+-target VM.
+-
+-VCPU polling allows a VCPU to poll for wakeup events instead of immediately
+-scheduling during guest halts. The maximum time a VCPU can spend polling is
+-controlled by the kvm module parameter halt_poll_ns. This capability allows
+-the maximum halt time to specified on a per-VM basis, effectively overriding
+-the module parameter for the target VM.
++KVM_CAP_HALT_POLL overrides the kvm.halt_poll_ns module parameter to set the
++maximum halt-polling time for all vCPUs in the target VM. This capability can
++be invoked at any time and any number of times to dynamically change the
++maximum halt-polling time.
++
++See Documentation/virt/kvm/halt-polling.rst for more information on halt
++polling.
+ 
+ 7.21 KVM_CAP_X86_USER_SPACE_MSR
+ -------------------------------
+diff --git a/Documentation/virt/kvm/halt-polling.rst b/Documentation/virt/kvm/halt-polling.rst
+index 4922e4a15f18..3fae39b1a5ba 100644
+--- a/Documentation/virt/kvm/halt-polling.rst
++++ b/Documentation/virt/kvm/halt-polling.rst
+@@ -119,6 +119,19 @@ These module parameters can be set from the debugfs files in:
+ Note: that these module parameters are system wide values and are not able to
+       be tuned on a per vm basis.
+ 
++Any changes to these parameters will be picked up by new and existing vCPUs the
++next time they halt, with the notable exception of VMs using KVM_CAP_HALT_POLL
++(see next section).
++
++KVM_CAP_HALT_POLL
++=================
++
++KVM_CAP_HALT_POLL is a VM capability that allows userspace to override halt_poll_ns
++on a per-VM basis. VMs using KVM_CAP_HALT_POLL ignore halt_poll_ns completely (but
++still obey halt_poll_ns_grow, halt_poll_ns_grow_start, and halt_poll_ns_shrink).
++
++See Documentation/virt/kvm/api.rst for more information on this capability.
++
+ Further Notes
+ =============
+ 
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
 
