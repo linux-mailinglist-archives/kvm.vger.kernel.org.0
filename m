@@ -2,122 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D66B863EEA4
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 12:01:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B23263EF67
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 12:24:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231211AbiLALBS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 06:01:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40544 "EHLO
+        id S229748AbiLALYb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 06:24:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230321AbiLALAl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 06:00:41 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FC24A321D
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 03:00:25 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id p24so1313029plw.1
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 03:00:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3m5F5SZmhCySHaq4Kl+nNPgZPVM9ttm1TTYlw+maT9E=;
-        b=BkcdZqbFeePP7PhgiNGQZiQ1/IrHQjmPITDEJdkxgFaPv7QkOL49k7MbmbtcMWit7j
-         ziUuIw/Rq95yF8hjpc7DirP8lrB/AP9iPYKQkePxfGawn12jQr3gWEIbxCYZEfH52HIn
-         ivtzqFiNBO4d/qxGtGCrRZBhgU6k+lNqPc/SElKFM9K8iiTGd6d4edx1e2x8f7itVwDl
-         3j/MC4rYxBD/wUGjtqVjwe/yGhpMFnlIM+lmbBwTDlQmEul39ZXTaGnm5thuriQ9H+0a
-         LlqleLvdN7CJOMBYdAZ915Jyph3Bul8ErQmRxhlJaL/ixydmMQs2qbEMi6h/iioNmh9b
-         wCfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3m5F5SZmhCySHaq4Kl+nNPgZPVM9ttm1TTYlw+maT9E=;
-        b=51wtH7aQgKKSE2fQRCFZag9e6pHA5riWnKMAGCUKVvt/OqmRVV1NuBrzSiqbXiZE6M
-         W0mmMP5FUW1PK6rMApG9JPv6vi88OylQHF6oDvAmJoOmAOJ7t5HxHZq3OvRXrhbRaDI2
-         9gEdW4CglhuKAlepG0mrWySY0dHzmmTbC1EEvA2xIMcLxcwOH4zUhJIbqhWkmYa9OZfK
-         xmrfBdFR/b25hIB46Oniqf7Qo7Gc0560HYo9UrcCqbq3/5S9vEeM2D2nVGkrEVjAK1Gk
-         ZbbO8aS8L1Vvf61VGQvclz/wzpcBCp1wUagndSywIaEgAAliSIVxv0ZLGsOYxfdJUDw3
-         Mjtw==
-X-Gm-Message-State: ANoB5pnv3CVGZmqFt9Hq6NF+QWBCJamreNKYuLeWnEgpMKdqhkeQ1OEP
-        5rsoG81DHtTzzPtKfpB/cRxbcA==
-X-Google-Smtp-Source: AA0mqf5tmeQONwE26vLCpkyddTpVvkN7A/tfrv/HQaUC8nVZjAqUywmWqMwYQ8ENrzKcMCsDq8fIGA==
-X-Received: by 2002:a17:90a:fa46:b0:200:1df3:a7a9 with SMTP id dt6-20020a17090afa4600b002001df3a7a9mr74111196pjb.202.1669892424814;
-        Thu, 01 Dec 2022 03:00:24 -0800 (PST)
-Received: from ?IPV6:2400:4050:c360:8200:7b99:f7c3:d084:f1e2? ([2400:4050:c360:8200:7b99:f7c3:d084:f1e2])
-        by smtp.gmail.com with ESMTPSA id x8-20020a170902ec8800b001895d87225csm3324805plg.182.2022.12.01.03.00.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Dec 2022 03:00:24 -0800 (PST)
-Message-ID: <a3cc1116-272d-a8e5-a131-7becf98115e0@daynix.com>
-Date:   Thu, 1 Dec 2022 20:00:22 +0900
+        with ESMTP id S230240AbiLALYJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 06:24:09 -0500
+X-Greylist: delayed 8303 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 01 Dec 2022 03:24:02 PST
+Received: from 7.mo552.mail-out.ovh.net (7.mo552.mail-out.ovh.net [188.165.59.253])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A62624C25A
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 03:24:02 -0800 (PST)
+Received: from mxplan5.mail.ovh.net (unknown [10.108.20.54])
+        by mo552.mail-out.ovh.net (Postfix) with ESMTPS id 8185A2AB7E;
+        Thu,  1 Dec 2022 08:45:36 +0000 (UTC)
+Received: from kaod.org (37.59.142.99) by DAG4EX2.mxp5.local (172.16.2.32)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Thu, 1 Dec
+ 2022 09:45:35 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-99G003ae4f326e-cf09-4a7e-bd34-11742f0112e6,
+                    86CABC68C878FB51CEC5412B97BD86A53B3625A5) smtp.auth=clg@kaod.org
+X-OVh-ClientIp: 82.64.250.170
+Message-ID: <68e075ec-2698-3591-b808-9cb0f4b2c4f1@kaod.org>
+Date:   Thu, 1 Dec 2022 09:45:34 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH] accel/kvm/kvm-all: Handle register access errors
+Subject: Re: [PATCH v12 0/7] s390x: CPU Topology
 Content-Language: en-US
-To:     Peter Maydell <peter.maydell@linaro.org>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20221201102728.69751-1-akihiko.odaki@daynix.com>
- <CAFEAcA_ORM9CpDCvPMs1XcZVhh_4fKE2wnaS_tp1s4DzZCHsXQ@mail.gmail.com>
-From:   Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CAFEAcA_ORM9CpDCvPMs1XcZVhh_4fKE2wnaS_tp1s4DzZCHsXQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Pierre Morel <pmorel@linux.ibm.com>, <qemu-s390x@nongnu.org>
+CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
+        <pasic@linux.ibm.com>, <richard.henderson@linaro.org>,
+        <david@redhat.com>, <thuth@redhat.com>, <cohuck@redhat.com>,
+        <mst@redhat.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <ehabkost@redhat.com>, <marcel.apfelbaum@gmail.com>,
+        <eblake@redhat.com>, <armbru@redhat.com>, <seiden@linux.ibm.com>,
+        <nrb@linux.ibm.com>, <scgl@linux.ibm.com>, <frankja@linux.ibm.com>,
+        <berrange@redhat.com>
+References: <20221129174206.84882-1-pmorel@linux.ibm.com>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+In-Reply-To: <20221129174206.84882-1-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [37.59.142.99]
+X-ClientProxiedBy: DAG6EX2.mxp5.local (172.16.2.52) To DAG4EX2.mxp5.local
+ (172.16.2.32)
+X-Ovh-Tracer-GUID: 69468969-3d29-4e97-ba6c-334b1b17d1a6
+X-Ovh-Tracer-Id: 7615586972420180947
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvhedrtdeggdduvdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgihesthejredttdefjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeuuddtteelgeejhfeikeegffekhfelvefgfeejveffjeeiveegfeehgfdtgfeitdenucfkphepuddvjedrtddrtddruddpfeejrdehledrudegvddrleelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepuddvjedrtddrtddruddpmhgrihhlfhhrohhmpeeotghlgheskhgrohgurdhorhhgqedpnhgspghrtghpthhtohepuddprhgtphhtthhopehpmhhorhgvlheslhhinhhugidrihgsmhdrtghomhdpshgtghhlsehlihhnuhigrdhisghmrdgtohhmpdhnrhgssehlihhnuhigrdhisghmrdgtohhmpdhsvghiuggvnheslhhinhhugidrihgsmhdrtghomhdprghrmhgsrhhusehrvgguhhgrthdrtghomhdpvggslhgrkhgvsehrvgguhhgrthdrtghomhdpmhgrrhgtvghlrdgrphhfvghlsggruhhmsehgmhgrihhlrdgtohhmpdgvhhgrsghkohhsthesrhgvughhrghtrdgtohhmpdhkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
+ hfrhgrnhhkjhgrsehlihhnuhigrdhisghmrdgtohhmpdhpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdgtohhhuhgtkhesrhgvughhrghtrdgtohhmpdhthhhuthhhsehrvgguhhgrthdrtghomhdpuggrvhhiugesrhgvughhrghtrdgtohhmpdhrihgthhgrrhgurdhhvghnuggvrhhsohhnsehlihhnrghrohdrohhrghdpphgrshhitgeslhhinhhugidrihgsmhdrtghomhdpsghorhhnthhrrggvghgvrhesuggvrdhisghmrdgtohhmpdhqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgpdhqvghmuhdqshefledtgiesnhhonhhgnhhurdhorhhgpdhmshhtsehrvgguhhgrthdrtghomhdpsggvrhhrrghnghgvsehrvgguhhgrthdrtghomhdpoffvtefjohhsthepmhhoheehvddpmhhouggvpehsmhhtphhouhht
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022/12/01 19:40, Peter Maydell wrote:
-> On Thu, 1 Dec 2022 at 10:27, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> A register access error typically means something seriously wrong
->> happened so that anything bad can happen after that and recovery is
->> impossible.
->> Even failing one register access is catastorophic as
->> architecture-specific code are not written so that it torelates such
->> failures.
->>
->> Make sure the VM stop and nothing worse happens if such an error occurs.
->>
->> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+Hello Pierre
+
+On 11/29/22 18:41, Pierre Morel wrote:
+> Hi,
 > 
-> In a similar vein there was also
-> https://lore.kernel.org/all/20220617144857.34189-1-peterx@redhat.com/
-> back in June, which on the one hand was less comprehensive but on
-> the other does the plumbing to pass the error upwards rather than
-> reporting it immediately at point of failure.
+> The implementation of the CPU Topology in QEMU has been modified
+> since the last patch series.
 > 
-> I'm in principle in favour but suspect we'll run into some corner
-> cases where we were happily ignoring not-very-important failures
-> (eg if you're running Linux as the host OS on a Mac M1 and your
-> host kernel doesn't have this fix:
-> https://lore.kernel.org/all/YnHz6Cw5ONR2e+KA@google.com/T/
-> then QEMU will go from "works by sheer luck" to "consistently
-> hits this error check"). So we should aim to land this extra
-> error checking early in the release cycle so we have plenty of
-> time to deal with any bug reports we get about it.
+> - The two preliminary patches have been accepted and are no longer
+>    part of this series.
 > 
-> thanks
-> -- PMM
+> - The topology machine property has been abandoned
+> 
+> - the topology_capable QEMU capability has been abandoned
+> 
+> - both where replaced with a new CPU feature, topology-disable
+>    to fence per default the ctop topology information feature.
+> 
+> To use the QEMU patches, you will need Linux V6-rc1 or newer,
+> or use the following Linux mainline patches:
+> 
+> f5ecfee94493 2022-07-20 KVM: s390: resetting the Topology-Change-Report
+> 24fe0195bc19 2022-07-20 KVM: s390: guest support for topology function
+> 0130337ec45b 2022-07-20 KVM: s390: Cleanup ipte lock access and SIIF fac..
+> 
+> Currently this code is for KVM only, I have no idea if it is interesting
+> to provide a TCG patch. If ever it will be done in another series.
+> 
+> To have a better understanding of the S390x CPU Topology and its
+> implementation in QEMU you can have a look at the documentation in the
+> last patch of this series.
+> 
+> The admin will want to match the host and the guest topology, taking
+> into account that the guest does not recognize multithreading.
+> Consequently, two vCPU assigned to threads of the same real CPU should
+> preferably be assigned to the same socket of the guest machine.
+Please make sure the patchset compiles on non-s390x platforms and check
+that the documentation generates correctly. You will need to install :
 
-Actually I found this problem when I tried to run QEMU with KVM on M2 
-MacBook Air and encountered a failure described and fixed at:
-https://lore.kernel.org/all/20221201104914.28944-2-akihiko.odaki@daynix.com/
+   python3-sphinx python3-sphinx_rtd_theme
 
-Although the affected register was not really important, QEMU couldn't 
-run the guest well enough because kvm_arch_put_registers for ARM64 is 
-written in a way that it fails early. I guess the situation is not so 
-different for other architectures as well.
+'configure' should then enable doc generation.
 
-I still agree that this should be postponed until a new release cycle 
-starts as register saving/restoring is too important to fail.
+Thanks,
 
-Regards,
-Akihiko Odaki
+C.
+
