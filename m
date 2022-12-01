@@ -2,201 +2,349 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BE3E63F0D3
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 13:48:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BCA263F19D
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 14:29:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230261AbiLAMsV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 07:48:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60760 "EHLO
+        id S231337AbiLAN3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 08:29:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229728AbiLAMsT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 07:48:19 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2075.outbound.protection.outlook.com [40.107.243.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 220C88B1B7
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 04:48:18 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FOPFHVVf5TA1nMCjdB+0KaGJZDl0DP1QPHhRABJ20Knvxe18ciY3oBeRG0VUktttMbhjufqFE30y3EWj/Ao6EfjM5J71JcTCIosBSzt7lQ+NMOSTBhwmg4mcLwf4pWZHMXFYgc2WsMXWgdLTmPouDQHYN1N0ou3NOxjzE5Zib1863pCEn2Q339GP7HQcuxTrO8+XYXPkvKq4aBc3t9JEufFSqFq10z0rcgsH3fNQoY3josYhcgOtZpTO5TXyORJ1PRSSXAhc3ugJpFXZ790Od8770wVphD9dwXjvnUX+8dYo4F9icRkTBR+qdg7y5nhxrr9xKKDRXM+v/NAry4SmqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oGgO9HtssinuVW4BoHS59YM5xmJwys4Bw6zWW19cLs0=;
- b=XW9F8lQPbyCZ4IZcozgBkEs3BGf2zfh/m8qnhqGQANNambDhJKroYaW36GtpOaR9k6SHTTeHyZcq5WBSbbwIWLdGC5iSPDIflLhf7vDHtmbjyCM7j/NDMFFaFmaDZw07QD1zKly5DTJG1+C8O9MwjFmyWIfghP3cuP4M5kCBzOb6pUcYUFKP3jdhkoc8eHsnSArP1R1Z+Rx1wrd9Y/qhmlIjZKaS1t9tM014NODF2MFfxFHybyJHe4Zx2fiQ40MBd1OGUwPScqJcjZTx9TQhdTPH7KPa63v+t6sBivNOwUEZ5uM4GZsWU70G57V7Na0EBpXKHh7ls5FPsP7oz68k6g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oGgO9HtssinuVW4BoHS59YM5xmJwys4Bw6zWW19cLs0=;
- b=lyLLVgo5ysG8ykygufgc/VndD8p4JQp3MAduGTkk+zeG616qXXzeAiDn4ymHTOeZKYfdyD7RrlqtClTixJuOUCxQkTpTbD1GYyJDAtQKOC4SdQ3/BXd4KdXyixliSZGoQpAOmfPUoO5cm6Cu9llFcDOx9ZgPcETEGLEMp7cu9/oxr/nPATOSBw7IpnzbLW8jZVEfvt5chDif6ZliaMmub4i4WNcd8UdjLyIphKkek2OfQ4NWkxixKcHfpck6YIQ6OvDaLLQarDxIZaJKQJZ+6SLKH7eg2iDAmFABlz+eljN6YBGOlWBmTub1D+nH+vhNYJtxcoyEwBEPy07AQjIAng==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB5853.namprd12.prod.outlook.com (2603:10b6:510:1d4::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Thu, 1 Dec
- 2022 12:48:16 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%8]) with mapi id 15.20.5857.023; Thu, 1 Dec 2022
- 12:48:15 +0000
-Date:   Thu, 1 Dec 2022 08:48:15 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [RFC v2 05/11] vfio: Make vfio_device_open() group agnostic
-Message-ID: <Y4iij7hyD2Qhj/F9@nvidia.com>
-References: <20221124122702.26507-1-yi.l.liu@intel.com>
- <20221124122702.26507-6-yi.l.liu@intel.com>
- <BN9PR11MB5276CD3944B24228753883418C139@BN9PR11MB5276.namprd11.prod.outlook.com>
- <28861625-d500-e5e9-98cc-d1ea10fe06b6@intel.com>
- <f57fcc1d-a3a4-c423-a863-b1958a8d453f@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f57fcc1d-a3a4-c423-a863-b1958a8d453f@intel.com>
-X-ClientProxiedBy: MN2PR13CA0026.namprd13.prod.outlook.com
- (2603:10b6:208:160::39) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S231280AbiLAN3a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 08:29:30 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E58DA9CFB
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 05:29:29 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B1CfaQ5001635
+        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 13:29:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=tZAbEw3tSlOTvoRWBIO0mGeRdkuR4ow6TQpFLjD2iKY=;
+ b=B15kT6b9Y99fXVIN9qemg3J1wA05eMxyerzKLEqfnFt6DA0JucDD6G9JKVEUVB3cnam9
+ tm4MdCJdi93FSRCT1+cM77J4tQuwUSq3KIQcT69W5D1KN2rkoUS23S33rTuzEosnScpS
+ N6rrWJ6xrlVMLGY/1g2qXJT2QYUrOOHotHnM2TqBDMqX/Hq6wcT96aKYey1BOVKw/NtG
+ EUFO291NUvCyE8DfWHUjCR3MJCWQo0A1Kkj0LSauGo7iTGG1I5ib5qqQCYKv9u56FaCL
+ +YkbA9mjzlwNzJtxBVzSRX41Axhg6nYCOzjZdI7fgfHuIQAiDqYGBNR9srxgq2oE17Tz /A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6uwt1xh9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 13:29:28 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B1Cg7MN003267
+        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 13:29:27 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6uwt1xge-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Dec 2022 13:29:27 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B1DLlxZ029174;
+        Thu, 1 Dec 2022 13:29:25 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 3m3ae9fcrr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Dec 2022 13:29:25 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B1DTMY91114642
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 1 Dec 2022 13:29:22 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4A98FA4040;
+        Thu,  1 Dec 2022 13:29:22 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 14251A404D;
+        Thu,  1 Dec 2022 13:29:22 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  1 Dec 2022 13:29:22 +0000 (GMT)
+Date:   Thu, 1 Dec 2022 14:16:50 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com,
+        pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/3] s390x: add library for
+ skey-related functions
+Message-ID: <20221201141650.32cfe787@p-imbrenda>
+In-Reply-To: <20221201084642.3747014-2-nrb@linux.ibm.com>
+References: <20221201084642.3747014-1-nrb@linux.ibm.com>
+        <20221201084642.3747014-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB5853:EE_
-X-MS-Office365-Filtering-Correlation-Id: 007fe22c-6b24-4898-57b8-08dad39a5096
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MG2Y1QglaxFL1YLd3RGCUA4ZEOUpBB3YEHHvWrzt8jqXlpUuqp5I3fXbhIFZmgowDOgTPvizh/Cf5vEopLIeaGvxcgkeG+Uhm724+CJhk+V8sgrS1LQoYS/bvpKi/FGJ0VyyK97E232vY4hJQzo3WIb7srqjU5WQgJ8L9S1xV2743aTAAs6fgETyANvkL0PjnXzlGQruJN0rZK2vBw4f6DfM6DPgzGjl3SneISc6EsuaKVvFMrBuNHdFe6f4Ub0iNAFh0fGYuP7NUDm2V+jkCUb9I28BHn4k2oL8Er+k6nayzMhFnCBFMj1UPPUwGswA7NX4qdfMvgXwnltUniEETmyr1Oqu/EuIe9OIwa/xguBXRf9ltj43qBX7t4YQoOrLodbV7rVWYwcGdTR2ptsK1pvBLRH518PYfJt0sQQ8gx4ScoeCW+c2xNVBS9gqWmwox8QobDnWpJyR3JO3Kpm/PKSAy+6itZnCJeByZdKJNG38EVxPwRJxz8kFMou9lp7G6IblmJWhq1CCRkDlUkpl3sVrYXH0Bdq0oXXM0ZxusF8gqspTpPG0mbvag9dBvZivR6oMVGPVlNxZcr6w626Yyad1MaUpfLyblSXI3eFtUiDnzmXCg61ifdbcydQXLmjf
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(346002)(136003)(366004)(396003)(376002)(451199015)(2616005)(186003)(316002)(86362001)(6486002)(54906003)(6916009)(36756003)(38100700002)(8936002)(26005)(6512007)(83380400001)(6506007)(53546011)(5660300002)(4326008)(66946007)(478600001)(2906002)(41300700001)(66476007)(8676002)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?emFqQVVKeGpMWWJkZzlIa1dTVDhZMUN2ZjVVWElTMHBBRkhxcG5lNGdQOWZh?=
- =?utf-8?B?dzlUU2M0Vk52bm1FdytUbWkraDlqeThVOEVINVJhaVlUai9LRTg3UWhPd0pX?=
- =?utf-8?B?WkZhbnA0emNJZWRhbnBPakRQNnZudHUwOXhvTi9IMWxzWEFsOEtoZTRLWFE5?=
- =?utf-8?B?MHhmOGNCYStURGdYV0ZlUTg0MnlEaUd0dWJIWXRRZkJOQkZ2M295ZVNmR3hI?=
- =?utf-8?B?bU4vcWVtK2NxVWVwSjFLdkJJQ3hydW83aHNjTEppRkRXaWk4aW9pRUo4MTFW?=
- =?utf-8?B?SWpMMzdVZFBQazBKUStWalM5RXJGejhLMDFBTkc0d3l6WFljakx4eU5WcUJC?=
- =?utf-8?B?ZHhwZkJUaFArSlRYYVpSbUNyOGwzengxMGdqT2VOaFpLOGZmRUN2UTJVb043?=
- =?utf-8?B?M1pUYzNxT1FSU1RYWFA2UU9YczRNTVFxWVd3bDJoZUYyR3ZGWkhoQkhBMW55?=
- =?utf-8?B?Y1RndVp2c1NHQVFpWHpTQ1RIS3hocmV5bkZhT2J1T1pHT00rNm5JTWRyeDBw?=
- =?utf-8?B?V3VNM0dKdWdhQkk1V2lFc29hMTRmVkszd1c5cGZFNDN5bUlIZjduTUZPMW1O?=
- =?utf-8?B?SngrMDUyNHBpZndLNitnY0RDTmVSME8xNnRSU2JTL0Y5MHJwY1ZXNExIRUd4?=
- =?utf-8?B?YnhsT25qZG5hd3FzVEZNYkx3SFR1UDlYMWVQem8zK3F2QTZkM0Z6ODEwaUt6?=
- =?utf-8?B?Y1VBS2x0dlBZMHJFV2U0NlNrS0h6ZU5HNmcrWEo1eHpKa0o4ZytsNi81QXN5?=
- =?utf-8?B?TDBSRkVzVER2RVVSOGE5REt4dW1DZ0hLNjQ1ZjRQSkxOTnJoVlU1eHRCRzBI?=
- =?utf-8?B?R0hSYTdUK20rY2FJeVMrK1ppcWVVZ2l5ZkhrMEdLZC95YVdQeEFHN0hWcGRD?=
- =?utf-8?B?eCtNMWxLTE1paDJLNGdjYjA3aXNxRFBtcU03QlVaQ3pwWDB3eXVQeGpPZEhI?=
- =?utf-8?B?cHd2WlkwbzdJQ0Y0ZUc0STl6ZEpyL29IRy8yNTZDRmtxeWp2M3ZZaUE2VVZB?=
- =?utf-8?B?ZE9MUEJNYmhSazV4VmFtSHZXMWYwU1RlRE9IaDZDL1dMSnBGaVdzWHZUSisw?=
- =?utf-8?B?Y2tSOXFIY20xTjdQRnd1eGxlZ2JJRkZINXZZbVJNdjVOVlpwZHo0dU50OWJE?=
- =?utf-8?B?Y3E1cXErV3RucmlBdHpXcjhrK3VXWU1KT0pnVjNwREgvaTZsTkdhSEhMdDdI?=
- =?utf-8?B?aWN4NTIxQWFudUtrQXN1cHQzblB5a1pUMEsxZVREZmdOVHZpeVQ0MjhTTlk5?=
- =?utf-8?B?amZaMWRVKzVuN2poQnFFK3g2L2ZWVDhwYS9lUUxKaFA4dlRyZ2VYaW5lVlBn?=
- =?utf-8?B?alhrVGFkY3BFT3hEQk9iWDJUbithcjJpT3FHek5RSXpMcnFyU3F1Tzh4dDY4?=
- =?utf-8?B?UlhnMHJtYklKUGJHYUJLMkRBaUdYeXVtTUNJRmdhR3h5UEx1MTVRU0k3UnRx?=
- =?utf-8?B?cVlXdHVpVlVIUFpDNGQrc3IzeTFNTGREcWFIWmxpVDJNSzU3Yk90Z2VhbkIw?=
- =?utf-8?B?UUVkOStFaFgyWnozeXd0bVNTODM5d3k4YnI3SU1BRUhUOFRBZk5xekQ0dXBv?=
- =?utf-8?B?VUNRVENYcWFKcGExMTA5bGg0UXg1OWRJTlBpeHpxeGxPejFUYTlLMldUYndn?=
- =?utf-8?B?YnJUTVZmU0JzQWZWb2RNYWFBOCtKYis2NmhaSURoL0FFREc0QjdhT0tlR1Fy?=
- =?utf-8?B?T21HZGl5ZmtVT0YveHpJU1JFVWpXSmFjd01hVkRKTUxUblg3aTdQbmZjMEp6?=
- =?utf-8?B?cjdlcjJOMjRRcytEb3FPRHdXZkZkbTJiVHBhZzI3bTcyLzdzMSsyaDBTT2lP?=
- =?utf-8?B?UWZOdFZObjBZak1TNU1HaklRaDk0S0tRSWRWWFZjcm1aZ2xjZEU4bkVTZCt3?=
- =?utf-8?B?VHZrY2gwTzRtdDBTanZDUnU5c1pvNHlIVXlLZVQ0OERPSnY3ZFNoTXRKS2J2?=
- =?utf-8?B?NUo5RHBzaTc1cFIxeFpGY040N05xYUJmdGlNWElyZU9XdFU5aTVlMzU3Ynlz?=
- =?utf-8?B?R2xJem4zWFZTNDJldTd5QkM5U3A0RUNCUEhxeFJxNWJ6MFpZR28wZkZsb2xO?=
- =?utf-8?B?OUdCSmszeThOVVRuUHlsOEdmQm1EQ3ZlR1ZFUDFOcFgzMVJYdjhZNGhib1Ew?=
- =?utf-8?Q?jjiQ=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 007fe22c-6b24-4898-57b8-08dad39a5096
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2022 12:48:15.8301
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: q5KfbohY9QVaYHdb/CsnFpjN6bK5YgUzO2dAoswX5nWZ6VwnGqG9tg6WXrlFhr5c
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5853
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: skZvIS_-BAyBw66nm6LOd7wmEWR7WiwT
+X-Proofpoint-ORIG-GUID: JyLexYiTYB2DkYT7U45npA-mM3yJAEwa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-01_04,2022-12-01_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ spamscore=0 suspectscore=0 adultscore=0 priorityscore=1501
+ lowpriorityscore=0 clxscore=1015 malwarescore=0 mlxlogscore=999
+ bulkscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2212010093
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 01, 2022 at 03:08:12PM +0800, Yi Liu wrote:
-> On 2022/11/28 17:19, Yi Liu wrote:
-> > On 2022/11/28 16:17, Tian, Kevin wrote:
-> > > > From: Liu, Yi L <yi.l.liu@intel.com>
-> > > > Sent: Thursday, November 24, 2022 8:27 PM
-> > > > 
-> > > > This prepares for moving group specific code to separate file.
-> > > > 
-> > > > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> > > > ---
-> > > >   drivers/vfio/vfio_main.c | 7 ++++---
-> > > >   1 file changed, 4 insertions(+), 3 deletions(-)
-> > > > 
-> > > > diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> > > > index edcfa8a61096..fcb9f778fc9b 100644
-> > > > --- a/drivers/vfio/vfio_main.c
-> > > > +++ b/drivers/vfio/vfio_main.c
-> > > > @@ -878,9 +878,6 @@ static struct file *vfio_device_open(struct vfio_device
-> > > > *device)
-> > > >        */
-> > > >       filep->f_mode |= (FMODE_PREAD | FMODE_PWRITE);
-> > > > 
-> > > > -    if (device->group->type == VFIO_NO_IOMMU)
-> > > > -        dev_warn(device->dev, "vfio-noiommu device opened by
-> > > > user "
-> > > > -             "(%s:%d)\n", current->comm, task_pid_nr(current));
-> > > >       /*
-> > > >        * On success the ref of device is moved to the file and
-> > > >        * put in vfio_device_fops_release()
-> > > > @@ -927,6 +924,10 @@ static int vfio_group_ioctl_get_device_fd(struct
-> > > > vfio_group *group,
-> > > >           goto err_put_fdno;
-> > > >       }
-> > > > 
-> > > > +    if (group->type == VFIO_NO_IOMMU)
-> > > > +        dev_warn(device->dev, "vfio-noiommu device opened by
-> > > > user "
-> > > > +             "(%s:%d)\n", current->comm, task_pid_nr(current));
-> > > > +
-> > > >       fd_install(fdno, filep);
-> > > >       return fdno;
-> > > > 
-> > > 
-> > > Do we want to support no-iommu mode in future cdev path?
-> > > 
-> > > If yes keeping the check in vfio_device_open() makes more sense. Just
-> > > replace direct device->group reference with a helper e.g.:
-> > > 
-> > >     vfio_device_group_noiommu()
-> > 
-> > I didn't see a reason cdev cannot support no-iommu mode. so a helper to
-> > check noiommu is reasonable.
+On Thu,  1 Dec 2022 09:46:40 +0100
+Nico Boehr <nrb@linux.ibm.com> wrote:
+
+> Upcoming changes will add a test which is very similar to the existing
+> skey migration test. To reduce code duplication, move the common
+> functions to a library which can be re-used by both tests.
 > 
-> This check should be done after opening device and the file. Current
-> vfio_device_open() opens device first and then open file. Open file is
-> group path specific, not needed in future device cdev path. So if want to
-> have this check in the common function, the open device and open file
-> order should be swapped. However, it is not necessary here. So may just
-> drop this patch and consider it in future device cdev series.
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 
-the point here was to remove the device->group touches from
-vfio_main.c, which this does and seems appropraite.
+a few nits, otherwise looks pretty straightforward
 
-cdev no-iommu mode is going to be quite different since it will work
-without groups
+> ---
+>  lib/s390x/skey.c       | 92 ++++++++++++++++++++++++++++++++++++++++++
+>  lib/s390x/skey.h       | 32 +++++++++++++++
+>  s390x/Makefile         |  1 +
+>  s390x/migration-skey.c | 44 +++-----------------
+>  4 files changed, 131 insertions(+), 38 deletions(-)
+>  create mode 100644 lib/s390x/skey.c
+>  create mode 100644 lib/s390x/skey.h
+> 
+> diff --git a/lib/s390x/skey.c b/lib/s390x/skey.c
+> new file mode 100644
+> index 000000000000..100f0949a244
+> --- /dev/null
+> +++ b/lib/s390x/skey.c
+> @@ -0,0 +1,92 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Storage key migration test library
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <asm/facility.h>
+> +#include <asm/mem.h>
+> +#include <skey.h>
+> +
+> +/*
+> + * Set storage keys on pagebuf.
 
-Jason
+surely you should explain better what the function does (e.g. how are
+you setting the keys and why)
+
+> + * pagebuf must point to page_count consecutive pages.
+> + */
+> +void skey_set_keys(uint8_t *pagebuf, unsigned long page_count)
+
+this name does not make clear what the function is doing. at first one
+would think that it sets the same key for all pages.
+
+maybe something like set_storage_keys_test_pattern or
+skey_set_test_pattern or something like that
+
+> +{
+> +	unsigned char key_to_set;
+> +	unsigned long i;
+> +
+> +	for (i = 0; i < page_count; i++) {
+> +		/*
+> +		 * Storage keys are 7 bit, lowest bit is always returned as zero
+> +		 * by iske.
+> +		 * This loop will set all 7 bits which means we set fetch
+> +		 * protection as well as reference and change indication for
+> +		 * some keys.
+> +		 */
+> +		key_to_set = i * 2;
+> +		set_storage_key(pagebuf + i * PAGE_SIZE, key_to_set, 1);
+
+why not just i * 2 instead of using key_to_set ?
+
+> +	}
+> +}
+> +
+> +/*
+> + * Verify storage keys on pagebuf.
+> + * Storage keys must have been set by skey_set_keys on pagebuf before.
+> + *
+> + * If storage keys match the expected result, will return a skey_verify_result
+> + * with verify_failed false. All other fields are then invalid.
+> + * If there is a mismatch, returned struct will have verify_failed true and will
+> + * be filled with the details on the first mismatch encountered.
+> + */
+> +struct skey_verify_result skey_verify_keys(uint8_t *pagebuf, unsigned long page_count)
+
+and here then adjust the function name accordingly
+
+> +{
+> +	union skey expected_key, actual_key;
+> +	struct skey_verify_result result = {
+> +		.verify_failed = true
+> +	};
+> +	uint8_t *cur_page;
+> +	unsigned long i;
+> +
+> +	for (i = 0; i < page_count; i++) {
+> +		cur_page = pagebuf + i * PAGE_SIZE;
+> +		actual_key.val = get_storage_key(cur_page);
+> +		expected_key.val = i * 2;
+> +
+> +		/*
+> +		 * The PoP neither gives a guarantee that the reference bit is
+> +		 * accurate nor that it won't be cleared by hardware. Hence we
+> +		 * don't rely on it and just clear the bits to avoid compare
+> +		 * errors.
+> +		 */
+> +		actual_key.str.rf = 0;
+> +		expected_key.str.rf = 0;
+> +
+> +		if (actual_key.val != expected_key.val) {
+> +			result.expected_key.val = expected_key.val;
+> +			result.actual_key.val = actual_key.val;
+> +			result.page_mismatch_idx = i;
+> +			result.page_mismatch_addr = (unsigned long)cur_page;
+> +			return result;
+> +		}
+> +	}
+> +
+> +	result.verify_failed = false;
+> +	return result;
+> +}
+> +
+> +void skey_report_verify(struct skey_verify_result * const result)
+> +{
+> +	if (result->verify_failed)
+> +		report_fail("page skey mismatch: first page idx = %lu, addr = 0x%lx, "
+> +			"expected_key = 0x%x, actual_key = 0x%x",
+> +			result->page_mismatch_idx, result->page_mismatch_addr,
+> +			result->expected_key.val, result->actual_key.val);
+> +	else
+> +		report_pass("skeys match");
+> +}
+> diff --git a/lib/s390x/skey.h b/lib/s390x/skey.h
+> new file mode 100644
+> index 000000000000..a0f8caa1270b
+> --- /dev/null
+> +++ b/lib/s390x/skey.h
+> @@ -0,0 +1,32 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Storage key migration test library
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +#ifndef S390X_SKEY_H
+> +#define S390X_SKEY_H
+> +
+> +#include <libcflat.h>
+> +#include <asm/facility.h>
+> +#include <asm/page.h>
+> +#include <asm/mem.h>
+> +
+> +struct skey_verify_result {
+> +	bool verify_failed;
+> +	union skey expected_key;
+> +	union skey actual_key;
+> +	unsigned long page_mismatch_idx;
+> +	unsigned long page_mismatch_addr;
+> +};
+> +
+> +void skey_set_keys(uint8_t *pagebuf, unsigned long page_count);
+> +
+> +struct skey_verify_result skey_verify_keys(uint8_t *pagebuf, unsigned long page_count);
+> +
+> +void skey_report_verify(struct skey_verify_result * const result);
+> +
+> +#endif /* S390X_SKEY_H */
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index bf1504f9d58c..d097b7071dfb 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -99,6 +99,7 @@ cflatobjs += lib/s390x/malloc_io.o
+>  cflatobjs += lib/s390x/uv.o
+>  cflatobjs += lib/s390x/sie.o
+>  cflatobjs += lib/s390x/fault.o
+> +cflatobjs += lib/s390x/skey.o
+>  
+>  OBJDIRS += lib/s390x
+>  
+> diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
+> index b7bd82581abe..fed6fc1ed0f8 100644
+> --- a/s390x/migration-skey.c
+> +++ b/s390x/migration-skey.c
+> @@ -10,55 +10,23 @@
+>  
+>  #include <libcflat.h>
+>  #include <asm/facility.h>
+> -#include <asm/page.h>
+> -#include <asm/mem.h>
+> -#include <asm/interrupt.h>
+>  #include <hardware.h>
+> +#include <skey.h>
+>  
+>  #define NUM_PAGES 128
+> -static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+> +static uint8_t pagebuf[NUM_PAGES * PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+>  
+>  static void test_migration(void)
+>  {
+> -	union skey expected_key, actual_key;
+> -	int i, key_to_set, key_mismatches = 0;
+> +	struct skey_verify_result result;
+>  
+> -	for (i = 0; i < NUM_PAGES; i++) {
+> -		/*
+> -		 * Storage keys are 7 bit, lowest bit is always returned as zero
+> -		 * by iske.
+> -		 * This loop will set all 7 bits which means we set fetch
+> -		 * protection as well as reference and change indication for
+> -		 * some keys.
+> -		 */
+> -		key_to_set = i * 2;
+
+ah I see, you have simply moved this code :)
+
+> -		set_storage_key(pagebuf[i], key_to_set, 1);
+> -	}
+> +	skey_set_keys(pagebuf, NUM_PAGES);
+>  
+>  	puts("Please migrate me, then press return\n");
+>  	(void)getchar();
+>  
+> -	for (i = 0; i < NUM_PAGES; i++) {
+> -		actual_key.val = get_storage_key(pagebuf[i]);
+> -		expected_key.val = i * 2;
+> -
+> -		/*
+> -		 * The PoP neither gives a guarantee that the reference bit is
+> -		 * accurate nor that it won't be cleared by hardware. Hence we
+> -		 * don't rely on it and just clear the bits to avoid compare
+> -		 * errors.
+> -		 */
+> -		actual_key.str.rf = 0;
+> -		expected_key.str.rf = 0;
+> -
+> -		/* don't log anything when key matches to avoid spamming the log */
+> -		if (actual_key.val != expected_key.val) {
+> -			key_mismatches++;
+> -			report_fail("page %d expected_key=0x%x actual_key=0x%x", i, expected_key.val, actual_key.val);
+> -		}
+> -	}
+> -
+> -	report(!key_mismatches, "skeys after migration match");
+> +	result = skey_verify_keys(pagebuf, NUM_PAGES);
+> +	skey_report_verify(&result);
+>  }
+>  
+>  int main(void)
+
