@@ -2,139 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEE6463F594
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 17:46:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB67863F59A
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 17:47:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229841AbiLAQq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 11:46:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35274 "EHLO
+        id S229890AbiLAQrY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 11:47:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229757AbiLAQqT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 11:46:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 329B2AE4F0
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 08:45:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669913119;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0j7iDCqKcud61bnCVouYTAjXYx/lMBjTVmeuK6IwiIs=;
-        b=NCBOe8Y+pheTUfOsgWlqkMEwefdvxMOaYnVDzMc/7pEvdZpPQ03apRGblsSMbc9olUhFv0
-        TsNzJSVC18hYJPMhFz7eSPOKaph9c1gd84vWzP31pdqgKEqxJ593IVgXJZMU7E5Fe5Np1v
-        69oNMzxQxmbCHp4tqUIchS7NHUqmlcg=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-168-CLIbz-_UMeC47HHZZgSMxA-1; Thu, 01 Dec 2022 11:45:18 -0500
-X-MC-Unique: CLIbz-_UMeC47HHZZgSMxA-1
-Received: by mail-ej1-f72.google.com with SMTP id sb2-20020a1709076d8200b007bdea97e799so1682758ejc.22
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 08:45:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0j7iDCqKcud61bnCVouYTAjXYx/lMBjTVmeuK6IwiIs=;
-        b=zySj/86hBRjiiRReIq+nKIsweGmETBlnp4hV5X+65y8c9szPdbuelFyDRNKrCJuDCJ
-         o+9PWuTAGQc2oHmybaZDiCuzh1LknfyBu2eSwjRvT5fWK/zGNlpC/yJ//vz1dX0oujjA
-         u4R3CPIdohTe2v6dFOx4B5EGCgUiR/vZloEZPOy0hs09PS/5pmtavcc/OgB1pkgGwyM3
-         pwrMIE9YVPrFCV8jLKIGb1G4gNiSxkI/kbXf0McboPMQsy5AJnb6h1ZuM3hG5LDWwaP8
-         jnKN7t8afgIKfYqBd+LJi7/SWhuztxyBhYVZjDy10c3EjRJEQqwU88HjLyj2NEgqFaSx
-         es1Q==
-X-Gm-Message-State: ANoB5pkyyalgI6ZiwIJDxHzvwuiQsMtTDJUeVx831uGpaABrzV0fmacF
-        ZDBz/NemGwbAHT9j6RhSu27np4uQiQwyobYZ0I1qhF55pOnVzEH4+z8MwMokw6Uci7kTPC0TUVq
-        rfwW+6RkmScUN
-X-Received: by 2002:a17:906:6c7:b0:78d:4061:5e1b with SMTP id v7-20020a17090606c700b0078d40615e1bmr47970147ejb.47.1669913117079;
-        Thu, 01 Dec 2022 08:45:17 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4eaU/O5iQxd1YPRfrkTQE4uquPar9KRJcIbFIa3jXZVSj/nGj010qrX05SJquNTJ1RK03UPA==
-X-Received: by 2002:a17:906:6c7:b0:78d:4061:5e1b with SMTP id v7-20020a17090606c700b0078d40615e1bmr47970132ejb.47.1669913116866;
-        Thu, 01 Dec 2022 08:45:16 -0800 (PST)
-Received: from ovpn-194-141.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id m11-20020a056402050b00b00467cc919072sm1917760edv.17.2022.12.01.08.45.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Dec 2022 08:45:15 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     coverity-bot <keescook@chromium.org>
-Cc:     Sean Christopherson <seanjc@google.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-next@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: Coverity: kvm_hv_flush_tlb(): Uninitialized variables
-In-Reply-To: <202212010825.9FB75F1F@keescook>
-References: <202212010825.9FB75F1F@keescook>
-Date:   Thu, 01 Dec 2022 17:45:14 +0100
-Message-ID: <87edtjf4yt.fsf@ovpn-194-141.brq.redhat.com>
+        with ESMTP id S229984AbiLAQqy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 11:46:54 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 725E8BD893
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 08:46:42 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B1FfsDN020900
+        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 16:46:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ZMcxQ9w7ZhIS0g7L2T7kOqJ65WhwkFg6yh6E5uKVcWM=;
+ b=NJoulmqHnKJW7sWWk3TZvymgzYiU7JwTpmphrUlL9q7687ULKT5SoRVtSbq/Jc1BLzFO
+ HnN43GWDJ28HDTJXNF+AMplbTadJjsyHv0/PK0efWpDPe524EAzp614h1GmzSylsoiHQ
+ TEwPNug43NHXBqUPVC+cpS/lKTi/ykcHq8MTvSaTLk9rCpX6tmX8h6WvAoOEceWH86Xx
+ IiAzATovlGuqo+fGF83DL6dZpx2NqoGm+ue4+NGjv7X8y5rBZloHPwJvM+FoKrotCmbL
+ zDPjgnI+VbkthkUQlXcLptzvm3BNaTFZAa7/yHoUzS7aRJSeEm15TcTJ3I295e94sTMw wA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6y4u9tb5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 16:46:42 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B1Ga7s4025272
+        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 16:46:41 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6y4u9tac-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Dec 2022 16:46:41 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B1Ge3DP011534;
+        Thu, 1 Dec 2022 16:46:39 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06fra.de.ibm.com with ESMTP id 3m3a2hwjgf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Dec 2022 16:46:39 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B1GkajX10158818
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 1 Dec 2022 16:46:36 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 073BE5204E;
+        Thu,  1 Dec 2022 16:46:36 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id BB1CC5204F;
+        Thu,  1 Dec 2022 16:46:35 +0000 (GMT)
+Date:   Thu, 1 Dec 2022 17:46:34 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com,
+        pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/3] s390x: add library for
+ skey-related functions
+Message-ID: <20221201174634.57a1a44a@p-imbrenda>
+In-Reply-To: <166991014258.186408.12012997417078839512@t14-nrb.local>
+References: <20221201084642.3747014-1-nrb@linux.ibm.com>
+        <20221201084642.3747014-2-nrb@linux.ibm.com>
+        <20221201141650.32cfe787@p-imbrenda>
+        <166991014258.186408.12012997417078839512@t14-nrb.local>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: yxgTYm-aW_z42FQ2HJvHPkYJ-48RU73I
+X-Proofpoint-ORIG-GUID: 7Y_np2FHJU7uImy39hlRktU40UOc-twG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-01_12,2022-12-01_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ bulkscore=0 priorityscore=1501 clxscore=1015 lowpriorityscore=0
+ malwarescore=0 suspectscore=0 spamscore=0 phishscore=0 impostorscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2212010123
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-coverity-bot <keescook@chromium.org> writes:
+On Thu, 01 Dec 2022 16:55:42 +0100
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-> Hello!
->
-> This is an experimental semi-automated report about issues detected by
-> Coverity from a scan of next-20221201 as part of the linux-next scan project:
-> https://scan.coverity.com/projects/linux-next-weekly-scan
->
-> You're getting this email because you were associated with the identified
-> lines of code (noted below) that were touched by commits:
->
->   Fri Nov 18 12:59:05 2022 -0500
->     260970862c88 ("KVM: x86: hyper-v: Handle HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls gently")
->
-> Coverity reported the following:
->
-> *** CID 1527764:  Uninitialized variables  (UNINIT)
-> arch/x86/kvm/hyperv.c:2024 in kvm_hv_flush_tlb()
-> 2018     		 * Hyper-V TLFS doesn't explicitly forbid non-empty sparse vCPU
-> 2019     		 * banks (and, thus, non-zero 'var_cnt') for the 'all vCPUs'
-> 2020     		 * case (HV_GENERIC_SET_ALL).  Always adjust data_offset and
-> 2021     		 * consumed_xmm_halves to make sure TLB flush entries are read
-> 2022     		 * from the correct offset.
-> 2023     		 */
-> vvv     CID 1527764:  Uninitialized variables  (UNINIT)
-> vvv     Using uninitialized value "data_offset".
-> 2024     		data_offset += hc->var_cnt * sizeof(sparse_banks[0]);
-> 2025     		consumed_xmm_halves += hc->var_cnt;
-> 2026     	}
-> 2027
-> 2028     	if (hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE ||
-> 2029     	    hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX ||
->
-> If this is a false positive, please let us know so we can mark it as
-> such, or teach the Coverity rules to be smarter. If not, please make
-> sure fixes get into linux-next. :) For patches fixing this, please
-> include these lines (but double-check the "Fixes" first):
+> Quoting Claudio Imbrenda (2022-12-01 14:16:50)
+> > On Thu,  1 Dec 2022 09:46:40 +0100
+> > Nico Boehr <nrb@linux.ibm.com> wrote:  
+> [...]
+> > > diff --git a/lib/s390x/skey.c b/lib/s390x/skey.c
+> > > new file mode 100644
+> > > index 000000000000..100f0949a244  
+> [...]
+> > > +/*
+> > > + * Set storage keys on pagebuf.  
 
-Looks half legit) 'data_offset' can only be uninitialized here in
-'hc->fast' case but this also means that the only user of 'data_offset'
-(kvm_hv_get_tlb_flush_entries()) below will not use it. So yes, we do
-increment an uninitialized variable but we won't use the result. I think
-we're better off fixing this, even if there's no real issue. I'll send a
-patch, hopefully tomorrow.
+... according to a pattern
 
-Thanks!
+> > 
+> > surely you should explain better what the function does (e.g. how are
+> > you setting the keys and why)  
+> 
+> Well there is the comment below which explains why the * 2 is needed, so what
+> about this paragraph (after merging the commits as discussed before):
+> 
+>     * Each page's storage key is generated by taking the page's index in pagebuf,
+>     * XOR-ing that with the given seed and then multipling the result with two.
 
->
-> Reported-by: coverity-bot <keescook+coverity-bot@chromium.org>
-> Addresses-Coverity-ID: 1527764 ("Uninitialized variables")
-> Fixes: 260970862c88 ("KVM: x86: hyper-v: Handle HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls gently")
->
-> Thanks for your attention!
+looks good
 
--- 
-Vitaly
+> 
+> (But really that's also easy to see from the code below, so I am not sure if
+> this really adds value.)
 
+if you want to add documentation, do it properly, otherwise there is no
+point in having documentation at all :)
+
+> 
+> > > + * pagebuf must point to page_count consecutive pages.
+> > > + */
+> > > +void skey_set_keys(uint8_t *pagebuf, unsigned long page_count)  
+> > 
+> > this name does not make clear what the function is doing. at first one
+> > would think that it sets the same key for all pages.
+> > 
+> > maybe something like set_storage_keys_test_pattern or
+> > skey_set_test_pattern or something like that  
+> 
+> Oh that's a nice suggestion, thanks.
+> 
+> >   
+> > > +{
+> > > +     unsigned char key_to_set;
+> > > +     unsigned long i;
+> > > +
+> > > +     for (i = 0; i < page_count; i++) {
+> > > +             /*
+> > > +              * Storage keys are 7 bit, lowest bit is always returned as zero
+> > > +              * by iske.
+> > > +              * This loop will set all 7 bits which means we set fetch
+> > > +              * protection as well as reference and change indication for
+> > > +              * some keys.
+> > > +              */
+> > > +             key_to_set = i * 2;
+> > > +             set_storage_key(pagebuf + i * PAGE_SIZE, key_to_set, 1);  
+> > 
+> > why not just i * 2 instead of using key_to_set ?  
+> 
+> Well you answered that yourself :)
+> 
+> In patch 2, the key_to_set expression becomes a bit more complex, so the extra
+> variable makes sense to me.
+
+fair enough
