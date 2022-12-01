@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D14263F339
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 15:55:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D295A63F33A
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 15:55:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231561AbiLAOzw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 09:55:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37258 "EHLO
+        id S231535AbiLAOzx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 09:55:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231345AbiLAOzr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 09:55:47 -0500
+        with ESMTP id S231484AbiLAOzs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 09:55:48 -0500
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67955BD895
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 06:55:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23429BB7FB
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 06:55:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669906546; x=1701442546;
+  t=1669906547; x=1701442547;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=fb8Y1Swxw5mauQqBDTEwmn9jPcwSdo1NITP8s6Ie23I=;
-  b=UsMjJh4DD1n9jt6bBt4ShAMymMZJnC6ed8qM60bc/Jxyol5/lYRcKAF8
-   1zDQX+POA1K+OORMIAsFTnjdkMuNH683ltNrID2hnCLyqA29D8NSaB0f6
-   zSkf8DGtnCjgrp2FGZhZ7DfAoWgABDKeKnvdgiQ5p8J0F2fEG5cY+eCkA
-   qC0ZxQv8DnV/teDqXpeVULtIEqGFdu4A+SgmdQSVfB3vZUWp+7TBe5Brb
-   1/9Aa5YElV5nmDNGS+mtflr8ra2LAykptbufJoOLW776FBnPh0pcCaRIx
-   22kn1PQ6seB1hemQaPiWDxBMS+2naRLi7QKrIwTI2CpmYeEInEK2aB8B2
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="317569325"
+  bh=ocJMWCXygOKnLgkenfWX6hqL5niJuF2MvULJmoNtGE4=;
+  b=Wsm+ulGVE1YszcG3YPFt3niG2h1ZC5QKg1y+0Q2gYwYJ+yRbPOFn2kX3
+   pKovOICmflcUzyCZmDZnIBam1VQ5ulRRtbf5O5LMuDwTgWKlAkV9UTBSW
+   4w6mQ9Olqi115R/LiVjrsNxUwbHmqol2X1P6wJVbge0d7OUSXT5QGpzuf
+   Hc01LpKgcZiEy2/pN1dZOdK5d8jBVwyUpMHd0KTt9CoswdtXASSkfgD7V
+   VZiLVRukNQeBq1IjHhddQ8gDGQ0bkWmovzT465WWOG4fubb3fkKwWltFH
+   KsmupkXlpmrOFXfqJYPtibPwFAr/fI0IeICvwxYaUe4TuYx/V2Fv/LnFR
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="317569332"
 X-IronPort-AV: E=Sophos;i="5.96,209,1665471600"; 
-   d="scan'208";a="317569325"
+   d="scan'208";a="317569332"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2022 06:55:45 -0800
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2022 06:55:46 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="708095200"
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="708095206"
 X-IronPort-AV: E=Sophos;i="5.96,209,1665471600"; 
-   d="scan'208";a="708095200"
+   d="scan'208";a="708095206"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga008.fm.intel.com with ESMTP; 01 Dec 2022 06:55:45 -0800
+  by fmsmga008.fm.intel.com with ESMTP; 01 Dec 2022 06:55:46 -0800
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com
 Cc:     kevin.tian@intel.com, cohuck@redhat.com, eric.auger@redhat.com,
         nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
         chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
         yi.y.sun@linux.intel.com
-Subject: [PATCH 08/10] vfio: Wrap vfio group module init/clean code into helpers
-Date:   Thu,  1 Dec 2022 06:55:33 -0800
-Message-Id: <20221201145535.589687-9-yi.l.liu@intel.com>
+Subject: [PATCH 09/10] vfio: Refactor dma APIs for emulated devices
+Date:   Thu,  1 Dec 2022 06:55:34 -0800
+Message-Id: <20221201145535.589687-10-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221201145535.589687-1-yi.l.liu@intel.com>
 References: <20221201145535.589687-1-yi.l.liu@intel.com>
@@ -61,116 +61,187 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This wraps the init/clean code of vfio group global variable to be helpers,
-and prepares for further moving vfio group specific code into separate
-file.
-
-As container is used by group, so vfio_container_init/cleanup() is moved
-into vfio_group_init/cleanup().
+To use group helpers instead of opening group related code in the
+API. This prepares moving group specific code out of vfio_main.c.
 
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
 ---
- drivers/vfio/vfio_main.c | 56 ++++++++++++++++++++++++++--------------
- 1 file changed, 36 insertions(+), 20 deletions(-)
+ drivers/vfio/container.c | 20 +++++++++++++-------
+ drivers/vfio/vfio.h      | 32 ++++++++++++++++----------------
+ drivers/vfio/vfio_main.c | 25 ++++++++++++++-----------
+ 3 files changed, 43 insertions(+), 34 deletions(-)
 
+diff --git a/drivers/vfio/container.c b/drivers/vfio/container.c
+index 6b362d97d682..b7a9560ab25e 100644
+--- a/drivers/vfio/container.c
++++ b/drivers/vfio/container.c
+@@ -540,10 +540,12 @@ void vfio_group_unuse_container(struct vfio_group *group)
+ 	fput(group->opened_file);
+ }
+ 
+-int vfio_container_pin_pages(struct vfio_container *container,
+-			     struct iommu_group *iommu_group, dma_addr_t iova,
+-			     int npage, int prot, struct page **pages)
++int vfio_device_container_pin_pages(struct vfio_device *device,
++				    dma_addr_t iova, int npage,
++				    int prot, struct page **pages)
+ {
++	struct vfio_container *container = device->group->container;
++	struct iommu_group *iommu_group = device->group->iommu_group;
+ 	struct vfio_iommu_driver *driver = container->iommu_driver;
+ 
+ 	if (npage > VFIO_PIN_PAGES_MAX_ENTRIES)
+@@ -555,9 +557,11 @@ int vfio_container_pin_pages(struct vfio_container *container,
+ 				      npage, prot, pages);
+ }
+ 
+-void vfio_container_unpin_pages(struct vfio_container *container,
+-				dma_addr_t iova, int npage)
++void vfio_device_container_unpin_pages(struct vfio_device *device,
++				       dma_addr_t iova, int npage)
+ {
++	struct vfio_container *container = device->group->container;
++
+ 	if (WARN_ON(npage <= 0 || npage > VFIO_PIN_PAGES_MAX_ENTRIES))
+ 		return;
+ 
+@@ -565,9 +569,11 @@ void vfio_container_unpin_pages(struct vfio_container *container,
+ 						  npage);
+ }
+ 
+-int vfio_container_dma_rw(struct vfio_container *container, dma_addr_t iova,
+-			  void *data, size_t len, bool write)
++int vfio_device_container_dma_rw(struct vfio_device *device,
++				 dma_addr_t iova, void *data,
++				 size_t len, bool write)
+ {
++	struct vfio_container *container = device->group->container;
+ 	struct vfio_iommu_driver *driver = container->iommu_driver;
+ 
+ 	if (unlikely(!driver || !driver->ops->dma_rw))
+diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+index ce5fe3fc493b..a112e8f2b291 100644
+--- a/drivers/vfio/vfio.h
++++ b/drivers/vfio/vfio.h
+@@ -122,13 +122,14 @@ int vfio_container_attach_group(struct vfio_container *container,
+ void vfio_group_detach_container(struct vfio_group *group);
+ void vfio_device_container_register(struct vfio_device *device);
+ void vfio_device_container_unregister(struct vfio_device *device);
+-int vfio_container_pin_pages(struct vfio_container *container,
+-			     struct iommu_group *iommu_group, dma_addr_t iova,
+-			     int npage, int prot, struct page **pages);
+-void vfio_container_unpin_pages(struct vfio_container *container,
+-				dma_addr_t iova, int npage);
+-int vfio_container_dma_rw(struct vfio_container *container, dma_addr_t iova,
+-			  void *data, size_t len, bool write);
++int vfio_device_container_pin_pages(struct vfio_device *device,
++				    dma_addr_t iova, int npage,
++				    int prot, struct page **pages);
++void vfio_device_container_unpin_pages(struct vfio_device *device,
++				       dma_addr_t iova, int npage);
++int vfio_device_container_dma_rw(struct vfio_device *device,
++				 dma_addr_t iova, void *data,
++				 size_t len, bool write);
+ 
+ int __init vfio_container_init(void);
+ void vfio_container_cleanup(void);
+@@ -166,22 +167,21 @@ static inline void vfio_device_container_unregister(struct vfio_device *device)
+ {
+ }
+ 
+-static inline int vfio_container_pin_pages(struct vfio_container *container,
+-					   struct iommu_group *iommu_group,
+-					   dma_addr_t iova, int npage, int prot,
+-					   struct page **pages)
++static inline int vfio_device_container_pin_pages(struct vfio_device *device,
++						  dma_addr_t iova, int npage,
++						  int prot, struct page **pages)
+ {
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static inline void vfio_container_unpin_pages(struct vfio_container *container,
+-					      dma_addr_t iova, int npage)
++static inline void vfio_device_container_unpin_pages(struct vfio_device *device,
++						     dma_addr_t iova, int npage)
+ {
+ }
+ 
+-static inline int vfio_container_dma_rw(struct vfio_container *container,
+-					dma_addr_t iova, void *data, size_t len,
+-					bool write)
++static inline int vfio_device_container_dma_rw(struct vfio_device *device,
++					       dma_addr_t iova, void *data,
++					       size_t len, bool write)
+ {
+ 	return -EOPNOTSUPP;
+ }
 diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 6906aa099c0e..6e7daed47e97 100644
+index 6e7daed47e97..11fe044e8703 100644
 --- a/drivers/vfio/vfio_main.c
 +++ b/drivers/vfio/vfio_main.c
-@@ -2071,12 +2071,11 @@ static char *vfio_devnode(struct device *dev, umode_t *mode)
- 	return kasprintf(GFP_KERNEL, "vfio/%s", dev_name(dev));
+@@ -1943,6 +1943,11 @@ int vfio_set_irqs_validate_and_prepare(struct vfio_irq_set *hdr, int num_irqs,
  }
+ EXPORT_SYMBOL(vfio_set_irqs_validate_and_prepare);
  
--static int __init vfio_init(void)
-+static int __init vfio_group_init(void)
- {
- 	int ret;
- 
- 	ida_init(&vfio.group_ida);
--	ida_init(&vfio.device_ida);
- 	mutex_init(&vfio.group_lock);
- 	INIT_LIST_HEAD(&vfio.group_list);
- 
-@@ -2093,24 +2092,12 @@ static int __init vfio_init(void)
- 
- 	vfio.class->devnode = vfio_devnode;
- 
--	/* /sys/class/vfio-dev/vfioX */
--	vfio.device_class = class_create(THIS_MODULE, "vfio-dev");
--	if (IS_ERR(vfio.device_class)) {
--		ret = PTR_ERR(vfio.device_class);
--		goto err_dev_class;
--	}
--
- 	ret = alloc_chrdev_region(&vfio.group_devt, 0, MINORMASK + 1, "vfio");
- 	if (ret)
- 		goto err_alloc_chrdev;
--
--	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
- 	return 0;
- 
- err_alloc_chrdev:
--	class_destroy(vfio.device_class);
--	vfio.device_class = NULL;
--err_dev_class:
- 	class_destroy(vfio.class);
- 	vfio.class = NULL;
- err_group_class:
-@@ -2118,18 +2105,47 @@ static int __init vfio_init(void)
- 	return ret;
- }
- 
--static void __exit vfio_cleanup(void)
-+static void vfio_group_cleanup(void)
- {
- 	WARN_ON(!list_empty(&vfio.group_list));
--
--	ida_destroy(&vfio.device_ida);
- 	ida_destroy(&vfio.group_ida);
- 	unregister_chrdev_region(vfio.group_devt, MINORMASK + 1);
--	class_destroy(vfio.device_class);
--	vfio.device_class = NULL;
- 	class_destroy(vfio.class);
--	vfio_container_cleanup();
- 	vfio.class = NULL;
-+	vfio_container_cleanup();
++static bool vfio_device_has_container(struct vfio_device *device)
++{
++	return device->group->container;
 +}
 +
-+static int __init vfio_init(void)
-+{
-+	int ret;
-+
-+	ida_init(&vfio.device_ida);
-+
-+	ret = vfio_group_init();
-+	if (ret)
-+		return ret;
-+
-+	/* /sys/class/vfio-dev/vfioX */
-+	vfio.device_class = class_create(THIS_MODULE, "vfio-dev");
-+	if (IS_ERR(vfio.device_class)) {
-+		ret = PTR_ERR(vfio.device_class);
-+		goto err_dev_class;
-+	}
-+
-+	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
-+	return 0;
-+
-+err_dev_class:
-+	vfio_group_cleanup();
-+	return ret;
-+}
-+
-+static void __exit vfio_cleanup(void)
-+{
-+	ida_destroy(&vfio.device_ida);
-+	class_destroy(vfio.device_class);
-+	vfio.device_class = NULL;
-+	vfio_group_cleanup();
- 	xa_destroy(&vfio_device_set_xa);
- }
+ /*
+  * Pin contiguous user pages and return their associated host pages for local
+  * domain only.
+@@ -1955,7 +1960,7 @@ EXPORT_SYMBOL(vfio_set_irqs_validate_and_prepare);
+  * Return error or number of pages pinned.
+  *
+  * A driver may only call this function if the vfio_device was created
+- * by vfio_register_emulated_iommu_dev() due to vfio_container_pin_pages().
++ * by vfio_register_emulated_iommu_dev() due to vfio_device_container_pin_pages().
+  */
+ int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
+ 		   int npage, int prot, struct page **pages)
+@@ -1963,10 +1968,9 @@ int vfio_pin_pages(struct vfio_device *device, dma_addr_t iova,
+ 	/* group->container cannot change while a vfio device is open */
+ 	if (!pages || !npage || WARN_ON(!vfio_assert_device_open(device)))
+ 		return -EINVAL;
+-	if (device->group->container)
+-		return vfio_container_pin_pages(device->group->container,
+-						device->group->iommu_group,
+-						iova, npage, prot, pages);
++	if (vfio_device_has_container(device))
++		return vfio_device_container_pin_pages(device, iova,
++						       npage, prot, pages);
+ 	if (device->iommufd_access) {
+ 		int ret;
  
+@@ -2002,9 +2006,8 @@ void vfio_unpin_pages(struct vfio_device *device, dma_addr_t iova, int npage)
+ 	if (WARN_ON(!vfio_assert_device_open(device)))
+ 		return;
+ 
+-	if (device->group->container) {
+-		vfio_container_unpin_pages(device->group->container, iova,
+-					   npage);
++	if (vfio_device_has_container(device)) {
++		vfio_device_container_unpin_pages(device, iova, npage);
+ 		return;
+ 	}
+ 	if (device->iommufd_access) {
+@@ -2041,9 +2044,9 @@ int vfio_dma_rw(struct vfio_device *device, dma_addr_t iova, void *data,
+ 	if (!data || len <= 0 || !vfio_assert_device_open(device))
+ 		return -EINVAL;
+ 
+-	if (device->group->container)
+-		return vfio_container_dma_rw(device->group->container, iova,
+-					     data, len, write);
++	if (vfio_device_has_container(device))
++		return vfio_device_container_dma_rw(device, iova,
++						    data, len, write);
+ 
+ 	if (device->iommufd_access) {
+ 		unsigned int flags = 0;
 -- 
 2.34.1
 
