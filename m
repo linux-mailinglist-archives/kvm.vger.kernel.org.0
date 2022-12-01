@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1273363F334
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 15:55:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E31363F335
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 15:55:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231504AbiLAOzq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 09:55:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37158 "EHLO
+        id S231476AbiLAOzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 09:55:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231345AbiLAOzm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230401AbiLAOzm (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 1 Dec 2022 09:55:42 -0500
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81C35BB7FB
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 06:55:41 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 403CABB7EF
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 06:55:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669906541; x=1701442541;
+  t=1669906542; x=1701442542;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=C4orkMOfRqw6618gMklzJXFD/AmQira52FZhUFGsbSg=;
-  b=OhG2NkcFLItzdTa+hLSrDfaND+D+HGc0Tw6616fngN2Y29Bh/0Ydxkk6
-   7OJs5bPuDJJDzF1aYFGo/fOXHT4mzLFEccwFObP7H9Dr1Vbd0IZkd2s8g
-   umD4/I570aeUQVkI2E+D0D+fCM4bNQ9v8TBKvSuBLe5eoCqaU1mtR2iga
-   z1hkmXOkuJJwUHuheBA0ySKbE7l2bcbrmAU70YLNbxXUOd2lVmZwELwC7
-   NezGTov+N05zYj4nP5Ft6HyBuOFg/Ew951/1qmtQajFhuzbGrvkSrCDn4
-   N5XgVRhfJ33w1dWV78glWo+OnDY76C/j6QvEDAinAcbD3l6L951K6PhwZ
+  bh=YK1f7TX6jPBOaz7dP+hzjNaSEoA6+RID/uuqF/NX/2M=;
+  b=YFBUbWyup2vm6LaU6luDWgLRQMqYfgdhL8pEEkgSfoiSDDbGL1EPLl3f
+   0nBIWWkbFtxZ7160wdj32QNXs7wWQu7RsdEycATS3+Ucg9vY8OObH5a3C
+   VvE9Hz4W8gzvyTAK7Mr/VP60N9/DLmb1BQ+hcRq0B4j4tyQ1ErO5V3Tb1
+   4PNDMoEFEBhbqMUn9/tbNtv5XALPteKEvoOb0wXITkHUw2T1XvD/W76Lp
+   vaHTX7CJFlQDLTUxCucTRo2Y0PtAU6eolHEfwAyjj3gTBOze870x8+zzT
+   W3yWNK3s1UPoo+YP2Jh+xsQKgDgU2WYuFt7NBqVuSfwI6Q5P8YT0dwzBz
    Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="317569293"
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="317569298"
 X-IronPort-AV: E=Sophos;i="5.96,209,1665471600"; 
-   d="scan'208";a="317569293"
+   d="scan'208";a="317569298"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2022 06:55:41 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="708095161"
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="708095167"
 X-IronPort-AV: E=Sophos;i="5.96,209,1665471600"; 
-   d="scan'208";a="708095161"
+   d="scan'208";a="708095167"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga008.fm.intel.com with ESMTP; 01 Dec 2022 06:55:40 -0800
+  by fmsmga008.fm.intel.com with ESMTP; 01 Dec 2022 06:55:41 -0800
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com
 Cc:     kevin.tian@intel.com, cohuck@redhat.com, eric.auger@redhat.com,
         nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
         chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
         yi.y.sun@linux.intel.com
-Subject: [PATCH 03/10] vfio: Create wrappers for group register/unregister
-Date:   Thu,  1 Dec 2022 06:55:28 -0800
-Message-Id: <20221201145535.589687-4-yi.l.liu@intel.com>
+Subject: [PATCH 04/10] vfio: Set device->group in helper function
+Date:   Thu,  1 Dec 2022 06:55:29 -0800
+Message-Id: <20221201145535.589687-5-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221201145535.589687-1-yi.l.liu@intel.com>
 References: <20221201145535.589687-1-yi.l.liu@intel.com>
@@ -61,71 +61,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This avoids decoding group fields in the common functions used by
-vfio_device registration, and prepares for further moving the vfio group
-specific code into separate file.
+This avoids referencing device->group in __vfio_register_dev().
 
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/vfio/vfio_main.c | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
+ drivers/vfio/vfio_main.c | 41 +++++++++++++++++++++++++---------------
+ 1 file changed, 26 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 9f05dab0fab5..7017d3da6e6f 100644
+index 7017d3da6e6f..d1e8e5d2a1bc 100644
 --- a/drivers/vfio/vfio_main.c
 +++ b/drivers/vfio/vfio_main.c
-@@ -487,6 +487,20 @@ static struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
- 	return group;
+@@ -501,18 +501,29 @@ static void vfio_device_group_unregister(struct vfio_device *device)
+ 	mutex_unlock(&device->group->device_lock);
  }
  
-+static void vfio_device_group_register(struct vfio_device *device)
-+{
-+	mutex_lock(&device->group->device_lock);
-+	list_add(&device->group_next, &device->group->device_list);
-+	mutex_unlock(&device->group->device_lock);
+-static int __vfio_register_dev(struct vfio_device *device,
+-		struct vfio_group *group)
++static int vfio_device_set_group(struct vfio_device *device,
++				 enum vfio_group_type type)
+ {
+-	int ret;
++	struct vfio_group *group;
++
++	if (type == VFIO_IOMMU)
++		group = vfio_group_find_or_alloc(device->dev);
++	else
++		group = vfio_noiommu_group_alloc(device->dev, type);
+ 
+-	/*
+-	 * In all cases group is the output of one of the group allocation
+-	 * functions and we have group->drivers incremented for us.
+-	 */
+ 	if (IS_ERR(group))
+ 		return PTR_ERR(group);
+ 
++	/* Our reference on group is moved to the device */
++	device->group = group;
++	return 0;
 +}
 +
-+static void vfio_device_group_unregister(struct vfio_device *device)
++static int __vfio_register_dev(struct vfio_device *device,
++			       enum vfio_group_type type)
 +{
-+	mutex_lock(&device->group->device_lock);
-+	list_del(&device->group_next);
-+	mutex_unlock(&device->group->device_lock);
-+}
++	int ret;
 +
- static int __vfio_register_dev(struct vfio_device *device,
- 		struct vfio_group *group)
+ 	if (WARN_ON(device->ops->bind_iommufd &&
+ 		    (!device->ops->unbind_iommufd ||
+ 		     !device->ops->attach_ioas)))
+@@ -525,12 +536,13 @@ static int __vfio_register_dev(struct vfio_device *device,
+ 	if (!device->dev_set)
+ 		vfio_assign_device_set(device, device);
+ 
+-	/* Our reference on group is moved to the device */
+-	device->group = group;
+-
+ 	ret = dev_set_name(&device->device, "vfio%d", device->index);
+ 	if (ret)
+-		goto err_out;
++		return ret;
++
++	ret = vfio_device_set_group(device, type);
++	if (ret)
++		return ret;
+ 
+ 	ret = device_add(&device->device);
+ 	if (ret)
+@@ -549,8 +561,7 @@ static int __vfio_register_dev(struct vfio_device *device,
+ 
+ int vfio_register_group_dev(struct vfio_device *device)
  {
-@@ -525,9 +539,7 @@ static int __vfio_register_dev(struct vfio_device *device,
- 	/* Refcounting can't start until the driver calls register */
- 	refcount_set(&device->refcount, 1);
+-	return __vfio_register_dev(device,
+-		vfio_group_find_or_alloc(device->dev));
++	return __vfio_register_dev(device, VFIO_IOMMU);
+ }
+ EXPORT_SYMBOL_GPL(vfio_register_group_dev);
  
--	mutex_lock(&group->device_lock);
--	list_add(&device->group_next, &group->device_list);
--	mutex_unlock(&group->device_lock);
-+	vfio_device_group_register(device);
- 
- 	return 0;
- err_out:
-@@ -587,7 +599,6 @@ static struct vfio_device *vfio_device_get_from_name(struct vfio_group *group,
-  * removed.  Open file descriptors for the device... */
- void vfio_unregister_group_dev(struct vfio_device *device)
+@@ -560,8 +571,7 @@ EXPORT_SYMBOL_GPL(vfio_register_group_dev);
+  */
+ int vfio_register_emulated_iommu_dev(struct vfio_device *device)
  {
--	struct vfio_group *group = device->group;
- 	unsigned int i = 0;
- 	bool interrupted = false;
- 	long rc;
-@@ -615,9 +626,7 @@ void vfio_unregister_group_dev(struct vfio_device *device)
- 		}
- 	}
+-	return __vfio_register_dev(device,
+-		vfio_noiommu_group_alloc(device->dev, VFIO_EMULATED_IOMMU));
++	return __vfio_register_dev(device, VFIO_EMULATED_IOMMU);
+ }
+ EXPORT_SYMBOL_GPL(vfio_register_emulated_iommu_dev);
  
--	mutex_lock(&group->device_lock);
--	list_del(&device->group_next);
--	mutex_unlock(&group->device_lock);
-+	vfio_device_group_unregister(device);
- 
+@@ -631,6 +641,7 @@ void vfio_unregister_group_dev(struct vfio_device *device)
  	/* Balances device_add in register path */
  	device_del(&device->device);
+ 
++	/* Balances vfio_device_set_group in register path */
+ 	vfio_device_remove_group(device);
+ }
+ EXPORT_SYMBOL_GPL(vfio_unregister_group_dev);
 -- 
 2.34.1
 
