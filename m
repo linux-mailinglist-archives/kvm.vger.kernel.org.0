@@ -2,90 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D756163F19E
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 14:29:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1345D63F1EE
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 14:47:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231431AbiLAN3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 08:29:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41814 "EHLO
+        id S231604AbiLANrY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 08:47:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231283AbiLAN3b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 08:29:31 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 835DCA9E8B
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 05:29:30 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B1DEX8W026956
-        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 13:29:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=23QTgNHWNa/GlrEN8huepuOrsi0rN7yrQwYJo3+si8k=;
- b=WEtTQFBe4Xu8XCk23iqWfReyse8N+5JDdRF8rDoMOXag0ViG76qiPETDP9FRIzZeaLTR
- NdB3y/rB2slFNOFjQTjDUFhZ7pOgIYeLwXX3PTbmIEW2NkGKWhzhvkTYpgRt7y6Hk30/
- 2zDIoWplmXaWWNFlpb+OZYZRsC9o+W641vpE5edEUWrfkparA3UOnDakEuUYJ/nl380e
- SbsWT7hV/Vp+9gi/rK2TUK+hpfy9lkFa921wqExBr8uOk0vCdzOx8RGcW6pQD2bsI7MZ
- 66eMnzYPEHra+MlegmSiYHfhpksOQvUCPacaHc10LQumNvjiNgQ1rpGSA0J0u0i4tw9p ow== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6vyngcfk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 13:29:30 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B1DFcfe032181
-        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 13:29:29 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6vyngcen-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Dec 2022 13:29:29 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B1DLm3U020270;
-        Thu, 1 Dec 2022 13:29:27 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04fra.de.ibm.com with ESMTP id 3m3ae95brx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Dec 2022 13:29:27 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B1DU7lH63570390
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Dec 2022 13:30:07 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ECA6DA404D;
-        Thu,  1 Dec 2022 13:29:23 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BC928A4040;
-        Thu,  1 Dec 2022 13:29:23 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  1 Dec 2022 13:29:23 +0000 (GMT)
-Date:   Thu, 1 Dec 2022 14:27:58 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com,
-        pbonzini@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v1 2/3] lib: s390x: skey: add seed value
- for storage keys
-Message-ID: <20221201142758.4ac860d2@p-imbrenda>
-In-Reply-To: <20221201084642.3747014-3-nrb@linux.ibm.com>
-References: <20221201084642.3747014-1-nrb@linux.ibm.com>
-        <20221201084642.3747014-3-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S231596AbiLANrV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 08:47:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB0631021
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 05:46:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669902387;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7oq/5KWy0M8bnmSAvvJkGvFC1dRf3gcIMbGnaxS+Ce4=;
+        b=RexrNQwvveAhZPCJ7X0Ss7eP0fV6bFzNtg0OB6RLbWSiGObQtO8z+yGORquDB2tCoxNQUU
+        OL96YsndeoYBphnO6B35Vz3qQVZnX4CTtR888GWlf5ZFg3Qq1leeu9vwvDbJyl1yf+86mf
+        Vl4km0hXFh2lYoRTYDnpO/WWgJSQva0=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-97-QMAA0uxePmi-k0hEZuezKQ-1; Thu, 01 Dec 2022 08:46:26 -0500
+X-MC-Unique: QMAA0uxePmi-k0hEZuezKQ-1
+Received: by mail-qt1-f197.google.com with SMTP id y8-20020ac87088000000b003a528a5b844so4364869qto.18
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 05:46:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7oq/5KWy0M8bnmSAvvJkGvFC1dRf3gcIMbGnaxS+Ce4=;
+        b=NVPNwlB/TPRm8xrwCRDGzovW46kJ3w9lRJAArg0XNY7KGUwEZGxMo3y7pdxzi3Ze4B
+         4CaNMUw1cjXOt/B3fVU1CMh+tjhEGh6tbnRGxfyPDxj6znM0wfA61K6pbXyY0fCmHvq/
+         ylF317x7PyVr50LZUCMmu9oL0Pztohs4gArHFZJKLTv8x/RS/jW8NypX/b059gWluS3R
+         uMYekDTtAeJTtwJ4j2xAx3J2aLn4q8OOY8BVxfp6AhT82xpv68dQmJfJeL7QYT9bvJ9C
+         b7wHLDg8KvCd4RD/3MHRniqepzHQzZjjztuHsLa31c2yB0J1KFRpHVUH99zJWxmrUSbg
+         Sg0A==
+X-Gm-Message-State: ANoB5plpvYihzRS1IaEKc6yqIsGa7lVYui0csVLWMrAYu58S2Vy+O9bQ
+        ya/0uaVvXjyAi/oDbGfnOLvaIvqNo+dpuabmjgT3xqg9tleXzYIsuy7n5HmPm8hOXdMtVzt72KB
+        g2evRYpuBKLhg
+X-Received: by 2002:ae9:ef82:0:b0:6fc:9612:a9b8 with SMTP id d124-20020ae9ef82000000b006fc9612a9b8mr9498534qkg.596.1669902382224;
+        Thu, 01 Dec 2022 05:46:22 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf41tVRL1INXSc+CJ8HMzatJNn0kpDNLtHx4uEip+W0bfXaSN/zV57Di/1yiJpsynuAm5XETaQ==
+X-Received: by 2002:ae9:ef82:0:b0:6fc:9612:a9b8 with SMTP id d124-20020ae9ef82000000b006fc9612a9b8mr9498327qkg.596.1669902378844;
+        Thu, 01 Dec 2022 05:46:18 -0800 (PST)
+Received: from [192.168.149.123] (58.254.164.109.static.wline.lns.sme.cust.swisscom.ch. [109.164.254.58])
+        by smtp.gmail.com with ESMTPSA id h12-20020ac8714c000000b0039a372fbaa5sm2521191qtp.69.2022.12.01.05.46.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Dec 2022 05:46:18 -0800 (PST)
+Message-ID: <332e7d94-4a3b-40d1-dc66-fa296e8d322e@redhat.com>
+Date:   Thu, 1 Dec 2022 14:46:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [kvm-unit-tests PATCH v3 01/27] x86: replace
+ irq_{enable|disable}() with sti()/cli()
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     Andrew Jones <drjones@redhat.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Cathy Avery <cavery@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20221122161152.293072-1-mlevitsk@redhat.com>
+ <20221122161152.293072-2-mlevitsk@redhat.com>
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+In-Reply-To: <20221122161152.293072-2-mlevitsk@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: HJfxePODTU5_qPc7imSKY_QLPuoNcgcF
-X-Proofpoint-GUID: yc06o9JK_uIFyNeDIdaHYIFZ86LcPLFU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-01_04,2022-12-01_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 mlxscore=0 mlxlogscore=965 phishscore=0 spamscore=0
- clxscore=1015 bulkscore=0 adultscore=0 priorityscore=1501 malwarescore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2212010093
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -93,98 +89,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  1 Dec 2022 09:46:41 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
 
-> Upcoming changes will change storage keys in a loop. To make sure each
-> iteration of the loops sets different keys, add variants of the storage
-> key library functions which allow to specify a seed.
+
+Am 22/11/2022 um 17:11 schrieb Maxim Levitsky:
+> This removes a layer of indirection which is strictly
+> speaking not needed since its x86 code anyway.
 > 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-
-I wonder if you can simply merge this patch with the previous one
-
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  lib/s390x/skey.c | 12 +++++++-----
->  lib/s390x/skey.h | 14 ++++++++++++--
->  2 files changed, 19 insertions(+), 7 deletions(-)
+>  lib/x86/processor.h       | 19 +++++-----------
+>  lib/x86/smp.c             |  2 +-
+>  x86/apic.c                |  2 +-
+>  x86/asyncpf.c             |  6 ++---
+>  x86/eventinj.c            | 22 +++++++++---------
+>  x86/hyperv_connections.c  |  2 +-
+>  x86/hyperv_stimer.c       |  4 ++--
+>  x86/hyperv_synic.c        |  6 ++---
+>  x86/intel-iommu.c         |  2 +-
+>  x86/ioapic.c              | 14 ++++++------
+>  x86/pmu.c                 |  4 ++--
+>  x86/svm.c                 |  4 ++--
+>  x86/svm_tests.c           | 48 +++++++++++++++++++--------------------
+>  x86/taskswitch2.c         |  4 ++--
+>  x86/tscdeadline_latency.c |  4 ++--
+>  x86/vmexit.c              | 18 +++++++--------
+>  x86/vmx_tests.c           | 42 +++++++++++++++++-----------------
+>  17 files changed, 98 insertions(+), 105 deletions(-)
 > 
-> diff --git a/lib/s390x/skey.c b/lib/s390x/skey.c
-> index 100f0949a244..4ab0828ee98f 100644
-> --- a/lib/s390x/skey.c
-> +++ b/lib/s390x/skey.c
-> @@ -14,10 +14,11 @@
->  #include <skey.h>
->  
->  /*
-> - * Set storage keys on pagebuf.
-> + * Set storage keys on pagebuf with a seed for the storage keys.
->   * pagebuf must point to page_count consecutive pages.
-> + * Only the lower seven bits of the seed are considered.
->   */
-> -void skey_set_keys(uint8_t *pagebuf, unsigned long page_count)
-> +void skey_set_keys_with_seed(uint8_t *pagebuf, unsigned long page_count, unsigned char seed)
->  {
->  	unsigned char key_to_set;
->  	unsigned long i;
-> @@ -30,7 +31,7 @@ void skey_set_keys(uint8_t *pagebuf, unsigned long page_count)
->  		 * protection as well as reference and change indication for
->  		 * some keys.
->  		 */
-> -		key_to_set = i * 2;
-> +		key_to_set = (i ^ seed) * 2;
->  		set_storage_key(pagebuf + i * PAGE_SIZE, key_to_set, 1);
->  	}
+> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+> index 7a9e8c82..b89f6a7c 100644
+> --- a/lib/x86/processor.h
+> +++ b/lib/x86/processor.h
+> @@ -653,11 +653,17 @@ static inline void pause(void)
+>  	asm volatile ("pause");
 >  }
-> @@ -38,13 +39,14 @@ void skey_set_keys(uint8_t *pagebuf, unsigned long page_count)
->  /*
->   * Verify storage keys on pagebuf.
->   * Storage keys must have been set by skey_set_keys on pagebuf before.
-> + * skey_set_keys must have been called with the same seed value.
->   *
->   * If storage keys match the expected result, will return a skey_verify_result
->   * with verify_failed false. All other fields are then invalid.
->   * If there is a mismatch, returned struct will have verify_failed true and will
->   * be filled with the details on the first mismatch encountered.
->   */
-> -struct skey_verify_result skey_verify_keys(uint8_t *pagebuf, unsigned long page_count)
-> +struct skey_verify_result skey_verify_keys_with_seed(uint8_t *pagebuf, unsigned long page_count, unsigned char seed)
+>  
+> +/* Disable interrupts as per x86 spec */
+>  static inline void cli(void)
 >  {
->  	union skey expected_key, actual_key;
->  	struct skey_verify_result result = {
-> @@ -56,7 +58,7 @@ struct skey_verify_result skey_verify_keys(uint8_t *pagebuf, unsigned long page_
->  	for (i = 0; i < page_count; i++) {
->  		cur_page = pagebuf + i * PAGE_SIZE;
->  		actual_key.val = get_storage_key(cur_page);
-> -		expected_key.val = i * 2;
-> +		expected_key.val = (i ^ seed) * 2;
+>  	asm volatile ("cli");
+>  }
 >  
->  		/*
->  		 * The PoP neither gives a guarantee that the reference bit is
-> diff --git a/lib/s390x/skey.h b/lib/s390x/skey.h
-> index a0f8caa1270b..bba1c131276d 100644
-> --- a/lib/s390x/skey.h
-> +++ b/lib/s390x/skey.h
-> @@ -23,9 +23,19 @@ struct skey_verify_result {
->  	unsigned long page_mismatch_addr;
->  };
+> +/*
+> + * Enable interrupts.
+> + * Note that next instruction after sti will not have interrupts
+> + * evaluated due to concept of 'interrupt shadow'
+> + */
+>  static inline void sti(void)
+>  {
+>  	asm volatile ("sti");
+> @@ -732,19 +738,6 @@ static inline void wrtsc(u64 tsc)
+>  	wrmsr(MSR_IA32_TSC, tsc);
+>  }
 >  
-> -void skey_set_keys(uint8_t *pagebuf, unsigned long page_count);
-> +void skey_set_keys_with_seed(uint8_t *pagebuf, unsigned long page_count, unsigned char seed);
->  
-> -struct skey_verify_result skey_verify_keys(uint8_t *pagebuf, unsigned long page_count);
-> +static inline void skey_set_keys(uint8_t *pagebuf, unsigned long page_count)
-> +{
-> +	skey_set_keys_with_seed(pagebuf, page_count, 0);
-> +}
-> +
-> +struct skey_verify_result skey_verify_keys_with_seed(uint8_t *pagebuf, unsigned long page_count, unsigned char seed);
-> +
-> +static inline struct skey_verify_result skey_verify_keys(uint8_t *pagebuf, unsigned long page_count)
-> +{
-> +	return skey_verify_keys_with_seed(pagebuf, page_count, 0);
-> +}
->  
->  void skey_report_verify(struct skey_verify_result * const result);
->  
+> -static inline void irq_disable(void)
+> -{
+> -	asm volatile("cli");
+> -}
+> -
+> -/* Note that irq_enable() does not ensure an interrupt shadow due
+> - * to the vagaries of compiler optimizations.  If you need the
+> - * shadow, use a single asm with "sti" and the instruction after it.
+Minor nitpick: instead of a new doc comment, why not use this same
+above? Looks clearer to me.
+
+Regardless,
+Reviewed-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
 
