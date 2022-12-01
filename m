@@ -2,89 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EB6B63F3C3
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 16:24:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E46D063F3B8
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 16:23:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231737AbiLAPYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 10:24:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60290 "EHLO
+        id S231655AbiLAPXS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 10:23:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231699AbiLAPYD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 10:24:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0578957B5D
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 07:23:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669908185;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zzhfax5vqwOtCKFjMXun2NOkTXtXPQNt2DKwUePEihM=;
-        b=WAVmOni2/jJFHuuVJDQrRoROqdnpwFhSxpu9pBzFEqe1zoZIHCGLhZ1wxO0l4ffO2uu6fj
-        G2LEcEPihlh2CfF6xd1+UXMQPwg6Saojqx3Z6fB1fJiIZslHf/PofRSADu2IkPBtH7KEUX
-        ZtOhAdL8rWjjD7tleghMqYOC7ogm1sM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-62-e-S7I278OwSbA2d4-N0PiA-1; Thu, 01 Dec 2022 10:22:53 -0500
-X-MC-Unique: e-S7I278OwSbA2d4-N0PiA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S230527AbiLAPXN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 10:23:13 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEEA95AE2A;
+        Thu,  1 Dec 2022 07:23:12 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9CA6D858F17;
-        Thu,  1 Dec 2022 15:22:51 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.98])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 269E8477F55;
-        Thu,  1 Dec 2022 15:22:51 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: Re: [PATCH v4 5/5] vfio: Fold vfio_virqfd.ko into vfio.ko
-In-Reply-To: <5-v4-7993c351e9dc+33a818-vfio_modules_jgg@nvidia.com>
-Organization: Red Hat GmbH
-References: <5-v4-7993c351e9dc+33a818-vfio_modules_jgg@nvidia.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Thu, 01 Dec 2022 16:22:47 +0100
-Message-ID: <87ilivw3lk.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8B8BBB81F0A;
+        Thu,  1 Dec 2022 15:23:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D18AC433C1;
+        Thu,  1 Dec 2022 15:23:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669908190;
+        bh=hdPK4C9u+b86XHyE+7GXEreLjX9Vd58RIXLhIVDS6l4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=PVY8A42NvyiQ21O91ajwdUW1/BiFDQs+cStEeMLZ37S4fKiItWTexJp0Jnjp8mJhD
+         m5NxvqdVX9r2s3FALR1PgSqBP7ECWpc44uTIkPmnKbRDKIcqYIYbXTx9z3yZUPkVfO
+         ulDRNP+KLxLlNlBV6K7QBIcr2d5sFT5YAx7PtsSUgnwL/80xg0IY7bOk9eNvlMAUSR
+         62HocJDMnzfiJg4ZQ02aIChkdCPdlDZbeKJvtbPmJIS/+1FNHfMZMb/fpErze8hUXi
+         K/1FKknabUcvooQxwQBUfosdysHD2HADQsgev67351QhEqSbzfHLgZVOaoFukvSUg0
+         47kX9JRmjBvmg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p0lP1-009rGS-Uv;
+        Thu, 01 Dec 2022 15:23:08 +0000
+Date:   Thu, 01 Dec 2022 15:23:07 +0000
+Message-ID: <865yevm9lw.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     KVM <kvm@vger.kernel.org>, David Matlack <dmatlack@google.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: linux-next: manual merge of the kvm-arm tree with the kvm tree
+In-Reply-To: <20221201131623.18ebc8d8@canb.auug.org.au>
+References: <20221201131623.18ebc8d8@canb.auug.org.au>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, sfr@canb.auug.org.au, kvm@vger.kernel.org, dmatlack@google.com, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, oliver.upton@linux.dev, seanjc@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 29 2022, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Thu, 01 Dec 2022 02:16:23 +0000,
+Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> 
+> Hi all,
+> 
+> Today's linux-next merge of the kvm-arm tree got a conflict in:
+> 
+>   tools/testing/selftests/kvm/include/perf_test_util.h
+> 
+> between commit:
+> 
+>   9fda6753c9dd ("KVM: selftests: Rename perf_test_util.[ch] to memstress.[ch]")
+> 
+> from the kvm tree and commit:
+> 
+>   9ec1eb1bccee ("KVM: selftests: Have perf_test_util signal when to stop vCPUs")
+> 
+> from the kvm-arm tree.
+> 
+> I fixed it up (I removed the file and applied the following patch) and
+> can carry the fix as necessary. This is now fixed as far as linux-next
+> is concerned, but any non trivial conflicts should be mentioned to your
+> upstream maintainer when your tree is submitted for merging.  You may
+> also want to consider cooperating with the maintainer of the conflicting
+> tree to minimise any particularly complex conflicts.
+> 
+> (this patch covered another occurrence fo the needed rename)
 
-> This is only 1.8k, putting it in its own module is not really
-> necessary. The kconfig infrastructure is still there to completely remove
-> it for systems that are trying for small footprint.
->
-> Put it in the main vfio.ko module now that kbuild can support multiple .c
-> files.
+Huh, this is a lot of conflicts.
 
-The biggest difference is that we now always have the vfio-irqfd-cleanup
-wq once the vfio module has been loaded, even if pci or platform have
-not been loaded. I guess that only affects a minority of setups (s390x
-without pci?), and probably doesn't really matter.
+Paolo, do you have a stable branch I can pull in my tree to kill
+those? Or do you want to deal with the conflicts yourself?
 
->
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/vfio/Kconfig     |  2 +-
->  drivers/vfio/Makefile    |  4 +---
->  drivers/vfio/vfio.h      | 13 +++++++++++++
->  drivers/vfio/vfio_main.c |  7 +++++++
->  drivers/vfio/virqfd.c    | 17 +++--------------
->  5 files changed, 25 insertions(+), 18 deletions(-)
+	M.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-
+-- 
+Without deviation from the norm, progress is not possible.
