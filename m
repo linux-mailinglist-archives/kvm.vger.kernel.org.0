@@ -2,237 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E930563EB88
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 09:48:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D61063EBEB
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 10:03:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229916AbiLAIsP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 03:48:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43958 "EHLO
+        id S230040AbiLAJDk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 04:03:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229843AbiLAIrg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 03:47:36 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6606288B5A
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 00:46:50 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B18ihUf005191
-        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 08:46:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=aCuJ66hDc+FTXapIKCGJxRZSHMW6ebvGa8EMLnUV81E=;
- b=F2qsIZ5igvG4sPsFfGIFfwzye5ZsaGIM+Sk13zclwYHiujA9QZyUf+SYwryoe6a9Cfcr
- 6af90L0Kz1IDl39Fdd7jW9mKPQQBpu2NC4ARSgIwT0KLdyD6RYMa5lZDGDs/tFoaSWLe
- JApe9+Ury0V+hnQLRqpmrzz82ww/sRwFob1+EErDjBk16SPtaU2PVPkjwImU9FXPXZbw
- 0pKhiAWXM9j6o2UEehyf/IEgRq0Ad5eHLNVF+WHz5w5vahYY6PiyHPcbq9wRfQBJOGIa
- 3+Zm4NR2CBrRi3DTSiUec2OajGKJnaipcjby338DVjKfXT9ZyZzgcyGUopEyXI+t3r+u Hg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6s1e822j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 08:46:49 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B18ikmu005477
-        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 08:46:49 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6s1e821t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Dec 2022 08:46:49 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B18ZtN9029645;
-        Thu, 1 Dec 2022 08:46:47 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 3m3ae9f1nr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Dec 2022 08:46:47 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B18kiFl64094578
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Dec 2022 08:46:44 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 14D1CAE045;
-        Thu,  1 Dec 2022 08:46:44 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D2DEFAE051;
-        Thu,  1 Dec 2022 08:46:43 +0000 (GMT)
-Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  1 Dec 2022 08:46:43 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
-        pbonzini@redhat.com
-Subject: [kvm-unit-tests PATCH v1 3/3] s390x: add storage key test during migration
-Date:   Thu,  1 Dec 2022 09:46:42 +0100
-Message-Id: <20221201084642.3747014-4-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20221201084642.3747014-1-nrb@linux.ibm.com>
-References: <20221201084642.3747014-1-nrb@linux.ibm.com>
+        with ESMTP id S230057AbiLAJDI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 04:03:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A5A05132E
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 01:02:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669885332;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GbYH4zENy89CzwfflFgwIWWGhamSM9hTJZawssPcIIk=;
+        b=EIiuMntjLoOIJmbm2u6Q1t5X80cuQxM+djRxWzpRJ3SWGFNyEoJJNfgt34EcB7QWHWXaz+
+        Iqwnw3sjxy4iA4Y73dKR1aeXE7bH8vYx08c3v7L6ZU+rvtp2oBxkLVnRVmxkm4OdkyKnrZ
+        mJusS7r+ZYx1XjQSnkJxai/6pZ+z6dc=
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
+ [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-423-28dawQ8WOkKOBaX6tYXtoQ-1; Thu, 01 Dec 2022 04:02:11 -0500
+X-MC-Unique: 28dawQ8WOkKOBaX6tYXtoQ-1
+Received: by mail-ot1-f69.google.com with SMTP id e5-20020a0568301e4500b0066e7236e566so496271otj.23
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 01:02:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GbYH4zENy89CzwfflFgwIWWGhamSM9hTJZawssPcIIk=;
+        b=bxNFzQQg9/NvuC14Ym0NGvOTQ6/WqSW2cEgZsSrl+StZGaTbGaAdgsHOazWu9WmkME
+         2NkFh2DOxMuVCidHHE1kkz/NHppwVUQbkDIqU4ioDUtYPmvcB/ltIf69KiwRowFg+b8A
+         OD6vvNNjxwemd6CkL+x+SHYzLbdCFb7GqI8zmmXWHSpVToo63/X/MIsjQszXX5m2lz9j
+         EAosUZDCa31iLxF30KpO9JLuEXTPP7QuktxOqhdLyP/knVcULabNTaWIGIrkqdPtywt6
+         4RBZWxVXpdF+7znGXjSROsBETFS7O1TiwI9tI6xyAEYjg0jAJnmpcpSwoXCbERCPWHHD
+         k36g==
+X-Gm-Message-State: ANoB5pnSbrtTNF/I59XXV43qqKhc8KZHqEOkjOFkcxNWznu6tUei42zz
+        olUVv24hVDbhb4Dz4b6Fe/rU2bf7C5V9GsC3KcjZW6z7d35vuio9zayS7RAtIw7LFRGGDZEDTBw
+        N8Z7RIrvrNlsJRD85OoBr9zWDhxao
+X-Received: by 2002:a05:6870:1e83:b0:132:7b3:29ac with SMTP id pb3-20020a0568701e8300b0013207b329acmr25998081oab.35.1669885330137;
+        Thu, 01 Dec 2022 01:02:10 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7tUBOklO4FBQwcg/EeqBEyl7DGUatKoKhFtd+FqPjTxyHkl7yQq5uNlEzKseBa4w5SnURhdbimUzdSSGOuqsc=
+X-Received: by 2002:a05:6870:1e83:b0:132:7b3:29ac with SMTP id
+ pb3-20020a0568701e8300b0013207b329acmr25998067oab.35.1669885329828; Thu, 01
+ Dec 2022 01:02:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: jnxnRiUQYz4umfqglDewWlPpJK7v1HUX
-X-Proofpoint-GUID: LOZfeddWrAOVmJpCeQFrYRhc5G82UGAq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-01_04,2022-11-30_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- adultscore=0 priorityscore=1501 mlxlogscore=999 suspectscore=0
- lowpriorityscore=0 mlxscore=0 bulkscore=0 clxscore=1015 spamscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2212010057
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221123102207.451527-1-asmetanin@yandex-team.ru>
+In-Reply-To: <20221123102207.451527-1-asmetanin@yandex-team.ru>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Thu, 1 Dec 2022 17:01:58 +0800
+Message-ID: <CACGkMEs3gdcQ5_PkYmz2eV-kFodZnnPPhvyRCyLXBYYdfHtNjw@mail.gmail.com>
+Subject: Re: [PATCH] vhost_net: revert upend_idx only on retriable error
+To:     Andrey Smetanin <asmetanin@yandex-team.ru>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yc-core@yandex-team.ru
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a test which modifies storage keys while migration is in progress.
+On Wed, Nov 23, 2022 at 6:24 PM Andrey Smetanin
+<asmetanin@yandex-team.ru> wrote:
+>
+> Fix possible virtqueue used buffers leak and corresponding stuck
+> in case of temporary -EIO from sendmsg() which is produced by
+> tun driver while backend device is not up.
+>
+> In case of no-retriable error and zcopy do not revert upend_idx
+> to pass packet data (that is update used_idx in corresponding
+> vhost_zerocopy_signal_used()) as if packet data has been
+> transferred successfully.
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- s390x/Makefile                |   1 +
- s390x/migration-during-skey.c | 103 ++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg           |   5 ++
- 3 files changed, 109 insertions(+)
- create mode 100644 s390x/migration-during-skey.c
+Should we mark head.len as VHOST_DMA_DONE_LEN in this case?
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index d097b7071dfb..d9ba9b5fc392 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -39,6 +39,7 @@ tests += $(TEST_DIR)/panic-loop-extint.elf
- tests += $(TEST_DIR)/panic-loop-pgm.elf
- tests += $(TEST_DIR)/migration-sck.elf
- tests += $(TEST_DIR)/exittime.elf
-+tests += $(TEST_DIR)/migration-during-skey.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/migration-during-skey.c b/s390x/migration-during-skey.c
-new file mode 100644
-index 000000000000..bd0e6feb02bc
---- /dev/null
-+++ b/s390x/migration-during-skey.c
-@@ -0,0 +1,103 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Perform storage key operations during migration
-+ *
-+ * Copyright IBM Corp. 2022
-+ *
-+ * Authors:
-+ *  Nico Boehr <nrb@linux.ibm.com>
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/facility.h>
-+#include <asm/barrier.h>
-+#include <hardware.h>
-+#include <smp.h>
-+#include <skey.h>
-+
-+#define NUM_PAGES 128
-+static uint8_t pagebuf[NUM_PAGES * PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
-+
-+static unsigned int thread_iters;
-+static bool thread_should_exit;
-+static bool thread_exited;
-+static struct skey_verify_result result;
-+
-+static void test_skeys_during_migration(void)
-+{
-+	while (!READ_ONCE(thread_should_exit)) {
-+		skey_set_keys_with_seed(pagebuf, NUM_PAGES, thread_iters);
-+
-+		result = skey_verify_keys_with_seed(pagebuf, NUM_PAGES, thread_iters);
-+
-+		/*
-+		 * Always increment even if the verify fails. This ensures primary CPU knows where
-+		 * we left off and can do an additional verify round after migration finished.
-+		 */
-+		thread_iters++;
-+
-+		if (result.verify_failed)
-+			break;
-+	}
-+
-+	WRITE_ONCE(thread_exited, 1);
-+}
-+
-+static void migrate_once(void)
-+{
-+	static bool migrated;
-+
-+	if (migrated)
-+		return;
-+
-+	migrated = true;
-+	puts("Please migrate me, then press return\n");
-+	(void)getchar();
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("migration-skey");
-+	if (test_facility(169)) {
-+		report_skip("storage key removal facility is active");
-+		goto error;
-+	}
-+
-+	if (smp_query_num_cpus() == 1) {
-+		report_skip("need at least 2 cpus for this test");
-+		goto error;
-+	}
-+
-+	smp_cpu_setup(1, PSW_WITH_CUR_MASK(test_skeys_during_migration));
-+
-+	migrate_once();
-+
-+	WRITE_ONCE(thread_should_exit, 1);
-+
-+	while (!thread_exited)
-+		mb();
-+
-+	report_info("thread completed %u iterations", thread_iters);
-+
-+	report_prefix_push("during migration");
-+	skey_report_verify(&result);
-+	report_prefix_pop();
-+
-+	/*
-+	 * Verification of skeys occurs on the thread. We don't know if we
-+	 * were still migrating during the verification.
-+	 * To be sure, make another verification round after the migration
-+	 * finished to catch skeys which might not have been migrated
-+	 * correctly.
-+	 */
-+	report_prefix_push("after migration");
-+	assert(thread_iters > 0);
-+	result = skey_verify_keys_with_seed(pagebuf, NUM_PAGES, thread_iters - 1);
-+	skey_report_verify(&result);
-+	report_prefix_pop();
-+
-+error:
-+	migrate_once();
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 3caf81eda396..855c352929a4 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -208,3 +208,8 @@ groups = migration
- [exittime]
- file = exittime.elf
- smp = 2
-+
-+[migration-during-skey]
-+file = migration-during-skey.elf
-+smp = 2
-+groups = migration
--- 
-2.36.1
+Thanks
+
+>
+> Signed-off-by: Andrey Smetanin <asmetanin@yandex-team.ru>
+> ---
+>  drivers/vhost/net.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 20265393aee7..93e9166039b9 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -934,13 +934,16 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+>
+>                 err = sock->ops->sendmsg(sock, &msg, len);
+>                 if (unlikely(err < 0)) {
+> +                       bool retry = err == -EAGAIN || err == -ENOMEM || err == -ENOBUFS;
+> +
+>                         if (zcopy_used) {
+>                                 if (vq->heads[ubuf->desc].len == VHOST_DMA_IN_PROGRESS)
+>                                         vhost_net_ubuf_put(ubufs);
+> -                               nvq->upend_idx = ((unsigned)nvq->upend_idx - 1)
+> -                                       % UIO_MAXIOV;
+> +                               if (retry)
+> +                                       nvq->upend_idx = ((unsigned)nvq->upend_idx - 1)
+> +                                               % UIO_MAXIOV;
+>                         }
+> -                       if (err == -EAGAIN || err == -ENOMEM || err == -ENOBUFS) {
+> +                       if (retry) {
+>                                 vhost_discard_vq_desc(vq, 1);
+>                                 vhost_net_enable_vq(net, vq);
+>                                 break;
+> --
+> 2.25.1
+>
 
