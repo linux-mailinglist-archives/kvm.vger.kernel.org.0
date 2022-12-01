@@ -2,150 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDA8F63FAEA
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 23:50:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BD4363FBE3
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 00:22:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231712AbiLAWuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 17:50:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43430 "EHLO
+        id S231556AbiLAXWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 18:22:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231681AbiLAWtq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 17:49:46 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04C34C725E
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 14:49:11 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id cm20so3246818pjb.1
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 14:49:11 -0800 (PST)
+        with ESMTP id S231539AbiLAXWu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 18:22:50 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F4422514
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 15:22:48 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id 6so2965727pgm.6
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 15:22:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mKF7ACqUicTgwRFQrz4oBsMFvmn+mRrenbI3VwK9VtA=;
-        b=Lo1VVBU0quIBqwSjUL/IX6jsQ3Rcbq3kNXFx1b09LmjnR9bQqqs8Qnjl452IWYkBSY
-         P1KTyvwrHEdLgoshrms0r4SI8z1ngo83OqCHRxrURyBE+yArcM+Cs5TCeq44GobVkF0m
-         IuDj+iWRP2zVVwjI1HJslgwJO64iafu01Owc+4A3/mvkEjyzFr8iFAR19fNs0LBLJTf3
-         Kg1ZIMc5fZ0ipGhmHdhLOXnD8uVTRyQX02DQttBjsyjAKjRvEJFav2gCuZ5FSQ6cpVhK
-         zD3GLCkmoDFgDHZV7t7XBqH0jElTPRdTcydGeJqtHoccQFH5HqfiAwKx6tg04wXmDFCc
-         QADQ==
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S55j1GM26l88fCy8Cwvgg1U+53HZFDkiSHsMw4aLUOg=;
+        b=B5JEM5AvjXgpEVamzuf8eGSnPsd/ZyjSbjDL/1h1I+QGbLhYvNWxN/GvwJsZ9Hnk6U
+         fSsUUB2XCABsd5N8c/kuaZlFUimXjDi2XcML/IxiXvPtraObdRIrG6FvQxVzMso3Ai2m
+         V31M/9uhRF5yvwhbaIr317ihQfnl71bRfUpOo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mKF7ACqUicTgwRFQrz4oBsMFvmn+mRrenbI3VwK9VtA=;
-        b=kCroi1F3LWJA5AWAlYhLv/9vLwNj/pYmaetXwkbuC6x3QCt33OKroaiXsUDqw22ydi
-         9I1LKKHDcdkjLd3K57jhW36A2Kva1yYggMwdKoJWAEBzS4Us58QAiv5gN940rXq/2ryX
-         saU5APMhdAZHou6XMqEkli5wjffKLq2+RkLKj3QpUxi6Drj6lIoqmtOq2zsqq6C5l3DQ
-         svzei+D6sG7PFJxkNHxUaNvOaH2+nH1Xz/SGpP18xkG3YgddHFULD2w8zXLYh3z+eIAA
-         Ibmt7r8uGtk8fAa8PMJxdnRUSnVbJNCeZldAvLuEozr/EHeUTB3BYYusNbqklNtyeGW1
-         a23w==
-X-Gm-Message-State: ANoB5pmPxuTgPhpc9sfeG7vkrKtZNEvnkGTemkC4oQuZnvh2/BK1+MGh
-        0d4fVdqtX1NQsjdZIH5BxWuECQ==
-X-Google-Smtp-Source: AA0mqf4Wt8uYV/bEa16p+0WrrISPwxZH3fHAX4g+Oh8a2UKzOEMh4LEyPBB3ZTgiAtA3/myS/mdVQA==
-X-Received: by 2002:a17:903:32ce:b0:189:a0eb:4a26 with SMTP id i14-20020a17090332ce00b00189a0eb4a26mr13829305plr.162.1669934951343;
-        Thu, 01 Dec 2022 14:49:11 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id c73-20020a624e4c000000b0056bc742d21esm3854175pfb.176.2022.12.01.14.49.10
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S55j1GM26l88fCy8Cwvgg1U+53HZFDkiSHsMw4aLUOg=;
+        b=4KclgBf1XBCBBjJo3mlO5O2tKaM1VhTppHFVf+iU1F12PF7kZqpYSHsaEw+B8eubql
+         5S6Ehy3OFdzcNHG6fsMhvd8U+NyqYcveonSFzlws1yueQu2rSeWrFr3YfyHKupsrnW3Y
+         J7o/2EUzva5fLw6GV5c80gBzss2QFQjKeEJwCrhHnJnDhNcdfhaeDbRW8/zeD1xRPA5y
+         IhnZgA6HF+hvlZSC4rB4GtLsLAhok+0uMIrgvHQjFHlOKjTWogR/0NbDiUFdfRDuxhWx
+         cMhjMptmzPQewNgCUzqyeuUNYjfWzKoTH9NpwYamWsNbXEQl8Jc4OU2FOrtCWDxVIrlG
+         736w==
+X-Gm-Message-State: ANoB5pkcWva41xGqh9x0yESlKcZD6oipp15xsoNknXmhKVddXhYiyYFi
+        VgSOfyZd335v7LIn3dRDZ5wteii2emYP5A==
+X-Google-Smtp-Source: AA0mqf7fZxs4hLpJQQbUuA0FCBTxjIxpVNLkOGaREDWVex2GFWW/6G0JzwsrZ3tOTgk3YMpayim+/w==
+X-Received: by 2002:a63:495e:0:b0:43c:a5cb:5d1b with SMTP id y30-20020a63495e000000b0043ca5cb5d1bmr43861545pgk.134.1669936967871;
+        Thu, 01 Dec 2022 15:22:47 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id i17-20020a170902c95100b001870dc3b4c0sm4263317pla.74.2022.12.01.15.22.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Dec 2022 14:49:10 -0800 (PST)
-Date:   Thu, 1 Dec 2022 22:49:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paul Durrant <paul@xen.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Yuan Yao <yuan.yao@intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v2 21/50] KVM: MIPS: Hardcode callbacks to hardware
- virtualization extensions
-Message-ID: <Y4kvYlCbhj87rceF@google.com>
-References: <20221130230934.1014142-1-seanjc@google.com>
- <20221130230934.1014142-22-seanjc@google.com>
- <beb697c2-dfad-780e-4638-76b229f28731@linaro.org>
+        Thu, 01 Dec 2022 15:22:47 -0800 (PST)
+Date:   Thu, 1 Dec 2022 15:22:46 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-next@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: Coverity: emulator_leave_smm(): Error handling issues
+Message-ID: <202212011522.0A318649@keescook>
+References: <202212010825.8589611F@keescook>
+ <Y4jwBahPrkwOI3w9@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <beb697c2-dfad-780e-4638-76b229f28731@linaro.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <Y4jwBahPrkwOI3w9@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 01, 2022, Philippe Mathieu-Daudé wrote:
-> On 1/12/22 00:09, Sean Christopherson wrote:
-> > Now that KVM no longer supports trap-and-emulate (see commit 45c7e8af4a5e
-> > "MIPS: Remove KVM_TE support"), hardcode the MIPS callbacks to the
-> > virtualization callbacks.
+On Thu, Dec 01, 2022 at 06:18:45PM +0000, Sean Christopherson wrote:
+> On Thu, Dec 01, 2022, coverity-bot wrote:
+> > Hello!
 > > 
-> > Harcoding the callbacks eliminates the technically-unnecessary check on
-> > non-NULL kvm_mips_callbacks in kvm_arch_init().  MIPS has never supported
-> > multiple in-tree modules, i.e. barring an out-of-tree module, where
-> > copying and renaming kvm.ko counts as "out-of-tree", KVM could never
-> > encounter a non-NULL set of callbacks during module init.
+> > This is an experimental semi-automated report about issues detected by
+> > Coverity from a scan of next-20221201 as part of the linux-next scan project:
+> > https://scan.coverity.com/projects/linux-next-weekly-scan
 > > 
-> > The callback check is also subtly broken, as it is not thread safe,
-> > i.e. if there were multiple modules, loading both concurrently would
-> > create a race between checking and setting kvm_mips_callbacks.
+> > You're getting this email because you were associated with the identified
+> > lines of code (noted below) that were touched by commits:
 > > 
-> > Given that out-of-tree shenanigans are not the kernel's responsibility,
-> > hardcode the callbacks to simplify the code.
+> >   Wed Nov 9 12:31:18 2022 -0500
+> >     1d0da94cdafe ("KVM: x86: do not go through ctxt->ops when emulating rsm")
 > > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/mips/include/asm/kvm_host.h |  2 +-
-> >   arch/mips/kvm/Makefile           |  2 +-
-> >   arch/mips/kvm/callback.c         | 14 --------------
-> >   arch/mips/kvm/mips.c             |  9 ++-------
-> >   arch/mips/kvm/vz.c               |  7 ++++---
-> >   5 files changed, 8 insertions(+), 26 deletions(-)
-> >   delete mode 100644 arch/mips/kvm/callback.c
+> > Coverity reported the following:
 > > 
-> > diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-> > index 28f0ba97db71..2803c9c21ef9 100644
-> > --- a/arch/mips/include/asm/kvm_host.h
-> > +++ b/arch/mips/include/asm/kvm_host.h
-> > @@ -758,7 +758,7 @@ struct kvm_mips_callbacks {
-> >   	void (*vcpu_reenter)(struct kvm_vcpu *vcpu);
-> >   };
-> >   extern struct kvm_mips_callbacks *kvm_mips_callbacks;
+> > *** CID 1527763:  Error handling issues  (CHECKED_RETURN)
+> > arch/x86/kvm/smm.c:631 in emulator_leave_smm()
+> > 625     		cr4 = kvm_read_cr4(vcpu);
+> > 626     		if (cr4 & X86_CR4_PAE)
+> > 627     			kvm_set_cr4(vcpu, cr4 & ~X86_CR4_PAE);
+> > 628
+> > 629     		/* And finally go back to 32-bit mode.  */
+> > 630     		efer = 0;
+> > vvv     CID 1527763:  Error handling issues  (CHECKED_RETURN)
+> > vvv     Calling "kvm_set_msr" without checking return value (as is done elsewhere 5 out of 6 times).
+> > 631     		kvm_set_msr(vcpu, MSR_EFER, efer);
+> > 632     	}
+> > 633     #endif
+> > 634
+> > 635     	/*
+> > 636     	 * Give leave_smm() a chance to make ISA-specific changes to the vCPU
+> > 
+> > If this is a false positive, please let us know so we can mark it as
 > 
-> IIUC we could even constify this pointer.
+> It's not a false positive per se, but absent a KVM bug the call can never fail.
+> Ditto for the kvm_set_cr{0,4}() calls above.  That said, I'm tempted to "fix"
+> these since we've had bugs related to this code in the past.  This doesn't seem
+> too ugly...
 
-Good point.  Protecting the pointer itself is a bit gross, but it is a nice
-stopgap until the callbacks are gone.  I'll fold this in.  Thanks!
+Yeah, that's what I've done with similar cases. "This should be
+impossible" get a WARN_ONCE and fail gracefully.
 
-  extern const struct kvm_mips_callbacks * const kvm_mips_callbacks;
+-Kees
+
+-- 
+Kees Cook
