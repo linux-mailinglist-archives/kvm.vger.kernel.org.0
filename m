@@ -2,165 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB67863F59A
-	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 17:47:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C08BC63F59F
+	for <lists+kvm@lfdr.de>; Thu,  1 Dec 2022 17:48:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229890AbiLAQrY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 11:47:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35920 "EHLO
+        id S229777AbiLAQs0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 11:48:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229984AbiLAQqy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 11:46:54 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 725E8BD893
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 08:46:42 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B1FfsDN020900
-        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 16:46:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=ZMcxQ9w7ZhIS0g7L2T7kOqJ65WhwkFg6yh6E5uKVcWM=;
- b=NJoulmqHnKJW7sWWk3TZvymgzYiU7JwTpmphrUlL9q7687ULKT5SoRVtSbq/Jc1BLzFO
- HnN43GWDJ28HDTJXNF+AMplbTadJjsyHv0/PK0efWpDPe524EAzp614h1GmzSylsoiHQ
- TEwPNug43NHXBqUPVC+cpS/lKTi/ykcHq8MTvSaTLk9rCpX6tmX8h6WvAoOEceWH86Xx
- IiAzATovlGuqo+fGF83DL6dZpx2NqoGm+ue4+NGjv7X8y5rBZloHPwJvM+FoKrotCmbL
- zDPjgnI+VbkthkUQlXcLptzvm3BNaTFZAa7/yHoUzS7aRJSeEm15TcTJ3I295e94sTMw wA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6y4u9tb5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 16:46:42 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B1Ga7s4025272
-        for <kvm@vger.kernel.org>; Thu, 1 Dec 2022 16:46:41 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m6y4u9tac-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Dec 2022 16:46:41 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B1Ge3DP011534;
-        Thu, 1 Dec 2022 16:46:39 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 3m3a2hwjgf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Dec 2022 16:46:39 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B1GkajX10158818
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Dec 2022 16:46:36 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 073BE5204E;
-        Thu,  1 Dec 2022 16:46:36 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id BB1CC5204F;
-        Thu,  1 Dec 2022 16:46:35 +0000 (GMT)
-Date:   Thu, 1 Dec 2022 17:46:34 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com,
-        pbonzini@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v1 1/3] s390x: add library for
- skey-related functions
-Message-ID: <20221201174634.57a1a44a@p-imbrenda>
-In-Reply-To: <166991014258.186408.12012997417078839512@t14-nrb.local>
-References: <20221201084642.3747014-1-nrb@linux.ibm.com>
-        <20221201084642.3747014-2-nrb@linux.ibm.com>
-        <20221201141650.32cfe787@p-imbrenda>
-        <166991014258.186408.12012997417078839512@t14-nrb.local>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S229947AbiLAQsD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 11:48:03 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D33AB1C92B
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 08:47:51 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id y17so2183760plp.3
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 08:47:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oiPlfSphC7yJwjzyONiuPHRaJCv76fAx56UNQh41g3U=;
+        b=aaSEEL1+r4eJA9s7O/txHL7Xi6SeBXxCYU48kQub2FzkoNiCQgY/eKMqO5OpiGzNkd
+         1fgcRFsW0Q8Eus37xwWj3KdJkf/nkdAn7deQM9A3unixyBBmCtnk4ItrX5zmkqeauV7Z
+         EHSxi6t3xV9JTzBKEe6qyUH3nU5jd8scAngXmGxbO4kHLXLzwd7eMIA1U+m6io8/hlIA
+         inkGF5zxjhY3WjorcUncv5WMH8ppC3yRqxudwsfmA3Vd8bdpGI39pdI3xbMqZhlJ9Dae
+         qoVrUQ5fNhLvFb2qSkC+7WLtct4Cl639VfIpdiNSV+VUkVIZJmLINY9wkDpQ16j8PGnQ
+         DUMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oiPlfSphC7yJwjzyONiuPHRaJCv76fAx56UNQh41g3U=;
+        b=FGHRprjnVBz3BQ3ByhQ9PvNfrSVZsOSZEatxdRSvSbC9YeAezWzOoDWvRgilDXPpKh
+         rgpFaVA/9scmvjzaoS6MEn6gFwyOndYCWyvGHbT0rqrT2ZBXUET+JpOTFfnAwjpArShK
+         opuv+oD23W8H7M32UPxMABktsRVgzTEifLyxZRHiX3voMK1JULD4hO+Vu8JFtHXB9G9a
+         FVjXgN08qlJG4xOeUcpUxIOOwVHiexRMUZ36ZP0hfAiaW7QbN7rfmFaMLdDIV829lXun
+         8ZCAxplyCo8BiaOvESpauXkm0H+lHHUqCRpLuEqbYB900jrsIC2hgIJDLTEmxY6qcDIQ
+         Y6Zg==
+X-Gm-Message-State: ANoB5pkVP5KwySgOQjtg+v8pT2ujHWsL26dE7Bh9v+UGREP5P6FvzRON
+        +Rtbb7Uj4SYdHA+fvbCJTW4kZw==
+X-Google-Smtp-Source: AA0mqf53wGa2uc6DutJAhGFjA4M2t8L/aNqHRIlBg+n5iB0HMiUkSRxe6etbVweNGGfkPbg13GSeTw==
+X-Received: by 2002:a17:90a:4e41:b0:218:a971:d847 with SMTP id t1-20020a17090a4e4100b00218a971d847mr56219004pjl.91.1669913271049;
+        Thu, 01 Dec 2022 08:47:51 -0800 (PST)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id g6-20020a63fa46000000b0046f469a2661sm2751612pgk.27.2022.12.01.08.47.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Dec 2022 08:47:50 -0800 (PST)
+Date:   Thu, 1 Dec 2022 08:47:47 -0800
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v4 04/16] KVM: arm64: PMU: Distinguish between 64bit
+ counter and 64bit overflow
+Message-ID: <Y4jasyxvFRNvvmox@google.com>
+References: <20221113163832.3154370-1-maz@kernel.org>
+ <20221113163832.3154370-5-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: yxgTYm-aW_z42FQ2HJvHPkYJ-48RU73I
-X-Proofpoint-ORIG-GUID: 7Y_np2FHJU7uImy39hlRktU40UOc-twG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-01_12,2022-12-01_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- bulkscore=0 priorityscore=1501 clxscore=1015 lowpriorityscore=0
- malwarescore=0 suspectscore=0 spamscore=0 phishscore=0 impostorscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2212010123
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221113163832.3154370-5-maz@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 01 Dec 2022 16:55:42 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
-
-> Quoting Claudio Imbrenda (2022-12-01 14:16:50)
-> > On Thu,  1 Dec 2022 09:46:40 +0100
-> > Nico Boehr <nrb@linux.ibm.com> wrote:  
-> [...]
-> > > diff --git a/lib/s390x/skey.c b/lib/s390x/skey.c
-> > > new file mode 100644
-> > > index 000000000000..100f0949a244  
-> [...]
-> > > +/*
-> > > + * Set storage keys on pagebuf.  
-
-... according to a pattern
-
-> > 
-> > surely you should explain better what the function does (e.g. how are
-> > you setting the keys and why)  
+On Sun, Nov 13, 2022 at 04:38:20PM +0000, Marc Zyngier wrote:
+> The PMU architecture makes a subtle difference between a 64bit
+> counter and a counter that has a 64bit overflow. This is for example
+> the case of the cycle counter, which can generate an overflow on
+> a 32bit boundary if PMCR_EL0.LC==0 despite the accumulation being
+> done on 64 bits.
 > 
-> Well there is the comment below which explains why the * 2 is needed, so what
-> about this paragraph (after merging the commits as discussed before):
+> Use this distinction in the few cases where it matters in the code,
+> as we will reuse this with PMUv3p5 long counters.
 > 
->     * Each page's storage key is generated by taking the page's index in pagebuf,
->     * XOR-ing that with the given seed and then multipling the result with two.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 43 ++++++++++++++++++++++++++++-----------
+>  1 file changed, 31 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 69b67ab3c4bf..d050143326b5 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -50,6 +50,11 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
+>   * @select_idx: The counter index
+>   */
+>  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
+> +{
+> +	return (select_idx == ARMV8_PMU_CYCLE_IDX);
+> +}
+> +
+> +static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
+>  {
+>  	return (select_idx == ARMV8_PMU_CYCLE_IDX &&
+>  		__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
+> @@ -57,7 +62,8 @@ static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
+>  
+>  static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
+>  {
+> -	return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX);
+> +	return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX &&
+> +		!kvm_pmu_idx_has_64bit_overflow(vcpu, idx));
+>  }
+>  
+>  static struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
+> @@ -97,7 +103,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+>  		counter += perf_event_read_value(pmc->perf_event, &enabled,
+>  						 &running);
+>  
+> -	if (select_idx != ARMV8_PMU_CYCLE_IDX)
+> +	if (!kvm_pmu_idx_is_64bit(vcpu, select_idx))
+>  		counter = lower_32_bits(counter);
+>  
+>  	return counter;
+> @@ -423,6 +429,23 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
+>  	}
+>  }
+>  
+> +/* Compute the sample period for a given counter value */
+> +static u64 compute_period(struct kvm_vcpu *vcpu, u64 select_idx, u64 counter)
+> +{
+> +	u64 val;
+> +
+> +	if (kvm_pmu_idx_is_64bit(vcpu, select_idx)) {
+> +		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx))
+> +			val = -(counter & GENMASK(31, 0));
 
-looks good
+If I understand things correctly, this might be missing another mask:
 
-> 
-> (But really that's also easy to see from the code below, so I am not sure if
-> this really adds value.)
++		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx)) {
++			val = -(counter & GENMASK(31, 0));
++			val &= GENMASK(31, 0);
++		} else {
 
-if you want to add documentation, do it properly, otherwise there is no
-point in having documentation at all :)
+For example, if the counter is 64-bits wide, it overflows at 32-bits,
+and it is _one_ sample away from overflowing at 32-bits:
 
-> 
-> > > + * pagebuf must point to page_count consecutive pages.
-> > > + */
-> > > +void skey_set_keys(uint8_t *pagebuf, unsigned long page_count)  
-> > 
-> > this name does not make clear what the function is doing. at first one
-> > would think that it sets the same key for all pages.
-> > 
-> > maybe something like set_storage_keys_test_pattern or
-> > skey_set_test_pattern or something like that  
-> 
-> Oh that's a nice suggestion, thanks.
-> 
-> >   
-> > > +{
-> > > +     unsigned char key_to_set;
-> > > +     unsigned long i;
-> > > +
-> > > +     for (i = 0; i < page_count; i++) {
-> > > +             /*
-> > > +              * Storage keys are 7 bit, lowest bit is always returned as zero
-> > > +              * by iske.
-> > > +              * This loop will set all 7 bits which means we set fetch
-> > > +              * protection as well as reference and change indication for
-> > > +              * some keys.
-> > > +              */
-> > > +             key_to_set = i * 2;
-> > > +             set_storage_key(pagebuf + i * PAGE_SIZE, key_to_set, 1);  
-> > 
-> > why not just i * 2 instead of using key_to_set ?  
-> 
-> Well you answered that yourself :)
-> 
-> In patch 2, the key_to_set expression becomes a bit more complex, so the extra
-> variable makes sense to me.
+	0x01010101_ffffffff
 
-fair enough
+Then "val = (-counter) & GENMASK(63, 0)" would return 0xffffffff_00000001.
+But the right period is 0x00000000_00000001 (it's one sample away from
+overflowing).
+
+> +		else
+> +			val = (-counter) & GENMASK(63, 0);
+> +	} else {
+> +		val = (-counter) & GENMASK(31, 0);
+> +	}
+> +
+> +	return val;
+> +}
+> +
+>  /**
+>   * When the perf event overflows, set the overflow status and inform the vcpu.
+>   */
+> @@ -442,10 +465,7 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+>  	 * Reset the sample period to the architectural limit,
+>  	 * i.e. the point where the counter overflows.
+>  	 */
+> -	period = -(local64_read(&perf_event->count));
+> -
+> -	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+> -		period &= GENMASK(31, 0);
+> +	period = compute_period(vcpu, idx, local64_read(&perf_event->count));
+>  
+>  	local64_set(&perf_event->hw.period_left, 0);
+>  	perf_event->attr.sample_period = period;
+> @@ -571,14 +591,13 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>  
+>  	/*
+>  	 * If counting with a 64bit counter, advertise it to the perf
+> -	 * code, carefully dealing with the initial sample period.
+> +	 * code, carefully dealing with the initial sample period
+> +	 * which also depends on the overflow.
+>  	 */
+> -	if (kvm_pmu_idx_is_64bit(vcpu, select_idx)) {
+> +	if (kvm_pmu_idx_is_64bit(vcpu, select_idx))
+>  		attr.config1 |= PERF_ATTR_CFG1_COUNTER_64BIT;
+> -		attr.sample_period = (-counter) & GENMASK(63, 0);
+> -	} else {
+> -		attr.sample_period = (-counter) & GENMASK(31, 0);
+> -	}
+> +
+> +	attr.sample_period = compute_period(vcpu, select_idx, counter);
+>  
+>  	event = perf_event_create_kernel_counter(&attr, -1, current,
+>  						 kvm_pmu_perf_overflow, pmc);
+> -- 
+> 2.34.1
+> 
+> 
