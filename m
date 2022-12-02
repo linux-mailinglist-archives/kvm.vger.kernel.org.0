@@ -2,54 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D648C640A23
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 17:05:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4556D640A48
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 17:08:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233876AbiLBQE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 11:04:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42328 "EHLO
+        id S233736AbiLBQIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 11:08:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233874AbiLBQEe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 11:04:34 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C6411D3
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 08:04:14 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id 4so5054972pli.0
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 08:04:14 -0800 (PST)
+        with ESMTP id S233715AbiLBQIL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 11:08:11 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E55FD8AAFA
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 08:08:08 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id k79so5295509pfd.7
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 08:08:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=b2GsRYGpugbtZSHFD2RurCZ4JW4xZuzTsOfxXrCkfT8=;
-        b=NpcRjd8PL93RDmu18EFPPR+cTZLP3kvCDAEAva9wUQzgEtv6dhPvDs1R9Q9+h2mN7N
-         H42dGaT+sl8xeMuYK2rfUD+midQutKuG+T3MUl21HeEIW4MolVpdsUIo9SmBbkggNx39
-         8eN3yXePSJelVozj19wEaq9z6VDhzvEr0ForIWyEXE5qa5rozQa3WxAYewh7SubIBKmO
-         02PPePyseXuLiMMtCMvFiCLdBEv6hZUEsP/WY2KPh2svytXFAqt8tvoUSmd0DdfZmIR5
-         sLez1JP4ikgagdRRPh2k9RbfsucGTq+KVdolkDHLvc/Uk58Zr0iw+nxpff3e47GDmBB4
-         X4Mw==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LMdFvNSIKdTJxppFI5JflU3ZXHxkZjSJ4fG5U4tk7Tk=;
+        b=kw0qyCOMp2u+ojev0wrASw/lF7r9rOnRJHqLy08FIIr+f+qpPtSFohe59bJmaOi/rJ
+         xcGzBwmHctfDCuY/HsZstsw01nTTKqB9D0ItsIVCZBuDkF6U4LFd8/XxyiMZ9HQQBawu
+         5Br6kbHRMEkmhVdkrdlpAnXBg7aXr8x1ngEkT987D0vDq9wJ1LYSA7pyGWl0PB6S36YX
+         Ye0BXjX/JFQwCFB0idj1kNjBh1WOFf2yIueArh18nn+f3Kk6RhG95XRHvHGlIJTCnyAw
+         T+Hf0HOA9lpO63L3167YfTmLHua9wbiTHz1XwCqkS0us3SdkuoK9a/bX1aNd1tZdIG9m
+         GSrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b2GsRYGpugbtZSHFD2RurCZ4JW4xZuzTsOfxXrCkfT8=;
-        b=yxWZrpE6p5PeRSFNzAnngcBlGCzxAwgCNQ5ghrqch8YMK98ywKs3YeHDcdTy2aoEye
-         pjotsSvQyKR36jafZYTmYlgw4IXGzcToNOcOVn+Jtjto/x0fk5ZNxVaNQgq9T43LOLFO
-         oEdpgdxFN8NNycFWU2nI8z4l17xgHXkShHtiEl4xKmJETWgveozFxvawES/0hpNou7sm
-         Nh8nlkOQeMnqrjaP3Trvz+xbQRUtkIT2BkCDaWntudxgbdmrvwaJWvlokRI35ZmfuymZ
-         Ib4mG0011XzrtGWLkbUYWxWUsXiytNOk8vrUq4CP4BPPQ4U6F7cTX4uipJdNKZ84xEul
-         /dAQ==
-X-Gm-Message-State: ANoB5pkU1TdJcaUeryeN9HWKsWjw99Q0q+1ibMEuXNRPFSdwiAX4Aiv9
-        6J3lOHnQyaYRZL6zNfKHfbQgSWJZKdZJEPxK
-X-Google-Smtp-Source: AA0mqf7w0TN/IsoZof5JEkNGBQ8Yd2Zjjhh4wCVFAlaPO07IGqPcQWl6OiCMwNp3DG6Q8B9rQJAiYA==
-X-Received: by 2002:a17:90a:9a98:b0:219:2f90:4fb3 with SMTP id e24-20020a17090a9a9800b002192f904fb3mr28837193pjp.109.1669997053879;
-        Fri, 02 Dec 2022 08:04:13 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LMdFvNSIKdTJxppFI5JflU3ZXHxkZjSJ4fG5U4tk7Tk=;
+        b=J8tfEXUZF+ejNtGZb3h09P/B41e4/BmbuZxukScD55nRPki4YzCJr8ELcI8La9X49m
+         AK/yOQv/qHg7S0mrxh5dQsQ13ImtuLR61aZl4jiAQbyXVPh+Z/13XhURUTWxjzfY/SHn
+         3HWcFQHPERpjmp3MNrXbtcvuhXPEu9lATHbymEABtS5GAtTfPioT1WaTnh2jPsfxhtEA
+         bj7u2wtMPdznyejs16bBlxMNF/2VWEL7R3mtyQgFmB2Hn6fCuO15JKGNKzQoVs41pQ6y
+         7ADGkgNGS9kEiWYGH7TQYe/UOmmMdfosQ80Xu4dT43Fr4eKaF2Nd83i5JTTD+0KoO9kI
+         qhGg==
+X-Gm-Message-State: ANoB5pmcc6hIdK1e72o1qGOZb5hyHctx1HNneehZ0UQPbUqTG2p6WkBU
+        fXOiQ1z/VY9xDPKJ1CJN230wmA==
+X-Google-Smtp-Source: AA0mqf5a5KU+HXt1yCJ0zhlFtswkW2r0VasQIXpEBIwwE2hKQw/T3gXBywz5nj+1M/Ux52wSBF1P1g==
+X-Received: by 2002:a63:495e:0:b0:470:75a1:c6d7 with SMTP id y30-20020a63495e000000b0047075a1c6d7mr47336241pgk.120.1669997286584;
+        Fri, 02 Dec 2022 08:08:06 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id q42-20020a17090a1b2d00b00219752c8ea5sm3349337pjq.37.2022.12.02.08.04.12
+        by smtp.gmail.com with ESMTPSA id w23-20020a1709026f1700b00189667acf19sm5714233plk.95.2022.12.02.08.08.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Dec 2022 08:04:13 -0800 (PST)
-Date:   Fri, 2 Dec 2022 16:04:09 +0000
+        Fri, 02 Dec 2022 08:08:06 -0800 (PST)
+Date:   Fri, 2 Dec 2022 16:08:02 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     "Huang, Kai" <kai.huang@intel.com>
 Cc:     "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
@@ -93,17 +92,16 @@ Cc:     "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
         "atishp@atishpatra.org" <atishp@atishpatra.org>,
         "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
         "Gao, Chao" <chao.gao@intel.com>
-Subject: Re: [PATCH v2 40/50] KVM: x86: Do compatibility checks when onlining
- CPU
-Message-ID: <Y4oh+XsbifA2BSj9@google.com>
+Subject: Re: [PATCH v2 41/50] KVM: Rename and move CPUHP_AP_KVM_STARTING to
+ ONLINE section
+Message-ID: <Y4oi4oRk7jsCqYJO@google.com>
 References: <20221130230934.1014142-1-seanjc@google.com>
- <20221130230934.1014142-41-seanjc@google.com>
- <cf755389c21c73e8367d8162cabc83629d3f9a74.camel@intel.com>
+ <20221130230934.1014142-42-seanjc@google.com>
+ <c74c88ba6a17da2d36e2d340ce22af127bda8383.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cf755389c21c73e8367d8162cabc83629d3f9a74.camel@intel.com>
+In-Reply-To: <c74c88ba6a17da2d36e2d340ce22af127bda8383.camel@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -117,37 +115,25 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Dec 02, 2022, Huang, Kai wrote:
 > On Wed, 2022-11-30 at 23:09 +0000, Sean Christopherson wrote:
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -11967,6 +11967,11 @@ int kvm_arch_hardware_enable(void)
-> >  	bool stable, backwards_tsc = false;
-> >  
-> >  	kvm_user_return_msr_cpu_online();
-> > +
-> > +	ret = kvm_x86_check_processor_compatibility();
-> > +	if (ret)
-> > +		return ret;
-> > +
-> >  	ret = static_call(kvm_x86_hardware_enable)();
-> >  	if (ret != 0)
-> >  		return ret;
+> > From: Chao Gao <chao.gao@intel.com>
+> > 
+> ...
 > 
-> Thinking more, AFAICT, kvm_x86_vendor_init() so far still does the compatibility
-> check on all online cpus.  Since now kvm_arch_hardware_enable() also does the
-> compatibility check, IIUC the compatibility check will be done twice -- one in
-> kvm_x86_vendor_init() and one in hardware_enable_all() when creating the first
-> VM.
+> > 
+> > Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+> > Signed-off-by: Chao Gao <chao.gao@intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Do you think it's still worth to do compatibility check in vm_x86_vendor_init()?
-> 
-> The behaviour difference should be "KVM module fail to load" vs "failing to
-> create the first VM" IIUC.  I don't know whether the former is better than the
-> better, but it seems duplicated compatibility checking isn't needed?
+> Perhaps I am wrong, but I have memory that if someone has SoB but isn't the
+> original author should also have a Co-developed-by?
 
-It's not strictly needed, but I think it's worth keeping.  The duplicate checking
-annoys me too, and I considered removing it multiple times when creating this
-series.  But, if there is a hardware incompatibility for whatever reason, failing
-to load and thus not instantiating /dev/kvm is friendlier to userspace, e.g.
-userspace can immediately flag the platform as potentially flaky, whereas
-detecting the likely hardware issue when VM creation fails would essentialy require
-scraping the kernel logs.
+This is the case where a patched is passed along as-is, e.g. same as when
+maintainers apply a patch.  Isaku posted Chao's patch, and then I came along and
+grabbed the patch that Isaku posted.  I could go back and grab Chao's patch
+directly, but Yuan's review was provided for the version Isaku posted, so I
+grabbed that version.
+
+> > Reviewed-by: Yuan Yao <yuan.yao@intel.com>
+> > [sean: drop WARN that IRQs are disabled]
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> 
