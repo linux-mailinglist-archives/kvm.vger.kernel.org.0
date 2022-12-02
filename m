@@ -2,153 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 70A0363FD1D
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 01:32:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C18B63FD14
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 01:31:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232292AbiLBAcv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 19:32:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47442 "EHLO
+        id S232263AbiLBAbm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 19:31:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232405AbiLBAcU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 19:32:20 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A325DB0B59
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 16:29:47 -0800 (PST)
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B20KhXe024390;
-        Fri, 2 Dec 2022 00:29:11 GMT
+        with ESMTP id S231464AbiLBAbR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 19:31:17 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 949BE2F03C
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 16:26:56 -0800 (PST)
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B20PFiu024873;
+        Fri, 2 Dec 2022 00:26:06 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : content-transfer-encoding : content-type :
- mime-version; s=corp-2022-7-12;
- bh=LyDgQXL/UtnonQnN44uV7lFYJ4T2U1SpEISrlmGFdDE=;
- b=FO16zGfmlIRSm/qAiE7biJwWF2PpGlL8C4l5/oBHQeq/peZjjnGvigJLmyusKM+Wc56d
- fAUYIkDx55iV10DFPqawkAHPSXkHAxWFSc1IxjRAzAPascT4PrFGq67KD2li1MGuEaLO
- ZAZsErD/J21bOiMiUqhxrbam6VU3/ps7w5pbVQWH0h4KyqsKoxRIvqhlry0KHzEH8cfw
- HmmGpuB0CsKpWg3k2BmVVj13AHIKokbtKPIA4PsNaQDTZqsk+Qg/ZTIayhSiHmBoPfw8
- X0ZGVWMdApibLvZiDJrbEol0h6dpZ03LCwBDU7elEL/7vOGy8EnCpdHWNQXkhnCPHY29 Fw== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3m76f0r16f-1
+ subject : date : message-id : in-reply-to : references :
+ content-transfer-encoding : content-type : mime-version; s=corp-2022-7-12;
+ bh=7hTQ0KulW8fHzyfyXunHYyE7lIpwH/xtHaTskd5eFAE=;
+ b=BJgaAF7LrYkSJtrOXj+NFSa5JD/bynCqOL2abgw5IJ1G4NspxXJHl8nQtVdvNIhMAceh
+ eAZVpfnNaNzAbxpLJm2XHY1Lp0y14SR2brS857YAAUKCoy+r9ptIytzLD2lOspQfAxqt
+ YIoWIUyQEeU3BZn7q9fdhfvj6Yp0mKLgOe1uiWJF3g6Y9VpGGED/ng74KC1aVE2MRNei
+ xicYyJdgo07lwViOu/aB0DEbFMM8PsXHOSbOYlkgTZvfK0hB+7sD1HqAcQt8dEfD5zTc
+ lkPC+IYXgEuZbxZs+OVgw6NjzvwAZLlNBivaeBRHkw4pMC7Iel9PxcUYYICXA0gpTE+1 Ng== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3m765w01uj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 02 Dec 2022 00:29:08 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2B1NwnAB016310;
-        Fri, 2 Dec 2022 00:25:26 GMT
-Received: from nam02-bn1-obe.outbound.protection.outlook.com (mail-bn1nam02lp2047.outbound.protection.outlook.com [104.47.51.47])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3m4a2nmjbc-1
+        Fri, 02 Dec 2022 00:26:05 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2B1NOMM0036602;
+        Fri, 2 Dec 2022 00:26:04 GMT
+Received: from nam02-bn1-obe.outbound.protection.outlook.com (mail-bn1nam02lp2040.outbound.protection.outlook.com [104.47.51.40])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3m3c215xms-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 02 Dec 2022 00:25:26 +0000
+        Fri, 02 Dec 2022 00:26:04 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mWVVGtu2ekFDgGFSYU1LHXuqruYpI0X4GUI4rpmoUcpcmK08QDf/Gm348aBl8ASoP8YO8KDFE3/sWUbFV5TBxVvuHO/GGsbzfT0qegAFzq+xo7Ii4e5yVeiP8lJl/eMyMrZaebqVPmosoDPH8yZ0VxcxCJgCZGy16ML5/C79C+SIaJwwYVrEhlgsw8va7J7JqLg1BasMu1Yxv5dHQh0uC9/KRhp2s1JGrwickWWEhWBxlQTy/kc1hK9KLah3Nvv7P+P+3++QY3odskskp19dwYpKTkBx5+XcUfalysrsApxnw020MoCLGmcEPswpjweMprWVIJlyz+mOQ515zyZg8A==
+ b=fQvB7AY54EianZZeSSuMSmazDuL7Y3MZeU1r3tFg5r2H91Qb88NsnychazmnPOX7ILfQAwtpBANp0e0Ep4Qeu2WPmrmblmh8iFBhMpAyygWtIDQtyVo16mG0cjduMuXwUHnZxwUmMVk+PEw42EF3eP74qIzzIxqW/iNZfJN3Un1r+3Og3hehri7wUFvV0/JbA080SkvIgLD853gOY7iyfe6fL8W+H7upWfPj+GdQE90laRUjlZQ1XjMJylnSBOrH+ayMKTbJEqsJUKGeHOwvEFM7WiR/c3XI6ueaWptpRklEvSLdjtAN/B1E6gZAcyFNwhUf8uvox3jUN5f8AkFzDg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LyDgQXL/UtnonQnN44uV7lFYJ4T2U1SpEISrlmGFdDE=;
- b=IKBmzWKOOjeroaRLn1cK011nGiFb8ZCYytZ7+aj9bLNngTh+XZMT0kLyptR0QznOTkAnWln5FMoLoImgC+Q4ZkJ8gRitUib9BdgYkMurR2KRyVpSlpbr0hPPxrw1lenb1WOMTPNk4oUQrfuuf82IBOXBkEFA7+epjz/bvpfQkn5D2nU79AGHqOZ3tIbgX+5DCNjFSR4g1xmosNPGY2lfVoD/6sqAjTNdW5BoJC8KQTPX5uqxsfC9fdALKhOMbN44n2VWxSdGRBIOb9JlS5d9tN6+s4QkgNk24wweUAGr8+0tEXmONxDcYCwbexoXFbDHCG4TVKyNeFwcHbrCqs8Oag==
+ bh=7hTQ0KulW8fHzyfyXunHYyE7lIpwH/xtHaTskd5eFAE=;
+ b=S95gm7D5O1QwpQiqZRoS5dFPDyCHLhU7zFwlK7t6V/U0hiPgmuwl1Oq064mNwJxr9+SIk7KF7Nvu6o2VqHR88vG1f2k5KAa6gQbov741mp9JQu9K6YtVBQDEbDMgDZC/+UlqBrpezfjSsfNuU9qXZNPOfWK7XFbL3OCzDcgBIb74hcZGGzGSsJq9ranYD59xJGVq1otwnAYMZUbNqfaQ/+29HQaiePIDyW3tji1in6SUs+2IDTCWSL5Mic/V4QqdzrzQkoHZf5pQn5btKK4puS9O5xJoeTfnxWkMc2HOPCATq9C20z2CJPUUSNQ7rOvFKu12LpV7xzDCEosGO3y6Qw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LyDgQXL/UtnonQnN44uV7lFYJ4T2U1SpEISrlmGFdDE=;
- b=iaclhN0YOO+EExqxTj9/q/SkG/992c/FiAO3odhm2CDcfIydByoRw2plU0i65MC+xl2S7x815IhjvDoysuobj7c35ievKIVUCJDN0FMCsO0DNLPAVdlGMNoED9de2h5LMtmQEZqwbsolC4Sa3YKMprfpukJT2f6sV8zbkejUiu4=
+ bh=7hTQ0KulW8fHzyfyXunHYyE7lIpwH/xtHaTskd5eFAE=;
+ b=yDsz1iL3Q2687Ly78Max6jzNfGcwcKQD3WAhjVzGDQYqldl3aPcqaEKlgmjWQ67toa6wrM6rIDOKHE/dvLYZN5iOoLXMVUAKd5uyOrzBuG74Jw3sLK5y+vaqimW/9yzttFJeptkysi9pppCouPt4F7IaL5rAKKH47iaN3I2oEvI=
 Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
  by DM6PR10MB4396.namprd10.prod.outlook.com (2603:10b6:5:21e::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.8; Fri, 2 Dec
- 2022 00:25:24 +0000
+ 2022 00:26:02 +0000
 Received: from BYAPR10MB2663.namprd10.prod.outlook.com
  ([fe80::d868:78cd:33d4:ec7]) by BYAPR10MB2663.namprd10.prod.outlook.com
  ([fe80::d868:78cd:33d4:ec7%7]) with mapi id 15.20.5857.023; Fri, 2 Dec 2022
- 00:25:24 +0000
+ 00:26:02 +0000
 From:   Dongli Zhang <dongli.zhang@oracle.com>
 To:     qemu-devel@nongnu.org, kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, mtosatti@redhat.com, joe.jin@oracle.com,
         likexu@tencent.com, groug@kaod.org, lyan@digitalocean.com
-Subject: [PATCH v2 0/2] target/i386/kvm: fix two svm pmu virtualization bugs
-Date:   Thu,  1 Dec 2022 16:22:54 -0800
-Message-Id: <20221202002256.39243-1-dongli.zhang@oracle.com>
+Subject: [PATCH v2 1/2] target/i386/kvm: introduce 'pmu-cap-disabled' to set KVM_PMU_CAP_DISABLE
+Date:   Thu,  1 Dec 2022 16:22:55 -0800
+Message-Id: <20221202002256.39243-2-dongli.zhang@oracle.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221202002256.39243-1-dongli.zhang@oracle.com>
+References: <20221202002256.39243-1-dongli.zhang@oracle.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SA0PR11CA0149.namprd11.prod.outlook.com
- (2603:10b6:806:131::34) To BYAPR10MB2663.namprd10.prod.outlook.com
+X-ClientProxiedBy: SN7PR04CA0181.namprd04.prod.outlook.com
+ (2603:10b6:806:126::6) To BYAPR10MB2663.namprd10.prod.outlook.com
  (2603:10b6:a02:a9::20)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: BYAPR10MB2663:EE_|DM6PR10MB4396:EE_
-X-MS-Office365-Filtering-Correlation-Id: e764a86f-c619-44c9-f798-08dad3fbb41b
+X-MS-Office365-Filtering-Correlation-Id: 09d50109-8c88-4b6a-57c0-08dad3fbcb15
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6cgv/R2GDDmzoFZyhBWnG4sdfHBrqRm1pPPSd7EKtLhphyWTLpOl1xpbpT79uXVcMbdlbxYEIIEpuvlWTA9H5/u2IlOo/PcOWNvjUnlpXRf2pBK0fneNZfAKhi8mNaNr5JxBk0yqRaGzeCZOUkqoMl7k0Sz7gh2/ZesoZZzkkdA1X4vNrgX/wzX/IOo4UcrcukHI+SBYVul3vnJpQbvx/FRx9cvL3rpTxu0iMp95lFZt3VoJRusN+1KPsXIVTvAqu+O+YxVS6voSzG1I5Tdkx233R9GfbOYtuKhYv7UfRvNsVPg9K1vf/8FwzgKYxmRY0LNyZP5upP+gW4iTdWNKdKi3PRw9sOH3++1ixtFhjy1ByBwtalIihKW4owTy+Ye9uSGhBppH7/JZEJ5Y37Pe09GDTU/cvMvwYKbe6BUotf6GMz8g8AyLyIdq0JtiMitHzDR4SRcrlVp0MIFFcje55wmyQ0yI7By8TSLkox3CFNi1ZopcnWxwWqmZBygr7dAd0ve4f5SvrXD8OuoqCea107W2lkLFzurW//PAP5FkEpWrw7I64IprGPepDe10AZJd45K9kcyYzv8c6+0g1SY35CHPhq0XCfn+GEcp8cBLf7wD/4Lys3DV40cwyFdJKQd78cViq4DGz4wAwWIdwRrNqhs0OXbmEtSzlTQs19+i6yYX2mRd6qFw1OLzePUsUeCX8S7hneMAC19HOJcg70YYYA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(376002)(136003)(346002)(39860400002)(366004)(451199015)(36756003)(86362001)(316002)(966005)(6486002)(44832011)(8676002)(66946007)(4326008)(2906002)(5660300002)(41300700001)(66476007)(8936002)(66556008)(83380400001)(38100700002)(478600001)(26005)(6666004)(6512007)(186003)(6506007)(2616005)(1076003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 9LiUhAcVa8BdXa04OAdqMQN9GBI2MJrgNLC5zQvF7pahcKAiVRpU5QV2ESVzCU+yRUuDgT/xsF1q1Ukh7WJlDCE1npIxcU/vaErkLcps/fxEEC4HPvUqTN0BIQm1cQBWFspfvBNVwp4bqhINTPDGiKKR4KFH4bru65Z7i5J3zWYdV8pfb42CvKdPRSsIWy2Ql8PDOb/srwjcfyPKZ9bicsmmFaYGC+pU+N1TSKwOv3Ez/oGArgzjJitlt2ATqH3pvgOel2RMC3D6vBJ6vEUFGQO9QqeCpR1B3wPp+j6Nc4qm5saJQPRdlV9btsCVsYADuf69aYXO022zH6+QaIZhZjPaBnYfKRBpjC/jt68YCxW3aONg1JSSb1xYJwCKKQ1RwgP/2oJRu5fxdXCHSrYqf9NEJedhFS8OsANOt4PU3fLxUElWt/3vfVQ5N0/APt3BCIqIRqXpIfHpO3DH63OfjykpKW3nowIB9yZVd8WamB7palR1T33zEF42LR5tCDhjVfGZfzcl5ld8AT+nC/qGEoiSNRccYtGOvU5k+ZrPh3yTEXmU8LKNskybLbCTaTl89ybUa+9zm5UT7ua4c8RShzIKjkHMNASztlE4BhiYOmSemaP7t/ubal7fqVYV3BSL0vgFID3bvH0+XzXu+1ShvA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(376002)(136003)(346002)(39860400002)(366004)(451199015)(36756003)(86362001)(316002)(6486002)(44832011)(8676002)(66946007)(4326008)(2906002)(5660300002)(41300700001)(66476007)(8936002)(66556008)(83380400001)(38100700002)(478600001)(26005)(6666004)(6512007)(186003)(6506007)(2616005)(1076003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/K6xDyVuhZU42LhTIaT1XTyS96v0ERqXRm0nhND6cWdBJIZyGi9KPX9aS0JE?=
- =?us-ascii?Q?YCT3+V1ErLY3DKz2RzNKp2VgIrrvQ7iwfPjB9U7q1GaNAEE7/LCGvlmkTjec?=
- =?us-ascii?Q?c/nZDk/V9sX4JSecw4Ki5a8Lcw3AkJiQ8hPeZ1NZwuqy0PobyIkBuv7psw+0?=
- =?us-ascii?Q?pvuvPp+/BsN0DvAk3EOI4qfo3Ct6n+r4VRR7PtCjVkkLLvLpmMFh07zfR6Kg?=
- =?us-ascii?Q?3OlALSgcfO1i/E+qoPljQG0eTks6xQU26HAnKe4rZfBD9xKYvEVFBdLjm0YH?=
- =?us-ascii?Q?yLc08loKlZ34WPwyONK6/cS5DcC8+OAMY5TwhR+wYQIIvLZrFGI9FQX6NyZw?=
- =?us-ascii?Q?yphB4kLk5OYt4YAL1DUOdlbefu2oSJEnf4Qh7clCiegTZyIpwrGYmxeAfgzS?=
- =?us-ascii?Q?9L1YktWgBc9ywHar7zx/vvWZr3QtVDzfJydAr5CpbNfz+bJ5we2n4XU7JkhG?=
- =?us-ascii?Q?jYC0IT0Jr+3fvt7rbN0Bg/TANZHkQyIjCjMQX+ngZZIJDIVBmu3IaeH2Xv3Q?=
- =?us-ascii?Q?xRSoUznzmiLwBNOhjhxLNd2YUF54/TozbVWKViJZ5SQOHfkiNcaoZuyjpOb0?=
- =?us-ascii?Q?wx8/4TLeBI44hsOZ2mFUM3OP063C5qsgrtWzoy/zci353KUhxT82O0vjJrzI?=
- =?us-ascii?Q?yMiAwUbKhPNwwZF0rAffsgaxJw3ZeXTWZoMzZkIx5//V+dB4w+1mgLXPS8Wb?=
- =?us-ascii?Q?lxiom3S8b4xlXnNPT6e3l4/jyZUhOnQ6U8yu4AVFosBPRpemwDhT9nRNN30x?=
- =?us-ascii?Q?h0so6clUZKHiY9U+I3P20E+HxDHegrYJMpAny5KUnW91V2huAP3vVAEEMBav?=
- =?us-ascii?Q?dniDij652CJs5GrwBe0l5m9Hypg3NWUytdVrfKOLlL72fGmQmwoOJiVCIPUz?=
- =?us-ascii?Q?kjrVnXQg1NJEGB3LAssg8R+Oa0pRQwLZLWai9XCu3xMKEbsqlr0UupEjzTQX?=
- =?us-ascii?Q?fJk1HqfLtE3aIV8FQcPYti1dViz4LOg7RXkVRnTl4Bp7xnG8suzuCmuKKEiF?=
- =?us-ascii?Q?dm3NZgLZKqZUwuGDyvSYVF+H3VXUa6j3UpP/9f+/irDTTYCpoSKRD4ks4zNZ?=
- =?us-ascii?Q?hiOyuOSlKI3o2NuK9XJk0SyfT0j8m+kEjNKb3kFnbd2sNRTV6Srh8+49y5bQ?=
- =?us-ascii?Q?UZpLIndvYL+kL3m0idmBWNDWZ8OfI0CBNOCwjSWlAuGoBwU+Xbi51Mq9eDxW?=
- =?us-ascii?Q?iC/wNPsuLU0QBkkIaVAVVWzvfrZQSUjcSWqWA+RVRMC5UYQGO9A5DdrMxXrx?=
- =?us-ascii?Q?0+mtL+xMtkFoyjXBCDhFClgwv6PzKevpYodj+qVMfd4o2SMO/r6+mAlqW4aM?=
- =?us-ascii?Q?/FMS9fb7yo23inRVk8xV1njiHOAKJ2ZijeGOi31V72UbFty/jy6zrAd9g5I1?=
- =?us-ascii?Q?9u10/S5+60fEGxxtC/7a/C85YbE7lJuYyyGhKn+bESUJBdhGea4jYWdjsEJZ?=
- =?us-ascii?Q?jvhSGgAVv80F1msgOo2+BArh/L0SHGLpuWszrvlFHX9hdjPeVCQDqleToo0t?=
- =?us-ascii?Q?ju/Mz4ZGgG3GELxcesC/xUlsizd5TA8Kh8JLSPVDD4U3bE3RAueEWvNP9qZP?=
- =?us-ascii?Q?E6ZzBFS0fZr+rLyQ6IwVVuEHZDj6C0rctupg1soC?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?UvpR9dQFvsMUDcStRLZM6eRyHwhgtE2vxoGKHv0R3Cp9dZioCJ9t8vAdbBpa?=
+ =?us-ascii?Q?T4jV+jTlSFJlzi0Ynlvx9cHLkpjgXG8mfc5+F/mb3RLTkQMFq2QlOGHC0UiH?=
+ =?us-ascii?Q?1AFuSrfZl1mGTMSruEybjH/FIQbp6qMfUpaRbQ0qFN5mH8xPnyj4gcRr9lOK?=
+ =?us-ascii?Q?o7lXGcSW3jJgmAAj2JEGxqbtOwO6Ff6hfCHRj0KeRG/9UftCSLx+c5a0Ox1a?=
+ =?us-ascii?Q?Lqpd/o7di0OB5MSuokxpoPF9seIpmcfksyj0sXKKYA6p54vwm7lpfQZPmH8B?=
+ =?us-ascii?Q?l1jWwPYIzUecnYaTt9/u5XKrhKxGoWfJ8HBLB4TL7HwofCwkdHRk9nMjMiyN?=
+ =?us-ascii?Q?897ayyidvL29FxJG6sqJ8z9TkB0uIG4jNLOHnslLBXU20SsfKpNxZyFp00Jy?=
+ =?us-ascii?Q?kkUlWx/CsJoukbYzj1zLz8u/UBYnuUHNns0BzAOudw2SEv7mKcCM3IOyr3EP?=
+ =?us-ascii?Q?4yioWy+eJNbPxhaEWxG5JglcOwGg3poBEEJjpu7iKCbilXroFfIMfAtyhqTd?=
+ =?us-ascii?Q?xK4ylfL6fUd9Qq/tF6DkEYHkUmJL71LZPr2RFYHxLsIa3z/7gdSRZ43eE30g?=
+ =?us-ascii?Q?MlZ2xLeKrkTB7QuRGuGSBhvzd2yfuvilY6nryHxSzxx/ye0RetJrjKjlDpvF?=
+ =?us-ascii?Q?tq8tez6ldEQybe7OqCOGnQx73Nvh1OyEqjw4f8IRvJFpPJQ/1KnORBfwIHcv?=
+ =?us-ascii?Q?vN2+enM6PAhgjFDM48j507GnYTiZ47y93QyqT1mibBBnBWCOfQEtJLq4Vy+v?=
+ =?us-ascii?Q?a5T5E4v375BBgvTK7ollBmE4JlTEFEK/KZo2W/lBz7ZklsMTDGgZdjPIiuR3?=
+ =?us-ascii?Q?PCGkM0Iy/g6Q6gyEbgrJ6GL54iiDq9jIfAephQTojWu1HxljBJJgeQ/s0aLy?=
+ =?us-ascii?Q?IHQueGDK7aBBCy39ZmcTk1tIj67rRDO+EsS0XXA5rhraabuSyMfBneKXU4/r?=
+ =?us-ascii?Q?OYt5wnh/IguxyaV24eEgAdhxs8zyTJ/vOQG88tj28A2FR6nbJ7QPvc0YqDLC?=
+ =?us-ascii?Q?WCqf0TMS5KCKwbaIoj4fQAqCBT5EkCx3zLPJ5qruidPp8HiDtwlDJ7s0/ZgR?=
+ =?us-ascii?Q?sTZq6u5WQ1dhQfUphy9RDYBD07zsogjEXGHTNIdE0FZwAxXUP39trid/JyU5?=
+ =?us-ascii?Q?EPbZUFV21j6uaEWGMd1jh9ITZ48AtMKZ6zx4/eOWL72pZNw5CNuwVSp9n4H0?=
+ =?us-ascii?Q?DuxVZLv+ky1wKtPNzZod/aU6lYM4lyVzNefRkZG4znDWv1o2+ASGWN1IxKUv?=
+ =?us-ascii?Q?1Loh1v34h2hPItKQt5NSOCsWOGojOBZdldBGOAkYym2nAOowrW+E3/A+0N3d?=
+ =?us-ascii?Q?QcxMvlhUo3EH2RZ+JQ+S8lDXsKScmVMpLbG37a1Uqr22AwI0FM79DqhXgujn?=
+ =?us-ascii?Q?hzMHlx3biwVpxw4CKukMtRgxQgtD9C6O5kAJiJ547zJKDn6qH9aQChDEQXfN?=
+ =?us-ascii?Q?dM/avTH92XDY80U+TWyUEO/TZq47v6CECAa9e4vEFma/DXXE61ZajYeYAQo5?=
+ =?us-ascii?Q?58Ih2QTR1fcL0Hv5Dj8/e3SjRlNQmUs7ez4PCFVj4aaZUfXhJxNr7nHFjxOB?=
+ =?us-ascii?Q?eaXkkVqZn0fvAvo+1ZhL0lksdS8rD0mKro8GLw5t?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?cpBKxYfLpY8Z8UCXQihKlAPwwWntCLYZ/dfEY3WVNJANHYISoCfb/OOKqgtn?=
- =?us-ascii?Q?Bo/jzlP49/agJZkg7u77FnJtv7+PclpIfwHTz8BO8SDVhepVJ+FUB8tXEUjC?=
- =?us-ascii?Q?h6NdKX9MP95pLeBeMo4ramfO20dZigyGiBYRZpE7g42vpKNk7kMWGWFO7H0C?=
- =?us-ascii?Q?4HdgR10K7JDjTkZLUC+YxJPL2IWf0WKmX0rqjent+mdD2KtjAiHFAG9469D5?=
- =?us-ascii?Q?CaHYYXHyyxtBi1VE4rznPRBG0DK7ZYTseWO++PW9NwI8x5AIDU12AlqIRu3y?=
- =?us-ascii?Q?w6mG2+vuFKg8okISBj0XYcEI3vWgGBFLUxk6qoOUmiHRWKF1GR6xWrQOfA1M?=
- =?us-ascii?Q?LIr/XCoLHfMmYWWcVQaxJNiC85oUorJ4NEiFwLSx8EozcY5WLhxehGu7JQZX?=
- =?us-ascii?Q?k8OkUS0+ZddsLApy/sTtLyupm8m61b2NVYhkqwHyQW4Q0YP+6JWT23PTpBzI?=
- =?us-ascii?Q?t3xO9TUBo7QZCPjg4KJmC7hthiEiz3A7FiSQ66hTpQ/01TsaQJti7V7Ruwom?=
- =?us-ascii?Q?SgLewVsM70C5+4LPR1nS/L1y46ov4AONt0mNPVq8RSoQS+QrXoqLhYiglOVm?=
- =?us-ascii?Q?b6hL+vvKD84peXNxPkfdMh1Eb0Drbg2rATC99KuTZ+n4mfY64AY1r1zRPVc7?=
- =?us-ascii?Q?czexORvo97lhODRTnkEEt7/1XNxF9r+aBhLQfw6RNBbCIWk5QYKLZBmzW83h?=
- =?us-ascii?Q?kbcVwrgneQ7HBpxQg3Vflx08Fdrq5eWiDL8sSUpYo4ebMyjVllSrke2zMJEL?=
- =?us-ascii?Q?y3cOX9aSAXr5HyZ79pPBooPEUcsOupdwr1dBSBZmJKOSHi+8qnaV06j6RCR1?=
- =?us-ascii?Q?v+KKRVXpDKl4IAPJDV7lGl2U41HNDuNypXrWSKAP8qnpCZAnwn0EJmRNQD7d?=
- =?us-ascii?Q?W0M096G5lvS5lUAu79kuE/tsWOXeTkPwpkPgpW5ZIpyGs905jiZrcTjJwz25?=
- =?us-ascii?Q?lZHX1SftQ3ld1qGpfdX1Bw=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?cCA7pxiHoopARJi+NejitNz+pIL6lplUEzvJ5z2ktPuYBdsMcFnXErE4GRia?=
+ =?us-ascii?Q?9I+fr7unsDE15Qur4zPx2NnAwYbsQMwi4AaCnrSPuM/K2M3RY4qG8TL1szBj?=
+ =?us-ascii?Q?yLfjzfi/gLx0K9kRoH668clphiMCxl+rsws+Qwiy+WtgBTa2TG4VGvQI9BEc?=
+ =?us-ascii?Q?cUo1Dwml7yuWvq639VlhDJ9LAC/QQNjlcg50hXh/1w8+BRwGJl+oGIwzxq2a?=
+ =?us-ascii?Q?SvMuf1ehydMTUC2LiR3DvhEJRMiO/JKTr4rZrZRdPj0Tep7INhcMgCeJTusI?=
+ =?us-ascii?Q?qR3+tl/kSV5bzI4d3uNNuW607bndEoDIehwUZv5NzOhViB1bb19sOlHpQbAX?=
+ =?us-ascii?Q?s2hYibHnDY0gui2LU1edzudMHo48af6s+XP56ZSt1jAMQRxP0+aGc6y5tTwe?=
+ =?us-ascii?Q?ftWT7UgnsdLeKKmkZfipebxsrB+Fl3c4pYwgof4zhcc5G1RHhs489B7U6vbD?=
+ =?us-ascii?Q?vqZpjqwyYUX/TsCyotXoKQqn7147FIjNtq5sFGBZQwRjmU1RrpXCZ07JWSGP?=
+ =?us-ascii?Q?foS3mAoLuFvbWPo5mjjWPuqO8SlJ3LScmnQ3iso3XBMhnVHEPYhlilNKZ98R?=
+ =?us-ascii?Q?RExvJ/SmMl+9Ti9l4pioqKY/elaSv2mLWP5QXeOe1qnM0DnasB1pGsmHpbR/?=
+ =?us-ascii?Q?iw6KQy/v5snHJlev8bg2uI2jQYVR1MZdzbRR4GbaZ2epo6XQ6mm4IT5o5pbm?=
+ =?us-ascii?Q?7wJ1yNUNcSsqB/5acmQXJ3us+emZ5UrLCVWdx5ifpKuIeXyMkbx5WHmjH5KP?=
+ =?us-ascii?Q?mm6bKW62tiOEHhIBGqAbewLIsWNkBtk8/yLwBlxjgcod6lg4GNSdHR3csKKv?=
+ =?us-ascii?Q?CU600SJYpyAmhJPtT2XtmgzbSF61uN9LOV/0pg/gSDiCxGK2nP9cRm5BlNVp?=
+ =?us-ascii?Q?egfudqvgg95Rpgpolqd94sWr+NCzZlxYMaEXkCRT0na3VRCH0hOkBTAUqp23?=
+ =?us-ascii?Q?l+R4Gsdez9DZGWhghVWOzQ=3D=3D?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e764a86f-c619-44c9-f798-08dad3fbb41b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09d50109-8c88-4b6a-57c0-08dad3fbcb15
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2022 00:25:24.0361
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2022 00:26:02.5646
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: T7Tx/s/O1tLpL0aYYcmx6iAuhopQcQkWi+MFI4Ir1/0nCR1jR0i+C+QhP0r80y1VYsdazF3awqammvQdcemYZg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: vZbJcD6Z5Sqni6zdNoK+AjQgkL0JjXCyMbDewDK0RweUTYSW+vcXm+SE76SRfew85NaFBsOjvACppj05ZAaDRQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR10MB4396
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-12-01_14,2022-12-01_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 bulkscore=0
- suspectscore=0 mlxlogscore=999 spamscore=0 phishscore=0 adultscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 phishscore=0 suspectscore=0
+ bulkscore=0 adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
  definitions=main-2212020002
-X-Proofpoint-ORIG-GUID: nfMP1LCbRVuDxyXLLGf55zJznqM1ZClQ
-X-Proofpoint-GUID: nfMP1LCbRVuDxyXLLGf55zJznqM1ZClQ
+X-Proofpoint-ORIG-GUID: gNxDslJ99jxP3cN3kATvoVzoInWQR3fM
+X-Proofpoint-GUID: gNxDslJ99jxP3cN3kATvoVzoInWQR3fM
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -159,15 +161,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patchset is to fix two svm pmu virtualization bugs, x86 only.
+The "perf stat" at the VM side still works even we set "-cpu host,-pmu" in
+the QEMU command line. That is, neither "-cpu host,-pmu" nor "-cpu EPYC"
+could disable the pmu virtualization in an AMD environment.
 
-version 1:
-https://lore.kernel.org/all/20221119122901.2469-1-dongli.zhang@oracle.com/
-
-1. The 1st bug is that "-cpu,-pmu" cannot disable svm pmu virtualization.
-
-To use "-cpu EPYC" or "-cpu host,-pmu" cannot disable the pmu
-virtualization. There is still below at the VM linux side ...
+We still see below at VM kernel side ...
 
 [    0.510611] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
 
@@ -176,64 +174,156 @@ virtualization. There is still below at the VM linux side ...
 [    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
 [    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
 
-The 1st patch has introduced a new x86 only accel/kvm property
-"pmu-cap-disabled=true" to disable the pmu virtualization via
-KVM_PMU_CAP_DISABLE.
+This is because the AMD pmu (v1) does not rely on cpuid to decide if the
+pmu virtualization is supported.
 
-I considered 'KVM_X86_SET_MSR_FILTER' initially before patchset v1.
-Since both KVM_X86_SET_MSR_FILTER and KVM_PMU_CAP_DISABLE are VM ioctl. I
-finally used the latter because it is easier to use.
+We introduce a new property 'pmu_disabled' for KVM accel to set
+KVM_PMU_CAP_DISABLE if KVM_CAP_PMU_CAPABILITY is supported. Only x86 host
+is supported because currently KVM uses KVM_CAP_PMU_CAPABILITY only for
+x86.
 
+Cc: Joe Jin <joe.jin@oracle.com>
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+---
+Changed since v1:
+  - In version 1 we did not introduce the new property. We ioctl
+    KVM_PMU_CAP_DISABLE only before the creation of the 1st vcpu. We had
+    introduced a helpfer function to do this job before creating the 1st
+    KVM vcpu in v1.
 
-2. The 2nd bug is that un-reclaimed perf events (after QEMU system_reset)
-at the KVM side may inject random unwanted/unknown NMIs to the VM.
+ accel/kvm/kvm-all.c      |  1 +
+ include/sysemu/kvm_int.h |  1 +
+ qemu-options.hx          |  7 ++++++
+ target/i386/kvm/kvm.c    | 46 ++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 55 insertions(+)
 
-The svm pmu registers are not reset during QEMU system_reset.
-
-(1). The VM resets (e.g., via QEMU system_reset or VM kdump/kexec) while it
-is running "perf top". The pmu registers are not disabled gracefully.
-
-(2). Although the x86_cpu_reset() resets many registers to zero, the
-kvm_put_msrs() does not puts AMD pmu registers to KVM side. As a result,
-some pmu events are still enabled at the KVM side.
-
-(3). The KVM pmc_speculative_in_use() always returns true so that the events
-will not be reclaimed. The kvm_pmc->perf_event is still active.
-
-(4). After the reboot, the VM kernel reports below error:
-
-[    0.092011] Performance Events: Fam17h+ core perfctr, Broken BIOS detected, complain to your hardware vendor.
-[    0.092023] [Firmware Bug]: the BIOS has corrupted hw-PMU resources (MSR c0010200 is 530076)
-
-(5). In a worse case, the active kvm_pmc->perf_event is still able to
-inject unknown NMIs randomly to the VM kernel.
-
-[...] Uhhuh. NMI received for unknown reason 30 on CPU 0.
-
-The 2nd patch is to fix the issue by resetting AMD pmu registers as well as
-Intel registers.
-
-
-This patchset does not cover PerfMonV2, until the below patchset is merged
-into the KVM side.
-
-[PATCH v3 0/8] KVM: x86: Add AMD Guest PerfMonV2 PMU support
-https://lore.kernel.org/all/20221111102645.82001-1-likexu@tencent.com/
-
-
-Dongli Zhang (2):
-      target/i386/kvm: introduce 'pmu-cap-disabled' to set KVM_PMU_CAP_DISABLE
-      target/i386/kvm: get and put AMD pmu registers
-
- accel/kvm/kvm-all.c      |   1 +
- include/sysemu/kvm_int.h |   1 +
- qemu-options.hx          |   7 +++
- target/i386/cpu.h        |   5 ++
- target/i386/kvm/kvm.c    | 129 +++++++++++++++++++++++++++++++++++++++++-
- 5 files changed, 141 insertions(+), 2 deletions(-)
-
-Thank you very much!
-
-Dongli Zhang
-
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index f99b0becd8..5d4439ba74 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -3620,6 +3620,7 @@ static void kvm_accel_instance_init(Object *obj)
+     s->kvm_dirty_ring_size = 0;
+     s->notify_vmexit = NOTIFY_VMEXIT_OPTION_RUN;
+     s->notify_window = 0;
++    s->pmu_cap_disabled = false;
+ }
+ 
+ /**
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index 3b4adcdc10..e29ac5d767 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -110,6 +110,7 @@ struct KVMState
+     struct KVMDirtyRingReaper reaper;
+     NotifyVmexitOption notify_vmexit;
+     uint32_t notify_window;
++    bool pmu_cap_disabled;
+ };
+ 
+ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 7f99d15b23..15a2f717ff 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -186,6 +186,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+     "                tb-size=n (TCG translation block cache size)\n"
+     "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
+     "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
++    "                pmu-cap-disabled=true|false (disable KVM_CAP_PMU_CAPABILITY, x86 only, default false)\n"
+     "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
+ SRST
+ ``-accel name[,prop=value[,...]]``
+@@ -247,6 +248,12 @@ SRST
+         open up for a specified of time (i.e. notify-window).
+         Default: notify-vmexit=run,notify-window=0.
+ 
++    ``pmu-cap-disabled=true|false``
++        When the KVM accelerator is used, it controls whether to disable the
++        KVM_CAP_PMU_CAPABILITY via KVM_PMU_CAP_DISABLE. When disabled, the
++        PMU virtualization is disabled at the KVM module side. This is for
++        x86 host only.
++
+ ERST
+ 
+ DEF("smp", HAS_ARG, QEMU_OPTION_smp,
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index a213209379..090e4fb44d 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -122,6 +122,7 @@ static bool has_msr_ucode_rev;
+ static bool has_msr_vmx_procbased_ctls2;
+ static bool has_msr_perf_capabs;
+ static bool has_msr_pkrs;
++static bool has_pmu_cap;
+ 
+ static uint32_t has_architectural_pmu_version;
+ static uint32_t num_architectural_pmu_gp_counters;
+@@ -2652,6 +2653,23 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         }
+     }
+ 
++    has_pmu_cap = kvm_check_extension(s, KVM_CAP_PMU_CAPABILITY);
++
++    if (s->pmu_cap_disabled) {
++        if (has_pmu_cap) {
++            ret = kvm_vm_enable_cap(s, KVM_CAP_PMU_CAPABILITY, 0,
++                                    KVM_PMU_CAP_DISABLE);
++            if (ret < 0) {
++                s->pmu_cap_disabled = false;
++                error_report("kvm: Failed to disable pmu cap: %s",
++                             strerror(-ret));
++            }
++        } else {
++            s->pmu_cap_disabled = false;
++            error_report("kvm: KVM_CAP_PMU_CAPABILITY is not supported");
++        }
++    }
++
+     return 0;
+ }
+ 
+@@ -5706,6 +5724,28 @@ static void kvm_arch_set_notify_window(Object *obj, Visitor *v,
+     s->notify_window = value;
+ }
+ 
++static void kvm_set_pmu_cap_disabled(Object *obj, Visitor *v,
++                                     const char *name, void *opaque,
++                                     Error **errp)
++{
++    KVMState *s = KVM_STATE(obj);
++    bool pmu_cap_disabled;
++    Error *error = NULL;
++
++    if (s->fd != -1) {
++        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
++        return;
++    }
++
++    visit_type_bool(v, name, &pmu_cap_disabled, &error);
++    if (error) {
++        error_propagate(errp, error);
++        return;
++    }
++
++    s->pmu_cap_disabled = pmu_cap_disabled;
++}
++
+ void kvm_arch_accel_class_init(ObjectClass *oc)
+ {
+     object_class_property_add_enum(oc, "notify-vmexit", "NotifyVMexitOption",
+@@ -5722,6 +5762,12 @@ void kvm_arch_accel_class_init(ObjectClass *oc)
+     object_class_property_set_description(oc, "notify-window",
+                                           "Clock cycles without an event window "
+                                           "after which a notification VM exit occurs");
++
++    object_class_property_add(oc, "pmu-cap-disabled", "bool",
++                              NULL, kvm_set_pmu_cap_disabled,
++                              NULL, NULL);
++    object_class_property_set_description(oc, "pmu-cap-disabled",
++                                          "Disable KVM_CAP_PMU_CAPABILITY");
+ }
+ 
+ void kvm_set_max_apic_id(uint32_t max_apic_id)
+-- 
+2.34.1
 
