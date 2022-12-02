@@ -2,123 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BA7C6407E0
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 14:44:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD70F6407FA
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 14:54:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233403AbiLBNol (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 08:44:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47460 "EHLO
+        id S233520AbiLBNyN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 08:54:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233420AbiLBNoi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 08:44:38 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D457DD78C4;
-        Fri,  2 Dec 2022 05:44:35 -0800 (PST)
+        with ESMTP id S233535AbiLBNyL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 08:54:11 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 403FFC3FE0;
+        Fri,  2 Dec 2022 05:54:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669988676; x=1701524676;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=skS3MR2BvQKKKmac1ZclTHHuTXnPM7lSX4PdHSON5iM=;
-  b=etrl713uP9zPN4Y7zzOnpu5bmc+dZ/UHIghKHo1yCxupTaAkrFTKUBaY
-   t4oc46tu8uZ8kkVhwqlV5wk7FYmCZTp4bn4DU0qR1fvvbnCoLMwOTcQwY
-   KyWPe1dM3gcRzgCwwsJW2Pvn8B36fT+vL8QwXI3zGWuGYWkSaKUDeJGmI
-   XcOKz0oM4NmX6dqQuXhEBmtqARggoMic/rL4G6ljl0i4ujXm+hJ6AetCw
-   yBSO/kCPQzE9EobLmy0B/Kk9u4MlqrjSReB22I6yUPeJVVAwP4nEtu4ue
-   1OhcApdKlizefoDn8GRmuom3izr80PksleDMf4MA10VloV3880DgajFx9
+  t=1669989250; x=1701525250;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7n0SkAtXNEP54Rvy3eAXZE7g3DEKAPeKCMLcGkCqZks=;
+  b=oCJgPUER6HGtT3V27zsJlML7QNTkbsKM9KtJ0MRq/8uXfZv04Hejw0CV
+   Nt0UcEqHOC200+mHw/+emG+PSDzX0QhD4SAm2d9YORjF6kE0Iq8EcAE2X
+   uUNqoOC7qaYyZu7xspsUZEOX0FbMAZHS8OP47PGXJuZmuBcXEtL1m3bK/
+   +aChi2Hyn2N0pMcw8C8xTWNXetref/9YxbhDR/wzFB4mTeIq6oZudZ0tG
+   CljLwxzeekGvI0JUgb5NjGeisJARSn1qfFi+yd+CECk2XtD3Xjnuu08Ib
+   slkS+z1BhDLpAoLEmoWxQAYHzPsk4pRVWDjJ1Bj52PycxQQgV9VOsYUiq
    w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="317102462"
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="315983400"
 X-IronPort-AV: E=Sophos;i="5.96,212,1665471600"; 
-   d="scan'208";a="317102462"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2022 05:44:35 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="622704069"
+   d="scan'208";a="315983400"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2022 05:54:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="675834126"
 X-IronPort-AV: E=Sophos;i="5.96,212,1665471600"; 
-   d="scan'208";a="622704069"
-Received: from valeriya-mobl2.ger.corp.intel.com (HELO box.shutemov.name) ([10.251.211.234])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2022 05:44:23 -0800
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id EC5D610975F; Fri,  2 Dec 2022 16:44:19 +0300 (+03)
-Date:   Fri, 2 Dec 2022 16:44:19 +0300
-From:   "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Vishal Annapurve <vannapurve@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        tabba@google.com, Michael Roth <michael.roth@amd.com>,
-        mhocko@suse.com, Muchun Song <songmuchun@bytedance.com>,
-        wei.w.wang@intel.com
-Subject: Re: [PATCH v9 1/8] mm: Introduce memfd_restricted system call to
- create restricted user memory
-Message-ID: <20221202134419.vjhqzuz5alv3v2ak@box.shutemov.name>
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <20221025151344.3784230-2-chao.p.peng@linux.intel.com>
- <CAGtprH9Qu==pohH9ZSTzX9rZWSO0QWJ9rGK6NRGaiDetWAPLYg@mail.gmail.com>
- <20221202064909.GA1070297@chaop.bj.intel.com>
+   d="scan'208";a="675834126"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga008.jf.intel.com with ESMTP; 02 Dec 2022 05:54:03 -0800
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     jgg@nvidia.com
+Cc:     alex.williamson@redhat.com, kevin.tian@intel.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
+        yi.y.sun@linux.intel.com, intel-gvt-dev@lists.freedesktop.org,
+        linux-s390@vger.kernel.org, Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Subject: [[iommufd] PATCH v3 0/2] Make mdev driver dma_unmap callback tolerant to unmaps come before device open
+Date:   Fri,  2 Dec 2022 05:54:00 -0800
+Message-Id: <20221202135402.756470-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221202064909.GA1070297@chaop.bj.intel.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 02, 2022 at 02:49:09PM +0800, Chao Peng wrote:
-> On Thu, Dec 01, 2022 at 06:16:46PM -0800, Vishal Annapurve wrote:
-> > On Tue, Oct 25, 2022 at 8:18 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
-> > >
-> ...
-> > > +}
-> > > +
-> > > +SYSCALL_DEFINE1(memfd_restricted, unsigned int, flags)
-> > > +{
-> > 
-> > Looking at the underlying shmem implementation, there seems to be no
-> > way to enable transparent huge pages specifically for restricted memfd
-> > files.
-> > 
-> > Michael discussed earlier about tweaking
-> > /sys/kernel/mm/transparent_hugepage/shmem_enabled setting to allow
-> > hugepages to be used while backing restricted memfd. Such a change
-> > will affect the rest of the shmem usecases as well. Even setting the
-> > shmem_enabled policy to "advise" wouldn't help unless file based
-> > advise for hugepage allocation is implemented.
-> 
-> Had a look at fadvise() and looks it does not support HUGEPAGE for any
-> filesystem yet.
+Jason's "Connect VFIO to IOMMUFD" introduces vfio iommufd compat mode. Under
+this mode, vfio_iommufd_bind() creates an access which has an unmap callback,
+which can be called immediately. This means mdev drivers may receive unmap
+requests before the mdev is opened. For now, there are only three drivers
+(gvt, vfio-ap and vfio-ccw) providing dma_unmap(). vfio-ccw is fine with
+such requests. While gvt-g and vfio-ap may have potential problem with such
+requests due to internal implementation. This series tries to enhance the two
+drivers.
 
-Yes, I think fadvise() is the right direction here. The problem is similar
-to NUMA policy where existing APIs are focused around virtual memory
-addresses. We need to extend ABI to take fd+offset as input instead.
+This series is based on Jason's below branch.
+
+https://github.com/jgunthorpe/linux/tree/iommufd
+
+(commit: 2079f24ce168f580a30e8eea94e660461d7d0d7a)
+
+Change:
+v3:
+ - Add explicit check on vgpu->nr_cache_entries, explicitly reset gvt cache (Zhenyu)
+ - Add Tony Krowiak's r-b for patch 0002
+
+v2: https://lore.kernel.org/kvm/20221129105831.466954-1-yi.l.liu@intel.com/
+ - Refine the cover letter and commit message of patch 0001 (Kevin)
+ - Rename patch 0001 to better fit the commit message
+ - Add r-b from Zhi for patch 0001
+ - Tweak iova range test to assume page-aligned for patch 0002 (Jason)
+ - Remove break so all queues within range are removed for patch 0002 (Kevin)
+
+v1: https://lore.kernel.org/kvm/20221123134832.429589-1-yi.l.liu@intel.com/
+
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>
+Cc: Jason Herne <jjherne@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org
+Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+Cc: Zhi Wang <zhi.a.wang@intel.com>
+Cc: Kevin Tian <kevin.tian@intel.com>
+Cc: intel-gvt-dev@lists.freedesktop.org
+
+Regards,
+	Yi Liu
+
+Matthew Rosato (1):
+  iommufd PATCH v2 2/2] vfio/ap: validate iova during dma_unmap and
+    trigger irq disable
+
+Yi Liu (1):
+  i915/gvt: Move gvt mapping cache initialization to
+    intel_vgpu_init_dev()
+
+ drivers/gpu/drm/i915/gvt/kvmgt.c  | 18 ++++++++++++++----
+ drivers/s390/crypto/vfio_ap_ops.c | 18 +++++++++++++++++-
+ 2 files changed, 31 insertions(+), 5 deletions(-)
 
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+2.34.1
+
