@@ -2,73 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B80AB64115B
-	for <lists+kvm@lfdr.de>; Sat,  3 Dec 2022 00:13:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6ACEB641185
+	for <lists+kvm@lfdr.de>; Sat,  3 Dec 2022 00:32:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234097AbiLBXN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 18:13:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41426 "EHLO
+        id S234685AbiLBXcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 18:32:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233947AbiLBXN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 18:13:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 146C5F7A0F
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 15:12:30 -0800 (PST)
+        with ESMTP id S233221AbiLBXco (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 18:32:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8A3BDC852
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 15:31:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670022750;
+        s=mimecast20190719; t=1670023903;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2/CllKU0U4UJwmVyb3sb1SBnPQ6vUB5Z0Z6WOmVpQeo=;
-        b=Yuzssan3LBXiMmr6ufk+RczuEfZqfZcC8uc2tWajdBuZDVj3XZfl6+0qFv+dnwIoXg7UVf
-        kigz4SZ5lf60bLvZeSt10MeIqpFlW4G9OpXFt082CpfpU6Hljee4f54W+mWzUcoYKmONuR
-        2i4+7yIE0nPfDTVL7huSTRo1MoywuT4=
+        bh=qjSR1M97GsLkCw1f1F0aNrEffSGd/N75Xh2LF2EhiHs=;
+        b=M/QIjhpFWSmw1x+gj25Tq+YrFgC4Te4GyN8Nv+2hXA8m/lSkqdRYmA9y7oHBdgHlPzMQSC
+        eXTQsHD0rsAxVNQLRLyr5AI1IwQD8bhkxG7wIF8Vmj+wAhbGBnbO+Bx2cGiOeMgtKqmIQ1
+        ocH+48tE5SzK0l25O0ZMLq4ODiN7heY=
 Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
  [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-435-8Pac2dWzN8Oz3kZJkgibrQ-1; Fri, 02 Dec 2022 18:12:29 -0500
-X-MC-Unique: 8Pac2dWzN8Oz3kZJkgibrQ-1
-Received: by mail-il1-f198.google.com with SMTP id o10-20020a056e02102a00b003006328df7bso6863254ilj.17
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 15:12:29 -0800 (PST)
+ us-mta-582-GwsdYlmrOg6cPB8Da_UwkA-1; Fri, 02 Dec 2022 18:31:42 -0500
+X-MC-Unique: GwsdYlmrOg6cPB8Da_UwkA-1
+Received: by mail-il1-f198.google.com with SMTP id y12-20020a056e021bec00b00302a7d5bc83so6832351ilv.16
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 15:31:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2/CllKU0U4UJwmVyb3sb1SBnPQ6vUB5Z0Z6WOmVpQeo=;
-        b=bNJ8mqwj9WPgtt0NIgf2VyNxMUItJa9BmdpYhBtXeNeO7uLv2/tqWSYGhJ70NU57Pq
-         ZfW5Me79e104maKfQXAhYA5aQEWojOs/z7OSBGjkYI+PonAIQ4qG01U+tCeG+5Z60NdA
-         W/LceGRbL9uRG5NNgKHYYbwZlgNN89448G6wrp6rmfbbW9X0iyoAVsyjSiwlmSzgUCCI
-         wZ+ymuUJJcdEEe7AzwAhGfZ0YRWK+LqcA4lkpdDDzvtq9L6DEs3Q3OYQCIoKD4uKk4mk
-         pjLb4Xhn41ZOzFLCC6UFW68JMwuRrWCn6epmduXNcPaV3Dx2yunn0EpuSaAQ64PbHPeL
-         hveA==
-X-Gm-Message-State: ANoB5pk5HopexjYX0otnJcrC6XIDxtONB/IAqEGtakGnbNE/XsDCeMbX
-        gxPydX/Or071xTURnji4iBKd2Qa5hhp9ahw/6c73KD8sqUKS42oEmUw5x2JTJIBdRltwG6MsUqe
-        7nmIh0k/60s7v
-X-Received: by 2002:a5d:9f1a:0:b0:6df:f1ea:70f9 with SMTP id q26-20020a5d9f1a000000b006dff1ea70f9mr1477878iot.3.1670022748282;
-        Fri, 02 Dec 2022 15:12:28 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6NOYnHuJfn4TD40sOo/ZiU6gdEH9eGAmwEgkmBv72fXBxDqMnMPy93GgA7m/lfBrANbhpAYg==
-X-Received: by 2002:a5d:9f1a:0:b0:6df:f1ea:70f9 with SMTP id q26-20020a5d9f1a000000b006dff1ea70f9mr1477869iot.3.1670022748006;
-        Fri, 02 Dec 2022 15:12:28 -0800 (PST)
+        bh=qjSR1M97GsLkCw1f1F0aNrEffSGd/N75Xh2LF2EhiHs=;
+        b=STWrOpFR8Y/4aK42f7CNYBuUXieNW25KRyP0fur1bKQHD7sAAeCvkFa+Dde4TaNMvW
+         FpRhzhryYgQRGY9dn40VKs834xYfDHlHXWbHF48oRmoM9VxWbIViwI7P6U3UvdXJSOWM
+         vPW/GMqnLCAI7TYQ55k3LmoBIMYGfQlyyTkNzL5sllR286Qlwfllr5Ha4NeXqtjh8HaD
+         DuTPRkGhXne6kyxWwfVQlRWarlfoG15F4jAoY3JkuZzR4EMxJmr074Yt/BV1YRbiKf3c
+         cE90V51eBjMo7A/pjglRLAJK6+UOprNOpyN2eDMPeA9PnT0nG2hGy9i1A3zqF2OTYztY
+         m5UQ==
+X-Gm-Message-State: ANoB5pkLrQosq4cAluk2GIjPLD4PX1XIoAvYRVYyfZs+Cum6tloXY31Y
+        xf36Qmo678QbNwF2Po1YxhS+Et2BAcQmy5ppSK1M5l0bTg5H2urAwA8HG9aOhs4gm4sljHZxZSt
+        y99/WR+5YOaNv
+X-Received: by 2002:a02:6a26:0:b0:389:d02c:7e4c with SMTP id l38-20020a026a26000000b00389d02c7e4cmr15760327jac.218.1670023901936;
+        Fri, 02 Dec 2022 15:31:41 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4UJutKQHtqhdI5bG+awzAArYAFUxFWfPU6PK+0gtysZdCjZw9rAh4eau7h+OH3TB7BubYgQA==
+X-Received: by 2002:a02:6a26:0:b0:389:d02c:7e4c with SMTP id l38-20020a026a26000000b00389d02c7e4cmr15760324jac.218.1670023901721;
+        Fri, 02 Dec 2022 15:31:41 -0800 (PST)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id ch11-20020a0566383e8b00b00375783003fcsm3064717jab.136.2022.12.02.15.12.27
+        by smtp.gmail.com with ESMTPSA id n32-20020a027120000000b003733e2ce4e8sm3088052jac.59.2022.12.02.15.31.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Dec 2022 15:12:27 -0800 (PST)
-Date:   Fri, 2 Dec 2022 16:12:25 -0700
+        Fri, 02 Dec 2022 15:31:41 -0800 (PST)
+Date:   Fri, 2 Dec 2022 16:31:39 -0700
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>, yi.y.sun@linux.intel.com
-Cc:     Yi Liu <yi.l.liu@intel.com>, kevin.tian@intel.com,
-        cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
-        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com
-Subject: Re: [PATCH 00/10] Move group specific code into group.c
-Message-ID: <20221202161225.3144305f.alex.williamson@redhat.com>
-In-Reply-To: <Y4oPTjCTlQ/ozjoZ@nvidia.com>
-References: <20221201145535.589687-1-yi.l.liu@intel.com>
-        <Y4kRC0SRD9kpKFWS@nvidia.com>
-        <86c4f504-a0b2-969c-c2c6-5fd43deb6627@intel.com>
-        <Y4oPTjCTlQ/ozjoZ@nvidia.com>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        Avihai Horon <avihaih@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v2] vfio/iova_bitmap: refactor iova_bitmap_set() to
+ better handle page boundaries
+Message-ID: <20221202163139.3dcf7884.alex.williamson@redhat.com>
+In-Reply-To: <20221129131235.38880-1-joao.m.martins@oracle.com>
+References: <20221129131235.38880-1-joao.m.martins@oracle.com>
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -83,53 +80,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2 Dec 2022 10:44:30 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Tue, 29 Nov 2022 13:12:35 +0000
+Joao Martins <joao.m.martins@oracle.com> wrote:
 
-> On Fri, Dec 02, 2022 at 09:57:45PM +0800, Yi Liu wrote:
-> > On 2022/12/2 04:39, Jason Gunthorpe wrote:  
-> > > On Thu, Dec 01, 2022 at 06:55:25AM -0800, Yi Liu wrote:  
-> > > > With the introduction of iommufd[1], VFIO is towarding to provide device
-> > > > centric uAPI after adapting to iommufd. With this trend, existing VFIO
-> > > > group infrastructure is optional once VFIO converted to device centric.
-> > > > 
-> > > > This series moves the group specific code out of vfio_main.c, prepares
-> > > > for compiling group infrastructure out after adding vfio device cdev[2]
-> > > > 
-> > > > Complete code in below branch:
-> > > > 
-> > > > https://github.com/yiliu1765/iommufd/commits/vfio_group_split_v1
-> > > > 
-> > > > This is based on Jason's "Connect VFIO to IOMMUFD"[3] and my "Make mdev driver
-> > > > dma_unmap callback tolerant to unmaps come before device open"[4]
-> > > > 
-> > > > [1] https://lore.kernel.org/all/0-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com/
-> > > > [2] https://github.com/yiliu1765/iommufd/tree/wip/vfio_device_cdev
-> > > > [3] https://lore.kernel.org/kvm/0-v4-42cd2eb0e3eb+335a-vfio_iommufd_jgg@nvidia.com/
-> > > > [4] https://lore.kernel.org/kvm/20221129105831.466954-1-yi.l.liu@intel.com/  
-> > > 
-> > > This looks good to me, and it applies OK to my branch here:
-> > > 
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/
-> > > 
-> > > Alex, if you ack this in the next few days I can include it in the
-> > > iommufd PR, otherwise it can go into the vfio tree in January
-> > > 
-> > > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> > >   
-> > 
-> > thanks. btw. I've updated my github to incorporate Kevin's nit and also
-> > r-b from you and Kevin.  
+> Commit f38044e5ef58 ("vfio/iova_bitmap: Fix PAGE_SIZE unaligned bitmaps")
+> had fixed the unaligned bitmaps by capping the remaining iterable set at
+> the start of the bitmap. Although, that mistakenly worked around
+> iova_bitmap_set() incorrectly setting bits across page boundary.
 > 
-> Please rebase it on the above branch also
+> Fix this by reworking the loop inside iova_bitmap_set() to iterate over a
+> range of bits to set (cur_bit .. last_bit) which may span different pinned
+> pages, thus updating @page_idx and @offset as it sets the bits. The
+> previous cap to the first page is now adjusted to be always accounted
+> rather than when there's only a non-zero pgoff.
+> 
+> While at it, make @page_idx , @offset and @nbits to be unsigned int given
+> that it won't be more than 512 and 4096 respectively (even a bigger
+> PAGE_SIZE or a smaller struct page size won't make this bigger than the
+> above 32-bit max). Also, delete the stale kdoc on Return type.
+> 
+> Cc: Avihai Horon <avihaih@nvidia.com>
+> Fixes: f38044e5ef58 ("vfio/iova_bitmap: Fix PAGE_SIZE unaligned bitmaps")
+> Co-developed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+> Changes since v1:
+>  * Add Reviewed-by by Jason Gunthorpe
+>  * Add Fixes tag (Alex Williamson)
+> 
+> It passes my tests but to be extra sure: Avihai could you take this
+> patch a spin in your rig/tests as well? Thanks!
+> ---
+>  drivers/vfio/iova_bitmap.c | 30 +++++++++++++-----------------
+>  1 file changed, 13 insertions(+), 17 deletions(-)
 
-It looks fine to me aside from the previous review comments and my own
-spelling nit.  I also don't see that this adds any additional conflicts
-vs the existing iommufd integration for any outstanding vfio patches on
-the list, therefore, where there's not already a sign-off from me:
+Applied to vfio next branch for v6.2 with Avihai's tested-by.  Thanks,
 
-Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
-
-Thanks,
 Alex
 
