@@ -2,66 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F9E6640C7F
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:46:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 93B3D640C99
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:53:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234227AbiLBRqJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 12:46:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37050 "EHLO
+        id S233848AbiLBRxm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 12:53:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234272AbiLBRpj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 12:45:39 -0500
-Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAD32E11AA
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:45:29 -0800 (PST)
-Received: by mail-wm1-x34a.google.com with SMTP id e8-20020a05600c218800b003cf634f5280so2192863wme.8
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:45:29 -0800 (PST)
+        with ESMTP id S232517AbiLBRxl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 12:53:41 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B239C2D2E
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:53:40 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id w4-20020a17090ac98400b002186f5d7a4cso9037134pjt.0
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:53:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MnK0SbAbrFxX8lABSVfT8kY69zxWWvrnpuk1/1B8fuk=;
-        b=kSuBJdt+hS5x3ZHEtRSrDlEuNlbOEXIMnxwRPZ1SivIweURft1uP22Tg/yGUhCatxW
-         3G+9hc+K3EzL0ZAgvmTbOVgPvmGyonkqK/VvQrN7MqspXdSmMO3wCuonF/qZ8TZTn7JG
-         TeWtmuqzBEBdUJ7jEci2npqJ1xVMHlySE9Mgs9m8E/K5jVYGmBslrxfUgIqJ2k1D7L3n
-         ur1evyor+vBw78mHpgLnRE7tXpw/slvUBFibv+k1FijXJk9BzVfONSwJ9sWxP6lm8vre
-         o1WaRs1Z8uI3glhb0g7EUQJltwLqoyFA5qKqk/CuwOcAlPMFHGwAURXoig2/ub4cxkh6
-         HnNw==
+        d=dabbelt-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9ZvJzDorQtOwNqLa1HHYVuO6backFKSVBd3ruJxRA2A=;
+        b=eQnZOvNRY11eiZD6GVvQZwn1takWYswEZO6mnHfFnI3IOwcIiD6Zx+pagggcuTggyE
+         KI2v9qhiuLOtxUaSbh05X+3u3ZJeuy2KPUw24QAEHeemgwvBVYSNg7VIrTgM/9CZF7Mh
+         qIGRAfb52QV9/EArXB3WfOf73n/Zj+mT+acVF8xXToHtE9sTGamB58BUDzFZvKKrcrQs
+         N82x9nRGEqlbGZDDayglBKpHk1Ju0LRifyISFL7XGTuJ4VTQZxgsAckVsHg9WKJDAtXL
+         l1P2Bi6HAp3c1vtRk7yGNxdUdXKhF7PSfRXpRsPFM+uN9qkQfh86kWUV6Q3Nt+kAw8ul
+         RFAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MnK0SbAbrFxX8lABSVfT8kY69zxWWvrnpuk1/1B8fuk=;
-        b=hCm9wwBgu0FJEW95UNgpVNekwKlPU2vkbQElT4qRFMGdMA5fZ7eXb/jPqoLbTcaLf7
-         YoPYcZX25ePl3KZ/K6gJEu8TNbvq5sFHlVI6AZcRsHOORTr9dID9Ej2WyFLakUrSJZOt
-         1r6hs27zxoPNNK55psI1M2QuqIFqFksvLRq3klpAxZMFt/EQLeqL7vjrnlOxDB+LGk2S
-         vM2/PSG+b22r3wZlEBziAqLGfwkdZywXOu2fRQfafvRQhq3u6AgqCQf6tCuf7Nlbmnkw
-         HsOgfBUMkZduDgXBjwjW+yGeHbP++wOT/D2UO77fcO3MadvtKwMu4zqynN3/4fwN/vIy
-         efpQ==
-X-Gm-Message-State: ANoB5pljl4DF+erej4Phmzb4SF4DD5RH/9hWV1o/l3z/15f344ZibHYV
-        Eoh+Mzb9Te4iuF3ZoqngTzIl4RURspV3QV1TlK+eU9a8s/oVOMvE/9ZMnWUOpktvQr3DXEoVzQY
-        /Te939W8K1KNTovdJ8WzgTs6n4fQZ57zcCk1/qoLohXHX/AwWa494T6c=
-X-Google-Smtp-Source: AA0mqf5nPWg/qdRIXxY5gq6kDrNPAC3zIzmRYFmoWPe7h3o/QDE4od2BgTGULPcpbtgkL4ehwyHFzh09aA==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:3d08:b0:3cf:e84d:6010 with SMTP id
- bh8-20020a05600c3d0800b003cfe84d6010mr43895963wmb.197.1670003127164; Fri, 02
- Dec 2022 09:45:27 -0800 (PST)
-Date:   Fri,  2 Dec 2022 17:44:17 +0000
-In-Reply-To: <20221202174417.1310826-1-tabba@google.com>
-Mime-Version: 1.0
-References: <20221202174417.1310826-1-tabba@google.com>
-X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221202174417.1310826-33-tabba@google.com>
-Subject: [RFC PATCH kvmtool v1 32/32] pkvm: Unmap all guest memory after initialization
-From:   Fuad Tabba <tabba@google.com>
-To:     kvm@vger.kernel.org
-Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
-        alexandru.elisei@arm.com, alex.bennee@linaro.org, will@kernel.org,
-        tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9ZvJzDorQtOwNqLa1HHYVuO6backFKSVBd3ruJxRA2A=;
+        b=Oehb0Qm3Q/Ufn0G3nsm0Lvrej1Vd0OaWmdR225pGwezTVhoRi3wqoeUnVKQVdi/22Z
+         Wem6BRgOpFRXGGmOXg4XmKdmO/KiyInrhgICPn26OYgdJA1iV0jyHdW7YAACPuxReUwB
+         DB1PCncL/GgpyxogtcU7roWX5j4V1tZvnzfI8vLixr3F7FbpDxivVCh+mAHuYKSI/wnk
+         xEJVB3yhwNWqU44M3UfYew9Lj6zO01NN0LXI8P+jeXL3S1S8cbVFHLIlztHjPwW6wfMt
+         GPT5v6LICfvQBMC3zzYFlEcFojjsCO2xZbtLh2g1cd5NdjZaFGtSWP/TDX8iWVTGtfuA
+         2fyQ==
+X-Gm-Message-State: ANoB5pkY0aUFtRWdY4Q21UshrfPaF7uT3WPuYsx6zJKCTjmFrQ5bsfTg
+        o3XKH9lnXPF0mn6mi5anwRFh0A==
+X-Google-Smtp-Source: AA0mqf5X/TeHx5A5xtNnIKw6jgBgvRIH82EYzaYQxx+YmUJkhxCg9UKytVs/q/xMiH6X+7zxecaK0w==
+X-Received: by 2002:a17:90a:ca85:b0:219:88aa:d3d1 with SMTP id y5-20020a17090aca8500b0021988aad3d1mr4968286pjt.135.1670003619663;
+        Fri, 02 Dec 2022 09:53:39 -0800 (PST)
+Received: from localhost ([50.221.140.188])
+        by smtp.gmail.com with ESMTPSA id w15-20020aa7954f000000b0056283e2bdbdsm5391440pfq.138.2022.12.02.09.53.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Dec 2022 09:53:39 -0800 (PST)
+Date:   Fri, 02 Dec 2022 09:53:39 -0800 (PST)
+X-Google-Original-Date: Fri, 02 Dec 2022 09:53:24 PST (-0800)
+Subject:     Re: [PATCH 6/9] RISC-V: Export sbi_get_mvendorid() and friends
+In-Reply-To: <20221128161424.608889-7-apatel@ventanamicro.com>
+CC:     pbonzini@redhat.com, atishp@atishpatra.org,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        ajones@ventanamicro.com, anup@brainfault.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, apatel@ventanamicro.com
+From:   Palmer Dabbelt <palmer@dabbelt.com>
+To:     apatel@ventanamicro.com
+Message-ID: <mhng-365b9851-cb0a-4e2c-9cf4-4eca9623cf04@palmer-ri-x1c9a>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,28 +73,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In pkvm, assume that all guest memory is private and unmap it by default.
-If it's shared and needed, the host can map it later.
+On Mon, 28 Nov 2022 08:14:21 PST (-0800), apatel@ventanamicro.com wrote:
+> The sbi_get_mvendorid(), sbi_get_marchid(), and sbi_get_mimpid()
+> can be used by KVM module so let us export these functions.
+>
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>  arch/riscv/kernel/sbi.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/arch/riscv/kernel/sbi.c b/arch/riscv/kernel/sbi.c
+> index 775d3322b422..5c87db8fdff2 100644
+> --- a/arch/riscv/kernel/sbi.c
+> +++ b/arch/riscv/kernel/sbi.c
+> @@ -627,16 +627,19 @@ long sbi_get_mvendorid(void)
+>  {
+>  	return __sbi_base_ecall(SBI_EXT_BASE_GET_MVENDORID);
+>  }
+> +EXPORT_SYMBOL_GPL(sbi_get_mvendorid);
+>
+>  long sbi_get_marchid(void)
+>  {
+>  	return __sbi_base_ecall(SBI_EXT_BASE_GET_MARCHID);
+>  }
+> +EXPORT_SYMBOL_GPL(sbi_get_marchid);
+>
+>  long sbi_get_mimpid(void)
+>  {
+>  	return __sbi_base_ecall(SBI_EXT_BASE_GET_MIMPID);
+>  }
+> +EXPORT_SYMBOL_GPL(sbi_get_mimpid);
+>
+>  static void sbi_send_cpumask_ipi(const struct cpumask *target)
+>  {
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- builtin-run.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/builtin-run.c b/builtin-run.c
-index 9ec5701..23a4f8b 100644
---- a/builtin-run.c
-+++ b/builtin-run.c
-@@ -780,6 +780,9 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
- 	if (init_list__init(kvm) < 0)
- 		die ("Initialisation failed");
- 
-+	if (kvm->cfg.pkvm)
-+		unmap_guest(kvm);
-+
- 	return kvm;
- }
- 
--- 
-2.39.0.rc0.267.gcb52ba06e7-goog
-
+Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
