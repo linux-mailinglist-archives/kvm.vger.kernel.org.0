@@ -2,187 +2,360 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C9BE763FFF1
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 06:44:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BC2164003A
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 07:18:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232295AbiLBFoq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 00:44:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42564 "EHLO
+        id S232277AbiLBGS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 01:18:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231195AbiLBFop (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 00:44:45 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80452D291D
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 21:44:42 -0800 (PST)
+        with ESMTP id S232236AbiLBGSW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 01:18:22 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80666CA78D;
+        Thu,  1 Dec 2022 22:18:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669959882; x=1701495882;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=CzLEat/O08ybCXtrejZTkhQwCin0XdV/tif4g2soqfE=;
-  b=D2Kc2Si1WFBJPJwy/Lb7mmMG7JRGUhFXc76CIV+yGDAelu3IniPVcHyy
-   wt+fJHlXn4+wFOnhTxgEddLtieW9FNNOWE9EgRBUgiCX0PMlsrS+SLovE
-   4aqRnoPRrLUbTFSvxsxS7hiqYTSHdfGYf46zN65YveMEE63V8OuyWG0Ss
-   hXp1+Ub4kJRbXlx7d4lV3VbX04nHdEXBN+vQdfySnl6VR+Rap/mmF9fs1
-   i7AyEEpGLetWb7tLFcf8cYoYLvu8txsBp8Gv5cHyCknehcN/CLShbPAQO
-   MWOumXJvGH8rM0B9/OIvDgbnIAjeIOr1tQDhDeQ+GkiaQWWXfisxMmWU1
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="295574691"
+  t=1669961900; x=1701497900;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9pJ+b2yeHo2LDdteBDTW1h9o4MtUauJFK7JJvjQzm24=;
+  b=MNvrhzKNOrplFVQykiuUTNcXxgzJUPCy7yCTvXHYsdtxJbNVgmlLKBqu
+   bZ5OEgUplhxs268MKTRgsgVtiUXhppeRC5GYXOiYsvn0nwHk6wjzTdySB
+   Re6LL4NqYyilA2kQ7Uo+m6EKQgAuPVDU8spgy48YW1YH8ebzOHNtLNnDn
+   qOkDVL6rm0YVeFvOUB761BXiEw1P9IGHH/xpGoDYiGsTDQ8NmlCz6ZcrD
+   qZN0UZyWBWEyJ4UVOIRNvEC93nVLa157nCYFl7obqa8eW1+i9oaCyo0tc
+   Bo0MblN5ZTUtHPYPtf+uoB134CrkMBD27elegcjg6mRrs28l2udN2JdsF
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="380170336"
 X-IronPort-AV: E=Sophos;i="5.96,210,1665471600"; 
-   d="scan'208";a="295574691"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2022 21:44:42 -0800
+   d="scan'208";a="380170336"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2022 22:18:19 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="787168804"
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="733698561"
 X-IronPort-AV: E=Sophos;i="5.96,210,1665471600"; 
-   d="scan'208";a="787168804"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga001.fm.intel.com with ESMTP; 01 Dec 2022 21:44:41 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Thu, 1 Dec 2022 21:44:41 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Thu, 1 Dec 2022 21:44:40 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Thu, 1 Dec 2022 21:44:40 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Thu, 1 Dec 2022 21:44:40 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mVLe3+eGeKDFhHNq7hYHKYGUWa/MR56zfuowaHA39rT73ZJ6HqGzr3BcWVOjT1jIGr8QRSJCpuB2gexGmWaTAotpPDIo/x5UV9McP12FKrm/ZN0QiOHuSatasmxrJbBY24N3+cXgoIXoA99joq571Wq3ndIauN6JDj9z3yOJN2b/Y5Y5W7FYD1adt+rQ4NvxI4dCdbkhQFOnh4wGbagbbXRHYeJsLAAmpgIiH++jSD1qBLWYI+9vjsxXqWfw0daw6Gh/bvHS6S2Ra3lnYMEO8z6GFSod4S08hEAx88Fn8gZzxEryo0JPKxQtAfC+1nGg4/U77luc46xG5Hd0I+yhzw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CzLEat/O08ybCXtrejZTkhQwCin0XdV/tif4g2soqfE=;
- b=ON8WwPnsJy/ZCocHunfJ/fF5lClVHmf98dJPcITGLRB7wTEQ2PkWys2+7sH3Bbnhgo7MHW55BqCKM6IyGBh97OuteeqxyUzFJgR/bXH0JgeeFYHePIkVBgTAF0/rGHMwAWeZddgiMybQW6v9TVanHeRhhGHnAe0kK1pkop4QjvlvMCmi3sqtRbq1R7Ar4kE5cTRcTx3a1RyuF8Eac921d/WKgYXmSdDw7BgRiZtzluBdchFhGcdQ6p69bHzYZB0uTvPzGhazjuqIRlt+3TKXEyh9hnmjMjmsP2nRWOHpnHlTjNQtEEVnv90EuUgaMRMA0ZurFHv0PB9ogINjEVzaMA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by PH0PR11MB4949.namprd11.prod.outlook.com (2603:10b6:510:31::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.8; Fri, 2 Dec
- 2022 05:44:33 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::c9ee:bc36:6cf4:c6fb]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::c9ee:bc36:6cf4:c6fb%5]) with mapi id 15.20.5857.023; Fri, 2 Dec 2022
- 05:44:33 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>
-CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>
-Subject: RE: [PATCH 06/10] vfio: Move device open/close code to be helpfers
-Thread-Topic: [PATCH 06/10] vfio: Move device open/close code to be helpfers
-Thread-Index: AQHZBZUOhMRfTQthY0mUmtG+RVh+S65aFMSA
-Date:   Fri, 2 Dec 2022 05:44:33 +0000
-Message-ID: <BN9PR11MB52768BAD331C3733CD0D91978C179@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20221201145535.589687-1-yi.l.liu@intel.com>
- <20221201145535.589687-7-yi.l.liu@intel.com>
-In-Reply-To: <20221201145535.589687-7-yi.l.liu@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH0PR11MB4949:EE_
-x-ms-office365-filtering-correlation-id: 50dd6269-94e5-4e01-f9b8-08dad4284a39
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cosZrfmtARXAYjwtnbWx8+NkoGGc3bqBfBbjger7MI/uudG8T4mAW4V6ydNg9TduYv6CaFQLdTSunHL0tsp2AE2Ci4EnXDbC0PqyJRyy54kktRR+UMuolzYCpXoUZl9Jjkafa2f9AHQdEaeqxnsq30MIESB99XVSYMCjgFVb+Kp6VRfl5z6byVz48bH9BnLE8iqndxzvXJmXqhoa9PLvtvogt2xWqqFKBfMY4T1Utfs9LIOtfOnDwdRHIGEGxivSe/bdE8pSbl4CY6dbptlVxnfzSEYFn++pVS17FI56F0RSuOe4EAE4KFZ/NrTakiIkyPqi1H7sypHJKKx4vFf9q5ltmqbPHwTTcmDBcnW1JJxRUlT5K1hRxldEXI2UJnnGHeKnHuWCzOxHtFIo0hr6qHQ/t/0Ia4np3bUtRXrRVCJ9BsmxiC1qHwDLRnDXDr/HmMi2/5RAp+AVO80zej8ThPl2RKm1U3TQ7XPbccpoYh6exiNilgS4EHf4Gdh5FL46oEGmd9Ojm3xq3/v3TZmmbbyKvHBfskxA+xMOF3OM3NRnFybk2lnQly9UaufEK5UCCDqVOs/FiZcdq1vpSfAG56zFRAnzUdjdk79lRVXHf60LQtUAV4MQb4FHLQZ6PoLGYTLJQ5e1TfqTMdhErWsjQ7kco4s7uCFvjjt0SUu7l5KHbqueFsVGsL1bGXhhm/IyilsRmJq1sGvp/XYIY+f/9g==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(366004)(39860400002)(376002)(136003)(396003)(451199015)(33656002)(7696005)(86362001)(9686003)(6506007)(478600001)(110136005)(71200400001)(55016003)(38070700005)(186003)(83380400001)(122000001)(82960400001)(41300700001)(52536014)(5660300002)(26005)(38100700002)(4744005)(8676002)(64756008)(66446008)(66556008)(66946007)(76116006)(8936002)(66476007)(316002)(4326008)(2906002)(54906003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Ig6bXgUcQGxqpZhHCYe6sFrKXR0VDWqIfKWcSw+v0upypm3XD/3k7kidGW5c?=
- =?us-ascii?Q?hH3tSPBHmWol6wv4rrHxgoNJVQQytnEcZ6IvFIgXnvWCHfA/Sd/fPINzPZEW?=
- =?us-ascii?Q?YwdERhBfc3zt97epiE4otoSreR1L+nTZ/9uebBshIOrEWWaNdcJORwJQo7s6?=
- =?us-ascii?Q?XgXwum4xGuwBcl0TpQsf9tjMm14k8gZJq5b2IaOA/6YUwIP+WrGkPxRjZnzh?=
- =?us-ascii?Q?nd4fYuBd01gIIPYuRVKmcQGYu4zkvtLoVitLZhZm5vGpnyhtmEht99UAtMPq?=
- =?us-ascii?Q?HRVryJiDg5VO2RDDw1DQRL9zNIkeDWVKTRGRG6QD/ycriQYBGw8vWc+2IwoZ?=
- =?us-ascii?Q?VzR8b59EX5d70AT4RYd8fJFlZOR7JkZMq0+FjPj33FImWgkiRrrS6oXPv15O?=
- =?us-ascii?Q?oFiC376/q2ChAWu3QhnAMKT+WhYyLD+EKX48THYSpvxNXaIR9jLo7PSkIsoX?=
- =?us-ascii?Q?Y28JGR/YFZ2RRXB3DxCPSu2Yk9TD2L0ZgNmYwSSXoxSVSR/WZnCpCKW7aADb?=
- =?us-ascii?Q?I2s77M8d1YujaEgSkwmJAEorC66znHKFnP9R97PioTF7A/dIoS0h1/6U1CJQ?=
- =?us-ascii?Q?d+/q8F2p33bPZ4LlhUrWM06lYQfyPzQO5ZuB4Z7+cZPeoVqH0S/fIBsGnWDR?=
- =?us-ascii?Q?LMenGYRWwlcUivz0GMZI+zlRYSsH5eWjSVH28QCqWXRi3xNvHTVjs7bm6WuL?=
- =?us-ascii?Q?9VNKfodlVUnm9kjIXXed0xalbXR6n6EUw9wF6y2HzaebeG/PrsS//JyRo+0U?=
- =?us-ascii?Q?jJ64mZex3+Q08HhRWg8Unzn5ePXAx5VbQpcWORab+TZVCy0TYARC052I6Spa?=
- =?us-ascii?Q?btutQsqb4FNA0Pqs65PqDZ+tOeiXIz1mYRH7KSPusOMbS/NAcl1oDeTMKKpM?=
- =?us-ascii?Q?j02scQ1sIRZNxjvMZW8Kkms5DQFt8QOOf/FFHvPfvGtq5kuJgU2qU/60gPtG?=
- =?us-ascii?Q?wgjmG85MycP9LQzTlZUHSgc9XlzTb2nLX1ULzbEDTqSkWVqZqeIpKjehSTE1?=
- =?us-ascii?Q?4BVIZ7nWSyGQ2Dj7awLGz0StfsytBReVpnGQzpWGNhKQzQxrPOqBGL91KEYi?=
- =?us-ascii?Q?FGReL7o6ltxY+xpgDg2JSUdza0d+2NJp6werWnqap1abzyhc7a/cE96fR1vI?=
- =?us-ascii?Q?DEFeAi/QMX0SrBstF0sAiY/fcPW/K7kadcT+AHml7OdWBicueonTcC2gHZhT?=
- =?us-ascii?Q?eby/o6mXLc68exSQ++EMzsyNfADqpo6iOCGvD8x4dkJP5juxn81+h3TuLxAr?=
- =?us-ascii?Q?MWMvRsVf1KafgDyHqmnjM10i6wMBy/psqhy+Vdx7SBs73cJrKhbFTr4yjeDs?=
- =?us-ascii?Q?CDLakL1/iB7NIGeNenR1m9QqQsOdtAgGCmbwv0kvIcAy+EIJeUZV5ZksOtlU?=
- =?us-ascii?Q?/rjaIikB0t3PgqLkaWgjp5Jr6T+tRXNxXzm8nCrW/zhBsoBYcICG0IBqXpvQ?=
- =?us-ascii?Q?GsXrsr5TD6Nt/u5LAy7fWR79bC6LOR+SX358xgBIR6aJkN/00kKZIFeLdty+?=
- =?us-ascii?Q?67iHHzZDwn276KaM6yYevTbYRtPMJuJffnvzWs6otoayYLDJZYEn4Z+FLI13?=
- =?us-ascii?Q?5fqWZL/usRWKUXshkimP0nA4GEadRmEialOKChdC?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="733698561"
+Received: from chaop.bj.intel.com ([10.240.193.75])
+  by FMSMGA003.fm.intel.com with ESMTP; 01 Dec 2022 22:18:08 -0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: [PATCH v10 0/9] KVM: mm: fd-based approach for supporting KVM
+Date:   Fri,  2 Dec 2022 14:13:38 +0800
+Message-Id: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 50dd6269-94e5-4e01-f9b8-08dad4284a39
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2022 05:44:33.4815
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 7lzehqEplebrJ6Hh1nbjM49SJyxiacGGw/soIT652dRp3HkEdLKwr6nBOF1ZToQpd9qJ+mEMzyx4AK+lf7GCTQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4949
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Thursday, December 1, 2022 10:56 PM
+This patch series implements KVM guest private memory for confidential
+computing scenarios like Intel TDX[1]. If a TDX host accesses
+TDX-protected guest memory, machine check can happen which can further
+crash the running host system, this is terrible for multi-tenant
+configurations. The host accesses include those from KVM userspace like
+QEMU. This series addresses KVM userspace induced crash by introducing
+new mm and KVM interfaces so KVM userspace can still manage guest memory
+via a fd-based approach, but it can never access the guest memory
+content.
 
-subject: 'helpfers' -> 'helpers'
+The patch series touches both core mm and KVM code. I appreciate
+Andrew/Hugh and Paolo/Sean can review and pick these patches. Any other
+reviews are always welcome.
+  - 01: mm change, target for mm tree
+  - 02-09: KVM change, target for KVM tree
 
->=20
-> This makes vfio_device_open/close() to be the top level helpers for devic=
-e
-> open and close. It handles the open_count, and vfio_device_first_open()
-> vfio_device_last_close() do the container/iommufd use/unuse and the
-> device
-> open.
->=20
-> Current vfio_device_open() handles the device open and the device file
-> open which is group specific. After this change, the group specific code
-> is in the vfio_device_open_file() which would be moved to separate group
-> source code in future.
+Given KVM is the only current user for the mm part, I have chatted with
+Paolo and he is OK to merge the mm change through KVM tree, but
+reviewed-by/acked-by is still expected from the mm people.
 
-It's clearer as below:
---
-vfio: Make vfio_device_open() truly device specific
+The patches have been verified with Intel TDX environment, but Vishal
+has done an excellent work on the selftests[4] which are dedicated for
+this series, making it possible to test this series without innovative
+hardware and fancy steps of building a VM environment. See Test section
+below for more info.
 
-Then move group related logic into vfio_device_open_file(). Accordingly
-introduce a vfio_device_close() to pair up.
---
 
-With above:
+Introduction
+============
+KVM userspace being able to crash the host is horrible. Under current
+KVM architecture, all guest memory is inherently accessible from KVM
+userspace and is exposed to the mentioned crash issue. The goal of this
+series is to provide a solution to align mm and KVM, on a userspace
+inaccessible approach of exposing guest memory. 
 
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+Normally, KVM populates secondary page table (e.g. EPT) by using a host
+virtual address (hva) from core mm page table (e.g. x86 userspace page
+table). This requires guest memory being mmaped into KVM userspace, but
+this is also the source where the mentioned crash issue can happen. In
+theory, apart from those 'shared' memory for device emulation etc, guest
+memory doesn't have to be mmaped into KVM userspace.
+
+This series introduces fd-based guest memory which will not be mmaped
+into KVM userspace. KVM populates secondary page table by using a
+fd/offset pair backed by a memory file system. The fd can be created
+from a supported memory filesystem like tmpfs/hugetlbfs and KVM can
+directly interact with them with newly introduced in-kernel interface,
+therefore remove the KVM userspace from the path of accessing/mmaping
+the guest memory. 
+
+Kirill had a patch [2] to address the same issue in a different way. It
+tracks guest encrypted memory at the 'struct page' level and relies on
+HWPOISON to reject the userspace access. The patch has been discussed in
+several online and offline threads and resulted in a design document [3]
+which is also the original proposal for this series. Later this patch
+series evolved as more comments received in community but the major
+concepts in [3] still hold true so recommend reading.
+
+The patch series may also be useful for other usages, for example, pure
+software approach may use it to harden itself against unintentional
+access to guest memory. This series is designed with these usages in
+mind but doesn't have code directly support them and extension might be
+needed.
+
+
+mm change
+=========
+Introduces a new memfd_restricted system call which can create memory
+file that is restricted from userspace access via normal MMU operations
+like read(), write() or mmap() etc and the only way to use it is
+passing it to a third kernel module like KVM and relying on it to
+access the fd through the newly added restrictedmem kernel interface.
+The restrictedmem interface bridges the memory file subsystems
+(tmpfs/hugetlbfs etc) and their users (KVM in this case) and provides
+bi-directional communication between them. 
+
+
+KVM change
+==========
+Extends the KVM memslot to provide guest private (encrypted) memory from
+a fd. With this extension, a single memslot can maintain both private
+memory through private fd (restricted_fd/restricted_offset) and shared
+(unencrypted) memory through userspace mmaped host virtual address
+(userspace_addr). For a particular guest page, the corresponding page in
+KVM memslot can be only either private or shared and only one of the
+shared/private parts of the memslot is visible to guest. For how this
+new extension is used in QEMU, please refer to kvm_set_phys_mem() in
+below TDX-enabled QEMU repo.
+
+Introduces new KVM_EXIT_MEMORY_FAULT exit to allow userspace to get the
+chance on decision-making for shared <-> private memory conversion. The
+exit can be an implicit conversion in KVM page fault handler or an
+explicit conversion from guest OS.
+
+Introduces new KVM ioctl KVM_SET_MEMORY_ATTRIBUTES to maintain whether a
+page is private or shared. This ioctl allows userspace to convert a page
+between private <-> shared. The data maintained tells the truth whether
+a guest page is private or shared and this information will be used in
+KVM page fault handler to decide whether the private or the shared part
+of the memslot is visible to guest.
+
+
+Test
+====
+Ran two kinds of tests:
+  - Selftests [4] from Vishal and VM boot tests in non-TDX environment
+    Code also in below repo: https://github.com/chao-p/linux/tree/privmem-v10
+
+  - Functional tests in TDX capable environment
+    Tested the new functionalities in TDX environment. Code repos:
+    Linux: https://github.com/chao-p/linux/tree/privmem-v10-tdx
+    QEMU: https://github.com/chao-p/qemu/tree/privmem-v10
+
+    An example QEMU command line for TDX test:
+    -object tdx-guest,id=tdx,debug=off,sept-ve-disable=off \
+    -machine confidential-guest-support=tdx \
+    -object memory-backend-memfd-private,id=ram1,size=${mem} \
+    -machine memory-backend=ram1
+
+
+TODO
+====
+  - Page accounting and limiting for encrypted memory
+  - hugetlbfs support
+
+
+Changelog
+=========
+v10:
+  - mm: hook up restricted_memfd to memory failure and route it to
+    kernel users through .error() callback.
+  - mm: call invalidate() notifier only for FALLOC_FL_PUNCH_HOLE, i.e.
+    not for allocation.
+  - KVM: introduce new ioctl KVM_SET_MEMORY_ATTRIBUTES for memory
+    conversion instead of reusing KVM_MEMORY_ENCRYPT_{UN,}REG_REGION.
+  - KVM: refine gfn-based mmu_notifier_retry() mechanism.
+  - KVM: improve lpage_info updating code.
+  - KVM: fix the bug in private memory handling that a private fault may
+    fall into a non-private memslot.
+  - KVM: handle memory machine check error for fd-based memory.
+v9:
+  - mm: move inaccessible memfd into separated syscall.
+  - mm: return page instead of pfn_t for inaccessible_get_pfn and remove
+    inaccessible_put_pfn.
+  - KVM: rename inaccessible/private to restricted and CONFIG change to
+    make the code friendly to pKVM.
+  - KVM: add invalidate_begin/end pair to fix race contention and revise
+    the lock protection for invalidation path.
+  - KVM: optimize setting lpage_info for > 2M level by direct accessing
+    lower level's result.
+  - KVM: avoid load xarray in kvm_mmu_max_mapping_level() and instead let
+    the caller to pass in is_private.
+  - KVM: API doc improvement.
+v8:
+  - mm: redesign mm part by introducing a shim layer(inaccessible_memfd)
+    in memfd to avoid touch the memory file systems directly.
+  - mm: exclude F_SEAL_AUTO_ALLOCATE as it is for shared memory and
+    cause confusion in this series, will send out separately.
+  - doc: exclude the man page change, it's not kernel patch and will
+    send out separately.
+  - KVM: adapt to use the new mm inaccessible_memfd interface.
+  - KVM: update lpage_info when setting mem_attr_array to support
+    large page.
+  - KVM: change from xa_store_range to xa_store for mem_attr_array due
+    to xa_store_range overrides all entries which is not intended
+    behavior for us.
+  - KVM: refine the mmu_invalidate_retry_gfn mechanism for private page.
+  - KVM: reorganize KVM_MEMORY_ENCRYPT_{UN,}REG_REGION and private page
+    handling code suggested by Sean.
+v7:
+  - mm: introduce F_SEAL_AUTO_ALLOCATE to avoid double allocation.
+  - KVM: use KVM_MEMORY_ENCRYPT_{UN,}REG_REGION to record
+    private/shared info.
+  - KVM: use similar sync mechanism between zap/page fault paths as
+    mmu_notifier for memfile_notifier based invalidation.
+v6:
+  - mm: introduce MEMFILE_F_* flags into memfile_node to allow checking
+    feature consistence among all memfile_notifier users and get rid of
+    internal flags like SHM_F_INACCESSIBLE.
+  - mm: make pfn_ops callbacks being members of memfile_backing_store
+    and then refer to it directly in memfile_notifier.
+  - mm: remove backing store unregister.
+  - mm: remove RLIMIT_MEMLOCK based memory accounting and limiting.
+  - KVM: reorganize patch sequence for page fault handling and private
+    memory enabling.
+v5:
+  - Add man page for MFD_INACCESSIBLE flag and improve KVM API do for
+    the new memslot extensions.
+  - mm: introduce memfile_{un}register_backing_store to allow memory
+    backing store to register/unregister it from memfile_notifier.
+  - mm: remove F_SEAL_INACCESSIBLE, use in-kernel flag
+    (SHM_F_INACCESSIBLE for shmem) instead. 
+  - mm: add memory accounting and limiting (RLIMIT_MEMLOCK based) for
+    MFD_INACCESSIBLE memory.
+  - KVM: remove the overlap check for mapping the same file+offset into
+    multiple gfns due to perf consideration, warned in document.
+v4:
+  - mm: rename memfd_ops to memfile_notifier and separate it from
+    memfd.c to standalone memfile-notifier.c.
+  - KVM: move pfn_ops to per-memslot scope from per-vm scope and allow
+    registering multiple memslots to the same memory backing store.
+  - KVM: add a 'kvm' reference in memslot so that we can recover kvm in
+    memfile_notifier handlers.
+  - KVM: add 'private_' prefix for the new fields in memslot.
+  - KVM: reshape the 'type' to 'flag' for kvm_memory_exit
+v3:
+  - Remove 'RFC' prefix.
+  - Fix race condition between memfile_notifier handlers and kvm destroy.
+  - mm: introduce MFD_INACCESSIBLE flag for memfd_create() to force
+    setting F_SEAL_INACCESSIBLE when the fd is created.
+  - KVM: add the shared part of the memslot back to make private/shared
+    pages live in one memslot.
+
+Reference
+=========
+[1] Intel TDX:
+https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html
+[2] Kirill's implementation:
+https://lore.kernel.org/all/20210416154106.23721-1-kirill.shutemov@linux.intel.com/T/ 
+[3] Original design proposal:
+https://lore.kernel.org/all/20210824005248.200037-1-seanjc@google.com/  
+[4] Selftest:
+https://lore.kernel.org/all/20221111014244.1714148-1-vannapurve@google.com/
+
+
+Chao Peng (8):
+  KVM: Introduce per-page memory attributes
+  KVM: Extend the memslot to support fd-based private memory
+  KVM: Add KVM_EXIT_MEMORY_FAULT exit
+  KVM: Use gfn instead of hva for mmu_notifier_retry
+  KVM: Unmap existing mappings when change the memory attributes
+  KVM: Update lpage info when private/shared memory are mixed
+  KVM: Handle page fault for private memory
+  KVM: Enable and expose KVM_MEM_PRIVATE
+
+Kirill A. Shutemov (1):
+  mm: Introduce memfd_restricted system call to create restricted user
+    memory
+
+ Documentation/virt/kvm/api.rst         | 125 ++++++-
+ arch/x86/entry/syscalls/syscall_32.tbl |   1 +
+ arch/x86/entry/syscalls/syscall_64.tbl |   1 +
+ arch/x86/include/asm/kvm_host.h        |   9 +
+ arch/x86/kvm/Kconfig                   |   3 +
+ arch/x86/kvm/mmu/mmu.c                 | 205 ++++++++++-
+ arch/x86/kvm/mmu/mmu_internal.h        |  14 +-
+ arch/x86/kvm/mmu/mmutrace.h            |   1 +
+ arch/x86/kvm/mmu/tdp_mmu.c             |   2 +-
+ arch/x86/kvm/x86.c                     |  17 +-
+ include/linux/kvm_host.h               | 103 +++++-
+ include/linux/restrictedmem.h          |  71 ++++
+ include/linux/syscalls.h               |   1 +
+ include/uapi/asm-generic/unistd.h      |   5 +-
+ include/uapi/linux/kvm.h               |  53 +++
+ include/uapi/linux/magic.h             |   1 +
+ kernel/sys_ni.c                        |   3 +
+ mm/Kconfig                             |   4 +
+ mm/Makefile                            |   1 +
+ mm/memory-failure.c                    |   3 +
+ mm/restrictedmem.c                     | 318 +++++++++++++++++
+ virt/kvm/Kconfig                       |   6 +
+ virt/kvm/kvm_main.c                    | 469 +++++++++++++++++++++----
+ 23 files changed, 1323 insertions(+), 93 deletions(-)
+ create mode 100644 include/linux/restrictedmem.h
+ create mode 100644 mm/restrictedmem.c
+
+
+base-commit: df0bb47baa95aad133820b149851d5b94cbc6790
+-- 
+2.25.1
+
