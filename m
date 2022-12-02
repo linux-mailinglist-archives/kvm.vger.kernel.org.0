@@ -2,235 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EAE1640EB8
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 20:47:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 580F7640F13
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 21:18:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234652AbiLBTru (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 14:47:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48454 "EHLO
+        id S234882AbiLBUSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 15:18:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234864AbiLBTrp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 14:47:45 -0500
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2048.outbound.protection.outlook.com [40.107.212.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7BD01B1CA
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 11:47:41 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VWtsMTL+kRctq0cmY134vYtk38dT8Qg0RJz23v2Tm47+TYKcTXesbPNOvRy3GmLwRA94puU/4iXCfkT0YKfQFRMHi7cOiS+z3YR84HmhX449QEgSNhR/RyE4CNR34qpgIRxm2reYvad5j+ucC2PAZ92T3L6XneNwIow0TKy4LZNhTBN4t1cxORMekNmRNXpK83t/fhNIMb8ACJn7K3WuI7p8/Xercw4UJZZxe2ERIN8JoTkYSWaMNVFrMLpOPPFvVVHPTvGHF6d8B9QKo87G2sbMeeEhDyKB2Z9qASph2hG+6RMJhdhhlTEi/G+LOu2nxECgiXdKg3MEoO249RNAww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qMazTAYRqbSTnaRIEEhec7Xbfh7ocx1Pe/rEqwsYOd8=;
- b=UajD9LroYw0absX6TxTSmw2aJkxl/AZKXfDbKu0rL12Mnqhrb42LzyWxJVv1VrXJdND0Dx+BK38mReomRAJGcNot4JcpQrlb/P67FZObTN3HzjVVHzFnV1RBMsQhQA5femYfAiBolUA8BBYPifkHP+q1z+SQNjRLR6pZxLjZFEsW9u8cFwGZU6AkkYewhgCtnr8w21m1jucOWQoY3EcW2pHfRTXzjVsm/SKBKz0mAl/s4kMhJD4w2FJOdcdYkQc1wfzyuc3GOOwx4t1hevNi0RWNWohQscLPoWsYfc9BU7JMrQ+l/8rToqVnTiluE5Tq3WwfdnuDnjFPCuiyapAKlA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qMazTAYRqbSTnaRIEEhec7Xbfh7ocx1Pe/rEqwsYOd8=;
- b=P3UZ8sNuyUfBYwAJweprd2gMVELporC/b3XI4gWS6s2iuDMzhU5odNAIAiVPuMRWkry2BaX513iROCsyGZmpNUY6LDMuEFpn3Dwzt3kwhk+bvOr5k1zuG+/FoAcQoBGaJbHaR9c/6uX7RHirLp9nupzjnF0sH0nc/JvloW5Km1g=
-Received: from DS7PR07CA0010.namprd07.prod.outlook.com (2603:10b6:5:3af::29)
- by IA1PR12MB7494.namprd12.prod.outlook.com (2603:10b6:208:41a::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Fri, 2 Dec
- 2022 19:47:39 +0000
-Received: from CY4PEPF0000B8EC.namprd05.prod.outlook.com
- (2603:10b6:5:3af:cafe::46) by DS7PR07CA0010.outlook.office365.com
- (2603:10b6:5:3af::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.10 via Frontend
- Transport; Fri, 2 Dec 2022 19:47:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000B8EC.mail.protection.outlook.com (10.167.241.8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5813.11 via Frontend Transport; Fri, 2 Dec 2022 19:47:39 +0000
-Received: from [127.0.1.1] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 2 Dec
- 2022 13:47:37 -0600
-Subject: [PATCH 5/5] target/i386: Add missing feature bits in EPYC-Milan model
-From:   Babu Moger <babu.moger@amd.com>
-To:     <pbonzini@redhat.com>
-CC:     <mtosatti@redhat.com>, <kvm@vger.kernel.org>, <mst@redhat.com>,
-        <marcel.apfelbaum@gmail.com>, <imammedo@redhat.com>,
-        <richard.henderson@linaro.org>, <yang.zhong@intel.com>,
-        <jing2.liu@intel.com>, <vkuznets@redhat.com>,
-        <qemu-devel@nongnu.org>, <michael.roth@amd.com>
-Date:   Fri, 2 Dec 2022 13:47:37 -0600
-Message-ID: <167001045745.62456.2099841557167523615.stgit@bmoger-ubuntu>
-In-Reply-To: <167001034454.62456.7111414518087569436.stgit@bmoger-ubuntu>
-References: <167001034454.62456.7111414518087569436.stgit@bmoger-ubuntu>
-User-Agent: StGit/1.1.dev103+g5369f4c
+        with ESMTP id S234874AbiLBUSA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 15:18:00 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDCE3DF5A
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 12:17:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=bzkXtlgFEOS9Jn2fmTjU/b6rSvJdWdhmAsxpiPTfPbg=; b=l5XRo8/Z2L0wzM2VJ93R/HwQgP
+        OSOsINdw5komMSdL+2qUvJb1PtIN8aXoN36z1OgKy0Babq8q0UB0f4xVHyekf2WqWS2b+NRNX64UK
+        I6by82I9JP5YClkL+TeZ/jPdxnB2UT7q1P/xBuf2db0h8zvYfqk7yoV1w6wCrTvoObVmnkTJ65JAv
+        pIK5qbLsdo4iXrs3GAlDg3mGeNGSMyYp/nASdn3fk0xQqo9EiabM5RX3dJ/4WneGfXufigP35FoTC
+        UktfRynaFcqTUKFL/xjN38RcY7V7RiQLelyZRe0fMmTJ1BAVxmt8RU9A+6HXOyBU9P7HadtVNdLl/
+        ori5FVAQ==;
+Received: from 54-240-198-36.amazon.com ([54.240.198.36] helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p1CTs-000UIB-Bm; Fri, 02 Dec 2022 20:17:56 +0000
+Message-ID: <e7f4398f5ba92f6de5ae11e4e6d765a942e03c58.camel@infradead.org>
+Subject: Re: [PATCH v1 0/2] KVM: x86/xen: Runstate cleanups on top of
+ kvm/queue
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Paul Durrant <paul@xen.org>, Michal Luczaj <mhal@rbox.co>,
+        kvm@vger.kernel.org
+Date:   Fri, 02 Dec 2022 12:17:45 -0800
+In-Reply-To: <561885a1-e1de-21f2-1da9-5abfea2a1045@redhat.com>
+References: <20221127122210.248427-1-dwmw2@infradead.org>
+         <cd107b6c-ae02-8fa6-50e0-d6cbca7d88bc@redhat.com>
+         <24408924dbe6041472f5e401f40c29311e1edd99.camel@infradead.org>
+         <561885a1-e1de-21f2-1da9-5abfea2a1045@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-pJsuzpP8nKzGUsCcLbKY"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000B8EC:EE_|IA1PR12MB7494:EE_
-X-MS-Office365-Filtering-Correlation-Id: 207d70a1-902f-4f7a-5cfe-08dad49e11ca
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jxmSUBKx5i8x2BeA5ES0ygkqPyQ1Vek0NK3azru3KqusjijTC6hvrdp39obIuGOIEjhvGEUDFebXFk+567zO4FmLzba6NYF6lvSAH7NIZfHXOvt84Xa2ZbfK6S6UJ+WlSt+K6sd5uWzOZ9Q5XTwy6fRYxa9WR89FwEIaSSWk2orZTJ0/LbAQ7krUTss0yde0N2K6IkndNqvCEo41MSF+u3gvEYAwnWulfFcQrzGnV7J92MK88TTBB/adectB9FuJJv5jS9ZPlKss6tR+f7T1Rhy/nWaUpVtQ/e7bW1aAjAQUv9GuadeMqIa0xu3oX8+aeMBlB2zKJpp3VvLCZTZ1oijONPxCAYqC+QKrXGk0xe4YQoyarx0tKCnXGTrJIT6GSPjPSNAgZmvZV48QjxIpFqvHFx980xdTHhiF1kQxe4uC849YH6c7ei8k5uTZCvZFPrwRfjq/1nNxwq/zUsHDjDzFNCYXL8t6Ny2AY5Yy5tDPFmKajGB92UHQ486SqZYFdy/i9fs3MulH3s7OMZO8pxDCj+WyW+93KaZfj9Qks5OTicRLfN3e8HDVcmqH3AUaxVfBvOEfSSkjcApKzhB+kIQQqc57uqlPSeea0pYbOK3/sR6NCJ3I+1JMGJr6Bwpa3GMrIW/5aRA8YpC+LazCejh/OEAUATsAJ7DZFyzBQ5uctBSLJrkZY+K+0jJ4MAka0o62D7xs6UL5sbyUX2M/aHsK0xrwsNL3o/w+0l1pCXqxK7Bn4EDi+VXng56Ynzcw9oBo0wAwPkQBICbJNWtKCzY1NGBScYYQf9FuJHiMchcHWhNddMnCFVE5EO6xqfZKzoOhlHg/9+4fjbaD68RmJw==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(7916004)(39860400002)(136003)(346002)(376002)(396003)(451199015)(36840700001)(40470700004)(46966006)(40480700001)(40460700003)(186003)(2906002)(86362001)(356005)(7416002)(16526019)(478600001)(966005)(81166007)(36860700001)(8936002)(44832011)(26005)(316002)(70586007)(5660300002)(33716001)(41300700001)(6916009)(4326008)(70206006)(16576012)(54906003)(8676002)(82740400003)(9686003)(336012)(103116003)(82310400005)(83380400001)(47076005)(426003)(71626007)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2022 19:47:39.3648
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 207d70a1-902f-4f7a-5cfe-08dad49e11ca
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000B8EC.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7494
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-And the following feature bits for EPYC-Milan model and bump the version.=
-=0A=
-vaes            : Vector VAES(ENC|DEC), VAES(ENC|DEC)LAST instruction suppo=
-rt=0A=
-vpclmulqdq	: Vector VPCLMULQDQ instruction support=0A=
-stibp-always-on : Single Thread Indirect Branch Prediction Mode has enhance=
-d=0A=
-                  performance and may be left Always on=0A=
-amd-psfd	: Predictive Store Forward Disable=0A=
-no-nested-data-bp         : Processor ignores nested data breakpoints=0A=
-lfence-always-serializing : LFENCE instruction is always serializing=0A=
-null-select-clears-base   : Null Selector Clears Base. When this bit is=0A=
-                            set, a null segment load clears the segment bas=
-e=0A=
-=0A=
-These new features will be added in EPYC-Milan-v2. The -cpu help output=0A=
-after the change.=0A=
-=0A=
-    x86 EPYC-Milan             (alias configured by machine type)=0A=
-    x86 EPYC-Milan-v1          AMD EPYC-Milan Processor=0A=
-    x86 EPYC-Milan-v2          AMD EPYC-Milan Processor=0A=
-=0A=
-The documentation for the features are available in the links below.=0A=
-a. Processor Programming Reference (PPR) for AMD Family 19h Model 01h,=0A=
-   Revision B1 Processors=0A=
-b. SECURITY ANALYSIS OF AMD PREDICTIVE STORE FORWARDING=0A=
-c. AMD64 Architecture Programmer=E2=80=99s Manual Volumes 1=E2=80=935 Publi=
-cation No. Revision=0A=
-    40332 4.05 Date October 2022=0A=
-=0A=
-Link: https://www.amd.com/system/files/TechDocs/55898_B1_pub_0.50.zip=0A=
-Link: https://www.amd.com/system/files/documents/security-analysis-predicti=
-ve-store-forwarding.pdf=0A=
-Link: https://www.amd.com/system/files/TechDocs/40332_4.05.pdf=0A=
-Signed-off-by: Babu Moger <Babu.Moger@amd.com>=0A=
----=0A=
- target/i386/cpu.c |   70 +++++++++++++++++++++++++++++++++++++++++++++++++=
-++++=0A=
- 1 file changed, 70 insertions(+)=0A=
-=0A=
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c=0A=
-index e9175da92f..54549a5127 100644=0A=
---- a/target/i386/cpu.c=0A=
-+++ b/target/i386/cpu.c=0A=
-@@ -1921,6 +1921,56 @@ static const CPUCaches epyc_milan_cache_info =3D {=
-=0A=
-     },=0A=
- };=0A=
- =0A=
-+static const CPUCaches epyc_milan_v2_cache_info =3D {=0A=
-+    .l1d_cache =3D &(CPUCacheInfo) {=0A=
-+        .type =3D DATA_CACHE,=0A=
-+        .level =3D 1,=0A=
-+        .size =3D 32 * KiB,=0A=
-+        .line_size =3D 64,=0A=
-+        .associativity =3D 8,=0A=
-+        .partitions =3D 1,=0A=
-+        .sets =3D 64,=0A=
-+        .lines_per_tag =3D 1,=0A=
-+        .self_init =3D 1,=0A=
-+        .no_invd_sharing =3D true,=0A=
-+    },=0A=
-+    .l1i_cache =3D &(CPUCacheInfo) {=0A=
-+        .type =3D INSTRUCTION_CACHE,=0A=
-+        .level =3D 1,=0A=
-+        .size =3D 32 * KiB,=0A=
-+        .line_size =3D 64,=0A=
-+        .associativity =3D 8,=0A=
-+        .partitions =3D 1,=0A=
-+        .sets =3D 64,=0A=
-+        .lines_per_tag =3D 1,=0A=
-+        .self_init =3D 1,=0A=
-+        .no_invd_sharing =3D true,=0A=
-+    },=0A=
-+    .l2_cache =3D &(CPUCacheInfo) {=0A=
-+        .type =3D UNIFIED_CACHE,=0A=
-+        .level =3D 2,=0A=
-+        .size =3D 512 * KiB,=0A=
-+        .line_size =3D 64,=0A=
-+        .associativity =3D 8,=0A=
-+        .partitions =3D 1,=0A=
-+        .sets =3D 1024,=0A=
-+        .lines_per_tag =3D 1,=0A=
-+    },=0A=
-+    .l3_cache =3D &(CPUCacheInfo) {=0A=
-+        .type =3D UNIFIED_CACHE,=0A=
-+        .level =3D 3,=0A=
-+        .size =3D 32 * MiB,=0A=
-+        .line_size =3D 64,=0A=
-+        .associativity =3D 16,=0A=
-+        .partitions =3D 1,=0A=
-+        .sets =3D 32768,=0A=
-+        .lines_per_tag =3D 1,=0A=
-+        .self_init =3D true,=0A=
-+        .inclusive =3D true,=0A=
-+        .complex_indexing =3D false,=0A=
-+    },=0A=
-+};=0A=
-+=0A=
- /* The following VMX features are not supported by KVM and are left out in=
- the=0A=
-  * CPU definitions:=0A=
-  *=0A=
-@@ -4270,6 +4320,26 @@ static const X86CPUDefinition builtin_x86_defs[] =3D=
- {=0A=
-         .xlevel =3D 0x8000001E,=0A=
-         .model_id =3D "AMD EPYC-Milan Processor",=0A=
-         .cache_info =3D &epyc_milan_cache_info,=0A=
-+        .versions =3D (X86CPUVersionDefinition[]) {=0A=
-+            { .version =3D 1 },=0A=
-+            {=0A=
-+                .version =3D 2,=0A=
-+                .props =3D (PropValue[]) {=0A=
-+                    { "model-id",=0A=
-+                      "AMD EPYC-Milan-v2 Processor" },=0A=
-+                    { "vaes", "on" },=0A=
-+                    { "vpclmulqdq", "on" },=0A=
-+                    { "stibp-always-on", "on" },=0A=
-+                    { "amd-psfd", "on" },=0A=
-+                    { "no-nested-data-bp", "on" },=0A=
-+                    { "lfence-always-serializing", "on" },=0A=
-+                    { "null-select-clears-base", "on" },=0A=
-+                    { /* end of list */ }=0A=
-+                },=0A=
-+                .cache_info =3D &epyc_milan_v2_cache_info=0A=
-+            },=0A=
-+            { /* end of list */ }=0A=
-+        }=0A=
-     },=0A=
- };=0A=
- =0A=
-=0A=
+
+--=-pJsuzpP8nKzGUsCcLbKY
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, 2022-12-02 at 20:00 +0100, Paolo Bonzini wrote:
+> > > Merged, thanks.
+> >=20
+> > Thanks. I've rebased the remaining GPC fixes on top and pushed them out
+> > (along with Metin's SCHEDOP_poll 32-bit compat support) to
+> >=20
+> > https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/gpc=
+-fixes
+> >=20
+>=20
+> Oh, so we do pull requests now too?  I'm all for it, but please use=20
+> signed tags. :)
+
+Not really intended as a pull request (unless you really want one).
+I've just kept it rebased on top of the other parts as they've evolved,
+so we always have the latest state in a known location. Didn't seem
+worth the noise of actually *resending* them repeatedly.=20
+
+> > I still haven't reinstated the last of those patches to make gpc->len
+> > immutable, although I think we concluded it's fine just to make the
+> > runstate code claim gpc->len=3D1 and manage its own destiny, right?
+>=20
+> Yeah, I'm not super keen on that either, but I guess it can work with=20
+> any of len =3D=3D 1 or len =3D=3D PAGE_SIZE - offset.
+>=20
+> Related to this, for 6.3 I will send a cleanup of the API to put=20
+> together lock and check.
+
+I suspect now's the time to actually resend those patches on top of the
+current kvm/queue, and we can work out the length and lock/check things
+on top?
+
+
+--=-pJsuzpP8nKzGUsCcLbKY
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMjAyMjAxNzQ1WjAvBgkqhkiG9w0BCQQxIgQgH3etYD1K
+cQLkNZVAcNHFlwAasNd/WMXA9oSFlgATR/gwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBNiFCCY502v/lFJJcXzSDfc4AMczRfL8jQ
+NCWdIrd11uEWwxudnNXXdD1eMTyJYvUtVaC/kRJ9UpKz7yWlfEg6hqF20xKHizYc66aQzSxqyBWR
+tbyiFmySKxtRjEiDvbvzsuofkEgCeLpFOytHrMbRWM9t9nxf+GGJF4F0NdZwtH9RdrVkg0nwtL2l
+rGDkr7HHpzbT3i4BH8cTo6FWe0oeQbL2IJWkq980eXxxZdAq0E1rElHw9xctVImwaee+ah0X1Ewm
+F3jQKSQF7oxTlANEfqmwrnmJMwRgwkxyCa3EN6ANRgtJF7vZfSs1GWshrdq2XNNsTN/npdFm4Wrr
+K4O/+vX+dZ6u+Q1thIfIeyUWz8ZysQnlfNjHo5x3WAvJIgQUDTvfbTRefaWmYbXuaNPjKc7qx9fh
++mYUIzl1f9/qb9DHaHF5ZxShjNE3KXzZiwuWzXpDQJ39o1sJJpoVnU8oXf+9ihPZUvZwxpYsDyg3
+7Rnv0/UAPG89RxzSGVJNf0g7Mxe8TBSuG3HEL6yGhVh0yjhCUcabfC2w5WRfn9CxiRrMlRgkI9UB
+mKFbVpd+jIvv7kJrEOtyHCHIL6Sip0aQd0clKX8L5/Fse0nDnD+swtED95vAkNVD5w+aFC6Izpsu
+V8jDbIWtHS1Vqn0l/frAIwZsocvF5dvh6n0rz+iMkQAAAAAAAA==
+
+
+--=-pJsuzpP8nKzGUsCcLbKY--
 
