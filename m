@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA724640EB7
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 20:47:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EAE1640EB8
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 20:47:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234848AbiLBTrs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 14:47:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48462 "EHLO
+        id S234652AbiLBTru (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 14:47:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234857AbiLBTrn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 14:47:43 -0500
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2076.outbound.protection.outlook.com [40.107.212.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64279C36
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 11:47:35 -0800 (PST)
+        with ESMTP id S234864AbiLBTrp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 14:47:45 -0500
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2048.outbound.protection.outlook.com [40.107.212.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7BD01B1CA
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 11:47:41 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jscMb5rO1W7ahPAHT7aYa2DV9/DJtZEKOVs2pC7WIwkS+fPhrFeekHaQhGoL4Qk/wtcA3qyVY1WEA/kTR0o7GCpkLdf9WFLrlkYpU8RZiV1E9BjX6bvcOQ2pSRuLOVW0lR7r03y2lOl7SdUneh8ksOG7xBAd1pYEFurqniXKig93Sytb6uc90VPvuPEbca9u8GIJap1xYC+P/+X9h0oBlr9ehMfpOSMd7JX9k/Pk3NxfyoIeVjabA0ouJJMEKfGLnq2FXuy7RBnXSyzNUxiDEx77HCSP85pf3GWxHdhs1WSQ7zo4tg8YPl4oq/CRycynPMwcDajGFmw16cAUncHPPg==
+ b=VWtsMTL+kRctq0cmY134vYtk38dT8Qg0RJz23v2Tm47+TYKcTXesbPNOvRy3GmLwRA94puU/4iXCfkT0YKfQFRMHi7cOiS+z3YR84HmhX449QEgSNhR/RyE4CNR34qpgIRxm2reYvad5j+ucC2PAZ92T3L6XneNwIow0TKy4LZNhTBN4t1cxORMekNmRNXpK83t/fhNIMb8ACJn7K3WuI7p8/Xercw4UJZZxe2ERIN8JoTkYSWaMNVFrMLpOPPFvVVHPTvGHF6d8B9QKo87G2sbMeeEhDyKB2Z9qASph2hG+6RMJhdhhlTEi/G+LOu2nxECgiXdKg3MEoO249RNAww==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=izQP7RpEY2jlnsZxrSHBScMOlI3t37DXftEVEl4B5Lg=;
- b=hhom824d2PlPWs7dIpOww59u5+fr/sAGTnfQ9IETbvHdo3AnYIkZZh+yZJLaxVvd/EfjV26GbINOACT7wuPNFkWBkKahpNxicVPhj5B+6Ph0VMfSFQzgYUtLSOyR8lLCPcP2vZf1cfQG0J6QFALoDih31emdCdUfEGC0Ui/FQOWgOkGXxdJjo1/of5OjTIX6CaMpt4G4ADftiLwTKe0WMilJ57EJHlHwt1bfYCvDy3YSt0J8WbopLBSMmHFOmuV7i+yuWmhQWXJcn18RAkKXWpceuISHwWNmOwDMyESjB60JulqdlapekY2cw6dWJccb5r0u0je/k32EtAAfkPqqEg==
+ bh=qMazTAYRqbSTnaRIEEhec7Xbfh7ocx1Pe/rEqwsYOd8=;
+ b=UajD9LroYw0absX6TxTSmw2aJkxl/AZKXfDbKu0rL12Mnqhrb42LzyWxJVv1VrXJdND0Dx+BK38mReomRAJGcNot4JcpQrlb/P67FZObTN3HzjVVHzFnV1RBMsQhQA5femYfAiBolUA8BBYPifkHP+q1z+SQNjRLR6pZxLjZFEsW9u8cFwGZU6AkkYewhgCtnr8w21m1jucOWQoY3EcW2pHfRTXzjVsm/SKBKz0mAl/s4kMhJD4w2FJOdcdYkQc1wfzyuc3GOOwx4t1hevNi0RWNWohQscLPoWsYfc9BU7JMrQ+l/8rToqVnTiluE5Tq3WwfdnuDnjFPCuiyapAKlA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=izQP7RpEY2jlnsZxrSHBScMOlI3t37DXftEVEl4B5Lg=;
- b=n3NLj257kTzCzpiRHntIEQ4QI7WfxttRJLXvmkdBG6t67JmK71aIxvftfCZ+iRifBxY+8BW+QXJs88IIFtUQbqz6mlg/+Jdjl0cLTsGfKnuW4MNyxBJu19VbjJUhLC7qjmBpH9GdzHTtPoErlp6S5U8AP5D9oDy4hWD4Odk92XI=
-Received: from DM6PR02CA0120.namprd02.prod.outlook.com (2603:10b6:5:1b4::22)
- by SA1PR12MB6726.namprd12.prod.outlook.com (2603:10b6:806:255::13) with
+ bh=qMazTAYRqbSTnaRIEEhec7Xbfh7ocx1Pe/rEqwsYOd8=;
+ b=P3UZ8sNuyUfBYwAJweprd2gMVELporC/b3XI4gWS6s2iuDMzhU5odNAIAiVPuMRWkry2BaX513iROCsyGZmpNUY6LDMuEFpn3Dwzt3kwhk+bvOr5k1zuG+/FoAcQoBGaJbHaR9c/6uX7RHirLp9nupzjnF0sH0nc/JvloW5Km1g=
+Received: from DS7PR07CA0010.namprd07.prod.outlook.com (2603:10b6:5:3af::29)
+ by IA1PR12MB7494.namprd12.prod.outlook.com (2603:10b6:208:41a::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Fri, 2 Dec
- 2022 19:47:33 +0000
-Received: from CY4PEPF0000B8EE.namprd05.prod.outlook.com
- (2603:10b6:5:1b4:cafe::b7) by DM6PR02CA0120.outlook.office365.com
- (2603:10b6:5:1b4::22) with Microsoft SMTP Server (version=TLS1_2,
+ 2022 19:47:39 +0000
+Received: from CY4PEPF0000B8EC.namprd05.prod.outlook.com
+ (2603:10b6:5:3af:cafe::46) by DS7PR07CA0010.outlook.office365.com
+ (2603:10b6:5:3af::29) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.10 via Frontend
- Transport; Fri, 2 Dec 2022 19:47:33 +0000
+ Transport; Fri, 2 Dec 2022 19:47:39 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,14 +46,14 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000B8EE.mail.protection.outlook.com (10.167.241.10) with Microsoft
+ CY4PEPF0000B8EC.mail.protection.outlook.com (10.167.241.8) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5813.11 via Frontend Transport; Fri, 2 Dec 2022 19:47:33 +0000
+ 15.20.5813.11 via Frontend Transport; Fri, 2 Dec 2022 19:47:39 +0000
 Received: from [127.0.1.1] (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 2 Dec
- 2022 13:47:31 -0600
-Subject: [PATCH 4/5] target/i386: Add feature bits for CPUID_Fn80000021_EAX
+ 2022 13:47:37 -0600
+Subject: [PATCH 5/5] target/i386: Add missing feature bits in EPYC-Milan model
 From:   Babu Moger <babu.moger@amd.com>
 To:     <pbonzini@redhat.com>
 CC:     <mtosatti@redhat.com>, <kvm@vger.kernel.org>, <mst@redhat.com>,
@@ -61,8 +61,8 @@ CC:     <mtosatti@redhat.com>, <kvm@vger.kernel.org>, <mst@redhat.com>,
         <richard.henderson@linaro.org>, <yang.zhong@intel.com>,
         <jing2.liu@intel.com>, <vkuznets@redhat.com>,
         <qemu-devel@nongnu.org>, <michael.roth@amd.com>
-Date:   Fri, 2 Dec 2022 13:47:31 -0600
-Message-ID: <167001045109.62456.7605531797911345380.stgit@bmoger-ubuntu>
+Date:   Fri, 2 Dec 2022 13:47:37 -0600
+Message-ID: <167001045745.62456.2099841557167523615.stgit@bmoger-ubuntu>
 In-Reply-To: <167001034454.62456.7111414518087569436.stgit@bmoger-ubuntu>
 References: <167001034454.62456.7111414518087569436.stgit@bmoger-ubuntu>
 User-Agent: StGit/1.1.dev103+g5369f4c
@@ -74,23 +74,23 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000B8EE:EE_|SA1PR12MB6726:EE_
-X-MS-Office365-Filtering-Correlation-Id: d2ee7505-029e-4e1a-3b95-08dad49e0e07
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000B8EC:EE_|IA1PR12MB7494:EE_
+X-MS-Office365-Filtering-Correlation-Id: 207d70a1-902f-4f7a-5cfe-08dad49e11ca
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CAe3WhljyNM6odjwjYxbeLfFYUPzZ/N6SG1/oeYnPqJWkg1AzoM8JmxsY24h7CLKONFaPtsaDN/5z4hc2v9M/ojZ1eH5X9Scb8h3UUoNUhScTuRH0IBeLl2zKzcMSWpNxxXE6SP3kXruRLC33+AQfQOiWUBSvV6eb2KCvJF1DllWgTOnEEtg9y/v1xEwOKUymXYAYejHiRg7Tm9iD3UxXJ9INN43rJAMj1PhKbtdYS3xRwj2Rf+j+GR3P32AWG0sRYxMPtVidvtAe0qfWly3INwTHdvCL77qAxcj3QsP7HInekpJ3tOb0DnLzhEvcQg8mABj2HsI9iBKBSjTLGH1IYVzm1k3uYXHiP0JuXsIno795gwQMDdRUi8NwZ9B93p7WQMtHhR//iW9Gy4EXqHAMVqdso8RNLHwdxlLZjbt5JguYDgsbXuDozSv5LmmROjJBLV3Bd3tVRNaae3A6fihAKc7sUt5IXbbVYOia1HYjf63vh+aN2Xq5KYRqw+qwNe1ri6ZH9F/4pZHZpmm0c5ekR3iEknAUP/hganRQ22tP2F+ipQ/k78I+v/qiyxzBWa9z+UCPtY5lwfQzMNc33eZhvT4AIBshMKATGDOF/W9jvrfY1aXGaHWmG+ajmPUVhsxSe/cl6ACrmhFMDZrpRGyksPnY4YeTCNLEi8RC34BUvVqMl6Z84lAxHoytZI/uoPkqi9L7FqqYlmMwUdB+cKCrFFpf8UlP7KRSoLIaTxIqHJuUQsSoxSh/jCVsshkSjK4GanCBhbVdpZxfCFGsYvvFgCfDGD8rqVmJSwgIAHItWnxK8LsqWlhg1FXGiqvh5vn4thKLi3QO1uWp6tptkbP6Q==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(7916004)(4636009)(136003)(346002)(396003)(39860400002)(376002)(451199015)(40470700004)(46966006)(36840700001)(82310400005)(86362001)(40460700003)(82740400003)(8936002)(336012)(70586007)(40480700001)(103116003)(70206006)(16526019)(41300700001)(186003)(426003)(5660300002)(81166007)(54906003)(8676002)(44832011)(16576012)(7416002)(966005)(4326008)(478600001)(9686003)(316002)(356005)(47076005)(6916009)(33716001)(36860700001)(26005)(2906002)(71626007)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: jxmSUBKx5i8x2BeA5ES0ygkqPyQ1Vek0NK3azru3KqusjijTC6hvrdp39obIuGOIEjhvGEUDFebXFk+567zO4FmLzba6NYF6lvSAH7NIZfHXOvt84Xa2ZbfK6S6UJ+WlSt+K6sd5uWzOZ9Q5XTwy6fRYxa9WR89FwEIaSSWk2orZTJ0/LbAQ7krUTss0yde0N2K6IkndNqvCEo41MSF+u3gvEYAwnWulfFcQrzGnV7J92MK88TTBB/adectB9FuJJv5jS9ZPlKss6tR+f7T1Rhy/nWaUpVtQ/e7bW1aAjAQUv9GuadeMqIa0xu3oX8+aeMBlB2zKJpp3VvLCZTZ1oijONPxCAYqC+QKrXGk0xe4YQoyarx0tKCnXGTrJIT6GSPjPSNAgZmvZV48QjxIpFqvHFx980xdTHhiF1kQxe4uC849YH6c7ei8k5uTZCvZFPrwRfjq/1nNxwq/zUsHDjDzFNCYXL8t6Ny2AY5Yy5tDPFmKajGB92UHQ486SqZYFdy/i9fs3MulH3s7OMZO8pxDCj+WyW+93KaZfj9Qks5OTicRLfN3e8HDVcmqH3AUaxVfBvOEfSSkjcApKzhB+kIQQqc57uqlPSeea0pYbOK3/sR6NCJ3I+1JMGJr6Bwpa3GMrIW/5aRA8YpC+LazCejh/OEAUATsAJ7DZFyzBQ5uctBSLJrkZY+K+0jJ4MAka0o62D7xs6UL5sbyUX2M/aHsK0xrwsNL3o/w+0l1pCXqxK7Bn4EDi+VXng56Ynzcw9oBo0wAwPkQBICbJNWtKCzY1NGBScYYQf9FuJHiMchcHWhNddMnCFVE5EO6xqfZKzoOhlHg/9+4fjbaD68RmJw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(7916004)(39860400002)(136003)(346002)(376002)(396003)(451199015)(36840700001)(40470700004)(46966006)(40480700001)(40460700003)(186003)(2906002)(86362001)(356005)(7416002)(16526019)(478600001)(966005)(81166007)(36860700001)(8936002)(44832011)(26005)(316002)(70586007)(5660300002)(33716001)(41300700001)(6916009)(4326008)(70206006)(16576012)(54906003)(8676002)(82740400003)(9686003)(336012)(103116003)(82310400005)(83380400001)(47076005)(426003)(71626007)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2022 19:47:33.0060
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2022 19:47:39.3648
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d2ee7505-029e-4e1a-3b95-08dad49e0e07
+X-MS-Exchange-CrossTenant-Network-Message-Id: 207d70a1-902f-4f7a-5cfe-08dad49e11ca
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000B8EE.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000B8EC.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6726
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7494
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
@@ -101,110 +101,136 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the following feature bits.=0A=
-no-nested-data-bp         : Processor ignores nested data breakpoints.=0A=
-lfence-always-serializing : LFENCE instruction is always serializing.=0A=
+And the following feature bits for EPYC-Milan model and bump the version.=
+=0A=
+vaes            : Vector VAES(ENC|DEC), VAES(ENC|DEC)LAST instruction suppo=
+rt=0A=
+vpclmulqdq	: Vector VPCLMULQDQ instruction support=0A=
+stibp-always-on : Single Thread Indirect Branch Prediction Mode has enhance=
+d=0A=
+                  performance and may be left Always on=0A=
+amd-psfd	: Predictive Store Forward Disable=0A=
+no-nested-data-bp         : Processor ignores nested data breakpoints=0A=
+lfence-always-serializing : LFENCE instruction is always serializing=0A=
 null-select-clears-base   : Null Selector Clears Base. When this bit is=0A=
                             set, a null segment load clears the segment bas=
-e.=0A=
+e=0A=
+=0A=
+These new features will be added in EPYC-Milan-v2. The -cpu help output=0A=
+after the change.=0A=
+=0A=
+    x86 EPYC-Milan             (alias configured by machine type)=0A=
+    x86 EPYC-Milan-v1          AMD EPYC-Milan Processor=0A=
+    x86 EPYC-Milan-v2          AMD EPYC-Milan Processor=0A=
 =0A=
 The documentation for the features are available in the links below.=0A=
 a. Processor Programming Reference (PPR) for AMD Family 19h Model 01h,=0A=
    Revision B1 Processors=0A=
-b. AMD64 Architecture Programmer=E2=80=99s Manual Volumes 1=E2=80=935 Publi=
+b. SECURITY ANALYSIS OF AMD PREDICTIVE STORE FORWARDING=0A=
+c. AMD64 Architecture Programmer=E2=80=99s Manual Volumes 1=E2=80=935 Publi=
 cation No. Revision=0A=
     40332 4.05 Date October 2022=0A=
 =0A=
 Link: https://www.amd.com/system/files/TechDocs/55898_B1_pub_0.50.zip=0A=
+Link: https://www.amd.com/system/files/documents/security-analysis-predicti=
+ve-store-forwarding.pdf=0A=
 Link: https://www.amd.com/system/files/TechDocs/40332_4.05.pdf=0A=
-=0A=
-Signed-off-by: Babu Moger <babu.moger@amd.com>=0A=
+Signed-off-by: Babu Moger <Babu.Moger@amd.com>=0A=
 ---=0A=
- target/i386/cpu.c |   24 ++++++++++++++++++++++++=0A=
- target/i386/cpu.h |    8 ++++++++=0A=
- 2 files changed, 32 insertions(+)=0A=
+ target/i386/cpu.c |   70 +++++++++++++++++++++++++++++++++++++++++++++++++=
+++++=0A=
+ 1 file changed, 70 insertions(+)=0A=
 =0A=
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c=0A=
-index b20e422b2e..e9175da92f 100644=0A=
+index e9175da92f..54549a5127 100644=0A=
 --- a/target/i386/cpu.c=0A=
 +++ b/target/i386/cpu.c=0A=
-@@ -918,6 +918,22 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] =3D {=
+@@ -1921,6 +1921,56 @@ static const CPUCaches epyc_milan_cache_info =3D {=
 =0A=
-         .tcg_features =3D 0,=0A=
-         .unmigratable_flags =3D 0,=0A=
      },=0A=
-+    [FEAT_8000_0021_EAX] =3D {=0A=
-+        .type =3D CPUID_FEATURE_WORD,=0A=
-+        .feat_names =3D {=0A=
-+            "no-nested-data-bp", NULL, "lfence-always-serializing", NULL,=
-=0A=
-+            NULL, NULL, "null-select-clears-base", NULL,=0A=
-+            NULL, NULL, NULL, NULL,=0A=
-+            NULL, NULL, NULL, NULL,=0A=
-+            NULL, NULL, NULL, NULL,=0A=
-+            NULL, NULL, NULL, NULL,=0A=
-+            NULL, NULL, NULL, NULL,=0A=
-+            NULL, NULL, NULL, NULL,=0A=
-+        },=0A=
-+        .cpuid =3D { .eax =3D 0x80000021, .reg =3D R_EAX, },=0A=
-+        .tcg_features =3D 0,=0A=
-+        .unmigratable_flags =3D 0,=0A=
+ };=0A=
+ =0A=
++static const CPUCaches epyc_milan_v2_cache_info =3D {=0A=
++    .l1d_cache =3D &(CPUCacheInfo) {=0A=
++        .type =3D DATA_CACHE,=0A=
++        .level =3D 1,=0A=
++        .size =3D 32 * KiB,=0A=
++        .line_size =3D 64,=0A=
++        .associativity =3D 8,=0A=
++        .partitions =3D 1,=0A=
++        .sets =3D 64,=0A=
++        .lines_per_tag =3D 1,=0A=
++        .self_init =3D 1,=0A=
++        .no_invd_sharing =3D true,=0A=
 +    },=0A=
-     [FEAT_XSAVE] =3D {=0A=
-         .type =3D CPUID_FEATURE_WORD,=0A=
-         .feat_names =3D {=0A=
-@@ -6002,6 +6018,10 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index,=
- uint32_t count,=0A=
-             *ebx |=3D sev_get_reduced_phys_bits() << 6;=0A=
-         }=0A=
-         break;=0A=
-+    case 0x80000021:=0A=
-+        *eax =3D env->features[FEAT_8000_0021_EAX];=0A=
-+        *ebx =3D *ecx =3D *edx =3D 0;=0A=
-+        break;=0A=
-     default:=0A=
-         /* reserved values: zero */=0A=
-         *eax =3D 0;=0A=
-@@ -6429,6 +6449,10 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **er=
-rp)=0A=
-             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);=
-=0A=
-         }=0A=
- =0A=
-+        if (env->features[FEAT_8000_0021_EAX]) {=0A=
-+            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x80000021);=
-=0A=
++    .l1i_cache =3D &(CPUCacheInfo) {=0A=
++        .type =3D INSTRUCTION_CACHE,=0A=
++        .level =3D 1,=0A=
++        .size =3D 32 * KiB,=0A=
++        .line_size =3D 64,=0A=
++        .associativity =3D 8,=0A=
++        .partitions =3D 1,=0A=
++        .sets =3D 64,=0A=
++        .lines_per_tag =3D 1,=0A=
++        .self_init =3D 1,=0A=
++        .no_invd_sharing =3D true,=0A=
++    },=0A=
++    .l2_cache =3D &(CPUCacheInfo) {=0A=
++        .type =3D UNIFIED_CACHE,=0A=
++        .level =3D 2,=0A=
++        .size =3D 512 * KiB,=0A=
++        .line_size =3D 64,=0A=
++        .associativity =3D 8,=0A=
++        .partitions =3D 1,=0A=
++        .sets =3D 1024,=0A=
++        .lines_per_tag =3D 1,=0A=
++    },=0A=
++    .l3_cache =3D &(CPUCacheInfo) {=0A=
++        .type =3D UNIFIED_CACHE,=0A=
++        .level =3D 3,=0A=
++        .size =3D 32 * MiB,=0A=
++        .line_size =3D 64,=0A=
++        .associativity =3D 16,=0A=
++        .partitions =3D 1,=0A=
++        .sets =3D 32768,=0A=
++        .lines_per_tag =3D 1,=0A=
++        .self_init =3D true,=0A=
++        .inclusive =3D true,=0A=
++        .complex_indexing =3D false,=0A=
++    },=0A=
++};=0A=
++=0A=
+ /* The following VMX features are not supported by KVM and are left out in=
+ the=0A=
+  * CPU definitions:=0A=
+  *=0A=
+@@ -4270,6 +4320,26 @@ static const X86CPUDefinition builtin_x86_defs[] =3D=
+ {=0A=
+         .xlevel =3D 0x8000001E,=0A=
+         .model_id =3D "AMD EPYC-Milan Processor",=0A=
+         .cache_info =3D &epyc_milan_cache_info,=0A=
++        .versions =3D (X86CPUVersionDefinition[]) {=0A=
++            { .version =3D 1 },=0A=
++            {=0A=
++                .version =3D 2,=0A=
++                .props =3D (PropValue[]) {=0A=
++                    { "model-id",=0A=
++                      "AMD EPYC-Milan-v2 Processor" },=0A=
++                    { "vaes", "on" },=0A=
++                    { "vpclmulqdq", "on" },=0A=
++                    { "stibp-always-on", "on" },=0A=
++                    { "amd-psfd", "on" },=0A=
++                    { "no-nested-data-bp", "on" },=0A=
++                    { "lfence-always-serializing", "on" },=0A=
++                    { "null-select-clears-base", "on" },=0A=
++                    { /* end of list */ }=0A=
++                },=0A=
++                .cache_info =3D &epyc_milan_v2_cache_info=0A=
++            },=0A=
++            { /* end of list */ }=0A=
 +        }=0A=
-+=0A=
-         /* SGX requires CPUID[0x12] for EPC enumeration */=0A=
-         if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_SGX) {=0A=
-             x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x12);=0A=
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h=0A=
-index 8c65c92131..42b347051a 100644=0A=
---- a/target/i386/cpu.h=0A=
-+++ b/target/i386/cpu.h=0A=
-@@ -597,6 +597,7 @@ typedef enum FeatureWord {=0A=
-     FEAT_8000_0001_ECX, /* CPUID[8000_0001].ECX */=0A=
-     FEAT_8000_0007_EDX, /* CPUID[8000_0007].EDX */=0A=
-     FEAT_8000_0008_EBX, /* CPUID[8000_0008].EBX */=0A=
-+    FEAT_8000_0021_EAX, /* CPUID[8000_0021].EAX */=0A=
-     FEAT_C000_0001_EDX, /* CPUID[C000_0001].EDX */=0A=
-     FEAT_KVM,           /* CPUID[4000_0001].EAX (KVM_CPUID_FEATURES) */=0A=
-     FEAT_KVM_HINTS,     /* CPUID[4000_0001].EDX */=0A=
-@@ -925,6 +926,13 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWor=
-d w,=0A=
- /* Predictive Store Forwarding Disable */=0A=
- #define CPUID_8000_0008_EBX_AMD_PSFD    (1U << 28)=0A=
+     },=0A=
+ };=0A=
  =0A=
-+/* Processor ignores nested data breakpoints */=0A=
-+#define CPUID_8000_0021_EAX_No_NESTED_DATA_BP    (1U << 0)=0A=
-+/* LFENCE is always serializing */=0A=
-+#define CPUID_8000_0021_EAX_LFENCE_ALWAYS_SERIALIZING    (1U << 2)=0A=
-+/* Null Selector Clears Base */=0A=
-+#define CPUID_8000_0021_EAX_NULL_SELECT_CLEARS_BASE    (1U << 6)=0A=
-+=0A=
- #define CPUID_XSAVE_XSAVEOPT   (1U << 0)=0A=
- #define CPUID_XSAVE_XSAVEC     (1U << 1)=0A=
- #define CPUID_XSAVE_XGETBV1    (1U << 2)=0A=
 =0A=
 
