@@ -2,68 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90CEA640E2A
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 20:03:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C7AB640E54
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 20:20:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234503AbiLBTDW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 14:03:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57542 "EHLO
+        id S234604AbiLBTUh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 14:20:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234500AbiLBTDU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 14:03:20 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 439E3D8267
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 11:03:19 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id 21so5742386pfw.4
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 11:03:19 -0800 (PST)
+        with ESMTP id S233903AbiLBTUf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 14:20:35 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68FBCEF8AA
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 11:20:34 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id b21so5483312plc.9
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 11:20:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BzQIwpfetdhZyRBwIU5BQIKvvSZ4/8R8B3ehTYDV0qE=;
-        b=pMInxBnvJlc2PwOobJoCPRUbGkde7rIQZAndraY4wjHPI43Afosr7/lEyukYNxMO8i
-         Hh3kqrXSCIX8ozRDJ0UnkkR2JMxcrcoOk99tWNgpR5DHDhi5zRMZcq2WXWGcPuUaFx+/
-         aFKtFQslfLwzkuX+8SEgmLSVnpM+x+udn4zcj+knG/B75aXmKyevT/hvObqPcnSyYjWY
-         mvU4o53cOx/LUp9qm1snhCRST+GUs6gD55kwo8Zt3GP0brp1z2L39/R1YjstAhA49xQO
-         SCb4w8xsnX/dSedgzfWbS5VttObghrzTjrR4LYAlEELqbj7+m6hk/qm6m5Ka+zWjSDAV
-         sH6A==
+        bh=KjhSpTyu+aaTapJuHKJDiYaRzS+s27HOfqbTwrumNXw=;
+        b=DN/PaAGRPHK+Crex4AP1cTmwbbPi6kfnfWjoEnMDdEuQ0JxtQn2tZtb0BHgFeGutZi
+         SP+tQK/nVZ/59x3jJmHtLFunwJsdKzdNK4A8sIa6wjTG3rQ5lgOA/AB/pdS6ekfcIiYy
+         g+1n3p9ETedR6IDCGlf7y1znqAgeaNpjVFPqG/3iamivl1xzI1XXJcBpBpJ423Azbuzw
+         7EQkYlSJV8bddI2WYsL6zby6ph/GjvNJ3Nd3SnYV6EJ6PGA7Ds1EP/lyNTYTK4LkaabU
+         y4pAMNHpdtdsNx1FD2Kx4e9RImh5sw9BHNkvbUKyFqcFUHtsBs2TGjocR60X8Z9q6YSe
+         Whbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BzQIwpfetdhZyRBwIU5BQIKvvSZ4/8R8B3ehTYDV0qE=;
-        b=5KgI46LS7drT90eJzxdAupDhxpJ4eZQQ19dbURwllaFsx5xCOpFReG+QbruNDtY8Jr
-         crNrEbPEQMzXyccfL+OFb7wstVm18FYzaaae5mbxRgN3QHPpcqocKZKou9EElCzRsE1B
-         kFqcxS5Rt5wBooekvwGfw67NApNsMQMqs03AKSjVVSwLk1BpCeRoQkqGKHeAhr7vz6Mc
-         2GbJua3bHRjK/6AVRNdrKw6mKFC4NIZJaUm7V8Ma3U6RRDsrpcdypa5VfgBKICmNU5Yt
-         5AtUV1B1ZWU+1dSu85lmnRYyBDP1Ysuj3z94ewpx2zwDFRKtkH0Wbqz+GMqSEdG/S3HB
-         AIbg==
-X-Gm-Message-State: ANoB5plunDtIgq7rgzOHyQAlxt0v+qChY+2Wc7iXiOwj9VIC/wl9QgQD
-        71cK1JQwHTOdhhHO442qa4BTIw==
-X-Google-Smtp-Source: AA0mqf5hNo6+a3PnVvngDWd8q/2NCzbESkPgraiN8XkIDzUZMcV+QrHBgY9hN8Nk2l9MIH8CQtDrPg==
-X-Received: by 2002:a63:1466:0:b0:476:cac7:16ad with SMTP id 38-20020a631466000000b00476cac716admr47839419pgu.128.1670007798641;
-        Fri, 02 Dec 2022 11:03:18 -0800 (PST)
+        bh=KjhSpTyu+aaTapJuHKJDiYaRzS+s27HOfqbTwrumNXw=;
+        b=xiFY5SpuDBhp0AMX8DqLOryUzxogmToSTcz7EPf7xoGfURaSHt6HvsZFz7a7I0X6EB
+         bAgakKP38KJF8sf9YkCOHbYDzkqY9xrix+d2fTN7t5hBWLh3Mlo5JFUtxNuG/bZPeLs9
+         vsB2VUxDiVmOH03CnV/Igr0ZL/IOsdT/TsgH/ql+nxhUX++B/GlLcASbeRM9oWw3nh9F
+         kX84qJTh1ycIzVQXQcBMflz6KsGHLlEj3TlUSZOaL+riqi2ND6QRAYaiJMeuvBx4UkfX
+         PCGCg6UyH2xAfw+IQhImdfrv00XAHgrb5jws7xLceREYjfC7pu+M50DfhccX3buLCNxN
+         8Fzw==
+X-Gm-Message-State: ANoB5pn9nOk6HZs+Tpigtp7HCGZ56HyiVaPMPbeDB5qa1yRgCZRnCWu5
+        yW7KXw7cb5hYQa4C5gnIGEzGrA==
+X-Google-Smtp-Source: AA0mqf6N7XJBTQ5M2dbhotjqw1xxqdG12arkFwdhLMUNrQOEt2VUghLgZJtxwxPkzvTTr8bHQ1OCaw==
+X-Received: by 2002:a17:90a:ba81:b0:219:3e1b:3dc1 with SMTP id t1-20020a17090aba8100b002193e1b3dc1mr26196564pjr.60.1670008833742;
+        Fri, 02 Dec 2022 11:20:33 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id o10-20020a17090aeb8a00b00218f830c63esm5077371pjy.1.2022.12.02.11.03.18
+        by smtp.gmail.com with ESMTPSA id a10-20020a1709027e4a00b001898aa48d17sm5868771pln.185.2022.12.02.11.20.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Dec 2022 11:03:18 -0800 (PST)
-Date:   Fri, 2 Dec 2022 19:03:14 +0000
+        Fri, 02 Dec 2022 11:20:33 -0800 (PST)
+Date:   Fri, 2 Dec 2022 19:20:30 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
-        Michal Luczaj <mhal@rbox.co>, kvm@vger.kernel.org
-Subject: Re: [PATCH v1 0/2] KVM: x86/xen: Runstate cleanups on top of
- kvm/queue
-Message-ID: <Y4pL8kieNaXZh5tF@google.com>
-References: <20221127122210.248427-1-dwmw2@infradead.org>
- <cd107b6c-ae02-8fa6-50e0-d6cbca7d88bc@redhat.com>
- <24408924dbe6041472f5e401f40c29311e1edd99.camel@infradead.org>
- <561885a1-e1de-21f2-1da9-5abfea2a1045@redhat.com>
+To:     Anton Romanov <romanton@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
+        mlevitsk@redhat.com
+Subject: Re: [PATCHv6] KVM: x86: Use current rather than snapshotted TSC
+ frequency if it is constant
+Message-ID: <Y4pP/uu7Mg+NaEUY@google.com>
+References: <20220608183525.1143682-1-romanton@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <561885a1-e1de-21f2-1da9-5abfea2a1045@redhat.com>
+In-Reply-To: <20220608183525.1143682-1-romanton@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,40 +72,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 02, 2022, Paolo Bonzini wrote:
-> On 11/30/22 20:51, David Woodhouse wrote:
-> > On Wed, 2022-11-30 at 17:03 +0100, Paolo Bonzini wrote:
-> > > On 11/27/22 13:22, David Woodhouse wrote:
-> > > > Clean the update code up a little bit by unifying the fast and slow
-> > > > paths as discussed, and make the update flag conditional to avoid
-> > > > confusing older guests that don't ask for it.
-> > > > 
-> > > > On top of kvm/queue as of today at commit da5f28e10aa7d.
-> > > > 
-> > > > (This is identical to what I sent a couple of minutes ago, except that
-> > > > this time I didn't forget to Cc the list)
-> > > > 
-> > > > 
-> > > 
-> > > Merged, thanks.
-> > 
-> > Thanks. I've rebased the remaining GPC fixes on top and pushed them out
-> > (along with Metin's SCHEDOP_poll 32-bit compat support) to
-> > 
-> > https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/gpc-fixes
+On Wed, Jun 08, 2022, Anton Romanov wrote:
+> Don't snapshot tsc_khz into per-cpu cpu_tsc_khz if the host TSC is
+> constant, in which case the actual TSC frequency will never change and thus
+> capturing TSC during initialization is unnecessary, KVM can simply use
+> tsc_khz.  This value is snapshotted from
+> kvm_timer_init->kvmclock_cpu_online->tsc_khz_changed(NULL)
 > 
-> Oh, so we do pull requests now too?  I'm all for it, but please use signed
-> tags. :)
+> On CPUs with constant TSC, but not a hardware-specified TSC frequency,
+> snapshotting cpu_tsc_khz and using that to set a VM's target TSC frequency
+> can lead to VM to think its TSC frequency is not what it actually is if
+> refining the TSC completes after KVM snapshots tsc_khz.  The actual
+> frequency never changes, only the kernel's calculation of what that
+> frequency is changes.
 > 
-> > I still haven't reinstated the last of those patches to make gpc->len
-> > immutable, although I think we concluded it's fine just to make the
-> > runstate code claim gpc->len=1 and manage its own destiny, right?
+> Ideally, KVM would not be able to race with TSC refinement, or would have
+> a hook into tsc_refine_calibration_work() to get an alert when refinement
+> is complete.  Avoiding the race altogether isn't practical as refinement
+> takes a relative eternity; it's deliberately put on a work queue outside of
+> the normal boot sequence to avoid unnecessarily delaying boot.
 > 
-> Yeah, I'm not super keen on that either, but I guess it can work with any of
-> len == 1 or len == PAGE_SIZE - offset.
+> Adding a hook is doable, but somewhat gross due to KVM's ability to be
+> built as a module.  And if the TSC is constant, which is likely the case
+> for every VMX/SVM-capable CPU produced in the last decade, the race can be
+> hit if and only if userspace is able to create a VM before TSC refinement
+> completes; refinement is slow, but not that slow.
 > 
-> Related to this, for 6.3 I will send a cleanup of the API to put together
-> lock and check.
+> For now, punt on a proper fix, as not taking a snapshot can help some uses
+> cases and not taking a snapshot is arguably correct irrespective of the
+> race with refinement.
+> 
+> Signed-off-by: Anton Romanov <romanton@google.com>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> ---
 
-We ended up with multiple threads on this topic.  Maybe pick up the conversation
-here?   https://lore.kernel.org/all/Y4ovbTiLQ2Jy0em9@google.com
+Merged to kvm/queue, thanks!
+
+https://lore.kernel.org/all/Y4lHxds8pvBhxXFX@google.com
