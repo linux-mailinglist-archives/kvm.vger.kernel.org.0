@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E67D1640C5E
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:44:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 54FCF640C5F
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:44:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233849AbiLBRoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 12:44:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35460 "EHLO
+        id S233878AbiLBRoc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 12:44:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232550AbiLBRoW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 12:44:22 -0500
-Received: from mail-ej1-x649.google.com (mail-ej1-x649.google.com [IPv6:2a00:1450:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 299CCDEA48
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:44:21 -0800 (PST)
-Received: by mail-ej1-x649.google.com with SMTP id hs42-20020a1709073eaa00b007c00fb5a509so3773949ejc.17
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:44:21 -0800 (PST)
+        with ESMTP id S233873AbiLBRo0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 12:44:26 -0500
+Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C0F9DEA48
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:44:23 -0800 (PST)
+Received: by mail-wr1-x44a.google.com with SMTP id g14-20020adfa48e000000b00241f94bcd54so1256590wrb.23
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:44:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ELTfV489YYSjtyZnXqT7/AolaabuOtlMIhcgXvH8VeU=;
-        b=I7TuXAoctAgeB1mXJ2K/ha5qYM8y39STgRq6R7rZGGpFPoW+fiaDr7LJh0w0TrBbjn
-         wSOQBhugGRx+fviEsw6u/NrXg6Bog0L14TY4Gz3wQyeVkBz6ZR6haPM6ip6xVK7Zpr3v
-         Si0z4bO758HMmZqJ5lAhyKxg/efd1vbl6RaumTgkwjjqteWi7HEf/44NV/42uHkIfqGU
-         N5kjHG8TWufE0m1y7fJAzISkDzZjKO+HpXqri48Mvv1YligGn6+KDJubSqbTuBlsnfmj
-         KrfMlMHAZ/W8VvWprU0nwB1d5HT2UPHsc8Oz50nrEbinqbrqco+4VxKD57oon800Fg/C
-         KMjA==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yhyawS7kJhQQSVgVJnQgPFltY+BVOYcIZhbJ8N9jvFw=;
+        b=gtsqf+Tqym3zq8mDcVkCeMWUB8q2lSdEtTktCFzYsBVqLm2De7d4IHGD8TsO5nFgm8
+         nQK38S/+XCyRIweXVhFDhaNgLD4UOUEBbtWpFcFJ7wsD3XVVeB4yUUHEBeJFEWdcPrLZ
+         WeDF698pPg6ny61H+Vks0oJOz7cQM0KL7qN3AcICIdS7bGsPjI/PvSx+TwQgd6JBiBRG
+         44TMojD+pefKthphiaGbuO/H5G+hqPtzuH4midb7Os0brCQEc2xHzsE8WGYtvZZfUVPX
+         xlE/P7waif9w2bwOMp+AAmZCYtI+F++/YZGRLaCTmJwGPcaAE+ZzoBLNQfTJegYj/5nt
+         Uvjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ELTfV489YYSjtyZnXqT7/AolaabuOtlMIhcgXvH8VeU=;
-        b=axxoLP/1KjFtA8SB3E5w3wcgqSB7ow0L5vwh/w53UQHfGC1488SVvOcG05/sFj8Y7q
-         3qlj81GoRzbWjDxK6rY8sRzQwlo+OPoibeoZb8xVImQ5hugUoyLRPjyUL8LtC2kMMxyR
-         ol1VWgc6qtPnWrxgQnQfzCorewsNrcga7niU/vncoh2P4ndaj4KO28w9puuHdCL9Jfbd
-         BqPiVKYmg0qFec6MIKU18tBM17HrOdRnAq6vjG+f7USYhx5cYfEBLT5deVF6+Kcgt4z5
-         uNVSkdkSQhiozFeMLUpJAGokpbpuLLnQD4g8iV2Lpa9ls635/oqeQKhmPak6h9TpRUqb
-         UO0Q==
-X-Gm-Message-State: ANoB5pnC2CBbDheyuqTidCmwHn8qq/OJeWfHu1h/Mx3RjF8ZF5fAT2Bv
-        moDoznLECM9o/OGlIoEbMjXajrMMAvkp/9+G6JaUQdLzRy4OEPB+0i1wI0UAOiim1PQUZ7lWi3t
-        d3BR5FQV+vMw434KhCxT2laKZl9+8KhhsgvrJ7pMBwRkW5Pu1TJk2AKc=
-X-Google-Smtp-Source: AA0mqf7JKfJ4M88hOlbKL6cRcsExn1IxWYtL/RkfSZEUmQqfsK3atWZGQcaT6es1AZPQCbBTAmgeK9RiYg==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yhyawS7kJhQQSVgVJnQgPFltY+BVOYcIZhbJ8N9jvFw=;
+        b=d5msfIPbes7BAYPj2woYtklAzue2LlJZknp/3vGlCzZmeOm4qe8pHMCKsGFEwU/Y4l
+         iPD1cdFe56W0pYcWteASQK62LM7KXIvDC3yWrDkvzqAOwZAu4Yig7VZijz6Z0beOAQoA
+         F1Ku9d/JGf073wuBQvG4UfjfRefNIHPo5VAddLY53sRzVXFt8MidU8RPsDvKarIPzSrb
+         2PcQ9xlesQWYmkEWmhEFe6aru0+pBfXCWPJy/zAF96BTNTxmT68MzHoq0yNRVphIsHSE
+         bZHU1cupiqqavkEsPGyTGpb46MpyKGNLkGpFIoK6KfwmmL0aFmvY+hJ7A0fZDXejp5rI
+         A8Ww==
+X-Gm-Message-State: ANoB5pm/uiHgUfRsTgja0PqcKG3DO4e5DupQUna0TPVJzbLIOcHuDtt6
+        u63QTTVvH8ht+FeJABkBCfXbXf64W6I1CsTho0DtbaaAOZHsABTu+XEN4RTSJcsrrGeQK56ma49
+        leUOIxjr3zdd6Zh3aODZzM/+vWsWyX3JXnfjX6kabdGZuqiMTIfB06QA=
+X-Google-Smtp-Source: AA0mqf74e+cbmoJWL9Zi0NnL0rlr6BCAZZWZ2/NEBmLz2sjz91ObQB1kMw5ko7n/L/fnEyxUMcIzKAKVXQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a17:907:6daa:b0:7ba:e537:c64b with SMTP id
- sb42-20020a1709076daa00b007bae537c64bmr39114403ejc.180.1670003059545; Fri, 02
- Dec 2022 09:44:19 -0800 (PST)
-Date:   Fri,  2 Dec 2022 17:43:45 +0000
+ (user=tabba job=sendgmr) by 2002:a05:600c:3514:b0:3cf:a985:7692 with SMTP id
+ h20-20020a05600c351400b003cfa9857692mr45930356wmq.104.1670003061592; Fri, 02
+ Dec 2022 09:44:21 -0800 (PST)
+Date:   Fri,  2 Dec 2022 17:43:46 +0000
+In-Reply-To: <20221202174417.1310826-1-tabba@google.com>
 Mime-Version: 1.0
+References: <20221202174417.1310826-1-tabba@google.com>
 X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221202174417.1310826-1-tabba@google.com>
-Subject: [RFC PATCH kvmtool v1 00/32] Add support for restricted guest memory
- in kvmtool
+Message-ID: <20221202174417.1310826-2-tabba@google.com>
+Subject: [RFC PATCH kvmtool v1 01/32] Initialize the return value in kvm__for_each_mem_bank()
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
@@ -68,120 +69,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The main goal of this patch series is to add support for the the
-restricted guest memory proposali (V9) [1] to kvmtool (V10 was
-released today [2]). This proposal is still being discussed, but
-it seems to be close to its final form. The intention is that
-the restricted guest memory would be used in various confidential
-computing environments, such as TDX and pKVM.
+If none of the bank types match, the function would return an
+uninitialized value.
 
-This series is intended to work with the kernel in of the
-V9 proposal [1], in addition to work to port it to
-pKVM [3]. It has been tested on qemu/arm64.
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ kvm.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-The patch series is divided as follows:
-
-Patches 1--4:
-General fixes and tidying up
-
-Patches 5--18:
-Move kvmtool from allocating guest vm memory using anonymous mmap
-to using memfd/ftruncate. The main motivation is to support the
-fd-based kvm guest memory proposal [1, 2]. It also facilitates using
-ipc memory sharing should that be needed in the future. It also
-moves kvmtool to using only a file based backend for guest memory
-allocation, with the file descriptor being the canonical
-reference to guest memory. The idea is to refer to all allocated
-guest memory via a file descriptor.
-
-Patches 19--28:
-Add architecture-independent framework to support restricted
-guest memory.
-
-Patches 29--32:
-Add pKVM-specific (arm64) support for restricted guest memory.
-
-I had posted a subset of this series earlier covering patches
-1--18  [4]. This series incorporates fixes and suggestions from
-Alex into those patches.
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.intel.com/
-[2] https://lore.kernel.org/all/20221202061347.1070246-1-chao.p.peng@linux.intel.com/
-[3] https://android-kvm.googlesource.com/kvmtool/+/refs/heads/tabba/fdmem-v9-core
-[4] https://lore.kernel.org/all/20221115111549.2784927-1-tabba@google.com/
-
-Fuad Tabba (31):
-  Initialize the return value in kvm__for_each_mem_bank()
-  Remove newline from end of die() aborts
-  Make mmap_hugetlbfs() static
-  Rename parameter in mmap_anon_or_hugetlbfs()
-  Add hostmem va to debug print
-  Factor out getting the hugetlb block size
-  Use memfd for hugetlbfs when allocating guest ram
-  Make blk_size a parameter and pass it to mmap_hugetlbfs()
-  Use memfd for all guest ram allocations
-  Allocate pvtime memory with memfd
-  Allocate vesa memory with memfd
-  Add a function that allocates aligned memory if specified
-  Use new function to align memory
-  Remove struct fields and code used for alignment
-  Replace kvm__arch_delete_ram() with kvm__delete_ram()
-  Remove no-longer used macro
-  Factor out set_user_memory_region code
-  Pass the memory file descriptor and offset when registering ram
-  Add memfd_restricted system call
-  Add kvm linux headers and structure extensions for restricted_fd
-  Add option for enabling restricted memory for guests
-  Change guest ram mapping from private to shared
-  Change pvtime mapping from private to shared
-  Change vesa mapping from private to shared
-  Allocate guest memory as restricted if needed
-  Use the new fd-based extended memory region
-  Track the memfd in the bank
-  Add functions for mapping/unmapping guest memory
-  pkvm: Enable exit hypercall capability if supported
-  pkvm: Handle (un)share hypercalls coming from the guest
-  pkvm: Unmap all guest memory after initialization
-
-Will Deacon (1):
-  pkvm: Add option to spawn a protected vm in pkvm
-
- arm/aarch32/include/kvm/kvm-arch.h |   1 +
- arm/aarch64/include/asm/kvm.h      |   7 +
- arm/aarch64/include/kvm/kvm-arch.h |   1 +
- arm/aarch64/kvm.c                  |  26 +++
- arm/aarch64/pvtime.c               |  20 +-
- arm/fdt.c                          |  18 ++
- arm/include/arm-common/fdt-arch.h  |   2 +-
- arm/include/arm-common/kvm-arch.h  |   7 -
- arm/kvm-cpu.c                      |  58 ++++++
- arm/kvm.c                          |  41 ++--
- arm/pci.c                          |   3 +
- builtin-run.c                      |   7 +
- framebuffer.c                      |   2 +
- hw/cfi_flash.c                     |   4 +-
- hw/vesa.c                          |  17 +-
- include/kvm/framebuffer.h          |   1 +
- include/kvm/kvm-config.h           |   2 +
- include/kvm/kvm.h                  |  25 ++-
- include/kvm/util.h                 |   5 +-
- include/linux/kvm.h                |  19 ++
- kvm.c                              | 301 ++++++++++++++++++++++++++---
- mips/kvm.c                         |  11 +-
- powerpc/kvm.c                      |   7 +-
- riscv/include/kvm/kvm-arch.h       |   7 -
- riscv/kvm.c                        |  26 +--
- util/util.c                        | 131 ++++++++++---
- vfio/core.c                        |   3 +-
- virtio/pci-modern.c                |   3 +
- x86/kvm.c                          |  11 +-
- 29 files changed, 606 insertions(+), 160 deletions(-)
-
-
-base-commit: e17d182ad3f797f01947fc234d95c96c050c534b
+diff --git a/kvm.c b/kvm.c
+index 42b8812..765dc71 100644
+--- a/kvm.c
++++ b/kvm.c
+@@ -381,14 +381,15 @@ u64 host_to_guest_flat(struct kvm *kvm, void *ptr)
+  * their type.
+  *
+  * If one call to @fun returns a non-zero value, stop iterating and return the
+- * value. Otherwise, return zero.
++ * value. If none of the bank types match, return -ENODEV. Otherwise, return
++ * zero.
+  */
+ int kvm__for_each_mem_bank(struct kvm *kvm, enum kvm_mem_type type,
+ 			   int (*fun)(struct kvm *kvm, struct kvm_mem_bank *bank, void *data),
+ 			   void *data)
+ {
+-	int ret;
+ 	struct kvm_mem_bank *bank;
++	int ret = -ENODEV;
+ 
+ 	list_for_each_entry(bank, &kvm->mem_banks, list) {
+ 		if (type != KVM_MEM_TYPE_ALL && !(bank->type & type))
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
 
