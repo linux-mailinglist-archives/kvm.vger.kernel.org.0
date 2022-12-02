@@ -2,205 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6250640D8C
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 19:39:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BD36640DBA
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 19:45:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234290AbiLBSju (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 13:39:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45594 "EHLO
+        id S234679AbiLBSpr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 13:45:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233673AbiLBSjG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 13:39:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C52D8216
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 10:37:32 -0800 (PST)
+        with ESMTP id S234398AbiLBSpV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 13:45:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E0836312
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 10:43:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670006252;
+        s=mimecast20190719; t=1670006593;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=RuMG0d33sEC7aE30jwx3bdY7txbQTuJrOEcspw8hQrc=;
-        b=D06NSRPZihPXbCci3diY1xylfdmIB9GrIkhvTdNofmXVKeVCgea9eI655B+wpGH3tXSfr3
-        yMPCrl6bHMSCCReykN6P5u2M6r+gNeNlTW7RMDBpQ99f9LFRerZei/7tplNGtyv8EcYCOf
-        KABQNaEGE3zfUt4R4w27LrT6WMpnxzE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-216-c-bv2q4XNBuoVs_WvpVduA-1; Fri, 02 Dec 2022 13:37:28 -0500
-X-MC-Unique: c-bv2q4XNBuoVs_WvpVduA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7D85985A59D;
-        Fri,  2 Dec 2022 18:37:28 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 59E6040C845E;
-        Fri,  2 Dec 2022 18:37:28 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Like Xu <like.xu.linux@gmail.com>
-Subject: [PATCH] KVM: x86: remove unnecessary exports
-Date:   Fri,  2 Dec 2022 13:37:27 -0500
-Message-Id: <20221202183727.1033906-1-pbonzini@redhat.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xcEA7o1BcfKrY2K2tVnrEXaf0YA37GTfmmfJSVGitL0=;
+        b=dMUCKLX+LiNpqCAsM9b7ZSRQWOFG7yrhx1QXD/h48X8nWV8dc78vI7Vdvc/lrKQfMbQZU6
+        O8csRVqDDvIGl91tUOPjhzhh/RbXMyzFtohjBV3+rk1bmKiZeWaiLlVzLZIDfnkSrjNjpM
+        0q9JgONcsRPiIa+nMaxOvg9MvrlQz9Q=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-399-RF6_niA3P4Sk_fkFwglOpw-1; Fri, 02 Dec 2022 13:43:06 -0500
+X-MC-Unique: RF6_niA3P4Sk_fkFwglOpw-1
+Received: by mail-wm1-f69.google.com with SMTP id x10-20020a05600c420a00b003cfa33f2e7cso2901473wmh.2
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 10:43:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xcEA7o1BcfKrY2K2tVnrEXaf0YA37GTfmmfJSVGitL0=;
+        b=AkdOGEmKfdGENPzAi55QJ6fiabPhC/sl7oeK8ovbqDSfpl56MyjbZtNFYrjYIsiqBy
+         d6nvumVdZmmizp8LWPGi6Tll+a7ywGICTAElB8cdtFTNoSlJJ+3pj0/fuNyapPYA/IX9
+         3vzn9V8gPh/o5SmFxrzia7F3bzArVSNY2ekkbBGkxLZo2CZllKQlHlK9xQrVxccpKLdZ
+         DWDCCaLCr34Q1uCBXlu11FjMquI0ywtWgjbrbTewcVlcJlY7ftexLMAfpUXKmaKVuxQr
+         zzvBHlHhLTllQLaT//i6NsWpCkckGEYuNwmDXhfvYQ/dTBvRai1d27YHm6aIl884quuw
+         8dGw==
+X-Gm-Message-State: ANoB5pnQZZT4rf+oNcJAF6yJJe6nrx7NFxrBvzTa7nv1l6JSTCcCr0w2
+        jaFAsCZK2pwCkcUAju5A0kNqCa9VoxWqBq6MPl/6B5l7jI0ZXEKZ1lpZuOHvaZ0byHu/OGdijBS
+        DiOaN9MCwNPFn
+X-Received: by 2002:adf:f64e:0:b0:242:4006:b55c with SMTP id x14-20020adff64e000000b002424006b55cmr4008170wrp.532.1670006585751;
+        Fri, 02 Dec 2022 10:43:05 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5WhXiKGTxZ6Btc40SYbZT6jTQG58ViDLAnwokq+LLgoJFeyTpExfGp4/9yXEqLSK2FGVbYeA==
+X-Received: by 2002:adf:f64e:0:b0:242:4006:b55c with SMTP id x14-20020adff64e000000b002424006b55cmr4008160wrp.532.1670006585549;
+        Fri, 02 Dec 2022 10:43:05 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id n36-20020a05600c502400b003cf6c2f9513sm9601785wmr.2.2022.12.02.10.43.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Dec 2022 10:43:05 -0800 (PST)
+Message-ID: <847ff9d1-c160-f243-65cf-92bbe14abf33@redhat.com>
+Date:   Fri, 2 Dec 2022 19:43:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH] KVM: x86: Optimize your code to avoid unnecessary calls
+Content-Language: en-US
+To:     liujing <liujing@cmss.chinamobile.com>
+Cc:     tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20221201014237.5764-1-liujing@cmss.chinamobile.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20221201014237.5764-1-liujing@cmss.chinamobile.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Several symbols are not used by vendor modules but still exported.
-Removing them ensures that new coupling between kvm.ko and kvm-*.ko
-is noticed and reviewed.
+Hi,
 
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Co-developed-by: Like Xu <like.xu.linux@gmail.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Like Xu <like.xu.linux@gmail.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/hyperv.c | 1 -
- arch/x86/kvm/irq.c    | 2 --
- arch/x86/kvm/lapic.c  | 3 ---
- arch/x86/kvm/x86.c    | 8 --------
- 4 files changed, 14 deletions(-)
+thanks for your contribution!  We can improve the code even further 
+though.  You are still calling kvm_pic_update_irq() after 
+kvm_set_ioapic(), and that is also unnecessary.
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 2c7f2a26421e..cc3e8c7d0850 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -898,7 +898,6 @@ bool kvm_hv_assist_page_enabled(struct kvm_vcpu *vcpu)
- 		return false;
- 	return vcpu->arch.pv_eoi.msr_val & KVM_MSR_ENABLED;
- }
--EXPORT_SYMBOL_GPL(kvm_hv_assist_page_enabled);
- 
- int kvm_hv_get_assist_page(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
-index d8d50558f165..a70952eca905 100644
---- a/arch/x86/kvm/irq.c
-+++ b/arch/x86/kvm/irq.c
-@@ -31,7 +31,6 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
- 
- 	return r;
- }
--EXPORT_SYMBOL(kvm_cpu_has_pending_timer);
- 
- /*
-  * check if there is a pending userspace external interrupt
-@@ -150,7 +149,6 @@ void kvm_inject_pending_timer_irqs(struct kvm_vcpu *vcpu)
- 	if (kvm_xen_timer_enabled(vcpu))
- 		kvm_xen_inject_timer_irqs(vcpu);
- }
--EXPORT_SYMBOL_GPL(kvm_inject_pending_timer_irqs);
- 
- void __kvm_migrate_timers(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 8224ac8b617a..4efdb4a4d72c 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -160,7 +160,6 @@ bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
- 	       && !(kvm_mwait_in_guest(vcpu->kvm) ||
- 		    kvm_can_post_timer_interrupt(vcpu));
- }
--EXPORT_SYMBOL_GPL(kvm_can_use_hv_timer);
- 
- static bool kvm_use_posted_timer_interrupt(struct kvm_vcpu *vcpu)
- {
-@@ -1914,7 +1913,6 @@ bool kvm_lapic_hv_timer_in_use(struct kvm_vcpu *vcpu)
- 
- 	return vcpu->arch.apic->lapic_timer.hv_timer_in_use;
- }
--EXPORT_SYMBOL_GPL(kvm_lapic_hv_timer_in_use);
- 
- static void cancel_hv_timer(struct kvm_lapic *apic)
- {
-@@ -2432,7 +2430,6 @@ void kvm_apic_update_apicv(struct kvm_vcpu *vcpu)
- 		apic->isr_count = count_vectors(apic->regs + APIC_ISR);
- 	}
- }
--EXPORT_SYMBOL_GPL(kvm_apic_update_apicv);
- 
- void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
- {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 152ea4993b76..4825773886f9 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -463,7 +463,6 @@ u64 kvm_get_apic_base(struct kvm_vcpu *vcpu)
- {
- 	return vcpu->arch.apic_base;
- }
--EXPORT_SYMBOL_GPL(kvm_get_apic_base);
- 
- enum lapic_mode kvm_get_apic_mode(struct kvm_vcpu *vcpu)
- {
-@@ -491,7 +490,6 @@ int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	kvm_recalculate_apic_map(vcpu->kvm);
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(kvm_set_apic_base);
- 
- /*
-  * Handle a fault on a hardware virtualization (VMX or SVM) instruction.
-@@ -782,7 +780,6 @@ void kvm_inject_page_fault(struct kvm_vcpu *vcpu, struct x86_exception *fault)
- 		kvm_queue_exception_e_p(vcpu, PF_VECTOR, fault->error_code,
- 					fault->address);
- }
--EXPORT_SYMBOL_GPL(kvm_inject_page_fault);
- 
- void kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
- 				    struct x86_exception *fault)
-@@ -811,7 +808,6 @@ void kvm_inject_nmi(struct kvm_vcpu *vcpu)
- 	atomic_inc(&vcpu->arch.nmi_queued);
- 	kvm_make_request(KVM_REQ_NMI, vcpu);
- }
--EXPORT_SYMBOL_GPL(kvm_inject_nmi);
- 
- void kvm_queue_exception_e(struct kvm_vcpu *vcpu, unsigned nr, u32 error_code)
- {
-@@ -836,7 +832,6 @@ bool kvm_require_cpl(struct kvm_vcpu *vcpu, int required_cpl)
- 	kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
- 	return false;
- }
--EXPORT_SYMBOL_GPL(kvm_require_cpl);
- 
- bool kvm_require_dr(struct kvm_vcpu *vcpu, int dr)
- {
-@@ -2069,7 +2064,6 @@ int kvm_emulate_as_nop(struct kvm_vcpu *vcpu)
- {
- 	return kvm_skip_emulated_instruction(vcpu);
- }
--EXPORT_SYMBOL_GPL(kvm_emulate_as_nop);
- 
- int kvm_emulate_invd(struct kvm_vcpu *vcpu)
- {
-@@ -2515,7 +2509,6 @@ u64 kvm_scale_tsc(u64 tsc, u64 ratio)
- 
- 	return _tsc;
- }
--EXPORT_SYMBOL_GPL(kvm_scale_tsc);
- 
- static u64 kvm_compute_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 target_tsc)
- {
-@@ -12068,7 +12061,6 @@ bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
- {
- 	return vcpu->kvm->arch.bsp_vcpu_id == vcpu->vcpu_id;
- }
--EXPORT_SYMBOL_GPL(kvm_vcpu_is_reset_bsp);
- 
- bool kvm_vcpu_is_bsp(struct kvm_vcpu *vcpu)
- {
--- 
-2.31.1
+On 12/1/22 02:42, liujing wrote:
+> @@ -6047,11 +6042,10 @@ static int kvm_vm_ioctl_set_irqchip(struct kvm *kvm, struct kvm_irqchip *chip)
+>   		kvm_set_ioapic(kvm, &chip->chip.ioapic);
+>   		break;
+>   	default:
+> -		r = -EINVAL;
+> -		break;
+> +		return -EINVAL;
+>   	}
+>   	kvm_pic_update_irq(pic);
+> -	return r;
+
+Please make instead a new function:
+
+void
+kvm_set_pic(struct kvm *kvm, int n, struct kvm_pic_state *state)
+{
+	struct kvm_pic *s = kvm->arch.vpic;
+
+	pic_lock(s);
+	memcpy(...)
+	pic_update_irq(s);
+	pic_unlock(s);
+}
+
+that lets you replace kvm_pic_update_irq() altogether.
+
+Thanks!
+
+Paolo
 
