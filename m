@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C7BC640C6F
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:45:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09D6E640C70
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:45:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234313AbiLBRph (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 12:45:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36932 "EHLO
+        id S234334AbiLBRpj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 12:45:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234256AbiLBRpY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 12:45:24 -0500
-Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFEDEEDD67
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:45:07 -0800 (PST)
-Received: by mail-wr1-x44a.google.com with SMTP id o8-20020adfba08000000b00241e80f08e0so1242658wrg.12
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:45:07 -0800 (PST)
+        with ESMTP id S234265AbiLBRp1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 12:45:27 -0500
+Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B8EBEFD20
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:45:10 -0800 (PST)
+Received: by mail-wm1-x34a.google.com with SMTP id ay40-20020a05600c1e2800b003cf8aa16377so2817073wmb.7
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:45:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+AbD6eW9Ewpp9J8IQbS9YAmB+Rhm6ksZAMygNcR9t8c=;
-        b=EqAA7GvZjA3UQUsiM1sFAaY3+Lc9qdPmYo9pQT/hppuVBWNJBekOUoeh48RG1U/2r7
-         ISk0VDTjQs+yss+qj/Jn8rwoOKVbZk1gFucEoh8GvnI+SqWzwsCJcjCY6rq/l3xzw5MA
-         VxgU41jzXvPvvqXgqxJDGH5Ja99YnKB/iunHg/oo05W1nHb2+tSBd1fAFQQIuAGbjyTE
-         qy0Xvp4rwnqkB8WU3YBTa+jcrZjOI0lYd6WiHZ6ljZqJEm+wvc+6FfjXBrlPZFhyrJNR
-         ytMun4VrlAGN3/AFA9tTHwk4w4rB8z4QbYa65kxiqua0RkmQCSbGxU03STJXIcK+1GQ9
-         6/dg==
+        bh=JuW98NK3szawI9EWp4s7ai+ga43lAX+Pov5xEYz6c0U=;
+        b=XNIkLOcJfFB16149vMnzWKOCFBWvKDgknVxHjgKpbHllb1p94gyN2NwKGeCOfyBpMC
+         bcIboAVxJQHjL9bz29cTC5lLHkf3zp9QnSvY5T/9g9uZUak4hV/JJco2No/ZD1RzrfXY
+         Nh1a+/ecv15WLLMP+vYcUO9ryI0feSvCZ2GjjL7fdNAu+5WmrTnnq8rikHlXW+HtyxBu
+         Snx7cLsbvrkLtDuKqIZzVZaCs3JokSaCScvziwqOtxChRjSiPw9M2jtyk66osBXyhoV7
+         RnkNBwJY+2ZuLz5nndkxkZeH+pXgJDYKRE2tpl5Y85vCJEU0hkY+ji9VhlRvggf2dN1S
+         VeWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+AbD6eW9Ewpp9J8IQbS9YAmB+Rhm6ksZAMygNcR9t8c=;
-        b=fWGd1LLpsETBOXGKsJHDNpl8bPb2QsrcnkfimdgGBkH+qmrMlaCaK7ew3az+ruP6kQ
-         20TzZQB/Q1p5HK6DXNApiagbGdZRyLdLkMfPAvndHzCNFuZODQmyupSlzb37lQaTl59m
-         DjNNT7pNuggKFqQz2AGphpdKh4mN2hDTCvDZZmL2gMrgHdlh/Ik4X0iV5RNIPv1IJjnB
-         WhDCZzencIMGvmy3bI8HvYWbUkmJhDw+crC5Gr3Ks3abhdHtM7sJ1ULhx05tz646U+NC
-         bv8gd/lQDNfMS8vWcK1/ZR6rJe8/i4PibTnTRfROny4VF8PUIp68VMlhIvh+/P1YDM0h
-         fWnw==
-X-Gm-Message-State: ANoB5pkoTy7kZL4/eoc5X5MjfwNk/u8P+MXWQmnPDydNPemlHRZhyx9k
-        pwxVFlWBbrvuNVbE/KjiNP/OhrGitr5m2SnwowoNTTFUZKYeinv4GmVuS/aqERqNhDLg9ntrxz8
-        MHKQl9+urgY6GkXMm3IdPUzGBJeCg28UvfS7AD+EEvqnfcgqBLsDxlas=
-X-Google-Smtp-Source: AA0mqf7R2VP/tC7C+nsn7l94H4EkFZm2cjbL5Ywl8fXgv8dPRI1bKyYJ/EH7XGxzZBSHGt2EhIYJ7C3tRg==
+        bh=JuW98NK3szawI9EWp4s7ai+ga43lAX+Pov5xEYz6c0U=;
+        b=TAA7rT8X/bU7yF/XaNfp8uDNLe4F7cYy2jiqixmlNjx50IPDjdaOIzNP9MHWsLfMI/
+         SF6byJdAEMwV1Gpykr9Y2YPkCVcOoGMxeFqmwXHA7QmhqE6X3mlSwSNuDsTj7MqiHb1K
+         epqyZ8kYmr/E+7hbS9jTA46jU783i3wYsyAfKo6A2NucGZwlk48uW1LsEY9B/T2Rtgj8
+         hEq86Fs9xxW6lTx9DUz6TjP33p2enUNsZNoUu+0UzHYnapVcL89M8/VyYNu7nwVfzTLQ
+         p3/IHuW8jRICHRbTxsJKiUBS5q4OKgK4ll+3AO+aDdGnH+Wl42M/AiZAusD49vrErowA
+         Kumw==
+X-Gm-Message-State: ANoB5pnnD8FNW/qq+cv1XKRwws/txImhozp7STSeGmn42u2MOqEzv3pI
+        MvHVuZKKPXqvIAn0dvTqfmeM3GEvRjdNO3GvHbnVUMMcEWSyVnJaOeIJ8pFVOb2QRvV4rIUwKW4
+        Rl8DqoW+IfzZlRzaIFLyueDsbWOxEiOkrlPZglOP6Yh+Wswa5qTxLo40=
+X-Google-Smtp-Source: AA0mqf7Im89Ehl+ovCJZqxkqbqa06pTnHR9DJ2DgfayflqV0O+zF/70eu4SECFxNVoJZZP3YYFrb9xtgVw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6000:1e0c:b0:242:3fa4:820d with SMTP id
- bj12-20020a0560001e0c00b002423fa4820dmr3875733wrb.564.1670003096056; Fri, 02
- Dec 2022 09:44:56 -0800 (PST)
-Date:   Fri,  2 Dec 2022 17:44:02 +0000
+ (user=tabba job=sendgmr) by 2002:adf:f7c5:0:b0:242:9e8:84b8 with SMTP id
+ a5-20020adff7c5000000b0024209e884b8mr20798438wrq.25.1670003097943; Fri, 02
+ Dec 2022 09:44:57 -0800 (PST)
+Date:   Fri,  2 Dec 2022 17:44:03 +0000
 In-Reply-To: <20221202174417.1310826-1-tabba@google.com>
 Mime-Version: 1.0
 References: <20221202174417.1310826-1-tabba@google.com>
 X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221202174417.1310826-18-tabba@google.com>
-Subject: [RFC PATCH kvmtool v1 17/32] Factor out set_user_memory_region code
+Message-ID: <20221202174417.1310826-19-tabba@google.com>
+Subject: [RFC PATCH kvmtool v1 18/32] Pass the memory file descriptor and
+ offset when registering ram
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
@@ -69,119 +70,250 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is common code, and will be reused in the future when
-setting memory regions using file descriptors.
+Since the memory file descriptor is the canonical reference to guest
+memory, pass that and the offset when registering guest memory.
+Future fd-based kvm proposals might even not require a userspace
+address [*].
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
----
- kvm.c       | 53 ++++++++++++++++++++++++++++-------------------------
- util/util.c |  2 +-
- 2 files changed, 29 insertions(+), 26 deletions(-)
 
-diff --git a/kvm.c b/kvm.c
-index 3a3383a..c71646f 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -193,10 +193,30 @@ int kvm__exit(struct kvm *kvm)
- }
- core_exit(kvm__exit);
+[*] https://lore.kernel.org/all/20221202061347.1070246-1-chao.p.peng@linux.intel.com/
+---
+ arm/aarch64/pvtime.c |  2 +-
+ arm/kvm.c            |  3 ++-
+ hw/cfi_flash.c       |  4 +++-
+ hw/vesa.c            |  2 +-
+ include/kvm/kvm.h    | 17 +++++++++--------
+ kvm.c                |  3 ++-
+ mips/kvm.c           |  6 +++---
+ powerpc/kvm.c        |  2 +-
+ riscv/kvm.c          |  2 +-
+ vfio/core.c          |  3 ++-
+ x86/kvm.c            |  6 +++---
+ 11 files changed, 28 insertions(+), 22 deletions(-)
+
+diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
+index a7ba03e..9b06ee4 100644
+--- a/arm/aarch64/pvtime.c
++++ b/arm/aarch64/pvtime.c
+@@ -28,7 +28,7 @@ static int pvtime__alloc_region(struct kvm *kvm)
+ 	}
  
-+
-+static int set_user_memory_region(int vm_fd, u32 slot, u32 flags,
-+				  u64 guest_phys, u64 size,
-+				  u64 userspace_addr)
-+{
-+	int ret = 0;
-+	struct kvm_userspace_memory_region mem = {
-+		.slot			= slot,
-+		.flags			= flags,
-+		.guest_phys_addr	= guest_phys,
-+		.memory_size		= size,
-+		.userspace_addr		= (unsigned long)userspace_addr,
-+	};
-+
-+	ret = ioctl(vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
-+	if (ret < 0)
-+		ret = -errno;
-+
-+	return ret;
-+}
-+
- int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size,
- 		     void *userspace_addr)
- {
--	struct kvm_userspace_memory_region mem;
- 	struct kvm_mem_bank *bank;
+ 	ret = kvm__register_ram(kvm, ARM_PVTIME_BASE,
+-				ARM_PVTIME_SIZE, mem);
++				ARM_PVTIME_SIZE, mem, mem_fd, 0);
+ 	if (ret) {
+ 		munmap(mem, ARM_PVTIME_SIZE);
+ 		close(mem_fd);
+diff --git a/arm/kvm.c b/arm/kvm.c
+index 5cceef8..8772a55 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -50,7 +50,8 @@ void kvm__init_ram(struct kvm *kvm)
+ 	phys_start	= kvm->cfg.ram_addr;
+ 	phys_size	= kvm->ram_size;
+ 
+-	err = kvm__register_ram(kvm, phys_start, phys_size, kvm->ram_start);
++	err = kvm__register_ram(kvm, phys_start, phys_size, kvm->ram_start,
++		kvm->ram_fd, 0);
+ 	if (err)
+ 		die("Failed to register %lld bytes of memory at physical "
+ 		    "address 0x%llx [err %d]", phys_size, phys_start, err);
+diff --git a/hw/cfi_flash.c b/hw/cfi_flash.c
+index 7faecdf..92a6567 100644
+--- a/hw/cfi_flash.c
++++ b/hw/cfi_flash.c
+@@ -131,6 +131,7 @@ struct cfi_flash_device {
+ 	u32			size;
+ 
+ 	void			*flash_memory;
++	int			flash_fd;
+ 	u8			program_buffer[PROGRAM_BUFF_SIZE];
+ 	unsigned long		*lock_bm;
+ 	u64			block_address;
+@@ -451,7 +452,7 @@ static int map_flash_memory(struct kvm *kvm, struct cfi_flash_device *sfdev)
  	int ret;
  
-@@ -220,18 +240,10 @@ int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size,
- 		goto out;
+ 	ret = kvm__register_mem(kvm, sfdev->base_addr, sfdev->size,
+-				sfdev->flash_memory,
++				sfdev->flash_memory, sfdev->flash_fd, 0,
+ 				KVM_MEM_TYPE_RAM | KVM_MEM_TYPE_READONLY);
+ 	if (!ret)
+ 		sfdev->is_mapped = true;
+@@ -583,6 +584,7 @@ static struct cfi_flash_device *create_flash_device_file(struct kvm *kvm,
+ 		ret = -errno;
+ 		goto out_free;
+ 	}
++	sfdev->flash_fd = fd;
+ 	sfdev->base_addr = KVM_FLASH_MMIO_BASE;
+ 	sfdev->state = READY;
+ 	sfdev->read_mode = READ_ARRAY;
+diff --git a/hw/vesa.c b/hw/vesa.c
+index 522ffa3..277d638 100644
+--- a/hw/vesa.c
++++ b/hw/vesa.c
+@@ -102,7 +102,7 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+ 		goto close_memfd;
  	}
  
--	mem = (struct kvm_userspace_memory_region) {
--		.slot			= bank->slot,
--		.guest_phys_addr	= guest_phys,
--		.memory_size		= 0,
--		.userspace_addr		= (unsigned long)userspace_addr,
--	};
--
--	ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
--	if (ret < 0) {
--		ret = -errno;
-+	ret = set_user_memory_region(kvm->vm_fd, bank->slot, 0, guest_phys, 0,
-+				     (u64) userspace_addr);
-+	if (ret < 0)
- 		goto out;
--	}
+-	r = kvm__register_dev_mem(kvm, VESA_MEM_ADDR, VESA_MEM_SIZE, mem);
++	r = kvm__register_dev_mem(kvm, VESA_MEM_ADDR, VESA_MEM_SIZE, mem, mem_fd, 0);
+ 	if (r < 0)
+ 		goto unmap_dev;
  
- 	list_del(&bank->list);
- 	free(bank);
-@@ -246,7 +258,6 @@ out:
- int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
- 		      void *userspace_addr, enum kvm_mem_type type)
+diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+index f0be524..33cae9d 100644
+--- a/include/kvm/kvm.h
++++ b/include/kvm/kvm.h
+@@ -135,24 +135,25 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
+ bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
+ int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
+ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
+-		      enum kvm_mem_type type);
++		      int memfd, u64 offset, enum kvm_mem_type type);
+ static inline int kvm__register_ram(struct kvm *kvm, u64 guest_phys, u64 size,
+-				    void *userspace_addr)
++				    void *userspace_addr, int memfd, u64 offset)
  {
--	struct kvm_userspace_memory_region mem;
+-	return kvm__register_mem(kvm, guest_phys, size, userspace_addr,
+-				 KVM_MEM_TYPE_RAM);
++	return kvm__register_mem(kvm, guest_phys, size, userspace_addr, memfd,
++				 offset, KVM_MEM_TYPE_RAM);
+ }
+ 
+ static inline int kvm__register_dev_mem(struct kvm *kvm, u64 guest_phys,
+-					u64 size, void *userspace_addr)
++					u64 size, void *userspace_addr,
++					int memfd, u64 offset)
+ {
+-	return kvm__register_mem(kvm, guest_phys, size, userspace_addr,
+-				 KVM_MEM_TYPE_DEVICE);
++	return kvm__register_mem(kvm, guest_phys, size, userspace_addr, memfd,
++				 offset, KVM_MEM_TYPE_DEVICE);
+ }
+ 
+ static inline int kvm__reserve_mem(struct kvm *kvm, u64 guest_phys, u64 size)
+ {
+-	return kvm__register_mem(kvm, guest_phys, size, NULL,
++	return kvm__register_mem(kvm, guest_phys, size, NULL, -1, 0,
+ 				 KVM_MEM_TYPE_RESERVED);
+ }
+ 
+diff --git a/kvm.c b/kvm.c
+index c71646f..fc0bfc4 100644
+--- a/kvm.c
++++ b/kvm.c
+@@ -256,7 +256,8 @@ out:
+ }
+ 
+ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
+-		      void *userspace_addr, enum kvm_mem_type type)
++		      void *userspace_addr, int memfd, u64 offset,
++		      enum kvm_mem_type type)
+ {
  	struct kvm_mem_bank *merged = NULL;
  	struct kvm_mem_bank *bank;
- 	struct list_head *prev_entry;
-@@ -327,19 +338,11 @@ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
- 		flags |= KVM_MEM_READONLY;
+diff --git a/mips/kvm.c b/mips/kvm.c
+index 0a0d025..ebb2b19 100644
+--- a/mips/kvm.c
++++ b/mips/kvm.c
+@@ -38,21 +38,21 @@ void kvm__init_ram(struct kvm *kvm)
+ 		phys_size  = kvm->ram_size;
+ 		host_mem   = kvm->ram_start;
  
- 	if (type != KVM_MEM_TYPE_RESERVED) {
--		mem = (struct kvm_userspace_memory_region) {
--			.slot			= slot,
--			.flags			= flags,
--			.guest_phys_addr	= guest_phys,
--			.memory_size		= size,
--			.userspace_addr		= (unsigned long)userspace_addr,
--		};
--
--		ret = ioctl(kvm->vm_fd, KVM_SET_USER_MEMORY_REGION, &mem);
--		if (ret < 0) {
--			ret = -errno;
-+		ret = set_user_memory_region(kvm->vm_fd, slot, flags,
-+					     guest_phys, size,
-+					     (u64) userspace_addr);
-+		if (ret < 0)
- 			goto out;
--		}
+-		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
++		kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
+ 	} else {
+ 		/* one region for memory that fits below MMIO range */
+ 		phys_start = 0;
+ 		phys_size  = KVM_MMIO_START;
+ 		host_mem   = kvm->ram_start;
+ 
+-		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
++		kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
+ 
+ 		/* one region for rest of memory */
+ 		phys_start = KVM_MMIO_START + KVM_MMIO_SIZE;
+ 		phys_size  = kvm->ram_size - KVM_MMIO_START;
+ 		host_mem   = kvm->ram_start + KVM_MMIO_START;
+ 
+-		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
++		kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
  	}
+ }
  
- 	list_add(&bank->list, prev_entry);
-diff --git a/util/util.c b/util/util.c
-index 9f83d70..1f2e1a6 100644
---- a/util/util.c
-+++ b/util/util.c
-@@ -141,7 +141,7 @@ void *mmap_anon_or_hugetlbfs_align(struct kvm *kvm, const char *hugetlbfs_path,
- 		blk_size = get_hugepage_blk_size(hugetlbfs_path);
+diff --git a/powerpc/kvm.c b/powerpc/kvm.c
+index 8d467e9..c36c497 100644
+--- a/powerpc/kvm.c
++++ b/powerpc/kvm.c
+@@ -88,7 +88,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 		    "overlaps MMIO!\n",
+ 		    phys_size);
  
- 		if (blk_size == 0 || blk_size > size) {
--			die("Can't use hugetlbfs pagesize %lld for mem size %lld\n",
-+			die("Can't use hugetlbfs pagesize %lld for mem size %lld",
- 				(unsigned long long)blk_size, (unsigned long long)size);
- 		}
+-	kvm__register_ram(kvm, phys_start, phys_size, host_mem);
++	kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
+ }
+ 
+ void kvm__arch_set_cmdline(char *cmdline, bool video)
+diff --git a/riscv/kvm.c b/riscv/kvm.c
+index 4a2a3df..bb79c5d 100644
+--- a/riscv/kvm.c
++++ b/riscv/kvm.c
+@@ -38,7 +38,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 	phys_size	= kvm->ram_size;
+ 	host_mem	= kvm->ram_start;
+ 
+-	err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
++	err = kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
+ 	if (err)
+ 		die("Failed to register %lld bytes of memory at physical "
+ 		    "address 0x%llx [err %d]", phys_size, phys_start, err);
+diff --git a/vfio/core.c b/vfio/core.c
+index 3ff2c0b..ea189a0 100644
+--- a/vfio/core.c
++++ b/vfio/core.c
+@@ -255,7 +255,8 @@ int vfio_map_region(struct kvm *kvm, struct vfio_device *vdev,
+ 	region->host_addr = base;
+ 
+ 	ret = kvm__register_dev_mem(kvm, region->guest_phys_addr, map_size,
+-				    region->host_addr);
++				    region->host_addr, vdev->fd,
++				    region->info.offset);
+ 	if (ret) {
+ 		vfio_dev_err(vdev, "failed to register region with KVM");
+ 		return ret;
+diff --git a/x86/kvm.c b/x86/kvm.c
+index 8d29904..cee82d3 100644
+--- a/x86/kvm.c
++++ b/x86/kvm.c
+@@ -107,7 +107,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 		phys_size  = kvm->ram_size;
+ 		host_mem   = kvm->ram_start;
+ 
+-		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
++		kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
+ 	} else {
+ 		/* First RAM range from zero to the PCI gap: */
+ 
+@@ -115,7 +115,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 		phys_size  = KVM_32BIT_GAP_START;
+ 		host_mem   = kvm->ram_start;
+ 
+-		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
++		kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
+ 
+ 		/* Second RAM range from 4GB to the end of RAM: */
+ 
+@@ -123,7 +123,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 		phys_size  = kvm->ram_size - phys_start;
+ 		host_mem   = kvm->ram_start + phys_start;
+ 
+-		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
++		kvm__register_ram(kvm, phys_start, phys_size, host_mem, kvm->ram_fd, 0);
+ 	}
+ }
  
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
