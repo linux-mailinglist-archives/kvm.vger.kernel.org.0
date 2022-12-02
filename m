@@ -2,64 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7E58640993
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 16:53:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D648C640A23
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 17:05:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233774AbiLBPxJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 10:53:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55816 "EHLO
+        id S233876AbiLBQE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 11:04:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233762AbiLBPxG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 10:53:06 -0500
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72E5728710
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 07:53:05 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id b2so12500271eja.7
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 07:53:05 -0800 (PST)
+        with ESMTP id S233874AbiLBQEe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 11:04:34 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C6411D3
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 08:04:14 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id 4so5054972pli.0
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 08:04:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hQQIwkkfpShhaXutSwKcHrJlLuTk4R5sSbebZoDIpW4=;
-        b=ZVUCYUR2kY+r9WYFmnJ/4gwG88fFiimRLHw9jtI3aWYRP2Bl8oCZoZlb3SdU9wEzdF
-         Fus+ldzdCBzNZQ7rlzevVFYpy20FS66m3hh12FIWnDDBuBfZgV5Xo0qAr3OUZyYc7Tg3
-         0+Z9f9oKcWf80fB60O/lMzAR4pDVcw17YaUinwGAWLS8HIv7maKD+O6LO7O0yA5NJNER
-         UBJvjtbTrqI9n0TzZA/wLyUs697euNkfFhFPQ/qFQM+MnMm8/gCluWstf+yWRbcQUr+b
-         y2BbrCmrr1pt3ARTh7QOEcuFoaZ3VXkPii9560ZTfFZaLZMNZoYPJZwsWBHkcF3lbsDJ
-         W/hw==
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=b2GsRYGpugbtZSHFD2RurCZ4JW4xZuzTsOfxXrCkfT8=;
+        b=NpcRjd8PL93RDmu18EFPPR+cTZLP3kvCDAEAva9wUQzgEtv6dhPvDs1R9Q9+h2mN7N
+         H42dGaT+sl8xeMuYK2rfUD+midQutKuG+T3MUl21HeEIW4MolVpdsUIo9SmBbkggNx39
+         8eN3yXePSJelVozj19wEaq9z6VDhzvEr0ForIWyEXE5qa5rozQa3WxAYewh7SubIBKmO
+         02PPePyseXuLiMMtCMvFiCLdBEv6hZUEsP/WY2KPh2svytXFAqt8tvoUSmd0DdfZmIR5
+         sLez1JP4ikgagdRRPh2k9RbfsucGTq+KVdolkDHLvc/Uk58Zr0iw+nxpff3e47GDmBB4
+         X4Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hQQIwkkfpShhaXutSwKcHrJlLuTk4R5sSbebZoDIpW4=;
-        b=KEMVEMsAaS3VXVfZVoJRcmvZ/IAplDWswA96L1XxfBsvybaU7SrL3X6v0CgY+dw5qb
-         zQT22gRjTnM4qoH4EsGn3jzwXQIt/XTCAG/kJkiRUU+N29slLaWOjg4f9qJUIr42+XQ7
-         KjP+4rvrgLXdM5lfxuzbPEPc3AXPg1pLDiUz/4ue6vrLnEGQxKZiiXp7dtdlfbX2b22+
-         RF5AhzGAtKM2Ppskd2dQUFbpQmBKtuoMkCKAia3M9tAKyn4nOlFpSTbHPkRr3UqhqTH5
-         SHeOQs2CiaxwHHJPaOZ7kk84HIU547uxBly1oyc/rYHkEa8DR+7nTp7rrCLhE51CaT4J
-         ryLQ==
-X-Gm-Message-State: ANoB5pnoD9hnIX4h0THEfcMgAdCp/sB5gDUdIHYwei8VBKzXYZq+vOyI
-        RZKgRJWLn/dPiMUOqwcTp8oX5Pa+JElGvjQnS9w2eNpuBFXukYLs
-X-Google-Smtp-Source: AA0mqf77if6An70nzCZZinqSqZR+fCHoSbWxalmI5uutnm+MTPqaZcN1xtw03FXGUhlOkdqIOFhGp1mz6jbYrhCNz9w=
-X-Received: by 2002:a17:906:4c92:b0:78d:ad29:396f with SMTP id
- q18-20020a1709064c9200b0078dad29396fmr61074156eju.165.1669996383770; Fri, 02
- Dec 2022 07:53:03 -0800 (PST)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b2GsRYGpugbtZSHFD2RurCZ4JW4xZuzTsOfxXrCkfT8=;
+        b=yxWZrpE6p5PeRSFNzAnngcBlGCzxAwgCNQ5ghrqch8YMK98ywKs3YeHDcdTy2aoEye
+         pjotsSvQyKR36jafZYTmYlgw4IXGzcToNOcOVn+Jtjto/x0fk5ZNxVaNQgq9T43LOLFO
+         oEdpgdxFN8NNycFWU2nI8z4l17xgHXkShHtiEl4xKmJETWgveozFxvawES/0hpNou7sm
+         Nh8nlkOQeMnqrjaP3Trvz+xbQRUtkIT2BkCDaWntudxgbdmrvwaJWvlokRI35ZmfuymZ
+         Ib4mG0011XzrtGWLkbUYWxWUsXiytNOk8vrUq4CP4BPPQ4U6F7cTX4uipJdNKZ84xEul
+         /dAQ==
+X-Gm-Message-State: ANoB5pkU1TdJcaUeryeN9HWKsWjw99Q0q+1ibMEuXNRPFSdwiAX4Aiv9
+        6J3lOHnQyaYRZL6zNfKHfbQgSWJZKdZJEPxK
+X-Google-Smtp-Source: AA0mqf7w0TN/IsoZof5JEkNGBQ8Yd2Zjjhh4wCVFAlaPO07IGqPcQWl6OiCMwNp3DG6Q8B9rQJAiYA==
+X-Received: by 2002:a17:90a:9a98:b0:219:2f90:4fb3 with SMTP id e24-20020a17090a9a9800b002192f904fb3mr28837193pjp.109.1669997053879;
+        Fri, 02 Dec 2022 08:04:13 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id q42-20020a17090a1b2d00b00219752c8ea5sm3349337pjq.37.2022.12.02.08.04.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Dec 2022 08:04:13 -0800 (PST)
+Date:   Fri, 2 Dec 2022 16:04:09 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+        "palmer@dabbelt.com" <palmer@dabbelt.com>,
+        "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "paul@xen.org" <paul@xen.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "anup@brainfault.org" <anup@brainfault.org>,
+        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "farosas@linux.ibm.com" <farosas@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "Yao, Yuan" <yuan.yao@intel.com>,
+        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "philmd@linaro.org" <philmd@linaro.org>,
+        "atishp@atishpatra.org" <atishp@atishpatra.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "Gao, Chao" <chao.gao@intel.com>
+Subject: Re: [PATCH v2 40/50] KVM: x86: Do compatibility checks when onlining
+ CPU
+Message-ID: <Y4oh+XsbifA2BSj9@google.com>
+References: <20221130230934.1014142-1-seanjc@google.com>
+ <20221130230934.1014142-41-seanjc@google.com>
+ <cf755389c21c73e8367d8162cabc83629d3f9a74.camel@intel.com>
 MIME-Version: 1.0
-References: <20221130161946.3254953-1-spm@google.com> <CABgObfby+9JNwrJnjPRp6pty05CqRUfKBA3AB=TNwq4q0KjBTg@mail.gmail.com>
-In-Reply-To: <CABgObfby+9JNwrJnjPRp6pty05CqRUfKBA3AB=TNwq4q0KjBTg@mail.gmail.com>
-From:   Space Meyer <spm@google.com>
-Date:   Fri, 2 Dec 2022 16:52:27 +0100
-Message-ID: <CAOLenvZm4aPJAv5O+iybMxJoD-ZeytbJ=9o1nLVSh+84uj2U8g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: Deal with nested sleeps in kvm_vcpu_block()
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kpsingh@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cf755389c21c73e8367d8162cabc83629d3f9a74.camel@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,45 +115,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 30, 2022 at 5:49 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On Wed, Nov 30, 2022 at 5:20 PM Space Meyer <spm@google.com> wrote:
-> > Previously this code assumed nothing would mess with current->state
-> > between the set_current_state() and schedule(). However the call to
-> > kvm_vcpu_check_block() in between might end up requiring locks or other
-> > actions, which would change current->state
->
-> This would be a bug (in particular kvm_arch_vcpu_runnable() and
-> kvm_cpu_has_pending_timer() should not need any lock). Do you
-> have a specific call stack in mind?
+On Fri, Dec 02, 2022, Huang, Kai wrote:
+> On Wed, 2022-11-30 at 23:09 +0000, Sean Christopherson wrote:
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -11967,6 +11967,11 @@ int kvm_arch_hardware_enable(void)
+> >  	bool stable, backwards_tsc = false;
+> >  
+> >  	kvm_user_return_msr_cpu_online();
+> > +
+> > +	ret = kvm_x86_check_processor_compatibility();
+> > +	if (ret)
+> > +		return ret;
+> > +
+> >  	ret = static_call(kvm_x86_hardware_enable)();
+> >  	if (ret != 0)
+> >  		return ret;
+> 
+> Thinking more, AFAICT, kvm_x86_vendor_init() so far still does the compatibility
+> check on all online cpus.  Since now kvm_arch_hardware_enable() also does the
+> compatibility check, IIUC the compatibility check will be done twice -- one in
+> kvm_x86_vendor_init() and one in hardware_enable_all() when creating the first
+> VM.
+> 
+> Do you think it's still worth to do compatibility check in vm_x86_vendor_init()?
+> 
+> The behaviour difference should be "KVM module fail to load" vs "failing to
+> create the first VM" IIUC.  I don't know whether the former is better than the
+> better, but it seems duplicated compatibility checking isn't needed?
 
-You already fixed the specific call stack in 26844fe upstream. Syzkaller was
-able to exercise the call stack you outlined in that commit on a 5.10 based
-branch via:
-
-------------[ cut here ]------------
-do not call blocking ops when !TASK_RUNNING; state=1 set at
-[<00000000f941c5dd>] kvm_vcpu_block+0x330/0xaf0
-WARNING: CPU: 1 PID: 2513 at kernel/sched/core.c:12350 __might_sleep+0xd7/0xe0
-[...]
-Call Trace:
-__might_fault+0x6c/0x120
-__kvm_read_guest_page+0x163/0x230
-kvm_vcpu_read_guest+0xc3/0x150
-read_and_check_msr_entry+0x3f/0x310
-nested_vmx_store_msr+0x12c/0x360
-prepare_vmcs12+0x5f2/0xd90
-nested_vmx_vmexit+0x663/0x17e0
-vmx_check_nested_events+0xfd8/0x1c60
-kvm_arch_vcpu_runnable+0xda/0x6c0
-kvm_vcpu_check_block+0x63/0x250
-kvm_vcpu_block+0x3b7/0xaf0
-[...]
-
-The bug doesn't seem to be easily reproducible, but looking at the code this
-should also be applicable for the upstream 6.0, 5.15, 5.10, 5.4, 4.19 and 4.14
-branches, which have not received a backport of 26844fe.
-
-Do you think this is all we should do? My conclusion from the LWN article was,
-that we should avoid the set_current_state -> conditional -> schedule pattern
-when possible as well.
+It's not strictly needed, but I think it's worth keeping.  The duplicate checking
+annoys me too, and I considered removing it multiple times when creating this
+series.  But, if there is a hardware incompatibility for whatever reason, failing
+to load and thus not instantiating /dev/kvm is friendlier to userspace, e.g.
+userspace can immediately flag the platform as potentially flaky, whereas
+detecting the likely hardware issue when VM creation fails would essentialy require
+scraping the kernel logs.
