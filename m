@@ -2,63 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BEDF640E5B
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 20:22:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 557CB640E5E
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 20:23:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234329AbiLBTWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 14:22:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47264 "EHLO
+        id S234435AbiLBTXS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 14:23:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234777AbiLBTVv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 14:21:51 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1FD5EF8AA
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 11:21:50 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id n3so1516211pfq.10
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 11:21:50 -0800 (PST)
+        with ESMTP id S234039AbiLBTXR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 14:23:17 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B297E11A2
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 11:23:16 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id x13-20020a17090a46cd00b00218f611b6e9so6020058pjg.1
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 11:23:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XmGr6IMGfo2tMfDpCqJrMiDrr3EvSVygSViq3ogxpYI=;
-        b=Yu90jyYBWPrF58JWX0HHlWqJThjCHQu20npkNI0DigSvcJI2PWbNBGIKbCBuME7NdH
-         b6U0QZCURXdmJhHlECGXdeVmkUapasCqblZfrK4k0/nXbSnyOHUWZZypD4pEPMGDVLzo
-         PxNZEF3ifgH611Atm+5EYQmxKmrJrF1A0DNXDBou4H8jtGjsulq6SyibBTtABuUiG5Cq
-         g1Qt7gEZL0poIEUQKkQjRbK0oqi0e5Bfbx51ELNHyDQxobuYOXrN++nR1ZwgHT3EEn5r
-         JV3MTrhMKQHDxxZOBCZSQJ1K/mvMrEeIWVCtcYjv1USN/JY6Di5YkryZdWDLDzV+jjzw
-         e+iA==
+        bh=DRtF/uYiJ/kcxCwlPoNOeHMIq7w92wCouUM7CJCyU/o=;
+        b=NCvJmBPLvyaAE2ksHvId3GwYS5DhVdKP/yu0Orst532MhP8ZbImrJNJBEdH9hcgoYQ
+         pIRjLrLeKetxbCbbS6JmWleH/xD9QiqnKAjIlaEIrC9MLHE7Qa3VgGo5ZLidOLNcbYFw
+         g0RmqQFbKtsRe+W2vQqSIBZjcbxIM8nQ/UwIh6in5oY/mPa+xXP7l4kuUDmjCmr8/d9S
+         ha7ZS/5MBQ6edT3YcUPceCrMTA/N4xC4USaj/fmL+OuTb6WIc1DuaYI1psM0esnzb0+F
+         I6QC3VFt8hPuqc+k/EW8EmBn8yPPNr5fm6kggMU4myebUNH9aVyfrno+ZNwJD5yJkhRw
+         kZHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XmGr6IMGfo2tMfDpCqJrMiDrr3EvSVygSViq3ogxpYI=;
-        b=xfuGQ3cppY5HRF9Qz8vrUejJshvSdtwp0w/3PvOa7XXD98WrmlBHW/zLFrOMW7C3Qo
-         PO1TkB3TcCG9uAx57tu9Kr87KV2Kqjm+ellrmj8xln680OYwraJITj/i+QTE+1llBTmf
-         rlDE8oWPJFnuLFKPx0eRrmdnXvbkBnjZLrIUOrPTITQTA8/vUteLZ2mjkyzV68rhQShD
-         qTZEyWNPEBT/9W9CRoaSovZc1EeoS3rgr3XL4T0A1SGBnWMDul5qXrG3pMcxaB0wUVXE
-         QSq8X0y1CuxPLg9jyhGupKK/UVV6N5+xXUFdflveWluHMmcHA7g9ibYPHOIFPeHQKHY1
-         ratA==
-X-Gm-Message-State: ANoB5pmpsu+kP97uw0Ay9AMJOwTxxn3ua+w/DeeV3BrxlZYr1iSjRVGu
-        neIHgJPcmLzzwX6hKl1HYCtJ5g==
-X-Google-Smtp-Source: AA0mqf6xcJMEfBB5YbMEy5Eqxv+P3sit8edMqNYtGIiqPUN61aN3+A5Qg8fLH+EPFOfPvinlxqIGDw==
-X-Received: by 2002:a63:f241:0:b0:46f:da0:f093 with SMTP id d1-20020a63f241000000b0046f0da0f093mr46647516pgk.441.1670008910077;
-        Fri, 02 Dec 2022 11:21:50 -0800 (PST)
+        bh=DRtF/uYiJ/kcxCwlPoNOeHMIq7w92wCouUM7CJCyU/o=;
+        b=hzWlQDLEMqnWXKl6vEk+D4LqODt47yfZ36fbCECIssJ5Leg0/Dv/Z53ZJI/uRoiDS1
+         K8A2ga+7sZgMl4g2rivc5l8pXkGQYxu5m4JJrDtztfVk4Yu+5YvwE+MTN5d6D2qVhul8
+         OS7NDk6bapF/9EqlPg/YwA4NkfM/1a60VFIPetVND49U3nHt++PKpKwphARNxw+r8gGv
+         pI+H85NxSs/RRJluEs6j3qvoMnfQ8faY3i3QmKzFQZr8Jm9XrunaSssDugVz0UhQP1pf
+         GKhN1PSO1pjt01bhZqya8DKLibb3PXiVNd2s2qS1Jpsps2VJFcOvLG1lzhKlQGBeqnuH
+         lMBg==
+X-Gm-Message-State: ANoB5pnWyoIlrpFD8wy267F5rmMIWOnEF4aw4dyvwKOxGySGkfjnr+cu
+        zxtOcp9oZDO2lBIT9n0RpmFgOQ==
+X-Google-Smtp-Source: AA0mqf7memne5cid1mg7iribYwmyia8hyhFD47wJWq3+hlbUbIdJre/KwBJhzsGjsxRp3ERZNmxmng==
+X-Received: by 2002:a17:902:e54f:b0:189:6a7f:3046 with SMTP id n15-20020a170902e54f00b001896a7f3046mr37023479plf.88.1670008995855;
+        Fri, 02 Dec 2022 11:23:15 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id c5-20020a170903234500b0017f48a9e2d6sm5946847plh.292.2022.12.02.11.21.49
+        by smtp.gmail.com with ESMTPSA id a9-20020a170902ecc900b0017f7628cbddsm6015757plh.30.2022.12.02.11.23.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Dec 2022 11:21:49 -0800 (PST)
-Date:   Fri, 2 Dec 2022 19:21:46 +0000
+        Fri, 02 Dec 2022 11:23:15 -0800 (PST)
+Date:   Fri, 2 Dec 2022 19:23:12 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: [PATCH v2 0/2] KVM: nVMX: Add IBPB between L2 and L1 to
-Message-ID: <Y4pQSnFOQSoB80K1@google.com>
-References: <20221019213620.1953281-1-jmattson@google.com>
+To:     Hao Peng <flyingpenghao@gmail.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        inux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] KVM: x86: Keep the lock order consistent
+Message-ID: <Y4pQoHRWfxGsdOQd@google.com>
+References: <CAPm50a++Cb=QfnjMZ2EnCj-Sb9Y4UM-=uOEtHAcjnNLCAAf-dQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221019213620.1953281-1-jmattson@google.com>
+In-Reply-To: <CAPm50a++Cb=QfnjMZ2EnCj-Sb9Y4UM-=uOEtHAcjnNLCAAf-dQ@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -70,30 +71,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 19, 2022, Jim Mattson wrote:
-> Since L1 and L2 share branch prediction modes (guest {kernel,user}), the
-> hardware will not protect indirect branches in L1 from steering by a
-> malicious agent in L2. However, IBRS guarantees this protection. (For
-> basic IBRS, a value of 1 must be written to IA32_SPEC_CTRL.IBRS after
-> the transition  from L2 to L1.)
+On Tue, Nov 08, 2022, Hao Peng wrote:
+> From: Peng Hao <flyingpeng@tencent.com>
 > 
-> Fix the regression introduced in commit 5c911beff20a ("KVM: nVMX: Skip
-> IBPB when switching between vmcs01 and vmcs02") by issuing an IBPB when
-> emulating a VM-exit from L2 to L1.
+> Acquire SRCU before taking the gpc spinlock in wait_pending_event() so as
+> to be consistent with all other functions that acquire both locks.  It's
+> not illegal to acquire SRCU inside a spinlock, nor is there deadlock
+> potential, but in general it's preferable to order locks from least
+> restrictive to most restrictive, e.g. if wait_pending_event() needed to
+> sleep for whatever reason, it could do so while holding SRCU, but would
+> need to drop the spinlock.
 > 
-> This is CVE-2022-2196.
+> Thanks Sean Christopherson for the comment.
 > 
-> v2: Reworded some comments [Sean].
-> 
-> Jim Mattson (2):
->   KVM: VMX: Guest usage of IA32_SPEC_CTRL is likely
->   KVM: VMX: Execute IBPB on emulated VM-exit when guest has IBRS
-> 
->  arch/x86/kvm/vmx/nested.c | 11 +++++++++++
->  arch/x86/kvm/vmx/vmx.c    | 10 ++++++----
->  2 files changed, 17 insertions(+), 4 deletions(-)
-> 
-> -- 
+> Signed-off-by: Peng Hao <flyingpeng@tencent.com>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> ---
 
 Merged to kvm/queue, thanks!
 
