@@ -2,84 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 136BE64085F
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 15:27:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00529640881
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 15:33:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232745AbiLBO11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 09:27:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55356 "EHLO
+        id S233552AbiLBOd2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 09:33:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiLBO10 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 09:27:26 -0500
+        with ESMTP id S233430AbiLBOdR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 09:33:17 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72943CFE6E
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 06:26:30 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAF64DCBDB
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 06:32:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669991189;
+        s=mimecast20190719; t=1669991534;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ktJw7/THvKJQoer2k/gtmvKNVq80OfR1EB/ZswF3ibA=;
-        b=gxBameohcwia10bznSdzsiScaQTwB67T35sfORRDIFw3FQVIiitiAr8iN+GuOxBOUuVWkM
-        8DTNdcm13iDPEqcqlyqtGHnEN1FCurUl5k7R3Y3xwm7jzDsBsrY+FACf0q+B/u07nl5T3y
-        kxyHmHZcPxvtxBEcEwK+guQkWygAFfo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=koItVlGu+1a/7vo9JIQM0stiBr7/5n7yzQpCFYzOrVs=;
+        b=O+zebGU42mOh9C0AIEgRYzzxwJ2eOz+cYOFvg2ji7mvSF/KuxpUnR0jtSA3aXgfB+kVdLc
+        pIyP6DoRW97XDgIZ52hTIrbN0Y7ez6KXMSZgyRLuZAjjVrDmcT+w+q7ycUW5W/3P7ashqe
+        8DETltFU4m8BrQ3ByArY/Cm/WluD5sQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-400-WnX5blDsOr6rLw9D8dAIiw-1; Fri, 02 Dec 2022 09:26:25 -0500
-X-MC-Unique: WnX5blDsOr6rLw9D8dAIiw-1
-Received: by mail-wm1-f71.google.com with SMTP id h9-20020a1c2109000000b003cfd37aec58so2586914wmh.1
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 06:26:25 -0800 (PST)
+ us-mta-640-_JALDLo-Mly5Gvx8rZbloA-1; Fri, 02 Dec 2022 09:32:13 -0500
+X-MC-Unique: _JALDLo-Mly5Gvx8rZbloA-1
+Received: by mail-wr1-f70.google.com with SMTP id d4-20020adfa404000000b002421ca8cb07so1116780wra.2
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 06:32:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ktJw7/THvKJQoer2k/gtmvKNVq80OfR1EB/ZswF3ibA=;
-        b=nH1KeZ6KGII5y3SbBuFw87a5E2FfusZAwY2jVsdCLTNsES9g274gifE47KOM29JqpA
-         f5bPSdpqFpqwQxLyZyiP+PSkic/YMnXWO4ocAKIu74H2CDKZhP8tmYxOgMLLHO6L62Wz
-         J2QjnHx+YtTQNiVDtXJ5jEylmuwqHbhiyxv6Rw8yrNMzhfgza6S9UsWHUuzVF3wMwO+c
-         vFWmzlrpI8tODvMh+8gSkqo7UKtjU5MaC00XpFkjWr9d3G5nUzWBFrA47vok3Y3oeLIF
-         DU2Vr4jn2+tmH50NXB+P9Cq9+devOLUnvLog8OXZShzW0nukpCouDLCV2WEZqZ9OsesT
-         Ek3w==
-X-Gm-Message-State: ANoB5pkpmO6M77s9Hde13203RRCubRrYmAEoDI930601QxSgBPKz5ITH
-        PFEEQJ088XsKbXuaZWrA+jCU2R2PxwXCkHuMpsi/OtvC8HSYfaH3yvn5Y5Z5/6lzBXnEAjzSCj0
-        OAqYDRGD0pDxq
-X-Received: by 2002:a5d:44c9:0:b0:242:ac5:e5e6 with SMTP id z9-20020a5d44c9000000b002420ac5e5e6mr19110881wrr.127.1669991184688;
-        Fri, 02 Dec 2022 06:26:24 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf74xCjHk/8jPmEDg28xhITzDYfDfF6+mdxAi0ScwpscCS6wYsH4t8jqx+tup07nZhB63CHYJg==
-X-Received: by 2002:a5d:44c9:0:b0:242:ac5:e5e6 with SMTP id z9-20020a5d44c9000000b002420ac5e5e6mr19110859wrr.127.1669991184430;
-        Fri, 02 Dec 2022 06:26:24 -0800 (PST)
-Received: from [192.168.0.5] (ip-109-43-178-86.web.vodafone.de. [109.43.178.86])
-        by smtp.gmail.com with ESMTPSA id q1-20020a05600000c100b002422fddcc94sm6545678wrx.96.2022.12.02.06.26.22
+        bh=koItVlGu+1a/7vo9JIQM0stiBr7/5n7yzQpCFYzOrVs=;
+        b=r34Qd4TD3Qp3BhIiMW5lWoOcoaGL0Q5dXD7wTKvLnz+T++eh382ROg2J78hAe2xuPL
+         WS75I7e7gOh2yoBwetM9zLEC13LOQrCXX8JmWMrsPCRGswQZm3vvyyeaqKPI3cWhcV9I
+         yddMLxtwdsK2uDs5mTCsOgEV0E3NcOYQIRezVubqIl89z4un/MI/Sky1/EZGzGtFe47a
+         MXT4bZKF/mmY5/iyu6323ufP8YXGGBCiWus8TnIyxif+JYl9nDGpGJ3hqYb9o1SgVO3L
+         KFZ3UF6F8y3cqdJsoO82lGIEQ1jrnBn1E4OE6xd/Ehe7g3ONUb7eDtRt8R7mg6dUdbl5
+         kfEg==
+X-Gm-Message-State: ANoB5pnX8/z1FJ5Nzjk21xW7IfAFyugfc+kSlbOSuc8/eQEozMPVzWvY
+        oXWdTodRLSgJtrIxyfwG0hUdfHp/qyPK/6oZ1E38782/wRGYujO091Y/OXj7aBc9fYCtOQrPbel
+        AzeSoYLY3R55p
+X-Received: by 2002:a5d:42c3:0:b0:242:32d7:85f6 with SMTP id t3-20020a5d42c3000000b0024232d785f6mr6165953wrr.645.1669991531930;
+        Fri, 02 Dec 2022 06:32:11 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5XdZB7BSSc6lg2fXLp8fzZOhjZSrFh3hrAlxoU7gYMrUbcfzV8a/07FDJrMVpugQI92fK1Cw==
+X-Received: by 2002:a5d:42c3:0:b0:242:32d7:85f6 with SMTP id t3-20020a5d42c3000000b0024232d785f6mr6165941wrr.645.1669991531751;
+        Fri, 02 Dec 2022 06:32:11 -0800 (PST)
+Received: from [192.168.149.123] (58.254.164.109.static.wline.lns.sme.cust.swisscom.ch. [109.164.254.58])
+        by smtp.gmail.com with ESMTPSA id r10-20020a05600c458a00b003cfd4a50d5asm14245431wmo.34.2022.12.02.06.32.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Dec 2022 06:26:23 -0800 (PST)
-Message-ID: <2c65f234-688a-796b-b451-e1661b2c07a4@redhat.com>
-Date:   Fri, 2 Dec 2022 15:26:21 +0100
+        Fri, 02 Dec 2022 06:32:11 -0800 (PST)
+Message-ID: <047d6a47-8c7b-0936-95ab-478afb61c21f@redhat.com>
+Date:   Fri, 2 Dec 2022 15:32:10 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
+ Thunderbird/91.2.0
+Subject: Re: [PATCH v3 2/3] KVM: keep track of running ioctls
 Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
-        david@redhat.com
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, cohuck@redhat.com, mst@redhat.com,
-        pbonzini@redhat.com, kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
-        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
-References: <20221129174206.84882-1-pmorel@linux.ibm.com>
- <20221129174206.84882-7-pmorel@linux.ibm.com>
- <fcedb98d-4333-9100-5366-8848727528f3@redhat.com>
- <ea965d1c-ab6a-5aa3-8ce3-65b8177f6320@linux.ibm.com>
- <37a20bee-a3fb-c421-b89d-c1760e77cb11@redhat.com>
- <59669e8e-6242-9c01-4c2e-5d70b9c31b2b@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v12 6/7] s390x/cpu_topology: activating CPU topology
-In-Reply-To: <59669e8e-6242-9c01-4c2e-5d70b9c31b2b@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To:     Robert Hoo <robert.hu@linux.intel.com>, qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Yanan Wang <wangyanan55@huawei.com>, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>
+References: <20221111154758.1372674-1-eesposit@redhat.com>
+ <20221111154758.1372674-3-eesposit@redhat.com>
+ <c7971c8ad3b4683e2b3036dd7524af1cb42e50e1.camel@linux.intel.com>
+ <22042ca5-9786-ca2b-3e3d-6443a744c5a9@redhat.com>
+ <0022a85f16c1f1dc14decdc71f58af492b45b50d.camel@linux.intel.com>
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+In-Reply-To: <0022a85f16c1f1dc14decdc71f58af492b45b50d.camel@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
@@ -90,103 +89,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/12/2022 15.08, Pierre Morel wrote:
-> 
-> 
-> On 12/2/22 10:05, Thomas Huth wrote:
->> On 01/12/2022 12.52, Pierre Morel wrote:
+
+
+Am 02/12/2022 um 14:32 schrieb Robert Hoo:
+> On Fri, 2022-12-02 at 13:03 +0100, Emanuele Giuseppe Esposito wrote:
+> ...
+>>>> @@ -3032,7 +3035,9 @@ int kvm_vcpu_ioctl(CPUState *cpu, int type,
+>>>> ...)
+>>>>      va_end(ap);
+>>>>  
+>>>>      trace_kvm_vcpu_ioctl(cpu->cpu_index, type, arg);
+>>>> +    accel_cpu_ioctl_begin(cpu);
 >>>
->>>
->>> On 12/1/22 11:15, Thomas Huth wrote:
->>>> On 29/11/2022 18.42, Pierre Morel wrote:
->>>>> The KVM capability, KVM_CAP_S390_CPU_TOPOLOGY is used to
->>>>> activate the S390_FEAT_CONFIGURATION_TOPOLOGY feature and
->>>>> the topology facility for the guest in the case the topology
->>>>> is available in QEMU and in KVM.
->>>>>
->>>>> The feature is fenced for SE (secure execution).
->>>>
->>>> Out of curiosity: Why does it not work yet?
->>>>
->>>>> To allow smooth migration with old QEMU the feature is disabled by
->>>>> default using the CPU flag -disable-topology.
->>>>
->>>> I stared at this code for a while now, but I have to admit that I don't 
->>>> quite get it. Why do we need a new "disable" feature flag here? I think 
->>>> it is pretty much impossible to set "ctop=on" with an older version of 
->>>> QEMU, since it would require the QEMU to enable 
->>>> KVM_CAP_S390_CPU_TOPOLOGY in the kernel for this feature bit - and older 
->>>> versions of QEMU don't set this capability yet.
->>>>
->>>> Which scenario would fail without this disable-topology feature bit? 
->>>> What do I miss?
->>>
->>> The only scenario it provides is that ctop is then disabled by default on 
->>> newer QEMU allowing migration between old and new QEMU for older machine 
->>> without changing the CPU flags.
->>>
->>> Otherwise, we would need -ctop=off on newer QEMU to disable the topology.
+>>> Does this mean that kvm_region_commit() can inhibit any other vcpus
+>>> doing any ioctls?
 >>
->> Ah, it's because you added S390_FEAT_CONFIGURATION_TOPOLOGY to the default 
->> feature set here:
+>> Yes, because we must prevent any vcpu from reading memslots while we
+>> are
+>> updating them.
 >>
->>   static uint16_t default_GEN10_GA1[] = {
->>       S390_FEAT_EDAT,
->>       S390_FEAT_GROUP_MSA_EXT_2,
->> +    S390_FEAT_DISABLE_CPU_TOPOLOGY,
->> +    S390_FEAT_CONFIGURATION_TOPOLOGY,
->>   };
->>
->> ?
->>
->> But what sense does it make to enable it by default, just to disable it by 
->> default again with the S390_FEAT_DISABLE_CPU_TOPOLOGY feature? ... sorry, 
->> I still don't quite get it, but maybe it's because my sinuses are quite 
->> clogged due to a bad cold ... so if you could elaborate again, that would 
->> be very appreciated!
->>
->> However, looking at this from a distance, I would not rather not add this 
->> to any default older CPU model at all (since it also depends on the kernel 
->> to have this feature enabled)? Enabling it in the host model is still ok, 
->> since the host model is not migration safe anyway.
->>
->>   Thomas
->>
+> But do most other vm/vcpu ioctls contend with memslot operations?
 > 
-> I think I did not understand what is exactly the request that was made about 
-> having a CPU flag to disable the topology when we decide to not have a new 
-> machine with new machine property.
-> 
-> Let see what we have if the only change to mainline is to activate 
-> S390_FEAT_CONFIGURATION_TOPOLOGY with the KVM capability:
-> 
-> In mainline, ctop is enabled in the full GEN10 only.
-> 
-> Consequently we have this feature activated by default for the host model 
-> only and deactivated by default if we specify the CPU.
-> It can be activated if we specify the CPU with the flag ctop=on.
-> 
-> This is what was in the patch series before the beginning of the discussion 
-> about having a new machine property for new machines.
 
-Sorry for all the mess ... I'm also not an expert when it comes to CPU model 
-features paired with compatibility and migration, and I'm still in progress 
-of learning ...
-
-> If this what we want: activating the topology by the CPU flag ctop=on it is 
-> perfect for me and I can take the original patch.
-> We may later make it a default for new machines.
-
-Given my current understanding, I think it's the best thing to do right now. 
-Not enable it by default, except for the host model where the enablement is 
-fine since migration is not supported any.
-
-As you said, we could still decide later to change the default for new 
-machines. Though, I recently learnt that features should also not be enable 
-by default at all if they depend on the environment, like a Linux kernel 
-that needs to have support for the feature. So maybe we should keep it off 
-by default forever - or just enable it on new CPU models (>=z17?) that would 
-require a new host kernel anyway.
-
-  Thomas
+I think this is the simplest way. I agree not all ioctls contend with
+memslot operations, but there are also not so many memslot operations
+too. Instead of going one by one in all possible ioctls, covering all of
+them is the simplest way and it covers also the case of a new ioctl
+reading memslots that could be added in the future (alternatively we
+would be always updating the list of ioctls to block).
 
