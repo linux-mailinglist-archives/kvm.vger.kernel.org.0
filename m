@@ -2,402 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5ACB76400BA
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 07:56:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97AEE640179
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 09:02:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232453AbiLBG4U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 01:56:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44770 "EHLO
+        id S232482AbiLBIC0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 03:02:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232185AbiLBG4T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 01:56:19 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39E5ABC59B
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 22:56:18 -0800 (PST)
+        with ESMTP id S231637AbiLBICY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 03:02:24 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 800016B3A1;
+        Fri,  2 Dec 2022 00:02:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669964178; x=1701500178;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=LInJB99w88b96dJGMSGwn5B+NNIUcRwF7aAeFsKchhI=;
-  b=Pyd0JMJ2Ye1JCDtGmbWRMDnZZIBaQ0LwqffbMpJlq1U7TsUeCjFEk7S5
-   XHNwx6CHDeyKZo63LAwihe2ETAQhTINsn9/qDv40e+2GamUt+CJL5wTex
-   I8seAesAE12mL4gB+abmOooNLHkFUjZyJ1MSZySC5QFRJ6FJCNcjaUmkU
-   dYUj/DO33DXIrnHd4AFAaE9jP6nv3kreyf/PKF+hNUYRbvo770Wct0++g
-   ywDiwxaDbFXZZzZZJNaBETau9+rFx+t72DQM/lQmz9iAHiCtORPf0tsEj
-   zh26r4lRuiwZl7LYY61ItLEKQMJ18Qwl1b75/Nwk/rhiJCW2HPG7SUlb8
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="295584316"
+  t=1669968143; x=1701504143;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=3u2qa+K5LwgLmrP2NXT4ZlvDi8zcqYjGUVfvrsyKUvQ=;
+  b=XhAyUWg9kSLEV99XXu9fxkf8oOSdWmBtv3vbPwt7fLuxxyZfE+ggmWM9
+   wCCK7gtQytjpIUEAlJgQUxFU469phq8cjYRyzJhPMjXqYSiQp9gFTj0ia
+   WbycvDVbtYWc0Z/8HY6GhzK/v+CWfFFERlmXIKPYPndnUs01KOZYg/blC
+   azAozzz7HZhm7R8lqjvIodO0ATLdnji/H4HEDvUwIf5ibK/4Ny8ez9X6x
+   XLR8HqpJ4d3UOgNIU2K/0A137Ka9c8TButVIvk5mWpOGDKo17IH/42M7q
+   zCddKZwocqrmaQbLzAwWns1xOJjAAz6b/LZodiUlzlbrRQ3fMFSEMipr1
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="317043482"
 X-IronPort-AV: E=Sophos;i="5.96,210,1665471600"; 
-   d="scan'208";a="295584316"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2022 22:56:17 -0800
+   d="scan'208";a="317043482"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2022 00:02:22 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="769512336"
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="644944361"
 X-IronPort-AV: E=Sophos;i="5.96,210,1665471600"; 
-   d="scan'208";a="769512336"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by orsmga004.jf.intel.com with ESMTP; 01 Dec 2022 22:56:15 -0800
-Message-ID: <f83c4b94a285dd8b6a9aac6294f3037129d34df5.camel@linux.intel.com>
-Subject: Re: [PATCH v3 1/3] accel: introduce accelerator blocker API
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        Yanan Wang <wangyanan55@huawei.com>, kvm@vger.kernel.org
-Date:   Fri, 02 Dec 2022 14:56:14 +0800
-In-Reply-To: <20221111154758.1372674-2-eesposit@redhat.com>
-References: <20221111154758.1372674-1-eesposit@redhat.com>
-         <20221111154758.1372674-2-eesposit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+   d="scan'208";a="644944361"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga002.jf.intel.com with ESMTP; 02 Dec 2022 00:02:22 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Fri, 2 Dec 2022 00:02:21 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Fri, 2 Dec 2022 00:02:21 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Fri, 2 Dec 2022 00:02:21 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WzQl5CWDZa8m6h+Vkt3R3wLFqCLiutyWIX/+qnRGXXbPVItfCdoltudzASRQS5nLU7/x30aOz8pe4wS9P2oDdPReUVSCE9nRm05FxI3ktZHojOLvLFaKk130TRhzYUtKhLIQRfmRKS6xO+++jeCnNvd/+jEpqYJ5pzf/7ToMd/ipfLnW04mOmHnlW0+byZ7IoPGoxfh1DDlVGjas57doqhePDhVRa7/o5gpitK9SMorjKZ4G/gyEf5oiEWvJg2OR2brfCCR/mw2nlaf8gSP3cafi+Ai4GFZH4gcUkDucNjARIbEiKx3MsJfYu36JspJoWGIINtMX8+wGToEQyCq+Jw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Y0JkCnL5yuhNfcpLiZP+8v2mEy/roPie5pXq2WAmow8=;
+ b=XKuvNJhZUnWc1lm3GJ3lTqfLTA9ctlw1E3URpisHMzN7GiyxEGkOmV00VHaXDN6xzmvV3V1otHoEbUfrVR5AL3ttYdocxElDdZDub8A/DA0nYZKG7Q2Fs3HR1A4c/AMErFWtWXXhuFWHmRmKwthzAFa4XeZqx8WpVgLW+5DaIzzYggTHv45RX1ygbqf7eYiiwvShLUusqaf8aqZyTRRenlbMdPQyKTxxKUJajjCmZpPO0ETFYNTQTuzTbMSxK4RMXElTOxYtN4o7WNSGLxAT4ZQHChT8LKzck18yCSBH5dYXUnXgfoVdM/797itHaIBxc9S28toTKhQbMvbd14mGaQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MWHPR1101MB2221.namprd11.prod.outlook.com
+ (2603:10b6:301:53::18) by DS7PR11MB6200.namprd11.prod.outlook.com
+ (2603:10b6:8:98::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Fri, 2 Dec
+ 2022 08:02:18 +0000
+Received: from MWHPR1101MB2221.namprd11.prod.outlook.com
+ ([fe80::5cf5:bbad:8442:f2b4]) by MWHPR1101MB2221.namprd11.prod.outlook.com
+ ([fe80::5cf5:bbad:8442:f2b4%2]) with mapi id 15.20.5880.008; Fri, 2 Dec 2022
+ 08:02:17 +0000
+Date:   Fri, 2 Dec 2022 16:02:08 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        "Huacai Chen" <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        "Paul Walmsley" <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Paul Durrant <paul@xen.org>,
+        "James Morse" <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Atish Patra <atishp@atishpatra.org>,
+        "David Hildenbrand" <david@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+        <kvmarm@lists.cs.columbia.edu>, <linux-mips@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <kvm-riscv@lists.infradead.org>,
+        <linux-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Yuan Yao <yuan.yao@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Kai Huang <kai.huang@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH v2 00/50] KVM: Rework kvm_init() and hardware enabling
+Message-ID: <Y4mxACzVOsJpiIow@gao-cwp>
+References: <20221130230934.1014142-1-seanjc@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
+X-ClientProxiedBy: SG2PR01CA0117.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:40::21) To MWHPR1101MB2221.namprd11.prod.outlook.com
+ (2603:10b6:301:53::18)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWHPR1101MB2221:EE_|DS7PR11MB6200:EE_
+X-MS-Office365-Filtering-Correlation-Id: c20b277e-aa52-4a09-4a90-08dad43b87ce
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5xmtXBOmYTCqEx9bsI8AUQs3eNgQ2GZUAVGu6LRKAX0xc1Qj44QoJBoklyfveJQWZKj5xz23rpesJfsZmfreis+UDof52Cc8DJ8N2nXruTl/oEgLMOkQ9GvXldP3jGXqTXNn7lb4vie/pWcjTrdNVq8mDRxTgCKo1t7zAW+kLInY7yfUXnGHl7LFadVIUJTL1qKgwWFF8bAm84/o3L5BzSctXvwjvVTiDedcjHmZ6wntvmJxI/VsjdJNMhIxiaDNyPoiOHQwAANXEuwK+7DX8MkQb6bLm9oDZayakNSbo6Ib645KZI9VmUF+7HiARmc0G6ea/DNwoLPXAsvf/AA/cWbB3KkEU9QMt7u2+yAaILLrUJbdYgvdrQRqPdk+dGQATaUfQzDR2E6yf3VEC7Arvh8rWp/hH2Xw2C5w/BZWKyI7yg5iG12zK8vsiCO8h2OS2nPteAjJp3iRmW1wa9+V+/nQ8dhyT3Cw+tKkhI5Skc3cntYE9l49FF2QQG81R7yxy7W8c75xY3VEnzMarkofrybxZ0IHSngXbhFj15Q0UIdmmJn8vWC9MgultcpHz8GUgQfaPlQzxiZstGEcV4ouid9D9Au+uXeWMkScJ4R9BmG8gk8xPHJJwII45gzJpeGVp3snN8H5krdA5FXAej4byw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1101MB2221.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(7916004)(39860400002)(396003)(136003)(346002)(366004)(376002)(451199015)(44832011)(86362001)(83380400001)(6486002)(2906002)(4326008)(41300700001)(82960400001)(66476007)(7406005)(7416002)(4744005)(66946007)(54906003)(33716001)(9686003)(186003)(8936002)(5660300002)(6666004)(8676002)(6506007)(6512007)(478600001)(6916009)(26005)(66556008)(316002)(38100700002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4aTDGEDazO5skc343i07bjXay2Tuul8oazjDHUA1A/JfGWCFPMwYTQJ+JvgW?=
+ =?us-ascii?Q?hA8t8h+m51BPyIAT3S1iMiCiN3CkdparD209+/1oh5Qq2KauTTmiZpomrAxH?=
+ =?us-ascii?Q?hEduUzhEJG/DRdCXVvyVbahMqWHPhkOxbnFZjtBIR/ctVRY+se7GdJHDQBG6?=
+ =?us-ascii?Q?62tvTS6Q1WCvLc9fy+UpRtYRgRbbH/eZdiVsjsrPc03DmQO/bdY50vG1EYGo?=
+ =?us-ascii?Q?YZIQd6tZOO1vS1JFWucDGAiHLwFd3Jdbc/6MgjogvBin+pa0nYpEJJBvmTwK?=
+ =?us-ascii?Q?h6rMyI92Ljbda+u6sfox2MVgMDE7v6mWcAipzy9zDYlaSlUNsW1b1wgKzbjU?=
+ =?us-ascii?Q?aUOgbFoEOL2t9X5sTcImVDKSXY64pQWUyU+4aeWbT+FNwgz/p2YO1bZoq3qJ?=
+ =?us-ascii?Q?l2g7Rt98Gw/w3qBQpbSrThMvz0kQR856z8kshu8mse3jTAqiZ15zGSuO1SNY?=
+ =?us-ascii?Q?VNqpK/qAskNcGg2d6E6BuvMGlYp423n/LwmFNBwu4VnccRI2KbvEr3Ds+oCn?=
+ =?us-ascii?Q?+LQ7or4TeLNRxiv9EXjEuKxz7f5SdDnKsY0eK5lVTH7Qh4+ygTeTAt+ZWvtb?=
+ =?us-ascii?Q?fpXwGhzo0+M1w0cPioY1YG4vjwlKrqMXzKEZQrOyS/up+VqaelbVf36XU74L?=
+ =?us-ascii?Q?AfPz9RUutwWk/XsMiDxwK7IBbkZ33a8NBkfcFuSheIYLV3q67noyHjFJlNtU?=
+ =?us-ascii?Q?/me04jpnXwys8nmswofJou/cOQH4xvlXP3Bh8xjTqVuxIQkMEj6ktM9Okd+7?=
+ =?us-ascii?Q?SSZVnLiZEn6nmFQKh6Xu7H38A8jIH7VcBkjDZYiA75/XcZ//04WJfpIlIVzu?=
+ =?us-ascii?Q?iNj07e32/oI9PvK1WIFO4QyRZKRSBfnLrNO2zHLFV+6qo50/ioCFX8RdYygQ?=
+ =?us-ascii?Q?7P/6V9kIW3vXL6CwbVwRWP0lYeJU8i0iuQvzsjHN+PF5MxBMTrsy3Jtcg/TT?=
+ =?us-ascii?Q?s1uu8g0YU2YYvNtVTyDO3/rfoxWjB22Qvb02Uvt+J3CqJ0VLfTdgQO2zGtEC?=
+ =?us-ascii?Q?UQmbSgzyDl2VIbUS3q9ObwzQazXqOcB164p2jjUWUtgiCrotBJTJTC0pXwqG?=
+ =?us-ascii?Q?Vd6Aje2H2bK/n6w2VnIlqo+oWWvyu2UGgPZ2j40E9fqA1RqTz1hnSrfeDqUK?=
+ =?us-ascii?Q?aWa8FxEVtyOiQZO2W8eMXhXBIAJszGSP1jhdvsHNKRZ+Unvg8hyqEBnpHsHZ?=
+ =?us-ascii?Q?TgLbstsfgZRYOvoXgPS/Y1wf2ph1r1HyfJYE3mXkatMQvDy76WnGZPUrV5K0?=
+ =?us-ascii?Q?5bnfTRBShZ04E51jCM+G5lj/URvVuXN1TGksN4NGbTv5mPXRPgumHCxYD940?=
+ =?us-ascii?Q?yF/+5iJSK5AVjnzaKSHTBAH9h3+U5Z3YJ5jn3Mn3826wUIh4Diy1j5ll/IKO?=
+ =?us-ascii?Q?qh+2Ug9aG8/UP0z9AKpuxOjU3CYkHed4eEl7VabyNqz8jxXLwzT7ScqyD9C0?=
+ =?us-ascii?Q?eMVgJpP2TGdHDDMg8AYAaGSypjORJy0Qbs0VdFW+Dkf/CJHrhCbETKeW8SKB?=
+ =?us-ascii?Q?HV915oWtsJCErpNao5m2FQKcUz6L3NnAdcbkkgHwmnzDQ8Rd+6ol5M7kkgWm?=
+ =?us-ascii?Q?4Xlh3HwhOS6Z8v4db9/2bXbn++y9SQqy99Pq4ory?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c20b277e-aa52-4a09-4a90-08dad43b87ce
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1101MB2221.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2022 08:02:17.5605
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +TB7Hg1KC+iwn+xMHCoWoyNmmlW0zsHSz+FUqqBX2lPsaFKz6NB6QLwHghDdpkwgEVyAvRm39dMj1iqc9ONgfA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6200
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-11-11 at 10:47 -0500, Emanuele Giuseppe Esposito wrote:
-> This API allows the accelerators to prevent vcpus from issuing
-> new ioctls while execting a critical section marked with the
-> accel_ioctl_inhibit_begin/end functions.
-> 
-> Note that all functions submitting ioctls must mark where the
-> ioctl is being called with accel_{cpu_}ioctl_begin/end().
-> 
-> This API requires the caller to always hold the BQL.
-> API documentation is in sysemu/accel-blocker.h
-> 
-> Internally, it uses a QemuLockCnt together with a per-CPU QemuLockCnt
-> (to minimize cache line bouncing) to keep avoid that new ioctls
-> run when the critical section starts, and a QemuEvent to wait
-> that all running ioctls finish.
-> 
-> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
-> ---
->  accel/accel-blocker.c          | 154
-> +++++++++++++++++++++++++++++++++
->  accel/meson.build              |   2 +-
->  hw/core/cpu-common.c           |   2 +
->  include/hw/core/cpu.h          |   3 +
->  include/sysemu/accel-blocker.h |  56 ++++++++++++
->  5 files changed, 216 insertions(+), 1 deletion(-)
->  create mode 100644 accel/accel-blocker.c
->  create mode 100644 include/sysemu/accel-blocker.h
-> 
-> diff --git a/accel/accel-blocker.c b/accel/accel-blocker.c
-> new file mode 100644
-> index 0000000000..1e7f423462
-> --- /dev/null
-> +++ b/accel/accel-blocker.c
-> @@ -0,0 +1,154 @@
-> +/*
-> + * Lock to inhibit accelerator ioctls
-> + *
-> + * Copyright (c) 2022 Red Hat Inc.
-> + *
-> + * Author: Emanuele Giuseppe Esposito       <eesposit@redhat.com>
-> + *
-> + * Permission is hereby granted, free of charge, to any person
-> obtaining a copy
-> + * of this software and associated documentation files (the
-> "Software"), to deal
-> + * in the Software without restriction, including without limitation
-> the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense,
-> and/or sell
-> + * copies of the Software, and to permit persons to whom the
-> Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be
-> included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-> EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-> MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
-> SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
-> OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-> ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-> DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/thread.h"
-> +#include "qemu/main-loop.h"
-> +#include "hw/core/cpu.h"
-> +#include "sysemu/accel-blocker.h"
-> +
-> +static QemuLockCnt accel_in_ioctl_lock;
-> +static QemuEvent accel_in_ioctl_event;
-> +
-> +void accel_blocker_init(void)
-> +{
-> +    qemu_lockcnt_init(&accel_in_ioctl_lock);
-> +    qemu_event_init(&accel_in_ioctl_event, false);
-> +}
-> +
-> +void accel_ioctl_begin(void)
-> +{
-> +    if (likely(qemu_mutex_iothread_locked())) {
-> +        return;
-> +    }
-> +
-> +    /* block if lock is taken in kvm_ioctl_inhibit_begin() */
-> +    qemu_lockcnt_inc(&accel_in_ioctl_lock);
-> +}
-> +
-> +void accel_ioctl_end(void)
-> +{
-> +    if (likely(qemu_mutex_iothread_locked())) {
-> +        return;
-> +    }
-> +
-> +    qemu_lockcnt_dec(&accel_in_ioctl_lock);
-> +    /* change event to SET. If event was BUSY, wake up all waiters
-> */
-> +    qemu_event_set(&accel_in_ioctl_event);
-> +}
-> +
-> +void accel_cpu_ioctl_begin(CPUState *cpu)
-> +{
-> +    if (unlikely(qemu_mutex_iothread_locked())) {
-> +        return;
-> +    }
-> +
-> +    /* block if lock is taken in kvm_ioctl_inhibit_begin() */
-> +    qemu_lockcnt_inc(&cpu->in_ioctl_lock);
-> +}
-> +
-> +void accel_cpu_ioctl_end(CPUState *cpu)
-> +{
-> +    if (unlikely(qemu_mutex_iothread_locked())) {
-> +        return;
-> +    }
-> +
-> +    qemu_lockcnt_dec(&cpu->in_ioctl_lock);
-> +    /* change event to SET. If event was BUSY, wake up all waiters
-> */
-> +    qemu_event_set(&accel_in_ioctl_event);
-> +}
-> +
-> +static bool accel_has_to_wait(void)
-> +{
-> +    CPUState *cpu;
-> +    bool needs_to_wait = false;
-> +
-> +    CPU_FOREACH(cpu) {
-> +        if (qemu_lockcnt_count(&cpu->in_ioctl_lock)) {
-> +            /* exit the ioctl, if vcpu is running it */
-> +            qemu_cpu_kick(cpu);
-> +            needs_to_wait = true;
-> +        }
-> +    }
-> +
-> +    return needs_to_wait ||
-> qemu_lockcnt_count(&accel_in_ioctl_lock);
-> +}
-> +
-> +void accel_ioctl_inhibit_begin(void)
-> +{
-> +    CPUState *cpu;
-> +
-> +    /*
-> +     * We allow to inhibit only when holding the BQL, so we can
-> identify
-> +     * when an inhibitor wants to issue an ioctl easily.
-> +     */
-> +    g_assert(qemu_mutex_iothread_locked());
-> +
-> +    /* Block further invocations of the ioctls outside the BQL.  */
-> +    CPU_FOREACH(cpu) {
-> +        qemu_lockcnt_lock(&cpu->in_ioctl_lock);
-> +    }
-> +    qemu_lockcnt_lock(&accel_in_ioctl_lock);
-> +
-> +    /* Keep waiting until there are running ioctls */
-> +    while (true) {
-> +
-> +        /* Reset event to FREE. */
-> +        qemu_event_reset(&accel_in_ioctl_event);
-> +
-> +        if (accel_has_to_wait()) {
-> +            /*
-> +             * If event is still FREE, and there are ioctls still in
-> progress,
-> +             * wait.
-> +             *
-> +             *  If an ioctl finishes before qemu_event_wait(), it
-> will change
-> +             * the event state to SET. This will prevent
-> qemu_event_wait() from
-> +             * blocking, but it's not a problem because if other
-> ioctls are
-> +             * still running the loop will iterate once more and
-> reset the event
-> +             * status to FREE so that it can wait properly.
-> +             *
-> +             * If an ioctls finishes while qemu_event_wait() is
-> blocking, then
-> +             * it will be waken up, but also here the while loop
-> makes sure
-> +             * to re-enter the wait if there are other running
-> ioctls.
-> +             */
-> +            qemu_event_wait(&accel_in_ioctl_event);
-> +        } else {
-> +            /* No ioctl is running */
-> +            return;
-> +        }
-> +    }
-> +}
-> +
-> +void accel_ioctl_inhibit_end(void)
-> +{
-> +    CPUState *cpu;
-> +
-> +    qemu_lockcnt_unlock(&accel_in_ioctl_lock);
-> +    CPU_FOREACH(cpu) {
-> +        qemu_lockcnt_unlock(&cpu->in_ioctl_lock);
-> +    }
-> +}
-> +
-> diff --git a/accel/meson.build b/accel/meson.build
-> index b9a963cf80..a0d49c4f31 100644
-> --- a/accel/meson.build
-> +++ b/accel/meson.build
-> @@ -1,4 +1,4 @@
-> -specific_ss.add(files('accel-common.c'))
-> +specific_ss.add(files('accel-common.c', 'accel-blocker.c'))
->  softmmu_ss.add(files('accel-softmmu.c'))
->  user_ss.add(files('accel-user.c'))
->  
-> diff --git a/hw/core/cpu-common.c b/hw/core/cpu-common.c
-> index f9fdd46b9d..8d6a4b1b65 100644
-> --- a/hw/core/cpu-common.c
-> +++ b/hw/core/cpu-common.c
-> @@ -237,6 +237,7 @@ static void cpu_common_initfn(Object *obj)
->      cpu->nr_threads = 1;
->  
->      qemu_mutex_init(&cpu->work_mutex);
-> +    qemu_lockcnt_init(&cpu->in_ioctl_lock);
->      QSIMPLEQ_INIT(&cpu->work_list);
->      QTAILQ_INIT(&cpu->breakpoints);
->      QTAILQ_INIT(&cpu->watchpoints);
-> @@ -248,6 +249,7 @@ static void cpu_common_finalize(Object *obj)
->  {
->      CPUState *cpu = CPU(obj);
->  
-> +    qemu_lockcnt_destroy(&cpu->in_ioctl_lock);
->      qemu_mutex_destroy(&cpu->work_mutex);
->  }
->  
-> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-> index f9b58773f7..15053663bc 100644
-> --- a/include/hw/core/cpu.h
-> +++ b/include/hw/core/cpu.h
-> @@ -397,6 +397,9 @@ struct CPUState {
->      uint32_t kvm_fetch_index;
->      uint64_t dirty_pages;
->  
-> +    /* Use by accel-block: CPU is executing an ioctl() */
-> +    QemuLockCnt in_ioctl_lock;
-> +
->      /* Used for events with 'vcpu' and *without* the 'disabled'
-> properties */
->      DECLARE_BITMAP(trace_dstate_delayed,
-> CPU_TRACE_DSTATE_MAX_EVENTS);
->      DECLARE_BITMAP(trace_dstate, CPU_TRACE_DSTATE_MAX_EVENTS);
-> diff --git a/include/sysemu/accel-blocker.h b/include/sysemu/accel-
-> blocker.h
-> new file mode 100644
-> index 0000000000..72020529ef
-> --- /dev/null
-> +++ b/include/sysemu/accel-blocker.h
-> @@ -0,0 +1,56 @@
-> +/*
-> + * Accelerator blocking API, to prevent new ioctls from starting and
-> wait the
-> + * running ones finish.
-> + * This mechanism differs from pause/resume_all_vcpus() in that it
-> does not
-> + * release the BQL.
-> + *
-> + *  Copyright (c) 2022 Red Hat Inc.
-> + *
-> + * Author: Emanuele Giuseppe Esposito       <eesposit@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2
-> or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +#ifndef ACCEL_BLOCKER_H
-> +#define ACCEL_BLOCKER_H
-> +
-> +#include "qemu/osdep.h"
-> +#include "sysemu/cpus.h"
-> +
-> +extern void accel_blocker_init(void);
-> +
-> +/*
-> + * accel_{cpu_}ioctl_begin/end:
-> + * Mark when ioctl is about to run or just finished.
-> + *
-> + * accel_{cpu_}ioctl_begin will block after
-> accel_ioctl_inhibit_begin() is
-> + * called, preventing new ioctls to run. They will continue only
-> after
-> + * accel_ioctl_inibith_end().
+On Wed, Nov 30, 2022 at 11:08:44PM +0000, Sean Christopherson wrote:
+>The main theme of this series is to kill off kvm_arch_init(),
+>kvm_arch_hardware_(un)setup(), and kvm_arch_check_processor_compat(), which
+>all originated in x86 code from way back when, and needlessly complicate
+>both common KVM code and architecture code.  E.g. many architectures don't
+>mark functions/data as __init/__ro_after_init purely because kvm_init()
+>isn't marked __init to support x86's separate vendor modules.
 
-Typo inibith --> inhibit
-
-> + */
-> +extern void accel_ioctl_begin(void);
-> +extern void accel_ioctl_end(void);
-> +extern void accel_cpu_ioctl_begin(CPUState *cpu);
-> +extern void accel_cpu_ioctl_end(CPUState *cpu);
-> +
-> +/*
-> + * accel_ioctl_inhibit_begin: start critical section
-> + *
-> + * This function makes sure that:
-> + * 1) incoming accel_{cpu_}ioctl_begin() calls block
-> + * 2) wait that all ioctls that were already running reach
-> + *    accel_{cpu_}ioctl_end(), kicking vcpus if necessary.
-> + *
-> + * This allows the caller to access shared data or perform
-> operations without
-> + * worrying of concurrent vcpus accesses.
-> + */
-> +extern void accel_ioctl_inhibit_begin(void);
-> +
-> +/*
-> + * accel_ioctl_inhibit_end: end critical section started by
-> + * accel_ioctl_inhibit_begin()
-> + *
-> + * This function allows blocked accel_{cpu_}ioctl_begin() to
-> continue.
-> + */
-> +extern void accel_ioctl_inhibit_end(void);
-> +
-
-git am complains ".git/rebase-apply/patch:170: new blank line at EOF."
-
-> +#endif /* ACCEL_BLOCKER_H */
-
+Applied this series and verified that an attempt to online incompatible
+CPUs (no VMX support) when some VMs are running will fail.
