@@ -2,99 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2464D64082F
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 15:08:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 40B4D640848
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 15:21:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233372AbiLBOI1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 09:08:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42314 "EHLO
+        id S233576AbiLBOVQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 09:21:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232784AbiLBOIZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 09:08:25 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 399CB9FEEA
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 06:08:24 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B2DgAxg021482;
-        Fri, 2 Dec 2022 14:08:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=oULq9ebBKI9JjP7FuumqR8cwsDgwubKsG6F3/MJ/a84=;
- b=ENfZsR0vKP7f0be9G9jxvlX5MWOR0WkjueQFommQSyYnNx/ZJj2jnIErrOza5f2pk4YU
- z4Mwkds1T0PONXADm1u88nB0v/+33G50zfJLT+E7pK1AEcCicuoT961ToSb8Qyod54ju
- a+hwa2FT8jucl0AB24B11uSctfWElRz6lwPABKHa9gihFkRD6BkcM2R2SGlTEi8nNMK2
- vhmWf94lN9Aq0+MtSD9IPasqdRMyU0vVR5TDH4nhAeN2Tc4Ja0Vu72RnX5UNLHFZHVLj
- ZsipFIM2EquoLmg/2aX7rSIOarSeTGtmaYs7SB99QTwfnuGfsAAq9ivC845T3aLTdAon zQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m7jfp8n5y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Dec 2022 14:08:15 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B2DuJIJ029855;
-        Fri, 2 Dec 2022 14:08:14 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m7jfp8n4x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Dec 2022 14:08:14 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B2E5umO023097;
-        Fri, 2 Dec 2022 14:08:11 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma02fra.de.ibm.com with ESMTP id 3m3ae96qsu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Dec 2022 14:08:11 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B2E88g26947546
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 2 Dec 2022 14:08:08 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A6F204C040;
-        Fri,  2 Dec 2022 14:08:08 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AACC14C046;
-        Fri,  2 Dec 2022 14:08:07 +0000 (GMT)
-Received: from [9.171.75.172] (unknown [9.171.75.172])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  2 Dec 2022 14:08:07 +0000 (GMT)
-Message-ID: <59669e8e-6242-9c01-4c2e-5d70b9c31b2b@linux.ibm.com>
-Date:   Fri, 2 Dec 2022 15:08:07 +0100
+        with ESMTP id S232745AbiLBOVP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 09:21:15 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC12E93828;
+        Fri,  2 Dec 2022 06:21:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=rX7SOjiuhddlh1KAl+MNvgomUzVHF7S30agNcSCE7Ss=; b=py/4OnOV4CAWntxUQio1Bg18BN
+        MfrvgwWl9XvBll9Srdp1mxzA/DEe6WAFme+VfFS+XkY8Uy9bcI0/OyxDxJnJII4l8LzKM0RAvK8i6
+        /zO1gdtHRI1u44i1YAY0Y29J5AolUNK3oRDT3qZeB4Jn8vU7WYA1ispNuth/Gt1F6QNpuI3kVVFyx
+        0ffqtqRoFoYzaO3SNFoRzu67YF4An/LlW7EKytJrcCns/2FJCxvYdjECu6XnB20g5XBnsBKZ3XkNR
+        u2kSLUlNNysilcp+9drgIy5ACqbwrGtHotjtOO43reMs23LyIvozyAlnXG9WoLo5uSpRqXhOvTKS1
+        BwCwHXSw==;
+Received: from 54-240-198-36.amazon.com ([54.240.198.36] helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p16uh-000EDO-01; Fri, 02 Dec 2022 14:21:15 +0000
+Message-ID: <ffc971cc6166528de7c33c30d190ece5eaee3dbf.camel@infradead.org>
+Subject: Re: [PATCH v2 05/16] KVM: x86: Remove unused argument in
+ gpc_unmap_khva()
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Michal Luczaj <mhal@rbox.co>, Like Xu <like.xu.linux@gmail.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Date:   Fri, 02 Dec 2022 06:21:04 -0800
+In-Reply-To: <6a984015-cacc-b8e9-d834-9d6827be5832@rbox.co>
+References: <20221013211234.1318131-1-seanjc@google.com>
+         <20221013211234.1318131-6-seanjc@google.com>
+         <544d854f-e980-c7bf-39e9-425202760cc5@gmail.com>
+         <6a984015-cacc-b8e9-d834-9d6827be5832@rbox.co>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-/nKiW8rdZIhmj3hszkIF"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v12 6/7] s390x/cpu_topology: activating CPU topology
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org,
-        david@redhat.com
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, cohuck@redhat.com, mst@redhat.com,
-        pbonzini@redhat.com, kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
-        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
-References: <20221129174206.84882-1-pmorel@linux.ibm.com>
- <20221129174206.84882-7-pmorel@linux.ibm.com>
- <fcedb98d-4333-9100-5366-8848727528f3@redhat.com>
- <ea965d1c-ab6a-5aa3-8ce3-65b8177f6320@linux.ibm.com>
- <37a20bee-a3fb-c421-b89d-c1760e77cb11@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <37a20bee-a3fb-c421-b89d-c1760e77cb11@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 7MzlxV-ajWJOEtbqxHtXpVGChPL_juug
-X-Proofpoint-GUID: R7A-AgtHI0ZCrUYPKVSg1gM2DrCKybf7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-02_06,2022-12-01_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
- bulkscore=0 adultscore=0 clxscore=1015 lowpriorityscore=0
- priorityscore=1501 mlxlogscore=999 mlxscore=0 phishscore=0 impostorscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2212020111
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -102,93 +56,148 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+--=-/nKiW8rdZIhmj3hszkIF
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/2/22 10:05, Thomas Huth wrote:
-> On 01/12/2022 12.52, Pierre Morel wrote:
->>
->>
->> On 12/1/22 11:15, Thomas Huth wrote:
->>> On 29/11/2022 18.42, Pierre Morel wrote:
->>>> The KVM capability, KVM_CAP_S390_CPU_TOPOLOGY is used to
->>>> activate the S390_FEAT_CONFIGURATION_TOPOLOGY feature and
->>>> the topology facility for the guest in the case the topology
->>>> is available in QEMU and in KVM.
->>>>
->>>> The feature is fenced for SE (secure execution).
->>>
->>> Out of curiosity: Why does it not work yet?
->>>
->>>> To allow smooth migration with old QEMU the feature is disabled by
->>>> default using the CPU flag -disable-topology.
->>>
->>> I stared at this code for a while now, but I have to admit that I 
->>> don't quite get it. Why do we need a new "disable" feature flag here? 
->>> I think it is pretty much impossible to set "ctop=on" with an older 
->>> version of QEMU, since it would require the QEMU to enable 
->>> KVM_CAP_S390_CPU_TOPOLOGY in the kernel for this feature bit - and 
->>> older versions of QEMU don't set this capability yet.
->>>
->>> Which scenario would fail without this disable-topology feature bit? 
->>> What do I miss?
->>
->> The only scenario it provides is that ctop is then disabled by default 
->> on newer QEMU allowing migration between old and new QEMU for older 
->> machine without changing the CPU flags.
->>
->> Otherwise, we would need -ctop=off on newer QEMU to disable the topology.
-> 
-> Ah, it's because you added S390_FEAT_CONFIGURATION_TOPOLOGY to the 
-> default feature set here:
-> 
->   static uint16_t default_GEN10_GA1[] = {
->       S390_FEAT_EDAT,
->       S390_FEAT_GROUP_MSA_EXT_2,
-> +    S390_FEAT_DISABLE_CPU_TOPOLOGY,
-> +    S390_FEAT_CONFIGURATION_TOPOLOGY,
->   };
-> 
-> ?
-> 
-> But what sense does it make to enable it by default, just to disable it 
-> by default again with the S390_FEAT_DISABLE_CPU_TOPOLOGY feature? ... 
-> sorry, I still don't quite get it, but maybe it's because my sinuses are 
-> quite clogged due to a bad cold ... so if you could elaborate again, 
-> that would be very appreciated!
-> 
-> However, looking at this from a distance, I would not rather not add 
-> this to any default older CPU model at all (since it also depends on the 
-> kernel to have this feature enabled)? Enabling it in the host model is 
-> still ok, since the host model is not migration safe anyway.
-> 
->   Thomas
-> 
+On Fri, 2022-12-02 at 11:57 +0100, Michal Luczaj wrote:
+> On 12/2/22 10:28, Like Xu wrote:
+> > On 14/10/2022 5:12 am, Sean Christopherson wrote:
+> > > Remove the unused @kvm argument from gpc_unmap_khva().
+> >=20
+> > Nit: the caller kvm_gpc_unmap() can also get rid of the unused @kvm arg=
+ument.
+>=20
+> Right, the initial series cleaned up kvm_gpc_unmap() in a separate patch.
+> Current iteration removes kvm_gpc_unmap() later in the series:
+> https://lore.kernel.org/kvm/20221013211234.1318131-12-seanjc@google.com/
 
-I think I did not understand what is exactly the request that was made 
-about having a CPU flag to disable the topology when we decide to not 
-have a new machine with new machine property.
+I have been keeping that series up to date in
+https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/gpc-fix=
+es
 
-Let see what we have if the only change to mainline is to activate 
-S390_FEAT_CONFIGURATION_TOPOLOGY with the KVM capability:
+Now that the dust has settled on the Xen runstate area, I may post it
+as v3 of the series.
 
-In mainline, ctop is enabled in the full GEN10 only.
+Or I may attempt to resolve the gpc->len immutability thing first. I'm
+still not really convinced Sean has won me round on that; I'm still
+quite attached to the TOCTOU benefit of checking the length right there
+at the moment you're going to use the pointer =E2=80=94 especially given th=
+at
+it *doesn't* have bounds checks like get_user() does, as Sean points
+out.
 
-Consequently we have this feature activated by default for the host 
-model only and deactivated by default if we specify the CPU.
-It can be activated if we specify the CPU with the flag ctop=on.
+--=-/nKiW8rdZIhmj3hszkIF
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-This is what was in the patch series before the beginning of the 
-discussion about having a new machine property for new machines.
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMjAyMTQyMTA0WjAvBgkqhkiG9w0BCQQxIgQgAkFyHmea
+aNQzo40K+Iv0vT9/N6h6gUdaiTlTn+2TsQowgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCqXp0XQvTMuw7fSrDaoRybOV0rzvRuW0jc
+FB1UR8pkhTcJ5sh3+IXeT7vvCkYD3uhUWxJBwU+fq90QAx2mxapk0EYptKJHXLCQ7RvHetyVy2C4
+HjwiXSbtgI/tgozQp6bp4kf0R+XQZDfR8miYv+fyd141292jejl9CaGQbx44H4mVG3g0pPr/E7Ji
+X9azL1HV/w0D0OORU14arxaqNpk6El9fdgs2RoH6VNBKhqT0C8WHX5B8PigB/2pBVHmFiJ8Lg1Ol
+rmCuYpanYovDTtrvPPulWHL9ga6lBaycSUCSukzFPUzIKZ8JAuCzX62OJEIpAahA8Ei3h6NjhgZq
+4Rq/26Z+U5VrkrL/5WrcWKn1qNgusHKxAJNw18Q0H5cf1Aud2+njbl3fPyE3N3HyT7/fhbsqAaWo
+BseTc0CSo2BW0jUMm+/obfbMNyFBoAqamkqiSXX6Q7Kk+uh2DcIZMr4q0srCKMYrwcnGhXRoi+KL
+YrnJG8mAyWlN5QeI89JQk+T0HzxM4AksK8KIMkSfJVF6ILWJPSlyueSqUk8YZFdfQoWnjX9AWnz5
+dYaSnoDZLWoatz2Ukf/A56LOzz5YXcD51rwttkZZ6tafpmlvcw7GIpk5hio9DKULw6mIG8n3lWXn
+TCTzkV8guVq8m3HsEaJjj2y4F23YMN/gBL1WSfm7ygAAAAAAAA==
 
-If this what we want: activating the topology by the CPU flag ctop=on it 
-is perfect for me and I can take the original patch.
-We may later make it a default for new machines.
 
-Otherwise or if I misunderstood something, which is greatly possible, I 
-need more advises.
+--=-/nKiW8rdZIhmj3hszkIF--
 
-Regards,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
