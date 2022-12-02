@@ -2,71 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BE5264104A
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 22:59:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B80AB64115B
+	for <lists+kvm@lfdr.de>; Sat,  3 Dec 2022 00:13:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234804AbiLBV7z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 16:59:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48104 "EHLO
+        id S234097AbiLBXN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 18:13:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233561AbiLBV7y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 16:59:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 578EFF4EB7
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 13:58:59 -0800 (PST)
+        with ESMTP id S233947AbiLBXN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 18:13:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 146C5F7A0F
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 15:12:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670018338;
+        s=mimecast20190719; t=1670022750;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PDnwcr2MsfbQiTUfEToP1oFEh6S+4RAS/eGf/9UCInk=;
-        b=eRKkeZsKfZ8SY30cplSTDIL/LU0xvNp8ndn/dKQu7ZhCd1ikMSoiX4Gw8O1+QiSbdRKcH9
-        W9yVRlJ6YtBih9BlhrZg3mtjyr+Ew8WRlc7omiFLbwuWX0XlekDRKMSU9iHPRxt7OuV/H5
-        axt67AbGaJBNyTWUOmqqZ1MeKwlDPxM=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=2/CllKU0U4UJwmVyb3sb1SBnPQ6vUB5Z0Z6WOmVpQeo=;
+        b=Yuzssan3LBXiMmr6ufk+RczuEfZqfZcC8uc2tWajdBuZDVj3XZfl6+0qFv+dnwIoXg7UVf
+        kigz4SZ5lf60bLvZeSt10MeIqpFlW4G9OpXFt082CpfpU6Hljee4f54W+mWzUcoYKmONuR
+        2i4+7yIE0nPfDTVL7huSTRo1MoywuT4=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-126-8I1KZ_5AMN2FZZRFjiUVqg-1; Fri, 02 Dec 2022 16:58:57 -0500
-X-MC-Unique: 8I1KZ_5AMN2FZZRFjiUVqg-1
-Received: by mail-io1-f71.google.com with SMTP id y5-20020a056602120500b006cf628c14ddso5663171iot.15
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 13:58:57 -0800 (PST)
+ us-mta-435-8Pac2dWzN8Oz3kZJkgibrQ-1; Fri, 02 Dec 2022 18:12:29 -0500
+X-MC-Unique: 8Pac2dWzN8Oz3kZJkgibrQ-1
+Received: by mail-il1-f198.google.com with SMTP id o10-20020a056e02102a00b003006328df7bso6863254ilj.17
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 15:12:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PDnwcr2MsfbQiTUfEToP1oFEh6S+4RAS/eGf/9UCInk=;
-        b=FeWxgfme/+nXuwzdRtqfh4S/VnB+u27IOaJ9Hee8REV5d+LA9zyoDLmuipweoG2nAx
-         tv+wmMOpCyRYBVal808osXXBWS1xfXrlnD9ajnWsUNqOYgWlFSSPowJLdbRl8HhmOAuR
-         gphBDXMsvqYAl0+EApaiHl9V6MeSGtzEyvMLis8ZP6kp/20uHtfzhOiw1MvMaw6jC0gG
-         VEtTGL4/WG9UHyaCmo8A9MX8I+TGnEjTBihcYZoSekDZNtrkxxoTqTO9te+f6t+NMNv8
-         BiTb+ph3ekXbugQMdVotcnsBP1xWo3jSqOaOI284jxVNgEPLLSXnmNB51MdrXiHgkENp
-         oYBg==
-X-Gm-Message-State: ANoB5plJH38a0vk4AoGfuWcZnbZYstepU5hu5M7YgcncjA3I/7teA2nD
-        ijqzkwe5iKwc/LuNPOtq9epqnkL8QOpHr5ME1rfoje2pLiz+zvJhbCwdrZeAnBfVcD/StZ2aKNb
-        AD7xZYRyQ1e+I
-X-Received: by 2002:a05:6638:3c47:b0:363:ba0f:deaf with SMTP id bg7-20020a0566383c4700b00363ba0fdeafmr33437516jab.150.1670018336468;
-        Fri, 02 Dec 2022 13:58:56 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7vqqLeRf1udEkgcPIgFvQP9qhoALK1g1bNloXT0bEs6KEm5PyNBkKc0dw0IEqrvrMZrYEHhQ==
-X-Received: by 2002:a05:6638:3c47:b0:363:ba0f:deaf with SMTP id bg7-20020a0566383c4700b00363ba0fdeafmr33437504jab.150.1670018336176;
-        Fri, 02 Dec 2022 13:58:56 -0800 (PST)
+        bh=2/CllKU0U4UJwmVyb3sb1SBnPQ6vUB5Z0Z6WOmVpQeo=;
+        b=bNJ8mqwj9WPgtt0NIgf2VyNxMUItJa9BmdpYhBtXeNeO7uLv2/tqWSYGhJ70NU57Pq
+         ZfW5Me79e104maKfQXAhYA5aQEWojOs/z7OSBGjkYI+PonAIQ4qG01U+tCeG+5Z60NdA
+         W/LceGRbL9uRG5NNgKHYYbwZlgNN89448G6wrp6rmfbbW9X0iyoAVsyjSiwlmSzgUCCI
+         wZ+ymuUJJcdEEe7AzwAhGfZ0YRWK+LqcA4lkpdDDzvtq9L6DEs3Q3OYQCIoKD4uKk4mk
+         pjLb4Xhn41ZOzFLCC6UFW68JMwuRrWCn6epmduXNcPaV3Dx2yunn0EpuSaAQ64PbHPeL
+         hveA==
+X-Gm-Message-State: ANoB5pk5HopexjYX0otnJcrC6XIDxtONB/IAqEGtakGnbNE/XsDCeMbX
+        gxPydX/Or071xTURnji4iBKd2Qa5hhp9ahw/6c73KD8sqUKS42oEmUw5x2JTJIBdRltwG6MsUqe
+        7nmIh0k/60s7v
+X-Received: by 2002:a5d:9f1a:0:b0:6df:f1ea:70f9 with SMTP id q26-20020a5d9f1a000000b006dff1ea70f9mr1477878iot.3.1670022748282;
+        Fri, 02 Dec 2022 15:12:28 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6NOYnHuJfn4TD40sOo/ZiU6gdEH9eGAmwEgkmBv72fXBxDqMnMPy93GgA7m/lfBrANbhpAYg==
+X-Received: by 2002:a5d:9f1a:0:b0:6df:f1ea:70f9 with SMTP id q26-20020a5d9f1a000000b006dff1ea70f9mr1477869iot.3.1670022748006;
+        Fri, 02 Dec 2022 15:12:28 -0800 (PST)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id l32-20020a026a20000000b00386dde027e7sm2993072jac.73.2022.12.02.13.58.55
+        by smtp.gmail.com with ESMTPSA id ch11-20020a0566383e8b00b00375783003fcsm3064717jab.136.2022.12.02.15.12.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Dec 2022 13:58:55 -0800 (PST)
-Date:   Fri, 2 Dec 2022 14:58:53 -0700
+        Fri, 02 Dec 2022 15:12:27 -0800 (PST)
+Date:   Fri, 2 Dec 2022 16:12:25 -0700
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     jgg@nvidia.com, kevin.tian@intel.com, cohuck@redhat.com,
-        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
-        yi.y.sun@linux.intel.com
-Subject: Re: [PATCH 07/10] vfio: Refactor vfio_device open and close
-Message-ID: <20221202145853.5c09b470.alex.williamson@redhat.com>
-In-Reply-To: <20221201145535.589687-8-yi.l.liu@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>, yi.y.sun@linux.intel.com
+Cc:     Yi Liu <yi.l.liu@intel.com>, kevin.tian@intel.com,
+        cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com
+Subject: Re: [PATCH 00/10] Move group specific code into group.c
+Message-ID: <20221202161225.3144305f.alex.williamson@redhat.com>
+In-Reply-To: <Y4oPTjCTlQ/ozjoZ@nvidia.com>
 References: <20221201145535.589687-1-yi.l.liu@intel.com>
-        <20221201145535.589687-8-yi.l.liu@intel.com>
+        <Y4kRC0SRD9kpKFWS@nvidia.com>
+        <86c4f504-a0b2-969c-c2c6-5fd43deb6627@intel.com>
+        <Y4oPTjCTlQ/ozjoZ@nvidia.com>
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -81,16 +83,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  1 Dec 2022 06:55:32 -0800
-Yi Liu <yi.l.liu@intel.com> wrote:
+On Fri, 2 Dec 2022 10:44:30 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> This refactor makes the vfio_device_open() to accept device, iommufd_ctx
-> pointer and kvm pointer. These parameters are generic items in today's
-> group path and furute device cdev path. Caller of vfio_device_open() should
+> On Fri, Dec 02, 2022 at 09:57:45PM +0800, Yi Liu wrote:
+> > On 2022/12/2 04:39, Jason Gunthorpe wrote:  
+> > > On Thu, Dec 01, 2022 at 06:55:25AM -0800, Yi Liu wrote:  
+> > > > With the introduction of iommufd[1], VFIO is towarding to provide device
+> > > > centric uAPI after adapting to iommufd. With this trend, existing VFIO
+> > > > group infrastructure is optional once VFIO converted to device centric.
+> > > > 
+> > > > This series moves the group specific code out of vfio_main.c, prepares
+> > > > for compiling group infrastructure out after adding vfio device cdev[2]
+> > > > 
+> > > > Complete code in below branch:
+> > > > 
+> > > > https://github.com/yiliu1765/iommufd/commits/vfio_group_split_v1
+> > > > 
+> > > > This is based on Jason's "Connect VFIO to IOMMUFD"[3] and my "Make mdev driver
+> > > > dma_unmap callback tolerant to unmaps come before device open"[4]
+> > > > 
+> > > > [1] https://lore.kernel.org/all/0-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com/
+> > > > [2] https://github.com/yiliu1765/iommufd/tree/wip/vfio_device_cdev
+> > > > [3] https://lore.kernel.org/kvm/0-v4-42cd2eb0e3eb+335a-vfio_iommufd_jgg@nvidia.com/
+> > > > [4] https://lore.kernel.org/kvm/20221129105831.466954-1-yi.l.liu@intel.com/  
+> > > 
+> > > This looks good to me, and it applies OK to my branch here:
+> > > 
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/
+> > > 
+> > > Alex, if you ack this in the next few days I can include it in the
+> > > iommufd PR, otherwise it can go into the vfio tree in January
+> > > 
+> > > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> > >   
+> > 
+> > thanks. btw. I've updated my github to incorporate Kevin's nit and also
+> > r-b from you and Kevin.  
+> 
+> Please rebase it on the above branch also
 
-Minor nit beyond what's already been mentioned here:
+It looks fine to me aside from the previous review comments and my own
+spelling nit.  I also don't see that this adds any additional conflicts
+vs the existing iommufd integration for any outstanding vfio patches on
+the list, therefore, where there's not already a sign-off from me:
 
-s/furute/future/
+Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
 
 Thanks,
 Alex
