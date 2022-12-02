@@ -2,88 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 234EF6400AF
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 07:53:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D30A66400B6
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 07:54:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232429AbiLBGxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 01:53:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43738 "EHLO
+        id S232442AbiLBGyy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 01:54:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232314AbiLBGxn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 01:53:43 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2254BB7C1;
-        Thu,  1 Dec 2022 22:53:42 -0800 (PST)
+        with ESMTP id S232185AbiLBGyx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 01:54:53 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93063BBBFD
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 22:54:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669964022; x=1701500022;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=hsL57ikcNVoLHdsSPb/2quBPJAcrsHQWRoxcjDJhwfk=;
-  b=eT0WFURXcMGeVYPNWIXxRON88XkgDgnK57MP8L9HBxKxsLmaAF3wJG7q
-   rnDKkrgZoX9TcVbQjFOyiHKO0gbbZ9fcMwwssDAXYyl0WJvN4OeI0hfn/
-   Kn0FuzeN0TDa37Lo4FaguVQsHPwL8t1p0mbouzgGyTeMfR+/WJw28w2b8
-   rh2r81QD8/4ACEi8dpcM54W2kVY5TcI1TPegcZnSzlgwg7wDRxmJr7X5t
-   P2v2sBsKA3vddkTIPlScUBDZCzecu1t1zNo639kpdVQMg7YY5Tl2lDL/u
-   KEf8CmRexAJLimiQPuCvaGZlDcib1wrhzm98hW6Vv0ekfUBtGpO0LdthQ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="299253379"
+  t=1669964092; x=1701500092;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=YikgxWHkjXBdW36x0bhe9MX4hxGxON7eQ2q2fKy1Od4=;
+  b=N+SGnPx5ycKNxaHfyWaCJjNAFoLv8UsJ7+75Kp0jWGL4BunAAnI+dt0f
+   ikEQ9zvXtdBIfmyjq8rbBbd/63mXg22D0DkIKWTEdxOvNqi9uq1pA3CEz
+   FnAap9nAO0xmAK/4t4+WvjvmpRY3myaFREXsCz5Mi4gn4emcNOJIbT7w8
+   5VjAOuAvVuxz3JhvIDH365JAqxFdcMussZ4ASPSa/6FB+CBPGbzR5PYn4
+   AMVbu9k3gkDzeSQvIRxEgJLeKxSRsh3lICRtAksPs7jpHo5xwPOBtff2u
+   yyMaIqEYHG5mdSjvt6K9vigYTOsEozv3MaQghm4ptb4APTVAYD/diFB81
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="342820202"
 X-IronPort-AV: E=Sophos;i="5.96,210,1665471600"; 
-   d="scan'208";a="299253379"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2022 22:53:41 -0800
+   d="scan'208";a="342820202"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2022 22:54:31 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="708374082"
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="733710089"
 X-IronPort-AV: E=Sophos;i="5.96,210,1665471600"; 
-   d="scan'208";a="708374082"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by fmsmga008.fm.intel.com with ESMTP; 01 Dec 2022 22:53:30 -0800
-Date:   Fri, 2 Dec 2022 14:49:09 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v9 1/8] mm: Introduce memfd_restricted system call to
- create restricted user memory
-Message-ID: <20221202064909.GA1070297@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
- <20221025151344.3784230-2-chao.p.peng@linux.intel.com>
- <CAGtprH9Qu==pohH9ZSTzX9rZWSO0QWJ9rGK6NRGaiDetWAPLYg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGtprH9Qu==pohH9ZSTzX9rZWSO0QWJ9rGK6NRGaiDetWAPLYg@mail.gmail.com>
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+   d="scan'208";a="733710089"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by FMSMGA003.fm.intel.com with ESMTP; 01 Dec 2022 22:54:29 -0800
+Message-ID: <c7971c8ad3b4683e2b3036dd7524af1cb42e50e1.camel@linux.intel.com>
+Subject: Re: [PATCH v3 2/3] KVM: keep track of running ioctls
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        Yanan Wang <wangyanan55@huawei.com>, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>
+Date:   Fri, 02 Dec 2022 14:54:28 +0800
+In-Reply-To: <20221111154758.1372674-3-eesposit@redhat.com>
+References: <20221111154758.1372674-1-eesposit@redhat.com>
+         <20221111154758.1372674-3-eesposit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,114 +68,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 01, 2022 at 06:16:46PM -0800, Vishal Annapurve wrote:
-> On Tue, Oct 25, 2022 at 8:18 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
-> >
-...
-> > +}
-> > +
-> > +SYSCALL_DEFINE1(memfd_restricted, unsigned int, flags)
-> > +{
+On Fri, 2022-11-11 at 10:47 -0500, Emanuele Giuseppe Esposito wrote:
+> Using the new accel-blocker API, mark where ioctls are being called
+> in KVM. Next, we will implement the critical section that will take
+> care of performing memslots modifications atomically, therefore
+> preventing any new ioctl from running and allowing the running ones
+> to finish.
 > 
-> Looking at the underlying shmem implementation, there seems to be no
-> way to enable transparent huge pages specifically for restricted memfd
-> files.
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+> ---
+>  accel/kvm/kvm-all.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> Michael discussed earlier about tweaking
-> /sys/kernel/mm/transparent_hugepage/shmem_enabled setting to allow
-> hugepages to be used while backing restricted memfd. Such a change
-> will affect the rest of the shmem usecases as well. Even setting the
-> shmem_enabled policy to "advise" wouldn't help unless file based
-> advise for hugepage allocation is implemented.
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index f99b0becd8..ff660fd469 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -2310,6 +2310,7 @@ static int kvm_init(MachineState *ms)
+>      assert(TARGET_PAGE_SIZE <= qemu_real_host_page_size());
+>  
+>      s->sigmask_len = 8;
+> +    accel_blocker_init();
+>  
+>  #ifdef KVM_CAP_SET_GUEST_DEBUG
+>      QTAILQ_INIT(&s->kvm_sw_breakpoints);
+> @@ -3014,7 +3015,9 @@ int kvm_vm_ioctl(KVMState *s, int type, ...)
+>      va_end(ap);
+>  
+>      trace_kvm_vm_ioctl(type, arg);
+> +    accel_ioctl_begin();
+>      ret = ioctl(s->vmfd, type, arg);
+> +    accel_ioctl_end();
+>      if (ret == -1) {
+>          ret = -errno;
+>      }
+> @@ -3032,7 +3035,9 @@ int kvm_vcpu_ioctl(CPUState *cpu, int type,
+> ...)
+>      va_end(ap);
+>  
+>      trace_kvm_vcpu_ioctl(cpu->cpu_index, type, arg);
+> +    accel_cpu_ioctl_begin(cpu);
 
-Had a look at fadvise() and looks it does not support HUGEPAGE for any
-filesystem yet.
+Does this mean that kvm_region_commit() can inhibit any other vcpus
+doing any ioctls?
 
-> 
-> Does it make sense to provide a flag here to allow creating restricted
-> memfds backed possibly by huge pages to give a more granular control?
+>      ret = ioctl(cpu->kvm_fd, type, arg);
+> +    accel_cpu_ioctl_end(cpu);
+>      if (ret == -1) {
+>          ret = -errno;
+>      }
+> @@ -3050,7 +3055,9 @@ int kvm_device_ioctl(int fd, int type, ...)
+>      va_end(ap);
+>  
+>      trace_kvm_device_ioctl(fd, type, arg);
+> +    accel_ioctl_begin();
+>      ret = ioctl(fd, type, arg);
+> +    accel_ioctl_end();
+>      if (ret == -1) {
+>          ret = -errno;
+>      }
 
-We do have a unused 'flags' can be extended for such usage, but I would
-let Kirill have further look, perhaps need more discussions.
-
-Chao
-> 
-> > +       struct file *file, *restricted_file;
-> > +       int fd, err;
-> > +
-> > +       if (flags)
-> > +               return -EINVAL;
-> > +
-> > +       fd = get_unused_fd_flags(0);
-> > +       if (fd < 0)
-> > +               return fd;
-> > +
-> > +       file = shmem_file_setup("memfd:restrictedmem", 0, VM_NORESERVE);
-> > +       if (IS_ERR(file)) {
-> > +               err = PTR_ERR(file);
-> > +               goto err_fd;
-> > +       }
-> > +       file->f_mode |= FMODE_LSEEK | FMODE_PREAD | FMODE_PWRITE;
-> > +       file->f_flags |= O_LARGEFILE;
-> > +
-> > +       restricted_file = restrictedmem_file_create(file);
-> > +       if (IS_ERR(restricted_file)) {
-> > +               err = PTR_ERR(restricted_file);
-> > +               fput(file);
-> > +               goto err_fd;
-> > +       }
-> > +
-> > +       fd_install(fd, restricted_file);
-> > +       return fd;
-> > +err_fd:
-> > +       put_unused_fd(fd);
-> > +       return err;
-> > +}
-> > +
-> > +void restrictedmem_register_notifier(struct file *file,
-> > +                                    struct restrictedmem_notifier *notifier)
-> > +{
-> > +       struct restrictedmem_data *data = file->f_mapping->private_data;
-> > +
-> > +       mutex_lock(&data->lock);
-> > +       list_add(&notifier->list, &data->notifiers);
-> > +       mutex_unlock(&data->lock);
-> > +}
-> > +EXPORT_SYMBOL_GPL(restrictedmem_register_notifier);
-> > +
-> > +void restrictedmem_unregister_notifier(struct file *file,
-> > +                                      struct restrictedmem_notifier *notifier)
-> > +{
-> > +       struct restrictedmem_data *data = file->f_mapping->private_data;
-> > +
-> > +       mutex_lock(&data->lock);
-> > +       list_del(&notifier->list);
-> > +       mutex_unlock(&data->lock);
-> > +}
-> > +EXPORT_SYMBOL_GPL(restrictedmem_unregister_notifier);
-> > +
-> > +int restrictedmem_get_page(struct file *file, pgoff_t offset,
-> > +                          struct page **pagep, int *order)
-> > +{
-> > +       struct restrictedmem_data *data = file->f_mapping->private_data;
-> > +       struct file *memfd = data->memfd;
-> > +       struct page *page;
-> > +       int ret;
-> > +
-> > +       ret = shmem_getpage(file_inode(memfd), offset, &page, SGP_WRITE);
-> > +       if (ret)
-> > +               return ret;
-> > +
-> > +       *pagep = page;
-> > +       if (order)
-> > +               *order = thp_order(compound_head(page));
-> > +
-> > +       SetPageUptodate(page);
-> > +       unlock_page(page);
-> > +
-> > +       return 0;
-> > +}
-> > +EXPORT_SYMBOL_GPL(restrictedmem_get_page);
-> > --
-> > 2.25.1
-> >
