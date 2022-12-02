@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FE3D640C74
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:45:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EE51640C76
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:45:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234306AbiLBRpu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 12:45:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36482 "EHLO
+        id S234382AbiLBRp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 12:45:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234293AbiLBRpc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 12:45:32 -0500
+        with ESMTP id S234302AbiLBRpd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 12:45:33 -0500
 Received: from mail-wm1-x349.google.com (mail-wm1-x349.google.com [IPv6:2a00:1450:4864:20::349])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CB12E118B
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:45:19 -0800 (PST)
-Received: by mail-wm1-x349.google.com with SMTP id bg25-20020a05600c3c9900b003cf3ed7e27bso2823404wmb.4
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:45:19 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4110DDEA73
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:45:23 -0800 (PST)
+Received: by mail-wm1-x349.google.com with SMTP id j2-20020a05600c1c0200b003cf7397fc9bso2821595wms.5
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:45:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RcceNNV74mWRvfNnRdRHxXqpLA5rMluXWpmCinfrAO4=;
-        b=dB2jQjNAjKHWVg6i2fnn5DYvoUYPTOPe6g6D5NDlYPmNLCbbdXurDG7l3tBGmRnQZJ
-         MmSpeH1WV+l4j0pXh9UNhpAAjNFD1HCx2tFJt2KGZRr/hVn37Kn3Hn5M1w67mQcUrI7s
-         oNtH20bjZXFBXWxM8V0eisKyqzF8PB3azf32mCa72QZHBqxGsinAgKfqD92GAy0fnjTg
-         pBCDck7PnknriEPt7tg9S7PJfZGMrUnYTe7pyMHZKDub5OtyZCH/6USI5JilBofzXBZP
-         DV2VuCjK84UrMNyyNNI2Sr0IvJZ9zDkmEZHodOsaU4XlqikU2k+7ZnkTC0KpEdJRNVTs
-         Fhkg==
+        bh=qdGLApNIp2m2lMTsqjYlEA803gC0XNxs7/9Tj6tqLSA=;
+        b=bjnibou905nzLPV3mq8fu2cP7YKBPUaCztouvWXecO2/JSqysCL2OXyhgbuYq4XBtn
+         JPR+FJtGZ9/17ShTLfNiVf/UnAW7nWAjG2Euq4Cv92cKuL/MzDmBtAj0pAiVbsxbSgOQ
+         CVjIpY90Od5gqO5nLD3PV6EHhAuuW427ZVf5/HS3eyndN/bAEhzzZYk10wyt8RfOkSzi
+         qsC5Bea1LcFixTQYIqlfjuGDCFBIdvuBVz3lckFvuCRg4ypcfMoAjlVQUMHyQZ9NUo9W
+         bs5sznFeHkl3CSZzr8Cge8ipjugfjTZA29TWpi7JBi8sXN4AbaHr/DXtaCKw3AoJ0W+N
+         umPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RcceNNV74mWRvfNnRdRHxXqpLA5rMluXWpmCinfrAO4=;
-        b=5HrQna3JHMf/U0XJSGwueJYfwzeAz6XPS/BBhsYBZDrm55hIqzTIP2tXsTa7d+pbn0
-         eWdEO6ItRpkNd82ExersYIxu3mn43lfRDdhajvgqyGDUnIDuS8CdMQ2Gbbunnr3cxL9w
-         tBchFUwtjNgHTFlcd1POFjiFrdj+PNzLwpMbFs7JnqZISfyJlHX6weUfPXuALRl3mJgk
-         Pax/hTgo6gYyv280y5uu4myF5bVrYnkui4LcrTaofsQiHYAe/J1GTOECoB325LNRjjdk
-         TiVN1zD721D2IJZopYMYVPORVX+oCEDP71ldc8CPixC048uaQ1rLaDtdvFbV25Tzjx5m
-         HMIg==
-X-Gm-Message-State: ANoB5pmfzGSVeZvDzpsu5SiB70BJydlfmu7uR6wdwj7CVOvwKRYCo3Mu
-        crOzqupgDCHDD3YBxa/1bM2VOr7ycU0e0Qxt7JS7BnKvxyEfIpWreWe/7aiSaADXuiETyEOCP7f
-        DOh5cpTRIlL9x0tm2yB6U9BLeAEKXEr4bKBxCCQRDWqqkIdE+qnWEXg4=
-X-Google-Smtp-Source: AA0mqf5FGBvWE56xTYlHasc5VW7hiCKk/l7OhpAKHcUOs/2SBAsfGGs5U5hXFyAYei7anzRyTSsOzDM5Ug==
+        bh=qdGLApNIp2m2lMTsqjYlEA803gC0XNxs7/9Tj6tqLSA=;
+        b=0kbS7aGA/GQcZWBbN3wVYoO+SFjR5ztHBA+LMuuFcMufg+gHMoOBoZAHupJPlBzzqR
+         FDjbNqhQAAg8yEbwPufn+/JJwxwRw9OFLaJpYwdp9MQVNS9QbBEkErpLOU2aM1DQ1w6i
+         pUPRdOKa0oPB7KMWBGFZ/XC6ZT/ylY/yGkTFriKuMs4fH36o2qM/65acKjz/x3Rr887v
+         tu4b3rwk2G7Ny+LQULku2pvYyX3NpOkTf/6DQxjTku+rpJ3nrxPpxELNLauxEgK8LKSs
+         J6OxWxkH3TR5Msgx2EUefqinhpoFoaWVmok/ZxnolMUa8TK5Nr2XtmS4OVgLxFrOrsOg
+         M3IA==
+X-Gm-Message-State: ANoB5pk/uWfD3dQgdxLbvHdKfoEhVI705rXxl7Y/FnXRDq9rOcPTg9kO
+        44MytczrlQTV4KwuP5MQAL1HM1bg658ZD3p1Z5MNl/6EsLjo1e+2heAzhppi2uPbXjMv63g4qAx
+        ZI7HBPENLhbnb+TBOOLrX8gcpzwluBZhfI9Zx7IZ08xdlL3i933t9kE4=
+X-Google-Smtp-Source: AA0mqf5h2J9oFoH6OwPRKwdUMH9YrATOyswrARRBpdBZ2Q0ivPxSMzGHGfcBLerWqa/pSKgv1IwtB/BIPg==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a5d:5251:0:b0:242:39bc:497 with SMTP id
- k17-20020a5d5251000000b0024239bc0497mr5369114wrc.411.1670003108672; Fri, 02
- Dec 2022 09:45:08 -0800 (PST)
-Date:   Fri,  2 Dec 2022 17:44:08 +0000
+ (user=tabba job=sendgmr) by 2002:a05:600c:384d:b0:3cf:7217:d5fa with SMTP id
+ s13-20020a05600c384d00b003cf7217d5famr42457601wmr.191.1670003110613; Fri, 02
+ Dec 2022 09:45:10 -0800 (PST)
+Date:   Fri,  2 Dec 2022 17:44:09 +0000
 In-Reply-To: <20221202174417.1310826-1-tabba@google.com>
 Mime-Version: 1.0
 References: <20221202174417.1310826-1-tabba@google.com>
 X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221202174417.1310826-24-tabba@google.com>
-Subject: [RFC PATCH kvmtool v1 23/32] Change pvtime mapping from private to shared
+Message-ID: <20221202174417.1310826-25-tabba@google.com>
+Subject: [RFC PATCH kvmtool v1 24/32] Change vesa mapping from private to shared
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
@@ -74,22 +74,22 @@ might be COWed.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arm/aarch64/pvtime.c | 2 +-
+ hw/vesa.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-index 9b06ee4..a452938 100644
---- a/arm/aarch64/pvtime.c
-+++ b/arm/aarch64/pvtime.c
-@@ -20,7 +20,7 @@ static int pvtime__alloc_region(struct kvm *kvm)
- 	if (mem_fd < 0)
- 		return -errno;
+diff --git a/hw/vesa.c b/hw/vesa.c
+index 277d638..3233794 100644
+--- a/hw/vesa.c
++++ b/hw/vesa.c
+@@ -96,7 +96,7 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+ 		goto unregister_device;
+ 	}
  
--	mem = mmap(NULL, ARM_PVTIME_SIZE, PROT_RW, MAP_PRIVATE, mem_fd, 0);
-+	mem = mmap(NULL, ARM_PVTIME_SIZE, PROT_RW, MAP_SHARED, mem_fd, 0);
+-	mem = mmap(NULL, VESA_MEM_SIZE, PROT_RW, MAP_PRIVATE, mem_fd, 0);
++	mem = mmap(NULL, VESA_MEM_SIZE, PROT_RW, MAP_SHARED, mem_fd, 0);
  	if (mem == MAP_FAILED) {
- 		ret = -errno;
- 		close(mem_fd);
+ 		r = -errno;
+ 		goto close_memfd;
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
 
