@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90F1F640DDB
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 19:52:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3E78640DDE
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 19:52:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234571AbiLBSwV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 13:52:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39546 "EHLO
+        id S234391AbiLBSwW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 13:52:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234579AbiLBSwT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 13:52:19 -0500
-Received: from out-88.mta0.migadu.com (out-88.mta0.migadu.com [IPv6:2001:41d0:1004:224b::58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44F56E347E
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 10:52:16 -0800 (PST)
+        with ESMTP id S229480AbiLBSwU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 13:52:20 -0500
+Received: from out-115.mta0.migadu.com (out-115.mta0.migadu.com [IPv6:2001:41d0:1004:224b::73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DC0DE2AB0
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 10:52:19 -0800 (PST)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1670007134;
+        t=1670007137;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HSI8GaEsrat3YCFbYitHgJjBxasqUXZCSku/OSEtqlI=;
-        b=rn85i92GvmxIPofIBwzmf1lgVTJuWw0qPq1mAfrFEoJGvXJqdyrlRYn1kHDeuX+rlP4Vx/
-        tmJ5gmeMa66ZXMnADmpVdaE5YinkQjY/RVPLx5K/leof84T2RL7O+6UkRik8oNep32Mcye
-        z1yTKtG3yErw1oBHC6vUD1maCGLrZ00=
+        bh=DotXXATh2xdtC3iIVT5NnRWrGz5Cdan4kCRiJ+W1n+E=;
+        b=MzpkHqPQ3VskkGqUcudj5NRlAggncjx0SdgO8O/+0tAeK0c/ddUKQDLutnJu+G9j8VivWd
+        7gY7H+zXwq74Dcvw3YxHkIqf+VUo+UbCQh+605YPvLVeore39m4c+9bYvNplDUb7IoyI+s
+        1KSMKc/XU9K87xYkbvsz2hBEtFxDs9o=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -36,9 +36,9 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         Ricardo Koller <ricarkol@google.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/6] KVM: arm64: Use KVM's pte type/helpers in handle_access_fault()
-Date:   Fri,  2 Dec 2022 18:51:51 +0000
-Message-Id: <20221202185156.696189-2-oliver.upton@linux.dev>
+Subject: [PATCH v2 2/6] KVM: arm64: Ignore EAGAIN for walks outside of a fault
+Date:   Fri,  2 Dec 2022 18:51:52 +0000
+Message-Id: <20221202185156.696189-3-oliver.upton@linux.dev>
 In-Reply-To: <20221202185156.696189-1-oliver.upton@linux.dev>
 References: <20221202185156.696189-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -53,62 +53,132 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Consistently use KVM's own pte types and helpers in
-handle_access_fault().
+The page table walkers are invoked outside fault handling paths, such as
+write protecting a range of memory. EAGAIN is generally used by the
+walkers to retry execution due to races on a particular PTE, like taking
+an access fault on a PTE being invalidated from another thread.
 
-No functional change intended.
+This early return behavior is undesirable for walkers that operate
+outside a fault handler. Suppress EAGAIN and continue the walk if
+operating outside a fault handler.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_pgtable.h |  5 +++++
- arch/arm64/kvm/mmu.c                 | 10 ++++------
- 2 files changed, 9 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h |  3 +++
+ arch/arm64/kvm/hyp/pgtable.c         | 30 +++++++++++++++++++++++++---
+ arch/arm64/kvm/mmu.c                 |  4 +++-
+ 3 files changed, 33 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 63f81b27a4e3..192f33b88dc1 100644
+index 192f33b88dc1..4cd6762bda80 100644
 --- a/arch/arm64/include/asm/kvm_pgtable.h
 +++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -71,6 +71,11 @@ static inline kvm_pte_t kvm_phys_to_pte(u64 pa)
- 	return pte;
+@@ -193,12 +193,15 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
+  *					children.
+  * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
+  *					with other software walkers.
++ * @KVM_PGTABLE_WALK_HANDLE_FAULT:	Indicates the page-table walk was
++ *					invoked from a fault handler.
+  */
+ enum kvm_pgtable_walk_flags {
+ 	KVM_PGTABLE_WALK_LEAF			= BIT(0),
+ 	KVM_PGTABLE_WALK_TABLE_PRE		= BIT(1),
+ 	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
+ 	KVM_PGTABLE_WALK_SHARED			= BIT(3),
++	KVM_PGTABLE_WALK_HANDLE_FAULT		= BIT(4),
+ };
+ 
+ struct kvm_pgtable_visit_ctx {
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index b11cf2c618a6..98818214a479 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -168,6 +168,25 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
+ 	return walker->cb(ctx, visit);
  }
  
-+static inline kvm_pfn_t kvm_pte_to_pfn(kvm_pte_t pte)
++static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
++				      int r)
 +{
-+	return __phys_to_pfn(kvm_pte_to_phys(pte));
++	/*
++	 * Visitor callbacks return EAGAIN when the conditions that led to a
++	 * fault are no longer reflected in the page tables due to a race to
++	 * update a PTE. In the context of a fault handler this is interpreted
++	 * as a signal to retry guest execution.
++	 *
++	 * Ignore the return code altogether for walkers outside a fault handler
++	 * (e.g. write protecting a range of memory) and chug along with the
++	 * page table walk.
++	 */
++	if (r == -EAGAIN)
++		return !(walker->flags & KVM_PGTABLE_WALK_HANDLE_FAULT);
++
++	return !r;
 +}
 +
- static inline u64 kvm_granule_shift(u32 level)
- {
- 	/* Assumes KVM_PGTABLE_MAX_LEVELS is 4 */
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index a3c71b5172cd..886ad5ee767a 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1399,20 +1399,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- /* Resolve the access fault by making the page young again. */
- static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- {
--	pte_t pte;
--	kvm_pte_t kpte;
-+	kvm_pte_t pte;
- 	struct kvm_s2_mmu *mmu;
+ static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
+ 			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, u32 level);
  
- 	trace_kvm_access_fault(fault_ipa);
+@@ -200,7 +219,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+ 		table = kvm_pte_table(ctx.old, level);
+ 	}
  
- 	write_lock(&vcpu->kvm->mmu_lock);
- 	mmu = vcpu->arch.hw_mmu;
--	kpte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
-+	pte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
- 	write_unlock(&vcpu->kvm->mmu_lock);
+-	if (ret)
++	if (!kvm_pgtable_walk_continue(data->walker, ret))
+ 		goto out;
  
--	pte = __pte(kpte);
--	if (pte_valid(pte))
--		kvm_set_pfn_accessed(pte_pfn(pte));
-+	if (kvm_pte_valid(pte))
-+		kvm_set_pfn_accessed(kvm_pte_to_pfn(pte));
+ 	if (!table) {
+@@ -211,13 +230,16 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+ 
+ 	childp = (kvm_pteref_t)kvm_pte_follow(ctx.old, mm_ops);
+ 	ret = __kvm_pgtable_walk(data, mm_ops, childp, level + 1);
+-	if (ret)
++	if (!kvm_pgtable_walk_continue(data->walker, ret))
+ 		goto out;
+ 
+ 	if (ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
+ 		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_POST);
+ 
+ out:
++	if (kvm_pgtable_walk_continue(data->walker, ret))
++		return 0;
++
+ 	return ret;
  }
  
- /**
+@@ -1095,7 +1117,8 @@ kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr)
+ {
+ 	kvm_pte_t pte = 0;
+ 	stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
+-				 &pte, NULL, 0);
++				 &pte, NULL,
++				 KVM_PGTABLE_WALK_HANDLE_FAULT);
+ 	dsb(ishst);
+ 	return pte;
+ }
+@@ -1141,6 +1164,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+ 		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+ 
+ 	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level,
++				       KVM_PGTABLE_WALK_HANDLE_FAULT |
+ 				       KVM_PGTABLE_WALK_SHARED);
+ 	if (!ret)
+ 		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 886ad5ee767a..dd8c715f0775 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1381,7 +1381,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	else
+ 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
+ 					     __pfn_to_phys(pfn), prot,
+-					     memcache, KVM_PGTABLE_WALK_SHARED);
++					     memcache,
++					     KVM_PGTABLE_WALK_HANDLE_FAULT |
++					     KVM_PGTABLE_WALK_SHARED);
+ 
+ 	/* Mark the page dirty only if the fault is handled successfully */
+ 	if (writable && !ret) {
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
 
