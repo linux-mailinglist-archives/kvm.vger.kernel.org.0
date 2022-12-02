@@ -2,75 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 061DE640534
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 11:51:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C51D0640569
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 12:00:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233355AbiLBKvg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 05:51:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35224 "EHLO
+        id S232769AbiLBLAF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 06:00:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233172AbiLBKv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 05:51:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A34EC7275
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 02:50:34 -0800 (PST)
+        with ESMTP id S232699AbiLBLAD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 06:00:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC27793A5D
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 02:59:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669978233;
+        s=mimecast20190719; t=1669978748;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=01EVu86F03ZVkaisaIA8aOhxapK6bD5iJUUbcQRNmys=;
-        b=gRBpVn4XFihIn5sMWZ7vHPj7PrTqcPk7f3MON2lpeIUdwZDH/iz1Zp1x2Rx6qagylD8apH
-        jj/4jxKXIM+n0hu4onVD7EoxT0wcrykZ2IOaLze5fo44iNwf4gLwW6ziBSjZpN/MB/+yz7
-        gi/YUlstB6B/dNnINKtWBpK/A9f8Bvk=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-271-c-fSbOTqP-iZPQwqIgeMDA-1; Fri, 02 Dec 2022 05:50:31 -0500
-X-MC-Unique: c-fSbOTqP-iZPQwqIgeMDA-1
-Received: by mail-wr1-f70.google.com with SMTP id e7-20020adf9bc7000000b00242121eebe2so969476wrc.3
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 02:50:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=01EVu86F03ZVkaisaIA8aOhxapK6bD5iJUUbcQRNmys=;
-        b=1sHW1xd9Bg5KSvx/uqa2nuNbR4W2UDpaw3D4Hbj2YaoRiKsne0JcSS4QyH/SAh/pDl
-         CRhA6leOFmaT714/zsD25WD/KwVK5AJ3bZssv1lm2RbUO229Lz4kEe7bO5/BmQlnPOfL
-         Wz5m87JpCH++8RCng0jyVTqa1OnrEREEg5X9mRTM6owZNdihAxLMMpQsBlBuyabYBIB/
-         U9VkeUts1J65L0iAUfka7YM2J6KxnyRCGFHjXjp9MnNgvvrZqki8GRUosmCXP+l1LL/3
-         sN5O02dRRXuuHmCLaNKrPsDwSMl5klD2+3gugtms4k+MFzQwy/YkjpUpBfEsHcnqeXgZ
-         xB3w==
-X-Gm-Message-State: ANoB5pm6L02RvzySueBGGKQGJTaNw4WW57xMWz/R7uXv3tv+oAlfjRFj
-        L5LoJGxxnY6mb93hLd9FFccDCL/Gs4MgkFg1CCLf6FihGF35YotE95axATBkBYNlqQZOeSSXYAf
-        0VRPgqzxKnKLP
-X-Received: by 2002:adf:e105:0:b0:236:73af:f9ad with SMTP id t5-20020adfe105000000b0023673aff9admr42046588wrz.225.1669978230867;
-        Fri, 02 Dec 2022 02:50:30 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5gKhowvqyk/ROz6Tub/sMJPyTW0HCi4czVL2HWfKAPTpnGRqZYvsKYMG8CpBMMwJo8CzalVg==
-X-Received: by 2002:adf:e105:0:b0:236:73af:f9ad with SMTP id t5-20020adfe105000000b0023673aff9admr42046575wrz.225.1669978230635;
-        Fri, 02 Dec 2022 02:50:30 -0800 (PST)
-Received: from minerva.home (205.pool92-176-231.dynamic.orange.es. [92.176.231.205])
-        by smtp.gmail.com with ESMTPSA id bg2-20020a05600c3c8200b003a3170a7af9sm9728818wmb.4.2022.12.02.02.50.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Dec 2022 02:50:29 -0800 (PST)
-From:   Javier Martinez Canillas <javierm@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sergio Lopez Pascual <slp@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Javier Martinez Canillas <javierm@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Subject: [PATCH v2 4/4] KVM: Add missing arch for KVM_CREATE_DEVICE and KVM_{SET,GET}_DEVICE_ATTR
-Date:   Fri,  2 Dec 2022 11:50:11 +0100
-Message-Id: <20221202105011.185147-5-javierm@redhat.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221202105011.185147-1-javierm@redhat.com>
-References: <20221202105011.185147-1-javierm@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=hJSM4gVvibFGELZBTl77hUPT9yZlZqQ7ZzM552mEWO0=;
+        b=aY3Hc0cW7u518tdQ/tk/5qDi4RucLiCK87Dt/+vdKqxBAU1HTNCBb1A3uXzFdsxLfEuB1b
+        USibcSXQ2sPR+3qGZzoBrifiNDjrW2eBr85UFXmrdU0c2w0mzbC+Zlj++Vsn7Brtlh1qxe
+        i9IFejhbE2TUKnn006Vd3gyvD39mz+Y=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-418-Q0X0gSc_PSy_bl-R3uZVhA-1; Fri, 02 Dec 2022 05:59:01 -0500
+X-MC-Unique: Q0X0gSc_PSy_bl-R3uZVhA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7F4E729324B7;
+        Fri,  2 Dec 2022 10:59:01 +0000 (UTC)
+Received: from ovpn-192-33.brq.redhat.com (ovpn-192-33.brq.redhat.com [10.40.192.33])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 89580C16922;
+        Fri,  2 Dec 2022 10:58:57 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        coverity-bot <keescook@chromium.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86: hyper-v: Fix 'using uninitialized value' Coverity warning
+Date:   Fri,  2 Dec 2022 11:58:56 +0100
+Message-Id: <20221202105856.434886-1-vkuznets@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -81,37 +61,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The ioctls are missing an architecture property that is present in others.
+In kvm_hv_flush_tlb(), 'data_offset' and 'consumed_xmm_halves' variables
+are used in a mutually exclusive way: in 'hc->fast' we count in 'XMM
+halves' and increase 'data_offset' otherwise. Coverity discovered, that in
+one case both variables are incremented unconditionally. This doesn't seem
+to cause any issues as the only user of 'data_offset'/'consumed_xmm_halves'
+data is kvm_hv_get_tlb_flush_entries() ->  kvm_hv_get_hc_data() which also
+takes into account 'hc->fast' but is still worth fixing.
 
-Suggested-by: Sergio Lopez Pascual <slp@redhat.com>
-Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+While on it, drop the unneeded 'consumed_xmm_halves' initializer. In
+'hc->fast' case the variable is always initialized and is not used
+otherwise, 'data_offset' is not being initialized either.
+
+Reported-by: coverity-bot <keescook+coverity-bot@chromium.org>
+Addresses-Coverity-ID: 1527764 ("Uninitialized variables")
+Fixes: 260970862c88 ("KVM: x86: hyper-v: Handle HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls gently")
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
+ arch/x86/kvm/hyperv.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-(no changes since v1)
-
- Documentation/virt/kvm/api.rst | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index b15ea129f9cf..1db60cd9e1ba 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -3266,6 +3266,7 @@ valid entries found.
- ----------------------
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 2c7f2a26421e..dee4961ad8ff 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1926,7 +1926,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 	struct kvm_vcpu *v;
+ 	unsigned long i;
+ 	bool all_cpus;
+-	int consumed_xmm_halves = 0;
++	int consumed_xmm_halves;
+ 	gpa_t data_offset;
  
- :Capability: KVM_CAP_DEVICE_CTRL
-+:Architectures: all
- :Type: vm ioctl
- :Parameters: struct kvm_create_device (in/out)
- :Returns: 0 on success, -1 on error
-@@ -3306,6 +3307,7 @@ number.
- :Capability: KVM_CAP_DEVICE_CTRL, KVM_CAP_VM_ATTRIBUTES for vm device,
-              KVM_CAP_VCPU_ATTRIBUTES for vcpu device
-              KVM_CAP_SYS_ATTRIBUTES for system (/dev/kvm) device (no set)
-+:Architectures: x86, arm64, s390
- :Type: device ioctl, vm ioctl, vcpu ioctl
- :Parameters: struct kvm_device_attr
- :Returns: 0 on success, -1 on error
+ 	/*
+@@ -2021,8 +2021,10 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 		 * consumed_xmm_halves to make sure TLB flush entries are read
+ 		 * from the correct offset.
+ 		 */
+-		data_offset += hc->var_cnt * sizeof(sparse_banks[0]);
+-		consumed_xmm_halves += hc->var_cnt;
++		if (hc->fast)
++			consumed_xmm_halves += hc->var_cnt;
++		else
++			data_offset += hc->var_cnt * sizeof(sparse_banks[0]);
+ 	}
+ 
+ 	if (hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE ||
 -- 
 2.38.1
 
