@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E407640C7D
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:46:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 05AB7640C7B
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:46:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234359AbiLBRqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 12:46:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37326 "EHLO
+        id S234344AbiLBRqC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 12:46:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234324AbiLBRpi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 12:45:38 -0500
-Received: from mail-wm1-x349.google.com (mail-wm1-x349.google.com [IPv6:2a00:1450:4864:20::349])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 720E4E11A0
+        with ESMTP id S234149AbiLBRph (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 12:45:37 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90D5DE11A2
         for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:45:28 -0800 (PST)
-Received: by mail-wm1-x349.google.com with SMTP id e8-20020a05600c218800b003cf634f5280so2192716wme.8
+Received: by mail-yb1-xb4a.google.com with SMTP id j6-20020a05690212c600b006fc7f6e6955so5003009ybu.12
         for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:45:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ojAIDneqly7urLUtSI7yC5BejOF4LmcYgz67ETGcXNg=;
-        b=RmDaW5xV98br0A+I4X8nKQxFUMHcQ4sapYf//UkOuibrJ4ua7j1fQCu2bYFjRdA8U/
-         wNSnbd7QE+2N/tk/XGm6BivQSSt4NUWaPByzCCo3ka8PquxmrOYB0UuQGfU6L2SdyEz+
-         w5DF8XEzwE/qgKZXXOFHgIhChTWZi+9Q05N5ls991gR2B32YT0w85kosnI03mSyeb8Rh
-         fbL7o4lbelQ619nvM4FymGDHa09fN9gLj6eIzVHUBQdh8HYiyCu6/gGkrgoFAEGNDEqf
-         9fzelRXfVj3WS86nxjk0IeJBBD/EwWOIn6Q8yAZs+eiQYuxcOKRnU0XZhJGuBDNoIcDo
-         MFrA==
+        bh=dXMwf5objvW3u6ccglKiojiodstPXhl+xSwcan5VDRU=;
+        b=ZPgK5NQWkr0CXkRYqMCgUI/C4GoMsg8aMCqYvByQ/aXs15J98f8nqD3uBJQ0qnvuDa
+         uwkTf0mC9yssNCXWIzIIKVslBkw65hrViaXtVkmOx/y7kUTr0jlZEEMXzQn6vvqTwwad
+         UeJif98U8hmBbQNYYNuj+4AYmBL9PKPCJtpHLsKFUNB/vHLWy5nnVsXcMOGkG8DaoHa6
+         ATctdP5PSik0cOhwczfgaojaACqO1H5u10nZZvVOxw1OJNGY4UgJEGqGavxB9Astj6WK
+         OrJ8lQWQKJxv3jytV+xd9Cv4KsojHjg77uWoF/xUbtcHAaRfjmIwgZo7TcZeaZY0P8LR
+         grGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ojAIDneqly7urLUtSI7yC5BejOF4LmcYgz67ETGcXNg=;
-        b=5TieTwZN0q4Tv0Nvyf3BK8RwQFlcfDyCqIwuOldIowfxjFeX7C5lsW3ysFHdQ/rixH
-         Yaf6Z4CxnnAvXJDWHwrLCNBPkYE5eobYJ74FcIqruoZkv8RwULOEX8VxNVttqc+VfW5d
-         pqeIloqglB7zRlqplxHWLpoWJCyw+qzL5TjW4BeaWrYMhCik9mUw6IMxso3eCTZIsm6X
-         B07/5eBuzy1CG/e/2wABUVNWrsmOHwIsbWwBufE7ZAYtfqJSs0lLGmpGdaJ9Ox6fRH8Z
-         W417LuAbBwd9YnXrfoMIqIAC6g6yDoouIlJp//LyxzLoT8V6AcoFEDpHpLSyaALYx89U
-         ZY3w==
-X-Gm-Message-State: ANoB5pnLKKHFyH2kBRF7oLQyckOISqdKyB94wP35luFVsHRlajgeLHVt
-        dz9hq6fZxhHh7fN/IqtrqJlpPqqIR72QL88aouvI55myeor0VNYuNVugcREUuFQyPotirw2EpSm
-        aJsGBpRbdFbP2FpUtnO1NLDz/RQPZpdhZkPRUot6ttCF7cwLhlm8ZJO8=
-X-Google-Smtp-Source: AA0mqf67b6YUTuw8IVvtFaKeWF+h7bmEauUlGhv/RG/zZjeABDv6PvbgtnybGDhOcsvkYqOIgpKrPhG2jQ==
+        bh=dXMwf5objvW3u6ccglKiojiodstPXhl+xSwcan5VDRU=;
+        b=BSXGm+lo7m9QVp3c5jFT5uLdN4kebX65L02sp8lc51fOPsQfi61V4LQF6rrLmW4ZgR
+         m2Xu3pbpRhuHF5pRzmT4qhGz9v1Dz4vXHbOUeDjGjcVArrhtpnaINRSPEmdlmO29yCBe
+         KczZyx3hvLb4EobdS++C2RQ08RwQgcCjbWJthJsmlmBxksyGr/bRNPc9LMBlB/DoLJmr
+         rPOb7/TtK+DOQqkfng2Bh0l8IOCN5nsT9j/FctBoEcFIt2m5wCVQAGGrIjOKZZNDp1r8
+         TNLuGvPCsZPaGjQZdBwADBeHnTAzXY4+4URiAj5Hv3MxwkQ6c2YsqXwb2TrVl3mXBRsG
+         vNsA==
+X-Gm-Message-State: ANoB5pnYo/Xy8RrdL0mgfULRl0ymx9X1l6QEl6xmQfoHUHSuDsJVkCIK
+        vkgO5BeW7fbZKw5BCLWZ3GXUJVFPK2kQNvUp6Ci19RiKIdqqoA3nknsns4neDW626yuc6l9iX8x
+        Im54rQ+Zk/AaZcJR3w5MDuvAd0uL8MqsqkmP6v5SE1BIutkkbf795FXk=
+X-Google-Smtp-Source: AA0mqf6rHNMirunmaZE2JJDlCsgHJepjQN08CpR4XnoKViXcj/YzhRg8yOKieWyVhuqDC4mgnCL0clQMHw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:6888:b0:3d0:7513:d149 with SMTP id
- fn8-20020a05600c688800b003d07513d149mr9595758wmb.156.1670003118948; Fri, 02
- Dec 2022 09:45:18 -0800 (PST)
-Date:   Fri,  2 Dec 2022 17:44:13 +0000
+ (user=tabba job=sendgmr) by 2002:a0d:ea91:0:b0:3d4:8f32:89d6 with SMTP id
+ t139-20020a0dea91000000b003d48f3289d6mr13794377ywe.35.1670003120853; Fri, 02
+ Dec 2022 09:45:20 -0800 (PST)
+Date:   Fri,  2 Dec 2022 17:44:14 +0000
 In-Reply-To: <20221202174417.1310826-1-tabba@google.com>
 Mime-Version: 1.0
 References: <20221202174417.1310826-1-tabba@google.com>
 X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221202174417.1310826-29-tabba@google.com>
-Subject: [RFC PATCH kvmtool v1 28/32] Add functions for mapping/unmapping
- guest memory
+Message-ID: <20221202174417.1310826-30-tabba@google.com>
+Subject: [RFC PATCH kvmtool v1 29/32] pkvm: Add option to spawn a protected vm
+ in pkvm
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
@@ -70,225 +70,146 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Host shouldn't map guest memory not shared with it. These
-functions allow kvmtool in a future patch to toggle the mapping
-depending on the sharing status, even if it changes.
+From: Will Deacon <will@kernel.org>
 
+For Testing
+
+Even when pkvm is enabled, guests are not protected by default.
+This allows the creation of protected guests with kvmtool.
+
+This is based on the current pKVM proposal [1, 2], and is likely
+to be different in the final version.
+
+[1] https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
+[2] https://lore.kernel.org/all/20221110190259.26861-1-will@kernel.org/
+
+Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- include/kvm/kvm.h |   4 +
- kvm.c             | 183 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 187 insertions(+)
+ arm/aarch64/kvm.c                 |  3 +++
+ arm/fdt.c                         | 18 ++++++++++++++++++
+ arm/include/arm-common/fdt-arch.h |  2 +-
+ arm/pci.c                         |  3 +++
+ builtin-run.c                     |  2 ++
+ include/kvm/kvm-config.h          |  1 +
+ virtio/pci-modern.c               |  3 +++
+ 7 files changed, 31 insertions(+), 1 deletion(-)
 
-diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-index 6192f6c..66b5664 100644
---- a/include/kvm/kvm.h
-+++ b/include/kvm/kvm.h
-@@ -220,6 +220,10 @@ static inline bool kvm__arch_has_cfg_ram_address(void)
+diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+index 54200c9..f65c9c1 100644
+--- a/arm/aarch64/kvm.c
++++ b/arm/aarch64/kvm.c
+@@ -131,6 +131,9 @@ int kvm__get_vm_type(struct kvm *kvm)
+ 	if (ipa_bits > max_ipa_bits)
+ 		die("Memory too large for this system (needs %d bits, %d available)", ipa_bits, max_ipa_bits);
  
- void *guest_flat_to_host(struct kvm *kvm, u64 offset);
- u64 host_to_guest_flat(struct kvm *kvm, void *ptr);
-+void map_guest_range(struct kvm *kvm, u64 gpa, u64 size);
-+void unmap_guest_range(struct kvm *kvm, u64 gpa, u64 size);
-+void map_guest(struct kvm *kvm);
-+void unmap_guest(struct kvm *kvm);
- 
- bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
- 				 const char *kernel_cmdline);
-diff --git a/kvm.c b/kvm.c
-index a0bddf4..66e6a8e 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -462,6 +462,189 @@ int kvm__for_each_mem_bank(struct kvm *kvm, enum kvm_mem_type type,
- 	return ret;
++	if (kvm->cfg.pkvm)
++		return KVM_VM_TYPE_ARM_IPA_SIZE(ipa_bits) | (1U << 8);
++
+ 	return KVM_VM_TYPE_ARM_IPA_SIZE(ipa_bits);
  }
  
-+static void *_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
-+{
-+	return mmap(addr, len, prot, flags | MAP_FIXED, fd, offset);
-+}
+diff --git a/arm/fdt.c b/arm/fdt.c
+index 286ccad..0049bef 100644
+--- a/arm/fdt.c
++++ b/arm/fdt.c
+@@ -116,6 +116,7 @@ static int setup_fdt(struct kvm *kvm)
+ 					void (*)(void *, u8, enum irq_type));
+ 	void (*generate_cpu_peripheral_fdt_nodes)(void *, struct kvm *)
+ 					= kvm->cpus[0]->generate_fdt_nodes;
++	u64 resv_mem_prop;
+ 
+ 	/* Create new tree without a reserve map */
+ 	_FDT(fdt_create(fdt, FDT_MAX_SIZE));
+@@ -163,6 +164,23 @@ static int setup_fdt(struct kvm *kvm)
+ 	_FDT(fdt_property(fdt, "reg", mem_reg_prop, sizeof(mem_reg_prop)));
+ 	_FDT(fdt_end_node(fdt));
+ 
++	if (kvm->cfg.pkvm) {
++		/* Reserved memory (restricted DMA) */
++		_FDT(fdt_begin_node(fdt, "reserved-memory"));
++		_FDT(fdt_property_cell(fdt, "#address-cells", 0x2));
++		_FDT(fdt_property_cell(fdt, "#size-cells", 0x2));
++		_FDT(fdt_property(fdt, "ranges", NULL, 0));
 +
-+static int _munmap(void *addr, size_t len)
-+{
-+	if (mmap(addr, len, PROT_NONE, MAP_SHARED | MAP_FIXED | MAP_ANON, -1, 0) != MAP_FAILED)
-+		return 0;
++		_FDT(fdt_begin_node(fdt, "restricted_dma_reserved"));
++		_FDT(fdt_property_string(fdt, "compatible", "restricted-dma-pool"));
++		resv_mem_prop = cpu_to_fdt64(SZ_8M);
++		_FDT(fdt_property(fdt, "size", &resv_mem_prop, sizeof(resv_mem_prop)));
++		_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_DMA));
++		_FDT(fdt_end_node(fdt));
 +
-+	return -EFAULT;
-+}
-+
-+struct bank_range {
-+	u64 gpa;
-+	u64 size;
-+};
-+
-+static bool is_bank_range(struct kvm_mem_bank *bank, struct bank_range *range)
-+{
-+	u64 bank_start = bank->guest_phys_addr;
-+	u64 bank_end = bank_start + bank->size;
-+	u64 gpa_end = range->gpa + range->size;
-+
-+	if (range->gpa < bank_start || range->gpa >= bank_end)
-+		return false;
-+
-+	if (gpa_end > bank_end || gpa_end <= bank_start) {
-+		pr_warning("%s invalid guest range", __func__);
-+		return false;
++		_FDT(fdt_end_node(fdt));
 +	}
 +
-+	return true;
-+}
+ 	/* CPU and peripherals (interrupt controller, timers, etc) */
+ 	generate_cpu_nodes(fdt, kvm);
+ 	if (generate_cpu_peripheral_fdt_nodes)
+diff --git a/arm/include/arm-common/fdt-arch.h b/arm/include/arm-common/fdt-arch.h
+index 60c2d40..81df744 100644
+--- a/arm/include/arm-common/fdt-arch.h
++++ b/arm/include/arm-common/fdt-arch.h
+@@ -1,6 +1,6 @@
+ #ifndef ARM__FDT_H
+ #define ARM__FDT_H
+ 
+-enum phandles {PHANDLE_RESERVED = 0, PHANDLE_GIC, PHANDLE_MSI, PHANDLES_MAX};
++enum phandles {PHANDLE_RESERVED = 0, PHANDLE_GIC, PHANDLE_MSI, PHANDLE_DMA, PHANDLES_MAX};
+ 
+ #endif /* ARM__FDT_H */
+diff --git a/arm/pci.c b/arm/pci.c
+index 5bd82d4..d183177 100644
+--- a/arm/pci.c
++++ b/arm/pci.c
+@@ -74,6 +74,9 @@ void pci__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ 	if (irqchip == IRQCHIP_GICV2M || irqchip == IRQCHIP_GICV3_ITS)
+ 		_FDT(fdt_property_cell(fdt, "msi-parent", PHANDLE_MSI));
+ 
++	if (kvm->cfg.pkvm)
++		_FDT(fdt_property_cell(fdt, "memory-region", PHANDLE_DMA));
 +
-+static int map_bank_range(struct kvm *kvm, struct kvm_mem_bank *bank, void *data)
-+{
-+	struct bank_range *range = data;
-+	u64 gpa_offset;
-+	u64 map_offset;
-+	u64 hva;
-+	void *mapping;
+ 	/* Generate the interrupt map ... */
+ 	dev_hdr = device__first_dev(DEVICE_BUS_PCI);
+ 	while (dev_hdr && nentries < ARRAY_SIZE(irq_map)) {
+diff --git a/builtin-run.c b/builtin-run.c
+index 4642bc4..9ec5701 100644
+--- a/builtin-run.c
++++ b/builtin-run.c
+@@ -204,6 +204,8 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
+ 		    "Use legacy virtio transport"),			\
+ 	OPT_BOOLEAN('\0', "restricted_mem", &(cfg)->restricted_mem,	\
+ 		    "Use restricted memory for guests"),		\
++	OPT_BOOLEAN('\0', "pkvm", &(cfg)->pkvm,				\
++		    "Spawn a protected VM (pkvm)"),			\
+ 									\
+ 	OPT_GROUP("Kernel options:"),					\
+ 	OPT_STRING('k', "kernel", &(cfg)->kernel_filename, "kernel",	\
+diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+index ea5f3ea..a18b8a3 100644
+--- a/include/kvm/kvm-config.h
++++ b/include/kvm/kvm-config.h
+@@ -66,6 +66,7 @@ struct kvm_config {
+ 	bool mmio_debug;
+ 	bool virtio_legacy;
+ 	bool restricted_mem;
++	bool pkvm;
+ };
+ 
+ #endif
+diff --git a/virtio/pci-modern.c b/virtio/pci-modern.c
+index c5b4bc5..84af042 100644
+--- a/virtio/pci-modern.c
++++ b/virtio/pci-modern.c
+@@ -150,6 +150,9 @@ static bool virtio_pci__common_read(struct virtio_device *vdev,
+ 	struct virtio_pci *vpci = vdev->virtio;
+ 	u64 features = 1ULL << VIRTIO_F_VERSION_1;
+ 
++	if (vpci->kvm->cfg.pkvm)
++		features |= 1ULL << VIRTIO_F_ACCESS_PLATFORM;
 +
-+	if (!is_bank_range(bank, range))
-+		return 0;
-+
-+	gpa_offset = range->gpa - bank->guest_phys_addr;
-+	map_offset = bank->memfd_offset + gpa_offset;
-+	hva = (u64) bank->host_addr + gpa_offset;
-+
-+	BUG_ON(map_offset > bank->memfd_offset + bank->size);
-+	BUG_ON(map_offset < bank->memfd_offset);
-+	BUG_ON(hva < (u64)bank->host_addr);
-+	BUG_ON(!bank->memfd);
-+
-+	mapping = _mmap((void *)hva, range->size, PROT_RW, MAP_SHARED, bank->memfd, map_offset);
-+	if (mapping == MAP_FAILED || mapping != (void *)hva)
-+		pr_warning("%s gpa 0x%llx (size: %llu) at hva 0x%llx failed with mapping 0x%llx",
-+			   __func__,
-+			   (unsigned long long)range->gpa,
-+			   (unsigned long long)range->size,
-+			   (unsigned long long)hva,
-+			   (unsigned long long)mapping);
-+
-+	/* Do not proceed to trying to map the other banks. */
-+	return 1;
-+}
-+
-+static int unmap_bank_range(struct kvm *kvm, struct kvm_mem_bank *bank, void *data)
-+{
-+	struct bank_range *range = data;
-+	u64 gpa_offset;
-+	u64 hva;
-+	int ret;
-+
-+	if (!is_bank_range(bank, range))
-+		return 0;
-+
-+	gpa_offset = range->gpa - bank->guest_phys_addr;
-+	hva = (u64)bank->host_addr + gpa_offset;
-+
-+	BUG_ON(hva < (u64)bank->host_addr);
-+	BUG_ON(!bank->memfd);
-+
-+	ret = _munmap((void *)hva, range->size);
-+	if (ret)
-+		pr_warning("%s gpa 0x%llx (size: %llu) at hva 0x%llx failed with error %d",
-+			 __func__,
-+			 (unsigned long long)range->gpa,
-+			 (unsigned long long)range->size,
-+			 (unsigned long long)hva,
-+			 ret);
-+
-+	/* Do not proceed to trying to unmap the other banks. */
-+	return 1;
-+}
-+
-+static int map_bank(struct kvm *kvm, struct kvm_mem_bank *bank, void *data)
-+{
-+	void *mapping;
-+
-+	BUG_ON(!bank->memfd);
-+
-+	pr_debug("%s hva 0x%llx (size: %llu) of memfd %d (offset %llu)",
-+		 __func__,
-+		 (unsigned long long)bank->host_addr,
-+		 (unsigned long long)bank->size,
-+		 bank->memfd,
-+		 (unsigned long long)bank->memfd_offset);
-+
-+	mapping = _mmap(bank->host_addr, bank->size, PROT_RW, MAP_SHARED, bank->memfd, bank->memfd_offset);
-+	if (!mapping || mapping != bank->host_addr)
-+		pr_warning("%s hva 0x%llx (size: %llu) failed with return 0x%llx",
-+			   __func__,
-+			   (unsigned long long)bank->host_addr,
-+			   (unsigned long long)bank->size,
-+			   (unsigned long long)mapping);
-+	return 0;
-+}
-+
-+static int unmap_bank(struct kvm *kvm, struct kvm_mem_bank *bank, void *data)
-+{
-+	int ret;
-+
-+	pr_debug("%s hva 0x%llx (size: %llu)",
-+		 __func__,
-+		 (unsigned long long)bank->host_addr,
-+		 (unsigned long long)bank->size);
-+
-+	ret = _munmap(bank->host_addr, bank->size);
-+	if (ret)
-+		pr_warning("%s hva 0x%llx (size: %llu) failed with error %d",
-+			   __func__,
-+			   (unsigned long long)bank->host_addr,
-+			   (unsigned long long)bank->size,
-+			   ret);
-+	return 0;
-+}
-+
-+void map_guest_range(struct kvm *kvm, u64 gpa, u64 size)
-+{
-+	struct bank_range range = { .gpa = gpa, .size = size };
-+	int ret;
-+
-+	ret = kvm__for_each_mem_bank(kvm, KVM_MEM_TYPE_RAM|KVM_MEM_TYPE_DEVICE,
-+				     map_bank_range, &range);
-+
-+	if (!ret)
-+		pr_warning("%s gpa 0x%llx (size: %llu) found no matches",
-+			   __func__,
-+			   (unsigned long long)gpa,
-+			   (unsigned long long)size);
-+}
-+
-+void unmap_guest_range(struct kvm *kvm, u64 gpa, u64 size)
-+{
-+	struct bank_range range = { .gpa = gpa, .size = size };
-+	int ret;
-+
-+	ret = kvm__for_each_mem_bank(kvm, KVM_MEM_TYPE_RAM|KVM_MEM_TYPE_DEVICE,
-+				     unmap_bank_range, &range);
-+
-+	if (!ret)
-+		pr_warning("%s gpa 0x%llx (size: %llu) found no matches",
-+			   __func__,
-+			   (unsigned long long)gpa,
-+			   (unsigned long long)size);
-+
-+	return;
-+}
-+
-+void map_guest(struct kvm *kvm)
-+{
-+	kvm__for_each_mem_bank(kvm, KVM_MEM_TYPE_RAM|KVM_MEM_TYPE_DEVICE,
-+			       map_bank, NULL);
-+}
-+
-+void unmap_guest(struct kvm *kvm)
-+{
-+	kvm__for_each_mem_bank(kvm, KVM_MEM_TYPE_RAM|KVM_MEM_TYPE_DEVICE,
-+			       unmap_bank, NULL);
-+}
-+
- int kvm__recommended_cpus(struct kvm *kvm)
- {
- 	int ret;
+ 	switch (offset - VPCI_CFG_COMMON_START) {
+ 	case VIRTIO_PCI_COMMON_DFSELECT:
+ 		val = vpci->device_features_sel;
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
 
