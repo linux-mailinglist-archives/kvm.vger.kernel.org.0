@@ -2,329 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6296E6402E1
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 10:04:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E51596402EA
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 10:06:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232995AbiLBJET (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 04:04:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56284 "EHLO
+        id S232438AbiLBJGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 04:06:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232947AbiLBJD4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 04:03:56 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56321C0576
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 01:03:30 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B287qfW005036
-        for <kvm@vger.kernel.org>; Fri, 2 Dec 2022 09:03:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=5GnaBRfioCygxBs8QMA75+ujybGlyscQu0BOathY2II=;
- b=FvkH60II7SvsL/XXD02ir2Fa7cfNL4gU7wedS8Wru4Iew1ISN6zjQHkgUbeefiZsw/f1
- freat+2dCSYOXFFztyifOGQHVRda0aSdbcqG8lU4m5FQGyaI6Si8JzLaMt86GksLxswZ
- Rk47RCIYyDnG4bD4MfI7HI7W30CPJ5/Y4C2t24GGJmWIDOU6xCJ2H+vVwmMagtJ7jIhJ
- 3XdkJB3IZxWR+CdLK5QxmReybRxWcstXh98TBd6x3hHoKBzXH8OkTTobRjhRjNu9U7Dj
- atdLcjdP2T9rYEnm5PP5+FnOAOOoZ2p+iV7wR6xTp8DKWlK2oHRXzIF6I9vSVU35lmFG /w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m7dbj1g44-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:03:29 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B288P32006677
-        for <kvm@vger.kernel.org>; Fri, 2 Dec 2022 09:03:29 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m7dbj1g30-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Dec 2022 09:03:29 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B28p3i3000453;
-        Fri, 2 Dec 2022 09:03:26 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 3m3a2hxd47-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Dec 2022 09:03:26 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B293NP82884212
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 2 Dec 2022 09:03:23 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6BC9C11C04C;
-        Fri,  2 Dec 2022 09:03:23 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1816311C04A;
-        Fri,  2 Dec 2022 09:03:23 +0000 (GMT)
-Received: from [9.179.12.252] (unknown [9.179.12.252])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  2 Dec 2022 09:03:23 +0000 (GMT)
-Message-ID: <933616a6-0e1b-51e9-223e-0009d0b6b34b@linux.ibm.com>
-Date:   Fri, 2 Dec 2022 10:03:22 +0100
+        with ESMTP id S232554AbiLBJG2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 04:06:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 630F3F2
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 01:05:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669971929;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PfJ93dLRCeG2GBsUtx3//WXn16R7gr7n62jhn2ToEZQ=;
+        b=e/diA4bscdT5iChz84V5E9m2bdrHFPIBhYwedjTcEZOYmPvr3MieW7337pA1ZU0v9l1igA
+        nyU7ds5y0IF1K8aY12nmpuazxygFKiztVT1ILfrazjAXayLPHT9kc7dFXRbx5/rJftqCJ5
+        wETl1sNMdeSzpATb07BuZT4nskVzsiE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-533-8duqE_txO8eAAgnhjNT1pw-1; Fri, 02 Dec 2022 04:05:27 -0500
+X-MC-Unique: 8duqE_txO8eAAgnhjNT1pw-1
+Received: by mail-wm1-f71.google.com with SMTP id bi19-20020a05600c3d9300b003cf9d6c4016so3829997wmb.8
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 01:05:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PfJ93dLRCeG2GBsUtx3//WXn16R7gr7n62jhn2ToEZQ=;
+        b=U0aCSlrvYioESWUU+zsvfCfzbaSbK6SSpOQ7vQqDD3yeK03RoPelOJuDEQ1eqIIX8L
+         4Vt75qnx3vUMWEZw55lrogw+kur5peAvIQCTpIWK2bfO65ecdg8awGskVYtPQtRICAmt
+         tQv3+3hzdLbCdt1iYSc5dnCRCLjJI4+zhB6z/hLq/WV9Thrp3/wLoqwSe0Ikil+0ZW0p
+         TuYYejnRjRVE9JlM8U/zKwYtGABNeaSs9knAEWaeHKPpbnX64xb14/DpOhooFN556mFU
+         V7Kdg5OC2t2P8d3MoZD6zq2VxnENy8YDPS36ySIDoo9Paewlf69ve7pbeKWYDCcnjfqO
+         Txrg==
+X-Gm-Message-State: ANoB5plw80bVmwKg1FsBlBiDB1aXR2Uyk4W18v//je5XLUS2/XGpwQfy
+        D+JaXEViOkZP/CK2zdDgurxYgs+w6LK7BaVwtFHqvHbRBqE8yei5U933fTYdHo6n0C7KdJe6t2U
+        0ayQW6rMEhf6d
+X-Received: by 2002:a5d:6045:0:b0:242:16ad:9a91 with SMTP id j5-20020a5d6045000000b0024216ad9a91mr15335411wrt.197.1669971926847;
+        Fri, 02 Dec 2022 01:05:26 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6WJceT8QBVUD0zpPQkSfWy5DScDnZDc3La9y+xbLksGd4EzJm0mv7STAApMu247vDJZ0sbSQ==
+X-Received: by 2002:a5d:6045:0:b0:242:16ad:9a91 with SMTP id j5-20020a5d6045000000b0024216ad9a91mr15335397wrt.197.1669971926631;
+        Fri, 02 Dec 2022 01:05:26 -0800 (PST)
+Received: from [192.168.0.5] (ip-109-43-178-86.web.vodafone.de. [109.43.178.86])
+        by smtp.gmail.com with ESMTPSA id r2-20020a056000014200b002422bc69111sm8080008wrx.9.2022.12.02.01.05.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Dec 2022 01:05:26 -0800 (PST)
+Message-ID: <37a20bee-a3fb-c421-b89d-c1760e77cb11@redhat.com>
+Date:   Fri, 2 Dec 2022 10:05:24 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, thuth@redhat.com, pbonzini@redhat.com
-References: <20221201084642.3747014-1-nrb@linux.ibm.com>
- <20221201084642.3747014-2-nrb@linux.ibm.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
 Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 1/3] s390x: add library for skey-related
- functions
-In-Reply-To: <20221201084642.3747014-2-nrb@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
+        david@redhat.com
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, cohuck@redhat.com, mst@redhat.com,
+        pbonzini@redhat.com, kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+References: <20221129174206.84882-1-pmorel@linux.ibm.com>
+ <20221129174206.84882-7-pmorel@linux.ibm.com>
+ <fcedb98d-4333-9100-5366-8848727528f3@redhat.com>
+ <ea965d1c-ab6a-5aa3-8ce3-65b8177f6320@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v12 6/7] s390x/cpu_topology: activating CPU topology
+In-Reply-To: <ea965d1c-ab6a-5aa3-8ce3-65b8177f6320@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: -ueDOxR2EAFd481150rBRgQ2CYnjguPn
-X-Proofpoint-GUID: dB95eukY7r0AdDRZeFUWCBXLaNxpWU1j
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-02_04,2022-12-01_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 spamscore=0 clxscore=1015 impostorscore=0
- suspectscore=0 phishscore=0 mlxlogscore=999 bulkscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2210170000 definitions=main-2212020069
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/1/22 09:46, Nico Boehr wrote:
-> Upcoming changes will add a test which is very similar to the existing
-> skey migration test. To reduce code duplication, move the common
-> functions to a library which can be re-used by both tests.
+On 01/12/2022 12.52, Pierre Morel wrote:
 > 
-
-NACK
-
-We're not putting test specific code into the library.
-
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   lib/s390x/skey.c       | 92 ++++++++++++++++++++++++++++++++++++++++++
->   lib/s390x/skey.h       | 32 +++++++++++++++
->   s390x/Makefile         |  1 +
->   s390x/migration-skey.c | 44 +++-----------------
->   4 files changed, 131 insertions(+), 38 deletions(-)
->   create mode 100644 lib/s390x/skey.c
->   create mode 100644 lib/s390x/skey.h
 > 
-> diff --git a/lib/s390x/skey.c b/lib/s390x/skey.c
-> new file mode 100644
-> index 000000000000..100f0949a244
-> --- /dev/null
-> +++ b/lib/s390x/skey.c
-> @@ -0,0 +1,92 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Storage key migration test library
-> + *
-> + * Copyright IBM Corp. 2022
-> + *
-> + * Authors:
-> + *  Nico Boehr <nrb@linux.ibm.com>
-> + */
-> +
-> +#include <libcflat.h>
-> +#include <asm/facility.h>
-> +#include <asm/mem.h>
-> +#include <skey.h>
-> +
-> +/*
-> + * Set storage keys on pagebuf.
-> + * pagebuf must point to page_count consecutive pages.
-> + */
-> +void skey_set_keys(uint8_t *pagebuf, unsigned long page_count)
-> +{
-> +	unsigned char key_to_set;
-> +	unsigned long i;
-> +
-> +	for (i = 0; i < page_count; i++) {
-> +		/*
-> +		 * Storage keys are 7 bit, lowest bit is always returned as zero
-> +		 * by iske.
-> +		 * This loop will set all 7 bits which means we set fetch
-> +		 * protection as well as reference and change indication for
-> +		 * some keys.
-> +		 */
-> +		key_to_set = i * 2;
-> +		set_storage_key(pagebuf + i * PAGE_SIZE, key_to_set, 1);
-> +	}
-> +}
-> +
-> +/*
-> + * Verify storage keys on pagebuf.
-> + * Storage keys must have been set by skey_set_keys on pagebuf before.
-> + *
-> + * If storage keys match the expected result, will return a skey_verify_result
-> + * with verify_failed false. All other fields are then invalid.
-> + * If there is a mismatch, returned struct will have verify_failed true and will
-> + * be filled with the details on the first mismatch encountered.
-> + */
-> +struct skey_verify_result skey_verify_keys(uint8_t *pagebuf, unsigned long page_count)
-> +{
-> +	union skey expected_key, actual_key;
-> +	struct skey_verify_result result = {
-> +		.verify_failed = true
-> +	};
-> +	uint8_t *cur_page;
-> +	unsigned long i;
-> +
-> +	for (i = 0; i < page_count; i++) {
-> +		cur_page = pagebuf + i * PAGE_SIZE;
-> +		actual_key.val = get_storage_key(cur_page);
-> +		expected_key.val = i * 2;
-> +
-> +		/*
-> +		 * The PoP neither gives a guarantee that the reference bit is
-> +		 * accurate nor that it won't be cleared by hardware. Hence we
-> +		 * don't rely on it and just clear the bits to avoid compare
-> +		 * errors.
-> +		 */
-> +		actual_key.str.rf = 0;
-> +		expected_key.str.rf = 0;
-> +
-> +		if (actual_key.val != expected_key.val) {
-> +			result.expected_key.val = expected_key.val;
-> +			result.actual_key.val = actual_key.val;
-> +			result.page_mismatch_idx = i;
-> +			result.page_mismatch_addr = (unsigned long)cur_page;
-> +			return result;
-> +		}
-> +	}
-> +
-> +	result.verify_failed = false;
-> +	return result;
-> +}
-> +
-> +void skey_report_verify(struct skey_verify_result * const result)
-> +{
-> +	if (result->verify_failed)
-> +		report_fail("page skey mismatch: first page idx = %lu, addr = 0x%lx, "
-> +			"expected_key = 0x%x, actual_key = 0x%x",
-> +			result->page_mismatch_idx, result->page_mismatch_addr,
-> +			result->expected_key.val, result->actual_key.val);
-> +	else
-> +		report_pass("skeys match");
-> +}
-> diff --git a/lib/s390x/skey.h b/lib/s390x/skey.h
-> new file mode 100644
-> index 000000000000..a0f8caa1270b
-> --- /dev/null
-> +++ b/lib/s390x/skey.h
-> @@ -0,0 +1,32 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Storage key migration test library
-> + *
-> + * Copyright IBM Corp. 2022
-> + *
-> + * Authors:
-> + *  Nico Boehr <nrb@linux.ibm.com>
-> + */
-> +#ifndef S390X_SKEY_H
-> +#define S390X_SKEY_H
-> +
-> +#include <libcflat.h>
-> +#include <asm/facility.h>
-> +#include <asm/page.h>
-> +#include <asm/mem.h>
-> +
-> +struct skey_verify_result {
-> +	bool verify_failed;
-> +	union skey expected_key;
-> +	union skey actual_key;
-> +	unsigned long page_mismatch_idx;
-> +	unsigned long page_mismatch_addr;
-> +};
-> +
-> +void skey_set_keys(uint8_t *pagebuf, unsigned long page_count);
-> +
-> +struct skey_verify_result skey_verify_keys(uint8_t *pagebuf, unsigned long page_count);
-> +
-> +void skey_report_verify(struct skey_verify_result * const result);
-> +
-> +#endif /* S390X_SKEY_H */
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index bf1504f9d58c..d097b7071dfb 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -99,6 +99,7 @@ cflatobjs += lib/s390x/malloc_io.o
->   cflatobjs += lib/s390x/uv.o
->   cflatobjs += lib/s390x/sie.o
->   cflatobjs += lib/s390x/fault.o
-> +cflatobjs += lib/s390x/skey.o
->   
->   OBJDIRS += lib/s390x
->   
-> diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
-> index b7bd82581abe..fed6fc1ed0f8 100644
-> --- a/s390x/migration-skey.c
-> +++ b/s390x/migration-skey.c
-> @@ -10,55 +10,23 @@
->   
->   #include <libcflat.h>
->   #include <asm/facility.h>
-> -#include <asm/page.h>
-> -#include <asm/mem.h>
-> -#include <asm/interrupt.h>
->   #include <hardware.h>
-> +#include <skey.h>
->   
->   #define NUM_PAGES 128
-> -static uint8_t pagebuf[NUM_PAGES][PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
-> +static uint8_t pagebuf[NUM_PAGES * PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
->   
->   static void test_migration(void)
->   {
-> -	union skey expected_key, actual_key;
-> -	int i, key_to_set, key_mismatches = 0;
-> +	struct skey_verify_result result;
->   
-> -	for (i = 0; i < NUM_PAGES; i++) {
-> -		/*
-> -		 * Storage keys are 7 bit, lowest bit is always returned as zero
-> -		 * by iske.
-> -		 * This loop will set all 7 bits which means we set fetch
-> -		 * protection as well as reference and change indication for
-> -		 * some keys.
-> -		 */
-> -		key_to_set = i * 2;
-> -		set_storage_key(pagebuf[i], key_to_set, 1);
-> -	}
-> +	skey_set_keys(pagebuf, NUM_PAGES);
->   
->   	puts("Please migrate me, then press return\n");
->   	(void)getchar();
->   
-> -	for (i = 0; i < NUM_PAGES; i++) {
-> -		actual_key.val = get_storage_key(pagebuf[i]);
-> -		expected_key.val = i * 2;
-> -
-> -		/*
-> -		 * The PoP neither gives a guarantee that the reference bit is
-> -		 * accurate nor that it won't be cleared by hardware. Hence we
-> -		 * don't rely on it and just clear the bits to avoid compare
-> -		 * errors.
-> -		 */
-> -		actual_key.str.rf = 0;
-> -		expected_key.str.rf = 0;
-> -
-> -		/* don't log anything when key matches to avoid spamming the log */
-> -		if (actual_key.val != expected_key.val) {
-> -			key_mismatches++;
-> -			report_fail("page %d expected_key=0x%x actual_key=0x%x", i, expected_key.val, actual_key.val);
-> -		}
-> -	}
-> -
-> -	report(!key_mismatches, "skeys after migration match");
-> +	result = skey_verify_keys(pagebuf, NUM_PAGES);
-> +	skey_report_verify(&result);
->   }
->   
->   int main(void)
+> On 12/1/22 11:15, Thomas Huth wrote:
+>> On 29/11/2022 18.42, Pierre Morel wrote:
+>>> The KVM capability, KVM_CAP_S390_CPU_TOPOLOGY is used to
+>>> activate the S390_FEAT_CONFIGURATION_TOPOLOGY feature and
+>>> the topology facility for the guest in the case the topology
+>>> is available in QEMU and in KVM.
+>>>
+>>> The feature is fenced for SE (secure execution).
+>>
+>> Out of curiosity: Why does it not work yet?
+>>
+>>> To allow smooth migration with old QEMU the feature is disabled by
+>>> default using the CPU flag -disable-topology.
+>>
+>> I stared at this code for a while now, but I have to admit that I don't 
+>> quite get it. Why do we need a new "disable" feature flag here? I think it 
+>> is pretty much impossible to set "ctop=on" with an older version of QEMU, 
+>> since it would require the QEMU to enable KVM_CAP_S390_CPU_TOPOLOGY in the 
+>> kernel for this feature bit - and older versions of QEMU don't set this 
+>> capability yet.
+>>
+>> Which scenario would fail without this disable-topology feature bit? What 
+>> do I miss?
+> 
+> The only scenario it provides is that ctop is then disabled by default on 
+> newer QEMU allowing migration between old and new QEMU for older machine 
+> without changing the CPU flags.
+> 
+> Otherwise, we would need -ctop=off on newer QEMU to disable the topology.
+
+Ah, it's because you added S390_FEAT_CONFIGURATION_TOPOLOGY to the default 
+feature set here:
+
+  static uint16_t default_GEN10_GA1[] = {
+      S390_FEAT_EDAT,
+      S390_FEAT_GROUP_MSA_EXT_2,
++    S390_FEAT_DISABLE_CPU_TOPOLOGY,
++    S390_FEAT_CONFIGURATION_TOPOLOGY,
+  };
+
+?
+
+But what sense does it make to enable it by default, just to disable it by 
+default again with the S390_FEAT_DISABLE_CPU_TOPOLOGY feature? ... sorry, I 
+still don't quite get it, but maybe it's because my sinuses are quite 
+clogged due to a bad cold ... so if you could elaborate again, that would be 
+very appreciated!
+
+However, looking at this from a distance, I would not rather not add this to 
+any default older CPU model at all (since it also depends on the kernel to 
+have this feature enabled)? Enabling it in the host model is still ok, since 
+the host model is not migration safe anyway.
+
+  Thomas
 
