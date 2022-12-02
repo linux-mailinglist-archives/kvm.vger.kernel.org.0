@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 54FCF640C5F
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:44:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48473640C60
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:44:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233878AbiLBRoc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 12:44:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35492 "EHLO
+        id S233901AbiLBRog (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 12:44:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233873AbiLBRo0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233888AbiLBRo0 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 2 Dec 2022 12:44:26 -0500
 Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C0F9DEA48
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:44:23 -0800 (PST)
-Received: by mail-wr1-x44a.google.com with SMTP id g14-20020adfa48e000000b00241f94bcd54so1256590wrb.23
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:44:23 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8C0DDEA58
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:44:25 -0800 (PST)
+Received: by mail-wr1-x44a.google.com with SMTP id e7-20020adf9bc7000000b00242121eebe2so1225179wrc.3
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:44:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yhyawS7kJhQQSVgVJnQgPFltY+BVOYcIZhbJ8N9jvFw=;
-        b=gtsqf+Tqym3zq8mDcVkCeMWUB8q2lSdEtTktCFzYsBVqLm2De7d4IHGD8TsO5nFgm8
-         nQK38S/+XCyRIweXVhFDhaNgLD4UOUEBbtWpFcFJ7wsD3XVVeB4yUUHEBeJFEWdcPrLZ
-         WeDF698pPg6ny61H+Vks0oJOz7cQM0KL7qN3AcICIdS7bGsPjI/PvSx+TwQgd6JBiBRG
-         44TMojD+pefKthphiaGbuO/H5G+hqPtzuH4midb7Os0brCQEc2xHzsE8WGYtvZZfUVPX
-         xlE/P7waif9w2bwOMp+AAmZCYtI+F++/YZGRLaCTmJwGPcaAE+ZzoBLNQfTJegYj/5nt
-         Uvjg==
+        bh=30AptmEOrxEptsR4xup5ZnAEVV6MngChT14ZxzqU+kw=;
+        b=Rg/bRb7xUsh3ybr2HBnoYLk5EM9nkIyydg1oLPtBI4hpGSaYU5EdeC5v0n1ihyaI2U
+         VfWifEPUHMCxGNzVYv+/aMXRvp35lV1KM+iTTrxs4bidFxXOK9YYv4sgEFgvJ15ioYiO
+         04HDdY11JQjh35v5d8WRsbTRCu9AP28uuwMm8uAr+QuHybxSmW2c/G9IOK5fTgu54A1D
+         CIBkZZIqj1xzn12w0Rz+tv7GVzMo+HDiRPJbr05M7xyDha23LQjyo7D4sU6AnseWKvom
+         h9BtNqDtWwt9bciRE4jaXN9kV/WZZye/LENS4sbiwgjIJIU0HeWnIEHimzkwkrj200dr
+         K+Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yhyawS7kJhQQSVgVJnQgPFltY+BVOYcIZhbJ8N9jvFw=;
-        b=d5msfIPbes7BAYPj2woYtklAzue2LlJZknp/3vGlCzZmeOm4qe8pHMCKsGFEwU/Y4l
-         iPD1cdFe56W0pYcWteASQK62LM7KXIvDC3yWrDkvzqAOwZAu4Yig7VZijz6Z0beOAQoA
-         F1Ku9d/JGf073wuBQvG4UfjfRefNIHPo5VAddLY53sRzVXFt8MidU8RPsDvKarIPzSrb
-         2PcQ9xlesQWYmkEWmhEFe6aru0+pBfXCWPJy/zAF96BTNTxmT68MzHoq0yNRVphIsHSE
-         bZHU1cupiqqavkEsPGyTGpb46MpyKGNLkGpFIoK6KfwmmL0aFmvY+hJ7A0fZDXejp5rI
-         A8Ww==
-X-Gm-Message-State: ANoB5pm/uiHgUfRsTgja0PqcKG3DO4e5DupQUna0TPVJzbLIOcHuDtt6
-        u63QTTVvH8ht+FeJABkBCfXbXf64W6I1CsTho0DtbaaAOZHsABTu+XEN4RTSJcsrrGeQK56ma49
-        leUOIxjr3zdd6Zh3aODZzM/+vWsWyX3JXnfjX6kabdGZuqiMTIfB06QA=
-X-Google-Smtp-Source: AA0mqf74e+cbmoJWL9Zi0NnL0rlr6BCAZZWZ2/NEBmLz2sjz91ObQB1kMw5ko7n/L/fnEyxUMcIzKAKVXQ==
+        bh=30AptmEOrxEptsR4xup5ZnAEVV6MngChT14ZxzqU+kw=;
+        b=rAc2T4NcApPrvhwg65nNL7IbS+8ywIzYtGdehfSRrxG7AfwQwmDH/VKXOuEoYZUIYk
+         fQHQ6lOm2kPPDjlv9KbQ3kCpTIwrKsxe0Kwj89+Sf7jO90FNkcJugxh6BfJrPCpO+bj6
+         Tg1la0k76LPPhtKTGyRBIXPmHoYJ7I8K/4u5MU0Z5LH1jvog889tb9Q96SXKHOYNCPj6
+         pF7mzEe8L9zFKgk61YbmqqruN4Ky69arQovZcs/r0WlO5/zIdURlYFfriEuf8atLsrml
+         Wb2i7GNcIm/GBpMFrsjDBJhn/1gDjEm94Wo12hgwnipylCkjCW4nimib2mH04nNW/sG5
+         GdrQ==
+X-Gm-Message-State: ANoB5pnrD+Nrnia2Hfvwkvivc+9WQ4zV48SstPx3/OQqoWgEI+Ic0asL
+        cFDfETt0oesbttZOH1KOfkpLUs/tnHMZk11ipRX0Dh2Bbuu9vxa8fTkkYI4wsbCbJaSYVgy98z4
+        rIEIQxldzb1raeT1ZGWm1b2OIA1iGB9+qCLLqVeYTnzBu4D0lTUfZhQU=
+X-Google-Smtp-Source: AA0mqf4yVfa+tq3OK2llj3VIeUfB6d5/ddbIgqyenU673ogOKPz25MnpjYoMoERdQjQwfZkoMhFs3QCuGg==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:3514:b0:3cf:a985:7692 with SMTP id
- h20-20020a05600c351400b003cfa9857692mr45930356wmq.104.1670003061592; Fri, 02
- Dec 2022 09:44:21 -0800 (PST)
-Date:   Fri,  2 Dec 2022 17:43:46 +0000
+ (user=tabba job=sendgmr) by 2002:a05:600c:3c91:b0:3cf:6f23:a3e3 with SMTP id
+ bg17-20020a05600c3c9100b003cf6f23a3e3mr3618369wmb.1.1670003063959; Fri, 02
+ Dec 2022 09:44:23 -0800 (PST)
+Date:   Fri,  2 Dec 2022 17:43:47 +0000
 In-Reply-To: <20221202174417.1310826-1-tabba@google.com>
 Mime-Version: 1.0
 References: <20221202174417.1310826-1-tabba@google.com>
 X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221202174417.1310826-2-tabba@google.com>
-Subject: [RFC PATCH kvmtool v1 01/32] Initialize the return value in kvm__for_each_mem_bank()
+Message-ID: <20221202174417.1310826-3-tabba@google.com>
+Subject: [RFC PATCH kvmtool v1 02/32] Remove newline from end of die() aborts
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
@@ -69,36 +69,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If none of the bank types match, the function would return an
-uninitialized value.
+die() already adds the newline at the end of the string.
 
+Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- kvm.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ util/util.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/kvm.c b/kvm.c
-index 42b8812..765dc71 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -381,14 +381,15 @@ u64 host_to_guest_flat(struct kvm *kvm, void *ptr)
-  * their type.
-  *
-  * If one call to @fun returns a non-zero value, stop iterating and return the
-- * value. Otherwise, return zero.
-+ * value. If none of the bank types match, return -ENODEV. Otherwise, return
-+ * zero.
-  */
- int kvm__for_each_mem_bank(struct kvm *kvm, enum kvm_mem_type type,
- 			   int (*fun)(struct kvm *kvm, struct kvm_mem_bank *bank, void *data),
- 			   void *data)
- {
--	int ret;
- 	struct kvm_mem_bank *bank;
-+	int ret = -ENODEV;
+diff --git a/util/util.c b/util/util.c
+index 1877105..786dfc5 100644
+--- a/util/util.c
++++ b/util/util.c
+@@ -90,14 +90,14 @@ void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+ 	unsigned long blk_size;
  
- 	list_for_each_entry(bank, &kvm->mem_banks, list) {
- 		if (type != KVM_MEM_TYPE_ALL && !(bank->type & type))
+ 	if (statfs(htlbfs_path, &sfs) < 0)
+-		die("Can't stat %s\n", htlbfs_path);
++		die("Can't stat %s", htlbfs_path);
+ 
+ 	if ((unsigned int)sfs.f_type != HUGETLBFS_MAGIC)
+-		die("%s is not hugetlbfs!\n", htlbfs_path);
++		die("%s is not hugetlbfs!", htlbfs_path);
+ 
+ 	blk_size = (unsigned long)sfs.f_bsize;
+ 	if (sfs.f_bsize == 0 || blk_size > size) {
+-		die("Can't use hugetlbfs pagesize %ld for mem size %lld\n",
++		die("Can't use hugetlbfs pagesize %ld for mem size %lld",
+ 			blk_size, (unsigned long long)size);
+ 	}
+ 
+@@ -106,10 +106,10 @@ void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size)
+ 	snprintf(mpath, PATH_MAX, "%s/kvmtoolXXXXXX", htlbfs_path);
+ 	fd = mkstemp(mpath);
+ 	if (fd < 0)
+-		die("Can't open %s for hugetlbfs map\n", mpath);
++		die("Can't open %s for hugetlbfs map", mpath);
+ 	unlink(mpath);
+ 	if (ftruncate(fd, size) < 0)
+-		die("Can't ftruncate for mem mapping size %lld\n",
++		die("Can't ftruncate for mem mapping size %lld",
+ 			(unsigned long long)size);
+ 	addr = mmap(NULL, size, PROT_RW, MAP_PRIVATE, fd, 0);
+ 	close(fd);
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
 
