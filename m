@@ -2,144 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D81864037C
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 10:39:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92995640391
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 10:43:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233039AbiLBJjK convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 2 Dec 2022 04:39:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42108 "EHLO
+        id S232854AbiLBJnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 04:43:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232577AbiLBJjB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 04:39:01 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54E46B7DCB
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 01:38:58 -0800 (PST)
-Received: from fraeml711-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4NNnql0wg2z6HJNr;
-        Fri,  2 Dec 2022 17:35:47 +0800 (CST)
-Received: from lhrpeml100004.china.huawei.com (7.191.162.219) by
- fraeml711-chm.china.huawei.com (10.206.15.60) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 2 Dec 2022 10:38:55 +0100
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml100004.china.huawei.com (7.191.162.219) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Fri, 2 Dec 2022 09:38:55 +0000
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2375.034;
- Fri, 2 Dec 2022 09:38:55 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Yishai Hadas <yishaih@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-        "leonro@nvidia.com" <leonro@nvidia.com>,
-        "shayd@nvidia.com" <shayd@nvidia.com>,
-        "maorg@nvidia.com" <maorg@nvidia.com>,
-        "avihaih@nvidia.com" <avihaih@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>
-Subject: RE: [PATCH V2 vfio 02/14] vfio: Extend the device migration protocol
- with PRE_COPY
-Thread-Topic: [PATCH V2 vfio 02/14] vfio: Extend the device migration protocol
- with PRE_COPY
-Thread-Index: AQHZBZoJXXyoA82qikWEEG1TNybH/65aVWHg
-Date:   Fri, 2 Dec 2022 09:38:55 +0000
-Message-ID: <90968e5f85a64bc68bb3d140fd7a4045@huawei.com>
-References: <20221201152931.47913-1-yishaih@nvidia.com>
- <20221201152931.47913-3-yishaih@nvidia.com>
-In-Reply-To: <20221201152931.47913-3-yishaih@nvidia.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.126.168.102]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        with ESMTP id S232526AbiLBJnv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 04:43:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED9A426499
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 01:42:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669974169;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+wLl4vtYCGhwohXxITZQq5I6CY9K6KjTKaeRzYrEEpY=;
+        b=GVyMkVrxHuH6ntzuBs4aff9tewyssz9Vp2M/M4P1m+LoXlEEKm8kH2GbKgdYtd2OJeF+vE
+        RyWKS65gp9qEqlF88IMqgTPxdZZiUdCeYdKGVDv6WMLCE2WO1AivtqZxglgo1HaZW+Wknk
+        BK4lxk/HK8Xti52QOHJO/Z22nhzgWSQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-111-uzTlSB3_Px20wqM9cYwOeQ-1; Fri, 02 Dec 2022 04:42:48 -0500
+X-MC-Unique: uzTlSB3_Px20wqM9cYwOeQ-1
+Received: by mail-wr1-f72.google.com with SMTP id r17-20020adfb1d1000000b002421ae7fd46so937733wra.10
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 01:42:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+wLl4vtYCGhwohXxITZQq5I6CY9K6KjTKaeRzYrEEpY=;
+        b=4LcVU/+D72a4XDWUXLKHK6z3oWstS9/IDAIx7Ka4zuWIY1f4M015U50Ye3C0LOzPBZ
+         lk6vsGTsybUfyKdYz2Z7o16hTmoeqObTjdRtxZ65JfWypygw/tl5ykjfOPL2ZC1VTjId
+         L4WXlfe8EYq33LGlNqAXlOn9B+2MqczZBpVtFfBBOQ96UbFRyw9qET1R65xbPSQBf6d2
+         WW33wQbW/f9djMekmgjfv+Rt9sqp4reOidx+htC8y1Mbu/kdmhP+k8S2sVS3IWOS71qN
+         gFfL51LZwLMBkyg8qAiNqznqkwBEf60PZ+S823mYDXhA5NYTyoGJ6Vm1GcDgcUjiZqhU
+         BgjA==
+X-Gm-Message-State: ANoB5plD+WYVU8NhBrPpXlgg1/+xRst9uCILD3HoW/6zx83R3bU9uxOO
+        GzT5loKIfwfeOJzSLDEOcJKKrEP/EAL/hRL1t4D2Cg7UPObCqWWsx+z5jHaQGN/UA/tC7hp6P39
+        rODGXIjzUriV0
+X-Received: by 2002:a5d:6947:0:b0:242:17a5:ee80 with SMTP id r7-20020a5d6947000000b0024217a5ee80mr14530216wrw.628.1669974166727;
+        Fri, 02 Dec 2022 01:42:46 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6UdJV/mDJpmRG4muvnS79yLQAxAfJtB+81SwOHAcWOxkps8MZJhxfA5YRNqhJp3giA0N1wyw==
+X-Received: by 2002:a5d:6947:0:b0:242:17a5:ee80 with SMTP id r7-20020a5d6947000000b0024217a5ee80mr14530202wrw.628.1669974166476;
+        Fri, 02 Dec 2022 01:42:46 -0800 (PST)
+Received: from [192.168.1.130] (205.pool92-176-231.dynamic.orange.es. [92.176.231.205])
+        by smtp.gmail.com with ESMTPSA id z5-20020adff745000000b002383fc96509sm6488257wrp.47.2022.12.02.01.42.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Dec 2022 01:42:46 -0800 (PST)
+Message-ID: <3805ed81-2315-4eca-3ea6-b391c1659cc7@redhat.com>
+Date:   Fri, 2 Dec 2022 10:42:44 +0100
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH 1/2] KVM: Mark KVM_SET_MEMORY_REGION and
+ KVM_SET_MEMORY_ALIAS as obsoleted
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Sergio Lopez Pascual <slp@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org
+References: <20221119085632.1018994-1-javierm@redhat.com>
+ <Y4T+SY9SZIRFBdBM@google.com>
+ <a6a59b75-2ee2-ab9b-3038-2590df17d031@redhat.com>
+Content-Language: en-US
+From:   Javier Martinez Canillas <javierm@redhat.com>
+In-Reply-To: <a6a59b75-2ee2-ab9b-3038-2590df17d031@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello Sean and Paolo,
 
+Thanks for your feedback.
 
-> -----Original Message-----
-> From: Yishai Hadas [mailto:yishaih@nvidia.com]
-> Sent: 01 December 2022 15:29
-> To: alex.williamson@redhat.com; jgg@nvidia.com
-> Cc: kvm@vger.kernel.org; kevin.tian@intel.com; joao.m.martins@oracle.com;
-> leonro@nvidia.com; shayd@nvidia.com; yishaih@nvidia.com;
-> maorg@nvidia.com; avihaih@nvidia.com; cohuck@redhat.com
-> Subject: [PATCH V2 vfio 02/14] vfio: Extend the device migration protocol
-> with PRE_COPY
+On 11/30/22 15:28, Paolo Bonzini wrote:
+> On 11/28/22 19:30, Sean Christopherson wrote:
+>> E.g. KVM_{CREATE,GET,SET}_PIT are good examples of obsolete ioctls; they've been
+>> supplanted by newer variants, but KVM still supports the old ones too.
+>>
+>> Alternatively (to marking them deprecated), can we completely remove all references
+>> to VM_SET_MEMORY_REGION and KVM_SET_MEMORY_ALIAS?  The cascading updates in api.rst
+>> will be painful, but it's one-time pain.
+> 
+> Yes, we should.
+>
 
-[...]
+Ok. I'll do that and post a v2 then.
  
-> +/**
-> + * VFIO_MIG_GET_PRECOPY_INFO - _IO(VFIO_TYPE, VFIO_BASE + 21)
-> + *
-> + * This ioctl is used on the migration data FD in the precopy phase of the
-> + * migration data transfer. It returns an estimate of the current data sizes
-> + * remaining to be transferred. It allows the user to judge when it is
-> + * appropriate to leave PRE_COPY for STOP_COPY.
-> + *
-> + * This ioctl is valid only in PRE_COPY states and kernel driver should
-> + * return -EINVAL from any other migration state.
-> + *
-> + * The vfio_precopy_info data structure returned by this ioctl provides
-> + * estimates of data available from the device during the PRE_COPY states.
-> + * This estimate is split into two categories, initial_bytes and
-> + * dirty_bytes.
-> + *
-> + * The initial_bytes field indicates the amount of initial precopy
-> + * data available from the device. This field should have a non-zero initial
-> + * value and decrease as migration data is read from the device.
-> + * It is recommended to leave PRE_COPY for STOP_COPY only after this field
-> + * reaches zero. Leaving PRE_COPY earlier might make things slower.
-> + *
-> + * The dirty_bytes field tracks device state changes relative to data
-> + * previously retrieved.  This field starts at zero and may increase as
-> + * the internal device state is modified or decrease as that modified
-> + * state is read from the device.
-> + *
-> + * Userspace may use the combination of these fields to estimate the
-> + * potential data size available during the PRE_COPY phases, as well as
-> + * trends relative to the rate the device is dirtying its internal
-> + * state, but these fields are not required to have any bearing relative
-> + * to the data size available during the STOP_COPY phase.
-> + *
-> + * Drivers have a lot of flexibility in when and what they transfer during the
-> + * PRE_COPY phase, and how they report this from
-> VFIO_MIG_GET_PRECOPY_INFO.
-> + *
-> + * During pre-copy the migration data FD has a temporary "end of stream"
-> that is
-> + * reached when both initial_bytes and dirty_byte are zero. For instance,
-> this
-> + * may indicate that the device is idle and not currently dirtying any internal
-> + * state. When read() is done on this temporary end of stream the kernel
-> driver
-> + * should return ENOMSG from read(). Userspace can wait for more data
-> (which may
-> + * never come) by using poll.
-> + *
-> + * Once in STOP_COPY the migration data FD has a permanent end of
-> stream
-> + * signaled in the usual way by read() always returning 0 and poll always
-> + * returning readable. ENOMSG may not be returned in STOP_COPY.
-> Support
-> + * for this ioctl is optional.
+> Paolo
+> 
 
-Isn't mandatory if the driver claims support for VFIO_MIGRATION_PRE_COPY?
+-- 
+Best regards,
 
-Other than that looks fine to me.
-
-Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Javier Martinez Canillas
+Core Platforms
+Red Hat
 
