@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6638B640C6C
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:45:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 46AE7640C6D
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:45:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234143AbiLBRo7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 12:44:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35812 "EHLO
+        id S234243AbiLBRpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 12:45:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234028AbiLBRo6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 12:44:58 -0500
+        with ESMTP id S234155AbiLBRpD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 12:45:03 -0500
 Received: from mail-wm1-x349.google.com (mail-wm1-x349.google.com [IPv6:2a00:1450:4864:20::349])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA06EDEA63
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:44:51 -0800 (PST)
-Received: by mail-wm1-x349.google.com with SMTP id b47-20020a05600c4aaf00b003d031aeb1b6so4436826wmp.9
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:44:51 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9ABDEDD65
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:44:53 -0800 (PST)
+Received: by mail-wm1-x349.google.com with SMTP id c187-20020a1c35c4000000b003cfee3c91cdso2814986wma.6
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:44:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tb2/i5z2SM49ghSm0/D7B5+7IVHEWxAtSa+JkItmtE8=;
-        b=dxd4OPFsvb86d3Iq1zAP3skHvxX32mkUw3Sv9ToO46aFddL6Q2j8UHOVVqs2DLyLO8
-         vvSsQsrnmGNfLvOJtC8J/yAEizF/JR/IYli/HV22CrpASLqdwlNf6DZKd4iWonuRCKbj
-         k9B6UACXZ5iwdIV+JcISFA33XvpVQm/hUyWU6xwVx6vJROwi0DTSitCb+COxFp+y+DjE
-         +6ycxKjG8Xd1qIXFFy6wByjPo3H4A+5AoflIIWxdaJhTZtAbxoAd7mwbnUiiduoxz2bL
-         kHKjL2f6VWHgVNMEA+BnFxhZZ9H0ZWpcoGRqRXDg3Dg6WmQWBgDps0ZktzQbB6i8byos
-         neiA==
+        bh=JIsIuRXiWXnXCKwBJDitiOnCfkciTH1HHiRQDJHgesk=;
+        b=lY3D0DG7OYlu/yLytmFiO8bmtzr8j9RfeLmUddAzokAVSmv+7ynAuyoKHx7GcG8t/F
+         55ZnmvJMFoCE0O0DAA8Axw8QMGxURWTXZsAb7YDYjVjKkZXhnxCe4Fk8ik8VyKqnCvRL
+         L6BNV1DD2lvnBStXHefVhTW4vwgGHseRN4XPWWc2TCRVgZ/AKW+nUTUVKzF0gqdUOIpl
+         GgsiQUH2slfO3tUMNZSJrY31AmOGGLD9oie3FPW1g9QRDikHVR0cBa3AgsL6Ipkr0VdL
+         rwnWmr2s+oCVC8OmEfGr81javC5h99KB6ZQuYwZaFWYZmsxXUhIJ2CznxwRmcL4gczNc
+         hhNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tb2/i5z2SM49ghSm0/D7B5+7IVHEWxAtSa+JkItmtE8=;
-        b=xq+0r7+yd5w+QQkTALlwUJTwt2NsA2QPcbaC8VMQmtPGhObXrsVJdOZNTXVLtNsW8t
-         JmRaMwGTamQ3eXpxgEDjUey+H2doUEYq3RyIRQguXOxUdGJq5MvSysdtyq0xEVbIL5sT
-         I0ad65xXhSEWP6fsRkYwV7TJU+VGK7bRwgl8rSbC5RsbLSPHaOYmQxeMsP8hmZzwY60G
-         9DdU5VB6u/pHw76WH6WB2nZH+2rOHmfQiSamHR8ocurnVs8xnGX9JgF9vOXw8y0OJHqn
-         7E4K7gwbHcsFrzUu5+vVaUis6i5F76y5DCKesAzIuO0les40TnaZawDRp80SSSjLKY3G
-         jCGA==
-X-Gm-Message-State: ANoB5plTuJiVieEDZuTayRGCezoPTWz3fypywLGlGYKto3hmPdP9NO38
-        kOoIR2DOiVqrHo6RP2/UcgSrPeHwejCTNO6Z9HxzHAViF15WwfZjDq6e7JqbJNXIk6vjH5ZNn4N
-        /4SpkCsGdjLqWZCVzT7xRxxb+tCNIMBe5XYvaQIvx+KLc1US8y1sVQpM=
-X-Google-Smtp-Source: AA0mqf6FrWavDFFYV1M8keBaJIE2TsVugeLr/0Dq4N98C4cBZrsGtGfVj1uM7Num2k2KgPdqZqsIjy1K6g==
+        bh=JIsIuRXiWXnXCKwBJDitiOnCfkciTH1HHiRQDJHgesk=;
+        b=IsDH+61WsfwIm4djGEB+6BBAoj881/eRc5sVdlciWHCTlImj6mgl+1a+niARQBdqEb
+         B0uN3e1ULuEmCvEfOIpF/AshZ+rvODtdub0wkiu/5NGM1G1i7YU9dif5ge56pZFwsocM
+         IkCj9bmbdq2ByySBIBkjTzDLZB8X+NwZSVt9cY0xDoUF3RtINt7OshkCWMc6kmdOLE9q
+         ebk1wBWGkh2c34rCHVjFriZq7WVGfREHd/7WOeaqabQ8R/a04exxkr+fl0NQ3pT9Gfxb
+         ijMSG5T2j3In3av5fPzYH90oMOKRhK1cRkCcmHhvhxYzvS7TQUS/Jp8DKsVjuMuzs8y8
+         pbTw==
+X-Gm-Message-State: ANoB5pmLl5KDmPSjBj/HG+XlougSH8WhvyZ5/cSm48iEepkglyBGVU9T
+        F4BSiCDmup7/AFxlVUFQWanQvcRmgUKEgSnLUGKwlDxPh7ykReTxPc/QlbsKodQhfc2Ho9nV5wx
+        b55EZfKvIf+ydEjKFP+AzLZlpNPMvt4Ye/Zck8cah1NRtqDNXXrHZxCQ=
+X-Google-Smtp-Source: AA0mqf43ij/55PqTAKj6ipU15xRnsATW4/+aFXEeVudl+Q4NKkeJLuJLubxlzu1acaQojbKVMfCbZr/kLQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:1f1b:b0:3cf:35c8:289f with SMTP id
- bd27-20020a05600c1f1b00b003cf35c8289fmr45006220wmb.153.1670003090215; Fri, 02
- Dec 2022 09:44:50 -0800 (PST)
-Date:   Fri,  2 Dec 2022 17:43:59 +0000
+ (user=tabba job=sendgmr) by 2002:a05:600c:2145:b0:3d0:920f:f7b7 with SMTP id
+ v5-20020a05600c214500b003d0920ff7b7mr515672wml.22.1670003092186; Fri, 02 Dec
+ 2022 09:44:52 -0800 (PST)
+Date:   Fri,  2 Dec 2022 17:44:00 +0000
 In-Reply-To: <20221202174417.1310826-1-tabba@google.com>
 Mime-Version: 1.0
 References: <20221202174417.1310826-1-tabba@google.com>
 X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221202174417.1310826-15-tabba@google.com>
-Subject: [RFC PATCH kvmtool v1 14/32] Remove struct fields and code used for alignment
+Message-ID: <20221202174417.1310826-16-tabba@google.com>
+Subject: [RFC PATCH kvmtool v1 15/32] Replace kvm__arch_delete_ram() with kvm__delete_ram()
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
@@ -69,164 +69,142 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that the allocator allocates aligned memory, remove
-arch-specific code and struct fields used for alignment.
+Now that deleting ram is the same across all architectures, no
+need for arch-specific deletion of ram.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arm/include/arm-common/kvm-arch.h |  7 -------
- arm/kvm.c                         | 31 +++++++++++--------------------
- riscv/include/kvm/kvm-arch.h      |  7 -------
- riscv/kvm.c                       | 21 +++++++--------------
- 4 files changed, 18 insertions(+), 48 deletions(-)
+ arm/kvm.c         |  5 -----
+ include/kvm/kvm.h |  1 -
+ kvm.c             | 13 +++++++++----
+ mips/kvm.c        |  5 -----
+ powerpc/kvm.c     |  5 -----
+ riscv/kvm.c       |  5 -----
+ x86/kvm.c         |  5 -----
+ 7 files changed, 9 insertions(+), 30 deletions(-)
 
-diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-index b2ae373..654abc9 100644
---- a/arm/include/arm-common/kvm-arch.h
-+++ b/arm/include/arm-common/kvm-arch.h
-@@ -96,13 +96,6 @@ static inline bool arm_addr_in_ioport_region(u64 phys_addr)
- }
- 
- struct kvm_arch {
--	/*
--	 * We may have to align the guest memory for virtio, so keep the
--	 * original pointers here for munmap.
--	 */
--	void	*ram_alloc_start;
--	u64	ram_alloc_size;
--
- 	/*
- 	 * Guest addresses for memory layout.
- 	 */
 diff --git a/arm/kvm.c b/arm/kvm.c
-index 0e5bfad..770075e 100644
+index 770075e..5cceef8 100644
 --- a/arm/kvm.c
 +++ b/arm/kvm.c
-@@ -27,7 +27,6 @@ bool kvm__arch_cpu_supports_vm(void)
- void kvm__init_ram(struct kvm *kvm)
- {
- 	u64 phys_start, phys_size;
--	void *host_mem;
- 	int err;
- 
- 	/*
-@@ -37,42 +36,34 @@ void kvm__init_ram(struct kvm *kvm)
- 	 * 2M trumps 64K, so let's go with that.
- 	 */
- 	kvm->ram_size = kvm->cfg.ram_size;
--	kvm->arch.ram_alloc_size = kvm->ram_size;
--	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs_align(kvm,
--						kvm->cfg.hugetlbfs_path,
--						kvm->arch.ram_alloc_size,
--						SZ_2M);
-+	kvm->ram_start = mmap_anon_or_hugetlbfs_align(kvm,
-+						      kvm->cfg.hugetlbfs_path,
-+						      kvm->ram_size, SZ_2M);
- 
--	if (kvm->arch.ram_alloc_start == MAP_FAILED)
-+	if (kvm->ram_start == MAP_FAILED)
- 		die("Failed to map %lld bytes for guest memory (%d)",
--		    kvm->arch.ram_alloc_size, errno);
-+		    kvm->ram_size, errno);
- 
--	kvm->ram_start = kvm->arch.ram_alloc_start;
--
--	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
--		MADV_MERGEABLE);
--
--	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
--		MADV_HUGEPAGE);
-+	madvise(kvm->ram_start, kvm->ram_size, MADV_MERGEABLE);
-+	madvise(kvm->ram_start, kvm->ram_size, MADV_HUGEPAGE);
- 
- 	phys_start	= kvm->cfg.ram_addr;
- 	phys_size	= kvm->ram_size;
--	host_mem	= kvm->ram_start;
- 
--	err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-+	err = kvm__register_ram(kvm, phys_start, phys_size, kvm->ram_start);
- 	if (err)
- 		die("Failed to register %lld bytes of memory at physical "
- 		    "address 0x%llx [err %d]", phys_size, phys_start, err);
- 
- 	kvm->arch.memory_guest_start = phys_start;
- 
--	pr_debug("RAM created at 0x%llx - 0x%llx (host_mem 0x%llx)",
--		 phys_start, phys_start + phys_size - 1, (u64)host_mem);
-+	pr_debug("RAM created at 0x%llx - 0x%llx (host ram_start 0x%llx)",
-+		 phys_start, phys_start + phys_size - 1, (u64)kvm->ram_start);
+@@ -61,11 +61,6 @@ void kvm__init_ram(struct kvm *kvm)
+ 		 phys_start, phys_start + phys_size - 1, (u64)kvm->ram_start);
  }
  
- void kvm__arch_delete_ram(struct kvm *kvm)
- {
--	munmap(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size);
-+	munmap(kvm->ram_start, kvm->ram_size);
- }
- 
+-void kvm__arch_delete_ram(struct kvm *kvm)
+-{
+-	munmap(kvm->ram_start, kvm->ram_size);
+-}
+-
  void kvm__arch_read_term(struct kvm *kvm)
-diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
-index 1e130f5..5bb7eee 100644
---- a/riscv/include/kvm/kvm-arch.h
-+++ b/riscv/include/kvm/kvm-arch.h
-@@ -56,13 +56,6 @@
- struct kvm;
+ {
+ 	serial8250__update_consoles(kvm);
+diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+index d0d519b..f0be524 100644
+--- a/include/kvm/kvm.h
++++ b/include/kvm/kvm.h
+@@ -198,7 +198,6 @@ void kvm__arch_validate_cfg(struct kvm *kvm);
+ void kvm__arch_set_cmdline(char *cmdline, bool video);
+ void kvm__arch_init(struct kvm *kvm);
+ u64 kvm__arch_default_ram_address(void);
+-void kvm__arch_delete_ram(struct kvm *kvm);
+ int kvm__arch_setup_firmware(struct kvm *kvm);
+ int kvm__arch_free_firmware(struct kvm *kvm);
+ bool kvm__arch_cpu_supports_vm(void);
+diff --git a/kvm.c b/kvm.c
+index 84a8675..3a3383a 100644
+--- a/kvm.c
++++ b/kvm.c
+@@ -169,14 +169,19 @@ struct kvm *kvm__new(void)
+ 	return kvm;
+ }
  
- struct kvm_arch {
--	/*
--	 * We may have to align the guest memory for virtio, so keep the
--	 * original pointers here for munmap.
--	 */
--	void	*ram_alloc_start;
--	u64	ram_alloc_size;
+-int kvm__exit(struct kvm *kvm)
++static void kvm__delete_ram(struct kvm *kvm)
+ {
+-	struct kvm_mem_bank *bank, *tmp;
 -
- 	/*
- 	 * Guest addresses for memory layout.
- 	 */
+-	kvm__arch_delete_ram(kvm);
++	munmap(kvm->ram_start, kvm->ram_size);
+ 
+ 	if (kvm->ram_fd >= 0)
+ 		close(kvm->ram_fd);
++}
++
++int kvm__exit(struct kvm *kvm)
++{
++	struct kvm_mem_bank *bank, *tmp;
++
++	kvm__delete_ram(kvm);
+ 
+ 	list_for_each_entry_safe(bank, tmp, &kvm->mem_banks, list) {
+ 		list_del(&bank->list);
+diff --git a/mips/kvm.c b/mips/kvm.c
+index 0faa03a..0a0d025 100644
+--- a/mips/kvm.c
++++ b/mips/kvm.c
+@@ -56,11 +56,6 @@ void kvm__init_ram(struct kvm *kvm)
+ 	}
+ }
+ 
+-void kvm__arch_delete_ram(struct kvm *kvm)
+-{
+-	munmap(kvm->ram_start, kvm->ram_size);
+-}
+-
+ void kvm__arch_set_cmdline(char *cmdline, bool video)
+ {
+ 
+diff --git a/powerpc/kvm.c b/powerpc/kvm.c
+index 7b0d066..8d467e9 100644
+--- a/powerpc/kvm.c
++++ b/powerpc/kvm.c
+@@ -148,11 +148,6 @@ void kvm__arch_init(struct kvm *kvm)
+ 			 SPAPR_PCI_IO_WIN_SIZE);
+ }
+ 
+-void kvm__arch_delete_ram(struct kvm *kvm)
+-{
+-	munmap(kvm->ram_start, kvm->ram_size);
+-}
+-
+ void kvm__irq_trigger(struct kvm *kvm, int irq)
+ {
+ 	kvm__irq_line(kvm, irq, 1);
 diff --git a/riscv/kvm.c b/riscv/kvm.c
-index e26b4f0..d05b8e4 100644
+index d05b8e4..4a2a3df 100644
 --- a/riscv/kvm.c
 +++ b/riscv/kvm.c
-@@ -48,7 +48,7 @@ void kvm__init_ram(struct kvm *kvm)
- 
- void kvm__arch_delete_ram(struct kvm *kvm)
- {
--	munmap(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size);
-+	munmap(kvm->ram_start, kvm->ram_size);
+@@ -46,11 +46,6 @@ void kvm__init_ram(struct kvm *kvm)
+ 	kvm->arch.memory_guest_start = phys_start;
  }
  
+-void kvm__arch_delete_ram(struct kvm *kvm)
+-{
+-	munmap(kvm->ram_start, kvm->ram_size);
+-}
+-
  void kvm__arch_read_term(struct kvm *kvm)
-@@ -70,23 +70,16 @@ void kvm__arch_init(struct kvm *kvm)
- 	 * 2M trumps 64K, so let's go with that.
- 	 */
- 	kvm->ram_size = min(kvm->cfg.ram_size, (u64)RISCV_MAX_MEMORY(kvm));
--	kvm->arch.ram_alloc_size = kvm->ram_size;
--	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs_align(kvm,
--						kvm->cfg.hugetlbfs_path,
--						kvm->arch.ram_alloc_size,
--						SZ_2M);
-+	kvm->ram_start = mmap_anon_or_hugetlbfs_align(kvm,
-+						      kvm->cfg.hugetlbfs_path,
-+						      kvm->ram_size, SZ_2M);
- 
--	if (kvm->arch.ram_alloc_start == MAP_FAILED)
-+	if (kvm->ram_start == MAP_FAILED)
- 		die("Failed to map %lld bytes for guest memory (%d)",
- 		    kvm->arch.ram_alloc_size, errno);
- 
--	kvm->ram_start = kvm->arch.ram_alloc_start;
--
--	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
--		MADV_MERGEABLE);
--
--	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
--		MADV_HUGEPAGE);
-+	madvise(kvm->ram_start, kvm->ram_size, MADV_MERGEABLE);
-+	madvise(kvm->ram_start, kvm->ram_size, MADV_HUGEPAGE);
+ {
+ 	serial8250__update_consoles(kvm);
+diff --git a/x86/kvm.c b/x86/kvm.c
+index 328fa75..8d29904 100644
+--- a/x86/kvm.c
++++ b/x86/kvm.c
+@@ -177,11 +177,6 @@ void kvm__arch_init(struct kvm *kvm)
+ 		die_perror("KVM_CREATE_IRQCHIP ioctl");
  }
  
- #define FDT_ALIGN	SZ_4M
+-void kvm__arch_delete_ram(struct kvm *kvm)
+-{
+-	munmap(kvm->ram_start, kvm->ram_size);
+-}
+-
+ void kvm__irq_line(struct kvm *kvm, int irq, int level)
+ {
+ 	struct kvm_irq_level irq_level;
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
 
