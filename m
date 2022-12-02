@@ -2,145 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9541563FD7B
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 02:06:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A87F63FD8F
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 02:17:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231453AbiLBBGl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Dec 2022 20:06:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56836 "EHLO
+        id S229473AbiLBBRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Dec 2022 20:17:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229893AbiLBBGj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Dec 2022 20:06:39 -0500
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2046.outbound.protection.outlook.com [40.107.96.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63702CE439
-        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 17:06:38 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=L4wngHqTCn+QD4r7zWlhKSZtYmDflJ6MWg18PFYj4UXIyE5IatAhXyT5CDfSJ16ofjKg7UEp6aBib0+pJZLOPPX/FbtsqDrrZ1fZmx+w70dUXuMGfDAJkmy06Ewx9fDWJqoBRYcz9o9KqwcWamxdZ/bQU9sfJLke2rVnWzM7yiNnrrIppBqMAsgNcykG7y/0HzYG1dG10rvqTYUzZjQhFNDYCDNqeeiSNfXA4LcTC5/xTx+nm8+ObCd1CYoRuEFQKJESr2Av0/YXP7nezWnE9eKYS0Addp7+o1eBQi2xlEuU4KZpyR9qHWCQTiQmimI/D6z6QBZz3iDrOLgQXgXELQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hoNmZQzNElv7Vwn6aRrwiubBX6SHk7LYmHl/O2Nibqc=;
- b=RgwsFEBlbdamqR25APuYqEY6R2l11D91eSHikRYka6pUWRNNohZHpOSPuSBZbcpAmrGBjIMehQWChMGWvfsz1ZH8tJggkPpgV+5VuKElZ/Eo4POQXWMqV/rwqB6n6iS+E015YIeez9GRVq1gR9SWi9v6oIXxRaSYz966WXYq+JzDoXpHnmMwOb2CQQhoC3PDK3frUA+9LCPg5f7xMzic5ZiBsBALD1zRjrraCAn/l+aFLAVMBZjw/zJcFXHElc4T16eHCl01GauLnMiZszYcWdcgVhA83eLaQ5JreFxASyYgawsBjYXzgfZM3U/IxPBnOtru/noUbzLorRocw+B21w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hoNmZQzNElv7Vwn6aRrwiubBX6SHk7LYmHl/O2Nibqc=;
- b=Ut6lJ9pfWNHufxjmE04NxGeKiSB2uHhMsU8ga42GZ3FOoLHpCsY904jo5eVJU/dL0ThoC2QdD/YcPsMDSJ7HLTPzV526yh63MAEMPlbvMF/pFMcEM/5Cb2oVaWKiw4QwJFpqsKOlLoE6s7hsYcPI5C5pi+dUv4fZixcTYHWjw7867ijx0iG7UAs9/IIIR7DuWzM3MVYYvuUDX4Xqhh2S35RH3E52t6K3fyq3aADNqzaPBmQDQ7KkmkX+73V9gJEoDgoGr+SexiEEbboSqVyrnOWFCwB6qNrBffli1m5pU+u5qHFuZuZckCxNSeV0qRnpTpeKA3pcFpCNib5o9jCouw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH2PR12MB4181.namprd12.prod.outlook.com (2603:10b6:610:a8::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.10; Fri, 2 Dec
- 2022 01:06:36 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%8]) with mapi id 15.20.5857.023; Fri, 2 Dec 2022
- 01:06:36 +0000
-Date:   Thu, 1 Dec 2022 21:06:35 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     alex.williamson@redhat.com, kvm@vger.kernel.org,
-        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
-        shayd@nvidia.com, maorg@nvidia.com, avihaih@nvidia.com,
-        cohuck@redhat.com
-Subject: Re: [PATCH V2 vfio 00/14] Add migration PRE_COPY support for mlx5
- driver
-Message-ID: <Y4lPm4ZYYfn7gUTh@nvidia.com>
-References: <20221201152931.47913-1-yishaih@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221201152931.47913-1-yishaih@nvidia.com>
-X-ClientProxiedBy: MN2PR03CA0001.namprd03.prod.outlook.com
- (2603:10b6:208:23a::6) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S231511AbiLBBRc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Dec 2022 20:17:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C65C3BB007
+        for <kvm@vger.kernel.org>; Thu,  1 Dec 2022 17:16:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669943793;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8raBElocjG+t7Z576KbcBzbA6x08SH2I7LOvae+fW3w=;
+        b=DphpiExuxJ3oorRTKWlib1+n/ytnh8dMujIfPRk+P5cF7ymjsP9UKOCi4zCj8GU0EZ5/+r
+        YnGu1bbiqoEQFl7RYgv+Bsl1qzFmjCaihuD9786C7Hj5ri9D048DwaK2Xy+b064KWfNG5r
+        VnVSIVAXOb12LFysWXgT81arFVMflZU=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-132-vMuBks6LO82rTsA1GdQg0w-1; Thu, 01 Dec 2022 20:16:32 -0500
+X-MC-Unique: vMuBks6LO82rTsA1GdQg0w-1
+Received: by mail-ed1-f71.google.com with SMTP id w4-20020a05640234c400b004631f8923baso1695585edc.5
+        for <kvm@vger.kernel.org>; Thu, 01 Dec 2022 17:16:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8raBElocjG+t7Z576KbcBzbA6x08SH2I7LOvae+fW3w=;
+        b=8LlojIhmfhE6An6AV6X0OUb3u5vGT6fkW1/HZE+VUlWMPlJ8xOq+a7l/GmLNvLPKmG
+         IZvRLeYiL32Ph4jKEpHYiZ5ZY2enfKbI1/FGNskW+KiXwQpCeVUoNGZiRtjnFvRBfH0O
+         Hii2Fv0bGSxBqgUJFVOn9OPnrTF9cldPTcpknhMPUnks8B1kXfvBR2/tS96MKjtb2lYl
+         QaZOtbx6YiKNQLr+VHXzG0Z3KSaFtMi6/yw2q7282m7vKz6EPMpzNO6Ja9opFCZchptF
+         3lMVzZ/MoxcwlL/8vqHHJAsx+CFN2suAfIOSxeZxczEcFk+0JFX+ONbRGPuFOeV43BbH
+         qD3g==
+X-Gm-Message-State: ANoB5plSkiBcUtdCWqWmObMZhpwp1mBhiNuNl+vXiwO7D4vigVqr7kNw
+        cXjB+ukjXq6F+1zfltqMlkh8Mnwd1hRCsBUEn8wevz3ILx2FyOrhFzAUFUYhGKKyLBjtopedP1x
+        q1jypQVB5zI0m
+X-Received: by 2002:a17:906:8616:b0:7ac:db70:3ab5 with SMTP id o22-20020a170906861600b007acdb703ab5mr58215752ejx.160.1669943789690;
+        Thu, 01 Dec 2022 17:16:29 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5DD/PVWtDOqetlcstMmsJ7MWcNf9tn4t1t6dCDSsyjo3/YdfehE39IoyjS0zJt1qxjwjKzFg==
+X-Received: by 2002:a17:906:8616:b0:7ac:db70:3ab5 with SMTP id o22-20020a170906861600b007acdb703ab5mr58215739ejx.160.1669943789445;
+        Thu, 01 Dec 2022 17:16:29 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:e3ec:5559:7c5c:1928? ([2001:b07:6468:f312:e3ec:5559:7c5c:1928])
+        by smtp.googlemail.com with ESMTPSA id a20-20020a17090680d400b007c081cf2d25sm2379668ejx.204.2022.12.01.17.16.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Dec 2022 17:16:28 -0800 (PST)
+Message-ID: <d1499221-99ca-0024-3094-81cd1b5787e5@redhat.com>
+Date:   Fri, 2 Dec 2022 02:16:26 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH2PR12MB4181:EE_
-X-MS-Office365-Filtering-Correlation-Id: ee0bfa9b-39f2-4818-8508-08dad40175f8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nuMi7wkedmxPU2rc1+9d0Sfht7em31dyz/rISAhFT+PRHF1tZsX1IC/X8xxP8z+DmUKZZdROFmSX5Xy9AMOhWiF5H1hE3gVxyaWJFSg48KVlJIUO0hVDsAs0dE8AHyBabIQ+gwrtg30/6nmy09DltrxtBbpoNo4CXjfLMDzQM7v7TW4GInHJnDhmofTriT4cQ9DLJq8tjvaSVEKHmhj1h7ZJmGTregppBrkBb0nqrdZFKjFuFe2YFZvJG13041txGv+LzY15bQz5+meodKm4UBwC0aUB7OmoSsZhtgqyhEGQaezqU5JRK/H7gok5tRgDsW64WEh6ZkQvlFVphL48toL7GagtnQuQIIK/051aqHoKr++PZcvf4F1lnNL6tvXX48vIFI3+XpFnsDK5+wjH82qm9WR30+blkbf2clZW7KcI+xcjz7tzZwKZXB6SLJj+S2brayZT3r6uCMwkFN4/M3COOG2SDeNsenf6Ki8KWysAfrjO6boisFOpoNmpOApvkiZw7yGSi27Cn9dAaRE3gFKUE+SMmor6o9VavV7zhYXo6OZF27ip2YgdEdQobgCbKvpsaMbZ+SOVbLaRlixlrWN619mT0XOv+F1CMqrnoePeig9pua1NjyjUMZPdS8iuUVhkoyEL/deS7hSGMs9c6Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(39860400002)(366004)(396003)(346002)(376002)(451199015)(6506007)(6486002)(6636002)(26005)(186003)(6512007)(316002)(478600001)(37006003)(8676002)(4326008)(66476007)(66946007)(66556008)(2616005)(41300700001)(8936002)(4744005)(5660300002)(6862004)(2906002)(36756003)(86362001)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6Hu1I41YmgQk/f5OnAymSj89bBZw6Hk5BDia0VBEFs/meBjFbE/PJf/ZB/e8?=
- =?us-ascii?Q?Ui4w9NzlAbvFpHv5X3QlyG3GILYv1SNlt2V8/BOn+PL2fXArP1185+wy9zTC?=
- =?us-ascii?Q?IpJmglMypNTKoYSMfVuL2cAnMo4rNf3wKORQcZ4BoTkTzy1A/ExaBiBbXbHM?=
- =?us-ascii?Q?FWH8gXf7JgpYt1VJB8fPc1d2RmjxdhNshX0LJf2X66nPGT+Ug26WKILfgTfu?=
- =?us-ascii?Q?ppohtaPhi8QuAzYo26o9XTknciPMCGq+Cx2HpOrD/nV/Jh61fSgs99x8lSSR?=
- =?us-ascii?Q?7s3xxKFejQGzV2f2jP4QXwNhHLZJtezk3uY8Z1RmVof4YrA9zOW/OHOpdVCr?=
- =?us-ascii?Q?BbGvwvKeMwngWzJE07xixUc+z0/JVYMYqFD21zBOgL3t2B6NJmYHxdV6zJNR?=
- =?us-ascii?Q?4D6pelarVRPVjoGDK3HOYeOFKlSA2OY/dJHV4LC14VP/cI7AbEJGzjgTkcaj?=
- =?us-ascii?Q?1Xh6zBUGNhSP6jLFqoDGvUER2gM0E2WRj17RzM10owK+nyrSEtDIg1OlK7Fk?=
- =?us-ascii?Q?EXGOVBcZueGCcEYsvg61DIq1GFunLcY2roMGIn/+l4OZfK1w6+peYIbpO0Jt?=
- =?us-ascii?Q?zOnpmSMN0/BFBBBP32mCEwhXASShwjCY5fEOnnhq2hRGDcyQhedTYzcseTjf?=
- =?us-ascii?Q?prq6kBd48fGQYwGpievKX+zHRaMHL8/btwizQjY71zCwzm5NtusL/1mg+z9r?=
- =?us-ascii?Q?SoeubpGb5M7b01Nv2uoFfoyaFnA6h2DU2uEHQaYY9t3axZjPjf5wc5oD6S7H?=
- =?us-ascii?Q?Apq1HMk8MB4TWlwtG0upN1wbncjJEGKyutPcdSRDxkyGLITTcvo2GBMvrMJJ?=
- =?us-ascii?Q?ikb+rrRgUmRbLufTEt8nVv5o6VYyxVkVso4MU8goY6W6K5QsLzQ1rbSVnQeg?=
- =?us-ascii?Q?Xj1IEt2B5a5jXLYSf2YmlOs72/rDPZjT/n0yLQ29+qIR2cBnjlQCVBx2SXMZ?=
- =?us-ascii?Q?GWbk+QSFUzDomLod9s2V1yTAlJ4ENVtDK7AXwhWUI/r6OXx0Cp4C/FKvmOKC?=
- =?us-ascii?Q?fad9cTd5sCxM8z/SAFw5fwVvcLmEIh21YTKOZl+3xmuABkW+T+405EUxP1n1?=
- =?us-ascii?Q?60bpMRym9cDkn8g5qyCFidk4gPGOcUXASOJxcaCXiY3XUt4V7oMh+flkZ0tN?=
- =?us-ascii?Q?aQYFTGZkpQ9g3bk1tpq1TU1ASAqz8jxPDvQQ2AlRQXSzrRU3ARZpgysUuZfB?=
- =?us-ascii?Q?PKYSbv19Km/ZsqivgVUEq8ElOGDUV7CQlWUfFmQgGSomVb1AtiyJ86sD5+cp?=
- =?us-ascii?Q?EjVF1czKNBE0cKSam/WTx4bjhC33WBBkz++jXcXfWGS6a3SSwly1OdQXpZeu?=
- =?us-ascii?Q?DoAN51QWV4HnZZuK9Hzp/hLdUFVbJg78m/DINd0+Eu+PhlZfI/NqI9DAxfXr?=
- =?us-ascii?Q?F50FPF7W7tQqHr35+dDzlvB/EWojULBq0TSATvXnG6pKkYgrK3W+6SkrZ2IW?=
- =?us-ascii?Q?FMMlfpfA++XQCcscQgdLMZ3aJPWbxyqddzeCQyV2t7xcC7RIEn02DVo23gs7?=
- =?us-ascii?Q?qQnel7thPmxzSStkLBDDKom1/tfWNfcbNZk7423+x4OMy6X2fj/RauHma6Px?=
- =?us-ascii?Q?nwr7QpBMDkiICDiER2M=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee0bfa9b-39f2-4818-8508-08dad40175f8
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2022 01:06:36.7186
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pcWjJF06EbshQVxhlwwfgNvg5rPmKPpcMK2olE7sZLQHvEeQKpchXwuclJNuzgQf
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4181
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Content-Language: en-US
+To:     "Ashish Gupta (SJC)" <ashish.gupta1@nutanix.com>,
+        Suresh Gumpula <suresh.gumpula@nutanix.com>,
+        Felipe Franciosi <felipe@nutanix.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "seanjc@google.com" <seanjc@google.com>,
+        John Levon <john.levon@nutanix.com>,
+        Bijan Mottahedeh <bijan.mottahedeh@nutanix.com>,
+        Eiichi Tsukata <eiichi.tsukata@nutanix.com>
+References: <PH0PR02MB84228844F6176836E8C86B1BA40F9@PH0PR02MB8422.namprd02.prod.outlook.com>
+ <df01b973-d56c-7ba9-866f-9ca47dccd123@redhat.com>
+ <PH0PR02MB84229CEBB3C7A8DAC626107CA40F9@PH0PR02MB8422.namprd02.prod.outlook.com>
+ <PH0PR02MB8422D2C6A7F56200FCD384D8A40F9@PH0PR02MB8422.namprd02.prod.outlook.com>
+ <CABgObfa+NKKeV=178L348VfrZkB7sa2kCZ1V1kwU+3pKfUd2jg@mail.gmail.com>
+ <PH0PR02MB84221C062510FCFAEE7EE9BAA4109@PH0PR02MB8422.namprd02.prod.outlook.com>
+ <0f4b560d-8148-6a1e-6634-6d31168d5032@redhat.com>
+ <PH0PR02MB8422C61596331E2B17E476C7A4149@PH0PR02MB8422.namprd02.prod.outlook.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: Nvidia GPU PCI passthrough and kernel commit
+ #5f33887a36824f1e906863460535be5d841a4364
+In-Reply-To: <PH0PR02MB8422C61596331E2B17E476C7A4149@PH0PR02MB8422.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 01, 2022 at 05:29:17PM +0200, Yishai Hadas wrote:
-
+On 12/2/22 01:29, Ashish Gupta (SJC) wrote:
+> Hi Paolo,
 > 
-> Jason Gunthorpe (1):
->   vfio: Extend the device migration protocol with PRE_COPY
+> While we were accessing code change done by commit : 
+> 5f33887a36824f1e906863460535be5d841a4364
 > 
-> Shay Drory (3):
->   net/mlx5: Introduce ifc bits for pre_copy
->   vfio/mlx5: Fallback to STOP_COPY upon specific PRE_COPY error
->   vfio/mlx5: Enable MIGRATION_PRE_COPY flag
+> Bijan, noticed following:
 > 
-> Yishai Hadas (10):
->   vfio/mlx5: Enforce a single SAVE command at a time
->   vfio/mlx5: Refactor PD usage
->   vfio/mlx5: Refactor MKEY usage
->   vfio/mlx5: Refactor migration file state
->   vfio/mlx5: Refactor to use queue based data chunks
->   vfio/mlx5: Introduce device transitions of PRE_COPY
->   vfio/mlx5: Introduce SW headers for migration states
->   vfio/mlx5: Introduce vfio precopy ioctl implementation
->   vfio/mlx5: Consider temporary end of stream as part of PRE_COPY
->   vfio/mlx5: Introduce multiple loads
+>  From the changed code in commit  # 
+> 5f33887a36824f1e906863460535be5d841a4364 , we see that the following check
+> 
+> !kvm_vcpu_apicv_active(vcpu)*/)/*
+> 
+> has been removed, so in fact the new code is basically assuming that 
+> apicv is always active.
 
-This looks OK to me now, the logic is clear
+Right, instead it checks irqchip_in_kernel(kvm) && enable_apicv.  This 
+is documented in the commit message:
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+     However, these checks do not attempt to synchronize with changes to
+     the IRTE.  In particular, there is no path that updates the IRTE
+     when APICv is re-activated on vCPU 0; and there is no path to wakeup
+     a CPU that has APICv disabled, if the wakeup occurs because of an
+     IRTE that points to a posted interrupt.
 
-Thanks,
-Jason
+The full series is at 
+https://lore.kernel.org/lkml/20211123004311.2954158-2-pbonzini@redhat.com/T/ 
+and has more details:
+
+     Now that APICv can be disabled per-CPU (depending on whether it has
+     some setup that is incompatible) we need to deal with guests having
+     a mix of vCPUs with enabled/disabled posted interrupts.  For
+     assigned devices, their posted interrupt configuration must be the
+     same across the whole VM, so handle posted interrupts by hand on
+     vCPUs with disabled posted interrupts.
+
+All four patches were marked as stable, but it looks like the first 
+three did not apply and therefore are not part of 5.10.
+
+78311a514099932cd8434d5d2194aa94e56ab67c
+     KVM: x86: ignore APICv if LAPIC is not enabled
+7e1901f6c86c896acff6609e0176f93f756d8b2a
+     KVM: VMX: prepare sync_pir_to_irr for running with APICv disabled
+37c4dbf337c5c2cdb24365ffae6ed70ac1e74d7a
+     KVM: x86: check PIR even for vCPUs with disabled APICv
+
+The three commits do not have any subsequent commit that Fixes them.
+
+> The latest upstream code however seems to disable apicv conditionally 
+> depending on if it is actually being used:
+
+Right.
+
+> We found that, once we disable hyperv benightment for Linux vm, 
+> everything is working fine (on v5.10.84)
+> 
+> Further Eiichi noticed, that your change were introduced in 5.16 and 
+> backported to 5.10.84.
+> 
+> On the other hand, Vitaly's patch (commit 
+> #0f250a646382e017725001a552624be0c86527bf) was introduced in 5.15 and 
+> NOT backported to 5.10.X.
+> 
+> Should we backport Vitaly's patch to stable 5.10.X? Do you think that 
+> will solve issue what we are facing?
+
+As you found out there are a lot of dependent changes to introduce 
+__kvm_request_apicv_update so it's not really feasible.
+
+Paolo
+
