@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD6D3640C72
-	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:45:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8273A640C73
+	for <lists+kvm@lfdr.de>; Fri,  2 Dec 2022 18:45:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234291AbiLBRpn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 12:45:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37052 "EHLO
+        id S234372AbiLBRpq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 12:45:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234276AbiLBRp2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S234298AbiLBRp2 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 2 Dec 2022 12:45:28 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E2FCEFD30
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:45:13 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-3dddef6adb6so41118627b3.11
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:45:13 -0800 (PST)
+Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C59DEFD3A
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 09:45:14 -0800 (PST)
+Received: by mail-wm1-x34a.google.com with SMTP id s24-20020a7bc398000000b003d087485a9aso950352wmj.1
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 09:45:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=beB34PxrwokOKRwQ8xX4T+xnA3Uimq2Xl8QpEqhqffA=;
-        b=o/OjwIVyALbfqTrJjPTPr8HceThCvm7SjfCFEzPLNyJJCJPsa3QcZ2DImnmBkrZCW4
-         7XDL+CaXI6VgRa5YAh+f29lE2McM4H3vX3I+4ynv8jjgrY+D7dtMiJ1aNs70pC6Ab1RT
-         JBBegRulixaGpkMAsIV1FTj9RoYrttZHyBUOlY4wuhQnjmb7fCLR7gK9jjw3y/qsnZ2Y
-         VKRTrnZfONqx2StzOk/PMG2BNqOy9OjLXqBrlcqFDuuMGgaqLfx6axGGB0D58vil6aeD
-         evg7fowe0LVlDotyWmoajqy7gwJUikq8/nCGQFbGVxhl9nLuZdvasALvONSB30WlZXvC
-         sBLA==
+        bh=1JhQFmKC0trfMj3OYJRD3fE4sfKhFU5srepZrR6R1LA=;
+        b=OGIdvxnj2RZt51XNqSbWS7t5fAHAqWtMKWXV/YtKDXlYfLuRJEFdiJnABW2Gso5oOS
+         7yRInVbZ8Uv2PW+z3iSaYxlGA6rYbxH3VLrdHRDwL6JOGWCiQGXTfJtcYgfViVlGK60r
+         7oe3RZG0wFfvuCWvdxG7V34m3+pt3ka95Zr/XB+ySGymC0/seh7oyusMl4j0XCwgb+JF
+         iEzV+GQF9Vwh9VAC6KGcvOJjRFn0i8ADPPjtonhPrjwK7zc2irTsEKKPZFEc/CM9GDJq
+         4K00ICeazPb+0ByTSgXEwr9Qtm6bIznfvWtD+DlggttmKekRUofEhM367P5Pal3V630P
+         RSWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=beB34PxrwokOKRwQ8xX4T+xnA3Uimq2Xl8QpEqhqffA=;
-        b=71ddygpIxAttG0rexOtlxz3wo8I2TAakUSmrK4GQhX5UsMWCNf+dghrD0eFZMo5DlB
-         SDz31tGXTPoKCMizPas+5OGIqPYTtyFZI+TZcjjEIW9BuKWqIPjuu5Dh+fzvzxAb7nYu
-         8hV1ofzvJwKC+yfpd6nuHUNomfpk5t4eVBonypG/D1X1Gfs+dlvNxX+r+YVGReAqILiM
-         Gb12+UvXYws/mA1MCLO+YOb3yOkCmEXb7TrtuzSf+wdbWt90oYYJP6k6S0uVL16WIo8e
-         rJdtYW2nZJZDA6kjUd8WGEpwgj2mkbW+YLNBLzitJgvEv+E9IQtUz+EPCL/lpUa/tkxU
-         FsFw==
-X-Gm-Message-State: ANoB5pkDN8MVxsCrI+aVO4n5x6dCx91tzK34XT+A0hEHuQlchlKEZdjF
-        euTPdN82fYPds9GIl5O58qFqjVDmj4/dZMh9DeS0m0ZEhlB+9sLEMK1jG687pUC/CKextBIDg3D
-        eLR66bCAwA9hREdIU54ChWMT7643FbyudWnms6MOKbfx17WTnjhm1Y3w=
-X-Google-Smtp-Source: AA0mqf7i54GXu9DUwt9r49UbWUKugAzuHriqgSQUqIFDvtyFnVoQlgcnPMdFw+wTcw5d7m8LJcUrWKeyBw==
+        bh=1JhQFmKC0trfMj3OYJRD3fE4sfKhFU5srepZrR6R1LA=;
+        b=fAw/hhfLj9TfLyqclFF7icPSRPZKlPsTuhi0ZV5MAX30EyXt68pOoWip42uLuFYZhL
+         zO4kwtW26fJ/Xd3KSYJVipdTMcxk6VihINQpR1bfd/90gMMljsVvlqDWHWJpV24Wcn1b
+         iF+kAcYDVNuqWX8/FkTlZaGorXbkiQ9okTsFoa5xd7mwn9GIOq+wR5QHZe3D95htNM+I
+         PRqpYjVf/eeaD6fM4MGL57QfohtC3LzwL7svTW8xK18HI6vZxneMYPlawGEJbGWpKeH5
+         Sz4aaQyEKJSfATHqzCgTKQtsRfb0VAw7ml52rp7ivlvpNQ8f9cwDKGYPJCwlxt0h7Q3B
+         Hh3g==
+X-Gm-Message-State: ANoB5pm3Rx7Sq/oIh+Ce9lEMTJ/ZDzdaIZ0l1XN3yeUu2tsfOGs+GzAA
+        5tvteJ0VrW/ZQbsZy6JEASp9DhlebpCB5mijiSBT0ca0BV2RcV2ckUz2TCgs1Ex5pLxV5h6fbiY
+        zsdHE4dYATGLKCIPW0pMBcqgfP+WUkdtYaEua3c88WK7/RFZCLACTxsc=
+X-Google-Smtp-Source: AA0mqf6SdCgGxNMSUKjDcZ3Pyx0Rvw6lzLFadPcCmIoTZD3xODT7kWVEvwNp99Eq+mP8hnzO0geg4Xa7MQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a81:715:0:b0:369:edd9:6c8b with SMTP id
- 21-20020a810715000000b00369edd96c8bmr576329ywh.452.1670003102340; Fri, 02 Dec
- 2022 09:45:02 -0800 (PST)
-Date:   Fri,  2 Dec 2022 17:44:05 +0000
+ (user=tabba job=sendgmr) by 2002:a05:6000:4a:b0:242:2db9:df6e with SMTP id
+ k10-20020a056000004a00b002422db9df6emr8279492wrx.480.1670003104425; Fri, 02
+ Dec 2022 09:45:04 -0800 (PST)
+Date:   Fri,  2 Dec 2022 17:44:06 +0000
 In-Reply-To: <20221202174417.1310826-1-tabba@google.com>
 Mime-Version: 1.0
 References: <20221202174417.1310826-1-tabba@google.com>
 X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221202174417.1310826-21-tabba@google.com>
-Subject: [RFC PATCH kvmtool v1 20/32] Add kvm linux headers and structure
- extensions for restricted_fd
+Message-ID: <20221202174417.1310826-22-tabba@google.com>
+Subject: [RFC PATCH kvmtool v1 21/32] Add option for enabling restricted
+ memory for guests
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
@@ -70,74 +70,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This enables building kvmtool on a host that doesn't have the
-kernel with the new extensions yet.
+Currently this way for testing only.
 
-No functional change intended.
+When the option restricted_mem is set, the guest will use the new
+restricted memory extensions.
+
+This is done this way for now to enable testing and debugging.
+In the future, pKVM will require that all its guest use
+restricted memory, so instead of a flag, the intention is for the
+final version of this patch series to rely on KVM_CAP_PRIVATE_MEM
+and fail if that capability isn't supported.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- include/linux/kvm.h | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ arm/kvm.c                | 5 +++++
+ builtin-run.c            | 2 ++
+ include/kvm/kvm-config.h | 1 +
+ 3 files changed, 8 insertions(+)
 
-diff --git a/include/linux/kvm.h b/include/linux/kvm.h
-index 0d5d441..1d35153 100644
---- a/include/linux/kvm.h
-+++ b/include/linux/kvm.h
-@@ -103,6 +103,14 @@ struct kvm_userspace_memory_region {
- 	__u64 userspace_addr; /* start of the userspace allocated memory */
+diff --git a/arm/kvm.c b/arm/kvm.c
+index 8772a55..094fbe4 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -74,6 +74,11 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
+ 
+ void kvm__arch_init(struct kvm *kvm)
+ {
++	if (kvm->cfg.restricted_mem &&
++	    !kvm__supports_extension(kvm, KVM_CAP_PRIVATE_MEM)) {
++		die("Guest restricted memory capability not supported.");
++	}
++
+ 	/* Create the virtual GIC. */
+ 	if (gic__create(kvm, kvm->cfg.arch.irqchip))
+ 		die("Failed to create virtual GIC");
+diff --git a/builtin-run.c b/builtin-run.c
+index bb7e6e8..4642bc4 100644
+--- a/builtin-run.c
++++ b/builtin-run.c
+@@ -202,6 +202,8 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
+ 			"Hugetlbfs path"),				\
+ 	OPT_BOOLEAN('\0', "virtio-legacy", &(cfg)->virtio_legacy,	\
+ 		    "Use legacy virtio transport"),			\
++	OPT_BOOLEAN('\0', "restricted_mem", &(cfg)->restricted_mem,	\
++		    "Use restricted memory for guests"),		\
+ 									\
+ 	OPT_GROUP("Kernel options:"),					\
+ 	OPT_STRING('k', "kernel", &(cfg)->kernel_filename, "kernel",	\
+diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+index 368e6c7..ea5f3ea 100644
+--- a/include/kvm/kvm-config.h
++++ b/include/kvm/kvm-config.h
+@@ -65,6 +65,7 @@ struct kvm_config {
+ 	bool ioport_debug;
+ 	bool mmio_debug;
+ 	bool virtio_legacy;
++	bool restricted_mem;
  };
  
-+struct kvm_userspace_memory_region_ext {
-+	struct kvm_userspace_memory_region region;
-+	__u64 restricted_offset;
-+	__u32 restricted_fd;
-+	__u32 pad1;
-+	__u64 pad2[14];
-+};
-+
- /*
-  * The bit 0 ~ bit 15 of kvm_memory_region::flags are visible for userspace,
-  * other bits are reserved for kvm internal use which are defined in
-@@ -110,6 +118,7 @@ struct kvm_userspace_memory_region {
-  */
- #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
- #define KVM_MEM_READONLY	(1UL << 1)
-+#define KVM_MEM_PRIVATE		(1UL << 2)
- 
- /* for KVM_IRQ_LINE */
- struct kvm_irq_level {
-@@ -272,6 +281,7 @@ struct kvm_xen_exit {
- #define KVM_EXIT_RISCV_SBI        35
- #define KVM_EXIT_RISCV_CSR        36
- #define KVM_EXIT_NOTIFY           37
-+#define KVM_EXIT_MEMORY_FAULT     38
- 
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -510,6 +520,14 @@ struct kvm_run {
- #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
- 			__u32 flags;
- 		} notify;
-+		/* KVM_EXIT_MEMORY_FAULT */
-+		struct {
-+#define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1 << 0)
-+			__u32 flags;
-+			__u32 padding;
-+			__u64 gpa;
-+			__u64 size;
-+		} memory;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
-@@ -1178,6 +1196,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_S390_ZPCI_OP 221
- #define KVM_CAP_S390_CPU_TOPOLOGY 222
- #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
-+#define KVM_CAP_PRIVATE_MEM 224
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+ #endif
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
 
