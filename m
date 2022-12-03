@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43E5B641260
-	for <lists+kvm@lfdr.de>; Sat,  3 Dec 2022 01:40:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0958D641263
+	for <lists+kvm@lfdr.de>; Sat,  3 Dec 2022 01:40:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235111AbiLCAk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 19:40:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43894 "EHLO
+        id S235085AbiLCAke (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 19:40:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235079AbiLCAkG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 19:40:06 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30BB01FCF8
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 16:37:51 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id g13-20020a056a000b8d00b0056e28b15757so6269572pfj.1
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 16:37:51 -0800 (PST)
+        with ESMTP id S235134AbiLCAkH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 19:40:07 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC3B7164BB
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 16:37:52 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id 7-20020a631547000000b00478959ba320so974271pgv.19
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 16:37:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=MQ2DipcqCIIlOynGgQG74Sc/21NET4A4uu5IriUFE+o=;
-        b=SxXUc63M6tJlnEa9G90sZBb/Ga5eyEFP62Gfiw9NU6XZfZ69koBRG2/Frc3Q8OO1Ir
-         epCvPCR+Lwsf5k+Wh+9lsvuoCwEZ+NpFtEklIm5YibOyYi0oUg09BqcOqma9relrrOLi
-         EXF2fSH3KYgb8w8AILUxXYy1mSxUcGwKEXfu9hMDmuhLLpFfVstM87mNxi16PLYjKpmd
-         AlQ46jDB/4NYtyjm3Mg8LMVw09cCwYGC4dHCyNib2PcemJai46WlGhkOljYFlwvoH7Kh
-         kMr79+aA+eGhiD9LwpFnZAOOq28GPIxB2reEE/YXVMGrdCSjj0bxIOaB7A2MJyAx7jCB
-         ZRBQ==
+        bh=DKqJP7Vjp6qJnG/7BU3uRzryYpaAgZyEUtuw+E87nQQ=;
+        b=PCEzejAytOa1aJqFlw0uTsN0TWp8InRHmSRFM4htCGB+SMI/84iNIv2hajPIKx5y+I
+         J/w1ZaSXb5YWmaQloVn+TvjsOH8ur8phH87vLAP6yEmymVjsmck6PuLxAx4K2NJK2k8J
+         76VbWsXXgw9fHdw/k9F4+pEGXt0cpUS5Vlhk0YOIDGsbJhaOsDKw5QEjIlfMdlB+YleQ
+         wKnzBZQ9akoXaZ7mlooolLtNz0TfRYcDr0KGjoWnIY54jfZdH8kGVPtRZNZelxrqOqTi
+         yvEX+uz72KPwB5S96Lv3oqrq1YFHZJ6SqpitDTU+1IIKP1kEcJtV4pDKGXRE6NfiF0No
+         mSjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MQ2DipcqCIIlOynGgQG74Sc/21NET4A4uu5IriUFE+o=;
-        b=clvVX9ORBtY6UurJyHy3y94t3fvVepU7/ZaTNuqxc7uFgzltKmZ2XygVqGAnYRVN0u
-         joxXomewx15eJSFBokOVMBQqg1eeUm88nhf/oVhPJLFj5WxwXmxThwaLNtGnH96svDaw
-         wJrVOgDSYNGiVFxoUZIAhV2OM1mlXmuckkQineWfRX6nbGBPLGa04kjhOItYNYRwpwI5
-         oPhAMV37jbddnCPQKGazUjFpgR9J885eHKeQbCD5JW9wX0fMKRuyB60rNiqlyuC49oiV
-         IqeLzEndvBcaadgyUbk452kGoK95VCBZd6oHOOLJC4minFWsDNzyl4s9bEUd3n98hAtW
-         L5HA==
-X-Gm-Message-State: ANoB5plcYhiC0/q7yBh6w83SmWvb/npVBqSVO5WMwGGQWIjfMhymfnBI
-        TECxF03tdUSorIMNHx8telHBNUT4bzo=
-X-Google-Smtp-Source: AA0mqf60LwLI+B5CAhzEB274z+4qWW/tmrNFD8b4CF81EQ/v0Hxz0pXGZ0T5ibAU0iU/TQJI05r0LBxcITs=
+        bh=DKqJP7Vjp6qJnG/7BU3uRzryYpaAgZyEUtuw+E87nQQ=;
+        b=R4TVItePiMDINeR0PBwWpVXGHirvCsv5zdXVEiQa03hWK+QNfdNc6DDf2srOdIW2KQ
+         XEVGwbdL0Dr1Sx4oyBE3vqJ++3DGCfGosbSIkMOpeHKGPt96CFRhLZgtDmxQRgLQg/vi
+         lVOs8sbdPsTJ5VbT6vk1QXUVGg9hoOcZkJydZ9zd6oe1jQFZdIXiEatf0YU122BQ9l/C
+         T5u8AeOPvgV1rWPupqexBkdHoRnELWV6neHwveIbbuZAFZYQ+dKiqb6GhVFJYTANPxG+
+         3dGcXpT73p8x9QcNpUXtBMgCdfAqjwS9joJPfAeyNLRqMApwmBINUd3t8xVO4VhuDam1
+         +Y7g==
+X-Gm-Message-State: ANoB5pnH5qGFTQH4sT5J6fAeKwfRMe1LWlwrSQ5QqHFD6VuSlmYcKzhq
+        4Pxt68kB6JtTq6bHJUk+QLDte+Bjjqk=
+X-Google-Smtp-Source: AA0mqf7tAkACTFTjewTL0hSc4V8mUF2uZIWpoBoxKnADATbemKx0CWdfx0K3J/W6U3L4eJYI2BCTQTR4boI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:8dd3:0:b0:573:4ae5:e475 with SMTP id
- j19-20020aa78dd3000000b005734ae5e475mr54315834pfr.64.1670027870646; Fri, 02
- Dec 2022 16:37:50 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:27ab:b0:56c:71a4:efe with SMTP id
+ bd43-20020a056a0027ab00b0056c71a40efemr58903928pfb.84.1670027872358; Fri, 02
+ Dec 2022 16:37:52 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat,  3 Dec 2022 00:37:43 +0000
+Date:   Sat,  3 Dec 2022 00:37:44 +0000
 In-Reply-To: <20221203003745.1475584-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221203003745.1475584-1-seanjc@google.com>
 X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221203003745.1475584-2-seanjc@google.com>
-Subject: [PATCH 1/3] x86/cpu: Process all CPUID dependencies after identifying
- CPU info
+Message-ID: <20221203003745.1475584-3-seanjc@google.com>
+Subject: [PATCH 2/3] x86/cpu: Mark SGX and VMX as being dependent on MSR_IA32_FEAT_CTL
 From:   Sean Christopherson <seanjc@google.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -74,89 +73,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Process all CPUID dependencies to ensure that a dependent is disabled if
-one or more of its parent features is unsupported.  As is, cpuid_deps is
-processed if an only if a feature is explicitly disabled via
-clear_cpu_cap(), which makes it annoying/dangerous to use cpuid_deps for
-features whose parent(s) do not always have explicit processing.
+Mark SGX and VMX as being dependent on MSR_IA32_FEAT_CTL now that CPUID
+dependencies are processed unconditionally, i.e. now that SGX and VMX
+will be disabled if MSR_IA32_FEAT_CTL is unsupported even if the kernel
+never explicitly disables MSR_IA32_FEAT_CTL.  Since init_ia32_feat_ctl()
+is invoked if and only if the CPU might possibly support the MSR and the
+kernel was built with the necessary CPU_SUP_*=y, it's possible for a CPU
+that supports VMX and/or SGX to run on a kernel that never sets the
+feature flag.
 
-E.g. VMX and SGX depend on the synthetic X86_FEATURE_MSR_IA32_FEAT_CTL,
-but there is no common location to clear MSR_IA32_FEAT_CTL, and so
-consumers of VMX and SGX are forced to check MSR_IA32_FEAT_CTL on top
-of the dependent feature.
+Explicitly clear MSR_IA32_FEAT_CTL if reading the MSR faults to handle
+the extremely unlikely edge case where the RDMSR fails when restoring CPU
+state after suspend, hibernate, kexec, etc.
 
-Manually clearing X86_FEATURE_MSR_IA32_FEAT_CTL is the obvious
-alternative, but it's subtly more difficult that updating
-init_ia32_feat_ctl().  CONFIG_IA32_FEAT_CTL depends on any of
-CONFIG_CPU_SUP_{INTEL,CENATUR,ZHAOXIN}, but init_ia32_feat_ctl() is
-invoked if and only if the actual CPU type matches one of the
-aforementioned CPU_SUP_* types. E.g. running a kernel built with
-
-  CONFIG_CPU_SUP_INTEL=y
-  CONFIG_CPU_SUP_AMD=y
-  # CONFIG_CPU_SUP_HYGON is not set
-  # CONFIG_CPU_SUP_CENTAUR is not set
-  # CONFIG_CPU_SUP_ZHAOXIN is not set
-
-on a Cenatur or Zhaoxin CPU will leave X86_FEATURE_VMX set but not set
-X86_FEATURE_MSR_IA32_FEAT_CTL, and will never call init_ia32_feat_ctl()
-to give the kernel a convenient opportunity to clear
-X86_FEATURE_MSR_IA32_FEAT_CTL.
+Capturing the SGX and VMX dependencies will allow dropping manual checks
+on X86_FEATURE_MSR_IA32_FEAT_CTL for code that just wants to detect if
+SGX or VMX is fully supported.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/cpufeature.h |  1 +
- arch/x86/kernel/cpu/common.c      |  6 ++++++
- arch/x86/kernel/cpu/cpuid-deps.c  | 10 ++++++++++
- 3 files changed, 17 insertions(+)
+ arch/x86/kernel/cpu/cpuid-deps.c | 2 ++
+ arch/x86/kernel/cpu/feat_ctl.c   | 3 +--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
-index 1a85e1fb0922..c4408d03b180 100644
---- a/arch/x86/include/asm/cpufeature.h
-+++ b/arch/x86/include/asm/cpufeature.h
-@@ -147,6 +147,7 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
- 
- extern void setup_clear_cpu_cap(unsigned int bit);
- extern void clear_cpu_cap(struct cpuinfo_x86 *c, unsigned int bit);
-+extern void apply_cpuid_deps(struct cpuinfo_x86 *c);
- 
- #define setup_force_cpu_cap(bit) do { \
- 	set_cpu_cap(&boot_cpu_data, bit);	\
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index bf4ac1cb93d7..094fc69dba63 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -1887,6 +1887,12 @@ static void identify_cpu(struct cpuinfo_x86 *c)
- 
- 	ppin_init(c);
- 
-+	/*
-+	 * Apply CPUID dependencies to ensure dependent features are disabled
-+	 * if a parent feature is unsupported but wasn't explicitly disabled.
-+	 */
-+	apply_cpuid_deps(c);
-+
- 	/* Init Machine Check Exception if available. */
- 	mcheck_cpu_init(c);
- 
 diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
-index c881bcafba7d..68e26d4c8063 100644
+index 68e26d4c8063..37abdb6fb4ea 100644
 --- a/arch/x86/kernel/cpu/cpuid-deps.c
 +++ b/arch/x86/kernel/cpu/cpuid-deps.c
-@@ -138,3 +138,13 @@ void setup_clear_cpu_cap(unsigned int feature)
- {
- 	do_clear_cpu_cap(NULL, feature);
- }
-+
-+void apply_cpuid_deps(struct cpuinfo_x86 *c)
-+{
-+	const struct cpuid_dep *d;
-+
-+	for (d = cpuid_deps; d->feature; d++) {
-+		if (!cpu_has(c, d->depends))
-+			clear_cpu_cap(c, d->feature);
-+	}
-+}
+@@ -72,6 +72,8 @@ static const struct cpuid_dep cpuid_deps[] = {
+ 	{ X86_FEATURE_AVX512_FP16,		X86_FEATURE_AVX512BW  },
+ 	{ X86_FEATURE_ENQCMD,			X86_FEATURE_XSAVES    },
+ 	{ X86_FEATURE_PER_THREAD_MBA,		X86_FEATURE_MBA       },
++	{ X86_FEATURE_VMX,			X86_FEATURE_MSR_IA32_FEAT_CTL },
++	{ X86_FEATURE_SGX,			X86_FEATURE_MSR_IA32_FEAT_CTL },
+ 	{ X86_FEATURE_SGX_LC,			X86_FEATURE_SGX	      },
+ 	{ X86_FEATURE_SGX1,			X86_FEATURE_SGX       },
+ 	{ X86_FEATURE_SGX2,			X86_FEATURE_SGX1      },
+diff --git a/arch/x86/kernel/cpu/feat_ctl.c b/arch/x86/kernel/cpu/feat_ctl.c
+index 03851240c3e3..0b7186d9ba05 100644
+--- a/arch/x86/kernel/cpu/feat_ctl.c
++++ b/arch/x86/kernel/cpu/feat_ctl.c
+@@ -117,8 +117,7 @@ void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
+ 	u64 msr;
+ 
+ 	if (rdmsrl_safe(MSR_IA32_FEAT_CTL, &msr)) {
+-		clear_cpu_cap(c, X86_FEATURE_VMX);
+-		clear_cpu_cap(c, X86_FEATURE_SGX);
++		clear_cpu_cap(c, X86_FEATURE_MSR_IA32_FEAT_CTL);
+ 		return;
+ 	}
+ 
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
 
