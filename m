@@ -2,227 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6BD1641723
-	for <lists+kvm@lfdr.de>; Sat,  3 Dec 2022 14:52:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1690A641870
+	for <lists+kvm@lfdr.de>; Sat,  3 Dec 2022 19:30:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229755AbiLCNws (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Dec 2022 08:52:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45500 "EHLO
+        id S229787AbiLCSah (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Dec 2022 13:30:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229747AbiLCNwo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Dec 2022 08:52:44 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D4AA5F72
-        for <kvm@vger.kernel.org>; Sat,  3 Dec 2022 05:52:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670075563; x=1701611563;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=YwW0cCYBimllXhdsZqLId0R005ZCCYC80KIXLCEXu9A=;
-  b=OKkEiCX1b6scWIJ+dcPzk+8WfswNOyIVKWjkL471HmpkpTb9/esdFYI2
-   49xrlVbIjsIHt87EMV7NdW6rvcq4KOi9W3TasorhiRH6UQ0f2oeypPrO8
-   GGotLl92ErjKcQVOT+4Nekus0lU0Y1G5rATYZNTvMAC5qWPfv8gyg9gwx
-   jKpYaXZMWBBYDlrlquvqQYZ3UOiCAqD2P53Tjna1iY9vjaaUbd0kiTD+r
-   KIQ0rj2p81xsq4cdKRuRWKvEW2abIFtLMC6YPu0b5nLFfA7W/h+W1VPzm
-   GujZ1GyeZAbTFEGcnkitb320nQnuuUdUcSkaAlDdSGRWWky/VHUyo7uOJ
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10549"; a="314829855"
-X-IronPort-AV: E=Sophos;i="5.96,214,1665471600"; 
-   d="scan'208";a="314829855"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2022 05:52:42 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10549"; a="639026591"
-X-IronPort-AV: E=Sophos;i="5.96,214,1665471600"; 
-   d="scan'208";a="639026591"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga007.jf.intel.com with ESMTP; 03 Dec 2022 05:52:42 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Sat, 3 Dec 2022 05:52:42 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Sat, 3 Dec 2022 05:52:41 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Sat, 3 Dec 2022 05:52:41 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.107)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Sat, 3 Dec 2022 05:52:41 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gKkDNrDPTbuP/8dpBe4u7/4KYnswHWGAZTx+xgE5xoQQiUM/wjEqw3WCEqsowg60dp5jEW0+Ga9UzojHUVJrC6Jm76KtYCnUdaoJwUX3Y2T4uDD3wRTo7+gpYbBAp8aayJ7BaBhVWPZaIor/Vh3t6Msmz/KazN4wtSyhnPvjIOI90ZgBfYHW4EDxgwTvi5eqMWTOdAMBpMAjtiA0foLxSVEDWMB/RTHmpRMXYLKXh+bEdnCTn6nMfxFZWFsP/dUi7mgSJQEWKrjWf3TH/SEnj8VLCtGaSaDL4X3sCpsU3uemTwrE24OcxF0//sjmyC9V+EmewMLMeLX3QXPaI/Jclw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=51hQHS0uW8LFJ5+OpjEWPZFkkX1xsLck/MG1AhZtU4Q=;
- b=DjcZlnZw0kX8eeqaSuyTdZDHsTbmNZGNgR0/a4b/2owld4TgbZzyvkiiSvfnP34ugXTICSdOBQr8E1LNLMRK6ucCn3sFgbeB89VfLfqgDpSnAAhbxVUu1Au7U94fIFQ49H2JO9DmXR6F50BhF4h0iEtnZDd13u7RSqgBC8sh3YPsjNsjdUH613db5oUAYxi45W5fHa22d/Y2q9/fgq3JOaYUKRQlRcEgXoMlnT6G2ScVr8TyUFscbcTB7Tl/XkatWVAMgJ0EzflaQqo4IdV8XOLNtDtkHfNf7ZyAbn4JZZieky9iltZFyJvyZaTB+YcrBA2zTXH9xFK9xmpn+Wp19A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by BL1PR11MB5400.namprd11.prod.outlook.com (2603:10b6:208:311::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.11; Sat, 3 Dec
- 2022 13:52:38 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::61c3:c221:e785:ce13]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::61c3:c221:e785:ce13%5]) with mapi id 15.20.5880.010; Sat, 3 Dec 2022
- 13:52:38 +0000
-Message-ID: <fecfc22d-cb9e-cac9-95ff-21df13f257c2@intel.com>
-Date:   Sat, 3 Dec 2022 21:53:18 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.11.0
-Subject: Re: [PATCH 00/10] Move group specific code into group.c
-Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, <yi.y.sun@linux.intel.com>
-CC:     <kevin.tian@intel.com>, <cohuck@redhat.com>,
-        <eric.auger@redhat.com>, <nicolinc@nvidia.com>,
-        <kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
-        <chao.p.peng@linux.intel.com>
-References: <20221201145535.589687-1-yi.l.liu@intel.com>
- <Y4kRC0SRD9kpKFWS@nvidia.com>
- <86c4f504-a0b2-969c-c2c6-5fd43deb6627@intel.com>
- <Y4oPTjCTlQ/ozjoZ@nvidia.com>
- <20221202161225.3144305f.alex.williamson@redhat.com>
-From:   Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <20221202161225.3144305f.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2PR01CA0048.apcprd01.prod.exchangelabs.com
- (2603:1096:4:193::17) To DS0PR11MB7529.namprd11.prod.outlook.com
- (2603:10b6:8:141::20)
+        with ESMTP id S229542AbiLCSaf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Dec 2022 13:30:35 -0500
+Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A07161DF2C
+        for <kvm@vger.kernel.org>; Sat,  3 Dec 2022 10:30:34 -0800 (PST)
+Received: by mail-lf1-x142.google.com with SMTP id f21so11425684lfm.9
+        for <kvm@vger.kernel.org>; Sat, 03 Dec 2022 10:30:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:to:subject:message-id:date:from:sender
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=fl9EPl0MFXaGnggWqF7B4K8i5posh//Yf8HQA4Rf49s=;
+        b=oMeUsk3+lcmUbQzTB8Lqgm5KKCS/BDSavO/jaElJQkyEx3x+h456NWhfYZAMmxxrQ4
+         zc8I8McizFJz4Bes8q8YUx8dorIn4IWm47VgNJo/2k1YH9iFHtmVTeH2aDdhNwH9XvBZ
+         8hB+jVqtFD3v+VfN+5wzgW0m0Z5YVrLPns8ksJfO+A21mbMMHeoVOLdHObcQCZ4gtF0m
+         e/pmiygcWdibAssomhZ6JbPh7M11fuqjPyJRLNmxaNsg2vyWoR0S0fxMTa8NAWoShSHk
+         R8dF2IVgMCHaA2deCdxSTp11e7fLIRuvR4rXEzYF/E+kZxem6KzMOgm5rQMpr9dnoRoD
+         2C/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:to:subject:message-id:date:from:sender
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fl9EPl0MFXaGnggWqF7B4K8i5posh//Yf8HQA4Rf49s=;
+        b=f+oKeacWhUTN0jXhNrOqyTRduz8SgWW2prLxAWysF/b5KMeX4melPAgBtJpGolHUs9
+         a18NV6LjBKs13PxL50rJm5xF8oi46Jvc6apsQp3N/Cl3wUnQtWquDG2we4bLdbb6CqMA
+         xDltNXO1r/jvgf2y5BRbJ/62dKQqFs/hEJ8MQBLP0lP4PlnEGgV4Ht5ZA1JfGeXsIWNM
+         yyI5nXLHtvOPH88G6bcZnssSIEPuFGPS1o1RCn+mM2W3i8BWdnTFN/dRPqjH1vjp6EqS
+         Tcra6GARii7d/coe6SqYXYRUi/FSqIrfjQmZfZqUQ6UlX68dcSZvjOCEyV8pxHeAc1qx
+         Ck5g==
+X-Gm-Message-State: ANoB5pl7JUsFa+qv6En6bkVQiR8EQTVwSSFSuzR/KyqJJdMOUgzi7ooN
+        9BlvepDdUNStNMYI7Fhwvp2/3Vzp47IiBaGH5q0=
+X-Google-Smtp-Source: AA0mqf7422qw2PwubWm99+hPNR9fxSDbXNchy9tK2NvapKXbTpVcjTcMW8pGJBYqmr5G4PcSKw8kFRHfd7GcajMbL1M=
+X-Received: by 2002:ac2:430e:0:b0:4b4:9c0b:f4d3 with SMTP id
+ l14-20020ac2430e000000b004b49c0bf4d3mr24840842lfh.349.1670092232795; Sat, 03
+ Dec 2022 10:30:32 -0800 (PST)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|BL1PR11MB5400:EE_
-X-MS-Office365-Filtering-Correlation-Id: e9449e53-0d2d-4c17-6ef4-08dad535a365
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZUHXUd8OpaXT1sMGmR9GKZtP1y6XMxt2ezbJeBJE3ZuDtOkbEjSyg8RGSCdtAcdwjHbMldw8Cq5u+PgzuvfwfI9wlvcbT9BRC+aO2jJ6jTxHv354CViQ66HCrnvtEBwyJQ3j5Sk0Pw39GGiTgEjwYxoN3fxNrrxotsjLMx+2icqGHc54FqT/A70+y5L3ybADBZZBeX/vKchCBeur3Vik++q6X/QGli1eewrvxQqxzF/CR7vX5az1onmVTncJYg7yE+KwH2Sy7GlfqCRykJJ5hk2+3kXX6vWyJH6/r/h6hGfQt3NUflc2uLk8bYgEzqie4b9S0PRsdu2NFlFSFdCxlzexIQjenHQ7fC79/AgFa9SKCmjF31qiHXzsTeOqATbNIGbUdJ9E0a+6GXwK9k+Mqkl0iJSyAQYR/wePotPijXp7wf048hBv3tWjsq17e1kbVjar8vcpqbVgFlKRsBmGPWMw6eYlNH3YCFammsdMWUa8SRBbeO/4w3GXxPQc6L6YkjkUdWTC86XAFnvcxMaikoAxw+x61w+UIhOffPGe6CRmnkTj6mkclS9/aoRSgW4OszSe+Wmi76AJagqq7vK9rHSI3p9O+HiF9+Dw7zlNbjRp55DzPwOK+ZSLmzWkHZlbYINlJddawRdG5ZclyXtikxxf1aIkE8XUU8ETAdWJ1bQD41m907yTGUFsRIe/+1EPk/rXmNbKGXOS8T3WgPzihF18EsdCjdUanfETTaPNJIlUeDO4cAIBSUyfPKADgagadZqgjI5upAf+9KBmz/BSmvWITQvJUEN/WinsiA1iYXQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(39860400002)(366004)(376002)(136003)(346002)(451199015)(86362001)(2906002)(31696002)(83380400001)(316002)(110136005)(6666004)(53546011)(6506007)(6512007)(186003)(26005)(966005)(6486002)(2616005)(478600001)(41300700001)(82960400001)(5660300002)(8936002)(38100700002)(4326008)(66946007)(66556008)(66476007)(8676002)(31686004)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NE1TbTVxVHd3b2IyMnJjQVk4OUxhZjVJeWdkNGlWcGhaaVZmQzIyblByUFhm?=
- =?utf-8?B?K0FiSlhYTVEzSU1ZRTB3UjFwVHBlQmo2RXRjalVyQjNVaHU1aHdHYnIvTzZH?=
- =?utf-8?B?Ky81T0RtS0twS3FMOUJXUG02cmhFZ0hyalpPYkswN09FV0ZMOUdzNU53amoz?=
- =?utf-8?B?VDZnOThnY2JlS0MrTkRWZVhzaGI5QnhVZGo4M0xUcG9La2FkWlJXM3VZTjI0?=
- =?utf-8?B?ZUtQVm81VnhwWHk5NEhKcjEzbVB2Ukd2TUd1dDA5VmRHeUFSell0MzZhSmw4?=
- =?utf-8?B?dnEybFcrWmkxc1Bpb2lMbGFnQTd5YU9NZ3dzNUYyQkZuT2FydFBlYUVEMk03?=
- =?utf-8?B?TGpnbjhUVmxjOTZQTDJaMi9XWTBQQVR4Z2tGS2VsQlVPTXoxNmRqaHVaa2d5?=
- =?utf-8?B?citESWs4YVBzV3J2dGIza1hobFJJQmxkV3FNdEYwejI2aU1HMExvcEN0bFQr?=
- =?utf-8?B?TG1Yb3JFaGt5ZGJvNllwL3I0anlxaEE4SEJOcVlYV3dhVTZUa3dLZ0ovU3NI?=
- =?utf-8?B?bGIwWm1PcWJHSkpaRTJKYi84bWtWalR5OFV3V3lVbHY2NFJlY25ZWlp2S3Ux?=
- =?utf-8?B?Q1o1cksycFd2QW0vc2M1b2JYVFV2SkFwcHBoS0c4ZTZ1U1BNcERkTU51Y0hu?=
- =?utf-8?B?SVFkS2lZdW9jbS92b3RoSUdzNjAvUXJIc2d5TzV4Ukh1M0NsM1RJTk1Dekds?=
- =?utf-8?B?QVM1MnorbUN6SGJKSy81V3ZIRTFqWE5wOHVDWks4NTl6WEp0K0xwOHE5QXl5?=
- =?utf-8?B?R1VpQXQ4YS9MQ2V5K0ljUERnU3B1alpqSjlSb01BazkxZzA0bldGeXlkdWpX?=
- =?utf-8?B?SUdrSXArZEx6aEpkelBPRkhmcjZlbjdIZjhnQXFUMDBmY2NsN3kwTnFOU1da?=
- =?utf-8?B?Y3V4empDTHpUMlFCT01RKzlxQ0xzZUpUOWNPNGpVY0JqWCs2RVF0Y25EbWlK?=
- =?utf-8?B?QUpReWx6ekNxVEZHUlNvYTl0T0FmQUd4VnNQaVRXbTdBWml2aFJoNmhySkhp?=
- =?utf-8?B?YVBPVkZrUytzZHphQzNGakhsV3FISGpVTnNwMGZ5dzhCWmg2WGx5OEJ2eFNB?=
- =?utf-8?B?YTQ3S1ZBTElZMDNMc1VvSklTalRhUXlETE40SDJJZzV0U0tSTi9aa2VBdlRM?=
- =?utf-8?B?NDhpRWI5cFU5dEljNE1JNnM0bU8za2pMU2NuZXAzbjZpN3EwMVZsUnhHTWY3?=
- =?utf-8?B?aU9Fa0RrdGlxUTg3aVUvN3F3dE01RW8zaVJ0RTB2SlhDN281NmcrWFFodFlx?=
- =?utf-8?B?ME5abkg5MXZmbDVCaHBQdjRwNlJqNjRmdDNwUzM1U1lxYVZHSkVIUU1qY0FK?=
- =?utf-8?B?NWM2WFliSDVtN2F6Rm92dVlkTFdYZ0VtZTNjUnQ4S090eEs3VkMyMDNSMG4z?=
- =?utf-8?B?emI0L1pLRWVEQjVNanFlc3JtTHRWVHhEaEI4UlczcWdhTEVvWUlrQUtOeTI0?=
- =?utf-8?B?VUxWRERyVEtDT0luTVMzMmNMT1JXSjViTTcreXZOL2srUUlJUVlEVHd3NTFB?=
- =?utf-8?B?YVhBN0daTTYvOWdIdWlZbFZEVU1yOXdqTUVTVXlxb2VGSWtwYTFRQVVsWEN6?=
- =?utf-8?B?WGRqM1NpZDg1S0pDcU1FUGVJTk0wOTgxYU1qZnRWendXb2toNHQvSWY3bmVm?=
- =?utf-8?B?TzFxSFNBVk4yNGZUL3pUNnpVVVo2b1lOTEVXL28vNGp5MFlIYzB6VnFGOWZY?=
- =?utf-8?B?d29OY0tZRCtiWStWcnhnZG5XaVNGUGI3MWNYZUNIdDZ0andBSk9lOGlQbXZk?=
- =?utf-8?B?cW9GRkVhenJuMHU4ZmpSNmlmczZmVG5LNFBpQ1lWc1ZkQ2g5bGE5NFJVL21I?=
- =?utf-8?B?aHU5K0tZSUlkZ3lpZTdZU1NyL2JORm0rTjhmR3dqU1ZTWjg0RHBnQ0RoYlRV?=
- =?utf-8?B?Nno1MUkzalFsTUtsbjhURlcyRmlzNzc4cXhUUzZGK0drdHUrSHF4aU1oVGQr?=
- =?utf-8?B?eW5xZU94N085RWNkY2M5MmpBYml5aW5ISmx6NFkzcEc0TmVQaUdDNmJLTFRa?=
- =?utf-8?B?UGg2cEVCbFZkKytSbnFXTmpqbkVUTjdrLzM1NURHWHZyM1R6OG15ZGxacjln?=
- =?utf-8?B?cmZvdmFXTUxlUC8vMnNFQ2ZIWjExdnV5aFZmSUorQ1MwdHRvd0loNVRORkRl?=
- =?utf-8?Q?FsCqmfTRgvSpWaOh2KHfuHqA/?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e9449e53-0d2d-4c17-6ef4-08dad535a365
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2022 13:52:38.0956
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NPTHqeWhQxlpdLQn7o3Fg5oOEXpZuOlH0rWw4bjVZUPfRfvI/Ttklt7dMClza8XORfmVbYjJMR6zISoSxQWrTg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5400
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Sender: ssgsggfgdgdg@gmail.com
+Received: by 2002:a05:6520:130f:b0:22d:530b:d86c with HTTP; Sat, 3 Dec 2022
+ 10:30:31 -0800 (PST)
+From:   mrseugeniajimenez <mrseugeniajimenez@gmail.com>
+Date:   Sat, 3 Dec 2022 18:30:31 +0000
+X-Google-Sender-Auth: aaXOBkW2f-rXntiZPYfZAzv1Dcc
+Message-ID: <CAFRzY3ZFuvMnWrmVvgN+XmR4t6NkEo=BuDebmFi8uV4X8e0SPg@mail.gmail.com>
+Subject: Hello to you dear close American friend Mr/Mrs, Sir/Madame,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: Yes, score=7.8 required=5.0 tests=ADVANCE_FEE_5_NEW_MONEY,
+        BAYES_50,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        FREEMAIL_FROM,HK_RANDOM_ENVFROM,LOTS_OF_MONEY,MONEY_FRAUD_8,
+        RCVD_IN_DNSWL_NONE,RISK_FREE,SPF_HELO_NONE,SPF_PASS,T_MONEY_PERCENT,
+        UNDISC_MONEY autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2a00:1450:4864:20:0:0:0:142 listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5019]
+        *  0.0 HK_RANDOM_ENVFROM Envelope sender username looks random
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [ssgsggfgdgdg[at]gmail.com]
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        *  0.0 LOTS_OF_MONEY Huge... sums of money
+        *  0.0 T_MONEY_PERCENT X% of a lot of money for you
+        *  1.0 RISK_FREE No risk!
+        *  0.0 MONEY_FRAUD_8 Lots of money and very many fraud phrases
+        *  3.0 ADVANCE_FEE_5_NEW_MONEY Advance Fee fraud and lots of money
+        *  3.2 UNDISC_MONEY Undisclosed recipients + money/fraud signs
+X-Spam-Level: *******
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022/12/3 07:12, Alex Williamson wrote:
-> On Fri, 2 Dec 2022 10:44:30 -0400
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
->> On Fri, Dec 02, 2022 at 09:57:45PM +0800, Yi Liu wrote:
->>> On 2022/12/2 04:39, Jason Gunthorpe wrote:
->>>> On Thu, Dec 01, 2022 at 06:55:25AM -0800, Yi Liu wrote:
->>>>> With the introduction of iommufd[1], VFIO is towarding to provide device
->>>>> centric uAPI after adapting to iommufd. With this trend, existing VFIO
->>>>> group infrastructure is optional once VFIO converted to device centric.
->>>>>
->>>>> This series moves the group specific code out of vfio_main.c, prepares
->>>>> for compiling group infrastructure out after adding vfio device cdev[2]
->>>>>
->>>>> Complete code in below branch:
->>>>>
->>>>> https://github.com/yiliu1765/iommufd/commits/vfio_group_split_v1
->>>>>
->>>>> This is based on Jason's "Connect VFIO to IOMMUFD"[3] and my "Make mdev driver
->>>>> dma_unmap callback tolerant to unmaps come before device open"[4]
->>>>>
->>>>> [1] https://lore.kernel.org/all/0-v5-4001c2997bd0+30c-iommufd_jgg@nvidia.com/
->>>>> [2] https://github.com/yiliu1765/iommufd/tree/wip/vfio_device_cdev
->>>>> [3] https://lore.kernel.org/kvm/0-v4-42cd2eb0e3eb+335a-vfio_iommufd_jgg@nvidia.com/
->>>>> [4] https://lore.kernel.org/kvm/20221129105831.466954-1-yi.l.liu@intel.com/
->>>>
->>>> This looks good to me, and it applies OK to my branch here:
->>>>
->>>> https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/
->>>>
->>>> Alex, if you ack this in the next few days I can include it in the
->>>> iommufd PR, otherwise it can go into the vfio tree in January
->>>>
->>>> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
->>>>    
->>>
->>> thanks. btw. I've updated my github to incorporate Kevin's nit and also
->>> r-b from you and Kevin.
->>
->> Please rebase it on the above branch also
+Hello To You,
 
-To Jason: done. Please fetch from below branch.
+Please i appeal to you to exercise a little patience and read through
+my Mail carefully and non-disclosure,i am contacting you personally
+for business partnership in your country.
 
-https://github.com/yiliu1765/iommufd/commits/for-jason/vfio_group_split
+I am Mrs. Eugenia Jim=C3=A9nez the Fondi asset manager in Banco Posta
+Italian, I decided to write you on privately regarding to a good
+business deal worth,($20 Million America dollars),invested in our
+Bancoprivately through Crypto Currency (BITCOIN) by late
+Mr.MirceaPopescua citizen of Romania who died date of June 23 2021 by
+drawn while swimming in coast of Costa Rica.
 
-> It looks fine to me aside from the previous review comments and my own
-> spelling nit.  I also don't see that this adds any additional conflicts
-> vs the existing iommufd integration for any outstanding vfio patches on
-> the list, therefore, where there's not already a sign-off from me:
-> 
-> Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
+The may reason why I contacted you about this fortune is because, I
+want you to partner with me and stand to contact our Banco Posta
+Italian manager as the investor partner trustee to late
+Mr.MirceaPopescu so that our Banco can be able to release the fund to
+you either by through Bitcoin or by Cash Transfer as you may prefer,
+note, this deal is 101 risk-free and I stand to provide you any
+documents regarding the Bitcoin fund. our Banco Posta may ask while
+contacting the manager for the fortune to be release to you.
 
-To Alex: thanks. above branch is based on Jason's for-next. So may have
-one minor conflict with below commit in your next branch.
+Immediately I receive your positive respond and you agreed to work
+with me in trust until this deal is done, then you have to reply back
+with few of your details as below require to enabling me draft you an
+official letter to contact the Banco Posta as the applicant, our both
+percentage share is 50/50 % each.
 
-vfio: Remove vfio_free_device
+1)      Your complete Name=E2=80=A6=E2=80=A6=E2=80=A6.
+2)      Your Resident/office address=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6
+3)      Your international/National Identity=E2=80=A6=E2=80=A6=E2=80=A6=E2=
+=80=A6=E2=80=A6.
+4)      Your  WhatsApp
+5)      Number=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=
+=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6
+6)      Your Occupation=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=
+=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=
+=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6.
 
--- 
-Regards,
-Yi Liu
+Your Sincerely
+Your positive response while be highly recommended
+Eugenia Jim=C3=A9nez
+Fondi asset manager in Banco Posta Italian
