@@ -2,77 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6ACEB641185
-	for <lists+kvm@lfdr.de>; Sat,  3 Dec 2022 00:32:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BEB264125E
+	for <lists+kvm@lfdr.de>; Sat,  3 Dec 2022 01:40:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234685AbiLBXcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Dec 2022 18:32:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60910 "EHLO
+        id S235130AbiLCAkX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Dec 2022 19:40:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233221AbiLBXco (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Dec 2022 18:32:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8A3BDC852
-        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 15:31:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670023903;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qjSR1M97GsLkCw1f1F0aNrEffSGd/N75Xh2LF2EhiHs=;
-        b=M/QIjhpFWSmw1x+gj25Tq+YrFgC4Te4GyN8Nv+2hXA8m/lSkqdRYmA9y7oHBdgHlPzMQSC
-        eXTQsHD0rsAxVNQLRLyr5AI1IwQD8bhkxG7wIF8Vmj+wAhbGBnbO+Bx2cGiOeMgtKqmIQ1
-        ocH+48tE5SzK0l25O0ZMLq4ODiN7heY=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-582-GwsdYlmrOg6cPB8Da_UwkA-1; Fri, 02 Dec 2022 18:31:42 -0500
-X-MC-Unique: GwsdYlmrOg6cPB8Da_UwkA-1
-Received: by mail-il1-f198.google.com with SMTP id y12-20020a056e021bec00b00302a7d5bc83so6832351ilv.16
-        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 15:31:42 -0800 (PST)
+        with ESMTP id S235084AbiLCAkE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Dec 2022 19:40:04 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58C071E726
+        for <kvm@vger.kernel.org>; Fri,  2 Dec 2022 16:37:49 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id a3-20020a17090a8c0300b00218bfce4c03so11235397pjo.1
+        for <kvm@vger.kernel.org>; Fri, 02 Dec 2022 16:37:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5cHO8TZ/NgQcG2/A3zvYgffqJLlGYe3zpPYcN2k37Z8=;
+        b=pJ5S5cEuTvr85SuayQOIMCDdKWDVpy5OfbTE8O7P7h6XgCY255xnijRFmkiZ6EEcfK
+         0lvECxqT6/3GkdRxF/jHKq5xohT1ObE6VE0Eibrb61uGMu6SUgQDwJD5BuPCdzjGOn9q
+         w8WhVgihJlIX8q2tXFA/U3boujzOhTlnSt7t24WoG1kH8y5WTsMub2143mrSyJaF1X6l
+         mC5lwHiuvETDepkPUjzzNhWRnRMTvjaZGwHXXtOJReduP/6a2VVdSn9f2Ujf2Bk4ahPE
+         Yy2xn+kT64NeaqpZCY6OxKsq6xl3GXNm/57OWtp2FfrcJS4USF+4PvWMehUxpEoBYyFU
+         UI0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qjSR1M97GsLkCw1f1F0aNrEffSGd/N75Xh2LF2EhiHs=;
-        b=STWrOpFR8Y/4aK42f7CNYBuUXieNW25KRyP0fur1bKQHD7sAAeCvkFa+Dde4TaNMvW
-         FpRhzhryYgQRGY9dn40VKs834xYfDHlHXWbHF48oRmoM9VxWbIViwI7P6U3UvdXJSOWM
-         vPW/GMqnLCAI7TYQ55k3LmoBIMYGfQlyyTkNzL5sllR286Qlwfllr5Ha4NeXqtjh8HaD
-         DuTPRkGhXne6kyxWwfVQlRWarlfoG15F4jAoY3JkuZzR4EMxJmr074Yt/BV1YRbiKf3c
-         cE90V51eBjMo7A/pjglRLAJK6+UOprNOpyN2eDMPeA9PnT0nG2hGy9i1A3zqF2OTYztY
-         m5UQ==
-X-Gm-Message-State: ANoB5pkLrQosq4cAluk2GIjPLD4PX1XIoAvYRVYyfZs+Cum6tloXY31Y
-        xf36Qmo678QbNwF2Po1YxhS+Et2BAcQmy5ppSK1M5l0bTg5H2urAwA8HG9aOhs4gm4sljHZxZSt
-        y99/WR+5YOaNv
-X-Received: by 2002:a02:6a26:0:b0:389:d02c:7e4c with SMTP id l38-20020a026a26000000b00389d02c7e4cmr15760327jac.218.1670023901936;
-        Fri, 02 Dec 2022 15:31:41 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4UJutKQHtqhdI5bG+awzAArYAFUxFWfPU6PK+0gtysZdCjZw9rAh4eau7h+OH3TB7BubYgQA==
-X-Received: by 2002:a02:6a26:0:b0:389:d02c:7e4c with SMTP id l38-20020a026a26000000b00389d02c7e4cmr15760324jac.218.1670023901721;
-        Fri, 02 Dec 2022 15:31:41 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id n32-20020a027120000000b003733e2ce4e8sm3088052jac.59.2022.12.02.15.31.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Dec 2022 15:31:41 -0800 (PST)
-Date:   Fri, 2 Dec 2022 16:31:39 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Avihai Horon <avihaih@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v2] vfio/iova_bitmap: refactor iova_bitmap_set() to
- better handle page boundaries
-Message-ID: <20221202163139.3dcf7884.alex.williamson@redhat.com>
-In-Reply-To: <20221129131235.38880-1-joao.m.martins@oracle.com>
-References: <20221129131235.38880-1-joao.m.martins@oracle.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5cHO8TZ/NgQcG2/A3zvYgffqJLlGYe3zpPYcN2k37Z8=;
+        b=i8FCcEEa0FVHiPmqhwrV8IUWa6tbWtYxJufXWdKRCf28PjY2rsRxXyjOPmgnEs1PRI
+         SzZvRqJMUVE3ooVWGl7dFrTFRNUDDizB8i3kVR+MLjr+uA4iBregJ548ICe2Bw6Ot/oK
+         L2TjgtkVjehAz85LkuLh/dwDKW5ddFzH6FSEEs/txmsCBzjadbw8F1m7Zo1NUO93/X/G
+         vgaY80rYk+Co1oAlgQ5I4sJGIo6LXzL3SKpCmxyyGMhjBPPr+u/myEQ3SxbJL5EwFN8A
+         X5N+vmmw+GyPX1OfBe6yJ0vJVbUqd4I2ZYTwRkaSkIWR86PNgS8H9YqhVxQLR38D0H95
+         0SlA==
+X-Gm-Message-State: ANoB5pldQe4bxTKIWfg/ZNJxrXNMraa39I9RYtVwjADOyZAYx3Zt8hHO
+        PTxnJIc7G/bSkjudsDeSL3Gooui8RQM=
+X-Google-Smtp-Source: AA0mqf7/Ed+dwcaWqhy6TT5UzFpiCfj7GO7PwtVZkzR3c7Pc0vUlcNewIK1n6B82nA+cULogbBYGuW/XRTU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:4946:0:b0:477:7c87:1087 with SMTP id
+ y6-20020a634946000000b004777c871087mr52392327pgk.452.1670027868906; Fri, 02
+ Dec 2022 16:37:48 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Sat,  3 Dec 2022 00:37:42 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
+Message-ID: <20221203003745.1475584-1-seanjc@google.com>
+Subject: [PATCH 0/3] x86/cpu: KVM: Make SGX and VMX depend on FEAT_CTL
+From:   Sean Christopherson <seanjc@google.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,43 +70,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 29 Nov 2022 13:12:35 +0000
-Joao Martins <joao.m.martins@oracle.com> wrote:
+"Officially" make SGX and VMX depend on X86_FEATURE_MSR_IA32_FEAT_CTL,
+and drop manual checks on X86_FEATURE_MSR_IA32_FEAT_CTL when querying
+VMX support.
 
-> Commit f38044e5ef58 ("vfio/iova_bitmap: Fix PAGE_SIZE unaligned bitmaps")
-> had fixed the unaligned bitmaps by capping the remaining iterable set at
-> the start of the bitmap. Although, that mistakenly worked around
-> iova_bitmap_set() incorrectly setting bits across page boundary.
-> 
-> Fix this by reworking the loop inside iova_bitmap_set() to iterate over a
-> range of bits to set (cur_bit .. last_bit) which may span different pinned
-> pages, thus updating @page_idx and @offset as it sets the bits. The
-> previous cap to the first page is now adjusted to be always accounted
-> rather than when there's only a non-zero pgoff.
-> 
-> While at it, make @page_idx , @offset and @nbits to be unsigned int given
-> that it won't be more than 512 and 4096 respectively (even a bigger
-> PAGE_SIZE or a smaller struct page size won't make this bigger than the
-> above 32-bit max). Also, delete the stale kdoc on Return type.
-> 
-> Cc: Avihai Horon <avihaih@nvidia.com>
-> Fixes: f38044e5ef58 ("vfio/iova_bitmap: Fix PAGE_SIZE unaligned bitmaps")
-> Co-developed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
-> Changes since v1:
->  * Add Reviewed-by by Jason Gunthorpe
->  * Add Fixes tag (Alex Williamson)
-> 
-> It passes my tests but to be extra sure: Avihai could you take this
-> patch a spin in your rig/tests as well? Thanks!
-> ---
->  drivers/vfio/iova_bitmap.c | 30 +++++++++++++-----------------
->  1 file changed, 13 insertions(+), 17 deletions(-)
+To make dependencies on MSR_IA32_FEAT_CTL work as expected, process all
+CPUID dependencies at the end of CPU indentification.  Because
+MSR_IA32_FEAT_CTL is a synthetic flag, it is effectively off-by-default,
+and thus may never be unset via clear_cpu_cap(), i.e. never triggers
+processing of its dependents.
 
-Applied to vfio next branch for v6.2 with Avihai's tested-by.  Thanks,
+The obvious alternative would be to explicitly clear MSR_IA32_FEAT_CTL if
+the MSR is unsupported, but that ends up being rather ugly as it would
+require clearing the flag in default_init() to handle the scenario where
+hardware supports the MSR, but the kernel was built without support for the
+CPU vendor.  E.g. running on an Intel CPU with CPU_SUP_INTEL=n.  This edge
+case is also why the existing manual checks in KVM are necessary; KVM_INTEL
+effectively depends on any of CPU_SUP_{INTEL,CENATUR,ZHAOXIN}.
 
-Alex
+Processing all dependencies also seems like the correct thing to do across
+the board, e.g. if the kernel ends up with more synthetic features with
+dependents.
+
+The placement of the call to apply_cpuid_deps() isn't super scientific.  I
+placed it after, AFAICT, the overwhelming majority of cpu cap updates had
+already been done, but before anything was likely to want the dependencies
+to be processed.  Specifically, I couldn't find any set_cpu_caps() in the
+machine check code, but there are definitely cpu_has() calls under
+mcheck_cpu_init().
+
+Last thought, patch 3 will conflict with at least one in-flight KVM series[*].
+The conflict should be straightfoward to resolve, but at the same time this
+is far from urgent, i.e. kicking this series down the road until KVM settles
+down is totally ok.
+
+[*] https://lore.kernel.org/all/20221130230934.1014142-1-seanjc@google.com
+
+Sean Christopherson (3):
+  x86/cpu: Process all CPUID dependencies after identifying CPU info
+  x86/cpu: Mark SGX and VMX as being dependent on MSR_IA32_FEAT_CTL
+  KVM: VMX: Drop manual checks on X86_FEATURE_MSR_IA32_FEAT_CTL
+
+ arch/x86/include/asm/cpufeature.h |  1 +
+ arch/x86/kernel/cpu/bugs.c        |  3 +--
+ arch/x86/kernel/cpu/common.c      |  6 ++++++
+ arch/x86/kernel/cpu/cpuid-deps.c  | 12 ++++++++++++
+ arch/x86/kernel/cpu/feat_ctl.c    |  3 +--
+ arch/x86/kvm/vmx/vmx.c            |  6 ++----
+ 6 files changed, 23 insertions(+), 8 deletions(-)
+
+
+base-commit: d800169041c0e035160c8b81f30d4b7e8f8ef777
+-- 
+2.39.0.rc0.267.gcb52ba06e7-goog
 
