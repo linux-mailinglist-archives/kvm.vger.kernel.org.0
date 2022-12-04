@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D4A6641E5A
-	for <lists+kvm@lfdr.de>; Sun,  4 Dec 2022 18:57:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 461EB641E5F
+	for <lists+kvm@lfdr.de>; Sun,  4 Dec 2022 18:57:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230318AbiLDR4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Dec 2022 12:56:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41486 "EHLO
+        id S230328AbiLDR4y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Dec 2022 12:56:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230289AbiLDR4a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Dec 2022 12:56:30 -0500
+        with ESMTP id S230295AbiLDR4d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Dec 2022 12:56:33 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94FE4140D0;
-        Sun,  4 Dec 2022 09:56:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CB2D140D0;
+        Sun,  4 Dec 2022 09:56:32 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2956560EDD;
-        Sun,  4 Dec 2022 17:56:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 449FEC433D7;
-        Sun,  4 Dec 2022 17:56:26 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E9E9560DEB;
+        Sun,  4 Dec 2022 17:56:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D5FAC433B5;
+        Sun,  4 Dec 2022 17:56:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670176588;
-        bh=pXsh8SVW/sBp/P3v6mc5bVyqy/bCl/0yI5e+z8DIwis=;
-        h=From:To:Cc:Subject:Date:From;
-        b=tQtG9KFpqkqGYmeGkTRbDw7dFD2tA0xqcHOa0rvlzLlRNlTklMnnb7Hra23zr673O
-         UCxXyY7ZxAa3ZBtBTYDJeszodPtvzxBSViHCAcKhduKrmfuYT1ucDpKIVxQQLWlZPd
-         /9Fa9kenqy3+BcN/nvOQNhPzOqI6CW+73bWJsAwuB7sTGorl3ggYWGdz+JXhI2Ut44
-         NUveSgkXxxfHMYikHN1Kj5TUi2lieXGxvSO2FtsArZzbtAzrh056c/CR3gkcp3n0T2
-         DFgdkDRbbkub+pvLLVU2PtGrbkQl2iXvvfC71aTAThHCKS9kwApzekms9ahM4gjg7T
-         Cf803DYekHhSw==
+        s=k20201202; t=1670176591;
+        bh=ARTuhir6BWBSEl/m8Qedtx8F7YcogAViI/5PbaogT2A=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=m2m7mLIl9zDz4yS97Bx4+LiNE125jD/8nAhNnA79/8kLWV4e+09fZmc4kezNjbblX
+         KYX4fVdqDVSMIL2GodZR2WGaDxaNjRW75DSnBKVqbIBCFV26C/lUbPvW/DRjG3IOrW
+         e+w+a/c5BOyvOHSNA5q96o9dEJzV19Sq+7OZl8lTUu/lg6XiLQ6Ge0zwlRlYqN5dEe
+         DzoTurRKNzaV363DscDaDc+te4Cor1/POsc7P6fi0XDLJh7hi1DTiUxC36qOfdGEAF
+         lc6a1r4OMGIOYuoriEWSJ5nmIvXDFMrBOw+7nI5FPdyCts7RmBTYlE1IO3A9MSTu/P
+         eAEuxTAUqkRAg==
 From:   Jisheng Zhang <jszhang@kernel.org>
 To:     Palmer Dabbelt <palmer@dabbelt.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
@@ -41,10 +41,12 @@ To:     Palmer Dabbelt <palmer@dabbelt.com>,
         Andrew Jones <ajones@ventanamicro.com>
 Cc:     linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: [PATCH v2 00/13] riscv: improve boot time isa extensions handling
-Date:   Mon,  5 Dec 2022 01:46:19 +0800
-Message-Id: <20221204174632.3677-1-jszhang@kernel.org>
+Subject: [PATCH v2 01/13] riscv: fix jal offsets in patched alternatives
+Date:   Mon,  5 Dec 2022 01:46:20 +0800
+Message-Id: <20221204174632.3677-2-jszhang@kernel.org>
 X-Mailer: git-send-email 2.37.2
+In-Reply-To: <20221204174632.3677-1-jszhang@kernel.org>
+References: <20221204174632.3677-1-jszhang@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -56,84 +58,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Generally, riscv ISA extensions are fixed for any specific hardware
-platform, that's to say, the hart features won't change any more
-after booting, this chacteristic make it straightforward to use
-static branch to check one specific ISA extension is supported or not
-to optimize performance.
+Alternatives live in a different section, so offsets used by jal
+instruction will point to wrong locations after the patch got applied.
 
-However, some ISA extensions such as SVPBMT and ZICBOM are handled
-via. the alternative sequences.
+Similar to arm64, adjust the location to consider that offset.
 
-Basically, for ease of maintenance, we prefer to use static branches
-in C code, but recently, Samuel found that the static branch usage in
-cpu_relax() breaks building with CONFIG_CC_OPTIMIZE_FOR_SIZE[1]. As
-Samuel pointed out, "Having a static branch in cpu_relax() is
-problematic because that function is widely inlined, including in some
-quite complex functions like in the VDSO. A quick measurement shows
-this static branch is responsible by itself for around 40% of the jump
-table."
+Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+---
+ arch/riscv/include/asm/alternative.h |  2 ++
+ arch/riscv/kernel/alternative.c      | 38 ++++++++++++++++++++++++++++
+ arch/riscv/kernel/cpufeature.c       |  3 +++
+ 3 files changed, 43 insertions(+)
 
-Samuel's findings pointed out one of a few downsides of static branches
-usage in C code to handle ISA extensions detected at boot time:
-static branch's metadata in the __jump_table section, which is not
-discarded after ISA extensions are finalized, wastes some space.
-
-I want to try to solve the issue for all possible dynamic handling of
-ISA extensions at boot time. Inspired by Mark[2], this patch introduces
-riscv_has_extension_*() helpers, which work like static branches but
-are patched using alternatives, thus the metadata can be freed after
-patching.
-
-Since v1
- - rebase on v6.1-rc7 + Heiko's alternative improvements[3]
- - collect Reviewed-by tag
- - add one patch to update jal offsets in patched alternatives
- - add one patch to switch to relative alternative entries
- - add patches to patch vdso
-
-[1]https://lore.kernel.org/linux-riscv/20220922060958.44203-1-samuel@sholland.org/
-[2]https://lore.kernel.org/linux-arm-kernel/20220912162210.3626215-8-mark.rutland@arm.com/
-[3]https://lore.kernel.org/linux-riscv/20221130225614.1594256-1-heiko@sntech.de/
-
-
-Andrew Jones (1):
-  riscv: KVM: Switch has_svinval() to riscv_has_extension_unlikely()
-
-Jisheng Zhang (12):
-  riscv: fix jal offsets in patched alternatives
-  riscv: move riscv_noncoherent_supported() out of ZICBOM probe
-  riscv: cpufeature: detect RISCV_ALTERNATIVES_EARLY_BOOT earlier
-  riscv: hwcap: make ISA extension ids can be used in asm
-  riscv: cpufeature: extend riscv_cpufeature_patch_func to all ISA
-    extensions
-  riscv: introduce riscv_has_extension_[un]likely()
-  riscv: fpu: switch has_fpu() to riscv_has_extension_likely()
-  riscv: module: move find_section to module.h
-  riscv: switch to relative alternative entries
-  riscv: alternative: patch alternatives in the vDSO
-  riscv: cpu_relax: switch to riscv_has_extension_likely()
-  riscv: remove riscv_isa_ext_keys[] array and related usage
-
- arch/riscv/errata/sifive/errata.c           |  4 +-
- arch/riscv/errata/thead/errata.c            | 11 ++-
- arch/riscv/include/asm/alternative-macros.h | 20 ++---
- arch/riscv/include/asm/alternative.h        | 14 +--
- arch/riscv/include/asm/errata_list.h        |  9 +-
- arch/riscv/include/asm/hwcap.h              | 96 +++++++++++----------
- arch/riscv/include/asm/module.h             | 15 ++++
- arch/riscv/include/asm/switch_to.h          |  3 +-
- arch/riscv/include/asm/vdso.h               |  4 +
- arch/riscv/include/asm/vdso/processor.h     |  2 +-
- arch/riscv/kernel/alternative.c             | 63 ++++++++++++++
- arch/riscv/kernel/cpufeature.c              | 82 +++---------------
- arch/riscv/kernel/module.c                  | 15 ----
- arch/riscv/kernel/setup.c                   |  2 +
- arch/riscv/kernel/vdso.c                    |  5 --
- arch/riscv/kernel/vdso/vdso.lds.S           |  7 ++
- arch/riscv/kvm/tlb.c                        |  3 +-
- 17 files changed, 191 insertions(+), 164 deletions(-)
-
+diff --git a/arch/riscv/include/asm/alternative.h b/arch/riscv/include/asm/alternative.h
+index c58ec3cc4bc3..33eae9541684 100644
+--- a/arch/riscv/include/asm/alternative.h
++++ b/arch/riscv/include/asm/alternative.h
+@@ -29,6 +29,8 @@ void apply_module_alternatives(void *start, size_t length);
+ 
+ void riscv_alternative_fix_auipc_jalr(void *alt_ptr, unsigned int len,
+ 				      int patch_offset);
++void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
++			       int patch_offset);
+ 
+ struct alt_entry {
+ 	void *old_ptr;		 /* address of original instruciton or data  */
+diff --git a/arch/riscv/kernel/alternative.c b/arch/riscv/kernel/alternative.c
+index 292cc42dc3be..9d88375624b5 100644
+--- a/arch/riscv/kernel/alternative.c
++++ b/arch/riscv/kernel/alternative.c
+@@ -125,6 +125,44 @@ void riscv_alternative_fix_auipc_jalr(void *alt_ptr, unsigned int len,
+ 	}
+ }
+ 
++#define to_jal_imm(value)						\
++	(((value & (RV_J_IMM_10_1_MASK << RV_J_IMM_10_1_OFF)) << RV_I_IMM_11_0_OPOFF) | \
++	 ((value & (RV_J_IMM_11_MASK << RV_J_IMM_11_OFF)) << RV_J_IMM_11_OPOFF) | \
++	 ((value & (RV_J_IMM_19_12_OPOFF << RV_J_IMM_19_12_OFF)) << RV_J_IMM_19_12_OPOFF) | \
++	 ((value & (1 << RV_J_IMM_SIGN_OFF)) << RV_J_IMM_SIGN_OPOFF))
++
++void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
++			       int patch_offset)
++{
++	int num_instr = len / sizeof(u32);
++	unsigned int call;
++	int i;
++	int imm;
++
++	for (i = 0; i < num_instr; i++) {
++		u32 inst = riscv_instruction_at(alt_ptr, i);
++
++		if (!riscv_insn_is_jal(inst))
++			continue;
++
++		/* get and adjust new target address */
++		imm = RV_EXTRACT_JTYPE_IMM(inst);
++		imm -= patch_offset;
++
++		/* pick the original jal */
++		call = inst;
++
++		/* drop the old IMMs, all jal imm bits sit at 31:12 */
++		call &= ~GENMASK(31, 12);
++
++		/* add the adapted IMMs */
++		call |= to_jal_imm(imm);
++
++		/* patch the call place again */
++		patch_text_nosync(alt_ptr + i * sizeof(u32), &call, 4);
++	}
++}
++
+ /*
+  * This is called very early in the boot process (directly after we run
+  * a feature detect on the boot CPU). No need to worry about other CPUs
+diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+index ba62a4ff5ccd..c743f0adc794 100644
+--- a/arch/riscv/kernel/cpufeature.c
++++ b/arch/riscv/kernel/cpufeature.c
+@@ -324,6 +324,9 @@ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
+ 			riscv_alternative_fix_auipc_jalr(alt->old_ptr,
+ 							 alt->alt_len,
+ 							 alt->old_ptr - alt->alt_ptr);
++			riscv_alternative_fix_jal(alt->old_ptr,
++						  alt->alt_len,
++						  alt->old_ptr - alt->alt_ptr);
+ 		}
+ 	}
+ }
 -- 
 2.37.2
 
