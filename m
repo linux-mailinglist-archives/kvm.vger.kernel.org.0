@@ -2,138 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1690A641870
-	for <lists+kvm@lfdr.de>; Sat,  3 Dec 2022 19:30:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F27FF641A12
+	for <lists+kvm@lfdr.de>; Sun,  4 Dec 2022 01:13:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229787AbiLCSah (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Dec 2022 13:30:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57100 "EHLO
+        id S229723AbiLDAM4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Dec 2022 19:12:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbiLCSaf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Dec 2022 13:30:35 -0500
-Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A07161DF2C
-        for <kvm@vger.kernel.org>; Sat,  3 Dec 2022 10:30:34 -0800 (PST)
-Received: by mail-lf1-x142.google.com with SMTP id f21so11425684lfm.9
-        for <kvm@vger.kernel.org>; Sat, 03 Dec 2022 10:30:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:to:subject:message-id:date:from:sender
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fl9EPl0MFXaGnggWqF7B4K8i5posh//Yf8HQA4Rf49s=;
-        b=oMeUsk3+lcmUbQzTB8Lqgm5KKCS/BDSavO/jaElJQkyEx3x+h456NWhfYZAMmxxrQ4
-         zc8I8McizFJz4Bes8q8YUx8dorIn4IWm47VgNJo/2k1YH9iFHtmVTeH2aDdhNwH9XvBZ
-         8hB+jVqtFD3v+VfN+5wzgW0m0Z5YVrLPns8ksJfO+A21mbMMHeoVOLdHObcQCZ4gtF0m
-         e/pmiygcWdibAssomhZ6JbPh7M11fuqjPyJRLNmxaNsg2vyWoR0S0fxMTa8NAWoShSHk
-         R8dF2IVgMCHaA2deCdxSTp11e7fLIRuvR4rXEzYF/E+kZxem6KzMOgm5rQMpr9dnoRoD
-         2C/w==
+        with ESMTP id S229450AbiLDAMw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Dec 2022 19:12:52 -0500
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46A2110B51;
+        Sat,  3 Dec 2022 16:12:51 -0800 (PST)
+Received: by mail-vk1-f182.google.com with SMTP id b81so3851058vkf.1;
+        Sat, 03 Dec 2022 16:12:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:to:subject:message-id:date:from:sender
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fl9EPl0MFXaGnggWqF7B4K8i5posh//Yf8HQA4Rf49s=;
-        b=f+oKeacWhUTN0jXhNrOqyTRduz8SgWW2prLxAWysF/b5KMeX4melPAgBtJpGolHUs9
-         a18NV6LjBKs13PxL50rJm5xF8oi46Jvc6apsQp3N/Cl3wUnQtWquDG2we4bLdbb6CqMA
-         xDltNXO1r/jvgf2y5BRbJ/62dKQqFs/hEJ8MQBLP0lP4PlnEGgV4Ht5ZA1JfGeXsIWNM
-         yyI5nXLHtvOPH88G6bcZnssSIEPuFGPS1o1RCn+mM2W3i8BWdnTFN/dRPqjH1vjp6EqS
-         Tcra6GARii7d/coe6SqYXYRUi/FSqIrfjQmZfZqUQ6UlX68dcSZvjOCEyV8pxHeAc1qx
-         Ck5g==
-X-Gm-Message-State: ANoB5pl7JUsFa+qv6En6bkVQiR8EQTVwSSFSuzR/KyqJJdMOUgzi7ooN
-        9BlvepDdUNStNMYI7Fhwvp2/3Vzp47IiBaGH5q0=
-X-Google-Smtp-Source: AA0mqf7422qw2PwubWm99+hPNR9fxSDbXNchy9tK2NvapKXbTpVcjTcMW8pGJBYqmr5G4PcSKw8kFRHfd7GcajMbL1M=
-X-Received: by 2002:ac2:430e:0:b0:4b4:9c0b:f4d3 with SMTP id
- l14-20020ac2430e000000b004b49c0bf4d3mr24840842lfh.349.1670092232795; Sat, 03
- Dec 2022 10:30:32 -0800 (PST)
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jqWnxoQvZbiditV/1/nr8cwEgzJwVCMstnT64OiZh8U=;
+        b=tf+T9u907uk5YtRTeDl5/oBrKpXNZkXD7WbM2DVBly+K2gg5BnpdtEIfAlgWpNl8VK
+         wwX7BjZI9y8lMdruIroKRGPxLye5x5NA0DN5xS+OrXzWVREj6vI3vzQDQageXtQFB1Cw
+         IEPv6Jcggx6t2Z3qMgwNxTZMjn9zfi90Q1VgqQ+tbkNOwb+WkPv7aYWKCzkBx+CDovRP
+         LBzR/jNR1Wh9Gus+6mCnMXl+huuwhg+x4EQ3mFXQhdMiK2wswpVIsZ1Wuy1qeAIAtNy7
+         hUB8MkEJsxB5NDpn88pjSr+qHYAULvAFj6Cq+tCfl0rY50XEWj9AkOXDJniqVWdpdxL5
+         LPvA==
+X-Gm-Message-State: ANoB5pm3iK8+yDAHAxKqNvlUC2+wINsc/N3wufmhip+t4cJve5iE8Bng
+        c08DcG1MDtd2YVRANog4RBeRpfB1ZpOjhL5D
+X-Google-Smtp-Source: AA0mqf6cYJb6IiG2F2p/KITmH1zdKYD+ftKQbXZfuKmTYpgItos/yTYSNg6UFwRwGZnClivQ8on0yQ==
+X-Received: by 2002:a05:6122:2017:b0:3bc:c10d:d61c with SMTP id l23-20020a056122201700b003bcc10dd61cmr23610760vkd.24.1670112770056;
+        Sat, 03 Dec 2022 16:12:50 -0800 (PST)
+Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com. [209.85.217.42])
+        by smtp.gmail.com with ESMTPSA id t16-20020ab06890000000b00418dce92951sm1481709uar.29.2022.12.03.16.12.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 03 Dec 2022 16:12:49 -0800 (PST)
+Received: by mail-vs1-f42.google.com with SMTP id 3so7111157vsq.7;
+        Sat, 03 Dec 2022 16:12:49 -0800 (PST)
+X-Received: by 2002:a05:6102:3c82:b0:3aa:17f4:d63d with SMTP id
+ c2-20020a0561023c8200b003aa17f4d63dmr35558496vsv.22.1670112769083; Sat, 03
+ Dec 2022 16:12:49 -0800 (PST)
 MIME-Version: 1.0
-Sender: ssgsggfgdgdg@gmail.com
-Received: by 2002:a05:6520:130f:b0:22d:530b:d86c with HTTP; Sat, 3 Dec 2022
- 10:30:31 -0800 (PST)
-From:   mrseugeniajimenez <mrseugeniajimenez@gmail.com>
-Date:   Sat, 3 Dec 2022 18:30:31 +0000
-X-Google-Sender-Auth: aaXOBkW2f-rXntiZPYfZAzv1Dcc
-Message-ID: <CAFRzY3ZFuvMnWrmVvgN+XmR4t6NkEo=BuDebmFi8uV4X8e0SPg@mail.gmail.com>
-Subject: Hello to you dear close American friend Mr/Mrs, Sir/Madame,
-To:     undisclosed-recipients:;
+From:   "mb@lab.how" <mb@lab.how>
+Date:   Sat, 3 Dec 2022 17:12:38 -0700
+X-Gmail-Original-Message-ID: <CAEdEoBYXHq9cCzsbMYTpG1B41Yz=-QAjFx7bJDOnPanN5Tmo7A@mail.gmail.com>
+Message-ID: <CAEdEoBYXHq9cCzsbMYTpG1B41Yz=-QAjFx7bJDOnPanN5Tmo7A@mail.gmail.com>
+Subject: Re: [PATCH 2/2] vfio/pci: Remove console drivers
+To:     alex.williamson@redhat.com
+Cc:     airlied@linux.ie, dri-devel@lists.freedesktop.org,
+        kraxel@redhat.com, kvm@vger.kernel.org, lersek@redhat.com,
+        linux-kernel@vger.kernel.org, tzimmermann@suse.de
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: Yes, score=7.8 required=5.0 tests=ADVANCE_FEE_5_NEW_MONEY,
-        BAYES_50,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        FREEMAIL_FROM,HK_RANDOM_ENVFROM,LOTS_OF_MONEY,MONEY_FRAUD_8,
-        RCVD_IN_DNSWL_NONE,RISK_FREE,SPF_HELO_NONE,SPF_PASS,T_MONEY_PERCENT,
-        UNDISC_MONEY autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2a00:1450:4864:20:0:0:0:142 listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5019]
-        *  0.0 HK_RANDOM_ENVFROM Envelope sender username looks random
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [ssgsggfgdgdg[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        *  0.0 LOTS_OF_MONEY Huge... sums of money
-        *  0.0 T_MONEY_PERCENT X% of a lot of money for you
-        *  1.0 RISK_FREE No risk!
-        *  0.0 MONEY_FRAUD_8 Lots of money and very many fraud phrases
-        *  3.0 ADVANCE_FEE_5_NEW_MONEY Advance Fee fraud and lots of money
-        *  3.2 UNDISC_MONEY Undisclosed recipients + money/fraud signs
-X-Spam-Level: *******
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
+        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello To You,
+Hi,
 
-Please i appeal to you to exercise a little patience and read through
-my Mail carefully and non-disclosure,i am contacting you personally
-for business partnership in your country.
+I hope it is ok to reply to this old thread. Unfortunately, I found a
+problem only now after upgrading to 6.0.
 
-I am Mrs. Eugenia Jim=C3=A9nez the Fondi asset manager in Banco Posta
-Italian, I decided to write you on privately regarding to a good
-business deal worth,($20 Million America dollars),invested in our
-Bancoprivately through Crypto Currency (BITCOIN) by late
-Mr.MirceaPopescua citizen of Romania who died date of June 23 2021 by
-drawn while swimming in coast of Costa Rica.
+My setup has multiple GPUs (2), and I depend on EFIFB to have a working console.
+pre-patch behavior, when I bind the vfio-pci to my secondary GPU both
+the passthrough and the EFIFB keep working fine.
+post-patch behavior, when I bind the vfio-pci to the secondary GPU,
+the EFIFB disappears from the system, binding the console to the
+"dummy console".
+Whenever you try to access the terminal, you have the screen stuck in
+whatever was the last buffer content, which gives the impression of
+"freezing," but I can still type.
+Everything else works, including the passthrough.
 
-The may reason why I contacted you about this fortune is because, I
-want you to partner with me and stand to contact our Banco Posta
-Italian manager as the investor partner trustee to late
-Mr.MirceaPopescu so that our Banco can be able to release the fund to
-you either by through Bitcoin or by Cash Transfer as you may prefer,
-note, this deal is 101 risk-free and I stand to provide you any
-documents regarding the Bitcoin fund. our Banco Posta may ask while
-contacting the manager for the fortune to be release to you.
+I can only think about a few options:
 
-Immediately I receive your positive respond and you agreed to work
-with me in trust until this deal is done, then you have to reply back
-with few of your details as below require to enabling me draft you an
-official letter to contact the Banco Posta as the applicant, our both
-percentage share is 50/50 % each.
+- Is there a way to have EFIFB show up again? After all it looks like
+the kernel has just abandoned it, but the buffer is still there. I
+can't find a single message about the secondary card and EFIFB in
+dmesg, but there's a message for the primary card and EFIFB.
+- Can we have a boolean controlling the behavior of vfio-pci
+altogether or at least controlling the behavior of vfio-pci for that
+specific ID? I know there's already some option for vfio-pci and VGA
+cards, would it be appropriate to attach this behavior to that option?
 
-1)      Your complete Name=E2=80=A6=E2=80=A6=E2=80=A6.
-2)      Your Resident/office address=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6
-3)      Your international/National Identity=E2=80=A6=E2=80=A6=E2=80=A6=E2=
-=80=A6=E2=80=A6.
-4)      Your  WhatsApp
-5)      Number=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=
-=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6
-6)      Your Occupation=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=
-=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=
-=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6.
+Thanks,
 
-Your Sincerely
-Your positive response while be highly recommended
-Eugenia Jim=C3=A9nez
-Fondi asset manager in Banco Posta Italian
+Carlos Augusto
