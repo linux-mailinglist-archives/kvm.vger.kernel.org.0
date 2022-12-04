@@ -2,406 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9DF9641E34
-	for <lists+kvm@lfdr.de>; Sun,  4 Dec 2022 18:20:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D4A6641E5A
+	for <lists+kvm@lfdr.de>; Sun,  4 Dec 2022 18:57:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230241AbiLDRUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Dec 2022 12:20:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51124 "EHLO
+        id S230318AbiLDR4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Dec 2022 12:56:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229785AbiLDRUA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Dec 2022 12:20:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAA7A13EB8
-        for <kvm@vger.kernel.org>; Sun,  4 Dec 2022 09:19:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670174347;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=20fyC3YFTPB+g5WEoCeX3R3U2nsrMQs9BQj6BjFEsrg=;
-        b=NkYC47vXd4pqnCZtShEmKNKqyJqZyfrUcff62BCS08cXe1/ap8ezs6FhA/VgXJLsO4ZD++
-        /p1RtNYc/RY8vzJ5aAxeL9Xnuw0ehpGdTv7KaTlDEz00TOE/WhfFop5LMS974jrBmWNrlI
-        TQi7yE1aDZRBCmBxVkAmTjmHqmY+Ohc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-400-TrlZGUC5MeSkNTsMiRRCJg-1; Sun, 04 Dec 2022 12:19:01 -0500
-X-MC-Unique: TrlZGUC5MeSkNTsMiRRCJg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S230289AbiLDR4a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Dec 2022 12:56:30 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94FE4140D0;
+        Sun,  4 Dec 2022 09:56:29 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C339A811E67;
-        Sun,  4 Dec 2022 17:19:00 +0000 (UTC)
-Received: from starship (unknown [10.35.206.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8A9A463A55;
-        Sun,  4 Dec 2022 17:18:56 +0000 (UTC)
-Message-ID: <c7629b0b246593ccf71661f2f8989e3a3acc3cbe.camel@redhat.com>
-Subject: Re: [PATCH v2 10/11] KVM: SVM: implement support for vNMI
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Sandipan Das <sandipan.das@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Babu Moger <babu.moger@amd.com>, linux-kernel@vger.kernel.org,
-        Jing Liu <jing2.liu@intel.com>,
-        Wyes Karny <wyes.karny@amd.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Santosh Shukla <santosh.shukla@amd.com>
-Date:   Sun, 04 Dec 2022 19:18:55 +0200
-In-Reply-To: <20221129193717.513824-11-mlevitsk@redhat.com>
-References: <20221129193717.513824-1-mlevitsk@redhat.com>
-         <20221129193717.513824-11-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2956560EDD;
+        Sun,  4 Dec 2022 17:56:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 449FEC433D7;
+        Sun,  4 Dec 2022 17:56:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670176588;
+        bh=pXsh8SVW/sBp/P3v6mc5bVyqy/bCl/0yI5e+z8DIwis=;
+        h=From:To:Cc:Subject:Date:From;
+        b=tQtG9KFpqkqGYmeGkTRbDw7dFD2tA0xqcHOa0rvlzLlRNlTklMnnb7Hra23zr673O
+         UCxXyY7ZxAa3ZBtBTYDJeszodPtvzxBSViHCAcKhduKrmfuYT1ucDpKIVxQQLWlZPd
+         /9Fa9kenqy3+BcN/nvOQNhPzOqI6CW+73bWJsAwuB7sTGorl3ggYWGdz+JXhI2Ut44
+         NUveSgkXxxfHMYikHN1Kj5TUi2lieXGxvSO2FtsArZzbtAzrh056c/CR3gkcp3n0T2
+         DFgdkDRbbkub+pvLLVU2PtGrbkQl2iXvvfC71aTAThHCKS9kwApzekms9ahM4gjg7T
+         Cf803DYekHhSw==
+From:   Jisheng Zhang <jszhang@kernel.org>
+To:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Andrew Jones <ajones@ventanamicro.com>
+Cc:     linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: [PATCH v2 00/13] riscv: improve boot time isa extensions handling
+Date:   Mon,  5 Dec 2022 01:46:19 +0800
+Message-Id: <20221204174632.3677-1-jszhang@kernel.org>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-11-29 at 21:37 +0200, Maxim Levitsky wrote:
-> This patch implements support for injecting pending
-> NMIs via the .kvm_x86_set_hw_nmi_pending using new AMD's vNMI
-> feature.
-> 
-> Note that the vNMI can't cause a VM exit, which is needed
-> when a nested guest intercepts NMIs.
-> 
-> Therefore to avoid breaking nesting, the vNMI is inhibited while
-> a nested guest is running and instead, the legacy NMI window
-> detection and delivery method is used.
-> 
-> While it is possible to passthrough the vNMI if a nested guest
-> doesn't intercept NMIs, such usage is very uncommon, and it's
-> not worth to optimize for.
-> 
-> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/x86/kvm/svm/nested.c |  42 +++++++++++++++
->  arch/x86/kvm/svm/svm.c    | 111 ++++++++++++++++++++++++++++++--------
->  arch/x86/kvm/svm/svm.h    |  10 ++++
->  3 files changed, 140 insertions(+), 23 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index e891318595113e..5bea672bf8b12d 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -623,6 +623,42 @@ static bool is_evtinj_nmi(u32 evtinj)
->  	return type == SVM_EVTINJ_TYPE_NMI;
->  }
+Generally, riscv ISA extensions are fixed for any specific hardware
+platform, that's to say, the hart features won't change any more
+after booting, this chacteristic make it straightforward to use
+static branch to check one specific ISA extension is supported or not
+to optimize performance.
+
+However, some ISA extensions such as SVPBMT and ZICBOM are handled
+via. the alternative sequences.
+
+Basically, for ease of maintenance, we prefer to use static branches
+in C code, but recently, Samuel found that the static branch usage in
+cpu_relax() breaks building with CONFIG_CC_OPTIMIZE_FOR_SIZE[1]. As
+Samuel pointed out, "Having a static branch in cpu_relax() is
+problematic because that function is widely inlined, including in some
+quite complex functions like in the VDSO. A quick measurement shows
+this static branch is responsible by itself for around 40% of the jump
+table."
+
+Samuel's findings pointed out one of a few downsides of static branches
+usage in C code to handle ISA extensions detected at boot time:
+static branch's metadata in the __jump_table section, which is not
+discarded after ISA extensions are finalized, wastes some space.
+
+I want to try to solve the issue for all possible dynamic handling of
+ISA extensions at boot time. Inspired by Mark[2], this patch introduces
+riscv_has_extension_*() helpers, which work like static branches but
+are patched using alternatives, thus the metadata can be freed after
+patching.
+
+Since v1
+ - rebase on v6.1-rc7 + Heiko's alternative improvements[3]
+ - collect Reviewed-by tag
+ - add one patch to update jal offsets in patched alternatives
+ - add one patch to switch to relative alternative entries
+ - add patches to patch vdso
+
+[1]https://lore.kernel.org/linux-riscv/20220922060958.44203-1-samuel@sholland.org/
+[2]https://lore.kernel.org/linux-arm-kernel/20220912162210.3626215-8-mark.rutland@arm.com/
+[3]https://lore.kernel.org/linux-riscv/20221130225614.1594256-1-heiko@sntech.de/
 
 
-Tiny bits of self review, I noticed some mistakes:
+Andrew Jones (1):
+  riscv: KVM: Switch has_svinval() to riscv_has_extension_unlikely()
 
->  
-> +static void nested_svm_save_vnmi(struct vcpu_svm *svm)
-> +{
-> +	struct vmcb *vmcb01 = svm->vmcb01.ptr;
-> +
-> +	/*
-> +	 * Copy the vNMI state back to software NMI tracking state
-> +	 * for the duration of the nested run
-> +	 */
-> +
-> +	svm->nmi_masked = vmcb01->control.int_ctl & V_NMI_MASK;
-> +	svm->vcpu.arch.nmi_pending += vmcb01->control.int_ctl & V_NMI_PENDING;
-Sorry for a mistake here - this should be converted to a boolean first, something like that:
+Jisheng Zhang (12):
+  riscv: fix jal offsets in patched alternatives
+  riscv: move riscv_noncoherent_supported() out of ZICBOM probe
+  riscv: cpufeature: detect RISCV_ALTERNATIVES_EARLY_BOOT earlier
+  riscv: hwcap: make ISA extension ids can be used in asm
+  riscv: cpufeature: extend riscv_cpufeature_patch_func to all ISA
+    extensions
+  riscv: introduce riscv_has_extension_[un]likely()
+  riscv: fpu: switch has_fpu() to riscv_has_extension_likely()
+  riscv: module: move find_section to module.h
+  riscv: switch to relative alternative entries
+  riscv: alternative: patch alternatives in the vDSO
+  riscv: cpu_relax: switch to riscv_has_extension_likely()
+  riscv: remove riscv_isa_ext_keys[] array and related usage
 
+ arch/riscv/errata/sifive/errata.c           |  4 +-
+ arch/riscv/errata/thead/errata.c            | 11 ++-
+ arch/riscv/include/asm/alternative-macros.h | 20 ++---
+ arch/riscv/include/asm/alternative.h        | 14 +--
+ arch/riscv/include/asm/errata_list.h        |  9 +-
+ arch/riscv/include/asm/hwcap.h              | 96 +++++++++++----------
+ arch/riscv/include/asm/module.h             | 15 ++++
+ arch/riscv/include/asm/switch_to.h          |  3 +-
+ arch/riscv/include/asm/vdso.h               |  4 +
+ arch/riscv/include/asm/vdso/processor.h     |  2 +-
+ arch/riscv/kernel/alternative.c             | 63 ++++++++++++++
+ arch/riscv/kernel/cpufeature.c              | 82 +++---------------
+ arch/riscv/kernel/module.c                  | 15 ----
+ arch/riscv/kernel/setup.c                   |  2 +
+ arch/riscv/kernel/vdso.c                    |  5 --
+ arch/riscv/kernel/vdso/vdso.lds.S           |  7 ++
+ arch/riscv/kvm/tlb.c                        |  3 +-
+ 17 files changed, 191 insertions(+), 164 deletions(-)
 
-if (vmcb01->control.int_ctl & V_NMI_PENDING)
-	svm->vcpu.arch.nmi_pending++;
-
-
-
-> +}
-> +
-> +static void nested_svm_restore_vnmi(struct vcpu_svm *svm)
-> +{
-> +	struct kvm_vcpu *vcpu = &svm->vcpu;
-> +	struct vmcb *vmcb01 = svm->vmcb01.ptr;
-> +
-> +	/*
-> +	 * Restore the vNMI state from the software NMI tracking state
-> +	 * after a nested run
-> +	 */
-> +
-> +	if (svm->nmi_masked)
-> +		vmcb01->control.int_ctl |= V_NMI_MASK;
-> +	else
-> +		vmcb01->control.int_ctl &= ~V_NMI_MASK;
-> +
-> +	if (vcpu->arch.nmi_pending) {
-> +		vcpu->arch.nmi_pending--;
-> +		vmcb01->control.int_ctl |= V_NMI_PENDING;
-> +	} else
-> +		vmcb01->control.int_ctl &= ~V_NMI_PENDING;
-> +}
-> +
-> +
->  static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
->  					  unsigned long vmcb12_rip,
->  					  unsigned long vmcb12_csbase)
-> @@ -646,6 +682,9 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
->  	else
->  		int_ctl_vmcb01_bits |= (V_GIF_MASK | V_GIF_ENABLE_MASK);
->  
-> +	if (vnmi)
-> +		nested_svm_save_vnmi(svm);
-> +
->  	/* Copied from vmcb01.  msrpm_base can be overwritten later.  */
->  	vmcb02->control.nested_ctl = vmcb01->control.nested_ctl;
->  	vmcb02->control.iopm_base_pa = vmcb01->control.iopm_base_pa;
-> @@ -1049,6 +1088,9 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
->  		svm_update_lbrv(vcpu);
->  	}
->  
-> +	if (vnmi)
-> +		nested_svm_restore_vnmi(svm);
-> +
->  	/*
->  	 * On vmexit the  GIF is set to false and
->  	 * no event can be injected in L1.
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index cfed6ab29c839a..bf10adcf3170a8 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -230,6 +230,8 @@ module_param(dump_invalid_vmcb, bool, 0644);
->  bool intercept_smi = true;
->  module_param(intercept_smi, bool, 0444);
->  
-> +bool vnmi = true;
-> +module_param(vnmi, bool, 0444);
->  
->  static bool svm_gp_erratum_intercept = true;
->  
-> @@ -1299,6 +1301,9 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
->  	if (kvm_vcpu_apicv_active(vcpu))
->  		avic_init_vmcb(svm, vmcb);
->  
-> +	if (vnmi)
-> +		svm->vmcb->control.int_ctl |= V_NMI_ENABLE;
-> +
->  	if (vgif) {
->  		svm_clr_intercept(svm, INTERCEPT_STGI);
->  		svm_clr_intercept(svm, INTERCEPT_CLGI);
-> @@ -3487,6 +3492,39 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
->  	++vcpu->stat.nmi_injections;
->  }
->  
-> +
-> +static bool svm_get_hw_nmi_pending(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	if (!is_vnmi_enabled(svm))
-> +		return false;
-> +
-> +	return !!(svm->vmcb->control.int_ctl & V_NMI_MASK);
-> +}
-> +
-> +static bool svm_set_hw_nmi_pending(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	if (!is_vnmi_enabled(svm))
-> +		return false;
-> +
-> +	if (svm->vmcb->control.int_ctl & V_NMI_PENDING)
-> +		return false;
-> +
-> +	svm->vmcb->control.int_ctl |= V_NMI_PENDING;
-> +	vmcb_mark_dirty(svm->vmcb, VMCB_INTR);
-
-vmcb_mark_dirty is not needed I think now, as KVM always leaves the VMCB_INTR dirty bit
-due to vTPR update.
-
-
-Best regards,
-	Maxim Levitsky
-
-> +
-> +	/*
-> +	 * NMI isn't yet technically injected but
-> +	 * this rough estimation should be good enough
-> +	 */
-> +	++vcpu->stat.nmi_injections;
-> +
-> +	return true;
-> +}
-> +
->  static void svm_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -3582,11 +3620,38 @@ static void svm_update_cr8_intercept(struct kvm_vcpu *vcpu, int tpr, int irr)
->  		svm_set_intercept(svm, INTERCEPT_CR8_WRITE);
->  }
->  
-> +static bool svm_get_nmi_mask(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	if (is_vnmi_enabled(svm))
-> +		return svm->vmcb->control.int_ctl & V_NMI_MASK;
-> +	else
-> +		return svm->nmi_masked;
-> +}
-> +
-> +static void svm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	if (is_vnmi_enabled(svm)) {
-> +		if (masked)
-> +			svm->vmcb->control.int_ctl |= V_NMI_MASK;
-> +		else
-> +			svm->vmcb->control.int_ctl &= ~V_NMI_MASK;
-> +	} else {
-> +		svm->nmi_masked = masked;
-> +		if (masked)
-> +			svm_enable_iret_interception(svm);
-> +		else
-> +			svm_disable_iret_interception(svm);
-> +	}
-> +}
-> +
->  bool svm_nmi_blocked(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  	struct vmcb *vmcb = svm->vmcb;
-> -	bool ret;
->  
->  	if (!gif_set(svm))
->  		return true;
-> @@ -3594,10 +3659,10 @@ bool svm_nmi_blocked(struct kvm_vcpu *vcpu)
->  	if (is_guest_mode(vcpu) && nested_exit_on_nmi(svm))
->  		return false;
->  
-> -	ret = (vmcb->control.int_state & SVM_INTERRUPT_SHADOW_MASK) ||
-> -	      (svm->nmi_masked);
-> +	if (svm_get_nmi_mask(vcpu))
-> +		return true;
->  
-> -	return ret;
-> +	return vmcb->control.int_state & SVM_INTERRUPT_SHADOW_MASK;
->  }
->  
->  static int svm_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
-> @@ -3615,24 +3680,6 @@ static int svm_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
->  	return 1;
->  }
->  
-> -static bool svm_get_nmi_mask(struct kvm_vcpu *vcpu)
-> -{
-> -	return to_svm(vcpu)->nmi_masked;
-> -}
-> -
-> -static void svm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
-> -{
-> -	struct vcpu_svm *svm = to_svm(vcpu);
-> -
-> -	if (masked) {
-> -		svm->nmi_masked = true;
-> -		svm_enable_iret_interception(svm);
-> -	} else {
-> -		svm->nmi_masked = false;
-> -		svm_disable_iret_interception(svm);
-> -	}
-> -}
-> -
->  bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -3725,10 +3772,16 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
->  	/*
->  	 * Something prevents NMI from been injected. Single step over possible
->  	 * problem (IRET or exception injection or interrupt shadow)
-> +	 *
-> +	 * With vNMI we should never need an NMI window
-> +	 * (we can always inject vNMI either by setting VNMI_PENDING or by EVENTINJ)
->  	 */
-> +	if (WARN_ON_ONCE(is_vnmi_enabled(svm)))
-> +		return;
-> +
->  	svm->nmi_singlestep_guest_rflags = svm_get_rflags(vcpu);
-> -	svm->nmi_singlestep = true;
->  	svm->vmcb->save.rflags |= (X86_EFLAGS_TF | X86_EFLAGS_RF);
-> +	svm->nmi_singlestep = true;
->  }
->  
->  static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
-> @@ -4770,6 +4823,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.patch_hypercall = svm_patch_hypercall,
->  	.inject_irq = svm_inject_irq,
->  	.inject_nmi = svm_inject_nmi,
-> +	.get_hw_nmi_pending = svm_get_hw_nmi_pending,
-> +	.set_hw_nmi_pending = svm_set_hw_nmi_pending,
->  	.inject_exception = svm_inject_exception,
->  	.cancel_injection = svm_cancel_injection,
->  	.interrupt_allowed = svm_interrupt_allowed,
-> @@ -5058,6 +5113,16 @@ static __init int svm_hardware_setup(void)
->  			pr_info("Virtual GIF supported\n");
->  	}
->  
-> +
-> +	vnmi = vgif && vnmi && boot_cpu_has(X86_FEATURE_AMD_VNMI);
-> +	if (vnmi)
-> +		pr_info("Virtual NMI enabled\n");
-> +
-> +	if (!vnmi) {
-> +		svm_x86_ops.get_hw_nmi_pending = NULL;
-> +		svm_x86_ops.set_hw_nmi_pending = NULL;
-> +	}
-> +
->  	if (lbrv) {
->  		if (!boot_cpu_has(X86_FEATURE_LBRV))
->  			lbrv = false;
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 587ddc150f9f34..0b7e1790fadde1 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -35,6 +35,7 @@ extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
->  extern bool npt_enabled;
->  extern int vgif;
->  extern bool intercept_smi;
-> +extern bool vnmi;
->  
->  enum avic_modes {
->  	AVIC_MODE_NONE = 0,
-> @@ -553,6 +554,15 @@ static inline bool is_x2apic_msrpm_offset(u32 offset)
->  	       (msr < (APIC_BASE_MSR + 0x100));
->  }
->  
-> +static inline bool is_vnmi_enabled(struct vcpu_svm *svm)
-> +{
-> +	/* L1's vNMI is inhibited while nested guest is running */
-> +	if (is_guest_mode(&svm->vcpu))
-> +		return false;
-> +
-> +	return !!(svm->vmcb01.ptr->control.int_ctl & V_NMI_ENABLE);
-> +}
-> +
->  /* svm.c */
->  #define MSR_INVALID				0xffffffffU
->  
-
+-- 
+2.37.2
 
