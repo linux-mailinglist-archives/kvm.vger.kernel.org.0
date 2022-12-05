@@ -2,177 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07264642BC3
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 16:30:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2E48642BC6
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 16:31:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232836AbiLEPaG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 10:30:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59800 "EHLO
+        id S232830AbiLEPbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 10:31:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231713AbiLEP3i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 10:29:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F28A117ABF
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 07:27:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670254031;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9UO7S0SWM1jnP4HZHZJz8sfF1M27ck2q1zdXWGwkxA4=;
-        b=SAwO+d6fft3WMVsWvwgkgGptSeo0cM/vArnGq7jp7HuXNv81l9pCQyT6pIYnQhi6TyJk/j
-        73W/u4nMKy4EKhDsOtpzVm0gQI/pCmQhlKy1TVLL+pbby8BMg3kyr60eaQgr4OSz0a1uy/
-        19hFDxuNM2efc+CySiwpwkqDEpk/a6g=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-608-R5O-JYeUN5SR_eXmuODKgQ-1; Mon, 05 Dec 2022 10:27:09 -0500
-X-MC-Unique: R5O-JYeUN5SR_eXmuODKgQ-1
-Received: by mail-qv1-f72.google.com with SMTP id og17-20020a056214429100b004c6ae186493so30592187qvb.3
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 07:27:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9UO7S0SWM1jnP4HZHZJz8sfF1M27ck2q1zdXWGwkxA4=;
-        b=Q2xQTWeOqK61L6kITuiMhNPkAYRp5C+UVhbrgtLbStAd4MyPJVY2VjNaMDdpIUy3ET
-         S2YpNxlfo+9Bl5Zx+Pm3/6gcw9NnZqn0iVT/7lGUMGjuJkIYJM7cZOvrP6aL8NdfqEG1
-         /SGU9ch8HA0oO8xD+rWN/viwa3kE4mHcvB0oWRI8B18Scl0DsNa5EQiIAPc8P0Ec7X/j
-         BQZNFDcXNZEDtLWFfsBVQQsMaatRaHcugL4glUOuuOwsaCPA+MmQIg2sxrTK/RmYcdVk
-         ZOuUxYy1n9GJa4ITT+WrAb+WTUQstqL1Qaf8W5e5EPctbBImKkcAvQxb0q8VUl5sjGLK
-         L5Og==
-X-Gm-Message-State: ANoB5plFpzxA2dPGLcZEf6CqOyrZ9bZpJRXzkhqJnG9CM8TVTGN2kqwY
-        pu8FT1gP3X5brS731L3dxotM9OXe5OqvZfJ9UouDLBg7F8Ihkl4d0SY0reJ+foT2n0a9uXJafT4
-        fLXyijuCWCr2a
-X-Received: by 2002:ae9:e901:0:b0:6fa:165:131c with SMTP id x1-20020ae9e901000000b006fa0165131cmr57975073qkf.389.1670254028833;
-        Mon, 05 Dec 2022 07:27:08 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6UQwJaurj93pRN1ykjnmCPLyB4AIFdfikJt1EvgSHc1df5f39Dyz+8QoXsXQQcz1rC36pt8w==
-X-Received: by 2002:ae9:e901:0:b0:6fa:165:131c with SMTP id x1-20020ae9e901000000b006fa0165131cmr57975044qkf.389.1670254028534;
-        Mon, 05 Dec 2022 07:27:08 -0800 (PST)
-Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
-        by smtp.gmail.com with ESMTPSA id bn36-20020a05620a2ae400b006fafaac72a6sm2213158qkb.84.2022.12.05.07.27.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Dec 2022 07:27:07 -0800 (PST)
-Date:   Mon, 5 Dec 2022 10:27:06 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     James Houghton <jthoughton@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Linux MM <linux-mm@kvack.org>, kvm <kvm@vger.kernel.org>,
-        chao.p.peng@linux.intel.com
-Subject: Re: [RFC] Improving userfaultfd scalability for live migration
-Message-ID: <Y44NylxprhPn6AoN@x1n>
-References: <CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com>
- <Y4qgampvx4lrHDXt@google.com>
+        with ESMTP id S232772AbiLEPam (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 10:30:42 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2066.outbound.protection.outlook.com [40.107.93.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8746CD8
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 07:29:28 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F/h0Vt/6aYJm5SzkCrKNA56jnGPHmA73Clb1NUYbaoHuVOuu2SS9NvYTgAeGUENNRAEKlwq7f/pXjAwsjRMfh8LaG+ENKuRxq/VjCgL32jsvH0AoSjNYtgY0GWeZyfeWPi/aE4FF5GnNXQbzShfQ5KhbEAaYbkSiqxGxKesMN+umeahlpy+3Xc88GC6irLqScRllqBVqUJQjIbaicklcK0enpLpQBJtB52kjY2D7LdKEvhfs769TlxBnXDT4Fq8wS77vyThg6a0chMQvQh/v9VGser24xIgbSZaZr02pnbtXDZGYsbY8SHbizPkt+MiCebDzx7ZQaz5Lbd3xZUIJ4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CUvJltKzIq61oWK+cNdikLB40r8dWmWPBRyyIq9wIBM=;
+ b=V8fd8sJzrXqM4K1mwy6wr2O/cVOAr/VRQy1i+nngoMKskSYtoBWBqqz4YZzPsi6Rp1u78q193QxjGF39t+0UaVooO4ZdpZAKCd+EZowVKgPkY9V2kwBDRnE8PN/cK9++ASC8xC9Y5AvhFMc2YQy/BCi4T5p/8ZfLGOf62OpEo2NjHcFUr6S25qz9aInR/gxFAEVtGf9/XaHVI+4P37CGZ2MRzhmd5/MTUQgGRzmWdcOZjpELSBC79O9GR2L7lmllyTvzcqLOen8Jz50//JfoRhNBzGOzDbGihoqjaP9298xjYe/V8FDfHK10F7YCsDIANeTr2lW3sgDnnDlCdpAQoA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CUvJltKzIq61oWK+cNdikLB40r8dWmWPBRyyIq9wIBM=;
+ b=hk/P3flPje3dGpCAPgEhBoYF/KPzrZm6z6A0aN8YDkdyRT48FmVzG8JvEt9f65MsLQdeZJuBpX5CW6seG36QxgmtOkz4mApAdr2Ndkk2lxMBbWdrTL1ULiqsmt8sa6KkD8Y9XMTP9EMGpja3WEOi4Eyo4HTgAhK/q6JMel6OiWkenEzh0ysV9p37Yu1DB7qygMrBZE53KbKGY+g7tMxOwye/nwDgBJJQPEbKd0j+G1/FVzb16vtV9JZ3vphlHqojrka3PEpfVa1Wlc77nUmFikmsy7rGYVEcHt/Rpl2ZCrAUFBJtz7gsdsQX857tfqePicq0YHISAx7ZJ7C0E2K8XQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM4PR12MB6662.namprd12.prod.outlook.com (2603:10b6:8:bb::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Mon, 5 Dec
+ 2022 15:29:23 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5880.013; Mon, 5 Dec 2022
+ 15:29:23 +0000
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>,
+        =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH v5 0/5] Simplify the module and kconfig structure in vfio
+Date:   Mon,  5 Dec 2022 11:29:15 -0400
+Message-Id: <0-v5-fc5346cacfd4+4c482-vfio_modules_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BYAPR07CA0098.namprd07.prod.outlook.com
+ (2603:10b6:a03:12b::39) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y4qgampvx4lrHDXt@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB6662:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3b5566b4-4267-4735-bfc9-08dad6d57c7e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xK+vydOzztLXIKzNdiIvq9eaM3mKDtneZe7aza4WXzfqBD0YihorE7efIZJey+zSWuauVVQMCGkHkw0LpZ+hzeUCIW46eO3pqChIy8XEGsCLOjfjMqJYenX05Rv6k8SRGaIcBenvBJsmx8b1CmhsCjlA7405Ofu2RfqZRCUA7713W+snhl8KFcdxSUuSMnW0izMQ/peAMZtObdMRanNcrhdhy7ucsnZZd3cJnNSXaTeK+TZ4UvqTtLPQXJBsIsOGYdjQNlawlXuyK0wG2NtK1ZeSqLqscXF4yty9BRcXvqzinuJ+RwE4fFHRNe4amzT0wJg47uXXvFXF973LjNviYKci3iErTECtOvaQoFrv46/hSEQl16oUor53Fb1tUi1n9g5gGEJcjOovDyDwoAEl3EuQIOaLvcIuu3fRU12SVctLF0yhejWOlL+073qAby4Ep5XJjscpvr+qxsaXiNxKo4SZhKY/LWi53WMSZwz7NozGos9aRivSgH2m7KGiKt1z1DYBvGeD5K9PWM+p9JSZCBTsCTsQzYY/E1erKL7nszEV5D1qzPhDDBpyCXRMGNxUq4CR8nSbLlwZqcBQChUasUw9BVSCeMMSgqmKFinZ4vE0UIuIc3SrswRtNHZYUqTMSj+WgJKQMc1b4oR2PN64luxGnwcfsD7JS+/xfBwCnKGebLORAanmDHhjpmtg4Gn/y96gEB7YRJgKkTxaQ9H1XCfC37kx6fmqmdq99r/5nZaWao9FVImWDwVu/lG992sryDyNL0JIWexOX2naLTr/VTS+XhT+JF9e5NBB7E5LT/SrXkWxMEWtnM8Wlo0e8616
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(39860400002)(396003)(366004)(136003)(346002)(451199015)(66476007)(36756003)(38100700002)(2906002)(41300700001)(4326008)(5660300002)(8936002)(83380400001)(86362001)(478600001)(6666004)(66556008)(966005)(2616005)(8676002)(54906003)(110136005)(186003)(316002)(6506007)(6486002)(66946007)(6512007)(26005)(4216001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RS9tam55c1VodysxSURSWERRZE9IN2ZxUERuQjhWcVBSNmt2U2REWXN1Uyt2?=
+ =?utf-8?B?NWJvQnhkbDg1Z1l3UXhrYlJtODB2K0FDa2UzVndNT2FiRFNCUE92dGhVSHBa?=
+ =?utf-8?B?eS9RVTE4V0l1WVgrUFNSdUt4R3pQalU0Y2hSNlpoZjF1akp6cU55dDEvZjda?=
+ =?utf-8?B?REthb3FMN2lsS0h3K25idGt1ZFAzWEN6K1ExWkU4RjkvSVFPcUFJQ2hielNl?=
+ =?utf-8?B?MkwxbXd6N05FYmdjY2RSSEVHZ0dZenJYZTZaM0htQTdsaFc2aUZPU2V4bkZ3?=
+ =?utf-8?B?UW5vem5DYWp5QmtEeXorM2ZJdVI1T2NBV21iMXRPSjBqYzlVMXJwcmRBR29i?=
+ =?utf-8?B?NmlMNDdlVHhOcXgzakxYMkJEUkIvTkVBeDBVeHZUMG9PWHFqZWxaeWZhUEZL?=
+ =?utf-8?B?K1lIbmI5UzdCeUZTa0ZaYXI0S2h4ay9FQ3djTnMzK3hnR2N6Um96dS9zbnR0?=
+ =?utf-8?B?T0J6MjRHNFJEOERGQ1doYTdTVXFOV3pjZTRDa2ZvMzVtckxFOCtsdStPcmF1?=
+ =?utf-8?B?Nkt0eWt4bWZZY1VwSi9QWXFMM1RlalVlQm80WjZBVXJ5c3owWVgvMjA5WnN1?=
+ =?utf-8?B?VTdGNXNnT1hOOGg5L1FQL2k2RGVVemVDYm5NWm1ra0NPbEI1YmFLSXBEQ0U3?=
+ =?utf-8?B?cCtUOXV3RG5HNkFPRHRXekZxSkxwQk5VMTgxcHNURVBvbmlDbE1CR0lkanpv?=
+ =?utf-8?B?NGlYanV4ZlZ5TFFJd3FiVnFPTGVxWnIxOXdnc0RMN1ZKZ2Z5YjRPVEZRQjdN?=
+ =?utf-8?B?d2NkbFBlODlWeU5henRwNlVGYk1kMFpLenhNVFBxWE1oT1JsTGVQYjNOSTds?=
+ =?utf-8?B?S2xVN1hHR2wzUnlPUkF3VXlaMjlDNlo5RFpyRllLMXM0SW9BUW8wN3pSNU1V?=
+ =?utf-8?B?ckdiczZYcjgrY25Gc3oxOWZUam4rZmpMbUExdXBEQUVIc3MzcGZYdUZ3VjJq?=
+ =?utf-8?B?MEtZSitZVnJYM0lSNjl4aXNTTmtTYnhhK0ROaS9qOHg3YVVDOVJUODU3d2N3?=
+ =?utf-8?B?S1hxQWdXMU1zanIrNFpJallSOVhDVDVOWEp1aG9OWVlQOWhMOFRUSlJ1T0xK?=
+ =?utf-8?B?MUM1Vm9CTVhqTm5oV1lDSWZwcjRLSERPNWJlbUR5Qko4SGs1OVB2WW1tbG55?=
+ =?utf-8?B?WXo5MWVvOHJWcnpSM3lmdlJaTUNhZVRXdVZHZGJLcEpFcy9BazVEK2Fzekt6?=
+ =?utf-8?B?RFlTU1ZJTVBkR2dyUE1DTmh2NktjTnRzR3UyaTBrdlFLYS9HVy94a1JQTHNp?=
+ =?utf-8?B?T0ljQmZtcW0vWDB2NTgwNklMQ0xUMkduQ013d2ZxMjJiN2ZLbkRscHFiS2xC?=
+ =?utf-8?B?ZmlHUlp4Vm10OGVSRjRDcnF2ZHpOWVZYbW5mMXlnQnJaS0dJaDJFRDUraU5R?=
+ =?utf-8?B?K0w0ZmpIa0hkR3FZMEx5Nm5qZ1VLZERHWFJGZlNxdEZ2N3d1S2s3bXJDL3gz?=
+ =?utf-8?B?YTBVZUxRZklXVXJYUUVRZlJkbkJGZDA3UTI3SVBZcjdZQXdlL2N2dGJhT3lt?=
+ =?utf-8?B?bmFRK2VzNXBsVXpMQldDOHh2S1l0dUhIUm5SSEVQSjFWUkdQQ0I0bHVOdFFF?=
+ =?utf-8?B?STJQczFJMTFBeEJXbEZLZXA2YTgxS0NzMjNsdVRsRTI4dlNBS1dyc25wZk42?=
+ =?utf-8?B?L096bTkyMlh6NlNzWndUNlFmM2VvczZWRHVsUmhSeWVqc045cGxpdjAxQVRJ?=
+ =?utf-8?B?a3c5Uld1V1NKVDVxMDFPR0tudWh2YVV0TklqRTlBbWVjZVRFNmFjS3kxRjhR?=
+ =?utf-8?B?NktiZnhPckVxOFhGNlFYRWhUVUg2N0NEMmkyaDBGUkFjc21qS2xhVXhHVjYx?=
+ =?utf-8?B?WTBCZjVpd0lzWktiWVZXa3c3eXQ5MTJYT0dPT2N0dkRyOHJhRlAyK3NLVHJs?=
+ =?utf-8?B?bDhoNXIwbjRzcEw4OTRjazdEend5ZDdtTVJsR0t0blpjK0VYTWRKTUhabnFl?=
+ =?utf-8?B?TjRwbExCeVBGWlBPWWxxQ3BNM3gyWVI1bXhRbEV1RG9UbTRkT3JuRlJva3lX?=
+ =?utf-8?B?NGlmcDY0Y0VEOFRWdXArQitNTERGWHhVMHlLc2VzVWdlWW9KbERkSnVTMkRz?=
+ =?utf-8?B?T3VMTFVGNUg4VTBoSE9GQUJHOHpzOVM1ekpJaWs5dFdzclV5RmI0MVpvSy84?=
+ =?utf-8?Q?9DAQFui+iIsQJYIYXJyK45Te1?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b5566b4-4267-4735-bfc9-08dad6d57c7e
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2022 15:29:23.2030
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: v4qN2lq1OUm6htEsJ8fR92vIpibhPkaCvTiQ9BBtjWRlPKWYoOMPIvaHV5tEmh6V
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6662
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Dec 03, 2022 at 01:03:38AM +0000, Sean Christopherson wrote:
-> On Thu, Dec 01, 2022, James Houghton wrote:
-> > #1, however, is quite doable. The main codepath for post-copy, the
-> > path that is taken when a vCPU attempts to access unmapped memory, is
-> > (for x86, but similar for other architectures): handle_ept_violation
-> > -> hva_to_pfn -> GUP -> handle_userfault. I'll call this the "EPT
-> > violation path" or "mem fault path." Other post-copy paths include at
-> > least: (i) KVM attempts to access guest memory via.
-> > copy_{to,from}_user -> #pf -> handle_mm_fault -> handle_userfault, and
-> > (ii) other callers of gfn_to_pfn* or hva_to_pfn* outside of the EPT
-> > violation path (e.g., instruction emulation).
-> > 
-> > We want the EPT violation path to be fast, as it is taken the vast
-> > majority of the time.
-> 
-> ...
-> 
-> > == Getting the faulting GPA to userspace ==
-> > KVM_EXIT_MEMORY_FAULT was introduced recently [1] (not yet merged),
-> > and it provides the main functionality we need. We can extend it
-> > easily to support our use case here, and I think we have at least two
-> > options:
-> > - Introduce something like KVM_CAP_MEM_FAULT_REPORTING, which causes
-> > KVM_RUN to exit with exit reason KVM_EXIT_MEMORY_FAULT when it would
-> > otherwise just return -EFAULT (i.e., when kvm_handle_bad_page returns
-> > -EFAULT).
-> > - We're already introducing a new CAP, so just tie the above behavior
-> > to whether or not one of the CAPs (below) is being used.
-> 
-> We might even be able to get away with a third option: unconditionally return
-> KVM_EXIT_MEMORY_FAULT instead of -EFAULT when the error occurs when accessing
-> guest memory.
-> 
-> > == Problems ==
-> > The major problem here is that this only solves the scalability
-> > problem for the KVM demand paging case. Other userfaultfd users, if
-> > they have scalability problems, will need to find another approach.
-> 
-> It may not fully solve KVM's problem either.  E.g. if the VM is running nested
-> VMs, many (most?) of the user faults could be triggered by FNAME(walk_addr_generic)
-> via __get_user() when walking L1's EPT tables.
-> 
-> Disclaimer: I know _very_ little about UFFD.
-> 
-> Rather than add yet another flag to gup(), what about flag to say the task doesn't
-> want to wait for UFFD faults?  If desired/necessary, KVM could even toggle the flag
-> in KVM_RUN so that faults that occur outside of KVM ultimately don't send an actual
-> SIGBUGS.
-> 
-> diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-> index 07c81ab3fd4d..7f66b56dd6e7 100644
-> --- a/fs/userfaultfd.c
-> +++ b/fs/userfaultfd.c
-> @@ -394,7 +394,7 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
->          * shmem_vm_ops->fault method is invoked even during
->          * coredumping without mmap_lock and it ends up here.
->          */
-> -       if (current->flags & (PF_EXITING|PF_DUMPCORE))
-> +       if (current->flags & (PF_EXITING|PF_DUMPCORE|PF_NO_UFFD_WAIT))
->                 goto out;
+This series does a little house cleaning to remove the SPAPR exported
+symbols, presence in the public header file, and reduce the number of
+modules that comprise VFIO.
 
-I'll have a closer read on the nested part, but note that this path already
-has the mmap lock then it invalidates the goal if we want to avoid taking
-it from the first place, or maybe we don't care?
+v5:
+ - Reword commit messages
+ - Remove whitespace change from drivers/vfio/pci/vfio_pci_priv.h
+v4: https://lore.kernel.org/r/0-v4-7993c351e9dc+33a818-vfio_modules_jgg@nvidia.com
+ - Copy IBM copyright header to vfio_iommu_spapr_tce.c
+ - Use "return" not "ret = " in vfio_spapr_ioctl_eeh_pe_op()
+ - Use just "#if IS_ENABLED(CONFIG_EEH)"
+v3: https://lore.kernel.org/r/0-v3-8db96837cdf9+784-vfio_modules_jgg@nvidia.com
+ - New patch to fold SPAPR VFIO_CHECK_EXTENSION EEH code into the actual ioctl
+ - Remove the 'case VFIO_EEH_PE_OP' indenting level
+ - Just open code the calls and #ifdefs to eeh_dev_open()/release()
+   instead of using inline wrappers
+ - Rebase to v6.1-rc1
+v2: https://lore.kernel.org/r/0-v2-18daead6a41e+98-vfio_modules_jgg@nvidia.com
+ - Add stubs for vfio_virqfd_init()/vfio_virqfd_exit() so that linking
+   works even if vfio_pci/etc is not selected
+v1: https://lore.kernel.org/r/0-v1-10a2dba77915+c23-vfio_modules_jgg@nvidia.com
 
-If we want to avoid taking the mmap lock at all (hence the fast-gup
-approach), I'd also suggest we don't make it related to uffd at all but
-instead an interface to say "let's check whether the page tables are there
-(walk pgtable by fast-gup only), if not return to userspace".
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Because IIUC fast-gup has nothing to do with uffd, so it can also be a more
-generic interface.  It's just that if the userspace knows what it's doing
-(postcopy-ing), it knows then the faults can potentially be resolved by
-userfaultfd at this stage.
+Jason Gunthorpe (5):
+  vfio/pci: Move all the SPAPR PCI specific logic to vfio_pci_core.ko
+  vfio/spapr: Move VFIO_CHECK_EXTENSION into tce_iommu_ioctl()
+  vfio: Move vfio_spapr_iommu_eeh_ioctl into vfio_iommu_spapr_tce.c
+  vfio: Remove CONFIG_VFIO_SPAPR_EEH
+  vfio: Fold vfio_virqfd.ko into vfio.ko
 
->  
->         /*
-> diff --git a/include/linux/sched.h b/include/linux/sched.h
-> index ffb6eb55cd13..4c6c53ac6531 100644
-> --- a/include/linux/sched.h
-> +++ b/include/linux/sched.h
-> @@ -1729,7 +1729,7 @@ extern struct pid *cad_pid;
->  #define PF_MEMALLOC            0x00000800      /* Allocating memory */
->  #define PF_NPROC_EXCEEDED      0x00001000      /* set_user() noticed that RLIMIT_NPROC was exceeded */
->  #define PF_USED_MATH           0x00002000      /* If unset the fpu must be initialized before use */
-> -#define PF__HOLE__00004000     0x00004000
-> +#define PF_NO_UFFD_WAIT                0x00004000
->  #define PF_NOFREEZE            0x00008000      /* This thread should not be frozen */
->  #define PF__HOLE__00010000     0x00010000
->  #define PF_KSWAPD              0x00020000      /* I am kswapd */
-> 
+ drivers/vfio/Kconfig                |   7 +-
+ drivers/vfio/Makefile               |   5 +-
+ drivers/vfio/pci/vfio_pci_core.c    |  11 ++-
+ drivers/vfio/vfio.h                 |  13 ++++
+ drivers/vfio/vfio_iommu_spapr_tce.c |  65 ++++++++++++++---
+ drivers/vfio/vfio_main.c            |   7 ++
+ drivers/vfio/vfio_spapr_eeh.c       | 107 ----------------------------
+ drivers/vfio/virqfd.c               |  17 +----
+ include/linux/vfio.h                |  23 ------
+ 9 files changed, 91 insertions(+), 164 deletions(-)
+ delete mode 100644 drivers/vfio/vfio_spapr_eeh.c
 
+
+base-commit: 9abf2313adc1ca1b6180c508c25f22f9395cc780
 -- 
-Peter Xu
+2.38.1
 
