@@ -2,146 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08C366429CC
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 14:44:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E2D8A6429F0
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 14:55:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230123AbiLENou (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 08:44:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36664 "EHLO
+        id S231592AbiLENzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 08:55:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232399AbiLENoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 08:44:25 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2063.outbound.protection.outlook.com [40.107.94.63])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2226ACE27
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 05:43:47 -0800 (PST)
+        with ESMTP id S230385AbiLENzA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 08:55:00 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2074.outbound.protection.outlook.com [40.107.243.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131CD24C
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 05:54:59 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JXIt1BbaNXcCoqNmJsae2juSxsdltu2eTDsWlJIxyNIgjOmDEWLp5ij1adOlOu5vmwLOloaAAuAyapqdhZWAEyJP9qaCfeJUtyMncqBTjtOAwjIz2fTppXdK2xDR3+pQ4rx6JPOwvoIiHzEVPfZw4dhp50fX8R2WwIt3waF5IF6PeSdj610BraSah1izZa1pabNaZnCnsKov+bk8N84Q6NeEVgCexRs/AzEkLGlDhXCk6LAx5GQBGAkk/Qk/wqfKio6sEGb8PTHC495HLZgd/l+GdR/ambgvltpIIk2RWTh3ruaH8uXd4k7azxj01SGPewUkwYwTmfbu4LUCCZlnUA==
+ b=JlH6oFM/azxvDf99VVHahEfv+rNXxa0ERXx21YUEcewyEl5EByHMN8Kg3sSfwZwNKcq1pI72zqIon9x6hjexDqpNJUmiX5bkU/svEtEOX/6bWV24iwdbRZ8SBLO53gYL/mqrhamWF7Lp6YFptiE4xXLpoxJI/lcC+3+bWvUzOJr9oQVCxeC+4Rqw/EehTp+SD+ExhmeJ38zbkGGkYk3UR3J5GTked2nEU5DytrpDuzeJbEhh5ZcWks4R2G9O22dqe0beQiBwStXVBbOh1EeWv5OxtiOZhE5/CfomNZzc5V65Z7bLQqroB73ipL5zANdNY4WLx+Ng/IwfQuQUm5mp3A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=12aU/QG/JfzyGvKNIXzvLUcODiGtMsPLsq/1O/Un+cY=;
- b=TmGHo9SESCH+tD3cLH9bmvWFWyFAAYjyyNE1yA6CLJqj+QOTF9vWmiu6OqVhiC3u0OMGNiriHG5naNxjrGNoLv9yX+XpD91FXdsrKxGIEjrsn1QZGyFcZyxcSZr1aUf9BNd8euBE+9SmqdcA9DnKo52bPwECGbljWpmpFdLGUjNIWSlZGTiCmcD/NuIdH/Hw6OxKDZSqVzvWYZMbyanD04LSpXtyzQfgwKt5GT03pHdiPtTN8U+kp3dD/VghTjkdkBHkU63eHPEG91PliBp4S+DZqeyc27V+KwM1nWaoGyME/WMZt6XFuFVS2EAc035B62h6mRjpsK4pdPXfbc5BPA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
+ bh=4TYWaWFBvBSc3MJMgDBy+ZcLd0ZPJ5bPoUtaP836x4o=;
+ b=oIIt6EP+jbS2AKzeVE+EMED5foRXZ7U1TcVww0HSGVv/DDV8TF58Ktc3V47ueRRygSPMypH2E0DgSWIoPn9tbWhT/EY2ANLP1znKgLC3c3PNogxqBtP2RhX3xDobNVhPh6hYKuycYM8trFwK+aVrIms+4pNwTz/mTjI9zOiaH7pdTb0uWMLBlZTywvX1BW6TvAFaqbd9MmNaVspyKTLWID9VLup+mOAnnF1ow5UeuTo0c8kMKLUahphkVZr94S1/9c16LpEept0kwob6UF45KxQD3poQokgk72MqInCKJbt2fd46z1nsQ0Ja3HarcxDgx8E9kuVSgQ0zRQx8Wuw1Cw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=huawei.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=12aU/QG/JfzyGvKNIXzvLUcODiGtMsPLsq/1O/Un+cY=;
- b=MizAvao0QCaP74jnsjN/fTnLI2WkyiuLocHas6Bj7F9vanotUEiew7VocXKcIIBcoM6OyqOsoBdZ+waT2Csf0Xub02hqYE/JmDL9pD5QVTJngCKS+St2tii+6txix0gTuDUkawxyZd8++x3F9loorR6OjdaufMc6NiHMiscHA4ad2nKwkzrc6ZdW3hA4580BrduQpcl+pteMSS+tFqpmyf7MibDprC3RTaM3FdyUmQwCUWjZxtx2CJWs4cKVT0j2oroOh97qAW+/N//kJiileCi9JQvUR3NttoE3ilGkguGTreefjAmnAgZ9O2iBTBcA6G+as4OznrNEecyktGPAWw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17) with
+ bh=4TYWaWFBvBSc3MJMgDBy+ZcLd0ZPJ5bPoUtaP836x4o=;
+ b=SOCyv7TQMfLnaKAV3fSQXqld0+xgCBkurEIWq3YOlvjlpfQTscFCwPOLC4I4+lupZiGke4RLS8Pc2Z6NHIR68DX3fU9Z6v9UQgVfkIqEwax/zUWrbU47WpieQJMJR2swfO/fNEfBmm/qsioswe7TmwBvCzHoxhXacqm9+J7CYt7jLNY/fXsbNZs3AK1UQU4Fn6SLOKqa1aruofZpTYc8Mip5kOAX2KTpLxxsUTlYCd8wGpBDNDjU6/Ry7esiuXvC7yI+VO0cHOdxDslNheh6ffkSoYs1EgQSuyheE8x6GNOSTqf0PxWtQxBbygxJ/roa09/5U9l7rpJoDzOSSjlTqg==
+Received: from CY5PR10CA0020.namprd10.prod.outlook.com (2603:10b6:930:1c::10)
+ by BL3PR12MB6522.namprd12.prod.outlook.com (2603:10b6:208:3be::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14; Mon, 5 Dec
- 2022 13:43:45 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5880.013; Mon, 5 Dec 2022
- 13:43:45 +0000
-Date:   Mon, 5 Dec 2022 09:43:43 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        yi.y.sun@linux.intel.com, kevin.tian@intel.com, cohuck@redhat.com,
-        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com
-Subject: Re: [PATCH 00/10] Move group specific code into group.c
-Message-ID: <Y431j8HBvuCsvP+U@nvidia.com>
-References: <20221201145535.589687-1-yi.l.liu@intel.com>
- <Y4kRC0SRD9kpKFWS@nvidia.com>
- <86c4f504-a0b2-969c-c2c6-5fd43deb6627@intel.com>
- <Y4oPTjCTlQ/ozjoZ@nvidia.com>
- <20221202161225.3144305f.alex.williamson@redhat.com>
- <fecfc22d-cb9e-cac9-95ff-21df13f257c2@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fecfc22d-cb9e-cac9-95ff-21df13f257c2@intel.com>
-X-ClientProxiedBy: YT3PR01CA0078.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:84::9) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.13; Mon, 5 Dec
+ 2022 13:54:57 +0000
+Received: from CY4PEPF0000B8EC.namprd05.prod.outlook.com
+ (2603:10b6:930:1c:cafe::e4) by CY5PR10CA0020.outlook.office365.com
+ (2603:10b6:930:1c::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14 via Frontend
+ Transport; Mon, 5 Dec 2022 13:54:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000B8EC.mail.protection.outlook.com (10.167.241.8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5813.11 via Frontend Transport; Mon, 5 Dec 2022 13:54:55 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Mon, 5 Dec 2022
+ 05:54:46 -0800
+Received: from [172.27.11.24] (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Mon, 5 Dec 2022
+ 05:54:42 -0800
+Message-ID: <f44e180c-7bef-4fdf-2380-16cec5800705@nvidia.com>
+Date:   Mon, 5 Dec 2022 15:54:40 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH V2 vfio 02/14] vfio: Extend the device migration protocol
+ with PRE_COPY
+Content-Language: en-US
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+        "leonro@nvidia.com" <leonro@nvidia.com>,
+        "shayd@nvidia.com" <shayd@nvidia.com>,
+        "maorg@nvidia.com" <maorg@nvidia.com>,
+        "avihaih@nvidia.com" <avihaih@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>
+References: <20221201152931.47913-1-yishaih@nvidia.com>
+ <20221201152931.47913-3-yishaih@nvidia.com>
+ <90968e5f85a64bc68bb3d140fd7a4045@huawei.com>
+From:   Yishai Hadas <yishaih@nvidia.com>
+In-Reply-To: <90968e5f85a64bc68bb3d140fd7a4045@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.126.231.35]
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5732:EE_
-X-MS-Office365-Filtering-Correlation-Id: ca150500-2ed0-4694-b465-08dad6c6bab2
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000B8EC:EE_|BL3PR12MB6522:EE_
+X-MS-Office365-Filtering-Correlation-Id: 730c83d8-d97e-4751-01a9-08dad6c84aca
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QV/JJB1aIu14LRRC4UL+dZv0M6baCu/UdVLmImLytwr3TINXJrZc9UzULpELsoKgY5qFmgLfMveU/nTxKl6ITSqfvJMqEnBOqPlWGIIv0d05VQ+nM399TNRHdeySVqNwW3NzVeV6d9XpW2G0tG4DtJVNCbBKxRtjM63Q2+hhI9q68fRfHmiUcXH11K9MUKYP8xiU02JLh2caUScAtcD6dVGpDRUOxFSlqBF0tPwKEMfvRoZxn5+cFxdCB4UaIiApIVfx03mjM0+7ILjcUZRIf6DZRagHuXDFkTX6V4Do/Hd8w+YGNcilPdtlbVshevcu1mPcU+rVowTmmT1h5ChYEPtwUapWzTQQaTtfgUX4GZCv1pflBRf90kyzk4uYYwUR2CGKCXcilqhCZ9sv9GCwym05ddzwsTZH6OUOH58Z73RGOBv5/VkY12kXGNpjdAHxpFsM5p7Maw+TPI1MfjKE6B+S70jR81A3YvYJ2SAePolxHc+7LDrNWsRsYDCgpIjRa26YbZecFQGneBp1LrA7rvA5MDTnz1ZrzHxPy2vtOqDhNGMILz6Te59/6+xcrC4VsRTuuaeJavQE5clZCD6Gy+9qvOYLedvYssKcvQnD6BE9zzJekgLN96xSfGW8/1TlABt91nP6uOszs2fx6yaPc2EhG0Ctc1ljRrXrnNWrp+Z9OYwV8D5EJJn7E7dLuSRKi72f9458pOH1BAyGdNrW2m8SPK09lF1XB5JDSYMWu20eJAElUV49ZkR+SdLH7lAWkM/CTogolBgjvtlbdbiXFg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(136003)(366004)(376002)(346002)(451199015)(86362001)(38100700002)(4744005)(5660300002)(41300700001)(8936002)(2906002)(4326008)(8676002)(186003)(26005)(6506007)(6512007)(316002)(2616005)(6916009)(66946007)(966005)(66476007)(66556008)(478600001)(6486002)(36756003)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wjIBWK0w3BnhExC92PZvbboixwkpjCV24wboWVj4MvPQQ08s5kBidH7giW2E?=
- =?us-ascii?Q?BcmfBdLonrQZC3ZamtfIGebiQ24xC+irEsoy/MzuTW1iollIqsM1SZhOgcMH?=
- =?us-ascii?Q?ZcNsJzegGc2ii8y6UL+LoRDU/vbDZ/oNgEW9ZHgp5BRfgTPv40ShJYhof1Js?=
- =?us-ascii?Q?N4/OF6OW4Vrtb4DlUA/5l3gkAcVqcCkw3zLfvzdHoT16cI83RN80RzIibrE7?=
- =?us-ascii?Q?mu5tl9REZM7qcKNhz4EPM6KEoqmYaZD85h1Nvs8LX8Mo+FgrglWb2IU6IPZL?=
- =?us-ascii?Q?HukexuruOPhxbknfXJZFlvWPz+oPZ0RPYbD8GHHJcd8vLURUulXbdDUzhH/C?=
- =?us-ascii?Q?axM/amEp58MPgF7jpyP7VCrDA1p1/gIpxDnKvDeSGVHthYTuKIQekcYsYC+C?=
- =?us-ascii?Q?OqO0yO9fUuQ0+Uu1BILWe7kaHi7fWIIyrzeZGi67L9kYgKJS0nsSgDKLPfij?=
- =?us-ascii?Q?0/5vH/5zNlvZx4fBJ4++ejuczBJc7Xoxi/sdvvzfzdayK6gXMDkRTT8UQnr4?=
- =?us-ascii?Q?mTB/Jtz+olXWghrSoRaTV8pyJsFtwVZy5YNBsawgsRSEvRvu6Adfa80vdk3y?=
- =?us-ascii?Q?Q/EVFXI2R5hx8SZ+5M4b41Lu1zsUzDf2m3mRm2qh3JXyM6gdR1d+r733MbQM?=
- =?us-ascii?Q?+tUEsNtJ3RMmx5DXOY9JD6ufMNNEE1vUjmwOTxTi4tj11iLdhp0IKk63JHaO?=
- =?us-ascii?Q?jFguPhx+DMhS751Wm0H1tWSi4kjlQshfTx4l3iG4vNxoLHDk8GDnjsAgBebM?=
- =?us-ascii?Q?/YS9Ion8h0Dp2T0tgbD16zct5nPP/l4vJlOsnA1G44PjlkTqV+d+DxGj2JF+?=
- =?us-ascii?Q?o3k6xgK1O4QLL0jGIYNyKSLZiKaZHZM2TVYMeWFBslt1cmOkH2+/9LvKFAsF?=
- =?us-ascii?Q?q25MVaRfm4U5SDdLPM7i/qg7kkMNfh8CeD3OcCbqfKKZ39gabwKaJHcWQNmj?=
- =?us-ascii?Q?NxeZNHrrBfHBBpO0rYhcikV/o5SQCKMvBRxzVo50EPqYCRHwR8/J1B4ErG1q?=
- =?us-ascii?Q?5Wu++ozqUzVMUiuLDBvSWAxhcOxYaO3yHi5V5WmY1w4kTLWW+SXOXtuBpgRC?=
- =?us-ascii?Q?hVVRGsftfzVwn/dpfA/8aPgsekTY6WpjL31WjkZEVHvLLWDk6ke9g6l5cU93?=
- =?us-ascii?Q?GQXIKbbWa4umDx+RT6iC77xQlI8K0276ENIydKhBqI+FqrbOTmxcPAX1TvK9?=
- =?us-ascii?Q?SHEmco38lUDN5eP5ozIdW1UiYewlwZLbNq9tjHdzKRgtGjDVTXtCSTA17Yw8?=
- =?us-ascii?Q?7TnOmsO6fermMl5Ms12ALZbZrS2ie5Wkyrz3kf3IEpa6mKvjeW9mDgc34gAT?=
- =?us-ascii?Q?9ftmyI2zIXPcqZ9SEsxVHgr7k3hMOeQDoUtNdmVwm0ZLDx1YkjilElHV48ze?=
- =?us-ascii?Q?5wK4aa2JygynLeYVvYHCEHKKCJfXpeNjjHhQOAgoT657E1qEwnhP7WWjZT8p?=
- =?us-ascii?Q?gpG9ordrVTpz2g+jmwhf3fGw09dQdygWVyYN0JdH2efSm4uTvEZNx+IxBADo?=
- =?us-ascii?Q?lFaBrHUZKHZ9cXHmo6NOA1357zKh21ePkiVN4xi6aIiZFS0qFelCgygFX+6G?=
- =?us-ascii?Q?AYB75IGqI86N1KencPv96cP900m5wLDcXXoXXf/1?=
+X-Microsoft-Antispam-Message-Info: rJF1S9i72esa/y1GSCQbjx7gbYkeI8XOdUg5xEFa4QV8ssBbEUxtAQbi9AGdn6tLw0q267+9HFUfoYbptnELx66zv0R4aUe8xv/pFt5yjpAVXo1Y/nfAO10N+inpJUapHfs6AUiqV/QnvuhNa39vRg76BJJx4a4b/ltJNlI44U2vs5eb6VSHMfQ73dL+su6IRqIjHbpq9jTjfrIk0/GH+oLU86AyRe2zVd9qF8pJnR63zYg56z75pabHaci9XYFlCAGaMBavYqzWNukq+Sh1vBc4VdKUGTAnaPByoCH4nVHY9NJ+/xwvFKO+1mEY7+ggW+vELXLbMKaCs2Nw+fMFzT6EejAISV0wsB54goZKHA/N66p+sG0zpZjgdjCjzGoeK+EIcisW/y6nAmFTalUik/5WVEEnvmHvd4FHX9vc8EAiVMUYD3EOwvZuQEcCN3YBDrF1RZDii2SuWi+QCM9rrOaDxPygMA5cqzmIimNqFLJvFQCxgX5ljZ2GvkDAEQNBh1x7mqdikKWj2MHLNkJh1dsh4rDk+xWNDewSSx9ZsIWarQmRJ5ao/VonL4xpjSoZuACQ07L63cMrQYxDsqyh/nvzMHyc2mJ9ddYiKRgZQh2fCE8rmyUh9UiUxsdPuMA+dK3xXBmN2XplIZ/BueNVE/iHgZw73pMMb8OySlvCEY/UcvRhYdIUEit0LaG57P++6jmtshuI3vWSlXbBW++ruhenmp6T06LockLUkG4lqF4=
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(396003)(136003)(346002)(451199015)(40470700004)(36840700001)(46966006)(2906002)(8676002)(4326008)(31686004)(70586007)(70206006)(16526019)(316002)(16576012)(40460700003)(110136005)(6636002)(36756003)(5660300002)(54906003)(86362001)(31696002)(26005)(40480700001)(53546011)(8936002)(186003)(336012)(478600001)(83380400001)(426003)(7636003)(47076005)(356005)(41300700001)(2616005)(82740400003)(36860700001)(82310400005)(43740500002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca150500-2ed0-4694-b465-08dad6c6bab2
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2022 13:43:45.1738
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2022 13:54:55.9933
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: 730c83d8-d97e-4751-01a9-08dad6c84aca
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Dnfbqzl8QWikZ6xRtttB0j29tLlMgsUJ+hcgzzg0YR+QvNSP7GrBAULAzserc/ju
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5732
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000B8EC.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6522
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Dec 03, 2022 at 09:53:18PM +0800, Yi Liu wrote:
+On 02/12/2022 11:38, Shameerali Kolothum Thodi wrote:
+>
+>> -----Original Message-----
+>> From: Yishai Hadas [mailto:yishaih@nvidia.com]
+>> Sent: 01 December 2022 15:29
+>> To: alex.williamson@redhat.com; jgg@nvidia.com
+>> Cc: kvm@vger.kernel.org; kevin.tian@intel.com; joao.m.martins@oracle.com;
+>> leonro@nvidia.com; shayd@nvidia.com; yishaih@nvidia.com;
+>> maorg@nvidia.com; avihaih@nvidia.com; cohuck@redhat.com
+>> Subject: [PATCH V2 vfio 02/14] vfio: Extend the device migration protocol
+>> with PRE_COPY
+> [...]
+>   
+>> +/**
+>> + * VFIO_MIG_GET_PRECOPY_INFO - _IO(VFIO_TYPE, VFIO_BASE + 21)
+>> + *
+>> + * This ioctl is used on the migration data FD in the precopy phase of the
+>> + * migration data transfer. It returns an estimate of the current data sizes
+>> + * remaining to be transferred. It allows the user to judge when it is
+>> + * appropriate to leave PRE_COPY for STOP_COPY.
+>> + *
+>> + * This ioctl is valid only in PRE_COPY states and kernel driver should
+>> + * return -EINVAL from any other migration state.
+>> + *
+>> + * The vfio_precopy_info data structure returned by this ioctl provides
+>> + * estimates of data available from the device during the PRE_COPY states.
+>> + * This estimate is split into two categories, initial_bytes and
+>> + * dirty_bytes.
+>> + *
+>> + * The initial_bytes field indicates the amount of initial precopy
+>> + * data available from the device. This field should have a non-zero initial
+>> + * value and decrease as migration data is read from the device.
+>> + * It is recommended to leave PRE_COPY for STOP_COPY only after this field
+>> + * reaches zero. Leaving PRE_COPY earlier might make things slower.
+>> + *
+>> + * The dirty_bytes field tracks device state changes relative to data
+>> + * previously retrieved.  This field starts at zero and may increase as
+>> + * the internal device state is modified or decrease as that modified
+>> + * state is read from the device.
+>> + *
+>> + * Userspace may use the combination of these fields to estimate the
+>> + * potential data size available during the PRE_COPY phases, as well as
+>> + * trends relative to the rate the device is dirtying its internal
+>> + * state, but these fields are not required to have any bearing relative
+>> + * to the data size available during the STOP_COPY phase.
+>> + *
+>> + * Drivers have a lot of flexibility in when and what they transfer during the
+>> + * PRE_COPY phase, and how they report this from
+>> VFIO_MIG_GET_PRECOPY_INFO.
+>> + *
+>> + * During pre-copy the migration data FD has a temporary "end of stream"
+>> that is
+>> + * reached when both initial_bytes and dirty_byte are zero. For instance,
+>> this
+>> + * may indicate that the device is idle and not currently dirtying any internal
+>> + * state. When read() is done on this temporary end of stream the kernel
+>> driver
+>> + * should return ENOMSG from read(). Userspace can wait for more data
+>> (which may
+>> + * never come) by using poll.
+>> + *
+>> + * Once in STOP_COPY the migration data FD has a permanent end of
+>> stream
+>> + * signaled in the usual way by read() always returning 0 and poll always
+>> + * returning readable. ENOMSG may not be returned in STOP_COPY.
+>> Support
+>> + * for this ioctl is optional.
+> Isn't mandatory if the driver claims support for VFIO_MIGRATION_PRE_COPY?
 
-> > > Please rebase it on the above branch also
-> 
-> To Jason: done. Please fetch from below branch.
-> 
-> https://github.com/yiliu1765/iommufd/commits/for-jason/vfio_group_split
+It seems reasonable to let it be mandatory once the driver claims to 
+support PRE_COPY.
 
-Okay, it is merged in to the iommufd tree
+This will also simplify things from QEMU point of view which can expect 
+the IOCTL to be supported.
 
-> > It looks fine to me aside from the previous review comments and my own
-> > spelling nit.  I also don't see that this adds any additional conflicts
-> > vs the existing iommufd integration for any outstanding vfio patches on
-> > the list, therefore, where there's not already a sign-off from me:
-> > 
-> > Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
-> 
-> To Alex: thanks. above branch is based on Jason's for-next. So may have
-> one minor conflict with below commit in your next branch.
-> 
-> vfio: Remove vfio_free_device
+Will add a note here as part of V3.
 
-It seems OK, I did a test merge
+>
+> Other than that looks fine to me.
+>
+> Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+>
+Thanks, will add your Reviewed-by as part of V3.
 
-Thanks,
-Jason
+Yishai
+
