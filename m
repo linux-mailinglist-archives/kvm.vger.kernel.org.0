@@ -2,81 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2331B643977
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 00:24:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E7E4643981
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 00:32:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233026AbiLEXYV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 18:24:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44714 "EHLO
+        id S232054AbiLEXcy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 18:32:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232947AbiLEXYL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 18:24:11 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4549A1F633
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 15:24:01 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id y11-20020a056a00190b00b005749340b8a8so11810070pfi.11
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 15:24:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4cT5T4kx5vV5G9qvldZN1GECLXLHFCHNlOSZmIc8Z4k=;
-        b=MSm36zjFu6mM+RphFRhsmlmaQyUoFJB0YM0+rChhr1tlfWke1UXduhSz6qDk1U/p2h
-         FyJwkto/N/PE2o78KOHsNxYMcclIv/h0KhRdKbsL+XavASCjGVCsaUN5E2Rv/aKmtlil
-         1NyfJffrd33nAYHPiyp6FZgRIIJSDDkCUQPM05Ul/yHFKW/+SqdKvC4ZzcZGapKJedBy
-         CaV2moL13a7T6cP6mf42IEZ5+88ljwkdO5/aKk2D1uAw1AjCBYdUfBEl5WNRJvM8jhPT
-         iiJ+9MGzjWp9fA9C5el/0GTTO/nk0bCWpXvo2F339y9Xj9YrqzA2Vwu88MHmmuZBCnWZ
-         EVQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4cT5T4kx5vV5G9qvldZN1GECLXLHFCHNlOSZmIc8Z4k=;
-        b=7X1k4YKLPU4oIKAoNQdJLC/Yp8dklxzSyI/N/rNPaHgyO1reQApVJjizZRdU/mhumn
-         X8Y30CySp63Xfr9TlpS9zSSWKZuD+ij5dBeCZPN3etl/1POvC0zxa1EFIyEJRaHtP8Xm
-         CozjzklYEjTSmj4lLW/F4OEHPiRH2wQ2ENJn3IAswHEw8Wnj04QNF+MHrCCrrJGeehbB
-         x0+Lx5U3TbMw0VR26yHvMNdFQF8ySFuyWIMNkKpOLOzFM1YAB/YS0fEN4ar4caHDf50z
-         QABjZqBM24saqzwv6Soy8SEkOA5G0GQ/qM9t0ZMorjiWpC4XP2Yi8nz06oyX8BcfrIi7
-         nz2A==
-X-Gm-Message-State: ANoB5pn+biUS4V0c3pjNFPpq60TFAYWaYaJgI5EQ18PdCyHbSilxzFWX
-        1DlZsj48SELtfIwVtmslQiL392lexQdjisWW
-X-Google-Smtp-Source: AA0mqf4UFnuvrvDn3jIhzMzVaZzt3ltuRFmfUtGo3Om7zoi8ApgY8/8IL5jZeTQdynJbAAGM5lt53AWd1Ct/beY/
-X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
- (user=vannapurve job=sendgmr) by 2002:a17:903:330e:b0:189:57e4:c470 with SMTP
- id jk14-20020a170903330e00b0018957e4c470mr57735426plb.66.1670282640756; Mon,
- 05 Dec 2022 15:24:00 -0800 (PST)
-Date:   Mon,  5 Dec 2022 23:23:41 +0000
-In-Reply-To: <20221205232341.4131240-1-vannapurve@google.com>
-Mime-Version: 1.0
-References: <20221205232341.4131240-1-vannapurve@google.com>
-X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221205232341.4131240-7-vannapurve@google.com>
-Subject: [V2 PATCH 6/6] KVM: selftests: x86: Add selftest for private memory
-From:   Vishal Annapurve <vannapurve@google.com>
-To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, shuah@kernel.org, yang.zhong@intel.com,
-        ricarkol@google.com, aaronlewis@google.com, wei.w.wang@intel.com,
-        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
-        jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
-        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
-        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
-        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
-        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
-        erdemaktas@google.com, pgonda@google.com, nikunj@amd.com,
-        seanjc@google.com, diviness@google.com, maz@kernel.org,
-        dmatlack@google.com, axelrasmussen@google.com,
-        maciej.szmigiero@oracle.com, mizhang@google.com,
-        bgardon@google.com, ackerleytng@google.com,
-        Vishal Annapurve <vannapurve@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        with ESMTP id S230036AbiLEXcw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 18:32:52 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2069.outbound.protection.outlook.com [40.107.243.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ACEE6543;
+        Mon,  5 Dec 2022 15:32:50 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nBa5UdOsc5uKK2agFcTaKiExl8KE+t6HAP2bAau96ldDy7a5+QNww4DewMqT+OBdyEj0X5GLXi8GC422jDk+TSWG+cx2RcI4pfDxsBCLlmJSbGocJYfrtvoKHLhKS4IbsaVRvVeVEvOVyv6lGGalMj5QhxEE2kYxLEhd6hcZdJeMHZ6hg53CuKCoikcAxLh3+9boJRvgkSyZ8Cx1oNpISz+YtGN694mi/2bLDb2HBO5QOL9b6Ig4/s34phBnU90P+ddxEmdZMXKamaP2zLiYOXiBCe0UKmnQIunjnvvNuSN8Trjbil3d/8XNKm0vq7BNC7pxwg9+dTU1VTQj7Fw8cA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oq+0Yzs6dxN6WQai/kZfnR0CZOdjFT4e6eXWc+J6wIg=;
+ b=nnKHBPt6AlEcUZb9zXYJVaAvWfaXNnTAIhcN+vYsKk1ulCjKJLZBNxIDwSWXR6rm5U+RTHz4HsizFK8J4Yb+tr9evU+2KIuwmuzn9o5XAOP80WmJnNsPZC2MXEgKobm3LulXVmVliWIXGCCNbuwezWxxpkfv17kY7Ng4Dwm8osrajNHYeghQp58TbXORLkgvNSSzia8sHvTisUcAa3cLhGLlZ6sYqf+bGRUFdrEy9TQ12RHRHYBdZ6+ItRsGJu1Z4wvjzRr3mKnh67mlSIHZGf/0ezWi4gIQaYsbbZu+bltO3Cz6c0QXzQITkqxx4gMeQD+Xve7Yu1P+RJpHMtG9bQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oq+0Yzs6dxN6WQai/kZfnR0CZOdjFT4e6eXWc+J6wIg=;
+ b=HI7I11KJcLdPDO1E3oIms6kRNQNEfZ5D+c0j3W9LNJHL5shs35j0mV3VIgedrH2ZGkSFInlGgB0au52j4ITtndrI5+6CL+gOW8H9kw/0w6SsD0t0sOBWriCpdg/Y1VP6RMrrZf2u8xbEk3DtYk0BwaRRZXm9s7qPMf1saUXuHcM=
+Received: from DS7PR03CA0326.namprd03.prod.outlook.com (2603:10b6:8:2b::28) by
+ BL0PR12MB4849.namprd12.prod.outlook.com (2603:10b6:208:1c2::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14; Mon, 5 Dec
+ 2022 23:32:45 +0000
+Received: from DS1PEPF0000E643.namprd02.prod.outlook.com
+ (2603:10b6:8:2b:cafe::83) by DS7PR03CA0326.outlook.office365.com
+ (2603:10b6:8:2b::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14 via Frontend
+ Transport; Mon, 5 Dec 2022 23:32:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DS1PEPF0000E643.mail.protection.outlook.com (10.167.17.197) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5880.8 via Frontend Transport; Mon, 5 Dec 2022 23:32:45 +0000
+Received: from fritz.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 5 Dec
+ 2022 17:32:43 -0600
+From:   Kim Phillips <kim.phillips@amd.com>
+To:     <x86@kernel.org>
+CC:     Kim Phillips <kim.phillips@amd.com>,
+        Babu Moger <Babu.Moger@amd.com>,
+        Borislav Petkov <bp@alien8.de>, Borislav Petkov <bp@amd.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Juergen Gross <jgross@suse.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Alexey Kardashevskiy <aik@amd.com>, <kvm@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v5 0/7] x86/cpu, kvm: Support AMD Automatic IBRS
+Date:   Mon, 5 Dec 2022 17:32:28 -0600
+Message-ID: <20221205233235.622491-1-kim.phillips@amd.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS1PEPF0000E643:EE_|BL0PR12MB4849:EE_
+X-MS-Office365-Filtering-Correlation-Id: e72ec5f1-ee38-476d-b685-08dad7190316
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: a1R0WiFAkDexnESh1NiHEygwqysjntnjgstvDzUkaKCKyhvil/+T7RSUT5hElDnKxOGJulealFwR3zAzKQn8TCn5PMQKKoGJzG81Ilzue+VPYIFRZwbq+swil9Fo31WubsZ+NHXsz8NCCp+3Wz6PXtsGA8y+UzVIqtS1fMfrF0aPJKROmB/1Wu7ZlGCEbirvrpi1g38jneh3ws8T0JkHmqhEre51S7KrhD2sz6ANP99LtXxr8GD+1CEwrvcxi6GRPL1sxB9QboTZSXw0LKwS5S63m+VJR9zWiUfUwzSt1BbEVvEdA/eyKR56tDaN3NcZ+WWKckYYvhAdIEs2zHWEmiqMuSfgu2KXOl4SumWPIQLcuCf1L0SxWATJFKfx8tminF/J7FOQbQVqfZARwX5PVZJbadwIy321zX5OfI9o/oQcmoDjmme0KOU4LVadTY36j+cQ6oHQhKFJXo1U6IbhiRXVBA5VEY6c4t6yZZRjZGSAfVga8VsXVxDTUvLeCVnPMyO08pIInvPJ8t2x88/4S/0kiELRzpL6O4y852tfGAHuPLzQ32As9jxa2nOh4tRqUCUTVaUqpEXOuV6mC5GsZbI7i1rqyJsTpAcA3j8wGdAIGKeYEVf17seo8sLAgqefiJLH9JmqmNCQZ36yfculfOrmkeaANB4oE4vISky64oJvkaBRy2gpHvmNDQUhiJXCFp0e5O1Q7tATmzCywCvuqMe0/WZkxGJBYT4J0HNZdlM5Ucd7h4tSm9McjMfIFi1I5QUV/spx1eioQNRaGU8di93mQQC6/1W+zgcvR7CMjbpl554SnqM9jheWh5Pe6Gk4
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(396003)(39860400002)(136003)(376002)(346002)(451199015)(46966006)(40470700004)(36840700001)(83380400001)(36860700001)(86362001)(81166007)(82740400003)(356005)(7416002)(5660300002)(44832011)(2906002)(41300700001)(40460700003)(8936002)(4326008)(8676002)(82310400005)(40480700001)(26005)(186003)(7696005)(6666004)(1076003)(16526019)(47076005)(426003)(336012)(6916009)(316002)(54906003)(2616005)(70586007)(966005)(478600001)(70206006)(36756003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2022 23:32:45.0602
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e72ec5f1-ee38-476d-b685-08dad7190316
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E643.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB4849
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,262 +114,126 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a selftest to exercise implicit/explicit conversion functionality
-within KVM and verify:
-1) Shared memory is visible to host userspace after conversion
-2) Private memory is not visible to host userspace before/after conversion
-3) Host userspace and guest can communicate over shared memory
+The AMD Zen4 core supports a new feature called Automatic IBRS
+(Indirect Branch Restricted Speculation).
 
-Signed-off-by: Vishal Annapurve <vannapurve@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/x86_64/private_mem_test.c   | 212 ++++++++++++++++++
- 3 files changed, 214 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_test.c
+Enable Automatic IBRS by default if the CPU feature is present.
+It typically provides greater performance over the incumbent
+generic retpolines mitigation.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 082855d94c72..19cdcde2ed08 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -34,6 +34,7 @@
- /x86_64/nested_exceptions_test
- /x86_64/nx_huge_pages_test
- /x86_64/platform_info_test
-+/x86_64/private_mem_test
- /x86_64/pmu_event_filter_test
- /x86_64/set_boot_cpu_id
- /x86_64/set_sregs_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 97f7d52c553b..beb793dd3e1c 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -99,6 +99,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/monitor_mwait_test
- TEST_GEN_PROGS_x86_64 += x86_64/nested_exceptions_test
- TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
- TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
-+TEST_GEN_PROGS_x86_64 += x86_64/private_mem_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
- TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
- TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
-diff --git a/tools/testing/selftests/kvm/x86_64/private_mem_test.c b/tools/testing/selftests/kvm/x86_64/private_mem_test.c
-new file mode 100644
-index 000000000000..015ada2e3d54
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/private_mem_test.c
-@@ -0,0 +1,212 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2022, Google LLC.
-+ */
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <limits.h>
-+#include <sched.h>
-+#include <signal.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include <linux/compiler.h>
-+#include <linux/kernel.h>
-+#include <linux/kvm_para.h>
-+#include <linux/memfd.h>
-+
-+#include <test_util.h>
-+#include <kvm_util.h>
-+#include <private_mem.h>
-+#include <processor.h>
-+
-+#define TEST_AREA_SLOT		10
-+#define TEST_AREA_GPA		0xC0000000
-+#define TEST_AREA_SIZE		(2 * 1024 * 1024)
-+#define GUEST_TEST_MEM_OFFSET	(1 * 1024 * 1024)
-+#define GUEST_TEST_MEM_SIZE	(10 * 4096)
-+
-+#define VM_STAGE_PROCESSED(x)	pr_info("Processed stage %s\n", #x)
-+
-+#define TEST_MEM_DATA_PATTERN1	0x66
-+#define TEST_MEM_DATA_PATTERN2	0x99
-+#define TEST_MEM_DATA_PATTERN3	0x33
-+#define TEST_MEM_DATA_PATTERN4	0xaa
-+#define TEST_MEM_DATA_PATTERN5	0x12
-+
-+static bool verify_mem_contents(void *mem, uint32_t size, uint8_t pattern)
-+{
-+	uint8_t *buf = (uint8_t *)mem;
-+
-+	for (uint32_t i = 0; i < size; i++) {
-+		if (buf[i] != pattern)
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+static void populate_test_area(void *test_area_base, uint64_t pattern)
-+{
-+	memset(test_area_base, pattern, TEST_AREA_SIZE);
-+}
-+
-+static void populate_guest_test_mem(void *guest_test_mem, uint64_t pattern)
-+{
-+	memset(guest_test_mem, pattern, GUEST_TEST_MEM_SIZE);
-+}
-+
-+static bool verify_test_area(void *test_area_base, uint64_t area_pattern,
-+	uint64_t guest_pattern)
-+{
-+	void *guest_test_mem = test_area_base + GUEST_TEST_MEM_OFFSET;
-+	void *test_area2_base = guest_test_mem + GUEST_TEST_MEM_SIZE;
-+	uint64_t test_area2_size = (TEST_AREA_SIZE - (GUEST_TEST_MEM_OFFSET +
-+			GUEST_TEST_MEM_SIZE));
-+
-+	return (verify_mem_contents(test_area_base, GUEST_TEST_MEM_OFFSET, area_pattern) &&
-+		verify_mem_contents(guest_test_mem, GUEST_TEST_MEM_SIZE, guest_pattern) &&
-+		verify_mem_contents(test_area2_base, test_area2_size, area_pattern));
-+}
-+
-+#define GUEST_STARTED			0
-+#define GUEST_PRIVATE_MEM_POPULATED	1
-+#define GUEST_SHARED_MEM_POPULATED	2
-+#define GUEST_PRIVATE_MEM_POPULATED2	3
-+
-+/*
-+ * Run memory conversion tests with explicit conversion:
-+ * Execute KVM hypercall to map/unmap gpa range which will cause userspace exit
-+ * to back/unback private memory. Subsequent accesses by guest to the gpa range
-+ * will not cause exit to userspace.
-+ *
-+ * Test memory conversion scenarios with following steps:
-+ * 1) Access private memory using private access and verify that memory contents
-+ *   are not visible to userspace.
-+ * 2) Convert memory to shared using explicit conversions and ensure that
-+ *   userspace is able to access the shared regions.
-+ * 3) Convert memory back to private using explicit conversions and ensure that
-+ *   userspace is again not able to access converted private regions.
-+ */
-+static void guest_conv_test_fn(void)
-+{
-+	void *test_area_base = (void *)TEST_AREA_GPA;
-+	void *guest_test_mem = (void *)(TEST_AREA_GPA + GUEST_TEST_MEM_OFFSET);
-+	uint64_t guest_test_size = GUEST_TEST_MEM_SIZE;
-+
-+	GUEST_SYNC(GUEST_STARTED);
-+
-+	populate_test_area(test_area_base, TEST_MEM_DATA_PATTERN1);
-+	GUEST_SYNC(GUEST_PRIVATE_MEM_POPULATED);
-+	GUEST_ASSERT(verify_test_area(test_area_base, TEST_MEM_DATA_PATTERN1,
-+		TEST_MEM_DATA_PATTERN1));
-+
-+	kvm_hypercall_map_shared((uint64_t)guest_test_mem, guest_test_size);
-+
-+	populate_guest_test_mem(guest_test_mem, TEST_MEM_DATA_PATTERN2);
-+
-+	GUEST_SYNC(GUEST_SHARED_MEM_POPULATED);
-+	GUEST_ASSERT(verify_test_area(test_area_base, TEST_MEM_DATA_PATTERN1,
-+		TEST_MEM_DATA_PATTERN5));
-+
-+	kvm_hypercall_map_private((uint64_t)guest_test_mem, guest_test_size);
-+
-+	populate_guest_test_mem(guest_test_mem, TEST_MEM_DATA_PATTERN3);
-+	GUEST_SYNC(GUEST_PRIVATE_MEM_POPULATED2);
-+
-+	GUEST_ASSERT(verify_test_area(test_area_base, TEST_MEM_DATA_PATTERN1,
-+		TEST_MEM_DATA_PATTERN3));
-+	GUEST_DONE();
-+}
-+
-+#define ASSERT_CONV_TEST_EXIT_IO(vcpu, stage) \
-+	{ \
-+		struct ucall uc; \
-+		ASSERT_EQ(vcpu->run->exit_reason, KVM_EXIT_IO); \
-+		ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_SYNC); \
-+		ASSERT_EQ(uc.args[1], stage); \
-+	}
-+
-+#define ASSERT_GUEST_DONE(vcpu) \
-+	{ \
-+		struct ucall uc; \
-+		ASSERT_EQ(vcpu->run->exit_reason, KVM_EXIT_IO); \
-+		ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_DONE); \
-+	}
-+
-+static void host_conv_test_fn(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-+{
-+	void *test_area_hva = addr_gpa2hva(vm, TEST_AREA_GPA);
-+	void *guest_test_mem_hva = (test_area_hva + GUEST_TEST_MEM_OFFSET);
-+
-+	vcpu_run_and_handle_mapgpa(vm, vcpu);
-+	ASSERT_CONV_TEST_EXIT_IO(vcpu, GUEST_STARTED);
-+	populate_test_area(test_area_hva, TEST_MEM_DATA_PATTERN4);
-+	VM_STAGE_PROCESSED(GUEST_STARTED);
-+
-+	vcpu_run_and_handle_mapgpa(vm, vcpu);
-+	ASSERT_CONV_TEST_EXIT_IO(vcpu, GUEST_PRIVATE_MEM_POPULATED);
-+	TEST_ASSERT(verify_test_area(test_area_hva, TEST_MEM_DATA_PATTERN4,
-+			TEST_MEM_DATA_PATTERN4), "failed");
-+	VM_STAGE_PROCESSED(GUEST_PRIVATE_MEM_POPULATED);
-+
-+	vcpu_run_and_handle_mapgpa(vm, vcpu);
-+	ASSERT_CONV_TEST_EXIT_IO(vcpu, GUEST_SHARED_MEM_POPULATED);
-+	TEST_ASSERT(verify_test_area(test_area_hva, TEST_MEM_DATA_PATTERN4,
-+			TEST_MEM_DATA_PATTERN2), "failed");
-+	populate_guest_test_mem(guest_test_mem_hva, TEST_MEM_DATA_PATTERN5);
-+	VM_STAGE_PROCESSED(GUEST_SHARED_MEM_POPULATED);
-+
-+	vcpu_run_and_handle_mapgpa(vm, vcpu);
-+	ASSERT_CONV_TEST_EXIT_IO(vcpu, GUEST_PRIVATE_MEM_POPULATED2);
-+	TEST_ASSERT(verify_test_area(test_area_hva, TEST_MEM_DATA_PATTERN4,
-+			TEST_MEM_DATA_PATTERN5), "failed");
-+	VM_STAGE_PROCESSED(GUEST_PRIVATE_MEM_POPULATED2);
-+
-+	vcpu_run_and_handle_mapgpa(vm, vcpu);
-+	ASSERT_GUEST_DONE(vcpu);
-+}
-+
-+static void execute_vm_with_private_test_mem(
-+			enum vm_mem_backing_src_type test_mem_src)
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_enable_cap cap;
-+	struct kvm_vcpu *vcpu;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_conv_test_fn);
-+
-+	vm_check_cap(vm, KVM_CAP_EXIT_HYPERCALL);
-+	cap.cap = KVM_CAP_EXIT_HYPERCALL;
-+	cap.flags = 0;
-+	cap.args[0] = (1 << KVM_HC_MAP_GPA_RANGE);
-+	vm_ioctl(vm, KVM_ENABLE_CAP, &cap);
-+
-+	vm_userspace_mem_region_add(vm, test_mem_src, TEST_AREA_GPA,
-+		TEST_AREA_SLOT, TEST_AREA_SIZE / vm->page_size, KVM_MEM_PRIVATE);
-+	vm_allocate_private_mem(vm, TEST_AREA_GPA, TEST_AREA_SIZE);
-+
-+	virt_map(vm, TEST_AREA_GPA, TEST_AREA_GPA, TEST_AREA_SIZE/vm->page_size);
-+
-+	host_conv_test_fn(vm, vcpu);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	execute_vm_with_private_test_mem(
-+				VM_MEM_SRC_ANONYMOUS_AND_RESTRICTED_MEMFD);
-+
-+	/* Needs 2MB Hugepages */
-+	if (get_free_huge_2mb_pages() >= 1) {
-+		printf("Running private mem test with 2M pages\n");
-+		execute_vm_with_private_test_mem(
-+				VM_MEM_SRC_ANON_HTLB2M_AND_RESTRICTED_MEMFD);
-+	} else
-+		printf("Skipping private mem test with 2M pages\n");
-+
-+	return 0;
-+}
+Patches 1-3 take the existing CPUID 0x80000021 EAX feature bits
+that are being propagated to the guest and define scattered
+versions for patch 4.
+
+Patch 4 moves CPUID 0x80000021 EAX feature bits propagation code
+to kvm_set_cpu_caps().
+
+Patch 5 Defines the AutoIBRS feature bit.
+
+Patch 6 Adds support for AutoIBRS by turning its EFER
+enablement bit on at startup if the feature is available.
+
+Patch 7 Adds support for propagating AutoIBRS to the guest.
+
+Thanks to Babu Moger for helping debug guest propagation (patch 7).
+
+Also thanks to Boris and Paolo for their early version diffs.
+
+v5: Address v4 comments from Dave Hansen, Pawan Gupta, and Boris:
+    - Don't add new user-visible 'autoibrs' command line
+      options that we have to document: reuse 'eibrs'
+    - Update Documentation/admin-guide/hw-vuln/spectre.rst
+    - Add NO_EIBRS_PBRSB to Hygon as well
+    - Re-word commit texts to not use words like 'us'
+
+v4: https://lore.kernel.org/lkml/20221201015003.295769-8-kim.phillips@amd.com/
+    Moved some kvm bits that had crept into patch 6/7 back into 7/7,
+    and addressed v3 comments:
+    - Don't put ", kvm" in titles of patches that don't touch kvm.  [SeanC]
+    - () after function names, i.e. kvm_set_cpu_caps().  [SeanC]
+    - follow the established kvm_cpu_cap_init_scattered() style [SeanC]
+    - Add using cpu_feature_enabled() instead of static_cpu_has() to
+      commit text [SeanC]
+    - Pawan Gupta mentioned that the ordering of enabling the Intel
+      feature bit past Intel EIBRS bug detection could be avoided
+      by setting NO_EIBRS_PBRSB to cpu_vuln_whitelist, so did that
+      which allowed regrouping all EIBRS related code to one place
+      in cpu_set_bug_bits().
+
+v3: https://lore.kernel.org/lkml/20221129235816.188737-1-kim.phillips@amd.com/
+    - Remove Co-developed-bys.  They require signed-off-bys,
+      so co-developers need to add them themselves.
+    - update check_null_seg_clears_base() [Boris]
+    - Made the feature bit additions separate patches
+      because v2 patch was clearly doing too many things at once.
+
+v2: https://lore.kernel.org/lkml/20221124000449.79014-1-kim.phillips@amd.com/
+    https://lkml.org/lkml/2022/11/23/1690
+    - Use synthetic/scattered bits instead of introducing new leaf [Boris]
+    - Combine the rest of the leaf's bits being used [Paolo]
+      Note: Bits not used by the host can be moved to kvm/cpuid.c if
+      maintainers do not want them in cpufeatures.h.
+    - Hoist bitsetting code to kvm_set_cpu_caps(), and use
+      cpuid_entry_override() in __do_cpuid_func() [Paolo]
+    - Reuse SPECTRE_V2_EIBRS spectre_v2_mitigation enum [Boris, PeterZ, D.Hansen]
+      - Change from Boris' diff:
+        Moved setting X86_FEATURE_IBRS_ENHANCED to after BUG_EIBRS_PBRSB
+        so PBRSB mitigations wouldn't be enabled.
+    - Allow for users to specify "autoibrs,lfence/retpoline" instead
+      of actively preventing the extra protections.  AutoIBRS doesn't
+      require the extra protection, but we allow it anyway.
+
+v1: https://lore.kernel.org/lkml/20221104213651.141057-1-kim.phillips@amd.com/
+
+Signed-off-by: Kim Phillips <kim.phillips@amd.com>
+Cc: Babu Moger <Babu.Moger@amd.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Borislav Petkov <bp@amd.com>
+Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Joao Martins <joao.m.martins@oracle.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: David Woodhouse <dwmw@amazon.co.uk>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Juergen Gross <jgross@suse.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Tony Luck <tony.luck@intel.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Alexey Kardashevskiy <aik@amd.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+Kim Phillips (7):
+  x86/cpu: Define a scattered No Nested Data Breakpoints feature bit
+  x86/cpu: Define a scattered Null Selector Clears Base feature bit
+  x86/cpu: Make X86_FEATURE_LFENCE_RDTSC a scattered feature bit
+  x86/cpu, kvm: Move CPUID 0x80000021 EAX feature bits propagation to
+    kvm_set_cpu_caps()
+  x86/cpu: Define a scattered AMD Automatic IBRS feature bit
+  x86/cpu: Support AMD Automatic IBRS
+  x86/cpu, kvm: Propagate the AMD Automatic IBRS feature to the guest
+
+ Documentation/admin-guide/hw-vuln/spectre.rst |  6 ++---
+ .../admin-guide/kernel-parameters.txt         |  6 ++---
+ arch/x86/include/asm/cpufeatures.h            |  3 +++
+ arch/x86/include/asm/msr-index.h              |  2 ++
+ arch/x86/kernel/cpu/bugs.c                    | 20 +++++++++------
+ arch/x86/kernel/cpu/common.c                  | 22 ++++++++--------
+ arch/x86/kernel/cpu/scattered.c               |  4 +++
+ arch/x86/kvm/cpuid.c                          | 25 ++++++++-----------
+ arch/x86/kvm/reverse_cpuid.h                  | 24 +++++++++++++-----
+ arch/x86/kvm/svm/svm.c                        |  3 +++
+ arch/x86/kvm/x86.c                            |  3 +++
+ 11 files changed, 73 insertions(+), 45 deletions(-)
+
 -- 
-2.39.0.rc0.267.gcb52ba06e7-goog
+2.34.1
 
