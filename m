@@ -2,208 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1499B64319A
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 20:17:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 94B5964326D
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 20:26:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233114AbiLETPv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 14:15:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34074 "EHLO
+        id S234071AbiLET0Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 14:26:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233145AbiLETPD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 14:15:03 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3E4E1F625
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 11:15:02 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id o18-20020a17090aac1200b00219ca917708so3937279pjq.8
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 11:15:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gqdtlwyr+v8G1ddHR3e3M88XUgYFZaKf3P//fSVXjVQ=;
-        b=U9+gDuLRpj8X0uBwWpodlvq9LGm20uFdRJezZJNc0jULKUO19Yg+bRUDdBl5kkl+Tz
-         e/UIakZ4CgAQy3x9g8gPWSC/f9X4gTltnxvS8FnVn9kevBCn0nMHHZpgd2FDi/mZRzRs
-         4nuV407jmqpoQDdGNwoh8fhraAJ/wpw/VVheyb/LLEUlQWDcDVdZSzCZ4/43wwneYAWQ
-         kE6vVJu5SD8NrHgGCgd3wjpcGJzn7kn5kHzF4FI28f3W6BvcSsMgwbgfTRMO3vhOXuDb
-         pMExLcWqFhEdjDE0BZ0m1RUC1RBMJWU8gsTMTXwlC2t65iZf26AqEB5zDUnLSt6Uoitf
-         kc6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gqdtlwyr+v8G1ddHR3e3M88XUgYFZaKf3P//fSVXjVQ=;
-        b=YOsHb+sYRkm5VEjkbrMPrCox1K9iBBTUp5QMu7SkxMQgAL7RTrRv4558qmUuNEm9O+
-         pEPydvPi/pO2SXeOTnUfKNHhPseiITdZXDzuGrunp64USaW9TSm2yTKIIJkpEJFaNGkW
-         SD1FUFNsiDNLXAZGSnERfKvvOGGGTyK4U+XMamistBveLQS407OWWJ87dXNBaUnfjKor
-         /rNGhDBduKWq8Va8xcMRWx1UFPYt0C1MsO1bd+TLJh1X4p2WV8KOzcbQ7e6yXyyTN+If
-         C38EuzUXLVGB+2zN+yYDNdygzSqbqw28uCydbD1swFUd1o+1+XGLJeZAl2xt2A6B8M34
-         teEw==
-X-Gm-Message-State: ANoB5pmQhk2VIx2m+3Nz4tzFkR/NHMxbrqYv6850M1Nza4gbnalIxqpy
-        xIHPQwpHlOJFU/5yxXQ9waCtzvQ3TG/k
-X-Google-Smtp-Source: AA0mqf5qm/sD7Fvgrx6qOFItxU3U3dSNy18JMdQi2vell6fgv2mxK7W9qMKyoPVhtpsegpoyl/sfwfqmA+1j
-X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a17:90a:d086:b0:219:227d:d91f with SMTP id
- k6-20020a17090ad08600b00219227dd91fmr4573263pju.0.1670267701970; Mon, 05 Dec
- 2022 11:15:01 -0800 (PST)
-Date:   Mon,  5 Dec 2022 11:14:30 -0800
-In-Reply-To: <20221205191430.2455108-1-vipinsh@google.com>
-Mime-Version: 1.0
-References: <20221205191430.2455108-1-vipinsh@google.com>
-X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221205191430.2455108-14-vipinsh@google.com>
-Subject: [Patch v3 13/13] KVM: selftests: Test Hyper-V extended hypercall exit
- to userspace
-From:   Vipin Sharma <vipinsh@google.com>
-To:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
-        dmatlack@google.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S233846AbiLET0C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 14:26:02 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B46081090;
+        Mon,  5 Dec 2022 11:22:23 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B5IS0X1024590;
+        Mon, 5 Dec 2022 19:22:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=UZ5nvpN1M9p6Et3XhUD+K4KDFkUCzVljhOxDMIr8/lc=;
+ b=MkFmVhBtpVwnwFq4MTcql150cK/98VWB0lVE7DKK2oRxzHyVB3UL40O8GyjFJwgeUR1a
+ eOp8lDcez+l+XS8RlS/vdufYY5f+b50ufl0UcpAkVCPSy+tNtUXUkKhWwjPfnLAXuBi9
+ /k65ZVz9LGf24zQCqGKuR6NFVBSPD6FDS0ToRopWOPedOUVnjVSaT4az/oKSSWTC0ooY
+ efWw9rO/rvgcUJOT0udsVXJNiMgDP+kWiQ7iXKZsUmX0WyX7VGzaXj97H/7tWwwQrboc
+ gXgidAhaYe8sEgDkbnx975RoCa/TDE2kWOORFm952vXvsh2nkNel5Hp6ZDK7TKLz8aZO fw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m8g7cx5ta-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Dec 2022 19:22:14 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B5IL8Qo014520;
+        Mon, 5 Dec 2022 19:22:13 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m8g7cx5sx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Dec 2022 19:22:13 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.17.1.19/8.16.1.2) with ESMTP id 2B5IwtdH014635;
+        Mon, 5 Dec 2022 19:22:11 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([9.208.130.98])
+        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3m9pd9g7wn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Dec 2022 19:22:11 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B5JKt0I656026
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Dec 2022 19:20:55 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 667BF58058;
+        Mon,  5 Dec 2022 19:20:55 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5B23958052;
+        Mon,  5 Dec 2022 19:20:54 +0000 (GMT)
+Received: from [9.77.142.238] (unknown [9.77.142.238])
+        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Mon,  5 Dec 2022 19:20:54 +0000 (GMT)
+Message-ID: <9fe1e000-e3ff-bf42-28f7-169fb57dc1ce@linux.ibm.com>
+Date:   Mon, 5 Dec 2022 14:20:53 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH] vfio/ap/ccw/samples: Fix device_register() unwind path
+Content-Language: en-US
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     ruanjinjie <ruanjinjie@huawei.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Eric Farman <farman@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <166999942139.645727.12439756512449846442.stgit@omen>
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <166999942139.645727.12439756512449846442.stgit@omen>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: bYj3kUn4fi2KlH4QcqQZ6G05zgdBoAOG
+X-Proofpoint-ORIG-GUID: tMmok1Vbva9jRFShzrzI5QPc1gqm7BPq
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-05_01,2022-12-05_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ adultscore=0 mlxscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=999
+ clxscore=1011 impostorscore=0 priorityscore=1501 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2212050158
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hyper-V extended hypercalls by default exit to userspace. Verify
-userspace gets the call, update the result and then verify in guest
-correct result is received.
+Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
 
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |  1 +
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../kvm/x86_64/hyperv_extended_hypercalls.c   | 93 +++++++++++++++++++
- 3 files changed, 95 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 082855d94c72..b17874697d74 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -24,6 +24,7 @@
- /x86_64/hyperv_clock
- /x86_64/hyperv_cpuid
- /x86_64/hyperv_evmcs
-+/x86_64/hyperv_extended_hypercalls
- /x86_64/hyperv_features
- /x86_64/hyperv_ipi
- /x86_64/hyperv_svm_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 2275ba861e0e..a0e12f5d9835 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -87,6 +87,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/fix_hypercall_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_evmcs
-+TEST_GEN_PROGS_x86_64 += x86_64/hyperv_extended_hypercalls
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_ipi
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_svm_test
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-new file mode 100644
-index 000000000000..6635f5988d8d
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-@@ -0,0 +1,93 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Test Hyper-V extended hypercall, HV_EXT_CALL_QUERY_CAPABILITIES (0x8001),
-+ * exit to userspace and receive result in guest.
-+ *
-+ * Negative tests are present in hyperv_features.c
-+ *
-+ * Copyright 2022 Google LLC
-+ * Author: Vipin Sharma <vipinsh@google.com>
-+ */
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "hyperv.h"
-+
-+/* Any value is fine */
-+#define EXT_CAPABILITIES 0xbull
-+
-+static void guest_code(vm_vaddr_t in_pg_gpa, vm_vaddr_t out_pg_gpa,
-+		       vm_vaddr_t out_pg_gva)
-+{
-+	uint64_t *output_gva;
-+
-+	wrmsr(HV_X64_MSR_GUEST_OS_ID, HYPERV_LINUX_OS_ID);
-+	wrmsr(HV_X64_MSR_HYPERCALL, in_pg_gpa);
-+
-+	output_gva = (uint64_t *)out_pg_gva;
-+
-+	hyperv_hypercall(HV_EXT_CALL_QUERY_CAPABILITIES, in_pg_gpa, out_pg_gpa);
-+
-+	/* TLFS states output will be a uint64_t value */
-+	GUEST_ASSERT_EQ(*output_gva, EXT_CAPABILITIES);
-+
-+	GUEST_DONE();
-+}
-+
-+int main(void)
-+{
-+	vm_vaddr_t hcall_out_page;
-+	vm_vaddr_t hcall_in_page;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_run *run;
-+	struct kvm_vm *vm;
-+	uint64_t *outval;
-+	struct ucall uc;
-+
-+	/* Verify if extended hypercalls are supported */
-+	if (!kvm_cpuid_has(kvm_get_supported_hv_cpuid(),
-+			   HV_ENABLE_EXTENDED_HYPERCALLS)) {
-+		print_skip("Extended calls not supported by the kernel");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+	run = vcpu->run;
-+	vcpu_set_hv_cpuid(vcpu);
-+
-+	/* Hypercall input */
-+	hcall_in_page = vm_vaddr_alloc_pages(vm, 1);
-+	memset(addr_gva2hva(vm, hcall_in_page), 0x0, vm->page_size);
-+
-+	/* Hypercall output */
-+	hcall_out_page = vm_vaddr_alloc_pages(vm, 1);
-+	memset(addr_gva2hva(vm, hcall_out_page), 0x0, vm->page_size);
-+
-+	vcpu_args_set(vcpu, 3, addr_gva2gpa(vm, hcall_in_page),
-+		      addr_gva2gpa(vm, hcall_out_page), hcall_out_page);
-+
-+	vcpu_run(vcpu);
-+
-+	ASSERT_EXIT_REASON(vcpu, KVM_EXIT_HYPERV);
-+
-+	outval = addr_gpa2hva(vm, run->hyperv.u.hcall.params[1]);
-+	*outval = EXT_CAPABILITIES;
-+	run->hyperv.u.hcall.result = HV_STATUS_SUCCESS;
-+
-+	vcpu_run(vcpu);
-+
-+	ASSERT_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT_2(uc, "arg1 = %ld, arg2 = %ld");
-+		break;
-+	case UCALL_DONE:
-+		break;
-+	default:
-+		TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
-+	}
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.39.0.rc0.267.gcb52ba06e7-goog
-
+On 12/2/22 11:46 AM, Alex Williamson wrote:
+> We always need to call put_device() if device_register() fails.
+> All vfio drivers calling device_register() include a similar unwind
+> stack via gotos, therefore split device_unregister() into its
+> device_del() and put_device() components in the unwind path, and
+> add a goto target to handle only the put_device() requirement.
+>
+> Reported-by: Ruan Jinjie <ruanjinjie@huawei.com>
+> Link: https://lore.kernel.org/all/20221118032827.3725190-1-ruanjinjie@huawei.com
+> Fixes: d61fc96f47fd ("sample: vfio mdev display - host device")
+> Fixes: 9d1a546c53b4 ("docs: Sample driver to demonstrate how to use Mediated device framework.")
+> Fixes: a5e6e6505f38 ("sample: vfio bochs vbe display (host device for bochs-drm)")
+> Fixes: 9e6f07cd1eaa ("vfio/ccw: create a parent struct")
+> Fixes: 36360658eb5a ("s390: vfio_ap: link the vfio_ap devices to the vfio_ap bus subsystem")
+> Cc: Tony Krowiak <akrowiak@linux.ibm.com>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Jason Herne <jjherne@linux.ibm.com>
+> Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Eric Farman <farman@linux.ibm.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>
+> I didn't intend to usurp Ruan's patch, but since the inline version is
+> collecting reviews, formally post it and include additional fixes tags
+> for vfio-ccw and vfio-ap.
+>
+>   drivers/s390/cio/vfio_ccw_drv.c   |    3 ++-
+>   drivers/s390/crypto/vfio_ap_drv.c |    2 +-
+>   samples/vfio-mdev/mbochs.c        |    7 ++++---
+>   samples/vfio-mdev/mdpy.c          |    7 ++++---
+>   samples/vfio-mdev/mtty.c          |    7 ++++---
+>   5 files changed, 15 insertions(+), 11 deletions(-)
+>
+> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+> index c2a65808605a..54aba7cceb33 100644
+> --- a/drivers/s390/cio/vfio_ccw_drv.c
+> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> @@ -199,8 +199,9 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+>   	return 0;
+>   
+>   out_unreg:
+> -	device_unregister(&parent->dev);
+> +	device_del(&parent->dev);
+>   out_free:
+> +	put_device(&parent->dev);
+>   	dev_set_drvdata(&sch->dev, NULL);
+>   	return ret;
+>   }
+> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+> index f43cfeabd2cc..997b524bdd2b 100644
+> --- a/drivers/s390/crypto/vfio_ap_drv.c
+> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+> @@ -122,7 +122,7 @@ static int vfio_ap_matrix_dev_create(void)
+>   	return 0;
+>   
+>   matrix_drv_err:
+> -	device_unregister(&matrix_dev->device);
+> +	device_del(&matrix_dev->device);
+>   matrix_reg_err:
+>   	put_device(&matrix_dev->device);
+>   matrix_alloc_err:
+> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+> index 8b5a3a778a25..e54eb752e1ba 100644
+> --- a/samples/vfio-mdev/mbochs.c
+> +++ b/samples/vfio-mdev/mbochs.c
+> @@ -1430,7 +1430,7 @@ static int __init mbochs_dev_init(void)
+>   
+>   	ret = device_register(&mbochs_dev);
+>   	if (ret)
+> -		goto err_class;
+> +		goto err_put;
+>   
+>   	ret = mdev_register_parent(&mbochs_parent, &mbochs_dev, &mbochs_driver,
+>   				   mbochs_mdev_types,
+> @@ -1441,8 +1441,9 @@ static int __init mbochs_dev_init(void)
+>   	return 0;
+>   
+>   err_device:
+> -	device_unregister(&mbochs_dev);
+> -err_class:
+> +	device_del(&mbochs_dev);
+> +err_put:
+> +	put_device(&mbochs_dev);
+>   	class_destroy(mbochs_class);
+>   err_driver:
+>   	mdev_unregister_driver(&mbochs_driver);
+> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+> index 721fb06c6413..e8400fdab71d 100644
+> --- a/samples/vfio-mdev/mdpy.c
+> +++ b/samples/vfio-mdev/mdpy.c
+> @@ -717,7 +717,7 @@ static int __init mdpy_dev_init(void)
+>   
+>   	ret = device_register(&mdpy_dev);
+>   	if (ret)
+> -		goto err_class;
+> +		goto err_put;
+>   
+>   	ret = mdev_register_parent(&mdpy_parent, &mdpy_dev, &mdpy_driver,
+>   				   mdpy_mdev_types,
+> @@ -728,8 +728,9 @@ static int __init mdpy_dev_init(void)
+>   	return 0;
+>   
+>   err_device:
+> -	device_unregister(&mdpy_dev);
+> -err_class:
+> +	device_del(&mdpy_dev);
+> +err_put:
+> +	put_device(&mdpy_dev);
+>   	class_destroy(mdpy_class);
+>   err_driver:
+>   	mdev_unregister_driver(&mdpy_driver);
+> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+> index 3c2a421b9b69..e887de672c52 100644
+> --- a/samples/vfio-mdev/mtty.c
+> +++ b/samples/vfio-mdev/mtty.c
+> @@ -1330,7 +1330,7 @@ static int __init mtty_dev_init(void)
+>   
+>   	ret = device_register(&mtty_dev.dev);
+>   	if (ret)
+> -		goto err_class;
+> +		goto err_put;
+>   
+>   	ret = mdev_register_parent(&mtty_dev.parent, &mtty_dev.dev,
+>   				   &mtty_driver, mtty_mdev_types,
+> @@ -1340,8 +1340,9 @@ static int __init mtty_dev_init(void)
+>   	return 0;
+>   
+>   err_device:
+> -	device_unregister(&mtty_dev.dev);
+> -err_class:
+> +	device_del(&mtty_dev.dev);
+> +err_put:
+> +	put_device(&mtty_dev.dev);
+>   	class_destroy(mtty_dev.vd_class);
+>   err_driver:
+>   	mdev_unregister_driver(&mtty_driver);
+>
+>
