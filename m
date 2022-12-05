@@ -2,243 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6BC7642A79
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 15:38:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2E94642AA6
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 15:49:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231601AbiLEOiM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 09:38:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44120 "EHLO
+        id S230353AbiLEOtS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 09:49:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230233AbiLEOiL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 09:38:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B510C1A81C
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 06:37:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670251035;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vV9PMDL+KA0rIpH4IuTajPJGN9XJ8EJIKaDHOdvt+Rk=;
-        b=RnUkiUX609/thskEINT3IerzkXHwLrDX+DNuDMRhF9CTYU1MI+75G3e4S8SsO6vQO5GbRj
-        4yKJ8jlxW2tVMxhWnCU0N84MQ9OTBjPmpcqtKeQGRWdq44Dw5IRCNfppgTjn9nVNHcTP9a
-        USQqWcERY1KTw+S9Je8SEKbEAAwmS5A=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-421-yXYBiN0SOweKd3xpku7l_w-1; Mon, 05 Dec 2022 09:37:10 -0500
-X-MC-Unique: yXYBiN0SOweKd3xpku7l_w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F1C43185A794;
-        Mon,  5 Dec 2022 14:37:09 +0000 (UTC)
-Received: from pinwheel (unknown [10.39.195.154])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 25D8140C6EC3;
-        Mon,  5 Dec 2022 14:37:07 +0000 (UTC)
-Date:   Mon, 5 Dec 2022 15:37:03 +0100
-From:   Kashyap Chamarthy <kchamart@redhat.com>
-To:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        rust-vmm@lists.opendev.org, libvir-list@redhat.com
-Cc:     Mahmoud Abdelghany <blackbeard334@protonmail.com>,
-        stefanha@gmail.com
-Subject: Re: Call for FOSDEM presentations on QEMU, KVM, and rust-vmm
-Message-ID: <Y44CD6zmU0G3vrEu@pinwheel>
-References: <CAJSP0QXc9MOUuU9amBorzV4hf9A9HWFZrtn3sZzJ-OkWMwvNPw@mail.gmail.com>
+        with ESMTP id S230108AbiLEOtQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 09:49:16 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2060.outbound.protection.outlook.com [40.107.223.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C2D91B78A
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 06:49:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PMabZ+ymQvLmzwJ6SCIqIv7ahszqDPd/zXX7Gx8QJlz1f2pyqwDQnBgqSm/c9Q5AdAHfakJ4SE2e8DHzsChWYWUBNWQWg5d1stHjb/Ca3ZSgwHAxkQBz0S8E0CkXz7jgux6XbEF3LGamxtBY8XGAE+MxN3wakbJmhy7bcgOWFYb7YxPmyfvAJmpoZ8xEGcpYyyd+cinHIWe/rYcAlGkxXDkZMtlzaN8H2Uag08z6l5i2zBfyGUZsaZZtmxc20p4+x1mn56v2j5IJSNSkT5XeupL4u5XyA5U7kU9LSSxwQD5h9l0NZmSLUQJWlEwudQeM6wl6lLApK5GxPdheZZzEsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kMfJi407eU5UVdBVKlAPcnlrD60VBumRUvEQXdWZQzg=;
+ b=ZWjUOmmd0m0GS0eg79ZlzU1q8IkC7IYxpzOdVioWzJkdqUw5/WXPswRpVjs0e7SxFmHM4rho0GKaeEk7gD9h8aBfZF/4jiccYmqiUxYVLnNIYUMUAKG7FwGZstm+aNtQNicbTy3H+xGSU6hk9Nll2G8Q/gbfHyPivwNTL+h3ASlzDMbJ+vYKJZHxo5mBJbOTciyA1IED2EkclOY21Ke/xC0voMzsIxQc0N+OyOwxuRdi6ccxZj78pCdE762W7IdskALS2UTbYO/mrjylYFkM5igrcV0dQkRS6/YLRLXmjLnSOLj5bHqa+QpuubtwkQbpEh6ROgazwJltggVLbo4EHA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kMfJi407eU5UVdBVKlAPcnlrD60VBumRUvEQXdWZQzg=;
+ b=VklegCNyvpXJlMXGwV7M8omV3Vx1llzkVvRG0BQfURGudbfOtTmJcF4tbPTgCxq9FFOftV2odZGixdYvIjRQbaxc917Ykeqn8Xi/dEjLTNnO3uCUCDWsKglO2C8PcZBQd4hxW7dNY0vol3vTfpSERpaCoOwbwO1PQEpgr+yJthA0HjR9qHA4rGyALz4mbRUCxEdrZuPkhKICrwMoxmfsB34Up64H7oklk4QLqX9Cos8TZNG5FFHw2MbgKho0pPpS6/TmJ78hsqACujvzYriYoYZcNd1+6N9ZmIHD495ncYgsFnG8EmfpGzjRxEEJ2jm247MicoWdvjKFnRe1s3LFIw==
+Received: from CY5PR15CA0091.namprd15.prod.outlook.com (2603:10b6:930:7::10)
+ by DM6PR12MB4548.namprd12.prod.outlook.com (2603:10b6:5:2a1::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.13; Mon, 5 Dec
+ 2022 14:49:13 +0000
+Received: from CY4PEPF0000B8E8.namprd05.prod.outlook.com
+ (2603:10b6:930:7:cafe::4f) by CY5PR15CA0091.outlook.office365.com
+ (2603:10b6:930:7::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.10 via Frontend
+ Transport; Mon, 5 Dec 2022 14:49:12 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000B8E8.mail.protection.outlook.com (10.167.241.4) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5813.11 via Frontend Transport; Mon, 5 Dec 2022 14:49:12 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Mon, 5 Dec 2022
+ 06:49:03 -0800
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Mon, 5 Dec 2022
+ 06:49:02 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.986.36 via Frontend Transport; Mon, 5 Dec
+ 2022 06:48:59 -0800
+From:   Yishai Hadas <yishaih@nvidia.com>
+To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>
+CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
+        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
+        <shayd@nvidia.com>, <yishaih@nvidia.com>, <maorg@nvidia.com>,
+        <avihaih@nvidia.com>, <cohuck@redhat.com>,
+        <shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH V3 vfio 00/14] Add migration PRE_COPY support for mlx5 driver
+Date:   Mon, 5 Dec 2022 16:48:24 +0200
+Message-ID: <20221205144838.245287-1-yishaih@nvidia.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QXc9MOUuU9amBorzV4hf9A9HWFZrtn3sZzJ-OkWMwvNPw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-0.7 required=5.0 tests=BAYES_05,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000B8E8:EE_|DM6PR12MB4548:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8cf7f244-b925-4ace-65b9-08dad6cfdfa6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pI9WQvq4ksn4m+7bynkFfpq9EGYu2lrYfQ1Wjo3Zt7YikVAtT4tFDWQUOQ7Sdpe3uLo1N26m1CRbsJamTDGjT4HJ+3hlmtymEE4k8eYhRUIot5ICzzZaLZRBKQdr1Ghb6ZKvJToEZ20VVzoCMAkm7wPWPlCt0wqLR1Ub8NZwbASF4IX0LjEqN4Ro/uKvOOT86DBbQbDwWIrjwx8P9kAer3DlW9ggOthnrwuOfdmjQkhHSXyai6PZfTNgvo7arIMjpg0FTELvVdDuIjtXDM6kit4g6lHzr5095SNmj+TXTyN6JEgpbsJFWslvMbxbMei/9GtjMT4rsjq8e2/VkXXlvrawre+eM7CzT+7DzMai97ind4ec6JE0mDUPZuMGZ9nd8g2IcewLZW1GOycm3Vgi0t8tN/ZR+B9oSNe7fiLU+sQ/MAg+QEpxW1dQnkARP4J7rXqtQCJ3ReU0a0So87oE/riYX9RjDZQbHUPprNlpSKlLM5waTr0w2BbQaDSWunSbz4EhSuybqXb4Mva5Sa+NcfG1YfNzoOWUCHPZuX0eqOs4Ifp7acS5JJi75WD7Lu0qYCvBs7jzq1NZW9JtChK9Sc2yC/IazEuF4hLuDrffRc49yFUZXmlUFGtpSjdXSGu3eAf78cgDSLLVPpCMBe9Gdqknf2RYAY2m8U7FU9YYg+m0tBYj0cEIO7Z1Mtd/1N0DXszwib4T+XbsFHxoRUkAGBbao3N8ljdqpRCLGZfCzvvsC0ocKz06/Q7Twnlob+NE1p+qTBRGgOMTkSvpQTnkN6vPiuWVxx1CXRLZi4x8ws4wJEWkmryo3whTEJOvB0uaXuBFLroZM5nYleG9hbtR9w==
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(39860400002)(136003)(396003)(451199015)(46966006)(36840700001)(40470700004)(6636002)(54906003)(110136005)(478600001)(26005)(6666004)(47076005)(966005)(316002)(70586007)(70206006)(4326008)(8676002)(2616005)(7696005)(426003)(5660300002)(8936002)(1076003)(36860700001)(336012)(83380400001)(2906002)(186003)(41300700001)(36756003)(82740400003)(40460700003)(7636003)(82310400005)(356005)(40480700001)(86362001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2022 14:49:12.3738
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8cf7f244-b925-4ace-65b9-08dad6cfdfa6
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000B8E8.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4548
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-(Cc also: libvirt upstream maling list)
+This series adds migration PRE_COPY uAPIs and their implementation as part of
+mlx5 driver.
 
-Gentle reminder ...
+The uAPIs follow some discussion that was done in the mailing list [1] in this
+area.
 
-tl;dr: please submit the proposals by *10th Dec 2022*
+By the time the patches were sent, there was no driver implementation for the
+uAPIs, now we have it for mlx5 driver.
 
-On Tue, Nov 08, 2022 at 10:45:33AM -0500, Stefan Hajnoczi wrote:
-> Hi,
-> The yearly FOSDEM open source conference is now accepting talk
-> proposals. FOSDEM '23 will be held in Brussels, Belgium on 4 & 5
-> February.
-> 
-> FOSDEM is a huge free conference about all things open source and an
-> opportunity for anyone to present QEMU or KVM topics. Both in-person
-> and pre-recorded talks are being accepted this year.
-> 
-> Please consider submitting your talks to the following devrooms:
-> 
-> Emulator Development Room:
-> https://blackbeard334.github.io/fosdem23-emulator-devroom-cfp/
-> 
-> Virtualization and IaaS devroom:
-> https://fosdem.org/2023/schedule/track/virtualization_and_iaas/
-> 
-> Rust devroom:
-> https://rust-fosdem.github.io/
+The optional PRE_COPY state opens the saving data transfer FD before reaching
+STOP_COPY and allows the device to dirty track the internal state changes with
+the general idea to reduce the volume of data transferred in the STOP_COPY
+stage.
 
-(I've re-posted the official announcement[0] along the way, I manually
-fixed the broken text formatting, a URL, and moved the "important dates"
-section to the top.
+While in PRE_COPY the device remains RUNNING, but the saving FD is open.
 
-[0] https://lists.fosdem.org/pipermail/fosdem/2022q4/003473.html)
+A new ioctl VFIO_MIG_GET_PRECOPY_INFO is provided to allow userspace to query
+the progress of the precopy operation in the driver with the idea it will judge
+to move to STOP_COPY once the initial data set is transferred, and possibly
+after the dirty size has shrunk appropriately.
 
------------------------------------------------------------------------
-We are excited to announce that the call for proposals is now open for
-the Virtualization & IaaS devroom at the upcoming FOSDEM 2023, to be
-hosted on February 4th 2023.
+User space can detect whether PRE_COPY is supported for a given device by
+checking the VFIO_MIGRATION_PRE_COPY flag once using the
+VFIO_DEVICE_FEATURE_MIGRATION ioctl.
 
-This devroom is a collaborative effort, and is organized by dedicated
-folks from projects such as OpenStack, Xen Project, KubeVirt, QEMU, KVM,
-and Foreman. We would like to invite all those who are involved in these
-fields to submit your proposals by December 10th, 2022.
+Extra details exist as part of the specific uAPI patch from the series.
 
-Important Dates
----------------
+Finally, we come with mlx5 implementation based on its device specification for
+PRE_COPY.
 
-Submission deadline: 10th December 2022
+To support PRE_COPY, mlx5 driver is transferring multiple states (images) of
+the device. e.g.: the source VF can save and transfer multiple states, and the
+target VF will load them by that order.
 
-Acceptance notifications: 15th December 2022
+The device is saving three kinds of states:
+1) Initial state - when the device moves to PRE_COPY state.
+2) Middle state - during PRE_COPY phase via VFIO_MIG_GET_PRECOPY_INFO,
+                  can be multiple such states.
+3) Final state - when the device moves to STOP_COPY state.
 
-Final schedule announcement: 20th December 2022
+After moving to PRE_COPY state, the user is holding the saving FD and should
+use it for transferring the data from the source to the target while the VM is
+still running. From user point of view, it's a stream of data, however, from
+mlx5 driver point of view it includes multiple images/states. For that, it sets
+some headers with metadata on the source to be parsed on the target.
 
-Conference devroom: first half of 4th February 2023
+At some point, user may switch the device state from PRE_COPY to STOP_COPY,
+this will invoke saving of the final state.
 
+As discussed earlier in the mailing list, the data that is returned as part of
+PRE_COPY is not required to have any bearing relative to the data size
+available during the STOP_COPY phase.
 
-About the Devroom
------------------
+For this, we have the VFIO_DEVICE_FEATURE_MIG_DATA_SIZE option.
 
-The Virtualization & IaaS devroom will feature session topics such as
-open source hypervisors or virtual machine managers such as Xen Project,
-KVM, bhyve and VirtualBox as well as Infrastructure-as-a-Service
-projects such as KubeVirt, Apache CloudStack, OpenStack, QEMU and
-OpenNebula.
+In mlx5 driver we could gain with this series about 20-30 percent improvement
+in the downtime compared to the previous code when PRE_COPY wasn't supported.
 
-This devroom will host presentations that focus on topics of shared
-interest, such as KVM; libvirt; shared storage; virtualized networking;
-cloud security; clustering and high availability; interfacing with multiple
-hypervisors; hyperconverged deployments; and scaling across hundreds or
-thousands of servers.
+The series includes some pre-patches to be ready for managing multiple images
+then it comes with the PRE_COPY implementation itself.
 
-Presentations in this devroom will be aimed at developers working on these
-platforms who are looking to collaborate and improve shared infrastructure
-or solve common problems. We seek topics that encourage dialog between
-projects and continued work post-FOSDEM.
+The matching qemu changes can be previewed here [2].
 
+They come on top of the v2 migration protocol patches that were sent already to
+the mailing list.
 
-Submit Your Proposal
---------------------
+[1] https://lore.kernel.org/kvm/20220302172903.1995-8-shameerali.kolothum.thodi@huawei.com/
+[2] https://github.com/avihai1122/qemu/commits/mig_v2_precopy
 
-All submissions must be made via the Pentabarf event planning site[1]. If
-you have not used Pentabarf before, you will need to create an account. If
-you submitted proposals for FOSDEM in previous years, you can use your
-existing account.
+Changes from V2: https://www.spinics.net/lists/kvm/msg297112.html
 
-After creating the account, select Create Event to start the submission
-process. Make sure to select Virtualization and IaaS devroom from the Track
-list. Please fill out all the required fields, and provide a meaningful
-abstract and description of your proposed session.
+Patch #2:
+- Add a note that the VFIO_MIG_GET_PRECOPY_INFO ioctl is mandatory when
+  a driver claims to support VFIO_MIGRATION_PRE_COPY as was raised by
+  Shameer Kolothum.
+- Add Reviewed-by: Shameer Kolothum and Kevin Tian.
+Patch #3:
+- Add a comment in the code as suggested by Jason.
+All:
+- Add Reviewed-by: Jason Gunthorpe for the series.
 
-Submission Guidelines
----------------------
+Note:
+As pointed out by Leon in the mailing list, no need for a PR for the
+first patch of net/mlx5.
 
-We expect more proposals than we can possibly accept, so it is vitally
-important that you submit your proposal on or before the deadline. Late
-submissions are unlikely to be considered.
+Changes from V1: https://www.spinics.net/lists/kvm/msg296475.html
 
-All presentation slots are 30 minutes, with 20 minutes planned for
-presentations, and 10 minutes for Q&A.
+Patch #2: Rephrase the 'initial_bytes' meaning as was suggested by Jason.
+Patch #9: Fix to send header based on PRE_COPY support.
+Patch #13: Fix some unwind flow to call complete().
 
-All presentations will be recorded and made available under Creative
-Commons licenses. In the Submission notes field, please indicate that you
-agree that your presentation will be licensed under the CC-By-SA-4.0 or
-CC-By-4.0 license and that you agree to have your presentation recorded.
+Changes from V0: https://www.spinics.net/lists/kvm/msg294247.html
 
-For example:
+Drop the first 2 patches that Alex merged already.
+Refactor mlx5 implementation based on Jason's comments on V0, it includes
+the below:
+* Refactor the PD usage to be aligned with the migration file life cycle.
+* Refactor the MKEY usage to be aligned with the migration file life cycle.
+* Refactor the migration file state.
+* Use queue based data chunks to simplify the driver code.
+* Use the FSM model on the target to simplify the driver code.
+* Extend the driver pre_copy header for future use.
 
-"If my presentation is accepted for FOSDEM, I hereby agree to license all
-recordings, slides, and other associated materials under the Creative
-Commons Attribution Share-Alike 4.0 International License. Sincerely,
-<NAME>."
+Yishai
 
-In the Submission notes field, please also confirm that if your talk is
-accepted, you will be able to attend FOSDEM and deliver your presentation.
-We will not consider proposals from prospective speakers who are unsure
-whether they will be able to secure funds for travel and lodging to attend
-FOSDEM. (Sadly, we are not able to offer travel funding for prospective
-speakers.)
+Jason Gunthorpe (1):
+  vfio: Extend the device migration protocol with PRE_COPY
 
-Submission Guidelines
----------------------
+Shay Drory (3):
+  net/mlx5: Introduce ifc bits for pre_copy
+  vfio/mlx5: Fallback to STOP_COPY upon specific PRE_COPY error
+  vfio/mlx5: Enable MIGRATION_PRE_COPY flag
 
-Mentored presentations will have 25-minute slots, where 20 minutes will
-include the presentation and 5 minutes will be reserved for questions.
-The number of newcomer session slots is limited, so we will probably not be
-able to accept all applications.
+Yishai Hadas (10):
+  vfio/mlx5: Enforce a single SAVE command at a time
+  vfio/mlx5: Refactor PD usage
+  vfio/mlx5: Refactor MKEY usage
+  vfio/mlx5: Refactor migration file state
+  vfio/mlx5: Refactor to use queue based data chunks
+  vfio/mlx5: Introduce device transitions of PRE_COPY
+  vfio/mlx5: Introduce SW headers for migration states
+  vfio/mlx5: Introduce vfio precopy ioctl implementation
+  vfio/mlx5: Consider temporary end of stream as part of PRE_COPY
+  vfio/mlx5: Introduce multiple loads
 
-You must submit your talk and abstract to apply for the mentoring program,
-our mentors are volunteering their time and will happily provide feedback
-but won't write your presentation for you!
-
-If you are experiencing problems with Pentabarf, the proposal submission
-interface, or have other questions, you can email our devroom mailing
-list[2] and we will try to help you.
-
-How to Apply
-------------
-
-In addition to agreeing to video recording and confirming that you can
-attend FOSDEM in case your session is accepted, please write "speaker
-mentoring program application" in the "Submission notes" field, and list
-any prior speaking experience or other relevant information for your
-application.
-
-Code of Conduct
----------------
-
-Following the release of the updated code of conduct for FOSDEM, we'd like
-to remind all speakers and attendees that all of the presentations and
-discussions in our devroom are held under the guidelines set in the CoC and
-we expect attendees, speakers, and volunteers to follow the CoC at all
-times.
-
-If you submit a proposal and it is accepted, you will be required to
-confirm that you accept the FOSDEM CoC. If you have any questions about the
-CoC or wish to have one of the devroom organizers review your presentation
-slides or any other content for CoC compliance, please email us and we will
-do our best to assist you.
-
-Call for Volunteers
--------------------
-
-We are also looking for volunteers to help run the devroom. We need
-assistance watching time for the speakers, and helping with video for the
-devroom. Please contact devroom mailing list[2] for more information.
-
-Questions?
-----------
-
-If you have any questions about this devroom, please send your questions to
-our devroom mailing list. You can also subscribe to the list to receive
-updates about important dates, session announcements, and to connect with
-other attendees.
-
-See you all at FOSDEM!
-
-[1] https://penta.fosdem.org/submission
-[2] iaas-virt-devroom at lists.fosdem.org
------------------------------------------------------------------------
+ drivers/vfio/pci/mlx5/cmd.c   | 409 ++++++++++++++----
+ drivers/vfio/pci/mlx5/cmd.h   |  96 ++++-
+ drivers/vfio/pci/mlx5/main.c  | 752 ++++++++++++++++++++++++++++------
+ drivers/vfio/vfio_main.c      |  74 +++-
+ include/linux/mlx5/mlx5_ifc.h |  14 +-
+ include/uapi/linux/vfio.h     | 123 +++++-
+ 6 files changed, 1248 insertions(+), 220 deletions(-)
 
 -- 
-/kashyap
+2.18.1
 
