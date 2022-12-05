@@ -2,164 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5390B642161
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 03:08:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 144B864223E
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 05:27:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231132AbiLECIr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Dec 2022 21:08:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54200 "EHLO
+        id S231371AbiLEEZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Dec 2022 23:25:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230307AbiLECIp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Dec 2022 21:08:45 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8FD71263E;
-        Sun,  4 Dec 2022 18:08:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670206124; x=1701742124;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=Uwb0j0vOSLTTI1yh+/S8G5w86vEZ102AbpppaI2wcK8=;
-  b=Q5pMd1DyjTQg+tjoqnIluCjVH/XQDK4IfVdxI2+6CIZi6vhL+onXFV5S
-   aPfC3159xUTGNwP+m/eoItS5xv2rFjmG1e00tnQIztgFnRi9DF7e1xFyU
-   RVnF7XsX8mw/JkCzlYxlBdx3BUep1V/H9Cfx43/OEodzdVJAU+Y/bu3/+
-   +brtgexhcpPIdT2lgZHimTGUIS/StwvbABGofBRZqc1D5cZQcwXajFLVZ
-   n3YDABmUKkJsCIPFzd0nlbHn6r3LRIToWg8iKCFDE4UD6RebXFIk4dmLV
-   f72UYGqNrxEBhipOqmAZ+bOGyZQAZIYf2Sbi2oGR0DteVvbCtgNwudnh6
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10551"; a="343232989"
-X-IronPort-AV: E=Sophos;i="5.96,218,1665471600"; 
-   d="asc'?scan'208";a="343232989"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2022 18:08:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10551"; a="596028083"
-X-IronPort-AV: E=Sophos;i="5.96,218,1665471600"; 
-   d="asc'?scan'208";a="596028083"
-Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.159.108])
-  by orsmga003.jf.intel.com with ESMTP; 04 Dec 2022 18:08:32 -0800
-Date:   Mon, 5 Dec 2022 10:07:08 +0800
-From:   Zhenyu Wang <zhenyuw@linux.intel.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     jgg@nvidia.com, alex.williamson@redhat.com, kevin.tian@intel.com,
-        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        intel-gvt-dev@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Subject: Re: [[iommufd] PATCH v3 1/2] i915/gvt: Move gvt mapping cache
- initialization to intel_vgpu_init_dev()
-Message-ID: <20221205020708.GA30028@zhen-hp.sh.intel.com>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20221202135402.756470-1-yi.l.liu@intel.com>
- <20221202135402.756470-2-yi.l.liu@intel.com>
+        with ESMTP id S231132AbiLEEZn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Dec 2022 23:25:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EAF912D19
+        for <kvm@vger.kernel.org>; Sun,  4 Dec 2022 20:24:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670214288;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R8n5fxGwWYcu15nmomTbV4cNBstkBFYb9k2K8ul1sbM=;
+        b=duOeEt6b936P0n626cjpa659D3JlghNwJhSR/byU+0sob7dts6k9kfpdSCngysaCvYuIDy
+        i3sa/2i7p3Tnd9wNL9jUhkwBZI7ufukoHUK3cFooCvYgQlHy9Wogyw/rfDZM7d9xzzCy8A
+        Y+GkygyGZ0nM/Sl8KzADkFiMceiYKfI=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-232-FKwysVEpNzixdjC2vnMD6g-1; Sun, 04 Dec 2022 23:24:25 -0500
+X-MC-Unique: FKwysVEpNzixdjC2vnMD6g-1
+Received: by mail-ot1-f71.google.com with SMTP id t14-20020a9d7f8e000000b0066c61f96c54so6215399otp.21
+        for <kvm@vger.kernel.org>; Sun, 04 Dec 2022 20:24:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R8n5fxGwWYcu15nmomTbV4cNBstkBFYb9k2K8ul1sbM=;
+        b=HTGV76/De2RV54Lv1fYndimDk2pf/2w2oBEtiNYjDjUIXtAldnSNeP5rrr9Vjw6jQp
+         mex0bGmEY2A+n56H2QVBujQsMJbt9yj+4NzXG/uiskiSglutCYH5SrJw+J8B+1peeAlE
+         DnSc8ECwTEyhDc9fl/9gxNecDaPW3nX+lIxERkwBNTCNvjUlUPbQnSpYJnqnCsnXXUje
+         6QkG/u9zSQQIUWtJG1syGUTWy6AgBwXmC4MOoOQMub5m7LyTrrSP5vRG0KhPu2IUyK62
+         N242ASYo7fLOfBQlr6l0FhB04HaLmRXp6g5gVK72IljL4GcClIEGs8WYHkQj+ojT1vM+
+         PGPw==
+X-Gm-Message-State: ANoB5ple4paHpfC3xnIs4/hYI6PH1o80oa/8vaUuMMI31GX0J9qfLZ8k
+        wsye+VyH6IAsfqhn4FjrxB8ARO9P+SYHFUKwyaZlGNJUHdZJvic8Reo7u1CMedkpW+XypFOYdk3
+        7VAsgaoH7PlH8jgsMPGhAdz7VZghV
+X-Received: by 2002:a9d:61ca:0:b0:66e:6d59:b2df with SMTP id h10-20020a9d61ca000000b0066e6d59b2dfmr10522445otk.201.1670214264938;
+        Sun, 04 Dec 2022 20:24:24 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4RmLbd7rUQksRMHkj9ik2O62qZVkkYm6Hly+Fv/Xv8q2NeYMX08gt01mq3ZbeT9soaY3c9pKmYRi9xo7xo4Uo=
+X-Received: by 2002:a9d:61ca:0:b0:66e:6d59:b2df with SMTP id
+ h10-20020a9d61ca000000b0066e6d59b2dfmr10522436otk.201.1670214264729; Sun, 04
+ Dec 2022 20:24:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="f6M9UaX53EEZorp0"
-Content-Disposition: inline
-In-Reply-To: <20221202135402.756470-2-yi.l.liu@intel.com>
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221124155158.2109884-1-eperezma@redhat.com> <20221124155158.2109884-7-eperezma@redhat.com>
+ <CACGkMEubBA9NYR5ynT_2C=iMEk3fph2GEOBvcw73BOuqiFKzJg@mail.gmail.com>
+ <CAJaqyWcR_3vdXLJ4=z+_uaoVN47gEXr7KHx3w6z8HtmqquK7zA@mail.gmail.com>
+ <CACGkMEs3xfGsptV9H+P+O1yjVzo_vugGnS72EwpE8FLECkccpQ@mail.gmail.com> <CAJaqyWemta-dmaqaVphqn=riEiVrVsm5K5nSZYxBZVY6Zt8Eow@mail.gmail.com>
+In-Reply-To: <CAJaqyWemta-dmaqaVphqn=riEiVrVsm5K5nSZYxBZVY6Zt8Eow@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Mon, 5 Dec 2022 12:24:13 +0800
+Message-ID: <CACGkMEs=6fv-DG_bvbMpu2xwj9s_neBcm=CqKnOArVE4_z-yHA@mail.gmail.com>
+Subject: Re: [PATCH for 8.0 v8 06/12] vdpa: extract vhost_vdpa_svq_allocate_iova_tree
+To:     Eugenio Perez Martin <eperezma@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eli Cohen <eli@mellanox.com>, Cindy Lu <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Gautam Dawar <gdawar@xilinx.com>,
+        Liuxiangdong <liuxiangdong5@huawei.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Stefano Garzarella <sgarzare@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Dec 1, 2022 at 5:50 PM Eugenio Perez Martin <eperezma@redhat.com> w=
+rote:
+>
+> On Thu, Dec 1, 2022 at 9:45 AM Jason Wang <jasowang@redhat.com> wrote:
+> >
+> > On Wed, Nov 30, 2022 at 3:40 PM Eugenio Perez Martin
+> > <eperezma@redhat.com> wrote:
+> > >
+> > > On Wed, Nov 30, 2022 at 7:43 AM Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > > >
+> > > > On Thu, Nov 24, 2022 at 11:52 PM Eugenio P=C3=A9rez <eperezma@redha=
+t.com> wrote:
+> > > > >
+> > > > > It can be allocated either if all virtqueues must be shadowed or =
+if
+> > > > > vdpa-net detects it can shadow only cvq.
+> > > > >
+> > > > > Extract in its own function so we can reuse it.
+> > > > >
+> > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > > > > ---
+> > > > >  net/vhost-vdpa.c | 29 +++++++++++++++++------------
+> > > > >  1 file changed, 17 insertions(+), 12 deletions(-)
+> > > > >
+> > > > > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> > > > > index 88e0eec5fa..9ee3bc4cd3 100644
+> > > > > --- a/net/vhost-vdpa.c
+> > > > > +++ b/net/vhost-vdpa.c
+> > > > > @@ -240,6 +240,22 @@ static NetClientInfo net_vhost_vdpa_info =3D=
+ {
+> > > > >          .check_peer_type =3D vhost_vdpa_check_peer_type,
+> > > > >  };
+> > > > >
+> > > > > +static int vhost_vdpa_get_iova_range(int fd,
+> > > > > +                                     struct vhost_vdpa_iova_rang=
+e *iova_range)
+> > > > > +{
+> > > > > +    int ret =3D ioctl(fd, VHOST_VDPA_GET_IOVA_RANGE, iova_range)=
+;
+> > > > > +
+> > > > > +    return ret < 0 ? -errno : 0;
+> > > > > +}
+> > > >
+> > > > I don't get why this needs to be moved to net specific code.
+> > > >
+> > >
+> > > It was already in net, this code just extracted it in its own functio=
+n.
+> >
+> > Ok, there's similar function that in vhost-vdpa.c:
+> >
+> > static void vhost_vdpa_get_iova_range(struct vhost_vdpa *v)
+> > {
+> >     int ret =3D vhost_vdpa_call(v->dev, VHOST_VDPA_GET_IOVA_RANGE,
+> >                               &v->iova_range);
+> >     if (ret !=3D 0) {
+> >         v->iova_range.first =3D 0;
+> >         v->iova_range.last =3D UINT64_MAX;
+> >     }
+> >
+> >     trace_vhost_vdpa_get_iova_range(v->dev, v->iova_range.first,
+> >                                     v->iova_range.last);
+> > }
+> >
+> > I think we can reuse that.
+> >
+>
+> That's right, but I'd do the reverse: I would store iova_min, iova_max
+> in VhostVDPAState and would set it to vhost_vdpa at
+> net_vhost_vdpa_init. That way, we only have one ioctl call at the
+> beginning instead of having (#vq pairs + cvq) calls each time the
+> device starts. I can send it in a new change if you see it ok.
+>
+> There are a few functions like that we can reuse in net/. To get the
+> features and the backend features are two other examples. Even if we
+> don't cache them since device initialization mandates the read, we
+> could reduce code duplication that way.
+>
+> However, they use vhost_dev or vhost_vdpa instead of directly the file
+> descriptor. Not a big deal but it's an extra step.
+>
+> What do you think?
 
---f6M9UaX53EEZorp0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm fine with this.
 
-On 2022.12.02 05:54:01 -0800, Yi Liu wrote:
-> vfio container registers .dma_unmap() callback after the device is opened.
-> So it's fine for mdev drivers to initialize internal mapping cache in
-> .open_device(). See vfio_device_container_register().
->=20
-> Now with iommufd an access ops with an unmap callback is registered
-> when the device is bound to iommufd which is before .open_device()
-> is called. This implies gvt's .dma_unmap() could be called before its
-> internal mapping cache is initialized.
->=20
-> The fix is moving gvt mapping cache initialization to vGPU init. While
-> at it also move ptable initialization together.
->=20
-> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> Cc: Zhi Wang <zhi.a.wang@intel.com>
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: intel-gvt-dev@lists.freedesktop.org
-> Reviewed-by: Zhi Wang <zhi.a.wang@intel.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> ---
->  drivers/gpu/drm/i915/gvt/kvmgt.c | 18 ++++++++++++++----
->  1 file changed, 14 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/=
-kvmgt.c
-> index 7a45e5360caf..aaf0d9e8da95 100644
-> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> @@ -671,9 +671,6 @@ static int intel_vgpu_open_device(struct vfio_device =
-*vfio_dev)
-> =20
->  	vgpu->attached =3D true;
-> =20
-> -	kvmgt_protect_table_init(vgpu);
-> -	gvt_cache_init(vgpu);
-> -
->  	vgpu->track_node.track_write =3D kvmgt_page_track_write;
->  	vgpu->track_node.track_flush_slot =3D kvmgt_page_track_flush_slot;
->  	kvm_page_track_register_notifier(vgpu->vfio_device.kvm,
-> @@ -718,6 +715,11 @@ static void intel_vgpu_close_device(struct vfio_devi=
-ce *vfio_dev)
->  	kvmgt_protect_table_destroy(vgpu);
->  	gvt_cache_destroy(vgpu);
-> =20
-> +	WARN_ON(vgpu->nr_cache_entries);
-> +
-> +	vgpu->gfn_cache =3D RB_ROOT;
-> +	vgpu->dma_addr_cache =3D RB_ROOT;
-> +
->  	intel_vgpu_release_msi_eventfd_ctx(vgpu);
-> =20
->  	vgpu->attached =3D false;
-> @@ -1451,9 +1453,17 @@ static int intel_vgpu_init_dev(struct vfio_device =
-*vfio_dev)
->  	struct intel_vgpu *vgpu =3D vfio_dev_to_vgpu(vfio_dev);
->  	struct intel_vgpu_type *type =3D
->  		container_of(mdev->type, struct intel_vgpu_type, type);
-> +	int ret;
-> =20
->  	vgpu->gvt =3D kdev_to_i915(mdev->type->parent->dev)->gvt;
-> -	return intel_gvt_create_vgpu(vgpu, type->conf);
-> +	ret =3D intel_gvt_create_vgpu(vgpu, type->conf);
-> +	if (ret)
-> +		return ret;
-> +
-> +	kvmgt_protect_table_init(vgpu);
-> +	gvt_cache_init(vgpu);
-> +
-> +	return 0;
->  }
-> =20
->  static void intel_vgpu_release_dev(struct vfio_device *vfio_dev)
-> --=20
+Thanks
 
-Reviewed-by: Zhenyu Wang <zhenyuw@linux.intel.com>
+>
+> Thanks!
+>
 
-thanks!
-
---f6M9UaX53EEZorp0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCY41SRgAKCRCxBBozTXgY
-Jz/rAKCf2XCkaQP0WhdwmGPDUwLtuGdwAgCfekY0SY9P43VoLP1yapxS6J6QSro=
-=Ndmv
------END PGP SIGNATURE-----
-
---f6M9UaX53EEZorp0--
