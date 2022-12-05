@@ -2,324 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 744516425BC
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 10:24:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD34F64267B
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 11:12:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230307AbiLEJYe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 04:24:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44522 "EHLO
+        id S230324AbiLEKMI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 05:12:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbiLEJYa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 04:24:30 -0500
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E520BC23
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 01:24:28 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id b13so6631899lfo.3
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 01:24:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Owo0phbbJOrq6sWBiQ2bW5Gab2bMQcmAUmytHNbH9wo=;
-        b=CBfUM4ABoy4rHbnJbQWlgFZPr36WGkyWiutGX6w63I8DmF/IJiild6FcVSNN7OWJZ7
-         pXxUiVma9yq+PhDIrUun9M9Va0gKBpKxjzL4hSd+yyVkziX/hM+hdNnS2HrixHqWqr+w
-         9uPS+gbUSproyB0am3JO8sKBKWWHQ/lzz53ju3Q567AM4L0/1VsnFw7a7e+xLX5dqtAL
-         ltPfrvJFTtJCH5f/cWONsgU7aRsJDDYFPsxECnuUV1Upx768mYuIz8CszK1XiyhlQVRZ
-         mn1NjlqoOAVwrxhEaj2jBzLXfvyd3qLezPV3GfuypCofEI10LU/+uMeT5vEdTm2OxrYD
-         evrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Owo0phbbJOrq6sWBiQ2bW5Gab2bMQcmAUmytHNbH9wo=;
-        b=tVXgzM/G6U+DYT0b1hK6kVs+BYXFS9ke9xe6/ax72XtjEcpj4uON3g77mZW6PVqM1U
-         p1wrpwzHcfjQPDG7K32BAV9QMujXx3rUyAfZY5qb2qd+/KmOOC9XNuMJRYIadblpbVUn
-         mOo8abFSLogXZqsrZhRaACpLHPthXHvHnwXXX9KI8OLPPpTXG3Cl8tokUv93dBknpnIv
-         NihCGZzZJF3YyiV3KbSTYeJBStIGouFwll3uij8uPzoziIpvFbF6QwZ4G0O69RhSHIqf
-         wHZHI1n8OaXMfNLkZdNQEOlO54tJRzWo2yuSKyKtCuIvcCjooFQ+ohlTu08mzQaBQfhQ
-         BQvg==
-X-Gm-Message-State: ANoB5pkcPm+4L3qzLYdEJWWufpG2jAzaVP8YGPx4MyI3tBngqt5bmtc1
-        DzXceXqL2fA+/9T7MDYJG9iVoVRFbiQbzKE8ZGrc6w==
-X-Google-Smtp-Source: AA0mqf7hmc7cmV5dRxw88/fxJnTLIThfoQtt0oTYjymTMQQZpTJzvpZeXdF6ZMUHCf5Dbxm0DrPC0sEiLurEnocH1bU=
-X-Received: by 2002:a05:6512:104e:b0:4b5:604a:5b24 with SMTP id
- c14-20020a056512104e00b004b5604a5b24mr2898439lfb.550.1670232266434; Mon, 05
- Dec 2022 01:24:26 -0800 (PST)
+        with ESMTP id S231665AbiLEKLn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 05:11:43 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 053CC193C1;
+        Mon,  5 Dec 2022 02:11:19 -0800 (PST)
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id A10A021BCC;
+        Mon,  5 Dec 2022 10:11:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1670235078; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sqNZA5zTyMlfI1v/fWKKuYoW5KcHHzow2+oG+C7H3Lc=;
+        b=eEdg5lOw/D6B1odChP48YfilmfMu1o9jtRwTHFBIGPJxjCici25pjIJg3K6BzAnte57dUK
+        +XJ7WTsdqrDmAhHsrGrqQA120LszXkJnQzqJPM/TwOq8wE2R4UvSn2dyK0LvsHMRgv0UVK
+        dNV4UWCoTLq/HOauAFkTed4WS8CGiFc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1670235078;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sqNZA5zTyMlfI1v/fWKKuYoW5KcHHzow2+oG+C7H3Lc=;
+        b=9hrWHb64ZFrR+bAWovsqhuYgCIPUFSdLjSFr+zcp5QMUaFsNCEKoYfcWn58Uk3hhj5knjp
+        CExaC89Kn0zsSYBQ==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 7149F1348F;
+        Mon,  5 Dec 2022 10:11:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id +mhfGsbDjWN+egAAGKfGzw
+        (envelope-from <tzimmermann@suse.de>); Mon, 05 Dec 2022 10:11:18 +0000
+Message-ID: <c1c8bfa5-8ba4-c365-1663-535f656ca353@suse.de>
+Date:   Mon, 5 Dec 2022 11:11:17 +0100
 MIME-Version: 1.0
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com> <20221202061347.1070246-6-chao.p.peng@linux.intel.com>
-In-Reply-To: <20221202061347.1070246-6-chao.p.peng@linux.intel.com>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Mon, 5 Dec 2022 09:23:49 +0000
-Message-ID: <CA+EHjTy5+Ke_7Uh72p--H9kGcE-PK4EVmp7ym6Q1-PO28u6CCQ@mail.gmail.com>
-Subject: Re: [PATCH v10 5/9] KVM: Use gfn instead of hva for mmu_notifier_retry
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH 2/2] vfio/pci: Remove console drivers
+Content-Language: en-US
+To:     "mb@lab.how" <mb@lab.how>
+Cc:     kvm@vger.kernel.org, airlied@linux.ie,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kraxel@redhat.com, lersek@redhat.com
+References: <CAEdEoBYXHq9cCzsbMYTpG1B41Yz=-QAjFx7bJDOnPanN5Tmo7A@mail.gmail.com>
+ <20221204175142.658d5c37.alex.williamson@redhat.com>
+ <1e4d62cf-8893-0bff-51f5-5a2e419ed5a0@suse.de>
+ <CAEdEoBYZa9cg0nq=P7EDsDS9m2EKYrd8M8ucqi8U0Csj0mtjDg@mail.gmail.com>
+From:   Thomas Zimmermann <tzimmermann@suse.de>
+In-Reply-To: <CAEdEoBYZa9cg0nq=P7EDsDS9m2EKYrd8M8ucqi8U0Csj0mtjDg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------uRsgP53PwlPRoZfb2hsusoNs"
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Chao,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------uRsgP53PwlPRoZfb2hsusoNs
+Content-Type: multipart/mixed; boundary="------------ubRTs0XIaXchmKOAzWfQJXuX";
+ protected-headers="v1"
+From: Thomas Zimmermann <tzimmermann@suse.de>
+To: "mb@lab.how" <mb@lab.how>
+Cc: kvm@vger.kernel.org, airlied@linux.ie, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, Alex Williamson
+ <alex.williamson@redhat.com>, kraxel@redhat.com, lersek@redhat.com
+Message-ID: <c1c8bfa5-8ba4-c365-1663-535f656ca353@suse.de>
+Subject: Re: [PATCH 2/2] vfio/pci: Remove console drivers
+References: <CAEdEoBYXHq9cCzsbMYTpG1B41Yz=-QAjFx7bJDOnPanN5Tmo7A@mail.gmail.com>
+ <20221204175142.658d5c37.alex.williamson@redhat.com>
+ <1e4d62cf-8893-0bff-51f5-5a2e419ed5a0@suse.de>
+ <CAEdEoBYZa9cg0nq=P7EDsDS9m2EKYrd8M8ucqi8U0Csj0mtjDg@mail.gmail.com>
+In-Reply-To: <CAEdEoBYZa9cg0nq=P7EDsDS9m2EKYrd8M8ucqi8U0Csj0mtjDg@mail.gmail.com>
 
-On Fri, Dec 2, 2022 at 6:19 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
->
-> Currently in mmu_notifier invalidate path, hva range is recorded and
-> then checked against by mmu_notifier_retry_hva() in the page fault
-> handling path. However, for the to be introduced private memory, a page
-> fault may not have a hva associated, checking gfn(gpa) makes more sense.
->
-> For existing hva based shared memory, gfn is expected to also work. The
-> only downside is when aliasing multiple gfns to a single hva, the
-> current algorithm of checking multiple ranges could result in a much
-> larger range being rejected. Such aliasing should be uncommon, so the
-> impact is expected small.
->
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c   |  8 +++++---
->  include/linux/kvm_host.h | 33 +++++++++++++++++++++------------
->  virt/kvm/kvm_main.c      | 32 +++++++++++++++++++++++---------
->  3 files changed, 49 insertions(+), 24 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 4736d7849c60..e2c70b5afa3e 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4259,7 +4259,7 @@ static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
->                 return true;
->
->         return fault->slot &&
-> -              mmu_invalidate_retry_hva(vcpu->kvm, mmu_seq, fault->hva);
-> +              mmu_invalidate_retry_gfn(vcpu->kvm, mmu_seq, fault->gfn);
->  }
->
->  static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> @@ -6098,7 +6098,9 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
->
->         write_lock(&kvm->mmu_lock);
->
-> -       kvm_mmu_invalidate_begin(kvm, gfn_start, gfn_end);
-> +       kvm_mmu_invalidate_begin(kvm);
-> +
-> +       kvm_mmu_invalidate_range_add(kvm, gfn_start, gfn_end);
->
->         flush = kvm_rmap_zap_gfn_range(kvm, gfn_start, gfn_end);
->
-> @@ -6112,7 +6114,7 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
->                 kvm_flush_remote_tlbs_with_address(kvm, gfn_start,
->                                                    gfn_end - gfn_start);
->
-> -       kvm_mmu_invalidate_end(kvm, gfn_start, gfn_end);
-> +       kvm_mmu_invalidate_end(kvm);
->
->         write_unlock(&kvm->mmu_lock);
->  }
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 02347e386ea2..3d69484d2704 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -787,8 +787,8 @@ struct kvm {
->         struct mmu_notifier mmu_notifier;
->         unsigned long mmu_invalidate_seq;
->         long mmu_invalidate_in_progress;
-> -       unsigned long mmu_invalidate_range_start;
-> -       unsigned long mmu_invalidate_range_end;
-> +       gfn_t mmu_invalidate_range_start;
-> +       gfn_t mmu_invalidate_range_end;
->  #endif
->         struct list_head devices;
->         u64 manual_dirty_log_protect;
-> @@ -1389,10 +1389,9 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
->  void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
->  #endif
->
-> -void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
-> -                             unsigned long end);
-> -void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
-> -                           unsigned long end);
-> +void kvm_mmu_invalidate_begin(struct kvm *kvm);
-> +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
-> +void kvm_mmu_invalidate_end(struct kvm *kvm);
->
->  long kvm_arch_dev_ioctl(struct file *filp,
->                         unsigned int ioctl, unsigned long arg);
-> @@ -1963,9 +1962,9 @@ static inline int mmu_invalidate_retry(struct kvm *kvm, unsigned long mmu_seq)
->         return 0;
->  }
->
-> -static inline int mmu_invalidate_retry_hva(struct kvm *kvm,
-> +static inline int mmu_invalidate_retry_gfn(struct kvm *kvm,
->                                            unsigned long mmu_seq,
-> -                                          unsigned long hva)
-> +                                          gfn_t gfn)
->  {
->         lockdep_assert_held(&kvm->mmu_lock);
->         /*
-> @@ -1974,10 +1973,20 @@ static inline int mmu_invalidate_retry_hva(struct kvm *kvm,
->          * that might be being invalidated. Note that it may include some false
+--------------ubRTs0XIaXchmKOAzWfQJXuX
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-nit: "might be" (or) "is being"
+SGkNCg0KQW0gMDUuMTIuMjIgdW0gMTA6MzIgc2NocmllYiBtYkBsYWIuaG93Og0KPiBJIGhh
+dmUgYSBydHggMzA3MCBhbmQgYSAzMDkwLCBJIGFtIGFic29sdXRlbHkgc3VyZSBJIGFtIGJp
+bmRpbmcgdmZpby1wY2kgDQo+IHRvIHRoZSAzMDkwIGFuZCBub3QgdGhlIDMwNzAuDQo+IA0K
+PiBJIGhhdmUgYm91bmQgdGhlIGRyaXZlciBpbiB0d28gZGlmZmVyZW50IHdheXMsIGZpcnN0
+IGJ5IHBhc3NpbmcgdGhlIElEcyANCj4gdG8gdGhlIG1vZHVsZSBhbmQgYWx0ZXJuYXRpdmVs
+eSBieSBtYW5pcHVsYXRpbmcgdGhlIHN5c3RlbSBpbnRlcmZhY2UgYW5kIA0KPiB1c2UgdGhl
+IG92ZXJyaWRlICh0aGlzIGlzIHdoYXQgSSBvcmlnaW5hbGx5IGhhZCB0byBkbyB3aGVuIEkg
+dXNlZCB0d28gDQo+IDEwODBzLCBzbyBJIGtub3cgaXQgd29ya3MpLg0KPiANCj4gV2hpbGUg
+dGhlIDMwOTAgZG9lc24ndCBzaG93IGEgY29uc29sZSwgdGhlcmUncyBhIHJlbW5hbnQgZnJv
+bSB0aGUgcmVmdW5kIA0KPiAoYW5kIGdydWIgcHJldmlvdXNseSkgdGhlcmUuDQo+IA0KPiBU
+aGUgYXNzZXNzbWVudCBBbGV4IG1hZGUgcHJldmlvdXNseSwgd2hlcmUgDQo+IGFwZXJ0dXJl
+X3JlbW92ZV9jb25mbGljdGluZ19wY2lfZGV2aWNlcygpIGlzIHJlbW92aW5nIHRoZSBkcml2
+ZXIgKEVGSUZCKSANCj4gaW5zdGVhZCBvZiB0aGUgZGV2aWNlIHNlZW1zIGNvcnJlY3QsIGJ1
+dCBpdCBjb3VsZCBhbHNvIGNhbiBiZSBhIHF1aXJreSANCj4gb2YgaG93IEVGSUZCIGlzIGlt
+cGxlbWVudGVkLiBJIHJlY2FsbCByZWFkaW5nIGEgbG9uZyB0aW1lIGFnbyB0aGF0IEVGSUZC
+IA0KPiBpcyBhIHNwZWNpYWwgZGV2aWNlIGFuZCBvbmNlIGl0IGRldGVjdHMgY2hhbmdlcyBp
+dCB3b3VsZCBzaW1wbHkgZ2l2ZSB1cC4gDQo+IFRoZXJlIHdhcyBhbHNvIG5vIHdheSB0byBh
+dHRhY2ggYSBkZXZpY2UgdG8gaXQgYWdhaW4gYXMgaXQgZGVwZW5kcyBvbiANCj4gYmVpbmcg
+cHJlbG9hZGVkIG91dHNpZGUgdGhlIGtlcm5lbDsgb25jZSBzb21ldGhpbmcgdGFrZXMgb3Zl
+ciB0aGUgYnVmZmVyIA0KPiByZWluaXRpYWxpemluZyBpcyAiaW1wb3NzaWJsZSIuIEkgbmV2
+ZXIgd2VudCBkZWVwZXIgdG8gdHJ5IGFuZCANCj4gdW5kZXJzdGFuZCBpdC4NCg0KV2UgcmVj
+ZW50bHkgcmV3b3JrZWQgZmJkZXYncyBpbnRlcmFjdGlvbiB3aXRoIHRoZSBhcGVydHVyZSBo
+ZWxwZXJzLiBbMV0gDQpBbGwgZGV2aWNlcyBzaG91bGQgbm93IGJlIHJlbW92ZWQgaWZmIHRo
+ZSBkcml2ZXIgaGFzIGJlZW4gYm91bmQgdG8gaXQgDQood2hpY2ggc2hvdWxkIGJlIHRoZSBj
+YXNlIGhlcmUpIFRoZSBwYXRjaGVzIHdlbnQgaW50byBhbiB2Ni4xLXJjLg0KDQpDb3VsZCB5
+b3UgdHJ5IHRoZSBtb3N0IHJlY2VudCB2Ni4xLXJjIGFuZCByZXBvcnQgaWYgdGhpcyBmaXhl
+cyB0aGUgcHJvYmxlbT8NCg0KQmVzdCByZWdhcmRzDQpUaG9tYXMNCg0KWzFdIGh0dHBzOi8v
+cGF0Y2h3b3JrLmZyZWVkZXNrdG9wLm9yZy9zZXJpZXMvMTA2MDQwLw0KDQo+IA0KPiANCj4g
+T24gTW9uLCBEZWMgNSwgMjAyMiwgMjowMCBBTSBUaG9tYXMgWmltbWVybWFubiA8dHppbW1l
+cm1hbm5Ac3VzZS5kZSANCj4gPG1haWx0bzp0emltbWVybWFubkBzdXNlLmRlPj4gd3JvdGU6
+DQo+IA0KPiAgICAgSGkNCj4gDQo+ICAgICBBbSAwNS4xMi4yMiB1bSAwMTo1MSBzY2hyaWVi
+IEFsZXggV2lsbGlhbXNvbjoNCj4gICAgICA+IE9uIFNhdCwgMyBEZWMgMjAyMiAxNzoxMjoz
+OCAtMDcwMA0KPiAgICAgID4gIm1iQGxhYi5ob3ciIDxtYkBsYWIuaG93PiB3cm90ZToNCj4g
+ICAgICA+DQo+ICAgICAgPj4gSGksDQo+ICAgICAgPj4NCj4gICAgICA+PiBJIGhvcGUgaXQg
+aXMgb2sgdG8gcmVwbHkgdG8gdGhpcyBvbGQgdGhyZWFkLg0KPiAgICAgID4NCj4gICAgICA+
+IEl0IGlzLCBidXQgdGhlIG9ubHkgcmVsaWMgb2YgdGhlIHRocmVhZCBpcyB0aGUgc3ViamVj
+dC7CoCBGb3INCj4gICAgIHJlZmVyZW5jZSwNCj4gICAgICA+IHRoZSBsYXRlc3QgdmVyc2lv
+biBvZiB0aGlzIHBvc3RlZCBpcyBoZXJlOg0KPiAgICAgID4NCj4gICAgICA+DQo+ICAgICBo
+dHRwczovL2xvcmUua2VybmVsLm9yZy9hbGwvMjAyMjA2MjIxNDAxMzQuMTI3NjMtNC10emlt
+bWVybWFubkBzdXNlLmRlLyA8aHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvYWxsLzIwMjIwNjIy
+MTQwMTM0LjEyNzYzLTQtdHppbW1lcm1hbm5Ac3VzZS5kZS8+DQo+ICAgICAgPg0KPiAgICAg
+ID4gV2hpY2ggaXMgY29tbWl0dGVkIGFzOg0KPiAgICAgID4NCj4gICAgICA+IGQxNzM3ODA2
+MjA3OSAoInZmaW8vcGNpOiBSZW1vdmUgY29uc29sZSBkcml2ZXJzIikNCj4gICAgICA+DQo+
+ICAgICAgPj4gVW5mb3J0dW5hdGVseSwgSSBmb3VuZCBhDQo+ICAgICAgPj4gcHJvYmxlbSBv
+bmx5IG5vdyBhZnRlciB1cGdyYWRpbmcgdG8gNi4wLg0KPiAgICAgID4+DQo+ICAgICAgPj4g
+TXkgc2V0dXAgaGFzIG11bHRpcGxlIEdQVXMgKDIpLCBhbmQgSSBkZXBlbmQgb24gRUZJRkIg
+dG8gaGF2ZSBhDQo+ICAgICB3b3JraW5nIGNvbnNvbGUuDQo+IA0KPiAgICAgV2hpY2ggR1BV
+cyBkbyB5b3UgaGF2ZT8NCj4gDQo+ICAgICAgPj4gcHJlLXBhdGNoIGJlaGF2aW9yLCB3aGVu
+IEkgYmluZCB0aGUgdmZpby1wY2kgdG8gbXkgc2Vjb25kYXJ5IEdQVQ0KPiAgICAgYm90aA0K
+PiAgICAgID4+IHRoZSBwYXNzdGhyb3VnaCBhbmQgdGhlIEVGSUZCIGtlZXAgd29ya2luZyBm
+aW5lLg0KPiAgICAgID4+IHBvc3QtcGF0Y2ggYmVoYXZpb3IsIHdoZW4gSSBiaW5kIHRoZSB2
+ZmlvLXBjaSB0byB0aGUgc2Vjb25kYXJ5IEdQVSwNCj4gICAgICA+PiB0aGUgRUZJRkIgZGlz
+YXBwZWFycyBmcm9tIHRoZSBzeXN0ZW0sIGJpbmRpbmcgdGhlIGNvbnNvbGUgdG8gdGhlDQo+
+ICAgICAgPj4gImR1bW15IGNvbnNvbGUiLg0KPiANCj4gICAgIFRoZSBlZmlmYiB3b3VsZCBs
+aWtlbHkgdXNlIHRoZSBmaXJzdCBHUFUuIEFuZCB2ZmlvLXBjaSBzaG91bGQgb25seQ0KPiAg
+ICAgcmVtb3ZlIHRoZSBnZW5lcmljIGRyaXZlciBmcm9tIHRoZSBzZWNvbmQgZGV2aWNlLiBB
+cmUgeW91IHN1cmUgdGhhdA0KPiAgICAgeW91J3JlIG5vdCBzb21laG93IHVzaW5nIHRoZSBm
+aXJzdCBHUFUgd2l0aCB2ZmlvLXBjaS4NCj4gDQo+ICAgICAgPj4gV2hlbmV2ZXIgeW91IHRy
+eSB0byBhY2Nlc3MgdGhlIHRlcm1pbmFsLCB5b3UgaGF2ZSB0aGUgc2NyZWVuDQo+ICAgICBz
+dHVjayBpbg0KPiAgICAgID4+IHdoYXRldmVyIHdhcyB0aGUgbGFzdCBidWZmZXIgY29udGVu
+dCwgd2hpY2ggZ2l2ZXMgdGhlIGltcHJlc3Npb24gb2YNCj4gICAgICA+PiAiZnJlZXppbmcs
+IiBidXQgSSBjYW4gc3RpbGwgdHlwZS4NCj4gICAgICA+PiBFdmVyeXRoaW5nIGVsc2Ugd29y
+a3MsIGluY2x1ZGluZyB0aGUgcGFzc3Rocm91Z2guDQo+ICAgICAgPg0KPiAgICAgID4gVGhp
+cyBzb3VuZHMgbGlrZSB0aGUgY2FsbCB0bw0KPiAgICAgYXBlcnR1cmVfcmVtb3ZlX2NvbmZs
+aWN0aW5nX3BjaV9kZXZpY2VzKCkNCj4gICAgICA+IGlzIHJlbW92aW5nIHRoZSBjb25mbGlj
+dGluZyBkcml2ZXIgaXRzZWxmIHJhdGhlciB0aGFuIHJlbW92aW5nIHRoZQ0KPiAgICAgID4g
+ZGV2aWNlIGZyb20gdGhlIGRyaXZlci7CoCBJcyBpdCBub3QgcG9zc2libGUgdG8gdW5iaW5k
+IHRoZSBHUFUgZnJvbQ0KPiAgICAgID4gZWZpZmIgYmVmb3JlIGJpbmRpbmcgdGhlIEdQVSB0
+byB2ZmlvLXBjaSB0byBlZmZlY3RpdmVseSBudWxsaWZ5IHRoZQ0KPiAgICAgID4gYWRkZWQg
+Y2FsbD8NCj4gICAgICA+DQo+ICAgICAgPj4gSSBjYW4gb25seSB0aGluayBhYm91dCBhIGZl
+dyBvcHRpb25zOg0KPiAgICAgID4+DQo+ICAgICAgPj4gLSBJcyB0aGVyZSBhIHdheSB0byBo
+YXZlIEVGSUZCIHNob3cgdXAgYWdhaW4/IEFmdGVyIGFsbCBpdCBsb29rcw0KPiAgICAgbGlr
+ZQ0KPiAgICAgID4+IHRoZSBrZXJuZWwgaGFzIGp1c3QgYWJhbmRvbmVkIGl0LCBidXQgdGhl
+IGJ1ZmZlciBpcyBzdGlsbCB0aGVyZS4gSQ0KPiAgICAgID4+IGNhbid0IGZpbmQgYSBzaW5n
+bGUgbWVzc2FnZSBhYm91dCB0aGUgc2Vjb25kYXJ5IGNhcmQgYW5kIEVGSUZCIGluDQo+ICAg
+ICAgPj4gZG1lc2csIGJ1dCB0aGVyZSdzIGEgbWVzc2FnZSBmb3IgdGhlIHByaW1hcnkgY2Fy
+ZCBhbmQgRUZJRkIuDQo+ICAgICAgPj4gLSBDYW4gd2UgaGF2ZSBhIGJvb2xlYW4gY29udHJv
+bGxpbmcgdGhlIGJlaGF2aW9yIG9mIHZmaW8tcGNpDQo+ICAgICAgPj4gYWx0b2dldGhlciBv
+ciBhdCBsZWFzdCBjb250cm9sbGluZyB0aGUgYmVoYXZpb3Igb2YgdmZpby1wY2kgZm9yIHRo
+YXQNCj4gICAgICA+PiBzcGVjaWZpYyBJRD8gSSBrbm93IHRoZXJlJ3MgYWxyZWFkeSBzb21l
+IG9wdGlvbiBmb3IgdmZpby1wY2kgYW5kIFZHQQ0KPiAgICAgID4+IGNhcmRzLCB3b3VsZCBp
+dCBiZSBhcHByb3ByaWF0ZSB0byBhdHRhY2ggdGhpcyBiZWhhdmlvciB0byB0aGF0DQo+ICAg
+ICBvcHRpb24/DQo+ICAgICAgPg0KPiAgICAgID4gSSBzdXBwb3NlIHdlIGNvdWxkIGhhdmUg
+YW4gb3B0LW91dCBtb2R1bGUgb3B0aW9uIG9uIHZmaW8tcGNpIHRvIHNraXANCj4gICAgICA+
+IHRoZSBhYm92ZSBjYWxsLCBidXQgY2xlYXJseSBpdCB3b3VsZCBiZSBiZXR0ZXIgaWYgdGhp
+bmdzIHdvcmtlZCBieQ0KPiAgICAgID4gZGVmYXVsdC7CoCBXZSBjYW5ub3QgbWFrZSBmdWxs
+IHVzZSBvZiBHUFVzIHdpdGggdmZpby1wY2kgaWYgdGhleSdyZQ0KPiAgICAgID4gc3RpbGwg
+aW4gdXNlIGJ5IGhvc3QgY29uc29sZSBkcml2ZXJzLsKgIFRoZSBpbnRlbnRpb24gd2FzIGNl
+cnRhaW5seSB0bw0KPiAgICAgID4gdW5iaW5kIHRoZSBkZXZpY2UgZnJvbSBhbnkgbG93IGxl
+dmVsIGRyaXZlcnMgcmF0aGVyIHRoYW4gZGlzYWJsZQ0KPiAgICAgdXNlIG9mDQo+ICAgICAg
+PiBhIGNvbnNvbGUgZHJpdmVyIGVudGlyZWx5LsKgIERSTS9HUFUgZm9sa3MsIGlzIHRoYXQg
+cG9zc2libHkgYW4NCj4gICAgICA+IGludGVyZmFjZSB3ZSBjb3VsZCBpbXBsZW1lbnQ/wqAg
+VGhhbmtzLA0KPiANCj4gICAgIFdoZW4gdmZpby1wY2kgZ2l2ZXMgdGhlIEdQVSBkZXZpY2Ug
+dG8gdGhlIGd1ZXN0LCB3aGljaCBkcml2ZXIgZHJpdmVyIGlzDQo+ICAgICBib3VuZCB0byBp
+dD8NCj4gDQo+ICAgICBCZXN0IHJlZ2FyZHMNCj4gICAgIFRob21hcw0KPiANCj4gICAgICA+
+DQo+ICAgICAgPiBBbGV4DQo+ICAgICAgPg0KPiANCj4gICAgIC0tIA0KPiAgICAgVGhvbWFz
+IFppbW1lcm1hbm4NCj4gICAgIEdyYXBoaWNzIERyaXZlciBEZXZlbG9wZXINCj4gICAgIFNV
+U0UgU29mdHdhcmUgU29sdXRpb25zIEdlcm1hbnkgR21iSA0KPiAgICAgTWF4ZmVsZHN0ci4g
+NSwgOTA0MDkgTsO8cm5iZXJnLCBHZXJtYW55DQo+ICAgICAoSFJCIDM2ODA5LCBBRyBOw7xy
+bmJlcmcpDQo+ICAgICBHZXNjaMOkZnRzZsO8aHJlcjogSXZvIFRvdGV2DQo+IA0KDQotLSAN
+ClRob21hcyBaaW1tZXJtYW5uDQpHcmFwaGljcyBEcml2ZXIgRGV2ZWxvcGVyDQpTVVNFIFNv
+ZnR3YXJlIFNvbHV0aW9ucyBHZXJtYW55IEdtYkgNCk1heGZlbGRzdHIuIDUsIDkwNDA5IE7D
+vHJuYmVyZywgR2VybWFueQ0KKEhSQiAzNjgwOSwgQUcgTsO8cm5iZXJnKQ0KR2VzY2jDpGZ0
+c2bDvGhyZXI6IEl2byBUb3Rldg0K
 
->          * positives, due to shortcuts when handing concurrent invalidations.
+--------------ubRTs0XIaXchmKOAzWfQJXuX--
 
-nit: handling
+--------------uRsgP53PwlPRoZfb2hsusoNs
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
 
->          */
-> -       if (unlikely(kvm->mmu_invalidate_in_progress) &&
-> -           hva >= kvm->mmu_invalidate_range_start &&
-> -           hva < kvm->mmu_invalidate_range_end)
-> -               return 1;
-> +       if (unlikely(kvm->mmu_invalidate_in_progress)) {
-> +               /*
-> +                * Dropping mmu_lock after bumping mmu_invalidate_in_progress
-> +                * but before updating the range is a KVM bug.
-> +                */
-> +               if (WARN_ON_ONCE(kvm->mmu_invalidate_range_start == INVALID_GPA ||
-> +                                kvm->mmu_invalidate_range_end == INVALID_GPA))
+-----BEGIN PGP SIGNATURE-----
 
-INVALID_GPA is an x86-specific define in
-arch/x86/include/asm/kvm_host.h, so this doesn't build on other
-architectures. The obvious fix is to move it to
-include/linux/kvm_host.h.
+wsF5BAABCAAjFiEExndm/fpuMUdwYFFolh/E3EQov+AFAmONw8UFAwAAAAAACgkQlh/E3EQov+C0
+TA//SlTy4HIrre0FZ/Pp7SIQGhEYUChZcgD6EST1ho9Ktp61x/nPABVnJjhz/kyQ8G7eAeqnSXK/
+hapklY65w13NI9M6sfnGFV+z/1ENL6+yYYX3iCDQtI+h2PSqC8khfF/tHItzzYDOZR/L9Xqw9dT8
+JAonPlSOFu1FRN0D6JgQaxG9DwLZMMBDlg6nkQR8cuzxGj480DzsaXgRNIV/lVTPqPjQQlDN6XIf
+g1Fg6oNNefwedRs5zMXs3VpIlz6o2rH4Az0iH1lcI3BeMqbytWLdgimLT+KLegggvY5FQe0y5Xa9
+yxb3gza26SyUn0Xk7PDmGB6VlgXAHj1UfSpVJvUQcpuKj0w07Kq5cc37TuTi6gHqDJtUZ/2VBqAD
+Tgdsbj7ZwR9YjfYHPQ2gZsoQyrz+IfJcKAJJNHJ5dyDLiSUF7r7aU7VujTLGlildmz4Sjk9Tb81N
+zsLNZpEix6ubTOHAF463NGDuxg/oO8gyDJ2loBN5tShBboelcT2yEFm4H0JbZJyFT7EDbqUHsJuU
+8rG9rqIxmzXo1lK6R2jy1yl9E5dEW/9kpUWS78dSX+y8jtaGZDZfvbAOCUNx9FqbGNe93Oud1Ua/
+c6LFSMyBOlnVrk71pkPhuhjPdGPXvwan4wSeScd31QFuhS4egpVeflPBoAcN1Ac6L2arFwUoM3hf
+548=
+=NgFS
+-----END PGP SIGNATURE-----
 
-Cheers,
-/fuad
-
-> +                       return 1;
-> +
-> +               if (gfn >= kvm->mmu_invalidate_range_start &&
-> +                   gfn < kvm->mmu_invalidate_range_end)
-> +                       return 1;
-> +       }
-> +
->         if (kvm->mmu_invalidate_seq != mmu_seq)
->                 return 1;
->         return 0;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index b882eb2c76a2..ad55dfbc75d7 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -540,9 +540,7 @@ static void kvm_mmu_notifier_invalidate_range(struct mmu_notifier *mn,
->
->  typedef bool (*hva_handler_t)(struct kvm *kvm, struct kvm_gfn_range *range);
->
-> -typedef void (*on_lock_fn_t)(struct kvm *kvm, unsigned long start,
-> -                            unsigned long end);
-> -
-> +typedef void (*on_lock_fn_t)(struct kvm *kvm);
->  typedef void (*on_unlock_fn_t)(struct kvm *kvm);
->
->  struct kvm_hva_range {
-> @@ -628,7 +626,8 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
->                                 locked = true;
->                                 KVM_MMU_LOCK(kvm);
->                                 if (!IS_KVM_NULL_FN(range->on_lock))
-> -                                       range->on_lock(kvm, range->start, range->end);
-> +                                       range->on_lock(kvm);
-> +
->                                 if (IS_KVM_NULL_FN(range->handler))
->                                         break;
->                         }
-> @@ -715,8 +714,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
->         kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
->  }
->
-> -void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
-> -                             unsigned long end)
-> +void kvm_mmu_invalidate_begin(struct kvm *kvm)
->  {
->         /*
->          * The count increase must become visible at unlock time as no
-> @@ -724,6 +722,17 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
->          * count is also read inside the mmu_lock critical section.
->          */
->         kvm->mmu_invalidate_in_progress++;
-> +
-> +       if (likely(kvm->mmu_invalidate_in_progress == 1)) {
-> +               kvm->mmu_invalidate_range_start = INVALID_GPA;
-> +               kvm->mmu_invalidate_range_end = INVALID_GPA;
-> +       }
-> +}
-> +
-> +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
-> +{
-> +       WARN_ON_ONCE(!kvm->mmu_invalidate_in_progress);
-> +
->         if (likely(kvm->mmu_invalidate_in_progress == 1)) {
->                 kvm->mmu_invalidate_range_start = start;
->                 kvm->mmu_invalidate_range_end = end;
-> @@ -744,6 +753,12 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
->         }
->  }
->
-> +static bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
-> +{
-> +       kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
-> +       return kvm_unmap_gfn_range(kvm, range);
-> +}
-> +
->  static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->                                         const struct mmu_notifier_range *range)
->  {
-> @@ -752,7 +767,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->                 .start          = range->start,
->                 .end            = range->end,
->                 .pte            = __pte(0),
-> -               .handler        = kvm_unmap_gfn_range,
-> +               .handler        = kvm_mmu_unmap_gfn_range,
->                 .on_lock        = kvm_mmu_invalidate_begin,
->                 .on_unlock      = kvm_arch_guest_memory_reclaimed,
->                 .flush_on_ret   = true,
-> @@ -791,8 +806,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->         return 0;
->  }
->
-> -void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
-> -                           unsigned long end)
-> +void kvm_mmu_invalidate_end(struct kvm *kvm)
->  {
->         /*
->          * This sequence increase will notify the kvm page fault that
-> --
-> 2.25.1
->
+--------------uRsgP53PwlPRoZfb2hsusoNs--
