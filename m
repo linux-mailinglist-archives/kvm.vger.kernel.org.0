@@ -2,229 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77475642FE3
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 19:24:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE837643095
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 19:40:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232317AbiLESYl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 13:24:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38948 "EHLO
+        id S233119AbiLESkh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 13:40:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232272AbiLESYd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 13:24:33 -0500
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52634209AE
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 10:24:32 -0800 (PST)
-Received: by mail-qk1-x731.google.com with SMTP id z17so5655084qki.11
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 10:24:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2P9EsS2tsbUaY4dcD49BmgQjZYX6Yb1webDSZ03mbXw=;
-        b=tSik+6xRk+SrYoWiJnRXnocphBDMpyh53ucwgGxIO7ZFeAEqD7VHCaOjr38zARzj8I
-         r2bVblVctpS7IbK6mkamgY7TJI9Rm6g86zEa38nBYh2LD5/Ere8TbLF4Q9qzqZWIu8ND
-         it+xe0OtYzmqqYhGr+4ZfgCBVkMztqbfLFMz/v5rPBKCmz9IS30QQcP/hF2+y/nX/X43
-         MaiL+peuROUFwTdNTjnDEUIIPp+nNKkaDs62xKBzhLZEBHhq448QoENSNoDXt1Q45/RZ
-         8hZ96cqDmRYB2OEqRIsrDQaLE7+s+6Vv0Q+mYPXT1W5J+/b2hH0Wn3YQ7IR4FW4y30Fg
-         eLmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2P9EsS2tsbUaY4dcD49BmgQjZYX6Yb1webDSZ03mbXw=;
-        b=sawzOK+XiOzRKMGlcRP6Nv4YbRUisJ8MN7Okw0/wkGmeKY18bK18jvtJetcxyAW75g
-         LqAhcu9uOH3EQrXH8qvWBpdIQSZbbr9V4xOkUcYhaZmnGNJ2orEI8pzkMlJOle/rveh8
-         6ceA/OfKwqy+lEzwMENX1u1whFsMh6zOjamLuz9i0JYWe4LMTj2iCmX80hcwpJ70XLUr
-         5mvyM96sRq67ZpnWIGjalidiZychvLY128NzIC+a5aUQsxdmMfS2lmrX4qV81XsaLScy
-         a5Kh6myUrfIb6OIIyr1cWmOqKe+B39yPxkYhZ4+3QYs7+a6t5mUvCDJvlZxNWNJn3w2K
-         9vCQ==
-X-Gm-Message-State: ANoB5pl0sJR3hHApF8GK14Cw5/ySD39JpJouYOm43FlJWnC90yMNx9RB
-        gm/KM4FTnA+fkNVQp6o3C+TxkVUWUyikhmIDQqutGA==
-X-Google-Smtp-Source: AA0mqf5Hb1GPcOEkgj/1xs5WXa3rdESQFMj847BK6VJDMjvdE2UYWIz8hpSJQF9ggzYC8A83Ji4eerK6Ajeyuyhspg8=
-X-Received: by 2002:a37:464b:0:b0:6fa:3431:1f2f with SMTP id
- t72-20020a37464b000000b006fa34311f2fmr59252381qka.81.1670264671267; Mon, 05
- Dec 2022 10:24:31 -0800 (PST)
+        with ESMTP id S233171AbiLESkF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 13:40:05 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9F6F23159;
+        Mon,  5 Dec 2022 10:36:52 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9E142B80E6F;
+        Mon,  5 Dec 2022 18:36:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5B86C433D6;
+        Mon,  5 Dec 2022 18:36:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670265410;
+        bh=OQdvaLSoaiBbTTeKD827k+4rYmwOJ9xbFSL1aPRYkUc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=G+9IUmmxBh5gC369f8/d/uPzj6Zkb+7CI3SvLvLo7xJHLH0rBA21oTgkmVrPWOViT
+         rBQy1UaWCVNWSCxSCPIsD0emZrqBpxiBVLv3QYarlQaYthhWsUkj1x0WCRTHeM1Wfd
+         D0BEi6k9iFMCNmtqzN+bd0wndTufsRWdRrd+1yJH5Pi6xCLbUzOyki2MUBtjCK7BUr
+         IuOqXY0BT0velhXHVw2msD1Iuf4jDJ6hh8LttPHoxVnbAFFmpw4gENyBZV41CNb2R7
+         QTOchzLUTlY/Hb/Wpq7nlC/ShzOBLStlp9KyP7Mfe+ERAYA69bfrwQFjsiL4r2KrG5
+         uU05A4S2JhIYg==
+Date:   Mon, 5 Dec 2022 18:36:45 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     Jisheng Zhang <jszhang@kernel.org>
+Cc:     Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 01/13] riscv: fix jal offsets in patched alternatives
+Message-ID: <Y446PdlUPGw5iB71@spud>
+References: <20221204174632.3677-1-jszhang@kernel.org>
+ <20221204174632.3677-2-jszhang@kernel.org>
+ <4764569.GXAFRqVoOG@diego>
+ <Y44Q/B6THtP38eyL@xhacker>
 MIME-Version: 1.0
-References: <20221201195718.1409782-1-vipinsh@google.com> <20221201195718.1409782-2-vipinsh@google.com>
-In-Reply-To: <20221201195718.1409782-2-vipinsh@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 5 Dec 2022 10:24:20 -0800
-Message-ID: <CANgfPd_sZoW6gRNgs44BbBu4RhwqNPjUO-=biJ++L5d8LpU3zg@mail.gmail.com>
-Subject: Re: [Patch v2 1/2] KVM: x86/mmu: Allocate page table pages on TDP
- splits during dirty log enable on the underlying page's numa node
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     dmatlack@google.com, seanjc@google.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="ygsvAbVCNFXeErrf"
+Content-Disposition: inline
+In-Reply-To: <Y44Q/B6THtP38eyL@xhacker>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 1, 2022 at 11:57 AM Vipin Sharma <vipinsh@google.com> wrote:
->
-> Huge pages are split when dirty log is enabled. New page table pages are
-> allocated based on the current thread NUMA node or mempolicy. This
-> causes inefficient page table accesses if underlying page is on a
-> different NUMA node
->
-> Allocate page table pages on the same NUMA node as the underlying huge
-> page when dirty log is enabled and huge pages are split.
->
-> The performance gain during the pre-copy phase of live migrations of a
-> 416 vCPUs and 11 TiB memory VM  on a 8 node host was seen in the range
-> of 130% to 150%.
->
-> Suggested-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  arch/x86/kvm/mmu.h         |  1 +
->  arch/x86/kvm/mmu/mmu.c     | 19 +++++++++++++++++++
->  arch/x86/kvm/mmu/tdp_mmu.c | 12 ++++++++----
->  include/linux/kvm_host.h   | 15 +++++++++++++++
->  4 files changed, 43 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 6bdaacb6faa0..c960fb096e5c 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -119,6 +119,7 @@ void kvm_mmu_unload(struct kvm_vcpu *vcpu);
->  void kvm_mmu_free_obsolete_roots(struct kvm_vcpu *vcpu);
->  void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu);
->  void kvm_mmu_sync_prev_roots(struct kvm_vcpu *vcpu);
-> +void *kvm_mmu_get_free_page(int nid, gfp_t gfp);
->
->  static inline int kvm_mmu_reload(struct kvm_vcpu *vcpu)
->  {
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 4736d7849c60..0554dfc55553 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -90,6 +90,9 @@ __MODULE_PARM_TYPE(nx_huge_pages_recovery_period_ms, "uint");
->  static bool __read_mostly force_flush_and_sync_on_reuse;
->  module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
->
-> +static bool __read_mostly numa_aware_pagetable = true;
-> +module_param_named(numa_aware_pagetable, numa_aware_pagetable, bool, 0644);
-> +
 
-I'm usually all for having module params to control things, but in
-this case I don't think it provides much value because whether this
-NUMA optimization is useful or not is going to depend more on VM size
-and workload than anything else. If we wanted to make this
-configurable, a VM capability would probably be a better mechanism so
-that userspace could leave it off when running small,
-non-performance-sensitive VMs and turn it on when running large,
-multi-node VMs. A whole-host module parameter seems overly
-restrictive.
+--ygsvAbVCNFXeErrf
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->  /*
->   * When setting this variable to true it enables Two-Dimensional-Paging
->   * where the hardware walks 2 page tables:
-> @@ -6984,3 +6987,19 @@ void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
->         if (kvm->arch.nx_huge_page_recovery_thread)
->                 kthread_stop(kvm->arch.nx_huge_page_recovery_thread);
->  }
-> +
-> +void *kvm_mmu_get_free_page(int nid, gfp_t gfp)
-> +{
-> +       struct page *spt_page;
-> +       void *address = NULL;
-> +
-> +       if (numa_aware_pagetable) {
-> +               spt_page = alloc_pages_node(nid, gfp, 0);
-> +               if (spt_page)
-> +                       address = page_address(spt_page);
-> +       } else {
-> +               address = (void *)__get_free_page(gfp);
-> +       }
-> +
-> +       return address;
-> +}
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 771210ce5181..1607afbfcc0b 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1413,7 +1413,7 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
->         return spte_set;
->  }
->
-> -static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
-> +static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(int nid, gfp_t gfp)
->  {
->         struct kvm_mmu_page *sp;
->
-> @@ -1423,7 +1423,8 @@ static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
->         if (!sp)
->                 return NULL;
->
-> -       sp->spt = (void *)__get_free_page(gfp);
-> +       sp->spt = kvm_mmu_get_free_page(nid, gfp);
-> +
->         if (!sp->spt) {
->                 kmem_cache_free(mmu_page_header_cache, sp);
->                 return NULL;
-> @@ -1437,6 +1438,9 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
->                                                        bool shared)
->  {
->         struct kvm_mmu_page *sp;
-> +       int nid;
-> +
-> +       nid = kvm_pfn_to_refcounted_page_nid(spte_to_pfn(iter->old_spte));
->
->         /*
->          * Since we are allocating while under the MMU lock we have to be
-> @@ -1447,7 +1451,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
->          * If this allocation fails we drop the lock and retry with reclaim
->          * allowed.
->          */
-> -       sp = __tdp_mmu_alloc_sp_for_split(GFP_NOWAIT | __GFP_ACCOUNT);
-> +       sp = __tdp_mmu_alloc_sp_for_split(nid, GFP_NOWAIT | __GFP_ACCOUNT);
->         if (sp)
->                 return sp;
->
-> @@ -1459,7 +1463,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
->                 write_unlock(&kvm->mmu_lock);
->
->         iter->yielded = true;
-> -       sp = __tdp_mmu_alloc_sp_for_split(GFP_KERNEL_ACCOUNT);
-> +       sp = __tdp_mmu_alloc_sp_for_split(nid, GFP_KERNEL_ACCOUNT);
->
->         if (shared)
->                 read_lock(&kvm->mmu_lock);
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 8f874a964313..558ded73f660 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1596,6 +1596,21 @@ void kvm_arch_sync_events(struct kvm *kvm);
->  int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu);
->
->  struct page *kvm_pfn_to_refcounted_page(kvm_pfn_t pfn);
-> +
-> +/*
-> + * Returns the nid of a 'struct page' if pfn is valid and backed by a refcounted
-> + * page, NUMA_NO_NODE otherwise.
-> + */
-> +static inline int kvm_pfn_to_refcounted_page_nid(kvm_pfn_t pfn)
-> +{
-> +       struct page *page = kvm_pfn_to_refcounted_page(pfn);
-> +
-> +       if (page)
-> +               return page_to_nid(page);
-> +       else
-> +               return NUMA_NO_NODE;
-> +}
-> +
->  bool kvm_is_zone_device_page(struct page *page);
->
->  struct kvm_irq_ack_notifier {
-> --
-> 2.39.0.rc0.267.gcb52ba06e7-goog
->
+Heiko, Jisheng,
+
+On Mon, Dec 05, 2022 at 11:40:44PM +0800, Jisheng Zhang wrote:
+> On Mon, Dec 05, 2022 at 04:31:08PM +0100, Heiko St=FCbner wrote:
+> > Am Sonntag, 4. Dezember 2022, 18:46:20 CET schrieb Jisheng Zhang:
+> > > Alternatives live in a different section, so offsets used by jal
+> > > instruction will point to wrong locations after the patch got applied.
+> > >=20
+> > > Similar to arm64, adjust the location to consider that offset.
+> > >=20
+> > > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> > > ---
+> > >  arch/riscv/include/asm/alternative.h |  2 ++
+> > >  arch/riscv/kernel/alternative.c      | 38 ++++++++++++++++++++++++++=
+++
+> > >  arch/riscv/kernel/cpufeature.c       |  3 +++
+> > >  3 files changed, 43 insertions(+)
+> > >=20
+> > > diff --git a/arch/riscv/include/asm/alternative.h b/arch/riscv/includ=
+e/asm/alternative.h
+> > > index c58ec3cc4bc3..33eae9541684 100644
+> > > --- a/arch/riscv/include/asm/alternative.h
+> > > +++ b/arch/riscv/include/asm/alternative.h
+> > > @@ -29,6 +29,8 @@ void apply_module_alternatives(void *start, size_t =
+length);
+> > > =20
+> > >  void riscv_alternative_fix_auipc_jalr(void *alt_ptr, unsigned int le=
+n,
+> > >  				      int patch_offset);
+> > > +void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
+> > > +			       int patch_offset);
+> > > =20
+> > >  struct alt_entry {
+> > >  	void *old_ptr;		 /* address of original instruciton or data  */
+> > > diff --git a/arch/riscv/kernel/alternative.c b/arch/riscv/kernel/alte=
+rnative.c
+> > > index 292cc42dc3be..9d88375624b5 100644
+> > > --- a/arch/riscv/kernel/alternative.c
+> > > +++ b/arch/riscv/kernel/alternative.c
+> > > @@ -125,6 +125,44 @@ void riscv_alternative_fix_auipc_jalr(void *alt_=
+ptr, unsigned int len,
+> > >  	}
+> > >  }
+> > > =20
+> > > +#define to_jal_imm(value)						\
+> > > +	(((value & (RV_J_IMM_10_1_MASK << RV_J_IMM_10_1_OFF)) << RV_I_IMM_1=
+1_0_OPOFF) | \
+> > > +	 ((value & (RV_J_IMM_11_MASK << RV_J_IMM_11_OFF)) << RV_J_IMM_11_OP=
+OFF) | \
+> > > +	 ((value & (RV_J_IMM_19_12_OPOFF << RV_J_IMM_19_12_OFF)) << RV_J_IM=
+M_19_12_OPOFF) | \
+> > > +	 ((value & (1 << RV_J_IMM_SIGN_OFF)) << RV_J_IMM_SIGN_OPOFF))
+> > > +
+> > > +void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
+> > > +			       int patch_offset)
+> > > +{
+> >=20
+> > I think we might want to unfiy this into a common function like
+> >=20
+> > 	riscv_alternative_fix_offsets(...)
+> >=20
+> > so that we only run through the code block once
+> >=20
+> > 	for (i =3D 0; i < num_instr; i++) {
+> > 		if (riscv_insn_is_auipc_jalr(inst1, inst2)) {
+> > 			riscv_alternative_fix_auipc_jalr(...)
+> > 			continue;
+> > 		}
+> >=20
+> > 		if (riscv_insn_is_jal(inst)) {
+> > 			riscv_alternative_fix_jal(...)
+> > 			continue;
+> > 		}
+> > 	}
+> >=20
+> > This would also remove the need from calling multiple functions
+> > after patching alternatives.
+>=20
+> Yesterday, I also wanted to unify the two instruction fix into
+> one. But that would need to roll back the
+> riscv_alternative_fix_auipc_jalr() to your v1 version. And IMHO,
+> it's better if you can split the Zbb string optimizations series
+> into two: one for alternative improvements, another for Zbb. Then
+> we may get the alternative improvements and this inst extension
+> series merged in v6.2-rc1.
+
+Heiko, perhaps you can correct me here:
+
+Last Wednesday you & Palmer agreed that it was too late in the cycle to
+apply any of the stuff touching alternatives?
+If I do recall correctly, gives plenty of time to sort out any
+interdependent changes here.
+
+Could easily be misremembering, wouldn't be the first time!
+
+Thanks,
+Conor.
+
+> > > +	int num_instr =3D len / sizeof(u32);
+> > > +	unsigned int call;
+> > > +	int i;
+> > > +	int imm;
+> > > +
+> > > +	for (i =3D 0; i < num_instr; i++) {
+> > > +		u32 inst =3D riscv_instruction_at(alt_ptr, i);
+> > > +
+> > > +		if (!riscv_insn_is_jal(inst))
+> > > +			continue;
+> > > +
+> > > +		/* get and adjust new target address */
+> > > +		imm =3D RV_EXTRACT_JTYPE_IMM(inst);
+> > > +		imm -=3D patch_offset;
+> > > +
+> > > +		/* pick the original jal */
+> > > +		call =3D inst;
+> > > +
+> > > +		/* drop the old IMMs, all jal imm bits sit at 31:12 */
+> > > +		call &=3D ~GENMASK(31, 12);
+> > > +
+> > > +		/* add the adapted IMMs */
+> > > +		call |=3D to_jal_imm(imm);
+> > > +
+> > > +		/* patch the call place again */
+> > > +		patch_text_nosync(alt_ptr + i * sizeof(u32), &call, 4);
+> > > +	}
+> > > +}
+> > > +
+> > >  /*
+> > >   * This is called very early in the boot process (directly after we =
+run
+> > >   * a feature detect on the boot CPU). No need to worry about other C=
+PUs
+> > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufe=
+ature.c
+> > > index ba62a4ff5ccd..c743f0adc794 100644
+> > > --- a/arch/riscv/kernel/cpufeature.c
+> > > +++ b/arch/riscv/kernel/cpufeature.c
+> > > @@ -324,6 +324,9 @@ void __init_or_module riscv_cpufeature_patch_func=
+(struct alt_entry *begin,
+> > >  			riscv_alternative_fix_auipc_jalr(alt->old_ptr,
+> > >  							 alt->alt_len,
+> > >  							 alt->old_ptr - alt->alt_ptr);
+> > > +			riscv_alternative_fix_jal(alt->old_ptr,
+> > > +						  alt->alt_len,
+> > > +						  alt->old_ptr - alt->alt_ptr);
+> > >  		}
+> > >  	}
+> > >  }
+> > >=20
+> >=20
+> >=20
+> >=20
+> >=20
+
+--ygsvAbVCNFXeErrf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY446PQAKCRB4tDGHoIJi
+0ldEAPwJgljT3AEEEsnqENoQ+sR344tG9T7LxDrQkdoYyWpvjgEAuK3E28qSwJLI
+qWSBSkWndIm2Tg+iQ+ibDY6yCGsg5w4=
+=2L1g
+-----END PGP SIGNATURE-----
+
+--ygsvAbVCNFXeErrf--
