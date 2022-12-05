@@ -2,101 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B6B8864369C
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 22:12:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 534AA6436AE
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 22:20:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232369AbiLEVMs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 16:12:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46810 "EHLO
+        id S233067AbiLEVUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 16:20:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232141AbiLEVMp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 16:12:45 -0500
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C1B0DEC0
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 13:12:44 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id k79so12638937pfd.7
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 13:12:44 -0800 (PST)
+        with ESMTP id S232916AbiLEVUM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 16:20:12 -0500
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D4A922B1E
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 13:20:11 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id h7so14766961wrs.6
+        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 13:20:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9BS9+Fk77r2sqEaU7XwhOF5T7uvKSgLeTZbiEXUGcMo=;
-        b=Ujio/I//LxFB/K3sVL9gmNsGJ2wTNbSjKjPUCByX11FEgdEzOgOqiXg/gRqfeGF7s+
-         BRBVYIHZsjiCW+mopZZqJtOFx8R72OQ+lxd1rMhvvBVaCHky62qMT42W7ann/KH4QVEi
-         7RDo5VhBRC8pzm08UnWL1v8bR/cRgCAMAHzAeJOZ77ZAJGj5jTiVT2fPdcmD7+sDDe5A
-         MCK85CoektbMIOfXCT03EXGqxDh77jznAXbuGFlYRgsEHGnbyTN0uldNNg+81eLCMpdy
-         485zxEh+YV7agkZEO9zh/Zlc6/uD1mmvMxm2NZPEwpELq6RwwxuABQO2pRIN5lh3pL9X
-         0pWA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=tvspzYuiNlqsolHQI9cb6UyP9lHHvgHoYr6XTMSAWqM=;
+        b=dsRKl0ZRF1eSzedOz30CZ2dJwfwV7y4nwtkPD4smqjVfgP9d7dmpoOw6yIogiGj/nZ
+         zU4YOI4+hZ+TE1Gds3vtpKbi8wJai7dTjae9wMfrwM0Qh+NCnHxbgZR4Wjwq+C+wrCxW
+         xUJQCbItYCDNOAV3wRMWxcwcqz3/b1fuV9e1GtzUnooJ/KjQMEgfd/gpOoAMxOQKgcy+
+         zsBJfIzp4ArHQtzPpflCnoX6qgpuTkueVJS2TmxRACY/1Tx1SnuJjup/isAofnnK5gdr
+         13xZMNb/k3wNV0ojVPKXY7OBxHzx/bQCA7biHHZZSWmyU6CsalX1sBY49NGJ4YTKI8LV
+         M6+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9BS9+Fk77r2sqEaU7XwhOF5T7uvKSgLeTZbiEXUGcMo=;
-        b=wzH1JnCVaQyjoIO+S2fUt4blV6GuO9v0e/875mLD70Sm42urOBYXb0U1iA+3F6B3Gj
-         Odd8XHu/iHE6iZKbjblav19Lx+H08NDFjc5+2CEAjF0v+OnFvgcrSscaeh72SbgCTSHR
-         enbB1Br1w54iMX9GyzeF3PFvXx/GRWjou9rV5pm1pdwGOFGes3PE0ir6ICU1ouSRjc6o
-         ylNsECV3sqUezB5fO34fFA3XhoFEpZ8kMnGB8etaFiMWL94U6EdFLpw/WGq/NHWBrB3T
-         jguIWxDqS1OyUia5fz3Us92h8bRgfJGpXDJ3CZPDUfEYXR0ABumE6fDa0+nTfTfMDLw8
-         susA==
-X-Gm-Message-State: ANoB5pnLz7Bf3bEgDwHGQUjnqLjt7J7x6eRqKnAyka0SzdTEKoJTccjW
-        wz9weBoq3QOJpr5VvQsh75fJXw==
-X-Google-Smtp-Source: AA0mqf7NtaiQFi9maqoCvGoM6sFH0HgJLUnKLXrzCG7pSHOZoyGtCDF0ZU4oxE1QMNHHmHHaqhNDEw==
-X-Received: by 2002:aa7:91d6:0:b0:574:c543:f804 with SMTP id z22-20020aa791d6000000b00574c543f804mr49454104pfa.51.1670274763510;
-        Mon, 05 Dec 2022 13:12:43 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id nn6-20020a17090b38c600b00219f8eb271fsm131413pjb.5.2022.12.05.13.12.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Dec 2022 13:12:43 -0800 (PST)
-Date:   Mon, 5 Dec 2022 21:12:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paul Durrant <paul@xen.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Yuan Yao <yuan.yao@intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v2 31/50] KVM: x86: Do CPU compatibility checks in x86
- code
-Message-ID: <Y45ex/CyTY7jYa5D@google.com>
-References: <20221130230934.1014142-1-seanjc@google.com>
- <20221130230934.1014142-32-seanjc@google.com>
- <20221205205246.GA3630770@ls.amr.corp.intel.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tvspzYuiNlqsolHQI9cb6UyP9lHHvgHoYr6XTMSAWqM=;
+        b=QWyWeR/CSWCqsouaV4SZ3BxMDAcBISf5Y/IfSVF3G/1qymIcXvs2eBZ2Twye2gP6xY
+         ICD4YRAUdFuZg++Zhd+wTecPyXvEPXMQWZfkqyj91rN/uYX9L2yyIZn0KpiLqqad+dsl
+         FgLWnzXfmhyndQeRlIShC2LUwzHAozjJKqSu7JzDgyRRxZcreA9IBQpPS4tRuTUC8eVp
+         wU6bqoqiWXYvBevzSNf/jUUpOH0qDhg10f0QQBBk/leSo+13iGPU0t8c1F50LgNVyghJ
+         E1fszB0Q+H3Ae2xkyUX39x/uSwNT2d9M0OS9/udKDYCTSUpKpd0zIUrSjxk1d3vy7ssC
+         f+WA==
+X-Gm-Message-State: ANoB5pnXqY2T6OgPU5Izu2sBEYAfHkRIj9pchAb1aivYVohghfbPLCgR
+        jN6mCIoICUbvdrb17VHW9VfWN2Mis3q/P/TnYxxv3w==
+X-Google-Smtp-Source: AA0mqf6a0X/TGRnbbsp7Qd6SvXvGiMvX6c07IfefpbXvQ6O+QW2rALKmjJ0Ku5ZwK7wmbWmPn0UZRm58qA5zBSGOaH4=
+X-Received: by 2002:a05:6000:124d:b0:242:10a:6667 with SMTP id
+ j13-20020a056000124d00b00242010a6667mr34250640wrx.39.1670275209777; Mon, 05
+ Dec 2022 13:20:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221205205246.GA3630770@ls.amr.corp.intel.com>
+References: <CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com>
+ <Y4qgampvx4lrHDXt@google.com> <Y44NylxprhPn6AoN@x1n> <CALzav=d=N7teRvjQZ1p0fs6i9hjmH7eVppJLMh_Go4TteQqqwg@mail.gmail.com>
+ <Y442dPwu2L6g8zAo@google.com>
+In-Reply-To: <Y442dPwu2L6g8zAo@google.com>
+From:   James Houghton <jthoughton@google.com>
+Date:   Mon, 5 Dec 2022 16:19:56 -0500
+Message-ID: <CADrL8HV_8=ssHSumpQX5bVm2h2J01swdB=+at8=xLr+KtW79MQ@mail.gmail.com>
+Subject: Re: [RFC] Improving userfaultfd scalability for live migration
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     David Matlack <dmatlack@google.com>, Peter Xu <peterx@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Linux MM <linux-mm@kvack.org>, kvm <kvm@vger.kernel.org>,
+        chao.p.peng@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -104,40 +73,138 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 05, 2022, Isaku Yamahata wrote:
-> On Wed, Nov 30, 2022 at 11:09:15PM +0000,
-> > index 66f16458aa97..3571bc968cf8 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -9277,10 +9277,36 @@ static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
-> >  	kvm_pmu_ops_update(ops->pmu_ops);
-> >  }
-> >  
-> > +struct kvm_cpu_compat_check {
-> > +	struct kvm_x86_init_ops *ops;
-> > +	int *ret;
-> 
-> minor nitpick: just int ret. I don't see the necessity of the pointer.
-> Anyway overall it looks good to me.
+On Mon, Dec 5, 2022 at 1:20 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Dec 05, 2022, David Matlack wrote:
+> > On Mon, Dec 5, 2022 at 7:30 AM Peter Xu <peterx@redhat.com> wrote:
+> > > > > == Getting the faulting GPA to userspace ==
+> > > > > KVM_EXIT_MEMORY_FAULT was introduced recently [1] (not yet merged),
+> > > > > and it provides the main functionality we need. We can extend it
+> > > > > easily to support our use case here, and I think we have at least two
+> > > > > options:
+> > > > > - Introduce something like KVM_CAP_MEM_FAULT_REPORTING, which causes
+> > > > > KVM_RUN to exit with exit reason KVM_EXIT_MEMORY_FAULT when it would
+> > > > > otherwise just return -EFAULT (i.e., when kvm_handle_bad_page returns
+> > > > > -EFAULT).
+> > > > > - We're already introducing a new CAP, so just tie the above behavior
+> > > > > to whether or not one of the CAPs (below) is being used.
+> > > >
+> > > > We might even be able to get away with a third option: unconditionally return
+> > > > KVM_EXIT_MEMORY_FAULT instead of -EFAULT when the error occurs when accessing
+> > > > guest memory.
 
-...
+Wouldn't we need a new CAP for this?
 
-> > @@ -9360,6 +9386,14 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-> >  	if (r != 0)
-> >  		goto out_mmu_exit;
-> >  
-> > +	c.ret = &r;
-> > +	c.ops = ops;
-> > +	for_each_online_cpu(cpu) {
-> > +		smp_call_function_single(cpu, kvm_x86_check_cpu_compat, &c, 1);
-> > +		if (r < 0)
-> 
-> Here it can be "c.ret < 0".
+> > > >
+> > > > > == Problems ==
+> > > > > The major problem here is that this only solves the scalability
+> > > > > problem for the KVM demand paging case. Other userfaultfd users, if
+> > > > > they have scalability problems, will need to find another approach.
+> > > >
+> > > > It may not fully solve KVM's problem either.  E.g. if the VM is running nested
+> > > > VMs, many (most?) of the user faults could be triggered by FNAME(walk_addr_generic)
+> > > > via __get_user() when walking L1's EPT tables.
+> >
+> > We could always modify FNAME(walk_addr_generic) to return out to user
+> > space in the same way if that is indeed another bottleneck.
+>
+> Yes, but given that there's a decent chance that solving this problem will add
+> new ABI, I want to make sure that we are confident that we won't end up with gaps
+> in the ABI.  I.e. I don't want to punt the nested case to the future.
+>
+> > > > Disclaimer: I know _very_ little about UFFD.
+> > > >
+> > > > Rather than add yet another flag to gup(), what about flag to say the task doesn't
+> > > > want to wait for UFFD faults?  If desired/necessary, KVM could even toggle the flag
+> > > > in KVM_RUN so that faults that occur outside of KVM ultimately don't send an actual
+> > > > SIGBUGS.
 
-No, because the below goto leads to "return r", i.e. "c.ret" needs to be propagated
-to "r".  That's why the code does the admittedly funky "int *ret" thing.
+I really like this idea! Having KVM_RUN toggle it in
+handle_ept_violation/etc. seems like it would work the best. If we
+toggled it in userspace before KVM_RUN, we would still open ourselves
+up to KVM_RUN exiting without post-copy information (like, if GUP
+failed during instruction emulation), IIUC.
 
-FWIW, this gets cleanup in the end.  "struct kvm_cpu_compat_check" goes away and
-"&r" is passed directly to kvm_x86_check_cpu_compat.
+> >
+> > There are some copy_to/from_user() calls in KVM that cannot easily
+> > exit out to KVM_RUN (for example, in the guts of the emulator IIRC).
+> > But we could use your approach just to wrap the specific call sites
+> > that can return from KVM_RUN.
+>
+> Yeah, it would definitely need to be opt-in.
+>
+> > > > diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
+> > > > index 07c81ab3fd4d..7f66b56dd6e7 100644
+> > > > --- a/fs/userfaultfd.c
+> > > > +++ b/fs/userfaultfd.c
+> > > > @@ -394,7 +394,7 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
+> > > >          * shmem_vm_ops->fault method is invoked even during
+> > > >          * coredumping without mmap_lock and it ends up here.
+> > > >          */
+> > > > -       if (current->flags & (PF_EXITING|PF_DUMPCORE))
+> > > > +       if (current->flags & (PF_EXITING|PF_DUMPCORE|PF_NO_UFFD_WAIT))
+> > > >                 goto out;
+> > >
+> > > I'll have a closer read on the nested part, but note that this path already
+> > > has the mmap lock then it invalidates the goal if we want to avoid taking
+> > > it from the first place, or maybe we don't care?
 
-> > +			goto out_hardware_unsetup;
+Not taking the mmap lock would be helpful, but we still have to take
+it in UFFDIO_CONTINUE, so it's ok if we have to still take it here.
+
+The main goal is to avoid the locks in the userfaultfd wait_queues. If
+we could completely avoid taking the mmap lock for reading in the
+common post-copy case, we would avoid potential latency spikes if
+someone (e.g. khugepaged) came around and grabbed the mmap lock for
+writing.
+
+It seems pretty difficult to make UFFDIO_CONTINUE *not* take the mmap
+lock for reading, but I suppose it could be done with something like
+the per-VMA lock work [2]. If we could avoid taking the lock in
+UFFDIO_CONTINUE, then it seems plausible that we could avoid taking it
+in slow GUP too. So really whether or not we are taking the mmap lock
+(for reading) in the mem fault path isn't a huge deal by itself.
+
+> > >
+> > > If we want to avoid taking the mmap lock at all (hence the fast-gup
+> > > approach), I'd also suggest we don't make it related to uffd at all but
+> > > instead an interface to say "let's check whether the page tables are there
+> > > (walk pgtable by fast-gup only), if not return to userspace".
+>
+> Ooh, good point.  If KVM provided a way for userspace to toggle a "fast-only" flag,
+> then hva_to_pfn() could bail if hva_to_pfn_fast() failed, and I think KVM could
+> just do pagefault_disable/enable() around compatible KVM uaccesses?
+>
+> > > Because IIUC fast-gup has nothing to do with uffd, so it can also be a more
+> > > generic interface.  It's just that if the userspace knows what it's doing
+> > > (postcopy-ing), it knows then the faults can potentially be resolved by
+> > > userfaultfd at this stage.
+> >
+> > Are there any cases where fast-gup can fail while uffd is enabled but
+> > it's not due to uffd? e.g. if a page is swapped out?
+>
+> Undoubtedly.  COW, NUMA balancing, KSM?, etc.  Nit, I don't think "due to uffd"
+> is the right terminology, I think the right phrasing is something like "but can't
+> be resolved by userspace", or maybe "but weren't induced by userspace".  UFFD
+> itself never causes faults.
+>
+> > I don't know what userspace would do in those situations to make forward progress.
+>
+> Access the page from userspace?  E.g. a "LOCK AND -1" would resolve read and write
+> faults without modifying guest memory.
+>
+> That won't work for guests backed by "restricted mem", a.k.a. UPM guests, but
+> restricted mem really should be able to prevent those types of faults in the first
+> place.  SEV guests are the one case I can think of where that approach won't work,
+> since writes will corrupt the guest.  SEV guests can likely be special cased though.
+
+As I mentioned in the original email, I think MADV_POPULATE_WRITE
+would work here (Peter suggested this to me last week, thanks Peter!).
+It would basically call slow GUP for us. So instead of hva_to_pfn_fast
+(fails) -> hva_to_pfn_slow -> slow GUP, we do hva_to_pfn_fast (fails)
+-> exit to userspace -> MADV_POPULATE_WRITE (-> slow GUP) -> KVM_RUN
+-> hva_to_pfn_fast (succeeds).
+
+[2]: https://lwn.net/Articles/906852/
+
+- James
