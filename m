@@ -2,236 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE837643095
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 19:40:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 323B66430BC
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 19:47:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233119AbiLESkh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 13:40:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60530 "EHLO
+        id S231826AbiLESr5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 13:47:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233171AbiLESkF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 13:40:05 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9F6F23159;
-        Mon,  5 Dec 2022 10:36:52 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9E142B80E6F;
-        Mon,  5 Dec 2022 18:36:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5B86C433D6;
-        Mon,  5 Dec 2022 18:36:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670265410;
-        bh=OQdvaLSoaiBbTTeKD827k+4rYmwOJ9xbFSL1aPRYkUc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=G+9IUmmxBh5gC369f8/d/uPzj6Zkb+7CI3SvLvLo7xJHLH0rBA21oTgkmVrPWOViT
-         rBQy1UaWCVNWSCxSCPIsD0emZrqBpxiBVLv3QYarlQaYthhWsUkj1x0WCRTHeM1Wfd
-         D0BEi6k9iFMCNmtqzN+bd0wndTufsRWdRrd+1yJH5Pi6xCLbUzOyki2MUBtjCK7BUr
-         IuOqXY0BT0velhXHVw2msD1Iuf4jDJ6hh8LttPHoxVnbAFFmpw4gENyBZV41CNb2R7
-         QTOchzLUTlY/Hb/Wpq7nlC/ShzOBLStlp9KyP7Mfe+ERAYA69bfrwQFjsiL4r2KrG5
-         uU05A4S2JhIYg==
-Date:   Mon, 5 Dec 2022 18:36:45 +0000
-From:   Conor Dooley <conor@kernel.org>
-To:     Jisheng Zhang <jszhang@kernel.org>
-Cc:     Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 01/13] riscv: fix jal offsets in patched alternatives
-Message-ID: <Y446PdlUPGw5iB71@spud>
-References: <20221204174632.3677-1-jszhang@kernel.org>
- <20221204174632.3677-2-jszhang@kernel.org>
- <4764569.GXAFRqVoOG@diego>
- <Y44Q/B6THtP38eyL@xhacker>
+        with ESMTP id S230280AbiLESrz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 13:47:55 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50846767D
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 10:47:55 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id 21so12275255pfw.4
+        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 10:47:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YrigZB+zmGJr5Zr508QSWdYu0zn32gW/8ZNDwNQuw7g=;
+        b=gSYORyZKVRjLACv6wQaHjSP9S7Pl9wLf7iQVGOXsrs0R4h5msPwAtRg2zHHoTtqHuq
+         KtVURmXwLvL0R6xQiAZ9/g2oJrjFTkdmXUxs50u9XEk2ZtIGm7LeTDAt+eyuSzBhwa4D
+         a2+Yv8ae6BCLyzcK1RjfKTmH6NjU0A2Fz0BMEx1QXpqeQOdugFYnNzaPCr3JJBFuuxJM
+         KDtEu+kO8MYua1hWG2EfeHXI3LAAQstbjQsATz/VzJ8po1WcZMrtUu+k/6ZJijvrMc+G
+         qXiI9Ft1dcXRD8o5Zh4E0M6SybmBhLLLgQWsOLyul5/5t+hwcqZawYpzLSY9GF1ulLDc
+         QNPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YrigZB+zmGJr5Zr508QSWdYu0zn32gW/8ZNDwNQuw7g=;
+        b=7T8e5uI4U1ab632fzP1J9+XriXBgEh02FJKyOAwp1VAco+NQyUzFtKjXI4eHeOl/QM
+         ns1i9vOhDEqQfHbG3DnCVAf6W8FPEfgpU73vNHLbqTn+8rMNeBZHFwO0C2ue6w3ra88W
+         uSuuQHCcC3dY3lDfxNo7LCpeY/qrf9OY0ns8qMpYcZMsA1WJKBhwMbqYsYuBx6pAvPTl
+         +Yon+I/VCo7SE16xspiMIi8z6/T+teMhuKE1Jkm8FH5OEQCzBiMQvdSeUxHEi3czbAR5
+         XtHWgnFqmIjzkRg0tCGAKHLWQ5XHX/gOfGNyXx0lJTgLcy/SR1BjNkWIvruxXSGAgv1C
+         lXUA==
+X-Gm-Message-State: ANoB5pkNR3CbZiGS04hOaZksTJRa0fV76BgWcMdAcmfGMFEFx/D8qYzS
+        pYGSPf8zVXxYBfLZ8Nt/NAr+iQ==
+X-Google-Smtp-Source: AA0mqf7eSz+OKER6mMRXKfL3nLzDoJzbbQPyH8j5i4FRo1/xDCtpYH2euAUKt5wRJ3P7imcwMrOoSw==
+X-Received: by 2002:a63:164f:0:b0:477:f9fa:2a1e with SMTP id 15-20020a63164f000000b00477f9fa2a1emr39836735pgw.87.1670266073492;
+        Mon, 05 Dec 2022 10:47:53 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 129-20020a620687000000b00574ee8cfdabsm7395799pfg.148.2022.12.05.10.47.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Dec 2022 10:47:53 -0800 (PST)
+Date:   Mon, 5 Dec 2022 18:47:49 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Vipin Sharma <vipinsh@google.com>, dmatlack@google.com,
+        pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [Patch v2 1/2] KVM: x86/mmu: Allocate page table pages on TDP
+ splits during dirty log enable on the underlying page's numa node
+Message-ID: <Y4481WPLstNidb9X@google.com>
+References: <20221201195718.1409782-1-vipinsh@google.com>
+ <20221201195718.1409782-2-vipinsh@google.com>
+ <CANgfPd_sZoW6gRNgs44BbBu4RhwqNPjUO-=biJ++L5d8LpU3zg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ygsvAbVCNFXeErrf"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y44Q/B6THtP38eyL@xhacker>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CANgfPd_sZoW6gRNgs44BbBu4RhwqNPjUO-=biJ++L5d8LpU3zg@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Side topic, the shortlog is way, way too long.  The purpose of the shortlog is
+to provide a synopsis of the change, not to describe the change in detail.
 
---ygsvAbVCNFXeErrf
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I also think this patch should be 2/2, with the more generic support added along
+with the module param (or capability) in 1/2.  E.g. to yield something like
 
-Heiko, Jisheng,
+  KVM: x86/mmu: Add a module param to make per-vCPU SPTs NUMA aware
+  KVM: x86/mmu: Honor NUMA awareness for per-VM page table allocations
 
-On Mon, Dec 05, 2022 at 11:40:44PM +0800, Jisheng Zhang wrote:
-> On Mon, Dec 05, 2022 at 04:31:08PM +0100, Heiko St=FCbner wrote:
-> > Am Sonntag, 4. Dezember 2022, 18:46:20 CET schrieb Jisheng Zhang:
-> > > Alternatives live in a different section, so offsets used by jal
-> > > instruction will point to wrong locations after the patch got applied.
-> > >=20
-> > > Similar to arm64, adjust the location to consider that offset.
-> > >=20
-> > > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> > > ---
-> > >  arch/riscv/include/asm/alternative.h |  2 ++
-> > >  arch/riscv/kernel/alternative.c      | 38 ++++++++++++++++++++++++++=
-++
-> > >  arch/riscv/kernel/cpufeature.c       |  3 +++
-> > >  3 files changed, 43 insertions(+)
-> > >=20
-> > > diff --git a/arch/riscv/include/asm/alternative.h b/arch/riscv/includ=
-e/asm/alternative.h
-> > > index c58ec3cc4bc3..33eae9541684 100644
-> > > --- a/arch/riscv/include/asm/alternative.h
-> > > +++ b/arch/riscv/include/asm/alternative.h
-> > > @@ -29,6 +29,8 @@ void apply_module_alternatives(void *start, size_t =
-length);
-> > > =20
-> > >  void riscv_alternative_fix_auipc_jalr(void *alt_ptr, unsigned int le=
-n,
-> > >  				      int patch_offset);
-> > > +void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
-> > > +			       int patch_offset);
-> > > =20
-> > >  struct alt_entry {
-> > >  	void *old_ptr;		 /* address of original instruciton or data  */
-> > > diff --git a/arch/riscv/kernel/alternative.c b/arch/riscv/kernel/alte=
-rnative.c
-> > > index 292cc42dc3be..9d88375624b5 100644
-> > > --- a/arch/riscv/kernel/alternative.c
-> > > +++ b/arch/riscv/kernel/alternative.c
-> > > @@ -125,6 +125,44 @@ void riscv_alternative_fix_auipc_jalr(void *alt_=
-ptr, unsigned int len,
-> > >  	}
-> > >  }
-> > > =20
-> > > +#define to_jal_imm(value)						\
-> > > +	(((value & (RV_J_IMM_10_1_MASK << RV_J_IMM_10_1_OFF)) << RV_I_IMM_1=
-1_0_OPOFF) | \
-> > > +	 ((value & (RV_J_IMM_11_MASK << RV_J_IMM_11_OFF)) << RV_J_IMM_11_OP=
-OFF) | \
-> > > +	 ((value & (RV_J_IMM_19_12_OPOFF << RV_J_IMM_19_12_OFF)) << RV_J_IM=
-M_19_12_OPOFF) | \
-> > > +	 ((value & (1 << RV_J_IMM_SIGN_OFF)) << RV_J_IMM_SIGN_OPOFF))
-> > > +
-> > > +void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
-> > > +			       int patch_offset)
-> > > +{
-> >=20
-> > I think we might want to unfiy this into a common function like
-> >=20
-> > 	riscv_alternative_fix_offsets(...)
-> >=20
-> > so that we only run through the code block once
-> >=20
-> > 	for (i =3D 0; i < num_instr; i++) {
-> > 		if (riscv_insn_is_auipc_jalr(inst1, inst2)) {
-> > 			riscv_alternative_fix_auipc_jalr(...)
-> > 			continue;
-> > 		}
-> >=20
-> > 		if (riscv_insn_is_jal(inst)) {
-> > 			riscv_alternative_fix_jal(...)
-> > 			continue;
-> > 		}
-> > 	}
-> >=20
-> > This would also remove the need from calling multiple functions
-> > after patching alternatives.
->=20
-> Yesterday, I also wanted to unify the two instruction fix into
-> one. But that would need to roll back the
-> riscv_alternative_fix_auipc_jalr() to your v1 version. And IMHO,
-> it's better if you can split the Zbb string optimizations series
-> into two: one for alternative improvements, another for Zbb. Then
-> we may get the alternative improvements and this inst extension
-> series merged in v6.2-rc1.
+On Mon, Dec 05, 2022, Ben Gardon wrote:
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 4736d7849c60..0554dfc55553 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -90,6 +90,9 @@ __MODULE_PARM_TYPE(nx_huge_pages_recovery_period_ms, "uint");
+> >  static bool __read_mostly force_flush_and_sync_on_reuse;
+> >  module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
+> >
+> > +static bool __read_mostly numa_aware_pagetable = true;
+> > +module_param_named(numa_aware_pagetable, numa_aware_pagetable, bool, 0644);
+> > +
+> 
+> I'm usually all for having module params to control things, but in
+> this case I don't think it provides much value because whether this
+> NUMA optimization is useful or not is going to depend more on VM size
+> and workload than anything else. If we wanted to make this
+> configurable, a VM capability would probably be a better mechanism so
+> that userspace could leave it off when running small,
+> non-performance-sensitive VMs
 
-Heiko, perhaps you can correct me here:
+Would we actually want to turn it off in this case?  IIUC, @nid is just the
+preferred node, i.e. failure to allocate for the preferred @nid will result in
+falling back to other nodes, not outright failure.  So the pathological worst
+case scenario would be that for a system with VMs that don't care about performance,
+all of a nodes memory is allocated due to all VMs starting on that node.
 
-Last Wednesday you & Palmer agreed that it was too late in the cycle to
-apply any of the stuff touching alternatives?
-If I do recall correctly, gives plenty of time to sort out any
-interdependent changes here.
+On the flip side, if a system had a mix of VM shapes, I think we'd want even the
+performance insensitive VMs to be NUMA aware so that they can be sequestered on
+their own node(s), i.e. don't "steal" memory from the VMs that are performance
+sensitive and have been affined to a single node.
 
-Could easily be misremembering, wouldn't be the first time!
-
-Thanks,
-Conor.
-
-> > > +	int num_instr =3D len / sizeof(u32);
-> > > +	unsigned int call;
-> > > +	int i;
-> > > +	int imm;
-> > > +
-> > > +	for (i =3D 0; i < num_instr; i++) {
-> > > +		u32 inst =3D riscv_instruction_at(alt_ptr, i);
-> > > +
-> > > +		if (!riscv_insn_is_jal(inst))
-> > > +			continue;
-> > > +
-> > > +		/* get and adjust new target address */
-> > > +		imm =3D RV_EXTRACT_JTYPE_IMM(inst);
-> > > +		imm -=3D patch_offset;
-> > > +
-> > > +		/* pick the original jal */
-> > > +		call =3D inst;
-> > > +
-> > > +		/* drop the old IMMs, all jal imm bits sit at 31:12 */
-> > > +		call &=3D ~GENMASK(31, 12);
-> > > +
-> > > +		/* add the adapted IMMs */
-> > > +		call |=3D to_jal_imm(imm);
-> > > +
-> > > +		/* patch the call place again */
-> > > +		patch_text_nosync(alt_ptr + i * sizeof(u32), &call, 4);
-> > > +	}
-> > > +}
-> > > +
-> > >  /*
-> > >   * This is called very early in the boot process (directly after we =
-run
-> > >   * a feature detect on the boot CPU). No need to worry about other C=
-PUs
-> > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufe=
-ature.c
-> > > index ba62a4ff5ccd..c743f0adc794 100644
-> > > --- a/arch/riscv/kernel/cpufeature.c
-> > > +++ b/arch/riscv/kernel/cpufeature.c
-> > > @@ -324,6 +324,9 @@ void __init_or_module riscv_cpufeature_patch_func=
-(struct alt_entry *begin,
-> > >  			riscv_alternative_fix_auipc_jalr(alt->old_ptr,
-> > >  							 alt->alt_len,
-> > >  							 alt->old_ptr - alt->alt_ptr);
-> > > +			riscv_alternative_fix_jal(alt->old_ptr,
-> > > +						  alt->alt_len,
-> > > +						  alt->old_ptr - alt->alt_ptr);
-> > >  		}
-> > >  	}
-> > >  }
-> > >=20
-> >=20
-> >=20
-> >=20
-> >=20
-
---ygsvAbVCNFXeErrf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY446PQAKCRB4tDGHoIJi
-0ldEAPwJgljT3AEEEsnqENoQ+sR344tG9T7LxDrQkdoYyWpvjgEAuK3E28qSwJLI
-qWSBSkWndIm2Tg+iQ+ibDY6yCGsg5w4=
-=2L1g
------END PGP SIGNATURE-----
-
---ygsvAbVCNFXeErrf--
+> and turn it on when running large, multi-node VMs. A whole-host module
+> parameter seems overly restrictive.
