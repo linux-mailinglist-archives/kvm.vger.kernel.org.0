@@ -2,446 +2,372 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AB99642562
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 10:05:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C40D642580
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 10:12:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232564AbiLEJFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 04:05:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53418 "EHLO
+        id S230143AbiLEJMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 04:12:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232465AbiLEJEE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 04:04:04 -0500
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AAAFF4B
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 01:03:50 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id c1so17478955lfi.7
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 01:03:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=i44XG+9hSjN1C92SauZLYWQ5eRQnzskjLCXxsayBXqk=;
-        b=kLUaIyfDjo9uDZEMoxllqnOwzh0Ffynik+sIGR/qJJyMcTcTd8ut0BTLskjnpO83sL
-         1grwpiJ3wPw/bi8dHj7SHXKusNhBg06UYnB0DUqQiNBmZ+BjJcvXkx9GTXkbjobnQvHV
-         cNBKQZYJe8HrVUI4HiB/zksfSPtas3UdWWGTXO9sGpWGVD7BvwubrkgwZBs0dUvoav3f
-         T5fNwaUu9lYGYk9EOKm2pjX08J3u51nA1s+GCMHEfAjRkbVVmfPJ2NL1AjgOrIhJ7IsZ
-         hIO7hbR6QG2T7KIZdcVzOp3p1C5jBkGV+gkLK2D0A/H1KkTsrsZWnWNdjSlUMgo6Bqgu
-         GTHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=i44XG+9hSjN1C92SauZLYWQ5eRQnzskjLCXxsayBXqk=;
-        b=K6ecqk9cf9rZnS+941li70DsSRkdZRxktHSgF83yGzBw9YizuMKKbb87zoBTl0SOjr
-         y8oA5PK/lRVxAHSKWskrNZVm1LKbE23L4yNO/36lMHH5EZHKPcWhp0T9yAusXcgDNJsT
-         OFt/S+d8vF+gdHMwhLwO7tPBoUEr1j/tAHOfonDIr0hpl9iGvhvHglkS4Whxgjysw7oM
-         uwdjjz3NH7OkEbSoR64yIkA/c5MsLtAxlL7tP8+8zunHFDtgHfFLUax7eNweo4y1GKuo
-         UDaObpf3TSAaFc5GXvVUgyjLlGbDCWeDtPrwhw0UsEaflCmilGzHZWV9Ds9unjdIowUI
-         DPNQ==
-X-Gm-Message-State: ANoB5plxAi3ja6XrHAYHafpmRXxJPamZuy0HdPCZw5ZRSuwLXGcwODyb
-        ACOkSBohJ/q6sjv2Llpr7uxIqeRTHjU8wd58ME0r0Q==
-X-Google-Smtp-Source: AA0mqf6j46Z+eZ9hXs0IXh0pl4WrzxhZnFFlBpMbAM23gDLBqguQPPMz1gW5ctaSgLK5OkqdoG8DwtZm8a/v+BZdtzs=
-X-Received: by 2002:a05:6512:15a8:b0:4a6:3ed2:3717 with SMTP id
- bp40-20020a05651215a800b004a63ed23717mr22998482lfb.637.1670231028239; Mon, 05
- Dec 2022 01:03:48 -0800 (PST)
-MIME-Version: 1.0
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com> <20221202061347.1070246-4-chao.p.peng@linux.intel.com>
-In-Reply-To: <20221202061347.1070246-4-chao.p.peng@linux.intel.com>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Mon, 5 Dec 2022 09:03:11 +0000
-Message-ID: <CA+EHjTyuQSa9YKkGd1OqtEzobuf6Bcghwiz00aaL15ikz7J2Vw@mail.gmail.com>
-Subject: Re: [PATCH v10 3/9] KVM: Extend the memslot to support fd-based
- private memory
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        with ESMTP id S230133AbiLEJMK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 04:12:10 -0500
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27FB1E0;
+        Mon,  5 Dec 2022 01:11:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1670231508; x=1701767508;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=jIpjkPXqHFP5AljxTPk3v1Sc8fFbfq9CBDoizAUK50I=;
+  b=iVNiNluWWo6Ko2alCqYd76IJ8riJsJOA0rSJHcC6m6kskwqqICKReCpv
+   XI5s6wMHtFFwr4dYLAz8wnp7KWefDgQMBIPfesJOS5BxMgh7ncA1Mqmj6
+   pYrrar8vMP+d1uii+oTsxEvNRT90R6UVduhLd9vFOMlWsC2LZpnQY9Bbw
+   HHPEFL0sOsgn5cyVRgVc8PXdfq0x77p/fj02J+BSeXDM9PizPsOOjD2Bm
+   TSxNpjeYn2erWcANRk3x6aTPYA5tfSCdo7d+41tVAb4wQUWEqIFpE62CX
+   sXCkiaahmnHsM5+SVd5PPV6/FwKaoPs+gr6bXuci9HcgHze/4SZfYDt8u
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10551"; a="299727568"
+X-IronPort-AV: E=Sophos;i="5.96,219,1665471600"; 
+   d="scan'208";a="299727568"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2022 01:11:47 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10551"; a="890889277"
+X-IronPort-AV: E=Sophos;i="5.96,219,1665471600"; 
+   d="scan'208";a="890889277"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga006.fm.intel.com with ESMTP; 05 Dec 2022 01:11:46 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Mon, 5 Dec 2022 01:11:45 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Mon, 5 Dec 2022 01:11:45 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Mon, 5 Dec 2022 01:11:45 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.47) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Mon, 5 Dec 2022 01:11:45 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XhUYdD03M7iS9+MeXrXASWlHK4jACN4fpypB1aMlWjV1rcQl+yKYqsieUD63EC6523lQtU4CI2BBjlJJY9NBkMsJ07FvvlPHMU4SZwyhn/DQxvn7ueQdh2VNLgJe/9mtMv7qqG5OefGnTEFEzmW7RsEnw3Hqge1zI0OePOfPPBNJrminc25pz2InsDNMgHemHWDdmXm43ZjumtI6Yt1LpcjQ8B7ogHPV6uRXTY3FJTa/IJAzktVHW3Sleh2mCLlMsCpZXNBmmeSPxkwD+aqB0Isu/B1x/G6qtTOrloM/2SFlU5ADI5PAz39sEfutpvKXB6McMQxPAX+7kakKD+ufVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bukNY57Bv86DC2/i2G8cmSXfRFHqoKgOALdlF1qztV8=;
+ b=Tx6cYqhUDdBeS95ZKQ/q8dd+hGMek+NCtsKAdqdBGMj8M/csQRWvy6jbvMm3jzVnB2NXa6zfuOh+ISlirn2ROOgZkd5m6X+VGOvsGR53/BUjVwwah3epgesA6aOXw01sEMBYPTy1w61zr93AITENWOd/N9KfAKzNtFUDlymV8A4Bpf/MEHXviLFD273W+/nwLKS/tZp5PoTOHINzsFU8mnH1fHj1iZlmkOFZthrHx4DM9K6fGuKbcS4XHCm+LYtbKt8TEAm2OUdxEq4sChq5rwXXRge25jBEGxgp+mIwSNT31aVpk7d6MFfl02dN5SRF//Jb7iHgAT0VuGGHtXuIcg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BY5PR11MB4449.namprd11.prod.outlook.com (2603:10b6:a03:1cc::23)
+ by MN0PR11MB6058.namprd11.prod.outlook.com (2603:10b6:208:376::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.13; Mon, 5 Dec
+ 2022 09:11:39 +0000
+Received: from BY5PR11MB4449.namprd11.prod.outlook.com
+ ([fe80::b289:7d0f:1d94:cd52]) by BY5PR11MB4449.namprd11.prod.outlook.com
+ ([fe80::b289:7d0f:1d94:cd52%5]) with mapi id 15.20.5880.013; Mon, 5 Dec 2022
+ 09:11:39 +0000
+Message-ID: <5147a603-363d-9773-70ee-277c8ff3fd82@intel.com>
+Date:   Mon, 5 Dec 2022 17:11:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.5.0
+Subject: Re: [PATCH bpf v3] selftests/bpf: Fix "missing ENDBR" BUG for
+ destructor kfunc
+To:     Jiri Olsa <olsajiri@gmail.com>
+CC:     Yonghong Song <yhs@meta.com>, <jpoimboe@kernel.org>,
+        <memxor@gmail.com>, <bpf@vger.kernel.org>,
+        Pengfei Xu <pengfei.xu@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
+        Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        "KP Singh" <kpsingh@kernel.org>,
+        Stanislav Fomichev <sdf@google.com>,
+        Hao Luo <haoluo@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Kees Cook <keescook@chromium.org>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>
+References: <20221130101135.26806-1-hu1.chen@intel.com>
+ <a1745d9b-4bfc-50d2-8da6-7631ae2b24d0@meta.com>
+ <aadf45b9-b6e1-256d-c618-31b65e9f7161@intel.com> <Y4iVCmBS1fbTw63o@krava>
+Content-Language: en-US
+From:   "Chen, Hu1" <hu1.chen@intel.com>
+In-Reply-To: <Y4iVCmBS1fbTw63o@krava>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI2PR01CA0036.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:192::22) To BY5PR11MB4449.namprd11.prod.outlook.com
+ (2603:10b6:a03:1cc::23)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BY5PR11MB4449:EE_|MN0PR11MB6058:EE_
+X-MS-Office365-Filtering-Correlation-Id: 09be4329-1b68-45fd-8e5f-08dad6a0b77d
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zzpMds5VGSXqA5H7x86ULzqeB9YYGM7ORlyiyqpQMeCkYV9yDcHYOeCSHXiNJX/o1CEXM5Fi8FUPkXlW45ZL7U4X6ihfc75O6ekrSTqJ9ROh5Ub8ufPYPtdmix3lqn4HtZayE9JyxBuXjJMtGPt8Qvg1TPg+6EZawY+MgfWIOAZ3tfPHbo56S82RWplHs4s7UIeQoErOqdpyI5VccvPiYXW7owS8Kkxpl7G0RCRekINUk+iOP//gyIzL3UXyje70mn3O7eDzzTaiusxv/HUwmE+Nr0pLq+MQtNxdgZhKbLybj2YLJzUmSJL624+RpqlIvMzwEbCuRZVTvzXrwWKNyUpDgMdl2JfcI5NpGM4J+HDFoRlMNyBi8sj6ovEB3tDaMPpEAjzFBAlbJiNsZfh/ZGNcnza+QQZvJ+rSYmOJucIth+iMOv8WtUTN5Bx+p6W1rBixQH960MlUav+nzdvFMGdojeM+ueTO6FHb6iGTZJJdYsZkn889LZVxiZZ8sJZhZXMGZfQH7yI3UiZOoLSIVbehmxZaZDa09nR1S+998I2eYaJNxrfHPYEl1GdAkiOZj2PHkmOHFVAGmMselz7IQPACJNsF39rnWijvTszyEtMbJwqGU2Ygbb6GO3ferrhvHp2dQHlqD08FOAy5HEfcdfkrLNZnJqBQQv+jpEjK1+9lWQHYRKhWqB1R2Ma9raG36MbeTw3X4ZMXHyk1nqSlL1wlGRrrMOFjwTwh6pSKz+orYNoUYP68kqutPnLG9Mk7aJhcQaEFgtZFxEXJ8hdt/GdmiM60Se63azwwIbueBCaXj0ibmgwmOv8msfEfCeAL
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR11MB4449.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(376002)(396003)(136003)(366004)(39860400002)(451199015)(31696002)(86362001)(186003)(8936002)(7406005)(5660300002)(7416002)(36756003)(316002)(54906003)(6916009)(6512007)(26005)(2616005)(41300700001)(6506007)(66476007)(66946007)(66556008)(8676002)(4326008)(53546011)(31686004)(38100700002)(6666004)(966005)(478600001)(2906002)(6486002)(83380400001)(82960400001)(21314003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OTlNSFVUckIxUjBUY292bGNqMzVtZVdQUTdCNklPSzgvb1NBOEtIRjh0NGNY?=
+ =?utf-8?B?eDdNMnA2QzF1eWZnYUVmeTZ3OHdnaSt2Y005UmpveVpabHMyZ3JXaGUwOGhw?=
+ =?utf-8?B?TVlVczFKbnA0ZnRncHFZQmJFT3N4TXNMTm93Nks4ZW5OTDlRVk5xS1VlZ1Zi?=
+ =?utf-8?B?ZGtCY0UwWEZhMHhLOE4vOXFHWGJET3dobG8yNnRoVzBVeGdGVGNnR3dYcUFi?=
+ =?utf-8?B?bTh3TFg1dHF1azFkM2V1MjhKWE83eGhENTgvdlQxSDFVK0tJSHpyQndMbHcy?=
+ =?utf-8?B?cmFUZjV6R29GTTloY29uSCtZWU90bGRTT2piT1B6bTIxQkJhbkkrV0FLa3Y5?=
+ =?utf-8?B?MmRjdE9NYXFLekcvaGhJcGgvUmFJNXh3bkViTEljVW9nS2dTZDJSQkhuYnhS?=
+ =?utf-8?B?bEs1NEZVS0VBQmJhSHJ5aTllQUNnUEJFRTA2enpsS0MyOFdqdE0wWHFoV2J5?=
+ =?utf-8?B?N1BGaEI2MkZzTlQ5MFFVbC8yQnZyVVJtaXZYSEtKZTZQaXhwZTBYRmIzSGV3?=
+ =?utf-8?B?bytSYjErdkwxZlNDVC9oOXdpYW1PRk8yVjJSNUJCT0tzOUZ1VDVJS2pCM3dv?=
+ =?utf-8?B?NHpxM0s5ak1CYlhHLzNzVWRjTkJnaWJtb2ZFUVR0MmNzRlBzb3U5NGZJeHJn?=
+ =?utf-8?B?M05MQWtiYzR2RFJUZThjdjRybnpqdTZZbjNmeHNHVGZmMWM0RVJtRHlOd0ll?=
+ =?utf-8?B?ZGxibmhya1VzdjE4VTkrcU9pZ2c2TXFzWmdCMDYvTTVvS1BKbFBkR2JvQ05F?=
+ =?utf-8?B?bURzekNJcnJnazFyM2lES1QzaTViVDhGT3YvTDNUbkI2RUNWb0ZETGFoZjhw?=
+ =?utf-8?B?WFZ3eityUFhiNTVPRFl6VHg4dTQwT1dqWEpjUTFSOFM0ellsSXpnaWMxeWs2?=
+ =?utf-8?B?NEtvUjd5b0s4bXRvU29HcWpETDM5TGVLVjR3REUzNHkvZGs4SjNXVEVpdU52?=
+ =?utf-8?B?dW9odDR4TXVMbDQ2Y2pyVURwalF3d2VpeW91T2hZbnRWMldTVUpRY2tFa1Mz?=
+ =?utf-8?B?cG9sUWp1a05BUzFjR0pCdG9qalRUb1EwZ0VFMjBQeEN1K3dFRU8wZ0FUaG1Z?=
+ =?utf-8?B?MmhSOHlXYi9ON2NPM21valdtUVBCMldGdEJyQkNuSjZJWmk1NFJCMldGbWpi?=
+ =?utf-8?B?bXdKNEZ6dk1TdFA4SEZrdDdnUkE1YmxGU0ZKbjRKOWxuY0EwTTNLbDNPVlVm?=
+ =?utf-8?B?ZER2M3NNbGJxT3ZQRlBTUkMvYjJrSkMwc0pGS3R6bWNlVjM2Y2xRWjhteTV4?=
+ =?utf-8?B?TWROUE5ENmFrZkQ1b3R3bC9CWDRuajRwVUxnSGZPUTl4SFc1dnJHNXVmTmV6?=
+ =?utf-8?B?OS9ya0xpbDFMb3g5d2hvT3BTeWVHaDlLbWI0ZmpFdDlTSlY4OEs5QUhqek1W?=
+ =?utf-8?B?NWFyYW9yMDNHb3FGN1ZEakkvTGc4ZVEvN3FKamdUbkRlSkVHd2JBMFFpS0Zp?=
+ =?utf-8?B?SVhjK0xWYmJGTHFqS3d2enEyZEt6cVB2eEtDV1FvbGJZWndybWdFaTd0KzVP?=
+ =?utf-8?B?NHdLK0lxWklaL3lrZlA4b2wwN2svcnAzTFljNmQ2UElXTVpKMlMxTGNGWm4z?=
+ =?utf-8?B?Y09WWFNxVXB1OGpyQjIydkJTSURWTFR0VTljY0t3SmhpZ3E4Wm9hOGRMWi9r?=
+ =?utf-8?B?Q1Zhdm1PUisyVWxHb0tBbjNOZ2hTZkRuZ2hRVUJEbW9kUXZBQkM5b1hXaStu?=
+ =?utf-8?B?OHNkcE5tRFkrL1pPZE9qRjMwS3E0T2Z4bWdrWUhBVFV3bytWakNaWk9BdWRs?=
+ =?utf-8?B?Q21MRDQvN2p1b3FnVkZZK3JCMzNDRmxiNU4zNGgwalFTRVhWaHVDK0xEaXd6?=
+ =?utf-8?B?UUIralVlQjdSc29yaGVJSlhmOXhsUlc4RVppNFdjZFZJbWRIYmRhWVlHT1lI?=
+ =?utf-8?B?N0RaMmJpYXROM2l3U3Vub1pEczFrSVo3SVRmSkJyd0JBK0R6QklFRnM1SkRX?=
+ =?utf-8?B?SG1tVElSbHVCblR1cU0vZGRSemdEUlVMQmY4cFA4YXZyMTBRNUhJOEtBRW92?=
+ =?utf-8?B?ZlZYWFp2V1J5aXEwT0U0Z0h2K256SzA3bm9uVGkxQnBhbHNrY3ZkNW5JQXBJ?=
+ =?utf-8?B?YXRJNWR3WFlwU0RHazd1Mkk1WTUxNHllWGgzVVMwSGpOM0tDOGNlb2xGeW0v?=
+ =?utf-8?Q?75QOaSdGAlCRnYUlwillbTRBN?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09be4329-1b68-45fd-8e5f-08dad6a0b77d
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR11MB4449.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2022 09:11:39.3229
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +v0hMhqqN178hFph0BCROA+7UDLY0Unq3x7DXCwxdtYSerC9/z686GXBe5GvDJ41auwNe4AuGUt3jcACDcZ5xQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6058
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Chao,
+On 12/1/2022 7:50 PM, Jiri Olsa wrote:
+>  On Thu, Dec 01, 2022 at 04:07:56PM +0800, Chen, Hu1 wrote:
+> >  On 12/1/2022 12:52 AM, Yonghong Song wrote:
+> > >   
+> > >   
+> > >   On 11/30/22 2:11 AM, Chen Hu wrote:
+> > > > With CONFIG_X86_KERNEL_IBT enabled, the test_verifier triggers the
+> > > > following BUG:
+> > > >
+> > > >    traps: Missing ENDBR: bpf_kfunc_call_test_release+0x0/0x30
+> > > >    ------------[ cut here ]------------
+> > > >    kernel BUG at arch/x86/kernel/traps.c:254!
+> > > >    invalid opcode: 0000 [#1] PREEMPT SMP
+> > > >    <TASK>
+> > > >     asm_exc_control_protection+0x26/0x50
+> > > >    RIP: 0010:bpf_kfunc_call_test_release+0x0/0x30
+> > > >    Code: 00 48 c7 c7 18 f2 e1 b4 e8 0d ca 8c ff 48 c7 c0 00 f2 e1 b4 c3
+> > > >     0f 1f 44 00 00 66 0f 1f 00 0f 1f 44 00 00 0f 0b 31 c0 c3 66 90
+> > > >         <66> 0f 1f 00 0f 1f 44 00 00 48 85 ff 74 13 4c 8d 47 18 b8 ff ff ff
+> > > >     bpf_map_free_kptrs+0x2e/0x70
+> > > >     array_map_free+0x57/0x140
+> > > >     process_one_work+0x194/0x3a0
+> > > >     worker_thread+0x54/0x3a0
+> > > >     ? rescuer_thread+0x390/0x390
+> > > >     kthread+0xe9/0x110
+> > > >     ? kthread_complete_and_exit+0x20/0x20
+> > > >
+> > > > It turns out that ENDBR in bpf_kfunc_call_test_release() is converted to
+> > > > NOP by apply_ibt_endbr().
+> > > >
+> > > > The only text references to this function from kernel side are:
+> > > >
+> > > >    $ grep -r bpf_kfunc_call_test_release
+> > > >    net/bpf/test_run.c:noinline void bpf_kfunc_call_test_release(...)
+> > > >    net/bpf/test_run.c:BTF_ID_FLAGS(func, bpf_kfunc_call_test_release, ...)
+> > > >    net/bpf/test_run.c:BTF_ID(func, bpf_kfunc_call_test_release)
+>   
+>   Alexei mentioned we could now move these ^^^ into kernel module:
+>     https://lore.kernel.org/bpf/CAADnVQJ4xaAacOUpzMG+bm2WK5u=1YLo5kLUL+RP3JZGW3Sfww@mail.gmail.com/
+>   
+>   would it help? not sure objtool scans modules as well
+>   
+>   but we'd still need fix for bpf_obj_new_impl/bpf_obj_drop_impl below
+>   
+>   jirka
+>
+Kernel module may not help on this issue.
 
-On Fri, Dec 2, 2022 at 6:18 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
->
-> In memory encryption usage, guest memory may be encrypted with special
-> key and can be accessed only by the guest itself. We call such memory
-> private memory. It's valueless and sometimes can cause problem to allow
-> userspace to access guest private memory. This new KVM memslot extension
-> allows guest private memory being provided through a restrictedmem
-> backed file descriptor(fd) and userspace is restricted to access the
-> bookmarked memory in the fd.
->
-> This new extension, indicated by the new flag KVM_MEM_PRIVATE, adds two
-> additional KVM memslot fields restricted_fd/restricted_offset to allow
-> userspace to instruct KVM to provide guest memory through restricted_fd.
-> 'guest_phys_addr' is mapped at the restricted_offset of restricted_fd
-> and the size is 'memory_size'.
->
-> The extended memslot can still have the userspace_addr(hva). When use, a
-> single memslot can maintain both private memory through restricted_fd
-> and shared memory through userspace_addr. Whether the private or shared
-> part is visible to guest is maintained by other KVM code.
->
-> A restrictedmem_notifier field is also added to the memslot structure to
-> allow the restricted_fd's backing store to notify KVM the memory change,
-> KVM then can invalidate its page table entries or handle memory errors.
->
-> Together with the change, a new config HAVE_KVM_RESTRICTED_MEM is added
-> and right now it is selected on X86_64 only.
->
-> To make future maintenance easy, internally use a binary compatible
-> alias struct kvm_user_mem_region to handle both the normal and the
-> '_ext' variants.
->
-> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Tested-by: Fuad Tabba <tabba@google.com>
+If the kernel thinks some of the ENDBR instrucitons in module are
+unneeded, it may remove them when load module. Let's take
+bpf_testmod_test_mod_kfunc in bpf_testmod.ko as example.
 
-V9 of this patch [*] had KVM_CAP_PRIVATE_MEM, but it's not in this
-patch series anymore. Any reason you removed it, or is it just an
-omission?
+- Disassembly in bpf_testmod.ko:
+$ objdump -D bpf_testmod.ko | grep bpf_testmod_test_mod_kfunc -A1
+00000000000005e0 <bpf_testmod_test_mod_kfunc>:
+ 5e0:   f3 0f 1e fa             endbr64
+...
 
-[*] https://lore.kernel.org/linux-mm/20221025151344.3784230-3-chao.p.peng@linux.intel.com/
+- Diassembly after kernel load bpf_testmod.ko
+(gdb) disas bpf_testmod_test_mod_kfunc
+Dump of assembler code for function bpf_testmod_test_mod_kfunc:
+   0xffffffffc02015e0 <+0>:     nopw   (%rax)
 
-Thanks,
-/fuad
+Below backtrace shows how ENDBR is converted to nopw when load_module:
+(gdb) bt
+#0  apply_ibt_endbr (start=0xffffffffc0202316, end=  ...
+#1  0xffffffff81096f19 in module_finalize (hdr=0xff  ...
+#2  0xffffffff8118375e in post_relocation (info=0xf  ...
+#3  load_module (info=info@entry=0xffa0000007843e08, ...
 
-> ---
->  Documentation/virt/kvm/api.rst | 40 ++++++++++++++++++++++-----
->  arch/x86/kvm/Kconfig           |  2 ++
->  arch/x86/kvm/x86.c             |  2 +-
->  include/linux/kvm_host.h       |  8 ++++--
->  include/uapi/linux/kvm.h       | 28 +++++++++++++++++++
->  virt/kvm/Kconfig               |  3 +++
->  virt/kvm/kvm_main.c            | 49 ++++++++++++++++++++++++++++------
->  7 files changed, 114 insertions(+), 18 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index bb2f709c0900..99352170c130 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -1319,7 +1319,7 @@ yet and must be cleared on entry.
->  :Capability: KVM_CAP_USER_MEMORY
->  :Architectures: all
->  :Type: vm ioctl
-> -:Parameters: struct kvm_userspace_memory_region (in)
-> +:Parameters: struct kvm_userspace_memory_region(_ext) (in)
->  :Returns: 0 on success, -1 on error
->
->  ::
-> @@ -1332,9 +1332,18 @@ yet and must be cleared on entry.
->         __u64 userspace_addr; /* start of the userspace allocated memory */
->    };
->
-> +  struct kvm_userspace_memory_region_ext {
-> +       struct kvm_userspace_memory_region region;
-> +       __u64 restricted_offset;
-> +       __u32 restricted_fd;
-> +       __u32 pad1;
-> +       __u64 pad2[14];
-> +  };
-> +
->    /* for kvm_memory_region::flags */
->    #define KVM_MEM_LOG_DIRTY_PAGES      (1UL << 0)
->    #define KVM_MEM_READONLY     (1UL << 1)
-> +  #define KVM_MEM_PRIVATE              (1UL << 2)
->
->  This ioctl allows the user to create, modify or delete a guest physical
->  memory slot.  Bits 0-15 of "slot" specify the slot id and this value
-> @@ -1365,12 +1374,29 @@ It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
->  be identical.  This allows large pages in the guest to be backed by large
->  pages in the host.
->
-> -The flags field supports two flags: KVM_MEM_LOG_DIRTY_PAGES and
-> -KVM_MEM_READONLY.  The former can be set to instruct KVM to keep track of
-> -writes to memory within the slot.  See KVM_GET_DIRTY_LOG ioctl to know how to
-> -use it.  The latter can be set, if KVM_CAP_READONLY_MEM capability allows it,
-> -to make a new slot read-only.  In this case, writes to this memory will be
-> -posted to userspace as KVM_EXIT_MMIO exits.
-> +kvm_userspace_memory_region_ext struct includes all fields of
-> +kvm_userspace_memory_region struct, while also adds additional fields for some
-> +other features. See below description of flags field for more information.
-> +It's recommended to use kvm_userspace_memory_region_ext in new userspace code.
-> +
-> +The flags field supports following flags:
-> +
-> +- KVM_MEM_LOG_DIRTY_PAGES to instruct KVM to keep track of writes to memory
-> +  within the slot. For more details, see KVM_GET_DIRTY_LOG ioctl.
-> +
-> +- KVM_MEM_READONLY, if KVM_CAP_READONLY_MEM allows, to make a new slot
-> +  read-only. In this case, writes to this memory will be posted to userspace as
-> +  KVM_EXIT_MMIO exits.
-> +
-> +- KVM_MEM_PRIVATE, if KVM_MEMORY_ATTRIBUTE_PRIVATE is supported (see
-> +  KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES ioctl), to indicate a new slot has private
-> +  memory backed by a file descriptor(fd) and userspace access to the fd may be
-> +  restricted. Userspace should use restricted_fd/restricted_offset in the
-> +  kvm_userspace_memory_region_ext to instruct KVM to provide private memory
-> +  to guest. Userspace should guarantee not to map the same host physical address
-> +  indicated by restricted_fd/restricted_offset to different guest physical
-> +  addresses within multiple memslots. Failed to do this may result undefined
-> +  behavior.
->
->  When the KVM_CAP_SYNC_MMU capability is available, changes in the backing of
->  the memory region are automatically reflected into the guest.  For example, an
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index a8e379a3afee..690cb21010e7 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -50,6 +50,8 @@ config KVM
->         select INTERVAL_TREE
->         select HAVE_KVM_PM_NOTIFIER if PM
->         select HAVE_KVM_MEMORY_ATTRIBUTES
-> +       select HAVE_KVM_RESTRICTED_MEM if X86_64
-> +       select RESTRICTEDMEM if HAVE_KVM_RESTRICTED_MEM
->         help
->           Support hosting fully virtualized guest machines using hardware
->           virtualization extensions.  You will need a fairly recent
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 7f850dfb4086..9a07380f8d3c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12224,7 +12224,7 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
->         }
->
->         for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> -               struct kvm_userspace_memory_region m;
-> +               struct kvm_user_mem_region m;
->
->                 m.slot = id | (i << 16);
->                 m.flags = 0;
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index a784e2b06625..02347e386ea2 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -44,6 +44,7 @@
->
->  #include <asm/kvm_host.h>
->  #include <linux/kvm_dirty_ring.h>
-> +#include <linux/restrictedmem.h>
->
->  #ifndef KVM_MAX_VCPU_IDS
->  #define KVM_MAX_VCPU_IDS KVM_MAX_VCPUS
-> @@ -585,6 +586,9 @@ struct kvm_memory_slot {
->         u32 flags;
->         short id;
->         u16 as_id;
-> +       struct file *restricted_file;
-> +       loff_t restricted_offset;
-> +       struct restrictedmem_notifier notifier;
->  };
->
->  static inline bool kvm_slot_dirty_track_enabled(const struct kvm_memory_slot *slot)
-> @@ -1123,9 +1127,9 @@ enum kvm_mr_change {
->  };
->
->  int kvm_set_memory_region(struct kvm *kvm,
-> -                         const struct kvm_userspace_memory_region *mem);
-> +                         const struct kvm_user_mem_region *mem);
->  int __kvm_set_memory_region(struct kvm *kvm,
-> -                           const struct kvm_userspace_memory_region *mem);
-> +                           const struct kvm_user_mem_region *mem);
->  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
->  void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
->  int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 5d0941acb5bb..13bff963b8b0 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -103,6 +103,33 @@ struct kvm_userspace_memory_region {
->         __u64 userspace_addr; /* start of the userspace allocated memory */
->  };
->
-> +struct kvm_userspace_memory_region_ext {
-> +       struct kvm_userspace_memory_region region;
-> +       __u64 restricted_offset;
-> +       __u32 restricted_fd;
-> +       __u32 pad1;
-> +       __u64 pad2[14];
-> +};
-> +
-> +#ifdef __KERNEL__
-> +/*
-> + * kvm_user_mem_region is a kernel-only alias of kvm_userspace_memory_region_ext
-> + * that "unpacks" kvm_userspace_memory_region so that KVM can directly access
-> + * all fields from the top-level "extended" region.
-> + */
-> +struct kvm_user_mem_region {
-> +       __u32 slot;
-> +       __u32 flags;
-> +       __u64 guest_phys_addr;
-> +       __u64 memory_size;
-> +       __u64 userspace_addr;
-> +       __u64 restricted_offset;
-> +       __u32 restricted_fd;
-> +       __u32 pad1;
-> +       __u64 pad2[14];
-> +};
-> +#endif
-> +
->  /*
->   * The bit 0 ~ bit 15 of kvm_memory_region::flags are visible for userspace,
->   * other bits are reserved for kvm internal use which are defined in
-> @@ -110,6 +137,7 @@ struct kvm_userspace_memory_region {
->   */
->  #define KVM_MEM_LOG_DIRTY_PAGES        (1UL << 0)
->  #define KVM_MEM_READONLY       (1UL << 1)
-> +#define KVM_MEM_PRIVATE                (1UL << 2)
->
->  /* for KVM_IRQ_LINE */
->  struct kvm_irq_level {
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index effdea5dd4f0..d605545d6dd1 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -89,3 +89,6 @@ config KVM_XFER_TO_GUEST_WORK
->
->  config HAVE_KVM_PM_NOTIFIER
->         bool
-> +
-> +config HAVE_KVM_RESTRICTED_MEM
-> +       bool
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 7f0f5e9f2406..b882eb2c76a2 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1532,7 +1532,7 @@ static void kvm_replace_memslot(struct kvm *kvm,
->         }
->  }
->
-> -static int check_memory_region_flags(const struct kvm_userspace_memory_region *mem)
-> +static int check_memory_region_flags(const struct kvm_user_mem_region *mem)
->  {
->         u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
->
-> @@ -1934,7 +1934,7 @@ static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
->   * Must be called holding kvm->slots_lock for write.
->   */
->  int __kvm_set_memory_region(struct kvm *kvm,
-> -                           const struct kvm_userspace_memory_region *mem)
-> +                           const struct kvm_user_mem_region *mem)
->  {
->         struct kvm_memory_slot *old, *new;
->         struct kvm_memslots *slots;
-> @@ -2038,7 +2038,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
->
->  int kvm_set_memory_region(struct kvm *kvm,
-> -                         const struct kvm_userspace_memory_region *mem)
-> +                         const struct kvm_user_mem_region *mem)
->  {
->         int r;
->
-> @@ -2050,7 +2050,7 @@ int kvm_set_memory_region(struct kvm *kvm,
->  EXPORT_SYMBOL_GPL(kvm_set_memory_region);
->
->  static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
-> -                                         struct kvm_userspace_memory_region *mem)
-> +                                         struct kvm_user_mem_region *mem)
->  {
->         if ((u16)mem->slot >= KVM_USER_MEM_SLOTS)
->                 return -EINVAL;
-> @@ -4698,6 +4698,33 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
->         return fd;
->  }
->
-> +#define SANITY_CHECK_MEM_REGION_FIELD(field)                                   \
-> +do {                                                                           \
-> +       BUILD_BUG_ON(offsetof(struct kvm_user_mem_region, field) !=             \
-> +                    offsetof(struct kvm_userspace_memory_region, field));      \
-> +       BUILD_BUG_ON(sizeof_field(struct kvm_user_mem_region, field) !=         \
-> +                    sizeof_field(struct kvm_userspace_memory_region, field));  \
-> +} while (0)
-> +
-> +#define SANITY_CHECK_MEM_REGION_EXT_FIELD(field)                                       \
-> +do {                                                                                   \
-> +       BUILD_BUG_ON(offsetof(struct kvm_user_mem_region, field) !=                     \
-> +                    offsetof(struct kvm_userspace_memory_region_ext, field));          \
-> +       BUILD_BUG_ON(sizeof_field(struct kvm_user_mem_region, field) !=                 \
-> +                    sizeof_field(struct kvm_userspace_memory_region_ext, field));      \
-> +} while (0)
-> +
-> +static void kvm_sanity_check_user_mem_region_alias(void)
-> +{
-> +       SANITY_CHECK_MEM_REGION_FIELD(slot);
-> +       SANITY_CHECK_MEM_REGION_FIELD(flags);
-> +       SANITY_CHECK_MEM_REGION_FIELD(guest_phys_addr);
-> +       SANITY_CHECK_MEM_REGION_FIELD(memory_size);
-> +       SANITY_CHECK_MEM_REGION_FIELD(userspace_addr);
-> +       SANITY_CHECK_MEM_REGION_EXT_FIELD(restricted_offset);
-> +       SANITY_CHECK_MEM_REGION_EXT_FIELD(restricted_fd);
-> +}
-> +
->  static long kvm_vm_ioctl(struct file *filp,
->                            unsigned int ioctl, unsigned long arg)
->  {
-> @@ -4721,14 +4748,20 @@ static long kvm_vm_ioctl(struct file *filp,
->                 break;
->         }
->         case KVM_SET_USER_MEMORY_REGION: {
-> -               struct kvm_userspace_memory_region kvm_userspace_mem;
-> +               struct kvm_user_mem_region mem;
-> +               unsigned long size = sizeof(struct kvm_userspace_memory_region);
-> +
-> +               kvm_sanity_check_user_mem_region_alias();
->
->                 r = -EFAULT;
-> -               if (copy_from_user(&kvm_userspace_mem, argp,
-> -                                               sizeof(kvm_userspace_mem)))
-> +               if (copy_from_user(&mem, argp, size))
-> +                       goto out;
-> +
-> +               r = -EINVAL;
-> +               if (mem.flags & KVM_MEM_PRIVATE)
->                         goto out;
->
-> -               r = kvm_vm_ioctl_set_memory_region(kvm, &kvm_userspace_mem);
-> +               r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
->                 break;
->         }
->         case KVM_GET_DIRTY_LOG: {
-> --
-> 2.25.1
->
+Thanks
+Chen Hu
+> > >   
+> > >   We have some other function like this. For example, some newly added
+> > >   functions like bpf_obj_new_impl(), bpf_obj_drop_impl(), do they have
+> > >   the same missing endbr problem? If this is the case, we need a
+> > >   general solution.
+> > > 
+> > 
+> >   bpf_obj_new_impl(), bpf_obj_drop_impl() also miss the ENDBR. Below is
+> >   the disassembly on bpf-next kernel:
+> > 
+> >   (gdb) disas bpf_obj_drop_impl
+> >   Dump of assembler code for function bpf_obj_drop_impl:
+> >      0xffffffff81288e40 <+0>:     nopw   (%rax)
+> >      0xffffffff81288e44 <+4>:     nopl   0x0(%rax,%rax,1)
+> >      0xffffffff81288e49 <+9>:     push   %rbp
+> >      ...
+> > 
+> >   (gdb) disas bpf_obj_new_impl
+> >   Dump of assembler code for function bpf_obj_new_impl:
+> >      0xffffffff81288cd0 <+0>:     nopw   (%rax)
+> >      0xffffffff81288cd4 <+4>:     nopl   0x0(%rax,%rax,1)
+> >      0xffffffff81288cd9 <+9>:     push   %rbp
+> >      ...
+> > 
+> >   The first insn in the bpf_obj_new_impl has been converted from ENDBR to
+> >   nopw by objtool. If the function is indirectly called on IBT enabled CPU
+> >   (Tigerlake for example), #CP raise.
+> > 
+> >   Looks like the possible fix in this patch is general?
+> >   If we don't want to seal a funciton, we use macro IBT_NOSEAL to claim.
+> >   IBT_NOSEAL just creates throwaway dummy compile-time references to the
+> >   functions. The section is already thrown away when kernel run. See
+> >   commit e27e5bea956c by Josh Poimboeuf.
+> > 
+> > > >
+> > > > but it may be called from bpf program as kfunc. (no other caller from
+> > > > kernel)
+> > > >
+> > > > This fix creates dummy references to destructor kfuncs so ENDBR stay
+> > > > there.
+> > > >
+> > > > Also modify macro XXX_NOSEAL slightly:
+> > > > - ASM_IBT_NOSEAL now stands for pure asm
+> > > > - IBT_NOSEAL can be used directly in C
+> > > >
+> > > > Signed-off-by: Chen Hu <hu1.chen@intel.com>
+> > > > Tested-by: Pengfei Xu <pengfei.xu@intel.com>
+> > > > ---
+> > > > v3:
+> > > > - Macro go to IBT related header as suggested by Jiri Olsa
+> > > > - Describe reference to the func clearly in commit message as suggested
+> > > >    by Peter Zijlstra and Jiri Olsa
+> > > >   v2: https://lore.kernel.org/all/20221122073244.21279-1-hu1.chen@intel.com/
+> > > >
+> > > > v1: https://lore.kernel.org/all/20221121085113.611504-1-hu1.chen@intel.com/
+> > > >
+> > > >   arch/x86/include/asm/ibt.h | 6 +++++-
+> > > >   arch/x86/kvm/emulate.c     | 2 +-
+> > > >   net/bpf/test_run.c         | 5 +++++
+> > > >   3 files changed, 11 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/arch/x86/include/asm/ibt.h b/arch/x86/include/asm/ibt.h
+> > > > index 9b08082a5d9f..be86dc31661c 100644
+> > > > --- a/arch/x86/include/asm/ibt.h
+> > > > +++ b/arch/x86/include/asm/ibt.h
+> > > > @@ -36,11 +36,14 @@
+> > > >    * the function as needing to be "sealed" (i.e. ENDBR converted to NOP by
+> > > >    * apply_ibt_endbr()).
+> > > >    */
+> > > > -#define IBT_NOSEAL(fname)                \
+> > > > +#define ASM_IBT_NOSEAL(fname)                \
+> > > >       ".pushsection .discard.ibt_endbr_noseal\n\t"    \
+> > > >       _ASM_PTR fname "\n\t"                \
+> > > >       ".popsection\n\t"
+> > > >   +#define IBT_NOSEAL(name)                \
+> > > > +    asm(ASM_IBT_NOSEAL(#name))
+> > > > +
+> > > >   static inline __attribute_const__ u32 gen_endbr(void)
+> > > >   {
+> > > >       u32 endbr;
+> > > > @@ -94,6 +97,7 @@ extern __noendbr void ibt_restore(u64 save);
+> > > >   #ifndef __ASSEMBLY__
+> > > >     #define ASM_ENDBR
+> > > > +#define ASM_IBT_NOSEAL(name)
+> > > >   #define IBT_NOSEAL(name)
+> > > >     #define __noendbr
+> > > > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> > > > index 4a43261d25a2..d870c8bb5831 100644
+> > > > --- a/arch/x86/kvm/emulate.c
+> > > > +++ b/arch/x86/kvm/emulate.c
+> > > > @@ -327,7 +327,7 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
+> > > >       ".type " name ", @function \n\t" \
+> > > >       name ":\n\t" \
+> > > >       ASM_ENDBR \
+> > > > -    IBT_NOSEAL(name)
+> > > > +    ASM_IBT_NOSEAL(name)
+> > > >     #define FOP_FUNC(name) \
+> > > >       __FOP_FUNC(#name)
+> > > > diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+> > > > index fcb3e6c5e03c..9e9c8e8d50d7 100644
+> > > > --- a/net/bpf/test_run.c
+> > > > +++ b/net/bpf/test_run.c
+> > > > @@ -601,6 +601,11 @@ noinline void bpf_kfunc_call_memb_release(struct prog_test_member *p)
+> > > >   {
+> > > >   }
+> > > >   +#ifdef CONFIG_X86_KERNEL_IBT
+> > > > +IBT_NOSEAL(bpf_kfunc_call_test_release);
+> > > > +IBT_NOSEAL(bpf_kfunc_call_memb_release);
+> > > > +#endif
+> > > > +
+> > > >   noinline void bpf_kfunc_call_memb1_release(struct prog_test_member1 *p)
+> > > >   {
+> > > >       WARN_ON_ONCE(1);
