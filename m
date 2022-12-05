@@ -2,54 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9207643964
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 00:23:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D54D1643969
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 00:23:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231290AbiLEXXv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 18:23:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44064 "EHLO
+        id S231888AbiLEXXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 18:23:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiLEXXs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 18:23:48 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A7DE18353
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 15:23:48 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id o31-20020a17090a0a2200b00219a2904952so6269864pjo.0
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 15:23:48 -0800 (PST)
+        with ESMTP id S231715AbiLEXXv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 18:23:51 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96DBE1835C
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 15:23:50 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id i19-20020a63e913000000b004705d1506a6so11004803pgh.13
+        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 15:23:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=iTzvLGTWLJU89YMgwwnvlvr5Kpl1FGcMOvQ/pbHMzbM=;
-        b=KyLc9GV6/CUhfLU9IMoTcRlJBolS4+1t6RFTh27gP6FNWM6iBDARcbicN/NRlkk2pG
-         WNxXokZ7XWgT0JLwBf+ynDuBAueLnOZ5JIBM2uEM3nLhWon+4dRxcWASghQUKXVxDKjH
-         iaKcEiGQOXpuTi5eY8wv7Wwd79mDU7ZiXvV4EMZMOqU6gx6sdNTGEQU418uoFyU/MReQ
-         3x+tGwBIwIcdVA4w8/hE7fxnLR5UqQWJ3W2eLdCCykT3kmulLBLBFnzZskF851JmZWG5
-         ct+FjREgWuWF2RhVDJApm64ZCPyM015zcTrOuq8Y7uQ/+phMgvoX+mLMRifE6uAPHrVL
-         0O4w==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bJsitMNrFwlWnkUPP+bzm0yFNlRi9o93p/cQJywTOXc=;
+        b=BeFPFGkoIaSJW4OwyhtPykbuDKK8eg9FRG8ZrYy513qt1mteOhpFvR+ZPC6SOxjT0E
+         Ee2a1RsDEA/8rV9K6WEagcDYhhMxcc3Yi+B2FRdqowFjfFx0ZExIpmGTZ25uFRzhVLSE
+         c9rrECLvcTpVHxi/O5g0MwFLcMlc5qK29gKnctJZIQPcsuR1Wdj2Zb2xBdSKYN5GaCXb
+         X9TW7aLUFnXHDIXxbaA8Wq52e/WoFR3oW6XsdtdF00zBsQ3ZSCRV+wyRlC6C2aRSHECH
+         BJRtfzsp8EUTLT84jRRMN/9ysYGTzHzE9yuLYCvBVSPlM4qkJZSMPznYV6Eatrb2gZXV
+         9qVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iTzvLGTWLJU89YMgwwnvlvr5Kpl1FGcMOvQ/pbHMzbM=;
-        b=KSVypQvCk2TH5+bhj5C8Elv94fhPAIniPDEa5MEKs2lltkcJRbGFf9F5VenNbYC1LP
-         L8B0T+Aa7FDY1NHIh88oJ+JMpULPBBrqLliOHGT6nO8yIK95KDKCtOi14HuEkObpShfT
-         W2ysjXZ2JJDS25Xo9hxz6cLDuoLg6bNznz8hRW7yDb5sXerDQAY7IQfBb1oX85iNs64U
-         1S8nR4bvqHh9SUHJrjjwHaH0jTZ60uvw7GoCZPN2Ewee3g1XHCEh9dkqzOrUy1kUmEyP
-         mRGOBvyclA0OU0CokNC6jBmko+pdJPuQqEA/Y/tjfpSZt/pKLek7C5qL1nvDYeQ0H2P4
-         sAJw==
-X-Gm-Message-State: ANoB5pm9Ub6kC1blhlGwUJz2/0hfPf1U5n2YhQNT4eBeGgpRM39rJZiX
-        x9af+wsOpI28/ERU1DePkG2wYWfEk/YeKBQ7
-X-Google-Smtp-Source: AA0mqf5CdXisKqVqfLw5y4zzdp9qmnLMHkYaZESKkO1KmxpM9AyOvGpCtQMPOR8mVUx0v3ibazqfAsfgDQ3kieyR
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bJsitMNrFwlWnkUPP+bzm0yFNlRi9o93p/cQJywTOXc=;
+        b=LEaQb+R8mrLqjhNnbAAfhmSavd6dUBEkeXOLlenbBS/vI5TOz8r9p65TFXSm5nrXK8
+         yGpKI2lvvxzBCvbgGC5YG58VHKTP5QvWxp+31JYCwfpM3HlXEchNW+LhEXVli65sj1dG
+         r5CpVB/Q9i0mjisiUete4yWtz7Cm3L+KfYNRbrhZOfcar6SjcR79mtBQ4BhPC5DVAwS1
+         EAM0l+0vRh8ASQkZszgNmy8QdemvD57w6wduifmKTUgApz7bUQmFtSaXnpsJ+74EMiBP
+         1phWhJj94j8+ykJBbZudlZGobZk4LUSW2aJM9GJbcl315uQLiaTfxjXtDchMKjy3Bfo7
+         7OnA==
+X-Gm-Message-State: ANoB5pmCf/26IMVB25TLyyCKORjCmgw3XQGtCSxDamjbjKGUzbM9zgbw
+        SCOk/2LMHXh36ujCEG63lb6X/actwG3gK3BE
+X-Google-Smtp-Source: AA0mqf70IPLrIk8kUk34OCEAZ8JdYwWW/LqbN4So04STHjgiA+SBHYffgYaXuzj2UbySbdE8Lbsi9J5g63+gR9VL
 X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
- (user=vannapurve job=sendgmr) by 2002:a17:90a:7d0f:b0:218:d50e:5af8 with SMTP
- id g15-20020a17090a7d0f00b00218d50e5af8mr67751305pjl.26.1670282627518; Mon,
- 05 Dec 2022 15:23:47 -0800 (PST)
-Date:   Mon,  5 Dec 2022 23:23:35 +0000
+ (user=vannapurve job=sendgmr) by 2002:a17:90a:2dc8:b0:219:baef:3ba with SMTP
+ id q8-20020a17090a2dc800b00219baef03bamr11402807pjm.6.1670282630094; Mon, 05
+ Dec 2022 15:23:50 -0800 (PST)
+Date:   Mon,  5 Dec 2022 23:23:36 +0000
+In-Reply-To: <20221205232341.4131240-1-vannapurve@google.com>
 Mime-Version: 1.0
+References: <20221205232341.4131240-1-vannapurve@google.com>
 X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221205232341.4131240-1-vannapurve@google.com>
-Subject: [V2 PATCH 0/6] KVM: selftests: selftests for fd-based private memory
+Message-ID: <20221205232341.4131240-2-vannapurve@google.com>
+Subject: [V2 PATCH 1/6] KVM: x86: Add support for testing private memory
 From:   Vishal Annapurve <vannapurve@google.com>
 To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kselftest@vger.kernel.org
@@ -74,7 +76,7 @@ Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,61 +84,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series implements selftests targeting the feature floated by Chao via:
-https://lore.kernel.org/lkml/20221202061347.1070246-10-chao.p.peng@linux.intel.com/T/
+Introduce HAVE_KVM_PRIVATE_MEM_TESTING config to be able to test fd based
+approach to support private memory with non-confidential selftest VMs.
+To support this testing few important aspects need to be considered from
+the perspective of selftests -
+* KVM needs to know whether the access from guest VM is private or shared.
+Confidential VMs (SNP/TDX) carry a dedicated bit in gpa that can be used by
+KVM to deduce the nature of the access.
+Non-confidential VMs don't have mechanism to carry/convey such an
+information to KVM. So KVM just relies on what attributes are set by
+userspace VMM keeping the userspace VMM in the TCB for the testing
+purposes.
+* arch_private_mem_supported is updated to allow private memory logic to
+work with non-confidential vm selftests.
 
-Below changes aim to test the fd based approach for guest private memory
-in context of normal (non-confidential) VMs executing on non-confidential
-platforms.
+Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+---
+ arch/x86/kvm/mmu/mmu_internal.h | 6 +++++-
+ virt/kvm/Kconfig                | 4 ++++
+ virt/kvm/kvm_main.c             | 3 ++-
+ 3 files changed, 11 insertions(+), 2 deletions(-)
 
-private_mem_test.c file adds selftest to access private memory from the
-guest via private/shared accesses and checking if the contents can be
-leaked to/accessed by vmm via shared memory view before/after conversions.
-
-Updates in V2:
-1) Simplified vcpu run loop implementation API
-2) Removed VM creation logic from private mem library
-
-Updates in V1 (Compared to RFC v3 patches):
-1) Incorporated suggestions from Sean around simplifying KVM changes
-2) Addressed comments from Sean
-3) Added private mem test with shared memory backed by 2MB hugepages.
-
-V1 series:
-https://lore.kernel.org/lkml/20221111014244.1714148-1-vannapurve@google.com/T/
-
-This series has dependency on following patches:
-1) V10 series patches from Chao mentioned above.
-
-Github link for the patches posted as part of this series:
-https://github.com/vishals4gh/linux/commits/priv_memfd_selftests_v2
-
-Vishal Annapurve (6):
-  KVM: x86: Add support for testing private memory
-  KVM: Selftests: Add support for private memory
-  KVM: selftests: x86: Add IS_ALIGNED/IS_PAGE_ALIGNED helpers
-  KVM: selftests: x86: Add helpers to execute VMs with private memory
-  KVM: selftests: Add get_free_huge_2m_pages
-  KVM: selftests: x86: Add selftest for private memory
-
- arch/x86/kvm/mmu/mmu_internal.h               |   6 +-
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   2 +
- .../selftests/kvm/include/kvm_util_base.h     |  15 +-
- .../testing/selftests/kvm/include/test_util.h |   5 +
- .../kvm/include/x86_64/private_mem.h          |  24 ++
- .../selftests/kvm/include/x86_64/processor.h  |   1 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  58 ++++-
- tools/testing/selftests/kvm/lib/test_util.c   |  29 +++
- .../selftests/kvm/lib/x86_64/private_mem.c    | 139 ++++++++++++
- .../selftests/kvm/x86_64/private_mem_test.c   | 212 ++++++++++++++++++
- virt/kvm/Kconfig                              |   4 +
- virt/kvm/kvm_main.c                           |   3 +-
- 13 files changed, 490 insertions(+), 9 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/include/x86_64/private_mem.h
- create mode 100644 tools/testing/selftests/kvm/lib/x86_64/private_mem.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_test.c
-
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 5ccf08183b00..e2f508db0b6e 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -263,6 +263,8 @@ enum {
+ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 					u32 err, bool prefetch)
+ {
++	bool is_tdp = likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault);
++
+ 	struct kvm_page_fault fault = {
+ 		.addr = cr2_or_gpa,
+ 		.error_code = err,
+@@ -272,13 +274,15 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 		.rsvd = err & PFERR_RSVD_MASK,
+ 		.user = err & PFERR_USER_MASK,
+ 		.prefetch = prefetch,
+-		.is_tdp = likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault),
++		.is_tdp = is_tdp,
+ 		.nx_huge_page_workaround_enabled =
+ 			is_nx_huge_page_enabled(vcpu->kvm),
+ 
+ 		.max_level = KVM_MAX_HUGEPAGE_LEVEL,
+ 		.req_level = PG_LEVEL_4K,
+ 		.goal_level = PG_LEVEL_4K,
++		.is_private = IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING) && is_tdp &&
++				kvm_mem_is_private(vcpu->kvm, cr2_or_gpa >> PAGE_SHIFT),
+ 	};
+ 	int r;
+ 
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index d605545d6dd1..1e326367a21c 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -92,3 +92,7 @@ config HAVE_KVM_PM_NOTIFIER
+ 
+ config HAVE_KVM_RESTRICTED_MEM
+        bool
++
++config HAVE_KVM_PRIVATE_MEM_TESTING
++       bool "Private memory selftests"
++       depends on HAVE_KVM_MEMORY_ATTRIBUTES && HAVE_KVM_RESTRICTED_MEM
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ac835fc77273..d2d829d23442 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1262,7 +1262,8 @@ int __weak kvm_arch_create_vm_debugfs(struct kvm *kvm)
+ 
+ bool __weak kvm_arch_has_private_mem(struct kvm *kvm)
+ {
+-	return false;
++	return IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING);
++
+ }
+ 
+ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
 
