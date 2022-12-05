@@ -2,197 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D20E36429C6
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 14:44:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08C366429CC
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 14:44:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232283AbiLENoL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 08:44:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37100 "EHLO
+        id S230123AbiLENou (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 08:44:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232383AbiLENnq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 08:43:46 -0500
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE6AC1D669
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 05:43:14 -0800 (PST)
-Received: by mail-wr1-x42f.google.com with SMTP id o5so18666592wrm.1
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 05:43:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PSfDwZPeG8ibIdq5sbKvkL1VsqUlUscnguEB5oSOxSc=;
-        b=ZhFQOk5sHEFKzbm8fBjTNTecUMb6srGFq09hOHXW6kISqLW8gBDE3jNN0izPXaaE3X
-         DVOXi2YDNUqfzOv8xB3pFAgcYIuK1FmRV4esx3+KJ3cyZFEiVKFzu7NPXpA2+JEoADaD
-         13amI67POzIZYrUkAoNZH8B4OE4iZiDvYqvAJYQnER8FK5PwsZr6ShoWEvnTLGky3x/A
-         HhQd1huG4wKL1p1O37IhT2z73k7GLly9/OUH08rQU99hjNPkV9UzyOOqX2HNMEd3rXei
-         1tFaqBk4u8sgKKmkYUA8ncwGRbe6Jl7fYsJpJVyDCV6HGhhlyfUEgS5LpfZztLytNEiy
-         wlog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PSfDwZPeG8ibIdq5sbKvkL1VsqUlUscnguEB5oSOxSc=;
-        b=orxaqOv/9R9e3rjAW6qRg/Iw1xDqMd5Dn/xn9LR9BP051Pk02qlKvVRbhQc8SxM5/u
-         PDShZ68CGp5uQJwJUMUvQ75ZLXeythMm8XCRny8tVR6KA+dMN2kChqrdzYZJNkhrexWx
-         WLaGUlwgAJsgpfnDy/4UvAJL1U/h6/LLzsA/OZZhgs9TOP6KhtEvx5jdW1nZNY/ehLk+
-         Qv/ow/0VfIGy0azNR4a/+cYN2BIbHcijzyJV/3WkrDK7bWZZ4Fpwh3crU6/EB5LJzX+e
-         8uTUpH+mpKG3p0rHmYeXNSrYlEvU7bwiHM35flBivtlxUOx2vazpLhMgaDPlt8Hc/2cQ
-         kzSg==
-X-Gm-Message-State: ANoB5pnj8guCJmnbHFsQwlVfYPfRg1xVrkHO87zo2oprkzT0u5082F1t
-        aqYQMYkfI4JCIJ28FmlAoHtsuw==
-X-Google-Smtp-Source: AA0mqf68CFsZMOCd88AhAlMizn4w9UrnERv3KIachtaDvBlHTCAHLOEwLF5Gb8KkdqSMJF8Id58Pag==
-X-Received: by 2002:a5d:6e8e:0:b0:236:5e77:b58e with SMTP id k14-20020a5d6e8e000000b002365e77b58emr44809235wrz.320.1670247793408;
-        Mon, 05 Dec 2022 05:43:13 -0800 (PST)
-Received: from ?IPV6:2a02:6b6a:b4bd:0:4759:d90c:43ca:e8f0? ([2a02:6b6a:b4bd:0:4759:d90c:43ca:e8f0])
-        by smtp.gmail.com with ESMTPSA id n3-20020a05600c3b8300b003cfbbd54178sm28603622wms.2.2022.12.05.05.43.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Dec 2022 05:43:12 -0800 (PST)
-Message-ID: <66bc7368-aabc-9ec3-f4ba-a3bbeed5938b@bytedance.com>
-Date:   Mon, 5 Dec 2022 13:43:12 +0000
+        with ESMTP id S232399AbiLENoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 08:44:25 -0500
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2063.outbound.protection.outlook.com [40.107.94.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2226ACE27
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 05:43:47 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JXIt1BbaNXcCoqNmJsae2juSxsdltu2eTDsWlJIxyNIgjOmDEWLp5ij1adOlOu5vmwLOloaAAuAyapqdhZWAEyJP9qaCfeJUtyMncqBTjtOAwjIz2fTppXdK2xDR3+pQ4rx6JPOwvoIiHzEVPfZw4dhp50fX8R2WwIt3waF5IF6PeSdj610BraSah1izZa1pabNaZnCnsKov+bk8N84Q6NeEVgCexRs/AzEkLGlDhXCk6LAx5GQBGAkk/Qk/wqfKio6sEGb8PTHC495HLZgd/l+GdR/ambgvltpIIk2RWTh3ruaH8uXd4k7azxj01SGPewUkwYwTmfbu4LUCCZlnUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=12aU/QG/JfzyGvKNIXzvLUcODiGtMsPLsq/1O/Un+cY=;
+ b=TmGHo9SESCH+tD3cLH9bmvWFWyFAAYjyyNE1yA6CLJqj+QOTF9vWmiu6OqVhiC3u0OMGNiriHG5naNxjrGNoLv9yX+XpD91FXdsrKxGIEjrsn1QZGyFcZyxcSZr1aUf9BNd8euBE+9SmqdcA9DnKo52bPwECGbljWpmpFdLGUjNIWSlZGTiCmcD/NuIdH/Hw6OxKDZSqVzvWYZMbyanD04LSpXtyzQfgwKt5GT03pHdiPtTN8U+kp3dD/VghTjkdkBHkU63eHPEG91PliBp4S+DZqeyc27V+KwM1nWaoGyME/WMZt6XFuFVS2EAc035B62h6mRjpsK4pdPXfbc5BPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=12aU/QG/JfzyGvKNIXzvLUcODiGtMsPLsq/1O/Un+cY=;
+ b=MizAvao0QCaP74jnsjN/fTnLI2WkyiuLocHas6Bj7F9vanotUEiew7VocXKcIIBcoM6OyqOsoBdZ+waT2Csf0Xub02hqYE/JmDL9pD5QVTJngCKS+St2tii+6txix0gTuDUkawxyZd8++x3F9loorR6OjdaufMc6NiHMiscHA4ad2nKwkzrc6ZdW3hA4580BrduQpcl+pteMSS+tFqpmyf7MibDprC3RTaM3FdyUmQwCUWjZxtx2CJWs4cKVT0j2oroOh97qAW+/N//kJiileCi9JQvUR3NttoE3ilGkguGTreefjAmnAgZ9O2iBTBcA6G+as4OznrNEecyktGPAWw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14; Mon, 5 Dec
+ 2022 13:43:45 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5880.013; Mon, 5 Dec 2022
+ 13:43:45 +0000
+Date:   Mon, 5 Dec 2022 09:43:43 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        yi.y.sun@linux.intel.com, kevin.tian@intel.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com
+Subject: Re: [PATCH 00/10] Move group specific code into group.c
+Message-ID: <Y431j8HBvuCsvP+U@nvidia.com>
+References: <20221201145535.589687-1-yi.l.liu@intel.com>
+ <Y4kRC0SRD9kpKFWS@nvidia.com>
+ <86c4f504-a0b2-969c-c2c6-5fd43deb6627@intel.com>
+ <Y4oPTjCTlQ/ozjoZ@nvidia.com>
+ <20221202161225.3144305f.alex.williamson@redhat.com>
+ <fecfc22d-cb9e-cac9-95ff-21df13f257c2@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fecfc22d-cb9e-cac9-95ff-21df13f257c2@intel.com>
+X-ClientProxiedBy: YT3PR01CA0078.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:84::9) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [External] Re: [v2 0/6] KVM: arm64: implement vcpu_is_preempted
- check
-Content-Language: en-US
-From:   Usama Arif <usama.arif@bytedance.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
-        yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-        steven.price@arm.com, mark.rutland@arm.com, bagasdotme@gmail.com,
-        fam.zheng@bytedance.com, liangma@liangbit.com,
-        punit.agrawal@bytedance.com
-References: <20221104062105.4119003-1-usama.arif@bytedance.com>
- <87k048f3cm.wl-maz@kernel.org>
- <180b91af-a2aa-2cfd-eb7f-b2825c4e3dbe@bytedance.com>
- <86r0y1nmep.wl-maz@kernel.org>
- <95efd030-27f6-5668-a25e-9fbf210bfa1c@bytedance.com>
-In-Reply-To: <95efd030-27f6-5668-a25e-9fbf210bfa1c@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5732:EE_
+X-MS-Office365-Filtering-Correlation-Id: ca150500-2ed0-4694-b465-08dad6c6bab2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: QV/JJB1aIu14LRRC4UL+dZv0M6baCu/UdVLmImLytwr3TINXJrZc9UzULpELsoKgY5qFmgLfMveU/nTxKl6ITSqfvJMqEnBOqPlWGIIv0d05VQ+nM399TNRHdeySVqNwW3NzVeV6d9XpW2G0tG4DtJVNCbBKxRtjM63Q2+hhI9q68fRfHmiUcXH11K9MUKYP8xiU02JLh2caUScAtcD6dVGpDRUOxFSlqBF0tPwKEMfvRoZxn5+cFxdCB4UaIiApIVfx03mjM0+7ILjcUZRIf6DZRagHuXDFkTX6V4Do/Hd8w+YGNcilPdtlbVshevcu1mPcU+rVowTmmT1h5ChYEPtwUapWzTQQaTtfgUX4GZCv1pflBRf90kyzk4uYYwUR2CGKCXcilqhCZ9sv9GCwym05ddzwsTZH6OUOH58Z73RGOBv5/VkY12kXGNpjdAHxpFsM5p7Maw+TPI1MfjKE6B+S70jR81A3YvYJ2SAePolxHc+7LDrNWsRsYDCgpIjRa26YbZecFQGneBp1LrA7rvA5MDTnz1ZrzHxPy2vtOqDhNGMILz6Te59/6+xcrC4VsRTuuaeJavQE5clZCD6Gy+9qvOYLedvYssKcvQnD6BE9zzJekgLN96xSfGW8/1TlABt91nP6uOszs2fx6yaPc2EhG0Ctc1ljRrXrnNWrp+Z9OYwV8D5EJJn7E7dLuSRKi72f9458pOH1BAyGdNrW2m8SPK09lF1XB5JDSYMWu20eJAElUV49ZkR+SdLH7lAWkM/CTogolBgjvtlbdbiXFg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(136003)(366004)(376002)(346002)(451199015)(86362001)(38100700002)(4744005)(5660300002)(41300700001)(8936002)(2906002)(4326008)(8676002)(186003)(26005)(6506007)(6512007)(316002)(2616005)(6916009)(66946007)(966005)(66476007)(66556008)(478600001)(6486002)(36756003)(67856001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wjIBWK0w3BnhExC92PZvbboixwkpjCV24wboWVj4MvPQQ08s5kBidH7giW2E?=
+ =?us-ascii?Q?BcmfBdLonrQZC3ZamtfIGebiQ24xC+irEsoy/MzuTW1iollIqsM1SZhOgcMH?=
+ =?us-ascii?Q?ZcNsJzegGc2ii8y6UL+LoRDU/vbDZ/oNgEW9ZHgp5BRfgTPv40ShJYhof1Js?=
+ =?us-ascii?Q?N4/OF6OW4Vrtb4DlUA/5l3gkAcVqcCkw3zLfvzdHoT16cI83RN80RzIibrE7?=
+ =?us-ascii?Q?mu5tl9REZM7qcKNhz4EPM6KEoqmYaZD85h1Nvs8LX8Mo+FgrglWb2IU6IPZL?=
+ =?us-ascii?Q?HukexuruOPhxbknfXJZFlvWPz+oPZ0RPYbD8GHHJcd8vLURUulXbdDUzhH/C?=
+ =?us-ascii?Q?axM/amEp58MPgF7jpyP7VCrDA1p1/gIpxDnKvDeSGVHthYTuKIQekcYsYC+C?=
+ =?us-ascii?Q?OqO0yO9fUuQ0+Uu1BILWe7kaHi7fWIIyrzeZGi67L9kYgKJS0nsSgDKLPfij?=
+ =?us-ascii?Q?0/5vH/5zNlvZx4fBJ4++ejuczBJc7Xoxi/sdvvzfzdayK6gXMDkRTT8UQnr4?=
+ =?us-ascii?Q?mTB/Jtz+olXWghrSoRaTV8pyJsFtwVZy5YNBsawgsRSEvRvu6Adfa80vdk3y?=
+ =?us-ascii?Q?Q/EVFXI2R5hx8SZ+5M4b41Lu1zsUzDf2m3mRm2qh3JXyM6gdR1d+r733MbQM?=
+ =?us-ascii?Q?+tUEsNtJ3RMmx5DXOY9JD6ufMNNEE1vUjmwOTxTi4tj11iLdhp0IKk63JHaO?=
+ =?us-ascii?Q?jFguPhx+DMhS751Wm0H1tWSi4kjlQshfTx4l3iG4vNxoLHDk8GDnjsAgBebM?=
+ =?us-ascii?Q?/YS9Ion8h0Dp2T0tgbD16zct5nPP/l4vJlOsnA1G44PjlkTqV+d+DxGj2JF+?=
+ =?us-ascii?Q?o3k6xgK1O4QLL0jGIYNyKSLZiKaZHZM2TVYMeWFBslt1cmOkH2+/9LvKFAsF?=
+ =?us-ascii?Q?q25MVaRfm4U5SDdLPM7i/qg7kkMNfh8CeD3OcCbqfKKZ39gabwKaJHcWQNmj?=
+ =?us-ascii?Q?NxeZNHrrBfHBBpO0rYhcikV/o5SQCKMvBRxzVo50EPqYCRHwR8/J1B4ErG1q?=
+ =?us-ascii?Q?5Wu++ozqUzVMUiuLDBvSWAxhcOxYaO3yHi5V5WmY1w4kTLWW+SXOXtuBpgRC?=
+ =?us-ascii?Q?hVVRGsftfzVwn/dpfA/8aPgsekTY6WpjL31WjkZEVHvLLWDk6ke9g6l5cU93?=
+ =?us-ascii?Q?GQXIKbbWa4umDx+RT6iC77xQlI8K0276ENIydKhBqI+FqrbOTmxcPAX1TvK9?=
+ =?us-ascii?Q?SHEmco38lUDN5eP5ozIdW1UiYewlwZLbNq9tjHdzKRgtGjDVTXtCSTA17Yw8?=
+ =?us-ascii?Q?7TnOmsO6fermMl5Ms12ALZbZrS2ie5Wkyrz3kf3IEpa6mKvjeW9mDgc34gAT?=
+ =?us-ascii?Q?9ftmyI2zIXPcqZ9SEsxVHgr7k3hMOeQDoUtNdmVwm0ZLDx1YkjilElHV48ze?=
+ =?us-ascii?Q?5wK4aa2JygynLeYVvYHCEHKKCJfXpeNjjHhQOAgoT657E1qEwnhP7WWjZT8p?=
+ =?us-ascii?Q?gpG9ordrVTpz2g+jmwhf3fGw09dQdygWVyYN0JdH2efSm4uTvEZNx+IxBADo?=
+ =?us-ascii?Q?lFaBrHUZKHZ9cXHmo6NOA1357zKh21ePkiVN4xi6aIiZFS0qFelCgygFX+6G?=
+ =?us-ascii?Q?AYB75IGqI86N1KencPv96cP900m5wLDcXXoXXf/1?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca150500-2ed0-4694-b465-08dad6c6bab2
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2022 13:43:45.1738
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Dnfbqzl8QWikZ6xRtttB0j29tLlMgsUJ+hcgzzg0YR+QvNSP7GrBAULAzserc/ju
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5732
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, Dec 03, 2022 at 09:53:18PM +0800, Yi Liu wrote:
 
+> > > Please rebase it on the above branch also
+> 
+> To Jason: done. Please fetch from below branch.
+> 
+> https://github.com/yiliu1765/iommufd/commits/for-jason/vfio_group_split
 
-On 24/11/2022 13:55, Usama Arif wrote:
-> 
-> 
-> On 18/11/2022 00:20, Marc Zyngier wrote:
->> On Mon, 07 Nov 2022 12:00:44 +0000,
->> Usama Arif <usama.arif@bytedance.com> wrote:
->>>
->>>
->>>
->>> On 06/11/2022 16:35, Marc Zyngier wrote:
->>>> On Fri, 04 Nov 2022 06:20:59 +0000,
->>>> Usama Arif <usama.arif@bytedance.com> wrote:
->>>>>
->>>>> This patchset adds support for vcpu_is_preempted in arm64, which
->>>>> allows the guest to check if a vcpu was scheduled out, which is
->>>>> useful to know incase it was holding a lock. vcpu_is_preempted can
->>>>> be used to improve performance in locking (see owner_on_cpu usage in
->>>>> mutex_spin_on_owner, mutex_can_spin_on_owner, rtmutex_spin_on_owner
->>>>> and osq_lock) and scheduling (see available_idle_cpu which is used
->>>>> in several places in kernel/sched/fair.c for e.g. in wake_affine to
->>>>> determine which CPU can run soonest):
->>>>
->>>> [...]
->>>>
->>>>> pvcy shows a smaller overall improvement (50%) compared to
->>>>> vcpu_is_preempted (277%).  Host side flamegraph analysis shows that
->>>>> ~60% of the host time when using pvcy is spent in kvm_handle_wfx,
->>>>> compared with ~1.5% when using vcpu_is_preempted, hence
->>>>> vcpu_is_preempted shows a larger improvement.
->>>>
->>>> And have you worked out *why* we spend so much time handling WFE?
->>>>
->>>>     M.
->>>
->>> Its from the following change in pvcy patchset:
->>>
->>> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->>> index e778eefcf214..915644816a85 100644
->>> --- a/arch/arm64/kvm/handle_exit.c
->>> +++ b/arch/arm64/kvm/handle_exit.c
->>> @@ -118,7 +118,12 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
->>>          }
->>>
->>>          if (esr & ESR_ELx_WFx_ISS_WFE) {
->>> -               kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
->>> +               int state;
->>> +               while ((state = kvm_pvcy_check_state(vcpu)) == 0)
->>> +                       schedule();
->>> +
->>> +               if (state == -1)
->>> +                       kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
->>>          } else {
->>>                  if (esr & ESR_ELx_WFx_ISS_WFxT)
->>>                          vcpu_set_flag(vcpu, IN_WFIT);
->>>
->>>
->>> If my understanding is correct of the pvcy changes, whenever pvcy
->>> returns an unchanged vcpu state, we would schedule to another
->>> vcpu. And its the constant scheduling where the time is spent. I guess
->>> the affects are much higher when the lock contention is very
->>> high. This can be seem from the pvcy host side flamegraph as well with
->>> (~67% of the time spent in the schedule() call in kvm_handle_wfx), For
->>> reference, I have put the graph at:
->>> https://uarif1.github.io/pvlock/perf_host_pvcy_nmi.svg
->>
->> The real issue here is that we don't try to pick the right vcpu to
->> run, and strictly rely on schedule() to eventually pick something that
->> can run.
->>
->> An interesting to do would be to try and fit the directed yield
->> mechanism there. It would be a lot more interesting than the one-off
->> vcpu_is_preempted hack, as it gives us a low-level primitive on which
->> to construct things (pvcy is effectively a mwait-like primitive).
-> 
-> We could use kvm_vcpu_yield_to to yield to a specific vcpu, but how 
-> would we determine which vcpu to yield to?
-> 
-> IMO vcpu_is_preempted is very well integrated in a lot of core kernel 
-> code, i.e. mutex, rtmutex, rwsem and osq_lock. It is also used in 
-> scheduler to determine better which vCPU we can run on soonest, select 
-> idle core, etc. I am not sure if all of these cases will be optimized by 
-> pvcy? Also, with vcpu_is_preempted, some of the lock heavy benchmarks 
-> come down from spending around 50% of the time in lock to less than 1% 
-> (so not sure how much more room is there for improvement).
-> 
-> We could also use vcpu_is_preempted to optimize IPI performance (along 
-> with directed yield to target IPI vCPU) similar to how its done in x86 
-> (https://lore.kernel.org/all/1560255830-8656-2-git-send-email-wanpengli@tencent.com/). 
-> This case definitely wont be covered by pvcy.
-> 
-> Considering all the above, i.e. the core kernel integration already 
-> present and possible future usecases of vcpu_is_preempted, maybe its 
-> worth making vcpu_is_preempted work on arm independently of pvcy?
-> 
+Okay, it is merged in to the iommufd tree
 
-Hi,
+> > It looks fine to me aside from the previous review comments and my own
+> > spelling nit.  I also don't see that this adds any additional conflicts
+> > vs the existing iommufd integration for any outstanding vfio patches on
+> > the list, therefore, where there's not already a sign-off from me:
+> > 
+> > Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
+> 
+> To Alex: thanks. above branch is based on Jason's for-next. So may have
+> one minor conflict with below commit in your next branch.
+> 
+> vfio: Remove vfio_free_device
 
-Just wanted to check if there are any comments on above? I can send a v3 
-with the doc and code fixes suggested in the earlier reviews if it makes 
-sense?
+It seems OK, I did a test merge
 
 Thanks,
-Usama
-
-> Thanks,
-> Usama
-> 
->>
->>     M.
->>
+Jason
