@@ -2,185 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3F9B642808
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 13:07:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EC7C642848
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 13:21:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231475AbiLEMHN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 07:07:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44282 "EHLO
+        id S231722AbiLEMVK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 07:21:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230332AbiLEMHJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 07:07:09 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CCA7AC76A
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 04:07:08 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 486AC106F;
-        Mon,  5 Dec 2022 04:07:15 -0800 (PST)
-Received: from e126514.cambridge.arm.com (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8039C3F73D;
-        Mon,  5 Dec 2022 04:07:06 -0800 (PST)
-From:   Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-To:     pbonzini@redhat.com, thuth@redhat.com, andrew.jones@linux.dev
-Cc:     kvm@vger.kernel.org, Suzuki.Poulose@arm.com,
-        Alexandru.Elisei@arm.com, nd@arm.com,
-        Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-Subject: [PATCH 2/2] arm/psci: Add PSCI_CPU_OFF testscase to arm/psci testsuite
-Date:   Mon,  5 Dec 2022 12:10:53 +0000
-Message-Id: <20221205121053.125964-3-Nikita.Venkatesh@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221205121053.125964-1-Nikita.Venkatesh@arm.com>
-References: <20221205121053.125964-1-Nikita.Venkatesh@arm.com>
+        with ESMTP id S230209AbiLEMVJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 07:21:09 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5279CE0A8;
+        Mon,  5 Dec 2022 04:21:08 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id jl24so10609713plb.8;
+        Mon, 05 Dec 2022 04:21:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ujNogmjXUzAdISFdb+k3CYrlxMM8u71cOZOj6myJAqE=;
+        b=No09YoJkVDU4OufxqqO6sN8dTeRdkfVar42K6FmDqjxSn+V79DeZYHgDGMSsUc+yzO
+         swE56S7z6QryfN/O2b0ocCjHnBapNqaZ8CecL9o7yMKRbI55uVtvwOmgcZVeLy5y4+KT
+         zPpULhsThc+raDCqC+Ul923r0ZeCPoslYvCIVPv/nYjWvJRIf9k+BGNDEwquTmNQaqFY
+         XNCG6rG9/tQ7R6/sZ750f4sc7cJACL7xZ/LF7z57lggPqbyCO4GQelqspkBSVZeYZgAN
+         R9hpJAhTVco0U12Vi++ttYjU7WeQkW6TjnPlJVCiCO9nCZU9mSOwAObmBE/Xu/nXYihu
+         YbKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ujNogmjXUzAdISFdb+k3CYrlxMM8u71cOZOj6myJAqE=;
+        b=kSJ4Ndu1FDtCp3o+5TnaEFspnqH4Bj6cyyKftgsceL84cmC0HCL6AEHRKmaC1q7NDy
+         uqrOg3giPFLgZtzdx8HdCf2R8FOnC7LmvM4JjG3Ax2o13Rt2MR4oL9V44+52dZJbIeSz
+         I8dvUU7vXv+cOc0EHKwsKwN9FKrp8Fmq9YZDopLrU5UCXUe9vbPlU6agXDG42wga9cqs
+         3eQCVSgD3QQhqp2m5k/9Hxhci9LTYi1ltFOG7Mp7Cc5/Kd6jDdqqjhC8zIXbQAzOQ0cq
+         kS0qF1Q6nCu0qZvIUc+d5fORGRBmHGyWm21F+WXdx6Mgds/8lroflGFGZmcyP94JWaig
+         dvNA==
+X-Gm-Message-State: ANoB5plYsdFD6rORoAsmGmYoAnKvaGY54c9wJN3SVRbVz1uVcR4mrt59
+        hlpfXcsrMZRAZeABjxsWptSD58FuxjaLng==
+X-Google-Smtp-Source: AA0mqf6J2G6JDn5Wk7NDveDevBtWVzpm+g15JdSbwO9wxgEMv+vSRBvdSsyR6//5Z5G6Oc2wXA9GHA==
+X-Received: by 2002:a17:902:b184:b0:189:1d01:a4ae with SMTP id s4-20020a170902b18400b001891d01a4aemr65843926plr.93.1670242867768;
+        Mon, 05 Dec 2022 04:21:07 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id jf1-20020a170903268100b00186b7443082sm10458256plb.195.2022.12.05.04.21.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Dec 2022 04:21:07 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86/pmu: Drop event_type and rename "struct kvm_event_hw_type_mapping"
+Date:   Mon,  5 Dec 2022 20:20:48 +0800
+Message-Id: <20221205122048.16023-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The test uses the following method.
+From: Like Xu <likexu@tencent.com>
 
-The primary CPU brings up all the secondary CPUs, which are held in a wait
-loop. Once the primary releases the CPUs, each of the secondary CPUs
-proceed to issue PSCI_CPU_OFF. This is indicated by a cpumask and also
-the status of the call is updated by the secondary CPU in cpu_off_done[].
+After commit ("02791a5c362b KVM: x86/pmu: Use PERF_TYPE_RAW
+to merge reprogram_{gp,fixed}counter()"), vPMU starts to directly
+use the hardware event eventsel and unit_mask to reprogram perf_event,
+and the event_type field in the "struct kvm_event_hw_type_mapping"
+is simply no longer being used.
 
-The primary CPU waits for all the secondary CPUs to update the cpumask
-and then proceeds to check for the status of the individual CPU CPU_OFF
-request. There is a chance that some CPUs might fail at the CPU_OFF
-request and come back and update the status once the primary CPU has
-finished the scan. There is no fool proof method to handle this. As of
-now, we add a 1sec delay between the cpumask check and the scan for the
-status.
+After discarding this field, the name of the structure also lost
+its mapping semantics, renaming it "struct kvm_pmu_hw_event" and
+reorganizing the comments to continue to help newcomers.
 
-Signed-off-by: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
+Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arm/psci.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 70 insertions(+), 6 deletions(-)
+ arch/x86/kvm/pmu.h           |  3 +--
+ arch/x86/kvm/vmx/pmu_intel.c | 34 +++++++++++++++++++++++++---------
+ 2 files changed, 26 insertions(+), 11 deletions(-)
 
-diff --git a/arm/psci.c b/arm/psci.c
-index 0b9834c..9a49347 100644
---- a/arm/psci.c
-+++ b/arm/psci.c
-@@ -12,6 +12,9 @@
- #include <asm/processor.h>
- #include <asm/smp.h>
- #include <asm/psci.h>
-+#include <asm/delay.h>
-+
-+#define CPU_OFF_TEST_WAIT_TIME 1000
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 85ff3c0588ba..2aef09eafb70 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -18,10 +18,9 @@
+ #define VMWARE_BACKDOOR_PMC_REAL_TIME		0x10001
+ #define VMWARE_BACKDOOR_PMC_APPARENT_TIME	0x10002
  
- static bool invalid_function_exception;
+-struct kvm_event_hw_type_mapping {
++struct kvm_pmu_hw_event {
+ 	u8 eventsel;
+ 	u8 unit_mask;
+-	unsigned event_type;
+ };
  
-@@ -69,8 +72,10 @@ static bool psci_affinity_info_off(void)
- }
+ struct kvm_pmu_ops {
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 28b0a784f6e9..d34e9f85bdce 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -20,16 +20,32 @@
  
- static int cpu_on_ret[NR_CPUS];
--static cpumask_t cpu_on_ready, cpu_on_done;
-+static bool cpu_off_success[NR_CPUS];
-+static cpumask_t cpu_on_ready, cpu_on_done, cpu_off_done;
- static volatile int cpu_on_start;
-+static volatile int cpu_off_start;
+ #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
  
- extern void secondary_entry(void);
- static void cpu_on_wake_target(void)
-@@ -92,6 +97,20 @@ static void cpu_on_target(void)
- 	cpumask_set_cpu(cpu, &cpu_on_done);
- }
+-static struct kvm_event_hw_type_mapping intel_arch_events[] = {
+-	[0] = { 0x3c, 0x00, PERF_COUNT_HW_CPU_CYCLES },
+-	[1] = { 0xc0, 0x00, PERF_COUNT_HW_INSTRUCTIONS },
+-	[2] = { 0x3c, 0x01, PERF_COUNT_HW_BUS_CYCLES  },
+-	[3] = { 0x2e, 0x4f, PERF_COUNT_HW_CACHE_REFERENCES },
+-	[4] = { 0x2e, 0x41, PERF_COUNT_HW_CACHE_MISSES },
+-	[5] = { 0xc4, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
+-	[6] = { 0xc5, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
++/*
++ * The first part of hw_events in the following array represent Intel's
++ * Pre-defined Architectural Performance Events in an ordered manner:
++ *
++ * 0 - PERF_COUNT_HW_CPU_CYCLES
++ * 1 - PERF_COUNT_HW_INSTRUCTIONS
++ * 2 - PERF_COUNT_HW_BUS_CYCLES
++ * 3 - PERF_COUNT_HW_CACHE_REFERENCES
++ * 4 - PERF_COUNT_HW_CACHE_MISSES
++ * 5 - PERF_COUNT_HW_BRANCH_INSTRUCTIONS
++ * 6 - PERF_COUNT_HW_BRANCH_MISSES
++ *
++ * the second part of hw_events is defined by the generic kernel perf:
++ *
++ * 7 - PERF_COUNT_HW_REF_CPU_CYCLES
++ */
++static struct kvm_pmu_hw_event intel_arch_events[] = {
++	[0] = { 0x3c, 0x00 },
++	[1] = { 0xc0, 0x00 },
++	[2] = { 0x3c, 0x01 },
++	[3] = { 0x2e, 0x4f },
++	[4] = { 0x2e, 0x41 },
++	[5] = { 0xc4, 0x00 },
++	[6] = { 0xc5, 0x00 },
+ 	/* The above index must match CPUID 0x0A.EBX bit vector */
+-	[7] = { 0x00, 0x03, PERF_COUNT_HW_REF_CPU_CYCLES },
++	[7] = { 0x00, 0x03 },
+ };
  
-+static void cpu_off_secondary_entry(void *data)
-+{
-+       int cpu = smp_processor_id();
-+
-+       while (!cpu_off_start)
-+               cpu_relax();
-+       /* On to the CPU off test */
-+       cpu_off_success[cpu] = true;
-+       cpumask_set_cpu(cpu, &cpu_off_done);
-+       cpu_psci_cpu_die();
-+       /* The CPU shouldn't execute the next steps. */
-+       cpu_off_success[cpu] = false;
-+}
-+
- static bool psci_cpu_on_test(void)
- {
- 	bool failed = false;
-@@ -142,7 +161,48 @@ static bool psci_cpu_on_test(void)
- 	return !failed;
- }
- 
--int main(void)
-+static void secondary_entry_stub (void *unused)
-+{
-+}
-+
-+static bool psci_cpu_off_test(void)
-+{
-+       bool failed = false;
-+       int cpu;
-+
-+       for_each_present_cpu(cpu) {
-+               if (cpu == 0)
-+                       continue;
-+               on_cpu_async(cpu, cpu_off_secondary_entry, NULL);
-+       }
-+
-+       cpumask_set_cpu(0, &cpu_off_done);
-+
-+       report_info("starting CPU_OFF test...");
-+
-+       /* Release the CPUs */
-+       cpu_off_start = 1;
-+
-+       /* Wait until all are done */
-+       while (!cpumask_full(&cpu_off_done))
-+               cpu_relax();
-+
-+       /* Allow all the other CPUs to complete the operation */
-+       mdelay(CPU_OFF_TEST_WAIT_TIME);
-+
-+       for_each_present_cpu(cpu) {
-+               if (cpu == 0)
-+                       continue;
-+
-+               if (!cpu_off_success[cpu]) {
-+                       report_info("CPU%d could not be turned off", cpu);
-+                       failed = true;
-+               }
-+       }
-+       return !failed;
-+}
-+
-+int main(int argc, char **argv)
- {
- 	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
- 
-@@ -155,14 +215,18 @@ int main(void)
- 
- 	report_info("PSCI version %d.%d", PSCI_VERSION_MAJOR(ver),
- 					  PSCI_VERSION_MINOR(ver));
-+
- 	report(psci_invalid_function(), "invalid-function");
--	report(psci_affinity_info_on(), "affinity-info-on");
--	report(psci_affinity_info_off(), "affinity-info-off");
-+        report(psci_affinity_info_on(), "affinity-info-on");
-+        report(psci_affinity_info_off(), "affinity-info-off");
- 
--	if (ERRATA(6c7a5dce22b3))
-+        if (ERRATA(6c7a5dce22b3)){
- 		report(psci_cpu_on_test(), "cpu-on");
--	else
-+	} else {
- 		report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
-+		on_cpus(secondary_entry_stub, NULL);
-+	}
-+	report(psci_cpu_off_test(), "cpu-off");
- 
- done:
- #if 0
+ /* mapping between fixed pmc index and intel_arch_events array */
 -- 
-2.25.1
+2.38.1
 
