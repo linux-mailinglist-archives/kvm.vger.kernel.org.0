@@ -2,310 +2,469 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C9FBE642C5A
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 16:58:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 523C0642C5D
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 16:59:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232367AbiLEP6w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 10:58:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35864 "EHLO
+        id S232432AbiLEP7D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 10:59:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231688AbiLEP6u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 10:58:50 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15BA21AF05
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 07:58:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670255930; x=1701791930;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=JNqk2zo29jRbPdA2MLbxtaNrrxw57qCJpdGVShNnXcM=;
-  b=WvMRs3Cd59KepwfflK4NUX7/hpInBsppz2vPU4lukqUeNRkYNAFX3c6K
-   DbK08n3XMX2lg/VdNhyh14jt/JjuE8oJtU4QpS98ZPyvczot3AKD35Ias
-   ZdlvFVn71CXTLOZmDrnCjo6NacHx3IBVq+ZYG9qlrI1aF6qGYSQjHRBr4
-   Ran0hH2YQ99uAAV7OiHNdSDomyEOy/981WzTTQwCBjrDmClv6B6JInDSW
-   OS1f909FFzLrISEDseZF3zKo1nNL2Fy7m2I5PcCpU1B/pNpU1RX297Fv8
-   yvrDEGoFAB67uP8Wccvzhy53QySpDzveSD+m5N1gYEA3qcm+4LYyeewFp
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10552"; a="296077586"
-X-IronPort-AV: E=Sophos;i="5.96,219,1665471600"; 
-   d="scan'208";a="296077586"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2022 07:58:49 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10552"; a="734641288"
-X-IronPort-AV: E=Sophos;i="5.96,219,1665471600"; 
-   d="scan'208";a="734641288"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.255.28.239]) ([10.255.28.239])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2022 07:58:43 -0800
-Message-ID: <7403f46e-90ff-9761-0b92-8dc8c163ebf8@linux.intel.com>
-Date:   Mon, 5 Dec 2022 23:58:41 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v6 08/19] iommufd: PFN handling for iopt_pages
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Anthony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
+        with ESMTP id S232372AbiLEP66 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 10:58:58 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA17C19C04
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 07:58:56 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 587EE6119B
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 15:58:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E6DAC43470;
+        Mon,  5 Dec 2022 15:58:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670255935;
+        bh=KlgS04hOpJbXhFkEwK22oyJCLlMLobJeeM+DEl6IoxQ=;
+        h=From:To:Cc:Subject:Date:From;
+        b=iorLEdNCcSbEbj2U9R9KTtmk/B3esnS365oOj02UJCLFx80S7wvB2K1S+f8WkY4jG
+         cmNsHIP7eKURISiMgIil4X72IwsSP2dZ14uZcXlT1fy2WJMIWAs6XrSYJC4lGnv8qG
+         TAXt6mUJyrdcaJeOyzoDwjbyHQ2Iorq9nQxJM0p4FQ3ixUIM7wFqBI1S1KWVJVdEtT
+         HuR2dNDRvH7yKp234rNWsfYmsf1kOm1Gm48YrdvzyfDQvC57TunUU0ePuBvapOSzQI
+         zddJNiz8E3yOy6Hj66sVRDbWUOmej9VQXZG4+wtGPvv4dZJybo3J6Mh3eJGPSdnykt
+         ipoRPKNeHV0pQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p2Dro-00AbwS-M5;
+        Mon, 05 Dec 2022 15:58:52 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Andrew Jones <andrew.jones@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
         Bagas Sanjaya <bagasdotme@gmail.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Ben Gardon <bgardon@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>, iommu@lists.linux.dev,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Lixiao Yang <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Yu He <yu.he@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-References: <8-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <8-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        Fuad Tabba <tabba@google.com>, Gavin Shan <gshan@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Peter Collingbourne <pcc@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Quentin Perret <qperret@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Ryan Roberts <ryan.roberts@arm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Steven Price <steven.price@arm.com>,
+        Usama Arif <usama.arif@bytedance.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Will Deacon <will@kernel.org>,
+        Zhiyuan Dai <daizhiyuan@phytium.com.cn>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
+        kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 updates for 6.2
+Date:   Mon,  5 Dec 2022 15:58:45 +0000
+Message-Id: <20221205155845.233018-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, andrew.jones@linux.dev, akpm@linux-foundation.org, anshuman.khandual@arm.com, acme@kernel.org, bagasdotme@gmail.com, bgardon@google.com, catalin.marinas@arm.com, cohuck@redhat.com, tabba@google.com, gshan@redhat.com, kuba@kernel.org, james.morse@arm.com, maciej.szmigiero@oracle.com, m.szyprowski@samsung.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, pcc@google.com, peterx@redhat.com, philmd@linaro.org, qperret@google.com, reijiw@google.com, ricarkol@google.com, ryan.roberts@arm.com, seanjc@google.com, steven.price@arm.com, usama.arif@bytedance.com, vdonnefort@google.com, will@kernel.org, daizhiyuan@phytium.com.cn, suzuki.poulose@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Paolo,
 
-On 11/30/2022 4:29 AM, Jason Gunthorpe wrote:
-> +#ifndef __IO_PAGETABLE_H
-> +#define __IO_PAGETABLE_H
-> +
-> +#include <linux/interval_tree.h>
-> +#include <linux/mutex.h>
-> +#include <linux/kref.h>
-> +#include <linux/xarray.h>
-> +
-> +#include "iommufd_private.h"
-> +
-> +struct iommu_domain;
-> +
-> +/*
-> + * Each io_pagetable is composed of intervals of areas which cover regions of
-> + * the iova that are backed by something. iova not covered by areas is not
-> + * populated in the page table. Each area is fully populated with pages.
-> + *
-> + * iovas are in byte units, but must be iopt->iova_alignment aligned.
-> + *
-> + * pages can be NULL, this means some other thread is still working on setting
-> + * up or tearing down the area. When observed under the write side of the
-> + * domain_rwsem a NULL pages must mean the area is still being setup and no
-> + * domains are filled.
-> + *
-> + * storage_domain points at an arbitrary iommu_domain that is holding the PFNs
-> + * for this area. It is locked by the pages->mutex. This simplifies the locking
-> + * as the pages code can rely on the storage_domain without having to get the
-> + * iopt->domains_rwsem.
-> + *
-> + * The io_pagetable::iova_rwsem protects node
-> + * The iopt_pages::mutex protects pages_node
-> + * iopt and immu_prot
+Here's the meat of the KVM/arm64 updates for 6.2, and it is quite
+packed with stuff (see the tag for the laundry list).
 
-typo, immu_prot -> iommu_prot
+Things to notice:
 
+- We have the usual shared branch with arm64, due to the never-ending
+  sysreg repainting. I'm sure it will stop one day...
 
->   are immutable
+- There is a lot of selftest conflicts with your own branch, see:
 
-> +
-> +/*
-> + * Carry means we carry a portion of the final hugepage over to the front of the
-> + * batch
-> + */
-> +static void batch_clear_carry(struct pfn_batch *batch, unsigned int keep_pfns)
-> +{
-> +	if (!keep_pfns)
-> +		return batch_clear(batch);
-> +
-> +	batch->total_pfns = keep_pfns;
-> +	batch->npfns[0] = keep_pfns;
-> +	batch->pfns[0] = batch->pfns[batch->end - 1] +
-> +			 (batch->npfns[batch->end - 1] - keep_pfns);
+  https://lore.kernel.org/r/20221201112432.4cb9ae42@canb.auug.org.au
+  https://lore.kernel.org/r/20221201113626.438f13c5@canb.auug.org.au
+  https://lore.kernel.org/r/20221201115741.7de32422@canb.auug.org.au
+  https://lore.kernel.org/r/20221201120939.3c19f004@canb.auug.org.au
+  https://lore.kernel.org/r/20221201131623.18ebc8d8@canb.auug.org.au
 
-The range of the skip_pfns is checked in batch_skip_carry, should 
-keep_pfns also be checked in this function?
+  for a rather exhaustive collection.
 
+- For the 6.3 cycle, we are going to experiment with Oliver taking
+  care of most of the patch herding. I'm sure he'll do a great job,
+  but if there is the odd mistake, please cut him some slack and blame
+  me instead.
 
-> +	batch->end = 0;
-> +}
-> +
-> +static void batch_skip_carry(struct pfn_batch *batch, unsigned int skip_pfns)
-> +{
-> +	if (!batch->total_pfns)
-> +		return;
-> +	skip_pfns = min(batch->total_pfns, skip_pfns);
+Please pull,
 
-Should use batch->npfns[0] instead of batch->total_pfns?
+	M.
 
+The following changes since commit f0c4d9fc9cc9462659728d168387191387e903cc:
 
+  Linux 6.1-rc4 (2022-11-06 15:07:11 -0800)
 
-> +	batch->pfns[0] += skip_pfns;
-> +	batch->npfns[0] -= skip_pfns;
-> +	batch->total_pfns -= skip_pfns;
-> +}
-> +
-> +static int __batch_init(struct pfn_batch *batch, size_t max_pages, void *backup,
-> +			size_t backup_len)
-> +{
-> +	const size_t elmsz = sizeof(*batch->pfns) + sizeof(*batch->npfns);
-> +	size_t size = max_pages * elmsz;
-> +
-> +	batch->pfns = temp_kmalloc(&size, backup, backup_len);
-> +	if (!batch->pfns)
-> +		return -ENOMEM;
-> +	batch->array_size = size / elmsz;
-> +	batch->npfns = (u32 *)(batch->pfns + batch->array_size);
-> +	batch_clear(batch);
-> +	return 0;
-> +}
-> +
-> +static int batch_init(struct pfn_batch *batch, size_t max_pages)
-> +{
-> +	return __batch_init(batch, max_pages, NULL, 0);
-> +}
-> +
-> +static void batch_init_backup(struct pfn_batch *batch, size_t max_pages,
-> +			      void *backup, size_t backup_len)
-> +{
-> +	__batch_init(batch, max_pages, backup, backup_len);
-> +}
-> +
-> +static void batch_destroy(struct pfn_batch *batch, void *backup)
-> +{
-> +	if (batch->pfns != backup)
-> +		kfree(batch->pfns);
-> +}
-> +
-> +/* true if the pfn could be added, false otherwise */
+are available in the Git repository at:
 
-It is not accurate to use "could be" here because returning ture means 
-the pfn has been added.
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-6.2
 
+for you to fetch changes up to 753d734f3f347e7fc49b819472bbf61dcfc1a16f:
 
-> +static bool batch_add_pfn(struct pfn_batch *batch, unsigned long pfn)
-> +{
-> +	const unsigned int MAX_NPFNS = type_max(typeof(*batch->npfns));
-> +
-> +	if (batch->end &&
-> +	    pfn == batch->pfns[batch->end - 1] + batch->npfns[batch->end - 1] &&
-> +	    batch->npfns[batch->end - 1] != MAX_NPFNS) {
-> +		batch->npfns[batch->end - 1]++;
-> +		batch->total_pfns++;
-> +		return true;
-> +	}
-> +	if (batch->end == batch->array_size)
-> +		return false;
-> +	batch->total_pfns++;
-> +	batch->pfns[batch->end] = pfn;
-> +	batch->npfns[batch->end] = 1;
-> +	batch->end++;
-> +	return true;
-> +}
-> +
-> +/*
-> + * Fill the batch with pfns from the domain. When the batch is full, or it
-> + * reaches last_index, the function will return. The caller should use
-> + * batch->total_pfns to determine the starting point for the next iteration.
-> + */
-> +static void batch_from_domain(struct pfn_batch *batch,
-> +			      struct iommu_domain *domain,
-> +			      struct iopt_area *area, unsigned long start_index,
-> +			      unsigned long last_index)
-> +{
-> +	unsigned int page_offset = 0;
-> +	unsigned long iova;
-> +	phys_addr_t phys;
-> +
-> +	iova = iopt_area_index_to_iova(area, start_index);
-> +	if (start_index == iopt_area_index(area))
-> +		page_offset = area->page_offset;
-> +	while (start_index <= last_index) {
-> +		/*
-> +		 * This is pretty slow, it would be nice to get the page size
-> +		 * back from the driver, or have the driver directly fill the
-> +		 * batch.
-> +		 */
-> +		phys = iommu_iova_to_phys(domain, iova) - page_offset;
+  Merge remote-tracking branch 'arm64/for-next/sysregs' into kvmarm-master/next (2022-12-05 14:39:53 +0000)
 
-seems no need to handle the page_offset, since PHYS_PFN(phys) is used in 
-batch_add_pfn below?
+----------------------------------------------------------------
+KVM/arm64 updates for 6.2
 
+- Enable the per-vcpu dirty-ring tracking mechanism, together with an
+  option to keep the good old dirty log around for pages that are
+  dirtied by something other than a vcpu.
 
+- Switch to the relaxed parallel fault handling, using RCU to delay
+  page table reclaim and giving better performance under load.
 
-> +		if (!batch_add_pfn(batch, PHYS_PFN(phys)))
-> +			return;
-> +		iova += PAGE_SIZE - page_offset;
-> +		page_offset = 0;
-> +		start_index++;
-> +	}
-> +}
-> +
-> +static struct page **raw_pages_from_domain(struct iommu_domain *domain,
-> +					   struct iopt_area *area,
-> +					   unsigned long start_index,
-> +					   unsigned long last_index,
-> +					   struct page **out_pages)
-> +{
-> +	unsigned int page_offset = 0;
-> +	unsigned long iova;
-> +	phys_addr_t phys;
-> +
-> +	iova = iopt_area_index_to_iova(area, start_index);
-> +	if (start_index == iopt_area_index(area))
-> +		page_offset = area->page_offset;
-> +	while (start_index <= last_index) {
-> +		phys = iommu_iova_to_phys(domain, iova) - page_offset;
+- Relax the MTE ABI, allowing a VMM to use the MAP_SHARED mapping
+  option, which multi-process VMMs such as crosvm rely on.
 
-ditto, since only PHYS_PFN(phys) is actually used, no need to handle 
-page_offset
+- Merge the pKVM shadow vcpu state tracking that allows the hypervisor
+  to have its own view of a vcpu, keeping that state private.
 
+- Add support for the PMUv3p5 architecture revision, bringing support
+  for 64bit counters on systems that support it, and fix the
+  no-quite-compliant CHAIN-ed counter support for the machines that
+  actually exist out there.
 
+- Fix a handful of minor issues around 52bit VA/PA support (64kB pages
+  only) as a prefix of the oncoming support for 4kB and 16kB pages.
 
-> +		*(out_pages++) = pfn_to_page(PHYS_PFN(phys));
-> +		iova += PAGE_SIZE - page_offset;
-> +		page_offset = 0;
-> +		start_index++;
-> +	}
-> +	return out_pages;
-> +}
-> +
-> +/* Continues reading a domain until we reach a discontiguity
+- Add/Enable/Fix a bunch of selftests covering memslots, breakpoints,
+  stage-2 faults and access tracking. You name it, we got it, we
+  probably broke it.
 
-typo, discontiguity -> discontinuity
+- Pick a small set of documentation and spelling fixes, because no
+  good merge window would be complete without those.
 
+As a side effect, this tag also drags:
 
->   in the pfns. */
-> +static void batch_from_domain_continue(struct pfn_batch *batch,
-> +				       struct iommu_domain *domain,
-> +				       struct iopt_area *area,
-> +				       unsigned long start_index,
-> +				       unsigned long last_index)
-> +{
-> +	unsigned int array_size = batch->array_size;
-> +
-> +	batch->array_size = batch->end;
-> +	batch_from_domain(batch, domain, area, start_index, last_index);
-> +	batch->array_size = array_size;
-> +}
-> +
+- The 'kvmarm-fixes-6.1-3' tag as a dependency to the dirty-ring
+  series
 
-BTW, this is a quite big patch, maybe break into smaller ones?
+- A shared branch with the arm64 tree that repaints all the system
+  registers to match the ARM ARM's naming, and resulting in
+  interesting conflicts
 
+----------------------------------------------------------------
+Anshuman Khandual (1):
+      KVM: arm64: PMU: Replace version number '0' with ID_AA64DFR0_EL1_PMUVer_NI
 
+Catalin Marinas (4):
+      mm: Do not enable PG_arch_2 for all 64-bit architectures
+      arm64: mte: Fix/clarify the PG_mte_tagged semantics
+      KVM: arm64: Simplify the sanitise_mte_tags() logic
+      arm64: mte: Lock a page for MTE tag initialisation
+
+Fuad Tabba (3):
+      KVM: arm64: Add hyp_spinlock_t static initializer
+      KVM: arm64: Add infrastructure to create and track pKVM instances at EL2
+      KVM: arm64: Instantiate pKVM hypervisor VM and vCPU structures from EL1
+
+Gavin Shan (14):
+      KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
+      KVM: Move declaration of kvm_cpu_dirty_log_size() to kvm_dirty_ring.h
+      KVM: Support dirty ring in conjunction with bitmap
+      KVM: arm64: Enable ring-based dirty memory tracking
+      KVM: selftests: Use host page size to map ring buffer in dirty_log_test
+      KVM: selftests: Clear dirty ring states between two modes in dirty_log_test
+      KVM: selftests: Automate choosing dirty ring size in dirty_log_test
+      KVM: selftests: memslot_perf_test: Use data->nslots in prepare_vm()
+      KVM: selftests: memslot_perf_test: Consolidate loop conditions in prepare_vm()
+      KVM: selftests: memslot_perf_test: Probe memory slots for once
+      KVM: selftests: memslot_perf_test: Support variable guest page size
+      KVM: selftests: memslot_perf_test: Consolidate memory
+      KVM: selftests: memslot_perf_test: Report optimal memory slots
+      KVM: Push dirty information unconditionally to backup bitmap
+
+James Morse (38):
+      arm64/sysreg: Standardise naming for ID_MMFR0_EL1
+      arm64/sysreg: Standardise naming for ID_MMFR4_EL1
+      arm64/sysreg: Standardise naming for ID_MMFR5_EL1
+      arm64/sysreg: Standardise naming for ID_ISAR0_EL1
+      arm64/sysreg: Standardise naming for ID_ISAR4_EL1
+      arm64/sysreg: Standardise naming for ID_ISAR5_EL1
+      arm64/sysreg: Standardise naming for ID_ISAR6_EL1
+      arm64/sysreg: Standardise naming for ID_PFR0_EL1
+      arm64/sysreg: Standardise naming for ID_PFR1_EL1
+      arm64/sysreg: Standardise naming for ID_PFR2_EL1
+      arm64/sysreg: Standardise naming for ID_DFR0_EL1
+      arm64/sysreg: Standardise naming for ID_DFR1_EL1
+      arm64/sysreg: Standardise naming for MVFR0_EL1
+      arm64/sysreg: Standardise naming for MVFR1_EL1
+      arm64/sysreg: Standardise naming for MVFR2_EL1
+      arm64/sysreg: Extend the maximum width of a register and symbol name
+      arm64/sysreg: Convert ID_MMFR0_EL1 to automatic generation
+      arm64/sysreg: Convert ID_MMFR1_EL1 to automatic generation
+      arm64/sysreg: Convert ID_MMFR2_EL1 to automatic generation
+      arm64/sysreg: Convert ID_MMFR3_EL1 to automatic generation
+      arm64/sysreg: Convert ID_MMFR4_EL1 to automatic generation
+      arm64/sysreg: Convert ID_ISAR0_EL1 to automatic generation
+      arm64/sysreg: Convert ID_ISAR1_EL1 to automatic generation
+      arm64/sysreg: Convert ID_ISAR2_EL1 to automatic generation
+      arm64/sysreg: Convert ID_ISAR3_EL1 to automatic generation
+      arm64/sysreg: Convert ID_ISAR4_EL1 to automatic generation
+      arm64/sysreg: Convert ID_ISAR5_EL1 to automatic generation
+      arm64/sysreg: Convert ID_ISAR6_EL1 to automatic generation
+      arm64/sysreg: Convert ID_PFR0_EL1 to automatic generation
+      arm64/sysreg: Convert ID_PFR1_EL1 to automatic generation
+      arm64/sysreg: Convert ID_PFR2_EL1 to automatic generation
+      arm64/sysreg: Convert MVFR0_EL1 to automatic generation
+      arm64/sysreg: Convert MVFR1_EL1 to automatic generation
+      arm64/sysreg: Convert MVFR2_EL1 to automatic generation
+      arm64/sysreg: Convert ID_MMFR5_EL1 to automatic generation
+      arm64/sysreg: Convert ID_AFR0_EL1 to automatic generation
+      arm64/sysreg: Convert ID_DFR0_EL1 to automatic generation
+      arm64/sysreg: Convert ID_DFR1_EL1 to automatic generation
+
+Marc Zyngier (32):
+      Merge tag 'kvmarm-fixes-6.1-3' into kvm-arm64/dirty-ring
+      arm64: Add ID_DFR0_EL1.PerfMon values for PMUv3p7 and IMP_DEF
+      KVM: arm64: PMU: Align chained counter implementation with architecture pseudocode
+      KVM: arm64: PMU: Always advertise the CHAIN event
+      KVM: arm64: PMU: Distinguish between 64bit counter and 64bit overflow
+      KVM: arm64: PMU: Narrow the overflow checking when required
+      KVM: arm64: PMU: Only narrow counters that are not 64bit wide
+      KVM: arm64: PMU: Add counter_index_to_*reg() helpers
+      KVM: arm64: PMU: Simplify setting a counter to a specific value
+      KVM: arm64: PMU: Do not let AArch32 change the counters' top 32 bits
+      KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver limit to VM creation
+      KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to be set from userspace
+      KVM: arm64: PMU: Allow ID_DFR0_EL1.PerfMon to be set from userspace
+      KVM: arm64: PMU: Implement PMUv3p5 long counter support
+      KVM: arm64: PMU: Allow PMUv3p5 to be exposed to the guest
+      KVM: arm64: PMU: Simplify vcpu computation on perf overflow notification
+      KVM: arm64: PMU: Make kvm_pmc the main data structure
+      KVM: arm64: PMU: Simplify PMCR_EL0 reset handling
+      KVM: arm64: PMU: Sanitise PMCR_EL0.LP on first vcpu run
+      KVM: arm64: PMU: Fix period computation for 64bit counters with 32bit overflow
+      Merge branch kvm-arm64/selftest/memslot-fixes into kvmarm-master/next
+      Merge branch kvm-arm64/selftest/linked-bps into kvmarm-master/next
+      Merge branch kvm-arm64/selftest/s2-faults into kvmarm-master/next
+      Merge branch kvm-arm64/selftest/access-tracking into kvmarm-master/next
+      Merge branch kvm-arm64/52bit-fixes into kvmarm-master/next
+      Merge branch kvm-arm64/dirty-ring into kvmarm-master/next
+      Merge branch kvm-arm64/parallel-faults into kvmarm-master/next
+      Merge branch kvm-arm64/pkvm-vcpu-state into kvmarm-master/next
+      Merge branch kvm-arm64/mte-map-shared into kvmarm-master/next
+      Merge branch kvm-arm64/pmu-unchained into kvmarm-master/next
+      Merge branch kvm-arm64/misc-6.2 into kvmarm-master/next
+      Merge remote-tracking branch 'arm64/for-next/sysregs' into kvmarm-master/next
+
+Oliver Upton (19):
+      KVM: arm64: Combine visitor arguments into a context structure
+      KVM: arm64: Stash observed pte value in visitor context
+      KVM: arm64: Pass mm_ops through the visitor context
+      KVM: arm64: Don't pass kvm_pgtable through kvm_pgtable_walk_data
+      KVM: arm64: Add a helper to tear down unlinked stage-2 subtrees
+      KVM: arm64: Use an opaque type for pteps
+      KVM: arm64: Tear down unlinked stage-2 subtree after break-before-make
+      KVM: arm64: Protect stage-2 traversal with RCU
+      KVM: arm64: Atomically update stage 2 leaf attributes in parallel walks
+      KVM: arm64: Split init and set for table PTE
+      KVM: arm64: Make block->table PTE changes parallel-aware
+      KVM: arm64: Make leaf->leaf PTE changes parallel-aware
+      KVM: arm64: Make table->block changes parallel-aware
+      KVM: arm64: Handle stage-2 faults in parallel
+      KVM: arm64: Take a pointer to walker data in kvm_dereference_pteref()
+      KVM: arm64: Don't acquire RCU read lock for exclusive table walks
+      KVM: arm64: Reject shared table walks in the hyp code
+      KVM: selftests: Have perf_test_util signal when to stop vCPUs
+      KVM: selftests: Build access_tracking_perf_test for arm64
+
+Peter Collingbourne (4):
+      mm: Add PG_arch_3 page flag
+      KVM: arm64: unify the tests for VMAs in memslots when MTE is enabled
+      KVM: arm64: permit all VM_MTE_ALLOWED mappings with MTE enabled
+      Documentation: document the ABI changes for KVM_CAP_ARM_MTE
+
+Quentin Perret (14):
+      KVM: arm64: Move hyp refcount manipulation helpers to common header file
+      KVM: arm64: Allow attaching of non-coalescable pages to a hyp pool
+      KVM: arm64: Back the hypervisor 'struct hyp_page' array for all memory
+      KVM: arm64: Fix-up hyp stage-1 refcounts for all pages mapped at EL2
+      KVM: arm64: Prevent the donation of no-map pages
+      KVM: arm64: Add helpers to pin memory shared with the hypervisor at EL2
+      KVM: arm64: Add per-cpu fixmap infrastructure at EL2
+      KVM: arm64: Add generic hyp_memcache helpers
+      KVM: arm64: Consolidate stage-2 initialisation into a single function
+      KVM: arm64: Instantiate guest stage-2 page-tables at EL2
+      KVM: arm64: Return guest memory from EL2 via dedicated teardown memcache
+      KVM: arm64: Unmap 'kvm_arm_hyp_percpu_base' from the host
+      KVM: arm64: Explicitly map 'kvm_vgic_global_state' at EL2
+      KVM: arm64: Don't unnecessarily map host kernel sections at EL2
+
+Reiji Watanabe (9):
+      KVM: arm64: selftests: Use FIELD_GET() to extract ID register fields
+      KVM: arm64: selftests: Add write_dbg{b,w}{c,v}r helpers in debug-exceptions
+      KVM: arm64: selftests: Remove the hard-coded {b,w}pn#0 from debug-exceptions
+      KVM: arm64: selftests: Add helpers to enable debug exceptions
+      KVM: arm64: selftests: Stop unnecessary test stage tracking of debug-exceptions
+      KVM: arm64: selftests: Change debug_version() to take ID_AA64DFR0_EL1
+      KVM: arm64: selftests: Add a test case for a linked breakpoint
+      KVM: arm64: selftests: Add a test case for a linked watchpoint
+      KVM: arm64: selftests: Test with every breakpoint/watchpoint
+
+Ricardo Koller (14):
+      KVM: selftests: Add a userfaultfd library
+      KVM: selftests: aarch64: Add virt_get_pte_hva() library function
+      KVM: selftests: Add missing close and munmap in __vm_mem_region_delete()
+      KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1 using sysreg.h macros
+      tools: Copy bitfield.h from the kernel sources
+      KVM: selftests: Stash backing_src_type in struct userspace_mem_region
+      KVM: selftests: Add vm->memslots[] and enum kvm_mem_region_type
+      KVM: selftests: Fix alignment in virt_arch_pgd_alloc() and vm_vaddr_alloc()
+      KVM: selftests: Use the right memslot for code, page-tables, and data allocations
+      KVM: selftests: aarch64: Add aarch64/page_fault_test
+      KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
+      KVM: selftests: aarch64: Add dirty logging tests into page_fault_test
+      KVM: selftests: aarch64: Add readonly memslot tests into page_fault_test
+      KVM: selftests: aarch64: Add mix of tests into page_fault_test
+
+Ryan Roberts (3):
+      KVM: arm64: Fix kvm init failure when mode!=vhe and VA_BITS=52.
+      KVM: arm64: Fix PAR_TO_HPFAR() to work independently of PA_BITS.
+      KVM: arm64: Fix benign bug with incorrect use of VA_BITS
+
+Usama Arif (1):
+      KVM: arm64: Fix pvtime documentation
+
+Will Deacon (9):
+      KVM: arm64: Unify identifiers used to distinguish host and hypervisor
+      KVM: arm64: Implement do_donate() helper for donating memory
+      KVM: arm64: Include asm/kvm_mmu.h in nvhe/mem_protect.h
+      KVM: arm64: Rename 'host_kvm' to 'host_mmu'
+      KVM: arm64: Initialise hypervisor copies of host symbols unconditionally
+      KVM: arm64: Provide I-cache invalidation by virtual address at EL2
+      KVM: arm64: Maintain a copy of 'kvm_arm_vmid_bits' at EL2
+      KVM: arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()
+      arm64/sysreg: Remove duplicate definitions from asm/sysreg.h
+
+Zhiyuan Dai (1):
+      KVM: arm64: Fix typo in comment
+
+ Documentation/virt/kvm/api.rst                     |   41 +-
+ Documentation/virt/kvm/arm/pvtime.rst              |   14 +-
+ Documentation/virt/kvm/devices/arm-vgic-its.rst    |    5 +-
+ Documentation/virt/kvm/devices/vcpu.rst            |    2 +
+ arch/arm64/Kconfig                                 |    1 +
+ arch/arm64/include/asm/kvm_arm.h                   |    8 +-
+ arch/arm64/include/asm/kvm_asm.h                   |    7 +-
+ arch/arm64/include/asm/kvm_host.h                  |   76 +-
+ arch/arm64/include/asm/kvm_hyp.h                   |    3 +
+ arch/arm64/include/asm/kvm_mmu.h                   |    2 +-
+ arch/arm64/include/asm/kvm_pgtable.h               |  175 ++-
+ arch/arm64/include/asm/kvm_pkvm.h                  |   38 +
+ arch/arm64/include/asm/mte.h                       |   65 +-
+ arch/arm64/include/asm/pgtable.h                   |    4 +-
+ arch/arm64/include/asm/sysreg.h                    |  138 ---
+ arch/arm64/include/uapi/asm/kvm.h                  |    1 +
+ arch/arm64/kernel/cpufeature.c                     |  212 ++--
+ arch/arm64/kernel/elfcore.c                        |    2 +-
+ arch/arm64/kernel/hibernate.c                      |    2 +-
+ arch/arm64/kernel/image-vars.h                     |   15 -
+ arch/arm64/kernel/mte.c                            |   21 +-
+ arch/arm64/kvm/Kconfig                             |    2 +
+ arch/arm64/kvm/arm.c                               |   90 +-
+ arch/arm64/kvm/guest.c                             |   18 +-
+ arch/arm64/kvm/hyp/hyp-constants.c                 |    3 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h      |   25 +-
+ arch/arm64/kvm/hyp/include/nvhe/memory.h           |   27 +
+ arch/arm64/kvm/hyp/include/nvhe/mm.h               |   18 +-
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h             |   68 ++
+ arch/arm64/kvm/hyp/include/nvhe/spinlock.h         |   10 +-
+ arch/arm64/kvm/hyp/nvhe/cache.S                    |   11 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |  110 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-smp.c                  |    2 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c              |  521 ++++++++-
+ arch/arm64/kvm/hyp/nvhe/mm.c                       |  167 ++-
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c               |   29 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                     |  436 ++++++++
+ arch/arm64/kvm/hyp/nvhe/setup.c                    |   98 +-
+ arch/arm64/kvm/hyp/pgtable.c                       |  652 ++++++------
+ arch/arm64/kvm/hyp/vhe/Makefile                    |    2 +-
+ arch/arm64/kvm/mmu.c                               |  193 ++--
+ arch/arm64/kvm/pkvm.c                              |  138 ++-
+ arch/arm64/kvm/pmu-emul.c                          |  482 ++++-----
+ arch/arm64/kvm/reset.c                             |   29 -
+ arch/arm64/kvm/sys_regs.c                          |  157 ++-
+ arch/arm64/kvm/vgic/vgic-its.c                     |   20 +
+ arch/arm64/lib/mte.S                               |    2 +-
+ arch/arm64/mm/copypage.c                           |    7 +-
+ arch/arm64/mm/fault.c                              |    4 +-
+ arch/arm64/mm/mteswap.c                            |   16 +-
+ arch/arm64/tools/gen-sysreg.awk                    |    2 +-
+ arch/arm64/tools/sysreg                            |  754 +++++++++++++
+ arch/x86/include/asm/kvm_host.h                    |    2 -
+ arch/x86/kvm/x86.c                                 |   15 +-
+ fs/proc/page.c                                     |    3 +-
+ include/kvm/arm_pmu.h                              |   15 +-
+ include/kvm/arm_vgic.h                             |    1 +
+ include/linux/kernel-page-flags.h                  |    1 +
+ include/linux/kvm_dirty_ring.h                     |   20 +-
+ include/linux/kvm_host.h                           |   10 +-
+ include/linux/page-flags.h                         |    3 +-
+ include/trace/events/mmflags.h                     |    9 +-
+ include/uapi/linux/kvm.h                           |    1 +
+ mm/Kconfig                                         |    8 +
+ mm/huge_memory.c                                   |    3 +-
+ tools/include/linux/bitfield.h                     |  176 ++++
+ tools/testing/selftests/kvm/.gitignore             |    1 +
+ tools/testing/selftests/kvm/Makefile               |    3 +
+ .../selftests/kvm/aarch64/aarch32_id_regs.c        |    3 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c       |  311 ++++--
+ .../selftests/kvm/aarch64/page_fault_test.c        | 1112 ++++++++++++++++++++
+ .../selftests/kvm/access_tracking_perf_test.c      |    8 +-
+ tools/testing/selftests/kvm/demand_paging_test.c   |  228 +---
+ tools/testing/selftests/kvm/dirty_log_test.c       |   53 +-
+ .../selftests/kvm/include/aarch64/processor.h      |   35 +-
+ .../testing/selftests/kvm/include/kvm_util_base.h  |   31 +-
+ .../testing/selftests/kvm/include/perf_test_util.h |    3 +
+ .../selftests/kvm/include/userfaultfd_util.h       |   45 +
+ .../testing/selftests/kvm/lib/aarch64/processor.c  |   55 +-
+ tools/testing/selftests/kvm/lib/elf.c              |    3 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c         |   84 +-
+ tools/testing/selftests/kvm/lib/perf_test_util.c   |    3 +
+ tools/testing/selftests/kvm/lib/riscv/processor.c  |   29 +-
+ tools/testing/selftests/kvm/lib/s390x/processor.c  |    8 +-
+ tools/testing/selftests/kvm/lib/userfaultfd_util.c |  186 ++++
+ tools/testing/selftests/kvm/lib/x86_64/processor.c |   13 +-
+ .../kvm/memslot_modification_stress_test.c         |    6 +-
+ tools/testing/selftests/kvm/memslot_perf_test.c    |  317 ++++--
+ virt/kvm/Kconfig                                   |    6 +
+ virt/kvm/dirty_ring.c                              |   46 +-
+ virt/kvm/kvm_main.c                                |   65 +-
+ 91 files changed, 6073 insertions(+), 1773 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+ create mode 100644 tools/include/linux/bitfield.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/page_fault_test.c
+ create mode 100644 tools/testing/selftests/kvm/include/userfaultfd_util.h
+ create mode 100644 tools/testing/selftests/kvm/lib/userfaultfd_util.c
