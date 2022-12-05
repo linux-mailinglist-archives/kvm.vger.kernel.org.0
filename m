@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73F976431B9
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 20:17:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A57F64319F
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 20:17:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233231AbiLETPe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 14:15:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33640 "EHLO
+        id S232894AbiLETPb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 14:15:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232825AbiLETO4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232839AbiLETO4 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 5 Dec 2022 14:14:56 -0500
 Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8139E24F1C
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 11:14:48 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id m2-20020a17090a730200b0021020cce6adso17328268pjk.3
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 11:14:48 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D3B624BEC
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 11:14:50 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id x6-20020a17090a46c600b002190cdd7bcdso11602435pjg.6
+        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 11:14:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K57oVOTIJXpguseziCpg/vQQxs6UXuw9AbSA2owsfi8=;
-        b=HtNBFcKG2iy4lFtJgcQ2xtObzlJMApX2s5CCj602Z3YNcQZiiu4DinXAshfTLmpGL3
-         yHwshknSCXvZA0MQjNAiuo2bOAn98fxg6mB1VPK7dqmIdlddw3Ajd5dYS/aXv9Emc27+
-         2a27HuRsuArPQFL2LSU4Yhx2fw0vpwq0ncdumR/5cK4AqweQZ5i5KeG/peP2HSVqx09X
-         u13F8680UwOBRQUDi2qWJoPx3Yo9pNYS5+zgScJauFsqeSJYIrCo3DA7Hqn4ZZF6xEM4
-         KisoYUqZn+gXdB0IK2wtcE8ygz5SGy6M0Ant3QOdBaXxjx/DZQFA7W9m1uHje5ynkZKB
-         B4zw==
+        bh=daLxPAlj0AKgivwx7dIcxg+ckndNdpX6zDGreZFgJFw=;
+        b=p6pPA/AoTDm7+9HZI9Q5ZYRXstd8T2xwmx9ZTx5bqUtQjIck7MAxYfNFCGQSweWMlk
+         h+QzNgiHgJKPviOjrSfmkbSG2PHv/NM9C64QX8wmPogTfSM+Eo0aV4vhouZyZcevt3Qf
+         AmGNJ5Qx7rjlcWpZZ4B6hBtCdk+1Kgglv1dyXhlQ8wRaoV4dj3G6uQPOrFnZeJscNG3v
+         HVkyHNgEKykTMi5z8rSCkc6Ri2xMLsGQXS1gQwe2UqBhSr3j3Zi9krjNM4k6lY/t32HG
+         qWagqMxjPcwWqGXUg/HlfhHiLsx5qIbAis63acAEhrlNiDULCOeXvUBzoF4ZjL3hc0pa
+         ZMbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K57oVOTIJXpguseziCpg/vQQxs6UXuw9AbSA2owsfi8=;
-        b=JyBsCaIWuA5FAUQt6SS6MS3aPEXflmzDFd1e6rjA4KOUFTE3mnlOMaBWn59WkDFYDP
-         hVQemQ5c4W8pvI35E5J4vuoISe/dsE0vClWYgBxS8eWy8W4IsFr4YcqICHWYcIUvIemV
-         4f+jlgqvM5Xt/frtC3+/NVafrTwtH6aT6y398ielyiKr8rljUSkMTiWgiI8M8/ACAS3K
-         cyC/fiHL+jKTE/PsA53tzgTjwwqoyZZCDzk0CN7qdMOWrkbzmehjjpDd2/8uHM7uUkbE
-         /CXdGnvoUBCup5s240pczt/njK8Xa9UEc39cTWxhlZhEwVRD2bH+z32QUdQd9tzzVGCt
-         054Q==
-X-Gm-Message-State: ANoB5pkLGIba9IvfG5jTkN0NDZBBqG3VH7RozQgTvmJTJ61t0eR25b1r
-        3p32inZtM7mNizCksvvGDu+vFmZzmYGr
-X-Google-Smtp-Source: AA0mqf7FV/ENQoUyINCmRHjVXNLyUgxjB3/KCvGBVqyeh1JKSVBqx3rnmDXbuGwxWkKaQz3VUz/rlt3Ks4rL
+        bh=daLxPAlj0AKgivwx7dIcxg+ckndNdpX6zDGreZFgJFw=;
+        b=iXF4DbEEmwk7+MXEV+bnBGqXxxfuUzSBCuXneHtotDI8Zj0l8EAKvhofFZk1CLponY
+         p51+Se3EaDO5aYmZwRwZtR/Lnyw/Kw2dmUVq4QJebfkAWB+jy6hPfnTDm0JEPKUkMdie
+         bnyvjxWH59JNqafrK0nhySrW0EtAHgyNI6vLdOL1JgySGSkToEn6dyKBCxOJjRpc5end
+         CFkkJUOFalVbLBjPg8ko4IO15DxtX5DjFNU5iVv2cZV5Luy7FjmB6dFUB4CPRrCcXIxj
+         zDtNihGWvMkEfKHY0EphIoGrgiXFt4cQDeI0bl6F+4NF+tkZklzZ09nZElH0eohq7rD9
+         ke6A==
+X-Gm-Message-State: ANoB5pkQnmQO2BCWqHH6PMf/iKoyRpWVObsl2U53CF46VFe7huJgwB5N
+        RVdtdTY8gktE7wTuRug1VoHUAmBNuepy
+X-Google-Smtp-Source: AA0mqf6MV6b8K6rn/Yh9WvJP+OL4A+6E8sQ8VIfww/YTjrTSp13gWrMvRBBrMhTi2jeQ6p8bkWCQdYfKqBV7
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a17:90a:77cc:b0:219:1747:f19c with SMTP id
- e12-20020a17090a77cc00b002191747f19cmr48553663pjs.222.1670267688064; Mon, 05
- Dec 2022 11:14:48 -0800 (PST)
-Date:   Mon,  5 Dec 2022 11:14:22 -0800
+ (user=vipinsh job=sendgmr) by 2002:aa7:954d:0:b0:576:f9e2:a968 with SMTP id
+ w13-20020aa7954d000000b00576f9e2a968mr5855831pfq.84.1670267689923; Mon, 05
+ Dec 2022 11:14:49 -0800 (PST)
+Date:   Mon,  5 Dec 2022 11:14:23 -0800
 In-Reply-To: <20221205191430.2455108-1-vipinsh@google.com>
 Mime-Version: 1.0
 References: <20221205191430.2455108-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221205191430.2455108-6-vipinsh@google.com>
-Subject: [Patch v3 05/13] KVM: selftests: Convert hyperv_features test to
- using KVM_X86_CPU_FEATURE()
+Message-ID: <20221205191430.2455108-7-vipinsh@google.com>
+Subject: [Patch v3 06/13] KVM: selftests: Test that values written to Hyper-V
+ MSRs are preserved
 From:   Vipin Sharma <vipinsh@google.com>
 To:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
         dmatlack@google.com
@@ -60,8 +60,8 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,USER_IN_DEF_DKIM_WL
-        autolearn=no autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -70,445 +70,91 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-hyperv_features test needs to set certain CPUID bits in Hyper-V feature
-leaves but instead of open coding this, common KVM_X86_CPU_FEATURE()
-infrastructure can be used.
+Enhance 'hyperv_features' selftest by adding a check that KVM
+preserves values written to PV MSRs. Two MSRs are, however, 'special':
+- HV_X64_MSR_EOI as it is a 'write-only' MSR,
+- HV_X64_MSR_RESET as it always reads as '0'.
+The later doesn't require any special handling right now because the
+test never writes anything besides '0' to the MSR, leave a TODO node
+about the fact.
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Reviewed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- .../selftests/kvm/include/x86_64/hyperv.h     | 141 ++++++++++++------
- .../selftests/kvm/x86_64/hyperv_features.c    |  67 ++++-----
- 2 files changed, 127 insertions(+), 81 deletions(-)
+ .../selftests/kvm/x86_64/hyperv_features.c    | 36 ++++++++++++++-----
+ 1 file changed, 28 insertions(+), 8 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-index 9218bb5f44bf..ab455c4efc66 100644
---- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-@@ -85,61 +85,108 @@
- #define HV_X64_MSR_SYNDBG_OPTIONS		0x400000FF
- 
- /* HYPERV_CPUID_FEATURES.EAX */
--#define HV_MSR_VP_RUNTIME_AVAILABLE		BIT(0)
--#define HV_MSR_TIME_REF_COUNT_AVAILABLE		BIT(1)
--#define HV_MSR_SYNIC_AVAILABLE			BIT(2)
--#define HV_MSR_SYNTIMER_AVAILABLE		BIT(3)
--#define HV_MSR_APIC_ACCESS_AVAILABLE		BIT(4)
--#define HV_MSR_HYPERCALL_AVAILABLE		BIT(5)
--#define HV_MSR_VP_INDEX_AVAILABLE		BIT(6)
--#define HV_MSR_RESET_AVAILABLE			BIT(7)
--#define HV_MSR_STAT_PAGES_AVAILABLE		BIT(8)
--#define HV_MSR_REFERENCE_TSC_AVAILABLE		BIT(9)
--#define HV_MSR_GUEST_IDLE_AVAILABLE		BIT(10)
--#define HV_ACCESS_FREQUENCY_MSRS		BIT(11)
--#define HV_ACCESS_REENLIGHTENMENT		BIT(13)
--#define HV_ACCESS_TSC_INVARIANT			BIT(15)
-+#define HV_MSR_VP_RUNTIME_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 0)
-+#define HV_MSR_TIME_REF_COUNT_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 1)
-+#define HV_MSR_SYNIC_AVAILABLE			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 2)
-+#define HV_MSR_SYNTIMER_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 3)
-+#define HV_MSR_APIC_ACCESS_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 4)
-+#define HV_MSR_HYPERCALL_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 5)
-+#define HV_MSR_VP_INDEX_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 6)
-+#define HV_MSR_RESET_AVAILABLE			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 7)
-+#define HV_MSR_STAT_PAGES_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 8)
-+#define HV_MSR_REFERENCE_TSC_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 9)
-+#define HV_MSR_GUEST_IDLE_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 10)
-+#define HV_ACCESS_FREQUENCY_MSRS		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 11)
-+#define HV_ACCESS_REENLIGHTENMENT		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 13)
-+#define HV_ACCESS_TSC_INVARIANT			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EAX, 15)
- 
- /* HYPERV_CPUID_FEATURES.EBX */
--#define HV_CREATE_PARTITIONS			BIT(0)
--#define HV_ACCESS_PARTITION_ID			BIT(1)
--#define HV_ACCESS_MEMORY_POOL			BIT(2)
--#define HV_ADJUST_MESSAGE_BUFFERS		BIT(3)
--#define HV_POST_MESSAGES			BIT(4)
--#define HV_SIGNAL_EVENTS			BIT(5)
--#define HV_CREATE_PORT				BIT(6)
--#define HV_CONNECT_PORT				BIT(7)
--#define HV_ACCESS_STATS				BIT(8)
--#define HV_DEBUGGING				BIT(11)
--#define HV_CPU_MANAGEMENT			BIT(12)
--#define HV_ISOLATION				BIT(22)
-+#define HV_CREATE_PARTITIONS		        \
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 0)
-+#define HV_ACCESS_PARTITION_ID			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 1)
-+#define HV_ACCESS_MEMORY_POOL			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 2)
-+#define HV_ADJUST_MESSAGE_BUFFERS		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 3)
-+#define HV_POST_MESSAGES			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 4)
-+#define HV_SIGNAL_EVENTS			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 5)
-+#define HV_CREATE_PORT				\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 6)
-+#define HV_CONNECT_PORT				\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 7)
-+#define HV_ACCESS_STATS				\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 8)
-+#define HV_DEBUGGING				\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 11)
-+#define HV_CPU_MANAGEMENT			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 12)
-+#define HV_ISOLATION				\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 22)
- 
- /* HYPERV_CPUID_FEATURES.EDX */
--#define HV_X64_MWAIT_AVAILABLE				BIT(0)
--#define HV_X64_GUEST_DEBUGGING_AVAILABLE		BIT(1)
--#define HV_X64_PERF_MONITOR_AVAILABLE			BIT(2)
--#define HV_X64_CPU_DYNAMIC_PARTITIONING_AVAILABLE	BIT(3)
--#define HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE		BIT(4)
--#define HV_X64_GUEST_IDLE_STATE_AVAILABLE		BIT(5)
--#define HV_FEATURE_FREQUENCY_MSRS_AVAILABLE		BIT(8)
--#define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE		BIT(10)
--#define HV_FEATURE_DEBUG_MSRS_AVAILABLE			BIT(11)
--#define HV_STIMER_DIRECT_MODE_AVAILABLE			BIT(19)
-+#define HV_X64_MWAIT_AVAILABLE				\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EDX, 0)
-+#define HV_X64_GUEST_DEBUGGING_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EDX, 1)
-+#define HV_X64_PERF_MONITOR_AVAILABLE			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EDX, 2)
-+#define HV_X64_CPU_DYNAMIC_PARTITIONING_AVAILABLE	\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EDX, 3)
-+#define HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EDX, 4)
-+#define HV_X64_GUEST_IDLE_STATE_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EDX, 5)
-+#define HV_FEATURE_FREQUENCY_MSRS_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EDX, 8)
-+#define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EDX, 10)
-+#define HV_FEATURE_DEBUG_MSRS_AVAILABLE			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EDX, 11)
-+#define HV_STIMER_DIRECT_MODE_AVAILABLE			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EDX, 19)
- 
- /* HYPERV_CPUID_ENLIGHTMENT_INFO.EAX */
--#define HV_X64_AS_SWITCH_RECOMMENDED			BIT(0)
--#define HV_X64_LOCAL_TLB_FLUSH_RECOMMENDED		BIT(1)
--#define HV_X64_REMOTE_TLB_FLUSH_RECOMMENDED		BIT(2)
--#define HV_X64_APIC_ACCESS_RECOMMENDED			BIT(3)
--#define HV_X64_SYSTEM_RESET_RECOMMENDED			BIT(4)
--#define HV_X64_RELAXED_TIMING_RECOMMENDED		BIT(5)
--#define HV_DEPRECATING_AEOI_RECOMMENDED			BIT(9)
--#define HV_X64_CLUSTER_IPI_RECOMMENDED			BIT(10)
--#define HV_X64_EX_PROCESSOR_MASKS_RECOMMENDED		BIT(11)
--#define HV_X64_ENLIGHTENED_VMCS_RECOMMENDED		BIT(14)
-+#define HV_X64_AS_SWITCH_RECOMMENDED			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_ENLIGHTMENT_INFO, 0, EAX, 0)
-+#define HV_X64_LOCAL_TLB_FLUSH_RECOMMENDED		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_ENLIGHTMENT_INFO, 0, EAX, 1)
-+#define HV_X64_REMOTE_TLB_FLUSH_RECOMMENDED		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_ENLIGHTMENT_INFO, 0, EAX, 2)
-+#define HV_X64_APIC_ACCESS_RECOMMENDED			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_ENLIGHTMENT_INFO, 0, EAX, 3)
-+#define HV_X64_SYSTEM_RESET_RECOMMENDED			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_ENLIGHTMENT_INFO, 0, EAX, 4)
-+#define HV_X64_RELAXED_TIMING_RECOMMENDED		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_ENLIGHTMENT_INFO, 0, EAX, 5)
-+#define HV_DEPRECATING_AEOI_RECOMMENDED			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_ENLIGHTMENT_INFO, 0, EAX, 9)
-+#define HV_X64_CLUSTER_IPI_RECOMMENDED			\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_ENLIGHTMENT_INFO, 0, EAX, 10)
-+#define HV_X64_EX_PROCESSOR_MASKS_RECOMMENDED		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_ENLIGHTMENT_INFO, 0, EAX, 11)
-+#define HV_X64_ENLIGHTENED_VMCS_RECOMMENDED		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_ENLIGHTMENT_INFO, 0, EAX, 14)
- 
- /* HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX */
--#define HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING	BIT(1)
-+#define HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING	\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES, 0, EAX, 1)
- 
- /* Hypercalls */
- #define HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE	0x0002
 diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-index 4cf1368af48a..daad3e3cc7bb 100644
+index daad3e3cc7bb..b00240963974 100644
 --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
 +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-@@ -13,6 +13,14 @@
- #include "processor.h"
- #include "hyperv.h"
+@@ -34,22 +34,36 @@ struct hcall_data {
+ 	bool ud_expected;
+ };
  
-+/*
-+ * HYPERV_CPUID_ENLIGHTMENT_INFO.EBX is not a 'feature' CPUID leaf
-+ * but to activate the feature it is sufficient to set it to a non-zero
-+ * value. Use BIT(0) for that.
-+ */
-+#define HV_PV_SPINLOCKS_TEST            \
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_ENLIGHTMENT_INFO, 0, EBX, 0)
++static bool is_write_only_msr(uint32_t msr)
++{
++	return msr == HV_X64_MSR_EOI;
++}
 +
- struct msr_data {
- 	uint32_t idx;
- 	bool fault_expected;
-@@ -89,7 +97,6 @@ static void vcpu_reset_hv_cpuid(struct kvm_vcpu *vcpu)
- static void guest_test_msrs_access(void)
+ static void guest_msr(struct msr_data *msr)
  {
- 	struct kvm_cpuid2 *prev_cpuid = NULL;
--	struct kvm_cpuid_entry2 *feat, *dbg;
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_run *run;
- 	struct kvm_vm *vm;
-@@ -116,9 +123,6 @@ static void guest_test_msrs_access(void)
- 			vcpu_init_cpuid(vcpu, prev_cpuid);
- 		}
+-	uint64_t ignored;
+-	uint8_t vector;
++	uint8_t vector = 0;
++	uint64_t msr_val = 0;
  
--		feat = vcpu_get_cpuid_entry(vcpu, HYPERV_CPUID_FEATURES);
--		dbg = vcpu_get_cpuid_entry(vcpu, HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES);
--
- 		vm_init_descriptor_tables(vm);
- 		vcpu_init_descriptor_tables(vcpu);
+ 	GUEST_ASSERT(msr->idx);
  
-@@ -143,7 +147,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 2:
--			feat->eax |= HV_MSR_HYPERCALL_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_MSR_HYPERCALL_AVAILABLE);
- 			/*
- 			 * HV_X64_MSR_GUEST_OS_ID has to be written first to make
- 			 * HV_X64_MSR_HYPERCALL available.
-@@ -170,7 +174,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 6:
--			feat->eax |= HV_MSR_VP_RUNTIME_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_MSR_VP_RUNTIME_AVAILABLE);
- 			msr->idx = HV_X64_MSR_VP_RUNTIME;
- 			msr->write = false;
- 			msr->fault_expected = false;
-@@ -189,7 +193,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 9:
--			feat->eax |= HV_MSR_TIME_REF_COUNT_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_MSR_TIME_REF_COUNT_AVAILABLE);
- 			msr->idx = HV_X64_MSR_TIME_REF_COUNT;
- 			msr->write = false;
- 			msr->fault_expected = false;
-@@ -208,7 +212,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 12:
--			feat->eax |= HV_MSR_VP_INDEX_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_MSR_VP_INDEX_AVAILABLE);
- 			msr->idx = HV_X64_MSR_VP_INDEX;
- 			msr->write = false;
- 			msr->fault_expected = false;
-@@ -227,7 +231,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 15:
--			feat->eax |= HV_MSR_RESET_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_MSR_RESET_AVAILABLE);
- 			msr->idx = HV_X64_MSR_RESET;
- 			msr->write = false;
- 			msr->fault_expected = false;
-@@ -245,7 +249,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 18:
--			feat->eax |= HV_MSR_REFERENCE_TSC_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_MSR_REFERENCE_TSC_AVAILABLE);
- 			msr->idx = HV_X64_MSR_REFERENCE_TSC;
- 			msr->write = false;
- 			msr->fault_expected = false;
-@@ -272,7 +276,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 22:
--			feat->eax |= HV_MSR_SYNIC_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_MSR_SYNIC_AVAILABLE);
- 			msr->idx = HV_X64_MSR_EOM;
- 			msr->write = false;
- 			msr->fault_expected = false;
-@@ -290,7 +294,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 25:
--			feat->eax |= HV_MSR_SYNTIMER_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_MSR_SYNTIMER_AVAILABLE);
- 			msr->idx = HV_X64_MSR_STIMER0_CONFIG;
- 			msr->write = false;
- 			msr->fault_expected = false;
-@@ -309,7 +313,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 28:
--			feat->edx |= HV_STIMER_DIRECT_MODE_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_STIMER_DIRECT_MODE_AVAILABLE);
- 			msr->idx = HV_X64_MSR_STIMER0_CONFIG;
- 			msr->write = true;
- 			msr->write_val = 1 << 12;
-@@ -322,7 +326,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 30:
--			feat->eax |= HV_MSR_APIC_ACCESS_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_MSR_APIC_ACCESS_AVAILABLE);
- 			msr->idx = HV_X64_MSR_EOI;
- 			msr->write = true;
- 			msr->write_val = 1;
-@@ -335,7 +339,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 32:
--			feat->eax |= HV_ACCESS_FREQUENCY_MSRS;
-+			vcpu_set_cpuid_feature(vcpu, HV_ACCESS_FREQUENCY_MSRS);
- 			msr->idx = HV_X64_MSR_TSC_FREQUENCY;
- 			msr->write = false;
- 			msr->fault_expected = false;
-@@ -354,7 +358,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 35:
--			feat->eax |= HV_ACCESS_REENLIGHTENMENT;
-+			vcpu_set_cpuid_feature(vcpu, HV_ACCESS_REENLIGHTENMENT);
- 			msr->idx = HV_X64_MSR_REENLIGHTENMENT_CONTROL;
- 			msr->write = false;
- 			msr->fault_expected = false;
-@@ -379,7 +383,7 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 39:
--			feat->edx |= HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE);
- 			msr->idx = HV_X64_MSR_CRASH_P0;
- 			msr->write = false;
- 			msr->fault_expected = false;
-@@ -397,8 +401,8 @@ static void guest_test_msrs_access(void)
- 			msr->fault_expected = true;
- 			break;
- 		case 42:
--			feat->edx |= HV_FEATURE_DEBUG_MSRS_AVAILABLE;
--			dbg->eax |= HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING;
-+			vcpu_set_cpuid_feature(vcpu, HV_FEATURE_DEBUG_MSRS_AVAILABLE);
-+			vcpu_set_cpuid_feature(vcpu, HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING);
- 			msr->idx = HV_X64_MSR_SYNDBG_STATUS;
- 			msr->write = false;
- 			msr->fault_expected = false;
-@@ -445,7 +449,6 @@ static void guest_test_msrs_access(void)
+-	if (!msr->write)
+-		vector = rdmsr_safe(msr->idx, &ignored);
+-	else
++	if (msr->write)
+ 		vector = wrmsr_safe(msr->idx, msr->write_val);
  
- static void guest_test_hcalls_access(void)
- {
--	struct kvm_cpuid_entry2 *feat, *recomm, *dbg;
- 	struct kvm_cpuid2 *prev_cpuid = NULL;
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_run *run;
-@@ -480,15 +483,11 @@ static void guest_test_hcalls_access(void)
- 			vcpu_init_cpuid(vcpu, prev_cpuid);
- 		}
++	if (!vector && (!msr->write || !is_write_only_msr(msr->idx)))
++		vector = rdmsr_safe(msr->idx, &msr_val);
++
+ 	if (msr->fault_expected)
+-		GUEST_ASSERT_2(vector == GP_VECTOR, msr->idx, vector);
++		GUEST_ASSERT_3(vector == GP_VECTOR, msr->idx, vector, GP_VECTOR);
+ 	else
+-		GUEST_ASSERT_2(!vector, msr->idx, vector);
++		GUEST_ASSERT_3(!vector, msr->idx, vector, 0);
++
++	if (vector || is_write_only_msr(msr->idx))
++		goto done;
++
++	if (msr->write)
++		GUEST_ASSERT_3(msr_val == msr->write_val, msr->idx,
++			       msr_val, msr->write_val);
++done:
+ 	GUEST_DONE();
+ }
  
--		feat = vcpu_get_cpuid_entry(vcpu, HYPERV_CPUID_FEATURES);
--		recomm = vcpu_get_cpuid_entry(vcpu, HYPERV_CPUID_ENLIGHTMENT_INFO);
--		dbg = vcpu_get_cpuid_entry(vcpu, HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES);
--
- 		run = vcpu->run;
- 
- 		switch (stage) {
- 		case 0:
--			feat->eax |= HV_MSR_HYPERCALL_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_MSR_HYPERCALL_AVAILABLE);
- 			hcall->control = 0xbeef;
- 			hcall->expect = HV_STATUS_INVALID_HYPERCALL_CODE;
- 			break;
-@@ -498,7 +497,7 @@ static void guest_test_hcalls_access(void)
- 			hcall->expect = HV_STATUS_ACCESS_DENIED;
- 			break;
- 		case 2:
--			feat->ebx |= HV_POST_MESSAGES;
-+			vcpu_set_cpuid_feature(vcpu, HV_POST_MESSAGES);
- 			hcall->control = HVCALL_POST_MESSAGE;
- 			hcall->expect = HV_STATUS_INVALID_HYPERCALL_INPUT;
- 			break;
-@@ -508,7 +507,7 @@ static void guest_test_hcalls_access(void)
- 			hcall->expect = HV_STATUS_ACCESS_DENIED;
- 			break;
- 		case 4:
--			feat->ebx |= HV_SIGNAL_EVENTS;
-+			vcpu_set_cpuid_feature(vcpu, HV_SIGNAL_EVENTS);
- 			hcall->control = HVCALL_SIGNAL_EVENT;
- 			hcall->expect = HV_STATUS_INVALID_HYPERCALL_INPUT;
- 			break;
-@@ -518,12 +517,12 @@ static void guest_test_hcalls_access(void)
- 			hcall->expect = HV_STATUS_INVALID_HYPERCALL_CODE;
- 			break;
- 		case 6:
--			dbg->eax |= HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING;
-+			vcpu_set_cpuid_feature(vcpu, HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING);
- 			hcall->control = HVCALL_RESET_DEBUG_SESSION;
- 			hcall->expect = HV_STATUS_ACCESS_DENIED;
- 			break;
- 		case 7:
--			feat->ebx |= HV_DEBUGGING;
-+			vcpu_set_cpuid_feature(vcpu, HV_DEBUGGING);
- 			hcall->control = HVCALL_RESET_DEBUG_SESSION;
- 			hcall->expect = HV_STATUS_OPERATION_DENIED;
- 			break;
-@@ -533,7 +532,7 @@ static void guest_test_hcalls_access(void)
- 			hcall->expect = HV_STATUS_ACCESS_DENIED;
- 			break;
- 		case 9:
--			recomm->eax |= HV_X64_REMOTE_TLB_FLUSH_RECOMMENDED;
-+			vcpu_set_cpuid_feature(vcpu, HV_X64_REMOTE_TLB_FLUSH_RECOMMENDED);
- 			hcall->control = HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE;
- 			hcall->expect = HV_STATUS_SUCCESS;
- 			break;
-@@ -542,7 +541,7 @@ static void guest_test_hcalls_access(void)
- 			hcall->expect = HV_STATUS_ACCESS_DENIED;
- 			break;
- 		case 11:
--			recomm->eax |= HV_X64_EX_PROCESSOR_MASKS_RECOMMENDED;
-+			vcpu_set_cpuid_feature(vcpu, HV_X64_EX_PROCESSOR_MASKS_RECOMMENDED);
- 			hcall->control = HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX;
- 			hcall->expect = HV_STATUS_SUCCESS;
- 			break;
-@@ -552,7 +551,7 @@ static void guest_test_hcalls_access(void)
- 			hcall->expect = HV_STATUS_ACCESS_DENIED;
- 			break;
- 		case 13:
--			recomm->eax |= HV_X64_CLUSTER_IPI_RECOMMENDED;
-+			vcpu_set_cpuid_feature(vcpu, HV_X64_CLUSTER_IPI_RECOMMENDED);
- 			hcall->control = HVCALL_SEND_IPI;
- 			hcall->expect = HV_STATUS_INVALID_HYPERCALL_INPUT;
- 			break;
-@@ -567,7 +566,7 @@ static void guest_test_hcalls_access(void)
- 			hcall->expect = HV_STATUS_ACCESS_DENIED;
- 			break;
+@@ -239,6 +253,12 @@ static void guest_test_msrs_access(void)
  		case 16:
--			recomm->ebx = 0xfff;
-+			vcpu_set_cpuid_feature(vcpu, HV_PV_SPINLOCKS_TEST);
- 			hcall->control = HVCALL_NOTIFY_LONG_SPIN_WAIT;
- 			hcall->expect = HV_STATUS_SUCCESS;
+ 			msr->idx = HV_X64_MSR_RESET;
+ 			msr->write = true;
++			/*
++			 * TODO: the test only writes '0' to HV_X64_MSR_RESET
++			 * at the moment, writing some other value there will
++			 * trigger real vCPU reset and the code is not prepared
++			 * to handle it yet.
++			 */
+ 			msr->write_val = 0;
+ 			msr->fault_expected = false;
  			break;
-@@ -577,7 +576,7 @@ static void guest_test_hcalls_access(void)
- 			hcall->ud_expected = true;
+@@ -433,7 +453,7 @@ static void guest_test_msrs_access(void)
+ 
+ 		switch (get_ucall(vcpu, &uc)) {
+ 		case UCALL_ABORT:
+-			REPORT_GUEST_ASSERT_2(uc, "MSR = %lx, vector = %lx");
++			REPORT_GUEST_ASSERT_3(uc, "MSR = %lx, arg1 = %lx, arg2 = %lx");
+ 			return;
+ 		case UCALL_DONE:
  			break;
- 		case 18:
--			feat->edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
-+			vcpu_set_cpuid_feature(vcpu, HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE);
- 			hcall->control = HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE | HV_HYPERCALL_FAST_BIT;
- 			hcall->ud_expected = false;
- 			hcall->expect = HV_STATUS_SUCCESS;
 -- 
 2.39.0.rc0.267.gcb52ba06e7-goog
 
