@@ -2,121 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BBA56430C3
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 19:51:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3AB86430CB
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 19:54:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231434AbiLESvh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 13:51:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40972 "EHLO
+        id S232149AbiLESyW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 13:54:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230148AbiLESvg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 13:51:36 -0500
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EADC31C41A
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 10:51:34 -0800 (PST)
-Received: by mail-qv1-xf34.google.com with SMTP id i12so8838335qvs.2
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 10:51:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XB10lz0QsRjxLo2pbbY9hjkEwtxi6QdcCS8KNqwdFjM=;
-        b=srFFNGm0Vqfsjysj03v3upOR/SxH0q3SyRMSCSv5leOyvmjpHcGdYZpBucA2Yg8NSU
-         /M74vYI6eIubRN3KThGKGsxjamCtXZgFrs8sMNC5BEsS0dHC97uIhJpQLafrt4zixZEz
-         FT1YT+pFHm2q7Q0ddFjI6gp32DLIUtbckL8+qF1ST2xUJfmXOpBkQFjj2aK+r2W5NjjB
-         78E8vIFyjmvB1d970w3rtv0wGhbbB7S83YEx9NpzF+gDFn5C2hOn9+Plm0HIaWQAjenQ
-         Y+UV6XkEt8xjzMciiN4a+g7D7amdD2+lLG9+WWiJyhebbroVc6vHlThTRZE/O9WCuS5U
-         rfBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XB10lz0QsRjxLo2pbbY9hjkEwtxi6QdcCS8KNqwdFjM=;
-        b=hRdvQvBKEVeQ0804oX+KJl/Zwu15JbW8Iu3wpvRlOp/9fXXO9FPPGaIWS3UNxLZQuh
-         pW6OwfoQ1+w12KBbeecKrl0vI4n3vw2Zs5LQPR/dg6xBrFI53+nFdnjzlHNfUOVShwWb
-         aLQD6NwNcSWOnA0HPUmCA80DG6EBVdZjKEptizUxeO/EVvsnaeCdaXVDKrle3OqIpVo5
-         1XMtUERmYgX2VeT8NNZcheuJ/eCviXRLcfFhyJMev4LYeGP/d81MEuQNWmADm4pcbhcz
-         gNBttTQNBfX2XlNZWO0b6Zn1r6CbNOePec3opBEJLAUigCZMPhSKUI6u+nqeNamxUjJA
-         pXOA==
-X-Gm-Message-State: ANoB5pnvrTdTWtmb1u3wzMMvjXPWQer14rdWwbraaZlAdYKzVLPNEluZ
-        tupKizbvUlQPb5kC+CmjBtPTcDAP2E1ntC716rtJxw==
-X-Google-Smtp-Source: AA0mqf5L3yZ9yRFFO9MUhWxAJgXtvIEyXL+pf6sijvhqvES8UEBskCyc0CKlqmLc+H30OAG3zLlpVJWs2+vU+TzW3r4=
-X-Received: by 2002:a0c:e6a9:0:b0:4bb:892a:fc11 with SMTP id
- j9-20020a0ce6a9000000b004bb892afc11mr58693006qvn.28.1670266293960; Mon, 05
- Dec 2022 10:51:33 -0800 (PST)
+        with ESMTP id S230036AbiLESyC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 13:54:02 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22E3F1FCFB;
+        Mon,  5 Dec 2022 10:54:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D4AF8B811E9;
+        Mon,  5 Dec 2022 18:53:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 002C8C433C1;
+        Mon,  5 Dec 2022 18:53:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670266438;
+        bh=dDkwloYPqTSZ4SPvf12m0QEAckEY0pJcFUlkg7vk9bw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dVE9deyV41By2ecKZTxyNR/vJluvD+S+wrV47jbjfV8izTa4gMYXx7zIVwLauOsyN
+         IHLVw3h9kHqr4SHZB2URR7iU/abT0V9/hd34vcLM74k2roTRA22lvJmObJDJzHA6g4
+         3qfgroGFhn4D/LIfrc4+DUSofA80f3hgJFeS1jVSc4v9m4CXqPaB9j72EGyto04aBz
+         ylV3HyuobxbU0IcwC/x0l6GGOO/8PRYpDdYDfX9oeu3z6eORZ+phGKIFZiK+5kbTG2
+         sc+yFdW1qyVq8CMgqZxRBGS7YJg67BmjczpwnszScQFrOdJr7Lpw/qIvcdRu+LQ0OM
+         fytLkls7jOHsg==
+Date:   Mon, 5 Dec 2022 18:53:53 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     Jisheng Zhang <jszhang@kernel.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 04/13] riscv: hwcap: make ISA extension ids can be
+ used in asm
+Message-ID: <Y44+QWJfaa7haS/5@spud>
+References: <20221204174632.3677-1-jszhang@kernel.org>
+ <20221204174632.3677-5-jszhang@kernel.org>
 MIME-Version: 1.0
-References: <20221201195718.1409782-1-vipinsh@google.com> <20221201195718.1409782-2-vipinsh@google.com>
- <CANgfPd_sZoW6gRNgs44BbBu4RhwqNPjUO-=biJ++L5d8LpU3zg@mail.gmail.com> <Y4481WPLstNidb9X@google.com>
-In-Reply-To: <Y4481WPLstNidb9X@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 5 Dec 2022 10:51:23 -0800
-Message-ID: <CANgfPd_Ya0TeSBp5ipseA3fT1C0L3NPGSaZ=0ACjyKa_PvrZxA@mail.gmail.com>
-Subject: Re: [Patch v2 1/2] KVM: x86/mmu: Allocate page table pages on TDP
- splits during dirty log enable on the underlying page's numa node
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vipin Sharma <vipinsh@google.com>, dmatlack@google.com,
-        pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="SoXKSTu70JicbV71"
+Content-Disposition: inline
+In-Reply-To: <20221204174632.3677-5-jszhang@kernel.org>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 5, 2022 at 10:47 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> Side topic, the shortlog is way, way too long.  The purpose of the shortlog is
-> to provide a synopsis of the change, not to describe the change in detail.
->
-> I also think this patch should be 2/2, with the more generic support added along
-> with the module param (or capability) in 1/2.  E.g. to yield something like
->
->   KVM: x86/mmu: Add a module param to make per-vCPU SPTs NUMA aware
->   KVM: x86/mmu: Honor NUMA awareness for per-VM page table allocations
->
-> On Mon, Dec 05, 2022, Ben Gardon wrote:
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index 4736d7849c60..0554dfc55553 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -90,6 +90,9 @@ __MODULE_PARM_TYPE(nx_huge_pages_recovery_period_ms, "uint");
-> > >  static bool __read_mostly force_flush_and_sync_on_reuse;
-> > >  module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
-> > >
-> > > +static bool __read_mostly numa_aware_pagetable = true;
-> > > +module_param_named(numa_aware_pagetable, numa_aware_pagetable, bool, 0644);
-> > > +
-> >
-> > I'm usually all for having module params to control things, but in
-> > this case I don't think it provides much value because whether this
-> > NUMA optimization is useful or not is going to depend more on VM size
-> > and workload than anything else. If we wanted to make this
-> > configurable, a VM capability would probably be a better mechanism so
-> > that userspace could leave it off when running small,
-> > non-performance-sensitive VMs
->
-> Would we actually want to turn it off in this case?  IIUC, @nid is just the
-> preferred node, i.e. failure to allocate for the preferred @nid will result in
-> falling back to other nodes, not outright failure.  So the pathological worst
-> case scenario would be that for a system with VMs that don't care about performance,
-> all of a nodes memory is allocated due to all VMs starting on that node.
->
-> On the flip side, if a system had a mix of VM shapes, I think we'd want even the
-> performance insensitive VMs to be NUMA aware so that they can be sequestered on
-> their own node(s), i.e. don't "steal" memory from the VMs that are performance
-> sensitive and have been affined to a single node.
 
-Yeah, the only reason to turn it off would be to save memory. As a
-strawman, if you had 100 1-vCPU VMs on a 2 node system, you'd have
-4000 pages allocated in caches, doing nothing.
+--SoXKSTu70JicbV71
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->
-> > and turn it on when running large, multi-node VMs. A whole-host module
-> > parameter seems overly restrictive.
+Hey Jisheng,
+
+On Mon, Dec 05, 2022 at 01:46:23AM +0800, Jisheng Zhang wrote:
+> We will make use of ISA extension in asm files, so make the multi-letter
+> RISC-V ISA extension IDs macros rather than enums and move them and
+> those base ISA extension IDs to suitable place.
+
+Which base ISA extension IDs? Changelog should match the patch contents,
+and it's a little unclear here since the base ISA extension IDs are
+visible here but in the context not the diff.
+
+>=20
+> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> Reviewed-by: Heiko Stuebner <heiko@sntech.de>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
+>  arch/riscv/include/asm/hwcap.h | 43 ++++++++++++++++------------------
+>  1 file changed, 20 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwca=
+p.h
+> index b22525290073..996884986fea 100644
+> --- a/arch/riscv/include/asm/hwcap.h
+> +++ b/arch/riscv/include/asm/hwcap.h
+> @@ -12,20 +12,6 @@
+>  #include <linux/bits.h>
+>  #include <uapi/asm/hwcap.h>
+> =20
+> -#ifndef __ASSEMBLY__
+> -#include <linux/jump_label.h>
+> -/*
+> - * This yields a mask that user programs can use to figure out what
+> - * instruction set this cpu supports.
+> - */
+> -#define ELF_HWCAP		(elf_hwcap)
+> -
+> -enum {
+> -	CAP_HWCAP =3D 1,
+> -};
+> -
+> -extern unsigned long elf_hwcap;
+> -
+>  #define RISCV_ISA_EXT_a		('a' - 'a')
+>  #define RISCV_ISA_EXT_c		('c' - 'a')
+>  #define RISCV_ISA_EXT_d		('d' - 'a')
+> @@ -46,22 +32,33 @@ extern unsigned long elf_hwcap;
+>  #define RISCV_ISA_EXT_BASE 26
+> =20
+>  /*
+> - * This enum represent the logical ID for each multi-letter RISC-V ISA e=
+xtension.
+> + * These macros represent the logical ID for each multi-letter RISC-V IS=
+A extension.
+>   * The logical ID should start from RISCV_ISA_EXT_BASE and must not exce=
+ed
+>   * RISCV_ISA_EXT_MAX. 0-25 range is reserved for single letter
+>   * extensions while all the multi-letter extensions should define the ne=
+xt
+>   * available logical extension id.
+>   */
+> -enum riscv_isa_ext_id {
+> -	RISCV_ISA_EXT_SSCOFPMF =3D RISCV_ISA_EXT_BASE,
+> -	RISCV_ISA_EXT_SVPBMT,
+> -	RISCV_ISA_EXT_ZICBOM,
+> -	RISCV_ISA_EXT_ZIHINTPAUSE,
+> -	RISCV_ISA_EXT_SSTC,
+> -	RISCV_ISA_EXT_SVINVAL,
+> -	RISCV_ISA_EXT_ID_MAX =3D RISCV_ISA_EXT_MAX,
+> +#define RISCV_ISA_EXT_SSCOFPMF		26
+> +#define RISCV_ISA_EXT_SVPBMT		27
+> +#define RISCV_ISA_EXT_ZICBOM		28
+> +#define RISCV_ISA_EXT_ZIHINTPAUSE	29
+> +#define RISCV_ISA_EXT_SSTC		30
+> +#define RISCV_ISA_EXT_SVINVAL		31
+
+Could you re-order these alphabetically when you move them please?
+
+Thanks,
+Conor.
+
+> +
+> +#ifndef __ASSEMBLY__
+> +#include <linux/jump_label.h>
+> +/*
+> + * This yields a mask that user programs can use to figure out what
+> + * instruction set this cpu supports.
+> + */
+> +#define ELF_HWCAP		(elf_hwcap)
+> +
+> +enum {
+> +	CAP_HWCAP =3D 1,
+>  };
+> =20
+> +extern unsigned long elf_hwcap;
+> +
+>  /*
+>   * This enum represents the logical ID for each RISC-V ISA extension sta=
+tic
+>   * keys. We can use static key to optimize code path if some ISA extensi=
+ons
+> --=20
+> 2.37.2
+>=20
+
+--SoXKSTu70JicbV71
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY44+QQAKCRB4tDGHoIJi
+0lI5AQCQU4Yulx3aPJ/8VwGzte0KU1wRgZkLQgu+/cIrvg4iygEArz2COMO1jpcT
+yHkDw3opFZX0/12MgPrroFAUZCOdQQw=
+=Ph2m
+-----END PGP SIGNATURE-----
+
+--SoXKSTu70JicbV71--
