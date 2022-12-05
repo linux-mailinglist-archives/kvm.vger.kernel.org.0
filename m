@@ -2,209 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 534AA6436AE
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 22:20:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D515643762
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 22:52:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233067AbiLEVUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 16:20:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52910 "EHLO
+        id S232399AbiLEVws convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 5 Dec 2022 16:52:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232916AbiLEVUM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 16:20:12 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D4A922B1E
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 13:20:11 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id h7so14766961wrs.6
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 13:20:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=tvspzYuiNlqsolHQI9cb6UyP9lHHvgHoYr6XTMSAWqM=;
-        b=dsRKl0ZRF1eSzedOz30CZ2dJwfwV7y4nwtkPD4smqjVfgP9d7dmpoOw6yIogiGj/nZ
-         zU4YOI4+hZ+TE1Gds3vtpKbi8wJai7dTjae9wMfrwM0Qh+NCnHxbgZR4Wjwq+C+wrCxW
-         xUJQCbItYCDNOAV3wRMWxcwcqz3/b1fuV9e1GtzUnooJ/KjQMEgfd/gpOoAMxOQKgcy+
-         zsBJfIzp4ArHQtzPpflCnoX6qgpuTkueVJS2TmxRACY/1Tx1SnuJjup/isAofnnK5gdr
-         13xZMNb/k3wNV0ojVPKXY7OBxHzx/bQCA7biHHZZSWmyU6CsalX1sBY49NGJ4YTKI8LV
-         M6+A==
+        with ESMTP id S234341AbiLEVwR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 16:52:17 -0500
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA738112F;
+        Mon,  5 Dec 2022 13:51:06 -0800 (PST)
+Received: by mail-vk1-f181.google.com with SMTP id 6so3892711vkz.0;
+        Mon, 05 Dec 2022 13:51:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tvspzYuiNlqsolHQI9cb6UyP9lHHvgHoYr6XTMSAWqM=;
-        b=QWyWeR/CSWCqsouaV4SZ3BxMDAcBISf5Y/IfSVF3G/1qymIcXvs2eBZ2Twye2gP6xY
-         ICD4YRAUdFuZg++Zhd+wTecPyXvEPXMQWZfkqyj91rN/uYX9L2yyIZn0KpiLqqad+dsl
-         FgLWnzXfmhyndQeRlIShC2LUwzHAozjJKqSu7JzDgyRRxZcreA9IBQpPS4tRuTUC8eVp
-         wU6bqoqiWXYvBevzSNf/jUUpOH0qDhg10f0QQBBk/leSo+13iGPU0t8c1F50LgNVyghJ
-         E1fszB0Q+H3Ae2xkyUX39x/uSwNT2d9M0OS9/udKDYCTSUpKpd0zIUrSjxk1d3vy7ssC
-         f+WA==
-X-Gm-Message-State: ANoB5pnXqY2T6OgPU5Izu2sBEYAfHkRIj9pchAb1aivYVohghfbPLCgR
-        jN6mCIoICUbvdrb17VHW9VfWN2Mis3q/P/TnYxxv3w==
-X-Google-Smtp-Source: AA0mqf6a0X/TGRnbbsp7Qd6SvXvGiMvX6c07IfefpbXvQ6O+QW2rALKmjJ0Ku5ZwK7wmbWmPn0UZRm58qA5zBSGOaH4=
-X-Received: by 2002:a05:6000:124d:b0:242:10a:6667 with SMTP id
- j13-20020a056000124d00b00242010a6667mr34250640wrx.39.1670275209777; Mon, 05
- Dec 2022 13:20:09 -0800 (PST)
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mFdsLFzswFTMipJStVwFiJsipVOV+7MBmY79S1gML8g=;
+        b=pN3iVsdUe89rB2QlXMZtfkRVEpP/2SDisnAA6dUj78/RsyB2q5TvT2ck1KCZvusOFz
+         fVZ8EU1nSJcwfyV7GfnK+1sB1HYxBg/1BMgA6Kcl8VttbTDksyK8no0OttBbUM4rSJn9
+         hr5pV5R1JuKnd1pl0w/L1pp8kDDYbnfEG+CCBB8DIp2CLtXboOo5l129rvMLM+pjo70e
+         pwSi1kyXeL7jcASyS+kpjJqdFJZviMxanRiD5pfJ387pYMh2+95aHtTM1rHufr0U4sRQ
+         V4P9MM7meej3b+MyfKiLkFh/7KyJ8KU1XJtiOcWRlKiflwdf59ZVvemGOapS70s+BzDC
+         wi/Q==
+X-Gm-Message-State: ANoB5pmxVA90FWZy0SYOEADcj+8sKMKQLSKqjs2m947pv9wM4E44ESDb
+        DLJX5+YWCv9Cuxx2+xItXvAnc7NfCfCYWA==
+X-Google-Smtp-Source: AA0mqf4VsF/MmDcoGXN+DmdBHP+zaV9q/Nr0d2lwAXRkoUQj75D0qLdVJQsskplAGWImSoXFq9FpeQ==
+X-Received: by 2002:a05:6122:2a8:b0:3b8:b112:5eed with SMTP id 8-20020a05612202a800b003b8b1125eedmr37783652vkq.24.1670277065315;
+        Mon, 05 Dec 2022 13:51:05 -0800 (PST)
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com. [209.85.217.46])
+        by smtp.gmail.com with ESMTPSA id j125-20020a1f5583000000b003a9993cdda6sm2367947vkb.54.2022.12.05.13.51.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Dec 2022 13:51:04 -0800 (PST)
+Received: by mail-vs1-f46.google.com with SMTP id 125so12422225vsi.9;
+        Mon, 05 Dec 2022 13:51:04 -0800 (PST)
+X-Received: by 2002:a05:6102:2221:b0:3b0:4a83:954d with SMTP id
+ d1-20020a056102222100b003b04a83954dmr38222003vsb.62.1670277064155; Mon, 05
+ Dec 2022 13:51:04 -0800 (PST)
 MIME-Version: 1.0
-References: <CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com>
- <Y4qgampvx4lrHDXt@google.com> <Y44NylxprhPn6AoN@x1n> <CALzav=d=N7teRvjQZ1p0fs6i9hjmH7eVppJLMh_Go4TteQqqwg@mail.gmail.com>
- <Y442dPwu2L6g8zAo@google.com>
-In-Reply-To: <Y442dPwu2L6g8zAo@google.com>
-From:   James Houghton <jthoughton@google.com>
-Date:   Mon, 5 Dec 2022 16:19:56 -0500
-Message-ID: <CADrL8HV_8=ssHSumpQX5bVm2h2J01swdB=+at8=xLr+KtW79MQ@mail.gmail.com>
-Subject: Re: [RFC] Improving userfaultfd scalability for live migration
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Matlack <dmatlack@google.com>, Peter Xu <peterx@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Linux MM <linux-mm@kvack.org>, kvm <kvm@vger.kernel.org>,
-        chao.p.peng@linux.intel.com
+References: <CAEdEoBYXHq9cCzsbMYTpG1B41Yz=-QAjFx7bJDOnPanN5Tmo7A@mail.gmail.com>
+ <20221204175142.658d5c37.alex.williamson@redhat.com> <1e4d62cf-8893-0bff-51f5-5a2e419ed5a0@suse.de>
+ <CAEdEoBYZa9cg0nq=P7EDsDS9m2EKYrd8M8ucqi8U0Csj0mtjDg@mail.gmail.com> <c1c8bfa5-8ba4-c365-1663-535f656ca353@suse.de>
+In-Reply-To: <c1c8bfa5-8ba4-c365-1663-535f656ca353@suse.de>
+From:   "mb@lab.how" <mb@lab.how>
+Date:   Mon, 5 Dec 2022 14:50:52 -0700
+X-Gmail-Original-Message-ID: <CAEdEoBaixaTEuNfQGv1das7TwHKV9MiRMKQM0kLspveJmipzyg@mail.gmail.com>
+Message-ID: <CAEdEoBaixaTEuNfQGv1das7TwHKV9MiRMKQM0kLspveJmipzyg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] vfio/pci: Remove console drivers
+To:     Thomas Zimmermann <tzimmermann@suse.de>
+Cc:     kvm@vger.kernel.org, airlied@linux.ie,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kraxel@redhat.com, lersek@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8BIT
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
+        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 5, 2022 at 1:20 PM Sean Christopherson <seanjc@google.com> wrote:
+Hi Thomas,
+
+On Mon, Dec 5, 2022 at 3:11 AM Thomas Zimmermann <tzimmermann@suse.de> wrote:
 >
-> On Mon, Dec 05, 2022, David Matlack wrote:
-> > On Mon, Dec 5, 2022 at 7:30 AM Peter Xu <peterx@redhat.com> wrote:
-> > > > > == Getting the faulting GPA to userspace ==
-> > > > > KVM_EXIT_MEMORY_FAULT was introduced recently [1] (not yet merged),
-> > > > > and it provides the main functionality we need. We can extend it
-> > > > > easily to support our use case here, and I think we have at least two
-> > > > > options:
-> > > > > - Introduce something like KVM_CAP_MEM_FAULT_REPORTING, which causes
-> > > > > KVM_RUN to exit with exit reason KVM_EXIT_MEMORY_FAULT when it would
-> > > > > otherwise just return -EFAULT (i.e., when kvm_handle_bad_page returns
-> > > > > -EFAULT).
-> > > > > - We're already introducing a new CAP, so just tie the above behavior
-> > > > > to whether or not one of the CAPs (below) is being used.
-> > > >
-> > > > We might even be able to get away with a third option: unconditionally return
-> > > > KVM_EXIT_MEMORY_FAULT instead of -EFAULT when the error occurs when accessing
-> > > > guest memory.
-
-Wouldn't we need a new CAP for this?
-
-> > > >
-> > > > > == Problems ==
-> > > > > The major problem here is that this only solves the scalability
-> > > > > problem for the KVM demand paging case. Other userfaultfd users, if
-> > > > > they have scalability problems, will need to find another approach.
-> > > >
-> > > > It may not fully solve KVM's problem either.  E.g. if the VM is running nested
-> > > > VMs, many (most?) of the user faults could be triggered by FNAME(walk_addr_generic)
-> > > > via __get_user() when walking L1's EPT tables.
+> Hi
+>
+> Am 05.12.22 um 10:32 schrieb mb@lab.how:
+> > I have a rtx 3070 and a 3090, I am absolutely sure I am binding vfio-pci
+> > to the 3090 and not the 3070.
 > >
-> > We could always modify FNAME(walk_addr_generic) to return out to user
-> > space in the same way if that is indeed another bottleneck.
->
-> Yes, but given that there's a decent chance that solving this problem will add
-> new ABI, I want to make sure that we are confident that we won't end up with gaps
-> in the ABI.  I.e. I don't want to punt the nested case to the future.
->
-> > > > Disclaimer: I know _very_ little about UFFD.
-> > > >
-> > > > Rather than add yet another flag to gup(), what about flag to say the task doesn't
-> > > > want to wait for UFFD faults?  If desired/necessary, KVM could even toggle the flag
-> > > > in KVM_RUN so that faults that occur outside of KVM ultimately don't send an actual
-> > > > SIGBUGS.
-
-I really like this idea! Having KVM_RUN toggle it in
-handle_ept_violation/etc. seems like it would work the best. If we
-toggled it in userspace before KVM_RUN, we would still open ourselves
-up to KVM_RUN exiting without post-copy information (like, if GUP
-failed during instruction emulation), IIUC.
-
+> > I have bound the driver in two different ways, first by passing the IDs
+> > to the module and alternatively by manipulating the system interface and
+> > use the override (this is what I originally had to do when I used two
+> > 1080s, so I know it works).
 > >
-> > There are some copy_to/from_user() calls in KVM that cannot easily
-> > exit out to KVM_RUN (for example, in the guts of the emulator IIRC).
-> > But we could use your approach just to wrap the specific call sites
-> > that can return from KVM_RUN.
->
-> Yeah, it would definitely need to be opt-in.
->
-> > > > diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-> > > > index 07c81ab3fd4d..7f66b56dd6e7 100644
-> > > > --- a/fs/userfaultfd.c
-> > > > +++ b/fs/userfaultfd.c
-> > > > @@ -394,7 +394,7 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
-> > > >          * shmem_vm_ops->fault method is invoked even during
-> > > >          * coredumping without mmap_lock and it ends up here.
-> > > >          */
-> > > > -       if (current->flags & (PF_EXITING|PF_DUMPCORE))
-> > > > +       if (current->flags & (PF_EXITING|PF_DUMPCORE|PF_NO_UFFD_WAIT))
-> > > >                 goto out;
-> > >
-> > > I'll have a closer read on the nested part, but note that this path already
-> > > has the mmap lock then it invalidates the goal if we want to avoid taking
-> > > it from the first place, or maybe we don't care?
-
-Not taking the mmap lock would be helpful, but we still have to take
-it in UFFDIO_CONTINUE, so it's ok if we have to still take it here.
-
-The main goal is to avoid the locks in the userfaultfd wait_queues. If
-we could completely avoid taking the mmap lock for reading in the
-common post-copy case, we would avoid potential latency spikes if
-someone (e.g. khugepaged) came around and grabbed the mmap lock for
-writing.
-
-It seems pretty difficult to make UFFDIO_CONTINUE *not* take the mmap
-lock for reading, but I suppose it could be done with something like
-the per-VMA lock work [2]. If we could avoid taking the lock in
-UFFDIO_CONTINUE, then it seems plausible that we could avoid taking it
-in slow GUP too. So really whether or not we are taking the mmap lock
-(for reading) in the mem fault path isn't a huge deal by itself.
-
-> > >
-> > > If we want to avoid taking the mmap lock at all (hence the fast-gup
-> > > approach), I'd also suggest we don't make it related to uffd at all but
-> > > instead an interface to say "let's check whether the page tables are there
-> > > (walk pgtable by fast-gup only), if not return to userspace".
->
-> Ooh, good point.  If KVM provided a way for userspace to toggle a "fast-only" flag,
-> then hva_to_pfn() could bail if hva_to_pfn_fast() failed, and I think KVM could
-> just do pagefault_disable/enable() around compatible KVM uaccesses?
->
-> > > Because IIUC fast-gup has nothing to do with uffd, so it can also be a more
-> > > generic interface.  It's just that if the userspace knows what it's doing
-> > > (postcopy-ing), it knows then the faults can potentially be resolved by
-> > > userfaultfd at this stage.
+> > While the 3090 doesn't show a console, there's a remnant from the refund
+> > (and grub previously) there.
 > >
-> > Are there any cases where fast-gup can fail while uffd is enabled but
-> > it's not due to uffd? e.g. if a page is swapped out?
+> > The assessment Alex made previously, where
+> > aperture_remove_conflicting_pci_devices() is removing the driver (EFIFB)
+> > instead of the device seems correct, but it could also can be a quirky
+> > of how EFIFB is implemented. I recall reading a long time ago that EFIFB
+> > is a special device and once it detects changes it would simply give up.
+> > There was also no way to attach a device to it again as it depends on
+> > being preloaded outside the kernel; once something takes over the buffer
+> > reinitializing is "impossible". I never went deeper to try and
+> > understand it.
 >
-> Undoubtedly.  COW, NUMA balancing, KSM?, etc.  Nit, I don't think "due to uffd"
-> is the right terminology, I think the right phrasing is something like "but can't
-> be resolved by userspace", or maybe "but weren't induced by userspace".  UFFD
-> itself never causes faults.
+> We recently reworked fbdev's interaction with the aperture helpers. [1]
+> All devices should now be removed iff the driver has been bound to it
+> (which should be the case here) The patches went into an v6.1-rc.
 >
-> > I don't know what userspace would do in those situations to make forward progress.
->
-> Access the page from userspace?  E.g. a "LOCK AND -1" would resolve read and write
-> faults without modifying guest memory.
->
-> That won't work for guests backed by "restricted mem", a.k.a. UPM guests, but
-> restricted mem really should be able to prevent those types of faults in the first
-> place.  SEV guests are the one case I can think of where that approach won't work,
-> since writes will corrupt the guest.  SEV guests can likely be special cased though.
+> Could you try the most recent v6.1-rc and report if this fixes the problem?
 
-As I mentioned in the original email, I think MADV_POPULATE_WRITE
-would work here (Peter suggested this to me last week, thanks Peter!).
-It would basically call slow GUP for us. So instead of hva_to_pfn_fast
-(fails) -> hva_to_pfn_slow -> slow GUP, we do hva_to_pfn_fast (fails)
--> exit to userspace -> MADV_POPULATE_WRITE (-> slow GUP) -> KVM_RUN
--> hva_to_pfn_fast (succeeds).
+I just tried the latest one, v6.1-rc8, and I can see all the commits
+for the series you mentioned there.
 
-[2]: https://lwn.net/Articles/906852/
+The same freeze behavior happens when I load vfio-pci:
 
-- James
+[ 6.525463] VFIO - User Level meta-driver version: 0.3
+[ 6.528231] Console: switching to colour dummy device 320x90
+
+--
+Carlos
+
+>
+> Best regards
+> Thomas
+>
+> [1] https://patchwork.freedesktop.org/series/106040/
+>
+> >
+> >
+> > On Mon, Dec 5, 2022, 2:00 AM Thomas Zimmermann <tzimmermann@suse.de
+> > <mailto:tzimmermann@suse.de>> wrote:
+> >
+> >     Hi
+> >
+> >     Am 05.12.22 um 01:51 schrieb Alex Williamson:
+> >      > On Sat, 3 Dec 2022 17:12:38 -0700
+> >      > "mb@lab.how" <mb@lab.how> wrote:
+> >      >
+> >      >> Hi,
+> >      >>
+> >      >> I hope it is ok to reply to this old thread.
+> >      >
+> >      > It is, but the only relic of the thread is the subject.  For
+> >     reference,
+> >      > the latest version of this posted is here:
+> >      >
+> >      >
+> >     https://lore.kernel.org/all/20220622140134.12763-4-tzimmermann@suse.de/ <https://lore.kernel.org/all/20220622140134.12763-4-tzimmermann@suse.de/>
+> >      >
+> >      > Which is committed as:
+> >      >
+> >      > d17378062079 ("vfio/pci: Remove console drivers")
+> >      >
+> >      >> Unfortunately, I found a
+> >      >> problem only now after upgrading to 6.0.
+> >      >>
+> >      >> My setup has multiple GPUs (2), and I depend on EFIFB to have a
+> >     working console.
+> >
+> >     Which GPUs do you have?
+> >
+> >      >> pre-patch behavior, when I bind the vfio-pci to my secondary GPU
+> >     both
+> >      >> the passthrough and the EFIFB keep working fine.
+> >      >> post-patch behavior, when I bind the vfio-pci to the secondary GPU,
+> >      >> the EFIFB disappears from the system, binding the console to the
+> >      >> "dummy console".
+> >
+> >     The efifb would likely use the first GPU. And vfio-pci should only
+> >     remove the generic driver from the second device. Are you sure that
+> >     you're not somehow using the first GPU with vfio-pci.
+> >
+> >      >> Whenever you try to access the terminal, you have the screen
+> >     stuck in
+> >      >> whatever was the last buffer content, which gives the impression of
+> >      >> "freezing," but I can still type.
+> >      >> Everything else works, including the passthrough.
+> >      >
+> >      > This sounds like the call to
+> >     aperture_remove_conflicting_pci_devices()
+> >      > is removing the conflicting driver itself rather than removing the
+> >      > device from the driver.  Is it not possible to unbind the GPU from
+> >      > efifb before binding the GPU to vfio-pci to effectively nullify the
+> >      > added call?
+> >      >
+> >      >> I can only think about a few options:
+> >      >>
+> >      >> - Is there a way to have EFIFB show up again? After all it looks
+> >     like
+> >      >> the kernel has just abandoned it, but the buffer is still there. I
+> >      >> can't find a single message about the secondary card and EFIFB in
+> >      >> dmesg, but there's a message for the primary card and EFIFB.
+> >      >> - Can we have a boolean controlling the behavior of vfio-pci
+> >      >> altogether or at least controlling the behavior of vfio-pci for that
+> >      >> specific ID? I know there's already some option for vfio-pci and VGA
+> >      >> cards, would it be appropriate to attach this behavior to that
+> >     option?
+> >      >
+> >      > I suppose we could have an opt-out module option on vfio-pci to skip
+> >      > the above call, but clearly it would be better if things worked by
+> >      > default.  We cannot make full use of GPUs with vfio-pci if they're
+> >      > still in use by host console drivers.  The intention was certainly to
+> >      > unbind the device from any low level drivers rather than disable
+> >     use of
+> >      > a console driver entirely.  DRM/GPU folks, is that possibly an
+> >      > interface we could implement?  Thanks,
+> >
+> >     When vfio-pci gives the GPU device to the guest, which driver driver is
+> >     bound to it?
+> >
+> >     Best regards
+> >     Thomas
+> >
+> >      >
+> >      > Alex
+> >      >
+> >
+> >     --
+> >     Thomas Zimmermann
+> >     Graphics Driver Developer
+> >     SUSE Software Solutions Germany GmbH
+> >     Maxfeldstr. 5, 90409 Nürnberg, Germany
+> >     (HRB 36809, AG Nürnberg)
+> >     Geschäftsführer: Ivo Totev
+> >
+>
+> --
+> Thomas Zimmermann
+> Graphics Driver Developer
+> SUSE Software Solutions Germany GmbH
+> Maxfeldstr. 5, 90409 Nürnberg, Germany
+> (HRB 36809, AG Nürnberg)
+> Geschäftsführer: Ivo Totev
