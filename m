@@ -2,150 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F665642BB2
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 16:27:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 07264642BC3
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 16:30:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232539AbiLEP12 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 10:27:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59836 "EHLO
+        id S232836AbiLEPaG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 10:30:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232810AbiLEP1E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 10:27:04 -0500
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50399DA
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 07:25:44 -0800 (PST)
-Received: by mail-ej1-x634.google.com with SMTP id n21so28614952ejb.9
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 07:25:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1z97OrGTU/hJWYAfqZfW/MI++6sXrfXzrMwpvG8EePg=;
-        b=dCM178E8Suk100QO/ms7b3XLKbOF+8tZvEEe9/zk+YQFvI3lnSe87JvStybbKAIfub
-         awqCa8ezZ4Uu3oKML0aHEtQOrVWM0NOjSyxTARAgBYK/FwVOxscrIDZb0vo9C0F1vhTv
-         CVlVKF5k1rIiSR4jcc1yHO9lBRBOEi2eHTk67Em7XOp7ByTQwljVXxY+ojE4+ei+ajt8
-         TEkAfU/7OsPg0uqxbXrxu8GBaSxhxorn+jHdkq93jedGn6DJ+7fXOLXWI5Q/4PjAoldP
-         831OfGZiiaXYkhnPAWplr8SxMrNd9DsxE7ZD4/4GiOHVOhoemq1Qq6Zm+ib+IqnFJXjX
-         Ns7g==
+        with ESMTP id S231713AbiLEP3i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 10:29:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F28A117ABF
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 07:27:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670254031;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9UO7S0SWM1jnP4HZHZJz8sfF1M27ck2q1zdXWGwkxA4=;
+        b=SAwO+d6fft3WMVsWvwgkgGptSeo0cM/vArnGq7jp7HuXNv81l9pCQyT6pIYnQhi6TyJk/j
+        73W/u4nMKy4EKhDsOtpzVm0gQI/pCmQhlKy1TVLL+pbby8BMg3kyr60eaQgr4OSz0a1uy/
+        19hFDxuNM2efc+CySiwpwkqDEpk/a6g=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-608-R5O-JYeUN5SR_eXmuODKgQ-1; Mon, 05 Dec 2022 10:27:09 -0500
+X-MC-Unique: R5O-JYeUN5SR_eXmuODKgQ-1
+Received: by mail-qv1-f72.google.com with SMTP id og17-20020a056214429100b004c6ae186493so30592187qvb.3
+        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 07:27:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1z97OrGTU/hJWYAfqZfW/MI++6sXrfXzrMwpvG8EePg=;
-        b=7wQjrY5c3dQx2ZR6/5QsR7I4CHTfvvO6ZhNZ+xwPiS5DiO7Nd1qybWyM8T1gD4IKHf
-         UHZDqZ3mx9G7bO9Amvk/xWJV+gcGCOa2Fr2H4iUsYpLNNnIl7ehXpAPASqV6t7sW+2vE
-         jpbjyc3XlXT/GgSlR/aICbknmhPadiY5ocIV/VSImq7Yl0HOcgBVpfMcKBqvzJLNPoN3
-         jPL+F3hVPj/FOFpox2qF+XrbRZ+/o06jX6A67c0e3kTBsr9QVoBsHSONInuO32bbrru/
-         0EfJPW9SoFLqEiBNKWEx2zzKYJP9CYXtwCS+wxGTQtWF8jxnZ6/J3vlGZQfTfU3dQ5zk
-         Q2cg==
-X-Gm-Message-State: ANoB5plfAK0MpEMUdOKW4UhyzpefmSPrLUf9T7pzGKs60CUWXmOq9mRQ
-        zds5zYz8SOFLOTPcENYmw3FWMQ==
-X-Google-Smtp-Source: AA0mqf6QxKwgJA2/+pD4o+mt3tAj8MLTz+WBlne9oWrdNVyr9G8GnF6kna89ihFcFCFx1zccpM/vew==
-X-Received: by 2002:a17:906:94e:b0:7ba:4617:3f17 with SMTP id j14-20020a170906094e00b007ba46173f17mr47839324ejd.226.1670253942928;
-        Mon, 05 Dec 2022 07:25:42 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-748-2a9a-a2a6-1362.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:748:2a9a:a2a6:1362])
-        by smtp.gmail.com with ESMTPSA id ca13-20020a170906a3cd00b007c08439161dsm6338597ejb.50.2022.12.05.07.25.42
+        bh=9UO7S0SWM1jnP4HZHZJz8sfF1M27ck2q1zdXWGwkxA4=;
+        b=Q2xQTWeOqK61L6kITuiMhNPkAYRp5C+UVhbrgtLbStAd4MyPJVY2VjNaMDdpIUy3ET
+         S2YpNxlfo+9Bl5Zx+Pm3/6gcw9NnZqn0iVT/7lGUMGjuJkIYJM7cZOvrP6aL8NdfqEG1
+         /SGU9ch8HA0oO8xD+rWN/viwa3kE4mHcvB0oWRI8B18Scl0DsNa5EQiIAPc8P0Ec7X/j
+         BQZNFDcXNZEDtLWFfsBVQQsMaatRaHcugL4glUOuuOwsaCPA+MmQIg2sxrTK/RmYcdVk
+         ZOuUxYy1n9GJa4ITT+WrAb+WTUQstqL1Qaf8W5e5EPctbBImKkcAvQxb0q8VUl5sjGLK
+         L5Og==
+X-Gm-Message-State: ANoB5plFpzxA2dPGLcZEf6CqOyrZ9bZpJRXzkhqJnG9CM8TVTGN2kqwY
+        pu8FT1gP3X5brS731L3dxotM9OXe5OqvZfJ9UouDLBg7F8Ihkl4d0SY0reJ+foT2n0a9uXJafT4
+        fLXyijuCWCr2a
+X-Received: by 2002:ae9:e901:0:b0:6fa:165:131c with SMTP id x1-20020ae9e901000000b006fa0165131cmr57975073qkf.389.1670254028833;
+        Mon, 05 Dec 2022 07:27:08 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6UQwJaurj93pRN1ykjnmCPLyB4AIFdfikJt1EvgSHc1df5f39Dyz+8QoXsXQQcz1rC36pt8w==
+X-Received: by 2002:ae9:e901:0:b0:6fa:165:131c with SMTP id x1-20020ae9e901000000b006fa0165131cmr57975044qkf.389.1670254028534;
+        Mon, 05 Dec 2022 07:27:08 -0800 (PST)
+Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
+        by smtp.gmail.com with ESMTPSA id bn36-20020a05620a2ae400b006fafaac72a6sm2213158qkb.84.2022.12.05.07.27.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Dec 2022 07:25:42 -0800 (PST)
-Date:   Mon, 5 Dec 2022 16:25:41 +0100
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Jisheng Zhang <jszhang@kernel.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 08/13] riscv: module: move find_section to module.h
-Message-ID: <20221205152541.5ahiqvlb7lt6np7w@kamzik>
-References: <20221204174632.3677-1-jszhang@kernel.org>
- <20221204174632.3677-9-jszhang@kernel.org>
+        Mon, 05 Dec 2022 07:27:07 -0800 (PST)
+Date:   Mon, 5 Dec 2022 10:27:06 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     James Houghton <jthoughton@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Linux MM <linux-mm@kvack.org>, kvm <kvm@vger.kernel.org>,
+        chao.p.peng@linux.intel.com
+Subject: Re: [RFC] Improving userfaultfd scalability for live migration
+Message-ID: <Y44NylxprhPn6AoN@x1n>
+References: <CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com>
+ <Y4qgampvx4lrHDXt@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221204174632.3677-9-jszhang@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Y4qgampvx4lrHDXt@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 05, 2022 at 01:46:27AM +0800, Jisheng Zhang wrote:
-> Move it to the header so that the implementation can be shared
-> by the alternatives code.
+On Sat, Dec 03, 2022 at 01:03:38AM +0000, Sean Christopherson wrote:
+> On Thu, Dec 01, 2022, James Houghton wrote:
+> > #1, however, is quite doable. The main codepath for post-copy, the
+> > path that is taken when a vCPU attempts to access unmapped memory, is
+> > (for x86, but similar for other architectures): handle_ept_violation
+> > -> hva_to_pfn -> GUP -> handle_userfault. I'll call this the "EPT
+> > violation path" or "mem fault path." Other post-copy paths include at
+> > least: (i) KVM attempts to access guest memory via.
+> > copy_{to,from}_user -> #pf -> handle_mm_fault -> handle_userfault, and
+> > (ii) other callers of gfn_to_pfn* or hva_to_pfn* outside of the EPT
+> > violation path (e.g., instruction emulation).
+> > 
+> > We want the EPT violation path to be fast, as it is taken the vast
+> > majority of the time.
 > 
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> ---
->  arch/riscv/include/asm/module.h | 15 +++++++++++++++
->  arch/riscv/kernel/module.c      | 15 ---------------
->  2 files changed, 15 insertions(+), 15 deletions(-)
+> ...
 > 
-> diff --git a/arch/riscv/include/asm/module.h b/arch/riscv/include/asm/module.h
-> index 76aa96a9fc08..78722a79fc59 100644
-> --- a/arch/riscv/include/asm/module.h
-> +++ b/arch/riscv/include/asm/module.h
-> @@ -111,4 +111,19 @@ static inline struct plt_entry *get_plt_entry(unsigned long val,
->  
->  #endif /* CONFIG_MODULE_SECTIONS */
-
-Should probably add an explicit #include <linux/elf.h>
-
-Otherwise
-
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-
-Thanks,
-drew
-
->  
-> +static inline const Elf_Shdr *find_section(const Elf_Ehdr *hdr,
-> +					   const Elf_Shdr *sechdrs,
-> +					   const char *name)
-> +{
-> +	const Elf_Shdr *s, *se;
-> +	const char *secstrs = (void *)hdr + sechdrs[hdr->e_shstrndx].sh_offset;
-> +
-> +	for (s = sechdrs, se = sechdrs + hdr->e_shnum; s < se; s++) {
-> +		if (strcmp(name, secstrs + s->sh_name) == 0)
-> +			return s;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
->  #endif /* _ASM_RISCV_MODULE_H */
-> diff --git a/arch/riscv/kernel/module.c b/arch/riscv/kernel/module.c
-> index 91fe16bfaa07..76f4b9c2ec5b 100644
-> --- a/arch/riscv/kernel/module.c
-> +++ b/arch/riscv/kernel/module.c
-> @@ -429,21 +429,6 @@ void *module_alloc(unsigned long size)
->  }
->  #endif
->  
-> -static const Elf_Shdr *find_section(const Elf_Ehdr *hdr,
-> -				    const Elf_Shdr *sechdrs,
-> -				    const char *name)
-> -{
-> -	const Elf_Shdr *s, *se;
-> -	const char *secstrs = (void *)hdr + sechdrs[hdr->e_shstrndx].sh_offset;
-> -
-> -	for (s = sechdrs, se = sechdrs + hdr->e_shnum; s < se; s++) {
-> -		if (strcmp(name, secstrs + s->sh_name) == 0)
-> -			return s;
-> -	}
-> -
-> -	return NULL;
-> -}
-> -
->  int module_finalize(const Elf_Ehdr *hdr,
->  		    const Elf_Shdr *sechdrs,
->  		    struct module *me)
-> -- 
-> 2.37.2
+> > == Getting the faulting GPA to userspace ==
+> > KVM_EXIT_MEMORY_FAULT was introduced recently [1] (not yet merged),
+> > and it provides the main functionality we need. We can extend it
+> > easily to support our use case here, and I think we have at least two
+> > options:
+> > - Introduce something like KVM_CAP_MEM_FAULT_REPORTING, which causes
+> > KVM_RUN to exit with exit reason KVM_EXIT_MEMORY_FAULT when it would
+> > otherwise just return -EFAULT (i.e., when kvm_handle_bad_page returns
+> > -EFAULT).
+> > - We're already introducing a new CAP, so just tie the above behavior
+> > to whether or not one of the CAPs (below) is being used.
 > 
+> We might even be able to get away with a third option: unconditionally return
+> KVM_EXIT_MEMORY_FAULT instead of -EFAULT when the error occurs when accessing
+> guest memory.
+> 
+> > == Problems ==
+> > The major problem here is that this only solves the scalability
+> > problem for the KVM demand paging case. Other userfaultfd users, if
+> > they have scalability problems, will need to find another approach.
+> 
+> It may not fully solve KVM's problem either.  E.g. if the VM is running nested
+> VMs, many (most?) of the user faults could be triggered by FNAME(walk_addr_generic)
+> via __get_user() when walking L1's EPT tables.
+> 
+> Disclaimer: I know _very_ little about UFFD.
+> 
+> Rather than add yet another flag to gup(), what about flag to say the task doesn't
+> want to wait for UFFD faults?  If desired/necessary, KVM could even toggle the flag
+> in KVM_RUN so that faults that occur outside of KVM ultimately don't send an actual
+> SIGBUGS.
+> 
+> diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
+> index 07c81ab3fd4d..7f66b56dd6e7 100644
+> --- a/fs/userfaultfd.c
+> +++ b/fs/userfaultfd.c
+> @@ -394,7 +394,7 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
+>          * shmem_vm_ops->fault method is invoked even during
+>          * coredumping without mmap_lock and it ends up here.
+>          */
+> -       if (current->flags & (PF_EXITING|PF_DUMPCORE))
+> +       if (current->flags & (PF_EXITING|PF_DUMPCORE|PF_NO_UFFD_WAIT))
+>                 goto out;
+
+I'll have a closer read on the nested part, but note that this path already
+has the mmap lock then it invalidates the goal if we want to avoid taking
+it from the first place, or maybe we don't care?
+
+If we want to avoid taking the mmap lock at all (hence the fast-gup
+approach), I'd also suggest we don't make it related to uffd at all but
+instead an interface to say "let's check whether the page tables are there
+(walk pgtable by fast-gup only), if not return to userspace".
+
+Because IIUC fast-gup has nothing to do with uffd, so it can also be a more
+generic interface.  It's just that if the userspace knows what it's doing
+(postcopy-ing), it knows then the faults can potentially be resolved by
+userfaultfd at this stage.
+
+>  
+>         /*
+> diff --git a/include/linux/sched.h b/include/linux/sched.h
+> index ffb6eb55cd13..4c6c53ac6531 100644
+> --- a/include/linux/sched.h
+> +++ b/include/linux/sched.h
+> @@ -1729,7 +1729,7 @@ extern struct pid *cad_pid;
+>  #define PF_MEMALLOC            0x00000800      /* Allocating memory */
+>  #define PF_NPROC_EXCEEDED      0x00001000      /* set_user() noticed that RLIMIT_NPROC was exceeded */
+>  #define PF_USED_MATH           0x00002000      /* If unset the fpu must be initialized before use */
+> -#define PF__HOLE__00004000     0x00004000
+> +#define PF_NO_UFFD_WAIT                0x00004000
+>  #define PF_NOFREEZE            0x00008000      /* This thread should not be frozen */
+>  #define PF__HOLE__00010000     0x00010000
+>  #define PF_KSWAPD              0x00020000      /* I am kswapd */
+> 
+
+-- 
+Peter Xu
+
