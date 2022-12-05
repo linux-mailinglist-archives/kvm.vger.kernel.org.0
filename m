@@ -2,119 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 323B66430BC
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 19:47:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70BAE6430BF
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 19:49:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231826AbiLESr5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 13:47:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38466 "EHLO
+        id S232141AbiLEStP convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 5 Dec 2022 13:49:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230280AbiLESrz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 13:47:55 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50846767D
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 10:47:55 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id 21so12275255pfw.4
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 10:47:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YrigZB+zmGJr5Zr508QSWdYu0zn32gW/8ZNDwNQuw7g=;
-        b=gSYORyZKVRjLACv6wQaHjSP9S7Pl9wLf7iQVGOXsrs0R4h5msPwAtRg2zHHoTtqHuq
-         KtVURmXwLvL0R6xQiAZ9/g2oJrjFTkdmXUxs50u9XEk2ZtIGm7LeTDAt+eyuSzBhwa4D
-         a2+Yv8ae6BCLyzcK1RjfKTmH6NjU0A2Fz0BMEx1QXpqeQOdugFYnNzaPCr3JJBFuuxJM
-         KDtEu+kO8MYua1hWG2EfeHXI3LAAQstbjQsATz/VzJ8po1WcZMrtUu+k/6ZJijvrMc+G
-         qXiI9Ft1dcXRD8o5Zh4E0M6SybmBhLLLgQWsOLyul5/5t+hwcqZawYpzLSY9GF1ulLDc
-         QNPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YrigZB+zmGJr5Zr508QSWdYu0zn32gW/8ZNDwNQuw7g=;
-        b=7T8e5uI4U1ab632fzP1J9+XriXBgEh02FJKyOAwp1VAco+NQyUzFtKjXI4eHeOl/QM
-         ns1i9vOhDEqQfHbG3DnCVAf6W8FPEfgpU73vNHLbqTn+8rMNeBZHFwO0C2ue6w3ra88W
-         uSuuQHCcC3dY3lDfxNo7LCpeY/qrf9OY0ns8qMpYcZMsA1WJKBhwMbqYsYuBx6pAvPTl
-         +Yon+I/VCo7SE16xspiMIi8z6/T+teMhuKE1Jkm8FH5OEQCzBiMQvdSeUxHEi3czbAR5
-         XtHWgnFqmIjzkRg0tCGAKHLWQ5XHX/gOfGNyXx0lJTgLcy/SR1BjNkWIvruxXSGAgv1C
-         lXUA==
-X-Gm-Message-State: ANoB5pkNR3CbZiGS04hOaZksTJRa0fV76BgWcMdAcmfGMFEFx/D8qYzS
-        pYGSPf8zVXxYBfLZ8Nt/NAr+iQ==
-X-Google-Smtp-Source: AA0mqf7eSz+OKER6mMRXKfL3nLzDoJzbbQPyH8j5i4FRo1/xDCtpYH2euAUKt5wRJ3P7imcwMrOoSw==
-X-Received: by 2002:a63:164f:0:b0:477:f9fa:2a1e with SMTP id 15-20020a63164f000000b00477f9fa2a1emr39836735pgw.87.1670266073492;
-        Mon, 05 Dec 2022 10:47:53 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 129-20020a620687000000b00574ee8cfdabsm7395799pfg.148.2022.12.05.10.47.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Dec 2022 10:47:53 -0800 (PST)
-Date:   Mon, 5 Dec 2022 18:47:49 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Vipin Sharma <vipinsh@google.com>, dmatlack@google.com,
-        pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [Patch v2 1/2] KVM: x86/mmu: Allocate page table pages on TDP
- splits during dirty log enable on the underlying page's numa node
-Message-ID: <Y4481WPLstNidb9X@google.com>
-References: <20221201195718.1409782-1-vipinsh@google.com>
- <20221201195718.1409782-2-vipinsh@google.com>
- <CANgfPd_sZoW6gRNgs44BbBu4RhwqNPjUO-=biJ++L5d8LpU3zg@mail.gmail.com>
+        with ESMTP id S229954AbiLEStO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 13:49:14 -0500
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ED881B783;
+        Mon,  5 Dec 2022 10:49:10 -0800 (PST)
+Received: from ip5b412258.dynamic.kabel-deutschland.de ([91.65.34.88] helo=diego.localnet)
+        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <heiko@sntech.de>)
+        id 1p2GWV-0005nw-0L; Mon, 05 Dec 2022 19:49:03 +0100
+From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+To:     Jisheng Zhang <jszhang@kernel.org>, Conor Dooley <conor@kernel.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 01/13] riscv: fix jal offsets in patched alternatives
+Date:   Mon, 05 Dec 2022 19:49:01 +0100
+Message-ID: <10190559.nUPlyArG6x@diego>
+In-Reply-To: <Y446PdlUPGw5iB71@spud>
+References: <20221204174632.3677-1-jszhang@kernel.org> <Y44Q/B6THtP38eyL@xhacker> <Y446PdlUPGw5iB71@spud>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd_sZoW6gRNgs44BbBu4RhwqNPjUO-=biJ++L5d8LpU3zg@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="iso-8859-1"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_PASS,
+        T_SPF_HELO_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Side topic, the shortlog is way, way too long.  The purpose of the shortlog is
-to provide a synopsis of the change, not to describe the change in detail.
-
-I also think this patch should be 2/2, with the more generic support added along
-with the module param (or capability) in 1/2.  E.g. to yield something like
-
-  KVM: x86/mmu: Add a module param to make per-vCPU SPTs NUMA aware
-  KVM: x86/mmu: Honor NUMA awareness for per-VM page table allocations
-
-On Mon, Dec 05, 2022, Ben Gardon wrote:
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 4736d7849c60..0554dfc55553 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -90,6 +90,9 @@ __MODULE_PARM_TYPE(nx_huge_pages_recovery_period_ms, "uint");
-> >  static bool __read_mostly force_flush_and_sync_on_reuse;
-> >  module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
-> >
-> > +static bool __read_mostly numa_aware_pagetable = true;
-> > +module_param_named(numa_aware_pagetable, numa_aware_pagetable, bool, 0644);
-> > +
+Am Montag, 5. Dezember 2022, 19:36:45 CET schrieb Conor Dooley:
+> Heiko, Jisheng,
 > 
-> I'm usually all for having module params to control things, but in
-> this case I don't think it provides much value because whether this
-> NUMA optimization is useful or not is going to depend more on VM size
-> and workload than anything else. If we wanted to make this
-> configurable, a VM capability would probably be a better mechanism so
-> that userspace could leave it off when running small,
-> non-performance-sensitive VMs
+> On Mon, Dec 05, 2022 at 11:40:44PM +0800, Jisheng Zhang wrote:
+> > On Mon, Dec 05, 2022 at 04:31:08PM +0100, Heiko Stübner wrote:
+> > > Am Sonntag, 4. Dezember 2022, 18:46:20 CET schrieb Jisheng Zhang:
+> > > > Alternatives live in a different section, so offsets used by jal
+> > > > instruction will point to wrong locations after the patch got applied.
+> > > > 
+> > > > Similar to arm64, adjust the location to consider that offset.
+> > > > 
+> > > > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> > > > ---
+> > > >  arch/riscv/include/asm/alternative.h |  2 ++
+> > > >  arch/riscv/kernel/alternative.c      | 38 ++++++++++++++++++++++++++++
+> > > >  arch/riscv/kernel/cpufeature.c       |  3 +++
+> > > >  3 files changed, 43 insertions(+)
+> > > > 
+> > > > diff --git a/arch/riscv/include/asm/alternative.h b/arch/riscv/include/asm/alternative.h
+> > > > index c58ec3cc4bc3..33eae9541684 100644
+> > > > --- a/arch/riscv/include/asm/alternative.h
+> > > > +++ b/arch/riscv/include/asm/alternative.h
+> > > > @@ -29,6 +29,8 @@ void apply_module_alternatives(void *start, size_t length);
+> > > >  
+> > > >  void riscv_alternative_fix_auipc_jalr(void *alt_ptr, unsigned int len,
+> > > >  				      int patch_offset);
+> > > > +void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
+> > > > +			       int patch_offset);
+> > > >  
+> > > >  struct alt_entry {
+> > > >  	void *old_ptr;		 /* address of original instruciton or data  */
+> > > > diff --git a/arch/riscv/kernel/alternative.c b/arch/riscv/kernel/alternative.c
+> > > > index 292cc42dc3be..9d88375624b5 100644
+> > > > --- a/arch/riscv/kernel/alternative.c
+> > > > +++ b/arch/riscv/kernel/alternative.c
+> > > > @@ -125,6 +125,44 @@ void riscv_alternative_fix_auipc_jalr(void *alt_ptr, unsigned int len,
+> > > >  	}
+> > > >  }
+> > > >  
+> > > > +#define to_jal_imm(value)						\
+> > > > +	(((value & (RV_J_IMM_10_1_MASK << RV_J_IMM_10_1_OFF)) << RV_I_IMM_11_0_OPOFF) | \
+> > > > +	 ((value & (RV_J_IMM_11_MASK << RV_J_IMM_11_OFF)) << RV_J_IMM_11_OPOFF) | \
+> > > > +	 ((value & (RV_J_IMM_19_12_OPOFF << RV_J_IMM_19_12_OFF)) << RV_J_IMM_19_12_OPOFF) | \
+> > > > +	 ((value & (1 << RV_J_IMM_SIGN_OFF)) << RV_J_IMM_SIGN_OPOFF))
+> > > > +
+> > > > +void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
+> > > > +			       int patch_offset)
+> > > > +{
+> > > 
+> > > I think we might want to unfiy this into a common function like
+> > > 
+> > > 	riscv_alternative_fix_offsets(...)
+> > > 
+> > > so that we only run through the code block once
+> > > 
+> > > 	for (i = 0; i < num_instr; i++) {
+> > > 		if (riscv_insn_is_auipc_jalr(inst1, inst2)) {
+> > > 			riscv_alternative_fix_auipc_jalr(...)
+> > > 			continue;
+> > > 		}
+> > > 
+> > > 		if (riscv_insn_is_jal(inst)) {
+> > > 			riscv_alternative_fix_jal(...)
+> > > 			continue;
+> > > 		}
+> > > 	}
+> > > 
+> > > This would also remove the need from calling multiple functions
+> > > after patching alternatives.
+> > 
+> > Yesterday, I also wanted to unify the two instruction fix into
+> > one. But that would need to roll back the
+> > riscv_alternative_fix_auipc_jalr() to your v1 version. And IMHO,
+> > it's better if you can split the Zbb string optimizations series
+> > into two: one for alternative improvements, another for Zbb. Then
+> > we may get the alternative improvements and this inst extension
+> > series merged in v6.2-rc1.
+> 
+> Heiko, perhaps you can correct me here:
+> 
+> Last Wednesday you & Palmer agreed that it was too late in the cycle to
+> apply any of the stuff touching alternatives?
+> If I do recall correctly, gives plenty of time to sort out any
+> interdependent changes here.
+> 
+> Could easily be misremembering, wouldn't be the first time!
 
-Would we actually want to turn it off in this case?  IIUC, @nid is just the
-preferred node, i.e. failure to allocate for the preferred @nid will result in
-falling back to other nodes, not outright failure.  So the pathological worst
-case scenario would be that for a system with VMs that don't care about performance,
-all of a nodes memory is allocated due to all VMs starting on that node.
+You slightly misremembered, but are still correct with the above ;-) .
 
-On the flip side, if a system had a mix of VM shapes, I think we'd want even the
-performance insensitive VMs to be NUMA aware so that they can be sequestered on
-their own node(s), i.e. don't "steal" memory from the VMs that are performance
-sensitive and have been affined to a single node.
+I.e. what we talked about was stuff for fixes for 6.1-rc, were Palmers
+wisely wanted to limit additions to really easy fixes for the remaining
+last rc, to not upset any existing boards.
 
-> and turn it on when running large, multi-node VMs. A whole-host module
-> parameter seems overly restrictive.
+But you are still correct that we also shouldn't target the 6.2 merge window
+anymore :-) .
+
+We're after -rc8 now (which is in itself uncommon) and in his -rc7
+announcement [0], Linus stated
+
+"[...] the usual rule is that things that I get sent for the
+merge window should have been all ready _before_ the merge window
+opened. But with the merge window happening largely during the holiday
+season, I'll just be enforcing that pretty strictly."
+
+That means new stuff should be reviewed and in linux-next _way before_ the
+merge window opens next weekend. Taking into account that people need
+to review stuff (and maybe the series needing another round), I really don't
+see this happening this week and everything else will get us shouted at
+from atop a christmas tree ;-) .
+
+That's the reason most maintainer-trees stop accepting stuff after -rc7
+
+
+Heiko
+
+
+[0] https://lkml.org/lkml/2022/11/27/278
+
+
+
+
