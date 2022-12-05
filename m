@@ -2,97 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72C836427A3
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 12:37:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 262466427FC
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 13:05:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231265AbiLELhy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 06:37:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51050 "EHLO
+        id S231468AbiLEMFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 07:05:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231375AbiLELhk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 06:37:40 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 545A2E2E;
-        Mon,  5 Dec 2022 03:37:39 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id s7so10519726plk.5;
-        Mon, 05 Dec 2022 03:37:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KFQHLYXEhvLwqH5TYvoapPT/lEw1a01Q5YmU44e+sHk=;
-        b=M80cJZmAOTqLsmxJMavm8jqVic1TepS37Ipu6dZMWyx0nyOTubp1KMtTBtwZ9ApgYU
-         KTalkwGpv2T+YQlQbsvg7HVPG061u42nZVmgtZdrv2OPw81go3nmhz6t7FABahlwuKmn
-         4P0vVsXyj+ixPTUBSk5BYbQ0tlVu3tjrdBSi26B6FhRjD91vRgek+7t3tI5TCi/w2iQz
-         wnigXB8csfmOccXBqrohXb5XOTgNcbqn736/2WEdJaaAt+oEarv1KKY6b+UCEF2nsKMH
-         LTm73cboePXX/YpiKOa0dZ5RmJAg9iFZGDkxdMvyBW+xj2OaG3/VPVxuWbc+0eiYH3mN
-         r1yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KFQHLYXEhvLwqH5TYvoapPT/lEw1a01Q5YmU44e+sHk=;
-        b=K1+9eYz0E4a3Dn3FBew0FUlZLvstK6JY1TQYIcq4Gkg52zx1MWTBQMKyj2xRL9tDbL
-         KF+KHka7CK9ctvM6j5IDz8EecZo9yHL5fmLBX1i9+mGmfV3BfxgV6Xmfqhxg/hUCsxiN
-         Hm2Ab7jdVdLVcYtMM1xdN936Ky57J1Z2DXalJ/oVPm4L95Rvi8cuNvsGAOEQs1qqBa/k
-         sWmo/u+esMo6YbNlhSgzi5rW/HZPFSojhRS1CDiBoHzjNPvykeK1haiTkT236EFLSVqR
-         CILI+x6F4i/yB1fRf0Y2cX9+igt4Hb0JRNwCQVz8NuRy74AMgVlw+pJPB3csf3ccuurE
-         35Yw==
-X-Gm-Message-State: ANoB5pl055H39zhlxbigidrFUBIaualzWA3nqga3T/sMlQlUNu5heQXn
-        +4678FMLiwtYNIIRhYRsaqc=
-X-Google-Smtp-Source: AA0mqf73p05qfaoI01ifWj80/DGFPBfVqbGuKzxhFLakycVPgMGoV3H/JckECUZlvBSgYtOMbCC4VA==
-X-Received: by 2002:a17:90b:264a:b0:213:7030:f69a with SMTP id pa10-20020a17090b264a00b002137030f69amr88900345pjb.231.1670240258868;
-        Mon, 05 Dec 2022 03:37:38 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id a3-20020a170902710300b001895b2d48a1sm1106394pll.253.2022.12.05.03.37.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Dec 2022 03:37:38 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/pmu: Avoid ternary operator by directly referring to counters->type
-Date:   Mon,  5 Dec 2022 19:37:18 +0800
-Message-Id: <20221205113718.1487-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.38.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231160AbiLEMFk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 07:05:40 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABE16101DF
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 04:05:38 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5E71FB80F88
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 12:05:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AE59C433C1;
+        Mon,  5 Dec 2022 12:05:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670241936;
+        bh=1fHArnZdHtBDYttToSuRg+u55hOMMtxuZQLQ3ikbPio=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qhpUXPMEEIJYEcXaromx2gKrxznuRTOJlurRkMrHHa44MTPNLIVBWFx95T8S9l7bK
+         1v0+8PmCqmxGVJSOnQyia3TjYIGBUMp1wFL3NRodYHDYUj6+eWIyZHCijCXREHdvcb
+         0tJo7lnd2vM+X/x5yQi5LeW72G10n4heMf2SSioSSEzWUUbLlEsI7B8puY6rOVYOCd
+         LT9M7MGEMMbakuPIS6sKhn6FaEt22625wpkjXAcqvHIlecFrqTfTnGFH9D/SrY9cK/
+         m/xYhXhGdWXOxBvmDjCHIcfaMW0J2fYIMWa0bu0wJLGRH/3KDhxaL49EtZTSA1IvQQ
+         TFACfFdGkrhmA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p2AE1-00AYvK-4k;
+        Mon, 05 Dec 2022 12:05:33 +0000
+Date:   Mon, 05 Dec 2022 12:05:32 +0000
+Message-ID: <86zgc2kqcz.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v4 04/16] KVM: arm64: PMU: Distinguish between 64bit counter and 64bit overflow
+In-Reply-To: <Y4jbosgHbUDI0WF4@google.com>
+References: <20221113163832.3154370-1-maz@kernel.org>
+        <20221113163832.3154370-5-maz@kernel.org>
+        <Y4jasyxvFRNvvmox@google.com>
+        <Y4jbosgHbUDI0WF4@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Thu, 01 Dec 2022 16:51:46 +0000,
+Ricardo Koller <ricarkol@google.com> wrote:
+> 
+> On Thu, Dec 01, 2022 at 08:47:47AM -0800, Ricardo Koller wrote:
+> > On Sun, Nov 13, 2022 at 04:38:20PM +0000, Marc Zyngier wrote:
+> > > The PMU architecture makes a subtle difference between a 64bit
+> > > counter and a counter that has a 64bit overflow. This is for example
+> > > the case of the cycle counter, which can generate an overflow on
+> > > a 32bit boundary if PMCR_EL0.LC==0 despite the accumulation being
+> > > done on 64 bits.
+> > > 
+> > > Use this distinction in the few cases where it matters in the code,
+> > > as we will reuse this with PMUv3p5 long counters.
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/pmu-emul.c | 43 ++++++++++++++++++++++++++++-----------
+> > >  1 file changed, 31 insertions(+), 12 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > > index 69b67ab3c4bf..d050143326b5 100644
+> > > --- a/arch/arm64/kvm/pmu-emul.c
+> > > +++ b/arch/arm64/kvm/pmu-emul.c
+> > > @@ -50,6 +50,11 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
+> > >   * @select_idx: The counter index
+> > >   */
+> > >  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
+> > > +{
+> > > +	return (select_idx == ARMV8_PMU_CYCLE_IDX);
+> > > +}
+> > > +
+> > > +static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
+> > >  {
+> > >  	return (select_idx == ARMV8_PMU_CYCLE_IDX &&
+> > >  		__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
+> > > @@ -57,7 +62,8 @@ static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
+> > >  
+> > >  static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
+> > >  {
+> > > -	return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX);
+> > > +	return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX &&
+> > > +		!kvm_pmu_idx_has_64bit_overflow(vcpu, idx));
+> > >  }
+> > >  
+> > >  static struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
+> > > @@ -97,7 +103,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+> > >  		counter += perf_event_read_value(pmc->perf_event, &enabled,
+> > >  						 &running);
+> > >  
+> > > -	if (select_idx != ARMV8_PMU_CYCLE_IDX)
+> > > +	if (!kvm_pmu_idx_is_64bit(vcpu, select_idx))
+> > >  		counter = lower_32_bits(counter);
+> > >  
+> > >  	return counter;
+> > > @@ -423,6 +429,23 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
+> > >  	}
+> > >  }
+> > >  
+> > > +/* Compute the sample period for a given counter value */
+> > > +static u64 compute_period(struct kvm_vcpu *vcpu, u64 select_idx, u64 counter)
+> > > +{
+> > > +	u64 val;
+> > > +
+> > > +	if (kvm_pmu_idx_is_64bit(vcpu, select_idx)) {
+> > > +		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx))
+> > > +			val = -(counter & GENMASK(31, 0));
+> > 
+> > If I understand things correctly, this might be missing another mask:
+> > 
+> > +		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx)) {
+> > +			val = -(counter & GENMASK(31, 0));
+> > +			val &= GENMASK(31, 0);
+> > +		} else {
+> > 
+> > For example, if the counter is 64-bits wide, it overflows at 32-bits,
+> > and it is _one_ sample away from overflowing at 32-bits:
+> > 
+> > 	0x01010101_ffffffff
+> > 
+> > Then "val = (-counter) & GENMASK(63, 0)" would return 0xffffffff_00000001.
+> 
+> Sorry, this should be:
+> 
+> 	Then "val = -(counter & GENMASK(31, 0))" would return 0xffffffff_00000001.
+> 
+> > But the right period is 0x00000000_00000001 (it's one sample away from
+> > overflowing).
 
-In either case, the counters will point to fixed or gp pmc array, and
-taking advantage of the C pointer, it's reasonable to use an almost known
-mem load operation directly without disturbing the branch predictor.
+Yup, this is a bit bogus. But this can be simplified by falling back
+to the normal 32bit handling (on top of the pmu-unchained branch):
 
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/vmx/pmu_intel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index e5cec07ca8d9..28b0a784f6e9 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -142,7 +142,7 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
- 	}
- 	if (idx >= num_counters)
- 		return NULL;
--	*mask &= pmu->counter_bitmask[fixed ? KVM_PMC_FIXED : KVM_PMC_GP];
-+	*mask &= pmu->counter_bitmask[counters->type];
- 	return &counters[array_index_nospec(idx, num_counters)];
- }
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index d8ea39943086..24908400e190 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -461,14 +461,10 @@ static u64 compute_period(struct kvm_pmc *pmc, u64 counter)
+ {
+ 	u64 val;
  
--- 
-2.38.1
+-	if (kvm_pmc_is_64bit(pmc)) {
+-		if (!kvm_pmc_has_64bit_overflow(pmc))
+-			val = -(counter & GENMASK(31, 0));
+-		else
+-			val = (-counter) & GENMASK(63, 0);
+-	} else {
++	if (kvm_pmc_is_64bit(pmc) && kvm_pmc_has_64bit_overflow(pmc))
++		val = (-counter) & GENMASK(63, 0);
++	else
+ 		val = (-counter) & GENMASK(31, 0);
+-	}
+ 
+ 	return val;
+ }
 
+which satisfies the requirement without any extra masking, and makes
+it plain that only a 64bit counter with 64bit overflow gets its period
+computed on the full 64bit, and that anyone else gets the 32bit
+truncation.
+
+I'll stash yet another patch on top and push it onto -next.
+
+Thanks!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
