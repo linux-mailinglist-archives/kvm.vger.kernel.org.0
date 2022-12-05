@@ -2,242 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F986642BC0
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 16:29:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 72A28642B9D
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 16:26:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232695AbiLEP3l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 10:29:41 -0500
+        id S232600AbiLEP0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 10:26:18 -0500
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232697AbiLEP3Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 10:29:25 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CA96347;
-        Mon,  5 Dec 2022 07:28:14 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 36433611AB;
-        Mon,  5 Dec 2022 15:28:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 667D3C433D6;
-        Mon,  5 Dec 2022 15:28:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670254093;
-        bh=Jmkt/6PesiLUerzNDnaGjzQezxhRSVgH7lMImePJ31s=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pWuA7w+3ChSIKV1HA4BQStqdKUZjj1LShIyPMNiAF/48YCCahdCX4dPBNBJIZBI5O
-         EBCMhUMfeahlRTKCSzCW9G8iVQoJ505nEXSabfl+EbZsWOk76Dlqe8/3hFpjE29Qln
-         HmPI1hW4QvUuWRxUGNuIPBu5bWaHhN1fBpgWIJOI5ie8sN4DJ7T/iCg9om7AMbD7eJ
-         3uc8cYt4iLIieQuq9S4IbP9bemT27vLg+sYy/7j87v6KhUV0YwMJLW5l0+lwkdZwhk
-         i3ERH6ZailqNT8+m+wJuBDMaOaTZ7uU9NON4wynTiTnkUrHximEp+iX1NRvoGahFMV
-         SBHwu5a1D1ZQQ==
-Date:   Mon, 5 Dec 2022 23:18:17 +0800
-From:   Jisheng Zhang <jszhang@kernel.org>
-To:     Guo Ren <guoren@kernel.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 09/13] riscv: switch to relative alternative entries
-Message-ID: <Y44LuRcQYPnVnFje@xhacker>
-References: <20221204174632.3677-1-jszhang@kernel.org>
- <20221204174632.3677-10-jszhang@kernel.org>
- <CAJF2gTRxm7LJFtups5fexJ5ishm9_j3e+yzfKv3nTtQqUtXPtA@mail.gmail.com>
+        with ESMTP id S232441AbiLEPZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 10:25:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50AAC20F50
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 07:22:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670253725;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=elsUsSh2guQFj13lKLZcZWyjOegOjpyy+dsSOWV4Rrk=;
+        b=HSQ/fL9mSNw7WukmadmrlLLR2WdcBo+D5vXIYNgU783B+TzZ1D0/CypLM/LXLLcr3T9bgY
+        bHPe6I3B0cXLmnYPf7xkJEogg1BR6oeOM9b4RxO6PPAO+DTVs2l6IvRD2XyBvAcxY4exqq
+        yFZHusR+5iAF0JgHqpKge9bYm5le3gI=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-408-AO6ENLyCOmCfMrIVcKqM8A-1; Mon, 05 Dec 2022 10:22:04 -0500
+X-MC-Unique: AO6ENLyCOmCfMrIVcKqM8A-1
+Received: by mail-io1-f69.google.com with SMTP id n23-20020a056602341700b00689fc6dbfd6so9889371ioz.8
+        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 07:22:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=elsUsSh2guQFj13lKLZcZWyjOegOjpyy+dsSOWV4Rrk=;
+        b=N99gZupe+MXDX/Qtcfm4S8T7Aq6f+EL099PoUnaZPAGYD/zJHc9ygq/kpRm7q1J2xK
+         l+8sqQ6e8gBvA3oA4Tn4vix4mCffeAx2wyfKrXqvxZ2fCF3V3L13R+twbdMjUk5Xy/he
+         HXmKNEZL2OSp4Sl1cDpv9m4lf7HnuqSycaUn075xDKFzKQAPReM9L3RfRDrrfGFPNVOb
+         PAXVF6qFIJXKq7zrq1riYvtt/O1+t+1zmVcEM5EMgqycf12uIDjosf0/7PDv5kRnENBa
+         tjI+9p7Evr1k9c81akibC/LkmkNNlqcl3FBCMQXtO6MZX9JteuCDum7sSrWiBhQT2S+T
+         Zh2A==
+X-Gm-Message-State: ANoB5pnPHPAKojsi9R1FTxPOwmKqU+uff8rFDZ8EGouVJTgGJGZfLQiX
+        pnF+IFkgBFlo5RstnwCAAHSBmQ4X4cL6AcIlYObXeMmS0qZCTvoKRqsUU1nmNEEFsR9TLC7yBbG
+        SDDDczZaU8u7c
+X-Received: by 2002:a02:6051:0:b0:38a:3421:f2cb with SMTP id d17-20020a026051000000b0038a3421f2cbmr3998879jaf.308.1670253723965;
+        Mon, 05 Dec 2022 07:22:03 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5Fn6RoG1BO70G70p7DKjgvtzDgC9bxusH3iJEQAmPrGw+cf8s+8RL38mY8uM4UGdTzS/Zg2g==
+X-Received: by 2002:a02:6051:0:b0:38a:3421:f2cb with SMTP id d17-20020a026051000000b0038a3421f2cbmr3998870jaf.308.1670253723749;
+        Mon, 05 Dec 2022 07:22:03 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id c4-20020a023304000000b003752e5b3c23sm5822470jae.20.2022.12.05.07.22.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Dec 2022 07:22:03 -0800 (PST)
+Date:   Mon, 5 Dec 2022 08:22:00 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <jgg@nvidia.com>, <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
+        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
+        <shayd@nvidia.com>, <maorg@nvidia.com>, <avihaih@nvidia.com>,
+        <cohuck@redhat.com>, <shameerali.kolothum.thodi@huawei.com>,
+        saeedm@nvidia.com
+Subject: Re: [PATCH V3 vfio 01/14] net/mlx5: Introduce ifc bits for pre_copy
+Message-ID: <20221205082200.6667589c.alex.williamson@redhat.com>
+In-Reply-To: <20221205144838.245287-2-yishaih@nvidia.com>
+References: <20221205144838.245287-1-yishaih@nvidia.com>
+        <20221205144838.245287-2-yishaih@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJF2gTRxm7LJFtups5fexJ5ishm9_j3e+yzfKv3nTtQqUtXPtA@mail.gmail.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 05, 2022 at 08:51:41AM +0800, Guo Ren wrote:
-> On Mon, Dec 5, 2022 at 1:57 AM Jisheng Zhang <jszhang@kernel.org> wrote:
-> >
-> > Instead of using absolute addresses for both the old instrucions and
-> > the alternative instructions, use offsets relative to the alt_entry
-> > values. So we can not only cut the size of the alternative entry, but
-> > also meet the prerequisite for patching alternatives in the vDSO,
-> > since absolute alternative entries are subject to dynamic relocation,
-> > which is incompatible with the vDSO building.
-> >
-> > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> > ---
-> >  arch/riscv/errata/sifive/errata.c           |  4 +++-
-> >  arch/riscv/errata/thead/errata.c            | 11 ++++++++---
-> >  arch/riscv/include/asm/alternative-macros.h | 20 ++++++++++----------
-> >  arch/riscv/include/asm/alternative.h        | 12 ++++++------
-> >  arch/riscv/kernel/cpufeature.c              | 13 ++++++-------
-> >  5 files changed, 33 insertions(+), 27 deletions(-)
-> >
-> > diff --git a/arch/riscv/errata/sifive/errata.c b/arch/riscv/errata/sifive/errata.c
-> > index 1031038423e7..0e537cdfd324 100644
-> > --- a/arch/riscv/errata/sifive/errata.c
-> > +++ b/arch/riscv/errata/sifive/errata.c
-> > @@ -107,7 +107,9 @@ void __init_or_module sifive_errata_patch_func(struct alt_entry *begin,
-> >
-> >                 tmp = (1U << alt->errata_id);
-> >                 if (cpu_req_errata & tmp) {
-> > -                       patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
-> > +                       patch_text_nosync((void *)&alt->old_offset + alt->old_offset,
-> > +                                         (void *)&alt->alt_offset + alt->alt_offset,
->  (void *)&alt->alt_offset + alt->alt_offset. ??!!
+On Mon, 5 Dec 2022 16:48:25 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-Hi Guo,
-
-what's the problem? I can't catch your meaning, could you please proide
-more details?
-
-Thanks
-
+> From: Shay Drory <shayd@nvidia.com>
 > 
-> > +                                         alt->alt_len);
-> >                         cpu_apply_errata |= tmp;
-> >                 }
-> >         }
-> > diff --git a/arch/riscv/errata/thead/errata.c b/arch/riscv/errata/thead/errata.c
-> > index 21546937db39..2a6e335b5a32 100644
-> > --- a/arch/riscv/errata/thead/errata.c
-> > +++ b/arch/riscv/errata/thead/errata.c
-> > @@ -68,6 +68,7 @@ void __init_or_module thead_errata_patch_func(struct alt_entry *begin, struct al
-> >         struct alt_entry *alt;
-> >         u32 cpu_req_errata = thead_errata_probe(stage, archid, impid);
-> >         u32 tmp;
-> > +       void *oldptr, *updptr;
-> >
-> >         for (alt = begin; alt < end; alt++) {
-> >                 if (alt->vendor_id != THEAD_VENDOR_ID)
-> > @@ -77,12 +78,16 @@ void __init_or_module thead_errata_patch_func(struct alt_entry *begin, struct al
-> >
-> >                 tmp = (1U << alt->errata_id);
-> >                 if (cpu_req_errata & tmp) {
-> > +                       oldptr = (void *)&alt->old_offset + alt->old_offset;
-> > +                       updptr = (void *)&alt->alt_offset + alt->alt_offset;
-> > +
-> >                         /* On vm-alternatives, the mmu isn't running yet */
-> >                         if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
-> > -                               memcpy((void *)__pa_symbol(alt->old_ptr),
-> > -                                      (void *)__pa_symbol(alt->alt_ptr), alt->alt_len);
-> > +                               memcpy((void *)__pa_symbol(oldptr),
-> > +                                      (void *)__pa_symbol(updptr),
-> > +                                      alt->alt_len);
-> >                         else
-> > -                               patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
-> > +                               patch_text_nosync(oldptr, updptr, alt->alt_len);
-> >                 }
-> >         }
-> >
-> > diff --git a/arch/riscv/include/asm/alternative-macros.h b/arch/riscv/include/asm/alternative-macros.h
-> > index ec2f3f1b836f..dd40727bc859 100644
-> > --- a/arch/riscv/include/asm/alternative-macros.h
-> > +++ b/arch/riscv/include/asm/alternative-macros.h
-> > @@ -7,11 +7,11 @@
-> >  #ifdef __ASSEMBLY__
-> >
-> >  .macro ALT_ENTRY oldptr newptr vendor_id errata_id new_len
-> > -       RISCV_PTR \oldptr
-> > -       RISCV_PTR \newptr
-> > -       REG_ASM \vendor_id
-> > -       REG_ASM \new_len
-> > -       .word   \errata_id
-> > +       .long \oldptr - .
-> > +       .long \newptr - .
-> > +       .short \vendor_id
-> > +       .short \new_len
-> > +       .long \errata_id
-> >  .endm
-> >
-> >  .macro ALT_NEW_CONTENT vendor_id, errata_id, enable = 1, new_c : vararg
-> > @@ -75,11 +75,11 @@
-> >  #include <linux/stringify.h>
-> >
-> >  #define ALT_ENTRY(oldptr, newptr, vendor_id, errata_id, newlen)                \
-> > -       RISCV_PTR " " oldptr "\n"                                       \
-> > -       RISCV_PTR " " newptr "\n"                                       \
-> > -       REG_ASM " " vendor_id "\n"                                      \
-> > -       REG_ASM " " newlen "\n"                                         \
-> > -       ".word " errata_id "\n"
-> > +       ".long  ((" oldptr ") - .) \n"                                  \
-> > +       ".long  ((" newptr ") - .) \n"                                  \
-> > +       ".short " vendor_id "\n"                                        \
-> > +       ".short " newlen "\n"                                           \
-> > +       ".long  " errata_id "\n"
-> >
-> >  #define ALT_NEW_CONTENT(vendor_id, errata_id, enable, new_c)           \
-> >         ".if " __stringify(enable) " == 1\n"                            \
-> > diff --git a/arch/riscv/include/asm/alternative.h b/arch/riscv/include/asm/alternative.h
-> > index 33eae9541684..3baf32e05b46 100644
-> > --- a/arch/riscv/include/asm/alternative.h
-> > +++ b/arch/riscv/include/asm/alternative.h
-> > @@ -33,12 +33,12 @@ void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
-> >                                int patch_offset);
-> >
-> >  struct alt_entry {
-> > -       void *old_ptr;           /* address of original instruciton or data  */
-> > -       void *alt_ptr;           /* address of replacement instruction or data */
-> > -       unsigned long vendor_id; /* cpu vendor id */
-> > -       unsigned long alt_len;   /* The replacement size */
-> > -       unsigned int errata_id;  /* The errata id */
-> > -} __packed;
-> > +       s32 old_offset;         /* offset to original instruciton or data  */
-> > +       s32 alt_offset;         /* offset to replacement instruction or data */
-> > +       u16 vendor_id;          /* cpu vendor id */
-> > +       u16 alt_len;            /* The replacement size */
-> > +       u32 errata_id;          /* The errata id */
-> > +};
-> >
-> >  struct errata_checkfunc_id {
-> >         unsigned long vendor_id;
-> > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-> > index 6244be5cd94a..adeac90b1d8e 100644
-> > --- a/arch/riscv/kernel/cpufeature.c
-> > +++ b/arch/riscv/kernel/cpufeature.c
-> > @@ -257,6 +257,7 @@ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
-> >                                                   unsigned int stage)
-> >  {
-> >         struct alt_entry *alt;
-> > +       void *oldptr, *updptr;
-> >
-> >         if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
-> >                 return;
-> > @@ -270,17 +271,15 @@ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
-> >                         continue;
-> >                 }
-> >
-> > +               oldptr = (void *)&alt->old_offset + alt->old_offset;
-> > +               updptr = (void *)&alt->alt_offset + alt->alt_offset;
-> >                 if (!__riscv_isa_extension_available(NULL, alt->errata_id))
-> >                         continue;
-> >
-> >                 /* do the basic patching */
-> > -               patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
-> > -               riscv_alternative_fix_auipc_jalr(alt->old_ptr,
-> > -                                                alt->alt_len,
-> > -                                                alt->old_ptr - alt->alt_ptr);
-> > -               riscv_alternative_fix_jal(alt->old_ptr,
-> > -                                         alt->alt_len,
-> > -                                         alt->old_ptr - alt->alt_ptr);
-> > +               patch_text_nosync(oldptr, updptr, alt->alt_len);
-> > +               riscv_alternative_fix_auipc_jalr(oldptr, alt->alt_len, oldptr - updptr);
-> > +               riscv_alternative_fix_jal(oldptr, alt->alt_len, oldptr - updptr);
-> >         }
-> >  }
-> >  #endif
-> > --
-> > 2.37.2
-> >
+> Introduce ifc related stuff to enable PRE_COPY of VF during migration.
 > 
+> Signed-off-by: Shay Drory <shayd@nvidia.com>
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+
+This will need an ack from Leon or Saeed to go through the vfio tree.
+Thanks,
+
+Alex
+
+> ---
+>  include/linux/mlx5/mlx5_ifc.h | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
 > 
-> -- 
-> Best Regards
->  Guo Ren
+> diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+> index 5a4e914e2a6f..230a96626a5f 100644
+> --- a/include/linux/mlx5/mlx5_ifc.h
+> +++ b/include/linux/mlx5/mlx5_ifc.h
+> @@ -1882,7 +1882,12 @@ struct mlx5_ifc_cmd_hca_cap_2_bits {
+>  	u8	   max_reformat_remove_size[0x8];
+>  	u8	   max_reformat_remove_offset[0x8];
+>  
+> -	u8	   reserved_at_c0[0xe0];
+> +	u8	   reserved_at_c0[0x8];
+> +	u8	   migration_multi_load[0x1];
+> +	u8	   migration_tracking_state[0x1];
+> +	u8	   reserved_at_ca[0x16];
+> +
+> +	u8	   reserved_at_e0[0xc0];
+>  
+>  	u8	   reserved_at_1a0[0xb];
+>  	u8	   log_min_mkey_entity_size[0x5];
+> @@ -11918,7 +11923,8 @@ struct mlx5_ifc_query_vhca_migration_state_in_bits {
+>  	u8         reserved_at_20[0x10];
+>  	u8         op_mod[0x10];
+>  
+> -	u8         reserved_at_40[0x10];
+> +	u8         incremental[0x1];
+> +	u8         reserved_at_41[0xf];
+>  	u8         vhca_id[0x10];
+>  
+>  	u8         reserved_at_60[0x20];
+> @@ -11944,7 +11950,9 @@ struct mlx5_ifc_save_vhca_state_in_bits {
+>  	u8         reserved_at_20[0x10];
+>  	u8         op_mod[0x10];
+>  
+> -	u8         reserved_at_40[0x10];
+> +	u8         incremental[0x1];
+> +	u8         set_track[0x1];
+> +	u8         reserved_at_42[0xe];
+>  	u8         vhca_id[0x10];
+>  
+>  	u8         reserved_at_60[0x20];
+
