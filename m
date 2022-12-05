@@ -2,176 +2,446 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AB5764254D
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 10:02:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AB99642562
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 10:05:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231640AbiLEJCW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 04:02:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47700 "EHLO
+        id S232564AbiLEJFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 04:05:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232383AbiLEJBX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 04:01:23 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 023DBD12C;
-        Mon,  5 Dec 2022 01:00:22 -0800 (PST)
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 590B51FE42;
-        Mon,  5 Dec 2022 09:00:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1670230821; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9mE8JW+82N0Nc8L3Y+5ne8li6B8o4ESVFkptCM1+tJk=;
-        b=SZFUgZbgw8ddwqWWKYIj9UFJMxD9Gq4WowkNcxDCOVM/JfdBshKd6K/FYtOAjsWpZgiodX
-        EM2WPlKMy/OJuKmocTNrc4W3Jp1ZxjE3nzU7jAWCISkIzOUGY/dhzz4pikBefUDb3IzAdy
-        62gI1ZinTDsLcN/v9zpy0NMlK4113nw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1670230821;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9mE8JW+82N0Nc8L3Y+5ne8li6B8o4ESVFkptCM1+tJk=;
-        b=/kn5HI/a/+Y44g8QBwSSSltAw1g/q6vRDfCUCItQMAJb1m9qP4RMBc6PPBAmeUp5RqSVE5
-        hWM1+9yCFCHsHvCA==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 1983813326;
-        Mon,  5 Dec 2022 09:00:21 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id AHbpBCWzjWO4UgAAGKfGzw
-        (envelope-from <tzimmermann@suse.de>); Mon, 05 Dec 2022 09:00:21 +0000
-Message-ID: <1e4d62cf-8893-0bff-51f5-5a2e419ed5a0@suse.de>
-Date:   Mon, 5 Dec 2022 10:00:20 +0100
+        with ESMTP id S232465AbiLEJEE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 04:04:04 -0500
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AAAFF4B
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 01:03:50 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id c1so17478955lfi.7
+        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 01:03:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=i44XG+9hSjN1C92SauZLYWQ5eRQnzskjLCXxsayBXqk=;
+        b=kLUaIyfDjo9uDZEMoxllqnOwzh0Ffynik+sIGR/qJJyMcTcTd8ut0BTLskjnpO83sL
+         1grwpiJ3wPw/bi8dHj7SHXKusNhBg06UYnB0DUqQiNBmZ+BjJcvXkx9GTXkbjobnQvHV
+         cNBKQZYJe8HrVUI4HiB/zksfSPtas3UdWWGTXO9sGpWGVD7BvwubrkgwZBs0dUvoav3f
+         T5fNwaUu9lYGYk9EOKm2pjX08J3u51nA1s+GCMHEfAjRkbVVmfPJ2NL1AjgOrIhJ7IsZ
+         hIO7hbR6QG2T7KIZdcVzOp3p1C5jBkGV+gkLK2D0A/H1KkTsrsZWnWNdjSlUMgo6Bqgu
+         GTHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=i44XG+9hSjN1C92SauZLYWQ5eRQnzskjLCXxsayBXqk=;
+        b=K6ecqk9cf9rZnS+941li70DsSRkdZRxktHSgF83yGzBw9YizuMKKbb87zoBTl0SOjr
+         y8oA5PK/lRVxAHSKWskrNZVm1LKbE23L4yNO/36lMHH5EZHKPcWhp0T9yAusXcgDNJsT
+         OFt/S+d8vF+gdHMwhLwO7tPBoUEr1j/tAHOfonDIr0hpl9iGvhvHglkS4Whxgjysw7oM
+         uwdjjz3NH7OkEbSoR64yIkA/c5MsLtAxlL7tP8+8zunHFDtgHfFLUax7eNweo4y1GKuo
+         UDaObpf3TSAaFc5GXvVUgyjLlGbDCWeDtPrwhw0UsEaflCmilGzHZWV9Ds9unjdIowUI
+         DPNQ==
+X-Gm-Message-State: ANoB5plxAi3ja6XrHAYHafpmRXxJPamZuy0HdPCZw5ZRSuwLXGcwODyb
+        ACOkSBohJ/q6sjv2Llpr7uxIqeRTHjU8wd58ME0r0Q==
+X-Google-Smtp-Source: AA0mqf6j46Z+eZ9hXs0IXh0pl4WrzxhZnFFlBpMbAM23gDLBqguQPPMz1gW5ctaSgLK5OkqdoG8DwtZm8a/v+BZdtzs=
+X-Received: by 2002:a05:6512:15a8:b0:4a6:3ed2:3717 with SMTP id
+ bp40-20020a05651215a800b004a63ed23717mr22998482lfb.637.1670231028239; Mon, 05
+ Dec 2022 01:03:48 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH 2/2] vfio/pci: Remove console drivers
-Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        "mb@lab.how" <mb@lab.how>
-Cc:     kvm@vger.kernel.org, airlied@linux.ie,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        kraxel@redhat.com, lersek@redhat.com
-References: <CAEdEoBYXHq9cCzsbMYTpG1B41Yz=-QAjFx7bJDOnPanN5Tmo7A@mail.gmail.com>
- <20221204175142.658d5c37.alex.williamson@redhat.com>
-From:   Thomas Zimmermann <tzimmermann@suse.de>
-In-Reply-To: <20221204175142.658d5c37.alex.williamson@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------1xuPk2XMwFJoYTbm2jYGXdQJ"
-X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com> <20221202061347.1070246-4-chao.p.peng@linux.intel.com>
+In-Reply-To: <20221202061347.1070246-4-chao.p.peng@linux.intel.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Mon, 5 Dec 2022 09:03:11 +0000
+Message-ID: <CA+EHjTyuQSa9YKkGd1OqtEzobuf6Bcghwiz00aaL15ikz7J2Vw@mail.gmail.com>
+Subject: Re: [PATCH v10 3/9] KVM: Extend the memslot to support fd-based
+ private memory
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------1xuPk2XMwFJoYTbm2jYGXdQJ
-Content-Type: multipart/mixed; boundary="------------8hWQJUaJQcB4rdEGAVAwfJxL";
- protected-headers="v1"
-From: Thomas Zimmermann <tzimmermann@suse.de>
-To: Alex Williamson <alex.williamson@redhat.com>, "mb@lab.how" <mb@lab.how>
-Cc: kvm@vger.kernel.org, airlied@linux.ie, linux-kernel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, kraxel@redhat.com, lersek@redhat.com
-Message-ID: <1e4d62cf-8893-0bff-51f5-5a2e419ed5a0@suse.de>
-Subject: Re: [PATCH 2/2] vfio/pci: Remove console drivers
-References: <CAEdEoBYXHq9cCzsbMYTpG1B41Yz=-QAjFx7bJDOnPanN5Tmo7A@mail.gmail.com>
- <20221204175142.658d5c37.alex.williamson@redhat.com>
-In-Reply-To: <20221204175142.658d5c37.alex.williamson@redhat.com>
+Hi Chao,
 
---------------8hWQJUaJQcB4rdEGAVAwfJxL
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+On Fri, Dec 2, 2022 at 6:18 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+>
+> In memory encryption usage, guest memory may be encrypted with special
+> key and can be accessed only by the guest itself. We call such memory
+> private memory. It's valueless and sometimes can cause problem to allow
+> userspace to access guest private memory. This new KVM memslot extension
+> allows guest private memory being provided through a restrictedmem
+> backed file descriptor(fd) and userspace is restricted to access the
+> bookmarked memory in the fd.
+>
+> This new extension, indicated by the new flag KVM_MEM_PRIVATE, adds two
+> additional KVM memslot fields restricted_fd/restricted_offset to allow
+> userspace to instruct KVM to provide guest memory through restricted_fd.
+> 'guest_phys_addr' is mapped at the restricted_offset of restricted_fd
+> and the size is 'memory_size'.
+>
+> The extended memslot can still have the userspace_addr(hva). When use, a
+> single memslot can maintain both private memory through restricted_fd
+> and shared memory through userspace_addr. Whether the private or shared
+> part is visible to guest is maintained by other KVM code.
+>
+> A restrictedmem_notifier field is also added to the memslot structure to
+> allow the restricted_fd's backing store to notify KVM the memory change,
+> KVM then can invalidate its page table entries or handle memory errors.
+>
+> Together with the change, a new config HAVE_KVM_RESTRICTED_MEM is added
+> and right now it is selected on X86_64 only.
+>
+> To make future maintenance easy, internally use a binary compatible
+> alias struct kvm_user_mem_region to handle both the normal and the
+> '_ext' variants.
+>
+> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Tested-by: Fuad Tabba <tabba@google.com>
 
-SGkNCg0KQW0gMDUuMTIuMjIgdW0gMDE6NTEgc2NocmllYiBBbGV4IFdpbGxpYW1zb246DQo+
-IE9uIFNhdCwgMyBEZWMgMjAyMiAxNzoxMjozOCAtMDcwMA0KPiAibWJAbGFiLmhvdyIgPG1i
-QGxhYi5ob3c+IHdyb3RlOg0KPiANCj4+IEhpLA0KPj4NCj4+IEkgaG9wZSBpdCBpcyBvayB0
-byByZXBseSB0byB0aGlzIG9sZCB0aHJlYWQuDQo+IA0KPiBJdCBpcywgYnV0IHRoZSBvbmx5
-IHJlbGljIG9mIHRoZSB0aHJlYWQgaXMgdGhlIHN1YmplY3QuICBGb3IgcmVmZXJlbmNlLA0K
-PiB0aGUgbGF0ZXN0IHZlcnNpb24gb2YgdGhpcyBwb3N0ZWQgaXMgaGVyZToNCj4gDQo+IGh0
-dHBzOi8vbG9yZS5rZXJuZWwub3JnL2FsbC8yMDIyMDYyMjE0MDEzNC4xMjc2My00LXR6aW1t
-ZXJtYW5uQHN1c2UuZGUvDQo+IA0KPiBXaGljaCBpcyBjb21taXR0ZWQgYXM6DQo+IA0KPiBk
-MTczNzgwNjIwNzkgKCJ2ZmlvL3BjaTogUmVtb3ZlIGNvbnNvbGUgZHJpdmVycyIpDQo+IA0K
-Pj4gVW5mb3J0dW5hdGVseSwgSSBmb3VuZCBhDQo+PiBwcm9ibGVtIG9ubHkgbm93IGFmdGVy
-IHVwZ3JhZGluZyB0byA2LjAuDQo+Pg0KPj4gTXkgc2V0dXAgaGFzIG11bHRpcGxlIEdQVXMg
-KDIpLCBhbmQgSSBkZXBlbmQgb24gRUZJRkIgdG8gaGF2ZSBhIHdvcmtpbmcgY29uc29sZS4N
-Cg0KV2hpY2ggR1BVcyBkbyB5b3UgaGF2ZT8NCg0KPj4gcHJlLXBhdGNoIGJlaGF2aW9yLCB3
-aGVuIEkgYmluZCB0aGUgdmZpby1wY2kgdG8gbXkgc2Vjb25kYXJ5IEdQVSBib3RoDQo+PiB0
-aGUgcGFzc3Rocm91Z2ggYW5kIHRoZSBFRklGQiBrZWVwIHdvcmtpbmcgZmluZS4NCj4+IHBv
-c3QtcGF0Y2ggYmVoYXZpb3IsIHdoZW4gSSBiaW5kIHRoZSB2ZmlvLXBjaSB0byB0aGUgc2Vj
-b25kYXJ5IEdQVSwNCj4+IHRoZSBFRklGQiBkaXNhcHBlYXJzIGZyb20gdGhlIHN5c3RlbSwg
-YmluZGluZyB0aGUgY29uc29sZSB0byB0aGUNCj4+ICJkdW1teSBjb25zb2xlIi4NCg0KVGhl
-IGVmaWZiIHdvdWxkIGxpa2VseSB1c2UgdGhlIGZpcnN0IEdQVS4gQW5kIHZmaW8tcGNpIHNo
-b3VsZCBvbmx5IA0KcmVtb3ZlIHRoZSBnZW5lcmljIGRyaXZlciBmcm9tIHRoZSBzZWNvbmQg
-ZGV2aWNlLiBBcmUgeW91IHN1cmUgdGhhdCANCnlvdSdyZSBub3Qgc29tZWhvdyB1c2luZyB0
-aGUgZmlyc3QgR1BVIHdpdGggdmZpby1wY2kuDQoNCj4+IFdoZW5ldmVyIHlvdSB0cnkgdG8g
-YWNjZXNzIHRoZSB0ZXJtaW5hbCwgeW91IGhhdmUgdGhlIHNjcmVlbiBzdHVjayBpbg0KPj4g
-d2hhdGV2ZXIgd2FzIHRoZSBsYXN0IGJ1ZmZlciBjb250ZW50LCB3aGljaCBnaXZlcyB0aGUg
-aW1wcmVzc2lvbiBvZg0KPj4gImZyZWV6aW5nLCIgYnV0IEkgY2FuIHN0aWxsIHR5cGUuDQo+
-PiBFdmVyeXRoaW5nIGVsc2Ugd29ya3MsIGluY2x1ZGluZyB0aGUgcGFzc3Rocm91Z2guDQo+
-IA0KPiBUaGlzIHNvdW5kcyBsaWtlIHRoZSBjYWxsIHRvIGFwZXJ0dXJlX3JlbW92ZV9jb25m
-bGljdGluZ19wY2lfZGV2aWNlcygpDQo+IGlzIHJlbW92aW5nIHRoZSBjb25mbGljdGluZyBk
-cml2ZXIgaXRzZWxmIHJhdGhlciB0aGFuIHJlbW92aW5nIHRoZQ0KPiBkZXZpY2UgZnJvbSB0
-aGUgZHJpdmVyLiAgSXMgaXQgbm90IHBvc3NpYmxlIHRvIHVuYmluZCB0aGUgR1BVIGZyb20N
-Cj4gZWZpZmIgYmVmb3JlIGJpbmRpbmcgdGhlIEdQVSB0byB2ZmlvLXBjaSB0byBlZmZlY3Rp
-dmVseSBudWxsaWZ5IHRoZQ0KPiBhZGRlZCBjYWxsPw0KPiAgIA0KPj4gSSBjYW4gb25seSB0
-aGluayBhYm91dCBhIGZldyBvcHRpb25zOg0KPj4NCj4+IC0gSXMgdGhlcmUgYSB3YXkgdG8g
-aGF2ZSBFRklGQiBzaG93IHVwIGFnYWluPyBBZnRlciBhbGwgaXQgbG9va3MgbGlrZQ0KPj4g
-dGhlIGtlcm5lbCBoYXMganVzdCBhYmFuZG9uZWQgaXQsIGJ1dCB0aGUgYnVmZmVyIGlzIHN0
-aWxsIHRoZXJlLiBJDQo+PiBjYW4ndCBmaW5kIGEgc2luZ2xlIG1lc3NhZ2UgYWJvdXQgdGhl
-IHNlY29uZGFyeSBjYXJkIGFuZCBFRklGQiBpbg0KPj4gZG1lc2csIGJ1dCB0aGVyZSdzIGEg
-bWVzc2FnZSBmb3IgdGhlIHByaW1hcnkgY2FyZCBhbmQgRUZJRkIuDQo+PiAtIENhbiB3ZSBo
-YXZlIGEgYm9vbGVhbiBjb250cm9sbGluZyB0aGUgYmVoYXZpb3Igb2YgdmZpby1wY2kNCj4+
-IGFsdG9nZXRoZXIgb3IgYXQgbGVhc3QgY29udHJvbGxpbmcgdGhlIGJlaGF2aW9yIG9mIHZm
-aW8tcGNpIGZvciB0aGF0DQo+PiBzcGVjaWZpYyBJRD8gSSBrbm93IHRoZXJlJ3MgYWxyZWFk
-eSBzb21lIG9wdGlvbiBmb3IgdmZpby1wY2kgYW5kIFZHQQ0KPj4gY2FyZHMsIHdvdWxkIGl0
-IGJlIGFwcHJvcHJpYXRlIHRvIGF0dGFjaCB0aGlzIGJlaGF2aW9yIHRvIHRoYXQgb3B0aW9u
-Pw0KPiANCj4gSSBzdXBwb3NlIHdlIGNvdWxkIGhhdmUgYW4gb3B0LW91dCBtb2R1bGUgb3B0
-aW9uIG9uIHZmaW8tcGNpIHRvIHNraXANCj4gdGhlIGFib3ZlIGNhbGwsIGJ1dCBjbGVhcmx5
-IGl0IHdvdWxkIGJlIGJldHRlciBpZiB0aGluZ3Mgd29ya2VkIGJ5DQo+IGRlZmF1bHQuICBX
-ZSBjYW5ub3QgbWFrZSBmdWxsIHVzZSBvZiBHUFVzIHdpdGggdmZpby1wY2kgaWYgdGhleSdy
-ZQ0KPiBzdGlsbCBpbiB1c2UgYnkgaG9zdCBjb25zb2xlIGRyaXZlcnMuICBUaGUgaW50ZW50
-aW9uIHdhcyBjZXJ0YWlubHkgdG8NCj4gdW5iaW5kIHRoZSBkZXZpY2UgZnJvbSBhbnkgbG93
-IGxldmVsIGRyaXZlcnMgcmF0aGVyIHRoYW4gZGlzYWJsZSB1c2Ugb2YNCj4gYSBjb25zb2xl
-IGRyaXZlciBlbnRpcmVseS4gIERSTS9HUFUgZm9sa3MsIGlzIHRoYXQgcG9zc2libHkgYW4N
-Cj4gaW50ZXJmYWNlIHdlIGNvdWxkIGltcGxlbWVudD8gIFRoYW5rcywNCg0KV2hlbiB2Zmlv
-LXBjaSBnaXZlcyB0aGUgR1BVIGRldmljZSB0byB0aGUgZ3Vlc3QsIHdoaWNoIGRyaXZlciBk
-cml2ZXIgaXMgDQpib3VuZCB0byBpdD8NCg0KQmVzdCByZWdhcmRzDQpUaG9tYXMNCg0KPiAN
-Cj4gQWxleA0KPiANCg0KLS0gDQpUaG9tYXMgWmltbWVybWFubg0KR3JhcGhpY3MgRHJpdmVy
-IERldmVsb3Blcg0KU1VTRSBTb2Z0d2FyZSBTb2x1dGlvbnMgR2VybWFueSBHbWJIDQpNYXhm
-ZWxkc3RyLiA1LCA5MDQwOSBOw7xybmJlcmcsIEdlcm1hbnkNCihIUkIgMzY4MDksIEFHIE7D
-vHJuYmVyZykNCkdlc2Now6RmdHNmw7xocmVyOiBJdm8gVG90ZXYNCg==
+V9 of this patch [*] had KVM_CAP_PRIVATE_MEM, but it's not in this
+patch series anymore. Any reason you removed it, or is it just an
+omission?
 
---------------8hWQJUaJQcB4rdEGAVAwfJxL--
+[*] https://lore.kernel.org/linux-mm/20221025151344.3784230-3-chao.p.peng@linux.intel.com/
 
---------------1xuPk2XMwFJoYTbm2jYGXdQJ
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
+Thanks,
+/fuad
 
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEExndm/fpuMUdwYFFolh/E3EQov+AFAmONsyQFAwAAAAAACgkQlh/E3EQov+Dj
-pg//a0JvZ00shXVwnKjlTJ95+HaaY3O7oW9BsTsyGZOvVcG1zlSES2XBMkMV0MTpM/C69KnWXld6
-WNcntoouweVEbZj3XCfSCA+FPWPavl7x3gFRG3hL7LiiWQQqc26g6v43aO+9XOXMN3jYpmhZYXlB
-bwBBoZhlPSmWFzZAJArbPaHw3XiC8TErNyxsaTs8J4sM9D6maLbvodvomWJlQ/HCWPAshSTRMrRP
-/IkSjNWtPv0L60L+VqVqSqZ6IhIexdcbx27UtcdmnxwM3tsVfIw6hcSDUKzT949Rpw756ye+C/zz
-YRdRxKislvhn/fh8rVvpjabI3uUFcuPOBH5+Mm8Qi+uLJZbbtblL2W5+L5r8dT0ikznenrprfaoj
-hU5OcUxOcBQ4n8Y/1gQ8/k6nNDLKOi4InseZTL/gaw5F1eACd/gJGii7lpNQcDdiy2GmVcrJJ+7I
-tWW1nrxV6pMYCjvXYR4VsmosMUoy1Qzd+1Sdu494Pni66R5AMcxdvDx/STh15Xk6HELrXTgqVrPt
-3xhebo2OXJjy9eW/mXJx8eYyTWk6R3kYlLFvkCbTpwalOJQegZxUWDP52IhGqX0RVCFSdik70ixe
-Ba+gN00EfQPKMTDInXvufbxCJ2UNq2HGovB69UNK6QzyN/8e/a2qhbsY4/U/ov+3ZCdPX5FOYHp4
-2sk=
-=nMjh
------END PGP SIGNATURE-----
-
---------------1xuPk2XMwFJoYTbm2jYGXdQJ--
+> ---
+>  Documentation/virt/kvm/api.rst | 40 ++++++++++++++++++++++-----
+>  arch/x86/kvm/Kconfig           |  2 ++
+>  arch/x86/kvm/x86.c             |  2 +-
+>  include/linux/kvm_host.h       |  8 ++++--
+>  include/uapi/linux/kvm.h       | 28 +++++++++++++++++++
+>  virt/kvm/Kconfig               |  3 +++
+>  virt/kvm/kvm_main.c            | 49 ++++++++++++++++++++++++++++------
+>  7 files changed, 114 insertions(+), 18 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index bb2f709c0900..99352170c130 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -1319,7 +1319,7 @@ yet and must be cleared on entry.
+>  :Capability: KVM_CAP_USER_MEMORY
+>  :Architectures: all
+>  :Type: vm ioctl
+> -:Parameters: struct kvm_userspace_memory_region (in)
+> +:Parameters: struct kvm_userspace_memory_region(_ext) (in)
+>  :Returns: 0 on success, -1 on error
+>
+>  ::
+> @@ -1332,9 +1332,18 @@ yet and must be cleared on entry.
+>         __u64 userspace_addr; /* start of the userspace allocated memory */
+>    };
+>
+> +  struct kvm_userspace_memory_region_ext {
+> +       struct kvm_userspace_memory_region region;
+> +       __u64 restricted_offset;
+> +       __u32 restricted_fd;
+> +       __u32 pad1;
+> +       __u64 pad2[14];
+> +  };
+> +
+>    /* for kvm_memory_region::flags */
+>    #define KVM_MEM_LOG_DIRTY_PAGES      (1UL << 0)
+>    #define KVM_MEM_READONLY     (1UL << 1)
+> +  #define KVM_MEM_PRIVATE              (1UL << 2)
+>
+>  This ioctl allows the user to create, modify or delete a guest physical
+>  memory slot.  Bits 0-15 of "slot" specify the slot id and this value
+> @@ -1365,12 +1374,29 @@ It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
+>  be identical.  This allows large pages in the guest to be backed by large
+>  pages in the host.
+>
+> -The flags field supports two flags: KVM_MEM_LOG_DIRTY_PAGES and
+> -KVM_MEM_READONLY.  The former can be set to instruct KVM to keep track of
+> -writes to memory within the slot.  See KVM_GET_DIRTY_LOG ioctl to know how to
+> -use it.  The latter can be set, if KVM_CAP_READONLY_MEM capability allows it,
+> -to make a new slot read-only.  In this case, writes to this memory will be
+> -posted to userspace as KVM_EXIT_MMIO exits.
+> +kvm_userspace_memory_region_ext struct includes all fields of
+> +kvm_userspace_memory_region struct, while also adds additional fields for some
+> +other features. See below description of flags field for more information.
+> +It's recommended to use kvm_userspace_memory_region_ext in new userspace code.
+> +
+> +The flags field supports following flags:
+> +
+> +- KVM_MEM_LOG_DIRTY_PAGES to instruct KVM to keep track of writes to memory
+> +  within the slot. For more details, see KVM_GET_DIRTY_LOG ioctl.
+> +
+> +- KVM_MEM_READONLY, if KVM_CAP_READONLY_MEM allows, to make a new slot
+> +  read-only. In this case, writes to this memory will be posted to userspace as
+> +  KVM_EXIT_MMIO exits.
+> +
+> +- KVM_MEM_PRIVATE, if KVM_MEMORY_ATTRIBUTE_PRIVATE is supported (see
+> +  KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES ioctl), to indicate a new slot has private
+> +  memory backed by a file descriptor(fd) and userspace access to the fd may be
+> +  restricted. Userspace should use restricted_fd/restricted_offset in the
+> +  kvm_userspace_memory_region_ext to instruct KVM to provide private memory
+> +  to guest. Userspace should guarantee not to map the same host physical address
+> +  indicated by restricted_fd/restricted_offset to different guest physical
+> +  addresses within multiple memslots. Failed to do this may result undefined
+> +  behavior.
+>
+>  When the KVM_CAP_SYNC_MMU capability is available, changes in the backing of
+>  the memory region are automatically reflected into the guest.  For example, an
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index a8e379a3afee..690cb21010e7 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -50,6 +50,8 @@ config KVM
+>         select INTERVAL_TREE
+>         select HAVE_KVM_PM_NOTIFIER if PM
+>         select HAVE_KVM_MEMORY_ATTRIBUTES
+> +       select HAVE_KVM_RESTRICTED_MEM if X86_64
+> +       select RESTRICTEDMEM if HAVE_KVM_RESTRICTED_MEM
+>         help
+>           Support hosting fully virtualized guest machines using hardware
+>           virtualization extensions.  You will need a fairly recent
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7f850dfb4086..9a07380f8d3c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12224,7 +12224,7 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
+>         }
+>
+>         for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> -               struct kvm_userspace_memory_region m;
+> +               struct kvm_user_mem_region m;
+>
+>                 m.slot = id | (i << 16);
+>                 m.flags = 0;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index a784e2b06625..02347e386ea2 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -44,6 +44,7 @@
+>
+>  #include <asm/kvm_host.h>
+>  #include <linux/kvm_dirty_ring.h>
+> +#include <linux/restrictedmem.h>
+>
+>  #ifndef KVM_MAX_VCPU_IDS
+>  #define KVM_MAX_VCPU_IDS KVM_MAX_VCPUS
+> @@ -585,6 +586,9 @@ struct kvm_memory_slot {
+>         u32 flags;
+>         short id;
+>         u16 as_id;
+> +       struct file *restricted_file;
+> +       loff_t restricted_offset;
+> +       struct restrictedmem_notifier notifier;
+>  };
+>
+>  static inline bool kvm_slot_dirty_track_enabled(const struct kvm_memory_slot *slot)
+> @@ -1123,9 +1127,9 @@ enum kvm_mr_change {
+>  };
+>
+>  int kvm_set_memory_region(struct kvm *kvm,
+> -                         const struct kvm_userspace_memory_region *mem);
+> +                         const struct kvm_user_mem_region *mem);
+>  int __kvm_set_memory_region(struct kvm *kvm,
+> -                           const struct kvm_userspace_memory_region *mem);
+> +                           const struct kvm_user_mem_region *mem);
+>  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
+>  void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
+>  int kvm_arch_prepare_memory_region(struct kvm *kvm,
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 5d0941acb5bb..13bff963b8b0 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -103,6 +103,33 @@ struct kvm_userspace_memory_region {
+>         __u64 userspace_addr; /* start of the userspace allocated memory */
+>  };
+>
+> +struct kvm_userspace_memory_region_ext {
+> +       struct kvm_userspace_memory_region region;
+> +       __u64 restricted_offset;
+> +       __u32 restricted_fd;
+> +       __u32 pad1;
+> +       __u64 pad2[14];
+> +};
+> +
+> +#ifdef __KERNEL__
+> +/*
+> + * kvm_user_mem_region is a kernel-only alias of kvm_userspace_memory_region_ext
+> + * that "unpacks" kvm_userspace_memory_region so that KVM can directly access
+> + * all fields from the top-level "extended" region.
+> + */
+> +struct kvm_user_mem_region {
+> +       __u32 slot;
+> +       __u32 flags;
+> +       __u64 guest_phys_addr;
+> +       __u64 memory_size;
+> +       __u64 userspace_addr;
+> +       __u64 restricted_offset;
+> +       __u32 restricted_fd;
+> +       __u32 pad1;
+> +       __u64 pad2[14];
+> +};
+> +#endif
+> +
+>  /*
+>   * The bit 0 ~ bit 15 of kvm_memory_region::flags are visible for userspace,
+>   * other bits are reserved for kvm internal use which are defined in
+> @@ -110,6 +137,7 @@ struct kvm_userspace_memory_region {
+>   */
+>  #define KVM_MEM_LOG_DIRTY_PAGES        (1UL << 0)
+>  #define KVM_MEM_READONLY       (1UL << 1)
+> +#define KVM_MEM_PRIVATE                (1UL << 2)
+>
+>  /* for KVM_IRQ_LINE */
+>  struct kvm_irq_level {
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index effdea5dd4f0..d605545d6dd1 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -89,3 +89,6 @@ config KVM_XFER_TO_GUEST_WORK
+>
+>  config HAVE_KVM_PM_NOTIFIER
+>         bool
+> +
+> +config HAVE_KVM_RESTRICTED_MEM
+> +       bool
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 7f0f5e9f2406..b882eb2c76a2 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1532,7 +1532,7 @@ static void kvm_replace_memslot(struct kvm *kvm,
+>         }
+>  }
+>
+> -static int check_memory_region_flags(const struct kvm_userspace_memory_region *mem)
+> +static int check_memory_region_flags(const struct kvm_user_mem_region *mem)
+>  {
+>         u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
+>
+> @@ -1934,7 +1934,7 @@ static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
+>   * Must be called holding kvm->slots_lock for write.
+>   */
+>  int __kvm_set_memory_region(struct kvm *kvm,
+> -                           const struct kvm_userspace_memory_region *mem)
+> +                           const struct kvm_user_mem_region *mem)
+>  {
+>         struct kvm_memory_slot *old, *new;
+>         struct kvm_memslots *slots;
+> @@ -2038,7 +2038,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>  EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
+>
+>  int kvm_set_memory_region(struct kvm *kvm,
+> -                         const struct kvm_userspace_memory_region *mem)
+> +                         const struct kvm_user_mem_region *mem)
+>  {
+>         int r;
+>
+> @@ -2050,7 +2050,7 @@ int kvm_set_memory_region(struct kvm *kvm,
+>  EXPORT_SYMBOL_GPL(kvm_set_memory_region);
+>
+>  static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
+> -                                         struct kvm_userspace_memory_region *mem)
+> +                                         struct kvm_user_mem_region *mem)
+>  {
+>         if ((u16)mem->slot >= KVM_USER_MEM_SLOTS)
+>                 return -EINVAL;
+> @@ -4698,6 +4698,33 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
+>         return fd;
+>  }
+>
+> +#define SANITY_CHECK_MEM_REGION_FIELD(field)                                   \
+> +do {                                                                           \
+> +       BUILD_BUG_ON(offsetof(struct kvm_user_mem_region, field) !=             \
+> +                    offsetof(struct kvm_userspace_memory_region, field));      \
+> +       BUILD_BUG_ON(sizeof_field(struct kvm_user_mem_region, field) !=         \
+> +                    sizeof_field(struct kvm_userspace_memory_region, field));  \
+> +} while (0)
+> +
+> +#define SANITY_CHECK_MEM_REGION_EXT_FIELD(field)                                       \
+> +do {                                                                                   \
+> +       BUILD_BUG_ON(offsetof(struct kvm_user_mem_region, field) !=                     \
+> +                    offsetof(struct kvm_userspace_memory_region_ext, field));          \
+> +       BUILD_BUG_ON(sizeof_field(struct kvm_user_mem_region, field) !=                 \
+> +                    sizeof_field(struct kvm_userspace_memory_region_ext, field));      \
+> +} while (0)
+> +
+> +static void kvm_sanity_check_user_mem_region_alias(void)
+> +{
+> +       SANITY_CHECK_MEM_REGION_FIELD(slot);
+> +       SANITY_CHECK_MEM_REGION_FIELD(flags);
+> +       SANITY_CHECK_MEM_REGION_FIELD(guest_phys_addr);
+> +       SANITY_CHECK_MEM_REGION_FIELD(memory_size);
+> +       SANITY_CHECK_MEM_REGION_FIELD(userspace_addr);
+> +       SANITY_CHECK_MEM_REGION_EXT_FIELD(restricted_offset);
+> +       SANITY_CHECK_MEM_REGION_EXT_FIELD(restricted_fd);
+> +}
+> +
+>  static long kvm_vm_ioctl(struct file *filp,
+>                            unsigned int ioctl, unsigned long arg)
+>  {
+> @@ -4721,14 +4748,20 @@ static long kvm_vm_ioctl(struct file *filp,
+>                 break;
+>         }
+>         case KVM_SET_USER_MEMORY_REGION: {
+> -               struct kvm_userspace_memory_region kvm_userspace_mem;
+> +               struct kvm_user_mem_region mem;
+> +               unsigned long size = sizeof(struct kvm_userspace_memory_region);
+> +
+> +               kvm_sanity_check_user_mem_region_alias();
+>
+>                 r = -EFAULT;
+> -               if (copy_from_user(&kvm_userspace_mem, argp,
+> -                                               sizeof(kvm_userspace_mem)))
+> +               if (copy_from_user(&mem, argp, size))
+> +                       goto out;
+> +
+> +               r = -EINVAL;
+> +               if (mem.flags & KVM_MEM_PRIVATE)
+>                         goto out;
+>
+> -               r = kvm_vm_ioctl_set_memory_region(kvm, &kvm_userspace_mem);
+> +               r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
+>                 break;
+>         }
+>         case KVM_GET_DIRTY_LOG: {
+> --
+> 2.25.1
+>
