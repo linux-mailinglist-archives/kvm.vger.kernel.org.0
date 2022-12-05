@@ -2,78 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B914B6430C2
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 19:50:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BBA56430C3
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 19:51:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229954AbiLESuo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 13:50:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40632 "EHLO
+        id S231434AbiLESvh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 13:51:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231573AbiLESum (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 13:50:42 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D73D31D64C
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 10:50:39 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id q71so11274797pgq.8
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 10:50:39 -0800 (PST)
+        with ESMTP id S230148AbiLESvg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 13:51:36 -0500
+Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EADC31C41A
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 10:51:34 -0800 (PST)
+Received: by mail-qv1-xf34.google.com with SMTP id i12so8838335qvs.2
+        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 10:51:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=p5ashMmlbLpHS/ekdQ6Rli3d8exmQ4txWz1/CMHFXQk=;
-        b=GlALXVUVyecG1mOEFO21aXN1nBxC1f9g38wb9bXfpUl8Wgjy0xAtLTM2LaB3YxJ7/q
-         x+fY+IFN9JVmqQ2JYJACVJsrBxsvE+qM3S5RfUK+NN5je79JbIGHvoGdd24y4HsUGWk9
-         9+ywZIvougKMLPZ2DGq1i7x0rqiiQ0DQwoCmjUgJigXqREQGm6/zbQAKXDnoR9uvb2PT
-         xBSXwFW9bHfA8xKAgNu3q6t4zjhzvCM5cmhD5oUl7NmjmD5pYIoOCQ1L0hFNTAtIEXFl
-         BMf2gUvK8vxrI3ILX9IIOws45ZGxZlv9IyioR3V5tHqupBZEc0bCe3L7gtkMRRXU0qYk
-         c+qA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XB10lz0QsRjxLo2pbbY9hjkEwtxi6QdcCS8KNqwdFjM=;
+        b=srFFNGm0Vqfsjysj03v3upOR/SxH0q3SyRMSCSv5leOyvmjpHcGdYZpBucA2Yg8NSU
+         /M74vYI6eIubRN3KThGKGsxjamCtXZgFrs8sMNC5BEsS0dHC97uIhJpQLafrt4zixZEz
+         FT1YT+pFHm2q7Q0ddFjI6gp32DLIUtbckL8+qF1ST2xUJfmXOpBkQFjj2aK+r2W5NjjB
+         78E8vIFyjmvB1d970w3rtv0wGhbbB7S83YEx9NpzF+gDFn5C2hOn9+Plm0HIaWQAjenQ
+         Y+UV6XkEt8xjzMciiN4a+g7D7amdD2+lLG9+WWiJyhebbroVc6vHlThTRZE/O9WCuS5U
+         rfBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p5ashMmlbLpHS/ekdQ6Rli3d8exmQ4txWz1/CMHFXQk=;
-        b=tmuRdRDxN+fRWA3sKnHFAQghu0VVyancCbM8WRJ6JzJDMRIBfXo0jwoVXcAnGPLQ1C
-         F9uxOvatqIqPPpH5tztV3/qncSLIR8eRvafK7ddh5cY5NUTOgZWstucNE0I1fiqR/DgH
-         JUTFmQo7sYFFSb4Z8VqKOijuiwTTc/qH7fjVCBGhBHCLyVgxSUkjk8TSVdNJmMKaV63v
-         RC0gO9v2lTN28ZAm2/CZ39bacM5sCmRpg1+HIMV74HGUYRuQYE/1bsRKvVlWbx6K4O8D
-         rntZqCxbc5LIuxMauVcdmP3MxMdvAT0ipacEAJcLde68m7QiC/lp+pGdglfd6d1/Ml1Y
-         5wAw==
-X-Gm-Message-State: ANoB5plbrC+F2vxzYh8F8MFIn+TTToo6rm4R/bjCS/oGDAl/Z0nGKU8A
-        qMo8ferC1WJNUuAWTtvRYpQqMy5U/92TxLVX
-X-Google-Smtp-Source: AA0mqf5twGUsQSeEi1/4s7d6sQeK1iMb4NejovSmn0WyEQ+wyi5jPiXs8MAqwng6CVsoyRqnvMgjMQ==
-X-Received: by 2002:a05:6a00:198d:b0:569:92fa:cbbc with SMTP id d13-20020a056a00198d00b0056992facbbcmr66701255pfl.77.1670266239153;
-        Mon, 05 Dec 2022 10:50:39 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id q100-20020a17090a1b6d00b00218ddc8048bsm11243965pjq.34.2022.12.05.10.50.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Dec 2022 10:50:38 -0800 (PST)
-Date:   Mon, 5 Dec 2022 10:50:35 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v4 04/16] KVM: arm64: PMU: Distinguish between 64bit
- counter and 64bit overflow
-Message-ID: <Y449e7dMzf1zaOh4@google.com>
-References: <20221113163832.3154370-1-maz@kernel.org>
- <20221113163832.3154370-5-maz@kernel.org>
- <Y4jasyxvFRNvvmox@google.com>
- <Y4jbosgHbUDI0WF4@google.com>
- <86zgc2kqcz.wl-maz@kernel.org>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XB10lz0QsRjxLo2pbbY9hjkEwtxi6QdcCS8KNqwdFjM=;
+        b=hRdvQvBKEVeQ0804oX+KJl/Zwu15JbW8Iu3wpvRlOp/9fXXO9FPPGaIWS3UNxLZQuh
+         pW6OwfoQ1+w12KBbeecKrl0vI4n3vw2Zs5LQPR/dg6xBrFI53+nFdnjzlHNfUOVShwWb
+         aLQD6NwNcSWOnA0HPUmCA80DG6EBVdZjKEptizUxeO/EVvsnaeCdaXVDKrle3OqIpVo5
+         1XMtUERmYgX2VeT8NNZcheuJ/eCviXRLcfFhyJMev4LYeGP/d81MEuQNWmADm4pcbhcz
+         gNBttTQNBfX2XlNZWO0b6Zn1r6CbNOePec3opBEJLAUigCZMPhSKUI6u+nqeNamxUjJA
+         pXOA==
+X-Gm-Message-State: ANoB5pnvrTdTWtmb1u3wzMMvjXPWQer14rdWwbraaZlAdYKzVLPNEluZ
+        tupKizbvUlQPb5kC+CmjBtPTcDAP2E1ntC716rtJxw==
+X-Google-Smtp-Source: AA0mqf5L3yZ9yRFFO9MUhWxAJgXtvIEyXL+pf6sijvhqvES8UEBskCyc0CKlqmLc+H30OAG3zLlpVJWs2+vU+TzW3r4=
+X-Received: by 2002:a0c:e6a9:0:b0:4bb:892a:fc11 with SMTP id
+ j9-20020a0ce6a9000000b004bb892afc11mr58693006qvn.28.1670266293960; Mon, 05
+ Dec 2022 10:51:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86zgc2kqcz.wl-maz@kernel.org>
+References: <20221201195718.1409782-1-vipinsh@google.com> <20221201195718.1409782-2-vipinsh@google.com>
+ <CANgfPd_sZoW6gRNgs44BbBu4RhwqNPjUO-=biJ++L5d8LpU3zg@mail.gmail.com> <Y4481WPLstNidb9X@google.com>
+In-Reply-To: <Y4481WPLstNidb9X@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 5 Dec 2022 10:51:23 -0800
+Message-ID: <CANgfPd_Ya0TeSBp5ipseA3fT1C0L3NPGSaZ=0ACjyKa_PvrZxA@mail.gmail.com>
+Subject: Re: [Patch v2 1/2] KVM: x86/mmu: Allocate page table pages on TDP
+ splits during dirty log enable on the underlying page's numa node
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vipin Sharma <vipinsh@google.com>, dmatlack@google.com,
+        pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,134 +70,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 05, 2022 at 12:05:32PM +0000, Marc Zyngier wrote:
-> On Thu, 01 Dec 2022 16:51:46 +0000,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > 
-> > On Thu, Dec 01, 2022 at 08:47:47AM -0800, Ricardo Koller wrote:
-> > > On Sun, Nov 13, 2022 at 04:38:20PM +0000, Marc Zyngier wrote:
-> > > > The PMU architecture makes a subtle difference between a 64bit
-> > > > counter and a counter that has a 64bit overflow. This is for example
-> > > > the case of the cycle counter, which can generate an overflow on
-> > > > a 32bit boundary if PMCR_EL0.LC==0 despite the accumulation being
-> > > > done on 64 bits.
-> > > > 
-> > > > Use this distinction in the few cases where it matters in the code,
-> > > > as we will reuse this with PMUv3p5 long counters.
-> > > > 
-> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > ---
-> > > >  arch/arm64/kvm/pmu-emul.c | 43 ++++++++++++++++++++++++++++-----------
-> > > >  1 file changed, 31 insertions(+), 12 deletions(-)
-> > > > 
-> > > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > > > index 69b67ab3c4bf..d050143326b5 100644
-> > > > --- a/arch/arm64/kvm/pmu-emul.c
-> > > > +++ b/arch/arm64/kvm/pmu-emul.c
-> > > > @@ -50,6 +50,11 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
-> > > >   * @select_idx: The counter index
-> > > >   */
-> > > >  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
-> > > > +{
-> > > > +	return (select_idx == ARMV8_PMU_CYCLE_IDX);
-> > > > +}
-> > > > +
-> > > > +static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
-> > > >  {
-> > > >  	return (select_idx == ARMV8_PMU_CYCLE_IDX &&
-> > > >  		__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
-> > > > @@ -57,7 +62,8 @@ static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
-> > > >  
-> > > >  static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
-> > > >  {
-> > > > -	return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX);
-> > > > +	return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX &&
-> > > > +		!kvm_pmu_idx_has_64bit_overflow(vcpu, idx));
-> > > >  }
-> > > >  
-> > > >  static struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
-> > > > @@ -97,7 +103,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
-> > > >  		counter += perf_event_read_value(pmc->perf_event, &enabled,
-> > > >  						 &running);
-> > > >  
-> > > > -	if (select_idx != ARMV8_PMU_CYCLE_IDX)
-> > > > +	if (!kvm_pmu_idx_is_64bit(vcpu, select_idx))
-> > > >  		counter = lower_32_bits(counter);
-> > > >  
-> > > >  	return counter;
-> > > > @@ -423,6 +429,23 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
-> > > >  	}
-> > > >  }
-> > > >  
-> > > > +/* Compute the sample period for a given counter value */
-> > > > +static u64 compute_period(struct kvm_vcpu *vcpu, u64 select_idx, u64 counter)
-> > > > +{
-> > > > +	u64 val;
-> > > > +
-> > > > +	if (kvm_pmu_idx_is_64bit(vcpu, select_idx)) {
-> > > > +		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx))
-> > > > +			val = -(counter & GENMASK(31, 0));
-> > > 
-> > > If I understand things correctly, this might be missing another mask:
-> > > 
-> > > +		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx)) {
-> > > +			val = -(counter & GENMASK(31, 0));
-> > > +			val &= GENMASK(31, 0);
-> > > +		} else {
-> > > 
-> > > For example, if the counter is 64-bits wide, it overflows at 32-bits,
-> > > and it is _one_ sample away from overflowing at 32-bits:
-> > > 
-> > > 	0x01010101_ffffffff
-> > > 
-> > > Then "val = (-counter) & GENMASK(63, 0)" would return 0xffffffff_00000001.
-> > 
-> > Sorry, this should be:
-> > 
-> > 	Then "val = -(counter & GENMASK(31, 0))" would return 0xffffffff_00000001.
-> > 
-> > > But the right period is 0x00000000_00000001 (it's one sample away from
-> > > overflowing).
-> 
-> Yup, this is a bit bogus. But this can be simplified by falling back
-> to the normal 32bit handling (on top of the pmu-unchained branch):
-> 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index d8ea39943086..24908400e190 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -461,14 +461,10 @@ static u64 compute_period(struct kvm_pmc *pmc, u64 counter)
->  {
->  	u64 val;
->  
-> -	if (kvm_pmc_is_64bit(pmc)) {
-> -		if (!kvm_pmc_has_64bit_overflow(pmc))
-> -			val = -(counter & GENMASK(31, 0));
-> -		else
-> -			val = (-counter) & GENMASK(63, 0);
-> -	} else {
-> +	if (kvm_pmc_is_64bit(pmc) && kvm_pmc_has_64bit_overflow(pmc))
+On Mon, Dec 5, 2022 at 10:47 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> Side topic, the shortlog is way, way too long.  The purpose of the shortlog is
+> to provide a synopsis of the change, not to describe the change in detail.
+>
+> I also think this patch should be 2/2, with the more generic support added along
+> with the module param (or capability) in 1/2.  E.g. to yield something like
+>
+>   KVM: x86/mmu: Add a module param to make per-vCPU SPTs NUMA aware
+>   KVM: x86/mmu: Honor NUMA awareness for per-VM page table allocations
+>
+> On Mon, Dec 05, 2022, Ben Gardon wrote:
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 4736d7849c60..0554dfc55553 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -90,6 +90,9 @@ __MODULE_PARM_TYPE(nx_huge_pages_recovery_period_ms, "uint");
+> > >  static bool __read_mostly force_flush_and_sync_on_reuse;
+> > >  module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
+> > >
+> > > +static bool __read_mostly numa_aware_pagetable = true;
+> > > +module_param_named(numa_aware_pagetable, numa_aware_pagetable, bool, 0644);
+> > > +
+> >
+> > I'm usually all for having module params to control things, but in
+> > this case I don't think it provides much value because whether this
+> > NUMA optimization is useful or not is going to depend more on VM size
+> > and workload than anything else. If we wanted to make this
+> > configurable, a VM capability would probably be a better mechanism so
+> > that userspace could leave it off when running small,
+> > non-performance-sensitive VMs
+>
+> Would we actually want to turn it off in this case?  IIUC, @nid is just the
+> preferred node, i.e. failure to allocate for the preferred @nid will result in
+> falling back to other nodes, not outright failure.  So the pathological worst
+> case scenario would be that for a system with VMs that don't care about performance,
+> all of a nodes memory is allocated due to all VMs starting on that node.
+>
+> On the flip side, if a system had a mix of VM shapes, I think we'd want even the
+> performance insensitive VMs to be NUMA aware so that they can be sequestered on
+> their own node(s), i.e. don't "steal" memory from the VMs that are performance
+> sensitive and have been affined to a single node.
 
-Great, thanks! Yes, that definitely makes things simpler ^.
+Yeah, the only reason to turn it off would be to save memory. As a
+strawman, if you had 100 1-vCPU VMs on a 2 node system, you'd have
+4000 pages allocated in caches, doing nothing.
 
-> +		val = (-counter) & GENMASK(63, 0);
-> +	else
->  		val = (-counter) & GENMASK(31, 0);
-> -	}
->  
->  	return val;
->  }
-> 
-> which satisfies the requirement without any extra masking, and makes
-> it plain that only a 64bit counter with 64bit overflow gets its period
-> computed on the full 64bit, and that anyone else gets the 32bit
-> truncation.
-> 
-> I'll stash yet another patch on top and push it onto -next.
-> 
-> Thanks!
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+>
+> > and turn it on when running large, multi-node VMs. A whole-host module
+> > parameter seems overly restrictive.
