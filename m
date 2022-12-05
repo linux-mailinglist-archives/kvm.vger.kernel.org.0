@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57D8B6420DA
-	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 01:52:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D46706420DE
+	for <lists+kvm@lfdr.de>; Mon,  5 Dec 2022 01:53:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231130AbiLEAwh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Dec 2022 19:52:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35538 "EHLO
+        id S231243AbiLEAxI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Dec 2022 19:53:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230479AbiLEAwg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Dec 2022 19:52:36 -0500
+        with ESMTP id S231207AbiLEAwx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Dec 2022 19:52:53 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1020EB47;
-        Sun,  4 Dec 2022 16:52:32 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEA85D11F;
+        Sun,  4 Dec 2022 16:52:49 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7EC8360F22;
-        Mon,  5 Dec 2022 00:52:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E82A0C4347C;
-        Mon,  5 Dec 2022 00:52:31 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F133B60F41;
+        Mon,  5 Dec 2022 00:52:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 635E2C4314B;
+        Mon,  5 Dec 2022 00:52:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670201551;
-        bh=s/KjoeG/YvGoR0oEAgkt8KtClqhFUTJq63bmI6YsBPo=;
+        s=k20201202; t=1670201568;
+        bh=jib82Q01YLW3qx/1zSi+9r7M6nVqOE5J7EtK6lVWsFM=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=YwHBWZu3PWtUDVuqFJLR0W1ZNGPezh3BT3/s0SwlOPcliyBz8sqes75kSelI6l/aW
-         xSt5a1WLghAIdbZiamT1JUQks8nsgR5BSiJiviVusYQr/QJO3eyqVwwrSF1Kw7iEed
-         tV2kVS1JRKsmtG7Z+Ht/PER/hLZ0g+d68TupN8Hx7MzIy1rvXk1pMkADTqV+Lw/58w
-         zEWxT3UZtQN8X8TWO5tTgRfv2Sqq0Ol58omxYSWWJ9RgnFxFPIBGIbwUN+Pecy7ruw
-         0tKdcx0qNjoRYR3Pj38CIEtRlarUtIOggl7NZrduZYuoZTr8vgPLuAeJ5Dz525pTFB
-         V4RhS0ef51d0Q==
-Received: by mail-ej1-f43.google.com with SMTP id vp12so24194917ejc.8;
-        Sun, 04 Dec 2022 16:52:31 -0800 (PST)
-X-Gm-Message-State: ANoB5pkX3+czrf9ZrV5Z/Db7UmTq5nQ0UrVd8RpTJFbDft2bF0hMV63N
-        lGv0dlucwngM+W6ohWUmZpD2cO9HJ6DlVLYt8aU=
-X-Google-Smtp-Source: AA0mqf6u3mfU1nSek+u3koHoY/aoUcux+SiCgRRELDXAjku/7GldOJ01M1jUGx1KmiiWZPp1QZaKXwpErigUqf5MuRM=
-X-Received: by 2002:a17:906:ee2:b0:78d:3f96:b7aa with SMTP id
- x2-20020a1709060ee200b0078d3f96b7aamr52877797eji.74.1670201550218; Sun, 04
- Dec 2022 16:52:30 -0800 (PST)
+        b=c4OG6YkZrqiaTLIU3ys/J39EJHbE0hDlBhlf+ojGPQYhfQh0CYGbbMnVKCG5tJF2l
+         W3T7Je3F86HVLFO/ukr9uJ4fBrxq7dl+BfPjdQdzPltQ4BuUHyuBAhaddRA+GYu8Ow
+         m8zOfWR0d6CP3dXSDZxmcMCpWTfmya6+lsRPiX3cHEERrT1AwrdhYAj2ICX3XBncRb
+         h8PK95kI+/xvvUw/96dBh1ytcCsrlXCsk7x3k8UDjq3xEywThzN5vOT7RhIg/2JYNx
+         Pblx1hVINMQSVbiNNbcOo5BZHmjm3d/blXgf50K6+p6nvGZVe8C/nETLnKKrYyjUoX
+         lPdOwhP515c6A==
+Received: by mail-ed1-f53.google.com with SMTP id d20so13781560edn.0;
+        Sun, 04 Dec 2022 16:52:48 -0800 (PST)
+X-Gm-Message-State: ANoB5pnIHEVN/MrdMvIN0CQR1qOcvuH/7A39sJanjJrffzEZwPTL6SZa
+        E2Zpi29hW+2YRvymVDSUZofuOtY2klMOWkJfEiw=
+X-Google-Smtp-Source: AA0mqf5VP9XfCfgCkhATJpcc8UvnyeJpKoB1by9S6CKiv7vkMNqEOi5vgUQwxDp/IlwIZ8hrm8OQHac5gGxCl45oatQ=
+X-Received: by 2002:a05:6402:538a:b0:458:fbd9:e3b1 with SMTP id
+ ew10-20020a056402538a00b00458fbd9e3b1mr15849493edb.6.1670201566654; Sun, 04
+ Dec 2022 16:52:46 -0800 (PST)
 MIME-Version: 1.0
-References: <20221204174632.3677-1-jszhang@kernel.org> <20221204174632.3677-12-jszhang@kernel.org>
-In-Reply-To: <20221204174632.3677-12-jszhang@kernel.org>
+References: <20221204174632.3677-1-jszhang@kernel.org> <20221204174632.3677-13-jszhang@kernel.org>
+In-Reply-To: <20221204174632.3677-13-jszhang@kernel.org>
 From:   Guo Ren <guoren@kernel.org>
-Date:   Mon, 5 Dec 2022 08:52:18 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTSBdJ53BDB5kXmh5y9cMZOmoVHqN6mhuNFqMB07E_T64g@mail.gmail.com>
-Message-ID: <CAJF2gTSBdJ53BDB5kXmh5y9cMZOmoVHqN6mhuNFqMB07E_T64g@mail.gmail.com>
-Subject: Re: [PATCH v2 11/13] riscv: cpu_relax: switch to riscv_has_extension_likely()
+Date:   Mon, 5 Dec 2022 08:52:35 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTRRjnnQLvCtvmwf0rGJgoc08s3JGq4PSe4sYfrq2bsqDA@mail.gmail.com>
+Message-ID: <CAJF2gTRRjnnQLvCtvmwf0rGJgoc08s3JGq4PSe4sYfrq2bsqDA@mail.gmail.com>
+Subject: Re: [PATCH v2 12/13] riscv: KVM: Switch has_svinval() to riscv_has_extension_unlikely()
 To:     Jisheng Zhang <jszhang@kernel.org>
 Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
@@ -71,29 +71,30 @@ Reviewed-by: Guo Ren <guoren@kernel.org>
 
 On Mon, Dec 5, 2022 at 1:57 AM Jisheng Zhang <jszhang@kernel.org> wrote:
 >
-> Switch cpu_relax() from statich branch to the new helper
-> riscv_has_extension_likely()
+> From: Andrew Jones <ajones@ventanamicro.com>
 >
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> Reviewed-by: Heiko Stuebner <heiko@sntech.de>
+> Switch has_svinval() from static branch to the new helper
+> riscv_has_extension_unlikely().
+>
+> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
 > ---
->  arch/riscv/include/asm/vdso/processor.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/riscv/kvm/tlb.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 >
-> diff --git a/arch/riscv/include/asm/vdso/processor.h b/arch/riscv/include/asm/vdso/processor.h
-> index fa70cfe507aa..edf0e25e43d1 100644
-> --- a/arch/riscv/include/asm/vdso/processor.h
-> +++ b/arch/riscv/include/asm/vdso/processor.h
-> @@ -10,7 +10,7 @@
+> diff --git a/arch/riscv/kvm/tlb.c b/arch/riscv/kvm/tlb.c
+> index 309d79b3e5cd..aa3da18ad873 100644
+> --- a/arch/riscv/kvm/tlb.c
+> +++ b/arch/riscv/kvm/tlb.c
+> @@ -15,8 +15,7 @@
+>  #include <asm/hwcap.h>
+>  #include <asm/insn-def.h>
 >
->  static inline void cpu_relax(void)
->  {
-> -       if (!static_branch_likely(&riscv_isa_ext_keys[RISCV_ISA_EXT_KEY_ZIHINTPAUSE])) {
-> +       if (!riscv_has_extension_likely(RISCV_ISA_EXT_ZIHINTPAUSE)) {
->  #ifdef __riscv_muldiv
->                 int dummy;
->                 /* In lieu of a halt instruction, induce a long-latency stall. */
+> -#define has_svinval()  \
+> -       static_branch_unlikely(&riscv_isa_ext_keys[RISCV_ISA_EXT_KEY_SVINVAL])
+> +#define has_svinval()  riscv_has_extension_unlikely(RISCV_ISA_EXT_SVINVAL)
+>
+>  void kvm_riscv_local_hfence_gvma_vmid_gpa(unsigned long vmid,
+>                                           gpa_t gpa, gpa_t gpsz,
 > --
 > 2.37.2
 >
