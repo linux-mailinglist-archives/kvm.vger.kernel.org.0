@@ -2,61 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E418643E9E
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 09:30:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E64C1643EA0
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 09:30:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233889AbiLFIaX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 03:30:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56502 "EHLO
+        id S233917AbiLFIaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 03:30:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233865AbiLFIaM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 03:30:12 -0500
+        with ESMTP id S233585AbiLFIaO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 03:30:14 -0500
 Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3961713E3A;
-        Tue,  6 Dec 2022 00:30:07 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id k88-20020a17090a4ce100b00219d0b857bcso5471066pjh.1;
-        Tue, 06 Dec 2022 00:30:07 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18A821B784;
+        Tue,  6 Dec 2022 00:30:09 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id w4-20020a17090ac98400b002186f5d7a4cso17389058pjt.0;
+        Tue, 06 Dec 2022 00:30:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CfGTpsEAU1sXOAt6OGjHmhhyP7PzExvQ+0gPINOh2xc=;
-        b=P21jlRXL2QJU7i6t7mUF/MddXtJ1jdJoMOqBI33hjcHohQ8vO/IgdyHqYPshiuo8xI
-         xuF5XDfe23o4J5zg4bWVPPsBrGhCZt9xcBitCiUViJv5UPmb9SpK++VUZBDLml1+wjqM
-         dArieJpP/mLNpkbuXOHogdGtFGDL5eYCXaCBVC4qYwGWiioYZvlwvqK0uR/cex14lSIL
-         SfHcyILIlOMW10I+kylESRVvSv18j1R1DJO2xqhCNos7/9Im1h2XANJSGi/tUqtOE+nm
-         AEnF2NBSOluAeVTW+xLXbtJ2Il6+XWxpIMTkBSlJjf3/uSNLBEwnPCPQhEM01yht0ATm
-         WEfg==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a04oUGY9n3fJGrXo8icImVtwc+ewjypnXhaaNSDY1GQ=;
+        b=ffnkQM8md00BOrMgIrR3OQZYzhrii36HasWPdUxYB3CgDo6No5kJFd/i9K+xbHtLM7
+         1NDNH+BlJfyHXiizyks0KVClq5KwqE/ZU4E9jO5j5VNnKAsExCuivoQikD59srPvvNEq
+         nZSVM3GZrE3aWExVe9ZFPT/p1R8nZzTgKed/QJrrQri63Xwl2vmVjv4sncRIQnvhmDbl
+         zifnMl7Td5TfcouQlYF7i5DihELWQgL+vPGnXir/P1GWFS104Y/kvgf89Us3U6tu6UYt
+         xkmP/zSaqQ4EeqCKiH83kcTc2DcQEe2uUSOzlOmceZnq42awAbh0Y5YV6amwVLzNiCIv
+         LKnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CfGTpsEAU1sXOAt6OGjHmhhyP7PzExvQ+0gPINOh2xc=;
-        b=pdrPCnM1Ym3XozWVIXqqf4vsEBF1ZXA8aP5+YgRAn1tQ/+wgIj9SPNPqImLQNS5A+C
-         FieyBIqntUcYfAO08hyrmoGF5T00r1HykelqU91BF5/BI+M7ie1Lf8iFKXvlg9eSrxuz
-         U8vJGCjsrKu5d50VpekKB8vT9LGQX4jAKN6ZBcg1p812BnEomS9wXMO++DmSdYHuXDcc
-         ssXXU4v/SJsRhoBcyJtPPEsDZuaqhL2u0JuRN3dQTVeYdCGChhdClOP/WJXMbkmCeU1m
-         pQwwB5mYGQbn8nZON5cP+Gs2BNqgn/oijaEuwxLRi65djZly09lw36qXs9Lbpi+QnquL
-         9RbA==
-X-Gm-Message-State: ANoB5pkFN06RLzRG6iQavHSbtVo6X92E9dV3lr3OEChsmL/sqgbIkEOu
-        FsnOvn53fX2bgt5KF7c+vYCHe8a4BG6PsQ==
-X-Google-Smtp-Source: AA0mqf7hVk5IoV7zaNKKIFAsMfYxtXj9MvXvwiOqbnkDIgShyEKbQzzQRAG/tjmUFyOYMmA7KSZHPQ==
-X-Received: by 2002:a17:902:f609:b0:188:a8a2:f43a with SMTP id n9-20020a170902f60900b00188a8a2f43amr79665791plg.130.1670315406501;
-        Tue, 06 Dec 2022 00:30:06 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a04oUGY9n3fJGrXo8icImVtwc+ewjypnXhaaNSDY1GQ=;
+        b=hjnCny9cCulD8YGNqM4jQi18pUBqe608JPzT9VYpzij+rNhQYDAb4fF8lBpTmoaLpb
+         JMV6JVVNgYGMD3dc5KAJ1G9JV6WtWSbBQmvZFJp9qprlPws/I13Khnabo9PQKr6/XETF
+         ep4BwiqrPkQUiQ5yc+awZSLdXJHVNBHnCrPJLx1pxfOY7+8kdeHcs3cA0iq3PRsr129i
+         bBdaBAa7A3DFWyqqB9a0bx0Rjdt1Ho+AiUJkWgpNZ294SDpIRZc9YxzDjKIRFwoPTN0x
+         xxxf7/FiZfZTDdh/4zM3ygfyWMg6vn9Hs7ShRJRtHCsTT800dKhtyUfHmFYb3HVLDLy8
+         dBbQ==
+X-Gm-Message-State: ANoB5plXGkg4aTCKNpOmGAZ6GtahoGLkZr/jxWJYygprXBdE8mx72uHR
+        56DBIB+ya8Gj05ihDQ7JAajKz+wkSdgbEA==
+X-Google-Smtp-Source: AA0mqf7DfNx2wCWwDvGDShzXe33Twfhp5f1Ny7zoaA1Pz7YwoM/INQKj1y6WHGMPY802E0NoqYa0gg==
+X-Received: by 2002:a17:90a:9f46:b0:219:b1db:f7e3 with SMTP id q6-20020a17090a9f4600b00219b1dbf7e3mr14235394pjv.64.1670315408566;
+        Tue, 06 Dec 2022 00:30:08 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id h15-20020a056a00000f00b00574d38f4d37sm11203330pfk.45.2022.12.06.00.30.04
+        by smtp.gmail.com with ESMTPSA id h15-20020a056a00000f00b00574d38f4d37sm11203330pfk.45.2022.12.06.00.30.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Dec 2022 00:30:05 -0800 (PST)
+        Tue, 06 Dec 2022 00:30:08 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH RESEND v3 0/3] KVM: x86/pmu: Enable guest PEBS for SPR and later models
-Date:   Tue,  6 Dec 2022 16:29:41 +0800
-Message-Id: <20221206082944.59837-1-likexu@tencent.com>
+Subject: [PATCH RESEND v3 1/3] KVM: x86/pmu: Disable guest PEBS on hybird cpu due to heterogeneity
+Date:   Tue,  6 Dec 2022 16:29:42 +0800
+Message-Id: <20221206082944.59837-2-likexu@tencent.com>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20221206082944.59837-1-likexu@tencent.com>
+References: <20221206082944.59837-1-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -69,40 +72,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+From: Like Xu <likexu@tencent.com>
 
-Finally, SPR will go live in early 2023. Virtualization support for SPR
-PEBS (kvm.x86.vpmu.pebs_ept) has officially available in the Intel SDM
-(June 2022), and this patch set is validated on a late stepping machine.
+From vPMU enabling perspective, KVM does not have proper support for
+hybird x86 core. The reported perf_capabilities value (e.g. the format
+of pebs record) depends on the type of cpu the kvm-intel module is init.
+When a vcpu of one pebs format migrates to a vcpu of another pebs format,
+the incorrect parsing of pebs records by guest can make profiling data
+analysis extremely problematic.
 
-Let's see if this new rebased revision will satisfy everyone's appetite.
+The safe way to fix this is to disable this part of the support until the
+guest recognizes that it is running on the hybird cpu, which is appropriate
+at the moment given that x86 hybrid architectures are not heavily touted
+in the data center market.
 
-Previous:
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/x86/kvm/vmx/capabilities.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-V3:
-https://lore.kernel.org/kvm/20221109082802.27543-1-likexu@tencent.com/
-V2:
-https://lore.kernel.org/kvm/20220922051929.89484-1-likexu@tencent.com/
-
-V2 -> V3 Changelog:
-- Add more commit message about the pdit/pdir stuff; (Sean)
-- Refine confusing comments on event precise level and TNT+; (Sean)
-- Use pmc_get_pebs_precise_level() instead of need_max_precise(); (Sean)
-- Move HYBRID_CPU change in a separate patch; (Sean)
-- Land KVM changes before perf core changes; (Sean)
-- Aalign code indentation; (Sean) // VScode is quite good for kernel dev.
-
-Like Xu (3):
-  KVM: x86/pmu: Disable guest PEBS on hybird cpu due to heterogeneity
-  KVM: x86/pmu: Add PRIR++ and PDist support for SPR and later models
-  perf/x86/intel: Expose EPT-friendly PEBS for SPR and future models
-
- arch/x86/events/intel/core.c    |  1 +
- arch/x86/events/intel/ds.c      |  4 ++-
- arch/x86/kvm/pmu.c              | 45 ++++++++++++++++++++++++---------
- arch/x86/kvm/vmx/capabilities.h |  4 ++-
- 4 files changed, 40 insertions(+), 14 deletions(-)
-
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index cd2ac9536c99..ea0498684048 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -392,7 +392,9 @@ static inline bool vmx_pt_mode_is_host_guest(void)
+ 
+ static inline bool vmx_pebs_supported(void)
+ {
+-	return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_ept;
++	return boot_cpu_has(X86_FEATURE_PEBS) &&
++	       !boot_cpu_has(X86_FEATURE_HYBRID_CPU) &&
++	       kvm_pmu_cap.pebs_ept;
+ }
+ 
+ static inline bool cpu_has_notify_vmexit(void)
 -- 
 2.38.1
 
