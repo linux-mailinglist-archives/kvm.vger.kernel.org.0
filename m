@@ -2,84 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84206644622
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 15:49:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6609064476A
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 16:06:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235035AbiLFOtr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 09:49:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46826 "EHLO
+        id S234603AbiLFPGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 10:06:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231274AbiLFOtp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 09:49:45 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA01D2AE30
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 06:48:24 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id f3so13575076pgc.2
-        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 06:48:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E3b5bdWA85OzMOTjNeR+xYtDEAbTCZli0u3K40D9kx4=;
-        b=OFUOd4PNQR8bRxCK6qegIBSYa3MK8J/1a32WRukCTxAY5fTbE+omxk8YDjbYTugGMt
-         YeXjCnUiKvlBk7edXLLva1LG+EYEPJj21wfIj1MmX7CR4SOWyOYUEzYSPs05BYdfhIq5
-         z1IaXMgmuZsbEAXA7r01df8vhuih3NfsWItIHWKZi0n6rXD8IocqnRosa8UqEyN/8mVL
-         i6iXH2dMdNFy5yDeIFaIvU+1FfeV0PfX9RbViXvdq9awFDH4LYyYXr/zLukIzNQ2rY4g
-         WSup0IALJEblLWRnTR/3BL3KE6NdkyZhPvl0lshlmlVISJYUUF2mgQiKaTs/T2Pmpe+Y
-         t8FQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E3b5bdWA85OzMOTjNeR+xYtDEAbTCZli0u3K40D9kx4=;
-        b=qHUM0CTCLVrMqVYm082i1K2vTdnTvemwBjMqElcbVbwYjcMJVINS2gsLycUxI60Ip/
-         QSBIBX4cI6nWG42pn11zLuxYkJCeTR+GPGMz68Seb2RDRya2lSO+jiqnlGSUwcbQyy1Q
-         Z79DMjlXsk20gyEylk7nigVfh/TbyIk9fkRdZaM1QAD6PMPTAqaOKAbXj0r6fIgBPsws
-         YP388TrjUEmyuz0iBaTJT+J9QfjHQjQNj61y/d5FPmOFEwmV8soavY0IygpSd6QInV8k
-         Sy5/7G/To3qEC4RF2zPzIZoX5CX24pEs6vbL+w0uBkUguw6p5Nh6Ouea6z8OlePeteqG
-         SGzg==
-X-Gm-Message-State: ANoB5pkofCnWRbCcEF9MfQ+68wDmaf0+YJyAIdTlqHChw2yg74zaCGpH
-        7oayDHlTdG+rGSzu75PHjyBK0g==
-X-Google-Smtp-Source: AA0mqf6wZNYJR+nxEDntmIwoB1WTx5lMm+/0X87R2SrkgFXKtucbmHuGQYhQGln4hWgCmve4UUXs+g==
-X-Received: by 2002:a63:105c:0:b0:46f:f72c:cdae with SMTP id 28-20020a63105c000000b0046ff72ccdaemr62687659pgq.237.1670338104328;
-        Tue, 06 Dec 2022 06:48:24 -0800 (PST)
-Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id u2-20020a170902e5c200b00186c5e8a8d7sm12785747plf.171.2022.12.06.06.48.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Dec 2022 06:48:23 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1p2ZF8-004cPA-AK;
-        Tue, 06 Dec 2022 10:48:22 -0400
-Date:   Tue, 6 Dec 2022 10:48:22 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Lei Rao <lei.rao@intel.com>, kbusch@kernel.org, axboe@fb.com,
-        kch@nvidia.com, sagi@grimberg.me, alex.williamson@redhat.com,
-        cohuck@redhat.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        mjrosato@linux.ibm.com, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, kvm@vger.kernel.org,
-        eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
-        Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com
-Subject: Re: [RFC PATCH 5/5] nvme-vfio: Add a document for the NVMe device
-Message-ID: <Y49WNo7XWZ2aFfds@ziepe.ca>
-References: <20221206055816.292304-1-lei.rao@intel.com>
- <20221206055816.292304-6-lei.rao@intel.com>
- <20221206062604.GB6595@lst.de>
- <Y48+AaG5rSCviIhl@ziepe.ca>
- <20221206130901.GB24358@lst.de>
- <Y49JNvdmRPNWw26q@ziepe.ca>
- <20221206140002.GB27689@lst.de>
- <Y49PqoAhZOeraLVa@ziepe.ca>
- <20221206143126.GB30297@lst.de>
+        with ESMTP id S234556AbiLFPFt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 10:05:49 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FCF82AE8;
+        Tue,  6 Dec 2022 07:00:37 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 35265B81A26;
+        Tue,  6 Dec 2022 15:00:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54919C433D6;
+        Tue,  6 Dec 2022 15:00:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670338834;
+        bh=3c6kibuQcbp7UNuOk1VcKWNfFbF3s27lK25A447UzA0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=py2GCys+Mcu9ZsFJkyBdhB1WOMuHh7A7c5fjZLcYjPhIr8/Xj4MT+hh1bYk0Tu2uy
+         NQ6vr2+qdQEZnVE8g2t1mpjtTXlsnAJ3a837AFInf5GXQVtLHROIz2cwSeitaA4IjW
+         FWEJltqCYqGEgL/+oKANoZKRSGRHRGeKvjek3StjY8UnI++1AsszgJomVzAMyMg39b
+         n0nB50HxU4WKpaUz79ZMA9rX7ky7SF08dVZhLEU0OQHHwJr/UtGvG/wSRfrVYNx4n7
+         uJkb4f61oWyoOUq274IJUGKYAul9ObboS1OqWqUIyBthcY7q4/v68ibdvr0CkO8NBV
+         7qflmREUz9rmA==
+Date:   Tue, 6 Dec 2022 22:50:37 +0800
+From:   Jisheng Zhang <jszhang@kernel.org>
+To:     Guo Ren <guoren@kernel.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 09/13] riscv: switch to relative alternative entries
+Message-ID: <Y49WvYWIsFAIeabH@xhacker>
+References: <20221204174632.3677-1-jszhang@kernel.org>
+ <20221204174632.3677-10-jszhang@kernel.org>
+ <CAJF2gTRxm7LJFtups5fexJ5ishm9_j3e+yzfKv3nTtQqUtXPtA@mail.gmail.com>
+ <Y44LuRcQYPnVnFje@xhacker>
+ <CAJF2gTQ98fyTNc6d3PJrkMjUjUstN8s1FcRNyZQCLiN5CV5NCw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221206143126.GB30297@lst.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+In-Reply-To: <CAJF2gTQ98fyTNc6d3PJrkMjUjUstN8s1FcRNyZQCLiN5CV5NCw@mail.gmail.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,40 +63,214 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 06, 2022 at 03:31:26PM +0100, Christoph Hellwig wrote:
-> On Tue, Dec 06, 2022 at 10:20:26AM -0400, Jason Gunthorpe wrote:
-> > In the VFIO restore model there is no "live OS" on resume. The
-> > load/resume cycle is as destructive as reset to the vfio device.
+On Tue, Dec 06, 2022 at 12:34:40PM +0800, Guo Ren wrote:
+> On Mon, Dec 5, 2022 at 11:28 PM Jisheng Zhang <jszhang@kernel.org> wrote:
+> >
+> > On Mon, Dec 05, 2022 at 08:51:41AM +0800, Guo Ren wrote:
+> > > On Mon, Dec 5, 2022 at 1:57 AM Jisheng Zhang <jszhang@kernel.org> wrote:
+> > > >
+> > > > Instead of using absolute addresses for both the old instrucions and
+> > > > the alternative instructions, use offsets relative to the alt_entry
+> > > > values. So we can not only cut the size of the alternative entry, but
+> > > > also meet the prerequisite for patching alternatives in the vDSO,
+> > > > since absolute alternative entries are subject to dynamic relocation,
+> > > > which is incompatible with the vDSO building.
+> > > >
+> > > > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> > > > ---
+> > > >  arch/riscv/errata/sifive/errata.c           |  4 +++-
+> > > >  arch/riscv/errata/thead/errata.c            | 11 ++++++++---
+> > > >  arch/riscv/include/asm/alternative-macros.h | 20 ++++++++++----------
+> > > >  arch/riscv/include/asm/alternative.h        | 12 ++++++------
+> > > >  arch/riscv/kernel/cpufeature.c              | 13 ++++++-------
+> > > >  5 files changed, 33 insertions(+), 27 deletions(-)
+> > > >
+> > > > diff --git a/arch/riscv/errata/sifive/errata.c b/arch/riscv/errata/sifive/errata.c
+> > > > index 1031038423e7..0e537cdfd324 100644
+> > > > --- a/arch/riscv/errata/sifive/errata.c
+> > > > +++ b/arch/riscv/errata/sifive/errata.c
+> > > > @@ -107,7 +107,9 @@ void __init_or_module sifive_errata_patch_func(struct alt_entry *begin,
+> > > >
+> > > >                 tmp = (1U << alt->errata_id);
+> > > >                 if (cpu_req_errata & tmp) {
+> > > > -                       patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
+> > > > +                       patch_text_nosync((void *)&alt->old_offset + alt->old_offset,
+> > > > +                                         (void *)&alt->alt_offset + alt->alt_offset,
+> > >  (void *)&alt->alt_offset + alt->alt_offset. ??!!
+> >
+> > Hi Guo,
+> >
+> > what's the problem? I can't catch your meaning, could you please proide
+> > more details?
+> Can you explain why:
 > 
-> Of course there may be and OS.  As soon as the VF is live Linux
-> will by default bind to it.  And that's the big problem here,
-> the VF should not actually exist or at least not be usable when
-> such a restore happens - or to say it in NVMe terms, the Secondary
-> Controller better be in offline state when state is loaded into it.
+> alt->old_ptr = (void *)&alt->old_offset + alt->old_offset
 
-Sadly in Linux we don't have a SRIOV VF lifecycle model that is any
-use.
+Hi,
 
-What we do have is a transfer of control from the normal OS driver (eg
-nvme) to the VFIO driver. Also, remember, that VFIO only does live
-migration between VFIO devices. We cannot use live migration and end
-up with a situation where the normal nvme driver is controlling the
-VF.
+when constructing the alt entry, we save the offset in
+then entry as below:
 
-The VFIO load model is explicitly destructive. We replace the current
-VF with the loading VF. Both the VFIO variant driver and the VFIO
-userspace issuing the load have to be aware of this and understand
-that the whole device will change.
+.long \oldptr - .
 
-From an implementation perspective, I would expect the nvme varient
-driver to either place the nvme device in the correct state during
-load, or refuse to execute load if it is in the wrong state.
+So we can restore the old_ptr by &alt->old_offset + alt->old_offset
 
-To be compatible with what qemu is doing the "right state" should be
-entered by completing function level reset of the VF.
+Thanks
 
-The Linux/qemu parts are still being finalized, so if you see
-something that could be changed to better match nvme it would be a
-great time to understand that.
-
-Jason
+> 
+> | offset | <- &offset
+> | ...       |
+> | value | <- ptr = &offset + offset
+> 
+> I don't make sense of the above.
+> 
+> >
+> > Thanks
+> >
+> > >
+> > > > +                                         alt->alt_len);
+> > > >                         cpu_apply_errata |= tmp;
+> > > >                 }
+> > > >         }
+> > > > diff --git a/arch/riscv/errata/thead/errata.c b/arch/riscv/errata/thead/errata.c
+> > > > index 21546937db39..2a6e335b5a32 100644
+> > > > --- a/arch/riscv/errata/thead/errata.c
+> > > > +++ b/arch/riscv/errata/thead/errata.c
+> > > > @@ -68,6 +68,7 @@ void __init_or_module thead_errata_patch_func(struct alt_entry *begin, struct al
+> > > >         struct alt_entry *alt;
+> > > >         u32 cpu_req_errata = thead_errata_probe(stage, archid, impid);
+> > > >         u32 tmp;
+> > > > +       void *oldptr, *updptr;
+> > > >
+> > > >         for (alt = begin; alt < end; alt++) {
+> > > >                 if (alt->vendor_id != THEAD_VENDOR_ID)
+> > > > @@ -77,12 +78,16 @@ void __init_or_module thead_errata_patch_func(struct alt_entry *begin, struct al
+> > > >
+> > > >                 tmp = (1U << alt->errata_id);
+> > > >                 if (cpu_req_errata & tmp) {
+> > > > +                       oldptr = (void *)&alt->old_offset + alt->old_offset;
+> > > > +                       updptr = (void *)&alt->alt_offset + alt->alt_offset;
+> > > > +
+> > > >                         /* On vm-alternatives, the mmu isn't running yet */
+> > > >                         if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
+> > > > -                               memcpy((void *)__pa_symbol(alt->old_ptr),
+> > > > -                                      (void *)__pa_symbol(alt->alt_ptr), alt->alt_len);
+> > > > +                               memcpy((void *)__pa_symbol(oldptr),
+> > > > +                                      (void *)__pa_symbol(updptr),
+> > > > +                                      alt->alt_len);
+> > > >                         else
+> > > > -                               patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
+> > > > +                               patch_text_nosync(oldptr, updptr, alt->alt_len);
+> > > >                 }
+> > > >         }
+> > > >
+> > > > diff --git a/arch/riscv/include/asm/alternative-macros.h b/arch/riscv/include/asm/alternative-macros.h
+> > > > index ec2f3f1b836f..dd40727bc859 100644
+> > > > --- a/arch/riscv/include/asm/alternative-macros.h
+> > > > +++ b/arch/riscv/include/asm/alternative-macros.h
+> > > > @@ -7,11 +7,11 @@
+> > > >  #ifdef __ASSEMBLY__
+> > > >
+> > > >  .macro ALT_ENTRY oldptr newptr vendor_id errata_id new_len
+> > > > -       RISCV_PTR \oldptr
+> > > > -       RISCV_PTR \newptr
+> > > > -       REG_ASM \vendor_id
+> > > > -       REG_ASM \new_len
+> > > > -       .word   \errata_id
+> > > > +       .long \oldptr - .
+> > > > +       .long \newptr - .
+> > > > +       .short \vendor_id
+> > > > +       .short \new_len
+> > > > +       .long \errata_id
+> > > >  .endm
+> > > >
+> > > >  .macro ALT_NEW_CONTENT vendor_id, errata_id, enable = 1, new_c : vararg
+> > > > @@ -75,11 +75,11 @@
+> > > >  #include <linux/stringify.h>
+> > > >
+> > > >  #define ALT_ENTRY(oldptr, newptr, vendor_id, errata_id, newlen)                \
+> > > > -       RISCV_PTR " " oldptr "\n"                                       \
+> > > > -       RISCV_PTR " " newptr "\n"                                       \
+> > > > -       REG_ASM " " vendor_id "\n"                                      \
+> > > > -       REG_ASM " " newlen "\n"                                         \
+> > > > -       ".word " errata_id "\n"
+> > > > +       ".long  ((" oldptr ") - .) \n"                                  \
+> > > > +       ".long  ((" newptr ") - .) \n"                                  \
+> > > > +       ".short " vendor_id "\n"                                        \
+> > > > +       ".short " newlen "\n"                                           \
+> > > > +       ".long  " errata_id "\n"
+> > > >
+> > > >  #define ALT_NEW_CONTENT(vendor_id, errata_id, enable, new_c)           \
+> > > >         ".if " __stringify(enable) " == 1\n"                            \
+> > > > diff --git a/arch/riscv/include/asm/alternative.h b/arch/riscv/include/asm/alternative.h
+> > > > index 33eae9541684..3baf32e05b46 100644
+> > > > --- a/arch/riscv/include/asm/alternative.h
+> > > > +++ b/arch/riscv/include/asm/alternative.h
+> > > > @@ -33,12 +33,12 @@ void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
+> > > >                                int patch_offset);
+> > > >
+> > > >  struct alt_entry {
+> > > > -       void *old_ptr;           /* address of original instruciton or data  */
+> > > > -       void *alt_ptr;           /* address of replacement instruction or data */
+> > > > -       unsigned long vendor_id; /* cpu vendor id */
+> > > > -       unsigned long alt_len;   /* The replacement size */
+> > > > -       unsigned int errata_id;  /* The errata id */
+> > > > -} __packed;
+> > > > +       s32 old_offset;         /* offset to original instruciton or data  */
+> > > > +       s32 alt_offset;         /* offset to replacement instruction or data */
+> > > > +       u16 vendor_id;          /* cpu vendor id */
+> > > > +       u16 alt_len;            /* The replacement size */
+> > > > +       u32 errata_id;          /* The errata id */
+> > > > +};
+> > > >
+> > > >  struct errata_checkfunc_id {
+> > > >         unsigned long vendor_id;
+> > > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> > > > index 6244be5cd94a..adeac90b1d8e 100644
+> > > > --- a/arch/riscv/kernel/cpufeature.c
+> > > > +++ b/arch/riscv/kernel/cpufeature.c
+> > > > @@ -257,6 +257,7 @@ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
+> > > >                                                   unsigned int stage)
+> > > >  {
+> > > >         struct alt_entry *alt;
+> > > > +       void *oldptr, *updptr;
+> > > >
+> > > >         if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
+> > > >                 return;
+> > > > @@ -270,17 +271,15 @@ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
+> > > >                         continue;
+> > > >                 }
+> > > >
+> > > > +               oldptr = (void *)&alt->old_offset + alt->old_offset;
+> > > > +               updptr = (void *)&alt->alt_offset + alt->alt_offset;
+> > > >                 if (!__riscv_isa_extension_available(NULL, alt->errata_id))
+> > > >                         continue;
+> > > >
+> > > >                 /* do the basic patching */
+> > > > -               patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
+> > > > -               riscv_alternative_fix_auipc_jalr(alt->old_ptr,
+> > > > -                                                alt->alt_len,
+> > > > -                                                alt->old_ptr - alt->alt_ptr);
+> > > > -               riscv_alternative_fix_jal(alt->old_ptr,
+> > > > -                                         alt->alt_len,
+> > > > -                                         alt->old_ptr - alt->alt_ptr);
+> > > > +               patch_text_nosync(oldptr, updptr, alt->alt_len);
+> > > > +               riscv_alternative_fix_auipc_jalr(oldptr, alt->alt_len, oldptr - updptr);
+> > > > +               riscv_alternative_fix_jal(oldptr, alt->alt_len, oldptr - updptr);
+> > > >         }
+> > > >  }
+> > > >  #endif
+> > > > --
+> > > > 2.37.2
+> > > >
+> > >
+> > >
+> > > --
+> > > Best Regards
+> > >  Guo Ren
+> 
+> 
+> 
+> -- 
+> Best Regards
+>  Guo Ren
