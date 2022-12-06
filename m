@@ -2,138 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29888644AFE
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 19:18:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31C96644BAF
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 19:24:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229751AbiLFSSC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 13:18:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60664 "EHLO
+        id S230256AbiLFSYE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 13:24:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229746AbiLFSSB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 13:18:01 -0500
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7E0965D8
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 10:17:59 -0800 (PST)
-Received: by mail-qv1-xf2e.google.com with SMTP id s14so10967833qvo.11
-        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 10:17:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=002hKsEdw2uXq9ifDp/QlcHXZWFBkFz3BHjDUjDbiHs=;
-        b=BzZjb686hC8vzc2qe1MwS0UoWmQVSw9zR+1hKP1jKqAV43vJhvGRby1DXzVD9Yml53
-         yFK/9KElZuwlVQJ689yyPZOzyse3Ce7XDnoURXR+0Y8qL1UgLK03T3XV17swWEuCyOtu
-         nX6mm5TpdWos8AqU5SD3vYAzsiOfXAmj6tgIRTE6ezTqZVgj/o/nNoVqfcZJqkzbAGlb
-         +N96mbikksKt/JMvT2uJzTQqLUJpYGrh+Shyo2tZeDpNoW2wjDJV5EPMYBjRDyPqwRIF
-         DE5h0Pbzf+y6bYR3aleueBYC7e1i7Np5LpMAR5PfeW95l03deJLNkSfx+9gi9i3DtLdG
-         sY7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=002hKsEdw2uXq9ifDp/QlcHXZWFBkFz3BHjDUjDbiHs=;
-        b=dFY9f0P2fa+oeSRx6CadNsIaVp3+Wno9CLacT+W+va1pvCCfEb8s/Z6DVWds31VHgI
-         NKZvdN+4h4gK2pn/ar10X+l2NHOX2o904+h6aoxTTqNIC/5E/Y+8mdP9r/DGhi4/HjD1
-         2Bf2OAPzktA1ZzVjBepXqhGYqjYpeNKGrzTqPr2p8MRA1YFGs7zV+IVUveltDOsMADr7
-         aCoJitP2vaolxP/g17puejT7SdME5FMzKnjbnJLMPwCh+3jglLTqlbyMedrw8xDwlAHq
-         HpaG5dexUAmZbwRBYwCPIomulKhlcMef879FS65ApsZFzepFAgcu/NJbMOTMi/K6pids
-         Kstg==
-X-Gm-Message-State: ANoB5plSEFTHOzfBapyhxQKpP4LliJjpllnCBXkz7XupvVrDQH1qNF2a
-        idSHRcTPGz06nUNOHyEyHbpBmi3DqYMQUD2rOaN5rQ==
-X-Google-Smtp-Source: AA0mqf7oltuiesL/YIJrr0ImRYYsfz9oaxd7tbi7sXdAJ0J0AUzBr9Scon3vM42VBtt6a2W3uijuQzhAi/V/HUIN+co=
-X-Received: by 2002:a0c:f70d:0:b0:4c7:39f0:561d with SMTP id
- w13-20020a0cf70d000000b004c739f0561dmr19454464qvn.84.1670350678827; Tue, 06
- Dec 2022 10:17:58 -0800 (PST)
+        with ESMTP id S229787AbiLFSXW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 13:23:22 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F704B4AA
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 10:21:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 98A4FCE1AF6
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 18:20:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B958BC433C1;
+        Tue,  6 Dec 2022 18:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670350832;
+        bh=T9UHAdLSg/MknZgZmsb/1izlnh+4dsvzvBWofrFnvPE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=luoPid1iZfu97Vys9ehffT9v4D2YjnhX+hRe3Ze191e72jhYr66Qn06GryAP2duoZ
+         1RE42tKko+FstPRliilBSUoanqmmlntF0Pwo/idQGwcxuI/UuVL9j03fZmPKxdhkk+
+         ynMXSyLih0xdWhwPts8R+zucxOoOpuza+6JtctEtRruJOu8kpnSCddjejE++z12uVw
+         oZ7vQ6u40msrAkSwhs6iSArVxG9wWO8kyPUU+6QRdWGRwUoS3ZMNnIywOsy55uXO/U
+         3XIlwh1bM24m6SWYrLm72pJ+zUKLyiEF+XNwOwxBcjC+vo8okKnW3XIgAkS1JOL7Rg
+         GpG/RdgMc7ZGA==
+Date:   Tue, 6 Dec 2022 18:20:21 +0000
+From:   Mark Brown <broonie@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Ben Gardon <bgardon@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Fuad Tabba <tabba@google.com>, Gavin Shan <gshan@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Peter Collingbourne <pcc@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        Quentin Perret <qperret@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Ryan Roberts <ryan.roberts@arm.com>,
+        Steven Price <steven.price@arm.com>,
+        Usama Arif <usama.arif@bytedance.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Will Deacon <will@kernel.org>,
+        Zhiyuan Dai <daizhiyuan@phytium.com.cn>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
+Message-ID: <Y4+H5Vwy/aLvjqbw@sirena.org.uk>
+References: <20221205155845.233018-1-maz@kernel.org>
+ <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
+ <Y4+FmDM7E5WYP3zV@google.com>
 MIME-Version: 1.0
-References: <20221201195718.1409782-1-vipinsh@google.com> <20221201195718.1409782-3-vipinsh@google.com>
- <CANgfPd9Khg2tMAfpj18R39cqzerFE6pu+4YUSrYr3KD5FG9zRA@mail.gmail.com> <CAHVum0cf_AeJ8rZGcWdne=QV6f_+09b=7kJb3xd-9eNiZr75Qg@mail.gmail.com>
-In-Reply-To: <CAHVum0cf_AeJ8rZGcWdne=QV6f_+09b=7kJb3xd-9eNiZr75Qg@mail.gmail.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 6 Dec 2022 10:17:47 -0800
-Message-ID: <CANgfPd9tBncLoVM4BnD5yq2O+=pXBN5_axBOh=bx=zjG7u8T7Q@mail.gmail.com>
-Subject: Re: [Patch v2 2/2] KVM: x86/mmu: Allocate page table pages on NUMA
- node of underlying pages
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     dmatlack@google.com, seanjc@google.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="syV9s6Ni/PXJMYNU"
+Content-Disposition: inline
+In-Reply-To: <Y4+FmDM7E5WYP3zV@google.com>
+X-Cookie: Save gas, don't use the shell.
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 5, 2022 at 3:40 PM Vipin Sharma <vipinsh@google.com> wrote:
->
-> On Mon, Dec 5, 2022 at 10:17 AM Ben Gardon <bgardon@google.com> wrote:
-> >
-> > On Thu, Dec 1, 2022 at 11:57 AM Vipin Sharma <vipinsh@google.com> wrote:
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index 1782c4555d94..4d59c9d48277 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -384,6 +384,11 @@ static void kvm_flush_shadow_all(struct kvm *kvm)
-> > >         kvm_arch_guest_memory_reclaimed(kvm);
-> > >  }
-> > >
-> > > +void * __weak kvm_arch_mmu_get_free_page(int nid, gfp_t gfp_flags)
-> > > +{
-> > > +               return (void *)__get_free_page(gfp_flags);
-> > > +}
-> > > +
-> >
-> > Rather than making this __weak, you could use #ifdef CONFIG_NUMA to
-> > just put all the code in the arch-neutral function.
-> >
->
-> I am not sure how it will work. Here, I am trying to keep this feature
-> only for x86. This function will be used for all architecture except
-> in x86 where we have different implementation in arch/x86/mmu/mmu.c
-> So, even if CONFIG_NUMA is defined, we want to keep the same
-> definition on other architectures.
->
->
 
-Something like:
+--syV9s6Ni/PXJMYNU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-+void * kvm_arch_mmu_get_free_page(int nid, gfp_t gfp_flags)
-+{
-+       struct page *spt_page;
-+       void *address = NULL;
-+
-+       #ifdef CONFIG_NUMA
-+       if (nid != NUMA_NO_NODE) {
-+               spt_page = alloc_pages_node(nid, gfp, 0);
-+               if (spt_page) {
-+                       address = page_address(spt_page);
-+                       return address;
-+               }
-+       }
-+       #endif // CONFIG_NUMA
-+       return (void *)__get_free_page(gfp);
-+}
+On Tue, Dec 06, 2022 at 06:10:32PM +0000, Sean Christopherson wrote:
 
->
->
->
-> > >  #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
-> > >  static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
-> > >                                                gfp_t gfp_flags)
-> > > @@ -393,7 +398,7 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
-> > >         if (mc->kmem_cache)
-> > >                 return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
-> > >         else
-> > > -               return (void *)__get_free_page(gfp_flags);
-> > > +               return kvm_arch_mmu_get_free_page(mc->node, gfp_flags);
-> > >  }
-> > >
-> > >  int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
-> > > --
-> > > 2.39.0.rc0.267.gcb52ba06e7-goog
-> > >
+> Alternatively, we could have a dedicated selftests/kvm tree (or branch)?
+
+> I almost suggested doing that on multiple occasions this cycle, but ultimately
+> decided not to because it would effectively mean splitting series that touch KVM
+> and selftests into different trees, which would create a different kind of
+> dependency hell.  Or maybe a hybrid approach where series that only (or mostly?)
+> touch selftests go into a dedicated tree?
+
+Some other subsystems do have a separate branch for kselftests.  One
+fairly common occurrence is that the selftests branch ends up failing to
+build independently because someone adds new ABI together with a
+selftest but the patches adding the ABI don't end up on the same branch
+as the tests which try to use them.  That is of course resolvable but
+it's a common friction point.
+
+--syV9s6Ni/PXJMYNU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOPh+UACgkQJNaLcl1U
+h9CC7Af+MMWaPoSDO/Esk9zkroLyT2xIe855zDLbqscWMEyns5kByu5KOIbQMuI9
+SUhH+Y3GvUDFrbipnIGOlU8gxrsFFta9BlEMNiisNoSMlJv2SmKDb9HZfZBYpiOt
+GlmJZ0i3yxKFOsLjWnxgo62AJheT4sE8wADRIPAkPxAWRyz3KGFBesc5EooCxLNt
+T/jqOtoRqoakiaejBd3eMQxKlMNdOcpqSoiOjjpWgzWOEUULA7wHa1oDRwO5W6Zr
+upb+KoHtzlYfa1UHiW3+8kg9vAk8MyBnvG0Bx6Xu6/0im6Is5WpQUc9ofnR26eLZ
+6aL4C8fUDYOKXdy6pfD6XAboCNuEtA==
+=GF2/
+-----END PGP SIGNATURE-----
+
+--syV9s6Ni/PXJMYNU--
