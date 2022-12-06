@@ -2,91 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8281644C82
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 20:27:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A4C0644D31
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 21:25:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229779AbiLFT1x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 14:27:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58830 "EHLO
+        id S229564AbiLFUZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 15:25:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229804AbiLFT1o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 14:27:44 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7C9326DA
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 11:27:43 -0800 (PST)
+        with ESMTP id S229475AbiLFUZm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 15:25:42 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CB51DF88;
+        Tue,  6 Dec 2022 12:25:41 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 28385617A4
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 19:27:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D4F0C433C1;
-        Tue,  6 Dec 2022 19:27:42 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 46E66B81B33;
+        Tue,  6 Dec 2022 20:25:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8399EC433D6;
+        Tue,  6 Dec 2022 20:25:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670354862;
-        bh=Lw7xP4Yc04PzmCy078UrA43cqbrbxWLZTAM1UvQS0OU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=enGHd1j9qLJwQrgaY86qoxtRYq3MdaMJuvp++/TqAEfHO4ERoj3orahD8+n0zasxg
-         HTJF3dPHVd3fM9lo5SVcz5AhVXMKUbSr8/nmBpimrcKtkcpDsBObAHyVIPluL1gk8P
-         cIMpsKf1LXSwHL+w4BpKZTct7do3xMp36YELRL9NYexjBO+Zaoh4gXCMaaiXtaayNq
-         ULomoN9dh14/GtEot6hw7J+IpVFswlSdoZ1q0khIgULQLjYgkZ4kzE8H2kHbGra0Qu
-         q6IIg8d1g6eXet1f8Sh7moO8LzTPxgkMto9ll5Pk8Mr/33pu3sp/CrP66PmEJx6SFS
-         6M7Qrvtk4mWdA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1p2dbP-00Av4O-T7;
-        Tue, 06 Dec 2022 19:27:39 +0000
-Date:   Tue, 06 Dec 2022 19:27:39 +0000
-Message-ID: <86lenkl4d0.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Andrew Jones <andrew.jones@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Ben Gardon <bgardon@google.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Fuad Tabba <tabba@google.com>, Gavin Shan <gshan@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Peter Collingbourne <pcc@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>,
-        Quentin Perret <qperret@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Ryan Roberts <ryan.roberts@arm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Usama Arif <usama.arif@bytedance.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Will Deacon <will@kernel.org>,
-        Zhiyuan Dai <daizhiyuan@phytium.com.cn>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
-In-Reply-To: <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
-References: <20221205155845.233018-1-maz@kernel.org>
-        <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, andrew.jones@linux.dev, akpm@linux-foundation.org, anshuman.khandual@arm.com, acme@kernel.org, bagasdotme@gmail.com, bgardon@google.com, catalin.marinas@arm.com, cohuck@redhat.com, tabba@google.com, gshan@redhat.com, kuba@kernel.org, james.morse@arm.com, maciej.szmigiero@oracle.com, m.szyprowski@samsung.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, pcc@google.com, peterx@redhat.com, philmd@linaro.org, qperret@google.com, reijiw@google.com, ricarkol@google.com, ryan.roberts@arm.com, seanjc@google.com, steven.price@arm.com, usama.arif@bytedance.com, vdonnefort@google.com, will@kernel.org, daizhiyuan@phytium.com.cn, suzuki.poulose@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        s=k20201202; t=1670358338;
+        bh=NiR96ZKIvW7IpMispdHsgp2vT3FznbdvWds2IP2JVJs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SQJ0xRSfGyt/EXVAtU8bHfgHspMYXuVOvWLqR/ovxSWRsgZHSw5L8LCDroazamMym
+         IHqNu1g6g/kyotibAwUMred1WrpsoMAPImQGefc4DYXrOdrgw8fAawTSWGq0h4Wi9r
+         CMd3P8V+cdPsG7LVmtibwhza1R6ReLm7VZi5lNEg1NvKCnDv6U8CL8CDYxXC+s4uDl
+         I+AzxmxLGbGjRqSd9NdLpll15a8EqeSxZY34uM+aUlm8HP9tNFF67zu4a9huKBMsx0
+         pqtLaO/fthDy4dCwev8aF6IvXXrUoub6FDpGwpuFOmpSeEWGVyQ1NY7YIsWaeNMF+i
+         eTcj/cpdlspZA==
+Date:   Tue, 6 Dec 2022 20:25:34 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     Jisheng Zhang <jszhang@kernel.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 06/13] riscv: introduce
+ riscv_has_extension_[un]likely()
+Message-ID: <Y4+lPiF7CpJJjmWR@spud>
+References: <20221204174632.3677-1-jszhang@kernel.org>
+ <20221204174632.3677-7-jszhang@kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="bxEn+e9TeJ7KX+1L"
+Content-Disposition: inline
+In-Reply-To: <20221204174632.3677-7-jszhang@kernel.org>
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -96,80 +62,149 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 06 Dec 2022 17:41:21 +0000,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
-> On 12/5/22 16:58, Marc Zyngier wrote:
-> > - There is a lot of selftest conflicts with your own branch, see:
-> > 
-> >    https://lore.kernel.org/r/20221201112432.4cb9ae42@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201113626.438f13c5@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201115741.7de32422@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201120939.3c19f004@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201131623.18ebc8d8@canb.auug.org.au
-> > 
-> >    for a rather exhaustive collection.
-> 
-> Yeah, I saw them in Stephen's messages but missed your reply.
-> 
-> In retrospect, at least Gavin's series for memslot_perf_test should have
-> been applied by both of us with a topic branch, but there's so many
-> conflicts all over the place that it's hard to single out one series.
-> It just happens.
 
-I generally queue things on topic branches for my own sanity, happy to
-make them available in the future.
+--bxEn+e9TeJ7KX+1L
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> The only conflict in non-x86 code is the following one, please check
-> if I got it right.
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> index 05bb6a6369c2..0cda70bef5d5 100644
-> --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> @@ -609,6 +609,8 @@ static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
->  				    data_size / guest_page_size,
->  				    p->test_desc->data_memslot_flags);
->  	vm->memslots[MEM_REGION_TEST_DATA] = TEST_DATA_MEMSLOT;
-> +
-> +	ucall_init(vm, data_gpa + data_size);
+Hey Jisheng,
+
+Just a couple really minor bits here...
+
+On Mon, Dec 05, 2022 at 01:46:25AM +0800, Jisheng Zhang wrote:
+> Generally, riscv ISA extensions are fixed for any specific hardware
+> platform, that's to say, the hart features won't change any more
+
+s/that's to say, the hart/so a hart's/
+s/any more//
+
+> after booting, this chacteristic make it straightforward to use
+
+"booting. This characteristic makes it"
+
+> static branch to check one specific ISA extension is supported or not
+
+"a static branch to check if a"
+
+> to optimize performance.
+>=20
+> However, some ISA extensions such as SVPBMT and ZICBOM are handled
+> via. the alternative sequences.
+>=20
+> Basically, for ease of maintenance, we prefer to use static branches
+> in C code, but recently, Samuel found that the static branch usage in
+> cpu_relax() breaks building with CONFIG_CC_OPTIMIZE_FOR_SIZE[1]. As
+> Samuel pointed out, "Having a static branch in cpu_relax() is
+> problematic because that function is widely inlined, including in some
+> quite complex functions like in the VDSO. A quick measurement shows
+> this static branch is responsible by itself for around 40% of the jump
+> table."
+>=20
+> Samuel's findings pointed out one of a few downsides of static branches
+> usage in C code to handle ISA extensions detected at boot time:
+> static branch's metadata in the __jump_table section, which is not
+> discarded after ISA extensions are finalized, wastes some space.
+>=20
+> I want to try to solve the issue for all possible dynamic handling of
+> ISA extensions at boot time. Inspired by Mark[2], this patch introduces
+> riscv_has_extension_*() helpers, which work like static branches but
+> are patched using alternatives, thus the metadata can be freed after
+> patching.
+>=20
+> [1]https://lore.kernel.org/linux-riscv/20220922060958.44203-1-samuel@shol=
+land.org/
+> [2]https://lore.kernel.org/linux-arm-kernel/20220912162210.3626215-8-mark=
+=2Erutland@arm.com/
+
+Can you make these into Link: tags please (and drop the line between the
+and the SoB)? So:
+
+Link: https://lore.kernel.org/linux-riscv/20220922060958.44203-1-samuel@sho=
+lland.org/ [1]
+Link: https://lore.kernel.org/linux-arm-kernel/20220912162210.3626215-8-mar=
+k.rutland@arm.com/ [2]
+> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+
+Changes themselves look grand, no comments there :)
+
+Thanks!
+Conor.
+
+> ---
+>  arch/riscv/include/asm/hwcap.h | 37 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 37 insertions(+)
+>=20
+> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwca=
+p.h
+> index 996884986fea..e2d3f6df7701 100644
+> --- a/arch/riscv/include/asm/hwcap.h
+> +++ b/arch/riscv/include/asm/hwcap.h
+> @@ -8,6 +8,7 @@
+>  #ifndef _ASM_RISCV_HWCAP_H
+>  #define _ASM_RISCV_HWCAP_H
+> =20
+> +#include <asm/alternative-macros.h>
+>  #include <asm/errno.h>
+>  #include <linux/bits.h>
+>  #include <uapi/asm/hwcap.h>
+> @@ -96,6 +97,42 @@ static __always_inline int riscv_isa_ext2key(int num)
+>  	}
 >  }
->   static void setup_default_handlers(struct test_desc *test)
-> @@ -704,8 +706,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   	setup_gva_maps(vm);
->  -	ucall_init(vm, NULL);
-> -
->  	reset_event_counts();
->   	/*
-> 
-> 
-> Special care is needed here because the test uses ____vm_create().
-> 
-> I haven't pushed to kvm/next yet to give you time to check, so the
-> merge is currently in kvm/queue only.
+> =20
+> +static __always_inline bool
+> +riscv_has_extension_likely(const unsigned long ext)
+> +{
+> +	compiletime_assert(ext < RISCV_ISA_EXT_MAX,
+> +			   "ext must be < RISCV_ISA_EXT_MAX");
+> +
+> +	asm_volatile_goto(
+> +	ALTERNATIVE("j	%l[l_no]", "nop", 0, %[ext], 1)
+> +	:
+> +	: [ext] "i" (ext)
+> +	:
+> +	: l_no);
+> +
+> +	return true;
+> +l_no:
+> +	return false;
+> +}
+> +
+> +static __always_inline bool
+> +riscv_has_extension_unlikely(const unsigned long ext)
+> +{
+> +	compiletime_assert(ext < RISCV_ISA_EXT_MAX,
+> +			   "ext must be < RISCV_ISA_EXT_MAX");
+> +
+> +	asm_volatile_goto(
+> +	ALTERNATIVE("nop", "j	%l[l_yes]", 0, %[ext], 1)
+> +	:
+> +	: [ext] "i" (ext)
+> +	:
+> +	: l_yes);
+> +
+> +	return false;
+> +l_yes:
+> +	return true;
+> +}
+> +
+>  unsigned long riscv_isa_extension_base(const unsigned long *isa_bitmap);
+> =20
+>  #define riscv_isa_extension_mask(ext) BIT_MASK(RISCV_ISA_EXT_##ext)
+> --=20
+> 2.37.2
+>=20
 
-There has been a couple of -next failures reported by broonie:
+--bxEn+e9TeJ7KX+1L
+Content-Type: application/pgp-signature; name="signature.asc"
 
-https://lore.kernel.org/r/20221206175916.250104-1-broonie@kernel.org
-https://lore.kernel.org/r/20221206181506.252537-1-broonie@kernel.org
+-----BEGIN PGP SIGNATURE-----
 
-which I think you've received as well. The second patch is definitely
-needed, but you've already solved the first one. At least things do
-build.
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY4+lPQAKCRB4tDGHoIJi
+0ioQAP4w8r5FQ0ejEXDGcp8UvPntHNhPculcXC9z8LBnhOgVggEAzzZHQlX1lhJN
+t6WlREfcRjs9PY31RoG5eskhVoUzrg4=
+=bz9l
+-----END PGP SIGNATURE-----
 
-> 
-> > - For the 6.3 cycle, we are going to experiment with Oliver taking
-> >    care of most of the patch herding. I'm sure he'll do a great job,
-> >    but if there is the odd mistake, please cut him some slack and blame
-> >    me instead.
-> 
-> Absolutely - you both have all the slack you need, synchronization
-> is harder than it seems.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--bxEn+e9TeJ7KX+1L--
