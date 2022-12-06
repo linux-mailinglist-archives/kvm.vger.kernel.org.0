@@ -2,125 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 31C96644BAF
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 19:24:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CF7C644BC3
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 19:32:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230256AbiLFSYE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 13:24:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33778 "EHLO
+        id S229992AbiLFScU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 13:32:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229787AbiLFSXW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 13:23:22 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F704B4AA
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 10:21:19 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 98A4FCE1AF6
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 18:20:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B958BC433C1;
-        Tue,  6 Dec 2022 18:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670350832;
-        bh=T9UHAdLSg/MknZgZmsb/1izlnh+4dsvzvBWofrFnvPE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=luoPid1iZfu97Vys9ehffT9v4D2YjnhX+hRe3Ze191e72jhYr66Qn06GryAP2duoZ
-         1RE42tKko+FstPRliilBSUoanqmmlntF0Pwo/idQGwcxuI/UuVL9j03fZmPKxdhkk+
-         ynMXSyLih0xdWhwPts8R+zucxOoOpuza+6JtctEtRruJOu8kpnSCddjejE++z12uVw
-         oZ7vQ6u40msrAkSwhs6iSArVxG9wWO8kyPUU+6QRdWGRwUoS3ZMNnIywOsy55uXO/U
-         3XIlwh1bM24m6SWYrLm72pJ+zUKLyiEF+XNwOwxBcjC+vo8okKnW3XIgAkS1JOL7Rg
-         GpG/RdgMc7ZGA==
-Date:   Tue, 6 Dec 2022 18:20:21 +0000
-From:   Mark Brown <broonie@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Ben Gardon <bgardon@google.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Fuad Tabba <tabba@google.com>, Gavin Shan <gshan@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Peter Collingbourne <pcc@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        Quentin Perret <qperret@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Ryan Roberts <ryan.roberts@arm.com>,
-        Steven Price <steven.price@arm.com>,
-        Usama Arif <usama.arif@bytedance.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Will Deacon <will@kernel.org>,
-        Zhiyuan Dai <daizhiyuan@phytium.com.cn>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
-Message-ID: <Y4+H5Vwy/aLvjqbw@sirena.org.uk>
-References: <20221205155845.233018-1-maz@kernel.org>
- <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
- <Y4+FmDM7E5WYP3zV@google.com>
+        with ESMTP id S230013AbiLFSbv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 13:31:51 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ED332FA7E
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 10:27:08 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id 21so15303050pfw.4
+        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 10:27:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UK2Ov4vIIB569X5qj1bj7VKGvVg/xKlS5gW5F5KP4x0=;
+        b=Q5jcQd4e/dID63d6UhYOxzlnA0bJMNl8YNulMSkVJ40hmXRE12e8wTns3DltqElZEa
+         SoXi43QTNRT31uSQHijjDjOYMg/+7/eQWTmrNRmq9RR6hT32UTVAsoLos0xg+zno8VQ5
+         5d9QORUhYO29AcJQcwbd60Y7l0pVvMF5RGeiMH2OOm34dlncciQApuLzgFA9k59CAIyo
+         R/w8+11u8+dZimhHjyU1khsCX3pCGbXTECI22WVzfvqGZWJz0zFlZP8GLtm55bvOIwSL
+         7opHLjgIRQ/RafN1yCY9vcBwLSOcKsYnzekS/+Miy4Aq3iOjfkNWLCWmQ49+g2hvvxVk
+         reHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UK2Ov4vIIB569X5qj1bj7VKGvVg/xKlS5gW5F5KP4x0=;
+        b=u9KJ4kDgV9Nmz0E+ayUmVveFUawo4bykCe/k6bcm4GJGXjdPor/BZJ6VFGNkNMpUYH
+         lvZYbfC3RvJM8vuptfhhWG6tSAkZi1aJt7hiEKwOnfHH4a+0kDFeWQ0IX69uFocIXhj5
+         ZTgkoRk0OCDbczv3iUwJgiaLT3/zXABL7P0shZozYiJIDQOI7u5/vkz21COhl4f4DbqN
+         f2tscALP7nO6ouN7f1mG5DW2UQlAGgz9qrcUXoPTp9s0Uoqx/Fk0WzKdf80LG1jzxLX0
+         CEnxg59il041WDWFu1nsWX5pQCqPNuD1Zxu9ApGfnRjMF5aHz08ktEWhRcckEwhD5gmu
+         X5Sg==
+X-Gm-Message-State: ANoB5pn8Ia4mBypoXLGiBXfmciYvWrXrctJr6BUo5/sNUCZeRJEEsjv2
+        UvRHmMtsX18RNumqsNPuJIJkHA==
+X-Google-Smtp-Source: AA0mqf5p0E7XA95WCYaopn7qNifORYZNTvxupSwbqpg2++nCK6+z1rOX/fnRK//z6/mv8j59N8bR1A==
+X-Received: by 2002:a63:500b:0:b0:440:4ad7:cde9 with SMTP id e11-20020a63500b000000b004404ad7cde9mr60515229pgb.308.1670351227926;
+        Tue, 06 Dec 2022 10:27:07 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id o1-20020a170902bcc100b00187197c4999sm12961794pls.167.2022.12.06.10.27.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Dec 2022 10:27:07 -0800 (PST)
+Date:   Tue, 6 Dec 2022 18:27:04 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sandipan Das <sandipan.das@amd.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Jing Liu <jing2.liu@intel.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Wyes Karny <wyes.karny@amd.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Babu Moger <babu.moger@amd.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org,
+        Santosh Shukla <santosh.shukla@amd.com>
+Subject: Re: [PATCH 07/13] KVM: SVM: Add VNMI support in get/set_nmi_mask
+Message-ID: <Y4+JeAiT8IpTXux9@google.com>
+References: <20221117143242.102721-1-mlevitsk@redhat.com>
+ <20221117143242.102721-8-mlevitsk@redhat.com>
+ <Y3aDTvglaSfhG8Tg@google.com>
+ <5bde88433d6962e38a4c2ddad778395cea98d13b.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="syV9s6Ni/PXJMYNU"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y4+FmDM7E5WYP3zV@google.com>
-X-Cookie: Save gas, don't use the shell.
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <5bde88433d6962e38a4c2ddad778395cea98d13b.camel@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Dec 04, 2022, Maxim Levitsky wrote:
+> For vNMI case it turns out that we don't need to intercept IRET at all after all:
+> 
+> Turns out that when vNMI is pending, you can still EVENTINJ another NMI, and
+> the pending vNMI will be kept pending, vNMI will became masked due to
+> EVENTINJ, and on IRET the pending vNMI will be serviced as well, so in total
+> both NMIs will be serviced.
 
---syV9s6Ni/PXJMYNU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I believe past me was thinking that the "merging" of pending NMIs happened in the
+context of the sender, but it always happens in the context of the target vCPU.
+Senders always do KVM_REQ_NMI, i.e. always kick if the vCPU in running, which gives
+KVM the hook it needs to update the VMCB.
 
-On Tue, Dec 06, 2022 at 06:10:32PM +0000, Sean Christopherson wrote:
-
-> Alternatively, we could have a dedicated selftests/kvm tree (or branch)?
-
-> I almost suggested doing that on multiple occasions this cycle, but ultimately
-> decided not to because it would effectively mean splitting series that touch KVM
-> and selftests into different trees, which would create a different kind of
-> dependency hell.  Or maybe a hybrid approach where series that only (or mostly?)
-> touch selftests go into a dedicated tree?
-
-Some other subsystems do have a separate branch for kselftests.  One
-fairly common occurrence is that the selftests branch ends up failing to
-build independently because someone adds new ABI together with a
-selftest but the patches adding the ABI don't end up on the same branch
-as the tests which try to use them.  That is of course resolvable but
-it's a common friction point.
-
---syV9s6Ni/PXJMYNU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOPh+UACgkQJNaLcl1U
-h9CC7Af+MMWaPoSDO/Esk9zkroLyT2xIe855zDLbqscWMEyns5kByu5KOIbQMuI9
-SUhH+Y3GvUDFrbipnIGOlU8gxrsFFta9BlEMNiisNoSMlJv2SmKDb9HZfZBYpiOt
-GlmJZ0i3yxKFOsLjWnxgo62AJheT4sE8wADRIPAkPxAWRyz3KGFBesc5EooCxLNt
-T/jqOtoRqoakiaejBd3eMQxKlMNdOcpqSoiOjjpWgzWOEUULA7wHa1oDRwO5W6Zr
-upb+KoHtzlYfa1UHiW3+8kg9vAk8MyBnvG0Bx6Xu6/0im6Is5WpQUc9ofnR26eLZ
-6aL4C8fUDYOKXdy6pfD6XAboCNuEtA==
-=GF2/
------END PGP SIGNATURE-----
-
---syV9s6Ni/PXJMYNU--
+So yeah, as long as KVM can stuff two NMIs into the VMCB, I think we're good.
+I'll give the series a proper review in the next week or so.
