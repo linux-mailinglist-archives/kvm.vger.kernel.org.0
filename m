@@ -2,217 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11CA6643CC5
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 06:50:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B266643CE2
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 06:58:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231715AbiLFFuO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 00:50:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36846 "EHLO
+        id S233008AbiLFF6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 00:58:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232500AbiLFFuL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 00:50:11 -0500
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8170818E33
-        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 21:50:10 -0800 (PST)
-Received: by mail-ej1-x630.google.com with SMTP id m18so2083257eji.5
-        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 21:50:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c6IAX5g6ledgAGKMBe/QiPZH1nxVzHQk9dCLqZzUwt0=;
-        b=PhSiFZVKOV80QGWnFhG4fhkEk4eKKXZ7LDW1qO7BVRMCpBAo3CUlllTeAr+MmTGicX
-         4HQjpCRJjRNTNL3aVGFIUjAY/PpSqxk/u4MJcEt/UM5eBjjVz1BBsDbAr2EMOpbkC/On
-         RczpIwbU6WsLJZFHDaiw7EpIfBhz/IPIry3hsVkdS5fi/TRjuf3Jsk6tBlG3phZ3540y
-         NZz2kIUBpk0VdPzoNyOnYb0GEfvBxktphGqEVpqXY2Glrfn6tuydvP6jF0BQba1LWmZu
-         RHiHrLMXk50dqwFEK4LQSr8bpd/2BcIblKvq2W6NpzvOVqQoiJPKz7HkrLUhMWoK7hpu
-         4eVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c6IAX5g6ledgAGKMBe/QiPZH1nxVzHQk9dCLqZzUwt0=;
-        b=1eZQGDeybi+yvWNUlaoQ5wo6ORB1yspIPnYUBKzDHF0St77geb6FXMzUo/s7RfRQXz
-         GTTmSWkoioarSQtW0SPHVn0NR4Yp4bHhEdOfH96ibs74KSgiriObt58PkfcRd5e31MRp
-         rL8xqejZldl49OZpABeOByAMKFdgzJggkmgGM7gXU/NqjeRNlwc7GnQ6tJAugQKSq/dL
-         kNLIaYRiY8xOOLryx0XG1qxiZsisayADlcxKqxvnaQymC8wCbYOidStvFQySfNAp12qi
-         kmem013mpGcCOfjspEXxxSXoL4V6NKP2iPYQr/h6MTgRsdc0O1tswygT3pJ1bPZhxAHB
-         SQrw==
-X-Gm-Message-State: ANoB5pkj7l/SOZcnhw1LQSZ6ymptLQ2oo9bBkLhaD0crBxNy9Y7LBNs/
-        VcafJ6XtAEgvDMfpFMslPp/E4g==
-X-Google-Smtp-Source: AA0mqf42zHplnnTX3EhWv3vS1EQcNMrEq3dkE0SS95uGttl1Xz5Njr7HJyTo75V4/pgIPyTnxhnnXg==
-X-Received: by 2002:a17:906:6bd4:b0:7c0:e23e:bbd6 with SMTP id t20-20020a1709066bd400b007c0e23ebbd6mr8906329ejs.551.1670305809017;
-        Mon, 05 Dec 2022 21:50:09 -0800 (PST)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id og40-20020a1709071de800b007c0d6b34d54sm3609973ejc.129.2022.12.05.21.50.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Dec 2022 21:50:08 -0800 (PST)
-Date:   Tue, 6 Dec 2022 06:50:07 +0100
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Jisheng Zhang <jszhang@kernel.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 01/13] riscv: fix jal offsets in patched alternatives
-Message-ID: <20221206055007.cvc4zfworla3fwwr@kamzik>
-References: <20221204174632.3677-1-jszhang@kernel.org>
- <20221204174632.3677-2-jszhang@kernel.org>
- <20221205145710.xzb4prrc44gv7mwm@kamzik>
- <Y44fY5tCC1hHDfcw@xhacker>
- <Y44hL3l8Uqg+JgWI@xhacker>
+        with ESMTP id S231213AbiLFF63 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 00:58:29 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 075D21ADB1;
+        Mon,  5 Dec 2022 21:58:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1670306309; x=1701842309;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=nLZI0skm1dszqhAO48j8Bg824jpCNH+WDBB/e0YlLoE=;
+  b=IZfljVk5hN8iFC6U5IN3LxsFbyAuRLb+WJ1Lmp84jeBRKHKQAHC6VN5J
+   3EhaRRx4n4GWDRHAlee5WD1+N9OslBD+WN7ysrG9l+yrfWwol++Gfw0Oz
+   hDeo19hLZhBLkQCCVAmN/KvKRccPBQm2m1/HgwscxDx2mmMleneSndLsn
+   LLKuYldDMHWJirAY10jyJlm6YI2qSlc6f6vX6MKgKQc8M9Y07v/d4EGdJ
+   IcTL8MrrpLoBpoHrK+Yto82UuRw5vsZXyfRQnyJx0YyHqsezmOc3qulL8
+   bpbdYGNTHX2sLYQ8+iYjkMNPtwrGj1UmcXQ4KmdneN6ssX28pLPCAIOu7
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10552"; a="378706577"
+X-IronPort-AV: E=Sophos;i="5.96,220,1665471600"; 
+   d="scan'208";a="378706577"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2022 21:58:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10552"; a="648211171"
+X-IronPort-AV: E=Sophos;i="5.96,220,1665471600"; 
+   d="scan'208";a="648211171"
+Received: from leirao-pc.bj.intel.com ([10.238.156.101])
+  by fmsmga007.fm.intel.com with ESMTP; 05 Dec 2022 21:58:23 -0800
+From:   Lei Rao <lei.rao@intel.com>
+To:     kbusch@kernel.org, axboe@fb.com, kch@nvidia.com, hch@lst.de,
+        sagi@grimberg.me, alex.williamson@redhat.com, cohuck@redhat.com,
+        jgg@ziepe.ca, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        mjrosato@linux.ibm.com, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, kvm@vger.kernel.org
+Cc:     eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
+        Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com,
+        Lei Rao <lei.rao@intel.com>
+Subject: [RFC PATCH 0/5] Add new VFIO PCI driver for NVMe devices
+Date:   Tue,  6 Dec 2022 13:58:11 +0800
+Message-Id: <20221206055816.292304-1-lei.rao@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y44hL3l8Uqg+JgWI@xhacker>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 06, 2022 at 12:49:51AM +0800, Jisheng Zhang wrote:
-> On Tue, Dec 06, 2022 at 12:42:16AM +0800, Jisheng Zhang wrote:
-> > On Mon, Dec 05, 2022 at 03:57:10PM +0100, Andrew Jones wrote:
-> > > On Mon, Dec 05, 2022 at 01:46:20AM +0800, Jisheng Zhang wrote:
-> > > > Alternatives live in a different section, so offsets used by jal
-> > > > instruction will point to wrong locations after the patch got applied.
-> > > > 
-> > > > Similar to arm64, adjust the location to consider that offset.
-> > > > 
-> > > > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> > > > ---
-> > > >  arch/riscv/include/asm/alternative.h |  2 ++
-> > > >  arch/riscv/kernel/alternative.c      | 38 ++++++++++++++++++++++++++++
-> > > >  arch/riscv/kernel/cpufeature.c       |  3 +++
-> > > >  3 files changed, 43 insertions(+)
-> > > > 
-> > > > diff --git a/arch/riscv/include/asm/alternative.h b/arch/riscv/include/asm/alternative.h
-> > > > index c58ec3cc4bc3..33eae9541684 100644
-> > > > --- a/arch/riscv/include/asm/alternative.h
-> > > > +++ b/arch/riscv/include/asm/alternative.h
-> > > > @@ -29,6 +29,8 @@ void apply_module_alternatives(void *start, size_t length);
-> > > >  
-> > > >  void riscv_alternative_fix_auipc_jalr(void *alt_ptr, unsigned int len,
-> > > >  				      int patch_offset);
-> > > > +void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
-> > > > +			       int patch_offset);
-> > > >  
-> > > >  struct alt_entry {
-> > > >  	void *old_ptr;		 /* address of original instruciton or data  */
-> > > > diff --git a/arch/riscv/kernel/alternative.c b/arch/riscv/kernel/alternative.c
-> > > > index 292cc42dc3be..9d88375624b5 100644
-> > > > --- a/arch/riscv/kernel/alternative.c
-> > > > +++ b/arch/riscv/kernel/alternative.c
-> > > > @@ -125,6 +125,44 @@ void riscv_alternative_fix_auipc_jalr(void *alt_ptr, unsigned int len,
-> > > >  	}
-> > > >  }
-> > > >  
-> > > > +#define to_jal_imm(value)						\
-> > > > +	(((value & (RV_J_IMM_10_1_MASK << RV_J_IMM_10_1_OFF)) << RV_I_IMM_11_0_OPOFF) | \
-> > >                                                                  ^ RV_J_IMM_10_1_OPOFF
-> > > 
-> > > > +	 ((value & (RV_J_IMM_11_MASK << RV_J_IMM_11_OFF)) << RV_J_IMM_11_OPOFF) | \
-> > > > +	 ((value & (RV_J_IMM_19_12_OPOFF << RV_J_IMM_19_12_OFF)) << RV_J_IMM_19_12_OPOFF) | \
-> > > > +	 ((value & (1 << RV_J_IMM_SIGN_OFF)) << RV_J_IMM_SIGN_OPOFF))
-> > 
-> > Hi all,
-> > 
-> > I believe there's bug in the to_jal_imm() macro implementation, the
-> > correct one should be like this:
-> > 
-> > #define to_jal_imm(value)                                               \
-> >         ((RV_X(value, RV_J_IMM_10_1_OFF, RV_J_IMM_10_1_MASK) << RV_J_IMM_10_1_OPOFF) | \
-> >         (RV_X(value, RV_J_IMM_11_OFF, RV_J_IMM_11_MASK) << RV_J_IMM_11_OPOFF) | \
-> >         (RV_X(value, RV_J_IMM_19_12_OFF, RV_J_IMM_19_12_MASK) << RV_J_IMM_19_12_OPOFF) | \
-> >         (RV_X(value, RV_J_IMM_SIGN_OFF, 1) << RV_J_IMM_SIGN_OPOFF))
-> 
-> And I just tested to_jal_imm() vs RV_EXTRACT_JTYPE_IMM(), they match perfectly.
-> E.g:
-> RV_EXTRACT_JTYPE_IMM(to_jal_imm(imm)) == imm is alway true when imm is a jal
-> valid offset.
+Some devices, such as Infrastructure Processing Units (IPUs) and Data
+Processing Units (DPUs), expose SR-IOV capable NVMe devices to the host.
+Its VF devices support live migration via specific NVMe commands issued
+through the PF's device's admin queue.
 
-I think we should define deposit() functions for each type, as well as the
-extract() functions, (and I'd prefer we use static inlines to macros to
-get some type checking). See [1] for my proposal.
+One of the problems is there are no standardized NVMe live migration
+commands to make our patches spec compliant, which prevents us from
+creating a spec-compliant implementation. So we've created a reference
+implantation based on the Vendor-specific command fields of the protocol.
+We want these commands to be standardized so that the implementation will
+be spec compliant in future versions and use this RFC as a basis for the
+same.
 
-[1] https://lore.kernel.org/all/20221205145323.l2dro6dt7muumqpn@kamzik/
+More importantly, we provide our work to help the community and start the
+discussion, so everyone can participate and benefit from our work in
+NVMe Live Migration implementation and help drive on standardization
+efforts.
 
-Thanks,
-drew
+This series implements the specific vfio-pci driver to support live
+migration of NVMe devices. Adds a new interface in the general
+NVMe driver to receive the VF device's commands submission to the PF
+device's admin queue. And also documents the details of NVMe device
+live migration commands.
 
-> 
-> > 
-> > Will fix it in next version.
-> > 
-> > Thanks
-> > > 
-> > > Should put () around value
-> > > 
-> > > > +
-> > > > +void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
-> > > > +			       int patch_offset)
-> > > > +{
-> > > > +	int num_instr = len / sizeof(u32);
-> > > > +	unsigned int call;
-> > > > +	int i;
-> > > > +	int imm;
-> > > > +
-> > > > +	for (i = 0; i < num_instr; i++) {
-> > > > +		u32 inst = riscv_instruction_at(alt_ptr, i);
-> > > > +
-> > > > +		if (!riscv_insn_is_jal(inst))
-> > > > +			continue;
-> > > > +
-> > > > +		/* get and adjust new target address */
-> > > > +		imm = RV_EXTRACT_JTYPE_IMM(inst);
-> > > > +		imm -= patch_offset;
-> > > > +
-> > > > +		/* pick the original jal */
-> > > > +		call = inst;
-> > > > +
-> > > > +		/* drop the old IMMs, all jal imm bits sit at 31:12 */
-> > > > +		call &= ~GENMASK(31, 12);
-> > > 
-> > > It'd be nice if this had a define.
-> > > 
-> > > > +
-> > > > +		/* add the adapted IMMs */
-> > > > +		call |= to_jal_imm(imm);
-> > > > +
-> > > > +		/* patch the call place again */
-> > > > +		patch_text_nosync(alt_ptr + i * sizeof(u32), &call, 4);
-> > > > +	}
-> > > > +}
-> > > > +
-> > > >  /*
-> > > >   * This is called very early in the boot process (directly after we run
-> > > >   * a feature detect on the boot CPU). No need to worry about other CPUs
-> > > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-> > > > index ba62a4ff5ccd..c743f0adc794 100644
-> > > > --- a/arch/riscv/kernel/cpufeature.c
-> > > > +++ b/arch/riscv/kernel/cpufeature.c
-> > > > @@ -324,6 +324,9 @@ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
-> > > >  			riscv_alternative_fix_auipc_jalr(alt->old_ptr,
-> > > >  							 alt->alt_len,
-> > > >  							 alt->old_ptr - alt->alt_ptr);
-> > > > +			riscv_alternative_fix_jal(alt->old_ptr,
-> > > > +						  alt->alt_len,
-> > > > +						  alt->old_ptr - alt->alt_ptr);
-> > > >  		}
-> > > >  	}
-> > > >  }
-> > > > -- 
-> > > > 2.37.2
-> > > >
-> > > 
-> > > Thanks,
-> > > drew
+Any feedback and comments are greatly appreciated.
+
+Lei Rao (5):
+  nvme-pci: add function nvme_submit_vf_cmd to issue admin commands for
+    VF driver.
+  nvme-vfio: add new vfio-pci driver for NVMe device
+  nvme-vfio: enable the function of VFIO live migration.
+  nvme-vfio: check if the hardware supports live migration
+  nvme-vfio: Add a document for the NVMe device
+
+ drivers/nvme/host/pci.c        |  18 +
+ drivers/vfio/pci/Kconfig       |   2 +
+ drivers/vfio/pci/Makefile      |   2 +
+ drivers/vfio/pci/nvme/Kconfig  |  10 +
+ drivers/vfio/pci/nvme/Makefile |   3 +
+ drivers/vfio/pci/nvme/nvme.c   | 636 +++++++++++++++++++++++++++++++++
+ drivers/vfio/pci/nvme/nvme.h   | 111 ++++++
+ drivers/vfio/pci/nvme/nvme.txt | 278 ++++++++++++++
+ 8 files changed, 1060 insertions(+)
+ create mode 100644 drivers/vfio/pci/nvme/Kconfig
+ create mode 100644 drivers/vfio/pci/nvme/Makefile
+ create mode 100644 drivers/vfio/pci/nvme/nvme.c
+ create mode 100644 drivers/vfio/pci/nvme/nvme.h
+ create mode 100644 drivers/vfio/pci/nvme/nvme.txt
+
+-- 
+2.34.1
+
