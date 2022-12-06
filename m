@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13DA1643C44
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 05:30:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 13668643C4D
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 05:35:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232616AbiLFEaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 23:30:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39088 "EHLO
+        id S230381AbiLFEfH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 23:35:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229982AbiLFE34 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 23:29:56 -0500
+        with ESMTP id S229938AbiLFEe6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 23:34:58 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A454BC3A;
-        Mon,  5 Dec 2022 20:29:53 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A150FDF35;
+        Mon,  5 Dec 2022 20:34:56 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 55C9BB81698;
-        Tue,  6 Dec 2022 04:29:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFEC4C43148;
-        Tue,  6 Dec 2022 04:29:50 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 30B4FB81693;
+        Tue,  6 Dec 2022 04:34:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC5D8C43142;
+        Tue,  6 Dec 2022 04:34:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670300991;
-        bh=XUnacoeF5yXfIeKrKNdeKKCmSBmbmdDPu8G2Ol5gSpc=;
+        s=k20201202; t=1670301293;
+        bh=msa/VwPes92I5wu/vP8BsHcD7BgDu9WgymdDavuJWxA=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=gWamiKgz3VX+Yw09lHLA2LxW9F/qImjf7t0OXzmBnx9kch+P3JYNo5Xf9LhM2v0O7
-         QXwxLpEGrUFQxFBI+iduC/plOWI5cII82rMdiUMJbOeucaFerIDjfE9aZHFZPyVhN1
-         NaMLY5AdRFj1tkyeHwNsqXOyKmy3C1tZPvBm1qRwmB/pTOR16xXTGvVPdPu68TOgRh
-         Al91UTzbiVmPiLp9tYoIAL8vcMCQRlRpue4+ySyRyQGi6Px0TnikLNZwqwkwxihnWG
-         99tyEBZx/tI9rLP/nD+3yzA/wz1VraLTPHJPRsggTORzHDiA5QTgvrV+5fLqZpPOmj
-         /f6OywaNZDR8Q==
-Received: by mail-ed1-f50.google.com with SMTP id e13so18611569edj.7;
-        Mon, 05 Dec 2022 20:29:50 -0800 (PST)
-X-Gm-Message-State: ANoB5pliq0jUlnlmRJxgu4br8AL/0vR2C7TGWe0JdPgzBNQbD1J7GRr3
-        td4nhsBbcTww4F/63jfka1UUD1PmpXhnaqoRo4I=
-X-Google-Smtp-Source: AA0mqf7YBSxN94Yi+YLxbPof3lmR+Ui+89LqMINsb4Z+Pc4tmQ0myAlsKfQfI8ytUrwf302j2H8gh0mS7Xd5wONewss=
-X-Received: by 2002:a05:6402:1117:b0:46b:6da7:e8a9 with SMTP id
- u23-20020a056402111700b0046b6da7e8a9mr28571704edv.401.1670300989129; Mon, 05
- Dec 2022 20:29:49 -0800 (PST)
+        b=CuN4sq4wwjyML+PXFapg5qJk6mPVkcHbsZuwUZjLtlsZ5kbDTDW9yKUt5aRjbYsRZ
+         /PDYBgG3STC8wsEpxguMFPcLUwY083/OOrBO2grps/+zm4Qg3ZZ9CoYIS9AoEJQoV7
+         abALkPKNw35YJVZKjxYiJLyWXZXbvq1nlub2MzObwFeyNEwLVDlvAM0LZIvDSUAon/
+         DWLJfhyYJ6ASDTbzyTumOv833Xps7A9U+wi7T8TTTDXvijP3eJLJAsSGhj5tlIAC/W
+         sfa6xXY6wzyfzZwYKDbb9WwOZzKjHHAYSKjQRCPTxhC1wRrTXiQbAop/xtGMe9mm8H
+         MVTAiu+BHK01Q==
+Received: by mail-ej1-f52.google.com with SMTP id m18so1804061eji.5;
+        Mon, 05 Dec 2022 20:34:53 -0800 (PST)
+X-Gm-Message-State: ANoB5pmSi6byheI8KlT3y5jJre0xB+BzM6weyrCGXGgiH3ypsFHe+9bI
+        m7UjwY5nWSm47c8xKB6/oq7ENx8hIhiAMnvRZBo=
+X-Google-Smtp-Source: AA0mqf6GuGvHiOPgth8wIKnoKnt5jLhpQ86kofAEtziMuYgxI4HGvPlxaa3cPf+bC0eiMd9r7hVWqPfgNab+xB5zkpw=
+X-Received: by 2002:a17:906:ee2:b0:78d:3f96:b7aa with SMTP id
+ x2-20020a1709060ee200b0078d3f96b7aamr56776437eji.74.1670301292065; Mon, 05
+ Dec 2022 20:34:52 -0800 (PST)
 MIME-Version: 1.0
-References: <20221204174632.3677-1-jszhang@kernel.org> <20221204174632.3677-11-jszhang@kernel.org>
- <CAJF2gTR5VW0m=czqF2cQOcX5Vstow6EsuT044_E4WLo-NeVCOg@mail.gmail.com> <Y44M5vHaqglLvL3c@xhacker>
-In-Reply-To: <Y44M5vHaqglLvL3c@xhacker>
+References: <20221204174632.3677-1-jszhang@kernel.org> <20221204174632.3677-10-jszhang@kernel.org>
+ <CAJF2gTRxm7LJFtups5fexJ5ishm9_j3e+yzfKv3nTtQqUtXPtA@mail.gmail.com> <Y44LuRcQYPnVnFje@xhacker>
+In-Reply-To: <Y44LuRcQYPnVnFje@xhacker>
 From:   Guo Ren <guoren@kernel.org>
-Date:   Tue, 6 Dec 2022 12:29:37 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTQW2GP6X-tOyt=4qN-vYGcBbbFeSvnmGXBq2T1Bm226FA@mail.gmail.com>
-Message-ID: <CAJF2gTQW2GP6X-tOyt=4qN-vYGcBbbFeSvnmGXBq2T1Bm226FA@mail.gmail.com>
-Subject: Re: [PATCH v2 10/13] riscv: alternative: patch alternatives in the vDSO
+Date:   Tue, 6 Dec 2022 12:34:40 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTQ98fyTNc6d3PJrkMjUjUstN8s1FcRNyZQCLiN5CV5NCw@mail.gmail.com>
+Message-ID: <CAJF2gTQ98fyTNc6d3PJrkMjUjUstN8s1FcRNyZQCLiN5CV5NCw@mail.gmail.com>
+Subject: Re: [PATCH v2 09/13] riscv: switch to relative alternative entries
 To:     Jisheng Zhang <jszhang@kernel.org>
 Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
@@ -68,142 +68,190 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 5, 2022 at 11:33 PM Jisheng Zhang <jszhang@kernel.org> wrote:
+On Mon, Dec 5, 2022 at 11:28 PM Jisheng Zhang <jszhang@kernel.org> wrote:
 >
-> On Mon, Dec 05, 2022 at 09:56:37AM +0800, Guo Ren wrote:
-> > Are there any patches that depend on it? Any existing utilization? My
-> > first idea is to let __vdso_flush_icache use it, the standard
-> > implementation is so heavy for user space JIT scenario, maybe vendors
-> > could give a custom one.
+> On Mon, Dec 05, 2022 at 08:51:41AM +0800, Guo Ren wrote:
+> > On Mon, Dec 5, 2022 at 1:57 AM Jisheng Zhang <jszhang@kernel.org> wrote:
+> > >
+> > > Instead of using absolute addresses for both the old instrucions and
+> > > the alternative instructions, use offsets relative to the alt_entry
+> > > values. So we can not only cut the size of the alternative entry, but
+> > > also meet the prerequisite for patching alternatives in the vDSO,
+> > > since absolute alternative entries are subject to dynamic relocation,
+> > > which is incompatible with the vDSO building.
+> > >
+> > > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> > > ---
+> > >  arch/riscv/errata/sifive/errata.c           |  4 +++-
+> > >  arch/riscv/errata/thead/errata.c            | 11 ++++++++---
+> > >  arch/riscv/include/asm/alternative-macros.h | 20 ++++++++++----------
+> > >  arch/riscv/include/asm/alternative.h        | 12 ++++++------
+> > >  arch/riscv/kernel/cpufeature.c              | 13 ++++++-------
+> > >  5 files changed, 33 insertions(+), 27 deletions(-)
+> > >
+> > > diff --git a/arch/riscv/errata/sifive/errata.c b/arch/riscv/errata/sifive/errata.c
+> > > index 1031038423e7..0e537cdfd324 100644
+> > > --- a/arch/riscv/errata/sifive/errata.c
+> > > +++ b/arch/riscv/errata/sifive/errata.c
+> > > @@ -107,7 +107,9 @@ void __init_or_module sifive_errata_patch_func(struct alt_entry *begin,
+> > >
+> > >                 tmp = (1U << alt->errata_id);
+> > >                 if (cpu_req_errata & tmp) {
+> > > -                       patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
+> > > +                       patch_text_nosync((void *)&alt->old_offset + alt->old_offset,
+> > > +                                         (void *)&alt->alt_offset + alt->alt_offset,
+> >  (void *)&alt->alt_offset + alt->alt_offset. ??!!
 >
 > Hi Guo,
 >
-> the 11th patch of swtiching cpu_relax() to riscv_has_extension_likely()
-> depends on this patch, the gettimeofday implementation calls cpu_relax()
-> which may use ZIHINTPAUSE extension, so we need to patch vDSO.
-Oh, I missed that. Thx.
+> what's the problem? I can't catch your meaning, could you please proide
+> more details?
+Can you explain why:
 
-Reviewed-by: Guo Ren <guoren@kernel.org>
+alt->old_ptr = (void *)&alt->old_offset + alt->old_offset
+
+| offset | <- &offset
+| ...       |
+| value | <- ptr = &offset + offset
+
+I don't make sense of the above.
 
 >
 > Thanks
 >
 > >
-> > On Mon, Dec 5, 2022 at 1:57 AM Jisheng Zhang <jszhang@kernel.org> wrote:
+> > > +                                         alt->alt_len);
+> > >                         cpu_apply_errata |= tmp;
+> > >                 }
+> > >         }
+> > > diff --git a/arch/riscv/errata/thead/errata.c b/arch/riscv/errata/thead/errata.c
+> > > index 21546937db39..2a6e335b5a32 100644
+> > > --- a/arch/riscv/errata/thead/errata.c
+> > > +++ b/arch/riscv/errata/thead/errata.c
+> > > @@ -68,6 +68,7 @@ void __init_or_module thead_errata_patch_func(struct alt_entry *begin, struct al
+> > >         struct alt_entry *alt;
+> > >         u32 cpu_req_errata = thead_errata_probe(stage, archid, impid);
+> > >         u32 tmp;
+> > > +       void *oldptr, *updptr;
 > > >
-> > > Make it possible to use alternatives in the vDSO, so that better
-> > > implementations can be used if possible.
+> > >         for (alt = begin; alt < end; alt++) {
+> > >                 if (alt->vendor_id != THEAD_VENDOR_ID)
+> > > @@ -77,12 +78,16 @@ void __init_or_module thead_errata_patch_func(struct alt_entry *begin, struct al
 > > >
-> > > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> > > ---
-> > >  arch/riscv/include/asm/vdso.h     |  4 ++++
-> > >  arch/riscv/kernel/alternative.c   | 25 +++++++++++++++++++++++++
-> > >  arch/riscv/kernel/vdso.c          |  5 -----
-> > >  arch/riscv/kernel/vdso/vdso.lds.S |  7 +++++++
-> > >  4 files changed, 36 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/arch/riscv/include/asm/vdso.h b/arch/riscv/include/asm/vdso.h
-> > > index af981426fe0f..b6ff7473fb8a 100644
-> > > --- a/arch/riscv/include/asm/vdso.h
-> > > +++ b/arch/riscv/include/asm/vdso.h
-> > > @@ -28,8 +28,12 @@
-> > >  #define COMPAT_VDSO_SYMBOL(base, name)                                         \
-> > >         (void __user *)((unsigned long)(base) + compat__vdso_##name##_offset)
-> > >
-> > > +extern char compat_vdso_start[], compat_vdso_end[];
+> > >                 tmp = (1U << alt->errata_id);
+> > >                 if (cpu_req_errata & tmp) {
+> > > +                       oldptr = (void *)&alt->old_offset + alt->old_offset;
+> > > +                       updptr = (void *)&alt->alt_offset + alt->alt_offset;
 > > > +
-> > >  #endif /* CONFIG_COMPAT */
+> > >                         /* On vm-alternatives, the mmu isn't running yet */
+> > >                         if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
+> > > -                               memcpy((void *)__pa_symbol(alt->old_ptr),
+> > > -                                      (void *)__pa_symbol(alt->alt_ptr), alt->alt_len);
+> > > +                               memcpy((void *)__pa_symbol(oldptr),
+> > > +                                      (void *)__pa_symbol(updptr),
+> > > +                                      alt->alt_len);
+> > >                         else
+> > > -                               patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
+> > > +                               patch_text_nosync(oldptr, updptr, alt->alt_len);
+> > >                 }
+> > >         }
 > > >
-> > > +extern char vdso_start[], vdso_end[];
-> > > +
-> > >  #endif /* !__ASSEMBLY__ */
+> > > diff --git a/arch/riscv/include/asm/alternative-macros.h b/arch/riscv/include/asm/alternative-macros.h
+> > > index ec2f3f1b836f..dd40727bc859 100644
+> > > --- a/arch/riscv/include/asm/alternative-macros.h
+> > > +++ b/arch/riscv/include/asm/alternative-macros.h
+> > > @@ -7,11 +7,11 @@
+> > >  #ifdef __ASSEMBLY__
 > > >
-> > >  #endif /* CONFIG_MMU */
-> > > diff --git a/arch/riscv/kernel/alternative.c b/arch/riscv/kernel/alternative.c
-> > > index 9d88375624b5..eaf7ddaba54c 100644
-> > > --- a/arch/riscv/kernel/alternative.c
-> > > +++ b/arch/riscv/kernel/alternative.c
-> > > @@ -11,7 +11,9 @@
-> > >  #include <linux/cpu.h>
-> > >  #include <linux/uaccess.h>
-> > >  #include <asm/alternative.h>
-> > > +#include <asm/module.h>
-> > >  #include <asm/sections.h>
-> > > +#include <asm/vdso.h>
-> > >  #include <asm/vendorid_list.h>
-> > >  #include <asm/sbi.h>
-> > >  #include <asm/csr.h>
-> > > @@ -187,6 +189,27 @@ static void __init_or_module _apply_alternatives(struct alt_entry *begin,
-> > >                                 stage);
-> > >  }
+> > >  .macro ALT_ENTRY oldptr newptr vendor_id errata_id new_len
+> > > -       RISCV_PTR \oldptr
+> > > -       RISCV_PTR \newptr
+> > > -       REG_ASM \vendor_id
+> > > -       REG_ASM \new_len
+> > > -       .word   \errata_id
+> > > +       .long \oldptr - .
+> > > +       .long \newptr - .
+> > > +       .short \vendor_id
+> > > +       .short \new_len
+> > > +       .long \errata_id
+> > >  .endm
 > > >
-> > > +static void __init apply_vdso_alternatives(void)
-> > > +{
-> > > +       const struct elf64_hdr *hdr;
-> > > +       const struct elf64_shdr *shdr;
-> > > +       const struct elf64_shdr *alt;
-> > > +       struct alt_entry *begin, *end;
-> > > +
-> > > +       hdr = (struct elf64_hdr *)vdso_start;
-> > > +       shdr = (void *)hdr + hdr->e_shoff;
-> > > +       alt = find_section(hdr, shdr, ".alternative");
-> > > +       if (!alt)
-> > > +               return;
-> > > +
-> > > +       begin = (void *)hdr + alt->sh_offset,
-> > > +       end = (void *)hdr + alt->sh_offset + alt->sh_size,
-> > > +
-> > > +       _apply_alternatives((struct alt_entry *)begin,
-> > > +                           (struct alt_entry *)end,
-> > > +                           RISCV_ALTERNATIVES_BOOT);
-> > > +}
-> > > +
-> > >  void __init apply_boot_alternatives(void)
+> > >  .macro ALT_NEW_CONTENT vendor_id, errata_id, enable = 1, new_c : vararg
+> > > @@ -75,11 +75,11 @@
+> > >  #include <linux/stringify.h>
+> > >
+> > >  #define ALT_ENTRY(oldptr, newptr, vendor_id, errata_id, newlen)                \
+> > > -       RISCV_PTR " " oldptr "\n"                                       \
+> > > -       RISCV_PTR " " newptr "\n"                                       \
+> > > -       REG_ASM " " vendor_id "\n"                                      \
+> > > -       REG_ASM " " newlen "\n"                                         \
+> > > -       ".word " errata_id "\n"
+> > > +       ".long  ((" oldptr ") - .) \n"                                  \
+> > > +       ".long  ((" newptr ") - .) \n"                                  \
+> > > +       ".short " vendor_id "\n"                                        \
+> > > +       ".short " newlen "\n"                                           \
+> > > +       ".long  " errata_id "\n"
+> > >
+> > >  #define ALT_NEW_CONTENT(vendor_id, errata_id, enable, new_c)           \
+> > >         ".if " __stringify(enable) " == 1\n"                            \
+> > > diff --git a/arch/riscv/include/asm/alternative.h b/arch/riscv/include/asm/alternative.h
+> > > index 33eae9541684..3baf32e05b46 100644
+> > > --- a/arch/riscv/include/asm/alternative.h
+> > > +++ b/arch/riscv/include/asm/alternative.h
+> > > @@ -33,12 +33,12 @@ void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
+> > >                                int patch_offset);
+> > >
+> > >  struct alt_entry {
+> > > -       void *old_ptr;           /* address of original instruciton or data  */
+> > > -       void *alt_ptr;           /* address of replacement instruction or data */
+> > > -       unsigned long vendor_id; /* cpu vendor id */
+> > > -       unsigned long alt_len;   /* The replacement size */
+> > > -       unsigned int errata_id;  /* The errata id */
+> > > -} __packed;
+> > > +       s32 old_offset;         /* offset to original instruciton or data  */
+> > > +       s32 alt_offset;         /* offset to replacement instruction or data */
+> > > +       u16 vendor_id;          /* cpu vendor id */
+> > > +       u16 alt_len;            /* The replacement size */
+> > > +       u32 errata_id;          /* The errata id */
+> > > +};
+> > >
+> > >  struct errata_checkfunc_id {
+> > >         unsigned long vendor_id;
+> > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> > > index 6244be5cd94a..adeac90b1d8e 100644
+> > > --- a/arch/riscv/kernel/cpufeature.c
+> > > +++ b/arch/riscv/kernel/cpufeature.c
+> > > @@ -257,6 +257,7 @@ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
+> > >                                                   unsigned int stage)
 > > >  {
-> > >         /* If called on non-boot cpu things could go wrong */
-> > > @@ -195,6 +218,8 @@ void __init apply_boot_alternatives(void)
-> > >         _apply_alternatives((struct alt_entry *)__alt_start,
-> > >                             (struct alt_entry *)__alt_end,
-> > >                             RISCV_ALTERNATIVES_BOOT);
-> > > +
-> > > +       apply_vdso_alternatives();
+> > >         struct alt_entry *alt;
+> > > +       void *oldptr, *updptr;
+> > >
+> > >         if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
+> > >                 return;
+> > > @@ -270,17 +271,15 @@ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
+> > >                         continue;
+> > >                 }
+> > >
+> > > +               oldptr = (void *)&alt->old_offset + alt->old_offset;
+> > > +               updptr = (void *)&alt->alt_offset + alt->alt_offset;
+> > >                 if (!__riscv_isa_extension_available(NULL, alt->errata_id))
+> > >                         continue;
+> > >
+> > >                 /* do the basic patching */
+> > > -               patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
+> > > -               riscv_alternative_fix_auipc_jalr(alt->old_ptr,
+> > > -                                                alt->alt_len,
+> > > -                                                alt->old_ptr - alt->alt_ptr);
+> > > -               riscv_alternative_fix_jal(alt->old_ptr,
+> > > -                                         alt->alt_len,
+> > > -                                         alt->old_ptr - alt->alt_ptr);
+> > > +               patch_text_nosync(oldptr, updptr, alt->alt_len);
+> > > +               riscv_alternative_fix_auipc_jalr(oldptr, alt->alt_len, oldptr - updptr);
+> > > +               riscv_alternative_fix_jal(oldptr, alt->alt_len, oldptr - updptr);
+> > >         }
 > > >  }
-> > >
-> > >  /*
-> > > diff --git a/arch/riscv/kernel/vdso.c b/arch/riscv/kernel/vdso.c
-> > > index 123d05255fcf..1f47bc6566cf 100644
-> > > --- a/arch/riscv/kernel/vdso.c
-> > > +++ b/arch/riscv/kernel/vdso.c
-> > > @@ -22,11 +22,6 @@ struct vdso_data {
-> > >  };
 > > >  #endif
-> > >
-> > > -extern char vdso_start[], vdso_end[];
-> > > -#ifdef CONFIG_COMPAT
-> > > -extern char compat_vdso_start[], compat_vdso_end[];
-> > > -#endif
-> > > -
-> > >  enum vvar_pages {
-> > >         VVAR_DATA_PAGE_OFFSET,
-> > >         VVAR_TIMENS_PAGE_OFFSET,
-> > > diff --git a/arch/riscv/kernel/vdso/vdso.lds.S b/arch/riscv/kernel/vdso/vdso.lds.S
-> > > index 150b1a572e61..4a0606633290 100644
-> > > --- a/arch/riscv/kernel/vdso/vdso.lds.S
-> > > +++ b/arch/riscv/kernel/vdso/vdso.lds.S
-> > > @@ -40,6 +40,13 @@ SECTIONS
-> > >         . = 0x800;
-> > >         .text           : { *(.text .text.*) }          :text
-> > >
-> > > +       . = ALIGN(4);
-> > > +       .alternative : {
-> > > +               __alt_start = .;
-> > > +               *(.alternative)
-> > > +               __alt_end = .;
-> > > +       }
-> > > +
-> > >         .data           : {
-> > >                 *(.got.plt) *(.got)
-> > >                 *(.data .data.* .gnu.linkonce.d.*)
 > > > --
 > > > 2.37.2
 > > >
