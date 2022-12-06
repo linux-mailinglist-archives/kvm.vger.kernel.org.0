@@ -2,105 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C2418644AFA
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 19:17:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29888644AFE
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 19:18:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229743AbiLFSQz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 13:16:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59688 "EHLO
+        id S229751AbiLFSSC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 13:18:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229731AbiLFSQw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 13:16:52 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0BBE2D74B;
-        Tue,  6 Dec 2022 10:16:51 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5953DB81B1F;
-        Tue,  6 Dec 2022 18:16:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA2EAC433D6;
-        Tue,  6 Dec 2022 18:16:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670350609;
-        bh=macQQ74pjNjmKFm8T+wbES3REUCkFjh+lVvmQilsrUY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=dYrsTt3f5z+/AXYuybQ15f05xy/VElaugfomTFjhbLP/qg9Uti9Fls6H6JUwHL/fA
-         fl8rendKXr2VbIz1PsCMsrkrsE1BSDM8//kKjrHtNvYkEYwriI4ufmzMvbB9IpIr5D
-         sEYocOUvA0Ze2//cjrMT3dOv5Wjd7xRskTGS+MdNNqB/Iin2zLKyz7QV3Jtghk+9Vu
-         mpOalcc5E1PjHjgLx9byYfihjjbSvO+kAuuvKWNFvM86dNLZBpj7kAeUiYsAmlz0Ne
-         yDDaR8kGnUMY0Z8mSZbYxqbqwhWpX9G3gj5RfEQr2QSIPXrTxfcRH8b7hpKMiWRnYd
-         86Z6QA5zLWnCg==
-From:   Mark Brown <broonie@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-next@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Mark Brown <broonie@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Ricardo Koller <ricarkol@google.com>
-Subject: [PATCH] KVM: selftests: Fix build due to ucall_uninit() removal
-Date:   Tue,  6 Dec 2022 18:15:06 +0000
-Message-Id: <20221206181506.252537-1-broonie@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        with ESMTP id S229746AbiLFSSB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 13:18:01 -0500
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7E0965D8
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 10:17:59 -0800 (PST)
+Received: by mail-qv1-xf2e.google.com with SMTP id s14so10967833qvo.11
+        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 10:17:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=002hKsEdw2uXq9ifDp/QlcHXZWFBkFz3BHjDUjDbiHs=;
+        b=BzZjb686hC8vzc2qe1MwS0UoWmQVSw9zR+1hKP1jKqAV43vJhvGRby1DXzVD9Yml53
+         yFK/9KElZuwlVQJ689yyPZOzyse3Ce7XDnoURXR+0Y8qL1UgLK03T3XV17swWEuCyOtu
+         nX6mm5TpdWos8AqU5SD3vYAzsiOfXAmj6tgIRTE6ezTqZVgj/o/nNoVqfcZJqkzbAGlb
+         +N96mbikksKt/JMvT2uJzTQqLUJpYGrh+Shyo2tZeDpNoW2wjDJV5EPMYBjRDyPqwRIF
+         DE5h0Pbzf+y6bYR3aleueBYC7e1i7Np5LpMAR5PfeW95l03deJLNkSfx+9gi9i3DtLdG
+         sY7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=002hKsEdw2uXq9ifDp/QlcHXZWFBkFz3BHjDUjDbiHs=;
+        b=dFY9f0P2fa+oeSRx6CadNsIaVp3+Wno9CLacT+W+va1pvCCfEb8s/Z6DVWds31VHgI
+         NKZvdN+4h4gK2pn/ar10X+l2NHOX2o904+h6aoxTTqNIC/5E/Y+8mdP9r/DGhi4/HjD1
+         2Bf2OAPzktA1ZzVjBepXqhGYqjYpeNKGrzTqPr2p8MRA1YFGs7zV+IVUveltDOsMADr7
+         aCoJitP2vaolxP/g17puejT7SdME5FMzKnjbnJLMPwCh+3jglLTqlbyMedrw8xDwlAHq
+         HpaG5dexUAmZbwRBYwCPIomulKhlcMef879FS65ApsZFzepFAgcu/NJbMOTMi/K6pids
+         Kstg==
+X-Gm-Message-State: ANoB5plSEFTHOzfBapyhxQKpP4LliJjpllnCBXkz7XupvVrDQH1qNF2a
+        idSHRcTPGz06nUNOHyEyHbpBmi3DqYMQUD2rOaN5rQ==
+X-Google-Smtp-Source: AA0mqf7oltuiesL/YIJrr0ImRYYsfz9oaxd7tbi7sXdAJ0J0AUzBr9Scon3vM42VBtt6a2W3uijuQzhAi/V/HUIN+co=
+X-Received: by 2002:a0c:f70d:0:b0:4c7:39f0:561d with SMTP id
+ w13-20020a0cf70d000000b004c739f0561dmr19454464qvn.84.1670350678827; Tue, 06
+ Dec 2022 10:17:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1809; i=broonie@kernel.org; h=from:subject; bh=macQQ74pjNjmKFm8T+wbES3REUCkFjh+lVvmQilsrUY=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjj4apcRMzRY/3tffeY2BaujjTzJ6CZMq8Xxzk9Awb SDUV+3GJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY4+GqQAKCRAk1otyXVSH0NlRB/ 9LWXJwFvylGOiRN1bWQfLyw9jaJOwv5Pf4HkB9GFM3Tip2CqJRRkV3sF4BQDX1PCMU7epSd0usq1T/ evWNcCpQZSFQ0bXovG4j4+cmHVim5y4EKIGWBqlR+dZ5nZsjTEf/nogWA0JoCmnG/rah6oh+SNNwsb /3NKaaDA3If0eGTSXcPe38ZWpPEd3DnNaqZYnnkyK84jVR2LE2jGep11ygv2Buq6ccxj5GAMLUa7JG 8N0gSW7ni2iwN7+IeUVEh5+X1kYgBJpufhUskYmz73ModYIPVKElZBPUxNosmzRtXGZCeXbwE18Qwf 05ADCKlxRAF18A3etfhA0+9mCFFcwR
-X-Developer-Key: i=broonie@kernel.org; a=openpgp; fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20221201195718.1409782-1-vipinsh@google.com> <20221201195718.1409782-3-vipinsh@google.com>
+ <CANgfPd9Khg2tMAfpj18R39cqzerFE6pu+4YUSrYr3KD5FG9zRA@mail.gmail.com> <CAHVum0cf_AeJ8rZGcWdne=QV6f_+09b=7kJb3xd-9eNiZr75Qg@mail.gmail.com>
+In-Reply-To: <CAHVum0cf_AeJ8rZGcWdne=QV6f_+09b=7kJb3xd-9eNiZr75Qg@mail.gmail.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 6 Dec 2022 10:17:47 -0800
+Message-ID: <CANgfPd9tBncLoVM4BnD5yq2O+=pXBN5_axBOh=bx=zjG7u8T7Q@mail.gmail.com>
+Subject: Re: [Patch v2 2/2] KVM: x86/mmu: Allocate page table pages on NUMA
+ node of underlying pages
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     dmatlack@google.com, seanjc@google.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Today's -next fails to build on arm64 due to:
+On Mon, Dec 5, 2022 at 3:40 PM Vipin Sharma <vipinsh@google.com> wrote:
+>
+> On Mon, Dec 5, 2022 at 10:17 AM Ben Gardon <bgardon@google.com> wrote:
+> >
+> > On Thu, Dec 1, 2022 at 11:57 AM Vipin Sharma <vipinsh@google.com> wrote:
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index 1782c4555d94..4d59c9d48277 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -384,6 +384,11 @@ static void kvm_flush_shadow_all(struct kvm *kvm)
+> > >         kvm_arch_guest_memory_reclaimed(kvm);
+> > >  }
+> > >
+> > > +void * __weak kvm_arch_mmu_get_free_page(int nid, gfp_t gfp_flags)
+> > > +{
+> > > +               return (void *)__get_free_page(gfp_flags);
+> > > +}
+> > > +
+> >
+> > Rather than making this __weak, you could use #ifdef CONFIG_NUMA to
+> > just put all the code in the arch-neutral function.
+> >
+>
+> I am not sure how it will work. Here, I am trying to keep this feature
+> only for x86. This function will be used for all architecture except
+> in x86 where we have different implementation in arch/x86/mmu/mmu.c
+> So, even if CONFIG_NUMA is defined, we want to keep the same
+> definition on other architectures.
+>
+>
 
-In file included from include/kvm_util.h:11,
-                 from aarch64/page_fault_test.c:15:
-include/ucall_common.h:36:47: note: expected ‘vm_paddr_t’ {aka ‘long unsigned int’} but argument is of type ‘void *’
-   36 | void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
-      |                                    ~~~~~~~~~~~^~~~~~~~
-aarch64/page_fault_test.c:725:2: warning: implicit declaration of function ‘ucall_uninit’; did you mean ‘ucall_init’? [-Wimplicit-function-declaration]
-  725 |  ucall_uninit(vm);
-      |  ^~~~~~~~~~~~
-      |  ucall_init
+Something like:
 
-which is caused by commit
++void * kvm_arch_mmu_get_free_page(int nid, gfp_t gfp_flags)
++{
++       struct page *spt_page;
++       void *address = NULL;
++
++       #ifdef CONFIG_NUMA
++       if (nid != NUMA_NO_NODE) {
++               spt_page = alloc_pages_node(nid, gfp, 0);
++               if (spt_page) {
++                       address = page_address(spt_page);
++                       return address;
++               }
++       }
++       #endif // CONFIG_NUMA
++       return (void *)__get_free_page(gfp);
++}
 
-interacting poorly with commit
-
-   28a65567acb5 ("KVM: selftests: Drop now-unnecessary ucall_uninit()")
-
-As is done for other ucall_uninit() users remove the call in the newly added
-page_fault_test.c.
-
-Fixes: 28a65567acb5 ("KVM: selftests: Drop now-unnecessary ucall_uninit()")
-Fixes: 35c581015712 ("KVM: selftests: aarch64: Add aarch64/page_fault_test")
-Signed-off-by: Mark Brown <broonie@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Ricardo Koller <ricarkol@google.com>
-Cc: Marc Zyngier <maz@kernel.org>
----
- tools/testing/selftests/kvm/aarch64/page_fault_test.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-index 05bb6a6369c2..4ef89c57a937 100644
---- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -722,7 +722,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 
- 	vcpu_run_loop(vm, vcpu, test);
- 
--	ucall_uninit(vm);
- 	kvm_vm_free(vm);
- 	free_uffd(test, pt_uffd, data_uffd);
- 
--- 
-2.30.2
-
+>
+>
+>
+> > >  #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+> > >  static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+> > >                                                gfp_t gfp_flags)
+> > > @@ -393,7 +398,7 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+> > >         if (mc->kmem_cache)
+> > >                 return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
+> > >         else
+> > > -               return (void *)__get_free_page(gfp_flags);
+> > > +               return kvm_arch_mmu_get_free_page(mc->node, gfp_flags);
+> > >  }
+> > >
+> > >  int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
+> > > --
+> > > 2.39.0.rc0.267.gcb52ba06e7-goog
+> > >
