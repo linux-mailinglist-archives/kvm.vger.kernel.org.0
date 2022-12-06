@@ -2,169 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 46C86644D6E
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 21:44:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9398C644D7C
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 21:49:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229637AbiLFUod (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 15:44:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37914 "EHLO
+        id S229696AbiLFUtX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 15:49:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbiLFUob (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 15:44:31 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 837F743852;
-        Tue,  6 Dec 2022 12:44:30 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229589AbiLFUtN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 15:49:13 -0500
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E2D017054;
+        Tue,  6 Dec 2022 12:49:07 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 46E03B815F6;
-        Tue,  6 Dec 2022 20:44:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D78DC433D6;
-        Tue,  6 Dec 2022 20:44:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670359468;
-        bh=VyFPKDskm09hB3DBPKUEg9fDFjmHc83whLCSf6+IOc8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=IqE4P1ST/kOEAMpHGncY2mQC42fpXvtPwi7fEW4ygWIoFXRBQwuTgi+T4Oj1cPt5U
-         PcjNwTHqkBmsHx/9f43E+84ht/2lDZommmLHFk+mU3z1b9QLM7RJQOx6kV11zhvH3r
-         P5nikwVYyFulq41FCiW40m3CjFGxVG9GoTFMzcCPWle7Ea+HjyVFxQrp4HhjtxEwi/
-         +0uNRruA6Qk6w9CyFMhuXtIQyt0LHEe/dVvePp/0v4RJtT3kfWGs3eidwAFiA38Uv5
-         cG6SSrO4TkMC9CGupB9JjNKVwRsNOqoTu+l8T9neSqXAK5HoiDJgMvjSnEO23A++f9
-         txRPoFxC8sExw==
-Date:   Tue, 6 Dec 2022 20:44:23 +0000
-From:   Conor Dooley <conor@kernel.org>
-To:     Jisheng Zhang <jszhang@kernel.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 08/13] riscv: module: move find_section to module.h
-Message-ID: <Y4+pp6XEu3GSWCiE@spud>
-References: <20221204174632.3677-1-jszhang@kernel.org>
- <20221204174632.3677-9-jszhang@kernel.org>
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4NRXZn29C4z4xGR;
+        Wed,  7 Dec 2022 07:49:05 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1670359745;
+        bh=QsqEJZkBj+bsOZmR3tCA3dJy4vZlG1oR0bu1q4PrRcA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qRIcMQCwDmVZNhlpkWVRJs/nQLMVUAvL9eRaMaYyaMnnf2+sjb8aygYUii4K0LK/X
+         auQnVEcuSDIThBsj2lR3GrRhICBC7iGHtyeKOU4frbkn5PldHfiL+A46dMPjpgX4qT
+         +evP3xqEwcYK/aLkHWfexqzpprL0bthGEBZ4rXVB2f+crECWef27CNoXrqtK8URWLv
+         zB48iTD79pBXqsf40UoedN11VbkE5nSFjElEyml82y9um6pLcpCePX2H1Lfy0R4cIe
+         P+DTX/remer6Cnk4osbsipfjTRdAb6TT1oGbTDhijpNIiGUXOP/W5/QL0K3h6LMq3p
+         eW247JDsmJILg==
+Date:   Wed, 7 Dec 2022 07:49:04 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Mark Brown <broonie@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-next@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH] KVM: selftests: Fix build due to ucall_uninit() removal
+Message-ID: <20221207074904.2f9d04ed@canb.auug.org.au>
+In-Reply-To: <20221206181506.252537-1-broonie@kernel.org>
+References: <20221206181506.252537-1-broonie@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="Kfeymfl++SYTH9yC"
-Content-Disposition: inline
-In-Reply-To: <20221204174632.3677-9-jszhang@kernel.org>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/u+q73nYgMy+BGDygpKgn=gy";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---Kfeymfl++SYTH9yC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--Sig_/u+q73nYgMy+BGDygpKgn=gy
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 05, 2022 at 01:46:27AM +0800, Jisheng Zhang wrote:
-> Move it to the header so that the implementation can be shared
-> by the alternatives code.
+Hi Mark,
 
-I'm not a super big fan of these perfunctory commit messages.
-Maybe I'm being a bit ornery, but a few words about why the alternatives
-could benefit from this would be nice. Also, s/it/find_section()/ please.
-
-How about:
-> Move find_section() to module.h so that the implementation can be shared
-> by the alternatives code. This will allow us to use alternatives in
-> the vdso.
-
-
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+On Tue,  6 Dec 2022 18:15:06 +0000 Mark Brown <broonie@kernel.org> wrote:
+>
+> Today's -next fails to build on arm64 due to:
+>=20
+> In file included from include/kvm_util.h:11,
+>                  from aarch64/page_fault_test.c:15:
+> include/ucall_common.h:36:47: note: expected =E2=80=98vm_paddr_t=E2=80=99=
+ {aka =E2=80=98long unsigned int=E2=80=99} but argument is of type =E2=80=
+=98void *=E2=80=99
+>    36 | void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
+>       |                                    ~~~~~~~~~~~^~~~~~~~
+> aarch64/page_fault_test.c:725:2: warning: implicit declaration of functio=
+n =E2=80=98ucall_uninit=E2=80=99; did you mean =E2=80=98ucall_init=E2=80=99=
+? [-Wimplicit-function-declaration]
+>   725 |  ucall_uninit(vm);
+>       |  ^~~~~~~~~~~~
+>       |  ucall_init
+>=20
+> which is caused by commit
+>=20
+> interacting poorly with commit
+>=20
+>    28a65567acb5 ("KVM: selftests: Drop now-unnecessary ucall_uninit()")
+>=20
+> As is done for other ucall_uninit() users remove the call in the newly ad=
+ded
+> page_fault_test.c.
+>=20
+> Fixes: 28a65567acb5 ("KVM: selftests: Drop now-unnecessary ucall_uninit()=
+")
+> Fixes: 35c581015712 ("KVM: selftests: aarch64: Add aarch64/page_fault_tes=
+t")
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Ricardo Koller <ricarkol@google.com>
+> Cc: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/riscv/include/asm/module.h | 15 +++++++++++++++
->  arch/riscv/kernel/module.c      | 15 ---------------
-
-Silly question maybe, but is module.h the right place to put this?
-But I have nothing better to suggest, and I hate bikeshedding stuff when
-I have no suggestion to make.
-
-Rationale behind the movement seems grand to me though, so I suppose:
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-
-Thanks,
-Conor.
-
->  2 files changed, 15 insertions(+), 15 deletions(-)
+>  tools/testing/selftests/kvm/aarch64/page_fault_test.c | 1 -
+>  1 file changed, 1 deletion(-)
 >=20
-> diff --git a/arch/riscv/include/asm/module.h b/arch/riscv/include/asm/mod=
-ule.h
-> index 76aa96a9fc08..78722a79fc59 100644
-> --- a/arch/riscv/include/asm/module.h
-> +++ b/arch/riscv/include/asm/module.h
-> @@ -111,4 +111,19 @@ static inline struct plt_entry *get_plt_entry(unsign=
-ed long val,
+> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tool=
+s/testing/selftests/kvm/aarch64/page_fault_test.c
+> index 05bb6a6369c2..4ef89c57a937 100644
+> --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> @@ -722,7 +722,6 @@ static void run_test(enum vm_guest_mode mode, void *a=
+rg)
 > =20
->  #endif /* CONFIG_MODULE_SECTIONS */
+>  	vcpu_run_loop(vm, vcpu, test);
 > =20
-> +static inline const Elf_Shdr *find_section(const Elf_Ehdr *hdr,
-> +					   const Elf_Shdr *sechdrs,
-> +					   const char *name)
-> +{
-> +	const Elf_Shdr *s, *se;
-> +	const char *secstrs =3D (void *)hdr + sechdrs[hdr->e_shstrndx].sh_offse=
-t;
-> +
-> +	for (s =3D sechdrs, se =3D sechdrs + hdr->e_shnum; s < se; s++) {
-> +		if (strcmp(name, secstrs + s->sh_name) =3D=3D 0)
-> +			return s;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
->  #endif /* _ASM_RISCV_MODULE_H */
-> diff --git a/arch/riscv/kernel/module.c b/arch/riscv/kernel/module.c
-> index 91fe16bfaa07..76f4b9c2ec5b 100644
-> --- a/arch/riscv/kernel/module.c
-> +++ b/arch/riscv/kernel/module.c
-> @@ -429,21 +429,6 @@ void *module_alloc(unsigned long size)
->  }
->  #endif
+> -	ucall_uninit(vm);
+>  	kvm_vm_free(vm);
+>  	free_uffd(test, pt_uffd, data_uffd);
 > =20
-> -static const Elf_Shdr *find_section(const Elf_Ehdr *hdr,
-> -				    const Elf_Shdr *sechdrs,
-> -				    const char *name)
-> -{
-> -	const Elf_Shdr *s, *se;
-> -	const char *secstrs =3D (void *)hdr + sechdrs[hdr->e_shstrndx].sh_offse=
-t;
-> -
-> -	for (s =3D sechdrs, se =3D sechdrs + hdr->e_shnum; s < se; s++) {
-> -		if (strcmp(name, secstrs + s->sh_name) =3D=3D 0)
-> -			return s;
-> -	}
-> -
-> -	return NULL;
-> -}
-> -
->  int module_finalize(const Elf_Ehdr *hdr,
->  		    const Elf_Shdr *sechdrs,
->  		    struct module *me)
 > --=20
-> 2.37.2
+> 2.30.2
 >=20
 
---Kfeymfl++SYTH9yC
-Content-Type: application/pgp-signature; name="signature.asc"
+Also added to my merge of the kvm-arm tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/u+q73nYgMy+BGDygpKgn=gy
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY4+ppwAKCRB4tDGHoIJi
-0vdPAPwMCMePiLIxdM2S19748MS5S9G5teWeIfVGdq6nal4HMQD/a2JizR3i5tUB
-H5BxI52RGgMvF963Rr0R5Ftrp24+yQw=
-=/QTm
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmOPqsAACgkQAVBC80lX
+0Gzv6gf9HsGS9Vbvxo9vuMbxYJqAD20wjHAVefhsKNGFjF8FQp55Qv9m6GHNTbof
+Aq6BzMYB4R2R0Ey+EwAXpnIYuaC2oxfjI//BFvOzrPg7KPkAJWYro9G7nzMIJICQ
+vNB+5MPf1cbYwIFdb5uQzQ6EzvmnGXBltR9RaARRm8tUSiG2VJi6ZFRcIAt6gBFE
+DRCNGknoOu9ede/ovkWzaRA4fXAx2ngmErvqRHiDiEzLULKhpVBHI45RwOGq5KyN
+4tQZA99I5faC/i6cFk8AP0reXJj3mIniuyKMAqM+BJjoAmIR18QgFNJv1GI5bYej
+TFvYgFqcKbH2lNp3hfHwBvep2I37KQ==
+=296z
 -----END PGP SIGNATURE-----
 
---Kfeymfl++SYTH9yC--
+--Sig_/u+q73nYgMy+BGDygpKgn=gy--
