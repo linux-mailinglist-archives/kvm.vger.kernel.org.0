@@ -2,267 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13668643C4D
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 05:35:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE612643C73
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 05:40:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230381AbiLFEfH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Dec 2022 23:35:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40810 "EHLO
+        id S232317AbiLFEkQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 23:40:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229938AbiLFEe6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 23:34:58 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A150FDF35;
-        Mon,  5 Dec 2022 20:34:56 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 30B4FB81693;
-        Tue,  6 Dec 2022 04:34:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC5D8C43142;
-        Tue,  6 Dec 2022 04:34:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670301293;
-        bh=msa/VwPes92I5wu/vP8BsHcD7BgDu9WgymdDavuJWxA=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=CuN4sq4wwjyML+PXFapg5qJk6mPVkcHbsZuwUZjLtlsZ5kbDTDW9yKUt5aRjbYsRZ
-         /PDYBgG3STC8wsEpxguMFPcLUwY083/OOrBO2grps/+zm4Qg3ZZ9CoYIS9AoEJQoV7
-         abALkPKNw35YJVZKjxYiJLyWXZXbvq1nlub2MzObwFeyNEwLVDlvAM0LZIvDSUAon/
-         DWLJfhyYJ6ASDTbzyTumOv833Xps7A9U+wi7T8TTTDXvijP3eJLJAsSGhj5tlIAC/W
-         sfa6xXY6wzyfzZwYKDbb9WwOZzKjHHAYSKjQRCPTxhC1wRrTXiQbAop/xtGMe9mm8H
-         MVTAiu+BHK01Q==
-Received: by mail-ej1-f52.google.com with SMTP id m18so1804061eji.5;
-        Mon, 05 Dec 2022 20:34:53 -0800 (PST)
-X-Gm-Message-State: ANoB5pmSi6byheI8KlT3y5jJre0xB+BzM6weyrCGXGgiH3ypsFHe+9bI
-        m7UjwY5nWSm47c8xKB6/oq7ENx8hIhiAMnvRZBo=
-X-Google-Smtp-Source: AA0mqf6GuGvHiOPgth8wIKnoKnt5jLhpQ86kofAEtziMuYgxI4HGvPlxaa3cPf+bC0eiMd9r7hVWqPfgNab+xB5zkpw=
-X-Received: by 2002:a17:906:ee2:b0:78d:3f96:b7aa with SMTP id
- x2-20020a1709060ee200b0078d3f96b7aamr56776437eji.74.1670301292065; Mon, 05
- Dec 2022 20:34:52 -0800 (PST)
+        with ESMTP id S231434AbiLFEj7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 23:39:59 -0500
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72283E59
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 20:39:58 -0800 (PST)
+Received: by mail-pg1-x52c.google.com with SMTP id q71so12348146pgq.8
+        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 20:39:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xqFAh2v1WFBzklz04TP/AWAU1Y1s3gtwJhYETzOXFDc=;
+        b=RbDRgNiJz9xtr32BYRh+f8GcS3c0nxUbEPIp1hnX6CG4hrzfuOJBSUfbDecnbBnA6+
+         P2DXhBTCnwrPQc01XtKp4mfVEKsMk5c1dOmUflMIjV0Tk/LpVkUb4/TATrApVk992Tc2
+         DKeruPykkdLQnhLii4FgB28hUaVeQir2QI8vkSaHBvMH/bzf9N5P5K0tDCGHMb1Yjq2i
+         CRj+iSeCv0HrSY+67Z14pGdgCMSMdAJbs64jcpKFzbdqnqTesMCy/i5hBV6QS9N1WOqG
+         jIxBPQf0FAEICEWnOXwAJs1JduW2dlvTAiD1+oNly76DtPv1PeISuPRpGDSFDdWx522G
+         YhBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xqFAh2v1WFBzklz04TP/AWAU1Y1s3gtwJhYETzOXFDc=;
+        b=F+IC2I2hGPWUEO2YWxoLy7vIWPrJzrLmiUG3LvxzLXc7Jo2jafSa983G17V9UPawGJ
+         VT844/TQf63Fm2WYwRxDn5noZ7aqu4mZc8Urdqas/rWHYwMwJ/RZiznDhBa8A5DjFwT6
+         OXxDzX2ShSoMHjFWBuWTUL7HBqnN1vfebMcJhy86vpTIXpf1Cd4Uh8OlRoiySGsmnvoh
+         bP23S+xo3RaFjD/SuwhforZEpvHCxY+y/nMDl2vqk5npyVtIvQQA/WWqVFo3a66x4jLL
+         8wmPDa/pA+bN7Bj2YNui+PYPKy9IGx2KIfIIbLtzAE4Y80C9Z5y+aP+apwHLDGEPGn8u
+         y5PA==
+X-Gm-Message-State: ANoB5plPEBcQH5PKxUESelu0J7tCLRTw16oalQESDdvBiyXgaUnUxwPA
+        y496VGwy9CxvwChO/rb41rMi7Q==
+X-Google-Smtp-Source: AA0mqf70H74bcqANnaDC/TsW/8gS3627MclHUagndhuJZ04rPP179n67SWk/SHm/c9P2dBIwhD9BFw==
+X-Received: by 2002:a63:1609:0:b0:477:467f:3dc0 with SMTP id w9-20020a631609000000b00477467f3dc0mr56706765pgl.504.1670301573310;
+        Mon, 05 Dec 2022 20:39:33 -0800 (PST)
+Received: from [192.168.10.153] (ppp121-45-204-168.cbr-trn-nor-bras38.tpg.internode.on.net. [121.45.204.168])
+        by smtp.gmail.com with ESMTPSA id f14-20020a170902684e00b0018971fba556sm11410996pln.139.2022.12.05.20.39.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Dec 2022 20:39:32 -0800 (PST)
+Message-ID: <5178485f-60d8-0f16-558b-05207102a37e@ozlabs.ru>
+Date:   Tue, 6 Dec 2022 15:39:26 +1100
 MIME-Version: 1.0
-References: <20221204174632.3677-1-jszhang@kernel.org> <20221204174632.3677-10-jszhang@kernel.org>
- <CAJF2gTRxm7LJFtups5fexJ5ishm9_j3e+yzfKv3nTtQqUtXPtA@mail.gmail.com> <Y44LuRcQYPnVnFje@xhacker>
-In-Reply-To: <Y44LuRcQYPnVnFje@xhacker>
-From:   Guo Ren <guoren@kernel.org>
-Date:   Tue, 6 Dec 2022 12:34:40 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTQ98fyTNc6d3PJrkMjUjUstN8s1FcRNyZQCLiN5CV5NCw@mail.gmail.com>
-Message-ID: <CAJF2gTQ98fyTNc6d3PJrkMjUjUstN8s1FcRNyZQCLiN5CV5NCw@mail.gmail.com>
-Subject: Re: [PATCH v2 09/13] riscv: switch to relative alternative entries
-To:     Jisheng Zhang <jszhang@kernel.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101
+ Thunderbird/108.0
+Subject: Re: [PATCH kernel v4] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
+ platform dependent
+Content-Language: en-US
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm-riscv@lists.infradead.org, Anup Patel <anup@brainfault.org>,
+        kvm-ppc@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
+        Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org
+References: <20221003235722.2085145-1-aik@ozlabs.ru>
+ <7a790aa8-c643-1098-4d28-bd3b10399fcd@ozlabs.ru>
+In-Reply-To: <7a790aa8-c643-1098-4d28-bd3b10399fcd@ozlabs.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 5, 2022 at 11:28 PM Jisheng Zhang <jszhang@kernel.org> wrote:
->
-> On Mon, Dec 05, 2022 at 08:51:41AM +0800, Guo Ren wrote:
-> > On Mon, Dec 5, 2022 at 1:57 AM Jisheng Zhang <jszhang@kernel.org> wrote:
-> > >
-> > > Instead of using absolute addresses for both the old instrucions and
-> > > the alternative instructions, use offsets relative to the alt_entry
-> > > values. So we can not only cut the size of the alternative entry, but
-> > > also meet the prerequisite for patching alternatives in the vDSO,
-> > > since absolute alternative entries are subject to dynamic relocation,
-> > > which is incompatible with the vDSO building.
-> > >
-> > > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> > > ---
-> > >  arch/riscv/errata/sifive/errata.c           |  4 +++-
-> > >  arch/riscv/errata/thead/errata.c            | 11 ++++++++---
-> > >  arch/riscv/include/asm/alternative-macros.h | 20 ++++++++++----------
-> > >  arch/riscv/include/asm/alternative.h        | 12 ++++++------
-> > >  arch/riscv/kernel/cpufeature.c              | 13 ++++++-------
-> > >  5 files changed, 33 insertions(+), 27 deletions(-)
-> > >
-> > > diff --git a/arch/riscv/errata/sifive/errata.c b/arch/riscv/errata/sifive/errata.c
-> > > index 1031038423e7..0e537cdfd324 100644
-> > > --- a/arch/riscv/errata/sifive/errata.c
-> > > +++ b/arch/riscv/errata/sifive/errata.c
-> > > @@ -107,7 +107,9 @@ void __init_or_module sifive_errata_patch_func(struct alt_entry *begin,
-> > >
-> > >                 tmp = (1U << alt->errata_id);
-> > >                 if (cpu_req_errata & tmp) {
-> > > -                       patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
-> > > +                       patch_text_nosync((void *)&alt->old_offset + alt->old_offset,
-> > > +                                         (void *)&alt->alt_offset + alt->alt_offset,
-> >  (void *)&alt->alt_offset + alt->alt_offset. ??!!
->
-> Hi Guo,
->
-> what's the problem? I can't catch your meaning, could you please proide
-> more details?
-Can you explain why:
-
-alt->old_ptr = (void *)&alt->old_offset + alt->old_offset
-
-| offset | <- &offset
-| ...       |
-| value | <- ptr = &offset + offset
-
-I don't make sense of the above.
-
->
-> Thanks
->
-> >
-> > > +                                         alt->alt_len);
-> > >                         cpu_apply_errata |= tmp;
-> > >                 }
-> > >         }
-> > > diff --git a/arch/riscv/errata/thead/errata.c b/arch/riscv/errata/thead/errata.c
-> > > index 21546937db39..2a6e335b5a32 100644
-> > > --- a/arch/riscv/errata/thead/errata.c
-> > > +++ b/arch/riscv/errata/thead/errata.c
-> > > @@ -68,6 +68,7 @@ void __init_or_module thead_errata_patch_func(struct alt_entry *begin, struct al
-> > >         struct alt_entry *alt;
-> > >         u32 cpu_req_errata = thead_errata_probe(stage, archid, impid);
-> > >         u32 tmp;
-> > > +       void *oldptr, *updptr;
-> > >
-> > >         for (alt = begin; alt < end; alt++) {
-> > >                 if (alt->vendor_id != THEAD_VENDOR_ID)
-> > > @@ -77,12 +78,16 @@ void __init_or_module thead_errata_patch_func(struct alt_entry *begin, struct al
-> > >
-> > >                 tmp = (1U << alt->errata_id);
-> > >                 if (cpu_req_errata & tmp) {
-> > > +                       oldptr = (void *)&alt->old_offset + alt->old_offset;
-> > > +                       updptr = (void *)&alt->alt_offset + alt->alt_offset;
-> > > +
-> > >                         /* On vm-alternatives, the mmu isn't running yet */
-> > >                         if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
-> > > -                               memcpy((void *)__pa_symbol(alt->old_ptr),
-> > > -                                      (void *)__pa_symbol(alt->alt_ptr), alt->alt_len);
-> > > +                               memcpy((void *)__pa_symbol(oldptr),
-> > > +                                      (void *)__pa_symbol(updptr),
-> > > +                                      alt->alt_len);
-> > >                         else
-> > > -                               patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
-> > > +                               patch_text_nosync(oldptr, updptr, alt->alt_len);
-> > >                 }
-> > >         }
-> > >
-> > > diff --git a/arch/riscv/include/asm/alternative-macros.h b/arch/riscv/include/asm/alternative-macros.h
-> > > index ec2f3f1b836f..dd40727bc859 100644
-> > > --- a/arch/riscv/include/asm/alternative-macros.h
-> > > +++ b/arch/riscv/include/asm/alternative-macros.h
-> > > @@ -7,11 +7,11 @@
-> > >  #ifdef __ASSEMBLY__
-> > >
-> > >  .macro ALT_ENTRY oldptr newptr vendor_id errata_id new_len
-> > > -       RISCV_PTR \oldptr
-> > > -       RISCV_PTR \newptr
-> > > -       REG_ASM \vendor_id
-> > > -       REG_ASM \new_len
-> > > -       .word   \errata_id
-> > > +       .long \oldptr - .
-> > > +       .long \newptr - .
-> > > +       .short \vendor_id
-> > > +       .short \new_len
-> > > +       .long \errata_id
-> > >  .endm
-> > >
-> > >  .macro ALT_NEW_CONTENT vendor_id, errata_id, enable = 1, new_c : vararg
-> > > @@ -75,11 +75,11 @@
-> > >  #include <linux/stringify.h>
-> > >
-> > >  #define ALT_ENTRY(oldptr, newptr, vendor_id, errata_id, newlen)                \
-> > > -       RISCV_PTR " " oldptr "\n"                                       \
-> > > -       RISCV_PTR " " newptr "\n"                                       \
-> > > -       REG_ASM " " vendor_id "\n"                                      \
-> > > -       REG_ASM " " newlen "\n"                                         \
-> > > -       ".word " errata_id "\n"
-> > > +       ".long  ((" oldptr ") - .) \n"                                  \
-> > > +       ".long  ((" newptr ") - .) \n"                                  \
-> > > +       ".short " vendor_id "\n"                                        \
-> > > +       ".short " newlen "\n"                                           \
-> > > +       ".long  " errata_id "\n"
-> > >
-> > >  #define ALT_NEW_CONTENT(vendor_id, errata_id, enable, new_c)           \
-> > >         ".if " __stringify(enable) " == 1\n"                            \
-> > > diff --git a/arch/riscv/include/asm/alternative.h b/arch/riscv/include/asm/alternative.h
-> > > index 33eae9541684..3baf32e05b46 100644
-> > > --- a/arch/riscv/include/asm/alternative.h
-> > > +++ b/arch/riscv/include/asm/alternative.h
-> > > @@ -33,12 +33,12 @@ void riscv_alternative_fix_jal(void *alt_ptr, unsigned int len,
-> > >                                int patch_offset);
-> > >
-> > >  struct alt_entry {
-> > > -       void *old_ptr;           /* address of original instruciton or data  */
-> > > -       void *alt_ptr;           /* address of replacement instruction or data */
-> > > -       unsigned long vendor_id; /* cpu vendor id */
-> > > -       unsigned long alt_len;   /* The replacement size */
-> > > -       unsigned int errata_id;  /* The errata id */
-> > > -} __packed;
-> > > +       s32 old_offset;         /* offset to original instruciton or data  */
-> > > +       s32 alt_offset;         /* offset to replacement instruction or data */
-> > > +       u16 vendor_id;          /* cpu vendor id */
-> > > +       u16 alt_len;            /* The replacement size */
-> > > +       u32 errata_id;          /* The errata id */
-> > > +};
-> > >
-> > >  struct errata_checkfunc_id {
-> > >         unsigned long vendor_id;
-> > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-> > > index 6244be5cd94a..adeac90b1d8e 100644
-> > > --- a/arch/riscv/kernel/cpufeature.c
-> > > +++ b/arch/riscv/kernel/cpufeature.c
-> > > @@ -257,6 +257,7 @@ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
-> > >                                                   unsigned int stage)
-> > >  {
-> > >         struct alt_entry *alt;
-> > > +       void *oldptr, *updptr;
-> > >
-> > >         if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
-> > >                 return;
-> > > @@ -270,17 +271,15 @@ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
-> > >                         continue;
-> > >                 }
-> > >
-> > > +               oldptr = (void *)&alt->old_offset + alt->old_offset;
-> > > +               updptr = (void *)&alt->alt_offset + alt->alt_offset;
-> > >                 if (!__riscv_isa_extension_available(NULL, alt->errata_id))
-> > >                         continue;
-> > >
-> > >                 /* do the basic patching */
-> > > -               patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
-> > > -               riscv_alternative_fix_auipc_jalr(alt->old_ptr,
-> > > -                                                alt->alt_len,
-> > > -                                                alt->old_ptr - alt->alt_ptr);
-> > > -               riscv_alternative_fix_jal(alt->old_ptr,
-> > > -                                         alt->alt_len,
-> > > -                                         alt->old_ptr - alt->alt_ptr);
-> > > +               patch_text_nosync(oldptr, updptr, alt->alt_len);
-> > > +               riscv_alternative_fix_auipc_jalr(oldptr, alt->alt_len, oldptr - updptr);
-> > > +               riscv_alternative_fix_jal(oldptr, alt->alt_len, oldptr - updptr);
-> > >         }
-> > >  }
-> > >  #endif
-> > > --
-> > > 2.37.2
-> > >
-> >
-> >
-> > --
-> > Best Regards
-> >  Guo Ren
+Paolo, ping? :)
 
 
+On 27/10/2022 18:38, Alexey Kardashevskiy wrote:
+> Paolo, ping?
+> 
+> 
+> On 04/10/2022 10:57, Alexey Kardashevskiy wrote:
+>> When introduced, IRQFD resampling worked on POWER8 with XICS. However
+>> KVM on POWER9 has never implemented it - the compatibility mode code
+>> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
+>> XIVE mode does not handle INTx in KVM at all.
+>>
+>> This moved the capability support advertising to platforms and stops
+>> advertising it on XIVE, i.e. POWER9 and later.
+>>
+>> This should cause no behavioural change for other architectures.
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> Acked-by: Nicholas Piggin <npiggin@gmail.com>
+>> Acked-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>> Changes:
+>> v4:
+>> * removed incorrect clause about changing behavoir on MIPS and RISCV
+>>
+>> v3:
+>> * removed all ifdeferry
+>> * removed the capability for MIPS and RISCV
+>> * adjusted the commit log about MIPS and RISCV
+>>
+>> v2:
+>> * removed ifdef for ARM64.
+>> ---
+>>   arch/arm64/kvm/arm.c       | 1 +
+>>   arch/powerpc/kvm/powerpc.c | 6 ++++++
+>>   arch/s390/kvm/kvm-s390.c   | 1 +
+>>   arch/x86/kvm/x86.c         | 1 +
+>>   virt/kvm/kvm_main.c        | 1 -
+>>   5 files changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 2ff0ef62abad..d2daa4d375b5 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>> long ext)
+>>       case KVM_CAP_VCPU_ATTRIBUTES:
+>>       case KVM_CAP_PTP_KVM:
+>>       case KVM_CAP_ARM_SYSTEM_SUSPEND:
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>>           r = 1;
+>>           break;
+>>       case KVM_CAP_SET_GUEST_DEBUG2:
+>> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+>> index fb1490761c87..908ce8bd91c9 100644
+>> --- a/arch/powerpc/kvm/powerpc.c
+>> +++ b/arch/powerpc/kvm/powerpc.c
+>> @@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>> long ext)
+>>           break;
+>>   #endif
+>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>> +        r = !xive_enabled();
+>> +        break;
+>> +#endif
+>> +
+>>       case KVM_CAP_PPC_ALLOC_HTAB:
+>>           r = hv_enabled;
+>>           break;
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index edfd4bbd0cba..7521adadb81b 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -577,6 +577,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>> long ext)
+>>       case KVM_CAP_SET_GUEST_DEBUG:
+>>       case KVM_CAP_S390_DIAG318:
+>>       case KVM_CAP_S390_MEM_OP_EXTENSION:
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>>           r = 1;
+>>           break;
+>>       case KVM_CAP_SET_GUEST_DEBUG2:
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 43a6a7efc6ec..2d6c5a8fdf14 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -4395,6 +4395,7 @@ int kvm_vm_ioctl_check_extension(struct kvm 
+>> *kvm, long ext)
+>>       case KVM_CAP_VAPIC:
+>>       case KVM_CAP_ENABLE_CAP:
+>>       case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>>           r = 1;
+>>           break;
+>>       case KVM_CAP_EXIT_HYPERCALL:
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> index 584a5bab3af3..05cf94013f02 100644
+>> --- a/virt/kvm/kvm_main.c
+>> +++ b/virt/kvm/kvm_main.c
+>> @@ -4447,7 +4447,6 @@ static long 
+>> kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>>   #endif
+>>   #ifdef CONFIG_HAVE_KVM_IRQFD
+>>       case KVM_CAP_IRQFD:
+>> -    case KVM_CAP_IRQFD_RESAMPLE:
+>>   #endif
+>>       case KVM_CAP_IOEVENTFD_ANY_LENGTH:
+>>       case KVM_CAP_CHECK_EXTENSION_VM:
+> 
 
 -- 
-Best Regards
- Guo Ren
+Alexey
