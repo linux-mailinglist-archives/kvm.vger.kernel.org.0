@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B266643CE2
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 06:58:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 543C7643CE4
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 06:58:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233008AbiLFF6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 00:58:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42738 "EHLO
+        id S231213AbiLFF6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 00:58:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231213AbiLFF63 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 00:58:29 -0500
+        with ESMTP id S233338AbiLFF6g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 00:58:36 -0500
 Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 075D21ADB1;
-        Mon,  5 Dec 2022 21:58:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E50C24F28;
+        Mon,  5 Dec 2022 21:58:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670306309; x=1701842309;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=nLZI0skm1dszqhAO48j8Bg824jpCNH+WDBB/e0YlLoE=;
-  b=IZfljVk5hN8iFC6U5IN3LxsFbyAuRLb+WJ1Lmp84jeBRKHKQAHC6VN5J
-   3EhaRRx4n4GWDRHAlee5WD1+N9OslBD+WN7ysrG9l+yrfWwol++Gfw0Oz
-   hDeo19hLZhBLkQCCVAmN/KvKRccPBQm2m1/HgwscxDx2mmMleneSndLsn
-   LLKuYldDMHWJirAY10jyJlm6YI2qSlc6f6vX6MKgKQc8M9Y07v/d4EGdJ
-   IcTL8MrrpLoBpoHrK+Yto82UuRw5vsZXyfRQnyJx0YyHqsezmOc3qulL8
-   bpbdYGNTHX2sLYQ8+iYjkMNPtwrGj1UmcXQ4KmdneN6ssX28pLPCAIOu7
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10552"; a="378706577"
+  t=1670306315; x=1701842315;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9tscb8eIosHw9BslFqEXbDs27VxieMXwgkEh6RsBQDE=;
+  b=aHuBepdwiqmRB6NerVm44L6r7YWbGKK1kQGiyivS//+h3RfVSE+hwTGc
+   TkbAk71WZwmMamn3kyDZrX8tmS9/+0uXOQvlkogI2BeOx3xdr804pgh7k
+   lABz2NklRnytnEifZCkM/ZdejZ/9qL05XPbtdui6GHhRHd87HXddj0t9Z
+   GkccAXwK22Su2jL2sCfgQIpJYjt05IDSOttuwpaC8gAoAdi6r0uu9v+1H
+   QLUt0uv+iwww3tyF7YEi1rh7XuVzGVYFymQSw8XYRmrG9da7dTpySpf2W
+   iEO7sEeGZWHp/qLQ9aDyp3kp4CM5LsyC8H/tSsJrxfLIRTqjUQ6bXyOpq
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10552"; a="378706621"
 X-IronPort-AV: E=Sophos;i="5.96,220,1665471600"; 
-   d="scan'208";a="378706577"
+   d="scan'208";a="378706621"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2022 21:58:28 -0800
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2022 21:58:34 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10552"; a="648211171"
+X-IronPort-AV: E=McAfee;i="6500,9779,10552"; a="648211267"
 X-IronPort-AV: E=Sophos;i="5.96,220,1665471600"; 
-   d="scan'208";a="648211171"
+   d="scan'208";a="648211267"
 Received: from leirao-pc.bj.intel.com ([10.238.156.101])
-  by fmsmga007.fm.intel.com with ESMTP; 05 Dec 2022 21:58:23 -0800
+  by fmsmga007.fm.intel.com with ESMTP; 05 Dec 2022 21:58:29 -0800
 From:   Lei Rao <lei.rao@intel.com>
 To:     kbusch@kernel.org, axboe@fb.com, kch@nvidia.com, hch@lst.de,
         sagi@grimberg.me, alex.williamson@redhat.com, cohuck@redhat.com,
@@ -48,10 +48,12 @@ To:     kbusch@kernel.org, axboe@fb.com, kch@nvidia.com, hch@lst.de,
 Cc:     eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
         Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com,
         Lei Rao <lei.rao@intel.com>
-Subject: [RFC PATCH 0/5] Add new VFIO PCI driver for NVMe devices
-Date:   Tue,  6 Dec 2022 13:58:11 +0800
-Message-Id: <20221206055816.292304-1-lei.rao@intel.com>
+Subject: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to issue admin commands for VF driver.
+Date:   Tue,  6 Dec 2022 13:58:12 +0800
+Message-Id: <20221206055816.292304-2-lei.rao@intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221206055816.292304-1-lei.rao@intel.com>
+References: <20221206055816.292304-1-lei.rao@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -63,55 +65,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some devices, such as Infrastructure Processing Units (IPUs) and Data
-Processing Units (DPUs), expose SR-IOV capable NVMe devices to the host.
-Its VF devices support live migration via specific NVMe commands issued
-through the PF's device's admin queue.
+The new function nvme_submit_vf_cmd() helps the host VF driver to issue
+VF admin commands. It's helpful in some cases that the host NVMe driver
+does not control VF's admin queue. For example, in the virtualization
+device pass-through case, the VF controller's admin queue is governed
+by the Guest NVMe driver. Host VF driver relies on PF device's admin
+queue to control VF devices like vendor-specific live migration commands.
 
-One of the problems is there are no standardized NVMe live migration
-commands to make our patches spec compliant, which prevents us from
-creating a spec-compliant implementation. So we've created a reference
-implantation based on the Vendor-specific command fields of the protocol.
-We want these commands to be standardized so that the implementation will
-be spec compliant in future versions and use this RFC as a basis for the
-same.
+Signed-off-by: Lei Rao <lei.rao@intel.com>
+Signed-off-by: Yadong Li <yadong.li@intel.com>
+Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+Reviewed-by: Eddie Dong <eddie.dong@intel.com>
+Reviewed-by: Hang Yuan <hang.yuan@intel.com>
+---
+ drivers/nvme/host/pci.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-More importantly, we provide our work to help the community and start the
-discussion, so everyone can participate and benefit from our work in
-NVMe Live Migration implementation and help drive on standardization
-efforts.
-
-This series implements the specific vfio-pci driver to support live
-migration of NVMe devices. Adds a new interface in the general
-NVMe driver to receive the VF device's commands submission to the PF
-device's admin queue. And also documents the details of NVMe device
-live migration commands.
-
-Any feedback and comments are greatly appreciated.
-
-Lei Rao (5):
-  nvme-pci: add function nvme_submit_vf_cmd to issue admin commands for
-    VF driver.
-  nvme-vfio: add new vfio-pci driver for NVMe device
-  nvme-vfio: enable the function of VFIO live migration.
-  nvme-vfio: check if the hardware supports live migration
-  nvme-vfio: Add a document for the NVMe device
-
- drivers/nvme/host/pci.c        |  18 +
- drivers/vfio/pci/Kconfig       |   2 +
- drivers/vfio/pci/Makefile      |   2 +
- drivers/vfio/pci/nvme/Kconfig  |  10 +
- drivers/vfio/pci/nvme/Makefile |   3 +
- drivers/vfio/pci/nvme/nvme.c   | 636 +++++++++++++++++++++++++++++++++
- drivers/vfio/pci/nvme/nvme.h   | 111 ++++++
- drivers/vfio/pci/nvme/nvme.txt | 278 ++++++++++++++
- 8 files changed, 1060 insertions(+)
- create mode 100644 drivers/vfio/pci/nvme/Kconfig
- create mode 100644 drivers/vfio/pci/nvme/Makefile
- create mode 100644 drivers/vfio/pci/nvme/nvme.c
- create mode 100644 drivers/vfio/pci/nvme/nvme.h
- create mode 100644 drivers/vfio/pci/nvme/nvme.txt
-
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 488ad7dabeb8..3d9c54d8e7fc 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -3585,6 +3585,24 @@ static struct pci_driver nvme_driver = {
+ 	.err_handler	= &nvme_err_handler,
+ };
+ 
++int nvme_submit_vf_cmd(struct pci_dev *dev, struct nvme_command *cmd,
++			      size_t *result, void *buffer, unsigned int bufflen)
++{
++	struct nvme_dev *ndev = NULL;
++	union nvme_result res = { };
++	int ret;
++
++	ndev = pci_iov_get_pf_drvdata(dev, &nvme_driver);
++	if (IS_ERR(ndev))
++		return PTR_ERR(ndev);
++	ret = __nvme_submit_sync_cmd(ndev->ctrl.admin_q, cmd, &res, buffer, bufflen,
++			      NVME_QID_ANY, 0, 0);
++	if (ret >= 0 && result)
++		*result = le32_to_cpu(res.u32);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(nvme_submit_vf_cmd);
++
+ static int __init nvme_init(void)
+ {
+ 	BUILD_BUG_ON(sizeof(struct nvme_create_cq) != 64);
 -- 
 2.34.1
 
