@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6670F644559
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 15:11:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9861F64455D
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 15:12:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234698AbiLFOLL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 09:11:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56534 "EHLO
+        id S234763AbiLFOMP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 09:12:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230093AbiLFOLJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 09:11:09 -0500
+        with ESMTP id S234758AbiLFOMN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 09:12:13 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC08F13E
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 06:10:12 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66BA82CE0C
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 06:11:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670335812;
+        s=mimecast20190719; t=1670335874;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=EjMwbYrUfvj4btSbY7QL+xE8cB7RFXkNXnUQjk3mAn4=;
-        b=fMoeiRtkfHzjnm5hFpQT9TBcnoUxKi8Y9ZL4UM5IBlPIW9fXBOYdxuYz8XKzvS+F0rpSJV
-        RuTnnsEp68zIjMTQBEXLgD1i87Vsc5xvs7pq2acienomBPJfdm+rp+8ak8qD2GezbZAwlj
-        QLPL8vvJeUWE+LPBrbmdbEN1y2tGZik=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=o/+CNhq5EBJ6i7cmYU6+NRbSCyGBErDwb5xA+7JRLuQ=;
+        b=BQH0wGnrAUAkjAo5BvVCFiI7Qzvvm3k4Dy+dKmSx4PeHRWdrpEblvaNKN9LTlr5pbVmqxa
+        wla/VjaNrrLysSpl8F49H2xZFTtLjesx1qZGB8sw2UOVUj94ypkxKJGg32xB2jo7pgV/6r
+        1HdF5f/D3kM/BKKS2IGErYAT0EE7Dbc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-379-RCLDGM52MCud1VOiXvCAyw-1; Tue, 06 Dec 2022 09:10:08 -0500
-X-MC-Unique: RCLDGM52MCud1VOiXvCAyw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+ us-mta-403-X1udCxM-OWifDwYYXytC3Q-1; Tue, 06 Dec 2022 09:11:11 -0500
+X-MC-Unique: X1udCxM-OWifDwYYXytC3Q-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6062E38123A4;
-        Tue,  6 Dec 2022 14:10:07 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0AB69801231;
+        Tue,  6 Dec 2022 14:11:11 +0000 (UTC)
 Received: from starship (unknown [10.35.206.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 40C331121315;
-        Tue,  6 Dec 2022 14:10:05 +0000 (UTC)
-Message-ID: <3ecd0be04273f91951d008ea815f7d217a6feac2.camel@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v3 15/27] svm: move some svm support
- functions into lib/x86/svm_lib.h
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F22EB4A9256;
+        Tue,  6 Dec 2022 14:11:08 +0000 (UTC)
+Message-ID: <eed073d8ab6e91ee9ac9012b59ddcc20bf3d0e54.camel@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 18/27] svm: move vmcb_ident to
+ svm_lib.c
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
         kvm@vger.kernel.org
@@ -52,16 +52,16 @@ Cc:     Andrew Jones <drjones@redhat.com>,
         Nico Boehr <nrb@linux.ibm.com>,
         Cathy Avery <cavery@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>
-Date:   Tue, 06 Dec 2022 16:10:04 +0200
-In-Reply-To: <3a3d705f-5867-5816-8545-df11b2ac8485@redhat.com>
+Date:   Tue, 06 Dec 2022 16:11:08 +0200
+In-Reply-To: <08c7eca0-b828-b1bd-b85c-babfc758c8a2@redhat.com>
 References: <20221122161152.293072-1-mlevitsk@redhat.com>
-         <20221122161152.293072-16-mlevitsk@redhat.com>
-         <3a3d705f-5867-5816-8545-df11b2ac8485@redhat.com>
+         <20221122161152.293072-19-mlevitsk@redhat.com>
+         <08c7eca0-b828-b1bd-b85c-babfc758c8a2@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -72,224 +72,194 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-12-01 at 14:59 +0100, Emanuele Giuseppe Esposito wrote:
+On Thu, 2022-12-01 at 17:18 +0100, Emanuele Giuseppe Esposito wrote:
 > 
 > Am 22/11/2022 um 17:11 schrieb Maxim Levitsky:
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  lib/x86/svm_lib.h | 53 +++++++++++++++++++++++++++++++++++++++++++++++
-> >  x86/svm.c         | 36 +-------------------------------
-> >  x86/svm.h         | 18 ----------------
-> >  x86/svm_npt.c     |  1 +
-> >  x86/svm_tests.c   |  1 +
-> >  5 files changed, 56 insertions(+), 53 deletions(-)
-> >  create mode 100644 lib/x86/svm_lib.h
+> > Extract vmcb_ident to svm_lib.c
 > > 
-> > diff --git a/lib/x86/svm_lib.h b/lib/x86/svm_lib.h
-> > new file mode 100644
-> > index 00000000..04910281
-> > --- /dev/null
-> > +++ b/lib/x86/svm_lib.h
-> > @@ -0,0 +1,53 @@
-> > +#ifndef SRC_LIB_X86_SVM_LIB_H_
-> > +#define SRC_LIB_X86_SVM_LIB_H_
-> > +
-> > +#include <x86/svm.h>
-> > +#include "processor.h"
-> > +
-> > +static inline bool npt_supported(void)
-> > +{
-> > +	return this_cpu_has(X86_FEATURE_NPT);
-> > +}
-> > +
-> > +static inline bool vgif_supported(void)
-> > +{
-> > +	return this_cpu_has(X86_FEATURE_VGIF);
-> > +}
-> > +
-> > +static inline bool lbrv_supported(void)
-> > +{
-> > +	return this_cpu_has(X86_FEATURE_LBRV);
-> > +}
-> > +
-> > +static inline bool tsc_scale_supported(void)
-> > +{
-> > +	return this_cpu_has(X86_FEATURE_TSCRATEMSR);
-> > +}
-> > +
-> > +static inline bool pause_filter_supported(void)
-> > +{
-> > +	return this_cpu_has(X86_FEATURE_PAUSEFILTER);
-> > +}
-> > +
-> > +static inline bool pause_threshold_supported(void)
-> > +{
-> > +	return this_cpu_has(X86_FEATURE_PFTHRESHOLD);
-> > +}
-> > +
-> > +static inline void vmmcall(void)
-> > +{
-> > +	asm volatile ("vmmcall" : : : "memory");
-> > +}
-> > +
-> > +static inline void stgi(void)
-> > +{
-> > +	asm volatile ("stgi");
-> > +}
-> > +
-> > +static inline void clgi(void)
-> > +{
-> > +	asm volatile ("clgi");
-> > +}
-> > +
-> Not an expert at all on this, but sti() and cli() in patch 1 are in
-> processor.h and stgi (g stansd for global?) and clgi are in a different
-> header? What about maybe moving them together?
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> 
+> Not sure if it holds for kvm unit tests, but indent of vmcb_set_seg
+> parameters seems a little bit off.
 
-Well the GI (global interrupt flag) is AMD specific, and even more correctly
-SVM specific as well. Same for VMMCALL (Intel has VMCALL instead).
+True, I will fix.
 
 Best regards,
 	Maxim Levitsky
+
 > 
-> > +
-> > +#endif /* SRC_LIB_X86_SVM_LIB_H_ */
-> > diff --git a/x86/svm.c b/x86/svm.c
-> > index 0b2a1d69..8d90a242 100644
-> > --- a/x86/svm.c
-> > +++ b/x86/svm.c
-> > @@ -14,6 +14,7 @@
-> >  #include "alloc_page.h"
-> >  #include "isr.h"
-> >  #include "apic.h"
-> > +#include "svm_lib.h"
-> >  
-> >  /* for the nested page table*/
-> >  u64 *pml4e;
-> > @@ -54,32 +55,6 @@ bool default_supported(void)
+> If that's fine:
+> Reviewed-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+> 
+> > ---
+> >  lib/x86/svm_lib.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+> >  lib/x86/svm_lib.h |  4 ++++
+> >  x86/svm.c         | 54 -----------------------------------------------
+> >  x86/svm.h         |  1 -
+> >  4 files changed, 58 insertions(+), 55 deletions(-)
+> > 
+> > diff --git a/lib/x86/svm_lib.c b/lib/x86/svm_lib.c
+> > index c7194909..aed757a1 100644
+> > --- a/lib/x86/svm_lib.c
+> > +++ b/lib/x86/svm_lib.c
+> > @@ -109,3 +109,57 @@ bool setup_svm(void)
+> >  	setup_npt();
 > >  	return true;
 > >  }
-> >  
-> > -bool vgif_supported(void)
-> > -{
-> > -	return this_cpu_has(X86_FEATURE_VGIF);
-> > -}
-> > -
-> > -bool lbrv_supported(void)
-> > -{
-> > -	return this_cpu_has(X86_FEATURE_LBRV);
-> > -}
-> > -
-> > -bool tsc_scale_supported(void)
-> > -{
-> > -	return this_cpu_has(X86_FEATURE_TSCRATEMSR);
-> > -}
-> > -
-> > -bool pause_filter_supported(void)
-> > -{
-> > -	return this_cpu_has(X86_FEATURE_PAUSEFILTER);
-> > -}
-> > -
-> > -bool pause_threshold_supported(void)
-> > -{
-> > -	return this_cpu_has(X86_FEATURE_PFTHRESHOLD);
-> > -}
-> > -
-> > -
-> >  void default_prepare(struct svm_test *test)
-> >  {
-> >  	vmcb_ident(vmcb);
-> > @@ -94,10 +69,6 @@ bool default_finished(struct svm_test *test)
-> >  	return true; /* one vmexit */
+> > +
+> > +void vmcb_set_seg(struct vmcb_seg *seg, u16 selector,
+> > +			 u64 base, u32 limit, u32 attr)
+> > +{
+> > +	seg->selector = selector;
+> > +	seg->attrib = attr;
+> > +	seg->limit = limit;
+> > +	seg->base = base;
+> > +}
+> > +
+> > +void vmcb_ident(struct vmcb *vmcb)
+> > +{
+> > +	u64 vmcb_phys = virt_to_phys(vmcb);
+> > +	struct vmcb_save_area *save = &vmcb->save;
+> > +	struct vmcb_control_area *ctrl = &vmcb->control;
+> > +	u32 data_seg_attr = 3 | SVM_SELECTOR_S_MASK | SVM_SELECTOR_P_MASK
+> > +		| SVM_SELECTOR_DB_MASK | SVM_SELECTOR_G_MASK;
+> > +	u32 code_seg_attr = 9 | SVM_SELECTOR_S_MASK | SVM_SELECTOR_P_MASK
+> > +		| SVM_SELECTOR_L_MASK | SVM_SELECTOR_G_MASK;
+> > +	struct descriptor_table_ptr desc_table_ptr;
+> > +
+> > +	memset(vmcb, 0, sizeof(*vmcb));
+> > +	asm volatile ("vmsave %0" : : "a"(vmcb_phys) : "memory");
+> > +	vmcb_set_seg(&save->es, read_es(), 0, -1U, data_seg_attr);
+> > +	vmcb_set_seg(&save->cs, read_cs(), 0, -1U, code_seg_attr);
+> > +	vmcb_set_seg(&save->ss, read_ss(), 0, -1U, data_seg_attr);
+> > +	vmcb_set_seg(&save->ds, read_ds(), 0, -1U, data_seg_attr);
+> > +	sgdt(&desc_table_ptr);
+> > +	vmcb_set_seg(&save->gdtr, 0, desc_table_ptr.base, desc_table_ptr.limit, 0);
+> > +	sidt(&desc_table_ptr);
+> > +	vmcb_set_seg(&save->idtr, 0, desc_table_ptr.base, desc_table_ptr.limit, 0);
+> > +	ctrl->asid = 1;
+> > +	save->cpl = 0;
+> > +	save->efer = rdmsr(MSR_EFER);
+> > +	save->cr4 = read_cr4();
+> > +	save->cr3 = read_cr3();
+> > +	save->cr0 = read_cr0();
+> > +	save->dr7 = read_dr7();
+> > +	save->dr6 = read_dr6();
+> > +	save->cr2 = read_cr2();
+> > +	save->g_pat = rdmsr(MSR_IA32_CR_PAT);
+> > +	save->dbgctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
+> > +	ctrl->intercept = (1ULL << INTERCEPT_VMRUN) |
+> > +		(1ULL << INTERCEPT_VMMCALL) |
+> > +		(1ULL << INTERCEPT_SHUTDOWN);
+> > +	ctrl->iopm_base_pa = virt_to_phys(io_bitmap);
+> > +	ctrl->msrpm_base_pa = virt_to_phys(msr_bitmap);
+> > +
+> > +	if (npt_supported()) {
+> > +		ctrl->nested_ctl = 1;
+> > +		ctrl->nested_cr3 = (u64)pml4e;
+> > +		ctrl->tlb_ctl = TLB_CONTROL_FLUSH_ALL_ASID;
+> > +	}
+> > +}
+> > diff --git a/lib/x86/svm_lib.h b/lib/x86/svm_lib.h
+> > index f603ff93..3bb098dc 100644
+> > --- a/lib/x86/svm_lib.h
+> > +++ b/lib/x86/svm_lib.h
+> > @@ -49,7 +49,11 @@ static inline void clgi(void)
+> >  	asm volatile ("clgi");
 > >  }
 > >  
-> > -bool npt_supported(void)
-> > -{
-> > -	return this_cpu_has(X86_FEATURE_NPT);
-> > -}
+> > +void vmcb_set_seg(struct vmcb_seg *seg, u16 selector,
+> > +				  u64 base, u32 limit, u32 attr);
+> > +
+> >  bool setup_svm(void);
+> > +void vmcb_ident(struct vmcb *vmcb);
 > >  
-> >  int get_test_stage(struct svm_test *test)
-> >  {
-> > @@ -128,11 +99,6 @@ static void vmcb_set_seg(struct vmcb_seg *seg, u16 selector,
-> >  	seg->base = base;
+> >  u64 *npt_get_pte(u64 address);
+> >  u64 *npt_get_pde(u64 address);
+> > diff --git a/x86/svm.c b/x86/svm.c
+> > index cf246c37..5e2c3a83 100644
+> > --- a/x86/svm.c
+> > +++ b/x86/svm.c
+> > @@ -63,15 +63,6 @@ void inc_test_stage(struct svm_test *test)
+> >  	barrier();
 > >  }
 > >  
-> > -inline void vmmcall(void)
+> > -static void vmcb_set_seg(struct vmcb_seg *seg, u16 selector,
+> > -			 u64 base, u32 limit, u32 attr)
 > > -{
-> > -	asm volatile ("vmmcall" : : : "memory");
+> > -	seg->selector = selector;
+> > -	seg->attrib = attr;
+> > -	seg->limit = limit;
+> > -	seg->base = base;
 > > -}
 > > -
 > >  static test_guest_func guest_main;
 > >  
 > >  void test_set_guest(test_guest_func func)
+> > @@ -85,51 +76,6 @@ static void test_thunk(struct svm_test *test)
+> >  	vmmcall();
+> >  }
+> >  
+> > -void vmcb_ident(struct vmcb *vmcb)
+> > -{
+> > -	u64 vmcb_phys = virt_to_phys(vmcb);
+> > -	struct vmcb_save_area *save = &vmcb->save;
+> > -	struct vmcb_control_area *ctrl = &vmcb->control;
+> > -	u32 data_seg_attr = 3 | SVM_SELECTOR_S_MASK | SVM_SELECTOR_P_MASK
+> > -		| SVM_SELECTOR_DB_MASK | SVM_SELECTOR_G_MASK;
+> > -	u32 code_seg_attr = 9 | SVM_SELECTOR_S_MASK | SVM_SELECTOR_P_MASK
+> > -		| SVM_SELECTOR_L_MASK | SVM_SELECTOR_G_MASK;
+> > -	struct descriptor_table_ptr desc_table_ptr;
+> > -
+> > -	memset(vmcb, 0, sizeof(*vmcb));
+> > -	asm volatile ("vmsave %0" : : "a"(vmcb_phys) : "memory");
+> > -	vmcb_set_seg(&save->es, read_es(), 0, -1U, data_seg_attr);
+> > -	vmcb_set_seg(&save->cs, read_cs(), 0, -1U, code_seg_attr);
+> > -	vmcb_set_seg(&save->ss, read_ss(), 0, -1U, data_seg_attr);
+> > -	vmcb_set_seg(&save->ds, read_ds(), 0, -1U, data_seg_attr);
+> > -	sgdt(&desc_table_ptr);
+> > -	vmcb_set_seg(&save->gdtr, 0, desc_table_ptr.base, desc_table_ptr.limit, 0);
+> > -	sidt(&desc_table_ptr);
+> > -	vmcb_set_seg(&save->idtr, 0, desc_table_ptr.base, desc_table_ptr.limit, 0);
+> > -	ctrl->asid = 1;
+> > -	save->cpl = 0;
+> > -	save->efer = rdmsr(MSR_EFER);
+> > -	save->cr4 = read_cr4();
+> > -	save->cr3 = read_cr3();
+> > -	save->cr0 = read_cr0();
+> > -	save->dr7 = read_dr7();
+> > -	save->dr6 = read_dr6();
+> > -	save->cr2 = read_cr2();
+> > -	save->g_pat = rdmsr(MSR_IA32_CR_PAT);
+> > -	save->dbgctl = rdmsr(MSR_IA32_DEBUGCTLMSR);
+> > -	ctrl->intercept = (1ULL << INTERCEPT_VMRUN) |
+> > -		(1ULL << INTERCEPT_VMMCALL) |
+> > -		(1ULL << INTERCEPT_SHUTDOWN);
+> > -	ctrl->iopm_base_pa = virt_to_phys(svm_get_io_bitmap());
+> > -	ctrl->msrpm_base_pa = virt_to_phys(svm_get_msr_bitmap());
+> > -
+> > -	if (npt_supported()) {
+> > -		ctrl->nested_ctl = 1;
+> > -		ctrl->nested_cr3 = (u64)npt_get_pml4e();
+> > -		ctrl->tlb_ctl = TLB_CONTROL_FLUSH_ALL_ASID;
+> > -	}
+> > -}
+> > -
+> >  struct regs regs;
+> >  
+> >  struct regs get_regs(void)
 > > diff --git a/x86/svm.h b/x86/svm.h
-> > index 3cd7ce8b..7cb1b898 100644
+> > index 67f3205d..a4aabeb2 100644
 > > --- a/x86/svm.h
 > > +++ b/x86/svm.h
-> > @@ -53,21 +53,14 @@ u64 *npt_get_pdpe(u64 address);
-> >  u64 *npt_get_pml4e(void);
-> >  bool smp_supported(void);
-> >  bool default_supported(void);
-> > -bool vgif_supported(void);
-> > -bool lbrv_supported(void);
-> > -bool tsc_scale_supported(void);
-> > -bool pause_filter_supported(void);
-> > -bool pause_threshold_supported(void);
-> >  void default_prepare(struct svm_test *test);
-> >  void default_prepare_gif_clear(struct svm_test *test);
-> >  bool default_finished(struct svm_test *test);
-> > -bool npt_supported(void);
+> > @@ -55,7 +55,6 @@ bool default_finished(struct svm_test *test);
 > >  int get_test_stage(struct svm_test *test);
 > >  void set_test_stage(struct svm_test *test, int s);
 > >  void inc_test_stage(struct svm_test *test);
-> >  void vmcb_ident(struct vmcb *vmcb);
+> > -void vmcb_ident(struct vmcb *vmcb);
 > >  struct regs get_regs(void);
-> > -void vmmcall(void);
 > >  int __svm_vmrun(u64 rip);
 > >  void __svm_bare_vmrun(void);
-> >  int svm_vmrun(void);
-> > @@ -75,17 +68,6 @@ void test_set_guest(test_guest_func func);
-> >  
-> >  extern struct vmcb *vmcb;
-> >  
-> > -static inline void stgi(void)
-> > -{
-> > -    asm volatile ("stgi");
-> > -}
-> > -
-> > -static inline void clgi(void)
-> > -{
-> > -    asm volatile ("clgi");
-> > -}
-> > -
-> > -
-> >  
-> >  #define SAVE_GPR_C                              \
-> >          "xchg %%rbx, regs+0x8\n\t"              \
-> > diff --git a/x86/svm_npt.c b/x86/svm_npt.c
-> > index b791f1ac..8aac0bb6 100644
-> > --- a/x86/svm_npt.c
-> > +++ b/x86/svm_npt.c
-> > @@ -2,6 +2,7 @@
-> >  #include "vm.h"
-> >  #include "alloc_page.h"
-> >  #include "vmalloc.h"
-> > +#include "svm_lib.h"
-> >  
-> >  static void *scratch_page;
-> >  
-> > diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-> > index 202e9271..f86c2fa4 100644
-> > --- a/x86/svm_tests.c
-> > +++ b/x86/svm_tests.c
-> > @@ -12,6 +12,7 @@
-> >  #include "delay.h"
-> >  #include "x86/usermode.h"
-> >  #include "vmalloc.h"
-> > +#include "svm_lib.h"
-> >  
-> >  #define SVM_EXIT_MAX_DR_INTERCEPT 0x3f
-> >  
 > > 
 
 
