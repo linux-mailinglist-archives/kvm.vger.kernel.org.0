@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB16D6447E3
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 16:22:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E5D7644802
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 16:28:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233884AbiLFPWl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 10:22:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48308 "EHLO
+        id S234390AbiLFP2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 10:28:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233190AbiLFPWh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 10:22:37 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC2E7B51
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 07:22:35 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id s7so14227734plk.5
-        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 07:22:35 -0800 (PST)
+        with ESMTP id S231530AbiLFP2R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 10:28:17 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8677028715
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 07:28:15 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id v3so13678514pgh.4
+        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 07:28:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UU8AMEdCApUKn2yCNu179y3IuDBUbfO2XN1Qp+qLAs8=;
-        b=jG3sZcdZjSQIRjZkl/f7DOP3dlw758+HEdK7GWWq8fnj9XOdoNxOkBB2jC/8fB14wx
-         9FNJy2pQnOLNPshZ0wncMGcgTjWilHuX1Bof33jsFVE2FkTXuTJbGdHUPK3/27UaGkvK
-         M5eCBf9DWrA3/swfuE4dabHXjTiAR1WKAKwpHstU30D9ufiWl2NcIxhMoypIVrjzmYCl
-         spyYHwWMmjSH6fjzFZEmEiwvpNMjodZFbFQeR2MIYjLq4JYYpySczgRZTnLObyGe9JnD
-         k6I7+5uanHUHMcum9tuQsR/k+FU6BcxcU7gl4DPlzzQZx8dB4g0Mi3WATLONu2k2T3NX
-         tEOQ==
+        bh=UbvbC5wWAbTk1+A45QMi3yV7gKIuXUVlv7TRLX6QDzQ=;
+        b=o2pfBKad+xs/gHyi3mDpxXl3Ejx08rQwd7nDOZGu8tih+03yTLG9XNmst/u1NsCpd2
+         kyGJtZ5d7CWoKzweigchYufl1D8gierL43WqERJwGSSQeRHqmRZWusQ6eSD0wl6ytQAR
+         PFhlOF+Zravyw5C5LhmVc6V5UXDs6Ieixn7Z71yBPjdl7i+Rhqodee7VZzSZxM6gbJ+M
+         mUv+e7BMb1dEYVIavlac4VR+uJPX1dz2MgumEnsBWeA5UZ3V9ne5rWYEA66kFu8C1QG1
+         JYeIna0Nvi7bBdxHdo5P39G0mu/SsSFQ/pA0afbIWx+7D7CDy0/xKN1Q9huuXlirg552
+         jxng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UU8AMEdCApUKn2yCNu179y3IuDBUbfO2XN1Qp+qLAs8=;
-        b=6Y+XVwLeecAeN8oBuByKAq/7KzJ13PRt7YDbLeOTCto8x0xoW2P8zdwMYZca56vf2i
-         UX3BO7BNGXujxS9a+p+TJsVB/inju/wKdxTX7OuASChmW81EKa8v8OvaJ9ayAMiL23ei
-         ITd4nwlRDfOe/bEsxX6z9tJcESn7UDQnK33S5xVlHHNynJKAAU7uJv/NIFCoFwDs/6Gi
-         fEILzLeafaufn0FHzVHNUIWnNVokWP6wa1l9QKNb5AYnpwg7tmQ6xg3QxCzTPd5EUzA8
-         jQyIEyv2Ps9GPfUfJ/kQ50k1QDFV4aaXceSqKOXQeV3F+9EelsJJhx49mTQJYM3ad40r
-         dHjQ==
-X-Gm-Message-State: ANoB5pnXTLR5OK/lVjcbl05quS1Sc3hoojir7l4Ql3Pv31biTZ30bv4X
-        5/JvKOW18Beyml6PuoEVBqCdLA==
-X-Google-Smtp-Source: AA0mqf4Ycm0ZpEHchEyW5wHkELYu+0YMn7TsJMJRfE0+nFFPq8XQvhmYhp2h5imhee7dmv/YvgeI/Q==
-X-Received: by 2002:a17:90b:2544:b0:20a:f341:4ed9 with SMTP id nw4-20020a17090b254400b0020af3414ed9mr98991840pjb.11.1670340155171;
-        Tue, 06 Dec 2022 07:22:35 -0800 (PST)
+        bh=UbvbC5wWAbTk1+A45QMi3yV7gKIuXUVlv7TRLX6QDzQ=;
+        b=lI4cjvuu0h+yuJhG2VFCUbKeEHooGHAPxJ8NO+hFOld/bSkkGGRXqo4FnmzTPjACiL
+         8DDsXwzsPSdUBW0m9gi1yXWs/Bazg9LIAySue9aLg5PxQFhuurIO0RqIpgvaAUKJ05Qc
+         w3KxvdUZRmQK4HylRTh2flfbe0zVUIKvwbKp2etcpBahICReObvFJF9oqvKbmnTCdNkF
+         O3KXjNLFF2yRJO1I8o5VKzKNiTvlGUDpgcq2qKUoZk3j6JBlzm3Jy0Hdk7kuVoNULC+u
+         eTdyFxtPLRk0gX0WPAqpSUHaxB0/KY6zvsZu9HXi14FHiOKySkZMWIjnIoFhDFW0T1MD
+         N0zw==
+X-Gm-Message-State: ANoB5pkqPBQPcf37wNNv3fLbOuKNfFKfTpH9rKkIR/sP6HLrqc6efbPS
+        yKPWUqvT1sM+vHwwnTC5V0z3Nw==
+X-Google-Smtp-Source: AA0mqf55x7M4sv2x3tayft1I7V3sSjX0b6B+H4EoWIBSX/GlBW1IkeeiP/C1ZdGWLs42NtueKdU4uw==
+X-Received: by 2002:a63:1865:0:b0:478:b1f4:1661 with SMTP id 37-20020a631865000000b00478b1f41661mr10871408pgy.317.1670340495049;
+        Tue, 06 Dec 2022 07:28:15 -0800 (PST)
 Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id n3-20020a170902d2c300b00176b84eb29asm12790880plc.301.2022.12.06.07.22.34
+        by smtp.gmail.com with ESMTPSA id d12-20020a170903230c00b0016c9e5f291bsm12848547plh.111.2022.12.06.07.28.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Dec 2022 07:22:34 -0800 (PST)
+        Tue, 06 Dec 2022 07:28:14 -0800 (PST)
 Received: from jgg by wakko with local (Exim 4.95)
         (envelope-from <jgg@ziepe.ca>)
-        id 1p2ZmD-004cnQ-5r;
-        Tue, 06 Dec 2022 11:22:33 -0400
-Date:   Tue, 6 Dec 2022 11:22:33 -0400
+        id 1p2Zrg-004crv-OQ;
+        Tue, 06 Dec 2022 11:28:12 -0400
+Date:   Tue, 6 Dec 2022 11:28:12 -0400
 From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Lei Rao <lei.rao@intel.com>, kbusch@kernel.org, axboe@fb.com,
@@ -63,58 +63,54 @@ Cc:     Lei Rao <lei.rao@intel.com>, kbusch@kernel.org, axboe@fb.com,
         linux-nvme@lists.infradead.org, kvm@vger.kernel.org,
         eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
         Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com
-Subject: Re: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to
- issue admin commands for VF driver.
-Message-ID: <Y49eObpI7QoSnugu@ziepe.ca>
-References: <20221206055816.292304-1-lei.rao@intel.com>
- <20221206055816.292304-2-lei.rao@intel.com>
- <20221206061940.GA6595@lst.de>
- <Y49HKHP9NrId39iH@ziepe.ca>
- <20221206135810.GA27689@lst.de>
+Subject: Re: [RFC PATCH 5/5] nvme-vfio: Add a document for the NVMe device
+Message-ID: <Y49fjFD6foGorhmp@ziepe.ca>
+References: <20221206055816.292304-6-lei.rao@intel.com>
+ <20221206062604.GB6595@lst.de>
+ <Y48+AaG5rSCviIhl@ziepe.ca>
+ <20221206130901.GB24358@lst.de>
+ <Y49JNvdmRPNWw26q@ziepe.ca>
+ <20221206140002.GB27689@lst.de>
+ <Y49PqoAhZOeraLVa@ziepe.ca>
+ <20221206143126.GB30297@lst.de>
+ <Y49WNo7XWZ2aFfds@ziepe.ca>
+ <20221206150131.GA32365@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221206135810.GA27689@lst.de>
+In-Reply-To: <20221206150131.GA32365@lst.de>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 06, 2022 at 02:58:10PM +0100, Christoph Hellwig wrote:
+On Tue, Dec 06, 2022 at 04:01:31PM +0100, Christoph Hellwig wrote:
 
-> Most importantly NVMe is very quiet on the relationship between
-> VFs and PFs, and there is no way to guarantee that a PF is, at the
-> NVMe level, much in control of a VF at all.  In other words this
-> concept really badly breaks NVMe abstractions.
+> So this isn't really about a VF live cycle, but how to manage life
+> migration, especially on the receive / restore side.  And restoring
+> the entire controller state is extremely invasive and can't be done
+> on a controller that is in any classic form live.  In fact a lot
+> of the state is subsystem-wide, so without some kind of virtualization
+> of the subsystem it is impossible to actually restore the state.
 
-Yeah, I think the spec effort is going to be interesting for sure.
+I cannot speak to nvme, but for mlx5 the VF is laregly a contained
+unit so we just replace the whole thing.
 
-From a pure Linux and implementation perspective a decision must be
-made early on how to label the DMAs for kernel/qemu vs VM controlled
-items at the PCI TLP level.
+From the PF there is some observability, eg the VF's MAC address is
+visible and a few other things. So the PF has to re-synchronize after
+the migration to get those things aligned.
 
-> controlled functions (which could very well be, and in some designs
-> are, additional PFs and not VFs) by controlling function.  
+> To cycle back to the hardware that is posted here, I'm really confused
+> how it actually has any chance to work and no one has even tried
+> to explain how it is supposed to work.
 
-In principle PF vs VF doesn't matter much - the question is really TLP
-labeling. If the spec says RID A is the controlling RID and RID B is
-the guest RID, then it doesn't matter if they have a PF/VF
-relationship or PF/PF relationship.
-
-We have locking issues in Linux SW connecting different SW drivers for
-things that are not a PF/VF relationship, but perhaps that can be
-solved.
-
-Using VF RID / VF PASID is appealing at first glance, but there is
-list of PCI emulation details that have to be worked out for that to
-be good. eg what do you do with guest triggered FLR? Or guest
-triggered memory disable? How do you handle PCIe AER? Also lack of
-PASID support in CPUs is problematic.
-
-Lots of trade offs..
+I'm interested as well, my mental model goes as far as mlx5 and
+hisillicon, so if nvme prevents the VFs from being contained units, it
+is a really big deviation from VFIO's migration design..
 
 Jason
