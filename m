@@ -2,75 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 515E9644ABD
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 19:01:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E6D0644AE3
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 19:10:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229624AbiLFSBG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 13:01:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50222 "EHLO
+        id S229605AbiLFSKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 13:10:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229632AbiLFSBD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 13:01:03 -0500
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CAA37FBA
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 10:00:57 -0800 (PST)
-Received: by mail-pg1-x532.google.com with SMTP id h33so14039823pgm.9
-        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 10:00:57 -0800 (PST)
+        with ESMTP id S229480AbiLFSKi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 13:10:38 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DECE13B9E3
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 10:10:36 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id k7so14713255pll.6
+        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 10:10:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IZ/eewSvSWgRvr6BfZF0Ink/Z3lXafgahPjrIsbVO+Q=;
-        b=p85BHNs950sX6+YdR/La3bRRURA5Iyad7gJsVNcTC8Sbk+t7TM0n4A5wqFUDrb0J6f
-         /+likKUnoCGnHd2e+jdC1CwShBvoYZHib+RPCaAbfYqQFG52EACFXxvD9DYMXO+PEYl+
-         qwbqcjtKYsJxS8/I7wW7xnVPOt1zRzkc56jDTXIIAxNmUEyeAa+/1AppO5vfWNEUyFGw
-         dJHifqN9g8OH8wzSVQ+WTMB6azYE08A6x/jubP+EiIxvUxNCNZRHXvhwhmPBSJGkocuZ
-         n/fDuAJER1/AJr4Z/DDGWOvFemUvWzGKqhRzAHgv9QPr2SjdLwEW1ufcjaCqR61Cj2+h
-         TrqQ==
+        bh=gAdL/5nVVJu1FQlGTdfBjUls0ERNiH40RtP9DKw3LIs=;
+        b=l9AGT4fXhM1oH7Du6wFnaTWjSCn3ASy0EdsFYwoxpz1XTmSJrI/6IYPrztRWGtgphI
+         MEU1JwB6naZw7c/1ettMldjjpLk7glwpCWqV3EXpRuhUI+cM9iyuVCU+X8uFtQpMw16H
+         y+VgP6Yz+mAMFxaAy3HgfBPOTFYdo5y/iogmk26sWTFOPpJyLaBDhg94MEROnHf5IE94
+         nWYww6CfABnUnL1AnWY2Cgwf8IRzYPXH3CPErKTJKwYOxZqve3srRPJGRu+YDWCJOMyj
+         ciVWMbA+0QFhqsdHTxv5x8llaaAKjhSyqtXi87fJCtsbFm+lXv45WSeSP6LhgyyqgED4
+         rVjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IZ/eewSvSWgRvr6BfZF0Ink/Z3lXafgahPjrIsbVO+Q=;
-        b=FKB680BLsLiKYS6DaafMafmYJ3taBRVJ33ce0wayJu7A1n9mApd+pF12vzBpzT9RkR
-         OJSejvRJbI2Q9ZlHwGIGcpzsPqS41HXIXbyRAkG9ZUelJ91HM6yfyfKtWbn9sV8Mhls/
-         yKLbFtD++OIeL93q1cCt068AdD0sjC4vXAQ1/6W4Z+E8fA2IPlYMG0bU+TdYhN8cEDD+
-         nSJXnGvfrR/J+YHlZFPtcJI7lTSlY+rTlCfO2P2N5FomVFYgfcCckZbMiNWvoRbekN3T
-         gR4BB0Sr8a+BENGS4eQFKhIgZzd5aTtl60Otr0GtIgqmx2lehU+io1q8TiaiI3/NnmT4
-         /LtQ==
-X-Gm-Message-State: ANoB5pkZ11EgJyf/5U0k1YUWZJJE2a1m2MbIKYJB9uUjw4sjidpd1k6T
-        ndCJMM92F4k0CtBuzSEP1j7X1g==
-X-Google-Smtp-Source: AA0mqf7DwpncQilHWw9mPUFGCznhUcmoxZzkWzvwjfoeUCID64NRYsXY8viyrYf11aEBw+RQWiYnsQ==
-X-Received: by 2002:a63:4043:0:b0:470:2ecd:333e with SMTP id n64-20020a634043000000b004702ecd333emr80514782pga.596.1670349657037;
-        Tue, 06 Dec 2022 10:00:57 -0800 (PST)
+        bh=gAdL/5nVVJu1FQlGTdfBjUls0ERNiH40RtP9DKw3LIs=;
+        b=v/At562JCTuLW2hwGL1yRPgsnt9/Hxj4cjup4aF9o+As55P6PMFwpr/8rDUMJfhvH3
+         bzD/z035OlTYH5yt6OalSi6K/BWoXbBivGpmJc77J3gUpqicU9YjoUSwXUU1kG3qpiRQ
+         Lgp1F8NFATwZAoke7PO87XZwo74fa968WsAglekf2G3XDfWX+jGQ4P1o44o125n4jGB1
+         6ggPcIm0Q9zev/7grGg+/myDNk+1yOdCf45lBfZVDI54sGxieuVuYXPoIHCwS7Y6R8sJ
+         qxsnmZX/2TuqIECDKFCffadj9p0fWYkrE5WGwBKZhfsIjZcKPmNML2iSubZsP9MDkrYm
+         aBww==
+X-Gm-Message-State: ANoB5pmC+JBBBerLEuSaFrg8ohC0IjT/i3IFLJ1njlRkQqhUus+UoxPw
+        t58OflLp/Qb36LlMgOympND3HA==
+X-Google-Smtp-Source: AA0mqf5SWGEOLKnaGxze9XgAsm4nFZyJ++7ROo35teN3Ikc66p+MXKu2i9uybgiJng0VsXfgkbFF9Q==
+X-Received: by 2002:a17:90a:c68d:b0:219:d415:d787 with SMTP id n13-20020a17090ac68d00b00219d415d787mr11690151pjt.127.1670350236316;
+        Tue, 06 Dec 2022 10:10:36 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id z18-20020a170903019200b00177f4ef7970sm13016894plg.11.2022.12.06.10.00.56
+        by smtp.gmail.com with ESMTPSA id x14-20020a170902ec8e00b001897916be2bsm12957433plg.268.2022.12.06.10.10.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Dec 2022 10:00:56 -0800 (PST)
-Date:   Tue, 6 Dec 2022 18:00:53 +0000
+        Tue, 06 Dec 2022 10:10:35 -0800 (PST)
+Date:   Tue, 6 Dec 2022 18:10:32 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     James Houghton <jthoughton@google.com>
-Cc:     David Matlack <dmatlack@google.com>, Peter Xu <peterx@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Linux MM <linux-mm@kvack.org>, kvm <kvm@vger.kernel.org>,
-        chao.p.peng@linux.intel.com
-Subject: Re: [RFC] Improving userfaultfd scalability for live migration
-Message-ID: <Y4+DVdq1Pj3k4Nyz@google.com>
-References: <CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com>
- <Y4qgampvx4lrHDXt@google.com>
- <Y44NylxprhPn6AoN@x1n>
- <CALzav=d=N7teRvjQZ1p0fs6i9hjmH7eVppJLMh_Go4TteQqqwg@mail.gmail.com>
- <Y442dPwu2L6g8zAo@google.com>
- <CADrL8HV_8=ssHSumpQX5bVm2h2J01swdB=+at8=xLr+KtW79MQ@mail.gmail.com>
- <Y46VgQRU+do50iuv@google.com>
- <CADrL8HVM1poR5EYCsghhMMoN2U+FYT6yZr_5hZ8pLZTXpLnu8Q@mail.gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Ben Gardon <bgardon@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Fuad Tabba <tabba@google.com>, Gavin Shan <gshan@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Peter Collingbourne <pcc@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        Quentin Perret <qperret@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Ryan Roberts <ryan.roberts@arm.com>,
+        Steven Price <steven.price@arm.com>,
+        Usama Arif <usama.arif@bytedance.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Will Deacon <will@kernel.org>,
+        Zhiyuan Dai <daizhiyuan@phytium.com.cn>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
+Message-ID: <Y4+FmDM7E5WYP3zV@google.com>
+References: <20221205155845.233018-1-maz@kernel.org>
+ <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CADrL8HVM1poR5EYCsghhMMoN2U+FYT6yZr_5hZ8pLZTXpLnu8Q@mail.gmail.com>
+In-Reply-To: <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -82,64 +103,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 06, 2022, James Houghton wrote:
-> On Mon, Dec 5, 2022 at 8:06 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Mon, Dec 05, 2022, James Houghton wrote:
-> > > On Mon, Dec 5, 2022 at 1:20 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > >
-> > > > On Mon, Dec 05, 2022, David Matlack wrote:
-> > > > > On Mon, Dec 5, 2022 at 7:30 AM Peter Xu <peterx@redhat.com> wrote:
-> > > > > > ...
-> > > > > > I'll have a closer read on the nested part, but note that this path already
-> > > > > > has the mmap lock then it invalidates the goal if we want to avoid taking
-> > > > > > it from the first place, or maybe we don't care?
-> > >
-> > > Not taking the mmap lock would be helpful, but we still have to take
-> > > it in UFFDIO_CONTINUE, so it's ok if we have to still take it here.
-> >
-> > IIUC, Peter is suggesting that the kernel not even get to the point where UFFD
-> > is involved.  The "fault" would get propagated to userspace by KVM, userspace
-> > fixes the fault (gets the page from the source, does MADV_POPULATE_WRITE), and
-> > resumes the vCPU.
+On Tue, Dec 06, 2022, Paolo Bonzini wrote:
+> On 12/5/22 16:58, Marc Zyngier wrote:
+> > - There is a lot of selftest conflicts with your own branch, see:
+> > 
+> >    https://lore.kernel.org/r/20221201112432.4cb9ae42@canb.auug.org.au
+> >    https://lore.kernel.org/r/20221201113626.438f13c5@canb.auug.org.au
+> >    https://lore.kernel.org/r/20221201115741.7de32422@canb.auug.org.au
+> >    https://lore.kernel.org/r/20221201120939.3c19f004@canb.auug.org.au
+> >    https://lore.kernel.org/r/20221201131623.18ebc8d8@canb.auug.org.au
+> > 
+> >    for a rather exhaustive collection.
 > 
-> If we haven't UFFDIO_CONTINUE'd some address range yet,
-> MADV_POPULATE_WRITE for that range will drop into handle_userfault and
-> go to sleep. Not good!
-
-Ah, right, userspace would still need to register UFFD for the region to handle
-non-KVM (or incompatible KVM) accesses and could loop back on itself.
-
-> So, going with the no-slow-GUP approach, resolving faults is done like this:
-> - If we haven't UFFDIO_CONTINUE'd yet, do that now and restart
-> KVM_RUN. The PTEs will be none/blank right now. This is the common
-> case.
-> - If we have UFFDIO_CONTINUE'd already, if we were to do it again, we
-> would get EEXIST. (In this case, we probably have some type of swap
-> entry in the page tables.) We have to change the page tables to make
-> fast GUP succeed now *without* using UFFDIO_CONTINUE now.
-> MADV_POPULATE_WRITE seems to be the right tool for the job. This case
-> happens if the kernel has swapped the memory out, is migrating it, has
-> poisoned it, etc. If MADV_POPULATE_WRITE fails, we probably need to
-> crash or inject a memory error.
+> Yeah, I saw them in Stephen's messages but missed your reply.
 > 
-> So with this approach, we never need to take the mmap_lock for reading
-> in hva_to_pfn, but we still need to take it in UFFDIO_CONTINUE.
-> Without removing the mmap_lock from *both*, we don't gain much.
-> 
-> So if we disregard this tiny mmap_lock benefit, the other approach
-> (the PF_NO_UFFD_WAIT approach) seems better.
+> In retrospect, at least Gavin's series for memslot_perf_test should have
+> been applied by both of us with a topic branch, but there's so many
+> conflicts all over the place that it's hard to single out one series.
+> It just happens.
 
-Can you elaborate on what makes it better?  Or maybe generate a list of pros and
-cons?  I can think of (dis)advantages for both approaches, but I haven't identified
-anything that would be a blocking issue for either approach.  Doesn't mean there
-isn't one or more blocking issues, just that I haven't thought of any :-)
+Alternatively, we could have a dedicated selftests/kvm tree (or branch)?
 
-> When KVM_RUN exits:
-> - If we haven't UFFDIO_CONTINUE'd yet, do that now and restart KVM_RUN.
-> - If we have, then something bad has happened. Slow GUP already ran
-> and failed, so we need to treat this in the same way we treat a
-> MADV_POPULATE_WRITE failure above: userspace might just want to crash
-> (or inject a memory error or something).
-> 
-> - James
+I almost suggested doing that on multiple occasions this cycle, but ultimately
+decided not to because it would effectively mean splitting series that touch KVM
+and selftests into different trees, which would create a different kind of
+dependency hell.  Or maybe a hybrid approach where series that only (or mostly?)
+touch selftests go into a dedicated tree?
+
+I get the feeling that I'm overthinking things though, this level of activity and
+conflicts should be relatively rare.
