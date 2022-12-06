@@ -2,239 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1372C643E97
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 09:29:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD6F9643E87
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 09:26:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233745AbiLFI3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 03:29:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56294 "EHLO
+        id S232642AbiLFI0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 03:26:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232099AbiLFI3n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 03:29:43 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 060216435
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 00:29:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670315383; x=1701851383;
-  h=from:to:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xH88F9LFNkxAdFgGY4E5K1XM7tcl1F4mWQoygpSaKQc=;
-  b=Bpp1g8ulBQhyECJhkjjsw3Zt9ThzRxLYGS/YJAbOpRiahkVrVphXuGLA
-   wBGxWLfO8kTyK+5kd9dEGHeZZACwOsAiXAkgJNgVjac/IuLfc3OqNL/Cf
-   dnH29vUARJKO/wlfLJC/Irig3eCo8K5USWcKl1rS0ifnlG1/HqPKCwJU7
-   GKxp5wzVkFiFqMtsImrG5tGvhxqkbNZxo8kpiXsnVBvU8Ejh9LwRroKk6
-   wueyfXYu5UZHjOnfZnN584EKTFoD2DNz7Vg5zWF50xW2NSgiu8tuIkJFR
-   RNF59wj4FTtAPBMBVSSdANbRYHkDNgtUKcD1Xyqcfmgs04zfToDyzTwvU
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10552"; a="317710234"
-X-IronPort-AV: E=Sophos;i="5.96,220,1665471600"; 
-   d="scan'208";a="317710234"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2022 00:29:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10552"; a="734910613"
-X-IronPort-AV: E=Sophos;i="5.96,220,1665471600"; 
-   d="scan'208";a="734910613"
-Received: from skxmcp01.bj.intel.com ([10.240.193.86])
-  by FMSMGA003.fm.intel.com with ESMTP; 06 Dec 2022 00:29:38 -0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org
-Subject: [PATCH] KVM: MMU: Add wrapper to check whether MMU is in direct mode
-Date:   Tue,  6 Dec 2022 15:39:51 +0800
-Message-Id: <20221206073951.172450-1-yu.c.zhang@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S233467AbiLFI00 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 03:26:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6501FD8C
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 00:25:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670315131;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zZAq/PtnFU0rbP7eP7C+jdgThKNnH+Mi6t7KTAN4IpE=;
+        b=gqD5ee0mkbeDQZ+rDbN/hy5krK9c9f8Jsd4Rl3IHTzWkRFnio4Xgayn1CCH7cVnk7VnRef
+        VBkqx6o1desSHB5Jdz3gBG+IKSnMAL0UOYhBjsGF9zdOY+Imj8xsXCqILDbESSbfWisy/N
+        cIs7RHod/Vr0lbJnVbd6LHo0g64pgXE=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-372-QbWMlR20O4Kp1-94um7FcA-1; Tue, 06 Dec 2022 03:25:30 -0500
+X-MC-Unique: QbWMlR20O4Kp1-94um7FcA-1
+Received: by mail-oi1-f200.google.com with SMTP id bo36-20020a05680822a400b00359dee97833so6252005oib.1
+        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 00:25:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zZAq/PtnFU0rbP7eP7C+jdgThKNnH+Mi6t7KTAN4IpE=;
+        b=pb3YolOo9OWDVUOw2dA7GiQSt8F14PLVYNt1kkHi0wU6xqzdq4oQ5/ewY70Ygxp2dh
+         3Qz339WNViHY00sr9fkKCD1fmR+Mf++twPcUI+R9nELR+f7Tkqxkw+yDACS0iz029RHn
+         SfDh66J4VnCe70cD2iSIw8SgmYpo40liLJyTP4ot01MhiGe16emdGeKQklQw/AJNB2mc
+         /enVFhx8fjHZiOgTqwM6KyCqyVR8zIdPd3ZY/gL/vDCVR8U4mplcNnamh0Bt4C4qNn3u
+         LVUnNgGGRyvsc/nTQ923vClG+YkUIfMG/AInWEsCibcmcIrKVa2zmlrgdvBJ5axi+jKm
+         HP8g==
+X-Gm-Message-State: ANoB5pnX9jR+jdV4O3cyL0QiCj07iszSa8Rbt91ZZOKo3mgz4WkCf/rx
+        zbLlouK4DL0tBQMHLJmNIhZRpfAWwksuYy8Jh7NCb0h6LXOqkHI13FoBVMG9UI0Aqi7cBXtDPlX
+        hF9U0ji180KBdAwWjh6hMjQD/Bzg6
+X-Received: by 2002:a9d:832:0:b0:670:5283:dd3e with SMTP id 47-20020a9d0832000000b006705283dd3emr2305379oty.201.1670315129731;
+        Tue, 06 Dec 2022 00:25:29 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf63/YSWSVfAKhDkxJJhg5tVQ6edTZ8+z5593ZO8OwAtsLg+gnP7Sk7CJg2MlOyZ4umJty76Hd1HiuYim0ssmgc=
+X-Received: by 2002:a9d:832:0:b0:670:5283:dd3e with SMTP id
+ 47-20020a9d0832000000b006705283dd3emr2305371oty.201.1670315129501; Tue, 06
+ Dec 2022 00:25:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221125145724.1129962-1-lingshan.zhu@intel.com>
+In-Reply-To: <20221125145724.1129962-1-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 6 Dec 2022 16:25:17 +0800
+Message-ID: <CACGkMEvEwutEZT4UyosOZmTcKjvhhS6covy6FgyMWm4nmtKn8w@mail.gmail.com>
+Subject: Re: [PATCH V2 00/12] ifcvf/vDPA implement features provisioning
+To:     Zhu Lingshan <lingshan.zhu@intel.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, hang.yuan@intel.com, piotr.uminski@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Simplify the code by introducing a wrapper, mmu_is_direct(),
-instead of using vcpu->arch.mmu->root_role.direct everywhere.
+On Fri, Nov 25, 2022 at 11:06 PM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+>
+> This series implements features provisioning for ifcvf.
+> By applying this series, we allow userspace to create
+> a vDPA device with selected (management device supported)
+> feature bits and mask out others.
+>
+> Examples:
+> a)The management device supported features:
+> $ vdpa mgmtdev show pci/0000:01:00.5
+> pci/0000:01:00.5:
+>   supported_classes net
+>   max_supported_vqs 9
+>   dev_features MTU MAC MRG_RXBUF CTRL_VQ MQ ANY_LAYOUT VERSION_1 ACCESS_PLATFORM
+>
+> b)Provision a vDPA device with all supported features:
+> $ vdpa dev add name vdpa0 mgmtdev pci/0000:01:00.5
+> $ vdpa/vdpa dev config show vdpa0
+> vdpa0: mac 00:e8:ca:11:be:05 link up link_announce false max_vq_pairs 4 mtu 1500
+>   negotiated_features MRG_RXBUF CTRL_VQ MQ VERSION_1 ACCESS_PLATFORM
+>
+> c)Provision a vDPA device with a subset of the supported features:
+> $ vdpa dev add name vdpa0 mgmtdev pci/0000:01:00.5 device_features 0x300020020
+> $ vdpa dev config show vdpa0
+> mac 00:e8:ca:11:be:05 link up link_announce false
+>   negotiated_features CTRL_VQ VERSION_1 ACCESS_PLATFORM
+>
+> Please help review
+>
+> Thanks
+>
+> Changes from V1:
+> split original patch 1 ~ patch 3 to small patches that are less
+> than 100 lines,
 
-Meanwhile, use temporary variable 'direct', in routines such
-as kvm_mmu_load()/kvm_mmu_page_fault() etc. instead of checking
-vcpu->arch.mmu->root_role.direct repeatedly.
+True but.
 
-No functional change intended.
+>so they can be applied to stalbe kernel(Jason)
+>
 
-Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
----
- arch/x86/kvm/mmu/mmu.c | 26 +++++++++++++-------------
- arch/x86/kvm/x86.c     |  9 +++++----
- arch/x86/kvm/x86.h     |  5 +++++
- 3 files changed, 23 insertions(+), 17 deletions(-)
+It requires each patch fixes a real issue so I think those can not go
+to -stable.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 4736d7849c60..d2d0fabdb702 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2280,7 +2280,7 @@ static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterato
- 
- 	if (iterator->level >= PT64_ROOT_4LEVEL &&
- 	    vcpu->arch.mmu->cpu_role.base.level < PT64_ROOT_4LEVEL &&
--	    !vcpu->arch.mmu->root_role.direct)
-+	    !mmu_is_direct(vcpu))
- 		iterator->level = PT32E_ROOT_LEVEL;
- 
- 	if (iterator->level == PT32E_ROOT_LEVEL) {
-@@ -2677,7 +2677,7 @@ static int kvm_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva)
- 	gpa_t gpa;
- 	int r;
- 
--	if (vcpu->arch.mmu->root_role.direct)
-+	if (mmu_is_direct(vcpu))
- 		return 0;
- 
- 	gpa = kvm_mmu_gva_to_gpa_read(vcpu, gva, NULL);
-@@ -3918,7 +3918,7 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
- 	int i;
- 	struct kvm_mmu_page *sp;
- 
--	if (vcpu->arch.mmu->root_role.direct)
-+	if (mmu_is_direct(vcpu))
- 		return;
- 
- 	if (!VALID_PAGE(vcpu->arch.mmu->root.hpa))
-@@ -4147,7 +4147,7 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 
- 	arch.token = alloc_apf_token(vcpu);
- 	arch.gfn = gfn;
--	arch.direct_map = vcpu->arch.mmu->root_role.direct;
-+	arch.direct_map = mmu_is_direct(vcpu);
- 	arch.cr3 = vcpu->arch.mmu->get_guest_pgd(vcpu);
- 
- 	return kvm_setup_async_pf(vcpu, cr2_or_gpa,
-@@ -4157,17 +4157,16 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- {
- 	int r;
-+	bool direct = mmu_is_direct(vcpu);
- 
--	if ((vcpu->arch.mmu->root_role.direct != work->arch.direct_map) ||
--	      work->wakeup_all)
-+	if ((work->arch.direct_map != direct) || work->wakeup_all)
- 		return;
- 
- 	r = kvm_mmu_reload(vcpu);
- 	if (unlikely(r))
- 		return;
- 
--	if (!vcpu->arch.mmu->root_role.direct &&
--	      work->arch.cr3 != vcpu->arch.mmu->get_guest_pgd(vcpu))
-+	if (!direct && work->arch.cr3 != vcpu->arch.mmu->get_guest_pgd(vcpu))
- 		return;
- 
- 	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
-@@ -5331,14 +5330,15 @@ EXPORT_SYMBOL_GPL(kvm_mmu_reset_context);
- int kvm_mmu_load(struct kvm_vcpu *vcpu)
- {
- 	int r;
-+	bool direct = mmu_is_direct(vcpu);
- 
--	r = mmu_topup_memory_caches(vcpu, !vcpu->arch.mmu->root_role.direct);
-+	r = mmu_topup_memory_caches(vcpu, !direct);
- 	if (r)
- 		goto out;
- 	r = mmu_alloc_special_roots(vcpu);
- 	if (r)
- 		goto out;
--	if (vcpu->arch.mmu->root_role.direct)
-+	if (direct)
- 		r = mmu_alloc_direct_roots(vcpu);
- 	else
- 		r = mmu_alloc_shadow_roots(vcpu);
-@@ -5575,7 +5575,7 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
- 		       void *insn, int insn_len)
- {
- 	int r, emulation_type = EMULTYPE_PF;
--	bool direct = vcpu->arch.mmu->root_role.direct;
-+	bool direct = mmu_is_direct(vcpu);
- 
- 	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root.hpa)))
- 		return RET_PF_RETRY;
-@@ -5606,8 +5606,8 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
- 	 * paging in both guests. If true, we simply unprotect the page
- 	 * and resume the guest.
- 	 */
--	if (vcpu->arch.mmu->root_role.direct &&
--	    (error_code & PFERR_NESTED_GUEST_PAGE) == PFERR_NESTED_GUEST_PAGE) {
-+	if (((error_code & PFERR_NESTED_GUEST_PAGE) == PFERR_NESTED_GUEST_PAGE) &&
-+	    direct) {
- 		kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(cr2_or_gpa));
- 		return 1;
- 	}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 72ac6bf05c8b..b95984a49700 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8420,6 +8420,7 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- {
- 	gpa_t gpa = cr2_or_gpa;
- 	kvm_pfn_t pfn;
-+	bool direct = mmu_is_direct(vcpu);
- 
- 	if (!(emulation_type & EMULTYPE_ALLOW_RETRY_PF))
- 		return false;
-@@ -8428,7 +8429,7 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	    WARN_ON_ONCE(!(emulation_type & EMULTYPE_PF)))
- 		return false;
- 
--	if (!vcpu->arch.mmu->root_role.direct) {
-+	if (!direct) {
- 		/*
- 		 * Write permission should be allowed since only
- 		 * write access need to be emulated.
-@@ -8461,7 +8462,7 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	kvm_release_pfn_clean(pfn);
- 
- 	/* The instructions are well-emulated on direct mmu. */
--	if (vcpu->arch.mmu->root_role.direct) {
-+	if (direct) {
- 		unsigned int indirect_shadow_pages;
- 
- 		write_lock(&vcpu->kvm->mmu_lock);
-@@ -8529,7 +8530,7 @@ static bool retry_instruction(struct x86_emulate_ctxt *ctxt,
- 	vcpu->arch.last_retry_eip = ctxt->eip;
- 	vcpu->arch.last_retry_addr = cr2_or_gpa;
- 
--	if (!vcpu->arch.mmu->root_role.direct)
-+	if (!mmu_is_direct(vcpu))
- 		gpa = kvm_mmu_gva_to_gpa_write(vcpu, cr2_or_gpa, NULL);
- 
- 	kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa));
-@@ -8830,7 +8831,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		ctxt->exception.address = cr2_or_gpa;
- 
- 		/* With shadow page tables, cr2 contains a GVA or nGPA. */
--		if (vcpu->arch.mmu->root_role.direct) {
-+		if (mmu_is_direct(vcpu)) {
- 			ctxt->gpa_available = true;
- 			ctxt->gpa_val = cr2_or_gpa;
- 		}
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 9de72586f406..aca11db10a8f 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -171,6 +171,11 @@ static inline bool mmu_is_nested(struct kvm_vcpu *vcpu)
- 	return vcpu->arch.walk_mmu == &vcpu->arch.nested_mmu;
- }
- 
-+static inline bool mmu_is_direct(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.mmu->root_role.direct;
-+}
-+
- static inline int is_pae(struct kvm_vcpu *vcpu)
- {
- 	return kvm_read_cr4_bits(vcpu, X86_CR4_PAE);
--- 
-2.25.1
+Btw, looking at git history what you want to decouple is basically
+functional equivalent to a partial revert of this commit:
+
+commit 378b2e956820ff5c082d05f42828badcfbabb614
+Author: Zhu Lingshan <lingshan.zhu@intel.com>
+Date:   Fri Jul 22 19:53:05 2022 +0800
+
+    vDPA/ifcvf: support userspace to query features and MQ of a
+management device
+
+    Adapting to current netlink interfaces, this commit allows userspace
+    to query feature bits and MQ capability of a management device.
+
+    Currently both the vDPA device and the management device are the VF itself,
+    thus this ifcvf should initialize the virtio capabilities in probe() before
+    setting up the struct vdpa_mgmt_dev.
+
+    Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+    Message-Id: <20220722115309.82746-3-lingshan.zhu@intel.com>
+    Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+Before this commit. adapter was allocated/freed in device_add/del
+which should be fine.
+
+Can we go back to doing things that way?
+
+Thanks
+
+> Zhu Lingshan (12):
+>   vDPA/ifcvf: decouple hw features manipulators from the adapter
+>   vDPA/ifcvf: decouple config space ops from the adapter
+>   vDPA/ifcvf: alloc the mgmt_dev before the adapter
+>   vDPA/ifcvf: decouple vq IRQ releasers from the adapter
+>   vDPA/ifcvf: decouple config IRQ releaser from the adapter
+>   vDPA/ifcvf: decouple vq irq requester from the adapter
+>   vDPA/ifcvf: decouple config/dev IRQ requester and vectors allocator
+>     from the adapter
+>   vDPA/ifcvf: ifcvf_request_irq works on ifcvf_hw
+>   vDPA/ifcvf: manage ifcvf_hw in the mgmt_dev
+>   vDPA/ifcvf: allocate the adapter in dev_add()
+>   vDPA/ifcvf: retire ifcvf_private_to_vf
+>   vDPA/ifcvf: implement features provisioning
+>
+>  drivers/vdpa/ifcvf/ifcvf_base.c |  32 ++-----
+>  drivers/vdpa/ifcvf/ifcvf_base.h |  10 +-
+>  drivers/vdpa/ifcvf/ifcvf_main.c | 162 +++++++++++++++-----------------
+>  3 files changed, 91 insertions(+), 113 deletions(-)
+>
+> --
+> 2.31.1
+>
 
