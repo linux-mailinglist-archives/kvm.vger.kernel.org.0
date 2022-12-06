@@ -2,123 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 628A3643A5B
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 01:41:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C02F6643A83
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 02:06:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232078AbiLFAlR convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 5 Dec 2022 19:41:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50740 "EHLO
+        id S232406AbiLFBGR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Dec 2022 20:06:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233241AbiLFAlA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Dec 2022 19:41:00 -0500
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01EF49594;
-        Mon,  5 Dec 2022 16:40:00 -0800 (PST)
-Received: from ip5b412258.dynamic.kabel-deutschland.de ([91.65.34.88] helo=diego.localnet)
-        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <heiko@sntech.de>)
-        id 1p2Lzz-0007ay-NO; Tue, 06 Dec 2022 01:39:51 +0100
-From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-To:     Conor Dooley <conor@kernel.org>
-Cc:     Jisheng Zhang <jszhang@kernel.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 01/13] riscv: fix jal offsets in patched alternatives
-Date:   Tue, 06 Dec 2022 01:39:50 +0100
-Message-ID: <12207576.O9o76ZdvQC@diego>
-In-Reply-To: <Y45LRu0Gvrurm5Rh@spud>
-References: <20221204174632.3677-1-jszhang@kernel.org> <10190559.nUPlyArG6x@diego> <Y45LRu0Gvrurm5Rh@spud>
+        with ESMTP id S231722AbiLFBGQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Dec 2022 20:06:16 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B816EB7ED
+        for <kvm@vger.kernel.org>; Mon,  5 Dec 2022 17:06:14 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id s196so12026988pgs.3
+        for <kvm@vger.kernel.org>; Mon, 05 Dec 2022 17:06:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sjRGBzzky7GEdbHMIaj50mNITkjhMUtLATUmInnNUXI=;
+        b=ZjTFVPb7C8TuejUqaxGN306ZgZFkObjgkZ2f3XHO14MbszUbIC221sxIgY4igZa8aC
+         p/ZCzaYZm0psbuBUTTXyDXT+/0o4fthyEB+eQuW6FtPp36c0l9uECEFjETRnZAKQcaLT
+         NoAFop2fOTbAb/ZggUIuqEpOim8ziWpPe65DeXJjyuVLkD8c71QATXqT0mliuCwNbsMO
+         9lWjndM14dWrGvF6Tga7a3blBCYQA6qOrLGX+mRXnztk8ZYs9/VBdSFoj+/hZiJBQFdS
+         awy4zY2OVMl17LQwFPLbGLvFgnTB+E81ISfekjaWuqFzlOsYY87ZNReEZNx8EDfDLRaG
+         PemQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sjRGBzzky7GEdbHMIaj50mNITkjhMUtLATUmInnNUXI=;
+        b=ikoXWyNdp+txrkKPG120NDlGBW9c5USMUMx6gGCmQHF/IEq2Z/srPVycG3VV0cwuWp
+         psIjepOynGyG8MsFf1PEABd0qJ7Gj9sjp+HKYrK6uNup6jZVrGA5+/7eJydPwJzTh43N
+         SJ4yLA+qiIJSBvU7shX46ps2bsi6npI5EkvqIYAq8AVfLzbDdlak04rdod7QvHndXEPd
+         pFPycMQAGdBqwZX9MX26va5i6jUsguMR7JF5ayNRTmpSMJ85TKSOsMCJ+TPGvTXeZ4yh
+         wW0PLIeBH/LgHT+TejHZooery70ZtP22pHLq+bnUAiWWhfIecvUH7XpINfCV2pPt1zb+
+         B75Q==
+X-Gm-Message-State: ANoB5pnfvU9rE4+KEnxYgB8OF/r1jp3FAAbnlHtNEw3EMjVeqM2EdjFD
+        aaUBqhgWMeidngn0j8GMVsoW4g==
+X-Google-Smtp-Source: AA0mqf6kk3lrzdJqgI08MzPjoWZfxCYTogxk+SRbtpdnkGhILnApvwYkdESzZOjTKi1rpcGHPU/K5g==
+X-Received: by 2002:a62:687:0:b0:56e:924e:ee22 with SMTP id 129-20020a620687000000b0056e924eee22mr67478063pfg.34.1670288773908;
+        Mon, 05 Dec 2022 17:06:13 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 24-20020a630d58000000b0045751ef6423sm8708405pgn.87.2022.12.05.17.06.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Dec 2022 17:06:12 -0800 (PST)
+Date:   Tue, 6 Dec 2022 01:06:09 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     James Houghton <jthoughton@google.com>
+Cc:     David Matlack <dmatlack@google.com>, Peter Xu <peterx@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Linux MM <linux-mm@kvack.org>, kvm <kvm@vger.kernel.org>,
+        chao.p.peng@linux.intel.com
+Subject: Re: [RFC] Improving userfaultfd scalability for live migration
+Message-ID: <Y46VgQRU+do50iuv@google.com>
+References: <CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com>
+ <Y4qgampvx4lrHDXt@google.com>
+ <Y44NylxprhPn6AoN@x1n>
+ <CALzav=d=N7teRvjQZ1p0fs6i9hjmH7eVppJLMh_Go4TteQqqwg@mail.gmail.com>
+ <Y442dPwu2L6g8zAo@google.com>
+ <CADrL8HV_8=ssHSumpQX5bVm2h2J01swdB=+at8=xLr+KtW79MQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Type: text/plain; charset="iso-8859-1"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_PASS,
-        T_SPF_HELO_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADrL8HV_8=ssHSumpQX5bVm2h2J01swdB=+at8=xLr+KtW79MQ@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am Montag, 5. Dezember 2022, 20:49:26 CET schrieb Conor Dooley:
-> On Mon, Dec 05, 2022 at 07:49:01PM +0100, Heiko Stübner wrote:
-> > Am Montag, 5. Dezember 2022, 19:36:45 CET schrieb Conor Dooley:
-> > > Heiko, Jisheng,
-> > > On Mon, Dec 05, 2022 at 11:40:44PM +0800, Jisheng Zhang wrote:
-> > > > Yesterday, I also wanted to unify the two instruction fix into
-> > > > one. But that would need to roll back the
-> > > > riscv_alternative_fix_auipc_jalr() to your v1 version. And IMHO,
-> > > > it's better if you can split the Zbb string optimizations series
-> > > > into two: one for alternative improvements, another for Zbb. Then
-> > > > we may get the alternative improvements and this inst extension
-> > > > series merged in v6.2-rc1.
-> > > 
-> > > Heiko, perhaps you can correct me here:
-> > > 
-> > > Last Wednesday you & Palmer agreed that it was too late in the cycle to
-> > > apply any of the stuff touching alternatives?
-> > > If I do recall correctly, gives plenty of time to sort out any
-> > > interdependent changes here.
-> > > 
-> > > Could easily be misremembering, wouldn't be the first time!
-> > 
-> > You slightly misremembered, but are still correct with the above ;-) .
-> > 
-> > I.e. what we talked about was stuff for fixes for 6.1-rc, were Palmers
-> > wisely wanted to limit additions to really easy fixes for the remaining
-> > last rc, to not upset any existing boards.
+On Mon, Dec 05, 2022, James Houghton wrote:
+> On Mon, Dec 5, 2022 at 1:20 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Mon, Dec 05, 2022, David Matlack wrote:
+> > > On Mon, Dec 5, 2022 at 7:30 AM Peter Xu <peterx@redhat.com> wrote:
+> > > > > > == Getting the faulting GPA to userspace ==
+> > > > > > KVM_EXIT_MEMORY_FAULT was introduced recently [1] (not yet merged),
+> > > > > > and it provides the main functionality we need. We can extend it
+> > > > > > easily to support our use case here, and I think we have at least two
+> > > > > > options:
+> > > > > > - Introduce something like KVM_CAP_MEM_FAULT_REPORTING, which causes
+> > > > > > KVM_RUN to exit with exit reason KVM_EXIT_MEMORY_FAULT when it would
+> > > > > > otherwise just return -EFAULT (i.e., when kvm_handle_bad_page returns
+> > > > > > -EFAULT).
+> > > > > > - We're already introducing a new CAP, so just tie the above behavior
+> > > > > > to whether or not one of the CAPs (below) is being used.
+> > > > >
+> > > > > We might even be able to get away with a third option: unconditionally return
+> > > > > KVM_EXIT_MEMORY_FAULT instead of -EFAULT when the error occurs when accessing
+> > > > > guest memory.
 > 
-> Ahh right. I was 50-50 on whether something like that was said so at
-> least I am not going crazy.
-> 
-> > But you are still correct that we also shouldn't target the 6.2 merge window
-> > anymore :-) .
-> > 
-> > We're after -rc8 now (which is in itself uncommon) and in his -rc7
-> > announcement [0], Linus stated
-> > 
-> > "[...] the usual rule is that things that I get sent for the
-> > merge window should have been all ready _before_ the merge window
-> > opened. But with the merge window happening largely during the holiday
-> > season, I'll just be enforcing that pretty strictly."
-> 
-> Yah, of all the windows to land patchsets that are being re-spun a few
-> days before it opens this probably isn't the best one to pick!
-> 
-> > That means new stuff should be reviewed and in linux-next _way before_ the
-> > merge window opens next weekend. Taking into account that people need
-> > to review stuff (and maybe the series needing another round), I really don't
-> > see this happening this week and everything else will get us shouted at
-> > from atop a christmas tree ;-) .
-> > 
-> > That's the reason most maintainer-trees stop accepting stuff after -rc7
-> 
-> Aye, in RISC-V land maybe we will get there one day :)
-> 
-> For the original question though, breaking them up into 3 or 4 smaller
-> bits that could get applied on their own is probably a good idea?
-> 
-> Between yourselves, Drew and Prabhakar there's a couple series touching
-> the same bits. Certainly don't want to seem like I am speaking for the
-> Higher Powers here, but some sort of logical ordering would probably be
-> a good idea so as not to hold each other up?
-> The non-string bit of your series has been fairly well reviewed & would,
-> in theory, be mergeable once the tree re-opens? Timing aside, Jisheng's
-> idea seems like a good one, no?
+> Wouldn't we need a new CAP for this?
 
-yeah, I had that same thought over the weekend - with the generic
-part being pretty good in the review and only the string part needing
-more work and thus ideally splitting the series [0] .
+Maybe?  I did say "might" :-)  -EFAULT is sooo useless for userspace in these
+cases that there's a chance we can get away with an unconditional change.  Probably
+not worth the risk of breaking userspace though as KVM will likely end up with a
+helper to fill in the exit info.
 
-Jisheng's series just made that even more important to do :-)
+> > > > > diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
+> > > > > index 07c81ab3fd4d..7f66b56dd6e7 100644
+> > > > > --- a/fs/userfaultfd.c
+> > > > > +++ b/fs/userfaultfd.c
+> > > > > @@ -394,7 +394,7 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
+> > > > >          * shmem_vm_ops->fault method is invoked even during
+> > > > >          * coredumping without mmap_lock and it ends up here.
+> > > > >          */
+> > > > > -       if (current->flags & (PF_EXITING|PF_DUMPCORE))
+> > > > > +       if (current->flags & (PF_EXITING|PF_DUMPCORE|PF_NO_UFFD_WAIT))
+> > > > >                 goto out;
+> > > >
+> > > > I'll have a closer read on the nested part, but note that this path already
+> > > > has the mmap lock then it invalidates the goal if we want to avoid taking
+> > > > it from the first place, or maybe we don't care?
+> 
+> Not taking the mmap lock would be helpful, but we still have to take
+> it in UFFDIO_CONTINUE, so it's ok if we have to still take it here.
 
+IIUC, Peter is suggesting that the kernel not even get to the point where UFFD
+is involved.  The "fault" would get propagated to userspace by KVM, userspace
+fixes the fault (gets the page from the source, does MADV_POPULATE_WRITE), and
+resumes the vCPU.
 
-Heiko
+> The main goal is to avoid the locks in the userfaultfd wait_queues. If
+> we could completely avoid taking the mmap lock for reading in the
+> common post-copy case, we would avoid potential latency spikes if
+> someone (e.g. khugepaged) came around and grabbed the mmap lock for
+> writing.
+> 
+> It seems pretty difficult to make UFFDIO_CONTINUE *not* take the mmap
+> lock for reading, but I suppose it could be done with something like
+> the per-VMA lock work [2]. If we could avoid taking the lock in
+> UFFDIO_CONTINUE, then it seems plausible that we could avoid taking it
+> in slow GUP too. So really whether or not we are taking the mmap lock
+> (for reading) in the mem fault path isn't a huge deal by itself.
 
+...
 
+> > > I don't know what userspace would do in those situations to make forward progress.
+> >
+> > Access the page from userspace?  E.g. a "LOCK AND -1" would resolve read and write
+> > faults without modifying guest memory.
+> >
+> > That won't work for guests backed by "restricted mem", a.k.a. UPM guests, but
+> > restricted mem really should be able to prevent those types of faults in the first
+> > place.  SEV guests are the one case I can think of where that approach won't work,
+> > since writes will corrupt the guest.  SEV guests can likely be special cased though.
+> 
+> As I mentioned in the original email, I think MADV_POPULATE_WRITE
+> would work here (Peter suggested this to me last week, thanks Peter!).
+> It would basically call slow GUP for us. So instead of hva_to_pfn_fast
+> (fails) -> hva_to_pfn_slow -> slow GUP, we do hva_to_pfn_fast (fails)
+> -> exit to userspace -> MADV_POPULATE_WRITE (-> slow GUP) -> KVM_RUN
+> -> hva_to_pfn_fast (succeeds).a
+
+Ah, nice.  Missed that (obviously).
