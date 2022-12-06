@@ -2,289 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C0A66444A8
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 14:34:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3B366444B5
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 14:36:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234420AbiLFNel (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 08:34:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36370 "EHLO
+        id S230313AbiLFNgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 08:36:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232676AbiLFNek (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 08:34:40 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D60EEBC36;
-        Tue,  6 Dec 2022 05:34:36 -0800 (PST)
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 79BDE1FE58;
-        Tue,  6 Dec 2022 13:34:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1670333675; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dRjMqe9XUfWybRrbUF7GOm/XPQRxXJ5e2gntwceUOoI=;
-        b=rMUnPAsfEpWIJsbRvlnc4Kq8LUTLvMgy4L7RRJsI38/Pmp/I/IQPIER3EVlgM35dwn6gLF
-        9ZOffk1YPWciOp0dX967xPXIahIWRQ/5YzUUD9f2frz4WDMV5fLhJNjg4n1USKz1p0k6RD
-        nGflIZSZE9DevBpSu3wVbSjTUepE5JY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1670333675;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dRjMqe9XUfWybRrbUF7GOm/XPQRxXJ5e2gntwceUOoI=;
-        b=bYBAhVZ4hM49gizquEVGwEMgfkUk376WJJmV6+Gbni2jnjdakO1jwryltaQqbVYP29g2vR
-        iDS88CFVOgK4GaAA==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 82E5D13326;
-        Tue,  6 Dec 2022 13:34:34 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id /kz2H+pEj2MYBwAAGKfGzw
-        (envelope-from <farosas@suse.de>); Tue, 06 Dec 2022 13:34:34 +0000
-From:   Fabiano Rosas <farosas@suse.de>
-To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
-In-Reply-To: <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
-Date:   Tue, 06 Dec 2022 10:34:32 -0300
-Message-ID: <877cz4ac5z.fsf@suse.de>
+        with ESMTP id S232490AbiLFNgM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 08:36:12 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2287B25EB2
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 05:36:12 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B6BxfER026167;
+        Tue, 6 Dec 2022 13:36:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=Vs6aG2t3dHz0F0i1JAmmTMOaG9kc9ITMFfrriJqGHxQ=;
+ b=V4CNDlzRUF/DOXCA7BAkk17ImYlIBHOx8iKX67D7yr5CLL7nf61npHv1c4wynln/2yNZ
+ +b7q9KnNElOtAd9fkGnjb4tjRJuypBy5JmQx2swNeRfpB3F7B9z+kxTGQ8GzwZOgSpT+
+ M7kY+YcZQV4clCPN8AvpwsbXToUS09e1tTxofbnRcPHW5pSZS+SSZOWTkb34qoxuDSJt
+ pgejjKhu6UwMdmxX6zjQRrYRQzXn6Fb5FjrypaaDgbIkyChjuzMjQNkZmMFQOnzZkRCZ
+ 2KF0ueZjKj5aTcEzS/TAcJEKqKHx0afG3x4nEShz8QX28t3ukD31C7QZEaCPlyV4YVE9 dA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m8g4kmc1a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Dec 2022 13:36:00 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B6DGMkt017483;
+        Tue, 6 Dec 2022 13:35:59 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m8g4kmc0k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Dec 2022 13:35:59 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2B69TMgO008321;
+        Tue, 6 Dec 2022 13:35:57 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3m9m5y1f84-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Dec 2022 13:35:57 +0000
+Received: from d06av21.portsmouth.uk.ibm.com ([9.149.105.232])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B6DZrAN13238572
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 6 Dec 2022 13:35:53 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 455815204F;
+        Tue,  6 Dec 2022 13:35:53 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.46.71])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6E24C5204E;
+        Tue,  6 Dec 2022 13:35:52 +0000 (GMT)
+Message-ID: <3f6f1ab828c9608fabf7ad855098cd6cae1874c4.camel@linux.ibm.com>
+Subject: Re: [PATCH v12 1/7] s390x/cpu topology: Creating CPU topology device
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Tue, 06 Dec 2022 14:35:52 +0100
+In-Reply-To: <cb4abea1-b585-2753-12e9-6b75999d7d2e@linux.ibm.com>
+References: <20221129174206.84882-1-pmorel@linux.ibm.com>
+         <20221129174206.84882-2-pmorel@linux.ibm.com>
+         <92e30cf1f091329b2076195e9c159be16c13f7f9.camel@linux.ibm.com>
+         <cb4abea1-b585-2753-12e9-6b75999d7d2e@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.1 (3.46.1-1.fc37) 
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: m_7BTofUSoGef7PC6vn5nhbNFCoDNOOP
+X-Proofpoint-ORIG-GUID: 4wXaBQXyrC6rd_u0cLcSnIImu9i8ztct
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-06_08,2022-12-06_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ lowpriorityscore=0 adultscore=0 phishscore=0 priorityscore=1501
+ impostorscore=0 spamscore=0 malwarescore=0 clxscore=1015 suspectscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2212060110
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Chao Peng <chao.p.peng@linux.intel.com> writes:
+On Tue, 2022-12-06 at 11:32 +0100, Pierre Morel wrote:
+>=20
+> On 12/6/22 10:31, Janis Schoetterl-Glausch wrote:
+> > On Tue, 2022-11-29 at 18:42 +0100, Pierre Morel wrote:
+> > > We will need a Topology device to transfer the topology
+> > > during migration and to implement machine reset.
+> > >=20
+> > > The device creation is fenced by s390_has_topology().
+> > >=20
+> > > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> > > ---
+> > >   include/hw/s390x/cpu-topology.h    | 44 +++++++++++++++
+> > >   include/hw/s390x/s390-virtio-ccw.h |  1 +
+> > >   hw/s390x/cpu-topology.c            | 87 +++++++++++++++++++++++++++=
++++
+> > >   hw/s390x/s390-virtio-ccw.c         | 25 +++++++++
+> > >   hw/s390x/meson.build               |  1 +
+> > >   5 files changed, 158 insertions(+)
+> > >   create mode 100644 include/hw/s390x/cpu-topology.h
+> > >   create mode 100644 hw/s390x/cpu-topology.c
+> > >=20
+> > [...]
+> >=20
+> > > diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s3=
+90-virtio-ccw.h
+> > > index 9bba21a916..47ce0aa6fa 100644
+> > > --- a/include/hw/s390x/s390-virtio-ccw.h
+> > > +++ b/include/hw/s390x/s390-virtio-ccw.h
+> > > @@ -28,6 +28,7 @@ struct S390CcwMachineState {
+> > >       bool dea_key_wrap;
+> > >       bool pv;
+> > >       uint8_t loadparm[8];
+> > > +    DeviceState *topology;
+> >=20
+> > Why is this a DeviceState, not S390Topology?
+> > It *has* to be a S390Topology, right? Since you cast it to one in patch=
+ 2.
+>=20
+> Yes, currently it is the S390Topology.
+> The idea of Cedric was to have something more generic for future use.
 
-> In confidential computing usages, whether a page is private or shared is
-> necessary information for KVM to perform operations like page fault
-> handling, page zapping etc. There are other potential use cases for
-> per-page memory attributes, e.g. to make memory read-only (or no-exec,
-> or exec-only, etc.) without having to modify memslots.
->
-> Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
-> userspace to operate on the per-page memory attributes.
->   - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
->     a guest memory range.
->   - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
->     memory attributes.
->
-> KVM internally uses xarray to store the per-page memory attributes.
->
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com/
-> ---
->  Documentation/virt/kvm/api.rst | 63 ++++++++++++++++++++++++++++
->  arch/x86/kvm/Kconfig           |  1 +
->  include/linux/kvm_host.h       |  3 ++
->  include/uapi/linux/kvm.h       | 17 ++++++++
->  virt/kvm/Kconfig               |  3 ++
->  virt/kvm/kvm_main.c            | 76 ++++++++++++++++++++++++++++++++++
->  6 files changed, 163 insertions(+)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 5617bc4f899f..bb2f709c0900 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -5952,6 +5952,59 @@ delivery must be provided via the "reg_aen" struct.
->  The "pad" and "reserved" fields may be used for future extensions and should be
->  set to 0s by userspace.
->  
-> +4.138 KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES
-> +-----------------------------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: vm ioctl
-> +:Parameters: u64 memory attributes bitmask(out)
-> +:Returns: 0 on success, <0 on error
-> +
-> +Returns supported memory attributes bitmask. Supported memory attributes will
-> +have the corresponding bits set in u64 memory attributes bitmask.
-> +
-> +The following memory attributes are defined::
-> +
-> +  #define KVM_MEMORY_ATTRIBUTE_READ              (1ULL << 0)
-> +  #define KVM_MEMORY_ATTRIBUTE_WRITE             (1ULL << 1)
-> +  #define KVM_MEMORY_ATTRIBUTE_EXECUTE           (1ULL << 2)
-> +  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-> +
-> +4.139 KVM_SET_MEMORY_ATTRIBUTES
-> +-----------------------------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: vm ioctl
-> +:Parameters: struct kvm_memory_attributes(in/out)
-> +:Returns: 0 on success, <0 on error
-> +
-> +Sets memory attributes for pages in a guest memory range. Parameters are
-> +specified via the following structure::
-> +
-> +  struct kvm_memory_attributes {
-> +	__u64 address;
-> +	__u64 size;
-> +	__u64 attributes;
-> +	__u64 flags;
-> +  };
-> +
-> +The user sets the per-page memory attributes to a guest memory range indicated
-> +by address/size, and in return KVM adjusts address and size to reflect the
-> +actual pages of the memory range have been successfully set to the attributes.
+But it still needs to be a S390Topology otherwise you cannot cast it to one=
+, can you?
+>=20
+> >=20
+> > >   };
+> > >  =20
+> > >   struct S390CcwMachineClass {
+> > > diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> > > new file mode 100644
+> > > index 0000000000..bbf97cd66a
+> > > --- /dev/null
+> > > +++ b/hw/s390x/cpu-topology.c
+> > >=20
+> > [...]
+> > >  =20
+> > > +static DeviceState *s390_init_topology(MachineState *machine, Error =
+**errp)
+> > > +{
+> > > +    DeviceState *dev;
+> > > +
+> > > +    dev =3D qdev_new(TYPE_S390_CPU_TOPOLOGY);
+> > > +
+> > > +    object_property_add_child(&machine->parent_obj,
+> > > +                              TYPE_S390_CPU_TOPOLOGY, OBJECT(dev));
+> >=20
+> > Why set this property, and why on the machine parent?
+>=20
+> For what I understood setting the num_cores and num_sockets as=20
+> properties of the CPU Topology object allows to have them better=20
+> integrated in the QEMU object framework.
 
-This wording could cause some confusion, what about a simpler:
+That I understand.
+>=20
+> The topology is added to the S390CcwmachineState, it is the parent of=20
+> the machine.
 
-"reflect the range of pages that had its attributes successfully set"
+But why? And is it added to the S390CcwMachineState, or its parent?
+>=20
+>=20
+> >=20
+> > > +    object_property_set_int(OBJECT(dev), "num-cores",
+> > > +                            machine->smp.cores * machine->smp.thread=
+s, errp);
+> > > +    object_property_set_int(OBJECT(dev), "num-sockets",
+> > > +                            machine->smp.sockets, errp);
+> > > +
+> > > +    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), errp);
+> >=20
+> > I must admit that I haven't fully grokked qemu's memory management yet.
+> > Is the topology devices now owned by the sysbus?
+>=20
+> Yes it is so we see it on the qtree with its properties.
+>=20
+>=20
+> > If so, is it fine to have a pointer to it S390CcwMachineState?
+>=20
+> Why not?
 
-> +If the call returns 0, "address" is updated to the last successful address + 1
-> +and "size" is updated to the remaining address size that has not been set
-> +successfully.
+If it's owned by the sysbus and the object is not explicitly referenced
+for the pointer, it might be deallocated and then you'd have a dangling poi=
+nter.
 
-"address + 1 page" or "subsequent page" perhaps.
+> It seems logical to me that the sysbus belong to the virtual machine.
+> But sometime the way of QEMU are not very transparent for me :)
+> so I can be wrong.
+>=20
+> Regards,
+> Pierre
+>=20
+> > > +
+> > > +    return dev;
+> > > +}
+> > > +
+> > [...]
+>=20
 
-In fact, wouldn't this all become simpler if size were number of pages instead?
-
-> The user should check the return value as well as the size to
-> +decide if the operation succeeded for the whole range or not. The user may want
-> +to retry the operation with the returned address/size if the previous range was
-> +partially successful.
-> +
-> +Both address and size should be page aligned and the supported attributes can be
-> +retrieved with KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES.
-> +
-> +The "flags" field may be used for future extensions and should be set to 0s.
-> +
-
-...
-
-> +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
-> +					   struct kvm_memory_attributes *attrs)
-> +{
-> +	gfn_t start, end;
-> +	unsigned long i;
-> +	void *entry;
-> +	u64 supported_attrs = kvm_supported_mem_attributes(kvm);
-> +
-> +	/* flags is currently not used. */
-> +	if (attrs->flags)
-> +		return -EINVAL;
-> +	if (attrs->attributes & ~supported_attrs)
-> +		return -EINVAL;
-> +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
-> +		return -EINVAL;
-> +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
-> +		return -EINVAL;
-> +
-> +	start = attrs->address >> PAGE_SHIFT;
-> +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
-
-Here PAGE_SIZE and -1 cancel out.
-
-Consider using gpa_to_gfn as well.
-
-> +
-> +	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
-> +
-> +	mutex_lock(&kvm->lock);
-> +	for (i = start; i < end; i++)
-> +		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
-> +				    GFP_KERNEL_ACCOUNT)))
-> +			break;
-> +	mutex_unlock(&kvm->lock);
-> +
-> +	attrs->address = i << PAGE_SHIFT;
-> +	attrs->size = (end - i) << PAGE_SHIFT;
-> +
-> +	return 0;
-> +}
-> +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
-> +
->  struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn)
->  {
->  	return __gfn_to_memslot(kvm_memslots(kvm), gfn);
-> @@ -4459,6 +4508,9 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
->  #ifdef CONFIG_HAVE_KVM_MSI
->  	case KVM_CAP_SIGNAL_MSI:
->  #endif
-> +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
-> +	case KVM_CAP_MEMORY_ATTRIBUTES:
-> +#endif
->  #ifdef CONFIG_HAVE_KVM_IRQFD
->  	case KVM_CAP_IRQFD:
->  	case KVM_CAP_IRQFD_RESAMPLE:
-> @@ -4804,6 +4856,30 @@ static long kvm_vm_ioctl(struct file *filp,
->  		break;
->  	}
->  #endif /* CONFIG_HAVE_KVM_IRQ_ROUTING */
-> +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
-> +	case KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES: {
-> +		u64 attrs = kvm_supported_mem_attributes(kvm);
-> +
-> +		r = -EFAULT;
-> +		if (copy_to_user(argp, &attrs, sizeof(attrs)))
-> +			goto out;
-> +		r = 0;
-> +		break;
-> +	}
-> +	case KVM_SET_MEMORY_ATTRIBUTES: {
-> +		struct kvm_memory_attributes attrs;
-> +
-> +		r = -EFAULT;
-> +		if (copy_from_user(&attrs, argp, sizeof(attrs)))
-> +			goto out;
-> +
-> +		r = kvm_vm_ioctl_set_mem_attributes(kvm, &attrs);
-> +
-> +		if (!r && copy_to_user(argp, &attrs, sizeof(attrs)))
-> +			r = -EFAULT;
-> +		break;
-> +	}
-> +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
->  	case KVM_CREATE_DEVICE: {
->  		struct kvm_create_device cd;
