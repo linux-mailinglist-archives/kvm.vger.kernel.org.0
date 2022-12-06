@@ -2,74 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4BC66444FF
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 14:54:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 421A7644514
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 14:57:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233661AbiLFNyJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 08:54:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46860 "EHLO
+        id S231756AbiLFN47 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 08:56:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230313AbiLFNyH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 08:54:07 -0500
+        with ESMTP id S234670AbiLFN4z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 08:56:55 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 959C32B600
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 05:53:09 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D89952CDC0
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 05:56:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670334788;
+        s=mimecast20190719; t=1670334961;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3ECE0g7YbfMnTJuWIRmn1xP32SqigQ6zugR1ek2C/cw=;
-        b=gIoK2Sv1XLB31lvryXFeBV7cwknc0iAyKipNJszmh/8dNcXZt4f7zrp+ryq7ou2OHmkWFV
-        XoiY8yj0SXZCSQ9vapiRIRQVPcjcvqd8Uibz5Qu81TV6Jq3IFMciEeqFUqnARoBlNSttMg
-        +2go88SA9PDQyS6eiqvpEwFYhYgoiE0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-376-c--faAUuPsyR3tMc_zsHAQ-1; Tue, 06 Dec 2022 08:53:07 -0500
-X-MC-Unique: c--faAUuPsyR3tMc_zsHAQ-1
-Received: by mail-wr1-f69.google.com with SMTP id v14-20020adf8b4e000000b0024174021277so3241793wra.13
-        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 05:53:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ECE0g7YbfMnTJuWIRmn1xP32SqigQ6zugR1ek2C/cw=;
-        b=fosnmcF+UEw5c07boV2OKowNRJ/ed+URhGdHuiZ6aACQF1cJqSPpL78yJbuojUabVl
-         KtUChndXAw+elkraZNpRwZ/WLnO7HTGZLV+x1r6l9l5eIX022nBXRxfkL1/gMHkG2IYI
-         p1JIbh+3QQx4MLqX31alYqRSRkofiuC+4GkOse85XwOvrnFElxjttY8OTCpqSDA2lzFY
-         UrE7DeWflVKOU7L9pxSQvAp8sBUYqCHGyo6vCPvox3SuKFLzqfIlsr35JSnHQ3PzLQmC
-         rqG/lk7m4Eqke3GTIxilwUlKJhnn4tLlXBlbPgfybBr5snZzGi3PoxxbBqhwrUGIyyjh
-         7U3Q==
-X-Gm-Message-State: ANoB5pnizjnRHKaZ9hoIvti0jSqp7V5h+CgwP6coa1NvebZiKrOflcOk
-        fZQ4RrbGxtP4rxNuhPqRYegAY7Ib93e7NCgQ8NR0opGhujyYKDNNPmqw4y4/IsaBxEOP5tSMo/Y
-        J6tvhYsTg/QWg
-X-Received: by 2002:a7b:c315:0:b0:3cf:ca62:7ab with SMTP id k21-20020a7bc315000000b003cfca6207abmr334258wmj.23.1670334786624;
-        Tue, 06 Dec 2022 05:53:06 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4Arxt6oofscVN8skgdjZ/sDcuxwWiozQstiNdWtSwlkiStCmejQeNBgbSlwRCno3PPgyy0+A==
-X-Received: by 2002:a7b:c315:0:b0:3cf:ca62:7ab with SMTP id k21-20020a7bc315000000b003cfca6207abmr334256wmj.23.1670334786383;
-        Tue, 06 Dec 2022 05:53:06 -0800 (PST)
-Received: from ovpn-194-152.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id j4-20020a05600c410400b003cfbbd54178sm2937311wmi.2.2022.12.06.05.53.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Dec 2022 05:53:05 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        coverity-bot <keescook@chromium.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: hyper-v: Fix 'using uninitialized value'
- Coverity warning
-In-Reply-To: <Y4odRLlFRj17tUNE@google.com>
-References: <20221202105856.434886-1-vkuznets@redhat.com>
- <Y4odRLlFRj17tUNE@google.com>
-Date:   Tue, 06 Dec 2022 14:53:04 +0100
-Message-ID: <87pmcwd4fz.fsf@ovpn-194-152.brq.redhat.com>
+        bh=4oz5S+plKf6L2SEwXLgW2hiN1Y4hoTJzX657+agsr4o=;
+        b=Gkr5DcGUPEzwTdauciwLU2HeGl1a16L4enEtfqauD4hxw7GJZLwLFj2YM8fTUn9TgXHthO
+        F21x5tYI6Y+4oDU9DIYrH29Dyw0/Sskl0jO+lChasjy+nsFPk/VUAZGl732+T8d3IJIQew
+        mCPDh/y6nXP+P3fSp/Kk9ukVu9vZn8g=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-672-MBcctp_aMqq4wOGqQO74jQ-1; Tue, 06 Dec 2022 08:55:58 -0500
+X-MC-Unique: MBcctp_aMqq4wOGqQO74jQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 20D12282382F;
+        Tue,  6 Dec 2022 13:55:58 +0000 (UTC)
+Received: from starship (unknown [10.35.206.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9FB324EA53;
+        Tue,  6 Dec 2022 13:55:54 +0000 (UTC)
+Message-ID: <82ff8b2d6e2036c3fab19e103f4b90144ba1176e.camel@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 01/27] x86: replace
+ irq_{enable|disable}() with sti()/cli()
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     Andrew Jones <drjones@redhat.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Cathy Avery <cavery@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Date:   Tue, 06 Dec 2022 15:55:52 +0200
+In-Reply-To: <332e7d94-4a3b-40d1-dc66-fa296e8d322e@redhat.com>
+References: <20221122161152.293072-1-mlevitsk@redhat.com>
+         <20221122161152.293072-2-mlevitsk@redhat.com>
+         <332e7d94-4a3b-40d1-dc66-fa296e8d322e@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -80,31 +72,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Thu, 2022-12-01 at 14:46 +0100, Emanuele Giuseppe Esposito wrote:
+> 
+> Am 22/11/2022 um 17:11 schrieb Maxim Levitsky:
+> > This removes a layer of indirection which is strictly
+> > speaking not needed since its x86 code anyway.
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  lib/x86/processor.h       | 19 +++++-----------
+> >  lib/x86/smp.c             |  2 +-
+> >  x86/apic.c                |  2 +-
+> >  x86/asyncpf.c             |  6 ++---
+> >  x86/eventinj.c            | 22 +++++++++---------
+> >  x86/hyperv_connections.c  |  2 +-
+> >  x86/hyperv_stimer.c       |  4 ++--
+> >  x86/hyperv_synic.c        |  6 ++---
+> >  x86/intel-iommu.c         |  2 +-
+> >  x86/ioapic.c              | 14 ++++++------
+> >  x86/pmu.c                 |  4 ++--
+> >  x86/svm.c                 |  4 ++--
+> >  x86/svm_tests.c           | 48 +++++++++++++++++++--------------------
+> >  x86/taskswitch2.c         |  4 ++--
+> >  x86/tscdeadline_latency.c |  4 ++--
+> >  x86/vmexit.c              | 18 +++++++--------
+> >  x86/vmx_tests.c           | 42 +++++++++++++++++-----------------
+> >  17 files changed, 98 insertions(+), 105 deletions(-)
+> > 
+> > diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+> > index 7a9e8c82..b89f6a7c 100644
+> > --- a/lib/x86/processor.h
+> > +++ b/lib/x86/processor.h
+> > @@ -653,11 +653,17 @@ static inline void pause(void)
+> >  	asm volatile ("pause");
+> >  }
+> >  
+> > +/* Disable interrupts as per x86 spec */
+> >  static inline void cli(void)
+> >  {
+> >  	asm volatile ("cli");
+> >  }
+> >  
+> > +/*
+> > + * Enable interrupts.
+> > + * Note that next instruction after sti will not have interrupts
+> > + * evaluated due to concept of 'interrupt shadow'
+> > + */
+> >  static inline void sti(void)
+> >  {
+> >  	asm volatile ("sti");
+> > @@ -732,19 +738,6 @@ static inline void wrtsc(u64 tsc)
+> >  	wrmsr(MSR_IA32_TSC, tsc);
+> >  }
+> >  
+> > -static inline void irq_disable(void)
+> > -{
+> > -	asm volatile("cli");
+> > -}
+> > -
+> > -/* Note that irq_enable() does not ensure an interrupt shadow due
+> > - * to the vagaries of compiler optimizations.  If you need the
+> > - * shadow, use a single asm with "sti" and the instruction after it.
+> Minor nitpick: instead of a new doc comment, why not use this same
+> above? Looks clearer to me.
+> 
+> Regardless,
+> Reviewed-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+> 
 
-> On Fri, Dec 02, 2022, Vitaly Kuznetsov wrote:
->> In kvm_hv_flush_tlb(), 'data_offset' and 'consumed_xmm_halves' variables
->> are used in a mutually exclusive way: in 'hc->fast' we count in 'XMM
->> halves' and increase 'data_offset' otherwise. Coverity discovered, that in
->> one case both variables are incremented unconditionally. This doesn't seem
->> to cause any issues as the only user of 'data_offset'/'consumed_xmm_halves'
->> data is kvm_hv_get_tlb_flush_entries() ->  kvm_hv_get_hc_data() which also
->> takes into account 'hc->fast' but is still worth fixing.
->
-> If those calls aren't inlined, then 32-bit Hyper-V will be "consuming" uninitialized
-> data when pushing parameters onto the stack.  It won't cause real problems, but
-> checkers might complain.
->
-> What about shoving this metadata into "struct kvm_hv_hcall" as a union?  That'd
-> help convey that the two are mutually exclusive, would provide a place to document
-> said exclusion, and would yield a nice cleanup too by eliminating multiple params
-> from various functions.
+I am not 100% sure what you mean.
+Note that cli() doesn't have the same interrupt window thing as sti().
 
-"struct kvm_hv_hcall" used to hold raw data from the guest and
-'consumed_xmm_halves'/ 'data_offset' are rather our implementation
-details, how we consume these data. I don't see why we can't re-purpose
-it a little bit to hold both, let me try that in v2.
-
--- 
-Vitaly
+Best regards,
+	Maxim Levitsky
 
