@@ -2,105 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36EF76449B7
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 17:50:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0DFB46449C4
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 17:55:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235660AbiLFQuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 11:50:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33170 "EHLO
+        id S235453AbiLFQzM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 11:55:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235708AbiLFQtk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 11:49:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43B281037
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 08:48:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670345309;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=EY22TUQQWLcxjDqZXv1ZQFqWQM2RSEk78RhFgF6fnNA=;
-        b=CyIk+nI3LIijqwfTIA5ruYfbyWjkVVhX56lS4ISGGuFuhzeco2LlLefp7psk6CftZU0zlC
-        nE4jxY0qPNBYbb1IdevzipGsw0xsm22+9bdfcop56B0dEKmoygyDStItNZ7xOsz2C1ODOI
-        gtkeCFfj2l7ywiLiQHB5n7VuYiJf8pM=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-513-8wEqMsc6PbOCjf6-F68lkw-1; Tue, 06 Dec 2022 11:48:26 -0500
-X-MC-Unique: 8wEqMsc6PbOCjf6-F68lkw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DA1D2381A723;
-        Tue,  6 Dec 2022 16:48:25 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BD1D040C6EC3;
-        Tue,  6 Dec 2022 16:48:25 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] Final KVM changes for Linux 6.1
-Date:   Tue,  6 Dec 2022 11:48:25 -0500
-Message-Id: <20221206164825.1758138-1-pbonzini@redhat.com>
+        with ESMTP id S231990AbiLFQzK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 11:55:10 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B9991FCC5;
+        Tue,  6 Dec 2022 08:55:09 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id B56DF68B05; Tue,  6 Dec 2022 17:55:03 +0100 (CET)
+Date:   Tue, 6 Dec 2022 17:55:03 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Christoph Hellwig <hch@lst.de>, Lei Rao <lei.rao@intel.com>,
+        kbusch@kernel.org, axboe@fb.com, kch@nvidia.com, sagi@grimberg.me,
+        alex.williamson@redhat.com, cohuck@redhat.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        mjrosato@linux.ibm.com, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, kvm@vger.kernel.org,
+        eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
+        Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com
+Subject: Re: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to
+ issue admin commands for VF driver.
+Message-ID: <20221206165503.GA8677@lst.de>
+References: <20221206055816.292304-1-lei.rao@intel.com> <20221206055816.292304-2-lei.rao@intel.com> <20221206061940.GA6595@lst.de> <Y49HKHP9NrId39iH@ziepe.ca> <20221206135810.GA27689@lst.de> <Y49eObpI7QoSnugu@ziepe.ca> <20221206153811.GB2266@lst.de> <Y49k++D3i8DfLOLL@ziepe.ca>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y49k++D3i8DfLOLL@ziepe.ca>
+User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Tue, Dec 06, 2022 at 11:51:23AM -0400, Jason Gunthorpe wrote:
+> That is a big deviation from where VFIO is right now, the controlled
+> function is the one with the VFIO driver, it should be the one that
+> drives the migration uAPI components.
 
-The following changes since commit b7b275e60bcd5f89771e865a8239325f86d9927d:
+Well, that is one way to see it, but I think the more natural
+way to deal with it is to drive everyting from the controlling
+function, because that is by definition much more in control.
 
-  Linux 6.1-rc7 (2022-11-27 13:31:48 -0800)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 34e30ebbe48cc43c14276f863f0d2995c8f13186:
-
-  KVM: Document the interaction between KVM_CAP_HALT_POLL and halt_poll_ns (2022-12-02 13:20:30 -0500)
-
-Unless anything comes from the ARM side, this should be the last pull
-request for this release---and it's mostly documentation.
-
-Thanks,
-
-Paolo
-
-----------------------------------------------------------------
-* Document the interaction between KVM_CAP_HALT_POLL and halt_poll_ns
-
-* s390: fix multi-epoch extension in nested guests
-
-* x86: fix uninitialized variable on nested triple fault
-
-----------------------------------------------------------------
-David Matlack (2):
-      KVM: Move halt-polling documentation into common directory
-      KVM: Document the interaction between KVM_CAP_HALT_POLL and halt_poll_ns
-
-Paolo Bonzini (2):
-      Merge tag 'kvm-s390-master-6.1-2' of https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD
-      KVM: x86: fix uninitialized variable use on KVM_REQ_TRIPLE_FAULT
-
-Thomas Huth (1):
-      KVM: s390: vsie: Fix the initialization of the epoch extension (epdx) field
-
- Documentation/virt/kvm/api.rst                    | 15 +++++++--------
- Documentation/virt/kvm/{x86 => }/halt-polling.rst | 13 +++++++++++++
- Documentation/virt/kvm/index.rst                  |  1 +
- Documentation/virt/kvm/x86/index.rst              |  1 -
- arch/s390/kvm/vsie.c                              |  4 +++-
- arch/x86/kvm/x86.c                                |  2 +-
- 6 files changed, 25 insertions(+), 11 deletions(-)
- rename Documentation/virt/kvm/{x86 => }/halt-polling.rst (92%)
-
+More importantly any sane design will have easy ways to list and
+manipulate all the controlled functions from the controlling
+functions, while getting from the controlled function to the
+controlling one is extremely awkward, as anything that can be
+used for that is by definition and information leak.  It seems
+mlx5 just gets away with that by saying controlled functions are
+always VFs, and the controlling function is a PF, but that will
+break down very easily, especially once you want to nest the
+controlling scheme (and yes, I'm not making this up, as the
+nesting scheme is being proposed for nvme privately).
