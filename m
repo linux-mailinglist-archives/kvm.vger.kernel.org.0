@@ -2,246 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23A29644E29
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 22:44:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D92AB644E32
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 22:50:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229724AbiLFVoF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 16:44:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40230 "EHLO
+        id S229744AbiLFVuJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 16:50:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229564AbiLFVoE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 16:44:04 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A828BE7;
-        Tue,  6 Dec 2022 13:44:02 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 795F0618C9;
-        Tue,  6 Dec 2022 21:44:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 351CAC433D7;
-        Tue,  6 Dec 2022 21:43:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670363041;
-        bh=hQJFrOi/riwxs9Q5lMZF7yhYqPIY/L8Z7et7euLwRMQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rFsRHJE2QieSENTNShtA8xr+u59axvZ7NnOk3RY9yQMOayaWZpptr3WVelO2Y461h
-         pc3BfKUDEHWU9kuF7HPNVFFkmcuY3VBPSDjcsyMdP9xmuNGbKLIHPV7p/3BhVAh2dW
-         4HziDxZX9PpijvGBhNIT39jawplVO7Y/esJFsQHizCyh7WnEKrvy5yfF0WIkmu06k9
-         QME+hd2y+t+7qth9IHTavEQK4FbUqOwNpxW0XRq3yauS9TBwrWE7FaFnjx7wgZUh7D
-         /5vk3EsOim7p2+ElkYXIP2UIJ1BEyNQlqd9T4Jd5WCCAUA6MluB6eOob81VceB8Duh
-         nt0b0UCdE8m1w==
-Date:   Tue, 6 Dec 2022 21:43:56 +0000
-From:   Conor Dooley <conor@kernel.org>
-To:     Jisheng Zhang <jszhang@kernel.org>
-Cc:     Guo Ren <guoren@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 09/13] riscv: switch to relative alternative entries
-Message-ID: <Y4+3nJ53nvmmc8+z@spud>
-References: <20221204174632.3677-1-jszhang@kernel.org>
- <20221204174632.3677-10-jszhang@kernel.org>
- <CAJF2gTRxm7LJFtups5fexJ5ishm9_j3e+yzfKv3nTtQqUtXPtA@mail.gmail.com>
- <Y44LuRcQYPnVnFje@xhacker>
- <CAJF2gTQ98fyTNc6d3PJrkMjUjUstN8s1FcRNyZQCLiN5CV5NCw@mail.gmail.com>
- <Y49WvYWIsFAIeabH@xhacker>
+        with ESMTP id S229728AbiLFVuH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 16:50:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEAF13E0A4
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 13:49:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670363352;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DGTEAbRK9dRUHgahifTbv1blBdUPytXFhdS0+7GmylE=;
+        b=jPWY3nYOkBvVytSgK9qCZ9Hc//zhuui43MlQdp+TFiGvwCQ+gvORFGeqIxPx27fYbrwjBf
+        PpCOExfSFS75hTxJJO4gtMHDD7vG9JOsxH5bWEV7q0xO7yZb17jXjxcDCLRUNzewnGs326
+        F4jNeHQSZVl453xYK0OvBxLSfdMR3Yg=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-336-sEy88xnmNiqbZhsBd-fOIg-1; Tue, 06 Dec 2022 16:49:11 -0500
+X-MC-Unique: sEy88xnmNiqbZhsBd-fOIg-1
+Received: by mail-io1-f71.google.com with SMTP id f23-20020a5d8157000000b006dfb209094fso12637033ioo.18
+        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 13:49:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DGTEAbRK9dRUHgahifTbv1blBdUPytXFhdS0+7GmylE=;
+        b=yfh6T+q65E75RMscVEXIiUtysC61HOnCE0gaISkWSSAB3+T9KQxnCodDePjzCgfGcP
+         H58kpqYw/rHSiY/IwoVxU50XVuRDqSCv5Xkg92Ebe3E2j1JFjauNIOFhroXEeXoibjF3
+         ZpSGHsbKzn+BLtFlIr+81MECY9iiUkDAjbIBr5H60Y0DiEPO6v6N8UKe5PP1DLMbLOF/
+         mXFVCHtsrhHnrw1uGjDEv3lH7XIbKnbelMsIQ42a+M+tcXgi8ZKhWG1Kj6c7e2uxs0o+
+         cEBjdSKl07w4n82RCBxQkoUWDf0mL68T7In4nAmuDGJqtpdN5RqiX3kVuP/KgjFOQGnT
+         A+yA==
+X-Gm-Message-State: ANoB5pkD34+Sv2fzopq9gdrj3uc5qFFPCt0NkMy5IabsBG3EyJYrdoRD
+        LjTHOKTHcKGiIJel/rtpGjEJp+B+KdRFGkcdc82cIko83/7AGhdE9idipAqwJIemhLCZGqVGQM2
+        Z9aquIf0xCU2+
+X-Received: by 2002:a02:6d6f:0:b0:375:c16b:7776 with SMTP id e47-20020a026d6f000000b00375c16b7776mr32596925jaf.54.1670363350456;
+        Tue, 06 Dec 2022 13:49:10 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4h8+gxaQRC9EfEEygqF4FQf03+JQR30Wq7HCz+CPqgvfMC5UJgpzZWSvmMg6mvSHoVMHs6Qw==
+X-Received: by 2002:a02:6d6f:0:b0:375:c16b:7776 with SMTP id e47-20020a026d6f000000b00375c16b7776mr32596909jaf.54.1670363350131;
+        Tue, 06 Dec 2022 13:49:10 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id z17-20020a056602081100b006ddd15ca0absm2631626iow.25.2022.12.06.13.49.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Dec 2022 13:49:09 -0800 (PST)
+Date:   Tue, 6 Dec 2022 14:49:07 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <jgg@nvidia.com>, <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
+        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
+        <shayd@nvidia.com>, <maorg@nvidia.com>, <avihaih@nvidia.com>,
+        <cohuck@redhat.com>, <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH V4 vfio 00/14] Add migration PRE_COPY support for mlx5
+ driver
+Message-ID: <20221206144907.25a08b52.alex.williamson@redhat.com>
+In-Reply-To: <20221206083438.37807-1-yishaih@nvidia.com>
+References: <20221206083438.37807-1-yishaih@nvidia.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="uWz0dNot0HPNalAT"
-Content-Disposition: inline
-In-Reply-To: <Y49WvYWIsFAIeabH@xhacker>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 6 Dec 2022 10:34:24 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
---uWz0dNot0HPNalAT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> This series adds migration PRE_COPY uAPIs and their implementation as part of
+> mlx5 driver.
+> 
+> The uAPIs follow some discussion that was done in the mailing list [1] in this
+> area.
+> 
+> By the time the patches were sent, there was no driver implementation for the
+> uAPIs, now we have it for mlx5 driver.
+> 
+> The optional PRE_COPY state opens the saving data transfer FD before reaching
+> STOP_COPY and allows the device to dirty track the internal state changes with
+> the general idea to reduce the volume of data transferred in the STOP_COPY
+> stage.
+> 
+> While in PRE_COPY the device remains RUNNING, but the saving FD is open.
+> 
+> A new ioctl VFIO_MIG_GET_PRECOPY_INFO is provided to allow userspace to query
+> the progress of the precopy operation in the driver with the idea it will judge
+> to move to STOP_COPY once the initial data set is transferred, and possibly
+> after the dirty size has shrunk appropriately.
+> 
+> User space can detect whether PRE_COPY is supported for a given device by
+> checking the VFIO_MIGRATION_PRE_COPY flag once using the
+> VFIO_DEVICE_FEATURE_MIGRATION ioctl.
+> 
+> Extra details exist as part of the specific uAPI patch from the series.
+> 
+> Finally, we come with mlx5 implementation based on its device specification for
+> PRE_COPY.
+> 
+> To support PRE_COPY, mlx5 driver is transferring multiple states (images) of
+> the device. e.g.: the source VF can save and transfer multiple states, and the
+> target VF will load them by that order.
+> 
+> The device is saving three kinds of states:
+> 1) Initial state - when the device moves to PRE_COPY state.
+> 2) Middle state - during PRE_COPY phase via VFIO_MIG_GET_PRECOPY_INFO,
+>                   can be multiple such states.
+> 3) Final state - when the device moves to STOP_COPY state.
+> 
+> After moving to PRE_COPY state, the user is holding the saving FD and should
+> use it for transferring the data from the source to the target while the VM is
+> still running. From user point of view, it's a stream of data, however, from
+> mlx5 driver point of view it includes multiple images/states. For that, it sets
+> some headers with metadata on the source to be parsed on the target.
+> 
+> At some point, user may switch the device state from PRE_COPY to STOP_COPY,
+> this will invoke saving of the final state.
+> 
+> As discussed earlier in the mailing list, the data that is returned as part of
+> PRE_COPY is not required to have any bearing relative to the data size
+> available during the STOP_COPY phase.
+> 
+> For this, we have the VFIO_DEVICE_FEATURE_MIG_DATA_SIZE option.
+> 
+> In mlx5 driver we could gain with this series about 20-30 percent improvement
+> in the downtime compared to the previous code when PRE_COPY wasn't supported.
+> 
+> The series includes some pre-patches to be ready for managing multiple images
+> then it comes with the PRE_COPY implementation itself.
+> 
+> The matching qemu changes can be previewed here [2].
+> 
+> They come on top of the v2 migration protocol patches that were sent already to
+> the mailing list.
+> 
+> [1] https://lore.kernel.org/kvm/20220302172903.1995-8-shameerali.kolothum.thodi@huawei.com/
+> [2] https://github.com/avihai1122/qemu/commits/mig_v2_precopy
+> 
+> Changes from V3: https://www.spinics.net/lists/kvm/msg297449.html
+> Patch #1:
+> - Add Acked-by: Leon Romanovsky.
+> Patch #10:
+> - Fix mlx5vf_precopy_ioctl() signature to return long instead of ssize_t
+>   as Alex pointed out.
+> 
+> Changes from V2: https://www.spinics.net/lists/kvm/msg297112.html
+> 
+> Patch #2:
+> - Add a note that the VFIO_MIG_GET_PRECOPY_INFO ioctl is mandatory when
+>   a driver claims to support VFIO_MIGRATION_PRE_COPY as was raised by
+>   Shameer Kolothum.
+> - Add Reviewed-by: Shameer Kolothum and Kevin Tian.
+> Patch #3:
+> - Add a comment in the code as suggested by Jason.
+> All:
+> - Add Reviewed-by: Jason Gunthorpe for the series.
+> 
+> Note:
+> As pointed out by Leon in the mailing list, no need for a PR for the
+> first patch of net/mlx5.
+> 
+> Changes from V1: https://www.spinics.net/lists/kvm/msg296475.html
+> 
+> Patch #2: Rephrase the 'initial_bytes' meaning as was suggested by Jason.
+> Patch #9: Fix to send header based on PRE_COPY support.
+> Patch #13: Fix some unwind flow to call complete().
+> 
+> Changes from V0: https://www.spinics.net/lists/kvm/msg294247.html
+> 
+> Drop the first 2 patches that Alex merged already.
+> Refactor mlx5 implementation based on Jason's comments on V0, it includes
+> the below:
+> * Refactor the PD usage to be aligned with the migration file life cycle.
+> * Refactor the MKEY usage to be aligned with the migration file life cycle.
+> * Refactor the migration file state.
+> * Use queue based data chunks to simplify the driver code.
+> * Use the FSM model on the target to simplify the driver code.
+> * Extend the driver pre_copy header for future use.
+> 
+> Yishai
+> 
+> Jason Gunthorpe (1):
+>   vfio: Extend the device migration protocol with PRE_COPY
+> 
+> Shay Drory (3):
+>   net/mlx5: Introduce ifc bits for pre_copy
+>   vfio/mlx5: Fallback to STOP_COPY upon specific PRE_COPY error
+>   vfio/mlx5: Enable MIGRATION_PRE_COPY flag
+> 
+> Yishai Hadas (10):
+>   vfio/mlx5: Enforce a single SAVE command at a time
+>   vfio/mlx5: Refactor PD usage
+>   vfio/mlx5: Refactor MKEY usage
+>   vfio/mlx5: Refactor migration file state
+>   vfio/mlx5: Refactor to use queue based data chunks
+>   vfio/mlx5: Introduce device transitions of PRE_COPY
+>   vfio/mlx5: Introduce SW headers for migration states
+>   vfio/mlx5: Introduce vfio precopy ioctl implementation
+>   vfio/mlx5: Consider temporary end of stream as part of PRE_COPY
+>   vfio/mlx5: Introduce multiple loads
+> 
+>  drivers/vfio/pci/mlx5/cmd.c   | 409 ++++++++++++++----
+>  drivers/vfio/pci/mlx5/cmd.h   |  96 ++++-
+>  drivers/vfio/pci/mlx5/main.c  | 752 ++++++++++++++++++++++++++++------
+>  drivers/vfio/vfio_main.c      |  74 +++-
+>  include/linux/mlx5/mlx5_ifc.h |  14 +-
+>  include/uapi/linux/vfio.h     | 123 +++++-
+>  6 files changed, 1248 insertions(+), 220 deletions(-)
 
-Hey Jisheng, Guo Ren,
+Applied to vfio next branch for v6.2.  Thanks,
 
-On Tue, Dec 06, 2022 at 10:50:37PM +0800, Jisheng Zhang wrote:
-> On Tue, Dec 06, 2022 at 12:34:40PM +0800, Guo Ren wrote:
-> > On Mon, Dec 5, 2022 at 11:28 PM Jisheng Zhang <jszhang@kernel.org> wrot=
-e:
-> > > On Mon, Dec 05, 2022 at 08:51:41AM +0800, Guo Ren wrote:
-> > > > On Mon, Dec 5, 2022 at 1:57 AM Jisheng Zhang <jszhang@kernel.org> w=
-rote:
-> > > > >
-> > > > > Instead of using absolute addresses for both the old instrucions =
-and
-> > > > > the alternative instructions, use offsets relative to the alt_ent=
-ry
-> > > > > values. So we can not only cut the size of the alternative entry,=
- but
+Alex
 
-"This not only cuts"
-
-> > > > > also meet the prerequisite for patching alternatives in the vDSO,
-> > > > > since absolute alternative entries are subject to dynamic relocat=
-ion,
-> > > > > which is incompatible with the vDSO building.
-
-I do this this is in the wrong order though, saving on size is
-secondary to enabling their use in the vdso?
-
-> > > > >
-> > > > > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> > > > > ---
-> > > > >  arch/riscv/errata/sifive/errata.c           |  4 +++-
-> > > > >  arch/riscv/errata/thead/errata.c            | 11 ++++++++---
-> > > > >  arch/riscv/include/asm/alternative-macros.h | 20 ++++++++++-----=
------
-> > > > >  arch/riscv/include/asm/alternative.h        | 12 ++++++------
-> > > > >  arch/riscv/kernel/cpufeature.c              | 13 ++++++-------
-> > > > >  5 files changed, 33 insertions(+), 27 deletions(-)
-> > > > >
-> > > > > diff --git a/arch/riscv/errata/sifive/errata.c b/arch/riscv/errat=
-a/sifive/errata.c
-> > > > > index 1031038423e7..0e537cdfd324 100644
-> > > > > --- a/arch/riscv/errata/sifive/errata.c
-> > > > > +++ b/arch/riscv/errata/sifive/errata.c
-> > > > > @@ -107,7 +107,9 @@ void __init_or_module sifive_errata_patch_fun=
-c(struct alt_entry *begin,
-> > > > >
-> > > > >                 tmp =3D (1U << alt->errata_id);
-> > > > >                 if (cpu_req_errata & tmp) {
-> > > > > -                       patch_text_nosync(alt->old_ptr, alt->alt_=
-ptr, alt->alt_len);
-> > > > > +                       patch_text_nosync((void *)&alt->old_offse=
-t + alt->old_offset,
-> > > > > +                                         (void *)&alt->alt_offse=
-t + alt->alt_offset,
-> > > >  (void *)&alt->alt_offset + alt->alt_offset. ??!!
-> > >
-> > > Hi Guo,
-> > >
-> > > what's the problem? I can't catch your meaning, could you please proi=
-de
-> > > more details?
-> > Can you explain why:
-> >=20
-> > alt->old_ptr =3D (void *)&alt->old_offset + alt->old_offset
->=20
-> Hi,
->=20
-> when constructing the alt entry, we save the offset in
-> then entry as below:
->=20
-> .long \oldptr - .
->=20
-> So we can restore the old_ptr by &alt->old_offset + alt->old_offset
-
-Please correct me if I have misunderstood, but for stuff like this I
-find it useful to kinda summarise a bit and figure out for myself what
-is going on..
-
-As things stand, we have absolute "locations" for the alternative and
-"old" instructions/data/functions. Your commit is converting us over to
-use offsets. The code that patches in the alternatives needs to have
-absolute addresses though, so you need to be able to, effectively,
-reverse engineer those from the offset.
-You do this by taking the address of the offset & adding the offset to
-the address before casting to (void *). This works, because the offset
-is the offset from the alt_entry data structure to the alternative?
-
-I hope I am in the right ballpark there haha, but I do think that this
-really needs a comment explaining what it is doing. Maybe extract that
-operation into some sort of macro in alternatives.h so the operation is
-done in a central location & you can leave the comment there?
-
-That'd make it at least more manageable for us mere mortals who can just
-do something like
-patch_text_nosync(ALT_OFFSET_ADDRESS(alt->old_offset),
-		  ALT_OFFSET_ADDRESS(alt->alt_offset),
-		  alt->alt_len);
-
-when we have to go an add some alternatives..
-
-> >=20
-> > | offset | <- &offset
-> > | ...       |
-> > | value | <- ptr =3D &offset + offset
-> >=20
-> > I don't make sense of the above.
-> >=20
-> > >
-> > > Thanks
-> > >
-> > > >
-> > > > > +                                         alt->alt_len);
-> > > > >                         cpu_apply_errata |=3D tmp;
-> > > > >                 }
-> > > > >         }
-> > > > > diff --git a/arch/riscv/errata/thead/errata.c b/arch/riscv/errata=
-/thead/errata.c
-> > > > > index 21546937db39..2a6e335b5a32 100644
-> > > > > --- a/arch/riscv/errata/thead/errata.c
-> > > > > +++ b/arch/riscv/errata/thead/errata.c
-> > > > > @@ -68,6 +68,7 @@ void __init_or_module thead_errata_patch_func(s=
-truct alt_entry *begin, struct al
-> > > > >         struct alt_entry *alt;
-> > > > >         u32 cpu_req_errata =3D thead_errata_probe(stage, archid, =
-impid);
-> > > > >         u32 tmp;
-> > > > > +       void *oldptr, *updptr;
-
-Why mix the terminology with "upd" instead of "alt"?
-
-> > > > >
-> > > > >         for (alt =3D begin; alt < end; alt++) {
-> > > > >                 if (alt->vendor_id !=3D THEAD_VENDOR_ID)
-
-> > > > >  struct alt_entry {
-> > > > > -       void *old_ptr;           /* address of original instrucit=
-on or data  */
-> > > > > -       void *alt_ptr;           /* address of replacement instru=
-ction or data */
-> > > > > -       unsigned long vendor_id; /* cpu vendor id */
-> > > > > -       unsigned long alt_len;   /* The replacement size */
-> > > > > -       unsigned int errata_id;  /* The errata id */
-> > > > > -} __packed;
-> > > > > +       s32 old_offset;         /* offset to original instruciton=
- or data */
-> > > > > +       s32 alt_offset;         /* offset to replacement instruct=
-ion or data */
-
-Perhaps also this comment could be expanded on to specify what it is an
-offset *from* as well as to?
-
-> > > > > +       u16 vendor_id;          /* cpu vendor id */
-> > > > > +       u16 alt_len;            /* The replacement size */
-> > > > > +       u32 errata_id;          /* The errata id */
-> > > > > +};
-
-I hope I didn't make a hames of trying to understand what you were
-doing, but please let me know what I have undoubtedly got mixed up on!
-Thanks,
-Conor.
-
-
---uWz0dNot0HPNalAT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY4+3nAAKCRB4tDGHoIJi
-0o4UAQDdFtrFC6LSB2je2GwWfqj+2QnzRowVGKALV/wZtobyOQEA0iR9BN1OvLLD
-yFafJBWPiUaXNg2nrA+uOw37n1XCUwc=
-=Q0N3
------END PGP SIGNATURE-----
-
---uWz0dNot0HPNalAT--
