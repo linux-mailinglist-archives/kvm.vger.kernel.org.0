@@ -2,65 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E059644827
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 16:38:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DC0264484C
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 16:48:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235164AbiLFPiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 10:38:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60204 "EHLO
+        id S231220AbiLFPsV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 10:48:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235053AbiLFPiT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 10:38:19 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF33A29C89;
-        Tue,  6 Dec 2022 07:38:16 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 832A468B05; Tue,  6 Dec 2022 16:38:11 +0100 (CET)
-Date:   Tue, 6 Dec 2022 16:38:11 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Christoph Hellwig <hch@lst.de>, Lei Rao <lei.rao@intel.com>,
-        kbusch@kernel.org, axboe@fb.com, kch@nvidia.com, sagi@grimberg.me,
-        alex.williamson@redhat.com, cohuck@redhat.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        mjrosato@linux.ibm.com, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, kvm@vger.kernel.org,
-        eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
-        Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com
-Subject: Re: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to
- issue admin commands for VF driver.
-Message-ID: <20221206153811.GB2266@lst.de>
-References: <20221206055816.292304-1-lei.rao@intel.com> <20221206055816.292304-2-lei.rao@intel.com> <20221206061940.GA6595@lst.de> <Y49HKHP9NrId39iH@ziepe.ca> <20221206135810.GA27689@lst.de> <Y49eObpI7QoSnugu@ziepe.ca>
+        with ESMTP id S232046AbiLFPsA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 10:48:00 -0500
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 222ECDFF5
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 07:47:59 -0800 (PST)
+Received: by mail-lj1-x22a.google.com with SMTP id f20so4504055lja.4
+        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 07:47:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=m1kCqWlRYfobNKnwTTmG2lD4ZIH0ubVAosfgV6W3Dk4=;
+        b=km4nt3h3SHb/kEB2LuEUazieUkF9KftHb5F5G6SyTF0tkPyKfN2VeOikiWxEBRycBp
+         HsbvpDP5MQFX5lKttQgca1p57UvCAGjzgI85ey19QT3BdjKfqI9Cvl6Wv6b4IRjUUGio
+         SNCBKhia8UVi2JEXoKNgW6LJLeJ34+7z8/13c3LqbFAKDJMO8Gy/+VyTLMrA7AhhENd1
+         TNOqx+MF6+0Q7sMMqfp/4fXIA6AYYQUMyiQMrZUKrOwSlFwEERF41f5MgnrniS4C+Zx7
+         aT0+T5Mh7IQLLskdVC1oVbKnMT2sukhYGiYH6rQJUVqDRrBUtxo2Y0A4TZ8KfOE3PyHH
+         RKTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=m1kCqWlRYfobNKnwTTmG2lD4ZIH0ubVAosfgV6W3Dk4=;
+        b=XWnVag9/hAydivXo88dz8A61WjpHpUjJP/9fL6ad/N3jINlrSYAC8mPZ+U3HsO0cRy
+         lbpFcr6G5Wp4/P9DU6Q3rMVoZZi4fW/zOqB7pDdWFvJfKIchS+VvufGN4OCIc3Ct4sIN
+         OJQuWdR/UX1z1CYqDBHAy1Fut9VFcESqGjvYSfzRZrVfUcZpdoWbwiwRxbN+s8Wtom4n
+         dO5U6RmIrMfMqMFthJrE5wTqgUQV/nSsQtuqRfIdPmUgohHugahxdb1ejt3DxFoQUUFU
+         RoJ72V56HKD8FNsJi4SxPTdhojiEnX/QCREwmlwbmoh6uLaXEmY3FRogso9fo49pXC75
+         iWQw==
+X-Gm-Message-State: ANoB5pmOpEreDvNpcQNPCU4uQXjiMEapkW0eGaXEju7/aie7/sBORiqE
+        VgD5V9isBY/Go+sbxa/k0cnFWtY1QcBsKXplrfk2Ag==
+X-Google-Smtp-Source: AA0mqf670rgKAoKyVamK5fGEwo/r7qIQAwktaBqfm7a0tY0XJdGyAcQGRLzmDTdXbe+6R04s2ufEeuo3JFvMsirw8Vc=
+X-Received: by 2002:a2e:a80d:0:b0:277:1295:31ca with SMTP id
+ l13-20020a2ea80d000000b00277129531camr27009331ljq.280.1670341677228; Tue, 06
+ Dec 2022 07:47:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y49eObpI7QoSnugu@ziepe.ca>
-User-Agent: Mutt/1.5.17 (2007-11-01)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com> <20221202061347.1070246-5-chao.p.peng@linux.intel.com>
+In-Reply-To: <20221202061347.1070246-5-chao.p.peng@linux.intel.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Tue, 6 Dec 2022 15:47:20 +0000
+Message-ID: <CA+EHjTyzZ2n8kQxH_Qx72aRq1k+dETJXTsoOM3tggPZAZkYbCA@mail.gmail.com>
+Subject: Re: [PATCH v10 4/9] KVM: Add KVM_EXIT_MEMORY_FAULT exit
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 06, 2022 at 11:22:33AM -0400, Jason Gunthorpe wrote:
-> > controlled functions (which could very well be, and in some designs
-> > are, additional PFs and not VFs) by controlling function.  
-> 
-> In principle PF vs VF doesn't matter much - the question is really TLP
-> labeling. If the spec says RID A is the controlling RID and RID B is
-> the guest RID, then it doesn't matter if they have a PF/VF
-> relationship or PF/PF relationship.
+Hi,
 
-Yes.  Or in fact if you use PASIDs inside a single function.
+On Fri, Dec 2, 2022 at 6:19 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+>
+> This new KVM exit allows userspace to handle memory-related errors. It
+> indicates an error happens in KVM at guest memory range [gpa, gpa+size).
+> The flags includes additional information for userspace to handle the
+> error. Currently bit 0 is defined as 'private memory' where '1'
+> indicates error happens due to private memory access and '0' indicates
+> error happens due to shared memory access.
+>
+> When private memory is enabled, this new exit will be used for KVM to
+> exit to userspace for shared <-> private memory conversion in memory
+> encryption usage. In such usage, typically there are two kind of memory
+> conversions:
+>   - explicit conversion: happens when guest explicitly calls into KVM
+>     to map a range (as private or shared), KVM then exits to userspace
+>     to perform the map/unmap operations.
+>   - implicit conversion: happens in KVM page fault handler where KVM
+>     exits to userspace for an implicit conversion when the page is in a
+>     different state than requested (private or shared).
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 22 ++++++++++++++++++++++
+>  include/uapi/linux/kvm.h       |  8 ++++++++
+>  2 files changed, 30 insertions(+)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 99352170c130..d9edb14ce30b 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6634,6 +6634,28 @@ array field represents return values. The userspace should update the return
+>  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+>  spec refer, https://github.com/riscv/riscv-sbi-doc.
+>
+> +::
+> +
+> +               /* KVM_EXIT_MEMORY_FAULT */
+> +               struct {
+> +  #define KVM_MEMORY_EXIT_FLAG_PRIVATE (1ULL << 0)
+> +                       __u64 flags;
 
-> We have locking issues in Linux SW connecting different SW drivers for
-> things that are not a PF/VF relationship, but perhaps that can be
-> solved.
+I see you've removed the padding and increased the flag size.
 
-And I think the only reasonable answer is that the entire workflow
-must be 100% managed from the controlling function, and the controlled
-function is just around for a ride, with the controlling function
-enabling/disabling it as needed without ever interacting with software
-that directly deals with the controlled function.
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Tested-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+
+
+
+> +                       __u64 gpa;
+> +                       __u64 size;
+> +               } memory;
+> +
+> +If exit reason is KVM_EXIT_MEMORY_FAULT then it indicates that the VCPU has
+> +encountered a memory error which is not handled by KVM kernel module and
+> +userspace may choose to handle it. The 'flags' field indicates the memory
+> +properties of the exit.
+> +
+> + - KVM_MEMORY_EXIT_FLAG_PRIVATE - indicates the memory error is caused by
+> +   private memory access when the bit is set. Otherwise the memory error is
+> +   caused by shared memory access when the bit is clear.
+> +
+> +'gpa' and 'size' indicate the memory range the error occurs at. The userspace
+> +may handle the error and return to KVM to retry the previous memory access.
+> +
+>  ::
+>
+>      /* KVM_EXIT_NOTIFY */
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 13bff963b8b0..c7e9d375a902 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -300,6 +300,7 @@ struct kvm_xen_exit {
+>  #define KVM_EXIT_RISCV_SBI        35
+>  #define KVM_EXIT_RISCV_CSR        36
+>  #define KVM_EXIT_NOTIFY           37
+> +#define KVM_EXIT_MEMORY_FAULT     38
+>
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -541,6 +542,13 @@ struct kvm_run {
+>  #define KVM_NOTIFY_CONTEXT_INVALID     (1 << 0)
+>                         __u32 flags;
+>                 } notify;
+> +               /* KVM_EXIT_MEMORY_FAULT */
+> +               struct {
+> +#define KVM_MEMORY_EXIT_FLAG_PRIVATE   (1ULL << 0)
+> +                       __u64 flags;
+> +                       __u64 gpa;
+> +                       __u64 size;
+> +               } memory;
+>                 /* Fix the size of the union. */
+>                 char padding[256];
+>         };
+> --
+> 2.25.1
+>
