@@ -2,89 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFF306444F3
-	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 14:51:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF72F6444F8
+	for <lists+kvm@lfdr.de>; Tue,  6 Dec 2022 14:53:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234594AbiLFNvo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 08:51:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45236 "EHLO
+        id S234596AbiLFNxC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 08:53:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231866AbiLFNvm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 08:51:42 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D8122A942;
-        Tue,  6 Dec 2022 05:51:40 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 82F8961764;
-        Tue,  6 Dec 2022 13:51:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1752EC433C1;
-        Tue,  6 Dec 2022 13:51:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670334699;
-        bh=T0tECl+xmG6w0G2M4NSz1zr6ar6ZtXwJiCFE6TbkrEE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mZi7gMbq8B+FXS/1OuUYuWdkweUmNL/lhM3MJDJshCQ6/juDh+jZcL+KhtmNXqlau
-         7LIZfO4dgwQ181y4DwAUq6112FGbvoAjAqw0Tt+808kN0e+AldDa6wYaUb6RxCEDvs
-         R0mCO6+70yfykLt1ZqHUvoJgDEsVt9Dkp21s75OSyURs/pdG17cv+Ly5KuoKA4Svk1
-         8YZZs2TG+M7+HG1Kef00M2Kqfh0e8r3AhTD7x2w4QUMkFZMeHvHR3gm8isTHndWkcN
-         5AKf100eN2p2Bem082iu/A8UIhNMrbhxE2hK9hwVZBLNdwLlMza2lhzdB3xb2PCh2O
-         8KZzypuFsEaWQ==
-Date:   Tue, 6 Dec 2022 13:51:32 +0000
-From:   Keith Busch <kbusch@kernel.org>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Christoph Hellwig <hch@lst.de>, Lei Rao <lei.rao@intel.com>,
-        axboe@fb.com, kch@nvidia.com, sagi@grimberg.me,
-        alex.williamson@redhat.com, cohuck@redhat.com, yishaih@nvidia.com,
+        with ESMTP id S232782AbiLFNw6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 08:52:58 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C2892AC4E
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 05:52:56 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id jl24so13952033plb.8
+        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 05:52:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=t87VCeTJakslqAl3f0yNOxHf0LTh2ZN124YXucQTICI=;
+        b=oZGCxyk5W3TMdU2o6vRqmJnJcYsYsbgQZVSOM118UHdICsH3wPjWdG68J6fsdeUwJJ
+         LZjdlixk2hY+1rJAdlL5ClWxqqWJXOGkHw3uofhd5LW64YmHG0gTJHdph0anX+bb/9My
+         jiDJujt3G7mvNF1/Fx9hDpNb6NDreKAF66YocfaiFEXNsIGJlveHzNomXypy1L28wwa2
+         vgrb7StUm5lVgdw01n/1Sd3qqNYmdgviT+hKhkTj38U16G3HVYESw6VZgHmfCwwdeoXU
+         BYxTR7YpicHMjA5z7L+fboO2DZA51Ze4QnenI7roy3++oRxN1gnjVynwB/LUaBTpYfEu
+         /gpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t87VCeTJakslqAl3f0yNOxHf0LTh2ZN124YXucQTICI=;
+        b=niVg/oO4h+Bul00HKjycYDPVYgl6kjG0wL/e0+amfupGXYH/qJJWxVDoEApwOGWlxu
+         NBzeH6LehIiVLsnxxEr1RDi7dkxwLNgx6h6Qp+dHdVt8ZRGDz1DyzT2v5hrfLjKn+23n
+         tM90UXHhZlaXtIXR1vHjHlGzhrd4hm+wxT9mPP2P/he6xihtjUNiHOkZ2aMCEk9UcWAe
+         /FeQRRl6zUexhwvSJSTO13JLdYm7Ks6MXgd2+pe1/o80V7UQ7uiZIJcONbloE+FpUnFE
+         +5nFhqJxvYbI8mVRWMalZs1s+VEiTyTzwUzqEOh6QuPKmlTBdhn2LhetXSHFTPdyRx58
+         AFMg==
+X-Gm-Message-State: ANoB5pkjYKVo0ZCFYhs7uQtcBAyDD9HCNYMzmXkX3WPF+K6XzL3vHzIZ
+        mJ56CU8GQ2RAHihpj38WMy0jFg==
+X-Google-Smtp-Source: AA0mqf482EjTSHDI4493LMS4boQvscR6VQMN38fEM7NnhASxT/N8ZFwDvLrAcycEwor9hfBksmUO8Q==
+X-Received: by 2002:a17:90a:5998:b0:219:d33d:4689 with SMTP id l24-20020a17090a599800b00219d33d4689mr10666134pji.233.1670334775910;
+        Tue, 06 Dec 2022 05:52:55 -0800 (PST)
+Received: from ziepe.ca ([206.223.160.26])
+        by smtp.gmail.com with ESMTPSA id b16-20020aa79510000000b00574f83c5d51sm11772416pfp.198.2022.12.06.05.52.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Dec 2022 05:52:55 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1p2YNS-004bct-0n;
+        Tue, 06 Dec 2022 09:52:54 -0400
+Date:   Tue, 6 Dec 2022 09:52:54 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Lei Rao <lei.rao@intel.com>, kbusch@kernel.org, axboe@fb.com,
+        kch@nvidia.com, sagi@grimberg.me, alex.williamson@redhat.com,
+        cohuck@redhat.com, yishaih@nvidia.com,
         shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
         mjrosato@linux.ibm.com, linux-kernel@vger.kernel.org,
         linux-nvme@lists.infradead.org, kvm@vger.kernel.org,
         eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
         Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com
-Subject: Re: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to
- issue admin commands for VF driver.
-Message-ID: <Y49I5MRsgHdNkIff@kbusch-mbp>
+Subject: Re: [RFC PATCH 5/5] nvme-vfio: Add a document for the NVMe device
+Message-ID: <Y49JNvdmRPNWw26q@ziepe.ca>
 References: <20221206055816.292304-1-lei.rao@intel.com>
- <20221206055816.292304-2-lei.rao@intel.com>
- <20221206061940.GA6595@lst.de>
- <Y49HKHP9NrId39iH@ziepe.ca>
+ <20221206055816.292304-6-lei.rao@intel.com>
+ <20221206062604.GB6595@lst.de>
+ <Y48+AaG5rSCviIhl@ziepe.ca>
+ <20221206130901.GB24358@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y49HKHP9NrId39iH@ziepe.ca>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221206130901.GB24358@lst.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 06, 2022 at 09:44:08AM -0400, Jason Gunthorpe wrote:
-> On Tue, Dec 06, 2022 at 07:19:40AM +0100, Christoph Hellwig wrote:
-> > On Tue, Dec 06, 2022 at 01:58:12PM +0800, Lei Rao wrote:
-> > > The new function nvme_submit_vf_cmd() helps the host VF driver to issue
-> > > VF admin commands. It's helpful in some cases that the host NVMe driver
-> > > does not control VF's admin queue. For example, in the virtualization
-> > > device pass-through case, the VF controller's admin queue is governed
-> > > by the Guest NVMe driver. Host VF driver relies on PF device's admin
-> > > queue to control VF devices like vendor-specific live migration commands.
-> > 
-> > WTF are you even smoking when you think this would be acceptable?
+On Tue, Dec 06, 2022 at 02:09:01PM +0100, Christoph Hellwig wrote:
+> On Tue, Dec 06, 2022 at 09:05:05AM -0400, Jason Gunthorpe wrote:
+> > In this case Intel has a real PCI SRIOV VF to expose to the guest,
+> > with a full VF RID.
 > 
-> Not speaking to NVMe - but this driver is clearly copying mlx5's live
-> migration driver, almost completely - including this basic function.
-> 
-> So, to explain why mlx5 works this way..
-> 
-> The VFIO approach is to fully assign an entire VF to the guest OS. The
-> entire VF assignment means every MMIO register *and all the DMA* of
-> the VF is owned by the guest operating system.
-> 
-> mlx5 needs to transfer hundreds of megabytes to gigabytes of in-device
-> state to perform a migration.
+> RID?
 
-For storage, though, you can't just transfer the controller state. You have to
-transfer all the namespace user data, too. So potentially many terabytes?
+"Requester ID" - PCI SIG term that in Linux basically means you get to
+assign an iommu_domain to the vfio device.
+
+Compared to a mdev where many vfio devices will share the same RID and
+cannot have iommu_domain's without using PASID.
+
+> > The proper VFIO abstraction is the variant PCI
+> > driver as this series does. We want to use the variant PCI drivers
+> > because they properly encapsulate all the PCI behaviors (MSI, config
+> > space, regions, reset, etc) without requiring re-implementation of this
+> > in mdev drivers.
+> 
+> I don't think the code in this series has any chance of actually
+> working.  There is a lot of state associated with a NVMe subsystem,
+> controller and namespace, such as the serial number, subsystem NQN,
+> namespace uniqueue identifiers, Get/Set features state, pending AENs,
+> log page content.  Just migrating from one device to another without
+> capturing all this has no chance of actually working.
+
+From what I understood this series basically allows two Intel devices
+to pass a big opaque blob of data. Intel didn't document what is in
+that blob, so I assume it captures everything you mention above.
+
+At least, that is the approach we have taken with mlx5. Every single
+bit of device state is serialized into the blob and when the device
+resumes it is indistinguishable from the original. Otherwise it is a
+bug.
+
+Jason
