@@ -2,127 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82DBE646049
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 18:32:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AC1564604C
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 18:33:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229947AbiLGRbu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 12:31:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39300 "EHLO
+        id S230051AbiLGRc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 12:32:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229879AbiLGRbr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 12:31:47 -0500
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C71139FF6
-        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 09:31:46 -0800 (PST)
-Received: by mail-qt1-x82c.google.com with SMTP id c15so16714359qtw.8
-        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 09:31:46 -0800 (PST)
+        with ESMTP id S230009AbiLGRc4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 12:32:56 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAF9C5E9D9
+        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 09:32:55 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id cm20so18309801pjb.1
+        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 09:32:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
+        d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GGYm/U8zQZjJljcYBsuBB43oBO+UowQVbQ4PB8XzHy4=;
-        b=JVYHn2Uq7dr+ybmwbABL740dori9GKB6509NnTrMEa0HWmWilQWCIsVF0ukAsjG0NJ
-         QB//ZxGk2bJyMjHgSdkpktwlHmE19dA8spOKyggVH/cdq3YhnCzM1OQu10Am4JJ/l6b9
-         2nSL+gRXQWCEy3K+o7LxOw8fQnrdBysQlRwgT7fXE1KZKfzPNG6gD8G5T0vGKFy/spxj
-         FSD0L66l01my1N0CgZoGKZTtdXiH42Kst31L7UDnWFgCpMa2vTSyYkSWzRCMEwZlVv6M
-         KWPgTxnjaLbHpwVKG8Sc8MS+9eVKpTy4TSwNughyBUWBb5GB6feee5Zf7HbiedQI/CPq
-         GFyg==
+        bh=gSytGWam2RsfZ8LDTXkI5HjY+j/pAQztbn0XEeCsCwU=;
+        b=l/guce6zU5tkdP1Fsai1HdMH375B1J1+FAu5avObfFwBew8DKDDWNueXLdA0wcnyRu
+         D+GmIizw1V5vReqrgZxwuA9l2gk4ZEc4gKxsm1GOWpsp26T38RliO4hYAOf80uqf544g
+         IPhfFnrW7vmozoSMxVZEUlSryLxy0ApW9IBVudYmg85F288FD57ZyHxy0wC1vH14aE7H
+         etGnPX09BP2AaxGchWVP6JqEUXpz/8f9FYrfpHtJw3kUNe0+nXt5vPJjPdKhpk/Qc3p9
+         nse6plPuR5xzqBXPsmxoSLUIk6B7FzsICHCRaUYXpiqS/l5YsMfSapTzNDjncaCBI040
+         ZlKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GGYm/U8zQZjJljcYBsuBB43oBO+UowQVbQ4PB8XzHy4=;
-        b=lX3c3uiL4jotp4oF4xSsd1y/tc6d7Wpx5ICtQHsVGNgz64frrRs42+pJ133UcOWEhF
-         MjzecuJFQhIXienv/hbUAxpAXjeyMhu7otii/zA5He5/rkR7IUer2bT5u2s1tgnyCcr2
-         SFd4legFqZdAf064+hvfOE+aGXP4gqFpvjWubxJnfPjw6Vh5MmJmybIjkonG3kDRtkXp
-         a/F/WTmBTv8qVgp7CIgImzOVrKbw3eq6+8gmnSnAMiPtnOv6SCy63KkdO5cu49oZLaH9
-         K+JZjpDGsP++hfTXWcraDVos6oTSezucmVH/wLbEny70Tc8WeoCSumae3WyMjAmuPe1m
-         Yb+w==
-X-Gm-Message-State: ANoB5pkXVlRoyiMwhFRElF+nkHPYOVAk0vtBSxmXmF2VBeBSxJKoH6gO
-        R7q+7Ar2BBpxKlBefufcT6LhYA==
-X-Google-Smtp-Source: AA0mqf42zyYSULlUE4U8ptwueXX6sRZDqQITBgKVrqFCvFRJD27eq+kQvOKvmlFR+vkVg2fYBCK3PA==
-X-Received: by 2002:a05:622a:17cb:b0:3a6:21fd:6c9a with SMTP id u11-20020a05622a17cb00b003a621fd6c9amr71657357qtk.545.1670434305934;
-        Wed, 07 Dec 2022 09:31:45 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
-        by smtp.gmail.com with ESMTPSA id t3-20020a05620a450300b006eea4b5abcesm18442401qkp.89.2022.12.07.09.31.45
+        bh=gSytGWam2RsfZ8LDTXkI5HjY+j/pAQztbn0XEeCsCwU=;
+        b=A6I0nBim75rgTxfEKLZ2j7SnS803XetQIqAb64IOkvKnN01cxZNcY552b4/B7IiE53
+         YKmsJ5D1gE17CRbGEH+1NLg/myRVXcJW6egaUSSTOirWBTlBoiQkd6UBEwREeapYpfYB
+         fSOoHGq+JQ4+2Sb9/eSvFXkwk6nxq1Pl/9IAIQ3WVu+cYwEnJcK2wNU2gmJG5QYyw0S2
+         uEgSaa0oV2LCDz2bCvUN8+wxSUMquglCVYxDjuzJLptaRHKEntOtOV12o9W7gXl42Yu+
+         jpe7CIsyKgcLarF2rDVYepv5xzoihHAQ76RSTbY0+PUtxIuFpA9a2K2jLvjOPlpaSMuJ
+         z28A==
+X-Gm-Message-State: ANoB5pkJX4HNkN30UYqTLqy3QICZI8YTXalQKoXOh/THMk3lpDNp4NlL
+        fhH8XG+26XueXSZoyh7sdbKUpw==
+X-Google-Smtp-Source: AA0mqf4YBY5cMi6mJjSx24Uxe6LWKvbJ3oUClYq/wCU+BgOOCsXJMgMFHSm/JA3aK2fI+/4tfLy9wg==
+X-Received: by 2002:a05:6a20:9597:b0:a3:49d2:9504 with SMTP id iu23-20020a056a20959700b000a349d29504mr1637716pzb.3.1670434375344;
+        Wed, 07 Dec 2022 09:32:55 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id t3-20020aa79463000000b00576b0893ecasm7844765pfq.46.2022.12.07.09.32.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Dec 2022 09:31:45 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1p2yGm-005IGO-HV;
-        Wed, 07 Dec 2022 13:31:44 -0400
-Date:   Wed, 7 Dec 2022 13:31:44 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Lei Rao <lei.rao@intel.com>, kbusch@kernel.org, axboe@fb.com,
-        kch@nvidia.com, sagi@grimberg.me, alex.williamson@redhat.com,
-        cohuck@redhat.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        mjrosato@linux.ibm.com, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, kvm@vger.kernel.org,
-        eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
-        Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com
-Subject: Re: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to
- issue admin commands for VF driver.
-Message-ID: <Y5DOAKArjyfb6Mcz@ziepe.ca>
-References: <Y49eObpI7QoSnugu@ziepe.ca>
- <20221206153811.GB2266@lst.de>
- <Y49k++D3i8DfLOLL@ziepe.ca>
- <20221206165503.GA8677@lst.de>
- <Y4+U3VR2LeEh2S7B@ziepe.ca>
- <20221207075415.GB2283@lst.de>
- <Y5CWVu08abcOuEQH@ziepe.ca>
- <20221207135203.GA22803@lst.de>
- <Y5CsH5PqMYAWYatw@ziepe.ca>
- <20221207163857.GB2010@lst.de>
+        Wed, 07 Dec 2022 09:32:54 -0800 (PST)
+Date:   Wed, 7 Dec 2022 17:32:51 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH kvm-unit-tests] x86/pmu: Add Intel Guest Transactional
+ (commited) cycles testcase
+Message-ID: <Y5DOQ3v2ylWTbGZ7@google.com>
+References: <20221207071506.15733-1-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221207163857.GB2010@lst.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221207071506.15733-1-likexu@tencent.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 07, 2022 at 05:38:57PM +0100, Christoph Hellwig wrote:
-> On Wed, Dec 07, 2022 at 11:07:11AM -0400, Jason Gunthorpe wrote:
-> > > And while that is a fine concept per see, the current incarnation of
-> > > that is fundamentally broken is it centered around the controlled
-> > > VM.  Which really can't work.
-> > 
-> > I don't see why you keep saying this. It is centered around the struct
-> > vfio_device object in the kernel, which is definately NOT the VM.
+On Wed, Dec 07, 2022, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
 > 
-> Sorry, I meant VF.  Your continued using of SR-IOV teminology now keeps
-> confusing my mind so much that I start mistyping things.
+> On Intel platforms with TSX feature, pmu users in guest can collect
+> the commited or total transactional cycles for a tsx-enabled workload,
+> adding new test cases to cover them, as they are not strictly the same
+> as normal hardware events from the KVM implementation point of view.
+> 
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  x86/pmu.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 72 insertions(+), 1 deletion(-)
+> 
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index 72c2c9c..d4c6813 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -20,7 +20,7 @@
+>  
+>  typedef struct {
+>  	uint32_t ctr;
+> -	uint32_t config;
+> +	uint64_t config;
+>  	uint64_t count;
+>  	int idx;
+>  } pmu_counter_t;
+> @@ -547,6 +547,76 @@ static void check_emulated_instr(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +#define _XBEGIN_STARTED		(~0u)
+> +
+> +static inline int
 
-Well, what words do you want to use?
+This should be "unsigned int".  EAX can yield a negative value, e.g. via "XABORT
+0xff", which is why the compiler instrinsics use this explicit, unsigned value
+(that relies on reserved bits in the abort status).
 
-Regardless of VF/VM, it doesn't matter - my point is that the
-vfio_device is the hypervisor control for *whatever* is under the
-vfio_device and it is not desirable to break it up along arbitrary HW
-boundaries.
+> _xbegin(void)
 
-I've given lots of reasons why not to do this now.
+These having nothing to do with the PMU, i.e. belong in processor.h.
 
-I strongly suspect it can work technically - as ugly as it is Pensando
-shows an approach.
+The naming is also non-stanard, i.e. drop the underscore.  I assume you're
+trying to match the compiler instrinsics, but that's bound to do more harm than
+good.  Either use the instrinsics or write code that aligns with KUT's style.
+Using instrinsics is probably a bad idea because eventually we'll want to do
+something weird, e.g. provide a bogus fallback address. And having to go lookup
+gcc/clang documentation is rather annoything.
 
-So I don't think I've learned anything more about your objection.
+> +{
+> +	int ret = _XBEGIN_STARTED;
 
-"fundamentally broken" doesn't help
+Newline after declarations.
 
-It is a major point, because if we are going to have to rip apart all
-the uAPI we built here and are completing the qemu work for, we need
-to come to an understanding very soon.
+> +	asm volatile(".byte 0xc7,0xf8 ; .long 0" : "+a" (ret) :: "memory");
 
-And given how difficult it has been to get to this point, I want a
-*really* good reason why we have to start again, and rewrite all the
-drivers that exist and are coming.
+This is just mean.
 
-Jason
+	unsigned int ret = XBEGIN_STARTED;
+	
+	asm volatile("xbegin 1f\n\t"
+		     "1:\n\t"
+		     : "+a" (ret) :: "memory");
+	return ret;
+
+> +	return ret;
+> +}
+> +
+> +static inline void _xend(void)
+> +{
+> +	asm volatile(".byte 0x0f,0x01,0xd5" ::: "memory");
+
+Like XBEGIN, use the mnemonic.
+
+> +}
+> +
+> +int *ptr;
+
+I'm honestly at a loss for words.
+
+> +static void tsx_fault(void)
+
+s/fault/abort.  Yes, a fault causes an abort, but no fault is ever observed by
+software.  Though I don't quite understand why helpers are needed in the first
+place.
+
+> +{
+> +	int value = 0;
+> +
+> +	ptr = NULL;
+> +	if(_xbegin() == _XBEGIN_STARTED) {
+
+Space after the "if".
+
+> +		value++;
+> +		// causes abort
+> +		*ptr = value;
+
+		/* Generate a non-canonical #GP to trigger ABORT. */
+		(int *)NONCANONICAL) = 0;
+
+> +		_xend();
+
+Why bother with XEND?
+
+> +	}
+> +}
+> +
+> +static void tsx_normal(void)
+> +{
+> +	int value = 0;
+> +
+> +	if(_xbegin() == _XBEGIN_STARTED) {
+> +		value++;
+
+What's the purpose of incrementing an arbitrary value?
+
+> +		_xend();
+
+Does this test rely on the region being successfully committed?  If so, the test
+is guaranteed to be flaky, e.g. due to a host IRQ at the "wrong" time.  Assuming
+success is not required, please add a comment describing the requirements.
+
+> +	}
+> +}
+> +
+> +static void check_tsx_cycles(void)
+> +{
+> +	pmu_counter_t cnt;
+> +	int i;
+> +
+> +	if (!this_cpu_has(X86_FEATURE_RTM) || !this_cpu_has(X86_FEATURE_HLE))
+> +		return;
+> +
+> +	report_prefix_push("TSX cycles");
+> +
+> +	for (i = 0; i < pmu.nr_gp_counters; i++) {
+> +		cnt.ctr = MSR_GP_COUNTERx(i);
+> +
+> +		if (i == 2)
+> +			/* Transactional cycles commited only on gp counter 2 */
+> +			cnt.config = EVNTSEL_OS | EVNTSEL_USR | 0x30000003c;
+> +		else
+> +			/* Transactional cycles */
+> +			cnt.config = EVNTSEL_OS | EVNTSEL_USR | 0x10000003c;
+> +
+> +		start_event(&cnt);
+> +		tsx_fault();
+> +		tsx_normal();
+
+As a above, why bother with helpers?  Can't this just be:
+
+
+		start_event(&cnt);
+
+		/* Generate a non-canonical #GP to trigger ABORT. */
+		if (xbegin() == XBEGIN_STARTED)
+			*(int *)NONCANONICAL = 0;
+
+		/* <comment about what requirements of this code> */
+		if (xbegin() == XBEGIN_STARTED)
+			xend();
+
+		stop_event(&cnt);
+
+> +		stop_event(&cnt);
+> +
+> +		report(cnt.count > 0, "gp cntr-%d", i);
+> +	}
+> +
+> +	report_prefix_pop();
+> +}
+> +
+>  static void check_counters(void)
+>  {
+>  	if (is_fep_available())
+> @@ -559,6 +629,7 @@ static void check_counters(void)
+>  	check_counter_overflow();
+>  	check_gp_counter_cmask();
+>  	check_running_counter_wrmsr();
+> +	check_tsx_cycles();
+>  }
+>  
+>  static void do_unsupported_width_counter_write(void *index)
+> -- 
+> 2.38.1
+> 
