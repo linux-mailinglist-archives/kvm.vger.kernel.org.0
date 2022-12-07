@@ -2,213 +2,442 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72683645CE7
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 15:50:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C4DC645D03
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 15:57:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230030AbiLGOuQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 09:50:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41136 "EHLO
+        id S230244AbiLGO4r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 09:56:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiLGOuO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 09:50:14 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2063.outbound.protection.outlook.com [40.107.243.63])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8E9A2A73E;
-        Wed,  7 Dec 2022 06:50:13 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mQ7jyeySMhH+ej2mhpHxUxHflR8KH1K5zaNXgG9f4T46oZE+9bDg/7G0AmQ3gKRFFSb1Kr7+jc6yM/E6aOJYsAuxrvqAPIqtK65uZ3UXWlIHmASmcvfZZ15GNfYUnLQD85TE190mFeTHGs9SUYMzQuz05qQfEMqvHClOutq38bGTiPXgtQpGAHp4IanS1NQRBd5HakHd+zSN19rtH04efsts7iXJ0YQwgMBcJZBQ9KKO2d6xxa6WQVKotm9qBGdzhgi5o3ZKGMUriqAyyPdH162AYffTjxcAqq5LbWamfqOjE/AJ15etHMxiabERxzEjFtnbdjqd1WrLr1NFr2YSHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=alIEnyvyuWfs3wUHyAimL7vmw1ZIf2GKS8TPqDPpe/U=;
- b=gB+XgjIf0o+Es73nLaE2QOLVEcUd6ILl5OW8A6QVqmjUFc5paEp/JrWroSc/TNsvyBmWytzitXEQ69rrOU5Azgl327/db8dPPyCOKe8ckorFZ2NC5a2tJoYZ7Gxrd6WXrbFXehI8ChVj018Y4QJpAflYncQP66YPirWDyYKCaCeho54z+iOF873ElowMLCv1M6BmYdQs6RQZP3MZ3bjHVr7tNPn0Y7Scv6zqidl7fGafAWWyAKKVy/6vIWdhWJEdyCmFm3N7izLbQs4SMS6PT92XmH1RR6tDUiJ+WJSMynjLqa7P5xV3/j7ADu0W885O5+wA3xYVhLbW+vvrgqIwVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=alIEnyvyuWfs3wUHyAimL7vmw1ZIf2GKS8TPqDPpe/U=;
- b=is3QpAIwpnkuKwFMRnKK3v462sB0rCvTJdBFFifaEE33IMDsDypFGFEJXViRiX0o4JXBpjvRLw7DVk9I7llaAUQhkm3+m/7/kXRs7NfPOwqU4wGW+CIXqT6cR00tvzXQmDIkBTZkoeHjHC1U41zpon55Sm3MkrNha9o45U75rb7w3PnQ4MjVbbK7DvT/XH754wxcM6IRIckaL0qhl3CFfx63kLqsbLpylDCfpCTOsLkcCMFxMK00EyVgdfUzounImwmPUT8XfRjO7zATt6o6qFVzM4RjvJiJVZ/83h2VlPWuZdj/Lkq1qVqfgbO2X+n4ZHfi/lJnaNuLGFicomMpXA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com (2603:10b6:5:38b::19)
- by LV2PR12MB5847.namprd12.prod.outlook.com (2603:10b6:408:174::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14; Wed, 7 Dec
- 2022 14:50:11 +0000
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::3fb9:3266:7937:44fc]) by DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::3fb9:3266:7937:44fc%9]) with mapi id 15.20.5880.014; Wed, 7 Dec 2022
- 14:50:11 +0000
-Message-ID: <d28a7848-b284-6c86-a2ae-ab79de3675d4@nvidia.com>
-Date:   Wed, 7 Dec 2022 16:50:00 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to
- issue admin commands for VF driver.
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Lei Rao <lei.rao@intel.com>,
-        kbusch@kernel.org, axboe@fb.com, kch@nvidia.com, sagi@grimberg.me,
-        alex.williamson@redhat.com, cohuck@redhat.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        mjrosato@linux.ibm.com, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, kvm@vger.kernel.org,
-        eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
-        Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com
-References: <20221206061940.GA6595@lst.de> <Y49HKHP9NrId39iH@ziepe.ca>
- <20221206135810.GA27689@lst.de> <Y49eObpI7QoSnugu@ziepe.ca>
- <20221206153811.GB2266@lst.de> <Y49k++D3i8DfLOLL@ziepe.ca>
- <20221206165503.GA8677@lst.de> <Y4+U3VR2LeEh2S7B@ziepe.ca>
- <20221207075415.GB2283@lst.de>
- <4f11e0bb-e090-bf9b-4f98-578273865200@nvidia.com>
- <20221207134644.GB21691@lst.de>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-In-Reply-To: <20221207134644.GB21691@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P265CA0255.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:8a::27) To DM4PR12MB5040.namprd12.prod.outlook.com
- (2603:10b6:5:38b::19)
+        with ESMTP id S230175AbiLGO4e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 09:56:34 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C7061500;
+        Wed,  7 Dec 2022 06:56:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1670424990; x=1701960990;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=kh3ipc/do0g5BsGTjbhwTw6LhaSLM7mY+zcxrKlObV8=;
+  b=Fj38cp/3u3mYI6SvRJ9/B001Y1+dg/k73gtpPOpOhj/tIv+J3SYM7oBx
+   kj3YkwRd+MBzIBP9kcnuju1JMT02C7IxiZX1cvDfnABa5CBo/W1GNF4y9
+   tcUNZoKShTD2YNBdY5n+pym7zmflA9L+TLcyV7R3NUahWPIE55W98WDj+
+   RmWDIQOfja5kyZoq9JO70xdsJszdZoaf6g6f8GhwUGd1Odm03yZs75cPS
+   HD4MMzJVMOPUhfUycdax5XWFwNrvI+7xAfo+qPWLfpNPVtRHWqxsn2tF6
+   ru6uviDQYifT6Lk/roCHReIXe2oxiGIn/UTtVME37TQOo+IuQiT9FzPXC
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10553"; a="304539221"
+X-IronPort-AV: E=Sophos;i="5.96,225,1665471600"; 
+   d="scan'208";a="304539221"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2022 06:56:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10553"; a="640270757"
+X-IronPort-AV: E=Sophos;i="5.96,225,1665471600"; 
+   d="scan'208";a="640270757"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by orsmga007.jf.intel.com with ESMTP; 07 Dec 2022 06:56:18 -0800
+Date:   Wed, 7 Dec 2022 22:51:58 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
+Message-ID: <20221207145158.GC1275553@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
+ <CA+EHjTxXOdzcP25F57Mtmnb1NWyG5DcyqeDPqzjEOzRUrqH8FQ@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5040:EE_|LV2PR12MB5847:EE_
-X-MS-Office365-Filtering-Correlation-Id: e0332c3d-2158-489f-5ac7-08dad862573e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Qz4g+HpZKP8PXaZ39q27Iljdl7BEA4PZx6nIeHBCKn5DBcZZQG9bCV/QqH/MChXtVkXbyEzCZxw7h8FvV7xkPDWUo2qnSra97DkE9rqD+oSsQtDUrXN6FIt5mpF3iCvAwQMR4qvRouYErz7q6pWsHo2zNVQH4LMYpKIcBdsIWmCd5X0vWLMVOYSkv3FQx9BTwFOTBnYUflGPQwgrhVyYlQqWrFHAZUmEmDXUbBuVyVEYGKVfOep7fg/3p+gthvyW3RdKbNTfrR1m5eFj2ZiPS6zmq4XL0Izyln4m+ltNgNNgD7cA0Sk16hoWb3R4IlGy0vobbzIuSR+YJYo+OoPUBQxhvekKZl4HXGS3gjKmvEunx4x/p7/XzDqKe2vN2I5knSlUqJP5z4x6Uv97E+PUTc8I8jzHh9GxG50aKUYD0Xv+y1uSmQTd1zjafOA6h2mixRW/xolRyRFnG6EcHNzr264QLTOQ0ZcCuTJWliRvCngxJ/Al1JVvOBEwIIBFQgm1Qgp+xnW56xtBTBMeKEBfSt335ZzBieB4A1jZKJIAOvyJE5wAkBQcI0Eaze5B3mRdWVEZwKhKCnHr9/qhLGP4FbrtuREEifs4+Wc4Ck+UcrPD00SpBHIriWElwgNiH4s7tXhooQ+3T1LnZ9EaJkr98jf5+cHcDsyK5F68Klj6Cf4BO0rWEeTqpPtNp61ef1NqddFOGTvMgr53f3yv37QIHhocDu+NcHs5QCeCn+QSsl4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5040.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(136003)(366004)(396003)(39860400002)(346002)(451199015)(2906002)(41300700001)(83380400001)(5660300002)(8936002)(36756003)(31696002)(86362001)(38100700002)(6916009)(316002)(31686004)(26005)(6506007)(186003)(53546011)(54906003)(6512007)(66946007)(66556008)(66476007)(4326008)(2616005)(6486002)(478600001)(6666004)(8676002)(7416002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RC9mYmVoMG9ydklJSkFkTkUwVjlweUNkMXVycFdVK3d4ck9ZNmgxbkJvWGF0?=
- =?utf-8?B?cDZrblRrQklOeFNxellFRW9FaGY3SG4xdFBMN3ZCZ1k5d1pkODhpdkZucUgw?=
- =?utf-8?B?blF2ODc0WU40Q2I3TldMRFdqQ2NTTmJOdy8rbXdYeHpzVThYYkVOa1NiR2U4?=
- =?utf-8?B?cm9oK1F6NW1ZMGVuMG54TFJlQXpOWnN5RHBMenk0WGVxWGlKbklZdWc4UU5x?=
- =?utf-8?B?NXVqMHM4SDdHVTNHYTIwOXRqNkFjTTN6RXZ5R3BIdkc5YUFIY1UzdU1Fc1Ru?=
- =?utf-8?B?TFJIVWNEeW9hamRHaWVrTCttYXFyWUVIZko1SnpaTkdmV2d0S05XaE9QM21U?=
- =?utf-8?B?Q1huWG1TeCsvWlRBcENSQWhlZnNnTDkrenRoZ1NjQzVyU0pSYVg4Q2lvRXpn?=
- =?utf-8?B?aDhzTStmYTdiZDZyakJ1Wk91YmJjcGNsbUtFWnRPS3orUGVXMXoyeE1iMldx?=
- =?utf-8?B?b2trRFdHSmZ4UklxNnFaRUQyNW1OaFJybjFlcyt0UUJyTWZlNW51VHZ1dy83?=
- =?utf-8?B?aXpZM0FQZ1NCRHF1cUE3N1hlSW5iSTB0dU5vSEJOcE9ZRlVFVlZWVXZQSEVq?=
- =?utf-8?B?WVFxaDcrV3ZldDhBcG10S3RFY3FPZHcrS2k1SlRhczlWenBwNHhvdXRxa29V?=
- =?utf-8?B?UXowR3VSYnAwNFFoWHpqN3BOdVpnbDRxeWVvZlBiMzVSL0lwNDBza09WN2xu?=
- =?utf-8?B?VVZnNjZDRVprZENYWnlNWmNXZzA5N2h2eVpIZ3ZFQjdJc1ZpcFM0UzI2SUh6?=
- =?utf-8?B?YkNOQ2tId1RBTzk1a2J5aHhhK0lQSWo3QWlZNk9DblVYQnFjNEVhQ0dqT2VO?=
- =?utf-8?B?NGlpZVB5c0pvTXQwVmpZcG51UlJPTk5ZZXI4NTZrMHpVMDlKSEs5eS9DTjdI?=
- =?utf-8?B?MndMaEJuSXBhOXYySndkeTZ4d3k5ZkczRXNLTTZXZ0t3TEpkUFI3STgyeGVy?=
- =?utf-8?B?dHJPWnZYM05KbjZqNjBGOVRZTGNzZkNJVE5IY3JsdllScUR3RVFmcUErYlND?=
- =?utf-8?B?NTV0TzBzMXhmUEw2eDQxMU5yeXRNQ08xcVJRM3IvVXVtMDFydE5nUTNlWWF5?=
- =?utf-8?B?Z3FPZGhYZzhPL1czZEUvaythTnpFcE4rZzg5S2dVWjVkTnVWQmhvTnVHRERK?=
- =?utf-8?B?MHJwZWlYOWszSlE4SkxrR0dEOS9FU0k2YW1aOFg2Z3lyTjU0V2drcTY4VlZm?=
- =?utf-8?B?YXpEd1NCVGNJeUZ5ZEx5Z0FmaGRTdlU4cmMvTGFnNWl6ODg5NktQVktGd0ZO?=
- =?utf-8?B?VDVEUXpSVlpJbmprU29wRm5iK1pXSngvWkNFS3FiK1NnNVpVVjdjTjNxUFdh?=
- =?utf-8?B?N0pndmhVU3lLK0ErSXdWTWp3N3NyUnJLbkF1RXlkNDAyaUhvZkJWTXV0Qm1m?=
- =?utf-8?B?blNDRUZhV3c2YUY5WE12bDgzbUk1LzJFcGJQN3BOS3ZJTU5UaElVV1lVVWdZ?=
- =?utf-8?B?NnMvSUkvcktjQU93a2piTDI3SnRMK2V0TkhueHlPZjZFM1M5QzBTRGdnNUJZ?=
- =?utf-8?B?cGZvYlB6U3BPYVU2M0plZ045K1VJS1h2R3N5dUpiem1lOS9lTXlKUkpCTzFC?=
- =?utf-8?B?cEZiMkJsb0tuQ3ZhUFlKM1YrRkdpWi9JVmtELzBGWUp4aFRDNzBhTEh1Rjg1?=
- =?utf-8?B?N0g0THRSRndWU0x2MUFpa1k2V2VSdUpyRXhXSGZoVGJjT2QwamtHU3BVOVUy?=
- =?utf-8?B?YnNBSWpCbkpwdGhtaUpPLzU1Rkx3czZUbHBGdjl6ajlZd1dOWVpUUjdJcGwx?=
- =?utf-8?B?NnJQaDRneUNRTE1HeFdkcTZHZkNtT3FFRnpZNjlFclZ2YzUwSjFyQnFiRmor?=
- =?utf-8?B?OCtqaFo3dXRtNG40T0FMTlFkT0ZUUHFGSzF6ejdGdFk2VXM0WitJbDR3UHpC?=
- =?utf-8?B?M2cyYlAvUy9PTnlHOUpIOEhRN24xQTVyQ1BoK3diTEREaFk2L0JMeXBmQll5?=
- =?utf-8?B?VmdOSVZFYlZ4Z1VOY2RvWEc0NmhJbUlHZHlLVHIrcG5QbDlkR0xXaWplNE0w?=
- =?utf-8?B?Uy9nNjIwK2xxbldXb3ZWRkQ4dGhhMHVmVUVaSTNuWjZ0MVJwZ01TNGhkaFRD?=
- =?utf-8?B?eFl0SGN2NWdlNXZhMm9nbDFHdjM1NlVvWU5YNzdlWnMwZEJCejU1MXF5YmpR?=
- =?utf-8?B?Q0VycnJ2MVM3eERaVWRuQ1Ixa2FMRGNZeEd4Vy9PRS8yYTNjOU1sZTh1ck9P?=
- =?utf-8?B?a1E9PQ==?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e0332c3d-2158-489f-5ac7-08dad862573e
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5040.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Dec 2022 14:50:11.1102
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yY1NzTZwMJVvEnxIrQOTLxjJol+0U+FIjcu01eGroV573me17FOeVGTcFKabCVBs7hMY9n+NsYVWGuQ15TXlhA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5847
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTxXOdzcP25F57Mtmnb1NWyG5DcyqeDPqzjEOzRUrqH8FQ@mail.gmail.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Dec 06, 2022 at 03:07:27PM +0000, Fuad Tabba wrote:
+> Hi,
+> 
+> On Fri, Dec 2, 2022 at 6:18 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> >
+> > In confidential computing usages, whether a page is private or shared is
+> > necessary information for KVM to perform operations like page fault
+> > handling, page zapping etc. There are other potential use cases for
+> > per-page memory attributes, e.g. to make memory read-only (or no-exec,
+> > or exec-only, etc.) without having to modify memslots.
+> >
+> > Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
+> > userspace to operate on the per-page memory attributes.
+> >   - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
+> >     a guest memory range.
+> >   - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
+> >     memory attributes.
+> >
+> > KVM internally uses xarray to store the per-page memory attributes.
+> >
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com/
+> > ---
+> >  Documentation/virt/kvm/api.rst | 63 ++++++++++++++++++++++++++++
+> >  arch/x86/kvm/Kconfig           |  1 +
+> >  include/linux/kvm_host.h       |  3 ++
+> >  include/uapi/linux/kvm.h       | 17 ++++++++
+> >  virt/kvm/Kconfig               |  3 ++
+> >  virt/kvm/kvm_main.c            | 76 ++++++++++++++++++++++++++++++++++
+> >  6 files changed, 163 insertions(+)
+> >
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index 5617bc4f899f..bb2f709c0900 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -5952,6 +5952,59 @@ delivery must be provided via the "reg_aen" struct.
+> >  The "pad" and "reserved" fields may be used for future extensions and should be
+> >  set to 0s by userspace.
+> >
+> > +4.138 KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES
+> > +-----------------------------------------
+> > +
+> > +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> > +:Architectures: x86
+> > +:Type: vm ioctl
+> > +:Parameters: u64 memory attributes bitmask(out)
+> > +:Returns: 0 on success, <0 on error
+> > +
+> > +Returns supported memory attributes bitmask. Supported memory attributes will
+> > +have the corresponding bits set in u64 memory attributes bitmask.
+> > +
+> > +The following memory attributes are defined::
+> > +
+> > +  #define KVM_MEMORY_ATTRIBUTE_READ              (1ULL << 0)
+> > +  #define KVM_MEMORY_ATTRIBUTE_WRITE             (1ULL << 1)
+> > +  #define KVM_MEMORY_ATTRIBUTE_EXECUTE           (1ULL << 2)
+> > +  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> > +
+> > +4.139 KVM_SET_MEMORY_ATTRIBUTES
+> > +-----------------------------------------
+> > +
+> > +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> > +:Architectures: x86
+> > +:Type: vm ioctl
+> > +:Parameters: struct kvm_memory_attributes(in/out)
+> > +:Returns: 0 on success, <0 on error
+> > +
+> > +Sets memory attributes for pages in a guest memory range. Parameters are
+> > +specified via the following structure::
+> > +
+> > +  struct kvm_memory_attributes {
+> > +       __u64 address;
+> > +       __u64 size;
+> > +       __u64 attributes;
+> > +       __u64 flags;
+> > +  };
+> > +
+> > +The user sets the per-page memory attributes to a guest memory range indicated
+> > +by address/size, and in return KVM adjusts address and size to reflect the
+> > +actual pages of the memory range have been successfully set to the attributes.
+> > +If the call returns 0, "address" is updated to the last successful address + 1
+> > +and "size" is updated to the remaining address size that has not been set
+> > +successfully. The user should check the return value as well as the size to
+> > +decide if the operation succeeded for the whole range or not. The user may want
+> > +to retry the operation with the returned address/size if the previous range was
+> > +partially successful.
+> > +
+> > +Both address and size should be page aligned and the supported attributes can be
+> > +retrieved with KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES.
+> > +
+> > +The "flags" field may be used for future extensions and should be set to 0s.
+> > +
+> >  5. The kvm_run structure
+> >  ========================
+> >
+> > @@ -8270,6 +8323,16 @@ structure.
+> >  When getting the Modified Change Topology Report value, the attr->addr
+> >  must point to a byte where the value will be stored or retrieved from.
+> >
+> > +8.40 KVM_CAP_MEMORY_ATTRIBUTES
+> > +------------------------------
+> > +
+> > +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> > +:Architectures: x86
+> > +:Type: vm
+> > +
+> > +This capability indicates KVM supports per-page memory attributes and ioctls
+> > +KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES/KVM_SET_MEMORY_ATTRIBUTES are available.
+> > +
+> >  9. Known KVM API problems
+> >  =========================
+> >
+> > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> > index fbeaa9ddef59..a8e379a3afee 100644
+> > --- a/arch/x86/kvm/Kconfig
+> > +++ b/arch/x86/kvm/Kconfig
+> > @@ -49,6 +49,7 @@ config KVM
+> >         select SRCU
+> >         select INTERVAL_TREE
+> >         select HAVE_KVM_PM_NOTIFIER if PM
+> > +       select HAVE_KVM_MEMORY_ATTRIBUTES
+> >         help
+> >           Support hosting fully virtualized guest machines using hardware
+> >           virtualization extensions.  You will need a fairly recent
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 8f874a964313..a784e2b06625 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -800,6 +800,9 @@ struct kvm {
+> >
+> >  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+> >         struct notifier_block pm_notifier;
+> > +#endif
+> > +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> > +       struct xarray mem_attr_array;
+> >  #endif
+> >         char stats_id[KVM_STATS_NAME_SIZE];
+> >  };
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index 64dfe9c07c87..5d0941acb5bb 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -1182,6 +1182,7 @@ struct kvm_ppc_resize_hpt {
+> >  #define KVM_CAP_S390_CPU_TOPOLOGY 222
+> >  #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
+> >  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+> > +#define KVM_CAP_MEMORY_ATTRIBUTES 225
+> >
+> >  #ifdef KVM_CAP_IRQ_ROUTING
+> >
+> > @@ -2238,4 +2239,20 @@ struct kvm_s390_zpci_op {
+> >  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+> >  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+> >
+> > +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
+> > +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
+> > +#define KVM_SET_MEMORY_ATTRIBUTES              _IOWR(KVMIO,  0xd3, struct kvm_memory_attributes)
+> > +
+> > +struct kvm_memory_attributes {
+> > +       __u64 address;
+> > +       __u64 size;
+> > +       __u64 attributes;
+> > +       __u64 flags;
+> > +};
+> > +
+> > +#define KVM_MEMORY_ATTRIBUTE_READ              (1ULL << 0)
+> > +#define KVM_MEMORY_ATTRIBUTE_WRITE             (1ULL << 1)
+> > +#define KVM_MEMORY_ATTRIBUTE_EXECUTE           (1ULL << 2)
+> > +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> 
+> nit: how about using the BIT() macro for these?
 
-On 12/7/2022 3:46 PM, Christoph Hellwig wrote:
-> On Wed, Dec 07, 2022 at 12:59:00PM +0200, Max Gurtovoy wrote:
->> Why is it preferred that the migration SW will talk directly to the PF and
->> not via VFIO interface ?
-> It should never talk directly to any hardware, but through a kernel
-> interface, and that's probably vfio.  But that interface needs to
-> centered around the controlling function for all the reasons I've
-> written down multiple times now.
->
->> It's just an implementation detail.
-> No, it's not.  While you could come up with awkward ways to map how
-> the hardware interface must work to a completely contrary kernel
-> interface that's just going to create the need for lots of boilerplate
-> code _and_ confuses users.  The function that is beeing migrated can
-> fundamentally not be in control of itself.  Any interface that pretends
-> it is broken and a long term nightmare for users and implementers.
+Might be the _BITULL() in include/uapi/linux/const.h since it will be
+used by userspace also.
 
-We're defining the SPEC and interfaces now :)
+> 
+> > +
+> >  #endif /* __LINUX_KVM_H */
+> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> > index 800f9470e36b..effdea5dd4f0 100644
+> > --- a/virt/kvm/Kconfig
+> > +++ b/virt/kvm/Kconfig
+> > @@ -19,6 +19,9 @@ config HAVE_KVM_IRQ_ROUTING
+> >  config HAVE_KVM_DIRTY_RING
+> >         bool
+> >
+> > +config HAVE_KVM_MEMORY_ATTRIBUTES
+> > +       bool
+> > +
+> >  # Only strongly ordered architectures can select this, as it doesn't
+> >  # put any explicit constraint on userspace ordering. They can also
+> >  # select the _ACQ_REL version.
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 1782c4555d94..7f0f5e9f2406 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -1150,6 +1150,9 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+> >         spin_lock_init(&kvm->mn_invalidate_lock);
+> >         rcuwait_init(&kvm->mn_memslots_update_rcuwait);
+> >         xa_init(&kvm->vcpu_array);
+> > +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> > +       xa_init(&kvm->mem_attr_array);
+> > +#endif
+> >
+> >         INIT_LIST_HEAD(&kvm->gpc_list);
+> >         spin_lock_init(&kvm->gpc_lock);
+> > @@ -1323,6 +1326,9 @@ static void kvm_destroy_vm(struct kvm *kvm)
+> >                 kvm_free_memslots(kvm, &kvm->__memslots[i][0]);
+> >                 kvm_free_memslots(kvm, &kvm->__memslots[i][1]);
+> >         }
+> > +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> > +       xa_destroy(&kvm->mem_attr_array);
+> > +#endif
+> >         cleanup_srcu_struct(&kvm->irq_srcu);
+> >         cleanup_srcu_struct(&kvm->srcu);
+> >         kvm_arch_free_vm(kvm);
+> > @@ -2323,6 +2329,49 @@ static int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
+> >  }
+> >  #endif /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
+> >
+> > +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> > +static u64 kvm_supported_mem_attributes(struct kvm *kvm)
+> > +{
+> > +       return 0;
+> > +}
+> > +
+> > +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> > +                                          struct kvm_memory_attributes *attrs)
+> > +{
+> > +       gfn_t start, end;
+> > +       unsigned long i;
+> > +       void *entry;
+> > +       u64 supported_attrs = kvm_supported_mem_attributes(kvm);
+> > +
+> > +       /* flags is currently not used. */
+> 
+> nit: "is reserved"? I think it makes it a bit clearer what its purpose is.
+OK, then:
+  flags is reserved for future extention and currently is not used.
 
-Bellow is some possible direction I can think of.
+> 
+> > +       if (attrs->flags)
+> > +               return -EINVAL;
+> > +       if (attrs->attributes & ~supported_attrs)
+> > +               return -EINVAL;
+> > +       if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
+> > +               return -EINVAL;
+> > +       if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
+> > +               return -EINVAL;
+> > +
+> > +       start = attrs->address >> PAGE_SHIFT;
+> > +       end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+> 
+> Would using existing helpers be better for getting the frame numbers?
 
->> I feel like it's even sounds more reasonable to have a common API like we
->> have today to save_state/resume_state/quiesce_device/freeze_device and each
->> device implementation will translate this functionality to its own SPEC.
-> Absolutely.
->
->> If I understand your direction is to have QEMU code to talk to
->> nvmecli/new_mlx5cli/my_device_cli to do that and I'm not sure it's needed.
-> No.
-great.
->
->> The controlled device is not aware of any of the migration process. Only
->> the migration SW, system admin and controlling device.
-> Exactly.
->
->> So in the source:
->>
->> 1. We enable SRIOV on the NVMe driver
-> Again.  Nothing in live migration is tied to SR-IOV at all.  SR-IOV
-> is just one way to get multiple functions.
+Yes, gpa_to_gfn() can be used.
 
-Sure.
+> Also, the code checks that the address and size are page aligned, so
+> the end rounding up seems redundant, and might even be wrong if the
+> address+size-1 is close to the gfn_t limit (which this code tries to
+> avoid in an earlier check).
 
-It's just an example. It can be some mdev.
+That's right.
 
->
->> 2. We list all the secondary controllers: nvme1, nvme2, nvme3
->>
->> 3. We allow migrating nvme1, nvme2, nvme3 - now these VFs are migratable
->> (controlling to controlled).
->>
->> 4. We bind nvme1, nvme2, nvme3 to VFIO NVMe driver
->>
->> 5. We pass these functions to VM
-> And you need to pass the controlling function (or rather a handle for
-> it), because there is absolutely no sane way to discover that from
-> the controlled function as it can't have that information by the
-> fact that it is beeing passed to unprivilged VMs.
+> 
+> > +       entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
+> > +
+> > +       mutex_lock(&kvm->lock);
+> > +       for (i = start; i < end; i++)
+> > +               if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+> > +                                   GFP_KERNEL_ACCOUNT)))
+> > +                       break;
+> > +       mutex_unlock(&kvm->lock);
+> > +
+> > +       attrs->address = i << PAGE_SHIFT;
+> > +       attrs->size = (end - i) << PAGE_SHIFT;
+> 
+> nit: helpers for these too?
 
-Just thinking out loud:
+Similarly, gfn_to_gpa() will be used.
 
-When we perform step #3 we are narrowing it's scope and maybe some caps 
-that you're concerned of. After this setting, the controlled function is 
-in LM mode (we should define what does that mean in order to be able to 
-migrate it correctly) and the controlling function is the migration 
-master of it. Both can be aware of that. The only one that can master 
-the controlled function is the controlling function in LM mode. Thus, it 
-will be easy to keep that handle inside the kernel for VFs and for MDEVs 
-as well.
-Although I'm not against passing this handle to migration SW somehow in 
-the command line of the QEMU but I still can't completely agree it's 
-necessary.
+> 
+> With the end calculation fixed,
+> 
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> After adding the necessary configs for arm64 (on qemu/arm64):
+> Tested-by: Fuad Tabba <tabba@google.com>
 
+Thanks.
+Chao
+> 
+> Cheers,
+> /fuad
+> 
+> > +
+> > +       return 0;
+> > +}
+> > +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
+> > +
+> >  struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn)
+> >  {
+> >         return __gfn_to_memslot(kvm_memslots(kvm), gfn);
+> > @@ -4459,6 +4508,9 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+> >  #ifdef CONFIG_HAVE_KVM_MSI
+> >         case KVM_CAP_SIGNAL_MSI:
+> >  #endif
+> > +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> > +       case KVM_CAP_MEMORY_ATTRIBUTES:
+> > +#endif
+> >  #ifdef CONFIG_HAVE_KVM_IRQFD
+> >         case KVM_CAP_IRQFD:
+> >         case KVM_CAP_IRQFD_RESAMPLE:
+> > @@ -4804,6 +4856,30 @@ static long kvm_vm_ioctl(struct file *filp,
+> >                 break;
+> >         }
+> >  #endif /* CONFIG_HAVE_KVM_IRQ_ROUTING */
+> > +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> > +       case KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES: {
+> > +               u64 attrs = kvm_supported_mem_attributes(kvm);
+> > +
+> > +               r = -EFAULT;
+> > +               if (copy_to_user(argp, &attrs, sizeof(attrs)))
+> > +                       goto out;
+> > +               r = 0;
+> > +               break;
+> > +       }
+> > +       case KVM_SET_MEMORY_ATTRIBUTES: {
+> > +               struct kvm_memory_attributes attrs;
+> > +
+> > +               r = -EFAULT;
+> > +               if (copy_from_user(&attrs, argp, sizeof(attrs)))
+> > +                       goto out;
+> > +
+> > +               r = kvm_vm_ioctl_set_mem_attributes(kvm, &attrs);
+> > +
+> > +               if (!r && copy_to_user(argp, &attrs, sizeof(attrs)))
+> > +                       r = -EFAULT;
+> > +               break;
+> > +       }
+> > +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
+> >         case KVM_CREATE_DEVICE: {
+> >                 struct kvm_create_device cd;
+> >
+> > --
+> > 2.25.1
+> >
