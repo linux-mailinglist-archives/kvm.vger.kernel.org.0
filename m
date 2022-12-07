@@ -2,143 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4C4E64505D
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 01:33:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 309AB645060
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 01:34:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbiLGAdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 19:33:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41894 "EHLO
+        id S229680AbiLGAeX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 19:34:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229667AbiLGAdg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 19:33:36 -0500
+        with ESMTP id S229605AbiLGAeV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 19:34:21 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60094A479
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 16:32:39 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CADA17A94
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 16:33:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670373158;
+        s=mimecast20190719; t=1670373196;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Bx3BXv2xaG+1EbHubRbeDcJNx5uekjE2mo+oSlv4S6s=;
-        b=DQf6dzsD1agHUbtZuAiFwcLzOAFkDZ03nInWtn3qE6c6pG97bha+L0w++27gA9LFuk72Bz
-        WYjVaKgQYf7KidNqdZQnkjRZtCsNeDQkM4jCmVt86lCq9+rgMlriWe4ETkD38qm7role87
-        4jP0ThuMc2Hv/MHCaVMO3rG+Qn9o8Wk=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=NZl+Hf1IB2CG9zoSnbGugOz3yIdHJ+P71G6LngJeT/A=;
+        b=bklKbQWxnjMSwkEQSHoDqMsqxWDQYvjYJOzLbuhYP4C2H+q9Zxi1FGgNCWTOpvFb2T+SuB
+        Yf1LfIAgHPXmuwAs5T5pO3n9Ek10wHZm66RAgfRkEiT5WZVuI++mqGz1XtjEMNnyLbf2i0
+        Ywcdcr49XbDPHAu6SrDoV2jxuDCol58=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-578-2QVNvla9PEKGZPwzZatlQA-1; Tue, 06 Dec 2022 19:32:37 -0500
-X-MC-Unique: 2QVNvla9PEKGZPwzZatlQA-1
-Received: by mail-ej1-f70.google.com with SMTP id hs18-20020a1709073e9200b007c0f9ac75f9so2387628ejc.9
-        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 16:32:37 -0800 (PST)
+ us-mta-138-u5iR4vuYO7ud7LXRyLRyIA-1; Tue, 06 Dec 2022 19:33:14 -0500
+X-MC-Unique: u5iR4vuYO7ud7LXRyLRyIA-1
+Received: by mail-ej1-f72.google.com with SMTP id hp16-20020a1709073e1000b007adf5a83df7so2413188ejc.1
+        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 16:33:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bx3BXv2xaG+1EbHubRbeDcJNx5uekjE2mo+oSlv4S6s=;
-        b=O+5KV9xDrDvpThCnWpmL7p4CT+y8UCMEJPWvgo88kF3bfQ6IVhqD46L9ScpTteuZSp
-         wXTxzcrPu/0WiPuA+FqEoAImUA15yo4xZ/z5FVJbntEr1nNyPjqPo7ujW8uj+Tj+67do
-         I2YrUcVs37R2Br4klu9WVfZGwSCNL0xtNIbLOqiQ2NRE/KU3dpLDjIwkqkGdl472TcIn
-         4FzD4ujLxQJFW/GHHLzSAoBSBSEH+NgbfSSDR0dLjVQWIG7zD5i20tGIPu1BV2CHN0Ld
-         g3wD8uIP/xmtaAUlAcfo1Zos7EIIMjRJ30bh2Ka6NIbVeVbeN36tBD9mZz0r4mCZGz1J
-         FYGQ==
-X-Gm-Message-State: ANoB5pkuiS5V+sZPb+sPLciNuUWhCYIKOEvq3BJsAwBDP/3HnXj48ogo
-        ISGu6/gWmwa2AO2u0JMAbx2EwziuEQv4pPdg8TNMW4aHVAO7cz4AvdmWZ8DgK4Mn3lCVFn0dpD+
-        juYrVOeP4R6hm
-X-Received: by 2002:a17:906:c358:b0:7c1:15ff:ce80 with SMTP id ci24-20020a170906c35800b007c115ffce80mr2620651ejb.172.1670373155576;
-        Tue, 06 Dec 2022 16:32:35 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6Oxf+wCsuYpvkjV1axw2D5khlwYSyP4XXkZLxf8xeI771oZdd9N0RssiIxK8XsowEBoPe0XQ==
-X-Received: by 2002:a17:906:c358:b0:7c1:15ff:ce80 with SMTP id ci24-20020a170906c35800b007c115ffce80mr2620637ejb.172.1670373155280;
-        Tue, 06 Dec 2022 16:32:35 -0800 (PST)
+        bh=NZl+Hf1IB2CG9zoSnbGugOz3yIdHJ+P71G6LngJeT/A=;
+        b=gEDytu5Xpm3RgJz/ubgWopCybQfrr5z6ysz+JTcegGjPoNW4pTDTtor1tgOmuyD+9L
+         IXD5LSSQbpltV6v3bsSxfMV1o/NdbYWaAIx/pG3pAFwlN4I6RN9ze5fSFNsoCw11kK5i
+         2cp1kIg+oyEK4bM5uF35ychIFqNtpC8MFX7qm4+yf9gw+OUY6g17FSIbxpauxjnsvBYD
+         dafaB5oTWcMLEmvK4wAHMbVTnL/WvfIJVmq7gb4DTDpkiiUpWUXgSrjcSFsJsxXv2dKZ
+         DUNAEOS2YZJgLZJzxDUCxXD7STCPSa2iWU4pu2+3qQIPxDO73EBn79zUmPfZ/8J8P5BE
+         /Dhg==
+X-Gm-Message-State: ANoB5pkAJVWNhcFL3S30BvV73g8w/tSfVfPseBSkU8zG6lHxePkfkqlM
+        c2AwHY3d0fvnO0WsUff3PnI2VXqo/rtSvgZP0k0rEbJMqrxZIXcH69h9UB96X7vdYQTIw/uzcFm
+        c36n+fHazbUoR
+X-Received: by 2002:a05:6402:2992:b0:460:12ef:cc45 with SMTP id eq18-20020a056402299200b0046012efcc45mr22630466edb.249.1670373193797;
+        Tue, 06 Dec 2022 16:33:13 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4TAPRCHrT8/SPQq1PN5R701IyzQgAlgjWljvBLEL6tTqPRlkI1rDN9WpJeQU3BiKG2bx5rfg==
+X-Received: by 2002:a05:6402:2992:b0:460:12ef:cc45 with SMTP id eq18-20020a056402299200b0046012efcc45mr22630455edb.249.1670373193566;
+        Tue, 06 Dec 2022 16:33:13 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id bv19-20020a170906b1d300b0077016f4c6d4sm7869812ejb.55.2022.12.06.16.32.34
+        by smtp.googlemail.com with ESMTPSA id l12-20020aa7d94c000000b0046b1d63cfc1sm1533413eds.88.2022.12.06.16.33.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Dec 2022 16:32:34 -0800 (PST)
-Message-ID: <16b5bdd0-ac8c-640f-579e-1335d1286d80@redhat.com>
-Date:   Wed, 7 Dec 2022 01:32:33 +0100
+        Tue, 06 Dec 2022 16:33:13 -0800 (PST)
+Message-ID: <47b3d23b-e00e-b78f-69f4-4687f4ac607f@redhat.com>
+Date:   Wed, 7 Dec 2022 01:33:12 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH] KVM: x86: Add proper ReST tables for userspace MSR
- exits/flags
+Subject: Re: [PATCH] KVM: selftests: Fix build for memstress.[ch] rename
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20221207000959.2035098-1-seanjc@google.com>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Mark Brown <broonie@kernel.org>
+Cc:     Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+        kvm@vger.kernel.org, Ricardo Koller <ricarkol@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20221206175916.250104-1-broonie@kernel.org>
+ <20221207074108.42477c2d@canb.auug.org.au>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221207000959.2035098-1-seanjc@google.com>
+In-Reply-To: <20221207074108.42477c2d@canb.auug.org.au>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/7/22 01:09, Sean Christopherson wrote:
-> Add ReST formatting to the set of userspace MSR exits/flags so that the
-> resulting HTML docs generate a table instead of malformed gunk.  This
-> also fixes a warning that was introduced by a recent cleanup of the
-> relevant documentation (yay copy+paste).
-> 
->   >> Documentation/virt/kvm/api.rst:7287: WARNING: Block quote ends
->      without a blank line; unexpected unindent.
+On 12/6/22 21:42, Stephen Rothwell wrote:
+> Thanks for that.  I have added that as a merge fix patch to the kvm-arm
+> merge.  I assume this will be fixed up when that tree is merged into
+> the kvm tree.
 
-Queued, thanks.
+Yes, I'll push as soon as I get confirmation that my own resolution is 
+correct.
 
 Paolo
-
-> Fixes: 1ae099540e8c ("KVM: x86: Allow deflecting unknown MSR accesses to user space")
-> Fixes: 1f158147181b ("KVM: x86: Clean up KVM_CAP_X86_USER_SPACE_MSR documentation")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   Documentation/virt/kvm/api.rst | 20 ++++++++++++--------
->   1 file changed, 12 insertions(+), 8 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index c618fae44ad7..778c6460d1de 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6455,9 +6455,11 @@ The "reason" field specifies why the MSR interception occurred. Userspace will
->   only receive MSR exits when a particular reason was requested during through
->   ENABLE_CAP. Currently valid exit reasons are:
->   
-> -	KVM_MSR_EXIT_REASON_UNKNOWN - access to MSR that is unknown to KVM
-> -	KVM_MSR_EXIT_REASON_INVAL - access to invalid MSRs or reserved bits
-> -	KVM_MSR_EXIT_REASON_FILTER - access blocked by KVM_X86_SET_MSR_FILTER
-> +============================ ========================================
-> + KVM_MSR_EXIT_REASON_UNKNOWN access to MSR that is unknown to KVM
-> + KVM_MSR_EXIT_REASON_INVAL   access to invalid MSRs or reserved bits
-> + KVM_MSR_EXIT_REASON_FILTER  access blocked by KVM_X86_SET_MSR_FILTER
-> +============================ ========================================
->   
->   For KVM_EXIT_X86_RDMSR, the "index" field tells userspace which MSR the guest
->   wants to read. To respond to this request with a successful read, userspace
-> @@ -7256,11 +7258,13 @@ to inform a user that an MSR was not emulated/virtualized by KVM.
->   
->   The valid mask flags are:
->   
-> -	KVM_MSR_EXIT_REASON_UNKNOWN - intercept accesses to unknown (to KVM) MSRs
-> -	KVM_MSR_EXIT_REASON_INVAL   - intercept accesses that are architecturally
-> -                                invalid according to the vCPU model and/or mode
-> -	KVM_MSR_EXIT_REASON_FILTER  - intercept accesses that are denied by userspace
-> -                                via KVM_X86_SET_MSR_FILTER
-> +============================ ===============================================
-> + KVM_MSR_EXIT_REASON_UNKNOWN intercept accesses to unknown (to KVM) MSRs
-> + KVM_MSR_EXIT_REASON_INVAL   intercept accesses that are architecturally
-> +                             invalid according to the vCPU model and/or mode
-> + KVM_MSR_EXIT_REASON_FILTER  intercept accesses that are denied by userspace
-> +                             via KVM_X86_SET_MSR_FILTER
-> +============================ ===============================================
->   
->   7.22 KVM_CAP_X86_BUS_LOCK_EXIT
->   -------------------------------
-> 
-> base-commit: 3d7af7c5e000c68581429d533ed63414e4a48e6d
 
