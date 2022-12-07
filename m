@@ -2,163 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61633645D22
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 16:01:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC71A645D37
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 16:04:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230075AbiLGPBS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 10:01:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45322 "EHLO
+        id S230259AbiLGPEB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 10:04:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbiLGPAy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 10:00:54 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C391663DF;
-        Wed,  7 Dec 2022 06:59:17 -0800 (PST)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B7Di8q5028746;
-        Wed, 7 Dec 2022 14:59:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=38TkxpuCDc1rkg9BpED5d/5JYbHeOXmRvwygUYJ4Kqw=;
- b=RkL2Mh/7F/o7YKyQT1fIbuTH9/FH1BtSZTrUaIe9lSQBiWaKu6cqt4hfgyk2zs4AgV1y
- snolnoFws5bC+uzXeFdwuSgmQlY5jtyBdYs2iFJ9CkVYURfSXrFa9d1hgFN3s741cOhg
- A4GWlPy8Z2SsIuQa6879vGa3J2VP/5duwt8NaxbAjllnHfpK1u1P2zAujbwNMmH/CDQH
- FoJJEbyJLzvlyuT3x6YfHvvyi3EEtpBIM7nQGRycNO19+6POyUHE9NJLIPFw5woLYLTV
- jzxT8Zd4m7vBfGZbEbmc9il7Cr/6sFn/RIst08Zri9GyUBkS/bK5bKoGi6uRFjzUD2Iz aA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3mauyht7px-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Dec 2022 14:59:16 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B7EAfPj006713;
-        Wed, 7 Dec 2022 14:59:15 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3mauyht7p8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Dec 2022 14:59:15 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2B7CAZx6010873;
-        Wed, 7 Dec 2022 14:59:13 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3m9kvbb3hg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Dec 2022 14:59:13 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B7ExBIx42729780
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 7 Dec 2022 14:59:11 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 676D82004B;
-        Wed,  7 Dec 2022 14:59:11 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 420DB20043;
-        Wed,  7 Dec 2022 14:59:11 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed,  7 Dec 2022 14:59:11 +0000 (GMT)
-Date:   Wed, 7 Dec 2022 15:59:09 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
-        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] s390x: sie: Test whether the epoch
- extension field is working as expected
-Message-ID: <20221207155909.6a3271f7@p-imbrenda>
-In-Reply-To: <20221207133118.70746-1-thuth@redhat.com>
-References: <20221207133118.70746-1-thuth@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S229863AbiLGPDf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 10:03:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04A4162EBC
+        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 07:02:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670425322;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yAFoepezIvCP3uAHr/BFfLPVvO1u5OHDj5w9FAPQ8+I=;
+        b=aCnGIwgVSZd+JpZGYNP2szYzL91KwIezC+Rpz1FzxjEK3KJr1pigQnqThuHXUbI/uv3Mu3
+        qzQXBZjQndAB+IIIhy7Y4ONmthNCAgX1THVLR8nSoagFwUTLjI2FBqm7yjD9Y5vVvBosO1
+        AXaoJ7uYZXsK72LpSh8gd0v1/wVkm+g=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-601-unw6DvBVNtqiqo2zesaq1w-1; Wed, 07 Dec 2022 10:01:59 -0500
+X-MC-Unique: unw6DvBVNtqiqo2zesaq1w-1
+Received: by mail-wm1-f70.google.com with SMTP id u9-20020a05600c00c900b003cfb12839d6so699782wmm.5
+        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 07:01:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yAFoepezIvCP3uAHr/BFfLPVvO1u5OHDj5w9FAPQ8+I=;
+        b=E4qfRgWg4U0UWt5b3ukP67LrV6/sTczHeeDjpfbQREc4qZuSJsuI1ksugRtH02P8ol
+         vDYxLbNtGSptN6PMh0kKAQibg/LFNiJP1G13zd39EfhSRlCnlv1p/spi1dtokTKNthYO
+         A6eCv7ZRokLrnez2dWZWdTuGitxJ5nFNkiMbVTITTIO2Ad3p8izabEJ4n9V2Zv4lIwic
+         /1NmSRySVib6KxKBsah4KigQ5fB0rDS7HY2OC+0Qs76tsMolRaE+kanx4NRGeX01nRwY
+         oF5PUbNrXfMOJUT1XLTJlqjajgPLFMErELnXQc2fGlF6aFq8wEDqjxGpGwuNYrCPe0c5
+         OmPA==
+X-Gm-Message-State: ANoB5pnepyt2j5tHHc2LzA5fSG8I+1S9SX5QU/tj2y0Q+5NeMMMnvG+Q
+        OAae10Uv/YvrXA4wVgCXDrZFY+cxaTaBA/mK/oP7TllbP2WyTOtOJfajOCrWV9pbYp7bwrBfNgL
+        TDK/VIwu1eV/V
+X-Received: by 2002:a05:6000:137a:b0:242:5b1f:3dd0 with SMTP id q26-20020a056000137a00b002425b1f3dd0mr10163871wrz.633.1670425317215;
+        Wed, 07 Dec 2022 07:01:57 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7WjIG9s5h6WW8iRE/Pz9BUs/TQH8zSEuM+9DqTqN/19T1vpGwnC7f+e6cMwuAEoG4IwzH/4A==
+X-Received: by 2002:a05:6000:137a:b0:242:5b1f:3dd0 with SMTP id q26-20020a056000137a00b002425b1f3dd0mr10163852wrz.633.1670425316889;
+        Wed, 07 Dec 2022 07:01:56 -0800 (PST)
+Received: from redhat.com ([2.52.154.114])
+        by smtp.gmail.com with ESMTPSA id e4-20020adff344000000b00236488f62d6sm20203849wrp.79.2022.12.07.07.01.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Dec 2022 07:01:56 -0800 (PST)
+Date:   Wed, 7 Dec 2022 10:01:53 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Daniil Tatianin <d-tatianin@yandex-team.ru>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] drivers/vhost/vhost: fix overflow checks in
+ vhost_overflow
+Message-ID: <20221207100028-mutt-send-email-mst@kernel.org>
+References: <20221207134631.907221-1-d-tatianin@yandex-team.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: p24tt_fyjWuXTBBWW4q3eRayG7NbLgMO
-X-Proofpoint-GUID: zmwEw-5QRQB_Tj_fLFjy4BJy28-h91ZD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-07_05,2022-12-07_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
- suspectscore=0 bulkscore=0 phishscore=0 mlxlogscore=999 priorityscore=1501
- adultscore=0 spamscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2212070122
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221207134631.907221-1-d-tatianin@yandex-team.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  7 Dec 2022 14:31:18 +0100
-Thomas Huth <thuth@redhat.com> wrote:
-
-> We recently discovered a bug with the time management in nested scenarios
-> which got fixed by kernel commit "KVM: s390: vsie: Fix the initialization
-> of the epoch extension (epdx) field". This adds a simple test for this
-> bug so that it is easier to decide whether the host kernel of a machine
-
-s/decide/determine/
-
-> has already been fixed or not.
+On Wed, Dec 07, 2022 at 04:46:31PM +0300, Daniil Tatianin wrote:
+> The if statement would erroneously check for > ULONG_MAX, which could
+> never evaluate to true. Check for equality instead.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Found by Linux Verification Center (linuxtesting.org) with the SVACE
+> static analysis tool.
+> 
+> Signed-off-by: Daniil Tatianin <d-tatianin@yandex-team.ru>
+
+It can trigger on a 32 bit system. I'd also expect more analysis
+of the code flow than "this can not trigger switch to a condition
+that can" to accompany a patch.
+
 > ---
->  s390x/sie.c | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
+>  drivers/vhost/vhost.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/s390x/sie.c b/s390x/sie.c
-> index 87575b29..7ec4b030 100644
-> --- a/s390x/sie.c
-> +++ b/s390x/sie.c
-> @@ -58,6 +58,33 @@ static void test_diags(void)
->  	}
->  }
->  
-> +static void test_epoch_ext(void)
-> +{
-> +	u32 instr[] = {
-> +		0xb2780000,	/* STCKE 0 */
-> +		0x83020044	/* DIAG 0x44 to intercept */
-
-I'm conflicted about this. one one hand, it should be 0x83000044, but
-on the other hand it does not matter at all, and the other testcase
-also has the spurious 2 in the middle (to check things we are not
-checking here)
-
-> +	};
-> +
-> +	if (!test_facility(139)) {
-> +		report_skip("epdx: Multiple Epoch Facility is not available");
-> +		return;
-> +	}
-> +
-> +	guest[0] = 0x00;
-> +	memcpy(guest_instr, instr, sizeof(instr));
-> +
-> +	vm.sblk->gpsw.addr = PAGE_SIZE * 2;
-> +	vm.sblk->gpsw.mask = PSW_MASK_64;
-> +
-> +	vm.sblk->ecd |= ECD_MEF;
-> +	vm.sblk->epdx = 0x47;	/* Setting the epoch extension here ... */
-> +
-> +	sie(&vm);
-> +
-> +	/* ... should result in the same epoch extension here: */
-> +	report(guest[0] == 0x47, "epdx: different epoch is visible in the guest");
-> +}
-> +
->  static void setup_guest(void)
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 40097826cff0..8df706e7bc6c 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -730,7 +730,7 @@ static bool log_access_ok(void __user *log_base, u64 addr, unsigned long sz)
+>  /* Make sure 64 bit math will not overflow. */
+>  static bool vhost_overflow(u64 uaddr, u64 size)
 >  {
->  	setup_vm();
-> @@ -80,6 +107,7 @@ int main(void)
+> -	if (uaddr > ULONG_MAX || size > ULONG_MAX)
+> +	if (uaddr == ULONG_MAX || size == ULONG_MAX)
+>  		return true;
 >  
->  	setup_guest();
->  	test_diags();
-> +	test_epoch_ext();
->  	sie_guest_destroy(&vm);
->  
->  done:
+>  	if (!size)
+> -- 
+> 2.25.1
 
