@@ -2,182 +2,413 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83315645FA8
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 18:09:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C264645FF2
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 18:18:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229773AbiLGRJW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 12:09:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50960 "EHLO
+        id S230002AbiLGRSO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 12:18:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229661AbiLGRJU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 12:09:20 -0500
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 833E168C60
-        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 09:09:18 -0800 (PST)
-Received: by mail-qv1-xf2e.google.com with SMTP id e18so13115183qvs.1
-        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 09:09:18 -0800 (PST)
+        with ESMTP id S230009AbiLGRRo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 12:17:44 -0500
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05D4C69A95
+        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 09:17:13 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id s8so29739111lfc.8
+        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 09:17:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HuOdYoaZDEPwhBHdw5R6JgoLkPkq5AjkABUnDUFXsvQ=;
-        b=L25+9nzuXC37mO5ONp1KFhc6uwSzdxjDuh+q1RUj9PcSUte1gnxzsik/niGqyJlF5r
-         53OzldyC7As1YQHTfuQXkUCDZylT+hQHdA2/R+yJZq7z90yb9AdKiFyaTdnTfBRaevEo
-         zC+71K/BSqP4kpYQfjwHnGOq1QeskrDwIstDJaj79Fc074imxcc+Z/CcRXYUrN986Jwx
-         xS8dM9tNpBVM48NztTfGeU2A93wHRwa96nJu3t80VE3WtqHGiKQQUtdbavSVZbIHe68Y
-         bJ2XHYeRTbrO++RiE1+HCcvFtsHmPnac6cUs6PMAOh5QtILJH0jNIQy8M1jwIgBBYi3c
-         RAQg==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=KOvIV73YgnEG59cUZf5Ci+GOdoXUPasVeUFnMPAdLwM=;
+        b=htG26Fer6Pxq8JTaoQ5v/dHBa5s5MmKyXHrJZjHvyjfixvrwz1XQB39yAuduHohAHu
+         Vph6fvk22IPPPQBksZiyiaPt/Wezn0I16HY0yeZms+dOb+OPaSercM3yB9tDRNJUGnWr
+         biwvuGc4m/EW6HOuTuNB04E9KE9+f+ZIWpjDcYGcWjq1Sx2IhvqdxhGytEybiS64YF7C
+         5PU2s0H31mQK/0DGoGl7GpJGJDzQsMKjuCfeqHyRgC5z78ZBPtKNgmI9r6XfpZCRZ9+L
+         gAkr097mPTp1LmBnj7uGSb3JWq6d2b5ck+VaIjm6ALX0+hKNwITUlhuVSRI+rqmcpj+n
+         NRpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HuOdYoaZDEPwhBHdw5R6JgoLkPkq5AjkABUnDUFXsvQ=;
-        b=zBLJsZJXBsdehBxpTdtGIHwOtBs+PNM1kcjnMF6U1AAgBVD3ORQnW+PRVhxuGHqFYD
-         a3yXaUdrUKGkn4n9VKfl7F9ggu7dPg8fcFkFdic1OmN2FrOG2I+GffMdtGDnYTbTOIGu
-         ilX5tV2/61ukFF8PbHTZSNg3dMfnih2tfZPN2fMODLKS0REj8fPer4XlVKLCgXHglGh7
-         MEGu2f+CCMEUv9Wu6W22pfJZljdt1n93cDPy+9G/r7UowpnLzg2PfKh0PFGmI8PyUbcy
-         6oIbDSMGhDZoxjIBGGTILjaOomAMdf+1fsFlOZbB9+A4lqjsuat0KnLSAbibDZWcsn10
-         0gSw==
-X-Gm-Message-State: ANoB5pnMYg5jD5yYEDgaIaOYAfGBoP0nxksqmFDD6BiaunYOg8FFnfec
-        i6iiDSH8GA5Z0Ki5HITOgelLeg==
-X-Google-Smtp-Source: AA0mqf6+64WwPK2RnAvM3DaEXfXQsESPqJfP0kddWqKFr7Sa3vYzCF3c5jfJflVZrGxJYm7E7NY2zA==
-X-Received: by 2002:a05:6214:448b:b0:4bb:6419:ecfb with SMTP id on11-20020a056214448b00b004bb6419ecfbmr64187654qvb.109.1670432957650;
-        Wed, 07 Dec 2022 09:09:17 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
-        by smtp.gmail.com with ESMTPSA id m10-20020ac8444a000000b0039cc944ebdasm13745329qtn.54.2022.12.07.09.09.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Dec 2022 09:09:17 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1p2xv2-005HvE-Hk;
-        Wed, 07 Dec 2022 13:09:16 -0400
-Date:   Wed, 7 Dec 2022 13:09:16 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Brett Creeley <brett.creeley@amd.com>
-Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
-        alex.williamson@redhat.com, cohuck@redhat.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        shannon.nelson@amd.com, drivers@pensando.io
-Subject: Re: [RFC PATCH vfio 3/7] vfio/pds: Add VFIO live migration support
-Message-ID: <Y5DIvM1Ca0qLNzPt@ziepe.ca>
-References: <20221207010705.35128-1-brett.creeley@amd.com>
- <20221207010705.35128-4-brett.creeley@amd.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KOvIV73YgnEG59cUZf5Ci+GOdoXUPasVeUFnMPAdLwM=;
+        b=an2oWNA1VIAC1cYZ1sIftslKbj2YhnVY1NGFH14ML5yCvWddGtmZmrxkFv0LKVLXC6
+         4vhQQJ9plbdp0rnLtaGmp0/FHIHaGZAZFebrwzNUW2IEgwcslv/3V0nQW0QSpmyVWrRq
+         LOKMOpBLe0nfdBWnc8ptNtiNtR0Ak1g3m8bzCNXgh4dadqVVafbU7zYnjfM0Dws5+JQ9
+         tX84htwOpqDUYPEmvtOuWiuSCVhiLiKyy2vRT0LvBE4IByTq331b8/4j7APWo/6H9t0V
+         zZNbB3GnJFKNPG8JrwbDIcblxwXkSYhrQPpuVbGvkXEup5ZCXYR0Y+jHgoMvfkaCdAPl
+         fy4g==
+X-Gm-Message-State: ANoB5pmpHOOH26lebIqfpc3zDYqGJyfX08lZg7H7A0E/EMvZZ6rQJjD7
+        wELIirlK0YMS8+f+ABLWIB7yiGAlGCNRpaOhpJ/kVQ==
+X-Google-Smtp-Source: AA0mqf7XJjVD1zzSSchYDQKkSsZlg5aPfGQxCBPJwi0Mel7MS0RZkYnek7XAkRieowSHQgdZ2IuMBsfBg7rRBbW39EI=
+X-Received: by 2002:ac2:5628:0:b0:4b5:2958:bd06 with SMTP id
+ b8-20020ac25628000000b004b52958bd06mr11920460lff.26.1670433431057; Wed, 07
+ Dec 2022 09:17:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221207010705.35128-4-brett.creeley@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com> <20221202061347.1070246-7-chao.p.peng@linux.intel.com>
+In-Reply-To: <20221202061347.1070246-7-chao.p.peng@linux.intel.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Wed, 7 Dec 2022 17:16:34 +0000
+Message-ID: <CA+EHjTxwxsAPGYGgBGqDnNvecKNztrBY4j9a9FHmSTJG3Senpg@mail.gmail.com>
+Subject: Re: [PATCH v10 6/9] KVM: Unmap existing mappings when change the
+ memory attributes
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 06, 2022 at 05:07:01PM -0800, Brett Creeley wrote:
+Hi,
 
-> +struct file *
-> +pds_vfio_step_device_state_locked(struct pds_vfio_pci_device *pds_vfio,
-> +				  enum vfio_device_mig_state next)
+On Fri, Dec 2, 2022 at 6:19 AM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+>
+> Unmap the existing guest mappings when memory attribute is changed
+> between shared and private. This is needed because shared pages and
+> private pages are from different backends, unmapping existing ones
+> gives a chance for page fault handler to re-populate the mappings
+> according to the new attribute.
+>
+> Only architecture has private memory support needs this and the
+> supported architecture is expected to rewrite the weak
+> kvm_arch_has_private_mem().
+
+This kind of ties into the discussion of being able to share memory in
+place. For pKVM for example, shared and private memory would have the
+same backend, and the unmapping wouldn't be needed.
+
+So I guess that, instead of kvm_arch_has_private_mem(), can the check
+be done differently, e.g., with a different function, say
+kvm_arch_private_notify_attribute_change() (but maybe with a more
+friendly name than what I suggested :) )?
+
+Thanks,
+/fuad
+
+>
+> Also, during memory attribute changing and the unmapping time frame,
+> page fault handler may happen in the same memory range and can cause
+> incorrect page state, invoke kvm_mmu_invalidate_* helpers to let the
+> page fault handler retry during this time frame.
+>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> ---
+>  include/linux/kvm_host.h |   7 +-
+>  virt/kvm/kvm_main.c      | 168 ++++++++++++++++++++++++++-------------
+>  2 files changed, 116 insertions(+), 59 deletions(-)
+>
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 3d69484d2704..3331c0c92838 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -255,7 +255,6 @@ bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
+>  #endif
+>
+> -#ifdef KVM_ARCH_WANT_MMU_NOTIFIER
+>  struct kvm_gfn_range {
+>         struct kvm_memory_slot *slot;
+>         gfn_t start;
+> @@ -264,6 +263,8 @@ struct kvm_gfn_range {
+>         bool may_block;
+>  };
+>  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
+> +
+> +#ifdef KVM_ARCH_WANT_MMU_NOTIFIER
+>  bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
+>  bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
+>  bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
+> @@ -785,11 +786,12 @@ struct kvm {
+>
+>  #if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
+>         struct mmu_notifier mmu_notifier;
+> +#endif
+>         unsigned long mmu_invalidate_seq;
+>         long mmu_invalidate_in_progress;
+>         gfn_t mmu_invalidate_range_start;
+>         gfn_t mmu_invalidate_range_end;
+> -#endif
+> +
+>         struct list_head devices;
+>         u64 manual_dirty_log_protect;
+>         struct dentry *debugfs_dentry;
+> @@ -1480,6 +1482,7 @@ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
+>  int kvm_arch_post_init_vm(struct kvm *kvm);
+>  void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+>  int kvm_arch_create_vm_debugfs(struct kvm *kvm);
+> +bool kvm_arch_has_private_mem(struct kvm *kvm);
+>
+>  #ifndef __KVM_HAVE_ARCH_VM_ALLOC
+>  /*
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index ad55dfbc75d7..4e1e1e113bf0 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -520,6 +520,62 @@ void kvm_destroy_vcpus(struct kvm *kvm)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_destroy_vcpus);
+>
+> +void kvm_mmu_invalidate_begin(struct kvm *kvm)
 > +{
-> +	enum vfio_device_mig_state cur = pds_vfio->state;
-> +	struct device *dev = &pds_vfio->pdev->dev;
-> +	unsigned long lm_action_start;
-> +	int err = 0;
+> +       /*
+> +        * The count increase must become visible at unlock time as no
+> +        * spte can be established without taking the mmu_lock and
+> +        * count is also read inside the mmu_lock critical section.
+> +        */
+> +       kvm->mmu_invalidate_in_progress++;
 > +
-> +	dev_dbg(dev, "%s => %s\n",
-> +		pds_vfio_lm_state(cur), pds_vfio_lm_state(next));
+> +       if (likely(kvm->mmu_invalidate_in_progress == 1)) {
+> +               kvm->mmu_invalidate_range_start = INVALID_GPA;
+> +               kvm->mmu_invalidate_range_end = INVALID_GPA;
+> +       }
+> +}
 > +
-> +	lm_action_start = jiffies;
-> +	if (cur == VFIO_DEVICE_STATE_STOP && next == VFIO_DEVICE_STATE_STOP_COPY) {
-> +		/* Device is already stopped
-> +		 * create save device data file & get device state from firmware
-> +		 */
-> +		err = pds_vfio_get_save_file(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
+> +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
+> +{
+> +       WARN_ON_ONCE(!kvm->mmu_invalidate_in_progress);
 > +
-> +		/* Get device state */
-> +		err = pds_vfio_get_lm_state_cmd(pds_vfio);
-> +		if (err) {
-> +			pds_vfio_put_save_file(pds_vfio);
-> +			return ERR_PTR(err);
-> +		}
+> +       if (likely(kvm->mmu_invalidate_in_progress == 1)) {
+> +               kvm->mmu_invalidate_range_start = start;
+> +               kvm->mmu_invalidate_range_end = end;
+> +       } else {
+> +               /*
+> +                * Fully tracking multiple concurrent ranges has diminishing
+> +                * returns. Keep things simple and just find the minimal range
+> +                * which includes the current and new ranges. As there won't be
+> +                * enough information to subtract a range after its invalidate
+> +                * completes, any ranges invalidated concurrently will
+> +                * accumulate and persist until all outstanding invalidates
+> +                * complete.
+> +                */
+> +               kvm->mmu_invalidate_range_start =
+> +                       min(kvm->mmu_invalidate_range_start, start);
+> +               kvm->mmu_invalidate_range_end =
+> +                       max(kvm->mmu_invalidate_range_end, end);
+> +       }
+> +}
 > +
-> +		return pds_vfio->save_file->filep;
-> +	}
+> +void kvm_mmu_invalidate_end(struct kvm *kvm)
+> +{
+> +       /*
+> +        * This sequence increase will notify the kvm page fault that
+> +        * the page that is going to be mapped in the spte could have
+> +        * been freed.
+> +        */
+> +       kvm->mmu_invalidate_seq++;
+> +       smp_wmb();
+> +       /*
+> +        * The above sequence increase must be visible before the
+> +        * below count decrease, which is ensured by the smp_wmb above
+> +        * in conjunction with the smp_rmb in mmu_invalidate_retry().
+> +        */
+> +       kvm->mmu_invalidate_in_progress--;
+> +}
 > +
-> +	if (cur == VFIO_DEVICE_STATE_STOP_COPY && next == VFIO_DEVICE_STATE_STOP) {
-> +		/* Device is already stopped
-> +		 * delete the save device state file
-> +		 */
-> +		pds_vfio_put_save_file(pds_vfio);
-> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio,
-> +						    PDS_LM_STA_NONE);
-> +		return NULL;
-> +	}
+>  #if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
+>  static inline struct kvm *mmu_notifier_to_kvm(struct mmu_notifier *mn)
+>  {
+> @@ -714,45 +770,6 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+>         kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
+>  }
+>
+> -void kvm_mmu_invalidate_begin(struct kvm *kvm)
+> -{
+> -       /*
+> -        * The count increase must become visible at unlock time as no
+> -        * spte can be established without taking the mmu_lock and
+> -        * count is also read inside the mmu_lock critical section.
+> -        */
+> -       kvm->mmu_invalidate_in_progress++;
+> -
+> -       if (likely(kvm->mmu_invalidate_in_progress == 1)) {
+> -               kvm->mmu_invalidate_range_start = INVALID_GPA;
+> -               kvm->mmu_invalidate_range_end = INVALID_GPA;
+> -       }
+> -}
+> -
+> -void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
+> -{
+> -       WARN_ON_ONCE(!kvm->mmu_invalidate_in_progress);
+> -
+> -       if (likely(kvm->mmu_invalidate_in_progress == 1)) {
+> -               kvm->mmu_invalidate_range_start = start;
+> -               kvm->mmu_invalidate_range_end = end;
+> -       } else {
+> -               /*
+> -                * Fully tracking multiple concurrent ranges has diminishing
+> -                * returns. Keep things simple and just find the minimal range
+> -                * which includes the current and new ranges. As there won't be
+> -                * enough information to subtract a range after its invalidate
+> -                * completes, any ranges invalidated concurrently will
+> -                * accumulate and persist until all outstanding invalidates
+> -                * complete.
+> -                */
+> -               kvm->mmu_invalidate_range_start =
+> -                       min(kvm->mmu_invalidate_range_start, start);
+> -               kvm->mmu_invalidate_range_end =
+> -                       max(kvm->mmu_invalidate_range_end, end);
+> -       }
+> -}
+> -
+>  static bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>  {
+>         kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
+> @@ -806,23 +823,6 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+>         return 0;
+>  }
+>
+> -void kvm_mmu_invalidate_end(struct kvm *kvm)
+> -{
+> -       /*
+> -        * This sequence increase will notify the kvm page fault that
+> -        * the page that is going to be mapped in the spte could have
+> -        * been freed.
+> -        */
+> -       kvm->mmu_invalidate_seq++;
+> -       smp_wmb();
+> -       /*
+> -        * The above sequence increase must be visible before the
+> -        * below count decrease, which is ensured by the smp_wmb above
+> -        * in conjunction with the smp_rmb in mmu_invalidate_retry().
+> -        */
+> -       kvm->mmu_invalidate_in_progress--;
+> -}
+> -
+>  static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
+>                                         const struct mmu_notifier_range *range)
+>  {
+> @@ -1140,6 +1140,11 @@ int __weak kvm_arch_create_vm_debugfs(struct kvm *kvm)
+>         return 0;
+>  }
+>
+> +bool __weak kvm_arch_has_private_mem(struct kvm *kvm)
+> +{
+> +       return false;
+> +}
 > +
-> +	if (cur == VFIO_DEVICE_STATE_STOP && next == VFIO_DEVICE_STATE_RESUMING) {
-> +		/* create resume device data file */
-> +		err = pds_vfio_get_restore_file(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
+>  static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+>  {
+>         struct kvm *kvm = kvm_arch_alloc_vm();
+> @@ -2349,15 +2354,47 @@ static u64 kvm_supported_mem_attributes(struct kvm *kvm)
+>         return 0;
+>  }
+>
+> +static void kvm_unmap_mem_range(struct kvm *kvm, gfn_t start, gfn_t end)
+> +{
+> +       struct kvm_gfn_range gfn_range;
+> +       struct kvm_memory_slot *slot;
+> +       struct kvm_memslots *slots;
+> +       struct kvm_memslot_iter iter;
+> +       int i;
+> +       int r = 0;
 > +
-> +		return pds_vfio->restore_file->filep;
-> +	}
+> +       gfn_range.pte = __pte(0);
+> +       gfn_range.may_block = true;
 > +
-> +	if (cur == VFIO_DEVICE_STATE_RESUMING && next == VFIO_DEVICE_STATE_STOP) {
-> +		/* Set device state */
-> +		err = pds_vfio_set_lm_state_cmd(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
+> +       for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> +               slots = __kvm_memslots(kvm, i);
 > +
-> +		/* delete resume device data file */
-> +		pds_vfio_put_restore_file(pds_vfio);
-> +		return NULL;
-> +	}
+> +               kvm_for_each_memslot_in_gfn_range(&iter, slots, start, end) {
+> +                       slot = iter.slot;
+> +                       gfn_range.start = max(start, slot->base_gfn);
+> +                       gfn_range.end = min(end, slot->base_gfn + slot->npages);
+> +                       if (gfn_range.start >= gfn_range.end)
+> +                               continue;
+> +                       gfn_range.slot = slot;
 > +
-> +	if (cur == VFIO_DEVICE_STATE_RUNNING && next == VFIO_DEVICE_STATE_STOP) {
-> +		/* Device should be stopped
-> +		 * no interrupts, dma or change in internal state
-> +		 */
-> +		err = pds_vfio_suspend_device_cmd(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
+> +                       r |= kvm_unmap_gfn_range(kvm, &gfn_range);
+> +               }
+> +       }
 > +
-> +		return NULL;
-> +	}
+> +       if (r)
+> +               kvm_flush_remote_tlbs(kvm);
+> +}
 > +
-> +	if (cur == VFIO_DEVICE_STATE_STOP && next == VFIO_DEVICE_STATE_RUNNING) {
-> +		/* Device should be functional
-> +		 * interrupts, dma, mmio or changes to internal state is allowed
-> +		 */
-> +		err = pds_vfio_resume_device_cmd(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
+>  static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+>                                            struct kvm_memory_attributes *attrs)
+>  {
+>         gfn_t start, end;
+>         unsigned long i;
+>         void *entry;
+> +       int idx;
+>         u64 supported_attrs = kvm_supported_mem_attributes(kvm);
+>
+> -       /* flags is currently not used. */
+> +       /* 'flags' is currently not used. */
+>         if (attrs->flags)
+>                 return -EINVAL;
+>         if (attrs->attributes & ~supported_attrs)
+> @@ -2372,6 +2409,13 @@ static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+>
+>         entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
+>
+> +       if (kvm_arch_has_private_mem(kvm)) {
+> +               KVM_MMU_LOCK(kvm);
+> +               kvm_mmu_invalidate_begin(kvm);
+> +               kvm_mmu_invalidate_range_add(kvm, start, end);
+> +               KVM_MMU_UNLOCK(kvm);
+> +       }
 > +
-> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio,
-> +						    PDS_LM_STA_NONE);
-> +		return NULL;
-> +	}
-
-Please implement the P2P states in your device. After long discussions
-we really want to see all VFIO migrations implementations support
-this.
-
-It is still not clear what qemu will do when it sees devices that do
-not support P2P, but it will not be nice.
-
-Also, since you are obviously using and testing the related qemu
-series, please participate in the review of that in the qemu list, or
-at least offer your support with testing.
-
-While HCH is objecting to this driver even existing I won't comment on
-specific details.. Though it is intesting this approach doesn't change
-NVMe at all so it does seem less objectionable to me than the Intel
-RFC.
-
-Jason
+>         mutex_lock(&kvm->lock);
+>         for (i = start; i < end; i++)
+>                 if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+> @@ -2379,6 +2423,16 @@ static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+>                         break;
+>         mutex_unlock(&kvm->lock);
+>
+> +       if (kvm_arch_has_private_mem(kvm)) {
+> +               idx = srcu_read_lock(&kvm->srcu);
+> +               KVM_MMU_LOCK(kvm);
+> +               if (i > start)
+> +                       kvm_unmap_mem_range(kvm, start, i);
+> +               kvm_mmu_invalidate_end(kvm);
+> +               KVM_MMU_UNLOCK(kvm);
+> +               srcu_read_unlock(&kvm->srcu, idx);
+> +       }
+> +
+>         attrs->address = i << PAGE_SHIFT;
+>         attrs->size = (end - i) << PAGE_SHIFT;
+>
+> --
+> 2.25.1
+>
