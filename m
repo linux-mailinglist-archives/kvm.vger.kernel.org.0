@@ -2,65 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AC1564604C
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 18:33:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A008364609D
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 18:49:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230051AbiLGRc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 12:32:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40886 "EHLO
+        id S230097AbiLGRtG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 12:49:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230009AbiLGRc4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 12:32:56 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAF9C5E9D9
-        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 09:32:55 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id cm20so18309801pjb.1
-        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 09:32:55 -0800 (PST)
+        with ESMTP id S229683AbiLGRtE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 12:49:04 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99D35654E9
+        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 09:49:03 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id q17-20020a17090aa01100b002194cba32e9so2158456pjp.1
+        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 09:49:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gSytGWam2RsfZ8LDTXkI5HjY+j/pAQztbn0XEeCsCwU=;
-        b=l/guce6zU5tkdP1Fsai1HdMH375B1J1+FAu5avObfFwBew8DKDDWNueXLdA0wcnyRu
-         D+GmIizw1V5vReqrgZxwuA9l2gk4ZEc4gKxsm1GOWpsp26T38RliO4hYAOf80uqf544g
-         IPhfFnrW7vmozoSMxVZEUlSryLxy0ApW9IBVudYmg85F288FD57ZyHxy0wC1vH14aE7H
-         etGnPX09BP2AaxGchWVP6JqEUXpz/8f9FYrfpHtJw3kUNe0+nXt5vPJjPdKhpk/Qc3p9
-         nse6plPuR5xzqBXPsmxoSLUIk6B7FzsICHCRaUYXpiqS/l5YsMfSapTzNDjncaCBI040
-         ZlKA==
+        bh=DoJAqfR7ZvwAFiT9srWB2lyZBimUwRAh5SkQOgCpWVU=;
+        b=agsFaYqECAL1MPKDSRlaJV8kh8LVOmH7JyrbPFY5LZHTSTSh4H1W0rBB/2jFHBM+ug
+         Ftz6j0F8PaZ/B0r106lYXc+WPNhnsE5AeHrn52PmxZ6jA4CxChancNX5S4XeRqatj7ml
+         Z+VNICtE76VbH/asrkz0yXijc36RDB2MozVL3yONb34dKckZdK3ORVSMef3B+SAWUYjR
+         yf7dCgc2ybBs1pTC7KU/zZ+J/nXsJjgUWHmLWU6YMVhQRl92etqNEXmiqUjBKcSSso3V
+         eYgjy4z83ZLVYjGSAkg+BH96z7VcIMqQ95O6AgQNoxiKZfnRe8UCGwDOPQ48N9xy8ZrG
+         Lw+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gSytGWam2RsfZ8LDTXkI5HjY+j/pAQztbn0XEeCsCwU=;
-        b=A6I0nBim75rgTxfEKLZ2j7SnS803XetQIqAb64IOkvKnN01cxZNcY552b4/B7IiE53
-         YKmsJ5D1gE17CRbGEH+1NLg/myRVXcJW6egaUSSTOirWBTlBoiQkd6UBEwREeapYpfYB
-         fSOoHGq+JQ4+2Sb9/eSvFXkwk6nxq1Pl/9IAIQ3WVu+cYwEnJcK2wNU2gmJG5QYyw0S2
-         uEgSaa0oV2LCDz2bCvUN8+wxSUMquglCVYxDjuzJLptaRHKEntOtOV12o9W7gXl42Yu+
-         jpe7CIsyKgcLarF2rDVYepv5xzoihHAQ76RSTbY0+PUtxIuFpA9a2K2jLvjOPlpaSMuJ
-         z28A==
-X-Gm-Message-State: ANoB5pkJX4HNkN30UYqTLqy3QICZI8YTXalQKoXOh/THMk3lpDNp4NlL
-        fhH8XG+26XueXSZoyh7sdbKUpw==
-X-Google-Smtp-Source: AA0mqf4YBY5cMi6mJjSx24Uxe6LWKvbJ3oUClYq/wCU+BgOOCsXJMgMFHSm/JA3aK2fI+/4tfLy9wg==
-X-Received: by 2002:a05:6a20:9597:b0:a3:49d2:9504 with SMTP id iu23-20020a056a20959700b000a349d29504mr1637716pzb.3.1670434375344;
-        Wed, 07 Dec 2022 09:32:55 -0800 (PST)
+        bh=DoJAqfR7ZvwAFiT9srWB2lyZBimUwRAh5SkQOgCpWVU=;
+        b=2NKTA1vB4jCaV3SFshoN1eENvPbZTdV9pLdQj7STt/C31pisia8HtPqfIyGaYFhqEv
+         BznQ0dnB2GfaWgZzvZzbM0e9X9DwH4PZ85d2ft/U8it8T+Okg6QuVgTbrPJPPVB9ItOU
+         9n87f0p9nvprRiLgj2t/YJ9wVxAd1Ojrt08pXc3DofNlErt6J6xQAA03LPObsF1ypCUt
+         HrwJ1O1Sktn6wl/7/wPoU7YL7JCxSlDAYuMj1vtczsHL1R0EdjTc1Q+0F/uy7s229llx
+         5lUmqb+qetHgiqw8uTDYDcTY1+6+m/0qzYNJDMIx6hQiq9Zk6uSsbKX04Z7LN68NVutJ
+         mGGg==
+X-Gm-Message-State: ANoB5pkUPONO1MosPPHp4Cw6U2IyNMvtDcxHjaVGiA7deefW4HLeSY9b
+        7SuGT+MOINTKzoxOv42H5PCUGQ==
+X-Google-Smtp-Source: AA0mqf7+cEw6DpVd/xxS6KqoKAuqr/wjwSNyv+uy7vc511bTIAbG5FcprGnJgigMDg5CjC3wkWNHWQ==
+X-Received: by 2002:a05:6a21:9996:b0:a4:efde:2ed8 with SMTP id ve22-20020a056a21999600b000a4efde2ed8mr1749638pzb.0.1670435342977;
+        Wed, 07 Dec 2022 09:49:02 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id t3-20020aa79463000000b00576b0893ecasm7844765pfq.46.2022.12.07.09.32.54
+        by smtp.gmail.com with ESMTPSA id m17-20020a170902f21100b00189393ab02csm14805031plc.99.2022.12.07.09.49.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Dec 2022 09:32:54 -0800 (PST)
-Date:   Wed, 7 Dec 2022 17:32:51 +0000
+        Wed, 07 Dec 2022 09:49:02 -0800 (PST)
+Date:   Wed, 7 Dec 2022 17:48:58 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH kvm-unit-tests] x86/pmu: Add Intel Guest Transactional
- (commited) cycles testcase
-Message-ID: <Y5DOQ3v2ylWTbGZ7@google.com>
-References: <20221207071506.15733-1-likexu@tencent.com>
+Subject: Re: [PATCH] KVM: x86/pmu: Avoid ternary operator by directly
+ referring to counters->type
+Message-ID: <Y5DSChtav9fqfeEA@google.com>
+References: <20221205113718.1487-1-likexu@tencent.com>
+ <Y44gbvm5Zb7a1Sbj@google.com>
+ <38b2a836-f9a4-23e4-107b-61efc74638a4@gmail.com>
+ <Y495sF0rDGrrfstD@google.com>
+ <7db2bc22-99b8-96f3-66f3-d1695e2e82c1@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221207071506.15733-1-likexu@tencent.com>
+In-Reply-To: <7db2bc22-99b8-96f3-66f3-d1695e2e82c1@gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,189 +77,78 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Dec 07, 2022, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
+> On 7/12/2022 1:19 am, Sean Christopherson wrote:
+> > On Tue, Dec 06, 2022, Like Xu wrote:
+> > > > > diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> > > > > index e5cec07ca8d9..28b0a784f6e9 100644
+> > > > > --- a/arch/x86/kvm/vmx/pmu_intel.c
+> > > > > +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> > > > > @@ -142,7 +142,7 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
+> > > > >    	}
+> > > > >    	if (idx >= num_counters)
+> > > > >    		return NULL;
+> > > > > -	*mask &= pmu->counter_bitmask[fixed ? KVM_PMC_FIXED : KVM_PMC_GP];
+> > > > > +	*mask &= pmu->counter_bitmask[counters->type];
+> > > > 
+> > > > In terms of readability, I have a slight preference for the current code as I
 > 
-> On Intel platforms with TSX feature, pmu users in guest can collect
-> the commited or total transactional cycles for a tsx-enabled workload,
-> adding new test cases to cover them, as they are not strictly the same
-> as normal hardware events from the KVM implementation point of view.
+> IMO, using counters->type directly just like pmc_bitmask() will add more readability
+> and opportunistically helps some stale compilers behave better.
+
+Anyone that cares about this level of micro-optimization absolutely should be
+using a toolchain that's at or near the bleeding edge.
+
+> > > > don't have to look at counters->type to understand its possible values.
+> > > When someone tries to add a new type of pmc type, the code bugs up.
+> > 
+> > Are there new types coming along?  If so, I definitely would not object to refactoring
+> > this code in the context of a series that adds a new type(s).  But "fixing" this one
+> > case is not sufficient to support a new type, e.g. intel_is_valid_rdpmc_ecx() also
+> > needs to be updated.  Actually, even this function would need additional updates
+> > to perform a similar sanity check.
 > 
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->  x86/pmu.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 72 insertions(+), 1 deletion(-)
+> True but this part of the change is semantically relevant, which should not
+> be present in a harmless generic optimization like this one. Right ?
+
+For modern compilers, it's not an optimization.
+
+> > 	if (fixed) {
+> > 		counters = pmu->fixed_counters;
+> > 		num_counters = pmu->nr_arch_fixed_counters;
+> > 	} else {
+> > 		counters = pmu->gp_counters;
+> > 		num_counters = pmu->nr_arch_gp_counters;
+> > 	}
+> > 	if (idx >= num_counters)
+> > 		return NULL;
+> > 
+> > > And, this one will make all usage of pmu->counter_bitmask[] more consistent.
+> > 
+> > How's that?  There's literally one instance of using ->type
+> > 
+> >    static inline u64 pmc_bitmask(struct kvm_pmc *pmc)
+> >    {
+> > 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+> > 
+> > 	return pmu->counter_bitmask[pmc->type];
+> >    }
+> > 
+> > everything else is hardcoded.  And using pmc->type there make perfect sense in
+> > that case.  But in intel_rdpmc_ecx_to_pmc(), there is already usage of "fixed",
+> > so IMO switching to ->type makes that function somewhat inconsistent with itself.
 > 
-> diff --git a/x86/pmu.c b/x86/pmu.c
-> index 72c2c9c..d4c6813 100644
-> --- a/x86/pmu.c
-> +++ b/x86/pmu.c
-> @@ -20,7 +20,7 @@
->  
->  typedef struct {
->  	uint32_t ctr;
-> -	uint32_t config;
-> +	uint64_t config;
->  	uint64_t count;
->  	int idx;
->  } pmu_counter_t;
-> @@ -547,6 +547,76 @@ static void check_emulated_instr(void)
->  	report_prefix_pop();
->  }
->  
-> +#define _XBEGIN_STARTED		(~0u)
-> +
-> +static inline int
+> More, it's rare to see code like " [ a ? b : c] " in the world of both KVM and x86.
 
-This should be "unsigned int".  EAX can yield a negative value, e.g. via "XABORT
-0xff", which is why the compiler instrinsics use this explicit, unsigned value
-(that relies on reserved bits in the abort status).
+There are a few false positives here, but ternary operators are common.
 
-> _xbegin(void)
+  $ git grep ? arch/x86/kvm | wc -l
+  292
 
-These having nothing to do with the PMU, i.e. belong in processor.h.
+If you're saying that indexing an array with a ternary operator is rare, then sure,
+but only because there is almost never anything that fits such a pattern, not because
+it's an inherently bad pattern.
 
-The naming is also non-stanard, i.e. drop the underscore.  I assume you're
-trying to match the compiler instrinsics, but that's bound to do more harm than
-good.  Either use the instrinsics or write code that aligns with KUT's style.
-Using instrinsics is probably a bad idea because eventually we'll want to do
-something weird, e.g. provide a bogus fallback address. And having to go lookup
-gcc/clang documentation is rather annoything.
+> Good practice (branchless) should be scattered everywhere and not the other
+> way around.
 
-> +{
-> +	int ret = _XBEGIN_STARTED;
-
-Newline after declarations.
-
-> +	asm volatile(".byte 0xc7,0xf8 ; .long 0" : "+a" (ret) :: "memory");
-
-This is just mean.
-
-	unsigned int ret = XBEGIN_STARTED;
-	
-	asm volatile("xbegin 1f\n\t"
-		     "1:\n\t"
-		     : "+a" (ret) :: "memory");
-	return ret;
-
-> +	return ret;
-> +}
-> +
-> +static inline void _xend(void)
-> +{
-> +	asm volatile(".byte 0x0f,0x01,0xd5" ::: "memory");
-
-Like XBEGIN, use the mnemonic.
-
-> +}
-> +
-> +int *ptr;
-
-I'm honestly at a loss for words.
-
-> +static void tsx_fault(void)
-
-s/fault/abort.  Yes, a fault causes an abort, but no fault is ever observed by
-software.  Though I don't quite understand why helpers are needed in the first
-place.
-
-> +{
-> +	int value = 0;
-> +
-> +	ptr = NULL;
-> +	if(_xbegin() == _XBEGIN_STARTED) {
-
-Space after the "if".
-
-> +		value++;
-> +		// causes abort
-> +		*ptr = value;
-
-		/* Generate a non-canonical #GP to trigger ABORT. */
-		(int *)NONCANONICAL) = 0;
-
-> +		_xend();
-
-Why bother with XEND?
-
-> +	}
-> +}
-> +
-> +static void tsx_normal(void)
-> +{
-> +	int value = 0;
-> +
-> +	if(_xbegin() == _XBEGIN_STARTED) {
-> +		value++;
-
-What's the purpose of incrementing an arbitrary value?
-
-> +		_xend();
-
-Does this test rely on the region being successfully committed?  If so, the test
-is guaranteed to be flaky, e.g. due to a host IRQ at the "wrong" time.  Assuming
-success is not required, please add a comment describing the requirements.
-
-> +	}
-> +}
-> +
-> +static void check_tsx_cycles(void)
-> +{
-> +	pmu_counter_t cnt;
-> +	int i;
-> +
-> +	if (!this_cpu_has(X86_FEATURE_RTM) || !this_cpu_has(X86_FEATURE_HLE))
-> +		return;
-> +
-> +	report_prefix_push("TSX cycles");
-> +
-> +	for (i = 0; i < pmu.nr_gp_counters; i++) {
-> +		cnt.ctr = MSR_GP_COUNTERx(i);
-> +
-> +		if (i == 2)
-> +			/* Transactional cycles commited only on gp counter 2 */
-> +			cnt.config = EVNTSEL_OS | EVNTSEL_USR | 0x30000003c;
-> +		else
-> +			/* Transactional cycles */
-> +			cnt.config = EVNTSEL_OS | EVNTSEL_USR | 0x10000003c;
-> +
-> +		start_event(&cnt);
-> +		tsx_fault();
-> +		tsx_normal();
-
-As a above, why bother with helpers?  Can't this just be:
-
-
-		start_event(&cnt);
-
-		/* Generate a non-canonical #GP to trigger ABORT. */
-		if (xbegin() == XBEGIN_STARTED)
-			*(int *)NONCANONICAL = 0;
-
-		/* <comment about what requirements of this code> */
-		if (xbegin() == XBEGIN_STARTED)
-			xend();
-
-		stop_event(&cnt);
-
-> +		stop_event(&cnt);
-> +
-> +		report(cnt.count > 0, "gp cntr-%d", i);
-> +	}
-> +
-> +	report_prefix_pop();
-> +}
-> +
->  static void check_counters(void)
->  {
->  	if (is_fep_available())
-> @@ -559,6 +629,7 @@ static void check_counters(void)
->  	check_counter_overflow();
->  	check_gp_counter_cmask();
->  	check_running_counter_wrmsr();
-> +	check_tsx_cycles();
->  }
->  
->  static void do_unsupported_width_counter_write(void *index)
-> -- 
-> 2.38.1
-> 
+Once again, modern compilers will not generate branches for this code.
