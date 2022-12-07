@@ -2,92 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 315BE6454DC
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 08:50:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D51C26454F8
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 08:55:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbiLGHu5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 02:50:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41706 "EHLO
+        id S229694AbiLGHzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 02:55:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbiLGHuz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 02:50:55 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B47532F3B0
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 23:50:54 -0800 (PST)
+        with ESMTP id S229670AbiLGHzn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 02:55:43 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC25F2F3B0;
+        Tue,  6 Dec 2022 23:55:40 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 717FFB815C9
-        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 07:50:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BC25C433C1;
-        Wed,  7 Dec 2022 07:50:52 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5DF9C60B5C;
+        Wed,  7 Dec 2022 07:55:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3374C433D6;
+        Wed,  7 Dec 2022 07:55:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670399452;
-        bh=5jlubpu3hv7gKSSUUnb9ZTzv2xyFMeitpywQVmBs7i4=;
+        s=k20201202; t=1670399739;
+        bh=OH3kkWQmptbUO59HxBeRpao04FMNiOHDo828acZrA4c=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=TLM9PRyqlGJBPrjPNAQAgMAAoZw8XntKFdQADfLO11A8YLALVYH3JaylM16awxXPD
-         Z1etOtXNuoKykJKkLmkTkc+C1Y5vKQkVWOz2su4/niLXjzWncQqT3kRQR6YCyWLmlu
-         mbjUH7H4To4YIpkiqM8VPcw0q+i6sqDWoVppv0V1QGOfgKZGVQ9DMdAIXm2mcMcWkj
-         K0n9mU58MZK3sNueC/OoJZcICPOzkpo72CStU/hAzJn/Y6d1bniYYNinyvDA0npsr3
-         MbUSHlD1SS4ihIGkq/Ie0levx8XZVpaWPPPDv7Al8ybWUOHIzYjp/F6N7reEdkooVc
-         cdNoQWvcv1JFA==
+        b=a9Jx9JsRwMuLsqVyWiw/ualKM9036oQqCA4uBx2BOlJk9u2BPBTgBSkptocj4C17f
+         GJBX+kU403ntXxk/WlUa6Wbdh7MShXbPR7BBQK+kbGaQ2ZPxXgLs+CzI/+sSNQWR7C
+         bSSZnHBsRojo8Td6B6pk5bWzE9Sd9BdpzRESvuEDn8VZVppE+RPEmsQ0RULW9asIw6
+         5kqDQ2vFWx58SDYepUSXaO+kH+rSEShnmOTFnDQI8gv+qHKnfMd1gDnksfrdFT4xxV
+         fVDm2U8PUcd2x6A650cSVIrvnIaJC2s79iPgXLuNRS6qgsAc9Lz7Yr0FxvCco+jALa
+         r3JNpKKRGAe0w==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1p2pCb-00B1kc-4L;
-        Wed, 07 Dec 2022 07:50:49 +0000
-Date:   Wed, 07 Dec 2022 07:49:08 +0000
-Message-ID: <877cz3u00b.wl-maz@kernel.org>
+        id 1p2pHF-00B1pE-JD;
+        Wed, 07 Dec 2022 07:55:37 +0000
+Date:   Wed, 07 Dec 2022 07:54:03 +0000
+Message-ID: <875yentzs4.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Mark Brown <broonie@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Ben Gardon <bgardon@google.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Fuad Tabba <tabba@google.com>, Gavin Shan <gshan@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Peter Collingbourne <pcc@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>,
-        Quentin Perret <qperret@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Mark Brown <broonie@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
         Ricardo Koller <ricarkol@google.com>,
-        Ryan Roberts <ryan.roberts@arm.com>,
-        Steven Price <steven.price@arm.com>,
-        Usama Arif <usama.arif@bytedance.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Will Deacon <will@kernel.org>,
-        Zhiyuan Dai <daizhiyuan@phytium.com.cn>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
-In-Reply-To: <28e7f298-972b-2cb8-df80-951076724c73@redhat.com>
-References: <20221205155845.233018-1-maz@kernel.org>
-        <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
-        <Y4+FmDM7E5WYP3zV@google.com>
-        <Y4+H5Vwy/aLvjqbw@sirena.org.uk>
-        <28e7f298-972b-2cb8-df80-951076724c73@redhat.com>
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH] KVM: selftests: Fix build for memstress.[ch] rename
+In-Reply-To: <47b3d23b-e00e-b78f-69f4-4687f4ac607f@redhat.com>
+References: <20221206175916.250104-1-broonie@kernel.org>
+        <20221207074108.42477c2d@canb.auug.org.au>
+        <47b3d23b-e00e-b78f-69f4-4687f4ac607f@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, broonie@kernel.org, seanjc@google.com, andrew.jones@linux.dev, akpm@linux-foundation.org, anshuman.khandual@arm.com, acme@kernel.org, bagasdotme@gmail.com, bgardon@google.com, catalin.marinas@arm.com, cohuck@redhat.com, tabba@google.com, gshan@redhat.com, kuba@kernel.org, james.morse@arm.com, maciej.szmigiero@oracle.com, m.szyprowski@samsung.com, mark.rutland@arm.com, oliver.upton@linux.dev, pcc@google.com, peterx@redhat.com, philmd@linaro.org, qperret@google.com, reijiw@google.com, ricarkol@google.com, ryan.roberts@arm.com, steven.price@arm.com, usama.arif@bytedance.com, vdonnefort@google.com, will@kernel.org, daizhiyuan@phytium.com.cn, suzuki.poulose@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, sfr@canb.auug.org.au, broonie@kernel.org, shuah@kernel.org, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, ricarkol@google.com, dmatlack@google.com, seanjc@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -99,38 +70,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 06 Dec 2022 21:43:43 +0000,
+On Wed, 07 Dec 2022 00:33:12 +0000,
 Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
-> On 12/6/22 19:20, Mark Brown wrote:
-> >> I almost suggested doing that on multiple occasions this cycle, but ultimately
-> >> decided not to because it would effectively mean splitting series that touch KVM
-> >> and selftests into different trees, which would create a different kind of
-> >> dependency hell.  Or maybe a hybrid approach where series that only (or mostly?)
-> >> touch selftests go into a dedicated tree?
-> > 
-> > Some other subsystems do have a separate branch for kselftests.  One
-> > fairly common occurrence is that the selftests branch ends up failing to
-> > build independently because someone adds new ABI together with a
-> > selftest but the patches adding the ABI don't end up on the same branch
-> > as the tests which try to use them.  That is of course resolvable but
-> > it's a common friction point.
+> On 12/6/22 21:42, Stephen Rothwell wrote:
+> > Thanks for that.  I have added that as a merge fix patch to the kvm-arm
+> > merge.  I assume this will be fixed up when that tree is merged into
+> > the kvm tree.
 > 
-> Yeah, the right solution is simply to merge selftests changes
-> separately from the rest and use topic branches.
+> Yes, I'll push as soon as I get confirmation that my own resolution is
+> correct.
 
-Don't know if this is what you have in mind, but I think that we
-should use topic branches for *everything*. The only things for which
-I don't use a separate branch are the odd drive-by patches, of the
-spelling fix persuasion.
-
-That's what we do for arm64 and the IRQ subsystem. It is a bit more
-involved at queuing time, but makes dropping series from -next
-extremely easy, without affecting the history. And crucially, it gives
-everyone a hint to base their stuff on a stable commit, not a random
-"tip of kvm/queue as of three days ago".
+As I said in [1], things do build once you add [2] to the mix. I
+haven't had time to test the tests, but that shouldn't hold the push
+into -next.
 
 	M.
+
+[1] https://lore.kernel.org/all/86lenkl4d0.wl-maz@kernel.org
+[2] https://lore.kernel.org/r/20221206181506.252537-1-broonie@kernel.org
 
 -- 
 Without deviation from the norm, progress is not possible.
