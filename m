@@ -2,72 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86D1764617B
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 20:06:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B724264617E
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 20:07:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229835AbiLGTGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 14:06:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34674 "EHLO
+        id S229733AbiLGTHt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 14:07:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229815AbiLGTGP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 14:06:15 -0500
-Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F896F0EB
-        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 11:05:46 -0800 (PST)
-Received: by mail-yb1-xb2a.google.com with SMTP id c140so23898462ybf.11
-        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 11:05:46 -0800 (PST)
+        with ESMTP id S229738AbiLGTHq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 14:07:46 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F2D13E084
+        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 11:07:43 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id v13-20020a17090a6b0d00b00219c3be9830so2614267pjj.4
+        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 11:07:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WUn+qxGFeua6jnVnEZsyHiVilr8+qvfQhWrzBR+mRkA=;
-        b=eC0dm8xhL736RQ47q0R84aRbHuiua23zL5wKpv5jpwq1kciI++DnPFOzFhXBaJEoXY
-         O3bAeT29x4XMnx+OFqL/uG4+zq0Wz63bwMOwOVUlmXghbtUL9f+jnlqPG4XEdLEicAld
-         S8n4hI7Rzsjq/StTE09vlLY3cOzFR8+uWCZwJcZzHeFp2rGm8sW88SXypFziZj7EdSqw
-         ScrAqi/gtqY40t7Q6b3PMSJnUsELZ0GywMnKe6X1MP19T/PQOcT5RP56lBdvSyJzYZvI
-         o7fRn6iLe+6H0szEyGWkNVo8yK6eUv8nJuhPQbuJLw6D1Dwe4XjjwWb/uown2CfIdYEL
-         aZbA==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MIIsC5n7QdCrwcQHmEVu9CQ5CUNGyRG2niR/eVQTyw0=;
+        b=LuEPjlp29xXvhszc9RKkHf6piCKKDeFwO7yr9EzkeMEbEfs4Ha2coRFR2D9Vv/OlmW
+         kbnv79bt+vD1NP1+Kdox9Yqctkailz5+b41kLfM7WlHSBkfsuzIUuahGyWmmty3LHgJ/
+         bwcKnmQA9XyR39zorh6CfHARke6VID8xDdAfVviw1MCH9mdVR9Xl2OPnDJX7gs9ZSPHq
+         f1TT4OxX/TNVNAhZGlEsPLW6l3ZxFtfISQAlkxXeV8vmDWC6aDycJqB8jMS9pQ6w1/UW
+         v4PmlMZ1YU3sqW7wzksCBlOkJ5b4WnPNR3VCOA1dNBdqi2el+f0n9GYJeENws/x23OW8
+         S1XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WUn+qxGFeua6jnVnEZsyHiVilr8+qvfQhWrzBR+mRkA=;
-        b=UTablrHYZNJGcf5nfUocEL5/CRucmMO1ia14sYA2VVa5mP/hE2G+Lw1fN7NRIq5MSf
-         o3170VLEtTpOwl+ZtGH/QHTQgHeFtEtKXO/SMibB9ASxbNerX9Y3WXKlIOBAjFr2DDoD
-         7v8APN6+K9J5iQ3dqfMQ+mWFPDkkf9UXXKaOLC0N45IYs4zi0nyuhVWig7LKc2Cu0zAZ
-         2oz5XAjvt+GTdd1+LoJU+RtiOm/Yv2iV2lanz1SFBxCr5lS1zz9RUrg8QXcFzDUfz+MX
-         qYhSgac12eE209hwHpi5YozBfsebrmZwnkDsbwjmY0U/GcvdOQzDGpuOnWksIigiiilC
-         cB5g==
-X-Gm-Message-State: ANoB5pmotFtDRC95OKBoMLT1h2SL20/a3zjmeLAkJ41eYoQ2Dfjnl1p3
-        GDrncfZdQbbeqpRqhIIIa9GXE0Fj5euL3LomslUmYQ==
-X-Google-Smtp-Source: AA0mqf7x8t9HeWdmFjqdYcjinp/ZnnVLYe6lHRkX5L9isZlK3k7c8bEuvEXdNVXjSOgPEzzhJuNhHC+naAPsFyX7C+c=
-X-Received: by 2002:a25:5091:0:b0:703:8471:c745 with SMTP id
- e139-20020a255091000000b007038471c745mr7862390ybb.358.1670439945420; Wed, 07
- Dec 2022 11:05:45 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MIIsC5n7QdCrwcQHmEVu9CQ5CUNGyRG2niR/eVQTyw0=;
+        b=3+0ahnDTV/4Qil3cFg4GiZ2qrhQya/56fnHQQNWPbnBboyKctxHNgicgQOwPs4IUPV
+         KvHvpn+6JxKNjirPZkOmhDsiAhVAXOmyKSaI8FQcVCsoseeQSqocGm3Hr0FjtDVhWKZ1
+         LR4WUvDxbefS6kXCA5U77iVt4YcKsnIJoyEFshuYFCv9qHa+kJiZFzPj0y5LLS8ASAAv
+         aUnoa+hAfa/KH4G99Ubpgr+5HBDBKfwNHhDxaf2hlKZWxK6DzhdtweBzsxu8iOfYehQY
+         BouLWLl2Rm5IhedjMNX7iwc+9AxIbSJBqO2sowPWXhqi956i9R/Pi2mUb+3UlnD7F9W7
+         UcVQ==
+X-Gm-Message-State: ANoB5pnp6nDlLBnCY3vE95lDzJRKof3x88zhE02El9rBbAMQfWvOIrZN
+        6vlhW3xo3X3Vly3yZVIasYyQkg==
+X-Google-Smtp-Source: AA0mqf55MWjxuHrH3IT7R8UFXI80tu1WDPZA5MI0p/jv2F4oxIFUeP9djV9/MtxqV/qX/TVXvxz/Yw==
+X-Received: by 2002:a05:6a20:e60e:b0:9d:b8e6:d8e5 with SMTP id my14-20020a056a20e60e00b0009db8e6d8e5mr1461920pzb.2.1670440062946;
+        Wed, 07 Dec 2022 11:07:42 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id t16-20020a170902e85000b00189fdadef9csm645772plg.107.2022.12.07.11.07.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Dec 2022 11:07:42 -0800 (PST)
+Date:   Wed, 7 Dec 2022 19:07:39 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Venu Busireddy <venu.busireddy@oracle.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Michael Sterritt <sterritt@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH kernel 3/3] x86/sev: Do not handle #VC for DR7 read/write
+Message-ID: <Y5Dke3WOpd8bJK9q@google.com>
+References: <20221201021948.9259-1-aik@amd.com>
+ <20221201021948.9259-4-aik@amd.com>
+ <Y4jmmfrUXAzydM0G@google.com>
+ <Y5DjBAH1P38hjJRP@zn.tnic>
 MIME-Version: 1.0
-References: <20221201195718.1409782-1-vipinsh@google.com> <20221201195718.1409782-3-vipinsh@google.com>
- <CANgfPd9Khg2tMAfpj18R39cqzerFE6pu+4YUSrYr3KD5FG9zRA@mail.gmail.com>
- <CAHVum0cf_AeJ8rZGcWdne=QV6f_+09b=7kJb3xd-9eNiZr75Qg@mail.gmail.com>
- <CANgfPd9tBncLoVM4BnD5yq2O+=pXBN5_axBOh=bx=zjG7u8T7Q@mail.gmail.com>
- <CAHVum0f_6UQvcqWAJxDJyL_LN-6ryAXNuh9xY6nFtLxCOMtoXA@mail.gmail.com>
- <CANgfPd-XkHPZyFsPe75WbUrufLpKtdr1Neri1JrrApQrjRLRJw@mail.gmail.com> <CAHVum0dkKSY9e90xgfBVBHUqntwJOmONK+TYBXFEwg6acvUrAw@mail.gmail.com>
-In-Reply-To: <CAHVum0dkKSY9e90xgfBVBHUqntwJOmONK+TYBXFEwg6acvUrAw@mail.gmail.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Wed, 7 Dec 2022 11:05:09 -0800
-Message-ID: <CAHVum0dPRqOmoMQsjV5M0kcaccqTpfwou0zrMj1R1RUYMFBjEg@mail.gmail.com>
-Subject: Re: [Patch v2 2/2] KVM: x86/mmu: Allocate page table pages on NUMA
- node of underlying pages
-To:     Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc:     Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y5DjBAH1P38hjJRP@zn.tnic>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,77 +90,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-By mistake I started replying to just Ben and realized it after few
-exchanges. Adding others. Sorry about that.
+On Wed, Dec 07, 2022, Borislav Petkov wrote:
+> On Thu, Dec 01, 2022 at 05:38:33PM +0000, Sean Christopherson wrote:
+> > Probably high time to add a helper/macro to convert the SEV_STATUS to
+> > the SEV_FEATURES field.
+> 
+> Nah, there's a couple of
+> 
+> MSR_AMD64_SEV*
+> 
+> defines in arch/x86/include/asm/msr-index.h.
+> 
+> Bit 5 should simply be added there.
 
-On Wed, Dec 7, 2022 at 10:58 AM Vipin Sharma <vipinsh@google.com> wrote:
->
-> On Tue, Dec 6, 2022 at 11:57 AM Ben Gardon <bgardon@google.com> wrote:
-> >
-> > On Tue, Dec 6, 2022 at 11:18 AM Vipin Sharma <vipinsh@google.com> wrote:
-> > >
-> > > On Tue, Dec 6, 2022 at 10:17 AM Ben Gardon <bgardon@google.com> wrote:
-> > > >
-> > > > On Mon, Dec 5, 2022 at 3:40 PM Vipin Sharma <vipinsh@google.com> wrote:
-> > > > >
-> > > > > On Mon, Dec 5, 2022 at 10:17 AM Ben Gardon <bgardon@google.com> wrote:
-> > > > > >
-> > > > > > On Thu, Dec 1, 2022 at 11:57 AM Vipin Sharma <vipinsh@google.com> wrote:
-> > > > > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > > > > > index 1782c4555d94..4d59c9d48277 100644
-> > > > > > > --- a/virt/kvm/kvm_main.c
-> > > > > > > +++ b/virt/kvm/kvm_main.c
-> > > > > > > @@ -384,6 +384,11 @@ static void kvm_flush_shadow_all(struct kvm *kvm)
-> > > > > > >         kvm_arch_guest_memory_reclaimed(kvm);
-> > > > > > >  }
-> > > > > > >
-> > > > > > > +void * __weak kvm_arch_mmu_get_free_page(int nid, gfp_t gfp_flags)
-> > > > > > > +{
-> > > > > > > +               return (void *)__get_free_page(gfp_flags);
-> > > > > > > +}
-> > > > > > > +
-> > > > > >
-> > > > > > Rather than making this __weak, you could use #ifdef CONFIG_NUMA to
-> > > > > > just put all the code in the arch-neutral function.
-> > > > > >
-> > > > >
-> > > > > I am not sure how it will work. Here, I am trying to keep this feature
-> > > > > only for x86. This function will be used for all architecture except
-> > > > > in x86 where we have different implementation in arch/x86/mmu/mmu.c
-> > > > > So, even if CONFIG_NUMA is defined, we want to keep the same
-> > > > > definition on other architectures.
-> > > > >
-> > > > >
-> > > >
-> > > > Something like:
-> > > >
-> > > > +void * kvm_arch_mmu_get_free_page(int nid, gfp_t gfp_flags)
-> > > > +{
-> > > > +       struct page *spt_page;
-> > > > +       void *address = NULL;
-> > > > +
-> > > > +       #ifdef CONFIG_NUMA
-> > > > +       if (nid != NUMA_NO_NODE) {
-> > > > +               spt_page = alloc_pages_node(nid, gfp, 0);
-> > > > +               if (spt_page) {
-> > > > +                       address = page_address(spt_page);
-> > > > +                       return address;
-> > > > +               }
-> > > > +       }
-> > > > +       #endif // CONFIG_NUMA
-> > > > +       return (void *)__get_free_page(gfp);
-> > > > +}
-> > > >
-> > >
-> > > 'nid' will be 0 not NUMA_NO_NODE for other architectures. In x86, I am
-> > > explicitly setting kvm_mmu_memory_cache->node to NUMA_NO_NODE or
-> > > specific desired nodes. In others architectures it will be 0 as struct
-> > > will be 0 initialized. __weak avoids initializing nid to NUM_NO_NODE
-> > > in other architectures.
-> >
-> > ooh, I see. It might be worth setting it to NUMA_NO_NODE on other
-> > archs as 0 could be kind of misleading.
->
-> Discussed offline with Ben.
-> Initialization code for cache is in the respective architectures.
-> Using "__weak" avoids touching code in other architectures.
+Ah, yeah, that's much better.
