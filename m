@@ -2,64 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2938645996
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 13:04:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D704645998
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 13:05:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230263AbiLGMEF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 07:04:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36644 "EHLO
+        id S229893AbiLGMFY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 07:05:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230255AbiLGMED (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 07:04:03 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E3030F6F;
-        Wed,  7 Dec 2022 04:04:01 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id q15so16346400pja.0;
-        Wed, 07 Dec 2022 04:04:01 -0800 (PST)
+        with ESMTP id S229565AbiLGMFV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 07:05:21 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9F0B2496D;
+        Wed,  7 Dec 2022 04:05:18 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id f9so16192947pgf.7;
+        Wed, 07 Dec 2022 04:05:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=B48Bgebo64pDPnErOoGn8kP3QfjuFIi7+ZxgDnij3iE=;
-        b=ilVdd8D4TxYIzE2AdIA34SYk+96BVbuc6gXJ6ULKeju93aqfrB3raseRvN11x3CuY8
-         fOe8wFXBz0mUn+D4C+y+exGD+tw3MKnTbfVfE0RU0vrTr9m/qZFmI8wDn0EzB6XBXXgy
-         Cvg/AX0+QZ5DT3PHi5a/xrBbcGzUpMv4wFR2+e9vF8q1e8Klcu5pDKqAg7d+KFmiy8gV
-         G08nqA9pm/bU5DA2RVeQRHm6Y1xsvggIrnl2fW7UMPrEjn+FLMaiI+F3t7j/Sqgr/yqC
-         N3AdF9dVmYU0naybqat8/JQzFOCaIm0SH+BBUpZPush8/xfGo6C5hWpMF6BD8My/8JfE
-         mXQw==
+        bh=nL5tMNIP5CIUKG866yYq0jxqk6KvygHKPiHerSie/Pk=;
+        b=G6EnekbGjZcrMT0lR2LZu1aVwcqsY2CgLDHoH3ih9zB2KUCFeCLb5XBMr8x7os8lah
+         MDI0WPgsAYHiQRFu7nPlhMXc41Bo1GOmdv0FqaYs6T533Na9Nz0RrByHVK68qY5GdJxj
+         tTX/KN3O6PSx8wAk7sX1VcqeLlWxkPpIyZ0pzBx5Fir5IvnumPYHXyKWq3QwxBfwW+0n
+         ew2NfVpC/UXVWjBe863JqATEPAJz8ghgmlhBYqLbt2WayjGaoNtpNEvXKK7Z30IG/cbK
+         ZqeNnaHdynuH2HB5ydLbZt7XpMsFh1dirUUjrUnHnkmx0Xb+HjsySIiKzrIR/x0dgtKh
+         LxFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=B48Bgebo64pDPnErOoGn8kP3QfjuFIi7+ZxgDnij3iE=;
-        b=CjGtaCTaBXYjTjG/MpMEzQF7+poEzbjNLT7u/+QoLkKa2yKU9+H6sfKblJLXbeNzkg
-         wtkZ0P+Y1jslnwXAmC5VlV7D4j8402KQAxN+L6p2F0l9e/oSWwULu27TQxMoBuZkZhUG
-         iWhhNFjCRku//EVi4pQnXXQp5xS5hZBD8P/56JzQPHOH+SDScE2HsufSOINClDGfn72r
-         KUxa+ivxDKfH+30RRv97RSSIwXUCvTe2ygaKTCDzGeym3OfHz5d3rWmIzon30eqDi6Vo
-         dBgiDBISxru3D5YufSxbtb2P0Bs/td1FK3khTxYtE327ht+gqTJipX9qdXBGjgRk6zzs
-         26zQ==
-X-Gm-Message-State: ANoB5pnYfBQo3N21bQcAQzUkBnhM/4aAIzsMCTS5S0Kr4qWf3/eG7Hbe
-        1OxSKry2f/38e5fWYvoFtr0XUBwKAc0=
-X-Google-Smtp-Source: AA0mqf4FYqazemg7UUTOvHMmpmMEjWrm28Tc/gxwvgGHaTBHvkz/5Dscb/0tBixzLE3FWCN0SXTaKw==
-X-Received: by 2002:a17:90a:2dc8:b0:219:baef:3ba with SMTP id q8-20020a17090a2dc800b00219baef03bamr19131172pjm.6.1670414640533;
-        Wed, 07 Dec 2022 04:04:00 -0800 (PST)
+        bh=nL5tMNIP5CIUKG866yYq0jxqk6KvygHKPiHerSie/Pk=;
+        b=icEHeqewEmImqeuEfFbLMuHG2UGyO+lb0cG5MNIEhG8rtprBT0OGt9o6OFbz75iJf5
+         9oEfSyZNHo2vkLzNqU1IfSbABH7wUVtatAMeNIwuzh+2diJ462cm3QQeOebFKwvlUZQ0
+         Uc93+ZdjBy2ByJ+1TdIZNqGKQPCGTs9m89BH36n/mdxgjWVUUNqt49lHUaZzLLsAxMYa
+         dAVj6x2BWsqgJxz/7S36G/4A9CO2MeqUE3EY0QqtsdIvjAnxuX3nJ3oGDYdiZ5orVQEr
+         pMDZL6/bMTl6AC01udNkFJt0mNCUFV6kVsnXhpnwHZD8TIHzNUq2uLx5dtpRll0Ikj3w
+         XsKg==
+X-Gm-Message-State: ANoB5pnxF8VJotUEFVV2AyLPtXXiAiwWECKZNlLc1kQldi7a1y1u3QUq
+        jbSUg8u0Lh/8UR1PaLb4j/v41bRfsHg=
+X-Google-Smtp-Source: AA0mqf7t54V55tRuJgxMoLFjTmLUs+A3ELpyZd4YPAXbIGAqvZ0mjU+Wnf0hb1665gD/2GjaZLt2Wg==
+X-Received: by 2002:a63:ed4f:0:b0:438:a751:f8fa with SMTP id m15-20020a63ed4f000000b00438a751f8famr82235298pgk.601.1670414718084;
+        Wed, 07 Dec 2022 04:05:18 -0800 (PST)
 Received: from localhost ([198.11.178.15])
-        by smtp.gmail.com with ESMTPSA id f6-20020a170902ce8600b001743ba85d39sm14501473plg.110.2022.12.07.04.03.59
+        by smtp.gmail.com with ESMTPSA id j4-20020a170903028400b00186e34524e3sm7562403plr.136.2022.12.07.04.05.17
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 07 Dec 2022 04:04:00 -0800 (PST)
+        Wed, 07 Dec 2022 04:05:17 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
-Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Subject: [PATCH] kvm: x86/mmu: Remove duplicated "be split" in spte.h
-Date:   Wed,  7 Dec 2022 20:05:05 +0800
-Message-Id: <20221207120505.9175-1-jiangshanlai@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: [PATCH] kvm: Remove the unused macro KVM_MMU_READ_LOCK()
+Date:   Wed,  7 Dec 2022 20:06:16 +0800
+Message-Id: <20221207120617.9409-1-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -75,26 +71,31 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-"be split be split" -> "be split"
+No code is using KVM_MMU_READ_LOCK().
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/kvm/mmu/spte.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ virt/kvm/kvm_mm.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 1f03701b943a..6f54dc9409c9 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -363,7 +363,7 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
-  * A shadow-present leaf SPTE may be non-writable for 4 possible reasons:
-  *
-  *  1. To intercept writes for dirty logging. KVM write-protects huge pages
-- *     so that they can be split be split down into the dirty logging
-+ *     so that they can be split down into the dirty logging
-  *     granularity (4KiB) whenever the guest writes to them. KVM also
-  *     write-protects 4KiB pages so that writes can be recorded in the dirty log
-  *     (e.g. if not using PML). SPTEs are write-protected for dirty logging
+diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
+index a1ab15006af3..e98e294080bf 100644
+--- a/virt/kvm/kvm_mm.h
++++ b/virt/kvm/kvm_mm.h
+@@ -14,13 +14,11 @@
+ #define KVM_MMU_LOCK_INIT(kvm)		rwlock_init(&(kvm)->mmu_lock)
+ #define KVM_MMU_LOCK(kvm)		write_lock(&(kvm)->mmu_lock)
+ #define KVM_MMU_UNLOCK(kvm)		write_unlock(&(kvm)->mmu_lock)
+-#define KVM_MMU_READ_LOCK(kvm)		read_lock(&(kvm)->mmu_lock)
+ #define KVM_MMU_READ_UNLOCK(kvm)	read_unlock(&(kvm)->mmu_lock)
+ #else
+ #define KVM_MMU_LOCK_INIT(kvm)		spin_lock_init(&(kvm)->mmu_lock)
+ #define KVM_MMU_LOCK(kvm)		spin_lock(&(kvm)->mmu_lock)
+ #define KVM_MMU_UNLOCK(kvm)		spin_unlock(&(kvm)->mmu_lock)
+-#define KVM_MMU_READ_LOCK(kvm)		spin_lock(&(kvm)->mmu_lock)
+ #define KVM_MMU_READ_UNLOCK(kvm)	spin_unlock(&(kvm)->mmu_lock)
+ #endif /* KVM_HAVE_MMU_RWLOCK */
+ 
 -- 
 2.19.1.6.gb485710b
 
