@@ -2,61 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3ED164546A
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 08:15:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FF7364546C
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 08:15:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229715AbiLGHPb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 02:15:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48640 "EHLO
+        id S229603AbiLGHPe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 02:15:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbiLGHP2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 02:15:28 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9FE73FBAF;
-        Tue,  6 Dec 2022 23:15:27 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id t11-20020a17090a024b00b0021932afece4so630260pje.5;
-        Tue, 06 Dec 2022 23:15:27 -0800 (PST)
+        with ESMTP id S229601AbiLGHPa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 02:15:30 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F7341993;
+        Tue,  6 Dec 2022 23:15:29 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id y17so16243764plp.3;
+        Tue, 06 Dec 2022 23:15:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=irwELKgku9XO+PkVp3PJk2lHXEjpEyjkc1Dg0ROQzm4=;
-        b=DFsxjvDT2uGfcXxcxPqVR0tKPPTxPVyRhht1b453vOlmzRPNrvE8e76aYflsONKUEl
-         DnkK3ZE4Thy5xxRxASZydKiHcyH+ChwFXZKuBVkQgOgxg7RAfOoA5dDbKdBHwRRz926I
-         l3EFfHM+WhEYE6xZKbFZ6hFY6GbHDzi5FQMTgAL9RenMHShSiPyEfK+MGIZaAq8Kp3Qa
-         12BkPXqXfuXeXTNXEYBpejN7myai/oJLnP/qpxlBB01LMADkt46h3uDqRnnBW7uRMcrv
-         PjK8C9rPZcA3l0evYCPPS0lldaFwrT4LxG7F0O8ntd/MnM4BzPBhy9RWBA2qMvMErhss
-         dXyg==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tSjXL3el8itvunz/kkodAyXJASEfYFJJyxPXVJ+LMlQ=;
+        b=F4SFDwDkaiLiWCTp1x41oama4Paex8vbGJ+/CGeQdi02LuS1pkCjqF9Lx0FjUNrcQq
+         ZQiZNRN/jhR/rEyXTW6FDUDrZkgTRCydTza6t9mu4Ffjjw9mbEApt0lsjeBOZdeugVHu
+         LXxy0yxFJ59IHOUQT50/028PutxYd+nITZEEb2UVbIFBvnJ1ZfQI4BLyetEzmbgzMA5H
+         SuSvRBefGz1Y0tE+ZSp1LUkXe4+l5C9QE4gHrJUJfH1gE5isGfArShJ8Sd+5sDHP4DuH
+         X1ylEXZHZJo2ZUpab6XejfbyF+BZRMJzjPWhaToObdBCtefeNQN3aGe9KFSII8Y4jJNV
+         aHHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=irwELKgku9XO+PkVp3PJk2lHXEjpEyjkc1Dg0ROQzm4=;
-        b=vTiDg7ZWKcxjI4UxbW8Sl6zN/LPnHy+PdzaZdOicB0vUTDixek2Ed7Xf20MD8O4sD7
-         wBfGmCbQeCV4vCti1JREjIC+dCDLTheDbCZT7gSo3M+XN74Z/pJZWXweDr8rrT99+hWE
-         /lSP4FuN4Hy6yljIsG497jmCu26KTI/4rvjtNVKBD4S6GqTqFTLdNlsIZDqZOcZGLKyL
-         Ch+9n/HrNUvTrAml+5dEbuFKvUW+1X//kR3TQpIqj0WO5Dt/cnbSCZG8d4bVb7f/stBD
-         6TYGJuvQ20/QaUmkeHeqsqQ4x4aLv/JKRIrPIEIGA7viHLqP6HuU6dGOw/2lNL9+QSJ0
-         8DHg==
-X-Gm-Message-State: ANoB5pmD8M3//mLwvYf4a198AvJxPlhf75/nVYk1n7nSNI5yDkDrTZ+f
-        5Pfl87F9drn8T9l1YI3aBq4=
-X-Google-Smtp-Source: AA0mqf6QXrGNB9Fck1EG29BMan7sV5UVMU6CmMYL8qP9Duvuy/5rYJo4VYk70QzxmUrZY6fVupKcxw==
-X-Received: by 2002:a17:90a:440b:b0:219:886b:9155 with SMTP id s11-20020a17090a440b00b00219886b9155mr26879356pjg.167.1670397327077;
-        Tue, 06 Dec 2022 23:15:27 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tSjXL3el8itvunz/kkodAyXJASEfYFJJyxPXVJ+LMlQ=;
+        b=kKW1sINFVhYkVl81O8+JlXWq2Fob9SfXMKNk0ca+LxbBKxsXntB2/rdur5R39xmuE8
+         5OdgzQZWbw0WglNZFKHj7/4RQHrOm+lZ8yJcY04lmtyxNunNbd+Ue+4ydTrHqCtVeh6b
+         yuWJfsrFZ7z5cDhUnuDa84uaVXxF7EvJciI5AO2ZwwGbJsuUwbPx0abyfKRPdVEGsWdo
+         6NJGAsG3kmFhBmv62b/ehKhFNvwDQ2SxxTNKtoF8xNrtBfIS1oJ8TYRG36dqZIjO78kT
+         qTD9eSjdQ1BNe1Jm5pxYSKHeWVRzpjbK8zAUfqajb30is2TtTq0xa1PsC1HOaNEZCA0Y
+         BGiw==
+X-Gm-Message-State: ANoB5pk1Ewzm2JG7zJynZjrQSEJkx7srEJjwahCxu6Yp07/IoOeI44qp
+        Hc8QE04+mwNjQJlSKgFAxuHDueYCEts4cQ==
+X-Google-Smtp-Source: AA0mqf4kxn/tqHv5woAQczBjsfUFvhLllTl+OLkuKfDKMPkXWfFqqrrAKaCDcihaz8iGRv1WmqdIaQ==
+X-Received: by 2002:a17:902:b705:b0:189:e711:16c with SMTP id d5-20020a170902b70500b00189e711016cmr8725979pls.67.1670397329091;
+        Tue, 06 Dec 2022 23:15:29 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id c126-20020a621c84000000b005629b6a8b53sm13198561pfc.15.2022.12.06.23.15.24
+        by smtp.gmail.com with ESMTPSA id c126-20020a621c84000000b005629b6a8b53sm13198561pfc.15.2022.12.06.23.15.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Dec 2022 23:15:26 -0800 (PST)
+        Tue, 06 Dec 2022 23:15:28 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH kvm-unit-tests] x86/pmu: Add Intel Guest Transactional (commited) cycles testcase
-Date:   Wed,  7 Dec 2022 15:15:05 +0800
-Message-Id: <20221207071506.15733-1-likexu@tencent.com>
+Subject: [PATCH] KVM: x86/pmu: Prevent zero period event from being repeatedly released
+Date:   Wed,  7 Dec 2022 15:15:06 +0800
+Message-Id: <20221207071506.15733-2-likexu@tencent.com>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20221207071506.15733-1-likexu@tencent.com>
+References: <20221207071506.15733-1-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -71,114 +74,51 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-On Intel platforms with TSX feature, pmu users in guest can collect
-the commited or total transactional cycles for a tsx-enabled workload,
-adding new test cases to cover them, as they are not strictly the same
-as normal hardware events from the KVM implementation point of view.
+The current vPMU can reuse the same pmc->perf_event for the same
+hardware event via pmc_pause/resume_counter(), but this optimization
+does not apply to a portion of the TSX events (e.g., "event=0x3c,in_tx=1,
+in_tx_cp=1"), where event->attr.sample_period is legally zero at creation,
+thus making the perf call to perf_event_period() meaningless (no need to
+adjust sample period in this case), and instead causing such reusable
+perf_events to be repeatedly released and created.
+
+Avoid releasing zero sample_period events by checking is_sampling_event()
+to follow the previously enable/disable optimization.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- x86/pmu.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 72 insertions(+), 1 deletion(-)
+ arch/x86/kvm/pmu.c | 3 ++-
+ arch/x86/kvm/pmu.h | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/x86/pmu.c b/x86/pmu.c
-index 72c2c9c..d4c6813 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -20,7 +20,7 @@
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 684393c22105..eb594620dd75 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -238,7 +238,8 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
+ 		return false;
  
- typedef struct {
- 	uint32_t ctr;
--	uint32_t config;
-+	uint64_t config;
- 	uint64_t count;
- 	int idx;
- } pmu_counter_t;
-@@ -547,6 +547,76 @@ static void check_emulated_instr(void)
- 	report_prefix_pop();
- }
+ 	/* recalibrate sample period and check if it's accepted by perf core */
+-	if (perf_event_period(pmc->perf_event,
++	if (is_sampling_event(pmc->perf_event) &&
++	    perf_event_period(pmc->perf_event,
+ 			      get_sample_period(pmc, pmc->counter)))
+ 		return false;
  
-+#define _XBEGIN_STARTED		(~0u)
-+
-+static inline int _xbegin(void)
-+{
-+	int ret = _XBEGIN_STARTED;
-+	asm volatile(".byte 0xc7,0xf8 ; .long 0" : "+a" (ret) :: "memory");
-+	return ret;
-+}
-+
-+static inline void _xend(void)
-+{
-+	asm volatile(".byte 0x0f,0x01,0xd5" ::: "memory");
-+}
-+
-+int *ptr;
-+
-+static void tsx_fault(void)
-+{
-+	int value = 0;
-+
-+	ptr = NULL;
-+	if(_xbegin() == _XBEGIN_STARTED) {
-+		value++;
-+		// causes abort
-+		*ptr = value;
-+		_xend();
-+	}
-+}
-+
-+static void tsx_normal(void)
-+{
-+	int value = 0;
-+
-+	if(_xbegin() == _XBEGIN_STARTED) {
-+		value++;
-+		_xend();
-+	}
-+}
-+
-+static void check_tsx_cycles(void)
-+{
-+	pmu_counter_t cnt;
-+	int i;
-+
-+	if (!this_cpu_has(X86_FEATURE_RTM) || !this_cpu_has(X86_FEATURE_HLE))
-+		return;
-+
-+	report_prefix_push("TSX cycles");
-+
-+	for (i = 0; i < pmu.nr_gp_counters; i++) {
-+		cnt.ctr = MSR_GP_COUNTERx(i);
-+
-+		if (i == 2)
-+			/* Transactional cycles commited only on gp counter 2 */
-+			cnt.config = EVNTSEL_OS | EVNTSEL_USR | 0x30000003c;
-+		else
-+			/* Transactional cycles */
-+			cnt.config = EVNTSEL_OS | EVNTSEL_USR | 0x10000003c;
-+
-+		start_event(&cnt);
-+		tsx_fault();
-+		tsx_normal();
-+		stop_event(&cnt);
-+
-+		report(cnt.count > 0, "gp cntr-%d", i);
-+	}
-+
-+	report_prefix_pop();
-+}
-+
- static void check_counters(void)
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 85ff3c0588ba..cdb91009701d 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -140,7 +140,8 @@ static inline u64 get_sample_period(struct kvm_pmc *pmc, u64 counter_value)
+ 
+ static inline void pmc_update_sample_period(struct kvm_pmc *pmc)
  {
- 	if (is_fep_available())
-@@ -559,6 +629,7 @@ static void check_counters(void)
- 	check_counter_overflow();
- 	check_gp_counter_cmask();
- 	check_running_counter_wrmsr();
-+	check_tsx_cycles();
- }
+-	if (!pmc->perf_event || pmc->is_paused)
++	if (!pmc->perf_event || pmc->is_paused ||
++	    !is_sampling_event(pmc->perf_event))
+ 		return;
  
- static void do_unsupported_width_counter_write(void *index)
+ 	perf_event_period(pmc->perf_event,
 -- 
 2.38.1
 
