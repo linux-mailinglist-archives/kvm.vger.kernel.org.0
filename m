@@ -2,78 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7787664548A
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 08:24:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D34DA6454C8
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 08:43:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbiLGHYO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 02:24:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52132 "EHLO
+        id S229836AbiLGHn4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 02:43:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229883AbiLGHXn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 02:23:43 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF24276
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 23:23:39 -0800 (PST)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NRpZ74szfzgYvH;
-        Wed,  7 Dec 2022 15:19:27 +0800 (CST)
-Received: from huawei.com (10.175.100.227) by kwepemi500016.china.huawei.com
- (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Wed, 7 Dec
- 2022 15:23:37 +0800
-From:   Shang XiaoJing <shangxiaojing@huawei.com>
-To:     <kwankhede@nvidia.com>, <alex.williamson@redhat.com>,
-        <kraxel@redhat.com>, <kvm@vger.kernel.org>
-CC:     <shangxiaojing@huawei.com>
-Subject: [PATCH] samples: vfio-mdev: Fix missing pci_disable_device() in mdpy_fb_probe()
-Date:   Wed, 7 Dec 2022 15:21:28 +0800
-Message-ID: <20221207072128.30344-1-shangxiaojing@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        with ESMTP id S229812AbiLGHny (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 02:43:54 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B0202AE0;
+        Tue,  6 Dec 2022 23:43:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Xo+BLb2JS7fOXM8liyCnCOcGBhHYcrzFV4Ex4WwEERc=; b=v9A1DfRlD5TiNLtWDRXF+Knm/N
+        jSTXdq4l2PUGJm8b3038Beq4PCYlXJ84qv7cm1Gs70opVZoWbbEUXdkpYZq4vFxQdEUKH6C/ef0zL
+        wyIT5yGyhbjQ9d3K3s7FsO47d3JASSkYzySG+8kasnoDlAgXrwcZXW/uzhpfcIg3Sb+E2D0IqIpWY
+        inZR3tQhTziTq77rRgIJ6qZ4Ypl33KxFxxB8S7ihPyAuGmwPXGlRJ10AgJG8XAjJHqUG8QU2LMW0Z
+        O8GJnRHnG24tUkVwEgXV7+KYgt8pUMYFbyM7Pye/Cf32FWogka2qhYxVWM5QeWHIUG1UpvAR28TS3
+        cKcPty7Q==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p2p5t-00ECz6-CM; Wed, 07 Dec 2022 07:43:53 +0000
+Date:   Tue, 6 Dec 2022 23:43:53 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Brett Creeley <brett.creeley@amd.com>
+Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
+        alex.williamson@redhat.com, cohuck@redhat.com, jgg@nvidia.com,
+        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+        kevin.tian@intel.com, shannon.nelson@amd.com, drivers@pensando.io
+Subject: Re: [RFC PATCH vfio 0/7] pds vfio driver
+Message-ID: <Y5BEOXKKAjVzyBVI@infradead.org>
+References: <20221207010705.35128-1-brett.creeley@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.100.227]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemi500016.china.huawei.com (7.221.188.220)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221207010705.35128-1-brett.creeley@amd.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add missing pci_disable_device() in fail path of mdpy_fb_probe().
+On Tue, Dec 06, 2022 at 05:06:58PM -0800, Brett Creeley wrote:
+> AMD/Pensando already supports a NVMe VF device (1dd8:1006) in the
+> Distributed Services Card (DSC). This patchset adds the new pds_vfio
+> driver in order to support NVMe VF live migration.
 
-Fixes: cacade1946a4 ("sample: vfio mdev display - guest driver")
-Signed-off-by: Shang XiaoJing <shangxiaojing@huawei.com>
----
- samples/vfio-mdev/mdpy-fb.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
-index 9ec93d90e8a5..a7b3a30058e5 100644
---- a/samples/vfio-mdev/mdpy-fb.c
-+++ b/samples/vfio-mdev/mdpy-fb.c
-@@ -109,7 +109,7 @@ static int mdpy_fb_probe(struct pci_dev *pdev,
- 
- 	ret = pci_request_regions(pdev, "mdpy-fb");
- 	if (ret < 0)
--		return ret;
-+		goto err_disable_dev;
- 
- 	pci_read_config_dword(pdev, MDPY_FORMAT_OFFSET, &format);
- 	pci_read_config_dword(pdev, MDPY_WIDTH_OFFSET,	&width);
-@@ -191,6 +191,9 @@ static int mdpy_fb_probe(struct pci_dev *pdev,
- err_release_regions:
- 	pci_release_regions(pdev);
- 
-+err_disable_dev:
-+	pci_disable_device(pdev);
-+
- 	return ret;
- }
- 
--- 
-2.17.1
-
+If you want NVMe live migration, please work with the nvme technical
+working group to standardize it.  We will not add support for a
+gazillion incompatible and probably broken concepts of this.
