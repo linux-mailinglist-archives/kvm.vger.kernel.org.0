@@ -2,68 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ED966464F3
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 00:21:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F8B564651A
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 00:29:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230097AbiLGXV2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 18:21:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36466 "EHLO
+        id S229931AbiLGX3r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 18:29:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230094AbiLGXVZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 18:21:25 -0500
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 542E72AC41
-        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 15:21:24 -0800 (PST)
-Received: by mail-qk1-x734.google.com with SMTP id k3so4735435qki.13
-        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 15:21:24 -0800 (PST)
+        with ESMTP id S230119AbiLGX32 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 18:29:28 -0500
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF7F58AAC6
+        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 15:29:26 -0800 (PST)
+Received: by mail-qk1-x733.google.com with SMTP id s10so9589743qkg.8
+        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 15:29:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=axedT4rtG43h/6SvQLH8htjZ6eotsOC4BNVL1rNL//s=;
-        b=J/C2GGkqlndESy5Iv13XgeaNXIxtmPrIyw9jg3fiunFymNOWM/wP15YqaaKggsypGy
-         5UAktL//7VEcMpVD/DDjv5VEl5iaC4iNBjmOouW/YljbfqvlM/HtbfkgY1PtfcK8fvvx
-         yY1DuCbVKMKNvc2GRn+DjDavNtqLivGDoJAg8WzGAzCtb/gRVXBswjTLpAsTizwszcWp
-         tILG58wDxw51elZLC5oPrXggWQL9ObPQao4m7TrcRKBcOWIFhBpLsm0CMNe2w3CjBirM
-         ojcrYYXw05D2NX+TGmOloyEcmdYmbWwkrnrLfp9Pm2FF8Addkuw97okEQox81kBKdppy
-         TFoA==
+        bh=5ZZkG+Qh1aym6roTCOMKJrBzIlZ6e3/h1nx0KB0nWZQ=;
+        b=IRJAvdL9bJF5wa8TKb3lIIaMfcZthRa4Fc2FYH47GAAjDWMn2r1EPs/rUni0ul4bdw
+         +ktgYf6lGNHZep5JAWZ2GKR/BirfY/H1W6cNn8e9zTlmor3SELgt2lwviGTfPCXXZSFW
+         Na9knU0EmPNJ25f43LKjBc5MiF8+JzPDCKsRTU7BSwXFNnhYcNQDe4Ushc5+NflEC7mo
+         2r43GY6fHxCmgrXjp+j3xglshE9k16ojaaLMkfROJFwXtfZ+/Pep1O0IUlBK3IA1Ta+p
+         pXe5UZOSkpQYP+RYgYjGqKd1oktcdNECS6hJICcUFd6lga/9b9a8WGa4GfZeyTRy4jyn
+         ZKCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=axedT4rtG43h/6SvQLH8htjZ6eotsOC4BNVL1rNL//s=;
-        b=X06DnVxNmbFnhBAh/OcEe5SgX3B1NvJtrmb1tOrwfiaVu6t/5VrJ/FZyrPuVyTo16B
-         wGTdpjZA4gYuf7k11Voe17r72mGs8i4C2YGQFXa0nXibenmVH5rPeyJvEN9XJhe5NHsF
-         PaKQPg++T8VVysZ1r523xtGOnagor3fKfPa3DYXDLM8dt96DwyMt8czLMWjwKlUpQcTQ
-         B+rrMq1bj72khG/VcBlGc/Q+cUnYHW9ApYp124IddS86Xr1sUpXPzwCMznhXX0FGkuwK
-         KavxJUc6dZX94vMHHJPCAk9wCXfECnP7QFiIKwLjldhRZP/lV3TIv3PaSxbJSQg21rcp
-         d0OQ==
-X-Gm-Message-State: ANoB5plVYs+VTWt0tddPIhFQGRhO3OEBZLkMuls/xB3YGplIHLWveq1a
-        w1NFqX5+TcyFhSAvh1gehC2CJw==
-X-Google-Smtp-Source: AA0mqf7/227tLAq8XJp7VAX89BClUKXjZS09fJVe1iQQbbj7UnyyxxaMQ0Kdv9zAeq5RikParUtCFA==
-X-Received: by 2002:a37:705:0:b0:6fe:c477:2544 with SMTP id 5-20020a370705000000b006fec4772544mr10599706qkh.577.1670455283465;
-        Wed, 07 Dec 2022 15:21:23 -0800 (PST)
+        bh=5ZZkG+Qh1aym6roTCOMKJrBzIlZ6e3/h1nx0KB0nWZQ=;
+        b=i1QipIxNxAjzt4GtFSom5pNqJqtchoPM/Fse2M7eh/ldMhfG6WnkliMtPA+jOdNpz7
+         El4gbhStSp5a6c3+teKr5aCb6KQS9rqWQNb7oaKi6M2Zrzpjfp+UrPzPVYXzHLZrFp5P
+         PPytpx8KBRyO1g+7RaGiwwz6jXPGGnKbNRkFoXSipF/+ugcmTZ0f6haNLBKIkepFVOM/
+         JUGTr6r0/5jkmRJMH0PSrHNK5N/e4BUii0po8Vdsf+uL/WW5OXhl5lcoIDKstkDXQAqR
+         t4cKbyJzxJPTorZ5IATNbfT5uAXgHk0VufMKdQ7ESUT2FlmDNd99Cn7BsoJ2FGN+IWYE
+         HGKg==
+X-Gm-Message-State: ANoB5pmtwezp3HB2/42Qk7oEVThueLhKH9XsJkQocxDk6/QXfv6zlY1i
+        nJKGq4WSbKb8iW7afIMpRo+WvQ==
+X-Google-Smtp-Source: AA0mqf5xHesK9HKgeRl+kujJdBiEK8wc+Z0M14t1KBrJH1kV7mMFGwyJ6QpQ3tfjCqVF+oqx4wgSuQ==
+X-Received: by 2002:a05:620a:43a9:b0:6fa:18a5:376d with SMTP id a41-20020a05620a43a900b006fa18a5376dmr57362219qkp.220.1670455765571;
+        Wed, 07 Dec 2022 15:29:25 -0800 (PST)
 Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
-        by smtp.gmail.com with ESMTPSA id fu24-20020a05622a5d9800b0038b684a1642sm14127831qtb.32.2022.12.07.15.21.22
+        by smtp.gmail.com with ESMTPSA id d14-20020a05622a15ce00b0035cd6a4ba3csm14542842qty.39.2022.12.07.15.29.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Dec 2022 15:21:22 -0800 (PST)
+        Wed, 07 Dec 2022 15:29:24 -0800 (PST)
 Received: from jgg by wakko with local (Exim 4.95)
         (envelope-from <jgg@ziepe.ca>)
-        id 1p33j7-005QoR-Vz;
-        Wed, 07 Dec 2022 19:21:21 -0400
-Date:   Wed, 7 Dec 2022 19:21:21 -0400
+        id 1p33qu-005Qvt-DN;
+        Wed, 07 Dec 2022 19:29:24 -0400
+Date:   Wed, 7 Dec 2022 19:29:24 -0400
 From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, steven.sistare@oracle.com
-Subject: Re: [PATCH] vfio/type1: Cleanup remaining vaddr removal/update
- fragments
-Message-ID: <Y5Ef8Ua2eu00ZbzJ@ziepe.ca>
-References: <167044909523.3885870.619291306425395938.stgit@omen>
+To:     Brett Creeley <bcreeley@amd.com>
+Cc:     Brett Creeley <brett.creeley@amd.com>, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, alex.williamson@redhat.com,
+        cohuck@redhat.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        shannon.nelson@amd.com, drivers@pensando.io
+Subject: Re: [RFC PATCH vfio 3/7] vfio/pds: Add VFIO live migration support
+Message-ID: <Y5Eh1Doh0d98wz2v@ziepe.ca>
+References: <20221207010705.35128-1-brett.creeley@amd.com>
+ <20221207010705.35128-4-brett.creeley@amd.com>
+ <Y5DIvM1Ca0qLNzPt@ziepe.ca>
+ <a94d3456-a7cf-164c-74f1-c946883534cf@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <167044909523.3885870.619291306425395938.stgit@omen>
+In-Reply-To: <a94d3456-a7cf-164c-74f1-c946883534cf@amd.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -73,15 +79,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 07, 2022 at 02:45:18PM -0700, Alex Williamson wrote:
-> Fix several loose ends relative to reverting support for vaddr removal
-> and update.  Mark feature and ioctl flags as deprecated, restore local
-> variable scope in pin pages, remove remaining support in the mapping
-> code.
-> 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
+On Wed, Dec 07, 2022 at 01:32:34PM -0800, Brett Creeley wrote:
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> > Please implement the P2P states in your device. After long discussions
+> > we really want to see all VFIO migrations implementations support
+> > this.
+> > 
+> > It is still not clear what qemu will do when it sees devices that do
+> > not support P2P, but it will not be nice.
+> 
+> Does that mean VFIO_MIGRATION_P2P is going to be required going forward or
+> do we just need to handle the P2P transitions? Can you point me to where
+> this is being discussed?
+
+It means the device has to support a state where it is not issuing any
+outgoing DMA but continuing to process incoming DMA.
+
+This is mandatory to properly support multiple VFIO devices in the
+same VM, which is why we want to see all devices implementing it. If
+the devices don't support it we may assume it means the device is
+broken and qemu will have to actively block P2P at the IOMMU.
+
+There was lots of long threads in around Dec 2021 if I recall, lore
+could probably find them. Somewhere around here based on the search
+
+https://lore.kernel.org/kvm/20220215155602.GB1046125@nvidia.com/
 
 Jason
