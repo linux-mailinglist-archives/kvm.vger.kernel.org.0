@@ -2,85 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78563645F17
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 17:39:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C5628645F30
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 17:44:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229689AbiLGQjE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 11:39:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60642 "EHLO
+        id S229989AbiLGQoc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 11:44:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbiLGQjD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 11:39:03 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA9A0164A7;
-        Wed,  7 Dec 2022 08:39:02 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 83FB967373; Wed,  7 Dec 2022 17:38:57 +0100 (CET)
-Date:   Wed, 7 Dec 2022 17:38:57 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Christoph Hellwig <hch@lst.de>, Lei Rao <lei.rao@intel.com>,
-        kbusch@kernel.org, axboe@fb.com, kch@nvidia.com, sagi@grimberg.me,
-        alex.williamson@redhat.com, cohuck@redhat.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        mjrosato@linux.ibm.com, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, kvm@vger.kernel.org,
-        eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
-        Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com
-Subject: Re: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to
- issue admin commands for VF driver.
-Message-ID: <20221207163857.GB2010@lst.de>
-References: <20221206135810.GA27689@lst.de> <Y49eObpI7QoSnugu@ziepe.ca> <20221206153811.GB2266@lst.de> <Y49k++D3i8DfLOLL@ziepe.ca> <20221206165503.GA8677@lst.de> <Y4+U3VR2LeEh2S7B@ziepe.ca> <20221207075415.GB2283@lst.de> <Y5CWVu08abcOuEQH@ziepe.ca> <20221207135203.GA22803@lst.de> <Y5CsH5PqMYAWYatw@ziepe.ca>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y5CsH5PqMYAWYatw@ziepe.ca>
-User-Agent: Mutt/1.5.17 (2007-11-01)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230028AbiLGQoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 11:44:25 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FAE661746
+        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 08:44:24 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F1CEEB81F30
+        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 16:44:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61405C433C1;
+        Wed,  7 Dec 2022 16:44:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670431461;
+        bh=zmCkclrRUCBzXngwQwzU/xVJaRBK3F8IRYex269YxTc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=gXcyf3ScbVgMx63WfboXd6CajSQbmO+YJCT1RIKkFtwFXszbdeKJ/ZI9NqsZsuCNb
+         wakmx0zVWe1APYobEImGoIeoIc3R5WmBf6FmpwTMIywJIBE5tOL83U7+bVO6HwuBdD
+         3JeTlUgZpuPo9wq/sZNIZ1Or30ur4++ODTj+Fh/bP3z9ZIoGJFEozzhkkXU6nCOiTD
+         VcCNYbsvUHu3l033BwQGwyEDmn6jcyeq+rvg0SW2tLGOO1SkHSTFdY6Glua0nmbX1L
+         Al+fXOKXwW36TkxBJoIUzWhFcu56LOibUwoYZhFLLmko5s0qB/Z9+u6mzVMQNDjr3P
+         I5bVU59tSkOKw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p2xWt-00BAQE-4L;
+        Wed, 07 Dec 2022 16:44:19 +0000
+Date:   Wed, 07 Dec 2022 16:44:14 +0000
+Message-ID: <86ilinqi3l.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com,
+        borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v7 1/4] KVM: Implement dirty quota-based throttling of vcpus
+In-Reply-To: <dfa49851-da9d-55f8-7dec-73a9cf985713@nutanix.com>
+References: <20221113170507.208810-1-shivam.kumar1@nutanix.com>
+        <20221113170507.208810-2-shivam.kumar1@nutanix.com>
+        <86zgcpo00m.wl-maz@kernel.org>
+        <18b66b42-0bb4-4b32-e92c-3dce61d8e6a4@nutanix.com>
+        <86mt8iopb7.wl-maz@kernel.org>
+        <dfa49851-da9d-55f8-7dec-73a9cf985713@nutanix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: shivam.kumar1@nutanix.com, pbonzini@redhat.com, seanjc@google.com, james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org, shaju.abraham@nutanix.com, manish.mishra@nutanix.com, anurag.madnawat@nutanix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 07, 2022 at 11:07:11AM -0400, Jason Gunthorpe wrote:
-> > And while that is a fine concept per see, the current incarnation of
-> > that is fundamentally broken is it centered around the controlled
-> > VM.  Which really can't work.
+On Tue, 06 Dec 2022 06:22:45 +0000,
+Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
 > 
-> I don't see why you keep saying this. It is centered around the struct
-> vfio_device object in the kernel, which is definately NOT the VM.
-
-Sorry, I meant VF.  Your continued using of SR-IOV teminology now keeps
-confusing my mind so much that I start mistyping things.
-
-> > Even then you need a controlling and a controlled entity.  The
-> > controlling entity even in SIOV remains a PCIe function.  The
-> > controlled entity might just be a bunch of hardware resoures and
-> > a PASID.  Making it important again that all migration is driven
-> > by the controlling entity.
 > 
-> If they are the same driver implementing vfio_device you may be able
-> to claim they conceptually exist, but it is pretty artificial to draw
-> this kind of distinction inside a single driver.
-
-How are they in this reply?  I can't parse how this even relates to
-what I wrote.
-
-> > Also the whole concept that only VFIO can do live migration is
-> > a little bogus.  With checkpoint and restart it absolutely
-> > does make sense to live migrate a container, and with that
-> > the hardware interface (e.g. nvme controller) assigned to it.
 > 
-> I agree people may want to do this, but it is very unclear how SRIOV
-> live migration can help do this.
+> On 22/11/22 11:16 pm, Marc Zyngier wrote:
+> > On Fri, 18 Nov 2022 09:47:50 +0000,
+> > Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
+> >> 
+> >> 
+> >> 
+> >> On 18/11/22 12:56 am, Marc Zyngier wrote:
+> >>> On Sun, 13 Nov 2022 17:05:06 +0000,
+> >>> Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
+> >>>> 
+> >>>> +    count: the current count of pages dirtied by the VCPU, can be
+> >>>> +    skewed based on the size of the pages accessed by each vCPU.
+> >>> 
+> >>> How can userspace make a decision on the amount of dirtying this
+> >>> represent if this doesn't represent a number of base pages? Or are you
+> >>> saying that this only counts the number of permission faults that have
+> >>> dirtied pages?
+> >> 
+> >> Yes, this only counts the number of permission faults that have
+> >> dirtied pages.
+> > 
+> > So how can userspace consistently set a quota of dirtied memory? This
+> > has to account for the size that has been faulted, because that's all
+> > userspace can reason about. Remember that at least on arm64, we're
+> > dealing with 3 different base page sizes, and many more large page
+> > sizes.
+> 
+> I understand that this helps only when the majority of dirtying is
+> happening for the same page size. In our use case (VM live migration),
+> even large page is broken into 4k pages at first dirty. If required in
+> future, we can add individual counters for different page sizes.
+> 
+> Thanks for pointing this out.
 
-SRIOV live migration doesn't, because honestly there is no such
-thing as "SRIOV" live migration to start with.
+Adding counters for different page sizes won't help. It will only make
+the API more complex and harder to reason about. arm64 has 3 base page
+sizes, up to 5 levels of translation, the ability to have block
+mappings at most levels, plus nice features such as contiguous hints
+that we treat as another block size. If you're lucky, that's about a
+dozen different sizes. Good luck with that.
 
-> Let alone how to solve the security problems of allow userspace to
-> load arbitary FW blobs into a device with potentially insecure DMA
-> access..
+You really need to move away from your particular, 4kB centric, live
+migration use case. This is about throttling a vcpu based on how much
+memory it dirties. Not about the number of page faults it takes.
 
-Any time you assign a PCI device to userspace you might get into that.
+You need to define the granularity of the counter, and account for
+each fault according to its mapping size. If an architecture has 16kB
+as the base page size, a 32MB fault (the size of the smallest block
+mapping) must bump the counter by 2048. That's the only way userspace
+can figure out what is going on.
+
+Without that, you may as well add a random number to the counter, it
+won't be any worse.
+
+[...]
+
+> >>> If you introduce additional #ifdefery here, why are the additional
+> >>> fields in the vcpu structure unconditional?
+> >> 
+> >> pages_dirtied can be a useful information even if dirty quota
+> >> throttling is not used. So, I kept it unconditional based on
+> >> feedback.
+> > 
+> > Useful for whom? This creates an ABI for all architectures, and this
+> > needs buy-in from everyone. Personally, I think it is a pretty useless
+> > stat.
+> 
+> When we started this patch series, it was a member of the kvm_run
+> struct. I made this a stat based on the feedback I received from the
+> reviews. If you think otherwise, I can move it back to where it was.
+
+I'm certainly totally opposed to stats that don't have a clear use
+case. People keep piling random stats that satisfy their pet usage,
+and this only bloats the various structures for no overall benefit
+other than "hey, it might be useful". This is death by a thousand cut.
+
+> > And while we're talking about pages_dirtied, I really dislike the
+> > WARN_ON in mark_page_dirty_in_slot(). A counter has rolled over?
+> > Shock, horror...
+> 
+> Ack. I'll give it a thought but if you have any specific suggestion on
+> how I can make it better, kindly let me know. Thanks.
+
+What is the effect of counter overflowing? Why is it important to
+warn? What goes wrong? What could be changed to *avoid* this being an
+issue?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
