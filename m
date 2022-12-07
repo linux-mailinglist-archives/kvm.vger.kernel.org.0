@@ -2,177 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72745645689
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 10:34:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 963916456BC
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 10:43:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230045AbiLGJe1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 04:34:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45508 "EHLO
+        id S229854AbiLGJm7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 04:42:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229636AbiLGJeZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 04:34:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C331D2FFE9
-        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 01:33:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670405608;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DNEaWgUnEyEq3pixNIdJuD3ogN+VEJSCbXOc5Itmm6k=;
-        b=P8KHDA3yU84IdiMEog4hF2a6suIbX40GfwuyfjOlSkRqDoXKjhiYeIDzXGRkvUdbCI5Rdj
-        vA/oFKpx+Owe/WUepJ/JvTUzcGr6aksDdD849xQ1C5eSzjT+qpqy0Rk2bznHMM1Es9XEMC
-        cEpMMM2T+i3zWeDRfmQTtUwHwvEpmn8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-591-U1YQYXxQPjCc2KxpgT9BDA-1; Wed, 07 Dec 2022 04:33:26 -0500
-X-MC-Unique: U1YQYXxQPjCc2KxpgT9BDA-1
-Received: by mail-wm1-f69.google.com with SMTP id v188-20020a1cacc5000000b003cf76c4ae66so532578wme.7
-        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 01:33:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DNEaWgUnEyEq3pixNIdJuD3ogN+VEJSCbXOc5Itmm6k=;
-        b=v42nvjIbxfawA4x/hFUKXx3R0FCnHb9F56IIs5TFrepTX6xagYndNOoxOK1tIaEGd5
-         i12gFvCFyw9/G/Tq5S5t+uumfe4EcRW+1W/DVEee7TqgJnchfTzlYi3FMpfMhIcVRq5S
-         /7LbyP/ZD2pDnO++EEufMEerfDTeE3qoaXDSKZoMyT/M4rVYAmZJ+8q1SWiK1js+DrfK
-         aQrVDiMoHPC8t+qDH3MLSCnnqDaVjLteimnsiCbzWens/7wrDcRJy7JBzmSmTdqpy56D
-         aR9myLLK1adOi08n+n79P9T2bn1VqG98shY7qrzssGDfU2yiz+Rnw2WQyJtfS3pmirGm
-         V5uA==
-X-Gm-Message-State: ANoB5pkaFtUWwBKspzoYTZEkaIsLTDGwJJoScIZln+gh/i1QoS6MqLJH
-        qWlNsty+fJH8fm0igl3bFcTehSXOtH5uPa0jgYqDLNoM0xXFp4qLNwMpPI9d8nlMYvv62Qn5Vby
-        TIrop76vF7JMo
-X-Received: by 2002:adf:f40d:0:b0:242:2bd5:b1ce with SMTP id g13-20020adff40d000000b002422bd5b1cemr19518378wro.519.1670405605665;
-        Wed, 07 Dec 2022 01:33:25 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7hVCwJXn1G2gZ1QbqkOxInRXOmGLIFnBp7xLwd5RYpissGS2YDvXCAQd5bcKlA67ovEbQGQw==
-X-Received: by 2002:adf:f40d:0:b0:242:2bd5:b1ce with SMTP id g13-20020adff40d000000b002422bd5b1cemr19518344wro.519.1670405605403;
-        Wed, 07 Dec 2022 01:33:25 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-106-100.dyn.eolo.it. [146.241.106.100])
-        by smtp.gmail.com with ESMTPSA id n10-20020adffe0a000000b00241bd7a7165sm18392917wrr.82.2022.12.07.01.33.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Dec 2022 01:33:24 -0800 (PST)
-Message-ID: <7cad964394ce47cff28ec7c2f5f1559880e29ae2.camel@redhat.com>
-Subject: Re: [PATCH v5] virtio/vsock: replace virtio_vsock_pkt with sk_buff
-From:   Paolo Abeni <pabeni@redhat.com>
-To:     Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 07 Dec 2022 10:33:22 +0100
-In-Reply-To: <Y3toiPtBgOcrb8TL@bullseye>
-References: <20221202173520.10428-1-bobby.eshleman@bytedance.com>
-         <863a58452b4a4c0d63a41b0f78b59d32919067fa.camel@redhat.com>
-         <Y3toiPtBgOcrb8TL@bullseye>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S229479AbiLGJm6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 04:42:58 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 141D3D117;
+        Wed,  7 Dec 2022 01:42:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Z71YLKDsSPRf2mz2GF5ktTNtur1IFW8hNvoan1Et5eQ=; b=hCaho5znCc9vIISFC8wCcnJzur
+        IgMXkWcIa/IRrYbgoGcAP0rqu04E5d2w65w8vYwtC5pm6rbCCInfnva5olYfBb0ItluDzR0dIImCa
+        SPXiLGYxC6uFQE0+x7MnfxJDn7hSYe7RrJDcLlYNkCMztcN6X0B7X2Grzj3Khxx/YaJz9nQdlt07e
+        SQfjnvyxnAnFhO528teHeRgdv39KmyKBb6fUUE1SZnVOwXvdpEdeiIzs1lBy6SFZpds14MFLWfoYW
+        Zpt3ksmPO2iTwuhH01nntykS/iccrMwxhj9T8dGhMNXLD1tsgTUj9ZQV8OpF0WjGlBMx2v15pmNVP
+        a+PpogbA==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p2qwZ-005RrV-Ly; Wed, 07 Dec 2022 09:42:23 +0000
+Message-ID: <d0f915ddd337ae3ce6ecb19f7d5f3faa6980b1de.camel@infradead.org>
+Subject: Re: [PATCH] KVM: x86: ioapic: Fix level-triggered EOI and userspace
+ IOAPIC reconfigure race
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Adamos Ttofari <attofari@amazon.de>, Thomas Huth <thuth@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Wed, 07 Dec 2022 09:42:15 +0000
+In-Reply-To: <20221207091324.89619-1-attofari@amazon.de>
+References: <20221207091324.89619-1-attofari@amazon.de>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-+xZGcjkKKkBPuU+uxobT"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-11-21 at 12:01 +0000, Bobby Eshleman wrote:
-> On Tue, Dec 06, 2022 at 11:20:21AM +0100, Paolo Abeni wrote:
-> > Hello,
-> > 
-> > On Fri, 2022-12-02 at 09:35 -0800, Bobby Eshleman wrote:
-> > [...]
-> > > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-> > > index 35d7eedb5e8e..6c0b2d4da3fe 100644
-> > > --- a/include/linux/virtio_vsock.h
-> > > +++ b/include/linux/virtio_vsock.h
-> > > @@ -3,10 +3,129 @@
-> > >  #define _LINUX_VIRTIO_VSOCK_H
-> > >  
-> > >  #include <uapi/linux/virtio_vsock.h>
-> > > +#include <linux/bits.h>
-> > >  #include <linux/socket.h>
-> > >  #include <net/sock.h>
-> > >  #include <net/af_vsock.h>
-> > >  
-> > > +#define VIRTIO_VSOCK_SKB_HEADROOM (sizeof(struct virtio_vsock_hdr))
-> > > +
-> > > +enum virtio_vsock_skb_flags {
-> > > +	VIRTIO_VSOCK_SKB_FLAGS_REPLY		= BIT(0),
-> > > +	VIRTIO_VSOCK_SKB_FLAGS_TAP_DELIVERED	= BIT(1),
-> > > +};
-> > > +
-> > > +static inline struct virtio_vsock_hdr *virtio_vsock_hdr(struct sk_buff *skb)
-> > > +{
-> > > +	return (struct virtio_vsock_hdr *)skb->head;
-> > > +}
-> > > +
-> > > +static inline bool virtio_vsock_skb_reply(struct sk_buff *skb)
-> > > +{
-> > > +	return skb->_skb_refdst & VIRTIO_VSOCK_SKB_FLAGS_REPLY;
-> > > +}
-> > 
-> > I'm sorry for the late feedback. The above is extremelly risky: if the
-> > skb will land later into the networking stack, we could experience the
-> > most difficult to track bugs.
-> > 
-> > You should use the skb control buffer instead (skb->cb), with the
-> > additional benefit you could use e.g. bool - the compiler could emit
-> > better code to manipulate such fields - and you will not need to clear
-> > the field before release nor enqueue.
-> > 
-> > [...]
-> > 
-> 
-> Hey Paolo, thank you for the review. For my own learning, this would
-> happen presumably when the skb is dropped? And I assume we don't see
-> this in sockmap because it is always cleared before leaving sockmap's
-> hands? I sanity checked this patch with an out-of-tree patch I have that
-> uses the networking stack, but I suspect I didn't see issues because my
-> test harness didn't induce dropping...
 
-skb->_skb_refdst carries a dst and a flag in the less significative bit
-specifying if the dst is refcounted. Passing to the network stack a skb
-overloading such bit semanthic is quite alike intentionally corrupting
-the kernel memory.
+--=-+xZGcjkKKkBPuU+uxobT
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> I originally avoided skb->cb because the reply flag is set at allocation
-> and would potentially be clobbered by a pass through the networking
-> stack. The reply flag would be used after a pass through the networking
-> stack (e.g., during transmission at the device level and when sockets
-> close while skbs are still queued for xmit).
+On Wed, 2022-12-07 at 09:13 +0000, Adamos Ttofari wrote:
+> When split-irqchip is used KVM uses ioapic_handled_vectors to identify
+> which vectors require an exit to userspace IOAPIC. Unfortunately, when th=
+e
+> IOAPIC is reconfigured while the interrupt is being handled, it will use
+> the newest configuration; therefore, the EOI will not be delivered to
+> IOAPIC.
+>=20
+> A previous commit 0fc5a36dd6b3
+> ("KVM: x86: ioapic: Fix level-triggered EOI and IOAPIC reconfigure race")
+> fixed the race for kernel ioapic, but the issue still persists for
+> userspace IOAPIC:
+>=20
+> 1) Userspace IOAPIC sends a level triggered interrupt to VCPU0.
+> 2) VCPU0's handler reconfigures the IOAPIC to route the interrupts to
+>    VCPU1. (This can cause userspace IOAPIC to commit a new routing table,
+>    eventually leading KVM to unset the vector in ioapic_handled_vectors)
+> 3) VCPU0 triggers an EOI, and it's not delivered to userspace IOAPIC
+>    because the vector bit is not set in ioapic_handled_vectors.
+> 4) The loss of EOI, leaves remote_irr in IOAPIC set. Eventually blocking
+>    new interrupts.
+>=20
+> To avoid the above scenario, we should apply a similar fix like
+> commit 0fc5a36dd6b3 ("KVM: x86: ioapic: Fix level-triggered EOI and IOAPI=
+C
+> reconfigure race") Which is to add all pending and running vectors to
+> ioapic_handled_vectors.
+>=20
+> Fixes: 0fc5a36dd6b3 ("KVM: x86: ioapic: Fix level-triggered EOI and IOAPI=
+C reconfigure race")
+>=20
+> Signed-off-by: Adamos Ttofari <attofari@amazon.de>
 
-I assumed the 'tap_delivered' and 'reply' flag where relevant only
-while the skb is owned by the virtio socket. If you need to preserve
-such information _after_ delivering the skb to the network stack, that
-is quite unfortunate - and skb->cb will not work.
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-The are a couple of options for adding new metadata inside the skb,
-both of them are quite discouraged/need a strong use-case:
+Thanks.
 
-- adding new fields in some skb hole
-- adding a new skb extension.
+This should fix https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/issues/1
+shouldn't it?
 
-Could you please describe the 'reply' and 'tap_delivered' life-cycle
-and their interaction with the network stack?
+--=-+xZGcjkKKkBPuU+uxobT
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMjA3MDk0MjE1WjAvBgkqhkiG9w0BCQQxIgQg06jVYRxo
+35ZazdYICSsB0Lq6KlxT8K/FG/5j4VWlMSIwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCIXELo/EuBDKsH/7N5XOcWe2gX5+BctIlz
++IRkQgRGf0+gdNdnuqOodUR7T9nGIz1MPY0kzhQgnPFtLfDVd8hQaIOPZfEKSVKOpXPMuSOoHp9w
+SbUVl9wgkLXAeJohBF+ETlbpuPcAxUfgciuPE2i3Ba7Xp4EQmHsRo6BtWUzZDkCHp/V8XrRrUCsU
+WFRZJ8QnuG43KacqGwTky6HN/ABxQQhTd+mQMxW/oAxuWuLEZ+ji99gZ8boSWx1+ROnvqGJhPcDm
+TTepBXByFOL9p4FtLkANmmw9Lizd9+D7H7nWhZI8trxqZYCez3sT6RkL5lfkH2JBPokiNEDnQWIt
+VKOq9Wd+0vvEoulmi9xY310vYQ2U/YD3QBI47G4ggttxUGM9EaAoGN4ehXWVWpDro4j8jrNFOpn/
++GoIkEZx8RUaZYin/A7WCz3k0nIzTerHQCpKplRxKS+wjVS4Usa8TOrTL3v06CUuoSlhZvXKNPQc
+1VAZG2u452k8unCuXUVuVxHOObqmCiLorwXbKnha1xScSVt+l76ChT+TKFNpm5N/TELQXbee6HZk
+YYpaBvqGjhXlJpNmPiT2sW31B0cB3P6Mc73m9S92MDxITeI7U2xiULPn0ZREEyeaw8lyXnPtkDCh
+oTJ96WXnoBNjGuTlMgxf+rjhclwuNfydBU3BYRC0nQAAAAAAAA==
 
 
-Cheers,
-
-Paolo
+--=-+xZGcjkKKkBPuU+uxobT--
 
