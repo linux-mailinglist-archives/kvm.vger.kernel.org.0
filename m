@@ -2,68 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 404D4645DA8
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 16:31:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE427645E00
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 16:52:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229480AbiLGPb2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 10:31:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39390 "EHLO
+        id S229760AbiLGPw3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 10:52:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbiLGPbZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 10:31:25 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EC895C0D0
-        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 07:31:23 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id x11so21298444ljh.7
-        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 07:31:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=J1rGAY9HSPcas/OkUZjLyzEB6I7Hg6c2WCXOiacVvP8=;
-        b=JNwVO6orYg1tIbTlftX1bqUOEWcULPIUBRywby0QeEXqPikOP63dfzQqnIyXYBjLUY
-         9JU0o3kPsX1nTg7uES5BoR+rPaIo/TcuZhZ08LF3/vLmOUs3Ss5vJuAG3/bRPkCkKB8N
-         BmKyvZ/jrPM2T8LX6bGRoZV7a72IUrzKrDbu8sTsrO4Bb4yBq2ft9zpnAgkAv3/FVEJj
-         Q+LUidqrAfzBCGQQKH/m0yfY4WBzpbEryI8qv6Ht/h29TfUjyDz3L3ENREojPbe1R/UO
-         XpqM1yzPWO9/065X+slhHrQYv33sXJ+YxKG5+YsI8iEd4VuEQzGeTCIxeJavrRtfLdZf
-         PYbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=J1rGAY9HSPcas/OkUZjLyzEB6I7Hg6c2WCXOiacVvP8=;
-        b=oseOdCP4qj+rW53u7e2696hI9b1d/9ne6/wMzhvJb/igFyD7dOFaZraZvi3OktolMH
-         +PSKR2df47VGEpLzVj8wS+Shry39A7mJzs3ByhYBKFZVFEaiv/hXOKZz6y8tOHeCsndP
-         4Z6bAK1h69HdI+ozWaxSNuUiwEIOsbNrKTZo+KkGXtaQQ4cFR0igVcI0k1mmqMnt+G+y
-         9sfGDCzPnj0y2rAMvd1zKIJelzhHTR95/k4qXf/sfwovBhg7BEuhiJGoDDZ7ObcjfE2g
-         kxNsiw66jE54pYI/baAigvaMGBb/VQEjPmEBtFAiO0Z3tNOobN/vkuIUkqt59UKgd9Pe
-         UYiw==
-X-Gm-Message-State: ANoB5pmWrmJ9ApfWTYKl/5ed3VugnfQFtv4CjHXuyE3iI+gUnxYlA54Q
-        ivzNXt/t/3YLl4xwzoRv+1QfSy8s7iUl5VuraDnjLw==
-X-Google-Smtp-Source: AA0mqf7fKPqCTSQYEhiQ3KO6wSwDrVKrIr9pFQn3TazdHCGL9cJeV2A4KQxat3EOBYvKtdAFwLa+/n5kJlz1GpVYTEI=
-X-Received: by 2002:a2e:a544:0:b0:278:f5b8:82c8 with SMTP id
- e4-20020a2ea544000000b00278f5b882c8mr24470369ljn.228.1670427081654; Wed, 07
- Dec 2022 07:31:21 -0800 (PST)
+        with ESMTP id S229964AbiLGPwL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 10:52:11 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBE5D63D74;
+        Wed,  7 Dec 2022 07:51:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1670428302; x=1701964302;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=vbYSxS1Ceji0zDYMwWachwh/WMw1as7TdPoy0yu61J8=;
+  b=Ik23cWYxsgSctteJey49d3X676DnXety65JX5OBrWMO7VU2dIbADuyg+
+   9qYCYX88lnzvkvTAmR9t7s1QSBveQ3BOb9n2raf3abOssyMJ/xoY2c2+A
+   O5wAFJLk+Z+PST+RKAdIoCAFNxdnEKr1mKXje1KowDlrKkIPm9lk/Crcs
+   JufQ6PjlkFlDS1cM1b6YoK0+MNDoEaKJQRNksOrBieQ9FovP7GIrlWMqv
+   OHKjfvxzc/Qc3eQH0Sr21plJk3/qczNxstRqS2lqItTyVALDRfWI3MnMU
+   UsMsx7wDtgeO0/beWcNvPQZL4PIZDN5FiVS3sLSYjFOviwOiMZ9cK5w1S
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10554"; a="316937259"
+X-IronPort-AV: E=Sophos;i="5.96,225,1665471600"; 
+   d="scan'208";a="316937259"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2022 07:51:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10554"; a="891847595"
+X-IronPort-AV: E=Sophos;i="5.96,225,1665471600"; 
+   d="scan'208";a="891847595"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga006.fm.intel.com with ESMTP; 07 Dec 2022 07:51:33 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Wed, 7 Dec 2022 07:51:33 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Wed, 7 Dec 2022 07:51:32 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Wed, 7 Dec 2022 07:51:32 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Wed, 7 Dec 2022 07:51:31 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ewQMHboL7pMoS77yzDz0S3t7nucCvHPNuH69Nm3cbyNiDVzSLsVF8jS2MaXNy46wMbI9yhEgRv4o++RgeimMjCI7IzbKD0kaRRTN4vc9IcFYtx5btCYF9fK6bRK0H9PFWOAw4NAt86P5jo78/bB5ytVeLSX0iMxYuXx9bKY55efIQG8eYg0wMpZ5jYRlF8gvX/aNo41b3kN/ABQCcnpPjQ4E8jiqqZs04LYhQ/GJR8CTy3Cll+dvPTPkAGDIxGsNJAWo7ZPWs5uroyIhjcrMBOBxk5PJrObiiN0v0UBC9YAZ3GgDOlX9mVcNb7WWq7AKu2Fpljda7OzqFwQynyAFrQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tY4EH0kMIMGKjsqSE02vE/dcg9KRok72UoIUPG6YgLk=;
+ b=jYUCF9VgAbo2gVpp1QSnSfy+4h11T6/8cv4GFD+rsJf4LQfSXkMSMx7xvZiR4blMmGnzm/7/KVOJeX57BfNoStTkwu8dKqHhpgUMphD6QR7j5L5L12uevxRLPwmkl1XhQSiX2p8IoDj6t3qlvEO9waRCICBek7ONQRdQpQrVKqH12px3DV5J5KiwIx210k1jDnQio+C5FsYkWFLnhXEHoPhPwwZbESIA7EBqr8pa/ZwUXhKFF6TKxhbDBmSjocSZa1k02xNDEiiFgh+7saqfFdydxpJ+FH4ChmNUkpaFjg/SQPby8MDE9f8fazBtmjoCYZnvgGd1oZhq5yj9wjj/ng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+ by BN9PR11MB5499.namprd11.prod.outlook.com (2603:10b6:408:104::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14; Wed, 7 Dec
+ 2022 15:51:27 +0000
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::ae1a:fa3e:e36e:c2fe]) by PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::ae1a:fa3e:e36e:c2fe%4]) with mapi id 15.20.5880.014; Wed, 7 Dec 2022
+ 15:51:27 +0000
+Message-ID: <02d4cf57-236d-ff0b-078a-d6ced6a2dcde@intel.com>
+Date:   Wed, 7 Dec 2022 23:51:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH kvm-unit-tests] x86/pmu: Add Intel Guest Transactional
+ (commited) cycles testcase
+Content-Language: en-US
+To:     Like Xu <like.xu.linux@gmail.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20221207071506.15733-1-likexu@tencent.com>
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <20221207071506.15733-1-likexu@tencent.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG3P274CA0006.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:be::18)
+ To PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
 MIME-Version: 1.0
-References: <20221202174417.1310826-1-tabba@google.com> <20221202174417.1310826-26-tabba@google.com>
- <94872199-2466-756b-df4a-bbf699e40a0b@arm.com> <CA+EHjTwpmGtme1MoZFR-n86YMGmQoH8T8KkmAt9u3E2O2K9A8Q@mail.gmail.com>
- <612f4925-7a69-2d21-50f8-091a2295a2ff@arm.com>
-In-Reply-To: <612f4925-7a69-2d21-50f8-091a2295a2ff@arm.com>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Wed, 7 Dec 2022 15:30:45 +0000
-Message-ID: <CA+EHjTw0gxHMcsahsrRmR+2nwbov8JCfo=JrYVBvSSTuxHgeAw@mail.gmail.com>
-Subject: Re: [RFC PATCH kvmtool v1 25/32] Allocate guest memory as restricted
- if needed
-To:     Steven Price <steven.price@arm.com>
-Cc:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
-        andre.przywara@arm.com, alexandru.elisei@arm.com,
-        alex.bennee@linaro.org, will@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|BN9PR11MB5499:EE_
+X-MS-Office365-Filtering-Correlation-Id: 76f040ba-4ec6-48de-d747-08dad86ae67a
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: O9VFjnLCXzGSIF3Spmhul2JH+Td6jFR4Fm3pUqJSIav6K5tEgYyS4fU6kCurrM083+G1sS2wOKLfRCDUEF+Y9PBPTnQ4RViS5osLo/xQRa0yyRHNBLW2P9fzun+0EU4rVeqpbO4DeLucCs7UuvaS7OfrnZT6n8db+x0YUtSmx4YZAFQ5bmczEuF3TxjFlmey8cCbw7aV1IgOSZd3PHr6mKjvyOSNAGH0HN86A6ZT1G0hevOzU5QvXuzfYG5AZq/aNDPOXPBiCgsku2CrZHhLxGeu6eF/87Af4J8I8v3U9UhbMK+664Y4LimHk11Jsj5iFWeM1VlnKVKeqL+AHjfMeANHa+Ky+XrFJsNPKbgMmGOJ7n4U9ecWduB3dvXasgTQBlHtK3NC43uiCIXTs0okiZDCAOjQhbTxZZfCLMku5c2Uj4M91LIs00YWpfoTVXNFJFDZzpHQ9iKGLBow8ZMTWwV+od3fclveejqG22WEDs/7FcdDaEWMIKugCAt4mKkwvXa0ta4MSVDsMMp5eGyiaTuAYwE3Z6DEafF6rG1gBv65Z+VBpIBiXJcdsg2Z8DY4sItmFbMr/CRN7t7bfaoCtzTcsCDkBNsefK5zZRxZc7+ntBpCEFgpAyxIqA4CaGPsz9fNgvowsG0E54n6hZLrvHNJGnrk+TYazAtTndec0OrQwEhkRa99x6N+/zMC+77FhI9y6uGAQTrxG+GLa6yz5iiqOpgAhpiV0P35NVGJLxc=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(346002)(396003)(376002)(136003)(366004)(451199015)(36756003)(2616005)(6916009)(6666004)(26005)(478600001)(41300700001)(2906002)(6512007)(186003)(31696002)(86362001)(316002)(8676002)(4326008)(53546011)(66476007)(38100700002)(6486002)(82960400001)(66556008)(83380400001)(31686004)(66946007)(8936002)(5660300002)(6506007)(54906003)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cnAwNkRTT3Z3Z0M4MkFSejBZSHlEWDcxWTRvZE1LMUx2ekE5RnBkNktKenBW?=
+ =?utf-8?B?NFNzSm1ORmVYOVljUjZEQ2psejkyMUY5VjJ5MDFoaUlCd2tFcUZzaDhTSW5S?=
+ =?utf-8?B?YkdSYmx1M3BrUzZQcE8zaUVKUTJSZ0tTVlJXMXg0U1BvVG1DWmlna1hZTERr?=
+ =?utf-8?B?TzNKaThTbkx5ck10bGtOcWRPeEVkK0NnYnN1NWxRcEhmaGNZUWJta2tYV240?=
+ =?utf-8?B?K0xaczVWNW1Ccmg0aDdDS2I4cmZJL3kxK2VTbmlZRGU3b1Vtams1VmlXMjVG?=
+ =?utf-8?B?TXlNcG85NTRJZWN6eG55NGJtN0JLYzBVd2dMN0Y1MDdjczFBRmgxeUxMRFc1?=
+ =?utf-8?B?eVJwU2dDV1N1QjQwV05FSWtXeWdTRE1QVmZUYmI2WmViaXdsSU9WUkFMSkVG?=
+ =?utf-8?B?dlViWTNOd1U4K0N5c1VQTDZyTXRyeEEwbCtya1VLQ2RrMmlCSE1zQmFSTE53?=
+ =?utf-8?B?ZmV4N1hlNnZjREFOcG1Gd0JLcVllVW1aRTB3MmZtem1WRVhoZjBuMGlTTWpi?=
+ =?utf-8?B?N3dkTjI3VGJ5MEg1RGtQZ1lLOHQ3UTNZdEp6Tk85dDZhN1UyUFFVMzR3c2JB?=
+ =?utf-8?B?eW1YNkZtdG0xeGRLWWtmS2l0N3VEWHVrTTNYMkkxaW9pLzhSMTl2dENYUkpE?=
+ =?utf-8?B?eEpHUTYwcEJvTmZXeFVSc3oyd0hPL2VKUjRDRTNiUDlER1lsZVFYekdLTjBC?=
+ =?utf-8?B?RVFTdFNNREZMNzhWcjY0RkJyTU43MXFwVlNYUEZINnBBTXFSRnNoaTJ2QXJZ?=
+ =?utf-8?B?OE0zdHQyMXlLR0wxei9KSnVpa3lGVFZqbHFXYzFCck4zQXZxNXBBRG1PNGkr?=
+ =?utf-8?B?MlVacnh0YnhwaDEvbVlTTURMcEJnUlR6TnBOREc1Y1lzbjNmQlp3NUVnVHgz?=
+ =?utf-8?B?TVdoTnRkNkd1bk1HSk43T1UzVnp3S1NueHdNMkl6NnF2UWFqT1RzQWFLTnd3?=
+ =?utf-8?B?dnJFTFBydzJ0L3IwRVlEMWJBVEpwWm9SZHgyTC95Q0RXVkoxdTRKVWhYRFZU?=
+ =?utf-8?B?NGZCOGdPVFdEMWo1OE9GZmpsMmxvbkV6RzV3c09ONzV0UVdISHVIb2VRTXhr?=
+ =?utf-8?B?L2FKVitOVDFSN0E2SWgyZDJncXlOUk9DNjRUYWFYbEY4VEsvclhDZFJVb1ph?=
+ =?utf-8?B?d0o1V2dIRTkwTW9zVFl6UzNhMC9DSnFtVHE3anVLUTRObUw5RHRVRnZPaHlu?=
+ =?utf-8?B?VFNweVhhcTc1TXBpcGw3TkdjVk1IQ29jYnUxenB5TjZzd09jMmJsQWhOcDVB?=
+ =?utf-8?B?c3hBNzgzRUxsMEdLbms3bWJ6b2NFYWRwSFJkNFoxMG00YmQxd0lJcWhENEhM?=
+ =?utf-8?B?N2NtQ3d0bm50RnVpc1lJYTV3SmN1NXBsZG9FeTJRSGFZQWFueXB4c3ZvcndS?=
+ =?utf-8?B?Nm5pT0tNTE1TTENDMGE1YVdvV3Q2UEF4R0NGSm00Q0NCNnltMXI0RElsUlBF?=
+ =?utf-8?B?RkZGK0gvTHJmY3puOGQyTk9WQlZVbk9TcllzRjlXd3R2YzRxSmJYT2JjcFda?=
+ =?utf-8?B?ck85dXQrL29oYk9HVkNkeExSa3VPWXpBeTBMbkFXZU1sNVNUV01ocjNKSTBv?=
+ =?utf-8?B?YVNQandUYjkyTlgwVm43ZC95QnlJc0FSSzg4V3plMHExckNYMFJPdDNlcFJC?=
+ =?utf-8?B?UkZSWXhwNUZhSFNBVFZpbWZVOWx2SzdScXhsQkwyMlFvVThKUGVpU3U0UmF5?=
+ =?utf-8?B?WmFOUHJTbHhYRkJqVlJrK0tqUkQ4NE80WXplS1gyeVAyQi80Sk5BVEpIQ0xJ?=
+ =?utf-8?B?aFZVeis1L2ZIdFhPWUlDcjVqYXVkaUVHa3NyOEhXeUJKSnlnMDIrNUxuY3RM?=
+ =?utf-8?B?TkZ6RVhPTnpQOENmR3pKZGdQaUFzVFg1QVQxenJRK2lZTE1SakRldEEwekh1?=
+ =?utf-8?B?OGRLdGZ5QlB2UFI3M1ZvdURJTDJvMEY3czVZbkREbUtUOGZhelQrY3JoSFls?=
+ =?utf-8?B?Y1RVOUVnQXZSYVJEaUIrR2dOeS9XamxaK09tbG5FWisxR3BxZjFBa0o3NlNC?=
+ =?utf-8?B?RktrWldWMGlGQXhBMmRFblVNKzUzRHBmNzZuZTRsOVlQRmhwL1lYZUFsc0dK?=
+ =?utf-8?B?MVVGRG5meXRsdEtRSDlQMWljVmxMSStVSnhsZGZSck1NMmRKVE5DcHZja0pW?=
+ =?utf-8?Q?GgLG9Lu8vNtLOk9D+FUhDhULh?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 76f040ba-4ec6-48de-d747-08dad86ae67a
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Dec 2022 15:51:27.4882
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: p1oZ9WYgpsq15zxVt6WBosapeody9+GOfUNOYDLvRTgXdHg3iup59VOVKtlPExUHAQky30wLhpXbGsQpEfiTCw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5499
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-7.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,186 +161,119 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
 
-On Wed, Dec 7, 2022 at 3:09 PM Steven Price <steven.price@arm.com> wrote:
+On 12/7/2022 3:15 PM, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
 >
-> On 07/12/2022 14:52, Fuad Tabba wrote:
-> > Hi,
-> >
-> > On Wed, Dec 7, 2022 at 2:25 PM Steven Price <steven.price@arm.com> wrote:
-> >>
-> >> On 02/12/2022 17:44, Fuad Tabba wrote:
-> >>> If specified by the option and supported by KVM, allocate guest
-> >>> memory as restricted with the new system call.
-> >>>
-> >>> Signed-off-by: Fuad Tabba <tabba@google.com>
-> >>> ---
-> >>>  arm/aarch64/pvtime.c |  2 +-
-> >>>  hw/vesa.c            |  2 +-
-> >>>  include/kvm/util.h   |  2 +-
-> >>>  util/util.c          | 12 ++++++++----
-> >>>  4 files changed, 11 insertions(+), 7 deletions(-)
-> >>>
-> >>> diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> >>> index a452938..8247c52 100644
-> >>> --- a/arm/aarch64/pvtime.c
-> >>> +++ b/arm/aarch64/pvtime.c
-> >>> @@ -16,7 +16,7 @@ static int pvtime__alloc_region(struct kvm *kvm)
-> >>>       int mem_fd;
-> >>>       int ret = 0;
-> >>>
-> >>> -     mem_fd = memfd_alloc(ARM_PVTIME_SIZE, false, 0);
-> >>> +     mem_fd = memfd_alloc(kvm, ARM_PVTIME_SIZE, false, 0);
-> >>>       if (mem_fd < 0)
-> >>>               return -errno;
-> >>>
-> >>> diff --git a/hw/vesa.c b/hw/vesa.c
-> >>> index 3233794..6c5287a 100644
-> >>> --- a/hw/vesa.c
-> >>> +++ b/hw/vesa.c
-> >>> @@ -90,7 +90,7 @@ struct framebuffer *vesa__init(struct kvm *kvm)
-> >>>       if (r < 0)
-> >>>               goto unregister_ioport;
-> >>>
-> >>> -     mem_fd = memfd_alloc(ARM_PVTIME_SIZE, false, 0, 0);
-> >>> +     mem_fd = memfd_alloc(kvm, ARM_PVTIME_SIZE, false, 0, 0);
-> >>>       if (mem_fd < 0) {
-> >>>               r = -errno;
-> >>>               goto unregister_device;
-> >>> diff --git a/include/kvm/util.h b/include/kvm/util.h
-> >>> index 79275ed..5a98d4a 100644
-> >>> --- a/include/kvm/util.h
-> >>> +++ b/include/kvm/util.h
-> >>> @@ -139,7 +139,7 @@ static inline int pow2_size(unsigned long x)
-> >>>  }
-> >>>
-> >>>  struct kvm;
-> >>> -int memfd_alloc(u64 size, bool hugetlb, u64 blk_size);
-> >>> +int memfd_alloc(struct kvm *kvm, size_t size, bool hugetlb, u64 hugepage_size);
-> >>>  void *mmap_anon_or_hugetlbfs_align(struct kvm *kvm, const char *hugetlbfs_path,
-> >>>                                  u64 size, u64 align);
-> >>>  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size);
-> >>> diff --git a/util/util.c b/util/util.c
-> >>> index 107f34d..13b3e82 100644
-> >>> --- a/util/util.c
-> >>> +++ b/util/util.c
-> >>> @@ -17,7 +17,7 @@
-> >>>  __SYSCALL(__NR_memfd_restricted, sys_memfd_restricted)
-> >>>  #endif
-> >>>
-> >>> -static inline int memfd_restricted(unsigned int flags)
-> >>> +static int memfd_restricted(unsigned int flags)
-> >>>  {
-> >>>       return syscall(__NR_memfd_restricted, flags);
-> >>>  }
-> >>> @@ -106,7 +106,7 @@ static u64 get_hugepage_blk_size(const char *hugetlbfs_path)
-> >>>       return sfs.f_bsize;
-> >>>  }
-> >>>
-> >>> -int memfd_alloc(u64 size, bool hugetlb, u64 blk_size)
-> >>> +int memfd_alloc(struct kvm *kvm, size_t size, bool hugetlb, u64 blk_size)
-> >>>  {
-> >>>       const char *name = "kvmtool";
-> >>>       unsigned int flags = 0;
-> >>> @@ -120,7 +120,11 @@ int memfd_alloc(u64 size, bool hugetlb, u64 blk_size)
-> >>>               flags |= blk_size << MFD_HUGE_SHIFT;
-> >>>       }
-> >>>
-> >>> -     fd = memfd_create(name, flags);
-> >>> +     if (kvm->cfg.restricted_mem)
-> >>> +             fd = memfd_restricted(flags);
-> >>> +     else
-> >>> +             fd = memfd_create(name, flags);
-> >>> +
-> >>>       if (fd < 0)
-> >>>               die_perror("Can't memfd_create for memory map");
-> >>>
-> >>> @@ -167,7 +171,7 @@ void *mmap_anon_or_hugetlbfs_align(struct kvm *kvm, const char *hugetlbfs_path,
-> >>>       if (addr_map == MAP_FAILED)
-> >>>               return MAP_FAILED;
-> >>>
-> >>> -     fd = memfd_alloc(size, hugetlbfs_path, blk_size);
-> >>> +     fd = memfd_alloc(kvm, size, hugetlbfs_path, blk_size);
-> >>>       if (fd < 0)
-> >>>               return MAP_FAILED;
-> >>>
-> >> Extra context:
-> >>>       /* Map the allocated memory in the fd to the specified alignment. */
-> >>>       addr_align = (void *)ALIGN((u64)addr_map, align_sz);
-> >>>       if (mmap(addr_align, size, PROT_RW, MAP_SHARED | MAP_FIXED, fd, 0) ==
-> >>>           MAP_FAILED) {
-> >>>               close(fd);
-> >>>               return MAP_FAILED;
-> >>>       }
-> >>
-> >> So I don't understand how this works. My understanding is that
-> >> memfd_restricted() returns a file descriptor that cannot be mapped in
-> >> user space. So surely this mmap() will always fail (when
-> >> kvm->cfg.restricted_mem)?
-> >>
-> >> What am I missing?
-> >
-> > You're right for the current memfd_restricted() proposal as it is now.
-> > However, in our discussions with the folks working on it (e.g., [1,
-> > 2]), we pointed out that for pkvm/arm64 and for Android we need to be
-> > able to mmap shared memory for a couple of reasons (e.g., sharing in
-> > place without copying, guest initialization). So in the pkvm/arm64
-> > port of the memfd_restricted (which we haven't yet sent out since
-> > everything is still in flux, but you can have a look at it here [3]), we
-> > add the ability to mmap restricted memory but with a few restrictions,
-> > one of them being that the memory must be shared.
+> On Intel platforms with TSX feature, pmu users in guest can collect
+> the commited or total transactional cycles for a tsx-enabled workload,
+> adding new test cases to cover them, as they are not strictly the same
+> as normal hardware events from the KVM implementation point of view.
 >
-> Ah, ok. I'm not sure if that works for TDX or not, my understanding was
-> they couldn't have a user space mapping, but I'll let others familiar
-> with TDX comment on that.
-
-My understanding of TDX is quite limited, and that's one of the
-reasons I didn't even try to implement the x86 arch-specific part in
-this series.
-
-> For Arm CCA we need to ensure that the kernel doesn't create mappings:
-> your tree seems to include changes to block GUP so that should work.
-> Accesses from the VMM are not permitted but can be handled 'gracefully'
-> by killing off the VMM - so the mappings are not necessarily a problem,
-> although they do provide a significant "foot gun" to the VMM.
-
-You're right that it includes changes to block gup, since the same
-problems you've mentioned apply to pKVM.
-
-> We still have open questions about our UABI so it would be good to have
-> a discussion about how to align pKVM and Arm CCA.
-
-Sounds good.
-
-> > Of course, we plan on submitting these patches as soon as the
-> > memfd_restricted is in.
-> >
-> > I hope this answers your question.
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>   x86/pmu.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 72 insertions(+), 1 deletion(-)
 >
-> Yes thanks, I hadn't realised from your cover letter you had changes to
-> memfd_restricted() on top of Chao's series.
-
-I just realized that that's my fault. I'd posted the wrong link in the
-cover letter.
-
-Cheers,
-/fuad
-
-
-> Thanks,
->
-> Steve
->
-> >
-> > Cheers,
-> > /fuad
-> >
-> > [1] https://lore.kernel.org/all/20220310140911.50924-1-chao.p.peng@linux.intel.com/
-> > [2] https://lore.kernel.org/all/20220915142913.2213336-1-chao.p.peng@linux.intel.com/
-> > [3] https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/fdmem-v9-core
-> >> Thanks,
-> >>
-> >> Steve
-> >>
->
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index 72c2c9c..d4c6813 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -20,7 +20,7 @@
+>   
+>   typedef struct {
+>   	uint32_t ctr;
+> -	uint32_t config;
+> +	uint64_t config;
+>   	uint64_t count;
+>   	int idx;
+>   } pmu_counter_t;
+> @@ -547,6 +547,76 @@ static void check_emulated_instr(void)
+>   	report_prefix_pop();
+>   }
+>   
+> +#define _XBEGIN_STARTED		(~0u)
+> +
+> +static inline int _xbegin(void)
+> +{
+> +	int ret = _XBEGIN_STARTED;
+> +	asm volatile(".byte 0xc7,0xf8 ; .long 0" : "+a" (ret) :: "memory");
+> +	return ret;
+> +}
+> +
+> +static inline void _xend(void)
+> +{
+> +	asm volatile(".byte 0x0f,0x01,0xd5" ::: "memory");
+> +}
+> +
+> +int *ptr;
+> +
+> +static void tsx_fault(void)
+> +{
+> +	int value = 0;
+> +
+> +	ptr = NULL;
+> +	if(_xbegin() == _XBEGIN_STARTED) {
+> +		value++;
+> +		// causes abort
+> +		*ptr = value;
+> +		_xend();
+> +	}
+> +}
+> +
+> +static void tsx_normal(void)
+> +{
+> +	int value = 0;
+> +
+> +	if(_xbegin() == _XBEGIN_STARTED) {
+> +		value++;
+> +		_xend();
+> +	}
+> +}
+> +
+> +static void check_tsx_cycles(void)
+> +{
+> +	pmu_counter_t cnt;
+> +	int i;
+> +
+> +	if (!this_cpu_has(X86_FEATURE_RTM) || !this_cpu_has(X86_FEATURE_HLE))
+> +		return;
+Since the test case is for xbegin/xend, HLE check may omit as it's for 
+other X-instructions.
+> +
+> +	report_prefix_push("TSX cycles");
+> +
+> +	for (i = 0; i < pmu.nr_gp_counters; i++) {
+> +		cnt.ctr = MSR_GP_COUNTERx(i);
+> +
+> +		if (i == 2)
+> +			/* Transactional cycles commited only on gp counter 2 */
+> +			cnt.config = EVNTSEL_OS | EVNTSEL_USR | 0x30000003c;
+> +		else
+> +			/* Transactional cycles */
+> +			cnt.config = EVNTSEL_OS | EVNTSEL_USR | 0x10000003c;
+> +
+> +		start_event(&cnt);
+> +		tsx_fault();
+> +		tsx_normal();
+> +		stop_event(&cnt);
+> +
+> +		report(cnt.count > 0, "gp cntr-%d", i);
+The purpose is to collect total cycles, why not print out the data here 
+for each GP counter?
+> +	}
+> +
+> +	report_prefix_pop();
+> +}
+> +
+>   static void check_counters(void)
+>   {
+>   	if (is_fep_available())
+> @@ -559,6 +629,7 @@ static void check_counters(void)
+>   	check_counter_overflow();
+>   	check_gp_counter_cmask();
+>   	check_running_counter_wrmsr();
+> +	check_tsx_cycles();
+>   }
+>   
+>   static void do_unsupported_width_counter_write(void *index)
