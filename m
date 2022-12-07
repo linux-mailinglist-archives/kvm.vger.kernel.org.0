@@ -2,97 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BAC964507A
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 01:37:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1208664507E
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 01:38:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229762AbiLGAhh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Dec 2022 19:37:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45370 "EHLO
+        id S229745AbiLGAim (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Dec 2022 19:38:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229878AbiLGAhN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Dec 2022 19:37:13 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 862C937F8A
-        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 16:36:40 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-3d3769a8103so174801637b3.17
-        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 16:36:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=62EGeFEMBZyYp+itlwZq+NNn4g2Is1savivfamQujGU=;
-        b=VDhYGGnEhkawbxSr5eKbU7at+thNJzM6vSm941xH9pwMAaDdNMUfwod2BpG6Mo+rdO
-         JcJ+eAcdPSwVGX91V95BZrpAc6K32SLyRNnwlnHAIqxYg+1tIgN3BnNAAeLqMbGKRjhd
-         FniGuxp8C4sB47Ki5FWVxcUavnUn6RHYvN4030I9jyxg1MOxEnwx4R96j2dAo9XCCNX2
-         0qRYE438vo017a1MIAv66YxXd9Fc0ypizgPtYRqNdGCs5mQ3e/BilCCTosNbwoMPnand
-         WeXECAYLmOkA/z5yfEY223hAyOG/HeP0ACTKt6Ep1O6PYRNeH6+tNaYDIMhxnOT4Anvu
-         D+Tg==
+        with ESMTP id S229555AbiLGAil (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Dec 2022 19:38:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCE57DA9
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 16:37:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670373460;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WhcOmraBn/ipi0vzEbMup/7gBsLFBKTP05KUuVvghdw=;
+        b=L/M8js0P6a61m/2qzjiVM25DCnzujLd7rkZ2ALJmPgOf7SzaHSyokh4JSy9fRFtXGhfdst
+        1wA9y25lEH8nlNx0uJQOp50hgHwAMZG68cQTOvghB99DFvkbmkzaceXnYuvY4gdoHS4z7s
+        R2DiNuCwk/nyXT5qIM2uhjSUNEaf6ck=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-640-3SX7B52JMBOkx86JMcO2TA-1; Tue, 06 Dec 2022 19:37:38 -0500
+X-MC-Unique: 3SX7B52JMBOkx86JMcO2TA-1
+Received: by mail-ej1-f71.google.com with SMTP id qb2-20020a1709077e8200b007bf01e43797so2421721ejc.13
+        for <kvm@vger.kernel.org>; Tue, 06 Dec 2022 16:37:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+        h=content-transfer-encoding:in-reply-to:references:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=62EGeFEMBZyYp+itlwZq+NNn4g2Is1savivfamQujGU=;
-        b=KmkMNzrzGLZBvNxrD30bkURLDdACc/ZRjj7tACijxnr6EpH0ajF1Of0w2zV1KDFcyG
-         yemUVBMxevEr7BZ3nZoDT6PIuo7OhvBc/sbN6EP+S1xYaUyCmwGxo3SZdkJX8wK1ZMBZ
-         3bHMyyTkjxFj2/EtWQMDIPWrWpNO/6eFUgu2c2lBFzm9fVxaMlxS3mnsRpkKheabI3wd
-         M9Jc7XMSSfNQ4aSeGS9O9GFmNny6/blkQW4mclrIAQVdLOUEhSuxl0nbrsJhLO0H1qyw
-         x/a6oEbBsOcyrD+kiiVIvjJn6rzZ0Fi8S5ad1jAH5jEyEO7YAmhwckHTMVme65V17zl9
-         76RA==
-X-Gm-Message-State: ANoB5plEw9La3902XaWDNHePJFSPLfplZbcxpxZ2Mu77Pz/N+AXJ94GK
-        RInk8+I9HEg8G2rS+Ph+jHJZVINSPHQ=
-X-Google-Smtp-Source: AA0mqf5LgkbBbvGM/FL/y/jn9/jCI4RrPYc1rQe2nCJ2Hu9CnlUuYpjEpmCoRq8+o4LtrnyOcLRLvW8HjTg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:120d:0:b0:3d5:ecbb:2923 with SMTP id
- 13-20020a81120d000000b003d5ecbb2923mr29309362yws.485.1670373399803; Tue, 06
- Dec 2022 16:36:39 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  7 Dec 2022 00:36:37 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221207003637.2041211-1-seanjc@google.com>
-Subject: [PATCH] KVM: Delete extra block of "};" in the KVM API documentation
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        bh=WhcOmraBn/ipi0vzEbMup/7gBsLFBKTP05KUuVvghdw=;
+        b=SrYK2InzvLwErmeEiHB030K0ZdWqDdoExaDjkwb//B2BEjSsDgIoCG7+hI7zQ/dcwk
+         atPNDmFGi2GN+mKjv5QC2mp4LydXrmNMpQNpx3rg4Qvw2wduvKyejH4hOhjsGvhhXFsk
+         FES3RNXBE9+nGy5XI+M1VFqzA9nJl+AZ1dyYNf+NWvuNBASHRx4NTQln52ah2oVg8XGT
+         z/2s4ALihybbcM7VvEsSmrA6g1o0jD6kL0YHxJV4b/uT/IEpGuNPMeyU2mtN4vckDH9B
+         4eBtV4IDac5GTPxbbnCWj9N2FAkSI1Ofilyc7MgApBGFbpfFyM1bzrQOroRu2lLvd/ed
+         JQuQ==
+X-Gm-Message-State: ANoB5pmiNKKYzJKShJGGTY/PS06G5+ffBantaoLSLpW/Eat4C+k3tkfj
+        EnntyY6oqLu6edr4A15FaIAB66Sg7ltUg0qRM29J27WkpcaQJNa6wSsQaZAUi6jHbMmlKsoyhf2
+        G5aG4p8qfBVy96uy4C8XWNfXjf01VmxSpDtAiFN9PewWlw9aPmpFHMugB5QwZAhUn
+X-Received: by 2002:aa7:d808:0:b0:46b:9715:1630 with SMTP id v8-20020aa7d808000000b0046b97151630mr29599592edq.213.1670373457253;
+        Tue, 06 Dec 2022 16:37:37 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf70qdvyC792Vyu8oNXNjzy5popB/qQXO4+wz1mhdGN2rHpNOIru/AwLS2lOBOGRfR92wn7qlg==
+X-Received: by 2002:aa7:d808:0:b0:46b:9715:1630 with SMTP id v8-20020aa7d808000000b0046b97151630mr29599576edq.213.1670373456894;
+        Tue, 06 Dec 2022 16:37:36 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id d17-20020aa7d691000000b0046bb7503d9asm1554808edr.24.2022.12.06.16.37.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Dec 2022 16:37:36 -0800 (PST)
+Message-ID: <2958eabb-f388-a935-fada-03c501258f6b@redhat.com>
+Date:   Wed, 7 Dec 2022 01:37:35 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: KVM 6.2 state
+Content-Language: en-US
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     KVM list <kvm@vger.kernel.org>, Thomas Huth <thuth@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <89e2e3f9-ad89-3581-4460-f87f552d08a5@redhat.com>
+In-Reply-To: <89e2e3f9-ad89-3581-4460-f87f552d08a5@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Delete an extra block of code/documentation that snuck in when KVM's
-documentation was converted to ReST format.
+On 11/18/22 19:16, Paolo Bonzini wrote:
+> 
+> These are the patches that are still on my list:
+> 
+> * https://patchew.org/linux/20221105045704.2315186-1-vipinsh@google.com/
+> [PATCH 0/6] Add Hyper-v extended hypercall support in KVM
 
-Fixes: 106ee47dc633 ("docs: kvm: Convert api.txt to ReST format")
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- Documentation/virt/kvm/api.rst | 5 -----
- 1 file changed, 5 deletions(-)
+Last version is at 
+https://patchew.org/linux/20221205191430.2455108-1-vipinsh@google.com/ - 
+lots of it is selftests so there's time, but please review!
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index c618fae44ad7..6fd348f88700 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6575,11 +6575,6 @@ Please note that the kernel is allowed to use the kvm_run structure as the
- primary storage for certain register types. Therefore, the kernel may use the
- values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
- 
--::
--
--  };
--
--
- 
- 6. Capabilities that can be enabled on vCPUs
- ============================================
+> * https://patchew.org/linux/20221012181702.3663607-1-seanjc@google.com/
+> [PATCH v4 00/11] KVM: x86/mmu: Make tdp_mmu a read-only parameter
 
-base-commit: 3d7af7c5e000c68581429d533ed63414e4a48e6d
--- 
-2.39.0.rc1.256.g54fd8350bd-goog
+Here I think I preferred David's plan, but Sean's additional changes 
+were useful anyway, only the introduction of static_key had to be dropped.
+
+Paolo
+
+> * https://patchew.org/linux/20221001005915.2041642-1-seanjc@google.com/
+> [PATCH v4 00/32] KVM: x86: AVIC and local APIC fixes+cleanups
+> 
+> 
+> Of which only the last one *might* be delayed to 6.3.
+> 
+> Sean, if you have anything else feel free to collect them yourself and 
+> send a pull request.
+> 
+> Paolo
+> 
 
