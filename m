@@ -2,199 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74958645959
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 12:54:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2938645996
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 13:04:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229915AbiLGLyM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 06:54:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53568 "EHLO
+        id S230263AbiLGMEF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 07:04:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229840AbiLGLxv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 06:53:51 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AAC2192B3
-        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 03:52:47 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B7BV5i7032642;
-        Wed, 7 Dec 2022 11:52:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=YzLpQcRCEUpJoSKEQfOZPHKHCPz2cbT9RjlIODsYn/8=;
- b=Kgt8dRWGj9qwenb+ODgYRvBkpTrCcTXUxCjn6K6vGChdKpNZ5PcwS6yZtHXDdg/EFtTi
- GbckPbsaegYQNDWZo4MyJrftEcqulh/mvVMKeB79U8w9kWjnjVzDw39pQv4/0484o8yK
- lf8oOAeJbTotcCLkSuaQiKBMnd3exB6hkHS1L4p1gt+7IqzEAcr3tVxKR+rkA4p7vDN/
- yAI/WkOnn/1KgJXEJ6ZXDU3iVeb/SdQ8jSZfUV7H2u3DbtKyEaL9PMSQFFXWbiL0NQgF
- XQpV74jvjQ33/ypcxaaQWOk1QIP0//bMOYzpXoeioh/LCcnenhqiJVNKvpJAC0N6FQtS IA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mat1c0f3v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Dec 2022 11:52:30 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B7BjK2U029226;
-        Wed, 7 Dec 2022 11:52:29 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mat1c0f31-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Dec 2022 11:52:29 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2B7BjguX010845;
-        Wed, 7 Dec 2022 11:52:27 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3m9kvbavu6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Dec 2022 11:52:27 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B7BqMJA42008860
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 7 Dec 2022 11:52:23 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72BA12006E;
-        Wed,  7 Dec 2022 11:52:22 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 561E82009F;
-        Wed,  7 Dec 2022 11:52:21 +0000 (GMT)
-Received: from [9.171.6.120] (unknown [9.171.6.120])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed,  7 Dec 2022 11:52:21 +0000 (GMT)
-Message-ID: <a7fcbcce-91db-5097-a3f6-ce6b29ae9f6a@linux.ibm.com>
-Date:   Wed, 7 Dec 2022 12:52:21 +0100
+        with ESMTP id S230255AbiLGMED (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 07:04:03 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E3030F6F;
+        Wed,  7 Dec 2022 04:04:01 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id q15so16346400pja.0;
+        Wed, 07 Dec 2022 04:04:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=B48Bgebo64pDPnErOoGn8kP3QfjuFIi7+ZxgDnij3iE=;
+        b=ilVdd8D4TxYIzE2AdIA34SYk+96BVbuc6gXJ6ULKeju93aqfrB3raseRvN11x3CuY8
+         fOe8wFXBz0mUn+D4C+y+exGD+tw3MKnTbfVfE0RU0vrTr9m/qZFmI8wDn0EzB6XBXXgy
+         Cvg/AX0+QZ5DT3PHi5a/xrBbcGzUpMv4wFR2+e9vF8q1e8Klcu5pDKqAg7d+KFmiy8gV
+         G08nqA9pm/bU5DA2RVeQRHm6Y1xsvggIrnl2fW7UMPrEjn+FLMaiI+F3t7j/Sqgr/yqC
+         N3AdF9dVmYU0naybqat8/JQzFOCaIm0SH+BBUpZPush8/xfGo6C5hWpMF6BD8My/8JfE
+         mXQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=B48Bgebo64pDPnErOoGn8kP3QfjuFIi7+ZxgDnij3iE=;
+        b=CjGtaCTaBXYjTjG/MpMEzQF7+poEzbjNLT7u/+QoLkKa2yKU9+H6sfKblJLXbeNzkg
+         wtkZ0P+Y1jslnwXAmC5VlV7D4j8402KQAxN+L6p2F0l9e/oSWwULu27TQxMoBuZkZhUG
+         iWhhNFjCRku//EVi4pQnXXQp5xS5hZBD8P/56JzQPHOH+SDScE2HsufSOINClDGfn72r
+         KUxa+ivxDKfH+30RRv97RSSIwXUCvTe2ygaKTCDzGeym3OfHz5d3rWmIzon30eqDi6Vo
+         dBgiDBISxru3D5YufSxbtb2P0Bs/td1FK3khTxYtE327ht+gqTJipX9qdXBGjgRk6zzs
+         26zQ==
+X-Gm-Message-State: ANoB5pnYfBQo3N21bQcAQzUkBnhM/4aAIzsMCTS5S0Kr4qWf3/eG7Hbe
+        1OxSKry2f/38e5fWYvoFtr0XUBwKAc0=
+X-Google-Smtp-Source: AA0mqf4FYqazemg7UUTOvHMmpmMEjWrm28Tc/gxwvgGHaTBHvkz/5Dscb/0tBixzLE3FWCN0SXTaKw==
+X-Received: by 2002:a17:90a:2dc8:b0:219:baef:3ba with SMTP id q8-20020a17090a2dc800b00219baef03bamr19131172pjm.6.1670414640533;
+        Wed, 07 Dec 2022 04:04:00 -0800 (PST)
+Received: from localhost ([198.11.178.15])
+        by smtp.gmail.com with ESMTPSA id f6-20020a170902ce8600b001743ba85d39sm14501473plg.110.2022.12.07.04.03.59
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 07 Dec 2022 04:04:00 -0800 (PST)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
+Subject: [PATCH] kvm: x86/mmu: Remove duplicated "be split" in spte.h
+Date:   Wed,  7 Dec 2022 20:05:05 +0800
+Message-Id: <20221207120505.9175-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v12 1/7] s390x/cpu topology: Creating CPU topology device
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-References: <20221129174206.84882-1-pmorel@linux.ibm.com>
- <20221129174206.84882-2-pmorel@linux.ibm.com>
- <92e30cf1f091329b2076195e9c159be16c13f7f9.camel@linux.ibm.com>
- <cb4abea1-b585-2753-12e9-6b75999d7d2e@linux.ibm.com>
- <3f6f1ab828c9608fabf7ad855098cd6cae1874c4.camel@linux.ibm.com>
- <ffb9b474-e29d-c790-611e-549846b939e4@linux.ibm.com>
- <34e774fc372e41f352ccf03761a78eff22728f89.camel@linux.ibm.com>
- <1c63d7e3-008b-5347-02eb-538e091f3639@linux.ibm.com>
- <b0055a81c8266a77843eead531c0b188ceea0abf.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <b0055a81c8266a77843eead531c0b188ceea0abf.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: xHqWnjxVAPK_Vyet3c5zmgrVREuIqDLh
-X-Proofpoint-GUID: zOsXy4Egorv8BdWZ3mxdNNYAOYUJeNWh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-07_05,2022-12-07_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- lowpriorityscore=0 bulkscore=0 adultscore=0 mlxlogscore=999 suspectscore=0
- impostorscore=0 mlxscore=0 phishscore=0 malwarescore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2212070099
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
+"be split be split" -> "be split"
 
-On 12/7/22 12:38, Janis Schoetterl-Glausch wrote:
->   * On Wed, 2022-12-07 at 11:00 +0100, Pierre Morel wrote:
->>
->> On 12/6/22 22:06, Janis Schoetterl-Glausch wrote:
->>> On Tue, 2022-12-06 at 15:35 +0100, Pierre Morel wrote:
->>>>
->>>> On 12/6/22 14:35, Janis Schoetterl-Glausch wrote:
->>>>> On Tue, 2022-12-06 at 11:32 +0100, Pierre Morel wrote:
->>>>>>
->>>>>> On 12/6/22 10:31, Janis Schoetterl-Glausch wrote:
->>>>>>> On Tue, 2022-11-29 at 18:42 +0100, Pierre Morel wrote:
->>>>>>>> We will need a Topology device to transfer the topology
->>>>>>>> during migration and to implement machine reset.
->>>>>>>>
->>>>>>>> The device creation is fenced by s390_has_topology().
->>>>>>>>
->>>>>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>>>>>> ---
->>>>>>>>   include/hw/s390x/cpu-topology.h | 44 +++++++++++++++
->>>>>>>>   include/hw/s390x/s390-virtio-ccw.h | 1 +
->>>>>>>>   hw/s390x/cpu-topology.c | 87 ++++++++++++++++++++++++++++++
->>>>>>>>   hw/s390x/s390-virtio-ccw.c | 25 +++++++++
->>>>>>>>   hw/s390x/meson.build | 1 +
->>>>>>>>   5 files changed, 158 insertions(+)
->>>>>>>>   create mode 100644 include/hw/s390x/cpu-topology.h
->>>>>>>>   create mode 100644 hw/s390x/cpu-topology.c
->>>>>>>
-> [...]
-> 
->>>>>>>> + object_property_set_int(OBJECT(dev), "num-cores",
->>>>>>>> + machine->smp.cores * machine->smp.threads, errp);
->>>>>>>> + object_property_set_int(OBJECT(dev), "num-sockets",
->>>>>>>> + machine->smp.sockets, errp);
->>>>>>>> +
->>>>>>>> + sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), errp);
->>>>>>>
->>>>>>> I must admit that I haven't fully grokked qemu's memory management yet.
->>>>>>> Is the topology devices now owned by the sysbus?
->>>>>>
->>>>>> Yes it is so we see it on the qtree with its properties.
->>>>>>
->>>>>>
->>>>>>> If so, is it fine to have a pointer to it S390CcwMachineState?
->>>>>>
->>>>>> Why not?
->>>>>
->>>>> If it's owned by the sysbus and the object is not explicitly referenced
->>>>> for the pointer, it might be deallocated and then you'd have a dangling pointer.
->>>>
->>>> Why would it be deallocated ?
->>>
->>> That's beside the point, if you transfer ownership, you have no control over when
->>> the deallocation happens.
->>> It's going to be fine in practice, but I don't think you should rely on it.
->>> I think you could just do sysbus_realize instead of ..._and_unref,
->>> but like I said, I haven't fully understood qemu memory management.
->>> (It would also leak in a sense, but since the machine exists forever that should be fine)
->>
->> If I understand correctly:
->>
->> - qdev_new adds a reference count to the new created object, dev.
->>
->> - object_property_add_child adds a reference count to the child also
->> here the new created device dev so the ref count of dev is 2 .
->>
->> after the unref on dev, the ref count of dev get down to 1
->>
->> then it seems OK. Did I miss something?
-> 
-> The properties ref belongs to the property, if the property were removed,
-> it would be unref'ed. There is no extra ref for the pointer in S390CcwMachineState.
-> I'm coming from a clean code perspective, I don't think we'd run into this problem in practice.
+Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+---
+ arch/x86/kvm/mmu/spte.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-OK, I understand, you are right.
-My original code used object_resolve_path() to retrieve the object what 
-made things cleaner I think.
-
-For performance reason, Cedric proposed during the review of V10 to add 
-the pointer to the machine state instead.
-
-I must say that I am not very comfortable to argument on this.
-@Cedric what do you think?
-
-
-Regards,
-Pierre
-
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 1f03701b943a..6f54dc9409c9 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -363,7 +363,7 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
+  * A shadow-present leaf SPTE may be non-writable for 4 possible reasons:
+  *
+  *  1. To intercept writes for dirty logging. KVM write-protects huge pages
+- *     so that they can be split be split down into the dirty logging
++ *     so that they can be split down into the dirty logging
+  *     granularity (4KiB) whenever the guest writes to them. KVM also
+  *     write-protects 4KiB pages so that writes can be recorded in the dirty log
+  *     (e.g. if not using PML). SPTEs are write-protected for dirty logging
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.19.1.6.gb485710b
+
