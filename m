@@ -2,206 +2,300 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 99087645C84
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 15:27:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D73B3645CB7
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 15:35:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229601AbiLGO1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 09:27:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51730 "EHLO
+        id S230042AbiLGOfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 09:35:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230354AbiLGO0w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 09:26:52 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF73E5FB90
-        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 06:26:40 -0800 (PST)
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B7ENfnr000515;
-        Wed, 7 Dec 2022 14:26:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2022-7-12;
- bh=L18IiDI+3BG+Wd68lIoRAd32xlz3nOPXYFfMdU6XnTQ=;
- b=a7pMh1xPXCIz+WhadsZEvIMDZOwCQ38hRhuagBqxka1pQMibAVSzctmY+/Zg8QQplg3n
- bRTjeZtqX6u0mW9KPw1x7+KzMaMD5rZ35AyU8F+EvZTZc84MvwrpvLziUimCpWB2O8HI
- 81xysFK9a6viXgcWx3VqceGrQ1sk4d05yJY196WlayU025/YD/S/cloV/7Q4sR0aztnh
- 48i064yQCV116Ooi47LlaNZjFS89YsK45u0PFq0+Kn+xlPdUL0BiaBFi3bRL5nV+zJIC
- d/P0CuH6FEl9Kj4JVPCh3stsyO+18aosVkcwyktbe7ZvOJkg2/quCAlqfHUUEC10wPQO +w== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3maudur6w5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 07 Dec 2022 14:26:38 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2B7Co8S7022256;
-        Wed, 7 Dec 2022 14:26:37 GMT
-Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2044.outbound.protection.outlook.com [104.47.73.44])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3maa5xr08k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 07 Dec 2022 14:26:37 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cmTq656IEhbwSNnrRf3yD+f4jc6f3M+TcSTsscgUhtrvehg6f945tKJcjDLFk5jX+L7hmb86Ih7FmtqisrGgLlMF1HHLDMW6RLHgytfcqglOE8wODRYK9BtUIuKhrPlkp4984KMb96xNssx3Sq0HdKoLlmq0bEWGq1xEKtdwiATKHFAOu9y7OqkpbKNaQBvvzlqDB81VMpYx75XusJuV2QbsFSLdkKn9+kL6ClpoKmiRG9MDTygGUE29aQUXK3pDVkQ+FRZaOLQVdPwTQcnTaHAymBkNHMYd/lALLrysASsNdP6ktuUzn1Cv6n4uIDuSR30aECGl5s77No1GrIlGpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=L18IiDI+3BG+Wd68lIoRAd32xlz3nOPXYFfMdU6XnTQ=;
- b=S0HC1j9JEzQ6tDIb3jYIKmi/oybRDQZdAWy9scVc2UFOHrACTDd7tB4XHw0Y+luxD1r3uN1hb6X9R8I+Jz02rsybIV6D0bPsQXDMrJbap65Cf1P5JjUBHRDKFfdcFe+PK8J3iUdiKzV6N5WV0/GFaDb7kJqy085poYZ+K3Umu8tA4zehqy80hmlxv9VxwYVleltVIT3l1Cpf4XBY4yXwG6KMr5aznx4l/6xbU89hZKYd4a7lh90Zizljjccgk2gdgTE4IBTiYVpPe40lifn/w2SFgnyY1lwykmkiYl/IU1TxiECY+AEmRPV5MOexAkNy4nPGNTqusIxr12kLJ3CQGQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L18IiDI+3BG+Wd68lIoRAd32xlz3nOPXYFfMdU6XnTQ=;
- b=ET0mHfRWjUez6RFvOnRc3fnFYGSI1Uh5j/3SXJet72Htj0bU3OvjZ9PMIJg33V5bKpHCgECEZawpfVSmT0nL6d4EY0ZWCjXctx732xvBdRjtuvklRImJAGFItTIN3uILxmxEE0GW6lVv7DJQOlWWvp712TosllwU0TBRHFYSTQM=
-Received: from SA2PR10MB4684.namprd10.prod.outlook.com (2603:10b6:806:119::14)
- by PH7PR10MB5721.namprd10.prod.outlook.com (2603:10b6:510:130::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14; Wed, 7 Dec
- 2022 14:26:35 +0000
-Received: from SA2PR10MB4684.namprd10.prod.outlook.com
- ([fe80::4056:9f2c:6171:c37e]) by SA2PR10MB4684.namprd10.prod.outlook.com
- ([fe80::4056:9f2c:6171:c37e%5]) with mapi id 15.20.5880.014; Wed, 7 Dec 2022
- 14:26:35 +0000
-Message-ID: <7614cc78-610a-f661-f564-b5cd6c624f42@oracle.com>
-Date:   Wed, 7 Dec 2022 09:26:33 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH V1 1/8] vfio: delete interfaces to update vaddr
-Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
-References: <1670363753-249738-1-git-send-email-steven.sistare@oracle.com>
- <1670363753-249738-2-git-send-email-steven.sistare@oracle.com>
- <20221206165232.2a822e52.alex.williamson@redhat.com>
-From:   Steven Sistare <steven.sistare@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <20221206165232.2a822e52.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR20CA0045.namprd20.prod.outlook.com
- (2603:10b6:208:235::14) To SA2PR10MB4684.namprd10.prod.outlook.com
- (2603:10b6:806:119::14)
+        with ESMTP id S229437AbiLGOfl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 09:35:41 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FD9156EC0;
+        Wed,  7 Dec 2022 06:35:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1670423740; x=1701959740;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=7EG1tTmoObEDuvvLIPiEYSoj23URjti2eUKjBDyglO0=;
+  b=MQNfNVaEXjVv8NPlLMgkAxd7Fpv4rCdVWqxZ7YszaiR9GEp6aDqAu6nn
+   rWqGbk+smFtPf2GeGWLg+38+VnpzFP8g7yMdHMnkn7VN5Lm12Jl3FVdtx
+   KQtncnpMXJQw2qEt6Qw5yasPsFI8szLaPtzsXh2ZRjqpEUQxdR5X6EUGd
+   7yQVNIQsQIr9mieLxl1VmVWEfnw4MeYdmAwG7cNx3xAjmH0Hbsacs0Daw
+   wxwA3GWaA75RsJCtUS4dPmHsx/Y6+OtHhv7VBkuqurVaVF551PkX8UujJ
+   2IqhLsx/DbaXw2IUij7e8GTeh3M5WFMry+MZxnXMEi7Xt+STI3WMSw35C
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10553"; a="296598364"
+X-IronPort-AV: E=Sophos;i="5.96,225,1665471600"; 
+   d="scan'208";a="296598364"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2022 06:35:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10553"; a="640266025"
+X-IronPort-AV: E=Sophos;i="5.96,225,1665471600"; 
+   d="scan'208";a="640266025"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by orsmga007.jf.intel.com with ESMTP; 07 Dec 2022 06:35:27 -0800
+Date:   Wed, 7 Dec 2022 22:31:08 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Fabiano Rosas <farosas@suse.de>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
+Message-ID: <20221207143108.GB1275553@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
+ <877cz4ac5z.fsf@suse.de>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PR10MB4684:EE_|PH7PR10MB5721:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2a30f94a-96c7-412f-7b45-08dad85f0bb1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nschbK/YiS/8RBTliRn9Qu6JUgKndFdvbCo6qUwZ/QM34mgfUhAOYTnnhcXlkofWmdV6DOLC6MR4QrINDAFRt4KG/gUy2Zy7+IkR5mtlA4l5S/CT2ScIhjkJjS5kB9iswPfThsa6Qu2b0wDbxa0wzqhRC/GlGhpXilVUs6uy8SJb2ho2FH5bIbR3Wkyep6YsIoHroO4Ryh7nK04O2glnZoOY6H0NT3j+Mq6xwvalb+2obrfrkgr4Sjz2nL00jNQQVWk9uze//C4A9Y5wlr8v9Y4r/RFlnqJQse68bg+ZmKvGHsEBx8Xw/TnGkY9ugCF4+4DRBXIrHGAELWvHEC3M0dBPyHVMwsktYh4aWJGa4PsGCMYK400bGE5MLWk6RnVDBi4v6YD0+YqHRQTKvfJnORLofdkZTa4czhM1igKTlShv34ofBavL1ZImVN9KS4lpoL1T8+E3EKFQZ8gaWZBEPwU5MzVGzYvSAuR7lv/O8SwBvBCSrxtba6xfwmFkEz4z/MfozGyE7BsSoTfcTokPXVYP6zHx8bPqr8lYHNjtLHqrjMv3aOSGWY4VJwTNneNwFOfpm7BiUeFLvsC86puEws1B0ri6ZSooRhQks0Q2K7cr5JbKuVQt1+EmNPZN6zop3EsEnPQ2OGa3BHDds8cUzzfXM4TrLKoXYUOp+BSyvnE8+EYW0q/cPggLMYX/C2NB/+dyZgT+Km4GLchMvrH4Josman/JJ0GcqzGXb4NAQwk=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR10MB4684.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(396003)(346002)(136003)(39860400002)(366004)(451199015)(6916009)(86362001)(66556008)(41300700001)(316002)(8676002)(66476007)(4326008)(66946007)(44832011)(8936002)(5660300002)(83380400001)(186003)(2616005)(38100700002)(6486002)(53546011)(36916002)(31696002)(6512007)(36756003)(26005)(6506007)(478600001)(66899015)(2906002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WkZDWTdsdDRWUm9iM3JCMEdNNVZYaUd3akZzb0lYZnlmUVJNMm1JQ0ZLY1RU?=
- =?utf-8?B?ZHpKTk1PdzhpbWNBMURveW5VQWl1ZjBMam84cmZqNVNGMTFtc3JkWlhNS1NY?=
- =?utf-8?B?dTNrNnZ5SWRsK25ub2NMeVEzTTl2NnppTkt1TFRhbXVsUmZKUGlIeVZxL0Ra?=
- =?utf-8?B?SU5mQzlkd21lZi9Ic2UwNjRLODdVYW9iR3ZpTUt1N3d3UEFtd0dwb1l4K0NQ?=
- =?utf-8?B?WERNZVBzUzY3elZqSHZIalhJb3k3OHVzQ3BCV0w3cldQN2pHdHMwa0J6UWhN?=
- =?utf-8?B?OVJSaGFWaE56emluaGVDWFNZTFVXczRHWW1PUzlWY2dQSGlHZ1kxNWhEUkYr?=
- =?utf-8?B?OGVicXIrajBlWHBRbXgyZUJBN1JteVlCZjdGWkhYaXA1MGdmRHNDdFBReFdw?=
- =?utf-8?B?U0xhUDFVdStXcTlsZFhDRkpHQmZhQnI4RUhuVUtQZWQvaEFDMXJpYlJiWk96?=
- =?utf-8?B?KzhOMm8vZ1krV0tKT3VvM2xJMlhyUUE3V0xROERrc3BUR3FJa21oK3o2bVlI?=
- =?utf-8?B?amw5WmM0bnh5WUpHKytocmh0T2ZWd2hzZDFiWThVa0k0SHh6OE5kWVBHblR4?=
- =?utf-8?B?VCtEenRzY28vU29Rb0t5TGV2dDE1dFFpUFFNMmpDYWFmVDU2ZEdaRlRWZ2w3?=
- =?utf-8?B?QWhaekw2UkQyK2xXV0s5cDk5UFMvVWdaNkdwOGlrYi9OdjdFRnUwUVV0c1hR?=
- =?utf-8?B?UW1CRlZOZE5XYlRDS0Z2VExOdWFybVpYbHd4ZE5uVXVCYk80a21NNkZHa3VY?=
- =?utf-8?B?QW5tZGRzK2tGRWlISElIaGM4UWUyQ1ZyNGZmK2p4anlwRlBhWEc4RG0wcFp1?=
- =?utf-8?B?TnNaMmtBSm5XRWlDQmlzVytGYlp3UVpMczB0K3hLakNPTU1yQmVPYmkzeEJW?=
- =?utf-8?B?NVB4dU9oeDZ6cHZzbnV0cXJ2VUZmT2FEdTE3bWs5NStiRWI1RDNmZE1KYWNI?=
- =?utf-8?B?d1R5Wm5nN0RGNDZBaHRTaEtaZnpzcVVRTmlYQ2FCaGlFK1JqL1F0bk9VUUh1?=
- =?utf-8?B?WUJEaW5HbnFBaG9JY2lrSnRWelRqRjNuOXN5UExyNkZMa2RyT0IwWmsweDFj?=
- =?utf-8?B?L1lmR2xWZWltRTJ0RW5wVHdrMzFpN1hSSkRBOWxaY0xPYnVlN3RrSkpIWWlQ?=
- =?utf-8?B?QUZoeUg5Sit1S0hBbDc0YnpoUjBDbUQ3RzhhaGRxdnFlQ1RSQkxjeWt5VnJy?=
- =?utf-8?B?cFhFNjZZYWZrb2loSnZHQ1pjU3RnSW1RNXNxdG9iZ09sZXZtNjBDVW91STdp?=
- =?utf-8?B?M2M2RkhvMzFzNHJzUXZEcnhGaTJQWU5wSDYwSE4yeEFCWjZwWDJPSkkrTDIx?=
- =?utf-8?B?TEM4bTFyNytodmdta21MZzRoRTdMbldDR0pYTXdYTXZ4R2ZmQ0g0akN3SmRK?=
- =?utf-8?B?NmlMbmloMkZBaVhrRm55Yk13ZHdvcWkwYmxyQm9CZXQvYlUyTm84djIvZ2o3?=
- =?utf-8?B?U0l4OVZDc01zREMyYTdCZmdpOGdLRkZHYlJvNDF6MWhxWDJTcjVVNENIRmZh?=
- =?utf-8?B?WFl6MU90WGJZSGhMNWZLdXIyQUJmMDNkYmk4UWRpZGJuc3JMRXIwSGIyc0xN?=
- =?utf-8?B?aHI0NUxST1RQd1hvVDE0SVVjYUtpQmRSeGhSU0FXVEZHL3BXZGhVNmc1b0Vk?=
- =?utf-8?B?TjNiWEl6WlEzdUEvWlhmYWE4NVRCaUZHMUh0U2hNQmtwYUtNVWN6K2E1cXFm?=
- =?utf-8?B?Tzgzelpaajh6KzhXSlJReG1LaEFSbVVkL0hNQzd3Vk8xQ0lQK1Y4OExEcjZh?=
- =?utf-8?B?Z3VRMkNxRG1QT3hnVGFCeWQ2aWNoM1FVbnNKaVZlRjdoR1BtR25GNzFGZXNV?=
- =?utf-8?B?YUlkRUZ4YWwrYzcyYjhtQXRFcFluNFJqRkRUb0h1ck51Q3BMQUV2NVc0Rzd2?=
- =?utf-8?B?b3IyNUxXZnpubjM5ZS9RYjdrVWtybG9DdTRqa2dmRm1rcEZVUlpuM3NTZDN4?=
- =?utf-8?B?ZGliL1lUL3lpcStRUEhCMFZxNEtQOXU5aklBMnlGMEVoZzRCSlRZOGFhN3pz?=
- =?utf-8?B?akNtUWJNdFpEYnMyOWp0ZG5nNk50M3hBa0hDY3ZrR0dkTlh5VzJMMzQ2ZUxU?=
- =?utf-8?B?MHhzYWJUTXBuYTdvVXQyWm5xRm92b1NVcGdQOTd5Ym91MXNNRW5WVUlJclRD?=
- =?utf-8?B?UVV5Rjd1MjJKSE5ld3RPeUlXeXBMdnlGSkV6N2FMWEt4ZUlZRy94RGVOQWhN?=
- =?utf-8?B?N1E9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 5J+ycrjmtloakpJE5TQH0Xdud8nz/c+q6chghaHFLVecnAhf1haFgmFy3NdEvV5I7I6KVgR5fOeTdrtRiEQOuDV5p30l8+07PhCd862oTNkmhffCm1Q6FNm6bkYEfbnkBph2iNYGGBBU4Bo9/zCGK4DjMQkOZLQ/C561NAy4YlEYzle6VyAkR56K7ZTWCb0FAbJcFJ+iaHLzJmuDsnCXP+kgCh9P3cuh3bw7fjn93jXyABMd6JzHMmpt8DFybQ45hdESYcqFogCLsiF1b97cUjzhU3aWT4eKcD+SpOdkya9JTJasi22ZnGGoOd5s9JKOe/CQXaajh2wGVxFYDIXUIaKR+3lMixUXwgh3PGh86J+iGxW2XOiXd0LjfOLnydN/dvckGCfhjMz/NZHHuswCHo1S62phxpA27qod2Pda4ZfvQBtjPxdhraQ/dDR+NAMycCdPgWkx63/v6mgnSexkRKVnpz5SbWkjN+cRUxTblvcluMSntSb8xxcpW6QSgTMHLsqAb6qybuTD5Ax+2/974AFcW3mLz9mU4TmpWJUu/KrqBo2UKqEG98NSeq2OdbJpITjdNx+f0ixXhBbxzVYAX42HLhFN/+DxexoLfEv+DATmJe065K6BkMj18aDI/81dMxl5RNG2zA/0I0sdhD/Ox6UE84bouXSI99K2NUIyeWCRufADM9MynLs6VeSsECAi4Ct3NRXri3Dh/xcn/Ad6kXwflqG3kZYCyXS8ra8ViA9kZ1IlCnkI2d8NgI0ohUeVFzpHw8V/mV4o15nNjDQS3vSHM6d5SRa0NNH/I8AZDzpBtSeaV0Jxcehfxq8SZCgo
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a30f94a-96c7-412f-7b45-08dad85f0bb1
-X-MS-Exchange-CrossTenant-AuthSource: SA2PR10MB4684.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Dec 2022 14:26:35.7894
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3znalBDaMrMN4lqTOqtPQFvNbnx/BIFIQHNDVRLIHhbAEsIEzfxFgjBX095+sjfkGjNDYfRtoMb12PvYuPYakUbvgReR0pV0P2j9S5zYCBA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB5721
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-07_06,2022-12-07_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
- phishscore=0 spamscore=0 bulkscore=0 mlxscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2212070124
-X-Proofpoint-ORIG-GUID: sQYG8p2xt9LQGSGweo6hRZZFjmHM6rPb
-X-Proofpoint-GUID: sQYG8p2xt9LQGSGweo6hRZZFjmHM6rPb
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <877cz4ac5z.fsf@suse.de>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/6/2022 6:52 PM, Alex Williamson wrote:
-> On Tue,  6 Dec 2022 13:55:46 -0800
-> Steve Sistare <steven.sistare@oracle.com> wrote:
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->> index d7d8e09..5c5cc7e 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
+On Tue, Dec 06, 2022 at 10:34:32AM -0300, Fabiano Rosas wrote:
+> Chao Peng <chao.p.peng@linux.intel.com> writes:
+> 
+> > In confidential computing usages, whether a page is private or shared is
+> > necessary information for KVM to perform operations like page fault
+> > handling, page zapping etc. There are other potential use cases for
+> > per-page memory attributes, e.g. to make memory read-only (or no-exec,
+> > or exec-only, etc.) without having to modify memslots.
+> >
+> > Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
+> > userspace to operate on the per-page memory attributes.
+> >   - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
+> >     a guest memory range.
+> >   - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
+> >     memory attributes.
+> >
+> > KVM internally uses xarray to store the per-page memory attributes.
+> >
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com/
+> > ---
+> >  Documentation/virt/kvm/api.rst | 63 ++++++++++++++++++++++++++++
+> >  arch/x86/kvm/Kconfig           |  1 +
+> >  include/linux/kvm_host.h       |  3 ++
+> >  include/uapi/linux/kvm.h       | 17 ++++++++
+> >  virt/kvm/Kconfig               |  3 ++
+> >  virt/kvm/kvm_main.c            | 76 ++++++++++++++++++++++++++++++++++
+> >  6 files changed, 163 insertions(+)
+> >
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index 5617bc4f899f..bb2f709c0900 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -5952,6 +5952,59 @@ delivery must be provided via the "reg_aen" struct.
+> >  The "pad" and "reserved" fields may be used for future extensions and should be
+> >  set to 0s by userspace.
+> >  
+> > +4.138 KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES
+> > +-----------------------------------------
+> > +
+> > +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> > +:Architectures: x86
+> > +:Type: vm ioctl
+> > +:Parameters: u64 memory attributes bitmask(out)
+> > +:Returns: 0 on success, <0 on error
+> > +
+> > +Returns supported memory attributes bitmask. Supported memory attributes will
+> > +have the corresponding bits set in u64 memory attributes bitmask.
+> > +
+> > +The following memory attributes are defined::
+> > +
+> > +  #define KVM_MEMORY_ATTRIBUTE_READ              (1ULL << 0)
+> > +  #define KVM_MEMORY_ATTRIBUTE_WRITE             (1ULL << 1)
+> > +  #define KVM_MEMORY_ATTRIBUTE_EXECUTE           (1ULL << 2)
+> > +  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> > +
+> > +4.139 KVM_SET_MEMORY_ATTRIBUTES
+> > +-----------------------------------------
+> > +
+> > +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> > +:Architectures: x86
+> > +:Type: vm ioctl
+> > +:Parameters: struct kvm_memory_attributes(in/out)
+> > +:Returns: 0 on success, <0 on error
+> > +
+> > +Sets memory attributes for pages in a guest memory range. Parameters are
+> > +specified via the following structure::
+> > +
+> > +  struct kvm_memory_attributes {
+> > +	__u64 address;
+> > +	__u64 size;
+> > +	__u64 attributes;
+> > +	__u64 flags;
+> > +  };
+> > +
+> > +The user sets the per-page memory attributes to a guest memory range indicated
+> > +by address/size, and in return KVM adjusts address and size to reflect the
+> > +actual pages of the memory range have been successfully set to the attributes.
+> 
+> This wording could cause some confusion, what about a simpler:
+> 
+> "reflect the range of pages that had its attributes successfully set"
+
+Thanks, this is much better.
+
+> 
+> > +If the call returns 0, "address" is updated to the last successful address + 1
+> > +and "size" is updated to the remaining address size that has not been set
+> > +successfully.
+> 
+> "address + 1 page" or "subsequent page" perhaps.
+> 
+> In fact, wouldn't this all become simpler if size were number of pages instead?
+
+It indeed becomes better if the size is number of pages and the address
+is gfn, but I think we don't want to imply that the page size is 4K to
+userspace.
+
+> 
+> > The user should check the return value as well as the size to
+> > +decide if the operation succeeded for the whole range or not. The user may want
+> > +to retry the operation with the returned address/size if the previous range was
+> > +partially successful.
+> > +
+> > +Both address and size should be page aligned and the supported attributes can be
+> > +retrieved with KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES.
+> > +
+> > +The "flags" field may be used for future extensions and should be set to 0s.
+> > +
+> 
 > ...
->> @@ -1265,18 +1256,12 @@ struct vfio_bitmap {
->>   *
->>   * If flags & VFIO_DMA_UNMAP_FLAG_ALL, unmap all addresses.  iova and size
->>   * must be 0.  This cannot be combined with the get-dirty-bitmap flag.
->> - *
->> - * If flags & VFIO_DMA_UNMAP_FLAG_VADDR, do not unmap, but invalidate host
->> - * virtual addresses in the iova range.  Tasks that attempt to translate an
->> - * iova's vaddr will block.  DMA to already-mapped pages continues.  This
->> - * cannot be combined with the get-dirty-bitmap flag.
->>   */
->>  struct vfio_iommu_type1_dma_unmap {
->>  	__u32	argsz;
->>  	__u32	flags;
->>  #define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
->>  #define VFIO_DMA_UNMAP_FLAG_ALL		     (1 << 1)
->> -#define VFIO_DMA_UNMAP_FLAG_VADDR	     (1 << 2)
 > 
+> > +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> > +					   struct kvm_memory_attributes *attrs)
+> > +{
+> > +	gfn_t start, end;
+> > +	unsigned long i;
+> > +	void *entry;
+> > +	u64 supported_attrs = kvm_supported_mem_attributes(kvm);
+> > +
+> > +	/* flags is currently not used. */
+> > +	if (attrs->flags)
+> > +		return -EINVAL;
+> > +	if (attrs->attributes & ~supported_attrs)
+> > +		return -EINVAL;
+> > +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
+> > +		return -EINVAL;
+> > +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
+> > +		return -EINVAL;
+> > +
+> > +	start = attrs->address >> PAGE_SHIFT;
+> > +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
 > 
-> This flag should probably be marked reserved.
+> Here PAGE_SIZE and -1 cancel out.
+
+Correct!
+
 > 
-> Should we consider this separately for v6.2?
+> Consider using gpa_to_gfn as well.
 
-Ideally I would like all kernels to support either the old or new vaddr interface.
-If iommufd + vfio compat does not make 6.2, then I prefer not to delete the old
-interface separately.
+Yes using gpa_to_gfn is appropriate.
 
-> For the remainder, the long term plan is to move to iommufd, so any new
-> feature of type1 would need equivalent support in iommufd.  Thanks,
-
-Sure.  I will study iommufd and make a proposal.
-
-Will you review these patches as is to give feedback on the approach?
-
-If I show that iommufd and the vfio compat layer can support these interfaces,
-are you open to accepting these in v6.2 if iommufd is still a ways off? I see 
-iommufd in qemu-next, but not the compat layer.
-
-- Steve
+Thanks,
+Chao
+> 
+> > +
+> > +	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
+> > +
+> > +	mutex_lock(&kvm->lock);
+> > +	for (i = start; i < end; i++)
+> > +		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+> > +				    GFP_KERNEL_ACCOUNT)))
+> > +			break;
+> > +	mutex_unlock(&kvm->lock);
+> > +
+> > +	attrs->address = i << PAGE_SHIFT;
+> > +	attrs->size = (end - i) << PAGE_SHIFT;
+> > +
+> > +	return 0;
+> > +}
+> > +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
+> > +
+> >  struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn)
+> >  {
+> >  	return __gfn_to_memslot(kvm_memslots(kvm), gfn);
+> > @@ -4459,6 +4508,9 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+> >  #ifdef CONFIG_HAVE_KVM_MSI
+> >  	case KVM_CAP_SIGNAL_MSI:
+> >  #endif
+> > +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> > +	case KVM_CAP_MEMORY_ATTRIBUTES:
+> > +#endif
+> >  #ifdef CONFIG_HAVE_KVM_IRQFD
+> >  	case KVM_CAP_IRQFD:
+> >  	case KVM_CAP_IRQFD_RESAMPLE:
+> > @@ -4804,6 +4856,30 @@ static long kvm_vm_ioctl(struct file *filp,
+> >  		break;
+> >  	}
+> >  #endif /* CONFIG_HAVE_KVM_IRQ_ROUTING */
+> > +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> > +	case KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES: {
+> > +		u64 attrs = kvm_supported_mem_attributes(kvm);
+> > +
+> > +		r = -EFAULT;
+> > +		if (copy_to_user(argp, &attrs, sizeof(attrs)))
+> > +			goto out;
+> > +		r = 0;
+> > +		break;
+> > +	}
+> > +	case KVM_SET_MEMORY_ATTRIBUTES: {
+> > +		struct kvm_memory_attributes attrs;
+> > +
+> > +		r = -EFAULT;
+> > +		if (copy_from_user(&attrs, argp, sizeof(attrs)))
+> > +			goto out;
+> > +
+> > +		r = kvm_vm_ioctl_set_mem_attributes(kvm, &attrs);
+> > +
+> > +		if (!r && copy_to_user(argp, &attrs, sizeof(attrs)))
+> > +			r = -EFAULT;
+> > +		break;
+> > +	}
+> > +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
+> >  	case KVM_CREATE_DEVICE: {
+> >  		struct kvm_create_device cd;
