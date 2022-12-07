@@ -2,59 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D34DA6454C8
-	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 08:43:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 315BE6454DC
+	for <lists+kvm@lfdr.de>; Wed,  7 Dec 2022 08:50:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229836AbiLGHn4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 02:43:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38100 "EHLO
+        id S229731AbiLGHu5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 02:50:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229812AbiLGHny (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 02:43:54 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B0202AE0;
-        Tue,  6 Dec 2022 23:43:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Xo+BLb2JS7fOXM8liyCnCOcGBhHYcrzFV4Ex4WwEERc=; b=v9A1DfRlD5TiNLtWDRXF+Knm/N
-        jSTXdq4l2PUGJm8b3038Beq4PCYlXJ84qv7cm1Gs70opVZoWbbEUXdkpYZq4vFxQdEUKH6C/ef0zL
-        wyIT5yGyhbjQ9d3K3s7FsO47d3JASSkYzySG+8kasnoDlAgXrwcZXW/uzhpfcIg3Sb+E2D0IqIpWY
-        inZR3tQhTziTq77rRgIJ6qZ4Ypl33KxFxxB8S7ihPyAuGmwPXGlRJ10AgJG8XAjJHqUG8QU2LMW0Z
-        O8GJnRHnG24tUkVwEgXV7+KYgt8pUMYFbyM7Pye/Cf32FWogka2qhYxVWM5QeWHIUG1UpvAR28TS3
-        cKcPty7Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p2p5t-00ECz6-CM; Wed, 07 Dec 2022 07:43:53 +0000
-Date:   Tue, 6 Dec 2022 23:43:53 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Brett Creeley <brett.creeley@amd.com>
-Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
-        alex.williamson@redhat.com, cohuck@redhat.com, jgg@nvidia.com,
-        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-        kevin.tian@intel.com, shannon.nelson@amd.com, drivers@pensando.io
-Subject: Re: [RFC PATCH vfio 0/7] pds vfio driver
-Message-ID: <Y5BEOXKKAjVzyBVI@infradead.org>
-References: <20221207010705.35128-1-brett.creeley@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221207010705.35128-1-brett.creeley@amd.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229523AbiLGHuz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 02:50:55 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B47532F3B0
+        for <kvm@vger.kernel.org>; Tue,  6 Dec 2022 23:50:54 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 717FFB815C9
+        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 07:50:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BC25C433C1;
+        Wed,  7 Dec 2022 07:50:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670399452;
+        bh=5jlubpu3hv7gKSSUUnb9ZTzv2xyFMeitpywQVmBs7i4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=TLM9PRyqlGJBPrjPNAQAgMAAoZw8XntKFdQADfLO11A8YLALVYH3JaylM16awxXPD
+         Z1etOtXNuoKykJKkLmkTkc+C1Y5vKQkVWOz2su4/niLXjzWncQqT3kRQR6YCyWLmlu
+         mbjUH7H4To4YIpkiqM8VPcw0q+i6sqDWoVppv0V1QGOfgKZGVQ9DMdAIXm2mcMcWkj
+         K0n9mU58MZK3sNueC/OoJZcICPOzkpo72CStU/hAzJn/Y6d1bniYYNinyvDA0npsr3
+         MbUSHlD1SS4ihIGkq/Ie0levx8XZVpaWPPPDv7Al8ybWUOHIzYjp/F6N7reEdkooVc
+         cdNoQWvcv1JFA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p2pCb-00B1kc-4L;
+        Wed, 07 Dec 2022 07:50:49 +0000
+Date:   Wed, 07 Dec 2022 07:49:08 +0000
+Message-ID: <877cz3u00b.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Mark Brown <broonie@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Ben Gardon <bgardon@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Fuad Tabba <tabba@google.com>, Gavin Shan <gshan@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Peter Collingbourne <pcc@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>,
+        Quentin Perret <qperret@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Ryan Roberts <ryan.roberts@arm.com>,
+        Steven Price <steven.price@arm.com>,
+        Usama Arif <usama.arif@bytedance.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Will Deacon <will@kernel.org>,
+        Zhiyuan Dai <daizhiyuan@phytium.com.cn>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
+In-Reply-To: <28e7f298-972b-2cb8-df80-951076724c73@redhat.com>
+References: <20221205155845.233018-1-maz@kernel.org>
+        <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
+        <Y4+FmDM7E5WYP3zV@google.com>
+        <Y4+H5Vwy/aLvjqbw@sirena.org.uk>
+        <28e7f298-972b-2cb8-df80-951076724c73@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, broonie@kernel.org, seanjc@google.com, andrew.jones@linux.dev, akpm@linux-foundation.org, anshuman.khandual@arm.com, acme@kernel.org, bagasdotme@gmail.com, bgardon@google.com, catalin.marinas@arm.com, cohuck@redhat.com, tabba@google.com, gshan@redhat.com, kuba@kernel.org, james.morse@arm.com, maciej.szmigiero@oracle.com, m.szyprowski@samsung.com, mark.rutland@arm.com, oliver.upton@linux.dev, pcc@google.com, peterx@redhat.com, philmd@linaro.org, qperret@google.com, reijiw@google.com, ricarkol@google.com, ryan.roberts@arm.com, steven.price@arm.com, usama.arif@bytedance.com, vdonnefort@google.com, will@kernel.org, daizhiyuan@phytium.com.cn, suzuki.poulose@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 06, 2022 at 05:06:58PM -0800, Brett Creeley wrote:
-> AMD/Pensando already supports a NVMe VF device (1dd8:1006) in the
-> Distributed Services Card (DSC). This patchset adds the new pds_vfio
-> driver in order to support NVMe VF live migration.
+On Tue, 06 Dec 2022 21:43:43 +0000,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+> On 12/6/22 19:20, Mark Brown wrote:
+> >> I almost suggested doing that on multiple occasions this cycle, but ultimately
+> >> decided not to because it would effectively mean splitting series that touch KVM
+> >> and selftests into different trees, which would create a different kind of
+> >> dependency hell.  Or maybe a hybrid approach where series that only (or mostly?)
+> >> touch selftests go into a dedicated tree?
+> > 
+> > Some other subsystems do have a separate branch for kselftests.  One
+> > fairly common occurrence is that the selftests branch ends up failing to
+> > build independently because someone adds new ABI together with a
+> > selftest but the patches adding the ABI don't end up on the same branch
+> > as the tests which try to use them.  That is of course resolvable but
+> > it's a common friction point.
+> 
+> Yeah, the right solution is simply to merge selftests changes
+> separately from the rest and use topic branches.
 
-If you want NVMe live migration, please work with the nvme technical
-working group to standardize it.  We will not add support for a
-gazillion incompatible and probably broken concepts of this.
+Don't know if this is what you have in mind, but I think that we
+should use topic branches for *everything*. The only things for which
+I don't use a separate branch are the odd drive-by patches, of the
+spelling fix persuasion.
+
+That's what we do for arm64 and the IRQ subsystem. It is a bit more
+involved at queuing time, but makes dropping series from -next
+extremely easy, without affecting the history. And crucially, it gives
+everyone a hint to base their stuff on a stable commit, not a random
+"tip of kvm/queue as of three days ago".
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
