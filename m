@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ABA17647A1A
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 00:36:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AB0A647A1D
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 00:36:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230153AbiLHXgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 18:36:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
+        id S230257AbiLHXgR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 18:36:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230109AbiLHXf7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 18:35:59 -0500
+        with ESMTP id S230158AbiLHXgE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 18:36:04 -0500
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA8FD6BC84;
-        Thu,  8 Dec 2022 15:35:58 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C39796BC9B;
+        Thu,  8 Dec 2022 15:35:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670542558; x=1702078558;
+  t=1670542559; x=1702078559;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=DfwJ+I06Y8UDWays5yaVFXu8YHnX7jZC5476+tFtbmw=;
-  b=g7Cb8Em523Z5iWuwqoIpLBFu2HAjamfgsKtH8Fp6dv1tI65RPYmhMfa+
-   nZM71cHP8lQbovCtWCzqmOMoyo0q4T3Jy/Zdh663urbS9Txg738VZoUgM
-   kTc4ILkif9Hg34JPYo+Uj4bCeUItfIYO9QJJ9yONoy8wKwnQXRbi67acd
-   nowtpcT8v/H70LbiY/uyhzPX0LK0AKDLp5VsQ3WJi1+sHAMmK+pdWPL3q
-   8zGug8u3Eu9vmNNFbVlZFLuzZc8VTlLvD2IQ79ZK6xzkLUFZifYmvkvzX
-   2XQkN1km65GbO8q2vv3tby9gMLl7/mZLBCpIOasmiOscEOiaf5/A+D3g7
+  bh=evLGS0Ysb2C50awEgkYSSa/pcL5o4ysLqfSgQX2aZMQ=;
+  b=kx9t+P60XYxObBRurtVa+M2S82eYBF1lDYGmvDX1kw34VJc5SxQFFDwq
+   CabbFWYM65rYk9PyHndhJN6/3WbmSfqs4bBBjL0ePbI4TTVNZmdFBwOJ1
+   9qT9ug828+SNceb/qLiG8pQmi28AOgChrCVuljvPYj/cwFBfZxFQ6YUP+
+   WRHDut1STje1tU4u9Q3vck1UfqQQAAEkGonto/1TawIdYcwEWodhcBLjS
+   ec1ns3CQlvXZv2Xa4gu5Tp0jFJob8mMVENPiwPwDWdl3C1Efin1gITH22
+   IF+bJCVt0JO20tumDhPe7MmpIukapajDNbW61HoKFWwbvVuyGGnxOUM/q
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="403586532"
+X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="403586544"
 X-IronPort-AV: E=Sophos;i="5.96,228,1665471600"; 
-   d="scan'208";a="403586532"
+   d="scan'208";a="403586544"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 15:35:58 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="677950980"
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 15:35:59 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="677950990"
 X-IronPort-AV: E=Sophos;i="5.96,228,1665471600"; 
-   d="scan'208";a="677950980"
+   d="scan'208";a="677950990"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 15:35:57 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 15:35:58 -0800
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         David Matlack <dmatlack@google.com>
-Subject: [RFC PATCH v2 09/15] KVM: TDX: Pass desired page level in err code for page fault handler
-Date:   Thu,  8 Dec 2022 15:35:44 -0800
-Message-Id: <29cdf1d12999e132f889e830385c4fce4f7c8e82.1670541736.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v2 10/15] KVM: x86/tdp_mmu: Split the large page when zap leaf
+Date:   Thu,  8 Dec 2022 15:35:45 -0800
+Message-Id: <7edb5526907c1d36e78647577cbf562e9155a76a.1670541736.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1670541736.git.isaku.yamahata@intel.com>
 References: <cover.1670541736.git.isaku.yamahata@intel.com>
@@ -62,156 +62,149 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 
-For TDX, EPT violation can happen when TDG.MEM.PAGE.ACCEPT.
-And TDG.MEM.PAGE.ACCEPT contains the desired accept page level of TD guest.
-
-1. KVM can map it with 4KB page while TD guest wants to accept 2MB page.
-
-  TD geust will get TDX_PAGE_SIZE_MISMATCH and it should try to accept
-  4KB size.
-
-2. KVM can map it with 2MB page while TD guest wants to accept 4KB page.
-
-  KVM needs to honor it because
-  a) there is no way to tell guest KVM maps it as 2MB size. And
-  b) guest accepts it in 4KB size since guest knows some other 4KB page
-     in the same 2MB range will be used as shared page.
-
-For case 2, it need to pass desired page level to MMU's
-page_fault_handler. Use bit 29:31 of kvm PF error code for this purpose.
+When TDX enabled, a large page cannot be zapped if it contains mixed
+pages. In this case, it has to split the large page.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/vmx/common.h       |  2 +-
- arch/x86/kvm/vmx/tdx.c          |  7 ++++++-
- arch/x86/kvm/vmx/tdx.h          | 19 -------------------
- arch/x86/kvm/vmx/tdx_arch.h     | 19 +++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c          |  2 +-
- 6 files changed, 29 insertions(+), 22 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          |  9 +++++
+ arch/x86/kvm/mmu/mmu_internal.h |  2 ++
+ arch/x86/kvm/mmu/tdp_mmu.c      | 62 +++++++++++++++++++++++++++++++--
+ 3 files changed, 71 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f9d64775193b..bb790466ebae 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -279,6 +279,8 @@ enum x86_intercept_stage;
- 				 PFERR_WRITE_MASK |		\
- 				 PFERR_PRESENT_MASK)
- 
-+#define PFERR_LEVEL(err_code)	(((err_code) & PFERR_LEVEL_MASK) >> PFERR_LEVEL_START_BIT)
-+
- /* apic attention bits */
- #define KVM_APIC_CHECK_VAPIC	0
- /*
-diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
-index 995cf22f47cf..69464ae0f7e8 100644
---- a/arch/x86/kvm/vmx/common.h
-+++ b/arch/x86/kvm/vmx/common.h
-@@ -99,7 +99,7 @@ static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
- 	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
- 	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
- 
--	if (err_page_level > 0)
-+	if (err_page_level > PG_LEVEL_NONE)
- 		error_code |= (err_page_level << PFERR_LEVEL_START_BIT) & PFERR_LEVEL_MASK;
- 
- 	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index fad7413f7eab..39760ee95f04 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -2312,6 +2312,7 @@ static int tdx_init_mem_region(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
- 	struct kvm_tdx_init_mem_region region;
- 	struct kvm_vcpu *vcpu;
- 	struct page *page;
-+	u64 error_code;
- 	kvm_pfn_t pfn;
- 	int idx, ret = 0;
- 
-@@ -2364,7 +2365,11 @@ static int tdx_init_mem_region(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
- 		kvm_tdx->source_pa = pfn_to_hpa(page_to_pfn(page)) |
- 				     (cmd->flags & KVM_TDX_MEASURE_MEMORY_REGION);
- 
--		pfn = kvm_mmu_map_tdp_page(vcpu, region.gpa, TDX_SEPT_PFERR,
-+		/* TODO: large page support. */
-+		error_code = TDX_SEPT_PFERR;
-+		error_code |= (PG_LEVEL_4K << PFERR_LEVEL_START_BIT) &
-+			PFERR_LEVEL_MASK;
-+		pfn = kvm_mmu_map_tdp_page(vcpu, region.gpa, error_code,
- 					   PG_LEVEL_4K);
- 		if (is_error_noslot_pfn(pfn) || kvm->vm_bugged)
- 			ret = -EFAULT;
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index e09757acc6f9..6eca8bf4d9e1 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -62,25 +62,6 @@ union tdx_exit_reason {
- 	u64 full;
- };
- 
--union tdx_ext_exit_qualification {
--	struct {
--		u64 type		: 4;
--		u64 reserved0		: 28;
--		u64 req_sept_level	: 3;
--		u64 err_sept_level	: 3;
--		u64 err_sept_state	: 8;
--		u64 err_sept_is_leaf	: 1;
--		u64 reserved1		: 17;
--	};
--	u64 full;
--};
--
--enum tdx_ext_exit_qualification_type {
--	EXT_EXIT_QUAL_NONE,
--	EXT_EXIT_QUAL_ACCEPT,
--	NUM_EXT_EXIT_QUAL,
--};
--
- struct vcpu_tdx {
- 	struct kvm_vcpu	vcpu;
- 
-diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
-index 18604734fb14..471a9f61fc81 100644
---- a/arch/x86/kvm/vmx/tdx_arch.h
-+++ b/arch/x86/kvm/vmx/tdx_arch.h
-@@ -163,4 +163,23 @@ struct td_params {
- #define TDX_MIN_TSC_FREQUENCY_KHZ		(100 * 1000)
- #define TDX_MAX_TSC_FREQUENCY_KHZ		(10 * 1000 * 1000)
- 
-+union tdx_ext_exit_qualification {
-+	struct {
-+		u64 type		:  4;
-+		u64 reserved0		: 28;
-+		u64 req_sept_level	:  3;
-+		u64 err_sept_level	:  3;
-+		u64 err_sept_state	:  8;
-+		u64 err_sept_is_leaf	:  1;
-+		u64 reserved1		: 17;
-+	};
-+	u64 full;
-+};
-+
-+enum tdx_ext_exit_qualification_type {
-+	EXT_EXIT_QUAL_NONE = 0,
-+	EXT_EXIT_QUAL_ACCEPT,
-+	NUM_EXT_EXIT_QUAL,
-+};
-+
- #endif /* __KVM_X86_TDX_ARCH_H */
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 30a715c22647..420c4cf9adeb 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5784,7 +5784,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
- 	if (unlikely(allow_smaller_maxphyaddr && kvm_vcpu_is_illegal_gpa(vcpu, gpa)))
- 		return kvm_emulate_instruction(vcpu, 0);
- 
--	return __vmx_handle_ept_violation(vcpu, gpa, exit_qualification, 0);
-+	return __vmx_handle_ept_violation(vcpu, gpa, exit_qualification, PG_LEVEL_NONE);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 02adc3c23627..7f56b1dd76fa 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7318,6 +7318,15 @@ static bool linfo_is_mixed(struct kvm_lpage_info *linfo)
+ 	return linfo->disallow_lpage & KVM_LPAGE_PRIVATE_SHARED_MIXED;
  }
  
- static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
++bool kvm_mem_attr_is_mixed(struct kvm_memory_slot *slot, gfn_t gfn, int level)
++{
++       struct kvm_lpage_info *linfo = lpage_info_slot(gfn & KVM_HPAGE_MASK(level),
++						      slot, level);
++
++       WARN_ON_ONCE(level == PG_LEVEL_4K);
++       return linfo_is_mixed(linfo);
++}
++
+ static void linfo_set_mixed(gfn_t gfn, struct kvm_memory_slot *slot,
+ 			    int level, bool mixed)
+ {
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 641afc4e90cb..2b7c16dfdf5e 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -435,6 +435,8 @@ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+ void track_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+ void untrack_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+ 
++bool kvm_mem_attr_is_mixed(struct kvm_memory_slot *slot, gfn_t gfn, int level);
++
+ #ifndef CONFIG_HAVE_KVM_RESTRICTED_MEM
+ static inline int kvm_restricted_mem_get_pfn(struct kvm_memory_slot *slot,
+ 					gfn_t gfn, kvm_pfn_t *pfn, int *order)
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index cb36089a40da..e9af8c95a3ae 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1102,6 +1102,14 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+ 	return true;
+ }
+ 
++
++static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
++						       struct tdp_iter *iter,
++						       bool shared);
++
++static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
++				   struct kvm_mmu_page *sp, bool shared);
++
+ /*
+  * If can_yield is true, will release the MMU lock and reschedule if the
+  * scheduler needs the CPU or there is contention on the MMU lock. If this
+@@ -1113,6 +1121,7 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+ 			      gfn_t start, gfn_t end, bool can_yield, bool flush,
+ 			      bool zap_private)
+ {
++	struct kvm_mmu_page *split_sp = NULL;
+ 	struct tdp_iter iter;
+ 
+ 	end = min(end, tdp_mmu_max_gfn_exclusive());
+@@ -1144,12 +1153,63 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		    !is_last_spte(iter.old_spte, iter.level))
+ 			continue;
+ 
++		if (kvm_gfn_shared_mask(kvm) && is_large_pte(iter.old_spte)) {
++			gfn_t gfn = iter.gfn & ~kvm_gfn_shared_mask(kvm);
++			gfn_t mask = KVM_PAGES_PER_HPAGE(iter.level) - 1;
++			struct kvm_memory_slot *slot;
++			struct kvm_mmu_page *sp;
++
++			slot = gfn_to_memslot(kvm, gfn);
++			if (kvm_mem_attr_is_mixed(slot, gfn, iter.level) ||
++			    (gfn & mask) < start ||
++			    end < (gfn & mask) + KVM_PAGES_PER_HPAGE(iter.level)) {
++				WARN_ON_ONCE(!can_yield);
++				if (split_sp) {
++					sp = split_sp;
++					split_sp = NULL;
++				} else {
++					WARN_ON(iter.yielded);
++					if (flush) {
++						kvm_flush_remote_tlbs(kvm);
++						flush = false;
++					}
++					sp = tdp_mmu_alloc_sp_for_split(kvm, &iter, false);
++					if (iter.yielded) {
++						split_sp = sp;
++						continue;
++					}
++				}
++				KVM_BUG_ON(!sp, kvm);
++
++				if (tdp_mmu_split_huge_page(kvm, &iter, sp, false)) {
++					kvm_flush_remote_tlbs(kvm);
++					flush = false;
++					/* force retry on this gfn. */
++					iter.yielded = true;
++				} else
++					flush = true;
++				continue;
++			}
++		}
++
+ 		tdp_mmu_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
+ 		flush = true;
+ 	}
+ 
+ 	rcu_read_unlock();
+ 
++	if (split_sp) {
++		WARN_ON(!can_yield);
++		if (flush) {
++			kvm_flush_remote_tlbs(kvm);
++			flush = false;
++		}
++
++		write_unlock(&kvm->mmu_lock);
++		tdp_mmu_free_sp(split_sp);
++		write_lock(&kvm->mmu_lock);
++	}
++
+ 	/*
+ 	 * Because this flow zaps _only_ leaf SPTEs, the caller doesn't need
+ 	 * to provide RCU protection as no 'struct kvm_mmu_page' will be freed.
+@@ -1691,8 +1751,6 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+ 
+ 	KVM_BUG_ON(kvm_mmu_page_role_is_private(role) !=
+ 		   is_private_sptep(iter->sptep), kvm);
+-	/* TODO: Large page isn't supported for private SPTE yet. */
+-	KVM_BUG_ON(kvm_mmu_page_role_is_private(role), kvm);
+ 
+ 	/*
+ 	 * Since we are allocating while under the MMU lock we have to be
 -- 
 2.25.1
 
